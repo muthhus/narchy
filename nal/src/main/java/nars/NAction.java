@@ -1,6 +1,7 @@
 package nars;
 
 import nars.concept.ActionConcept;
+import nars.term.Compound;
 import nars.time.Tense;
 import org.eclipse.collections.api.block.predicate.primitive.FloatPredicate;
 import org.eclipse.collections.api.block.procedure.primitive.BooleanProcedure;
@@ -167,6 +168,11 @@ public interface NAction {
      */
     @NotNull
     default ActionConcept action(@NotNull String s, @NotNull ActionConcept.MotorFunction update) {
+        return action($.$(s), update);
+    }
+
+    @NotNull
+    default ActionConcept action(@NotNull Compound s, @NotNull ActionConcept.MotorFunction update) {
         ActionConcept m = new ActionConcept(s, nar(), update);
         actions().add(m);
         return m;

@@ -25,6 +25,7 @@ public class DynamicBeliefTableTest {
 
         //n.ask("(a:x && a:y)")
     }
+
     @Test
     public void testDynamicConjunction3() {
         NAR n = new Default();
@@ -66,5 +67,26 @@ public class DynamicBeliefTableTest {
 
     }
 
+    @Test
+    public void testDynamicConjunction2Temporal() {
+        NAR n = new Default();
+        n.believe($("a:x"), (long)0, 1f, 0.9f);
+        n.believe($("a:y"), (long)4, 1f, 0.9f);
+        n.run(1);
+        CompoundConcept cc = (CompoundConcept) n.concept($("(a:x && a:y)"), true);
+        cc.print();
+
+//        System.out.println(cc.beliefs().match(n.task("(a:x && a:y)."), 4));
+//        System.out.println(cc.beliefs().match(n.task("(a:x &&+4 a:y)."), 4));
+
+
+        Truth now = cc.belief(n.time());
+        assertEquals($.t(1f,0.39f),now); //evidence decayed due to time
+
+        n.run(1);
+        cc.print();
+
+        //n.ask("(a:x && a:y)")
+    }
 
 }

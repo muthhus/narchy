@@ -65,7 +65,7 @@ public class Abbreviation/*<S extends Term>*/ extends Leak<CompoundConcept> {
     public final MutableFloat abbreviationProbability = new MutableFloat(2f);
 
     /** whether to use a (strong, proxying) alias atom concept */
-    boolean aliasConcept = true;
+    boolean aliasConcept = false;
 
     static final Logger logger = LoggerFactory.getLogger(Abbreviation.class);
 

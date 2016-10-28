@@ -367,6 +367,7 @@ public interface TimeFunctions {
                     //if both provide a possible timing for the result,
                     // choose by random wighted confidence which one
                     Task t = chooseByConf(task, belief, p);
+                    //System.out.println("choose " + task + " " + belief + " ---> " + t);
                     if (t == decomposingTask)
                         occ = relOccDecomposed;
                     else

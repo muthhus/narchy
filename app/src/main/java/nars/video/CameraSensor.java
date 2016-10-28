@@ -3,9 +3,11 @@ package nars.video;
 import nars.$;
 import nars.NAR;
 import nars.NAgent;
+import nars.Param;
 import nars.concept.SensorConcept;
 import nars.term.Compound;
 import nars.term.Term;
+import nars.term.atom.Atomic;
 import nars.truth.Truth;
 import nars.util.data.list.FasterList;
 import nars.util.math.FloatSupplier;
@@ -25,9 +27,9 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
     private static final int radix = 3;
     private final NAR nar;
     private final NAgent agent;
-    float resolution = 0.02f;
+    float resolution = Param.TRUTH_EPSILON;
 
-    public CameraSensor(Term root, P src, NAgent agent, FloatToObjectFunction<Truth> brightnessToTruth) {
+    public CameraSensor(Atomic root, P src, NAgent agent, FloatToObjectFunction<Truth> brightnessToTruth) {
         super(src, src.width(), src.height());
 
         this.nar = agent.nar;
@@ -36,11 +38,11 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
         agent.sensors.addAll(
             encode((x,y)->
 
-                $.inh( $.p(
+                $.func(root,
                     (radix > 1 ?
-                        $.p(coord(x, width), coord(y, height)) :
-                        $.p(x, y)
-                    )), root)
+                        new Term[] { coord(x, width), coord(y, height) } :
+                        new Term[] { $.the(x), $.the(y) }
+                    ))
 
             , brightnessToTruth));
 
@@ -91,6 +93,7 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
 //        return r;
 //    }
 
+    @Override
     public void accept(NAR n) {
 
         src.update(agent.frameRate);

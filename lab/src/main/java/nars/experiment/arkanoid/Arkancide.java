@@ -13,7 +13,7 @@ public class Arkancide extends NAgents {
     final int visH = 24;
 
 
-    float paddleSpeed = 25f;
+    float paddleSpeed = 50f;
 
 
     final Arkanoid noid;

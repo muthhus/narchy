@@ -45,25 +45,27 @@ public class NARSpace<X, Y extends Spatial<X>> extends ListSpace<X, Y> {
 
     public static void main(String[] args) {
 
-        Default n = new Default(512, 3, 2, 3 );
+        Default n = new Default(512, 1, 1, 2);
         //Default2 n = new Default2();
         //n.nal(4);
 
 
         //new ArithmeticInduction(n);
 
-        newConceptWindow(n,  96, 5);
+        newConceptWindow(n,  128, 5);
 
         //n.run(20); //headstart
 
-        n.DEFAULT_BELIEF_PRIORITY = 0.5f;
+        //n.DEFAULT_BELIEF_PRIORITY = 0.5f;
 
 
-        //n.log();
-        //n.input("(a<->b).", "(b<->c).");
-        new DeductiveMeshTest(n, new int[]{4, 4}, 16384);
+        n.log();
+        n.input("(a-->b).", "(b-->c).","(c-->d).", "(d-->e).");
+        //new DeductiveMeshTest(n, new int[]{4, 4}, 16384);
 
         //new DeductiveChainTest(n, 10, 9999991, (x, y) -> $.p($.the(x), $.the(y)));
+
+        //n.linkFeedbackRate.setValue(0.05f);
 
 
         //Param.DEBUG = true;
@@ -81,9 +83,8 @@ public class NARSpace<X, Y extends Spatial<X>> extends ListSpace<X, Y> {
 //                );
 //                //.run(800);
 //
-        n.linkFeedbackRate.setValue(0.05f);
 
-        n.loop(15f);
+        n.loop(1f);
 
     }
 
@@ -179,7 +180,8 @@ public class NARSpace<X, Y extends Spatial<X>> extends ListSpace<X, Y> {
     }
 
     private static boolean display(Concept concept) {
-        return !(concept.term() instanceof Atomic);
+        return true;
+        //return !(concept.term() instanceof Atomic);
     }
 
 //    public static ConceptWidget newLinkWidget(final NAR nar, SpaceGraph<Term> space, final ConceptWidget core, Term SRC, Term TARGET, BLink bt, boolean task) {

@@ -33,7 +33,7 @@ public class Arkanoid extends JFrame implements KeyListener {
 	public static final int COUNT_BLOCKS_X = 7;
 	public static final int COUNT_BLOCKS_Y = 3;
 
-	public static final double FT_STEP = 1.0;
+	public static final double FT_STEP = 2.0;
 
 
 	/* GAME VARIABLES */

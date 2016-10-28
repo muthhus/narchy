@@ -52,8 +52,8 @@ public class Tetris extends NAgents {
             new MultiThreadExecutioner(3, 1024*8);
 
 
-    public static final int tetris_width = 8;
-    public static final int tetris_height = 16;
+    public static final int tetris_width = 6;
+    public static final int tetris_height = 14;
     public static final int TIME_PER_FALL = 3;
     public static final int frameRate = 2;
     static boolean easy;
@@ -407,7 +407,7 @@ public class Tetris extends NAgents {
 //            }
 //        });
 
-        float p = 0.1f;
+        float p = 1f;
         nar.DEFAULT_BELIEF_PRIORITY = 0.75f * p;
         nar.DEFAULT_GOAL_PRIORITY = 1f * p;
         nar.DEFAULT_QUESTION_PRIORITY = 0.5f * p;

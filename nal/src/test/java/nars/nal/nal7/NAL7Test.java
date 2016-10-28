@@ -3,6 +3,7 @@ package nars.nal.nal7;
 import nars.$;
 import nars.NAR;
 import nars.nal.AbstractNALTest;
+import nars.nar.Default;
 import nars.test.TestNAR;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
@@ -527,9 +528,6 @@ public class NAL7Test extends AbstractNALTest {
                 0.1f, 0.37f,
                 0)
         .mustBelieve(cycles,
-                "(a:x <=>+10 b:x)", 0.1f, 0.37f, //notice the subtle discrepency between here
-                0)
-        .mustBelieve(cycles,
                 "(a:x <=>+10 b:x)", 0.27f, 0.41f, // and here, as a result of the comparison truth function's asymmetry
                 0)
         .mustBelieve(cycles,
@@ -804,7 +802,23 @@ public class NAL7Test extends AbstractNALTest {
                 .mustBelieve(cycles,"((x&y)-->a)",1f,0.81f,8)
                 ;
     }
+    @Test public void testPrediction1() {
+        test()
+            //.log()
+                .inputAt( 0, "$0.1$ (x). :|:")
+                .inputAt( 4, "$0.1$ (y). :|:")
+//
+                .inputAt( 10, "$0.1$ (x). :|:")
+                .inputAt( 14, "$0.1$ (y). :|:")
+//
+//                .inputAt(12, "(x). :|:")
+//                .inputAt(16, "(y). :|:")
 
+                .inputAt(20, "(x). :|:")
+
+                .mustBelieve(24,"(y)", 1f, 0.4f, 24)
+        ;
+    }
 //    @Test public void testTruthDecayOverTime0() {
 //        testTruthDecayOverTime(0, 0.81f, 0.005f);
 //    }

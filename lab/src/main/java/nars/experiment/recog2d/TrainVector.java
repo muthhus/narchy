@@ -1,10 +1,14 @@
 package nars.experiment.recog2d;
 
+import nars.$;
 import nars.NAR;
 import nars.NAgent;
+import nars.concept.ActionConcept;
+import nars.concept.Concept;
 import nars.concept.SensorConcept;
 import nars.term.Compound;
 import nars.term.Termed;
+import nars.time.Tense;
 import nars.truth.Truth;
 import org.eclipse.collections.api.block.function.primitive.IntToFloatFunction;
 
@@ -12,13 +16,15 @@ import java.util.LinkedHashMap;
 import java.util.function.IntFunction;
 import java.util.stream.IntStream;
 
+
+
 /**
  * Created by me on 10/15/16.
  */
 public class TrainVector {
 
     public double errorSum() {
-        return out.values().stream().mapToDouble(x -> x.error).map(x -> x==x ? x : 0).sum();
+        return out.values().stream().mapToDouble(x -> x.error).map(x -> x==x ? x : 1f).sum();
     }
 
     static class Neuron {
@@ -57,13 +63,13 @@ public class TrainVector {
             } else if (a != a) {
                 this.error = 1f;
             } else {
-                this.error = Math.abs(a - e) * this.actualConf;
+                this.error = ( Math.abs(a - e) - Math.abs(1f-(a-e))) * (this.actualConf);
             }
         }
     }
 
-    final LinkedHashMap<SensorConcept,Neuron> out;
-    private SensorConcept[] outVector;
+    final LinkedHashMap<Concept,Neuron> out;
+    private Concept[] outVector;
 
     final int states;
 
@@ -77,17 +83,37 @@ public class TrainVector {
         this.nar = a.nar;
         this.states = maxStates;
         this.out = new LinkedHashMap<>(maxStates);
-        this.outVector = IntStream.range(0, maxStates).mapToObj(i ->
-                        a.sense(namer.apply(i), () -> {
-                            if (train) {
-                                return out.get(outVector[i]).expected;// ? 1f : 0.5f - (1f / states);
-                            } else {
-                                return Float.NaN; //no prediction
-                            }
-                        })
-                            ///.timing(0, 1) //synchronous feed
+        this.outVector = IntStream.range(0, maxStates).mapToObj((int i) -> {
+                    Compound tt = namer.apply(i);
+                    return a.action(tt, (b, d) -> {
+                        if (train) {
+                            float ee = out.get(outVector[i]).expected;
 
-        ).peek(c -> out.put(c, new Neuron())).toArray(SensorConcept[]::new);
+                            float thresh = 0.1f;
+                            if (d==null || Math.abs(ee-d.freq())>thresh) {
+                                a.nar.goal(tt, Tense.Present, ee, a.gamma);
+                                return null;
+                            }
+
+                            //return $.t(ee, a.alpha() );
+                            //return null;
+                        }
+
+                        return d;
+                    });
+                }
+//                        a.sense(namer.apply(i), () -> {
+//                            if (train) {
+//                                return out.get(outVector[i]).expected;// ? 1f : 0.5f - (1f / states);
+//                            } else {
+//                                return Float.NaN; //no prediction
+//                            }
+//                        }, 0.01f, (v) -> $.t(v, a.alpha/2f))
+//                            .pri(0.9f)
+//                            //.timing(0, 1) //synchronous feed
+
+        ).peek(c -> out.put(c, new Neuron()))
+                .toArray(Concept[]::new);
 
 
 
@@ -126,6 +152,7 @@ public class TrainVector {
     public void expect(int onlyStateToBeOn) {
         float offValue =
                 //0.5f - (1f/states)*0.5f;
+                //1f/states * 0.5f;
                 0f;
 
         expect(ii -> ii == onlyStateToBeOn ? 1f : offValue);

@@ -35,13 +35,21 @@ public interface NSense {
 
     @NotNull
     default SensorConcept sense(@NotNull String term, FloatSupplier value) {
-        return sense(term, value, nar().truthResolution.floatValue(), (v) -> $.t(v, alpha()));
+        return sense($.$(term), value);
     }
     @NotNull
     default SensorConcept sense(@NotNull Compound term, FloatSupplier value) {
-        return sense(term, value, nar().truthResolution.floatValue(), (v) -> $.t(v, alpha()));
+        return sense(term, value, (v)->$.t(v, alpha()));
     }
 
+    @NotNull
+    default SensorConcept sense(@NotNull String term, FloatSupplier value, FloatToObjectFunction<Truth> truthFunc) {
+        return sense($.$(term), value, truthFunc);
+    }
+    @NotNull
+    default SensorConcept sense(@NotNull Compound term, FloatSupplier value, FloatToObjectFunction<Truth> truthFunc) {
+        return sense(term, value, nar().truthResolution.floatValue(), truthFunc);
+    }
     @NotNull
     default SensorConcept sense(@NotNull String term, FloatSupplier value, float resolution, FloatToObjectFunction<Truth> truthFunc) {
         return sense($.$(term), value, resolution, truthFunc);

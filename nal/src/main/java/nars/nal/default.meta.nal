@@ -267,9 +267,11 @@
         S, P, time(eternal), task(negative), task("."), neqCom(P,S), notEqui(S), notImplEqui(P) |- varIntro((P ==> (--,%S))), (Belief:AbductionN)
     S, P, time(eternal), task(positive), task("."), neqCom(P,S), notImplEqui(S), notImplEqui(P) |- varIntro((S <=> P)), (Belief:Comparison)
         S, P, time(eternal), task(negative), task("."), neqCom(P,S), notImplEqui(S), notImplEqui(P) |- varIntro((--,(S <=> P))), (Belief:ComparisonN)
-    S, P, time(eternal), task(positive), task("."), neqCom(P,S) |- varIntro((S && P)), (Belief:Intersection)
-        S, P, time(eternal), task(negative), task("."), neqCom(P,S) |- varIntro(((--,%S) && P)), (Belief:IntersectionN)
-    %S, %P, time(eternal), task("."), neqCom(%P,%S) |- (%S || %P), (Belief:Union)
+    S, P, time(eternal), task("."), neqCom(P,S) |- varIntro((S && P)), (Belief:Intersection)
+        //S, P, time(eternal), task(negative), task("."), neqCom(P,S) |- varIntro(((--,%S) && P)), (Belief:IntersectionN)
+    //S || P:
+    %S, %P, time(eternal), task("."), neqCom(%P,%S) |- (--,varIntro(((--,%S) && (--,%P)))), (Belief:Union)
+
 
 ////Temporal induction: ////////////////////////////////////////////////////////////////////////////////////
 //When P and then S happened according to an observation, by induction (weak) it may be that alyways after P, usually S happens.
@@ -284,9 +286,10 @@
     A, B, task(positive), task("."), time(dtAfter), neqCom(A,B), notImplEqui(A), notImplEqui(B) |- varIntro((A <=>+- B)), (Belief:Comparison)
         A, B, task(negative), task("."), time(dtAfter), neqCom(A,B), notImplEqui(A), notImplEqui(B) |- varIntro((--,(A <=>+- B))), (Belief:ComparisonN)
 
-    A, B, task(positive), task("."), time(dtAfter), neqCom(A,B) |- varIntro((A &&+- B)), (Belief:Intersection)
-        A, B, task(negative), task("."), time(dtAfter), neqCom(A,B) |- varIntro(((--,%A) &&+- B)), (Belief:IntersectionN)
+    A, B, task("."), time(dtAfter), neqCom(A,B) |- varIntro((A &&+- B)), (Belief:Intersection)
+        //A, B, task(negative), task("."), time(dtAfter), neqCom(A,B) |- varIntro(((--,%A) &&+- B)), (Belief:IntersectionN)
 
+    //S || P:
     %S, %P, time(dtAfter), task("."), neqCom(%P,%S) |- (--,varIntro(((--,%S) &&+- (--,%P)))), (Belief:Union)
 
                 //A, B, task(negative), task("."), time(dtAfter), neqRec(A,B) notImplEqui(A), notImplEqui(B) |- ((--,%A) &&+- B), (Belief:IntersectionN)
@@ -307,7 +310,7 @@
          //(&&,X,A), B, time(decomposeTaskSubset) |- subIfUnifiesDep(X,A,B), (Belief:AnonymousAnalogy, Goal:Strong)
 
 //disjunction
-   // (&&,(--,%B),(--,%A)), B, task("?") |- (||,%B,%A), (Belief:BeliefStructuralDeduction, Punctuation:Belief)
+    (&&,(--,%B),(--,%A)), B, task("?") |- (||,%B,%A), (Belief:BeliefStructuralDeduction, Punctuation:Belief)
 
 //substitutionViaSimilarity
      X, (B<->C), neqCom(X,C), neq(X,B) |- substitute(X,B,C,strict), (Belief:Intersection, Goal:Intersection)

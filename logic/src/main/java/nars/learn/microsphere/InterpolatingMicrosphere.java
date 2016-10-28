@@ -50,6 +50,10 @@ public class InterpolatingMicrosphere {
      * Number of surface elements.
      */
     private final int size;
+
+    /** effective (minimum) radius of one point, an interval within which distance is zero (co-tangent) */
+    private float pointRadius = 0.5f;
+
 //    /** Maximum fraction of the facets that can be dark. */
 //    private float maxDarkFraction;
 //    /** Lowest non-zero illumination. */
@@ -330,8 +334,7 @@ public class InterpolatingMicrosphere {
         for (int i = 0; i < numSamples; i++) {
             // Vector between interpolation point and current sample point.
             final float[] diff = ebeSubtract(samplePoints[i], targetPoint);
-            final float distance = safeNorm(epsilon, diff);
-
+            final float distance = Math.max(0, safeNorm(epsilon, diff) - pointRadius);
 
             @Nullable float[] sampleDirection = distance!=0 ? diff : null;
             float evidence = (sampleEvidences == null) ? 1f : sampleEvidences[i];

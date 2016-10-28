@@ -10,7 +10,9 @@ import nars.concept.SensorConcept;
 import nars.gui.BeliefTableChart;
 import nars.remote.NAgents;
 import nars.task.MutableTask;
+import nars.term.Compound;
 import nars.truth.Truth;
+import nars.video.Scale;
 import spacegraph.SpaceGraph;
 import spacegraph.Surface;
 import spacegraph.obj.GridSurface;
@@ -19,6 +21,7 @@ import spacegraph.render.Draw;
 
 import java.awt.*;
 import java.awt.font.LineMetrics;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.util.LinkedHashMap;
 
@@ -42,11 +45,11 @@ public class Recog2D extends NAgents {
 
     int image = 0;
     final int maxImages = 4;
-    int imagePeriod = 100;
-    int TRAINING_PERIOD = imagePeriod * 8;
+    int imagePeriod = 16;
+    int TRAINING_PERIOD = imagePeriod * 16;
 
-    float theta;
-    float dTheta = 0.25f;
+//    float theta;
+//    float dTheta = 0.25f;
 
     static {
         Param.DEBUG = false;
@@ -55,34 +58,39 @@ public class Recog2D extends NAgents {
     public Recog2D(NAR n) {
         super(n, 1);
 
-        w = 24;
-        h = 24;
+        w = 10;
+        h = 12;
         canvas = new BufferedImage(w, h, BufferedImage.TYPE_INT_BGR);
         g = ((Graphics2D) canvas.getGraphics());
 
+        g.setColor(Color.WHITE);
         g.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 16));
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
         //n.beliefConfidence(0.2f);
 
-        imgTrainer = new TrainVector(ii -> $.p($.the("i"), $.the(ii)), maxImages, this);
-        imgTrainer.out.keySet().forEach(x ->
-                        predictors.addAll(
-                                new MutableTask($.seq(x.term(), 1, happy.term()), '?', null).time(now, now),
-                                new MutableTask($.impl($.inh($.varQuery("wat"), $.the("cam")), 0, happy.term()), '?', null) {
-                                    @Override
-                                    public boolean onAnswered(Task answer) {
-                                        System.err.println(this + "\n\t" + answer);
-                                        return false;
-                                    }
-                                }.time(now, now)
-                        )
+        imgTrainer = new TrainVector(ii -> $.func("x", $.the("s" + ii)), maxImages, this);
+//        imgTrainer.out.keySet().forEach(x ->
+//                        predictors.addAll(
+//                                new MutableTask($.seq(x.term(), 1, happy.term()), '?', null).time(now, now),
+//                                new MutableTask($.impl($.inh($.varQuery("wat"), $.the("cam")), 0, happy.term()), '?', null) {
+//                                    @Override
+//                                    public boolean onAnswered(Task answer) {
+//                                        System.err.println(this + "\n\t" + answer);
+//                                        return false;
+//                                    }
+//                                }.time(now, now)
+//                        )
 //                predictors.add(new MutableTask(x, Symbols.QUESTION, null).present(nar.time()))
-        );
 
-        addCamera("cam", () -> canvas, w, h, v -> $.t(v, alpha));
-        //addCamera("x", new Scale(() -> canvas, w, h), v -> $.t(v, alpha));
 
+        //retina
+        //addCamera("x", () -> canvas, w, h, v -> $.t(v, alpha));
+
+        //still
+        addCamera("x", new Scale(() -> canvas, w, h), v -> $.t(v, alpha));
+
+        //nar.log();
 
         new Thread(() -> {
             SpaceGraph.window(conceptTraining(imgTrainer, nar), 800, 600);
@@ -92,15 +100,18 @@ public class Recog2D extends NAgents {
 
     public Surface conceptTraining(TrainVector tv, NAR nar) {
 
-        LinkedHashMap<SensorConcept, TrainVector.Neuron> out = tv.out;
+        LinkedHashMap<Concept, TrainVector.Neuron> out = tv.out;
 
         Plot2D p, s;
+
+        int history = 1024;
+
         GridSurface g = col(
 
                 row(BeliefTableChart.beliefTableCharts(nar, out.keySet(), 1024)),
 
-                row(p = new Plot2D(8192, Plot2D.Line).add("Error", () -> tv.errorSum())),
-                row(s = new Plot2D(8192, Plot2D.BarWave).add("Rward", () -> rewardValue)),
+                row(p = new Plot2D(history, Plot2D.Line).add("Error", () -> tv.errorSum())),
+                row(s = new Plot2D(history, Plot2D.BarWave).add("Rward", () -> rewardValue)),
 
                 row(out.entrySet().stream().map(ccnn -> new Surface() {
                     @Override
@@ -120,44 +131,43 @@ public class Recog2D extends NAgents {
                         } else {
                             conf = nar.confMin.floatValue();
                             float defaultFreq =
-                                    0f; //interpret no-belief as false
+                                    0.5f; //interpret no-belief as maybe
                             //Float.NaN  //use NaN to force learning of negation as separate from no-belief
                             freq = defaultFreq;
                         }
 
 
                         Draw.colorPolarized(gl,
-                                freq //unipolar (1 color)
+                                2f * (freq - 0.5f) * conf  //unipolar (1 color)
                                 //2f * (-0.5f + freq) //bipolar (2 colors)
                         );
 
                         float m = 0.5f * conf;
 
+                        Draw.rect(gl, 0, 0, 1f, 1f);
 
                         if (tv.verify) {
                             float error = nn.error;
                             if (error != error) {
 
                                 //training phase
-
+                                //Draw.rect(gl, m / 2, m / 2, 1 - m, 1 - m);
                             } else {
 
                                 //verification
 
                                 //draw backgroudn/border
-                                Draw.colorPolarized(gl, -error);
-                                Draw.rect(gl, 0, 0, 1f, 1f);
+                                //gl.glColor3f(error, 1f - error, 0f);
 
-                                gl.glColor3f(error, 1f - error, 0f);
                                 float fontSize = 0.08f;
+                                gl.glColor3f(1f,1f,1f);
                                 Draw.text(gl, c.term().toString(), fontSize, m / 2, 1f - m / 2, 0);
                                 Draw.text(gl, "err=" + n2(error), fontSize, m / 2, m / 2, 0);
                             }
                         }
 
 
-                        //draw center icon
-                        Draw.rect(gl, m / 2, m / 2, 1 - m, 1 - m);
+
 
 
                     }
@@ -179,7 +189,7 @@ public class Recog2D extends NAgents {
         float r;
 
         if (imgTrainer.verify) {
-            r = 0.5f - (float) imgTrainer.errorSum() / imgTrainer.states;
+            r = 1f - (float) imgTrainer.errorSum();// / imgTrainer.states;
         } else {
             //r = 1f; //general positive reinforcement during training
             r = Float.NaN;
@@ -221,15 +231,17 @@ public class Recog2D extends NAgents {
         FontMetrics fontMetrics = g.getFontMetrics();
 
         String s = String.valueOf((char) ('0' + image));
-        LineMetrics lineMetrics = fontMetrics.getLineMetrics(s, g);
+        //LineMetrics lineMetrics = fontMetrics.getLineMetrics(s, g);
+        Rectangle2D sb = fontMetrics.getStringBounds(s, g);
+
         //System.out.println(s + " : " + lineMetrics.getHeight() + " pixel height");
 
         //g.rotate(nar.random.nextFloat() * dTheta, w/2, h/2);
 
-        g.drawString(s, w / 4, lineMetrics.getHeight());
+        g.drawString(s, Math.round(w/2f - sb.getCenterX()), Math.round(h/2f - sb.getCenterY()));
     }
 
     public static void main(String[] arg) {
-        NAgents.runRT(Recog2D::new);
+        NAgents.run(Recog2D::new, 5500);
     }
 }

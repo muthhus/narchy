@@ -91,16 +91,13 @@ public class PixelAutoClassifier extends Autoencoder implements Consumer<NAR> {
 
         this.conceptOut = new SensorConcept[nw][nh][states];
 
-        float res = 0.02f;
-
-        Term r = $.$(root);
         for (int i = 0; i< nw; i++) {
             for (int j = 0; j < nh; j++) {
                 Term coord= $.p(coord(i, nw), coord(j, nh));
                 for (int k = 0; k < states; k++) {
-                    Compound term = $.inh($.p(coord, $.the(k)), r);
+                    Compound term = $.func(root, coord, $.the(k));
                     int ii = i;  int jj = j; int kk = k;
-                    agent.sense(term, () -> pixEnable[ii][jj][kk] ? 1f : Float.NaN, res, (v) -> $.t(v, pixConf[ii][jj]));
+                    agent.sense(term, () -> pixEnable[ii][jj][kk] ? 1f : Float.NaN, (v) -> $.t(v, pixConf[ii][jj]));
                 }
             }
         }

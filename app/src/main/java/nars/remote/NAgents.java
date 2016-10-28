@@ -16,6 +16,8 @@ import nars.nar.util.DefaultConceptBuilder;
 import nars.op.mental.Abbreviation;
 import nars.op.mental.Inperience;
 import nars.op.time.MySTMClustered;
+import nars.time.Clock;
+import nars.time.FrameClock;
 import nars.time.RealtimeMSClock;
 import nars.truth.Truth;
 import nars.util.data.random.XorShift128PlusRandom;
@@ -49,23 +51,10 @@ abstract public class NAgents extends NAgent {
 
     }
 
-    public static void runRT(Function<NAR, NAgents> init) {
-
-
+    public static void run(Function<NAR, NAgents> init, int frames) {
+        Default nar = newMultiThreadNAR(3, new FrameClock(), true);
         //Default nar = newNAR();
-        Default nar = newNAR1async(3);
         //Default2 nar = newNAR2();
-
-
-
-        MySTMClustered stm = new MySTMClustered(nar, 64, '.', 3, true, 8);
-        MySTMClustered stmGoal = new MySTMClustered(nar, 32, '!', 2, true, 4);
-
-        Abbreviation abbr = new Abbreviation(nar, "the",
-                4, 16,
-                0.5f, 32);
-
-        new Inperience(nar);
 
         NAgents a = init.apply(nar);
         a.trace = true;
@@ -73,9 +62,7 @@ abstract public class NAgents extends NAgent {
 
         chart(a);
 
-
-        //a.run(frames);
-        a.runRT(40f).join();
+        a.run(frames);
 
         NAR.printTasks(nar, true);
         NAR.printTasks(nar, false);
@@ -86,13 +73,28 @@ abstract public class NAgents extends NAgent {
         });
 
         nar.printConceptStatistics();
-
         //((TreeTaskIndex)nar.tasks).tasks.prettyPrint(System.out);
+
+    }
+    public static void runRT(Function<NAR, NAgents> init) {
+
+
+        Default nar = NAgents.newMultiThreadNAR(3, new RealtimeMSClock(true), false);
+        //Default nar = newNAR();
+        //Default2 nar = newNAR2();
+
+        NAgents a = init.apply(nar);
+        a.trace = true;
+        chart(a);
+
+        //a.run(frames);
+        a.runRT(30f).join();
+
     }
 
-    private static Default newNAR1async(int cores) {
-        Default d = newMultiThreadNAR(cores);
-        ((MultiThreadExecutioner)d.exe).sync(false);
+    private static Default newMultiThreadNAR(int cores, Clock clock, boolean sync) {
+        Default d = newMultiThreadNAR(cores, clock);
+        ((MultiThreadExecutioner)d.exe).sync(sync);
         return d;
     }
 
@@ -128,25 +130,25 @@ abstract public class NAgents extends NAgent {
 
 
 
-    public static Default newMultiThreadNAR(int threads) {
+    public static Default newMultiThreadNAR(int threads, Clock clock) {
         Random rng = new XorShift128PlusRandom(1);
         final Executioner exe =
                 //new SingleThreadExecutioner();
                 new MultiThreadExecutioner(threads, 8192 /* TODO chose a power of 2 number to scale proportionally to # of threads */);
 
-        int volMax = 48;
-        int conceptsPerCycle = 96;
+        int volMax = 40;
+        int conceptsPerCycle = 128;
 
 
         //Multi nar = new Multi(3,512,
-        Default nar = new Default(2048,
-                conceptsPerCycle, 2, 3, rng,
+        Default nar = new Default(1024,
+                conceptsPerCycle, 1, 3, rng,
                 //new CaffeineIndex(new DefaultConceptBuilder(rng), 1024*1024, volMax/2, false, exe)
                 new TreeTermIndex.L1TreeIndex(new DefaultConceptBuilder(), 4* 1024 * 128, 16*1024, 4)
 
                 ,
                 //new FrameClock()
-                new RealtimeMSClock(true),
+                clock,
                 exe) {
 
             @Override
@@ -155,20 +157,28 @@ abstract public class NAgents extends NAgent {
             }
         };
 
-
         nar.beliefConfidence(0.9f);
-        nar.goalConfidence(0.8f);
+        nar.goalConfidence(0.75f);
 
-        float p = 0.15f;
+        float p = 0.25f;
         nar.DEFAULT_BELIEF_PRIORITY = 0.9f * p;
         nar.DEFAULT_GOAL_PRIORITY = 1f * p;
-        nar.DEFAULT_QUESTION_PRIORITY = 0.7f * p;
-        nar.DEFAULT_QUEST_PRIORITY = 0.8f * p;
+        nar.DEFAULT_QUESTION_PRIORITY = 0.6f * p;
+        nar.DEFAULT_QUEST_PRIORITY = 0.7f * p;
 
-        nar.confMin.setValue(0.04f);
+        nar.confMin.setValue(0.01f);
         nar.compoundVolumeMax.setValue(volMax);
 
-        nar.linkFeedbackRate.setValue(0.05f);
+        MySTMClustered stm = new MySTMClustered(nar, 96, '.', 3, true, 16);
+        MySTMClustered stmGoal = new MySTMClustered(nar, 32, '!', 2, true, 8);
+
+        Abbreviation abbr = new Abbreviation(nar, "the",
+                4, 16,
+                0.05f, 32);
+
+        new Inperience(nar);
+
+        //nar.linkFeedbackRate.setValue(0.01f);
         return nar;
     }
 
