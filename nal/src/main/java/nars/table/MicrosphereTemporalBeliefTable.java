@@ -401,7 +401,7 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
         Task topEternal = eternal.strongest();
         boolean includeEternal = topEternal != null;
 
-        Task[] tr = list.toArray((i) -> new Task[i], includeEternal ? 1 : 0);
+        Task[] tr = list.toArray(Task[]::new, includeEternal ? 1 : 0);
         int s = tr.length;
         if (includeEternal)
             tr[s -1] = topEternal;
@@ -415,10 +415,23 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
                 Task the = tr[0];
                 Truth res = the.truth();
                 long o = the.occurrence();
-                if ((now == ETERNAL || when == now) && o == when) //optimization: if at the current time and when
-                    return res;
-                else
-                    return Revision.project(res, when, now, o, false);
+                if (now == ETERNAL)// || when == now) && o == when) //optimization: if at the current time and when
+                    return res.eternalize();
+                else {
+                    long delta = Math.abs(o - when);
+                    if (delta == 0)
+                        return res; //as-is
+                    else {
+                        float decay = InterpolatingMicrosphere.lightCurve(1).get(delta, 1f);
+                        return res.confWeightMult(
+                                decay
+                        );
+                    }
+
+                    //return Revision.project(res, when, now, o, false);
+                    //adjust evidence by the lightcurve
+
+                }
 
             default:
                 InterpolatingMicrosphere.LightCurve x = InterpolatingMicrosphere.lightCurve(duration());

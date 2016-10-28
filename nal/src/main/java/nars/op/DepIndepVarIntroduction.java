@@ -124,11 +124,11 @@ public class DepIndepVarIntroduction extends VarIntroduction {
 
     }
 
-    private boolean validDepVarSuperterm(Op o) {
+    private static boolean validDepVarSuperterm(Op o) {
         return /*o.statement ||*/ o == CONJ;
     }
 
-    boolean validIndepVarSuperterm(Op o) {
+    static boolean validIndepVarSuperterm(Op o) {
         return o == IMPL || o == EQUI;
     }
 

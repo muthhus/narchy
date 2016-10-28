@@ -123,7 +123,7 @@ abstract public class substituteIfUnifies extends TermTransformOperator  {
             if (Terms.equalAtemporally(px, py)) {
                 equals = true;
                 if (xn ^ yn) {
-                    if (yn && !xn) { //x isnt negated and y is, so
+                    if (yn/* && !xn*/) { //x isnt negated and y is, so
                         y = py;
                     } else { //if (xn && !yn) { //x is negated and y isn't, so
                         y = $.neg(y);
@@ -132,7 +132,7 @@ abstract public class substituteIfUnifies extends TermTransformOperator  {
                     term = $.neg(term);
 
                     //now x and y have matching polarities
-                } else if (xn && yn) {
+                } else if (xn/* && yn*/) {
                     //both negated
                 } else {
                     //shouldnt hapen?

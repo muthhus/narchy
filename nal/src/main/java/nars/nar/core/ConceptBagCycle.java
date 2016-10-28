@@ -68,7 +68,7 @@ public class ConceptBagCycle implements Consumer<NAR> {
 
 
 
-    @Nullable
+    @NotNull
     private final ConceptBuilder conceptBuilder;
 
     //cached value for use in the next firing

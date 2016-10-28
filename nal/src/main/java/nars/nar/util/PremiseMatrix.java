@@ -105,12 +105,12 @@ public class PremiseMatrix {
 
                 } else {
                     if (Param.DEBUG_EXTRA)
-                        logger.warn(c + " has zero termlinks");
+                        logger.warn("{} has zero termlinks", c);
                 }
 
             } else {
                 if (Param.DEBUG_EXTRA)
-                    logger.warn(c + " has zero tasklinks");
+                    logger.warn("{} has zero tasklinks", c);
             }
 
 

@@ -52,7 +52,7 @@ public abstract class Unify extends Termunator implements Subst {
     @NotNull
     public final Versioning versioning;
 
-    @Nullable
+    @NotNull
     public final TermIndex index;
 
 

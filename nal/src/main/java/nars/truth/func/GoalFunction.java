@@ -140,7 +140,7 @@ public enum GoalFunction implements TruthOperator {
 
     ;
 
-    @Nullable
+    @NotNull
     private static Truth defaultTruth(@NotNull NAR m) {
         return m.truthDefault(Symbols.GOAL /* goal? */);
     }

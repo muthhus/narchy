@@ -25,7 +25,6 @@ import java.util.List;
 import static nars.nal.UtilityFunctions.aveAri;
 import static nars.nal.UtilityFunctions.or;
 import static nars.time.Tense.ETERNAL;
-import static nars.util.SloppyMath.max;
 
 /**
  * Defines the conditions used in an instance of a derivation

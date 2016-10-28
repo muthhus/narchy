@@ -120,9 +120,14 @@ abstract public class DerivedTask extends MutableTask {
 
         private void feedbackToPremiseConcepts(@NotNull NAR nar) {
             Concept thisConcept = concept(nar);
-            feedbackToPremiseConcepts(thisConcept, nar, getParentTask());
-            feedbackToPremiseConcepts(thisConcept, nar, getParentBelief());
-            feedbackToPremiseConcepts(thisConcept, nar, premise.concept);
+            if (thisConcept!=null) {
+                Premise p;
+                if ((p = premise) != null)
+                    feedbackToPremiseConcepts(thisConcept, nar, p.concept);
+
+                feedbackToPremiseConcepts(thisConcept, nar, getParentTask());
+                feedbackToPremiseConcepts(thisConcept, nar, getParentBelief());
+            }
         }
 
         private void feedbackToPremiseConcepts(@NotNull Concept thisConcept, @NotNull NAR nar, @Nullable Termed p) {

@@ -46,9 +46,9 @@ public interface TimeFunctions {
                 return t <= b ? t : b;
             else
                 return t >= b ? t : b;
-        } else if (!bEternal && tEternal) {
+        } else if (!bEternal/* && tEternal*/) {
             return b;
-        } else if (!tEternal && bEternal) {
+        } else if (!tEternal/* && bEternal*/) {
             return t;
         }
         return ETERNAL;
@@ -673,7 +673,10 @@ public interface TimeFunctions {
 //
 //            ;
 //        }
-        occReturn[0] = chooseByConf(p.task, p.belief, p).occurrence();
+        occReturn[0] =
+                //chooseByConf(p.task, p.belief, p).occurrence();
+                occInterpolate(p.task, p.belief);
+
         return derived;
     };
 

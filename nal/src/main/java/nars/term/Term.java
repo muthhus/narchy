@@ -400,7 +400,7 @@ public interface Term extends Termed, Termlike, Comparable<Termlike> {
 
 
     /** unwraps any negation superterm */
-    @Override default Term unneg() {
+    @NotNull @Override default Term unneg() {
         return this;
     }
 

@@ -32,6 +32,11 @@ public final class Forget implements Consumer<BLink> {
 
         float r = -((size * expectedAvgMass) - pressure - existingMass) / existingMass;
 
+        //float pressurePlusOversize = pressure + Math.max(0, expectedAvgMass * size - existingMass);
+        //float r = (pressurePlusOversize) / (pressurePlusOversize + existingMass*4f /* momentum*/);
+
+        //System.out.println(pressure + " " + existingMass + "\t" + r);
+
         Forget f;
         if (r >= Param.BUDGET_EPSILON)
             f = new Forget(Util.unitize(r));

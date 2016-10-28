@@ -77,10 +77,10 @@ public class TermVector implements TermContainer {
      public TermVector(@NotNull Term... terms) {
         this.terms = terms;
 
-         if (Param.DEBUG) {
-             for (Term x : terms)
-                 if (x == null) throw new NullPointerException();
-         }
+//         if (Param.DEBUG) {
+//             for (Term x : terms)
+//                 if (x == null) throw new NullPointerException();
+//         }
          if (terms.length > Param.MAX_SUBTERMS)
              throw new UnsupportedOperationException("too many subterms (" + terms.length + " > " + Param.MAX_SUBTERMS);
 

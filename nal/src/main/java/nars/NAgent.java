@@ -67,7 +67,7 @@ abstract public class NAgent implements NSense, NAction {
 
     public float alpha, gamma, epsilonProbability = 0.04f;
     @Deprecated
-    public float gammaEpsilonFactor = 0.75f;
+    public float gammaEpsilonFactor = 0.5f;
 
     final int curiosityMonitorDuration = 32; //frames
     final DescriptiveStatistics avgActionDesire = new DescriptiveStatistics(curiosityMonitorDuration);
@@ -76,7 +76,7 @@ abstract public class NAgent implements NSense, NAction {
 
     public float rewardValue;
 
-    float predictorProbability = 0.5f;
+    float predictorProbability = 1f;
 
     protected final FasterList<MutableTask> predictors = $.newArrayList();
     private float predictorPriFactor = 1f;

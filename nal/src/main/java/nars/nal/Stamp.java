@@ -288,7 +288,7 @@ public interface Stamp {
         if (Param.DEBUG) {
 //            if (a == null || b == null)
 //                throw new RuntimeException("null evidence");
-            if (a == null || b == null || a.length == 0 || b.length == 0) {
+            if (a.length == 0 || b.length == 0) {
                 throw new RuntimeException("missing evidence");
             }
         }
@@ -299,13 +299,10 @@ public interface Stamp {
             if (x == Long.MAX_VALUE)
                 continue; //ignore the cyclic flag
             for (long y : b) {
-                if (x == Long.MAX_VALUE)
-                    continue; //ignore the cyclic flag
                 if (x == y) {
                     return true; //commonality detected
-                } else if (y > x)  {
-                    //any values after y in b will not be equal to x
-                    break;
+                } else if (y > x) {
+                    break; //any values after y in b will not be equal to x
                 }
             }
         }

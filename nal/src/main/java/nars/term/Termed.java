@@ -31,7 +31,7 @@ public interface Termed<T extends Term>  {
 
     default int structure() { return term().structure(); }
 
-    default Term unneg() {
+    @NotNull default Term unneg() {
         return term().unneg();
     }
 

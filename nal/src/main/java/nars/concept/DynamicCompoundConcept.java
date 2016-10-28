@@ -9,7 +9,6 @@ import nars.budget.merge.BudgetMerge;
 import nars.nal.Stamp;
 import nars.table.BeliefTable;
 import nars.table.DefaultBeliefTable;
-import nars.task.Revision;
 import nars.task.RevisionTask;
 import nars.term.Compound;
 import nars.term.Term;
@@ -44,7 +43,7 @@ public class DynamicCompoundConcept extends CompoundConcept {
         this.goals = newGoalTable(0,0);
     }
 
-    public static final class DynTruth extends RawBudget {
+    public static final class DynTruth {
         //@NotNull private final List<Truth> t;
         @Nullable final List<Task> e;
         private final float confMin;
@@ -52,13 +51,23 @@ public class DynamicCompoundConcept extends CompoundConcept {
         @Deprecated float freq, conf; //running product
 
         public DynTruth(Op o, float confMin, List<Task> e) {
-            super(0,0,0);
             if (o!=CONJ)
                 throw new UnsupportedOperationException("aggregate truth for " + o + " not implemented or not applicable");
             this.confMin = confMin;
             //this.t = t;
             this.e = e;
             freq = conf = 1f;
+        }
+
+        @NotNull public Budget budget() {
+            RawBudget b = new RawBudget();
+            int s = e.size();
+            assert(s > 0);
+            float f = 1f / s;
+            for (Task x : e) {
+                BudgetMerge.plusBlend.apply(b, x.budget(), f);
+            }
+            return b;
         }
 
         @Nullable public long[] evidence() {
@@ -115,7 +124,8 @@ public class DynamicCompoundConcept extends CompoundConcept {
         }
 
         @Nullable private DynamicCompoundConcept.DynTruth truth(long when, @NotNull Compound template, boolean evidence) {
-            return truth(when, when, nar.concept(template), template.op() == NEG, evidence);
+            return truth(when, when, DynamicCompoundConcept.this /*nar.concept(template)*/,
+                    template.op() == NEG, evidence);
         }
 
         @Nullable private DynamicCompoundConcept.DynTruth truth(long when, long now, @Nullable Concept templateConcept, boolean negated, boolean evidence) {
@@ -227,12 +237,8 @@ public class DynamicCompoundConcept extends CompoundConcept {
                 return false;
 
             if (d.e!=null) {
-                @Nullable Task bt = table.top(when+dt, now);
+                Task bt = table.top(when+dt, now);
                 if (bt != null) {
-                    Budget btb = bt.budget();
-                    if (!btb.isDeleted())
-                        BudgetMerge.plusBlend.apply(d, btb, 1f);
-
                     d.e.add(bt); //HACK this doesnt include the non-top tasks which may contribute to the evaluated truth during truthpolation
                 }
             }
@@ -309,8 +315,7 @@ public class DynamicCompoundConcept extends CompoundConcept {
 
             long then = target.occurrence();
 
-            long occThresh = 1;
-            if (x == null || then == ETERNAL || Math.abs(then - x.occurrence() ) >= occThresh) {
+            if (x == null || then == ETERNAL /*|| Math.abs(then - x.occurrence() ) >= occThresh*/) {
 
                 if (then == ETERNAL)
                     then = now;
@@ -332,7 +337,7 @@ public class DynamicCompoundConcept extends CompoundConcept {
 
                         RevisionTask t = new RevisionTask(template, beliefOrGoal ? Symbols.BELIEF : Symbols.GOAL,
                                 y, nar.time(), then, yy.evidence());
-                        t.setBudget(yy);
+                        t.setBudget(yy.budget());
                         t.log("Dynamic");
 
 

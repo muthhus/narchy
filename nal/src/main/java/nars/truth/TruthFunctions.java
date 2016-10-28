@@ -622,14 +622,7 @@ public final class TruthFunctions extends UtilityFunctions {
             return denom == 0 ? 1f : (abs(sourceTime - targetTime)) / (float) denom;
         }
     }
-    public static float projection(float sourceTime, float targetTime, float currentTime) {
-        if (sourceTime == targetTime) {
-            return 1f;
-        } else {
-            float denom = (abs(sourceTime - currentTime) + abs(targetTime - currentTime));
-            return denom == 0 ? 1f : (abs(sourceTime - targetTime)) / denom;
-        }
-    }
+
 
     public static float expectation(float frequency, float confidence) {
         return (confidence * (frequency - 0.5f) + 0.5f);

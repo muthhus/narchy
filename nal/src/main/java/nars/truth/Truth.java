@@ -33,6 +33,8 @@ import org.jetbrains.annotations.Nullable;
 import java.io.IOException;
 import java.util.Comparator;
 
+import static nars.truth.TruthFunctions.w2c;
+
 
 /** scalar (1D) truth value "frequency", stored as a floating point value */
 public interface Truth extends Truthed {
@@ -229,29 +231,12 @@ public interface Truth extends Truthed {
     /** clones a copy with confidence multiplied. null if conf < epsilon */
     @Nullable Truth confMult(float f);
 
+    default Truth confWeightMult(float f) {
+        return withConf(w2c(confWeight() * f));
+    }
+
     @Nullable Truth withConf(float f);
 
-//    default @Nullable Truth confMultViaWeight(float f) {
-//        return withConf(w2c(c2w(conf()) * f));
-//    }
-//    default @Nullable Truth confMultViaWeightMaxEternal(float f) {
-//        if (f == 1f) {
-//            return this;
-//        }
-//        else {
-//            float c = conf();
-//            return withConf(
-//                    Math.max(eternalize(), w2c(c2w(c) * f)));
-//        }
-//    }
-
-
-//    @NotNull
-//    default Truth project(long when, long occ, long now, float dur) {
-//        if (occ == when || occ == Tense.ETERNAL)
-//            return this;
-//        return withConf(conf() * temporalIntersection( when, occ, now, dur ));
-//    }
 
 //    @NotNull
 //    default Truth interpolate(@NotNull Truthed y) {
@@ -293,6 +278,8 @@ public interface Truth extends Truthed {
     static Truth maxConf(@NotNull Truth a, @NotNull Truth b) {
         return a.conf() >= b.conf() ? a : b;
     }
+
+
 //    static <T extends Truthed> T minConf(T a, T b) {
 //        return a.conf() <= b.conf() ? a : b;
 //    }

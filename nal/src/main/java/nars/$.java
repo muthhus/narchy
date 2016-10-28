@@ -180,8 +180,7 @@ public enum $ {
     }
 
     @Nullable public static Compound negIf(@NotNull Compound x, boolean negate) {
-        if (negate) return (Compound) neg(x);
-        return x;
+        return negate ? (Compound) neg(x) : x;
     }
 
     @NotNull

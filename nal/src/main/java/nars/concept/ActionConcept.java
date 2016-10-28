@@ -18,10 +18,10 @@ public class ActionConcept extends WiredCompoundConcept implements WiredCompound
 
 
     /** relative temporal delta time for desire/belief prediction */
-    final int decisionDT = 0;
+    static final int decisionDT = 0;
 
     /** relative temporal delta time for feedback occurrence */
-    final int feedbackDT = 0;
+    static final int feedbackDT = 0;
 
 
 

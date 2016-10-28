@@ -637,6 +637,7 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
 
 
 
+    @Override
     default long occurrence() {
         return ETERNAL;
     }
@@ -648,23 +649,23 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
 
     //projects the truth to a certain time, covering all 4 cases as discussed in
     //https://groups.google.com/forum/#!searchin/open-nars/task$20eteneral/open-nars/8KnAbKzjp4E/rBc-6V5pem8J
-    @Nullable
-    default ProjectedTruth projectTruth(long targetTime, long now, boolean eternalizeIfWeaklyTemporal) {
-
-
-        Truth currentTruth = truth();
-        long occ = occurrence();
-
-        if (targetTime == ETERNAL) {
-
-            return isEternal() ? new ProjectedTruth(currentTruth, ETERNAL) : eternalize(currentTruth);
-
-        } else {
-
-            return Revision.project(currentTruth, targetTime, now, occ, eternalizeIfWeaklyTemporal);
-        }
-
-    }
+//    @Nullable
+//    default ProjectedTruth projectTruth(long targetTime, long now, boolean eternalizeIfWeaklyTemporal) {
+//
+//
+//        Truth currentTruth = truth();
+//        long occ = occurrence();
+//
+//        if (targetTime == ETERNAL) {
+//
+//            return isEternal() ? new ProjectedTruth(currentTruth, ETERNAL) : eternalize(currentTruth);
+//
+//        } else {
+//
+//            return Revision.project(currentTruth, targetTime, now, occ, eternalizeIfWeaklyTemporal);
+//        }
+//
+//    }
 
 
 //    final class ExpectationComparator implements Comparator<Task>, Serializable {

@@ -159,14 +159,14 @@ public class MySTMClustered extends STMClustered {
                         Map<Term, Task> vv = new HashMap(tt.size());
                         tt.forEach(_z -> {
                             Task z = _z.get();
-                            if (z != null) {
+                            //if (z != null) {
                                 vv.merge(z.term(), z, (prevZ, newZ) -> {
                                     if (prevZ == null || newZ.conf() > prevZ.conf())
                                         return newZ;
                                     else
                                         return prevZ;
                                 });
-                            }
+                            //}
                         });
 
                         Collection<Task> uu = vv.values();
@@ -196,7 +196,7 @@ public class MySTMClustered extends STMClustered {
                         float pri = (float) uu.stream().mapToDouble(x -> x.pri()).max().getAsDouble();
 
                         Task m = new GeneratedTask(conj, punc,
-                                new DefaultTruth(finalFreq, conf)) //TODO use a truth calculated specific to this fixed-size batch, not all the tasks combined
+                                $.t(finalFreq, conf)) //TODO use a truth calculated specific to this fixed-size batch, not all the tasks combined
                                 .time(now, t)
                                 .evidence(evidence)
                                 .budget(BudgetFunctions.fund(uu, pri / uu.size()))

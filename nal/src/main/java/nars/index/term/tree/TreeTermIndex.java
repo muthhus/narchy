@@ -200,7 +200,7 @@ public class TreeTermIndex extends TermIndex implements Consumer<NAR> {
     }
 
     @NotNull
-    public TermKey key(@NotNull Term t) {
+    public static TermKey key(@NotNull Term t) {
         return TermTree.key(t);
     }
 

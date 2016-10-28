@@ -50,12 +50,6 @@ public final class DefaultConceptPolicy extends ConceptPolicy {
     }
 
 
-
-    @Override
-    public @NotNull Op op() {
-        return ATOM;
-    }
-
     @Override
     public int beliefCap(CompoundConcept compoundConcept, boolean beliefOrGoal, boolean eternalOrTemporal) {
         if (beliefOrGoal) {

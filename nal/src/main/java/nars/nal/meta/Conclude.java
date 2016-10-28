@@ -336,9 +336,9 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
 
             System.out.println(
                     r + "\t" +
-                            Texts.n4(s.pri.getSum()) + "\t" +
-                            Texts.n4(s.dConf.getSum()) + "\t" +
-                            Texts.n4(s.dSat.getSum()) + "\t" +
+                            Texts.n4(s.pri.getSum()) + '\t' +
+                            Texts.n4(s.dConf.getSum()) + '\t' +
+                            Texts.n4(s.dSat.getSum()) + '\t' +
                             n
                     //" \t " + mean +
             );
