@@ -75,6 +75,8 @@ function decodeConceptSummaries(e, m) {
     const d = new DataView(m);
     let j = 0;
 
+    e.emit('concept_summary_start', d);
+
     while (d.byteLength > j) {
         const pri = d.getFloat32(j); j += 4;
         const dur = d.getFloat32(j); j += 4;
@@ -88,6 +90,8 @@ function decodeConceptSummaries(e, m) {
             qua: qua
         });
     }
+
+    e.emit('concept_summary_end', d);
 }
 
 function decodeTasks(e, m) {
@@ -475,7 +479,7 @@ function NARConsole(terminal, render) {
 
 }
 
-function TopTable() {
+function TopTable(s) {
     const e = $('<div/>').attr('class', 'ConceptTable');
 
     function row(c) {
@@ -498,7 +502,7 @@ function TopTable() {
     }
 
     var d = div();
-    var s = NARSocket('active', decodeConceptSummaries);
+
     var shown = [];
     var busy = false;
     var maxShown = 1024*1024; //unlimited

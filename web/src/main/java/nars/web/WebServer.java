@@ -70,15 +70,15 @@ public class WebServer /*extends PathHandler*/ {
         this.path = path()
                 .addPrefixPath("/", resource(
 
-//                        new FileResourceManager(getResourcePath().toFile(), 0))
+                        new FileResourceManager(getResourcePath().toFile(), 0))
 
-                        new CachingResourceManager(
-                                16384,
-                                16*1024*1024,
-                                new DirectBufferCache(100, 10, 1000),
-                                new PathResourceManager(getResourcePath(), 0, true, true),
-                                0 //7 * 24 * 60 * 60 * 1000
-                        ))
+//                        new CachingResourceManager(
+//                                16384,
+//                                16*1024*1024,
+//                                new DirectBufferCache(100, 10, 1000),
+//                                new PathResourceManager(getResourcePath(), 0, true, true),
+//                                0 //7 * 24 * 60 * 60 * 1000
+//                        ))
                                 .setCachable((x) -> false)
                                 .setDirectoryListingEnabled(true)
                                 .addWelcomeFiles("index.html")
@@ -140,7 +140,7 @@ public class WebServer /*extends PathHandler*/ {
 
         //new IRCServer("localhost", 6667);
 
-        @NotNull Default nar = newRealtimeNAR(512, 4, 8);
+        @NotNull Default nar = newRealtimeNAR(512, 3, 2);
         //Default nar = new Default();
 
 //        new IRCAgent(nar,

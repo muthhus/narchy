@@ -316,6 +316,8 @@ $(document).ready(() => {
     const io = NARSocket('terminal', decodeTasks, {
         onopen: function() {
 
+            var ioActive = NARSocket('active', decodeConceptSummaries);
+
             const layout = new GoldenLayout({
                 content: [{
                     type: 'row',
@@ -467,10 +469,24 @@ $(document).ready(() => {
 
                 const c = spacegraph({});
 
-                io.on('task', function (x) {
+                // ioActive.on('concept_summary_start', function (x) {
+                //     c.graph.startBatch();
+                //     // c.graph.nodes().each(n => {
+                //     //     if (n.pri) {
+                //     //         n.pri = 0.95 * n.pri; //decay HACK
+                //     //         //c.changed = true;
+                //     //     }
+                //     // });
+                // });
+                //
+                // ioActive.on('concept_summary_end', function (x) {
+                //     c.graph.endBatch();
+                // });
 
-                    const id = x.term + x.punc + x.freq + ';' + x.conf; //HACK for Task's
-                    x.label = x.term; //HACK
+                ioActive.on('concept_summary', function (x) {
+                    const id = x.term;
+                    x.label = id;
+                    x.id = id;
 
 
                     let existing = c.graph.get(id);
@@ -479,23 +495,48 @@ $(document).ready(() => {
 
                         //add
                         c.graph.add({group: "nodes", data: x});
+                        c.changed = true;
 
                     } else {
                         //replace / merge
-                        existing.data = x;
+                        if (!_.isEqual(x, existing.data)) {
+                            existing.data = x;
+                            c.changed = true;
+                        }
                     }
 
-                    c.changed = true;
                 });
+                // io.on('task', function (x) {
+                //
+                //     const id = x.term + x.punc + x.freq + ';' + x.conf; //HACK for Task's
+                //     x.label = x.term; //HACK
+                //
+                //
+                //     let existing = c.graph.get(id);
+                //
+                //     if (!existing) {
+                //
+                //         //add
+                //         c.graph.add({group: "nodes", data: x});
+                //
+                //     } else {
+                //         //replace / merge
+                //         existing.data = x;
+                //     }
+                //
+                //     c.changed = true;
+                // });
 
-                tgt.getElement().html(c);
                 tgt.on('resize', () => {
                     setTimeout(() => c.graph.resize(), 0);
                 });
 
+                tgt.getElement().html(c);
+
+
             });
             layout.registerComponent('top', function (tgt, state) {
-                tgt.getElement().html(TopTable());
+                tgt.getElement().html(TopTable(ioActive));
             });
 
             layout.init();
