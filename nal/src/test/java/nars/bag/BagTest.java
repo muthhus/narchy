@@ -176,7 +176,7 @@ public class BagTest {
         a.put("x", new RawBudget(0.1f, 0.5f, 0.5f), 0.5f, null);
         a.commit();
 
-        assertEquals(0.125, a.get("x").pri(), 0.001f);
+        assertEquals(0.15, a.get("x").pri(), 0.001f);
     }
 
     void testScalePut2(Bag<String> a) {
