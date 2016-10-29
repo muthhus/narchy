@@ -187,22 +187,31 @@ public abstract class TermBuilder {
     }
 
     @NotNull
-    public Term productNormalize(@NotNull Term t) {
-        boolean neg = t.op() == NEG;
+    public Term productNormalize(@NotNull Term u) {
+        boolean neg = u.op() == NEG;
+        Term t;
         if (neg)
-            t = t.unneg();
+            t = u.unneg();
+        else
+            t = u;
 
         if (t instanceof Compound && (t.op() == INH) && (t.varPattern()==0) && t.hasAny(Op.IMGbits))  {
             Term s = (((Compound) t).term(0));
-            Term p = (((Compound) t).term(1));
             Op so = s.op();
+            Term p = (((Compound) t).term(1));
             Op po = p.op();
             if (so == Op.IMGi && !po.image) {
                 Compound ii  = (Compound)s;
                 t = $.inh(ii.term(0), imageUnwrapToProd(p, ii));
+                if (t == null)
+                    return False;
             } else if (po == Op.IMGe && !so.image) {
                 Compound ii  = (Compound)p;
                 t = $.inh(imageUnwrapToProd(s, ii), ii.term(0));
+                if (t == null)
+                    return False;
+            } else {
+                return u; //original value
             }
         }
 

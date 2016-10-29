@@ -137,9 +137,11 @@ abstract public class DerivedTask extends MutableTask {
 
                     //TODO use CrossLink or other Activation's here?
 
-                    parentConcept.tasklinks().put(this);
+                    if (Param.DERIVATION_TASKLINKED) {
+                        parentConcept.tasklinks().put(this);
+                    }
 
-                    if (!thisConcept.equals(parentConcept)) {
+                    if (Param.DERIVATION_TERMLINKED && !thisConcept.equals(parentConcept)) {
                         parentConcept.termlinks().put(thisConcept.term(), budget());
                         thisConcept.termlinks().put(parentConcept.term(), budget());
                     }

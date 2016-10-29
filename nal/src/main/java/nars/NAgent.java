@@ -7,6 +7,7 @@ import nars.concept.ActionConcept;
 import nars.concept.Concept;
 import nars.concept.SensorConcept;
 import nars.concept.WiredCompoundConcept;
+import nars.link.BLink;
 import nars.nal.UtilityFunctions;
 import nars.nar.Default;
 import nars.task.GeneratedTask;
@@ -34,6 +35,7 @@ import java.util.List;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static nars.$.t;
+import static nars.Op.IMPL;
 import static nars.Symbols.BELIEF;
 import static nars.Symbols.GOAL;
 import static nars.time.Tense.ETERNAL;
@@ -65,7 +67,7 @@ abstract public class NAgent implements NSense, NAction {
     public final List<SensorConcept> sensors = $.newArrayList();
     public final List<ActionConcept> actions = $.newArrayList();
 
-    public float alpha, gamma, epsilonProbability = 0.04f;
+    public float alpha, gamma, epsilonProbability = 0.05f;
     @Deprecated
     public float gammaEpsilonFactor = 0.5f;
 
@@ -261,19 +263,22 @@ abstract public class NAgent implements NSense, NAction {
 //                //(float) Math.sqrt(numSensors); //HEURISTIC
 //                numSensors / 2f;
 
-        minSensorPriority = new MutableFloat(nar.priorityDefault(BELIEF)/20f);
-        assert(minSensorPriority.floatValue() > Param.BUDGET_EPSILON  /* HACK a minimum value below which might result in possible loss */ );
+        minSensorPriority = new MutableFloat(Param.BUDGET_EPSILON * 4);
 
-        maxSensorPriority = new MutableFloat(nar.priorityDefault(BELIEF)/2f);
+        maxSensorPriority = new MutableFloat(nar.priorityDefault(BELIEF));
 
-        Iterable<? extends WiredCompoundConcept.Prioritizable> p = Iterables.concat(
-                sensors,
-                actions,
-                newArrayList(happy, joy)
-        );
+//        Iterable<? extends WiredCompoundConcept.Prioritizable> p = Iterables.concat(
+//                sensors,
+//                actions,
+//                newArrayList(happy, joy)
+//        );
+//        SensorConcept.activeAttention(p, minSensorPriority, maxSensorPriority, nar);
 
+        //in separate banks so they dont compete with eachother for attention:
+        SensorConcept.activeAttention(sensors, minSensorPriority, maxSensorPriority, nar);
+        SensorConcept.activeAttention(actions, minSensorPriority, maxSensorPriority, nar);
+        SensorConcept.activeAttention(newArrayList(happy, joy), minSensorPriority, maxSensorPriority, nar);
 
-        SensorConcept.activeAttention(p, minSensorPriority, maxSensorPriority, nar);
         //SensorConcept.flatAttention(p, minSensorPriority);
 
 
@@ -332,13 +337,18 @@ abstract public class NAgent implements NSense, NAction {
 
             int lookahead = 1;
             for (int i = 0; i < lookahead; i++) {
-                predictors.addAll(
-                    new MutableTask($.seq(action, 1+lookahead, happiness), '?', null).eternal()
-                    //new MutableTask($.impl(action, 1+lookahead, happiness), '?', null).eternal()
-                    //new MutableTask($.impl(action, dt, happiness), '?', null).time(now, then),
-                    //new MutableTask(action, '@', null).time(now, then)
-                );
+//                predictors.addAll(
+//                    new MutableTask($.seq(action, 1+lookahead, happiness), '?', null).eternal()
+//                    //new MutableTask($.impl(action, 1+lookahead, happiness), '?', null).eternal()
+//                    //new MutableTask($.impl(action, dt, happiness), '?', null).time(now, then),
+//                    //new MutableTask(action, '@', null).time(now, then)
+//                );
             }
+
+            predictors.addAll(
+                    new MutableTask($.seq($.varQuery(0), 1, action), '?', null).eternal(),
+                    new MutableTask($.seq(action, 1, happiness), '?', null).eternal()
+            );
 
         }
 
@@ -424,7 +434,7 @@ abstract public class NAgent implements NSense, NAction {
                     new GeneratedTask(c, GOAL,
                             $.t(nar.random.nextFloat()
                                 //Math.random() > 0.5f ? 1f : 0f
-                                , Math.max(nar.truthResolution.floatValue(), 0.5f + (0.5f * nar.random.nextFloat() * gamma * gammaEpsilonFactor))))
+                                , Math.max(nar.truthResolution.floatValue(), (nar.random.nextFloat() * gamma * gammaEpsilonFactor))))
                                 .time(now, now).budgetByTruth(c.pri.asFloat(), nar.durabilityDefault(GOAL)).log("Curiosity"));
 
                                 //in order to auto-destruct corectly, the task needs to remove itself from the taskindex too
@@ -452,6 +462,20 @@ abstract public class NAgent implements NSense, NAction {
         float m = 0;
         int n = actions.size();
         for (ActionConcept a : actions) {
+
+//            Term at = a.term();
+//
+//            for (BLink<Term> x : a.termlinks()) {
+//                Term t = x.get();
+//                System.out.println(t + " -> " + a);
+//                if (t instanceof Compound) {
+//                    if (t.op() == IMPL && ((Compound)t).term(1).equals(at)) {
+//                        System.out.println("\t***");
+//                    } else {
+//
+//                    }
+//                }
+//            }
 
             Truth d = a.desire();
             if (d != null)

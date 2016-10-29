@@ -3,6 +3,7 @@ package nars.experiment.misc;
 import nars.$;
 import nars.NAR;
 import nars.NAgent;
+import nars.Param;
 import nars.concept.ActionConcept;
 import nars.concept.SensorConcept;
 import nars.index.term.map.CaffeineIndex;
@@ -10,6 +11,7 @@ import nars.nar.Default;
 import nars.nar.exe.Executioner;
 import nars.nar.exe.SingleThreadExecutioner;
 import nars.nar.util.DefaultConceptBuilder;
+import nars.task.DerivedTask;
 import nars.term.Term;
 import nars.time.FrameClock;
 import nars.util.data.random.XorShift128PlusRandom;
@@ -25,6 +27,10 @@ import static java.lang.System.out;
  */
 public class Line1DContinuous extends NAgent {
 
+    static {
+        Param.DEBUG = true;
+    }
+
     public interface IntToFloatFunction {
         float valueOf(int i);
     }
@@ -34,7 +40,7 @@ public class Line1DContinuous extends NAgent {
     boolean print;
     private float yHidden;
     private float yEst;
-    float speed = 1f;
+    float speed = 0.25f;
     final float[] ins;
 
     public Line1DContinuous(NAR n, int size, IntToFloatFunction target) {
@@ -50,27 +56,37 @@ public class Line1DContinuous extends NAgent {
         for (int i = 0; i < size; i++) {
             int ii = i;
             //hidden
-            @NotNull Term actual = $.the(0 /*"h"*/);
-            sensors.add(new SensorConcept($.p(actual, $.the(i)), n, ()->{
+            sensors.add(new SensorConcept($.func("h", $.the(i)), n, ()->{
                 return ins[ii];
             }, (v) -> $.t(v, alpha)));
 
             //estimated
-            @NotNull Term estim = $.the(1 /*"e"*/);
-            sensors.add(new SensorConcept($.p(estim, $.the(i)), n, ()->{
+            sensors.add(new SensorConcept($.func("e", $.the(i)), n, ()->{
                 return ins[size + ii];
             }, (v) -> $.t(v, alpha)));
         }
 
-        actions.add(new ActionConcept("(leftright)", n, (b, d) -> {
+        ActionConcept a;
+        actions.add(a = new ActionConcept("e(leftright)", n, (b, d) -> {
             if (d!=null) {
                 float v =
                         //d.expectation();
                         d.freq();
                 yEst += (v -0.5f)*speed;
+                return $.t(d.freq(), gamma);
             }
-            return d;
+            return null;
         }));
+
+        n.onTask(t -> {
+           if (t instanceof DerivedTask
+                   //t.term().equals(a.term())
+                   && t.term().containsTermRecursively(a.term())
+            ) {
+                System.out.println(t.proof());
+                n.runLater(()->a.print());
+           }
+        });
 
         trace = false;
 
@@ -183,35 +199,33 @@ public class Line1DContinuous extends NAgent {
     public static void main(String[] args) {
 
         XorShift128PlusRandom rng = new XorShift128PlusRandom((int)(Math.random()*1000));
-        int cyclesPerFrame = 8;
-        int conceptsPerCycle = 16;
+        int conceptsPerCycle = 24;
 
         final Executioner exe =
                 //new MultiThreadExecutioner(2, 2048);
                 new SingleThreadExecutioner();
 
         Default nar = new Default(1024,
-                conceptsPerCycle, 2, 2, rng,
-                new CaffeineIndex(new DefaultConceptBuilder(), 1024*16, 12, false, exe),
+                conceptsPerCycle, 2, 4, rng,
+                new CaffeineIndex(new DefaultConceptBuilder(), 1024*64, 12, false, exe),
                 new FrameClock(), exe
         );
 
 
-        nar.beliefConfidence(0.95f);
-        nar.goalConfidence(0.7f);
-        nar.DEFAULT_BELIEF_PRIORITY = 0.02f;
-        nar.DEFAULT_GOAL_PRIORITY = 0.02f;
-        nar.DEFAULT_QUESTION_PRIORITY = 0.01f;
-        nar.DEFAULT_QUEST_PRIORITY = 0.01f;
+        nar.beliefConfidence(0.9f);
+        nar.goalConfidence(0.6f);
 
-        nar.compoundVolumeMax.set(16);
+        //nar.truthResolution.setValue(0.02f);
+        //nar.durMin.setValue(0.03f);
+
+        nar.compoundVolumeMax.set(20);
 
         Line1DContinuous l = new Line1DContinuous(nar, 6,
-                sine(55)
+                sine(255)
                 //random(120)
         );
         l.print = true;
-        l.run(1500);
+        l.run(15000);
 
         NAR.printTasks(nar, true);
         NAR.printTasks(nar, false);

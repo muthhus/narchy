@@ -25,6 +25,10 @@ public abstract class Param /*extends Container*/ implements Level {
      * typically a NAR instance's 'compoundVolumeMax' parameter will be lower than this */
     public static final int COMPOUND_VOLUME_MAX = 128;
 
+    /** whether derivation's concepts are cross-termlink'ed with the premise concept */
+    public static boolean DERIVATION_TERMLINKED = false;
+    public static boolean DERIVATION_TASKLINKED = false;
+
     //    //TODO use 'I' for SELf, it is 3 characters shorter
 //    public static final Atom DEFAULT_SELF = (Atom) $.the("I");
     public static Atom defaultSelf() {
@@ -115,7 +119,7 @@ public abstract class Param /*extends Container*/ implements Level {
     public static final float BUDGET_EPSILON = 0.0005f;
 
 
-    public static final int DEFAULT_WIRED_CONCEPT_BELIEFS = 24;
+    public static final int DEFAULT_WIRED_CONCEPT_BELIEFS = 32;
     public static final int DEFAULT_WIRED_CONCEPT_GOALS = 16;
 
     /** size of each thread's normalization cache, in entries */

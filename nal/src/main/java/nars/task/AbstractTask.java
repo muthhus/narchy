@@ -39,7 +39,7 @@ import static nars.time.Tense.ETERNAL;
 public abstract class AbstractTask extends RawBudget implements Task, Temporal {
 
     /** content term of this task */
-    @Nullable
+    @NotNull
     private Compound term;
 
     protected char punc;

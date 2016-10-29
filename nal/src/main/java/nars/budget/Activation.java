@@ -139,7 +139,7 @@ public class Activation {
 
         Concept targetConcept = linkSubterm(src, target, scale, depth);;
 
-        if (targetConcept != null && depth <= tasklinkDepth && in instanceof Task) {
+        if ( targetConcept != null && depth <= tasklinkDepth && in instanceof Task) {
             targetConcept.tasklinks().put((Task) in, in, scale, null);
         }
 
