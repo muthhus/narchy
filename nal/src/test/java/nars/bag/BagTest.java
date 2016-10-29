@@ -176,7 +176,7 @@ public class BagTest {
         a.put("x", new RawBudget(0.1f, 0.5f, 0.5f), 0.5f, null);
         a.commit();
 
-        assertEquals(0.15, a.get("x").pri(), 0.001f);
+        assertEquals(0.125, a.get("x").pri(), 0.001f);
     }
 
     void testScalePut2(Bag<String> a) {
@@ -263,8 +263,8 @@ public class BagTest {
 
         System.out.println(ratioUniform + " " + ratioFlat);
 
-        assertTrue(ratioUniform > 3.5f); //should be ideally ~10
-        assertTrue(ratioFlat < 2.5f); //should be ideally ~1
+        assertTrue(ratioUniform > 12.5f); //should be ideally ~10
+        assertTrue(ratioFlat < 4.5f); //should be ideally ~1
 
     }
 

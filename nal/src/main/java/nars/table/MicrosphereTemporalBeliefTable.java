@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
+import static java.lang.Long.*;
 import static java.lang.Long.MAX_VALUE;
 import static java.lang.Long.MIN_VALUE;
 import static nars.learn.microsphere.InterpolatingMicrosphere.timeDecay;
@@ -119,7 +120,7 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
 
                 add(input);
 
-                if (next != input && list.size() + 1 <= cap) {
+                if (next != input /*&& list.size() + 1 <= cap*/) {
                     add(next);
                 }
 
@@ -128,8 +129,7 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
             }
         });
 
-        TruthDelta x = delta[0];
-        return x;
+        return delta[0];
     }
 
     private void add(@NotNull Task x) {
@@ -138,7 +138,7 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
             if (minT!=MAX_VALUE) {
                 if (o < minT) minT = o;
             }
-            if (maxT!=Long.MIN_VALUE) {
+            if (maxT!= MIN_VALUE) {
                 if (o > maxT) maxT = o;
             }
         }
@@ -149,7 +149,7 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
     }
 
     /** HACK use of volatiles here is a hack. it may rarely cause the bag to experience flashbacks. proper locking can solve this */
-    private volatile long minT = MAX_VALUE, maxT = Long.MIN_VALUE;
+    private volatile long minT = MAX_VALUE, maxT = MIN_VALUE;
 
     public long range() {
         if (minT==MAX_VALUE || maxT==MIN_VALUE) {
@@ -203,7 +203,7 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
     private void invalidateDuration() {
         //invalidate
         minT = MAX_VALUE;
-        maxT = Long.MIN_VALUE;
+        maxT = MIN_VALUE;
     }
 
 

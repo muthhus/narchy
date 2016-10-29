@@ -353,7 +353,7 @@ abstract public class NAgent implements NSense, NAction {
         }
 
         predictors.add(
-            new MutableTask($.seq($.varQuery("what"), 1, happiness), '?', null).time(now, now)
+            new MutableTask($.seq($.varQuery(0 /*"what"*/), 1, happiness), '?', null).time(now, now)
         );
 
         System.out.println(Joiner.on('\n').join(predictors));

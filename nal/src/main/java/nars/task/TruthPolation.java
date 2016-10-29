@@ -40,10 +40,7 @@ public final class TruthPolation extends InterpolatingMicrosphere {
     public TruthPolation(int size) {
         super(1, 2 /* must be 2 for 1-D microsphere */, null);
 
-        times = new float[size][];
-        for (int i = 0; i < size; i++) {
-            times[i] = new float[1];
-        }
+        times = new float[size][1];
         freq = new float[size];
         conf = new float[size];
 
@@ -129,12 +126,15 @@ public final class TruthPolation extends InterpolatingMicrosphere {
         float c1 = w2c(v[1]);
 
         float minConf = Param.TRUTH_EPSILON; //HACK take value from NAR
+
+        float F = v[0];
+
         if (c1 >= minConf) {
-            return $.t(v[0], c1);
+            return $.t(F, c1);
         } else {
             //attempt to use the calculated frequency with the eternalized confidence of the minimum task (conservative heuristic)
             float c2 = eternalize(minTaskConf);
-            return (c2 >= minConf) ? $.t(v[0], c2) : null;
+            return (c2 >= minConf) ? $.t(F, c2) : null;
         }
     }
 

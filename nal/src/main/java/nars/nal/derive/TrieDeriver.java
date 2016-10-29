@@ -30,8 +30,7 @@ public class TrieDeriver extends Deriver {
 
     @NotNull
     public final BoolCondition[] roots;
-    @Nullable
-    public final TermTrie<Term, PremiseRule> trie;
+
 
     /**
      * derivation term graph, gathered for analysis
@@ -77,7 +76,7 @@ public class TrieDeriver extends Deriver {
         super(ruleset);
 
         //return Collections.unmodifiableList(premiseRules);
-        this.trie = new TermPremiseRuleTermTrie(ruleset);
+        final TermTrie<Term, PremiseRule> trie = new TermPremiseRuleTermTrie(ruleset);
 
         @NotNull List<BoolCondition> bb = subtree(trie.trie.root);
         this.roots = bb.toArray(new BoolCondition[bb.size()]);

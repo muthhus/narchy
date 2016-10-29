@@ -27,27 +27,16 @@ public class TrieDeriverTest {
         d.print(System.out);
     }
 
-
-    @Test public void testRuleTrie() {
-
-        d.trie.printSummary();
-        /*for (Term p : x.roots) {
-            out.println();
-            out.println(p);
-        }*/
-        assert(d.roots.length > 1);
-    }
-
-    @Test public void printRuleSet() {
-
-//        List<PremiseRule> rr = d.rules.rules;
-//        System.out.println(rr.size() + " rules");
-//        rr.forEach(r -> {
-//            System.out.println(r);
-//        });
-
-        d.trie.costAnalyze((t) -> 1, System.out);
-    }
+//    @Test public void printRuleSet() {
+//
+////        List<PremiseRule> rr = d.rules.rules;
+////        System.out.println(rr.size() + " rules");
+////        rr.forEach(r -> {
+////            System.out.println(r);
+////        });
+//
+//        d.trie.costAnalyze((t) -> 1, System.out);
+//    }
 
 
 

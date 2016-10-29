@@ -340,8 +340,14 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
         int r = ii.result;
         switch (r) {
             case 0:
-                float pBefore = v.pri();
                 Budget vv = v.clone();
+                if (vv == null) {
+                    //it has been deleted
+                    map.remove(key);
+                    return;
+                }
+
+                float pBefore = vv.pri();
 
                 //re-rank
                 float o;
@@ -417,12 +423,12 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
                 } else {
                     //failure, undo: remove the key from the map
                     map.remove(key);
-                    onRemoved(null);
+                    //onRemoved(null);
                 }
                 break;
             case -1:
                 //reject due to insufficient budget
-                onRemoved(null);
+                //onRemoved(null);
                 break;
         }
 

@@ -279,7 +279,7 @@ public class Narsese extends BaseParser<Object> {
 
 
                 Term(true, false),
-                term.set((Term) pop()),
+                term.set(the(pop())),
 
                 SentencePunctuation(punc),
 
@@ -448,8 +448,7 @@ public class Narsese extends BaseParser<Object> {
         return seq(
                 s(),
                 firstOf(
-                        QuotedMultilineLiteral(),
-                        QuotedLiteral(),
+                        QuotedAtom(),
 
                         seq(oper, ColonReverseInheritance()),
 
@@ -731,21 +730,20 @@ public class Narsese extends BaseParser<Object> {
 //    }
 
 
-    Rule QuotedLiteral() {
-        return sequence(dquote(), AnyString(), push($.quote(match())), dquote());
-    }
-
-    Rule QuotedMultilineLiteral() {
+    Rule QuotedAtom() {
         return sequence(
-                TripleQuote(), //dquote(), dquote(), dquote()),
-                AnyString(), push('\"' + match() + '\"'),
-                TripleQuote() //dquote(), dquote(), dquote()
+                dquote(),
+                firstOf(
+                    //multi-line TRIPLE quotes
+                    seq( regex("\"\"[\\s\\S]+\"\"\""), push( $.the( '\"' + match() ) ) ),
+
+                        //one quote
+                    seq( regex(".*\""), push( $.the( '\"' + match() ) ) )
+                )
         );
     }
 
-    Rule TripleQuote() {
-        return string("\"\"\"");
-    }
+
 
     Rule Ellipsis() {
         return sequence(
@@ -772,9 +770,15 @@ public class Narsese extends BaseParser<Object> {
         );
     }
 
-    Rule AnyString() {
+    Rule AnyStringExceptQuote() {
         //TODO handle \" escape
-        return oneOrMore(noneOf("\""));
+        return zeroOrMore(noneOf("\""));
+    }
+
+
+
+    Rule AnyString() {
+        return zeroOrMore(ANY);
     }
 
 

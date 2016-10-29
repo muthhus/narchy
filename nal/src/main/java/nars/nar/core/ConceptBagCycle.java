@@ -270,8 +270,7 @@ public class ConceptBagCycle implements Consumer<NAR> {
 
 
         @Override
-        public final void onRemoved(@Nullable BLink<Concept> value) {
-            if (value!=null) {
+        public final void onRemoved(@NotNull BLink<Concept> value) {
                 Concept c  = value.get();
                 sleep(c);
 
@@ -281,7 +280,6 @@ public class ConceptBagCycle implements Consumer<NAR> {
                         c.put(this, s);
                     }
                 }
-            }
         }
 
         @Override

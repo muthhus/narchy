@@ -550,8 +550,11 @@ public class NarseseTest {
 
     @Test
     public void testMultilineQuotes() {
-        String a = "js(\"\"\"\n" + "1\n" + "\"\"\")!";
-        List<Task> l = tasks(a);
+
+        String a = "js(\"\"\"\n" + "1\n" + "\"\"\")";
+        System.out.println(a +  " " + $.$(a));
+        assertEquals(a, $.$(a).toString());
+        List<Task> l = tasks(a + "!");
         assertEquals(1, l.size());
     }
 

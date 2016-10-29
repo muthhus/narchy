@@ -164,7 +164,9 @@ public class Revision {
 
         //get a stamp collecting all evidence from the table, since it all contributes to the result
         //TODO weight by the relative confidence of each so that more confidence contributes more evidence data to the stamp
-        long[] evidence = Stamp.zip(((DefaultBeliefTable) concept.tableFor(a.punc())).temporal);
+        //long[] evidence = Stamp.zip(((DefaultBeliefTable) concept.tableFor(a.punc())).temporal);
+
+        long[] evidence = Stamp.zip(a.evidence(), b.evidence(), aProp);
 
         RevisionTask t = new RevisionTask(cc, a.punc(),
                 newTruth,
