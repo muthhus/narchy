@@ -162,6 +162,7 @@ public class InterpolatingMicrosphere {
 
         float newEvi = evi / (1f + dt*dt/dur  );
 
+
         //System.out.println("\t\t" + evi + " x ( dt=" + dt + " dur=" + dur + " ) ---> " + evi);
         return newEvi;
     }

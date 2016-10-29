@@ -2,9 +2,12 @@ package nars.task;
 
 import com.google.common.base.Joiner;
 import nars.$;
+import nars.Param;
 import nars.Task;
 import nars.learn.microsphere.InterpolatingMicrosphere;
 import nars.truth.Truth;
+import nars.util.data.list.FasterList;
+import org.apache.commons.lang3.ArrayUtils;
 import org.eclipse.collections.impl.list.mutable.primitive.FloatArrayList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -14,7 +17,11 @@ import java.util.Collection;
 import java.util.stream.Collectors;
 
 import static nars.time.Tense.ETERNAL;
+import static nars.truth.TruthFunctions.c2w;
+import static nars.truth.TruthFunctions.eternalize;
 import static nars.truth.TruthFunctions.w2c;
+import static org.eclipse.collections.impl.block.factory.Functions2.min;
+import static org.eclipse.collections.impl.block.factory.Functions2.minBy;
 
 /**
  * Truth Interpolation and Extrapolation of Temporal Beliefs/Goals
@@ -78,6 +85,7 @@ public final class TruthPolation extends InterpolatingMicrosphere {
         assert(tasks.length > 2);
 
         long minT = Long.MAX_VALUE, maxT = Long.MIN_VALUE;
+        float minTaskConf = Float.POSITIVE_INFINITY;
 
         //int volume = tasks[0].term().volume();
         int i = 0;
@@ -86,7 +94,10 @@ public final class TruthPolation extends InterpolatingMicrosphere {
             long o = t.occurrence();
             times[i][0] = (o != ETERNAL) ? o : when;
             freq[i] = t.freq();
-            conf[i] = t.confWeight();
+            float ci = t.conf();
+            if (ci < minTaskConf)
+                minTaskConf = ci;
+            conf[i] = c2w(ci);
 
             if (minT > o) minT = o;
             if (maxT < o) maxT = o;
@@ -115,7 +126,16 @@ public final class TruthPolation extends InterpolatingMicrosphere {
                 freq, conf,
                 lightCurve,
                 i);
-        return $.t(v[0], w2c(v[1]));
+        float c1 = w2c(v[1]);
+
+        float minConf = Param.TRUTH_EPSILON; //HACK take value from NAR
+        if (c1 >= minConf) {
+            return $.t(v[0], c1);
+        } else {
+            //attempt to use the calculated frequency with the eternalized confidence of the minimum task (conservative heuristic)
+            float c2 = eternalize(minTaskConf);
+            return (c2 >= minConf) ? $.t(v[0], c2) : null;
+        }
     }
 
 

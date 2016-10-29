@@ -422,10 +422,11 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
                     if (delta == 0)
                         return res; //as-is
                     else {
-                        float decay = InterpolatingMicrosphere.lightCurve(1).get(delta, 1f);
-                        return res.confWeightMult(
-                                decay
-                        );
+                        return res.eternalize();
+//                        float decay = InterpolatingMicrosphere.lightCurve(1).get(delta, 1f);
+//                        return res.confWeightMult(
+//                                decay
+//                        );
                     }
 
                     //return Revision.project(res, when, now, o, false);
@@ -435,8 +436,8 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
 
             default:
                 InterpolatingMicrosphere.LightCurve x = InterpolatingMicrosphere.lightCurve(duration());
-                return new TruthPolation(s).truth(when, tr, x);
-
+                Truth t = new TruthPolation(s).truth(when, tr, x);
+                return t;
         }
 
     }

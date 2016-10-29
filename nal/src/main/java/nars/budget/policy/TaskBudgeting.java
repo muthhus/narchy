@@ -59,23 +59,26 @@ public class TaskBudgeting {
         //volRatioScale = (float) Math.pow(volRatioScale, 2);
 
 
-        float factor = occam * derivationQuality;
+        float factor = derivationQuality;
         final float durability = baseBudget.dur() * factor;
         if (durability < minDur)
             return null;
-
-        float baseQuality = baseBudget.qua();
-
-        final float quality = and(baseQuality, factor);
-
 
         float priority =
                 //nal.taskLink.priIfFiniteElseZero() * volRatioScale;
                 //or(nal.taskLink.priIfFiniteElseZero(), nal.termLink.priIfFiniteElseZero())
                 //or(nal.taskLink.priIfFiniteElseZero(), nal.termLink.priIfFiniteElseZero())
-                baseBudget.pri() * factor
-                        //;
-        ;
+                baseBudget.pri() * occam * factor
+                //;
+                ;
+
+        final float quality =
+                and(derivationQuality, baseBudget.qua());
+                //and(baseQuality, factor);
+                //baseBudget.qua();
+
+
+
         //* occam //priority should be reduced as well as durability, because in the time between here and the next forgetting it should not have similar priority as parent in cases like Belief:Identity truth function derivations
         //* qual
         //if (priority * durability < Param.BUDGET_EPSILON)
@@ -106,14 +109,26 @@ public class TaskBudgeting {
 
     /** occam's razor: penalize complexity - returns a value between 0 and 1 that priority will be scaled by */
     public static float occamBasic(@NotNull Termed derived, @NotNull Premise pp) {
-        Task parentTask = pp.task;
-        float parentComplexity = parentTask.complexity();
-        Task parentBelief = pp.belief;
-        if (parentBelief!=null) // && parentBelief.complexity() > parentComplexity)
-            parentComplexity += parentBelief.complexity();
+//        Task parentTask = pp.task;
+//        float parentComplexity = parentTask.complexity();
+//        Task parentBelief = pp.belief;
+//        if (parentBelief!=null) // && parentBelief.complexity() > parentComplexity)
+//            parentComplexity += parentBelief.complexity();
 
-        int derivedComplexity = derived.complexity();
-        return (1f - (derivedComplexity / (derivedComplexity + parentComplexity)));
+        //..return (1f - (derivedComplexity / (derivedComplexity + parentComplexity)));
+
+        Task parentBelief = pp.belief;
+        int parentComplexity;
+        int taskCompl = pp.task.complexity();
+        if (parentBelief!=null) // && parentBelief.complexity() > parentComplexity)
+            parentComplexity = Math.max(taskCompl, parentBelief.complexity());
+        else
+            parentComplexity = taskCompl;
+
+        float baseCost = 1;
+        return parentComplexity/(parentComplexity + Math.max(baseCost, derived.complexity() - parentComplexity));
+
+
     }
 
 //    /** occam's razor: penalize complexity - returns a value between 0 and 1 that priority will be scaled by
