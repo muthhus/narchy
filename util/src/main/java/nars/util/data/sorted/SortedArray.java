@@ -48,7 +48,7 @@ public class SortedArray<E> implements Iterable<E> {
 
     final static Object[] zeroList = new Object[0];
 
-    protected static final int binarySearchThreshold = 8;
+    public static final int binarySearchThreshold = 8;
     @Deprecated protected final IntFunction<E[]> builder;
     protected E[] list = (E[]) zeroList;
     private int size;

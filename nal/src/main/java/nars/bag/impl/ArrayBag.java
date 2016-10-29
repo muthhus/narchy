@@ -160,13 +160,15 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
             if (k == null)
                 continue;
 
-            BLink<V> k2 = map.remove(k);
+            synchronized(map) {
+                BLink<V> k2 = map.remove(k);
 
-            if (k2 != w && k2 != null) {
-                //throw new RuntimeException(
-                logger.error("bag inconsistency: " + w + " removed but " + k2 + " may still be in the items list");
-                //reinsert it because it must have been added in the mean-time:
-                map.putIfAbsent(k, k2);
+                if (k2 != w && k2 != null) {
+                    //throw new RuntimeException(
+                    logger.error("bag inconsistency: " + w + " removed but " + k2 + " may still be in the items list");
+                    //reinsert it because it must have been added in the mean-time:
+                    map.putIfAbsent(k, k2);
+                }
             }
 
             pendingRemoval.add(w);
@@ -335,7 +337,10 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
 
         Insertion ii = new Insertion(bp);
 
-        BLink<V> v = map.compute(key, ii);
+        BLink<V> v;
+        synchronized (map) {
+            v = map.compute(key, ii);
+        }
 
         int r = ii.result;
         switch (r) {
@@ -343,7 +348,9 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
                 Budget vv = v.clone();
                 if (vv == null) {
                     //it has been deleted
-                    map.remove(key);
+                    synchronized(map) {
+                        map.remove(key);
+                    }
                     return;
                 }
 
@@ -422,7 +429,9 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
                     onAdded(v);
                 } else {
                     //failure, undo: remove the key from the map
-                    map.remove(key);
+                    synchronized (map) {
+                        map.remove(key);
+                    }
                     //onRemoved(null);
                 }
                 break;

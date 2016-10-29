@@ -29,6 +29,7 @@ public class TermKey extends DynByteSeq {
     private final static ThreadLocal<Lz4Compressor> compressor = ThreadLocal.withInitial(Lz4Compressor::new);
     final static Lz4Decompressor decompressor = new Lz4Decompressor();
     private final static float minCompressionRatio = 0.9f;
+    private final static int MIN_COMPRESSION_INPUT = 16;
 
     /** term with volume byte prepended for sorting by volume */
     @NotNull
@@ -91,6 +92,10 @@ public class TermKey extends DynByteSeq {
     //TODO add parameter for from..to range compresion, currently this will only skip a prefix
     public boolean compress(int from) {
         int to = length();
+        if (to < MIN_COMPRESSION_INPUT) {
+            return false;
+        }
+
         int uncLength = to-from;
 
         byte[] uncompressed = this.bytes;

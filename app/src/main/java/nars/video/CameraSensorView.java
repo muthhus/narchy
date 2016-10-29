@@ -51,7 +51,7 @@ public class CameraSensorView extends MatrixView implements MatrixView.ViewFunc 
         float dr, dg;
         if (d!=null) {
             float f = d.freq();
-            float c = d.conf();
+            //float c = d.conf();
             if (f > 0.5f) {
                 dr = 0;
                 dg = (f - 0.5f) * 2f;// * c;

@@ -6,6 +6,8 @@ import com.googlecode.concurrenttrees.radix.RadixTree;
 import com.googlecode.concurrenttrees.radix.node.concrete.voidvalue.VoidValue;
 import nars.util.ByteSeq;
 import nars.util.data.list.FasterList;
+import nars.util.data.sorted.SortedArray;
+import nars.util.data.sorted.SortedList;
 import org.eclipse.collections.api.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -13,9 +15,7 @@ import org.jetbrains.annotations.Nullable;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.*;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicReferenceArray;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -76,11 +76,11 @@ public class MyConcurrentRadixTree<X> implements /*RadixTree<X>,*/Serializable, 
 
     public interface Node extends Prefixed, Serializable {
 
-        ByteSeq getIncomingEdge();
+        @NotNull ByteSeq getIncomingEdge();
 
-        Object getValue();
+        @Nullable Object getValue();
 
-        Node getOutgoingEdge(byte var1);
+        @Nullable Node getOutgoingEdge(byte var1);
 
         void updateOutgoingEdge(Node var1);
 
@@ -135,11 +135,7 @@ public class MyConcurrentRadixTree<X> implements /*RadixTree<X>,*/Serializable, 
         return o1.getIncomingEdgeFirstCharacter() - o2.getIncomingEdgeFirstCharacter();
     };
 
-    private static int cmp(Prefixed o1, byte o2) {
-        return o1.getIncomingEdgeFirstCharacter() - o2;
-    }
-
-//    private static int cmp(byte o1, byte o2) {
+    //    private static int cmp(byte o1, byte o2) {
 //        return o1 - o2;
 //    }
 
@@ -161,53 +157,41 @@ public class MyConcurrentRadixTree<X> implements /*RadixTree<X>,*/Serializable, 
         return (startIndex > mainLength ? ByteSeq.EMPTY : main.subSequence(startIndex, mainLength));
     }
 
-    static int binarySearch(AtomicReferenceArray<? extends Prefixed> l, byte key) {
+    static int search(Node[] a, int size, byte key) {
+        if (size == 0) {
+            return -1;
+        } else if (size >= SortedArray.binarySearchThreshold) {
+            return binarySearch(key, size, a);
+        } else {
+            return linearSearch(key, a);
+        }
+    }
+
+    private static int linearSearch(byte key, Node[] a) {
+        for (int i = 0, aLength = a.length; i < aLength; i++) {
+            Node x = a[i];
+            if (x == null)
+                break; //early end of array
+            if (x.getIncomingEdgeFirstCharacter() == key)
+                return i;
+        }
+        return -1;
+    }
+
+    private static int binarySearch(byte key, int size, Node[] a) {
+        int high = size-1;
         int low = 0;
-
-        int high = l.length() - 1;
-
         while (low <= high) {
-            int mid = (low + high) >>> 1;
-            int cmp = cmp(l.get(mid), key);
+            int midIndex = (low + high) >>> 1;
+            int cmp = a[midIndex].getIncomingEdgeFirstCharacter() - key;
 
-            if (cmp < 0) low = mid + 1;
-            else if (cmp > 0) high = mid - 1;
-            else return mid; // key found
+            if (cmp < 0) low = midIndex + 1;
+            else if (cmp > 0) high = midIndex - 1;
+            else return midIndex; // key found
         }
         return -(low + 1);  // key not found
     }
 
-    static int binarySearch(List<? extends Prefixed> l, byte key) {
-        int low = 0;
-
-        int high = l.size() - 1;
-
-        while (low <= high) {
-            int mid = (low + high) >>> 1;
-            int cmp = cmp(l.get(mid), key);
-
-            if (cmp < 0) low = mid + 1;
-            else if (cmp > 0) high = mid - 1;
-            else return mid; // key found
-        }
-        return -(low + 1);  // key not found
-    }
-
-//    static <T> int binarySearch(AtomicReferenceArray<? extends T> l, T key, Comparator<? super T> c) {
-//        int low = 0;
-//
-//        int high = l.length()-1;
-//
-//        while (low <= high) {
-//            int mid = (low + high) >>> 1;
-//            int cmp = c.compare(l.get(mid), key);
-//
-//            if (cmp < 0) low = mid + 1;
-//            else if (cmp > 0) high = mid - 1;
-//            else return mid; // key found
-//        }
-//        return -(low + 1);  // key not found
-//    }
 
     static final class ByteArrayNodeDefault extends NonLeafNode {
         private final Object value;
@@ -238,7 +222,7 @@ public class MyConcurrentRadixTree<X> implements /*RadixTree<X>,*/Serializable, 
         }
 
         @Override
-        public byte getIncomingEdgeFirstCharacter() {
+        public final byte getIncomingEdgeFirstCharacter() {
             return this.bytes[0];
         }
 
@@ -295,20 +279,23 @@ public class MyConcurrentRadixTree<X> implements /*RadixTree<X>,*/Serializable, 
         }
 
         @Nullable @Override
-        public Node getOutgoingEdge(byte edgeFirstCharacter) {
+        public final Node getOutgoingEdge(byte edgeFirstCharacter) {
             //AtomicReferenceArrayListAdapter childNodesList = new AtomicReferenceArrayListAdapter<>(childNodes);
             //NodeCharacterKey searchKey = new NodeCharacterKey(edgeFirstCharacter);
 
-            int index = MyConcurrentRadixTree.binarySearch(this, edgeFirstCharacter);
-            return index < 0 ? null : get(index);
+            Node[] a = array();
+            int index = MyConcurrentRadixTree.search(a, size(), edgeFirstCharacter);
+            if (index < 0)
+                return null;
+            return a[index];
         }
 
         @Override
-        public void updateOutgoingEdge(@NotNull Node childNode) {
+        public final void updateOutgoingEdge(@NotNull Node childNode) {
             //AtomicReferenceArrayListAdapter childNodesList = new AtomicReferenceArrayListAdapter<>(childNodes);
             //NodeCharacterKey searchKey = new NodeCharacterKey(edgeFirstCharacter);
 
-            int index = MyConcurrentRadixTree.binarySearch(this, childNode.getIncomingEdgeFirstCharacter());
+            int index = MyConcurrentRadixTree.search(array(), size(), childNode.getIncomingEdgeFirstCharacter());
             if (index < 0) {
                 throw new IllegalStateException("Cannot update the reference to the following child node for the edge starting with \'" + childNode.getIncomingEdgeFirstCharacter() + "\', no such edge already exists: " + childNode);
             } else {

@@ -28,9 +28,10 @@ import static org.eclipse.collections.impl.block.factory.Functions2.minBy;
  */
 public final class TruthPolation extends InterpolatingMicrosphere {
 
-    @NotNull final float[][] times;
-    @NotNull final float[] freq;
-    @NotNull final float[] conf;
+    /* points x { 0=time, 1=freq, 2=conf } */
+    @NotNull final float[][] data;
+//    @NotNull final float[] freq;
+//    @NotNull final float[] conf;
 
     //private final static boolean clipToBeliefs = true;
 
@@ -40,9 +41,7 @@ public final class TruthPolation extends InterpolatingMicrosphere {
     public TruthPolation(int size) {
         super(1, 2 /* must be 2 for 1-D microsphere */, null);
 
-        times = new float[size][1];
-        freq = new float[size];
-        conf = new float[size];
+        data = new float[size][3 /* 0=time, 1=freq, 2=conf */];
 
     }
 
@@ -88,13 +87,14 @@ public final class TruthPolation extends InterpolatingMicrosphere {
         int i = 0;
         for (Task t : tasks) {
 
+            float[] f = data[i];
             long o = t.occurrence();
-            times[i][0] = (o != ETERNAL) ? o : when;
-            freq[i] = t.freq();
+            f[0] = (o != ETERNAL) ? o : when;
+            f[1] = t.freq();
             float ci = t.conf();
             if (ci < minTaskConf)
                 minTaskConf = ci;
-            conf[i] = c2w(ci);
+            f[2] = c2w(ci);
 
             if (minT > o) minT = o;
             if (maxT < o) maxT = o;
@@ -119,8 +119,7 @@ public final class TruthPolation extends InterpolatingMicrosphere {
 
         float[] v = this.value(
                 new float[] { when },
-                times,
-                freq, conf,
+                data,
                 lightCurve,
                 i);
         float c1 = w2c(v[1]);
@@ -176,7 +175,7 @@ public final class TruthPolation extends InterpolatingMicrosphere {
 
 
     public int capacity() {
-        return times.length;
+        return data.length;
     }
 
     public void print(@NotNull PrintStream out) {

@@ -18,6 +18,7 @@ import nars.term.atom.Atomic;
 import nars.term.obj.Termject;
 import nars.term.obj.TermjectConcept;
 import nars.term.var.Variable;
+import org.eclipse.collections.impl.map.mutable.UnifiedMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -26,6 +27,7 @@ import org.slf4j.LoggerFactory;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 
 //import org.eclipse.collections.impl.map.mutable.ConcurrentHashMapUnsafe;
@@ -229,14 +231,16 @@ import java.util.function.Function;
 
     @NotNull
     public Map newBagMap() {
-        int defaultInitialCap = 4;
-        if (nar.exe.concurrent()) {
-            return new ConcurrentHashMap(defaultInitialCap);
-            //return new NonBlockingHashMap(cap);
-            //return new org.eclipse.collections.impl.map.mutable.ConcurrentHashMap<>();
-            //ConcurrentHashMapUnsafe(cap);
-        } else {
-            return new HashMap(defaultInitialCap);
-        }
+        //int defaultInitialCap = 0;
+//        if (nar.exe.concurrent()) {
+//            //return new ConcurrentHashMap(defaultInitialCap, 1f);
+//            //return new NonBlockingHashMap(cap);
+//            return new org.eclipse.collections.impl.map.mutable.ConcurrentHashMapUnsafe<>();
+//            //ConcurrentHashMapUnsafe(cap);
+//        } else {
+//            return new HashMap(defaultInitialCap, 1f);
+              return new UnifiedMap(0, 0.9f);
+//        }
+
     }
 }

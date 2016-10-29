@@ -101,7 +101,7 @@ public class GenericCompound implements Compound {
 
             cthat = (Compound)that;
 
-        } else if (that instanceof Termed)  {
+        } /*else if (that instanceof Termed)  {
             Term tthat = ((Termed) that).term();
             if (tthat instanceof Compound) {
 
@@ -113,7 +113,7 @@ public class GenericCompound implements Compound {
             } else {
                 return false;
             }
-        } else {
+        }*/ else {
             return false;
         }
 

@@ -236,9 +236,7 @@ public class InterpolatingMicrosphere {
      */
     @NotNull
     public float[] value(@NotNull float[] targetPoint,
-                         float[][] samplePoints,
-                         float[] sampleValues,
-                         float[] sampleWeights,
+                         float[][] data,
                          LightCurve curve,
                          int numSamples) {
 
@@ -247,7 +245,7 @@ public class InterpolatingMicrosphere {
 
         // Contribution of each sample point to the illumination of the
         // microsphere's facets.
-        illuminate(targetPoint, samplePoints, sampleValues, sampleWeights, curve, numSamples);
+        illuminate(targetPoint, data, curve, numSamples);
 
         return interpolate();
 
@@ -329,18 +327,18 @@ public class InterpolatingMicrosphere {
         return (float) var24;
     }
 
-    public void illuminate(@NotNull float[] targetPoint, float[][] samplePoints, float[] sampleValues, @Nullable float[] sampleEvidences, LightCurve lightCurve, int numSamples) {
+    public void illuminate(@NotNull float[] targetPoint, float[][] data, LightCurve lightCurve, int numSamples) {
         float epsilon = 0.01f;
 
         for (int i = 0; i < numSamples; i++) {
             // Vector between interpolation point and current sample point.
-            final float[] diff = ebeSubtract(samplePoints[i], targetPoint);
+            //HACK this only supports 1D points for now
+            float[] X = data[i];
+            final float[] diff = ebeSubtract(new float[] { X[0] }, targetPoint);
             final float distance = Math.max(0, safeNorm(epsilon, diff) - pointRadius);
 
             @Nullable float[] sampleDirection = distance!=0 ? diff : null;
-            float evidence = (sampleEvidences == null) ? 1f : sampleEvidences[i];
-
-
+            float evidence = X[2];
             int vectors = distance!=0  ? this.size : 1; //if exactly on-point then only compute once, otherwise compute for each microsphere vecctor
 
             for (int j = 0; j < vectors; j++) {
@@ -353,7 +351,7 @@ public class InterpolatingMicrosphere {
                     if (illumination > 0) {
                         final float[] d = microsphereData.get(j);
                         d[0] += illumination;
-                        d[1] += illumination * sampleValues[i] /* 0...1.0 */;
+                        d[1] += illumination * X[1] /* 0...1.0 */;
                     }
                 }
             }
