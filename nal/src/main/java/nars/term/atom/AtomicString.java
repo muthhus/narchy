@@ -10,11 +10,12 @@ public abstract class AtomicString implements Atomic {
      *  comparison would be redundant. */
     @Override public boolean equals(Object u) {
 
-        return  (u instanceof Atomic) &&
+        return  (this == u)
+                ||
                 (
-                    (this == u)
-                        ||
-                    (toString().equals(u.toString()) && (u instanceof AtomicString || op() == ((Atomic) u).op()))
+                        (u instanceof Atomic) &&
+                        (toString().equals(u.toString()) &&
+                        (u instanceof AtomicString || op() == ((Atomic) u).op()))
                 );
 
     }

@@ -4,11 +4,39 @@ import nars.Op;
 import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
 
-/** default Atom implementation */
-public class Atom extends AtomicStringConstant {
+/** default Atom implementation: wraps a String instance as closely as possible.
+ * ideally this string is stored encoded in UTF8 byte[]'s */
+public class Atom extends AtomicString {
+
+    private final String id;
 
     public Atom(@NotNull String id) {
-        super(validateAtomID(id));
+        this.id = (validateAtomID(id));
+    }
+
+    @Override
+    public final String toString() {
+        return id;
+    }
+
+    @Override
+    public final int varIndep() {
+        return 0;
+    }
+
+    @Override
+    public final int varDep() {
+        return 0;
+    }
+
+    @Override
+    public final int varQuery() {
+        return 0;
+    }
+
+    @Override
+    public final int varPattern() {
+        return 0;
     }
 
     @NotNull
@@ -32,7 +60,7 @@ public class Atom extends AtomicStringConstant {
 
     @NotNull
     @Override
-    public Op op() {
+    public final Op op() {
         return Op.ATOM;
     }
 

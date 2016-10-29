@@ -23,6 +23,7 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+import static java.lang.System.arraycopy;
 import static org.eclipse.collections.impl.tuple.Tuples.pair;
 
 /**
@@ -67,6 +68,7 @@ public class MyConcurrentRadixTree<X> implements /*RadixTree<X>,*/Serializable, 
             this.character = character;
         }
 
+        @Override
         public byte getIncomingEdgeFirstCharacter() {
             return this.character;
         }
@@ -82,13 +84,13 @@ public class MyConcurrentRadixTree<X> implements /*RadixTree<X>,*/Serializable, 
 
         void updateOutgoingEdge(Node var1);
 
-        List<Node> getOutgoingEdges();
+        FasterList<Node> getOutgoingEdges();
     }
 
     /**
      * default factory
      */
-    protected static Node createNode(ByteSeq edgeCharacters, Object value, List<Node> childNodes, boolean isRoot) {
+    protected static Node createNode(ByteSeq edgeCharacters, Object value, FasterList<Node> childNodes, boolean isRoot) {
         if (edgeCharacters == null) {
             throw new IllegalStateException("The edgeCharacters argument was null");
         } else if (!isRoot && edgeCharacters.length() == 0) {
@@ -97,7 +99,7 @@ public class MyConcurrentRadixTree<X> implements /*RadixTree<X>,*/Serializable, 
             throw new IllegalStateException("The childNodes argument was null");
         } else {
             //ensureNoDuplicateEdges(childNodes);
-            return (Node) (childNodes.isEmpty() ?
+            return childNodes.isEmpty() ?
                     ((value instanceof VoidValue) ?
                             new ByteArrayNodeLeafVoidValue(edgeCharacters) :
                             ((value != null) ?
@@ -107,22 +109,25 @@ public class MyConcurrentRadixTree<X> implements /*RadixTree<X>,*/Serializable, 
                             innerVoid(edgeCharacters, childNodes) :
                             ((value == null) ?
                                     innerNull(edgeCharacters, childNodes) :
-                                    inner(edgeCharacters, value, childNodes))));
+                                    inner(edgeCharacters, value, childNodes)));
         }
     }
 
-    static public ByteArrayNodeDefault inner(ByteSeq in, Object value, List<Node> outs) {
-        Collections.sort(outs, NODE_COMPARATOR);
+    static public ByteArrayNodeDefault inner(ByteSeq in, Object value, FasterList<Node> outs) {
+        if (outs.size() > 1)
+            Collections.sort(outs, NODE_COMPARATOR);
         return new ByteArrayNodeDefault(in.array(), value, outs);
     }
 
-    static public ByteArrayNodeNonLeafVoidValue innerVoid(ByteSeq in, List<Node> outs) {
-        Collections.sort(outs, NODE_COMPARATOR);
+    static public ByteArrayNodeNonLeafVoidValue innerVoid(ByteSeq in, FasterList<Node> outs) {
+        if (outs.size() > 1)
+            Collections.sort(outs, NODE_COMPARATOR);
         return new ByteArrayNodeNonLeafVoidValue(in.array(), outs);
     }
 
-    static public ByteArrayNodeNonLeafNullValue innerNull(ByteSeq in, List<Node> outs) {
-        Collections.sort(outs, NODE_COMPARATOR);
+    static public ByteArrayNodeNonLeafNullValue innerNull(ByteSeq in, FasterList<Node> outs) {
+        if (outs.size() > 1)
+            Collections.sort(outs, NODE_COMPARATOR);
         return new ByteArrayNodeNonLeafNullValue(in.array(), outs);
     }
 
@@ -207,11 +212,12 @@ public class MyConcurrentRadixTree<X> implements /*RadixTree<X>,*/Serializable, 
     static final class ByteArrayNodeDefault extends NonLeafNode {
         private final Object value;
 
-        public ByteArrayNodeDefault(byte[] edgeCharSequence, Object value, List<Node> outgoingEdges) {
+        public ByteArrayNodeDefault(@NotNull byte[] edgeCharSequence, Object value, @NotNull FasterList<Node> outgoingEdges) {
             super(edgeCharSequence, outgoingEdges);
             this.value = value;
         }
 
+        @Override
         public Object getValue() {
             return this.value;
         }
@@ -226,28 +232,34 @@ public class MyConcurrentRadixTree<X> implements /*RadixTree<X>,*/Serializable, 
             //this.incomingEdgeCharArray = edgeCharSequence.array();
         }
 
+        @Override
         public ByteSeq getIncomingEdge() {
             return this;
         }
 
+        @Override
         public byte getIncomingEdgeFirstCharacter() {
             return this.bytes[0];
         }
 
+        @Override
         public Object getValue() {
             return VoidValue.SINGLETON;
         }
 
+        @Override
         public Node getOutgoingEdge(byte edgeFirstCharacter) {
             return null;
         }
 
+        @Override
         public void updateOutgoingEdge(Node childNode) {
             throw new IllegalStateException("Cannot update the reference to the following child node for the edge starting with \'" + childNode.getIncomingEdgeFirstCharacter() + "\', no such edge already exists: " + childNode);
         }
 
-        public List<Node> getOutgoingEdges() {
-            return Collections.emptyList();
+        @Override
+        public FasterList<Node> getOutgoingEdges() {
+            return emptyList;
         }
 
         public String toString() {
@@ -262,37 +274,41 @@ public class MyConcurrentRadixTree<X> implements /*RadixTree<X>,*/Serializable, 
     }
 
 
-    abstract static class NonLeafNode extends CopyOnWriteArrayList<Node> implements Node {
+    abstract static class NonLeafNode extends FasterList /*CopyOnWriteArrayList*/<Node> implements Node {
         public final byte[] incomingEdgeCharArray;
         //private final AtomicReferenceArray<Node> outgoingEdges;
         //public final CopyOnWriteArrayList<Node> outgoingEdges;
 
-        protected NonLeafNode(byte[] incomingEdgeCharArray, List<Node> outs) {
-            super();
+        protected NonLeafNode(@NotNull byte[] incomingEdgeCharArray, @NotNull FasterList<Node> outs) {
+            super(outs.size(), outs.array());
             this.incomingEdgeCharArray = incomingEdgeCharArray;
-            addAll(outs);
         }
 
+        @NotNull @Override
         public ByteSeq getIncomingEdge() {
             return new ByteSeq.RawByteSeq(this.incomingEdgeCharArray);
         }
 
+        @Override
         public byte getIncomingEdgeFirstCharacter() {
             return this.incomingEdgeCharArray[0];
         }
 
+        @Nullable @Override
         public Node getOutgoingEdge(byte edgeFirstCharacter) {
             //AtomicReferenceArrayListAdapter childNodesList = new AtomicReferenceArrayListAdapter<>(childNodes);
             //NodeCharacterKey searchKey = new NodeCharacterKey(edgeFirstCharacter);
-            int index = binarySearch(this, edgeFirstCharacter);
-            return index < 0 ? null : (Node) get(index);
+
+            int index = MyConcurrentRadixTree.binarySearch(this, edgeFirstCharacter);
+            return index < 0 ? null : get(index);
         }
 
-        public void updateOutgoingEdge(Node childNode) {
+        @Override
+        public void updateOutgoingEdge(@NotNull Node childNode) {
             //AtomicReferenceArrayListAdapter childNodesList = new AtomicReferenceArrayListAdapter<>(childNodes);
             //NodeCharacterKey searchKey = new NodeCharacterKey(edgeFirstCharacter);
 
-            int index = binarySearch(this, childNode.getIncomingEdgeFirstCharacter());
+            int index = MyConcurrentRadixTree.binarySearch(this, childNode.getIncomingEdgeFirstCharacter());
             if (index < 0) {
                 throw new IllegalStateException("Cannot update the reference to the following child node for the edge starting with \'" + childNode.getIncomingEdgeFirstCharacter() + "\', no such edge already exists: " + childNode);
             } else {
@@ -300,7 +316,8 @@ public class MyConcurrentRadixTree<X> implements /*RadixTree<X>,*/Serializable, 
             }
         }
 
-        public List<Node> getOutgoingEdges() {
+        @Override
+        public FasterList<Node> getOutgoingEdges() {
             return this;
         }
 
@@ -316,7 +333,7 @@ public class MyConcurrentRadixTree<X> implements /*RadixTree<X>,*/Serializable, 
 
     static final class ByteArrayNodeNonLeafNullValue extends NonLeafNode {
 
-        protected ByteArrayNodeNonLeafNullValue(byte[] incomingEdgeCharArray, List<Node> outgoingEdges) {
+        protected ByteArrayNodeNonLeafNullValue(byte[] incomingEdgeCharArray, FasterList<Node> outgoingEdges) {
             super(incomingEdgeCharArray, outgoingEdges);
         }
 
@@ -325,7 +342,7 @@ public class MyConcurrentRadixTree<X> implements /*RadixTree<X>,*/Serializable, 
             return null;
         }
 
-        //        public ByteArrayNodeNonLeafNullValue(ByteSeq edgeCharSequence, List<Node> outgoingEdges) {
+        //        public ByteArrayNodeNonLeafNullValue(ByteSeq edgeCharSequence, FasterList<Node> outgoingEdges) {
 //            super(edgeCharSequence, outgoingEdges.toArray(new Node[outgoingEdges.size()]));
 //        }
 
@@ -348,6 +365,7 @@ public class MyConcurrentRadixTree<X> implements /*RadixTree<X>,*/Serializable, 
             this.value = value;
         }
 
+        @Override
         public Object getValue() {
             return this.value;
         }
@@ -369,6 +387,7 @@ public class MyConcurrentRadixTree<X> implements /*RadixTree<X>,*/Serializable, 
             super(edgeCharSequence);
         }
 
+        @Override
         public Object getValue() {
             return null;
         }
@@ -387,10 +406,11 @@ public class MyConcurrentRadixTree<X> implements /*RadixTree<X>,*/Serializable, 
     static final class ByteArrayNodeNonLeafVoidValue extends NonLeafNode {
 
 
-        public ByteArrayNodeNonLeafVoidValue(byte[] edgeCharSequence, List<Node> outgoingEdges) {
+        public ByteArrayNodeNonLeafVoidValue(byte[] edgeCharSequence, FasterList<Node> outgoingEdges) {
             super(edgeCharSequence, outgoingEdges);
         }
 
+        @Override
         public Object getValue() {
             return VoidValue.SINGLETON;
         }
@@ -440,10 +460,12 @@ public class MyConcurrentRadixTree<X> implements /*RadixTree<X>,*/Serializable, 
         clear();
     }
 
+    private final static FasterList<Node> emptyList = new FasterList(0, new Node[] {});
+
     public void clear() {
         acquireWriteLock();
         try {
-            this.root = createNode(ByteSeq.EMPTY, null, Collections.emptyList(), true);
+            this.root = createNode(ByteSeq.EMPTY, null, emptyList, true);
         } finally {
             releaseWriteLock();
         }
@@ -494,9 +516,7 @@ public class MyConcurrentRadixTree<X> implements /*RadixTree<X>,*/Serializable, 
 //        O existingValue = (O) putInternal(key, value, true);  // putInternal acquires write lock
 //        return existingValue;
 
-        return compute(key, value, (k, r, existing, v) -> {
-            return v;
-        });
+        return compute(key, value, (k, r, existing, v) -> v);
     }
 
     /**
@@ -681,7 +701,7 @@ public class MyConcurrentRadixTree<X> implements /*RadixTree<X>,*/Serializable, 
 
 
                 // Proceed with deleting the node...
-                List<Node> childEdges = found.getOutgoingEdges();
+                FasterList<Node> childEdges = found.getOutgoingEdges();
                 int numChildren = childEdges.size();
                 if (numChildren > 0) {
                     if (!recurse) {
@@ -732,17 +752,22 @@ public class MyConcurrentRadixTree<X> implements /*RadixTree<X>,*/Serializable, 
                     // (a special case which we never merge), then we also need to merge the parent with its
                     // remaining child.
 
-                    List<Node> currentEdgesFromParent = parent.getOutgoingEdges();
+                    FasterList<Node> currentEdgesFromParent = parent.getOutgoingEdges();
                     // Create a list of the outgoing edges of the parent which will remain
                     // if we remove this child...
-                    // Use a non-resizable list, as a sanity check to force ArrayIndexOutOfBounds...
-                    List<Node> newEdgesOfParent = new FasterList(parent.getOutgoingEdges().size());
+
+                    FasterList<Node> newEdgesOfParent = new FasterList(0, new Node[ parent.getOutgoingEdges().size() ] );
+                    boolean differs = false;
                     for (int i = 0, numParentEdges = currentEdgesFromParent.size(); i < numParentEdges; i++) {
                         Node node = currentEdgesFromParent.get(i);
                         if (node != found) {
                             newEdgesOfParent.add(node);
+                        } else {
+                            differs = true;
                         }
                     }
+                    if (!differs)
+                        newEdgesOfParent = currentEdgesFromParent; //re-use original
 
                     // Note the parent might actually be the root node (which we should never merge)...
                     boolean parentIsRoot = (parent == root);
@@ -958,7 +983,7 @@ public class MyConcurrentRadixTree<X> implements /*RadixTree<X>,*/Serializable, 
         if (aValue(v))
             sum++;
 
-        List<Node> l = n.getOutgoingEdges();
+        FasterList<Node> l = n.getOutgoingEdges();
         for (int i = 0, lSize = l.size(); i < lSize; i++) {
             sum += _size(l.get(i));
         }
@@ -975,7 +1000,7 @@ public class MyConcurrentRadixTree<X> implements /*RadixTree<X>,*/Serializable, 
         if (aValue(v))
             sum++;
 
-        List<Node> l = n.getOutgoingEdges();
+        FasterList<Node> l = n.getOutgoingEdges();
         for (int i = 0, lSize = l.size(); i < lSize; i++) {
             int s = _size(l.get(i));
             if (s < 0)
@@ -1005,7 +1030,7 @@ public class MyConcurrentRadixTree<X> implements /*RadixTree<X>,*/Serializable, 
         if (aValue(v))
             action.accept((X) v);
 
-        List<Node> l = start.getOutgoingEdges();
+        FasterList<Node> l = start.getOutgoingEdges();
         for (Node child : l)
             forEach(child, action);
     }
@@ -1015,7 +1040,7 @@ public class MyConcurrentRadixTree<X> implements /*RadixTree<X>,*/Serializable, 
         if (aValue(v))
             action.accept(start.getIncomingEdge(), (X) v);
 
-        List<Node> l = start.getOutgoingEdges();
+        FasterList<Node> l = start.getOutgoingEdges();
         for (int i = 0, lSize = l.size(); i < lSize; i++) {
             forEach(l.get(i), action);
         }
@@ -1056,7 +1081,7 @@ public class MyConcurrentRadixTree<X> implements /*RadixTree<X>,*/Serializable, 
         //}
 
         while (true) {
-            List<Node> c = current.getOutgoingEdges();
+            FasterList<Node> c = current.getOutgoingEdges();
             int s = c.size();
             if (s == 0) {
                 break; //select it
@@ -1105,23 +1130,19 @@ public class MyConcurrentRadixTree<X> implements /*RadixTree<X>,*/Serializable, 
         Object foundValue;
         Node found;
 
-        {
+        version = writes.intValue();
 
-            version = writes.intValue();
+        acquireReadLockIfNecessary();
+        try {
 
-            acquireReadLockIfNecessary();
-            try {
-
-                // Note we search the tree here after we have acquired the write lock...
-                result = searchTree(key);
-                found = result.found;
-                matched = result.charsMatched;
-                foundValue = found != null ? found.getValue() : null;
-                foundX = ((matched == key.length()) && (foundValue != VoidValue.SINGLETON)) ? ((X) foundValue) : null;
-            } finally {
-                releaseReadLockIfNecessary();
-            }
-
+            // Note we search the tree here after we have acquired the write lock...
+            result = searchTree(key);
+            found = result.found;
+            matched = result.charsMatched;
+            foundValue = found != null ? found.getValue() : null;
+            foundX = ((matched == key.length()) && (foundValue != VoidValue.SINGLETON)) ? ((X) foundValue) : null;
+        } finally {
+            releaseReadLockIfNecessary();
         }
 
         newValue = computeFunc.apply(key, result, foundX, value);
@@ -1147,7 +1168,7 @@ public class MyConcurrentRadixTree<X> implements /*RadixTree<X>,*/Serializable, 
                 if (foundX == null)
                     estSize.incrementAndGet();
 
-                List<Node> oedges = found.getOutgoingEdges();
+                FasterList<Node> oedges = found.getOutgoingEdges();
                 switch (classification) {
                     case EXACT_MATCH:
                         // Search found an exact match for all edges leading to this node.
@@ -1174,7 +1195,7 @@ public class MyConcurrentRadixTree<X> implements /*RadixTree<X>,*/Serializable, 
                         // Create new nodes...
                         Node newChild = createNode(suffixFromExistingEdge, foundValue, oedges, false);
 
-                        Node newParent = createNode(commonPrefix, newValue, Arrays.asList(newChild), false);
+                        Node newParent = createNode(commonPrefix, newValue, new FasterList(newChild), false);
 
                         // Add the new parent to the parent of the node being replaced (replacing the existing node)...
                         result.parentNode.updateOutgoingEdge(newParent);
@@ -1192,13 +1213,20 @@ public class MyConcurrentRadixTree<X> implements /*RadixTree<X>,*/Serializable, 
                         // Create a new child node containing the trailing characters...
                         ByteSeq keySuffix = key.subSequence(matched, key.length());
 
-                        Node newChild = createNode(keySuffix, newValue, Collections.emptyList(), false);
+                        Node newChild = createNode(keySuffix, newValue, emptyList, false);
 
                         // Clone the current node adding the new child...
-                        List<Node> edges = new FasterList(oedges.size() + 1);
-                        edges.addAll(oedges);
-                        edges.add(newChild);
-                        cloneAndReattach(result, found, foundValue, edges);
+                        int numEdges = oedges.size();
+                        Node[] edgesArray;
+                        if (numEdges > 0) {
+                            edgesArray = new Node[numEdges+1];
+                            arraycopy(oedges.array(), 0, edgesArray, 0, numEdges);
+                            edgesArray[numEdges] = newChild;
+                        } else {
+                            edgesArray = new Node[] { newChild };
+                        }
+
+                        cloneAndReattach(result, found, foundValue, new FasterList(edgesArray.length, edgesArray));
 
                         break;
 
@@ -1218,7 +1246,7 @@ public class MyConcurrentRadixTree<X> implements /*RadixTree<X>,*/Serializable, 
                         ByteSeq suffixFromKey = key.subSequence(matched, key.length());
 
                         // Create new nodes...
-                        Node n1 = createNode(suffixFromKey, newValue, Collections.emptyList(), false);
+                        Node n1 = createNode(suffixFromKey, newValue, emptyList, false);
 
                         ByteSeq keyCharsFromStartOfNodeFound = key.subSequence(matched - result.charsMatchedInNodeFound, key.length());
                         ByteSeq commonPrefix = getCommonPrefix(keyCharsFromStartOfNodeFound, found.getIncomingEdge());
@@ -1226,7 +1254,7 @@ public class MyConcurrentRadixTree<X> implements /*RadixTree<X>,*/Serializable, 
 
                         Node n2 = createNode(suffixFromExistingEdge, foundValue, oedges, false);
                         @SuppressWarnings({"NullableProblems"})
-                        Node n3 = createNode(commonPrefix, null, Arrays.asList(n1, n2), false);
+                        Node n3 = createNode(commonPrefix, null, new FasterList(2, new Node[] { n1, n2} ), false);
 
                         result.parentNode.updateOutgoingEdge(n3);
 
@@ -1245,7 +1273,7 @@ public class MyConcurrentRadixTree<X> implements /*RadixTree<X>,*/Serializable, 
         return newValue;
     }
 
-    private void cloneAndReattach(SearchResult searchResult, Node found, Object foundValue, List<Node> edges) {
+    private void cloneAndReattach(SearchResult searchResult, Node found, Object foundValue, FasterList<Node> edges) {
         ByteSeq ie = found.getIncomingEdge();
         boolean root = ie.length() == 0;
 
@@ -1388,7 +1416,7 @@ public class MyConcurrentRadixTree<X> implements /*RadixTree<X>,*/Serializable, 
                             return endOfData();
                         }
                         NodeKeyPair current = stack.pop();
-                        List<Node> childNodes = current.node.getOutgoingEdges();
+                        FasterList<Node> childNodes = current.node.getOutgoingEdges();
 
                         // -> Iterate child nodes in reverse order and so push them onto the stack in reverse order,
                         // to counteract that pushing them onto the stack alone would otherwise reverse their processing order.
@@ -1656,6 +1684,7 @@ public class MyConcurrentRadixTree<X> implements /*RadixTree<X>,*/Serializable, 
 //        this.forEach(c);
 //    }
 
+    @Override
     public Iterator<X> iterator() {
         return getValuesForKeysStartingWith(ByteSeq.EMPTY).iterator();
     }
