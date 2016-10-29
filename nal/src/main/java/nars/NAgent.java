@@ -51,11 +51,15 @@ abstract public class NAgent implements NSense, NAction {
 
     public static final Logger logger = LoggerFactory.getLogger(NAgent.class);
 
-    /** general reward signal for this agent */
+    /**
+     * general reward signal for this agent
+     */
     @NotNull
     public final SensorConcept happy;
 
-    /** d(happy)/dt = change in happiness over time (ie. first-order difference of happiness signal) */
+    /**
+     * d(happy)/dt = change in happiness over time (ie. first-order difference of happiness signal)
+     */
     @Nullable
     public final SensorConcept joy;
 
@@ -81,12 +85,14 @@ abstract public class NAgent implements NSense, NAction {
     float predictorProbability = 1f;
 
     protected final FasterList<MutableTask> predictors = $.newArrayList();
-    private float predictorPriFactor = 1f;
+    private float predictorPriFactor = 0.25f;
 
     public boolean trace = false;
 
 
-    /** >=0 : NAR frames that are computed between each Agent frame */
+    /**
+     * >=0 : NAR frames that are computed between each Agent frame
+     */
     public final int frameRate;
 
     protected long now;
@@ -94,7 +100,7 @@ abstract public class NAgent implements NSense, NAction {
 
     //private float curiosityAttention;
     private float rewardSum = 0;
-    private MutableFloat minSensorPriority, maxSensorPriority;
+    private MutableFloat maxSensorPriority;
 
     public NAgent(@NotNull NAR nar) {
         this(nar, 1);
@@ -111,13 +117,13 @@ abstract public class NAgent implements NSense, NAction {
 
         rewardNormalized = new FloatPolarNormalized(() -> rewardValue);
 
-        happy = new SensorConcept("(happy)", nar,
+        happy = new SensorConcept("happy" + "(" + nar.self + ")", nar,
                 rewardNormalized,
                 (x) -> t(x, rewardConf)
         );
 
 
-        joy = new SensorConcept("(joy)", nar,
+        joy = new SensorConcept("joy" + "(" + nar.self + ")", nar,
                 new FloatPolarNormalized(
                         new FirstOrderDifferenceFloat(
                                 () -> nar.time(), () -> rewardValue
@@ -129,39 +135,49 @@ abstract public class NAgent implements NSense, NAction {
     }
 
     @NotNull
-    @Override public final Collection<SensorConcept> sensors() {
+    @Override
+    public final Collection<SensorConcept> sensors() {
         return sensors;
     }
 
     @NotNull
-    @Override public final Collection<ActionConcept> actions() {
+    @Override
+    public final Collection<ActionConcept> actions() {
         return actions;
     }
 
-    @Override public final NAR nar() {
+    @Override
+    public final NAR nar() {
         return nar;
     }
 
-    /** should only be invoked before agent has started TODO check for this */
+    /**
+     * should only be invoked before agent has started TODO check for this
+     */
     public void sense(SensorConcept... s) {
         sense(Lists.newArrayList(s));
     }
 
-    /** should only be invoked before agent has started TODO check for this */
+    /**
+     * should only be invoked before agent has started TODO check for this
+     */
     public void sense(@NotNull Iterable<SensorConcept> s) {
         Iterables.addAll(sensors, s);
     }
 
-    /** should only be invoked before agent has started TODO check for this */
+    /**
+     * should only be invoked before agent has started TODO check for this
+     */
     public void action(ActionConcept... s) {
         action(Lists.newArrayList(s));
     }
 
-    /** should only be invoked before agent has started TODO check for this */
+    /**
+     * should only be invoked before agent has started TODO check for this
+     */
     public void action(@NotNull Iterable<ActionConcept> s) {
         Iterables.addAll(actions, s);
     }
-
 
 
     /**
@@ -177,7 +193,7 @@ abstract public class NAgent implements NSense, NAction {
         if (phase == 0) {
             ticks(0); //freeze clock
         }
-        if ((phase == frameRate-1) || (frameRate < 2)) {
+        if ((phase == frameRate - 1) || (frameRate < 2)) {
             ticks(1);
             doFrame();
         }
@@ -188,7 +204,7 @@ abstract public class NAgent implements NSense, NAction {
     private void ticks(int t) {
         Clock clock = (Clock) nar.clock;
         if (clock instanceof FrameClock)
-            ((FrameClock)clock).tick(t); //resume clock for the last cycle before repeating
+            ((FrameClock) clock).tick(t); //resume clock for the last cycle before repeating
     }
 
     private void doFrame() {
@@ -196,7 +212,7 @@ abstract public class NAgent implements NSense, NAction {
         now = nar.time();
 
         float r = rewardValue = act();
-        if (r==r) {
+        if (r == r) {
             rewardSum += r;
             rewardWindow.addValue(rewardValue);
         }
@@ -204,15 +220,16 @@ abstract public class NAgent implements NSense, NAction {
         /** safety valve: if overloaded, enter shock / black out and do not receive sensor input */
         if (nar.exe.load() < 1) {
 
-            updateActions();
 
-            curiosity();
+            predict();
 
-            nar.runLater(sensors, SensorConcept::run, 16);
+            nar.runLater(sensors, SensorConcept::run, 4);
             happy.run();
             joy.run();
 
-            predict();
+            updateActions();
+
+            curiosity();
 
         } else {
             logger.warn("sensor overwhelm");
@@ -263,7 +280,7 @@ abstract public class NAgent implements NSense, NAction {
 //                //(float) Math.sqrt(numSensors); //HEURISTIC
 //                numSensors / 2f;
 
-        minSensorPriority = new MutableFloat(Param.BUDGET_EPSILON * 4);
+        //minSensorPriority = new MutableFloat(Param.BUDGET_EPSILON * 4);
 
         maxSensorPriority = new MutableFloat(nar.priorityDefault(BELIEF));
 
@@ -275,9 +292,9 @@ abstract public class NAgent implements NSense, NAction {
 //        SensorConcept.activeAttention(p, minSensorPriority, maxSensorPriority, nar);
 
         //in separate banks so they dont compete with eachother for attention:
-        SensorConcept.activeAttention(sensors, minSensorPriority, maxSensorPriority, nar);
-        SensorConcept.activeAttention(actions, minSensorPriority, maxSensorPriority, nar);
-        SensorConcept.activeAttention(newArrayList(happy, joy), minSensorPriority, maxSensorPriority, nar);
+        SensorConcept.activeAttention(sensors, new MutableFloat(maxSensorPriority.floatValue()/sensors.size()), maxSensorPriority, nar);
+        SensorConcept.activeAttention(actions, new MutableFloat(maxSensorPriority.floatValue()/actions.size()), maxSensorPriority, nar);
+        SensorConcept.activeAttention(newArrayList(happy, joy), new MutableFloat(maxSensorPriority.floatValue()/2f), maxSensorPriority, nar);
 
         //SensorConcept.flatAttention(p, minSensorPriority);
 
@@ -301,7 +318,7 @@ abstract public class NAgent implements NSense, NAction {
             predictors.add(
                     new MutableTask(happy, '!', 1f, rewardGamma)
                             .eternal()
-                            //.present(nar.time()+dt)
+                    //.present(nar.time()+dt)
             );
 //                    happy.desire($.t(1f, rewardGamma),
 //                            nar.priorityDefault(Symbols.GOAL),
@@ -347,13 +364,15 @@ abstract public class NAgent implements NSense, NAction {
 
             predictors.addAll(
                     new MutableTask($.seq($.varQuery(0), 1, action), '?', null).eternal(),
-                    new MutableTask($.seq(action, 1, happiness), '?', null).eternal()
+                    new MutableTask($.impl($.varQuery(0), 1, action), '?', null).eternal(),
+                    new MutableTask($.seq(action, 1, happiness), '?', null).eternal(),
+                    new MutableTask($.impl(action, 1, happiness), '?', null).eternal()
             );
 
         }
 
         predictors.add(
-            new MutableTask($.seq($.varQuery(0 /*"what"*/), 1, happiness), '?', null).time(now, now)
+                new MutableTask($.seq($.varQuery(0 /*"what"*/), 1, happiness), '?', null).time(now, now)
         );
 
         System.out.println(Joiner.on('\n').join(predictors));
@@ -371,7 +390,10 @@ abstract public class NAgent implements NSense, NAction {
         nar.run(cycles);
         return this;
     }
-    /** run Real-time */
+
+    /**
+     * run Real-time
+     */
     @NotNull
     public Loop runRT(float fps) {
 
@@ -416,28 +438,27 @@ abstract public class NAgent implements NSense, NAction {
     }
 
 
-
-
     private void curiosity() {
         //Budget curiosityBudget = Budget.One.clone().multiplied(minSensorPriority.floatValue(), 0.5f, 0.9f);
 
 
         for (ActionConcept c : actions) {
 
-            float motorEpsilonProbability = epsilonProbability * (1f - Math.min(1f, c.goalConf(now, 0)/gamma));
+            float motorEpsilonProbability = epsilonProbability * (1f - Math.min(1f, c.goalConf(now, 0) / gamma));
 
             if (nar.random.nextFloat() < motorEpsilonProbability) {
 
                 logger.info("curiosity: {} conf={}", c, c.goalConf(now, 0));
 
                 nar.inputLater(
-                    new GeneratedTask(c, GOAL,
-                            $.t(nar.random.nextFloat()
-                                //Math.random() > 0.5f ? 1f : 0f
-                                , Math.max(nar.truthResolution.floatValue(), (nar.random.nextFloat() * gamma * gammaEpsilonFactor))))
-                                .time(now, now).budgetByTruth(c.pri.asFloat(), nar.durabilityDefault(GOAL)).log("Curiosity"));
+                        new GeneratedTask(c, GOAL,
+                                $.t(nar.random.nextFloat()
+                                        //Math.random() > 0.5f ? 1f : 0f
+                                        , Math.max(nar.truthResolution.floatValue(), (nar.random.nextFloat() * gamma * gammaEpsilonFactor))))
+                                .time(now, now).budgetByTruth(c.pri.asFloat(),
+                                Math.max(nar.durMin.floatValue(), gammaEpsilonFactor * nar.durabilityDefault(GOAL))).log("Curiosity"));
 
-                                //in order to auto-destruct corectly, the task needs to remove itself from the taskindex too
+                //in order to auto-destruct corectly, the task needs to remove itself from the taskindex too
                 /* {
                     @Override
                     public boolean onConcept(@NotNull Concept c) {
@@ -481,7 +502,7 @@ abstract public class NAgent implements NSense, NAction {
             if (d != null)
                 m += d.confWeight();
         }
-        m/=n;
+        m /= n;
         avgActionDesire.addValue(w2c(m)); //resulting from the previous frame
 
         nar.runLater(actions, ActionConcept::run, 1);
@@ -526,7 +547,7 @@ abstract public class NAgent implements NSense, NAction {
         MutableTask s;
         if (t.occurrence() != ETERNAL) {
             s = new GeneratedTask(t.term(), t.punc(), t.truth())
-                            .time(now, now + (t.occurrence() - t.creation()));
+                    .time(now, now + (t.occurrence() - t.creation()));
 
             s.evidence(t)
                     .log("Agent Predictor");

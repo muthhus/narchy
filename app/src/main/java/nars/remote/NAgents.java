@@ -136,7 +136,7 @@ abstract public class NAgents extends NAgent {
                 //new SingleThreadExecutioner();
                 new MultiThreadExecutioner(threads, 8192 /* TODO chose a power of 2 number to scale proportionally to # of threads */);
 
-        int volMax = 40;
+        int volMax = 32;
         int conceptsPerCycle = 64;
 
 
@@ -158,9 +158,9 @@ abstract public class NAgents extends NAgent {
         };
 
         nar.beliefConfidence(0.9f);
-        nar.goalConfidence(0.75f);
+        nar.goalConfidence(0.9f);
 
-        float p = 0.25f;
+        float p = 0.1f;
         nar.DEFAULT_BELIEF_PRIORITY = 0.9f * p;
         nar.DEFAULT_GOAL_PRIORITY = 1f * p;
         nar.DEFAULT_QUESTION_PRIORITY = 0.6f * p;
@@ -169,12 +169,12 @@ abstract public class NAgents extends NAgent {
         nar.confMin.setValue(0.01f);
         nar.compoundVolumeMax.setValue(volMax);
 
-        MySTMClustered stm = new MySTMClustered(nar, 96, '.', 3, true, 16);
+        MySTMClustered stm = new MySTMClustered(nar, 128, '.', 3, true, 32);
         MySTMClustered stmGoal = new MySTMClustered(nar, 32, '!', 2, true, 8);
 
         Abbreviation abbr = new Abbreviation(nar, "the",
                 4, 16,
-                0.05f, 32);
+                0.1f, 32);
 
         new Inperience(nar);
 

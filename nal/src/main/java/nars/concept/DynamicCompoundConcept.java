@@ -4,6 +4,7 @@ import com.google.common.collect.Iterators;
 import nars.*;
 import nars.bag.Bag;
 import nars.budget.Budget;
+import nars.budget.BudgetFunctions;
 import nars.budget.RawBudget;
 import nars.budget.merge.BudgetMerge;
 import nars.nal.Stamp;
@@ -60,14 +61,15 @@ public class DynamicCompoundConcept extends CompoundConcept {
         }
 
         @NotNull public Budget budget() {
-            RawBudget b = new RawBudget();
+            //RawBudget b = new RawBudget();
             int s = e.size();
             assert(s > 0);
             float f = 1f / s;
-            for (Task x : e) {
-                BudgetMerge.plusBlend.apply(b, x.budget(), f);
-            }
-            return b;
+//            for (Task x : e) {
+//                BudgetMerge.plusBlend.apply(b, x.budget(), f);
+//            }
+//            return b;
+            return BudgetFunctions.fund(e, f);
         }
 
         @Nullable public long[] evidence() {
@@ -315,7 +317,7 @@ public class DynamicCompoundConcept extends CompoundConcept {
 
             long then = target.occurrence();
 
-            if (x == null || then == ETERNAL /*|| Math.abs(then - x.occurrence() ) >= occThresh*/) {
+            //if (x == null || then == ETERNAL /*|| Math.abs(then - x.occurrence() ) >= occThresh*/) {
 
                 if (then == ETERNAL)
                     then = now;
@@ -326,29 +328,32 @@ public class DynamicCompoundConcept extends CompoundConcept {
                 DynTruth yy = truth(then, template, true);
                 if (yy!=null) {
                     Truth y = yy.truth();
-                    if ((y != null) && (x==null || (y.conf() > x.conf()))) { //!y.equals(x.truth())) {
+
+                    if ((y != null)) {
+                        @Nullable long[] yEv = yy.evidence();
+                        if ((x == null || (!Stamp.overlapping(target.evidence(), yEv) && y.conf() > x.conf()))) { //!y.equals(x.truth())) {
 
 
 //                        /*if the belief tables provided a value, interpolate this with the dynamic value to get the final truth value */
 //                        float overlap = 0; //TODO compute overlap %
 //                        Truth z = x != null ? Revision.revise(y,x,1f-overlap,nar.confMin.floatValue()) : y;
 //                        long[] e = x!=null ? Stamp.zip(yy.evidence(), x.evidence()) : yy.evidence();
-                        //System.err.println(x + " + " + y + " = " + z);
+                            //System.err.println(x + " + " + y + " = " + z);
 
-                        RevisionTask t = new RevisionTask(template, beliefOrGoal ? Symbols.BELIEF : Symbols.GOAL,
-                                y, nar.time(), then, yy.evidence());
-                        t.setBudget(yy.budget());
-                        t.log("Dynamic");
+                            RevisionTask t = new RevisionTask(template, beliefOrGoal ? Symbols.BELIEF : Symbols.GOAL,
+                                    y, nar.time(), then, yEv);
+                            t.setBudget(yy.budget());
+                            t.log("Dynamic");
 
 
-                        //System.err.println(xx + "\tvs\t" + x);
-                        //nar.inputLater(xx);
-                        x = t;
+                            //System.err.println(xx + "\tvs\t" + x);
+                            //nar.inputLater(xx);
+                            x = t;
 
+                        }
                     }
-
                 }
-            }
+            //}
 
 
             return x;

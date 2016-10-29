@@ -21,7 +21,7 @@ import static nars.time.Tense.ETERNAL;
 @RunWith(Parameterized.class)
 public class NAL7Test extends AbstractNALTest {
 
-    final int cycles = 2000;
+    final int cycles = 500;
 
     public NAL7Test(Supplier<NAR> b) {
         super(b);
@@ -819,6 +819,30 @@ public class NAL7Test extends AbstractNALTest {
                 .mustBelieve(24,"(y)", 1f, 0.4f, 24)
         ;
     }
+
+    @Test
+    public void multiConditionSyllogismPre() {
+        //    Y, ((&&,X,A..+) ==> B), time(dtBeliefExact), notImplEqui(A..+) |- subIfUnifiesAny(((&&,A..+) ==>+- B),X,Y), (Belief:Deduction)
+
+        test()
+                .input("hold(key). :|:")
+                .input("((hold(?x) && open(door)) ==> enter(room)). :|:")
+                .mustBelieve(cycles, "(open(door) ==> enter(room))",
+                        1.00f, 0.81f,
+                        0);
+    }
+    @Test
+    public void multiConditionSyllogismPost() {
+        //    Y, ((&&,X,A..+) ==> B), time(dtBeliefExact), notImplEqui(A..+) |- subIfUnifiesAny(((&&,A..+) ==>+- B),X,Y), (Belief:Deduction)
+
+        test()
+                .input("hold(key). :|:")
+                .input("(goto(door) ==> (hold(?x) && open(door))). :|:")
+                .mustBelieve(cycles, "(goto(door) ==> open(door))",
+                        1.00f, 0.81f,
+                        0);
+    }
+
 //    @Test public void testTruthDecayOverTime0() {
 //        testTruthDecayOverTime(0, 0.81f, 0.005f);
 //    }

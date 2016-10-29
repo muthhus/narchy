@@ -166,7 +166,7 @@ public class Vis {
     }
 
     public static <X extends Termed> BagChart<X> items(Bag<X> bag, final Iterative d, final int count) {
-        BagChart<X> tc = new BagChart<>(bag, count) {
+        BagChart<X> tc = new BagChart<X>(bag, count) {
             @Override
             public void accept(BLink<X> x, ItemVis<BLink<X>> y) {
                 float p = x.pri();

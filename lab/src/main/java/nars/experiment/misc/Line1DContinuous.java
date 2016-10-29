@@ -6,6 +6,7 @@ import nars.NAgent;
 import nars.Param;
 import nars.concept.ActionConcept;
 import nars.concept.SensorConcept;
+import nars.gui.Vis;
 import nars.index.term.map.CaffeineIndex;
 import nars.nar.Default;
 import nars.nar.exe.Executioner;
@@ -20,6 +21,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Arrays;
 
 import static java.lang.System.out;
+import static nars.Symbols.GOAL;
 
 
 /**
@@ -66,25 +68,61 @@ public class Line1DContinuous extends NAgent {
             }, (v) -> $.t(v, alpha)));
         }
 
-        ActionConcept a;
-        actions.add(a = new ActionConcept("e(leftright)", n, (b, d) -> {
+        ActionConcept a1, a2;
+//        actions.add(a = new ActionConcept("e(leftright)", n, (b, d) -> {
+//            if (d!=null) {
+//                float v =
+//                        //d.expectation();
+//                        d.freq();
+//                yEst += (v -0.5f)*speed;
+//                return $.t(d.freq(), gamma);
+//            }
+//            return null;
+//        }));
+//        actions.add(a = new ActionConcept("e(leftright)", n, (b, d) -> {
+//            if (d!=null) {
+//                float v =
+//                        //d.expectation();
+//                        d.freq();
+//                yEst += (v -0.5f)*speed;
+//                return $.t(d.freq(), gamma);
+//            }
+//            return null;
+//        }));
+
+        actions.add(a1 = new ActionConcept("e(left)", n, (b, d) -> {
             if (d!=null) {
                 float v =
                         //d.expectation();
                         d.freq();
-                yEst += (v -0.5f)*speed;
+                yEst += v*speed;
+                return $.t(d.freq(), gamma);
+            }
+            return null;
+        }));
+        actions.add(a2 = new ActionConcept("e(right)", n, (b, d) -> {
+            if (d!=null) {
+                float v =
+                        //d.expectation();
+                        d.freq();
+                yEst += v*(-speed);
                 return $.t(d.freq(), gamma);
             }
             return null;
         }));
 
+
+
         n.onTask(t -> {
            if (t instanceof DerivedTask
-                   //t.term().equals(a.term())
-                   && t.term().containsTermRecursively(a.term())
+                   && t.punc() == GOAL
+                   && (t.term().equals(a1.term()) || t.term().equals(a2.term()))
+                   //&& t.term().containsTermRecursively(a.term())
             ) {
                 System.out.println(t.proof());
-                n.runLater(()->a.print());
+                System.out.println();
+//                n.runLater(()->a1.print());
+//               n.runLater(()->a2.print());
            }
         });
 
@@ -199,7 +237,7 @@ public class Line1DContinuous extends NAgent {
     public static void main(String[] args) {
 
         XorShift128PlusRandom rng = new XorShift128PlusRandom((int)(Math.random()*1000));
-        int conceptsPerCycle = 24;
+        int conceptsPerCycle = 64;
 
         final Executioner exe =
                 //new MultiThreadExecutioner(2, 2048);
@@ -213,19 +251,23 @@ public class Line1DContinuous extends NAgent {
 
 
         nar.beliefConfidence(0.9f);
-        nar.goalConfidence(0.6f);
+        nar.goalConfidence(0.9f);
 
         //nar.truthResolution.setValue(0.02f);
-        //nar.durMin.setValue(0.03f);
+        //nar.durMin.setValue(0.1f);
 
-        nar.compoundVolumeMax.set(20);
+        nar.compoundVolumeMax.set(16);
 
         Line1DContinuous l = new Line1DContinuous(nar, 6,
                 sine(255)
                 //random(120)
         );
+
+        Vis.show((Default) l.nar, 2000); //Vis.agentActions(l, 2000);
+
         l.print = true;
         l.run(15000);
+
 
         NAR.printTasks(nar, true);
         NAR.printTasks(nar, false);

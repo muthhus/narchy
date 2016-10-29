@@ -420,7 +420,12 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
 
         String contentName;
         if (term) {
-            contentName = term().toString();
+            try {
+                contentName = term().toString();
+            } catch (Throwable t) {
+                contentName = t.toString();
+            }
+
         } else {
             contentName = "";
         }
