@@ -110,7 +110,7 @@ public class Islands {
 		return islandId;
 	}
 
-	public <X> void buildIslands(Intersecter intersecter, OArrayList<Collidable<X>> collidables) {
+	public <X> void buildIslands(Intersecter intersecter, OArrayList<Collidable> collidables) {
 
 		//System.out.println("build islands");
 
@@ -246,7 +246,7 @@ public class Islands {
 		//System.err.println("error in island management: " + colObj0 + " " + colObj0.data());
 	}
 
-	public <X> void buildAndProcessIslands(Intersecter intersecter, OArrayList<Collidable<X>> collidables, IslandCallback callback) {
+	public <X> void buildAndProcessIslands(Intersecter intersecter, OArrayList<Collidable> collidables, IslandCallback callback) {
 		buildIslands(intersecter, collidables);
 
 		int endIslandIndex = 1;

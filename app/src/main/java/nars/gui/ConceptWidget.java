@@ -106,7 +106,7 @@ public class ConceptWidget extends SimpleSpatial<Term> {
         scale(nodeScale, nodeScale, nodeScale / 4f);
 
 
-        Draw.hsb( (tt.op().ordinal()/16f), 0.75f + 0.25f * p, 0.5f  , 1f, shapeColor);
+        Draw.hsb( (tt.op().ordinal()/16f), 0.75f + 0.25f * p, 0.5f  , 0.9f, shapeColor);
 
 
 
@@ -148,16 +148,16 @@ public class ConceptWidget extends SimpleSpatial<Term> {
 
 
 
-    boolean addLink(SpaceGraph space, BLink<? extends Termed> ll) {
+    boolean addEdge(SpaceGraph space, BLink<? extends Termed> ll) {
 
         Termed gg = ll.get();
         if (gg == null)
             return true;
-        return addLink(space, gg, ll)!=null;
+        return addEdge(space, gg, ll)!=null;
     }
 
     @Nullable
-    public EDraw addLink(@NotNull SpaceGraph space, @NotNull Termed gg, @NotNull  Budget ll) {
+    public EDraw addEdge(@NotNull SpaceGraph space, @NotNull Termed gg, @NotNull  Budget ll) {
         SimpleSpatial target = (SimpleSpatial) space.getIfActive(gg.term());
         if (target == null)
             return null;
@@ -187,7 +187,8 @@ public class ConceptWidget extends SimpleSpatial<Term> {
             z.g = 0.25f + 0.7f * (pri * qua);
             float dur = l.dur();
             z.b = 0.25f + 0.7f * (pri * dur);
-            z.a = 0.9f;
+            z.a = 0.5f + 0.5f * pri;
+                    //0.9f;
             z.attraction = sqr(or(qua,dur))*maxAttraction;
 
             ee.add(z);

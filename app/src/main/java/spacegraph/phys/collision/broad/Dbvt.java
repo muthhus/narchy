@@ -900,7 +900,7 @@ public final class Dbvt {
 		}
 
 		/** recursively collets all leaves  */
-		public final <X> void leaves(Collection<Collidable<X>> l) {
+		public final <X> void leaves(Collection<Collidable> l) {
 
 			if (data!=null) {
 				l.add(data.data);

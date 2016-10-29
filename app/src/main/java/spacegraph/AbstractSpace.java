@@ -21,7 +21,7 @@ abstract public class AbstractSpace<X, Y extends Spatial<X>> implements Iterable
 
     final List<SpaceTransform> transforms = $.newArrayList();
 
-    public AbstractSpace with(SpaceTransform<X>... t) {
+    public AbstractSpace with(SpaceTransform... t) {
         Collections.addAll(this.transforms, t);
         return this;
     }

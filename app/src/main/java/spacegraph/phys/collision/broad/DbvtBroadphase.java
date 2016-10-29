@@ -152,7 +152,7 @@ public class DbvtBroadphase extends Broadphase {
 		//btAlignedFree(proxy);
 	}
 
-	@Override public <X> void forEach(int maxClusterPopulation, OArrayList<Collidable<X>> all, Consumer<List<Collidable<X>>> each) {
+	@Override public <X> void forEach(int maxClusterPopulation, OArrayList<Collidable> all, Consumer<List<Collidable>> each) {
 		Node root = sets[0].root;
 		if (root == null)
 			return;
@@ -167,7 +167,7 @@ public class DbvtBroadphase extends Broadphase {
 		forEach(root, maxClusterPopulation, population, 0, each);
 	}
 
-	public <X> int forEach(Node node, int maxClusterPopulation, int unvisited, int level, Consumer<List<Collidable<X>>> each) {
+	public <X> int forEach(Node node, int maxClusterPopulation, int unvisited, int level, Consumer<List<Collidable>> each) {
 
 
 		//HACK approximate cluster segmentation, a better one can be designed which will more evenly partition the set
@@ -182,7 +182,7 @@ public class DbvtBroadphase extends Broadphase {
 			}
 		} else {
 			//stop here and batch
-			List<Collidable<X>> l = $.newArrayList(nodePop);
+			List<Collidable> l = $.newArrayList(nodePop);
 			node.leaves(l);
 			if (!l.isEmpty()) {
 				each.accept(l);

@@ -6,6 +6,6 @@ import spacegraph.phys.util.OArrayList;
 
 
 /** for applying NxN interactions */
-public interface BroadConstraint<X> {
-    void solve(Broadphase b, OArrayList<Collidable<X>> objects, float timeStep);
+public interface BroadConstraint {
+    void solve(Broadphase b, OArrayList<Collidable> objects, float timeStep);
 }

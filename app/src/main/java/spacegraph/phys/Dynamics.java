@@ -72,7 +72,7 @@ public abstract class Dynamics<X> extends Collisions<X> {
     protected final OArrayList<TypedConstraint> constraints = new OArrayList<TypedConstraint>();
     protected final v3 gravity = new v3(0f, -10f, 0f);
     //hold sthe current list of active bodies
-    private final OArrayList<Collidable<X>> collidable = new OArrayList<>();
+    private final OArrayList<Collidable> collidable = new OArrayList<>();
     private final OArrayList<TypedConstraint> sortedConstraints = new OArrayList<TypedConstraint>();
     private final InplaceSolverIslandCallback solverCallback = new InplaceSolverIslandCallback();
     protected InternalTickCallback internalTickCallback;
@@ -139,7 +139,7 @@ public abstract class Dynamics<X> extends Collisions<X> {
         v3 tmpAngVel = new v3();
 
         // todo: iterate over awake simulation islands!
-        OArrayList<Collidable<X>> colliding = this.collidable;
+        OArrayList<Collidable> colliding = this.collidable;
         for (int i = 0, collidingSize = colliding.size(); i < collidingSize; i++) {
             Dynamic body = ifDynamic(colliding.get(i));
 
@@ -242,7 +242,7 @@ public abstract class Dynamics<X> extends Collisions<X> {
     @Override
     public final void forEachCollidable(IntObjectProcedure<Collidable<X>> each) {
 
-        OArrayList<Collidable<X>> o = this.collidable;
+        OArrayList<Collidable> o = this.collidable;
         int s = o.size();
 
         for (int i = 0; i < s; i++) {
@@ -268,7 +268,7 @@ public abstract class Dynamics<X> extends Collisions<X> {
     }
 
     @Override
-    public OArrayList<Collidable<X>> collidables() {
+    public OArrayList<Collidable> collidables() {
         return collidable;
     }
 
@@ -545,7 +545,7 @@ public abstract class Dynamics<X> extends Collisions<X> {
         }
     }
 
-    List<BroadConstraint> broadConstraints = $.newArrayList(0);
+    final List<BroadConstraint> broadConstraints = $.newArrayList(0);
 
     public void addBroadConstraint(BroadConstraint b) {
         broadConstraints.add(b);

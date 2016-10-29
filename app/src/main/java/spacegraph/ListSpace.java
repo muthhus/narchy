@@ -16,7 +16,7 @@ import java.util.function.Function;
  */
 public class ListSpace<X,Y extends Spatial<X>> extends AbstractSpace<X,Y> {
 
-    protected FasterList<Y> active = new FasterList<>(0);
+    public FasterList<Y> active = new FasterList<>(0);
 
     public ListSpace() {
         super();

@@ -88,7 +88,7 @@ public abstract class Collisions<X> {
 	abstract public void forEachIntSpatial(IntObjectPredicate<Spatial<X>> each);
 
 	/** list of current colidables in the engine, aggregated from the spatials that are present */
-	abstract public OArrayList<Collidable<X>> collidables();
+	abstract public OArrayList<Collidable> collidables();
 
 	abstract public void forEachCollidable(IntObjectProcedure<Collidable<X>> each);
 
@@ -551,7 +551,7 @@ public abstract class Collisions<X> {
 
 		Transform tmpTrans = new Transform();
 
-		OArrayList<Collidable<X>> objs = collidables();
+		OArrayList<Collidable> objs = collidables();
 		int n = objs.size();
 		for (int i = 0; i < n; i++) {
 			// terminate further ray tests, once the closestHitFraction reached zero
@@ -622,7 +622,7 @@ public abstract class Collisions<X> {
 		// go over all objects, and if the ray intersects their aabb + cast shape aabb,
 		// do a ray-shape query using convexCaster (CCD)
 
-		OArrayList<Collidable<X>> ccc = collidables();
+		OArrayList<Collidable> ccc = collidables();
 		for (int i = 0; i < ccc.size(); i++) {
 			//return array[index];
 			Collidable collidable = ccc.get(i);

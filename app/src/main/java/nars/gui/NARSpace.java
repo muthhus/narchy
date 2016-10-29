@@ -13,7 +13,6 @@ import nars.nar.Default2;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.atom.Atomic;
-import nars.test.DeductiveMeshTest;
 import nars.util.data.list.FasterList;
 import nars.util.event.On;
 import org.eclipse.collections.api.tuple.Pair;
@@ -56,7 +55,7 @@ public class NARSpace<X, Y extends Spatial<X>> extends ListSpace<X, Y> {
 
         //n.run(20); //headstart
 
-        //n.DEFAULT_BELIEF_PRIORITY = 0.5f;
+        n.DEFAULT_BELIEF_PRIORITY = 0.1f;
 
 
         n.log();
@@ -139,7 +138,7 @@ public class NARSpace<X, Y extends Spatial<X>> extends ListSpace<X, Y> {
             //phase 2: add edges
             edges.forEach(eb -> {
                 Pair<ConceptWidget, Term> ebt = eb.get();
-                ebt.getOne().addLink(space, ebt.getTwo(), eb);
+                ebt.getOne().addEdge(space, ebt.getTwo(), eb);
             });
             edges.clear();
 

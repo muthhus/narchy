@@ -85,6 +85,7 @@ public class SimpleSpatial<X> extends AbstractSpatial<X> {
         );
     }
 
+
     public final void move(v3 p) {
         move(p.x, p.y, p.z);
     }

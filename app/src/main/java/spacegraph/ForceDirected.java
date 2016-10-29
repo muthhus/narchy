@@ -14,7 +14,7 @@ import static spacegraph.math.v3.v;
 /**
  * Created by me on 8/24/16.
  */
-public class ForceDirected<X> implements spacegraph.phys.constraint.BroadConstraint<X> {
+public class ForceDirected<X> implements spacegraph.phys.constraint.BroadConstraint {
 
     public static final int clusters = 1;
 
@@ -46,7 +46,7 @@ public class ForceDirected<X> implements spacegraph.phys.constraint.BroadConstra
 //        }
 
     @Override
-    public void solve(Broadphase b, OArrayList<Collidable<X>> objects, float timeStep) {
+    public void solve(Broadphase b, OArrayList<Collidable> objects, float timeStep) {
 
         //System.out.print("Force direct " + objects.size() + ": ");
         //final int[] count = {0};
@@ -80,7 +80,7 @@ public class ForceDirected<X> implements spacegraph.phys.constraint.BroadConstra
 
     }
 
-    protected void batch(List<Collidable<X>> l) {
+    protected void batch(List<Collidable> l) {
 
 
         for (int i = 0, lSize = l.size(); i < lSize; i++) {
