@@ -13,6 +13,7 @@ import nars.nar.Default2;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.atom.Atomic;
+import nars.test.DeductiveMeshTest;
 import nars.util.data.list.FasterList;
 import nars.util.event.On;
 import org.eclipse.collections.api.tuple.Pair;
@@ -44,7 +45,7 @@ public class NARSpace<X, Y extends Spatial<X>> extends ListSpace<X, Y> {
 
     public static void main(String[] args) {
 
-        Default n = new Default(512, 1, 1, 3);
+        Default n = new Default(1024, 16, 1, 3);
         //Default2 n = new Default2();
         //n.nal(4);
 
@@ -58,9 +59,9 @@ public class NARSpace<X, Y extends Spatial<X>> extends ListSpace<X, Y> {
         n.DEFAULT_BELIEF_PRIORITY = 0.1f;
 
 
-        n.log();
-        n.input("(a-->b).", "(b-->c).","(c-->d).", "(d-->e).");
-        //new DeductiveMeshTest(n, new int[]{4, 4}, 16384);
+        //n.log();
+        //n.input("(a-->b).", "(b-->c).","(c-->d).", "(d-->e).");
+        new DeductiveMeshTest(n, new int[]{4, 4}, 16384);
 
         //new DeductiveChainTest(n, 10, 9999991, (x, y) -> $.p($.the(x), $.the(y)));
 

@@ -3,6 +3,7 @@ package nars.budget;
 import nars.NAR;
 import nars.Param;
 import nars.Task;
+import nars.bag.Bag;
 import nars.concept.Concept;
 import nars.term.Term;
 import nars.term.Termed;
@@ -20,7 +21,8 @@ public class Activation {
     private final int tasklinkDepth;
     private final int termlinkDepth;
 
-    @NotNull public final Budgeted in;
+    @NotNull
+    public final Budgeted in;
 
     @NotNull
     public final Concept src;
@@ -72,7 +74,6 @@ public class Activation {
     }
 
 
-
 //    public void linkTermLinks(Concept src, float scale) {
 //        src.termlinks().forEach(n -> {
 //            Term nn = n.get();
@@ -81,74 +82,78 @@ public class Activation {
 //        });
 //    }
 
-    void linkTerms(@NotNull Concept src, @NotNull Term[] tgt, float scale, int depth) {
-
-        int n = tgt.length;
-        float subScale = scale / n;
-
-        if (subScale >= minScale) { //TODO use a min bound to prevent the iteration ahead of time
-
-            //then link this to terms
-            for (int i = 0; i < n; i++)
-                link(src, tgt[i], subScale, depth); //Link the peer termlink bidirectionally
-        }
-    }
-
     /**
      * crosslinks termlinks
      */
     @Nullable
-    Concept linkSubterm(@NotNull Concept source, @NotNull Termed target, float subScale, int depth) {
+    Concept linkSubterm(@NotNull Termed target, float subScale, int depth) {
 
     /* activate concept */
         Concept targetConcept = nar.concept(target, true);
-        Term targetTerm;
 
-        if (targetConcept!=null) {
-            activateConcept(targetConcept, subScale);
+        if (targetConcept != null) {
+
+            //System.out.println("+" + scale + " x " + targetConcept);
+            concepts.addToValue(targetConcept, subScale);
 
             if (depth < termlinkDepth) {
+
                 @NotNull TermContainer ttt = targetConcept.templates();
-                if (ttt.size() > 0) {
-                    linkTerms(targetConcept, ttt.terms(), subScale, depth + 1);
+                int n = ttt.size();
+                if (n > 0) {
+                    float subScale1 = subScale / n;
+                    if (subScale1 >= minScale) { //TODO use a min bound to prevent the iteration ahead of time
+                        for (int i = 0; i < n; i++)
+                            link(targetConcept, ttt.term(i), subScale1, depth + 1); //Link the peer termlink bidirectionally
+                    }
+                } else {
+                    if (Param.ACTIVATE_TERMLINKS_IF_NO_TEMPLATE) {
+                        Bag<Term> bbb = targetConcept.termlinks();
+                        n = bbb.size();
+                        if (n > 0) {
+                            float subScale1 = subScale / n;
+                            if (subScale1 >= minScale) {
+                                bbb.forEachKey(x -> {
+                                    //only activate:
+                                    linkSubterm(x, subScale1, depth + 1); //Link the peer termlink bidirectionally
+                                });
+                            }
+                        }
+                    }
                 }
+
             }
 
-            targetTerm = targetConcept.term();
-        } else {
-            targetTerm = target.term();
         }
 
-        Term sourceTerm = source.term();
-        if (!targetTerm.equals(sourceTerm)) {
-
-            /* insert termlink target to source */
-            //boolean alsoReverse = true;
-            if (targetConcept != null /*&& alsoReverse*/) {
-                targetConcept.termlinks().put(sourceTerm, in, subScale, linkOverflow);
-            }
-
-            /* insert termlink source to target */
-            source.termlinks().put(targetTerm, in, subScale, linkOverflow);
-        }
 
         return targetConcept;
     }
 
     protected final void link(@NotNull Concept src, @NotNull Termed target, float scale, int depth) {
 
-        Concept targetConcept = linkSubterm(src, target, scale, depth);;
+        Concept targetConcept = linkSubterm(target, scale, depth);
 
-        if ( targetConcept != null && depth <= tasklinkDepth && in instanceof Task) {
+        Term sourceTerm = src.term();
+        Term targetTerm = target.term();
+
+        if (!targetTerm.equals(sourceTerm)) {
+
+            /* insert termlink target to source */
+            //boolean alsoReverse = true;
+            if (targetConcept != null /*&& alsoReverse*/) {
+                targetConcept.termlinks().put(sourceTerm, in, scale, linkOverflow);
+            }
+
+            /* insert termlink source to target */
+            src.termlinks().put(targetTerm, in, scale, linkOverflow);
+        }
+
+        if (targetConcept != null && depth <= tasklinkDepth && in instanceof Task) {
             targetConcept.tasklinks().put((Task) in, in, scale, null);
         }
 
     }
 
-
-    public void activateConcept(Concept targetConcept, float scale) {
-        //System.out.println("+" + scale + " x " + targetConcept);
-        concepts.addToValue(targetConcept, scale);
-    }
 
 }
