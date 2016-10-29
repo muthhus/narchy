@@ -175,7 +175,7 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
     }
 
     public float duration() {
-        return (((float)range()) / size()) * 2f;
+        return (((float)range()) / size());
     }
 
     @Override
@@ -415,7 +415,9 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
                 Task the = tr[0];
                 Truth res = the.truth();
                 long o = the.occurrence();
-                if (now == ETERNAL)// || when == now) && o == when) //optimization: if at the current time and when
+                if (o == ETERNAL)
+                    return res;
+                else if (now == ETERNAL)// || when == now) && o == when) //optimization: if at the current time and when
                     return res.eternalize();
                 else {
                     long delta = Math.abs(o - when);

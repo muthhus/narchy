@@ -84,7 +84,9 @@ public class Abbreviation/*<S extends Term>*/ extends Leak<CompoundConcept> {
         this.termPrefix = termPrefix;
         this.bag.setCapacity(capacity);
         this.minAbbreviableVolume.set(volMin);
-        this.abbreviationConfidence = new MutableFloat(1f - nar.truthResolution.floatValue());
+        this.abbreviationConfidence =
+                new MutableFloat(nar.confidenceDefault(Symbols.BELIEF));
+                //new MutableFloat(1f - nar.truthResolution.floatValue());
         //new MutableFloat(nar.confidenceDefault(Symbols.BELIEF));
         this.maxVol = volMax;
     }

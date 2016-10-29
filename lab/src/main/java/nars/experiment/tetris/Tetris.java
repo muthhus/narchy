@@ -376,88 +376,90 @@ public class Tetris extends NAgents {
     public static void main(String[] args) {
         Param.DEBUG = false;
 
-        Random rng = new XorShift128PlusRandom(1);
-        //Multi nar = new Multi(3,512,
-        int maxVol = 32;
+        NAR nar = NAgents.newMultiThreadNAR(3, new FrameClock());
 
-        Executioner e = Tetris.exe;
-        ((MultiThreadExecutioner)exe).sync(false);
-
-        Default nar = new Default(1024,
-                256, 2, 3, rng,
-                //new CaffeineIndex(new DefaultConceptBuilder(rng), 1024*128, maxVol/2, false, e),
-                //new MapDBIndex(new DefaultConceptBuilder(rng), 200000, Executors.newSingleThreadScheduledExecutor()),
-                new TreeTermIndex.L1TreeIndex(new DefaultConceptBuilder(), 200000, 8192, 2),
-                new FrameClock(), e
-        );
-
-
-        nar.beliefConfidence(0.9f);
-        nar.goalConfidence(0.9f);
-
-        Param.DEBUG_ANSWERS = Param.DEBUG;
-
-//        nar.onTask(t -> {
-//            long now = nar.time();
-//            if (t.isBeliefOrGoal() && t.occurrence() > 1 + now) {
-//                System.err.println("\tFUTURE: " + t + "\t vs. PRESENT: " +
-//                        ((BeliefTable)(t.concept(nar).tableFor(t.punc()))).truth(now)
-//                        //+ "\n" + t.proof() + "\n"
-//                );
-//            }
-//        });
-
-        float p = 1f;
-        nar.DEFAULT_BELIEF_PRIORITY = 0.75f * p;
-        nar.DEFAULT_GOAL_PRIORITY = 1f * p;
-        nar.DEFAULT_QUESTION_PRIORITY = 0.5f * p;
-        nar.DEFAULT_QUEST_PRIORITY = 0.5f * p;
-
-
-        nar.confMin.setValue(0.02f);
-
-
-        nar.compoundVolumeMax.setValue(maxVol);
-        nar.linkFeedbackRate.setValue(0.15f);
-
-        //nar.truthResolution.setValue(0.02f);
-
-//        nar.on(new TransformConcept("seq", (c) -> {
-//            if (c.size() != 3)
-//                return null;
-//            Term X = c.term(0);
-//            Term Y = c.term(1);
+//        Random rng = new XorShift128PlusRandom(1);
+//        //Multi nar = new Multi(3,512,
+//        int maxVol = 32;
 //
-//            Integer x = intOrNull(X);
-//            Integer y = intOrNull(Y);
-//            Term Z = (x!=null && y!=null)? ((Math.abs(x-y) <= 1) ? $.the("TRUE") : $.the("FALSE")) : c.term(2);
+//        Executioner e = Tetris.exe;
+//        ((MultiThreadExecutioner)exe).sync(false);
+//
+//        Default nar = new Default(1024,
+//                256, 2, 3, rng,
+//                //new CaffeineIndex(new DefaultConceptBuilder(rng), 1024*128, maxVol/2, false, e),
+//                //new MapDBIndex(new DefaultConceptBuilder(rng), 200000, Executors.newSingleThreadScheduledExecutor()),
+//                new TreeTermIndex.L1TreeIndex(new DefaultConceptBuilder(), 200000, 8192, 2),
+//                new FrameClock(), e
+//        );
 //
 //
-//            return $.inh($.p(X, Y, Z), $.oper("seq"));
-//        }));
-//        nar.believe("seq(#1,#2,TRUE)");
-//        nar.believe("seq(#1,#2,FALSE)");
-
-        //nar.log();
-        //nar.logSummaryGT(System.out, 0.1f);
-
-//		nar.log(System.err, v -> {
-//			if (v instanceof Task) {
-//				Task t = (Task)v;
-//				if (t instanceof DerivedTask && t.punc() == '!')
-//					return true;
-//			}
-//			return false;
-//		});
-
-
-//        Abbreviation abbr = new Abbreviation(nar, "the", 3, 12,
-//                0.01f, 64);
-
-        new Inperience(nar);
-
-        MySTMClustered stm = new MySTMClustered(nar, 64, '.', 4, true, 8);
-        MySTMClustered stmGoal = new MySTMClustered(nar, 16, '!', 2, true, 4);
+//        nar.beliefConfidence(0.9f);
+//        nar.goalConfidence(0.9f);
+//
+//        Param.DEBUG_ANSWERS = Param.DEBUG;
+//
+////        nar.onTask(t -> {
+////            long now = nar.time();
+////            if (t.isBeliefOrGoal() && t.occurrence() > 1 + now) {
+////                System.err.println("\tFUTURE: " + t + "\t vs. PRESENT: " +
+////                        ((BeliefTable)(t.concept(nar).tableFor(t.punc()))).truth(now)
+////                        //+ "\n" + t.proof() + "\n"
+////                );
+////            }
+////        });
+//
+//        float p = 1f;
+//        nar.DEFAULT_BELIEF_PRIORITY = 0.75f * p;
+//        nar.DEFAULT_GOAL_PRIORITY = 1f * p;
+//        nar.DEFAULT_QUESTION_PRIORITY = 0.5f * p;
+//        nar.DEFAULT_QUEST_PRIORITY = 0.5f * p;
+//
+//
+//        nar.confMin.setValue(0.02f);
+//
+//
+//        nar.compoundVolumeMax.setValue(maxVol);
+//        nar.linkFeedbackRate.setValue(0.15f);
+//
+//        //nar.truthResolution.setValue(0.02f);
+//
+////        nar.on(new TransformConcept("seq", (c) -> {
+////            if (c.size() != 3)
+////                return null;
+////            Term X = c.term(0);
+////            Term Y = c.term(1);
+////
+////            Integer x = intOrNull(X);
+////            Integer y = intOrNull(Y);
+////            Term Z = (x!=null && y!=null)? ((Math.abs(x-y) <= 1) ? $.the("TRUE") : $.the("FALSE")) : c.term(2);
+////
+////
+////            return $.inh($.p(X, Y, Z), $.oper("seq"));
+////        }));
+////        nar.believe("seq(#1,#2,TRUE)");
+////        nar.believe("seq(#1,#2,FALSE)");
+//
+//        //nar.log();
+//        //nar.logSummaryGT(System.out, 0.1f);
+//
+////		nar.log(System.err, v -> {
+////			if (v instanceof Task) {
+////				Task t = (Task)v;
+////				if (t instanceof DerivedTask && t.punc() == '!')
+////					return true;
+////			}
+////			return false;
+////		});
+//
+//
+////        Abbreviation abbr = new Abbreviation(nar, "the", 3, 12,
+////                0.01f, 64);
+//
+//        new Inperience(nar);
+//
+//        MySTMClustered stm = new MySTMClustered(nar, 64, '.', 4, true, 8);
+//        MySTMClustered stmGoal = new MySTMClustered(nar, 16, '!', 2, true, 4);
 
         //new VariableCompressor(nar);
 
@@ -639,7 +641,7 @@ public class Tetris extends NAgents {
 
 
         //t.run(runFrames);
-        t.runRT(25f);
+        t.run(10000);
 
 //        NARController meta = new NARController(nar, loop, t);
 //

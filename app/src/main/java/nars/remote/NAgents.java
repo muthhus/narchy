@@ -5,8 +5,12 @@ import com.google.common.collect.Lists;
 import nars.$;
 import nars.NAR;
 import nars.NAgent;
+import nars.Task;
+import nars.concept.Concept;
+import nars.concept.SensorConcept;
 import nars.gui.Vis;
 import nars.index.term.tree.TreeTermIndex;
+import nars.nal.Stamp;
 import nars.nar.Default;
 import nars.nar.Default2;
 import nars.nar.Multi;
@@ -16,10 +20,15 @@ import nars.nar.util.DefaultConceptBuilder;
 import nars.op.mental.Abbreviation;
 import nars.op.mental.Inperience;
 import nars.op.time.MySTMClustered;
+import nars.task.GeneratedTask;
+import nars.term.Compound;
+import nars.term.Term;
 import nars.time.Clock;
 import nars.time.FrameClock;
 import nars.time.RealtimeMSClock;
 import nars.truth.Truth;
+import nars.truth.func.BeliefFunction;
+import nars.truth.func.GoalFunction;
 import nars.util.data.random.XorShift128PlusRandom;
 import nars.video.*;
 import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunction;
@@ -36,6 +45,9 @@ import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import static nars.$.t;
+import static nars.Op.NEG;
+import static nars.time.Tense.DTERNAL;
+import static nars.time.Tense.ETERNAL;
 import static spacegraph.SpaceGraph.window;
 import static spacegraph.obj.GridSurface.grid;
 
@@ -76,6 +88,7 @@ abstract public class NAgents extends NAgent {
         //((TreeTaskIndex)nar.tasks).tasks.prettyPrint(System.out);
 
     }
+
     public static void runRT(Function<NAR, NAgents> init) {
 
 
@@ -94,15 +107,15 @@ abstract public class NAgents extends NAgent {
 
     private static Default newMultiThreadNAR(int cores, Clock clock, boolean sync) {
         Default d = newMultiThreadNAR(cores, clock);
-        ((MultiThreadExecutioner)d.exe).sync(sync);
+        ((MultiThreadExecutioner) d.exe).sync(sync);
         return d;
     }
 
     private static Default2 newNAR2() {
         Default2 d = new Default2();
 
-        SpaceGraph.window(grid( d.cores.stream().map(c ->
-                Vis.items(c.terms, d, 16)).toArray(Surface[]::new) ), 900, 700);
+        SpaceGraph.window(grid(d.cores.stream().map(c ->
+                Vis.items(c.terms, d, 16)).toArray(Surface[]::new)), 900, 700);
 
         return d;
     }
@@ -110,11 +123,11 @@ abstract public class NAgents extends NAgent {
     private static Default newNAR3(int cores) {
         Multi m = new Multi(cores, (i, j) -> {
             //feedforward
-            if (i+1 == j )
+            if (i + 1 == j)
                 return 0.9f; //decay
 
             //if ((i + 1) % cores == j)
-               // return 0.9f / (j - i);
+            // return 0.9f / (j - i);
 
             return 0;
             //return Math.random() < 0.5f ? 0.8f : 0f;
@@ -122,12 +135,11 @@ abstract public class NAgents extends NAgent {
 
         Default in = m.core[0];
 
-        SpaceGraph.window(grid( Stream.of(m.core).map(c ->
-                Vis.items(c.core.active, c, 32)).toArray(Surface[]::new) ), 900, 700);
+        SpaceGraph.window(grid(Stream.of(m.core).map(c ->
+                Vis.items(c.core.active, c, 32)).toArray(Surface[]::new)), 900, 700);
 
         return in;
     }
-
 
 
     public static Default newMultiThreadNAR(int threads, Clock clock) {
@@ -136,15 +148,15 @@ abstract public class NAgents extends NAgent {
                 //new SingleThreadExecutioner();
                 new MultiThreadExecutioner(threads, 8192 /* TODO chose a power of 2 number to scale proportionally to # of threads */);
 
-        int volMax = 32;
-        int conceptsPerCycle = 64;
+        int volMax = 40;
+        int conceptsPerCycle = 256;
 
 
         //Multi nar = new Multi(3,512,
         Default nar = new Default(1024,
                 conceptsPerCycle, 1, 3, rng,
                 //new CaffeineIndex(new DefaultConceptBuilder(rng), 1024*1024, volMax/2, false, exe)
-                new TreeTermIndex.L1TreeIndex(new DefaultConceptBuilder(), 4* 1024 * 128, 16*1024, 4)
+                new TreeTermIndex.L1TreeIndex(new DefaultConceptBuilder(), 4 * 1024 * 128, 16 * 1024, 4)
 
                 ,
                 //new FrameClock()
@@ -158,7 +170,7 @@ abstract public class NAgents extends NAgent {
         };
 
         nar.beliefConfidence(0.9f);
-        nar.goalConfidence(0.9f);
+        nar.goalConfidence(0.8f);
 
         float p = 0.1f;
         nar.DEFAULT_BELIEF_PRIORITY = 0.9f * p;
@@ -169,14 +181,89 @@ abstract public class NAgents extends NAgent {
         nar.confMin.setValue(0.01f);
         nar.compoundVolumeMax.setValue(volMax);
 
-        MySTMClustered stm = new MySTMClustered(nar, 128, '.', 3, true, 32);
+        MySTMClustered stm = new MySTMClustered(nar, 128, '.', 3, true, 16);
         MySTMClustered stmGoal = new MySTMClustered(nar, 32, '!', 2, true, 8);
 
         Abbreviation abbr = new Abbreviation(nar, "the",
                 4, 16,
-                0.1f, 32);
+                0.05f, 32);
 
         new Inperience(nar);
+
+        //causal accelerator
+        nar.onTask(t -> {
+
+            switch (t.op()) {
+                case IMPL:
+                    //decompose with Goal:Induction
+                    if (t.isBelief()) {
+                        Term subj = t.term(0);
+                        Term pred = t.term(1);
+                        if (pred instanceof Compound && (subj.vars() == 0) && (pred.vars() == 0)) {
+                            Concept postconditionConcept = nar.concept(pred);
+
+                            //if (pred.equals(a1.term()) || pred.equals(a2.term())) {
+                            boolean negate = false;
+                            if (subj.op() == NEG) {
+                                subj = subj.unneg();
+                                negate = true;
+                            }
+                            Concept preconditionConcept = nar.concept(subj);
+                            if (preconditionConcept != null) {
+
+                                int dt = t.dt();
+                                if (dt == DTERNAL)
+                                    dt = 0;
+
+                                for (long when : new long[]{t.occurrence(),
+                                        nar.time(), nar.time() + 1, nar.time() + 2 //, nar.time() + 200, nar.time() + 300}
+                                }) {
+
+                                    if (when == ETERNAL)
+                                        continue;
+
+                                    //TODO project, not just eternalize for other times
+                                    Truth tt = when != t.occurrence() ? t.truth().eternalize() : t.truth();
+
+                                    if (!(postconditionConcept instanceof SensorConcept)) {
+                                        {
+                                            Task preconditionBelief = preconditionConcept.beliefs().top(when);
+                                            if (preconditionBelief != null) {
+                                                Truth postcondition = BeliefFunction.Deduction.apply(preconditionBelief.truth().negated(negate), tt, nar, nar.confMin.floatValue());
+                                                if (postcondition != null) {
+                                                    Task m = new GeneratedTask(pred, '.', postcondition.truth())
+                                                            .evidence(Stamp.zip(t, preconditionBelief))
+                                                            .budget(t.budget())
+                                                            .time(nar.time(), when + dt)
+                                                            .log("Causal Accel");
+                                                    nar.inputLater(m);
+                                                }
+                                            }
+                                        }
+                                        {
+                                            Task preconditionGoal = preconditionConcept.goals().top(when);
+                                            if (preconditionGoal != null) {
+                                                Truth postcondition = GoalFunction.Induction.apply(preconditionGoal.truth().negated(negate), tt, nar, nar.confMin.floatValue());
+                                                if (postcondition != null) {
+                                                    Task m = new GeneratedTask(pred, '!', postcondition.truth())
+                                                            .evidence(Stamp.zip(t, preconditionGoal))
+                                                            .budget(t.budget())
+                                                            .time(nar.time(), when + dt)
+                                                            .log("Causal Accel");
+                                                    nar.inputLater(m);
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            //}
+                        }
+                    }
+                    break;
+            }
+        });
+
 
         //nar.linkFeedbackRate.setValue(0.01f);
         return nar;
@@ -188,7 +275,7 @@ abstract public class NAgents extends NAgent {
                 grid(
                         grid(a.cam.values().stream().map(cs -> new CameraSensorView(cs, nar)).toArray(Surface[]::new)),
 
-                        Vis.concepts((Default)nar, 128),
+                        Vis.concepts((Default) nar, 128),
 
                         Vis.agentActions(a, 200),
 
@@ -219,6 +306,7 @@ abstract public class NAgents extends NAgent {
         pb.addActions(id, this);
         return addCamera(id, pb, pixelTruth);
     }
+
     protected Sensor2D<WaveletBag> addFreqCamera(String id, Supplier<BufferedImage> w, int pw, int ph, FloatToObjectFunction<Truth> pixelTruth) {
         WaveletBag pb = new WaveletBag(w, pw, ph);
         return addCamera(id, pb, pixelTruth);

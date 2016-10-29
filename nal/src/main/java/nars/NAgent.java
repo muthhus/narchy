@@ -71,9 +71,9 @@ abstract public class NAgent implements NSense, NAction {
     public final List<SensorConcept> sensors = $.newArrayList();
     public final List<ActionConcept> actions = $.newArrayList();
 
-    public float alpha, gamma, epsilonProbability = 0.05f;
+    public float alpha, gamma, epsilonProbability = 0.03f;
     @Deprecated
-    public float gammaEpsilonFactor = 0.5f;
+    public float gammaEpsilonFactor = 0.25f;
 
     final int curiosityMonitorDuration = 32; //frames
     final DescriptiveStatistics avgActionDesire = new DescriptiveStatistics(curiosityMonitorDuration);
@@ -117,13 +117,19 @@ abstract public class NAgent implements NSense, NAction {
 
         rewardNormalized = new FloatPolarNormalized(() -> rewardValue);
 
-        happy = new SensorConcept("happy" + "(" + nar.self + ")", nar,
+        happy = new SensorConcept("" +
+                //"happy" + "(" + nar.self + ")", nar,
+                "(happy)",
+                nar,
                 rewardNormalized,
                 (x) -> t(x, rewardConf)
         );
 
 
-        joy = new SensorConcept("joy" + "(" + nar.self + ")", nar,
+        joy = new SensorConcept(
+                //"joy" + "(" + nar.self + ")", nar,
+                "(joy)",
+                nar,
                 new FloatPolarNormalized(
                         new FirstOrderDifferenceFloat(
                                 () -> nar.time(), () -> rewardValue
