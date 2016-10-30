@@ -12,8 +12,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
 
-import static nars.time.Tense.ETERNAL;
-
 /**
  * Created by me on 3/23/16.
  */
@@ -29,10 +27,6 @@ public interface ConceptBuilder extends Function<Term, Termed> {
     void start(NAR nar);
 
     List<Task> EmptyTaskList = Collections.emptyList();
-
-    default void init(@NotNull Concept c) {
-        c.policy(init(), ETERNAL, EmptyTaskList);
-    }
 
 
     ConceptBuilder Null = new NullConceptBuilder();

@@ -21,9 +21,9 @@ public interface QuestionTable extends TaskTable {
      * @return: the input task itself, it it was added to the table
      * an existing equivalent task if this was a duplicate
      */
-    @Nullable Task add(@NotNull Task t, @NotNull BeliefTable answers, @NotNull List<Task> displ, @NotNull NAR n);
+    @Nullable Task add(@NotNull Task t, @NotNull BeliefTable answers, @NotNull NAR n);
 
-    void capacity(int newCapacity, @NotNull List<Task> displ);
+    void capacity(int newCapacity, NAR nar);
 
 
 
@@ -47,12 +47,12 @@ public interface QuestionTable extends TaskTable {
 
         @Nullable
         @Override
-        public Task add(Task t, BeliefTable answers, List<Task> displ, NAR n) {
+        public Task add(Task t, BeliefTable answers, NAR n) {
             return null;
         }
 
         @Override
-        public void capacity(int newCapacity, List<Task> onRemoval) {
+        public void capacity(int newCapacity, NAR n) {
 
         }
 

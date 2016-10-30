@@ -22,7 +22,12 @@ abstract public class TaskIndex {
     @Nullable
     public abstract Task addIfAbsent(@NotNull Task x);
 
-    public abstract void remove(@NotNull Task tt);
+    public final void remove(@NotNull Task tt) {
+        removeInternal(tt);
+        tt.delete();
+    }
+
+    protected abstract void removeInternal(@NotNull Task tt);
 
     public abstract void clear();
 

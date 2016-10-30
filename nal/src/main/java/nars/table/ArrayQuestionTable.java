@@ -46,7 +46,7 @@ public class ArrayQuestionTable  implements QuestionTable, Comparator<Task> {
     }
 
     @Override
-    public final void capacity(int newCapacity, @NotNull List<Task> displ) {
+    public final void capacity(int newCapacity, NAR n) {
 
         if (this.capacity != newCapacity) {
 
@@ -58,7 +58,7 @@ public class ArrayQuestionTable  implements QuestionTable, Comparator<Task> {
                     int s = ll.size();
                     int toRemove = s - capacity;
                     while (toRemove > 0) {
-                        displ.add(list.remove(--s)); //last element
+                        n.tasks.remove(list.remove(--s)); //last element
                         toRemove--;
                     }
                 }
@@ -90,22 +90,21 @@ public class ArrayQuestionTable  implements QuestionTable, Comparator<Task> {
             //TODO weaken the match based on dt discrepencies between question and answer. this will discriminate according to unique dt patterns of questions vs answers
 
             boolean affected = false;
-            for (int i = 0; i < size && !a.isDeleted(); ) {
+            for (int i = 0; i < size && !a.isDeleted(); i++) {
                 Task q = l.get(i);
-                if (!q.isDeleted()) {
+                if (q.isDeleted()) {
+                    l.remove(i);
+                    nar.tasks.remove(q);
+                    size--;
+                } else {
                     if (answer(q, a, 1f / size, answerConcept, nar)) {
-                        i++;
                         affected = true;
-                        continue;
                     }
                 }
-
-                remove(q, null, displ);
-                size--;
             }
 
             if (affected && size > 1)
-                list.sortThis(this);
+                l.sortThis(this);
 
         });
 
@@ -190,9 +189,9 @@ public class ArrayQuestionTable  implements QuestionTable, Comparator<Task> {
 
     @Nullable
     @Override
-    public final Task add(@NotNull Task question, @NotNull BeliefTable answers, List<Task> displ, @NotNull NAR n) {
+    public final Task add(@NotNull Task question, @NotNull BeliefTable answers, @NotNull NAR n) {
 
-        Task questioned = insert(question, displ);
+        Task questioned = insert(question, n);
 
         //inserted if questioned!=null
         if (questioned != null && !answers.isEmpty()) {
@@ -209,7 +208,7 @@ public class ArrayQuestionTable  implements QuestionTable, Comparator<Task> {
 
 
     @Nullable
-    private Task insert(@NotNull Task t, @NotNull List<Task> displaced) {
+    private Task insert(@NotNull Task t, NAR n) {
 
 
         float tp = t.pri();
@@ -222,30 +221,31 @@ public class ArrayQuestionTable  implements QuestionTable, Comparator<Task> {
             int sizeStart = l.size();
             if (sizeStart > 0) {
 
-                list.sortThis(this);
+                l.sortThis(this);
 
                 if (sizeStart >= capacity()) {
-                    if (list.get(sizeStart - 1).qua() > tp) {
+                    if (l.get(sizeStart - 1).qua() > tp) {
                         t.log("Insufficient Priority");
                         result[0] = null;
                         return;
                     } else {
-                        // FIFO, remove oldest question (last)
-                        float removedPri = remove(list, sizeStart - 1, "Table Pop", displaced);
-                        if (removedPri == removedPri) //not deleted
-                            t.budget().setPriority(Math.max(t.pri(), removedPri)); //utilize at least its priority since theyre sorted by other factor
+                        Task last = l.remove(sizeStart - 1);
+                        n.tasks.remove(last);
+//                        float removedPri = remove(list, sizeStart - 1, "Table Pop", n);
+//                        if (removedPri == removedPri) //not deleted
+//                            t.budget().setPriority(Math.max(t.pri(), removedPri)); //utilize at least its priority since theyre sorted by other factor
                     }
                 }
             }
 
             //insert in sorted order by qua
             int i = 0;
-            int sizeInsert = list.size();
+            int sizeInsert = l.size();
             for (; i < sizeInsert - 1; i++) {
-                if (list.get(i).qua() < tp)
+                if (l.get(i).qua() < tp)
                     break;
             }
-            list.add(i, t);
+            l.add(i, t);
 
             result[0] = t;
         });
@@ -254,27 +254,27 @@ public class ArrayQuestionTable  implements QuestionTable, Comparator<Task> {
         return result[0];
     }
 
-    private float remove(@NotNull Task q, Object reason, @NotNull List<Task> displaced) {
+//    private float remove(@NotNull Task q, Object reason, @NotNull List<Task> displaced) {
+//
+//        if (list.remove(q)) {
+//            if (Param.DEBUG)
+//                q.log(reason);
+//            displaced.add(q);
+//        }
+//        return q.pri();
+//
+//
+//    }
 
-        if (list.remove(q)) {
-            if (Param.DEBUG)
-                q.log(reason);
-            displaced.add(q);
-        }
-        return q.pri();
-
-
-    }
-
-    private static float remove(@NotNull List<Task> l, int n, Object reason, @NotNull List<Task> displaced) {
-
-        Task removed = l.remove(n);
-        if (Param.DEBUG)
-            removed.log(reason);
-        displaced.add(removed);
-        return removed.pri();
-
-    }
+//    private static float remove(@NotNull List<Task> l, int n, Object reason, ) {
+//
+//        Task removed = l.remove(n);
+//        if (Param.DEBUG)
+//            removed.log(reason);
+//        displaced.add(removed);
+//        return removed.pri();
+//
+//    }
 
 //    /** returns the original, "revised", or null question to input
 //     * @param t incoming question which may be unique, overlapping, or equivalent to an existing question in the table

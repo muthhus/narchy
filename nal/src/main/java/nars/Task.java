@@ -286,13 +286,6 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
     @Override
     boolean delete();
 
-    /**
-     * you should use this delete, not the other
-     */
-    default void delete(@NotNull NAR nar) {
-        nar.tasks.remove(this);
-        delete();
-    }
 
     @Nullable
     default Concept concept(@NotNull NAR n) {

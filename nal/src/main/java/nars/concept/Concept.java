@@ -49,8 +49,6 @@ import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 
-import static nars.time.Tense.ETERNAL;
-
 public interface Concept extends Termed {
 
     @NotNull Bag<Task> tasklinks();
@@ -148,7 +146,7 @@ public interface Concept extends Termed {
 
     static void delete(@NotNull Concept c, @NotNull NAR nar) {
         List<Task> removed = $.newArrayList();
-        c.policy(ConceptPolicy.Deleted, ETERNAL, removed);
+        c.policy(ConceptPolicy.Deleted, nar);
         nar.tasks.remove(removed);
 
         c.termlinks().clear();
@@ -434,12 +432,9 @@ public interface Concept extends Termed {
         out.println('\n');
     }
 
-
     @Nullable ConceptPolicy policy();
 
-    void policy(@NotNull ConceptPolicy c, long now, @NotNull List<Task> removed);
-
-
+    void policy(@NotNull ConceptPolicy c, @NotNull NAR nar);
 
     default void commit() {
         tasklinks().commit();

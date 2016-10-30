@@ -159,11 +159,7 @@ public class Default2 extends NAR {
                 Concept d = Default2.this.concept(next.get());
                 if (d != null) {
 
-                    List<Task> trash = $.newArrayList(0);
-                    d.policy(concepts.conceptBuilder().awake(), time(), trash);
-                    tasks.remove(trash);
-
-
+                    d.policy(concepts.conceptBuilder().awake(), Default2.this);
 
                     d.termlinks().commit().transfer(2, terms);
                     d.tasklinks().commit().transfer(2, tasklinks);

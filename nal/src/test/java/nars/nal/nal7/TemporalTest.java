@@ -17,6 +17,7 @@ import nars.term.Termed;
 import nars.term.Terms;
 import nars.term.container.TermContainer;
 import nars.time.Tense;
+import nars.util.data.list.FasterList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.junit.Assert;
@@ -319,10 +320,10 @@ public class TemporalTest {
     @Test public void testConceptualization2() {
         //test that an image is not considered temporal:
         Default d = new Default();
-        d.believe("((\\,((#1-->[happy])&&(#1-->[sad])),((0-->v),(0-->h)),_)-->[pill])");
+        d.believe("(((#1-->[happy])&&(#1-->[sad])),(((0-->v),(0-->h))-->[pill]))");
         d.run(1);
         d.core.active.print();
-        assertTrue(6 <= d.core.active.size());
+        assertTrue(3 <= d.core.active.size());
     }
 
     @Test public void testConceptualizationIntermpolationEternal() {
@@ -347,7 +348,6 @@ public class TemporalTest {
             //assertEquals(q, cc.toString());
         }
 
-        cc.print();
         //INTERMPOLATION APPLIED DURING REVISION:
         assertEquals("((a ==>+4 b)-->[pill])", cc.beliefs().eternalTop().term().toString());
     }
@@ -355,19 +355,27 @@ public class TemporalTest {
     @Test public void testConceptualizationIntermpolationTemporal() {
 
         Default d = new Default();
-        d.believe("((\\,(a ==>+2 b),_)-->[pill])", Tense.Present, 1f, 0.9f);
+        d.believe("((a ==>+2 b)-->[pill])", Tense.Present, 1f, 0.9f);
         d.run(4);
-        d.believe("((\\,(a ==>+6 b),_)-->[pill])", Tense.Present, 1f, 0.9f);
+        d.believe("((a ==>+6 b)-->[pill])", Tense.Present, 1f, 0.9f);
         d.run(1);
 
         Bag<Concept> cb = d.core.active;
         cb.print();
         assertTrue(5 <= cb.size());
         Concept cc = ((ArrayBag<Concept>) cb).get(0).get();
-        assertEquals("((\\,(a==>b),_)-->[pill])", cc.toString());
+        assertEquals("((a==>b)-->[pill])", cc.toString());
+
+        cc.beliefs().capacity(1,1, d); //set to capacity=1 to force compression
+
         cc.print();
-        //INTERMPOLATION APPLIED DURING REVISION:
-        assertEquals("((\\,(a ==>+4 b),_)-->[pill])", cc.beliefs().topTemporal(2,d.time(), null).term().toString());
+
+        d.tasks.forEach(System.out::println);
+
+
+
+        //INTERMPOLATION APPLIED AFTER REVECTION:
+        assertEquals("((a ==>+4 b)-->[pill])", cc.beliefs().topTemporal(2,d.time(), null).term().toString());
     }
 
     @Test public void testSubtermTimeRecursive() {

@@ -144,7 +144,7 @@ public class Revision {
         return solution;
     }
 
-    @Nullable public static Task mergeInterpolate(@NotNull Task a, @NotNull Task b, long when, long now, @NotNull Truth newTruth, @NotNull Concept concept) {
+    @Nullable public static Task mergeInterpolate(@NotNull Task a, @NotNull Task b, long when, long now, @NotNull Truth newTruth) {
         assert (a.punc() == b.punc());
 
         float aw = a.isQuestOrQuestion() ? 0 : a.confWeight(); //question

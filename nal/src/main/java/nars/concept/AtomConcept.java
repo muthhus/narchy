@@ -16,7 +16,6 @@ import nars.term.container.TermContainer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
 import java.util.Map;
 
 
@@ -63,7 +62,7 @@ public class AtomConcept extends AtomicStringConstant implements Concept {
     }
 
     @Override
-    public void policy(@NotNull  ConceptPolicy p, long now, List<Task> removed) {
+    public void policy(@NotNull ConceptPolicy p, NAR nar) {
         ConceptPolicy current = this.policy;
         if (current!=p) {
             this.policy = p;

@@ -111,7 +111,7 @@ public class ConceptBagCycle implements Consumer<NAR> {
     protected void sleep(@NotNull Concept c) {
         NAR n = this.nar;
 
-        n.policy(c, conceptBuilder.sleep(), now);
+        n.policy(c, conceptBuilder.sleep());
 
         n.emotion.alert(1f / active.size());
     }
@@ -248,7 +248,7 @@ public class ConceptBagCycle implements Consumer<NAR> {
 
             float forgetPeriod = getForgetPeriod();
 
-            nar.policy(c, conceptBuilder.awake(), now);
+            nar.policy(c, conceptBuilder.awake());
             BudgetSavings existing = c.get(this);
             if (existing!=null) {
                 if (existing.isDeleted())

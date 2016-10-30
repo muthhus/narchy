@@ -42,7 +42,7 @@ public interface BeliefTable extends TaskTable {
         }
 
         @Override
-        public void capacity(int eternals, int temporals, List<Task> removed, long now) {
+        public void capacity(int eternals, int temporals, NAR nar) {
 
         }
 
@@ -59,7 +59,7 @@ public interface BeliefTable extends TaskTable {
 
 
         @Override
-        public TruthDelta add(@NotNull Task input, @NotNull QuestionTable questions, List<Task> displaced, CompoundConcept<?> concept, @NotNull NAR nar) {
+        public TruthDelta add(@NotNull Task input, @NotNull QuestionTable questions, CompoundConcept<?> concept, @NotNull NAR nar) {
             return null;
         }
 
@@ -96,7 +96,7 @@ public interface BeliefTable extends TaskTable {
 
     };
 
-    void capacity(int eternals, int temporals, List<Task> removed, long now);
+    void capacity(int eternals, int temporals, NAR nar);
 
 
 //    /**
@@ -165,7 +165,7 @@ public interface BeliefTable extends TaskTable {
      * <p>
      * return null if wasn't added
      */
-    @Nullable TruthDelta add(@NotNull Task input, @NotNull QuestionTable questions, List<Task> displaced, CompoundConcept<?> concept, @NotNull NAR nar);
+    @Nullable TruthDelta add(@NotNull Task input, @NotNull QuestionTable questions, CompoundConcept<?> concept, @NotNull NAR nar);
 
 
 //    @Nullable

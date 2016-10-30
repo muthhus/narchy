@@ -1396,19 +1396,15 @@ public abstract class NAR extends Param implements Level, Consumer<Task>, NARIn,
         level = newLevel;
     }
 
-    public final void policy(@NotNull Concept c, @NotNull ConceptPolicy p, long now) {
+    public final void policy(@NotNull Concept c, @NotNull ConceptPolicy p) {
 
         @Nullable ConceptPolicy prev = c.policy();
         if (prev != p) {
 
-            List<Task> removed = newArrayList();
-            c.policy(p, now, removed);
-            tasks.remove(removed);
-
+            c.policy(p, this);
 
             concepts.onPolicyChanged(c);
         }
-
 
     }
 

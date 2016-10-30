@@ -62,9 +62,8 @@ public final class MapTaskIndex extends TaskIndex {
 
 
     @Override
-    public final void remove(@NotNull Task tt) {
+    protected final void removeInternal(@NotNull Task tt) {
         tasks.remove(tt);
-        tt.delete();
     }
 
     @Override

@@ -53,10 +53,10 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, Sorted
 
     public EternalTable(int initialCapacity) {
         super(Task[]::new);
-        capacity(initialCapacity, Collections.emptyList());
+        this.capacity = initialCapacity;
     }
 
-    public void capacity(int c, @NotNull List<Task> displ) {
+    public void capacity(int c, @NotNull NAR nar) {
         if (this.capacity != c) {
 
             this.capacity = c;
@@ -65,8 +65,7 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, Sorted
 
             //TODO can be accelerated by batch remove operation
             while (c < s--) {
-                Task x = removeWeakest();
-                displ.add(x);
+                nar.tasks.remove(removeWeakest());
             }
         }
     }
@@ -243,7 +242,7 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, Sorted
 //    }
 
     @Nullable
-    public TruthDelta add(@NotNull Task input, @NotNull List<Task> displaced, CompoundConcept<?> concept, @NotNull NAR nar) {
+    public TruthDelta add(@NotNull Task input, CompoundConcept<?> concept, @NotNull NAR nar) {
 
         int cap = capacity();
         if (cap == 0) {
@@ -255,11 +254,9 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, Sorted
         synchronized (this) {
             if ((input.conf() >= 1f) && (cap != 1) && (isEmpty() || (first().conf() < 1f))) {
                 //AXIOMATIC/CONSTANT BELIEF/GOAL
-                addEternalAxiom(input, this, displaced);
+                addEternalAxiom(input, this, nar);
                 return new TruthDelta(input.truth(), input.truth()); //special
             }
-
-            removeDeleted(displaced);
 
             //Try forming a revision and if successful, inputs to NAR for subsequent cycle
             Task revised;
@@ -283,7 +280,7 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, Sorted
 
 
             //Finally try inserting this task.  If successful, it will be returned for link activation etc
-            TruthDelta delta = insert(input, displaced);
+            TruthDelta delta = insert(input, nar);
             if (revised != null) {
 
                 //            revised = insert(revised, displaced) ? revised : null;
@@ -317,7 +314,7 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, Sorted
      * try to insert but dont delete the input task if it wasn't inserted (but delete a displaced if it was)
      * returns true if it was inserted, false if not
      */
-    private TruthDelta insert(@NotNull Task input, @NotNull List<Task> displ) {
+    private TruthDelta insert(@NotNull Task input, @NotNull NAR nar) {
 
         Truth before = this.truth;
 
@@ -327,7 +324,7 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, Sorted
             return null; //rejected
         } else if (displaced!=null) {
             TaskTable.removeTask(displaced,
-                    "Displaced", displ
+                    "Displaced", nar
                     //"Displaced by " + incoming,
             );
         }
@@ -335,13 +332,13 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, Sorted
         return new TruthDelta(before, this.truth = truth());
     }
 
-    private void addEternalAxiom(@NotNull Task input, @NotNull EternalTable et, @NotNull List<Task> displ) {
+    private void addEternalAxiom(@NotNull Task input, @NotNull EternalTable et, NAR nar) {
         //lock incoming 100% confidence belief/goal into a 1-item capacity table by itself, preventing further insertions or changes
         //1. clear the corresponding table, set capacity to one, and insert this task
-        Consumer<Task> overridden = t -> TaskTable.removeTask(t, "Overridden", displ);
+        Consumer<Task> overridden = t -> TaskTable.removeTask(t, "Overridden", nar);
         et.forEach(overridden);
         et.clear();
-        et.capacity(1, displ);
+        et.capacity(1, nar);
 
 //        //2. clear the other table, set capcity to zero preventing temporal tasks
         //TODO
@@ -366,22 +363,4 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, Sorted
         return size() == capacity();
     }
 
-    /**
-     * TODO abstract into removeIf(Predicate<> p) ...
-     */
-    public void removeDeleted(@NotNull List<Task> displ) {
-
-        synchronized (this) {
-            int s = size();
-            for (int i = 0; i < s; ) {
-                Task n = list[i];
-                if (n == null || n.isDeleted()) {
-                    displ.add(remove(i));
-                    s--;
-                } else {
-                    i++;
-                }
-            }
-        }
-    }
 }

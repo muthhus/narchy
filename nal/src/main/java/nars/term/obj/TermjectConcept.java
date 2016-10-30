@@ -22,7 +22,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
 
@@ -219,7 +218,7 @@ public class TermjectConcept<X> implements AbstractConcept, Termject<X> {
     }
 
     @Override
-    public void policy(@NotNull ConceptPolicy c, long now, @NotNull List<Task> removed) {
+    public void policy(@NotNull ConceptPolicy c, NAR nar) {
         this.policy = c;
     }
 

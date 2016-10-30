@@ -11,6 +11,8 @@ import spacegraph.render.Draw;
 import java.util.List;
 import java.util.function.DoubleSupplier;
 
+import static nars.util.Texts.n2;
+
 public class Plot2D extends Surface {
     private final List<Series> series;
     private String title = null;
@@ -247,12 +249,12 @@ public class Plot2D extends Surface {
             gl.glColor4f(0.5f,0.5f,0.5f, 0.75f); //gray
 
             //g.fillText(String.valueOf(maxValue), 0, m + g.getFont().getSize());
-            Draw.text(gl, rangeFontScale, rangeFontScale, String.valueOf(minValue), 0, 0, labelDZ);
+            Draw.text(gl, rangeFontScale, rangeFontScale, n2(minValue), 0, 0, labelDZ);
 
             Draw.line(gl, 0, 0, W, 0);
             Draw.line(gl, 0, H, W, H);
 
-            Draw.text(gl, rangeFontScale, rangeFontScale, String.valueOf(maxValue), 0, H, labelDZ);
+            Draw.text(gl, rangeFontScale, rangeFontScale, n2(maxValue), 0, H, labelDZ);
 
             for (int si = 0, seriesSize = series.size(); si < seriesSize; si++) {
 

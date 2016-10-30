@@ -113,8 +113,8 @@ public class SensorConcept extends WiredCompoundConcept implements FloatFunction
 
 
     @Override
-    final protected void beliefCapacity(ConceptPolicy p, long now, List<Task> removed) {
-        beliefCapacity(0, beliefCapacity, 1, goalCapacity, now, removed);
+    final protected void beliefCapacity(ConceptPolicy p, NAR mar) {
+        beliefCapacity(0, beliefCapacity, 1, goalCapacity, nar);
     }
 
     @Override

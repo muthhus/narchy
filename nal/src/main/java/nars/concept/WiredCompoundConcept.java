@@ -154,17 +154,15 @@ public abstract class WiredCompoundConcept extends CompoundConcept<Compound> imp
 //    public abstract boolean validBelief(@NotNull Task belief, @NotNull NAR nar);
 //    public abstract boolean validGoal(@NotNull Task goal, @NotNull NAR nar);
 
-
-
-    /** called when a conflicting belief has attempted to be processed */
-    protected void onConflict(@NotNull Task belief) {
-        //logger.error("Sensor concept rejected derivation:\n {}\npredicted={} derived={}", belief.explanation(), belief(belief.occurrence()), belief.truth());
-
-    }
+//    /** called when a conflicting belief has attempted to be processed */
+//    protected void onConflict(@NotNull Task belief) {
+//        //logger.error("Sensor concept rejected derivation:\n {}\npredicted={} derived={}", belief.explanation(), belief(belief.occurrence()), belief.truth());
+//
+//    }
 
     @Override
-    protected void beliefCapacity(@NotNull ConceptPolicy p, long now, List<Task> removed) {
-        beliefCapacity(0, beliefCapacity, 0, goalCapacity, now, removed);
+    protected void beliefCapacity(@NotNull ConceptPolicy p, NAR nar) {
+        beliefCapacity(0, beliefCapacity, 0, goalCapacity, nar);
     }
 
     @Override

@@ -1,5 +1,6 @@
 package nars.table;
 
+import nars.NAR;
 import nars.Task;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -13,9 +14,9 @@ import java.util.function.Consumer;
  */
 public interface TaskTable extends Iterable<Task> {
 
-    @Deprecated static void removeTask(@NotNull Task t, @Nullable String reason, @NotNull List<Task> displ) {
+    @Deprecated static void removeTask(@NotNull Task t, @Nullable String reason, NAR n) {
         t.log(reason);
-        displ.add(t);
+        n.tasks.remove(t);
     }
 
     int capacity();

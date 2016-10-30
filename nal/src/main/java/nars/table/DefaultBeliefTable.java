@@ -68,11 +68,7 @@ public class DefaultBeliefTable implements BeliefTable {
         if (!eternal.isEmpty())
             throw new UnsupportedOperationException("eternal clear impl soon");
 
-        if (!temporal.isEmpty()) {
-            List<Task> l = $.newArrayList();
-            temporal.removeIf((Task x)->true,l);
-            nar.tasks.remove(l);
-        }
+        temporal.removeIf((Task x)->true, nar);
     }
 
     @NotNull
@@ -116,9 +112,9 @@ public class DefaultBeliefTable implements BeliefTable {
     }
 
     @Override
-    public final void capacity(int eternals, int temporals, @NotNull List<Task> removed, long now) {
-        eternal.capacity(eternals, removed);
-        temporal.capacity(temporals, now, removed);
+    public final void capacity(int eternals, int temporals, NAR nar) {
+        temporal.capacity(temporals, nar);
+        eternal.capacity(eternals, nar);
     }
 
 //    @Override
@@ -177,16 +173,16 @@ public class DefaultBeliefTable implements BeliefTable {
 
 
     @Override
-    public TruthDelta add(@NotNull Task input, @NotNull QuestionTable questions, @NotNull List<Task> displaced, @NotNull CompoundConcept<?> concept, @NotNull NAR nar) {
+    public TruthDelta add(@NotNull Task input, @NotNull QuestionTable questions, @NotNull CompoundConcept<?> concept, @NotNull NAR nar) {
 
         TruthDelta result;
         if (input.isEternal()) {
-            result = nonEmptyEternal(concept, input).add(input, displaced, concept, nar);
+            result = nonEmptyEternal(concept, input).add(input, concept, nar);
         } else {
-            result = temporal.add(input, eternal, displaced, concept, nar);
-            if (result != null && !displaced.isEmpty() && Param.eternalizeForgottenTemporal(input.op())) {
-                eternalizeForgottenTemporals(displaced, nar, Param.ETERNALIZATION_CONFIDENCE_FACTOR);
-            }
+            result = temporal.add(input, eternal, concept, nar);
+//            if (result != null && !displaced.isEmpty() && Param.eternalizeForgottenTemporal(input.op())) {
+//                eternalizeForgottenTemporals(displaced, nar, Param.ETERNALIZATION_CONFIDENCE_FACTOR);
+//            }
         }
 
 //        if (result != null) {
@@ -205,42 +201,42 @@ public class DefaultBeliefTable implements BeliefTable {
     }
 
 
-    private void eternalizeForgottenTemporals(@NotNull List<Task> displaced, @NotNull NAR nar, float factor) {
-        float confMin = nar.confMin.floatValue();
-
-        @NotNull EternalTable eternal = this.eternal;
-
-        float minRank = eternal.isFull() ? eternal.rank(eternal.weakest()) : 0;
-
-        int displacedSize = displaced.size();
-
-        //should use indexed list access because adding eternal might add new eternal tasks at the end (which should not be processed here
-        for (int i = 0; i < displacedSize; i++) {
-            Task d = displaced.get(i);
-
-            assert (d.occurrence() != ETERNAL);
-
-            if (!d.isDeleted()) {
-                float eConf = TruthFunctions.eternalize(d.conf()) * factor;
-                if (eConf > confMin) {
-                    if (eternal.rank(eConf, d.evidence().length) > minRank) {
-
-                        Task ee = new EternalizedTask(
-                                d.term(), d.punc(),
-                                $.t(d.freq(), eConf)
-                        )
-                                .time(nar.time(), ETERNAL)
-                                .evidence(d)
-                                .budget(Budget.Zero)
-                                .log("Eternalized");
-
-                        nar.inputLater(ee);
-                    }
-
-                }
-            }
-        }
-    }
+//    private void eternalizeForgottenTemporals(@NotNull List<Task> displaced, @NotNull NAR nar, float factor) {
+//        float confMin = nar.confMin.floatValue();
+//
+//        @NotNull EternalTable eternal = this.eternal;
+//
+//        float minRank = eternal.isFull() ? eternal.rank(eternal.weakest()) : 0;
+//
+//        int displacedSize = displaced.size();
+//
+//        //should use indexed list access because adding eternal might add new eternal tasks at the end (which should not be processed here
+//        for (int i = 0; i < displacedSize; i++) {
+//            Task d = displaced.get(i);
+//
+//            assert (d.occurrence() != ETERNAL);
+//
+//            if (!d.isDeleted()) {
+//                float eConf = TruthFunctions.eternalize(d.conf()) * factor;
+//                if (eConf > confMin) {
+//                    if (eternal.rank(eConf, d.evidence().length) > minRank) {
+//
+//                        Task ee = new EternalizedTask(
+//                                d.term(), d.punc(),
+//                                $.t(d.freq(), eConf)
+//                        )
+//                                .time(nar.time(), ETERNAL)
+//                                .evidence(d)
+//                                .budget(Budget.Zero)
+//                                .log("Eternalized");
+//
+//                        nar.inputLater(ee);
+//                    }
+//
+//                }
+//            }
+//        }
+//    }
 
 
 }

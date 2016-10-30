@@ -1,6 +1,5 @@
 package nars.concept;
 
-import nars.$;
 import nars.NAR;
 import nars.Symbols;
 import nars.Task;
@@ -25,7 +24,6 @@ import nars.util.Util;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
 import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Predicate;
@@ -229,7 +227,7 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept, Ter
      */
     @NotNull
     @Override
-    public BeliefTable beliefs() {
+    public final BeliefTable beliefs() {
         return beliefTableOrEmpty(beliefs);
     }
 
@@ -238,15 +236,15 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept, Ter
      */
     @NotNull
     @Override
-    public BeliefTable goals() {
+    public final BeliefTable goals() {
         return beliefTableOrEmpty(goals);
     }
 
 
     public
     @Nullable
-    boolean processQuest(@NotNull Task task, @NotNull NAR nar, @NotNull List<Task> displaced) {
-        return processQuestion(task, nar, displaced);
+    boolean processQuest(@NotNull Task task, @NotNull NAR nar) {
+        return processQuestion(task, nar);
     }
 
 
@@ -265,8 +263,8 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept, Ter
      * To accept a new judgment as belief, and check for revisions and solutions
      * Returns null if the task was not accepted, else the goal which was accepted and somehow modified the state of this concept
      */
-    public @Nullable TruthDelta processBelief(@NotNull Task belief, @NotNull NAR nar, List<Task> displaced) {
-        return processBeliefOrGoal(belief, nar, beliefsOrNew(), questions(), displaced);
+    public @Nullable TruthDelta processBelief(@NotNull Task belief, @NotNull NAR nar) {
+        return processBeliefOrGoal(belief, beliefsOrNew(), questions(), nar);
     }
 
     /**
@@ -274,17 +272,17 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept, Ter
      * decide whether to actively pursue it
      * Returns null if the task was not accepted, else the goal which was accepted and somehow modified the state of this concept
      */
-    public @Nullable TruthDelta processGoal(@NotNull Task goal, @NotNull NAR nar, List<Task> displaced) {
-        return processBeliefOrGoal(goal, nar, goalsOrNew(), quests(), displaced);
+    public @Nullable TruthDelta processGoal(@NotNull Task goal, @NotNull NAR nar) {
+        return processBeliefOrGoal(goal, goalsOrNew(), quests(), nar);
     }
 
     /**
      * @return null if the task was not accepted, else the goal which was accepted and somehow modified the state of this concept
      * TODO remove synchronized by lock-free technique
      */
-    private final @Nullable TruthDelta processBeliefOrGoal(@NotNull Task belief, @NotNull NAR nar, @NotNull BeliefTable target, @NotNull QuestionTable questions, List<Task> displaced) {
+    private final TruthDelta processBeliefOrGoal(@NotNull Task belief, @NotNull BeliefTable target, @NotNull QuestionTable questions, @NotNull NAR nar) {
 
-        return target.add(belief, questions, displaced, this, nar);
+        return target.add(belief, questions, this, nar);
 
     }
 
@@ -295,19 +293,19 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept, Ter
     }
 
     @Override
-    public final void policy(@NotNull ConceptPolicy p, long now, @NotNull List<Task> removed) {
+    public final void policy(@NotNull ConceptPolicy p, NAR nar) {
         ConceptPolicy current = this.policy;
         if (current != p) {
             this.policy = p;
             linkCapacity(p);
 
-            beliefCapacity(p, now, removed);
-            questionCapacity(p, removed);
+            beliefCapacity(p, nar);
+            questionCapacity(p, nar);
         }
     }
 
 
-    protected void beliefCapacity(@NotNull ConceptPolicy p, long now, List<Task> removed) {
+    protected void beliefCapacity(@NotNull ConceptPolicy p, NAR nar) {
 
         int be = p.beliefCap(this, true, true);
         int bt = p.beliefCap(this, true, false);
@@ -315,19 +313,19 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept, Ter
         int ge = p.beliefCap(this, false, true);
         int gt = p.beliefCap(this, false, false);
 
-        beliefCapacity(be, bt, ge, gt, now, removed);
+        beliefCapacity(be, bt, ge, gt, nar);
     }
 
-    protected final void beliefCapacity(int be, int bt, int ge, int gt, long now, List<Task> removed) {
+    protected final void beliefCapacity(int be, int bt, int ge, int gt, NAR nar) {
 
-        beliefs().capacity(be, bt, removed, now);
-        goals().capacity(ge, gt, removed, now);
+        beliefs().capacity(be, bt, nar);
+        goals().capacity(ge, gt, nar);
 
     }
 
-    protected void questionCapacity(@NotNull ConceptPolicy p, @NotNull List<Task> removed) {
-        questions().capacity((byte) p.questionCap(true), removed);
-        quests().capacity((byte) p.questionCap(false), removed);
+    protected void questionCapacity(@NotNull ConceptPolicy p, NAR nar) {
+        questions().capacity((byte) p.questionCap(true), nar);
+        quests().capacity((byte) p.questionCap(false), nar);
     }
 
     /**
@@ -338,7 +336,7 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept, Ter
      * @param displaced
      * @return the relevant task
      */
-    public boolean processQuestion(@NotNull Task q, @NotNull NAR nar, @NotNull List<Task> displaced) {
+    public boolean processQuestion(@NotNull Task q, @NotNull NAR nar) {
 
         final QuestionTable questionTable;
         final BeliefTable answerTable;
@@ -353,7 +351,7 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept, Ter
         }
 
 
-        return questionTable.add(q, answerTable, displaced, nar) != null;
+        return questionTable.add(q, answerTable,  nar) != null;
     }
 
 
@@ -383,7 +381,6 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept, Ter
     @Override
     public final Activation process(@NotNull Task input, @NotNull NAR nar) {
 
-        List<Task> toRemove = $.newArrayList();
 
         boolean accepted = false;
 
@@ -391,26 +388,24 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept, Ter
 
         switch (input.punc()) {
             case Symbols.BELIEF:
-                delta = processBelief(input, nar, toRemove);
+                delta = processBelief(input, nar);
                 break;
 
             case Symbols.GOAL:
-                delta = processGoal(input, nar, toRemove);
+                delta = processGoal(input, nar);
                 break;
 
             case Symbols.QUESTION:
-                accepted = processQuestion(input, nar, toRemove);
+                accepted = processQuestion(input, nar);
                 break;
 
             case Symbols.QUEST:
-                accepted = processQuest(input, nar, toRemove);
+                accepted = processQuest(input, nar);
                 break;
 
             default:
                 throw new RuntimeException("Invalid sentence type: " + input);
         }
-
-        nar.tasks.remove(toRemove);
 
         if (delta != null)
             accepted = true;

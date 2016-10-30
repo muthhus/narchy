@@ -49,8 +49,8 @@ import java.util.function.Consumer;
     }
 
     @Override
-    public TruthDelta processGoal(@NotNull Task goal, @NotNull NAR nar, List<Task> displaced) {
-        TruthDelta truthDelta = super.processGoal(goal, nar, displaced);
+    public TruthDelta processGoal(@NotNull Task goal, @NotNull NAR nar) {
+        TruthDelta truthDelta = super.processGoal(goal, nar);
         if (truthDelta!=null){
             executeLater(goal, nar);
             return truthDelta;
@@ -59,8 +59,8 @@ import java.util.function.Consumer;
     }
 
     @Override
-    public TruthDelta processBelief(@NotNull Task belief, @NotNull NAR nar, List<Task> displaced) {
-        TruthDelta truthDelta = super.processBelief(belief, nar, displaced);
+    public TruthDelta processBelief(@NotNull Task belief, @NotNull NAR nar) {
+        TruthDelta truthDelta = super.processBelief(belief, nar);
         if (truthDelta!=null){
             executeLater(belief, nar);
             return truthDelta;
