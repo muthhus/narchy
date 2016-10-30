@@ -74,14 +74,14 @@ public abstract class AbstractVariable implements Variable {
             }
             //TODO check if this is already a common variable containing y
             return subst.putCommon(this, (Variable)y);
-        } else {//if (subst.matchType(xo) && !subst.matchType(y) ) {
+        } else if (subst.matchType(xo) && !subst.matchType(y) ) {
             /*
             note: the !subst.matchType(y) subcondition is an attempt at preventing infinite cycles of variable references
             */
             return subst.matchVarX(this, y);
         }
 
-        //return false;
+        return false;
     }
 
     //    @Override

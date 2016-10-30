@@ -875,7 +875,7 @@ public enum Draw {
 
 
         HGlyph(String hspec) {
-            FasterList<byte[]> segments = $.newArrayList();
+            FasterList<byte[]> segments = (FasterList)$.newArrayList();
 
             //idx      = Integer.valueOf(hspec.substring(0, 5));
             //verts    = Integer.valueOf(hspec.substring(5, 8));

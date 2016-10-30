@@ -70,7 +70,7 @@ public class Narsese extends BaseParser<Object> {
     }
 
     @NotNull
-    public static Task makeTask(NAR memory, @Nullable float[] b, Termed content, char p, @Nullable Truth t, Tense tense) {
+    public static Task makeTask(NAR nar, @Nullable float[] b, Termed content, char p, @Nullable Truth t, Tense tense) {
 
 //        if (p == null)
 //            throw new RuntimeException("character is null");
@@ -88,31 +88,24 @@ public class Narsese extends BaseParser<Object> {
         }
 
         if (t == null) {
-            t = memory.truthDefault(p);
+            t = nar.truthDefault(p);
         }
 
         MutableTask ttt =
                 new MutableTask(content, p, t)
                         .time(
-                                memory.time(), //creation time
+                                nar.time(), //creation time
                                 Tense.getRelativeOccurrence(
                                         tense,
-                                        memory
+                                        nar
                                 ));
 
         switch (blen) {
             case 0:     /* do not set, Memory will apply defaults */
+                ttt.budgetSafe(nar.priorityDefault(p), Float.NaN, Float.NaN);
                 break;
             case 1:
-                if ((p == Symbols.QUEST || p == Symbols.QUESTION)) {
-                    ttt.setBudget(b[0],
-                            memory.durabilityDefault(p),
-                            memory.qualityDefault(p));
-
-                } else {
-                    ttt.budgetByTruth(b[0],
-                            memory.durabilityDefault(p));
-                }
+                ttt.budgetSafe(b[0], Float.NaN, Float.NaN);
                 break;
             case 2:
                 ttt.budgetByTruth(b[1], b[0]);

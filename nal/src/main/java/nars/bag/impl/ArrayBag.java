@@ -10,6 +10,7 @@ import nars.budget.RawBudget;
 import nars.budget.merge.BudgetMerge;
 import nars.link.BLink;
 import nars.util.Util;
+import nars.util.data.list.FasterList;
 import nars.util.data.sorted.SortedArray;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
@@ -67,7 +68,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
 
         SortedArray<BLink<V>> items = this.items;
 
-        List<BLink<V>> pendingRemoval;
+        //List<BLink<V>> pendingRemoval;
         synchronized (items) {
             int additional = (toAdd != null) ? 1 : 0;
 
@@ -75,12 +76,10 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
             int c = capacity();
 
             if (s + additional > c) {
-                pendingRemoval = $.newArrayList((s + additional) - c);
+                List<BLink<V>> pendingRemoval = $.newArrayList((s + additional) - c);
                 s = clean(toAdd, s, additional, pendingRemoval);
                 if (s + additional > c)
                     return false; //throw new RuntimeException("overflow");
-            } else {
-                pendingRemoval = null;
             }
 
             if (toAdd != null) {
@@ -105,6 +104,9 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
                     //items.addInternal(toAdd); //grows the list if necessary
                 } else {
                     //throw new RuntimeException("list became full during insert");
+                    synchronized (map) {
+                        map.remove(toAdd.get());
+                    }
                     return false;
                 }
 
@@ -118,13 +120,6 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
 
         }
 
-        //call these outside of the synchronization
-        if (pendingRemoval != null) {
-            for (BLink<V> w : pendingRemoval) {
-                onRemoved(w);
-                w.delete();
-            }
-        }
 
         return true;
 
@@ -141,39 +136,41 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
 
     }
 
-    private int clean(@Nullable BLink<V> toAdd, int s, int sizeThresh, List<BLink<V>> pendingRemoval) {
-
-        List<BLink<V>> toRemove = $.newArrayList(Math.max(0, s - sizeThresh));
+    private int clean(@Nullable BLink<V> toAdd, int s, int sizeThresh, List<BLink<V>> trash) {
 
         //first step: remove any nulls and deleted values
-        s -= removeDeleted(toRemove);
+        s -= removeDeleted(trash);
 
         //second step: if still not enough, do a hardcore removal of the lowest ranked items until quota is met
-        s = removeWeakestUntilUnderCapacity(s, toRemove, toAdd != null);
+        s = removeWeakestUntilUnderCapacity(s, trash, toAdd != null);
 
+        int toRemoveSize = trash.size();
+        if (toRemoveSize > 0) {
 
-        //do full removal
-        for (int i = 0, toRemoveSize = toRemove.size(); i < toRemoveSize; i++) {
-            BLink<V> w = toRemove.get(i);
+            for (int i = 0; i < toRemoveSize; i++) {
+                BLink<V> w = trash.get(i);
 
-            V k = w.get();
-            if (k == null)
-                continue;
+                V k = w.get();
 
-            synchronized(map) {
-                BLink<V> k2 = map.remove(k);
-
-                if (k2 != w && k2 != null) {
-                    //throw new RuntimeException(
-                    logger.error("bag inconsistency: " + w + " removed but " + k2 + " may still be in the items list");
-                    //reinsert it because it must have been added in the mean-time:
-                    map.putIfAbsent(k, k2);
+                synchronized (map) {
+                    map.remove(k);
                 }
+
+//                    if (k2 != w && k2 != null) {
+//                        //throw new RuntimeException(
+//                        logger.error("bag inconsistency: " + w + " removed but " + k2 + " may still be in the items list");
+//                        //reinsert it because it must have been added in the mean-time:
+//                        map.putIfAbsent(k, k2);
+//                    }
+
+                onRemoved(w);
+                w.delete();
+
             }
 
-            pendingRemoval.add(w);
-
         }
+
+
         return s;
     }
 
@@ -348,7 +345,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
                 Budget vv = v.clone();
                 if (vv == null) {
                     //it has been deleted
-                    synchronized(map) {
+                    synchronized (map) {
                         map.remove(key);
                     }
                     return;
@@ -369,7 +366,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
                 else
                     direction = 0;
 
-                if (direction!=0) {
+                if (direction != 0) {
                     synchronized (items) {
 
                         int p = items.indexOf(v, this);
@@ -409,7 +406,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
 
                 v.setBudget(vv); //update in-place
 
-                if ((o > 0) && (overflow!=null))
+                if ((o > 0) && (overflow != null))
                     overflow.add(o);
 
 //                float pAfter = v.pri();
@@ -422,19 +419,13 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
 
                 break;
             case +1:
+
                 v.setBudget(bp * scale, b.dur(), b.qua());
-                //v.set(key);
                 if (update(v)) {
-                    //success
-                    onAdded(v);
-                } else {
-                    //failure, undo: remove the key from the map
-                    synchronized (map) {
-                        map.remove(key);
-                    }
-                    //onRemoved(null);
+                    onAdded(v); //success
                 }
                 break;
+
             case -1:
                 //reject due to insufficient budget
                 //onRemoved(null);

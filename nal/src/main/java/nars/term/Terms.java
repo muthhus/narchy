@@ -8,6 +8,7 @@ import nars.term.container.TermContainer;
 import nars.term.container.TermVector;
 import nars.util.Texts;
 import nars.util.Util;
+import nars.util.data.list.FasterList;
 import nars.util.data.sorted.SortedList;
 import org.eclipse.collections.api.block.predicate.primitive.IntObjectPredicate;
 import org.eclipse.collections.api.list.MutableList;
@@ -681,7 +682,7 @@ public class Terms   {
         int s = uniques.size();
         if (s > 0) {
 
-            MutableList<Term> oi = $.newArrayList();
+            FasterList<Term> oi = (FasterList)$.newArrayList();
 
             uniques.forEachWithOccurrences((Term t, int count) -> {
                 if (count >= minCount) {

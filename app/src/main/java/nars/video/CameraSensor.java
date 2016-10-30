@@ -56,7 +56,7 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
     }
 
     public List<SensorConcept> encode(Int2Function<Compound> cellTerm, FloatToObjectFunction<Truth> brightnessToTruth) {
-        FasterList<SensorConcept> l = $.newArrayList();
+        List<SensorConcept> l = $.newArrayList();
         for (int x = 0; x < width; x++) {
             int xx = x;
             for (int y = 0; y < height; y++) {

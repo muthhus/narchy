@@ -13,6 +13,7 @@ import nars.concept.Concept;
 import nars.concept.Functor;
 import nars.concept.OperationConcept;
 import nars.concept.util.InvalidConceptException;
+import nars.index.task.MapTaskIndex;
 import nars.index.task.TaskIndex;
 import nars.index.task.TreeTaskIndex;
 import nars.index.term.TermIndex;
@@ -218,8 +219,8 @@ public abstract class NAR extends Param implements Level, Consumer<Task>, NARIn,
         this.concepts = concepts;
 
         this.tasks =
-                //new MapTaskIndex();
-                new TreeTaskIndex();
+                new MapTaskIndex();
+                //new TreeTaskIndex();
 
 
         self = Param.defaultSelf(); //default value
@@ -608,6 +609,7 @@ public abstract class NAR extends Param implements Level, Consumer<Task>, NARIn,
 
         MutableTask t = new MutableTask(term, questionOrQuest, null);
         t.time(time(), when);
+        t.setPriority(priorityDefault(questionOrQuest));
 
         input(t);
 
@@ -649,7 +651,7 @@ public abstract class NAR extends Param implements Level, Consumer<Task>, NARIn,
         //TODO create: protected Concept NAR.process(input, c)  so it can just return or exception here
         try {
             input.normalize(this); //accept into input buffer for eventual processing
-        } catch (@NotNull InvalidTaskException | InvalidTermException e) {
+        } catch (@NotNull InvalidTaskException | InvalidTermException | Budget.BudgetException e) {
             emotion.frustration(input.priIfFiniteElseZero());
             emotion.eror();
 
@@ -669,6 +671,7 @@ public abstract class NAR extends Param implements Level, Consumer<Task>, NARIn,
         }
 
         input.budget().priMult(activationGlobal.floatValue());
+        emotion.busy(input.pri());
 
         Task existing = tasks.addIfAbsent(input);
         if (existing == null) {
@@ -684,7 +687,6 @@ public abstract class NAR extends Param implements Level, Consumer<Task>, NARIn,
 
                 Activation a = c.process(input, this);
 
-                emotion.busy(input.pri());
 
                 if (a != null) {
 
@@ -713,12 +715,13 @@ public abstract class NAR extends Param implements Level, Consumer<Task>, NARIn,
 
                 //different instance
 
-                float pBefore = existing.priIfFiniteElseZero();
-                DuplicateMerge.merge(existing.budget(), input, 1f);
-                float pAfter = existing.pri();
-                emotion.busy(pAfter - pBefore);
-
-                input.feedback(null, Float.NaN, Float.NaN, this);
+                if (!existing.isDeleted()) {
+                    DuplicateMerge.merge(existing.budget(), input, 1f);
+                    input.feedback(null, Float.NaN, Float.NaN, this);
+                } else {
+                    //attempt to revive deleted task
+                    existing.budget().set(input.budget());
+                }
 
                 input.delete("Duplicate");
             }

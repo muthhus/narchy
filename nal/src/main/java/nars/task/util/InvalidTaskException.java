@@ -8,7 +8,7 @@ import org.jetbrains.annotations.NotNull;
 /**
  * Created by me on 10/15/16.
  */
-public final class InvalidTaskException extends RuntimeException {
+public final class InvalidTaskException extends SoftException {
 
     public final Termed task;
 
@@ -26,13 +26,6 @@ public final class InvalidTaskException extends RuntimeException {
         return super.getMessage() + ": " + task.toString();
 //        return super.getMessage() + ": " +
 //                ((task instanceof Task) ? ((Task) task).proof() : task.toString());
-    }
-
-    @Override
-    public Throwable fillInStackTrace() {
-        if (!Param.DEBUG)
-            return this; //omit stacktrace if not in debug mode for efficiency
-        return super.fillInStackTrace();
     }
 
 }

@@ -19,7 +19,6 @@ import java.util.function.Supplier;
 
 import static nars.experiment.misc.Line1DContinuous.random;
 import static nars.experiment.misc.Line1DContinuous.sine;
-import static nars.experiment.tetris.Tetris.DEFAULT_INDEX_WEIGHT;
 
 /**
  * Created by me on 8/30/16.
@@ -73,7 +72,7 @@ public class EvalExperiments {
 
             Default nar = new Default(1024,
                     conceptsPerCycle, 2, 2, rng,
-                    new CaffeineIndex(cb, DEFAULT_INDEX_WEIGHT, false, exe),
+                    new CaffeineIndex(cb, 25 * 100000, false, exe),
                     new FrameClock(), exe
             );
 

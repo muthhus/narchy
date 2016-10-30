@@ -4,6 +4,7 @@ import com.google.common.base.Joiner;
 import nars.NAR;
 import nars.Op;
 import nars.Param;
+import nars.Task;
 import nars.budget.Budget;
 import nars.nal.Premise;
 import nars.nal.rule.PremiseRule;
@@ -143,11 +144,14 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
         if (content == null)
             return; //somehow became null
 
+        if (!Task.taskContentValid(content, ct.punc, nar, !Param.DEBUG))
+            return;
+
         Op o = content.op();
         if (o == NEG) {
             content = compoundOrNull(content.unneg());
             if (content == null)
-                return;
+                return; //??
 
             if (truth!=null)
                 truth = truth.negated();

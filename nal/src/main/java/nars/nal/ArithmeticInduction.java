@@ -422,7 +422,6 @@ public class ArithmeticInduction {
 
     @NotNull
     private static List<IntInterval> features(@NotNull List<Term> nnnt) {
-        FasterList<IntInterval> ll = $.newArrayList(0);
 
         RangeSet<Integer> intIntervals = ranges(nnnt);
 
@@ -432,7 +431,14 @@ public class ArithmeticInduction {
 
         //boolean connected = true;
         //Range q = null;
-        for (Range<Integer> rr : intIntervals.asRanges()) {
+
+
+
+        Set<Range<Integer>> srr = intIntervals.asRanges();
+
+        List<IntInterval> ll = $.newArrayList(srr.size());
+
+        for (Range<Integer> rr : srr) {
             int l = rr.lowerEndpoint();
             int u = rr.upperEndpoint();
             if (rr.lowerBoundType() == BoundType.OPEN)

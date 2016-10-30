@@ -146,7 +146,7 @@ public class ControlSurface extends PanelSurface {
 //            w.addIfNotNull(field(remainingDepth-1, k, v, built));
 //        });
 
-        FasterList<Surface> w = $.newArrayList();
+        FasterList<Surface> w = (FasterList)$.newArrayList();
 
         Field[] fields = aClass.getDeclaredFields();
         for (Field f : fields) {

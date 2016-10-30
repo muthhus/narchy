@@ -13,6 +13,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * Short-term Memory Belief Event Induction.
@@ -68,7 +69,7 @@ public final class STMTemporalLinkage extends STM {
         Term tt = t.unneg();
 
 
-        FasterList<Task> queued = $.newArrayList(stm.size());
+        List<Task> queued = $.newArrayList(stm.size());
 
         synchronized (stm) {
             int numExtra = Math.max(0, (stm.size()+1) - stmCapacity);

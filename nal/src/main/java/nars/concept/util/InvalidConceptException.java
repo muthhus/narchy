@@ -1,12 +1,13 @@
 package nars.concept.util;
 
+import nars.task.util.SoftException;
 import nars.term.Termed;
 import org.jetbrains.annotations.NotNull;
 
 /**
  * Created by me on 9/13/16.
  */
-public final class InvalidConceptException extends RuntimeException {
+public final class InvalidConceptException extends SoftException {
 
     @NotNull
     public final Termed term;

@@ -3,6 +3,7 @@ package nars;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import nars.budget.BudgetFunctions;
 import nars.concept.ActionConcept;
 import nars.concept.Concept;
 import nars.concept.SensorConcept;
@@ -17,6 +18,7 @@ import nars.term.Term;
 import nars.time.Clock;
 import nars.time.FrameClock;
 import nars.truth.Truth;
+import nars.truth.TruthFunctions;
 import nars.util.Loop;
 import nars.util.data.list.FasterList;
 import nars.util.math.FirstOrderDifferenceFloat;
@@ -84,7 +86,7 @@ abstract public class NAgent implements NSense, NAction {
 
     float predictorProbability = 1f;
 
-    protected final FasterList<MutableTask> predictors = $.newArrayList();
+    protected final List<MutableTask> predictors = $.newArrayList();
     private float predictorPriFactor = 0.25f;
 
     public boolean trace = false;
@@ -368,7 +370,7 @@ abstract public class NAgent implements NSense, NAction {
 //                );
             }
 
-            predictors.addAll(
+            ((FasterList)predictors).addAll(
                     new MutableTask($.seq($.varQuery(0), 1, action), '?', null).eternal(),
                     new MutableTask($.impl($.varQuery(0), 1, action), '?', null).eternal(),
                     new MutableTask($.seq(action, 1, happiness), '?', null).eternal(),
@@ -551,8 +553,9 @@ abstract public class NAgent implements NSense, NAction {
             return t;
 
         MutableTask s;
+        char pp = t.punc();
         if (t.occurrence() != ETERNAL) {
-            s = new GeneratedTask(t.term(), t.punc(), t.truth())
+            s = new GeneratedTask(t.term(), pp, t.truth())
                     .time(now, now + (t.occurrence() - t.creation()));
 
             s.evidence(t)
@@ -565,7 +568,9 @@ abstract public class NAgent implements NSense, NAction {
 
             if (t.isDeleted()) {
                 //TODO check if dur or qua changed?
-                t.setBudget(nar.priorityDefault(t.punc()), t.dur(), t.qua());
+                t.budgetSafe(nar.priorityDefault(pp),
+                             nar.durabilityDefault(pp),
+                             t.isQuestOrQuestion() ? nar.qualityDefault(pp) : BudgetFunctions.truthToQuality(t));
             }
 
             nar.inputLater(t);

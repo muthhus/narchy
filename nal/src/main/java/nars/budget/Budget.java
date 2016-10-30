@@ -3,6 +3,7 @@ package nars.budget;
 import nars.Param;
 import nars.Symbols;
 import nars.Task;
+import nars.task.util.SoftException;
 import nars.util.Texts;
 import nars.util.Util;
 import org.fusesource.jansi.Ansi;
@@ -113,14 +114,14 @@ public interface Budget extends Budgeted {
 
 
 
-    final static class BudgetException extends RuntimeException {
+    final static class BudgetException extends SoftException {
         public BudgetException() {
             super();
         }
 
         @Override
         public String getMessage() {
-            return "NaN priority";
+            return "NaN";
         }
     }
 

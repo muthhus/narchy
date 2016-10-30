@@ -875,13 +875,13 @@ public enum $ {
         //return new LinkedHashMap(capacity);
     }
 
-    public static @NotNull <X> FasterList<X> newArrayList() {
+    public static @NotNull <X> List<X> newArrayList() {
         return new FasterList<>(); //GS
         //return new ArrayList();
     }
 
     @NotNull
-    public static <X> FasterList<X> newArrayList(int capacity) {
+    public static <X> List<X> newArrayList(int capacity) {
         return new FasterList(capacity);
         //return new ArrayList(capacity);
     }
@@ -948,7 +948,7 @@ public enum $ {
 
     @NotNull
     public static <X> List<X> newArrayList(@NotNull X... x) {
-        FasterList<X> l = $.newArrayList(x.length);
+        FasterList<X> l = (FasterList)$.newArrayList(x.length);
         l.addAll(x);
         return l;
     }

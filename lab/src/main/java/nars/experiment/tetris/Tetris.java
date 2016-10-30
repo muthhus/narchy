@@ -44,18 +44,16 @@ import static spacegraph.obj.GridSurface.grid;
  */
 public class Tetris extends NAgents {
 
-    @Deprecated public static final int DEFAULT_INDEX_WEIGHT = 25 * 100000;
-
-    static final Executioner exe =
-            //new SingleThreadExecutioner();
-//            new MultiThreadExecutioner(2, 1024*8);
-            new MultiThreadExecutioner(3, 1024*8);
+    //    static final Executioner exe =
+//            //new SingleThreadExecutioner();
+////            new MultiThreadExecutioner(2, 1024*8);
+//            new MultiThreadExecutioner(3, 1024*8);
 
 
     public static final int tetris_width = 6;
     public static final int tetris_height = 14;
-    public static final int TIME_PER_FALL = 3;
-    public static final int frameRate = 2;
+    public static final int TIME_PER_FALL = 8;
+    public static final int frameRate = 1;
     static boolean easy;
 
 
@@ -375,7 +373,7 @@ public class Tetris extends NAgents {
     public static void main(String[] args) {
         Param.DEBUG = false;
 
-        NAR nar = NAgents.newMultiThreadNAR(3, new FrameClock());
+        NAR nar = NAgents.newMultiThreadNAR(5, new FrameClock());
 
 //        Random rng = new XorShift128PlusRandom(1);
 //        //Multi nar = new Multi(3,512,

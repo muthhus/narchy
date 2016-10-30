@@ -190,79 +190,79 @@ abstract public class NAgents extends NAgent {
 
         new Inperience(nar);
 
-        //causal accelerator
-        nar.onTask(t -> {
-
-            switch (t.op()) {
-                case IMPL:
-                    //decompose with Goal:Induction
-                    if (t.isBelief()) {
-                        Term subj = t.term(0);
-                        Term pred = t.term(1);
-                        if (pred instanceof Compound && (subj.vars() == 0) && (pred.vars() == 0)) {
-                            Concept postconditionConcept = nar.concept(pred);
-
-                            //if (pred.equals(a1.term()) || pred.equals(a2.term())) {
-                            boolean negate = false;
-                            if (subj.op() == NEG) {
-                                subj = subj.unneg();
-                                negate = true;
-                            }
-                            Concept preconditionConcept = nar.concept(subj);
-                            if (preconditionConcept != null) {
-
-                                int dt = t.dt();
-                                if (dt == DTERNAL)
-                                    dt = 0;
-
-                                for (long when : new long[]{t.occurrence(),
-                                        nar.time(), nar.time() + 1, nar.time() + 2 //, nar.time() + 200, nar.time() + 300}
-                                }) {
-
-                                    if (when == ETERNAL)
-                                        continue;
-
-                                    //TODO project, not just eternalize for other times
-                                    Truth tt = when != t.occurrence() ? t.truth().eternalize() : t.truth();
-
-                                    if (!(postconditionConcept instanceof SensorConcept)) {
-                                        {
-                                            Task preconditionBelief = preconditionConcept.beliefs().top(when);
-                                            if (preconditionBelief != null) {
-                                                Truth postcondition = BeliefFunction.Deduction.apply(preconditionBelief.truth().negated(negate), tt, nar, nar.confMin.floatValue());
-                                                if (postcondition != null) {
-                                                    Task m = new GeneratedTask(pred, '.', postcondition.truth())
-                                                            .evidence(Stamp.zip(t, preconditionBelief))
-                                                            .budget(t.budget())
-                                                            .time(nar.time(), when + dt)
-                                                            .log("Causal Accel");
-                                                    nar.inputLater(m);
-                                                }
-                                            }
-                                        }
-                                        {
-                                            Task preconditionGoal = preconditionConcept.goals().top(when);
-                                            if (preconditionGoal != null) {
-                                                Truth postcondition = GoalFunction.Induction.apply(preconditionGoal.truth().negated(negate), tt, nar, nar.confMin.floatValue());
-                                                if (postcondition != null) {
-                                                    Task m = new GeneratedTask(pred, '!', postcondition.truth())
-                                                            .evidence(Stamp.zip(t, preconditionGoal))
-                                                            .budget(t.budget())
-                                                            .time(nar.time(), when + dt)
-                                                            .log("Causal Accel");
-                                                    nar.inputLater(m);
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                            //}
-                        }
-                    }
-                    break;
-            }
-        });
+//        //causal accelerator
+//        nar.onTask(t -> {
+//
+//            switch (t.op()) {
+//                case IMPL:
+//                    //decompose with Goal:Induction
+//                    if (t.isBelief()) {
+//                        Term subj = t.term(0);
+//                        Term pred = t.term(1);
+//                        if (pred instanceof Compound && (subj.vars() == 0) && (pred.vars() == 0)) {
+//                            Concept postconditionConcept = nar.concept(pred);
+//
+//                            //if (pred.equals(a1.term()) || pred.equals(a2.term())) {
+//                            boolean negate = false;
+//                            if (subj.op() == NEG) {
+//                                subj = subj.unneg();
+//                                negate = true;
+//                            }
+//                            Concept preconditionConcept = nar.concept(subj);
+//                            if (preconditionConcept != null) {
+//
+//                                int dt = t.dt();
+//                                if (dt == DTERNAL)
+//                                    dt = 0;
+//
+//                                for (long when : new long[]{t.occurrence(),
+//                                        nar.time(), nar.time() + 1, nar.time() + 2 //, nar.time() + 200, nar.time() + 300}
+//                                }) {
+//
+//                                    if (when == ETERNAL)
+//                                        continue;
+//
+//                                    //TODO project, not just eternalize for other times
+//                                    Truth tt = when != t.occurrence() ? t.truth().eternalize() : t.truth();
+//
+//                                    if (!(postconditionConcept instanceof SensorConcept)) {
+//                                        {
+//                                            Task preconditionBelief = preconditionConcept.beliefs().top(when);
+//                                            if (preconditionBelief != null) {
+//                                                Truth postcondition = BeliefFunction.Deduction.apply(preconditionBelief.truth().negated(negate), tt, nar, nar.confMin.floatValue());
+//                                                if (postcondition != null) {
+//                                                    Task m = new GeneratedTask(pred, '.', postcondition.truth())
+//                                                            .evidence(Stamp.zip(t, preconditionBelief))
+//                                                            .budget(t.budget())
+//                                                            .time(nar.time(), when + dt)
+//                                                            .log("Causal Accel");
+//                                                    nar.inputLater(m);
+//                                                }
+//                                            }
+//                                        }
+//                                        {
+//                                            Task preconditionGoal = preconditionConcept.goals().top(when);
+//                                            if (preconditionGoal != null) {
+//                                                Truth postcondition = GoalFunction.Induction.apply(preconditionGoal.truth().negated(negate), tt, nar, nar.confMin.floatValue());
+//                                                if (postcondition != null) {
+//                                                    Task m = new GeneratedTask(pred, '!', postcondition.truth())
+//                                                            .evidence(Stamp.zip(t, preconditionGoal))
+//                                                            .budget(t.budget())
+//                                                            .time(nar.time(), when + dt)
+//                                                            .log("Causal Accel");
+//                                                    nar.inputLater(m);
+//                                                }
+//                                            }
+//                                        }
+//                                    }
+//                                }
+//                            }
+//                            //}
+//                        }
+//                    }
+//                    break;
+//            }
+//        });
 
 
         //nar.linkFeedbackRate.setValue(0.01f);

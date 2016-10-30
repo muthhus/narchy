@@ -45,7 +45,7 @@ public class PremiseMatrix {
 
             int tasklinksSampled = (int)Math.ceil(tasklinks * Param.BAG_OVERSAMPLING);
 
-            FasterList<BLink<Task>> tasksBuffer = $.newArrayList(tasklinksSampled);
+            FasterList<BLink<Task>> tasksBuffer = (FasterList)$.newArrayList(tasklinksSampled);
 
             tasklinkBag.sample(tasklinksSampled, tasksBuffer::addIfNotNull);
 
@@ -54,7 +54,7 @@ public class PremiseMatrix {
 
                 int termlinksSampled = (int)Math.ceil(termlinks * Param.BAG_OVERSAMPLING);
 
-                FasterList<BLink<Term>> termsBuffer = $.newArrayList(termlinksSampled);
+                FasterList<BLink<Term>> termsBuffer = (FasterList)$.newArrayList(termlinksSampled);
                 termlinkBag.sample(termlinksSampled, termsBuffer::addIfNotNull);
 
 

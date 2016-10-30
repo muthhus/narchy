@@ -95,9 +95,9 @@ public class MultiThreadExecutioner extends Executioner {
                 exe,
                 ProducerType.MULTI,
                 //new SleepingWaitStrategy()
-                new BlockingWaitStrategy()
+                //new BlockingWaitStrategy()
                 //new LiteTimeoutBlockingWaitStrategy(0, TimeUnit.MILLISECONDS)
-                //new LiteBlockingWaitStrategy()
+                new LiteBlockingWaitStrategy()
         );
 
         this.ring = disruptor.getRingBuffer();

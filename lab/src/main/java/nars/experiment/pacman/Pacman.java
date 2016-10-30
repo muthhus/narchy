@@ -41,7 +41,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Random;
 
-import static nars.experiment.tetris.Tetris.DEFAULT_INDEX_WEIGHT;
 import static spacegraph.SpaceGraph.window;
 import static spacegraph.obj.GridSurface.col;
 import static spacegraph.obj.GridSurface.grid;
@@ -202,7 +201,7 @@ public class Pacman extends NAgent {
 
         Default nar = new Default(1024,
                 16, 2, 3, rng,
-                new CaffeineIndex(new DefaultConceptBuilder(), DEFAULT_INDEX_WEIGHT, false, e),
+                new CaffeineIndex(new DefaultConceptBuilder(), 25 * 100000, false, e),
                 //new TreeIndex.L1TreeIndex(new DefaultConceptBuilder(rng), 150000, 8192, 2),
                 new FrameClock(), e
 

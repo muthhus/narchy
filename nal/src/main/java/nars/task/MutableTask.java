@@ -238,8 +238,18 @@ public class MutableTask extends AbstractTask {
     /** sets the budget even if 'b' has been deleted; priority will be zero in that case */
     @NotNull
     public final MutableTask budgetSafe(@NotNull Budget b) {
-        float p = b.priIfFiniteElseZero();
-        setBudget(p, b.dur(), b.qua());
+        budgetSafe(b.pri(), b.dur(), b.qua());
+        return this;
+    }
+
+    /** if p is NaN (indicating deletion), p <== 0 */
+    @NotNull public final MutableTask budgetSafe(float p, float d, float q) {
+        priority = p;
+        durability = d;
+        quality = q;
+//        if (p!=p)
+//            p = 0;
+//        setBudget(p, d, q);
         return this;
     }
 

@@ -1,6 +1,7 @@
 package nars.task;
 
 import nars.*;
+import nars.budget.BudgetFunctions;
 import nars.budget.RawBudget;
 import nars.concept.util.InvalidConceptException;
 import nars.task.util.InvalidTaskException;
@@ -168,8 +169,16 @@ public abstract class AbstractTask extends RawBudget implements Task, Temporal {
             case Symbols.GOAL:
                 if (truth == null) {
                     //apply the default truth value for specified punctuation
-                    truth = nar.truthDefault(punc);
+                    setTruth(nar.truthDefault(punc));
+                } else {
+
+                    float confLimit = 1f - Param.TRUTH_EPSILON;
+                    if (!isInput() && conf() > confLimit) {
+                        //clip maximum confidence in case a derivation of an axiomatic belief reaches conf=~1.0 also
+                        setTruth(t(freq(), confLimit));
+                    }
                 }
+
                 break;
             case Symbols.QUEST:
             case Symbols.QUESTION:
@@ -184,9 +193,8 @@ public abstract class AbstractTask extends RawBudget implements Task, Temporal {
 
         }
 
-        if (!Task.taskContentValid(t, punc, nar, !Param.DEBUG)) {
-            return;
-        }
+        if (!Task.taskContentValid(t, punc, nar, !Param.DEBUG))
+            throw new InvalidTaskException(t, "Invalid content");
 
         Compound ntt = nar.normalize(t);
         if (ntt == null)
@@ -211,21 +219,22 @@ public abstract class AbstractTask extends RawBudget implements Task, Temporal {
             setOccurrence(oc);
         }
 
+        float d = dur();
+        if (d!=d /* fast NaN test */)
+            setDurability(nar.durabilityDefault(punc));
 
-
-
-
-        /** NaN quality is a signal that a budget's values need initialized */
         float q = qua();
         if (q!=q /* fast NaN test */) {
-            //HACK for now just assume that only MutableTask supports unbudgeted input
-            nar.budgetDefault((MutableTask)this);
+
+            if (isBeliefOrGoal()) {
+                setQuality(BudgetFunctions.truthToQuality(truth()));
+            } else {
+                setQuality(punc == Symbols.QUESTION ? nar.DEFAULT_QUESTION_QUALITY : nar.DEFAULT_QUEST_QUALITY);
+            }
         }
 
-
-
         //finally, assign a unique stamp if none specified (input)
-        if (evidence.length == 0) {
+        if (evidence.length == 0)
             setEvidence(nar.clock.nextStamp());
 
             //shift the occurrence time if input and dt < 0 and non-eternal HACK dont use log it may be removed without warning
@@ -238,13 +247,6 @@ public abstract class AbstractTask extends RawBudget implements Task, Temporal {
 //                }
 //            }
 //        }
-        } else {
-            float confLimit = 1f - Param.TRUTH_EPSILON;
-            if (conf() > confLimit) {
-                //clip maximum confidence in case a derivation of an axiomatic belief reaches conf=~1.0 also
-                setTruth(t(freq(), confLimit));
-            }
-        }
 
 
 

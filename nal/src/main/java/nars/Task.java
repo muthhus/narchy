@@ -94,32 +94,33 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
      * otherwise returns null
      */
     @Nullable
-    static boolean taskContentValid(@NotNull Term t, char punc, @NotNull NAR nar, boolean safe) {
+    static boolean taskContentValid(@NotNull Compound t, char punc, @NotNull NAR nar, boolean safe) {
 
 
-        if (!(t instanceof Compound) && !t.isNormalized())
+        if (!t.isNormalized())
             return test(t, "Task Term is null or not a normalized Compound", safe);
         if (t.volume() > nar.compoundVolumeMax.intValue())
             return test(t, "Term exceeds maximum volume", safe);
         if (!t.levelValid(nar.level()))
             return test(t, "Term exceeds maximum NAL level", safe);
 
-        Compound ct = (Compound) t;
-
         /* A statement sentence is not allowed to have a independent variable as subj or pred"); */
         Op op = t.op();
 
-        switch (ct.varIndep()) {
+        switch (t.varIndep()) {
             case 0:
                 break;  //OK
             case 1:
-                return test(t, "One independent variable must be balanced elsewhere", safe);
+                return test(t, "singular independent variable must be balanced elsewhere", safe);
             default:
-                if (op.statement && subjectOrPredicateIsIndependentVar(ct))
-                    return test(t, "Statement Task's subject or predicate is VAR_INDEP", safe);
-                //prevent conceptualization of non-statement VarIndep containing terms
                 if (!t.hasAny(Op.StatementBits))
                     return test(t, "Independent variables require statements super-terms", safe);
+                else if (op.statement && subjectOrPredicateIsIndependentVar(t))
+                    return test(t, "Statement Task's subject or predicate is VAR_INDEP", safe);
+
+                //TODO more thorough test for invalid independent-variable containing compounds
+                // DepIndepVarIntroduction does this, adapt/share code from there
+
                 break;
         }
 

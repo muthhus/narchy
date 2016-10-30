@@ -130,16 +130,16 @@ public abstract class TermIndex extends TermBuilder {
     @NotNull
     public final Term cached(@NotNull Op op, int dt, @NotNull Term[] u) throws InvalidTermException {
 
-        int totalVolume = 0;
-        for (Term x : u)
-            totalVolume += x.volume();
+//        int totalVolume = 0;
+//        for (Term x : u)
+//            totalVolume += x.volume();
 
 //        if (totalVolume > volumeMax(op))
 //            throw new InvalidTermException(op, dt, u, "Too voluminous");
 
         boolean cacheable =
-                (totalVolume > 2)
-                        &&
+                //(totalVolume > 2)
+                        //&&
                 ((op!=INH) || !(u[1] instanceof TermTransform && u[0].op() == PROD)) //prevents caching for potential transforming terms
                 ;
 
@@ -221,7 +221,7 @@ public abstract class TermIndex extends TermBuilder {
             return src;
 
         int len = src.size();
-        FasterList<Term> sub = $.newArrayList(len /* estimate */);
+        List<Term> sub = $.newArrayList(len /* estimate */);
 
         boolean strict = f instanceof PremiseEval;
 
@@ -336,14 +336,15 @@ public abstract class TermIndex extends TermBuilder {
     @Nullable
     public final Compound normalize(@NotNull Compound t) {
 
-        Compound c;
 
         if (t.isNormalized()) {
-            c = t; //already normalized
+            return t; //c = t; //already normalized
         } else {
             //see if subterms need change
             TermContainer src = t.subterms();
             TermContainer tgt = normalize(src);
+
+            Compound c;
             if (src == tgt) {
                 c = t; //subterms dont change
             } else if (tgt != InvalidSubterms) {
@@ -351,15 +352,16 @@ public abstract class TermIndex extends TermBuilder {
             } else {
                 c = null;
             }
+
+            //if (c!=null) {
+            //c = compoundOrNull($.unneg((Compound) c));
+            if (c != null) {
+                ((GenericCompound) c).setNormalized();
+            }
+            //}
+            return c;
         }
 
-        //if (c!=null) {
-        //c = compoundOrNull($.unneg((Compound) c));
-        if (c != null) {
-            ((GenericCompound) c).setNormalized();
-        }
-        //}
-        return c;
     }
 
     @Nullable

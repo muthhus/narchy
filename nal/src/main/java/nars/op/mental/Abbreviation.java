@@ -93,13 +93,14 @@ public class Abbreviation/*<S extends Term>*/ extends Leak<CompoundConcept> {
 
     @Nullable
     @Override
-    protected void in(Task task, @NotNull Consumer<BLink<CompoundConcept>> each) {
+    protected void in(@NotNull Task task, @NotNull Consumer<BLink<CompoundConcept>> each) {
 
         if (task instanceof AbbreviationTask)
             return;
 
-        input(task.budget(), each, task.term());
-
+        Budget b = task.budget().clone();
+        if (b!=null)
+            input(b, each, task.term());
     }
 
     private void input(@NotNull Budget b, @NotNull Consumer<BLink<CompoundConcept>> each, @NotNull Compound t) {

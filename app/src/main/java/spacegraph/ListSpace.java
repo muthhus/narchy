@@ -54,7 +54,7 @@ public class ListSpace<X,Y extends Spatial<X>> extends AbstractSpace<X,Y> {
 
     public void set(List<X> items, Function<X, Y> materializer) {
         int n = 0;
-        FasterList<Y> v = $.newArrayList(items.size());
+        FasterList<Y> v = new FasterList(items.size());
         for (X x : items) {
             v.add(space.update(x, materializer));
         }
@@ -73,7 +73,7 @@ public class ListSpace<X,Y extends Spatial<X>> extends AbstractSpace<X,Y> {
 
     @Override
     public int forEachIntSpatial(int offset, IntObjectPredicate<Spatial<X>> each) {
-        return active.forEachIntSpatial(offset ,each);
+        return active.forEach(offset ,each);
     }
 
     @Override

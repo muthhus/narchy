@@ -1,6 +1,7 @@
 package nars.link;
 
 import nars.budget.Budget;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Created by me on 5/29/16.
@@ -8,6 +9,7 @@ import nars.budget.Budget;
 public interface BLink<X> extends Budget, Link<X> {
 
 
+    @NotNull
     @Override
     X get();
 

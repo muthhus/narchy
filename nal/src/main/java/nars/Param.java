@@ -121,7 +121,7 @@ public abstract class Param /*extends Container*/ implements Level {
     public static final float BUDGET_EPSILON = 0.0005f;
 
 
-    public static final int DEFAULT_WIRED_CONCEPT_BELIEFS = 32;
+    public static final int DEFAULT_WIRED_CONCEPT_BELIEFS = 16;
     public static final int DEFAULT_WIRED_CONCEPT_GOALS = 16;
 
     /** size of each thread's normalization cache, in entries */
@@ -300,28 +300,7 @@ public abstract class Param /*extends Container*/ implements Level {
         }
     }
 
-    public void budgetDefault(@NotNull MutableTask t) {
 
-        char punc = t.punc();
-
-        float defPri = priorityDefault(punc);
-        float defDur = durabilityDefault(punc);
-
-        if (t.isBeliefOrGoal()) {
-            t.budgetByTruth(defPri, defDur);
-
-            /** if q was not specified, and truth is, then we can calculate q from truthToQuality */
-            float q = t.qua();
-            if (q != q /* fast NaN test */) {
-                t.setQuality(BudgetFunctions.truthToQuality(t.truth()));
-            }
-        } else if (t.isQuestion()) {
-            t.setBudget(defPri, defDur, DEFAULT_QUESTION_QUALITY);
-        } else if (t.isQuest()) {
-            t.setBudget(defPri, defDur, DEFAULT_QUEST_QUALITY);
-        }
-
-    }
 
 
     /**
@@ -359,8 +338,8 @@ public abstract class Param /*extends Container*/ implements Level {
      */
     float DEFAULT_QUEST_DURABILITY = 0.5f;
 
-    float DEFAULT_QUESTION_QUALITY = 0.5f;
-    float DEFAULT_QUEST_QUALITY = 0.5f;
+    public float DEFAULT_QUESTION_QUALITY = 0.5f;
+    public float DEFAULT_QUEST_QUALITY = DEFAULT_QUESTION_QUALITY;
 
     public float priorityDefault(char punctuation) {
         switch (punctuation) {
@@ -399,7 +378,7 @@ public abstract class Param /*extends Container*/ implements Level {
         throw new RuntimeException("Unknown sentence type: " + punctuation);
     }
 
-    public float qualityDefault(char punctuation) {
+    @Deprecated public float qualityDefault(char punctuation) {
         switch (punctuation) {
             case QUEST:
                 return DEFAULT_QUEST_QUALITY;

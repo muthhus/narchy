@@ -147,7 +147,11 @@ public class DepIndepVarIntroduction extends VarIntroduction {
 
         protected boolean introduce(Term x) {
             return x instanceof Compound &&
-                   random.nextFloat() > (1f / (1f + x.size()));
+                   random.nextFloat() >
+                           1f / x.volume()
+                           //0.5f;
+                           //(1f / (1f + x.size()))
+            ;
         }
 
         @Override

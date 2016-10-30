@@ -259,7 +259,7 @@ public class FasterList<X> extends FastList<X> {
         return false;
     }
 
-    public int forEachIntSpatial(int offset, IntObjectPredicate each) {
+    public int forEach(int offset, IntObjectPredicate each) {
         int n = offset;
         for (Object j : items) {
             if (j == null)

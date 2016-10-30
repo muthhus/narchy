@@ -59,33 +59,35 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
 
             this.capacity = newCapacity;
 
-            clean(nar);
+            synchronized (list) {
+                clean(nar);
 
-            int toRemove = list.size() - newCapacity;
-            if (toRemove > 0) {
-                //compress until under-capacity
-                list.withWriteLockAndDelegate((l)->{
+                int toRemove = list.size() - newCapacity;
+                if (toRemove > 0) {
+                    //compress until under-capacity
+                    list.withWriteLockAndDelegate((l) -> {
 
-                    while (list.size() > capacity) {
-                        long now = nar.time();
+                        while (list.size() > capacity) {
+                            long now = nar.time();
 
-                        Task a = matchWeakest(now);
+                            Task a = matchWeakest(now);
 
-                        Task b = matchMerge(now, a);
+                            Task b = matchMerge(now, a);
 
-                        Task c = (b!=null && b!=a) ? merge(a, b, now, null) : null;
+                            Task c = (b != null && b != a) ? merge(a, b, now, null) : null;
 
-                        remove(a, nar);
+                            remove(a, nar);
 
-                        if (c != null) {
-                            if (remove(b, nar)) {
+                            if (c != null) {
+                                remove(b, nar);
+
                                 addMerged(c, nar);
                             }
+
                         }
 
-                    }
-
-                });
+                    });
+                }
             }
 //            for (int i = 0; i < toRemove && nullAttempts > 0; ) {
 //
@@ -204,11 +206,11 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
     }
 
     public float duration() {
-        return (((float)range()) / size());
+        return (((float)range()) / size()) * 2f;
     }
 
     @Override
-    public boolean removeIf(@NotNull Predicate<? super Task> o, NAR nar) {
+    public boolean removeIf(@NotNull Predicate<? super Task> o, @NotNull  NAR nar) {
         return list.removeIf(((Predicate<Task>) t -> {
             if (o.test(t)) {
                 onRemoved( t, nar );

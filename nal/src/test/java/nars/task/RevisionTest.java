@@ -273,7 +273,7 @@ public class RevisionTest {
         Compound a = $.$("(a &&+3 (b &&+3 c))");
         Compound b = $.$("(a &&+0 (b &&+3 c))");
         Compound c = $.$("(a &&+3 (b &&+0 c))");
-        Compound e = $.$("(a && (b &&+3 c))");
+        //Compound e = $.$("(a && (b &&+3 c))");
 
 
 

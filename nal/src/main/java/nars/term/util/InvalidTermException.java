@@ -2,6 +2,7 @@ package nars.term.util;
 
 import nars.Op;
 import nars.Param;
+import nars.task.util.SoftException;
 import nars.term.Term;
 import nars.term.container.TermContainer;
 import org.jetbrains.annotations.NotNull;
@@ -13,7 +14,7 @@ import static nars.time.Tense.DTERNAL;
 /**
  * Created by me on 2/26/16.
  */
-public final class InvalidTermException extends RuntimeException {
+public final class InvalidTermException extends SoftException {
 
     @NotNull private final Op op;
     private final int dt;
@@ -35,12 +36,7 @@ public final class InvalidTermException extends RuntimeException {
         this.reason = reason;
     }
 
-    @Override
-    public Throwable fillInStackTrace() {
-        if (!Param.DEBUG)
-            return this; //omit stacktrace if not in debug mode for efficiency
-        return super.fillInStackTrace();
-    }
+
 
     @NotNull
     @Override
