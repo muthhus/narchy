@@ -136,11 +136,10 @@ public class Tetris extends NAgents {
                 int xx = x;
                 Compound squareTerm =
                         //$.p(x, y);
-                        //$.inh(
-                              $.p($.pRecurse($.radixArray(x, 2, state.width)),
-                                  $.pRecurse($.radixArray(y, 2, state.height)))
-                          //   , $.the("tetris")
-                ;
+
+                              $.p($.pRecurse($.radixArray(x, 4, state.width)),
+                                  $.pRecurse($.radixArray(y, 4, state.height)));
+
 
                 //$.p($.pRadix(x, 4, state.width), $.pRadix(y, 4, state.height));
                 int index = yy * state.width + xx;

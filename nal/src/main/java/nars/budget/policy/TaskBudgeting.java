@@ -126,7 +126,8 @@ public class TaskBudgeting {
             parentComplexity = taskCompl;
 
         float baseCost = 1;
-        return parentComplexity/(parentComplexity + Math.max(baseCost, derived.complexity() - parentComplexity));
+        //return parentComplexity/(parentComplexity + Math.max(baseCost, derived.complexity() - parentComplexity));
+        return 1f/(1f + (float)Math.sqrt(Math.max(baseCost, derived.complexity() - parentComplexity)));
 
 
     }

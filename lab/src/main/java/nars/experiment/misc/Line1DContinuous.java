@@ -45,7 +45,7 @@ public class Line1DContinuous extends NAgent {
     boolean print;
     private float yHidden;
     private float yEst;
-    float speed = 0.5f;
+    float speed = 0.75f;
     final float[] ins;
 
     public Line1DContinuous(NAR n, int size, IntToFloatFunction target) {
@@ -73,13 +73,14 @@ public class Line1DContinuous extends NAgent {
 
         ActionConcept a;
 
-        actions.add(a = new ActionConcept("e(leftright)", n, (b, d) -> {
+        actions.add(a = new ActionConcept("(leftright)", n, (b, d) -> {
             if (d!=null) {
                 float v =
                         //d.expectation();
                         d.freq();
                 yEst += (v -0.5f)*speed;
-                return $.t(d.freq(), gamma);
+                //return $.t(d.freq(), gamma);
+                return d;
             }
             return null;
         }));

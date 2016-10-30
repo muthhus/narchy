@@ -54,75 +54,75 @@ public abstract class WiredCompoundConcept extends CompoundConcept<Compound> imp
         n.on(this);
     }
 
-    @Override
-    protected TermContainer buildTemplates(Compound term, NAR nar) {
-        if (term.volume()==2 && term.op() == Op.PROD) {
-            //special case. these are atom-like products of 1 term
-            return Terms.NoSubterms;
-        }
-        return super.buildTemplates(term, nar);
-    }
+//    @Override
+//    protected TermContainer buildTemplates(Compound term, NAR nar) {
+//        if (term.volume()==2 && term.op() == Op.PROD) {
+//            //special case. these are atom-like products of 1 term
+//            return Terms.NoSubterms;
+//        }
+//        return super.buildTemplates(term, nar);
+//    }
+//
+//    @Nullable protected Task filter(@NotNull Task t, @NotNull BeliefTable table, @Nullable BiPredicate<Task,NAR> valid, @NotNull NAR nar, @NotNull List<Task> displaced) {
+//
+//        if (valid!=null) {
+//            if (!table.isEmpty() /*&& ((DefaultBeliefTable)beliefs()).temporal.isFull()*/) {
+//                //try to remove at least one past belief which did not originate from this sensor
+//                //this should clear space for future predictions
+//                TemporalBeliefTable tb = ((DefaultBeliefTable) table).temporal;
+//                tb.removeIf(x -> !valid.test(x, nar), displaced);
+//            }
+//
+//            if (!valid.test(t, nar)) {
+//
+//                //TODO delete its non-input parent tasks?
+//                onConflict(t);
+//
+//                //TaskTable.removeTask(t, "Ignored Speculation", displaced); //will be displaced normally by returning null
+//                return null;
+//            }
+//        }
+//
+//        return t;
+//    }
 
-    @Nullable protected Task filter(@NotNull Task t, @NotNull BeliefTable table, @Nullable BiPredicate<Task,NAR> valid, @NotNull NAR nar, @NotNull List<Task> displaced) {
+//    @Override
+//    public TruthDelta processBelief(@NotNull Task t, @NotNull NAR nar, @NotNull List<Task> displaced) {
+//        t = filterBeliefs(t, nar, displaced);
+//        if (t != null) {
+//            TruthDelta td = super.processBelief(t, nar, displaced);
+//            if (td != null) {
+//                //executeLater(t, nar);
+//                return td;
+//            }
+//        }
+//        return null;
+//    }
+//
+//    @Override
+//    public TruthDelta processGoal(@NotNull Task t, @NotNull NAR nar, @NotNull List<Task> displaced) {
+//        t = filterGoals(t, nar, displaced);
+//        if (t != null) {
+//            TruthDelta td = super.processGoal(t, nar, displaced);
+//            if (td != null) {
+//                //executeLater(t, nar);
+//                return td;
+//            }
+//        }
+//        return null;
+//    }
 
-        if (valid!=null) {
-            if (!table.isEmpty() /*&& ((DefaultBeliefTable)beliefs()).temporal.isFull()*/) {
-                //try to remove at least one past belief which did not originate from this sensor
-                //this should clear space for future predictions
-                TemporalBeliefTable tb = ((DefaultBeliefTable) table).temporal;
-                tb.removeIf(x -> !valid.test(x, nar), displaced);
-            }
-
-            if (!valid.test(t, nar)) {
-
-                //TODO delete its non-input parent tasks?
-                onConflict(t);
-
-                //TaskTable.removeTask(t, "Ignored Speculation", displaced); //will be displaced normally by returning null
-                return null;
-            }
-        }
-
-        return t;
-    }
-
-    @Override
-    public TruthDelta processBelief(@NotNull Task t, @NotNull NAR nar, @NotNull List<Task> displaced) {
-        t = filterBeliefs(t, nar, displaced);
-        if (t != null) {
-            TruthDelta td = super.processBelief(t, nar, displaced);
-            if (td != null) {
-                //executeLater(t, nar);
-                return td;
-            }
-        }
-        return null;
-    }
-
-    @Override
-    public TruthDelta processGoal(@NotNull Task t, @NotNull NAR nar, @NotNull List<Task> displaced) {
-        t = filterGoals(t, nar, displaced);
-        if (t != null) {
-            TruthDelta td = super.processGoal(t, nar, displaced);
-            if (td != null) {
-                //executeLater(t, nar);
-                return td;
-            }
-        }
-        return null;
-    }
-
-    /** NOTE: if validBelief always returns true, then this can be bypassed by overriding with blank method */
-    public @Nullable Task filterBeliefs(@NotNull Task t, @NotNull NAR nar, @NotNull List<Task> displaced) {
-        t = filter(t, beliefs(), null, nar, displaced);
-        return t;
-    }
-
-    /** NOTE: if validGoal always returns true, then this can be bypassed by overriding with blank method */
-    public @Nullable Task filterGoals(@NotNull Task t, @NotNull NAR nar, @NotNull List<Task> displaced) {
-        t = filter(t, goals(), null, nar, displaced);
-        return t;
-    }
+//    /** NOTE: if validBelief always returns true, then this can be bypassed by overriding with blank method */
+//    public @Nullable Task filterBeliefs(@NotNull Task t, @NotNull NAR nar, @NotNull List<Task> displaced) {
+//        t = filter(t, beliefs(), null, nar, displaced);
+//        return t;
+//    }
+//
+//    /** NOTE: if validGoal always returns true, then this can be bypassed by overriding with blank method */
+//    public @Nullable Task filterGoals(@NotNull Task t, @NotNull NAR nar, @NotNull List<Task> displaced) {
+//        t = filter(t, goals(), null, nar, displaced);
+//        return t;
+//    }
 
 
 //    @Nullable
