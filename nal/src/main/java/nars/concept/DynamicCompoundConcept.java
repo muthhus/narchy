@@ -1,6 +1,7 @@
 package nars.concept;
 
 import com.google.common.collect.Iterators;
+import com.google.common.collect.Lists;
 import nars.*;
 import nars.bag.Bag;
 import nars.budget.Budget;
@@ -116,13 +117,13 @@ public class DynamicCompoundConcept extends CompoundConcept {
         @Override
         @Nullable
         public Truth truth(long when, long now) {
-            DynTruth d = dyntruth(when, now);
+            DynTruth d = dyntruth(when, now, false);
             return d != null ? d.truth() : super.truth(when, now);
         }
 
         @Nullable
-        protected DynTruth dyntruth(long when, long now) {
-            return truth(when, now, DynamicCompoundConcept.this, false, false);
+        protected DynTruth dyntruth(long when, long now, boolean evidence) {
+            return truth(when, now, DynamicCompoundConcept.this, false, evidence);
         }
 
         @Nullable private DynamicCompoundConcept.DynTruth truth(long when, @NotNull Compound template, boolean evidence) {
@@ -148,7 +149,7 @@ public class DynamicCompoundConcept extends CompoundConcept {
             } else {
                 @NotNull BeliefTable table = beliefOrGoal ? templateConcept.beliefs() : templateConcept.goals();
                 if (table instanceof DynamicBeliefTable) {
-                    return ((DynamicBeliefTable)table).dyntruth(when, now);
+                    return ((DynamicBeliefTable)table).dyntruth(when, now, evidence);
                 } else {
                     Task x = table.top(when, now);
                     if (x == null)
@@ -221,30 +222,29 @@ public class DynamicCompoundConcept extends CompoundConcept {
 
             @Nullable Truth nt = null;
             if (tableDynamic) {
-                @Nullable DynamicCompoundConcept.DynTruth ndt = ((DynamicBeliefTable)table).truth(when + dt, now, subConcept, negated, false);
-                if (ndt!=null) {
-                    nt = ndt.truth();
+                boolean evi = d.e!=null;
+                @Nullable DynamicCompoundConcept.DynTruth ndt = ((DynamicBeliefTable)table).truth(when + dt, now, subConcept, negated, evi);
+                //already negated via the parameter
+                if (ndt!=null && d.add(ndt.truth())) {
+                    if (d.e!=null) {
+                        d.e.addAll(ndt.e);
+                    }
+                    return true;
                 }
             } else {
                 nt = table.truth(when + dt, now);
-                if (nt!=null)
-                    nt = nt.negated(negated);
-            }
-
-            if (nt==null) {
-                return false;
-            }
-
-            if (!d.add(nt))
-                return false;
-
-            if (d.e!=null) {
-                Task bt = table.top(when+dt, now);
-                if (bt != null) {
-                    d.e.add(bt); //HACK this doesnt include the non-top tasks which may contribute to the evaluated truth during truthpolation
+                if (nt!=null && d.add(nt.negated(negated))) {
+                    if (d.e!=null) {
+                        Task bt = table.top(when+dt, now);
+                        if (bt != null) {
+                            d.e.add(bt); //HACK this doesnt include the non-top tasks which may contribute to the evaluated truth during truthpolation
+                        }
+                    }
+                    return true;
                 }
             }
-            return true;
+
+            return false;
         }
 
         /** unroll IntInterval's */
@@ -319,8 +319,8 @@ public class DynamicCompoundConcept extends CompoundConcept {
 
             //if (x == null || then == ETERNAL /*|| Math.abs(then - x.occurrence() ) >= occThresh*/) {
 
-                if (then == ETERNAL)
-                    then = now;
+//                if (then == ETERNAL)
+//                    then = now;
 
                 //template which may contain temporal relationship to emulate
                 Compound template = x!=null ?  x.term() : term();

@@ -9,6 +9,7 @@ import nars.bag.impl.ArrayBag;
 import nars.concept.CompoundConcept;
 import nars.concept.Concept;
 import nars.io.NarseseTest;
+import nars.link.BLink;
 import nars.nar.Default;
 import nars.term.Compound;
 import nars.term.Term;
@@ -327,22 +328,28 @@ public class TemporalTest {
     @Test public void testConceptualizationIntermpolationEternal() {
 
         Default d = new Default();
-        d.believe("((\\,(a ==>+2 b),_)-->[pill])");
-        d.believe("((\\,(a ==>+6 b),_)-->[pill])"); //same concept
-        //d.run(1);
+        d.believe("((a ==>+2 b)-->[pill])");
+        d.believe("((a ==>+6 b)-->[pill])"); //same concept
+        d.run(1);
 
         Bag<Concept> cb = d.core.active;
         cb.print();
         assertTrue(5 <= cb.size());
         Concept cc = ((ArrayBag<Concept>) cb).get(0).get();
 
-        String q = "((\\,(a==>b),_)-->[pill])=$1.0000;0.5000;0.9000$";
-        assertEquals(q,cb.get($(q)).toString());
-        //assertEquals(q, cc.toString());
+        {
+            Term term = $("((a==>b)-->[pill])");
+
+            BLink<Concept> link = cb.get(term);
+            assertNotNull(link);
+            String q = "((a==>b)-->[pill])=$1.0000;0.5000;0.9000$";
+            assertEquals(q, link.toString());
+            //assertEquals(q, cc.toString());
+        }
 
         cc.print();
         //INTERMPOLATION APPLIED DURING REVISION:
-        assertEquals("((\\,(a ==>+4 b),_)-->[pill])", cc.beliefs().eternalTop().term().toString());
+        assertEquals("((a ==>+4 b)-->[pill])", cc.beliefs().eternalTop().term().toString());
     }
 
     @Test public void testConceptualizationIntermpolationTemporal() {

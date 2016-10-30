@@ -47,10 +47,10 @@
 //                (A --> C)
 //If A is a special case of B, and B is a special case of C, so is A a special case of C (strong), the other variations are hypotheses (weak)
 
-    (A --> B), (B --> C), neqCom(A,C) |- (A --> C), (Belief:Deduction, Goal:Strong)
-    (A --> B), (A --> C), neqCom(B,C) |- (C --> B), (Belief:Abduction, Goal:Weak)
-    (A --> C), (B --> C), neqCom(A,B) |- (A --> B), (Belief:Induction, Goal:Weak)
-    (A --> B), (B --> C), neqCom(A,C) |- (C --> A), (Belief:Exemplification, Goal:Weak)
+    (A --> B), (B --> C), neqCom(A,C) |- (A --> C), (Belief:Deduction, Goal:Strong, Permute:Backward)
+    (A --> B), (A --> C), neqCom(B,C) |- (C --> B), (Belief:Abduction, Goal:Weak, Permute:Backward)
+    (A --> C), (B --> C), neqCom(A,B) |- (A --> B), (Belief:Induction, Goal:Weak, Permute:Backward)
+    (A --> B), (B --> C), neqCom(A,C) |- (C --> A), (Belief:Exemplification, Goal:Weak, Permute:Backward)
 
 //// similarity from inheritance ////////////////////////////////////////////////////////////////////////////////////
 //If S is a special case of P, and P is a special case of S, then S and P are similar
@@ -81,13 +81,13 @@
 //  corresponds to extensional union, and extensional intersection corresponds
 //  to intensional union.
 
-    (P --> M), (S --> M), notSet(S), notSet(P), neqCom(S,P) |- ((S | P) --> M), (Belief:Intersection)
-    (P --> M), (S --> M), notSet(S), notSet(P), neqCom(S,P) |- ((S & P) --> M), (Belief:Union)
-    (P --> M), (S --> M), notSet(S), notSet(P), neqCom(S,P) |- ((P ~ S) --> M), (Belief:Difference)
+    (P --> M), (S --> M), notSet(S), notSet(P), neqCom(S,P) |- ((S | P) --> M), (Belief:Intersection, Permute:Backward)
+    (P --> M), (S --> M), notSet(S), notSet(P), neqCom(S,P) |- ((S & P) --> M), (Belief:Union, Permute:Backward)
+    (P --> M), (S --> M), notSet(S), notSet(P), neqCom(S,P) |- ((P ~ S) --> M), (Belief:Difference, Permute:Backward)
 
-    (M --> P), (M --> S), notSet(S), notSet(P), neqCom(S,P) |- (M --> (P & S)), (Belief:Intersection)
-    (M --> P), (M --> S), notSet(S), notSet(P), neqCom(S,P) |- (M --> (P | S)), (Belief:Union)
-    (M --> P), (M --> S), notSet(S), notSet(P), neqCom(S,P) |- (M --> (P - S)), (Belief:Difference)
+    (M --> P), (M --> S), notSet(S), notSet(P), neqCom(S,P) |- (M --> (P & S)), (Belief:Intersection, Permute:Backward)
+    (M --> P), (M --> S), notSet(S), notSet(P), neqCom(S,P) |- (M --> (P | S)), (Belief:Union, Permute:Backward)
+    (M --> P), (M --> S), notSet(S), notSet(P), neqCom(S,P) |- (M --> (P - S)), (Belief:Difference, Permute:Backward)
 
 //raw product composition
 //    (A..+), (B..+) |- ((A..+) | (B..+)), (Belief:Intersection)
@@ -169,13 +169,13 @@
     //not necessarily the same as the order in the premises, given the hypothetical
     //nature of such a rule."
 
-    (M ==> P), (S ==> M), neqCom(S,P), time(dtUnionReverse), notImplEqui(S), notEqui(P) |- (S ==>+- P), (Belief:Deduction)
+    (M ==> P), (S ==> M), neqCom(S,P), time(dtUnionReverse), notImplEqui(S), notEqui(P) |- (S ==>+- P), (Belief:Deduction, Permute:Backward)
 
-    (P ==> M), (S ==> M), neqCom(S,P), time(dtBminT), notImplEqui(S), notEqui(P) |- (S ==>+- P), (Belief:Induction)
+    (P ==> M), (S ==> M), neqCom(S,P), time(dtBminT), notImplEqui(S), notEqui(P) |- (S ==>+- P), (Belief:Induction, Permute:Backward)
 
-    (M ==> P), (M ==> S), neqCom(S,P), time(dtTminB), notImplEqui(S), notEqui(P) |- (S ==>+- P), (Belief:Abduction)
+    (M ==> P), (M ==> S), neqCom(S,P), time(dtTminB), notImplEqui(S), notEqui(P) |- (S ==>+- P), (Belief:Abduction, Permute:Backward)
 
-    (P ==> M), (M ==> S), neqCom(S,P), time(dtUnion), notImplEqui(S), notEqui(P) |- (S ==>+- P), (Belief:Exemplification)
+    (P ==> M), (M ==> S), neqCom(S,P), time(dtUnion), notImplEqui(S), notEqui(P) |- (S ==>+- P), (Belief:Exemplification, Permute:Backward)
 
 //// implication to equivalence ////////////////////////////////////////////////////////////////////////////////////
 //If when S happens, P happens, and before P happens, S has happened, then they are truth-related equivalent
@@ -453,12 +453,11 @@
 
 //backward inference rules which should really only work on backward inference:
 
+    //(A --> S), (B --> S), neqCom(A,B), task("?@") |- (A --> B), ()
+    //(A --> S), (B --> S), neqCom(A,B), task("?@") |- (B --> A), ()
 
-    (A --> S), (B --> S), neqCom(A,B), task("?@") |- (A --> B), ()
-    (A --> S), (B --> S), neqCom(A,B), task("?@") |- (B --> A), ()
-
-    (A ==> S), (B ==> S), neqCom(A,B), task("?@"), notImplEqui(A), notEqui(B)  |- (A ==>+- B), ()
-    (A ==> S), (B ==> S), neqCom(A,B), task("?@"), notImplEqui(B), notEqui(A)  |- (B ==>+- A), ()
+    //(A ==> S), (B ==> S), neqCom(A,B), task("?@"), notImplEqui(A), notEqui(B)  |- (A ==>+- B), ()
+    //(A ==> S), (B ==> S), neqCom(A,B), task("?@"), notImplEqui(B), notEqui(A)  |- (B ==>+- A), ()
 
 //Inheritance to Similarity
 

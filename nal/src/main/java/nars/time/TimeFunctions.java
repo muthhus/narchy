@@ -16,6 +16,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import static nars.Op.CONJ;
+import static nars.Op.NEG;
 import static nars.task.Revision.chooseByConf;
 import static nars.task.Revision.occInterpolate;
 import static nars.time.Tense.*;
@@ -394,7 +395,7 @@ public interface TimeFunctions {
 
     @Nullable
     static Term resolve(@NotNull PremiseEval p, @NotNull Term t) {
-        return p.resolve(/*productNormalize*/(t.unneg()));
+        return p.resolve(/*productNormalize*/(t));
     }
 
     @Nullable
@@ -869,80 +870,82 @@ public interface TimeFunctions {
         if (occ > Tense.TIMELESS) {
 
             Term T = resolve(p, tt);
-            Term B = bb != null ? resolve(p, bb) : null;
-            Term C = derived;
+            if (T!=null) {
+                Term B = bb != null ? resolve(p, bb) : null;
+                Term C = derived;
 
-            if (belief != null) {
-                //TODO cleanup simplify this is messy and confusing
+                if (belief != null) {
+                    //TODO cleanup simplify this is messy and confusing
 
-                if (task.isEternal() && !belief.isEternal()) {
-                    //find relative time of belief in the task, relative time of the conclusion, and subtract
-                    //the occ (=belief time's)
-                    long timeOfBeliefInTask = T.subtermTime(B, td);
-                    long timeOfDerivedInTask = T.subtermTime(C, td);
-                    if (timeOfDerivedInTask != DTERNAL && timeOfBeliefInTask != DTERNAL)
-                        occ += (timeOfDerivedInTask - timeOfBeliefInTask);
-                    else if (timeOfDerivedInTask != DTERNAL)
-                        occ += timeOfDerivedInTask;
-                } else if (!task.isEternal() && belief.isEternal() && B!=null) {
-                    long timeOfTaskInBelief = B.subtermTime(T, bd);
-                    long timeOfDerivedInBelief = B.subtermTime(C, bd);
-
-                    if (timeOfTaskInBelief != DTERNAL && timeOfDerivedInBelief != DTERNAL)
-                        occ += (timeOfDerivedInBelief - timeOfTaskInBelief);
-                    else if (timeOfDerivedInBelief != DTERNAL)
-                        occ += timeOfDerivedInBelief;
-                    else {
+                    if (task.isEternal() && !belief.isEternal()) {
+                        //find relative time of belief in the task, relative time of the conclusion, and subtract
+                        //the occ (=belief time's)
+                        long timeOfBeliefInTask = T.subtermTime(B, td);
                         long timeOfDerivedInTask = T.subtermTime(C, td);
-                        if (timeOfDerivedInTask != DTERNAL) {
+                        if (timeOfDerivedInTask != DTERNAL && timeOfBeliefInTask != DTERNAL)
+                            occ += (timeOfDerivedInTask - timeOfBeliefInTask);
+                        else if (timeOfDerivedInTask != DTERNAL)
                             occ += timeOfDerivedInTask;
-                        } else {
-                            //??
+                    } else if (!task.isEternal() && belief.isEternal() && B != null) {
+                        long timeOfTaskInBelief = B.subtermTime(T, bd);
+                        long timeOfDerivedInBelief = B.subtermTime(C, bd);
+
+                        if (timeOfTaskInBelief != DTERNAL && timeOfDerivedInBelief != DTERNAL)
+                            occ += (timeOfDerivedInBelief - timeOfTaskInBelief);
+                        else if (timeOfDerivedInBelief != DTERNAL)
+                            occ += timeOfDerivedInBelief;
+                        else {
+                            long timeOfDerivedInTask = T.subtermTime(C, td);
+                            if (timeOfDerivedInTask != DTERNAL) {
+                                occ += timeOfDerivedInTask;
+                            } else {
+                                //??
+                            }
                         }
+                    } else if (!task.isEternal() && !belief.isEternal()) {
+                        //throw new RuntimeException("ambiguous task or belief");
+
+                        //long ot = T.subtermTime(C, td);
+                        //long ob = B.subtermTime(C, bd);
+                        //if (t!=ITERNAL)
+                        //    occ -= t;
                     }
-                } else if (!task.isEternal() && !belief.isEternal()) {
-                    //throw new RuntimeException("ambiguous task or belief");
-
-                    //long ot = T.subtermTime(C, td);
-                    //long ob = B.subtermTime(C, bd);
-                    //if (t!=ITERNAL)
-                    //    occ -= t;
-                }
-            } else {
-
-                if (!task.isEternal()) {
-                    long timeOfDerivedInTask = T.subtermTime(C, td);
-                    if (timeOfDerivedInTask != DTERNAL)
-                        occ += timeOfDerivedInTask;
                 } else {
 
-                    int ot = tp.subtermTime(cp, td);
-                    int ob = bp.subtermTime(cp, bd);
+                    if (!task.isEternal()) {
+                        long timeOfDerivedInTask = T.subtermTime(C, td);
+                        if (timeOfDerivedInTask != DTERNAL)
+                            occ += timeOfDerivedInTask;
+                    } else {
 
-                    if (ot != DTERNAL) {
-                        if (tp instanceof Compound) {
-                            Compound ctp = (Compound) tp;
-                            if (derivationMatch(ctp.term(0), cp)) {
-                                ot -= td;
-                            }
-                        }
-                        occ += ot; //occ + ot;
-                    } else if (ob != DTERNAL) {
+                        int ot = tp.subtermTime(cp, td);
+                        int ob = bp.subtermTime(cp, bd);
 
-                        if (belief.occurrence() != task.occurrence()) { //why?
-                            if (bp instanceof Compound) {
-                                Compound cbp = (Compound) bp;
-                                if (!derivationMatch(cbp.term(1), cp)) {
-                                    ob -= bd;
+                        if (ot != DTERNAL) {
+                            if (tp instanceof Compound) {
+                                Compound ctp = (Compound) tp;
+                                if (derivationMatch(ctp.term(0), cp)) {
+                                    ot -= td;
                                 }
                             }
+                            occ += ot; //occ + ot;
+                        } else if (ob != DTERNAL) {
+
+                            if (belief.occurrence() != task.occurrence()) { //why?
+                                if (bp instanceof Compound) {
+                                    Compound cbp = (Compound) bp;
+                                    if (!derivationMatch(cbp.term(1), cp)) {
+                                        ob -= bd;
+                                    }
+                                }
+                            }
+
+                            occ += ob;
+
+                        } else {
+                            //neither, remain eternal
+                            throw new RuntimeException("unhandled case");
                         }
-
-                        occ += ob;
-
-                    } else {
-                        //neither, remain eternal
-                        throw new RuntimeException("unhandled case");
                     }
                 }
             }

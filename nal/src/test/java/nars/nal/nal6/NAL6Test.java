@@ -16,7 +16,7 @@ import static nars.time.Tense.ETERNAL;
 public class NAL6Test extends AbstractNALTest {
 
 
-    final int cycles = 1300;
+    final int cycles = 2300;
 
     public NAL6Test(Supplier<NAR> b) {
         super(b);
@@ -265,9 +265,9 @@ public class NAL6Test extends AbstractNALTest {
     public void variable_introduction_with_existing_vars()  {
         //test that an introduced variable doesn't interfere with an existing variable of same name ($1)
         TestNAR tester = test();
-        tester.believe("<swan --> <$1 --> birdlike>>"); //en("A swan is a bird.");
+        tester.believe("<swan --> <?1 --> birdlike>>"); //en("A swan is a bird.");
         tester.believe("<swan --> swimmer>", 0.80f, 0.9f); //en("A swan is usually a swimmer.");
-        tester.mustBelieve(cycles, "<<$1 --> <$2 --> birdlike>> ==> <$1 --> swimmer>>", 0.80f, 0.45f); //en("I guess a bird is usually a swimmer.");
+        tester.mustBelieve(cycles, "<<$1 --> <?2 --> birdlike>> ==> <$1 --> swimmer>>", 0.80f, 0.45f); //en("I guess a bird is usually a swimmer.");
     }
 
 
@@ -471,6 +471,13 @@ public class NAL6Test extends AbstractNALTest {
         tester.mustBelieve(cycles, "c:d", 1.00f, 0.81f); //en("there is a lock which is opened by key1");
     }
 
+    @Test
+    public void equivVariableSubst()  {
+        TestNAR tester = test();
+        tester.believe("(x,y).");
+        tester.believe("((x,$y)<=>($y,x)).");
+        tester.mustBelieve(cycles, "(y,x)", 1.00f, 0.81f); //en("there is a lock which is opened by key1");
+    }
 
 
     @Test public void recursionSmall2()  {

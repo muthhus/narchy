@@ -154,7 +154,7 @@ public interface Execution  {
     //feedback(Object o)
 
     static void feedback(@NotNull OperationConcept cause, Task feedback, @NotNull NAR n) {
-        n.input(
+        n.inputLater(
             noticeExecuted(n, cause),
             feedback
         );

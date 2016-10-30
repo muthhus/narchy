@@ -3,6 +3,7 @@ package nars.term.compound;
 import nars.IO;
 import nars.Op;
 import nars.Param;
+import nars.concept.Concept;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
@@ -101,7 +102,7 @@ public class GenericCompound implements Compound {
 
             cthat = (Compound)that;
 
-        } /*else if (that instanceof Termed)  {
+        } else if (that instanceof Concept /* Termed but not Task*/)  {
             Term tthat = ((Termed) that).term();
             if (tthat instanceof Compound) {
 
@@ -113,7 +114,7 @@ public class GenericCompound implements Compound {
             } else {
                 return false;
             }
-        }*/ else {
+        } else {
             return false;
         }
 

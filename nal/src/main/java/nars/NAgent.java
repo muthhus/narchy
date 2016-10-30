@@ -71,11 +71,11 @@ abstract public class NAgent implements NSense, NAction {
     public final List<SensorConcept> sensors = $.newArrayList();
     public final List<ActionConcept> actions = $.newArrayList();
 
-    public float alpha, gamma, epsilonProbability = 0.03f;
+    public float alpha, gamma, epsilonProbability = 0.02f;
     @Deprecated
-    public float gammaEpsilonFactor = 0.25f;
+    public float gammaEpsilonFactor = 0.5f;
 
-    final int curiosityMonitorDuration = 32; //frames
+    final int curiosityMonitorDuration = 8; //frames
     final DescriptiveStatistics avgActionDesire = new DescriptiveStatistics(curiosityMonitorDuration);
     final DescriptiveStatistics rewardWindow = new DescriptiveStatistics(curiosityMonitorDuration);
 

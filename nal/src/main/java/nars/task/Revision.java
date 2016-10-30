@@ -7,10 +7,8 @@ import nars.budget.Budget;
 import nars.concept.Concept;
 import nars.nal.Stamp;
 import nars.nal.meta.PremiseEval;
-import nars.table.DefaultBeliefTable;
 import nars.term.Compound;
 import nars.term.Term;
-import nars.term.Termed;
 import nars.truth.ProjectedTruth;
 import nars.truth.Truth;
 import nars.truth.Truthed;
@@ -290,31 +288,39 @@ public class Revision {
 //    }
 //
     @NotNull
-    public static Term intermpolate(@NotNull Term a, @NotNull Term b, float aProp, @NotNull MutableFloat accumulatedDifference, float depth, @NotNull Random rng) {
+    public static Term intermpolate(@NotNull Term a, @NotNull Term b, float aProp, @NotNull MutableFloat accumulatedDifference, float curDepth, @NotNull Random rng) {
         if (a.equals(b)) {
             return a;
         } else if (a instanceof Compound) {
             boolean sameOp = a.op() == b.op();
-            boolean sameSize = a.size() == b.size();
+            int len = a.size();
+            boolean sameSize = (len == b.size());
             if (sameSize && sameOp) {
-                if (a.op().temporal && a.size() == 2) {
-                    return dtMergeTemporal((Compound)a, (Compound)b, aProp, accumulatedDifference, depth/2f, rng);
+                Compound ca = (Compound) a;
+                Compound cb = (Compound) b;
+                if (a.op().temporal && len == 2) {
+                    return dtMergeTemporal(ca, cb, aProp, accumulatedDifference, curDepth/2f, rng);
                 } else {
-                    if (!a.op().image) //dont fuck with images here
-                        return dtMergeGeneric((Compound)a, (Compound)b, aProp, rng);
+                    assert(ca.dt()== cb.dt());
+
+                    //Term[] x = choose(ca.terms(), cb.terms(), aProp, rng)
+
+                    Term[] x = new Term[len];
+                    for (int i = 0; i < len; i++) {
+                        x[i] = intermpolate(ca.term(i), cb.term(i), aProp, accumulatedDifference, curDepth/2f, rng);
+                    }
+
+                    return $.compound(
+                            ca.op(), /* although parallel could be maintained if this happens by choosing dt between a and b */
+                            ca.dt(), //incase 'a' is an image
+                            x
+                    );
                 }
             }
         }
 
         return choose(a, b, aProp, rng);
 
-    }
-
-    /** a and b must have same operator and size */
-    @NotNull private static Term dtMergeGeneric(@NotNull Compound a, @NotNull Compound b, float aProp, @NotNull Random rng) {
-        return $.compound(a.op(), DTERNAL, /* although parallel could be maintained if this happens by choosing dt between a and b */
-            choose(a.terms(), b.terms(), aProp, rng)
-        );
     }
 
     @NotNull
@@ -335,61 +341,65 @@ public class Revision {
         }
 
         depth/=2f;
-        return $.compound(a.op(), (choose(a, b, aProp, rng) == a) ? adt : bdt,
+
+        int dt =
+                //(choose(a, b, aProp, rng) == a) ? adt : bdt;
+                lerp(adt, bdt, aProp);
+
+        return $.compound(a.op(), dt,
                 intermpolate(a0, b0, aProp, accumulatedDifference, depth, rng),
                 intermpolate(a1, b1, aProp, accumulatedDifference, depth, rng));
 
     }
 
-    private static void failIntermpolation(@NotNull Compound a, @NotNull Compound b) {
-        throw new RuntimeException("interpolation failure: different or invalid internal structure and can not be compared:\n\t" + a + "\n\t" + b);
-    }
+//    private static void failIntermpolation(@NotNull Compound a, @NotNull Compound b) {
+//        throw new RuntimeException("interpolation failure: different or invalid internal structure and can not be compared:\n\t" + a + "\n\t" + b);
+//    }
+//
+//    private static int dtCompare(@NotNull Compound a, @NotNull Compound b, float aProp, @NotNull MutableFloat accumulatedDifference, float depth, @Nullable Random rng) {
+//        int newDT;
+//        int adt = a.dt();
+//        if (adt != b.dt()) {
+//
+//            int bdt = b.dt();
+//            if (adt != DTERNAL && bdt != DTERNAL) {
+//
+//                accumulatedDifference.add(Math.abs(adt - bdt) * depth);
+//
+//                //newDT = Math.round(Util.lerp(adt, bdt, aProp));
+//                if (rng != null)
+//                    newDT = choose(adt, bdt, aProp, rng);
+//                else
+//                    newDT = aProp > 0.5f ? adt : bdt;
+//
+//
+//            } else if (bdt != DTERNAL) {
+//                newDT = bdt;
+//                //accumulatedDifference.add(bdt * depth);
+//
+//            } else if (adt != DTERNAL) {
+//                newDT = adt;
+//                //accumulatedDifference.add(adt * depth);
+//            } else {
+//                throw new RuntimeException();
+//            }
+//        } else {
+//            newDT = adt;
+//        }
+//        return newDT;
+//    }
 
-    private static int dtCompare(@NotNull Compound a, @NotNull Compound b, float aProp, @NotNull MutableFloat accumulatedDifference, float depth, @Nullable Random rng) {
-        int newDT;
-        int adt = a.dt();
-        if (adt != b.dt()) {
-
-            int bdt = b.dt();
-            if (adt != DTERNAL && bdt != DTERNAL) {
-
-                accumulatedDifference.add(Math.abs(adt - bdt) * depth);
-
-                //newDT = Math.round(Util.lerp(adt, bdt, aProp));
-                if (rng != null)
-                    newDT = choose(adt, bdt, aProp, rng);
-                else
-                    newDT = aProp > 0.5f ? adt : bdt;
-
-
-            } else if (bdt != DTERNAL) {
-                newDT = bdt;
-                //accumulatedDifference.add(bdt * depth);
-
-            } else if (adt != DTERNAL) {
-                newDT = adt;
-                //accumulatedDifference.add(adt * depth);
-            } else {
-                throw new RuntimeException();
-            }
-        } else {
-            newDT = adt;
-        }
-        return newDT;
-    }
-
-    static int choose(int x, int y, float xProp, @NotNull Random random) {
-        return random.nextFloat() < xProp ? x : y;
-    }
+//    static int choose(int x, int y, float xProp, @NotNull Random random) {
+//        return random.nextFloat() < xProp ? x : y;
+//    }
 
 //    private static Compound failStrongest(Compound a, Compound b, float aProp) {
 //        //logger.warn("interpolation failure: {} and {}", a, b);
 //        return strongest(a, b, aProp);
 //    }
 
-    public static Compound choose(Compound a, Compound b, float balance) {
-        return (balance >= 0.5f) ? a : b;
-    }
+
+
 
     public static Term choose(Term a, Term b, float aBalance, @NotNull Random rng) {
         return (rng.nextFloat() < aBalance) ? a : b;
@@ -419,32 +429,33 @@ public class Revision {
                         !Stamp.overlapping(newBelief, oldBelief);
     }
 
-    /**
-     * assumes the compounds are the same except for possible numeric metadata differences
-     */
-    public static @NotNull Compound intermpolate(@NotNull Termed<Compound> a, @NotNull Termed<Compound> b, float aConf, float bConf) {
-        @NotNull Compound aterm = a.term();
-        if (a.equals(b))
-            return aterm;
-
-        float aWeight = c2w(aConf);
-        float bWeight = c2w(bConf);
-        float aProp = aWeight / (aWeight + bWeight);
-
-        @NotNull Compound bterm = b.term();
-
-        int dt = DTERNAL;
-        int at = aterm.dt();
-        if (at != DTERNAL) {
-            int bt = bterm.dt();
-            if (bt != DTERNAL) {
-                dt = Math.round(lerp(at, bt, ((double)aProp)));
-            }
-        }
-
-        Term r = $.compound(a.op(), dt, aterm.terms());
-        return !(r instanceof Compound) ? choose(aterm, bterm, aProp) : (Compound) r;
-    }
+//    /**
+//     * assumes the compounds are the same except for possible numeric metadata differences
+//     */
+//    public static @NotNull Compound intermpolate(@NotNull Termed<Compound> a, @NotNull Termed<Compound> b, float aConf, float bConf, @NotNull TermIndex index) {
+//        @NotNull Compound aterm = a.term();
+//        if (a.equals(b))
+//            return aterm;
+//
+//        float aWeight = c2w(aConf);
+//        float bWeight = c2w(bConf);
+//        float aProp = aWeight / (aWeight + bWeight);
+//
+//        @NotNull Compound bterm = b.term();
+//
+//        int dt = DTERNAL;
+//        int at = aterm.dt();
+//        if (at != DTERNAL) {
+//            int bt = bterm.dt();
+//            if (bt != DTERNAL) {
+//                dt = lerp(at, bt, aProp);
+//            }
+//        }
+//
+//
+//        Term r = index.the(a.op(), dt, aterm.terms());
+//        return !(r instanceof Compound) ? choose(aterm, bterm, aProp) : (Compound) r;
+//    }
 
     @Nullable
     public static ProjectedTruth project(@NotNull Truth t, long target, long now, long occ, boolean eternalizeIfWeaklyTemporal) {
@@ -490,7 +501,7 @@ public class Revision {
 
             float tw = t.confWeight();
             float bw = b.confWeight();
-            return Util.lerp(to, bo, ((double)tw) / (bw + tw));
+            return Util.lerp(to, bo, (tw) / (bw + tw));
         } else {
             return bo != ETERNAL ? bo : to;
         }
@@ -519,7 +530,7 @@ public class Revision {
     }
 
     public static Term intermpolate(@NotNull Term a, @NotNull Term b, float aProp, @NotNull Random rng) {
-        return intermpolate(a, b, aProp, new MutableFloat(),1,rng);
+        return intermpolate(a, b, aProp, /* unused: */ new MutableFloat(),1,rng);
     }
 
 //    /** get the task which occurrs nearest to the target time */

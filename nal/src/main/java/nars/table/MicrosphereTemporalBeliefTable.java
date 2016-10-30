@@ -424,11 +424,11 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
                     if (delta == 0)
                         return res; //as-is
                     else {
-                        return res.eternalize();
-//                        float decay = InterpolatingMicrosphere.lightCurve(1).get(delta, 1f);
-//                        return res.confWeightMult(
-//                                decay
-//                        );
+                        //return res.eternalize();
+                        float decay = InterpolatingMicrosphere.lightCurve(1).get(delta, 1f);
+                        return res.confWeightMult(
+                                decay
+                        );
                     }
 
                     //return Revision.project(res, when, now, o, false);

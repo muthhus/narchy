@@ -9,6 +9,7 @@ import nars.task.AnswerTask;
 import nars.task.Revision;
 import nars.task.RevisionTask;
 import nars.term.Compound;
+import nars.term.Term;
 import nars.truth.Truth;
 import nars.truth.TruthDelta;
 import nars.util.data.sorted.SortedArray;
@@ -20,6 +21,7 @@ import java.util.List;
 import java.util.function.Consumer;
 
 import static nars.time.Tense.ETERNAL;
+import static nars.truth.TruthFunctions.c2w;
 
 
 /**
@@ -122,7 +124,7 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, Sorted
 //    }
 
     @Nullable
-    public /*Revision*/Task tryRevision(@NotNull Task newBelief, Concept concept, @NotNull NAR nar) {
+    public /*Revision*/Task tryRevision(@NotNull Task newBelief, @NotNull Concept concept, @NotNull NAR nar) {
 
         Object[] list = this.list;
         int bsize = list.length;
@@ -134,7 +136,7 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, Sorted
         Task oldBelief = null;
         float bestRank = 0f, bestConf = 0f;
         Truth conclusion = null;
-        final float newBeliefConf = newBelief.conf();
+
         Truth newBeliefTruth = newBelief.truth();
 
 
@@ -183,9 +185,14 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, Sorted
         if (oldBelief == null) {
             return null;
         }
-        Compound t = Revision.intermpolate(
-                newBelief, oldBelief,
-                newBeliefConf, oldBelief.conf()
+
+
+        final float newBeliefWeight = newBelief.confWeight();
+        float aProp = newBeliefWeight / ( newBeliefWeight + oldBelief.confWeight());
+        Term t = Revision.intermpolate(
+                newBelief.term(), oldBelief.term(),
+                aProp,
+                nar.random
         );
 
         return new RevisionTask( t,

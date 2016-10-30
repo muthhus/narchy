@@ -67,15 +67,21 @@ public abstract class AbstractVariable implements Variable {
 
         Op xo = op();
         if (y.op() == xo) {
-            return subst.putCommon(this, y);
-        } else if (subst.matchType(xo) && !subst.matchType(y) ) {
+            if (this instanceof CommonVariable) {
+                int[] mv = ((CommonVariable)this).multiVariables();
+                if (mv[0] == y.hashCode() || mv[1] == y.hashCode())
+                    return true; //already part of this common variable
+            }
+            //TODO check if this is already a common variable containing y
+            return subst.putCommon(this, (Variable)y);
+        } else {//if (subst.matchType(xo) && !subst.matchType(y) ) {
             /*
             note: the !subst.matchType(y) subcondition is an attempt at preventing infinite cycles of variable references
             */
             return subst.matchVarX(this, y);
         }
 
-        return false;
+        //return false;
     }
 
     //    @Override

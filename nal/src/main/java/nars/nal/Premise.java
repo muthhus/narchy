@@ -157,6 +157,10 @@ public final class Premise extends RawBudget implements Tasked {
 
         Budget beliefBudget;
         if (belief != null) {
+            if (belief.evidence().length == 0) {
+                beliefConcept.beliefs().match(task, now);
+                throw new NullPointerException();
+            }
             beliefBudget = belief.budget().clone();
             if (beliefBudget == null)
                 belief = null;

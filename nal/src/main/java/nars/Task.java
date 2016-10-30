@@ -109,12 +109,20 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
         /* A statement sentence is not allowed to have a independent variable as subj or pred"); */
         Op op = t.op();
 
-        if (op.statement && subjectOrPredicateIsIndependentVar(ct))
-            return test(t, "Statement Task's subject or predicate is VAR_INDEP", safe);
+        switch (ct.varIndep()) {
+            case 0:
+                break;  //OK
+            case 1:
+                return test(t, "One independent variable must be balanced elsewhere", safe);
+            default:
+                if (op.statement && subjectOrPredicateIsIndependentVar(ct))
+                    return test(t, "Statement Task's subject or predicate is VAR_INDEP", safe);
+                //prevent conceptualization of non-statement VarIndep containing terms
+                if (!t.hasAny(Op.StatementBits))
+                    return test(t, "Independent variables require statements super-terms", safe);
+                break;
+        }
 
-        //prevent conceptualization of non-statement VarIndep containing terms
-        if (t.hasVarIndep() && !t.hasAny(Op.StatementBits))
-            return test(t, "conceptualization: contains no statements yet has VarIndep", safe);
 
         if ((punc == Symbols.GOAL || punc == Symbols.QUEST) && (op == Op.IMPL || op == Op.EQUI))
             return test(t, "Goal/Quest task term may not be Implication or Equivalence", safe);

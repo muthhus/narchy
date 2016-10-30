@@ -149,7 +149,7 @@ public class UnificationTest {
     @Test
     public void unificationP2() {
         test(Op.VAR_DEP,
-                "<(#1,$1) --> wu>",
+                "<(#1,c) --> wu>",
                 "<(a,b) --> wu>",
                 false
         );
@@ -158,8 +158,8 @@ public class UnificationTest {
     @Test
     public void unificationP3() {
         test(Op.VAR_PATTERN,
-                "<(%1,%1,$1) --> wu>",
-                "<(lol,lol2,$1) --> wu>",
+                "<(%1,%1,#1) --> wu>",
+                "<(lol,lol2,#1) --> wu>",
                 false
         );
     }
@@ -201,35 +201,35 @@ public class UnificationTest {
     public void pattern_trySubs_Dep_Var() {
         test(Op.VAR_PATTERN,
                 "<%A ==> %B>",
-                "<<#1 --> A> ==> <$1 --> B>>",
+                "<<#1 --> A> ==> <?1 --> B>>",
                 true);
     }
 
     @Test
-    public void pattern_trySubs_Indep_Var_2_parallel() {
-        test(Op.VAR_INDEP,
-                "(&&,<($1,x) --> on>,<(SELF,#2) --> at>)",
+    public void pattern_trySubs_Var_2_parallel() {
+        test(Op.VAR_QUERY,
+                "(&&,<(?1,x) --> on>,<(SELF,#2) --> at>)",
                 "(&&,<({t002},x) --> on>,<(SELF,#1) --> at>)",
                 true);
     }
 
     @Test
-    public void pattern_trySubs_Indep_Var_2_product_and_common_depvar_bidirectional() {
-        Unify sub = test(Op.VAR_INDEP,
-                "(<($1,x) --> on>,<(SELF,x) --> at>)",
-                "(<({t002},x) --> on>,<$1 --> at>)",
+    public void pattern_trySubs_Var_2_product_and_common_depvar_bidirectional() {
+        Unify sub = test(Op.VAR_DEP,
+                "(<(#1,x) --> on>,<(SELF,x) --> at>)",
+                "(<({t002},x) --> on>,<#1 --> at>)",
                 true);
 
         //additional test that verifies correct common variable substitution result
-        assertEquals("{$1={t002}}", sub.xy.toString());
-        assertEquals("{(SELF,x)=$1}", sub.yx.toString());
+        assertEquals("{#1={t002}}", sub.xy.toString());
+        assertEquals("{(SELF,x)=#1}", sub.yx.toString());
     }
 
     @Test
-    public void pattern_trySubs_Indep_Var_2_product() {
-        test(Op.VAR_INDEP,
-                "(<($1,x) --> on>,<(SELF,x) --> at>)",
-                "(<({t002},x) --> on>,<(SELF,x) --> at>)",
+    public void pattern_trySubs_2_product() {
+        test(Op.VAR_QUERY,
+                "(on(?1,x),     at(SELF,x))",
+                "(on({t002},x), at(SELF,x))",
                 true);
     }
 
@@ -243,16 +243,16 @@ public class UnificationTest {
 
     @Test
     public void pattern_trySubs_Indep_Var_2_set() {
-        test(Op.VAR_INDEP,
-                "{<($1,x) --> on>,<(SELF,x) --> at>}",
+        test(Op.VAR_DEP,
+                "{<(#1,x) --> on>,<(SELF,x) --> at>}",
                 "{<({t002},x) --> on>,<(SELF,x) --> at>}",
                 true);
     }
 
     @Test
     public void pattern_trySubs_Indep_Var_2_set2() {
-        test(Op.VAR_INDEP,
-                "{<($1,x) --> on>,<(SELF,x) --> at>}",
+        test(Op.VAR_DEP,
+                "{<(#1,x) --> on>,<(SELF,x) --> at>}",
                 "{<(z,x) --> on>,<(SELF,x) --> at>}",
                 true);
     }

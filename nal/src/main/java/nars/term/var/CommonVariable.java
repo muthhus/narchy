@@ -44,6 +44,10 @@ public final class CommonVariable extends GenericNormalizedVariable {
         return new CommonVariable(type, a, b);
     }
 
+    public int[] multiVariables() {
+        return new int[] { hash & 0xff, (hash >> 8) & 0xff };
+    }
+
 //    //TODO use a 2d array not an enum map, just flatten the 4 op types to 0,1,2,3
 //    /** variables x 10 (digits) x (1..10) (digits) cache;
 //     *  triangular matrix because the pairs is sorted */

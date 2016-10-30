@@ -109,7 +109,7 @@ public class PatrickTests extends AbstractNALTest {
 
 
         tt.input("made_of:(toothbrush,plastic).",
-                "( ( made_of:($1, plastic) &&+10 lighter({SELF}, $1) ) ==>+10 <$1 --> [heated]>).",
+                "( ( made_of($1, plastic) &&+10 lighter({SELF}, $1) ) ==>+10 <$1 --> [heated]>).",
                 "(<$1 --> [heated]> ==>+10 <$1 --> [melted]>).",
                 "(<$1 --> [melted]> <=>+0 <$1 --> [pliable]>).",
                 "(( <$1 --> [pliable]> &&+0 reshape({SELF},$1)) ==>+10 <$1 --> [hardened]>).",

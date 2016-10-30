@@ -132,8 +132,9 @@ public final class TruthPolation extends InterpolatingMicrosphere {
             return $.t(F, c1);
         } else {
             //attempt to use the calculated frequency with the eternalized confidence of the minimum task (conservative heuristic)
-            float c2 = eternalize(minTaskConf);
-            return (c2 >= minConf) ? $.t(F, c2) : null;
+            //float c2 = eternalize(minTaskConf);
+            //return (c2 >= minConf) ? $.t(F, c2) : null;
+            return null;
         }
     }
 

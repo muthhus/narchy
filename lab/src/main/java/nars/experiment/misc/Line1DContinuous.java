@@ -247,8 +247,8 @@ public class Line1DContinuous extends NAgent {
         );
 
 
-        nar.beliefConfidence(0.9f);
-        nar.goalConfidence(0.8f);
+        nar.beliefConfidence(0.8f);
+        nar.goalConfidence(0.7f);
 
         //nar.truthResolution.setValue(0.02f);
         //nar.durMin.setValue(0.1f);

@@ -28,7 +28,7 @@ public class SideCraft extends NAgents {
     }
 
     public SideCraft(NAR nar) {
-        super(nar, 8);
+        super(nar, 1);
 
         this.craft = new SideScrollMinicraft();
 
