@@ -163,7 +163,7 @@ public class RevectionTest {
 
             long now = b.nar.time();
 
-            Task tt = b.concept().beliefs().top(now, now);
+            Task tt = b.concept().beliefs().match(now, now);
             tops.add(tt);
 
             System.out.println(now + " " +  tt);

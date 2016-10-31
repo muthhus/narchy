@@ -15,7 +15,6 @@ import nars.concept.OperationConcept;
 import nars.concept.util.InvalidConceptException;
 import nars.index.task.MapTaskIndex;
 import nars.index.task.TaskIndex;
-import nars.index.task.TreeTaskIndex;
 import nars.index.term.TermIndex;
 import nars.nal.Level;
 import nars.nal.nal8.AbstractOperator;
@@ -37,6 +36,7 @@ import nars.time.Clock;
 import nars.time.FrameClock;
 import nars.time.Tense;
 import nars.util.Iterative;
+import nars.util.Util;
 import nars.util.data.MutableInteger;
 import nars.util.event.DefaultTopic;
 import nars.util.event.On;
@@ -138,7 +138,14 @@ public abstract class NAR extends Param implements Level, Consumer<Task>, NARIn,
 
     //private final Collection<Object> on = $.newArrayList(); //registered handlers, for strong-linking them when using soft-index
 
-    public void printConceptStatistics() {
+    public final void printConceptStatistics() {
+        printConceptStatistics(System.out);
+    }
+    public final void printTaskStatistics() {
+        printTaskStatistics(System.out);
+    }
+
+    public void printConceptStatistics(PrintStream out) {
         //Frequency complexity = new Frequency();
         Frequency clazz = new Frequency();
         Frequency policy = new Frequency();
@@ -179,21 +186,78 @@ public abstract class NAR extends Param implements Level, Consumer<Task>, NARIn,
 
             }
 
-
         });
-        System.out.println("Total Concepts:\n" + i.get());
-        System.out.println("\ntermLinksUsed:\n" + termlinksUsed);
-        System.out.println("\ntermLinksCapacity:\n" + termlinksCap);
-        System.out.println("\ntaskLinksUsed:\n" + tasklinksUsed);
-        System.out.println("\ntaskLinksCapacity:\n" + tasklinksCap);
-        //System.out.println("\nComplexity:\n" + complexity);
-        System.out.println("\npolicy:\n" + policy);
-        System.out.println("\nrootOp:\n" + rootOp);
-        System.out.println("\nvolume:\n" + volume);
-        System.out.println("\nclass:\n" + clazz);
+        out.println("Total Concepts:\n" + i.get());
+        out.println("\ntermLinksUsed:\n" + termlinksUsed);
+        out.println("\ntermLinksCapacity:\n" + termlinksCap);
+        out.println("\ntaskLinksUsed:\n" + tasklinksUsed);
+        out.println("\ntaskLinksCapacity:\n" + tasklinksCap);
+        //out.println("\nComplexity:\n" + complexity);
+        out.println("\npolicy:\n" + policy);
+        out.println("\nrootOp:\n" + rootOp);
+        out.println("\nvolume:\n" + volume);
+        out.println("\nclass:\n" + clazz);
 
     }
 
+
+    public void printTaskStatistics(PrintStream out) {
+        //TODO lastLog string
+
+        AtomicInteger i = new AtomicInteger(0);
+
+        Frequency clazz = new Frequency();
+        Frequency volume = new Frequency();
+        Frequency rootOp = new Frequency();
+        Frequency punc = new Frequency();
+        Frequency eviLength = new Frequency();
+
+        Frequency freq = new Frequency();
+        Frequency conf = new Frequency();
+        Frequency pri = new Frequency();
+        Frequency dur = new Frequency();
+        Frequency qua = new Frequency();
+
+
+        tasks.forEach(t -> {
+
+            if (t.isDeleted())
+                return;
+
+            i.incrementAndGet();
+            //complexity.addValue(c.complexity());
+            volume.addValue(t.volume());
+            rootOp.addValue(t.op());
+            clazz.addValue(t.getClass().toString());
+            punc.addValue(t.punc());
+            eviLength.addValue(t.evidence().length);
+
+            if (t.isBeliefOrGoal()) {
+                freq.addValue(Util.round(t.freq(), 0.1f));
+                conf.addValue(Util.round(t.conf(), 0.1f));
+            }
+            pri.addValue( Util.round(t.pri(), 0.1f) );
+            dur.addValue( Util.round(t.dur(), 0.1f) );
+            qua.addValue( Util.round(t.qua(), 0.1f) );
+
+        });
+
+        out.println("-------------------------------------------------");
+        out.println("Total Tasks:\n" + i.get());
+
+        out.println("\npunc:\n" + punc);
+        out.println("\nrootOp:\n" + rootOp);
+        out.println("\nvolume:\n" + volume);
+        out.println("\nevidence:\n" + eviLength);
+        out.println("\nclass:\n" + clazz);
+
+        out.println("\nfreq:\n" + freq);
+        out.println("\nconf:\n" + conf);
+        out.println("\npri:\n" + pri);
+        out.println("\ndur:\n" + dur);
+        out.println("\nqua:\n" + qua);
+
+    }
 
     @Nullable
     public final Compound normalize(@NotNull Compound t) {
@@ -284,7 +348,7 @@ public abstract class NAR extends Param implements Level, Consumer<Task>, NARIn,
             BeliefTable table = beliefsOrGoals ? c.beliefs() : c.goals();
 
             if (!table.isEmpty()) {
-                bt.add(table.top(n.time()));
+                bt.add(table.match(n.time()));
                 //System.out.println("\t" + c.beliefs().top(n.time()));
             }
         });

@@ -60,7 +60,7 @@ public class TaskBudgeting {
 
 
         float factor = derivationQuality;
-        final float durability = baseBudget.dur() * factor;
+        final float durability = baseBudget.dur() * occam;
         if (durability < minDur)
             return null;
 
@@ -121,15 +121,21 @@ public class TaskBudgeting {
         int parentComplexity;
         int taskCompl = pp.task.complexity();
         if (parentBelief!=null) // && parentBelief.complexity() > parentComplexity)
-            parentComplexity = Math.max(taskCompl, parentBelief.complexity());
+            parentComplexity =
+                //Math.max(taskCompl, parentBelief.complexity());
+                Math.min(taskCompl, parentBelief.complexity());
         else
             parentComplexity = taskCompl;
 
-        float baseCost = 1;
-        //return parentComplexity/(parentComplexity + Math.max(baseCost, derived.complexity() - parentComplexity));
-        return 1f/(1f + Math.max(baseCost, derived.complexity() - parentComplexity));
-        //return 1f/(1f + (float)Math.sqrt(Math.max(baseCost, derived.complexity() - parentComplexity)));
+        int derivedComplexity = derived.complexity();
+        return parentComplexity / (1f + Math.max(parentComplexity, derivedComplexity));
+        //return parentComplexity / (1f + Math.max(parentComplexity, derivedComplexity));
 
+        //float baseCost = 1;
+        //return (float) (1f/(1f + Math.sqrt( Math.max(baseCost, derived.complexity() - parentComplexity)) ));
+
+        //return parentComplexity/(parentComplexity + Math.max(baseCost, derived.complexity() - parentComplexity));
+        //return 1f/(1f + (float)Math.sqrt(Math.max(baseCost, derived.complexity() - parentComplexity)));
 
     }
 

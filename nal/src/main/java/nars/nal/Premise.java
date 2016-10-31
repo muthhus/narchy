@@ -107,17 +107,16 @@ public final class Premise extends RawBudget implements Tasked {
         if (taskBudget == null)
             return null;
 
-        Budget termLinkBudget = termLink.clone();
-        if (termLinkBudget == null)
-            return null;
-
+//        Budget termLinkBudget = termLink.clone();
+//        if (termLinkBudget == null)
+//            return null;
 
         Task belief = null;
 
         Concept beliefConcept = nar.concept(term);
         if (beliefConcept != null) {
 
-            belief = beliefConcept.beliefs().match(task, now); //in case of quest, proceed with matching belief
+            belief = beliefConcept.beliefs().match(task.occurrence(), now, task); //in case of quest, proceed with matching belief
 
 //            if (task.isQuestOrQuestion()) {
 //
@@ -157,10 +156,6 @@ public final class Premise extends RawBudget implements Tasked {
 
         Budget beliefBudget;
         if (belief != null) {
-            if (belief.evidence().length == 0) {
-                beliefConcept.beliefs().match(task, now);
-                throw new NullPointerException();
-            }
             beliefBudget = belief.budget().clone();
             if (beliefBudget == null)
                 belief = null;

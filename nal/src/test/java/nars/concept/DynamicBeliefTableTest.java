@@ -81,7 +81,7 @@ public class DynamicBeliefTableTest {
 
 
         Truth now = cc.belief(n.time());
-        assertEquals($.t(1f,0.39f),now); //evidence decayed due to time
+        assertEquals($.t(1f,0.57f),now); //evidence decayed due to time
 
         n.run(1);
         cc.print();

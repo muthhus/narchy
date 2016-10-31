@@ -71,6 +71,7 @@ abstract public class NAgents extends NAgent {
         });
 
         nar.printConceptStatistics();
+        nar.printTaskStatistics();
         //((TreeTaskIndex)nar.tasks).tasks.prettyPrint(System.out);
 
     }
@@ -134,7 +135,7 @@ abstract public class NAgents extends NAgent {
                 //new SingleThreadExecutioner();
                 new MultiThreadExecutioner(threads, 8192 /* TODO chose a power of 2 number to scale proportionally to # of threads */);
 
-        int volMax = 36;
+        int volMax = 24;
         int conceptsPerCycle = 192;
 
 
@@ -155,10 +156,10 @@ abstract public class NAgents extends NAgent {
             }
         };
 
-        nar.beliefConfidence(0.9f);
+        nar.beliefConfidence(0.8f);
         nar.goalConfidence(0.8f);
 
-        float p = 0.1f;
+        float p = 0.5f;
         nar.DEFAULT_BELIEF_PRIORITY = 0.9f * p;
         nar.DEFAULT_GOAL_PRIORITY = 1f * p;
         nar.DEFAULT_QUESTION_PRIORITY = 0.6f * p;

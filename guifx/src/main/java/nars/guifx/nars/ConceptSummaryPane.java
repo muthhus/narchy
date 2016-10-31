@@ -72,7 +72,7 @@ public class ConceptSummaryPane extends Text {
 
             Color color;
 
-            Task ttv = concept.beliefs().top(now);
+            Task ttv = concept.beliefs().match(now);
             if (ttv!=null) {
                 Truth tv = ttv.truth();
                 color = truthColors.get(tv.freq(), tv.conf());

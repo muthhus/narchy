@@ -72,7 +72,7 @@ public class BeliefTableTest  {
         n.next();
         b.print();
 
-        assertEquals(0.86f, b.beliefs().top(n.time()).expectation(), 0.1f);
+        assertEquals(0.86f, b.beliefs().match(n.time()).expectation(), 0.1f);
 
         n.input("a:b. %0.2|0.7%");
         n.input("a:b. %0.1|0.8%"); //highest negative
@@ -101,7 +101,7 @@ public class BeliefTableTest  {
         BeliefTable beliefs = b.concept().beliefs();
 
         assertEquals(0.5, beliefs.eternalTop().conf(), 0.001);
-        assertEquals(0.5, beliefs.top(n.time()).conf(), 0.001);
+        assertEquals(0.5, beliefs.match(n.time()).conf(), 0.001);
         assertEquals(1, beliefs.size());
 
         b.believe(1.0f, 0.5f); n.next();
@@ -114,7 +114,7 @@ public class BeliefTableTest  {
         assertEquals(5, beliefs.size());
         @NotNull BeliefTable bb = beliefs;
         assertEquals(0.75, bb.eternalTop().conf(), 0.001);
-        assertEquals(0.75, bb.top(n.time()).conf(), 0.001);
+        assertEquals(0.75, bb.match(n.time()).conf(), 0.001);
 
         b.believe(1.0f, 0.5f); n.next();
         b.print();

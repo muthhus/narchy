@@ -373,7 +373,7 @@ public class Tetris extends NAgents {
     public static void main(String[] args) {
         Param.DEBUG = false;
 
-        NAR nar = NAgents.newMultiThreadNAR(5, new FrameClock());
+        NAR nar = NAgents.newMultiThreadNAR(3, new FrameClock());
 
 //        Random rng = new XorShift128PlusRandom(1);
 //        //Multi nar = new Multi(3,512,
@@ -638,7 +638,7 @@ public class Tetris extends NAgents {
 
 
         //t.run(runFrames);
-        t.run(10000);
+        t.run(1000);
 
 //        NARController meta = new NARController(nar, loop, t);
 //
@@ -656,6 +656,7 @@ public class Tetris extends NAgents {
         NAR.printTasks(nar, true);
         NAR.printTasks(nar, false);
         nar.printConceptStatistics();
+        nar.printTaskStatistics();
 
         //NAR.printTasks(meta.nar, true);
         //NAR.printTasks(meta.nar, false);

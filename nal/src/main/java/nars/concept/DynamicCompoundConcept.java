@@ -8,7 +8,6 @@ import nars.budget.BudgetFunctions;
 import nars.nal.Stamp;
 import nars.table.BeliefTable;
 import nars.table.DefaultBeliefTable;
-import nars.table.EternalTable;
 import nars.task.RevisionTask;
 import nars.term.Compound;
 import nars.term.Term;
@@ -147,7 +146,7 @@ public class DynamicCompoundConcept extends CompoundConcept {
                 if (table instanceof DynamicBeliefTable) {
                     return ((DynamicBeliefTable)table).dyntruth(when, now, evidence);
                 } else {
-                    Task x = table.top(when, now);
+                    Task x = table.match(when, now);
                     if (x == null)
                         return null;
                     else {
@@ -231,7 +230,7 @@ public class DynamicCompoundConcept extends CompoundConcept {
                 nt = table.truth(when + dt, now);
                 if (nt!=null && d.add(nt.negated(negated))) {
                     if (d.e!=null) {
-                        Task bt = table.top(when+dt, now);
+                        Task bt = table.match(when+dt, now);
                         if (bt != null) {
                             d.e.add(bt); //HACK this doesnt include the non-top tasks which may contribute to the evaluated truth during truthpolation
                         }
@@ -305,11 +304,10 @@ public class DynamicCompoundConcept extends CompoundConcept {
 
         }
 
-
         @Override
-        public Task match(@NotNull Task target, long now) {
+        public @Nullable Task match(long when, long now, @Nullable Task target) {
 
-            Task x = super.match(target, now);
+            Task x = super.match(target.occurrence(), now, target);
 
             long then = target.occurrence();
 

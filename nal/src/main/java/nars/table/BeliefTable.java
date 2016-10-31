@@ -14,7 +14,6 @@ import java.io.PrintStream;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
-import java.util.List;
 
 import static java.util.stream.StreamSupport.stream;
 import static nars.nal.UtilityFunctions.and;
@@ -174,20 +173,20 @@ public interface BeliefTable extends TaskTable {
 //    }
 
     @Nullable
-    default Task top(long now) {
-        return top(now, now);
+    default Task match(long now) {
+        return match(now, now);
     }
 
     @Nullable
-    default Task top(long when, long now) {
-        return top(when, now, null);
+    default Task match(long when, long now) {
+        return match(when, now, null);
     }
 
     /**
      * get the most relevant belief/goal with respect to a specific time.
      */
     @Nullable
-    default Task top(long when, long now, @Nullable Task against) {
+    default Task match(long when, long now, @Nullable Task against) {
 
         final Task ete = eternalTop();
         if (when == ETERNAL) {
@@ -346,37 +345,37 @@ public interface BeliefTable extends TaskTable {
         return truth(when, when);
     }
 
-    /**
-     * finds the strongest matching belief for the given term (and its possible 'dt' value) and the given occurrence time.
-     * <p>
-     * TODO consider similarity of any of term's recursive 'dt' temporality in ranking
-     */
-    @Nullable
-    default Task match(@NotNull Task target, long now) {
-
-        int size = size();
-        if (size == 0)
-            return null;
-
-
-        long occ = target.occurrence();
-        return top(occ, now, target);
-
-//        do {
+//    /**
+//     * finds the strongest matching belief for the given term (and its possible 'dt' value) and the given occurrence time.
+//     * <p>
+//     * TODO consider similarity of any of term's recursive 'dt' temporality in ranking
+//     */
+//    @Nullable
+//    default Task match(@NotNull Task target, long now) {
 //
-//            Task belief = top( occ );
+//        int size = size();
+//        if (size == 0)
+//            return null;
 //
-//            if (belief == null) {
-//                return null;
-//            } else if (belief.isDeleted()) {
-//                remove(belief);
-//            } else {
-//                return belief;
-//            }
 //
-//        } while (size-- > 0);
-//        return null;
-    }
+//        long occ = target.occurrence();
+//        return top(occ, now, target);
+//
+////        do {
+////
+////            Task belief = top( occ );
+////
+////            if (belief == null) {
+////                return null;
+////            } else if (belief.isDeleted()) {
+////                remove(belief);
+////            } else {
+////                return belief;
+////            }
+////
+////        } while (size-- > 0);
+////        return null;
+//    }
 
     default float expectation(long when) {
         Truth t = truth(when);

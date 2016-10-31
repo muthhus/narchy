@@ -82,7 +82,7 @@ public class SequenceTest {
         TreeSet<Task> beliefs = new TreeSet(Truth.compareConfidence);
 
         n.forEachActiveConcept(c -> {
-            Task t = c.beliefs().top(n.time());
+            Task t = c.beliefs().match(n.time());
             if (t!=null)
                 beliefs.add(t);
 

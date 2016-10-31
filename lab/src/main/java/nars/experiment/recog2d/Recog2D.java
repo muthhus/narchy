@@ -47,8 +47,8 @@ public class Recog2D extends NAgents {
     int a = 0;
 
     int image = 0;
-    final int maxImages = 4;
-    int imagePeriod = 16;
+    final int maxImages = 9;
+    int imagePeriod = 128;
     int TRAINING_PERIOD = imagePeriod * 3;
 
 //    float theta;
@@ -87,11 +87,11 @@ public class Recog2D extends NAgents {
 
 
         //retina
-        //Sensor2D<PixelBag> sp = addCamera("x", () -> canvas, w, h, v -> $.t(v, alpha));
+        Sensor2D<PixelBag> sp = addCamera("x", () -> canvas, w, h, v -> $.t(v, alpha));
 
 
         //still
-        addCamera("x", new Scale(() -> canvas, w, h), v -> $.t(v, alpha));
+        //addCamera("x", new Scale(() -> canvas, w, h), v -> $.t(v, alpha));
 
         //nar.log();
 
@@ -99,9 +99,9 @@ public class Recog2D extends NAgents {
 
         outs = new Outputs(ii -> $.func("x", $.the("s" + ii)), maxImages, this);
         train = new Training(
-                Lists.newArrayList(Iterables.concat(sensors/*,sp.src.actions*/)),
+                Lists.newArrayList(Iterables.concat(sensors,sp.src.actions)),
                 outs, nar);
-        epsilonProbability = 0; //disable curiosity
+        //epsilonProbability = 0; //disable curiosity
 
         new Thread(() -> {
             SpaceGraph.window(conceptTraining(outs, nar), 800, 600);
