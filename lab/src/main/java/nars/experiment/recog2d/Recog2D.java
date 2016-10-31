@@ -47,8 +47,8 @@ public class Recog2D extends NAgents {
     int a = 0;
 
     int image = 0;
-    final int maxImages = 9;
-    int imagePeriod = 128;
+    final int maxImages = 4;
+    int imagePeriod = 16;
     int TRAINING_PERIOD = imagePeriod * 3;
 
 //    float theta;
@@ -87,11 +87,11 @@ public class Recog2D extends NAgents {
 
 
         //retina
-        Sensor2D<PixelBag> sp = addCamera("x", () -> canvas, w, h, v -> $.t(v, alpha));
+        //Sensor2D<PixelBag> sp = addCamera("x", () -> canvas, w, h, v -> $.t(v, alpha));
 
 
         //still
-        //addCamera("x", new Scale(() -> canvas, w, h), v -> $.t(v, alpha));
+        addCamera("x", new Scale(() -> canvas, w, h), v -> $.t(v, alpha));
 
         //nar.log();
 
@@ -99,9 +99,9 @@ public class Recog2D extends NAgents {
 
         outs = new Outputs(ii -> $.func("x", $.the("s" + ii)), maxImages, this);
         train = new Training(
-                Lists.newArrayList(Iterables.concat(sensors,sp.src.actions)),
+                Lists.newArrayList(Iterables.concat(sensors/*,sp.src.actions*/)),
                 outs, nar);
-
+        epsilonProbability = 0; //disable curiosity
 
         new Thread(() -> {
             SpaceGraph.window(conceptTraining(outs, nar), 800, 600);
@@ -149,7 +149,8 @@ public class Recog2D extends NAgents {
 
 
                         Draw.colorPolarized(gl,
-                                2f * (freq - 0.5f) * conf  //unipolar (1 color)
+                                2f * (freq - 0.5f)
+                                //2f * (freq - 0.5f) * conf  //unipolar (1 color)
                                 //2f * (-0.5f + freq) //bipolar (2 colors)
                         );
 
@@ -198,12 +199,12 @@ public class Recog2D extends NAgents {
 
         train.update(outs.verify);
 
-        if (outs.verify) {
+        //if (outs.verify) {
             r = 1f - (float) outs.errorSum();// / imgTrainer.states;
-        } else {
+        /*} else {
             //r = 1f; //general positive reinforcement during training
             r = Float.NaN;
-        }
+        }*/
 
         if (a % imagePeriod == 0) {
             nextImage();
@@ -219,7 +220,7 @@ public class Recog2D extends NAgents {
                 outs.train();
             } else {
                 outs.verify();
-                image = -1;
+                //image = -1;
             }
 
         }
@@ -296,7 +297,8 @@ public class Recog2D extends NAgents {
                 float[] err = trainer.put(i, outs.expected(null), learningRate, momentum);
 
                 System.err.println("error sum=" + Util.sum(err));
-            } else {
+            }
+            {
                 float[] o = trainer.get(i);
                 for (int j = 0, oLength = o.length; j < oLength; j++) {
                     float y = o[j];

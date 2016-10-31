@@ -9,15 +9,14 @@ import nars.budget.merge.BudgetMerge;
 import nars.budget.policy.ConceptPolicy;
 import nars.link.TermLinkBuilder;
 import nars.nar.util.DefaultConceptBuilder;
-import nars.table.ArrayQuestionTable;
-import nars.table.BeliefTable;
-import nars.table.DefaultBeliefTable;
-import nars.table.QuestionTable;
+import nars.table.*;
+import nars.task.TruthPolation;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termlike;
 import nars.term.container.TermContainer;
 import nars.term.container.TermSet;
+import nars.time.Clock;
 import nars.truth.Truth;
 import nars.truth.TruthDelta;
 import nars.util.Util;
@@ -144,11 +143,6 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept, Ter
     }
 
 
-//    @Override
-//    public final boolean contains(@NotNull Task t) {
-//        return tasks.containsKey(t);
-//    }
-
 
     /**
      * Pending Quests to be answered by new desire values
@@ -187,39 +181,42 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept, Ter
     }
 
     @NotNull
-    final BeliefTable beliefsOrNew() {
-        return beliefs == null ? (beliefs = newBeliefTable()) : beliefs;
+    final BeliefTable beliefsOrNew(@NotNull NAR nar) {
+        return beliefs == null ? (beliefs = newBeliefTable(nar, true)) : beliefs;
     }
 
 
     @NotNull
-    final BeliefTable goalsOrNew() {
-        return goals == null ? (goals = newGoalTable()) : goals;
+    final BeliefTable goalsOrNew(@NotNull NAR nar) {
+        return goals == null ? (goals = newBeliefTable(nar, false)) : goals;
     }
 
     @NotNull
-    protected BeliefTable newBeliefTable() {
-        int eCap = policy.beliefCap(this, true, true);
-        int tCap = policy.beliefCap(this, true, false);
-        return newBeliefTable(eCap, tCap);
+    protected BeliefTable newBeliefTable(NAR nar, boolean beliefOrGoal) {
+        int eCap = policy.beliefCap(this, beliefOrGoal, true);
+        int tCap = policy.beliefCap(this, beliefOrGoal, false);
+        return newBeliefTable(nar, beliefOrGoal, eCap, tCap);
     }
 
-    @NotNull
-    protected BeliefTable newBeliefTable(int eCap, int tCap) {
-        return new DefaultBeliefTable(tCap);
+
+    protected BeliefTable newBeliefTable(NAR nar, boolean beliefOrGoal, int eCap, int tCap) {
+
+        return new DefaultBeliefTable(
+
+                    newEternalTable(eCap),
+
+                    newTemporalTable(tCap, nar)
+        );
     }
 
-    @NotNull
-    protected BeliefTable newGoalTable() {
-        int eCap = policy.beliefCap(this, false, true);
-        int tCap = policy.beliefCap(this, false, false);
-        return newGoalTable(eCap, tCap);
+    protected MicrosphereTemporalBeliefTable newTemporalTable(final int tCap, NAR nar) {
+        return new MyMicrosphereTemporalBeliefTable(tCap, nar.clock);
     }
 
-    @NotNull
-    protected BeliefTable newGoalTable(int eCap, int tCap) {
-        return new DefaultBeliefTable(tCap);
+    protected EternalTable newEternalTable(int eCap) {
+        return eCap > 0 ? new EternalTable(eCap) : EternalTable.EMPTY;
     }
+
 
     /**
      * Judgments directly made about the term Use ArrayList because of access
@@ -264,7 +261,7 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept, Ter
      * Returns null if the task was not accepted, else the goal which was accepted and somehow modified the state of this concept
      */
     public @Nullable TruthDelta processBelief(@NotNull Task belief, @NotNull NAR nar) {
-        return processBeliefOrGoal(belief, beliefsOrNew(), questions(), nar);
+        return processBeliefOrGoal(belief, beliefsOrNew(nar), questions(), nar);
     }
 
     /**
@@ -273,7 +270,7 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept, Ter
      * Returns null if the task was not accepted, else the goal which was accepted and somehow modified the state of this concept
      */
     public @Nullable TruthDelta processGoal(@NotNull Task goal, @NotNull NAR nar) {
-        return processBeliefOrGoal(goal, goalsOrNew(), quests(), nar);
+        return processBeliefOrGoal(goal, goalsOrNew(nar), quests(), nar);
     }
 
     /**
@@ -677,5 +674,19 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept, Ter
     @Override
     public int volume() {
         return term.volume();
+    }
+
+    static final class MyMicrosphereTemporalBeliefTable extends MicrosphereTemporalBeliefTable {
+
+        private final Clock clock;
+
+        public MyMicrosphereTemporalBeliefTable(int tCap, Clock clock) {
+            super(tCap);
+            this.clock = clock;
+        }
+
+        @Override public float focus(float dt, float evidence) {
+            return TruthPolation.timeDecay(evidence, clock.duration(), dt);
+        }
     }
 }

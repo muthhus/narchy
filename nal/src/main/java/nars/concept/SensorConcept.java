@@ -4,7 +4,6 @@ import nars.$;
 import nars.NAR;
 import nars.Narsese;
 import nars.Task;
-import nars.budget.policy.ConceptPolicy;
 import nars.nal.UtilityFunctions;
 import nars.table.BeliefTable;
 import nars.table.DefaultBeliefTable;
@@ -24,8 +23,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.List;
 
 import static nars.Symbols.BELIEF;
 import static nars.time.Tense.ETERNAL;
@@ -112,20 +109,11 @@ public class SensorConcept extends WiredCompoundConcept implements FloatFunction
 //
 
 
-    @Override
-    final protected void beliefCapacity(ConceptPolicy p, NAR mar) {
-        beliefCapacity(0, beliefCapacity, 1, goalCapacity, nar);
-    }
-
-    @Override
-    final protected @NotNull BeliefTable newBeliefTable() {
-        return newBeliefTable(0,beliefCapacity);
-    }
-
-    @Override
-    final protected @NotNull BeliefTable newGoalTable() {
-        return newGoalTable(1,goalCapacity);
-    }
+//
+//    @Override
+//    final protected @NotNull BeliefTable newGoalTable() {
+//        return newGoalTable(1,goalCapacity);
+//    }
 
 
 //    /** async timing: only commits when value has changed significantly, and as often as necessary */
@@ -212,10 +200,9 @@ public class SensorConcept extends WiredCompoundConcept implements FloatFunction
         return currentValue;
     }
 
-    @NotNull
     @Override
-    protected BeliefTable newBeliefTable(int eCap, int tCap) {
-        return new SensorBeliefTable(tCap);
+    protected BeliefTable newBeliefTable(NAR nar, boolean beliefOrGoal, int eCap, int tCap) {
+        return new SensorBeliefTable(eCap, tCap);
     }
 
 
@@ -243,15 +230,15 @@ public class SensorConcept extends WiredCompoundConcept implements FloatFunction
     }
 
 
-    public static void flatAttention(@NotNull Iterable<? extends Prioritizable> c, @NotNull MutableFloat p) {
-        c.forEach( s -> s.pri(p::floatValue) );
-    }
+//    public static void flatAttention(@NotNull Iterable<? extends Prioritizable> c, @NotNull MutableFloat p) {
+//        c.forEach( s -> s.pri(p::floatValue) );
+//    }
 
     private final class SensorBeliefTable extends DefaultBeliefTable {
 
 
-        public SensorBeliefTable(int tCap) {
-            super(tCap);
+        public SensorBeliefTable(int eCap, int tCap) {
+            super(newEternalTable(eCap), newTemporalTable(tCap, nar));
         }
 
         @Override

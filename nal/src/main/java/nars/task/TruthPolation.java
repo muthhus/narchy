@@ -2,12 +2,9 @@ package nars.task;
 
 import com.google.common.base.Joiner;
 import nars.$;
-import nars.Param;
 import nars.Task;
 import nars.learn.microsphere.InterpolatingMicrosphere;
 import nars.truth.Truth;
-import nars.util.data.list.FasterList;
-import org.apache.commons.lang3.ArrayUtils;
 import org.eclipse.collections.impl.list.mutable.primitive.FloatArrayList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -17,11 +14,8 @@ import java.util.Collection;
 import java.util.stream.Collectors;
 
 import static nars.time.Tense.ETERNAL;
-import static nars.truth.TruthFunctions.c2w;
 import static nars.truth.TruthFunctions.eternalize;
 import static nars.truth.TruthFunctions.w2c;
-import static org.eclipse.collections.impl.block.factory.Functions2.min;
-import static org.eclipse.collections.impl.block.factory.Functions2.minBy;
 
 /**
  * Truth Interpolation and Extrapolation of Temporal Beliefs/Goals
@@ -43,6 +37,16 @@ public final class TruthPolation extends InterpolatingMicrosphere {
 
         data = new float[size][3 /* 0=time, 1=freq, 2=conf */];
 
+    }
+
+    public static Focus lightCurve(float dur) {
+        return (dt, evi) -> timeDecay(evi, dur, dt);
+    }
+
+    public static float timeDecay(float evi, float dur, float dt) {
+        return dt == 0 ? evi : evi / (1f +
+            dt / dur //1st-order linear decay
+        );
     }
 
 //    public static float temporalConfidenceLoss(float dt, float evidence, float decayPeriod) {
@@ -76,28 +80,24 @@ public final class TruthPolation extends InterpolatingMicrosphere {
     }
 
     @Nullable
-    public Truth truth(long when, @NotNull Task[] tasks, LightCurve lightCurve) {
+    public Truth truth(long when, @NotNull Task[] tasks, Focus focus) {
 
         assert(tasks.length > 2);
 
-        long minT = Long.MAX_VALUE, maxT = Long.MIN_VALUE;
-        float minTaskConf = Float.POSITIVE_INFINITY;
+        //long minT = Long.MAX_VALUE, maxT = Long.MIN_VALUE;
 
-        //int volume = tasks[0].term().volume();
         int i = 0;
         for (Task t : tasks) {
 
             float[] f = data[i];
+
             long o = t.occurrence();
             f[0] = (o != ETERNAL) ? o : when;
             f[1] = t.freq();
-            float ci = t.conf();
-            if (ci < minTaskConf)
-                minTaskConf = ci;
-            f[2] = c2w(ci);
+            f[2] = t.confWeight();
 
-            if (minT > o) minT = o;
-            if (maxT < o) maxT = o;
+            //if (minT > o) minT = o;
+            //if (maxT < o) maxT = o;
 
             i++;
         }
@@ -120,22 +120,10 @@ public final class TruthPolation extends InterpolatingMicrosphere {
         float[] v = this.value(
                 new float[] { when },
                 data,
-                lightCurve,
+                focus,
                 i);
-        float c1 = w2c(v[1]);
 
-        float minConf = Param.TRUTH_EPSILON; //HACK take value from NAR
-
-        float F = v[0];
-
-        if (c1 >= minConf) {
-            return $.t(F, c1);
-        } else {
-            //attempt to use the calculated frequency with the eternalized confidence of the minimum task (conservative heuristic)
-            //float c2 = eternalize(minTaskConf);
-            //return (c2 >= minConf) ? $.t(F, c2) : null;
-            return null;
-        }
+        return $.t(v[0], w2c(v[1]));
     }
 
 

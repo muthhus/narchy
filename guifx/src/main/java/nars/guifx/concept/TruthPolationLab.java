@@ -7,6 +7,7 @@ import javafx.geometry.Orientation;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -39,6 +40,7 @@ public class TruthPolationLab extends VBox implements ChangeListener {
     private final List<Task> tasks;
     final ArrayList<Slider> freqSliders;
     final ArrayList<Slider> confSliders;
+    private final Slider durationSlider;
 
     public TruthPolationLab() {
         super();
@@ -55,7 +57,15 @@ public class TruthPolationLab extends VBox implements ChangeListener {
         polation = new Canvas(width, height);
         //polation.autosize();
 
-        VBox v = new VBox(polation, newSliderBank(), newSliderBank());
+
+        durationSlider= new Slider(0.1f, 4f, 1f);
+        durationSlider.valueProperty().addListener(this);
+
+        HBox controls = new HBox(new Label("Duration", durationSlider));
+
+
+
+        VBox v = new VBox(polation, newSliderBank(), controls);
         getChildren().add(v);
 
         System.out.println(freqSliders.size() + " " + confSliders.size());
@@ -73,6 +83,7 @@ public class TruthPolationLab extends VBox implements ChangeListener {
 
         for (int i = 0; i < range; i++) {
             Slider f = new Slider(0, 1, 0);
+
             f.setOrientation(Orientation.VERTICAL);
             freqSliders.add(f);
             freqEdit.getChildren().add(f);
@@ -138,12 +149,15 @@ public class TruthPolationLab extends VBox implements ChangeListener {
             double my = rad * 2;
             double dx = w / range;
             double h = ch * 0.9;
+
+            float dur = (float) durationSlider.getValue();
+
             for (int i = 0; i < range; i++) {
-                Truth tc = truth.truth(i, 1f, tasks  /* TODO add eternal background control widget */ );
+                Truth tc = truth.truth(i, dur, tasks  /* TODO add eternal background control widget */ );
                 if (tc!=null) {
                     double x = dx * i;
                     double y = (1f - tc.freq()) * h;
-                    double r = 5 + tc.conf() * rad;
+                    double r = 5 + tc.confWeight() * rad;
 
                     x -= r / 2;
                     y -= r / 2;

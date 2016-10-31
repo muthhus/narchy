@@ -8,7 +8,7 @@ import nars.index.term.tree.TreeTermIndex;
 import nars.nar.exe.SingleThreadExecutioner;
 import nars.nar.util.DefaultConceptBuilder;
 import nars.time.Clock;
-import nars.time.RealtimeDSClock;
+import nars.time.RealtimeClock;
 import nars.util.data.random.XorShift128PlusRandom;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -37,7 +37,7 @@ public class Multi {
     final static Logger logger = LoggerFactory.getLogger(Multi.class);
 
     public Multi(int numCores, @NotNull ConnectivityFunction conn /*, TermIndex index, Clock c*/) {
-        Clock clock = new RealtimeDSClock(true);
+        Clock clock = new RealtimeClock.DS(true);
 
         TermIndex index = new TreeTermIndex.L1TreeIndex(new DefaultConceptBuilder(), 1024 * 1024, 8192, numCores);
 

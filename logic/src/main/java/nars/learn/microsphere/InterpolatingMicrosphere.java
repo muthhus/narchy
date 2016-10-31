@@ -52,7 +52,7 @@ public class InterpolatingMicrosphere {
     private final int size;
 
     /** effective (minimum) radius of one point, an interval within which distance is zero (co-tangent) */
-    private float pointRadius = 0.5f;
+    private float pointRadius = 0f;
 
 //    /** Maximum fraction of the facets that can be dark. */
 //    private float maxDarkFraction;
@@ -149,24 +149,6 @@ public class InterpolatingMicrosphere {
         }
     }
 
-    public static LightCurve lightCurve(float dur) {
-        return (dt, evi) -> {
-            return timeDecay(evi, dur, dt);
-        };
-    }
-
-    public static float timeDecay(float evi, float dur, float dt) {
-        if (dt == 0)
-            return evi;
-        dur = Math.max(dur, 1f);
-
-        float newEvi = evi / (1f + dt*dt/dur  );
-
-
-        //System.out.println("\t\t" + evi + " x ( dt=" + dt + " dur=" + dur + " ) ---> " + evi);
-        return newEvi;
-    }
-
 
 //    /**
 //     * Copy constructor.
@@ -237,7 +219,7 @@ public class InterpolatingMicrosphere {
     @NotNull
     public float[] value(@NotNull float[] targetPoint,
                          float[][] data,
-                         LightCurve curve,
+                         Focus curve,
                          int numSamples) {
 
         clear();
@@ -327,7 +309,7 @@ public class InterpolatingMicrosphere {
         return (float) var24;
     }
 
-    public void illuminate(@NotNull float[] targetPoint, float[][] data, LightCurve lightCurve, int numSamples) {
+    public void illuminate(@NotNull float[] targetPoint, float[][] data, Focus focus, int numSamples) {
         float epsilon = 0.01f;
 
         for (int i = 0; i < numSamples; i++) {
@@ -347,7 +329,7 @@ public class InterpolatingMicrosphere {
                 final float cos = (sampleDirection != null) ? cosAngleNormalized(n, sampleDirection) : 1f;
 
                 if (cos > 0) {
-                    final float illumination = cos * lightCurve.get(distance, evidence);
+                    final float illumination = cos * focus.focus(distance, evidence);
                     if (illumination > 0) {
                         final float[] d = microsphereData.get(j);
                         d[0] += illumination;
@@ -544,16 +526,16 @@ public class InterpolatingMicrosphere {
 //    }
 
     /**
-     * Created by me on 10/15/16.
+     * Determines the conservation and decay of evidence through time during interpolation of belief table evidence
      */
-    public static interface LightCurve {
+    public static interface Focus {
         /**
          * @param dt absolute value of distance between target and the evidence's occurrence
                 * TODO use a directional vector between the target point and the origin point, allowing asymmetric handling between an event's relative past and future
          * @param evidence evidence weight held by the light source
          * @return the adjusted evidence contribution (illumination in the microsphere model). normally this will decay the evidence across time
          */
-        float get(float dt, float evidence);
+        float focus(float dt, float evidence);
 
     }
 }

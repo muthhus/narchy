@@ -1,16 +1,14 @@
 package nars.concept;
 
 import com.google.common.collect.Iterators;
-import com.google.common.collect.Lists;
 import nars.*;
 import nars.bag.Bag;
 import nars.budget.Budget;
 import nars.budget.BudgetFunctions;
-import nars.budget.RawBudget;
-import nars.budget.merge.BudgetMerge;
 import nars.nal.Stamp;
 import nars.table.BeliefTable;
 import nars.table.DefaultBeliefTable;
+import nars.table.EternalTable;
 import nars.task.RevisionTask;
 import nars.term.Compound;
 import nars.term.Term;
@@ -28,7 +26,6 @@ import java.util.Map;
 import static nars.Op.CONJ;
 import static nars.Op.NEG;
 import static nars.time.Tense.DTERNAL;
-import static nars.time.Tense.ETERNAL;
 
 /**
  * Adds support for dynamically calculated truth values
@@ -41,8 +38,8 @@ public class DynamicCompoundConcept extends CompoundConcept {
     public DynamicCompoundConcept(@NotNull Compound term, @NotNull Bag termLinks, @NotNull Bag taskLinks, @NotNull NAR nar) {
         super(term, termLinks, taskLinks, nar);
         this.nar = nar;
-        this.beliefs = newBeliefTable(0,0);
-        this.goals = newGoalTable(0,0);
+        this.beliefs = newBeliefTable(nar, true, 0,1 /* initial space */);
+        this.goals = newBeliefTable(nar, false, 0,1 /* initial space */);
     }
 
     public static final class DynTruth {
@@ -92,16 +89,15 @@ public class DynamicCompoundConcept extends CompoundConcept {
 
     }
 
-    @NotNull
     @Override
-    protected BeliefTable newBeliefTable(int eCap, int tCap) {
-        return new DynamicBeliefTable(true, tCap);
+    protected BeliefTable newBeliefTable(NAR nar, boolean beliefOrGoal, int eCap, int tCap) {
+        return new DynamicBeliefTable(beliefOrGoal, tCap);
     }
-    @NotNull
-    @Override
-    protected BeliefTable newGoalTable(int eCap, int tCap) {
-        return new DynamicBeliefTable(false, tCap);
-    }
+//    @NotNull
+//    @Override
+//    protected BeliefTable newGoalTable(int eCap, int tCap) {
+//        return new DynamicBeliefTable(false, tCap);
+//    }
 
     private class DynamicBeliefTable extends DefaultBeliefTable {
 
@@ -109,7 +105,7 @@ public class DynamicCompoundConcept extends CompoundConcept {
 
         public DynamicBeliefTable(boolean beliefOrGoal, int tCap) {
 
-            super(tCap);
+            super(EternalTable.EMPTY, newTemporalTable(tCap, nar));
             this.beliefOrGoal = beliefOrGoal;
         }
 

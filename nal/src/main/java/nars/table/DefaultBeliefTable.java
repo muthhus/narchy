@@ -27,22 +27,17 @@ import static nars.time.Tense.ETERNAL;
 public class DefaultBeliefTable implements BeliefTable {
 
     @NotNull
-    public EternalTable eternal;
+    public final EternalTable eternal;
     @NotNull
     public final TemporalBeliefTable temporal;
 
-    public DefaultBeliefTable(int initialTemporalCapacity) {
+    public DefaultBeliefTable(EternalTable eternal, TemporalBeliefTable temporal) {
 
         /* Ranking by originality is a metric used to conserve original information in balance with confidence */
-        eternal = EternalTable.EMPTY;
-        //new EternalTable(initialEternalCapacity);
-        temporal = newTemporalBeliefTable(initialTemporalCapacity);
+        this.eternal = eternal;
+        this.temporal = temporal;
     }
 
-    @NotNull
-    protected static TemporalBeliefTable newTemporalBeliefTable(int initialTemporalCapacity) {
-        return new MicrosphereTemporalBeliefTable(initialTemporalCapacity);
-    }
 
     /**
      * TODO this value can be cached per cycle (when,now) etc
@@ -173,32 +168,17 @@ public class DefaultBeliefTable implements BeliefTable {
 
 
     @Override
-    public TruthDelta add(@NotNull Task input, @NotNull QuestionTable questions, @NotNull CompoundConcept<?> concept, @NotNull NAR nar) {
+    public final TruthDelta add(@NotNull Task input, @NotNull QuestionTable questions, @NotNull CompoundConcept<?> concept, @NotNull NAR nar) {
+        return input.isEternal() ?  eternal.add(input, concept, nar) : temporal.add(input, eternal, concept, nar);
+    }
 
-        TruthDelta result;
-        if (input.isEternal()) {
-            result = nonEmptyEternal(concept, input).add(input, concept, nar);
-        } else {
-            result = temporal.add(input, eternal, concept, nar);
-//            if (result != null && !displaced.isEmpty() && Param.eternalizeForgottenTemporal(input.op())) {
-//                eternalizeForgottenTemporals(displaced, nar, Param.ETERNALIZATION_CONFIDENCE_FACTOR);
-//            }
-        }
-
-//        if (result != null) {
-//            questions.answer(input, concept, nar, displaced);
+//    @NotNull
+//    private EternalTable nonEmptyEternal(@NotNull CompoundConcept<?> concept, @NotNull Task input) {
+//        if (eternal == EternalTable.EMPTY) {
+//            eternal = new EternalTable(concept.policy().beliefCap(concept, input.isBelief(), true));
 //        }
-
-        return result;
-    }
-
-    @NotNull
-    private EternalTable nonEmptyEternal(@NotNull CompoundConcept<?> concept, @NotNull Task input) {
-        if (eternal == EternalTable.EMPTY) {
-            eternal = new EternalTable(concept.policy().beliefCap(concept, input.isBelief(), true));
-        }
-        return eternal;
-    }
+//        return eternal;
+//    }
 
 
 //    private void eternalizeForgottenTemporals(@NotNull List<Task> displaced, @NotNull NAR nar, float factor) {

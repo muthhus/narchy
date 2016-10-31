@@ -1,23 +1,12 @@
 package nars.concept;
 
 import nars.NAR;
-import nars.Op;
 import nars.Param;
-import nars.Task;
 import nars.budget.policy.ConceptPolicy;
 import nars.table.BeliefTable;
-import nars.table.DefaultBeliefTable;
-import nars.table.TemporalBeliefTable;
 import nars.term.Compound;
-import nars.term.Terms;
-import nars.term.container.TermContainer;
-import nars.truth.TruthDelta;
 import nars.util.math.FloatSupplier;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.List;
-import java.util.function.BiPredicate;
 
 /**
  * base class for concepts which are more or less programmatically "hard-wired" into
@@ -162,16 +151,16 @@ public abstract class WiredCompoundConcept extends CompoundConcept<Compound> imp
 
     @Override
     protected void beliefCapacity(@NotNull ConceptPolicy p, NAR nar) {
-        beliefCapacity(0, beliefCapacity, 0, goalCapacity, nar);
+        beliefCapacity(0, beliefCapacity, 1, goalCapacity, nar);
     }
 
-    @Override
-    protected @NotNull BeliefTable newBeliefTable() {
-        return newBeliefTable(0,beliefCapacity);
-    }
-
-    @Override
-    protected @NotNull BeliefTable newGoalTable() {
-        return newGoalTable(0,goalCapacity);
-    }
+//    @Override
+//    protected @NotNull BeliefTable newBeliefTable() {
+//        return newBeliefTable(nar, 0,beliefCapacity);
+//    }
+//
+//    @Override
+//    protected @NotNull BeliefTable newGoalTable() {
+//        return newGoalTable(0,goalCapacity);
+//    }
 }

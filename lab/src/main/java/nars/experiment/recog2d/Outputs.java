@@ -27,7 +27,6 @@ public class Outputs {
         return out.values().stream().mapToDouble(x -> x.error).map(x -> x==x ? x : 1f).sum();
     }
 
-
     static class Neuron {
 
         public float actual, actualConf;
@@ -109,19 +108,19 @@ public class Outputs {
         this.outVector = IntStream.range(0, maxStates).mapToObj((int i) -> {
                     Compound tt = namer.apply(i);
                     return a.action(tt, (b, d) -> {
-                        if (train) {
-                            float ee = expected(i);
-
-                            float thresh = 0.1f;
-                            if (d==null || Math.abs(ee-d.freq())>thresh) {
-                                //correction
-                                a.nar.goal(tt, Tense.Present, ee, a.gamma);
-                                //return null;
-                            }
-
+//                        if (train) {
+//                            float ee = expected(i);
+//
+//                            float thresh = 0.1f;
+//                            if (d==null || Math.abs(ee-d.freq())>thresh) {
+//                                //correction
+//                                a.nar.goal(tt, Tense.Present, ee, a.gamma);
+//                                //return null;
+//                            }
+//
                             //return $.t(ee, a.alpha() );
-                            //return null;
-                        }
+//                            //return null;
+//                        }
 
                         return d;
                     });

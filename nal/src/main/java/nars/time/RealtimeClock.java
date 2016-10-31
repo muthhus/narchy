@@ -11,12 +11,34 @@ import java.util.concurrent.atomic.AtomicLong;
 public abstract class RealtimeClock implements Clock {
 
 
+    private static final float DEFAULT_DURATION_SECONDS = 0.5f;
+    private final int unitsPerSecod;
     long t, t0 = -1;
     private long start;
 
     long seed = Math.abs(UUID.randomUUID().getLeastSignificantBits() ) & 0xffff0000;
     final AtomicLong nextStamp = new AtomicLong(1);
 
+    float duration;
+
+
+    protected RealtimeClock(int unitsPerSecond, boolean relativeToStart) {
+        super();
+        this.unitsPerSecod = unitsPerSecond;
+        this.start = relativeToStart ? System.currentTimeMillis() : 0L;
+
+        setDuration(DEFAULT_DURATION_SECONDS);
+
+    }
+
+    public final RealtimeClock setDuration(float seconds) {
+        duration = secondsToUnits(seconds);
+        return this;
+    }
+
+    public final float secondsToUnits(float s) {
+        return s / unitsToSeconds(1);
+    }
 
     @Override
     public long nextStamp() {
@@ -26,7 +48,7 @@ public abstract class RealtimeClock implements Clock {
     @Override
     public void clear() {
         tick();
-        t = t0 = getRealTime();
+        t = t0 = (getRealTime()-start);
 
         start = t;
     }
@@ -34,7 +56,7 @@ public abstract class RealtimeClock implements Clock {
 
     @Override
     public final void tick() {
-        long now = getRealTime();
+        long now = (getRealTime()-start);
 
         t0 = t;
 
@@ -75,12 +97,73 @@ public abstract class RealtimeClock implements Clock {
         return unitsToSeconds(t - start);
     }
 
-    protected abstract float unitsToSeconds(long l);
+    protected final float unitsToSeconds(long l) {
+        return l / ((float)unitsPerSecod);
+    }
+
+    @Override
+    public final float duration() {
+        return duration;
+    }
 
     @NotNull
     @Override
     public String toString() {
         return secondsSinceStart() + "s";
+    }
+
+    /** decisecond (0.1) accuracy */
+    public static class DS extends RealtimeClock {
+
+
+        public DS() {
+            this(false);
+        }
+
+        public DS(boolean relativeToStart) {
+            super(10, relativeToStart);
+        }
+
+        @Override
+        protected long getRealTime() {
+            return System.currentTimeMillis() / 100;
+        }
+
+    }
+
+    /** millisecond accuracy */
+    public static class MS extends RealtimeClock {
+
+
+        public MS() {
+            this(false);
+        }
+
+
+        public MS(boolean relativeToStart) {
+            super(1000, relativeToStart);
+        }
+
+        @Override
+        protected long getRealTime() {
+            return System.currentTimeMillis();
+        }
+
+    }
+
+    /** nanosecond accuracy */
+    public static class NS extends RealtimeClock {
+
+
+        protected NS(boolean relativeToStart) {
+            super(1000*1000*1000, relativeToStart);
+        }
+
+        @Override
+        protected long getRealTime() {
+            return System.nanoTime();
+        }
+
     }
 }
 

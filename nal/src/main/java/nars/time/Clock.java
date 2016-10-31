@@ -25,4 +25,6 @@ public interface Clock extends Serializable {
 	}
 
 	long elapsed();
+
+    float duration();
 }

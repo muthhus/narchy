@@ -5,12 +5,8 @@ import com.google.common.collect.Lists;
 import nars.$;
 import nars.NAR;
 import nars.NAgent;
-import nars.Task;
-import nars.concept.Concept;
-import nars.concept.SensorConcept;
 import nars.gui.Vis;
 import nars.index.term.tree.TreeTermIndex;
-import nars.nal.Stamp;
 import nars.nar.Default;
 import nars.nar.Default2;
 import nars.nar.Multi;
@@ -20,15 +16,8 @@ import nars.nar.util.DefaultConceptBuilder;
 import nars.op.mental.Abbreviation;
 import nars.op.mental.Inperience;
 import nars.op.time.MySTMClustered;
-import nars.task.GeneratedTask;
-import nars.term.Compound;
-import nars.term.Term;
-import nars.time.Clock;
-import nars.time.FrameClock;
-import nars.time.RealtimeMSClock;
+import nars.time.*;
 import nars.truth.Truth;
-import nars.truth.func.BeliefFunction;
-import nars.truth.func.GoalFunction;
 import nars.util.data.random.XorShift128PlusRandom;
 import nars.video.*;
 import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunction;
@@ -45,9 +34,6 @@ import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import static nars.$.t;
-import static nars.Op.NEG;
-import static nars.time.Tense.DTERNAL;
-import static nars.time.Tense.ETERNAL;
 import static spacegraph.SpaceGraph.window;
 import static spacegraph.obj.GridSurface.grid;
 
@@ -92,7 +78,7 @@ abstract public class NAgents extends NAgent {
     public static void runRT(Function<NAR, NAgents> init) {
 
 
-        Default nar = NAgents.newMultiThreadNAR(3, new RealtimeMSClock(true), false);
+        Default nar = NAgents.newMultiThreadNAR(3, new RealtimeClock.DS(true).setDuration(0.1f), false);
         //Default nar = newNAR();
         //Default2 nar = newNAR2();
 

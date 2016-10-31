@@ -1,5 +1,6 @@
 package nars.table;
 
+import nars.$;
 import nars.NAR;
 import nars.Param;
 import nars.Task;
@@ -16,13 +17,12 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Iterator;
-import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 import static java.lang.Long.MAX_VALUE;
 import static java.lang.Long.MIN_VALUE;
-import static nars.learn.microsphere.InterpolatingMicrosphere.timeDecay;
+import static nars.task.TruthPolation.timeDecay;
 import static nars.time.Tense.ETERNAL;
 import static nars.truth.TruthFunctions.c2w;
 import static nars.util.Util.sqr;
@@ -30,7 +30,7 @@ import static nars.util.Util.sqr;
 /**
  * stores the items unsorted; revection manages their ranking and removal
  */
-public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
+public abstract class MicrosphereTemporalBeliefTable implements TemporalBeliefTable, InterpolatingMicrosphere.Focus {
 
     private volatile int capacity;
     final MultiRWFasterList<Task> list;
@@ -206,7 +206,8 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
     }
 
     public float duration() {
-        return (((float)range()) / size()) * 2f;
+        //return (((float)range()) / size()) * 2f;
+        return 1f;
     }
 
     @Override
@@ -458,10 +459,7 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
                         return res; //as-is
                     else {
                         //return res.eternalize();
-                        float decay = InterpolatingMicrosphere.lightCurve(1).get(delta, 1f);
-                        return res.confWeightMult(
-                                decay
-                        );
+                        return $.t(res.freq(), focus(delta, res.confWeight()));
                     }
 
                     //return Revision.project(res, when, now, o, false);
@@ -470,14 +468,11 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
                 }
 
             default:
-                InterpolatingMicrosphere.LightCurve x = InterpolatingMicrosphere.lightCurve(duration());
-                Truth t = new TruthPolation(s).truth(when, tr, x);
-                return t;
+                InterpolatingMicrosphere.Focus x = TruthPolation.lightCurve(duration());
+                return new TruthPolation(s).truth(when, tr, x);
         }
 
     }
-
-
 
     private boolean clean(NAR nar) {
         return list.removeIf(x -> {

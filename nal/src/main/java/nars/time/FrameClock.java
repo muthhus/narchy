@@ -11,6 +11,7 @@ public class FrameClock implements Clock {
 
     long t;
     int dt;
+    float duration = 1f;
 
     public FrameClock() {
         this(1);
@@ -71,4 +72,8 @@ public class FrameClock implements Clock {
             validate(s[s.length-1]);
     }
 
+    @Override
+    public float duration() {
+        return duration;
+    }
 }
