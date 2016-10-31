@@ -65,10 +65,10 @@ abstract public class NAgents extends NAgent {
         NAR.printTasks(nar, true);
         NAR.printTasks(nar, false);
 
-        nar.tasks.forEach(x -> {
-            if (x.isQuestOrQuestion())
-                System.out.println(x.proof());
-        });
+//        nar.tasks.forEach(x -> {
+//            if (x.isQuestOrQuestion())
+//                System.out.println(x.proof());
+//        });
 
         nar.printConceptStatistics();
         nar.printTaskStatistics();

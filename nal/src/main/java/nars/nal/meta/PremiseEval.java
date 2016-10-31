@@ -41,6 +41,7 @@ public class PremiseEval extends Unify {
     @NotNull
     public final Premise premise;
     private final float truthResolution;
+    public float durMin;
 
     public boolean setPunct(@Nullable Truth t, char p, long[] evidence) {
 
@@ -94,7 +95,7 @@ public class PremiseEval extends Unify {
      * cached values
      */
 
-    public float confMin = Param.TRUTH_EPSILON;
+    public final float confMin;
 
     /** op ordinals, 0=task, 1=belief */
     public final int termSub0op;
@@ -146,6 +147,7 @@ public class PremiseEval extends Unify {
         this.nar = nar;
         this.truthResolution = nar.truthResolution.floatValue();
         this.confMin = Math.max(truthResolution, nar.confMin.floatValue());
+        this.durMin = nar.durMin.floatValue();
 
         //occDelta = new Versioned(this);
         //tDelta = new Versioned(this);
@@ -304,10 +306,10 @@ public class PremiseEval extends Unify {
      */
     @Nullable
     public final Budget budget(@Nullable Truth truth, @NotNull Termed derived) {
-        float minDur = nar.durMin.floatValue();
+
         return (truth != null) ?
-                TaskBudgeting.derivationForward(truth, derived, this, minDur) :
-                TaskBudgeting.derivationBackward(derived, this, minDur);
+                TaskBudgeting.derivationForward(truth, derived, this) :
+                TaskBudgeting.derivationBackward(derived, this);
     }
 
 

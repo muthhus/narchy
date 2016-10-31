@@ -56,7 +56,7 @@ public class NAL6MultistepTest {
         for (int i = 0; i < 5; i++) {
             // burglary.print();  earthquake.print();
             //long now = d.time();
-            d.run(30);
+            d.run(100);
             System.out.println("burglary=" + burglary.belief(Tense.ETERNAL) + "\tearthquake=" + earthquake.belief(Tense.ETERNAL));
         }
 

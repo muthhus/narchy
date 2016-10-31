@@ -70,17 +70,17 @@ public abstract class TermBuilder {
             return a;
         }
 
-        int retained = 0, size = a.size();
+        int size = a.size();
         List<Term> terms = $.newArrayList(size);
 
         for (int i = 0; i < size; i++) {
             Term x = a.term(i);
             if (!b.containsTerm(x)) {
                 terms.add(x);
-                retained++;
             }
         }
 
+        int retained = terms.size();
         if (retained == size) { //same as 'a'
             return a;
         } else if (retained == 0) {

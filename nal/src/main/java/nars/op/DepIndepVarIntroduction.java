@@ -28,28 +28,20 @@ public class DepIndepVarIntroduction extends VarIntroduction {
 
 
 
-    public DepIndepVarIntroduction(NAR nar) {
-        super(1, nar);
+    public DepIndepVarIntroduction(Random rng) {
+        super(1, rng);
     }
 
-    @Override
-    public void accept(@NotNull Task task) {
+//    @Override
+//    public void accept(@NotNull Task task) {
+//
+//        if (task.cyclic())
+//            return; //avoids reprocessing the same
+//
+//        super.accept(task);
+//    }
 
-        if (task.cyclic())
-            return; //avoids reprocessing the same
 
-        super.accept(task);
-    }
-
-    @NotNull
-    @Override
-    protected Task clone(@NotNull Task original, Compound c) {
-        Task t = super.clone(original, c);
-//        if (t!=null) {
-//            t.budget().setPriority(t.pri()*t.pri()); //shrink
-//        }
-        return t;
-    }
 
     final static int ConjOrStatementBits = Op.IMPL.bit | Op.EQUI.bit | Op.CONJ.bit;
     final static int DepOrIndepBits = Op.VAR_INDEP.bit | Op.VAR_DEP.bit | Op.VAR_PATTERN.bit;
@@ -132,23 +124,22 @@ public class DepIndepVarIntroduction extends VarIntroduction {
         return o == IMPL || o == EQUI;
     }
 
-    public static class VarIntro extends TermTransformOperator {
+    public static final class VarIntro extends TermTransformOperator {
 
         @NotNull
         final DepIndepVarIntroduction introducer;
-        @NotNull
-        private final Random random;
 
         public VarIntro(@NotNull NAR nar) {
             super("varIntro");
-            this.introducer = new DepIndepVarIntroduction(nar);
-            this.random = nar.random;
+            this.introducer = new DepIndepVarIntroduction(nar.random);
         }
 
         protected boolean introduce(Term x) {
             return x instanceof Compound &&
-                   random.nextFloat() >
-                           1f / x.volume()
+                   introducer.rng.nextFloat() <=
+                            1f / (1 + x.size())
+                           //1f / Math.sqrt(x.volume())
+                           //1f / x.volume()
                            //0.5f;
                            //(1f / (1f + x.size()))
             ;

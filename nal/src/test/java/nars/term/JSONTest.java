@@ -14,7 +14,7 @@ public class JSONTest {
     @Test
     public void testJSON1() {
         Term t = IO.fromJSON("{ \"a\": [1, 2], \"b\": \"x\", \"c\": { \"d\": 1 } }");
-        assertEquals("(&,(\"x\"-->b),((1-->d)-->c),a(1,2))", t.toString());
+        assertEquals("( &&+0, (\"x\"-->b),((1-->d)-->c),a(1,2))", t.toString());
     }
     @Test
     public void testJSONTermFunction() {

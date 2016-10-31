@@ -22,58 +22,30 @@ import static nars.nal.UtilityFunctions.and;
  */
 public class TaskBudgeting {
 
-
-//    /** combines the tasklinks and termlink budgets to arrive at a Premise budget, used in budgeting its derivations */
-//    public static void premise(@NotNull Budget p, @NotNull BLink<Task> taskLink, @NotNull BLink<Term> termLink) {
-//        try {
-//            if (taskLink.isDeleted())
-//                return;
-//            p.setBudget(taskLink);
-//            if (termLink.isDeleted())
-//                return;
-//            BudgetMerge.
-//                    orBlend
-//                    //plusBlend
-//                    //avgBlend
-//                    //andBlend
-//                    .apply(p, termLink, 1f);
-//            p.setDurability( );
-//        } catch (Budget.BudgetException e) {
-//            //HACK - this isnt a full solution, but it should work temporarily
-//            return;
-//        }
-//    }
-
-    public static @Nullable Budget derivation(float derivationQuality, @NotNull Termed derived, @NotNull PremiseEval p, float minDur) {
+    public static @Nullable Budget derivation(float derivationQuality, @NotNull Termed derived, @NotNull PremiseEval p) {
 
         Premise baseBudget = p.premise;
 
-
-
         //Penalize by complexity: RELATIVE SIZE INCREASE METHOD
         /** occam factor */
-        float occam = occamBasic(derived, baseBudget);
-                //occamSquareWithDeadzone(derived, pp);
-
-        //volRatioScale = volRatioScale * volRatioScale; //sharpen
-        //volRatioScale = (float) Math.pow(volRatioScale, 2);
+        float occam = occamGrowth(derived, baseBudget);
 
 
-        float factor = derivationQuality;
-        final float durability = baseBudget.dur() * occam;
-        if (durability < minDur)
+        final float durability =
+                baseBudget.dur() * occam * derivationQuality;
+        if (durability < p.durMin)
             return null;
 
         float priority =
                 //nal.taskLink.priIfFiniteElseZero() * volRatioScale;
                 //or(nal.taskLink.priIfFiniteElseZero(), nal.termLink.priIfFiniteElseZero())
                 //or(nal.taskLink.priIfFiniteElseZero(), nal.termLink.priIfFiniteElseZero())
-                baseBudget.pri() * occam * factor
+                baseBudget.pri() * occam * derivationQuality
                 //;
                 ;
 
         final float quality =
-                and(derivationQuality, baseBudget.qua());
+                baseBudget.qua() * derivationQuality;
                 //and(baseQuality, factor);
                 //baseBudget.qua();
 
@@ -107,16 +79,9 @@ public class TaskBudgeting {
          */
     }
 
-    /** occam's razor: penalize complexity - returns a value between 0 and 1 that priority will be scaled by */
-    public static float occamBasic(@NotNull Termed derived, @NotNull Premise pp) {
-//        Task parentTask = pp.task;
-//        float parentComplexity = parentTask.complexity();
-//        Task parentBelief = pp.belief;
-//        if (parentBelief!=null) // && parentBelief.complexity() > parentComplexity)
-//            parentComplexity += parentBelief.complexity();
-
-        //..return (1f - (derivedComplexity / (derivedComplexity + parentComplexity)));
-
+    /** occam's razor: penalize relative complexity growth
+     * @return a value between 0 and 1 that priority will be scaled by */
+    public static float occamGrowth(@NotNull Termed derived, @NotNull Premise pp) {
         Task parentBelief = pp.belief;
         int parentComplexity;
         int taskCompl = pp.task.complexity();
@@ -129,79 +94,25 @@ public class TaskBudgeting {
 
         int derivedComplexity = derived.complexity();
         return parentComplexity / (1f + Math.max(parentComplexity, derivedComplexity));
-        //return parentComplexity / (1f + Math.max(parentComplexity, derivedComplexity));
-
-        //float baseCost = 1;
-        //return (float) (1f/(1f + Math.sqrt( Math.max(baseCost, derived.complexity() - parentComplexity)) ));
-
-        //return parentComplexity/(parentComplexity + Math.max(baseCost, derived.complexity() - parentComplexity));
-        //return 1f/(1f + (float)Math.sqrt(Math.max(baseCost, derived.complexity() - parentComplexity)));
-
     }
-
-//    /** occam's razor: penalize complexity - returns a value between 0 and 1 that priority will be scaled by
-//     *  NOT TESTED may have math problems
-//     * */
-//    public static float occamSquareWithDeadzone(@NotNull Termed derived, Premise pp) {
-//        Task parentTask = pp.task;
-//        float parentComplexity = parentTask.volume();
-//        Task parentBelief = pp.belief;
-//
-//        int derivedComplexity = derived.volume();
-//
-//        //choose the task or belief (if present) which has the complexity nearest the derived (optimistic)
-//        Term parentTerm;
-//        float delta = Math.abs(derivedComplexity - parentComplexity);
-//        if (parentBelief!=null && delta > Math.abs(derivedComplexity - parentBelief.volume())) {
-//            parentTerm = parentBelief.term();
-//            parentComplexity = parentTerm.volume();
-//            delta = Math.abs(derivedComplexity - parentComplexity); //recompute delta for new value
-//        } else {
-//            parentTerm = parentTask.term();
-//        }
-//
-//        if (Math.max(derived.term().vars(), parentTerm.vars()) >= delta) {
-//            //no penalty if the difference in complexity is within a range bounded by the number of variables in the derived.
-//            //this is the 'dead-zone' of the curve which encourages variable introduction and substitution
-//            return 1f;
-//        } else {
-//            //otherwise, the penalty is proportional to the absolute change in complexity
-//            //this includes whether the complexity decreased (ex: decomposition/substition) or increased (composition)
-//            //the theory behind penalizing decrease in complexity is to marginalize
-//            //potentially useless runaway decomposition results that could be considered noisy echos or residue of
-//            //its premise components
-//
-//            float relDelta = delta /
-//                    aveAri(parentComplexity); //TODO could be LERP based on compared confidence of premise to derived (if belief/goal)
-//
-//            //the decay rate is given a polynomial boost here to further enforce the
-//            //need to avoid complexity
-//            float divisor = 1f + relDelta;
-//            float scale = 1f / (divisor*divisor);
-//
-//            //System.out.println(parentTerm + " :: " + derived + "  -- " + n2(scale) + " vs " + n2(occamBasic(derived, pp)));
-//
-//            return scale;
-//        }
-//    }
 
     /**
      * Backward logic with CompoundTerm conclusion, stronger case
      */
     @Nullable
-    public static Budget derivationBackward(@NotNull Termed content, @NotNull PremiseEval premise, float minDur) {
-        return derivation(premise.nar.qualityDefault(Symbols.QUESTION), content, premise, minDur);
+    public static Budget derivationBackward(@NotNull Termed content, @NotNull PremiseEval premise) {
+        return derivation(premise.nar.qualityDefault(Symbols.QUESTION), content, premise);
     }
 
     /**
      * Forward logic with CompoundTerm conclusion
      */
     @Nullable
-    public static Budget derivationForward(@NotNull Truth truth, @NotNull Termed content, @NotNull PremiseEval premise, float minDur) {
+    public static Budget derivationForward(@NotNull Truth truth, @NotNull Termed content, @NotNull PremiseEval premise) {
         return derivation(
                 BudgetFunctions.truthToQuality(truth),
                 content,
-                premise, minDur);
+                premise);
     }
 
     /**

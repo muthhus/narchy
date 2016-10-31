@@ -13,22 +13,8 @@ import org.jetbrains.annotations.Nullable;
 /** all X which are in the first term AND not in the second term */
 public class differ extends BinaryTermOperator {
 
-
     public differ() {
         super("differ");
-    }
-
-    /**
-     * returns null if empty set
-     */
-    @Nullable
-    public static Term difference(@NotNull Op op, @NotNull Compound a, @NotNull Compound b) {
-        return $.terms.difference(op, a, b);
-    }
-
-    @NotNull
-    public static Term difference(@NotNull TermBuilder t, @NotNull Compound a, @NotNull TermContainer b) {
-        return t.difference(a.op(), a, b);
     }
 
     @NotNull
@@ -36,6 +22,9 @@ public class differ extends BinaryTermOperator {
     public Term apply(@NotNull Term a, @NotNull Term b) {
         ensureCompounds(a, b);
 
-        return $.terms.difference( a.op(), (Compound) a, (Compound) b );
+        Term y = $.terms.difference( a.op(), (Compound) a, (Compound) b );
+        if (y.equals(a))
+            return False; //prevent identical fall-through
+        return y;
     }
 }

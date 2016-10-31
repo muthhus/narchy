@@ -283,7 +283,7 @@ public abstract class NAR extends Param implements Level, Consumer<Task>, NARIn,
         this.concepts = concepts;
 
         this.tasks =
-                new MapTaskIndex();
+                new MapTaskIndex(exe.concurrent());
                 //new TreeTaskIndex();
 
 

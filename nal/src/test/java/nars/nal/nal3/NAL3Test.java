@@ -1,6 +1,7 @@
 package nars.nal.nal3;
 
 
+import nars.$;
 import nars.NAR;
 import nars.nal.AbstractNALTest;
 import nars.test.TestNAR;
@@ -11,11 +12,12 @@ import org.junit.runners.Parameterized;
 import java.util.function.Supplier;
 
 import static nars.time.Tense.ETERNAL;
+import static org.junit.Assert.assertEquals;
 
 @RunWith(Parameterized.class)
 public class NAL3Test extends AbstractNALTest {
 
-    public static final int cycles = 550;
+    public static final int cycles = 250;
 
     public NAL3Test(Supplier<NAR> b) { super(b); }
 
@@ -50,7 +52,7 @@ public class NAL3Test extends AbstractNALTest {
         TestNAR tester = test();
         tester.believe("<robin --> (|,bird,swimmer)>",1.0f,0.9f); //.en("Robin is a type of bird or a type of swimmer.");
         tester.believe("<robin --> swimmer>", 0.0f, 0.9f); //.en("Robin is not a type of swimmer.");
-        tester.mustBelieve(cycles*2, "<robin --> bird>", 1.0f ,0.81f); //.en("Robin is a type of bird.");
+        tester.mustBelieve(cycles, "<robin --> bird>", 1.0f ,0.81f); //.en("Robin is a type of bird.");
 
     }
 
@@ -60,7 +62,7 @@ public class NAL3Test extends AbstractNALTest {
         
         tester.believe("<robin --> swimmer>",0.0f,0.9f); //.en("Robin is not a type of swimmer.");
         tester.believe("<robin --> (-,mammal,swimmer)>", 0.0f, 0.9f); //.en("Robin is not a nonswimming mammal.");
-        tester.mustBelieve(cycles*3, "<robin --> mammal>", 0.0f ,0.81f); //.en("Robin is not a type of mammal.");
+        tester.mustBelieve(cycles, "<robin --> mammal>", 0.0f ,0.81f); //.en("Robin is not a type of mammal.");
 
     }
 
@@ -95,7 +97,7 @@ public class NAL3Test extends AbstractNALTest {
         TestNAR tester = test();
         tester.believe("<planetX --> [marsy,earthly,venusy]>",1.0f,0.9f); //.en("PlanetX is Mars, Pluto, or Venus.");
         tester.believe("<planetX --> [earthly,saturny]>", 0.1f, 0.9f); //.en("PlanetX is probably neither Pluto nor Saturn.");
-        tester.mustBelieve(cycles*2, "<planetX --> [marsy,earthly,saturny,venusy]>", 0.1f ,0.81f); //.en("PlanetX is Mars, Pluto, Saturn, or Venus.");
+        tester.mustBelieve(cycles, "<planetX --> [marsy,earthly,saturny,venusy]>", 0.1f ,0.81f); //.en("PlanetX is Mars, Pluto, Saturn, or Venus.");
     }
 
     @Test
@@ -103,16 +105,18 @@ public class NAL3Test extends AbstractNALTest {
         TestNAR tester = test();
         tester.believe("<planetX --> [marsy,venusy]>",1.0f,0.9f); //.en("PlanetX is Mars, Pluto, or Venus.");
         tester.believe("<planetX --> [earthly]>", 0.1f, 0.9f); //.en("PlanetX is probably neither Pluto nor Saturn.");
-        tester.mustBelieve(cycles*3, "<planetX --> [marsy,earthly,venusy]>", 0.1f ,0.81f); //.en("PlanetX is Mars, Pluto, Saturn, or Venus.");
+        tester.mustBelieve(cycles, "<planetX --> [marsy,earthly,venusy]>", 0.1f ,0.81f); //.en("PlanetX is Mars, Pluto, Saturn, or Venus.");
 
     }
 
     @Test
     public void set_operations2_difference()  {
+        assertEquals("{Mars,Venus}", $.diffe($.$("{Mars,Pluto,Venus}"),$.$("{Pluto,Saturn}")).toString());
+
         TestNAR tester = test();
-        tester.believe("<planetX --> {Mars,Pluto,Venus}>",0.9f,0.9f); //.en("PlanetX is Mars, Pluto, or Venus.");
-        tester.believe("<planetX --> {Pluto,Saturn}>", 0.1f, 0.9f); //.en("PlanetX is probably neither Pluto nor Saturn.");
-        tester.mustBelieve(cycles*4, "<planetX --> {Mars,Venus}>", 0.81f ,0.81f); //.en("PlanetX is either Mars or Venus.");
+        tester.believe("(planetX --> {Mars,Pluto,Venus})",0.9f,0.9f); //.en("PlanetX is Mars, Pluto, or Venus.");
+        tester.believe("(planetX --> {Pluto,Saturn})", 0.1f, 0.9f); //.en("PlanetX is probably neither Pluto nor Saturn.");
+        tester.mustBelieve(cycles, "(planetX --> {Mars,Venus})", 0.81f ,0.81f); //.en("PlanetX is either Mars or Venus.");
 
     }
 
@@ -122,7 +126,7 @@ public class NAL3Test extends AbstractNALTest {
         TestNAR tester = test();
         tester.believe("<planetX --> [marsy,earthly,venusy]>",1.0f,0.9f); //.en("PlanetX is Mars, Pluto, or Venus.");
         tester.believe("<planetX --> [earthly,saturny]>", 0.1f, 0.9f); //.en("PlanetX is probably neither Pluto nor Saturn.");
-        tester.mustBelieve(cycles*4, "<planetX --> [marsy,venusy]>", 0.90f , 0.81f); //.en("PlanetX is either Mars or Venus.");
+        tester.mustBelieve(cycles, "<planetX --> [marsy,venusy]>", 0.90f , 0.81f); //.en("PlanetX is either Mars or Venus.");
     }
 
     @Test
@@ -130,8 +134,8 @@ public class NAL3Test extends AbstractNALTest {
         TestNAR tester = test();
         tester.believe("<[marsy,earthly,venusy] --> planetX>",1.0f,0.9f); //.en("PlanetX is Mars, Pluto, or Venus.");
         tester.believe("<[earthly,saturny] --> planetX>", 0.1f, 0.9f); //.en("PlanetX is probably neither Pluto nor Saturn.");
-        tester.mustBelieve(cycles*4, "<[marsy,earthly,saturny,venusy] --> planetX>", 1.0f ,0.81f); //.en("PlanetX is Mars, Pluto, Saturn, or Venus.");
-        tester.mustBelieve(cycles*4, "<[marsy,venusy] --> planetX>", 0.90f ,0.81f); //.en("PlanetX is either Mars or Venus.");
+        tester.mustBelieve(cycles, "<[marsy,earthly,saturny,venusy] --> planetX>", 1.0f ,0.81f); //.en("PlanetX is Mars, Pluto, Saturn, or Venus.");
+        tester.mustBelieve(cycles, "<[marsy,venusy] --> planetX>", 0.90f ,0.81f); //.en("PlanetX is either Mars or Venus.");
 
     }
 
@@ -140,8 +144,8 @@ public class NAL3Test extends AbstractNALTest {
         TestNAR tester = test();
         tester.believe("<{Mars,Pluto,Venus} --> planetX>",1.0f,0.9f); //.en("PlanetX is Mars, Pluto, or Venus.");
         tester.believe("<{Pluto,Saturn} --> planetX>", 0.1f, 0.9f); //.en("PlanetX is probably neither Pluto nor Saturn.");
-        tester.mustBelieve(cycles*4, "<{Mars,Pluto,Saturn,Venus} --> planetX>", 0.1f ,0.81f); //.en("PlanetX is Mars, Pluto, Saturn, or Venus.");
-        tester.mustBelieve(cycles*4, "<{Mars,Venus} --> planetX>", 0.90f ,0.81f); //.en("PlanetX is either Mars or Venus.");
+        tester.mustBelieve(cycles, "<{Mars,Pluto,Saturn,Venus} --> planetX>", 0.1f ,0.81f); //.en("PlanetX is Mars, Pluto, Saturn, or Venus.");
+        tester.mustBelieve(cycles, "<{Mars,Venus} --> planetX>", 0.90f ,0.81f); //.en("PlanetX is either Mars or Venus.");
 
     }
 
@@ -159,7 +163,7 @@ public class NAL3Test extends AbstractNALTest {
         TestNAR tester = test();
         tester.believe("<bird --> animal>",0.9f,0.9f); //.en("Bird is a type of animal.");
         tester.ask("<(|,bird,swimmer) --> (|,animal,swimmer)>"); //.en("Is a swimming bird a type of swimming animal?");
-        tester.mustBelieve(cycles*2, "<(|,bird,swimmer) --> (|,animal,swimmer)>", 0.90f ,0.73f); //.en("A swimming bird is probably a type of swimming animal.");
+        tester.mustBelieve(cycles, "<(|,bird,swimmer) --> (|,animal,swimmer)>", 0.90f ,0.73f); //.en("A swimming bird is probably a type of swimming animal.");
 
         /*<bird --> animal>. %0.9;0.9%
                 <(|,bird,swimmer) --> (|,animal,swimmer)>?*/
@@ -216,7 +220,7 @@ public class NAL3Test extends AbstractNALTest {
         TestNAR tester = test();
         tester.believe("<swan --> bird>",0.9f,0.9f); //.en("Swan is a type of bird.");
         tester.askAt(cycles/2,"<(~,swimmer, swan) --> bird>"); //.en("Is being bird what differ swimmer from swan?");
-        tester.mustBelieve(cycles*2, "<(~,swimmer, swan) --> bird>", 0.10f, 0.73f); //.en("What differs swimmer from swan is not being bird.");
+        tester.mustBelieve(cycles, "<(~,swimmer, swan) --> bird>", 0.10f, 0.73f); //.en("What differs swimmer from swan is not being bird.");
 
     }
 
@@ -232,7 +236,7 @@ public class NAL3Test extends AbstractNALTest {
     public void compound_decomposition_one_premise2()  {
         TestNAR tester = test();
         tester.believe("<(|, boy, girl) --> youth>", 0.9f, 0.9f); //.en("Boys and gials are youth.");
-        tester.mustBelieve(cycles*3, "<boy --> youth>", 0.90f ,0.73f); //.en("Boys are youth.");
+        tester.mustBelieve(cycles, "<boy --> youth>", 0.90f ,0.73f); //.en("Boys are youth.");
 
     }
 
@@ -289,10 +293,10 @@ public class NAL3Test extends AbstractNALTest {
             .believe("<{x,y}-->c>")
             .believe("<{x,z}-->c>")
             .mustBelieve(cycles, "<{x,y,z}-->c>", 1f, 0.81f) //union
-            .mustBelieve(cycles, "<{x}-->c>", 1f, 0.73f) //intersect
-            .mustBelieve(cycles, "<{y}-->c>", 1f, 0.73f) //difference
-            .mustBelieve(cycles, "<{y}-->c>", 0f, 0.73f) //difference
-            .mustBelieve(cycles, "<{z}-->c>", 0f, 0.73f) //difference
+            .mustBelieve(cycles, "<{x}-->c>", 1f, 0.81f) //intersect
+            .mustBelieve(cycles, "<{y}-->c>", 1f, 0.81f) //difference
+            .mustBelieve(cycles, "<{y}-->c>", 0f, 0.81f) //difference
+            .mustBelieve(cycles, "<{z}-->c>", 0f, 0.81f) //difference
         //these are probably ok:
             //.mustNotOutput(cycles,"<{x}-->c>", '.', 0, 0, 0.5f, 1, ETERNAL) //contradiction of input above conf=0.5
             //.mustNotOutput(cycles,"<{x,y}-->c>", '.', 0, 0, 0.5f, 1, ETERNAL) //contradiction of input above conf=0.5

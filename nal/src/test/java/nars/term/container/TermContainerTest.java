@@ -1,7 +1,6 @@
 package nars.term.container;
 
 import nars.$;
-import nars.op.data.differ;
 import nars.term.Compound;
 import org.junit.Test;
 
@@ -55,7 +54,7 @@ public class TermContainerTest {
         Compound x = $("{x}");
         Compound y = $("{y}");
         assertTrue(
-                differ.difference($.terms, x, y) == x
+                $.terms.difference(x.op(), x, y) == x
         );
     }
     @Test
@@ -73,7 +72,7 @@ public class TermContainerTest {
         Compound y = $("{e,d}");
 
         System.out.println($.terms.intersect(x.op(), x, y));
-        System.out.println(differ.difference($.terms, x, y));
+        System.out.println($.terms.difference(x.op(), x, y));
         System.out.println($.terms.union(x.op(), x, y));
 
     }

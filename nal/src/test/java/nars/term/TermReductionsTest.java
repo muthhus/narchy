@@ -2,7 +2,6 @@ package nars.term;
 
 import nars.$;
 import nars.Op;
-import nars.op.data.differ;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.junit.Ignore;
@@ -251,7 +250,7 @@ public class TermReductionsTest {
         //check consistency with differenceSorted
         assertArrayEquals(
                 new Term[]{r, s},
-                ((Compound) differ.difference(Op.SETe, sete(r, p, q, s), sete(p, q))).terms()
+                ((Compound) terms.difference(Op.SETe, sete(r, p, q, s), sete(p, q))).terms()
         );
     }
 
@@ -264,7 +263,7 @@ public class TermReductionsTest {
         //check consistency with differenceSorted
         assertEquals(
                 False,
-                differ.difference(Op.SETe, sete(p, q), sete(p, q))
+                terms.difference(Op.SETe, sete(p, q), sete(p, q))
         );
     }
 
@@ -278,19 +277,11 @@ public class TermReductionsTest {
 
         assertEquals(
                 $("{Mars,Venus}"),
-                differ.difference(
-                        Op.SETe,
-                        $("{Mars,Pluto,Venus}"),
-                        $("{Pluto,Saturn}")
-                )
+                terms.difference(Op.SETe, $("{Mars,Pluto,Venus}"), $.<Compound>$("{Pluto,Saturn}"))
         );
         assertEquals(
                 $("{Saturn}"),
-                differ.difference(
-                        Op.SETe,
-                        $("{Pluto,Saturn}"),
-                        $("{Mars,Pluto,Venus}")
-                )
+                terms.difference(Op.SETe, $("{Pluto,Saturn}"), $.<Compound>$("{Mars,Pluto,Venus}"))
         );
 
 

@@ -5,6 +5,7 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -20,14 +21,16 @@ public final class MapTaskIndex extends TaskIndex {
     @NotNull
     protected final Map<Task, Task> tasks;
 
-    public MapTaskIndex() {
-        this(16 * 1024);
+    public MapTaskIndex(boolean concurrent) {
+        this(concurrent, 1);
     }
 
-    public MapTaskIndex(int initialCapacity) {
+    public MapTaskIndex(boolean concurrent, int initialCapacity) {
         this.tasks =
-                new ConcurrentHashMap<>(initialCapacity/* estimate TODO */);
-                //new ConcurrentHashMapUnsafe(128 * 1024 /* estimate TODO */);
+                concurrent ?
+                    new ConcurrentHashMap<>(initialCapacity/* estimate TODO */):
+                        //new ConcurrentHashMapUnsafe(128 * 1024 /* estimate TODO */);
+                    new HashMap(initialCapacity);
 
         //Caffeine.newBuilder()
 

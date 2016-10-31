@@ -76,8 +76,6 @@ public class DynamicBeliefTableTest {
         CompoundConcept cc = (CompoundConcept) n.concept($("(a:x && a:y)"), true);
         cc.print();
 
-//        System.out.println(cc.beliefs().match(n.task("(a:x && a:y)."), 4));
-//        System.out.println(cc.beliefs().match(n.task("(a:x &&+4 a:y)."), 4));
 
 
         Truth now = cc.belief(n.time());

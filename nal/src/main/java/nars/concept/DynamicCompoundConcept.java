@@ -307,9 +307,7 @@ public class DynamicCompoundConcept extends CompoundConcept {
         @Override
         public @Nullable Task match(long when, long now, @Nullable Task target) {
 
-            Task x = super.match(target.occurrence(), now, target);
-
-            long then = target.occurrence();
+            Task x = super.match(when, now, target);
 
             //if (x == null || then == ETERNAL /*|| Math.abs(then - x.occurrence() ) >= occThresh*/) {
 
@@ -319,13 +317,20 @@ public class DynamicCompoundConcept extends CompoundConcept {
                 //template which may contain temporal relationship to emulate
                 Compound template = x!=null ?  x.term() : term();
 
-                DynTruth yy = truth(then, template, true);
+                DynTruth yy = truth(when, template, true);
                 if (yy!=null) {
                     Truth y = yy.truth();
 
                     if ((y != null)) {
                         @Nullable long[] yEv = yy.evidence();
-                        if ((x == null || (!Stamp.overlapping(target.evidence(), yEv) && y.conf() > x.conf()))) { //!y.equals(x.truth())) {
+                        if (
+                            (x == null)
+                                ||
+                            (
+                                    (target==null || !Stamp.overlapping(target.evidence(), yEv))
+                                            &&
+                                    (y.conf() > x.conf())
+                            )) { //!y.equals(x.truth())) {
 
 
 //                        /*if the belief tables provided a value, interpolate this with the dynamic value to get the final truth value */
@@ -335,7 +340,7 @@ public class DynamicCompoundConcept extends CompoundConcept {
                             //System.err.println(x + " + " + y + " = " + z);
 
                             RevisionTask t = new RevisionTask(template, beliefOrGoal ? Symbols.BELIEF : Symbols.GOAL,
-                                    y, nar.time(), then, yEv);
+                                    y, nar.time(), when, yEv);
                             t.setBudget(yy.budget());
                             t.log("Dynamic");
 
