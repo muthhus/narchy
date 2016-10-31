@@ -25,7 +25,7 @@ public abstract class RealtimeClock implements Clock {
     protected RealtimeClock(int unitsPerSecond, boolean relativeToStart) {
         super();
         this.unitsPerSecod = unitsPerSecond;
-        this.start = relativeToStart ? System.currentTimeMillis() : 0L;
+        this.start = relativeToStart ? getRealTime() : 0L;
 
         setDuration(DEFAULT_DURATION_SECONDS);
 
@@ -48,9 +48,11 @@ public abstract class RealtimeClock implements Clock {
     @Override
     public void clear() {
         tick();
-        t = t0 = (getRealTime()-start);
 
-        start = t;
+        if (start!=0)
+            start = getRealTime();
+
+        t = t0 = (getRealTime()-start);
     }
 
 
@@ -62,23 +64,6 @@ public abstract class RealtimeClock implements Clock {
 
         t = now;
     }
-
-//    static class Lag implements Serializable {
-//
-//        private final double frameTime;
-//        private final int dur;
-//
-//        public Lag(int duration, double frameTime) {
-//            dur = duration;
-//            this.frameTime = frameTime;
-//        }
-//
-//        @NotNull
-//        public String toString() {
-//            return "Lag frameTime=" +
-//                    frameTime + ", duration=" + dur + " cycles)";
-//        }
-//    }
 
 
     @Override
@@ -127,6 +112,25 @@ public abstract class RealtimeClock implements Clock {
         @Override
         protected long getRealTime() {
             return System.currentTimeMillis() / 100;
+        }
+
+    }
+
+    /** centisecond (0.01) accuracy */
+    public static class CS extends RealtimeClock {
+
+
+        public CS() {
+            this(false);
+        }
+
+        public CS(boolean relativeToStart) {
+            super(100, relativeToStart);
+        }
+
+        @Override
+        protected long getRealTime() {
+            return System.currentTimeMillis() / 10;
         }
 
     }

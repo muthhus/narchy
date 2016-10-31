@@ -39,44 +39,30 @@ public final class TruthPolation extends InterpolatingMicrosphere {
 
     }
 
-    public static Focus lightCurve(float dur) {
-        return (dt, evi) -> timeDecay(evi, dur, dt);
-    }
-
     public static float timeDecay(float evi, float dur, float dt) {
-        return dt == 0 ? evi : evi / (1f +
+        //assert(dt > 0);
+        if (dt < 0)
+            throw new UnsupportedOperationException();
+
+        return evi / (1f +
             dt / dur //1st-order linear decay
         );
     }
 
-//    public static float temporalConfidenceLoss(float dt, float evidence, float decayPeriod) {
-//        if (dt <= 0.5f) {
-//            return evidence;
-//        } else {
-////            float eternalized =
-////                    //c2w(TruthFunctions.eternalize(w2c(evidence)));
-////                    evidence/8f;
-//
-//
-//            float newEvidence = evidence * 1f / (1f + (dt*dt) / (decayPeriod/2f));
-//            //System.out.println(dt + "," + evidence + "\t" + decayPeriod + ","+decayFactor + "\t --> " + newEvidence);
-//            //return Math.max(eternalized, newEvidence);
-//            return newEvidence;
-//        }
-//    }
-
-//    public static final InterpolatingMicrosphere.LightCurve evidentialDecayThroughTime = (dt, evidence) -> {
-//        return TruthPolation.temporalConfidenceLoss(dt, evidence, 1f);
-//    };
-
-    @Nullable
-    public Truth truth(long when, float dur, @NotNull Task... tasks) {
-        return truth(when, tasks, lightCurve(dur));
+    @Deprecated private static Focus decayCurve(float dur) {
+        return (dt, evi) -> timeDecay(evi, dur, dt);
     }
 
-    @Nullable
+    /** only used by Tests for now */
+    @Deprecated @Nullable
+    public Truth truth(long when, float dur, @NotNull Task... tasks) {
+        return truth(when, tasks, decayCurve(dur));
+    }
+
+    /** only used by Tests for now */
+    @Deprecated @Nullable
     public Truth truth(long when, float dur, @NotNull Collection<Task> tasks) {
-        return truth(when, tasks.toArray(new Task[tasks.size()]), lightCurve(dur));
+        return truth(when, tasks.toArray(new Task[tasks.size()]), decayCurve(dur));
     }
 
     @Nullable

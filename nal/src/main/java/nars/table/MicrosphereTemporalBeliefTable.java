@@ -25,6 +25,7 @@ import static java.lang.Long.MIN_VALUE;
 import static nars.task.TruthPolation.timeDecay;
 import static nars.time.Tense.ETERNAL;
 import static nars.truth.TruthFunctions.c2w;
+import static nars.truth.TruthFunctions.w2c;
 import static nars.util.Util.sqr;
 
 /**
@@ -175,9 +176,7 @@ public abstract class MicrosphereTemporalBeliefTable implements TemporalBeliefTa
         }
     }
 
-    static float rankTemporalByConfidence(@Nullable Task t, long now, float duration) {
-        return t == null ? -1 : timeDecay(t.confWeight(), duration, Math.abs(t.occurrence() - now));
-    }
+
 
     /** HACK use of volatiles here is a hack. it may rarely cause the bag to experience flashbacks. proper locking can solve this */
     private volatile long minT = MAX_VALUE, maxT = MIN_VALUE;
@@ -205,10 +204,10 @@ public abstract class MicrosphereTemporalBeliefTable implements TemporalBeliefTa
 
     }
 
-    public float duration() {
-        //return (((float)range()) / size()) * 2f;
-        return 1f;
-    }
+//    public float duration() {
+//        //return (((float)range()) / size()) * 2f;
+//        return 1f;
+//    }
 
     @Override
     public boolean removeIf(@NotNull Predicate<? super Task> o, @NotNull  NAR nar) {
@@ -291,8 +290,11 @@ public abstract class MicrosphereTemporalBeliefTable implements TemporalBeliefTa
 
 
     public Task matchWeakest(long now) {
-        float duration = duration();
-        return list.minBy(x -> rankTemporalByConfidence(x, now, duration));
+        return list.minBy(x -> rankTemporalByConfidence(x, now));
+    }
+
+    final float rankTemporalByConfidence(@Nullable Task t, long now) {
+        return t == null ? -1 : focus(Math.abs(t.occurrence() - now), t.confWeight());
     }
 
     public Task matchMerge(long now, @NotNull Task toMergeWith) {
@@ -309,7 +311,6 @@ public abstract class MicrosphereTemporalBeliefTable implements TemporalBeliefTa
         //  more time from now
 
         long yo = y.occurrence();
-        float duration = Math.abs(now - yo);
         float yf = y.freq();
 
         return x -> {
@@ -318,11 +319,9 @@ public abstract class MicrosphereTemporalBeliefTable implements TemporalBeliefTa
 
             long xo = x.occurrence();
 
-            float d2 = duration/2f;
             return (1f + (1f - Math.abs(x.freq() - yf)))
                     * (1f + (1f - y.conf()))
-                    * (1f + (1f - (float)sqr(xo - yo) / d2))
-                    / (1f + (float)sqr(now - xo) / d2);
+                    * (1f + focus(Math.abs(xo-yo), 1));
         };
 
     }
@@ -352,14 +351,13 @@ public abstract class MicrosphereTemporalBeliefTable implements TemporalBeliefTa
             return input; //no need for compression
         }
 
-        float dur = duration();
 
         //return rankTemporalByConfidenceAndOriginality(t, when, now, -1);
-        float inputRank = input != null ? rankTemporalByConfidence(input, now, dur) : Float.POSITIVE_INFINITY;
+        float inputRank = input != null ? rankTemporalByConfidence(input, now) : Float.POSITIVE_INFINITY;
 
         Task a = matchWeakest(now);
         //return rankTemporalByConfidenceAndOriginality(t, when, now, -1);
-        if (a == null || inputRank <= rankTemporalByConfidence(a, now, dur) || !remove(a, nar)) {
+        if (a == null || inputRank <= rankTemporalByConfidence(a, now) || !remove(a, nar)) {
             //dont continue if the input was too weak, or there was a problem removing a (like it got removed already by a different thread or something)
             return null;
         }
@@ -404,19 +402,23 @@ public abstract class MicrosphereTemporalBeliefTable implements TemporalBeliefTa
 
 
 
-        float dur = duration();
         if (against == null) {
 
             //System.out.println(this + " against: " + against + " @ " + now);
 
             //list.forEach(x -> System.out.println("\t" + x + "  " + rankTemporalByConfidence(x, now, dur)));
 
-            Task l = list.maxBy(x -> rankTemporalByConfidence(x, now, dur));
+            Task l = list.maxBy(x -> rankTemporalByConfidence(x, now));
             //System.out.println(l);
             return l;
 
         } else {
-            return list.maxBy(x -> rankTemporalByConfidence(x, against.occurrence(), dur));
+            return list.maxBy(x -> {
+                long occurrence = against.occurrence();
+                if (occurrence == ETERNAL)
+                    occurrence = now;
+                return rankTemporalByConfidence(x, occurrence);
+            });
             //return list.maxBy(rankPenalizingOverlap(now, against));
         }
 
@@ -458,18 +460,12 @@ public abstract class MicrosphereTemporalBeliefTable implements TemporalBeliefTa
                     if (delta == 0)
                         return res; //as-is
                     else {
-                        //return res.eternalize();
-                        return $.t(res.freq(), focus(delta, res.confWeight()));
+                        return $.t(res.freq(), w2c(focus(delta, res.confWeight())));
                     }
-
-                    //return Revision.project(res, when, now, o, false);
-                    //adjust evidence by the lightcurve
-
                 }
 
             default:
-                InterpolatingMicrosphere.Focus x = TruthPolation.lightCurve(duration());
-                return new TruthPolation(s).truth(when, tr, x);
+                return new TruthPolation(s).truth(when, tr, this);
         }
 
     }

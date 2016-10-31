@@ -33,7 +33,12 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, Sorted
 
         @Override
         public @Nullable Task put(@NotNull Task incoming) {
-            throw new UnsupportedOperationException();
+            throw new UnsupportedOperationException(incoming + " not insertable into EternalTable.EMPTY");
+        }
+
+        @Override
+        public final int capacity() {
+            return 0;
         }
 
         @Override
