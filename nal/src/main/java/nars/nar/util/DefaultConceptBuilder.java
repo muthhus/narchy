@@ -35,7 +35,7 @@ import java.util.function.Function;
 /**
  * Created by me on 2/24/16.
  */
- public class DefaultConceptBuilder implements ConceptBuilder {
+public class DefaultConceptBuilder implements ConceptBuilder {
 
     public DefaultConceptBuilder() {
 
@@ -74,7 +74,6 @@ import java.util.function.Function;
     }
 
 
-
     @NotNull
     private final ConceptPolicy init;
     @NotNull
@@ -90,7 +89,7 @@ import java.util.function.Function;
 //            (Variable v) -> new VariableConcept(v);
 
     @Nullable
-    final Concept newConcept(@NotNull Compound t){
+    final Concept newConcept(@NotNull Compound t) {
 
 //        Map map1 = newBagMap(DEFAULT_CONCEPT_LINK_MAP_CAPACITY);
 //        Map map2 =
@@ -121,28 +120,27 @@ import java.util.function.Function;
         }
 
         return
-            (!dynamic) ?
-                new CompoundConcept<>(t, termbag, taskbag, nar)
-                    :
-                new DynamicCompoundConcept(t, termbag, taskbag, nar)
-        ;
+                (!dynamic) ?
+                        new CompoundConcept<>(t, termbag, taskbag, nar)
+                        :
+                        new DynamicCompoundConcept(t, termbag, taskbag, nar)
+                ;
 
     }
 
-    /** use average blend so that reactivations of adjusted task budgets can be applied repeatedly without inflating the link budgets they activate; see CompoundConcept.process */
+    /**
+     * use average blend so that reactivations of adjusted task budgets can be applied repeatedly without inflating the link budgets they activate; see CompoundConcept.process
+     */
     private final BudgetMerge mergeDefault = BudgetMerge
             .plusBlend;
-            //.avgBlend;
+    //.avgBlend;
 
 
     final static Logger logger = LoggerFactory.getLogger(DefaultConceptBuilder.class);
 
 
-
     @NotNull
     public CurveBag.CurveSampler defaultCurveSampler; //shared
-
-
 
 
     @Override
@@ -185,7 +183,7 @@ import java.util.function.Function;
                 //Map m = newBagMap(DEFAULT_ATOM_LINK_MAP_CAPACITY);
 
                 Map sharedMap = newBagMap();
-                result = new TermjectConcept((Termject)term, newCurveBag(sharedMap), newCurveBag(sharedMap));
+                result = new TermjectConcept((Termject) term, newCurveBag(sharedMap), newCurveBag(sharedMap));
             }
 
             if (term instanceof Variable) {
@@ -193,8 +191,7 @@ import java.util.function.Function;
                 //serial++;
                 //result = varBuilder.apply((Variable) term);
                 return term;
-            }
-            else if (term instanceof Atomic) {
+            } else if (term instanceof Atomic) {
                 result = atomBuilder.apply((Atomic) term);
             }
 
@@ -202,7 +199,7 @@ import java.util.function.Function;
         if (result == null) {
             throw new UnsupportedOperationException(
                     "unknown conceptualization method for term \"" +
-                            term + "\" of class: "  + term.getClass()
+                            term + "\" of class: " + term.getClass()
             );
         }
 
@@ -217,6 +214,7 @@ import java.util.function.Function;
     public ConceptPolicy init() {
         return init;
     }
+
     @NotNull
     @Override
     public ConceptPolicy awake() {
@@ -232,15 +230,36 @@ import java.util.function.Function;
     @NotNull
     public Map newBagMap() {
         //int defaultInitialCap = 0;
-//        if (nar.exe.concurrent()) {
+        float loadFactor = 0.9f;
+
+        if (nar.exe.concurrent()) {
 //            //return new ConcurrentHashMap(defaultInitialCap, 1f);
 //            //return new NonBlockingHashMap(cap);
 //            return new org.eclipse.collections.impl.map.mutable.ConcurrentHashMapUnsafe<>();
 //            //ConcurrentHashMapUnsafe(cap);
 //        } else {
 //            return new HashMap(defaultInitialCap, 1f);
-              return new UnifiedMap(0, 0.9f);
-//        }
+            return new SynchronizedUnifiedMap(0, loadFactor);
+        } else {
+            return new UnifiedMap(0, loadFactor);
+        }
 
+    }
+
+    public static final class SynchronizedUnifiedMap<K, V> extends UnifiedMap<K, V> {
+
+        public SynchronizedUnifiedMap(int cap, float loadFactor) {
+            super(cap, loadFactor);
+        }
+
+        @Override
+        public synchronized V remove(Object key) {
+            return super.remove(key);
+        }
+
+        @Override
+        public synchronized V compute(K key, BiFunction<? super K, ? super V, ? extends V> remappingFunction) {
+            return super.compute(key, remappingFunction);
+        }
     }
 }

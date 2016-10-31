@@ -104,9 +104,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
                     //items.addInternal(toAdd); //grows the list if necessary
                 } else {
                     //throw new RuntimeException("list became full during insert");
-                    synchronized (map) {
-                        map.remove(toAdd.get());
-                    }
+                    map.remove(toAdd.get());
                     return false;
                 }
 
@@ -152,9 +150,8 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
 
                 V k = w.get();
 
-                synchronized (map) {
-                    map.remove(k);
-                }
+
+                map.remove(k);
 
 //                    if (k2 != w && k2 != null) {
 //                        //throw new RuntimeException(
@@ -334,10 +331,8 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
 
         Insertion ii = new Insertion(bp);
 
-        BLink<V> v;
-        synchronized (map) {
-            v = map.compute(key, ii);
-        }
+        BLink<V> v = map.compute(key, ii);
+
 
         int r = ii.result;
         switch (r) {
@@ -345,9 +340,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
                 Budget vv = v.clone();
                 if (vv == null) {
                     //it has been deleted
-                    synchronized (map) {
-                        map.remove(key);
-                    }
+                    map.remove(key);
                     return;
                 }
 
@@ -572,9 +565,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
         return lowestUnsorted;
     }
 
-    /**
-     * must be called in synchronized(items) block
-     */
+
     private int removeDeleted(@NotNull List<BLink<V>> removed) {
 
 
@@ -760,9 +751,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
     @NotNull
     @Override
     public String toString() {
-        //synchronized (map) {
         return super.toString() + '{' + items.getClass().getSimpleName() + '}';
-        //}
     }
 
 

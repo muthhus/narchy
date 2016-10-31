@@ -21,11 +21,12 @@ import java.util.stream.IntStream;
 /**
  * Created by me on 10/15/16.
  */
-public class TrainVector {
+public class Outputs {
 
     public double errorSum() {
         return out.values().stream().mapToDouble(x -> x.error).map(x -> x==x ? x : 1f).sum();
     }
+
 
     static class Neuron {
 
@@ -63,13 +64,35 @@ public class TrainVector {
             } else if (a != a) {
                 this.error = 1f;
             } else {
-                this.error = ( 1f + Math.abs(a - e) ) * (1f + this.actualConf);
+                this.error = ( Math.abs(a - e) ) * ( this.actualConf);
             }
         }
     }
 
+    public float[] expected(float[] output) {
+        output = sized(output);
+        for (int i = 0; i < outVector.length; i++)
+            output[i] = expected(i);
+        return output;
+    }
+
+    public float[] actual(float[] output, long when) {
+        output = sized(output);
+        for (int i = 0; i < outVector.length; i++)
+            output[i] = actual(i, when);
+        return output;
+    }
+
+    float[] sized(float[] output) {
+        if (output == null || output.length!=states) {
+            output = new float[states];
+        }
+        return output;
+    }
+
+
     final LinkedHashMap<Concept,Neuron> out;
-    private Concept[] outVector;
+    Concept[] outVector;
 
     final int states;
 
@@ -79,7 +102,7 @@ public class TrainVector {
     boolean verify = false;
 
 
-    public TrainVector(IntFunction<Compound> namer, int maxStates, NAgent a) {
+    public Outputs(IntFunction<Compound> namer, int maxStates, NAgent a) {
         this.nar = a.nar;
         this.states = maxStates;
         this.out = new LinkedHashMap<>(maxStates);
@@ -87,7 +110,7 @@ public class TrainVector {
                     Compound tt = namer.apply(i);
                     return a.action(tt, (b, d) -> {
                         if (train) {
-                            float ee = out.get(outVector[i]).expected;
+                            float ee = expected(i);
 
                             float thresh = 0.1f;
                             if (d==null || Math.abs(ee-d.freq())>thresh) {
@@ -136,6 +159,10 @@ public class TrainVector {
         });
     }
 
+    public float expected(int i) {
+        return out.get(outVector[i]).expected;
+    }
+
 
     public float actual(int state, long when) {
         return actual(outVector[state], when);
@@ -167,7 +194,6 @@ public class TrainVector {
     public void verify() {
         verify = true;
         train = false;
-
     }
 
     public float error(Compound c) {

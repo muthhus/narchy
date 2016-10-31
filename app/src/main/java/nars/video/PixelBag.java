@@ -1,9 +1,12 @@
 package nars.video;
 
+import nars.$;
 import nars.NAgent;
+import nars.concept.ActionConcept;
 import nars.util.data.random.XorShift128PlusRandom;
 
 import java.awt.image.BufferedImage;
+import java.util.List;
 import java.util.Random;
 import java.util.function.Supplier;
 
@@ -43,6 +46,7 @@ public class PixelBag implements Bitmap2D {
     float maxZoomOut = 1;
 
     public boolean vflip = false;
+    public List<ActionConcept> actions;
 
 
     public PixelBag(BufferedImage b, int px, int py) {
@@ -194,9 +198,10 @@ public class PixelBag implements Bitmap2D {
     }
 
     public PixelBag addActions(String termRoot, NAgent a) {
-        a.actionBipolar(termRoot + ":moveX", this::setX);
-        a.actionBipolar(termRoot + ":moveY", this::setY);
-        a.actionBipolar(termRoot + ":zoom", this::setZ);
+        actions = $.newArrayList(3);
+        actions.add( a.actionBipolar(termRoot + ":moveX", this::setX) );
+        actions.add( a.actionBipolar(termRoot + ":moveY", this::setY) );
+        actions.add( a.actionBipolar(termRoot + ":zoom", this::setZ) );
         return this;
     }
 

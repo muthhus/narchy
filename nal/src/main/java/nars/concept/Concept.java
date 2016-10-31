@@ -205,12 +205,6 @@ public interface Concept extends Termed {
         return (t != null) ? t.conf() : ifMissing;
     }
 
-    @Nullable
-    default float goalFreq(long now, float ifMissing) {
-        Truth t = goals().truth(now);
-        return (t != null) ? t.freq() : ifMissing;
-    }
-
 
     @Nullable
     default TaskTable tableFor(char punc) {
@@ -442,16 +436,28 @@ public interface Concept extends Termed {
     }
 
     default float beliefFreq(long time) {
-        return freq(time, beliefs());
+        return beliefFreq(time, Float.NaN);
+    }
+
+    default float beliefFreq(long time, float valueIfNonExistent) {
+        return freq(time, beliefs(), valueIfNonExistent);
     }
 
     default float goalFreq(long time) {
-        return freq(time, goals());
+        return goalFreq(time, Float.NaN);
+    }
+
+    default float goalFreq(long time, float valueIfNonExistent) {
+        return freq(time, goals(), valueIfNonExistent);
     }
 
     static float freq(long time, @NotNull BeliefTable table) {
+        return freq(time, table, Float.NaN);
+    }
+
+    static float freq(long time, @NotNull BeliefTable table, float valueIfNonExistent) {
         Truth t = table.truth(time);
-        return t != null ? t.freq() : Float.NaN;
+        return t != null ? t.freq() : valueIfNonExistent;
     }
 
     Activation process(@NotNull Task input, NAR nar);

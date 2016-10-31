@@ -232,8 +232,6 @@ public class Plot2D extends Surface {
 
     public static final PlotVis Line = (List<Series> series, GL2 gl, float minValue, float maxValue) -> {
 
-        float labelDZ = 0.1f;
-        float rangeFontScale = 0.0005f;
 
         //background
         gl.glColor4f(0,0,0,0.75f);
@@ -248,13 +246,13 @@ public class Plot2D extends Surface {
 
             gl.glColor4f(0.5f,0.5f,0.5f, 0.75f); //gray
 
-            //g.fillText(String.valueOf(maxValue), 0, m + g.getFont().getSize());
-            Draw.text(gl, rangeFontScale, rangeFontScale, n2(minValue), 0, 0, labelDZ);
+
+            Draw.text(gl, n2(minValue), 0.1f, 0, 0, 0, Draw.TextAlignment.Left);
 
             Draw.line(gl, 0, 0, W, 0);
             Draw.line(gl, 0, H, W, H);
 
-            Draw.text(gl, rangeFontScale, rangeFontScale, n2(maxValue), 0, H, labelDZ);
+            Draw.text(gl, n2(maxValue), 0.1f, 0, H, 0, Draw.TextAlignment.Left);
 
             for (int si = 0, seriesSize = series.size(); si < seriesSize; si++) {
 
