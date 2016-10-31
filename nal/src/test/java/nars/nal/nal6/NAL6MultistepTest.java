@@ -42,9 +42,9 @@ public class NAL6MultistepTest {
                 "(p_alarm1). %0.9;0.9%",
                 "(p_alarm2). %0.8;0.9%",
                 "(p_alarm3). %0.1;0.9%",
-                "((&&, (burglary), (earthquake), (p_alarm1)) ==> (alarm)).",
-                "((&&, (burglary), (--,(earthquake)), (p_alarm2)) ==> (alarm)).",
-                "((&&, (--,(burglary)), (earthquake), (p_alarm3)) ==> (alarm)).",
+                "((&&, (burglary), (earthquake), (p_alarm1)) ==> (alarm)). %1.0;0.95%",
+                "((&&, (burglary), (--,(earthquake)), (p_alarm2)) ==> (alarm)). %1.0;0.95%",
+                "((&&, (--,(burglary)), (earthquake), (p_alarm3)) ==> (alarm)). %1.0;0.95%",
                 "(alarm).",
                 "(burglary)?",
                 "(earthquake)?"
@@ -56,8 +56,8 @@ public class NAL6MultistepTest {
         for (int i = 0; i < 5; i++) {
             // burglary.print();  earthquake.print();
             //long now = d.time();
+            d.run(30);
             System.out.println("burglary=" + burglary.belief(Tense.ETERNAL) + "\tearthquake=" + earthquake.belief(Tense.ETERNAL));
-            d.run(400);
         }
 
         //result from Probcog:  earthquake=23%, burglary=99%

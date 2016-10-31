@@ -38,8 +38,8 @@ public class DynamicCompoundConcept extends CompoundConcept {
     public DynamicCompoundConcept(@NotNull Compound term, @NotNull Bag termLinks, @NotNull Bag taskLinks, @NotNull NAR nar) {
         super(term, termLinks, taskLinks, nar);
         this.nar = nar;
-        this.beliefs = newBeliefTable(nar, true, 0,1 /* initial space */);
-        this.goals = newBeliefTable(nar, false, 0,1 /* initial space */);
+        this.beliefs = newBeliefTable(nar, true, 1,1 /* initial space */);
+        this.goals = newBeliefTable(nar, false, 1,1 /* initial space */);
     }
 
     public static final class DynTruth {
@@ -91,7 +91,7 @@ public class DynamicCompoundConcept extends CompoundConcept {
 
     @Override
     protected BeliefTable newBeliefTable(NAR nar, boolean beliefOrGoal, int eCap, int tCap) {
-        return new DynamicBeliefTable(beliefOrGoal, tCap);
+        return new DynamicBeliefTable(beliefOrGoal, eCap, tCap);
     }
 //    @NotNull
 //    @Override
@@ -103,9 +103,9 @@ public class DynamicCompoundConcept extends CompoundConcept {
 
         private final boolean beliefOrGoal;
 
-        public DynamicBeliefTable(boolean beliefOrGoal, int tCap) {
+        public DynamicBeliefTable(boolean beliefOrGoal, int eCap, int tCap) {
 
-            super(EternalTable.EMPTY, newTemporalTable(tCap, nar));
+            super(newEternalTable(eCap), newTemporalTable(tCap, nar));
             this.beliefOrGoal = beliefOrGoal;
         }
 

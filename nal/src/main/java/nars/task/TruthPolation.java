@@ -41,8 +41,8 @@ public final class TruthPolation extends InterpolatingMicrosphere {
 
     public static float timeDecay(float evi, float dur, float dt) {
         //assert(dt > 0);
-        if (dt < 0)
-            throw new UnsupportedOperationException();
+//        if (dt < 0)
+//            throw new UnsupportedOperationException();
 
         return evi / (1f +
             dt / dur //1st-order linear decay
