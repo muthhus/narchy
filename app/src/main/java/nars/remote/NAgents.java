@@ -79,7 +79,7 @@ abstract public class NAgents extends NAgent {
     public static void runRT(Function<NAR, NAgents> init) {
 
 
-        Default nar = NAgents.newMultiThreadNAR(3, new RealtimeClock.DS(true).setDuration(0.1f), false);
+        Default nar = NAgents.newMultiThreadNAR(3, new RealtimeClock.DS(true).setDuration(0.04f), false);
         //Default nar = newNAR();
         //Default2 nar = newNAR2();
 

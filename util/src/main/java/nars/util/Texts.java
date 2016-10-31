@@ -282,6 +282,9 @@ public enum Texts {
     }
 
     public static String n2(float x) {
+        if (x!=x)
+            return "Nn"; //NaN
+
         if ((x < 0) || (x > 1.0f))
             return twoDecimal.format(x);
 

@@ -1,14 +1,9 @@
 package nars.experiment.recog2d;
 
-import nars.$;
 import nars.NAR;
 import nars.NAgent;
-import nars.concept.ActionConcept;
 import nars.concept.Concept;
-import nars.concept.SensorConcept;
 import nars.term.Compound;
-import nars.term.Termed;
-import nars.time.Tense;
 import nars.truth.Truth;
 import org.eclipse.collections.api.block.function.primitive.IntToFloatFunction;
 
@@ -44,12 +39,12 @@ public class Outputs {
             error = 0;
         }
 
-        public void expect(float expected, long when) {
+        public void expect(float expected) {
             this.expected = expected ;
             update();
         }
 
-        public void actual(float f, float c, long when) {
+        public void actual(float f, float c) {
             this.actual = f;
             this.actualConf = c;
             update();
@@ -75,10 +70,10 @@ public class Outputs {
         return output;
     }
 
-    public float[] actual(float[] output, long when) {
+    public float[] actual(float[] output) {
         output = sized(output);
         for (int i = 0; i < outVector.length; i++)
-            output[i] = actual(i, when);
+            output[i] = actual(i);
         return output;
     }
 
@@ -143,16 +138,19 @@ public class Outputs {
         a.nar.onFrame(nn -> {
             long now = nar.time();
             out.forEach((cc, nnn) -> {
-                Truth t = cc.belief(now);
+
+                Truth t =
+                        //cc.belief(now);
+                        cc.goal(now);
                 float f, c;
                 if (t == null) {
-                    f = Float.NaN;
+                    f = 0; //Float.NaN;
                     c = Float.NaN;
                 } else {
                     f = t.freq();
                     c = t.conf();
                 }
-                nnn.actual(f, c, now);
+                nnn.actual(f, c);
             });
 
         });
@@ -163,17 +161,19 @@ public class Outputs {
     }
 
 
-    public float actual(int state, long when) {
-        return actual(outVector[state], when);
+    public float actual(int state) {
+
+        //return actual(outVector[state], when);
+        return out.get(outVector[state]).actual;
     }
-    public float actual(Termed<Compound> state, long when) {
-        return nar.concept(state).beliefFreq(when);
-    }
+//    public float actual(Termed<Compound> state, long when) {
+//        return nar.concept(state).beliefFreq(when);
+//    }
 
     public void expect(IntToFloatFunction stateValue) {
-        long now = nar.time();
+        //long now = nar.time();
         for (int i = 0; i < states; i++)
-            out.get(outVector[i]).expect( stateValue.valueOf(i), now );
+            out.get(outVector[i]).expect( stateValue.valueOf(i));
     }
 
     public void expect(int onlyStateToBeOn) {

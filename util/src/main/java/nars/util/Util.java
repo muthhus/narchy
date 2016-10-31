@@ -1173,15 +1173,22 @@ public enum Util { ;
         return System.getProperty("java.io.tmpdir");
     }
 
-    public static float sum(float[] x) {
+    public static float sum(float... x) {
         float y = 0;
         for (float f : x) {
             y += f;
         }
         return y;
     }
+    public static float sumAbs(float... x) {
+        float y = 0;
+        for (float f : x) {
+            y += Math.abs(f);
+        }
+        return y;
+    }
 
-    public static int argmax(final double[] vec) {
+    public static int argmax(final double... vec) {
         int result = -1;
         double max = Double.NEGATIVE_INFINITY;
 
@@ -1208,7 +1215,7 @@ public enum Util { ;
         }
     }
 
-    public static int argmax(float[] vec, Random random) {
+    public static int argmax(Random random, float... vec) {
         int result = -1;
         float max = Float.NEGATIVE_INFINITY;
 
