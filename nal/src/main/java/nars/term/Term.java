@@ -385,7 +385,6 @@ public interface Term extends Termed, Termlike, Comparable<Termlike> {
             if (diff3 != 0)
                 return diff3;
 
-            //return Integer.compare(cx.dt(), cy.dt());
             return cx.dt() - cy.dt();
 
         } else if (this instanceof AbstractVariable) {

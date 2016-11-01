@@ -89,13 +89,13 @@ public abstract class TermIndex extends TermBuilder {
      */
     public abstract int size();
 
-    @Nullable
+    @NotNull
     abstract public ConceptBuilder conceptBuilder();
 
     /**
      * override to possibly intern termcontainers
      */
-    public TermContainer intern(TermContainer s) {
+    @NotNull public TermContainer intern(@NotNull TermContainer s) {
         return s;
     }
 

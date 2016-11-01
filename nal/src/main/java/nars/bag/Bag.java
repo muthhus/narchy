@@ -602,10 +602,8 @@ public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Iterable<BLink<
         BLink<V> x = sample();
         if (x!=null) {
             V v = x.get();
-            if (v!=null) {
-                remove(v);
-                return x;
-            }
+            remove(v);
+            return x;
         }
         return null;
     }

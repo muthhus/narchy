@@ -21,8 +21,6 @@ import static nars.Op.*;
 
 /**
  * 1-iteration DepVar and IndepVar introduction that emulates and expands the original NAL6 Variable Introduction Rules
- * <p>
- * allows promoting query variables to dep/indep vars
  */
 public class DepIndepVarIntroduction extends VarIntroduction {
 
@@ -72,10 +70,10 @@ public class DepIndepVarIntroduction extends VarIntroduction {
         }
 
 
-
-        ObjectByteHashMap<Term> conjCoverage = new ObjectByteHashMap<>(p.size());
-        ObjectByteHashMap<Term> indepEquivCoverage = new ObjectByteHashMap<>(p.size() /* estimate */);
-        for (int occurrence = 0, pSize = p.size(); occurrence < pSize; occurrence++) {
+        int pSize = p.size();
+        ObjectByteHashMap<Term> conjCoverage = new ObjectByteHashMap<>(pSize);
+        ObjectByteHashMap<Term> indepEquivCoverage = new ObjectByteHashMap<>(pSize /* estimate */);
+        for (int occurrence = 0; occurrence < pSize; occurrence++) {
             byte[] path = p.get(occurrence);
             Term t = null; //root
             int pathLength = path.length;

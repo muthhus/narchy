@@ -75,7 +75,7 @@ public interface Compound extends Term, IPair, TermContainer {
     @NotNull
     default Set<Term> recurseTermsToSet() {
         Set<Term> t = $.newHashSet(volume());
-        recurseTerms((x) -> t.add(x));
+        recurseTerms(t::add);
         return t;
     }
 

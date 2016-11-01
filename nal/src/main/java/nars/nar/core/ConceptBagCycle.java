@@ -30,7 +30,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
@@ -40,14 +39,12 @@ import java.util.function.Consumer;
  *
  * multithreading granularity at the concept (outermost loop)
  */
-public class ConceptBagCycle implements Consumer<NAR> {
+public class ConceptBagCycle {
 
 
     private static final Logger logger = LoggerFactory.getLogger(ConceptBagCycle.class);
 
     final static Deriver deriver = Deriver.getDefaultDeriver();
-
-
 
     /**
      * concepts active in this cycle
@@ -80,6 +77,7 @@ public class ConceptBagCycle implements Consumer<NAR> {
     private int _tasklinks, _termlinks;
     private long now;
 
+    final AtomicBoolean busy = new AtomicBoolean(false);
 
 //    private Comparator<? super BLink<Concept>> sortConceptLinks = (a, b) -> {
 //        Concept A = a.get();
@@ -102,7 +100,45 @@ public class ConceptBagCycle implements Consumer<NAR> {
         this.active = new BagIndexAdapter(initialCapacity, ((DefaultConceptBuilder) conceptBuilder).defaultCurveSampler);
 
 
-        nar.onFrame(this);
+        //nar.onFrame(this);
+        nar.onFrame((n) -> {
+            if (busy.compareAndSet(false, true)) {
+                now = nar.time();
+
+                //updae concept bag
+                active.commit();
+
+                float load = nar.exe.load();
+
+                int cpf = Math.round(conceptsFiredPerCycle.floatValue() * (1f - load));
+                if (cpf > 0) {
+
+
+                    //logger.info("firing {} concepts (exe load={})", cpf, load);
+
+                    this._tasklinks = tasklinksFiredPerFiredConcept.intValue();
+                    this._termlinks = termlinksFiredPerFiredConcept.intValue();
+
+                    List<BLink<Concept>> toFire = $.newArrayList(cpf);
+                    active.sample(cpf, toFire::add);
+
+                    //toFire.sort(sortConceptLinks);
+
+                    this.nar.runLater(toFire, bc -> {
+                        Concept c = bc.get();
+                        PremiseMatrix.run(c, this.nar,
+                                _tasklinks, _termlinks,
+                                this.nar::input, //input them within the current thread here
+                                deriver
+                        );
+                    }, 1);
+
+                }
+
+                busy.set(false);
+            }
+
+        });
         nar.eventReset.on((n)->active.clear());
 
     }
@@ -119,50 +155,8 @@ public class ConceptBagCycle implements Consumer<NAR> {
 
 
 
-    final AtomicBoolean busy = new AtomicBoolean(false);
-
-    /** called each frame */
-    @Override public void accept(@NotNull NAR nar) {
-
-        if (busy.compareAndSet(false, true)) {
-            now = nar.time();
-
-            //updae concept bag
-            active.commit();
-
-            float load = nar.exe.load();
-
-            int cpf = Math.round(conceptsFiredPerCycle.floatValue() * (1f - load));
-            if (cpf > 0) {
 
 
-                //logger.info("firing {} concepts (exe load={})", cpf, load);
-
-                this._tasklinks = tasklinksFiredPerFiredConcept.intValue();
-                this._termlinks = termlinksFiredPerFiredConcept.intValue();
-
-                List<BLink<Concept>> toFire = $.newArrayList(cpf);
-                active.sample(cpf, toFire::add);
-
-                //toFire.sort(sortConceptLinks);
-
-                this.nar.runLater(toFire, bc -> {
-                    Concept c = bc.get();
-                    if (c != null) {
-                        PremiseMatrix.run(c, this.nar,
-                                _tasklinks, _termlinks,
-                                this.nar::input, //input them within the current thread here
-                                deriver
-                        );
-                    }
-                }, 1);
-
-            }
-
-            busy.set(false);
-        }
-
-    }
 
     public void activate(@NotNull ObjectFloatHashMap<Concept> activations, @NotNull Budgeted in, float activation, MutableFloat overflow) {
         this.active.put(activations, in, activation, overflow);
@@ -191,46 +185,44 @@ public class ConceptBagCycle implements Consumer<NAR> {
             );
         }
 
-        final AtomicBoolean busyPut = new AtomicBoolean(false);
-        final ArrayBlockingQueue<Object[]> pending =
-                //ArrayBlockingQueue
-                new ArrayBlockingQueue(8);
-
-        @Override
-        public void put(ObjectFloatHashMap<? extends Concept> values, Budgeted in, float scale, MutableFloat overflow) {
-            if (busyPut.compareAndSet(false, true)) {
-
-                //synchronized (items) {
-                    super.put(values, in, scale, overflow);
-
-                    //process any pending that arrived
-                    Object[] p;
-                    while ((p = pending.poll()) != null) {
-                        super.put((ObjectFloatHashMap) p[0], (Budgeted) p[1], (float) p[2], (MutableFloat) p[3]);
-                    }
-                //}
-
-                busyPut.set(false);
-            } else {
-                try {
-                    values.compact();
-                    pending.put(new Object[] { values, in, scale, overflow });
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
+//        final AtomicBoolean busyPut = new AtomicBoolean(false);
+//        final ArrayBlockingQueue<Object[]> pending =
+//                //ArrayBlockingQueue
+//                new ArrayBlockingQueue(8);
+//
+//        @Override
+//        public void put(ObjectFloatHashMap<? extends Concept> values, Budgeted in, float scale, MutableFloat overflow) {
+//            if (busyPut.compareAndSet(false, true)) {
+//
+//                //synchronized (items) {
+//                    super.put(values, in, scale, overflow);
+//
+//                    //process any pending that arrived
+//                    Object[] p;
+//                    while ((p = pending.poll()) != null) {
+//                        super.put((ObjectFloatHashMap) p[0], (Budgeted) p[1], (float) p[2], (MutableFloat) p[3]);
+//                    }
+//                //}
+//
+//                busyPut.set(false);
+//            } else {
+//                try {
+//                    values.compact();
+//                    pending.put(new Object[] { values, in, scale, overflow });
+//                } catch (InterruptedException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//        }
 
         @Override
         public void clear() {
             forEach((BLink<Concept> v) -> {
-                if (v!=null) {
-                    Concept c = v.get();
-                    if (c!=null) {
-                        sleep(c);
-                        c.put(this, null);
-                    }
-                }
+
+                Concept c = v.get();
+                sleep(c);
+                c.put(this, null);
+
                 //TODO clear BudgetSavings in the meta maps
             }); //HACK allow opportunity to process removals
             super.clear();
@@ -243,8 +235,6 @@ public class ConceptBagCycle implements Consumer<NAR> {
         @Override
         public final void onAdded(@NotNull BLink<Concept> v) {
             Concept c = v.get();
-            if (c == null)
-                throw new NullPointerException();
 
             float forgetPeriod = getForgetPeriod();
 

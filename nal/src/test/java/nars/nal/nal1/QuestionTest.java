@@ -19,9 +19,12 @@ import java.util.Arrays;
 import java.util.DoubleSummaryStatistics;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.BiFunction;
+import java.util.function.IntFunction;
 
 import static nars.time.Tense.ETERNAL;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -116,53 +119,71 @@ public class QuestionTest {
 
     }
 
+    /** tests whether the use of a question guides inference as measured by the speed to reach a specific conclusion */
     @Test public void questionDrivesInference() {
-        long seed  = 1;
 
-        final int[] dims = {3, 2};
-        final int timelimit = 3000;
+        final int[] dims = {4, 3};
+        final int timelimit = 23000;
 
         TaskStatistics withTasks = new TaskStatistics();
         TaskStatistics withoutTasks = new TaskStatistics();
-        DoubleSummaryStatistics with = new DoubleSummaryStatistics();
-        DoubleSummaryStatistics withOut = new DoubleSummaryStatistics();
+        DoubleSummaryStatistics withTime = new DoubleSummaryStatistics();
+        DoubleSummaryStatistics withOutTime = new DoubleSummaryStatistics();
+
+        IntFunction<NAR> narProvider = (seed) -> {
+            NAR d = new Default(256, 1, 1, 1);
+            d.random.setSeed(seed);
+            d.nal(4);
+            return d;
+        };
+
+        BiFunction<Integer,Integer,TestNAR> testProvider = (seed, variation) -> {
+            NAR n = narProvider.apply(seed);
+            TestNAR t = new TestNAR(n);
+            switch (variation) {
+                case 0:
+                    new DeductiveMeshTest(t, dims, timelimit);
+                    break;
+                case 1:
+                    new DeductiveMeshTest(t, dims, timelimit) {
+                        @Override
+                        public void ask(@NotNull TestNAR n, Compound term) {
+                            //disabled
+                        }
+                    };
+                    break;
+            }
+            return t;
+        };
+
         for (int i = 0; i < 10; i++) {
-            TestNAR withQuestion = new TestNAR(new Default());
-            withQuestion.nar.random.setSeed(seed++);
-            withQuestion.nar.nal(4);
+            int seed = i + 1;
 
-            new DeductiveMeshTest(withQuestion, dims, timelimit);
-            withQuestion.run(true);
+            {
+                TestNAR withQuestion = testProvider.apply(seed, 0);
+                withQuestion.run(true);
+                withTime.accept(withQuestion.time());
+                withTasks.add(withQuestion.nar);
+            }
 
-
-
-            TestNAR withoutQuestion = new TestNAR(new Default());
-            withoutQuestion.nar.random.setSeed(seed++);
-            withoutQuestion.nar.nal(4);
-
-            new DeductiveMeshTest(withoutQuestion, dims, timelimit) {
-                @Override
-                public void ask(@NotNull TestNAR n, Compound term) {
-                    //disabled
-                }
-            };
-            withoutQuestion.run(true);
-
-            long withQuestionTime = withQuestion.time();
-            with.accept(withQuestionTime);
-            long withoutQuestionTime = withoutQuestion.time();
-            withOut.accept(withoutQuestionTime);
-
-            System.out.println("with: " + withQuestionTime + " vs without: " + withoutQuestionTime);
-
-            withTasks.add(withQuestion.nar);
-            withoutTasks.add(withoutQuestion.nar);
+            {
+                TestNAR withoutQuestion = testProvider.apply(seed, 1);
+                withoutQuestion.run(true);
+                withOutTime.accept(withoutQuestion.time());
+                withoutTasks.add(withoutQuestion.nar);
+            }
         }
 
-        System.out.println("with: " + with + "\n");
         withTasks.print();
-        System.out.println("withOut: " + withOut + "\n" + withoutTasks);
         withoutTasks.print();
+
+        assertNotEquals(withTime, withOutTime);
+        System.out.println("with: " + withTime);
+        System.out.println("withOut: " + withOutTime);
+
+
+//        assertTrue(withTime.getSum() < withOutTime.getSum());
+//        assertTrue(withTime.getSum() < 2 * withOutTime.getSum()); //less than half, considering that a search "diameter" becomes a "radius" by providing the answer end-point
     }
 
 

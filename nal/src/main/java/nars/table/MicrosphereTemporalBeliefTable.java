@@ -5,6 +5,7 @@ import nars.NAR;
 import nars.Param;
 import nars.Task;
 import nars.concept.Concept;
+import nars.index.term.PatternTermIndex;
 import nars.learn.microsphere.InterpolatingMicrosphere;
 import nars.task.Revision;
 import nars.task.TruthPolation;
@@ -35,6 +36,11 @@ public abstract class MicrosphereTemporalBeliefTable implements TemporalBeliefTa
 
     private volatile int capacity;
     final MultiRWFasterList<Task> list;
+
+    private final static int MAX_SIZE = 64;
+    private static final ThreadLocal<TruthPolation> truther = ThreadLocal.withInitial(()-> {
+        return new TruthPolation(MAX_SIZE);
+    });
 
     public MicrosphereTemporalBeliefTable(int initialCapacity) {
         super();
@@ -465,7 +471,7 @@ public abstract class MicrosphereTemporalBeliefTable implements TemporalBeliefTa
                 }
 
             default:
-                return new TruthPolation(s).truth(when, tr, this);
+                return truther.get().truth(when, tr, this);
         }
 
     }

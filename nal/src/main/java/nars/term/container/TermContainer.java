@@ -609,22 +609,19 @@ public interface TermContainer extends Termlike, Iterable<Term> {
         if ((diff = ((s = A.size()) - b.size())) != 0)
             return diff;
 
-        int v;
-        if ((diff = ((v = A.vars()) - b.vars())) != 0)
-            return diff;
+//        if ((diff = ( A.vars() - b.vars())) != 0)
+//            return diff;
 
         TermContainer B = (TermContainer) b;
 
 
-        //TODO BooleanArrayList or BitSet to mark indices where variables occurr?
-
-        boolean compareVar = false;
+        int inequalVariable = -1; //only need to compare the first non-equal variable term
         for (int i = 0; i < s; i++) {
             Term x = A.term(i);
             Term y = B.term(i);
             if (x instanceof Variable && y instanceof Variable) {
-                if (!x.equals(y))
-                    compareVar = true; //test below; allow differing non-variable terms to determine sort order first
+                if (inequalVariable==-1 && !x.equals(y))
+                    inequalVariable = i; //test below; allow differing non-variable terms to determine sort order first
 
             } else {
                 int d = x.compareTo(y);
@@ -635,17 +632,8 @@ public interface TermContainer extends Termlike, Iterable<Term> {
         }
 
         //2nd-stage:
-        if (compareVar) {
-            for (int i = 0; i < s; i++) {
-                Term x = A.term(i);
-                Term y = B.term(i);
-                if (x instanceof Variable && y instanceof Variable) {
-                    int d = x.compareTo(y);
-                    if (d != 0) {
-                        return d;
-                    }
-                }
-            }
+        if (inequalVariable!=-1) {
+            return A.term(inequalVariable).compareTo(B.term(inequalVariable));
         }
 
 

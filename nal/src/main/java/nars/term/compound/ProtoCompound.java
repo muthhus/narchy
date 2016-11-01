@@ -56,14 +56,11 @@ public interface ProtoCompound {
         @Override
         public final boolean equals(Object o) {
             if (this == o) return true;
-            if (!(o instanceof RawProtoCompound)) return false;
+            //if (!(o instanceof RawProtoCompound)) return false;
 
             RawProtoCompound that = (RawProtoCompound) o;
 
-            if (dt != that.dt) return false;
-            if (op != that.op) return false;
-
-            return Util.equals(args, that.args);
+            return (dt == that.dt) && (op == that.op) && Util.equals(args, that.args);
         }
 
         @NotNull
