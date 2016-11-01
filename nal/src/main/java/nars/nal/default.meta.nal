@@ -285,8 +285,10 @@
         A, B, task(negative), task("."), time(dtAfter), neqCom(A,B),             notImplEqui(A), notEqui(B) |- ((--,%A) ==>+- B), (Belief:InductionN)
         A, B, task(negative), task("."), time(dtAfterOrEternal), neqAndCom(A,B), notImplEqui(A), notEqui(B) |- varIntro(((--,%A) ==>+- B)), (Belief:InductionN)
 
-    A, B, task(positive), task("."), time(dtAfterReverse), neqCom(A,B), notEqui(A), notImplEqui(B) |- (B ==>+- A), (Belief:Abduction)
-        A, B, task(negative), task("."), time(dtAfterReverse), neqCom(A,B), notEqui(A), notImplEqui(B) |- (B ==>+- (--,%A)), (Belief:AbductionN)
+    A, B, task(positive), task("."), time(dtAfterReverse), neqCom(A,B),                 notEqui(A), notImplEqui(B) |- (B ==>+- A), (Belief:Abduction)
+    A, B, task(positive), task("."), time(dtAfterOrEternalReverse), neqAndCom(A,B),     notEqui(A), notImplEqui(B) |- varIntro((B ==>+- A)), (Belief:Abduction)
+        A, B, task(negative), task("."), time(dtAfterReverse), neqCom(A,B),             notEqui(A), notImplEqui(B) |- (B ==>+- (--,%A)), (Belief:AbductionN)
+        A, B, task(negative), task("."), time(dtAfterOrEternalReverse), neqAndCom(A,B), notEqui(A), notImplEqui(B) |- varIntro((B ==>+- (--,%A))), (Belief:AbductionN)
 
     A, B, task(positive), task("."), time(dtAfter), neqCom(A,B),                     notImplEqui(A), notImplEqui(B) |- (A <=>+- B), (Belief:Comparison)
     A, B, task(positive), task("."), time(dtAfterOrEternal), neqAndCom(A,B),         notImplEqui(A), notImplEqui(B) |- varIntro((A <=>+- B)), (Belief:Comparison)

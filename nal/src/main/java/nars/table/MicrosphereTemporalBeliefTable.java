@@ -299,8 +299,8 @@ public abstract class MicrosphereTemporalBeliefTable implements TemporalBeliefTa
         return list.minBy(x -> rankTemporalByConfidence(x, now));
     }
 
-    final float rankTemporalByConfidence(@Nullable Task t, long now) {
-        return t == null ? -1 : focus(Math.abs(t.occurrence() - now), t.confWeight());
+    final float rankTemporalByConfidence(@Nullable Task t, long when) {
+        return t == null ? -1 : focus(Math.abs(t.occurrence() - when), t.confWeight());
     }
 
     public Task matchMerge(long now, @NotNull Task toMergeWith) {
@@ -408,25 +408,14 @@ public abstract class MicrosphereTemporalBeliefTable implements TemporalBeliefTa
 
 
 
-        if (against == null) {
-
-            //System.out.println(this + " against: " + against + " @ " + now);
-
-            //list.forEach(x -> System.out.println("\t" + x + "  " + rankTemporalByConfidence(x, now, dur)));
-
-            Task l = list.maxBy(x -> rankTemporalByConfidence(x, now));
-            //System.out.println(l);
-            return l;
-
-        } else {
-            return list.maxBy(x -> {
-                long occurrence = against.occurrence();
-                if (occurrence == ETERNAL)
-                    occurrence = now;
-                return rankTemporalByConfidence(x, occurrence);
-            });
-            //return list.maxBy(rankPenalizingOverlap(now, against));
-        }
+        //if (against == null) {
+            return list.maxBy(x -> rankTemporalByConfidence(x, when));
+//
+//        } else {
+//            long then = when != ETERNAL ? when : now;
+//            return list.maxBy(x -> rankTemporalByConfidence(x, then));
+//            //return list.maxBy(rankPenalizingOverlap(now, against));
+//        }
 
     }
 

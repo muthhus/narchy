@@ -1,21 +1,15 @@
 package nars.table;
 
 import com.google.common.collect.Iterators;
-import nars.$;
 import nars.NAR;
-import nars.Param;
 import nars.Task;
-import nars.budget.Budget;
 import nars.concept.CompoundConcept;
-import nars.task.EternalizedTask;
 import nars.truth.Truth;
 import nars.truth.TruthDelta;
-import nars.truth.TruthFunctions;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Iterator;
-import java.util.List;
 import java.util.function.Consumer;
 
 import static nars.time.Tense.ETERNAL;
@@ -157,13 +151,40 @@ public class DefaultBeliefTable implements BeliefTable {
 
     @Nullable
     @Override
-    public final Task eternalTop() {
+    public final Task matchEternal() {
         return eternal.strongest();
     }
 
-    @Override
-    @Nullable public final Task topTemporal(long when, long now, @Nullable Task against) {
-        return temporal.match(when, now, against);
+
+    /**
+     * get the most relevant belief/goal with respect to a specific time.
+     */
+    @Nullable
+    public Task match(long when, long now, @Nullable Task against) {
+
+        final Task ete = matchEternal();
+        if (when == ETERNAL) {
+            if (ete != null) {
+                return ete;
+            } /*else {
+                //eternalize the topTemporal?
+            } */
+        }
+
+        Task tmp = temporal.match(when, now, against);
+
+
+        if (tmp == null) {
+            return ete;
+        } else {
+            if (ete == null) {
+                return tmp;
+            } else {
+                return (ete.conf() > tmp.conf()) ?
+                        ete : tmp;
+            }
+        }
+
     }
 
 

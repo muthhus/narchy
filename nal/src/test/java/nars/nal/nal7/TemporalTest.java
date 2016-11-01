@@ -17,7 +17,6 @@ import nars.term.Termed;
 import nars.term.Terms;
 import nars.term.container.TermContainer;
 import nars.time.Tense;
-import nars.util.data.list.FasterList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.junit.Assert;
@@ -349,7 +348,7 @@ public class TemporalTest {
         }
 
         //INTERMPOLATION APPLIED DURING REVISION:
-        assertEquals("((a ==>+4 b)-->[pill])", cc.beliefs().eternalTop().term().toString());
+        assertEquals("((a ==>+4 b)-->[pill])", cc.beliefs().matchEternal().term().toString());
     }
 
     @Test public void testConceptualizationIntermpolationTemporal() {
@@ -375,7 +374,7 @@ public class TemporalTest {
 
 
         //INTERMPOLATION APPLIED AFTER REVECTION:
-        assertEquals("((a ==>+4 b)-->[pill])", cc.beliefs().topTemporal(2,d.time(), null).term().toString());
+        assertEquals("((a ==>+4 b)-->[pill])", cc.beliefs().match(2,d.time(), null).term().toString());
     }
 
     @Test public void testSubtermTimeRecursive() {

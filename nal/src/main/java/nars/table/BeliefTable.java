@@ -17,7 +17,6 @@ import java.util.Iterator;
 
 import static java.util.stream.StreamSupport.stream;
 import static nars.nal.UtilityFunctions.and;
-import static nars.time.Tense.ETERNAL;
 
 /**
  * A model storing, ranking, and projecting beliefs or goals (tasks with TruthValue).
@@ -64,17 +63,15 @@ public interface BeliefTable extends TaskTable {
 
 
         @Override
-        public Task eternalTop() {
+        public Task matchEternal() {
             return null;
         }
 
-        @Nullable
+
         @Override
-        public Task topTemporal(long when, long now, Task against) {
+        public Task match(long when, long now, @Nullable Task against) {
             return null;
         }
-
-
 
         @Nullable
         @Override
@@ -182,45 +179,15 @@ public interface BeliefTable extends TaskTable {
         return match(when, now, null);
     }
 
-    /**
-     * get the most relevant belief/goal with respect to a specific time.
-     */
-    @Nullable
-    default Task match(long when, long now, @Nullable Task against) {
+    Task match(long when, long now, @Nullable Task against);
 
-        final Task ete = eternalTop();
-        if (when == ETERNAL) {
-            if (ete != null) {
-                return ete;
-            } /*else {
-                //eternalize the topTemporal?
-            } */
-        }
-
-        Task tmp = topTemporal(when, now, against);
-
-        if (tmp == null) {
-            return ete;
-        } else {
-            if (ete == null) {
-                return tmp;
-            } else {
-                return (ete.conf() > tmp.conf()) ?
-                        ete : tmp;
-            }
-        }
-
-    }
 
     /**
      * get the top-ranking eternal belief/goal; null if no eternal beliefs known
      */
-    @Nullable Task eternalTop();
+    @Deprecated @Nullable Task matchEternal();
 
-    /**
-     * finds the most relevant temporal belief for the given time; ; null if no temporal beliefs known
-     */
-    @Nullable Task topTemporal(long when, long now, @Nullable Task against);
+
 
 
 
@@ -258,7 +225,7 @@ public interface BeliefTable extends TaskTable {
 
     @Nullable
     default Truth topEternalTruth(@Nullable Truth ifNone) {
-        Task t = eternalTop();
+        Task t = matchEternal();
         return t == null ? ifNone : t.truth();
     }
 

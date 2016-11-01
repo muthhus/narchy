@@ -26,6 +26,7 @@ import nars.Op;
 import nars.Param;
 import nars.term.container.TermContainer;
 import nars.term.subst.Unify;
+import nars.term.var.Variable;
 import nars.term.visit.SubtermVisitor;
 import nars.term.visit.SubtermVisitorX;
 import nars.time.Tense;
@@ -146,10 +147,10 @@ public interface Compound extends Term, IPair, TermContainer {
     @Override
     default Term unneg() {
         if (op() == NEG) {
-            Term t = term(0);
-            if (Param.DEBUG && t.op() == NEG)
-                throw new RuntimeException("double negation detected: " + t);
-            return t;
+            return term(0);
+//            if (Param.DEBUG && t.op() == NEG)
+//                throw new RuntimeException("double negation detected: " + t);
+//            return t;
         }
         return this;
     }
@@ -601,15 +602,24 @@ public interface Compound extends Term, IPair, TermContainer {
 
     @Override
     default boolean equalsIgnoringVariables(@NotNull Term other) {
+        if (other instanceof Variable)
+            return true;
+
         if (!(other instanceof Compound))
             return false;
+
+        if (op() == NEG)
+            throw new UnsupportedOperationException("left hand side should already be unneg'd");
+
+        if (other.op()==NEG)
+            other = other.unneg();
 
         int s = size();
 
         if ((((Compound) other).dt() == dt()) && (other.size() == s)) {
             Compound o = (Compound) other;
             for (int i = 0; i < s; i++) {
-                if (!term(i).equalsIgnoringVariables(o.term(i)))
+                if (!term(i).unneg().equalsIgnoringVariables(o.term(i)))
                     return false;
             }
             return true;

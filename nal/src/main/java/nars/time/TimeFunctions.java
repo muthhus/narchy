@@ -213,7 +213,7 @@ public interface TimeFunctions {
 
     @Deprecated
     static boolean derivationMatch(@NotNull Term a, @NotNull Term b) {
-        return /*productNormalize*/(a.unneg()).equalsIgnoringVariables(/*productNormalize*/(b.unneg()));
+        return /*productNormalize*/(a.unneg()).equalsIgnoringVariables(/*productNormalize*/b);
     }
 
     static boolean derivationMatch(@NotNull Term a, @NotNull Term b, @NotNull PremiseEval p) {

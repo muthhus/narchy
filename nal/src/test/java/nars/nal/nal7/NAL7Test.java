@@ -396,7 +396,6 @@ public class NAL7Test extends AbstractNALTest {
     public void induction_on_events_with_variable_introduction2() {
         TestNAR tester = test();
 
-
         //tester.log();
         tester.input("<John --> (/,open,_,door)>. :|:");
         tester.inputAt(2, "<John --> (/,enter,_,room)>. :|:");
@@ -498,20 +497,19 @@ public class NAL7Test extends AbstractNALTest {
     public void variable_introduction_on_events() {
         TestNAR tester = test();
 
-        tester.log();
-        tester.input("<{t003} --> (/,at,SELF,_)>. :|:");
-        tester.inputAt(10, "<{t003} --> (/,on,{t002},_)>. :|:");
+        tester.input("at(SELF,{t003}). :|:");
+        tester.inputAt(10, "on({t002},{t003}). :|:");
 
         tester.mustBelieve(cycles,
                 //"(<#1 --> (/,at,SELF,_)> &&+10 <#1 --> (/,on,{t002},_)>)",
-                "(((SELF,{t003})-->at) &&+10 (({t002},{t003})-->on))",
+                "(at(SELF,{t003}) &&+10 on({t002},{t003}))",
                 1.0f, 0.81f,
                 0);
         tester.mustBelieve(cycles,
-                "(((SELF,#1)-->at) &&+10 (({t002},#1)-->on))",
+                    "(at(SELF,#1) &&+10 on({t002},#1))",
                 1.0f, 0.81f,
                 0);
-        tester.mustNotOutput(cycles, "(((SELF,#1)-->at) &&-10 (({t002},#1)-->on))", '.', ETERNAL);
+        tester.mustNotOutput(cycles, "(at(SELF,#1) &&-10 on({t002},#1))", '.', ETERNAL);
 
     }
 
@@ -816,7 +814,7 @@ public class NAL7Test extends AbstractNALTest {
 
                 .inputAt(20, "(x). :|:")
 
-                .mustBelieve(24,"(y)", 1f, 0.4f, 24)
+                .mustBelieve(24,"(y)", 1f, 0.36f, 24)
         ;
     }
 
