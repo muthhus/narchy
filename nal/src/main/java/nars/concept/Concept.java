@@ -320,7 +320,7 @@ public interface Concept extends Termed {
 //    }
 
 
-    default void visitTasks(@NotNull Consumer<Task> each, boolean includeConceptBeliefs, boolean includeConceptQuestions, boolean includeConceptGoals, boolean includeConceptQuests) {
+    default void forEachTask(@NotNull Consumer<Task> each, boolean includeConceptBeliefs, boolean includeConceptQuestions, boolean includeConceptGoals, boolean includeConceptQuests) {
         if (includeConceptBeliefs) beliefs().forEach(each);
         if (includeConceptQuestions) questions().forEach(each);
         if (includeConceptGoals) goals().forEach(each);

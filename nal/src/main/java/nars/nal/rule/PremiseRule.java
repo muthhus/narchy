@@ -591,17 +591,21 @@ public class PremiseRule extends GenericCompound {
                     break;
 
 
+                case "neqAndCom":
+                    neqPrefilter(pres, taskTermPattern, beliefTermPattern, X, Y);
+                    constraints.put(Y, new CommonSubtermConstraint(X));
+                    constraints.put(X, new CommonSubtermConstraint(Y));
+                    break;
+
                 case "neqCom":
                     neqPrefilter(pres, taskTermPattern, beliefTermPattern, X, Y);
-
-                    constraints.put(X, new NoCommonSubtermConstraint(Y, false));
                     constraints.put(Y, new NoCommonSubtermConstraint(X, false));
+                    constraints.put(X, new NoCommonSubtermConstraint(Y, false));
                     break;
                 case "neqRCom":
                     neqPrefilter(pres, taskTermPattern, beliefTermPattern, X, Y);
-
-                    constraints.put(X, new NoCommonSubtermConstraint(Y, true));
                     constraints.put(Y, new NoCommonSubtermConstraint(X, true));
+                    constraints.put(X, new NoCommonSubtermConstraint(Y, true));
                     break;
 
 

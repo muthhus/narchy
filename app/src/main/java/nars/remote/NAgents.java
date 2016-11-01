@@ -18,6 +18,7 @@ import nars.op.mental.Inperience;
 import nars.op.time.MySTMClustered;
 import nars.time.*;
 import nars.truth.Truth;
+import nars.util.TaskStatistics;
 import nars.util.data.random.XorShift128PlusRandom;
 import nars.video.*;
 import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunction;
@@ -71,7 +72,7 @@ abstract public class NAgents extends NAgent {
 //        });
 
         nar.printConceptStatistics();
-        nar.printTaskStatistics();
+        new TaskStatistics().add(nar).print(System.out);
         //((TreeTaskIndex)nar.tasks).tasks.prettyPrint(System.out);
 
     }
@@ -159,7 +160,7 @@ abstract public class NAgents extends NAgent {
         nar.beliefConfidence(0.8f);
         nar.goalConfidence(0.8f);
 
-        float p = 0.5f;
+        float p = 0.1f;
         nar.DEFAULT_BELIEF_PRIORITY = 0.9f * p;
         nar.DEFAULT_GOAL_PRIORITY = 1f * p;
         nar.DEFAULT_QUESTION_PRIORITY = 0.6f * p;
@@ -168,8 +169,8 @@ abstract public class NAgents extends NAgent {
         nar.confMin.setValue(0.01f);
         nar.compoundVolumeMax.setValue(volMax);
 
-        MySTMClustered stm = new MySTMClustered(nar, 128, '.', 3, true, 16);
-        MySTMClustered stmGoal = new MySTMClustered(nar, 32, '!', 2, true, 8);
+        MySTMClustered stm = new MySTMClustered(nar, 128, '.', 3, true, 6);
+        MySTMClustered stmGoal = new MySTMClustered(nar, 32, '!', 2, true, 4);
 
         Abbreviation abbr = new Abbreviation(nar, "the",
                 4, 16,

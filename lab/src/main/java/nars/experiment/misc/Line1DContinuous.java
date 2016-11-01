@@ -45,7 +45,7 @@ public class Line1DContinuous extends NAgent {
     boolean print;
     private float yHidden;
     private float yEst;
-    float speed = 0.75f;
+    float speed = 2f;
     final float[] ins;
 
     public Line1DContinuous(NAR n, int size, IntToFloatFunction target) {

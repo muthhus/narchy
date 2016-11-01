@@ -9,13 +9,6 @@ import nars.concept.ActionConcept;
 import nars.concept.SensorConcept;
 import nars.experiment.tetris.visualizer.TetrisVisualizer;
 import nars.gui.Vis;
-import nars.index.term.tree.TreeTermIndex;
-import nars.nar.Default;
-import nars.nar.exe.Executioner;
-import nars.nar.exe.MultiThreadExecutioner;
-import nars.nar.util.DefaultConceptBuilder;
-import nars.op.mental.Inperience;
-import nars.op.time.MySTMClustered;
 import nars.remote.NAgents;
 import nars.term.Compound;
 import nars.term.Term;
@@ -24,7 +17,7 @@ import nars.term.obj.Termject;
 import nars.time.FrameClock;
 import nars.time.Tense;
 import nars.truth.Truth;
-import nars.util.data.random.XorShift128PlusRandom;
+import nars.util.TaskStatistics;
 import org.jetbrains.annotations.NotNull;
 import spacegraph.Surface;
 import spacegraph.math.Vector2f;
@@ -32,7 +25,6 @@ import spacegraph.obj.ConsoleSurface;
 import spacegraph.obj.MatrixView;
 
 import java.io.IOException;
-import java.util.Random;
 
 import static nars.experiment.tetris.TetrisState.*;
 import static spacegraph.SpaceGraph.window;
@@ -52,8 +44,8 @@ public class Tetris extends NAgents {
 
     public static final int tetris_width = 6;
     public static final int tetris_height = 14;
-    public static final int TIME_PER_FALL = 8;
-    public static final int frameRate = 1;
+    public static final int TIME_PER_FALL = 2;
+    public static final int frameRate = 4;
     static boolean easy;
 
 
@@ -656,7 +648,7 @@ public class Tetris extends NAgents {
         NAR.printTasks(nar, true);
         NAR.printTasks(nar, false);
         nar.printConceptStatistics();
-        nar.printTaskStatistics();
+        new TaskStatistics().add(nar).print();
 
         //NAR.printTasks(meta.nar, true);
         //NAR.printTasks(meta.nar, false);

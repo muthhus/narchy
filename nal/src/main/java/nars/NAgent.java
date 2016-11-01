@@ -67,6 +67,7 @@ abstract public class NAgent implements NSense, NAction {
 
     @NotNull
     public final FloatNormalized rewardNormalized;
+    private final float actionBoost;
 
     public NAR nar;
 
@@ -114,6 +115,8 @@ abstract public class NAgent implements NSense, NAction {
         alpha = this.nar.confidenceDefault(BELIEF);
         gamma = this.nar.confidenceDefault(GOAL);
         this.frameRate = frameRate;
+
+        this.actionBoost = gamma;
 
         float rewardConf = alpha;
 
@@ -483,7 +486,7 @@ abstract public class NAgent implements NSense, NAction {
 
             }
 
-            boost(c, gamma);
+            boost(c, actionBoost);
         }
     }
 

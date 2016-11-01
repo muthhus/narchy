@@ -10,9 +10,7 @@ import nars.term.atom.Atomic;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 import static nars.time.Tense.ETERNAL;
 
@@ -41,14 +39,12 @@ public class DeductiveMeshTest {
         if (dims.length!=2)
             throw new UnsupportedOperationException("2-D only implemented");
 
+        Set<Term> edges = new HashSet();
+
         coords = $.newArrayList();
         for (int x = 0; x < dims[0]; x++) {
             for (int y = 0; y < dims[1]; y++) {
                 Compound c = c(x, y);
-
-
-                List<Term> edges = new ArrayList();
-
 
                 if (x > y) {
                     if (x > 0)
@@ -60,24 +56,24 @@ public class DeductiveMeshTest {
                     if (y < dims[1] - 1)
                         edges.add(link(x, y, x, y + 1));
                 }
-
-                edges.forEach(n.nar::believe);
-//                if (!edges.isEmpty())
-//                    n.nar.believe( $.conj(edges.toArray(new Term[edges.size()])) );// $.sete(c)));
-
-
             }
         }
 
+        edges.forEach(n.nar::believe);
 
-        n.nar.ask( q = (Compound) link(0,0, dims[0]-1, dims[1]-1), ETERNAL, a -> {
-            System.out.println(a.proof());
-            return true;
-        });
+        Compound term = q = (Compound) link(0, 0, dims[0] - 1, dims[1] - 1);
+        ask(n, term);
 
         if (timeLimit>0)
             n.mustBelieve(timeLimit, q.toString(), 1f, 1f, 0.01f, 1f);
 
+    }
+
+    public void ask(@NotNull TestNAR n, Compound term) {
+        n.nar.ask(term, ETERNAL, a -> {
+            System.out.println(a.proof());
+            return true;
+        });
     }
 
     @Nullable

@@ -7,11 +7,16 @@ import nars.nar.Default;
 import nars.nar.Terminal;
 import nars.nar.util.Answerer;
 import nars.nar.util.OperationAnswerer;
+import nars.term.Compound;
 import nars.term.Term;
+import nars.test.DeductiveMeshTest;
+import nars.test.TestNAR;
+import nars.util.TaskStatistics;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
 import java.util.Arrays;
+import java.util.DoubleSummaryStatistics;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -110,6 +115,56 @@ public class QuestionTest {
 
 
     }
+
+    @Test public void questionDrivesInference() {
+        long seed  = 1;
+
+        final int[] dims = {3, 2};
+        final int timelimit = 3000;
+
+        TaskStatistics withTasks = new TaskStatistics();
+        TaskStatistics withoutTasks = new TaskStatistics();
+        DoubleSummaryStatistics with = new DoubleSummaryStatistics();
+        DoubleSummaryStatistics withOut = new DoubleSummaryStatistics();
+        for (int i = 0; i < 10; i++) {
+            TestNAR withQuestion = new TestNAR(new Default());
+            withQuestion.nar.random.setSeed(seed++);
+            withQuestion.nar.nal(4);
+
+            new DeductiveMeshTest(withQuestion, dims, timelimit);
+            withQuestion.run(true);
+
+
+
+            TestNAR withoutQuestion = new TestNAR(new Default());
+            withoutQuestion.nar.random.setSeed(seed++);
+            withoutQuestion.nar.nal(4);
+
+            new DeductiveMeshTest(withoutQuestion, dims, timelimit) {
+                @Override
+                public void ask(@NotNull TestNAR n, Compound term) {
+                    //disabled
+                }
+            };
+            withoutQuestion.run(true);
+
+            long withQuestionTime = withQuestion.time();
+            with.accept(withQuestionTime);
+            long withoutQuestionTime = withoutQuestion.time();
+            withOut.accept(withoutQuestionTime);
+
+            System.out.println("with: " + withQuestionTime + " vs without: " + withoutQuestionTime);
+
+            withTasks.add(withQuestion.nar);
+            withoutTasks.add(withoutQuestion.nar);
+        }
+
+        System.out.println("with: " + with + "\n");
+        withTasks.print();
+        System.out.println("withOut: " + withOut + "\n" + withoutTasks);
+        withoutTasks.print();
+    }
+
 
 //    @Test public void testSaneBudgeting() {
 //        Param.DEBUG = true;

@@ -152,10 +152,11 @@ abstract public class events extends AtomicBoolCondition {
             Task b = m.belief;
             if (b == null) return false;
 
-            long tOcc = m.task.occurrence();
             long bOcc = b.occurrence();
-            boolean tEternal = (tOcc == ETERNAL);
             boolean bEternal = (bOcc == ETERNAL);
+
+            long tOcc = m.task.occurrence();
+            boolean tEternal = (tOcc == ETERNAL);
             return tEternal ? bEternal : (!bEternal && (bOcc <= tOcc));
         }
     };

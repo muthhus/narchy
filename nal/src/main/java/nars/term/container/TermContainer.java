@@ -7,6 +7,7 @@ import nars.term.Term;
 import nars.term.Termlike;
 import nars.term.Terms;
 import nars.term.atom.Atomic;
+import nars.term.var.AbstractVariable;
 import nars.term.var.Variable;
 import org.eclipse.collections.api.block.predicate.primitive.IntObjectPredicate;
 import org.eclipse.collections.api.list.primitive.ByteList;
@@ -133,14 +134,14 @@ public interface TermContainer extends Termlike, Iterable<Term> {
 
     @NotNull
     static boolean commonSubterms(@NotNull Compound a, @NotNull Compound b) {
-        return commonSubterms(a, b, false, new HashSet());
+        return commonSubterms(a, b, false);
     }
 
     /**
      * recursively
      */
     @NotNull
-    static boolean commonSubtermsRecurse(@NotNull Compound a, @NotNull Compound b, boolean excludeVariables, @NotNull HashSet<Term> scratch) {
+    static boolean commonSubtermsRecurse(@NotNull Compound a, @NotNull Compound b, boolean excludeVariables) {
 
         int commonStructure = a.structure() & b.structure();
         if (excludeVariables)
@@ -149,7 +150,7 @@ public interface TermContainer extends Termlike, Iterable<Term> {
         if (commonStructure == 0)
             return false;
 
-        scratch.clear();
+        Set<Term> scratch = new HashSet(a.size());
         a.termsToSetRecurse(commonStructure, scratch, true);
         return b.termsToSetRecurse(commonStructure, scratch, false);
     }
@@ -206,7 +207,7 @@ public interface TermContainer extends Termlike, Iterable<Term> {
     }
 
     @NotNull
-    static boolean commonSubterms(@NotNull Compound a, @NotNull Compound b, boolean excludeVariables, @NotNull HashSet<Term> scratch) {
+    static boolean commonSubterms(@NotNull Compound a, @NotNull Compound b, boolean excludeVariables) {
 
         int commonStructure = a.structure() & b.structure();
         if (excludeVariables)
@@ -215,7 +216,7 @@ public interface TermContainer extends Termlike, Iterable<Term> {
         if (commonStructure == 0)
             return false;
 
-        scratch.clear();
+        Set<Term> scratch = new HashSet(a.size()  );
         a.termsToSet(commonStructure, scratch, true);
         return b.termsToSet(commonStructure, scratch, false);
 
@@ -593,47 +594,57 @@ public interface TermContainer extends Termlike, Iterable<Term> {
 //        return compareTo(this, o);
 //    }
 
-    static int compare(@NotNull TermContainer a, @NotNull Termlike b) {
-        if (a == b) return 0;
-
-
-
-        //why doesnt this work:
-//        int hashDiff = Integer.compare(a.hashCode(), b.hashCode());
-//        if (hashDiff!=0) {
-//            return hashDiff;
-//        }
+    static int compare(@NotNull TermContainer A, @NotNull Termlike b) {
+        if (A == b) return 0;
 
         int diff;
 
-//        int h = a.hashCode();
-//        if ((diff = Integer.compare(h, b.hashCode())) != 0)
-//            return diff;
-
-
-//        int v = a.structure();
-//        if ((diff = Integer.compare(v, b.structure())) != 0)
-//            return diff;
-
-        long h = a.sizeVolumeStructure();
-        if ((diff = Long.compare(h, b.sizeVolumeStructure())) != 0)
+        if ((diff = (A.structure() - b.structure())) != 0)
             return diff;
 
-        int s = a.size();
-        TermContainer cc = (TermContainer) b;
+        if ((diff = (A.volume() - b.volume())) != 0)
+            return diff;
+
+        int s;
+        if ((diff = ((s = A.size()) - b.size())) != 0)
+            return diff;
+
+        int v;
+        if ((diff = ((v = A.vars()) - b.vars())) != 0)
+            return diff;
+
+        TermContainer B = (TermContainer) b;
+
+
+        //TODO BooleanArrayList or BitSet to mark indices where variables occurr?
+
+        boolean compareVar = false;
         for (int i = 0; i < s; i++) {
-            int d = a.term(i).compareTo(cc.term(i));
+            Term x = A.term(i);
+            Term y = B.term(i);
+            if (x instanceof Variable && y instanceof Variable) {
+                if (!x.equals(y))
+                    compareVar = true; //test below; allow differing non-variable terms to determine sort order first
 
+            } else {
+                int d = x.compareTo(y);
+                if (d != 0) {
+                    return d;
+                }
+            }
+        }
 
-            /*if (Global.DEBUG) {
-                int d2 = cc.term(i).compareTo(a.term(i));
-                if (d2!=-d)
-                    throw new RuntimeException("ordering inconsistency: " + a + ", " + b );
-            }*/
-
-
-            if (d != 0) {
-                return d;
+        //2nd-stage:
+        if (compareVar) {
+            for (int i = 0; i < s; i++) {
+                Term x = A.term(i);
+                Term y = B.term(i);
+                if (x instanceof Variable && y instanceof Variable) {
+                    int d = x.compareTo(y);
+                    if (d != 0) {
+                        return d;
+                    }
+                }
             }
         }
 

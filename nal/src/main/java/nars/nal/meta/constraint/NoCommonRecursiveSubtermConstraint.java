@@ -18,7 +18,7 @@ public final class NoCommonRecursiveSubtermConstraint extends CommonalityConstra
     /** comparison between two compounds */
     @Override
     @NotNull protected boolean invalid(@NotNull Compound x, @NotNull Compound y) {
-        return commonSubtermsRecurse(x, y, true, new HashSet(2));
+        return commonSubtermsRecurse(x, y, true);
     }
 
     @NotNull

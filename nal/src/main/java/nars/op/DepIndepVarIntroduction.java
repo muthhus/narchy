@@ -134,27 +134,26 @@ public class DepIndepVarIntroduction extends VarIntroduction {
             this.introducer = new DepIndepVarIntroduction(nar.random);
         }
 
-        protected boolean introduce(Term x) {
-            return x instanceof Compound &&
-                   introducer.rng.nextFloat() <=
-                            1f / (1 + x.size())
-                           //1f / Math.sqrt(x.volume())
-                           //1f / x.volume()
-                           //0.5f;
-                           //(1f / (1f + x.size()))
-            ;
-        }
-
         @Override
         public @NotNull Term apply(@NotNull Term[] args) {
 
-            Term x = args[0];
-            if (introduce(x)) {
-                Term[] only = new Term[] { x };
-                introducer.accept((Compound)x, y -> only[0] = y);
-                return only[0];
-            }
-            return x;
+            Term[] only = new Term[] { False };
+            introducer.accept((Compound) args[0], y -> only[0] = y);
+            return only[0];
         }
     }
+
 }
+
+//        protected boolean introduce(Term x) {
+//            return true;
+////            return x instanceof Compound &&
+////                   introducer.rng.nextFloat() <=
+////                            1f / (1 + x.size())
+////                           //1f / Math.sqrt(x.volume())
+////                           //1f / x.volume()
+////                           //0.5f;
+////                           //(1f / (1f + x.size()))
+////            ;
+//        }
+

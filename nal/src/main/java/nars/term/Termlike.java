@@ -121,11 +121,6 @@ public interface Termlike {
     int varPattern();
 
 
-    default long sizeVolumeStructure() {
-        long l = (volume()+1);
-        l = (l << 16) | (size()+1L);
-        l = (l << 32) | (structure());
-        return l;
-    }
+
 
 }

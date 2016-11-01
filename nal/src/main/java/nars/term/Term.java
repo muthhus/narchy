@@ -32,6 +32,7 @@ import nars.term.var.Variable;
 import nars.term.visit.SubtermVisitor;
 import nars.term.visit.SubtermVisitorX;
 import nars.util.data.array.IntArrays;
+import nars.util.data.rope.StringHack;
 import org.eclipse.collections.api.list.primitive.ByteList;
 import org.eclipse.collections.impl.factory.primitive.ByteLists;
 import org.eclipse.collections.impl.list.mutable.primitive.ByteArrayList;
@@ -54,13 +55,13 @@ public interface Term extends Termed, Termlike, Comparable<Termlike> {
      */
     AtomicSingleton True = new AtomicSingleton("†");
 
-    AtomicSingleton False = new AtomicSingleton("Ø") {
+    AtomicSingleton False = new AtomicSingleton("Ø");/* {
         @NotNull
         @Override
         public Term unneg() {
             return True;
         }
-    };
+    };*/
 
 
     @NotNull
@@ -371,7 +372,7 @@ public interface Term extends Termed, Termlike, Comparable<Termlike> {
     default int compareTo(@NotNull Termlike y) {
         if (this == y /*|| this.equals(y)*/) return 0;
 
-        int d = Integer.compare(this.op().ordinal(), ((Term)y).op().ordinal());
+        int d = this.op().ordinal() - ((Term)y).op().ordinal();
         if (d!=0)
             return d;
 
@@ -384,15 +385,20 @@ public interface Term extends Termed, Termlike, Comparable<Termlike> {
             if (diff3 != 0)
                 return diff3;
 
-            return Integer.compare(cx.dt(), cy.dt());
+            //return Integer.compare(cx.dt(), cy.dt());
+            return cx.dt() - cy.dt();
 
         } else if (this instanceof AbstractVariable) {
             //hashcode serves as the ordering too
-            return Integer.compare(this.hashCode(), y.hashCode());
+            //return Integer.compare(this.hashCode(), y.hashCode());
+            return hashCode() - y.hashCode();
         } else if (this instanceof Atomic) {
             //if the op is the same, it is required to be a subclass of Atomic
             //which should have an ordering determined by its toString()
-            return this.toString().compareTo((/*(Atomic)*/y).toString());
+
+            //return this.toString().compareTo((/*(Atomic)*/y).toString());
+            return StringHack.compare(toString(), y.toString());
+
         }
 
         throw new RuntimeException("ordering exception: " + this + ", " + y);
