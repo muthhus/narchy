@@ -1,5 +1,6 @@
 package nars.concept;
 
+import com.google.common.base.Objects;
 import nars.*;
 import nars.task.GeneratedTask;
 import nars.term.Compound;
@@ -36,12 +37,13 @@ public class ActionConcept extends WiredCompoundConcept implements WiredCompound
     public FloatSupplier pri;
     @Nullable
     private Truth currentDesire;
+    private boolean updateOnBeliefChange = false;
 
     @Override
     public void pri(FloatSupplier v) {
         this.pri = v;
     }
-    //private Truth lastDesire, lastBelief;
+    private Truth lastDesire, lastBelief;
 
 
     /** determines the feedback belief when desire or belief has changed in a MotorConcept
@@ -147,18 +149,19 @@ public class ActionConcept extends WiredCompoundConcept implements WiredCompound
     public void run() {
         long now = nar.time();
 
-        //boolean desireChange, beliefChange;
+        boolean desireChange, beliefChange;
 
         @Nullable Truth d = this.goal(now + decisionDT);
         this.currentDesire = d;
-        //desireChange = (lastDesire == null || !lastDesire.equals(d));
+        desireChange = (d == null ^ lastDesire==null) || (d!=null && d.equals(lastDesire));
 
         @Nullable Truth b = this.belief(now + decisionDT);
-        //beliefChange = (lastBelief == null || !lastBelief.equals(d));
+        beliefChange = (b == null ^ lastBelief ==null) || (b!=null && b.equals(lastBelief));
 
-        //lastBelief = b; lastDesire = d;
+        lastBelief = b; lastDesire = d;
 
-        /*if (beliefChange || desireChange)*/ {
+        if (desireChange || (updateOnBeliefChange && beliefChange)) {
+        //if (beliefChange || desireChange)
 
             Truth feedback = motor.motor(b, d);
             if (feedback != null) {
@@ -171,12 +174,13 @@ public class ActionConcept extends WiredCompoundConcept implements WiredCompound
         }
     }
 
+    public void setUpdateOnBeliefChange(boolean updateOnBeliefChange) {
+        this.updateOnBeliefChange = updateOnBeliefChange;
+    }
+
     @Nullable
     public Truth desire() { return currentDesire; }
 
-    protected boolean alwaysUpdateFeedback() {
-        return false;
-    }
 
     protected final Task feedback(Truth t, long when) {
         return new GeneratedTask(this, Symbols.BELIEF, t)

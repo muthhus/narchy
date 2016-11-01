@@ -22,7 +22,7 @@ public class Arkancide extends NAgents {
 
 
     public Arkancide(NAR nar) {
-        super(nar, 1 );
+        super(nar, 4 );
 
         noid = new Arkanoid();
 
@@ -42,12 +42,14 @@ public class Arkancide extends NAgents {
                 //TODO add limits for feedback, dont just return the value
                 //do this with a re-usable feedback interface because this kind of acton -> limitation detection will be common
                 float pct = noid.paddle.move((d.freq() - 0.5f) * paddleSpeed);
-                if (pct > 0)
-                    return $.t(d.freq(), alpha*pct);
+//                if (pct > 0)
+//                    return $.t(d.freq(), gamma*pct);
                     //return $.t(Util.lerp(d.freq(), 0.5f, pct), alpha);
 
+                return $.t(d.freq(), gamma);
+
             }
-            return $.t(0.5f, alpha);
+            return null; //$.t(0.5f, alpha);
         }));
 
 

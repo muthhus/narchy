@@ -44,12 +44,12 @@ public class Recog2D extends NAgents {
     private final Training train;
     BufferedImage canvas;
 
-    final static int trainFrames = 2000, verifyFrames = 2000;
+    final static int trainFrames = 4000, verifyFrames = 4000;
 
 
     int image = 0;
-    final int maxImages = 9;
-    int imagePeriod = 128;
+    final int maxImages = 6;
+    int imagePeriod = 64;
 
 //    float theta;
 //    float dTheta = 0.25f;
@@ -59,7 +59,7 @@ public class Recog2D extends NAgents {
     }
 
     public Recog2D(NAR n) {
-        super(n, 1);
+        super(n, 8);
 
         w = 10;
         h = 12;
@@ -87,11 +87,11 @@ public class Recog2D extends NAgents {
 
 
         //retina
-        //Sensor2D<PixelBag> sp = addCamera("x", () -> canvas, w, h, v -> $.t(v, alpha));
+        Sensor2D<PixelBag> sp = addCamera("x", () -> canvas, w, h, v -> $.t(v, alpha));
 
 
         //still
-        addCamera("x", new Scale(() -> canvas, w, h), v -> $.t(v, alpha));
+        //addCamera("x", new Scale(() -> canvas, w, h), v -> $.t(v, alpha));
 
         //nar.log();
 
@@ -99,8 +99,8 @@ public class Recog2D extends NAgents {
 
         outs = new Outputs(ii -> $.func("x", $.the("s" + ii)), maxImages, this);
         train = new Training(
-                sensors,
-                //Lists.newArrayList(Iterables.concat(sensors,sp.src.actions)),
+                //sensors,
+                Lists.newArrayList(Iterables.concat(sensors,sp.src.actions)),
                 outs, nar);
         //epsilonProbability = 0; //disable curiosity
 
@@ -114,7 +114,7 @@ public class Recog2D extends NAgents {
 
         LinkedHashMap<Concept, Outputs.Neuron> out = tv.out;
 
-        Plot2D p, s;
+        Plot2D p;
 
         int history = 1024;
 
@@ -123,7 +123,7 @@ public class Recog2D extends NAgents {
                 row(BeliefTableChart.beliefTableCharts(nar, out.keySet(), 1024)),
 
                 row(p = new Plot2D(history, Plot2D.Line).add("Error", () -> tv.errorSum())),
-                row(s = new Plot2D(history, Plot2D.BarWave).add("Rward", () -> rewardValue)),
+                //row(s = new Plot2D(history, Plot2D.BarWave).add("Rward", () -> rewardValue)),
 
                 row(out.entrySet().stream().map(ccnn -> new Surface() {
                     @Override
@@ -184,8 +184,25 @@ public class Recog2D extends NAgents {
                 }).toArray(Surface[]::new)));
 
         nar.onFrame(() -> {
+
+            if (nar.time() % imagePeriod == 0) {
+                nextImage();
+            }
+
+            redraw();
+
+            if (nar.time() < trainFrames) {
+                outs.expect(image);
+                outs.train();
+            } else {
+                outs.expect(-1);
+                outs.verify();
+            }
+
+            train.update(outs.train, true);
+
             p.update();
-            s.update();
+            //s.update();
         });
 
         return g;
@@ -198,28 +215,16 @@ public class Recog2D extends NAgents {
         float r;
 
 
-        //if (outs.verify) {
-            r = 1f - (float) outs.errorSum();// / imgTrainer.states;
-        /*} else {
-            //r = 1f; //general positive reinforcement during training
-            r = Float.NaN;
-        }*/
-
-        if (nar.time() % imagePeriod == 0) {
-            nextImage();
-        }
-
-        redraw();
-
-        outs.expect(image);
-
-        if (nar.time() < trainFrames) {
-            outs.train();
+        if (outs.verify) {
+            r = 0.5f - (float) outs.errorSum()
+                    / outs.states;
+                    ;
         } else {
-            outs.verify();
+            //r = 1f; //general positive reinforcement during training
+            r = Float.NaN; //no feedback during training
         }
 
-        train.update(outs.train, true);
+
 
         return r;
     }
@@ -258,7 +263,13 @@ public class Recog2D extends NAgents {
         private final MLP trainer;
         private final NAR nar;
 
-        private float learningRate = 0.1f;
+        private float learningRate = 0.3f;
+
+        /** Introduction of the momentum rate allows the attenuation of oscillations in the gradient descent. The geometric idea behind this idea can probably best be understood in terms of an eigenspace analysis in the linear case. If the ratio between lowest and largest eigenvalue is large then performing a gradient descent is slow even if the learning rate large due to the conditioning of the matrix. The momentum introduces some balancing in the update between the eigenvectors associated to lower and larger eigenvalues.
+
+         For more detail I refer to
+
+         http://page.mi.fu-berlin.de/rojas/neural/chapter/K8.pdf */
         private float momentum = 0.6f;
 
         public Training(java.util.List<? extends Concept> ins, Outputs outs, NAR nar) {
@@ -289,17 +300,23 @@ public class Recog2D extends NAgents {
         protected void update(boolean train, boolean apply) {
             float[] i = in(null, nar.time());
 
+            float errSum;
             if (train) {
                 float[] err = trainer.put(i, outs.expected(null), learningRate, momentum);
                 //System.err.println("error=" + Texts.n2(err));
-                System.err.println("error sum=" + Util.sumAbs(err));
+                errSum = Util.sumAbs(err) / err.length;
+                System.err.println("error sum=" + errSum);
+            } else {
+                errSum = 0f;
             }
 
-            if (apply) {
+            if (apply && errSum < 0.25f) {
                 float[] o = trainer.get(i);
                 for (int j = 0, oLength = o.length; j < oLength; j++) {
                     float y = o[j];
-                    nar.goal(outs.outVector[j], Tense.Present, y);
+                    //nar.goal(
+                    nar.believe(
+                            outs.outVector[j], Tense.Present, y, nar.confidenceDefault('.') * (1f - errSum));
                 }
                 //System.out.println(Arrays.toString(o));
             }
@@ -342,39 +359,44 @@ public class Recog2D extends NAgents {
                 System.arraycopy(in, 0, input, 0, in.length);
                 input[input.length - 1] = 1;
                 int offs = 0;
-                Arrays.fill(output, 0);
+                int il = input.length;
                 for (int i = 0; i < output.length; i++) {
                     float o = 0;
-                    for (int j = 0; j < input.length; j++) {
+                    for (int j = 0; j < il; j++) {
                         o += weights[offs + j] * input[j];
                     }
-                    output[i] += o;
                     if (isSigmoid) {
-                        output[i] = (float) (1 / (1 + Math.exp(-output[i])));
+                        o = (float) (1 / (1 + Math.exp(-o)));
                     }
-                    offs += input.length;
+                    output[i] = o;
+                    offs += il;
                 }
-                return Arrays.copyOf(output, output.length);
+                return output;
             }
 
-            public float[] train(float[] error, float learningRate, float momentum) {
+            public float[] train(float[] inError, float learningRate, float momentum) {
+
+                float[] outError = new float[input.length];
+                int inLength = input.length;
+
                 int offs = 0;
-                float[] nextError = new float[input.length];
                 for (int i = 0; i < output.length; i++) {
-                    float d = error[i];
+                    float d = inError[i];
                     if (isSigmoid) {
-                        d *= output[i] * (1 - output[i]);
+                        float oi = output[i];
+                        d *= oi * (1 - oi);
                     }
-                    for (int j = 0; j < input.length; j++) {
+                    float dLR = d * learningRate;
+                    for (int j = 0; j < inLength; j++) {
                         int idx = offs + j;
-                        nextError[j] += weights[idx] * d;
-                        float dw = input[j] * d * learningRate;
+                        outError[j] += weights[idx] * d;
+                        float dw = input[j] * dLR;
                         weights[idx] += dweights[idx] * momentum + dw;
                         dweights[idx] = dw;
                     }
-                    offs += input.length;
+                    offs += inLength;
                 }
-                return nextError;
+                return outError;
             }
         }
 

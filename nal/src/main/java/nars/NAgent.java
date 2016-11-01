@@ -73,7 +73,7 @@ abstract public class NAgent implements NSense, NAction {
     public final List<SensorConcept> sensors = $.newArrayList();
     public final List<ActionConcept> actions = $.newArrayList();
 
-    public float alpha, gamma, epsilonProbability = 0.02f;
+    public float alpha, gamma, epsilonProbability = 0.1f;
     @Deprecated
     public float gammaEpsilonFactor = 0.5f;
 
@@ -483,7 +483,7 @@ abstract public class NAgent implements NSense, NAction {
 
             }
 
-            //boost(c);
+            boost(c, gamma);
         }
     }
 
@@ -531,9 +531,10 @@ abstract public class NAgent implements NSense, NAction {
         return Math.min(1f, ((float) avgActionDesire.getMean()));
     }
 
-//    @Nullable
-//    protected Concept boost(Concept c) {
-//
+    @Nullable
+    protected Concept boost(Concept c, float amount) {
+
+        ((Default)nar).core.active.add(c, amount);
 //        new Activation(boostBudget, c, nar, 1) {
 //
 //            @Override
@@ -542,9 +543,9 @@ abstract public class NAgent implements NSense, NAction {
 //                super.commit(scale);
 //            }
 //        };
-//
-//        return c;
-//    }
+
+        return c;
+    }
 
 
     private MutableTask boost(@NotNull MutableTask t) {

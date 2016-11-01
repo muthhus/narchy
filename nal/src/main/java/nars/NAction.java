@@ -151,10 +151,7 @@ public interface NAction {
             }
 
             return $.t(v, alpha);
-        }) {
-            @Override
-            protected boolean alwaysUpdateFeedback() { return true; }
-        };
+        });
 
         actions().add(m);
         return m;

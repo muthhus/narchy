@@ -11,6 +11,7 @@ import java.util.LinkedHashMap;
 import java.util.function.IntFunction;
 import java.util.stream.IntStream;
 
+import static nars.truth.TruthFunctions.c2w;
 
 
 /**
@@ -58,7 +59,9 @@ public class Outputs {
             } else if (a != a) {
                 this.error = 1f;
             } else {
-                this.error = ( Math.abs(a - e) ) * ( this.actualConf);
+                this.error = ( Math.abs(a - e) )
+                        //* ( this.actualConf )
+                        ;
             }
         }
     }
@@ -91,7 +94,6 @@ public class Outputs {
     final int states;
 
     private final NAR nar;
-    boolean reset = true;
     boolean train = true;
     boolean verify = false;
 
@@ -117,6 +119,11 @@ public class Outputs {
 //                            //return null;
 //                        }
 
+//                        if (b!=null && d!=null) {
+//                            return d.confMult(0.5f + 0.5f * Math.abs(d.freq()-b.freq()));
+//                        } else {
+                            //return d!=null ? d.confWeightMult(0.5f) : null;
+                        //}
                         return d;
                     });
                 }
@@ -140,11 +147,11 @@ public class Outputs {
             out.forEach((cc, nnn) -> {
 
                 Truth t =
-                        //cc.belief(now);
-                        cc.goal(now);
+                        cc.belief(now);
+                        //cc.goal(now);
                 float f, c;
                 if (t == null) {
-                    f = 0; //Float.NaN;
+                    f = Float.NaN;
                     c = Float.NaN;
                 } else {
                     f = t.freq();
@@ -178,9 +185,10 @@ public class Outputs {
 
     public void expect(int onlyStateToBeOn) {
         float offValue =
+                0f;
                 //0.5f - (1f/states)*0.5f;
                 //1f/states * 0.5f;
-                0f;
+                //0.5f;
 
         expect(ii -> ii == onlyStateToBeOn ? 1f : offValue);
     }

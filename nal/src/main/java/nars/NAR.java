@@ -35,6 +35,7 @@ import nars.term.util.InvalidTermException;
 import nars.time.Clock;
 import nars.time.FrameClock;
 import nars.time.Tense;
+import nars.truth.Truth;
 import nars.util.Iterative;
 import nars.util.Util;
 import nars.util.data.MutableInteger;
@@ -643,13 +644,18 @@ public abstract class NAR extends Param implements Level, Consumer<Task>, NARIn,
     }
 
     @Nullable
-    public Task input(float pri, float dur, @NotNull Termed<Compound> term, char punc, long occurrenceTime, float freq, float conf) {
+    public Task input(float pri, float dur, Termed<Compound> term, char punc, long occurrenceTime, float freq, float conf) {
 
         if (term == null) {
-            throw new RuntimeException("null term for task");
+            throw new NullPointerException("null task term");
         }
 
-        Task t = new MutableTask(term, punc, t(freq, conf))
+        Truth tr = t(freq, conf, confMin.floatValue());
+        if (tr == null) {
+            throw new InvalidTaskException(term, "insufficient confidence");
+        }
+
+        Task t = new MutableTask(term, punc, tr)
                 .budgetByTruth(pri, dur)
                 .time(time(), occurrenceTime);
 
