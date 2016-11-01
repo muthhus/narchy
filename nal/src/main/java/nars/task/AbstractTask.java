@@ -193,12 +193,12 @@ public abstract class AbstractTask extends RawBudget implements Task, Temporal {
 
         }
 
-        if (!Task.taskContentValid(t, punc, nar, !Param.DEBUG))
-            throw new InvalidTaskException(t, "Invalid content");
-
         Compound ntt = nar.normalize(t);
         if (ntt == null)
             throw new InvalidTaskException(t, "Failed normalization");
+
+        if (!Task.taskContentValid(t, punc, nar, !Param.DEBUG))
+            throw new InvalidTaskException(t, "Invalid content");
 
         if (ntt!=t) {
             this.term = ntt;

@@ -605,14 +605,16 @@ public interface Compound extends Term, IPair, TermContainer {
         if (other instanceof Variable)
             return true;
 
-        if (!(other instanceof Compound))
-            return false;
-
         if (op() == NEG)
             throw new UnsupportedOperationException("left hand side should already be unneg'd");
 
         if (other.op()==NEG)
             other = other.unneg();
+
+        if (!(other instanceof Compound))
+            return false;
+
+
 
         int s = size();
 

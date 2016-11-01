@@ -221,7 +221,7 @@ public interface TimeFunctions {
         if (pa!=null) {
             Term pb = resolve(p, b);
             if (pb!=null) {
-                return pa.equalsIgnoringVariables(pb);
+                return pa.unneg().equalsIgnoringVariables(pb);
             }
         }
         return false;
@@ -252,7 +252,7 @@ public interface TimeFunctions {
         occReturn[0] = task.occurrence();
         int taskSize = taskTerm.size();
 
-        if (derived.op() == CONJ && (task.volume() == derived.volume() && taskSize == derived.size())) {
+        if (derived.op() == CONJ && (task.volume() == derived.volume() && taskSize == derived.size() && task.term().vars() == derived.vars())) {
             //something wrong happened with the ellipsis selection.
             //being a decomposition it should produce a smaller result
             throw new InvalidTermException(derived.op(), derived.terms(), "ellipsis commutive match fault: same as parent");

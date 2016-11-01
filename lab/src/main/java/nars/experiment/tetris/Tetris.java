@@ -44,8 +44,9 @@ public class Tetris extends NAgents {
 
     public static final int tetris_width = 6;
     public static final int tetris_height = 14;
-    public static final int TIME_PER_FALL = 2;
-    public static final int frameRate = 4;
+    public static final int TIME_PER_FALL = 16;
+    public static final int frameRate = 1;
+    public static final int PIXEL_RADIX = 4;
     static boolean easy;
 
 
@@ -127,8 +128,8 @@ public class Tetris extends NAgents {
                 Compound squareTerm =
                         //$.p(x, y);
 
-                              $.p($.pRecurse($.radixArray(x, 4, state.width)),
-                                  $.pRecurse($.radixArray(y, 4, state.height)));
+                              $.p($.pRecurse($.radixArray(x, PIXEL_RADIX, state.width)),
+                                  $.pRecurse($.radixArray(y, PIXEL_RADIX, state.height)));
 
 
                 //$.p($.pRadix(x, 4, state.width), $.pRadix(y, 4, state.height));
@@ -159,8 +160,8 @@ public class Tetris extends NAgents {
 
         float actionThresholdHigh = 1f - actionMargin;
         float actionThresholdLow = actionMargin;
-        float actionThresholdHigher = 1f - actionMargin / 1.5f;
-        float actionThresholdLower = actionMargin / 1.5f;
+//        float actionThresholdHigher = 1f - actionMargin / 1.5f;
+//        float actionThresholdLower = actionMargin / 1.5f;
 
 
         actions.add(motorLeftRight = new ActionConcept("(leftright)", nar, (b, d) -> {
@@ -189,12 +190,12 @@ public class Tetris extends NAgents {
             actions.add(motorRotate = new ActionConcept("(rotate)", nar, (b, d) -> {
                 if (d != null) {
                     float r = d.freq();
-                    if (r > actionThresholdHigher) {
+                    if (r > actionThresholdHigh) {
                         if (state.take_action(CW))
                             //return d; //legal move
                             //return d.withConf(gamma);
                             return $.t(1, alpha);
-                    } else if (r < actionThresholdLower) {
+                    } else if (r < actionThresholdLow) {
                         if (state.take_action(CCW))
                             //return d; //legal move
                             //return d.withConf(gamma);
@@ -365,7 +366,7 @@ public class Tetris extends NAgents {
     public static void main(String[] args) {
         Param.DEBUG = false;
 
-        NAR nar = NAgents.newMultiThreadNAR(3, new FrameClock());
+        NAR nar = NAgents.newMultiThreadNAR(3, new FrameClock().setDuration(TIME_PER_FALL/2));
 
 //        Random rng = new XorShift128PlusRandom(1);
 //        //Multi nar = new Multi(3,512,
@@ -630,7 +631,7 @@ public class Tetris extends NAgents {
 
 
         //t.run(runFrames);
-        t.run(10000);
+        t.run(100000);
 
 //        NARController meta = new NARController(nar, loop, t);
 //

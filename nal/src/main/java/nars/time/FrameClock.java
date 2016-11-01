@@ -76,4 +76,10 @@ public class FrameClock implements Clock {
     public float duration() {
         return duration;
     }
+
+    public FrameClock setDuration(float newDuration) {
+        this.duration = newDuration;
+        return this;
+    }
+
 }

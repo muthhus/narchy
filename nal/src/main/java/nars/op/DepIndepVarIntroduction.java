@@ -1,5 +1,6 @@
 package nars.op;
 
+import nars.$;
 import nars.NAR;
 import nars.Op;
 import nars.Task;
@@ -69,10 +70,20 @@ public class DepIndepVarIntroduction extends VarIntroduction {
                     return null; //substitution would replace something at the top level of a statement
         }
 
+        //decide what kind of variable can be introduced according to the input operator
+        boolean dep, indep;
+        if (input.op() == CONJ) {
+            dep = true; indep = false;
+        } else if (input.isAny(ImplicationOrEquivalenceBits)) {
+            dep = false; indep = true;
+        } else {
+            throw new UnsupportedOperationException();
+        }
+
 
         int pSize = p.size();
-        ObjectByteHashMap<Term> conjCoverage = new ObjectByteHashMap<>(pSize);
-        ObjectByteHashMap<Term> indepEquivCoverage = new ObjectByteHashMap<>(pSize /* estimate */);
+        @Nullable ObjectByteHashMap<Term> conjCoverage = dep ? new ObjectByteHashMap<>(pSize) : null;
+        @Nullable ObjectByteHashMap<Term> indepEquivCoverage = indep ? new ObjectByteHashMap<>(pSize /* estimate */) : null;
         for (int occurrence = 0; occurrence < pSize; occurrence++) {
             byte[] path = p.get(occurrence);
             Term t = null; //root
@@ -83,10 +94,11 @@ public class DepIndepVarIntroduction extends VarIntroduction {
                 else
                     t = ((Compound) t).term(path[i]);
                 Op o = t.op();
-                if (validIndepVarSuperterm(o)) {
+
+                if (indep && validIndepVarSuperterm(o)) {
                     byte inside = (byte) (1 << path[i + 1]);
                     indepEquivCoverage.updateValue(t, inside, (previous) -> (byte) ((previous) | inside));
-                } else if (validDepVarSuperterm(o)) {
+                } else if (dep && validDepVarSuperterm(o)) {
                     conjCoverage.addToValue(t, (byte) 1);
                 }
             }
@@ -95,16 +107,16 @@ public class DepIndepVarIntroduction extends VarIntroduction {
         int iteration = 0;
 
         //at least one impl/equiv must have both sides covered
-        Term I = (indepEquivCoverage.anySatisfy(b -> b == 0b11)) ?
+        Term I = indep && (indepEquivCoverage.anySatisfy(b -> b == 0b11)) ?
                 varIndep("i" + iteration) : null;
 
         //at least one conjunction must contain >=2 path instances
-        Term D = conjCoverage.anySatisfy(b -> b >= 2) ?
+        Term D = dep && conjCoverage.anySatisfy(b -> b >= 2) ?
                 varDep("i" + iteration) : null;
 
-        if (I!=null && D!=null) {
+        /*if (I!=null && D!=null) {
             return new Term[] { I , D };
-        } else if (I!=null) {
+        } else */if (I!=null) {
             return new Term[] { I };
         } else if (D!=null) {
             return new Term[] { D };
@@ -136,8 +148,23 @@ public class DepIndepVarIntroduction extends VarIntroduction {
         public @NotNull Term apply(@NotNull Term[] args) {
 
             Term[] only = new Term[] { False };
-            introducer.accept((Compound) args[0], y -> only[0] = y);
-            return only[0];
+            Compound x = (Compound) args[0];
+
+            //temporarily unwrap negation
+            boolean negated;
+            if (x.op() == NEG) {
+                x = (Compound) x.unneg();
+                negated = true;
+            } else {
+                negated = false;
+            }
+
+            introducer.accept(x, y -> only[0] = y);
+
+            Term y = only[0];
+            if (y == False)
+                return False;
+            return $.negIf((Compound) y, negated);
         }
     }
 
