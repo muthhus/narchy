@@ -96,9 +96,9 @@ public class NARSpace<X, Y extends Spatial<X>> extends ListSpace<X, Y> {
 
         NARSpace<Term, Spatial<Term>> n = new NARSpace<>(nn, (nar, space, target) -> {
             Bag<Concept> x =
-                    nar instanceof Default ?
-                            ((Default) nar).core.active :
-                            ((Default2)nar).active;
+                    //nar instanceof Default ?
+                            ((Default) nar).core.active;
+                            //((Default2)nar).active;
 
             //System.out.println(((Default) nar).core.concepts.size() + " "+ ((Default) nar).index.size());
 

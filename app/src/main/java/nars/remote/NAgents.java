@@ -80,9 +80,10 @@ abstract public class NAgents extends NAgent {
     public static void runRT(Function<NAR, NAgents> init) {
 
 
-        Default nar = NAgents.newMultiThreadNAR(3, new RealtimeClock.DS(true).setDuration(0.04f), false);
+
+        //Default nar = NAgents.newMultiThreadNAR(3, new RealtimeClock.DS(true).setDuration(0.04f), false);
         //Default nar = newNAR();
-        //Default2 nar = newNAR2();
+        Default2 nar = newNAR2();
 
         NAgents a = init.apply(nar);
         a.trace = true;
@@ -263,7 +264,7 @@ abstract public class NAgents extends NAgent {
                 grid(
                         grid(a.cam.values().stream().map(cs -> new CameraSensorView(cs, nar)).toArray(Surface[]::new)),
 
-                        Vis.concepts((Default) nar, 128),
+                        nar instanceof Default ? Vis.concepts((Default) nar, 128) : grid(/*blank*/),
 
                         Vis.agentActions(a, 200),
 

@@ -6,6 +6,7 @@ import nars.Param;
 import nars.Task;
 import nars.bag.Bag;
 import nars.bag.impl.CurveBag;
+import nars.bag.impl.experimental.HijackBag;
 import nars.budget.Budgeted;
 import nars.budget.merge.BudgetMerge;
 import nars.concept.Concept;
@@ -31,6 +32,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
 import static java.lang.System.out;
@@ -45,83 +47,113 @@ public class Default2 extends NAR {
 
     private static final Logger logger = LoggerFactory.getLogger(Default2.class);
 
-    @NotNull
-    public final Bag<Concept> active;
 
     public final List<GraphPremiseBuilder> cores;
 
     final static Deriver deriver = Deriver.getDefaultDeriver();
 
 
+    static private final BudgetMerge blend = BudgetMerge.plusBlend;
 
     public final class GraphPremiseBuilder implements Runnable {
 
-        public static final int seedRate = 1;
+        //public static final int seedRate = 5;
 
         @Nullable Concept here;
         @Nullable
         private BLink<Term> linkHere;
 
+
+//        @NotNull
+//        public final Bag<Concept> active;
+
+
         //Bag<Concept> local = new HijackBag<>(32, 4, BudgetMerge.avgBlend, random);
         public final Bag<Term> terms =
-                //new HijackBag<>(24, 4, BudgetMerge.plusBlend, random);
-                new CurveBag(16, new CurveBag.NormalizedSampler(power2BagCurve, random), BudgetMerge.plusBlend, new ConcurrentHashMap(16));
+                new HijackBag<>(128, 3, blend, random);
+                //new CurveBag(16, new CurveBag.NormalizedSampler(power2BagCurve, random), blend, new ConcurrentHashMap(16));
         public final Bag<Task> tasklinks =
-                //new HijackBag<>(16, 4, BudgetMerge.plusBlend, random);
-                new CurveBag(16, new CurveBag.NormalizedSampler(power2BagCurve, random), BudgetMerge.plusBlend, new ConcurrentHashMap(16));
+                new HijackBag<>(128, 3, blend, random);
+                //new CurveBag(16, new CurveBag.NormalizedSampler(power2BagCurve, random), blend, new ConcurrentHashMap(16));
 
-        int iterations = 2;
+        int iterations = 8;
         int tasklinksFiring = 2;
-        int termlinksFiring = 2;
+        int termlinksFiring = 3;
 
         /** multiplier to apply to links in the 'active' bag when they have been accepted as seeds to this core
          *  it is a cost (reduction) applied to the 'active' bag
          * */
-        private float conceptSeedCost = 0.8f;
+        //private float conceptSeedCost = 0.1f;
 
         /* a cost (reduction) applied to the local 'term' bag */
-        private float conceptVisitCost = 0.8f;
+        private float conceptVisitCost = 0.5f;
 
         /** a value which should be less than 1.0,
          * indicating the preference for the current value vs. a tendency to move */
-        float momentum = 0.1f;
+        float momentum = 0.5f;
 
         public GraphPremiseBuilder() {
+//            active = //new CurveBag(BudgetMerge.plusBlend, random).setCapacity(1024);
+//                new HijackBag<>(512, 4, random);
+
         }
 
-        protected void seed(int num) {
-
-//            while (num-- > 0) {
-//                BLink<Concept> c = active.pop();
-//                if (c != null)
-//                    terms.put(c.get().term(), c);
-//                else
-//                    break;
-//            }
-
-
-            active.sample(num, c -> {
-                Concept key = c.get();
-                terms.put(key.term(), c);
-                active.mul(key, conceptSeedCost);
-                return true;
-            });
-        }
+//        protected void seed(int num) {
+//
+////            while (num-- > 0) {
+////                BLink<Concept> c = active.pop();
+////                if (c != null)
+////                    terms.put(c.get().term(), c);
+////                else
+////                    break;
+////            }
+//
+//
+////            active.commit().sample(num, c -> {
+////                Concept key = c.get();
+////                active.mul(key, conceptSeedCost);
+////                terms.put(key.term(), c);
+////                return true;
+////            });
+//        }
 
         @Override
         public void run() {
-            for (int i = 0; i < iterations; i++) {
+            for (int i = 0; i < Math.round(iterations * exe.load()); i++) {
                 iterate();
             }
         }
 
+        public synchronized void loop() {
+            while (true) {
+                try {
+                    //run();
+                    iterate();
+                } catch (Throwable t) {
+                    logger.error("run: {}", t);
+                }
+            }
+        }
+
+        public void loopAsync() {
+            try {
+
+                for (int i = 0; i < Math.round(iterations * exe.load()); i++) {
+                    iterate();
+                }
+            } catch (Throwable t) {
+                logger.error("run: {}", t);
+            }
+
+            runLater(this::loop); //retrigger asynch
+        }
 
         void iterate() {
 
             //decide whether to remain here
             boolean move;
             if (here !=null) {
-                move = (random.nextFloat() > (1f-momentum) * linkHere.priIfFiniteElseZero());
+                move = (random.nextFloat() > (momentum) * linkHere.priIfFiniteElseZero());
             } else {
                 move = true;
             }
@@ -131,7 +163,7 @@ public class Default2 extends NAR {
                 BLink<Term> next = go();
 
                 if (next == null) {
-                    seed(seedRate);
+                    //seed(seedRate);
                     go();
                 }
             }
@@ -188,18 +220,15 @@ public class Default2 extends NAR {
     public Default2() {
         this(new FrameClock(),
                 //new SingleThreadExecutioner()
-                new MultiThreadExecutioner(4, 4096)
+                new MultiThreadExecutioner(2, 1024*16).sync(false),
+                4
         );
     }
 
-    public Default2(@NotNull Clock clock, Executioner exe) {
+    public Default2(@NotNull Clock clock, Executioner exe, int cores) {
         super(clock, new TreeTermIndex.L1TreeIndex(new DefaultConceptBuilder(), 1024*1024, 8192, 4),
                 new XorShift128PlusRandom(1), Param.defaultSelf(), exe);
 
-        CurveBag<Concept> cb = new CurveBag(BudgetMerge.plusBlend, random);
-        cb.setCapacity(1024);
-        active = cb;
-//                new HijackBag<>(512, 4, random);
 
 
         durMin.setValue(BUDGET_EPSILON * 2f);
@@ -219,12 +248,24 @@ public class Default2 extends NAR {
 
         }
 
-        int numCores = 4;
-        this.cores = range(0, numCores ).mapToObj(i -> new GraphPremiseBuilder()).collect(toList());
 
-        onFrame(()-> {
-            runLater(cores, GraphPremiseBuilder::run, 1);
+        this.cores = range(0, cores).mapToObj(i -> new GraphPremiseBuilder()).collect(toList());
+
+        AtomicBoolean running = new AtomicBoolean(false);
+        runLater(()-> {
+           if (running.compareAndSet(false,true)) {
+               for (GraphPremiseBuilder b : this.cores)
+                   new Thread(b::loop).start();
+
+//               for (GraphPremiseBuilder b : this.cores)
+//                   runLater(b::loopAsync);
+           }
         });
+
+
+//        onFrame(()-> {
+//            runLater(cores, GraphPremiseBuilder::run, 1);
+//        });
     }
 
     private float getNextActivationRate() {
@@ -249,29 +290,40 @@ public class Default2 extends NAR {
 
     @Override
     public final Concept concept(@NotNull Term term, float boost) {
+//        Concept c = concept(term);
+//        if (c!=null) {
+//            return active.mul(c, boost);
+//        }
+
         Concept c = concept(term);
         if (c!=null) {
-            return active.mul(c, boost);
+            cores.get(Math.abs(term.hashCode()) % cores.size()).terms.add(term, boost);
         }
-        return null;
+        return c;
     }
 
     @Override
     public final void activationAdd(@NotNull ObjectFloatHashMap<Concept> concepts, @NotNull Budgeted in, float activation, MutableFloat overflow) {
-        active.put(concepts, in, activation, overflow);
+        //active.put(concepts, in, activation, overflow);
+        int numCores = cores.size();
+
+        concepts.forEachKeyValue((c,v)->{
+            cores.get(Math.abs(c.hashCode()) % numCores).terms.put(c.term(), in, activation * v, overflow);
+        });
     }
 
     @Override
     public final float activation(@NotNull Termed concept) {
-        BLink<Concept> c = active.get(concept);
-        return c != null ? c.priIfFiniteElseZero() : 0;
+        /*BLink<Concept> c = active.get(concept);
+        return c != null ? c.priIfFiniteElseZero() : 0;*/
+        return 0;
     }
 
 
     @NotNull
     @Override
     public NAR forEachActiveConcept(@NotNull Consumer<Concept> recip) {
-        active.forEachKey(recip);
+        //active.forEachKey(recip);
         return this;
     }
 

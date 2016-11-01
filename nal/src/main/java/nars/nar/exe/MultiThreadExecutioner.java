@@ -37,8 +37,9 @@ public class MultiThreadExecutioner extends Executioner {
     private long cursor;
     private boolean sync = true;
 
-    public void sync(boolean b) {
+    public MultiThreadExecutioner sync(boolean b) {
         this.sync = b;
+        return this;
     }
 
 
@@ -87,7 +88,9 @@ public class MultiThreadExecutioner extends Executioner {
         this.exe = new AffinityExecutor("exe");
 
         this.cap = ringSize;
-        this.safetyLimit = (int)((1f/threads) * ringSize);
+        this.safetyLimit =
+                (int)((1f/threads) * ringSize)/2;
+                //0;
 
         this.disruptor = new Disruptor<>(
                 TaskEvent::new,

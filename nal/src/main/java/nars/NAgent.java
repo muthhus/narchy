@@ -229,7 +229,8 @@ abstract public class NAgent implements NSense, NAction {
         }
 
         /** safety valve: if overloaded, enter shock / black out and do not receive sensor input */
-        if (nar.exe.load() < 1) {
+        float load = nar.exe.load();
+        if (load < 1) {
 
 
             predict();
@@ -243,7 +244,7 @@ abstract public class NAgent implements NSense, NAction {
             curiosity();
 
         } else {
-            logger.warn("sensor overwhelm");
+            logger.warn("sensor overwhelm: load={}",load);
         }
 
 
@@ -537,7 +538,11 @@ abstract public class NAgent implements NSense, NAction {
     @Nullable
     protected Concept boost(Concept c, float amount) {
 
-        ((Default)nar).core.active.add(c, amount);
+        //HACK
+        if (nar instanceof Default) {
+            ((Default) nar).core.active.add(c, amount);
+        }
+
 //        new Activation(boostBudget, c, nar, 1) {
 //
 //            @Override

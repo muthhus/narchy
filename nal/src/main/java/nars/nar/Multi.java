@@ -31,10 +31,14 @@ public class Multi {
          * priority multiplier of activation a core produced in a processed task,
          * shared to another core (possibly 0)
          */
-        public float link(int from, int to);
+        float link(int from, int to);
     }
 
     final static Logger logger = LoggerFactory.getLogger(Multi.class);
+
+    public Multi(int numCores) {
+        this(numCores, (i,j)->0);
+    }
 
     public Multi(int numCores, @NotNull ConnectivityFunction conn /*, TermIndex index, Clock c*/) {
         Clock clock = new RealtimeClock.DS(true);

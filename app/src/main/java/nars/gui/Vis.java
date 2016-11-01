@@ -193,7 +193,8 @@ public class Vis {
         if (nar instanceof Default) {
             return budgetHistogram(((Default)nar).core.active, bins);
         } else { //if (nar instance)
-            return budgetHistogram(((Default2)nar).active, bins);
+            //return budgetHistogram(((Default2)nar).active, bins);
+            return grid(); //TODO
         }
     }
 
