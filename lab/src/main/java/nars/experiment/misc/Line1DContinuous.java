@@ -255,9 +255,9 @@ public class Line1DContinuous extends NAgent {
 
         nar.compoundVolumeMax.set(12);
 
-        Line1DContinuous l = new Line1DContinuous(nar, 4,
-                sine(100)
-                //random(120)
+        Line1DContinuous l = new Line1DContinuous(nar, 6,
+                //sine(100)
+                random(120)
         );
 
         Vis.show((Default) l.nar, 2000); //Vis.agentActions(l, 2000);
