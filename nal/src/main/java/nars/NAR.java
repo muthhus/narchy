@@ -1031,7 +1031,9 @@ public abstract class NAR extends Param implements Level, Consumer<Task>, NARIn,
                 int end = Math.min(i + chunkSize, s);
                 runLater(() -> {
                     for (int j = start; j < end; j++) {
-                        each.accept(items.get(j));
+                        X x = items.get(j);
+                        if (x!=null)
+                            each.accept(x);
                     }
                 });
                 i += chunkSize;

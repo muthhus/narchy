@@ -321,6 +321,8 @@ public abstract class Param /*extends Container*/ implements Level {
     public float DEFAULT_QUESTION_DURABILITY = 0.5f;
 
 
+    public static final int CONCEPT_FIRE_BATCH_SIZE = 4;
+
     /**
      * Default priority of input judgment
      */

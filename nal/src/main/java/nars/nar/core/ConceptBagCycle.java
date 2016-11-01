@@ -18,20 +18,15 @@ import nars.nar.util.PremiseMatrix;
 import nars.util.data.MutableInteger;
 import nars.util.data.Range;
 import org.apache.commons.lang3.mutable.MutableFloat;
-import org.eclipse.collections.api.block.procedure.primitive.ObjectFloatProcedure;
 import org.eclipse.collections.impl.map.mutable.primitive.ObjectFloatHashMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Deque;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Queue;
-import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.Consumer;
 
 /**
  * The default deterministic memory cycle implementation that is currently used as a standard
@@ -62,6 +57,13 @@ public class ConceptBagCycle {
     public final @NotNull MutableInteger conceptsFiredPerCycle;
 
 
+    /** size of each sampled concept batch that adds up to conceptsFiredPerCycle.
+     *  reducing this value should provide finer-grained / higher-precision concept selection
+     *  since results between batches can affect the next one.
+     */
+    public final @NotNull MutableInteger conceptsFiredPerBatch;
+
+
     @Range(min = 0, max = 16, unit = "TaskLink") //TODO use float percentage
     public final MutableInteger tasklinksFiredPerFiredConcept = new MutableInteger(1);
 
@@ -74,7 +76,6 @@ public class ConceptBagCycle {
     private final ConceptBuilder conceptBuilder;
 
     //cached value for use in the next firing
-    private int _tasklinks, _termlinks;
     private long now;
 
     final AtomicBoolean busy = new AtomicBoolean(false);
@@ -95,6 +96,7 @@ public class ConceptBagCycle {
         this.nar = nar;
 
         this.conceptsFiredPerCycle = new MutableInteger(1);
+        this.conceptsFiredPerBatch = new MutableInteger(Param.CONCEPT_FIRE_BATCH_SIZE);
         this.conceptBuilder = nar.concepts.conceptBuilder();
 
         this.active = new BagIndexAdapter(initialCapacity, ((DefaultConceptBuilder) conceptBuilder).defaultCurveSampler);
@@ -113,26 +115,37 @@ public class ConceptBagCycle {
                 int cpf = Math.round(conceptsFiredPerCycle.floatValue() * (1f - load));
                 if (cpf > 0) {
 
+                    int cbs = conceptsFiredPerBatch.intValue();
 
                     //logger.info("firing {} concepts (exe load={})", cpf, load);
 
-                    this._tasklinks = tasklinksFiredPerFiredConcept.intValue();
-                    this._termlinks = termlinksFiredPerFiredConcept.intValue();
+                    while (cpf > 0) {
 
-                    List<BLink<Concept>> toFire = $.newArrayList(cpf);
-                    active.sample(cpf, toFire::add);
+                        int batchSize = Math.min(cpf, cbs);
+                        cpf -= cbs;
 
-                    //toFire.sort(sortConceptLinks);
+                        this.nar.runLater(() -> {
 
-                    this.nar.runLater(toFire, bc -> {
-                        Concept c = bc.get();
-                        PremiseMatrix.run(c, this.nar,
-                                _tasklinks, _termlinks,
-                                this.nar::input, //input them within the current thread here
-                                deriver
-                        );
-                    }, 1);
+                            List<BLink<Concept>> toFire = $.newArrayList(batchSize);
+                            toFire.clear();
+                            active.sample(batchSize, toFire::add);
 
+
+                            int _tasklinks = tasklinksFiredPerFiredConcept.intValue();
+                            int _termlinks = termlinksFiredPerFiredConcept.intValue();
+
+                            for (int i = 0, toFireSize = toFire.size(); i < toFireSize; i++) {
+                                Concept c = toFire.get(i).get();
+                                PremiseMatrix.run(c, this.nar,
+                                        _tasklinks, _termlinks,
+                                        this.nar::input, //input them within the current thread here
+                                        deriver
+                                );
+                            }
+                        });
+
+
+                    }
                 }
 
                 busy.set(false);
