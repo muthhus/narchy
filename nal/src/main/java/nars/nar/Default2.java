@@ -30,6 +30,7 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -64,20 +65,17 @@ public class Default2 extends NAR {
         private BLink<Term> linkHere;
 
 
-//        @NotNull
-//        public final Bag<Concept> active;
-
-
-        //Bag<Concept> local = new HijackBag<>(32, 4, BudgetMerge.avgBlend, random);
         public final Bag<Term> terms =
-                new HijackBag<>(128, 3, blend, random);
-                //new CurveBag(16, new CurveBag.NormalizedSampler(power2BagCurve, random), blend, new ConcurrentHashMap(16));
-        public final Bag<Task> tasklinks =
-                new HijackBag<>(128, 3, blend, random);
-                //new CurveBag(16, new CurveBag.NormalizedSampler(power2BagCurve, random), blend, new ConcurrentHashMap(16));
+                //new HijackBag<>(128, 3, blend, random);
+                new CurveBag(64, new CurveBag.NormalizedSampler(power2BagCurve, random), blend, new ConcurrentHashMap(64));
 
-        int iterations = 8;
-        int tasklinksFiring = 2;
+        /** the tasklink bag is only modified and accessed by the core, locally, so it does not need to have a concurrent Map */
+        public final Bag<Task> tasklinks =
+                //new HijackBag<>(128, 3, blend, random);
+                new CurveBag(64, new CurveBag.NormalizedSampler(power2BagCurve, random), blend, new HashMap(64));
+
+        int iterations = 16;
+        int tasklinksFiring = 1;
         int termlinksFiring = 3;
 
         /** multiplier to apply to links in the 'active' bag when they have been accepted as seeds to this core

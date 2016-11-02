@@ -464,8 +464,8 @@ public class IRCAgent extends IRC {
 
         IRCAgent bot = new IRCAgent(n,
                 "experiment1", "irc.freenode.net",
-                "#123xyz"
-                //"#netention"
+                //"#123xyz"
+                "#netention"
                 //"#nars"
         );
 

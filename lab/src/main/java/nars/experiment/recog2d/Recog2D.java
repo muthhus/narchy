@@ -326,6 +326,22 @@ public class Recog2D extends NAgents {
 
     /**
      * http://stackoverflow.com/a/12653770
+     *
+     * Notes ( http://ml.informatik.uni-freiburg.de/_media/publications/12riedmillertricks.pdf ):
+     * Surprisingly, the same robustness is observed for the choice of the neural
+     network size and structure. In our experience, a multilayer perceptron with 2
+     hidden layers and 20 neurons per layer works well over a wide range of applications.
+     We use the tanh activation function for the hidden neurons and the
+     standard sigmoid function at the output neuron. The latter restricts the output
+     range of estimated path costs between 0 and 1 and the choice of the immediate
+     costs and terminal costs have to be done accordingly. This means, in a typical
+     setting, terminal goal costs are 0, terminal failure costs are 1 and immediate
+     costs are usually set to a small value, e.g. c = 0.01. The latter is done with the
+     consideration, that the expected maximum episode length times the transition
+     costs should be well below 1 to distinguish successful trajectories from failures.
+     As a general impression, the success of learning depends much more on the
+     proper setting of other parameters of the learning framework. The neural network
+     and its training procedure work very robustly over a wide range of choices.
      */
     public static class MLP {
 

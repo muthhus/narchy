@@ -295,3 +295,7 @@ In keeping with a design preference for unity and balanced spectral continuity, 
  - Discussion Group https://groups.google.com/forum/?fromgroups#!forum/open-nars
 
 [![](https://images.microbadger.com/badges/image/automenta/narchy.svg)](http://microbadger.com/images/automenta/narchy "image badge from microbadger.com")
+
+̶̳̺͐᷀̊N̲̠̥̻A̙ͨ͋ͪR̳̖̯̲̞̪߮߯ͫ̈́́ͮc̙͎̑ͮ߬͟͏h̨͍߳y͈߭߳᷉͘͜
+̼߲᷆̋N゙̺҄߰͋Ả̀R߲̞͈̜ͧ͌ͤc̸͉᷄̀ẖ̈̊y゚̡̤͎᷁
+̶N̛̫͈ͤ͟͠͏͉Ȧ̲᷅ͩR҆̑߬c゚̰͂҇҇͡h͇᷈ͥ̓̀y̸̗̕
