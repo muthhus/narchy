@@ -285,6 +285,7 @@ public class NAL7Test extends AbstractNALTest {
             .mustBelieve(cycles, "( enter(John, room) ==>-4 open(John, door) )",
                     1.00f, 0.45f, 0);
     }
+
     @Test
     public void induction_on_events_0_neg() {
         test()
@@ -293,8 +294,8 @@ public class NAL7Test extends AbstractNALTest {
                 .inputAt(4, "enter(John,room). :|:")
                 .mustBelieve(cycles, "( (--,open(John, door)) ==>+4 enter(John, room) )",
                         1.00f, 0.45f, 0)
-                .mustBelieve(cycles, "( open(John, door) &&+4 enter(John, room) )",
-                        0f, 0.81f, 0)
+                .mustBelieve(cycles, "( (--,open(John, door)) &&+4 enter(John, room) )",
+                        1f, 0.81f, 0)
         ;
     }
 
@@ -530,7 +531,7 @@ public class NAL7Test extends AbstractNALTest {
                 0)
         .mustBelieve(cycles,
                 "(($1 --> a) <=>+10 ($1 -->b))",
-                0.27f, 0.41f,
+                0.1f, 0.37f,
                 0)
         ;
 

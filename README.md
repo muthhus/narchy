@@ -25,9 +25,6 @@ Non-Axiomatic Reasoning System ([NARS](https://sites.google.com/site/narswang/ho
                         | <variable>                         // an atomic variable term
                         | <compound>                         // a term with internal structure
 
-                        | `<object>`                         // object value or expression (TODO)
-                        | `<integer>`                        // integer value (TODO)
-
            <compound> ::=
                         | "(--," <term> ")"                  // negation
                         | --<term>                           // negation shorthand, semi-functional TODO
@@ -44,11 +41,11 @@ Non-Axiomatic Reasoning System ([NARS](https://sites.google.com/site/narswang/ho
                         | "("<term> "<=>"<dt> <term>")"      // equivalence sequence
 
                         | "(&&," <term> {","<term>} ")"      // conjunction eternal, also: (x && y)
-                        | "(&|," <term> {","<term>} ")"      // conjunction parallel (shorthand for &&+0) TODO
+                        | "(&|," <term> {","<term>} ")"      // conjunction parallel (shorthand for &&+0), also: (x &| y) TODO
                         | "(&/," <term> {","<term>} ")"      // conjunction sequence, internally converted to recursive 2-ary sequence conjunctions TODO
                         | "("<term> "&&"<dt> <term>")"       // conjunction sequence (size=2 only)
 
-                        | "(||," <term> {","<term>} ")"      // disjunction, internally converted to negated conjunction of negations, also: (x || y)
+                        | "(||," <term> {","<term>} ")"      // disjunction, internally converts to negated conjunction of negations, also: (x || y)
 
                         | "("<term> "-{-" <term>")"          // instance, expanded on input to: {x} --> y
                         | "("<term> "-]-" <term>")"          // property, expanded on input to: x --> [y]
@@ -66,7 +63,7 @@ Non-Axiomatic Reasoning System ([NARS](https://sites.google.com/site/narswang/ho
                         | "(-," <term> "," <term> ")"        // extensional difference, also: (x - y)
                         | "(~," <term> "," <term> ")"        // intensional difference, also: (x ~ y)
 
-                        | <term>"("<term> {","<term>} ")"    // an operation to be executed (function syntax); op(x,y) internally is: ((x,y)-->^op)
+                        | <term>"("<term> {","<term>} ")"    // an operation to be executed (function syntax); f(x,y) internally is: ((x,y)-->f)
 
 
                  <dt> ::= [+|-]<number>                      //delta-time amount (frames); positive = future, negative = past, +0 = simultaneous

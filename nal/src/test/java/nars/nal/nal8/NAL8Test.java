@@ -19,7 +19,7 @@ import static org.junit.Assert.assertEquals;
 @RunWith(Parameterized.class)
 public class NAL8Test extends AbstractNALTest {
 
-    final int cycles = 550;
+    final int cycles = 70;
 
     public NAL8Test(Supplier<NAR> b) { super(b); }
 
@@ -450,8 +450,8 @@ public class NAL8Test extends AbstractNALTest {
 
         test()
             
-            .input(              "on:({t002},{t003}). :|:")
-            .inputAt(10,         "(on:({t002},#1) &&+0 at(SELF,#1)).")
+            .input(              "on({t002},{t003}). :|:")
+            .inputAt(10,         "(on({t002},#1) &&+0 at(SELF,#1)).")
             .mustBelieve(cycles,   "at(SELF,{t003})", 1.0f, 0.43f, 0)
             .mustNotOutput(cycles, "at(SELF,{t003})", '.', 0, 1f, 0, 1f, ETERNAL);
 
@@ -461,8 +461,8 @@ public class NAL8Test extends AbstractNALTest {
     public void condition_belief_deduction_2_easier()  {
 
         test()
-                .input(      "on:(t002,t003). :|:")
-                .inputAt(2,  "(on:(t002,#1) &&+0 at(SELF,#1)).")
+                .input(      "on(t002,t003). :|:")
+                .inputAt(2,  "(on(t002,#1) &&+0 at(SELF,#1)).")
                 .mustBelieve(cycles,   "at(SELF,t003)", 1.0f, 0.43f, 0)
                 .mustNotOutput(cycles, "at(SELF,t003)", '.', 0, 1f, 0, 1f, ETERNAL);
     }
