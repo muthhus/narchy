@@ -844,6 +844,16 @@ public class NAL7Test extends AbstractNALTest {
     }
 
     @Test
+    public void preconImplyConjPre() {
+        //implication-based composition
+        test()
+                .input("(x ==>+2 a). :|:")
+                .input("(y ==>+3 a). :|:")
+                .mustBelieve(cycles,   "((y &&+1 x) ==>+2 a)", 1.00f, 0.81f, 0) //correct conj sub-term DT
+                .mustNotOutput(cycles, "((x && y) ==>+2 a)", '.', 0, ETERNAL)
+                .mustNotOutput(cycles, "((x && y) ==>+3 a)", '.', 0, ETERNAL);
+    }
+    @Test
     public void preconImplyConjPost() {
         //implication-based composition
         test()
@@ -852,6 +862,15 @@ public class NAL7Test extends AbstractNALTest {
                 .mustBelieve(cycles,   "(a ==>+2 (x &&+1 y))", 1.00f, 0.81f, 0) //correct conj sub-term DT
                 .mustNotOutput(cycles, "(a ==>+2 (x && y))", '.', 0, ETERNAL)
                 .mustNotOutput(cycles, "(a ==>+3 (x && y))", '.', 0, ETERNAL);
+    }
+    @Test
+    public void preconImplyConjPost2() {
+        //implication-based composition
+        test()
+                .input("(a ==>+2 x). :|:")
+                .input("(a ==>-3 y). :|:")
+                .mustBelieve(cycles, "(a ==>-3 (y &&+5 x))", 1.00f, 0.81f, 0) //correct conj sub-term DT
+        ;
     }
 
 //    @Test public void testTruthDecayOverTime0() {

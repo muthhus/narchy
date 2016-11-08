@@ -62,7 +62,7 @@ public final class Emotion implements Serializable {
         this.happy = new FloatGuage("happy");
         this.sad = new FloatGuage("sad");
 
-        this.confident = new FloatGuage("happy");
+        this.confident = new FloatGuage("confidence");
 
         this.stress = new FloatGuage("stress");
         this.frustration = new FloatGuage("frustration");

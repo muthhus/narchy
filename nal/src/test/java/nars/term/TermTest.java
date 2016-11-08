@@ -723,11 +723,11 @@ public class TermTest {
         assertEquals(+1, a.compareTo(b));
         assertEquals(-1, b.compareTo(a));
 
-        assertEquals(+1, a.compareTo(c));
-        assertEquals(-1, c.compareTo(a));
+        assertEquals(+2, a.compareTo(c));
+        assertEquals(-2, c.compareTo(a));
 
-        assertEquals(+1, b.compareTo(c));
-        assertEquals(-1, c.compareTo(b));
+        assertEquals(+2, b.compareTo(c));
+        assertEquals(-2, c.compareTo(b));
 
 
     }

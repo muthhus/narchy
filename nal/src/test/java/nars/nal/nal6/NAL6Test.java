@@ -58,7 +58,7 @@ public class NAL6Test extends AbstractNALTest {
         tester.mustBelieve(cycles, "<<$1 --> swimmer> ==> <$1 --> bird>>", 1.00f, 0.37f); //en("I guess if something is a swimmer, then it is a bird.");
         tester.mustBelieve(cycles, "<<$1 --> bird> ==> <$1 --> swimmer>>", 0.80f, 0.42f); //en("I guess if something is a bird, then it is a swimmer.");
         tester.mustBelieve(cycles, "<<$1 --> bird> <=> <$1 --> swimmer>>", 0.80f, 0.42f); //en("I guess something is a bird, if and only if it is a swimmer.");
-        tester.mustBelieve(cycles, "<<$1 --> swan> ==> (&&,(--,<$1 --> bird>),(--,<$1 --> swimmer>))>", 0.00f, 0.72f); //en("I believe that if something is a swan, then it is a bird or a swimmer.");
+        //tester.mustBelieve(cycles, "<<$1 --> swan> ==> (&&,(--,<$1 --> bird>),(--,<$1 --> swimmer>))>", 0.00f, 0.72f); //en("I believe that if something is a swan, then it is a bird or a swimmer.");
             //technicallt this is the same as:
             //  tester.mustBelieve(cycles, "<<$1 --> swan> ==> (||,<$1 --> bird>,<$1 --> swimmer>)>", 1.00f, 0.72f); //en("I believe that if something is a swan, then it is a bird or a swimmer.");
 
@@ -71,7 +71,7 @@ public class NAL6Test extends AbstractNALTest {
         tester.believe("<<bird --> $x> ==> <robin --> $x>>"); //en("What can be said about bird can also be said about robin.");
         tester.believe("<<swimmer --> $y> ==> <robin --> $y>>", 0.70f, 0.90f); //en("What can be said about swimmer usually can also be said about robin.");
         tester.mustBelieve(cycles, "<(&&,<bird --> $1>,<swimmer --> $1>) ==> <robin --> $1>>", 1.00f, 0.81f); //en("What can be said about bird and swimmer can also be said about robin.");
-        tester.mustBelieve(cycles, "<(||,<bird --> $1>,<swimmer --> $1>) ==> <robin --> $1>>", 0.70f, 0.81f); //en("What can be said about bird or swimmer can also be said about robin.");
+        //tester.mustBelieve(cycles, "<(||,<bird --> $1>,<swimmer --> $1>) ==> <robin --> $1>>", 0.70f, 0.81f); //en("What can be said about bird or swimmer can also be said about robin.");
         tester.mustBelieve(cycles, "<<bird --> $1> ==> <swimmer --> $1>>", 1.00f, 0.36f); //en("I guess what can be said about bird can also be said about swimmer.");
         tester.mustBelieve(cycles, "<<swimmer --> $1> ==> <bird --> $1>>", 0.70f, 0.45f); //en("I guess what can be said about swimmer can also be said about bird.");
         tester.mustBelieve(cycles, "<<bird --> $1> <=> <swimmer --> $1>>", 0.70f, 0.45f); //en("I guess bird and swimmer share most properties.");

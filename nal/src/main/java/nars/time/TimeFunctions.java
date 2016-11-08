@@ -654,19 +654,17 @@ public interface TimeFunctions {
         occReturn[0] = p.occurrenceTarget(earliestOccurrence);
 
         if (pre) {
-
+            //set subterm 0's DT
+            derived = (Compound) terms.the(derived,
+                    terms.the((Compound) derived.term(0),
+                            ((taskDT != DTERNAL) && (beliefDT != DTERNAL)) ? (taskDT - beliefDT) : DTERNAL),
+                    derived.term(1));
         }
         if (post) {
             //set subterm 1's DT
-            Compound x = (Compound) derived.term(1);
-            int dt;
-            if (taskDT!=DTERNAL && beliefDT!=DTERNAL) {
-                dt = taskDT - beliefDT;
-            } else {
-                dt = DTERNAL;
-            }
-            Term y =  terms.the(x, dt);
-            derived = (Compound) terms.the(derived, derived.term(0), y );
+            derived = (Compound) terms.the(derived,
+                    derived.term(0), terms.the((Compound) derived.term(1),
+                            ((taskDT != DTERNAL) && (beliefDT != DTERNAL)) ? (taskDT - beliefDT) : DTERNAL));
         }
 
         return deriveDT(derived, 1, p, eventDelta, occReturn);
