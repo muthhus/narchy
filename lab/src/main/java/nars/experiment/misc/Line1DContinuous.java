@@ -234,7 +234,7 @@ public class Line1DContinuous extends NAgent {
     public static void main(String[] args) {
 
         XorShift128PlusRandom rng = new XorShift128PlusRandom((int)(Math.random()*1000));
-        int conceptsPerCycle = 128;
+        int conceptsPerCycle = 32;
 
         final Executioner exe =
                 //new MultiThreadExecutioner(2, 2048);
@@ -256,8 +256,8 @@ public class Line1DContinuous extends NAgent {
         nar.compoundVolumeMax.set(12);
 
         Line1DContinuous l = new Line1DContinuous(nar, 6,
-                //sine(100)
-                random(120)
+                sine(100)
+                //random(120)
         );
 
         Vis.show((Default) l.nar, 2000); //Vis.agentActions(l, 2000);

@@ -256,7 +256,10 @@ public enum Texts {
     static final ThreadLocal<Format> fourDecimal = ThreadLocal.withInitial( () -> new DecimalFormat("0.0000") );
 
     public static String n4(float x) {
-        return fourDecimal.get().format(x);
+        if (x!=x)
+            return "NotNum"; //NaN
+        else
+            return fourDecimal.get().format(x);
     }
 
     public static String n4(double x) {
@@ -283,7 +286,7 @@ public enum Texts {
 
     public static String n2(float x) {
         if (x!=x)
-            return "Nn"; //NaN
+            return "NaN"; //NaN
 
         if ((x < 0) || (x > 1.0f))
             return twoDecimal.format(x);

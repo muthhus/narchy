@@ -731,13 +731,11 @@ public class PremiseRule extends GenericCompound {
                             pres.add(IfTermLinkBefore.ifBeliefBefore);
                             break;
 
-                        case "decomposeBelief":
-                            timeFunction = TimeFunctions.decomposeBelief;
-                            break;
+                        case "decomposeBelief": timeFunction = TimeFunctions.decomposeBelief; break;
 
-                        case "dtCombine":
-                            timeFunction = TimeFunctions.dtCombine;
-                            break;
+                        case "dtCombine":     timeFunction = TimeFunctions.dtCombine;  break;
+                        case "dtCombinePre":  timeFunction = TimeFunctions.dtCombinePre; break;
+                        case "dtCombinePost": timeFunction = TimeFunctions.dtCombinePost; break;
 
 //                        case "dtForward":
 //                            timeFunction = TimeFunctions.occForward;

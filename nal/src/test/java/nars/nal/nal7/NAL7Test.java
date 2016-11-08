@@ -828,7 +828,8 @@ public class NAL7Test extends AbstractNALTest {
                 .input("((hold(?x) && open(door)) ==> enter(room)). :|:")
                 .mustBelieve(cycles, "(open(door) ==> enter(room))",
                         1.00f, 0.81f,
-                        0);
+                        0)
+                ;
     }
     @Test
     public void multiConditionSyllogismPost() {
@@ -840,6 +841,17 @@ public class NAL7Test extends AbstractNALTest {
                 .mustBelieve(cycles, "(goto(door) ==> open(door))",
                         1.00f, 0.81f,
                         0);
+    }
+
+    @Test
+    public void preconImplyConjPost() {
+        //implication-based composition
+        test()
+                .input("(a ==>+2 x). :|:")
+                .input("(a ==>+3 y). :|:")
+                .mustBelieve(cycles,   "(a ==>+2 (x &&+1 y))", 1.00f, 0.81f, 0) //correct conj sub-term DT
+                .mustNotOutput(cycles, "(a ==>+2 (x && y))", '.', 0, ETERNAL)
+                .mustNotOutput(cycles, "(a ==>+3 (x && y))", '.', 0, ETERNAL);
     }
 
 //    @Test public void testTruthDecayOverTime0() {

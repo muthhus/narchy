@@ -48,22 +48,16 @@ public class Default2 extends NAR {
 
     private static final Logger logger = LoggerFactory.getLogger(Default2.class);
 
+    static private final BudgetMerge blend = BudgetMerge.plusBlend;
 
     public final List<GraphPremiseBuilder> cores;
 
     final static Deriver deriver = Deriver.getDefaultDeriver();
 
-
-    static private final BudgetMerge blend = BudgetMerge.plusBlend;
-
     public final class GraphPremiseBuilder implements Runnable {
 
-        //public static final int seedRate = 5;
-
-        @Nullable Concept here;
-        @Nullable
+        Concept here;
         private BLink<Term> linkHere;
-
 
         public final Bag<Term> terms =
                 //new HijackBag<>(128, 3, blend, random);
@@ -78,11 +72,6 @@ public class Default2 extends NAR {
         int tasklinksFiring = 1;
         int termlinksFiring = 3;
 
-        /** multiplier to apply to links in the 'active' bag when they have been accepted as seeds to this core
-         *  it is a cost (reduction) applied to the 'active' bag
-         * */
-        //private float conceptSeedCost = 0.1f;
-
         /* a cost (reduction) applied to the local 'term' bag */
         private float conceptVisitCost = 0.5f;
 
@@ -90,30 +79,6 @@ public class Default2 extends NAR {
          * indicating the preference for the current value vs. a tendency to move */
         float momentum = 0.5f;
 
-        public GraphPremiseBuilder() {
-//            active = //new CurveBag(BudgetMerge.plusBlend, random).setCapacity(1024);
-//                new HijackBag<>(512, 4, random);
-
-        }
-
-//        protected void seed(int num) {
-//
-////            while (num-- > 0) {
-////                BLink<Concept> c = active.pop();
-////                if (c != null)
-////                    terms.put(c.get().term(), c);
-////                else
-////                    break;
-////            }
-//
-//
-////            active.commit().sample(num, c -> {
-////                Concept key = c.get();
-////                active.mul(key, conceptSeedCost);
-////                terms.put(key.term(), c);
-////                return true;
-////            });
-//        }
 
         @Override
         public void run() {
@@ -122,7 +87,7 @@ public class Default2 extends NAR {
             }
         }
 
-        public synchronized void loop() {
+        public  void loop() {
             while (true) {
                 try {
                     //run();
@@ -133,18 +98,7 @@ public class Default2 extends NAR {
             }
         }
 
-        public void loopAsync() {
-            try {
 
-                for (int i = 0; i < Math.round(iterations * exe.load()); i++) {
-                    iterate();
-                }
-            } catch (Throwable t) {
-                logger.error("run: {}", t);
-            }
-
-            runLater(this::loop); //retrigger asynch
-        }
 
         void iterate() {
 
@@ -186,7 +140,7 @@ public class Default2 extends NAR {
             BLink<Term> next = terms.commit().sample();
             if (next != null) {
 
-                Concept d = Default2.this.concept(next.get());
+                Concept d = concept(next.get());
                 if (d != null) {
 
                     d.policy(concepts.conceptBuilder().awake(), Default2.this);
@@ -227,25 +181,18 @@ public class Default2 extends NAR {
         super(clock, new TreeTermIndex.L1TreeIndex(new DefaultConceptBuilder(), 1024*1024, 8192, 4),
                 new XorShift128PlusRandom(1), Param.defaultSelf(), exe);
 
-
-
         durMin.setValue(BUDGET_EPSILON * 2f);
-
 
         int level = level();
 
         if (level >= 7) {
-
             initNAL7();
 
             if (level >= 8) {
-
                 initNAL8();
-
             }
 
         }
-
 
         this.cores = range(0, cores).mapToObj(i -> new GraphPremiseBuilder()).collect(toList());
 
@@ -254,29 +201,16 @@ public class Default2 extends NAR {
            if (running.compareAndSet(false,true)) {
                for (GraphPremiseBuilder b : this.cores)
                    new Thread(b::loop).start();
-
-//               for (GraphPremiseBuilder b : this.cores)
-//                   runLater(b::loopAsync);
            }
         });
 
-
-//        onFrame(()-> {
-//            runLater(cores, GraphPremiseBuilder::run, 1);
-//        });
     }
 
-    private float getNextActivationRate() {
-        return 1f / (cores.stream().mapToInt(GraphPremiseBuilder::duty).sum());
-
-    }
-
-    private STMTemporalLinkage stmLinkage;
 
     /** NAL7 plugins */
     protected void initNAL7() {
 
-        stmLinkage = new STMTemporalLinkage(this, 2);
+        STMTemporalLinkage stmLinkage = new STMTemporalLinkage(this, 2);
 
     }
 
@@ -288,11 +222,6 @@ public class Default2 extends NAR {
 
     @Override
     public final Concept concept(@NotNull Term term, float boost) {
-//        Concept c = concept(term);
-//        if (c!=null) {
-//            return active.mul(c, boost);
-//        }
-
         Concept c = concept(term);
         if (c!=null) {
             cores.get(Math.abs(term.hashCode()) % cores.size()).terms.add(term, boost);
@@ -302,7 +231,6 @@ public class Default2 extends NAR {
 
     @Override
     public final void activationAdd(@NotNull ObjectFloatHashMap<Concept> concepts, @NotNull Budgeted in, float activation, MutableFloat overflow) {
-        //active.put(concepts, in, activation, overflow);
         int numCores = cores.size();
 
         concepts.forEachKeyValue((c,v)->{
@@ -312,8 +240,7 @@ public class Default2 extends NAR {
 
     @Override
     public final float activation(@NotNull Termed concept) {
-        /*BLink<Concept> c = active.get(concept);
-        return c != null ? c.priIfFiniteElseZero() : 0;*/
+        //TODO impl
         return 0;
     }
 
@@ -321,19 +248,8 @@ public class Default2 extends NAR {
     @NotNull
     @Override
     public NAR forEachActiveConcept(@NotNull Consumer<Concept> recip) {
-        //active.forEachKey(recip);
+        //TODO impl
         return this;
     }
-
-
-
-    public static void main(String[] args) {
-        new Default2().log()
-                .believe("(a-->b)")
-                .believe("(b-->c)")
-                .believe("(c-->d)")
-                .run(64);
-    }
-
 
 }

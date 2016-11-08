@@ -15,6 +15,7 @@ import nars.term.util.InvalidTermException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import static nars.$.terms;
 import static nars.Op.CONJ;
 import static nars.Op.NEG;
 import static nars.task.Revision.chooseByConf;
@@ -609,17 +610,27 @@ public interface TimeFunctions {
         return dt(derived, dt, p, occReturn);
     }
 
+
+    @NotNull TimeFunctions dtCombine = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Conclude d, long[] occReturn, float[] confScale) ->
+            dtCombiner(derived, p, occReturn, false, false);
+
+    @NotNull TimeFunctions dtCombinePre = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Conclude d, long[] occReturn, float[] confScale) ->
+            dtCombiner(derived, p, occReturn, true, false);
+
+    @NotNull TimeFunctions dtCombinePost = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Conclude d, long[] occReturn, float[] confScale) ->
+            dtCombiner(derived, p, occReturn, false, true);
+
+
     /**
      * combine any existant DT's in the premise (assumes both task and belief are present)
      */
-    @NotNull TimeFunctions dtCombine = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Conclude d, long[] occReturn, float[] confScale) -> {
+    @Nullable static Compound dtCombiner(@NotNull Compound derived, @NotNull PremiseEval p, long[] occReturn, boolean pre, boolean post) {
 
         Task task = p.task;
-
         int taskDT = ((Compound) p.taskTerm.unneg()).dt();
-        Term bt = p.beliefTerm;
 
-        int beliefDT = (bt instanceof Compound) ? ((Compound) bt).dt() : DTERNAL;
+        Term bt = p.beliefTerm;
+        int beliefDT = (bt instanceof Compound) ? ((Compound) bt.unneg()).dt() : DTERNAL;
 
         int eventDelta;
         if (taskDT == DTERNAL && beliefDT == DTERNAL) {
@@ -629,22 +640,7 @@ public interface TimeFunctions {
             Task belief = p.belief;
 
             if (belief != null && task.isBeliefOrGoal() && belief.isBeliefOrGoal()) {
-                //blend task and belief's DT's weighted by their relative confidence
-                /*float taskConf = task.confWeight();
-                eventDelta = Math.round(Util.lerp(
-                        taskDT,
-                        beliefDT,
-                        taskConf / (taskConf + belief.confWeight())
-                ));*/
                 eventDelta = chooseByConf(task, belief, p).dt();
-//
-//                //reduce confidence by the total change proportion
-//                confScale[0] = eventDelta / (Math.abs(eventDelta-taskDT) + Math.abs(eventDelta-beliefDT)
-
-                //choose dt from task with more confidence
-                //eventDelta = task.conf() > belief.conf() ? taskDT : beliefDT;
-
-
             } else {
                 eventDelta = taskDT;
             }
@@ -655,10 +651,26 @@ public interface TimeFunctions {
             eventDelta = taskDT;
         }
 
-        occReturn[0] = p.occurrenceTarget(earliestOccurrence); //(t, b) -> t >= b ? t : b); //latest occurring one
+        occReturn[0] = p.occurrenceTarget(earliestOccurrence);
+
+        if (pre) {
+
+        }
+        if (post) {
+            //set subterm 1's DT
+            Compound x = (Compound) derived.term(1);
+            int dt;
+            if (taskDT!=DTERNAL && beliefDT!=DTERNAL) {
+                dt = taskDT - beliefDT;
+            } else {
+                dt = DTERNAL;
+            }
+            Term y =  terms.the(x, dt);
+            derived = (Compound) terms.the(derived, derived.term(0), y );
+        }
 
         return deriveDT(derived, 1, p, eventDelta, occReturn);
-    };
+    }
 
     TimeFunctions occMerge = (derived, p, d, occReturn, confScale) -> {
 //        long taskOcc = p.task.occurrence();
@@ -994,7 +1006,7 @@ public interface TimeFunctions {
             dt = DTERNAL;
         }
         if (derived.dt() != dt) {
-            @NotNull Term n = $.terms.the(o, dt, derived.subterms());
+            @NotNull Term n = terms.the(o, dt, derived.subterms());
             if (!(n instanceof Compound))
                 throw new InvalidTermException(o, dt, derived.subterms(), "Untemporalizable to new DT");
             return (Compound) n;

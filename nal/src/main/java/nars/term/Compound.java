@@ -65,7 +65,7 @@ public interface Compound extends Term, IPair, TermContainer {
      */
     @NotNull
     default Set<Term> recurseTermsToSet(@NotNull Op onlyType) {
-        Set<Term> t = $.newHashSet(volume());
+        Set<Term> t = $.newHashSet(volume() /* estimate */);
         recurseTerms((t1) -> {
             if (t1.op() == onlyType)
                 t.add(t1);
@@ -75,7 +75,7 @@ public interface Compound extends Term, IPair, TermContainer {
 
     @NotNull
     default Set<Term> recurseTermsToSet() {
-        Set<Term> t = $.newHashSet(volume());
+        Set<Term> t = $.newHashSet(volume() /* estimate */);
         recurseTerms(t::add);
         return t;
     }
@@ -87,7 +87,7 @@ public interface Compound extends Term, IPair, TermContainer {
     }
 
     @NotNull default MutableBiMap<Term,Short> recurseTermsToBiMap() {
-        MutableBiMap<Term,Short> t = new HashBiMap(volume()); //BiMaps.mutable.empty();
+        MutableBiMap<Term,Short> t = new HashBiMap(volume() /* estimate */); //BiMaps.mutable.empty();
         recurseTerms((x) -> t.putIfAbsent(x, (short)t.size()));
         return t;
     }
