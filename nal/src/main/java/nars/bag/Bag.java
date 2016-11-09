@@ -635,12 +635,13 @@ public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Iterable<BLink<
         }
     }
 
-    default @NotNull Bag<V> transfer(int maxItemsToSend, @NotNull Bag target) {
-        return this.sample(maxItemsToSend, t -> {
+    default @NotNull Bag<V> copy(int limit, @NotNull Bag target) {
+        return this.sample(limit, t -> {
             target.putLink(t);
             return true; //assume it worked
         });
     }
 
+    //TODO default @NotNull Bag<V> move(int limit, @NotNull Bag target) {
 
 }

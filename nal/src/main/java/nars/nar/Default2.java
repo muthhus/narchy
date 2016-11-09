@@ -1,12 +1,10 @@
 package nars.nar;
 
-import nars.$;
 import nars.NAR;
 import nars.Param;
 import nars.Task;
 import nars.bag.Bag;
 import nars.bag.impl.CurveBag;
-import nars.bag.impl.experimental.HijackBag;
 import nars.budget.Budgeted;
 import nars.budget.merge.BudgetMerge;
 import nars.concept.Concept;
@@ -56,7 +54,11 @@ public class Default2 extends NAR {
 
     public final class GraphPremiseBuilder implements Runnable {
 
+        /** how many tasklinks to absorb on a visit */
+        public static final int TASKLINK_COLLECTION_RATE = 1;
+
         Concept here;
+
         private BLink<Term> linkHere;
 
         public final Bag<Term> terms =
@@ -145,8 +147,8 @@ public class Default2 extends NAR {
 
                     d.policy(concepts.conceptBuilder().awake(), Default2.this);
 
-                    d.termlinks().commit().transfer(2, terms);
-                    d.tasklinks().commit().transfer(2, tasklinks);
+                    //d.termlinks().commit().transfer(2, terms);
+                    d.tasklinks().commit().copy(TASKLINK_COLLECTION_RATE, tasklinks);
 
                     this.here = d;
                     this.linkHere = next;
@@ -178,7 +180,7 @@ public class Default2 extends NAR {
     }
 
     public Default2(@NotNull Clock clock, Executioner exe, int cores) {
-        super(clock, new TreeTermIndex.L1TreeIndex(new DefaultConceptBuilder(), 1024*1024, 8192, 4),
+        super(clock, new TreeTermIndex.L1TreeIndex(new DefaultConceptBuilder(), 1024*1024, 16384, 3),
                 new XorShift128PlusRandom(1), Param.defaultSelf(), exe);
 
         durMin.setValue(BUDGET_EPSILON * 2f);

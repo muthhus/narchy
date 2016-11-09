@@ -303,6 +303,7 @@
 
     //S || P:
     %S, %P, time(dtAfter), task("."), neqCom(%P,%S) |- (--,((--,%S) &&+- (--,%P))), (Belief:Union)
+    %S, %P, time(dtAfter), task("."), neqCom(%P,%S) |- varIntro((--,((--,%S) &&+- (--,%P)))), (Belief:Union)
 
 
 
