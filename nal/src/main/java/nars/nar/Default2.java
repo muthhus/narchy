@@ -16,7 +16,6 @@ import nars.nar.exe.MultiThreadExecutioner;
 import nars.nar.util.DefaultConceptBuilder;
 import nars.nar.util.PremiseMatrix;
 import nars.op.time.STMTemporalLinkage;
-import nars.term.Term;
 import nars.term.Termed;
 import nars.time.Clock;
 import nars.time.FrameClock;
@@ -148,7 +147,7 @@ public class Default2 extends NAR {
                     d.policy(concepts.conceptBuilder().awake(), Default2.this);
 
                     //d.termlinks().commit().transfer(2, terms);
-                    d.tasklinks().commit().copy(TASKLINK_COLLECTION_RATE, tasklinks);
+                    d.tasklinks().commit().copy(tasklinks, TASKLINK_COLLECTION_RATE);
 
                     this.here = d;
                     this.linkHere = next;

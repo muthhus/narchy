@@ -631,7 +631,7 @@ public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Iterable<BLink<
         }
     }
 
-    default @NotNull Bag<V> copy(int limit, @NotNull Bag target) {
+    default Bag<V> copy(@NotNull Bag target, int limit) {
         return this.sample(limit, t -> {
             target.putLink(t);
             return true; //assume it worked
