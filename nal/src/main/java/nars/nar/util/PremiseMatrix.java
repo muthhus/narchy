@@ -12,6 +12,7 @@ import nars.nal.Deriver;
 import nars.nal.Premise;
 import nars.nal.meta.PremiseEval;
 import nars.term.Term;
+import nars.term.Termed;
 import nars.util.data.list.FasterList;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -36,7 +37,7 @@ public class PremiseMatrix {
         return run(c, nar, tasklinks, termlinks, target, deriver, c.tasklinks(), c.termlinks());
     }
 
-    public static int run(@NotNull Concept c, @NotNull NAR nar, int tasklinks, int termlinks, @NotNull Consumer<Task> target, @NotNull Deriver deriver, @NotNull Bag<Task> tasklinkBag, @NotNull Bag<Term> termlinkBag) {
+    public static int run(@NotNull Concept c, @NotNull NAR nar, int tasklinks, int termlinks, @NotNull Consumer<Task> target, @NotNull Deriver deriver, @NotNull Bag<Task> tasklinkBag, @NotNull Bag<? extends Termed> termlinkBag) {
         int count = 0;
 
         try {
@@ -54,7 +55,7 @@ public class PremiseMatrix {
 
                 int termlinksSampled = (int)Math.ceil(termlinks * Param.BAG_OVERSAMPLING);
 
-                FasterList<BLink<Term>> termsBuffer = (FasterList)$.newArrayList(termlinksSampled);
+                FasterList<BLink<? extends Termed>> termsBuffer = (FasterList)$.newArrayList(termlinksSampled);
                 termlinkBag.sample(termlinksSampled, termsBuffer::addIfNotNull);
 
 
@@ -74,7 +75,7 @@ public class PremiseMatrix {
                         BLink<Task> taskLink = tasksBuffer.get( il % tasksBufferSize );
 
                         Task task = taskLink.get();
-                        if (task == null || task.isDeleted())
+                        if (task.isDeleted())
                             continue;
 
                         Budget taskLinkBudget = taskLink.clone(); //save a copy because in multithread, the original may be deleted in-between the sample result and now

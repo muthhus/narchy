@@ -49,14 +49,14 @@ public final class Premise extends RawBudget implements Tasked {
     public final Task belief;
 
     @NotNull
-    public final Term concept;
+    public final Termed concept;
 
 
     ///** not used in creating a Premise key, because the same premise components may be generated from different originating concepts or even other methods of forming them*/
     //@NotNull transient private final Term conceptLink;
 
 
-    public Premise(@NotNull Term concept, @NotNull Task taskLink,
+    public Premise(@NotNull Termed concept, @NotNull Task taskLink,
                    @NotNull Term termLink,
                    @Nullable Task belief, float p, float d, float q) {
 
@@ -92,9 +92,9 @@ public final class Premise extends RawBudget implements Tasked {
      * patham9 its using the result of higher confidence
      */
     public static @Nullable Premise build(@NotNull NAR nar, @NotNull Concept c, long now, @NotNull Task task, @NotNull Budget taskLinkBudget,
-                                          @NotNull BLink<Term> termLink) {
+                                          @NotNull BLink<? extends Termed> termLink) {
 
-        Term term = termLink.get();
+        Termed term = termLink.get();
         if (term == null)
             return null;
 
@@ -180,7 +180,7 @@ public final class Premise extends RawBudget implements Tasked {
                 //aveAri(taskLinkBudget.pri(), termLinkBudget.pri());
                 //nar.conceptPriority(c);
 
-        return new Premise(c.term(), task, term, belief, pri, dur, qua);
+        return new Premise(c, task, term.term(), belief, pri, dur, qua);
     }
 
     @Nullable

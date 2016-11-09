@@ -1395,7 +1395,7 @@ public abstract class NAR extends Param implements Level, Consumer<Task>, NARIn,
      * if the concept is active, returns the Concept while applying the boost factor to its budget
      */
     @Nullable
-    abstract public Concept concept(Term term, float boost);
+    abstract public Concept concept(Termed termed, float boost);
 
     @Override
     public final int level() {

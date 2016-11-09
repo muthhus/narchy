@@ -59,9 +59,9 @@ public class Default2 extends NAR {
 
         Concept here;
 
-        private BLink<Term> linkHere;
+        private BLink<? extends Termed> linkHere;
 
-        public final Bag<Term> terms =
+        public final Bag<Concept> terms =
                 //new HijackBag<>(128, 3, blend, random);
                 new CurveBag(64, new CurveBag.NormalizedSampler(power2BagCurve, random), blend, new ConcurrentHashMap(64));
 
@@ -114,7 +114,7 @@ public class Default2 extends NAR {
 
             if (move) {
 
-                BLink<Term> next = go();
+                BLink<? extends Termed> next = go();
 
                 if (next == null) {
                     //seed(seedRate);
@@ -138,8 +138,8 @@ public class Default2 extends NAR {
 
 
         @Nullable
-        private BLink<Term> go() {
-            BLink<Term> next = terms.commit().sample();
+        private BLink<Concept> go() {
+            BLink<Concept> next = terms.commit().sample();
             if (next != null) {
 
                 Concept d = concept(next.get());
@@ -223,7 +223,7 @@ public class Default2 extends NAR {
 
 
     @Override
-    public final Concept concept(@NotNull Term term, float boost) {
+    public final Concept concept(@NotNull Termed term, float boost) {
         Concept c = concept(term);
         if (c!=null) {
             cores.get(Math.abs(term.hashCode()) % cores.size()).terms.add(term, boost);
@@ -236,7 +236,7 @@ public class Default2 extends NAR {
         int numCores = cores.size();
 
         concepts.forEachKeyValue((c,v)->{
-            cores.get(Math.abs(c.hashCode()) % numCores).terms.put(c.term(), in, activation * v, overflow);
+            cores.get(Math.abs(c.hashCode()) % numCores).terms.put(c, in, activation * v, overflow);
         });
     }
 
