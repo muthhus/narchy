@@ -22,7 +22,7 @@ import com.github.pfmiles.dropincc.ParamedAction;
 public class DelayedAction {
 
     public Object action;
-    public Object matched;
+    public final Object matched;
 
     public DelayedAction(Object action, Object matched) {
         this.action = action;

@@ -82,15 +82,6 @@ public class Grule implements Element {
         return super.hashCode();
     }
 
-    /**
-     * Grule needs exactly the same 'equals' method as Object.class has, for
-     * 'every individual grule is different from each other even if their
-     * containing alts are the same.'
-     */
-    public boolean equals(Object obj) {
-        return super.equals(obj);
-    }
-
     public String toString() {
         return "Grule[" + name + ']';
     }

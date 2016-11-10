@@ -172,11 +172,6 @@ public class Lang implements Serializable {
         return super.hashCode();
     }
 
-    // same equals method as Object.class needed
-    public boolean equals(Object obj) {
-        return super.equals(obj);
-    }
-
     /**
      * Get debug messages generated while grammar analyzing. Should be called
      * after 'compile'.

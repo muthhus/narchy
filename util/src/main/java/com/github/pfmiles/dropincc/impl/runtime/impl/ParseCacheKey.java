@@ -16,8 +16,8 @@ package com.github.pfmiles.dropincc.impl.runtime.impl;
  */
 public class ParseCacheKey {
 
-    public int ruleNum;
-    public int position;
+    public final int ruleNum;
+    public final int position;
 
     public ParseCacheKey(int ruleNum, int position) {
         this.ruleNum = ruleNum;

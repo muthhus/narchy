@@ -59,7 +59,7 @@ public class DfaState {
      * @return
      */
     public List<AtnConfig> getResolvedConfs() {
-        List<AtnConfig> ret = new ArrayList<>();
+        List<AtnConfig> ret = new ArrayList<>(this.confs.size());
         for (AtnConfig c : this.confs) {
             if (c.isResolved())
                 ret.add(c);

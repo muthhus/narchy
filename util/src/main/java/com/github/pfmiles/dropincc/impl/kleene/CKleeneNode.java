@@ -41,11 +41,6 @@ public class CKleeneNode implements Serializable {
         return super.hashCode();
     }
 
-    // this class requires the same equals method to the Object class
-    public boolean equals(Object obj) {
-        return super.equals(obj);
-    }
-
     public String toString() {
         return "CKleeneNode(" + contents + ')';
     }

@@ -31,7 +31,7 @@ public class Alternative {
     // semantic predicate
     private Predicate<?> pred;
 
-    public Alternative(Element[] eles) {
+    public Alternative(Element... eles) {
 
         switch (checkNull(eles)) {
         case 0:
@@ -53,7 +53,7 @@ public class Alternative {
      * Returns 0 if all elements are null; 1 if some of them are, 2 if none of
      * them...
      */
-    private static int checkNull(Element[] eles) {
+    private static int checkNull(Element... eles) {
         int nullCount = 0;
         for (Element ele : eles)
             if (ele == null)
@@ -82,11 +82,6 @@ public class Alternative {
     // same hashCode method as Object.class needed
     public int hashCode() {
         return super.hashCode();
-    }
-
-    // same equals method as Object.class needed
-    public boolean equals(Object obj) {
-        return super.equals(obj);
     }
 
     public Predicate<?> getPred() {

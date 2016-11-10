@@ -32,6 +32,10 @@ import com.github.pfmiles.dropincc.impl.util.Util;
  */
 public class HotCompileUtil {
 
+
+    public static CompilationResult compile(String qualifiedName, String sourceCode) {
+        return _compile(qualifiedName, sourceCode);
+    }
     /**
      * Compile java source code dynamically, with a full-qualified class name.
      * 
@@ -40,7 +44,7 @@ public class HotCompileUtil {
      * @return The resulting java class object and its corresponding class
      *         loader.
      */
-    public static CompilationResult compile(String qualifiedName, String sourceCode) {
+    public static CompilationResult _compile(String qualifiedName, String sourceCode) {
         JavaStringSource source = new JavaStringSource(qualifiedName, sourceCode);
         List<JavaStringSource> ss = Collections.singletonList(source);
         JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();

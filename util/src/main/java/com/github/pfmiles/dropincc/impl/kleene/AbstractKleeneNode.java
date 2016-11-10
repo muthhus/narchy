@@ -26,7 +26,7 @@ import com.github.pfmiles.dropincc.impl.OrSubRule;
 @SuppressWarnings("serial")
 public abstract class AbstractKleeneNode implements Element {
 
-    protected List<Element> elements = new ArrayList<>();
+    protected final List<Element> elements = new ArrayList<>();
 
     protected AbstractKleeneNode(Element... elements) {
         if (elements == null || elements.length == 0)
@@ -36,7 +36,7 @@ public abstract class AbstractKleeneNode implements Element {
         Collections.addAll(this.elements, elements);
     }
 
-    private static boolean allNotNull(Element[] eles) {
+    private static boolean allNotNull(Element... eles) {
         for (Element ele : eles)
             if (ele == null)
                 return false;
@@ -54,11 +54,6 @@ public abstract class AbstractKleeneNode implements Element {
     // same hashCode method implementation as Object.class needed
     public int hashCode() {
         return super.hashCode();
-    }
-
-    // same equals method implementation as Object.class needed
-    public boolean equals(Object obj) {
-        return super.equals(obj);
     }
 
     public abstract String toString();

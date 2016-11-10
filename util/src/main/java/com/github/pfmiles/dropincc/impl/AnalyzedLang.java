@@ -101,12 +101,11 @@ public class AnalyzedLang {
 
         this.tokenTypeMapping = LexerCompiler.buildTokenTypeMapping(tokens, whitespaceSensitive);
 
-        List<Grule> grules1 = grules;
         // rewrite sub-rules
-        List<Grule> genGrules = ParserCompiler.rewriteSubRules(grules1);
+        List<Grule> genGrules = ParserCompiler.rewriteSubRules(grules);
         // build grule -> gruleType mapping for all grules(including generated
         // ones) in 'gruleTypeMapping'
-        this.gruleTypeMapping = ParserCompiler.buildGruleTypeMapping(grules1, genGrules);
+        this.gruleTypeMapping = ParserCompiler.buildGruleTypeMapping(grules, genGrules);
 
         // traverse and register kleene nodes
         this.kleeneTypeMapping = KleeneCompiler.buildKleeneTypeMapping(this.gruleTypeMapping);

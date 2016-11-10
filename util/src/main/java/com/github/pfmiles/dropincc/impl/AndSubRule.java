@@ -30,7 +30,7 @@ public class AndSubRule implements Element {
     public AndSubRule(Element ele, Object other) {
         if (other == null)
             throw new DropinccException("Could not add null elements.");
-        Element[] es = Util.filterProductionEles(new Object[] { other });
+        Element[] es = Util.filterProductionEles(other);
         if (es == null || es.length == 0)
             throw new DropinccException("Could not add null elements.");
         this.alts.add(new Alternative(new Element[] { ele, es[0] }));
@@ -39,7 +39,7 @@ public class AndSubRule implements Element {
     public AndSubRule and(Object ele) {
         if (ele == null)
             throw new DropinccException("Could not add null elements.");
-        Element[] es = Util.filterProductionEles(new Object[] { ele });
+        Element[] es = Util.filterProductionEles(ele);
         if (es == null || es.length == 0)
             throw new DropinccException("Could not add null elements.");
         this.alts.get(0).getElements().add(es[0]);
@@ -56,10 +56,6 @@ public class AndSubRule implements Element {
 
     public int hashCode() {
         return super.hashCode();
-    }
-
-    public boolean equals(Object obj) {
-        return super.equals(obj);
     }
 
 }

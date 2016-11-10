@@ -19,6 +19,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import com.github.pfmiles.dropincc.CC;
 import com.github.pfmiles.dropincc.DropinccException;
@@ -39,6 +41,7 @@ import com.github.pfmiles.dropincc.impl.lexical.InstantTokenDef;
  */
 public abstract class Util {
     public static final String PATH_SEP = "/";
+    private static final Pattern DOT = Pattern.compile(".", Pattern.LITERAL);
 
     private Util() {
     }
@@ -64,7 +67,7 @@ public abstract class Util {
      * @param lang
      * @return
      */
-    public static Element[] filterProductionEles(Object[] eles) {
+    public static Element[] filterProductionEles(Object... eles) {
         if (eles == null)
             return null;
         Element[] eleNoCon = new Element[eles.length];
@@ -264,7 +267,7 @@ public abstract class Util {
                 dropinccPath = path != null ? path.substring(path.indexOf(':') + 1, path.indexOf('!')) : null;
             } else if ("file".equalsIgnoreCase(url.getProtocol())) {
                 String path = toFilePath(url);
-                dropinccPath = path != null ? path.substring(0, path.lastIndexOf(PATH_SEP + Util.class.getName().replace(".", PATH_SEP) + ".class"))
+                dropinccPath = path != null ? path.substring(0, path.lastIndexOf(PATH_SEP + DOT.matcher(Util.class.getName()).replaceAll(Matcher.quoteReplacement(PATH_SEP)) + ".class"))
                         : null;
             }
             if (dropinccPath != null && !dropinccPath.isEmpty() && sb.indexOf(dropinccPath) == -1) {

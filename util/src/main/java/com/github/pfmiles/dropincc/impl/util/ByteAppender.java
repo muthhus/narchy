@@ -39,7 +39,7 @@ public class ByteAppender {
         count = newcount;
     }
 
-    public void append(byte[] b) {
+    public void append(byte... b) {
         this.append(b, 0, b.length);
     }
 

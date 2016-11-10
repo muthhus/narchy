@@ -27,7 +27,7 @@ public abstract class Lexer implements Enumeration<Token> {
 
     // TODO test if LinkedList or ArrayDeque is better? or invent a new
     // implementation to suit for the lexer situation
-    protected List<Token> lookAheadBuf = new ArrayList<>();
+    protected final List<Token> lookAheadBuf = new ArrayList<>();
 
     protected int allBufferedLexemeLength = 0;
 

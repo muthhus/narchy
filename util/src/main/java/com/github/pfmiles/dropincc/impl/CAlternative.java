@@ -56,11 +56,6 @@ public class CAlternative {
         return super.hashCode();
     }
 
-    // same equals method as Object.class needed
-    public boolean equals(Object obj) {
-        return super.equals(obj);
-    }
-
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("CAlternative(").append(this.matchSequence.toString());

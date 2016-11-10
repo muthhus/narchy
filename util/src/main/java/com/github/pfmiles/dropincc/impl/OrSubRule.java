@@ -37,7 +37,7 @@ public class OrSubRule implements Element {
      * @param objs
      *            new alt's elements
      */
-    public OrSubRule(Element ele, Object[] objs) {
+    public OrSubRule(Element ele, Object... objs) {
         if (objs == null || objs.length == 0)
             throw new DropinccException("Could not construct empty alternative.");
         this.alts.add(new Alternative(new Element[] { ele }));
@@ -48,7 +48,7 @@ public class OrSubRule implements Element {
     public OrSubRule or(Object ele) {
         if (ele == null)
             throw new DropinccException("Could not construct empty alternative.");
-        Element[] eles = Util.filterProductionEles(new Object[] { ele });
+        Element[] eles = Util.filterProductionEles(ele);
         if (eles == null || eles.length == 0)
             throw new DropinccException("Could not construct empty alternative.");
         this.alts.add(new Alternative(eles));
@@ -65,10 +65,6 @@ public class OrSubRule implements Element {
 
     public int hashCode() {
         return super.hashCode();
-    }
-
-    public boolean equals(Object obj) {
-        return super.equals(obj);
     }
 
 }

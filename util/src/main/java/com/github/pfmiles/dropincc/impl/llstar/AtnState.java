@@ -31,11 +31,11 @@ import com.github.pfmiles.dropincc.impl.util.Pair;
  * 
  */
 public class AtnState {
-    private String name;
+    private final String name;
     // transitions to other states
     private final Map<Object, Set<AtnState>> transitions = new HashMap<>();
     // if this is a final state
-    private boolean _final;
+    private final boolean _final;
 
     /**
      * Return all transitions as (edge, state) pairs
@@ -122,9 +122,6 @@ public class AtnState {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
 
     public Map<Object, Set<AtnState>> getTransitions() {
         return transitions;
@@ -134,9 +131,6 @@ public class AtnState {
         return _final;
     }
 
-    public void setFinal(boolean f) {
-        this._final = f;
-    }
 
     /**
      * Return num of transitions

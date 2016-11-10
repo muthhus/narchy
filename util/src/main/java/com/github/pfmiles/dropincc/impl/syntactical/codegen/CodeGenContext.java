@@ -37,28 +37,28 @@ public class CodeGenContext {
     /**
      * generated parser class field's name to tokenType mapping
      */
-    public Map<String, TokenType> fieldTokenTypeMapping = new HashMap<>();
+    public final Map<String, TokenType> fieldTokenTypeMapping = new HashMap<>();
 
     /**
      * generated parser class field's name to alts action mapping
      */
-    public Map<String, Object> fieldAltsActionMapping = new HashMap<>();
+    public final Map<String, Object> fieldAltsActionMapping = new HashMap<>();
 
     /**
      * generated parser class field's name to semantic predicate mapping
      */
-    public Map<String, Predicate<?>> fieldPredsMapping = new HashMap<>();
+    public final Map<String, Predicate<?>> fieldPredsMapping = new HashMap<>();
 
     /**
      * generated parser class field's name to rule dfa mapping
      */
-    public Map<String, RunningDfaState> fieldRuleDfaMapping = new HashMap<>();
+    public final Map<String, RunningDfaState> fieldRuleDfaMapping = new HashMap<>();
 
     /**
      * generated parser class field's name to kleene nodes' look ahead dfa
      * mapping
      */
-    public Map<String, RunningDfaState> fieldKleeneDfaMapping = new HashMap<>();
+    public final Map<String, RunningDfaState> fieldKleeneDfaMapping = new HashMap<>();
 
     /**
      * variable sequence generator for method local variables
@@ -73,10 +73,10 @@ public class CodeGenContext {
     /**
      * alts' action obj to generated parser class field's name mapping
      */
-    public Map<Object, String> actionFieldMapping = new HashMap<>();
+    public final Map<Object, String> actionFieldMapping = new HashMap<>();
 
     /**
      * kleeneType to its PredictingKleene mapping
      */
-    public Map<KleeneType, PredictingKleene> kleeneTypeToPredicting;
+    public final Map<KleeneType, PredictingKleene> kleeneTypeToPredicting;
 }

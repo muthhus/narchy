@@ -40,9 +40,9 @@ import com.github.pfmiles.dropincc.example.boolexpr.operator.NotInclude;
  */
 public class BoolExpr {
 
-    private static Exe exe = null;
+    private static Exe exe;
 
-    private static Map<String, Operator> opMapping = new HashMap<String, Operator>();
+    private static final Map<String, Operator> opMapping = new HashMap<>();
     static {
         opMapping.put(">", new GreaterThan());
         opMapping.put("<", new LessThan());
@@ -115,89 +115,37 @@ public class BoolExpr {
         Grule andExpr = lang.newGrule();
         Grule value = lang.newGrule();
 
-        lang.defineGrule(boolExpr, CC.EOF).action(new Action<Object[]>() {
-            public Boolean act(Object[] matched) {
-                return (Boolean) matched[0];
+        lang.defineGrule(boolExpr, CC.EOF).action((Action<Object[]>) matched -> (Boolean) matched[0]);
+        boolExpr.define(orExpr, CC.ks(OR, orExpr)).action((Action<Object[]>) matched -> Util.reduceOrExprs((Boolean) matched[0], (Object[]) matched[1]));
+        orExpr.define(andExpr, CC.ks(AND, andExpr)).action((Action<Object[]>) matched -> Util.reduceAndExprs((Boolean) matched[0], (Object[]) matched[1]));
+        andExpr.define(TRUE).action((Action<String>) matched -> Boolean.TRUE).alt(FALSE).action((Action<String>) matched -> Boolean.FALSE).alt(value, OP, value).action((ParamedAction<Map<String, Object>, Object[]>) (context, matched) -> {
+            Object left = matched[0];
+            Object right = matched[2];
+            if (!opMapping.containsKey(matched[1]))
+                throw new RuntimeException("Illegal operator: " + matched[1]);
+            return opMapping.get(matched[1]).compute(left, right);
+        }).alt(CC.ks(NOT), LEFT_PAREN, boolExpr, RIGHT_PAREN).action((Action<Object[]>) matched -> {
+            int numOfNots = ((Object[]) matched[0]).length;
+            Boolean ret = (Boolean) matched[2];
+            if (numOfNots % 2 == 0) {
+                return ret;
+            } else {
+                return !ret;
             }
+        }).alt(value).action((Action<Object>) matched -> {
+            if (!(matched instanceof Boolean))
+                throw new RuntimeException("");
+            return (Boolean) matched;
         });
-        boolExpr.define(orExpr, CC.ks(OR, orExpr)).action(new Action<Object[]>() {
-            public Boolean act(Object[] matched) {
-                return Util.reduceOrExprs((Boolean) matched[0], (Object[]) matched[1]);
+        value.define(STRING).action((Action<String>) matched -> matched.substring(1, matched.length() - 1)).alt(NUMBER).action((Action<String>) Double::parseDouble).alt(DATE).action((Action<String>) matched -> {
+            SimpleDateFormat fmt = null;
+            fmt = matched.contains(" ") ? new SimpleDateFormat("#yyyy-MM-dd HH:mm:ss#") : new SimpleDateFormat("#yyyy-MM-dd#");
+            try {
+                return fmt.parse(matched);
+            } catch (ParseException e) {
+                throw new RuntimeException(e);
             }
-        });
-        orExpr.define(andExpr, CC.ks(AND, andExpr)).action(new Action<Object[]>() {
-            public Boolean act(Object[] matched) {
-                return Util.reduceAndExprs((Boolean) matched[0], (Object[]) matched[1]);
-            }
-        });
-        andExpr.define(TRUE).action(new Action<String>() {
-            public Boolean act(String matched) {
-                return Boolean.TRUE;
-            }
-        }).alt(FALSE).action(new Action<String>() {
-            public Boolean act(String matched) {
-                return Boolean.FALSE;
-            }
-        }).alt(value, OP, value).action(new ParamedAction<Map<String, Object>, Object[]>() {
-            public Boolean act(Map<String, Object> context, Object[] matched) {
-                Object left = matched[0];
-                Object right = matched[2];
-                if (!opMapping.containsKey((String) matched[1]))
-                    throw new RuntimeException("Illegal operator: " + matched[1]);
-                return opMapping.get((String) matched[1]).compute(left, right);
-            }
-        }).alt(CC.ks(NOT), LEFT_PAREN, boolExpr, RIGHT_PAREN).action(new Action<Object[]>() {
-            public Boolean act(Object[] matched) {
-                int numOfNots = ((Object[]) matched[0]).length;
-                Boolean ret = (Boolean) matched[2];
-                if (numOfNots % 2 == 0) {
-                    return ret;
-                } else {
-                    return !ret;
-                }
-            }
-        }).alt(value).action(new Action<Object>() {
-            public Boolean act(Object matched) {
-                if (!(matched instanceof Boolean))
-                    throw new RuntimeException("");
-                return (Boolean) matched;
-            }
-        });
-        value.define(STRING).action(new Action<String>() {
-            public String act(String matched) {
-                return matched.substring(1, matched.length() - 1);
-            }
-        }).alt(NUMBER).action(new Action<String>() {
-            public Double act(String matched) {
-                return Double.parseDouble(matched);
-            }
-        }).alt(DATE).action(new Action<String>() {
-            public Date act(String matched) {
-                SimpleDateFormat fmt = null;
-                if (matched.contains(" ")) {
-                    fmt = new SimpleDateFormat("#yyyy-MM-dd HH:mm:ss#");
-                } else {
-                    fmt = new SimpleDateFormat("#yyyy-MM-dd#");
-                }
-                try {
-                    return fmt.parse(matched);
-                } catch (ParseException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        }).alt(REF).action(new ParamedAction<Map<String, Object>, String>() {
-            public Object act(Map<String, Object> arg, String matched) {
-                return arg.get(matched);
-            }
-        }).alt(LEFT_PAREN.or(LEFT_BRACKET), value, COMMA, value, RIGHT_BRACKET.or(RIGHT_PAREN)).action(new Action<Object[]>() {
-            public Interval act(Object[] matched) {
-                return Util.createInterval("(".equals(matched[0]), matched[1], matched[3], ")".equals(matched[4]));
-            }
-        }).alt(LEFT_BRACE, value, CC.ks(COMMA, value), RIGHT_BRACE).action(new Action<Object[]>() {
-            public Set<Object> act(Object[] matched) {
-                return Util.buildCollection(matched[1], (Object[]) matched[2]);
-            }
-        });
+        }).alt(REF).action((ParamedAction<Map<String, Object>, String>) Map::get).alt(LEFT_PAREN.or(LEFT_BRACKET), value, COMMA, value, RIGHT_BRACKET.or(RIGHT_PAREN)).action((Action<Object[]>) matched -> Util.createInterval("(".equals(matched[0]), matched[1], matched[3], ")".equals(matched[4]))).alt(LEFT_BRACE, value, CC.ks(COMMA, value), RIGHT_BRACE).action((Action<Object[]>) matched -> Util.buildCollection(matched[1], (Object[]) matched[2]));
         exe = lang.compile();
     }
 

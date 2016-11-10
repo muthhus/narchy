@@ -51,7 +51,7 @@ public class MemClsFileManager extends ForwardingJavaFileManager<StandardJavaFil
     // redirects class file output to memory
     @Override
     public JavaFileObject getJavaFileForOutput(Location location, String className, Kind kind, FileObject sibling) throws IOException {
-        if (!(Kind.CLASS.equals(kind) && StandardLocation.CLASS_OUTPUT.equals(location)))
+        if (!(Kind.CLASS == kind && StandardLocation.CLASS_OUTPUT == location))
             return super.getJavaFileForOutput(location, className, kind, sibling);
         if (destFiles.containsKey(className)) {
             return destFiles.get(className);
@@ -71,7 +71,7 @@ public class MemClsFileManager extends ForwardingJavaFileManager<StandardJavaFil
     @Override
     public Iterable<JavaFileObject> list(Location location, String packageName, Set<Kind> kinds, boolean recurse) throws IOException {
         List<JavaFileObject> ret = new ArrayList<>();
-        if ((StandardLocation.CLASS_OUTPUT.equals(location) || StandardLocation.CLASS_PATH.equals(location)) && kinds.contains(Kind.CLASS)) {
+        if ((StandardLocation.CLASS_OUTPUT == location || StandardLocation.CLASS_PATH == location) && kinds.contains(Kind.CLASS)) {
             for (Map.Entry<String, JavaMemCls> e : destFiles.entrySet()) {
                 String pkgName = resolvePkgName(e.getKey());
                 if (recurse) {
@@ -82,7 +82,7 @@ public class MemClsFileManager extends ForwardingJavaFileManager<StandardJavaFil
                         ret.add(e.getValue());
                 }
             }
-        } else if (StandardLocation.SOURCE_PATH.equals(location) && kinds.contains(Kind.SOURCE)) {
+        } else if (StandardLocation.SOURCE_PATH == location && kinds.contains(Kind.SOURCE)) {
             for (Map.Entry<String, JavaStringSource> e : srcFiles.entrySet()) {
                 String pkgName = resolvePkgName(e.getKey());
                 if (recurse) {
