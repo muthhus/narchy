@@ -1,0 +1,9 @@
+Object {0} = null;
+try '{'
+    lexer.setSavePoint({1});
+    {2}
+    lexer.releaseSavePoint({1}, true);
+    {0} = {3};
+'}' catch (DropinccException e) '{'
+    lexer.releaseSavePoint({1}, false);
+'}'

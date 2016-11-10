@@ -1,0 +1,34 @@
+/*******************************************************************************
+ * Copyright (c) 2012 pf_miles.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * 
+ * Contributors:
+ *     pf_miles - initial API and implementation
+ ******************************************************************************/
+package com.github.pfmiles.dropincc.impl.llstar;
+
+/**
+ * Constants used in LL(*) analyzing
+ * 
+ * @author pf-miles
+ * 
+ */
+public interface Constants {
+    /**
+     * The epsilon transition of ATN
+     */
+    Object epsilon = new Object() {
+        public String toString() {
+            return "ε";
+        }
+    };
+
+    /**
+     * maximun recursion depth when doing 'closure' operation in ATN
+     */
+    int MAX_REC_DEPTH = 10;
+
+}

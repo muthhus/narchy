@@ -1,0 +1,2 @@
+Object {0} = null;
+{0} = newDelayedAction(null, new Object[] '{' {1} '}');

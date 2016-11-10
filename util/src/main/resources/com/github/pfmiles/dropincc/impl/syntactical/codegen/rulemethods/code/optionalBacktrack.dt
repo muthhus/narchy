@@ -1,0 +1,10 @@
+Object {0} = null;
+try '{'
+    lexer.setSavePoint({1});
+    {2}
+	lexer.releaseSavePoint({1}, true);
+	cleanCache();
+    {0} = newDelayedAction(null, {3}).act(arg);
+'}' catch (DropinccException e) '{'
+    lexer.releaseSavePoint({1}, false);
+'}'
