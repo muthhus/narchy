@@ -117,6 +117,7 @@ public class BoolExpr {
         boolExpr.when(orExpr, CC.ks(OR, orExpr)).then((Action<Object[]>) matched -> Util.reduceOrExprs((Boolean) matched[0], (Object[]) matched[1]));
 
         orExpr.when(andExpr, CC.ks(AND, andExpr)).then((Action<Object[]>) matched -> Util.reduceAndExprs((Boolean) matched[0], (Object[]) matched[1]));
+
         andExpr.when(TRUE).then((Action<String>) matched -> Boolean.TRUE).orWhen(FALSE).then((Action<String>) matched -> Boolean.FALSE).orWhen(value, OP, value).then((Object context, Object[] matched) -> {
             Object left = matched[0];
             Object right = matched[2];
