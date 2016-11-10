@@ -16,6 +16,8 @@ import nars.nar.Default;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.atom.Atom;
+import nars.term.obj.IntTerm;
+import nars.test.DeductiveMeshTest;
 import nars.util.Texts;
 import nars.util.Util;
 import nars.util.Wiki;
@@ -193,6 +195,13 @@ public class WebServer /*extends PathHandler*/ {
             });
         }
 
+
+        nar.on("grid", (terms) -> {
+            IntTerm x = (IntTerm) terms[0];
+            IntTerm y = (IntTerm) terms[1];
+            new DeductiveMeshTest(nar, new int[] { x.val(), y.val() });
+            return null;
+        });
 
         nar.on("read", (terms) -> {
 

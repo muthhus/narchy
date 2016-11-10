@@ -1,12 +1,44 @@
 "use strict";
 
-
+const later = window.setTimeout; //defaults to zero
 
 const maxLabelLen = 16;
 function labelize(l) {
     return l.length > maxLabelLen ? l.substr(0, maxLabelLen) + '..' : l;
 }
 
+function MainMenuButton() {
+    return $('<div>[@]</div>').addClass('MainMenuButton').click(() => setTimeout(Menu, 0));
+}
+
+
+function truthString(f, c) {
+    return c ?
+        ("%" + truthComponentStr(f) +
+        ";" + truthComponentStr(c) + "%") :
+        "";
+}
+
+
+function truthComponentStr(x) {
+
+    const i = parseInt(Math.round(100 * x));
+    if (i == 100)
+        return '1.0';
+    else if (i == 0)
+        return '0.0';
+    else
+        return i / 100.0;
+}
+
+
+function div(cssklass) {
+    const d = document.createElement('div');
+    if (cssklass) {
+        d.className = cssklass;
+    }
+    return $(d);
+}
 
 const defaultHostname = window.location.hostname || 'localhost';
 const defaultWSPort = window.location.port || 8080;
@@ -71,28 +103,6 @@ const NARSocket = function(path, onMessage, options) {
 if (!("TextEncoder" in window))
     alert("Sorry, this browser does not support TextEncoder...");
 
-function decodeConceptSummaries(e, m) {
-    const d = new DataView(m);
-    let j = 0;
-
-    e.emit('concept_summary_start', d);
-
-    while (d.byteLength > j) {
-        const pri = d.getFloat32(j); j += 4;
-        const dur = d.getFloat32(j); j += 4;
-        const qua = d.getFloat32(j); j += 4;
-        const termStrLen = d.getInt16(j);  j += 2;
-        const term = new TextDecoder("utf8").decode(m.slice(j, j+termStrLen)); j += termStrLen;
-        e.emit('concept_summary', {
-            term: term,
-            pri: pri,
-            dur: dur,
-            qua: qua
-        });
-    }
-
-    e.emit('concept_summary_end', d);
-}
 
 function decodeTasks(e, m) {
 
@@ -200,7 +210,7 @@ function Editor(options) {
     return div;
 }
 
-function NALInputEditor(terminal, initialValue) {
+function NALInputEditor(socket, initialValue) {
 
     const div = $('<div/>');//.addClass('NALEditor');
 
@@ -222,7 +232,7 @@ function NALInputEditor(terminal, initialValue) {
         if (event.ctrlKey && event.code==="Enter") {
             const txt = editor.getValue();
             if (txt) {
-                terminal.send(txt);
+                socket.send(txt);
                 editor.setValue('');
             }
 
@@ -367,9 +377,9 @@ function NARSpeechRecognition(editor) {
 
 }
 
-function NARInputter(terminal, initialValue) {
+function NARInputter(socket, initialValue) {
 
-    const e = NALInputEditor(terminal, initialValue);
+    const e = NALInputEditor(socket, initialValue);
     const d = $('<div/>').append(
         NARSpeechRecognition(e.editor),
 
@@ -386,7 +396,7 @@ function NARInputter(terminal, initialValue) {
 }
 
 
-function NARConsole(terminal, render) {
+function NARConsole(socket, render) {
 
     const view = $('<div/>');
     const items = $('<div/>').appendTo(view);
@@ -422,7 +432,7 @@ function NARConsole(terminal, render) {
 
     };
 
-    terminal.on('task', function(x) {
+    socket.on('task', function(x) {
 
         //console.log('console: ', JSON.stringify(x), x);
 
@@ -546,33 +556,33 @@ function TopTable(s) {
 
     return d;
 
-    // return SocketView(path,
-    //
-    //     function (p) {
-    //         return e;
-    //     },
-    //
-    //     function (msg) {
-    //
-    //         setTimeout(()=> {
-    //             const m = JSON.parse(msg.data);
-    //
-    //             const rr = [];
-    //             for (let k of m) {
-    //                 rr.push(row(k));
-    //             }
-    //
-    //             fastdom.mutate(()=>
-    //                 e.empty().append(rr)
-    //             );
-    //
-    //         }, 0);
-    //
-    //     }
-    // );
-
-
 }
+
+
+
+
+
+
+//            div('max grid-stack').append(
+//
+//                gridCell([
+
+
+//                ]),
+//
+//                //gridCell(div().html('<h1>ABC</h1>')),
+//                //gridCell( NALTimeline(term).attr('id', 'graph') ),
+//
+//                gridCell( TopTable("active") )
+
+//            ).gridstack({
+//                cellHeight: 160,
+//                cellWidth: 160,
+//                verticalMargin: 20,
+//                horizontalMargin: 20
+//            })
+
+
 
 
 

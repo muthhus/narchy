@@ -135,7 +135,7 @@ public class PremiseRuleSet {
 
         this.patterns = patterns;
 
-        logger.info("indexed {} total rules, consisting of {} unique pattern components terms", rules.size(), patterns.size());
+        logger.info("indexed {} total rules, consisting of {} unique components", rules.size(), patterns.size());
         if (errors[0] > 0) {
             logger.warn("\trule errors: {}", errors[0]);
         }

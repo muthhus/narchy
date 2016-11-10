@@ -28,7 +28,8 @@ function spacegraph(opt) {
 
     opt = opt || {};
 
-    const d = div('graph max');
+    const d = _.extend(div('graph max'), opt || {});
+
 
     const c = cytoscape(cytoscapeOptions(opt, function() {}, d));
     const cypp = c._private.elements._private.ids;
@@ -134,7 +135,7 @@ function spacegraph(opt) {
     }, updatePeriodMS);
 
 
-    d.graph = c;
+    d.graph = c; //DEPRECATED, use proper extension
 
     return d;
 }
