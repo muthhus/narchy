@@ -173,7 +173,7 @@ public class AnalyzedLang {
             if (!enteredGrule.contains(g)) {
                 enteredGrule.add(g);
                 for (CAlternative alt : alts) {
-                    filterOutInvokedGrule(alt.getMatchSequence(), allGs, ruleTypeToAlts, kleeneTypeToNode, enteredGrule);
+                    filterOutInvokedGrule(alt.seq, allGs, ruleTypeToAlts, kleeneTypeToNode, enteredGrule);
                 }
             }
         }
@@ -196,7 +196,7 @@ public class AnalyzedLang {
                 if (!enteredGrule.contains(ele)) {
                     enteredGrule.add((GruleType) ele);
                     for (CAlternative alt : ruleTypeToAlts.get(ele)) {
-                        filterOutInvokedGrule(alt.getMatchSequence(), allGs, ruleTypeToAlts, kleeneTypeToNode, enteredGrule);
+                        filterOutInvokedGrule(alt.seq, allGs, ruleTypeToAlts, kleeneTypeToNode, enteredGrule);
                     }
                 }
             } else if (ele instanceof KleeneType) {

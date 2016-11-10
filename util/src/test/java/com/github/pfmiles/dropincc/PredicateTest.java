@@ -62,7 +62,7 @@ public class PredicateTest extends TestCase {
             public Integer apply(Object matched) {
                 return 0;
             }
-        }).alt(CC.ks("b"), "c").pred(new Predicate<Integer>() {
+        }).orWhen(CC.ks("b"), "c").pred(new Predicate<Integer>() {
             public boolean pred(Integer arg, LookAhead la) {
                 // skip any 'b' before seeing an 'c'
                 int i = 1;

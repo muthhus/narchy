@@ -49,16 +49,16 @@ public class MultiAltMatchBacktrackGen extends CodeGen {
     @Override
     @SuppressWarnings("unchecked")
     public String render(CodeGenContext context) {
-        String ruleName = this.pg.getGruleType().toCodeGenStr();
+        String ruleName = this.pg.type.toCodeGenStr();
         StringBuilder backtrackCode = new StringBuilder();
-        String ruleNum = String.valueOf(pg.getGruleType().getDefIndex());
-        for (CAlternative alt : pg.getAlts()) {
+        String ruleNum = String.valueOf(pg.type.getDefIndex());
+        for (CAlternative alt : pg.alts) {
             // the container rule is self-backtracking, so all its sub
             // components must generate backtracking code
-            Pair<String, String> varAndCode = new ElementsCodeGen(alt.getMatchSequence(), true).render(context);
+            Pair<String, String> varAndCode = new ElementsCodeGen(alt.seq, true).render(context);
             String actionName = "null";
-            if (alt.getAction() != null) {
-                actionName = context.actionFieldMapping.get(alt.getAction());
+            if (alt.action != null) {
+                actionName = context.actionFieldMapping.get(alt.action);
             }
             if (this.generatingBacktrackCode) {
                 backtrackCode.append(MessageFormat.format(altBacktrackOnPathFmt, ruleNum, varAndCode.getRight(), varAndCode.getLeft(), actionName))

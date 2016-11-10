@@ -38,7 +38,7 @@ public class LexerTest extends TestCase {
         Element c = lang.the("c");
         Grule A = lang.rule();
         lang.when(A, CC.EOF);
-        A.when(CC.ks(a), b).alt(CC.kc(a), c);
+        A.when(CC.ks(a), b).orWhen(CC.kc(a), c);
         Exe exe = lang.compile();
         // to test ignore whitespaces
         // System.out.println(exe.lexing("     abc   a\r\tbc\n   \r   "));
@@ -86,7 +86,7 @@ public class LexerTest extends TestCase {
         Grammar lang = new Grammar("Test");
         Grule A = lang.rule();
         lang.when(A, CC.EOF);
-        A.when("\\(", A, "\\)").alt("\\\\G");
+        A.when("\\(", A, "\\)").orWhen("\\\\G");
         Exe exe = lang.compile();
         assertTrue(exe.lexing("(((\\G)))").size() == 8);
     }
@@ -95,7 +95,7 @@ public class LexerTest extends TestCase {
         Grammar lang = new Grammar("Test");
         Grule A = lang.rule();
         lang.when(A, CC.EOF);
-        A.when(" \\(", A, "\\) ").alt(" \\\\G ");
+        A.when(" \\(", A, "\\) ").orWhen(" \\\\G ");
         lang.setWhiteSpaceSensitive(true);
         Exe exe = lang.compile();
         // System.out.println(exe.lexing(" ( ( ( \\G ) ) ) "));
@@ -106,7 +106,7 @@ public class LexerTest extends TestCase {
         Grammar lang = new Grammar("Test");
         Grule A = lang.rule();
         lang.when(A, CC.EOF);
-        A.when(" \\(", A, "\\) ").alt(" \\\\G ");
+        A.when(" \\(", A, "\\) ").orWhen(" \\\\G ");
         lang.setWhiteSpaceSensitive(true);
         Exe exe = lang.compile();
         AnalyzedLang al = TestHelper.priField(exe, "al");

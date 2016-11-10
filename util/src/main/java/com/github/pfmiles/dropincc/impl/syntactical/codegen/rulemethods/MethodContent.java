@@ -39,7 +39,7 @@ public class MethodContent extends CodeGen {
     @SuppressWarnings("unchecked")
     public String render(CodeGenContext context) {
         String matchCode = null;
-        if (this.pg.getAlts().size() == 1) {
+        if (this.pg.alts.size() == 1) {
             // single alt rule, same to elements match code
             matchCode = new SingleAltMatchCodeGen(pg, false).render(context);
         } else {
@@ -54,7 +54,7 @@ public class MethodContent extends CodeGen {
         }
         if (pg.isOnBacktrackPath()) {
             String matchCodeOnPath = null;
-            if (this.pg.getAlts().size() == 1) {
+            if (this.pg.alts.size() == 1) {
                 // single alt rule, same to elements match code
                 matchCodeOnPath = new SingleAltMatchCodeGen(pg, true).render(context);
             } else {
@@ -66,7 +66,7 @@ public class MethodContent extends CodeGen {
                     matchCodeOnPath = new MultiAltMatchCodeGen(this.pg, true).render(context);
                 }
             }
-            return MessageFormat.format(onBacktrackPathFmt, String.valueOf(pg.getGruleType().getDefIndex()), matchCode, matchCodeOnPath);
+            return MessageFormat.format(onBacktrackPathFmt, String.valueOf(pg.type.getDefIndex()), matchCode, matchCodeOnPath);
         } else {
             return matchCode;
         }

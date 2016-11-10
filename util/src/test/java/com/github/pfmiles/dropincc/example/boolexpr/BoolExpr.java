@@ -90,6 +90,7 @@ public class BoolExpr {
      */
     static {
         Grammar g = new Grammar("BoolExpr");
+
         TokenDef OR = g.the("\\|\\|");
         TokenDef AND = g.the("&&");
         TokenDef TRUE = g.the("true");
@@ -108,38 +109,44 @@ public class BoolExpr {
         TokenDef RIGHT_BRACE = g.the("\\}");
         TokenDef COMMA = g.the(",");
 
-        Grule boolExpr = g.rule();
         Grule orExpr = g.rule();
         Grule andExpr = g.rule();
         Grule value = g.rule();
 
-        g.when(boolExpr, CC.EOF).then((Action<Object[]>) matched -> (Boolean) matched[0]);
+        Grule boolExpr = g.rule();
         boolExpr.when(orExpr, CC.ks(OR, orExpr)).then((Action<Object[]>) matched -> Util.reduceOrExprs((Boolean) matched[0], (Object[]) matched[1]));
+
         orExpr.when(andExpr, CC.ks(AND, andExpr)).then((Action<Object[]>) matched -> Util.reduceAndExprs((Boolean) matched[0], (Object[]) matched[1]));
-        andExpr.when(TRUE).then((Action<String>) matched -> Boolean.TRUE).alt(FALSE).then((Action<String>) matched -> Boolean.FALSE).alt(value, OP, value).then((ParamedAction<Map<String, Object>, Object[]>) (context, matched) -> {
+        andExpr.when(TRUE).then((Action<String>) matched -> Boolean.TRUE).orWhen(FALSE).then((Action<String>) matched -> Boolean.FALSE).orWhen(value, OP, value).then((Object context, Object[] matched) -> {
             Object left = matched[0];
             Object right = matched[2];
             if (!opMapping.containsKey(matched[1]))
                 throw new RuntimeException("Illegal operator: " + matched[1]);
             return opMapping.get(matched[1]).compute(left, right);
-        }).alt(CC.ks(NOT), LEFT_PAREN, boolExpr, RIGHT_PAREN).then((Action<Object[]>) matched -> {
-            int numOfNots = ((Object[]) matched[0]).length;
-            Boolean ret = (Boolean) matched[2];
-            return numOfNots % 2 == 0 ? ret : !ret;
-        }).alt(value).then((Action<Object>) matched -> {
+        }).orWhen(CC.ks(NOT), LEFT_PAREN, boolExpr, RIGHT_PAREN).then((Action<Object[]>) matched -> {
+            int notCount = ((Object[]) matched[0]).length;
+            return (notCount % 2 == 0) == (Boolean) matched[2];
+        }).orWhen(value).then((Action<Object>) matched -> {
             if (!(matched instanceof Boolean))
                 throw new RuntimeException("");
             return (Boolean) matched;
         });
-        value.when(STRING).then((Action<String>) matched -> matched.substring(1, matched.length() - 1)).alt(NUMBER).then((Action<String>) Double::parseDouble).alt(DATE).then((Action<String>) matched -> {
-            SimpleDateFormat fmt = new SimpleDateFormat(matched.contains(" ") ? "#yyyy-MM-dd HH:mm:ss#" : "#yyyy-MM-dd#");
-            try {
-                return fmt.parse(matched);
-            } catch (ParseException e) {
-                throw new RuntimeException(e);
-            }
-        }).alt(REF).then((ParamedAction<Map<String, Object>, String>) Map::get).alt(LEFT_PAREN.or(LEFT_BRACKET), value, COMMA, value, RIGHT_BRACKET.or(RIGHT_PAREN)).then((Action<Object[]>) matched -> Util.createInterval("(".equals(matched[0]), matched[1], matched[3], ")".equals(matched[4]))).alt(LEFT_BRACE, value, CC.ks(COMMA, value), RIGHT_BRACE).then((Action<Object[]>) matched -> Util.buildCollection(matched[1], (Object[]) matched[2]));
-        exe = g.compile();
+        value
+            .when(STRING).then((Action<String>) matched -> matched.substring(1, matched.length() - 1))
+            .orWhen(NUMBER).then((Action<String>) Double::parseDouble)
+            .orWhen(DATE).then((Action<String>) matched -> {
+                SimpleDateFormat fmt = new SimpleDateFormat(matched.contains(" ") ? "#yyyy-MM-dd HH:mm:ss#" : "#yyyy-MM-dd#");
+                try {
+                    return fmt.parse(matched);
+                } catch (ParseException e) {
+                    throw new RuntimeException(e);
+                }
+            })
+            .orWhen(REF).then((ParamedAction<Map<String, Object>, String>) Map::get)
+            .orWhen(LEFT_PAREN.or(LEFT_BRACKET), value, COMMA, value, RIGHT_BRACKET.or(RIGHT_PAREN)).then((Action<Object[]>) matched -> Util.createInterval("(".equals(matched[0]), matched[1], matched[3], ")".equals(matched[4]))).orWhen(LEFT_BRACE, value, CC.ks(COMMA, value), RIGHT_BRACE)
+                .then((Action<Object[]>) matched -> Util.buildCollection(matched[1], (Object[]) matched[2]));
+
+        exe = g.compile(boolExpr);
     }
 
     public static Boolean exe(Map<String, Object> context, String code) {

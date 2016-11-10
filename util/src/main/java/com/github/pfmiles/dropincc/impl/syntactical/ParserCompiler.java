@@ -21,11 +21,7 @@ import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
 
-import com.github.pfmiles.dropincc.CC;
-import com.github.pfmiles.dropincc.DropinccException;
-import com.github.pfmiles.dropincc.Element;
-import com.github.pfmiles.dropincc.Grule;
-import com.github.pfmiles.dropincc.TokenDef;
+import com.github.pfmiles.dropincc.*;
 import com.github.pfmiles.dropincc.impl.Alternative;
 import com.github.pfmiles.dropincc.impl.AndSubRule;
 import com.github.pfmiles.dropincc.impl.CAlternative;
@@ -202,7 +198,7 @@ public class ParserCompiler {
                 path.push((GruleType) t);
                 List<CAlternative> alts = ruleTypeToAlts.get(t);
                 for (CAlternative a : alts) {
-                    for (EleType ele : a.getMatchSequence()) {
+                    for (EleType ele : a.seq) {
                         examineEleType(ele, path, ruleTypeToAlts, kleeneTypeToNode);
                         if (!(ele instanceof KleeneStarType || ele instanceof OptionalType))
                             break;
@@ -269,7 +265,7 @@ public class ParserCompiler {
                     continue;
                 examinedGrules.add(g);
                 for (CAlternative alt : ruleTypeToAlts.get(g)) {
-                    markBacktrackPathForElements(alt.getMatchSequence(), onPathGrules, ruleTypeToAlts, kleeneTypeToNode, examinedGrules, examinedKleenes);
+                    markBacktrackPathForElements(alt.seq, onPathGrules, ruleTypeToAlts, kleeneTypeToNode, examinedGrules, examinedKleenes);
                 }
             }
         if (backtrackKleenes != null)
@@ -291,7 +287,7 @@ public class ParserCompiler {
                     continue;
                 examinedGrules.add(g);
                 for (CAlternative alt : ruleTypeToAlts.get(g)) {
-                    markBacktrackPathForElements(alt.getMatchSequence(), onPathGrules, ruleTypeToAlts, kleeneTypeToNode, examinedGrules, examinedKleenes);
+                    markBacktrackPathForElements(alt.seq, onPathGrules, ruleTypeToAlts, kleeneTypeToNode, examinedGrules, examinedKleenes);
                 }
             } else if (ele instanceof KleeneType) {
                 // add to on-path kleene set and process children
@@ -318,14 +314,14 @@ public class ParserCompiler {
         // list([grule, altInfex, predObj])
         List<Object[]> predInfos = new ArrayList<>();
         for (PredictingGrule pg : predGrules) {
-            GruleType grule = pg.getGruleType();
-            for (int i = 0; i < pg.getAlts().size(); i++) {
-                CAlternative calt = pg.getAlts().get(i);
-                if (calt.getAction() != null) {
-                    actionInfos.add(new Object[] { grule, i, calt.getAction() });
+            GruleType grule = pg.type;
+            for (int i = 0; i < pg.alts.size(); i++) {
+                CAlternative calt = pg.alts.get(i);
+                if (calt.action != null) {
+                    actionInfos.add(new Object[] { grule, i, calt.action});
                 }
-                if (calt.getPredicate() != null) {
-                    predInfos.add(new Object[] { grule, i, calt.getPredicate() });
+                if (calt.predicate != null) {
+                    predInfos.add(new Object[] { grule, i, calt.predicate});
                 }
             }
         }

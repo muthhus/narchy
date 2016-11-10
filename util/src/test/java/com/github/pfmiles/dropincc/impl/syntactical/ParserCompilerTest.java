@@ -49,7 +49,7 @@ public class ParserCompilerTest extends TestCase {
         Grule expr = calculator.rule();
         Grule term = calculator.rule();
         Element mulTail = calculator.when(MUL.or(DIV), term);
-        term.when(DIGIT, mulTail).alt(LEFTPAREN, expr, RIGHTPAREN).alt(DIGIT);
+        term.when(DIGIT, mulTail).orWhen(LEFTPAREN, expr, RIGHTPAREN).orWhen(DIGIT);
         Element addendTail = calculator.when(ADD.or(SUB), term);
         expr.when(term, addendTail, CC.EOF);
 
@@ -90,7 +90,7 @@ public class ParserCompilerTest extends TestCase {
 
         Grule term = calculator.rule();
         Grule expr = calculator.rule();
-        term.when(DIGIT, MUL.or(DIV).and(term)).alt(LEFTPAREN, expr, RIGHTPAREN).alt(DIGIT);
+        term.when(DIGIT, MUL.or(DIV).and(term)).orWhen(LEFTPAREN, expr, RIGHTPAREN).orWhen(DIGIT);
         expr.when(term, ADD.or(SUB).and(term), CC.EOF);
 
         List<Grule> grules = (List<Grule>) TestHelper.priField(calculator, "grules");
@@ -183,7 +183,7 @@ public class ParserCompilerTest extends TestCase {
         gt = testLang.the("\\>");
         Grule A = testLang.rule();
         Grule B = testLang.rule();
-        Element l = testLang.when(leftParen, A, rightParen).alt(B, rightBracket).alt(zero);
+        Element l = testLang.when(leftParen, A, rightParen).orWhen(B, rightBracket).orWhen(zero);
         A.when(leftBrace, B, rightBrace);
         B.when(l, gt);
         a = TestHelper.resolveAnalyzedLangForTest(testLang);
@@ -206,8 +206,8 @@ public class ParserCompilerTest extends TestCase {
         gt = testLang.the("\\>");
         A = testLang.rule();
         B = testLang.rule();
-        l = testLang.when(leftParen, A, rightParen).alt(CC.ks(B, rightBracket)).alt(zero);
-        A.when(leftBrace, B, rightBrace).alt(CC.op(l));
+        l = testLang.when(leftParen, A, rightParen).orWhen(CC.ks(B, rightBracket)).orWhen(zero);
+        A.when(leftBrace, B, rightBrace).orWhen(CC.op(l));
         B.when(CC.kc(A), gt);
         a = TestHelper.resolveAnalyzedLangForTest(testLang);
         try {
@@ -235,7 +235,7 @@ public class ParserCompilerTest extends TestCase {
         Element c = ll1.the("c");
         Grule A = ll1.rule();
         ll1.when(A, CC.EOF);
-        A.when(a, CC.ks(c)).alt(b, CC.ks(c));
+        A.when(a, CC.ks(c)).orWhen(b, CC.ks(c));
         AnalyzedLangForTest al = TestHelper.resolveAnalyzedLangForTest(ll1);
         List<PredictingGrule> ps = ParserCompiler.computePredictingGrules(al.ruleTypeToAlts, al.kleeneTypeToNode).getPgs();
         // System.out.println(ps);
@@ -252,13 +252,13 @@ public class ParserCompilerTest extends TestCase {
         Grule C = ll3.rule();
         Grule D = ll3.rule();
 
-        A.when(B, CC.ks("a")).alt(C, CC.kc("a")).alt(D, CC.op("a"));
+        A.when(B, CC.ks("a")).orWhen(C, CC.kc("a")).orWhen(D, CC.op("a"));
 
-        B.when("a", "b", "c", C).alt("a", "b", "c", D).alt("d");
+        B.when("a", "b", "c", C).orWhen("a", "b", "c", D).orWhen("d");
 
-        C.when("e", "f", "g", D).alt("e", "f", "g", "h");
+        C.when("e", "f", "g", D).orWhen("e", "f", "g", "h");
 
-        D.when("i", "j", "k", "l").alt("i", "j", "k", "m");
+        D.when("i", "j", "k", "l").orWhen("i", "j", "k", "m");
 
         AnalyzedLangForTest al = TestHelper.resolveAnalyzedLangForTest(ll3);
         List<PredictingGrule> ps = ParserCompiler.computePredictingGrules(al.ruleTypeToAlts, al.kleeneTypeToNode).getPgs();
@@ -300,8 +300,8 @@ public class ParserCompilerTest extends TestCase {
                 System.out.println("F result, length(3 exp): " + ms.length);
                 return ms;
             }
-        }).alt("[0-9]+").then(new ParamedAction<Object, Object>() {
-            public Object act(Object arg, Object matched) {
+        }).orWhen("[0-9]+").then(new ParamedAction<Object, Object>() {
+            public Object apply(Object arg, Object matched) {
                 String m = (String) matched;
                 System.out.println("F result, single value: " + m + ", arg: " + arg);
                 return m;
@@ -323,7 +323,7 @@ public class ParserCompilerTest extends TestCase {
         Grammar lang = new Grammar("Test");
         Grule A = lang.rule();
         lang.when(A, CC.EOF);
-        A.when("a", "b", "c").alt("a", "b", "c");
+        A.when("a", "b", "c").orWhen("a", "b", "c");
         lang.compile();
         // System.out.println(lang.getDebugMsgs());
         assertTrue(lang.getDebugMsgs() != null);

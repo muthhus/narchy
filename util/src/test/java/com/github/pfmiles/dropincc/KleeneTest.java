@@ -36,7 +36,7 @@ public class KleeneTest extends TestCase {
         Grule A = lang.rule();
 
         lang.when(A, CC.EOF).then(mgr.newCheck(1, 2));
-        A.when(CC.ks("a", CC.kc("b", "d")), "c").then(mgr.newCheck(0, 0)).alt(CC.kc("e", CC.op("g", "h"), "f")).then(mgr.newCheck(1, 2));
+        A.when(CC.ks("a", CC.kc("b", "d")), "c").then(mgr.newCheck(0, 0)).orWhen(CC.kc("e", CC.op("g", "h"), "f")).then(mgr.newCheck(1, 2));
 
         Exe exe = lang.compile();
         exe.eval("efeghf");
@@ -61,7 +61,7 @@ public class KleeneTest extends TestCase {
 
         lang.when(A, CC.EOF).then(mgr.newCheck(1, 2));
         A.when(CC.ks("a", CC.kc("b", C, "e"), "b", C, "d")).then(mgr.newCheck(1, 2));
-        C.when("f").then(mgr.newCheck(7, -1)).alt("g", C, "h").then(mgr.newCheck(11, 3));
+        C.when("f").then(mgr.newCheck(7, -1)).orWhen("g", C, "h").then(mgr.newCheck(11, 3));
 
         Exe exe = lang.compile();
         exe.eval("abfebgfhebfdabggfhhebgggfhhhebggggfhhhhebgfhd");
@@ -88,7 +88,7 @@ public class KleeneTest extends TestCase {
 
         A.when(CC.ks(B, CC.kc("e", "f"), "d"), B, "c").then(mgr.newCheck(1, 3));
 
-        B.when("g").then(mgr.newCheck(4, -1)).alt("h", B, "i").then(mgr.newCheck(7, 3));
+        B.when("g").then(mgr.newCheck(4, -1)).orWhen("h", B, "i").then(mgr.newCheck(7, 3));
 
         Exe exe = lang.compile();
 
@@ -113,7 +113,7 @@ public class KleeneTest extends TestCase {
 
         lang.when(A, CC.EOF).then(mgr.newCheck(1, 2));
         A.when(CC.kc(B, CC.op(B, "c"), B, "d"), B, "c").then(mgr.newCheck(1, 3));
-        B.when("e").then(mgr.newCheck(6, -1)).alt("f", B, "g").then(mgr.newCheck(15, 3));
+        B.when("e").then(mgr.newCheck(6, -1)).orWhen("f", B, "g").then(mgr.newCheck(15, 3));
 
         Exe exe = lang.compile();
         exe.eval("efegdffeggfffegggcffffeggggdfffffegggggc");
@@ -137,7 +137,7 @@ public class KleeneTest extends TestCase {
 
         lang.when(A, CC.EOF).then(mgr.newCheck(1, 2));
         A.when(CC.kc(B, CC.op(B, "c"), B, "d"), B, "c").then(mgr.newCheck(1, 3));
-        B.when("e").then(mgr.newCheck(3, -1)).alt("f", B, "g").then(mgr.newCheck(1, 3));
+        B.when("e").then(mgr.newCheck(3, -1)).orWhen("f", B, "g").then(mgr.newCheck(1, 3));
 
         Exe exe = lang.compile();
         exe.eval("eedfegc");

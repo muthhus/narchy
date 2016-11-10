@@ -65,7 +65,7 @@ public class DelayedAction {
             if (this.action instanceof Action) {
                 return ((Action) this.action).apply(input);
             } else if (this.action instanceof ParamedAction) {
-                return ((ParamedAction) this.action).act(arg, input);
+                return ((ParamedAction) this.action).apply(arg, input);
             } else {
                 throw new RuntimeException("Invalid action: " + this.action);
             }

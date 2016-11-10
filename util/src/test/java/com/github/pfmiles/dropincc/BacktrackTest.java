@@ -43,7 +43,7 @@ public class BacktrackTest extends TestCase {
                 // System.out.println("b count:" + count);
                 return matched;
             }
-        }).alt("e", B, "f").then(new Action<Object>() {
+        }).orWhen("e", B, "f").then(new Action<Object>() {
             private int count;
 
             public Object apply(Object matched) {
@@ -81,7 +81,7 @@ public class BacktrackTest extends TestCase {
                 // System.out.println("b count:" + count);
                 return matched;
             }
-        }).alt("e", B, "f").then(new Action<Object>() {
+        }).orWhen("e", B, "f").then(new Action<Object>() {
             private int count;
 
             public Object apply(Object matched) {
@@ -119,7 +119,7 @@ public class BacktrackTest extends TestCase {
                 // System.out.println("b count:" + count);
                 return matched;
             }
-        }).alt("e", B, "f").then(new Action<Object>() {
+        }).orWhen("e", B, "f").then(new Action<Object>() {
             private int count;
 
             public Object apply(Object matched) {

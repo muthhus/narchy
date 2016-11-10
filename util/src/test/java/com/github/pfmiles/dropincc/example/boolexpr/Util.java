@@ -21,7 +21,7 @@ import java.util.Set;
  */
 public class Util {
 
-    public static Boolean reduceOrExprs(Boolean b0, Object[] others) {
+    public static Boolean reduceOrExprs(boolean b0, Object[] others) {
         for (Object other : others) {
             Boolean b = (Boolean) ((Object[]) other)[1];
             b0 |= b;
@@ -29,7 +29,7 @@ public class Util {
         return b0;
     }
 
-    public static Boolean reduceAndExprs(Boolean b0, Object[] others) {
+    public static Boolean reduceAndExprs(boolean b0, Object[] others) {
         for (Object other : others) {
             b0 &= (Boolean) ((Object[]) other)[1];
         }

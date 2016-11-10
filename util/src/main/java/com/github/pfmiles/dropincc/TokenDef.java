@@ -28,7 +28,7 @@ public class TokenDef implements Element {
 
     private static final long serialVersionUID = -8800772928848920147L;
 
-    private final String regexp;
+    public final String regexp;
 
     /*
      * Construct a token described in regex, package access privilege makes it
@@ -70,15 +70,13 @@ public class TokenDef implements Element {
         return new AndSubRule(this, ele);
     }
 
-    public String getRegexp() {
-        return regexp;
-    }
-
     public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((regexp == null) ? 0 : regexp.hashCode());
-        return result;
+//        final int prime = 31;
+//        int result = 1;
+//        result = prime * result + ((regexp == null) ? 0 : regexp.hashCode());
+//        return result;
+        String r = regexp;
+        return r == null ? 0 : regexp.hashCode();
     }
 
     public boolean equals(Object obj) {

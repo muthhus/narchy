@@ -23,11 +23,11 @@ import com.github.pfmiles.dropincc.impl.GruleType;
  */
 public class PredictingGrule {
 
-    private GruleType gruleType;
+    public final GruleType type;
     // the LL(*) look-ahead DFA
-    private LookAheadDfa dfa;
+    public final LookAheadDfa dfa;
     // all alternative productions
-    private List<CAlternative> alts;
+    public final List<CAlternative> alts;
 
     // Non LL-regular grammar, no valid look-ahead dfa found, fallback to back
     // tracking
@@ -39,13 +39,13 @@ public class PredictingGrule {
     /**
      * Create a predicting grule with look-ahead DFA
      * 
-     * @param gruleType
+     * @param type
      * @param dfa
      * @param alts
      */
-    public PredictingGrule(GruleType gruleType, LookAheadDfa dfa, List<CAlternative> alts, boolean onBacktrackPath) {
+    public PredictingGrule(GruleType type, LookAheadDfa dfa, List<CAlternative> alts, boolean onBacktrackPath) {
         super();
-        this.gruleType = gruleType;
+        this.type = type;
         this.dfa = dfa;
         this.alts = alts;
         this.onBacktrackPath = onBacktrackPath;
@@ -59,35 +59,13 @@ public class PredictingGrule {
      * @param alts
      */
     public PredictingGrule(GruleType grule, List<CAlternative> alts, boolean onBacktrackPath) {
-        this.gruleType = grule;
+        this.type = grule;
+        this.dfa = null;
         this.alts = alts;
         this.backtrack = true;
         this.onBacktrackPath = onBacktrackPath;
     }
 
-    public GruleType getGruleType() {
-        return gruleType;
-    }
-
-    public void setGruleType(GruleType gruleType) {
-        this.gruleType = gruleType;
-    }
-
-    public LookAheadDfa getDfa() {
-        return dfa;
-    }
-
-    public void setDfa(LookAheadDfa dfa) {
-        this.dfa = dfa;
-    }
-
-    public List<CAlternative> getAlts() {
-        return alts;
-    }
-
-    public void setAlts(List<CAlternative> alts) {
-        this.alts = alts;
-    }
 
     public boolean isBacktrack() {
         return backtrack;

@@ -40,11 +40,14 @@ public class Calculator {
          * </pre>
          */
         Grammar c = new Grammar("Calculator");
-        Grule expr = c.rule();
-        c.when(expr, CC.EOF).then((Action<Object>) matched -> (Double) ((Object[]) matched)[0]);
-        TokenDef a = c.the("\\+");
+
+        TokenDef plus = c.the("\\+");
+        TokenDef mult = c.the("\\*");
+
         Grule addend = c.rule();
-        expr.when(addend, CC.ks(a.or("\\-"), addend)).then((Action<Object>) matched -> {
+
+        Grule expr = c.rule();
+        expr.when(addend, CC.ks(plus.or("\\-"), addend)).then((Action<Object>) matched -> {
             Object[] ms = (Object[]) matched;
             Double a0 = (Double) ms[0];
             Object[] aPairs = (Object[]) ms[1];
@@ -59,9 +62,8 @@ public class Calculator {
             }
             return a0;
         });
-        TokenDef m = c.the("\\*");
         Grule factor = c.rule();
-        addend.when(factor, CC.ks(m.or("/"), factor)).then((Action<Object>) matched -> {
+        addend.when(factor, CC.ks(mult.or("/"), factor)).then((Action<Object>) matched -> {
             Object[] ms = (Object[]) matched;
             Double f0 = (Double) ms[0];
             Object[] fPairs = (Object[]) ms[1];
@@ -76,8 +78,12 @@ public class Calculator {
             }
             return f0;
         });
-        factor.when("\\(", expr, "\\)").then((Action<Object>) matched -> (Double) ((Object[]) matched)[1]).alt("\\d+(\\.\\d+)?").then((Action<Object>) matched -> Double.parseDouble((String) matched));
-        calc = c.compile();
+        factor
+            .when("\\(", expr, "\\)").then((Action<Object>) matched -> (Double) ((Object[]) matched)[1])
+            .orWhen("\\d+(\\.\\d+)?").then((Action) matched -> Double.parseDouble((String) matched));
+
+
+        calc = c.compile(expr);
     }
 
     /**

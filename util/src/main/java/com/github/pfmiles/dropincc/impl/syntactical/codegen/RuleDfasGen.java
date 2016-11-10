@@ -43,12 +43,12 @@ public class RuleDfasGen extends CodeGen {
     public String render(CodeGenContext context) {
         StringBuilder sb = new StringBuilder();
         for (PredictingGrule p : pgs) {
-            if (p.getDfa() == null)
+            if (p.dfa == null)
                 continue;
-            String ruleName = p.getGruleType().toCodeGenStr();
+            String ruleName = p.type.toCodeGenStr();
             sb.append(MessageFormat.format(fmt, ruleName)).append('\n');
             String dfaName = ruleName + "DfaStart";
-            RunningDfaState start = toPredictingDfa(p.getDfa());
+            RunningDfaState start = toPredictingDfa(p.dfa);
             context.fieldRuleDfaMapping.put(dfaName, start);
         }
         return sb.toString();

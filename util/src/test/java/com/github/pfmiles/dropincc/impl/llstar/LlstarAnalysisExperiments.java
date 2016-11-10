@@ -43,7 +43,7 @@ public class LlstarAnalysisExperiments {
         TokenDef m = lang.the("\\*");
         Grule F = lang.rule();
         A.when(F, CC.ks(m.or("/"), F));
-        F.when("\\(", L, "\\)").alt("[0-9]+");
+        F.when("\\(", L, "\\)").orWhen("[0-9]+");
 
         genImages(lang);
     }

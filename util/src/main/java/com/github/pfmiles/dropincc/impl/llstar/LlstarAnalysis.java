@@ -94,12 +94,12 @@ public class LlstarAnalysis {
             AtnState pa1 = this.atn.newEndStateForGrule(grule);
             for (int i = 0; i < calts.size(); i++) {
                 CAlternative calt = calts.get(i);
-                List<EleType> alt = calt.getMatchSequence();
+                List<EleType> alt = calt.seq;
                 AtnState pai = this.atn.newAltStateForGrule(grule, i);
                 pa.addTransition(Constants.epsilon, pai);
                 if (alt != null && !alt.isEmpty()) {
                     AtnState p0 = this.atn.newAtnState(grule);
-                    Predicate<?> pred = calt.getPredicate();
+                    Predicate<?> pred = calt.predicate;
                     if (pred != null) {
                         pai.addTransition(pred, p0);
                     } else {

@@ -13,6 +13,7 @@ package com.github.pfmiles.dropincc;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
 import java.util.regex.Pattern;
 
 import com.github.pfmiles.dropincc.impl.Alternative;
@@ -103,6 +104,13 @@ public class Grammar implements Serializable {
         return new ConstructingGrule(g);
     }
 
+    public Exe compile(Grule root) {
+        return compile(root, matched -> matched[0]);
+    }
+    public <X> Exe compile(Grule root, Action<X[]> eval) {
+        when(root, CC.EOF).then(eval);
+        return compile();
+    }
     /**
      * Compile the grammar and return the executable object. The returned object
      * could be used for interpreting the newly defined language.
@@ -166,6 +174,7 @@ public class Grammar implements Serializable {
         this.grules.add(g);
         return g;
     }
+
 
     // same hashCode method as Object.class needed
     public int hashCode() {

@@ -10,6 +10,8 @@
  ******************************************************************************/
 package com.github.pfmiles.dropincc;
 
+import java.util.function.BiFunction;
+
 /**
  * Parameterized action, it could receive the parameter passed from the outside.
  * 
@@ -20,7 +22,7 @@ package com.github.pfmiles.dropincc;
  * @param <M>
  *            the expected type of the matched sequence
  */
-public interface ParamedAction<P, M> {
+public interface ParamedAction<P, M> extends BiFunction<P,M,Object> {
     /**
      * The same as the 'act' metod in com.github.pfmiles.dropincc.Action
      * interface, except that there is an additional 'arg' argument which is
@@ -31,5 +33,5 @@ public interface ParamedAction<P, M> {
      * @see Action#apply(Object)
      * @return
      */
-    Object act(P arg, M matched);
+    //Object apply(P arg, M matched);
 }

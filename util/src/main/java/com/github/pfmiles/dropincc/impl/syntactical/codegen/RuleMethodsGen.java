@@ -42,8 +42,8 @@ public class RuleMethodsGen extends CodeGen {
         for (PredictingGrule p : pgs) {
             // the 'varSeq' is method scoped
             context.varSeq = new SeqGen();
-            context.curGrule = p.getGruleType();
-            String ruleName = p.getGruleType().toCodeGenStr();
+            context.curGrule = p.type;
+            String ruleName = p.type.toCodeGenStr();
             sb.append(MessageFormat.format(ruleMethodSkeleton, ruleName, new MethodContent(p).render(context))).append('\n');
         }
         return sb.toString();

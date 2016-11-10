@@ -50,7 +50,7 @@ public class LexerCompiler {
                 TokenDef t = iter.next();
                 if (tokenTypeMapping.containsKey(t))
                     continue;
-                tokenTypeMapping.put(t, new TokenType(i, t.getRegexp()));
+                tokenTypeMapping.put(t, new TokenType(i, t.regexp));
                 i++;
             }
             // EOF is of token type -1
@@ -81,12 +81,12 @@ public class LexerCompiler {
 
     private static void checkRegexps(List<TokenDef> tokens) {
         for (TokenDef t : tokens) {
-            if (Util.isEmpty(t.getRegexp()))
+            if (Util.isEmpty(t.regexp))
                 throw new DropinccException("Cannot create null token.");
             try {
-                Pattern.compile(t.getRegexp());
+                Pattern.compile(t.regexp);
             } catch (PatternSyntaxException e) {
-                throw new DropinccException("Invalid token rule: '" + t.getRegexp() + '\'', e);
+                throw new DropinccException("Invalid token rule: '" + t.regexp + '\'', e);
             }
         }
     }
@@ -104,7 +104,7 @@ public class LexerCompiler {
                 sb.append('|');
             sb.append("(\\G");
 
-            String regExp = t.getRegexp();
+            String regExp = t.regexp;
             sb.append(regExp);
             groupNumToType.put(groupCount, tokenTypeMapping.get(t));
 

@@ -50,7 +50,7 @@ public class MultiAltMatchCodeGen extends CodeGen {
     private static final String actionIvkFormat = "{0}.apply({1})";
     // 0: actionName
     // 1: matchedVar
-    private static final String paramedActionIvkFormat = "{0}.act(arg, {1})";
+    private static final String paramedActionIvkFormat = "{0}.apply(arg, {1})";
 
     private final PredictingGrule pg;
     private final boolean generatingBacktrackCode;
@@ -64,33 +64,33 @@ public class MultiAltMatchCodeGen extends CodeGen {
     @SuppressWarnings("unchecked")
     public String render(CodeGenContext context) {
         StringBuilder altsSwitchCode = new StringBuilder();
-        for (int i = 0; i < pg.getAlts().size(); i++) {
-            CAlternative alt = pg.getAlts().get(i);
+        for (int i = 0; i < pg.alts.size(); i++) {
+            CAlternative alt = pg.alts.get(i);
             String altNum = String.valueOf(i);
-            Pair<String, String> varAndCode = new ElementsCodeGen(alt.getMatchSequence(), generatingBacktrackCode).render(context);
+            Pair<String, String> varAndCode = new ElementsCodeGen(alt.seq, generatingBacktrackCode).render(context);
             String elementsCode = varAndCode.getRight();
             String elementsVar = varAndCode.getLeft();
             String actionIvk = elementsVar;
             String actionName = "null";
-            if (alt.getAction() != null) {
-                actionName = context.actionFieldMapping.get(alt.getAction());
-                if (alt.getAction() instanceof ParamedAction) {
+            if (alt.action != null) {
+                actionName = context.actionFieldMapping.get(alt.action);
+                if (alt.action instanceof ParamedAction) {
                     actionIvk = MessageFormat.format(paramedActionIvkFormat, actionName, elementsVar);
-                } else if (alt.getAction() instanceof Action) {
+                } else if (alt.action instanceof Action) {
                     actionIvk = MessageFormat.format(actionIvkFormat, actionName, elementsVar);
                 } else {
-                    throw new DropinccException("Illegal action type: " + alt.getAction().getClass());
+                    throw new DropinccException("Illegal action type: " + alt.action.getClass());
                 }
             }
             if (generatingBacktrackCode) {
                 altsSwitchCode.append(
                         MessageFormat.format(altCaseOnBacktrackPath, altNum, elementsCode, elementsVar, actionName,
-                                String.valueOf(pg.getGruleType().getDefIndex()))).append('\n');
+                                String.valueOf(pg.type.getDefIndex()))).append('\n');
             } else {
                 altsSwitchCode.append(MessageFormat.format(altCase, altNum, elementsCode, actionIvk)).append('\n');
             }
         }
-        return MessageFormat.format(fmt, pg.getGruleType().toCodeGenStr(), altsSwitchCode.toString());
+        return MessageFormat.format(fmt, pg.type.toCodeGenStr(), altsSwitchCode.toString());
     }
 
 }

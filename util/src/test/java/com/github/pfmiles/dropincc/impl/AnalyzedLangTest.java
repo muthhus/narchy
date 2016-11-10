@@ -59,7 +59,7 @@ public class AnalyzedLangTest extends TestCase {
         Element expr = calculator.when(addition, CC.EOF);
         addition.when(addend, CC.ks(ADD.or(SUB), addend));
         addend.when(factor, CC.ks(MUL.or(DIV), factor));
-        factor.when(DIGIT).alt(LEFTPAREN, addition, RIGHTPAREN);
+        factor.when(DIGIT).orWhen(LEFTPAREN, addition, RIGHTPAREN);
         AnalyzedLang cl = new AnalyzedLang("test", (List<TokenDef>) TestHelper.priField(calculator, "tokens"), (List<Grule>) TestHelper.priField(
                 calculator, "grules"), false);
         KleeneStarNode k1 = (KleeneStarNode) addition.getAlts().get(0).getElements().get(1);
@@ -138,7 +138,7 @@ public class AnalyzedLangTest extends TestCase {
             public Object apply(Object param) {
                 return Double.parseDouble((String) param);
             }
-        }).alt(LEFTPAREN, addition, RIGHTPAREN).then(new Action<Object>() {
+        }).orWhen(LEFTPAREN, addition, RIGHTPAREN).then(new Action<Object>() {
             public Object apply(Object matched) {
                 return (Double) ((Object[]) matched)[1];
             }
@@ -153,56 +153,56 @@ public class AnalyzedLangTest extends TestCase {
             case 0:
                 // addition
                 assertTrue(calts.size() == 1);
-                assertTrue(calts.get(0).getMatchSequence().size() == 2);
-                assertTrue(calts.get(0).getMatchSequence().get(0) instanceof GruleType);
-                assertTrue(calts.get(0).getMatchSequence().get(1) instanceof KleeneStarType);
+                assertTrue(calts.get(0).seq.size() == 2);
+                assertTrue(calts.get(0).seq.get(0) instanceof GruleType);
+                assertTrue(calts.get(0).seq.get(1) instanceof KleeneStarType);
                 break;
             case 1:
                 // addend
                 assertTrue(calts.size() == 1);
-                assertTrue(calts.get(0).getMatchSequence().size() == 2);
-                assertTrue(calts.get(0).getMatchSequence().get(0) instanceof GruleType);
-                assertTrue(calts.get(0).getMatchSequence().get(1) instanceof KleeneStarType);
+                assertTrue(calts.get(0).seq.size() == 2);
+                assertTrue(calts.get(0).seq.get(0) instanceof GruleType);
+                assertTrue(calts.get(0).seq.get(1) instanceof KleeneStarType);
                 break;
             case 2:
                 // factor
                 assertTrue(calts.size() == 2);
-                assertTrue(calts.get(0).getMatchSequence().size() == 1);
-                assertTrue(calts.get(0).getMatchSequence().get(0) instanceof TokenType);
+                assertTrue(calts.get(0).seq.size() == 1);
+                assertTrue(calts.get(0).seq.get(0) instanceof TokenType);
 
-                assertTrue(calts.get(1).getMatchSequence().size() == 3);
-                assertTrue(calts.get(1).getMatchSequence().get(0) instanceof TokenType);
-                assertTrue(calts.get(1).getMatchSequence().get(1) instanceof GruleType);
-                assertTrue(calts.get(1).getMatchSequence().get(2) instanceof TokenType);
+                assertTrue(calts.get(1).seq.size() == 3);
+                assertTrue(calts.get(1).seq.get(0) instanceof TokenType);
+                assertTrue(calts.get(1).seq.get(1) instanceof GruleType);
+                assertTrue(calts.get(1).seq.get(2) instanceof TokenType);
                 break;
             case 3:
                 // expr
                 assertTrue(calts.size() == 1);
-                assertTrue(calts.get(0).getMatchSequence().size() == 2);
-                assertTrue(calts.get(0).getMatchSequence().get(0) instanceof GruleType);
-                assertTrue(calts.get(0).getMatchSequence().get(1) instanceof TokenType);
+                assertTrue(calts.get(0).seq.size() == 2);
+                assertTrue(calts.get(0).seq.get(0) instanceof GruleType);
+                assertTrue(calts.get(0).seq.get(1) instanceof TokenType);
                 break;
             case 4:
                 // sub rule in addend
                 assertTrue(calts.size() == 2);
-                assertTrue(calts.get(0).getMatchSequence().size() == 1);
-                assertTrue(calts.get(0).getMatchSequence().get(0) instanceof TokenType);
-                assertTrue(calts.get(0).getMatchSequence().get(0).getDefIndex() == 3);
+                assertTrue(calts.get(0).seq.size() == 1);
+                assertTrue(calts.get(0).seq.get(0) instanceof TokenType);
+                assertTrue(calts.get(0).seq.get(0).getDefIndex() == 3);
 
-                assertTrue(calts.get(1).getMatchSequence().size() == 1);
-                assertTrue(calts.get(1).getMatchSequence().get(0) instanceof TokenType);
-                assertTrue(calts.get(1).getMatchSequence().get(0).getDefIndex() == 4);
+                assertTrue(calts.get(1).seq.size() == 1);
+                assertTrue(calts.get(1).seq.get(0) instanceof TokenType);
+                assertTrue(calts.get(1).seq.get(0).getDefIndex() == 4);
                 break;
             case 5:
                 // sub rule in addition
                 assertTrue(calts.size() == 2);
-                assertTrue(calts.get(0).getMatchSequence().size() == 1);
-                assertTrue(calts.get(0).getMatchSequence().get(0) instanceof TokenType);
-                assertTrue(calts.get(0).getMatchSequence().get(0).getDefIndex() == 1);
+                assertTrue(calts.get(0).seq.size() == 1);
+                assertTrue(calts.get(0).seq.get(0) instanceof TokenType);
+                assertTrue(calts.get(0).seq.get(0).getDefIndex() == 1);
 
-                assertTrue(calts.get(1).getMatchSequence().size() == 1);
-                assertTrue(calts.get(1).getMatchSequence().get(0) instanceof TokenType);
-                assertTrue(calts.get(1).getMatchSequence().get(0).getDefIndex() == 2);
+                assertTrue(calts.get(1).seq.size() == 1);
+                assertTrue(calts.get(1).seq.get(0) instanceof TokenType);
+                assertTrue(calts.get(1).seq.get(0).getDefIndex() == 2);
                 break;
             default:
                 assertTrue(false);// error num of grules

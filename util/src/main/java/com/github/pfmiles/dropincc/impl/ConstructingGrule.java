@@ -12,6 +12,7 @@ package com.github.pfmiles.dropincc.impl;
 
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 import com.github.pfmiles.dropincc.*;
 import com.github.pfmiles.dropincc.impl.util.Util;
@@ -46,7 +47,7 @@ public class ConstructingGrule implements Element {
      *            'String'(instant token)
      * @return
      */
-    public ConstructingGrule alt(Object... eles) {
+    public ConstructingGrule orWhen(Object... eles) {
         if (eles == null || eles.length == 0)
             throw new DropinccException(
                     "Could not add empty grammar rule, if you want to add a rule alternative that matches nothing, use CC.NOTHING.");
@@ -65,7 +66,7 @@ public class ConstructingGrule implements Element {
      *            or 'ParamedAction'
      * @return
      */
-    public ConstructingGrule then(Object action) {
+    public <X,Y> ConstructingGrule then(Function<X,Y> action) {
         List<Alternative> alts = this.grule.getAlts();
         Alternative alt = alts.get(alts.size() - 1);
         if (alt.getAction() != null)
@@ -73,6 +74,17 @@ public class ConstructingGrule implements Element {
         alt.setAction(action);
         return this;
     }
+    public <X,Y> ConstructingGrule then(ParamedAction<X,Y> action) {
+        List<Alternative> alts = this.grule.getAlts();
+        Alternative alt = alts.get(alts.size() - 1);
+        if (alt.getAction() != null)
+            throw new DropinccException("Any alternative could have one and only one action.");
+        alt.setAction(action);
+        return this;
+    }
+//    public final <X,Y> ConstructingGrule then(Function<X,Y> action) {
+//        return then((Object)action);
+//    }
 
 
     /**
