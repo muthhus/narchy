@@ -1,268 +1,280 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>opennars</groupId>
-  <artifactId>util</artifactId>
-  <version>1.8-SNAPSHOT</version>
-  <packaging>jar</packaging>
-  <parent>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+         xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <modelVersion>4.0.0</modelVersion>
     <groupId>opennars</groupId>
-    <artifactId>narchy</artifactId>
+    <artifactId>util</artifactId>
     <version>1.8-SNAPSHOT</version>
-  </parent>
-  <inceptionYear>2016</inceptionYear>
-  <licenses>
-    <license>
-      <name>GNU AFFERO GENERAL PUBLIC LICENSE (AGPL)</name>
-      <url>https://www.gnu.org/licenses/agpl.txt</url>
-      <distribution>repo</distribution>
-    </license>
-  </licenses>
+    <packaging>jar</packaging>
+    <parent>
+        <groupId>opennars</groupId>
+        <artifactId>narchy</artifactId>
+        <version>1.8-SNAPSHOT</version>
+    </parent>
+    <inceptionYear>2016</inceptionYear>
+    <licenses>
+        <license>
+            <name>GNU AFFERO GENERAL PUBLIC LICENSE (AGPL)</name>
+            <url>https://www.gnu.org/licenses/agpl.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
 
 
+    <dependencies>
+        <dependency>
+            <groupId>org.jetbrains</groupId>
+            <artifactId>annotations</artifactId>
+            <version>15.0</version>
+            <scope>compile</scope>
+        </dependency>
 
-  <dependencies>
-    <dependency>
-      <groupId>org.jetbrains</groupId>
-      <artifactId>annotations</artifactId>
-      <version>15.0</version>
-      <scope>compile</scope>
-    </dependency>
+        <dependency>
+            <groupId>org.eclipse.collections</groupId>
+            <artifactId>eclipse-collections-api</artifactId>
+            <version>8.0.0</version>
+            <scope>compile</scope>
+        </dependency>
 
-    <dependency>
-      <groupId>org.eclipse.collections</groupId>
-      <artifactId>eclipse-collections-api</artifactId>
-      <version>8.0.0</version>
-      <scope>compile</scope>
-    </dependency>
+        <dependency>
+            <groupId>org.eclipse.collections</groupId>
+            <artifactId>eclipse-collections</artifactId>
+            <version>8.0.0</version>
+            <scope>compile</scope>
+        </dependency>
 
-    <dependency>
-      <groupId>org.eclipse.collections</groupId>
-      <artifactId>eclipse-collections</artifactId>
-      <version>8.0.0</version>
-      <scope>compile</scope>
-    </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-collections4</artifactId>
+            <version>4.1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.lmax</groupId>
+            <artifactId>disruptor</artifactId>
+            <version>3.3.6</version>
+        </dependency>
+        <dependency>
+            <!-- https://vimeo.com/12165742 -->
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>20.0</version>
+            <scope>compile</scope>
+        </dependency>
 
-    <dependency>
-      <groupId>org.apache.commons</groupId>
-      <artifactId>commons-collections4</artifactId>
-      <version>4.1</version>
-    </dependency>
-    <dependency>
-      <groupId>com.lmax</groupId>
-      <artifactId>disruptor</artifactId>
-      <version>3.3.6</version>
-    </dependency>
-    <dependency>
-      <!-- https://vimeo.com/12165742 -->
-      <groupId>com.google.guava</groupId>
-      <artifactId>guava</artifactId>
-      <version>20.0</version>
-      <scope>compile</scope>
-    </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.5</version>
+            <scope>compile</scope>
+        </dependency>
 
-    <dependency>
-      <groupId>org.apache.commons</groupId>
-      <artifactId>commons-lang3</artifactId>
-      <version>3.5</version>
-      <scope>compile</scope>
-    </dependency>
+        <!-- http://mvnrepository.com/artifact/org.jgrapht/jgrapht-core -->
+        <dependency>
+            <groupId>org.jgrapht</groupId>
+            <artifactId>jgrapht-core</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+        <!-- http://mvnrepository.com/artifact/org.jgrapht/jgrapht-ext -->
+        <dependency>
+            <groupId>org.jgrapht</groupId>
+            <artifactId>jgrapht-ext</artifactId>
+            <version>1.0.0</version>
+        </dependency>
 
-    <!-- http://mvnrepository.com/artifact/org.jgrapht/jgrapht-core -->
-    <dependency>
-      <groupId>org.jgrapht</groupId>
-      <artifactId>jgrapht-core</artifactId>
-      <version>1.0.0</version>
-    </dependency>
-    <!-- http://mvnrepository.com/artifact/org.jgrapht/jgrapht-ext -->
-    <dependency>
-      <groupId>org.jgrapht</groupId>
-      <artifactId>jgrapht-ext</artifactId>
-      <version>1.0.0</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.codehaus.janino</groupId>
-      <artifactId>janino</artifactId>
-      <version>3.0.6</version>
-      <scope>compile</scope>
-    </dependency>
-
-
-    <!-- https://mvnrepository.com/artifact/org.ow2.asm/asm-all -->
-    <dependency>
-      <groupId>org.ow2.asm</groupId>
-      <artifactId>asm-debug-all</artifactId>
-      <version>6.0_ALPHA</version>
-      <scope>compile</scope>
-    </dependency>
+        <dependency>
+            <groupId>org.codehaus.janino</groupId>
+            <artifactId>janino</artifactId>
+            <version>3.0.6</version>
+            <scope>compile</scope>
+        </dependency>
 
 
-
-    <!--<dependency>-->
-      <!--<groupId>me.qmx.jitescript</groupId>-->
-      <!--<artifactId>jitescript</artifactId>-->
-      <!--<version>0.4.1</version>-->
-      <!--<scope>compile</scope>-->
-    <!--</dependency>-->
-    <dependency>
-      <groupId>org.javassist</groupId>
-      <artifactId>javassist</artifactId>
-      <version>3.22.0-CR1</version>
-      <scope>compile</scope>
-    </dependency>
-    <dependency>
-      <groupId>net.bytebuddy</groupId>
-      <artifactId>byte-buddy</artifactId>
-      <version>1.5.3</version>
-      <scope>compile</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.commons</groupId>
-      <artifactId>commons-math3</artifactId>
-      <version>3.6.1</version>
-      <scope>compile</scope>
-    </dependency>
-    <!--<dependency>-->
-      <!--<groupId>org.slf4j</groupId>-->
-      <!--<artifactId>slf4j-api</artifactId>-->
-      <!--<version>1.7.21</version>-->
-    <!--</dependency>-->
-    <dependency>
-      <groupId>ch.qos.logback</groupId>
-      <artifactId>logback-classic</artifactId>
-      <version>1.1.7</version>
-      <scope>compile</scope>
-    </dependency>
+        <!-- https://mvnrepository.com/artifact/org.ow2.asm/asm-all -->
+        <dependency>
+            <groupId>org.ow2.asm</groupId>
+            <artifactId>asm-debug-all</artifactId>
+            <version>6.0_ALPHA</version>
+            <scope>compile</scope>
+        </dependency>
 
 
-    <!--<dependency>-->
-      <!--<groupId>de.ruedigermoeller</groupId>-->
-      <!--<artifactId>fst</artifactId>-->
-      <!--<version>2.48</version>-->
-      <!--<scope>compile</scope>-->
-      <!--<exclusions>-->
+        <!--<dependency>-->
+        <!--<groupId>me.qmx.jitescript</groupId>-->
+        <!--<artifactId>jitescript</artifactId>-->
+        <!--<version>0.4.1</version>-->
+        <!--<scope>compile</scope>-->
+        <!--</dependency>-->
+        <dependency>
+            <groupId>org.javassist</groupId>
+            <artifactId>javassist</artifactId>
+            <version>3.22.0-CR1</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>net.bytebuddy</groupId>
+            <artifactId>byte-buddy</artifactId>
+            <version>1.5.3</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-math3</artifactId>
+            <version>3.6.1</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>1.7.21</version>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>1.1.7</version>
+            <scope>compile</scope>
+            <exclusions>
+                <exclusion>
+                    <artifactId>slf4j-api</artifactId>
+                    <groupId>org.slf4j</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+
+        <!--<dependency>-->
+        <!--<groupId>de.ruedigermoeller</groupId>-->
+        <!--<artifactId>fst</artifactId>-->
+        <!--<version>2.48</version>-->
+        <!--<scope>compile</scope>-->
+        <!--<exclusions>-->
         <!--<exclusion><artifactId>javassist</artifactId><groupId>org.javassist</groupId></exclusion>-->
         <!--<exclusion><artifactId>objenesis</artifactId><groupId>org.objenesis</groupId></exclusion>-->
         <!--<exclusion>-->
-          <!--<groupId>commons-logging</groupId>-->
-          <!--<artifactId>commons-logging</artifactId>-->
+        <!--<groupId>commons-logging</groupId>-->
+        <!--<artifactId>commons-logging</artifactId>-->
         <!--</exclusion>-->
-      <!--</exclusions>-->
-    <!--</dependency>-->
-    <dependency>
-      <groupId>com.eclipsesource.minimal-json</groupId>
-      <artifactId>minimal-json</artifactId>
-      <version>0.9.4</version>
-    </dependency>
+        <!--</exclusions>-->
+        <!--</dependency>-->
+        <dependency>
+            <groupId>com.eclipsesource.minimal-json</groupId>
+            <artifactId>minimal-json</artifactId>
+            <version>0.9.4</version>
+        </dependency>
 
-    <!-- https://mvnrepository.com/artifact/com.googlecode.concurrent-trees/concurrent-trees -->
-    <dependency>
-      <groupId>com.googlecode.concurrent-trees</groupId>
-      <artifactId>concurrent-trees</artifactId>
-      <version>2.6.0</version>
-      <scope>compile</scope>
-    </dependency>
+        <!-- https://mvnrepository.com/artifact/com.googlecode.concurrent-trees/concurrent-trees -->
+        <dependency>
+            <groupId>com.googlecode.concurrent-trees</groupId>
+            <artifactId>concurrent-trees</artifactId>
+            <version>2.6.0</version>
+            <scope>compile</scope>
+        </dependency>
 
-    <dependency>
-      <groupId>ognl</groupId>
-      <artifactId>ognl</artifactId>
-      <version>3.1.12</version>
-      <scope>compile</scope>
-      <exclusions>
-        <exclusion><artifactId>javassist</artifactId><groupId>org.javassist</groupId></exclusion>
-      </exclusions>
-    </dependency>
+        <dependency>
+            <groupId>ognl</groupId>
+            <artifactId>ognl</artifactId>
+            <version>3.1.12</version>
+            <scope>compile</scope>
+            <exclusions>
+                <exclusion>
+                    <artifactId>javassist</artifactId>
+                    <groupId>org.javassist</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
 
-    <!--&lt;!&ndash; https://mvnrepository.com/artifact/com.addthis/stream-lib &ndash;&gt;-->
-    <!--<dependency>-->
-      <!--<groupId>com.addthis</groupId>-->
-      <!--<artifactId>stream-lib</artifactId>-->
-      <!--<version>3.0.0</version>-->
-    <!--</dependency>-->
-
-
-    <dependency>
-      <groupId>org.objenesis</groupId>
-      <artifactId>objenesis</artifactId>
-      <version>2.4</version>
-      <scope>compile</scope>
-    </dependency>
-    <!--<dependency>-->
-      <!--<groupId>org.mockito</groupId>-->
-      <!--<artifactId>mockito-core</artifactId>-->
-      <!--<version>2.0.53-beta</version>-->
-      <!--<scope>test</scope>-->
-      <!--<exclusions>-->
-          <!--<exclusion><artifactId>byte-buddy</artifactId><groupId>net.bytebuddy</groupId></exclusion>-->
-          <!--<exclusion><artifactId>objenesis</artifactId><groupId>org.objenesis</groupId></exclusion>-->
-      <!--</exclusions>-->
-    <!--</dependency>-->
-    <!--<dependency>-->
-      <!--<groupId>org.assertj</groupId>-->
-      <!--<artifactId>assertj-core</artifactId>-->
-      <!--<version>3.4.1</version>-->
-      <!--<scope>test</scope>-->
-    <!--</dependency>-->
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>4.12</version>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>com.github.ben-manes.caffeine</groupId>
-      <artifactId>caffeine</artifactId>
-      <version>2.3.5</version>
-      <scope>compile</scope>
-    </dependency>
+        <!--&lt;!&ndash; https://mvnrepository.com/artifact/com.addthis/stream-lib &ndash;&gt;-->
+        <!--<dependency>-->
+        <!--<groupId>com.addthis</groupId>-->
+        <!--<artifactId>stream-lib</artifactId>-->
+        <!--<version>3.0.0</version>-->
+        <!--</dependency>-->
 
 
+        <dependency>
+            <groupId>org.objenesis</groupId>
+            <artifactId>objenesis</artifactId>
+            <version>2.4</version>
+            <scope>compile</scope>
+        </dependency>
+        <!--<dependency>-->
+        <!--<groupId>org.mockito</groupId>-->
+        <!--<artifactId>mockito-core</artifactId>-->
+        <!--<version>2.0.53-beta</version>-->
+        <!--<scope>test</scope>-->
+        <!--<exclusions>-->
+        <!--<exclusion><artifactId>byte-buddy</artifactId><groupId>net.bytebuddy</groupId></exclusion>-->
+        <!--<exclusion><artifactId>objenesis</artifactId><groupId>org.objenesis</groupId></exclusion>-->
+        <!--</exclusions>-->
+        <!--</dependency>-->
+        <!--<dependency>-->
+        <!--<groupId>org.assertj</groupId>-->
+        <!--<artifactId>assertj-core</artifactId>-->
+        <!--<version>3.4.1</version>-->
+        <!--<scope>test</scope>-->
+        <!--</dependency>-->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.12</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.github.ben-manes.caffeine</groupId>
+            <artifactId>caffeine</artifactId>
+            <version>2.3.5</version>
+            <scope>compile</scope>
+        </dependency>
 
 
-    <!--<dependency>-->
-      <!--<groupId>org.mapdb</groupId>-->
-      <!--<artifactId>mapdb</artifactId>-->
-      <!--<version>3.0.1</version>-->
-    <!--</dependency>-->
+        <!--<dependency>-->
+        <!--<groupId>org.mapdb</groupId>-->
+        <!--<artifactId>mapdb</artifactId>-->
+        <!--<version>3.0.1</version>-->
+        <!--</dependency>-->
 
 
-    <!--<dependency>-->
+        <!--<dependency>-->
         <!--<groupId>org.cache2k</groupId>-->
         <!--<artifactId>cache2k-api</artifactId>-->
         <!--<version>0.27-BETA</version>-->
-      <!--</dependency>-->
-      <!--<dependency>-->
+        <!--</dependency>-->
+        <!--<dependency>-->
         <!--<groupId>org.cache2k</groupId>-->
         <!--<artifactId>cache2k-core</artifactId>-->
         <!--<version>0.27-BETA</version>-->
-      <!--</dependency>-->
+        <!--</dependency>-->
 
 
-    <!-- https://mvnrepository.com/artifact/net.openhft/affinity -->
-    <dependency>
-      <groupId>net.openhft</groupId>
-      <artifactId>affinity</artifactId>
-      <version>3.0.6</version>
-    </dependency>
+        <!-- https://mvnrepository.com/artifact/net.openhft/affinity -->
+        <dependency>
+            <groupId>net.openhft</groupId>
+            <artifactId>affinity</artifactId>
+            <version>3.0.6</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>slf4j-api</artifactId>
+                    <groupId>org.slf4j</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
 
 
-    <!--&lt;!&ndash; https://mvnrepository.com/artifact/org.iq80.snappy/snappy &ndash;&gt;-->
-    <!--<dependency>-->
-      <!--<groupId>org.iq80.snappy</groupId>-->
-      <!--<artifactId>snappy</artifactId>-->
-      <!--<version>0.4</version>-->
-    <!--</dependency>-->
-    <!-- https://mvnrepository.com/artifact/io.airlift/aircompressor -->
-    <dependency>
-      <groupId>io.airlift</groupId>
-      <artifactId>aircompressor</artifactId>
-      <version>0.4</version>
-    </dependency>
+        <!--&lt;!&ndash; https://mvnrepository.com/artifact/org.iq80.snappy/snappy &ndash;&gt;-->
+        <!--<dependency>-->
+        <!--<groupId>org.iq80.snappy</groupId>-->
+        <!--<artifactId>snappy</artifactId>-->
+        <!--<version>0.4</version>-->
+        <!--</dependency>-->
+        <!-- https://mvnrepository.com/artifact/io.airlift/aircompressor -->
+        <dependency>
+            <groupId>io.airlift</groupId>
+            <artifactId>aircompressor</artifactId>
+            <version>0.4</version>
+        </dependency>
 
 
-  </dependencies>
+    </dependencies>
 
 </project>

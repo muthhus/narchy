@@ -14,19 +14,6 @@
         <version>1.8-SNAPSHOT</version>
     </parent>
 
-    <repositories>
-        <repository>
-            <id>central</id>
-            <name>jcenter</name>
-            <url>https://jcenter.bintray.com</url>
-        </repository>
-        <repository>
-            <id>snapshots-repo</id>
-            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-            <releases><enabled>false</enabled></releases>
-            <snapshots><enabled>true</enabled></snapshots>
-        </repository>
-    </repositories>
 
     <licenses>
         <license>
@@ -85,20 +72,19 @@
         </dependency>
 
 
-
         <!-- http://mvnrepository.com/artifact/com.eclipsesource.minimal-json/minimal-json -->
         <!--<dependency>-->
-            <!--<groupId>com.eclipsesource.minimal-json</groupId>-->
-            <!--<artifactId>minimal-json</artifactId>-->
-            <!--<version>0.9.4</version>-->
-            <!--<scope>compile</scope>-->
+        <!--<groupId>com.eclipsesource.minimal-json</groupId>-->
+        <!--<artifactId>minimal-json</artifactId>-->
+        <!--<version>0.9.4</version>-->
+        <!--<scope>compile</scope>-->
         <!--</dependency>-->
 
         <!--<dependency>-->
-            <!--<groupId>org.infinispan</groupId>-->
-            <!--<artifactId>infinispan-embedded</artifactId>-->
-            <!--<version>9.0.0.Alpha4</version>-->
-            <!--<scope>compile</scope>-->
+        <!--<groupId>org.infinispan</groupId>-->
+        <!--<artifactId>infinispan-embedded</artifactId>-->
+        <!--<version>9.0.0.Alpha4</version>-->
+        <!--<scope>compile</scope>-->
         <!--</dependency>-->
 
         <dependency>
@@ -125,6 +111,16 @@
             <groupId>de.dfki.mary</groupId>
             <artifactId>voice-cmu-slt-hsmm</artifactId>
             <version>5.2</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>log4j</artifactId>
+                    <groupId>log4j</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>slf4j-log4j12</artifactId>
+                    <groupId>org.slf4j</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
@@ -181,6 +177,7 @@
             <version>0.3.6</version>
         </dependency>
     </dependencies>
+
     <build>
         <plugins>
             <plugin>
@@ -191,6 +188,37 @@
                     <mainClass>nars.Repl</mainClass>
                 </configuration>
             </plugin>
+
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <addClasspath>true</addClasspath>
+                            <mainClass>nars.Repl</mainClass>
+                            <classpathPrefix>lib/</classpathPrefix>
+                            <classpathLayoutType>repository</classpathLayoutType>
+                        </manifest>
+                    </archive>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>com.hubspot.maven.plugins</groupId>
+                <artifactId>slimfast-plugin</artifactId>
+                <version>0.12</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>copy</goal>
+                        </goals>
+                        <phase>package</phase>
+                    </execution>
+                </executions>
+            </plugin>
+
         </plugins>
+
     </build>
 </project>
