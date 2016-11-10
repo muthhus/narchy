@@ -12,7 +12,7 @@ package com.github.pfmiles.dropincc.impl.llstar;
 
 import com.github.pfmiles.dropincc.CC;
 import com.github.pfmiles.dropincc.Grule;
-import com.github.pfmiles.dropincc.Lang;
+import com.github.pfmiles.dropincc.Grammar;
 import com.github.pfmiles.dropincc.TokenDef;
 import com.github.pfmiles.dropincc.impl.GruleType;
 import com.github.pfmiles.dropincc.impl.automataview.DotAdaptors;
@@ -34,21 +34,21 @@ public class LlstarAnalysisExperiments {
          * S ::= L $ L ::= A ((+|-) A)* A ::= F ((*|/) F)* F ::= '(' L ')' |
          * '[0-9]'+
          */
-        Lang lang = new Lang("Calculator");
-        Grule L = lang.newGrule();
-        TokenDef a = lang.newToken("\\+");
-        lang.defineGrule(L, CC.EOF);
-        Grule A = lang.newGrule();
-        L.define(A, CC.ks(a.or("\\-"), A));
-        TokenDef m = lang.newToken("\\*");
-        Grule F = lang.newGrule();
-        A.define(F, CC.ks(m.or("/"), F));
-        F.define("\\(", L, "\\)").alt("[0-9]+");
+        Grammar lang = new Grammar("Calculator");
+        Grule L = lang.rule();
+        TokenDef a = lang.the("\\+");
+        lang.when(L, CC.EOF);
+        Grule A = lang.rule();
+        L.when(A, CC.ks(a.or("\\-"), A));
+        TokenDef m = lang.the("\\*");
+        Grule F = lang.rule();
+        A.when(F, CC.ks(m.or("/"), F));
+        F.when("\\(", L, "\\)").alt("[0-9]+");
 
         genImages(lang);
     }
 
-    private static void genImages(Lang lang) throws Throwable {
+    private static void genImages(Grammar lang) throws Throwable {
         AnalyzedLangForTest al = TestHelper.resolveAnalyzedLangForTest(lang);
         LlstarAnalysis llstar = new LlstarAnalysis(al.ruleTypeToAlts, al.kleeneTypeToNode);
         System.out.println(llstar.getWarnings());

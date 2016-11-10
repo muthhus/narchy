@@ -20,7 +20,7 @@ import com.github.pfmiles.dropincc.CC;
 import com.github.pfmiles.dropincc.Element;
 import com.github.pfmiles.dropincc.Exe;
 import com.github.pfmiles.dropincc.Grule;
-import com.github.pfmiles.dropincc.Lang;
+import com.github.pfmiles.dropincc.Grammar;
 import com.github.pfmiles.dropincc.TokenDef;
 import com.github.pfmiles.dropincc.impl.kleene.KleeneStarNode;
 import com.github.pfmiles.dropincc.impl.kleene.KleeneStarType;
@@ -44,22 +44,22 @@ public class AnalyzedLangTest extends TestCase {
      */
     @SuppressWarnings({ "unused", "unchecked" })
     public void testSubRuleRewriteWithKleeneNodes() {
-        Lang calculator = new Lang("Test");
-        TokenDef DIGIT = calculator.newToken("\\d+");
-        TokenDef ADD = calculator.newToken("\\+");
-        TokenDef SUB = calculator.newToken("\\-");
-        TokenDef MUL = calculator.newToken("\\*");
-        TokenDef DIV = calculator.newToken("/");
-        TokenDef LEFTPAREN = calculator.newToken("\\(");
-        TokenDef RIGHTPAREN = calculator.newToken("\\)");
+        Grammar calculator = new Grammar("Test");
+        TokenDef DIGIT = calculator.the("\\d+");
+        TokenDef ADD = calculator.the("\\+");
+        TokenDef SUB = calculator.the("\\-");
+        TokenDef MUL = calculator.the("\\*");
+        TokenDef DIV = calculator.the("/");
+        TokenDef LEFTPAREN = calculator.the("\\(");
+        TokenDef RIGHTPAREN = calculator.the("\\)");
         // 2.define grammar rules and corresponding actions
-        Grule addition = calculator.newGrule();
-        Grule addend = calculator.newGrule();
-        Grule factor = calculator.newGrule();
-        Element expr = calculator.defineGrule(addition, CC.EOF);
-        addition.define(addend, CC.ks(ADD.or(SUB), addend));
-        addend.define(factor, CC.ks(MUL.or(DIV), factor));
-        factor.define(DIGIT).alt(LEFTPAREN, addition, RIGHTPAREN);
+        Grule addition = calculator.rule();
+        Grule addend = calculator.rule();
+        Grule factor = calculator.rule();
+        Element expr = calculator.when(addition, CC.EOF);
+        addition.when(addend, CC.ks(ADD.or(SUB), addend));
+        addend.when(factor, CC.ks(MUL.or(DIV), factor));
+        factor.when(DIGIT).alt(LEFTPAREN, addition, RIGHTPAREN);
         AnalyzedLang cl = new AnalyzedLang("test", (List<TokenDef>) TestHelper.priField(calculator, "tokens"), (List<Grule>) TestHelper.priField(
                 calculator, "grules"), false);
         KleeneStarNode k1 = (KleeneStarNode) addition.getAlts().get(0).getElements().get(1);
@@ -82,24 +82,24 @@ public class AnalyzedLangTest extends TestCase {
 
     @SuppressWarnings("unused")
     public void testResolveParserAst() {
-        Lang calculator = new Lang("Test");
-        TokenDef DIGIT = calculator.newToken("\\d+");
-        TokenDef ADD = calculator.newToken("\\+");
-        TokenDef SUB = calculator.newToken("\\-");
-        TokenDef MUL = calculator.newToken("\\*");
-        TokenDef DIV = calculator.newToken("/");
-        TokenDef LEFTPAREN = calculator.newToken("\\(");
-        TokenDef RIGHTPAREN = calculator.newToken("\\)");
-        Grule addition = calculator.newGrule();
-        Grule addend = calculator.newGrule();
-        Grule factor = calculator.newGrule();
-        Element expr = calculator.defineGrule(addition, CC.EOF).action(new Action<Object>() {
-            public Object act(Object params) {
+        Grammar calculator = new Grammar("Test");
+        TokenDef DIGIT = calculator.the("\\d+");
+        TokenDef ADD = calculator.the("\\+");
+        TokenDef SUB = calculator.the("\\-");
+        TokenDef MUL = calculator.the("\\*");
+        TokenDef DIV = calculator.the("/");
+        TokenDef LEFTPAREN = calculator.the("\\(");
+        TokenDef RIGHTPAREN = calculator.the("\\)");
+        Grule addition = calculator.rule();
+        Grule addend = calculator.rule();
+        Grule factor = calculator.rule();
+        Element expr = calculator.when(addition, CC.EOF).then(new Action<Object>() {
+            public Object apply(Object params) {
                 return ((Object[]) params)[0];
             }
         });
-        addition.define(addend, CC.ks((ADD.or(SUB)), addend)).action(new Action<Object>() {
-            public Object act(Object matched) {
+        addition.when(addend, CC.ks((ADD.or(SUB)), addend)).then(new Action<Object>() {
+            public Object apply(Object matched) {
                 Object[] params = ((Object[]) matched);
                 double leftMost = (Double) params[0];
                 Object[] opAndOther = (Object[]) params[1];
@@ -116,8 +116,8 @@ public class AnalyzedLangTest extends TestCase {
                 return leftMost;
             }
         });
-        addend.define(factor, CC.ks(MUL.or(DIV), factor)).action(new Action<Object>() {
-            public Object act(Object matched) {
+        addend.when(factor, CC.ks(MUL.or(DIV), factor)).then(new Action<Object>() {
+            public Object apply(Object matched) {
                 Object[] params = (Object[]) matched;
                 double leftMost = (Double) params[0];
                 Object[] opAndOthers = (Object[]) params[1];
@@ -134,12 +134,12 @@ public class AnalyzedLangTest extends TestCase {
                 return leftMost;
             }
         });
-        factor.define(DIGIT).action(new Action<Object>() {
-            public Object act(Object param) {
+        factor.when(DIGIT).then(new Action<Object>() {
+            public Object apply(Object param) {
                 return Double.parseDouble((String) param);
             }
-        }).alt(LEFTPAREN, addition, RIGHTPAREN).action(new Action<Object>() {
-            public Object act(Object matched) {
+        }).alt(LEFTPAREN, addition, RIGHTPAREN).then(new Action<Object>() {
+            public Object apply(Object matched) {
                 return (Double) ((Object[]) matched)[1];
             }
         });

@@ -47,7 +47,7 @@ public class MultiAltMatchCodeGen extends CodeGen {
 
     // 0: actionName
     // 1: matchedVar
-    private static final String actionIvkFormat = "{0}.act({1})";
+    private static final String actionIvkFormat = "{0}.apply({1})";
     // 0: actionName
     // 1: matchedVar
     private static final String paramedActionIvkFormat = "{0}.act(arg, {1})";

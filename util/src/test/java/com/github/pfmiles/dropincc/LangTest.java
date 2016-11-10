@@ -61,28 +61,28 @@ public class LangTest extends TestCase {
      */
     public void testEmptyAlternative() {
         // normal empty alt
-        Lang lang = new Lang("Test");
-        Grule A = lang.newGrule();
-        lang.defineGrule(A, CC.EOF);
-        A.define("a").alt(CC.NOTHING);
+        Grammar lang = new Grammar("Test");
+        Grule A = lang.rule();
+        lang.when(A, CC.EOF);
+        A.when("a").alt(CC.NOTHING);
         Exe exe = lang.compile();
         assertTrue("a".equals(((Object[]) exe.eval("a"))[0]));
 
         // empty single alt
-        lang = new Lang("Test");
-        A = lang.newGrule();
-        lang.defineGrule(A, CC.EOF);
-        A.define(CC.NOTHING);
+        lang = new Grammar("Test");
+        A = lang.rule();
+        lang.when(A, CC.EOF);
+        A.when(CC.NOTHING);
         exe = lang.compile();
         assertTrue(((Object[]) exe.eval(""))[0] == null);
 
         // with action
         // empty single alt
-        lang = new Lang("Test");
-        A = lang.newGrule();
-        lang.defineGrule(A, CC.EOF);
-        A.define(CC.NOTHING).action(new Action<Object>() {
-            public Object act(Object matched) {
+        lang = new Grammar("Test");
+        A = lang.rule();
+        lang.when(A, CC.EOF);
+        A.when(CC.NOTHING).then(new Action<Object>() {
+            public Object apply(Object matched) {
                 assertTrue(matched == null);
                 return matched;
             }
@@ -91,19 +91,15 @@ public class LangTest extends TestCase {
         assertTrue(((Object[]) exe.eval(""))[0] == null);
 
         // normal empty alt
-        lang = new Lang("Test");
-        A = lang.newGrule();
-        lang.defineGrule(A, CC.EOF);
-        A.define("a").action(new Action<Object>() {
-            public Object act(Object matched) {
-                assertTrue("a".equals(matched));
-                return matched;
-            }
-        }).alt(CC.NOTHING).action(new ParamedAction<Object, Object>() {
-            public Object act(Object arg, Object matched) {
-                assertTrue(matched == null);
-                return matched;
-            }
+        lang = new Grammar("Test");
+        A = lang.rule();
+        lang.when(A, CC.EOF);
+        A.when("a").then((Action<Object>) matched -> {
+            assertTrue("a".equals(matched));
+            return matched;
+        }).alt(CC.NOTHING).then((ParamedAction<Object, Object>) (arg, matched) -> {
+            assertTrue(matched == null);
+            return matched;
         });
         exe = lang.compile();
         assertTrue("a".equals(((Object[]) exe.eval("a"))[0]));
@@ -125,49 +121,49 @@ public class LangTest extends TestCase {
      * </pre>
      */
     public void testNonLLRegularRule() {
-        Lang lang = new Lang("Test");
-        Grule A = lang.newGrule();
-        lang.defineGrule(A, CC.EOF).action(new Action<Object>() {
-            public Object act(Object matched) {
+        Grammar lang = new Grammar("Test");
+        Grule A = lang.rule();
+        lang.when(A, CC.EOF).then(new Action<Object>() {
+            public Object apply(Object matched) {
                 return ((Object[]) matched)[0];
             }
         });
-        Grule B = lang.newGrule();
-        A.define(B, "c").action(new Action<Object>() {
-            public Object act(Object matched) {
+        Grule B = lang.rule();
+        A.when(B, "c").then(new Action<Object>() {
+            public Object apply(Object matched) {
                 Object[] ms = (Object[]) matched;
                 return ((String) ms[0]) + ((String) ms[1]);
             }
-        }).alt(B, "d").action(new Action<Object>() {
-            public Object act(Object matched) {
+        }).alt(B, "d").then(new Action<Object>() {
+            public Object apply(Object matched) {
                 Object[] ms = (Object[]) matched;
                 return ((String) ms[0]) + ((String) ms[1]);
             }
         });
-        Grule C = lang.newGrule();
-        B.define(C, B, "e").action(new Action<Object>() {
-            public Object act(Object matched) {
+        Grule C = lang.rule();
+        B.when(C, B, "e").then(new Action<Object>() {
+            public Object apply(Object matched) {
                 Object[] ms = (Object[]) matched;
                 return ((String) ms[0]) + ((String) ms[1] + ((String) ms[2]));
             }
 
-        }).alt(C, B, "f").action(new Action<Object>() {
-            public Object act(Object matched) {
+        }).alt(C, B, "f").then(new Action<Object>() {
+            public Object apply(Object matched) {
                 Object[] ms = (Object[]) matched;
                 return ((String) ms[0]) + ((String) ms[1] + ((String) ms[2]));
             }
-        }).alt("b").action(new Action<Object>() {
-            public Object act(Object matched) {
+        }).alt("b").then(new Action<Object>() {
+            public Object apply(Object matched) {
                 return (String) matched;
             }
         });
-        C.define("g", C).action(new ParamedAction<Pair<String, Integer>, Object>() {
+        C.when("g", C).then(new ParamedAction<Pair<String, Integer>, Object>() {
             public Object act(Pair<String, Integer> arg, Object matched) {
                 arg.setRight(arg.getRight() + 1);
                 Object[] ms = (Object[]) matched;
                 return ((String) ms[0]) + ((String) ms[1]);
             }
-        }).alt("g").action(new ParamedAction<Pair<String, Integer>, Object>() {
+        }).alt("g").then(new ParamedAction<Pair<String, Integer>, Object>() {
             public Object act(Pair<String, Integer> arg, Object matched) {
                 arg.setRight(arg.getRight() + 1);
                 return matched;
@@ -195,9 +191,9 @@ public class LangTest extends TestCase {
      */
     public void testOneRuleNonLLRegular() {
         Map<String, Integer> actionCounter = new HashMap<String, Integer>();
-        Lang lang = new Lang("Test");
-        Grule A = lang.newGrule();
-        lang.defineGrule(A, CC.EOF).action(new ParamedAction<Map<String, Integer>, Object>() {
+        Grammar lang = new Grammar("Test");
+        Grule A = lang.rule();
+        lang.when(A, CC.EOF).then(new ParamedAction<Map<String, Integer>, Object>() {
             public Object act(Map<String, Integer> arg, Object matched) {
                 String k = this.getClass().getName();// 12
                 if (arg.containsKey(k)) {
@@ -210,8 +206,8 @@ public class LangTest extends TestCase {
                 return ms[0];
             }
         });
-        Grule B = lang.newGrule();
-        A.define(B, "c").action(new ParamedAction<Map<String, Integer>, Object>() {
+        Grule B = lang.rule();
+        A.when(B, "c").then(new ParamedAction<Map<String, Integer>, Object>() {
             public Object act(Map<String, Integer> arg, Object matched) {
                 assertTrue(false);// would never entered
                 String k = this.getClass().getName();
@@ -223,7 +219,7 @@ public class LangTest extends TestCase {
                 Object[] ms = (Object[]) matched;
                 return (String) ms[0] + (String) ms[1];
             }
-        }).alt(B, "d").action(new ParamedAction<Map<String, Integer>, Object>() {
+        }).alt(B, "d").then(new ParamedAction<Map<String, Integer>, Object>() {
             public Object act(Map<String, Integer> arg, Object matched) {
                 String k = this.getClass().getName();// 14
                 if (arg.containsKey(k)) {
@@ -236,7 +232,7 @@ public class LangTest extends TestCase {
                 return (String) ms[0] + (String) ms[1];
             }
         });
-        B.define("b").action(new ParamedAction<Map<String, Integer>, Object>() {
+        B.when("b").then(new ParamedAction<Map<String, Integer>, Object>() {
             public Object act(Map<String, Integer> arg, Object matched) {
                 String k = this.getClass().getName();// 15
                 if (arg.containsKey(k)) {
@@ -247,7 +243,7 @@ public class LangTest extends TestCase {
                 assertTrue(arg.get(k) == 1);
                 return matched;
             }
-        }).alt("e", B, "f").action(new ParamedAction<Map<String, Integer>, Object>() {
+        }).alt("e", B, "f").then(new ParamedAction<Map<String, Integer>, Object>() {
             public Object act(Map<String, Integer> arg, Object matched) {
                 String k = this.getClass().getName();// 16
                 if (arg.containsKey(k)) {
@@ -278,41 +274,41 @@ public class LangTest extends TestCase {
      * </pre>
      */
     public void testEmptyAltBackTrack() {
-        Lang lang = new Lang("Test");
-        Grule A = lang.newGrule();
-        lang.defineGrule(A, CC.EOF).action(new Action<Object>() {
+        Grammar lang = new Grammar("Test");
+        Grule A = lang.rule();
+        lang.when(A, CC.EOF).then(new Action<Object>() {
             private int count = 0;
 
-            public Object act(Object matched) {
+            public Object apply(Object matched) {
                 count++;
                 assertTrue(count == 1);
                 return matched;
             }
         });
-        Grule B = lang.newGrule();
-        A.define(B, "c").action(new ParamedAction<Object, Object>() {
+        Grule B = lang.rule();
+        A.when(B, "c").then(new ParamedAction<Object, Object>() {
             public Object act(Object arg, Object matched) {
                 assertTrue(false);
                 return matched;
             }
-        }).alt(B, "d").action(new Action<Object>() {
+        }).alt(B, "d").then(new Action<Object>() {
             private int count;
 
-            public Object act(Object matched) {
+            public Object apply(Object matched) {
                 count++;
                 assertTrue(count == 1);
                 return matched;
             }
         });
-        B.define("e", B, "f").action(new Action<Object>() {
+        B.when("e", B, "f").then(new Action<Object>() {
             private int count = 0;
 
-            public Object act(Object matched) {
+            public Object apply(Object matched) {
                 count++;
                 assertTrue(count <= 2);
                 return matched;
             }
-        }).alt(CC.NOTHING).action(new ParamedAction<Object, Object>() {
+        }).alt(CC.NOTHING).then(new ParamedAction<Object, Object>() {
             private int count;
 
             public Object act(Object arg, Object matched) {

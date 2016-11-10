@@ -12,16 +12,14 @@ package com.github.pfmiles.dropincc.example.boolexpr;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 import com.github.pfmiles.dropincc.Action;
 import com.github.pfmiles.dropincc.CC;
 import com.github.pfmiles.dropincc.Exe;
 import com.github.pfmiles.dropincc.Grule;
-import com.github.pfmiles.dropincc.Lang;
+import com.github.pfmiles.dropincc.Grammar;
 import com.github.pfmiles.dropincc.ParamedAction;
 import com.github.pfmiles.dropincc.TokenDef;
 import com.github.pfmiles.dropincc.example.boolexpr.operator.Between;
@@ -40,7 +38,7 @@ import com.github.pfmiles.dropincc.example.boolexpr.operator.NotInclude;
  */
 public class BoolExpr {
 
-    private static Exe exe;
+    private static final Exe exe;
 
     private static final Map<String, Operator> opMapping = new HashMap<>();
     static {
@@ -91,62 +89,57 @@ public class BoolExpr {
      * </pre>
      */
     static {
-        Lang lang = new Lang("BoolExpr");
-        TokenDef OR = lang.newToken("\\|\\|");
-        TokenDef AND = lang.newToken("&&");
-        TokenDef TRUE = lang.newToken("true");
-        TokenDef FALSE = lang.newToken("false");
-        TokenDef OP = lang.newToken("\\!?[a-zA-Z\\>\\<\\=]+");
-        TokenDef NOT = lang.newToken("\\!");
-        TokenDef LEFT_PAREN = lang.newToken("\\(");
-        TokenDef RIGHT_PAREN = lang.newToken("\\)");
-        TokenDef STRING = lang.newToken("'[^']*'");
-        TokenDef NUMBER = lang.newToken("\\-?[0-9]+(\\.[0-9]+)?");
-        TokenDef DATE = lang.newToken("#[0-9][0-9][0-9][0-9]\\-[0-9][0-9]\\-[0-9][0-9]( [0-9][0-9]:[0-9][0-9]:[0-9][0-9])?#");
-        TokenDef REF = lang.newToken("\\$[a-zA-Z][a-zA-Z0-9_]*");
-        TokenDef LEFT_BRACKET = lang.newToken("\\[");
-        TokenDef RIGHT_BRACKET = lang.newToken("\\]");
-        TokenDef LEFT_BRACE = lang.newToken("\\{");
-        TokenDef RIGHT_BRACE = lang.newToken("\\}");
-        TokenDef COMMA = lang.newToken(",");
+        Grammar g = new Grammar("BoolExpr");
+        TokenDef OR = g.the("\\|\\|");
+        TokenDef AND = g.the("&&");
+        TokenDef TRUE = g.the("true");
+        TokenDef FALSE = g.the("false");
+        TokenDef OP = g.the("\\!?[a-zA-Z\\>\\<\\=]+");
+        TokenDef NOT = g.the("\\!");
+        TokenDef LEFT_PAREN = g.the("\\(");
+        TokenDef RIGHT_PAREN = g.the("\\)");
+        TokenDef STRING = g.the("'[^']*'");
+        TokenDef NUMBER = g.the("\\-?[0-9]+(\\.[0-9]+)?");
+        TokenDef DATE = g.the("#[0-9][0-9][0-9][0-9]\\-[0-9][0-9]\\-[0-9][0-9]( [0-9][0-9]:[0-9][0-9]:[0-9][0-9])?#");
+        TokenDef REF = g.the("\\$[a-zA-Z][a-zA-Z0-9_]*");
+        TokenDef LEFT_BRACKET = g.the("\\[");
+        TokenDef RIGHT_BRACKET = g.the("\\]");
+        TokenDef LEFT_BRACE = g.the("\\{");
+        TokenDef RIGHT_BRACE = g.the("\\}");
+        TokenDef COMMA = g.the(",");
 
-        Grule boolExpr = lang.newGrule();
-        Grule orExpr = lang.newGrule();
-        Grule andExpr = lang.newGrule();
-        Grule value = lang.newGrule();
+        Grule boolExpr = g.rule();
+        Grule orExpr = g.rule();
+        Grule andExpr = g.rule();
+        Grule value = g.rule();
 
-        lang.defineGrule(boolExpr, CC.EOF).action((Action<Object[]>) matched -> (Boolean) matched[0]);
-        boolExpr.define(orExpr, CC.ks(OR, orExpr)).action((Action<Object[]>) matched -> Util.reduceOrExprs((Boolean) matched[0], (Object[]) matched[1]));
-        orExpr.define(andExpr, CC.ks(AND, andExpr)).action((Action<Object[]>) matched -> Util.reduceAndExprs((Boolean) matched[0], (Object[]) matched[1]));
-        andExpr.define(TRUE).action((Action<String>) matched -> Boolean.TRUE).alt(FALSE).action((Action<String>) matched -> Boolean.FALSE).alt(value, OP, value).action((ParamedAction<Map<String, Object>, Object[]>) (context, matched) -> {
+        g.when(boolExpr, CC.EOF).then((Action<Object[]>) matched -> (Boolean) matched[0]);
+        boolExpr.when(orExpr, CC.ks(OR, orExpr)).then((Action<Object[]>) matched -> Util.reduceOrExprs((Boolean) matched[0], (Object[]) matched[1]));
+        orExpr.when(andExpr, CC.ks(AND, andExpr)).then((Action<Object[]>) matched -> Util.reduceAndExprs((Boolean) matched[0], (Object[]) matched[1]));
+        andExpr.when(TRUE).then((Action<String>) matched -> Boolean.TRUE).alt(FALSE).then((Action<String>) matched -> Boolean.FALSE).alt(value, OP, value).then((ParamedAction<Map<String, Object>, Object[]>) (context, matched) -> {
             Object left = matched[0];
             Object right = matched[2];
             if (!opMapping.containsKey(matched[1]))
                 throw new RuntimeException("Illegal operator: " + matched[1]);
             return opMapping.get(matched[1]).compute(left, right);
-        }).alt(CC.ks(NOT), LEFT_PAREN, boolExpr, RIGHT_PAREN).action((Action<Object[]>) matched -> {
+        }).alt(CC.ks(NOT), LEFT_PAREN, boolExpr, RIGHT_PAREN).then((Action<Object[]>) matched -> {
             int numOfNots = ((Object[]) matched[0]).length;
             Boolean ret = (Boolean) matched[2];
-            if (numOfNots % 2 == 0) {
-                return ret;
-            } else {
-                return !ret;
-            }
-        }).alt(value).action((Action<Object>) matched -> {
+            return numOfNots % 2 == 0 ? ret : !ret;
+        }).alt(value).then((Action<Object>) matched -> {
             if (!(matched instanceof Boolean))
                 throw new RuntimeException("");
             return (Boolean) matched;
         });
-        value.define(STRING).action((Action<String>) matched -> matched.substring(1, matched.length() - 1)).alt(NUMBER).action((Action<String>) Double::parseDouble).alt(DATE).action((Action<String>) matched -> {
-            SimpleDateFormat fmt = null;
-            fmt = matched.contains(" ") ? new SimpleDateFormat("#yyyy-MM-dd HH:mm:ss#") : new SimpleDateFormat("#yyyy-MM-dd#");
+        value.when(STRING).then((Action<String>) matched -> matched.substring(1, matched.length() - 1)).alt(NUMBER).then((Action<String>) Double::parseDouble).alt(DATE).then((Action<String>) matched -> {
+            SimpleDateFormat fmt = new SimpleDateFormat(matched.contains(" ") ? "#yyyy-MM-dd HH:mm:ss#" : "#yyyy-MM-dd#");
             try {
                 return fmt.parse(matched);
             } catch (ParseException e) {
                 throw new RuntimeException(e);
             }
-        }).alt(REF).action((ParamedAction<Map<String, Object>, String>) Map::get).alt(LEFT_PAREN.or(LEFT_BRACKET), value, COMMA, value, RIGHT_BRACKET.or(RIGHT_PAREN)).action((Action<Object[]>) matched -> Util.createInterval("(".equals(matched[0]), matched[1], matched[3], ")".equals(matched[4]))).alt(LEFT_BRACE, value, CC.ks(COMMA, value), RIGHT_BRACE).action((Action<Object[]>) matched -> Util.buildCollection(matched[1], (Object[]) matched[2]));
-        exe = lang.compile();
+        }).alt(REF).then((ParamedAction<Map<String, Object>, String>) Map::get).alt(LEFT_PAREN.or(LEFT_BRACKET), value, COMMA, value, RIGHT_BRACKET.or(RIGHT_PAREN)).then((Action<Object[]>) matched -> Util.createInterval("(".equals(matched[0]), matched[1], matched[3], ")".equals(matched[4]))).alt(LEFT_BRACE, value, CC.ks(COMMA, value), RIGHT_BRACE).then((Action<Object[]>) matched -> Util.buildCollection(matched[1], (Object[]) matched[2]));
+        exe = g.compile();
     }
 
     public static Boolean exe(Map<String, Object> context, String code) {

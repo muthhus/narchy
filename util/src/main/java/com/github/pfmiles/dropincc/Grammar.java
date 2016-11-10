@@ -27,7 +27,7 @@ import com.github.pfmiles.dropincc.impl.util.Util;
  * @author pf-miles
  * 
  */
-public class Lang implements Serializable {
+public class Grammar implements Serializable {
 
     private static final long serialVersionUID = 631738160652653120L;
 
@@ -59,7 +59,7 @@ public class Lang implements Serializable {
      * 
      * @param name
      */
-    public Lang(String name) {
+    public Grammar(String name) {
         if (name == null)
             throw new DropinccException("Language name could not be null.");
         if (!langNamePattern.matcher(name).matches())
@@ -78,7 +78,7 @@ public class Lang implements Serializable {
      * @return the added token itself as an element, for use in later grammar
      *         rule definitions.
      */
-    public TokenDef newToken(String regExpr) {
+    public TokenDef the(String regExpr) {
         TokenDef t = new TokenDef(regExpr);
         this.tokens.add(t);
         return t;
@@ -92,7 +92,7 @@ public class Lang implements Serializable {
      * @return the added grammar rule object itself(wrapped for continuing rule
      *         construction), for use in later grammar rule definitions.
      */
-    public ConstructingGrule defineGrule(Object... eles) {
+    public ConstructingGrule when(Object... eles) {
         if (eles == null || eles.length == 0)
             throw new DropinccException(
                     "Could not add empty grammar rule, if you want to add a rule alternative that matches nothing, use CC.NOTHING.");
@@ -161,7 +161,7 @@ public class Lang implements Serializable {
      * 
      * @return
      */
-    public Grule newGrule() {
+    public Grule rule() {
         Grule g = new Grule(this.grules.size());
         this.grules.add(g);
         return g;

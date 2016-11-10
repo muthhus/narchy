@@ -36,15 +36,15 @@ public class ComplexBacktrackTest extends TestCase {
      */
     public void testComplexBacktrack1() {
         IccActionManager mgr = new IccActionManager();
-        Lang lang = new Lang("Test");
-        Grule A = lang.newGrule();
-        Grule B = lang.newGrule();
-        Grule C = lang.newGrule();
+        Grammar lang = new Grammar("Test");
+        Grule A = lang.rule();
+        Grule B = lang.rule();
+        Grule C = lang.rule();
 
-        lang.defineGrule(A, CC.EOF).action(mgr.newCheck(1, 2));
-        A.define("c", "b").action(mgr.newCheck(0, 0)).alt("d", B).action(mgr.newCheck(1, 2));
-        B.define(C, "e").action(mgr.newCheck(0, 0)).alt(C, "f").action(mgr.newCheck(1, 2));
-        C.define("g").action(mgr.newCheck(1, -1)).alt("h", C, "i").action(mgr.newCheck(3, 3));
+        lang.when(A, CC.EOF).then(mgr.newCheck(1, 2));
+        A.when("c", "b").then(mgr.newCheck(0, 0)).alt("d", B).then(mgr.newCheck(1, 2));
+        B.when(C, "e").then(mgr.newCheck(0, 0)).alt(C, "f").then(mgr.newCheck(1, 2));
+        C.when("g").then(mgr.newCheck(1, -1)).alt("h", C, "i").then(mgr.newCheck(3, 3));
 
         Exe exe = lang.compile();
         exe.eval("dhhhgiiif");
@@ -65,13 +65,13 @@ public class ComplexBacktrackTest extends TestCase {
      */
     public void testComplexBacktrack2() {
         IccActionManager mgr = new IccActionManager();
-        Lang lang = new Lang("Test");
-        Grule A = lang.newGrule();
-        Grule B = lang.newGrule();
+        Grammar lang = new Grammar("Test");
+        Grule A = lang.rule();
+        Grule B = lang.rule();
 
-        lang.defineGrule(A, CC.EOF).action(mgr.newCheck(1, 2));
-        A.define(CC.ks("a"), B, "c").action(mgr.newCheck(0, 0)).alt(CC.kc("a"), B, "d").action(mgr.newCheck(0, 0)).alt(CC.op("a"), B, "e").action(mgr.newCheck(1, 3));
-        B.define("f").action(mgr.newCheck(1, -1)).alt("g", B, "h").action(mgr.newCheck(3, 3));
+        lang.when(A, CC.EOF).then(mgr.newCheck(1, 2));
+        A.when(CC.ks("a"), B, "c").then(mgr.newCheck(0, 0)).alt(CC.kc("a"), B, "d").then(mgr.newCheck(0, 0)).alt(CC.op("a"), B, "e").then(mgr.newCheck(1, 3));
+        B.when("f").then(mgr.newCheck(1, -1)).alt("g", B, "h").then(mgr.newCheck(3, 3));
 
         Exe exe = lang.compile();
         exe.eval("agggfhhhe");
@@ -91,14 +91,14 @@ public class ComplexBacktrackTest extends TestCase {
      */
     public void testComplexBacktrack4() {
         IccActionManager mgr = new IccActionManager();
-        Lang lang = new Lang("Test");
-        Grule A = lang.newGrule();
-        Grule B = lang.newGrule();
+        Grammar lang = new Grammar("Test");
+        Grule A = lang.rule();
+        Grule B = lang.rule();
 
-        lang.defineGrule(A, CC.EOF).action(mgr.newCheck(1, 2));
-        A.define(B, CC.ks(B, "i"), B, "j").action(mgr.newCheck(0, 0)).alt(B, CC.kc(B, "i"), B, "k").action(mgr.newCheck(1, 4));
+        lang.when(A, CC.EOF).then(mgr.newCheck(1, 2));
+        A.when(B, CC.ks(B, "i"), B, "j").then(mgr.newCheck(0, 0)).alt(B, CC.kc(B, "i"), B, "k").then(mgr.newCheck(1, 4));
 
-        B.define("e").action(mgr.newCheck(5, -1)).alt("f", B, "g").action(mgr.newCheck(10, 3));
+        B.when("e").then(mgr.newCheck(5, -1)).alt("f", B, "g").then(mgr.newCheck(10, 3));
 
         Exe exe = lang.compile();
         exe.eval("efegiffeggifffegggiffffeggggk");
@@ -117,14 +117,14 @@ public class ComplexBacktrackTest extends TestCase {
      */
     public void testComplexBacktrack4b1() {
         IccActionManager mgr = new IccActionManager();
-        Lang lang = new Lang("Test");
-        Grule A = lang.newGrule();
-        Grule B = lang.newGrule();
+        Grammar lang = new Grammar("Test");
+        Grule A = lang.rule();
+        Grule B = lang.rule();
 
-        lang.defineGrule(A, CC.EOF).action(mgr.newCheck(1, 2));
-        A.define(B, CC.ks(B, "i"), B, "j").action(mgr.newCheck(0, 0)).alt(B, CC.kc(B, "i"), B, "k").action(mgr.newCheck(1, 4));
+        lang.when(A, CC.EOF).then(mgr.newCheck(1, 2));
+        A.when(B, CC.ks(B, "i"), B, "j").then(mgr.newCheck(0, 0)).alt(B, CC.kc(B, "i"), B, "k").then(mgr.newCheck(1, 4));
 
-        B.define("e").action(mgr.newCheck(3, -1)).alt("f", B, "g").action(mgr.newCheck(1, 3));
+        B.when("e").then(mgr.newCheck(3, -1)).alt("f", B, "g").then(mgr.newCheck(1, 3));
 
         Exe exe = lang.compile();
         exe.eval("efegiek");
@@ -146,15 +146,15 @@ public class ComplexBacktrackTest extends TestCase {
     public void testComplexBacktrack5() {
         IccActionManager mgr = new IccActionManager();
 
-        Lang lang = new Lang("Test");
-        Grule A = lang.newGrule();
-        Grule C = lang.newGrule();
-        Grule B = lang.newGrule();
+        Grammar lang = new Grammar("Test");
+        Grule A = lang.rule();
+        Grule C = lang.rule();
+        Grule B = lang.rule();
 
-        lang.defineGrule(A, CC.EOF).action(mgr.newCheck(1, 2));
-        A.define(CC.ks("b", C), "d").action(mgr.newCheck(1, 2));
-        C.define(B, "e").action(mgr.newCheck(2, 2)).alt(B, "f").action(mgr.newCheck(2, 2));
-        B.define("g").action(mgr.newCheck(4, -1)).alt("h", B, "i").action(mgr.newCheck(6, 3));
+        lang.when(A, CC.EOF).then(mgr.newCheck(1, 2));
+        A.when(CC.ks("b", C), "d").then(mgr.newCheck(1, 2));
+        C.when(B, "e").then(mgr.newCheck(2, 2)).alt(B, "f").then(mgr.newCheck(2, 2));
+        B.when("g").then(mgr.newCheck(4, -1)).alt("h", B, "i").then(mgr.newCheck(6, 3));
 
         Exe exe = lang.compile();
         exe.eval("bgebhgifbhhgiiebhhhgiiifd");
@@ -175,15 +175,15 @@ public class ComplexBacktrackTest extends TestCase {
      */
     public void testComplexBacktrack7() {
         IccActionManager mgr = new IccActionManager();
-        Lang lang = new Lang("Test");
-        Grule A = lang.newGrule();
-        Grule C = lang.newGrule();
-        Grule B = lang.newGrule();
+        Grammar lang = new Grammar("Test");
+        Grule A = lang.rule();
+        Grule C = lang.rule();
+        Grule B = lang.rule();
 
-        lang.defineGrule(A, CC.EOF).action(mgr.newCheck(1, 2));
-        A.define(CC.ks(C, "b"), C, "d").action(mgr.newCheck(1, 3));
-        C.define(B, "e").action(mgr.newCheck(2, 2)).alt(B, "f").action(mgr.newCheck(3, 2));
-        B.define("g").action(mgr.newCheck(5, -1)).alt("h", B, "i").action(mgr.newCheck(10, 3));
+        lang.when(A, CC.EOF).then(mgr.newCheck(1, 2));
+        A.when(CC.ks(C, "b"), C, "d").then(mgr.newCheck(1, 3));
+        C.when(B, "e").then(mgr.newCheck(2, 2)).alt(B, "f").then(mgr.newCheck(3, 2));
+        B.when("g").then(mgr.newCheck(5, -1)).alt("h", B, "i").then(mgr.newCheck(10, 3));
 
         Exe exe = lang.compile();
         exe.eval("gfbhgiebhhgiifbhhhgiiiebhhhhgiiiifd");
@@ -205,17 +205,17 @@ public class ComplexBacktrackTest extends TestCase {
      */
     public void testComplexBacktrack8() {
         IccActionManager mgr = new IccActionManager();
-        Lang lang = new Lang("Test");
-        Grule A = lang.newGrule();
-        Grule B = lang.newGrule();
-        Grule C = lang.newGrule();
+        Grammar lang = new Grammar("Test");
+        Grule A = lang.rule();
+        Grule B = lang.rule();
+        Grule C = lang.rule();
 
-        lang.defineGrule(A, CC.EOF).action(mgr.newCheck(1, 2));
-        A.define(B, C, "d").action(mgr.newCheck(0, 0)).alt(B, C, "e").action(mgr.newCheck(1, 3));
+        lang.when(A, CC.EOF).then(mgr.newCheck(1, 2));
+        A.when(B, C, "d").then(mgr.newCheck(0, 0)).alt(B, C, "e").then(mgr.newCheck(1, 3));
 
-        B.define("b").action(mgr.newCheck(1, -1)).alt("f", B, "g").action(mgr.newCheck(2, 3));
+        B.when("b").then(mgr.newCheck(1, -1)).alt("f", B, "g").then(mgr.newCheck(2, 3));
 
-        C.define("h").action(mgr.newCheck(0, 0)).alt("i").action(mgr.newCheck(1, -1));
+        C.when("h").then(mgr.newCheck(0, 0)).alt("i").then(mgr.newCheck(1, -1));
 
         Exe exe = lang.compile();
 
@@ -235,13 +235,13 @@ public class ComplexBacktrackTest extends TestCase {
      */
     public void testComplexBacktrack9() {
         IccActionManager mgr = new IccActionManager();
-        Lang lang = new Lang("Test");
-        Grule A = lang.newGrule();
-        Grule C = lang.newGrule();
+        Grammar lang = new Grammar("Test");
+        Grule A = lang.rule();
+        Grule C = lang.rule();
 
-        lang.defineGrule(A, CC.EOF).action(mgr.newCheck(1, 2));
-        A.define(CC.kc(C, "d", "e"), "f", "g").action(mgr.newCheck(1, 3));
-        C.define("h").action(mgr.newCheck(1, -1)).alt("i").action(mgr.newCheck(1, -1));
+        lang.when(A, CC.EOF).then(mgr.newCheck(1, 2));
+        A.when(CC.kc(C, "d", "e"), "f", "g").then(mgr.newCheck(1, 3));
+        C.when("h").then(mgr.newCheck(1, -1)).alt("i").then(mgr.newCheck(1, -1));
 
         Exe exe = lang.compile();
         exe.eval("hdeidefg");

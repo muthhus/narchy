@@ -63,7 +63,7 @@ public class DelayedAction {
             return input;
         } else {
             if (this.action instanceof Action) {
-                return ((Action) this.action).act(input);
+                return ((Action) this.action).apply(input);
             } else if (this.action instanceof ParamedAction) {
                 return ((ParamedAction) this.action).act(arg, input);
             } else {

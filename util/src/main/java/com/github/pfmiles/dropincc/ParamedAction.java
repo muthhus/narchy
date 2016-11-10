@@ -28,7 +28,7 @@ public interface ParamedAction<P, M> {
      * 
      * @param arg
      * @param matched
-     * @see Action#act(Object)
+     * @see Action#apply(Object)
      * @return
      */
     Object act(P arg, M matched);

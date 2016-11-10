@@ -10,6 +10,8 @@
  ******************************************************************************/
 package com.github.pfmiles.dropincc;
 
+import java.util.function.Function;
+
 /**
  * Action of an alternative. It is passed to a grammar's alternative when
  * building your grammar rules.It has no explicit implementation.Just create an
@@ -21,7 +23,7 @@ package com.github.pfmiles.dropincc;
  * @param <T>
  *            The expected type of matched sequence
  */
-public interface Action<T> {
+public interface Action<T> extends Function<T,Object> {
     /**
      * code you would like to execute when corresponding alternative matches.
      * 
@@ -47,5 +49,5 @@ public interface Action<T> {
      *            a single object returned by 'A' rule.
      * @return
      */
-    Object act(T matched);
+    //Object apply(T matched);
 }

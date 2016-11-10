@@ -11,11 +11,9 @@
 package com.github.pfmiles.dropincc.impl;
 
 import java.util.List;
+import java.util.function.Consumer;
 
-import com.github.pfmiles.dropincc.DropinccException;
-import com.github.pfmiles.dropincc.Element;
-import com.github.pfmiles.dropincc.Grule;
-import com.github.pfmiles.dropincc.Predicate;
+import com.github.pfmiles.dropincc.*;
 import com.github.pfmiles.dropincc.impl.util.Util;
 
 /**
@@ -67,7 +65,7 @@ public class ConstructingGrule implements Element {
      *            or 'ParamedAction'
      * @return
      */
-    public ConstructingGrule action(Object action) {
+    public ConstructingGrule then(Object action) {
         List<Alternative> alts = this.grule.getAlts();
         Alternative alt = alts.get(alts.size() - 1);
         if (alt.getAction() != null)
@@ -75,6 +73,7 @@ public class ConstructingGrule implements Element {
         alt.setAction(action);
         return this;
     }
+
 
     /**
      * Add predicate to the current alternative of this grule. Each alternative

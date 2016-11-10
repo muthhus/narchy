@@ -32,11 +32,11 @@ public class KleeneTest extends TestCase {
      */
     public void test1() {
         IccActionManager mgr = new IccActionManager();
-        Lang lang = new Lang("Test");
-        Grule A = lang.newGrule();
+        Grammar lang = new Grammar("Test");
+        Grule A = lang.rule();
 
-        lang.defineGrule(A, CC.EOF).action(mgr.newCheck(1, 2));
-        A.define(CC.ks("a", CC.kc("b", "d")), "c").action(mgr.newCheck(0, 0)).alt(CC.kc("e", CC.op("g", "h"), "f")).action(mgr.newCheck(1, 2));
+        lang.when(A, CC.EOF).then(mgr.newCheck(1, 2));
+        A.when(CC.ks("a", CC.kc("b", "d")), "c").then(mgr.newCheck(0, 0)).alt(CC.kc("e", CC.op("g", "h"), "f")).then(mgr.newCheck(1, 2));
 
         Exe exe = lang.compile();
         exe.eval("efeghf");
@@ -55,13 +55,13 @@ public class KleeneTest extends TestCase {
      */
     public void test2() {
         IccActionManager mgr = new IccActionManager();
-        Lang lang = new Lang("Test");
-        Grule A = lang.newGrule();
-        Grule C = lang.newGrule();
+        Grammar lang = new Grammar("Test");
+        Grule A = lang.rule();
+        Grule C = lang.rule();
 
-        lang.defineGrule(A, CC.EOF).action(mgr.newCheck(1, 2));
-        A.define(CC.ks("a", CC.kc("b", C, "e"), "b", C, "d")).action(mgr.newCheck(1, 2));
-        C.define("f").action(mgr.newCheck(7, -1)).alt("g", C, "h").action(mgr.newCheck(11, 3));
+        lang.when(A, CC.EOF).then(mgr.newCheck(1, 2));
+        A.when(CC.ks("a", CC.kc("b", C, "e"), "b", C, "d")).then(mgr.newCheck(1, 2));
+        C.when("f").then(mgr.newCheck(7, -1)).alt("g", C, "h").then(mgr.newCheck(11, 3));
 
         Exe exe = lang.compile();
         exe.eval("abfebgfhebfdabggfhhebgggfhhhebggggfhhhhebgfhd");
@@ -80,15 +80,15 @@ public class KleeneTest extends TestCase {
      */
     public void test3() {
         IccActionManager mgr = new IccActionManager();
-        Lang lang = new Lang("Test");
-        Grule A = lang.newGrule();
-        Grule B = lang.newGrule();
+        Grammar lang = new Grammar("Test");
+        Grule A = lang.rule();
+        Grule B = lang.rule();
 
-        lang.defineGrule(A, CC.EOF).action(mgr.newCheck(1, 2));
+        lang.when(A, CC.EOF).then(mgr.newCheck(1, 2));
 
-        A.define(CC.ks(B, CC.kc("e", "f"), "d"), B, "c").action(mgr.newCheck(1, 3));
+        A.when(CC.ks(B, CC.kc("e", "f"), "d"), B, "c").then(mgr.newCheck(1, 3));
 
-        B.define("g").action(mgr.newCheck(4, -1)).alt("h", B, "i").action(mgr.newCheck(7, 3));
+        B.when("g").then(mgr.newCheck(4, -1)).alt("h", B, "i").then(mgr.newCheck(7, 3));
 
         Exe exe = lang.compile();
 
@@ -107,13 +107,13 @@ public class KleeneTest extends TestCase {
      */
     public void test4() {
         IccActionManager mgr = new IccActionManager();
-        Lang lang = new Lang("Test");
-        Grule A = lang.newGrule();
-        Grule B = lang.newGrule();
+        Grammar lang = new Grammar("Test");
+        Grule A = lang.rule();
+        Grule B = lang.rule();
 
-        lang.defineGrule(A, CC.EOF).action(mgr.newCheck(1, 2));
-        A.define(CC.kc(B, CC.op(B, "c"), B, "d"), B, "c").action(mgr.newCheck(1, 3));
-        B.define("e").action(mgr.newCheck(6, -1)).alt("f", B, "g").action(mgr.newCheck(15, 3));
+        lang.when(A, CC.EOF).then(mgr.newCheck(1, 2));
+        A.when(CC.kc(B, CC.op(B, "c"), B, "d"), B, "c").then(mgr.newCheck(1, 3));
+        B.when("e").then(mgr.newCheck(6, -1)).alt("f", B, "g").then(mgr.newCheck(15, 3));
 
         Exe exe = lang.compile();
         exe.eval("efegdffeggfffegggcffffeggggdfffffegggggc");
@@ -131,13 +131,13 @@ public class KleeneTest extends TestCase {
      */
     public void test4b1() {
         IccActionManager mgr = new IccActionManager();
-        Lang lang = new Lang("Test");
-        Grule A = lang.newGrule();
-        Grule B = lang.newGrule();
+        Grammar lang = new Grammar("Test");
+        Grule A = lang.rule();
+        Grule B = lang.rule();
 
-        lang.defineGrule(A, CC.EOF).action(mgr.newCheck(1, 2));
-        A.define(CC.kc(B, CC.op(B, "c"), B, "d"), B, "c").action(mgr.newCheck(1, 3));
-        B.define("e").action(mgr.newCheck(3, -1)).alt("f", B, "g").action(mgr.newCheck(1, 3));
+        lang.when(A, CC.EOF).then(mgr.newCheck(1, 2));
+        A.when(CC.kc(B, CC.op(B, "c"), B, "d"), B, "c").then(mgr.newCheck(1, 3));
+        B.when("e").then(mgr.newCheck(3, -1)).alt("f", B, "g").then(mgr.newCheck(1, 3));
 
         Exe exe = lang.compile();
         exe.eval("eedfegc");
@@ -153,11 +153,11 @@ public class KleeneTest extends TestCase {
      */
     public void testKsNoMatch() {
         IccActionManager mgr = new IccActionManager();
-        Lang lang = new Lang("Test");
-        Grule A = lang.newGrule();
+        Grammar lang = new Grammar("Test");
+        Grule A = lang.rule();
 
-        lang.defineGrule(A, CC.EOF).action(mgr.newCheck(1, 2));
-        A.define(CC.ks("a", "b")).action(mgr.newCheck(1, 0));
+        lang.when(A, CC.EOF).then(mgr.newCheck(1, 2));
+        A.when(CC.ks("a", "b")).then(mgr.newCheck(1, 0));
 
         Exe exe = lang.compile();
         exe.eval("");
@@ -173,9 +173,9 @@ public class KleeneTest extends TestCase {
      */
     public void testOpNoMatch() {
         IccActionManager mgr = new IccActionManager();
-        Lang lang = new Lang("Test");
-        Grule A = lang.newGrule();
-        lang.defineGrule(A, CC.EOF).action(mgr.newCheck(1, 2));
-        A.define(CC.op("a", "b")).action(mgr.newCheck(1, -2));
+        Grammar lang = new Grammar("Test");
+        Grule A = lang.rule();
+        lang.when(A, CC.EOF).then(mgr.newCheck(1, 2));
+        A.when(CC.op("a", "b")).then(mgr.newCheck(1, -2));
     }
 }

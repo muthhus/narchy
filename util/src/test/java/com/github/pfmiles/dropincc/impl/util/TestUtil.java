@@ -30,7 +30,7 @@ public class TestUtil extends TestCase {
     public void testResolveActionName() {
         Action<Object> a = new Action<Object>() {
 
-            public Object act(Object matched) {
+            public Object apply(Object matched) {
                 return null;
             }
         };

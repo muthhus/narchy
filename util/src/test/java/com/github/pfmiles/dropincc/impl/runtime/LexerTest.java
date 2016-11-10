@@ -19,7 +19,7 @@ import com.github.pfmiles.dropincc.CC;
 import com.github.pfmiles.dropincc.Element;
 import com.github.pfmiles.dropincc.Exe;
 import com.github.pfmiles.dropincc.Grule;
-import com.github.pfmiles.dropincc.Lang;
+import com.github.pfmiles.dropincc.Grammar;
 import com.github.pfmiles.dropincc.TokenDef;
 import com.github.pfmiles.dropincc.impl.AnalyzedLang;
 import com.github.pfmiles.dropincc.impl.runtime.impl.Lexer;
@@ -32,13 +32,13 @@ import com.github.pfmiles.dropincc.testhelper.TestHelper;
 public class LexerTest extends TestCase {
 
     public void testBasicLex1() {
-        Lang lang = new Lang("Test");
-        Element a = lang.newToken("a");
-        Element b = lang.newToken("b");
-        Element c = lang.newToken("c");
-        Grule A = lang.newGrule();
-        lang.defineGrule(A, CC.EOF);
-        A.define(CC.ks(a), b).alt(CC.kc(a), c);
+        Grammar lang = new Grammar("Test");
+        Element a = lang.the("a");
+        Element b = lang.the("b");
+        Element c = lang.the("c");
+        Grule A = lang.rule();
+        lang.when(A, CC.EOF);
+        A.when(CC.ks(a), b).alt(CC.kc(a), c);
         Exe exe = lang.compile();
         // to test ignore whitespaces
         // System.out.println(exe.lexing("     abc   a\r\tbc\n   \r   "));
@@ -49,28 +49,28 @@ public class LexerTest extends TestCase {
     // public void testBasicInstantTokens()
 
     public void testJavaTokens() {
-        Lang lang = new Lang("Test");
+        Grammar lang = new Grammar("Test");
         // these keywords tokens must be defined before the identifier token in
         // the initial version of dropincc.java, because it could not do
         // 'longest' match, the later versions of dropincc.java should solve the
         // problem
-        Element _public = lang.newToken("public");
-        Element _void = lang.newToken("void");
-        Element digit = lang.newToken("\\d+");
-        Element _id = lang.newToken("[a-zA-Z_]\\w*");
-        Element _new = lang.newToken("new");
-        Element leftParen = lang.newToken("\\(");
-        Element rightParen = lang.newToken("\\)");
-        Element leftBrace = lang.newToken("\\{");
-        Element rightBrace = lang.newToken("\\}");
-        Element equal = lang.newToken("\\=\\=");
-        Element assign = lang.newToken("\\=");
-        Element dot = lang.newToken("\\.");
-        Element semi = lang.newToken(";");
-        Element comma = lang.newToken(",");
-        Element str = lang.newToken("\"[^\"]*\"");
+        Element _public = lang.the("public");
+        Element _void = lang.the("void");
+        Element digit = lang.the("\\d+");
+        Element _id = lang.the("[a-zA-Z_]\\w*");
+        Element _new = lang.the("new");
+        Element leftParen = lang.the("\\(");
+        Element rightParen = lang.the("\\)");
+        Element leftBrace = lang.the("\\{");
+        Element rightBrace = lang.the("\\}");
+        Element equal = lang.the("\\=\\=");
+        Element assign = lang.the("\\=");
+        Element dot = lang.the("\\.");
+        Element semi = lang.the(";");
+        Element comma = lang.the(",");
+        Element str = lang.the("\"[^\"]*\"");
 
-        lang.defineGrule(_public, _void, _new, digit, _id, leftParen, rightParen, leftBrace, rightBrace, equal, assign, dot, semi, comma, str, CC.EOF);
+        lang.when(_public, _void, _new, digit, _id, leftParen, rightParen, leftBrace, rightBrace, equal, assign, dot, semi, comma, str, CC.EOF);
 
         Exe exe = lang.compile();
         List<Token> ts = exe.lexing("public void testBasicLex1() {" + "Lang lang = new Lang();" + "Element a = lang.newToken(\"a\");"
@@ -83,19 +83,19 @@ public class LexerTest extends TestCase {
     }
 
     public void testJavaRegexAnnoyingTokens() {
-        Lang lang = new Lang("Test");
-        Grule A = lang.newGrule();
-        lang.defineGrule(A, CC.EOF);
-        A.define("\\(", A, "\\)").alt("\\\\G");
+        Grammar lang = new Grammar("Test");
+        Grule A = lang.rule();
+        lang.when(A, CC.EOF);
+        A.when("\\(", A, "\\)").alt("\\\\G");
         Exe exe = lang.compile();
         assertTrue(exe.lexing("(((\\G)))").size() == 8);
     }
 
     public void testWhitespaceSensitive() {
-        Lang lang = new Lang("Test");
-        Grule A = lang.newGrule();
-        lang.defineGrule(A, CC.EOF);
-        A.define(" \\(", A, "\\) ").alt(" \\\\G ");
+        Grammar lang = new Grammar("Test");
+        Grule A = lang.rule();
+        lang.when(A, CC.EOF);
+        A.when(" \\(", A, "\\) ").alt(" \\\\G ");
         lang.setWhiteSpaceSensitive(true);
         Exe exe = lang.compile();
         // System.out.println(exe.lexing(" ( ( ( \\G ) ) ) "));
@@ -103,10 +103,10 @@ public class LexerTest extends TestCase {
     }
 
     public void testLaLt() {
-        Lang lang = new Lang("Test");
-        Grule A = lang.newGrule();
-        lang.defineGrule(A, CC.EOF);
-        A.define(" \\(", A, "\\) ").alt(" \\\\G ");
+        Grammar lang = new Grammar("Test");
+        Grule A = lang.rule();
+        lang.when(A, CC.EOF);
+        A.when(" \\(", A, "\\) ").alt(" \\\\G ");
         lang.setWhiteSpaceSensitive(true);
         Exe exe = lang.compile();
         AnalyzedLang al = TestHelper.priField(exe, "al");
@@ -123,10 +123,10 @@ public class LexerTest extends TestCase {
     }
 
     public void testLexerRuleContainsVerticalBar() {
-        Lang lang = new Lang("Test");
-        TokenDef a = lang.newToken("ab|bc");
-        TokenDef b = lang.newToken("uv|wx");
-        lang.defineGrule(CC.ks(a, b), CC.EOF);
+        Grammar lang = new Grammar("Test");
+        TokenDef a = lang.the("ab|bc");
+        TokenDef b = lang.the("uv|wx");
+        lang.when(CC.ks(a, b), CC.EOF);
         Exe exe = lang.compile();
         List<Token> ts = exe.lexing("bcabababbcbcabwxwxuvwx");
         // System.out.println(ts);

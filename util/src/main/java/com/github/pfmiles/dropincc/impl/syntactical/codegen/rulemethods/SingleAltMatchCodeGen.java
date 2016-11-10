@@ -42,7 +42,7 @@ public class SingleAltMatchCodeGen extends CodeGen {
     // action invoke
     // 0: actionName
     // 1: matchedVar
-    private static final String actionIvkFmt = "{0}.act({1})";
+    private static final String actionIvkFmt = "{0}.apply({1})";
     // paramed action invoke
     // 0: actionName
     // 1: matchedVar

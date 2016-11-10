@@ -19,7 +19,7 @@ import java.util.Map;
 
 import com.github.pfmiles.dropincc.Element;
 import com.github.pfmiles.dropincc.Grule;
-import com.github.pfmiles.dropincc.Lang;
+import com.github.pfmiles.dropincc.Grammar;
 import com.github.pfmiles.dropincc.TokenDef;
 import com.github.pfmiles.dropincc.impl.AnalyzedLang;
 import com.github.pfmiles.dropincc.impl.GruleType;
@@ -104,7 +104,7 @@ public class TestHelper {
      * @return
      */
     @SuppressWarnings("unchecked")
-    public static AnalyzedLangForTest resolveAnalyzedLangForTest(Lang lang) {
+    public static AnalyzedLangForTest resolveAnalyzedLangForTest(Grammar lang) {
         AnalyzedLangForTest ret = new AnalyzedLangForTest();
         AnalyzedLang al = new AnalyzedLang("test", (List<TokenDef>) priField(lang, "tokens"), (List<Grule>) priField(lang, "grules"),
                 (Boolean) priField(lang, "whiteSpaceSensitive"));

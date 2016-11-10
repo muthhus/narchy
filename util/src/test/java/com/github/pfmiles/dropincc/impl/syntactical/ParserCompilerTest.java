@@ -21,7 +21,7 @@ import com.github.pfmiles.dropincc.DropinccException;
 import com.github.pfmiles.dropincc.Element;
 import com.github.pfmiles.dropincc.Exe;
 import com.github.pfmiles.dropincc.Grule;
-import com.github.pfmiles.dropincc.Lang;
+import com.github.pfmiles.dropincc.Grammar;
 import com.github.pfmiles.dropincc.ParamedAction;
 import com.github.pfmiles.dropincc.TokenDef;
 import com.github.pfmiles.dropincc.impl.Alternative;
@@ -38,20 +38,20 @@ public class ParserCompilerTest extends TestCase {
 
     @SuppressWarnings("unchecked")
     public void testOrSubRuleRewrite() {
-        Lang calculator = new Lang("Test");
-        TokenDef DIGIT = calculator.newToken("\\d+");
-        TokenDef ADD = calculator.newToken("\\+");
-        TokenDef SUB = calculator.newToken("\\-");
-        TokenDef MUL = calculator.newToken("\\*");
-        TokenDef DIV = calculator.newToken("/");
-        TokenDef LEFTPAREN = calculator.newToken("\\(");
-        TokenDef RIGHTPAREN = calculator.newToken("\\)");
-        Grule expr = calculator.newGrule();
-        Grule term = calculator.newGrule();
-        Element mulTail = calculator.defineGrule(MUL.or(DIV), term);
-        term.define(DIGIT, mulTail).alt(LEFTPAREN, expr, RIGHTPAREN).alt(DIGIT);
-        Element addendTail = calculator.defineGrule(ADD.or(SUB), term);
-        expr.define(term, addendTail, CC.EOF);
+        Grammar calculator = new Grammar("Test");
+        TokenDef DIGIT = calculator.the("\\d+");
+        TokenDef ADD = calculator.the("\\+");
+        TokenDef SUB = calculator.the("\\-");
+        TokenDef MUL = calculator.the("\\*");
+        TokenDef DIV = calculator.the("/");
+        TokenDef LEFTPAREN = calculator.the("\\(");
+        TokenDef RIGHTPAREN = calculator.the("\\)");
+        Grule expr = calculator.rule();
+        Grule term = calculator.rule();
+        Element mulTail = calculator.when(MUL.or(DIV), term);
+        term.when(DIGIT, mulTail).alt(LEFTPAREN, expr, RIGHTPAREN).alt(DIGIT);
+        Element addendTail = calculator.when(ADD.or(SUB), term);
+        expr.when(term, addendTail, CC.EOF);
 
         List<Grule> grules = (List<Grule>) TestHelper.priField(calculator, "grules");
         List<Grule> genGrules = ParserCompiler.rewriteSubRules(grules);
@@ -79,19 +79,19 @@ public class ParserCompilerTest extends TestCase {
      */
     @SuppressWarnings("unchecked")
     public void testSubRuleRewriteOrCascadingAnd() {
-        Lang calculator = new Lang("Test");
-        TokenDef DIGIT = calculator.newToken("\\d+");
-        TokenDef ADD = calculator.newToken("\\+");
-        TokenDef SUB = calculator.newToken("\\-");
-        TokenDef MUL = calculator.newToken("\\*");
-        TokenDef DIV = calculator.newToken("/");
-        TokenDef LEFTPAREN = calculator.newToken("\\(");
-        TokenDef RIGHTPAREN = calculator.newToken("\\)");
+        Grammar calculator = new Grammar("Test");
+        TokenDef DIGIT = calculator.the("\\d+");
+        TokenDef ADD = calculator.the("\\+");
+        TokenDef SUB = calculator.the("\\-");
+        TokenDef MUL = calculator.the("\\*");
+        TokenDef DIV = calculator.the("/");
+        TokenDef LEFTPAREN = calculator.the("\\(");
+        TokenDef RIGHTPAREN = calculator.the("\\)");
 
-        Grule term = calculator.newGrule();
-        Grule expr = calculator.newGrule();
-        term.define(DIGIT, MUL.or(DIV).and(term)).alt(LEFTPAREN, expr, RIGHTPAREN).alt(DIGIT);
-        expr.define(term, ADD.or(SUB).and(term), CC.EOF);
+        Grule term = calculator.rule();
+        Grule expr = calculator.rule();
+        term.when(DIGIT, MUL.or(DIV).and(term)).alt(LEFTPAREN, expr, RIGHTPAREN).alt(DIGIT);
+        expr.when(term, ADD.or(SUB).and(term), CC.EOF);
 
         List<Grule> grules = (List<Grule>) TestHelper.priField(calculator, "grules");
         List<Grule> genGrules = ParserCompiler.rewriteSubRules(grules);
@@ -158,11 +158,11 @@ public class ParserCompilerTest extends TestCase {
      */
     public void testCheckAndReportLeftRecursions() {
         // direct left recursion
-        Lang testLang = new Lang("Test");
-        TokenDef gt = testLang.newToken("\\>");
-        TokenDef zero = testLang.newToken("0");
-        Grule L = testLang.newGrule();
-        L.define(L, gt, zero);
+        Grammar testLang = new Grammar("Test");
+        TokenDef gt = testLang.the("\\>");
+        TokenDef zero = testLang.the("0");
+        Grule L = testLang.rule();
+        L.when(L, gt, zero);
         AnalyzedLangForTest a = TestHelper.resolveAnalyzedLangForTest(testLang);
         try {
             ParserCompiler.checkAndReportLeftRecursions(a.ruleTypeToAlts, a.kleeneTypeToNode);
@@ -173,19 +173,19 @@ public class ParserCompilerTest extends TestCase {
         }
 
         // chained left recursion
-        testLang = new Lang("Test");
-        TokenDef leftParen = testLang.newToken("\\(");
-        TokenDef rightParen = testLang.newToken("\\)");
-        TokenDef rightBracket = testLang.newToken("\\]");
-        zero = testLang.newToken("0");
-        TokenDef leftBrace = testLang.newToken("\\{");
-        TokenDef rightBrace = testLang.newToken("\\}");
-        gt = testLang.newToken("\\>");
-        Grule A = testLang.newGrule();
-        Grule B = testLang.newGrule();
-        Element l = testLang.defineGrule(leftParen, A, rightParen).alt(B, rightBracket).alt(zero);
-        A.define(leftBrace, B, rightBrace);
-        B.define(l, gt);
+        testLang = new Grammar("Test");
+        TokenDef leftParen = testLang.the("\\(");
+        TokenDef rightParen = testLang.the("\\)");
+        TokenDef rightBracket = testLang.the("\\]");
+        zero = testLang.the("0");
+        TokenDef leftBrace = testLang.the("\\{");
+        TokenDef rightBrace = testLang.the("\\}");
+        gt = testLang.the("\\>");
+        Grule A = testLang.rule();
+        Grule B = testLang.rule();
+        Element l = testLang.when(leftParen, A, rightParen).alt(B, rightBracket).alt(zero);
+        A.when(leftBrace, B, rightBrace);
+        B.when(l, gt);
         a = TestHelper.resolveAnalyzedLangForTest(testLang);
         try {
             ParserCompiler.checkAndReportLeftRecursions(a.ruleTypeToAlts, a.kleeneTypeToNode);
@@ -196,19 +196,19 @@ public class ParserCompilerTest extends TestCase {
         }
 
         // left recursion in kleene nodes
-        testLang = new Lang("Test");
-        leftParen = testLang.newToken("\\(");
-        rightParen = testLang.newToken("\\)");
-        rightBracket = testLang.newToken("\\]");
-        zero = testLang.newToken("0");
-        leftBrace = testLang.newToken("\\{");
-        rightBrace = testLang.newToken("\\}");
-        gt = testLang.newToken("\\>");
-        A = testLang.newGrule();
-        B = testLang.newGrule();
-        l = testLang.defineGrule(leftParen, A, rightParen).alt(CC.ks(B, rightBracket)).alt(zero);
-        A.define(leftBrace, B, rightBrace).alt(CC.op(l));
-        B.define(CC.kc(A), gt);
+        testLang = new Grammar("Test");
+        leftParen = testLang.the("\\(");
+        rightParen = testLang.the("\\)");
+        rightBracket = testLang.the("\\]");
+        zero = testLang.the("0");
+        leftBrace = testLang.the("\\{");
+        rightBrace = testLang.the("\\}");
+        gt = testLang.the("\\>");
+        A = testLang.rule();
+        B = testLang.rule();
+        l = testLang.when(leftParen, A, rightParen).alt(CC.ks(B, rightBracket)).alt(zero);
+        A.when(leftBrace, B, rightBrace).alt(CC.op(l));
+        B.when(CC.kc(A), gt);
         a = TestHelper.resolveAnalyzedLangForTest(testLang);
         try {
             ParserCompiler.checkAndReportLeftRecursions(a.ruleTypeToAlts, a.kleeneTypeToNode);
@@ -229,13 +229,13 @@ public class ParserCompilerTest extends TestCase {
      * </pre>
      */
     public void testComputePredictingGrules() {
-        Lang ll1 = new Lang("Test");
-        Element a = ll1.newToken("a");
-        Element b = ll1.newToken("b");
-        Element c = ll1.newToken("c");
-        Grule A = ll1.newGrule();
-        ll1.defineGrule(A, CC.EOF);
-        A.define(a, CC.ks(c)).alt(b, CC.ks(c));
+        Grammar ll1 = new Grammar("Test");
+        Element a = ll1.the("a");
+        Element b = ll1.the("b");
+        Element c = ll1.the("c");
+        Grule A = ll1.rule();
+        ll1.when(A, CC.EOF);
+        A.when(a, CC.ks(c)).alt(b, CC.ks(c));
         AnalyzedLangForTest al = TestHelper.resolveAnalyzedLangForTest(ll1);
         List<PredictingGrule> ps = ParserCompiler.computePredictingGrules(al.ruleTypeToAlts, al.kleeneTypeToNode).getPgs();
         // System.out.println(ps);
@@ -243,22 +243,22 @@ public class ParserCompilerTest extends TestCase {
     }
 
     public void testComputePredictingGrulesWithInstantTokens() {
-        Lang ll3 = new Lang("Test");
-        Grule A = ll3.newGrule();
+        Grammar ll3 = new Grammar("Test");
+        Grule A = ll3.rule();
 
-        ll3.defineGrule(A, CC.EOF);
+        ll3.when(A, CC.EOF);
 
-        Grule B = ll3.newGrule();
-        Grule C = ll3.newGrule();
-        Grule D = ll3.newGrule();
+        Grule B = ll3.rule();
+        Grule C = ll3.rule();
+        Grule D = ll3.rule();
 
-        A.define(B, CC.ks("a")).alt(C, CC.kc("a")).alt(D, CC.op("a"));
+        A.when(B, CC.ks("a")).alt(C, CC.kc("a")).alt(D, CC.op("a"));
 
-        B.define("a", "b", "c", C).alt("a", "b", "c", D).alt("d");
+        B.when("a", "b", "c", C).alt("a", "b", "c", D).alt("d");
 
-        C.define("e", "f", "g", D).alt("e", "f", "g", "h");
+        C.when("e", "f", "g", D).alt("e", "f", "g", "h");
 
-        D.define("i", "j", "k", "l").alt("i", "j", "k", "m");
+        D.when("i", "j", "k", "l").alt("i", "j", "k", "m");
 
         AnalyzedLangForTest al = TestHelper.resolveAnalyzedLangForTest(ll3);
         List<PredictingGrule> ps = ParserCompiler.computePredictingGrules(al.ruleTypeToAlts, al.kleeneTypeToNode).getPgs();
@@ -267,40 +267,40 @@ public class ParserCompilerTest extends TestCase {
     }
 
     public void testParserCodeGen() {
-        Lang lang = new Lang("Calculator");
-        Grule L = lang.newGrule();
-        TokenDef a = lang.newToken("\\+");
-        lang.defineGrule(L, CC.EOF).action(new Action<Object>() {
-            public Object act(Object matched) {
+        Grammar lang = new Grammar("Calculator");
+        Grule L = lang.rule();
+        TokenDef a = lang.the("\\+");
+        lang.when(L, CC.EOF).then(new Action<Object>() {
+            public Object apply(Object matched) {
                 Object[] ms = (Object[]) matched;
                 System.out.println("Total result, length(2 exp): " + ms.length);
                 return ms;
             }
         });
-        Grule A = lang.newGrule();
-        L.define(A, CC.ks(a.or("\\-"), A)).action(new Action<Object>() {
-            public Object act(Object matched) {
+        Grule A = lang.rule();
+        L.when(A, CC.ks(a.or("\\-"), A)).then(new Action<Object>() {
+            public Object apply(Object matched) {
                 Object[] ms = (Object[]) matched;
                 System.out.println("L result, length(2 exp): " + ms.length);
                 return ms;
             }
         });
-        TokenDef m = lang.newToken("\\*");
-        Grule F = lang.newGrule();
-        A.define(F, CC.ks(m.or("/"), F)).action(new Action<Object>() {
-            public Object act(Object matched) {
+        TokenDef m = lang.the("\\*");
+        Grule F = lang.rule();
+        A.when(F, CC.ks(m.or("/"), F)).then(new Action<Object>() {
+            public Object apply(Object matched) {
                 Object[] ms = (Object[]) matched;
                 System.out.println("A result, length(2 exp): " + ms.length);
                 return ms;
             }
         });
-        F.define("\\(", L, "\\)").action(new Action<Object>() {
-            public Object act(Object matched) {
+        F.when("\\(", L, "\\)").then(new Action<Object>() {
+            public Object apply(Object matched) {
                 Object[] ms = (Object[]) matched;
                 System.out.println("F result, length(3 exp): " + ms.length);
                 return ms;
             }
-        }).alt("[0-9]+").action(new ParamedAction<Object, Object>() {
+        }).alt("[0-9]+").then(new ParamedAction<Object, Object>() {
             public Object act(Object arg, Object matched) {
                 String m = (String) matched;
                 System.out.println("F result, single value: " + m + ", arg: " + arg);
@@ -320,10 +320,10 @@ public class ParserCompilerTest extends TestCase {
      * </pre>
      */
     public void testDebugAndWarningsMsgs() {
-        Lang lang = new Lang("Test");
-        Grule A = lang.newGrule();
-        lang.defineGrule(A, CC.EOF);
-        A.define("a", "b", "c").alt("a", "b", "c");
+        Grammar lang = new Grammar("Test");
+        Grule A = lang.rule();
+        lang.when(A, CC.EOF);
+        A.when("a", "b", "c").alt("a", "b", "c");
         lang.compile();
         // System.out.println(lang.getDebugMsgs());
         assertTrue(lang.getDebugMsgs() != null);

@@ -30,7 +30,7 @@ public class IvkCountCheckAction implements Action<Object> {
         this.matchedLength = mlength;
     }
 
-    public Object act(Object matched) {
+    public Object apply(Object matched) {
         this.count++;
         if (this.count > this.limit)
             throw new RuntimeException("Action ivk count exceeds the limit, limit: " + this.limit + ", actual: " + this.count);

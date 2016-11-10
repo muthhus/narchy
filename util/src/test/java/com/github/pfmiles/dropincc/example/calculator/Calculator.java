@@ -14,7 +14,7 @@ import com.github.pfmiles.dropincc.Action;
 import com.github.pfmiles.dropincc.CC;
 import com.github.pfmiles.dropincc.Exe;
 import com.github.pfmiles.dropincc.Grule;
-import com.github.pfmiles.dropincc.Lang;
+import com.github.pfmiles.dropincc.Grammar;
 import com.github.pfmiles.dropincc.TokenDef;
 
 /**
@@ -39,60 +39,44 @@ public class Calculator {
          *          | '\\d+(\\.\\d+)?'
          * </pre>
          */
-        Lang c = new Lang("Calculator");
-        Grule expr = c.newGrule();
-        c.defineGrule(expr, CC.EOF).action(new Action<Object>() {
-            public Double act(Object matched) {
-                return (Double) ((Object[]) matched)[0];
-            }
-        });
-        TokenDef a = c.newToken("\\+");
-        Grule addend = c.newGrule();
-        expr.define(addend, CC.ks(a.or("\\-"), addend)).action(new Action<Object>() {
-            public Double act(Object matched) {
-                Object[] ms = (Object[]) matched;
-                Double a0 = (Double) ms[0];
-                Object[] aPairs = (Object[]) ms[1];
-                for (Object p : aPairs) {
-                    String op = (String) ((Object[]) p)[0];
-                    Double a = (Double) ((Object[]) p)[1];
-                    if ("+".equals(op)) {
-                        a0 += a;
-                    } else {
-                        a0 -= a;
-                    }
+        Grammar c = new Grammar("Calculator");
+        Grule expr = c.rule();
+        c.when(expr, CC.EOF).then((Action<Object>) matched -> (Double) ((Object[]) matched)[0]);
+        TokenDef a = c.the("\\+");
+        Grule addend = c.rule();
+        expr.when(addend, CC.ks(a.or("\\-"), addend)).then((Action<Object>) matched -> {
+            Object[] ms = (Object[]) matched;
+            Double a0 = (Double) ms[0];
+            Object[] aPairs = (Object[]) ms[1];
+            for (Object p : aPairs) {
+                String op = (String) ((Object[]) p)[0];
+                Double a1 = (Double) ((Object[]) p)[1];
+                if ("+".equals(op)) {
+                    a0 += a1;
+                } else {
+                    a0 -= a1;
                 }
-                return a0;
             }
+            return a0;
         });
-        TokenDef m = c.newToken("\\*");
-        Grule factor = c.newGrule();
-        addend.define(factor, CC.ks(m.or("/"), factor)).action(new Action<Object>() {
-            public Double act(Object matched) {
-                Object[] ms = (Object[]) matched;
-                Double f0 = (Double) ms[0];
-                Object[] fPairs = (Object[]) ms[1];
-                for (Object p : fPairs) {
-                    String op = (String) ((Object[]) p)[0];
-                    Double f = (Double) ((Object[]) p)[1];
-                    if ("*".equals(op)) {
-                        f0 *= f;
-                    } else {
-                        f0 /= f;
-                    }
+        TokenDef m = c.the("\\*");
+        Grule factor = c.rule();
+        addend.when(factor, CC.ks(m.or("/"), factor)).then((Action<Object>) matched -> {
+            Object[] ms = (Object[]) matched;
+            Double f0 = (Double) ms[0];
+            Object[] fPairs = (Object[]) ms[1];
+            for (Object p : fPairs) {
+                String op = (String) ((Object[]) p)[0];
+                Double f = (Double) ((Object[]) p)[1];
+                if ("*".equals(op)) {
+                    f0 *= f;
+                } else {
+                    f0 /= f;
                 }
-                return f0;
             }
+            return f0;
         });
-        factor.define("\\(", expr, "\\)").action(new Action<Object>() {
-            public Double act(Object matched) {
-                return (Double) ((Object[]) matched)[1];
-            }
-        }).alt("\\d+(\\.\\d+)?").action(new Action<Object>() {
-            public Double act(Object matched) {
-                return Double.parseDouble((String) matched);
-            }
-        });
+        factor.when("\\(", expr, "\\)").then((Action<Object>) matched -> (Double) ((Object[]) matched)[1]).alt("\\d+(\\.\\d+)?").then((Action<Object>) matched -> Double.parseDouble((String) matched));
         calc = c.compile();
     }
 

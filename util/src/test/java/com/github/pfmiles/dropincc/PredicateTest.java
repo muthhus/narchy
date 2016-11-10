@@ -29,15 +29,15 @@ public class PredicateTest extends TestCase {
      * </pre>
      */
     public void testLookAhead() {
-        Lang lang = new Lang("Test");
-        Grule A = lang.newGrule();
+        Grammar lang = new Grammar("Test");
+        Grule A = lang.rule();
 
-        lang.defineGrule(A, CC.EOF).action(new Action<Object[]>() {
-            public Integer act(Object[] matched) {
+        lang.when(A, CC.EOF).then(new Action<Object[]>() {
+            public Integer apply(Object[] matched) {
                 return (Integer) matched[0];
             }
         });
-        A.define(CC.ks("b"), "c").pred(new Predicate<Integer>() {
+        A.when(CC.ks("b"), "c").pred(new Predicate<Integer>() {
             public boolean pred(Integer arg, LookAhead la) {
                 // skip any 'b' before seeing an 'c'
                 int i = 1;
@@ -58,8 +58,8 @@ public class PredicateTest extends TestCase {
                     }
                 }
             }
-        }).action(new Action<Object>() {
-            public Integer act(Object matched) {
+        }).then(new Action<Object>() {
+            public Integer apply(Object matched) {
                 return 0;
             }
         }).alt(CC.ks("b"), "c").pred(new Predicate<Integer>() {
@@ -83,8 +83,8 @@ public class PredicateTest extends TestCase {
                     }
                 }
             }
-        }).action(new Action<Object>() {
-            public Integer act(Object matched) {
+        }).then(new Action<Object>() {
+            public Integer apply(Object matched) {
                 return 1;
             }
         });

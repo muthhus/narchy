@@ -52,7 +52,7 @@ public class Grule implements Element {
         return new OrSubRule(this, new Object[] { e });
     }
 
-    public ConstructingGrule define(Object... eles) {
+    public ConstructingGrule when(Object... eles) {
         if (eles == null || eles.length == 0)
             throw new DropinccException("Could not add empty grammar rule, if you want to add a rule alternative that matches nothing, use CC.NOTHING.");
         Element[] elements = Util.filterProductionEles(eles);

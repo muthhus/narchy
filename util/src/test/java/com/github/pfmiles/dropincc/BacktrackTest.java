@@ -29,24 +29,24 @@ public class BacktrackTest extends TestCase {
      * </pre>
      */
     public void testBasicBacktrackKs() {
-        Lang lang = new Lang("Test");
-        Grule A = lang.newGrule();
-        lang.defineGrule(A, CC.EOF);
-        Grule B = lang.newGrule();
-        A.define(CC.ks(B, "c"), B, "d");
-        B.define("b").action(new Action<Object>() {
+        Grammar lang = new Grammar("Test");
+        Grule A = lang.rule();
+        lang.when(A, CC.EOF);
+        Grule B = lang.rule();
+        A.when(CC.ks(B, "c"), B, "d");
+        B.when("b").then(new Action<Object>() {
             private int count;
 
-            public Object act(Object matched) {
+            public Object apply(Object matched) {
                 count++;
                 assertTrue(count <= 3);
                 // System.out.println("b count:" + count);
                 return matched;
             }
-        }).alt("e", B, "f").action(new Action<Object>() {
+        }).alt("e", B, "f").then(new Action<Object>() {
             private int count;
 
-            public Object act(Object matched) {
+            public Object apply(Object matched) {
                 count++;
                 assertTrue(count <= 9);
                 // System.out.println("ef count:" + count);
@@ -67,24 +67,24 @@ public class BacktrackTest extends TestCase {
      * </pre>
      */
     public void testBasicBacktrackKc() {
-        Lang lang = new Lang("Test");
-        Grule A = lang.newGrule();
-        lang.defineGrule(A, CC.EOF);
-        Grule B = lang.newGrule();
-        A.define(CC.kc(B, "c"), B, "d");
-        B.define("b").action(new Action<Object>() {
+        Grammar lang = new Grammar("Test");
+        Grule A = lang.rule();
+        lang.when(A, CC.EOF);
+        Grule B = lang.rule();
+        A.when(CC.kc(B, "c"), B, "d");
+        B.when("b").then(new Action<Object>() {
             private int count;
 
-            public Object act(Object matched) {
+            public Object apply(Object matched) {
                 count++;
                 assertTrue(count <= 3);
                 // System.out.println("b count:" + count);
                 return matched;
             }
-        }).alt("e", B, "f").action(new Action<Object>() {
+        }).alt("e", B, "f").then(new Action<Object>() {
             private int count;
 
-            public Object act(Object matched) {
+            public Object apply(Object matched) {
                 count++;
                 assertTrue(count <= 9);
                 // System.out.println("ef count:" + count);
@@ -105,24 +105,24 @@ public class BacktrackTest extends TestCase {
      * </pre>
      */
     public void testBasicBacktrackOp() {
-        Lang lang = new Lang("Test");
-        Grule A = lang.newGrule();
-        lang.defineGrule(A, CC.EOF);
-        Grule B = lang.newGrule();
-        A.define(CC.op(B, "c"), B, "d");
-        B.define("b").action(new Action<Object>() {
+        Grammar lang = new Grammar("Test");
+        Grule A = lang.rule();
+        lang.when(A, CC.EOF);
+        Grule B = lang.rule();
+        A.when(CC.op(B, "c"), B, "d");
+        B.when("b").then(new Action<Object>() {
             private int count;
 
-            public Object act(Object matched) {
+            public Object apply(Object matched) {
                 count++;
                 assertTrue(count == 1);
                 // System.out.println("b count:" + count);
                 return matched;
             }
-        }).alt("e", B, "f").action(new Action<Object>() {
+        }).alt("e", B, "f").then(new Action<Object>() {
             private int count;
 
-            public Object act(Object matched) {
+            public Object apply(Object matched) {
                 count++;
                 assertTrue(count <= 4);
                 // System.out.println("ef count:" + count);
