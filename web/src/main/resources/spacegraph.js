@@ -56,8 +56,8 @@ function spacegraph(opt) {
 //           changed = false;
 //        });
 
-    const maxNodes = 32;
-    const updatePeriodMS = 50;
+    const maxNodes = 96;
+    const updatePeriodMS = 100;
 
 
     const localPriDecay = 0.999;
@@ -65,13 +65,20 @@ function spacegraph(opt) {
     const minRad = 16.0;
     const maxRad = 256.0;
 
-    const seedRadius = 128.0;
+
+    const minThick = 1;
+    const maxThick = 16;
+
+    const seedRadius = 256.0;
     const speed = 0.5;
     const perturbed = 2;
 
     const friction = 0.01;
-    const repel = 0.5;
-    const noiseLevel = 1;
+
+    const attract = 0.1;
+    const repel = 3.5;
+
+    const noiseLevel = 0.8;
 
     setInterval(() => {
 
@@ -175,12 +182,12 @@ function spacegraph(opt) {
                 const x = e._private.data; //HACK
                 const p = x.pri;
 
-                const minWidth = 1;
-                const maxWidth = 4;
+
                 e.style({
                     'lineColor': colorFunc(0.25 + 0.75 * p, x.dur, x.qua),
-                    'width': minWidth + (maxWidth-minWidth) * Math.sqrt(p)
+                    'width': minThick + (maxThick-minThick) * Math.sqrt(p)
                 });
+
             });
 
 
@@ -192,14 +199,17 @@ function spacegraph(opt) {
                 const nni = nn[i];
                 const iv = nn[i].vel;
 
+                //FRICTION
                 var vx = iv[0] * antifriction;
                 var vy = iv[1] * antifriction;
 
+                //JITTER NOISE
                 if (noiseLevel > 0) {
                     vx += (Math.random() - 0.5) * noiseLevel;
                     vy += (Math.random() - 0.5) * noiseLevel;
                 }
 
+                //REPEL NEIGHBORS
                 const a = nni.pos;
                 for (var j = i+1; j < nnn; j++) {
                     const b = nn[j].pos;
@@ -211,6 +221,23 @@ function spacegraph(opt) {
                     vx += rr * dx;
                     vy += rr * dy;
                 }
+
+                //ATTRACT LINKS
+                for (const tl of nni.termlinks) {
+                    const target = c.get(tl.target);
+                    if (target) {
+                        const y = target._private.data;
+                        const b = y.pos;
+                        const dx = (a[0] - b[0]);
+                        const dy = (a[1] - b[1]);
+                        var dist = Math.sqrt(dx*dx + dy*dy);
+                        const rr = (1.0 + y.pri) * attract / dist
+                            // / dist; //hooks law, spring ? TODO check
+                        vx -= rr * dx;
+                        vy -= rr * dy;
+                    }
+                }
+
 
                 iv[0] = vx;
                 iv[1] = vy;
