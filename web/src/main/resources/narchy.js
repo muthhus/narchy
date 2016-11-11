@@ -8,7 +8,7 @@ function labelize(l) {
 }
 
 function MainMenuButton() {
-    return $('<div>[@]</div>').addClass('MainMenuButton').click(() => setTimeout(Menu, 0));
+    return $('<div>[@]</div>').addClass('MainMenuButton').click(() => setTimeout(menu, 0));
 }
 
 

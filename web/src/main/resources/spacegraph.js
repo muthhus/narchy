@@ -1,5 +1,6 @@
-
 "use strict";
+
+const BUDGET_EPSILON = 0.001;
 
 function uuid() {
     //Mongo _id = 12 bytes (BSON) = Math.pow(2, 12*8) = 7.922816251426434e+28 permutations
@@ -55,38 +56,28 @@ function spacegraph(opt) {
 //           changed = false;
 //        });
 
-    const maxNodes = 32;
-    const updatePeriodMS = 100;
+    const maxNodes = 128;
+    const updatePeriodMS = 50;
 
 
-    const layout = c.makeLayout({
-        /* https://github.com/cytoscape/cytoscape.js-spread */
-        name: 'spread',
-        minDist: 250,
-        //padding: 100,
+    const localPriDecay = 0.999;
 
-        speed: 0.06,
-        animate: false,
-        randomize: false, // uses random initial node positions on true
-        fit: false,
-        maxFruchtermanReingoldIterations: 1, // Maximum number of initial force-directed iterations
-        maxExpandIterations: 2, // Maximum number of expanding iterations
+    const minRad = 16.0;
+    const maxRad = 256.0;
 
-        ready: function () {
-            //console.log('starting spread', Date.now());
-        },
-        stop: function () {
-            //console.log('stop spread', Date.now());
-        }
-    });
+    const seedRadius = 128.0;
+    const speed = 0.5;
+    const perturbed = 2;
 
+    const friction = 0.01;
+    const repel = 0.5;
+    const noiseLevel = 1;
 
     setInterval(() => {
 
-        layout.run();
 
-        if (!d.changed)
-            return;
+        // if (!d.changed)
+        //     return;
 
         c.batch(() => {
 
@@ -95,39 +86,120 @@ function spacegraph(opt) {
             if (toRemove > 0) {
                 //console.log(nodes.size(), 'oversize');
                 const sorted = nodes.sort((a, b) => {
+                    if (a == b)
+                        return 0;
+
                     //increasing priority
-                    return a._private.data.pri - b._private.data.pri;
+                    let ad = a._private.data;
+                    let bd = b._private.data;
+
+                    const x = ad.pri - bd.pri;
+                    if (x <= BUDGET_EPSILON)
+                        return ad.term.localeCompare( bd.term );
+                    else
+                        return x;
                 });
 
                 for (let i = 0; i < toRemove; i++) {
                     //console.log(sorted[i], 'removed');
                     sorted[i].remove();
                 }
-                //console.log(nodes.size(), 'current size');
             }
 
+
+            const nn = new Array();
 
             nodes.each((i, n) => {
                 const x = n._private.data; //HACK
                 if (x) {
 
-                    const p1 = 1 + x.pri; // * d(x, 'belief');
-                    const r = parseInt(24 + 48 * (p1 * p1));
+                    const p = x.pri || 0; // * d(x, 'belief');
+                    x.pri *= localPriDecay;
+
+                    const r =
+                            minRad + (maxRad-minRad) * Math.sqrt( p )  //for pi^2 area
+                        ;
+
+                    const ri = 1 + parseInt(r);
+
+                    let pos = x.pos;
+                    if (!pos) {
+                        //initialization
+                        x.pos = pos = [ (Math.random()-0.5)*seedRadius, (Math.random()-0.5)*seedRadius ];
+                        x.vel = [0.0,0.0];
+                    } else {
+                        const vispos = n.position();
+
+                        const px = pos[0];
+                        const py = pos[1];
+
+                        if ((Math.abs(vispos.x - px) > perturbed) || (Math.abs(vispos.y - py) > perturbed)) {
+                            //interaction overrides
+                            pos[0] = vispos.x;
+                            pos[1] = vispos.y;
+                        } else {
+
+                            //pos.x = (pos.x * (1.0 - speed) + vispos.x * speed) + x.vel[0];
+                            //pos.y = (pos.y * (1.0 - speed) + vispos.y * speed) + x.vel[1];
+                            pos[0] = (px * (1.0 - speed) + (px + x.vel[0]) * speed);
+                            pos[1] = (py * (1.0 - speed) + (py + x.vel[1]) * speed);
+
+                        }
+
+                    }
+
                     n.style({
                         //                       sg.spacegraph.style().selector('node')
                         //                       .style('background-color', function(x) {
                         //                           const belief = 0.25 + 0.75 * d(x, 'belief');
                         //                           const aBelief = 0.25 + 0.75 * Math.abs(belief);
                         //                           const pri = 0.25 + 0.75 * d(x, 'pri');
-                        width: r,
-                        height: r,
+                        width: ri,
+                        height: ri,
+                        fontSize: 1 + parseInt(r/10.0),
                         shape: 'hexagon',
-                        backgroundColor: colorFunc(0.25 + 0.75 * x.pri, x.dur, x.qua)
-
+                        backgroundColor: colorFunc(0.25 + 0.75 * p, x.dur, x.qua),
+                        //position: n.position() || [ Math.random() * 10, Math.random() * 10]
 
                     });
+                    n.position({ x: parseInt(pos[0]), y: parseInt(pos[1]) }); //pos);
+
+                    nn.push(x);
+
                 }
             });
+
+
+            const antifriction = (1.0-friction);
+            const nnn = nn.length;
+
+            for (var i = 0; i < nnn; i++) {
+
+                const nni = nn[i];
+                const iv = nn[i].vel;
+
+                var vx = iv[0] * antifriction;
+                var vy = iv[1] * antifriction;
+
+                if (noiseLevel > 0) {
+                    vx += (Math.random() - 0.5) * noiseLevel;
+                    vy += (Math.random() - 0.5) * noiseLevel;
+                }
+
+                const a = nni.pos;
+                for (var j = i+1; j < nnn; j++) {
+                    const b = nn[j].pos;
+
+                    const dx = (a[0] - b[0]);
+                    const dy = (a[1] - b[1]);
+                    var distsq = dx*dx + dy*dy;
+                    vx += repel/distsq * dx;
+                    vy += repel/distsq * dy;
+                }
+
+                iv[0] = vx;
+                iv[1] = vy;
+            }
         });
 
         d.changed = false;
@@ -345,7 +417,7 @@ function updateWidget(node) {
     //TODO non-String way to do this
     //var matb = 0, matc = 0;
     //style.transform = 'matrix(' + wx+ ',' + 0/*matb*/ + ',' + 0/*matc*/ + ',' + wy + ',' + px + ',' + py + ')';;
-    style.transform = 'matrix(' + wx+ ',0,0,' + wy + ',' + px + ',' + py + ')';;
+    style.transform = 'matrix(' + wx+ ',0,0,' + wy + ',' + px + ',' + py + ')';
 }
 
 

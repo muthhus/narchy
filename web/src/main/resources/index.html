@@ -29,7 +29,8 @@
     <link rel="stylesheet" href="index.jsoneditor.css"/>
 
     <script src="lib/cytoscape/dist/cytoscape.min.js"></script>
-    <script src="cytoscape-spread/cytoscape-spread.js"></script>
+
+    <script src="lib/vivagraph/dist/vivagraph.min.js"></script>
 
     <link rel="stylesheet" href="lib/codemirror/lib/codemirror.css">
     <script src="lib/codemirror/lib/codemirror.js"></script>
@@ -63,12 +64,12 @@
                     type: 'column',
                     content: [
                         { componentName: 'graph', type: 'component', componentState: {} },
-                        { componentName: 'terminal', type: 'component' },
 
                         {
                             type: 'column',
                             content: [
-                                { componentName: 'options', type: 'component' },
+                                { componentName: 'terminal', type: 'component' },
+                                //{ componentName: 'options', type: 'component' },
                                 //{ componentName: 'edit', type: 'component' },
                                 { componentName: 'input', type: 'component' }
                             ]
@@ -333,7 +334,7 @@
             const label = x.term + x.punc + truthString(x.freq, x.conf);
 
             //const fontSize = 2 * (1 + parseInt(x.pri * 99.0)) + '%';
-            const fontSize = (75 + 8 * Math.sqrt(1 + 10 * parseInt(x.pri * 9.0))) + '%';
+            const fontSize = parseInt(15 + 4 * /*Math.sqrt*/(1 + 10 * x.pri * 9.0)) + '%';
 
 
             const d = document.createElement('div');
