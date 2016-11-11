@@ -148,7 +148,8 @@ function menu() {
             //.degreeCentralityNormalized();
             //.pageRank();
 
-            cc.nodes().each((i, n) => {
+            cc.nodes().each((n, i) => {
+
 
                 var v = //1 / Math.pow(pr.rank(n), 2);
                     pr.closeness(n);
@@ -218,7 +219,7 @@ function menu() {
         }
     }
 
-    c.nodes().each((i, v) => onAdd(v));
+    c.nodes().each((v, i) => onAdd(v));
     c.on('add', /* select unselect  */ function (e) {
         onAdd(e.cyTarget);
     });
@@ -244,7 +245,7 @@ function menu() {
 
     c.on('position style data', /* select unselect  */ function (e) {
 
-        const node = e.cyTarget;
+        const node = e.target;
         const data = node._private.data;
         if (data && data.widget) {
             updateWidget(node);

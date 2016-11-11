@@ -135,7 +135,7 @@ function spacegraph(opt) {
             const nn = new Array();
 
 
-            nodes.each((i, n) => {
+            nodes.each((n, i) => {
                 const x = n._private.data; //HACK
                 if (x) {
                     nn.push(x);
@@ -201,7 +201,7 @@ function spacegraph(opt) {
             });
 
 
-            c.edges().each((i, e) => {
+            c.edges().each((e, i) => {
                 const x = e._private.data; //HACK
                 const p = x.pri;
 
@@ -408,29 +408,25 @@ function updateWidget(node) {
     const widget = (data.widget[0]) ? data.widget[0] : data.widget; //HACK un-querify
 
      //unjquery-ify
-    var pixelScale=widget.pixelScale,
-        minPixels= widget.minPixels;
+    var minPixels= widget.minPixels;
 
-    pixelScale = parseFloat(pixelScale) || 1.0; //# pixels wide
-
-    var pw, ph;
-
+    const pixelScale = parseFloat(widget.pixelScale || 128.0); //# pixels wide
 
     var pos = node.renderedPosition();
 
-    try {
-        pw = parseFloat(node.renderedWidth());
-        ph = parseFloat(node.renderedHeight());
-    }
-    catch (e) {
-        console.error(e);
-        return;
+    const bb = node.renderedBoundingBox({
+        includeNodes: true,
+        useCache: true,
+        includeOverlays: false,
+        includeShadows: false,
+        includeEdges: false,
+        includeLabels: false
+    });
+    const pw = parseFloat(bb.w); //parseFloat(node.renderedWidth());
+    const ph = parseFloat(bb.h); //parseFloat(node.renderedHeight());
 
-    }
 
-
-
-    var scale = parseFloat(widget.scale) || 0.75;
+    var scale = parseFloat(widget.scale || 0.75);
 
     var cw, ch;
     var narrower = parseInt(pixelScale);
@@ -455,8 +451,10 @@ function updateWidget(node) {
         widget.specWidth = style.width = cw;
         widget.specHeight = style.height = ch;
 
-        cw = hcw;
-        ch = hch;
+
+        // cw = hcw;
+        // ch = hch;
+
     }
     if (minPixels) {
         var hidden = ('none' === style.display);
