@@ -22,15 +22,15 @@ import nars.util.TaskStatistics;
 import org.jetbrains.annotations.NotNull;
 import spacegraph.Surface;
 import spacegraph.math.v2;
-import spacegraph.obj.ConsoleSurface;
-import spacegraph.obj.MatrixView;
+import spacegraph.obj.widget.ConsoleSurface;
+import spacegraph.obj.widget.MatrixView;
 
 import java.io.IOException;
 
 import static nars.experiment.tetris.impl.TetrisState.*;
 import static spacegraph.SpaceGraph.window;
 import static spacegraph.obj.ControlSurface.newControlWindow;
-import static spacegraph.obj.GridSurface.grid;
+import static spacegraph.obj.layout.Grid.grid;
 
 /**
  * Created by me on 7/28/16.

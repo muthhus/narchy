@@ -1,13 +1,13 @@
-package spacegraph.obj;
+package spacegraph.obj.layout;
 
 import spacegraph.Surface;
 
 /**
  * TODO
  */
-public class LayerSurface extends LayoutSurface {
+public class Stacking extends Layout {
 
-    public LayerSurface(Surface... children) {
+    public Stacking(Surface... children) {
         super(children);
     }
 

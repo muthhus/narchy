@@ -16,7 +16,7 @@ public class Facial implements WindowListener, KeyListener, MouseListener {
 
     boolean visible;
 
-    final Finger finger;
+    final Finger mouse;
 
 
 //    public static void main(String[] args) {
@@ -31,7 +31,7 @@ public class Facial implements WindowListener, KeyListener, MouseListener {
 
     public Facial(Surface surface) {
         this.surface = surface;
-        this.finger = new Finger(surface);
+        this.mouse = new Finger(surface);
     }
 
     public Facial move(float x, float y) {
@@ -107,7 +107,7 @@ public class Facial implements WindowListener, KeyListener, MouseListener {
 
     @Override
     public void windowLostFocus(WindowEvent e) {
-
+        updateMouse(null);
     }
 
     @Override
@@ -132,41 +132,41 @@ public class Facial implements WindowListener, KeyListener, MouseListener {
 
     @Override
     public void mouseEntered(MouseEvent e) {
-        update(e);
+        updateMouse(e);
     }
 
     @Override
     public void mouseExited(MouseEvent e) {
-        update(null);
+        updateMouse(null);
     }
 
     @Override
     public void mousePressed(MouseEvent e) {
-        update(e);
+        updateMouse(e);
     }
 
     @Override
     public void mouseReleased(MouseEvent e) {
-        update(e);
+        updateMouse(e);
     }
 
     @Override
     public void mouseMoved(MouseEvent e) {
-        update(e);
+        updateMouse(e);
     }
 
     @Override
     public void mouseDragged(MouseEvent e) {
-        update(e);
+        updateMouse(e);
     }
 
-    private void update(@Nullable MouseEvent e) {
+    private void updateMouse(@Nullable MouseEvent e) {
         if (e == null) {
-            finger.off();
+            mouse.off();
         } else {
             float x = ((float) e.getX()) / window.getWidth();
             float y = 1f - ((float) e.getY()) / window.getHeight();
-            finger.on(v(x, y), e.getButtonsDown());
+            mouse.on(v(x, y), e.getButtonsDown());
         }
     }
 

@@ -1,13 +1,18 @@
-package spacegraph.obj;
+package spacegraph.obj.widget;
 
 import com.jogamp.opengl.GL2;
 import org.apache.commons.lang3.mutable.MutableFloat;
+import org.jetbrains.annotations.NotNull;
 import spacegraph.Facial;
 import spacegraph.SpaceGraph;
+import spacegraph.Surface;
 import spacegraph.math.v2;
+import spacegraph.obj.CrosshairSurface;
+import spacegraph.obj.layout.Grid;
+import spacegraph.obj.RectWidget;
 import spacegraph.render.Draw;
 
-import static spacegraph.obj.GridSurface.col;
+import static spacegraph.obj.layout.Grid.col;
 
 /**
  * Generic 1D slider/scrollbar
@@ -18,6 +23,8 @@ public class Slider extends Widget {
     public final MutableFloat min;
     public final MutableFloat max;
 
+    /** the tangible area of the slider */
+    public final Surface pad;
 
     public Slider(float v, float min, float max) {
         this(new MutableFloat(v), new MutableFloat(min), new MutableFloat(max));
@@ -27,6 +34,58 @@ public class Slider extends Widget {
         this.value = value;
         this.min = min;
         this.max = max;
+
+
+        this.pad = new Surface() {
+
+            @Override
+            protected void paint(GL2 gl) {
+
+
+
+                float p = value();
+                //float margin = 0.1f;
+                //float mh = margin / 2.0f;
+
+                float W = 1;
+                float H = 1;
+
+                //gl.glLineWidth(mh * 2);
+                //gl.glColor3f(0.5f, 0.5f, 0.5f);
+                //ShapeDrawer.strokeRect(gl, 0, 0, W, H);
+
+                //double hp = 0.5 + 0.5 * p;
+                gl.glColor4f(1f - p, p, 0f, 0.8f);
+                //g1.setFill(Color.ORANGE.deriveColor(70 * (p - 0.5), hp, 0.65f, 1.0f));
+
+                float barSize = W * p;
+                //ShapeDrawer.rect(gl, mh/2, mh/2f, barSize - mh, H - mh);
+                Draw.rect(gl, 0, 0, barSize, H);
+            }
+
+
+            @Override
+            protected boolean onTouching(v2 hitPoint, short[] buttons) {
+                super.onTouching(hitPoint, buttons);
+
+                if (leftButton(buttons)) {
+                    //System.out.println(this + " touched " + hitPoint + " " + Arrays.toString(buttons));
+
+                    value.setValue(r(value(hitPoint)));
+
+                    return true;
+                }
+                return false;
+            }
+
+
+        };
+    }
+
+
+    @Override
+    protected @NotNull Surface content() {
+        return pad;
     }
 
     //    public static void main(String[] args) {
@@ -41,8 +100,8 @@ public class Slider extends Widget {
     public static void main(String[] args) {
         SpaceGraph<?> s = new SpaceGraph();
         s.add( new RectWidget(
-                new GridSurface(
-                    new GridSurface(
+                new Grid(
+                    new Grid(
                         new XYSlider(), new XYSlider(), new XYSlider()
                     ),
                     col(
@@ -64,46 +123,6 @@ public class Slider extends Widget {
 
     public float value() {
         return value.floatValue();
-    }
-
-    @Override
-    protected void paintComponent(GL2 gl) {
-
-
-
-        float p = value();
-        //float margin = 0.1f;
-        //float mh = margin / 2.0f;
-
-        float W = 1;
-        float H = 1;
-
-        //gl.glLineWidth(mh * 2);
-        //gl.glColor3f(0.5f, 0.5f, 0.5f);
-        //ShapeDrawer.strokeRect(gl, 0, 0, W, H);
-
-        //double hp = 0.5 + 0.5 * p;
-        gl.glColor3f(0.9f, 0.2f, 0f);
-        //g1.setFill(Color.ORANGE.deriveColor(70 * (p - 0.5), hp, 0.65f, 1.0f));
-
-        float barSize = W * p;
-        //ShapeDrawer.rect(gl, mh/2, mh/2f, barSize - mh, H - mh);
-        Draw.rect(gl, 0, 0, barSize, H);
-    }
-
-
-    @Override
-    protected boolean onTouching(v2 hitPoint, short[] buttons) {
-        super.onTouching(hitPoint, buttons);
-
-        if (leftButton(buttons)) {
-            //System.out.println(this + " touched " + hitPoint + " " + Arrays.toString(buttons));
-
-            value.setValue(r(value(hitPoint)));
-
-            return true;
-        }
-        return false;
     }
 
 

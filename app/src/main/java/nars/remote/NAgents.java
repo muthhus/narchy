@@ -36,7 +36,7 @@ import java.util.stream.Stream;
 
 import static nars.$.t;
 import static spacegraph.SpaceGraph.window;
-import static spacegraph.obj.GridSurface.grid;
+import static spacegraph.obj.layout.Grid.grid;
 
 /**
  * Created by me on 9/19/16.

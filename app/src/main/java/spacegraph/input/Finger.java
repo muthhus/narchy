@@ -3,7 +3,7 @@ package spacegraph.input;
 import org.jetbrains.annotations.Nullable;
 import spacegraph.Surface;
 import spacegraph.math.v2;
-import spacegraph.obj.Widget;
+import spacegraph.obj.widget.Widget;
 
 import static java.lang.System.arraycopy;
 import static java.util.Arrays.fill;
@@ -25,7 +25,7 @@ public class Finger {
     //TODO wheel state
 
     /** widget above which this finger currently hovers */
-    Widget touching = null;
+    @Nullable Widget touching = null;
 
     public Finger(Surface root) {
         this.root = root;

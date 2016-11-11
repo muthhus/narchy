@@ -7,6 +7,9 @@ import org.apache.commons.lang3.mutable.MutableFloat;
 import spacegraph.Facial;
 import spacegraph.SpaceGraph;
 import spacegraph.Surface;
+import spacegraph.obj.layout.Grid;
+import spacegraph.obj.widget.Label;
+import spacegraph.obj.widget.LabeledPane;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -16,7 +19,7 @@ import java.util.IdentityHashMap;
 /**
  * Generic widget control panel for arbitrary POJOs
  */
-public class ControlSurface extends PanelSurface {
+public class ControlSurface extends LabeledPane {
 
     private static final int DEFAULT_DEPTH = 2;
     /** the object being controlled */
@@ -47,7 +50,7 @@ public class ControlSurface extends PanelSurface {
     }
 
     public ControlSurface(Object label, Object o, int maxDepth, IdentityHashMap built) {
-        super(label.toString(), new GridSurface());
+        super(label.toString(), new Grid());
 
         this.built = built == null ?  new IdentityHashMap() : built;
 
@@ -78,17 +81,17 @@ public class ControlSurface extends PanelSurface {
         } else if (v instanceof Iterable) {
             return build((Iterable)v, remainingDepth, built);
         } else if (v.getClass().isPrimitive()) {
-            return new LabelSurface(k.toString());
+            return new Label(k.toString());
         } else {
             if (v == o) {
-                return new GridSurface(children(o, remainingDepth, built));
+                return new Grid(children(o, remainingDepth, built));
             } else if (remainingDepth > 1) {
                 return new ControlSurface(k, v, remainingDepth, built);
             }
         }
 
         //else..
-        return new LabelSurface(k + ":" + v);
+        return new Label(k + ":" + v);
 
 
 
@@ -107,7 +110,7 @@ public class ControlSurface extends PanelSurface {
         //
         // return new SliderSurface(0.5f, 0, 1);
 
-        return new LabelSurface(k + " " + Texts.n4(f.floatValue()));
+        return new Label(k + " " + Texts.n4(f.floatValue()));
 //        int ki = 0;
 //        for (Object x : c) {
 //            g.children.add(build(ki, x, remainingDepth, built));
@@ -117,7 +120,7 @@ public class ControlSurface extends PanelSurface {
     }
 
     private Surface build(Iterable c, int remainingDepth, IdentityHashMap built) {
-        GridSurface g = new GridSurface();
+        Grid g = new Grid();
         int ki = 0;
         for (Object x : c) {
             g.children.add(build(ki, x, remainingDepth, built));
@@ -180,7 +183,7 @@ public class ControlSurface extends PanelSurface {
 
     private Surface field(int remainingDepth, Object k, Object v, IdentityHashMap built) {
         if (v == null)
-            return new LabelSurface("null");
+            return new Label("null");
         if (alreadyAdded(remainingDepth, v, built)) return null;
         return build(k, v, remainingDepth, built);
     }

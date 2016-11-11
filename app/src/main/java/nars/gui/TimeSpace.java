@@ -16,7 +16,7 @@ import spacegraph.SpaceGraph;
 import spacegraph.Spatial;
 import spacegraph.layout.Flatten;
 import spacegraph.obj.RectWidget;
-import spacegraph.obj.XYSlider;
+import spacegraph.obj.widget.XYSlider;
 
 import java.util.*;
 import java.util.function.Function;

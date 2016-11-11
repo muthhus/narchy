@@ -11,7 +11,7 @@ import nars.truth.TruthWave;
 import spacegraph.Facial;
 import spacegraph.SpaceGraph;
 import spacegraph.Surface;
-import spacegraph.obj.GridSurface;
+import spacegraph.obj.layout.Grid;
 import spacegraph.render.Draw;
 
 import java.util.Collection;
@@ -22,7 +22,7 @@ import java.util.function.BiFunction;
 import static java.lang.Math.PI;
 import static java.util.stream.Collectors.toList;
 import static nars.time.Tense.ETERNAL;
-import static spacegraph.obj.GridSurface.VERTICAL;
+import static spacegraph.obj.layout.Grid.VERTICAL;
 
 
 public class BeliefTableChart extends Surface {
@@ -91,7 +91,7 @@ public class BeliefTableChart extends Surface {
         List<Surface> actionTables = beliefTableCharts(nar, terms, window);
 
 
-        new SpaceGraph().add(new Facial(new GridSurface(VERTICAL, actionTables)).maximize()).show(800,600);
+        new SpaceGraph().add(new Facial(new Grid(VERTICAL, actionTables)).maximize()).show(800,600);
     }
 
     public static List<Surface> beliefTableCharts(NAR nar, Collection<? extends Termed> terms, long window) {

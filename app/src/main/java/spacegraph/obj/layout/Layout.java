@@ -1,4 +1,4 @@
-package spacegraph.obj;
+package spacegraph.obj.layout;
 
 import com.google.common.collect.Lists;
 import spacegraph.Surface;
@@ -8,14 +8,14 @@ import java.util.List;
 /**
  * Created by me on 7/20/16.
  */
-abstract public class LayoutSurface extends Surface {
+abstract public class Layout extends Surface {
 
 
-    public LayoutSurface(Surface... children) {
+    public Layout(Surface... children) {
         this(Lists.newArrayList(children));
     }
 
-    public LayoutSurface(List<Surface> children) {
+    public Layout(List<Surface> children) {
         setChildren(children);
     }
 

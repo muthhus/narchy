@@ -1,4 +1,4 @@
-package spacegraph.obj;
+package spacegraph.obj.layout;
 
 import com.google.common.collect.Iterables;
 import org.apache.commons.lang3.mutable.MutableFloat;
@@ -12,7 +12,7 @@ import java.util.List;
     aspect ratio=+inf: col (x)
                  else: grid( %x, %(ratio * x) )
  */
-public class GridSurface extends LayoutSurface {
+public class Grid extends Layout {
 
     private final MutableFloat aspect = new MutableFloat(0f);
 
@@ -20,21 +20,21 @@ public class GridSurface extends LayoutSurface {
     public static final float VERTICAL = Float.POSITIVE_INFINITY;
     public static final float SQUARE = 0.5f;
 
-    public GridSurface(Surface... children) {
+    public Grid(Surface... children) {
         this(SQUARE, children);
     }
 
-    public GridSurface(List<Surface> children) {
+    public Grid(List<Surface> children) {
         this(SQUARE, children);
     }
 
-    public GridSurface(float aspect, Surface... children) {
+    public Grid(float aspect, Surface... children) {
         super();
         this.aspect.setValue(aspect);
         setChildren(children);
     }
 
-    public GridSurface(float aspect, List<Surface> children) {
+    public Grid(float aspect, List<Surface> children) {
         super();
         this.aspect.setValue(aspect);
         setChildren(children);
@@ -120,18 +120,18 @@ public class GridSurface extends LayoutSurface {
     }
 
 
-    public static GridSurface grid(Iterable<Surface> content) {
+    public static Grid grid(Iterable<Surface> content) {
         return grid( Iterables.toArray(content, Surface.class ) );
     }
 
-    public static GridSurface grid(Surface... content) {
-        return new GridSurface(content);
+    public static Grid grid(Surface... content) {
+        return new Grid(content);
     }
 
-    public static GridSurface row(Collection<Surface> content) {
+    public static Grid row(Collection<Surface> content) {
         return row(array(content));
     }
-    public static GridSurface col(Collection<Surface> content) {
+    public static Grid col(Collection<Surface> content) {
         return col(array(content));
     }
 
@@ -139,11 +139,11 @@ public class GridSurface extends LayoutSurface {
         return content.toArray(new Surface[content.size()]);
     }
 
-    public static GridSurface row(Surface... content) {
-        return new GridSurface(HORIZONTAL, content);
+    public static Grid row(Surface... content) {
+        return new Grid(HORIZONTAL, content);
     }
-    public static GridSurface col(Surface... content) {
-        return new GridSurface(VERTICAL, content);
+    public static Grid col(Surface... content) {
+        return new Grid(VERTICAL, content);
     }
 
 }

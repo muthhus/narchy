@@ -13,9 +13,9 @@ import org.jetbrains.annotations.Nullable;
 import spacegraph.Facial;
 import spacegraph.SpaceGraph;
 import spacegraph.Surface;
-import spacegraph.obj.ConsoleSurface;
-import spacegraph.obj.GridSurface;
-import spacegraph.obj.LayerSurface;
+import spacegraph.obj.widget.ConsoleSurface;
+import spacegraph.obj.layout.Grid;
+import spacegraph.obj.layout.Stacking;
 import spacegraph.render.Draw;
 
 
@@ -82,7 +82,7 @@ public class STMView  {
         final float maxVolume = 64;
 
         s.add(new Facial(
-                    new GridSurface(
+                    new Grid(
                         inputBagChart = new BagChart<Task>(stm.input, -1) {
                             @Override
                             protected ItemVis<BLink<Task>> newItem(BLink<Task> i) {
@@ -98,7 +98,7 @@ public class STMView  {
                         },
 
 
-                        new LayerSurface(
+                        new Stacking(
                             new ConsoleSurface(new TopicTerminal<Task>(
                                 stm.generate,
                                     (Task t) -> t.toStringWithoutBudget(),

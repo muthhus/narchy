@@ -10,14 +10,14 @@ import nars.term.Term;
 import nars.util.Util;
 import nars.util.signal.Autoencoder;
 import spacegraph.Surface;
-import spacegraph.obj.MatrixView;
+import spacegraph.obj.widget.MatrixView;
 
 import java.util.Arrays;
 import java.util.function.Consumer;
 
 import static nars.truth.TruthFunctions.w2c;
 import static nars.video.CameraSensor.coord;
-import static spacegraph.obj.GridSurface.col;
+import static spacegraph.obj.layout.Grid.col;
 
 /**
  * Created by me on 9/22/16.

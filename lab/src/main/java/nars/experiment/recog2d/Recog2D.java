@@ -11,15 +11,13 @@ import nars.gui.BeliefTableChart;
 import nars.remote.NAgents;
 import nars.time.Tense;
 import nars.truth.Truth;
-import nars.util.Texts;
 import nars.util.Util;
 import nars.video.PixelBag;
-import nars.video.Scale;
 import nars.video.Sensor2D;
 import spacegraph.SpaceGraph;
 import spacegraph.Surface;
-import spacegraph.obj.GridSurface;
-import spacegraph.obj.Plot2D;
+import spacegraph.obj.layout.Grid;
+import spacegraph.obj.widget.Plot2D;
 import spacegraph.render.Draw;
 
 import java.awt.*;
@@ -29,8 +27,8 @@ import java.util.*;
 import java.util.List;
 
 import static nars.util.Texts.n2;
-import static spacegraph.obj.GridSurface.col;
-import static spacegraph.obj.GridSurface.row;
+import static spacegraph.obj.layout.Grid.col;
+import static spacegraph.obj.layout.Grid.row;
 
 /**
  * Created by me on 10/8/16.
@@ -118,7 +116,7 @@ public class Recog2D extends NAgents {
 
         int history = 1024;
 
-        GridSurface g = col(
+        Grid g = col(
 
                 row(BeliefTableChart.beliefTableCharts(nar, out.keySet(), 1024)),
 

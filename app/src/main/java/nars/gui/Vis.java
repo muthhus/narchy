@@ -22,34 +22,39 @@ import spacegraph.SpaceGraph;
 import spacegraph.Surface;
 import spacegraph.math.Color3f;
 import spacegraph.obj.*;
+import spacegraph.obj.layout.Grid;
+import spacegraph.obj.layout.Stacking;
+import spacegraph.obj.widget.Label;
+import spacegraph.obj.widget.LabeledPane;
+import spacegraph.obj.widget.Plot2D;
 import spacegraph.render.Draw;
 
 import java.util.List;
 
 import static java.util.stream.Collectors.toList;
-import static spacegraph.obj.GridSurface.*;
+import static spacegraph.obj.layout.Grid.*;
 
 /**
  * SpaceGraph-based visualization utilities for NAR analysis
  */
 public class Vis {
     public static void newBeliefChartWindow(NAgent narenv, long window) {
-        GridSurface chart = agentActions(narenv, window);
+        Grid chart = agentActions(narenv, window);
         new SpaceGraph().add(new Facial(chart).maximize()).show(800, 600);
     }
 
     public static void newBeliefChartWindow(NAR nar, long window, Term... t) {
-        GridSurface chart = agentActions(nar, Lists.newArrayList(t), window);
+        Grid chart = agentActions(nar, Lists.newArrayList(t), window);
         new SpaceGraph().add(new Facial(chart).maximize()).show(800, 600);
     }
 
     public static void newBeliefChartWindow(NAR nar, long window, List<? extends Termed> t) {
-        GridSurface chart = agentActions(nar, t, window);
+        Grid chart = agentActions(nar, t, window);
         new SpaceGraph().add(new Facial(chart).maximize()).show(800, 600);
     }
 
 
-    public static GridSurface agentActions(NAR nar, Iterable<? extends Termed> cc, long window) {
+    public static Grid agentActions(NAR nar, Iterable<? extends Termed> cc, long window) {
         long[] btRange = new long[2];
         nar.onFrame(nn -> {
             long now = nn.time();
@@ -61,10 +66,10 @@ public class Vis {
             actionTables.add(new BeliefTableChart(nar, c, btRange));
         }
 
-        return new GridSurface(VERTICAL, actionTables);
+        return new Grid(VERTICAL, actionTables);
     }
 
-    public static GridSurface agentActions(NAgent a, long window) {
+    public static Grid agentActions(NAgent a, long window) {
         NAR nar = a.nar;
         long[] btRange = new long[2];
         nar.onFrame(nn -> {
@@ -76,7 +81,7 @@ public class Vis {
         s.add(new BeliefTableChart(nar, a.happy, btRange));
         s.add(new BeliefTableChart(nar, a.joy, btRange));
 
-        return new GridSurface(s);
+        return new Grid(s);
     }
 
     public static void show(Default d) {
@@ -199,7 +204,7 @@ public class Vis {
 
         double[] d = new double[bins];
         return //new GridSurface(VERTICAL,
-                PanelSurface.of("Concept Priority Distribution (0..1)", new HistogramChart(
+                LabeledPane.of("Concept Priority Distribution (0..1)", new HistogramChart(
                         ()->bag.priHistogram(d), new Color3f(0.5f, 0.25f, 0f), new Color3f(1f, 0.5f, 0.1f)));
 
 //                PanelSurface.of("Concept Durability Distribution (0..1)", new HistogramChart(nar, c -> {
@@ -210,10 +215,10 @@ public class Vis {
 
     }
 
-    public static GridSurface conceptLinePlot(NAR nar, Iterable<? extends Termed> concepts, int plotHistory, FloatFunction<Termed> value) {
+    public static Grid conceptLinePlot(NAR nar, Iterable<? extends Termed> concepts, int plotHistory, FloatFunction<Termed> value) {
 
         //TODO make a lambda Grid constructor
-        GridSurface grid = new GridSurface();
+        Grid grid = new Grid();
         List<Plot2D> plots = $.newArrayList();
         for (Termed t : concepts) {
             Plot2D p = new Plot2D(plotHistory, Plot2D.Line /*BarWave*/);
@@ -230,10 +235,10 @@ public class Vis {
         return grid;
     }
 
-    public static GridSurface conceptLinePlot(NAR nar, Iterable<? extends Termed> concepts, int plotHistory) {
+    public static Grid conceptLinePlot(NAR nar, Iterable<? extends Termed> concepts, int plotHistory) {
 
         //TODO make a lambda Grid constructor
-        GridSurface grid = new GridSurface();
+        Grid grid = new Grid();
         List<Plot2D> plots = $.newArrayList();
         for (Termed t : concepts) {
             Plot2D p = new Plot2D(plotHistory, Plot2D.Line /*BarWave*/);
@@ -254,12 +259,12 @@ public class Vis {
     }
 
 
-    public static GridSurface agentBudgetPlot(NAgent t, int history) {
+    public static Grid agentBudgetPlot(NAgent t, int history) {
         return conceptLinePlot(t.nar,
                 Iterables.concat(t.actions, Lists.newArrayList(t.happy, t.joy)), history);
     }
 
-    public static GridSurface emotionPlots(NAR nar, int plotHistory) {
+    public static Grid emotionPlots(NAR nar, int plotHistory) {
 //        Plot2D plot = new Plot2D(plotHistory, Plot2D.Line);
 //        plot.add("Rwrd", reward);
 
@@ -292,12 +297,12 @@ public class Vis {
         return col(plot1, plot2, plot3, plot4);
     }
 
-    public static Surface label(String text) {
-        return new LabelSurface(text);
+    public static Label label(String text) {
+        return new Label(text);
     }
 
     /** ordering: first is underneath, last is above */
-    public static Surface stacking(Surface... s) {
-        return new LayerSurface(s);
+    public static Stacking stacking(Surface... s) {
+        return new Stacking(s);
     }
 }

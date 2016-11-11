@@ -1,4 +1,4 @@
-package spacegraph.obj;
+package spacegraph.obj.widget;
 
 import com.jogamp.opengl.GL2;
 import org.slf4j.Logger;

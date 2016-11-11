@@ -1,4 +1,4 @@
-package spacegraph.obj;
+package spacegraph.obj.widget;
 
 import com.jogamp.opengl.GL2;
 import spacegraph.Surface;
@@ -7,12 +7,12 @@ import spacegraph.render.Draw;
 /**
  * Created by me on 7/29/16.
  */
-public class LabelSurface extends Surface {
+public class Label extends Surface {
 
     private String value = "";
     float fontScale;
 
-    public LabelSurface(String s) {
+    public Label(String s) {
         super();
         set(s);
     }

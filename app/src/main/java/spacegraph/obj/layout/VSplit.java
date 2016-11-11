@@ -1,19 +1,20 @@
-package spacegraph.obj;
+package spacegraph.obj.layout;
 
 import spacegraph.Surface;
+import spacegraph.obj.layout.Layout;
 
 /**
  * Splits a surface into a top and bottom vertical column
  */
-public class VSurface extends LayoutSurface {
+public class VSplit extends Layout {
 
     public float proportion; //0.5f = middle, 0.0 = all top, 1.0 = all bottom
 
-    public VSurface(Surface top, Surface bottom) {
+    public VSplit(Surface top, Surface bottom) {
         this(top, bottom, 0.5f);
     }
 
-    public VSurface(Surface top, Surface bottom, float proportion) {
+    public VSplit(Surface top, Surface bottom, float proportion) {
         super(top, bottom);
         this.proportion = proportion;
     }

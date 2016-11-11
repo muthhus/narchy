@@ -1,4 +1,4 @@
-package spacegraph.obj;
+package spacegraph.obj.widget;
 
 import com.googlecode.lanterna.TerminalPosition;
 import com.googlecode.lanterna.TextCharacter;
@@ -14,6 +14,7 @@ import com.jogamp.opengl.util.gl2.GLUT;
 import nars.util.Util;
 import spacegraph.SpaceGraph;
 import spacegraph.Surface;
+import spacegraph.obj.RectWidget;
 import spacegraph.render.Draw;
 
 import java.io.IOException;

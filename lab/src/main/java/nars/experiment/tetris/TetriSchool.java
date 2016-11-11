@@ -7,15 +7,15 @@ import nars.nar.Alann;
 import spacegraph.Facial;
 import spacegraph.SpaceGraph;
 import spacegraph.Surface;
-import spacegraph.obj.ConsoleSurface;
+import spacegraph.obj.widget.ConsoleSurface;
 import spacegraph.obj.CrosshairSurface;
-import spacegraph.obj.Slider;
+import spacegraph.obj.widget.Slider;
 
 import static nars.gui.Vis.label;
 import static nars.gui.Vis.stacking;
-import static spacegraph.obj.GridSurface.col;
-import static spacegraph.obj.GridSurface.grid;
-import static spacegraph.obj.GridSurface.row;
+import static spacegraph.obj.layout.Grid.col;
+import static spacegraph.obj.layout.Grid.grid;
+import static spacegraph.obj.layout.Grid.row;
 
 /**
  * Created by me on 11/11/16.

@@ -7,15 +7,15 @@ import nars.util.signal.OneDHaar;
 import org.eclipse.collections.impl.list.mutable.primitive.FloatArrayList;
 import spacegraph.SpaceGraph;
 import spacegraph.Surface;
-import spacegraph.obj.GridSurface;
-import spacegraph.obj.MatrixView;
-import spacegraph.obj.Plot2D;
+import spacegraph.obj.layout.Grid;
+import spacegraph.obj.widget.MatrixView;
+import spacegraph.obj.widget.Plot2D;
 import spacegraph.obj.RectWidget;
 
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import static spacegraph.obj.GridSurface.VERTICAL;
+import static spacegraph.obj.layout.Grid.VERTICAL;
 
 /**
  * Created by me on 10/28/15.
@@ -84,7 +84,7 @@ public class WaveCapture implements Runnable {
         });
 
 
-        GridSurface v = new GridSurface(VERTICAL,
+        Grid v = new Grid(VERTICAL,
                 audioPlot,
                 audioPlot2, freqHistory) {
             @Override
