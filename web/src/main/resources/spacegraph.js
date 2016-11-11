@@ -262,17 +262,19 @@ function spacegraph(opt) {
                         if (target) {
                             const y = target._private.data;
                             const b = y.pos;
-                            const dx = (a[0] - b[0]);
-                            const dy = (a[1] - b[1]);
+                            if (b) {
+                                const dx = (a[0] - b[0]);
+                                const dy = (a[1] - b[1]);
 
-                            const distSq = dx * dx + dy * dy;
-                            if (distSq >= minAttractDistanceSq) {
-                                const dist = Math.sqrt(distSq);
+                                const distSq = dx * dx + dy * dy;
+                                if (distSq >= minAttractDistanceSq) {
+                                    const dist = Math.sqrt(distSq);
 
-                                const rr = (tl.pri) * attract / dist;
-                                // / dist; //hooks law, spring ? TODO check
-                                vx -= rr * dx;
-                                vy -= rr * dy;
+                                    const rr = (tl.pri) * attract / dist;
+                                    // / dist; //hooks law, spring ? TODO check
+                                    vx -= rr * dx;
+                                    vy -= rr * dy;
+                                }
                             }
                         }
                     }

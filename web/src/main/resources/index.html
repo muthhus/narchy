@@ -31,11 +31,15 @@
         .script("dock.js")
         .wait(function() {
 
-            //menu();
-            var s = null; //HACK
 
-            s = NARSocket('terminal', decodeTasks, {
-                onopen: () => dock(s, $('body'))
+            //$('body').append( graphConcepts($('body')) );
+
+
+             var s = null; //HACK
+             s = NARSocket('terminal', decodeTasks, {
+                onopen: () => {
+                    return dock(s, $('body'));
+                }
             });
 
         });
