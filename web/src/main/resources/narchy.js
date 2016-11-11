@@ -377,23 +377,23 @@ function NARSpeechRecognition(editor) {
 
 }
 
-function NARInputter(socket, initialValue) {
-
-    const e = NALInputEditor(socket, initialValue);
-    const d = $('<div/>').append(
-        NARSpeechRecognition(e.editor),
-
-        //other input types..
-
-        e);
-
-    e.editor.renderer.setShowGutter(false);
-    
-    d.editor = e.editor;
-
-    return d;
-    //return d.addClass('ui fluid menu inverted');
-}
+// function NARInputter(socket, initialValue) {
+//
+//     const e = NALInputEditor(socket, initialValue);
+//     const d = $('<div/>').append(
+//         NARSpeechRecognition(e.editor),
+//
+//         //other input types..
+//
+//         e);
+//
+//     e.editor.renderer.setShowGutter(false);
+//
+//     d.editor = e.editor;
+//
+//     return d;
+//     //return d.addClass('ui fluid menu inverted');
+// }
 
 
 function NARConsole(socket, render) {

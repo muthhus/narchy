@@ -32,6 +32,8 @@ public class ActiveConceptService extends PeriodicWebsocketService {
     protected long now;
     ByteBuffer current;
 
+    static final int termlinks = 8;
+
     public ActiveConceptService(NAR nar, int updatePeriodMS, int maxConcepts) {
         super(updatePeriodMS);
         this.nar = nar;
@@ -79,6 +81,10 @@ public class ActiveConceptService extends PeriodicWebsocketService {
                         //s.addValue(c.pri());
                     });
 
+                    try {
+                        dos.writeFloat(-1); //end of concepts
+                    } catch (IOException e) { }
+
                     ByteBuffer next = ByteBuffer.wrap(bs.toByteArray());
                     if (!Objects.equals(current, next)) {
                         send(next);
@@ -116,13 +122,25 @@ public class ActiveConceptService extends PeriodicWebsocketService {
         }
     }
 
-    private static void writeConceptSummary(DataOutput dos, BLink<? extends Concept> bc) throws IOException {
+    private static void writeConceptSummary(DataOutput out, BLink<? extends Concept> bc) throws IOException {
+        Concept c = bc.get();
 
         //punctuation: ConceptSummary
 
-        IO.writeBudget(dos, bc);
-        IO.writeStringUTF(dos, bc.get().toString());
+        IO.writeBudget(out, bc);
 
+        IO.writeStringUTF(out, c.toString());
+
+        Bag<Term> b = c.termlinks();
+        b.forEach(termlinks, t -> {
+            try {
+                IO.writeBudget(out, t);
+                IO.writeStringUTF(out, t.get().toString());
+                //TODO write budget info
+            } catch (IOException e) {            }
+        });
+
+        out.writeFloat(-1); //end of termlinks, will be detected when trying to read next priority
     }
 
 //    private Object[] truth(BeliefTable b) {
@@ -131,23 +149,4 @@ public class ActiveConceptService extends PeriodicWebsocketService {
 //        return new Object[] { Math.round(100f* t.freq()), Math.round(100f * t.conf()) };
 //    }
 
-    final int maxTermLinks = 5;
-    final int minTermLinks = 0;
-
-    private static Object[] termLinks(Concept c, int num) {
-        Bag<Term> b = c.termlinks();
-        Object[] tl = new Object[ Math.min(num, b.size() )];
-        final int[] n = {0};
-        b.forEach(num, t -> {
-            tl[n[0]++] = new Object[] {
-                    Json.escape(t.get()), //ID
-                    b(t.pri()), b(t.dur()), b(t.qua())
-            };
-        });
-        return tl;
-    }
-
-    private static int b(float budgetValue) {
-        return Math.round(budgetValue  * 1000);
-    }
 }

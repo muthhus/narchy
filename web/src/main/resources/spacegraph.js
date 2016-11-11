@@ -56,7 +56,7 @@ function spacegraph(opt) {
 //           changed = false;
 //        });
 
-    const maxNodes = 128;
+    const maxNodes = 32;
     const updatePeriodMS = 50;
 
 
@@ -109,11 +109,12 @@ function spacegraph(opt) {
 
             const nn = new Array();
 
+
             nodes.each((i, n) => {
                 const x = n._private.data; //HACK
                 if (x) {
 
-                    const p = x.pri || 0; // * d(x, 'belief');
+                    const p = x.pri;
                     x.pri *= localPriDecay;
 
                     const r =
@@ -170,6 +171,19 @@ function spacegraph(opt) {
             });
 
 
+            c.edges().each((i, e) => {
+                const x = e._private.data; //HACK
+                const p = x.pri;
+
+                const minWidth = 1;
+                const maxWidth = 4;
+                e.style({
+                    'lineColor': colorFunc(0.25 + 0.75 * p, x.dur, x.qua),
+                    'width': minWidth + (maxWidth-minWidth) * Math.sqrt(p)
+                });
+            });
+
+
             const antifriction = (1.0-friction);
             const nnn = nn.length;
 
@@ -193,8 +207,9 @@ function spacegraph(opt) {
                     const dx = (a[0] - b[0]);
                     const dy = (a[1] - b[1]);
                     var distsq = dx*dx + dy*dy;
-                    vx += repel/distsq * dx;
-                    vy += repel/distsq * dy;
+                    const rr = repel/distsq;
+                    vx += rr * dx;
+                    vy += rr * dy;
                 }
 
                 iv[0] = vx;
