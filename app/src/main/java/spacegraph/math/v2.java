@@ -1,7 +1,7 @@
 /*
  * $RCSfile$
  *
- * Copyright 1998-2008 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright 1997-2008 Sun Microsystems, Inc.  All Rights Reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -32,90 +32,91 @@
 package spacegraph.math;
 
 /**
- * A 2-element vector that is represented by double-precision floating 
+ * A 2-element vector that is represented by single-precision floating 
  * point x,y coordinates.
  *
  */
-public class Vector2d extends Tuple2d implements java.io.Serializable {
+public class v2 extends Tuple2f implements java.io.Serializable {
 
     // Combatible with 1.1
-    static final long serialVersionUID = 8572646365302599857L;
+    static final long serialVersionUID = -2168194326883512320L;
 
     /**
-     * Constructs and initializes a Vector2d from the specified xy coordinates.
+     * Constructs and initializes a Vector2f from the specified xy coordinates.
      * @param x the x coordinate
      * @param y the y coordinate
      */
-    public Vector2d(double x, double y)
+    public v2(float x, float y)
     {
       super(x,y);
     }
 
 
     /**
-     * Constructs and initializes a Vector2d from the specified array.
+     * Constructs and initializes a Vector2f from the specified array.
      * @param v the array of length 2 containing xy in order
      */
-    public Vector2d(double[] v)
+    public v2(float[] v)
     {
       super(v);
     }
 
 
     /**
-     * Constructs and initializes a Vector2d from the specified Vector2d.
-     * @param v1 the Vector2d containing the initialization x y data
-     */
-    public Vector2d(Vector2d v1)
-    {
-       super(v1);
-    }
-
-
-    /**
-     * Constructs and initializes a Vector2d from the specified Vector2f.
+     * Constructs and initializes a Vector2f from the specified Vector2f.
      * @param v1 the Vector2f containing the initialization x y data
      */
-    public Vector2d(v2 v1)
+    public v2(v2 v1)
     {
        super(v1);
     }
 
 
     /**
-     * Constructs and initializes a Vector2d from the specified Tuple2d.
-     * @param t1 the Tuple2d containing the initialization x y data
-     */  
-    public Vector2d(Tuple2d t1)
+     * Constructs and initializes a Vector2f from the specified Vector2d.
+     * @param v1 the Vector2d containing the initialization x y data
+     */
+    public v2(Vector2d v1)
     {
-       super(t1);
+       super(v1);
     }
 
 
     /**
-     * Constructs and initializes a Vector2d from the specified Tuple2f.
+     * Constructs and initializes a Vector2f from the specified Tuple2f.
      * @param t1 the Tuple2f containing the initialization x y data
      */  
-    public Vector2d(Tuple2f t1)
+    public v2(Tuple2f t1)
     {
        super(t1);
     }
 
 
     /**
-     * Constructs and initializes a Vector2d to (0,0).
+     * Constructs and initializes a Vector2f from the specified Tuple2d.
+     * @param t1 the Tuple2d containing the initialization x y data
+     */  
+    public v2(Tuple2d t1)
+    {
+       super(t1);
+    }
+
+
+
+    /**
+     * Constructs and initializes a Vector2f to (0,0).
      */
-    public Vector2d()
+    public v2()
     {
         super();
     }
 
 
-  /**
+    /**
    * Computes the dot product of the this vector and vector v1.
    * @param v1 the other vector
    */
-  public final double dot(Vector2d v1)
+  public final float dot(v2 v1)
     {
       return (this.x*v1.x + this.y*v1.y);
     }
@@ -125,16 +126,16 @@ public class Vector2d extends Tuple2d implements java.io.Serializable {
      * Returns the length of this vector.
      * @return the length of this vector
      */  
-    public final double length()
+    public final float length()
     {
-        return Math.sqrt(this.x*this.x + this.y*this.y);
+        return (float) Math.sqrt(this.x*this.x + this.y*this.y);
     }
 
     /**  
      * Returns the squared length of this vector.
      * @return the squared length of this vector
      */  
-    public final double lengthSquared()
+    public final float lengthSquared()
     {
         return (this.x*this.x + this.y*this.y);
     }
@@ -143,10 +144,10 @@ public class Vector2d extends Tuple2d implements java.io.Serializable {
      * Sets the value of this vector to the normalization of vector v1.
      * @param v1 the un-normalized vector
      */  
-    public final void normalize(Vector2d v1)
+    public final void normalize(v2 v1)
     {
 
-        double norm = 1.0 / Math.sqrt(v1.x * v1.x + v1.y * v1.y);
+        float norm = (float) (1.0 / Math.sqrt(v1.x * v1.x + v1.y * v1.y));
         this.x = v1.x*norm;
         this.y = v1.y*norm;
     }
@@ -157,7 +158,8 @@ public class Vector2d extends Tuple2d implements java.io.Serializable {
     public final void normalize()
     {
 
-        double norm = 1.0 / Math.sqrt(this.x * this.x + this.y * this.y);
+        float norm = (float)
+                (1.0 / Math.sqrt(this.x * this.x + this.y * this.y));
         this.x *= norm;
         this.y *= norm;
     }
@@ -169,13 +171,12 @@ public class Vector2d extends Tuple2d implements java.io.Serializable {
     *   @param v1    the other vector
     *   @return   the angle in radians in the range [0,PI]
     */
-   public final double angle(Vector2d v1)
+   public final float angle(v2 v1)
    {
       double vDot = this.dot(v1) / ( this.length()*v1.length() );
       if( vDot < -1.0) vDot = -1.0;
       if( vDot >  1.0) vDot =  1.0;
-      return Math.acos( vDot );
-
+      return((float) (Math.acos( vDot )));
    }
 
 

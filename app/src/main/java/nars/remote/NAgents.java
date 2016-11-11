@@ -8,7 +8,7 @@ import nars.NAgent;
 import nars.gui.Vis;
 import nars.index.term.tree.TreeTermIndex;
 import nars.nar.Default;
-import nars.nar.Default2;
+import nars.nar.Alann;
 import nars.nar.Multi;
 import nars.nar.exe.Executioner;
 import nars.nar.exe.MultiThreadExecutioner;
@@ -83,7 +83,7 @@ abstract public class NAgents extends NAgent {
 
         //Default nar = NAgents.newMultiThreadNAR(3, new RealtimeClock.DS(true).setDuration(0.04f), false);
         //Default nar = newNAR();
-        Default2 nar = newNAR2();
+        Alann nar = newAlann();
 
         NAgents a = init.apply(nar);
         a.trace = true;
@@ -100,8 +100,8 @@ abstract public class NAgents extends NAgent {
         return d;
     }
 
-    private static Default2 newNAR2() {
-        Default2 d = new Default2();
+    public static Alann newAlann() {
+        Alann d = new Alann();
 
         SpaceGraph.window(grid(d.cores.stream().map(c ->
                 Vis.items(c.terms, d, 16)).toArray(Surface[]::new)), 900, 700);

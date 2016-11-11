@@ -10,7 +10,6 @@ import nars.bag.Bag;
 import nars.concept.Concept;
 import nars.link.BLink;
 import nars.nar.Default;
-import nars.nar.Default2;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.atom.Atomic;
@@ -22,10 +21,7 @@ import spacegraph.Facial;
 import spacegraph.SpaceGraph;
 import spacegraph.Surface;
 import spacegraph.math.Color3f;
-import spacegraph.obj.CrosshairSurface;
-import spacegraph.obj.GridSurface;
-import spacegraph.obj.PanelSurface;
-import spacegraph.obj.Plot2D;
+import spacegraph.obj.*;
 import spacegraph.render.Draw;
 
 import java.util.List;
@@ -294,5 +290,14 @@ public class Vis {
         });
 
         return col(plot1, plot2, plot3, plot4);
+    }
+
+    public static Surface label(String text) {
+        return new LabelSurface(text);
+    }
+
+    /** ordering: first is underneath, last is above */
+    public static Surface stacking(Surface... s) {
+        return new LayerSurface(s);
     }
 }

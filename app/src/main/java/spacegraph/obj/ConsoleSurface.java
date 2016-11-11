@@ -264,8 +264,8 @@ public class ConsoleSurface extends Surface {
         }
     }
 
-    public static class DummyTerminal extends DefaultVirtualTerminal {
-        public DummyTerminal(int c, int r) {
+    public static class Demo extends DefaultVirtualTerminal {
+        public Demo(int c, int r) {
             super(c, r);
 
             new Thread(() -> {

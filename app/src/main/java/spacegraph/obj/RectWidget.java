@@ -4,7 +4,7 @@ import com.jogamp.opengl.GL2;
 import nars.util.Util;
 import spacegraph.SimpleSpatial;
 import spacegraph.Surface;
-import spacegraph.math.Vector2f;
+import spacegraph.math.v2;
 import spacegraph.math.v3;
 import spacegraph.phys.Collidable;
 import spacegraph.phys.Dynamic;
@@ -12,6 +12,7 @@ import spacegraph.phys.collision.ClosestRay;
 import spacegraph.phys.math.Transform;
 import spacegraph.phys.shape.BoxShape;
 
+import static spacegraph.math.v3.v;
 import static spacegraph.math.v3.v;
 
 /**
@@ -26,7 +27,7 @@ public class RectWidget<X> extends SimpleSpatial<X> {
 
 
     public RectWidget(Surface s, float w, float h) {
-        this((X)s,s, w, h);
+        this((X) s, s, w, h);
     }
 
     public RectWidget(X x, Surface s, float w, float h) {
@@ -35,7 +36,7 @@ public class RectWidget<X> extends SimpleSpatial<X> {
         this.surface = s;
 
         final float thick = 0.2f;
-        scale(w, h, thick * (Math.min(w,h)));
+        scale(w, h, thick * (Math.min(w, h)));
 
         s.setParent(null);
     }
@@ -50,12 +51,14 @@ public class RectWidget<X> extends SimpleSpatial<X> {
     }
 
     @Override
-    public boolean onTouch(Collidable body, ClosestRay r, short[] buttons) {
-        if (!super.onTouch(body, r, buttons)) {
+    public Surface onTouch(Collidable body, ClosestRay r, short[] buttons) {
+        Surface s0 = super.onTouch(body, r, buttons);
 
+        if (s0 != null)
+            return s0;
 
-            Transform it = Transform.t(transform()).inverse();
-            v3 localPoint = it.transform(v(r.hitPointWorld));
+        Transform it = Transform.t(transform()).inverse();
+        v3 localPoint = it.transform(v(r.hitPointWorld));
 
 
 //            //TODO maybe do this test with the normal vector of the hit ray
@@ -64,22 +67,19 @@ public class RectWidget<X> extends SimpleSpatial<X> {
 //                this.thick = h.z;
 //            }
 
-            BoxShape shape = (BoxShape) body.shape();
-            float frontZ = shape.z()/2;
-            float zTolerance = frontZ/4f;
+        BoxShape shape = (BoxShape) body.shape();
+        float frontZ = shape.z() / 2;
+        float zTolerance = frontZ / 4f;
 
-            if (Util.equals(localPoint.z, frontZ, zTolerance)) { //top surface only, ignore sides and back
+        if (Util.equals(localPoint.z, frontZ, zTolerance)) { //top surface only, ignore sides and back
 
-                //System.out.println(localPoint + " " + thick);
-                return surface.onTouch(new Vector2f(localPoint.x / shape.x() + 0.5f, localPoint.y / shape.y() + 0.5f), buttons);
-            }
+            //System.out.println(localPoint + " " + thick);
+            return surface.onTouch(new v2(localPoint.x / shape.x() + 0.5f, localPoint.y / shape.y() + 0.5f), buttons);
         }
-        return false;
+
+
+        return null;
     }
-
-
-
-
 
 
     @Override

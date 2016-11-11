@@ -16,7 +16,7 @@ import spacegraph.phys.shape.BoxShape;
 public class TestP2PNode extends RectWidget {
 
     public TestP2PNode(float w, float h) {
-        super(new GridSurface(new ConsoleSurface(new ConsoleSurface.DummyTerminal(10, 4))), w, h);
+        super(new GridSurface(new ConsoleSurface(new ConsoleSurface.Demo(10, 4))), w, h);
     }
 
     public static class TestP2PLink extends RectWidget {

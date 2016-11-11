@@ -21,14 +21,14 @@ public class LabelSurface extends Surface {
     public void paint(GL2 gl) {
         float dz = 0.1f;
         gl.glColor4f(1f,1f,1f,1f); //TODO color params
-        Draw.text(gl, fontScale, fontScale, value(), scaleLocal.x/2f, scaleLocal.y/2f, dz);
+        Draw.text(gl, value(), fontScale, scaleLocal.x/2f, scaleLocal.y/2f, dz);
     }
 
     public void set(String newValue) {
         if (newValue == null)
             newValue = "(null)";
         this.value = newValue;
-        this.fontScale = (1f/ConsoleSurface.fontWidth)/value.length();
+        this.fontScale = 0.5f; //(1f/ConsoleSurface.fontWidth)/value.length();
 
     }
 

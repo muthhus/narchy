@@ -120,8 +120,12 @@ public class v3 extends Tuple3f implements java.io.Serializable {
         return new v3();
     }
 
-    public static v3 v(float a, float b, float c) {
-        return new v3(a, b, c);
+    public static v3 v(float x, float y, float z) {
+        return new v3(x, y, z);
+    }
+
+    public static v2 v(float x, float y) {
+        return new v2(x, y);
     }
 
 

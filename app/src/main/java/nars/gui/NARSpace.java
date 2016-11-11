@@ -9,7 +9,6 @@ import nars.budget.merge.BudgetMerge;
 import nars.concept.Concept;
 import nars.link.BLink;
 import nars.nar.Default;
-import nars.nar.Default2;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.atom.Atomic;

@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.function.Consumer;
 
 import static spacegraph.math.v3.v;
+import static spacegraph.math.v3.v;
 
 /** simplified implementation which manages one body and N constraints. useful for simple objects */
 public class SimpleSpatial<X> extends AbstractSpatial<X> {
@@ -172,7 +173,7 @@ public class SimpleSpatial<X> extends AbstractSpatial<X> {
 
     //TODO make abstract
     protected CollisionShape newShape() {
-        return new BoxShape(v(1, 1, 1));
+        return new BoxShape(v3.v(1, 1, 1));
     }
 
     public Dynamic newBody(boolean collidesWithOthersLikeThis) {

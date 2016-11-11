@@ -11,6 +11,7 @@ import org.eclipse.collections.impl.map.mutable.primitive.IntBooleanHashMap;
 import org.eclipse.collections.impl.map.mutable.primitive.IntObjectHashMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import spacegraph.math.v2;
 import spacegraph.math.v3;
 import spacegraph.phys.Collidable;
 import spacegraph.phys.Dynamic;
@@ -248,8 +249,10 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
         return l;
     }
 
-    public static void window(Surface s, int w, int h) {
-        new SpaceGraph().add(new Facial( s ).maximize()).show(w, h);
+    public static SpaceGraph window(Surface s, int w, int h) {
+        SpaceGraph win = new SpaceGraph().add(new Facial( s ).maximize());
+        win.show(w, h);
+        return win;
     }
 
 
@@ -626,7 +629,7 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
             return r;
         }
 
-        private boolean mouseMotionFunc(int x, int y, short[] buttons) {
+        @Deprecated /* TODO probably rewrite */ private boolean mouseMotionFunc(int x, int y, short[] buttons) {
 
             v3 ray = space.rayTo(x, y);
 
@@ -644,7 +647,7 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
                 if (t instanceof Spatial) {
                     pickedSpatial = ((Spatial) t);
                     hitPoint = cray.hitPointWorld;
-                    if (pickedSpatial.onTouch(picked, cray, buttons)) {
+                    if (pickedSpatial.onTouch(picked, cray, buttons)!=null) {
                         //absorbed
                         clearDrag();
                         return true;
@@ -775,7 +778,7 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
 //            clearDrag();
 //        }
 
-        public void clearDrag() {
+        @Deprecated public void clearDrag() {
             mouseDragDX = mouseDragDY = 0; //clear drag
             mouseDragPrevX = mouseDragPrevY = -1;
         }

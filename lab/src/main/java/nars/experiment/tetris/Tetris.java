@@ -7,7 +7,8 @@ import nars.NAR;
 import nars.Param;
 import nars.concept.ActionConcept;
 import nars.concept.SensorConcept;
-import nars.experiment.tetris.visualizer.TetrisVisualizer;
+import nars.experiment.tetris.impl.TetrisState;
+import nars.experiment.tetris.impl.TetrisVisualizer;
 import nars.gui.Vis;
 import nars.remote.NAgents;
 import nars.term.Compound;
@@ -20,13 +21,13 @@ import nars.truth.Truth;
 import nars.util.TaskStatistics;
 import org.jetbrains.annotations.NotNull;
 import spacegraph.Surface;
-import spacegraph.math.Vector2f;
+import spacegraph.math.v2;
 import spacegraph.obj.ConsoleSurface;
 import spacegraph.obj.MatrixView;
 
 import java.io.IOException;
 
-import static nars.experiment.tetris.TetrisState.*;
+import static nars.experiment.tetris.impl.TetrisState.*;
 import static spacegraph.SpaceGraph.window;
 import static spacegraph.obj.ControlSurface.newControlWindow;
 import static spacegraph.obj.GridSurface.grid;
@@ -96,7 +97,7 @@ public class Tetris extends NAgents {
         };
         view.vis = new TetrisVisualizer(state, 64, false) {
             @Override
-            public boolean onKey(Vector2f hitPoint, char charCode, boolean pressed) {
+            public boolean onKey(v2 hitPoint, char charCode, boolean pressed) {
 
                 switch (charCode) {
                     case 'a':

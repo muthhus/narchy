@@ -2,7 +2,7 @@ package spacegraph.obj;
 
 import com.jogamp.opengl.GL2;
 import spacegraph.Surface;
-import spacegraph.math.Vector2f;
+import spacegraph.math.v2;
 import spacegraph.render.Draw;
 
 /**
@@ -10,7 +10,7 @@ import spacegraph.render.Draw;
  */
 public class XYSlider extends Surface {
 
-    final Vector2f knob = new Vector2f(0.5f, 0.5f);
+    final v2 knob = new v2(0.5f, 0.5f);
     private final float knobSize = 0.25f;
 
     public XYSlider() {
@@ -18,7 +18,7 @@ public class XYSlider extends Surface {
     }
 
     @Override
-    protected boolean onTouching(Vector2f hitPoint, short[] buttons) {
+    protected boolean onTouching(v2 hitPoint, short[] buttons) {
         if (leftButton(buttons)) {
             knob.set(hitPoint);
             return true;

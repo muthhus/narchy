@@ -1,6 +1,7 @@
 package spacegraph;
 
 import com.jogamp.opengl.GL2;
+import org.jetbrains.annotations.Nullable;
 import spacegraph.math.v3;
 import spacegraph.phys.Collidable;
 import spacegraph.phys.Dynamic;
@@ -96,8 +97,8 @@ public abstract class Spatial<X> implements BiConsumer<GL2, Dynamic> {
     }
 
     /** returns true if the event has been absorbed, false if it should continue propagating */
-    public boolean onTouch(Collidable body, ClosestRay hitPoint, short[] buttons) {
-        return false;
+    public @Nullable Surface onTouch(Collidable body, ClosestRay hitPoint, short[] buttons) {
+        return null;
     }
 
     /** returns true if the event has been absorbed, false if it should continue propagating */

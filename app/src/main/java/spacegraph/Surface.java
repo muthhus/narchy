@@ -3,9 +3,11 @@ package spacegraph;
 import com.google.common.collect.Lists;
 import com.jogamp.opengl.GL2;
 import org.jetbrains.annotations.NotNull;
-import spacegraph.math.Vector2f;
+import org.jetbrains.annotations.Nullable;
+import spacegraph.math.v2;
 import spacegraph.math.v3;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -17,14 +19,14 @@ public class Surface {
 
 
     public v3 translateLocal;
-    public Vector2f scaleLocal;
+    public v2 scaleLocal;
 
     public Surface parent;
     public List<Surface> children;
 
     public Surface() {
         translateLocal = new v3();
-        scaleLocal = new Vector2f(1f,1f);
+        scaleLocal = new v2(1f,1f);
     }
 
     public void setParent(Surface s) {
@@ -46,13 +48,27 @@ public class Surface {
         }
     }
 
-    /** returns true if the event has been absorbed, false if it should continue propagating */
-    public final boolean onTouch(Vector2f hitPoint, short[] buttons) {
-        return onTouching(hitPoint, buttons) || (children!=null && onChildTouching(hitPoint, buttons));
+    /** returns non-null if the event has been absorbed by a speciifc sub-surface
+     * or null if nothing absorbed the gesture
+     */
+    @Nullable
+    public final Surface onTouch(v2 hitPoint, short[] buttons) {
+        //System.out.println(this + " " + hitPoint + " " + Arrays.toString(buttons));
+
+        //1. test local reaction
+        boolean b = onTouching(hitPoint, buttons);
+        if (b)
+            return this;
+
+        //2. test children reaction
+        if (children!=null)
+            return onChildTouching(hitPoint, buttons);
+        else
+            return this;
     }
 
-    protected final boolean onChildTouching(Vector2f hitPoint, short[] buttons) {
-        Vector2f subHit = new Vector2f();
+    protected final Surface onChildTouching(v2 hitPoint, short[] buttons) {
+        v2 subHit = new v2();
 
         for (Surface c : children) {
             //project to child's space
@@ -65,24 +81,24 @@ public class Surface {
 
             float hx = subHit.x, hy = subHit.y;
             if (hx >= 0f && hx <= 1f && hy >= 0 && hy <= 1f) {
-                if (c.onTouch(subHit, buttons)) {
-                    return true;
-                }
+                Surface s = c.onTouch(subHit, buttons);
+                if (s!=null)
+                    return s; //FIFO
             }
         }
-        return false;
+        return this;
     }
 
 
     /** may be overridden to trap events on this surface (returning true), otherwise they pass through to any children */
-    protected boolean onTouching(Vector2f hitPoint, short[] buttons) {
+    protected boolean onTouching(v2 hitPoint, short[] buttons) {
         return false;
     }
 
 
 
     /** returns true if the event has been absorbed, false if it should continue propagating */
-    public boolean onKey(Vector2f hitPoint, char charCode, boolean pressed) {
+    public boolean onKey(v2 hitPoint, char charCode, boolean pressed) {
         if (children!=null) {
             for (Surface c : children) {
                 if (c.onKey(hitPoint, charCode, pressed))
@@ -122,7 +138,7 @@ public class Surface {
         if (translate!=null)
             gl.glTranslatef(translate.x, translate.y, translate.z);
 
-        Vector2f scale = c.scaleLocal;
+        v2 scale = c.scaleLocal;
         if (scale!=null)
             gl.glScalef(scale.x, scale.y, 1f);
     }
