@@ -20,7 +20,6 @@
 
     <script src="lib/jquery-ui/jquery-ui.min.js"></script>
 
-
     <script src="lib/golden-layout/dist/goldenlayout.min.js"></script>
     <link rel="stylesheet" href="lib/golden-layout/src/css/goldenlayout-base.css"/>
     <link rel="stylesheet" href="index.goldenlayout.css"/>
@@ -29,8 +28,6 @@
     <link rel="stylesheet" href="index.jsoneditor.css"/>
 
     <script src="lib/cytoscape/dist/cytoscape.min.js"></script>
-
-    <script src="lib/vivagraph/dist/vivagraph.min.js"></script>
 
     <link rel="stylesheet" href="lib/codemirror/lib/codemirror.css">
     <script src="lib/codemirror/lib/codemirror.js"></script>
@@ -215,187 +212,7 @@
 
         layout.registerComponent('graph', function (tgt) {
 
-            const c = spacegraph({});
-
-
-            // ioActive.on('concept_summary_start', function (x) {
-            //     c.startBatch();
-            //     // c.nodes().each(n => {
-            //     //     if (n.pri) {
-            //     //         n.pri = 0.95 * n.pri; //decay HACK
-            //     //         //c.changed = true;
-            //     //     }
-            //     // });
-            // });
-            //
-            // ioActive.on('concept_summary_end', function (x) {
-            //     c.endBatch();
-            // });
-
-            const decoder = new TextDecoder("utf8");
-
-            //callee should increment its data pointer by 3 x 4 (12 bytes)
-            function nextBudgeted(d, m, j) {
-                const p = d.getFloat32(j); j += 4;
-
-                const c = { };
-
-                if (p >= 0) {
-                    c.pri = p;
-                    c.dur = d.getFloat32(j); j+=4;
-                    c.qua = d.getFloat32(j); j+=4;
-
-                    const termStrLen = d.getInt16(j); j += 2;
-                    if (termStrLen > 0) {
-                        c.term = decoder.decode(m.slice(j, j + termStrLen)); j += termStrLen;
-                    }
-
-                } /* else, it is end of segment signal */
-
-                c.j = j;
-
-
-                return c;
-            }
-
-            function decodeConceptSummaries(e, m) {
-                const d = new DataView(m);
-                let j = 0;
-
-                e.emit('concept_summary_start', d);
-
-                var pending = new Array();
-
-                while (d.byteLength > j) {
-
-                    //budget + Concept ID
-                    const c = nextBudgeted(d, m, j); j = c.j;
-                    if (c.term) {
-
-
-                        //TERMLINKS sequence
-                        {
-                            var termlinks = new Array();
-
-                            do {
-
-                                const t = nextBudgeted(d, m, j); j = t.j;
-                                if (t.term)
-                                    termlinks.push(t);
-                                else
-                                    break;
-
-                            //} while (maxTermlinks-- > 0);
-                            } while (true);
-
-                            c.termlinks = termlinks;
-                        }
-
-
-                        pending.push(c);
-
-                    } else {
-
-                        break; //end of concepts
-                    }
-                }
-
-
-                if (pending.length > 0)
-                    e.emit('concept_summary', pending);
-
-                e.emit('concept_summary_end', d);
-            }
-
-
-            const active = NARSocket('active', decodeConceptSummaries);
-
-            active.on('concept_summary', function (xx) {
-
-                c.graph.batch(()=> {
-                    for (const x of xx) {
-
-                        const id = x.term;
-                        x.label = id;
-                        x.id = id;
-
-
-                        const existing = c.graph.get(id);
-
-                        if (!existing) {
-
-                            //first addition:
-                            c.graph.add({group: "nodes", data: x});
-
-                            c.changed = true;
-
-                        } else {
-                            //replace / merge
-                            if (!_.isEqual(x, existing.data)) {
-                                existing.data = x;
-                                c.changed = true;
-                            }
-                        }
-                    }
-
-                    //update edges
-                    for (const x of xx) {
-
-                        const src = x.term;
-
-                        for (const tl of x.termlinks) {
-
-                            const target = tl.term;
-
-                            const edge = tl.id = src + "," + target; //TODO maybe use an immutable array for a pair rather than consrtruct a string key
-
-                            if (!c.graph.get(edge)) {
-
-
-                                if (c.graph.get(target)) {
-
-
-                                    tl.source = src;
-                                    tl.target = target;
-
-                                    c.graph.add({
-                                        group: "edges",
-                                        data: tl
-                                    });
-                                }
-                            }
-                        }
-                    }
-                });
-            });
-
-            tgt.on('resize', () => {
-                later(() => c.graph.resize());
-            });
-
-            tgt.getElement().html(c);
-
-            // io.on('task', function (x) {
-            //
-            //     const id = x.term + x.punc + x.freq + ';' + x.conf; //HACK for Task's
-            //     x.label = x.term; //HACK
-            //
-            //
-            //     let existing = c.get(id);
-            //
-            //     if (!existing) {
-            //
-            //         //add
-            //         c.add({group: "nodes", data: x});
-            //
-            //     } else {
-            //         //replace / merge
-            //         existing.data = x;
-            //     }
-            //
-            //     c.changed = true;
-            // });
-
+            tgt.getElement().html(graphConcepts(tgt));
 
         });
 
@@ -409,41 +226,6 @@
         layout.registerComponent('top', function (tgt, state) {
             tgt.getElement().html(TopTable(ioActive));
         });
-    }
-
-    function taskFeed(socket) {
-
-        return new NARConsole(socket, (x) => {
-
-
-            const label = x.term + x.punc + truthString(x.freq, x.conf);
-
-            //const fontSize = 2 * (1 + parseInt(x.pri * 99.0)) + '%';
-            const fontSize = parseInt(15 + 4 * /*Math.sqrt*/(1 + 10 * x.pri * 9.0)) + '%';
-
-
-            const d = document.createElement('div');
-            switch (x.punc) {
-                case '.':
-                    d.className = 'belief';
-                    break;
-                case '?':
-                    d.className = 'question';
-                    break;
-                case '!':
-                    d.className = 'goal';
-                    break;
-                case ';':
-                    d.className = 'command';
-                    break;
-            }
-            d.style.opacity = 0.5 + 0.5 * x.dur;
-            d.style.fontSize = fontSize;
-            d.innerText = label;
-            return d;
-
-
-        }).addClass('terminal');
     }
 
 

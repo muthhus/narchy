@@ -16,8 +16,7 @@
     "golden-layout": "latest",
     "fastdom": "latest",
     "jsoneditor": "latest",
-    "d3": "latest",
-    "vivagraph": "latest"
+    "d3": "latest"
   },
   "keywords": [
     "nars",

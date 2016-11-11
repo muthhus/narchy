@@ -32,7 +32,9 @@ function spacegraph(opt) {
     const d = _.extend(div('graph max'), opt || {});
 
 
-    const c = cytoscape(cytoscapeOptions(opt, function() {}, d));
+    var oo  = cytoscapeOptions(opt, function() {}, d);
+
+    const c = cytoscape(oo);
     const cypp = c._private.elements._private.ids;
     c.get = function(id) {
         return cypp[id];
@@ -41,15 +43,19 @@ function spacegraph(opt) {
 
     const colorFunc = function (r, g, b) {
 
-        const R = parseInt(r * 255);
-        const G = parseInt(g * 255);
-        const B = parseInt(b * 255);
+        const colorDivisor = 8; //integer, to minimize total unique colors by rounding to nearest N color values
+
+        const scale = 256.0 / colorDivisor;
+
+        const R = parseInt(r * scale) * colorDivisor;
+        const G = parseInt(g * scale) * colorDivisor;
+        const B = parseInt(b * scale) * colorDivisor;
 
         return "rgb(" + R + "," + G + "," + B + ")";
 
     };
 
-    d.changed = true;
+
 
 //        c.onRender(()=>{
 //           console.log('render');
@@ -57,7 +63,7 @@ function spacegraph(opt) {
 //        });
 
     const maxNodes = 96;
-    const updatePeriodMS = 100;
+    const updatePeriodMS = 50;
 
 
     const localPriDecay = 0.999;
@@ -67,52 +73,64 @@ function spacegraph(opt) {
 
 
     const minThick = 1;
-    const maxThick = 16;
+    const maxThick = 24;
 
-    const seedRadius = 256.0;
-    const speed = 0.5;
-    const perturbed = 2;
+    const seedRadius = 512.0;
 
-    const friction = 0.01;
+    const speed = 0.85;
+    const friction = 0.05;
 
-    const attract = 0.1;
-    const repel = 3.5;
+    const perturbThresh = 2;
 
-    const noiseLevel = 0.8;
 
+    const attract = 2;
+    const repel = 15;
+    const maxRepelDistance = 1500;
+
+    const minAttractDistance = 50; //padding
+
+    const noiseLevel = 0;
+
+    var busy = false;
     setInterval(() => {
 
+        if (busy)
+            return;
 
-        // if (!d.changed)
-        //     return;
+        busy = true;
+
+
+        const nodes = c.nodes();
+        const toRemove = nodes.size() - maxNodes;
+        var sorted;
+        if (toRemove > 0) {
+            sorted = nodes.sort((a, b) => {
+                if (a == b)
+                    return 0;
+
+                //increasing priority
+                let ad = a._private.data;
+                let bd = b._private.data;
+
+                const x = ad.pri - bd.pri;
+                if (x <= BUDGET_EPSILON)
+                    return ad.term.localeCompare( bd.term );
+                else
+                    return x;
+            });
+
+        } else {
+            sorted = null;
+        }
 
         c.batch(() => {
 
-            const nodes = c.nodes();
-            const toRemove = (nodes.size()) - maxNodes;
-            if (toRemove > 0) {
-                //console.log(nodes.size(), 'oversize');
-                const sorted = nodes.sort((a, b) => {
-                    if (a == b)
-                        return 0;
+            busy = false;
 
-                    //increasing priority
-                    let ad = a._private.data;
-                    let bd = b._private.data;
-
-                    const x = ad.pri - bd.pri;
-                    if (x <= BUDGET_EPSILON)
-                        return ad.term.localeCompare( bd.term );
-                    else
-                        return x;
-                });
-
-                for (let i = 0; i < toRemove; i++) {
-                    //console.log(sorted[i], 'removed');
-                    sorted[i].remove();
-                }
+            //remove weakest items from the graph
+            for (let i = 0; i < toRemove; i++) {
+                sorted[i].remove();
             }
-
 
             const nn = new Array();
 
@@ -120,6 +138,7 @@ function spacegraph(opt) {
             nodes.each((i, n) => {
                 const x = n._private.data; //HACK
                 if (x) {
+                    nn.push(x);
 
                     const p = x.pri;
                     x.pri *= localPriDecay;
@@ -141,18 +160,23 @@ function spacegraph(opt) {
                         const px = pos[0];
                         const py = pos[1];
 
-                        if ((Math.abs(vispos.x - px) > perturbed) || (Math.abs(vispos.y - py) > perturbed)) {
-                            //interaction overrides
-                            pos[0] = vispos.x;
-                            pos[1] = vispos.y;
+                        var nx, ny;
+                        if ((Math.abs(vispos.x - px) >= perturbThresh) || (Math.abs(vispos.y - py) >= perturbThresh)) {
+                            //interaction overrides:
+                            nx = vispos.x;
+                            ny = vispos.y;
                         } else {
 
-                            //pos.x = (pos.x * (1.0 - speed) + vispos.x * speed) + x.vel[0];
-                            //pos.y = (pos.y * (1.0 - speed) + vispos.y * speed) + x.vel[1];
-                            pos[0] = (px * (1.0 - speed) + (px + x.vel[0]) * speed);
-                            pos[1] = (py * (1.0 - speed) + (py + x.vel[1]) * speed);
+                            const mass = 1 + p;
+
+                            //then this isnt velocity exactly, more like force or impulse
+                            nx = (px * (1.0 - speed) + (px + x.vel[0]/mass) * speed);
+                            ny = (py * (1.0 - speed) + (py + x.vel[1]/mass) * speed);
 
                         }
+
+                        pos[0] = nx;
+                        pos[1] = ny;
 
                     }
 
@@ -172,7 +196,6 @@ function spacegraph(opt) {
                     });
                     n.position({ x: parseInt(pos[0]), y: parseInt(pos[1]) }); //pos);
 
-                    nn.push(x);
 
                 }
             });
@@ -185,66 +208,86 @@ function spacegraph(opt) {
 
                 e.style({
                     'lineColor': colorFunc(0.25 + 0.75 * p, x.dur, x.qua),
-                    'width': minThick + (maxThick-minThick) * Math.sqrt(p)
+                    'width': parseInt(minThick + (maxThick-minThick) * Math.sqrt(p))
                 });
 
             });
 
 
-            const antifriction = (1.0-friction);
-            const nnn = nn.length;
+            //force-directed layout update
+            later( ()=> {
 
-            for (var i = 0; i < nnn; i++) {
+                //cache:
+                const antifriction = (1.0 - friction);
+                const maxRepelDistanceSq = maxRepelDistance*maxRepelDistance;
+                const minAttractDistanceSq = minAttractDistance*minAttractDistance;
 
-                const nni = nn[i];
-                const iv = nn[i].vel;
+                for (var i = 0; i < nn.length; i++) {
 
-                //FRICTION
-                var vx = iv[0] * antifriction;
-                var vy = iv[1] * antifriction;
+                    const nni = nn[i];
+                    const iv = nni.vel;
 
-                //JITTER NOISE
-                if (noiseLevel > 0) {
-                    vx += (Math.random() - 0.5) * noiseLevel;
-                    vy += (Math.random() - 0.5) * noiseLevel;
-                }
 
-                //REPEL NEIGHBORS
-                const a = nni.pos;
-                for (var j = i+1; j < nnn; j++) {
-                    const b = nn[j].pos;
+                    //FRICTION
+                    var vx = iv[0] * antifriction;
+                    var vy = iv[1] * antifriction;
 
-                    const dx = (a[0] - b[0]);
-                    const dy = (a[1] - b[1]);
-                    var distsq = dx*dx + dy*dy;
-                    const rr = repel/distsq;
-                    vx += rr * dx;
-                    vy += rr * dy;
-                }
+                    //JITTER NOISE
+                    if (noiseLevel > 0) {
+                        vx += (Math.random() - 0.5) * noiseLevel;
+                        vy += (Math.random() - 0.5) * noiseLevel;
+                    }
 
-                //ATTRACT LINKS
-                for (const tl of nni.termlinks) {
-                    const target = c.get(tl.target);
-                    if (target) {
-                        const y = target._private.data;
-                        const b = y.pos;
+                    //REPEL NEIGHBORS
+                    const a = nni.pos;
+                    for (var j = i + 1; j < nn.length; j++) {
+                    //for (var j = 0; j < nn.length; j++) {
+                        //if (i == j) continue;
+
+                        const b = nn[j].pos;
+
                         const dx = (a[0] - b[0]);
                         const dy = (a[1] - b[1]);
-                        var dist = Math.sqrt(dx*dx + dy*dy);
-                        const rr = (1.0 + y.pri) * attract / dist
-                            // / dist; //hooks law, spring ? TODO check
-                        vx -= rr * dx;
-                        vy -= rr * dy;
+                        var distsq = dx * dx + dy * dy;
+                        if (distsq <= maxRepelDistanceSq) {
+                            const rr = repel / distsq;
+                            vx += rr * dx;
+                            vy += rr * dy;
+                        }
                     }
+
+                    //ATTRACT LINKS
+                    for (const tl of nni.termlinks) {
+                        const target = c.get(tl.target);
+                        if (target) {
+                            const y = target._private.data;
+                            const b = y.pos;
+                            const dx = (a[0] - b[0]);
+                            const dy = (a[1] - b[1]);
+
+                            const distSq = dx * dx + dy * dy;
+                            if (distSq >= minAttractDistanceSq) {
+                                const dist = Math.sqrt(distSq);
+
+                                const rr = (tl.pri) * attract / dist;
+                                // / dist; //hooks law, spring ? TODO check
+                                vx -= rr * dx;
+                                vy -= rr * dy;
+                            }
+                        }
+                    }
+
+
+                    iv[0] = vx;
+                    iv[1] = vy;
                 }
 
 
-                iv[0] = vx;
-                iv[1] = vy;
-            }
+
+            });
+
         });
 
-        d.changed = false;
 
     }, updatePeriodMS);
 
@@ -264,8 +307,8 @@ function cytoscapeOptions(opt, ready, target) {
         zoom: 1,
         pan: {x: 0, y: 0},
         // interaction options:
-        minZoom: 1e-50,
-        maxZoom: 1e50,
+        minZoom: 1e-15,
+        maxZoom: 1e15,
         zoomingEnabled: true,
         userZoomingEnabled: true,
         panningEnabled: true,
@@ -274,7 +317,7 @@ function cytoscapeOptions(opt, ready, target) {
         boxSelectionEnabled: false,
         autolock: false,
         autoungrabify: false,
-        autounselectify: true,
+        autounselectify: false,
         //fps: 25, //target max fps (frames per second)
         // rendering options:
         headless: false,
@@ -283,9 +326,9 @@ function cytoscapeOptions(opt, ready, target) {
         hideLabelsOnViewport: false,
         textureOnViewport: true, //true = higher performance, lower quality
         motionBlur: false,
-        wheelSensitivity: 1,
+        wheelSensitivity: 0.5,
         //pixelRatio: 0.25, //downsample pixels
-        //pixelRatio: 0.25,
+        //pixelRatio: 0.5,
         //pixelRatio: 1,
 
         initrender: function (evt) { /* ... */
@@ -304,19 +347,23 @@ function cytoscapeOptions(opt, ready, target) {
             {
                 selector: 'node',
                 style: {
+                    'color': '#fff',
                     'background-color': '#888',
                     'label': 'data(label)',
                     'text-valign': 'center',
                     'text-halign': 'center',
-                    'color': '#fff',
                     'font-family':  //keep short because this gets repeated as part of strings in the style system badly
                         //'Arial',
                         'Monospace',
+
+
+                    'text-outline-width': 0,
+
                     //'outside-texture-bg-opacity': 1,
-                    'shadow-blur': 0,
-                    'text-shadow-blur': 0,
-                    'shadow-opacity': 1,
-                    'min-zoomed-font-size': 5,
+                    //'shadow-blur': 0,
+                    //'text-shadow-blur': 0,
+                    //'shadow-opacity': 1,
+                    'min-zoomed-font-size': 6,
                     'text-events': false,
                     'border-width': 0
                     /*border-width : The size of the node’s border.

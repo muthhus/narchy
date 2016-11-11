@@ -109,6 +109,7 @@ function decodeTasks(e, m) {
     const d = new DataView(m);
     let j = 0;
 
+    const decoder = new TextDecoder("utf8");
 
     while (d.byteLength > j) {
 
@@ -140,7 +141,7 @@ function decodeTasks(e, m) {
                     freq = conf = undefined;
                 }
                 const termStrLen = d.getInt16(j); j += 2;
-                const term = new TextDecoder("utf8").decode(m.slice(j, j + termStrLen)); j += termStrLen;
+                const term = decoder.decode(m.slice(j, j + termStrLen)); j += termStrLen;
 
                 //console.log(term, punct, pri, when, freq, conf);
 
@@ -197,6 +198,208 @@ function decodeTasks(e, m) {
 //
 //
 // }
+
+
+function graphConcepts(tgt) {
+    const c = spacegraph({});
+
+
+    // ioActive.on('concept_summary_start', function (x) {
+    //     c.startBatch();
+    //     // c.nodes().each(n => {
+    //     //     if (n.pri) {
+    //     //         n.pri = 0.95 * n.pri; //decay HACK
+    //     //         //c.changed = true;
+    //     //     }
+    //     // });
+    // });
+    //
+    // ioActive.on('concept_summary_end', function (x) {
+    //     c.endBatch();
+    // });
+
+    const decoder = new TextDecoder("utf8");
+
+    //callee should increment its data pointer by 3 x 4 (12 bytes)
+    function nextBudgeted(d, m) {
+        var j = d.j || 0;
+
+        const p = d.getFloat32(j); j += 4;
+
+        const x = { };
+
+        if (p >= 0) {
+            x.pri = p;
+            x.dur = d.getFloat32(j); j+=4;
+            x.qua = d.getFloat32(j); j+=4;
+
+            const termStrLen = d.getInt16(j); j += 2;
+            if (termStrLen > 0) {
+                x.term = decoder.decode(m.slice(j, j + termStrLen)); j += termStrLen;
+            }
+
+        } /* else, it is end of segment signal */
+
+        d.j = j;
+
+
+        return x;
+    }
+
+    function decodeConceptSummaries(e, m) {
+        const d = new DataView(m);
+        let j = 0;
+
+        e.emit('concept_summary_start', d);
+
+        var pending = new Array();
+
+        while (d.byteLength > j) {
+
+            //budget + Concept ID
+            const x = nextBudgeted(d, m);
+            if (x.term) {
+
+
+                //TERMLINKS sequence
+                {
+                    var termlinks = new Array();
+
+                    do {
+
+                        const t = nextBudgeted(d, m);
+                        if (t.term) {
+                            //t.targetNode = c.get(t.target);
+                            termlinks.push(t);
+                        } else
+                            break;
+
+                        //} while (maxTermlinks-- > 0);
+                    } while (true);
+
+                    x.termlinks = termlinks;
+                }
+
+
+                pending.push(x);
+
+            } else {
+
+                break; //end of concepts
+            }
+        }
+
+
+        if (pending.length > 0)
+            e.emit('concept_summary', pending);
+
+        e.emit('concept_summary_end', d);
+    }
+
+
+    const active = NARSocket('active', decodeConceptSummaries);
+
+    active.on('concept_summary', function (xx) {
+
+        c.graph.batch(()=> {
+            for (const x of xx) {
+
+                const id = x.term;
+                x.label = id;
+                x.id = id;
+
+
+                const existing = c.graph.get(id);
+
+                if (!existing) {
+
+                    //first addition:
+                    c.graph.add({group: "nodes", data: x});
+
+                    //c.changed = true;
+
+                } else {
+                    //replace / merge
+                    if (!_.isEqual(x, existing.data)) {
+                        existing.data = x;
+                        //c.changed = true;
+                    }
+                }
+            }
+
+            //update edges
+            for (const x of xx) {
+
+                const src = x.term;
+
+                for (const tl of x.termlinks) {
+
+                    const target = tl.term;
+
+                    const edge = tl.id = src + "," + target; //TODO maybe use an immutable array for a pair rather than consrtruct a string key
+
+                    if (!c.graph.get(edge)) {
+
+
+                        if (c.graph.get(target)) {
+
+
+                            tl.source = src;
+                            tl.target = target;
+
+                            c.graph.add({
+                                group: "edges",
+                                data: tl
+                            });
+                        }
+                    }
+                }
+            }
+        });
+    });
+
+    tgt.on('resize', () => {
+        later(() => c.graph.resize());
+    });
+    return c;
+}
+
+function taskFeed(socket) {
+
+    return new NARConsole(socket, (x) => {
+
+
+        const label = x.term + x.punc + truthString(x.freq, x.conf);
+
+        //const fontSize = 2 * (1 + parseInt(x.pri * 99.0)) + '%';
+        const fontSize = parseInt(75.0 + 100.0 * Math.sqrt( x.pri )) + '%';
+
+
+        const d = document.createElement('div');
+        switch (x.punc) {
+            case '.':
+                d.className = 'belief';
+                break;
+            case '?':
+                d.className = 'question';
+                break;
+            case '!':
+                d.className = 'goal';
+                break;
+            case ';':
+                d.className = 'command';
+                break;
+        }
+        d.style.opacity = 0.5 + 0.5 * x.dur;
+        d.style.fontSize = fontSize;
+        d.innerText = label;
+        return d;
+
+
+    }).addClass('terminal');
+}
+
+
 
 function Editor(options) {
     const div = $('<div/>');//.addClass('NALEditor');
@@ -398,10 +601,10 @@ function NARSpeechRecognition(editor) {
 
 function NARConsole(socket, render) {
 
-    const view = $('<div/>');
-    const items = $('<div/>').appendTo(view);
+    const view = div();
+    const items = div().appendTo(view);
 
-    const maxLines = 256;
+    const maxLines = 128;
 
     let shown = [];
 
@@ -424,9 +627,7 @@ function NARConsole(socket, render) {
 
             const height = newItems.scrollHeight;
 
-            setTimeout(() => {
-                view.scrollTop(height);
-            }, 0);
+            later( () => view.scrollTop(height) );
 
         });
 
@@ -459,8 +660,7 @@ function NARConsole(socket, render) {
 
             queued = true;
 
-
-            setTimeout(redraw, 0);
+            later(redraw);
         }
 
 
