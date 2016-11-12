@@ -120,7 +120,6 @@ public class Tetris extends NAgents {
             }
         };
 
-        state.seen = new float[state.width * state.height];
 
         for (int y = 0; y < state.height; y++) {
             int yy = y;
@@ -216,7 +215,7 @@ public class Tetris extends NAgents {
 //            state.take_action(FALL);
 //        }
 
-        reset();
+        state.reset();
     }
 
 //    //TODO
@@ -227,16 +226,16 @@ public class Tetris extends NAgents {
 //
 //    }
 
-    /**
-     * RLE/scanline input method: groups similar pixels (monochrome) into a runline using a integer range
-     */
-    protected void input() {
-
-//        float thresh = 0.5f;
+//    /**
+//     * RLE/scanline input method: groups similar pixels (monochrome) into a runline using a integer range
+//     */
+//    protected void input() {
 //
-//        inputAxis(thresh, true);
-//        inputAxis(thresh, false);
-    }
+////        float thresh = 0.5f;
+////
+////        inputAxis(thresh, true);
+////        inputAxis(thresh, false);
+//    }
 
     private void inputAxis(float thresh, boolean horizontal) {
         int hh = horizontal ? state.height : state.width;
@@ -335,33 +334,11 @@ public class Tetris extends NAgents {
     @Override
     public float act() {
 
-
-        if (state.running) {
-            state.take_action(-1); //actions already taken above
-            state.update();
-        } else {
-            state.spawn_block();
-        }
-
-        state.checkIfRowAndScore();
-
-        state.toVector(false, state.seen);
-
-
-        if (state.gameOver()) {
-            reset();
-        }
-
-        input();
+        state.next();
 
         return state.score;
     }
 
-    public void reset() {
-        state.reset();
-        state.spawn_block();
-        state.running = true;
-    }
 
 
     public static void main(String[] args) {

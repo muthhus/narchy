@@ -77,6 +77,7 @@ public class TetrisState {
         possibleBlocks.add(TetrisPiece.makeJShape());
 
         worldState=new float[this.height * this.width];
+        seen = new float[width * height];
         reset();
     }
 
@@ -89,6 +90,10 @@ public class TetrisState {
         }
         currentRotation = 0;
         is_game_over = false;
+
+        spawn_block();
+        running = true;
+
     }
 
     public void toVector(boolean monochrome, float[] target) {
@@ -208,7 +213,7 @@ public class TetrisState {
      * @param y
      * @return
      */
-    final int i(int x, int y) {
+    public final int i(int x, int y) {
         return y * width + x;
         //assert returnValue >= 0 : " "+y+" * "+worldWidth+" + "+x+" was less than 0.";
         //return returnValue;
@@ -563,6 +568,25 @@ public class TetrisState {
 
     public Random getRandom() {
         return randomGenerator;
+    }
+
+    public void next() {
+        if (running) {
+            take_action(-1); //actions already taken above
+            update();
+        } else {
+            spawn_block();
+        }
+
+        checkIfRowAndScore();
+
+        toVector(false, seen);
+
+        if (gameOver()) {
+            reset();
+        }
+
+
     }
 
 

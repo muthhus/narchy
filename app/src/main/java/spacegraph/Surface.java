@@ -64,7 +64,7 @@ public class Surface {
         if (children!=null)
             return onChildTouching(hitPoint, buttons);
         else
-            return this;
+            return null;
     }
 
     protected final Surface onChildTouching(v2 hitPoint, short[] buttons) {

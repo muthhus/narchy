@@ -1,46 +1,125 @@
 package nars.experiment.tetris;
 
+import com.jogamp.opengl.GL2;
 import nars.NAR;
 import nars.NSchool;
 import nars.experiment.tetris.impl.TetrisState;
 import nars.nar.Alann;
+import nars.util.Util;
 import spacegraph.Facial;
 import spacegraph.SpaceGraph;
 import spacegraph.Surface;
 import spacegraph.obj.widget.ConsoleSurface;
 import spacegraph.obj.CrosshairSurface;
+import spacegraph.obj.widget.MatrixPad;
+import spacegraph.obj.widget.PushButton;
 import spacegraph.obj.widget.Slider;
+import spacegraph.render.Draw;
 
+import java.awt.*;
+import java.util.Date;
+
+import static nars.experiment.tetris.TetriSchool.TrainingPanel.newTrainingPanel;
 import static nars.gui.Vis.label;
 import static nars.gui.Vis.stacking;
+import static spacegraph.SpaceGraph.window;
 import static spacegraph.obj.layout.Grid.col;
 import static spacegraph.obj.layout.Grid.grid;
 import static spacegraph.obj.layout.Grid.row;
 
-/**
- * Created by me on 11/11/16.
- */
-public class TetriSchool extends NSchool {
+public class TetriSchool extends NSchool implements Runnable {
 
-    private final TetrisState state;
+    private final TetrisState game;
+
+
+    final Thread sim;
+    int updatePeriodMS = 50;
 
     public TetriSchool(NAR nar, int width, int height) {
         super(nar);
 
-        state = new TetrisState(width, height, 1) {
+        game = new TetrisState(width, height, 2) {
 
         };
+
+        sim = new Thread(this);
+        sim.start();
+    }
+
+    @Override
+    public void run() {
+        while (true) {
+            game.next();
+            Util.sleep(updatePeriodMS);
+        }
     }
 
     public static void main(String[] args) {
-        TetriSchool t = new TetriSchool(new Alann(), 8, 16);
+        int H = 16;
+        int W = 8;
+        TetriSchool t = new TetriSchool(new Alann(), W, H);
 
-        SpaceGraph s = SpaceGraph.window(TrainingPanel.newTrainingPanel(t), 1000, 800);
+        SpaceGraph s = window(row(
+            newTrainingPanel(t),
+            new MatrixPad(W, H, (x, y) ->
+                new PushButton(x + "," + y) {
+                    @Override
+                    public void paintBack(GL2 gl) {
+                        float bc = (t.game.seen[t.game.i(x, H-1-y)]);
+
+                        Color c;
+                        if ((bc < 1.0) && (bc > 0)) {
+                            c = Color.WHITE; // falling block, ~0.5
+                        } else if (bc > 0) {
+
+                            switch ((int) bc) {
+                                case 1:
+                                    c = (Color.PINK);
+                                    break;
+                                case 2:
+                                    c = (Color.RED);
+                                    break;
+                                case 3:
+                                    c = (Color.GREEN);
+                                    break;
+                                case 4:
+                                    c = (Color.YELLOW);
+                                    break;
+                                case 5:
+                                    c = new Color(0.3f, 0.3f, 1.0f); // blue
+                                    break;
+                                case 6:
+                                    c = (Color.ORANGE);
+                                    break;
+                                case 7:
+                                    c = (Color.MAGENTA);
+                                    break;
+                                default:
+                                    c = Color.BLACK;
+                                    break;
+                            }
+                        } else {
+                            c = Color.BLACK;
+                        }
+
+                        float r = c.getRed()/256f,
+                              g = c.getGreen()/256f,
+                              b = c.getBlue()/256f;
+                        gl.glColor3f(r, g, b);
+
+                        float m = 0.05f;
+                        Draw.rect(gl, m, m, 1f-2*m, 1f-2*m);
+                    }
+                } )
+        ), 1000, 800);
+
         s.add(new Facial(new CrosshairSurface(s)));
     }
 
-    /** -- clock controls
-     *  -- contextual commenting feedback input */
+    /**
+     * -- clock controls
+     * -- contextual commenting feedback input
+     */
     public static class TrainingPanel {
 
 
@@ -49,15 +128,19 @@ public class TetriSchool extends NSchool {
 
             return grid(
 
-                stacking(
-                    new Slider(5, 0 /* pause */, 10),
-                    runLabel
-                ),
+                    stacking(
+                            new Slider(.25f, 0 /* pause */, 1),
+                            runLabel
+                    ),
 
-                stacking(
-                    new Slider(0.5f, 0 /* pause */, 1f),
-                    label("xyz")
-                )
+                    new PushButton("clickme", (p) -> {
+                        p.setText(String.valueOf(new Date().hashCode()));
+                    }),
+
+                    grid(
+                            new PushButton("a"), new PushButton("b"), new PushButton("c"), new PushButton("d")
+                    )
+
 
             );
         }
@@ -66,10 +149,10 @@ public class TetriSchool extends NSchool {
 
             return col(
 
-                newSchoolControl(school),
+                    newSchoolControl(school),
 
-                new ConsoleSurface(new ConsoleSurface.Demo(80, 25))
-                //new CrosshairSurface(s)
+                    new ConsoleSurface(new ConsoleSurface.Demo(80, 25))
+                    //new CrosshairSurface(s)
 
             );
         }

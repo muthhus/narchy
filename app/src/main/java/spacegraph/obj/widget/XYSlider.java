@@ -46,9 +46,8 @@ public class XYSlider extends Surface {
         float w1 = px - W / 2f;
         Draw.rect(gl, w1, 0, W, 1); //vert
 
-
-        gl.glColor4f(0.2f, 0.8f, 0f, 0.75f);
-        Draw.rect(gl, w1-knobSize/2f, h1-knobSize/2f, knobSize, knobSize, 0.25f); //knob
+        //gl.glColor4f(0.2f, 0.8f, 0f, 0.75f);
+        Draw.rect(gl, w1-knobSize/2f, h1-knobSize/2f, knobSize, knobSize, 0); //knob
     }
 
 }

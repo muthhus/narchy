@@ -36,7 +36,7 @@ public class TetrisBlocksComponent {
 	final Color alphaBlack = new Color(0, 0, 0);
 	final Color alphaWhite = new Color(1.0f, 1.0f, 1.0f);
 
-	public void render(GL2 gl, int DABS, float[] state) {
+	public void render(GL2 gl, float[] state) {
 
 		if (state == null)
 			return;

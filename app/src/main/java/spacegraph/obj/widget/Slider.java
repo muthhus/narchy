@@ -23,9 +23,6 @@ public class Slider extends Widget {
     public final MutableFloat min;
     public final MutableFloat max;
 
-    /** the tangible area of the slider */
-    public final Surface pad;
-
     public Slider(float v, float min, float max) {
         this(new MutableFloat(v), new MutableFloat(min), new MutableFloat(max));
     }
@@ -36,57 +33,46 @@ public class Slider extends Widget {
         this.max = max;
 
 
-        this.pad = new Surface() {
+    }
 
-            @Override
-            protected void paint(GL2 gl) {
-
-
-
-                float p = value();
-                //float margin = 0.1f;
-                //float mh = margin / 2.0f;
-
-                float W = 1;
-                float H = 1;
-
-                //gl.glLineWidth(mh * 2);
-                //gl.glColor3f(0.5f, 0.5f, 0.5f);
-                //ShapeDrawer.strokeRect(gl, 0, 0, W, H);
-
-                //double hp = 0.5 + 0.5 * p;
-                gl.glColor4f(1f - p, p, 0f, 0.8f);
-                //g1.setFill(Color.ORANGE.deriveColor(70 * (p - 0.5), hp, 0.65f, 1.0f));
-
-                float barSize = W * p;
-                //ShapeDrawer.rect(gl, mh/2, mh/2f, barSize - mh, H - mh);
-                Draw.rect(gl, 0, 0, barSize, H);
-            }
+    @Override
+    protected void paintComponent(GL2 gl) {
 
 
-            @Override
-            protected boolean onTouching(v2 hitPoint, short[] buttons) {
-                super.onTouching(hitPoint, buttons);
+        float p = value();
+        //float margin = 0.1f;
+        //float mh = margin / 2.0f;
 
-                if (leftButton(buttons)) {
-                    //System.out.println(this + " touched " + hitPoint + " " + Arrays.toString(buttons));
+        float W = 1;
+        float H = 1;
 
-                    value.setValue(r(value(hitPoint)));
+        //gl.glLineWidth(mh * 2);
+        //gl.glColor3f(0.5f, 0.5f, 0.5f);
+        //ShapeDrawer.strokeRect(gl, 0, 0, W, H);
 
-                    return true;
-                }
-                return false;
-            }
+        //double hp = 0.5 + 0.5 * p;
+        gl.glColor4f(1f - p, p, 0f, 0.8f);
+        //g1.setFill(Color.ORANGE.deriveColor(70 * (p - 0.5), hp, 0.65f, 1.0f));
 
-
-        };
+        float barSize = W * p;
+        //ShapeDrawer.rect(gl, mh/2, mh/2f, barSize - mh, H - mh);
+        Draw.rect(gl, 0, 0, barSize, H);
     }
 
 
     @Override
-    protected @NotNull Surface content() {
-        return pad;
+    protected boolean onTouching(v2 hitPoint, short[] buttons) {
+
+        if (leftButton(buttons)) {
+            //System.out.println(this + " touched " + hitPoint + " " + Arrays.toString(buttons));
+
+            value.setValue(r(value(hitPoint)));
+
+            return true;
+        }
+        return true;
     }
+
 
     //    public static void main(String[] args) {
 //        new GraphSpace<Surface>(

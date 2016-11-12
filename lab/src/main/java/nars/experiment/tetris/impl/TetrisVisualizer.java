@@ -85,7 +85,7 @@ public class TetrisVisualizer extends Surface {
     public void paint(GL2 g) {
         //g.setPaintMode();
         if (blocks != null && tetris != null)
-            blocks.render(g, 1, tetris.seen);
+            blocks.render(g, tetris.seen);
         //g.setColor(Color.BLUE);
         //g.setXORMode(Color.GREEN);
         //g.drawString("Score: " + Texts.n4(tetris.reward()), 0, 400);

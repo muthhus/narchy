@@ -4,8 +4,11 @@ import com.jogamp.newt.Window;
 import com.jogamp.newt.event.*;
 import com.jogamp.newt.opengl.GLWindow;
 import com.jogamp.opengl.GL2;
+import org.apache.commons.lang.ArrayUtils;
 import org.jetbrains.annotations.Nullable;
 import spacegraph.input.Finger;
+
+import java.util.Arrays;
 
 import static spacegraph.math.v3.v;
 
@@ -127,7 +130,7 @@ public class Facial implements WindowListener, KeyListener, MouseListener {
 
     @Override
     public void mouseClicked(MouseEvent e) {
-
+        //updateMouse(e);
     }
 
     @Override
@@ -147,7 +150,10 @@ public class Facial implements WindowListener, KeyListener, MouseListener {
 
     @Override
     public void mouseReleased(MouseEvent e) {
-        updateMouse(e);
+        short[] bd = e.getButtonsDown();
+        int ii = ArrayUtils.indexOf(bd, e.getButton());
+        bd[ii] = -1;
+        updateMouse(e, bd);
     }
 
     @Override
@@ -161,12 +167,18 @@ public class Facial implements WindowListener, KeyListener, MouseListener {
     }
 
     private void updateMouse(@Nullable MouseEvent e) {
+
+        short[] buttonsDown = e!=null ? e.getButtonsDown() : null;
+        updateMouse(e, buttonsDown);
+    }
+
+    private void updateMouse(@Nullable MouseEvent e, short[] buttonsDown) {
         if (e == null) {
             mouse.off();
         } else {
             float x = ((float) e.getX()) / window.getWidth();
             float y = 1f - ((float) e.getY()) / window.getHeight();
-            mouse.on(v(x, y), e.getButtonsDown());
+            mouse.on(v(x, y), buttonsDown);
         }
     }
 

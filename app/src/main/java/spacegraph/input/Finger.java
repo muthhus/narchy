@@ -5,6 +5,8 @@ import spacegraph.Surface;
 import spacegraph.math.v2;
 import spacegraph.obj.widget.Widget;
 
+import java.util.Arrays;
+
 import static java.lang.System.arraycopy;
 import static java.util.Arrays.fill;
 
@@ -19,8 +21,8 @@ public class Finger {
     private final Surface root;
 
     final v2 hit = new v2();
-    final boolean[] buttonDown = new boolean[5];
-    final boolean[] prevButtonDown = new boolean[5];
+    public final boolean[] buttonDown = new boolean[5];
+    public final boolean[] prevButtonDown = new boolean[5];
 
     //TODO wheel state
 
@@ -34,11 +36,12 @@ public class Finger {
     public void on(v2 nextHit, short[] nextButtonDown) {
         this.hit.set(nextHit);
 
-        arraycopy(this.buttonDown, 0, prevButtonDown, 0, nextButtonDown.length);
+        arraycopy(this.buttonDown, 0, prevButtonDown, 0, buttonDown.length);
 
         fill(this.buttonDown, false);
         for (short s : nextButtonDown) {
-            this.buttonDown[s] = true;
+            if (s > 0) //ignore -1 values
+                this.buttonDown[ s - 1 /* start at zero=left button */] = true;
         }
 
         Surface s = root.onTouch(nextHit, nextButtonDown);
@@ -50,8 +53,8 @@ public class Finger {
     }
 
     private void on(@Nullable Widget touched) {
-        if (touching == touched)
-            return; //no change
+//        if (touching == touched)
+//            return; //no change
 
         if (touching!=null) {
             touching.touch(null);
@@ -70,4 +73,9 @@ public class Finger {
             touching = null;
         }
     }
+
+    public void print() {
+        System.out.println(root + " " + hit + " " + touching + " " + Arrays.toString(buttonDown));
+    }
+
 }

@@ -132,6 +132,11 @@ public abstract class Tuple3f implements java.io.Serializable, Cloneable {
         this.z = z;
     }
 
+    /** assumes z=0 */
+    public void set(float x, float y) {
+        set(x, y, 0);
+    }
+
     public final void setNegative(v3 v) {
         set(-v.x, -v.y, -v.z);
     }

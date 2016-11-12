@@ -23,7 +23,7 @@ public class VSplit extends Layout {
     @Override
     protected void layout() {
         float margin = 0.0f;
-        float content = 1f - margin;
+        //float content = 1f - margin;
         float x = margin/2f;
 
         Surface top = top();

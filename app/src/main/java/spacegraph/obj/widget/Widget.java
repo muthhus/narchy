@@ -17,28 +17,38 @@ public abstract class Widget extends Stacking {
 
     @Nullable Finger touchedBy = null;
 
-    static final Label questionLabel = label("?");
 
-    public Widget() {
-        super(questionLabel);
-    }
+//MARGIN
+//    @Override
+//    public void setParent(Surface s) {
+//        super.setParent(s);
+//
+//        float proportion = 0.9f;
+//        float margin = 0.0f;
+//        //float content = 1f - margin;
+//        float x = margin / 2f;
+//
+//        Surface content = content();
+//        content.scaleLocal.set(proportion, proportion);
+//        content.translateLocal.set(x, 1f - proportion, 0);
+//
+//    }
 
-    @NotNull
-    protected abstract Surface content();
 
     @Override
-    protected void paint(GL2 gl) {
+    protected final void paint(GL2 gl) {
 
-        if (touchedBy!=null) {
-            gl.glColor3f(1f,1f,0f);
+        if (touchedBy != null) {
+            gl.glColor3f(1f, 1f, 0f);
             gl.glLineWidth(4);
             Draw.rectStroke(gl, 0, 0, 1, 1);
         }
 
-        children.set(0, content());
-        super.paint(gl);
+        paintComponent(gl);
 
     }
+
+    protected abstract void paintComponent(GL2 gl);
 
 
 //    @Override
