@@ -40,11 +40,11 @@ public class XYSlider extends Surface {
         float W = knobSize / 3f;
         float H = knobSize / 3f;
 
-        gl.glColor4f(0f, 0.2f, 0.8f, 0.75f);
+        gl.glColor4f(0.75f, 0.75f, 0.75f, 0.75f);
         float h1 = py - H / 2f;
-        Draw.rect(gl, 0, h1, 1, H); //horiz
+        Draw.rect(gl, 0, h1-H/2, 1, H); //horiz
         float w1 = px - W / 2f;
-        Draw.rect(gl, w1, 0, W, 1); //vert
+        Draw.rect(gl, w1-W/2, 0, W, 1); //vert
 
         //gl.glColor4f(0.2f, 0.8f, 0f, 0.75f);
         Draw.rect(gl, w1-knobSize/2f, h1-knobSize/2f, knobSize, knobSize, 0); //knob

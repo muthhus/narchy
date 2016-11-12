@@ -11,7 +11,6 @@ import org.eclipse.collections.impl.map.mutable.primitive.IntBooleanHashMap;
 import org.eclipse.collections.impl.map.mutable.primitive.IntObjectHashMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import spacegraph.math.v2;
 import spacegraph.math.v3;
 import spacegraph.phys.Collidable;
 import spacegraph.phys.Dynamic;
@@ -251,6 +250,16 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
 
     public static SpaceGraph window(Surface s, int w, int h) {
         SpaceGraph win = new SpaceGraph().add(new Facial( s ).maximize());
+        win.show(w, h);
+        return win;
+    }
+
+    public static SpaceGraph window(Spatial s, int w, int h) {
+        return window(w, h, s);
+    }
+
+    public static SpaceGraph window(int w, int h, Spatial... s) {
+        SpaceGraph win = new SpaceGraph(s);
         win.show(w, h);
         return win;
     }

@@ -15,7 +15,7 @@ import spacegraph.SimpleSpatial;
 import spacegraph.SpaceGraph;
 import spacegraph.Spatial;
 import spacegraph.layout.Flatten;
-import spacegraph.obj.RectWidget;
+import spacegraph.obj.Cuboid;
 import spacegraph.obj.widget.XYSlider;
 
 import java.util.*;
@@ -78,7 +78,7 @@ public class TimeSpace extends NARSpace implements NARSpace.TriConsumer<NAR, Spa
     @Override
     public Spatial apply(Object o) {
         if (o instanceof FloatValues) {
-            RectWidget s = new RectWidget(o, new XYSlider(), 1, 1) {
+            Cuboid s = new Cuboid(o, new XYSlider(), 1, 1) {
 
             };
 

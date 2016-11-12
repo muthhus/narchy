@@ -24,6 +24,8 @@ import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.input.*;
 import com.googlecode.lanterna.terminal.ExtendedTerminal;
 import com.googlecode.lanterna.terminal.MouseCaptureMode;
+import com.twmacinta.io.NullOutputStream;
+import org.apache.commons.io.input.NullInputStream;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -39,7 +41,7 @@ import java.util.regex.Pattern;
  * @see <a href="http://en.wikipedia.org/wiki/ANSI_escape_code">Wikipedia</a>
  * @author Martin
  */
-public abstract class ANSITerminal extends StreamBasedTerminal implements ExtendedTerminal {
+public class ANSITerminal extends StreamBasedTerminal implements ExtendedTerminal {
 
     private static final Pattern oo7 = Pattern.compile("\007", Pattern.LITERAL);
     private MouseCaptureMode mouseCaptureMode;
@@ -56,6 +58,16 @@ public abstract class ANSITerminal extends StreamBasedTerminal implements Extend
         this.mouseCaptureMode = null;
         getInputDecoder().addProfile(getDefaultKeyDecodingProfile());
     }
+
+    public ANSITerminal(int cols, int rows) {
+        this(new NullInputStream(0), new NullOutputStream(), Charset.defaultCharset());
+        try {
+            setTerminalSize(cols, rows);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 
     /**
      * This method can be overridden in a custom terminal implementation to change the default key decoders.
@@ -92,7 +104,7 @@ public abstract class ANSITerminal extends StreamBasedTerminal implements Extend
 
     // Final because we handle the onResized logic here; extending classes should override #findTerminalSize instead
     @Override
-    public final synchronized TerminalPosition terminalSize() throws IOException {
+    public final TerminalPosition terminalSize() throws IOException {
         TerminalPosition size = findTerminalSize();
         onResized(size);
         return size;

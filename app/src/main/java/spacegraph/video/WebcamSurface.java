@@ -10,7 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spacegraph.SpaceGraph;
 import spacegraph.Surface;
-import spacegraph.obj.RectWidget;
+import spacegraph.obj.Cuboid;
 import spacegraph.render.Draw;
 
 import java.awt.*;
@@ -139,7 +139,7 @@ public class WebcamSurface extends Surface implements Runnable {
 
     public static void main(String[] args) {
 
-        new SpaceGraph(new RectWidget(new WebcamSurface(320,200), 16,8)).show(1200,1200);
+        new SpaceGraph(new Cuboid(new WebcamSurface(320,200), 16,8)).show(1200,1200);
 
 
 //        NARfx.run((a, b) -> {

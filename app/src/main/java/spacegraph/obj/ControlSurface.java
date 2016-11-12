@@ -35,7 +35,7 @@ public class ControlSurface extends LabeledPane {
     public static void newControlWindow(float w, float h, Object[] oo) {
         SpaceGraph<?> s = new SpaceGraph();
         for (Object o : oo) {
-            s.add(new RectWidget(
+            s.add(new Cuboid(
                     new ControlSurface(o), w /* width */, h /* height */
             ));
         }

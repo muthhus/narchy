@@ -14,7 +14,7 @@ import com.jogamp.opengl.util.gl2.GLUT;
 import nars.util.Util;
 import spacegraph.SpaceGraph;
 import spacegraph.Surface;
-import spacegraph.obj.RectWidget;
+import spacegraph.obj.Cuboid;
 import spacegraph.render.Draw;
 
 import java.io.IOException;
@@ -25,7 +25,7 @@ import static spacegraph.render.JoglSpace.glut;
 /**
  * Created by me on 4/1/16.
  */
-public class ConsoleSurface extends Surface {
+public class ConsoleSurface extends Surface implements Appendable {
 
 
 
@@ -42,7 +42,7 @@ public class ConsoleSurface extends Surface {
 
 
         new SpaceGraph<VirtualTerminal>(
-                new RectWidget(new ConsoleSurface(vt1), 8, 8)
+                new Cuboid(new ConsoleSurface(vt1), 8, 8)
         ).show(800, 800);
     }
 
@@ -63,19 +63,23 @@ public class ConsoleSurface extends Surface {
 
 
     public ConsoleSurface(int cols, int rows) {
-        this(new DefaultVirtualTerminal(cols, rows));
+        this(
+            new DefaultVirtualTerminal(cols, rows)
+            //new LoggerTerminal(cols, rows)
+            //new ANSITerminal(cols, rows)
+        );
     }
 
-    public static RectWidget<VirtualTerminal> widget(int cols, int rows) {
+    public static Cuboid<VirtualTerminal> widget(int cols, int rows) {
         return widget(new DefaultVirtualTerminal(cols, rows));
     }
 
-    public static RectWidget<VirtualTerminal> widget(VirtualTerminal vt) {
+    public static Cuboid<VirtualTerminal> widget(VirtualTerminal vt) {
         return widget(new ConsoleSurface(vt));
     }
 
-    public static RectWidget<VirtualTerminal> widget(ConsoleSurface s) {
-        return new RectWidget(s.term, s, 1, 1);
+    public static Cuboid<VirtualTerminal> widget(ConsoleSurface s) {
+        return new Cuboid(s.term, s, 1, 1);
     }
 
     public ConsoleSurface(VirtualTerminal term) {
@@ -204,6 +208,24 @@ public class ConsoleSurface extends Surface {
                 break;
         }
         return cc;
+    }
+
+    @Override
+    public Appendable append(CharSequence charSequence) throws IOException {
+        for (int i = 0; i < charSequence.length(); i++)
+            append(charSequence.charAt(i));
+        return this;
+    }
+
+    @Override
+    public Appendable append(CharSequence charSequence, int i, int i1) throws IOException {
+        throw new UnsupportedOperationException("TODO");
+    }
+
+    @Override
+    public Appendable append(char c) throws IOException {
+        this.term.put(c);
+        return this;
     }
 
 

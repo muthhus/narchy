@@ -5,7 +5,7 @@ package nars;
  */
 public class NSchool {
 
-    private final NAR nar;
+    public final NAR nar;
 
     public NSchool(NAR nar) {
         this.nar = nar;

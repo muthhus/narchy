@@ -16,13 +16,13 @@ import spacegraph.phys.shape.BoxShape;
 /**
  * Created by me on 7/23/16.
  */
-public class TestP2PNode extends RectWidget {
+public class TestP2PNode extends Cuboid {
 
     public TestP2PNode(float w, float h) {
         super(new Grid(new ConsoleSurface(new ConsoleSurface.Demo(10, 4))), w, h);
     }
 
-    public static class TestP2PLink extends RectWidget {
+    public static class TestP2PLink extends Cuboid {
 
         private final SimpleSpatial a;
         private final SimpleSpatial b;

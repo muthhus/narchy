@@ -161,26 +161,20 @@ public class Facial implements WindowListener, KeyListener, MouseListener {
         updateMouse(e);
     }
 
+    private void updateMouse(MouseEvent e) {
+        updateMouse(e, e!=null ? e.getButtonsDown() : null);
+    }
+
+    private void updateMouse(MouseEvent e, short[] buttonsDown) {
+        mouse.update(e, buttonsDown, window.window);
+    }
+
     @Override
     public void mouseDragged(MouseEvent e) {
         updateMouse(e);
     }
 
-    private void updateMouse(@Nullable MouseEvent e) {
 
-        short[] buttonsDown = e!=null ? e.getButtonsDown() : null;
-        updateMouse(e, buttonsDown);
-    }
-
-    private void updateMouse(@Nullable MouseEvent e, short[] buttonsDown) {
-        if (e == null) {
-            mouse.off();
-        } else {
-            float x = ((float) e.getX()) / window.getWidth();
-            float y = 1f - ((float) e.getY()) / window.getHeight();
-            mouse.on(v(x, y), buttonsDown);
-        }
-    }
 
     @Override
     public void mouseWheelMoved(MouseEvent e) {

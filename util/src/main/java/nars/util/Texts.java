@@ -357,7 +357,7 @@ public enum Texts {
         return sl - tl;
     }
 
-    public static CharSequence n2(double p) {
+    public static String n2(double p) {
         return n2((float) p);
     }
 

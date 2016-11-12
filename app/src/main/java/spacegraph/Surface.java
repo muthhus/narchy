@@ -149,4 +149,12 @@ public class Surface {
     }
 
 
+    public Surface scale(float x, float y) {
+        scaleLocal.set(x, y);
+        return this;
+    }
+    public Surface pos(float x, float y) {
+        translateLocal.set(x, y);
+        return this;
+    }
 }

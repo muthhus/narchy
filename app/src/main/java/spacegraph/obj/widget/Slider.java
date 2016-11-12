@@ -2,14 +2,12 @@ package spacegraph.obj.widget;
 
 import com.jogamp.opengl.GL2;
 import org.apache.commons.lang3.mutable.MutableFloat;
-import org.jetbrains.annotations.NotNull;
 import spacegraph.Facial;
 import spacegraph.SpaceGraph;
-import spacegraph.Surface;
 import spacegraph.math.v2;
 import spacegraph.obj.CrosshairSurface;
 import spacegraph.obj.layout.Grid;
-import spacegraph.obj.RectWidget;
+import spacegraph.obj.Cuboid;
 import spacegraph.render.Draw;
 
 import static spacegraph.obj.layout.Grid.col;
@@ -85,7 +83,7 @@ public class Slider extends Widget {
 //    }
     public static void main(String[] args) {
         SpaceGraph<?> s = new SpaceGraph();
-        s.add( new RectWidget(
+        s.add( new Cuboid(
                 new Grid(
                     new Grid(
                         new XYSlider(), new XYSlider(), new XYSlider()

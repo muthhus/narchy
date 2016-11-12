@@ -4,6 +4,7 @@ import com.jogamp.opengl.GL2;
 import nars.util.Util;
 import spacegraph.SimpleSpatial;
 import spacegraph.Surface;
+import spacegraph.input.Finger;
 import spacegraph.math.v2;
 import spacegraph.math.v3;
 import spacegraph.phys.Collidable;
@@ -11,41 +12,50 @@ import spacegraph.phys.Dynamic;
 import spacegraph.phys.collision.ClosestRay;
 import spacegraph.phys.math.Transform;
 import spacegraph.phys.shape.BoxShape;
+import spacegraph.render.Draw;
 
 import static spacegraph.math.v3.v;
 import static spacegraph.math.v3.v;
 
 /**
- * A mount for a 2D surface (embeds a surface in 3D space)
+ * https://en.wikipedia.org/wiki/Cuboid
+ * Serves as a mount for an attached (forward-facing) 2D surface (embeds a surface in 3D space)
  */
-public class RectWidget<X> extends SimpleSpatial<X> {
+public class Cuboid<X> extends SimpleSpatial<X> {
 
-    public final Surface surface;
+    public final Surface front;
     final float zOffset = 0.05f; //relative to scale
 
+    public final Finger mouseFront;
+    private v3 mousePick;
     //private float padding;
 
 
-    public RectWidget(Surface s, float w, float h) {
-        this((X) s, s, w, h);
+    public Cuboid(Surface front, float w, float h) {
+        this((X) front, front, w, h);
     }
 
-    public RectWidget(X x, Surface s, float w, float h) {
+    public Cuboid(X x, Surface front, float w, float h) {
+        this(x, front, w, h, (Math.min(w, h)/2f));
+    }
+
+    public Cuboid(X x, Surface front, float w, float h, float d) {
         super(x);
 
-        this.surface = s;
+        this.front = front;
 
-        final float thick = 0.2f;
-        scale(w, h, thick * (Math.min(w, h)));
+        scale(w, h, d);
 
-        s.setParent(null);
+        front.setParent(null);
+
+        mouseFront = new Finger(front);
     }
 
     @Override
     public boolean onKey(Collidable body, v3 hitPoint, char charCode, boolean pressed) {
         if (!super.onKey(body, hitPoint, charCode, pressed)) {
 
-            return surface != null && surface.onKey(null, charCode, pressed);
+            return front != null && front.onKey(null, charCode, pressed);
         }
         return true;
     }
@@ -73,8 +83,12 @@ public class RectWidget<X> extends SimpleSpatial<X> {
 
         if (Util.equals(localPoint.z, frontZ, zTolerance)) { //top surface only, ignore sides and back
 
+            this.mousePick = r.hitPointWorld;
+
             //System.out.println(localPoint + " " + thick);
-            return surface.onTouch(new v2(localPoint.x / shape.x() + 0.5f, localPoint.y / shape.y() + 0.5f), buttons);
+            return mouseFront.on(new v2(localPoint.x / shape.x() + 0.5f, localPoint.y / shape.y() + 0.5f), buttons);
+        } else {
+            this.mousePick = null;
         }
 
 
@@ -85,6 +99,8 @@ public class RectWidget<X> extends SimpleSpatial<X> {
     @Override
     protected final void renderRelative(GL2 gl, Dynamic body) {
         super.renderRelative(gl, body);
+
+
 
         //float p = this.padding;
 
@@ -97,9 +113,28 @@ public class RectWidget<X> extends SimpleSpatial<X> {
         //gl.glScalef(pp, pp, 1f);
 
 
-        surface.render(gl);
+        front.render(gl);
 
         gl.glPopMatrix();
+
     }
 
+    @Override
+    protected void renderAbsolute(GL2 gl) {
+        super.renderAbsolute(gl);
+
+
+        if (mousePick!=null) {
+            //display pick location (debugging)
+            gl.glPushMatrix();
+            gl.glTranslatef(mousePick.x, mousePick.y, mousePick.z);
+            gl.glScalef(0.25f, 0.25f, 0.25f);
+            gl.glColor4f(1f, 1f, 1f, 0.5f);
+            gl.glRotated(Math.random()*360.0, Math.random()-0.5f, Math.random()-0.5f, Math.random()-0.5f);
+            gl.glDisable(GL2.GL_DEPTH_TEST);
+            Draw.rect(gl, -0.5f, -0.5f, 1, 1);
+            gl.glEnable(GL2.GL_DEPTH_TEST);
+            gl.glPopMatrix();
+        }
+    }
 }

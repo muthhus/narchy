@@ -237,98 +237,98 @@ public class Tetris extends NAgents {
 ////        inputAxis(thresh, false);
 //    }
 
-    private void inputAxis(float thresh, boolean horizontal) {
-        int hh = horizontal ? state.height : state.width;
-        for (int y = 0; y < hh; ) {
-
-            int start = 0, end = 0;
-            int sign = 0;
-
-            int ww = horizontal ? state.width : state.height;
-            for (int x = 0; x < ww; ) {
-
-                int i;
-                if (horizontal)
-                    i = y * ww + x;
-                else
-                    i = x * hh + y;
-
-                float s = state.seen[i];
-
-                if (x == 0) {
-                    //beginning of span
-                    sign = (int) Math.signum(s);
-                } else {
-
-                    if (sign > 0) {
-                        if (s < (thresh)) {
-                            sign = -1;
-                        } else {
-                            end = x;  //continue span
-                        }
-                    }
-                    if (sign < 0) {
-                        if (s > (1f - thresh)) {
-                            sign = +1;
-                        } else {
-                            end = x; //continue span
-                        }
-                    }
-                }
-
-                //if it switched or reach the end of the line
-                if (end != x || (x >= ww - 1)) {
-                    //end of span
-                    if (end - start == 1) {
-                        inputBlock(start, start + 1, sign, horizontal);
-                    } else {
-                        inputSpan(start, end, y, sign, horizontal);
-                    }
-                }
-
-                x++;
-            }
-
-            y++;
-        }
-    }
-
-    private void inputSpan(int start, int end, int axis, int sign, boolean horizontal) {
-
-        Truth t = $.t(sign > 0 ? 1f : 0f,
-                //(float)Math.pow(alpha, end-start)
-                alpha
-        );
-        if (t == null)
-            return; //too low confidence
-
-        Term range = new Termject.IntInterval(start, end);
-        Term fixed = new IntTerm(axis);
-
-        //TODO collect evidence stamp
-        nar.believe(
-                horizontal ? $.p(range, fixed) : $.p(fixed, range),
-                Tense.Present,
-                t.freq(), t.conf() //HACK this parameters sux
-        );
-    }
-
-    private void inputBlock(int x, int y, float v, boolean horizontal) {
-
-        Truth t = $.t(v > 0 ? 1f : 0f,
-                //(float)Math.pow(alpha, end-start)
-                alpha
-        );
-        if (t == null)
-            return; //too low confidence
-
-        //TODO collect evidence stamp
-        nar.believe(
-                horizontal ? $.p(x, y) : $.p(y, x),
-                Tense.Present,
-                t.freq(), t.conf() //HACK this parameters sux
-        );
-    }
+//    private void inputAxis(float thresh, boolean horizontal) {
+//        int hh = horizontal ? state.height : state.width;
+//        for (int y = 0; y < hh; ) {
+//
+//            int start = 0, end = 0;
+//            int sign = 0;
+//
+//            int ww = horizontal ? state.width : state.height;
+//            for (int x = 0; x < ww; ) {
+//
+//                int i;
+//                if (horizontal)
+//                    i = y * ww + x;
+//                else
+//                    i = x * hh + y;
+//
+//                float s = state.seen[i];
+//
+//                if (x == 0) {
+//                    //beginning of span
+//                    sign = (int) Math.signum(s);
+//                } else {
+//
+//                    if (sign > 0) {
+//                        if (s < (thresh)) {
+//                            sign = -1;
+//                        } else {
+//                            end = x;  //continue span
+//                        }
+//                    }
+//                    if (sign < 0) {
+//                        if (s > (1f - thresh)) {
+//                            sign = +1;
+//                        } else {
+//                            end = x; //continue span
+//                        }
+//                    }
+//                }
+//
+//                //if it switched or reach the end of the line
+//                if (end != x || (x >= ww - 1)) {
+//                    //end of span
+//                    if (end - start == 1) {
+//                        inputBlock(start, start + 1, sign, horizontal);
+//                    } else {
+//                        inputSpan(start, end, y, sign, horizontal);
+//                    }
+//                }
+//
+//                x++;
+//            }
+//
+//            y++;
+//        }
+//    }
+//
+//    private void inputSpan(int start, int end, int axis, int sign, boolean horizontal) {
+//
+//        Truth t = $.t(sign > 0 ? 1f : 0f,
+//                //(float)Math.pow(alpha, end-start)
+//                alpha
+//        );
+//        if (t == null)
+//            return; //too low confidence
+//
+//        Term range = new Termject.IntInterval(start, end);
+//        Term fixed = new IntTerm(axis);
+//
+//        //TODO collect evidence stamp
+//        nar.believe(
+//                horizontal ? $.p(range, fixed) : $.p(fixed, range),
+//                Tense.Present,
+//                t.freq(), t.conf() //HACK this parameters sux
+//        );
+//    }
+//
+//    private void inputBlock(int x, int y, float v, boolean horizontal) {
+//
+//        Truth t = $.t(v > 0 ? 1f : 0f,
+//                //(float)Math.pow(alpha, end-start)
+//                alpha
+//        );
+//        if (t == null)
+//            return; //too low confidence
+//
+//        //TODO collect evidence stamp
+//        nar.believe(
+//                horizontal ? $.p(x, y) : $.p(y, x),
+//                Tense.Present,
+//                t.freq(), t.conf() //HACK this parameters sux
+//        );
+//    }
 
 
     @Override

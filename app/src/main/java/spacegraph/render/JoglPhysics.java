@@ -306,7 +306,13 @@ abstract public class JoglPhysics<X> extends JoglSpace implements GLEventListene
 
 
         gl.glClear(gl.GL_COLOR_BUFFER_BIT | gl.GL_DEPTH_BUFFER_BIT);
+        gl.glDepthFunc(gl.GL_LEQUAL);
         gl.glEnable(GL2.GL_DEPTH_TEST);
+        gl.glShadeModel(GL2.GL_SMOOTH);
+        gl.glEnable(GL2.GL_POINT_SMOOTH);
+        gl.glEnable(GL2.GL_LINE_SMOOTH);
+        gl.glEnable(GL2.GL_POLYGON_SMOOTH);
+        gl.glEnable(GL2.GL_MULTISAMPLE);
 
         long dt = clock.getTimeThenReset();
 
@@ -346,7 +352,7 @@ abstract public class JoglPhysics<X> extends JoglSpace implements GLEventListene
 //    final Quat4f roll = new Quat4f(); //stack.quats.get();
 //    final Quat4f rot = new Quat4f(); //stack.quats.get();
 
-    public synchronized void updateCamera() {
+    public void updateCamera() {
 //        stack.vectors.push();
 //        stack.matrices.push();
 //        stack.quats.push();
@@ -405,7 +411,7 @@ abstract public class JoglPhysics<X> extends JoglSpace implements GLEventListene
 //        stack.matrices.pop();
 //        stack.quats.pop();
 
-        gl.glShadeModel(GL2.GL_SMOOTH);
+
     }
 
     private final float[] matTmp = new float[16];

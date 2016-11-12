@@ -10,7 +10,7 @@ import spacegraph.Surface;
 import spacegraph.obj.layout.Grid;
 import spacegraph.obj.widget.MatrixView;
 import spacegraph.obj.widget.Plot2D;
-import spacegraph.obj.RectWidget;
+import spacegraph.obj.Cuboid;
 
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -302,7 +302,7 @@ public class WaveCapture implements Runnable {
                 50);
         audio.gain = 1000f;
 
-        new SpaceGraph(new RectWidget(au.newMonitorPane(), 16,8)).show(1200,1200);
+        new SpaceGraph(new Cuboid(au.newMonitorPane(), 16,8)).show(1200,1200);
 
 //            b.setScene(new Scene(au.newMonitorPane(), 500, 400));
 //            b.show();

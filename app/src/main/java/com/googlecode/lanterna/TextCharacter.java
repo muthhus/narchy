@@ -100,9 +100,9 @@ public class TextCharacter {
         // Don't allow creating a TextCharacter containing a control character
         // For backward-compatibility, do allow tab for now
         // TODO: In lanterna 3.1, don't allow tab
-        if(TerminalTextUtils.isControlCharacter(c) && c != '\t') {
-            throw new IllegalArgumentException("Cannot create a TextCharacter from a control character (0x" + Integer.toHexString(c) + ')');
-        }
+//        if(TerminalTextUtils.isControlCharacter(c) && c != '\t') {
+//            throw new IllegalArgumentException("Cannot create a TextCharacter from a control character (0x" + Integer.toHexString(c) + ')');
+//        }
 
         if(foregroundColor == null) {
             foregroundColor = TextColor.ANSI.DEFAULT;

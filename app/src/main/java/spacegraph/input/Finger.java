@@ -1,5 +1,7 @@
 package spacegraph.input;
 
+import com.jogamp.newt.event.MouseEvent;
+import com.jogamp.newt.opengl.GLWindow;
 import org.jetbrains.annotations.Nullable;
 import spacegraph.Surface;
 import spacegraph.math.v2;
@@ -9,6 +11,7 @@ import java.util.Arrays;
 
 import static java.lang.System.arraycopy;
 import static java.util.Arrays.fill;
+import static spacegraph.math.v3.v;
 
 /**
  * gestural generalization of mouse cursor's (or touchpad's, etc)
@@ -33,7 +36,7 @@ public class Finger {
         this.root = root;
     }
 
-    public void on(v2 nextHit, short[] nextButtonDown) {
+    public Surface on(v2 nextHit, short[] nextButtonDown) {
         this.hit.set(nextHit);
 
         arraycopy(this.buttonDown, 0, prevButtonDown, 0, buttonDown.length);
@@ -50,13 +53,12 @@ public class Finger {
         } else {
             on(null);
         }
+        return s;
     }
 
     private void on(@Nullable Widget touched) {
-//        if (touching == touched)
-//            return; //no change
 
-        if (touching!=null) {
+        if (touching!=null && touched!=touching) {
             touching.touch(null);
         }
 
@@ -74,6 +76,22 @@ public class Finger {
         }
     }
 
+    public void update(@Nullable MouseEvent e, GLWindow window) {
+
+        short[] buttonsDown = e!=null ? e.getButtonsDown() : null;
+        update(e, buttonsDown, window);
+    }
+
+    public void update(@Nullable MouseEvent e, short[] buttonsDown, GLWindow window) {
+        if (e == null) {
+            off();
+        } else {
+            float x = ((float) e.getX()) / window.getWidth();
+            float y = 1f - ((float) e.getY()) / window.getHeight();
+            on(v(x, y), buttonsDown);
+        }
+
+    }
     public void print() {
         System.out.println(root + " " + hit + " " + touching + " " + Arrays.toString(buttonDown));
     }

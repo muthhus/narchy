@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.TreeSet;
+import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
@@ -83,7 +84,8 @@ public class DefaultVirtualTerminal extends AbstractTerminal implements VirtualT
 
         // Terminal state
         this.inputQueue =
-                new LinkedBlockingQueue<>();
+                new ArrayBlockingQueue<KeyStroke>(4096);
+                //new LinkedBlockingQueue<>();
 
         this.activeModifiers = EnumSet.noneOf(SGR.class);
         this.activeForegroundColor = TextColor.ANSI.DEFAULT;

@@ -38,7 +38,7 @@ public class SimpleSpatial<X> extends AbstractSpatial<X> {
     public float radius;
     private List<Collidable> bodies = Collections.emptyList();
 
-    public float[] shapeColor;
+    public final float[] shapeColor;
 
     public SimpleSpatial(X x) {
         super(x);
@@ -61,6 +61,17 @@ public class SimpleSpatial<X> extends AbstractSpatial<X> {
     public Dynamic body;
     private final List<TypedConstraint> constraints = $.newArrayList(0);
 
+    public SimpleSpatial color(float r, float g, float b) {
+        return color(r, g, b, 1f);
+    }
+
+    public SimpleSpatial color(float r, float g, float b, float a) {
+        shapeColor[0] = r;
+        shapeColor[1] = g;
+        shapeColor[2] = b;
+        shapeColor[3] = a;
+        return this;
+    }
 
     public final Transform transform() {
         Dynamic b = this.body;

@@ -5,15 +5,13 @@ import nars.NAR;
 import nars.NSchool;
 import nars.experiment.tetris.impl.TetrisState;
 import nars.nar.Alann;
+import nars.nar.Default;
 import nars.util.Util;
 import spacegraph.Facial;
 import spacegraph.SpaceGraph;
 import spacegraph.Surface;
-import spacegraph.obj.widget.ConsoleSurface;
+import spacegraph.obj.widget.*;
 import spacegraph.obj.CrosshairSurface;
-import spacegraph.obj.widget.MatrixPad;
-import spacegraph.obj.widget.PushButton;
-import spacegraph.obj.widget.Slider;
 import spacegraph.render.Draw;
 
 import java.awt.*;
@@ -42,8 +40,13 @@ public class TetriSchool extends NSchool implements Runnable {
 
         };
 
+
         sim = new Thread(this);
         sim.start();
+
+        nar.input("a:b.", "b:c.");
+        nar.loop(5);
+
     }
 
     @Override
@@ -57,12 +60,15 @@ public class TetriSchool extends NSchool implements Runnable {
     public static void main(String[] args) {
         int H = 16;
         int W = 8;
-        TetriSchool t = new TetriSchool(new Alann(), W, H);
+
+        //Alann n = new Alann();
+        Default n = new Default();
+        TetriSchool t = new TetriSchool(n, W, H);
 
         SpaceGraph s = window(row(
             newTrainingPanel(t),
             new MatrixPad(W, H, (x, y) ->
-                new PushButton(x + "," + y) {
+                new PushButton(/*x + "," + y*/) {
                     @Override
                     public void paintBack(GL2 gl) {
                         float bc = (t.game.seen[t.game.i(x, H-1-y)]);
@@ -124,21 +130,21 @@ public class TetriSchool extends NSchool implements Runnable {
 
 
         public static Surface newSchoolControl(NSchool school) {
-            Surface runLabel = label("Run");
-
-            return grid(
+            Surface runLabel = label("Slide");
+            return col(
 
                     stacking(
                             new Slider(.25f, 0 /* pause */, 1),
                             runLabel
                     ),
 
-                    new PushButton("clickme", (p) -> {
-                        p.setText(String.valueOf(new Date().hashCode()));
-                    }),
+//                    new PushButton("clickme", (p) -> {
+//                        p.setText(String.valueOf(new Date().hashCode()));
+//                    }),
 
                     grid(
-                            new PushButton("a"), new PushButton("b"), new PushButton("c"), new PushButton("d")
+                        new PushButton("a"), col(new CheckBox("fuck"),new CheckBox("shit")),
+                        new PushButton("c"), new XYSlider()
                     )
 
 
@@ -147,11 +153,13 @@ public class TetriSchool extends NSchool implements Runnable {
 
         public static Surface newTrainingPanel(NSchool school) {
 
+            ConsoleSurface term = new ConsoleSurface(80, 25);
+            school.nar.log(term);
             return col(
 
                     newSchoolControl(school),
 
-                    new ConsoleSurface(new ConsoleSurface.Demo(80, 25))
+                    term
                     //new CrosshairSurface(s)
 
             );

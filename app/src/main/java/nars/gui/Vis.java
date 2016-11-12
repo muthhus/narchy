@@ -106,7 +106,7 @@ public class Vis {
 
     public static BagChart<Concept> concepts(final Default d, final int count) {
         long[] now = new long[] { d.time() };
-        BagChart<Concept> tc = new BagChart<>(d.core.active, count) {
+        BagChart<Concept> tc = new BagChart<Concept>(d.core.active, count) {
 
             @Override
             public void accept(BLink<Concept> x, ItemVis<BLink<Concept>> y) {
