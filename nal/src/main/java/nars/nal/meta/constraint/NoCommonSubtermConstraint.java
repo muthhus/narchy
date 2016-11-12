@@ -21,6 +21,7 @@ public final class NoCommonSubtermConstraint extends CommonalityConstraint {
     @Override
     @NotNull protected boolean invalid(@NotNull Compound x, @NotNull Compound y) {
 
+        //return subtermOfTheOther(x, y, recurse, true);
         return subtermOfTheOther(x, y, recurse, true);
     }
 

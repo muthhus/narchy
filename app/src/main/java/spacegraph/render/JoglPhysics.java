@@ -262,8 +262,13 @@ abstract public class JoglPhysics<X> extends JoglSpace implements GLEventListene
 //            gl.glEnable(gl.GL_LIGHT1);
 //        }
 
+        gl.glEnable(GL2.GL_DEPTH_TEST);
+        gl.glEnable(GL2.GL_POINT_SMOOTH);
+        gl.glEnable(GL2.GL_LINE_SMOOTH);
+        gl.glEnable(GL2.GL_POLYGON_SMOOTH);
+        gl.glEnable(GL2.GL_MULTISAMPLE);
+
         gl.glShadeModel(gl.GL_SMOOTH);
-        gl.glShadeModel(GL2.GL_LINE_SMOOTH); // Enable Smooth Shading
         gl.glHint(GL2.GL_PERSPECTIVE_CORRECTION_HINT, GL2.GL_NICEST);
 
         //https://www.sjbaker.org/steve/omniv/opengl_lighting.html
@@ -304,13 +309,7 @@ abstract public class JoglPhysics<X> extends JoglSpace implements GLEventListene
 
 
         gl.glClear(gl.GL_COLOR_BUFFER_BIT | gl.GL_DEPTH_BUFFER_BIT);
-        gl.glDepthFunc(gl.GL_LEQUAL);
-        gl.glEnable(GL2.GL_DEPTH_TEST);
-        gl.glShadeModel(GL2.GL_SMOOTH);
-        gl.glEnable(GL2.GL_POINT_SMOOTH);
-        gl.glEnable(GL2.GL_LINE_SMOOTH);
-        gl.glEnable(GL2.GL_POLYGON_SMOOTH);
-        gl.glEnable(GL2.GL_MULTISAMPLE);
+
 
         long dt = clock.getTimeThenReset();
 
@@ -426,10 +425,11 @@ abstract public class JoglPhysics<X> extends JoglSpace implements GLEventListene
         bottom = -top;
         left = -right;
 
-        gl.glMultMatrixf(
-                makeFrustum(matTmp, m_off, initM, left, right, bottom, top, zNear, zFar),
-                0
-        );
+//        gl.glMultMatrixf(
+//                makeFrustum(matTmp, m_off, initM, left, right, bottom, top, zNear, zFar),
+//                0
+//        );
+        glu.gluPerspective(45, aspect, zNear, zFar);
     }
 
 

@@ -159,15 +159,9 @@ public interface TermContainer extends Termlike, Iterable<Term> {
     static boolean subtermOfTheOther(@NotNull Compound a, @NotNull Compound b, boolean recurse, boolean excludeVariables) {
 
         if ((excludeVariables) && (a instanceof Variable || b instanceof Variable))
-            return true;
+            return false;
 
-        int d = a.volume() - b.volume();
-        if (d < 0) {
-            Compound c = b;  b = a; a = c; //swap
-        }
-
-        return (d != 0) &&
-                (recurse ? a.containsTermRecursively(b) : a.containsTerm(b));
+        return (recurse ? a.containsTermRecursively(b) : a.containsTerm(b));
     }
     /**
      * Check the subterms (first level only) for a target term

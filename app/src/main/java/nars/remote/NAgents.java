@@ -101,12 +101,21 @@ abstract public class NAgents extends NAgent {
     }
 
     public static Alann newAlann() {
-        Alann d = new Alann();
+        Alann nar = new Alann();
 
-        SpaceGraph.window(grid(d.cores.stream().map(c ->
-                Vis.items(c.terms, d, 16)).toArray(Surface[]::new)), 900, 700);
+        MySTMClustered stm = new MySTMClustered(nar, 128, '.', 3, true, 6);
+        MySTMClustered stmGoal = new MySTMClustered(nar, 32, '!', 2, true, 4);
 
-        return d;
+        Abbreviation abbr = new Abbreviation(nar, "the",
+                4, 16,
+                0.05f, 32);
+
+        new Inperience(nar);
+
+        SpaceGraph.window(grid(nar.cores.stream().map(c ->
+                Vis.items(c.terms, nar, 16)).toArray(Surface[]::new)), 900, 700);
+
+        return nar;
     }
 
     private static Default newNAR3(int cores) {
@@ -137,12 +146,12 @@ abstract public class NAgents extends NAgent {
                 //new SingleThreadExecutioner();
                 new MultiThreadExecutioner(threads, 8192 /* TODO chose a power of 2 number to scale proportionally to # of threads */);
 
-        int volMax = 32;
+        int volMax = 64;
         int conceptsPerCycle = 192;
 
 
         //Multi nar = new Multi(3,512,
-        Default nar = new Default(1024,
+        Default nar = new Default(2048,
                 conceptsPerCycle, 1, 3, rng,
                 //new CaffeineIndex(new DefaultConceptBuilder(rng), 1024*1024, volMax/2, false, exe)
                 new TreeTermIndex.L1TreeIndex(new DefaultConceptBuilder(), 4 * 1024 * 128, 16 * 1024, 4)
@@ -158,10 +167,10 @@ abstract public class NAgents extends NAgent {
             }
         };
 
-        nar.beliefConfidence(0.8f);
+        nar.beliefConfidence(0.9f);
         nar.goalConfidence(0.8f);
 
-        float p = 0.1f;
+        float p = 0.5f;
         nar.DEFAULT_BELIEF_PRIORITY = 0.9f * p;
         nar.DEFAULT_GOAL_PRIORITY = 1f * p;
         nar.DEFAULT_QUESTION_PRIORITY = 0.6f * p;

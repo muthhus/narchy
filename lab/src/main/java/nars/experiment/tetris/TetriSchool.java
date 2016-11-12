@@ -1,11 +1,16 @@
 package nars.experiment.tetris;
 
 import com.jogamp.opengl.GL2;
+import nars.$;
 import nars.NAR;
 import nars.NSchool;
+import nars.concept.SensorConcept;
 import nars.experiment.tetris.impl.TetrisState;
 import nars.nar.Alann;
 import nars.nar.Default;
+import nars.remote.NAgents;
+import nars.term.Termed;
+import nars.time.RealtimeClock;
 import nars.util.Util;
 import spacegraph.Facial;
 import spacegraph.SpaceGraph;
@@ -16,6 +21,7 @@ import spacegraph.render.Draw;
 
 import java.awt.*;
 import java.util.Date;
+import java.util.List;
 
 import static nars.experiment.tetris.TetriSchool.TrainingPanel.newTrainingPanel;
 import static nars.gui.Vis.label;
@@ -31,21 +37,44 @@ public class TetriSchool extends NSchool implements Runnable {
 
 
     final Thread sim;
-    int updatePeriodMS = 50;
+    private final List<SensorConcept> cells;
+    int updatePeriodMS = 200;
 
     public TetriSchool(NAR nar, int width, int height) {
         super(nar);
 
+        cells = $.newArrayList(width*height);
+
         game = new TetrisState(width, height, 2) {
 
+            @Override
+            public int spawn_block() {
+                int b = super.spawn_block();
+                nar.input("tetris(block," + b + "). :|:");
+                return b;
+            }
+
+            @Override
+            public void reset() {
+                super.reset();
+                nar.input("tetris(reset). :|:");
+            }
+
+            @Override
+            public void next() {
+                super.next();
+
+                nar.input("tetris(time," + game.time + " ). :|:");
+                cells.forEach(SensorConcept::run);
+            }
         };
 
+        Tetris.sensors(nar, game, cells);
 
         sim = new Thread(this);
         sim.start();
 
-        nar.input("a:b.", "b:c.");
-        nar.loop(5);
+        //nar.loop(50);
 
     }
 
@@ -58,11 +87,17 @@ public class TetriSchool extends NSchool implements Runnable {
     }
 
     public static void main(String[] args) {
-        int H = 16;
-        int W = 8;
+        int H = 12;
+        int W = 6;
 
-        //Alann n = new Alann();
-        Default n = new Default();
+
+        NAR n =
+                //NAgents.newAlann();
+                NAgents.newMultiThreadNAR(3,
+                    new RealtimeClock.DS(true).setDuration(1)
+                ).loop(40).nar;
+
+
         TetriSchool t = new TetriSchool(n, W, H);
 
         SpaceGraph s = window(row(
@@ -105,13 +140,15 @@ public class TetriSchool extends NSchool implements Runnable {
                                     break;
                             }
                         } else {
-                            c = Color.BLACK;
+                            c = Color.DARK_GRAY;
                         }
 
                         float r = c.getRed()/256f,
                               g = c.getGreen()/256f,
                               b = c.getBlue()/256f;
-                        gl.glColor3f(r, g, b);
+
+                        float pri = n.activation( t.cell(x, y) );
+                        gl.glColor3f(r * pri, g * pri, b * pri);
 
                         float m = 0.05f;
                         Draw.rect(gl, m, m, 1f-2*m, 1f-2*m);
@@ -122,6 +159,10 @@ public class TetriSchool extends NSchool implements Runnable {
         s.add(new Facial(new CrosshairSurface(s)));
     }
 
+    private Termed cell(int x, int y) {
+        return cells.get(game.i(x, y));
+    }
+
     /**
      * -- clock controls
      * -- contextual commenting feedback input
@@ -129,7 +170,7 @@ public class TetriSchool extends NSchool implements Runnable {
     public static class TrainingPanel {
 
 
-        public static Surface newSchoolControl(NSchool school) {
+        public static Surface newSchoolControl(TetriSchool school) {
             Surface runLabel = label("Slide");
             return col(
 
@@ -143,7 +184,13 @@ public class TetriSchool extends NSchool implements Runnable {
 //                    }),
 
                     grid(
-                        new PushButton("a"), col(new CheckBox("fuck"),new CheckBox("shit")),
+
+                        new CheckBox("play").on((c,e)->{
+                            school.updatePeriodMS = (e ? 200 : 10000);
+                        }).set(true),
+
+                        col(new CheckBox("fuck"),new CheckBox("shit")),
+
                         new PushButton("c"), new XYSlider()
                     )
 
@@ -151,16 +198,17 @@ public class TetriSchool extends NSchool implements Runnable {
             );
         }
 
-        public static Surface newTrainingPanel(NSchool school) {
+        public static Surface newTrainingPanel(TetriSchool school) {
 
-            ConsoleSurface term = new ConsoleSurface(80, 25);
-            school.nar.log(term);
+            ConsoleSurface term = new ConsoleSurface(120, 40);
+
+            school.nar.logSummaryGT(term, 0.25f);
+
             return col(
 
                     newSchoolControl(school),
 
                     term
-                    //new CrosshairSurface(s)
 
             );
         }

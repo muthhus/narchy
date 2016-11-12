@@ -56,9 +56,10 @@ public class TetrisState {
 
     //	/*Hold all the possible bricks that can fall*/
     Vector<TetrisPiece> possibleBlocks = new Vector<>();
-    private int time;
+    public int time;
 
     private final int timePerFall;
+
 
     //private double[] worldObservation;
 
@@ -391,7 +392,7 @@ public class TetrisState {
 
     }
 
-    public void spawn_block() {
+    public int spawn_block() {
         running = true;
 
         currentBlockId = nextBlock();
@@ -414,6 +415,8 @@ public class TetrisState {
         if (is_game_over) {
             running = false;
         }
+
+        return currentBlockId;
     }
 
     protected int nextBlock() {

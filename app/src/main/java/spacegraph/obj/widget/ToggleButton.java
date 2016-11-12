@@ -11,8 +11,8 @@ public abstract class ToggleButton extends AbstractButton {
 
     final AtomicBoolean on = new AtomicBoolean(false);
 
-    public interface ToggleAction {
-        boolean onChange(spacegraph.obj.widget.ToggleButton t, boolean enabled);
+    @FunctionalInterface  public interface ToggleAction {
+        void onChange(spacegraph.obj.widget.ToggleButton t, boolean enabled);
     }
 
     @Nullable ToggleAction action = null;
@@ -21,11 +21,12 @@ public abstract class ToggleButton extends AbstractButton {
 
     }
 
-    public void set(boolean on) {
+    public ToggleButton set(boolean on) {
         if (this.on.compareAndSet(!on, on)) {
             if (action != null)
                 action.onChange(this, on);
         }
+        return this;
     }
 
     public spacegraph.obj.widget.ToggleButton on(ToggleAction a) {

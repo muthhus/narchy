@@ -26,6 +26,7 @@ import spacegraph.obj.widget.ConsoleSurface;
 import spacegraph.obj.widget.MatrixView;
 
 import java.io.IOException;
+import java.util.List;
 
 import static nars.experiment.tetris.impl.TetrisState.*;
 import static spacegraph.SpaceGraph.window;
@@ -47,7 +48,7 @@ public class Tetris extends NAgents {
     public static final int tetris_height = 14;
     public static final int TIME_PER_FALL = 16;
     public static final int frameRate = 1;
-    public static final int PIXEL_RADIX = 2;
+    public static final int PIXEL_RADIX = 4;
     static boolean easy;
 
 
@@ -68,10 +69,11 @@ public class Tetris extends NAgents {
     static final View view = new View();
 
 
-    private final ActionConcept motorRotate;
+    //private final ActionConcept motorRotate;
     //private MotorConcept motorDown;
-    private final ActionConcept motorLeftRight;
-    private final boolean rotate = !easy;
+    //private final ActionConcept motorLeftRight;
+
+    //private final boolean rotate = !easy;
 
     /**
      * @param width
@@ -98,65 +100,42 @@ public class Tetris extends NAgents {
         view.vis = new TetrisVisualizer(state, 64, false) {
             @Override
             public boolean onKey(v2 hitPoint, char charCode, boolean pressed) {
-
-                switch (charCode) {
-                    case 'a':
-                        if (motorRotate!=null)
-                            nar.goal(motorRotate, Tense.Present, pressed ? 0f : 0.5f, gamma);
-                        break;
-                    case 's':
-                        if (motorRotate!=null)
-                            nar.goal(motorRotate, Tense.Present, pressed ? 1f : 0.5f, gamma);
-                        break;
-                    case 'z':
-                        nar.goal(motorLeftRight, Tense.Present, pressed ? 0f : 0.5f, gamma);
-                        break;
-                    case 'x':
-                        nar.goal(motorLeftRight, Tense.Present, pressed ? 1f : 0.5f, gamma);
-                        break;
-                }
+//
+//                switch (charCode) {
+//                    case 'a':
+//                        if (motorRotate!=null)
+//                            nar.goal(motorRotate, Tense.Present, pressed ? 0f : 0.5f, gamma);
+//                        break;
+//                    case 's':
+//                        if (motorRotate!=null)
+//                            nar.goal(motorRotate, Tense.Present, pressed ? 1f : 0.5f, gamma);
+//                        break;
+//                    case 'z':
+//                        nar.goal(motorLeftRight, Tense.Present, pressed ? 0f : 0.5f, gamma);
+//                        break;
+//                    case 'x':
+//                        nar.goal(motorLeftRight, Tense.Present, pressed ? 1f : 0.5f, gamma);
+//                        break;
+//                }
 
                 return true;
             }
         };
 
 
-        for (int y = 0; y < state.height; y++) {
-            int yy = y;
-            for (int x = 0; x < state.width; x++) {
-                int xx = x;
-                Compound squareTerm =
-                        //$.p(x, y);
+        sensors(nar, state, sensors);
 
-                              $.p($.pRecurse($.radixArray(x, PIXEL_RADIX, state.width)),
-                                  $.pRecurse($.radixArray(y, PIXEL_RADIX, state.height)));
+        actions(nar, state, actions);
 
+        state.reset();
+    }
 
-                //$.p($.pRadix(x, 4, state.width), $.pRadix(y, 4, state.height));
-                int index = yy * state.width + xx;
-                @NotNull SensorConcept s = new SensorConcept(squareTerm, nar,
-                        () -> state.seen[index] > 0 ? 1f : 0f,
-
-                        //null //disable input
-
-                        (v) -> $.t(v, alpha)
-
-                )
-                        //timing(0, visionSyncPeriod)
-                        ;
-
-//                FloatSupplier defaultPri = s.sensor.pri;
-//                s.pri( () -> defaultPri.asFloat() * 0.25f );
-
-                sensors.add(s);
-
-            }
-        }
-
+    public static void actions(NAR nar, TetrisState state, List<ActionConcept> actions) {
+        float alpha = nar.confidenceDefault('.');
 
         float actionMargin =
                 0.33f; //divides the range into 3 sections: left/nothing/right
-                //0.25f;
+        //0.25f;
 
         float actionThresholdHigh = 1f - actionMargin;
         float actionThresholdLow = actionMargin;
@@ -164,7 +143,7 @@ public class Tetris extends NAgents {
 //        float actionThresholdLower = actionMargin / 1.5f;
 
 
-        actions.add(motorLeftRight = new ActionConcept("(leftright)", nar, (b, d) -> {
+        actions.add(new ActionConcept("(leftright)", nar, (b, d) -> {
             if (d != null) {
                 float x = d.freq();
                 //System.out.println(d + " " + x);
@@ -186,8 +165,8 @@ public class Tetris extends NAgents {
             //return null;
         }));
 
-        if (rotate) {
-            actions.add(motorRotate = new ActionConcept("(rotate)", nar, (b, d) -> {
+        //if (rotate) {
+            actions.add(new ActionConcept("(rotate)", nar, (b, d) -> {
                 if (d != null) {
                     float r = d.freq();
                     if (r > actionThresholdHigh) {
@@ -207,15 +186,56 @@ public class Tetris extends NAgents {
                 return $.t(0.5f, alpha); //no action taken or move ineffective
                 //return null;
             }));
-        } else {
-            motorRotate = null;
-        }
+//        } else {
+//            motorRotate = null;
+//        }
+
         //actions.add(motorDown = new MotorConcept("(down)", nar));
 //        if (downMotivation > actionThresholdHigh) {
 //            state.take_action(FALL);
 //        }
+    }
 
-        state.reset();
+    public static void sensors(NAR nar, TetrisState state, List<SensorConcept> sensors) {
+        float alpha = nar.confidenceDefault('.');
+
+        for (int y = 0; y < state.height; y++) {
+            int yy = y;
+            for (int x = 0; x < state.width; x++) {
+                int xx = x;
+                Compound squareTerm =
+                        //$.p(x, y);
+
+                        //$.inh(
+                        $.func($.the("tetris"),
+                          $.pRecurse($.radixArray(x, PIXEL_RADIX, state.width)),
+                              $.pRecurse($.radixArray(y, PIXEL_RADIX, state.height))
+                        )
+                                //$.p(
+                                        //$.the("tetris"))
+                                        //, $.the(state.time)))
+                                ;
+
+                //$.p($.pRadix(x, 4, state.width), $.pRadix(y, 4, state.height));
+                int index = yy * state.width + xx;
+                @NotNull SensorConcept s = new SensorConcept(squareTerm, nar,
+                        () -> state.seen[index] > 0 ? 1f : 0f,
+
+                        //null //disable input
+
+                        (v) -> $.t(v, alpha)
+
+                )
+                        //timing(0, visionSyncPeriod)
+                        ;
+
+//                FloatSupplier defaultPri = s.sensor.pri;
+//                s.pri( () -> defaultPri.asFloat() * 0.25f );
+
+                sensors.add(s);
+
+            }
+        }
     }
 
 //    //TODO
