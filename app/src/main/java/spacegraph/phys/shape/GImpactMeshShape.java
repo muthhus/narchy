@@ -73,7 +73,7 @@ public class GImpactMeshShape extends GImpactShape {
 	}
 
 	@Override
-	public void setMargin(float margin) {
+	public GImpactShape setMargin(float margin) {
 		collisionMargin = margin;
 
 		int i = mesh_parts.size();
@@ -84,7 +84,8 @@ public class GImpactMeshShape extends GImpactShape {
 		}
 
 		needs_update = true;
-	}
+        return null;
+    }
 
 	@Override
 	public void postUpdate() {
@@ -398,9 +399,10 @@ public class GImpactMeshShape extends GImpactShape {
         }
 
         @Override
-        public void setMargin(float margin) {
+        public GImpactShape setMargin(float margin) {
             primitive_manager.margin = margin;
             postUpdate();
+            return null;
         }
 
         @Override

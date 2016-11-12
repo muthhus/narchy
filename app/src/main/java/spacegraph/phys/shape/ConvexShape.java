@@ -55,7 +55,7 @@ public abstract class ConvexShape extends CollisionShape {
 	public abstract v3 getLocalScaling(v3 out);
 
 	@Override
-	public abstract void setMargin(float margin);
+	public abstract CollisionShape setMargin(float margin);
 
 	@Override
 	public abstract float getMargin();

@@ -125,7 +125,7 @@ public class BoxShape extends PolyhedralConvexShape {
 	}
 
 	@Override
-	public void setMargin(float margin) {
+	public BoxShape setMargin(float margin) {
 		// correct the implicitShapeDimensions for the margin
 		float m = getMargin();
 		v3 oldMargin = new v3(m, m,m);
@@ -138,6 +138,7 @@ public class BoxShape extends PolyhedralConvexShape {
 		float n = getMargin();
 		v3 newMargin = new v3(n, n, n);
 		implicitShapeDimensions.sub(implicitShapeDimensionsWithMargin, newMargin);
+		return this;
 	}
 
 	@Override

@@ -226,8 +226,9 @@ public class CompoundShape extends CollisionShape {
 	}
 
 	@Override
-	public void setMargin(float margin) {
+	public GImpactShape setMargin(float margin) {
 		collisionMargin = margin;
+		return null;
 	}
 
 	@Override

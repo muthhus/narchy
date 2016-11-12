@@ -83,8 +83,19 @@ public abstract class Widget extends Stacking {
     public static void main(String[] args) {
 
         SpaceGraph.window(widgetDemo(), 800, 600);
-        SpaceGraph.window(new Cuboid(widgetDemo(), 2, 1.6f).color(0.5f, 0.5f, 0.5f, 0.25f), 1200, 1000);
 
+        SpaceGraph dd = SpaceGraph.window(new Cuboid(widgetDemo(), 16, 8f).color(0.5f, 0.5f, 0.5f, 0.25f), 1000, 1000);
+
+//        SpaceGraph.window(col(
+//                new Slider(0.5f, 0, 1).on((s,v)->{
+//                    dd.zNear = 0.1f + 2f * v;
+//                    System.out.println("zNear=" + dd.zNear);
+//                }),
+//                new Slider(0.5f, 0, 1).on((s,v)->{
+//                    dd.zFar = 10f + 200f * v;
+//                    System.out.println("zFar=" + dd.zFar);
+//                })
+//        ), 1000, 1000);
 
     }
 

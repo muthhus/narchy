@@ -15,6 +15,7 @@ import spacegraph.math.v3;
 import spacegraph.phys.Collidable;
 import spacegraph.phys.Dynamic;
 import spacegraph.phys.collision.ClosestRay;
+import spacegraph.phys.collision.narrow.VoronoiSimplexSolver;
 import spacegraph.phys.constraint.Point2PointConstraint;
 import spacegraph.phys.constraint.TypedConstraint;
 import spacegraph.phys.math.MotionState;
@@ -466,6 +467,7 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
         private Spatial pickedSpatial;
         private Collidable picked;
         private v3 hitPoint;
+        private final VoronoiSimplexSolver simplexSolver = new VoronoiSimplexSolver();
 
 
         public OrbMouse(JoglPhysics g) {
@@ -498,7 +500,7 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
 
                         v3 objTarget = co.getWorldOrigin();
 
-                        space.camera(objTarget, co.shape().getBoundingRadius() * 1.25f + space.nearPlane * 1.25f);
+                        space.camera(objTarget, co.shape().getBoundingRadius() * 1.25f + space.zNear * 1.25f);
 
                     }
                 }
@@ -628,13 +630,14 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
         }
 
         public ClosestRay mousePick(int sx, int sy) {
-            return mousePick(v(space.rayTo(sx, sy)));
+            return mousePick(space.rayTo(sx, sy));
         }
 
         public ClosestRay mousePick(v3 rayTo) {
             ClosestRay r = this.rayCallback;
             v3 camPos = space.camPos;
-            space.dyn.rayTest(camPos, rayTo, r.set(camPos, rayTo));
+
+            space.dyn.rayTest(camPos, rayTo, r.set(camPos, rayTo), simplexSolver);
             return r;
         }
 

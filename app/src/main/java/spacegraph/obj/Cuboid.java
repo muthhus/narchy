@@ -62,8 +62,8 @@ public class Cuboid<X> extends SimpleSpatial<X> {
 
     @Override
     public Surface onTouch(Collidable body, ClosestRay r, short[] buttons) {
-        Surface s0 = super.onTouch(body, r, buttons);
 
+        Surface s0 = super.onTouch(body, r, buttons);
         if (s0 != null)
             return s0;
 

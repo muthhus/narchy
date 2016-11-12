@@ -2,6 +2,7 @@ package spacegraph.obj.widget;
 
 import com.jogamp.opengl.GL2;
 import org.apache.commons.lang3.mutable.MutableFloat;
+import org.jetbrains.annotations.Nullable;
 import spacegraph.Facial;
 import spacegraph.SpaceGraph;
 import spacegraph.math.v2;
@@ -21,6 +22,12 @@ public class Slider extends Widget {
     public final MutableFloat min;
     public final MutableFloat max;
 
+    @Nullable SliderChange change = null;
+
+    public interface SliderChange {
+        void onChange(Slider s, float value);
+    }
+
     public Slider(float v, float min, float max) {
         this(new MutableFloat(v), new MutableFloat(min), new MutableFloat(max));
     }
@@ -31,6 +38,11 @@ public class Slider extends Widget {
         this.max = max;
 
 
+    }
+
+    public Slider on(SliderChange c) {
+        this.change = c;
+        return this;
     }
 
     @Override
@@ -64,11 +76,20 @@ public class Slider extends Widget {
         if (leftButton(buttons)) {
             //System.out.println(this + " touched " + hitPoint + " " + Arrays.toString(buttons));
 
-            value.setValue(r(value(hitPoint)));
+            set(r(value(hitPoint)));
 
             return true;
         }
         return true;
+    }
+
+    public void set(float v) {
+        float x = value();
+        if (x != v) {
+            value.setValue(v);
+            if (change!=null)
+                change.onChange(this, v);
+        }
     }
 
 

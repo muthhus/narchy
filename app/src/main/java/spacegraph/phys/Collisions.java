@@ -257,22 +257,7 @@ public abstract class Collisions<X> {
 		return collidables().size();
 	}
 
-	// TODO
-	public static void rayTestSingle(Transform rayFromTrans, Transform rayToTrans,
-									 Collidable collidable,
-									 CollisionShape collisionShape,
-									 Transform colObjWorldTransform,
-									 RayResultCallback resultCallback) {
-		rayTestSingle(
-				rayFromTrans,
-				rayToTrans,
-				collidable,
-				collisionShape,
-				colObjWorldTransform,
-				new VoronoiSimplexSolver(),
-				resultCallback);
-
-	}
+	final static ConvexShape pointShape = (ConvexShape) new SphereShape(0f).setMargin(0);
 
 	public static void rayTestSingle(Transform rayFromTrans, Transform rayToTrans,
                                      Collidable collidable,
@@ -280,20 +265,16 @@ public abstract class Collisions<X> {
                                      Transform colObjWorldTransform,
 									 VoronoiSimplexSolver simplexSolver,
                                      RayResultCallback resultCallback) {
-		SphereShape pointShape = new SphereShape(0f);
-		pointShape.setMargin(0f);
-		ConvexShape castShape = pointShape;
 
 		if (collisionShape.isConvex()) {
 			ConvexCast.CastResult castResult = new ConvexCast.CastResult();
 			castResult.fraction = resultCallback.closestHitFraction;
 
 			ConvexShape convexShape = (ConvexShape) collisionShape;
-			simplexSolver.reset();
 
 			//#define USE_SUBSIMPLEX_CONVEX_CAST 1
 			//#ifdef USE_SUBSIMPLEX_CONVEX_CAST
-			SubsimplexConvexCast convexCaster = new SubsimplexConvexCast(castShape, convexShape, simplexSolver);
+			SubsimplexConvexCast convexCaster = new SubsimplexConvexCast(pointShape, convexShape, simplexSolver);
 			//#else
 			//btGjkConvexCast	convexCaster(castShape,convexShape,&simplexSolver);
 			//btContinuousConvexCollision convexCaster(castShape,convexShape,&simplexSolver,0);
@@ -373,11 +354,15 @@ public abstract class Collisions<X> {
 						// replace collision shape so that callback can determine the triangle
 						CollisionShape saveCollisionShape = collidable.shape();
 						collidable.internalSetTemporaryCollisionShape(childCollisionShape);
+
+						simplexSolver.reset();
 						rayTestSingle(rayFromTrans, rayToTrans,
 								collidable,
 								childCollisionShape,
 								childWorldTrans,
+								simplexSolver,
 								resultCallback);
+
 						// restore
 						collidable.internalSetTemporaryCollisionShape(saveCollisionShape);
 					}
@@ -539,7 +524,7 @@ public abstract class Collisions<X> {
 	 * rayTest performs a raycast on all objects in the CollisionWorld, and calls the resultCallback.
 	 * This allows for several queries: first hit, all hits, any hit, dependent on the value returned by the callback.
 	 */
-	public RayResultCallback rayTest(v3 rayFromWorld, v3 rayToWorld, RayResultCallback resultCallback) {
+	public RayResultCallback rayTest(v3 rayFromWorld, v3 rayToWorld, RayResultCallback resultCallback, VoronoiSimplexSolver simplexSolver) {
 
 
 		Transform rayFromTrans = new Transform(rayFromWorld);
@@ -577,10 +562,13 @@ public abstract class Collisions<X> {
 					hitLambda[0] = resultCallback.closestHitFraction;
 
 					if (AabbUtil2.rayAabb(rayFromWorld, rayToWorld, collisionObjectAabbMin, collisionObjectAabbMax, hitLambda)) {
+
+						simplexSolver.reset();
 						rayTestSingle(rayFromTrans, rayToTrans,
 								collidable,
 								shape,
 								worldTransform,
+								simplexSolver,
 								resultCallback);
 					}
 				}

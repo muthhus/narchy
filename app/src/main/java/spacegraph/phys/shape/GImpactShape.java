@@ -116,7 +116,7 @@ public abstract class GImpactShape extends ConcaveShape {
 	}
 
 	@Override
-	public void setMargin(float margin) {
+	public CollisionShape setMargin(float margin) {
 		collisionMargin = margin;
 		int i = getNumChildShapes();
 		while ((i--) != 0) {
@@ -125,6 +125,7 @@ public abstract class GImpactShape extends ConcaveShape {
 		}
 
 		needs_update = true;
+		return this;
 	}
 
 	/**

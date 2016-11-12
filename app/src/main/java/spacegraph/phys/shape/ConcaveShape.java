@@ -42,8 +42,9 @@ public abstract class ConcaveShape extends CollisionShape {
 	}
 
 	@Override
-	public void setMargin(float margin) {
+	public CollisionShape setMargin(float margin) {
 		this.collisionMargin = margin;
+		return this;
 	}
 	
 }

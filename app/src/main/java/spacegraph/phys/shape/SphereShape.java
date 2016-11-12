@@ -83,11 +83,6 @@ public class SphereShape extends ConvexInternalShape {
 	}
 
 	@Override
-	public void setMargin(float margin) {
-		super.setMargin(margin);
-	}
-
-	@Override
 	public float getMargin() {
 		// to improve gjk behaviour, use radius+margin as the full margin, so never get into the penetration case
 		// this means, non-uniform scaling is not supported anymore

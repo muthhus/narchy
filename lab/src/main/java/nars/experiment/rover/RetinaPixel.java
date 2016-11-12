@@ -6,6 +6,7 @@ import spacegraph.SimpleSpatial;
 import spacegraph.math.v3;
 import spacegraph.phys.Collisions;
 import spacegraph.phys.Dynamics;
+import spacegraph.phys.collision.narrow.VoronoiSimplexSolver;
 import spacegraph.phys.math.Transform;
 import spacegraph.render.Draw;
 
@@ -18,6 +19,7 @@ public class RetinaPixel extends Collisions.RayResultCallback {
     float r, g, b, a;
     public float rangeMax;
     private final SimpleSpatial parent;
+    private final VoronoiSimplexSolver simplexSolver = new VoronoiSimplexSolver();
 
     public RetinaPixel(SimpleSpatial parent) {
         this.parent = parent;
@@ -38,7 +40,8 @@ public class RetinaPixel extends Collisions.RayResultCallback {
         a = distanceToAlpha(rangeMax);
         worldHit.set(worldTarget);
 
-        d.rayTest(worldPosition, worldTarget, this);
+        simplexSolver.reset();
+        d.rayTest(worldPosition, worldTarget, this, simplexSolver);
     }
 
     public void render(GL2 gl) {

@@ -45,6 +45,8 @@ public class ConvexConvexAlgorithm extends CollisionAlgorithm {
 
 	private final GjkPairDetector gjkPairDetector = new GjkPairDetector();
 
+	final VoronoiSimplexSolver voronoiSimplex = new VoronoiSimplexSolver();
+
 	public boolean ownManifold;
 	public PersistentManifold manifoldPtr;
 	public boolean lowLevelOfDetail;
@@ -167,7 +169,9 @@ public class ConvexConvexAlgorithm extends CollisionAlgorithm {
 
 			SphereShape sphere1 = new SphereShape(col1.getCcdSweptSphereRadius()); // todo: allow non-zero sphere sizes, for better approximation
 			ConvexCast.CastResult result = new ConvexCast.CastResult();
-			VoronoiSimplexSolver voronoiSimplex = new VoronoiSimplexSolver();
+
+			voronoiSimplex.reset();
+
 			//SubsimplexConvexCast ccd0(&sphere,min0,&voronoiSimplex);
 			///Simplification, one object is simplified as a sphere
 			GjkConvexCast ccd1 = new GjkConvexCast(convex0, sphere1, voronoiSimplex);

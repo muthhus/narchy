@@ -57,6 +57,13 @@ public class VoronoiSimplexSolver extends SimplexSolverInterface {
 
 	public final SubSimplexClosestResult cachedBC = new SubSimplexClosestResult();
 
+
+
+	/** TODO there are many instances where instantiating this can be replaced by a reusable instance, but call reset() before use */
+	@Deprecated public VoronoiSimplexSolver() {
+
+	}
+
 	public boolean needsUpdate;
 	
 	{

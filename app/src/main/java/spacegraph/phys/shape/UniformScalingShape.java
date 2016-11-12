@@ -101,8 +101,9 @@ public class UniformScalingShape extends ConvexShape {
 	}
 
 	@Override
-	public void setMargin(float margin) {
+	public CollisionShape setMargin(float margin) {
 		childConvexShape.setMargin(margin);
+		return this;
 	}
 
 	@Override

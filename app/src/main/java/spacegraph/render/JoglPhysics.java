@@ -71,6 +71,7 @@ abstract public class JoglPhysics<X> extends JoglSpace implements GLEventListene
     private float lastFrameTime;
 
     private int maxSubsteps = 8; //set to zero for variable timing
+    private float aspect;
 
 
     public void camera(v3 target, float distance) {
@@ -129,16 +130,13 @@ abstract public class JoglPhysics<X> extends JoglSpace implements GLEventListene
 //    public final MutableFloat azi;
     float top;
     float bottom;
-    public float nearPlane;
     float tanFovV;
-    float tanFovH;
-    float fov;
-    float farPlane;
+    //float fov;
     float left;
     float right;
 
-    int zNear = 1;
-    int zFar = 500;
+    public float zNear = 0.5f;
+    public float zFar = 400;
 
 
     protected int screenWidth = 0;
@@ -388,7 +386,7 @@ abstract public class JoglPhysics<X> extends JoglSpace implements GLEventListene
 
         //gl.glFrustumf(-1.0f, 1.0f, -1.0f, 1.0f, 1.0f, 10000.0f);
         //glu.gluPerspective(45, (float) screenWidth / screenHeight, 4, 2000);
-        perspective(0, true, 45 * FloatUtil.PI / 180.0f, (float) screenWidth / screenHeight, zNear, zFar);
+        perspective(0, true, 45 * FloatUtil.PI / 180.0f, (float) screenWidth / screenHeight);
 
 
 //        final v3 camDir = new v3();
@@ -417,16 +415,17 @@ abstract public class JoglPhysics<X> extends JoglSpace implements GLEventListene
     private final float[] matTmp = new float[16];
 
     void perspective(final int m_off, final boolean initM,
-                     final float fovy_rad, final float aspect, final float zNear, final float zFar) throws GLException {
-        this.top = (float) Math.tan(fovy_rad / 2f) * zNear; // use tangent of half-fov !
-        this.bottom = -1.0f * top;    //          -1f * fovhvTan.top * zNear
-        left = aspect * bottom; // aspect * -1f * fovhvTan.top * zNear
+                     final float fovy_rad, final float aspect) throws GLException {
+
+        this.aspect = aspect;
+
+        tanFovV = (float)Math.tan(fovy_rad / 2f);
+
+        top = tanFovV * zNear; // use tangent of half-fov !
         right = aspect * top;    // aspect * fovhvTan.top * zNear
-        nearPlane = zNear;
-        farPlane = zFar;
-        tanFovV = (top - bottom) * 0.5f / zNear;
-        tanFovH = (right - left) * 0.5f / zNear;
-        fov = 2f * (float) Math.atan(tanFovV);
+        bottom = -top;
+        left = -right;
+
         gl.glMultMatrixf(
                 makeFrustum(matTmp, m_off, initM, left, right, bottom, top, zNear, zFar),
                 0
@@ -642,52 +641,24 @@ abstract public class JoglPhysics<X> extends JoglSpace implements GLEventListene
 //    }
 
     public v3 rayTo(int x, int y) {
+        return rayTo(  -1f + 2 *  x / (float) screenWidth,   -1f + 2 * y / (float)screenHeight);
+    }
 
+    public v3 rayTo(float x, float y) {
+        return rayTo(x, y, zFar);
+    }
 
-        v3 rayFrom = v(camPos);
-        v3 rayForward = v(camFwd);
-//        rayForward.sub(camPosTarget, camPos);
-        rayForward.normalize();
-        rayForward.scale(farPlane);
+    public v3 rayTo(float x, float y, float depth) {
 
-        //Vector3f rightOffset = new Vector3f();
-        v3 vertical = v(camUp);
+        v3 hor = v().cross(camFwd, camUp);
+        v3 ver = v().cross(hor, camFwd);
 
-        v3 hor = v();
-        // TODO: check: hor = rayForward.cross(vertical);
-        hor.cross(rayForward, vertical);
-        hor.normalize();
-        // TODO: check: vertical = hor.cross(rayForward);
-        vertical.cross(hor, rayForward);
-        vertical.normalize();
+        v3 center = v(camPos); center.addScaled(camFwd, depth);
 
-        hor.scale(2f * farPlane * tanFovH);
-        vertical.scale(2f * farPlane * tanFovV);
-
-        v3 rayToCenter = v();
-        rayToCenter.add(rayFrom, rayForward);
-
-        v3 dHor = v(hor);
-        dHor.scale(1f / (float) screenWidth);
-
-        v3 dVert = v(vertical);
-        dVert.scale(1.f / (float) screenHeight);
-
-        v3 tmp1 = v();
-        v3 tmp2 = v();
-        tmp1.scale(0.5f, hor);
-        tmp2.scale(0.5f, vertical);
-
-        v3 rayTo = v();
-        rayTo.sub(rayToCenter, tmp1);
-        rayTo.add(tmp2);
-
-        tmp1.scale(x, dHor);
-        tmp2.scale(y, dVert);
-
-        rayTo.add(tmp1);
-        rayTo.sub(tmp2);
-        return rayTo;
+        return (v3)
+            v(center)
+                .addScaled(hor, depth * tanFovV * aspect * x)
+                .addScaled(ver, depth * tanFovV *  -y);
     }
 
     /**

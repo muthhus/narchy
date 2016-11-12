@@ -153,7 +153,7 @@ public abstract class CollisionShape {
 //debugging support
 	public abstract String getName();
 //#endif //__SPU__
-	public abstract void setMargin(float margin);
+	public abstract CollisionShape setMargin(float margin);
 
 	public abstract float getMargin();
 	

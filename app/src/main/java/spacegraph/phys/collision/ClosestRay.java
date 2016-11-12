@@ -35,20 +35,21 @@ public class ClosestRay extends Collisions.RayResultCallback {
 
     @Override
     public float addSingleResult(Collisions.LocalRayResult rayResult, boolean normalInWorldSpace) {
-        // caller already does the filter on the closestHitFraction
-        assert (rayResult.hitFraction <= closestHitFraction);
+        // note: caller already does the filter on the closestHitFraction
+        float f = rayResult.hitFraction;
+        if ((f > closestHitFraction))
+            throw new RuntimeException();
 
-        closestHitFraction = rayResult.hitFraction;
+        closestHitFraction = f;
         collidable = rayResult.collidable;
-        if (normalInWorldSpace) {
-            hitNormalWorld.set(rayResult.hitNormal);
-        } else {
+
+        hitNormalWorld.set(rayResult.hitNormal);
+        if (!normalInWorldSpace) {
             // need to transform normal into worldspace
-            hitNormalWorld.set(rayResult.hitNormal);
-            collidable.getWorldTransform(new Transform()).basis.transform(hitNormalWorld);
+            collidable.getWorldTransform(new Transform()).transform(hitNormalWorld);
         }
 
-        VectorUtil.setInterpolate3(hitPointWorld, rayFromWorld, rayToWorld, rayResult.hitFraction);
-        return rayResult.hitFraction;
+        VectorUtil.setInterpolate3(hitPointWorld, rayFromWorld, rayToWorld, f);
+        return f;
     }
 }

@@ -110,8 +110,9 @@ public abstract class ConvexInternalShape extends ConvexShape {
 	}
 
 	@Override
-	public void setMargin(float margin) {
+	public CollisionShape setMargin(float margin) {
 		this.collisionMargin = margin;
+		return this;
 	}
 
 	@Override
