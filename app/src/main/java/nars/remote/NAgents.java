@@ -89,8 +89,7 @@ abstract public class NAgents extends NAgent {
         a.trace = true;
         chart(a);
 
-        //a.run(frames);
-        a.runRT(30f).join();
+        a.runRT(50).join();
 
     }
 
@@ -101,7 +100,7 @@ abstract public class NAgents extends NAgent {
     }
 
     public static Alann newAlann() {
-        Alann nar = new Alann();
+        Alann nar = new Alann(new RealtimeClock.CS(true).setDuration(1));
 
         MySTMClustered stm = new MySTMClustered(nar, 128, '.', 3, true, 6);
         MySTMClustered stmGoal = new MySTMClustered(nar, 32, '!', 2, true, 4);

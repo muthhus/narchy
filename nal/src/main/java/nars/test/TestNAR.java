@@ -387,8 +387,8 @@ public class TestNAR  {
         return mustOutput(ttt, ttt + withinCycles, term, '.', freq, freq, confidence, confidence, nar.time(t));
     }
 
-    @NotNull
-    public TestNAR mustNotOutput(long withinCycles, @NotNull String sentenceTerm, char punc, @NotNull long... occs) {
+    /** tests for any truth value at the given occurrences */
+    @NotNull public TestNAR mustNotOutput(long withinCycles, @NotNull String sentenceTerm, char punc, @NotNull long... occs) {
         for (long occ : occs)
             mustNotOutput(withinCycles, sentenceTerm, punc, 0, 1, 0, 1, occ);
         return this;

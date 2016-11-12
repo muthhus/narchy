@@ -579,6 +579,7 @@ public class PremiseRule extends GenericCompound {
                 arg1 = arg2 = null;*/
             //}
 
+            String XString = X.toString();
             switch (predicateNameStr) {
 
 
@@ -660,7 +661,7 @@ public class PremiseRule extends GenericCompound {
 //                    break;
 
                 case "component":
-                    if (X.toString().equals("task") && Y.toString().equals("belief")) {
+                    if (XString.equals("task") && Y.toString().equals("belief")) {
                         pres.add(new ComposedBy(0,1));
                     } else {
                         throw new UnsupportedOperationException();
@@ -668,7 +669,7 @@ public class PremiseRule extends GenericCompound {
                     break;
 
                 case "time":
-                    switch (X.toString()) {
+                    switch (XString) {
                         case "after":
                             pres.add(events.after);
                             break;
@@ -847,19 +848,19 @@ public class PremiseRule extends GenericCompound {
 ////                    }
 //                    break;
 
-//                case "belief":
-//                    switch (arg1.toString()) {
-//                        case "negative":
-//                            pres.add( BeliefNegative.the;
-//                            break;
-//                        case "positive":
-//                            pres.add( BeliefPositive.the;
-//                            break;
-//                    }
-//                    break;
+                case "belief":
+                    switch (XString) {
+                        case "negative":
+                            pres.add( BeliefPositive.BeliefNegative.the);
+                            break;
+                        case "positive":
+                            pres.add( BeliefPositive.the);
+                            break;
+                    }
+                    break;
 
                 case "task":
-                    switch (X.toString()) {
+                    switch (XString) {
                         case "negative":
                             pres.add(TaskNegative.the);
                             break;
@@ -890,7 +891,7 @@ public class PremiseRule extends GenericCompound {
                             taskPunc = ' ';
                             break;
                         default:
-                            throw new RuntimeException("Unknown task punctuation type: " + X.toString());
+                            throw new RuntimeException("Unknown task punctuation type: " + XString);
                     }
                     break;
 

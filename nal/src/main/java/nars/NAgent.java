@@ -10,6 +10,7 @@ import nars.concept.SensorConcept;
 import nars.concept.WiredCompoundConcept;
 import nars.link.BLink;
 import nars.nal.UtilityFunctions;
+import nars.nar.Alann;
 import nars.nar.Default;
 import nars.task.GeneratedTask;
 import nars.task.MutableTask;
@@ -415,6 +416,9 @@ abstract public class NAgent implements NSense, NAction {
 
             @Override
             public void next() {
+
+                now = nar.time();
+
                 doFrame();
 
                 now = nar.time();

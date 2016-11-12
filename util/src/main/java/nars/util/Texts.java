@@ -257,7 +257,7 @@ public enum Texts {
 
     public static String n4(float x) {
         if (x!=x)
-            return "NotNum"; //NaN
+            return "NNaaNN";
         else
             return fourDecimal.get().format(x);
     }

@@ -11,7 +11,7 @@ import java.util.concurrent.atomic.AtomicLong;
 public abstract class RealtimeClock implements Clock {
 
 
-    private static final float DEFAULT_DURATION_SECONDS = 0.5f;
+
     private final int unitsPerSecod;
     long t, t0 = -1;
     private long start;
@@ -27,13 +27,17 @@ public abstract class RealtimeClock implements Clock {
         this.unitsPerSecod = unitsPerSecond;
         this.start = relativeToStart ? getRealTime() : 0L;
 
-        setDuration(DEFAULT_DURATION_SECONDS);
+        setDuration(1 /* time unit */);
 
     }
 
-    public final RealtimeClock setDuration(float seconds) {
-        duration = secondsToUnits(seconds);
+    public final RealtimeClock setDuration(int units) {
+        duration = units;
         return this;
+    }
+
+    public final RealtimeClock setDuration(float seconds) {
+        return setDuration(secondsToUnits(seconds));
     }
 
     public final float secondsToUnits(float s) {

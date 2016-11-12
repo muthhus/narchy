@@ -18,9 +18,11 @@ public interface TruthOperator {
     static void permuteTruth(@NotNull TruthOperator[] values, @NotNull Map<Term, TruthOperator> table) {
         for (TruthOperator tm : values) {
             table.put($.the(tm.toString()), tm);
-            table.put($.the(tm.toString() + 'X'), TruthOperator.swapped(tm));
-            table.put($.the(tm.toString() + 'N'), TruthOperator.negated(tm));
-            table.put($.the(tm.toString() + "NX"), TruthOperator.negated(TruthOperator.swapped(tm)));
+            table.put($.the(tm.toString() + 'X'), new SwappedTruth(tm));
+            table.put($.the(tm.toString() + 'N'), new NegatedTaskTruth(tm)); //ie. NP
+            table.put($.the(tm.toString() + "PN"), new NegatedBeliefTruth(tm));
+            table.put($.the(tm.toString() + "NN"), new NegatedTruths(tm));
+            table.put($.the(tm.toString() + "NX"), new NegatedTaskTruth(new SwappedTruth(tm)));
         }
     }
 
@@ -39,15 +41,6 @@ public interface TruthOperator {
     boolean allowOverlap();
     boolean single();
 
-
-    @NotNull
-    static TruthOperator swapped(TruthOperator o) {
-        return new SwappedTruth(o);
-    }
-    @NotNull
-    static TruthOperator negated(@NotNull TruthOperator o) {
-        return new NegatedTruth(o);
-    }
 
     final class SwappedTruth implements TruthOperator {
 
@@ -81,42 +74,76 @@ public interface TruthOperator {
         }
     }
 
-    final class NegatedTruth implements TruthOperator {
+    /** ____N , although more accurately it would be called: 'NP' */
+    final class NegatedTaskTruth implements TruthOperator {
 
-        @NotNull
-        private final TruthOperator o;
-        private final transient boolean overlapCached;
+        @NotNull private final TruthOperator o;
 
-        public NegatedTruth(@NotNull TruthOperator o) {
+        public NegatedTaskTruth(@NotNull TruthOperator o) {
             this.o = o;
-            overlapCached = o.allowOverlap();
         }
 
-        @NotNull
-        @Override
-        public final String toString() {
-            return o.toString() + 'N';
-        }
-
-        @Override
-        public
-        @Nullable
-        Truth apply(@Nullable Truth task, @Nullable Truth belief, NAR m, float minConf) {
+        @Override @Nullable public Truth apply(@Nullable Truth task, @Nullable Truth belief, NAR m, float minConf) {
             return task == null ? null : o.apply(task.negated(), belief, m, minConf);
         }
 
-        @Override
-        public boolean allowOverlap() {
-            //return o.allowOverlap();
-            return overlapCached;
+        @NotNull @Override public final String toString() {
+            return o.toString() + "PN";
         }
 
-        @Override
-        public boolean single() {
+        @Override public boolean allowOverlap() { return o.allowOverlap(); }
+
+        @Override public boolean single() {
             return o.single();
         }
     }
 
+    final class NegatedBeliefTruth implements TruthOperator {
+
+        @NotNull private final TruthOperator o;
+
+        public NegatedBeliefTruth(@NotNull TruthOperator o) {
+            this.o = o;
+        }
+
+        @Override @Nullable public Truth apply(@Nullable Truth task, @Nullable Truth belief, NAR m, float minConf) {
+            return o.apply(task, belief!=null ? belief.negated() : null, m, minConf);
+        }
+
+        @NotNull @Override public final String toString() {
+            return o + "PN";
+        }
+
+        @Override public boolean allowOverlap() {  return o.allowOverlap();         }
+
+        @Override public boolean single() {
+            return o.single();
+        }
+    }
+
+    /** negates both task and belief frequency */
+    final class NegatedTruths implements TruthOperator {
+
+        @NotNull private final TruthOperator o;
+
+        public NegatedTruths(@NotNull TruthOperator o) {
+            this.o = o;
+        }
+
+        @Override @Nullable public Truth apply(@Nullable Truth task, @Nullable Truth belief, NAR m, float minConf) {
+            return task == null ? null : o.apply(task.negated(), belief!=null ? belief.negated() : null, m, minConf);
+        }
+
+        @NotNull @Override public final String toString() {
+            return o + "NN";
+        }
+
+        @Override public boolean allowOverlap() {  return o.allowOverlap();         }
+
+        @Override public boolean single() {
+            return o.single();
+        }
+    }
 
     @Nullable
     static Truth identity(@Nullable Truth t, float minConf) {

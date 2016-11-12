@@ -173,7 +173,11 @@ public class Alann extends NAR {
     }
 
     public Alann() {
-        this(new FrameClock(),
+        this(new FrameClock());
+    }
+
+    public Alann(Clock clock) {
+        this(clock,
                 //new SingleThreadExecutioner()
                 new MultiThreadExecutioner(2, 1024*16).sync(false),
                 4

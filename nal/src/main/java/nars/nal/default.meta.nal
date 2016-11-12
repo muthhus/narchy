@@ -230,17 +230,20 @@
 //      //NAL7 specific inference ////////////////////////////////////////////////////////////////////////////////////
 //      Reasoning about temporal statements. those are using the ==> relation because relation in time is a relation of the truth between statements.
 
-    (A ==> C), B, time(decomposeTask) |- subIfUnifiesAny(C,A,B), (Belief:DeductionX, Goal:InductionX)
+
     B, (A ==> C), task(positive), time(decomposeBelief) |- subIfUnifiesAny(C,A,B), (Belief:Deduction, Goal:Induction)
         B, ((--,%A) ==> C), task(negative), time(decomposeBelief) |- subIfUnifiesAny(C,A,B), (Belief:DeductionN, Goal:InductionN)
 
     B, (C ==> A), task(positive), time(decomposeBelief) |- subIfUnifiesAny(C,A,B), (Belief:Abduction, Goal:Deduction)
-        B, (C ==> (--,%A)), task(negative), time(decomposeBelief) |- subIfUnifiesAny(C,A,B), (Belief:AbductionN, Goal:Deduction)
+        //B, (C ==> A), task(negative), belief(negative), time(decomposeBelief) |- subIfUnifiesAny(C,A,B), (Belief:AbductionPN, Goal:DeductionPN)
 
-    B, (A <=> C), time(decomposeBelief) |- subIfUnifiesAny(C,A,B), (Belief:Analogy, Goal:Strong)
+    B, (A <=> C), belief(positive), time(decomposeBelief), neqCom(B,C) |- subIfUnifiesAny(C,A,B), (Belief:Analogy, Goal:Strong)
+        B, (A <=> C), belief(negative), time(decomposeBelief), neqCom(B,C) |- subIfUnifiesAny((--,%C),A,B), (Belief:AnalogyPN, Goal:StrongPN)
 
     //these are only valid if A occurrs during or after C. the opposite is not logical and would also produce redundant results
-    B, (C && A), time(decomposeBelief) |- subIfUnifiesForward(C,A,B), (Goal:Strong)
+    B, (C && A), task(positive), time(decomposeBelief), neqCom(B,C) |- subIfUnifiesForward(C,A,B), (Goal:Strong)
+        B, (C && (--,%A)), task(negative), time(decomposeBelief), neqCom(B,C) |- subIfUnifiesForward(C,A,B), (Goal:StrongN)
+
         //experimental pos/neg polarization
         //B, (C && (--,%A)), task(negative), time(decomposeBelief) |- subIfUnifiesForward(C,A,B), (Goal:StrongN)
 

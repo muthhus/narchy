@@ -74,9 +74,6 @@ public class NarseseExtendedTest {
         eternal(task("(a & b). %1.0;0.9%"));
 
 
-
-
-
     }
 
     @Test public void testQuestionTenseOneCharacter() {
@@ -189,6 +186,13 @@ public class NarseseExtendedTest {
 
         assertEquals( "(--,(x&&y))", term("-- (x && y)").toString() );
 
+        assertEquals( term("(goto(z) <=>+5 --(x))"),
+                term("(goto(z) <=>+5 (--,(x)))")
+        );
+
+        assertEquals( term("(goto(z) <=>+5 --x:y)"),
+                      term("(goto(z) <=>+5 (--,x:y))")
+        );
 
         Compound nab = term("--(a & b)");
         assertTrue(nab.op() == Op.NEG);

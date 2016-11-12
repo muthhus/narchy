@@ -2,7 +2,7 @@
 
 Non-Axiomatic Reasoning System ([NARS](https://sites.google.com/site/narswang/home)) processes **Tasks** imposed by and perceived from its environment, which may include human or animal users, and other computer systems.
 
-**NARchy** derives from [OpenNARS](https://github.com/opennars/opennars2), the open-source version of [NARS](https://sites.google.com/site/narswang/home), a general-purpose AI system, designed in the framework of a reasoning system.
+**NARchy** is derived from the general-purpose reasoning system [OpenNARS](https://github.com/opennars).
 
 ## Usage
 
