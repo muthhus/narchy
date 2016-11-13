@@ -5,6 +5,8 @@ import com.jogamp.opengl.GL2;
 import org.apache.commons.lang.ArrayUtils;
 import spacegraph.input.Finger;
 import spacegraph.math.v2;
+import spacegraph.math.v3;
+import spacegraph.phys.Collidable;
 
 import java.util.Arrays;
 
@@ -127,13 +129,15 @@ public class Ortho implements WindowListener, KeyListener, MouseListener {
 
     @Override
     public void keyPressed(KeyEvent e) {
-
+        surface.onKey(e, true);
     }
 
     @Override
     public void keyReleased(KeyEvent e) {
-
+        surface.onKey(e, false);
     }
+
+
 
     @Override
     public void mouseClicked(MouseEvent e) {

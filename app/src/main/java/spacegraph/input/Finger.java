@@ -23,7 +23,7 @@ public class Finger {
 
     private final Surface root;
 
-    final v2 hit = new v2();
+    public final v2 hit = new v2();
     public final boolean[] buttonDown = new boolean[5];
     public final boolean[] prevButtonDown = new boolean[5];
 

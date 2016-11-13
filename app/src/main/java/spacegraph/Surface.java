@@ -1,6 +1,7 @@
 package spacegraph;
 
 import com.google.common.collect.Lists;
+import com.jogamp.newt.event.KeyEvent;
 import com.jogamp.opengl.GL2;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -97,16 +98,6 @@ public class Surface {
 
 
 
-    /** returns true if the event has been absorbed, false if it should continue propagating */
-    public boolean onKey(v2 hitPoint, char charCode, boolean pressed) {
-        if (children!=null) {
-            for (Surface c : children) {
-                if (c.onKey(hitPoint, charCode, pressed))
-                    return true;
-            }
-        }
-        return false;
-    }
 
     protected void paint(GL2 gl) {
 
@@ -157,4 +148,26 @@ public class Surface {
         translateLocal.set(x, y);
         return this;
     }
+
+    public boolean onKey(KeyEvent e, boolean pressed) {
+        if (children!=null) {
+            for (Surface c : children) {
+                if (c.onKey(e, pressed))
+                    return true;
+            }
+        }
+        return false;
+    }
+
+    /** returns true if the event has been absorbed, false if it should continue propagating */
+    @Deprecated public boolean onKey(v2 hitPoint, char charCode, boolean pressed) {
+        if (children!=null) {
+            for (Surface c : children) {
+                if (c.onKey(hitPoint, charCode, pressed))
+                    return true;
+            }
+        }
+        return false;
+    }
+
 }
