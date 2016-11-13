@@ -7,7 +7,7 @@ import com.googlecode.lanterna.terminal.virtual.VirtualTerminal;
 import com.jogamp.opengl.GL2;
 import nars.util.data.list.FasterList;
 import org.apache.commons.collections4.queue.CircularFifoQueue;
-import spacegraph.Facial;
+import spacegraph.Ortho;
 import spacegraph.SpaceGraph;
 import spacegraph.Surface;
 import spacegraph.render.Draw;
@@ -42,7 +42,7 @@ public class TreeChart<X> extends Surface {
 				w("c", 0.07f)
 		);
 		System.out.println(tc.children);
-		s.add(new Facial(tc));
+		s.add(new Ortho(tc));
 	}
 
 	enum LayoutOrient {

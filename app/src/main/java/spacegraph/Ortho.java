@@ -1,12 +1,10 @@
 package spacegraph;
 
-import com.jogamp.newt.Window;
 import com.jogamp.newt.event.*;
-import com.jogamp.newt.opengl.GLWindow;
 import com.jogamp.opengl.GL2;
 import org.apache.commons.lang.ArrayUtils;
-import org.jetbrains.annotations.Nullable;
 import spacegraph.input.Finger;
+import spacegraph.math.v2;
 
 import java.util.Arrays;
 
@@ -15,7 +13,7 @@ import static spacegraph.math.v3.v;
 /**
  * orthographic widget adapter. something which goes on the "face" of a HUD ("head"s-up-display)
  */
-public class Facial implements WindowListener, KeyListener, MouseListener {
+public class Ortho implements WindowListener, KeyListener, MouseListener {
 
     boolean visible;
 
@@ -30,30 +28,44 @@ public class Facial implements WindowListener, KeyListener, MouseListener {
 
     final Surface surface;
     private boolean maximize;
-    private SpaceGraph window;
+    public SpaceGraph window;
 
-    public Facial(Surface surface) {
+    public Ortho(Surface surface) {
         this.surface = surface;
         this.mouse = new Finger(surface);
     }
 
-    public Facial move(float x, float y) {
+    public Ortho translate(float x, float y) {
         surface.translateLocal.set(x, y, 0);
         return this;
     }
 
-    public Facial scale(float s) {
+    public Ortho move(float x, float y) {
+        surface.translateLocal.add(x, y, 0);
+        return this;
+    }
+
+    public Ortho scale(float s) {
         return scale(s, s);
     }
 
-    public Facial scale(float sx, float sy) {
-        surface.scaleLocal.set(sx, sy);
+    public v2 scale() {
+        return surface.scaleLocal;
+    }
+
+    public Ortho scale(float sx, float sy) {
+        surface.scaleLocal.set(sx * window.getWidth(), sy * window.getHeight());
+        return this;
+    }
+
+    public Ortho scaleScale(float sx, float sy) {
+        surface.scaleLocal.scale(sx * window.getWidth(), sy * window.getHeight());
         return this;
     }
 
     public void start(SpaceGraph s) {
         this.window = s;
-        resized(s.window);
+        resized();
         s.addWindowListener(this);
         s.addMouseListener(this);
         s.addKeyListener(this);
@@ -66,25 +78,20 @@ public class Facial implements WindowListener, KeyListener, MouseListener {
     /**
      * expand to window
      */
-    public Facial maximize() {
+    public Ortho maximize() {
         maximize = true;
         return this;
     }
 
     @Override
     public void windowResized(WindowEvent e) {
-        resized((Window) e.getSource());
+        resized();
     }
 
-    private void resized(GLWindow window) {
+    private void resized() {
+        //TODO resize preserving aspect, translation, etc
         if (maximize) {
-            scale(window.getWidth(), window.getHeight());
-        }
-    }
-
-    private void resized(Window window) {
-        if (maximize) {
-            scale(window.getWidth(), window.getHeight());
+            scale(1f, 1f);
         }
     }
 
@@ -166,11 +173,33 @@ public class Facial implements WindowListener, KeyListener, MouseListener {
     }
 
     private void updateMouse(MouseEvent e, short[] buttonsDown) {
-        mouse.update(e, buttonsDown, window.window);
+        float x, y;
+
+        if (e != null) {
+
+            //screen coordinates
+            float sx = e.getX();
+            float sy = window.getHeight() - e.getY();
+
+            //screen to local
+            float lx = surface.scaleLocal.x;
+            float ly = surface.scaleLocal.y;
+
+            x = (sx - surface.translateLocal.x) / (lx);
+            y = (sy - surface.translateLocal.y) / (ly);
+
+        }
+        else {
+            x = y = Float.NaN;
+        }
+
+        mouse.update(e, x, y, buttonsDown);
+
     }
 
     @Override
     public void mouseDragged(MouseEvent e) {
+
         updateMouse(e);
     }
 
@@ -180,4 +209,5 @@ public class Facial implements WindowListener, KeyListener, MouseListener {
     public void mouseWheelMoved(MouseEvent e) {
 
     }
+
 }

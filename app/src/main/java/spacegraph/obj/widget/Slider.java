@@ -3,7 +3,7 @@ package spacegraph.obj.widget;
 import com.jogamp.opengl.GL2;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.Nullable;
-import spacegraph.Facial;
+import spacegraph.Ortho;
 import spacegraph.SpaceGraph;
 import spacegraph.math.v2;
 import spacegraph.obj.CrosshairSurface;
@@ -117,8 +117,8 @@ public class Slider extends Widget {
                 ), 8f /* width */, 6 /* height */
         ) );
 
-        s.add(new Facial(new ConsoleSurface(new ConsoleSurface.Demo(80, 25))).scale(500f, 400f));
-        s.add(new Facial(new CrosshairSurface(s)));
+        s.add(new Ortho(new ConsoleSurface(new ConsoleSurface.Demo(80, 25))).scale(500f, 400f));
+        s.add(new Ortho(new CrosshairSurface(s)));
         s.show(800, 800);
     }
 

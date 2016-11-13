@@ -38,7 +38,7 @@ import static spacegraph.math.v3.v;
 public class SpaceGraph<X> extends JoglPhysics<X> {
 
 
-    final List<Facial> facials = new FasterList<>(1);
+    final List<Ortho> orthos = new FasterList<>(1);
 
     final List<AbstractSpace<X,?>> inputs = new FasterList<>(1);
 
@@ -83,16 +83,21 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
         add(cc);
     }
 
+    public SpaceGraph(Ortho o) {
+        this();
+        add(o);
+    }
+
 
 //    private void onEvicted(O k1, Spatial<O> v1, RemovalCause removalCause) {
 //        //..
 //    }
 
-    final List<Facial> preAdd = $.newArrayList();
+    final List<Ortho> preAdd = $.newArrayList();
 
 
 
-    public SpaceGraph add(Facial c) {
+    public SpaceGraph add(Ortho c) {
         if (window == null) {
             preAdd.add(c);
         } else {
@@ -101,8 +106,8 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
         return this;
     }
 
-    void _add(Facial c) {
-        if (this.facials.add(c))
+    void _add(Ortho c) {
+        if (this.orthos.add(c))
             c.start(this);
     }
 
@@ -159,7 +164,7 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
         addKeyListener(new KeyXYZ(this));
 
 
-        for (Facial f : preAdd) {
+        for (Ortho f : preAdd) {
             _add(f);
         }
         preAdd.clear();
@@ -218,8 +223,8 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
         ortho();
 
         GL2 gl = this.gl;
-        for (int i = 0, facialsSize = facials.size(); i < facialsSize; i++) {
-            facials.get(i).render(gl);
+        for (int i = 0, facialsSize = orthos.size(); i < facialsSize; i++) {
+            orthos.get(i).render(gl);
         }
     }
 
@@ -250,7 +255,7 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
     }
 
     public static SpaceGraph window(Surface s, int w, int h) {
-        SpaceGraph win = new SpaceGraph().add(new Facial( s ).maximize());
+        SpaceGraph win = new SpaceGraph(new Ortho( s ).maximize());
         win.show(w, h);
         return win;
     }

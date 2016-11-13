@@ -6,13 +6,11 @@ import nars.NAR;
 import nars.NSchool;
 import nars.concept.SensorConcept;
 import nars.experiment.tetris.impl.TetrisState;
-import nars.nar.Alann;
-import nars.nar.Default;
 import nars.remote.NAgents;
 import nars.term.Termed;
 import nars.time.RealtimeClock;
 import nars.util.Util;
-import spacegraph.Facial;
+import spacegraph.Ortho;
 import spacegraph.SpaceGraph;
 import spacegraph.Surface;
 import spacegraph.obj.widget.*;
@@ -20,7 +18,6 @@ import spacegraph.obj.CrosshairSurface;
 import spacegraph.render.Draw;
 
 import java.awt.*;
-import java.util.Date;
 import java.util.List;
 
 import static nars.experiment.tetris.TetriSchool.TrainingPanel.newTrainingPanel;
@@ -156,7 +153,7 @@ public class TetriSchool extends NSchool implements Runnable {
                 } )
         ), 1000, 800);
 
-        s.add(new Facial(new CrosshairSurface(s)));
+        s.add(new Ortho(new CrosshairSurface(s)));
     }
 
     private Termed cell(int x, int y) {

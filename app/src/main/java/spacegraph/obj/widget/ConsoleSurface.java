@@ -10,7 +10,6 @@ import com.googlecode.lanterna.terminal.ShellTerminal;
 import com.googlecode.lanterna.terminal.virtual.DefaultVirtualTerminal;
 import com.googlecode.lanterna.terminal.virtual.VirtualTerminal;
 import com.jogamp.opengl.GL2;
-import com.jogamp.opengl.util.gl2.GLUT;
 import nars.util.Util;
 import spacegraph.SpaceGraph;
 import spacegraph.Surface;
@@ -19,8 +18,6 @@ import spacegraph.render.Draw;
 
 import java.io.IOException;
 import java.util.List;
-
-import static spacegraph.render.JoglSpace.glut;
 
 /**
  * Created by me on 4/1/16.
@@ -41,9 +38,7 @@ public class ConsoleSurface extends Surface implements Appendable {
         );
 
 
-        new SpaceGraph<VirtualTerminal>(
-                new Cuboid(new ConsoleSurface(vt1), 8, 8)
-        ).show(800, 800);
+        SpaceGraph.window(new ConsoleSurface(vt1), 800, 800);
     }
 
 
@@ -52,11 +47,15 @@ public class ConsoleSurface extends Surface implements Appendable {
      */
     public final VirtualTerminal term;
 
-    public final static int font = GLUT.STROKE_MONO_ROMAN;
-    public final static float fontWidth = glut.glutStrokeWidthf(font, 'X');
+    /** height/width of each cell */
+    final float charAspect = 1.25f;
 
-    final float fontUnscale;
-    private final float fontHeight;
+    /** percent of each grid cell width filled with the character */
+    float charScaleX = 0.75f;
+
+    /** percent of each grid cell height filled with the character */
+    float charScaleY = 0.6f;
+
 
     float bgAlpha = 0.5f;
     float fgAlpha = 0.9f;
@@ -84,9 +83,6 @@ public class ConsoleSurface extends Surface implements Appendable {
 
     public ConsoleSurface(VirtualTerminal term) {
         this.term = term;
-        fontHeight = fontWidth * 1.25f; //glut.glutStrokeLengthf(font, "X");
-
-        fontUnscale = 1 / fontHeight;
     }
 
 
@@ -97,38 +93,31 @@ public class ConsoleSurface extends Surface implements Appendable {
         int rows = ts.row;
         int cols = ts.col;
 
+        float charScaleX = (float) 1 * this.charScaleX;
+        float charScaleY = charAspect * this.charScaleY;
 
-        float cw = 1;
-        float aspect = fontHeight / fontWidth;
-        float ch = 1 * aspect;
+        float dz = 0f;
 
-        float charScaleX = cw * 0.9f;
-        float charScaleY = ch * 0.9f;
-
-        float dz = 0.05f;
-
-        gl.glPushMatrix();
-
-        float th = (rows * ch);
-        float tw = (cols * cw);
-
-        gl.glScalef(1 / tw, 1 / th, 1f);
-
-        gl.glLineWidth(3f);
-
-        int cury = term.cursor().row;
-        int curx = term.cursor().col;
+        TerminalPosition cursor = term.cursor();
+        int cury = cursor.row;
+        int curx = cursor.col;
 
         long t = System.currentTimeMillis(); //HACK
 
         final int[] j = {0};
+
+        gl.glPushMatrix();
+
+        gl.glScalef(1f / cols, 1f / (rows * charAspect), 1f);
+
+        gl.glLineWidth(3f);
 
         term.view(0, rows, (List<TextCharacter> line) -> {
 
             gl.glPushMatrix();
 
             int jj = j[0];
-            gl.glTranslatef(0, (rows - 1 - jj) * ch, dz);
+            gl.glTranslatef(0, (rows - 1 - jj) * charAspect, dz);
 
             for (int i = 0; i < cols; i++) {
 
@@ -144,8 +133,8 @@ public class ConsoleSurface extends Surface implements Appendable {
                                 backColor.red(),
                                 backColor.green(), backColor.blue(), bgAlpha);
                         Draw.rect(gl,
-                                cw * i, 0,
-                                cw, ch
+                                (float) 1 * i, 0,
+                                (float) 1, charAspect
                                 ,-dz
                         );
                     }
@@ -161,7 +150,7 @@ public class ConsoleSurface extends Surface implements Appendable {
                         //gl.glTranslatef(cw*i, +charScaleY, 0);
 
                         //gl.glScalef(charScaleX, charScaleY, 1f);
-                        Draw.text(gl, cc /* TODO char */, charScaleX, charScaleY, cw*i, 0, 0f);
+                        Draw.text(gl, cc /* TODO char */, charScaleX, charScaleY, (float) 1 * i, 0, 0f);
                         //glut.glutStrokeCharacter(GLUT.STROKE_MONO_ROMAN, cc);
                         //gl.glPopMatrix();
 
@@ -173,8 +162,8 @@ public class ConsoleSurface extends Surface implements Appendable {
                     gl.glColor4f( 1f, 0.5f,0f, 0.3f + p * 0.4f);
                     float m = -(0.1f + 0.3f * p);
                     Draw.rect(gl,
-                            cw * i + m, 0+m,
-                            cw-m, ch-m
+                            (float) 1 * i + m, 0+m,
+                            (float) 1 -m, charAspect -m
                             ,-dz-m
                     );
                 }

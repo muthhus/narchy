@@ -198,6 +198,7 @@ public abstract class JoglSpace implements GLEventListener, WindowListener {
 
 
 
+
     public GLWindow show(int w, int h) {
         return show("", w, h );
     }

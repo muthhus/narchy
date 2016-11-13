@@ -4,7 +4,7 @@ import nars.$;
 import nars.util.Texts;
 import nars.util.data.list.FasterList;
 import org.apache.commons.lang3.mutable.MutableFloat;
-import spacegraph.Facial;
+import spacegraph.Ortho;
 import spacegraph.SpaceGraph;
 import spacegraph.Surface;
 import spacegraph.obj.layout.Grid;
@@ -41,7 +41,7 @@ public class ControlSurface extends LabeledPane {
         }
 
         //s.add(new Facial(new ConsoleSurface(new ConsoleSurface.DummyTerminal(80, 25))).scale(500f, 400f));
-        s.add(new Facial(new CrosshairSurface(s)));
+        s.add(new Ortho(new CrosshairSurface(s)));
         s.show(1200, 800);
     }
 

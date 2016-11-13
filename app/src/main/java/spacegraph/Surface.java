@@ -18,8 +18,8 @@ import java.util.Objects;
 public class Surface {
 
 
-    public v3 translateLocal;
-    public v2 scaleLocal;
+    public final v3 translateLocal;
+    public final v2 scaleLocal;
 
     public Surface parent;
     public List<Surface> children;

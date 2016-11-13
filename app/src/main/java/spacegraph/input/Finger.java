@@ -30,7 +30,7 @@ public class Finger {
     //TODO wheel state
 
     /** widget above which this finger currently hovers */
-    @Nullable Widget touching = null;
+    public @Nullable Widget touching = null;
 
     public Finger(Surface root) {
         this.root = root;
@@ -76,18 +76,16 @@ public class Finger {
         }
     }
 
-    public void update(@Nullable MouseEvent e, GLWindow window) {
+//    public void update(@Nullable MouseEvent e, GLWindow window) {
+//
+//        short[] buttonsDown = e!=null ? e.getButtonsDown() : null;
+//        update(e, buttonsDown, window);
+//    }
 
-        short[] buttonsDown = e!=null ? e.getButtonsDown() : null;
-        update(e, buttonsDown, window);
-    }
-
-    public void update(@Nullable MouseEvent e, short[] buttonsDown, GLWindow window) {
+    public void update(@Nullable MouseEvent e, float x, float y, short[] buttonsDown) {
         if (e == null) {
             off();
         } else {
-            float x = ((float) e.getX()) / window.getWidth();
-            float y = 1f - ((float) e.getY()) / window.getHeight();
             on(v(x, y), buttonsDown);
         }
 

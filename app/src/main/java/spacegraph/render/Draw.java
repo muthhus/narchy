@@ -158,11 +158,11 @@ public enum Draw {
                 CollisionShape colShape = compoundShape.getChildShape(i);
 
 
-                gl.glPushMatrix();
+                push(gl);
                 stack.pushCommonMath();
                 draw(gl, colShape);
                 stack.popCommonMath();
-                gl.glPopMatrix();
+                pop(gl);
             }
         } else {
             boolean useWireframeFallback = true;
@@ -513,7 +513,7 @@ public enum Draw {
 
     @Deprecated
     static public void text(GL2 gl, float scaleX, float scaleY, String label, float dx, float dy, float dz, float[] color) {
-        gl.glPushMatrix();
+        push(gl);
         //gl.glNormal3f(0, 0, 1f);
         gl.glTranslatef(dx, dy, dz + zStep);
 
@@ -534,7 +534,7 @@ public enum Draw {
         renderString(gl, /*GLUT.STROKE_ROMAN*/ STROKE_MONO_ROMAN, label,
                 scaleX, scaleY,
                 0, 0, dz); // Print GL Text To The Screen
-        gl.glPopMatrix();
+        pop(gl);
     }
 
     //    static final float[] tmpV = new float[3];
@@ -573,7 +573,7 @@ public enum Draw {
         vv.normalize();
         vv.scale(width);
 
-        gl.glPushMatrix();
+        push(gl);
         gl.glBegin(GL2.GL_TRIANGLES);
 
         {
@@ -590,7 +590,7 @@ public enum Draw {
 
         gl.glEnd();
 
-        gl.glPopMatrix();
+        pop(gl);
 
     }
 
@@ -918,7 +918,7 @@ public enum Draw {
                 gl.glBegin(GL2.GL_LINE_STRIP);
                 for (int j = 0; j < ss; ) {
                     //gl.glVertex2fv
-                    gl.glVertex3f(seg[j++] + x, seg[j++], 0);
+                    gl.glVertex3f(seg[j++] + x * 16, seg[j++], 0);
                 }
                 gl.glEnd();
             }
@@ -962,6 +962,9 @@ public enum Draw {
 
 
         int sl = s.length();
+        if (sl == 0)
+            return;
+
         float totalWidth = sl * scale;
         switch (a) {
             case Left:
@@ -975,10 +978,20 @@ public enum Draw {
                 break;
         }
 
+        push(gl);
+
+        float dx = textStart(gl, scale, scale/1.25f, x, y, z);
+
+
         for (int i = 0; i < sl; i++) {
-            char c = s.charAt(i);
-            text(gl, c, scale, x + scale * i, y, z);
+            textNext(gl, s.charAt(i), i);
         }
+
+        pop(gl);
+    }
+
+    public static void push(GL2 gl) {
+        gl.glPushMatrix();
     }
 
     public static void text(GL2 gl, char c, float scale, float x, float y, float z) {
@@ -990,16 +1003,41 @@ public enum Draw {
         int ci = c - 32; //ASCII to index
         if (ci >= 0 && (ci < fontMono.length)) {
 
+            push(gl);
+
             float sx = scaleX / 16f;
             float sy = scaleY / 20f;
-
-            gl.glPushMatrix();
-            gl.glTranslatef(x, y, z);
             gl.glScalef(sx, sy, 1f);
 
+            gl.glTranslatef(x / sx, y / sy, z);
+
             fontMono[ci].draw(gl, 0);
-            gl.glPopMatrix();
+            pop(gl);
         }
+    }
+
+    public static void pop(GL2 gl) {
+        gl.glPopMatrix();
+    }
+
+    /** call glPush before this, and after all textNext's. returns the character width to translate by to display the next character (left to right direction) */
+    public static float textStart(GL2 gl, float scaleX, float scaleY, float x, float y, float z) {
+
+        float sx = scaleX / 16f;
+        float sy = scaleY / 20f;
+        gl.glTranslatef(x, y, z);
+        gl.glScalef(sx, sy, 1f);
+
+        return sx;
+    }
+
+    public static void textNext(GL2 gl, char c, float x) {
+
+        int ci = c - 32; //ASCII to index
+        if (ci >= 0 && (ci < fontMono.length)) {
+            fontMono[ci].draw(gl, x);
+        }
+
     }
 
     public final static HGlyph[] fontMono;

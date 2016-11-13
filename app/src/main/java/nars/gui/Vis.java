@@ -17,7 +17,7 @@ import nars.truth.Truth;
 import nars.util.Iterative;
 import org.eclipse.collections.api.block.function.primitive.FloatFunction;
 import org.jetbrains.annotations.Nullable;
-import spacegraph.Facial;
+import spacegraph.Ortho;
 import spacegraph.SpaceGraph;
 import spacegraph.Surface;
 import spacegraph.math.Color3f;
@@ -40,17 +40,17 @@ import static spacegraph.obj.layout.Grid.*;
 public class Vis {
     public static void newBeliefChartWindow(NAgent narenv, long window) {
         Grid chart = agentActions(narenv, window);
-        new SpaceGraph().add(new Facial(chart).maximize()).show(800, 600);
+        new SpaceGraph().add(new Ortho(chart).maximize()).show(800, 600);
     }
 
     public static void newBeliefChartWindow(NAR nar, long window, Term... t) {
         Grid chart = agentActions(nar, Lists.newArrayList(t), window);
-        new SpaceGraph().add(new Facial(chart).maximize()).show(800, 600);
+        new SpaceGraph().add(new Ortho(chart).maximize()).show(800, 600);
     }
 
     public static void newBeliefChartWindow(NAR nar, long window, List<? extends Termed> t) {
         Grid chart = agentActions(nar, t, window);
-        new SpaceGraph().add(new Facial(chart).maximize()).show(800, 600);
+        new SpaceGraph().add(new Ortho(chart).maximize()).show(800, 600);
     }
 
 
@@ -91,12 +91,12 @@ public class Vis {
     public static void show(Default d, int count) {
 
         SpaceGraph<VirtualTerminal> s = new SpaceGraph<>();
-        s.add(new Facial(grid(
+        s.add(new Ortho(grid(
                 concepts(d, count),
                 budgetHistogram(d, 16),
                 emotionPlots(d, 256)
         )).maximize());
-        s.add(new Facial(new CrosshairSurface(s)));
+        s.add(new Ortho(new CrosshairSurface(s)));
 
 
         s.show(1400, 800);

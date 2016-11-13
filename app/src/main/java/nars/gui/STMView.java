@@ -10,7 +10,7 @@ import nars.op.time.MySTMClustered;
 import nars.op.time.STMClustered;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import spacegraph.Facial;
+import spacegraph.Ortho;
 import spacegraph.SpaceGraph;
 import spacegraph.Surface;
 import spacegraph.obj.widget.ConsoleSurface;
@@ -81,7 +81,7 @@ public class STMView  {
 
         final float maxVolume = 64;
 
-        s.add(new Facial(
+        s.add(new Ortho(
                     new Grid(
                         inputBagChart = new BagChart<Task>(stm.input, -1) {
                             @Override

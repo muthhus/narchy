@@ -8,7 +8,7 @@ import nars.table.BeliefTable;
 import nars.term.Termed;
 import nars.truth.Truth;
 import nars.truth.TruthWave;
-import spacegraph.Facial;
+import spacegraph.Ortho;
 import spacegraph.SpaceGraph;
 import spacegraph.Surface;
 import spacegraph.obj.layout.Grid;
@@ -91,7 +91,7 @@ public class BeliefTableChart extends Surface {
         List<Surface> actionTables = beliefTableCharts(nar, terms, window);
 
 
-        new SpaceGraph().add(new Facial(new Grid(VERTICAL, actionTables)).maximize()).show(800,600);
+        new SpaceGraph().add(new Ortho(new Grid(VERTICAL, actionTables)).maximize()).show(800,600);
     }
 
     public static List<Surface> beliefTableCharts(NAR nar, Collection<? extends Termed> terms, long window) {

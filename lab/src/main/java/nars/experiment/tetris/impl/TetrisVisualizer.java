@@ -19,7 +19,7 @@ limitations under the License.
 package nars.experiment.tetris.impl;
 
 import com.jogamp.opengl.GL2;
-import spacegraph.Facial;
+import spacegraph.Ortho;
 import spacegraph.SpaceGraph;
 import spacegraph.Surface;
 
@@ -51,7 +51,7 @@ public class TetrisVisualizer extends Surface {
         if (newWindow) {
             SpaceGraph s = new SpaceGraph();
             s.show(t.getWidth() * blockSize, t.getHeight() * blockSize);
-            s.add(new Facial(this).maximize());
+            s.add(new Ortho(this).maximize());
         }
 
         tetris = t;
