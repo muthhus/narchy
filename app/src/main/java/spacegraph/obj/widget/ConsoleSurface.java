@@ -33,8 +33,9 @@ public class ConsoleSurface extends Surface implements Appendable {
                 //"/bin/zsh"
                 //"/usr/bin/fish"
         ).input(
-            //"htop\n"
-            "w\nfree\n"
+            //"top\n"
+            "htop\n"
+            //"w\nfree\n"
         );
 
 
@@ -117,56 +118,47 @@ public class ConsoleSurface extends Surface implements Appendable {
             gl.glPushMatrix();
 
             int jj = j[0];
-            gl.glTranslatef(0, (rows - 1 - jj) * charAspect, dz);
+
+            Draw.textStart(gl,
+                    charScaleX, charScaleY,
+                    //0, (rows - 1 - jj) * charAspect,
+                    0.5f, (rows - 1 - jj) * charAspect,
+                    dz);
 
             for (int i = 0; i < cols; i++) {
 
 
                 TextCharacter c = i < line.size() ? line.get(i) : null;
-
                 if (c!=null) {
 
-                    TextColor backColor = c.back;
-                    if (backColor!=null) {
-
-                        gl.glColor4f(
-                                backColor.red(),
-                                backColor.green(), backColor.blue(), bgAlpha);
-                        Draw.rect(gl,
-                                (float) 1 * i, 0,
-                                (float) 1, charAspect
-                                ,-dz
-                        );
-                    }
+            //TODO: Background color
+//
+//                    TextColor backColor = c.back;
+//                    if (backColor!=null) {
+//
+//                        gl.glColor4f(
+//                                backColor.red(),
+//                                backColor.green(), backColor.blue(), bgAlpha);
+//                        Draw.rect(gl,
+//                                (float) i, 0,
+//                                (float) 1*16, charAspect*20
+//                                ,-dz
+//                        );
+//                    }
 
 
                     char cc = displayChar(c);
                     if ((cc != 0) && (cc != ' ')) {
                         TextColor fg = c.fore;
 
+                        //TODO: if (!fg.equals(previousFG))
                         gl.glColor4f(fg.red(), fg.green(), fg.blue(), fgAlpha);
 
-                        //gl.glPushMatrix();
-                        //gl.glTranslatef(cw*i, +charScaleY, 0);
-
-                        //gl.glScalef(charScaleX, charScaleY, 1f);
-                        Draw.text(gl, cc /* TODO char */, charScaleX, charScaleY, (float) 1 * i, 0, 0f);
-                        //glut.glutStrokeCharacter(GLUT.STROKE_MONO_ROMAN, cc);
-                        //gl.glPopMatrix();
-
+                        Draw.textNext(gl, cc, i);
                     }
                 }
 
-                if ((i == curx) && (jj == cury)) {
-                    float p = (1f + (float)Math.sin(t/100.0)) * 0.5f;
-                    gl.glColor4f( 1f, 0.5f,0f, 0.3f + p * 0.4f);
-                    float m = -(0.1f + 0.3f * p);
-                    Draw.rect(gl,
-                            (float) 1 * i + m, 0+m,
-                            (float) 1 -m, charAspect -m
-                            ,-dz-m
-                    );
-                }
+
 
             }
 
@@ -174,6 +166,17 @@ public class ConsoleSurface extends Surface implements Appendable {
 
             j[0]++;
         });
+
+
+        //DRAW CURSOR
+        float p = (1f + (float)Math.sin(t/100.0)) * 0.5f;
+        gl.glColor4f( 1f, 0.5f,0f, 0.3f + p * 0.4f);
+        float m = (0.5f + 2f * p);
+        Draw.rect(gl,
+                (float) charScaleX * (curx + 0.5f + m/2f), charScaleY * (rows - 1 - cury + 0.5f + m/2f),
+                (float) charScaleX * (1 - m), charScaleY * (1 - m)
+                ,-dz
+        );
 
         gl.glPopMatrix();
 

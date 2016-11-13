@@ -137,7 +137,7 @@ public class Ortho implements WindowListener, KeyListener, MouseListener {
 
     @Override
     public void mouseClicked(MouseEvent e) {
-        //updateMouse(e);
+
     }
 
     @Override
