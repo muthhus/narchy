@@ -6,7 +6,7 @@ import spacegraph.SpaceGraph;
 import spacegraph.layout.Flatten;
 import spacegraph.math.v3;
 import spacegraph.obj.layout.Grid;
-import spacegraph.obj.widget.ConsoleSurface;
+import spacegraph.obj.widget.console.ConsoleSurface;
 import spacegraph.obj.widget.XYSlider;
 import spacegraph.phys.Dynamic;
 import spacegraph.phys.Dynamics;
@@ -19,7 +19,7 @@ import spacegraph.phys.shape.BoxShape;
 public class TestP2PNode extends Cuboid {
 
     public TestP2PNode(float w, float h) {
-        super(new Grid(new ConsoleSurface(new ConsoleSurface.Demo(10, 4))), w, h);
+        super(new Grid(), w, h);
     }
 
     public static class TestP2PLink extends Cuboid {

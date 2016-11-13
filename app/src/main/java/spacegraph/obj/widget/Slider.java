@@ -9,6 +9,7 @@ import spacegraph.math.v2;
 import spacegraph.obj.CrosshairSurface;
 import spacegraph.obj.layout.Grid;
 import spacegraph.obj.Cuboid;
+import spacegraph.obj.widget.console.ConsoleSurface;
 import spacegraph.render.Draw;
 
 import static spacegraph.obj.layout.Grid.col;
@@ -117,7 +118,7 @@ public class Slider extends Widget {
                 ), 8f /* width */, 6 /* height */
         ) );
 
-        s.add(new Ortho(new ConsoleSurface(new ConsoleSurface.Demo(80, 25))).scale(500f, 400f));
+        //s.add(new Ortho(new ConsoleSurface(new ConsoleSurface.Demo(80, 25))).scale(500f, 400f));
         s.add(new Ortho(new CrosshairSurface(s)));
         s.show(800, 800);
     }

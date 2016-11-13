@@ -13,7 +13,7 @@ import org.jetbrains.annotations.Nullable;
 import spacegraph.Ortho;
 import spacegraph.SpaceGraph;
 import spacegraph.Surface;
-import spacegraph.obj.widget.ConsoleSurface;
+import spacegraph.obj.widget.console.ConsoleSurface;
 import spacegraph.obj.layout.Grid;
 import spacegraph.obj.layout.Stacking;
 import spacegraph.render.Draw;
@@ -99,18 +99,18 @@ public class STMView  {
 
 
                         new Stacking(
-                            new ConsoleSurface(new TopicTerminal<Task>(
-                                stm.generate,
-                                    (Task t) -> t.toStringWithoutBudget(),
-                                    (Task t) -> {
-                                        float p = t.pri() * 0.5f + 0.5f;
-                                        float c = t.conf() * 0.5f + 0.5f;
-                                        float f = t.freq();
-                                        return TextColor.rgb((1f - f) * p * c, f * p * c, p * t.qua());
-                                    },
-                                    null,  //(Task t) -> TextColor.hsb(t.term().volume()/maxVolume, 0.8f, 0.25f),
-                                    50, 24
-                            )),
+//                            new ConsoleSurface(new TopicTerminal<Task>(
+//                                stm.generate,
+//                                    (Task t) -> t.toStringWithoutBudget(),
+//                                    (Task t) -> {
+//                                        float p = t.pri() * 0.5f + 0.5f;
+//                                        float c = t.conf() * 0.5f + 0.5f;
+//                                        float f = t.freq();
+//                                        return TextColor.rgb((1f - f) * p * c, f * p * c, p * t.qua());
+//                                    },
+//                                    null,  //(Task t) -> TextColor.hsb(t.term().volume()/maxVolume, 0.8f, 0.25f),
+//                                    50, 24
+//                            )),
                             new BubbleChart()
                         )
                 )).maximize());

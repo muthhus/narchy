@@ -12,17 +12,13 @@ import nars.experiment.tetris.impl.TetrisVisualizer;
 import nars.gui.Vis;
 import nars.remote.NAgents;
 import nars.term.Compound;
-import nars.term.Term;
-import nars.term.obj.IntTerm;
-import nars.term.obj.Termject;
 import nars.time.FrameClock;
-import nars.time.Tense;
 import nars.truth.Truth;
 import nars.util.TaskStatistics;
 import org.jetbrains.annotations.NotNull;
 import spacegraph.Surface;
 import spacegraph.math.v2;
-import spacegraph.obj.widget.ConsoleSurface;
+import spacegraph.obj.widget.console.ConsoleSurface;
 import spacegraph.obj.widget.MatrixView;
 
 import java.io.IOException;

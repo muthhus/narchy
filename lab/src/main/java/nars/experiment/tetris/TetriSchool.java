@@ -15,6 +15,7 @@ import spacegraph.SpaceGraph;
 import spacegraph.Surface;
 import spacegraph.obj.widget.*;
 import spacegraph.obj.CrosshairSurface;
+import spacegraph.obj.widget.console.ConsoleSurface;
 import spacegraph.render.Draw;
 
 import java.awt.*;
