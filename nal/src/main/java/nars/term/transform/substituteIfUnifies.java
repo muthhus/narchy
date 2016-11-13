@@ -11,6 +11,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import static nars.Op.NEG;
+import static nars.term.Terms.equal;
+import static nars.term.Terms.equalAtemporally;
 import static nars.time.Tense.DTERNAL;
 
 /**
@@ -113,32 +115,32 @@ abstract public class substituteIfUnifies extends TermTransformOperator  {
             return False; //FAILED
         }
 
-        boolean equals = x.equals(y);
-        if (!equals) {
-            //try auto-negation:
-            boolean xn = (x.op()==NEG);
-            boolean yn = (y.op()==NEG);
-            Term px = (xn) ? x.unneg() : x; //positive X
-            Term py = (yn) ? y.unneg() : y; //positive Y
-            if (Terms.equalAtemporally(px, py)) {
-                equals = true;
-                if (xn ^ yn) {
-                    if (yn/* && !xn*/) { //x isnt negated and y is, so
-                        y = py;
-                    } else { //if (xn && !yn) { //x is negated and y isn't, so
-                        y = $.neg(y);
-                    }
-
-                    term = $.neg(term);
-
-                    //now x and y have matching polarities
-                } else if (xn/* && yn*/) {
-                    //both negated
-                } else {
-                    //shouldnt hapen?
-                }
-            }
-        }
+        boolean equals = equal(x, y, false /* different dt */, true /* same polarity */);
+//        if (!equals) {
+//            //try auto-negation:
+//            boolean xn = (x.op()==NEG);
+//            boolean yn = (y.op()==NEG);
+//            Term px = (xn) ? x.unneg() : x; //positive X
+//            Term py = (yn) ? y.unneg() : y; //positive Y
+//            if (equalAtemporally(px, py)) {
+//                equals = true;
+//                if (xn ^ yn) {
+//                    if (yn/* && !xn*/) { //x isnt negated and y is, so
+//                        y = py;
+//                    } else { //if (xn && !yn) { //x is negated and y isn't, so
+//                        y = $.neg(y);
+//                    }
+//
+//                    term = $.neg(term);
+//
+//                    //now x and y have matching polarities
+//                } else if (xn/* && yn*/) {
+//                    //both negated
+//                } else {
+//                    //shouldnt hapen?
+//                }
+//            }
+//        }
 
         if (!equals && hasAnyOp) {
             SubUnify m = new SubUnify(parent, op);

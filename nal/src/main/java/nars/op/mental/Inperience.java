@@ -236,7 +236,7 @@ public class Inperience extends Leak<Task> {
     public static Compound reify(@NotNull Task s, Term self, float conceptCreationExpectation) {
 
         Truth tr = s.truth();
-        Term[] arg = new Term[1 + (tr == null ? 1 : 2)];
+        Term[] arg = new Term[1 + (tr == null ? 1 : 3)];
 
         int k = 0;
 
@@ -245,7 +245,9 @@ public class Inperience extends Leak<Task> {
         arg[k++] = s.term(); //unwrapping negation here isnt necessary sice the term of a task will be non-negated
 
         if (tr != null) {
-            arg[k] = tr.expectation(tr.expectation(), conceptCreationExpectation);
+            //arg[k] = tr.expectation(tr.expectation(), conceptCreationExpectation);
+            arg[k++] = tr.freqTerm(tr.freq(), 0.66f);
+            arg[k++] = tr.confTerm(tr.conf(), 0.5f);
         }
 
         return $.func(reify(s.punc()), arg);

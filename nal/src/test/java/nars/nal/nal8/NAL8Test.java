@@ -756,6 +756,25 @@ public class NAL8Test extends AbstractNALTest {
                 .mustNotOutput(cycles, "(y)", '!', ETERNAL);
     }
 
+    @Test public void testGoalConjunctionDecomposeNegative() {
+        /*
+        WRONG:
+        $0.0;.01;.02$ h(5)! 1657+0 %.98;.04% {1657+0: 1;W;Æ;2Õ;2û} ((%1,(%2&&%3),task(positive),time(decomposeBelief),neqCom(%1,%3)),(subIfUnifiesForward(%3,%2,%1),((Strong-->Goal))))
+            $.01;.05;.14$ e(5)! 383-145 %1.0;.14% {383-145: 1;W;Æ} ((%1,(%2==>%3),task(positive),time(decomposeBelief)),(subIfUnifiesAny(%3,%2,%1),((Deduction-->Belief),(Induction-->Goal))))
+              $.13;.95;.99$ (happy)! :2: %1.0;.99% {2: 1}
+              $NaN;.03;.13$ ((happy) ==>+96 e(5)). 267-125 %1.0;.17% {267-125: W;Æ} ((%1,%2,task(positive),task("."),time(dtAfter),neqCom(%1,%2),notImplEqui(%1),notEqui(%2)),((%1 ==>+- %2),((Induction-->Belief))))
+                $NaN;.50;.50$ (happy). 142+0 %.83;.50% {142+0: W}
+                $NaN;.50;.50$ e(5). 238+0 %1.0;.50% {238+0: Æ}
+            $0.0;.38;.38$ ((--,h(5)) &&+632 (--,e(5))). 1657+0 %.98;.26% {1657+0: 2Õ;2û} Dynamic
+         */
+
+        test()
+            .log()
+            .goal("(f)", Tense.Present, 1f, 0.9f)
+            .believe("(--(g) &&+1 --(f))", Tense.Present, 1f, 0.9f)
+            .mustNotOutput(cycles, "(g)", '!', -1, 0, 1, ETERNAL);
+    }
+
     @Test public void testGoalConjunctionPostDecompose() {
         //after a belief has been fedback, continue decomposing the conjunction goal to expose the (y) desire:
 

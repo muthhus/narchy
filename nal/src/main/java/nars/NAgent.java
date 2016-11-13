@@ -460,7 +460,7 @@ abstract public class NAgent implements NSense, NAction {
 
         for (ActionConcept c : actions) {
 
-            float motorEpsilonProbability = epsilonProbability * (1f - Math.min(1f, c.goalConf(now, 0) / gamma)) / actions.size();
+            float motorEpsilonProbability = epsilonProbability * (1f - Math.min(1f, c.goalConf(now, 0) / gamma));
 
             if (nar.random.nextFloat() < motorEpsilonProbability) {
 

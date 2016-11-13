@@ -43,7 +43,10 @@ public interface Truth extends Truthed {
 
     Term Truth_TRUE = $.the("TRUE");
     Term Truth_FALSE = $.the("FALSE");
-    Term Truth_UNSURE = $.the("UNSURE");
+    Term Truth_UNSURE = $.the("UNSURE"); //only really valid for describing expectation, not frequency by itself
+    Term Truth_MAYBE = $.the("MAYBE");
+    Term Truth_CERTAIN = $.the("CERTAIN");
+    Term Truth_UNCERTAIN = $.the("UNCERTAIN");
     Comparator<Truthed> compareConfidence = (o1, o2) -> Float.compare(o2.truth().conf(), o1.truth().conf());
 
 
@@ -198,17 +201,29 @@ public interface Truth extends Truthed {
 //    }
 
     
-    @NotNull
-    default Term expectation(float e, float trueExpectationThreshold) {
-
-
-        if (e > trueExpectationThreshold) {
+    @NotNull default Term expTerm(float expectation, float trueExpectationThreshold) {
+        if (expectation > trueExpectationThreshold)
             return Truth_TRUE;
-        }
-        if (e < 1f - trueExpectationThreshold) {
+        else if (expectation < 1f - trueExpectationThreshold)
             return Truth_FALSE;
-        }
-        return Truth_UNSURE;
+        else
+            return Truth_UNSURE;
+    }
+    @NotNull
+    default Term freqTerm(float f, float freqThreshold) {
+        if (f > freqThreshold)
+            return Truth_TRUE;
+        else if (f < 1f - freqThreshold)
+            return Truth_FALSE;
+        else
+            return Truth_MAYBE;
+    }
+    @NotNull
+    default Term confTerm(float c, float confThreshold) {
+        if (c > confThreshold)
+            return Truth_CERTAIN;
+        else
+            return Truth_UNCERTAIN;
     }
 
 

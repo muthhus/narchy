@@ -763,16 +763,26 @@ public class Terms   {
         return true;
     }
 
+    public static boolean equalAtemporally(@NotNull Termed a, @NotNull Termed b) {
+        return equal(a.term(), b.term(), false, false);
+    }
+
     /** equal atemporally AND with any outer negations removed */
-    public static boolean equalAtemporally(@NotNull Termed _a, @NotNull Termed _b) {
-        if (_a == _b)
+    public static boolean equal(@NotNull Term a, @NotNull Term b, boolean sameTemporality, boolean samePolarity) {
+        if (a == b)
             return true;
-        Term a = _a.unneg();//.term();
-        Term b = _b.unneg();//.term();
-        return ((a.structure() == b.structure()) &&
-                (a.volume() == b.volume()) &&
-                (a.op() == b.op()) &&
-                atemporalize(b).equals(atemporalize(a)));
+        if (!samePolarity) {
+            a = a.unneg();
+            b = b.unneg();
+        }
+        if (!sameTemporality) {
+            return ((a.structure() == b.structure()) &&
+                    (a.volume() == b.volume()) &&
+                    (a.op() == b.op()) &&
+                    atemporalize(b).equals(atemporalize(a)));
+        } else {
+            return a.equals(b);
+        }
     }
 
     interface SubtermScorer {
