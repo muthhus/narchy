@@ -450,7 +450,7 @@ public class IRCAgent extends IRC {
 
         MySTMClustered stm = new MySTMClustered(nar, 64, '.', 3, true, 1);
 
-        new Inperience(nar);
+        new Inperience(nar, 0.05f);
 
         nar.loop(framesPerSecond);
 

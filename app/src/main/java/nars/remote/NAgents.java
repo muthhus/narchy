@@ -89,7 +89,7 @@ abstract public class NAgents extends NAgent {
         a.trace = true;
         chart(a);
 
-        a.runRT(50).join();
+        a.runRT(20).join();
 
     }
 
@@ -109,7 +109,7 @@ abstract public class NAgents extends NAgent {
                 4, 16,
                 0.05f, 32);
 
-        new Inperience(nar);
+        new Inperience(nar, 0.05f);
 
         SpaceGraph.window(grid(nar.cores.stream().map(c ->
                 Vis.items(c.terms, nar, 16)).toArray(Surface[]::new)), 900, 700);
@@ -160,20 +160,20 @@ abstract public class NAgents extends NAgent {
                 clock,
                 exe) {
 
-            @Override
-            protected void initNAL7() {
-                //no STM linkage
-            }
+//            @Override
+//            protected void initNAL7() {
+//                //no STM linkage
+//            }
         };
 
-        nar.beliefConfidence(0.9f);
-        nar.goalConfidence(0.8f);
+        nar.beliefConfidence(0.5f);
+        nar.goalConfidence(0.5f);
 
         float p = 0.5f;
-        nar.DEFAULT_BELIEF_PRIORITY = 0.9f * p;
+        nar.DEFAULT_BELIEF_PRIORITY = 0.75f * p;
         nar.DEFAULT_GOAL_PRIORITY = 1f * p;
-        nar.DEFAULT_QUESTION_PRIORITY = 0.6f * p;
-        nar.DEFAULT_QUEST_PRIORITY = 0.7f * p;
+        nar.DEFAULT_QUESTION_PRIORITY = 0.5f * p;
+        nar.DEFAULT_QUEST_PRIORITY = 0.5f * p;
 
         nar.confMin.setValue(0.01f);
         nar.compoundVolumeMax.setValue(volMax);
@@ -183,9 +183,9 @@ abstract public class NAgents extends NAgent {
 
         Abbreviation abbr = new Abbreviation(nar, "the",
                 4, 16,
-                0.05f, 32);
+                0.02f, 32);
 
-        new Inperience(nar);
+        new Inperience(nar, 0.05f);
 
 //        //causal accelerator
 //        nar.onTask(t -> {

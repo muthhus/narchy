@@ -75,9 +75,9 @@ abstract public class NAgent implements NSense, NAction {
     public final List<SensorConcept> sensors = $.newArrayList();
     public final List<ActionConcept> actions = $.newArrayList();
 
-    public float alpha, gamma, epsilonProbability = 0.1f;
+    public float alpha, gamma, epsilonProbability = 0.025f;
     @Deprecated
-    public float gammaEpsilonFactor = 0.5f;
+    public float gammaEpsilonFactor = 0.75f;
 
     final int curiosityMonitorDuration = 8; //frames
     final DescriptiveStatistics avgActionDesire = new DescriptiveStatistics(curiosityMonitorDuration);
@@ -89,7 +89,7 @@ abstract public class NAgent implements NSense, NAction {
     float predictorProbability = 1f;
 
     protected final List<MutableTask> predictors = $.newArrayList();
-    private float predictorPriFactor = 0.25f;
+    private float predictorPriFactor = 1; //0.25f;
 
     public boolean trace = false;
 
@@ -331,7 +331,7 @@ abstract public class NAgent implements NSense, NAction {
             predictors.add(
                     new MutableTask(happy, '!', 1f, rewardGamma)
                             .eternal()
-                    //.present(nar.time()+dt)
+                            .budgetSafe(0.5f, 0.95f, 0.99f)
             );
 //                    happy.desire($.t(1f, rewardGamma),
 //                            nar.priorityDefault(Symbols.GOAL),
@@ -377,15 +377,15 @@ abstract public class NAgent implements NSense, NAction {
 
             ((FasterList)predictors).addAll(
                     new MutableTask($.seq($.varQuery(0), 1, action), '?', null).eternal(),
-                    new MutableTask($.impl($.varQuery(0), 1, action), '?', null).eternal(),
-                    new MutableTask($.seq(action, 1, happiness), '?', null).eternal(),
-                    new MutableTask($.impl(action, 1, happiness), '?', null).eternal()
+                    //new MutableTask($.impl($.varQuery(0), 1, action), '?', null).eternal(),
+                    new MutableTask($.seq(action, 1, happiness), '?', null).eternal()
+                    //new MutableTask($.impl(action, 1, happiness), '?', null).eternal()
             );
 
         }
 
         predictors.add(
-                new MutableTask($.seq($.varQuery(0 /*"what"*/), 1, happiness), '?', null).time(now, now)
+                new MutableTask($.seq($.varQuery(0 /*"what"*/), 1, happiness), '?', null).eternal()
         );
 
         System.out.println(Joiner.on('\n').join(predictors));
@@ -460,7 +460,7 @@ abstract public class NAgent implements NSense, NAction {
 
         for (ActionConcept c : actions) {
 
-            float motorEpsilonProbability = epsilonProbability * (1f - Math.min(1f, c.goalConf(now, 0) / gamma));
+            float motorEpsilonProbability = epsilonProbability * (1f - Math.min(1f, c.goalConf(now, 0) / gamma)) / actions.size();
 
             if (nar.random.nextFloat() < motorEpsilonProbability) {
 

@@ -110,8 +110,8 @@ public class Inperience extends Leak<Task> {
 
 //
 
-    public Inperience(@NotNull NAR n) {
-        super(new CurveBag(BudgetMerge.max, n.random), 0.02f, n);
+    public Inperience(@NotNull NAR n, float rate) {
+        super(new CurveBag(BudgetMerge.max, n.random), rate, n);
 
         this.nar = n;
 
@@ -139,10 +139,10 @@ public class Inperience extends Leak<Task> {
 
         Compound tt = task.term();
 
-        if (task.isCommand() || !isExperienceTerm(tt)) //no infinite loops in the present moment
+        if (task.isCommand() || isExperienceTerm(tt)) //no infinite loops in the present moment
             return;
 
-        each.accept(new DefaultBLink(task, task, 1f/tt.volume()));
+        each.accept(new DefaultBLink<>(task, task, 1f/tt.volume()));
 
         // if(OLD_BELIEVE_WANT_EVALUATE_WONDER_STRATEGY ||
         //         (!OLD_BELIEVE_WANT_EVALUATE_WONDER_STRATEGY && (task.sentence.punctuation==Symbols.QUESTION || task.sentence.punctuation==Symbols.QUEST))) {

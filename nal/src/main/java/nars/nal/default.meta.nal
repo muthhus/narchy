@@ -59,20 +59,20 @@
 
 //// inheritance from similarty <- todo check why this one was missing ////////////////////////////////////////////////////////////////////////////////////
 
-    (S <-> P), (P --> S) |- (S --> P), (Belief:ReduceConjunction, Goal:Strong)
+    (S <-> P), (P --> S), neqCom(S,P) |- (S --> P), (Belief:ReduceConjunction, Goal:Strong)
 
 //// similarity-based syllogism ////////////////////////////////////////////////////////////////////////////////////
 //If P and S are a special case of M, then they might be similar (weak),
 //also if P and S are a general case of M
 
-    (P --> M), (S --> M), neqCom(S,P) |- (S <-> P), (Belief:Comparison)
-    (M --> P), (M --> S), neqCom(S,P) |- (S <-> P), (Belief:Comparison)
+    (P --> M), (S --> M), neqCom(S,P) |- (S <-> P), (Belief:Comparison, Goal:Weak)
+    (M --> P), (M --> S), neqCom(S,P) |- (S <-> P), (Belief:Comparison, Goal:Weak)
 
 //If M is a special case of P and S and M are similar, then S is also a special case of P (strong)
 
     (M --> P), (S <-> M), neqCom(S,P) |- (S --> P), (Belief:Analogy, Goal:Strong)
     (P --> M), (S <-> M), neqCom(S,P) |- (P --> S), (Belief:Analogy, Goal:Strong)
-    (M <-> P), (S <-> M), neqCom(S,P) |- (S <-> P), (Belief:Resemblance)
+    (M <-> P), (S <-> M), neqCom(S,P) |- (S <-> P), (Belief:Resemblance, Goal:Strong)
 
 //// inheritance composition ////////////////////////////////////////////////////////////////////////////////////
 //If P and S are in the intension/extension of M, then union/difference and intersection can be built:

@@ -815,7 +815,7 @@ public class NAL7Test extends AbstractNALTest {
 
                 .inputAt(20, "(x). :|:")
 
-                .mustBelieve(24,"(y)", 1f, 0.36f, 24)
+                .mustBelieve(24,"(y)", 1f, 0.4f, 24)
         ;
     }
 

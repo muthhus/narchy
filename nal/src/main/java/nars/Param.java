@@ -24,6 +24,7 @@ public abstract class Param /*extends Container*/ implements Level {
     /** absolute limit for constructing terms in any context in which a NAR is not known, which could provide a limit.
      * typically a NAR instance's 'compoundVolumeMax' parameter will be lower than this */
     public static final int COMPOUND_VOLUME_MAX = 128;
+    public static final boolean ARITHMETIC_INDUCTION = false;
 
 
     /** whether derivation's concepts are cross-termlink'ed with the premise concept */

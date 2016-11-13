@@ -489,22 +489,25 @@ public class Revision {
         return new ProjectedTruth(t.freq(), nextConf, target);
     }
 
-    public static long occInterpolate(@NotNull Task t, @Nullable Task b) {
+    public static long occInterpolate(@NotNull Task t, @Nullable Task b, PremiseEval p) {
         long to = t.occurrence();
-
+        if (to == ETERNAL)
+            to = p.time(); //only un-eternalize task
         if (b == null)
             return to;
 
         long bo = b.occurrence();
+        if (bo == ETERNAL)
+            return to; //dont un-eternalize belief, defer to task's occurrence
 
-        if (to != ETERNAL && bo != ETERNAL) {
+        //if (to != ETERNAL && bo != ETERNAL) {
 
             float tw = t.confWeight();
             float bw = b.confWeight();
             return Util.lerp(to, bo, (tw) / (bw + tw));
-        } else {
-            return bo != ETERNAL ? bo : to;
-        }
+//        } else {
+//            return bo != ETERNAL ? bo : to;
+//        }
 
     }
     @NotNull

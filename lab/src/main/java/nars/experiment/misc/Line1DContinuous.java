@@ -241,19 +241,18 @@ public class Line1DContinuous extends NAgent {
                 new SingleThreadExecutioner();
 
         Default nar = new Default(1024,
-                conceptsPerCycle, 1, 4, rng,
+                conceptsPerCycle, 1, 3, rng,
                 new CaffeineIndex(new DefaultConceptBuilder(), 1024*64, 12, false, exe),
                 new FrameClock(), exe
         );
 
 
-        nar.beliefConfidence(0.9f);
-        nar.goalConfidence(0.9f);
+        nar.beliefConfidence(0.5f);
+        nar.goalConfidence(0.5f);
 
         //nar.truthResolution.setValue(0.02f);
-        nar.durMin.setValue(0.1f);
 
-        nar.compoundVolumeMax.set(12);
+        nar.compoundVolumeMax.set(28);
 
         Line1DContinuous l = new Line1DContinuous(nar, 6,
                 sine(100)

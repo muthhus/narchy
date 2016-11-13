@@ -58,6 +58,10 @@ public class PremiseEval extends Unify {
         return res == Param.TRUTH_EPSILON ? t : DefaultTruth.ditherOrNull(t, res);
     }
 
+    public final long time() {
+        return nar.time();
+    }
+
     public static final class TruthPuncEvidence {
         public final Truth truth;
         public final char punc;

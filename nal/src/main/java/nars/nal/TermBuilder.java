@@ -2,6 +2,7 @@ package nars.nal;
 
 import nars.$;
 import nars.Op;
+import nars.Param;
 import nars.nal.meta.match.Ellipsislike;
 import nars.term.Compound;
 import nars.term.Term;
@@ -384,7 +385,8 @@ public abstract class TermBuilder {
             }
         }
 
-        args = ArithmeticInduction.compress(op, dt, args);
+        if (Param.ARITHMETIC_INDUCTION)
+            args = ArithmeticInduction.compress(op, dt, args);
 
         int s = args.size();
         if (s == 0) {

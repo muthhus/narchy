@@ -45,7 +45,7 @@ public abstract class Leak</* TODO: A, */B>  {
     abstract protected float onOut(@NotNull BLink<B> b);
 
     /** next iteration, each frame */
-    protected void next(@NotNull NAR nar) {
+    protected final void next(@NotNull NAR nar) {
 
         bag.commit();
 

@@ -293,12 +293,12 @@ public interface TimeFunctions {
         Compound decomposedTerm = (Compound) (decomposeTask ? p.taskTerm : p.beliefTerm);
         //int dtDecomposed = decomposedTerm.dt();
 
-        long occDecomposed = decomposeTask ? task.occurrence() : (belief != null ? belief.occurrence() : ETERNAL);
+        long occDecomposed = decomposeTask ? task.occurrence() : (belief != null ? belief.occurrence() : task.occurrence());
 
         //the non-decomposed counterpart of the premise
 
 
-        long occOther = (otherTask != null) ? otherTask.occurrence() : ETERNAL;
+        long occOther = (otherTask != null) ? otherTask.occurrence() : occDecomposed;
 
 
         if ((occDecomposed == ETERNAL) && (occOther == ETERNAL)) {
@@ -313,6 +313,12 @@ public interface TimeFunctions {
             }
 
         } else {
+
+            //project any ETERNAL to NOW, since an ETERNAL truth is the same for the present moment
+            if (occDecomposed == ETERNAL)
+                occDecomposed = p.time();
+            if (occOther == ETERNAL)
+                occOther = p.time();
 
             long occ;
 
@@ -687,7 +693,7 @@ public interface TimeFunctions {
 //        }
         occReturn[0] =
                 //chooseByConf(p.task, p.belief, p).occurrence();
-                occInterpolate(p.task, p.belief);
+                occInterpolate(p.task, p.belief, p);
 
         return derived;
     };
@@ -720,7 +726,7 @@ public interface TimeFunctions {
         Task task = p.task;
         Task belief = p.belief;
 
-        long occ = occInterpolate(task, belief); //reset
+        long occ = occInterpolate(task, belief, p); //reset
 
         Compound tt = (Compound) p.taskTerm.unneg();
         Term bb = p.beliefTerm; // belief() != null ? belief().term() : null;
