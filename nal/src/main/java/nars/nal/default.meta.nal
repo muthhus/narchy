@@ -66,9 +66,9 @@
 //also if P and S are a general case of M
 
     (P --> M), (S --> M), neqCom(S,P) |- (P <-> S), (Belief:Comparison, Goal:Weak)
-        (P --> M), (S --> M), neqCom(S,P) |- ((P --> $1) <-> (S --> $1)), (Belief:Comparison, Goal:Weak)
+        (P --> M), (S --> M), neqCom(S,P) |- ((P --> ?1) <-> (S --> ?1)), (Belief:Comparison, Goal:Weak)
     (M --> P), (M --> S), neqCom(S,P) |- (P <-> S), (Belief:Comparison, Goal:Weak)
-        (M --> P), (M --> S), neqCom(S,P) |- (($1 --> P) <-> ($1 --> S)), (Belief:Comparison, Goal:Weak)
+        (M --> P), (M --> S), neqCom(S,P) |- ((?1 --> P) <-> (?1 --> S)), (Belief:Comparison, Goal:Weak)
                 //TODO decide if this should be ?1 or $1
 
 //If M is a special case of P and S and M are similar, then S is also a special case of P (strong)

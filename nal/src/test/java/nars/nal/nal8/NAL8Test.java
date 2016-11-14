@@ -35,7 +35,7 @@ public class NAL8Test extends AbstractNALTest {
 
         //TODO decide correct parentheses ordering
 
-        //tester.nar.log();
+        //tester.nar;
         tester.input("[opened]:{t001}. :|:");
         tester.inputAt(10,
                 "(((hold:({t002}) &&+5 at({t001})) &&+5 open({t001})) &&+5 [opened]:{t001}).");
@@ -116,7 +116,7 @@ public class NAL8Test extends AbstractNALTest {
     }
 
     @Test
-    public void ded_with_var_temporal()  {
+    public void ded_with_indep_var_temporal()  {
         TestNAR tester = test();
 
         tester.input("goto({t003}). :|:");
@@ -124,6 +124,15 @@ public class NAL8Test extends AbstractNALTest {
 
         tester.mustBelieve(cycles, "at(SELF,{t003})", 1.0f, 0.81f, 5);
 
+    }
+
+    @Test
+    public void ded_with_query_var_temporal()  {
+        test()
+            
+            .input("goto({t003}). :|:")
+            .inputAt(10, "(goto(?1) ==>+5 at(SELF,?1)).")
+            .mustBelieve(cycles, "at(SELF,{t003})", 1.0f, 0.81f, 5);
     }
 
     @Test
@@ -210,7 +219,7 @@ public class NAL8Test extends AbstractNALTest {
     @Test public void goal_deduction_equi_pos_posneg()  {
 
             test()
-                    .log()
+                    
                     .input("(R)! :|:")
                     .input("((S) <=>+5 --(R)).") //internally, this reduces to --(S ==> R)
                     .mustDesire(cycles, "(S)", 0.0f, 0.81f, -5);
@@ -219,7 +228,7 @@ public class NAL8Test extends AbstractNALTest {
     @Test public void goal_deduction_equi_pos_posneg_var()  {
 
         test()
-                .log()
+                
                 .input("g(x)! :|:")
                 .input("(f($1) <=>+5 --g($1)).") //internally, this reduces to --(S ==> R)
                 .mustDesire(cycles, "f(x)", 0.0f, 0.81f, -5);
@@ -229,7 +238,7 @@ public class NAL8Test extends AbstractNALTest {
     @Test public void goal_deduction_equi_neg_posneg()  {
 
         test()
-                .log()
+                
                 .input("--(R)! :|:")
                 .input("((S) <=>+5 --(R)).") //internally, this reduces to --(S ==> R)
                 .mustDesire(cycles, "(S)", 1.0f, 0.81f, -5);
@@ -345,7 +354,7 @@ public class NAL8Test extends AbstractNALTest {
             .mustDesire(64, "exe(x, #1)", 1.0f, 0.9f, 0);
 
         //if (!(tester.nar instanceof SingleStepNAR)) {
-        //tester.nar.log();
+        //tester.nar;
         //tester.mustBelieve(250, "exe(x, a)", 1.0f, 0.99f, 10);
         //        tester.mustBelieve(26, "<a --> (/, ^exe, x, _)>",
         //                exeFunc.getResultFrequency(),
@@ -399,7 +408,7 @@ public class NAL8Test extends AbstractNALTest {
     @Test
     public void condition_goal_deduction_3simplerReverse()  {
         test()
-//                .log()
+//                
                 .inputAt(1, "at:t003! :|:")
                 .inputAt(1, "(at:$1 ==>+5 goto:$1).")
 
@@ -416,7 +425,7 @@ public class NAL8Test extends AbstractNALTest {
     public void temporal_deduction_1()  {
         TestNAR tester = test();
 
-        //tester.nar.log();
+        //tester.nar;
 //        tester.input("pick({t002}). :\\:");
 //        tester.inputAt(10, "(pick({t002}) ==>+5 hold:({t002})). :\\:");
 //
@@ -686,7 +695,7 @@ public class NAL8Test extends AbstractNALTest {
     @Test
     public void implSubstitutionViaSimilarityReverse()  {
         test()
-                .log()
+                
                 .input("(a:b<->c:d).") //ETERNAL
                 .input("(e:f ==>+1 c:d). :|:") //PRESENT
                 .mustBelieve(cycles, "(e:f ==>+1 a:b)", 1.0f, 0.81f, 0)
@@ -740,7 +749,7 @@ public class NAL8Test extends AbstractNALTest {
     @Test public void testBelievedImplOfDesireDelayed() {
 
         test()
-                //t.log()
+                //t
                 .goal("(x)", Tense.Present, 1f, 0.9f)
                 .believe("((x)==>+3(y))")
                 .mustDesire(cycles, "(y)", 1f, 0.45f, 3)
@@ -769,7 +778,7 @@ public class NAL8Test extends AbstractNALTest {
          */
 
         test()
-            .log()
+            
             .goal("(f)", Tense.Present, 1f, 0.9f)
             .believe("(--(g) &&+1 --(f))", Tense.Present, 1f, 0.9f)
             .mustNotOutput(cycles, "(g)", '!', -1, 0, 1, ETERNAL);
@@ -801,7 +810,7 @@ public class NAL8Test extends AbstractNALTest {
 
         //        @Test public void subsent_1_even_simpler_simplerGoalTemporal()  {
         //        test()
-        //                .log()
+        //                
         //                .input("(open(t1) &&+5 [opened]:t1)! :|:")
         //                .mustDesire(cycles, "open(t1)", 1.0f, 0.81f, 0) //temporal
         //                .mustNotDesire(cycles, "[opened]:t1", 1.0f, 0.81f, 5) //temporal
@@ -895,7 +904,7 @@ public class NAL8Test extends AbstractNALTest {
     @Test public void testNegatedImplicationP() {
 
         test()
-                .log()
+                
                 .input("(R)! :|:")
                 .input("((S) ==>+0 --(R)).") //internally, this reduces to --(S ==> R)
                 .mustDesire(cycles, "(S)", 0.0f, 0.81f, 0);
@@ -992,7 +1001,7 @@ public class NAL8Test extends AbstractNALTest {
 
 //    @Test public void testImplBackward1() {
 //        test()
-//            .log()
+//            
 //                //.inputAt(2, "(?x ==>+2 (b))? :|:")
 //                //.inputAt(2, "(?x &&+2 (b))? :|:")
 //                .inputAt(2, "(a). :|:")
@@ -1002,7 +1011,7 @@ public class NAL8Test extends AbstractNALTest {
 //    }
 //    @Test public void testMixedTemporalInductionGoalConj() {
 //        test()
-//                .log()
+//                
 //                .inputAt(0, "(x). :|:")
 //                .inputAt(1, "(y)! :|:")
 //                .mustDesire(cycles, "((x) &&+1 (y))", 1f,0.81f, 0)

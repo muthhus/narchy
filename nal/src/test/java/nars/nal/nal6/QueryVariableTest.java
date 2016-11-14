@@ -1,5 +1,7 @@
 package nars.nal.nal6;
 
+import nars.NAR;
+import nars.Narsese;
 import nars.Task;
 import nars.nar.Default;
 import nars.term.Termed;
@@ -9,6 +11,7 @@ import org.junit.Test;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import static nars.time.Tense.ETERNAL;
 import static org.junit.Assert.assertTrue;
 
 
@@ -45,6 +48,48 @@ public class QueryVariableTest {
         });
         nar.run(time);
         assertTrue(valid.get());
+
+    }
+
+    @Test
+    public void testQuery2() throws Narsese.NarseseException {
+        testQueryAnswered(64, 1);
+    }
+
+    @Test
+    public void testQuery1()  {
+        testQueryAnswered(1, 32);
+    }
+
+
+    public void testQueryAnswered(int cyclesBeforeQuestion, int cyclesAfterQuestion) throws Narsese.NarseseException {
+
+        AtomicBoolean b = new AtomicBoolean(false);
+
+        String question = cyclesBeforeQuestion == 0 ?
+                "<a --> b>" /* unknown solution to be derived */ :
+                "<b --> a>" /* existing solution, to test finding existing solutions */;
+
+        NAR n = new Default(100, 1, 1, 3);
+        n.nal(2);
+        //.trace()
+        n.input("<a <-> b>. %1.0;0.5%",
+                "<b --> a>. %1.0;0.5%").run(cyclesBeforeQuestion);
+
+        NAR nar = new Default(100, 1, 1, 3);
+        n.nal(2);
+        n.log()
+                .input("<a <-> b>. %1.0;0.5%",
+                        "<b --> a>. %1.0;0.5%")
+                .stopIf(b::get)
+                .ask(question, ETERNAL, (Task t) -> {
+                    b.set(true);
+                    return false;
+                });
+
+        nar.run(cyclesAfterQuestion);
+
+        assertTrue(b.get());
 
     }
 

@@ -1,6 +1,5 @@
 package nars.time;
 
-import nars.$;
 import nars.Op;
 import nars.Param;
 import nars.Task;
@@ -12,14 +11,14 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.util.InvalidTermException;
+import nars.util.Util;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import static nars.$.terms;
 import static nars.Op.CONJ;
-import static nars.Op.NEG;
 import static nars.task.Revision.chooseByConf;
-import static nars.task.Revision.occInterpolate;
+import static nars.time.TimeFunctions.occInterpolate;
 import static nars.time.Tense.*;
 
 /**
@@ -27,6 +26,7 @@ import static nars.time.Tense.*;
  */
 @FunctionalInterface
 public interface TimeFunctions {
+
 
 
     /**
@@ -316,9 +316,11 @@ public interface TimeFunctions {
 
             //project any ETERNAL to NOW, since an ETERNAL truth is the same for the present moment
             if (occDecomposed == ETERNAL)
-                occDecomposed = p.time();
+                //occDecomposed = p.time();
+                occDecomposed = occOther;
             if (occOther == ETERNAL)
-                occOther = p.time();
+                //occOther = p.time();
+                occOther = occDecomposed;
 
             long occ;
 
@@ -790,7 +792,7 @@ public interface TimeFunctions {
                 }
 
                 long to = task.occurrence();
-                long bo = belief != null ? belief.occurrence() : ETERNAL;
+                long bo = belief != null ? belief.occurrence() : to;
 
                 int occDiff = (to != ETERNAL && bo != ETERNAL) ? (int) (bo - to) : 0;
 
@@ -997,6 +999,32 @@ public interface TimeFunctions {
         return derived;
 
     };
+
+    static long occInterpolate(@NotNull Task t, @Nullable Task b, PremiseEval p) {
+
+        long to = t.occurrence();
+        if (b == null)
+            return to;
+
+        long bo = b.occurrence();
+        if (to == ETERNAL)
+            return bo;
+            //to = p.time(); //only un-eternalize task
+
+        if (bo == ETERNAL)
+            return to; //dont uneternalize belief, defer to task's occurrence
+
+        //if (to != ETERNAL && bo != ETERNAL) {
+
+        float tw = t.confWeight();
+        float bw = b.confWeight();
+        return Util.lerp(to, bo, (tw) / (bw + tw));
+//        } else {
+//            return bo != ETERNAL ? bo : to;
+//        }
+
+    }
+
 
     @NotNull
     static Compound dt(@NotNull Compound derived, int dt, @NotNull PremiseEval p, long[] occReturn) {
