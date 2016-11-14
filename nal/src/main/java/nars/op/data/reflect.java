@@ -30,7 +30,7 @@ public class reflect extends TermFunction {
 
         Term content = x.term(0);
 
-        return getMetaTerm(content);
+        return reflect(content);
     }
 
 
@@ -39,10 +39,11 @@ public class reflect extends TermFunction {
      */
     @Nullable
     public static Term sop(Term subject, Term object, Term predicate) {
-        return $.inh($.p(getMetaTerm(subject), getMetaTerm(object)), predicate);
+        return $.inh($.p(reflect(subject), reflect(object)), predicate);
     }
+
     @Nullable
-    public static Term sop(@NotNull Compound s, String operatorName) {
+    public static Term sopNamed(String operatorName, @NotNull Compound s) {
         //return Atom.the(Utf8.toUtf8(name));
 
         //return $.the('"' + t + '"');
@@ -62,17 +63,17 @@ public class reflect extends TermFunction {
 //                    throw new RuntimeException("atom name too long");
 
         //  }
-        return $.inh($.p(getMetaTerm(s.term(0)), getMetaTerm(s.term(1))), $.quote(operatorName));
+        return $.inh($.p(reflect(s.term(0)), reflect(s.term(1))), $.quote(operatorName));
     }
     @Nullable
     public static Term sop(@NotNull Compound s, Term predicate) {
-        return $.inh($.p(getMetaTerm(s.term(0)), getMetaTerm(s.term(1))), predicate);
+        return $.inh($.p(reflect(s.term(0)), reflect(s.term(1))), predicate);
     }
     @Nullable
     public static Term sop(String operatorName, @NotNull Compound c) {
         Term[] m = new Term[c.size()];
         for (int i = 0; i < c.size(); i++)
-            m[i] = getMetaTerm(c.term(i));
+            m[i] = reflect(c.term(i));
 
         //return Atom.the(Utf8.toUtf8(name));
 
@@ -97,14 +98,14 @@ public class reflect extends TermFunction {
     }
     
     @Nullable
-    public static Term getMetaTerm(Term node) {
+    public static Term reflect(Term node) {
         if (!(node instanceof Compound)) {
             return node;
         }
         Compound t = (Compound)node;
         switch (t.op()) {
-            case INH: return sop(t, "inheritance");
-            case SIM:  return sop(t, "similarity");
+            //case INH: return sop(t, "inheritance");
+            //case SIM:  return sop(t, "similarity");
             default: return sop(t.op().toString(), t);
         }
         

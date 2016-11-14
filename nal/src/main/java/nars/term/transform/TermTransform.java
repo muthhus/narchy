@@ -14,12 +14,6 @@ import java.util.function.Function;
 
 public interface TermTransform extends Atomic, Function<Term[],Term> {
 
-    Concept[] StaticBuiltins = {
-            new intersect(),
-            new differ(),
-            new union()
-    };
-
 
 
     @NotNull

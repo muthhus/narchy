@@ -82,6 +82,7 @@ public abstract class TermIndex extends TermBuilder {
 
     public void start(NAR nar) {
         this.nar = nar;
+        conceptBuilder().start(nar);
     }
 
     /**
@@ -552,10 +553,6 @@ public abstract class TermIndex extends TermBuilder {
     }
 
 
-    public void loadBuiltins() {
-        for (Concept t : TermTransform.StaticBuiltins)
-            set(t);
-    }
 
     /**
      * implementations can override this to update the index when a concept's state changes, ex: to re-evaluate it's features

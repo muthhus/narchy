@@ -681,6 +681,7 @@ public class Narsese extends BaseParser<Object> {
             case '#':
             case '$':
             case ':':
+            case ';':
             case '`':
 
             case '\'':

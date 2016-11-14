@@ -87,7 +87,7 @@ public class IRCAgent extends IRC {
             }
         });
 
-        nar.onExec(new IRCBotOperator("readWiki") {
+        nar.on(new IRCBotOperator("readWiki") {
 
 
             @Override

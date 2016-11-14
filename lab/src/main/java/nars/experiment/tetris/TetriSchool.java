@@ -16,6 +16,7 @@ import spacegraph.Surface;
 import spacegraph.obj.widget.*;
 import spacegraph.obj.CrosshairSurface;
 import spacegraph.obj.widget.console.ConsoleSurface;
+import spacegraph.obj.widget.console.VirtualConsole;
 import spacegraph.render.Draw;
 
 import java.awt.*;
@@ -198,15 +199,15 @@ public class TetriSchool extends NSchool implements Runnable {
 
         public static Surface newTrainingPanel(TetriSchool school) {
 
-            //ConsoleSurface term = new ConsoleSurface(120, 40);
+            ConsoleSurface term = new VirtualConsole(120, 40);
 
-            //school.nar.logSummaryGT(term, 0.25f);
+            school.nar.logSummaryGT(term, 0.25f);
 
             return col(
 
-                    newSchoolControl(school)
+                    newSchoolControl(school),
 
-                    //term
+                    term
 
             );
         }

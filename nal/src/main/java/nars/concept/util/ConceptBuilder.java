@@ -26,8 +26,6 @@ public interface ConceptBuilder extends Function<Term, Termed> {
 
     void start(NAR nar);
 
-    List<Task> EmptyTaskList = Collections.emptyList();
-
 
     ConceptBuilder Null = new NullConceptBuilder();
 

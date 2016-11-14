@@ -91,8 +91,14 @@ public enum $ {
     }
 
     @NotNull
-    public static Atom quote(String text) {
-        return (Atom)$.the('"' + text + '"');
+    public static Atom quote(Object text) {
+        return (Atom)$.the("'" + text + '"');
+    }
+
+
+    /** warning: this will modify the StringBuilder parameter in generating the quote, to avoid duplicating the instance */
+    @NotNull public static Atom quote(StringBuilder getsModified) {
+        return (Atom)$.the(getsModified.insert(0, '"').append('"'));
     }
 
     @NotNull
@@ -155,6 +161,7 @@ public enum $ {
                 opTerm
         );
     }
+
     @NotNull public static Compound func(@NotNull Atomic opTerm, @Nullable Collection<Term> arg) {
         return (Compound) compound(
                 INH,
@@ -845,6 +852,8 @@ public enum $ {
         if (o instanceof Term) return ((Term)o);
         if (o instanceof String)
             return the((String)o);
+        if (o instanceof StringBuilder)
+            return the(o.toString());
         if (o instanceof Number)
             return the((Number)o);
 

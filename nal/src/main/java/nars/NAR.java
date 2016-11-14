@@ -65,6 +65,7 @@ import static nars.$.*;
 import static nars.Op.*;
 import static nars.Symbols.*;
 import static nars.concept.CompoundConcept.DuplicateMerge;
+import static nars.concept.Functor.f;
 import static nars.time.Tense.ETERNAL;
 import static org.fusesource.jansi.Ansi.ansi;
 
@@ -88,7 +89,6 @@ import static org.fusesource.jansi.Ansi.ansi;
  * Memory is serializable so it can be persisted and transported.
  */
 public abstract class NAR extends Param implements Level, Consumer<Task>, NARIn, NAROut, Iterative<NAR> {
-
 
     public static final Logger logger = LoggerFactory.getLogger(NAR.class);
 
@@ -254,10 +254,12 @@ public abstract class NAR extends Param implements Level, Consumer<Task>, NARIn,
 //        });
 
 
-        concepts.conceptBuilder().start(this);
-
-        concepts.loadBuiltins();
         concepts.start(this);
+
+        for (Concept t : Builtin.statik)
+            on(t);
+
+        new Builtin(this).forEach(this::on);
 
     }
 
@@ -771,7 +773,7 @@ public abstract class NAR extends Param implements Level, Consumer<Task>, NARIn,
 
         Compound z = func(self, x, y); //form a compound by attaching SELF to it
 
-        logger.info(" {}", z);
+        //logger.info(" {}", z);
 
         eventTaskProcess.emit(command(z));
 
@@ -801,7 +803,7 @@ public abstract class NAR extends Param implements Level, Consumer<Task>, NARIn,
     }
 
 
-    public final On onExec(@NotNull AbstractOperator r) {
+    public final On on(@NotNull AbstractOperator r) {
         r.init(this);
         return onExecution(r.operator(), r);
     }
@@ -1345,19 +1347,17 @@ public abstract class NAR extends Param implements Level, Consumer<Task>, NARIn,
      */
     @NotNull
     public final Concept on(@NotNull Concept c) {
+
+        Concept existing = concept(c.term());
+        if ((existing !=null) && (existing!=c))
+            throw new RuntimeException("concept already indexed for term: " + c.term());
         concepts.set(c);
         return c;
     }
 
     @NotNull
-    public final Concept on(@NotNull String functor, @NotNull Function<Term[],Term> f) {
-        Concept c = new Functor(functor) {
-            @Override public final Term apply(Term[] terms) {
-                return f.apply(terms);
-            }
-        };
-        concepts.set(c);
-        return c;
+    public final Concept on(@NotNull String termAtom, @NotNull Function<Term[],Term> f) {
+        return on(f(termAtom, f));
     }
 
     /**

@@ -33,7 +33,6 @@ public class PatternTermIndex extends MapTermIndex {
             new ConcurrentHashMap<>(capacity),
             new ConcurrentHashMap<>(capacity));
 
-        loadBuiltins();
     }
 
     @Override

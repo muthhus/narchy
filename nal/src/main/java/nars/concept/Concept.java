@@ -29,6 +29,7 @@ import nars.bag.Bag;
 import nars.budget.Activation;
 import nars.budget.Budgeted;
 import nars.budget.policy.ConceptPolicy;
+import nars.link.BLink;
 import nars.table.BeliefTable;
 import nars.table.QuestionTable;
 import nars.table.TaskTable;
@@ -41,6 +42,7 @@ import org.eclipse.collections.impl.map.mutable.UnifiedMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.IOException;
 import java.io.PrintStream;
 import java.util.Collections;
 import java.util.Iterator;
@@ -348,82 +350,94 @@ public interface Concept extends Termed {
         print(System.out);
     }
 
-    default void print(@NotNull PrintStream out) {
+    default <A extends Appendable> A print(@NotNull A out) {
         print(out, true, true, true, true);
+        return out;
     }
 
 
     /**
      * prints a summary of all termlink, tasklink, etc..
      */
-    default void print(@NotNull PrintStream out, boolean showbeliefs, boolean showgoals, boolean showtermlinks, boolean showtasklinks) {
+    default void print(@NotNull Appendable out, boolean showbeliefs, boolean showgoals, boolean showtermlinks, boolean showtasklinks) {
 
-        out.println("concept: " + toString());
+        try {
+            out.append("concept: " + toString()).append('\n');
+            String indent = "  \t";
 
-        String indent = "  \t";
+            Consumer<Task> printTask = s -> {
+                try {
+                    out.append(indent);
+                    out.append(s.toString());
+                    out.append(" ");
+                    out.append(s.lastLogged().toString());
+                    out.append('\n');
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            };
 
-        Consumer<Task> printTask = s -> {
-            out.print(indent);
-            out.print(s);
-            out.print(" ");
-            out.print(s.lastLogged());
-            out.println();
-        };
+            Consumer<BLink> printBagItem = b -> {
+                try {
+                    out.append(indent);
+                    out.append(b.get() + " " + b.toBudgetString());
+                    out.append(" ");
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            };
 
-        if (showbeliefs) {
-            out.print(" Beliefs:");
-            if (beliefs().isEmpty()) out.println(" none");
-            else {
-                out.println();
-                beliefs().forEach(printTask);
+            if (showbeliefs) {
+                out.append(" Beliefs:");
+                if (beliefs().isEmpty()) out.append(" none").append('\n');
+                else {
+                    out.append('\n');
+                    beliefs().forEach(printTask);
+                }
+                out.append(" Questions:");
+                if (questions().isEmpty()) out.append(" none").append('\n');
+                else {
+                    out.append('\n');
+                    questions().forEach(printTask);
+                }
             }
-            out.print(" Questions:");
-            if (questions().isEmpty()) out.println(" none");
-            else {
-                out.println();
-                questions().forEach(printTask);
+
+            if (showgoals) {
+                out.append(" Goals:");
+                if (goals().isEmpty()) out.append(" none").append('\n');
+                else {
+                    out.append('\n');
+                    goals().forEach(printTask);
+                }
+                out.append(" Quests:");
+                if (questions().isEmpty()) out.append(" none").append('\n');
+                else {
+                    out.append('\n');
+                    quests().forEach(printTask);
+                }
             }
+
+            if (showtermlinks) {
+                //out.append("TermLinkTemplates: ");
+                //out.appendln(termlinkTemplates());
+
+                out.append("\n TermLinks: " + termlinks().size() + '/' + termlinks().capacity() +
+                        "\tTemplates: " + this.templates()).append('\n');
+
+                termlinks().forEach(printBagItem);
+            }
+
+            if (showtasklinks) {
+                out.append("\n TaskLinks: " + tasklinks().size() + '/' + tasklinks().capacity()).append('\n');
+
+                tasklinks().forEach(printBagItem);
+            }
+
+            out.append('\n');
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
-        if (showgoals) {
-            out.print(" Goals:");
-            if (goals().isEmpty()) out.println(" none");
-            else {
-                out.println();
-                goals().forEach(printTask);
-            }
-            out.print(" Quests:");
-            if (questions().isEmpty()) out.println(" none");
-            else {
-                out.println();
-                quests().forEach(printTask);
-            }
-        }
-
-        if (showtermlinks) {
-            //out.print("TermLinkTemplates: ");
-            //out.println(termlinkTemplates());
-
-            out.println("\n TermLinks: " + termlinks().size() + '/' + termlinks().capacity() +
-                    "\tTemplates: " + this.templates());
-
-            termlinks().forEach(b -> {
-                out.print(indent);
-                out.print(b.get() + " " + b.toBudgetString());
-                out.print(" ");
-            });
-        }
-
-        if (showtasklinks) {
-            out.println("\n TaskLinks: " + tasklinks().size() + '/' + tasklinks().capacity());
-            tasklinks().forEach(b -> {
-                out.print(indent);
-                out.print(b.get() + " " + b.toBudgetString());
-                out.print(" ");
-            });
-        }
-
-        out.println('\n');
     }
 
     @Nullable ConceptPolicy policy();

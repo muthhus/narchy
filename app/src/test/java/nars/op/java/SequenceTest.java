@@ -38,7 +38,7 @@ public class SequenceTest {
         //n.DEFAULT_QUESTION_PRIORITY = 0.1f;
         //n.shortTermMemoryHistory.set(4);
 
-        n.onExec(new TermFunction("vocalize") {
+        n.on(new TermFunction("vocalize") {
 
             @Nullable
             @Override

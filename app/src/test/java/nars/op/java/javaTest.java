@@ -40,7 +40,7 @@ public class javaTest  {
         //nars.op.sys.java
 
         NAR d = new Default();
-        d.onExec(new java());
+        d.on(new java());
         d.input("java(\"nars.op.sys.java.java\", #x)!");
         d.log();
         d.run(5);
@@ -54,7 +54,7 @@ public class javaTest  {
     @Test public void testAmbientExpression() {
 
         NAR d = new Default();
-        d.onExec(new java());
+        d.on(new java());
 
 
         d.input("java(\"System.currentTimeMillis()\", #x)!");

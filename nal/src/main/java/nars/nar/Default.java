@@ -18,7 +18,6 @@ import nars.op.mental.schizo;
 import nars.op.out.say;
 import nars.op.sys.reset;
 import nars.op.time.STMTemporalLinkage;
-import nars.term.Term;
 import nars.term.Termed;
 import nars.time.Clock;
 import nars.time.FrameClock;
@@ -108,7 +107,7 @@ public class Default extends NAR {
     /* NAL8 plugins */
     protected void initNAL8() {
         for (AbstractOperator o : defaultOperators)
-            onExec(o);
+            on(o);
     }
 
 

@@ -146,8 +146,6 @@ public abstract class TermFunction<O> extends AbstractOperator {
     @Override
     public void execute(@NotNull OperationConcept exec) {
 
-
-
         final Compound ttt = exec.term();
         assert(ttt.op()==INH);
         Compound args = (Compound) ttt.term(0);
