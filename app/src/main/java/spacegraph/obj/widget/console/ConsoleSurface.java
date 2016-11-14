@@ -37,10 +37,6 @@ public abstract class ConsoleSurface extends Surface implements Appendable {
     final float charAspect = 1.25f;
     private int cols, rows;
 
-    /**
-     * cursor position
-     */
-    int curx, cury;
 
     /**
      * percent of each grid cell width filled with the character
@@ -67,8 +63,8 @@ public abstract class ConsoleSurface extends Surface implements Appendable {
     public void paint(GL2 gl) {
 
 
-        float charScaleX = (float) 1 * this.charScaleX;
-        float charScaleY = charAspect * this.charScaleY;
+        float charScaleX = this.charScaleX / charAspect;
+        float charScaleY = this.charScaleY;
 
         float dz = 0f;
 
@@ -78,7 +74,15 @@ public abstract class ConsoleSurface extends Surface implements Appendable {
 
         gl.glPushMatrix();
 
-        gl.glScalef(1f / cols, 1f / (rows * charAspect), 1f);
+
+        gl.glScalef(1f / (cols), 1f / (rows), 1f);
+
+
+
+        //background extents
+        gl.glColor3f(0.25f, 0.25f, 0.25f);
+        Draw.rect(gl, 0, 0, cols, rows);
+
 
         gl.glLineWidth(3f);
 
@@ -90,7 +94,7 @@ public abstract class ConsoleSurface extends Surface implements Appendable {
             Draw.textStart(gl,
                     charScaleX, charScaleY,
                     //0, (rows - 1 - jj) * charAspect,
-                    0.5f, (rows - 1 - row) * charAspect,
+                    0.5f,  (rows - 1 - row),
                     dz);
 
             for (int col = 0; col < cols; col++) {
@@ -122,9 +126,9 @@ public abstract class ConsoleSurface extends Surface implements Appendable {
 
                     //TODO: if (!fg.equals(previousFG))
                     //gl.glColor4f(fg.red(), fg.green(), fg.blue(), fgAlpha);
-                    gl.glColor3f(1f, 1f, 1f);
+                    gl.glColor3f(0.75f, 0.75f, 0.75f);
 
-                    Draw.textNext(gl, cc, col);
+                    Draw.textNext(gl, cc, col/charScaleX);
                 }
             }
 
@@ -134,14 +138,17 @@ public abstract class ConsoleSurface extends Surface implements Appendable {
 
         }
 
+        int[] cursor = getCursorPos();
+        int curx = cursor[0];
+        int cury = cursor[1];
 
         //DRAW CURSOR
         float p = (1f + (float) Math.sin(t / 100.0)) * 0.5f;
-        gl.glColor4f(1f, 0.5f, 0f, 0.3f + p * 0.4f);
-        float m = (0.5f + 2f * p);
+        float m = ( p);
+        gl.glColor4f(1f, 0.7f, 0f, 0.4f + p * 0.4f);
         Draw.rect(gl,
-                (float) charScaleX * (curx + 0.5f + m / 2f), charScaleY * (rows - 1 - cury + 0.5f + m / 2f),
-                (float) charScaleX * (1 - m), charScaleY * (1 - m)
+                (float) (curx) + m/2f, (rows - 1 - cury) + m / 2f,
+                (float) (1 - m), (1 - m)
                 , -dz
         );
 
@@ -149,11 +156,11 @@ public abstract class ConsoleSurface extends Surface implements Appendable {
 
     }
 
+    /** x,y aka col,row */
+    public abstract int[] getCursorPos();
+
     abstract public TextCharacter charAt(int col, int row);
 
-    private String[] lines() {
-        return new String[]{"wtf, wtf", "xxkjv"};
-    }
 
     public char visible(char cc) {
         //HACK: un-ANSIfy
@@ -174,23 +181,7 @@ public abstract class ConsoleSurface extends Surface implements Appendable {
         return cc;
     }
 
-    @Override
-    public Appendable append(CharSequence charSequence) throws IOException {
-        for (int i = 0; i < charSequence.length(); i++)
-            append(charSequence.charAt(i));
-        return this;
-    }
 
-    @Override
-    public Appendable append(CharSequence charSequence, int i, int i1) throws IOException {
-        throw new UnsupportedOperationException("TODO");
-    }
-
-    @Override
-    public Appendable append(char c) throws IOException {
-        //this.term.put(c);
-        return this;
-    }
 
 
 //    public static class EditTerminal extends DefaultVirtualTerminal {

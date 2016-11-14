@@ -3,13 +3,9 @@ package nars.web;
 import io.undertow.Undertow;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.handlers.PathHandler;
-import io.undertow.server.handlers.cache.DirectBufferCache;
-import io.undertow.server.handlers.resource.CachingResourceManager;
 import io.undertow.server.handlers.resource.FileResourceManager;
-import io.undertow.server.handlers.resource.PathResourceManager;
 import io.undertow.websockets.WebSocketConnectionCallback;
 import io.undertow.websockets.extensions.PerMessageDeflateHandshake;
-import nars.$;
 import nars.bag.Bag;
 import nars.concept.Concept;
 import nars.nar.Default;
@@ -24,7 +20,6 @@ import nars.util.Wiki;
 import nars.util.data.MutableInteger;
 import ognl.Ognl;
 import ognl.OgnlException;
-import org.apache.commons.lang.mutable.MutableFloat;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -46,8 +41,8 @@ import static io.undertow.UndertowOptions.ENABLE_HTTP2;
 import static io.undertow.UndertowOptions.ENABLE_SPDY;
 import static java.util.zip.Deflater.BEST_COMPRESSION;
 import static nars.$.*;
-import static spacegraph.irc.IRCAgent.hear;
-import static spacegraph.irc.IRCAgent.newRealtimeNAR;
+import static spacegraph.net.IRCAgent.hear;
+import static spacegraph.net.IRCAgent.newRealtimeNAR;
 
 
 public class WebServer /*extends PathHandler*/ {

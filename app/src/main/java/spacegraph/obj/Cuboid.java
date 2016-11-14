@@ -24,7 +24,7 @@ import static spacegraph.math.v3.v;
 public class Cuboid<X> extends SimpleSpatial<X> {
 
     public final Surface front;
-    final float zOffset = 0.05f; //relative to scale
+    final float zOffset = 0f; //relative to scale
 
     public final Finger mouseFront;
     private v3 mousePick;
@@ -113,7 +113,9 @@ public class Cuboid<X> extends SimpleSpatial<X> {
         //gl.glScalef(pp, pp, 1f);
 
 
+        gl.glDepthMask(false);
         front.render(gl);
+        gl.glDepthMask(true);
 
         gl.glPopMatrix();
 
@@ -131,9 +133,9 @@ public class Cuboid<X> extends SimpleSpatial<X> {
             gl.glScalef(0.25f, 0.25f, 0.25f);
             gl.glColor4f(1f, 1f, 1f, 0.5f);
             gl.glRotated(Math.random()*360.0, Math.random()-0.5f, Math.random()-0.5f, Math.random()-0.5f);
-            gl.glDisable(GL2.GL_DEPTH_TEST);
+            gl.glDepthMask(false);
             Draw.rect(gl, -0.5f, -0.5f, 1, 1);
-            gl.glEnable(GL2.GL_DEPTH_TEST);
+            gl.glDepthMask(true);
             gl.glPopMatrix();
         }
     }

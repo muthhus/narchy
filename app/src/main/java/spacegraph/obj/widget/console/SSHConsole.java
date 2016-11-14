@@ -1,22 +1,27 @@
 package spacegraph.obj.widget.console;
 
 import com.googlecode.lanterna.TerminalPosition;
-import com.googlecode.lanterna.TextCharacter;
-import com.googlecode.lanterna.input.KeyStroke;
-import com.googlecode.lanterna.terminal.virtual.DefaultVirtualTerminal;
 import com.jcraft.jsch.JSchException;
 import com.jogamp.newt.event.KeyEvent;
 import org.fusesource.jansi.AnsiOutputStream;
 import spacegraph.SpaceGraph;
+import spacegraph.net.SSH;
 
 import java.io.*;
 
 /**
  * Created by me on 11/13/16.
  */
-public class SSHConsole extends ConsoleSurface  {
+public class SSHConsole extends VirtualConsole  {
 
-    final DefaultVirtualTerminal term = new DefaultVirtualTerminal();
+
+    public static void main(String[] args) throws IOException, JSchException {
+
+        SpaceGraph.window(new SSHConsole(
+                "gest", "localhost", "tseg",
+                80, 24 ), 1000, 600);
+    }
+
 
     final PipedOutputStream ins = new PipedOutputStream();
 
@@ -149,17 +154,6 @@ public class SSHConsole extends ConsoleSurface  {
         );
     }
 
-    public static void main(String[] args) throws IOException, JSchException {
-
-        SpaceGraph.window(new SSHConsole(
-                "gest", "localhost", "tseg",
-                80, 24 ), 1000, 600);
-    }
-
-    @Override
-    public TextCharacter charAt(int col, int row) {
-        return term.getCharacter(col, row);
-    }
 
     @Override
     public boolean onKey(KeyEvent e, boolean pressed) {
@@ -171,8 +165,6 @@ public class SSHConsole extends ConsoleSurface  {
         //only interested on release
         if (pressed)
             return false;
-
-        KeyStroke k;
 
         if (e.isModifierKey()) {
             return true;

@@ -254,22 +254,19 @@ abstract public class JoglPhysics<X> extends JoglSpace implements GLEventListene
 
         if (useLight0) {
             gl.glEnable(gl.GL_LIGHTING);
-        }
-        if (useLight0) {
             gl.glEnable(gl.GL_LIGHT0);
         }
 //        if (useLight1) {
 //            gl.glEnable(gl.GL_LIGHT1);
 //        }
 
-        gl.glEnable(GL2.GL_DEPTH_TEST);
         gl.glEnable(GL2.GL_POINT_SMOOTH);
         gl.glEnable(GL2.GL_LINE_SMOOTH);
         gl.glEnable(GL2.GL_POLYGON_SMOOTH);
         gl.glEnable(GL2.GL_MULTISAMPLE);
 
         gl.glShadeModel(gl.GL_SMOOTH);
-        gl.glHint(GL2.GL_PERSPECTIVE_CORRECTION_HINT, GL2.GL_NICEST);
+        //gl.glHint(GL2.GL_PERSPECTIVE_CORRECTION_HINT, GL2.GL_NICEST);
 
         //https://www.sjbaker.org/steve/omniv/opengl_lighting.html
         gl.glColorMaterial ( GL2.GL_FRONT_AND_BACK, GL2.GL_AMBIENT_AND_DIFFUSE ) ;
@@ -279,7 +276,6 @@ abstract public class JoglPhysics<X> extends JoglSpace implements GLEventListene
         //gl.glMaterialfv( GL2.GL_FRONT_AND_BACK, GL2.GL_EMISSION, new float[] { 0, 0, 0, 0 }, 0);
 
         gl.glEnable(gl.GL_DEPTH_TEST);
-        //gl.glDepthFunc(gl.GL_LESS);
         gl.glDepthFunc(gl.GL_LEQUAL);
 
 
