@@ -11,7 +11,9 @@ import spacegraph.render.Draw;
 public class XYSlider extends Surface {
 
     final v2 knob = new v2(0.5f, 0.5f);
-    private final float knobSize = 0.25f;
+
+    private final float knobWidth = 0.25f;
+    private final float crosshairWidth = knobWidth/6f;
 
     public XYSlider() {
         super();
@@ -36,9 +38,9 @@ public class XYSlider extends Surface {
         float px = knob.x;
         float py = knob.y;
 
-        float knobSize = this.knobSize;
-        float W = knobSize / 3f;
-        float H = knobSize / 3f;
+        float knobSize = this.knobWidth;
+        float W = this.crosshairWidth;
+        float H = this.crosshairWidth;
 
         gl.glColor4f(0.75f, 0.75f, 0.75f, 0.75f);
         float h1 = py - H / 2f;

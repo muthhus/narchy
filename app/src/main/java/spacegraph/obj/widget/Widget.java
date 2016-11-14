@@ -104,25 +104,13 @@ public abstract class Widget extends Stacking {
 
     public static Surface widgetDemo() {
         return grid(
-
-                    stacking(
-                            new Slider(.25f, 0 /* pause */, 1)
-                            //label("Slide").scale(0.25f,0.25f)
-                    ),
-
-
-                    //row(
-                            col(new CheckBox("ABC"),new CheckBox("XYZ")),
-                            //col(
-                                new PushButton("clickMe()", (p) -> {
-                                    p.setText(Texts.n2(Math.random()));
-                                }),
-                                new XYSlider(),
-                            //),
-                    //),
-
+                    new Slider(.25f, 0 /* pause */, 1),
+                    col(new CheckBox("ABC"),new CheckBox("XYZ")),
+                        new PushButton("clickMe()", (p) -> {
+                            p.setText(Texts.n2(Math.random()));
+                    }),
+                    new XYSlider(),
                     new DummyConsole()
-
             );
     }
 
