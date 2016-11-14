@@ -1,6 +1,0 @@
-name = Tourist
-info = Useful for a casual trip around the local solar system and back.
-
-thrust          = 1.5
-maneuverability = 0.25
-mass            = 0.5

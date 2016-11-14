@@ -82,7 +82,8 @@ public class IRCAgent extends IRC {
         //SPEAK
         nar.onTask(t -> {
             float p = t.pri();
-            if (p >= 0.7f || (t.term().containsTermRecursively(nar.self) && (p > 0.5f))) {
+            if (t.op()==INH && t.term(1).equals(nar.self)) {
+            //if (p >= 0.7f || (t.term().containsTermRecursively(nar.self) && (p > 0.5f))) {
                 send(channels, t.toString());
             }
         });
@@ -272,26 +273,26 @@ public class IRCAgent extends IRC {
             if (msg.startsWith("//"))
                 return; //comment or previous output
 
-            switch (msg) {
-                case "memstat":
-                    pevent.respondWith(nar.concepts.summary());
-                    return;
-                //@NotNull Bag<Concept> cbag = ((Default) nar).core.concepts;
-                //" | core pri: " + cbag.priMin() + "<" + Texts.n4(cbag.priHistogram(5)) + ">" + cbag.priMax();
-//                case "top":
-//                    pevent.respondWith(top(Terms.ZeroProduct));
+//            switch (msg) {
+//                case "memstat":
+//                    pevent.respondWith(nar.concepts.summary());
 //                    return;
-                case "clear":
-                    ((Default) nar).core.active.clear();
-                    pevent.respondWith("Ready.");
-                    return;
-                case "save":
-                    File tmp = Files.createTempFile("nar_save_", ".nal").toFile();
-                    PrintStream ps = new PrintStream(new FileOutputStream(tmp));
-                    nar.outputTasks((x) -> true, ps);
-                    pevent.respondWith("Memory saved to: " + tmp.getAbsolutePath());
-                    return;
-            }
+//                //@NotNull Bag<Concept> cbag = ((Default) nar).core.concepts;
+//                //" | core pri: " + cbag.priMin() + "<" + Texts.n4(cbag.priHistogram(5)) + ">" + cbag.priMax();
+////                case "top":
+////                    pevent.respondWith(top(Terms.ZeroProduct));
+////                    return;
+//                case "clear":
+//                    ((Default) nar).core.active.clear();
+//                    pevent.respondWith("Ready.");
+//                    return;
+//                case "save":
+//                    File tmp = Files.createTempFile("nar_save_", ".nal").toFile();
+//                    PrintStream ps = new PrintStream(new FileOutputStream(tmp));
+//                    nar.outputTasks((x) -> true, ps);
+//                    pevent.respondWith("Memory saved to: " + tmp.getAbsolutePath());
+//                    return;
+//            }
 
             String nick = pevent.getUser().getNick(); //TODO use hostmask ?
             String channel = pevent.getChannel().getName();

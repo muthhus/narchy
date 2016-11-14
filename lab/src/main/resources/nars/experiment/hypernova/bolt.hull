@@ -1,7 +1,0 @@
-name = Bolt
-info = A small projectile.
-
-hp    = 0.1
-mass  = 0.0
-model = bolt
-size  = 0.5
