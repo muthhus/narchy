@@ -29,7 +29,7 @@ public class TopCraft extends NAgents {
 
         this.craft = new TopDownMinicraft();
 
-        pixels = addCamera("see", ()->craft.image, 48,48, (v) -> $.t( v, alpha));
+        pixels = addCameraRetina("see", ()->craft.image, 48,48, (v) -> $.t( v, alpha));
         //pixels = addFreqCamera("see", ()->craft.image, 64,64, (v) -> $.t( v, alpha));
 
         int nx = 8;

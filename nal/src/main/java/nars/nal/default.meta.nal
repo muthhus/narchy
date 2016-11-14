@@ -335,6 +335,11 @@
 
 //desire spreading by similarity
      S, (S<->P) |- P, (Goal:Intersection)
+        %S, ((--,%S)<->P), task(negative)  |- P, (Goal:IntersectionN)
+        %S, ((--,%P)<->S), task(negative)  |- (--,%P), (Goal:IntersectionN)
+
+
+
 
         //(&&,(--,%X),A..+), X, time(decomposeTask) |- (&&,A..+), (Belief:StructuralDeduction)
      //(&&,X,A..+), B, time(decomposeTask) |- subOnlyIfUnifiesDep((&&,A..+),X,B), (Belief:AnonymousAnalogy, Goal:Strong)

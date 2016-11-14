@@ -393,7 +393,8 @@ public class NAL6Test extends AbstractNALTest {
         //tester.log();
         tester.believe("<open($1,lock1) ==> <$1 --> key>>"); //en("if something opens lock1, it is a key");
         tester.believe("<lock1 --> lock>"); //en("lock1 is a key");
-        tester.mustBelieve(cycles, "<(<#1 --> lock> && open($2,#1)) ==> <$2 --> key>>", 1.00f, 0.81f); //en("there is a lock with the property that when opened by something, this something is a key (induction)");
+        tester.mustBelieve(cycles, "(<#1 --> lock> && (open($2,#1) ==> <$2 --> key>))", 1.00f, 0.81f); //en("there is a lock with the property that when opened by something, this something is a key (induction)");
+        tester.mustBelieve(cycles, "<(<$1 --> lock> && open($2,$1)) ==> <$2 --> key>>", 1.00f, 0.45f); //en("there is a lock with the property that when opened by something, this something is a key (induction)");
 
     }
 

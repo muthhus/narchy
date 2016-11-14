@@ -33,8 +33,6 @@ public final class substitute extends TermTransformOperator  {
         //original term (x)
         final Term x = parent.yxResolve(xx[1]);
 
-        //replacement term (y)
-        final Term y = parent.yxResolve(xx[2]);
 
         final Term strict = xx.length > 3 ? xx[3] : null;
         if (Objects.equal(strict, STRICT)) {
@@ -42,6 +40,9 @@ public final class substitute extends TermTransformOperator  {
                 return False;
             }
         }
+
+        //replacement term (y)
+        final Term y = parent.yxResolve(xx[2]);
 
         return parent.transform(term, new MapSubst.MapSubstWithOverride(parent.yx,  x, y));
     }

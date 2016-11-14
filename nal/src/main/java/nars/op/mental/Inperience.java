@@ -8,6 +8,7 @@ import nars.link.BLink;
 import nars.link.DefaultBLink;
 import nars.nal.Premise;
 import nars.op.Leak;
+import nars.task.GeneratedTask;
 import nars.task.MutableTask;
 import nars.term.Compound;
 import nars.term.Term;
@@ -24,13 +25,12 @@ import java.util.Random;
 import java.util.function.Consumer;
 
 import static nars.$.the;
-import static nars.Op.INH;
 import static nars.time.Tense.ETERNAL;
 
 /**
  * Internal Experience (NAL9)
  * To remember activity as internal action operations
- *
+ * <p>
  * https://www.youtube.com/watch?v=ia4wMU-vfrw
  */
 public class Inperience extends Leak<Task> {
@@ -54,10 +54,10 @@ public class Inperience extends Leak<Task> {
 //    public static float INTERNAL_EXPERIENCE_PRIORITY_MUL = 0.1f; //0.1
 
 
-
-    /** minimum expectation necessary to create a concept
-     *  original value: 0.66
-     * */
+    /**
+     * minimum expectation necessary to create a concept
+     * original value: 0.66
+     */
     @NotNull
     public final AtomicDouble conceptCreationExpectation = new AtomicDouble(0.66);
 
@@ -93,7 +93,7 @@ public class Inperience extends Leak<Task> {
     public static final Atomic anticipate = the("anticipate");
 
     public static final ImmutableSet<Atomic> operators = Sets.immutable.of(
-            believe,want,wonder,evaluate,anticipate);
+            believe, want, wonder, evaluate, anticipate);
 
     static final Atomic[] NON_INNATE_BELIEF_ATOMICs = {
             the("remind"),
@@ -111,7 +111,7 @@ public class Inperience extends Leak<Task> {
 //
 
     public Inperience(@NotNull NAR n, float rate) {
-        super(new CurveBag(BudgetMerge.max, n.random), rate, n);
+        super(new CurveBag<>(BudgetMerge.max, n.random), rate, n);
 
         this.nar = n;
 
@@ -139,10 +139,10 @@ public class Inperience extends Leak<Task> {
 
         Compound tt = task.term();
 
-        if (task.isCommand() || isExperienceTerm(tt)) //no infinite loops in the present moment
+        if (task.isCommand() || task instanceof Abbreviation.AbbreviationTask || task instanceof InperienceTask) //no infinite loops in the present moment
             return;
 
-        each.accept(new DefaultBLink<>(task, task, 1f/tt.volume()));
+        each.accept(new DefaultBLink<>(task, task, 1f / tt.volume()));
 
         // if(OLD_BELIEVE_WANT_EVALUATE_WONDER_STRATEGY ||
         //         (!OLD_BELIEVE_WANT_EVALUATE_WONDER_STRATEGY && (task.sentence.punctuation==Symbols.QUESTION || task.sentence.punctuation==Symbols.QUEST))) {
@@ -163,8 +163,6 @@ public class Inperience extends Leak<Task> {
 //        }
 
 
-
-
 //        float pri = Global.DEFAULT_JUDGMENT_PRIORITY * INTERNAL_EXPERIENCE_PRIORITY_MUL;
 //        float dur = Global.DEFAULT_JUDGMENT_DURABILITY * INTERNAL_EXPERIENCE_DURABILITY_MUL;
 //        if (!OLD_BELIEVE_WANT_EVALUATE_WONDER_STRATEGY) {
@@ -176,38 +174,46 @@ public class Inperience extends Leak<Task> {
     }
 
     @Override
-    protected float onOut(BLink<Task> b) {
+    protected float onOut(@NotNull BLink<Task> b) {
 
         Task task = b.get();
 
         try {
-            Compound ret = reify(task, nar.self, conceptCreationExpectation.floatValue());
-            if (ret != null) {
-
-                long o = task.occurrence();
-                if (o == ETERNAL)
-                    o = nar.time();
-
-                MutableTask e = $.task(ret, Symbols.BELIEF, 1f, nar.confidenceDefault(Symbols.BELIEF))
-                        .time(nar.time(), o)
-                        .budgetByTruth(task.priIfFiniteElseZero(), task.dur())
-                        .evidence(task)
-                        .because("Inperience");
+            Compound r = reify(task, nar.self, conceptCreationExpectation.floatValue());
+            if (r!=null) {
+                MutableTask e = new InperienceTask(task,
+                        r,
+                        nar.time(),
+                        nar.confidenceDefault(Symbols.BELIEF));
 
                 logger.info(" {}", e);
                 nar.inputLater(e);
             }
-        } catch (ClassCastException cc) {
-            //TODO handle this if it happens (rare)
+        } catch (ClassCastException e) {
+            //happens rarely, due to circularity while trying to create something like: want((x<->want),...
+
+            //System.err.println(task);
         }
 
         return 0;
     }
 
 
-    private boolean isExperienceTerm(@NotNull Compound term) {
-        return term.op() == INH && operators.contains(term.subterm(1) /* predicate of the inheritance */);
+    public static class InperienceTask extends GeneratedTask {
+
+        public InperienceTask(Task task, Compound c, long now, float conf) {
+            super(c, Symbols.BELIEF, $.t(1, conf));
+
+            time(now, task.occurrence() != ETERNAL ? task.occurrence() : now)
+                    .budgetByTruth(task.priIfFiniteElseZero(), task.dur())
+                    .evidence(task)
+                    .because("Inperience");
+        }
     }
+
+//    private boolean isExperienceTerm(@NotNull Compound term) {
+//        return term.op() == INH && operators.contains(term.subterm(1) /* predicate of the inheritance */);
+//    }
 
 
     @NotNull
@@ -236,7 +242,7 @@ public class Inperience extends Leak<Task> {
     public static Compound reify(@NotNull Task s, Term self, float conceptCreationExpectation) {
 
         Truth tr = s.truth();
-        Term[] arg = new Term[1 + (tr == null ? 1 : 3)];
+        Term[] arg = new Term[1 + (tr == null ? 1 : 2)];
 
         int k = 0;
 
@@ -244,15 +250,19 @@ public class Inperience extends Leak<Task> {
 
         arg[k++] = s.term(); //unwrapping negation here isnt necessary sice the term of a task will be non-negated
 
+        boolean neg;
+
         if (tr != null) {
-            //arg[k] = tr.expectation(tr.expectation(), conceptCreationExpectation);
-            arg[k++] = tr.freqTerm(tr.freq(), 0.66f);
-            arg[k++] = tr.confTerm(tr.conf(), 0.5f);
+            neg = tr.isNegative();
+            arg[k] = tr.expTerm(tr.negated(neg).expectation(), conceptCreationExpectation);
+            //arg[k++] = tr.freqTerm(tr.freq(), 0.66f);
+            //arg[k++] = tr.confTerm(tr.conf(), 0.5f);
+        } else {
+            neg = false;
         }
 
-        return $.func(reify(s.punc()), arg);
+        return $.negIf($.func(reify(s.punc()), arg), neg);
     }
-
 
 
     public static Atomic randomNonInnate(@NotNull Random r) {
@@ -302,12 +312,12 @@ public class Inperience extends Leak<Task> {
             if (valid) {
                 Compound c = $.func(anticipate, beliefTerm.term(1));
                 //if (c!=null) {
-                    //long interval = (impsub instanceof Interval ? ((Interval)impsub).duration() : 0);
-                    //int interval = 0;
+                //long interval = (impsub instanceof Interval ? ((Interval)impsub).duration() : 0);
+                //int interval = 0;
 
-                    input(task, belief,
-                            c,
-                            0);
+                input(task, belief,
+                        c,
+                        0);
                 //}
             }
         }
@@ -317,8 +327,8 @@ public class Inperience extends Leak<Task> {
         //the Atomics which dont have a innate belief
         //also get a chance to reveal its effects to the system this way
 
-        Compound c = $.func(op, $.p( belief.term() ) );
-        if (c!=null)
+        Compound c = $.func(op, $.p(belief.term()));
+        if (c != null)
             input(task, belief, c, 0);
     }
 
@@ -331,9 +341,9 @@ public class Inperience extends Leak<Task> {
         nar.input(new MutableTask(new_term, Symbols.GOAL, 1f, nar)
                         /*.budget(Global.DEFAULT_GOAL_PRIORITY * INTERNAL_EXPERIENCE_PRIORITY_MUL,
                                 Global.DEFAULT_GOAL_DURABILITY * INTERNAL_EXPERIENCE_DURABILITY_MUL)*/
-                        //.parent(parent, belief)
-                        .time(now, now + delay)
-                        .because("Inperience")
+                //.parent(parent, belief)
+                .time(now, now + delay)
+                .because("Inperience")
         );
     }
 

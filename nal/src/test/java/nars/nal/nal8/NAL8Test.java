@@ -935,10 +935,17 @@ public class NAL8Test extends AbstractNALTest {
     }
     @Test public void testNegatedGoalSimilaritySpreading() {
         test()
-                
-                .input("(--,(R))!")
+                .input("--(R)!")
                 .input("((G) <-> (R)).")
                 .mustDesire(cycles, "(G)", 0.0f, 0.81f);
+    }
+
+    @Test public void testNegatedSubtermGoalSimilaritySpreading() {
+        test()
+
+                .input("--(R)!")
+                .input("((G) <-> --(R)).")
+                .mustDesire(cycles, "(G)", 1.0f, 0.81f);
     }
 
 //    @Test public void testInheritanceCompositionTemporal() {

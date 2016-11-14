@@ -295,10 +295,10 @@ abstract public class NAgents extends NAgent {
     }
 
     protected Sensor2D<PixelBag> addCameraRetina(String id, Container w, int pw, int ph, FloatToObjectFunction<Truth> pixelTruth) {
-        return addCamera(id, new SwingCamera(w), pw, ph, pixelTruth);
+        return addCameraRetina(id, new SwingCamera(w), pw, ph, pixelTruth);
     }
 
-    protected Sensor2D<PixelBag> addCamera(String id, Supplier<BufferedImage> w, int pw, int ph, FloatToObjectFunction<Truth> pixelTruth) {
+    protected Sensor2D<PixelBag> addCameraRetina(String id, Supplier<BufferedImage> w, int pw, int ph, FloatToObjectFunction<Truth> pixelTruth) {
         PixelBag pb = new PixelBag(w, pw, ph);
         pb.addActions(id, this);
         return addCamera(id, pb, pixelTruth);

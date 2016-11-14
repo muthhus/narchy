@@ -85,7 +85,7 @@ public class Recog2D extends NAgents {
 
 
         //retina
-        Sensor2D<PixelBag> sp = addCamera("x", () -> canvas, w, h, v -> $.t(v, alpha));
+        Sensor2D<PixelBag> sp = addCameraRetina("x", () -> canvas, w, h, v -> $.t(v, alpha));
 
 
         //still

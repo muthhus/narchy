@@ -130,7 +130,7 @@ public class InterNAR extends Peer implements PeerModel {
 
         if (paranoid) {
             nar.believe(
-                    Inperience.reify(t, $.quote(q.idString()), 0.75f), Tense.Present
+                    Inperience.reify(t, $.quote(q.idString()), 0.66f), Tense.Present
             );
         } else {
             nar.input(t);

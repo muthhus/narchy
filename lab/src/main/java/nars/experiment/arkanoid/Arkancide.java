@@ -6,6 +6,8 @@ import nars.NAR;
 import nars.concept.ActionConcept;
 import nars.remote.NAgents;
 
+import static nars.$.t;
+
 public class Arkancide extends NAgents {
 
 
@@ -32,7 +34,8 @@ public class Arkancide extends NAgents {
         senseNumber("noid", noid, "ball.velocityX");
         senseNumber("noid", noid, "ball.velocityY");
 
-        addCamera("noid", noid, visW, visH);
+        //addCamera("noid", noid, visW, visH);
+        addCameraRetina("noid", noid, visW/2, visH/2, (v) -> t(v, alpha));
 
         action(new ActionConcept(
                 //"happy:noid(paddle,x)"
