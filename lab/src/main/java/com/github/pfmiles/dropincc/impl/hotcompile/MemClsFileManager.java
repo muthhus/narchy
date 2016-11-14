@@ -1,17 +1,12 @@
 package com.github.pfmiles.dropincc.impl.hotcompile;
 
+import javax.tools.*;
+import javax.tools.JavaFileObject.Kind;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import javax.tools.FileObject;
-import javax.tools.ForwardingJavaFileManager;
-import javax.tools.JavaFileObject;
-import javax.tools.JavaFileObject.Kind;
-import javax.tools.StandardJavaFileManager;
-import javax.tools.StandardLocation;
 
 /**
  * A forwarding file manager which is used to decouple the file system

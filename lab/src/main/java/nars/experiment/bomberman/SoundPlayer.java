@@ -2,16 +2,18 @@ package nars.experiment.bomberman;/*
  * SoundPlayer.java
  * Created on March 10, 2001, 4:23 PM
  */
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
+
 import javax.sound.midi.*;
 import javax.sound.sampled.*;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.BufferedInputStream;
-import java.util.Vector;
 import java.net.URL;
+import java.util.Vector;
 
 /**
  * This class is used to play sound files.

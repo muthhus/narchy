@@ -31,8 +31,8 @@ import nars.term.var.AbstractVariable;
 import nars.term.var.Variable;
 import nars.term.visit.SubtermVisitor;
 import nars.term.visit.SubtermVisitorX;
+import nars.util.Hack;
 import nars.util.data.array.IntArrays;
-import nars.util.data.rope.StringHack;
 import org.eclipse.collections.api.list.primitive.ByteList;
 import org.eclipse.collections.impl.factory.primitive.ByteLists;
 import org.eclipse.collections.impl.list.mutable.primitive.ByteArrayList;
@@ -396,7 +396,7 @@ public interface Term extends Termed, Termlike, Comparable<Termlike> {
             //which should have an ordering determined by its toString()
 
             //return this.toString().compareTo((/*(Atomic)*/y).toString());
-            return StringHack.compare(toString(), y.toString());
+            return Hack.compare(toString(), y.toString());
 
         }
 

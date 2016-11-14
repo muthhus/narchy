@@ -10,9 +10,6 @@
  ******************************************************************************/
 package com.github.pfmiles.dropincc.impl.syntactical.codegen;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import com.github.pfmiles.dropincc.Predicate;
 import com.github.pfmiles.dropincc.impl.GruleType;
 import com.github.pfmiles.dropincc.impl.TokenType;
@@ -20,6 +17,9 @@ import com.github.pfmiles.dropincc.impl.kleene.KleeneType;
 import com.github.pfmiles.dropincc.impl.llstar.PredictingKleene;
 import com.github.pfmiles.dropincc.impl.runtime.impl.RunningDfaState;
 import com.github.pfmiles.dropincc.impl.util.SeqGen;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Context during parser code generation. Put anything needed here.

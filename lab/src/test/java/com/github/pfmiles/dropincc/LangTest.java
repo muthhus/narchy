@@ -10,13 +10,12 @@
  ******************************************************************************/
 package com.github.pfmiles.dropincc;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import junit.framework.TestCase;
-
 import com.github.pfmiles.dropincc.example.calculator.Calculator;
 import com.github.pfmiles.dropincc.impl.util.Pair;
+import junit.framework.TestCase;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * 

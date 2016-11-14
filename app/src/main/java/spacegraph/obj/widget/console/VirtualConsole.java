@@ -7,8 +7,6 @@ import com.googlecode.lanterna.terminal.virtual.DefaultVirtualTerminal;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.PrintStream;
-import java.io.UnsupportedEncodingException;
 
 /**
  * Created by me on 11/14/16.

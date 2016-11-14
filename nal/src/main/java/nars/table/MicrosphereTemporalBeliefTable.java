@@ -5,14 +5,13 @@ import nars.NAR;
 import nars.Param;
 import nars.Task;
 import nars.concept.Concept;
-import nars.index.term.PatternTermIndex;
 import nars.learn.microsphere.InterpolatingMicrosphere;
 import nars.task.Revision;
 import nars.task.TruthPolation;
 import nars.truth.Truth;
 import nars.truth.TruthDelta;
 import nars.util.Util;
-import nars.util.data.list.MultiRWFasterList;
+import nars.util.list.MultiRWFasterList;
 import org.eclipse.collections.api.block.function.Function;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -23,11 +22,9 @@ import java.util.function.Predicate;
 
 import static java.lang.Long.MAX_VALUE;
 import static java.lang.Long.MIN_VALUE;
-import static nars.task.TruthPolation.timeDecay;
 import static nars.time.Tense.ETERNAL;
 import static nars.truth.TruthFunctions.c2w;
 import static nars.truth.TruthFunctions.w2c;
-import static nars.util.Util.sqr;
 
 /**
  * stores the items unsorted; revection manages their ranking and removal

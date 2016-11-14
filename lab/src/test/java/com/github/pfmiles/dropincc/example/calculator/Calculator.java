@@ -10,12 +10,7 @@
  ******************************************************************************/
 package com.github.pfmiles.dropincc.example.calculator;
 
-import com.github.pfmiles.dropincc.Action;
-import com.github.pfmiles.dropincc.CC;
-import com.github.pfmiles.dropincc.Exe;
-import com.github.pfmiles.dropincc.Grule;
-import com.github.pfmiles.dropincc.Grammar;
-import com.github.pfmiles.dropincc.TokenDef;
+import com.github.pfmiles.dropincc.*;
 
 /**
  * A simple calculator implementation. It could do non-negative floating point

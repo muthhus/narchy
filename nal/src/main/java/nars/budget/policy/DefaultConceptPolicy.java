@@ -1,13 +1,10 @@
 package nars.budget.policy;
 
-import nars.Op;
 import nars.concept.CompoundConcept;
 import nars.concept.Concept;
 import nars.util.Util;
 import nars.util.data.MutableInteger;
 import org.jetbrains.annotations.NotNull;
-
-import static nars.Op.ATOM;
 
 /**
  * Created by me on 5/11/16.

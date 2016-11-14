@@ -8,7 +8,6 @@ import nars.concept.Concept;
 import nars.task.AnswerTask;
 import nars.task.Revision;
 import nars.task.RevisionTask;
-import nars.term.Compound;
 import nars.term.Term;
 import nars.truth.Truth;
 import nars.truth.TruthDelta;
@@ -16,12 +15,9 @@ import nars.util.data.sorted.SortedArray;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collections;
-import java.util.List;
 import java.util.function.Consumer;
 
 import static nars.time.Tense.ETERNAL;
-import static nars.truth.TruthFunctions.c2w;
 
 
 /**

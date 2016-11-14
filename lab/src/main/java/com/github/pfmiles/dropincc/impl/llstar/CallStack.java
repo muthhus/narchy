@@ -10,12 +10,12 @@
  ******************************************************************************/
 package com.github.pfmiles.dropincc.impl.llstar;
 
+import com.github.pfmiles.dropincc.DropinccException;
+import com.github.pfmiles.dropincc.impl.util.Pair;
+
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.Iterator;
-
-import com.github.pfmiles.dropincc.DropinccException;
-import com.github.pfmiles.dropincc.impl.util.Pair;
 
 /**
  * CallStack needed in 'closure' operation.

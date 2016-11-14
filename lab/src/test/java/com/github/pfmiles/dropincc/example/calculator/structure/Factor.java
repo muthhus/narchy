@@ -10,11 +10,11 @@
  ******************************************************************************/
 package com.github.pfmiles.dropincc.example.calculator.structure;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-
 import com.github.pfmiles.dropincc.impl.util.Pair;
 import com.github.pfmiles.dropincc.testhelper.TestHelper;
+
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 /**
  * @author pf-miles

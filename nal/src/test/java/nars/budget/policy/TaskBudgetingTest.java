@@ -4,8 +4,6 @@ import nars.nar.Default;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
-
 /**
  * Created by me on 10/28/16.
  */

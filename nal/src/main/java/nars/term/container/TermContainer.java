@@ -7,7 +7,6 @@ import nars.term.Term;
 import nars.term.Termlike;
 import nars.term.Terms;
 import nars.term.atom.Atomic;
-import nars.term.var.AbstractVariable;
 import nars.term.var.Variable;
 import org.eclipse.collections.api.block.predicate.primitive.IntObjectPredicate;
 import org.eclipse.collections.api.list.primitive.ByteList;

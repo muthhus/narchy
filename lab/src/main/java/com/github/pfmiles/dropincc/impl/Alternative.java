@@ -10,13 +10,13 @@
  ******************************************************************************/
 package com.github.pfmiles.dropincc.impl;
 
-import java.util.Collections;
-import java.util.List;
-
 import com.github.pfmiles.dropincc.DropinccException;
 import com.github.pfmiles.dropincc.Element;
 import com.github.pfmiles.dropincc.Predicate;
 import com.google.common.collect.Lists;
+
+import java.util.Collections;
+import java.util.List;
 
 /**
  * A rule alternative, for internal implementation usage only.

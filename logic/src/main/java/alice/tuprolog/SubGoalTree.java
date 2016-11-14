@@ -1,6 +1,6 @@
 package alice.tuprolog;
 
-import nars.util.data.list.FasterList;
+import nars.util.list.FasterList;
 
 import java.util.Iterator;
 import java.util.List;

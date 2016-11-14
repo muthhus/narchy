@@ -4,7 +4,6 @@ import nars.Task;
 import nars.bag.Bag;
 import nars.term.Term;
 import nars.term.atom.Atom;
-import nars.term.atom.Atomic;
 import nars.term.transform.TermTransform;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

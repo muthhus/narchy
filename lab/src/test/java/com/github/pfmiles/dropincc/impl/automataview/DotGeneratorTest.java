@@ -10,12 +10,11 @@
  ******************************************************************************/
 package com.github.pfmiles.dropincc.impl.automataview;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import com.github.pfmiles.dropincc.impl.util.Pair;
 import junit.framework.TestCase;
 
-import com.github.pfmiles.dropincc.impl.util.Pair;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author pf-miles

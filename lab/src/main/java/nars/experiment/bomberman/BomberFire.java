@@ -1,7 +1,6 @@
 package nars.experiment.bomberman;
 
 import java.awt.*;
-import javax.swing.*;
 
 /**
  * Title:        Bomberman

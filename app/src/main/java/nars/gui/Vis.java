@@ -21,7 +21,7 @@ import spacegraph.Ortho;
 import spacegraph.SpaceGraph;
 import spacegraph.Surface;
 import spacegraph.math.Color3f;
-import spacegraph.obj.*;
+import spacegraph.obj.CrosshairSurface;
 import spacegraph.obj.layout.Grid;
 import spacegraph.obj.layout.Stacking;
 import spacegraph.obj.widget.Label;

@@ -1,8 +1,7 @@
 package nars.experiment.bomberman;
 
-import java.awt.*;
 import javax.swing.*;
-import java.io.*;
+import java.awt.*;
 
 /**
  * File:         BomberImagePanel.java

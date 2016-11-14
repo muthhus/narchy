@@ -10,7 +10,6 @@ import nars.term.container.TermContainer;
 import nars.term.container.TermSet;
 import nars.term.obj.IntTerm;
 import nars.term.obj.Termject.IntInterval;
-import nars.util.data.list.FasterList;
 import org.eclipse.collections.api.list.primitive.ByteList;
 import org.eclipse.collections.api.set.MutableSet;
 import org.eclipse.collections.api.tuple.Pair;

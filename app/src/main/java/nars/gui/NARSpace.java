@@ -13,7 +13,7 @@ import nars.term.Term;
 import nars.term.Termed;
 import nars.term.atom.Atomic;
 import nars.test.DeductiveMeshTest;
-import nars.util.data.list.FasterList;
+import nars.util.list.FasterList;
 import nars.util.event.On;
 import org.eclipse.collections.api.tuple.Pair;
 import org.eclipse.collections.impl.tuple.Tuples;

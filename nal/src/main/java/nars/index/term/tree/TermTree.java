@@ -3,7 +3,7 @@ package nars.index.term.tree;
 import nars.$;
 import nars.term.Term;
 import nars.term.Termed;
-import nars.util.ByteSeq;
+import nars.util.data.byt.ByteSeq;
 import nars.util.radixtree.MyConcurrentRadixTree;
 import org.jetbrains.annotations.NotNull;
 

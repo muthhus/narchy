@@ -1,8 +1,6 @@
 package nars.experiment.bomberman;
 
 import java.awt.*;
-import javax.swing.*;
-import java.io.*;
 
 /**
  * File:         BomberBomb

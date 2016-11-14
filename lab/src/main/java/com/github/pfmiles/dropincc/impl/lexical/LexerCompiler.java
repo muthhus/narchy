@@ -10,29 +10,15 @@
  ******************************************************************************/
 package com.github.pfmiles.dropincc.impl.lexical;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.regex.Pattern;
-import java.util.regex.PatternSyntaxException;
-
-import com.github.pfmiles.dropincc.CC;
-import com.github.pfmiles.dropincc.DropinccException;
-import com.github.pfmiles.dropincc.Element;
-import com.github.pfmiles.dropincc.Grule;
-import com.github.pfmiles.dropincc.TokenDef;
-import com.github.pfmiles.dropincc.impl.Alternative;
-import com.github.pfmiles.dropincc.impl.AndSubRule;
-import com.github.pfmiles.dropincc.impl.ConstructingGrule;
-import com.github.pfmiles.dropincc.impl.OrSubRule;
-import com.github.pfmiles.dropincc.impl.TokenType;
+import com.github.pfmiles.dropincc.*;
+import com.github.pfmiles.dropincc.impl.*;
 import com.github.pfmiles.dropincc.impl.kleene.AbstractKleeneNode;
 import com.github.pfmiles.dropincc.impl.util.Pair;
 import com.github.pfmiles.dropincc.impl.util.Util;
+
+import java.util.*;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 /**
  * Util, to check and compile lexer rules.

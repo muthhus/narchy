@@ -15,7 +15,8 @@ import java.io.IOException;
 import static java.lang.Math.pow;
 import static nars.nal.UtilityFunctions.and;
 import static nars.nal.UtilityFunctions.or;
-import static nars.util.Util.*;
+import static nars.util.Util.lerp;
+import static nars.util.Util.unitize;
 
 /**
  * Created by me on 12/11/15.

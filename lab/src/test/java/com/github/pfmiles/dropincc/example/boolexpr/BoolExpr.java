@@ -10,26 +10,13 @@
  ******************************************************************************/
 package com.github.pfmiles.dropincc.example.boolexpr;
 
+import com.github.pfmiles.dropincc.*;
+import com.github.pfmiles.dropincc.example.boolexpr.operator.*;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.Map;
-
-import com.github.pfmiles.dropincc.Action;
-import com.github.pfmiles.dropincc.CC;
-import com.github.pfmiles.dropincc.Exe;
-import com.github.pfmiles.dropincc.Grule;
-import com.github.pfmiles.dropincc.Grammar;
-import com.github.pfmiles.dropincc.ParamedAction;
-import com.github.pfmiles.dropincc.TokenDef;
-import com.github.pfmiles.dropincc.example.boolexpr.operator.Between;
-import com.github.pfmiles.dropincc.example.boolexpr.operator.Equals;
-import com.github.pfmiles.dropincc.example.boolexpr.operator.GreaterThan;
-import com.github.pfmiles.dropincc.example.boolexpr.operator.Include;
-import com.github.pfmiles.dropincc.example.boolexpr.operator.LessThan;
-import com.github.pfmiles.dropincc.example.boolexpr.operator.NotBetween;
-import com.github.pfmiles.dropincc.example.boolexpr.operator.NotEquals;
-import com.github.pfmiles.dropincc.example.boolexpr.operator.NotInclude;
 
 /**
  * A simple bool expression DSL example.

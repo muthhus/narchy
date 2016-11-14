@@ -3,7 +3,6 @@ package nars.concept;
 import nars.NAR;
 import nars.Param;
 import nars.budget.policy.ConceptPolicy;
-import nars.table.BeliefTable;
 import nars.term.Compound;
 import nars.util.math.FloatSupplier;
 import org.jetbrains.annotations.NotNull;

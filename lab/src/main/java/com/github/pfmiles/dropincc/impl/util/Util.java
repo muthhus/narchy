@@ -10,30 +10,18 @@
  ******************************************************************************/
 package com.github.pfmiles.dropincc.impl.util;
 
+import com.github.pfmiles.dropincc.*;
+import com.github.pfmiles.dropincc.impl.*;
+import com.github.pfmiles.dropincc.impl.kleene.AbstractKleeneNode;
+import com.github.pfmiles.dropincc.impl.lexical.InstantTokenDef;
+
 import java.io.File;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import com.github.pfmiles.dropincc.CC;
-import com.github.pfmiles.dropincc.DropinccException;
-import com.github.pfmiles.dropincc.Element;
-import com.github.pfmiles.dropincc.Grule;
-import com.github.pfmiles.dropincc.TokenDef;
-import com.github.pfmiles.dropincc.impl.AndSubRule;
-import com.github.pfmiles.dropincc.impl.ConstructingGrule;
-import com.github.pfmiles.dropincc.impl.EleType;
-import com.github.pfmiles.dropincc.impl.OrSubRule;
-import com.github.pfmiles.dropincc.impl.TypeMappingParam;
-import com.github.pfmiles.dropincc.impl.kleene.AbstractKleeneNode;
-import com.github.pfmiles.dropincc.impl.lexical.InstantTokenDef;
 
 /**
  * @author pf-miles

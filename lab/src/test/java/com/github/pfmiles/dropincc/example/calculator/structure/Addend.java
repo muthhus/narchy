@@ -10,11 +10,11 @@
  ******************************************************************************/
 package com.github.pfmiles.dropincc.example.calculator.structure;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.github.pfmiles.dropincc.impl.util.Pair;
 import com.github.pfmiles.dropincc.testhelper.TestHelper;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author pf-miles

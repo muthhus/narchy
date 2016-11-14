@@ -30,7 +30,7 @@ import nars.time.TimeFunctions;
 import nars.truth.func.BeliefFunction;
 import nars.truth.func.GoalFunction;
 import nars.truth.func.TruthOperator;
-import nars.util.data.list.FasterList;
+import nars.util.list.FasterList;
 import org.eclipse.collections.impl.map.mutable.UnifiedMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

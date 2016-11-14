@@ -10,12 +10,6 @@
  ******************************************************************************/
 package com.github.pfmiles.dropincc.impl.llstar;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import com.github.pfmiles.dropincc.DropinccException;
 import com.github.pfmiles.dropincc.impl.EleType;
 import com.github.pfmiles.dropincc.impl.GruleType;
@@ -25,6 +19,8 @@ import com.github.pfmiles.dropincc.impl.kleene.KleeneStarType;
 import com.github.pfmiles.dropincc.impl.kleene.KleeneType;
 import com.github.pfmiles.dropincc.impl.kleene.OptionalType;
 import com.github.pfmiles.dropincc.impl.util.SeqGen;
+
+import java.util.*;
 
 /**
  * The whole ATN network for the analyzing grammar

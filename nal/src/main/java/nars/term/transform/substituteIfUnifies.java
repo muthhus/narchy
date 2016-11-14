@@ -1,18 +1,14 @@
 package nars.term.transform;
 
-import nars.$;
 import nars.Op;
 import nars.nal.meta.PremiseEval;
 import nars.term.Compound;
 import nars.term.Term;
-import nars.term.Terms;
 import nars.term.subst.SubUnify;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import static nars.Op.NEG;
 import static nars.term.Terms.equal;
-import static nars.term.Terms.equalAtemporally;
 import static nars.time.Tense.DTERNAL;
 
 /**

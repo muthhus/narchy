@@ -1,7 +1,6 @@
 package nars.term.atom;
 
 import nars.Op;
-import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
 
 /** default Atom implementation: wraps a String instance as closely as possible.

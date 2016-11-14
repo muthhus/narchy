@@ -10,17 +10,11 @@
  ******************************************************************************/
 package com.github.pfmiles.dropincc.example.boolexpr.test;
 
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
+import com.github.pfmiles.dropincc.example.boolexpr.BoolExpr;
 import junit.framework.TestCase;
 
-import com.github.pfmiles.dropincc.example.boolexpr.BoolExpr;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
  * @author pf-miles Aug 21, 2012 1:45:51 PM

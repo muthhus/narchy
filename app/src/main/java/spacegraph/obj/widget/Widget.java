@@ -4,21 +4,17 @@ import com.jogamp.opengl.GL2;
 import nars.util.Texts;
 import nars.util.Util;
 import org.jetbrains.annotations.Nullable;
-import spacegraph.Ortho;
 import spacegraph.SpaceGraph;
 import spacegraph.Surface;
-import spacegraph.ZoomOrtho;
 import spacegraph.input.Finger;
 import spacegraph.obj.Cuboid;
 import spacegraph.obj.layout.Stacking;
 import spacegraph.obj.widget.console.VirtualConsole;
 import spacegraph.render.Draw;
 
-import static nars.gui.Vis.label;
 import static nars.gui.Vis.stacking;
 import static spacegraph.obj.layout.Grid.col;
 import static spacegraph.obj.layout.Grid.grid;
-import static spacegraph.obj.layout.Grid.row;
 
 /**
  * Base class for GUI widgets, similarly designed to JComponent

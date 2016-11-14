@@ -10,8 +10,6 @@
  ******************************************************************************/
 package com.github.pfmiles.dropincc.impl.syntactical.codegen.rulemethods.code;
 
-import java.text.MessageFormat;
-
 import com.github.pfmiles.dropincc.DropinccException;
 import com.github.pfmiles.dropincc.impl.kleene.KleeneCrossType;
 import com.github.pfmiles.dropincc.impl.kleene.KleeneStarType;
@@ -20,6 +18,8 @@ import com.github.pfmiles.dropincc.impl.llstar.PredictingKleene;
 import com.github.pfmiles.dropincc.impl.syntactical.codegen.CodeGen;
 import com.github.pfmiles.dropincc.impl.syntactical.codegen.CodeGenContext;
 import com.github.pfmiles.dropincc.impl.util.Pair;
+
+import java.text.MessageFormat;
 
 /**
  * Responsible for kleene node code generation.

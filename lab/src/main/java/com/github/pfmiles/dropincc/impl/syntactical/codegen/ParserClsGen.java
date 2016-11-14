@@ -10,9 +10,9 @@
  ******************************************************************************/
 package com.github.pfmiles.dropincc.impl.syntactical.codegen;
 
-import java.text.MessageFormat;
-
 import com.github.pfmiles.dropincc.impl.GruleType;
+
+import java.text.MessageFormat;
 
 /**
  * Generates the whole parser class.

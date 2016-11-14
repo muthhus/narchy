@@ -1,10 +1,11 @@
 package nars.experiment.bomberman;
 
-import java.awt.*;
-import java.awt.event.*;
 import javax.swing.*;
-import java.lang.Integer;
-import java.io.*;
+import java.awt.*;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 /**
  * File:         BomberMain.java

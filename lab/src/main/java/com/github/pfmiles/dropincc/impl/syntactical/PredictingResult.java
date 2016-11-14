@@ -10,10 +10,10 @@
  ******************************************************************************/
 package com.github.pfmiles.dropincc.impl.syntactical;
 
-import java.util.List;
-
 import com.github.pfmiles.dropincc.impl.llstar.PredictingGrule;
 import com.github.pfmiles.dropincc.impl.llstar.PredictingKleene;
+
+import java.util.List;
 
 /**
  * @author pf-miles

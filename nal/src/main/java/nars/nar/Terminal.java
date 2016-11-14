@@ -5,7 +5,6 @@ import nars.Param;
 import nars.budget.Budgeted;
 import nars.concept.Concept;
 import nars.nar.exe.SingleThreadExecutioner;
-import nars.term.Term;
 import nars.term.Termed;
 import nars.time.Clock;
 import nars.time.FrameClock;

@@ -10,10 +10,10 @@
  ******************************************************************************/
 package com.github.pfmiles.dropincc.impl;
 
-import java.util.List;
-
 import com.github.pfmiles.dropincc.Predicate;
 import com.github.pfmiles.dropincc.impl.util.Util;
+
+import java.util.List;
 
 /**
  * Compiled rule alternative, with matching element sequence and look-aheads,

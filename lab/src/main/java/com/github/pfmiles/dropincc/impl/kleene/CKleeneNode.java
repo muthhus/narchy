@@ -10,11 +10,11 @@
  ******************************************************************************/
 package com.github.pfmiles.dropincc.impl.kleene;
 
-import java.io.Serializable;
-import java.util.List;
-
 import com.github.pfmiles.dropincc.DropinccException;
 import com.github.pfmiles.dropincc.impl.EleType;
+
+import java.io.Serializable;
+import java.util.List;
 
 /**
  * @author pf-miles

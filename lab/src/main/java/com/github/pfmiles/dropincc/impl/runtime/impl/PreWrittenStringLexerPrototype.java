@@ -10,10 +10,10 @@
  ******************************************************************************/
 package com.github.pfmiles.dropincc.impl.runtime.impl;
 
+import com.github.pfmiles.dropincc.impl.TokenType;
+
 import java.util.Map;
 import java.util.regex.Pattern;
-
-import com.github.pfmiles.dropincc.impl.TokenType;
 
 /**
  * Lexer prototype using pre-written code skeleton. For string code lexing(not

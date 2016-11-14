@@ -4,7 +4,7 @@ import nars.util.data.random.XorShift128PlusRandom;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.*;
+import java.util.Random;
 
 public class CA extends JFrame implements Runnable {
 

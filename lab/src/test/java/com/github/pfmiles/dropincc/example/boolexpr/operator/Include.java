@@ -10,9 +10,9 @@
  ******************************************************************************/
 package com.github.pfmiles.dropincc.example.boolexpr.operator;
 
-import java.util.Set;
-
 import com.github.pfmiles.dropincc.example.boolexpr.Operator;
+
+import java.util.Set;
 
 /**
  * @author pf-miles Aug 21, 2012 9:46:14 AM

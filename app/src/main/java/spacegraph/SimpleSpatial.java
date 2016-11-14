@@ -20,7 +20,6 @@ import java.util.List;
 import java.util.function.Consumer;
 
 import static spacegraph.math.v3.v;
-import static spacegraph.math.v3.v;
 
 /** simplified implementation which manages one body and N constraints. useful for simple objects */
 public class SimpleSpatial<X> extends AbstractSpatial<X> {

@@ -10,26 +10,22 @@
  ******************************************************************************/
 package com.github.pfmiles.dropincc.testhelper;
 
+import com.github.pfmiles.dropincc.Element;
+import com.github.pfmiles.dropincc.Grammar;
+import com.github.pfmiles.dropincc.Grule;
+import com.github.pfmiles.dropincc.TokenDef;
+import com.github.pfmiles.dropincc.impl.*;
+import com.github.pfmiles.dropincc.impl.kleene.AbstractKleeneNode;
+import com.github.pfmiles.dropincc.impl.kleene.KleeneCompiler;
+import com.github.pfmiles.dropincc.impl.kleene.KleeneType;
+import com.github.pfmiles.dropincc.impl.syntactical.ParserCompiler;
+
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
-import com.github.pfmiles.dropincc.Element;
-import com.github.pfmiles.dropincc.Grule;
-import com.github.pfmiles.dropincc.Grammar;
-import com.github.pfmiles.dropincc.TokenDef;
-import com.github.pfmiles.dropincc.impl.AnalyzedLang;
-import com.github.pfmiles.dropincc.impl.GruleType;
-import com.github.pfmiles.dropincc.impl.SpecialType;
-import com.github.pfmiles.dropincc.impl.TokenType;
-import com.github.pfmiles.dropincc.impl.TypeMappingParam;
-import com.github.pfmiles.dropincc.impl.kleene.AbstractKleeneNode;
-import com.github.pfmiles.dropincc.impl.kleene.KleeneCompiler;
-import com.github.pfmiles.dropincc.impl.kleene.KleeneType;
-import com.github.pfmiles.dropincc.impl.syntactical.ParserCompiler;
 
 /**
  * Some helper methods to help tests.

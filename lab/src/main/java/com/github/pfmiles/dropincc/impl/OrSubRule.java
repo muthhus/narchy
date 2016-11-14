@@ -10,12 +10,12 @@
  ******************************************************************************/
 package com.github.pfmiles.dropincc.impl;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.github.pfmiles.dropincc.DropinccException;
 import com.github.pfmiles.dropincc.Element;
 import com.github.pfmiles.dropincc.impl.util.Util;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 

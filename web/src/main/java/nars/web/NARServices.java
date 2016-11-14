@@ -3,15 +3,12 @@ package nars.web;
 import io.undertow.server.handlers.PathHandler;
 import io.undertow.websockets.core.BufferedTextMessage;
 import io.undertow.websockets.core.WebSocketChannel;
-import nars.$;
 import nars.IO;
 import nars.NAR;
 import nars.time.Tense;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spacegraph.web.WebsocketService;
-
-import java.io.IOException;
 
 import static nars.web.WebServer.socket;
 
@@ -28,7 +25,7 @@ import static nars.web.WebServer.socket;
 
         path
                 .addPrefixPath("/terminal", socket(new NarseseIOService(nar)))
-                .addPrefixPath("/emotion", socket(new EvalService(nar, "emotion", 200)))
+                //.addPrefixPath("/emotion", socket(new EvalService(nar, "emotion", 200)))
                 .addPrefixPath("/active", socket(new ActiveConceptService(nar, 200, 48)))
                 .addPrefixPath("/json/in", socket(new WebsocketService() {
 

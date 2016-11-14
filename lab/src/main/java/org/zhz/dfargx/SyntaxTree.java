@@ -1,7 +1,7 @@
 package org.zhz.dfargx;
 
 import nars.util.Texts;
-import nars.util.data.list.FasterList;
+import nars.util.list.FasterList;
 import org.zhz.dfargx.node.*;
 import org.zhz.dfargx.node.bracket.LeftBracket;
 import org.zhz.dfargx.node.bracket.RightBracket;

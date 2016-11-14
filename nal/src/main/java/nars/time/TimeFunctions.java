@@ -18,8 +18,8 @@ import org.jetbrains.annotations.Nullable;
 import static nars.$.terms;
 import static nars.Op.CONJ;
 import static nars.task.Revision.chooseByConf;
-import static nars.time.TimeFunctions.occInterpolate;
 import static nars.time.Tense.*;
+import static nars.time.TimeFunctions.occInterpolate;
 
 /**
  * Strategies for solving temporal components of a derivation

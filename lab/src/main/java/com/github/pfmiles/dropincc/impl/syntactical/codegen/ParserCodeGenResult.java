@@ -10,12 +10,12 @@
  ******************************************************************************/
 package com.github.pfmiles.dropincc.impl.syntactical.codegen;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import com.github.pfmiles.dropincc.Predicate;
 import com.github.pfmiles.dropincc.impl.TokenType;
 import com.github.pfmiles.dropincc.impl.runtime.impl.RunningDfaState;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Parser code generation result.

@@ -10,10 +10,6 @@
  ******************************************************************************/
 package com.github.pfmiles.dropincc.impl.syntactical.codegen.rulemethods.code;
 
-import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.List;
-
 import com.github.pfmiles.dropincc.DropinccException;
 import com.github.pfmiles.dropincc.impl.EleType;
 import com.github.pfmiles.dropincc.impl.GruleType;
@@ -23,6 +19,10 @@ import com.github.pfmiles.dropincc.impl.syntactical.codegen.CodeGen;
 import com.github.pfmiles.dropincc.impl.syntactical.codegen.CodeGenContext;
 import com.github.pfmiles.dropincc.impl.util.Pair;
 import com.github.pfmiles.dropincc.impl.util.Util;
+
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * List of elements code generation.

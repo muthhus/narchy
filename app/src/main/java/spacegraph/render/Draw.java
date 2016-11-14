@@ -28,7 +28,7 @@ import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.util.ImmModeSink;
 import nars.$;
-import nars.util.data.list.FasterList;
+import nars.util.list.FasterList;
 import org.apache.commons.io.IOUtils;
 import org.eclipse.collections.impl.list.mutable.primitive.ByteArrayList;
 import org.jetbrains.annotations.NotNull;

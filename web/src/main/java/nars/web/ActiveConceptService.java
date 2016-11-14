@@ -8,7 +8,6 @@ import nars.link.BLink;
 import nars.nar.Default;
 import nars.term.Term;
 import nars.util.data.MutableInteger;
-import spacegraph.web.Json;
 import spacegraph.web.PeriodicWebsocketService;
 
 import java.io.ByteArrayOutputStream;

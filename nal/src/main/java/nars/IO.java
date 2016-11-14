@@ -19,7 +19,7 @@ import nars.term.var.AbstractVariable;
 import nars.term.var.GenericVariable;
 import nars.truth.Truth;
 import nars.truth.Truthed;
-import nars.util.data.rope.StringHack;
+import nars.util.Hack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -143,7 +143,7 @@ public class IO {
     public static void writeStringUTF(@NotNull DataOutput out, String s) throws IOException {
 
         //byte[] bb = s.getBytes(Charset.defaultCharset());
-        byte[] bb = StringHack.bytes(s);
+        byte[] bb = Hack.bytes(s);
         out.writeShort(bb.length);
         out.write(bb);
     }

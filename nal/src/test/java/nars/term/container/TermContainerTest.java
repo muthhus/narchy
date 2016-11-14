@@ -4,8 +4,6 @@ import nars.$;
 import nars.term.Compound;
 import org.junit.Test;
 
-import java.util.HashSet;
-
 import static nars.$.$;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;

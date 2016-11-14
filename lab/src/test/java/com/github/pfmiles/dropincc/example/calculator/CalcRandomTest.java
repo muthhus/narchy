@@ -10,9 +10,9 @@
  ******************************************************************************/
 package com.github.pfmiles.dropincc.example.calculator;
 
-import java.util.concurrent.CountDownLatch;
-
 import junit.framework.TestCase;
+
+import java.util.concurrent.CountDownLatch;
 
 /**
  * Random test for Calculator.java

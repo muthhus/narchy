@@ -10,13 +10,13 @@
  ******************************************************************************/
 package com.github.pfmiles.dropincc.testhelper;
 
-import java.util.List;
-import java.util.Map;
-
 import com.github.pfmiles.dropincc.impl.CAlternative;
 import com.github.pfmiles.dropincc.impl.EleType;
 import com.github.pfmiles.dropincc.impl.GruleType;
 import com.github.pfmiles.dropincc.impl.kleene.KleeneType;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author pf-miles

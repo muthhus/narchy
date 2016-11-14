@@ -1,6 +1,6 @@
 package org.zhz.dfargx.automata;
 
-import nars.util.data.list.FasterList;
+import nars.util.list.FasterList;
 import org.zhz.dfargx.node.*;
 
 import java.util.List;

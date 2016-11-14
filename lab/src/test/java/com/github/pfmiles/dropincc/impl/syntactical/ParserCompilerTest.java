@@ -10,25 +10,16 @@
  ******************************************************************************/
 package com.github.pfmiles.dropincc.impl.syntactical;
 
-import java.util.List;
-import java.util.Map;
-
-import junit.framework.TestCase;
-
-import com.github.pfmiles.dropincc.Action;
-import com.github.pfmiles.dropincc.CC;
-import com.github.pfmiles.dropincc.DropinccException;
-import com.github.pfmiles.dropincc.Element;
-import com.github.pfmiles.dropincc.Exe;
-import com.github.pfmiles.dropincc.Grule;
-import com.github.pfmiles.dropincc.Grammar;
-import com.github.pfmiles.dropincc.ParamedAction;
-import com.github.pfmiles.dropincc.TokenDef;
+import com.github.pfmiles.dropincc.*;
 import com.github.pfmiles.dropincc.impl.Alternative;
 import com.github.pfmiles.dropincc.impl.GruleType;
 import com.github.pfmiles.dropincc.impl.llstar.PredictingGrule;
 import com.github.pfmiles.dropincc.testhelper.AnalyzedLangForTest;
 import com.github.pfmiles.dropincc.testhelper.TestHelper;
+import junit.framework.TestCase;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author pf-miles

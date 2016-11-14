@@ -7,9 +7,8 @@ import spacegraph.Ortho;
 import spacegraph.SpaceGraph;
 import spacegraph.math.v2;
 import spacegraph.obj.CrosshairSurface;
-import spacegraph.obj.layout.Grid;
 import spacegraph.obj.Cuboid;
-import spacegraph.obj.widget.console.ConsoleSurface;
+import spacegraph.obj.layout.Grid;
 import spacegraph.render.Draw;
 
 import static spacegraph.obj.layout.Grid.col;

@@ -10,15 +10,6 @@
  ******************************************************************************/
 package com.github.pfmiles.dropincc.impl.llstar;
 
-import java.util.ArrayDeque;
-import java.util.Collections;
-import java.util.Deque;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import com.github.pfmiles.dropincc.DropinccException;
 import com.github.pfmiles.dropincc.Predicate;
 import com.github.pfmiles.dropincc.impl.CAlternative;
@@ -32,6 +23,8 @@ import com.github.pfmiles.dropincc.impl.kleene.OptionalType;
 import com.github.pfmiles.dropincc.impl.syntactical.ParserCompiler;
 import com.github.pfmiles.dropincc.impl.util.Pair;
 import com.github.pfmiles.dropincc.impl.util.Util;
+
+import java.util.*;
 
 /**
  * A 'session' of an analysis progress. Some global context variables needed

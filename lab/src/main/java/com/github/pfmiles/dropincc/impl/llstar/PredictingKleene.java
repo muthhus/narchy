@@ -10,10 +10,10 @@
  ******************************************************************************/
 package com.github.pfmiles.dropincc.impl.llstar;
 
-import java.util.List;
-
 import com.github.pfmiles.dropincc.impl.EleType;
 import com.github.pfmiles.dropincc.impl.kleene.KleeneType;
+
+import java.util.List;
 
 /**
  * Kleene node with predicting DFA

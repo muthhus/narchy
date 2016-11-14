@@ -1,7 +1,6 @@
 package spacegraph.obj.layout;
 
 import spacegraph.Surface;
-import spacegraph.obj.layout.Layout;
 
 /**
  * Splits a surface into a top and bottom vertical column

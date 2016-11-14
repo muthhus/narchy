@@ -8,7 +8,7 @@ import nars.net.gnutella.message.QueryMessage;
 import nars.net.gnutella.thread.DownloadThread;
 import nars.net.gnutella.thread.ServerThread;
 import nars.util.Util;
-import nars.util.data.map.CapacityLinkedHashMap;
+import nars.util.map.CapacityLinkedHashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

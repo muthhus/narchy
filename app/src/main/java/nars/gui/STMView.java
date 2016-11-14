@@ -1,6 +1,5 @@
 package nars.gui;
 
-import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.terminal.virtual.VirtualTerminal;
 import com.jogamp.opengl.GL2;
 import nars.Task;
@@ -13,7 +12,6 @@ import org.jetbrains.annotations.Nullable;
 import spacegraph.Ortho;
 import spacegraph.SpaceGraph;
 import spacegraph.Surface;
-import spacegraph.obj.widget.console.ConsoleSurface;
 import spacegraph.obj.layout.Grid;
 import spacegraph.obj.layout.Stacking;
 import spacegraph.render.Draw;

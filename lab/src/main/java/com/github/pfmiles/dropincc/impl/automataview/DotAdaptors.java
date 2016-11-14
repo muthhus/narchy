@@ -10,15 +10,11 @@
  ******************************************************************************/
 package com.github.pfmiles.dropincc.impl.automataview;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import com.github.pfmiles.dropincc.impl.llstar.AtnState;
 import com.github.pfmiles.dropincc.impl.llstar.DfaState;
 import com.github.pfmiles.dropincc.impl.util.Pair;
+
+import java.util.*;
 
 /**
  * Some adapting methods to convert ATN or DFA states to GeneratingStates which

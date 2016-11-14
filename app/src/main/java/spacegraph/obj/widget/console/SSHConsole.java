@@ -7,7 +7,10 @@ import org.fusesource.jansi.AnsiOutputStream;
 import spacegraph.SpaceGraph;
 import spacegraph.net.SSH;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PipedInputStream;
+import java.io.PipedOutputStream;
 
 /**
  * Created by me on 11/13/16.

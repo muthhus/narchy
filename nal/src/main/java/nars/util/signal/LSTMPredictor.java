@@ -3,7 +3,7 @@ package nars.util.signal;
 import com.google.common.collect.Lists;
 import nars.learn.lstm.Interaction;
 import nars.learn.lstm.test.LiveSTM;
-import nars.util.data.list.FasterList;
+import nars.util.list.FasterList;
 import nars.util.math.DelayedFloat;
 import nars.util.math.FloatSupplier;
 import org.apache.commons.lang3.mutable.MutableFloat;

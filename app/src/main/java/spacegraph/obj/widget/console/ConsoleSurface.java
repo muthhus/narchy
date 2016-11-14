@@ -1,29 +1,9 @@
 package spacegraph.obj.widget.console;
 
-import com.googlecode.lanterna.TerminalPosition;
 import com.googlecode.lanterna.TextCharacter;
-import com.googlecode.lanterna.TextColor;
-import com.googlecode.lanterna.input.KeyStroke;
-import com.googlecode.lanterna.input.KeyType;
-import com.googlecode.lanterna.terminal.virtual.DefaultVirtualTerminal;
-import com.jcraft.jsch.JSchException;
-import com.jogamp.common.nio.ByteBufferInputStream;
-import com.jogamp.common.util.Bitstream;
-import com.jogamp.newt.event.KeyEvent;
 import com.jogamp.opengl.GL2;
-import nars.util.data.SimpleIntDeque;
-import org.fusesource.jansi.AnsiOutputStream;
-import spacegraph.SpaceGraph;
 import spacegraph.Surface;
-import spacegraph.math.v2;
 import spacegraph.render.Draw;
-
-import java.awt.*;
-import java.io.*;
-import java.util.ArrayDeque;
-import java.util.Deque;
-import java.util.Queue;
-import java.util.concurrent.ArrayBlockingQueue;
 
 /**
  * Created by me on 4/1/16.

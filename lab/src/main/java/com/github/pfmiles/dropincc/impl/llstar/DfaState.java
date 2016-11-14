@@ -10,17 +10,11 @@
  ******************************************************************************/
 package com.github.pfmiles.dropincc.impl.llstar;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import com.github.pfmiles.dropincc.DropinccException;
 import com.github.pfmiles.dropincc.Predicate;
 import com.github.pfmiles.dropincc.impl.TokenType;
+
+import java.util.*;
 
 /**
  * DfaState in look-ahead DFA

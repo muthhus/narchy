@@ -4,7 +4,6 @@ import nars.$;
 import nars.Param;
 import nars.Task;
 import nars.budget.Budget;
-import nars.concept.Concept;
 import nars.nal.Stamp;
 import nars.nal.meta.PremiseEval;
 import nars.term.Compound;

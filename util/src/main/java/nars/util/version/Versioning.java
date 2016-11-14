@@ -1,6 +1,6 @@
 package nars.util.version;
 
-import nars.util.data.list.FasterList;
+import nars.util.list.FasterList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

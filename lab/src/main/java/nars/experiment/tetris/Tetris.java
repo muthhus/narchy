@@ -18,10 +18,8 @@ import nars.util.TaskStatistics;
 import org.jetbrains.annotations.NotNull;
 import spacegraph.Surface;
 import spacegraph.math.v2;
-import spacegraph.obj.widget.console.ConsoleSurface;
 import spacegraph.obj.widget.MatrixView;
 
-import java.io.IOException;
 import java.util.List;
 
 import static nars.experiment.tetris.impl.TetrisState.*;

@@ -1,7 +1,6 @@
 package nars.term.util;
 
 import nars.Op;
-import nars.Param;
 import nars.task.util.SoftException;
 import nars.term.Term;
 import nars.term.container.TermContainer;

@@ -10,12 +10,12 @@
  ******************************************************************************/
 package com.github.pfmiles.dropincc.impl.syntactical.codegen;
 
-import java.text.MessageFormat;
-import java.util.List;
-
 import com.github.pfmiles.dropincc.impl.llstar.PredictingGrule;
 import com.github.pfmiles.dropincc.impl.syntactical.codegen.rulemethods.MethodContent;
 import com.github.pfmiles.dropincc.impl.util.SeqGen;
+
+import java.text.MessageFormat;
+import java.util.List;
 
 /**
  * Responsible for recursive descent rule matching methods generation.

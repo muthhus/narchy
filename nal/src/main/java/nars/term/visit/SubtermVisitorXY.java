@@ -1,7 +1,7 @@
 package nars.term.visit;
 
 import nars.term.Compound;
-import nars.util.data.list.FasterList;
+import nars.util.list.FasterList;
 import org.eclipse.collections.impl.list.mutable.primitive.ByteArrayList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

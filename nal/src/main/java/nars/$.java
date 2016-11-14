@@ -7,6 +7,7 @@ import ch.qos.logback.classic.encoder.PatternLayoutEncoder;
 import ch.qos.logback.classic.net.SyslogAppender;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.ConsoleAppender;
+import jdk.nashorn.api.scripting.NashornScriptEngine;
 import nars.budget.Budget;
 import nars.budget.RawBudget;
 import nars.concept.util.ConceptBuilder;
@@ -27,7 +28,7 @@ import nars.term.var.Variable;
 import nars.truth.DefaultTruth;
 import nars.truth.Truth;
 import nars.util.Util;
-import nars.util.data.list.FasterList;
+import nars.util.list.FasterList;
 import org.apache.commons.lang3.ArrayUtils;
 import org.eclipse.collections.api.block.function.primitive.CharToObjectFunction;
 import org.eclipse.collections.impl.set.mutable.UnifiedSet;
@@ -35,6 +36,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.LoggerFactory;
 
+import javax.script.ScriptEngineManager;
 import java.lang.ref.Reference;
 import java.lang.ref.SoftReference;
 import java.lang.ref.WeakReference;
@@ -69,9 +71,6 @@ public enum $ {
 
     public static final org.slf4j.Logger logger = LoggerFactory.getLogger($.class);
     public static final Function<Object, Term> ToStringToTerm = (x) -> $.the(x.toString());
-
-
-
 
     @NotNull
     public static <T extends Term> T $(@NotNull String term) throws Narsese.NarseseException {
@@ -1030,6 +1029,13 @@ public enum $ {
         return x;
     }
 
+    /** global shared Javascript context */
+    public final static NashornScriptEngine JS = JS();
+
+    /** instantiate new Javascript context */
+    public final static NashornScriptEngine JS() {
+        return (NashornScriptEngine) new ScriptEngineManager().getEngineByName("nashorn");
+    }
 
     public static final class StaticTermBuilder extends TermIndex {
 

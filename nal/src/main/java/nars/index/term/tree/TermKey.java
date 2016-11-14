@@ -11,7 +11,7 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.term.atom.Atomic;
 import nars.term.container.TermContainer;
-import nars.util.DynByteSeq;
+import nars.util.data.byt.DynByteSeq;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.DataOutput;
@@ -19,7 +19,7 @@ import java.io.IOException;
 
 import static nars.IO.SPECIAL_OP;
 import static nars.IO.writeEvidence;
-import static nars.util.data.rope.StringHack.bytes;
+import static nars.util.Hack.bytes;
 
 /**
  * TODO lazily compute

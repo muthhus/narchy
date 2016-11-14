@@ -8,7 +8,6 @@ import nars.nal.Stamp;
 import nars.task.GeneratedTask;
 import nars.term.Compound;
 import nars.term.Term;
-import nars.truth.DefaultTruth;
 import nars.truth.TruthFunctions;
 import nars.util.data.MutableInteger;
 import nars.util.event.DefaultTopic;

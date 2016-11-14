@@ -10,11 +10,10 @@
  ******************************************************************************/
 package com.github.pfmiles.dropincc.impl.hotcompile;
 
+import javax.tools.SimpleJavaFileObject;
 import java.io.IOException;
 import java.net.URI;
 import java.util.regex.Pattern;
-
-import javax.tools.SimpleJavaFileObject;
 
 /**
  * @author pf-miles

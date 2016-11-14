@@ -1,6 +1,6 @@
 package nars.util.event;
 
-import nars.util.data.list.FasterList;
+import nars.util.list.FasterList;
 
 import java.util.Collections;
 

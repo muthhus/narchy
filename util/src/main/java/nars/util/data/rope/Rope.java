@@ -22,6 +22,7 @@
  */
 package nars.util.data.rope;
 
+import nars.util.Hack;
 import nars.util.data.rope.impl.*;
 
 import java.io.IOException;
@@ -709,7 +710,7 @@ import java.util.regex.Pattern;
      */
     static char[] getCharArray(String s) {
         try {
-            return (char[]) StringHack.String_value.get(s);
+            return (char[]) Hack.String_value.get(s);
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -718,7 +719,7 @@ import java.util.regex.Pattern;
 
     static char[] getCharArray(StringBuilder s) {
         try {
-            return (char[]) StringHack.sbval.get(s);
+            return (char[]) Hack.sbval.get(s);
         } catch (Exception ex) {
             ex.printStackTrace();
         }

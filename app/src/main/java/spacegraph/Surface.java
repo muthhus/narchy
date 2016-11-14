@@ -8,7 +8,6 @@ import org.jetbrains.annotations.Nullable;
 import spacegraph.math.v2;
 import spacegraph.math.v3;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 

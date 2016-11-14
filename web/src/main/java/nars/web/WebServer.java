@@ -10,15 +10,12 @@ import nars.bag.Bag;
 import nars.concept.Concept;
 import nars.nar.Default;
 import nars.term.Term;
-import nars.term.Termed;
 import nars.term.obj.IntTerm;
 import nars.test.DeductiveMeshTest;
 import nars.util.Texts;
 import nars.util.Util;
 import nars.util.Wiki;
 import nars.util.data.MutableInteger;
-import ognl.Ognl;
-import ognl.OgnlException;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -31,7 +28,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Set;
-import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -158,35 +154,6 @@ public class WebServer /*extends PathHandler*/ {
 
             Field[] ff = nar.getClass().getFields();
 
-            nar.on("nar", (terms) -> {
-                //WARNING this could be dangerous to allow open access
-                Term t = terms[0];
-                if (t.op().var) {
-                    Set<Term> pp = new TreeSet();
-                    for (Field f : ff) {
-                        if (classWhitelist.contains(f.getType())) {
-                            try {
-                                pp.add(func("nar", the(f.getName()), the(f.get(nar))));
-                            } catch (IllegalAccessException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    }
-                    return parallel(pp);
-                } else {
-                    String expr = unquote(t);
-                    Object r;
-                    try {
-                        r = Ognl.getValue(expr, nar);
-                    } catch (OgnlException e) {
-                        r = e;
-                    }
-                    if (r instanceof Termed)
-                        return ((Termed) r).term();
-                    else
-                        return the(r.toString());
-                }
-            });
         }
 
 

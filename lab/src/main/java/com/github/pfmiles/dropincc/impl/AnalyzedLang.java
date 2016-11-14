@@ -10,18 +10,7 @@
  ******************************************************************************/
 package com.github.pfmiles.dropincc.impl;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.regex.Pattern;
-
-import com.github.pfmiles.dropincc.CC;
-import com.github.pfmiles.dropincc.DropinccException;
-import com.github.pfmiles.dropincc.Element;
-import com.github.pfmiles.dropincc.Grule;
-import com.github.pfmiles.dropincc.TokenDef;
+import com.github.pfmiles.dropincc.*;
 import com.github.pfmiles.dropincc.impl.hotcompile.CompilationResult;
 import com.github.pfmiles.dropincc.impl.hotcompile.HotCompileUtil;
 import com.github.pfmiles.dropincc.impl.kleene.AbstractKleeneNode;
@@ -31,17 +20,15 @@ import com.github.pfmiles.dropincc.impl.lexical.LexerCompiler;
 import com.github.pfmiles.dropincc.impl.llstar.GenedKleeneGruleType;
 import com.github.pfmiles.dropincc.impl.llstar.PredictingGrule;
 import com.github.pfmiles.dropincc.impl.llstar.PredictingKleene;
-import com.github.pfmiles.dropincc.impl.runtime.impl.Lexer;
-import com.github.pfmiles.dropincc.impl.runtime.impl.LexerPrototype;
-import com.github.pfmiles.dropincc.impl.runtime.impl.Parser;
-import com.github.pfmiles.dropincc.impl.runtime.impl.ParserPrototype;
-import com.github.pfmiles.dropincc.impl.runtime.impl.PreWrittenStringLexerPrototype;
-import com.github.pfmiles.dropincc.impl.runtime.impl.StatelessParserPrototype;
+import com.github.pfmiles.dropincc.impl.runtime.impl.*;
 import com.github.pfmiles.dropincc.impl.syntactical.GenedGruleType;
 import com.github.pfmiles.dropincc.impl.syntactical.ParserCompiler;
 import com.github.pfmiles.dropincc.impl.syntactical.PredictingResult;
 import com.github.pfmiles.dropincc.impl.syntactical.codegen.ParserCodeGenResult;
 import com.github.pfmiles.dropincc.impl.util.Pair;
+
+import java.util.*;
+import java.util.regex.Pattern;
 
 /**
  * 

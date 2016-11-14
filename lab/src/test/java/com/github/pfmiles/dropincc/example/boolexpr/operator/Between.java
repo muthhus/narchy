@@ -10,10 +10,10 @@
  ******************************************************************************/
 package com.github.pfmiles.dropincc.example.boolexpr.operator;
 
-import java.util.Date;
-
 import com.github.pfmiles.dropincc.example.boolexpr.Interval;
 import com.github.pfmiles.dropincc.example.boolexpr.Operator;
+
+import java.util.Date;
 
 /**
  * @author pf-miles Aug 20, 2012 4:39:35 PM

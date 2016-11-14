@@ -11,17 +11,15 @@ import nars.op.data.reflect;
 import nars.op.data.union;
 import nars.term.atom.Atom;
 import nars.util.Texts;
-import nars.util.data.list.FasterList;
+import nars.util.list.FasterList;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
 import java.util.Date;
 
-import static java.nio.file.Files.*;
+import static java.nio.file.Files.createTempFile;
 import static nars.$.quote;
-import static nars.concept.Functor.f;
-import static nars.concept.Functor.f0;
-import static nars.concept.Functor.f1;
+import static nars.concept.Functor.*;
 
 /**
  * Built-in functors, ie. the standard core function set
@@ -107,6 +105,37 @@ public class Builtin extends FasterList<Concept> {
 
                 })
         );
+
+//        nar.on("nar", (terms) -> {
+//            //WARNING this could be dangerous to allow open access
+//            Term t = terms[0];
+//            if (t.op().var) {
+//                Set<Term> pp = new TreeSet();
+//                for (Field f : ff) {
+//                    if (classWhitelist.contains(f.getType())) {
+//                        try {
+//                            pp.add(func("nar", the(f.getName()), the(f.get(nar))));
+//                        } catch (IllegalAccessException e) {
+//                            e.printStackTrace();
+//                        }
+//                    }
+//                }
+//                return parallel(pp);
+//            } else {
+//                String expr = unquote(t);
+//                Object r;
+//                try {
+//                    r = Ognl.getValue(expr, nar);
+//                } catch (OgnlException e) {
+//                    r = e;
+//                }
+//                if (r instanceof Termed)
+//                    return ((Termed) r).term();
+//                else
+//                    return the(r.toString());
+//            }
+//        });
+
     }
 
 }

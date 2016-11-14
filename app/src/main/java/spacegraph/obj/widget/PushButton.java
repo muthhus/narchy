@@ -2,7 +2,6 @@ package spacegraph.obj.widget;
 
 import com.jogamp.opengl.GL2;
 import org.jetbrains.annotations.Nullable;
-import spacegraph.render.Draw;
 
 import java.util.function.Consumer;
 

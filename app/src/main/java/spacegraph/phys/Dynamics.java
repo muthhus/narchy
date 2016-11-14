@@ -24,7 +24,7 @@
 package spacegraph.phys;
 
 import nars.$;
-import nars.util.data.list.FasterList;
+import nars.util.list.FasterList;
 import org.eclipse.collections.api.block.procedure.primitive.IntObjectProcedure;
 import spacegraph.Spatial;
 import spacegraph.math.v3;

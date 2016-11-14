@@ -10,11 +10,11 @@
  ******************************************************************************/
 package com.github.pfmiles.dropincc.impl.runtime.impl;
 
-import java.lang.reflect.Field;
-import java.util.Map;
-
 import com.github.pfmiles.dropincc.DropinccException;
 import com.github.pfmiles.dropincc.impl.syntactical.codegen.ParserCodeGenResult;
+
+import java.lang.reflect.Field;
+import java.util.Map;
 
 /**
  * @author pf-miles

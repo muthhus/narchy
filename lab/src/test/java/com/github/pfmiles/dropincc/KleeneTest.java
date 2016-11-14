@@ -10,9 +10,8 @@
  ******************************************************************************/
 package com.github.pfmiles.dropincc;
 
-import junit.framework.TestCase;
-
 import com.github.pfmiles.dropincc.testhelper.IccActionManager;
+import junit.framework.TestCase;
 
 /**
  * Complex kleene nodes situation tests.

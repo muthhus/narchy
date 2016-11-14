@@ -1,6 +1,6 @@
 package nars.util.meter.event;
 
-import nars.util.DoubleSummaryReusableStatistics;
+import nars.util.math.DoubleSummaryReusableStatistics;
 
 /**
  * Sums guaged objects, and returns

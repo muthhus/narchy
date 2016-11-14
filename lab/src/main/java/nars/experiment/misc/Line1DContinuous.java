@@ -1,30 +1,23 @@
 package nars.experiment.misc;
 
-import nars.*;
+import nars.$;
+import nars.NAR;
+import nars.NAgent;
+import nars.Param;
 import nars.concept.ActionConcept;
-import nars.concept.Concept;
 import nars.concept.SensorConcept;
 import nars.gui.Vis;
 import nars.index.term.map.CaffeineIndex;
-import nars.nal.Stamp;
 import nars.nar.Default;
 import nars.nar.exe.Executioner;
 import nars.nar.exe.SingleThreadExecutioner;
 import nars.nar.util.DefaultConceptBuilder;
-import nars.task.DerivedTask;
-import nars.task.GeneratedTask;
-import nars.term.Term;
 import nars.time.FrameClock;
-import nars.truth.Truth;
-import nars.truth.func.GoalFunction;
 import nars.util.data.random.XorShift128PlusRandom;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 
 import static java.lang.System.out;
-import static nars.Op.NEG;
-import static nars.Symbols.GOAL;
 
 
 /**

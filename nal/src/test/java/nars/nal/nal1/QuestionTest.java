@@ -23,9 +23,7 @@ import java.util.function.BiFunction;
 import java.util.function.IntFunction;
 
 import static nars.time.Tense.ETERNAL;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * Created by me on 5/24/16.

@@ -6,7 +6,6 @@ import nars.concept.Concept;
 import org.apache.commons.math3.stat.Frequency;
 
 import java.io.PrintStream;
-import java.util.Collection;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**

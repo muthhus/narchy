@@ -10,12 +10,12 @@
  ******************************************************************************/
 package com.github.pfmiles.dropincc.impl.runtime.impl;
 
+import com.github.pfmiles.dropincc.impl.TokenType;
+import com.github.pfmiles.dropincc.impl.runtime.Token;
+
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
-
-import com.github.pfmiles.dropincc.impl.TokenType;
-import com.github.pfmiles.dropincc.impl.runtime.Token;
 
 /**
  * Common super class for all generated lexer.

@@ -10,9 +10,9 @@
  ******************************************************************************/
 package com.github.pfmiles.dropincc.testhelper;
 
-import java.lang.reflect.Array;
-
 import com.github.pfmiles.dropincc.Action;
+
+import java.lang.reflect.Array;
 
 /**
  * @author pf-miles

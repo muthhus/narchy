@@ -5,9 +5,8 @@ package spacegraph.net;/* -*-mode:java; c-basic-offset:2; indent-tabs-mode:nil -
 
 import com.jcraft.jsch.*;
 
-import java.awt.*;
-import javax.swing.*;
-import java.io.*;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 
 public class SSH {

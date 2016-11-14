@@ -10,11 +10,11 @@
  ******************************************************************************/
 package com.github.pfmiles.dropincc.impl.syntactical.codegen;
 
-import java.io.IOException;
-import java.io.InputStream;
-
 import com.github.pfmiles.dropincc.DropinccException;
 import com.github.pfmiles.dropincc.impl.util.ByteAppender;
+
+import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * Common interface of all code rendering elements of a parser.

@@ -10,13 +10,13 @@
  ******************************************************************************/
 package com.github.pfmiles.dropincc.impl.syntactical.codegen;
 
-import java.text.MessageFormat;
-import java.util.List;
-
 import com.github.pfmiles.dropincc.Action;
 import com.github.pfmiles.dropincc.DropinccException;
 import com.github.pfmiles.dropincc.ParamedAction;
 import com.github.pfmiles.dropincc.impl.GruleType;
+
+import java.text.MessageFormat;
+import java.util.List;
 
 /**
  * @author pf-miles

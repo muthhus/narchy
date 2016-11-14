@@ -2,7 +2,7 @@ package nars.util.data.sorted;
 
 //package net.sourceforge.nite.other;
 
-import nars.util.data.list.FasterList;
+import nars.util.list.FasterList;
 
 import java.util.Comparator;
 

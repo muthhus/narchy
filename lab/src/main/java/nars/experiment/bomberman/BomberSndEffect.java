@@ -1,6 +1,6 @@
 package nars.experiment.bomberman;
 
-import java.io.*;
+import java.io.File;
 
 /**
  * File:         BomberBGM

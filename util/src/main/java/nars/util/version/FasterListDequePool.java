@@ -1,7 +1,7 @@
 package nars.util.version;
 
 import nars.util.data.DequePool;
-import nars.util.data.list.FasterList;
+import nars.util.list.FasterList;
 import org.jetbrains.annotations.NotNull;
 
 /**

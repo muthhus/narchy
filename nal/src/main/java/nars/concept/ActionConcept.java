@@ -1,6 +1,5 @@
 package nars.concept;
 
-import com.google.common.base.Objects;
 import nars.*;
 import nars.task.GeneratedTask;
 import nars.term.Compound;

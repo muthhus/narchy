@@ -10,10 +10,10 @@
  ******************************************************************************/
 package com.github.pfmiles.dropincc.example.calculator;
 
-import java.util.concurrent.CountDownLatch;
-
 import com.github.pfmiles.dropincc.example.calculator.structure.Expr;
 import com.github.pfmiles.dropincc.impl.util.Pair;
+
+import java.util.concurrent.CountDownLatch;
 
 /**
  * @author pf-miles

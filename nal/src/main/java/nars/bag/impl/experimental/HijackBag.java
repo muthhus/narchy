@@ -7,7 +7,7 @@ import nars.budget.Forget;
 import nars.budget.merge.BudgetMerge;
 import nars.link.ArrayBLink;
 import nars.link.BLink;
-import nars.util.data.map.nbhm.HijacKache;
+import nars.util.map.nbhm.HijacKache;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -18,7 +18,7 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-import static nars.util.data.map.nbhm.HijacKache.*;
+import static nars.util.map.nbhm.HijacKache.*;
 
 /**
  * Created by me on 9/4/16.

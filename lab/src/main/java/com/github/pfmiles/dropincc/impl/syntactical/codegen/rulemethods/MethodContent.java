@@ -10,11 +10,11 @@
  ******************************************************************************/
 package com.github.pfmiles.dropincc.impl.syntactical.codegen.rulemethods;
 
-import java.text.MessageFormat;
-
 import com.github.pfmiles.dropincc.impl.llstar.PredictingGrule;
 import com.github.pfmiles.dropincc.impl.syntactical.codegen.CodeGen;
 import com.github.pfmiles.dropincc.impl.syntactical.codegen.CodeGenContext;
+
+import java.text.MessageFormat;
 
 /**
  * @author pf-miles

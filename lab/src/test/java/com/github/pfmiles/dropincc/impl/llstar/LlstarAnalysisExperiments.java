@@ -11,8 +11,8 @@
 package com.github.pfmiles.dropincc.impl.llstar;
 
 import com.github.pfmiles.dropincc.CC;
-import com.github.pfmiles.dropincc.Grule;
 import com.github.pfmiles.dropincc.Grammar;
+import com.github.pfmiles.dropincc.Grule;
 import com.github.pfmiles.dropincc.TokenDef;
 import com.github.pfmiles.dropincc.impl.GruleType;
 import com.github.pfmiles.dropincc.impl.automataview.DotAdaptors;

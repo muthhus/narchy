@@ -5,7 +5,6 @@ import nars.Task;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayDeque;
-import java.util.HashMap;
 
 /**
  * Created by me on 8/16/16.

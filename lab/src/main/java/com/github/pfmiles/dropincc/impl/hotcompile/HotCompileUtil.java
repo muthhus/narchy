@@ -10,19 +10,13 @@
  ******************************************************************************/
 package com.github.pfmiles.dropincc.impl.hotcompile;
 
-import java.io.StringWriter;
-import java.util.*;
-
-import javax.tools.Diagnostic;
-import javax.tools.DiagnosticCollector;
-import javax.tools.JavaCompiler;
-import javax.tools.JavaCompiler.CompilationTask;
-import javax.tools.JavaFileManager;
-import javax.tools.JavaFileObject;
-import javax.tools.ToolProvider;
-
 import com.github.pfmiles.dropincc.DropinccException;
 import com.github.pfmiles.dropincc.impl.util.Util;
+
+import javax.tools.*;
+import javax.tools.JavaCompiler.CompilationTask;
+import java.io.StringWriter;
+import java.util.*;
 
 /**
  * Compiles code at runtime, using JDK1.6 compiler API.

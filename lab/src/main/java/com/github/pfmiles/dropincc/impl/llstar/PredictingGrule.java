@@ -10,10 +10,10 @@
  ******************************************************************************/
 package com.github.pfmiles.dropincc.impl.llstar;
 
-import java.util.List;
-
 import com.github.pfmiles.dropincc.impl.CAlternative;
 import com.github.pfmiles.dropincc.impl.GruleType;
+
+import java.util.List;
 
 /**
  * Grammar rule with lookAhead DFA and alternatives.

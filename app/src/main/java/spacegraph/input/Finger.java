@@ -1,7 +1,6 @@
 package spacegraph.input;
 
 import com.jogamp.newt.event.MouseEvent;
-import com.jogamp.newt.opengl.GLWindow;
 import org.jetbrains.annotations.Nullable;
 import spacegraph.Surface;
 import spacegraph.math.v2;

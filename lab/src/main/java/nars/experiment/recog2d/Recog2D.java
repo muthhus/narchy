@@ -23,8 +23,9 @@ import spacegraph.render.Draw;
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
-import java.util.*;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Random;
 
 import static nars.util.Texts.n2;
 import static spacegraph.obj.layout.Grid.col;

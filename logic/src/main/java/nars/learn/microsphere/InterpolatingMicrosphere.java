@@ -17,7 +17,7 @@
 package nars.learn.microsphere;
 
 
-import nars.util.data.list.FasterList;
+import nars.util.list.FasterList;
 import org.apache.commons.math3.exception.*;
 import org.apache.commons.math3.random.UnitSphereRandomVectorGenerator;
 import org.jetbrains.annotations.NotNull;

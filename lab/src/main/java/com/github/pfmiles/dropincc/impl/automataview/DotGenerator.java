@@ -10,14 +10,14 @@
  ******************************************************************************/
 package com.github.pfmiles.dropincc.impl.automataview;
 
+import com.github.pfmiles.dropincc.impl.util.Pair;
+import com.github.pfmiles.dropincc.impl.util.Util;
+
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.regex.Pattern;
-
-import com.github.pfmiles.dropincc.impl.util.Pair;
-import com.github.pfmiles.dropincc.impl.util.Util;
 
 /**
  * Utility class to convert a automata network to a dot file, the dot file could

@@ -23,12 +23,13 @@ public abstract class ReinforceJSAgent implements Agent {
 
     @Override public void start(int inputs, int actions)  {
         try {
-            NashornScriptEngine engine = (NashornScriptEngine) new ScriptEngineManager().getEngineByName("nashorn");
-            engine.eval(new FileReader("/home/me/opennars/logic/src/main/java/nars/learn/ql/rl.js"));
+
+            NashornScriptEngine JS = (NashornScriptEngine) new ScriptEngineManager().getEngineByName("nashorn");
+            JS.eval(new FileReader("/home/me/opennars/logic/src/main/java/nars/learn/ql/rl.js"));
 
 
 
-            CompiledScript cscript = engine.compile(
+            CompiledScript cscript = JS.compile(
                     "java.lang.System.out.println('creating new rl.js agent'); " +
                     "var Math = Java.type('java.lang.Math'); " +
                     "var env = { getNumStates: function() { return " + inputs + "; }, getMaxNumActions: function() { return " + actions + "; } }; " +
@@ -52,7 +53,7 @@ public abstract class ReinforceJSAgent implements Agent {
 //            System.out.printf("%s: %s\n",me.getKey(),String.valueOf(me.getValue()));
 //        }
 //        //cscript.eval();
-            cscript.eval(engine.getBindings(ScriptContext.ENGINE_SCOPE));
+            cscript.eval(JS.getBindings(ScriptContext.ENGINE_SCOPE));
             js = (Invocable) cscript.getEngine();
 
         }catch(Exception e) {

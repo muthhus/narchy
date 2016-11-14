@@ -15,7 +15,6 @@ import spacegraph.phys.shape.BoxShape;
 import spacegraph.render.Draw;
 
 import static spacegraph.math.v3.v;
-import static spacegraph.math.v3.v;
 
 /**
  * https://en.wikipedia.org/wiki/Cuboid

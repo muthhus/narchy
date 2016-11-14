@@ -10,12 +10,11 @@
  ******************************************************************************/
 package com.github.pfmiles.dropincc.impl;
 
-import java.util.List;
-import java.util.function.Consumer;
-import java.util.function.Function;
-
 import com.github.pfmiles.dropincc.*;
 import com.github.pfmiles.dropincc.impl.util.Util;
+
+import java.util.List;
+import java.util.function.Function;
 
 /**
  * 

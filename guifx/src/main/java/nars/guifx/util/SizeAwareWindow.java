@@ -15,7 +15,7 @@ import nars.guifx.NARfx;
 import nars.guifx.demo.NARide;
 import nars.nar.Default;
 import nars.util.FX;
-import nars.util.data.map.LMap;
+import nars.util.map.LMap;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;

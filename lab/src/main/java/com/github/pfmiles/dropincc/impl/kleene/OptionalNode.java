@@ -10,9 +10,9 @@
  ******************************************************************************/
 package com.github.pfmiles.dropincc.impl.kleene;
 
-import java.util.Iterator;
-
 import com.github.pfmiles.dropincc.Element;
+
+import java.util.Iterator;
 
 /**
  * This is not a kleene closure node indeed... But it's quite a convenience to

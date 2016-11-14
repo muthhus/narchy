@@ -10,14 +10,14 @@
  ******************************************************************************/
 package com.github.pfmiles.dropincc.impl.kleene;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import com.github.pfmiles.dropincc.DropinccException;
 import com.github.pfmiles.dropincc.Element;
 import com.github.pfmiles.dropincc.impl.AndSubRule;
 import com.github.pfmiles.dropincc.impl.OrSubRule;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * @author pf-miles

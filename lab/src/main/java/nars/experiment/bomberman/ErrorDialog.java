@@ -2,9 +2,10 @@ package nars.experiment.bomberman;/*
  * ErrorDialog.java
  * Created on March 9, 2001, 3:06 PM
  */
-import java.awt.*;
+
 import javax.swing.*;
-import java.io.*;
+import java.io.CharArrayWriter;
+import java.io.PrintWriter;
 
 /**
  * This class displays an error dialog then exits the program when specified.

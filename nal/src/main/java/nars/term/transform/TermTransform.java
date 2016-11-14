@@ -1,10 +1,6 @@
 package nars.term.transform;
 
 import nars.Op;
-import nars.concept.Concept;
-import nars.op.data.differ;
-import nars.op.data.intersect;
-import nars.op.data.union;
 import nars.term.Term;
 import nars.term.atom.Atomic;
 import org.jetbrains.annotations.NotNull;

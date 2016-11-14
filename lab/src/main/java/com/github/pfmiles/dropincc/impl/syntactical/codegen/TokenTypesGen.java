@@ -10,10 +10,10 @@
  ******************************************************************************/
 package com.github.pfmiles.dropincc.impl.syntactical.codegen;
 
+import com.github.pfmiles.dropincc.impl.TokenType;
+
 import java.text.MessageFormat;
 import java.util.Collection;
-
-import com.github.pfmiles.dropincc.impl.TokenType;
 
 /**
  * Be responsible for generate token type list in a parser.

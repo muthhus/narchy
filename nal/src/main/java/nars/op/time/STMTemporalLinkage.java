@@ -6,7 +6,6 @@ import nars.Task;
 import nars.concept.Concept;
 import nars.term.Term;
 import nars.util.data.MutableInteger;
-import nars.util.data.list.FasterList;
 import nars.util.event.On;
 import org.jetbrains.annotations.NotNull;
 

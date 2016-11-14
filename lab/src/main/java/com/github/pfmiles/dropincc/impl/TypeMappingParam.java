@@ -10,13 +10,13 @@
  ******************************************************************************/
 package com.github.pfmiles.dropincc.impl;
 
-import java.util.Map;
-
 import com.github.pfmiles.dropincc.Element;
 import com.github.pfmiles.dropincc.Grule;
 import com.github.pfmiles.dropincc.TokenDef;
 import com.github.pfmiles.dropincc.impl.kleene.AbstractKleeneNode;
 import com.github.pfmiles.dropincc.impl.kleene.KleeneType;
+
+import java.util.Map;
 
 /**
  * @author pf-miles

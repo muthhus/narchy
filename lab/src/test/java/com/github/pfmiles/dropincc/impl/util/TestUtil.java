@@ -10,17 +10,11 @@
  ******************************************************************************/
 package com.github.pfmiles.dropincc.impl.util;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
-
-import junit.framework.TestCase;
-
 import com.github.pfmiles.dropincc.Action;
 import com.github.pfmiles.dropincc.impl.automataview.DotGenerator;
+import junit.framework.TestCase;
+
+import java.io.*;
 
 /**
  * @author pf-miles

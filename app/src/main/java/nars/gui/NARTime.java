@@ -1,26 +1,20 @@
 package nars.gui;
 
-import org.eclipse.collections.impl.map.mutable.primitive.LongObjectHashMap;
 import com.jogamp.newt.opengl.GLWindow;
 import nars.$;
 import nars.NAR;
 import nars.Task;
 import nars.nar.Default;
 import nars.term.Term;
-import org.jetbrains.annotations.NotNull;
+import org.eclipse.collections.impl.map.mutable.primitive.LongObjectHashMap;
 import spacegraph.*;
 import spacegraph.layout.Flatten;
-import spacegraph.phys.Collidable;
-import spacegraph.phys.collision.broad.Broadphase;
-import spacegraph.phys.constraint.BroadConstraint;
 import spacegraph.phys.shape.CollisionShape;
 import spacegraph.phys.shape.SphereShape;
-import spacegraph.phys.util.OArrayList;
 import spacegraph.render.Draw;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 import static nars.Symbols.BELIEF;
 

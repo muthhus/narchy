@@ -1,9 +1,8 @@
 package nars.experiment.bomberman;
 
-import java.awt.*;
-import java.awt.event.*;
 import javax.swing.*;
-import java.io.*;
+import java.awt.*;
+import java.io.File;
 import java.util.Vector;
 
 /**

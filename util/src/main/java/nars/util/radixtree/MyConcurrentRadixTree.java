@@ -1,13 +1,8 @@
 package nars.util.radixtree;
 
-import com.googlecode.concurrenttrees.common.KeyValuePair;
-import com.googlecode.concurrenttrees.common.LazyIterator;
-import com.googlecode.concurrenttrees.radix.RadixTree;
-import com.googlecode.concurrenttrees.radix.node.concrete.voidvalue.VoidValue;
-import nars.util.ByteSeq;
-import nars.util.data.list.FasterList;
+import nars.util.data.byt.ByteSeq;
+import nars.util.list.FasterList;
 import nars.util.data.sorted.SortedArray;
-import nars.util.data.sorted.SortedList;
 import org.eclipse.collections.api.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

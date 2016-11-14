@@ -3,7 +3,6 @@ package nars.nal.nal7;
 import nars.$;
 import nars.NAR;
 import nars.nal.AbstractNALTest;
-import nars.nar.Default;
 import nars.test.TestNAR;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;

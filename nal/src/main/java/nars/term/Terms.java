@@ -8,7 +8,7 @@ import nars.term.container.TermContainer;
 import nars.term.container.TermVector;
 import nars.util.Texts;
 import nars.util.Util;
-import nars.util.data.list.FasterList;
+import nars.util.list.FasterList;
 import nars.util.data.sorted.SortedList;
 import org.eclipse.collections.api.block.predicate.primitive.IntObjectPredicate;
 import org.eclipse.collections.api.list.MutableList;

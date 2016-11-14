@@ -10,13 +10,13 @@
  ******************************************************************************/
 package com.github.pfmiles.dropincc.impl.runtime.impl;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import com.github.pfmiles.dropincc.DropinccException;
 import com.github.pfmiles.dropincc.impl.TokenType;
 import com.github.pfmiles.dropincc.impl.runtime.Token;
 import com.github.pfmiles.dropincc.impl.util.Pair;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * The parer super class for non-stream (that means, input is finite) parsing.

@@ -14,7 +14,6 @@ import java.util.Collection;
 import java.util.stream.Collectors;
 
 import static nars.time.Tense.ETERNAL;
-import static nars.truth.TruthFunctions.eternalize;
 import static nars.truth.TruthFunctions.w2c;
 
 /**

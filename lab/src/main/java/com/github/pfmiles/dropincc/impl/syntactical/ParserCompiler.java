@@ -10,28 +10,8 @@
  ******************************************************************************/
 package com.github.pfmiles.dropincc.impl.syntactical;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.ListIterator;
-import java.util.Map;
-import java.util.Set;
-
 import com.github.pfmiles.dropincc.*;
-import com.github.pfmiles.dropincc.impl.Alternative;
-import com.github.pfmiles.dropincc.impl.AndSubRule;
-import com.github.pfmiles.dropincc.impl.CAlternative;
-import com.github.pfmiles.dropincc.impl.ConstructingGrule;
-import com.github.pfmiles.dropincc.impl.EleType;
-import com.github.pfmiles.dropincc.impl.GruleType;
-import com.github.pfmiles.dropincc.impl.OrSubRule;
-import com.github.pfmiles.dropincc.impl.SpecialType;
-import com.github.pfmiles.dropincc.impl.TokenType;
-import com.github.pfmiles.dropincc.impl.TypeMappingParam;
+import com.github.pfmiles.dropincc.impl.*;
 import com.github.pfmiles.dropincc.impl.kleene.AbstractKleeneNode;
 import com.github.pfmiles.dropincc.impl.kleene.KleeneStarType;
 import com.github.pfmiles.dropincc.impl.kleene.KleeneType;
@@ -40,19 +20,13 @@ import com.github.pfmiles.dropincc.impl.llstar.GenedKleeneGruleType;
 import com.github.pfmiles.dropincc.impl.llstar.LlstarAnalysis;
 import com.github.pfmiles.dropincc.impl.llstar.PredictingGrule;
 import com.github.pfmiles.dropincc.impl.llstar.PredictingKleene;
-import com.github.pfmiles.dropincc.impl.syntactical.codegen.AltsActionsGen;
-import com.github.pfmiles.dropincc.impl.syntactical.codegen.CodeGenContext;
-import com.github.pfmiles.dropincc.impl.syntactical.codegen.KleeneDfasGen;
-import com.github.pfmiles.dropincc.impl.syntactical.codegen.ParserClsGen;
-import com.github.pfmiles.dropincc.impl.syntactical.codegen.ParserCodeGenResult;
-import com.github.pfmiles.dropincc.impl.syntactical.codegen.PredsGen;
-import com.github.pfmiles.dropincc.impl.syntactical.codegen.RuleDfasGen;
-import com.github.pfmiles.dropincc.impl.syntactical.codegen.RuleMethodsGen;
-import com.github.pfmiles.dropincc.impl.syntactical.codegen.TokenTypesGen;
+import com.github.pfmiles.dropincc.impl.syntactical.codegen.*;
 import com.github.pfmiles.dropincc.impl.util.Pair;
 import com.github.pfmiles.dropincc.impl.util.SeqGen;
 import com.github.pfmiles.dropincc.impl.util.SetStack;
 import com.github.pfmiles.dropincc.impl.util.Util;
+
+import java.util.*;
 
 /**
  * Util, to analysis & check, manipulate Grammar rules.

@@ -10,14 +10,14 @@
  ******************************************************************************/
 package com.github.pfmiles.dropincc;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.github.pfmiles.dropincc.impl.Alternative;
 import com.github.pfmiles.dropincc.impl.AndSubRule;
 import com.github.pfmiles.dropincc.impl.ConstructingGrule;
 import com.github.pfmiles.dropincc.impl.OrSubRule;
 import com.github.pfmiles.dropincc.impl.util.Util;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Grammar rule

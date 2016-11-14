@@ -4,8 +4,6 @@ import nars.budget.Budgeted;
 import nars.budget.RawBudget;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Objects;
-
 /**
  * Buffered/Budgeted Link (an entry in a bag)
  * equalsTo/hashCode proxies to the wrapped element, X id

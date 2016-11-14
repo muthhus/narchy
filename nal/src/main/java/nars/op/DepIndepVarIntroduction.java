@@ -3,7 +3,6 @@ package nars.op;
 import nars.$;
 import nars.NAR;
 import nars.Op;
-import nars.Task;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Terms;

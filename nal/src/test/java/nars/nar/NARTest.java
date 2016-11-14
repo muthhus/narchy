@@ -2,17 +2,14 @@ package nars.nar;
 
 import nars.NAR;
 import nars.Narsese;
-import nars.Task;
 import nars.concept.Concept;
 import nars.term.Termed;
 import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.StringWriter;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static nars.time.Tense.ETERNAL;
 import static org.junit.Assert.*;
 
 /**

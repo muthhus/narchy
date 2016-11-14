@@ -1,14 +1,10 @@
 package spacegraph.obj.widget;
 
-import com.jogamp.opengl.GL2;
 import nars.$;
-import nars.Param;
-import org.eclipse.collections.api.tuple.primitive.IntIntPair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spacegraph.Surface;
 import spacegraph.obj.layout.Layout;
-import spacegraph.render.Draw;
 
 import java.util.List;
 

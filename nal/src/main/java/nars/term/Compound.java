@@ -23,7 +23,6 @@ package nars.term;
 import nars.$;
 import nars.IO;
 import nars.Op;
-import nars.Param;
 import nars.term.container.TermContainer;
 import nars.term.subst.Unify;
 import nars.term.var.Variable;

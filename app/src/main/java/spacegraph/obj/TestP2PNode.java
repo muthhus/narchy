@@ -6,7 +6,6 @@ import spacegraph.SpaceGraph;
 import spacegraph.layout.Flatten;
 import spacegraph.math.v3;
 import spacegraph.obj.layout.Grid;
-import spacegraph.obj.widget.console.ConsoleSurface;
 import spacegraph.obj.widget.XYSlider;
 import spacegraph.phys.Dynamic;
 import spacegraph.phys.Dynamics;

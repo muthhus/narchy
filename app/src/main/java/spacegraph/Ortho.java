@@ -5,12 +5,6 @@ import com.jogamp.opengl.GL2;
 import org.apache.commons.lang.ArrayUtils;
 import spacegraph.input.Finger;
 import spacegraph.math.v2;
-import spacegraph.math.v3;
-import spacegraph.phys.Collidable;
-
-import java.util.Arrays;
-
-import static spacegraph.math.v3.v;
 
 /**
  * orthographic widget adapter. something which goes on the "face" of a HUD ("head"s-up-display)

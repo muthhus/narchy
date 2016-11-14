@@ -7,10 +7,10 @@ import nars.util.signal.OneDHaar;
 import org.eclipse.collections.impl.list.mutable.primitive.FloatArrayList;
 import spacegraph.SpaceGraph;
 import spacegraph.Surface;
+import spacegraph.obj.Cuboid;
 import spacegraph.obj.layout.Grid;
 import spacegraph.obj.widget.MatrixView;
 import spacegraph.obj.widget.Plot2D;
-import spacegraph.obj.Cuboid;
 
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;

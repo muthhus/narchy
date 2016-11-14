@@ -1,17 +1,8 @@
 package nars.op;
 
 import nars.$;
-import nars.NAR;
-import nars.Param;
-import nars.Task;
-import nars.concept.Concept;
-import nars.nal.Stamp;
-import nars.op.mental.Abbreviation;
-import nars.task.GeneratedTask;
-import nars.task.MutableTask;
 import nars.term.Compound;
 import nars.term.Term;
-import nars.truth.TruthDelta;
 import nars.util.Util;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

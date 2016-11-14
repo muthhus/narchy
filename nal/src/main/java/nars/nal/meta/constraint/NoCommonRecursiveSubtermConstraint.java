@@ -4,8 +4,6 @@ import nars.term.Compound;
 import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.HashSet;
-
 import static nars.term.container.TermContainer.commonSubtermsRecurse;
 
 /** ensures the compared terms are not equal and recursively share no terms in common.  variables excluded */

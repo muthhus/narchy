@@ -11,8 +11,6 @@ import java.util.LinkedHashMap;
 import java.util.function.IntFunction;
 import java.util.stream.IntStream;
 
-import static nars.truth.TruthFunctions.c2w;
-
 
 /**
  * Created by me on 10/15/16.

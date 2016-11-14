@@ -1,7 +1,7 @@
 package nars.table;
 
 import nars.bag.Table;
-import nars.util.CollectorMap;
+import nars.util.map.CollectorMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

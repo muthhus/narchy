@@ -11,7 +11,7 @@ import nars.term.mutate.Termunator;
 import nars.term.mutate.Termutator;
 import nars.term.var.CommonVariable;
 import nars.term.var.Variable;
-import nars.util.data.list.LimitedFasterList;
+import nars.util.list.LimitedFasterList;
 import nars.util.version.VersionMap;
 import nars.util.version.Versioned;
 import nars.util.version.Versioning;

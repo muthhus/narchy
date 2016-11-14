@@ -1,8 +1,6 @@
 package nars;
 
-import nars.budget.BudgetFunctions;
 import nars.nal.Level;
-import nars.task.MutableTask;
 import nars.term.atom.Atom;
 import nars.truth.DefaultTruth;
 import nars.truth.Truth;
