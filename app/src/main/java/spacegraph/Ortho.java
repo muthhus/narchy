@@ -137,8 +137,6 @@ public class Ortho implements WindowListener, KeyListener, MouseListener {
         surface.onKey(e, false);
     }
 
-
-
     @Override
     public void mouseClicked(MouseEvent e) {
 

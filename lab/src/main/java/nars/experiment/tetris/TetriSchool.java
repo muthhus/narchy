@@ -198,15 +198,15 @@ public class TetriSchool extends NSchool implements Runnable {
 
         public static Surface newTrainingPanel(TetriSchool school) {
 
-            ConsoleSurface term = new ConsoleSurface(120, 40);
+            //ConsoleSurface term = new ConsoleSurface(120, 40);
 
-            school.nar.logSummaryGT(term, 0.25f);
+            //school.nar.logSummaryGT(term, 0.25f);
 
             return col(
 
-                    newSchoolControl(school),
+                    newSchoolControl(school)
 
-                    term
+                    //term
 
             );
         }

@@ -9,6 +9,7 @@ import java.awt.*;
 import javax.swing.*;
 import java.io.*;
 
+
 public class SSH {
 
     public final Session session;
@@ -61,6 +62,7 @@ public class SSH {
             channel = (ChannelShell) session.openChannel("shell");
 
 
+
             // Enable agent-forwarding.
             //((ChannelShell)channel).setAgentForwarding(true);
 
@@ -93,6 +95,9 @@ public class SSH {
 
 
     }
+
+
+
 
     public static class MyUserInfo
             implements UserInfo, UIKeyboardInteractive {

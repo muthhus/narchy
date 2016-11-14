@@ -18,220 +18,17 @@ import spacegraph.Surface;
 import spacegraph.math.v2;
 import spacegraph.render.Draw;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.awt.*;
+import java.io.*;
 import java.util.ArrayDeque;
 import java.util.Deque;
+import java.util.Queue;
+import java.util.concurrent.ArrayBlockingQueue;
 
 /**
  * Created by me on 4/1/16.
  */
 public abstract class ConsoleSurface extends Surface implements Appendable {
-
-    public static void main(String[] args) throws InterruptedException, IOException, JSchException {
-
-
-        //new DefaultVirtualTerminal();
-
-        //new UnixTerminal();
-        //= new DefaultVirtualTerminal();
-                /*new ANSITerminal(new NullInputStream(1), new NullOutputStream(), Charset.defaultCharset()) {
-
-                };*/
-
-//        Screen s = new TerminalScreen(term);
-//        s.setCursorPosition(new TerminalPosition(0,0));
-
-        DefaultVirtualTerminal term = /*new ANSITerminal(System.in, System.out, Charset.defaultCharset()) {
-
-        };*/ new DefaultVirtualTerminal() {
-
-        };
-
-        //term.enterPrivateMode();
-        //term.setCursorPosition(0,0);
-//        TerminalScreen s =
-//                //new TerminalScreen(term);
-//                new TerminalScreen(term);
-//        s.startScreen();
-
-        //final Terminal rawTerminal = new DefaultTerminalFactory().createSwingTerminal();
-        //final Terminal rawTerminal = new UnixTerminal();
-
-        Deque<Byte> outgoing = new ArrayDeque(16);
-
-        SSH ssh = new SSH("gest", "localhost", "tseg", new InputStream() {
-
-            @Override
-            public int available() throws IOException {
-                return outgoing.size();
-            }
-
-            @Override
-            public int read() throws IOException {
-                return outgoing.pop();
-            }
-        },
-                new AnsiOutputStream(new OutputStream() {
-
-                    //normal characters output
-                    @Override
-                    public void write(int i) throws IOException {
-                        term.putCharacter((char) i);
-                    }
-
-                    @Override
-                    public void flush() throws IOException {
-                        term.flush();
-                    }
-                }) {
-                    //ANSI filters
-                    @Override
-                    protected void processCursorTo(int row, int col) throws IOException {
-                        term.setCursorPosition(col, row);
-                    }
-
-
-                    @Override
-                    protected void processCursorDown(int count) throws IOException {
-                        System.out.println("down");
-                    }
-
-                    @Override
-                    protected void processCursorRight(int count) throws IOException {
-                        System.out.println("right");
-                    }
-
-                    @Override
-                    protected void processCursorUp(int count) throws IOException {
-                        System.out.println("up");
-                    }
-
-
-                    @Override
-                    protected void processCursorToColumn(int c) throws IOException {
-                        term.setCursorPosition(c, term.getCursorPosition().getRow());
-                    }
-
-                    @Override
-                    protected void processEraseLine(int eraseOption) throws IOException {
-
-//                        protected static final int ERASE_LINE_TO_END = 0;
-//                        protected static final int ERASE_LINE_TO_BEGINING = 1;
-//                        protected static final int ERASE_LINE = 2;
-                        //System.out.println("earse line: " + eraseOption);
-                        switch (eraseOption) {
-                            case 0:
-                                TerminalPosition p = term.getCursorPosition();
-
-                                //WTF lanterna why cant i access the buffer directly its private
-                                int start = p.getColumn();
-                                for (int i = start; i < term.getTerminalSize().getColumns(); i++)
-                                    term.putCharacter(' ');
-
-                                //return
-                                term.setCursorPosition(start, p.getRow());
-
-                                break;
-                        }
-                    }
-
-                    @Override
-                    protected void processEraseScreen(int eraseOption) throws IOException {
-//                        protected static final int ERASE_SCREEN_TO_END = 0;
-//                        protected static final int ERASE_SCREEN_TO_BEGINING = 1;
-//                        protected static final int ERASE_SCREEN = 2;
-
-                        switch (eraseOption) {
-                            case ERASE_SCREEN:
-                                term.clearScreen();
-                                break;
-                            case ERASE_SCREEN_TO_BEGINING:
-                                break;
-                            case ERASE_SCREEN_TO_END:
-                                //TODO make sure this is correct
-                                term.clearScreen();
-                                break;
-                        }
-                    }
-                }
-        );
-
-
-        SpaceGraph.window(new ConsoleSurface(80, 24) {
-            @Override
-            public TextCharacter charAt(int col, int row) {
-                return term.getCharacter(col, row);
-            }
-
-            @Override
-            public boolean onKey(KeyEvent e, boolean pressed) {
-
-                //only interested on release
-                if (pressed)
-                    return false;
-
-//                KeyStroke k;
-//                if (e.isActionKey()) {
-//                    KeyType type = null;
-//                    switch (e.getKeyCode()) {
-//                        case KeyEvent.VK_LEFT: type = KeyType.ArrowLeft; break;
-//                        case KeyEvent.VK_RIGHT: type = KeyType.ArrowRight; break;
-//                        case KeyEvent.VK_UP: type = KeyType.ArrowUp; break;
-//                        case KeyEvent.VK_DOWN: type = KeyType.ArrowDown; break;
-//                        case KeyEvent.VK_ENTER: type = KeyType.Enter; break;
-//                        case KeyEvent.VK_ESCAPE: type = KeyType.Escape; break;
-//                        case KeyEvent.VK_BACK_SPACE: type = KeyType.Backspace; break;
-//                        case KeyEvent.VK_PAGE_UP: type = KeyType.PageUp; break;
-//                        case KeyEvent.VK_PAGE_DOWN: type = KeyType.PageDown; break;
-//                        default:
-//                            System.err.println("unhandled key: "+ e.getKeyCode());
-//                            break;
-//                    }
-//                    if (type == null)
-//                        return false;
-//
-//                    k = new KeyStroke(type, e.isControlDown(), e.isAltDown(), e.isShiftDown());
-//                } else {
-//                    k = new KeyStroke(e.getKeyChar(), e.isControlDown(), e.isAltDown());
-//                }
-                System.out.println("in: " + e);
-                //term.addInput(k);
-
-                outgoing.add((byte) e.getKeyCode());
-
-
-
-                return true;
-            }
-        }, 1000, 600);
-    }
-
-
-//    public static void main(String[] args) throws IOException {
-//
-//        Terminal terminal = new DefaultTerminalFactory().createTerminal();
-//        System.out.println( new TerminalScreen(new UnixTerminal()).getFrontCharacter(0,0) );
-//
-//        DefaultVirtualTerminal vt1 = ShellTerminal.build(80, 25,
-//                "slashem"
-//                //"/bin/sh"
-//                //"/bin/bash"
-//                //"/bin/zsh"
-//                //"/usr/bin/fish"
-//        )/*.input(
-//            "slashem\n"
-//            //"top\n"
-//            //"htop\n"
-//            //"w\nfree\n"
-//        );*/
-//        ;
-//
-//
-//        SpaceGraph.window(new ConsoleSurface(vt1), 1200, 900);
-//    }
 
 
     /**
@@ -579,4 +376,5 @@ public abstract class ConsoleSurface extends Surface implements Appendable {
 //        }
 //
 //    }
+
 }

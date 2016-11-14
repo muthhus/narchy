@@ -56,7 +56,7 @@ public class Tetris extends NAgents {
 
         public TetrisVisualizer vis;
         public Surface plot1;
-        public ConsoleSurface term = new ConsoleSurface(40, 8);
+        //public ConsoleSurface term = new ConsoleSurface(40, 8);
 
         public Surface plot2;
         //public Plot2D lstm;
@@ -532,13 +532,13 @@ public class Tetris extends NAgents {
 //                }
 
 
-        nar.onFrame(f -> {
-            //view.lstm.update();
-            try {
-                view.term.term.putLinePre(t.summary());
-            } catch (IOException e1) {
-            }
-        });
+//        nar.onFrame(f -> {
+//            //view.lstm.update();
+//            try {
+//                view.term.term.putLinePre(t.summary());
+//            } catch (IOException e1) {
+//            }
+//        });
 
 
 //                int window = 32;
