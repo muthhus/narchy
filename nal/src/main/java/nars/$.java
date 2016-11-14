@@ -92,7 +92,7 @@ public enum $ {
 
     @NotNull
     public static Atom quote(Object text) {
-        return (Atom)$.the("'" + text + '"');
+        return (Atom)$.the("\"" + text + '"');
     }
 
 
@@ -1016,6 +1016,18 @@ public enum $ {
     public static Task command(@NotNull String functor, Term... args) {
         //TODO use lightweight CommandTask impl without all the logic metadata
         return command(func(functor, args));
+    }
+
+    @NotNull
+    public static String unquote(@NotNull Term s) {
+        String x = s.toString();
+        if (s instanceof Atom) {
+            int len = x.length();
+            if (len > 0 && x.charAt(0) == '\"' && x.charAt(len - 1) == '\"') {
+                return x.substring(1, len - 1);
+            }
+        }
+        return x;
     }
 
 

@@ -65,19 +65,5 @@ public class Atom extends AtomicString {
     }
 
 
-    @NotNull
-    public static String unquote(@NotNull Term s) {
-        return toUnquoted(s.toString());
-    }
-
-    @NotNull
-    public static String toUnquoted(@NotNull String x) {
-        int len = x.length();
-        if (len > 0 && x.charAt(0) == '\"' && x.charAt(len - 1) == '\"') {
-            return x.substring(1, len - 1);
-        }
-        return x;
-    }
-
 }
 

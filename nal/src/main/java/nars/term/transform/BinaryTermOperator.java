@@ -3,6 +3,7 @@ package nars.term.transform;
 import nars.$;
 import nars.bag.Bag;
 import nars.concept.AtomConcept;
+import nars.concept.PermanentConcept;
 import nars.term.Compound;
 import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
@@ -10,7 +11,7 @@ import org.jetbrains.annotations.NotNull;
 /**
  * Created by me on 12/12/15.
  */
-public abstract class BinaryTermOperator extends AtomConcept implements TermTransform {
+public abstract class BinaryTermOperator extends AtomConcept implements TermTransform, PermanentConcept {
 
     protected BinaryTermOperator(@NotNull String id) {
         super($.the(id), Bag.EMPTY, Bag.EMPTY);

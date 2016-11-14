@@ -11,7 +11,6 @@ import nars.concept.Concept;
 import nars.nar.Default;
 import nars.term.Term;
 import nars.term.Termed;
-import nars.term.atom.Atom;
 import nars.term.obj.IntTerm;
 import nars.test.DeductiveMeshTest;
 import nars.util.Texts;
@@ -175,7 +174,7 @@ public class WebServer /*extends PathHandler*/ {
                     }
                     return parallel(pp);
                 } else {
-                    String expr = Atom.unquote(t);
+                    String expr = unquote(t);
                     Object r;
                     try {
                         r = Ognl.getValue(expr, nar);

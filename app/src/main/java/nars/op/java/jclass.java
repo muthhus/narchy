@@ -20,7 +20,7 @@ public class jclass extends TermFunction {
         try {
             Term t = x.term(0);
             if (t instanceof Atom) {
-                String tt = ((Atom)t).toStringUnquoted();
+                String tt = $.unquote(t);
                 Class c = Class.forName(tt);
                 return $.p(termizer.term(c), termizer.term(c.getMethods()));
             }

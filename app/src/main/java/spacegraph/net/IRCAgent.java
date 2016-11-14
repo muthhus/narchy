@@ -278,9 +278,9 @@ public class IRCAgent extends IRC {
                     return;
                 //@NotNull Bag<Concept> cbag = ((Default) nar).core.concepts;
                 //" | core pri: " + cbag.priMin() + "<" + Texts.n4(cbag.priHistogram(5)) + ">" + cbag.priMax();
-                case "top":
-                    pevent.respondWith(top(Terms.ZeroProduct));
-                    return;
+//                case "top":
+//                    pevent.respondWith(top(Terms.ZeroProduct));
+//                    return;
                 case "clear":
                     ((Default) nar).core.active.clear();
                     pevent.respondWith("Ready.");
@@ -503,30 +503,6 @@ public class IRCAgent extends IRC {
 //    }
 
 
-    public int MAX_RESULT_LENGTH = 800;
 
-    @Nullable
-    public String top(Compound arguments) {
-
-        StringBuilder b = new StringBuilder();
-        @NotNull Bag<Concept> cbag = ((Default) nar).core.active;
-
-        String query;
-        if (arguments.size() > 0 && arguments.term(0) instanceof Atom) {
-            query = arguments.term(0).toString().toLowerCase();
-        } else {
-            query = null;
-        }
-
-        cbag.topWhile(c -> {
-            String bs = c.get().toString();
-            if (query == null || bs.toLowerCase().contains(query)) {
-                b.append(c.get()).append('=').append(Texts.n2(c.pri())).append("  ");
-            }
-            return b.length() <= MAX_RESULT_LENGTH;
-        });
-
-        return b.toString();
-    }
 
 }

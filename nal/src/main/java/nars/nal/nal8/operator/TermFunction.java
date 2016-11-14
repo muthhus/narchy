@@ -13,7 +13,6 @@ import nars.table.BeliefTable;
 import nars.task.MutableTask;
 import nars.term.Compound;
 import nars.term.Term;
-import nars.term.atom.Atom;
 import nars.term.var.Variable;
 import nars.time.Tense;
 import nars.truth.DefaultTruth;
@@ -54,7 +53,7 @@ public abstract class TermFunction<O> extends AbstractOperator {
     }
 
     public static int integer(@NotNull Term x) throws NumberFormatException {
-        return Texts.i(Atom.unquote(x));
+        return Texts.i($.unquote(x));
     }
 
     //TODO supply the execution instead of the TermBuilder which is referenced from it. in TermBuilder, supply a dummy Execution context for the ImmediateTransforms that need it

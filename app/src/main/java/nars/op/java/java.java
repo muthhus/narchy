@@ -1,5 +1,6 @@
 package nars.op.java;
 
+import nars.$;
 import nars.index.term.TermIndex;
 import nars.nal.nal8.operator.TermFunction;
 import nars.term.Compound;
@@ -23,7 +24,7 @@ public class java extends TermFunction {
         //TODO handle multi-arg by returning a tuple of that # elements each processed
         Term x = args.term(0);
         if (x instanceof Atom) {
-            String s = Atom.unquote(x);
+            String s = $.unquote(x);
 
             Class cl = resolveClass(s);
             if (cl != null)

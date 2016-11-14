@@ -12,7 +12,6 @@ import org.jetbrains.annotations.Nullable;
 import java.io.IOException;
 import java.util.function.Predicate;
 
-import static nars.term.atom.Atom.toUnquoted;
 
 /** Base class for Atomic types. */
 public interface Atomic extends Term {
@@ -57,10 +56,6 @@ public interface Atomic extends Term {
         return false;
     }
 
-    @NotNull
-    default String toStringUnquoted() {
-        return toUnquoted(toString());
-    }
 
     @Override
     default void append(@NotNull Appendable w) throws IOException {

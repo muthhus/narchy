@@ -60,6 +60,12 @@ abstract public class Functor extends AtomConcept implements TermTransform, Perm
     public static Concept f0(@NotNull String termAtom, @NotNull Supplier<Term> ff) {
         return f0(fName(termAtom), ff);
     }
+    public static Concept f0(@NotNull String termAtom, @NotNull Runnable ff) {
+        return f0(fName(termAtom), ()-> {
+            ff.run();
+            return null;
+        });
+    }
 
 
     /** one argument functor (convenience method) */

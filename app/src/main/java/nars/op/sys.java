@@ -25,7 +25,8 @@ public class sys extends TermFunction {
     public Object function(Compound args, TermIndex i) {
         for (Term x : args.terms()) {
             if (x instanceof Atom) {
-                String cmd = ((Atom) x).toStringUnquoted();
+
+                String cmd = $.unquote(x);
 
                 long pid = -1;
                 try {
