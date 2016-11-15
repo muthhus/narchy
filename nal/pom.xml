@@ -89,12 +89,12 @@
 
             <exclusions>
                 <exclusion>
-                    <artifactId>org.ow2.asm</artifactId>
-                    <groupId>*</groupId>
+                    <groupId>org.ow2.asm</groupId>
+                    <artifactId>*</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>com.google.guava</artifactId>
-                    <groupId>guava</groupId>
+                    <artifactId>guava</artifactId>
+                    <groupId>com.google.guava</groupId>
                 </exclusion>
             </exclusions>
         </dependency>

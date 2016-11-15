@@ -22,7 +22,7 @@ public class Surface {
     public final v2 scaleLocal;
 
     public Surface parent;
-    public List<Surface> children;
+    volatile public List<Surface> children;
 
     public Surface() {
         translateLocal = new v3();

@@ -686,7 +686,7 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept, Ter
         }
 
         @Override public float focus(float dt, float evidence) {
-            return TruthPolation.timeDecay(evidence, clock.duration(), dt);
+            return TruthPolation.evidenceDecay(evidence, clock.duration(), dt);
         }
     }
 }

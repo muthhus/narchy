@@ -51,7 +51,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import static com.jogamp.opengl.util.gl2.GLUT.STROKE_MONO_ROMAN;
-import static jdk.nashorn.internal.runtime.regexp.joni.encoding.CharacterType.ALPHA;
 import static spacegraph.math.v3.v;
 import static spacegraph.render.JoglSpace.glut;
 import static spacegraph.test.Lesson14.renderString;
@@ -684,6 +683,9 @@ public enum Draw {
         gl.glColor3f(r, g, b);
     }
 
+    public static void colorHash(Object x, float[] color) {
+        Draw.hsb((x.hashCode()%500) / 500f * 360.0f, 0.7f, 0.7f, 1f, color);
+    }
 
 
 //

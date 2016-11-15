@@ -31,13 +31,12 @@ public class Plot2D extends Surface {
 
     //public static final ColorMatrix ca = new ColorMatrix(17, 1, (x, y) -> Color.hsb(x * 360.0, 0.6f, y * 0.5 + 0.5));
 
-    public static abstract class Series extends FloatArrayList {
+    public static class Series extends FloatArrayList {
 
-        final String name;
+        String name;
 
         /** history size */
         private final int capacity;
-        private final FloatProcedure rangeFinder;
 
         protected transient float maxValue, minValue;
 
@@ -52,34 +51,39 @@ public class Plot2D extends Surface {
         @SuppressWarnings("ConstructorNotProtectedInAbstractClass")
         public Series(String name, int capacity) {
             super(capacity);
-
-            this.name = name;
-            this.color = new float[4];
-            Draw.hsb((name.hashCode()%500) / 500f * 360.0f, 0.7f, 0.7f, 1f, color);
-
+            setName(name);
             this.capacity = capacity;
-
-            this.rangeFinder = v -> {
-                if (v < minValue) minValue = v;
-                if (v > maxValue) maxValue = v;
-                //mean += v;
-            };
         }
+
+        public Series(String name, float[] data) {
+            super(data);
+            setName(name);
+            capacity = data.length;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+            Draw.colorHash( name, color );
+        }
+
 
         @Override
         public String toString() {
             return name + '[' + size() + "/" + capacity + "]";
         }
 
-        public abstract void update();
+        public void update() {
 
-
-
+        }
 
         protected void autorange() {
             minValue = Float.POSITIVE_INFINITY;
             maxValue = Float.NEGATIVE_INFINITY;
-            forEach(rangeFinder);
+            forEach(v -> {
+                if (v < minValue) minValue = v;
+                if (v > maxValue) maxValue = v;
+                //mean += v;
+            });
         }
 
         protected void limit() {

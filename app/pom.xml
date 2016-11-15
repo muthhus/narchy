@@ -51,7 +51,6 @@
         </dependency>
 
 
-
         <dependency>
             <groupId>com.github.drapostolos</groupId>
             <artifactId>type-parser</artifactId>
@@ -135,6 +134,10 @@
                     <artifactId>slf4j-log4j12</artifactId>
                     <groupId>org.slf4j</groupId>
                 </exclusion>
+                <exclusion>
+                    <artifactId>guava</artifactId>
+                    <groupId>com.google.guava</groupId>
+                </exclusion>
             </exclusions>
         </dependency>
 
@@ -184,6 +187,12 @@
             <groupId>org.pircbotx</groupId>
             <artifactId>pircbotx</artifactId>
             <version>2.1</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>guava</artifactId>
+                    <groupId>com.google.guava</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>

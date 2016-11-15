@@ -102,6 +102,7 @@ public class Hack {
       //return s.toCharArray();
   }
 
+  /** TODO microbenchmark comparison if this faster than String.compareTo */
   public static int compare(String x, String y) {
       return (x == y) ? 0 : Arrays.compare(bytes(x), bytes(y));
 

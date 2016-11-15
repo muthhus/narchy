@@ -726,4 +726,6 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
         return LongSets.immutable.of(evidence());
     }
 
+    float conf(long occ);
+
 }

@@ -238,7 +238,7 @@
         //B, (C ==> A), task(negative), belief(negative), time(decomposeBelief) |- subIfUnifiesAny(C,A,B), (Belief:AbductionPN, Goal:DeductionPN)
 
     B, (A <=> C), belief(positive), time(decomposeBelief), neqCom(B,C) |- subIfUnifiesAny(C,A,B), (Belief:Analogy, Goal:Strong)
-        B, (A <=> C), belief(negative), time(decomposeBelief), neqCom(B,C) |- subIfUnifiesAny((--,%C),A,B), (Belief:AnalogyPN, Goal:StrongPN)
+        //BAD: B, (A <=> C), belief(negative), time(decomposeBelief), neqCom(B,C) |- subIfUnifiesAny((--,%C),A,B), (Belief:AnalogyPN, Goal:StrongPN)
 
     //these are only valid if A occurrs during or after C. the opposite is not logical and would also produce redundant results
     B, (C && A), task(positive), time(decomposeBelief), neqCom(B,C) |- subIfUnifiesForward(C,A,B), (Goal:Strong)
@@ -253,7 +253,7 @@
 
     S, (&&,S,A..+), time(decomposeBelief) |- (&&,A..+), (Belief:DecomposePositiveNegativeNegative)
         //S, (||,S,A..+)                        |- (||,A..+), (Belief:DecomposeNegativePositivePositive)
-    S, (&&,(--,%S),A..+), time(decomposeBelief) |- (&&,A..+), (Belief:DecomposeNegativeNegativeNegative)
+    //BAD: S, (&&,(--,%S),A..+), time(decomposeBelief) |- (&&,A..+), (Belief:DecomposeNegativeNegativeNegative)
         //S, (||,(--,%S),A..+)                        |- (||,A..+), (Belief:DecomposePositivePositivePositive)
 
 

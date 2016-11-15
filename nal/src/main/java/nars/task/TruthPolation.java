@@ -38,18 +38,12 @@ public final class TruthPolation extends InterpolatingMicrosphere {
 
     }
 
-    public static float timeDecay(float evi, float dur, float dt) {
-        //assert(dt > 0);
-//        if (dt < 0)
-//            throw new UnsupportedOperationException();
-
-        return evi / (1f +
-            dt / dur //1st-order linear decay
-        );
+    public static float evidenceDecay(float evi, float dur, float dt) {
+        return evi / (1f + dt / dur );
     }
 
     @Deprecated private static Focus decayCurve(float dur) {
-        return (dt, evi) -> timeDecay(evi, dur, dt);
+        return (dt, evi) -> evidenceDecay(evi, dur, dt);
     }
 
     /** only used by Tests for now */

@@ -14,6 +14,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 
 import static nars.$.t;
+import static nars.time.Tense.ETERNAL;
 
 /**
  * Mutable task with additional fluent api utility methods
@@ -52,6 +53,16 @@ public class MutableTask extends AbstractTask {
         return this;
     }
 
+    @Override
+    public float conf(long occ) {
+        if (occ == ETERNAL)
+            return conf();
+
+        long o = occurrence();
+        if (o!=occ)
+            return 0;
+        return conf();
+    }
 
     @NotNull
     public final MutableTask truth(float freq, float conf) {
