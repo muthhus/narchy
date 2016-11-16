@@ -47,7 +47,7 @@ public class ArithmeticInduction {
         if (op!=CONJ || !(((dt == DTERNAL) || (dt == 0))) || args.size() < 2 || !args.hasAny(Op.INT))
             return args; //early exit condition
 
-        MutableSet<Term> xx = args.toSet();
+        Set<Term> xx = args.toSet();
         Set<Term> yy = compress(xx, 2);
 
         if (!yy.equals(xx)) {

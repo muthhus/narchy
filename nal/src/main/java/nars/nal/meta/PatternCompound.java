@@ -355,7 +355,7 @@ abstract public class PatternCompound extends GenericCompound {
 
             }
 
-            MutableSet<Term> yFree = y.toSet();
+            Set<Term> yFree = y.toSet();
 
             if (ellipsisMatched) {
                 //Xellipsis = null;
@@ -380,7 +380,7 @@ abstract public class PatternCompound extends GenericCompound {
         /**
          * toMatch matched into some or all of Y's terms
          */
-        boolean matchEllipsisCommutive(@NotNull Unify subst, @NotNull Set<Term> xFree, @NotNull MutableSet<Term> yFree) {
+        boolean matchEllipsisCommutive(@NotNull Unify subst, @NotNull Set<Term> xFree, @NotNull Set<Term> yFree) {
             int xs = xFree.size();
 
             switch (xs) {

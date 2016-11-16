@@ -102,7 +102,7 @@ public class Terms   {
 
 
 
-    public static boolean equalSubTermsInRespectToImageAndProduct(@Nullable Term a, @Nullable Term b) {
+    @Deprecated public static boolean equalSubTermsInRespectToImageAndProduct(@Nullable Term a, @Nullable Term b) {
 
         /*if (a == null || b == null) {
             return false;

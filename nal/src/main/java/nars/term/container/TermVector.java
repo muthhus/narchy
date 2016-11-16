@@ -210,7 +210,7 @@ public abstract class TermVector implements TermContainer {
 
     /** accelerated implementation */
     @Override
-    public final boolean equalTerms(@NotNull TermContainer c) {
+    public boolean equalTerms(@NotNull TermContainer c) {
 
         int cl = c.size();
         for (int i = 0; i < cl; i++) {

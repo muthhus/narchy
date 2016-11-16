@@ -109,7 +109,7 @@ public interface TermContainer extends Termlike, Iterable<Term> {
         return size() <= i ? ifOutOfBounds : term(i);
     }
 
-    default @NotNull MutableSet<Term> toSet() {
+    default @NotNull Set<Term> toSet() {
         return mutable.of(terms());
     }
 
@@ -263,7 +263,6 @@ public interface TermContainer extends Termlike, Iterable<Term> {
         return (hashCode() == b.hashCode()) &&
                 //(structure() == b.structure()) &&
                 //(volume() == b.volume()) &&
-                (size() == b.size()) &&
                 (equalTerms(b));
     }
 
@@ -272,6 +271,8 @@ public interface TermContainer extends Termlike, Iterable<Term> {
      * size should already be known equal
      */
     default boolean equalTerms(@NotNull TermContainer c) {
+        if (size()!=c.size())
+            return false;
         int cl = size();
         for (int i = 0; i < cl; i++) {
             if (!term(i).equals(c.term(i)))
@@ -674,16 +675,16 @@ public interface TermContainer extends Termlike, Iterable<Term> {
      * for use with commutive (TermSet's)
      */
     @NotNull
-    static TermContainer except(@NotNull TermContainer c, @NotNull MutableSet<Term> toRemove) {
-        MutableSet<Term> s = c.toSet();
+    static TermContainer except(@NotNull TermContainer c, @NotNull Set<Term> toRemove) {
+        Set<Term> s = c.toSet();
         if (s.removeAll(toRemove)) {
             return TermSet.the(s);
         }
         return c; //unchanged
     }
     @NotNull
-    static MutableSet<Term> exceptToSet(@NotNull TermContainer c, @NotNull MutableSet<Term> toRemove) {
-        MutableSet<Term> s = c.toSet();
+    static Set<Term> exceptToSet(@NotNull TermContainer c, @NotNull MutableSet<Term> toRemove) {
+        Set<Term> s = c.toSet();
         s.removeAll(toRemove);
         return s;
     }
