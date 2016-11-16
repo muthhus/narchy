@@ -11,6 +11,7 @@ import nars.nal.rule.PremiseRule;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
+import nars.term.container.TermContainer;
 import nars.term.util.InvalidTermException;
 import nars.util.Util;
 import org.jetbrains.annotations.NotNull;
@@ -1051,9 +1052,10 @@ public interface TimeFunctions {
             dt = DTERNAL;
         }
         if (derived.dt() != dt) {
-            @NotNull Term n = terms.the(o, dt, derived.subterms());
+            TermContainer ds = derived.subterms();
+            @NotNull Term n = terms.the(o, dt, ds);
             if (!(n instanceof Compound))
-                throw new InvalidTermException(o, dt, derived.subterms(), "Untemporalizable to new DT");
+                throw new InvalidTermException(o, dt, ds, "Untemporalizable to new DT");
             return (Compound) n;
         } else {
             return derived;

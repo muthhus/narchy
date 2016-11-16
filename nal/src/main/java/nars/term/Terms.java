@@ -14,6 +14,7 @@ import nars.util.data.sorted.SortedList;
 import org.eclipse.collections.api.block.predicate.primitive.IntObjectPredicate;
 import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.api.set.ImmutableSet;
+import org.eclipse.collections.api.set.MutableSet;
 import org.eclipse.collections.api.tuple.primitive.ObjectIntPair;
 import org.eclipse.collections.impl.bag.mutable.HashBag;
 import org.eclipse.collections.impl.set.mutable.UnifiedSet;
@@ -286,7 +287,8 @@ public class Terms   {
         return r;
     }
 
-    public static Term[] toSortedSetArray(@NotNull Term... arg) {
+
+    public static Term[] sorted(@NotNull Term... arg) {
         switch (arg.length) {
 
             case 0:
@@ -596,12 +598,12 @@ public class Terms   {
 
         if (subsChanged || dtChanged) {
 
-            GenericCompound xx = new GenericCompound(o,
+            Compound xx = $.terms.newCompound(o,
                     dtChanged ? DTERNAL : pdt,
                     subsChanged ? newSubs : psubs);
 
             if (c.isNormalized())
-                xx.setNormalized();
+                ((GenericCompound)xx).setNormalized();
 
             //Termed exxist = get(xx, false); //early exit: atemporalized to a concept already, so return
             //if (exxist!=null)
@@ -786,6 +788,14 @@ public class Terms   {
         } else {
             return a.equals(b);
         }
+    }
+
+    /** a Set is already duplicate free, so just sort it */
+    public static Term[] sorted(Set<Term> s) {
+        Term[] x = s.toArray(new Term[s.size()]);
+        if ((x.length > 2) && (!(s instanceof SortedSet)))
+            Arrays.sort(x);
+        return x;
     }
 
     interface SubtermScorer {

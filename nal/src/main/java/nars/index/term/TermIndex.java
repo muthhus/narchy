@@ -93,12 +93,6 @@ public abstract class TermIndex extends TermBuilder {
     @NotNull
     abstract public ConceptBuilder conceptBuilder();
 
-    /**
-     * override to possibly intern termcontainers
-     */
-    @NotNull public TermContainer intern(@NotNull TermContainer s) {
-        return s;
-    }
 
 
     /**
@@ -176,11 +170,6 @@ public abstract class TermIndex extends TermBuilder {
     }
 
 
-    @Override
-    @NotNull
-    protected Term newCompound(@NotNull Op op, int dt, @NotNull TermContainer s) {
-        return super.newCompound(op, dt, intern(s));
-    }
 
 
 

@@ -131,11 +131,11 @@ public class TermTest {
         Term b = n.term("b").term();
         Term c = n.term("c").term();
 
-        assertEquals(3, Terms.toSortedSetArray(a, b, c).length);
-        assertEquals(2, Terms.toSortedSetArray(a, b, b).length);
-        assertEquals(1, Terms.toSortedSetArray(a, a).length);
-        assertEquals(1, Terms.toSortedSetArray(a).length);
-        assertEquals("correct natural ordering", a, Terms.toSortedSetArray(a, b)[0]);
+        assertEquals(3, Terms.sorted(a, b, c).length);
+        assertEquals(2, Terms.sorted(a, b, b).length);
+        assertEquals(1, Terms.sorted(a, a).length);
+        assertEquals(1, Terms.sorted(a).length);
+        assertEquals("correct natural ordering", a, Terms.sorted(a, b)[0]);
     }
 
     @Test

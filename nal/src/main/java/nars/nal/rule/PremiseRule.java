@@ -930,7 +930,7 @@ public class PremiseRule extends GenericCompound {
 
             Term[] modifiers = ((Compound) postcons[i++]).terms();
 
-            postConditions.add(PostCondition.make(this, t, toSortedSetArray(modifiers)));
+            postConditions.add(PostCondition.make(this, t, sorted(modifiers)));
         }
 
         if (Sets.newHashSet(postConditions).size() != postConditions.size())

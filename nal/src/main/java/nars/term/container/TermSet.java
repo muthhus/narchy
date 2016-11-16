@@ -3,18 +3,16 @@ package nars.term.container;
 
 import nars.term.Term;
 import nars.term.Terms;
+import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 
 public class TermSet {
 
     @NotNull
     public static TermContainer the(@NotNull Term... x) {
-        return TermVector.the(Terms.toSortedSetArray(x));
+        return TermVector.the(Terms.sorted(x));
     }
 
     public static TermContainer concat(@NotNull Term[] a, @NotNull Term... b) {
@@ -24,14 +22,17 @@ public class TermSet {
 //        }
         TreeSet<Term> t = new TreeSet<>();
         Collections.addAll(t, a);
-        return TermSet.concat(t, b);
+        return TermSet.the(TermSet.concat(t, b));
     }
 
-    public
+    public static Term[] concatArray(@NotNull Term[] a, @NotNull Term... b) {
+        return Terms.sorted(ArrayUtils.addAll(a, b));
+    }
+
     @NotNull
-    static TermContainer concat(@NotNull TreeSet<Term> t, Term[] b) {
+    static Set<Term> concat(@NotNull TreeSet<Term> t, Term[] b) {
         Collections.addAll(t, b);
-        return TermSet.the(t);
+        return t;
     }
 
 

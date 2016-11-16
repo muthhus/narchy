@@ -51,11 +51,27 @@ public interface TermContainer extends Termlike, Iterable<Term> {
             //the smaller is contained by the larger other
             return as > bs ? a : b;
         }
-
         return TermSet.the(t);
     }
 
 
+    static Term[] unionArray(TermContainer a, TermContainer b) {
+
+        if (a.equals(b))
+            return a.terms();
+
+        int as = a.size();
+        int bs = b.size();
+        int maxSize = Math.max(as, bs);
+        TreeSet<Term> t = new TreeSet<>();
+        a.copyInto(t);
+        b.copyInto(t);
+        if (t.size() == maxSize) {
+            //the smaller is contained by the larger other
+            return as > bs ? a.terms() : b.terms();
+        }
+        return Terms.toArray(t);
+    }
 
     @NotNull
     default public TermContainer append(@NotNull Term x) {
@@ -553,13 +569,13 @@ public interface TermContainer extends Termlike, Iterable<Term> {
 
     @NotNull
     static TermContainer the(@NotNull Op op, @NotNull Term... tt) {
-        return requiresTermSet(op, tt.length) ?
+        return requiresSorting(op, tt.length) ?
                 TermSet.the(tt) :
                 TermVector.the(tt);
     }
 
 
-    static boolean requiresTermSet(@NotNull Op op, int num) {
+    public static boolean requiresSorting(@NotNull Op op, int num) {
         return
             /*(dt==0 || dt==ITERNAL) &&*/ //non-zero or non-iternal dt disqualifies any reason for needing a TermSet
                 ((num > 1) && op.commutative);

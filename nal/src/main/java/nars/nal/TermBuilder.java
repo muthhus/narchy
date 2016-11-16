@@ -2,12 +2,10 @@ package nars.nal;
 
 import nars.$;
 import nars.Op;
-import nars.Param;
 import nars.nal.meta.match.Ellipsislike;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Terms;
-import nars.term.atom.AtomicSingleton;
 import nars.term.compound.GenericCompound;
 import nars.term.container.TermVector;
 import nars.term.container.TermContainer;
@@ -19,10 +17,7 @@ import org.eclipse.collections.api.set.MutableSet;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.TreeSet;
+import java.util.*;
 
 import static java.util.Arrays.copyOfRange;
 import static nars.Op.*;
@@ -307,10 +302,23 @@ public abstract class TermBuilder {
     }
 
 
-    @NotNull
-    protected Term newCompound(@NotNull Op op, int dt, @NotNull TermContainer subterms) {
-        return new GenericCompound(op, dt, subterms);
+    /**
+     * override to possibly intern termcontainers
+     */
+    @NotNull public TermContainer intern(@NotNull TermContainer s) {
+        return s;
     }
+
+    @NotNull
+    public final Compound newCompound(@NotNull Op op, int dt, Term[] subterms) {
+        return new GenericCompound(op, dt, intern(TermVector.the(subterms)));
+    }
+
+    @Deprecated
+    public final Compound newCompound(@NotNull Op op, int dt, TermContainer subterms) {
+        return newCompound(op, dt, subterms.terms());
+    }
+
 
     @NotNull
     public final Term the(@NotNull Op op, @NotNull Term... tt) {
@@ -346,13 +354,16 @@ public abstract class TermBuilder {
     }
 
     @NotNull
-    private Term finish(@NotNull Op op, @NotNull TermContainer args) {
-        return finish(op, DTERNAL, args);
+    private Term finish(@NotNull Op op, int dt, @NotNull Term... args) {
+        if (TermContainer.requiresSorting(op, dt)) {
+            args = Terms.sorted(args);
+        }
+        return finalize(op, dt, args);
     }
 
     @NotNull
-    private Term finish(@NotNull Op op, int dt, @NotNull Term... args) {
-        return finish(op, dt, TermContainer.the(op, args));
+    private Term finish(@NotNull Op op, int dt, @NotNull Set<Term> args) {
+        return finalize(op, dt, Terms.sorted(args));
     }
 
     public static boolean isTrueOrFalse(@NotNull Term x) {
@@ -369,17 +380,25 @@ public abstract class TermBuilder {
     }
 
 
+    @NotNull
+    private Term finalize(@NotNull Op op, @NotNull Term[] args) {
+        return finalize(op, DTERNAL, args);
+    }
+
     /**
-     * final step in compound construction
+     * terms must be sorted, if they need to be, before calling.
      */
     @NotNull
-    private Term finish(@NotNull Op op, int dt, @NotNull TermContainer args) {
+    private Term finalize(@NotNull Op op, int dt, @NotNull Term[] args) {
 
         //if (Param.DEBUG ) {
         //check for any imdex terms that may have not been removed
-        int s = args.size();
+        int s = args.length;
         for (int i = 0; i < s; i++) {
-            Term x = args.term(i);
+            Term x = args[i];
+            if (x == null)
+                return False;
+
             if (isTrueOrFalse(x)) {
                 if ((op == NEG) || (op == CONJ) || (op == IMPL) || (op == EQUI))
                    throw new RuntimeException("appearance of True/False in " + op + " should have been filtered prior to this");
@@ -389,15 +408,15 @@ public abstract class TermBuilder {
             }
         }
 
-        if (Param.ARITHMETIC_INDUCTION)
-            args = ArithmeticInduction.compress(op, dt, args);
+//        if (Param.ARITHMETIC_INDUCTION)
+//            args = ArithmeticInduction.compress(op, dt, args);
 
         if (s == 0) {
             throw new RuntimeException("should not have zero args here");
         }
         if (s == 1 && op.minSize > 1) {
             //special case: allow for ellipsis to occupy one item even if minArity>1
-            Term a0 = args.term(0);
+            Term a0 = args[0];
             if (!(a0 instanceof Ellipsislike)) {
                 //return null;
                 //throw new RuntimeException("invalid size " + s + " for " + op);
@@ -576,7 +595,7 @@ public abstract class TermBuilder {
                 TreeSet<Term> ts = conjTrueFalseFilter(cs);
                 if (ts == null || ts.isEmpty())
                     return False;
-                return finish(op, dt, TermSet.the(ts));
+                return finish(op, dt, ts);
         }
 
     }
@@ -646,7 +665,7 @@ public abstract class TermBuilder {
                 next = s.iterator().next();
                 break;
             default:
-                next = the(CONJ, innerDT, TermSet.the(s));
+                next = the(CONJ, innerDT, Terms.toArray(s));
                 break;
         }
 
@@ -902,7 +921,7 @@ public abstract class TermBuilder {
 
                 }
 
-                return finish(op, dt, TermVector.the(subject, predicate)); //use the calculated ordering, not the TermContainer default for commutives
+                return finalize(op, dt, new Term[] { subject, predicate } ); //use the calculated ordering, not the TermContainer default for commutives
 
             }
         }
@@ -1025,9 +1044,10 @@ public abstract class TermBuilder {
         //reduction between one or both of the intersection type
 
         if (o1 == intersection) {
-            return finish(intersection, TermSet.concat(
-                    ((TermContainer) term1).terms(),
-                    o2 == intersection ? ((TermContainer) term2).terms() : new Term[]{term2}
+            return finish(intersection,
+                    TermSet.concatArray(
+                        ((TermContainer) term1).terms(),
+                        o2 == intersection ? ((TermContainer) term2).terms() : new Term[]{term2}
                     )
             );
         }
@@ -1044,16 +1064,16 @@ public abstract class TermBuilder {
         MutableSet<Term> s = TermContainer.intersect(
                 /*(TermContainer)*/ a, /*(TermContainer)*/ b
         );
-        return s.isEmpty() ? empty(o) : (Compound) finish(o, TermContainer.the(o, s));
+        return s.isEmpty() ? empty(o) : (Compound) finish(o, Terms.sorted(s));
     }
 
 
     @NotNull
     public Compound union(@NotNull Op o, @NotNull Compound term1, @NotNull Compound term2) {
-        TermContainer u = TermContainer.union(term1, term2);
-        if (u == term1)
+        Term[] u = TermContainer.unionArray(term1, term2);
+        if (term1.equivalent(u))
             return term1;
-        else if (u == term2)
+        else if (term2.equivalent(u))
             return term2;
         else
             return (Compound) finish(o, u);
@@ -1062,9 +1082,7 @@ public abstract class TermBuilder {
     @NotNull public Term the(@NotNull Compound csrc, @NotNull Term[] newSubs) {
         return the(csrc.op(), csrc.dt(), newSubs);
     }
-    @NotNull public Term the(@NotNull Compound csrc, @NotNull TermContainer newSubs) {
-        return the(csrc.op(), csrc.dt(), newSubs.terms());
-    }
+
     @NotNull public Term the(@NotNull Op op, int dt, @NotNull TermContainer newSubs) {
         return the(op, dt, newSubs.terms());
     }
