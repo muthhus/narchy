@@ -21,6 +21,7 @@ import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Longs;
 import nars.util.data.LongString;
 import nars.util.list.FasterList;
+import org.apache.commons.lang3.ArrayUtils;
 import org.eclipse.collections.api.block.function.primitive.IntToFloatFunction;
 import org.eclipse.collections.api.tuple.Pair;
 import org.eclipse.collections.impl.list.mutable.primitive.DoubleArrayList;
@@ -911,6 +912,13 @@ public enum Util { ;
         return s;
     }
 
+    /** modifies the input array */
+    public static <X> X[] reverse(X[] array) {
+        if(array != null) {
+            ArrayUtils.reverse(array, 0, array.length);
+        }
+        return array;
+    }
 
     public static int[] reverse(IntArrayList l) {
         switch (l.size()) {

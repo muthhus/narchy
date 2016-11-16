@@ -22,7 +22,7 @@ public class NAL5Test extends AbstractNALTest {
         return AbstractNALTest.nars(5);
     }
 
-    final int cycles = 250;
+    final int cycles = 550;
 
     @Test public void revision(){
         test()
@@ -206,6 +206,7 @@ public class NAL5Test extends AbstractNALTest {
     @Test
     public void compound_decomposition_two_premises2(){
         TestNAR tester = test();
+        tester.log();
         tester.believe("(&&,<robin --> [flying]>,<robin --> swimmer>)",0.0f,0.9f); //.en("Robin cannot be both a flyer and a swimmer.");
         tester.believe("<robin --> [flying]>"); //.en("Robin can fly.");
         tester.mustBelieve(cycles,"<robin --> swimmer>",0.00f,0.81f); //.en("Robin cannot swim.");

@@ -4,7 +4,7 @@ import nars.Op;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Terms;
-import nars.term.container.TermVector;
+import nars.term.container.ArrayTermVector;
 import nars.term.subst.Unify;
 import nars.term.visit.SubtermVisitor;
 import nars.term.visit.SubtermVisitorX;
@@ -21,7 +21,7 @@ import java.util.List;
  * subterm collection, and post-filter before
  * forming a resulting substituted term.
  */
-public class EllipsisMatch extends TermVector implements Term {
+public class EllipsisMatch extends ArrayTermVector implements Term {
 
     //    public static ArrayEllipsisMatch matchedSubterms(Compound Y, IntObjectPredicate<Term> filter) {
 //        Function<IntObjectPredicate,Term[]> arrayGen =

@@ -1,9 +1,9 @@
 package nars.term;
 
 import nars.$;
+import nars.term.container.TermVector;
 import nars.term.container.TermContainer;
 import nars.term.container.TermSet;
-import nars.term.container.TermVector;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -76,7 +76,7 @@ public class TermVectorTest {
         assertTrue(a.isSorted());
         TermContainer b = TermVector.the($.$("b"), $.$("a"));
         assertFalse(b.isSorted());
-        TermVector s = TermSet.the(b.terms());
+        TermContainer s = TermSet.the(b.terms());
         assertTrue(s.isSorted());
         assertEquals(a, s);
         assertNotEquals(b, s);

@@ -12,77 +12,45 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.eclipse.collections.api.block.predicate.primitive.IntObjectPredicate;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.function.Consumer;
 
 /**
- * Holds a vector or tuple of terms.
- * Useful for storing a fixed number of subterms
- *
- * TODO make this class immutable and term field private
- * provide a MutableTermVector that holds any write/change methods
+ * Created by me on 11/16/16.
  */
-public class TermVector implements TermContainer {
-
-
-    /**
-     * list of (direct) term
-     * TODO make not public
-     */
-    @NotNull
-    public final Term[] terms;
-
-
-
+public abstract class TermVector implements TermContainer {
     /** normal high-entropy "content" hash */
     public  final int hash;
-
     /**
      * bitvector of subterm types, indexed by NALOperator's .ordinal() and OR'd into by each subterm
      * low-entropy, use 'hash' for normal hash operations.
      */
     public  final int structure;
-
-
     /** stored as volume+1 as if this termvector were already wrapped in its compound */
     public  final short volume;
     /** stored as complexity+1 as if this termvector were already wrapped in its compound */
     public  final short complexity;
-
     /**
      * # variables contained, of each type & total
      * this means maximum of 127 variables per compound
      */
-    public final byte vars;
     public final byte varQuerys;
     public final byte varIndeps;
     public final byte varPatterns;
     public final byte varDeps;
 
+    public TermVector(Term... terms) {
 
-    public static TermVector the(@NotNull Collection<? extends Term> t) {
-        return TermVector.the((Term[]) t.toArray(new Term[t.size()]));
-    }
+        if (terms.length > Param.MAX_SUBTERMS)
+            throw new UnsupportedOperationException("too many subterms (" + terms.length + " > " + Param.MAX_SUBTERMS);
 
-//    /** first n items */
-//    protected TermVector(@NotNull Collection<Term> t, int n) {
-//        this( t.toArray(new Term[n]));
-//    }
-
-
-     @SafeVarargs
-     public TermVector(@NotNull Term... terms) {
-        this.terms = terms;
 
 //         if (Param.DEBUG) {
 //             for (Term x : terms)
 //                 if (x == null) throw new NullPointerException();
 //         }
-         if (terms.length > Param.MAX_SUBTERMS)
-             throw new UnsupportedOperationException("too many subterms (" + terms.length + " > " + Param.MAX_SUBTERMS);
 
         /**
          0: depVars
@@ -93,8 +61,7 @@ public class TermVector implements TermContainer {
          5: struct
          */
         int[] meta = new int[6];
-        this.hash = Terms.hashSubterms(this.terms, meta);
-
+        this.hash = Terms.hashSubterms(terms, meta);
 
         final int vP = meta[3];  this.varPatterns = (byte)vP;   //varTot+=NO
 
@@ -103,7 +70,6 @@ public class TermVector implements TermContainer {
         final int vQ = meta[2];  this.varQuerys = (byte)vQ;
 
         int varTot = vD + vI + vQ ;
-        this.vars = (byte)(varTot);
 
         final int vol = meta[4] + 1;
         this.volume = (short)( vol );
@@ -111,30 +77,46 @@ public class TermVector implements TermContainer {
         final int cmp = vol - varTot - vP;
         this.complexity = (short)(cmp);
 
-
         this.structure = meta[5];
-
     }
 
+    public static TermContainer the(@NotNull Collection<? extends Term> t) {
+        return TermVector.the((Term[]) t.toArray(new Term[t.size()]));
+    }
 
+    @NotNull
+    public static TermVector the(@NotNull Term... t) {
+        switch (t.length) {
+            case 0:
+                return Terms.NoSubterms;
+            case 1:
+                return new TermVector1(t[0]);
+            default:
+                return new ArrayTermVector(t);
+        }
+    }
 
     @Override
     public final boolean isTerm(int i, @NotNull Op o) {
-        return terms[i].op() == o;
+        return term(i).op() == o;
     }
 
-    @NotNull @Override public final Term[] terms() {
-        return terms;
+    @NotNull @Override public abstract Term[] terms();
+
+
+    @Override
+    public void forEach(@NotNull Consumer<? super Term> action) {
+        forEach(action, 0, size());
     }
 
     @NotNull
     @Override public final Term[] terms(@NotNull IntObjectPredicate<Term> filter) {
-        return Terms.filter(terms, filter);
+        return Terms.filter(terms(), filter);
     }
 
     @NotNull
-    public TermVector append(Term x) {
-        return new TermVector(ArrayUtils.add(terms,x));
+    public TermContainer append(Term x) {
+        return TermVector.the(ArrayUtils.add(terms(),x));
     }
 
     @Override
@@ -142,14 +124,7 @@ public class TermVector implements TermContainer {
         return structure;
     }
 
-    @Override
-    @NotNull public final Term term(int i) {
-        return terms[i];
-    }
-
-//    public final boolean equals(Term[] t) {
-//        return Arrays.equals(term, t);
-//    }
+    @NotNull abstract public Term term(int i);
 
     @Override
     public final int volume() {
@@ -166,27 +141,13 @@ public class TermVector implements TermContainer {
         return complexity;
     }
 
-    /**
-     * get the number of term
-     *
-     * @return the size of the component list
-     */
     @Override
-    public final int size() {
-        return terms.length;
-    }
-
-//
-//    @Override
-//    public void setNormalized(boolean b) {
-//        normalized = true;
-//    }
-
+    public abstract int size();
 
     @NotNull
     @Override
     public String toString() {
-        return '(' + Joiner.on(',').join(terms) + ')';
+        return '(' + Joiner.on(',').join(terms()) + ')';
     }
 
     @Override
@@ -211,16 +172,15 @@ public class TermVector implements TermContainer {
 
     @Override
     public final int vars() {
-        return vars;
+        return volume-complexity-varPatterns;
     }
 
     @Override
     public final int init(@NotNull int[] meta) {
-        if (vars > 0) {
-            meta[0] += varDeps;
-            meta[1] += varIndeps;
-            meta[2] += varQuerys;
-        }
+
+        meta[0] += varDeps;
+        meta[1] += varIndeps;
+        meta[2] += varQuerys;
 
         meta[3] += varPatterns;
         meta[4] += volume;
@@ -229,33 +189,11 @@ public class TermVector implements TermContainer {
         return 0; //hashcode for this isn't used
     }
 
-    //    public Term[] cloneTermsReplacing(int index, Term replaced) {
-//        Term[] y = termsCopy();
-//        y[index] = replaced;
-//        return y;
-//    }
-
-
+    @Override
+    public abstract Iterator<Term> iterator();
 
     @Override
-    public final Iterator<Term> iterator() {
-        return Arrays.stream(terms).iterator();
-    }
-
-
-    @Override
-    public final void forEach(@NotNull Consumer<? super Term> action, int start, int stop) {
-        Term[] tt = terms;
-        for (int i = start; i < stop; i++)
-            action.accept(tt[i]);
-    }
-
-    @Override
-    public final void forEach(@NotNull Consumer<? super Term> action) {
-        for (Term t : terms)
-            action.accept(t);
-    }
-
+    public abstract void forEach(@NotNull Consumer<? super Term> action, int start, int stop);
 
     @Override
     public final boolean equals(@NotNull Object obj) {
@@ -265,30 +203,24 @@ public class TermVector implements TermContainer {
         if (hash!=obj.hashCode())
             return false;
 
-        if (obj instanceof TermVector) {
-            TermVector ot = (TermVector) obj;
-            return Util.equals(terms, ot.terms);
-        } else {
-            return (obj instanceof TermContainer) && (equalTo((TermContainer) obj));
-        }
+        return (obj instanceof TermContainer) && equalTo((TermContainer)obj);
     }
 
     /** accelerated implementation */
     @Override
     public final boolean equalTerms(@NotNull TermContainer c) {
-        Term[] tt = this.terms;
-        int cl = tt.length;
+
+        int cl = c.size();
         for (int i = 0; i < cl; i++) {
-            if (!tt[i].equals(c.term(i)))
+            if (!term(i).equals(c.term(i)))
                 return false;
         }
         return true;
     }
 
-
     @Override
     public final void copyInto(@NotNull Collection<Term> target) {
-        Collections.addAll(target, terms);
+        Collections.addAll(target, terms());
     }
 
     @Override
@@ -297,67 +229,27 @@ public class TermVector implements TermContainer {
     }
 
     public final void visit(@NotNull SubtermVisitorX v, Compound parent) {
-        for (Term t : terms)
-            v.accept(t, parent);
+        int cl = size();
+        for (int i = 0; i < cl; i++) {
+            v.accept(term(i), parent);
+        }
     }
 
     @NotNull
-    public TermVector reverse() {
-        Term[] s = this.terms;
-        if (s.length < 2)
+    public TermContainer reverse() {
+        if (size() < 2)
             return this; //no change needed
-        Term[] r = s.clone();
-        ArrayUtils.reverse(r);
-        return TermVector.the(r);
+
+        return TermVector.the( Util.reverse( terms().clone() ) );
     }
-
-    @NotNull
-    public static TermVector the(@NotNull Term... t) {
-        return t.length == 0 ? Terms.NoSubterms : new TermVector(t);
-    }
-    @NotNull
-    public static TermVector the(@NotNull Term one) {
-        return new TermVector(one);
-    }
-
-
-//    /** thrown if a compound term contains itself as an immediate subterm */
-//    public static final class RecursiveTermContentException extends RuntimeException {
-//
-//        @NotNull
-//        public final Term term;
-//
-//        public RecursiveTermContentException(@NotNull Term t) {
-//            super(t.toString());
-//            this.term = t;
-//        }
-//    }
-
-//    /** creates a copy if changed */
-//    @NotNull
-//    public TermVector replacing(int subterm, @NotNull Term replacement) {
-//        if (replacement.equals(term(subterm)))
-//            return this;
-//
-//        Term[] u = term;
-//        if (!u[subterm].equals(replacement)) {
-//            Term[] t = u.clone();
-//            t[subterm] = replacement;
-//            return new TermVector(t);
-//        } else
-//            return this;
-//
-//    }
-
 
     /** accelerated version of super-class's */
     @Override public final boolean hasAll(int equivalentSize, int baseStructure, int minVol) {
             return  (minVol <= this.volume)
                     &&
-                    (equivalentSize == this.terms.length)
+                    (equivalentSize == size())
                     &&
                     Op.hasAll(this.structure, baseStructure)
             ;
     }
-
 }

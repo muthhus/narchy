@@ -10,35 +10,34 @@ import java.util.Collections;
 import java.util.Set;
 import java.util.TreeSet;
 
-public class TermSet<X extends Term> extends TermVector {
+public class TermSet<X extends Term> {
 
     @NotNull
-    public static TermSet the(@NotNull Term... x) {
-        return new TermSet(Terms.toSortedSetArray(x));
+    public static TermVector the(@NotNull Term... x) {
+        return TermVector.the(Terms.toSortedSetArray(x));
     }
 
-    @NotNull public static TermSet concat(@NotNull Term[] a, @NotNull Term... b) {
+    public static TermVector concat(@NotNull Term[] a, @NotNull Term... b) {
 //        if ((a.length + b.length) == 2) {
 //            //simple case
 //            return TermSet.the(a[0], b[0]);
 //        }
         TreeSet<Term> t = new TreeSet<>();
         Collections.addAll(t, a);
-        return concat(t, b);
+        return TermSet.concat(t, b);
     }
 
     public
     @NotNull
-    static TermSet concat(@NotNull TreeSet<Term> t, Term[] b) {
+    static TermVector concat(@NotNull TreeSet<Term> t, Term[] b) {
         Collections.addAll(t, b);
         return TermSet.the(t);
     }
 
 
     @NotNull
-    public static TermSet the(@NotNull Set<? extends Term> x) {
-
-        return new TermSet(toSortedSetArray(x));
+    public static TermVector the(@NotNull Set<? extends Term> x) {
+        return TermVector.the(toSortedSetArray(x));
     }
 
     //    public static TermSet newTermSetPresorted(Term... presorted) {
@@ -47,9 +46,6 @@ public class TermSet<X extends Term> extends TermVector {
 
 
 
-    private TermSet(X[] x) {
-        super((Term[]) x);
-    }
 
     @NotNull
     public static Term[] toSortedSetArray(@NotNull Set<? extends Term> c) {
@@ -82,9 +78,6 @@ public class TermSet<X extends Term> extends TermVector {
 //        }
     }
 
-    @Override public final boolean isSorted() {
-        return true;
-    }
 
 //    @NotNull
 //    @Override

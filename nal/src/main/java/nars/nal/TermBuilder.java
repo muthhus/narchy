@@ -7,10 +7,11 @@ import nars.nal.meta.match.Ellipsislike;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Terms;
+import nars.term.atom.AtomicSingleton;
 import nars.term.compound.GenericCompound;
+import nars.term.container.TermVector;
 import nars.term.container.TermContainer;
 import nars.term.container.TermSet;
-import nars.term.container.TermVector;
 import nars.term.transform.TermTransform;
 import nars.term.util.InvalidTermException;
 import nars.term.var.Variable;
@@ -501,7 +502,6 @@ public abstract class TermBuilder {
 
         }
 
-
         if (dt == XTERNAL) {
             if (n!=2)
                 throw new InvalidTermException(CONJ, XTERNAL, u, "XTERNAL only applies to 2 subterms, as dt placeholder");
@@ -556,8 +556,9 @@ public abstract class TermBuilder {
         assert (dt == 0 || dt == DTERNAL); //throw new RuntimeException("should only have been called with dt==0 or dt==DTERNAL");
 
 
-        TreeSet<Term> s = new TreeSet();
-        flatten(op, u, dt, s);
+        TreeSet<Term> s = new TreeSet<>();
+        if (!flatten(op, u, dt, s))
+            return False;
 
         //boolean negate = false;
         int n = s.size();
@@ -585,10 +586,12 @@ public abstract class TermBuilder {
      * by grouping all non-sequence subterms into its own subterm, future
      * flattening and intermpolation is prevented from destroying temporal
      * measurements.
+     *
+     * @param innerDT will either 0 or DTERNAL (commutive relation)
      */
     @Nullable
     private TreeSet<Term> junctionGroupNonDTSubterms(@NotNull TreeSet<Term> s, int innerDT) {
-        TreeSet<Term> outer = new TreeSet();
+        TreeSet<Term> outer = new TreeSet<>();
         Iterator<Term> ss = s.iterator();
         while (ss.hasNext()) {
             Term x = ss.next();
@@ -596,9 +599,37 @@ public abstract class TermBuilder {
                 ss.remove();
             } else if (isFalse(x)) {
                 return null;
-            } else if (x.op() == CONJ /* dt will be something other than 'innerDT' having just been flattened */) {
-                outer.add(x);
-                ss.remove();
+            } else {
+                switch (x.op()) {
+                    case CONJ:
+                        // dt will be something other than 'innerDT' having just been flattened
+                        outer.add(x);
+                        ss.remove();
+                        break;
+                    case NEG:
+                        Compound n = (Compound) x;
+                        Term nn = n.term(0);
+                        if (nn.op()==CONJ) {
+                            Compound cnn = ((Compound) nn);
+                            int dt = cnn.dt();
+                            if (dt == innerDT) {
+                                //negating unwrap each subterm of the negated conjunction to the outer level of compatible 'dt'
+                                int cnns = cnn.size();
+                                for (int i = 0; i < cnns; i++) {
+                                    Term cnt = cnn.term(i);
+                                    if (s.contains(cnt)) {
+                                        //co-negation detected
+                                        return null;
+                                    }
+
+                                    outer.add($.neg(cnt));
+                                }
+                                ss.remove();
+                            }
+                        }
+                        break;
+                }
+
             }
         }
         if (outer.isEmpty()) {
@@ -613,7 +644,7 @@ public abstract class TermBuilder {
                 next = s.iterator().next();
                 break;
             default:
-                next = finish(CONJ, innerDT, TermSet.the(s));
+                next = the(CONJ, innerDT, TermSet.the(s));
                 break;
         }
 
@@ -623,26 +654,30 @@ public abstract class TermBuilder {
     }
 
     /**
-     * for commutive conjunction (0 or DTERNAL)
+     * for commutive conjunction
+     * @param dt will be either 0 or DTERNAL (commutive relation)
      */
-    private void flatten(@NotNull Op op, @NotNull Term[] u, int dt, @NotNull Collection<Term> s) {
+    private boolean flatten(@NotNull Op op, @NotNull Term[] u, int dt, @NotNull Collection<Term> s) {
 
         for (Term x : u) {
 
             if ((x.op() == op) && (((Compound) x).dt() == dt)) {
-                flatten(op, ((Compound) x).terms(), dt, s); //recurse
+                if (!flatten(op, ((Compound) x).terms(), dt, s)) //recurse
+                    return false;
             } else {
                 if (x instanceof Compound) {
                     //cancel co-negations TODO optimize this?
                     if (!s.isEmpty()) {
-                        if (s.remove(neg(x))) {
-                            continue;
+                        if (s.contains(neg(x))) {
+                            //co-negation detected
+                            return false;
                         }
                     }
                 }
                 s.add(x);
             }
         }
+        return true;
     }
 
 

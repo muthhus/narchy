@@ -7,8 +7,8 @@ import nars.concept.Concept;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
-import nars.term.container.TermContainer;
 import nars.term.container.TermVector;
+import nars.term.container.TermContainer;
 import nars.term.util.InvalidTermException;
 import nars.time.Tense;
 import nars.util.Util;
@@ -25,7 +25,7 @@ public class GenericCompound implements Compound {
      * subterm vector
      */
     @NotNull
-    protected TermVector subterms;
+    protected TermContainer subterms;
 
 
     /**
@@ -120,14 +120,14 @@ public class GenericCompound implements Compound {
 
         //subterm sharing:
         TermContainer cs = cthat.subterms();
-        TermVector as = this.subterms;
+        TermContainer as = this.subterms;
         if (as != cs) {
             if (!as.equals(cs)) {
                 return false;
             } else {
                 //share the subterms vector
-                if (cthat instanceof GenericCompound && cs instanceof TermVector) {
-                    this.subterms = (TermVector) cs; //HACK cast sucks
+                if (cthat instanceof GenericCompound && cs instanceof TermContainer) {
+                    this.subterms = cs; //HACK cast sucks
                 }
             }
         }

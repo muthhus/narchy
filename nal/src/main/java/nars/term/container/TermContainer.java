@@ -542,19 +542,11 @@ public interface TermContainer extends Termlike, Iterable<Term> {
                 TermSet.the(tt.terms());
     }
 
-
-    @NotNull
-    static TermContainer the(@NotNull Term one) {
-        return TermVector.the(one);
-    }
-
-
     @NotNull
     static TermContainer the(@NotNull Op op, @NotNull Collection<Term> tt) {
         //if (tt.isEmpty()) ...
-        return requiresTermSet(op, tt.size()) ?
-                TermSet.the(tt) :
-                TermVector.the(tt.toArray(new Term[tt.size()]));
+        Term[] ttt = tt.toArray(new Term[tt.size()]);
+        return TermContainer.the(op, ttt);
     }
 
     @NotNull
@@ -698,7 +690,7 @@ public interface TermContainer extends Termlike, Iterable<Term> {
 
     @NotNull
     default TermVector filter(Predicate<Term> p) {
-        if (!(this instanceof TermVector))
+        if (!(this instanceof TermContainer))
             throw new UnsupportedOperationException("only implemented for TermVector instance currently");
 
         return TermVector.the(
@@ -715,5 +707,6 @@ public interface TermContainer extends Termlike, Iterable<Term> {
                 &&
                 (volCached <= volume());
     }
+
 
 }

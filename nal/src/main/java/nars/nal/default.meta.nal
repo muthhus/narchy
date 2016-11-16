@@ -551,6 +551,10 @@
 
     ((\, M, A.._=B..+) --> B), M |- (M --> (A.._=B..+)), (Belief:Identity, Goal:Identity)
 
+//NAL4 experimental raw product transform
+    (A..B=_..+), B |- (B --> (/, ?1, A..B=_..+)), (Belief:Identity, Goal:Identity)
+    (A..B=_..+), B |- ((\, ?1, A..B=_..+) --> B), (Belief:Identity, Goal:Identity)
+
 
 //NAL4 backwards composition
     ((/, %M, A.._=B..+) --> Z), (C --> B), task("?") |- ((/, %M, A.._=B..+) --> substitute((/, %M, A.._=B..+),B,C)), (Belief:BeliefStructuralDeduction, Punctuation:Belief)

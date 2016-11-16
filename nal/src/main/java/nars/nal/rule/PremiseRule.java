@@ -20,8 +20,8 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.term.atom.Atomic;
 import nars.term.compound.GenericCompound;
-import nars.term.container.TermContainer;
 import nars.term.container.TermVector;
+import nars.term.container.TermContainer;
 import nars.term.transform.CompoundTransform;
 import nars.term.transform.VariableNormalization;
 import nars.term.var.AbstractVariable;
@@ -40,6 +40,7 @@ import java.util.function.BiConsumer;
 
 import static java.util.Collections.addAll;
 import static nars.$.*;
+import static nars.Op.NEG;
 import static nars.Op.VAR_PATTERN;
 import static nars.nal.meta.TaskBeliefSubterms.withinNonCommutive;
 import static nars.term.Terms.*;
@@ -1143,11 +1144,11 @@ public class PremiseRule extends GenericCompound {
      */
     @NotNull
     private static Term neg(@NotNull Term x) {
-        if (x.op() == Op.NEG) {
+        if (x.op() == NEG) {
             return ((Compound) x).term(0); //unwrap
         } else {
             //do this manually for premise rules since they will need to negate atoms which is not usually allowed
-            return new GenericCompound(Op.NEG, TermContainer.the(x));
+            return new GenericCompound(NEG, TermContainer.the(NEG, x));
         }
     }
 

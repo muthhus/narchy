@@ -20,6 +20,7 @@ import nars.term.Terms;
 import nars.term.atom.Atom;
 import nars.term.atom.Atomic;
 import nars.term.container.TermVector;
+import nars.term.container.TermContainer;
 import nars.term.obj.IntTerm;
 import nars.term.var.AbstractVariable;
 import nars.term.var.GenericVariable;
@@ -199,7 +200,7 @@ public enum $ {
         return (t.length == 0) ? Terms.ZeroProduct : (Compound) compound(PROD, t);
     }
     @NotNull
-    public static Compound p(@NotNull TermVector t) {
+    public static Compound p(@NotNull TermContainer t) {
         return p((Term[])t.terms());
     }
 
@@ -801,7 +802,7 @@ public enum $ {
     }
 
     /** negates each entry in the array */
-    public static TermVector neg(@NotNull TermVector s) {
+    public static TermContainer negAll(@NotNull TermContainer s) {
         int l = s.size();
         Term[] r = new Term[l];
         for (int i = 0; i < l; i++) {

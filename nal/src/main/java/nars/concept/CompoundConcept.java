@@ -16,6 +16,7 @@ import nars.term.Term;
 import nars.term.Termlike;
 import nars.term.container.TermContainer;
 import nars.term.container.TermSet;
+import nars.term.container.TermVector;
 import nars.time.Time;
 import nars.truth.Truth;
 import nars.truth.TruthDelta;
@@ -82,7 +83,7 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept, Ter
     }
 
     protected TermContainer buildTemplates(@NotNull T term, @NotNull NAR nar) {
-        TermSet tt = TermSet.the(TermLinkBuilder.components(term, nar));
+        TermVector tt = TermSet.the(TermLinkBuilder.components(term, nar));
         TermContainer ts = term.subterms();
         return tt.equals(ts) ? ts : nar.concepts.intern(tt); //re-use the term's own subterms as the termlink templates if they are equal
     }

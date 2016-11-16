@@ -203,7 +203,8 @@ public class Tetris extends NAgents {
                         //$.p(x, y);
 
                         //$.inh(
-                        $.func($.the("tetris"),
+                        //$.func($.the("tetris"),
+                        $.p(
                           $.pRecurse($.radixArray(x, PIXEL_RADIX, state.width)),
                               $.pRecurse($.radixArray(y, PIXEL_RADIX, state.height))
                         )
@@ -626,7 +627,7 @@ public class Tetris extends NAgents {
 
 
         //t.run(runFrames);
-        t.run(15000);
+        t.run(200);
 
 //        NARController meta = new NARController(nar, loop, t);
 //

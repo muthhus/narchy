@@ -4,8 +4,9 @@ import nars.$;
 import nars.Op;
 import nars.term.compound.GenericCompound;
 import nars.term.compound.Statement;
-import nars.term.container.TermContainer;
 import nars.term.container.TermVector;
+import nars.term.container.TermContainer;
+import nars.term.container.ArrayTermVector;
 import nars.util.Texts;
 import nars.util.Util;
 import nars.util.list.FasterList;
@@ -38,7 +39,7 @@ public class Terms   {
 
     //@NotNull public static final int[] ZeroIntArray = new int[0];
     @NotNull public static final Term[] empty = new Term[0];
-    @NotNull public static final TermVector NoSubterms = new TermVector((Term[])new Term[] { });
+    @NotNull public static final TermVector NoSubterms =  new ArrayTermVector((Term[]) new Term[]{});
     @NotNull public static final Compound ZeroProduct = new GenericCompound(Op.PROD, DTERNAL, NoSubterms);
     @NotNull public static final IntFunction<Term[]> NewTermArray = Term[]::new;
 

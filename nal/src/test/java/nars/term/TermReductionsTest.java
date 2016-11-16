@@ -462,6 +462,20 @@ public class TermReductionsTest {
         assertInvalid("(a ==> (&&, a, b, c))");
     }
 
+    @Test public void testConegatedConjunctionTerms1() {
+        assertEquals($("(&&,(x),--(y),--(z))"), $("((x) && --((y) && (z)))"));
+    }
+    @Test public void testConegatedConjunctionTerms1not() {
+        //dont unwrap due to different 'dt'
+        assertEquals("((--,((y) &&+0 (z)))&&(x))", $("((x)&&--((y) &&+0 (z)))").toString());
+
+        assertEquals("((--,((y)&&(z))) &&+0 (x))", $("((x) &&+0 --((y) && (z)))").toString());
+    }
+
+    @Test public void testConegatedConjunctionTerms2() {
+        assertInvalid("(#1 && --(#1&&(robin-->swimmer)))");
+    }
+
     @Test
     public void testDemorgan1() {
         //https://en.wikipedia.org/wiki/De_Morgan%27s_laws
@@ -484,11 +498,18 @@ public class TermReductionsTest {
     @Test
     public void testCoNegatedJunction() {
         //the conegation cancels itself out
-        assertEquals("x",
-                $("(&&,x,a:b,(--,a:b))").toString());
+        assertInvalid(
+                "(&&,x,a:b,(--,a:b))");
 
-        assertEquals("(x&&y)",
-                $("(&&,x,y,a:b,(--,a:b))").toString());
+        assertInvalid(
+                "(&&,x,y,a:b,(--,a:b))");
+    }
+
+
+    @Test
+    public void testCoNegatedJunction2() {
+        assertEquals(False,
+                $("(&&,x, a:b,(--,a:b))"));
 
         assertEquals(True,
                 $("(||,x,a:b,(--,a:b))"));

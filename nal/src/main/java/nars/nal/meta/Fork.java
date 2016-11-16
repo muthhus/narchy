@@ -3,11 +3,14 @@ package nars.nal.meta;
 import nars.Op;
 import nars.term.Term;
 import nars.term.compound.GenericCompound;
+import nars.term.container.TermContainer;
 import nars.term.container.TermSet;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+
+import static nars.Op.CONJ;
 
 
 /** parallel branching */
@@ -17,7 +20,7 @@ public final class Fork extends GenericCompound implements BoolCondition {
     public final BoolCondition[] termCache;
 
     protected Fork(@NotNull BoolCondition[] actions) {
-        super(Op.CONJ, TermSet.the((Term[]) actions));
+        super(CONJ, TermContainer.the(CONJ, (Term[]) actions));
         if (actions.length == 1)
             throw new RuntimeException("unnecessary use of fork");
         this.termCache = actions;
