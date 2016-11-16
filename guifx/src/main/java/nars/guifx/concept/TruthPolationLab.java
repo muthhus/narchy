@@ -49,7 +49,7 @@ public class TruthPolationLab extends VBox implements ChangeListener {
         freqSliders = new ArrayList<>(range);
         confSliders = new ArrayList<>(range);
 
-        this.truth = new TruthPolation(range);
+        this.truth = new TruthPolation();
 
         tasks = new ArrayList(range);
 
@@ -153,7 +153,7 @@ public class TruthPolationLab extends VBox implements ChangeListener {
             float dur = (float) durationSlider.getValue();
 
             for (int i = 0; i < range; i++) {
-                Truth tc = truth.truth(i, dur, tasks  /* TODO add eternal background control widget */ );
+                Truth tc = truth.truth(i, tasks  /* TODO add eternal background control widget */ );
                 if (tc!=null) {
                     double x = dx * i;
                     double y = (1f - tc.freq()) * h;

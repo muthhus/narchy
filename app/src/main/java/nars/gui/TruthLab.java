@@ -211,7 +211,7 @@ public class TruthLab extends Grid {
                 1200, 900);
 
         Param.DEBUG = true;
-        ((FrameTime)n.time).setDuration(2);
+        ((FrameTime)n.time).setDuration(1);
         n.log()
             .inputAt(10, "(x).   :|: %1.0;0.9%")
             .inputAt(20, "(y).   :|: %1.0;0.9%")

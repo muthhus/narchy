@@ -726,6 +726,19 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
         return LongSets.immutable.of(evidence());
     }
 
-    float conf(long occ);
+    Truth truth(long when);
+
+    default float conf(long when) {
+        Truth t = truth(when);
+        return t!=null ? t.conf() : 0;
+    }
+    default float freq(long when) {
+        Truth t = truth(when);
+        return t!=null ? t.freq() : Float.NaN;
+    }
+    default float confWeight(long when) {
+        Truth t = truth(when);
+        return t!=null ? t.confWeight() : 0;
+    }
 
 }

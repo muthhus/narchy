@@ -210,7 +210,7 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept, Ter
     }
 
     protected MicrosphereTemporalBeliefTable newTemporalTable(final int tCap, NAR nar) {
-        return new MyMicrosphereTemporalBeliefTable(tCap, nar.time);
+        return new MicrosphereTemporalBeliefTable(tCap);
     }
 
     protected EternalTable newEternalTable(int eCap) {
@@ -676,17 +676,17 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept, Ter
         return term.volume();
     }
 
-    static final class MyMicrosphereTemporalBeliefTable extends MicrosphereTemporalBeliefTable {
-
-        private final Time time;
-
-        public MyMicrosphereTemporalBeliefTable(int tCap, Time time) {
-            super(tCap);
-            this.time = time;
-        }
-
-        @Override public float focus(float dt, float evidence) {
-            return TruthPolation.evidenceDecay(evidence, time.duration(), dt);
-        }
-    }
+//    static final class MyMicrosphereTemporalBeliefTable extends MicrosphereTemporalBeliefTable {
+//
+//        private final Time time;
+//
+//        public MyMicrosphereTemporalBeliefTable(int tCap, Time time) {
+//            super(tCap);
+//            this.time = time;
+//        }
+//
+//        @Override public float focus(float dt, float evidence) {
+//            return TruthPolation.evidenceDecay(evidence, time.duration(), dt);
+//        }
+//    }
 }

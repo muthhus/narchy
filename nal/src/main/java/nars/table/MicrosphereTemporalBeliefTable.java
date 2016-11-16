@@ -29,15 +29,13 @@ import static nars.truth.TruthFunctions.w2c;
 /**
  * stores the items unsorted; revection manages their ranking and removal
  */
-public abstract class MicrosphereTemporalBeliefTable implements TemporalBeliefTable, InterpolatingMicrosphere.Focus {
+public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
 
     private volatile int capacity;
     final MultiRWFasterList<Task> list;
 
     private final static int MAX_SIZE = 64;
-    private static final ThreadLocal<TruthPolation> truther = ThreadLocal.withInitial(()-> {
-        return new TruthPolation(MAX_SIZE);
-    });
+
 
     public MicrosphereTemporalBeliefTable(int initialCapacity) {
         super();
@@ -297,7 +295,7 @@ public abstract class MicrosphereTemporalBeliefTable implements TemporalBeliefTa
     }
 
     final float rankTemporalByConfidence(@Nullable Task t, long when) {
-        return t == null ? -1 : focus(Math.abs(t.occurrence() - when), t.confWeight());
+        return t == null ? -1 : t.confWeight(when);
     }
 
     public Task matchMerge(long now, @NotNull Task toMergeWith) {
@@ -324,7 +322,7 @@ public abstract class MicrosphereTemporalBeliefTable implements TemporalBeliefTa
 
             return (1f + (1f - Math.abs(x.freq() - yf)))
                     * (1f + (1f - y.conf()))
-                    * (1f + focus(Math.abs(xo-yo), 1));
+                    * (1f + TruthPolation.evidenceDecay(1, 1, Math.abs(xo-yo)));
         };
 
     }
@@ -429,10 +427,10 @@ public abstract class MicrosphereTemporalBeliefTable implements TemporalBeliefTa
         Task topEternal = eternal.strongest();
         boolean includeEternal = topEternal != null;
 
-        Task[] tr = list.toArray(Task[]::new, includeEternal ? 1 : 0);
-        int s = tr.length;
+        Task[] tasks = list.toArray(Task[]::new, includeEternal ? 1 : 0);
+        int s = tasks.length;
         if (includeEternal)
-            tr[s -1] = topEternal;
+            tasks[s -1] = topEternal;
 
         switch (s) {
 
@@ -440,24 +438,11 @@ public abstract class MicrosphereTemporalBeliefTable implements TemporalBeliefTa
                 return null;
 
             case 1:
-                Task the = tr[0];
-                Truth res = the.truth();
-                long o = the.occurrence();
-                if (o == ETERNAL)
-                    return res;
-                else if (now == ETERNAL)// || when == now) && o == when) //optimization: if at the current time and when
-                    return res.eternalize();
-                else {
-                    long delta = Math.abs(o - when);
-                    if (delta == 0)
-                        return res; //as-is
-                    else {
-                        return $.t(res.freq(), w2c(focus(delta, res.confWeight())));
-                    }
-                }
+                Task the = tasks[0];
+                return the.truth(when);
 
             default:
-                return truther.get().truth(when, tr, this);
+                return new TruthPolation().truth(when, tasks);
         }
 
     }

@@ -14,7 +14,9 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 
 import static nars.$.t;
+import static nars.time.Tense.DTERNAL;
 import static nars.time.Tense.ETERNAL;
+import static nars.truth.TruthFunctions.w2c;
 
 /**
  * Mutable task with additional fluent api utility methods
@@ -53,15 +55,51 @@ public class MutableTask extends AbstractTask {
         return this;
     }
 
-    @Override
-    public float conf(long occ) {
-        if (occ == ETERNAL)
-            return conf();
 
-        long o = occurrence();
-        if (o!=occ)
-            return 0;
-        return conf();
+
+    @Override
+    public Truth truth(long when) {
+        if (!isBeliefOrGoal())
+            return null;
+
+        long a = occurrence();
+
+        Truth t = truth();
+        if (a == ETERNAL)
+            return t;
+        else if (when == ETERNAL)// || when == now) && o == when) //optimization: if at the current time and when
+            return t.eternalize();
+        else {
+            long z = end();
+
+            if (z < a) { long x = a; a = z; z = x; } //order a..z
+            if ((when >= a) && (when <= z)) {
+                return t;
+            } else {
+                long nearest; //nearest endpoint of the interval
+                if (when < a) nearest = a;
+                else /*if (when > z)*/ nearest = z;
+                long delta = Math.abs(nearest - when);
+
+                float dur = 1f;
+                return $.t(t.freq(), w2c(TruthPolation.evidenceDecay(t.confWeight(), dur, delta)));
+
+
+            }
+
+        }
+
+    }
+
+    /** end occurrence */
+    private long end() {
+        long dt = 0;
+        if (op().temporal) {
+            dt=dt();
+            if (dt==DTERNAL)
+                dt = 0;
+        }
+        return occurrence()+dt;
     }
 
     @NotNull
