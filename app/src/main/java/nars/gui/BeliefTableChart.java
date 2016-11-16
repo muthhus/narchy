@@ -53,13 +53,15 @@ public class BeliefTableChart extends Surface {
     int projections = 16;
 
     private boolean showTaskLinks = true;
-    @Deprecated private boolean showEternal = true;
+    @Deprecated
+    private boolean showEternal = true;
 
     long[] range;
 
     public BeliefTableChart(NAR n, Termed term) {
         this(n, term, null);
     }
+
     public BeliefTableChart(NAR n, Termed term, long[] range) {
         super();
         this.term = term;
@@ -91,7 +93,7 @@ public class BeliefTableChart extends Surface {
         List<Surface> actionTables = beliefTableCharts(nar, terms, window);
 
 
-        new SpaceGraph().add(new Ortho(new Grid(VERTICAL, actionTables)).maximize()).show(800,600);
+        new SpaceGraph().add(new Ortho(new Grid(VERTICAL, actionTables)).maximize()).show(800, 600);
     }
 
     public static List<Surface> beliefTableCharts(NAR nar, Collection<? extends Termed> terms, long window) {
@@ -125,7 +127,6 @@ public class BeliefTableChart extends Surface {
     protected void draw(Termed tt, Concept cc, GL2 gl, long minT, long maxT) {
 
 
-
         float cp = nar.activation(cc);
         gl.glColor4f(0.5f, 0.5f, 0.5f, 0.2f + 0.25f * cp);
         float size = (cp > 0 ? (0.0003f + 0.00015f * cp) : 0.00015f); //if not active then show in small, otherwise if active show larger and grow in proportion to the activity
@@ -145,7 +146,7 @@ public class BeliefTableChart extends Surface {
             gl.glLineWidth(1f);
             float nowX = xTime(minT, maxT, now);
             cc.tasklinks().forEach(tl -> {
-                if (tl!=null) {
+                if (tl != null) {
                     Task x = tl.get();
                     if ((x != null) && (x.isBeliefOrGoal())) {
                         long o = x.occurrence();
@@ -181,14 +182,13 @@ public class BeliefTableChart extends Surface {
         //swapBuffers();
 
 
-
         //clear
         //clear(1f /*0.5f*/);
 
 
         long minT, maxT;
 
-        if (range!=null) {
+        if (range != null) {
             minT = range[0];
             maxT = range[1];
         } else {
@@ -224,12 +224,12 @@ public class BeliefTableChart extends Surface {
         }
 
 
-        gl.glColor3f(0,0,0); //background
-        Draw.rect(gl, 0,0, 1, 1);
+        gl.glColor3f(0, 0, 0); //background
+        Draw.rect(gl, 0, 0, 1, 1);
 
         gl.glLineWidth(1f);
-        gl.glColor3f(0.5f,0.5f,0.5f); //border
-        Draw.rectStroke(gl, 0,0, 1, 1);
+        gl.glColor3f(0.5f, 0.5f, 0.5f); //border
+        Draw.rectStroke(gl, 0, 0, 1, 1);
 
         Concept cc = nar.concept(term);
         if (cc != null) {
@@ -248,17 +248,7 @@ public class BeliefTableChart extends Surface {
 
     static final float dz = 0.0f;
 
-    //horizontal block
-    final static TaskRenderer beliefRenderer = (ge, q, c, w, h, x, y) -> {
-        ge.glColor4f(0.3f + 0.7f * c, 0.1f, 0.1f, 0.75f + 0.2f * q);
-        Draw.rect(ge, x - w / 2, y - h / 4, w, h / 2, dz);
-    };
 
-    //vertical block
-    final static TaskRenderer goalRenderer = (ge, q, c, w, h, x, y) -> {
-        ge.glColor4f(0.1f, 0.3f + 0.7f * c, 0.1f, 0.7f + 0.2f * q);
-        Draw.rect(ge, x - w / 4, y - h / 2, w / 2, h, dz);
-    };
 
 
     public void drawCrossHair(GL2 gl, float x, float gew, Truth truth, double theta) {
@@ -285,7 +275,6 @@ public class BeliefTableChart extends Surface {
     }
 
 
-
     public void ready() {
         redraw.set(true);
     }
@@ -309,7 +298,7 @@ public class BeliefTableChart extends Surface {
 
         /** drawn "pixel" dimensions*/
 
-        renderWave(nowX, minT, maxT, gl, wave, beliefOrGoal ? beliefRenderer : goalRenderer);
+        renderWave(nowX, minT, maxT, gl, wave, beliefOrGoal);
 
         //draw projections
         if (projections > 0 && minT != maxT) {
@@ -317,14 +306,14 @@ public class BeliefTableChart extends Surface {
             BeliefTable table = beliefOrGoal ? c.beliefs() : c.goals();
 
             TruthWave pwave = beliefProj;
-            pwave.setProjected(table, minT, maxT, projections);
+            pwave.project(table, minT, maxT, projections);
             renderWaveLine(nowX, minT, maxT, gl, pwave, beliefOrGoal);
         }
 
         Truth bc = wave.current;
         if (bc != null) {
             float theta;
-            float dTheta = (bc.expectation()-0.5f) * angleSpeed;
+            float dTheta = (bc.expectation() - 0.5f) * angleSpeed;
             if (beliefOrGoal) {
                 this.beliefTheta += dTheta;
                 theta = beliefTheta;
@@ -340,60 +329,82 @@ public class BeliefTableChart extends Surface {
 
     }
 
-    private void renderWave(float nowX, long minT, long maxT, GL2 gl, TruthWave wave, TaskRenderer r) {
-        wave.forEach((freq, conf, o, qua) -> {
+    private void renderWave(float nowX, long minT, long maxT, GL2 gl, TruthWave wave, boolean beliefOrGoal) {
+        wave.forEach((freq, conf, start, end, qua) -> {
 
-            boolean eternal = (o != o);
-            float x;
-            float pw = baseTaskSize;// + gew / (1f / conf) / 4f;//10 + 10 * conf;
-            float ph = baseTaskSize;// + geh / (1f / conf) / 4f;//10 + 10 * conf;
+            boolean eternal = (start != start);
+            float pw = baseTaskSize / 4f;// + gew / (1f / conf) / 4f;//10 + 10 * conf;
+            float ph = baseTaskSize + conf * baseTaskSize;// + geh / (1f / conf) / 4f;//10 + 10 * conf;
 
             if (showEternal && eternal) {
-                x = nowX;
-            } else if ((o >= minT) && (o <= maxT)) {
-                x = xTime(minT, maxT, o);
+                start = end = nowX;
+            } else if (((end <= maxT) && (end >= minT)) || ((start >= minT) && (start <= maxT))) {
+                start = xTime(minT, maxT, Math.min(maxT, Math.max(minT, start)));
+                end = xTime(minT, maxT, Math.max(minT, Math.min(maxT, end)));
             } else {
-                x = Float.NaN; //dont draw
+                return;
             }
 
-            if(x==x) {
-                r.renderTask(gl, qua, conf, pw, ph, x, freq);
-            }
+            //r.renderTask(gl, qua, conf, pw, ph, xStart, xEnd, freq);
+
+            if (!beliefOrGoal)
+                gl.glColor4f(0.75f, 0.25f, 0f, 0.2f + conf * 0.5f); //, 0.7f + 0.2f * q);
+            else
+                gl.glColor4f(0.25f, 0f, 0.75f, 0.2f + conf * 0.5f); //, 0.7f + 0.2f * q);
+
+            float mid = (end + start) / 2f;
+            float W = Math.max((end - start), pw);
+
+            float x = mid - W / 2;
+            float y = freq - ph / 2;
+            Draw.rect(gl,
+                    x, y,
+                    W, ph);
         });
     }
+
     private void renderWaveLine(float nowX, long minT, long maxT, GL2 gl, TruthWave wave, boolean beliefOrGoal) {
 
         gl.glLineWidth(4.0f);
         gl.glBegin(GL2.GL_LINE_STRIP);
 
-        wave.forEach((freq, conf, o, qua) -> {
+        wave.forEach((freq, conf, start, end, qua) -> {
 
-            boolean eternal = (o != o);
+            boolean eternal = (start != start);
             float x;
             float pw = baseTaskSize;// + gew / (1f / conf) / 4f;//10 + 10 * conf;
             float ph = baseTaskSize;// + geh / (1f / conf) / 4f;//10 + 10 * conf;
 
-            if (showEternal && eternal) {
-                x = nowX;
-            } else if ((o >= minT) && (o <= maxT)) {
-                x = xTime(minT, maxT, o);
+            if (eternal) {
+                x = nowX; //???
+            } else if ((start >= minT) && (start <= maxT)) {
+                x = xTime(minT, maxT, start);
             } else {
-                x = Float.NaN; //dont draw
+                return;
             }
 
-            if(x==x) {
-
-                float a = 0.25f + 0.75f * conf;
-                if(beliefOrGoal) {
-                    gl.glColor4f(0.75f, 0.25f, 0f, a);
-                }
-                else {
-                    gl.glColor4f(0f, 0.75f, 0.25f,  a);
-                }
-
-                //r.renderTask(gl, qua, conf, pw, ph, x, freq);
-                gl.glVertex3f(x, freq, dz);
+            float a = 0.25f + 0.75f * conf;
+            if (beliefOrGoal) {
+                gl.glColor4f(0.75f, 0.25f, 0f, a);
+            } else {
+                gl.glColor4f(0f, 0.75f, 0.25f, a);
             }
+
+            //r.renderTask(gl, qua, conf, pw, ph, x, freq);
+            gl.glVertex3f(x, freq, dz);
+
+
+            if (start == end)
+                return; //just the one point
+
+            if (eternal) {
+                //x = nowX; //??
+                return;
+            } else if ((end >= minT) && (end <= maxT)) {
+                x = xTime(minT, maxT, end);
+            }
+
+            gl.glVertex3f(x, freq, dz);
         });
 
         gl.glEnd();
@@ -426,15 +437,11 @@ public class BeliefTableChart extends Surface {
         return this;
     }
 
-    @FunctionalInterface
-    interface TaskRenderer {
-        void renderTask(GL2 gl, float qua, float c, float w, float h, float x, float y);
-    }
 
 
     private static float xTime(float minT, float maxT, float o) {
         float p = (minT == maxT) ? 0.5f : (o - minT) / (maxT - minT);
-        return p ;
+        return p;
     }
 
 

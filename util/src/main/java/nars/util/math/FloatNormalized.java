@@ -2,6 +2,8 @@ package nars.util.math;
 
 import nars.util.Util;
 
+import java.util.function.DoubleSupplier;
+
 
 public class FloatNormalized implements FloatSupplier {
 
@@ -15,6 +17,9 @@ public class FloatNormalized implements FloatSupplier {
     static final float epsilon = 0.01f;
 
 
+    public FloatNormalized(DoubleSupplier in) {
+        this(()->(float)in.getAsDouble());
+    }
     public FloatNormalized(FloatSupplier in) {
         this(in, Float.POSITIVE_INFINITY, Float.NEGATIVE_INFINITY);
     }

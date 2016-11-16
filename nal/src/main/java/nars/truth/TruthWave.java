@@ -11,12 +11,15 @@ import java.util.Arrays;
 /** compact chart-like representation of a belief state at each time cycle in a range of time.
  *  useful as a memoized state snapshot of a belief table
  *  stored in an array of float quadruplets for each task:
- *      1) freq
- *      2) conf
- *      3) occ
- *      4) quality
+ *      1) start
+ *      2) end
+ *      3) freq
+ *      4) conf
+ *      5) quality
  * */
 public class TruthWave {
+
+    private static final int ENTRY_SIZE = 5;
 
     /** start and stop interval (in cycles) */
     long start;
@@ -39,7 +42,7 @@ public class TruthWave {
     }
 
     private void resize(int cap) {
-        truth = new float[4*cap];
+        truth = new float[ENTRY_SIZE*cap];
     }
 
     public TruthWave(@NotNull BeliefTable b, @NotNull NAR n) {
@@ -63,34 +66,39 @@ public class TruthWave {
         b.forEach(x -> {
             int ss = size[0];
             if (ss < s) { //HACK in case the table size changed since allocating above
-                int j = (size[0]++) * 4;
-                long occ = x.occurrence();
-                load(t, x, j, occ, x.qua());
+                int j = (size[0]++) * ENTRY_SIZE;
+                load(t, x.start(), x.end(), x, j, x.qua());
             }
         });
         this.size = size[0];
 
         //compute time range
-        long start = Long.MAX_VALUE;
-        long end = Long.MIN_VALUE;
+        float start = Float.POSITIVE_INFINITY;
+        float end = Float.NEGATIVE_INFINITY;
         for (int i = 0; i < size[0]; i++) {
-            float o = t[i*4 + 2];
-            long oo = (long) o;
-            if (oo > end) end = oo;
-            if (oo < start) start = oo;
+            float starts = t[i*ENTRY_SIZE + 0];
+            if (start == start) {
+                float ends = t[i*ENTRY_SIZE + 1];
+
+                float oo = (starts + ends)/2; //midpoint
+
+                if (oo > end) end = oo;
+                if (oo < start) start = oo;
+            }
         }
-        this.start = start;
-        this.end = end;
+        this.start = (long) start;
+        this.end = (long) end;
 
         this.current = b.truth(now);
     }
 
-    public static void load(float[] t, @Nullable Truthed x, int j, long occ, float q) {
+    public static void load(float[] t, long start, long end, @Nullable Truthed x, int j, float q) {
         if (x == null)
             return;
+        t[j++] = start == Tense.ETERNAL ? Float.NaN : start;
+        t[j++] = end == Tense.ETERNAL ? Float.NaN : end;
         t[j++] = x.freq();
         t[j++] = x.conf();
-        t[j++] = occ== Tense.ETERNAL ? Float.NaN : occ;
         t[j/*++*/] = q;
     }
 
@@ -108,15 +116,12 @@ public class TruthWave {
 
 
     /** fills the wave with evenly sampled points in a time range */
-    public void setProjected(@NotNull BeliefTable table, float minT, float maxT, int points) {
+    public void project(@NotNull BeliefTable table, float minT, float maxT, int points) {
         if (minT == maxT) {
             clear();
             return;
         }
         ensureSize(points);
-
-
-
 
         float dt = (maxT-minT)/(points);
         float t = minT;
@@ -124,7 +129,7 @@ public class TruthWave {
         for (int i = 0; i < points; i++) {
             int lt = Math.round(t);
             Truth x = table.truth(lt);
-            load(data, x, i*4, lt, 0.5f);
+            load(data, lt, lt, x, i*ENTRY_SIZE, 0.5f);
             t+= dt;
         }
         this.current = null;
@@ -145,23 +150,24 @@ public class TruthWave {
 
 
     @FunctionalInterface public interface TruthWaveVisitor {
-        void onTruth(float f, float c, @Deprecated float occ /* should be double here */, float qua);
+        void onTruth(float f, float c, float start, float end, float qua);
     }
 
     public final void forEach(@NotNull TruthWaveVisitor v) {
-        int s = this.size;
+        int n = this.size;
         float[] t = this.truth;
         int j = 0;
-        for (int i = 0; i < s; i++) {
+        for (int i = 0; i < n; i++) {
+            float s = t[j++];
+            float e = t[j++];
             float f = t[j++];
             float c = t[j++];
-            float o = t[j++];
             float q = t[j++];
-            v.onTruth(f, c, o, q);
+            v.onTruth(f, c, s, e, q);
         }
     }
 
-    public final int capacity() { return truth.length / 4; }
+    public final int capacity() { return truth.length / ENTRY_SIZE; }
 
 //        //get min and max occurence time
 //        for (Task t : beliefs) {

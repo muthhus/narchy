@@ -59,7 +59,7 @@ public abstract class ScalarSignal implements Consumer<NAR>, DoubleSupplier {
     public final static FloatToFloatFunction direct = n -> n;
     @Nullable
     public Task current;
-    private int dt;
+
     @NotNull
     private final long[] commonEvidence;
 
@@ -139,11 +139,10 @@ public abstract class ScalarSignal implements Consumer<NAR>, DoubleSupplier {
 
         if ((inputIfSame || different || lateEnough) && (!tooSoon)) {
 
-            Task t = newInputTask(f, prevF, now);
+            Task t = newInputTask(f, prevF, now, this.current);
             if (t!=null) {
                 Task prevStart = this.current;
 
-                Task prevEnd = null;
 //                if (prevStart!=null && t.occurrence() - prevStart.occurrence() > latchResolution) {
 //                    //input a cloned version of the previous task as an intermediate task, squarewave approximation
 //                    prevEnd = newInputTask(prevStart.truth(), now, now-1);
@@ -152,7 +151,7 @@ public abstract class ScalarSignal implements Consumer<NAR>, DoubleSupplier {
 //                }
 
 
-                input(prevStart, prevEnd, this.current = t);
+                input(prevStart, this.current = t);
                 this.lastInputTime = now;
                 this.prevF = f;
             }
@@ -162,7 +161,7 @@ public abstract class ScalarSignal implements Consumer<NAR>, DoubleSupplier {
     }
 
 
-    abstract public void input(@NotNull Task prevStart, @Nullable Task prevEnd, @NotNull Task next);
+    abstract public void input(@NotNull Task prevStart, @NotNull Task next);
         //nar.inputLater(next);
 
 
@@ -189,16 +188,29 @@ public abstract class ScalarSignal implements Consumer<NAR>, DoubleSupplier {
 //    }
 
     @Nullable
-    protected Task newInputTask(float v, float prevV, long now) {
+    protected Task newInputTask(float v, float prevV, long now, Task previous) {
         float changeFactor = prevV==prevV ? Math.abs(v - prevV) : 1f /* if prevV == NaN */;
 
         Truth t = truthFloatFunction.valueOf(v);
         if (t == null)
             return null;
-        long when = now + dt();
-        return new MutableTask(term(), punc, t)
+
+        long start = previous!=null ? previous.end()+1 : now-1;
+        long end = now;
+
+        return new MutableTask(term(), punc, t) {
+            @Override
+            public long start() {
+                return start;
+            }
+
+            @Override
+            public long end() {
+                return end;
+            }
+        }
                 .evidence(commonEvidence)
-                .time(now, when)
+                .time(now, now)
                 .budgetByTruth( Math.max(Param.BUDGET_EPSILON*2, changeFactor * pri.asFloat())  /*(v, now, prevF, lastInput)*/, dur);
         //.log(this);
     }
@@ -218,16 +230,6 @@ public abstract class ScalarSignal implements Consumer<NAR>, DoubleSupplier {
         return term;
     }
 
-    /**
-     * time shift input tasks, relative to NAR's current time
-     */
-    protected int dt() {
-        return dt;
-    }
-
-    public void dt(int dt) {
-        this.dt = dt;
-    }
 
     @Override
     public double getAsDouble() {

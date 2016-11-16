@@ -168,8 +168,8 @@ abstract public class NAgents extends NAgent {
 //            }
         };
 
-        nar.beliefConfidence(0.5f);
-        nar.goalConfidence(0.5f);
+        nar.beliefConfidence(0.75f);
+        nar.goalConfidence(0.75f);
 
         float p = 0.5f;
         nar.DEFAULT_BELIEF_PRIORITY = 0.75f * p;

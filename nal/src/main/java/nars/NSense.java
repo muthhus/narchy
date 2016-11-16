@@ -1,9 +1,11 @@
 package nars;
 
+import nars.concept.FuzzyScalarConcepts;
 import nars.concept.SensorConcept;
 import nars.term.Compound;
 import nars.truth.Truth;
 import nars.util.Util;
+import nars.util.math.FloatNormalized;
 import nars.util.math.FloatSupplier;
 import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunction;
 import org.jetbrains.annotations.NotNull;
@@ -12,6 +14,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.Collection;
 import java.util.function.BooleanSupplier;
+import java.util.function.DoubleSupplier;
 import java.util.function.IntSupplier;
 import java.util.function.Supplier;
 
@@ -155,6 +158,20 @@ public interface NSense {
 //        } catch (Exception e1) {
 //            e1.printStackTrace();
 //        }
+    }
+
+    @NotNull
+    default FuzzyScalarConcepts senseNumber(String id, FloatSupplier v) {
+        FuzzyScalarConcepts fs = new FuzzyScalarConcepts(
+                new FloatNormalized(v), nar(), id
+        );//.resolution(0.05f);
+        sensors().addAll(fs.sensors);
+        return fs;
+    }
+    @NotNull
+    default FuzzyScalarConcepts senseNumber(String id, DoubleSupplier v) {
+
+        return senseNumber(id, ()->(float)v.getAsDouble());
     }
 
     /**

@@ -24,7 +24,7 @@ import nars.util.FX;
  */
 public class DetailedConceptPane extends AbstractConceptPane {
 
-    private final TaskTablePane beliefChart;
+    //private final TaskTablePane beliefChart;
     private final Plot2D budgetGraph;
     private final BagView<Termed> termlinkView;
     private final BagView<Task> tasklinkView;
@@ -33,7 +33,7 @@ public class DetailedConceptPane extends AbstractConceptPane {
         super(nar, conceptTerm);
 
 
-        beliefChart = new TaskTablePane(nar);
+        //beliefChart = new TaskTablePane(nar);
 
         int budgetGraphWidth = 0;
         int budgetGraphHeight = 32;
@@ -42,7 +42,7 @@ public class DetailedConceptPane extends AbstractConceptPane {
 
 
         int maxDisplayedBagItems = 16;
-        
+
         termlinkView = new BagView(
                 () -> currentConcept != null ? currentConcept.termlinks() : null,
                 //(t) -> SubButton.make(nar, t.term())
@@ -57,14 +57,14 @@ public class DetailedConceptPane extends AbstractConceptPane {
 
 
 
-        beliefChart.setMouseTransparent(true);
-        beliefChart.setPickOnBounds(false);
+//        beliefChart.setMouseTransparent(true);
+//        beliefChart.setPickOnBounds(false);
 
         budgetGraph.setMouseTransparent(true);
         budgetGraph.setPickOnBounds(false);
         budgetGraph.setAlignment(Pos.BOTTOM_CENTER);
 
-        beliefChart.setAlignment(Pos.TOP_RIGHT);
+        //beliefChart.setAlignment(Pos.TOP_RIGHT);
         termlinkView.setAlignment(Pos.CENTER_LEFT);
         tasklinkView.setAlignment(Pos.CENTER_RIGHT);
 
@@ -86,7 +86,7 @@ public class DetailedConceptPane extends AbstractConceptPane {
 
                 //overlay
                 budgetGraph,
-                beliefChart,
+                //beliefChart,
 
                 termlinkView, tasklinkView
         );
@@ -164,7 +164,7 @@ public class DetailedConceptPane extends AbstractConceptPane {
 
         budgetGraph.update();
 
-        beliefChart.update(concept);
+        //beliefChart.update(concept);
 
         termlinkView.update();
         tasklinkView.update();

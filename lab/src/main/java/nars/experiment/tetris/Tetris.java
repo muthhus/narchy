@@ -25,7 +25,9 @@ import java.util.List;
 import static nars.experiment.tetris.impl.TetrisState.*;
 import static spacegraph.SpaceGraph.window;
 import static spacegraph.obj.ControlSurface.newControlWindow;
+import static spacegraph.obj.layout.Grid.col;
 import static spacegraph.obj.layout.Grid.grid;
+import static spacegraph.obj.layout.Grid.row;
 
 /**
  * Created by me on 7/28/16.
@@ -472,15 +474,15 @@ public class Tetris extends NAgents {
         //STMView.show(stm, 800, 600);
 
         window(
-                grid(
+                col(
 
                         //Vis.concepts(nar, 32),
-                        Vis.agentActions(t, 5000),
+                        Vis.agentActions(t, 500),
 
-                        Vis.budgetHistogram(nar, 32),
-                        Vis.conceptLinePlot(nar,
+                        Vis.budgetHistogram(nar, 24)
+                        /*Vis.conceptLinePlot(nar,
                                 Iterables.concat(t.actions, Lists.newArrayList(t.happy, t.joy)),
-                                1200)
+                                600)*/
                 ), 1200, 900);
 
 
@@ -624,7 +626,7 @@ public class Tetris extends NAgents {
 
 
         //t.run(runFrames);
-        t.run(5000);
+        t.run(15000);
 
 //        NARController meta = new NARController(nar, loop, t);
 //

@@ -57,12 +57,13 @@ public class MutableTask extends AbstractTask {
 
 
 
-    @Override
+    @Nullable @Override
     public Truth truth(long when) {
         if (!isBeliefOrGoal())
             return null;
 
-        long a = occurrence();
+
+        long a = start();
 
         Truth t = truth();
         if (a == ETERNAL)
@@ -91,8 +92,13 @@ public class MutableTask extends AbstractTask {
 
     }
 
+    @Override
+    public long start() {
+        return occurrence();
+    }
+
     /** end occurrence */
-    private long end() {
+    @Override public long end() {
         long dt = 0;
         if (op().temporal) {
             dt=dt();

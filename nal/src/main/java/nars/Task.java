@@ -726,7 +726,7 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
         return LongSets.immutable.of(evidence());
     }
 
-    Truth truth(long when);
+    @Nullable Truth truth(long when);
 
     default float conf(long when) {
         Truth t = truth(when);
@@ -741,4 +741,6 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
         return t!=null ? t.confWeight() : 0;
     }
 
+    long start();
+    long end();
 }

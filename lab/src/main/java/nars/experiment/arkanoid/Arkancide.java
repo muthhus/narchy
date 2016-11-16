@@ -28,14 +28,14 @@ public class Arkancide extends NAgents {
 
         noid = new Arkanoid();
 
-        senseNumber("noid", noid, "paddle.x");
-        senseNumber("noid", noid, "ball.x");
-        senseNumber("noid", noid, "ball.y");
-        senseNumber("noid", noid, "ball.velocityX");
-        senseNumber("noid", noid, "ball.velocityY");
+        senseNumber("(paddle,x)", ()->noid.paddle.x);
+        senseNumber("(ball,x)", ()->noid.ball.x);
+        senseNumber("(ball,y)", ()->noid.ball.y);
+        senseNumber("(ball,vx)", ()->noid.ball.velocityX);
+        senseNumber("(ball,vy)", ()->noid.ball.velocityY);
 
-        //addCamera("noid", noid, visW, visH);
-        addCameraRetina("noid", noid, visW/2, visH/2, (v) -> t(v, alpha));
+        addCamera("noid", noid, visW, visH);
+        //addCameraRetina("noid", noid, visW/2, visH/2, (v) -> t(v, alpha));
 
         action(new ActionConcept(
                 //"happy:noid(paddle,x)"

@@ -30,7 +30,8 @@ public final class TruthPolation  {
 
 
     public static float evidenceDecay(float evi, float dur, float dt) {
-        return evi / (1f + (dt*dt) / (dur*dur) );
+        //return evi / (1f + (dt*dt) / (dur*dur) );
+        return evi / (1f + dt / dur );
     }
 
 
