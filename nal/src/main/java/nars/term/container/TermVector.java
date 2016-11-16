@@ -91,6 +91,8 @@ public abstract class TermVector implements TermContainer {
                 return Terms.NoSubterms;
             case 1:
                 return new TermVector1(t[0]);
+            case 2:
+                return new TermVector2(t[0], t[1]);
             default:
                 return new ArrayTermVector(t);
         }

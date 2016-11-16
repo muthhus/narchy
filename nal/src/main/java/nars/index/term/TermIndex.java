@@ -24,6 +24,7 @@ import nars.term.transform.CompoundTransform;
 import nars.term.transform.TermTransform;
 import nars.term.transform.VariableNormalization;
 import nars.term.util.InvalidTermException;
+import nars.util.Util;
 import nars.util.map.nbhm.HijacKache;
 import org.eclipse.collections.api.list.primitive.ByteList;
 import org.eclipse.collections.impl.factory.Maps;
@@ -145,8 +146,7 @@ public abstract class TermIndex extends TermBuilder {
 
         if (cacheable) {
 
-            ProtoCompound p = new ProtoCompound.RawProtoCompound(op, dt, u);
-            return terms.computeIfAbsent(p, termizer);
+            return terms.computeIfAbsent(new ProtoCompound.RawProtoCompound(op, dt, u), termizer);
 
         } else {
             return _the(op, dt, u);
@@ -315,16 +315,16 @@ public abstract class TermIndex extends TermBuilder {
         try {
             int numVars = u.vars();
 
-            @NotNull Term[] src = u.terms();
+
 
             Term[] tgt =
-                    transform(src, null,
+                    transform(u, null,
                             (numVars == 1 && u.varPattern() == 0) ?
                                     VariableNormalization.singleVariableNormalization :
                                     new VariableNormalization(numVars /* estimate */)
                     );
 
-            result = tgt != src ? TermVector.the(tgt) : u;
+            result = TermVector.the(tgt);
 
         } catch (InvalidTermException e) {
 
@@ -385,42 +385,43 @@ public abstract class TermIndex extends TermBuilder {
         if (src == null || !t.testSuperTerm(src))
             return src;
 
-        Term[] srcSubs = src.terms();
-        Term[] tgtSubs = transform(srcSubs, src, t);
+        return the(src.op(), src.dt(), transform(src, src, t));
 
-        return tgtSubs != srcSubs ?
-                the(src.op(), src.dt(), tgtSubs) : //must not allow subterms to be tested for equality, for variable normalization purpose the variables will seem equivalent but they are not
-                src;
+//        return !Util.equals(tgtSubs, srcSubs) ?
+//                the(src.op(), src.dt(), tgtSubs) : //must not allow subterms to be tested for equality, for variable normalization purpose the variables will seem equivalent but they are not
+//                src;
 
     }
 
     @NotNull
-    public Term[] transform(@NotNull Term[] src, Compound superterm, @NotNull CompoundTransform t) {
+    public Term[] transform(TermContainer src, Compound superterm, @NotNull CompoundTransform t) {
 
         int modifications = 0;
 
-        Term[] target = src.clone();
+        int s = src.size();
 
-        for (int i = 0, n = src.length; i < n; i++) {
+        Term[] target = new Term[s];
 
-            Term x = src[i], y;
+        for (int i = 0; i < s; i++) {
+
+            Term x = src.term(i), y;
 
             if (t.test(x)) {
                 y = t.apply(superterm, x);
             } else if (x instanceof Compound) {
                 y = transform((Compound) x, t); //recurse
             } else {
-                continue;
+                y = x;
             }
 
             if (x != y) { //must be refernce equality test for some variable normalization cases
                 modifications++;
-                target[i] = y;
             }
 
+            target[i] = y;
         }
 
-        return modifications > 0 ? target : src;
+        return target;
     }
 
 

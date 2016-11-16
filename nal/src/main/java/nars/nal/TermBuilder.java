@@ -376,7 +376,9 @@ public abstract class TermBuilder {
 
         //if (Param.DEBUG ) {
         //check for any imdex terms that may have not been removed
-        for (Term x : args.terms()) {
+        int s = args.size();
+        for (int i = 0; i < s; i++) {
+            Term x = args.term(i);
             if (isTrueOrFalse(x)) {
                 if ((op == NEG) || (op == CONJ) || (op == IMPL) || (op == EQUI))
                    throw new RuntimeException("appearance of True/False in " + op + " should have been filtered prior to this");
@@ -389,7 +391,6 @@ public abstract class TermBuilder {
         if (Param.ARITHMETIC_INDUCTION)
             args = ArithmeticInduction.compress(op, dt, args);
 
-        int s = args.size();
         if (s == 0) {
             throw new RuntimeException("should not have zero args here");
         }

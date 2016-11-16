@@ -11,7 +11,7 @@ import java.util.function.Consumer;
 /**
  * Size 1 TermVector
  */
-public class TermVector1 extends TermVector {
+public final class TermVector1 extends TermVector {
 
     public final Term the;
 

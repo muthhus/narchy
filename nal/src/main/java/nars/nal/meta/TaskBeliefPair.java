@@ -6,6 +6,9 @@ import nars.term.compound.GenericCompound;
 import nars.term.container.TermVector;
 import org.jetbrains.annotations.NotNull;
 
+import static nars.Op.PROD;
+import static nars.time.Tense.DTERNAL;
+
 /**
  * just holds two terms, not really necessary. recycled
  */
@@ -13,18 +16,9 @@ public final class TaskBeliefPair extends GenericCompound {
 
     //int actualStructure;
 
-    public TaskBeliefPair() {
-        super(Op.PROD, TermVector.the(Op.Imdex, Op.Imdex) /* placeholders */);
-    }
-
     public TaskBeliefPair(@NotNull Term a, @NotNull Term b) {
-        this();
-        Term[] t = terms();
-        t[0] = a;
-        t[1] = b;
+        super(PROD, TermVector.the(a, b));
     }
-
-
 
     @Override
     public int structure() {

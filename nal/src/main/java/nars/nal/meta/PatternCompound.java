@@ -25,10 +25,6 @@ abstract public class PatternCompound extends GenericCompound {
     public final int sizeCached;
     public final int structureCached;
 
-    @NotNull
-    public final Term[] termsCached;
-
-
     PatternCompound(@NotNull Compound seed, @NotNull TermContainer subterms) {
         super(seed.op(), seed.dt(), subterms);
 
@@ -39,16 +35,8 @@ abstract public class PatternCompound extends GenericCompound {
         structureCached =
                 //seed.structure() & ~(Op.VariableBits);
                 seed.structure() & ~(Op.VAR_PATTERN.bit);
-        this.termsCached = subterms.terms();
-
     }
 
-
-    @NotNull
-    @Override
-    public Term[] terms() {
-        return termsCached;
-    }
 
     @Override
     public final int structure() {
@@ -118,7 +106,7 @@ abstract public class PatternCompound extends GenericCompound {
             //TODO check for shim and subtract xsize?
 
             while (i < xsize) {
-                Term x = termsCached[i++];
+                Term x = term(i++);
 
                 if (x instanceof Ellipsis) {
                     int available = ysize - j;
@@ -326,7 +314,10 @@ abstract public class PatternCompound extends GenericCompound {
             final Ellipsis ellipsis = this.ellipsis;
 
             boolean ellipsisMatched = false;
-            for (Term x : termsCached) {
+
+            int s = size();
+            for (int i = 0; i < s; i++) {
+                Term x = term(i);
 
                 //boolean xVar = x.op() == type;
                 //ellipsis to be matched in stage 2
