@@ -16,7 +16,7 @@ import nars.term.Term;
 import nars.term.Termlike;
 import nars.term.container.TermContainer;
 import nars.term.container.TermSet;
-import nars.time.Clock;
+import nars.time.Time;
 import nars.truth.Truth;
 import nars.truth.TruthDelta;
 import nars.util.Util;
@@ -210,7 +210,7 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept, Ter
     }
 
     protected MicrosphereTemporalBeliefTable newTemporalTable(final int tCap, NAR nar) {
-        return new MyMicrosphereTemporalBeliefTable(tCap, nar.clock);
+        return new MyMicrosphereTemporalBeliefTable(tCap, nar.time);
     }
 
     protected EternalTable newEternalTable(int eCap) {
@@ -678,15 +678,15 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept, Ter
 
     static final class MyMicrosphereTemporalBeliefTable extends MicrosphereTemporalBeliefTable {
 
-        private final Clock clock;
+        private final Time time;
 
-        public MyMicrosphereTemporalBeliefTable(int tCap, Clock clock) {
+        public MyMicrosphereTemporalBeliefTable(int tCap, Time time) {
             super(tCap);
-            this.clock = clock;
+            this.time = time;
         }
 
         @Override public float focus(float dt, float evidence) {
-            return TruthPolation.evidenceDecay(evidence, clock.duration(), dt);
+            return TruthPolation.evidenceDecay(evidence, time.duration(), dt);
         }
     }
 }

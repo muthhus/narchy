@@ -6,8 +6,8 @@ import nars.budget.Budgeted;
 import nars.concept.Concept;
 import nars.nar.exe.SingleThreadExecutioner;
 import nars.term.Termed;
-import nars.time.Clock;
-import nars.time.FrameClock;
+import nars.time.Time;
+import nars.time.FrameTime;
 import nars.util.data.random.XORShiftRandom;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.eclipse.collections.impl.map.mutable.primitive.ObjectFloatHashMap;
@@ -32,9 +32,9 @@ public class Terminal extends NAR {
     }
 
     public Terminal(int capacity) {
-        this(capacity, new XORShiftRandom(1), new FrameClock());
+        this(capacity, new XORShiftRandom(1), new FrameTime());
     }
-    public Terminal(int capacity, @NotNull Random random, @NotNull Clock c) {
+    public Terminal(int capacity, @NotNull Random random, @NotNull Time c) {
         super(c, new Default.DefaultTermTermIndex(capacity), random, Param.defaultSelf(), new SingleThreadExecutioner());
 
 

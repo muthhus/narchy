@@ -240,6 +240,7 @@
     B, (A <=> C), belief(positive), time(decomposeBelief), neqCom(B,C) |- subIfUnifiesAny(C,A,B), (Belief:Analogy, Goal:Strong)
         B, (A <=> C), belief(negative), time(decomposeBelief), neqCom(B,C) |- subIfUnifiesAny((--,%C),A,B), (Belief:AnalogyPN, Goal:StrongPN)
 
+
     //these are only valid if A occurrs during or after C. the opposite is not logical and would also produce redundant results
     B, (C && A), task(positive), time(decomposeBelief), neqCom(B,C) |- subIfUnifiesForward(C,A,B), (Goal:Strong)
         B, (C && (--,%A)), task(negative), time(decomposeBelief), neqCom(B,C) |- subIfUnifiesForward(C,A,B), (Goal:StrongN)
@@ -251,9 +252,9 @@
     //// propositional decomposition ////////////////////////////////////////////////////////////////////////////////////
     //If S is the case, and (&&,S,A..+) is not the case, it can't be that (&&,A..+) is the case
 
-    S, (&&,S,A..+), time(decomposeBelief) |- (&&,A..+), (Belief:DecomposePositiveNegativeNegative)
+    //S, (&&,S,A..+), time(decomposeBelief) |- (&&,A..+), (Belief:DecomposePositiveNegativeNegative)
         //S, (||,S,A..+)                        |- (||,A..+), (Belief:DecomposeNegativePositivePositive)
-    S, (&&,(--,%S),A..+), time(decomposeBelief) |- (&&,A..+), (Belief:DecomposeNegativeNegativeNegative)
+    //S, (&&,(--,%S),A..+), time(decomposeBelief) |- (&&,A..+), (Belief:DecomposeNegativeNegativeNegative)
         //S, (||,(--,%S),A..+)                        |- (||,A..+), (Belief:DecomposePositivePositivePositive)
 
 
@@ -316,14 +317,17 @@
 
      //structural decompose any component of a conjunction.
      //     NOTE: the multi-term decomposition allows the superset of subterms without overlap. if they are chosen only one at a time, then overlap will prevent their recombination to the aforementioned superset result so it is incomplete. thus only the ellipsis form is necessary
-     (&&,X,A..+), X, time(decomposeTaskSubset) |- (&&,A..+), (Belief:StructuralDeduction,Goal:StructuralDeduction)
-        (&&,(--,%X),A..+), X, time(decomposeTaskSubset) |- (&&,A..+), (Belief:StructuralDeduction,Goal:StructuralDeduction)
-         //(&&,X,A..+), X, time(decomposeTaskSubset) |- X, (Belief:StructuralDeduction,Goal:StructuralDeduction)
+
+     (&&,X,A..+), X, time(decomposeTaskSubset) |-                 (&&,A..+), (Belief:StructuralDeduction,Goal:StructuralDeduction)
+     (&&,(--,%X),A..+), X, time(decomposeTaskSubset) |-       (&&,A..+), (Belief:StructuralDeduction,Goal:StructuralDeduction)
+
+
      (&&,X,A..+), X, time(decomposeTaskSubset), task("?@") |- (&&,A..+), ()
+        (&&,(--,%X),A..+), X, time(decomposeTaskSubset), task("?@") |- (&&,A..+), ()
         //(&&,X,A..+), X, time(decomposeTaskSubset), task("?") |- X, (Punctuation:Question)
 
      (&&,X,A..+), B, time(decomposeTaskSubset) |- subIfUnifiesDep((&&,A..+),X,B), (Belief:AnonymousAnalogy, Goal:Strong)
-         //(&&,X,A), B, time(decomposeTaskSubset) |- subIfUnifiesDep(X,A,B), (Belief:AnonymousAnalogy, Goal:Strong)
+         //TODO: negation form for this?
 
 //disjunction
     (&&,(--,%B),(--,%A)), B, task("?") |- (||,%B,%A), (Belief:BeliefStructuralDeduction, Punctuation:Belief)

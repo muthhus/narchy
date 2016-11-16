@@ -268,11 +268,11 @@ public class NAL7Test extends AbstractNALTest {
     public void inference_on_tense_4() {
         TestNAR tester = test();
         //tester.log();
-        tester.mustBelieve(cycles, "<(John,key) --> hold>",
-                1.00f, 0.45f, -3);
+
         tester.believe("(((John,key) --> hold) ==>+3 ((John,room) --> enter))");
         tester.input("<(John,room) --> enter>. :|:");
-
+        tester.mustBelieve(cycles, "<(John,key) --> hold>",
+                1.00f, 0.45f, -3);
     }
 
     @Test
@@ -594,11 +594,6 @@ public class NAL7Test extends AbstractNALTest {
             .mustBelieve(cycles, "(b)", 1f, 0.81f, 1 /* occ */);
     }
 
-    /** because the two temporal events create a contradiction when evaluating the
-     * derivation's result time, this tests decomposition's
-     * ability to randomly choose (by confidence weighting) the result
-     * determined by either the task or the belief.
-     */
     @Test public void testImplicationDecompositionContradictionFairness() {
 
         test()
@@ -606,8 +601,13 @@ public class NAL7Test extends AbstractNALTest {
                 .inputAt(0, "(b). :|:")
                 .inputAt(0, "((a) ==>+1 (b)). :|:")
                 .mustNotOutput(cycles, "(a)", '.', ETERNAL)
-                .mustBelieve(cycles, "(a)", 1f, 0.45f, -1 /* occ */)
                 .mustBelieve(cycles, "(a)", 1f, 0.45f, 0 /* occ */);
+                //.mustBelieve(cycles, "(a)", 1f, 0.45f, 0 /* occ */);
+                //        /** because the two temporal events create a contradiction when evaluating the
+                //         * derivation's result time, this tests decomposition's
+                //         * ability to randomly choose (by confidence weighting) the result
+                //         * determined by either the task or the belief.
+                //         */
     }
 
     @Test

@@ -12,7 +12,7 @@ import nars.experiment.tetris.impl.TetrisVisualizer;
 import nars.gui.Vis;
 import nars.remote.NAgents;
 import nars.term.Compound;
-import nars.time.FrameClock;
+import nars.time.FrameTime;
 import nars.truth.Truth;
 import nars.util.TaskStatistics;
 import org.jetbrains.annotations.NotNull;
@@ -358,7 +358,7 @@ public class Tetris extends NAgents {
     public static void main(String[] args) {
         Param.DEBUG = false;
 
-        NAR nar = NAgents.newMultiThreadNAR(3, new FrameClock().setDuration(TIME_PER_FALL/3f));
+        NAR nar = NAgents.newMultiThreadNAR(3, new FrameTime().setDuration(TIME_PER_FALL/3f));
         nar.linkFeedbackRate.setValue(0.05f);
 
 //        Random rng = new XorShift128PlusRandom(1);

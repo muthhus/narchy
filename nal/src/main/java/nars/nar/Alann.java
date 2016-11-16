@@ -17,8 +17,8 @@ import nars.nar.util.DefaultConceptBuilder;
 import nars.nar.util.PremiseMatrix;
 import nars.op.time.STMTemporalLinkage;
 import nars.term.Termed;
-import nars.time.Clock;
-import nars.time.FrameClock;
+import nars.time.Time;
+import nars.time.FrameTime;
 import nars.util.data.random.XorShift128PlusRandom;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.eclipse.collections.impl.map.mutable.primitive.ObjectFloatHashMap;
@@ -173,19 +173,19 @@ public class Alann extends NAR {
     }
 
     public Alann() {
-        this(new FrameClock());
+        this(new FrameTime());
     }
 
-    public Alann(Clock clock) {
-        this(clock,
+    public Alann(Time time) {
+        this(time,
                 //new SingleThreadExecutioner()
                 new MultiThreadExecutioner(2, 1024*16).sync(false),
                 4
         );
     }
 
-    public Alann(@NotNull Clock clock, Executioner exe, int cores) {
-        super(clock, new TreeTermIndex.L1TreeIndex(new DefaultConceptBuilder(), 1024*1024, 16384, 3),
+    public Alann(@NotNull Time time, Executioner exe, int cores) {
+        super(time, new TreeTermIndex.L1TreeIndex(new DefaultConceptBuilder(), 1024*1024, 16384, 3),
                 new XorShift128PlusRandom(1), Param.defaultSelf(), exe);
 
         durMin.setValue(BUDGET_EPSILON * 2f);

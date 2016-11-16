@@ -3,9 +3,9 @@ package nars.time;
 import java.io.Serializable;
 
 /**
- * Created by me on 7/2/15.
+ * Time state
  */
-public interface Clock extends Serializable {
+public interface Time extends Serializable {
 
 	/** called when memory reset */
 	void clear();

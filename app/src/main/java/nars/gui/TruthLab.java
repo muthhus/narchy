@@ -10,6 +10,8 @@ import nars.concept.Concept;
 import nars.nar.Default;
 import nars.table.BeliefTable;
 import nars.term.Term;
+import nars.term.Terms;
+import nars.time.FrameTime;
 import nars.truth.Truth;
 import org.eclipse.collections.api.block.function.primitive.IntToObjectFunction;
 import spacegraph.SpaceGraph;
@@ -99,7 +101,7 @@ public class TruthLab extends Grid {
                 if (t != null)
                     c = t.conf();
                 else
-                    c = 0;
+                    c = -1;
 
                 data[i++] = c;
 
@@ -114,7 +116,7 @@ public class TruthLab extends Grid {
 
         @Override
         protected void paint(GL2 gl) {
-            float sw = 0.9f;
+            float sw = 0.9f * timeScale;
             float sh = 0.9f;
 
             //HACK
@@ -130,9 +132,16 @@ public class TruthLab extends Grid {
                 float occ = data[i++];
                 float f = data[i++];
                 float c = data[i++];
+                if (c < 0)
+                    continue;
+
+                float x = occ * timeScale;
+                float y = (1f - sh) / 2f;
 
                 gl.glColor4f(1-f, f, 0, c);
-                Draw.rect(gl, occ * timeScale, (1f - sh)/2f, sw * timeScale, sh);
+                Draw.rect(gl, x, y, sw, sh);
+                gl.glColor4f(0.5f, 0.5f, 0.5f, 0.5f);
+                Draw.rectStroke(gl, x, y, sw, sh);
             }
         }
 
@@ -144,7 +153,7 @@ public class TruthLab extends Grid {
             super(start, end, samplePeriod, (w) -> $.t(task.freq(), task.conf(w)));
 
             this.label = task.toString();
-            Draw.colorHash(task.term(), labelColor);
+            Draw.colorHash(Terms.atemporalize( task.term() ), labelColor);
         }
     }
     static class BeliefTableTimeline extends TruthTimeline {
@@ -191,17 +200,23 @@ public class TruthLab extends Grid {
 
 
     public static void main(String[] args) {
-        NAR n = new Default();
+        NAR n = new Default(1000, 64, 1, 3);
         SpaceGraph.window(
-                new TruthLab(n, $("(x)"), $("(y)"), $("(x && y)")),
+                new TruthLab(n, $("(x)"), $("(y)"),
+                        $("((x) && (y))"),
+                        $("((x) && --(y))"),
+                        $("(--(x) && (y))"),
+                        $("(--(x) && --(y))")
+                ),
                 1200, 900);
 
         Param.DEBUG = true;
+        ((FrameTime)n.time).setDuration(2);
         n.log()
-            .inputAt(10, "(x).   :|: %1.0;0.4%")
-            .inputAt(20, "(y).   :|: %1.0;0.4%")
-            .inputAt(30, "--(x). :|: %1.0;0.3%")
-            .inputAt(40, "--(y). :|: %1.0;0.3%")
+            .inputAt(10, "(x).   :|: %1.0;0.9%")
+            .inputAt(20, "(y).   :|: %1.0;0.9%")
+            .inputAt(30, "--(x). :|: %1.0;0.8%")
+            .inputAt(40, "--(y). :|: %1.0;0.8%")
             .run(60);
 
     }

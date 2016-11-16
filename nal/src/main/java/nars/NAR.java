@@ -32,8 +32,8 @@ import nars.term.atom.Atom;
 import nars.term.atom.Atomic;
 import nars.term.transform.TermTransform;
 import nars.term.util.InvalidTermException;
-import nars.time.Clock;
-import nars.time.FrameClock;
+import nars.time.Time;
+import nars.time.FrameTime;
 import nars.time.Tense;
 import nars.truth.Truth;
 import nars.util.Iterative;
@@ -104,7 +104,7 @@ public abstract class NAR extends Param implements Level, Consumer<Task>, NARIn,
     @NotNull
     public final transient Emotion emotion;
     @NotNull
-    public final Clock clock;
+    public final Time time;
     /**
      * holds known Term's and Concept's
      */
@@ -210,14 +210,14 @@ public abstract class NAR extends Param implements Level, Consumer<Task>, NARIn,
         return concepts.normalize(t);
     }
 
-    public NAR(@NotNull Clock clock, @NotNull TermIndex concepts, @NotNull Random rng, @NotNull Atom self, Executioner exe) {
+    public NAR(@NotNull Time time, @NotNull TermIndex concepts, @NotNull Random rng, @NotNull Atom self, Executioner exe) {
 
         random = rng;
 
         level = 8;
 
-        this.clock = clock;
-        clock.clear();
+        this.time = time;
+        time.clear();
 
         this.concepts = concepts;
 
@@ -320,7 +320,7 @@ public abstract class NAR extends Param implements Level, Consumer<Task>, NARIn,
 
             clear();
 
-            clock.clear();
+            time.clear();
 
             concepts.clear();
 
@@ -686,9 +686,9 @@ public abstract class NAR extends Param implements Level, Consumer<Task>, NARIn,
         Task existing = tasks.addIfAbsent(input);
         if (existing == null) {
 
-            if (clock instanceof FrameClock) {
+            if (time instanceof FrameTime) {
                 //HACK for unique serial number w/ frameclock
-                ((FrameClock) clock).validate(input.evidence());
+                ((FrameTime) time).validate(input.evidence());
             }
 
             try {
@@ -848,7 +848,7 @@ public abstract class NAR extends Param implements Level, Consumer<Task>, NARIn,
 
         for (; frames > 0; frames--) {
 
-            clock.tick();
+            time.tick();
 
             exe.next(this);
 
@@ -1422,7 +1422,7 @@ public abstract class NAR extends Param implements Level, Consumer<Task>, NARIn,
     }
 
     public final long time() {
-        return clock.time();
+        return time.time();
     }
 
 

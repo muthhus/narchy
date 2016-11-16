@@ -8,7 +8,7 @@ import java.util.concurrent.atomic.AtomicLong;
 /**
  * Created by me on 7/2/15.
  */
-public abstract class RealtimeClock implements Clock {
+public abstract class RealtimeTime implements Time {
 
 
 
@@ -22,7 +22,7 @@ public abstract class RealtimeClock implements Clock {
     float duration;
 
 
-    protected RealtimeClock(int unitsPerSecond, boolean relativeToStart) {
+    protected RealtimeTime(int unitsPerSecond, boolean relativeToStart) {
         super();
         this.unitsPerSecod = unitsPerSecond;
         this.start = relativeToStart ? getRealTime() : 0L;
@@ -31,12 +31,12 @@ public abstract class RealtimeClock implements Clock {
 
     }
 
-    public final RealtimeClock setDuration(int units) {
+    public final RealtimeTime setDuration(int units) {
         duration = units;
         return this;
     }
 
-    public final RealtimeClock setDuration(float seconds) {
+    public final RealtimeTime setDuration(float seconds) {
         return setDuration(secondsToUnits(seconds));
     }
 
@@ -102,7 +102,7 @@ public abstract class RealtimeClock implements Clock {
     }
 
     /** decisecond (0.1) accuracy */
-    public static class DS extends RealtimeClock {
+    public static class DS extends RealtimeTime {
 
 
         public DS() {
@@ -121,7 +121,7 @@ public abstract class RealtimeClock implements Clock {
     }
 
     /** centisecond (0.01) accuracy */
-    public static class CS extends RealtimeClock {
+    public static class CS extends RealtimeTime {
 
 
         public CS() {
@@ -140,7 +140,7 @@ public abstract class RealtimeClock implements Clock {
     }
 
     /** millisecond accuracy */
-    public static class MS extends RealtimeClock {
+    public static class MS extends RealtimeTime {
 
 
         public MS() {
@@ -160,7 +160,7 @@ public abstract class RealtimeClock implements Clock {
     }
 
     /** nanosecond accuracy */
-    public static class NS extends RealtimeClock {
+    public static class NS extends RealtimeTime {
 
 
         protected NS(boolean relativeToStart) {

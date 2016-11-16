@@ -219,7 +219,6 @@ public class NAL8Test extends AbstractNALTest {
     @Test public void goal_deduction_equi_pos_posneg()  {
 
             test()
-                    
                     .input("(R)! :|:")
                     .input("((S) <=>+5 --(R)).") //internally, this reduces to --(S ==> R)
                     .mustDesire(cycles, "(S)", 0.0f, 0.81f, -5);

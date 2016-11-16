@@ -12,7 +12,7 @@ import nars.nar.Default;
 import nars.nar.exe.Executioner;
 import nars.nar.exe.SingleThreadExecutioner;
 import nars.nar.util.DefaultConceptBuilder;
-import nars.time.FrameClock;
+import nars.time.FrameTime;
 import nars.util.data.random.XorShift128PlusRandom;
 
 import java.util.Arrays;
@@ -236,7 +236,7 @@ public class Line1DContinuous extends NAgent {
         Default nar = new Default(1024,
                 conceptsPerCycle, 1, 3, rng,
                 new CaffeineIndex(new DefaultConceptBuilder(), 1024*64, 12, false, exe),
-                new FrameClock().setDuration(2), exe
+                new FrameTime().setDuration(2), exe
         );
 
 

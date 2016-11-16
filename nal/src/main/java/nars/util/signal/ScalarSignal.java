@@ -74,7 +74,7 @@ public abstract class ScalarSignal implements Consumer<NAR>, DoubleSupplier {
         this.value = value;
         this.truthFloatFunction = truthFloatFunction == null ? (v)->null : truthFloatFunction;
 
-        this.commonEvidence = Param.SENSOR_TASKS_SHARE_COMMON_EVIDENCE ? new long[] { n.clock.nextStamp() } : LongArrays.EMPTY_ARRAY;
+        this.commonEvidence = Param.SENSOR_TASKS_SHARE_COMMON_EVIDENCE ? new long[] { n.time.nextStamp() } : LongArrays.EMPTY_ARRAY;
 
         pri(pri);
         this.dur = dur;

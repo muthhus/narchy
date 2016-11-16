@@ -16,9 +16,9 @@ import nars.nar.util.DefaultConceptBuilder;
 import nars.op.mental.Abbreviation;
 import nars.op.mental.Inperience;
 import nars.op.time.MySTMClustered;
-import nars.time.Clock;
-import nars.time.FrameClock;
-import nars.time.RealtimeClock;
+import nars.time.Time;
+import nars.time.FrameTime;
+import nars.time.RealtimeTime;
 import nars.truth.Truth;
 import nars.util.TaskStatistics;
 import nars.util.data.random.XorShift128PlusRandom;
@@ -53,7 +53,7 @@ abstract public class NAgents extends NAgent {
     }
 
     public static void run(Function<NAR, NAgents> init, int frames) {
-        Default nar = newMultiThreadNAR(3, new FrameClock(), true);
+        Default nar = newMultiThreadNAR(3, new FrameTime(), true);
         //Default nar = newNAR();
         //Default2 nar = newNAR2();
 
@@ -95,14 +95,14 @@ abstract public class NAgents extends NAgent {
 
     }
 
-    private static Default newMultiThreadNAR(int cores, Clock clock, boolean sync) {
-        Default d = newMultiThreadNAR(cores, clock);
+    private static Default newMultiThreadNAR(int cores, Time time, boolean sync) {
+        Default d = newMultiThreadNAR(cores, time);
         ((MultiThreadExecutioner) d.exe).sync(sync);
         return d;
     }
 
     public static Alann newAlann() {
-        Alann nar = new Alann(new RealtimeClock.DS(true).setDuration(1));
+        Alann nar = new Alann(new RealtimeTime.DS(true).setDuration(1));
 
         MySTMClustered stm = new MySTMClustered(nar, 128, '.', 3, true, 6);
         MySTMClustered stmGoal = new MySTMClustered(nar, 32, '!', 2, true, 4);
@@ -141,7 +141,7 @@ abstract public class NAgents extends NAgent {
     }
 
 
-    public static Default newMultiThreadNAR(int threads, Clock clock) {
+    public static Default newMultiThreadNAR(int threads, Time time) {
         Random rng = new XorShift128PlusRandom(1);
         final Executioner exe =
                 //new SingleThreadExecutioner();
@@ -159,7 +159,7 @@ abstract public class NAgents extends NAgent {
 
                 ,
                 //new FrameClock()
-                clock,
+                time,
                 exe) {
 
 //            @Override

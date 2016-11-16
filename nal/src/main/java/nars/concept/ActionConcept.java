@@ -90,7 +90,7 @@ public class ActionConcept extends WiredCompoundConcept implements WiredCompound
         this.feedbackResolution = n.truthResolution.floatValue();
         this.motor = motor;
 
-        this.commonEvidence = Param.SENSOR_TASKS_SHARE_COMMON_EVIDENCE ? new long[] { n.clock.nextStamp() } : LongArrays.EMPTY_ARRAY;
+        this.commonEvidence = Param.SENSOR_TASKS_SHARE_COMMON_EVIDENCE ? new long[] { n.time.nextStamp() } : LongArrays.EMPTY_ARRAY;
 
     }
 

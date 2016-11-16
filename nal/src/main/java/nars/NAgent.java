@@ -13,8 +13,8 @@ import nars.task.GeneratedTask;
 import nars.task.MutableTask;
 import nars.term.Compound;
 import nars.term.Term;
-import nars.time.Clock;
-import nars.time.FrameClock;
+import nars.time.Time;
+import nars.time.FrameTime;
 import nars.truth.Truth;
 import nars.util.Loop;
 import nars.util.list.FasterList;
@@ -209,9 +209,9 @@ abstract public class NAgent implements NSense, NAction {
     }
 
     private void ticks(int t) {
-        Clock clock = (Clock) nar.clock;
-        if (clock instanceof FrameClock)
-            ((FrameClock) clock).tick(t); //resume clock for the last cycle before repeating
+        Time time = (Time) nar.time;
+        if (time instanceof FrameTime)
+            ((FrameTime) time).tick(t); //resume clock for the last cycle before repeating
     }
 
     private void doFrame() {

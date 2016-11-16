@@ -300,7 +300,7 @@ public interface TimeFunctions {
         //the non-decomposed counterpart of the premise
 
 
-        long occOther = (otherTask != null) ? otherTask.occurrence() : occDecomposed;
+        long occOther = (otherTask != null) ? otherTask.occurrence() : ETERNAL;
 
 
         if ((occDecomposed == ETERNAL) && (occOther == ETERNAL)) {
@@ -335,7 +335,6 @@ public interface TimeFunctions {
 
                 occ = ETERNAL;
 
-                long relOccDecomposed = ETERNAL, relOccOther = ETERNAL;
 
                 @Nullable Term rDecomposed = resolve(p, decomposedTerm);
 
@@ -345,28 +344,29 @@ public interface TimeFunctions {
 
                     int dt = rDecomposed.subtermTime(rDerived);
                     if (dt != DTERNAL)
-                        relOccDecomposed = occDecomposed + dt;
+                        occ = occDecomposed + dt;
 
                 }
 
-                if (occOther != ETERNAL) {
+                if (occ == ETERNAL && occOther != ETERNAL) {
 
                     @Nullable Term rOtherTerm = resolve(p, decomposeTask ? p.beliefTerm.term() : p.taskTerm);
                     if (rOtherTerm!=null) {
 
                         if (derivationMatch(rOtherTerm, derived, p)) {
-                            relOccOther = occOther;
+                            occ = occOther;
                         } else if (rDecomposed != null) {
                             int otherInDecomposed = rDecomposed.subtermTime(rOtherTerm);
                             if (decomposedTerm.dt() == 0 && otherInDecomposed == 0) {
                                 //special case for &&+0 having undergone some unrecognizable change
-                                relOccOther = occOther - otherInDecomposed; //+0 should ensure it has the same time as this siblign event
+                                occ = occOther - otherInDecomposed; //+0 should ensure it has the same time as this siblign event
 
-                            } else if (rDerived != null && otherInDecomposed != DTERNAL) {
+                            } else if (rDerived != null) { //{ && otherInDecomposed != DTERNAL) {
                                 int derivedInDecomposed = rDecomposed.subtermTime(rDerived);
                                 if (derivedInDecomposed != DTERNAL) {
-                                    //now compute the dt between derived and otherTerm, as a shift added to occOther
-                                    relOccOther = occOther + (derivedInDecomposed - otherInDecomposed);
+                                    occ = occOther + derivedInDecomposed - otherInDecomposed;
+
+
                                 }
                             }
 
@@ -375,30 +375,14 @@ public interface TimeFunctions {
 
                 }
 
-                if (relOccDecomposed != ETERNAL && relOccOther != ETERNAL) {
-//                    //if both provide a possible timing for the result,
-//                    // choose by random wighted confidence which one
-//                    Task t = chooseByConf(task, belief, p);
-//                    //System.out.println("choose " + task + " " + belief + " ---> " + t);
-//                    if (t == decomposingTask)
-//                        occ = relOccDecomposed;
-//                    else
-//                        occ = relOccOther;
 
-                    //default to the task's
-                    occ = decomposeTask ? relOccDecomposed : relOccOther;
-
-                } else if (relOccDecomposed != ETERNAL) {
-                    occ = relOccDecomposed;
-                } else if (relOccOther != ETERNAL) {
-                    occ = relOccOther;
-                }
 
                 if (occ == ETERNAL) {
                     return noTemporalBasis(derived);
                 }
 
             }
+
 
             occReturn[0] = occ;
 

@@ -235,7 +235,7 @@ public abstract class AbstractTask extends RawBudget implements Task, Temporal {
 
         //finally, assign a unique stamp if none specified (input)
         if (evidence.length == 0)
-            setEvidence(nar.clock.nextStamp());
+            setEvidence(nar.time.nextStamp());
 
             //shift the occurrence time if input and dt < 0 and non-eternal HACK dont use log it may be removed without warning
 //        if (isInput()) {

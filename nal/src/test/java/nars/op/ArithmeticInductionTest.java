@@ -2,6 +2,7 @@ package nars.op;
 
 import nars.$;
 import nars.term.obj.Termject;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import static nars.$.*;
@@ -10,6 +11,7 @@ import static org.junit.Assert.assertEquals;
 /**
  * Created by me on 8/5/16.
  */
+@Ignore
 public class ArithmeticInductionTest {
 
     @Test

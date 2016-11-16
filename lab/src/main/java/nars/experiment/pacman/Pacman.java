@@ -33,7 +33,7 @@ import nars.nar.exe.Executioner;
 import nars.nar.exe.MultiThreadExecutioner;
 import nars.nar.util.DefaultConceptBuilder;
 import nars.op.time.MySTMClustered;
-import nars.time.FrameClock;
+import nars.time.FrameTime;
 import nars.truth.Truth;
 import nars.util.data.random.XorShift128PlusRandom;
 import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunction;
@@ -203,7 +203,7 @@ public class Pacman extends NAgent {
                 16, 2, 3, rng,
                 new CaffeineIndex(new DefaultConceptBuilder(), 25 * 100000, false, e),
                 //new TreeIndex.L1TreeIndex(new DefaultConceptBuilder(rng), 150000, 8192, 2),
-                new FrameClock(), e
+                new FrameTime(), e
 
         );
         //Object queryIntroducer = queryVariableIntroduction(nar, 100, 0.1f, 0.25f);
