@@ -2,9 +2,11 @@ package nars.term.container;
 
 import nars.$;
 import nars.term.Compound;
+import nars.term.Term;
 import org.junit.Test;
 
 import static nars.$.$;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -74,4 +76,20 @@ public class TermContainerTest {
         System.out.println($.terms.union(x.op(), x, y));
 
     }
+
+    @Test
+    public void testEqualityOfVector1() {
+        Term a = $.the("a");
+        TermContainer x = TermVector.the(a);
+        TermContainer y = TermVector.the(a);
+        assertEquals(x, y);
+
+        TermContainer z = new ArrayTermVector(a);
+        assertEquals(z.hashCode(), x.hashCode());
+        assertEquals(x, z);
+        assertEquals(z, x);
+
+
+    }
+
 }

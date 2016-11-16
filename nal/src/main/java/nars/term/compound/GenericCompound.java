@@ -48,16 +48,14 @@ public class GenericCompound implements Compound {
         this(op, Tense.DTERNAL, subterms);
     }
 
-    public GenericCompound(@NotNull Op op, int dt, @NotNull TermContainer _subterms) {
+    public GenericCompound(@NotNull Op op, int dt, @NotNull TermContainer subterms) {
 
-        TermVector subterms = (TermVector) _subterms; //HACK for future support of alternate TermContainer impls
-
-        if (dt != DTERNAL) {
+        if (Param.DEBUG && dt != DTERNAL) {
 
             if (op.image && ((dt < 0) || (dt > subterms.size()))) {
                 throw new InvalidTermException(op, dt, subterms.terms(), "Invalid dt value for image " + op);
             }
-            if (op != CONJ && (op.temporal && _subterms.size()!=2))
+            if (op != CONJ && (op.temporal && subterms.size()!=2))
                 throw new InvalidTermException(op, dt, subterms.terms(), "Invalid dt value for operator " + op);
         }
 
@@ -68,7 +66,7 @@ public class GenericCompound implements Compound {
 
         this.dt = dt;
 
-        this.hash = Util.hashCombine(subterms.hash, op.ordinal(), dt);
+        this.hash = Util.hashCombine(subterms.hashCode(), op.ordinal(), dt);
     }
 
     @NotNull

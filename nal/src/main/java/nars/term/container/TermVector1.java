@@ -1,6 +1,8 @@
 package nars.term.container;
 
+import com.google.common.base.Joiner;
 import com.google.common.collect.Iterators;
+import nars.Op;
 import nars.term.Term;
 import nars.term.Termlike;
 import org.apache.commons.math3.exception.OutOfRangeException;
@@ -17,13 +19,25 @@ import java.util.function.Predicate;
 /**
  * Size 1 TermVector
  */
-public final class TermVector1 extends TermVector implements Set<Term> {
+public final class TermVector1 implements TermContainer, Set<Term> {
 
     public final Term the;
 
     public TermVector1(Term the) {
-        super(the);
         this.the = the;
+    }
+
+    @Override
+    public int hashCode() {
+        return 31 + the.hashCode(); //HACK consistent with Terms.hash(..)
+    }
+
+    @Override
+    public final boolean equals(@NotNull Object obj) {
+        return
+                (this == obj)
+                        ||
+                        ((obj instanceof TermContainer) && equalTo((TermContainer)obj));
     }
 
     @NotNull
@@ -40,6 +54,27 @@ public final class TermVector1 extends TermVector implements Set<Term> {
     }
 
     @Override
+    public boolean isTerm(int i, @NotNull Op o) {
+        return i == 0 && the.op() == o;
+    }
+
+
+    /** vol and complexity are reported as if they were already part of an enclosing Compound */
+    @Override public int volume() {
+        return the.volume() + 1;
+    }
+
+    /** vol and complexity are reported as if they were already part of an enclosing Compound */
+    @Override public int complexity() {
+        return the.complexity() + 1;
+    }
+
+    @Override
+    public int structure() {
+        return the.structure();
+    }
+
+    @Override
     public int size() {
         return 1;
     }
@@ -47,6 +82,12 @@ public final class TermVector1 extends TermVector implements Set<Term> {
 
     @Override @NotNull public Set<Term> toSet() {
         return this; //this is why this class implements Set
+    }
+
+    @NotNull
+    @Override
+    public String toString() {
+        return "(" + the + ')';
     }
 
     @Override
@@ -131,11 +172,16 @@ public final class TermVector1 extends TermVector implements Set<Term> {
     }
 
     @Override public boolean equalTo(@NotNull TermContainer b) {
-        return (hash == b.hashCode()) &&
+        return (hashCode() == b.hashCode()) &&
                 //(structure() == b.structure()) &&
                 //(volume() == b.volume()) &&
                 (b.size()==1) &&
                 the.equals(b.term(0));
+    }
+
+    @Override
+    public void copyInto(Collection<Term> target) {
+        target.add(the);
     }
 
     @Override
@@ -146,6 +192,26 @@ public final class TermVector1 extends TermVector implements Set<Term> {
     @Override
     public boolean or(@NotNull Predicate<Term> p) {
         return p.test(the);
+    }
+
+    @Override
+    public int varIndep() {
+        return the.varIndep();
+    }
+
+    @Override
+    public int varDep() {
+        return the.varDep();
+    }
+
+    @Override
+    public int varQuery() {
+        return the.varQuery();
+    }
+
+    @Override
+    public int varPattern() {
+        return the.varPattern();
     }
 
     @Override

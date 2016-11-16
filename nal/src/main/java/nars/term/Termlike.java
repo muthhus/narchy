@@ -89,6 +89,23 @@ public interface Termlike {
     }
 
 
+    /**
+     * @param meta 6-element array that accumulates the metadata
+     * @return returns hashcode if a Term, but TermContainers may return zero
+     */
+    default int init(@NotNull int[] meta) {
+
+        meta[0] += varDep();
+        meta[1] += varIndep();
+        meta[2] += varQuery();
+
+        meta[3] += varPattern();
+        meta[4] += volume();
+        meta[5] |= structure();
+
+        return 0;
+    }
+
     default boolean impossibleSubTermOrEquality(@NotNull Term target) {
         return ((!Op.hasAll(structure(), target.structure())) ||
                 (impossibleSubTermOrEqualityVolume(target.volume())));

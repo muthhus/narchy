@@ -10,14 +10,14 @@ import java.util.Collections;
 import java.util.Set;
 import java.util.TreeSet;
 
-public class TermSet<X extends Term> {
+public class TermSet {
 
     @NotNull
-    public static TermVector the(@NotNull Term... x) {
+    public static TermContainer the(@NotNull Term... x) {
         return TermVector.the(Terms.toSortedSetArray(x));
     }
 
-    public static TermVector concat(@NotNull Term[] a, @NotNull Term... b) {
+    public static TermContainer concat(@NotNull Term[] a, @NotNull Term... b) {
 //        if ((a.length + b.length) == 2) {
 //            //simple case
 //            return TermSet.the(a[0], b[0]);
@@ -29,14 +29,14 @@ public class TermSet<X extends Term> {
 
     public
     @NotNull
-    static TermVector concat(@NotNull TreeSet<Term> t, Term[] b) {
+    static TermContainer concat(@NotNull TreeSet<Term> t, Term[] b) {
         Collections.addAll(t, b);
         return TermSet.the(t);
     }
 
 
     @NotNull
-    public static TermVector the(@NotNull Set<? extends Term> x) {
+    public static TermContainer the(@NotNull Set<? extends Term> x) {
         return TermVector.the(toSortedSetArray(x));
     }
 

@@ -8,6 +8,7 @@ import nars.term.Termlike;
 import nars.term.Terms;
 import nars.term.atom.Atomic;
 import nars.term.var.Variable;
+import org.apache.commons.lang3.ArrayUtils;
 import org.eclipse.collections.api.block.predicate.primitive.IntObjectPredicate;
 import org.eclipse.collections.api.list.primitive.ByteList;
 import org.eclipse.collections.api.set.ImmutableSet;
@@ -33,6 +34,8 @@ import static org.eclipse.collections.impl.factory.Sets.mutable;
  */
 public interface TermContainer extends Termlike, Iterable<Term> {
 
+
+
     @NotNull
     static TermContainer union(@NotNull TermContainer a, @NotNull TermContainer b) {
         if (a.equals(b))
@@ -50,6 +53,13 @@ public interface TermContainer extends Termlike, Iterable<Term> {
         }
 
         return TermSet.the(t);
+    }
+
+
+
+    @NotNull
+    default public TermContainer append(@NotNull Term x) {
+        return TermVector.the(ArrayUtils.add(terms(),x));
     }
 
     //TODO optionally allow atomic structure positions to differ
@@ -94,14 +104,6 @@ public interface TermContainer extends Termlike, Iterable<Term> {
         return (C) term(i);
     }
 
-    /**
-     * tests if subterm i is op o
-     */
-    boolean isTerm(int i, @NotNull Op o);
-    /*default boolean isTerm(int i, @NotNull Op o) {
-        T ti = term(i);
-        return (ti.op() == o);
-    }*/
 
     @Override
     @Nullable
@@ -162,6 +164,15 @@ public interface TermContainer extends Termlike, Iterable<Term> {
 
         return (recurse ? a.containsTermRecursively(b) : a.containsTerm(b));
     }
+
+
+    /**
+     * tests if subterm i is op o
+     */
+    default boolean isTerm(int i, @NotNull Op o) {
+        return term(i).op() == o;
+    }
+
     /**
      * Check the subterms (first level only) for a target term
      *
@@ -271,10 +282,10 @@ public interface TermContainer extends Termlike, Iterable<Term> {
      * size should already be known equal
      */
     default boolean equalTerms(@NotNull TermContainer c) {
-        if (size()!=c.size())
+        int s = size();
+        if (s !=c.size())
             return false;
-        int cl = size();
-        for (int i = 0; i < cl; i++) {
+        for (int i = 0; i < s; i++) {
             if (!term(i).equals(c.term(i)))
                 return false;
         }
@@ -669,7 +680,7 @@ public interface TermContainer extends Termlike, Iterable<Term> {
         return s;
     }
 
-    @NotNull default TermVector filter(Predicate<Term> p) {
+    @NotNull default TermContainer filter(Predicate<Term> p) {
         if (!(this instanceof TermContainer))
             throw new UnsupportedOperationException("only implemented for TermVector instance currently");
 
@@ -678,7 +689,6 @@ public interface TermContainer extends Termlike, Iterable<Term> {
         );
     }
 
-    int init(@NotNull int[] meta);
 
     default boolean hasAll(int equivalentSize, int structure, int volCached) {
         return (equivalentSize == size())

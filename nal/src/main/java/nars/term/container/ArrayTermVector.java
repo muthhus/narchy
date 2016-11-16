@@ -18,7 +18,7 @@ public class ArrayTermVector extends TermVector {
     @NotNull
     public final Term[] terms;
 
-     public ArrayTermVector(@NotNull Term[] terms) {
+     public ArrayTermVector(@NotNull Term... terms) {
          super(terms);
          this.terms = terms;
     }

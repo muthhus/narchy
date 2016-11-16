@@ -19,6 +19,7 @@ import org.jetbrains.annotations.Nullable;
 import static nars.$.terms;
 import static nars.Op.CONJ;
 import static nars.Op.NEG;
+import static nars.nal.TermBuilder.isTrueOrFalse;
 import static nars.task.Revision.chooseByConf;
 import static nars.time.Tense.*;
 import static nars.time.TimeFunctions.occInterpolate;
@@ -673,9 +674,18 @@ public interface TimeFunctions {
         }
         if (post) {
             //set subterm 1's DT
-            derived = (Compound) terms.the(derived,
-                    derived.term(0), terms.the((Compound) derived.term(1),
-                            ((taskDT != DTERNAL) && (beliefDT != DTERNAL)) ? (taskDT - beliefDT) : DTERNAL));
+            Term newSubterm1 = terms.the((Compound) derived.term(1),
+                    ((taskDT != DTERNAL) && (beliefDT != DTERNAL)) ? (taskDT - beliefDT) : DTERNAL);
+
+            if (isTrueOrFalse(newSubterm1))
+                return null;
+
+            Term newDerived = terms.the(derived, derived.term(0), newSubterm1);
+            if (!(newDerived instanceof Compound))
+                return null;
+
+            derived = (Compound) newDerived;
+
         }
 
         return deriveDT(derived, 1, p, eventDelta, occReturn);

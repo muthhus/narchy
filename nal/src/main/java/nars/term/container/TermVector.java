@@ -83,7 +83,7 @@ public abstract class TermVector implements TermContainer {
 
 
     @NotNull
-    public static TermVector the(@NotNull Term the) {
+    public static TermVector1 the(@NotNull Term the) {
         return new TermVector1(the);
     }
 
@@ -94,7 +94,7 @@ public abstract class TermVector implements TermContainer {
 
 
     @NotNull
-    public static TermVector the(@NotNull Term... t) {
+    public static TermContainer the(@NotNull Term... t) {
         switch (t.length) {
             case 0:
                 return Terms.NoSubterms;
@@ -111,10 +111,6 @@ public abstract class TermVector implements TermContainer {
         return TermVector.the((Term[]) t.toArray(new Term[t.size()]));
     }
 
-    @Override
-    public final boolean isTerm(int i, @NotNull Op o) {
-        return term(i).op() == o;
-    }
 
     @NotNull @Override public abstract Term[] terms();
 
@@ -127,11 +123,6 @@ public abstract class TermVector implements TermContainer {
     @NotNull
     @Override public final Term[] terms(@NotNull IntObjectPredicate<Term> filter) {
         return Terms.filter(terms(), filter);
-    }
-
-    @NotNull
-    public TermContainer append(Term x) {
-        return TermVector.the(ArrayUtils.add(terms(),x));
     }
 
     @Override
@@ -190,19 +181,7 @@ public abstract class TermVector implements TermContainer {
         return volume-complexity-varPatterns;
     }
 
-    @Override
-    public final int init(@NotNull int[] meta) {
 
-        meta[0] += varDeps;
-        meta[1] += varIndeps;
-        meta[2] += varQuerys;
-
-        meta[3] += varPatterns;
-        meta[4] += volume;
-        meta[5] |= structure;
-
-        return 0; //hashcode for this isn't used
-    }
 
     @Override
     public abstract Iterator<Term> iterator();
@@ -212,26 +191,13 @@ public abstract class TermVector implements TermContainer {
 
     @Override
     public final boolean equals(@NotNull Object obj) {
-        if (this == obj)
-            return true;
-
-        if (hash!=obj.hashCode())
-            return false;
-
-        return (obj instanceof TermContainer) && equalTo((TermContainer)obj);
+        return
+            (this == obj)
+            ||
+            ((obj instanceof TermContainer) && equalTo((TermContainer)obj));
     }
 
-    /** accelerated implementation */
-    @Override
-    public boolean equalTerms(@NotNull TermContainer c) {
 
-        int cl = c.size();
-        for (int i = 0; i < cl; i++) {
-            if (!term(i).equals(c.term(i)))
-                return false;
-        }
-        return true;
-    }
 
     @Override
     public final void copyInto(@NotNull Collection<Term> target) {
