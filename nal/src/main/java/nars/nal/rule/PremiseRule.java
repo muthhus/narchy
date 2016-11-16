@@ -469,7 +469,7 @@ public class PremiseRule extends GenericCompound {
         public boolean test(Term term) {
             if (term instanceof Atomic) {
                 String name = term.toString();
-                return (Character.isUpperCase(name.charAt(0)));
+                return (Character.isUpperCase(name.charAt(0)) && name.length() == 1);
             }
             return false;
         }
@@ -479,12 +479,9 @@ public class PremiseRule extends GenericCompound {
         public Term apply(@NotNull Compound containingCompound, @NotNull Term v) {
 
             //do not alter postconditions
-            if ((containingCompound.op() == Op.INH)
-                    && PostCondition.reservedMetaInfoCategories.contains(
-                    containingCompound.term(1)))
-                return v;
+            return (containingCompound.op() == Op.INH) && PostCondition.reservedMetaInfoCategories.contains(containingCompound.term(1)) ?
+                    v : v(Op.VAR_PATTERN, v.toString());
 
-            return v(Op.VAR_PATTERN, v.toString());
         }
     }
 

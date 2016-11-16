@@ -202,10 +202,10 @@
     //otherwise it will remain DTERNAL. using XTERNAL (&&+-) here is more trouble than its worth
 
     (P ==> M), (S ==> M), neqCom(S,P), time(dtCombinePre) |- ((P && S) ==>+- M), (Belief:Union)
-    //(%P ==> %M), (%S ==> %M), neqCom(%S,%P), time(dtCombine) |- ((%P || %S) ==>+- %M), (Belief:Intersection)
+        (%P ==> %M), (%S ==> %M), neqCom(%S,%P), time(dtCombinePre) |- ((%P || %S) ==>+- %M), (Belief:Intersection)
 
     (M ==> P), (M ==> S), neqCom(S,P), time(dtCombinePost) |- (M ==>+- (P && S)), (Belief:Intersection)
-    //(%M ==> %P), (%M ==> %S), neqCom(%S,%P), time(dtCombine) |- (%M ==>+- (%P || %S)), (Belief:Union)
+        (%M ==> %P), (%M ==> %S), neqCom(%S,%P), time(dtCombinePost) |- (%M ==>+- (%P || %S)), (Belief:Union)
 
 
 //    (D =/> R), (D =\> K), neq(R,K) |- (K =/> R), (Belief:Abduction),
@@ -238,7 +238,7 @@
         //B, (C ==> A), task(negative), belief(negative), time(decomposeBelief) |- subIfUnifiesAny(C,A,B), (Belief:AbductionPN, Goal:DeductionPN)
 
     B, (A <=> C), belief(positive), time(decomposeBelief), neqCom(B,C) |- subIfUnifiesAny(C,A,B), (Belief:Analogy, Goal:Strong)
-        //BAD: B, (A <=> C), belief(negative), time(decomposeBelief), neqCom(B,C) |- subIfUnifiesAny((--,%C),A,B), (Belief:AnalogyPN, Goal:StrongPN)
+        B, (A <=> C), belief(negative), time(decomposeBelief), neqCom(B,C) |- subIfUnifiesAny((--,%C),A,B), (Belief:AnalogyPN, Goal:StrongPN)
 
     //these are only valid if A occurrs during or after C. the opposite is not logical and would also produce redundant results
     B, (C && A), task(positive), time(decomposeBelief), neqCom(B,C) |- subIfUnifiesForward(C,A,B), (Goal:Strong)
@@ -253,7 +253,7 @@
 
     S, (&&,S,A..+), time(decomposeBelief) |- (&&,A..+), (Belief:DecomposePositiveNegativeNegative)
         //S, (||,S,A..+)                        |- (||,A..+), (Belief:DecomposeNegativePositivePositive)
-    //BAD: S, (&&,(--,%S),A..+), time(decomposeBelief) |- (&&,A..+), (Belief:DecomposeNegativeNegativeNegative)
+    S, (&&,(--,%S),A..+), time(decomposeBelief) |- (&&,A..+), (Belief:DecomposeNegativeNegativeNegative)
         //S, (||,(--,%S),A..+)                        |- (||,A..+), (Belief:DecomposePositivePositivePositive)
 
 
@@ -317,6 +317,7 @@
      //structural decompose any component of a conjunction.
      //     NOTE: the multi-term decomposition allows the superset of subterms without overlap. if they are chosen only one at a time, then overlap will prevent their recombination to the aforementioned superset result so it is incomplete. thus only the ellipsis form is necessary
      (&&,X,A..+), X, time(decomposeTaskSubset) |- (&&,A..+), (Belief:StructuralDeduction,Goal:StructuralDeduction)
+        (&&,(--,%X),A..+), X, time(decomposeTaskSubset) |- (&&,A..+), (Belief:StructuralDeduction,Goal:StructuralDeduction)
          //(&&,X,A..+), X, time(decomposeTaskSubset) |- X, (Belief:StructuralDeduction,Goal:StructuralDeduction)
      (&&,X,A..+), X, time(decomposeTaskSubset), task("?@") |- (&&,A..+), ()
         //(&&,X,A..+), X, time(decomposeTaskSubset), task("?") |- X, (Punctuation:Question)

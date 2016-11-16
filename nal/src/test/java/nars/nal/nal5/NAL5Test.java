@@ -22,7 +22,7 @@ public class NAL5Test extends AbstractNALTest {
         return AbstractNALTest.nars(5);
     }
 
-    final int cycles = 450;
+    final int cycles = 250;
 
     @Test public void revision(){
         test()
@@ -216,6 +216,7 @@ public class NAL5Test extends AbstractNALTest {
     @Test
     public void compound_decomposition_two_premises3(){
         TestNAR tester = test();
+        tester.log();
         tester.believe("(||,<robin --> [flying]>,<robin --> swimmer>)"); //.en("Robin can fly or swim.");
         tester.believe("<robin --> swimmer>",0.0f,0.9f); //.en("Robin cannot swim.");
         tester.mustBelieve(cycles,"<robin --> [flying]>",1.00f,0.81f); //.en("Robin can fly.");
@@ -228,7 +229,8 @@ public class NAL5Test extends AbstractNALTest {
         TestNAR tester = test();
         tester.believe("<robin --> [flying]>"); //.en("Robin can fly.");
         tester.ask("(||,<robin --> [flying]>,<robin --> swimmer>)"); //.en("Can robin fly or swim?");
-        tester.mustBelieve(cycles*2," (||,<robin --> swimmer>,<robin --> [flying]>)",1.00f,0.81f); //.en("Robin can fly or swim.");
+        //tester.mustBelieve(cycles*2," (||,<robin --> swimmer>,<robin --> [flying]>)",1.00f,0.81f); //.en("Robin can fly or swim.");
+        tester.mustBelieve(cycles*2," (&&,(--,<robin --> swimmer>),(--,<robin --> [flying]>))",0.00f,0.81f); //.en("Robin can fly or swim.");
 
     }
 

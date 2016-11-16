@@ -24,6 +24,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Consumer;
 
+import static nars.Op.NEG;
 import static nars.Op.VAR_PATTERN;
 import static nars.term.transform.substituteIfUnifies.*;
 import static nars.time.Tense.DTERNAL;
@@ -172,8 +173,10 @@ public class PremiseEval extends Unify {
 
         Task belief;
         this.belief = belief = p.belief();
-        Term beliefTerm = this.beliefTerm = p.beliefTerm().term();
-
+        this.beliefTerm = p.beliefTerm().term();
+        if (beliefTerm.op()==NEG) {
+            throw new RuntimeException("negated belief term");
+        }
 
         this.taskTruth = task.truth();
         this.taskPunct = task.punc();
@@ -207,9 +210,9 @@ public class PremiseEval extends Unify {
         this.termSub0op = tOp.ordinal();
         this.termSub0opBit = tOp.bit;
 
-        this.termSub1Struct = beliefTerm.structure();
+        this.termSub1Struct = p.beliefTerm().term().structure();
 
-        @NotNull Op bOp = beliefTerm.op();
+        @NotNull Op bOp = p.beliefTerm().term().op();
         this.termSub1op = bOp.ordinal();
         this.termSub1opBit = bOp.bit;
 

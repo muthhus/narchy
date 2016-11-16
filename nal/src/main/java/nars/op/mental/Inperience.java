@@ -12,6 +12,7 @@ import nars.task.GeneratedTask;
 import nars.task.MutableTask;
 import nars.term.Compound;
 import nars.term.Term;
+import nars.term.Terms;
 import nars.term.atom.Atomic;
 import nars.truth.Truth;
 import org.eclipse.collections.api.set.ImmutableSet;
@@ -261,7 +262,7 @@ public class Inperience extends Leak<Task> {
             neg = false;
         }
 
-        return $.negIf($.func(reify(s.punc()), arg), neg);
+        return Terms.compoundOrNull($.negIf($.func(reify(s.punc()), arg), neg));
     }
 
 

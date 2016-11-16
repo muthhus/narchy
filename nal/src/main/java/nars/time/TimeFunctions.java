@@ -1,5 +1,6 @@
 package nars.time;
 
+import nars.$;
 import nars.Op;
 import nars.Param;
 import nars.Task;
@@ -17,6 +18,7 @@ import org.jetbrains.annotations.Nullable;
 
 import static nars.$.terms;
 import static nars.Op.CONJ;
+import static nars.Op.NEG;
 import static nars.task.Revision.chooseByConf;
 import static nars.time.Tense.*;
 import static nars.time.TimeFunctions.occInterpolate;
@@ -262,10 +264,10 @@ public interface TimeFunctions {
 
         if (taskSize <= 2) { //conjunction of 1 can not occur actually, but for completeness use the <=
             //a decomposition of this will result in a complete subterm (half) of the input.
-            if (dt!=DTERNAL || dt!=XTERNAL || dt!=0) {
+            //if (dt!=DTERNAL || dt!=XTERNAL || dt!=0) {
                 //call "decomposeTask"
                 return decompose(derived, p, occReturn, true);
-            }
+            //}
         } else {
             //3 or more
             if (derived.op() == CONJ) {
@@ -663,10 +665,23 @@ public interface TimeFunctions {
 
         if (pre) {
             //set subterm 0's DT
+
+
+            Compound preSub = (Compound) derived.term(0);
+            boolean neg = preSub.op()==NEG;
+            if (neg) {
+                preSub = (Compound) preSub.unneg(); //unwrap
+            }
+
+            preSub = (Compound)$.negIf(
+                    terms.the(
+                        preSub,
+                        ((taskDT != DTERNAL) && (beliefDT != DTERNAL)) ? (taskDT - beliefDT) : DTERNAL
+                    ), neg);
+
             derived = (Compound) terms.the(derived,
-                    terms.the((Compound) derived.term(0),
-                            ((taskDT != DTERNAL) && (beliefDT != DTERNAL)) ? (taskDT - beliefDT) : DTERNAL),
-                    derived.term(1));
+                    preSub,
+                    derived.term(1) );
         }
         if (post) {
             //set subterm 1's DT
