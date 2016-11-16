@@ -42,6 +42,7 @@ public abstract class TermBuilder {
     private static final Term[] TrueArray = {True};
     private static final Term[] FalseArray = {False};
     public static final TermContainer InvalidSubterms = TermVector.the(False);
+    public static final Compound InvalidCompound = new GenericCompound(Op.PROD, InvalidSubterms);
 
 
     private static final int InvalidEquivalenceTerm = or(IMPL, EQUI);

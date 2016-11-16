@@ -1268,11 +1268,11 @@ public class PremiseRule extends GenericCompound {
             return super.newVariable(v, actualSerial);
         }
 
-        @Override
-        public final boolean testSuperTerm(@NotNull Compound t) {
-            //descend all, because VAR_PATTERN is not yet always considered a variable
-            return true;
-        }
+//        @Override
+//        public final boolean testSuperTerm(@NotNull Compound t) {
+//            //descend all, because VAR_PATTERN is not yet always considered a variable
+//            return true;
+//        }
 
         @NotNull
         public Term applyAfter(@NotNull Variable secondary) {

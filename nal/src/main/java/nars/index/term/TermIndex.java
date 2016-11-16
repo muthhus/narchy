@@ -110,7 +110,7 @@ public abstract class TermIndex extends TermBuilder {
     public abstract void remove(@NotNull Term entry);
 
 
-    public final HijacKache<TermContainer, TermContainer> normalizations =
+    public final HijacKache<Compound, Compound> normalizations =
             new HijacKache<>(Param.NORMALIZATION_CACHE_SIZE, 4);
     public final HijacKache<ProtoCompound, Term> terms =
             new HijacKache<>(Param.TERM_CACHE_SIZE, 4);
@@ -308,69 +308,52 @@ public abstract class TermIndex extends TermBuilder {
         out.println();
     }
 
-    final Function<? super TermContainer, ? extends TermContainer> normalizer = u -> {
+    final Function<? super Compound, ? extends Compound> normalizer = src -> {
 
-        TermContainer result;
+        Compound result;
 
         try {
-            int numVars = u.vars();
+            int numVars = src.vars();
 
-
-
-            Term[] tgt =
-                    transform(u, null,
-                            (numVars == 1 && u.varPattern() == 0) ?
+            Term r = transform(src,
+                            (numVars == 1 && src.varPattern() == 0) ?
                                     VariableNormalization.singleVariableNormalization :
                                     new VariableNormalization(numVars /* estimate */)
                     );
 
-            result = TermVector.the(tgt);
+            result = !(r instanceof Compound) ? InvalidCompound : (Compound) r;
 
         } catch (InvalidTermException e) {
 
             if (Param.DEBUG_EXTRA)
-                logger.warn("normalize {} : {}", u, e);
+                logger.warn("normalize {} : {}", src, e);
 
-            result = InvalidSubterms;
+            result = InvalidCompound;
         }
 
         return result;
     };
 
+
     @Nullable
-    public final Compound normalize(@NotNull Compound t) {
+    public final Compound normalize(@NotNull Compound src) {
 
 
-        if (t.isNormalized()) {
-            return t; //c = t; //already normalized
+        if (src.isNormalized()) {
+            return src; //c = t; //already normalized
         } else {
             //see if subterms need change
-            TermContainer src = t.subterms();
-            TermContainer tgt = normalize(src);
-
-            Compound c;
-            if (src == tgt) {
-                c = t; //subterms dont change
-            } else if (tgt != InvalidSubterms) {
-                c = Terms.compoundOrNull($.terms.the(t, tgt));
-            } else {
-                c = null;
-            }
+            Compound tgt = normalizations.computeIfAbsent(src, normalizer);
+            if (tgt == InvalidCompound)
+                return null;
 
             //if (c!=null) {
             //c = compoundOrNull($.unneg((Compound) c));
-            if (c != null) {
-                ((GenericCompound) c).setNormalized();
-            }
+            ((GenericCompound) tgt).setNormalized();
             //}
-            return c;
+            return tgt;
         }
 
-    }
-
-    @Nullable
-    public final TermContainer normalize(@NotNull TermContainer t) {
-        return normalizations.computeIfAbsent(t, normalizer);
     }
 
 
@@ -382,19 +365,25 @@ public abstract class TermIndex extends TermBuilder {
 
     @NotNull
     public Term transform(@NotNull Compound src, @NotNull CompoundTransform t) {
-        if (src == null || !t.testSuperTerm(src))
+        if (!t.testSuperTerm(src))
             return src;
 
-        return the(src.op(), src.dt(), transform(src, src, t));
+        TermContainer tc = transform(src, src, t);
 
-//        return !Util.equals(tgtSubs, srcSubs) ?
-//                the(src.op(), src.dt(), tgtSubs) : //must not allow subterms to be tested for equality, for variable normalization purpose the variables will seem equivalent but they are not
-//                src;
+        if (tc == src) {
+            return src; //unmodified
+        } else {
+//            if (tc.equalTerms(superterm)) {
+//                throw new RuntimeException("actually unmodified");
+//            }
 
+            //construct new compound with same op and dt
+            return (Compound) the(src.op(), src.dt(), tc);
+        }
     }
 
     @NotNull
-    public Term[] transform(TermContainer src, Compound superterm, @NotNull CompoundTransform t) {
+    public TermContainer transform(TermContainer src, Compound superterm, @NotNull CompoundTransform t) {
 
         int modifications = 0;
 
@@ -411,17 +400,20 @@ public abstract class TermIndex extends TermBuilder {
             } else if (x instanceof Compound) {
                 y = transform((Compound) x, t); //recurse
             } else {
-                y = x;
+                y = null;
             }
 
-            if (x != y) { //must be refernce equality test for some variable normalization cases
+            //if (x != y) { //must be refernce equality test for some variable normalization cases
+            if (y!=null && !x.equals(y)) { //must be refernce equality test for some variable normalization cases
                 modifications++;
+            } else {
+                y = x; //use original value
             }
 
             target[i] = y;
         }
 
-        return target;
+        return modifications == 0 ? src : TermVector.the(target);
     }
 
 
