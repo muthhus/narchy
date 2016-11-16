@@ -289,7 +289,7 @@ public interface TimeFunctions {
         //if (premBelief == null)
         //premBelief = p.task; //it is the task itself being decomposed
 
-        Task decomposingTask = (decomposeTask) ? task : belief;
+        //Task decomposingTask = (decomposeTask) ? task : belief;
         Task otherTask = (decomposeTask) ? belief : task;
 
         Compound decomposedTerm = (Compound) (decomposeTask ? p.taskTerm : p.beliefTerm);
@@ -317,12 +317,12 @@ public interface TimeFunctions {
         } else {
 
             //project any ETERNAL to NOW, since an ETERNAL truth is the same for the present moment
-            if (occDecomposed == ETERNAL)
-                //occDecomposed = p.time();
-                occDecomposed = occOther;
-            if (occOther == ETERNAL)
-                //occOther = p.time();
-                occOther = occDecomposed;
+//            if (occDecomposed == ETERNAL)
+//                //occDecomposed = p.time();
+//                occDecomposed = occOther;
+//            if (occOther == ETERNAL)
+//                //occOther = p.time();
+//                occOther = occDecomposed;
 
             long occ;
 
@@ -376,14 +376,18 @@ public interface TimeFunctions {
                 }
 
                 if (relOccDecomposed != ETERNAL && relOccOther != ETERNAL) {
-                    //if both provide a possible timing for the result,
-                    // choose by random wighted confidence which one
-                    Task t = chooseByConf(task, belief, p);
-                    //System.out.println("choose " + task + " " + belief + " ---> " + t);
-                    if (t == decomposingTask)
-                        occ = relOccDecomposed;
-                    else
-                        occ = relOccOther;
+//                    //if both provide a possible timing for the result,
+//                    // choose by random wighted confidence which one
+//                    Task t = chooseByConf(task, belief, p);
+//                    //System.out.println("choose " + task + " " + belief + " ---> " + t);
+//                    if (t == decomposingTask)
+//                        occ = relOccDecomposed;
+//                    else
+//                        occ = relOccOther;
+
+                    //default to the task's
+                    occ = decomposeTask ? relOccDecomposed : relOccOther;
+
                 } else if (relOccDecomposed != ETERNAL) {
                     occ = relOccDecomposed;
                 } else if (relOccOther != ETERNAL) {
