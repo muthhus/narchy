@@ -102,7 +102,7 @@ public class TermIndexTest {
         testShared(tt, "<a --> b>");
         testShared(tt, "(c, d)");
         testShared(tt, "<e <=> f>");
-        testShared(tt, "g");
+        //testShared(tt, "g"); //atoms are special, their concept and the atom are not the same
 
         //tt.print(System.out);
         //System.out.println();
@@ -174,8 +174,8 @@ public class TermIndexTest {
         if (t1 != t2)
             System.err.println("share failed: " + t1 + ' ' + t1.getClass() + ' ' + t2 + ' ' + t2.getClass());
 
-        assertTrue(t1 == t2);
         assertEquals(t1, t2);
+        assertTrue(t1 == t2);
 
         if (t1 instanceof Compound) {
             //test all subterms are shared

@@ -52,7 +52,7 @@ public class GenericCompound implements Compound {
 
         TermVector subterms = (TermVector) _subterms; //HACK for future support of alternate TermContainer impls
 
-        if (Param.DEBUG && dt != DTERNAL) {
+        if (dt != DTERNAL) {
 
             if (op.image && ((dt < 0) || (dt > subterms.size()))) {
                 throw new InvalidTermException(op, dt, subterms.terms(), "Invalid dt value for image " + op);
@@ -63,7 +63,7 @@ public class GenericCompound implements Compound {
 
         this.subterms = subterms;
 
-        this.normalized = !subterms.hasAny(Op.VariableBits) && (subterms.varPatterns == 0); /* not included in the count */
+        this.normalized = subterms.constant();
         this.op = op;
 
         this.dt = dt;
@@ -126,7 +126,7 @@ public class GenericCompound implements Compound {
                 return false;
             } else {
                 //share the subterms vector
-                if (cthat instanceof GenericCompound && cs instanceof TermContainer) {
+                if (cthat instanceof GenericCompound) {
                     this.subterms = cs; //HACK cast sucks
                 }
             }

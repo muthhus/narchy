@@ -378,7 +378,7 @@ public abstract class TermIndex extends TermBuilder {
 //            }
 
             //construct new compound with same op and dt
-            return (Compound) the(src.op(), src.dt(), tc);
+            return the(src.op(), src.dt(), tc);
         }
     }
 

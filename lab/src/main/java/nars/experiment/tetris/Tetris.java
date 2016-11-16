@@ -359,7 +359,7 @@ public class Tetris extends NAgents {
 
 
     public static void main(String[] args) {
-        Param.DEBUG = false;
+        Param.DEBUG = true;
 
         NAR nar = NAgents.newMultiThreadNAR(3, new FrameTime().setDuration(TIME_PER_FALL/3f));
         nar.linkFeedbackRate.setValue(0.05f);
@@ -627,7 +627,7 @@ public class Tetris extends NAgents {
 
 
         //t.run(runFrames);
-        t.run(200);
+        t.run(20000);
 
 //        NARController meta = new NARController(nar, loop, t);
 //

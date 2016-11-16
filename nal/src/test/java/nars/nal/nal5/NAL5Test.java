@@ -204,13 +204,19 @@ public class NAL5Test extends AbstractNALTest {
 
 
     @Test
-    public void compound_decomposition_two_premises2(){
+    public void compound_decomposition_one_premise_pos(){
         TestNAR tester = test();
-        tester.log();
-        tester.believe("(&&,<robin --> [flying]>,<robin --> swimmer>)",0.0f,0.9f); //.en("Robin cannot be both a flyer and a swimmer.");
-        tester.believe("<robin --> [flying]>"); //.en("Robin can fly.");
-        tester.mustBelieve(cycles,"<robin --> swimmer>",0.00f,0.81f); //.en("Robin cannot swim.");
 
+        tester.believe("(&&,<robin --> [flying]>,<robin --> swimmer>)",1.0f,0.9f); //.en("Robin cannot be both a flyer and a swimmer.");
+        tester.mustBelieve(cycles,"<robin --> swimmer>",1.00f,0.81f); //.en("Robin cannot swim.");
+    }
+
+    @Test
+    public void compound_decomposition_one_premise_neg(){
+        //freq 0 conjunction would not be decomposed
+        TestNAR tester = test();
+        tester.believe("(&&,<robin --> [flying]>,<robin --> swimmer>)",0.0f,0.9f); //.en("Robin cannot be both a flyer and a swimmer.");
+        tester.mustNotOutput(cycles,"<robin --> swimmer>", '.', ETERNAL); //.en("Robin cannot swim.");
     }
 
 

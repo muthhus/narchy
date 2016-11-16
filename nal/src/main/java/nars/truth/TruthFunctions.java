@@ -529,7 +529,9 @@ public final class TruthFunctions extends UtilityFunctions {
 
     /** decompose positive / negative */
     @Nullable
-    public static Truth decompose(@NotNull Truth a, @NotNull Truth b, boolean x, boolean y, boolean z, float minConf) {
+    public static Truth decompose(@Nullable Truth a, @Nullable Truth b, boolean x, boolean y, boolean z, float minConf) {
+        if (a == null || b == null) return null;
+
         float f1 = a.freq(), c1 = a.conf(), f2 = b.freq(), c2 = b.conf();
         float f = and(x ? f1 : 1-f1, y ? f2 : 1-f2);
         float c = and(f, c1, c2);

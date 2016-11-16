@@ -252,9 +252,9 @@
     //// propositional decomposition ////////////////////////////////////////////////////////////////////////////////////
     //If S is the case, and (&&,S,A..+) is not the case, it can't be that (&&,A..+) is the case
 
-    //S, (&&,S,A..+), time(decomposeBelief) |- (&&,A..+), (Belief:DecomposePositiveNegativeNegative)
+    S, (&&,S,A..+), time(decomposeBelief) |- (&&,A..+), (Belief:DecomposePositiveNegativeNegative,Goal:DecomposePositiveNegativeNegative)
         //S, (||,S,A..+)                        |- (||,A..+), (Belief:DecomposeNegativePositivePositive)
-    //S, (&&,(--,%S),A..+), time(decomposeBelief) |- (&&,A..+), (Belief:DecomposeNegativeNegativeNegative)
+    S, (&&,(--,%S),A..+), time(decomposeBelief) |- (&&,A..+), (Belief:DecomposeNegativeNegativeNegative,Goal:DecomposeNegativeNegativeNegative)
         //S, (||,(--,%S),A..+)                        |- (||,A..+), (Belief:DecomposePositivePositivePositive)
 
 
@@ -318,13 +318,12 @@
      //structural decompose any component of a conjunction.
      //     NOTE: the multi-term decomposition allows the superset of subterms without overlap. if they are chosen only one at a time, then overlap will prevent their recombination to the aforementioned superset result so it is incomplete. thus only the ellipsis form is necessary
 
-     (&&,X,A..+), X, time(decomposeTaskSubset) |-                 (&&,A..+), (Belief:StructuralDeduction,Goal:StructuralDeduction)
-     (&&,(--,%X),A..+), X, time(decomposeTaskSubset) |-       (&&,A..+), (Belief:StructuralDeduction,Goal:StructuralDeduction)
+     (&&,X,A..+), X, time(decomposeTaskSubset) |-                   (&&,A..+), (Belief:StructuralDeduction,Goal:StructuralDeduction)
 
+     (&&,(--,%X),A..+), X, time(decomposeTaskSubset) |-       (&&,A..+), (Belief:StructuralDeduction,Goal:StructuralDeduction)
 
      (&&,X,A..+), X, time(decomposeTaskSubset), task("?@") |- (&&,A..+), ()
         (&&,(--,%X),A..+), X, time(decomposeTaskSubset), task("?@") |- (&&,A..+), ()
-        //(&&,X,A..+), X, time(decomposeTaskSubset), task("?") |- X, (Punctuation:Question)
 
      (&&,X,A..+), B, time(decomposeTaskSubset) |- subIfUnifiesDep((&&,A..+),X,B), (Belief:AnonymousAnalogy, Goal:Strong)
          //TODO: negation form for this?

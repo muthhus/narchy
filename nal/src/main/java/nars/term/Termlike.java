@@ -121,6 +121,7 @@ public interface Termlike {
     int varPattern();
 
 
-
-
+    default boolean constant() {
+        return !hasAny(Op.VariableBits) && (varPattern() == 0); /* not included in the count */
+    }
 }

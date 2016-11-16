@@ -214,18 +214,14 @@ public enum BeliefFunction implements TruthOperator {
     },
 
 
-//    DecomposeNegativeNegativePositive() {
-//        @Nullable
-//        @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, @NotNull Memory m, float minConf) {
-//            if (B == null || T == null) return null;
-//            return TruthFunctions.decompose(T, B, false, false, true, minConf);
-//        }
-//    },
+    DecomposePositiveNegativeNegative() {
+        @Nullable @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, NAR m, float minConf) {
+            return TruthFunctions.decompose(T, B, true, false, false, minConf);
+        }
+    },
 
     DecomposeNegativeNegativeNegative() {
-        @Nullable
-        @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, NAR m, float minConf) {
-            if (B == null || T == null) return null;
+        @Nullable @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, NAR m, float minConf) {
             return TruthFunctions.decompose(T, B, false, false, false, minConf);
         }
     },
@@ -233,7 +229,6 @@ public enum BeliefFunction implements TruthOperator {
     DecomposePositiveNegativePositive() {
         @Nullable
         @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, NAR m, float minConf) {
-            if (B == null || T == null) return null;
             return TruthFunctions.decompose(T,B, true, false, true, minConf);
         }
     },
@@ -241,7 +236,6 @@ public enum BeliefFunction implements TruthOperator {
     DecomposeNegativePositivePositive() {
         @Nullable
         @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, NAR m, float minConf) {
-            if (B == null || T == null) return null;
             return TruthFunctions.decompose(T,B, false, true, true, minConf);
         }
     },
@@ -249,18 +243,11 @@ public enum BeliefFunction implements TruthOperator {
     DecomposePositivePositivePositive() {
         @Nullable
         @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, NAR m, float minConf) {
-            if (B == null || T == null) return null;
             return TruthFunctions.decompose(T,B, true, true, true, minConf);
         }
     },
 
-    DecomposePositiveNegativeNegative() {
-        @Nullable
-        @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, NAR m, float minConf) {
-            if (B == null || T == null) return null;
-            return TruthFunctions.decompose(T,B, true, false, false, minConf);
-        }
-    },
+
 
     @SinglePremise
     Identity() {
