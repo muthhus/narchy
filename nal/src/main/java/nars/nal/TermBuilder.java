@@ -13,6 +13,7 @@ import nars.term.container.TermSet;
 import nars.term.transform.TermTransform;
 import nars.term.util.InvalidTermException;
 import nars.term.var.Variable;
+import org.apache.commons.lang3.ArrayUtils;
 import org.eclipse.collections.api.set.MutableSet;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -355,15 +356,19 @@ public abstract class TermBuilder {
 
     @NotNull
     private Term finish(@NotNull Op op, int dt, @NotNull Term... args) {
-        if (TermContainer.requiresSorting(op, dt)) {
+        if (TermContainer.requiresSorting(op, args.length)) {
             args = Terms.sorted(args);
         }
         return finalize(op, dt, args);
     }
 
     @NotNull
-    private Term finish(@NotNull Op op, int dt, @NotNull Set<Term> args) {
+    private Term finalize(@NotNull Op op, int dt, @NotNull Set<Term> args) {
         return finalize(op, dt, Terms.sorted(args));
+    }
+    @NotNull
+    private Term finalize(@NotNull Op op, @NotNull Set<Term> args) {
+        return finalize(op, DTERNAL, args);
     }
 
     public static boolean isTrueOrFalse(@NotNull Term x) {
@@ -381,7 +386,7 @@ public abstract class TermBuilder {
 
 
     @NotNull
-    private Term finalize(@NotNull Op op, @NotNull Term[] args) {
+    private Term finalize(@NotNull Op op, @NotNull Term... args) {
         return finalize(op, DTERNAL, args);
     }
 
@@ -389,15 +394,15 @@ public abstract class TermBuilder {
      * terms must be sorted, if they need to be, before calling.
      */
     @NotNull
-    private Term finalize(@NotNull Op op, int dt, @NotNull Term[] args) {
+    private Term finalize(@NotNull Op op, int dt, @NotNull Term... args) {
 
         //if (Param.DEBUG ) {
         //check for any imdex terms that may have not been removed
         int s = args.length;
         for (int i = 0; i < s; i++) {
             Term x = args[i];
-            if (x == null)
-                return False;
+//            if (x == null)
+//                return False;
 
             if (isTrueOrFalse(x)) {
                 if ((op == NEG) || (op == CONJ) || (op == IMPL) || (op == EQUI))
@@ -465,7 +470,7 @@ public abstract class TermBuilder {
                 return t.unneg();
             } else {
                 return //newCompound(NEG, DTERNAL, TermVector.the(t)); //newCompound bypasses some checks that finish involves
-                       finish(NEG, t);
+                       finalize(NEG, t);
             }
         } else {
             if (isFalse(t)) return True;
@@ -595,7 +600,7 @@ public abstract class TermBuilder {
                 TreeSet<Term> ts = conjTrueFalseFilter(cs);
                 if (ts == null || ts.isEmpty())
                     return False;
-                return finish(op, dt, ts);
+                return finalize(op, dt, ts);
         }
 
     }
@@ -921,7 +926,7 @@ public abstract class TermBuilder {
 
                 }
 
-                return finalize(op, dt, new Term[] { subject, predicate } ); //use the calculated ordering, not the TermContainer default for commutives
+                return finalize(op, dt, subject, predicate); //use the calculated ordering, not the TermContainer default for commutives
 
             }
         }
@@ -1043,16 +1048,17 @@ public abstract class TermBuilder {
 
         //reduction between one or both of the intersection type
 
+        Term[] args;
         if (o1 == intersection) {
-            return finish(intersection,
-                    TermSet.concatArray(
-                        ((TermContainer) term1).terms(),
-                        o2 == intersection ? ((TermContainer) term2).terms() : new Term[]{term2}
-                    )
+            args = ArrayUtils.addAll(
+                ((TermContainer) term1).terms(),
+                o2 == intersection ? ((TermContainer) term2).terms() : new Term[]{term2}
             );
+        } else {
+            args = new Term[] { term1, term2 };
         }
 
-        return finish(intersection, term1, term2);
+        return finish(intersection, args);
     }
 
 
@@ -1064,19 +1070,27 @@ public abstract class TermBuilder {
         MutableSet<Term> s = TermContainer.intersect(
                 /*(TermContainer)*/ a, /*(TermContainer)*/ b
         );
-        return s.isEmpty() ? empty(o) : (Compound) finish(o, Terms.sorted(s));
+        return s.isEmpty() ? empty(o) : (Compound) finalize(o, s);
     }
 
 
     @NotNull
-    public Compound union(@NotNull Op o, @NotNull Compound term1, @NotNull Compound term2) {
-        Term[] u = TermContainer.unionArray(term1, term2);
-        if (term1.equivalent(u))
-            return term1;
-        else if (term2.equivalent(u))
-            return term2;
-        else
-            return (Compound) finish(o, u);
+    public Compound union(@NotNull Op o, @NotNull Compound a, @NotNull Compound b) {
+
+        if (a.equals(b))
+            return a;
+
+        int as = a.size();
+        int bs = b.size();
+        int maxSize = Math.max(as, bs);
+        TreeSet<Term> t = new TreeSet<>();
+        a.copyInto(t);
+        b.copyInto(t);
+        if (t.size() == maxSize) {
+            //the smaller is contained by the larger other
+            return as > bs ? a : b;
+        }
+        return (Compound) finalize(o, t);
     }
 
     @NotNull public Term the(@NotNull Compound csrc, @NotNull Term[] newSubs) {

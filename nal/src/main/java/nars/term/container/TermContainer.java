@@ -55,23 +55,7 @@ public interface TermContainer extends Termlike, Iterable<Term> {
     }
 
 
-    static Term[] unionArray(TermContainer a, TermContainer b) {
 
-        if (a.equals(b))
-            return a.terms();
-
-        int as = a.size();
-        int bs = b.size();
-        int maxSize = Math.max(as, bs);
-        TreeSet<Term> t = new TreeSet<>();
-        a.copyInto(t);
-        b.copyInto(t);
-        if (t.size() == maxSize) {
-            //the smaller is contained by the larger other
-            return as > bs ? a.terms() : b.terms();
-        }
-        return Terms.toArray(t);
-    }
 
     @NotNull
     default public TermContainer append(@NotNull Term x) {
