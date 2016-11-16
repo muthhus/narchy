@@ -40,7 +40,7 @@ public class Terms   {
     //@NotNull public static final int[] ZeroIntArray = new int[0];
     @NotNull public static final Term[] empty = new Term[0];
     @NotNull public static final TermVector NoSubterms =  new ArrayTermVector((Term[]) new Term[]{});
-    @NotNull public static final Compound ZeroProduct = new GenericCompound(Op.PROD, DTERNAL, NoSubterms);
+    @NotNull public static final Compound ZeroProduct = new GenericCompound(Op.PROD, NoSubterms);
     @NotNull public static final IntFunction<Term[]> NewTermArray = Term[]::new;
 
     /**
@@ -571,6 +571,8 @@ public class Terms   {
 
         TermContainer psubs = c.subterms();
         TermContainer newSubs;
+
+        Op o = c.op();
         if (psubs.hasAny(Op.TemporalBits)) {
             boolean subsChanged = false;
             int cs = c.size();
@@ -582,21 +584,21 @@ public class Terms   {
                     subsChanged = true;
 
             }
-            newSubs = subsChanged ? /*theSubterms(*/TermVector.the(ss)/*)*/ : null;
+            newSubs = subsChanged ? /*theSubterms(*/TermContainer.the(o, ss)/*)*/ : null;
         } else {
             newSubs = null;
         }
 
 
         int pdt = c.dt();
-        Op o = c.op();
         boolean dtChanged = (pdt != DTERNAL && o.temporal);
+        boolean subsChanged = newSubs != null;
 
-        if (newSubs!=null || dtChanged) {
+        if (subsChanged || dtChanged) {
 
             GenericCompound xx = new GenericCompound(o,
                     dtChanged ? DTERNAL : pdt,
-                    newSubs!=null ? newSubs : psubs);
+                    subsChanged ? newSubs : psubs);
 
             if (c.isNormalized())
                 xx.setNormalized();
@@ -608,9 +610,9 @@ public class Terms   {
 
             //x = i.the(xx).term();
             return xx;
+        } else {
+            return c;
         }
-
-        return c;
     }
 
     /** returns the most optimal subterm that can be replaced with a variable, or null if one does not meet the criteria */

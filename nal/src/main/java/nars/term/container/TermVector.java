@@ -80,9 +80,18 @@ public abstract class TermVector implements TermContainer {
         this.structure = meta[5];
     }
 
-    public static TermContainer the(@NotNull Collection<? extends Term> t) {
-        return TermVector.the((Term[]) t.toArray(new Term[t.size()]));
+
+
+    @NotNull
+    public static TermVector the(@NotNull Term the) {
+        return new TermVector1(the);
     }
+
+    @NotNull
+    public static TermVector the(@NotNull Term x, @NotNull Term y) {
+        return new TermVector2(x, y);
+    }
+
 
     @NotNull
     public static TermVector the(@NotNull Term... t) {
@@ -90,12 +99,16 @@ public abstract class TermVector implements TermContainer {
             case 0:
                 return Terms.NoSubterms;
             case 1:
-                return new TermVector1(t[0]);
+                return the(t[0]);
             case 2:
-                return new TermVector2(t[0], t[1]);
+                return the(t[0], t[1]);
             default:
                 return new ArrayTermVector(t);
         }
+    }
+
+    public static TermContainer the(@NotNull Collection<? extends Term> t) {
+        return TermVector.the((Term[]) t.toArray(new Term[t.size()]));
     }
 
     @Override

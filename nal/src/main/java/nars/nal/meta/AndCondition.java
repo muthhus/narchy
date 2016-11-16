@@ -23,7 +23,7 @@ public final class AndCondition extends GenericCompound implements BoolCondition
         this(TermVector.the((Term[])p));
     }*/
     public AndCondition(@NotNull Collection<BoolCondition> p) {
-        super(Op.CONJ, TermVector.the(p));
+        super(Op.PROD, TermVector.the(p));
         this.termCache = p.toArray(new BoolCondition[p.size()]);
         if (termCache.length < 2)
             throw new RuntimeException("unnecessary use of AndCondition");

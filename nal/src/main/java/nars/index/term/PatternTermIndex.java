@@ -79,7 +79,7 @@ public class PatternTermIndex extends MapTermIndex {
             bb[i] = b;
         }
 
-        TermContainer v = (changed ? TermVector.the(bb) : s);
+        TermContainer v = (changed ? TermContainer.the(x.op(), bb) : s);
 
 
         Ellipsis e = Ellipsis.firstEllipsis(v);

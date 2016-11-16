@@ -1148,7 +1148,7 @@ public class PremiseRule extends GenericCompound {
             return ((Compound) x).term(0); //unwrap
         } else {
             //do this manually for premise rules since they will need to negate atoms which is not usually allowed
-            return new GenericCompound(NEG, TermContainer.the(NEG, x));
+            return new GenericCompound(NEG, TermVector.the(x));
         }
     }
 

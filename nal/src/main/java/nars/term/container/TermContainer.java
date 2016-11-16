@@ -531,17 +531,6 @@ public interface TermContainer extends Termlike, Iterable<Term> {
         return r;
     }
 
-    /**
-     * produces the correct TermContainer for the given Op,
-     * according to the existing type
-     */
-    @NotNull
-    static TermContainer the(@NotNull Op op, @NotNull TermContainer tt) {
-        return (!requiresTermSet(op, tt.size()) ||
-                tt.isSorted()) ?
-                tt :
-                TermSet.the(tt.terms());
-    }
 
     @NotNull
     static TermContainer the(@NotNull Op op, @NotNull Collection<Term> tt) {
@@ -549,6 +538,7 @@ public interface TermContainer extends Termlike, Iterable<Term> {
         Term[] ttt = tt.toArray(new Term[tt.size()]);
         return TermContainer.the(op, ttt);
     }
+
 
     @NotNull
     static TermContainer the(@NotNull Op op, @NotNull Term... tt) {
@@ -671,17 +661,7 @@ public interface TermContainer extends Termlike, Iterable<Term> {
         return output;
     }
 
-    /**
-     * for use with commutive (TermSet's)
-     */
-    @NotNull
-    static TermContainer except(@NotNull TermContainer c, @NotNull Set<Term> toRemove) {
-        Set<Term> s = c.toSet();
-        if (s.removeAll(toRemove)) {
-            return TermSet.the(s);
-        }
-        return c; //unchanged
-    }
+
     @NotNull
     static Set<Term> exceptToSet(@NotNull TermContainer c, @NotNull MutableSet<Term> toRemove) {
         Set<Term> s = c.toSet();
@@ -689,8 +669,7 @@ public interface TermContainer extends Termlike, Iterable<Term> {
         return s;
     }
 
-    @NotNull
-    default TermVector filter(Predicate<Term> p) {
+    @NotNull default TermVector filter(Predicate<Term> p) {
         if (!(this instanceof TermContainer))
             throw new UnsupportedOperationException("only implemented for TermVector instance currently");
 

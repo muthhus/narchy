@@ -801,15 +801,6 @@ public enum $ {
         }
     }
 
-    /** negates each entry in the array */
-    public static TermContainer negAll(@NotNull TermContainer s) {
-        int l = s.size();
-        Term[] r = new Term[l];
-        for (int i = 0; i < l; i++) {
-            r[i] = $.neg(s.term(i));
-        }
-        return TermVector.the(r);
-    }
 
     /** static storeless term builder */
     public static final StaticTermBuilder terms = new StaticTermBuilder();

@@ -413,7 +413,7 @@ public abstract class TermIndex extends TermBuilder {
             target[i] = y;
         }
 
-        return modifications == 0 ? src : TermVector.the(target);
+        return modifications == 0 ? src : TermContainer.the(superterm.op(), target);
     }
 
 
