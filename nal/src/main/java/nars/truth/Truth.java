@@ -289,6 +289,10 @@ public interface Truth extends Truthed {
         return withConf(TruthFunctions.eternalize(conf()));
     }
 
+    default float eternalizedConf() {
+        return TruthFunctions.eternalize(conf());
+    }
+
     @NotNull
     static Truth maxConf(@NotNull Truth a, @NotNull Truth b) {
         return a.conf() >= b.conf() ? a : b;

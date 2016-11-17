@@ -5,6 +5,7 @@ import nars.$;
 import nars.Task;
 import nars.learn.microsphere.InterpolatingMicrosphere;
 import nars.truth.Truth;
+import nars.util.Util;
 import nars.util.list.FasterList;
 import org.apache.commons.math3.exception.*;
 import org.apache.commons.math3.random.UnitSphereRandomVectorGenerator;
@@ -19,6 +20,7 @@ import java.util.stream.Collectors;
 
 import static nars.time.Tense.ETERNAL;
 import static nars.truth.TruthFunctions.w2c;
+import static nars.util.Util.sqr;
 
 /**
  * Truth Interpolation and Extrapolation of Temporal Beliefs/Goals
@@ -30,8 +32,12 @@ public final class TruthPolation  {
 
 
     public static float evidenceDecay(float evi, float dur, float dt) {
-        //return evi / (1f + (dt*dt) / (dur*dur) );
-        return evi / (1f + dt / dur );
+        //return evi * 1f/( (1+dt/dur) ); //inverse
+        return evi * 1f/( sqr(1+dt/dur) ); //inverse square
+        //return evi * Math.max(0, 1f - dt / dur ); //hard linear
+        //return evi / (1f + dt / dur ); //first order decay
+        //return evi / (1f + (dt*dt) / (dur*dur) ); //2nd order decay
+
     }
 
 

@@ -147,8 +147,8 @@ abstract public class NAgents extends NAgent {
                 //new SingleThreadExecutioner();
                 new MultiThreadExecutioner(threads, 8192 /* TODO chose a power of 2 number to scale proportionally to # of threads */);
 
-        int volMax = 64;
-        int conceptsPerCycle = 192;
+        int volMax = 48;
+        int conceptsPerCycle = 256;
 
 
         //Multi nar = new Multi(3,512,
@@ -168,8 +168,8 @@ abstract public class NAgents extends NAgent {
 //            }
         };
 
-        nar.beliefConfidence(0.75f);
-        nar.goalConfidence(0.75f);
+        nar.beliefConfidence(0.9f);
+        nar.goalConfidence(0.9f);
 
         float p = 0.5f;
         nar.DEFAULT_BELIEF_PRIORITY = 0.75f * p;

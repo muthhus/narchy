@@ -252,9 +252,9 @@
     //// propositional decomposition ////////////////////////////////////////////////////////////////////////////////////
     //If S is the case, and (&&,S,A..+) is not the case, it can't be that (&&,A..+) is the case
 
-    S, (&&,S,A..+), time(decomposeBelief) |- (&&,A..+), (Belief:DecomposePositiveNegativeNegative,Goal:DecomposePositiveNegativeNegative)
+    S, (&&,S,A..+), time(decomposeBelief) |- (&&,A..+), (Belief:DecomposePositiveNegativeNegative)
         //S, (||,S,A..+)                        |- (||,A..+), (Belief:DecomposeNegativePositivePositive)
-    S, (&&,(--,%S),A..+), time(decomposeBelief) |- (&&,A..+), (Belief:DecomposeNegativeNegativeNegative,Goal:DecomposeNegativeNegativeNegative)
+    S, (&&,(--,%S),A..+), time(decomposeBelief) |- (&&,A..+), (Belief:DecomposeNegativeNegativeNegative)
         //S, (||,(--,%S),A..+)                        |- (||,A..+), (Belief:DecomposePositivePositivePositive)
 
 
@@ -551,8 +551,8 @@
     ((\, M, A.._=B..+) --> B), M |- (M --> (A.._=B..+)), (Belief:Identity, Goal:Identity)
 
 //NAL4 experimental raw product transform
-    (A..B=_..+), B |- (B --> (/, ?1, A..B=_..+)), (Belief:Identity, Goal:Identity)
-    (A..B=_..+), B |- ((\, ?1, A..B=_..+) --> B), (Belief:Identity, Goal:Identity)
+//    (A..B=_..+), B |- (B --> (/, ?1, A..B=_..+)), (Belief:Identity, Goal:Identity)
+//    (A..B=_..+), B |- ((\, ?1, A..B=_..+) --> B), (Belief:Identity, Goal:Identity)
 
 
 //NAL4 backwards composition

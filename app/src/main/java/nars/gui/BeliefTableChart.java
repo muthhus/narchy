@@ -50,7 +50,7 @@ public class BeliefTableChart extends Surface {
     /**
      * (if > 0): draw additional projection wave to show truthpolation values for a set of evenly spaced points on the visible range
      */
-    int projections = 16;
+    int projections = 32;
 
     private boolean showTaskLinks = true;
     @Deprecated

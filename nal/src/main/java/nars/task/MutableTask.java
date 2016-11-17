@@ -82,8 +82,15 @@ public class MutableTask extends AbstractTask {
                 else /*if (when > z)*/ nearest = z;
                 long delta = Math.abs(nearest - when);
 
-                float dur = 1f;
-                return $.t(t.freq(), w2c(TruthPolation.evidenceDecay(t.confWeight(), dur, delta)));
+                float dur =
+                        1f;
+                        //1f + (z - a)/2f;
+                return $.t(t.freq(),
+                    //Math.max(
+                        w2c(TruthPolation.evidenceDecay(t.confWeight(), dur, delta))
+                    //    t.eternalizedConf()
+                    //)
+                );
 
 
             }

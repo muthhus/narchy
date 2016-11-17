@@ -14,6 +14,7 @@ import nars.term.Termed;
 import nars.term.container.TermContainer;
 import nars.term.util.InvalidTermException;
 import nars.util.Util;
+import nars.util.math.Interval;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -62,6 +63,7 @@ public interface TimeFunctions {
 
     //nars.Premise.OccurrenceSolver latestOccurrence = (t, b) -> earlyOrLate(t, b, false);
     OccurrenceSolver earliestOccurrence = (t, b) -> earlyOrLate(t, b, true);
+    OccurrenceSolver latestOccurence = (t, b) -> earlyOrLate(t, b, false);
 
 
     /**
@@ -177,43 +179,69 @@ public interface TimeFunctions {
     @NotNull
     static Compound occBeliefMinTask(@NotNull Compound derived, @NotNull PremiseEval p, @NotNull long[] occReturn, int polarity) {
 
-        int eventDelta;
+        int dt;
 
-        long beliefO = p.belief.occurrence();
-        long taskO = p.task.occurrence();
-        if (beliefO != ETERNAL && taskO != ETERNAL) {
-            long earliest = p.occurrenceTarget(earliestOccurrence);
+        long beliefStart = p.belief.start();
+        long taskStart = p.task.start();
 
-            //TODO check valid int/long conversion
-            eventDelta = (int) (
-                    beliefO -
-                            taskO);
+        if (beliefStart != ETERNAL && taskStart != ETERNAL) {
+
+            long beliefEnd = p.belief.end();
+            long taskEnd = p.task.end();
+
+            long start;
+
+            if (beliefEnd == beliefStart && taskEnd == taskStart) {
+
+                //HACK the original calculation, involving point events
+
+                dt = (int) (beliefStart - taskStart); //TODO check valid int/long conversion
+                start = p.occurrenceTarget(earliestOccurrence);
 
 
-            occReturn[0] = earliest;
-        } else if (beliefO != ETERNAL) {
-            occReturn[0] = beliefO;
-            eventDelta = DTERNAL;
-        } else if (taskO != ETERNAL) {
-            occReturn[0] = taskO;
-            eventDelta = DTERNAL;
+            } else {
+
+//                switch (derived.op()) {
+//                    case CONJ:
+                        Interval i = Interval.union(taskStart, taskEnd, beliefStart, beliefEnd);
+                        start = i.a;
+                        dt = (int) i.length();
+//                        break;
+//                    default:
+//                        dt = (int) (beliefStart - taskStart); //TODO check valid int/long conversion
+//                        start = p.occurrenceTarget(earliestOccurrence);
+//                        break;
+
+//                }
+            }
+
+            occReturn[0] = start;
+
+            //HACK to handle commutive switching so that the dt is relative to the effective subject
+            if (dt != 0 && dt != DTERNAL && derived.op().commutative) {
+
+                Term bt = p.beliefTerm;
+                Term d0 = derived.term(0);
+
+                if (derivationMatch(bt, d0))
+                    dt *= -1;
+            }
+
+
+            return deriveDT(derived, polarity, p, dt, occReturn);
+
+
+        } else if (beliefStart != ETERNAL) {
+            occReturn[0] = beliefStart;
+            //eventDelta = DTERNAL;
+        } else if (taskStart != ETERNAL) {
+            occReturn[0] = taskStart;
+            //eventDelta = DTERNAL;
         } else {
-            eventDelta = DTERNAL;
+            //eventDelta = DTERNAL;
         }
 
-
-        //HACK to handle commutive switching so that the dt is relative to the effective subject
-        if (eventDelta != 0 && eventDelta != DTERNAL && derived.op().commutative) {
-
-            Term bt = p.beliefTerm;
-            Term d0 = derived.term(0);
-
-            if (derivationMatch(bt, d0))
-                eventDelta *= -1;
-        }
-
-
-        return deriveDT(derived, polarity, p, eventDelta, occReturn);
+        return derived;
     }
 
     @Deprecated
@@ -663,14 +691,15 @@ public interface TimeFunctions {
                 preSub = (Compound) preSub.unneg(); //unwrap
             }
 
-            preSub = (Compound)$.negIf(
-                    terms.the(
-                        preSub,
-                        ((taskDT != DTERNAL) && (beliefDT != DTERNAL)) ? (taskDT - beliefDT) : DTERNAL
-                    ), neg);
+            Term newPresub = terms.the( preSub,
+                ((taskDT != DTERNAL) && (beliefDT != DTERNAL)) ? (taskDT - beliefDT) : DTERNAL
+            );
+
+            if (!(newPresub instanceof Compound))
+                return null;
 
             derived = (Compound) terms.the(derived,
-                    preSub,
+                    $.negIf(newPresub, neg),
                     derived.term(1) );
         }
         if (post) {

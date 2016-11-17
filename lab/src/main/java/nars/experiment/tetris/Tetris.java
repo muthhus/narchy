@@ -42,7 +42,7 @@ public class Tetris extends NAgents {
 
     public static final int tetris_width = 6;
     public static final int tetris_height = 14;
-    public static final int TIME_PER_FALL = 16;
+    public static final int TIME_PER_FALL = 8;
     public static final int frameRate = 1;
     public static final int PIXEL_RADIX = 4;
     static boolean easy;
@@ -359,9 +359,9 @@ public class Tetris extends NAgents {
 
 
     public static void main(String[] args) {
-        Param.DEBUG = true;
+        //Param.DEBUG = true;
 
-        NAR nar = NAgents.newMultiThreadNAR(3, new FrameTime().setDuration(TIME_PER_FALL/3f));
+        NAR nar = NAgents.newMultiThreadNAR(3, new FrameTime().setDuration(1));
         nar.linkFeedbackRate.setValue(0.05f);
 
 //        Random rng = new XorShift128PlusRandom(1);
