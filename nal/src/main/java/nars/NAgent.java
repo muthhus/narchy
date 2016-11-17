@@ -72,7 +72,7 @@ abstract public class NAgent implements NSense, NAction {
 
     public float alpha, gamma, epsilonProbability = 0.025f;
     @Deprecated
-    public float gammaEpsilonFactor = 0.25f;
+    public float gammaEpsilonFactor = 0.9f;
 
     final int curiosityMonitorDuration = 8; //frames
     final DescriptiveStatistics avgActionDesire = new DescriptiveStatistics(curiosityMonitorDuration);

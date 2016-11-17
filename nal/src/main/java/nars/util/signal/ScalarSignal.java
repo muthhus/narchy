@@ -107,7 +107,11 @@ public class ScalarSignal implements Consumer<NAR>, DoubleSupplier {
 
         //update previous task: extend its end time to current time
         if (current!=null) {
-            current.setEnd(now);
+            if (!current.isDeleted()) {
+                current.setEnd(now);
+            } else {
+                prevF = Float.NaN; //force re-input
+            }
         }
 
         int timeSinceLastInput = (int) (now - lastInputTime);
@@ -147,7 +151,6 @@ public class ScalarSignal implements Consumer<NAR>, DoubleSupplier {
                 this.lastInputTime = now;
                 this.prevF = f;
             }
-
         }
 
     }

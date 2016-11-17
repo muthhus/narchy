@@ -3,36 +3,32 @@ package nars.concept;
 import nars.*;
 import nars.task.GeneratedTask;
 import nars.term.Compound;
+import nars.term.Term;
 import nars.truth.Truth;
-import nars.util.data.array.LongArrays;
 import nars.util.math.FloatSupplier;
+import nars.util.signal.ScalarSignal;
+import org.eclipse.collections.api.block.function.primitive.FloatFunction;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.function.Consumer;
+
 import static nars.$.$;
+import static nars.$.t;
 import static nars.Symbols.GOAL;
 
 
 /** TODO make extend SensorConcept and utilize that for feedback control */
-public class ActionConcept extends WiredCompoundConcept implements WiredCompoundConcept.Prioritizable, Runnable {
+public class ActionConcept extends WiredCompoundConcept implements WiredCompoundConcept.Prioritizable, Runnable, FloatFunction<Term>, Consumer<Task> {
 
 
     /** relative temporal delta time for desire/belief prediction */
     static final int decisionDT = 0;
 
-    /** relative temporal delta time for feedback occurrence */
-    static final int feedbackDT = 0;
+    final ScalarSignal feedback;
 
+    private float currentFeedback;
 
-
-
-    private final float feedbackDurability;
-    @NotNull
-    private final long[] commonEvidence;
-
-    private Task nextFeedback;
-
-    float feedbackResolution;
     public FloatSupplier pri;
     @Nullable
     private Truth currentDesire;
@@ -43,6 +39,11 @@ public class ActionConcept extends WiredCompoundConcept implements WiredCompound
         this.pri = v;
     }
     private Truth lastDesire, lastBelief;
+
+    @Override
+    public void accept(Task feedback) {
+        nar.input(feedback);
+    }
 
 
     /** determines the feedback belief when desire or belief has changed in a MotorConcept
@@ -85,13 +86,23 @@ public class ActionConcept extends WiredCompoundConcept implements WiredCompound
 
         //assert (Op.isOperation(this));
 
-        this.pri = () -> n.priorityDefault(GOAL /* though these will be used for beliefs */);
-        this.feedbackDurability = n.durabilityDefault(GOAL /* though these will be used for beliefs */);
-        this.feedbackResolution = n.truthResolution.floatValue();
         this.motor = motor;
 
-        this.commonEvidence = Param.SENSOR_TASKS_SHARE_COMMON_EVIDENCE ? new long[] { n.time.nextStamp() } : LongArrays.EMPTY_ARRAY;
+        //this.commonEvidence = Param.SENSOR_TASKS_SHARE_COMMON_EVIDENCE ? new long[] { n.time.nextStamp() } : LongArrays.EMPTY_ARRAY;
 
+        feedback = new ScalarSignal(n, term, this, (x) ->
+            t(x, n.confidenceDefault(Symbols.GOAL)),
+            this
+        );
+        feedback.resolution(n.truthResolution.floatValue());
+        feedback.pri(
+                () -> n.priorityDefault(GOAL /* though these will be used for beliefs */)
+        );
+    }
+
+    @Override
+    public final float floatValueOf(Term anObject) {
+        return this.currentFeedback;
     }
 
 //    @Override
@@ -162,32 +173,30 @@ public class ActionConcept extends WiredCompoundConcept implements WiredCompound
         if (desireChange || (updateOnBeliefChange && beliefChange)) {
         //if (beliefChange || desireChange)
 
-            Truth feedback = motor.motor(b, d);
-            if (feedback != null) {
-                //if feedback is different from last
-                if (nextFeedback == null || !nextFeedback.equalsTruth(feedback, feedbackResolution)) {
-                    this.nextFeedback = feedback(feedback, now + feedbackDT);
-                    nar.input(nextFeedback);
-                }
+            Truth f = this.motor.motor(b, d);
+            if (f!=null) {
+                this.currentFeedback = f.freq(); //HACK ignores the conf component
+            } else {
+                this.currentFeedback = Float.NaN;
             }
+
+
+//            if (feedback != null) {
+//                //if feedback is different from last
+//                if (nextFeedback == null || !nextFeedback.equalsTruth(feedback, feedbackResolution)) {
+//                    this.nextFeedback = feedback(feedback, now + feedbackDT);
+//                    nar.input(nextFeedback);
+//                }
+//            }
         }
+
+        feedback.accept(nar);
     }
 
-    public void setUpdateOnBeliefChange(boolean updateOnBeliefChange) {
-        this.updateOnBeliefChange = updateOnBeliefChange;
-    }
 
     @Nullable
     public Truth desire() { return currentDesire; }
 
-
-    protected final Task feedback(Truth t, long when) {
-        return new GeneratedTask(this, Symbols.BELIEF, t)
-                .time(when, when)
-                .evidence(commonEvidence)
-                .budgetByTruth(pri.asFloat(), feedbackDurability)
-                .log("Motor Feedback");
-    }
 
 
 //    @NotNull

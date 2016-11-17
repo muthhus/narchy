@@ -152,9 +152,6 @@ public class SensorConcept extends WiredCompoundConcept implements FloatFunction
         this.signal = signal;
     }
 
-    public final FloatSupplier getSignal() {
-        return signal;
-    }
 
     @Override
     public final float floatValueOf(Term anObject) {
