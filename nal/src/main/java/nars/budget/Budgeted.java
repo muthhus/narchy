@@ -69,7 +69,7 @@ public interface Budgeted  {
      * @return The summary value
      */
     default float summary() {
-        return aveGeo(pri(), dur(), qua());
+        return aveGeo(pri(), 0, qua());
     }
 
     float pri();
@@ -81,12 +81,10 @@ public interface Budgeted  {
 
     float qua();
 
-    float dur();
 
 
     default boolean equalsBudget(@NotNull Budgeted t, float epsilon) {
         return Util.equals(pri(), t.pri(), epsilon) &&
-                Util.equals(dur(), t.dur(), epsilon) &&
                 Util.equals(qua(), t.qua(), epsilon);
     }
 

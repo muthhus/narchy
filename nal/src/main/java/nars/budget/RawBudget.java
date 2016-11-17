@@ -18,13 +18,6 @@ public class RawBudget implements Budget {
      */
     protected float priority;
 
-    /**
-     * The percent of priority to be kept in a constant period; All priority
-     * values "decay" over time, though at different rates. Each item is given a
-     * "durability" factor in (0, 1) to specify the percentage of priority level
-     * left after each reevaluation
-     */
-    protected float durability;
 
     /**
      * The overall (context-independent) evaluation
@@ -35,15 +28,14 @@ public class RawBudget implements Budget {
     }
 
     public RawBudget(@NotNull Budgeted b, float scale) {
-        this(b.pri()*scale, b.dur(), b.qua());
+        this(b.pri()*scale, b.qua());
     }
     public RawBudget(@NotNull Budgeted b) {
-        this(b.pri(), b.dur(), b.qua());
+        this(b.pri(), b.qua());
     }
 
-    public RawBudget(float p, float d, float q) {
+    public RawBudget(float p, float q) {
         this.priority = validBudgetValue(p);
-        this.durability = validBudgetValueOrNaN(d);
         this.quality = validBudgetValueOrNaN(q);
     }
 
@@ -52,7 +44,7 @@ public class RawBudget implements Budget {
     @Override
     public Budget clone() {
         float p = priority;
-        return p != p /* deleted? */ ? null : new RawBudget(p, dur(), qua());
+        return p != p /* deleted? */ ? null : new RawBudget(p, qua());
     }
 
     /**
@@ -82,15 +74,6 @@ public class RawBudget implements Budget {
         return p!=p; //fast NaN check
     }
 
-    /**
-     * Get durability value
-     *
-     * @return The current durability
-     */
-    @Override
-    public final float dur() {
-        return durability;
-    }
 
 
 
@@ -143,9 +126,8 @@ public class RawBudget implements Budget {
 
     @NotNull
     @Override
-    public final Budget setBudget(float p, float d, float q) {
+    public final Budget setBudget(float p, float q) {
         this.priority = validBudgetValue(p);
-        this.durability = validBudgetValue(d);
         this.quality = validBudgetValue(q);
         return this;
     }
@@ -155,16 +137,6 @@ public class RawBudget implements Budget {
         this.priority = validBudgetValue(p);
     }
 
-
-    /**
-     * Change durability value
-     *
-     * @param d The new durability
-     */
-    @Override
-    public final void setDurability(float d) {
-        this.durability = validBudgetValue(d);
-    }
 
 
     /**
@@ -179,16 +151,6 @@ public class RawBudget implements Budget {
     }
 
 
-    /**
-     * Decrease quality value by a percentage of the remaining range
-     *
-     * @param v The decreasing percent
-     */
-    public void andQuality(float v) {
-        quality = and(quality, v);
-    }
-    public void mulDurability(float factor) {
-        setDurability(durability * factor);
-    }
+
 
 }

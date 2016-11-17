@@ -14,13 +14,11 @@ public class TaskBudgetingTest {
     @Test
     public void structuralDeduction1() {
 
-        DescriptiveStatistics dur = new DescriptiveStatistics();
         DescriptiveStatistics qua = new DescriptiveStatistics();
 
         Default d = new Default();
 
         d.onTask(t -> {
-            dur.addValue( t.dur() );
             qua.addValue( t.qua() );
         });
 
@@ -30,7 +28,6 @@ public class TaskBudgetingTest {
 
         d.run(100);
 
-        System.out.println("dur: \n" + dur);
         System.out.println("qua: \n" + qua);
 
     }

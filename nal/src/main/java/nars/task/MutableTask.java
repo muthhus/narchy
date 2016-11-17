@@ -161,7 +161,7 @@ public class MutableTask extends AbstractTask {
     }
 
     @NotNull
-    public MutableTask budgetByTruth(float p, float d) {
+    public MutableTask budgetByTruth(float p) {
         float q;
         Truth t = truth();
         if (truth()!=null) {
@@ -170,7 +170,7 @@ public class MutableTask extends AbstractTask {
             throw new RuntimeException("missing truth");
         }
 
-        setBudget(p, d, q);
+        setBudget(p, q);
         return this;
     }
 
@@ -298,14 +298,13 @@ public class MutableTask extends AbstractTask {
     /** sets the budget even if 'b' has been deleted; priority will be zero in that case */
     @NotNull
     public final MutableTask budgetSafe(@NotNull Budget b) {
-        budgetSafe(b.pri(), b.dur(), b.qua());
+        budgetSafe(b.pri(), b.qua());
         return this;
     }
 
     /** if p is NaN (indicating deletion), p <== 0 */
-    @NotNull public final MutableTask budgetSafe(float p, float d, float q) {
+    @NotNull public final MutableTask budgetSafe(float p, float q) {
         priority = p;
-        durability = d;
         quality = q;
 //        if (p!=p)
 //            p = 0;

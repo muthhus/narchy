@@ -25,25 +25,32 @@ public interface Budget extends Budgeted {
 
 
     /**common instance for a 'Deleted budget'.*/
-    Budget Deleted = new ROBudget(Float.NaN, 0, 0);
+    Budget Deleted = new ROBudget(Float.NaN, 0);
 
     /** common instance for a 'full budget'.*/
-    Budget One = new ROBudget(1f,1f,1f);
+    Budget One = new ROBudget(1f, 1f);
 
     /** common instance for a 'half budget'.*/
-    Budget Half = new ROBudget(0.5f, 0.5f, 0.5f);
+    Budget Half = new ROBudget(0.5f, 0.5f);
 
     /** common instance for a 'zero budget'.*/
-    Budget Zero = new ROBudget(0,0,0);
+    Budget Zero = new ROBudget(0, 0);
 
     //@Contract(pure = true)
     public static boolean aveGeoNotLessThan(float min, float a, float b, float c) {
         float minCubed = min * min * min; //cube both sides
         return a * b * c >= minCubed;
     }
+    public static boolean aveGeoNotLessThan(float min, float a, float b) {
+        float minCubed = min * min; //cube both sides
+        return a * b >= minCubed;
+    }
 
     public static float aveGeo(float a, float b, float c) {
         return (float) pow(a * b * c, 1.0 / 3.0);
+    }
+    public static float aveGeo(float a, float b) {
+        return (float) Math.sqrt(a * b);
     }
 
 //    //@Contract(pure = true)
@@ -60,13 +67,12 @@ public interface Budget extends Budgeted {
 
 
     public static String toString(@NotNull Budget b) throws IOException {
-
-        return toStringBuilder(new StringBuilder(), Texts.n4(b.pri()), Texts.n4(b.dur()), Texts.n4(b.qua())).toString();
+        return toStringBuilder(null, Texts.n4(b.pri()), Texts.n4(b.qua())).toString();
     }
 
     @NotNull
-    public static Appendable toStringBuilder(@Nullable Appendable sb, @NotNull CharSequence priorityString, @NotNull CharSequence durabilityString, @NotNull CharSequence qualityString) throws IOException {
-        int c = 1 + priorityString.length() + 1 + durabilityString.length() + 1 + qualityString.length() + 1;
+    public static Appendable toStringBuilder(@Nullable Appendable sb, @NotNull CharSequence priorityString, @NotNull CharSequence qualityString) throws IOException {
+        int c = 1 + priorityString.length() + 1 + qualityString.length() + 1;
         if (sb == null)
             sb = new StringBuilder(c);
         else {
@@ -76,7 +82,6 @@ public interface Budget extends Budgeted {
 
         sb.append(Symbols.BUDGET_VALUE_MARK)
                 .append(priorityString).append(Symbols.VALUE_SEPARATOR)
-                .append(durabilityString).append(Symbols.VALUE_SEPARATOR)
                 .append(qualityString)
                 .append(Symbols.BUDGET_VALUE_MARK);
 
@@ -88,7 +93,7 @@ public interface Budget extends Budgeted {
      */
     @Nullable
     default Budget zero() {
-        return setBudget(0, 0, 0);
+        return setBudget(0, 0);
     }
 
 
@@ -109,7 +114,7 @@ public interface Budget extends Budgeted {
     @NotNull
     default Budgeted cloneMult(float p, float d, float q) {
         Budget x = clone();
-        x.mul(p, d, q);
+        x.mul(p, q);
         return x;
     }
 
@@ -188,9 +193,6 @@ public interface Budget extends Budgeted {
 
     }
 
-    default void durMult(float factor) {
-        setDurability(dur() * factor);
-    }
     default void quaMult(float factor) {
         setQuality(qua() * factor);
     }
@@ -198,7 +200,6 @@ public interface Budget extends Budgeted {
     default boolean equals(Budgeted b, float epsilon) {
         return
                 Util.equals(priIfFiniteElseNeg1(), b.priIfFiniteElseNeg1(), epsilon) &&
-                Util.equals(dur(), dur(), epsilon) &&
                 Util.equals(qua(), qua(), epsilon);
 
     }
@@ -211,7 +212,6 @@ public interface Budget extends Budgeted {
 //    }
 
 
-    void setDurability(float d);
 
     void setQuality(float q);
 
@@ -241,7 +241,7 @@ public interface Budget extends Budgeted {
      * uses optimized aveGeoNotLessThan to avoid a cube root operation
      */
     default boolean summaryNotLessThan(float min) {
-        return min == 0f || aveGeoNotLessThan(min, pri(), dur(), qua());
+        return min == 0f || aveGeoNotLessThan(min, pri(), qua());
     }
 
 
@@ -253,23 +253,7 @@ public interface Budget extends Budgeted {
 //        setQuality(Util.max(getQuality(), otherQuality)); //max durab
 //    }
 
-    /**
-     * Increase durability value by a percentage of the remaining range
-     *
-     * @param v The increasing percent
-     */
-    default void orDurability(float v) {
-        setDurability(or(dur(), v));
-    }
 
-    /**
-     * Decrease durability value by a percentage of the remaining range
-     *
-     * @param v The decreasing percent
-     */
-    default void andDurability(float v) {
-        setDurability(and(dur(), v));
-    }
 
     /**
      * AND's (multiplies) priority with another value
@@ -305,13 +289,13 @@ public interface Budget extends Budgeted {
         if (srcCopy == null) {
             zero();
         } else {
-            setBudget(srcCopy.pri(), srcCopy.dur(), srcCopy.qua());
+            setBudget(srcCopy.pri(), srcCopy.qua());
         }
 
         return this;
     }
 
-    Budget setBudget(float p, float d, float q);
+    Budget setBudget(float p, float q);
 
 //    /**
 //     * returns this budget, after being modified
@@ -336,7 +320,7 @@ public interface Budget extends Budgeted {
 
     @NotNull
     default Appendable toBudgetStringExternal(Appendable sb) throws IOException {
-        return toStringBuilder(sb, Texts.n2(pri()), Texts.n2(dur()), Texts.n2(qua()));
+        return toStringBuilder(sb, Texts.n2(pri()), Texts.n2(qua()));
     }
 
     @NotNull
@@ -358,7 +342,7 @@ public interface Budget extends Budgeted {
     }
 
     default void set(@NotNull Budgeted b) {
-        setBudget(b.pri(), b.dur(), b.qua());
+        setBudget(b.pri(), b.qua());
     }
 
     @NotNull
@@ -375,14 +359,12 @@ public interface Budget extends Budgeted {
         }
     }
 
-    default void mul(float pf, float df, float qf) {
+    default void mul(float pf, float qf) {
         setPriority(pri()*pf);
-        setDurability(dur()*df);
         setQuality(qua()*qf);
     }
-    @NotNull
-    default Budget multiplied(float pf, float df, float qf) {
-        mul(pf, df, qf);
+    default Budget multiplied(float pf, float qf) {
+        mul(pf, qf);
         return this;
     }
 

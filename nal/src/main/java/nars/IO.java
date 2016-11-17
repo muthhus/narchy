@@ -66,7 +66,6 @@ public class IO {
         long[] evi = readEvidence(in);
 
         float pri = in.readFloat();
-        float dur = in.readFloat();
         float qua = in.readFloat();
 
         long cre = in.readLong();
@@ -74,7 +73,7 @@ public class IO {
 
         MutableTask mm = new MutableTask(term, punc, truth).time(cre, occ);
         mm.evidence(evi);
-        mm.setBudget(pri, dur, qua);
+        mm.setBudget(pri, qua);
         return mm;
     }
 
@@ -150,7 +149,6 @@ public class IO {
 
     public static void writeBudget(@NotNull DataOutput out, @NotNull Budgeted t) throws IOException {
         out.writeFloat(t.priIfFiniteElseZero());
-        out.writeFloat(t.dur());
         out.writeFloat(t.qua());
     }
 

@@ -35,11 +35,6 @@ public class TaskBudgeting {
 //        if (quality < p.durMin)
 //            return null;
 
-        final float durability =
-                baseBudget.dur() * occam * derivationQuality;
-        if (durability < p.durMin)
-            return null;
-
         float priority =
                 //nal.taskLink.priIfFiniteElseZero() * volRatioScale;
                 //or(nal.taskLink.priIfFiniteElseZero(), nal.termLink.priIfFiniteElseZero())
@@ -58,7 +53,7 @@ public class TaskBudgeting {
         //if (priority * durability < Param.BUDGET_EPSILON)
         //return null;
 
-        return $.b(priority, durability, quality);
+        return $.b(priority, quality);
 
 
         /* ORIGINAL: https://code.google.com/p/open-nars/source/browse/trunk/nars_core_java/nars/inference/BudgetFunctions.java
@@ -152,7 +147,7 @@ public class TaskBudgeting {
             budget = new RawBudget(
                     and(taskPriority, quality),
                     //UtilityFunctions.or(taskPriority, quality),
-                    question.dur(), BudgetFunctions.truthToQuality(solution.truth()));
+                    BudgetFunctions.truthToQuality(solution.truth()));
             question.budget().setPriority(Math.min(1 - quality, taskPriority));
         }
         /*

@@ -117,7 +117,7 @@ public abstract class AbstractTask extends RawBudget implements Task, Temporal {
 
 
     public AbstractTask(@NotNull Termed<Compound> term, char punctuation, @Nullable Truth truth, float p, float d, float q) {
-        super(p, d, q);
+        super(p, q);
 
         this.punc = punctuation;
 
@@ -218,9 +218,6 @@ public abstract class AbstractTask extends RawBudget implements Task, Temporal {
             setOccurrence(oc);
         }
 
-        float d = dur();
-        if (d!=d /* fast NaN test */)
-            setDurability(nar.durabilityDefault(punc));
 
         float q = qua();
         if (q!=q /* fast NaN test */) {

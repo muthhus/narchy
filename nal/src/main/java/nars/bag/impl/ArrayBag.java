@@ -411,7 +411,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
                 break;
             case +1:
 
-                v.setBudget(bp * scale, b.dur(), b.qua());
+                v.setBudget(bp * scale, b.qua());
                 if (update(v)) {
                     onAdded(v); //success
                 }

@@ -239,8 +239,7 @@ public class HijackBag<X> implements Bag<X> {
             } else {
                 //overwite an empty or deleted entry
                 f[0] = range(nP);
-                f[1] = b.dur();
-                f[2] = b.qua();
+                f[1] = b.qua();
                 pressure += range(nP);
             }
 

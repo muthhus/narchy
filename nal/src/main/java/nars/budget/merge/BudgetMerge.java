@@ -71,7 +71,7 @@ public interface BudgetMerge extends BiFunction<Budget, Budget, Budget> {
             }
         } else {
             if (!hasTP) {
-                tgt.setBudget(sPri * sScale, src.dur(), src.qua()); //target has no influence, it becomes set entirely by incoming
+                tgt.setBudget(sPri * sScale, src.qua()); //target has no influence, it becomes set entirely by incoming
                 return 0;
             }
         }
@@ -105,7 +105,6 @@ public interface BudgetMerge extends BiFunction<Budget, Budget, Budget> {
 
         tgt.setBudget(
                 newPri,
-                (tgtInfluence * tgt.dur()) + ((1f-tgtInfluence) * src.dur()),
                 (tgtInfluence * tgt.qua()) + ((1f-tgtInfluence)  * src.qua()));
 
         return overflow;
@@ -223,8 +222,7 @@ public interface BudgetMerge extends BiFunction<Budget, Budget, Budget> {
     BudgetMerge max = (tgt, src, srcScaleIgnored) -> {
         tgt.setBudget(
             Util.max(src.priIfFiniteElseZero(), tgt.priIfFiniteElseZero()),
-            Util.max(src.dur(), tgt.dur()),
-            Util.max(src.qua(), tgt.qua()));
+                Util.max(src.qua(), tgt.qua()));
         return 0;
     };
 

@@ -66,13 +66,6 @@ abstract public class DerivedTask extends MutableTask {
 //        multiply(factor, termLink, alsoDurability);
 //    }
 
-    static void multiply(float factor, @Nullable BLink link, boolean alsoDurability) {
-        if (link != null && !link.isDeleted()) {
-            link.andPriority(factor);
-            if (alsoDurability)
-                link.andDurability(factor);
-        }
-    }
 
 
     @Override

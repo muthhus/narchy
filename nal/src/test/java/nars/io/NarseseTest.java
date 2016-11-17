@@ -73,7 +73,6 @@ public class NarseseTest {
         assertNotNull(t);
         assertEquals('!', t.punc());
         assertEquals(0.99f, t.pri(), 0.001);
-        assertEquals(0.95f, t.dur(), 0.001);
         assertEquals(0.93f, t.freq(), 0.001);
         assertEquals(0.95f, t.conf(), 0.001);
     }
@@ -126,7 +125,6 @@ public class NarseseTest {
     public void testBudget() throws Narsese.NarseseException {
         Task t = task("$0.70;0.60;0.50$ <a <=> b>. %0.00;0.93");
         assertEquals(0.7f, t.pri(), 0.01f);
-        assertEquals(0.6f, t.dur(), 0.01f);
         assertEquals(0.5f, t.qua(), 0.01f);
 
         Task u = task("$0.9$ <a <=> b>. %0.00;0.93");

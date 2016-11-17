@@ -1,7 +1,6 @@
 package nars.util.signal;
 
 import nars.*;
-import nars.task.AbstractTask;
 import nars.task.MutableTask;
 import nars.term.Compound;
 import nars.term.Term;
@@ -209,7 +208,7 @@ public class ScalarSignal implements Consumer<NAR>, DoubleSupplier {
             return null;
 
         SignalTask s = new SignalTask(term(), punc, t, now);
-        s.budgetByTruth( Math.max(Param.BUDGET_EPSILON*2, changeFactor * pri.asFloat())  /*(v, now, prevF, lastInput)*/, dur);
+        s.budgetByTruth( Math.max(Param.BUDGET_EPSILON*2, changeFactor * pri.asFloat())  /*(v, now, prevF, lastInput)*/);
         //.log(this);
         return s;
     }

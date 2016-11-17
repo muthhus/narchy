@@ -41,10 +41,9 @@ import static nars.budget.Budget.validBudgetValue;
 
     @NotNull
     @Override
-    public Budget setBudget(float p, float d, float q) {
+    public Budget setBudget(float p, float q) {
         f[0] = validBudgetValue(p);
-        f[1] = validBudgetValue(d);
-        f[2] = validBudgetValue(q);
+        f[1] = validBudgetValue(q);
         return this;
     }
 
@@ -53,14 +52,10 @@ import static nars.budget.Budget.validBudgetValue;
         f[0] = validBudgetValue(p);
     }
 
-    @Override
-    public final void setDurability(float d) {
-        f[1] = validBudgetValue(d);
-    }
 
     @Override
     public final void setQuality(float q) {
-        f[2] = validBudgetValue(q);
+        f[1] = validBudgetValue(q);
     }
 
     @Override
@@ -89,11 +84,6 @@ import static nars.budget.Budget.validBudgetValue;
     @Override
     public final float qua() {
         return f[1];
-    }
-
-    @Override
-    public final float dur() {
-        return f[2];
     }
 
     @NotNull

@@ -21,8 +21,8 @@ public class DefaultBLink<X> extends RawBudget implements BLink<X> {
         this.id = id;
     }
 
-    public DefaultBLink(@NotNull X id, float p, float d, float q) {
-        setBudget(p, d, q);
+    public DefaultBLink(@NotNull X id, float p, float q) {
+        setBudget(p, q);
         this.id = id;
     }
 
@@ -31,7 +31,7 @@ public class DefaultBLink<X> extends RawBudget implements BLink<X> {
     }
 
     public DefaultBLink(@NotNull X id, @NotNull Budgeted b, float scale) {
-        this(id, b.pri() * scale, b.dur(), b.qua());
+        this(id, b.pri() * scale, b.qua());
     }
 
     @Override

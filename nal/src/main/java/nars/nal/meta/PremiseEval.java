@@ -42,7 +42,7 @@ public class PremiseEval extends Unify {
     @NotNull
     public final Premise premise;
     private final float truthResolution;
-    public float durMin;
+    public float quaMin;
 
     public boolean setPunct(@Nullable Truth t, char p, long[] evidence) {
 
@@ -152,7 +152,7 @@ public class PremiseEval extends Unify {
         this.nar = nar;
         this.truthResolution = nar.truthResolution.floatValue();
         this.confMin = Math.max(truthResolution, nar.confMin.floatValue());
-        this.durMin = nar.durMin.floatValue();
+        this.quaMin = nar.durMin.floatValue();
 
         //occDelta = new Versioned(this);
         //tDelta = new Versioned(this);

@@ -19,7 +19,6 @@ import nars.term.Termed;
 import nars.term.Terms;
 import nars.term.atom.Atom;
 import nars.term.atom.Atomic;
-import nars.term.container.TermVector;
 import nars.term.container.TermContainer;
 import nars.term.obj.IntTerm;
 import nars.term.var.AbstractVariable;
@@ -788,9 +787,8 @@ public enum $ {
         return c < minConf ? null : new DefaultTruth(f, c);
     }
 
-    @NotNull
-    public static Budget b(float p, float d, float q) {
-        return new RawBudget(p, d, q);
+    public static Budget b(float p, float q) {
+        return new RawBudget(p, q);
     }
 
     /** negates each entry in the array */
@@ -999,7 +997,7 @@ public enum $ {
     public static Task command(@NotNull Compound op) {
         //TODO use lightweight CommandTask impl without all the logic metadata
         MutableTask t = new MutableTask(op, Symbols.COMMAND, null);
-        t.setBudget(1f,1f,1f);
+        t.setBudget(1f, 1f);
         return t;
     }
 

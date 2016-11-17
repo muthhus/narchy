@@ -102,16 +102,16 @@ public class Narsese extends BaseParser<Object> {
 
         switch (blen) {
             case 0:     /* do not set, Memory will apply defaults */
-                ttt.budgetSafe(nar.priorityDefault(p), Float.NaN, Float.NaN);
+                ttt.budgetSafe(nar.priorityDefault(p), Float.NaN);
                 break;
             case 1:
-                ttt.budgetSafe(b[0], Float.NaN, Float.NaN);
+                ttt.budgetSafe(b[0], Float.NaN);
                 break;
             case 2:
-                ttt.budgetByTruth(b[1], b[0]);
+                ttt.budgetByTruth(b[1]);
                 break;
             default:
-                ttt.setBudget(b[2], b[1], b[0]);
+                ttt.setBudget(b[2], b[0]);
                 break;
         }
 

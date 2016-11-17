@@ -326,7 +326,7 @@ abstract public class NAgent implements NSense, NAction {
             predictors.add(
                     new MutableTask(happy, '!', 1f, rewardGamma)
                             .eternal()
-                            .budgetSafe(0.5f, 0.95f, 0.99f)
+                            .budgetSafe(0.5f, 0.99f)
             );
 //                    happy.desire($.t(1f, rewardGamma),
 //                            nar.priorityDefault(Symbols.GOAL),
@@ -466,8 +466,8 @@ abstract public class NAgent implements NSense, NAction {
                                 $.t(nar.random.nextFloat()
                                         //Math.random() > 0.5f ? 1f : 0f
                                         , Math.max(nar.truthResolution.floatValue(), (nar.random.nextFloat() * gamma * gammaEpsilonFactor))))
-                                .time(now, now).budgetByTruth(c.pri.asFloat(),
-                                Math.max(nar.durMin.floatValue(), gammaEpsilonFactor * nar.durabilityDefault(GOAL))).log("Curiosity"));
+                                .time(now, now).budgetByTruth(c.pri.asFloat()
+                        ).log("Curiosity"));
 
                 //in order to auto-destruct corectly, the task needs to remove itself from the taskindex too
                 /* {
@@ -577,8 +577,7 @@ abstract public class NAgent implements NSense, NAction {
             if (t.isDeleted()) {
                 //TODO check if dur or qua changed?
                 t.budgetSafe(nar.priorityDefault(pp),
-                             nar.durabilityDefault(pp),
-                             t.isQuestOrQuestion() ? nar.qualityDefault(pp) : BudgetFunctions.truthToQuality(t));
+                        t.isQuestOrQuestion() ? nar.qualityDefault(pp) : BudgetFunctions.truthToQuality(t));
             }
 
             nar.inputLater(t);

@@ -7,11 +7,10 @@ import org.jetbrains.annotations.NotNull;
  */
 public final class ROBudget implements Budget {
 
-    private final float pri, dur, qua;
+    private final float pri, qua;
 
-    public ROBudget(float pri, float dur, float qua) {
+    public ROBudget(float pri, float qua) {
         this.pri = pri;
-        this.dur = dur;
         this.qua = qua;
     }
 
@@ -30,10 +29,6 @@ public final class ROBudget implements Budget {
         throw new UnsupportedOperationException();
     }
 
-    @Override
-    public void setDurability(float d) {
-        throw new UnsupportedOperationException();
-    }
 
     @Override
     public void setQuality(float q) {
@@ -48,7 +43,7 @@ public final class ROBudget implements Budget {
 
     @NotNull
     @Override
-    public Budget setBudget(float p, float d, float q) {
+    public Budget setBudget(float p, float q) {
         throw new UnsupportedOperationException();
     }
 
@@ -62,10 +57,6 @@ public final class ROBudget implements Budget {
         return qua;
     }
 
-    @Override
-    public float dur() {
-        return dur;
-    }
 
     @Override
     public float priIfFiniteElseZero() {

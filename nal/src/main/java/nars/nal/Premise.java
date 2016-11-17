@@ -57,9 +57,9 @@ public final class Premise extends RawBudget implements Tasked {
 
     public Premise(@NotNull Termed concept, @NotNull Task taskLink,
                    @NotNull Term termLink,
-                   @Nullable Task belief, float p, float d, float q) {
+                   @Nullable Task belief, float p, float q) {
 
-        super(p, d, q);
+        super(p, q);
 
         this.concept = concept;
 
@@ -168,9 +168,6 @@ public final class Premise extends RawBudget implements Tasked {
 
         //TODO lerp by the two budget's qualities instead of aveAri,or etc ?
 
-        float dur = belief == null ? taskBudget.dur() : or(taskBudget.dur(), beliefBudget.dur());
-//        if (dur < nar.durMin.floatValue())
-//            return null;
 
         float qua = belief == null ? taskBudget.qua() : or(taskBudget.qua(), beliefBudget.qua());
         if (qua < nar.durMin.floatValue())
@@ -181,7 +178,7 @@ public final class Premise extends RawBudget implements Tasked {
                 //aveAri(taskLinkBudget.pri(), termLinkBudget.pri());
                 //nar.conceptPriority(c);
 
-        return new Premise(c, task, term.term(), belief, pri, dur, qua);
+        return new Premise(c, task, term.term(), belief, pri, qua);
     }
 
     @Nullable

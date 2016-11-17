@@ -484,13 +484,9 @@ public abstract class NAR extends Param implements Level, Consumer<Task>, NARIn,
 
     @Nullable
     public Task believe(float priority, @NotNull Termed term, @NotNull Tense tense, float freq, float conf) throws NarseseException {
-        return believe(priority, durabilityDefault(BELIEF), term, time(tense), freq, conf);
+        return believe(priority, term, time(tense), freq, conf);
     }
 
-    @Nullable
-    public Task believe(float priority, @NotNull Termed term, long when, float freq, float conf) throws NarseseException {
-        return believe(priority, durabilityDefault(BELIEF), term, when, freq, conf);
-    }
 
     @NotNull
     public NAR believe(@NotNull Termed term, float freq, float conf) throws NarseseException {
@@ -568,23 +564,23 @@ public abstract class NAR extends Param implements Level, Consumer<Task>, NARIn,
     }
 
     @Nullable
-    public Task believe(float pri, float dur, @NotNull Termed<Compound> term, long occurrenceTime, float freq, float conf) throws NarseseException {
-        return input(pri, dur, term, BELIEF, occurrenceTime, freq, conf);
+    public Task believe(float pri, @NotNull Termed<Compound> term, long occurrenceTime, float freq, float conf) throws NarseseException {
+        return input(pri, term, BELIEF, occurrenceTime, freq, conf);
     }
 
 
     @Nullable
     public Task goal(float pri, @NotNull Termed<Compound> goal, long when, float freq, float conf) {
-        return input(pri, durabilityDefault(GOAL), goal, GOAL, when, freq, conf);
+        return input(pri, goal, GOAL, when, freq, conf);
     }
 
     @Nullable
     public Task goal(float pri, @NotNull Termed<Compound> goal, @NotNull Tense tense, float freq, float conf) {
-        return input(pri, durabilityDefault(GOAL), goal, GOAL, time(tense), freq, conf);
+        return input(pri, goal, GOAL, time(tense), freq, conf);
     }
 
     @Nullable
-    public Task input(float pri, float dur, Termed<Compound> term, char punc, long occurrenceTime, float freq, float conf) {
+    public Task input(float pri, Termed<Compound> term, char punc, long occurrenceTime, float freq, float conf) {
 
         if (term == null) {
             throw new NullPointerException("null task term");
@@ -596,7 +592,7 @@ public abstract class NAR extends Param implements Level, Consumer<Task>, NARIn,
         }
 
         Task t = new MutableTask(term, punc, tr)
-                .budgetByTruth(pri, dur)
+                .budgetByTruth(pri)
                 .time(time(), occurrenceTime);
 
         inputLater(t);
@@ -955,7 +951,6 @@ public abstract class NAR extends Param implements Level, Consumer<Task>, NARIn,
                             Ansi.Attribute.INTENSITY_BOLD :
                             Ansi.Attribute.INTENSITY_FAINT)
                     .a(tv.pri() > 0.5f ? Ansi.Attribute.NEGATIVE_ON : Ansi.Attribute.NEGATIVE_OFF)
-                    .a(tv.dur() > 0.5f ? Ansi.Attribute.UNDERLINE : Ansi.Attribute.UNDERLINE_OFF)
                     .fg(Budget.budgetSummaryColor(tv))
                     .a(
                             tv.toString(this, true)
