@@ -293,8 +293,12 @@ public interface Truth extends Truthed {
         return TruthFunctions.eternalize(conf());
     }
 
-    @NotNull
-    static Truth maxConf(@NotNull Truth a, @NotNull Truth b) {
+    @Nullable
+    static Truth maxConf(@Nullable Truth a, @Nullable Truth b) {
+        if (a == null)
+            return b;
+        if (b == null)
+            return a;
         return a.conf() >= b.conf() ? a : b;
     }
 

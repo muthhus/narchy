@@ -170,7 +170,7 @@ public class DynamicConcept extends CompoundConcept {
         @Nullable
         public Truth truth(long when, long now) {
             DynTruth d = dyntruth(when, now, false);
-            return d != null ? d.truth() : super.truth(when, now);
+            return Truth.maxConf(d != null ? d.truth() : null, super.truth(when, now) /* includes only non-dynamic beliefs */ );
         }
 
         @Nullable
@@ -370,58 +370,22 @@ public class DynamicConcept extends CompoundConcept {
         @Override
         public @Nullable Task match(long when, long now, @Nullable Task target) {
             Compound template = target!=null ? target.term() : term();
-            return generate(template, when);
 
-            //Task x = super.match(when, now, target);
+            Task y = generate(template, when);
 
-            //if (x == null || then == ETERNAL /*|| Math.abs(then - x.occurrence() ) >= occThresh*/) {
+            Task x = super.match(when, now, target);
 
-//                if (then == ETERNAL)
-//                    then = now;
+            if (x == null) return y;
+            if (y == null) return x;
 
-                //template which may contain temporal relationship to emulate
-//            Compound template = target!=null ? target.term() : term();
-//            return generate(template, when);
+            //choose the non-overlapping one
+            if (Stamp.overlapping(x, target))
+                return y;
+            if (Stamp.overlapping(y, target))
+                return x;
 
-//                DynTruth yy = truth(when, template, true);
-//                if (yy!=null) {
-//                    Truth y = yy.truth();
-//
-//                    if ((y != null)) {
-//                        @Nullable long[] yEv = yy.evidence();
-//                        if (
-//                            (x == null)
-//                                ||
-//                            (
-//                                    (target==null || !Stamp.overlapping(target.evidence(), yEv))
-//                                            &&
-//                                    (y.conf() > x.conf())
-//                            )) { //!y.equals(x.truth())) {
-//
-//
-////                        /*if the belief tables provided a value, interpolate this with the dynamic value to get the final truth value */
-////                        float overlap = 0; //TODO compute overlap %
-////                        Truth z = x != null ? Revision.revise(y,x,1f-overlap,nar.confMin.floatValue()) : y;
-////                        long[] e = x!=null ? Stamp.zip(yy.evidence(), x.evidence()) : yy.evidence();
-//                            //System.err.println(x + " + " + y + " = " + z);
-//
-//                            RevisionTask t = new RevisionTask(template, beliefOrGoal ? Symbols.BELIEF : Symbols.GOAL,
-//                                    y, nar.time(), when, yEv);
-//                            t.setBudget(yy.budget());
-//                            t.log("Dynamic");
-//
-//
-//                            //System.err.println(xx + "\tvs\t" + x);
-//                            //nar.inputLater(xx);
-//                            x = t;
-//
-//                        }
-//                    }
-//                }
-//            //}
-
-
-            //return x;
+            //choose higher confidence
+            return x.conf() > y.conf() ? x : y;
         }
     }
 }

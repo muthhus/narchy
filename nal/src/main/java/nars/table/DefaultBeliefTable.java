@@ -180,7 +180,7 @@ public class DefaultBeliefTable implements BeliefTable {
             if (ete == null) {
                 return tmp;
             } else {
-                return (ete.conf() > tmp.conf()) ?
+                return (ete.conf(when) > tmp.conf(when)) ?
                         ete : tmp;
             }
         }

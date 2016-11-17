@@ -282,7 +282,6 @@ public interface TimeFunctions {
         Task task = p.task;
         Compound taskTerm = task.term();
 
-        occReturn[0] = task.occurrence();
         int taskSize = taskTerm.size();
 
         if (derived.op() == CONJ && (task.volume() == derived.volume() && taskSize == derived.size() && task.term().vars() == derived.vars())) {
@@ -290,17 +289,19 @@ public interface TimeFunctions {
             //being a decomposition it should produce a smaller result
             throw new InvalidTermException(derived.op(), derived.terms(), "ellipsis commutive match fault: same as parent");
         }
-        int dt = task.dt();
 
         if (taskSize <= 2) { //conjunction of 1 can not occur actually, but for completeness use the <=
             //a decomposition of this will result in a complete subterm (half) of the input.
             //if (dt!=DTERNAL || dt!=XTERNAL || dt!=0) {
                 //call "decomposeTask"
-                return decompose(derived, p, occReturn, true);
+            return decompose(derived, p, occReturn, true);
             //}
         } else {
+            occReturn[0] = task.occurrence();
+
             //3 or more
             if (derived.op() == CONJ) {
+                int dt = task.dt();
                 //in this case, set the resulting conjunction to either the && or &| state, copying from the task's term
                 return deriveDT(derived, +0, p, dt, occReturn);
             }
@@ -354,7 +355,7 @@ public interface TimeFunctions {
 //                //occOther = p.time();
 //                occOther = occDecomposed;
 
-            long occ;
+            long occ = ETERNAL;
 
             //int edtDecomposed = dtDecomposed != DTERNAL ? dtDecomposed : 0; //effective dt decomposed
 
@@ -362,9 +363,6 @@ public interface TimeFunctions {
                 //probably a (&&+0, ...)
                 occ = occDecomposed != ETERNAL ? occDecomposed : occOther;
             } else {
-
-                occ = ETERNAL;
-
 
                 @Nullable Term rDecomposed = resolve(p, decomposedTerm);
 
@@ -394,7 +392,9 @@ public interface TimeFunctions {
                             } else if (rDerived != null) { //{ && otherInDecomposed != DTERNAL) {
                                 int derivedInDecomposed = rDecomposed.subtermTime(rDerived);
                                 if (derivedInDecomposed != DTERNAL) {
-                                    occ = occOther + derivedInDecomposed - otherInDecomposed;
+                                    occ = occOther + derivedInDecomposed;
+                                    if (otherInDecomposed!=DTERNAL) //???
+                                        occ -= otherInDecomposed;
 
 
                                 }

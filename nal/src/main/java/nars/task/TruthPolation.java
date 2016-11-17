@@ -3,6 +3,7 @@ package nars.task;
 import com.google.common.collect.Lists;
 import nars.$;
 import nars.Task;
+import nars.concept.DynamicConcept;
 import nars.truth.Truth;
 import org.apache.commons.math3.exception.*;
 import org.jetbrains.annotations.NotNull;
@@ -53,8 +54,8 @@ public enum TruthPolation  {
         // microsphere's facets.
         for (int i1 = 0, tasksSize = tasks.size(); i1 < tasksSize; i1++) {
             Task t = tasks.get(i1);
-            // Vector between interpolation point and current sample point.
-            //HACK this only supports 1D points for now
+            if (t instanceof DynamicConcept.DynamicBeliefTask)
+                continue; //ignore dynamic belief tasks
 
             Truth tt = t.truth(when);
             if (tt != null) {
@@ -64,7 +65,6 @@ public enum TruthPolation  {
                     weightedValue += tw * tt.freq();
                 }
             }
-            //}
         }
 
         if (topEternal!=null) {
