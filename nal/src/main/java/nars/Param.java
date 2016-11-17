@@ -120,8 +120,8 @@ public abstract class Param /*extends Container*/ implements Level {
     public static final float BUDGET_EPSILON = 0.0005f;
 
 
-    public static final int DEFAULT_WIRED_CONCEPT_BELIEFS = 16;
-    public static final int DEFAULT_WIRED_CONCEPT_GOALS = 16;
+    public static final int DEFAULT_WIRED_CONCEPT_BELIEFS = 24;
+    public static final int DEFAULT_WIRED_CONCEPT_GOALS = 24;
 
     /** size of each thread's normalization cache, in entries */
     public static final int NORMALIZATION_CACHE_SIZE = 16*1024;
@@ -279,7 +279,7 @@ public abstract class Param /*extends Container*/ implements Level {
     /**
      * budget durability threshold necessary to form a derived task.
      */
-    public final MutableFloat durMin = new MutableFloat(0);
+    public final MutableFloat quaMin = new MutableFloat(0);
 
 
     public float confidenceDefault(char punctuation) {

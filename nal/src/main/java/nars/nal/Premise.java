@@ -170,7 +170,7 @@ public final class Premise extends RawBudget implements Tasked {
 
 
         float qua = belief == null ? taskBudget.qua() : or(taskBudget.qua(), beliefBudget.qua());
-        if (qua < nar.durMin.floatValue())
+        if (qua < nar.quaMin.floatValue())
             return null;
 
         float pri =

@@ -17,6 +17,7 @@ import nars.term.obj.Termject;
 import nars.truth.Truth;
 import nars.truth.TruthDelta;
 import nars.truth.Truthed;
+import nars.util.Util;
 import org.eclipse.collections.api.list.primitive.ByteList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -28,6 +29,7 @@ import java.util.Map;
 
 import static nars.Op.CONJ;
 import static nars.Op.NEG;
+import static nars.Param.TRUTH_EPSILON;
 import static nars.time.Tense.DTERNAL;
 
 /**
@@ -129,24 +131,24 @@ public class DynamicConcept extends CompoundConcept {
         }
 
 
-        @Override
-        public TruthDelta add(@NotNull Task input, @NotNull QuestionTable questions, @NotNull CompoundConcept<?> concept, @NotNull NAR nar) {
-            //only allow input and dynamic belief tasks to be inserted; otherwise process a new dynamic result
-            if (!input.isInput() && (!(input instanceof DynamicBeliefTask))) {
-                DynamicBeliefTask d = generate(input.term(), input.occurrence(), input.budget());
-                if (d!=null) {
-                    input.delete(); //necessary to cause NAR to replace the Task in the index, so as not to seem as a duplicate
-                    nar.inputLater(d);
-                    return null;
-                }
-            }
-
-//            //only allow input tasks
-//            if (!input.isInput())
-//                return null;
-
-            return super.add(input, questions, concept, nar);
-        }
+//        @Override
+//        public TruthDelta add(@NotNull Task input, @NotNull QuestionTable questions, @NotNull CompoundConcept<?> concept, @NotNull NAR nar) {
+//            //only allow input and dynamic belief tasks to be inserted; otherwise process a new dynamic result
+//            if (!input.isInput() && (!(input instanceof DynamicBeliefTask))) {
+//                DynamicBeliefTask d = generate(input.term(), input.occurrence(), input.budget());
+//                if (d!=null) {
+//                    input.delete(); //necessary to cause NAR to replace the Task in the index, so as not to seem as a duplicate
+//                    nar.inputLater(d);
+//                    return null;
+//                }
+//            }
+//
+////            //only allow input tasks
+////            if (!input.isInput())
+////                return null;
+//
+//            return super.add(input, questions, concept, nar);
+//        }
 
         @Nullable public DynamicBeliefTask generate(@NotNull Compound template, long when) {
             return generate(template, when, null);
@@ -379,13 +381,22 @@ public class DynamicConcept extends CompoundConcept {
             if (y == null) return x;
 
             //choose the non-overlapping one
-            if (Stamp.overlapping(x, target))
-                return y;
-            if (Stamp.overlapping(y, target))
-                return x;
+            if (target!=null) {
+                if (Stamp.overlapping(x, target))
+                    return y;
+                if (Stamp.overlapping(y, target))
+                    return x;
+            }
 
             //choose higher confidence
-            return x.conf() > y.conf() ? x : y;
+            float xc = x.conf();
+            float yc = y.conf();
+            if (!Util.equals(xc, yc, TRUTH_EPSILON)) {
+                return xc > yc ? x : y;
+            }
+
+            //choose based on originality (includes cyclic), but by default prefer the existing task not the dynamic one
+            return (x.originality() > y.originality()) ? x : y;
         }
     }
 }

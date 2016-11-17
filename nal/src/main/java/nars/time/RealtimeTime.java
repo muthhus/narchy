@@ -19,7 +19,6 @@ public abstract class RealtimeTime implements Time {
     long seed = Math.abs(UUID.randomUUID().getLeastSignificantBits() ) & 0xffff0000;
     final AtomicLong nextStamp = new AtomicLong(1);
 
-    float duration;
 
 
     protected RealtimeTime(int unitsPerSecond, boolean relativeToStart) {
@@ -27,18 +26,9 @@ public abstract class RealtimeTime implements Time {
         this.unitsPerSecod = unitsPerSecond;
         this.start = relativeToStart ? getRealTime() : 0L;
 
-        setDuration(1 /* time unit */);
 
     }
 
-    public final RealtimeTime setDuration(int units) {
-        duration = units;
-        return this;
-    }
-
-    public final RealtimeTime setDuration(float seconds) {
-        return setDuration(secondsToUnits(seconds));
-    }
 
     public final float secondsToUnits(float s) {
         return s / unitsToSeconds(1);
@@ -90,10 +80,7 @@ public abstract class RealtimeTime implements Time {
         return l / ((float)unitsPerSecod);
     }
 
-    @Override
-    public final float duration() {
-        return duration;
-    }
+
 
     @NotNull
     @Override

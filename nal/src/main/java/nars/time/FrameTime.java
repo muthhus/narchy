@@ -11,7 +11,6 @@ public class FrameTime implements Time {
 
     long t;
     int dt;
-    float duration = 1f;
 
     public FrameTime() {
         this(1);
@@ -72,14 +71,5 @@ public class FrameTime implements Time {
             validate(s[s.length-1]);
     }
 
-    @Override
-    public float duration() {
-        return duration;
-    }
-
-    public FrameTime setDuration(float newDuration) {
-        this.duration = newDuration;
-        return this;
-    }
 
 }

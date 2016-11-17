@@ -26,5 +26,4 @@ public interface Time extends Serializable {
 
 	long elapsed();
 
-    float duration();
 }

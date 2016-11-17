@@ -188,7 +188,7 @@ public class Alann extends NAR {
         super(time, new TreeTermIndex.L1TreeIndex(new DefaultConceptBuilder(), 1024*1024, 16384, 3),
                 new XorShift128PlusRandom(1), Param.defaultSelf(), exe);
 
-        durMin.setValue(BUDGET_EPSILON * 2f);
+        quaMin.setValue(BUDGET_EPSILON * 2f);
 
         int level = level();
 

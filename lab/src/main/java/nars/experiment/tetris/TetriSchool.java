@@ -91,7 +91,7 @@ public class TetriSchool extends NSchool implements Runnable {
         NAR n =
                 //NAgents.newAlann();
                 NAgents.newMultiThreadNAR(3,
-                    new RealtimeTime.DS(true).setDuration(1)
+                    new RealtimeTime.DS(true)
                 ).loop(40).nar;
 
 

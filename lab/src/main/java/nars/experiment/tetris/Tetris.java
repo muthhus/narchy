@@ -361,7 +361,7 @@ public class Tetris extends NAgents {
     public static void main(String[] args) {
         //Param.DEBUG = true;
 
-        NAR nar = NAgents.newMultiThreadNAR(3, new FrameTime().setDuration(1));
+        NAR nar = NAgents.newMultiThreadNAR(3, new FrameTime());
         nar.linkFeedbackRate.setValue(0.05f);
 
 //        Random rng = new XorShift128PlusRandom(1);
@@ -478,7 +478,7 @@ public class Tetris extends NAgents {
                 col(
 
                         //Vis.concepts(nar, 32),
-                        Vis.agentActions(t, 500),
+                        Vis.agentActions(t, 1200),
 
                         Vis.budgetHistogram(nar, 24)
                         /*Vis.conceptLinePlot(nar,
