@@ -481,7 +481,24 @@ public interface TermContainer extends Termlike, Iterable<Term> {
         }
         return false;
     }
+    default boolean equivalent(@NotNull TermContainer sub) {
+        if (hashCodeSubTerms() == sub.hashCodeSubTerms()) {
+            int s = size();
+            if (s == sub.size()) {
+                for (int i = 0; i < s; i++) {
+                    if (!term(i).equals(sub.term(i)))
+                        return false;
+                }
+                return true;
+            }
+        }
+        return false;
+    }
 
+    /** allows the subterms to hold a different hashcode than hashCode when comparing subterms */
+    default int hashCodeSubTerms() {
+        return hashCode();
+    }
 
     /**
      * returns true if evaluates true for any terms

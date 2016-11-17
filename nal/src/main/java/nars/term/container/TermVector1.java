@@ -19,7 +19,7 @@ import java.util.function.Predicate;
 /**
  * Size 1 TermVector
  */
-public final class TermVector1 implements TermContainer, Set<Term> {
+public class TermVector1 implements TermContainer, Set<Term> {
 
     public final Term the;
 
@@ -33,7 +33,7 @@ public final class TermVector1 implements TermContainer, Set<Term> {
     }
 
     @Override
-    public final boolean equals(@NotNull Object obj) {
+    public boolean equals(@NotNull Object obj) {
         return
                 (this == obj)
                         ||

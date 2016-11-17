@@ -7,6 +7,7 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Terms;
 import nars.term.compound.GenericCompound;
+import nars.term.compound.UnitCompound1;
 import nars.term.container.TermVector;
 import nars.term.container.TermContainer;
 import nars.term.container.TermSet;
@@ -312,6 +313,15 @@ public abstract class TermBuilder {
 
     @NotNull
     public final Compound newCompound(@NotNull Op op, int dt, Term[] subterms) {
+//        switch (subterms.length) {
+//            case 1: {
+//                Term the = subterms[0];
+//                if (!(the instanceof Variable))
+//                    return new UnitCompound1(op, the);
+//                break; //use default below
+//            }
+//        }
+
         return new GenericCompound(op, dt, intern(TermVector.the(subterms)));
     }
 

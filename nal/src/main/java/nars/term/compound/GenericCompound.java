@@ -120,7 +120,7 @@ public class GenericCompound implements Compound {
         TermContainer cs = cthat.subterms();
         TermContainer as = this.subterms;
         if (as != cs) {
-            if (!as.equals(cs)) {
+            if (!as.equivalent(cs)) {
                 return false;
             } else {
                 //share the subterms vector

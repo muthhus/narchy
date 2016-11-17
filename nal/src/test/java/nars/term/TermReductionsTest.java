@@ -2,6 +2,7 @@ package nars.term;
 
 import nars.$;
 import nars.Op;
+import nars.term.compound.UnitCompound1;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.junit.Ignore;
@@ -9,6 +10,8 @@ import org.junit.Test;
 
 import static nars.$.*;
 import static nars.Op.CONJ;
+import static nars.Op.NEG;
+import static nars.Op.PROD;
 import static nars.io.NarseseTest.assertInvalid;
 import static nars.nal.TermBuilder.imageUnwrap;
 import static nars.term.Term.False;
