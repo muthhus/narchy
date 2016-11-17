@@ -169,10 +169,12 @@ public final class Premise extends RawBudget implements Tasked {
         //TODO lerp by the two budget's qualities instead of aveAri,or etc ?
 
         float dur = belief == null ? taskBudget.dur() : or(taskBudget.dur(), beliefBudget.dur());
-        if (dur < nar.durMin.floatValue())
-            return null;
+//        if (dur < nar.durMin.floatValue())
+//            return null;
 
         float qua = belief == null ? taskBudget.qua() : or(taskBudget.qua(), beliefBudget.qua());
+        if (qua < nar.durMin.floatValue())
+            return null;
 
         float pri =
                 belief == null ? taskBudget.pri() : or(taskBudget.pri(), beliefBudget.pri());

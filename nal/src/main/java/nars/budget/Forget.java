@@ -54,7 +54,7 @@ public final class Forget implements Consumer<BLink> {
     public void accept(@NotNull BLink bLink) {
         float p = bLink.pri();
         if (p == p) {
-            float d = bLink.dur();
+            float d = bLink.qua();
             bLink.setPriority(p * (1f - (r * (1f - d * maxEffectiveDurability))));
             //float d = or(bLink.dur(), bLink.qua());
             //float d = Math.max(bLink.dur(), bLink.qua());

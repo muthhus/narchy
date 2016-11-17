@@ -30,6 +30,10 @@ public class TaskBudgeting {
         /** occam factor */
         float occam = occamGrowth(derived, baseBudget);
 
+        final float quality =
+                baseBudget.qua() * occam * derivationQuality;
+//        if (quality < p.durMin)
+//            return null;
 
         final float durability =
                 baseBudget.dur() * occam * derivationQuality;
@@ -44,8 +48,6 @@ public class TaskBudgeting {
                 //;
                 ;
 
-        final float quality =
-                baseBudget.qua() * derivationQuality;
                 //and(baseQuality, factor);
                 //baseBudget.qua();
 

@@ -240,12 +240,12 @@ public class Line1DContinuous extends NAgent {
         );
 
 
-        nar.beliefConfidence(0.5f);
-        nar.goalConfidence(0.5f);
+        nar.beliefConfidence(0.8f);
+        nar.goalConfidence(0.8f);
 
         //nar.truthResolution.setValue(0.02f);
 
-        nar.compoundVolumeMax.set(28);
+        nar.compoundVolumeMax.set(20);
 
         Line1DContinuous l = new Line1DContinuous(nar, 6,
                 sine(100)
