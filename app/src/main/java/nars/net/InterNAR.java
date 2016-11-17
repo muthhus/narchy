@@ -126,7 +126,7 @@ public class InterNAR extends Peer implements PeerModel {
 
     public void consider(Message q, Task t) {
 
-        t.log(q);
+        //t.log(q);
 
         if (paranoid) {
             nar.believe(

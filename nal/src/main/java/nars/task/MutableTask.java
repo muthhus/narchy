@@ -223,7 +223,6 @@ public class MutableTask extends AbstractTask {
     }
 
     @NotNull
-    @Override
     public Task log(@Nullable List historyToCopy) {
         if (!Param.DEBUG_TASK_LOG)
             return this;
@@ -241,7 +240,6 @@ public class MutableTask extends AbstractTask {
      * of the Task and the reason for it.
      */
     @NotNull
-    @Override
     public final MutableTask log(@Nullable Object entry) {
         if (!(entry == null || !Param.DEBUG_TASK_LOG))
             getOrCreateLog().add(entry);
@@ -334,4 +332,17 @@ public class MutableTask extends AbstractTask {
         yt.time(t.creation(), newOccurrence);
         return yt;
     }
+
+//    /**
+//     * append a log entry; returns this task
+//     */
+//    @NotNull
+//    Task log(Object entry);
+//
+//    /**
+//     * append log entries; returns this task
+//     */
+//    @NotNull
+//    Task log(List entries);
+
 }

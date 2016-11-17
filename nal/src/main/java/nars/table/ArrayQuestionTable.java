@@ -225,7 +225,6 @@ public class ArrayQuestionTable  implements QuestionTable, Comparator<Task> {
 
                 if (sizeStart >= capacity()) {
                     if (l.get(sizeStart - 1).qua() > tp) {
-                        t.log("Insufficient Priority");
                         result[0] = null;
                         return;
                     } else {

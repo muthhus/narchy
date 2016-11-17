@@ -20,9 +20,10 @@ import org.eclipse.collections.api.block.function.primitive.FloatFunction;
 import org.eclipse.collections.api.block.function.primitive.FloatToFloatFunction;
 import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunction;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.function.Consumer;
 
 import static nars.Symbols.BELIEF;
 import static nars.time.Tense.ETERNAL;
@@ -31,11 +32,11 @@ import static nars.time.Tense.ETERNAL;
 /**
  * primarily a collector for believing time-changing input signals
  */
-public class SensorConcept extends WiredCompoundConcept implements FloatFunction<Term>, FloatSupplier, WiredCompoundConcept.Prioritizable, Runnable {
+public class SensorConcept extends WiredCompoundConcept implements FloatFunction<Term>, FloatSupplier, WiredCompoundConcept.Prioritizable, Consumer<Task>, Runnable {
 
     @NotNull
     public final ScalarSignal sensor;
-    private FloatSupplier input;
+    private FloatSupplier signal;
     protected float currentValue = Float.NaN;
 
     public static final Logger logger = LoggerFactory.getLogger(SensorConcept.class);
@@ -45,29 +46,16 @@ public class SensorConcept extends WiredCompoundConcept implements FloatFunction
 
 
 
-    public SensorConcept(@NotNull String term, @NotNull NAR n, FloatSupplier input, FloatToObjectFunction<Truth> truth) throws Narsese.NarseseException {
-        this($.$(term), n, input, truth);
+    public SensorConcept(@NotNull String term, @NotNull NAR n, FloatSupplier signal, FloatToObjectFunction<Truth> truth) throws Narsese.NarseseException {
+        this($.$(term), n, signal, truth);
     }
 
-    public SensorConcept(@NotNull Compound term, @NotNull NAR n, FloatSupplier input, FloatToObjectFunction<Truth> truth)  {
+    public SensorConcept(@NotNull Compound term, @NotNull NAR n, FloatSupplier signal, FloatToObjectFunction<Truth> truth)  {
         super(term, n);
 
-        this.sensor = new ScalarSignal(n, this, this, truth) {
+        this.sensor = new ScalarSignal(n, this, this, truth, this);
 
-            @Override
-            protected void init() {
-                //dont auto-start, do nothing here
-            }
-
-            @Override
-            public void input(Task prevStart, Task next) {
-
-                SensorConcept.this.input(next);
-
-            }
-        };
-
-        this.input = input;
+        this.signal = signal;
 
         pri(() -> nar.priorityDefault(BELIEF));
 
@@ -160,17 +148,17 @@ public class SensorConcept extends WiredCompoundConcept implements FloatFunction
 //    }
 
 
-    public void setInput(FloatSupplier input) {
-        this.input = input;
+    public void setSignal(FloatSupplier signal) {
+        this.signal = signal;
     }
 
-    public final FloatSupplier getInput() {
-        return input;
+    public final FloatSupplier getSignal() {
+        return signal;
     }
 
     @Override
     public final float floatValueOf(Term anObject) {
-        return this.currentValue = input.asFloat();
+        return this.currentValue = signal.asFloat();
     }
 
     @NotNull
@@ -226,6 +214,11 @@ public class SensorConcept extends WiredCompoundConcept implements FloatFunction
     /** should only be called if autoupdate() is false */
     @Override public final void run() {
         sensor.accept(nar);
+    }
+
+    @Override
+    public void accept(Task generated) {
+        nar.input(generated);
     }
 
 

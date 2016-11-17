@@ -527,17 +527,6 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
 
     @Nullable Object log(int index);
 
-    /**
-     * append a log entry; returns this task
-     */
-    @NotNull
-    Task log(Object entry);
-
-    /**
-     * append log entries; returns this task
-     */
-    @NotNull
-    Task log(List entries);
 
     /**
      * get the recorded log entries
@@ -706,12 +695,6 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
         return Stamp.isCyclic(evidence());
     }
 
-    @Override
-    default boolean delete(@Nullable Object removalReason) {
-        if (removalReason != null)
-            log(removalReason);
-        return delete();
-    }
 
     default boolean temporal() {
         return occurrence() != ETERNAL;

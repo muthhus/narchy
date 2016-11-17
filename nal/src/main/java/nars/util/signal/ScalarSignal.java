@@ -1,16 +1,13 @@
 package nars.util.signal;
 
-import nars.NAR;
-import nars.Param;
-import nars.Symbols;
-import nars.Task;
+import nars.*;
+import nars.task.AbstractTask;
 import nars.task.MutableTask;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.truth.Truth;
 import nars.util.Util;
-import nars.util.data.array.LongArrays;
 import nars.util.math.FloatSupplier;
 import org.eclipse.collections.api.block.function.primitive.FloatFunction;
 import org.eclipse.collections.api.block.function.primitive.FloatToFloatFunction;
@@ -22,11 +19,12 @@ import java.util.function.Consumer;
 import java.util.function.DoubleSupplier;
 
 /**
- * Created by me on 2/2/16.
+ * Generates temporal tasks in reaction to the change in a scalar numeric value
  */
-public abstract class ScalarSignal implements Consumer<NAR>, DoubleSupplier {
+public class ScalarSignal implements Consumer<NAR>, DoubleSupplier {
 
 
+    private final Consumer<Task> target;
     /**
      * resolution of the output freq value
      */
@@ -41,8 +39,6 @@ public abstract class ScalarSignal implements Consumer<NAR>, DoubleSupplier {
     @NotNull
     private final FloatToObjectFunction<Truth> truthFloatFunction;
 
-    @NotNull
-    public final NAR nar;
     public FloatSupplier pri;
     public float dur;
 
@@ -58,35 +54,26 @@ public abstract class ScalarSignal implements Consumer<NAR>, DoubleSupplier {
 
     public final static FloatToFloatFunction direct = n -> n;
     @Nullable
-    public Task current;
-
-    @NotNull
-    private final long[] commonEvidence;
+    public SignalTask current;
 
 
-    public ScalarSignal(@NotNull NAR n, @NotNull Termed t, FloatFunction<Term> value, FloatToObjectFunction<Truth> truthFloatFunction) {
-        this(n, t, value, truthFloatFunction, n.priorityDefault(Symbols.BELIEF), n.durabilityDefault(Symbols.BELIEF));
+    public ScalarSignal(@NotNull NAR n, @NotNull Termed t, FloatFunction<Term> value, FloatToObjectFunction<Truth> truthFloatFunction, Consumer<Task> target) {
+        this(n, t, value, truthFloatFunction, n.priorityDefault(Symbols.BELIEF), n.durabilityDefault(Symbols.BELIEF), target);
     }
 
-    public ScalarSignal(@NotNull NAR n, @NotNull Termed t, FloatFunction<Term> value, @Nullable FloatToObjectFunction<Truth> truthFloatFunction, float pri, float dur) {
-        this.nar = n;
+    public ScalarSignal(@NotNull NAR n, @NotNull Termed t, FloatFunction<Term> value, @Nullable FloatToObjectFunction<Truth> truthFloatFunction, float pri, float dur, Consumer<Task> target) {
+
         this.term = t.term();
         this.value = value;
         this.truthFloatFunction = truthFloatFunction == null ? (v)->null : truthFloatFunction;
 
-        this.commonEvidence = Param.SENSOR_TASKS_SHARE_COMMON_EVIDENCE ? new long[] { n.time.nextStamp() } : LongArrays.EMPTY_ARRAY;
 
         pri(pri);
         this.dur = dur;
         this.lastInputTime = n.time() - 1;
 
         this.prevF = Float.NaN;
-        init();
-    }
-
-    protected void init() {
-        //auto-start
-        nar.onFrame(this);
+        this.target = target;
     }
 
     @NotNull
@@ -108,15 +95,21 @@ public abstract class ScalarSignal implements Consumer<NAR>, DoubleSupplier {
 
     public char punc() { return punc; }
 
-    /** clears timing information so it thinks it will need to input on next attempt */
-    public void ready() {
-        this.lastInputTime = nar.time() - minTimeBetweenUpdates;
-    }
+//    /** clears timing information so it thinks it will need to input on next attempt */
+//    public void ready() {
+//        this.lastInputTime = nar.time() - minTimeBetweenUpdates;
+//    }
 
     @Override
     public void accept(@NotNull NAR nar) {
 
         long now = nar.time();
+
+        //update previous task: extend its end time to current time
+        if (current!=null) {
+            current.setEnd(now);
+        }
+
         int timeSinceLastInput = (int) (now - lastInputTime);
 
 
@@ -139,9 +132,9 @@ public abstract class ScalarSignal implements Consumer<NAR>, DoubleSupplier {
 
         if ((inputIfSame || different || lateEnough) && (!tooSoon)) {
 
-            Task t = newInputTask(f, prevF, now, this.current);
+            SignalTask t = task(f, prevF, now, this.current);
             if (t!=null) {
-                Task prevStart = this.current;
+                //Task prevStart = this.current;
 
 //                if (prevStart!=null && t.occurrence() - prevStart.occurrence() > latchResolution) {
 //                    //input a cloned version of the previous task as an intermediate task, squarewave approximation
@@ -150,8 +143,7 @@ public abstract class ScalarSignal implements Consumer<NAR>, DoubleSupplier {
 //                    prevEnd = null; //dont generate an intermediate task
 //                }
 
-
-                input(prevStart, this.current = t);
+                target.accept(this.current = t);
                 this.lastInputTime = now;
                 this.prevF = f;
             }
@@ -160,9 +152,6 @@ public abstract class ScalarSignal implements Consumer<NAR>, DoubleSupplier {
 
     }
 
-
-    abstract public void input(@NotNull Task prevStart, @NotNull Task next);
-        //nar.inputLater(next);
 
 
     @Nullable
@@ -187,32 +176,39 @@ public abstract class ScalarSignal implements Consumer<NAR>, DoubleSupplier {
 //        return v;
 //    }
 
+    static class SignalTask extends MutableTask {
+
+        long end;
+
+        public SignalTask(@NotNull Termed<Compound> t, char punct, @Nullable Truth truth, long start)  {
+            super(t, punct, truth);
+            time(start, start);
+
+            end = start;
+        }
+
+        public void setEnd(long end) {
+            this.end = end;
+        }
+
+        @Override
+        public long end() {
+            return end;
+        }
+    }
+
     @Nullable
-    protected Task newInputTask(float v, float prevV, long now, Task previous) {
+    protected SignalTask task(float v, float prevV, long now, Task previous) {
         float changeFactor = prevV==prevV ? Math.abs(v - prevV) : 1f /* if prevV == NaN */;
 
         Truth t = truthFloatFunction.valueOf(v);
         if (t == null)
             return null;
 
-        long start = previous!=null ? previous.end()+1 : now-1;
-        long end = now;
-
-        return new MutableTask(term(), punc, t) {
-            @Override
-            public long start() {
-                return start;
-            }
-
-            @Override
-            public long end() {
-                return end;
-            }
-        }
-                .evidence(commonEvidence)
-                .time(now, now)
-                .budgetByTruth( Math.max(Param.BUDGET_EPSILON*2, changeFactor * pri.asFloat())  /*(v, now, prevF, lastInput)*/, dur);
+        SignalTask s = new SignalTask(term(), punc, t, now);
+        s.budgetByTruth( Math.max(Param.BUDGET_EPSILON*2, changeFactor * pri.asFloat())  /*(v, now, prevF, lastInput)*/, dur);
         //.log(this);
+        return s;
     }
 
     /** provides an immediate truth assessment with the last known signal value */

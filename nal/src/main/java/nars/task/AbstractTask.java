@@ -141,7 +141,6 @@ public abstract class AbstractTask extends RawBudget implements Task, Temporal {
 
 
 
-
     @Override
     public void normalize(@NotNull NAR nar) throws InvalidConceptException, InvalidTaskException {
 
