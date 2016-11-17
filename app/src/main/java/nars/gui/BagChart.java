@@ -70,6 +70,7 @@ public class BagChart<X> extends TreeChart<BLink<X>> implements BiConsumer<BLink
     public void accept(BLink<X> x, ItemVis<BLink<X>> y) {
         float p = x.pri();
         float ph = 0.25f + 0.75f * p;
-        y.update(p, ph, ph * x.dur(), ph * x.qua());
+        float q = x.qua();
+        y.update(p, ph, ph * (1f - q), ph * q);
     }
 }

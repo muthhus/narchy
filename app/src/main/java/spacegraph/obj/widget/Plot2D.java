@@ -92,6 +92,9 @@ public class Plot2D extends Surface {
                 removeAtIndex(0);
         }
 
+        public float[] array() {
+            return items;
+        }
     }
 
     private transient float minValue, maxValue;
@@ -177,14 +180,14 @@ public class Plot2D extends Surface {
         plotVis.draw(series, gl, minValue, maxValue);
 
         if (title!=null) {
-            gl.glEnable(GL2.GL_COLOR_LOGIC_OP);
-            gl.glLogicOp(GL2.GL_XOR);
+//            gl.glEnable(GL2.GL_COLOR_LOGIC_OP);
+//            gl.glLogicOp(GL2.GL_XOR);
 
             //Draw.text(gl, 0.001f, 0.001f, title, 0.5f,0.5f,0);
             gl.glColor3f(1f, 1f, 1f);
-
+            gl.glLineWidth(1f);
             Draw.text(gl, title, 0.1f, 0.5f, 0.5f, 0);
-            gl.glDisable(GL2.GL_COLOR_LOGIC_OP);
+//            gl.glDisable(GL2.GL_COLOR_LOGIC_OP);
         }
 
     }
@@ -250,12 +253,12 @@ public class Plot2D extends Surface {
 
             gl.glColor4f(0.5f,0.5f,0.5f, 0.75f); //gray
 
-
-            Draw.text(gl, n2(minValue), 0.1f, 0, 0, 0, Draw.TextAlignment.Left);
+            gl.glLineWidth(1);
 
             Draw.line(gl, 0, 0, W, 0);
             Draw.line(gl, 0, H, W, H);
 
+            Draw.text(gl, n2(minValue), 0.1f, 0, 0, 0, Draw.TextAlignment.Left);
             Draw.text(gl, n2(maxValue), 0.1f, 0, H, 0, Draw.TextAlignment.Left);
 
             for (int si = 0, seriesSize = series.size(); si < seriesSize; si++) {
@@ -265,10 +268,9 @@ public class Plot2D extends Surface {
                 float mid = ypos(minValue ,maxValue, (s.minValue + s.maxValue)/2f);
 
 
-                FloatArrayList sh = s;
-                int ss = sh.size();
+                int ss = s.size();
 
-                float[] ssh = sh.toArray();
+                float[] ssh = s.array();
 
                 int histSize = ss;
 
@@ -291,7 +293,7 @@ public class Plot2D extends Surface {
                         ny = ypos(minValue, range, v);
 
                         //if (i > 0) {
-                        gl.glVertex3f(x, ny, 0);
+                        gl.glVertex2f(x, ny);
                         //Draw.line(gl, x - dx, py, x, ny);
                         //}
                     }

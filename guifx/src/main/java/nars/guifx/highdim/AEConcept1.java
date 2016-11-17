@@ -13,7 +13,7 @@ import nars.util.Util;
 public class AEConcept1 extends HighDim.AutoEnc2Projection<BLink<? extends Concept>> {
 
     public AEConcept1() {
-        super(20, 8, 4);
+        super(19, 8, 4);
     }
 
     @Override
@@ -25,11 +25,10 @@ public class AEConcept1 extends HighDim.AutoEnc2Projection<BLink<? extends Conce
         x[0] = (c.hashCode() % 8) / 8.0f;
         x[1] = (t instanceof Compound ? 1f : 0f);
         x[2] = clink.pri();
-        x[3] = clink.dur();
-        x[4] = clink.qua();
-        Util.writeBits(t.op().ordinal() + 1, 5, x, 5); //+5
-        Util.writeBits(t.volume() + 1, 5, x, 10); //+5
-        Util.writeBits(t.size() + 1, 5, x, 15); //+5
+        x[3] = clink.qua();
+        Util.writeBits(t.op().ordinal() + 1, 5, x, 4); //+5
+        Util.writeBits(t.volume() + 1, 5, x, 9); //+5
+        Util.writeBits(t.size() + 1, 5, x, 14); //+5
 
 
         //System.out.println(Arrays.toString(x));

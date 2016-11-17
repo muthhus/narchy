@@ -8,11 +8,15 @@ import nars.budget.BudgetFunctions;
 import nars.nal.Stamp;
 import nars.table.BeliefTable;
 import nars.table.DefaultBeliefTable;
+import nars.table.QuestionTable;
 import nars.task.RevisionTask;
 import nars.term.Compound;
 import nars.term.Term;
+import nars.term.Termed;
 import nars.term.obj.Termject;
 import nars.truth.Truth;
+import nars.truth.TruthDelta;
+import nars.truth.Truthed;
 import org.eclipse.collections.api.list.primitive.ByteList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -29,24 +33,24 @@ import static nars.time.Tense.DTERNAL;
 /**
  * Adds support for dynamically calculated truth values
  */
-public class DynamicCompoundConcept extends CompoundConcept {
+public class DynamicConcept extends CompoundConcept {
 
     @NotNull
     public final NAR nar;
 
-    public DynamicCompoundConcept(@NotNull Compound term, @NotNull Bag termLinks, @NotNull Bag taskLinks, @NotNull NAR nar) {
+    public DynamicConcept(@NotNull Compound term, @NotNull Bag termLinks, @NotNull Bag taskLinks, @NotNull NAR nar) {
         super(term, termLinks, taskLinks, nar);
         this.nar = nar;
         this.beliefs = newBeliefTable(nar, true, 1,1 /* initial space */);
         this.goals = newBeliefTable(nar, false, 1,1 /* initial space */);
     }
 
-    public static final class DynTruth {
+    public static final class DynTruth implements Truthed {
         //@NotNull private final List<Truth> t;
         @Nullable final List<Task> e;
         private final float confMin;
 
-        @Deprecated float freq, conf; //running product
+        float freq, conf; //running product
 
         public DynTruth(Op o, float confMin, List<Task> e) {
             if (o!=CONJ)
@@ -73,11 +77,14 @@ public class DynamicCompoundConcept extends CompoundConcept {
             return e == null ? null : Stamp.zip(e);
         }
 
-        @Nullable public Truth truth() {
+        @Override @Nullable public Truth truth() {
             return conf <= 0 ? null : $.t(freq, conf);
         }
 
-        public boolean add(@NotNull Truth truth) {
+        public boolean add(@Nullable Truth truth) {
+            if (truth == null)
+                return false;
+
             //specific to Truth.Intersection:
             conf *= truth.conf();
             if (conf < confMin)
@@ -86,6 +93,10 @@ public class DynamicCompoundConcept extends CompoundConcept {
             return true;
         }
 
+        @Override
+        public String toString() {
+            return truth().toString();
+        }
     }
 
     @Override
@@ -98,7 +109,16 @@ public class DynamicCompoundConcept extends CompoundConcept {
 //        return new DynamicBeliefTable(false, tCap);
 //    }
 
-    private class DynamicBeliefTable extends DefaultBeliefTable {
+
+    public static class DynamicBeliefTask extends RevisionTask {
+
+
+        public DynamicBeliefTask(@NotNull Termed<Compound> term, char punc, Truth conclusion, long creationTime, long occTime, long[] evidence) {
+            super(term, punc, conclusion, creationTime, occTime, evidence);
+        }
+    }
+
+    public class DynamicBeliefTable extends DefaultBeliefTable {
 
         private final boolean beliefOrGoal;
 
@@ -110,6 +130,43 @@ public class DynamicCompoundConcept extends CompoundConcept {
 
 
         @Override
+        public TruthDelta add(@NotNull Task input, @NotNull QuestionTable questions, @NotNull CompoundConcept<?> concept, @NotNull NAR nar) {
+            //only allow input and dynamic belief tasks to be inserted; otherwise process a new dynamic result
+            if (!input.isInput() && (!(input instanceof DynamicBeliefTask))) {
+                DynamicBeliefTask d = generate(input.term(), input.occurrence(), input.budget());
+                if (d!=null) {
+                    input.delete(); //necessary to cause NAR to replace the Task in the index, so as not to seem as a duplicate
+                    nar.inputLater(d);
+                    return null;
+                }
+            }
+
+//            //only allow input tasks
+//            if (!input.isInput())
+//                return null;
+
+            return super.add(input, questions, concept, nar);
+        }
+
+        @Nullable public DynamicBeliefTask generate(@NotNull Compound template, long when) {
+            return generate(template, when, null);
+        }
+
+        @Nullable public DynamicBeliefTask generate(@NotNull Compound template, long when, @Nullable Budget b) {
+            DynTruth yy = truth(when, template, true);
+            if (yy == null)
+                return null;
+
+            DynamicBeliefTask t = new DynamicBeliefTask(template, beliefOrGoal ? Symbols.BELIEF : Symbols.GOAL,
+                    yy.truth(), nar.time(), when, yy.evidence());
+            t.setBudget(
+                b!=null ? b : yy.budget()
+            );
+            t.log("Dynamic");
+            return t;
+        }
+
+        @Override
         @Nullable
         public Truth truth(long when, long now) {
             DynTruth d = dyntruth(when, now, false);
@@ -118,47 +175,50 @@ public class DynamicCompoundConcept extends CompoundConcept {
 
         @Nullable
         protected DynTruth dyntruth(long when, long now, boolean evidence) {
-            return truth(when, now, DynamicCompoundConcept.this, false, evidence);
+            return truth(when, now, DynamicConcept.this.term(), DynamicConcept.this, false, evidence);
         }
 
-        @Nullable private DynamicCompoundConcept.DynTruth truth(long when, @NotNull Compound template, boolean evidence) {
-            return truth(when, when, DynamicCompoundConcept.this /*nar.concept(template)*/,
+        @Nullable public DynamicConcept.DynTruth truth(long when, @NotNull Compound template, boolean evidence) {
+            return truth(when, when, template,DynamicConcept.this /*nar.concept(template)*/,
                     template.op() == NEG, evidence);
         }
 
-        @Nullable private DynamicCompoundConcept.DynTruth truth(long when, long now, @Nullable Concept templateConcept, boolean negated, boolean evidence) {
+
+        @Nullable public DynamicConcept.DynTruth truth(long when, int dt, boolean evidence) {
+            return truth(when, (Compound)$.terms.the(term(), dt), evidence);
+        }
+
+        @Nullable private DynamicConcept.DynTruth truth(long when, long now, Compound template, @Nullable Concept templateConcept, boolean negated, boolean evidence) {
 
             if (templateConcept == null)
                 return null;
 
-            Term template = templateConcept.term();
-            if (template instanceof Compound) {
-                Compound ctemplate = (Compound)template;
-                Term[] subs = ctemplate.terms();
-                DynTruth d = newDyn(evidence);
-                for (Term s : subs) {
-                    if (!subTruth(ctemplate, s, when, now, negated, d))
-                        return null;
-                }
-                return d;
-            } else {
-                @NotNull BeliefTable table = beliefOrGoal ? templateConcept.beliefs() : templateConcept.goals();
-                if (table instanceof DynamicBeliefTable) {
-                    return ((DynamicBeliefTable)table).dyntruth(when, now, evidence);
-                } else {
-                    Task x = table.match(when, now);
-                    if (x == null)
-                        return null;
-                    else {
-                        DynTruth d = newDyn(evidence);
-                        if (d.add(x.truth().negated(negated))) {
-                            if (d.e != null)
-                                d.e.add(x);
-                        }
-                        return d;
-                    }
-                }
+            //if (template instanceof Compound) {
+            DynTruth d = newDyn(evidence);
+            int s = template.size();
+            for (int i = 0; i < s; i++) {
+                if (!subTruth(template, template.term(i), when, now, negated, d))
+                    return null;
             }
+            return d;
+//            } else {
+//                @NotNull BeliefTable table = beliefOrGoal ? templateConcept.beliefs() : templateConcept.goals();
+//                if (table instanceof DynamicBeliefTable) {
+//                    return ((DynamicBeliefTable)table).dyntruth(when, now, evidence);
+//                } else {
+//                    Task x = table.match(when, now);
+//                    if (x == null)
+//                        return null;
+//                    else {
+//                        DynTruth d = newDyn(evidence);
+//                        if (d.add(x.truth().negated(negated))) {
+//                            if (d.e != null)
+//                                d.e.add(x);
+//                        }
+//                        return d;
+//                    }
+//                }
+//            }
 
         }
 
@@ -178,38 +238,41 @@ public class DynamicCompoundConcept extends CompoundConcept {
             if (negated)
                 subterm = subterm.unneg();
 
-            if (subterm instanceof Compound && subterm.hasAny(Op.INT)) {
+            if (subterm instanceof Compound) {
+                Compound cs = (Compound) subterm;
+                if (subterm.hasAny(Op.INT)) {
 
-                Iterator<Term> unrolled = unroll((Compound) subterm);
-                if (unrolled!=null) {
-                    while (unrolled.hasNext()) {
-                        if (!subTruth(unrolled.next(), superterm, when, now, d, ss, negated))
-                            return false;
+                    Iterator<Term> unrolled = unroll(cs);
+                    if (unrolled!=null) {
+                        while (unrolled.hasNext()) {
+                            Term next = unrolled.next();
+                            if (!(next instanceof Compound) || !subTruth((Compound)next, superterm, when, now, d, ss, negated))
+                                return false;
+                        }
+
+                        return true;
                     }
 
-                    return true;
+                } else {
+                    return subTruth(cs, superterm, when, now, d, ss, negated);
                 }
-
             }
 
-            return subTruth(subterm, superterm, when, now, d, ss, negated);
-
+            return false;
         }
 
-        private boolean subTruth(@NotNull Term next, Compound superterm, long when, long now, @NotNull DynTruth d, @NotNull Term ss, boolean negated) {
-            Concept nextConcept = nar.concept(next);
-            return nextConcept != null && subTruth(superterm, nextConcept, when, now, d, ss, negated);
+        private boolean subTruth(@NotNull Compound next, Compound template, long when, long now, @NotNull DynTruth d, @NotNull Term ss, boolean negated) {
+            Concept subConcept = nar.concept(next);
+            if (subConcept == null)
+                return false;
 
-        }
-
-        private boolean subTruth(@Nullable Compound superterm, @NotNull Concept subConcept, long when, long now, @NotNull DynTruth d, @NotNull Term ss, boolean negated) {
             BeliefTable table = beliefOrGoal ? subConcept.beliefs() : subConcept.goals();
             boolean tableDynamic = table instanceof DynamicBeliefTable;
             if (!tableDynamic && table.isEmpty()) {
                 return false;
             }
 
-            int dt = superterm!=null ? superterm.subtermTime(ss) : 0;
+            int dt = template!=null ? template.subtermTime(ss) : 0;
             if (dt == DTERNAL) dt = 0;
 
             //System.out.println(ss + " "+ dt + " in " + template);
@@ -218,7 +281,7 @@ public class DynamicCompoundConcept extends CompoundConcept {
             @Nullable Truth nt = null;
             if (tableDynamic) {
                 boolean evi = d.e!=null;
-                @Nullable DynamicCompoundConcept.DynTruth ndt = ((DynamicBeliefTable)table).truth(when + dt, now, subConcept, negated, evi);
+                @Nullable DynamicConcept.DynTruth ndt = ((DynamicBeliefTable)table).truth(when + dt, now, next, subConcept, negated, evi);
                 //already negated via the parameter
                 if (ndt!=null && d.add(ndt.truth())) {
                     if (d.e!=null) {
@@ -306,8 +369,10 @@ public class DynamicCompoundConcept extends CompoundConcept {
 
         @Override
         public @Nullable Task match(long when, long now, @Nullable Task target) {
+            Compound template = target!=null ? target.term() : term();
+            return generate(template, when);
 
-            Task x = super.match(when, now, target);
+            //Task x = super.match(when, now, target);
 
             //if (x == null || then == ETERNAL /*|| Math.abs(then - x.occurrence() ) >= occThresh*/) {
 
@@ -315,47 +380,48 @@ public class DynamicCompoundConcept extends CompoundConcept {
 //                    then = now;
 
                 //template which may contain temporal relationship to emulate
-                Compound template = x!=null ?  x.term() : term();
+//            Compound template = target!=null ? target.term() : term();
+//            return generate(template, when);
 
-                DynTruth yy = truth(when, template, true);
-                if (yy!=null) {
-                    Truth y = yy.truth();
+//                DynTruth yy = truth(when, template, true);
+//                if (yy!=null) {
+//                    Truth y = yy.truth();
+//
+//                    if ((y != null)) {
+//                        @Nullable long[] yEv = yy.evidence();
+//                        if (
+//                            (x == null)
+//                                ||
+//                            (
+//                                    (target==null || !Stamp.overlapping(target.evidence(), yEv))
+//                                            &&
+//                                    (y.conf() > x.conf())
+//                            )) { //!y.equals(x.truth())) {
+//
+//
+////                        /*if the belief tables provided a value, interpolate this with the dynamic value to get the final truth value */
+////                        float overlap = 0; //TODO compute overlap %
+////                        Truth z = x != null ? Revision.revise(y,x,1f-overlap,nar.confMin.floatValue()) : y;
+////                        long[] e = x!=null ? Stamp.zip(yy.evidence(), x.evidence()) : yy.evidence();
+//                            //System.err.println(x + " + " + y + " = " + z);
+//
+//                            RevisionTask t = new RevisionTask(template, beliefOrGoal ? Symbols.BELIEF : Symbols.GOAL,
+//                                    y, nar.time(), when, yEv);
+//                            t.setBudget(yy.budget());
+//                            t.log("Dynamic");
+//
+//
+//                            //System.err.println(xx + "\tvs\t" + x);
+//                            //nar.inputLater(xx);
+//                            x = t;
+//
+//                        }
+//                    }
+//                }
+//            //}
 
-                    if ((y != null)) {
-                        @Nullable long[] yEv = yy.evidence();
-                        if (
-                            (x == null)
-                                ||
-                            (
-                                    (target==null || !Stamp.overlapping(target.evidence(), yEv))
-                                            &&
-                                    (y.conf() > x.conf())
-                            )) { //!y.equals(x.truth())) {
 
-
-//                        /*if the belief tables provided a value, interpolate this with the dynamic value to get the final truth value */
-//                        float overlap = 0; //TODO compute overlap %
-//                        Truth z = x != null ? Revision.revise(y,x,1f-overlap,nar.confMin.floatValue()) : y;
-//                        long[] e = x!=null ? Stamp.zip(yy.evidence(), x.evidence()) : yy.evidence();
-                            //System.err.println(x + " + " + y + " = " + z);
-
-                            RevisionTask t = new RevisionTask(template, beliefOrGoal ? Symbols.BELIEF : Symbols.GOAL,
-                                    y, nar.time(), when, yEv);
-                            t.setBudget(yy.budget());
-                            t.log("Dynamic");
-
-
-                            //System.err.println(xx + "\tvs\t" + x);
-                            //nar.inputLater(xx);
-                            x = t;
-
-                        }
-                    }
-                }
-            //}
-
-
-            return x;
+            //return x;
         }
     }
 }

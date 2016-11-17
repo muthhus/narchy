@@ -24,7 +24,7 @@ public class TaskAxis extends HighDim.AutoEnc2Projection<Task> {
     final double xscale = 100;
 
     public TaskAxis() {
-        super(22, 8, 4);
+        super(21, 8, 4);
 
         this.axes = new Group();
         for (int i = 0; i < 10; i++) {
@@ -43,12 +43,11 @@ public class TaskAxis extends HighDim.AutoEnc2Projection<Task> {
         //x[0] = (c.hashCode() % 32) / 32.0f;
         //x[1] = (t instanceof Compound ? 1f : 0f);
         x[0] = c.priIfFiniteElseZero();
-        x[1] = c.dur();
-        x[2] = c.qua();
-        Util.writeBits(t.op().ordinal() + 1, 5, x, 3); //+5
-        Util.writeBits(t.volume() + 1, 5, x, 8); //+5
-        Util.writeBits(t.hashCode(), 5, x, 13); //+5
-        Util.writeBits((int)(x[0] * 16), 4, x, 18); //+5
+        x[1] = c.qua();
+        Util.writeBits(t.op().ordinal() + 1, 5, x, 2); //+5
+        Util.writeBits(t.volume() + 1, 5, x, 7); //+5
+        Util.writeBits(t.hashCode(), 5, x, 12); //+5
+        Util.writeBits((int)(x[0] * 16), 4, x, 17); //+5
         //Util.writeBits(t.size() + 1, 5, x, 13); //+5
 
 

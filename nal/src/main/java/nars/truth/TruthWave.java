@@ -117,8 +117,9 @@ public class TruthWave {
 
     /** fills the wave with evenly sampled points in a time range */
     public void project(@NotNull BeliefTable table, float minT, float maxT, int points) {
+        clear();
+
         if (minT == maxT) {
-            clear();
             return;
         }
         ensureSize(points);
@@ -126,14 +127,17 @@ public class TruthWave {
         float dt = (maxT-minT)/(points);
         float t = minT;
         float[] data = this.truth;
+        int j = 0;
         for (int i = 0; i < points; i++) {
             int lt = Math.round(t);
             Truth x = table.truth(lt);
-            load(data, lt, lt, x, i*ENTRY_SIZE, 0.5f);
+            if (x!=null) {
+                load(data, lt, lt, x, (j++) * ENTRY_SIZE, 0.5f);
+            }
             t+= dt;
         }
         this.current = null;
-        this.size = points;
+        this.size = j;
         this.start = (long)Math.floor(minT);
         this.end = (long)Math.ceil(maxT);
     }

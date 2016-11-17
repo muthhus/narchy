@@ -34,8 +34,6 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
     private volatile int capacity;
     final MultiRWFasterList<Task> list;
 
-    private final static int MAX_SIZE = 64;
-
 
     public MicrosphereTemporalBeliefTable(int initialCapacity) {
         super();
@@ -165,13 +163,13 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
 
     private void add(@NotNull Task x) {
         if (list.add(x)) {
-            long o = x.occurrence();
-            if (minT!=MAX_VALUE) {
-                if (o < minT) minT = o;
-            }
-            if (maxT!= MIN_VALUE) {
-                if (o > maxT) maxT = o;
-            }
+//            long o = x.occurrence();
+//            if (minT!=MAX_VALUE) {
+//                if (o < minT) minT = o;
+//            }
+//            if (maxT!= MIN_VALUE) {
+//                if (o > maxT) maxT = o;
+//            }
         } else {
             throw new UnsupportedOperationException("couldnt add?");
         }
@@ -179,31 +177,31 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
 
 
 
-    /** HACK use of volatiles here is a hack. it may rarely cause the bag to experience flashbacks. proper locking can solve this */
-    private volatile long minT = MAX_VALUE, maxT = MIN_VALUE;
+//    /** HACK use of volatiles here is a hack. it may rarely cause the bag to experience flashbacks. proper locking can solve this */
+//    private volatile long minT = MAX_VALUE, maxT = MIN_VALUE;
 
-    public long range() {
-        if (minT==MAX_VALUE || maxT==MIN_VALUE) {
-            //cached valus invalidated, re-compute
-            forEach(u -> {
-                long o = u.occurrence();
-                if (minT > o)
-                    minT = o;
-                if (maxT < o)
-                    maxT = o;
-            });
-        } else {
-            //using cached value
-        }
-
-        if (minT==MAX_VALUE || maxT==MIN_VALUE) {
-            return 1; //empty probably} else {
-        } else {
-
-            return Math.max(0, maxT - minT);
-        }
-
-    }
+//    public long range() {
+//        if (minT==MAX_VALUE || maxT==MIN_VALUE) {
+//            //cached valus invalidated, re-compute
+//            forEach(u -> {
+//                long o = u.occurrence();
+//                if (minT > o)
+//                    minT = o;
+//                if (maxT < o)
+//                    maxT = o;
+//            });
+//        } else {
+//            //using cached value
+//        }
+//
+//        if (minT==MAX_VALUE || maxT==MIN_VALUE) {
+//            return 1; //empty probably} else {
+//        } else {
+//
+//            return Math.max(0, maxT - minT);
+//        }
+//
+//    }
 
 //    public float duration() {
 //        //return (((float)range()) / size()) * 2f;
@@ -222,21 +220,21 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
 
 
     private void onRemoved(@NotNull Task t, NAR nar) {
-        if (minT != MAX_VALUE) {
-            long o = t.occurrence();
-            if ((minT == o) || (maxT == o)) {
-                invalidateDuration();
-            }
-        }
+//        if (minT != MAX_VALUE) {
+//            long o = t.occurrence();
+//            if ((minT == o) || (maxT == o)) {
+//                invalidateDuration();
+//            }
+//        }
 
         nar.tasks.remove(t);
     }
 
-    private void invalidateDuration() {
-        //invalidate
-        minT = MAX_VALUE;
-        maxT = MIN_VALUE;
-    }
+//    private void invalidateDuration() {
+//        //invalidate
+//        minT = MAX_VALUE;
+//        maxT = MIN_VALUE;
+//    }
 
 
     @Override
@@ -296,6 +294,7 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
 
     final float rankTemporalByConfidence(@Nullable Task t, long when) {
         return t == null ? -1 : t.confWeight(when);
+                //* (t.dur()+1);
     }
 
     public Task matchMerge(long now, @NotNull Task toMergeWith) {
@@ -422,29 +421,14 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
     @Nullable
     @Override
     public final Truth truth(long when, long now, @Nullable EternalTable eternal) {
-
-
         Task topEternal = eternal.strongest();
-        boolean includeEternal = topEternal != null;
 
-        Task[] tasks = list.toArray(Task[]::new, includeEternal ? 1 : 0);
-        int s = tasks.length;
-        if (includeEternal)
-            tasks[s -1] = topEternal;
+        final Truth[] t = new Truth[1];
+        list.withReadLockAndDelegate((l)->{
+            t[0] = TruthPolation.truth(topEternal, when, l);
+        });
 
-        switch (s) {
-
-            case 0:
-                return null;
-
-            case 1:
-                Task the = tasks[0];
-                return the.truth(when);
-
-            default:
-                return new TruthPolation().truth(when, tasks);
-        }
-
+        return t[0];
     }
 
     private boolean clean(NAR nar) {

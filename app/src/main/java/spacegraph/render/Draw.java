@@ -463,8 +463,8 @@ public enum Draw {
 
     public static void line(GL2 gl, float x1, float y1, float x2, float y2) {
         gl.glBegin(GL2.GL_LINES);
-        gl.glVertex3f(x1, y1, 0);
-        gl.glVertex3f(x2, y2, 0);
+        gl.glVertex2f(x1, y1);
+        gl.glVertex2f(x2, y2);
         gl.glEnd();
     }
 
@@ -476,30 +476,43 @@ public enum Draw {
     }
 
     public static void rectStroke(GL2 gl, float x1, float y1, float w, float h) {
-        line(gl, x1, y1, x1 + w, y1);
-        line(gl, x1, y1, x1, y1 + h);
-        line(gl, x1, y1 + h, x1 + w, y1 + h);
-        line(gl, x1 + w, y1, x1 + w, y1 + h);
+        gl.glBegin(GL2.GL_LINE_STRIP);
+        gl.glVertex2f(x1, y1);
+        gl.glVertex2f(x1+w, y1);
+        gl.glVertex2f(x1+w, y1+h);
+        gl.glVertex2f(x1, y1+h);
+        gl.glVertex2f(x1, y1);
+        gl.glEnd();
+//        line(gl, x1, y1, x1 + w, y1);
+//        line(gl, x1, y1, x1, y1 + h);
+//        line(gl, x1, y1 + h, x1 + w, y1 + h);
+//        line(gl, x1 + w, y1, x1 + w, y1 + h);
+
     }
 
     public static void rect(GL2 gl, float x1, float y1, float w, float h) {
 
-        gl.glBegin(GL2.GL_QUADS);
-        gl.glVertex3f(x1, y1, 0);
-        gl.glVertex3f(x1 + w, y1, 0);
-        gl.glVertex3f(x1 + w, y1 + h, 0);
-        gl.glVertex3f(x1, y1 + h, 0);
-        gl.glEnd();
+        gl.glRectf(x1, y1, x1+w, y1+h);
+//        gl.glBegin(GL2.GL_QUADS);
+//        gl.glVertex3f(x1, y1, 0);
+//        gl.glVertex3f(x1 + w, y1, 0);
+//        gl.glVertex3f(x1 + w, y1 + h, 0);
+//        gl.glVertex3f(x1, y1 + h, 0);
+//        gl.glEnd();
     }
 
     public static void rect(GL2 gl, float x1, float y1, float w, float h, float z) {
-
-        gl.glBegin(GL2.GL_QUADS);
-        gl.glVertex3f(x1, y1, z);
-        gl.glVertex3f(x1 + w, y1, z);
-        gl.glVertex3f(x1 + w, y1 + h, z);
-        gl.glVertex3f(x1, y1 + h, z);
-        gl.glEnd();
+        if (z == 0) {
+            rect(gl, x1, y1, w, h);
+        } else {
+            //TODO maybe translate z then call above method?
+            gl.glBegin(GL2.GL_QUADS);
+            gl.glVertex3f(x1, y1, z);
+            gl.glVertex3f(x1 + w, y1, z);
+            gl.glVertex3f(x1 + w, y1 + h, z);
+            gl.glVertex3f(x1, y1 + h, z);
+            gl.glEnd();
+        }
     }
 
     /**
@@ -916,16 +929,26 @@ public enum Draw {
         public void draw(GL2 gl, float x) {
             //int pLastX = 0, pLastY = 0;
 
+//            GLint firstA[4] = {0, 250, 500, 750};
+//            GLint countA[4] = {250, 250, 250, 250};
+//            glMultiDrawArrays(GL_LINE_STRIP, firstA, countA, 4);
+
+            if (x!=0)
+                gl.glTranslatef(x, 0, 0);
+
             for (byte[] seg : segments) {
 
                 int ss = seg.length;
+
                 gl.glBegin(GL2.GL_LINE_STRIP);
                 for (int j = 0; j < ss; ) {
-                    //gl.glVertex2fv
-                    gl.glVertex3f(seg[j++] + x * 16, seg[j++], 0);
+                    gl.glVertex2i(seg[j++], seg[j++]);
                 }
                 gl.glEnd();
             }
+
+            if (x!=0)
+                gl.glTranslatef(-x, 0, 0); //HACK un-translate, cheaper than pushMatrix
         }
     }
 
@@ -1039,7 +1062,7 @@ public enum Draw {
 
         int ci = c - 32; //ASCII to index
         if (ci >= 0 && (ci < fontMono.length)) {
-            fontMono[ci].draw(gl, x);
+            fontMono[ci].draw(gl, x*16);
         }
 
     }

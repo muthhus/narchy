@@ -726,4 +726,8 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
 
     long start();
     long end();
+
+    default long dur() {
+        return Math.abs(end() - start());
+    }
 }

@@ -24,7 +24,6 @@ import static org.junit.Assert.assertTrue;
  * Created by me on 5/8/16.
  */
 public class RevectionTest {
-    @NotNull TruthPolation polation = new TruthPolation();
 
     @Test
     public void testRevisionEquivalence()  {
@@ -33,10 +32,10 @@ public class RevectionTest {
         MutableTask b = t(1f, 0.5f, 0);
         b.evidence(new long[] { 1 } ); //cause different hash
 
-        //assertEquals(a.truth(), polation.truth(0, a, a)); //same item
+        //assertEquals(a.truth(), TruthPolation.truth(0, a, a)); //same item
 
-        //System.out.println( polation.truth(0, a, b) );
-        assertEquals(Revision.revise(a, b), polation.truth(0, a, b));
+        //System.out.println( TruthPolation.truth(0, a, b) );
+        assertEquals(Revision.revise(a, b), TruthPolation.truth(0, a, b));
 
     }
 
@@ -45,7 +44,7 @@ public class RevectionTest {
         Task a = t(1f, 0.5f, -4);
         Task b = t(0f, 0.5f, 4);
 
-        Truth pt = polation.truth(0, a, b);
+        Truth pt = TruthPolation.truth(0, a, b);
         @Nullable Truth rt = Revision.revise(a, b);
 
         assertEquals(pt.freq(), rt.freq(), 0.01f);
@@ -58,7 +57,7 @@ public class RevectionTest {
     public void testRevisionEquivalence2Instant() {
         Task a = t(1f, 0.5f, 0);
         Task b = t(0f, 0.5f, 0);
-        assertEquals( Revision.revise(a, b), polation.truth(0, a, b) );
+        assertEquals( Revision.revise(a, b), TruthPolation.truth(0, a, b) );
     }
 
     @Test
@@ -66,19 +65,19 @@ public class RevectionTest {
         Task a = t(1f, 0.5f, 3);
         Task b = t(0f, 0.5f, 6);
         for (int i = 0; i < 10; i++) {
-            System.out.println(i + " " + polation.truth(i, a, b));
+            System.out.println(i + " " + TruthPolation.truth(i, a, b));
         }
 
         System.out.println();
 
-        Truth ab2 = polation.truth(3, a, b);
+        Truth ab2 = TruthPolation.truth(3, a, b);
         assertTrue( ab2.conf() >= 0.5f );
 
-        Truth abneg1 = polation.truth(3, a, b);
+        Truth abneg1 = TruthPolation.truth(3, a, b);
         assertTrue( abneg1.freq() > 0.6f );
         assertTrue( abneg1.conf() >= 0.5f );
 
-        Truth ab5 = polation.truth(6, a, b);
+        Truth ab5 = TruthPolation.truth(6, a, b);
         assertTrue( ab5.freq() < 0.35f );
         assertTrue( ab5.conf() >= 0.5f );
     }
@@ -92,7 +91,7 @@ public class RevectionTest {
         Task e = t(0f, 0.1f, 7);
 
         for (int i = 0; i < 15; i++) {
-            System.out.println(i + " " + polation.truth(i, a, b, c, d, e));
+            System.out.println(i + " " + TruthPolation.truth(i, a, b, c, d, e));
         }
 
     }

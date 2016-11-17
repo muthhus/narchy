@@ -384,18 +384,23 @@ public interface Stamp {
         final int extra = 1;
         int maxPer = Math.max(1, Math.round((float)maxLen / num)) + extra;
         LongHashSet l = new LongHashSet(maxLen);
+        final boolean[] cyclic = {false};
         s.forEach( (Stamp t) -> {
             long[] e = t.evidence();
             int el = e.length;
             for (int i = Math.max(0, el - maxPer); i < el; i++) {
                 long ee = e[i];
                 if (ee !=Long.MAX_VALUE) {
-                    l.add(ee);
+                    if (!l.add(ee) || isCyclic(e))
+                        cyclic[0] = true;
                 }
             }
         } );
         int ls = l.size();
-        return ArrayUtils.subarray(l.toSortedArray(), Math.max(0, ls -maxLen), ls);
+        long[] e = ArrayUtils.subarray(l.toSortedArray(), Math.max(0, ls - maxLen), ls);
+        if (cyclic[0])
+            e = cyclic(e);
+        return e;
     }
 
 

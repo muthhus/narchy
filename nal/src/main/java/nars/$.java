@@ -784,7 +784,7 @@ public enum $ {
 
     @Nullable
     public static Truth t(float f, float c, float minConf) {
-        return c < minConf ? null : new DefaultTruth(f, c);
+        return (f!=f || c!=c || c < minConf) ? null : new DefaultTruth(f, c);
     }
 
     public static Budget b(float p, float q) {

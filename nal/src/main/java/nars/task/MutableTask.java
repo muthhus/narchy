@@ -57,63 +57,6 @@ public class MutableTask extends AbstractTask {
 
 
 
-    @Nullable @Override
-    public Truth truth(long when) {
-        if (!isBeliefOrGoal())
-            return null;
-
-
-        long a = start();
-
-        Truth t = truth();
-        if (a == ETERNAL)
-            return t;
-        else if (when == ETERNAL)// || when == now) && o == when) //optimization: if at the current time and when
-            return t.eternalize();
-        else {
-            long z = end();
-
-            if (z < a) { long x = a; a = z; z = x; } //order a..z
-            if ((when >= a) && (when <= z)) {
-                return t;
-            } else {
-                long nearest; //nearest endpoint of the interval
-                if (when < a) nearest = a;
-                else /*if (when > z)*/ nearest = z;
-                long delta = Math.abs(nearest - when);
-
-                float dur =
-                        1f;
-                        //1f + (z - a)/2f;
-                return $.t(t.freq(),
-                    //Math.max(
-                        w2c(TruthPolation.evidenceDecay(t.confWeight(), dur, delta))
-                    //    t.eternalizedConf()
-                    //)
-                );
-
-
-            }
-
-        }
-
-    }
-
-    @Override
-    public long start() {
-        return occurrence();
-    }
-
-    /** end occurrence */
-    @Override public long end() {
-        long dt = 0;
-        if (op().temporal) {
-            dt=dt();
-            if (dt==DTERNAL)
-                dt = 0;
-        }
-        return occurrence()+dt;
-    }
 
     @NotNull
     public final MutableTask truth(float freq, float conf) {
@@ -220,7 +163,7 @@ public class MutableTask extends AbstractTask {
     }
 
     @NotNull
-    public final MutableTask evidence(long[] evi) {
+    public final MutableTask evidence(long... evi) {
         setEvidence(evi);
         return this;
     }

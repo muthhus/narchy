@@ -66,6 +66,7 @@ public class MultiRWFasterList<T>  extends AbstractMultiReaderMutableCollection<
             }
         }
 
+
         @Override
         public boolean removeIf(java.util.function.Predicate<? super T> filter) {
             this.acquireWriteLock();

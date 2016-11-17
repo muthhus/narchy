@@ -23,7 +23,7 @@ import static spacegraph.math.v3.v;
 public class Cuboid<X> extends SimpleSpatial<X> {
 
     public final Surface front;
-    final float zOffset = 0f; //relative to scale
+    final float zOffset = 0.1f; //relative to scale
 
     public final Finger mouseFront;
     private v3 mousePick;

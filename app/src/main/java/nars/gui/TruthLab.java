@@ -9,6 +9,7 @@ import nars.Task;
 import nars.concept.Concept;
 import nars.nar.Default;
 import nars.table.BeliefTable;
+import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Terms;
 import nars.time.FrameTime;
@@ -35,21 +36,24 @@ public class TruthLab extends Grid {
     private final List<ConceptTimeline> views;
     private final NAR nar;
 
-    private final List<Term> concepts;
+    private final List<Compound> concepts;
 
     /** samples per frame */
     int samplePeriod = 1;
 
     long start, end;
+    boolean showBeliefs = false;
 
-    public TruthLab(NAR n, Term... x) {
+    public TruthLab(NAR n, Compound... x) {
         super(VERTICAL);
         start = n.time();
         this.nar = n;
         this.concepts = Lists.newArrayList(x);
-        this.views = concepts.stream().map(ConceptTimeline::new).collect(toList());
+        this.views = concepts.stream().map(xx -> new ConceptTimeline(xx, showBeliefs)).collect(toList());
 
         n.onFrame(this::update);
+
+        update(n);
     }
 
     @Override
@@ -150,7 +154,7 @@ public class TruthLab extends Grid {
     static class TaskTimeline extends TruthTimeline {
 
         public TaskTimeline(Task task, long start, long end, int samplePeriod) {
-            super(start, end, samplePeriod, (w) -> $.t(task.freq(), task.conf(w)));
+            super(start, end, samplePeriod, (w) -> task.truth(w));
 
             this.label = task.toString();
             Draw.colorHash(Terms.atemporalize( task.term() ), labelColor);
@@ -158,8 +162,13 @@ public class TruthLab extends Grid {
     }
     static class BeliefTableTimeline extends TruthTimeline {
 
-        public BeliefTableTimeline(Term t, BeliefTable b, long start, long end, int samplePeriod) {
-            super(start, end, samplePeriod, (w) -> b.truth(w));
+        public BeliefTableTimeline(Compound t, BeliefTable b, long start, long end, int samplePeriod) {
+            super(start, end, samplePeriod, (w) -> {
+                Task x = b.match(w, w, $.task(t, '?', null).evidence(0));
+                if (x!=null)
+                    return x.truth(w);
+                return null;
+            });
 
             this.label = t.toString();
             Draw.colorHash(t, labelColor);
@@ -167,11 +176,13 @@ public class TruthLab extends Grid {
     }
 
     public static class ConceptTimeline extends Grid {
-        private final Term term;
+        private final Compound term;
+        private boolean showBeliefs;
 
-        public ConceptTimeline(Term x) {
+        public ConceptTimeline(Compound x, boolean showBeliefs) {
             super(VERTICAL);
 
+            this.showBeliefs = showBeliefs;
             this.term = x;
         }
 
@@ -188,9 +199,12 @@ public class TruthLab extends Grid {
 
 
                 cc.add(new BeliefTableTimeline(term, c.beliefs(), start, end, samplePeriod));
-                c.beliefs().forEach(b -> {
-                    cc.add(new TaskTimeline(b, start, end, samplePeriod));
-                });
+
+                if (showBeliefs) {
+                    c.beliefs().forEach(b -> {
+                        cc.add(new TaskTimeline(b, start, end, samplePeriod));
+                    });
+                }
             }
 
             return cc;
@@ -201,12 +215,17 @@ public class TruthLab extends Grid {
 
     public static void main(String[] args) {
         NAR n = new Default(1000, 64, 1, 3);
+
         SpaceGraph.window(
                 new TruthLab(n, $("(x)"), $("(y)"),
                         $("((x) && (y))"),
-                        $("((x) && --(y))"),
-                        $("(--(x) && (y))"),
-                        $("(--(x) && --(y))")
+                        $("((x) &&+0 (y))"),
+                        $("((x) &&+5 (y))"),
+                        $("((x) &&+10 (y))"),
+                        //$("((x) && --(y))"),
+                        //$("(--(x) && (y))"),
+                        $("(--(x) && --(y))"),
+                        $("(--(x) &&+10 --(y))")
                 ),
                 1200, 900);
 
@@ -219,6 +238,9 @@ public class TruthLab extends Grid {
             .inputAt(40, "--(y). :|: %1.0;0.8%")
             .run(60);
 
+
+
+        n.run(1);
     }
 
 }

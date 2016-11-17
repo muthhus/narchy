@@ -680,6 +680,11 @@ public abstract class NAR extends Param implements Level, Consumer<Task>, NARIn,
         emotion.busy(input.pri());
 
         Task existing = tasks.addIfAbsent(input);
+        if (existing!=null && existing.isDeleted()) {
+            //allow the new one to replace it
+            tasks.remove(existing);
+            existing = null;
+        }
         if (existing == null) {
 
             if (time instanceof FrameTime) {

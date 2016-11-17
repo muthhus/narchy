@@ -55,6 +55,8 @@ import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
+import static com.jogamp.opengl.GL.GL_NICEST;
+import static com.jogamp.opengl.GL2.*;
 import static spacegraph.math.v3.v;
 
 /**
@@ -216,7 +218,7 @@ abstract public class JoglPhysics<X> extends JoglSpace implements GLEventListene
 
         window.addKeyListener(this);
 
-        gl.glLightModelf(GL2.GL_LIGHT_MODEL_AMBIENT, 0.6f);
+        gl.glLightModelf(GL_LIGHT_MODEL_AMBIENT, 0.6f);
 
         float[] light_ambient = new float[]{0.3f, 0.3f, 0.3f, 1.0f};
         float[] light_diffuse = new float[]{0.5f, 0.5f, 0.5f, 0.5f};
@@ -259,16 +261,20 @@ abstract public class JoglPhysics<X> extends JoglSpace implements GLEventListene
 //            gl.glEnable(gl.GL_LIGHT1);
 //        }
 
-        gl.glEnable(GL2.GL_POINT_SMOOTH);
-        gl.glEnable(GL2.GL_LINE_SMOOTH);
-        gl.glEnable(GL2.GL_POLYGON_SMOOTH);
-        gl.glEnable(GL2.GL_MULTISAMPLE);
+
+        gl.glEnable(GL_POINT_SPRITE);
+        gl.glEnable(GL_POINT_SMOOTH);
+        gl.glEnable(GL_LINE_SMOOTH);
+        gl.glEnable(GL_POLYGON_SMOOTH);
+        //gl.glEnable(GL2.GL_MULTISAMPLE);
 
         gl.glShadeModel(gl.GL_SMOOTH);
-        //gl.glHint(GL2.GL_PERSPECTIVE_CORRECTION_HINT, GL2.GL_NICEST);
+
+        gl.glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
+        gl.glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
 
         //https://www.sjbaker.org/steve/omniv/opengl_lighting.html
-        gl.glColorMaterial ( GL2.GL_FRONT_AND_BACK, GL2.GL_AMBIENT_AND_DIFFUSE ) ;
+        gl.glColorMaterial ( GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE ) ;
         gl.glEnable(gl.GL_COLOR_MATERIAL);
 
         //gl.glMaterialfv( GL2.GL_FRONT_AND_BACK, GL2.GL_SPECULAR, new float[] { 1, 1, 1, 1 }, 0);
@@ -397,7 +403,7 @@ abstract public class JoglPhysics<X> extends JoglSpace implements GLEventListene
                 camUp.x, camUp.y, camUp.z);
 
 
-        gl.glMatrixMode(GL2.GL_MODELVIEW);
+        gl.glMatrixMode(GL_MODELVIEW);
         gl.glLoadIdentity();
 //        stack.vectors.pop();
 //        stack.matrices.pop();
@@ -708,7 +714,7 @@ abstract public class JoglPhysics<X> extends JoglSpace implements GLEventListene
     // See http://www.lighthouse3d.com/opengl/glut/index.php?bmpfontortho
     public void ortho() {
         gl.glViewport(0, 0, screenWidth, screenHeight);
-        gl.glMatrixMode(GL2.GL_PROJECTION);
+        gl.glMatrixMode(GL_PROJECTION);
         gl.glLoadIdentity();
 
         //gl.glOrtho(-2.0, 2.0, -2.0, 2.0, -1.5, 1.5);
@@ -731,7 +737,7 @@ abstract public class JoglPhysics<X> extends JoglSpace implements GLEventListene
         gl.glMatrixMode(gl.GL_MODELVIEW);
         //gl.glLoadIdentity();
 
-        gl.glDisable(GL2.GL_DEPTH_TEST);
+        //gl.glDisable(GL2.GL_DEPTH_TEST);
     }
 
 

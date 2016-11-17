@@ -128,9 +128,9 @@ public class BeliefTableChart extends Surface {
 
 
         float cp = nar.activation(cc);
-        gl.glColor4f(0.5f, 0.5f, 0.5f, 0.2f + 0.25f * cp);
-        float size = (cp > 0 ? (0.0003f + 0.00015f * cp) : 0.00015f); //if not active then show in small, otherwise if active show larger and grow in proportion to the activity
-        Draw.text(gl, size, size, tt.toString(), 1 / 2f, 1 / 2f, 0);
+        gl.glColor4f(0.5f, 0.5f, 0.5f, 0.6f + 0.25f * cp);
+
+        Draw.text(gl, tt.toString(), 0.15f + 0.05f * cp, 1 / 2f, 1 / 2f, 0);
 
         TruthWave beliefs = this.beliefs;
         if (!beliefs.isEmpty()) {
@@ -347,10 +347,10 @@ public class BeliefTableChart extends Surface {
 
             //r.renderTask(gl, qua, conf, pw, ph, xStart, xEnd, freq);
 
-            if (!beliefOrGoal)
+            if (beliefOrGoal)
                 gl.glColor4f(0.75f, 0.25f, 0f, 0.2f + conf * 0.5f); //, 0.7f + 0.2f * q);
             else
-                gl.glColor4f(0.25f, 0f, 0.75f, 0.2f + conf * 0.5f); //, 0.7f + 0.2f * q);
+                gl.glColor4f(0f, 0.75f, 0.25f, 0.2f + conf * 0.5f); //, 0.7f + 0.2f * q);
 
             float mid = (end + start) / 2f;
             float W = Math.max((end - start), pw);
@@ -365,7 +365,7 @@ public class BeliefTableChart extends Surface {
 
     private void renderWaveLine(float nowX, long minT, long maxT, GL2 gl, TruthWave wave, boolean beliefOrGoal) {
 
-        gl.glLineWidth(4.0f);
+        gl.glLineWidth(2.0f);
         gl.glBegin(GL2.GL_LINE_STRIP);
 
         wave.forEach((freq, conf, start, end, qua) -> {

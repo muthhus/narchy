@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
+import static com.jogamp.opengl.GL.*;
 import static com.jogamp.opengl.math.FloatUtil.sin;
 import static java.lang.Math.cos;
 import static spacegraph.math.v3.v;
@@ -180,11 +181,12 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
         //gl.glEnable(GL2.GL_LIGHTING); // Enable Lighting
 
 
-        gl.glBlendFunc(GL2.GL_SRC_ALPHA, GL2.GL_ONE_MINUS_SRC_ALPHA);
-        gl.glBlendEquation(GL2.GL_FUNC_ADD);
         gl.glEnable(GL2.GL_BLEND);
+        //gl.glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        //gl.glBlendEquation(GL_FUNC_ADD);
 
-
+        gl.glBlendEquationSeparate(GL_FUNC_ADD, GL_FUNC_ADD);
+        gl.glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ZERO);
 
         //gl.glHint(GL2.GL_PERSPECTIVE_CORRECTION_HINT, GL2.GL_NICEST); // Really Nice Perspective Calculations
 

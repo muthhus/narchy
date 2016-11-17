@@ -184,10 +184,10 @@ public class SensorConcept extends WiredCompoundConcept implements FloatFunction
         return currentValue;
     }
 
-    @Override
-    protected BeliefTable newBeliefTable(NAR nar, boolean beliefOrGoal, int eCap, int tCap) {
-        return new SensorBeliefTable(eCap, tCap);
-    }
+//    @Override
+//    protected BeliefTable newBeliefTable(NAR nar, boolean beliefOrGoal, int eCap, int tCap) {
+//        return new SensorBeliefTable(eCap, tCap);
+//    }
 
 
     public static void activeAttention(@NotNull Iterable<? extends Prioritizable> c, @NotNull MutableFloat min, @NotNull MutableFloat limit, @NotNull NAR nar) {

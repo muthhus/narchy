@@ -21,7 +21,9 @@ import java.util.Arrays;
 import java.util.Objects;
 
 import static nars.$.t;
+import static nars.time.Tense.DTERNAL;
 import static nars.time.Tense.ETERNAL;
+import static nars.truth.TruthFunctions.w2c;
 
 /**
  * Default Task implementation
@@ -530,6 +532,63 @@ public abstract class AbstractTask extends RawBudget implements Task, Temporal {
         }
     }
 
+    @Nullable @Override
+    public Truth truth(long when) {
+        if (!isBeliefOrGoal())
+            return null;
+
+
+        long a = start();
+
+        Truth t = truth();
+        if (a == ETERNAL)
+            return t;
+        else if (when == ETERNAL)// || when == now) && o == when) //optimization: if at the current time and when
+            return t.eternalize();
+        else {
+            long z = end();
+
+            if (z < a) { long x = a; a = z; z = x; } //order a..z
+            if ((when >= a) && (when <= z)) {
+                return t;
+            } else {
+                long nearest; //nearest endpoint of the interval
+                if (when < a) nearest = a;
+                else /*if (when > z)*/ nearest = z;
+                long delta = Math.abs(nearest - when);
+
+                float dur =
+                        1f;
+                //1f + (z - a)/2f;
+                return $.t(t.freq(),
+                        //Math.max(
+                        w2c(TruthPolation.evidenceDecay(t.confWeight(), dur, delta))
+                        //    t.eternalizedConf()
+                        //)
+                );
+
+
+            }
+
+        }
+
+    }
+
+    @Override
+    public long start() {
+        return occurrence();
+    }
+
+    /** end occurrence */
+    @Override public long end() {
+        long dt = 0;
+        if (op().temporal) {
+            dt=dt();
+            if (dt==DTERNAL)
+                dt = 0;
+        }
+        return occurrence()+dt;
+    }
 
 
 }

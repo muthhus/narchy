@@ -121,7 +121,7 @@ public class DefaultConceptBuilder implements ConceptBuilder {
                 (!dynamic) ?
                         new CompoundConcept<>(t, termbag, taskbag, nar)
                         :
-                        new DynamicCompoundConcept(t, termbag, taskbag, nar)
+                        new DynamicConcept(t, termbag, taskbag, nar)
                 ;
 
     }

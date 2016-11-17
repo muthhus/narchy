@@ -932,7 +932,7 @@ public interface TimeFunctions {
 
             Term T = resolve(p, tt);
             if (T!=null) {
-                Term B = bb != null ? resolve(p, bb) : null;
+                Term B = resolve(p, bb);
                 Term C = derived;
 
                 if (belief != null) {

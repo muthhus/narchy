@@ -46,10 +46,11 @@ public abstract class ConsoleSurface extends Surface implements Appendable {
         float charScaleX = this.charScaleX / charAspect;
         float charScaleY = this.charScaleY;
 
-        float dz = 0f;
+
 
 
         long t = System.currentTimeMillis(); //HACK
+        float dz = 0f;
 
 
         gl.glPushMatrix();
@@ -126,6 +127,7 @@ public abstract class ConsoleSurface extends Surface implements Appendable {
         float p = (1f + (float) Math.sin(t / 100.0)) * 0.5f;
         float m = ( p);
         gl.glColor4f(1f, 0.7f, 0f, 0.4f + p * 0.4f);
+
         Draw.rect(gl,
                 (float) (curx) + m/2f, (rows - 1 - cury) + m / 2f,
                 (float) (1 - m), (1 - m)

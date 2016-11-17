@@ -185,11 +185,10 @@ public class ConceptWidget extends SimpleSpatial<Term> {
             z.r = 0.25f + 0.7f * (pri * 1f / ((Term)target.key).volume());
             float qua = l.qua();
             z.g = 0.25f + 0.7f * (pri * qua);
-            float dur = l.dur();
-            z.b = 0.25f + 0.7f * (pri * dur);
+            z.b = 0.25f + 0.7f * (pri * (1f-qua));
             z.a = 0.5f + 0.5f * pri;
                     //0.9f;
-            z.attraction = sqr(or(qua,dur))*maxAttraction;
+            z.attraction = sqr(qua)*maxAttraction;
 
             ee.add(z);
             return z;

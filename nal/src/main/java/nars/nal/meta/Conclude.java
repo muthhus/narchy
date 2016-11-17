@@ -176,10 +176,13 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
             );
 
             //temporalization failure, could not determine temporal attributes. seems this can happen normally
-            if (temporalized == null) {
-//                Compound temporalized2 = this.time.compute(content,
-//                        m, this, occReturn, confScale
-//                );
+            if ((temporalized == null) || ((long)temporalized.dt()) == -((long)DTERNAL) /* long cast here due to integer wraparound */ ) {
+//                if (temporalized!=null) {
+//                    //FOR DEBUGGING, re-run it
+//                    Compound temporalized2 = this.time.compute(content,
+//                            m, this, occReturn, confScale
+//                    );
+//                }
 
                 throw new InvalidTermException(content.op(), content.dt(), content.terms(),
                         "temporalization failure" + (Param.DEBUG ? rule : ""));

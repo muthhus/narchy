@@ -189,7 +189,7 @@ public class DefaultBeliefTable implements BeliefTable {
 
 
     @Override
-    public final TruthDelta add(@NotNull Task input, @NotNull QuestionTable questions, @NotNull CompoundConcept<?> concept, @NotNull NAR nar) {
+    public TruthDelta add(@NotNull Task input, @NotNull QuestionTable questions, @NotNull CompoundConcept<?> concept, @NotNull NAR nar) {
         return input.isEternal() ?  eternal.add(input, concept, nar) : temporal.add(input, eternal, concept, nar);
     }
 
