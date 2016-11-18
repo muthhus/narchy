@@ -27,7 +27,9 @@ import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunctio
 import spacegraph.SpaceGraph;
 import spacegraph.Surface;
 import spacegraph.obj.layout.Grid;
+import spacegraph.obj.widget.CheckBox;
 import spacegraph.obj.widget.FloatSlider;
+import spacegraph.obj.widget.ToggleButton;
 
 import java.awt.Container;
 import java.awt.image.BufferedImage;
@@ -35,6 +37,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
@@ -372,6 +375,8 @@ abstract public class NAgents extends NAgent {
                 if (c == FloatParam.class) {
                     FloatParam f = v.get();
                     l.add(col(Vis.label(k), new FloatSlider(f) ));
+                } else if (c == AtomicBoolean.class) {
+                    l.add(new CheckBox(k, v.get()));
                 }
                 /*else {
                     l.add(new PushButton(k));

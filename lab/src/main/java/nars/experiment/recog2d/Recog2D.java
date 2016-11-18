@@ -26,6 +26,7 @@ import java.awt.image.BufferedImage;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static nars.util.Texts.n2;
 import static spacegraph.obj.layout.Grid.col;
@@ -43,7 +44,9 @@ public class Recog2D extends NAgents {
     private final Training train;
     BufferedImage canvas;
 
-    final static int trainFrames = 4000, verifyFrames = 4000;
+    public final AtomicBoolean neural = new AtomicBoolean(true);
+
+
 
 
     int image = 0;
@@ -190,15 +193,19 @@ public class Recog2D extends NAgents {
 
             redraw();
 
-            if (nar.time() < trainFrames) {
+            if (neural.get()) {
+                //if (nar.time() < trainFrames) {
                 outs.expect(image);
                 outs.train();
-            } else {
-                outs.expect(-1);
-                outs.verify();
             }
+            //} else {
+              //  outs.expect(-1);
+              //  outs.verify();
+            //}
 
-            train.update(outs.train, true);
+            if (neural.get()) {
+                train.update(outs.train, true);
+            }
 
             p.update();
             //s.update();
@@ -253,7 +260,7 @@ public class Recog2D extends NAgents {
     }
 
     public static void main(String[] arg) {
-        NAgents.run(Recog2D::new, trainFrames + verifyFrames);
+        NAgents.run(Recog2D::new, 50000);
     }
 
     public static class Training {

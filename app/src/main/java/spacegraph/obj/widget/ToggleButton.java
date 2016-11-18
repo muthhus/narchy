@@ -18,8 +18,12 @@ public abstract class ToggleButton extends AbstractButton {
     @Nullable ToggleAction action = null;
 
     public ToggleButton() {
-
+        this(false);
     }
+    public ToggleButton(boolean startingValue) {
+        on.set(startingValue);
+    }
+
 
     public ToggleButton set(boolean on) {
         if (this.on.compareAndSet(!on, on)) {
