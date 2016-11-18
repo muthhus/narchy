@@ -27,6 +27,7 @@ import spacegraph.obj.layout.Stacking;
 import spacegraph.obj.widget.Label;
 import spacegraph.obj.widget.LabeledPane;
 import spacegraph.obj.widget.Plot2D;
+import spacegraph.obj.widget.Slider;
 import spacegraph.render.Draw;
 
 import java.util.List;
@@ -81,7 +82,7 @@ public class Vis {
         s.add(new BeliefTableChart(nar, a.happy, btRange));
         s.add(new BeliefTableChart(nar, a.joy, btRange));
 
-        return new Grid(s);
+        return new Grid(VERTICAL, s);
     }
 
     public static void show(Default d) {
@@ -204,7 +205,7 @@ public class Vis {
 
         double[] d = new double[bins];
         return //new GridSurface(VERTICAL,
-                LabeledPane.of("Concept Priority Distribution (0..1)", new HistogramChart(
+                Vis.pane("Concept Priority Distribution (0..1)", new HistogramChart(
                         ()->bag.priHistogram(d), new Color3f(0.5f, 0.25f, 0f), new Color3f(1f, 0.5f, 0.1f)));
 
 //                PanelSurface.of("Concept Durability Distribution (0..1)", new HistogramChart(nar, c -> {
@@ -304,5 +305,9 @@ public class Vis {
     /** ordering: first is underneath, last is above */
     public static Stacking stacking(Surface... s) {
         return new Stacking(s);
+    }
+
+    public static LabeledPane pane(String k, Surface s) {
+        return new LabeledPane(k, s);
     }
 }

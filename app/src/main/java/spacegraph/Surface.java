@@ -11,29 +11,65 @@ import spacegraph.math.v3;
 import java.util.List;
 import java.util.Objects;
 
+import static spacegraph.math.v3.v;
+
 /**
  * planar subspace.
  * (fractal) 2D Surface embedded relative to a parent 2D surface or 3D space
  */
 public class Surface {
 
+    public enum Align {
+
+
+
+        /** 1:1, centered */
+        Center,
+
+        /** 1:1, x=left, y=center */
+        LeftCenter,
+
+        /** 1:1, x=right, y=center */
+        RightCenter
+
+        //TODO etc...
+    }
 
     public final v3 translateLocal;
     public final v2 scaleLocal;
+    public final v2 scaleGlobal = v(Float.NaN, Float.NaN);
 
     public Surface parent;
     volatile public List<Surface> children;
+    Align align = Align.Center;
+
+    /** height/width target aspect ratio; if aspect is NaN, no adjustment applied */
+    protected float aspect = Float.NaN;
 
     public Surface() {
         translateLocal = new v3();
         scaleLocal = new v2(1f,1f);
     }
 
+    public Surface align(Align align) {
+        this.align = align;
+        return this;
+    }
+
+    public Surface align(Align align, float aspect) {
+        this.aspect = aspect;
+        return align(align);
+    }
+
+    public Surface align(Align align, float width, float height) {
+        return align(align, height/width);
+    }
+
     public void setParent(Surface s) {
         parent = s;
     }
 
-    protected void layout() {
+    public void layout() {
         //nothing by default
     }
 
@@ -102,10 +138,14 @@ public class Surface {
 
     }
 
-    public final void render(GL2 gl) {
+    public final void render(GL2 gl, v2 globalScale) {
+
+        scaleGlobal.set(globalScale);
+
         gl.glPushMatrix();
 
-        transform(gl);
+        transform(gl, globalScale);
+
 
         gl.glNormal3f(0,0,1);
 
@@ -113,24 +153,58 @@ public class Surface {
 
         List<? extends Surface> cc = this.children;
         if (cc != null) {
-            for (int i = 0, childrenSize = cc.size(); i < childrenSize; i++)
-                cc.get(i).render(gl);
+            v2 global = new v2();
+            for (int i = 0, childrenSize = cc.size(); i < childrenSize; i++) {
+                Surface child = cc.get(i);
+                global.set(scaleLocal);
+                global.scale(child.scaleLocal);
+                child.render(gl, global);
+            }
         }
 
         gl.glPopMatrix();
     }
 
 
-    public void transform(GL2 gl) {
+    public void transform(GL2 gl, v2 globalScale) {
         final Surface c = this;
 
         v3 translate = c.translateLocal;
-        if (translate!=null)
-            gl.glTranslatef(translate.x, translate.y, translate.z);
 
         v2 scale = c.scaleLocal;
-        if (scale!=null)
-            gl.glScalef(scale.x, scale.y, 1f);
+
+        float sx, sy;
+
+        if (aspect==aspect) {
+            float globalAspect = globalScale.y / globalScale.x;
+            float a = globalAspect / aspect;
+            if (a < 1f) {
+                sx = scale.x;
+                sy = scale.y * a;
+            } else {
+                sx = scale.x;
+                sy = scale.y / a;
+            }
+        } else {
+            //consume entire area, regardless of aspect
+            sx = scale.x; sy = scale.y;
+        }
+
+        float tx = translate.x, ty = translate.y;
+        switch (align) {
+
+            default:
+            case Center:
+                tx += (scale.x - sx)/2f;
+                ty += (scale.y - sy)/2f;
+                break;
+
+
+        }
+
+        //globalScale.set(sx, sy);
+        gl.glTranslatef(tx, ty, translate.z);
+        gl.glScalef(sx, sy, 1f);
     }
 
 

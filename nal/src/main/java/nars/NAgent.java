@@ -70,9 +70,11 @@ abstract public class NAgent implements NSense, NAction {
     public final List<SensorConcept> sensors = $.newArrayList();
     public final List<ActionConcept> actions = $.newArrayList();
 
-    public float alpha, gamma, epsilonProbability = 0.025f;
-    @Deprecated
-    public float gammaEpsilonFactor = 0.9f;
+    public float alpha, gamma;
+
+    public final MutableFloat epsilonProbability = new MutableFloat(0.1f);
+
+    public final MutableFloat gammaEpsilonFactor = new MutableFloat(0.75f);
 
     final int curiosityMonitorDuration = 8; //frames
     final DescriptiveStatistics avgActionDesire = new DescriptiveStatistics(curiosityMonitorDuration);
@@ -453,9 +455,12 @@ abstract public class NAgent implements NSense, NAction {
         //Budget curiosityBudget = Budget.One.clone().multiplied(minSensorPriority.floatValue(), 0.5f, 0.9f);
 
 
+        float gammaEpsilonFactor = this.gammaEpsilonFactor.floatValue();
+
         for (ActionConcept c : actions) {
 
-            float motorEpsilonProbability = epsilonProbability * (1f - Math.min(1f, c.goalConf(now, 0) / gamma));
+            float motorEpsilonProbability = epsilonProbability.floatValue() * (1f - Math.min(1f, c.goalConf(now, 0) / gamma));
+
 
             if (nar.random.nextFloat() < motorEpsilonProbability) {
 

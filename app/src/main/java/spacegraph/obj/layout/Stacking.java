@@ -12,7 +12,7 @@ public class Stacking extends Layout {
     }
 
     @Override
-    protected void layout() {
+    public void layout() {
         //?
     }
 }

@@ -854,10 +854,10 @@ public enum Draw {
 //    String exampleCurly = " 2226 40KYPBRCSDTFTHSJRKQMQOSQ R" +
 //            "RCSESGRIQJPLPNQPURQTPVPXQZR[S]S_Ra R" +
 //            "SSQUQWRYSZT\\T^S`RaPb";
-
-    static boolean isGlyphInteger(String str) {
-        return str.matches("-?\\d+");
-    }
+//
+//    static boolean isGlyphInteger(String str) {
+//        return str.matches("-?\\d+");
+//    }
 
 
 //    // Point wrapper -- no tuples in Processing

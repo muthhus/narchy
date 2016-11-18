@@ -2,6 +2,7 @@ package spacegraph.obj.widget;
 
 import com.jogamp.opengl.GL2;
 import spacegraph.Surface;
+import spacegraph.math.v2;
 import spacegraph.render.Draw;
 
 /**
@@ -12,6 +13,10 @@ public class Label extends Surface {
     private String value = "";
     float fontScale;
 
+    public Label() {
+        this("");
+    }
+
     public Label(String s) {
         super();
         set(s);
@@ -21,15 +26,22 @@ public class Label extends Surface {
     public void paint(GL2 gl) {
         float dz = 0.1f;
         gl.glColor4f(1f,1f,1f,1f); //TODO color params
-        Draw.text(gl, value(), fontScale, scaleLocal.x/2f, scaleLocal.y/2f, dz);
+        Draw.text(gl, value(), fontScale, 0.5f, 0.5f, dz);
     }
 
     public void set(String newValue) {
         if (newValue == null)
             newValue = "(null)";
         this.value = newValue;
-        this.fontScale = 0.5f; //(1f/ConsoleSurface.fontWidth)/value.length();
-
+        int len = newValue.length();
+        this.fontScale =
+                1f / (1f + len);
+                //0.5f; //(1f/ConsoleSurface.fontWidth)/value.length();
+        if (len > 0) {
+            this.aspect = 1f / len;
+        } else {
+            this.aspect = 1f;
+        }
     }
 
     public String value() {

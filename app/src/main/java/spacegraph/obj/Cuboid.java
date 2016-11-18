@@ -111,9 +111,11 @@ public class Cuboid<X> extends SimpleSpatial<X> {
         gl.glTranslatef(-0.5f, -0.5f, 0.5f + zOffset);
         //gl.glScalef(pp, pp, 1f);
 
-
+        Transform t = transform();
+        float tw = t.x;
+        float th = t.y;
         gl.glDepthMask(false);
-        front.render(gl);
+        front.render(gl, v(1,1));
         gl.glDepthMask(true);
 
         gl.glPopMatrix();
@@ -124,9 +126,8 @@ public class Cuboid<X> extends SimpleSpatial<X> {
     protected void renderAbsolute(GL2 gl) {
         super.renderAbsolute(gl);
 
-
+        //display pick location (debugging)
         if (mousePick!=null) {
-            //display pick location (debugging)
             gl.glPushMatrix();
             gl.glTranslatef(mousePick.x, mousePick.y, mousePick.z);
             gl.glScalef(0.25f, 0.25f, 0.25f);

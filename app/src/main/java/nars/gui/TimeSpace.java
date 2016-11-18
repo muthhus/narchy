@@ -8,6 +8,7 @@ import nars.nar.Default;
 import nars.test.DeductiveChainTest;
 import nars.test.DeductiveMeshTest;
 import nars.util.Texts;
+import nars.util.TriConsumer;
 import nars.util.time.Between;
 import nars.util.time.IntervalTree;
 import spacegraph.ForceDirected;
@@ -22,7 +23,7 @@ import java.util.*;
 import java.util.function.Function;
 
 
-public class TimeSpace extends NARSpace implements NARSpace.TriConsumer<NAR, SpaceGraph, List<Spatial>>, Function<Object,Spatial> {
+public class TimeSpace extends NARSpace implements TriConsumer<NAR, SpaceGraph, List<Spatial>>, Function<Object,Spatial> {
 
     final IntervalTree<Long,Object> data = new IntervalTree<>();
     private final int capacity;

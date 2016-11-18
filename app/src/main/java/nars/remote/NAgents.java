@@ -1,7 +1,5 @@
 package nars.remote;
 
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
 import nars.$;
 import nars.NAR;
 import nars.NAgent;
@@ -23,13 +21,21 @@ import nars.truth.Truth;
 import nars.util.TaskStatistics;
 import nars.util.data.random.XorShift128PlusRandom;
 import nars.video.*;
+import objenome.O;
+import org.apache.commons.lang3.mutable.MutableFloat;
 import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunction;
 import spacegraph.SpaceGraph;
 import spacegraph.Surface;
+import spacegraph.obj.layout.Grid;
+import spacegraph.obj.widget.Label;
+import spacegraph.obj.widget.LabeledPane;
+import spacegraph.obj.widget.PushButton;
+import spacegraph.obj.widget.Slider;
 
-import java.awt.*;
+import java.awt.Container;
 import java.awt.image.BufferedImage;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.function.Function;
@@ -39,6 +45,7 @@ import java.util.stream.Stream;
 import static nars.$.t;
 import static spacegraph.SpaceGraph.window;
 import static spacegraph.obj.layout.Grid.grid;
+import static spacegraph.obj.layout.Grid.row;
 
 /**
  * Created by me on 9/19/16.
@@ -271,17 +278,20 @@ abstract public class NAgents extends NAgent {
     public static void chart(NAgents a) {
         NAR nar = a.nar;
         window(
-                grid(
-                        grid(a.cam.values().stream().map(cs -> new CameraSensorView(cs, nar)).toArray(Surface[]::new)),
+                row(
+                        grid(a.cam.values().stream().map(cs ->
+                                new CameraSensorView(cs, nar).align(Surface.Align.Center, cs.width, cs.height))
+                                    .toArray(Surface[]::new)),
 
-                        nar instanceof Default ? Vis.concepts((Default) nar, 128) : grid(/*blank*/),
+                        new ReflectionSurface(a),
+                        //nar instanceof Default ? Vis.concepts((Default) nar, 128) : grid(/*blank*/),
 
-                        Vis.agentActions(a, 200),
+                        Vis.agentActions(a, 400)
 
-                        Vis.budgetHistogram(nar, 32),
-                        Vis.conceptLinePlot(nar,
+                        //Vis.budgetHistogram(nar, 32),
+                        /*Vis.conceptLinePlot(nar,
                                 Iterables.concat(a.actions, Lists.newArrayList(a.happy, a.joy)),
-                                2000)
+                                2000)*/
                 ), 1200, 900);
     }
 
@@ -294,6 +304,10 @@ abstract public class NAgents extends NAgent {
 
     protected Sensor2D<Scale> addCamera(String id, Container w, int pw, int ph, FloatToObjectFunction<Truth> pixelTruth) {
         return addCamera(id, new Scale(new SwingCamera(w), pw, ph), pixelTruth);
+    }
+
+    protected Sensor2D<PixelBag> addCameraRetina(String id, Container w, int pw, int ph) {
+        return addCameraRetina(id, new SwingCamera(w), pw, ph, (v) -> t(v, alpha));
     }
 
     protected Sensor2D<PixelBag> addCameraRetina(String id, Container w, int pw, int ph, FloatToObjectFunction<Truth> pixelTruth) {
@@ -331,5 +345,24 @@ abstract public class NAgents extends NAgent {
 //        return c;
 //    }
 
+    public static class ReflectionSurface<X> extends Grid {
+
+        private final X x;
+
+        public ReflectionSurface(X x) {
+            this.x = x;
+
+            List<Surface> l = $.newArrayList();
+            O.in(x).fields((k,c,v) -> {
+
+                if (c == MutableFloat.class) {
+                    l.add(Vis.pane( k, new Slider(0.5f, 0, 1f) ));
+                } else {
+                    l.add(new PushButton(k));
+                }
+            });
+            setChildren(l);
+        }
+    }
 
 }

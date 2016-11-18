@@ -20,17 +20,18 @@ public class VSplit extends Layout {
 
 
     @Override
-    protected void layout() {
+    public void layout() {
+
         float margin = 0.0f;
         //float content = 1f - margin;
         float x = margin/2f;
 
         Surface top = top();
-        top.scaleLocal.set(1f, proportion);
+        top.scale(1f, proportion);
         top.translateLocal.set(x, 1f - proportion, 0);
 
         Surface bottom = bottom();
-        bottom.scaleLocal.set(1f, 1f-proportion);
+        bottom.scale(1f, 1f-proportion);
         bottom.translateLocal.set(x, proportion, 0);
 
     }

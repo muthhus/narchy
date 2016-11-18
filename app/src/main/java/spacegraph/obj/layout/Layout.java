@@ -19,6 +19,5 @@ abstract public class Layout extends Surface {
         setChildren(children);
     }
 
-    @Override
-    abstract protected void layout();
+
 }

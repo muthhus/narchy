@@ -2,9 +2,11 @@ package spacegraph;
 
 import com.jogamp.newt.event.*;
 import com.jogamp.opengl.GL2;
-import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import spacegraph.input.Finger;
 import spacegraph.math.v2;
+
+import static spacegraph.math.v3.v;
 
 /**
  * orthographic widget adapter. something which goes on the "face" of a HUD ("head"s-up-display)
@@ -50,12 +52,7 @@ public class Ortho implements WindowListener, KeyListener, MouseListener {
     }
 
     public Ortho scale(float sx, float sy) {
-        surface.scaleLocal.set(sx * window.getWidth(), sy * window.getHeight());
-        return this;
-    }
-
-    public Ortho scaleScale(float sx, float sy) {
-        surface.scaleLocal.scale(sx * window.getWidth(), sy * window.getHeight());
+        surface.scale(sx, sy);
         return this;
     }
 
@@ -68,7 +65,7 @@ public class Ortho implements WindowListener, KeyListener, MouseListener {
     }
 
     public void render(GL2 gl) {
-        surface.render(gl);
+        surface.render(gl, v(1,1));
     }
 
     /**

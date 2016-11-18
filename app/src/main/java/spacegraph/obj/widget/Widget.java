@@ -15,6 +15,7 @@ import spacegraph.render.Draw;
 import static nars.gui.Vis.stacking;
 import static spacegraph.obj.layout.Grid.col;
 import static spacegraph.obj.layout.Grid.grid;
+import static spacegraph.obj.layout.Grid.row;
 
 /**
  * Base class for GUI widgets, similarly designed to JComponent
@@ -42,7 +43,7 @@ public abstract class Widget extends Stacking {
 
 
     @Override
-    protected final void paint(GL2 gl) {
+    protected void paint(GL2 gl) {
 
         if (touchedBy != null) {
             gl.glColor3f(1f, 1f, 0f);
@@ -86,7 +87,7 @@ public abstract class Widget extends Stacking {
 
         SpaceGraph.window(widgetDemo(), 800, 600);
 
-        SpaceGraph dd = SpaceGraph.window(new Cuboid(widgetDemo(), 16, 8f).color(0.5f, 0.5f, 0.5f, 0.25f), 1000, 1000);
+        //SpaceGraph dd = SpaceGraph.window(new Cuboid(widgetDemo(), 16, 8f).color(0.5f, 0.5f, 0.5f, 0.25f), 1000, 1000);
 
 //        SpaceGraph.window(col(
 //                new Slider(0.5f, 0, 1).on((s,v)->{
@@ -102,13 +103,31 @@ public abstract class Widget extends Stacking {
 
     }
 
+    public static class ScaleDebugLabel extends Label {
+
+        public ScaleDebugLabel() {
+            super();
+        }
+
+        @Override
+        public void paint(GL2 gl) {
+            set(scaleLocal.toString());
+            super.paint(gl);
+        }
+    }
+
     public static Surface widgetDemo() {
         return grid(
                     new Slider(.25f, 0 /* pause */, 1),
                     col(new CheckBox("ABC"),new CheckBox("XYZ")),
+                        grid(new ScaleDebugLabel(), new ScaleDebugLabel(),
+                                row(new ScaleDebugLabel(), new ScaleDebugLabel()),
+                                col(new ScaleDebugLabel(), new ScaleDebugLabel())
+                        ),
                         new PushButton("clickMe()", (p) -> {
                             p.setText(Texts.n2(Math.random()));
                     }),
+
                     new XYSlider(),
                     new DummyConsole()
             );

@@ -13,6 +13,7 @@ import nars.term.Term;
 import nars.term.Termed;
 import nars.term.atom.Atomic;
 import nars.test.DeductiveMeshTest;
+import nars.util.TriConsumer;
 import nars.util.list.FasterList;
 import nars.util.event.On;
 import org.eclipse.collections.api.tuple.Pair;
@@ -32,10 +33,6 @@ import java.util.function.Consumer;
 public class NARSpace<X, Y extends Spatial<X>> extends ListSpace<X, Y> {
 
     public static final @NotNull Atomic L = $.the("_l");
-
-    public interface TriConsumer<A,B,C> {
-        void accept(A a, B b, C c);
-    }
 
     private final TriConsumer<NAR, SpaceGraph<X>, List<Y>> collect;
     private On on;

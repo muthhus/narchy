@@ -57,7 +57,7 @@ public class ZoomOrtho extends Ortho {
         super.mouseWheelMoved(e);
 
         //when wheel rotated on negative (empty) space, adjust scale
-        if (mouse.touching == null) {
+        //if (mouse.touching == null) {
             //System.out.println(Arrays.toString(e.getRotation()) + " " + e.getRotationScale());
             float zoomMult = 1f + -e.getRotation()[1] * zoomRate;
             v2 s = scale();
@@ -71,9 +71,18 @@ public class ZoomOrtho extends Ortho {
                 float dsx = sx - psx;
                 float dsy = sy - psy;
                 s.set(sx, sy);
-                move(-dsx/2f, -dsy/2f); //keep centered
+
+                float epx, epy;
+                if (zoomMult > 1f) {
+                    epx = -psx / 4f * ((float) e.getX() / wx - 0.5f);
+                    epy = psy / 4f * ((float) e.getY() / wy - 0.5f);
+                } else {
+                    //TODO calculate correctly based on viewed center
+                    epx = epy = 0; //zoom out from center
+                }
+                move(-dsx/2f + epx, -dsy/2f + epy); //centered on mouse
             }
-        }
+        //}
     }
 
 }

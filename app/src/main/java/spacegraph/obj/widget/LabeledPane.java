@@ -6,10 +6,7 @@ import spacegraph.obj.layout.VSplit;
 public class LabeledPane extends VSplit {
 
     public LabeledPane(String title, Surface content) {
-        super(new Label(title), content, 0.9f);
+        super(new Label(title), content, 0.1f);
     }
 
-    public static LabeledPane of(String title, Surface content) {
-        return new LabeledPane(title, content);
-    }
 }

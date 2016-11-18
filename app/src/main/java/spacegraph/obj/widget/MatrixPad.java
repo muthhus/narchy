@@ -38,7 +38,8 @@ public class MatrixPad extends Layout {
     }
 
     @Override
-    protected void layout() {
+    public void layout() {
+
         float sx = 1f/w;
         float sy = 1f/h;
         for (int x = 0; x < w; x++) {

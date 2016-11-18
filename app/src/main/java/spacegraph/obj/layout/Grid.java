@@ -1,11 +1,15 @@
 package spacegraph.obj.layout;
 
 import com.google.common.collect.Iterables;
+import com.jogamp.opengl.GL2;
+import nars.util.Util;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import spacegraph.Surface;
 
 import java.util.Collection;
 import java.util.List;
+
+import static nars.util.Util.lerp;
 
 /** TODO parameterize DX/DY to choose between row, column, or grid of arbitrary aspect ratio
        aspect ratio=0: row (x)
@@ -19,6 +23,8 @@ public class Grid extends Layout {
     public static final float HORIZONTAL = 0f;
     public static final float VERTICAL = Float.POSITIVE_INFINITY;
     public static final float SQUARE = 0.5f;
+
+    float margin = 0.05f;
 
     public Grid(Surface... children) {
         this(SQUARE, children);
@@ -40,10 +46,28 @@ public class Grid extends Layout {
         setChildren(children);
     }
 
+    /** previous scale */
+    float lw, lh;
+    @Override
+    protected void paint(GL2 gl) {
+        if (isGrid() && (lw!=scaleLocal.x || lh!=scaleLocal.y) ) {
 
+            layout();
+
+        }
+        super.paint(gl);
+    }
+
+    public boolean isGrid() {
+        float a = aspect.floatValue();
+        return a!=0 && a!=Float.POSITIVE_INFINITY;
+    }
 
     @Override
     public void layout() {
+
+        lw = scaleLocal.x;
+        lh = scaleLocal.y;
 
         int n = children.size();
         if (n == 0)
@@ -54,16 +78,31 @@ public class Grid extends Layout {
         if ((n < 3) && !((a==0) || (a == Float.POSITIVE_INFINITY)))
             a = 0; //use linear layout for small n
 
-        float margin = 0.05f;
 
         if (a == 0) {
             layoutLinear(1f/n, 0f, margin);
         } else if (!Float.isFinite(a)) {
             layoutLinear(0f, 1f/n, margin);
         } else {
-            //HACK: pretends a = 0.5f;
-            int x = (int)Math.max(1, Math.ceil(Math.sqrt(n)));
+
+            //determine the ideal rows and columns of the grid to match the visible aspect ratio
+            //in a way that keeps each grid cell as close to 1:1 as possible
+
+            float actualAspect = lh/lw;
+
+            int x;
+            int s = (int)Math.sqrt(n);
+            if (actualAspect > 1f) {
+                x = lerp(1, s, (actualAspect-1f)/s );
+            } else if (actualAspect < 1f) {
+                x = lerp(s, 1, (actualAspect)/s );
+            } else {
+                x = s;
+            }
+
+            x = Math.max(1, x);
             int y = (int)Math.max(1, Math.ceil((float)n / x));
+
             layoutGrid(x, y, margin);
         }
     }
@@ -72,7 +111,8 @@ public class Grid extends Layout {
         int i = 0;
         float content = 1f - margin;
 
-        float px, py = margin/2f;
+        float px;
+        float py = margin/2;
         float dx = 1f/nx;
         float dxc = dx * content;
         float dy = 1f/ny;
@@ -80,7 +120,7 @@ public class Grid extends Layout {
         int n = children.size();
         //System.out.println(nx + " " + ny + " x " + dx + " " + dy);
 
-        for (int y = 0; y < ny; y++) {
+        for (int y = ny-1; y >=0; y--) {
 
             px = margin/2f;
 
@@ -90,7 +130,9 @@ public class Grid extends Layout {
                 Surface c = children.get(i);
 
                 c.translateLocal.set(px, py, 0);
-                c.scaleLocal.set(dxc, dyc);
+                c.scale(dxc, dyc);
+                c.layout();
+
                 px += dx;
 
                 i++;
@@ -113,7 +155,7 @@ public class Grid extends Layout {
         for (int i = 0; i < n; i++) {
             Surface c = children.get(i);
             c.translateLocal.set(x, y, 0);
-            c.scaleLocal.set(dxc, dyc);
+            c.scale(dxc, dyc);
             x += dx;
             y += dy;
         }
