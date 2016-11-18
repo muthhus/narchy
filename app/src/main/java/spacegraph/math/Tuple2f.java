@@ -251,9 +251,10 @@ public abstract class Tuple2f implements java.io.Serializable, Cloneable {
      *
      * @param s the scalar value
      */
-    public final void scale(float s) {
+    public final Tuple2f scale(float s) {
         this.x *= s;
         this.y *= s;
+        return this;
     }
 
     /** multiplies each component */

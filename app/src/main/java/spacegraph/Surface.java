@@ -154,10 +154,10 @@ public class Surface {
         List<? extends Surface> cc = this.children;
         if (cc != null) {
             v2 global = new v2();
+            global.set(scaleLocal);
+            global.scale(globalScale);
             for (int i = 0, childrenSize = cc.size(); i < childrenSize; i++) {
                 Surface child = cc.get(i);
-                global.set(scaleLocal);
-                global.scale(child.scaleLocal);
                 child.render(gl, global);
             }
         }

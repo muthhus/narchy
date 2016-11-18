@@ -5,6 +5,7 @@ import com.jogamp.opengl.GL2;
 import nars.util.Util;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import spacegraph.Surface;
+import spacegraph.math.v2;
 
 import java.util.Collection;
 import java.util.List;
@@ -46,15 +47,25 @@ public class Grid extends Layout {
         setChildren(children);
     }
 
+    @Override
+    public void transform(GL2 gl, v2 globalScale) {
+        super.transform(gl, globalScale);
+
+        float xx = scaleLocal.x * globalScale.x;
+        float yy = scaleLocal.y * globalScale.y;
+        if (isGrid() && (lw!= xx || lh!= yy) ) {
+
+            layout();
+            lw = xx;
+            lh = yy;
+
+        }
+    }
+
     /** previous scale */
     float lw, lh;
     @Override
     protected void paint(GL2 gl) {
-        if (isGrid() && (lw!=scaleLocal.x || lh!=scaleLocal.y) ) {
-
-            layout();
-
-        }
         super.paint(gl);
     }
 
@@ -66,13 +77,9 @@ public class Grid extends Layout {
     @Override
     public void layout() {
 
-        lw = scaleLocal.x;
-        lh = scaleLocal.y;
-
         int n = children.size();
         if (n == 0)
             return;
-
 
         float a = aspect.floatValue();
         if ((n < 3) && !((a==0) || (a == Float.POSITIVE_INFINITY)))

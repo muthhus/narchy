@@ -155,13 +155,14 @@ public class v2 extends Tuple2f implements java.io.Serializable {
     /**
      * Normalizes this vector in place.
      */  
-    public final void normalize()
+    public final v2 normalize()
     {
 
         float norm = (float)
                 (1.0 / Math.sqrt(this.x * this.x + this.y * this.y));
         this.x *= norm;
         this.y *= norm;
+        return this;
     }
 
 
