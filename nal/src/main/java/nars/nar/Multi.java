@@ -8,7 +8,7 @@ import nars.index.term.tree.TreeTermIndex;
 import nars.nar.exe.SingleThreadExecutioner;
 import nars.nar.util.DefaultConceptBuilder;
 import nars.time.Time;
-import nars.time.RealtimeTime;
+import nars.time.RealTime;
 import nars.util.data.random.XorShift128PlusRandom;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -41,7 +41,7 @@ public class Multi {
     }
 
     public Multi(int numCores, @NotNull ConnectivityFunction conn /*, TermIndex index, Clock c*/) {
-        Time time = new RealtimeTime.DS(true);
+        Time time = new RealTime.DS(true);
 
         TermIndex index = new TreeTermIndex.L1TreeIndex(new DefaultConceptBuilder(), 1024 * 1024, 8192, numCores);
 

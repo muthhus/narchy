@@ -37,10 +37,11 @@ public class Surface {
 
     public final v3 translateLocal;
     public final v2 scaleLocal;
-    public final v2 scaleGlobal = v(Float.NaN, Float.NaN);
 
     public Surface parent;
     volatile public List<Surface> children;
+
+    /** not used unless aspect ratio is set to non-NaN value */
     Align align = Align.Center;
 
     /** height/width target aspect ratio; if aspect is NaN, no adjustment applied */
@@ -139,8 +140,6 @@ public class Surface {
     }
 
     public final void render(GL2 gl, v2 globalScale) {
-
-        scaleGlobal.set(globalScale);
 
         gl.glPushMatrix();
 

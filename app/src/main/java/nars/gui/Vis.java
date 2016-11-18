@@ -27,7 +27,6 @@ import spacegraph.obj.layout.Stacking;
 import spacegraph.obj.widget.Label;
 import spacegraph.obj.widget.LabeledPane;
 import spacegraph.obj.widget.Plot2D;
-import spacegraph.obj.widget.Slider;
 import spacegraph.render.Draw;
 
 import java.util.List;
@@ -92,15 +91,11 @@ public class Vis {
     public static void show(Default d, int count) {
 
         SpaceGraph<VirtualTerminal> s = new SpaceGraph<>();
-        s.add(new Ortho(grid(
+        SpaceGraph.window(grid(
                 concepts(d, count),
                 budgetHistogram(d, 16),
                 emotionPlots(d, 256)
-        )).maximize());
-        s.add(new Ortho(new CrosshairSurface(s)));
-
-
-        s.show(1400, 800);
+        ),1400, 800);
 
 
     }

@@ -19,7 +19,7 @@ import nars.term.Term;
 import nars.term.atom.Atom;
 import nars.term.atom.Atomic;
 import nars.term.var.Variable;
-import nars.time.RealtimeTime;
+import nars.time.RealTime;
 import nars.time.Tense;
 import nars.util.Loop;
 import nars.util.Wiki;
@@ -404,7 +404,7 @@ public class IRCAgent extends IRC {
                 //new CaffeineIndex(new DefaultConceptBuilder(random), 10000000, false, exe),
                 new TreeTermIndex.L1TreeIndex(new DefaultConceptBuilder(), 400000, 64 * 1024, 3),
 
-                new RealtimeTime.MS(true),
+                new RealTime.MS(true),
                 exe
         );
 

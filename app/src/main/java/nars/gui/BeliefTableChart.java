@@ -330,36 +330,70 @@ public class BeliefTableChart extends Surface {
     }
 
     private void renderWave(float nowX, long minT, long maxT, GL2 gl, TruthWave wave, boolean beliefOrGoal) {
-        wave.forEach((freq, conf, start, end, qua) -> {
+        wave.forEach((freq, conf, s, e, qua, dur) -> {
 
-            boolean eternal = (start != start);
+            boolean eternal = (s != s);
             float pw = baseTaskSize / 4f;// + gew / (1f / conf) / 4f;//10 + 10 * conf;
             float ph = baseTaskSize + conf * baseTaskSize;// + geh / (1f / conf) / 4f;//10 + 10 * conf;
 
+            float start, end, startD, endD;
             if (showEternal && eternal) {
                 start = end = nowX;
-            } else if (((end <= maxT) && (end >= minT)) || ((start >= minT) && (start <= maxT))) {
-                start = xTime(minT, maxT, Math.min(maxT, Math.max(minT, start)));
-                end = xTime(minT, maxT, Math.max(minT, Math.min(maxT, end)));
+                startD = endD = Float.NaN;
+            } else if (((e <= maxT) && (e >= minT)) || ((s >= minT) && (s <= maxT))) {
+                start = xTime(minT, maxT, s);
+                startD = xTime(minT, maxT, s-dur);
+                end = xTime(minT, maxT, e);
+                endD = xTime(minT, maxT, e+dur);
             } else {
                 return;
             }
 
+
+
             //r.renderTask(gl, qua, conf, pw, ph, xStart, xEnd, freq);
 
-            if (beliefOrGoal)
-                gl.glColor4f(0.75f, 0.25f, 0f, 0.2f + conf * 0.5f); //, 0.7f + 0.2f * q);
-            else
-                gl.glColor4f(0f, 0.75f, 0.25f, 0.2f + conf * 0.5f); //, 0.7f + 0.2f * q);
+            float alpha = 0.2f + conf * 0.5f;
+            float r, g, b;
+            if (beliefOrGoal) {
+                r = 0.75f;
+                g = 0.25f;
+                b = 0;
 
-            float mid = (end + start) / 2f;
-            float W = Math.max((end - start), pw);
+            } else {
+                r = 0;
+                g = 0.75f;
+                b = 0.25f;
+            }
 
-            float x = mid - W / 2;
-            float y = freq - ph / 2;
-            Draw.rect(gl,
-                    x, y,
-                    W, ph);
+
+
+
+            //draw shadow to indicate duration
+            if (!eternal) {
+                float mid = (endD + startD) / 2f;
+                float W = Math.max((endD - startD), pw);
+                float x = mid - W / 2;
+                float phh = ph / 2f;
+                float y = freq - phh / 2;
+                gl.glColor4f(r, g, b, alpha/2f); //, 0.7f + 0.2f * q);
+                Draw.rect(gl,
+                        x, y,
+                        W, phh);
+            }
+
+            {
+                float mid = (end + start) / 2f;
+                float W = Math.max((end - start), pw);
+                float x = mid - W / 2;
+                float y = freq - ph / 2;
+                gl.glColor4f(r, g, b, alpha); //, 0.7f + 0.2f * q);
+                Draw.rect(gl,
+                        x, y,
+                        W, ph);
+            }
+
+
         });
     }
 
@@ -368,7 +402,7 @@ public class BeliefTableChart extends Surface {
         gl.glLineWidth(2.0f);
         gl.glBegin(GL2.GL_LINE_STRIP);
 
-        wave.forEach((freq, conf, start, end, qua) -> {
+        wave.forEach((freq, conf, start, end, qua, dur) -> {
 
             boolean eternal = (start != start);
             float x;
@@ -440,8 +474,8 @@ public class BeliefTableChart extends Surface {
 
 
     private static float xTime(float minT, float maxT, float o) {
-        float p = (minT == maxT) ? 0.5f : (o - minT) / (maxT - minT);
-        return p;
+        if (minT == maxT) return 0.5f;
+        return (Math.min(maxT, Math.max(minT,o)) - minT) / (maxT - minT);
     }
 
 

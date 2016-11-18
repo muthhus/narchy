@@ -1,41 +1,36 @@
 package spacegraph.obj.widget;
 
 import com.jogamp.opengl.GL2;
+import nars.util.Texts;
+import nars.util.Util;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.Nullable;
-import spacegraph.Ortho;
 import spacegraph.SpaceGraph;
 import spacegraph.math.v2;
-import spacegraph.obj.CrosshairSurface;
-import spacegraph.obj.Cuboid;
-import spacegraph.obj.layout.Grid;
 import spacegraph.render.Draw;
 
 import static spacegraph.obj.layout.Grid.col;
 import static spacegraph.obj.layout.Grid.grid;
 
 /**
- * Generic 1D slider/scrollbar
+ * abstract 1D slider/scrollbar
  */
-public class Slider extends Widget {
+public class BaseSlider extends Widget {
 
-    public final MutableFloat value;
 
     @Nullable SliderChange change = null;
+    private float p;
 
     public interface SliderChange {
-        void onChange(Slider s, float value);
+        void onChange(BaseSlider s, float value);
     }
 
-    public Slider(float v) {
-        this(new MutableFloat(v));
+    public BaseSlider(float p) {
+        this.p = p;
     }
 
-    public Slider(MutableFloat value) {
-        this.value = value;
-    }
 
-    public Slider on(SliderChange c) {
+    public BaseSlider on(SliderChange c) {
         this.change = c;
         return this;
     }
@@ -44,7 +39,7 @@ public class Slider extends Widget {
     protected void paintComponent(GL2 gl) {
 
 
-        float p = value();
+
         //float margin = 0.1f;
         //float mh = margin / 2.0f;
 
@@ -56,6 +51,8 @@ public class Slider extends Widget {
         //ShapeDrawer.strokeRect(gl, 0, 0, W, H);
 
         //double hp = 0.5 + 0.5 * p;
+
+        float p = this.p;
         gl.glColor4f(1f - p, p, 0f, 0.8f);
         //g1.setFill(Color.ORANGE.deriveColor(70 * (p - 0.5), hp, 0.65f, 1.0f));
 
@@ -71,22 +68,41 @@ public class Slider extends Widget {
         if (leftButton(buttons)) {
             //System.out.println(this + " touched " + hitPoint + " " + Arrays.toString(buttons));
 
-            set(r(value(hitPoint)));
+            _set(p(hitPoint));
 
             return true;
         }
         return true;
     }
 
-    public void set(float v) {
-        float x = value();
-        if (x != v) {
-            value.setValue(v);
+    public void _set(float p) {
+        float current = this.p;
+        if (current != p) {
+            this.p = p;
             if (change!=null)
-                change.onChange(this, v);
+                change.onChange(this, value());
         }
     }
 
+    public float value() {
+        return v(p);
+    }
+
+    public void value(float v) {
+        this.p = p(v);
+    }
+
+    /** normalize: gets the output value given the proportion (0..1.0) */
+    protected float v(float p) {
+        return p;
+    }
+
+    /**
+     * unnormalize: gets proportion from external value
+     */
+    protected float p(float v) {
+        return v;
+    }
 
     //    public static void main(String[] args) {
 //        new GraphSpace<Surface>(
@@ -103,42 +119,16 @@ public class Slider extends Widget {
                 grid(
                     new XYSlider(), new XYSlider(), new XYSlider(),
                     col(
-                        new Slider(0.75f),
-                        new Slider(0.25f),
-                        new Slider(0.5f)
+                        new BaseSlider(0.75f),
+                        new BaseSlider(0.25f),
+                        new BaseSlider(0.5f)
                     )
                 )
         , 800, 800 );
     }
 
-    private float value(v2 hitPoint) {
+    private float p(v2 hitPoint) {
         return hitPoint.x; //TODO interpret point coordinates according to the current drawn model, which could be a knob etc
-    }
-
-    public float value() {
-        return value.floatValue();
-    }
-
-
-//    /**
-//     * normalizesa a value to the specified numeric bounds
-//     */
-//    public final float p(float v) {
-//        float min = this.min.floatValue();
-//        float max = this.max.floatValue();
-//        return (v - min) / (max - min);
-//    }
-
-    /**
-     * unnormalize
-     */
-    public final float r(float u) {
-        float mn = 0;
-        float mx = 1f;
-        float v = (u) * (mx - mn) + mn;
-        if (v < mn) v = mn; //clip to bounds
-        if (v > mx) v = mx;
-        return v;
     }
 
 

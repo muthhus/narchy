@@ -26,4 +26,9 @@ public interface Time extends Serializable {
 
 	long elapsed();
 
+	/** the default duration applied to input tasks that do not specify one */
+	default float dur() {
+		return 1f;
+	}
+
 }

@@ -21,7 +21,6 @@ import java.util.Arrays;
 import java.util.Objects;
 
 import static nars.$.t;
-import static nars.time.Tense.DTERNAL;
 import static nars.time.Tense.ETERNAL;
 import static nars.truth.TruthFunctions.w2c;
 
@@ -55,6 +54,8 @@ public abstract class AbstractTask extends RawBudget implements Task, Temporal {
 
     private long creation = Tense.TIMELESS;
     private long occurrence = ETERNAL;
+
+    protected float dur = Float.NaN;
 
 //    /** Array of tasks from which the Task is derived, or null if input
 //     *
@@ -234,6 +235,11 @@ public abstract class AbstractTask extends RawBudget implements Task, Temporal {
         //finally, assign a unique stamp if none specified (input)
         if (evidence.length == 0)
             setEvidence(nar.time.nextStamp());
+
+        if (dur!=dur) {
+            //assign default duration from NAR
+            dur = nar.time.dur();
+        }
 
             //shift the occurrence time if input and dt < 0 and non-eternal HACK dont use log it may be removed without warning
 //        if (isInput()) {
@@ -532,41 +538,37 @@ public abstract class AbstractTask extends RawBudget implements Task, Temporal {
         }
     }
 
-    @Nullable @Override
-    public Truth truth(long when) {
-        if (!isBeliefOrGoal())
-            return null;
 
+    @Nullable @Override
+    public float confWeight(long when) {
+        if (!isBeliefOrGoal())
+            throw new UnsupportedOperationException();
 
         long a = start();
 
         Truth t = truth();
+        float cw = t.confWeight();
         if (a == ETERNAL)
-            return t;
+            return cw;
         else if (when == ETERNAL)// || when == now) && o == when) //optimization: if at the current time and when
-            return t.eternalize();
+            return t.eternalizedConf();
         else {
             long z = end();
 
             if (z < a) { long x = a; a = z; z = x; } //order a..z
             if ((when >= a) && (when <= z)) {
-                return t;
+                return cw;
             } else {
                 long nearest; //nearest endpoint of the interval
-                if (when < a) nearest = a;
+                if (when <= a) nearest = a;
                 else /*if (when > z)*/ nearest = z;
                 long delta = Math.abs(nearest - when);
 
-                float dur =
-                        1f;
-                //1f + (z - a)/2f;
-                return $.t(t.freq(),
-                        //Math.max(
-                        w2c(TruthPolation.evidenceDecay(t.confWeight(), dur, delta))
-                        //    t.eternalizedConf()
-                        //)
-                );
+                float dur = dur();
+                if (dur!=dur)
+                    throw new RuntimeException("NaN duration");
 
+                return TruthPolation.evidenceDecay(cw, dur, delta);
 
             }
 
@@ -581,14 +583,18 @@ public abstract class AbstractTask extends RawBudget implements Task, Temporal {
 
     /** end occurrence */
     @Override public long end() {
-        long dt = 0;
-        if (op().temporal) {
-            dt=dt();
-            if (dt==DTERNAL)
-                dt = 0;
-        }
-        return occurrence()+dt;
+        return occurrence();
+//        long dt = 0;
+//        if (op().temporal) {
+//            dt=dt();
+//            if (dt==DTERNAL)
+//                dt = 0;
+//        }
+//        return occurrence()+dt;
     }
 
-
+    @Override
+    public float dur() {
+        return dur;
+    }
 }

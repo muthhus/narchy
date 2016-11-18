@@ -116,7 +116,7 @@ public abstract class Widget extends Stacking {
 
     public static Surface widgetDemo() {
         return grid(
-                    new Slider(.25f  /* pause */),
+                    new BaseSlider(.25f  /* pause */),
                     col(new CheckBox("ABC"),new CheckBox("XYZ")),
                         grid(new ScaleDebugLabel(), new ScaleDebugLabel(),
                                 row(new ScaleDebugLabel(), new ScaleDebugLabel()),

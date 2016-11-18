@@ -28,7 +28,8 @@ public class PacmanAgent extends NAgents {
 //        senseNumber("(ball,vx)", ()-> game.ball.velocityX);
 //        senseNumber("(ball,vy)", ()-> game.ball.velocityY);
 //
-        addCameraRetina("game", game, visW, visH);
+        addCamera("game", game, visW, visH);
+        //addCameraRetina("game", game, visW, visH);
 
         float THRESH = 0.25f;
         actionBipolar("(updown)", (f) -> {
@@ -80,7 +81,7 @@ public class PacmanAgent extends NAgents {
     }
 
     public static void main(String[] args) {
-        runRT(PacmanAgent::new);
+        runRT(PacmanAgent::new, 5);
         //runRT(PacmanAgent::new);
     }
 

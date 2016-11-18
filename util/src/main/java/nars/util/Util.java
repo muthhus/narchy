@@ -1294,10 +1294,10 @@ public enum Util { ;
     }
 
 
-    public static float clamp(float i, float min, float max) {
-        if (i < min) i = min;
-        if (i > max) i = max;
-        return i;
+    public static float clamp(float f, float min, float max) {
+        if (f < min) f = min;
+        if (f > max) f = max;
+        return f;
     }
 
 

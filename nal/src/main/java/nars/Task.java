@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.util.List;
 
 import static nars.time.Tense.ETERNAL;
+import static nars.truth.TruthFunctions.w2c;
 
 /**
  * A task to be processed, consists of a Sentence and a BudgetValue.
@@ -91,15 +92,17 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
      * otherwise returns null
      */
     @Nullable
-    static boolean taskContentValid(@NotNull Compound t, char punc, @NotNull NAR nar, boolean safe) {
+    static boolean taskContentValid(@NotNull Compound t, char punc, @Nullable NAR nar, boolean safe) {
 
 
         if (!t.isNormalized())
             return test(t, "Task Term is null or not a normalized Compound", safe);
-        if (t.volume() > nar.compoundVolumeMax.intValue())
-            return test(t, "Term exceeds maximum volume", safe);
-        if (!t.levelValid(nar.level()))
-            return test(t, "Term exceeds maximum NAL level", safe);
+        if (nar!=null) {
+            if (t.volume() > nar.compoundVolumeMax.intValue())
+                return test(t, "Term exceeds maximum volume", safe);
+            if (!t.levelValid(nar.level()))
+                return test(t, "Term exceeds maximum NAL level", safe);
+        }
 
         /* A statement sentence is not allowed to have a independent variable as subj or pred"); */
         Op op = t.op();
@@ -709,25 +712,38 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
         return LongSets.immutable.of(evidence());
     }
 
-    @Nullable Truth truth(long when);
 
     default float conf(long when) {
-        Truth t = truth(when);
-        return t!=null ? t.conf() : 0;
+        float cw = confWeight(when);
+        return cw == cw ? w2c(cw) : Float.NaN;
     }
-    default float freq(long when) {
-        Truth t = truth(when);
-        return t!=null ? t.freq() : Float.NaN;
+
+
+    @Nullable default Truth truth(long when) {
+        float cw = confWeight(when);
+        if (cw==cw && cw > 0) {
+
+            return $.t(freq(),
+                    //Math.max(
+                    w2c(cw)
+                    //    t.eternalizedConf()
+                    //)
+            );
+        } else {
+            return null;
+        }
+
     }
-    default float confWeight(long when) {
-        Truth t = truth(when);
-        return t!=null ? t.confWeight() : 0;
-    }
+
+    /**
+     * @param when time
+     * @return value >= 0 indicating the evidence
+     */
+    float confWeight(long when);
 
     long start();
     long end();
 
-    default long dur() {
-        return Math.abs(end() - start());
-    }
+    /** duration time constant in which evidence diminishes at a time before start() and after end() */
+    float dur();
 }

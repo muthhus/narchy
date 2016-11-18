@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Random;
 
+import static nars.term.Terms.compoundOrNull;
 import static nars.time.Tense.DTERNAL;
 import static nars.time.Tense.ETERNAL;
 import static nars.truth.TruthFunctions.*;
@@ -155,8 +156,8 @@ public class Revision {
         Random rng = new XorShift128PlusRandom(Util.hashCombine(a.hashCode(), b.hashCode()) << 32 + Util.hashCombine((int) when, (int) now) * 31 + newTruth.hashCode());
 
         MutableFloat accumulatedDifference = new MutableFloat(0);
-        Term cc = intermpolate(a.term(), b.term(), aProp, accumulatedDifference, 1f, rng);
-        if (!(cc instanceof Compound))
+        Compound cc = compoundOrNull( intermpolate(a.term(), b.term(), aProp, accumulatedDifference, 1f, rng) );
+        if (cc == null)
             return null;
 
         //get a stamp collecting all evidence from the table, since it all contributes to the result
@@ -165,6 +166,9 @@ public class Revision {
 
         long[] evidence = Stamp.zip(a.evidence(), b.evidence(), aProp);
 
+        if (!Task.taskContentValid(cc, a.punc(), null, true))
+            return null;
+
         RevisionTask t = new RevisionTask(cc, a.punc(),
                 newTruth,
                 now, when,
@@ -172,6 +176,7 @@ public class Revision {
         );
 
         t.budget(a, b, aProp);
+        t.dur( lerp(a.dur(), b.dur(), aw/(aw+bw)) );
 
         if (Param.REVECTION_PRIORITY_ZERO)
             t.setPriority(0);

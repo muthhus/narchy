@@ -23,7 +23,6 @@ import static nars.truth.TruthFunctions.w2c;
  */
 public class MutableTask extends AbstractTask {
 
-
     @Nullable
     private List log;
 
@@ -56,7 +55,10 @@ public class MutableTask extends AbstractTask {
     }
 
 
-
+    public MutableTask dur(float newDur) {
+        this.dur = newDur;
+        return this;
+    }
 
     @NotNull
     public final MutableTask truth(float freq, float conf) {

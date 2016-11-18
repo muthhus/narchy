@@ -33,6 +33,7 @@ import org.jetbrains.annotations.Nullable;
 import java.io.IOException;
 import java.util.Comparator;
 
+import static nars.truth.TruthFunctions.c2w;
 import static nars.truth.TruthFunctions.w2c;
 
 
@@ -291,6 +292,10 @@ public interface Truth extends Truthed {
 
     default float eternalizedConf() {
         return TruthFunctions.eternalize(conf());
+    }
+    default float eternalizedConfWeight() {
+        //TODO does this simplify?
+        return c2w(TruthFunctions.eternalize(conf()));
     }
 
     @Nullable

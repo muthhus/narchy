@@ -16,20 +16,18 @@ import nars.op.mental.Inperience;
 import nars.op.time.MySTMClustered;
 import nars.time.Time;
 import nars.time.FrameTime;
-import nars.time.RealtimeTime;
+import nars.time.RealTime;
 import nars.truth.Truth;
 import nars.util.TaskStatistics;
+import nars.util.data.FloatParam;
 import nars.util.data.random.XorShift128PlusRandom;
 import nars.video.*;
 import objenome.O;
-import org.apache.commons.lang3.mutable.MutableFloat;
 import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunction;
 import spacegraph.SpaceGraph;
 import spacegraph.Surface;
 import spacegraph.obj.layout.Grid;
-import spacegraph.obj.widget.Label;
-import spacegraph.obj.widget.PushButton;
-import spacegraph.obj.widget.Slider;
+import spacegraph.obj.widget.FloatSlider;
 
 import java.awt.Container;
 import java.awt.image.BufferedImage;
@@ -86,18 +84,20 @@ abstract public class NAgents extends NAgent {
     }
 
     public static void runRT(Function<NAR, NAgents> init) {
+        runRT(init, 20);
+    }
 
+    public static void runRT(Function<NAR, NAgents> init, float fps) {
 
-
-        //Default nar = NAgents.newMultiThreadNAR(3, new RealtimeClock.DS(true).setDuration(0.04f), false);
+        Default nar = NAgents.newMultiThreadNAR(3, new RealTime.CS(true).dur(2/fps), false);
         //Default nar = newNAR();
-        Alann nar = newAlann();
+        //Alann nar = newAlann();
 
         NAgents a = init.apply(nar);
         a.trace = true;
         chart(a);
 
-        a.runRT(20).join();
+        a.runRT(fps).join();
 
     }
 
@@ -108,7 +108,7 @@ abstract public class NAgents extends NAgent {
     }
 
     public static Alann newAlann() {
-        Alann nar = new Alann(new RealtimeTime.DS(true));
+        Alann nar = new Alann(new RealTime.DS(true));
 
         MySTMClustered stm = new MySTMClustered(nar, 128, '.', 3, true, 6);
         MySTMClustered stmGoal = new MySTMClustered(nar, 32, '!', 2, true, 4);
@@ -153,8 +153,8 @@ abstract public class NAgents extends NAgent {
                 //new SingleThreadExecutioner();
                 new MultiThreadExecutioner(threads, 8192 /* TODO chose a power of 2 number to scale proportionally to # of threads */);
 
-        int volMax = 48;
-        int conceptsPerCycle = 256;
+        int volMax = 40;
+        int conceptsPerCycle = 128;
 
 
         //Multi nar = new Multi(3,512,
@@ -293,6 +293,21 @@ abstract public class NAgents extends NAgent {
                                 2000)*/
                 ), 1200, 900);
     }
+    public static void chart(NAgent a) {
+        NAR nar = a.nar;
+        window(
+                row(
+                        new ReflectionSurface(a),
+                        //nar instanceof Default ? Vis.concepts((Default) nar, 128) : grid(/*blank*/),
+
+                        Vis.agentActions(a, 400)
+
+                        //Vis.budgetHistogram(nar, 32),
+                        /*Vis.conceptLinePlot(nar,
+                                Iterables.concat(a.actions, Lists.newArrayList(a.happy, a.joy)),
+                                2000)*/
+                ), 1200, 900);
+    }
 
     /**
      * pixelTruth defaults to linear monochrome brightness -> frequency
@@ -354,11 +369,13 @@ abstract public class NAgents extends NAgent {
             List<Surface> l = $.newArrayList();
             O.in(x).fields((k,c,v) -> {
 
-                if (c == MutableFloat.class) {
-                    l.add(col( new Label(k), new Slider(0.5f) ));
-                } else {
-                    l.add(new PushButton(k));
+                if (c == FloatParam.class) {
+                    FloatParam f = v.get();
+                    l.add(col(Vis.label(k), new FloatSlider(f) ));
                 }
+                /*else {
+                    l.add(new PushButton(k));
+                }*/
             });
             setChildren(l);
         }

@@ -10,7 +10,7 @@ import nars.NAR;
 import nars.guifx.chart.Plot2D;
 import nars.guifx.util.NSlider;
 import nars.rdfowl.NQuadsRDF;
-import nars.time.RealtimeTime;
+import nars.time.RealTime;
 import nars.util.Texts;
 import nars.util.event.Active;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
@@ -183,7 +183,7 @@ public class NARMenu extends HBox {
 
     public static class RTClockPane extends CycleClockPane {
 
-        private final RealtimeTime.MS clock;
+        private final RealTime.MS clock;
         private final TextField clockTextField;
         private final Plot2D busyPlot;
         final long startTime;
@@ -196,7 +196,7 @@ public class NARMenu extends HBox {
             super(nar);
 
 
-            this.clock = (RealtimeTime.MS) nar.time;
+            this.clock = (RealTime.MS) nar.time;
             this.startTime = nar.time();
 
             clockTextField = new TextField();

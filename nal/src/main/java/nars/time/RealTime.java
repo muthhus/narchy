@@ -8,7 +8,7 @@ import java.util.concurrent.atomic.AtomicLong;
 /**
  * Created by me on 7/2/15.
  */
-public abstract class RealtimeTime implements Time {
+public abstract class RealTime implements Time {
 
 
 
@@ -18,10 +18,10 @@ public abstract class RealtimeTime implements Time {
 
     long seed = Math.abs(UUID.randomUUID().getLeastSignificantBits() ) & 0xffff0000;
     final AtomicLong nextStamp = new AtomicLong(1);
+    private float dur;
 
 
-
-    protected RealtimeTime(int unitsPerSecond, boolean relativeToStart) {
+    protected RealTime(int unitsPerSecond, boolean relativeToStart) {
         super();
         this.unitsPerSecod = unitsPerSecond;
         this.start = relativeToStart ? getRealTime() : 0L;
@@ -88,8 +88,18 @@ public abstract class RealtimeTime implements Time {
         return secondsSinceStart() + "s";
     }
 
+    public Time dur(float seconds) {
+        this.dur = secondsToUnits(seconds);
+        return this;
+    }
+
+    @Override
+    public float dur() {
+        return dur;
+    }
+
     /** decisecond (0.1) accuracy */
-    public static class DS extends RealtimeTime {
+    public static class DS extends RealTime {
 
 
         public DS() {
@@ -108,7 +118,7 @@ public abstract class RealtimeTime implements Time {
     }
 
     /** centisecond (0.01) accuracy */
-    public static class CS extends RealtimeTime {
+    public static class CS extends RealTime {
 
 
         public CS() {
@@ -127,7 +137,7 @@ public abstract class RealtimeTime implements Time {
     }
 
     /** millisecond accuracy */
-    public static class MS extends RealtimeTime {
+    public static class MS extends RealTime {
 
 
         public MS() {
@@ -147,7 +157,7 @@ public abstract class RealtimeTime implements Time {
     }
 
     /** nanosecond accuracy */
-    public static class NS extends RealtimeTime {
+    public static class NS extends RealTime {
 
 
         protected NS(boolean relativeToStart) {

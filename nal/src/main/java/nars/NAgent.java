@@ -17,6 +17,7 @@ import nars.time.Time;
 import nars.time.FrameTime;
 import nars.truth.Truth;
 import nars.util.Loop;
+import nars.util.data.FloatParam;
 import nars.util.list.FasterList;
 import nars.util.math.FirstOrderDifferenceFloat;
 import nars.util.math.FloatNormalized;
@@ -72,9 +73,9 @@ abstract public class NAgent implements NSense, NAction {
 
     public float alpha, gamma;
 
-    public final MutableFloat epsilonProbability = new MutableFloat(0.1f);
+    public final FloatParam epsilonProbability = new FloatParam(0.1f);
 
-    public final MutableFloat gammaEpsilonFactor = new MutableFloat(0.75f);
+    public final FloatParam gammaEpsilonFactor = new FloatParam(0.75f);
 
     final int curiosityMonitorDuration = 8; //frames
     final DescriptiveStatistics avgActionDesire = new DescriptiveStatistics(curiosityMonitorDuration);
@@ -101,7 +102,12 @@ abstract public class NAgent implements NSense, NAction {
 
     //private float curiosityAttention;
     private float rewardSum = 0;
-    private MutableFloat maxSensorPriority;
+
+    public final FloatParam sensorPriority;
+    public final FloatParam actionPriority;
+    public final FloatParam rewardPriority;
+
+    //private MutableFloat maxSensorPriority;
 
     public NAgent(@NotNull NAR nar) {
         this(nar, 1);
@@ -113,6 +119,10 @@ abstract public class NAgent implements NSense, NAction {
         alpha = this.nar.confidenceDefault(BELIEF);
         gamma = this.nar.confidenceDefault(GOAL);
         this.frameRate = frameRate;
+
+        sensorPriority = new FloatParam(alpha);
+        actionPriority = new FloatParam(gamma);
+        rewardPriority = new FloatParam(gamma);
 
         this.actionBoost = gamma;
 
@@ -292,7 +302,7 @@ abstract public class NAgent implements NSense, NAction {
 
         //minSensorPriority = new MutableFloat(Param.BUDGET_EPSILON * 4);
 
-        maxSensorPriority = new MutableFloat(nar.priorityDefault(BELIEF));
+        //maxSensorPriority = new MutableFloat(nar.priorityDefault(BELIEF));
 
 //        Iterable<? extends WiredCompoundConcept.Prioritizable> p = Iterables.concat(
 //                sensors,
@@ -302,9 +312,15 @@ abstract public class NAgent implements NSense, NAction {
 //        SensorConcept.activeAttention(p, minSensorPriority, maxSensorPriority, nar);
 
         //in separate banks so they dont compete with eachother for attention:
-        SensorConcept.activeAttention(sensors, new MutableFloat(maxSensorPriority.floatValue()/sensors.size()), maxSensorPriority, nar);
-        SensorConcept.activeAttention(actions, new MutableFloat(maxSensorPriority.floatValue()/actions.size()), maxSensorPriority, nar);
-        SensorConcept.activeAttention(newArrayList(happy, joy), new MutableFloat(maxSensorPriority.floatValue()/2f), maxSensorPriority, nar);
+        //SensorConcept.activeAttention(sensors, new MutableFloat(maxSensorPriority.floatValue()/sensors.size()), maxSensorPriority, nar);
+//        SensorConcept.activeAttention(sensors, new MutableFloat(maxSensorPriority.floatValue()/sensors.size()), maxSensorPriority, nar);
+//        SensorConcept.activeAttention(actions, new MutableFloat(maxSensorPriority.floatValue()/actions.size()), maxSensorPriority, nar);
+//        SensorConcept.activeAttention(newArrayList(happy, joy), new MutableFloat(maxSensorPriority.floatValue()/2f), maxSensorPriority, nar);
+
+        sensors.forEach(s -> s.pri(sensorPriority));
+        actions.forEach(s -> s.pri(actionPriority));
+        happy.pri(rewardPriority);
+        joy.pri(rewardPriority);
 
         //SensorConcept.flatAttention(p, minSensorPriority);
 

@@ -12,11 +12,28 @@ public class FrameTime implements Time {
     long t;
     int dt;
 
+    float dur;
+
     public FrameTime() {
         this(1);
     }
+
+    public FrameTime(float dur) {
+        this(1, dur);
+    }
+
     public FrameTime(int dt) {
+        this(dt, 1f);
+    }
+
+    public FrameTime(int dt, float dur) {
         this.dt = dt;
+        this.dur = dur;
+    }
+
+    @Override
+    public float dur() {
+        return dur;
     }
 
     @Override

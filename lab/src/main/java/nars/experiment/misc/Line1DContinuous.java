@@ -12,6 +12,7 @@ import nars.nar.Default;
 import nars.nar.exe.Executioner;
 import nars.nar.exe.SingleThreadExecutioner;
 import nars.nar.util.DefaultConceptBuilder;
+import nars.remote.NAgents;
 import nars.time.FrameTime;
 import nars.util.data.random.XorShift128PlusRandom;
 
@@ -236,7 +237,7 @@ public class Line1DContinuous extends NAgent {
         Default nar = new Default(1024,
                 conceptsPerCycle, 1, 3, rng,
                 new CaffeineIndex(new DefaultConceptBuilder(), 1024*64, 12, false, exe),
-                new FrameTime(), exe
+                new FrameTime(7f), exe
         );
 
 
@@ -252,10 +253,11 @@ public class Line1DContinuous extends NAgent {
                 //random(120)
         );
 
-        Vis.show((Default) l.nar, 2000); //Vis.agentActions(l, 2000);
+        Vis.show((Default) l.nar, 16); //Vis.agentActions(l, 2000);
+        NAgents.chart(l);
 
         l.print = true;
-        l.run(2000);
+        l.run(200000);
 
 
         NAR.printTasks(nar, true);

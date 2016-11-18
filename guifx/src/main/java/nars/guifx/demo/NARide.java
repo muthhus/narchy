@@ -37,7 +37,7 @@ import nars.index.term.TermIndex;
 import nars.nar.core.ConceptBagCycle;
 import nars.term.Term;
 import nars.time.FrameTime;
-import nars.time.RealtimeTime;
+import nars.time.RealTime;
 import nars.util.FX;
 import nars.util.Util;
 import org.jewelsea.willow.browser.WebBrowser;
@@ -473,7 +473,7 @@ public class NARide extends StackPane {
         //default node builders
         //TODO make these Function<Object,Node>, not a supplier interface
         icon(FrameTime.class, (c) -> new NARMenu.CycleClockPane(nar));
-        icon(RealtimeTime.MS.class, (c) -> new NARMenu.RTClockPane(nar));
+        icon(RealTime.MS.class, (c) -> new NARMenu.RTClockPane(nar));
         //icon(NARLoop.class, (ll) -> loopPane);
         icon(ConceptBagCycle.class, (c) ->
                 new DefaultCyclePane((ConceptBagCycle) c) //cast is hack
