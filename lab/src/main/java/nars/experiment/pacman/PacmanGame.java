@@ -68,7 +68,9 @@ public class PacmanGame extends JPanel implements MouseMotionListener, MouseList
 	int pendingKeyCode = -1; // no pending key at the beginning
 	
 	boolean paused = false;
-	
+	public int vx;
+	public int vy;
+
 	enum Things {
 		CHERRY,
 		DOT,
@@ -229,30 +231,32 @@ public class PacmanGame extends JPanel implements MouseMotionListener, MouseList
 			{
 				// switch pacman direction
 				///if (pendingKeyCode != -1) {
-				if(UP || pendingKeyCode == KeyEvent.VK_UP && (pacman.x % SQUARE_SIZE == 0) && !Organism.isWallAtPoint(board, pacman.x, pacman.y-SQUARE_SIZE))
-                {
-                    pacman.dir = Organism.Direction.UP;
-                    pendingKeyCode = -1;
+//				if(UP || pendingKeyCode == KeyEvent.VK_UP && (pacman.x % SQUARE_SIZE == 0) && !Organism.isWallAtPoint(board, pacman.x, pacman.y-SQUARE_SIZE))
+//                {
+//                    pacman.dir = Organism.Direction.UP;
+//                    pendingKeyCode = -1;
+//
+//                }
+//				if(DOWN || pendingKeyCode == KeyEvent.VK_DOWN && (pacman.x % SQUARE_SIZE == 0) && !Organism.isWallAtPoint(board, pacman.x, pacman.y+SQUARE_SIZE))
+//                {
+//                    pacman.dir = Organism.Direction.DOWN;
+//                    pendingKeyCode = -1;
+//                }
+//				if(LEFT || pendingKeyCode == KeyEvent.VK_LEFT && (pacman.y % SQUARE_SIZE == 0) && !Organism.isWallAtPoint(board, pacman.x-SQUARE_SIZE, pacman.y))
+//                {
+//                    pacman.dir = Organism.Direction.LEFT;
+//                    pendingKeyCode = -1;
+//                }
+//				if(RIGHT || pendingKeyCode == KeyEvent.VK_RIGHT && (pacman.y % SQUARE_SIZE == 0) && !Organism.isWallAtPoint(board, pacman.x+SQUARE_SIZE, pacman.y))
+//                {
+//                    pacman.dir = Organism.Direction.RIGHT;
+//                    pendingKeyCode = -1;
+//                }
+//				//}
+//
+//				pacman.move(board, PACMAN_SPEED);
 
-                }
-				if(DOWN || pendingKeyCode == KeyEvent.VK_DOWN && (pacman.x % SQUARE_SIZE == 0) && !Organism.isWallAtPoint(board, pacman.x, pacman.y+SQUARE_SIZE))
-                {
-                    pacman.dir = Organism.Direction.DOWN;
-                    pendingKeyCode = -1;
-                }
-				if(LEFT || pendingKeyCode == KeyEvent.VK_LEFT && (pacman.y % SQUARE_SIZE == 0) && !Organism.isWallAtPoint(board, pacman.x-SQUARE_SIZE, pacman.y))
-                {
-                    pacman.dir = Organism.Direction.LEFT;
-                    pendingKeyCode = -1;
-                }
-				if(RIGHT || pendingKeyCode == KeyEvent.VK_RIGHT && (pacman.y % SQUARE_SIZE == 0) && !Organism.isWallAtPoint(board, pacman.x+SQUARE_SIZE, pacman.y))
-                {
-                    pacman.dir = Organism.Direction.RIGHT;
-                    pendingKeyCode = -1;
-                }
-				//}
 
-				pacman.move(board, PACMAN_SPEED);
 				boolean isGameOver = true;
 				for (int a = 0; a < board.length; a++) {
 					for (int b = 0; b < board[a].length; b++) {

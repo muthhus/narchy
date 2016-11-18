@@ -21,6 +21,7 @@ import java.util.Arrays;
 import java.util.Objects;
 
 import static nars.$.t;
+import static nars.time.Tense.DTERNAL;
 import static nars.time.Tense.ETERNAL;
 import static nars.truth.TruthFunctions.w2c;
 
@@ -539,7 +540,7 @@ public abstract class AbstractTask extends RawBudget implements Task, Temporal {
     }
 
 
-    @Nullable @Override
+    @Override
     public float confWeight(long when) {
         if (!isBeliefOrGoal())
             throw new UnsupportedOperationException();
@@ -568,7 +569,10 @@ public abstract class AbstractTask extends RawBudget implements Task, Temporal {
                 if (dur!=dur)
                     throw new RuntimeException("NaN duration");
 
-                return TruthPolation.evidenceDecay(cw, dur, delta);
+                float dc = TruthPolation.evidenceDecay(cw, dur, delta);
+                if (term.vars() > 0)
+                    return Math.max(dc, t.eternalizedConf());
+                return dc;
 
             }
 
@@ -583,14 +587,16 @@ public abstract class AbstractTask extends RawBudget implements Task, Temporal {
 
     /** end occurrence */
     @Override public long end() {
-        return occurrence();
-//        long dt = 0;
-//        if (op().temporal) {
-//            dt=dt();
-//            if (dt==DTERNAL)
-//                dt = 0;
-//        }
-//        return occurrence()+dt;
+
+        //return occurrence();
+
+        long dt = 0;
+        if (op().temporal) {
+            dt=dt();
+            if (dt==DTERNAL)
+                dt = 0;
+        }
+        return occurrence()+dt;
     }
 
     @Override

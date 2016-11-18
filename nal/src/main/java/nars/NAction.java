@@ -191,7 +191,8 @@ public interface NAction {
                 if (update.accept(y)) {
                     return $.t(f, alpha);
                 } else {
-                    return $.t(0.5f, alpha); //neutral on failure
+                    //return $.t(0.5f, alpha); //neutral on failure
+                    return null;
                 }
             }
             return null;

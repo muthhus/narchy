@@ -26,6 +26,7 @@ public class ActionConcept extends WiredCompoundConcept implements WiredCompound
     static final int decisionDT = 0;
 
     final ScalarSignal feedback;
+    private float feedbackConf = 0;
 
     private float currentFeedback;
 
@@ -91,12 +92,12 @@ public class ActionConcept extends WiredCompoundConcept implements WiredCompound
         //this.commonEvidence = Param.SENSOR_TASKS_SHARE_COMMON_EVIDENCE ? new long[] { n.time.nextStamp() } : LongArrays.EMPTY_ARRAY;
 
         feedback = new ScalarSignal(n, term, this, (x) ->
-            t(x, n.confidenceDefault(Symbols.GOAL)),
+            t(x, feedbackConf),
             this
         );
         feedback.resolution(n.truthResolution.floatValue());
         feedback.pri(
-                () -> n.priorityDefault(GOAL /* though these will be used for beliefs */)
+                () -> n.priorityDefault(Symbols.BELIEF)
         );
     }
 
@@ -176,6 +177,7 @@ public class ActionConcept extends WiredCompoundConcept implements WiredCompound
             Truth f = this.motor.motor(b, d);
             if (f!=null) {
                 this.currentFeedback = f.freq(); //HACK ignores the conf component
+                this.feedbackConf = f.conf();
             } else {
                 this.currentFeedback = Float.NaN;
             }

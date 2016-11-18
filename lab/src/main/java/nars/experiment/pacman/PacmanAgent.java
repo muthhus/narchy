@@ -28,25 +28,17 @@ public class PacmanAgent extends NAgents {
 //        senseNumber("(ball,vx)", ()-> game.ball.velocityX);
 //        senseNumber("(ball,vy)", ()-> game.ball.velocityY);
 //
-        addCamera("game", game, visW, visH);
-        //addCameraRetina("game", game, visW, visH);
+        //addCamera("game", game, visW, visH);
+        addCameraRetina("game", game, visW, visH);
 
-        float THRESH = 0.25f;
-        actionBipolar("(updown)", (f) -> {
-            if (!game.LEFT && !game.RIGHT) {
-                game.UP = (f > THRESH);
-                game.DOWN = (f < -THRESH);
-                return true;
-            }
-            return false;
+        int speed = 10;
+        actionBipolar("move(x)", (f) -> {
+            return game.pacman.move(game.board, 0, Math.round(f * speed)) > 0;
+
         });
-        actionBipolar("(leftright)", (f) -> {
-            if (!game.UP && !game.DOWN) {
-                game.LEFT = (f > THRESH);
-                game.RIGHT = (f < -THRESH);
-                return true;
-            }
-            return false;
+
+        actionBipolar("move(y)", (f) -> {
+            return game.pacman.move(game.board, Math.round(f * speed), 0) > 0;
         });
 
         //addCameraRetina("noid", noid, visW/2, visH/2, (v) -> t(v, alpha));
@@ -81,7 +73,7 @@ public class PacmanAgent extends NAgents {
     }
 
     public static void main(String[] args) {
-        runRT(PacmanAgent::new, 5);
+        runRT(PacmanAgent::new, 15);
         //runRT(PacmanAgent::new);
     }
 

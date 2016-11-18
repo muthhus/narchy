@@ -14,9 +14,9 @@ class Pacman extends Organism {
 	}
 
 	@Override
-	public void move(PacmanGame.Things board[][], int speed) {
-		super.move(board,  speed);
-		
+	protected void moved(PacmanGame.Things board[][], int newX, int newY) {
+		super.moved(board, newX, newY);
+
 		int i = (y+PacmanGame.SQUARE_SIZE/2) / PacmanGame.SQUARE_SIZE;
 		int j = (x+PacmanGame.SQUARE_SIZE/2) / PacmanGame.SQUARE_SIZE;
 		if (isMouthOpening){
@@ -44,6 +44,14 @@ class Pacman extends Organism {
 			PacmanGame.score+=5;
 		}
 	}
+
+	@Override
+	public void move(PacmanGame.Things board[][], int speed) {
+		super.move(board,  speed);
+
+		moved(board, x, y);
+	}
+
 	public void drawPacman(Graphics2D g){
 		g.setColor(Color.WHITE);
 		if (dir == Direction.RIGHT) {

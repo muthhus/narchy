@@ -67,12 +67,14 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
                     //compress until under-capacity
                     list.withWriteLockAndDelegate((l) -> {
 
+                        float dur = nar.time.dur();
+
                         while (list.size() > capacity) {
                             long now = nar.time();
 
                             Task a = matchWeakest(now);
 
-                            Task b = matchMerge(now, a);
+                            Task b = matchMerge(now, a, dur);
 
                             Task c = (b != null && b != a) ? merge(a, b, now, null) : null;
 
@@ -297,12 +299,12 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
                 //* (t.dur()+1);
     }
 
-    public Task matchMerge(long now, @NotNull Task toMergeWith) {
-        return list.maxBy(rankMatchMerge( toMergeWith, now ));
+    public Task matchMerge(long now, @NotNull Task toMergeWith, float dur) {
+        return list.maxBy(rankMatchMerge( toMergeWith, now, dur ));
     }
 
     /** max value given to the ideal match for the provided task to be merged with */
-    @NotNull public Function<Task, Float> rankMatchMerge(@NotNull Task y, long now) {
+    @NotNull public Function<Task, Float> rankMatchMerge(@NotNull Task y, long now, float dur) {
 
         //prefer (when selecting by minimum rank:)
         //  less freq delta
@@ -320,8 +322,8 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
             long xo = x.occurrence();
 
             return (1f + (1f - Math.abs(x.freq() - yf)))
-                    * (1f + (1f - y.conf()))
-                    * (1f + TruthPolation.evidenceDecay(1, 1, Math.abs(xo-yo)));
+                    * (1f + (1f - y.conf(now)))
+                    * (1f + TruthPolation.evidenceDecay(1, dur, Math.abs(xo-yo)));
         };
 
     }
@@ -362,7 +364,7 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
             return null;
         }
 
-        Task b = matchMerge(now, a);
+        Task b = matchMerge(now, a, nar.time.dur());
         if (b != null && remove(b, nar)) {
             return merge(a, b, now, eternal);
         } else {

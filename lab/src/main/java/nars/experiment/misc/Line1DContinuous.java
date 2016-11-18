@@ -55,12 +55,18 @@ public class Line1DContinuous extends NAgent {
         for (int i = 0; i < size; i++) {
             int ii = i;
             //hidden
-            sensors.add(new SensorConcept($.func("h", $.the(i)), n, ()->{
+            sensors.add(new SensorConcept(
+                    //$.func("h", $.the(i)),
+                    $.p($.the("h"), $.the(i)),
+                    n, ()->{
                 return ins[ii];
             }, (v) -> $.t(v, alpha)));
 
             //estimated
-            sensors.add(new SensorConcept($.func("e", $.the(i)), n, ()->{
+            sensors.add(new SensorConcept(
+                    //$.func("e", $.the(i)),
+                    $.p($.the("e"), $.the(i)),
+                    n, ()->{
                 return ins[size + ii];
             }, (v) -> $.t(v, alpha)));
         }
@@ -72,9 +78,19 @@ public class Line1DContinuous extends NAgent {
                 float v =
                         //d.expectation();
                         d.freq();
-                yEst += (v -0.5f)*speed;
-                //return $.t(d.freq(), gamma);
-                return d;
+                float yBefore = yEst;
+                yEst += (v - 0.5f)*speed;
+
+                float f;
+                if (yBefore==0 || yBefore == 1) {
+                    //wall
+                    f = 0.5f;
+                } else {
+                    f = v;
+                }
+
+                return $.t(f, alpha);
+                //return d;
             }
             return null;
         }));
@@ -228,7 +244,7 @@ public class Line1DContinuous extends NAgent {
     public static void main(String[] args) {
 
         XorShift128PlusRandom rng = new XorShift128PlusRandom((int)(Math.random()*1000));
-        int conceptsPerCycle = 128;
+        int conceptsPerCycle = 256;
 
         final Executioner exe =
                 //new MultiThreadExecutioner(2, 2048);
@@ -237,16 +253,16 @@ public class Line1DContinuous extends NAgent {
         Default nar = new Default(1024,
                 conceptsPerCycle, 1, 3, rng,
                 new CaffeineIndex(new DefaultConceptBuilder(), 1024*64, 12, false, exe),
-                new FrameTime(7f), exe
+                new FrameTime(2f), exe
         );
 
 
-        nar.beliefConfidence(0.8f);
-        nar.goalConfidence(0.8f);
+        nar.beliefConfidence(0.9f);
+        nar.goalConfidence(0.9f);
 
         //nar.truthResolution.setValue(0.02f);
 
-        nar.compoundVolumeMax.set(20);
+        nar.compoundVolumeMax.set(30);
 
         Line1DContinuous l = new Line1DContinuous(nar, 6,
                 sine(100)

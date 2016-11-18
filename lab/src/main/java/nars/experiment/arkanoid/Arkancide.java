@@ -78,7 +78,7 @@ public class Arkancide extends NAgents {
 
     public static void main(String[] args) {
         //runRT(Arkancide::new);
-        runRT(Arkancide::new, 20);
+        runRT(Arkancide::new, 10);
     }
 
 
