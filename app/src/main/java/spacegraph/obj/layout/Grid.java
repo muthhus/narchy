@@ -80,9 +80,11 @@ public class Grid extends Layout {
 
 
         if (a == 0) {
-            layoutLinear(1f/n, 0f, margin);
+            //horizontal
+            layoutLinear(1f/n, 0f, margin, 0, n);
         } else if (!Float.isFinite(a)) {
-            layoutLinear(0f, 1f/n, margin);
+            //vertical
+            layoutLinear(0f, 1f/n, margin, n-1, -1);
         } else {
 
             //determine the ideal rows and columns of the grid to match the visible aspect ratio
@@ -93,15 +95,17 @@ public class Grid extends Layout {
             int x;
             int s = (int)Math.sqrt(n);
             if (actualAspect > 1f) {
-                x = lerp(1, s, (actualAspect-1f)/s );
+                x = Math.round(lerp(1f, s, (actualAspect)/n ));
             } else if (actualAspect < 1f) {
-                x = lerp(s, 1, (actualAspect)/s );
+                //TODO fix
+                x = Math.round(lerp((float)s, n, 1f-(1f/actualAspect)/n ));
             } else {
                 x = s;
             }
 
             x = Math.max(1, x);
             int y = (int)Math.max(1, Math.ceil((float)n / x));
+
 
             layoutGrid(x, y, margin);
         }
@@ -112,15 +116,15 @@ public class Grid extends Layout {
         float content = 1f - margin;
 
         float px;
-        float py = margin/2;
         float dx = 1f/nx;
         float dxc = dx * content;
         float dy = 1f/ny;
         float dyc = dy * content;
+        float py = ((ny-1) * dy) + margin/2;
         int n = children.size();
         //System.out.println(nx + " " + ny + " x " + dx + " " + dy);
 
-        for (int y = ny-1; y >=0; y--) {
+        for (int y = 0; y < ny; y++) {
 
             px = margin/2f;
 
@@ -129,7 +133,7 @@ public class Grid extends Layout {
 
                 Surface c = children.get(i);
 
-                c.translateLocal.set(px, py, 0);
+                c.pos(px, py);
                 c.scale(dxc, dyc);
                 c.layout();
 
@@ -140,19 +144,20 @@ public class Grid extends Layout {
             }
 
             if (i >= n) break;
-            py += dy;
+            py -= dy;
 
         }
     }
 
-    protected void layoutLinear(float dx, float dy, float margin) {
+    protected void layoutLinear(float dx, float dy, float margin, int start, int end) {
         float content = 1f - margin;
         float x = margin/2f;
         float y = margin/2f;
         float dxc = dx != 0 ? dx * content : content;
         float dyc = dy != 0 ? dy * content : content;
-        int n = children.size();
-        for (int i = 0; i < n; i++) {
+
+        int inc = start > end ? -1 : +1;
+        for (int i = start; i != end; i+=inc) {
             Surface c = children.get(i);
             c.translateLocal.set(x, y, 0);
             c.scale(dxc, dyc);

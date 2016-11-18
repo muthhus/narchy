@@ -28,7 +28,6 @@ import spacegraph.SpaceGraph;
 import spacegraph.Surface;
 import spacegraph.obj.layout.Grid;
 import spacegraph.obj.widget.Label;
-import spacegraph.obj.widget.LabeledPane;
 import spacegraph.obj.widget.PushButton;
 import spacegraph.obj.widget.Slider;
 
@@ -356,7 +355,7 @@ abstract public class NAgents extends NAgent {
             O.in(x).fields((k,c,v) -> {
 
                 if (c == MutableFloat.class) {
-                    l.add(Vis.pane( k, new Slider(0.5f, 0, 1f) ));
+                    l.add(col( new Label(k), new Slider(0.5f) ));
                 } else {
                     l.add(new PushButton(k));
                 }

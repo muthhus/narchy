@@ -12,6 +12,7 @@ import spacegraph.obj.layout.Grid;
 import spacegraph.render.Draw;
 
 import static spacegraph.obj.layout.Grid.col;
+import static spacegraph.obj.layout.Grid.grid;
 
 /**
  * Generic 1D slider/scrollbar
@@ -19,8 +20,6 @@ import static spacegraph.obj.layout.Grid.col;
 public class Slider extends Widget {
 
     public final MutableFloat value;
-    public final MutableFloat min;
-    public final MutableFloat max;
 
     @Nullable SliderChange change = null;
 
@@ -28,16 +27,12 @@ public class Slider extends Widget {
         void onChange(Slider s, float value);
     }
 
-    public Slider(float v, float min, float max) {
-        this(new MutableFloat(v), new MutableFloat(min), new MutableFloat(max));
+    public Slider(float v) {
+        this(new MutableFloat(v));
     }
 
-    public Slider(MutableFloat value, MutableFloat min, MutableFloat max) {
+    public Slider(MutableFloat value) {
         this.value = value;
-        this.min = min;
-        this.max = max;
-
-
     }
 
     public Slider on(SliderChange c) {
@@ -103,23 +98,17 @@ public class Slider extends Widget {
 //        ).show(800,800);
 //    }
     public static void main(String[] args) {
-        SpaceGraph<?> s = new SpaceGraph();
-        s.add( new Cuboid(
-                new Grid(
-                    new Grid(
-                        new XYSlider(), new XYSlider(), new XYSlider()
-                    ),
-                    col(
-                        new Slider(0.75f, 0, 1),
-                        new Slider(0.25f, 0, 1),
-                        new Slider(0.5f, 0, 1)
-                    )
-                ), 8f /* width */, 6 /* height */
-        ) );
 
-        //s.add(new Ortho(new ConsoleSurface(new ConsoleSurface.Demo(80, 25))).scale(500f, 400f));
-        s.add(new Ortho(new CrosshairSurface(s)));
-        s.show(800, 800);
+        SpaceGraph.window(
+                grid(
+                    new XYSlider(), new XYSlider(), new XYSlider(),
+                    col(
+                        new Slider(0.75f),
+                        new Slider(0.25f),
+                        new Slider(0.5f)
+                    )
+                )
+        , 800, 800 );
     }
 
     private float value(v2 hitPoint) {
@@ -131,22 +120,22 @@ public class Slider extends Widget {
     }
 
 
-    /**
-     * normalizesa a value to the specified numeric bounds
-     */
-    public final float p(float v) {
-        float min = this.min.floatValue();
-        float max = this.max.floatValue();
-        return (v - min) / (max - min);
-    }
+//    /**
+//     * normalizesa a value to the specified numeric bounds
+//     */
+//    public final float p(float v) {
+//        float min = this.min.floatValue();
+//        float max = this.max.floatValue();
+//        return (v - min) / (max - min);
+//    }
 
     /**
      * unnormalize
      */
-    public final float r(float nn) {
-        float mn = this.min.floatValue();
-        float mx = this.max.floatValue();
-        float v = (nn) * (mx - mn) + mn;
+    public final float r(float u) {
+        float mn = 0;
+        float mx = 1f;
+        float v = (u) * (mx - mn) + mn;
         if (v < mn) v = mn; //clip to bounds
         if (v > mx) v = mx;
         return v;

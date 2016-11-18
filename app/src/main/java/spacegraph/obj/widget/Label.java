@@ -37,11 +37,11 @@ public class Label extends Surface {
         this.fontScale =
                 1f / (1f + len);
                 //0.5f; //(1f/ConsoleSurface.fontWidth)/value.length();
-        if (len > 0) {
-            this.aspect = 1f / len;
-        } else {
-            this.aspect = 1f;
-        }
+//        if (len > 0) {
+//            this.aspect = 0.5f; ///0.5f / len;
+//        } else {
+//            this.aspect = Float.NaN;
+//        }
     }
 
     public String value() {

@@ -7,12 +7,10 @@ import org.jetbrains.annotations.Nullable;
 import spacegraph.SpaceGraph;
 import spacegraph.Surface;
 import spacegraph.input.Finger;
-import spacegraph.obj.Cuboid;
 import spacegraph.obj.layout.Stacking;
 import spacegraph.obj.widget.console.VirtualConsole;
 import spacegraph.render.Draw;
 
-import static nars.gui.Vis.stacking;
 import static spacegraph.obj.layout.Grid.col;
 import static spacegraph.obj.layout.Grid.grid;
 import static spacegraph.obj.layout.Grid.row;
@@ -118,7 +116,7 @@ public abstract class Widget extends Stacking {
 
     public static Surface widgetDemo() {
         return grid(
-                    new Slider(.25f, 0 /* pause */, 1),
+                    new Slider(.25f  /* pause */),
                     col(new CheckBox("ABC"),new CheckBox("XYZ")),
                         grid(new ScaleDebugLabel(), new ScaleDebugLabel(),
                                 row(new ScaleDebugLabel(), new ScaleDebugLabel()),

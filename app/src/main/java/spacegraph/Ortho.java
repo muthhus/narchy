@@ -73,6 +73,7 @@ public class Ortho implements WindowListener, KeyListener, MouseListener {
      */
     public Ortho maximize() {
         maximize = true;
+        resized();
         return this;
     }
 
@@ -83,8 +84,9 @@ public class Ortho implements WindowListener, KeyListener, MouseListener {
 
     private void resized() {
         //TODO resize preserving aspect, translation, etc
-        if (maximize) {
-            scale(1f, 1f);
+        if (maximize && window!=null) {
+            scale(window.getWidth(), window.getHeight());
+            translate(0,0);
         }
     }
 

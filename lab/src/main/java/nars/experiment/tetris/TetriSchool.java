@@ -172,7 +172,7 @@ public class TetriSchool extends NSchool implements Runnable {
             return col(
 
                     stacking(
-                            new Slider(.25f, 0 /* pause */, 1),
+                            new Slider(.25f  /* pause */),
                             runLabel
                     ),
 
