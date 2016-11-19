@@ -94,8 +94,6 @@ public final class Premise extends RawBudget implements Tasked {
                                           @NotNull BLink<? extends Termed> termLink) {
 
         Termed term = termLink.get();
-        if (term == null)
-            return null;
 
         if (Terms.equalAtemporally(task.term(), term))
             return null;
@@ -116,8 +114,8 @@ public final class Premise extends RawBudget implements Tasked {
         if (beliefConcept != null) {
 
             long when =
-                    //task.occurrence();
-                    now;
+                    task.occurrence();
+                    //now;
 
             belief = beliefConcept.beliefs().match(when, now, task); //in case of quest, proceed with matching belief
 

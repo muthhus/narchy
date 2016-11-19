@@ -74,6 +74,9 @@ abstract public class NAgent implements NSense, NAction {
     public final List<SensorConcept> sensors = $.newArrayList();
     public final List<ActionConcept> actions = $.newArrayList();
 
+    public static final float predictorQuality = 0.9f;
+
+
     public float alpha, gamma;
 
     float curiosityFreqMin = 0.01f; //nyquist
@@ -261,16 +264,18 @@ abstract public class NAgent implements NSense, NAction {
             rewardWindow.addValue(rewardValue);
         }
 
+
         /** safety valve: if overloaded, enter shock / black out and do not receive sensor input */
         float load = nar.exe.load();
         if (load < 1) {
 
-
-            predict();
-
-            nar.runLater(sensors, SensorConcept::run, 4);
             happy.run();
             joy.run();
+
+
+            nar.runLater(sensors, SensorConcept::run, 4);
+
+            predict();
 
             updateActions();
 
@@ -419,10 +424,10 @@ abstract public class NAgent implements NSense, NAction {
             ((FasterList)predictors).addAll(
                     //new MutableTask($.seq($.varQuery(0), dur, action), '?', null).eternal(),
                     //new MutableTask($.impl($.varQuery(0), dur, action), '?', null).eternal(),
-                    new MutableTask($.seq(action, 0, happiness), '?', null).time(now, now + dur),
-                    new MutableTask($.seq($.neg(action), 0, happiness), '?', null).time(now, now + dur),
-                    new MutableTask($.impl(action, 0, happiness), '?', null).time(now, now + dur),
-                    new MutableTask($.impl($.neg(action), 0, happiness), '?', null).time(now, now + dur)
+                    new MutableTask($.impl(action, dur, happiness), '?', null).time(now, now),
+                    new MutableTask($.impl($.neg(action), dur, happiness), '?', null).time(now, now)
+                    //new MutableTask($.impl($.parallel($.varDep(0), action), dur, happiness), '?', null).time(now, now + dur),
+                    //new MutableTask($.impl($.parallel($.varDep(0), $.neg( action )), dur, happiness), '?', null).time(now, now + dur)
             );
 
         }
@@ -621,7 +626,7 @@ abstract public class NAgent implements NSense, NAction {
         char pp = t.punc();
         if (t.occurrence() != ETERNAL) {
             s = new GeneratedTask(t.term(), pp, t.truth())
-                    .budgetSafe(p, nar)
+                    .budgetSafe(p, predictorQuality)
                     .time(now, now + (t.occurrence() - t.creation()))
                     .log("Agent Predictor");
 
@@ -635,7 +640,7 @@ abstract public class NAgent implements NSense, NAction {
 //            if (t.isDeleted()) {
 //                //TODO check if dur or qua changed?
 //            }
-            t.budgetSafe(p, nar);
+            t.budgetSafe(p, predictorQuality);
 
             nar.inputLater(t);
             return t;

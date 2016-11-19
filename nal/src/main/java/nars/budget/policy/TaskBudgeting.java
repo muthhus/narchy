@@ -31,7 +31,7 @@ public class TaskBudgeting {
         float occam = occamGrowth(derived, baseBudget);
 
         final float quality =
-                baseBudget.qua() * occam;// * derivationQuality;
+                baseBudget.qua() * occam * (0.5f + 0.5f * derivationQuality);
 
         if (quality < p.quaMin)
             return null;

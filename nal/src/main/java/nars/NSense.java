@@ -162,12 +162,28 @@ public interface NSense {
 
     @NotNull
     default FuzzyScalarConcepts senseNumber(String id, FloatSupplier v) {
+        String[] states = {id};
+        return senseNumber(v, states);
+    }
+
+    @NotNull
+    default FuzzyScalarConcepts senseNumber(FloatSupplier v, String... states) {
         FuzzyScalarConcepts fs = new FuzzyScalarConcepts(
-                new FloatNormalized(v), nar(), id
+                new FloatNormalized(v), nar(), states
         );//.resolution(0.05f);
         sensors().addAll(fs.sensors);
         return fs;
     }
+
+    @NotNull
+    default FuzzyScalarConcepts senseNumberBi(String id, FloatSupplier v) {
+        return senseNumber(v,  "hi:" + id, "lo:" + id);
+    }
+    @NotNull
+    default FuzzyScalarConcepts senseNumberTrii(String id, FloatSupplier v) {
+        return senseNumber(v,  "hi:" + id, "mid:" + id, "lo:" + id);
+    }
+
     @NotNull
     default FuzzyScalarConcepts senseNumber(String id, DoubleSupplier v) {
 

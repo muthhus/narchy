@@ -508,5 +508,27 @@ public class NAL5Test extends AbstractNALTest {
                 .mustNotOutput(cycles, "(x)", '.', 0f, 0.5f, 0, 1, ETERNAL)
         ;
     }
+    @Test public void testConversion() {
+        test()
+                .input("((x)==>(y))?")
+                .input("((y)==>(x)).")
+                .mustBelieve(cycles, "((x)==>(y)).", 1.0f, 0.47f)
+        ;
+    }
+    @Test public void testConversionNeg() {
+        test()
+                .input("((x) ==> (y))?")
+                .input("(--(y) ==> (x)).")
+                .mustBelieve(cycles, "((x)==>(y)).", 0.0f, 0.47f)
+        ;
+    }
+    @Test public void testConversionNeg2() {
+        test()
+                .log()
+                .input("((x) ==> (y))?")
+                .input("((y) ==> --(x)).")
+                .mustBelieve(cycles, "(--(x)==>(y)).", 1.0f, 0.47f)
+        ;
+    }
 
 }

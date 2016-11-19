@@ -20,20 +20,20 @@ public class Arkanoid extends JFrame implements KeyListener {
 	public static final int BLOCK_LEFT_MARGIN = 10;
 	public static final int BLOCK_TOP_MARGIN = 15;
 
-	public static final double BALL_RADIUS = 10.0;
-	public static final double BALL_VELOCITY = 1;
+	public static final float BALL_RADIUS = 10.0f;
+	public static final float BALL_VELOCITY = 1f;
 
-	public static final double PADDLE_WIDTH = 60.0;
-	public static final double PADDLE_HEIGHT = 20.0;
-	public static final double PADDLE_VELOCITY = 0.6;
+	public static final float PADDLE_WIDTH = 60.0f;
+	public static final float PADDLE_HEIGHT = 20.0f;
+	public static final float PADDLE_VELOCITY = 0.6f;
 
-	public static final double BLOCK_WIDTH = 40.0;
-	public static final double BLOCK_HEIGHT = 15.0;
+	public static final float BLOCK_WIDTH = 40.0f;
+	public static final float BLOCK_HEIGHT = 15.0f;
 
 	public static final int COUNT_BLOCKS_X = 7;
 	public static final int COUNT_BLOCKS_Y = 3;
 
-	public static final double FT_STEP = 2.0;
+	public static final float FT_STEP = 2.0f;
 
 
 	/* GAME VARIABLES */
@@ -45,43 +45,43 @@ public class Arkanoid extends JFrame implements KeyListener {
 	public final Ball ball = new Ball(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2);
 	public final Collection<Brick> bricks = new ConcurrentSkipListSet<Brick>();
 
-	//private double lastFt;
-	//private double currentSlice;
+	//private float lastFt;
+	//private float currentSlice;
 
 	abstract class GameObject {
-		abstract double left();
+		abstract float left();
 
-		abstract double right();
+		abstract float right();
 
-		abstract double top();
+		abstract float top();
 
-		abstract double bottom();
+		abstract float bottom();
 	}
 
 	class Rectangle extends GameObject {
 
-		public double x, y;
-		public double sizeX;
-		public double sizeY;
+		public float x, y;
+		public float sizeX;
+		public float sizeY;
 
 		@Override
-		double left() {
-			return x - sizeX / 2.0;
+		float left() {
+			return x - sizeX / 2.0f;
 		}
 
 		@Override
-		double right() {
-			return x + sizeX / 2.0;
+		float right() {
+			return x + sizeX / 2.0f;
 		}
 
 		@Override
-		double top() {
-			return y - sizeY / 2.0;
+		float top() {
+			return y - sizeY / 2.0f;
 		}
 
 		@Override
-		double bottom() {
-			return y + sizeY / 2.0;
+		float bottom() {
+			return y + sizeY / 2.0f;
 		}
 
 	}
@@ -104,9 +104,9 @@ public class Arkanoid extends JFrame implements KeyListener {
 
 	class Paddle extends Rectangle {
 
-		public double velocity;
+		public float velocity;
 
-		public Paddle(double x, double y) {
+		public Paddle(float x, float y) {
 			this.x = x;
 			this.y = y;
 			this.sizeX = PADDLE_WIDTH;
@@ -115,7 +115,7 @@ public class Arkanoid extends JFrame implements KeyListener {
 
 		/** returns percent of movement accomplished */
 		public float move(float dx) {
-			double px = x;
+			float px = x;
 			x += dx;
 			x = Math.max(x, sizeX);
 			x = Math.min(x, SCREEN_WIDTH - sizeX);
@@ -127,14 +127,14 @@ public class Arkanoid extends JFrame implements KeyListener {
 		}
 
 		void stopMove() {
-			velocity = 0.0;
+			velocity = 0.0f;
 		}
 
 		void moveLeft() {
 			if (left() > 0.0) {
 				velocity = -PADDLE_VELOCITY;
 			} else {
-				velocity = 0.0;
+				velocity = 0.0f;
 			}
 		}
 
@@ -142,7 +142,7 @@ public class Arkanoid extends JFrame implements KeyListener {
 			if (right() < SCREEN_WIDTH) {
 				velocity = PADDLE_VELOCITY;
 			} else {
-				velocity = 0.0;
+				velocity = 0.0f;
 			}
 		}
 
@@ -181,7 +181,7 @@ public class Arkanoid extends JFrame implements KeyListener {
 		int id;
 		boolean destroyed;
 
-		Brick(double x, double y) {
+		Brick(float x, float y) {
 			this.x = x;
 			this.y = y;
 			this.sizeX = BLOCK_WIDTH;
@@ -202,12 +202,12 @@ public class Arkanoid extends JFrame implements KeyListener {
 
 	class Ball extends GameObject {
 
-		public double x, y;
-		double radius = BALL_RADIUS;
+		public float x, y;
+		float radius = BALL_RADIUS;
 
 		//45 degree angle initially
-		public double velocityX;
-		public double velocityY;
+		public float velocityX;
+		public float velocityY;
 
 		Ball(int x, int y) {
 			this.x = x;
@@ -216,12 +216,12 @@ public class Arkanoid extends JFrame implements KeyListener {
 		}
 
 		public void setVelocityRandom() {
-			this.setVelocity(BALL_VELOCITY, Math.random() * Math.PI/3 - Math.PI/2); //angled upward
+			this.setVelocity(BALL_VELOCITY, (float)(Math.random() * Math.PI/3 - Math.PI/2)); //angled upward
 		}
 
-		public void setVelocity(double speed, double angle) {
-			this.velocityX = Math.cos(angle) * speed;
-			this.velocityY = Math.sin(angle) * speed;
+		public void setVelocity(float speed, float angle) {
+			this.velocityX = (float)Math.cos(angle) * speed;
+			this.velocityY = (float)Math.sin(angle) * speed;
 		}
 
 		void draw(Graphics g) {
@@ -250,22 +250,22 @@ public class Arkanoid extends JFrame implements KeyListener {
 		}
 
 		@Override
-		double left() {
+		float left() {
 			return x - radius;
 		}
 
 		@Override
-		double right() {
+		float right() {
 			return x + radius;
 		}
 
 		@Override
-		double top() {
+		float top() {
 			return y - radius;
 		}
 
 		@Override
-		double bottom() {
+		float bottom() {
 			return y + radius;
 		}
 
@@ -294,16 +294,16 @@ public class Arkanoid extends JFrame implements KeyListener {
 
 		increaseScore();
 
-		double overlapLeft = mBall.right() - mBrick.left();
-		double overlapRight = mBrick.right() - mBall.left();
-		double overlapTop = mBall.bottom() - mBrick.top();
-		double overlapBottom = mBrick.bottom() - mBall.top();
+		float overlapLeft = mBall.right() - mBrick.left();
+		float overlapRight = mBrick.right() - mBall.left();
+		float overlapTop = mBall.bottom() - mBrick.top();
+		float overlapBottom = mBrick.bottom() - mBall.top();
 
 		boolean ballFromLeft = overlapLeft < overlapRight;
 		boolean ballFromTop = overlapTop < overlapBottom;
 
-		double minOverlapX = ballFromLeft ? overlapLeft : overlapRight;
-		double minOverlapY = ballFromTop ? overlapTop : overlapBottom;
+		float minOverlapX = ballFromLeft ? overlapLeft : overlapRight;
+		float minOverlapY = ballFromTop ? overlapTop : overlapBottom;
 
 		if (minOverlapX < minOverlapY) {
 			mBall.velocityX = ballFromLeft ? -BALL_VELOCITY : BALL_VELOCITY;

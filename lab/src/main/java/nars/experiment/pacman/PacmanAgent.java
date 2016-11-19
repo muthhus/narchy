@@ -9,7 +9,7 @@ import nars.remote.NAgents;
 
 public class PacmanAgent extends NAgents {
 
-    final int visW = 32, visH = 16;
+    final int visW = 24, visH = 12;
 
 
     final PacmanGame game;
@@ -28,8 +28,8 @@ public class PacmanAgent extends NAgents {
 //        senseNumber("(ball,vx)", ()-> game.ball.velocityX);
 //        senseNumber("(ball,vy)", ()-> game.ball.velocityY);
 //
-        //addCamera("game", game, visW, visH);
-        addCameraRetina("game", game, visW, visH);
+        addCamera("game", game, visW, visH);
+        //addCameraRetina("game", game, visW, visH);
 
         int speed = 10;
         actionBipolar("move(x)", (f) -> {
@@ -73,7 +73,7 @@ public class PacmanAgent extends NAgents {
     }
 
     public static void main(String[] args) {
-        runRT(PacmanAgent::new, 15);
+        runRT(PacmanAgent::new, 15, 5);
         //runRT(PacmanAgent::new);
     }
 

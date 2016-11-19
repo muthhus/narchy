@@ -205,14 +205,16 @@ public class ScalarSignal implements Consumer<NAR>, DoubleSupplier {
 
     @Nullable
     protected SignalTask task(float v, float prevV, long now, Task previous) {
-        float changeFactor = prevV==prevV ? Math.abs(v - prevV) : 1f /* if prevV == NaN */;
 
         Truth t = truthFloatFunction.valueOf(v);
         if (t == null)
             return null;
 
         SignalTask s = new SignalTask(term(), punc, t, now);
-        s.budgetByTruth( Math.max(Param.BUDGET_EPSILON*2, changeFactor * pri.asFloat())  /*(v, now, prevF, lastInput)*/);
+        s.budgetByTruth( pri.asFloat()  /*(v, now, prevF, lastInput)*/);
+
+        //float changeFactor = prevV==prevV ? Math.abs(v - prevV) : 1f /* if prevV == NaN */;
+        //s.budgetByTruth( Math.max(Param.BUDGET_EPSILON*2, changeFactor * pri.asFloat())  /*(v, now, prevF, lastInput)*/);
         //.log(this);
         return s;
     }

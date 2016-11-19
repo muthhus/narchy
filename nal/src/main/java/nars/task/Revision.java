@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Random;
 
+import static nars.Op.NEG;
 import static nars.term.Terms.compoundOrNull;
 import static nars.time.Tense.DTERNAL;
 import static nars.time.Tense.ETERNAL;
@@ -159,6 +160,12 @@ public class Revision {
         Compound cc = compoundOrNull( intermpolate(a.term(), b.term(), aProp, accumulatedDifference, 1f, rng, mergeOrChoose) );
         if (cc == null)
             return null;
+        if (cc.op()==NEG) {
+            cc = compoundOrNull(cc.unneg());
+            if (cc == null)
+                return null;
+            newTruth = newTruth.negated();
+        }
 
         //get a stamp collecting all evidence from the table, since it all contributes to the result
         //TODO weight by the relative confidence of each so that more confidence contributes more evidence data to the stamp
@@ -166,8 +173,7 @@ public class Revision {
 
         long[] evidence = Stamp.zip(a.evidence(), b.evidence(), aProp);
 
-        if (!Task.taskContentValid(cc, a.punc(), null, true))
-            return null;
+
 
         RevisionTask t = new RevisionTask(cc, a.punc(),
                 newTruth,

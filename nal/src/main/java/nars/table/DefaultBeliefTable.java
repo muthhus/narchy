@@ -166,9 +166,7 @@ public class DefaultBeliefTable implements BeliefTable {
         if (when == ETERNAL) {
             if (ete != null) {
                 return ete;
-            } /*else {
-                //eternalize the topTemporal?
-            } */
+            }
         }
 
         Task tmp = temporal.match(when, now, against);

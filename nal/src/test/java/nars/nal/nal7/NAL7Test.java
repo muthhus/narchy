@@ -40,9 +40,7 @@ public class NAL7Test extends AbstractNALTest {
         //    P, S, after(Task,Belief), notConjunction(P), notConjunction(S),  measure_time(I), notImplicationOrEquivalence(P), notImplicationOrEquivalence(S) |-
         //              (&/,S,I,P), (Belief:Intersection)
 
-
         test()
-
                 .input("x:before. :|:")
                 .inputAt(10, "x:after. :|:")
                 .mustBelieve(cycles, "(x:before ==>+10 x:after)", 1.00f, 0.45f /*abductionConf*/, 0)
@@ -52,6 +50,29 @@ public class NAL7Test extends AbstractNALTest {
         ;
     }
 
+    @Test
+    public void induction_on_events_neg() {
+        test()
+                .input("--x:before. :|:")
+                .inputAt(10, "x:after. :|:")
+                .mustBelieve(cycles, "(--x:before ==>+10 x:after)", 1.00f, 0.45f /*abductionConf*/, 0)
+                .mustBelieve(cycles, "(x:after ==>-10 x:before)", 0.00f, 0.45f /*inductionConf*/, 0)
+                .mustBelieve(cycles, "(x:after <=>-10 x:before)", 0.00f, 0.45f /*comparisonConf*/, 0)
+                .mustBelieve(cycles, "(--x:before &&+10 x:after)", 1.00f, 0.81f /*intersectionConf*/, 0)
+        ;
+    }
+    @Test
+    public void induction_on_events_neg2() {
+        test()
+                .input("x:before. :|:")
+                .inputAt(10, "--x:after. :|:")
+                .mustBelieve(cycles, "(x:before ==>+10 x:after)", 0.00f, 0.45f /*abductionConf*/, 0)
+                .mustBelieve(cycles, "(--x:after ==>-10 x:before)", 1.00f, 0.45f /*inductionConf*/, 0)
+                .mustBelieve(cycles, "(x:after <=>-10 x:before)", 0.00f, 0.45f /*comparisonConf*/, 0)
+                .mustBelieve(cycles, "(x:before &&+10 --x:after)", 1.00f, 0.81f /*intersectionConf*/, 0)
+                .mustNotOutput(cycles, "(x:before &&-10 --x:after)", '.')
+        ;
+    }
 
     @Test
     public void temporal_explification() {

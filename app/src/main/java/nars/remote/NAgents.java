@@ -82,17 +82,27 @@ abstract public class NAgents extends NAgent {
 
         nar.printConceptStatistics();
         new TaskStatistics().add(nar).print(System.out);
+
+        a.predictors.forEach(p->{
+            nar.concept(p).print();
+        });
+
+
         //((TreeTaskIndex)nar.tasks).tasks.prettyPrint(System.out);
 
     }
 
     public static void runRT(Function<NAR, NAgents> init) {
-        runRT(init, 20);
+        runRT(init, 10);
     }
 
     public static void runRT(Function<NAR, NAgents> init, float fps) {
+        runRT(init, fps, 1);
+    }
 
-        Default nar = NAgents.newMultiThreadNAR(3, new RealTime.CS(true).dur(2/fps), false);
+    public static void runRT(Function<NAR, NAgents> init, float fps, int durFrames) {
+
+        Default nar = NAgents.newMultiThreadNAR(4, new RealTime.DS(true).dur(durFrames/fps), false);
         //Default nar = newNAR();
         //Alann nar = newAlann();
 
@@ -101,6 +111,8 @@ abstract public class NAgents extends NAgent {
         chart(a);
 
         a.runRT(fps).join();
+
+
 
     }
 
@@ -154,17 +166,17 @@ abstract public class NAgents extends NAgent {
         Random rng = new XorShift128PlusRandom(1);
         final Executioner exe =
                 //new SingleThreadExecutioner();
-                new MultiThreadExecutioner(threads, 8192 /* TODO chose a power of 2 number to scale proportionally to # of threads */);
+                new MultiThreadExecutioner(threads, 16384 /* TODO chose a power of 2 number to scale proportionally to # of threads */);
 
-        int volMax = 48;
-        int conceptsPerCycle = 128;
+        int volMax = 32;
+        int conceptsPerCycle = 64;
 
 
         //Multi nar = new Multi(3,512,
         Default nar = new Default(2048,
                 conceptsPerCycle, 1, 3, rng,
                 //new CaffeineIndex(new DefaultConceptBuilder(rng), 1024*1024, volMax/2, false, exe)
-                new TreeTermIndex.L1TreeIndex(new DefaultConceptBuilder(), 4 * 1024 * 128, 16 * 1024, 4)
+                new TreeTermIndex.L1TreeIndex(new DefaultConceptBuilder(), 4 * 1024 * 128, 32 * 1024, 4)
 
                 ,
                 //new FrameClock()
@@ -194,9 +206,9 @@ abstract public class NAgents extends NAgent {
 
         Abbreviation abbr = new Abbreviation(nar, "the",
                 4, 16,
-                0.02f, 32);
+                0.01f, 32);
 
-        new Inperience(nar, 0.05f);
+        new Inperience(nar, 0.01f);
 
 //        //causal accelerator
 //        nar.onTask(t -> {

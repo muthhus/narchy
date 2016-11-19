@@ -21,8 +21,8 @@ import java.util.function.Consumer;
  */
 public class TreeTermIndex extends TermIndex implements Consumer<NAR> {
 
-    float maxFractionThatCanBeRemovedAtATime = 0.03f;
-    float descentRate = 0.5f;
+    float maxFractionThatCanBeRemovedAtATime = 0.05f;
+    float descentRate = 0.35f;
     int iterationLimit = 8; //TODO tune iterationLimit by the overflow amount
 
     @NotNull
@@ -156,10 +156,9 @@ public class TreeTermIndex extends TermIndex implements Consumer<NAR> {
         float r = rng.nextFloat();
         r = (r * r); //r^2
         r = (r * r); //r^4
-        r = (r * r); //r^8
-        r = 1 - r;
+        //r = (r * r); //r^8
 
-        return l.get( Math.round((levels - 1) * r) );
+        return l.get( Math.round((levels - 1) * (1 - r)) );
     }
 
     private int sizeEst() {
