@@ -12,6 +12,7 @@ import spacegraph.Ortho;
 import spacegraph.SpaceGraph;
 import spacegraph.Surface;
 import spacegraph.obj.layout.Grid;
+import spacegraph.obj.widget.Widget;
 import spacegraph.render.Draw;
 
 import java.util.Collection;
@@ -25,7 +26,7 @@ import static nars.time.Tense.ETERNAL;
 import static spacegraph.obj.layout.Grid.VERTICAL;
 
 
-public class BeliefTableChart extends Surface {
+public class BeliefTableChart extends Widget {
 
     public static final float baseTaskSize = 0.05f;
     public static final float CROSSHAIR_THICK = 3;
@@ -39,6 +40,7 @@ public class BeliefTableChart extends Surface {
 
 
     private final NAR nar;
+    private String termString;
     private long now;
 
     float angleSpeed = 0.5f;
@@ -127,10 +129,7 @@ public class BeliefTableChart extends Surface {
     protected void draw(Termed tt, Concept cc, GL2 gl, long minT, long maxT) {
 
 
-        float cp = nar.activation(cc);
-        gl.glColor4f(0.5f, 0.5f, 0.5f, 0.6f + 0.25f * cp);
 
-        Draw.text(gl, tt.toString(), 0.15f + 0.05f * cp, 1 / 2f, 1 / 2f, 0);
 
         TruthWave beliefs = this.beliefs;
         if (!beliefs.isEmpty()) {
@@ -172,8 +171,7 @@ public class BeliefTableChart extends Surface {
     }
 
     @Override
-    protected void paint(GL2 gl) {
-
+    protected void paintComponent(GL2 gl) {
 
         /*if (!redraw.compareAndSet(true, false)) {
             return;
@@ -232,10 +230,18 @@ public class BeliefTableChart extends Surface {
         Draw.rectStroke(gl, 0, 0, 1, 1);
 
         Concept cc = nar.concept(term);
+        float cp;
         if (cc != null) {
+            cp = nar.activation(cc);
             draw(term, cc, gl, minT, maxT);
+            termString = cc.toString();
+        } else {
+            cp = 0;
+            termString = term.toString();
         }
-
+        gl.glColor4f(0.75f, 0.75f, 0.75f, 0.8f + 0.2f * cp);
+        gl.glLineWidth(1);
+        Draw.text(gl, termString, (1f/termString.length()) * (0.5f + 0.25f * cp), 1 / 2f, 1 / 2f, 0);
     }
 
 

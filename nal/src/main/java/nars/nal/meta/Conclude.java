@@ -248,11 +248,9 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
     public final DerivedTask derive(@NotNull Termed<Compound> c, @NotNull Budget budget, long now, long occ, @NotNull PremiseEval p, Truth truth, char punc, long[] evidence) {
 
         DerivedTask dt =
-                new DerivedTask.DefaultDerivedTask(c, truth, punc, evidence, p);
+                new DerivedTask.DefaultDerivedTask(c, truth, punc, evidence, p, now, occ);
         //new RuleFeedbackDerivedTask(c, truth, punc, evidence, p, rule);
-
-        dt.time(now, occ)
-                .budget(budget) // copied in, not shared
+        dt.budget(budget) // copied in, not shared
                 //.anticipate(derivedTemporal && d.anticipate)
                 .log(Param.DEBUG ? rule : null);
 
@@ -296,8 +294,8 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
 
         private final @NotNull PremiseRule rule;
 
-        public RuleFeedbackDerivedTask(@NotNull Termed<Compound> tc, @Nullable Truth truth, char punct, long[] evidence, @NotNull PremiseEval premise, @NotNull PremiseRule rule) {
-            super(tc, truth, punct, evidence, premise);
+        public RuleFeedbackDerivedTask(@NotNull Termed<Compound> tc, @Nullable Truth truth, char punct, long[] evidence, @NotNull PremiseEval premise, @NotNull PremiseRule rule, long now, long occ) {
+            super(tc, truth, punct, evidence, premise, now, occ);
             this.rule = rule;
         }
 

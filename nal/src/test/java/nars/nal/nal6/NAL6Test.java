@@ -356,7 +356,13 @@ public class NAL6Test extends AbstractNALTest {
         tester.believe("(&&,<#1 --> lock>,<<$2 --> key> ==> <#1 --> (/,open,$2,_)>>)", 1.00f, 0.90f); //en("there is a lock which is opened by all keys");
         tester.believe("<{key1} --> key>", 1.00f, 0.90f); //en("key1 is a key");
         tester.mustBelieve(cycles, "(&&,<#1 --> lock>,<#1 --> (/,open,{key1},_)>)", 1.00f, 0.81f); //en("there is a lock which is opened by key1");
-
+    }
+    @Test
+    public void second_level_variable_unification_neg()  {
+        TestNAR tester = test();
+        tester.believe("(&&,<#1 --> lock>,<--($2 --> key) ==> <#1 --> (/,open,$2,_)>>)");
+        tester.believe("--({key1} --> key)");
+        tester.mustBelieve(cycles, "(&&,<#1 --> lock>,<#1 --> (/,open,{key1},_)>)", 1.00f, 0.81f);
     }
 
 
@@ -402,10 +408,18 @@ public class NAL6Test extends AbstractNALTest {
     @Test
     public void variable_elimination_deduction()  {
         test()
-            //.log()
-            .believe("((&&,(#1 --> lock),open:($2,#1)) ==> ($2 --> key))", 1.00f, 0.90f) //en("there is a lock with the property that when opened by something, this something is a key");
+            .log()
+            .believe("((&&,(#1 --> lock),open($2,#1)) ==> ($2 --> key))", 1.00f, 0.90f) //en("there is a lock with the property that when opened by something, this something is a key");
             .believe("(lock1 --> lock)", 1.00f, 0.90f) //en("lock1 is a lock");
-            .mustBelieve(cycles, "(open:($1,lock1) ==> ($1 --> key))", 1.00f, 0.81f); //en("whatever opens lock1 is a key");
+            .mustBelieve(cycles, "(open($1,lock1) ==> ($1 --> key))", 1.00f, 0.81f); //en("whatever opens lock1 is a key");
+    }
+    @Test
+    public void variable_elimination_deduction_neg()  {
+        test()
+                .log()
+                .believe("((&&, --(#1 --> lock), open($2,#1)) ==> ($2 --> key))") //en("there is not a lock with the property that when opened by something, this something is a key");
+                .believe("--(lock1 --> lock)") //en("lock1 is not a lock");
+                .mustBelieve(cycles, "(open($1,lock1) ==> ($1 --> key))", 1.00f, 0.81f); //en("whatever opens lock1 is a key");
     }
 
 
@@ -413,18 +427,18 @@ public class NAL6Test extends AbstractNALTest {
     @Test
     public void abduction_with_variable_elimination()  {
         test()
-            .believe("(open:($1,lock1) ==> ($1 --> key))", 1.00f, 0.90f) //en("whatever opens lock1 is a key");
+            .believe("(open($1,lock1) ==> ($1 --> key))", 1.00f, 0.90f) //en("whatever opens lock1 is a key");
                 ///tester.believe("<<lock1 --> (/,open,$1,_)> ==> <$1 --> key>>", 1.00f, 0.90f); //en("whatever opens lock1 is a key");
-            .believe("(((#1 --> lock) && open:($2,#1)) ==> ($2 --> key))", 1.00f, 0.90f) //en("there is a lock with the property that when opened by something, this something is a key");
+            .believe("(((#1 --> lock) && open($2,#1)) ==> ($2 --> key))", 1.00f, 0.90f) //en("there is a lock with the property that when opened by something, this something is a key");
             .mustBelieve(cycles, "lock:lock1", 1.00f, 0.45f) //en("lock1 is a lock");
         ;
     }
     @Test
     public void abduction_with_variable_elimination_negated()  {
         test()
-                .believe("(open:($1,lock1) ==> ($1 --> key))", 1.00f, 0.90f) //en("whatever opens lock1 is a key");
+                .believe("(open($1,lock1) ==> ($1 --> key))", 1.00f, 0.90f) //en("whatever opens lock1 is a key");
                 ///tester.believe("<<lock1 --> (/,open,$1,_)> ==> <$1 --> key>>", 1.00f, 0.90f); //en("whatever opens lock1 is a key");
-                .believe("(((--,(#1 --> lock)) && open:($2,#1)) ==> ($2 --> key))", 1.00f, 0.90f) //en("there is NOT a lock with the property that when opened by something, this something is a key");
+                .believe("(((--,(#1 --> lock)) && open($2,#1)) ==> ($2 --> key))", 1.00f, 0.90f) //en("there is NOT a lock with the property that when opened by something, this something is a key");
                 .mustBelieve(cycles, "lock:lock1", 0.00f, 0.45f) //en("lock1 is NOT a lock")
                 .mustNotOutput(cycles, "lock:lock1", '.', 0.5f,1f,0,1f,ETERNAL)
         ;

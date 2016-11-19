@@ -21,6 +21,8 @@ import java.util.Arrays;
 import java.util.Objects;
 
 import static nars.$.t;
+import static nars.Op.EQUI;
+import static nars.Op.IMPL;
 import static nars.time.Tense.DTERNAL;
 import static nars.time.Tense.ETERNAL;
 import static nars.truth.TruthFunctions.w2c;
@@ -570,7 +572,7 @@ public abstract class AbstractTask extends RawBudget implements Task, Temporal {
                     throw new RuntimeException("NaN duration");
 
                 float dc = TruthPolation.evidenceDecay(cw, dur, delta);
-                if (term.vars() > 0)
+                if (eternalizable())
                     return Math.max(dc, t.eternalizedConf());
                 return dc;
 
@@ -578,6 +580,14 @@ public abstract class AbstractTask extends RawBudget implements Task, Temporal {
 
         }
 
+    }
+
+    public boolean eternalizable() {
+        return term.vars() > 0;
+        //return term.varIndep() > 0;
+        //Op op = term.op();
+        //return op ==IMPL || op ==EQUI || term.vars() > 0;
+        //return op.statement || term.vars() > 0;
     }
 
     @Override

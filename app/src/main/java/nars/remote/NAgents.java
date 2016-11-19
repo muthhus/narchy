@@ -156,8 +156,8 @@ abstract public class NAgents extends NAgent {
                 //new SingleThreadExecutioner();
                 new MultiThreadExecutioner(threads, 8192 /* TODO chose a power of 2 number to scale proportionally to # of threads */);
 
-        int volMax = 40;
-        int conceptsPerCycle = 64;
+        int volMax = 48;
+        int conceptsPerCycle = 128;
 
 
         //Multi nar = new Multi(3,512,
@@ -177,8 +177,8 @@ abstract public class NAgents extends NAgent {
 //            }
         };
 
-        nar.beliefConfidence(0.8f);
-        nar.goalConfidence(0.8f);
+        nar.beliefConfidence(0.9f);
+        nar.goalConfidence(0.9f);
 
         float p = 0.5f;
         nar.DEFAULT_BELIEF_PRIORITY = 0.75f * p;
@@ -279,37 +279,42 @@ abstract public class NAgents extends NAgent {
 
     public static void chart(NAgents a) {
         NAR nar = a.nar;
-        window(
-                row(
-                        grid(a.cam.values().stream().map(cs ->
-                                new CameraSensorView(cs, nar).align(Surface.Align.Center, cs.width, cs.height))
+        a.nar.runLater(()-> {
+            window(
+                    row(
+                            grid(a.cam.values().stream().map(cs ->
+                                    new CameraSensorView(cs, nar).align(Surface.Align.Center, cs.width, cs.height))
                                     .toArray(Surface[]::new)),
 
-                        new ReflectionSurface(a),
-                        //nar instanceof Default ? Vis.concepts((Default) nar, 128) : grid(/*blank*/),
+                            new ReflectionSurface(a),
+                            //nar instanceof Default ? Vis.concepts((Default) nar, 128) : grid(/*blank*/),
 
-                        Vis.agentActions(a, 400)
+                            Vis.agentActions(a, 400),
+                            Vis.beliefCharts(400, a.predictors, a.nar)
 
-                        //Vis.budgetHistogram(nar, 32),
-                        /*Vis.conceptLinePlot(nar,
-                                Iterables.concat(a.actions, Lists.newArrayList(a.happy, a.joy)),
-                                2000)*/
-                ), 1200, 900);
+                            //Vis.budgetHistogram(nar, 32),
+                            /*Vis.conceptLinePlot(nar,
+                                    Iterables.concat(a.actions, Lists.newArrayList(a.happy, a.joy)),
+                                    2000)*/
+                    ), 1200, 900);
+        });
     }
     public static void chart(NAgent a) {
-        NAR nar = a.nar;
-        window(
-                row(
-                        new ReflectionSurface(a),
-                        //nar instanceof Default ? Vis.concepts((Default) nar, 128) : grid(/*blank*/),
+        a.nar.runLater(()-> {
+            window(
+                    row(
+                            new ReflectionSurface(a),
+                            //nar instanceof Default ? Vis.concepts((Default) nar, 128) : grid(/*blank*/),
 
-                        Vis.agentActions(a, 400)
+                            Vis.agentActions(a, 400),
+                            Vis.beliefCharts(400, a.predictors, a.nar)
 
-                        //Vis.budgetHistogram(nar, 32),
-                        /*Vis.conceptLinePlot(nar,
-                                Iterables.concat(a.actions, Lists.newArrayList(a.happy, a.joy)),
-                                2000)*/
-                ), 1200, 900);
+                            //Vis.budgetHistogram(nar, 32),
+                            /*Vis.conceptLinePlot(nar,
+                                    Iterables.concat(a.actions, Lists.newArrayList(a.happy, a.joy)),
+                                    2000)*/
+                    ), 1200, 900);
+        });
     }
 
     /**

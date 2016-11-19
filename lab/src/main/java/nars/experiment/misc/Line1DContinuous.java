@@ -56,16 +56,16 @@ public class Line1DContinuous extends NAgent {
             int ii = i;
             //hidden
             sensors.add(new SensorConcept(
-                    //$.func("h", $.the(i)),
-                    $.p($.the("h"), $.the(i)),
+                    $.func("h", $.the(i)),
+                    //$.p($.the("h"), $.the(i)),
                     n, ()->{
                 return ins[ii];
             }, (v) -> $.t(v, alpha)));
 
             //estimated
             sensors.add(new SensorConcept(
-                    //$.func("e", $.the(i)),
-                    $.p($.the("e"), $.the(i)),
+                    $.func("e", $.the(i)),
+                    //$.p($.the("e"), $.the(i)),
                     n, ()->{
                 return ins[size + ii];
             }, (v) -> $.t(v, alpha)));
@@ -244,7 +244,7 @@ public class Line1DContinuous extends NAgent {
     public static void main(String[] args) {
 
         XorShift128PlusRandom rng = new XorShift128PlusRandom((int)(Math.random()*1000));
-        int conceptsPerCycle = 256;
+        int conceptsPerCycle = 64;
 
         final Executioner exe =
                 //new MultiThreadExecutioner(2, 2048);
@@ -253,7 +253,7 @@ public class Line1DContinuous extends NAgent {
         Default nar = new Default(1024,
                 conceptsPerCycle, 1, 3, rng,
                 new CaffeineIndex(new DefaultConceptBuilder(), 1024*64, 12, false, exe),
-                new FrameTime(2f), exe
+                new FrameTime(3f), exe
         );
 
 
@@ -262,10 +262,10 @@ public class Line1DContinuous extends NAgent {
 
         //nar.truthResolution.setValue(0.02f);
 
-        nar.compoundVolumeMax.set(30);
+        nar.compoundVolumeMax.set(24);
 
-        Line1DContinuous l = new Line1DContinuous(nar, 6,
-                sine(100)
+        Line1DContinuous l = new Line1DContinuous(nar, 4,
+                sine(50)
                 //random(120)
         );
 
@@ -273,12 +273,16 @@ public class Line1DContinuous extends NAgent {
         NAgents.chart(l);
 
         l.print = true;
-        l.run(200000);
+        l.run(1500);
 
 
         NAR.printTasks(nar, true);
         NAR.printTasks(nar, false);
         System.out.println("AVG SCORE=" + l.rewardSum()/ nar.time());
+
+        l.predictors.forEach(p->{
+           nar.concept(p).print();
+        });
     }
 
 }

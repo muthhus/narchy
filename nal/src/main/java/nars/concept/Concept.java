@@ -369,7 +369,9 @@ public interface Concept extends Termed {
                     out.append(indent);
                     out.append(s.toString());
                     out.append(" ");
-                    out.append(s.lastLogged().toString());
+                    Object ll = s.lastLogged();
+                    if (ll!=null)
+                        out.append(ll.toString());
                     out.append('\n');
                 } catch (IOException e) {
                     e.printStackTrace();

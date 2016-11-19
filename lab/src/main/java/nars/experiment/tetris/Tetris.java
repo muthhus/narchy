@@ -16,8 +16,10 @@ import nars.time.FrameTime;
 import nars.truth.Truth;
 import nars.util.TaskStatistics;
 import org.jetbrains.annotations.NotNull;
+import spacegraph.SpaceGraph;
 import spacegraph.Surface;
 import spacegraph.math.v2;
+import spacegraph.obj.ControlSurface;
 import spacegraph.obj.widget.MatrixView;
 
 import java.util.List;
@@ -42,9 +44,9 @@ public class Tetris extends NAgents {
 
     public static final int tetris_width = 6;
     public static final int tetris_height = 14;
-    public static final int TIME_PER_FALL = 8;
+    public static final int TIME_PER_FALL = 4;
     public static final int frameRate = 1;
-    public static final int PIXEL_RADIX = 4;
+    public static final int PIXEL_RADIX = 3;
     static boolean easy;
 
 
@@ -157,8 +159,8 @@ public class Tetris extends NAgents {
                     //return $.t(0.5f, alpha); //no action taken or move ineffective
                 }
             }
-            return $.t(0.5f, alpha); //no action taken or move ineffective
-            //return null;
+            //return $.t(0.5f, alpha); //no action taken or move ineffective
+            return null;
         }));
 
         //if (rotate) {
@@ -179,8 +181,8 @@ public class Tetris extends NAgents {
                         //return $.t(0.5f, alpha); //no action taken or move ineffective
                     }
                 }
-                return $.t(0.5f, alpha); //no action taken or move ineffective
-                //return null;
+                //return $.t(0.5f, alpha); //no action taken or move ineffective
+                return null;
             }));
 //        } else {
 //            motorRotate = null;
@@ -203,10 +205,11 @@ public class Tetris extends NAgents {
                         //$.p(x, y);
 
                         //$.inh(
-                        //$.func($.the("tetris"),
+                        $.func($.the("tetris"),
                         $.p(
                           $.pRecurse($.radixArray(x, PIXEL_RADIX, state.width)),
                               $.pRecurse($.radixArray(y, PIXEL_RADIX, state.height))
+                        )
                         )
                                 //$.p(
                                         //$.the("tetris"))
@@ -361,8 +364,8 @@ public class Tetris extends NAgents {
     public static void main(String[] args) {
         //Param.DEBUG = true;
 
-        NAR nar = NAgents.newMultiThreadNAR(3, new FrameTime());
-        nar.linkFeedbackRate.setValue(0.05f);
+        NAR nar = NAgents.newMultiThreadNAR(3, new FrameTime().dur(TIME_PER_FALL));
+        //nar.linkFeedbackRate.setValue(0.05f);
 
 //        Random rng = new XorShift128PlusRandom(1);
 //        //Multi nar = new Multi(3,512,
@@ -450,7 +453,19 @@ public class Tetris extends NAgents {
         //new VariableCompressor(nar);
 
 
-        Tetris t = new Tetris(nar, frameRate, tetris_width, tetris_height, TIME_PER_FALL);
+        Tetris t = new Tetris(nar, frameRate, tetris_width, tetris_height, TIME_PER_FALL) {
+            @Override
+            protected void init() {
+                super.init();
+                view.plot1 =
+                        Vis.emotionPlots(nar, 256);
+
+
+                view.plot2 = Vis.agentBudgetPlot(this, 256);
+                SpaceGraph.window(new ControlSurface(view), 800, 600);
+                NAgents.chart(this);
+            }
+        };
 
 
 //                AutoClassifier ac = new AutoClassifier($.the("row"), nar, sensors,
@@ -473,25 +488,21 @@ public class Tetris extends NAgents {
         //window(Vis.concepts(nar, 1024), 500, 500);
 
         //STMView.show(stm, 800, 600);
-
-        window(
-                col(
-
-                        //Vis.concepts(nar, 32),
-                        Vis.agentActions(t, 1200),
-
-                        Vis.budgetHistogram(nar, 24)
-                        /*Vis.conceptLinePlot(nar,
-                                Iterables.concat(t.actions, Lists.newArrayList(t.happy, t.joy)),
-                                600)*/
-                ), 1200, 900);
-
-
-        view.plot1 =
-                Vis.emotionPlots(nar, 256);
+//
+//        window(
+//                col(
+//
+//                        //Vis.concepts(nar, 32),
+//                        //Vis.agentActions(t, 1200),
+//
+//                        Vis.budgetHistogram(nar, 24)
+//                        /*Vis.conceptLinePlot(nar,
+//                                Iterables.concat(t.actions, Lists.newArrayList(t.happy, t.joy)),
+//                                600)*/
+//                ), 1200, 900);
 
 
-        view.plot2 = Vis.agentBudgetPlot(t, 256);
+
             /*view.plot2 = new GridSurface(HORIZONTAL,
                 //conceptLinePlot(nar, Lists.newArrayList( t.happy, t.joy ), (c) -> nar.conceptPriority(c), 256),
 
@@ -552,7 +563,8 @@ public class Tetris extends NAgents {
 //                );
 //                newControlWindow(12f,4f, new Object[] { camHistory } );
 
-        newControlWindow(view);
+        //newControlWindow(view);
+
 
         //newControlWindow(2f,4f, new Object[] { new MatrixView(tetris_width, tetris_height, sensorMatrixView(nar, 0)) } );
 

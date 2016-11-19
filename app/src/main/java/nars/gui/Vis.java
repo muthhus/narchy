@@ -7,6 +7,7 @@ import nars.$;
 import nars.NAR;
 import nars.NAgent;
 import nars.bag.Bag;
+import nars.concept.ActionConcept;
 import nars.concept.Concept;
 import nars.link.BLink;
 import nars.nar.Default;
@@ -70,17 +71,24 @@ public class Vis {
     }
 
     public static Grid agentActions(NAgent a, long window) {
+        List<Termed> ii = Lists.newArrayList();
+        ii.addAll(a.actions);
+        ii.add(a.happy);
+        ii.add(a.joy);
+
         NAR nar = a.nar;
+
+        return beliefCharts(window, ii, nar);
+    }
+
+    public static Grid beliefCharts(long window, List<? extends Termed> ii, NAR nar) {
         long[] btRange = new long[2];
         nar.onFrame(nn -> {
             long now = nn.time();
             btRange[0] = now - window;
             btRange[1] = now + window;
         });
-        List<Surface> s = a.actions.stream().map(c -> new BeliefTableChart(nar, c, btRange)).collect(toList());
-        s.add(new BeliefTableChart(nar, a.happy, btRange));
-        s.add(new BeliefTableChart(nar, a.joy, btRange));
-
+        List<Surface> s = ii.stream().map(c -> new BeliefTableChart(nar, c, btRange)).collect(toList());
         return new Grid(VERTICAL, s);
     }
 

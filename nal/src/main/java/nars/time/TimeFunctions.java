@@ -264,8 +264,10 @@ public interface TimeFunctions {
     /**
      * copiesthe 'dt' and the occurence of the task term directly
      */
-    TimeFunctions dtTaskExact = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Conclude d, long[] occReturn, float[] confScale) -> dtExact(derived, occReturn, p, true);
-    TimeFunctions dtBeliefExact = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Conclude d, long[] occReturn, float[] confScale) -> dtExact(derived, occReturn, p, false);
+    TimeFunctions dtTaskExact = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Conclude d, long[] occReturn, float[] confScale) ->
+            dtExact(derived, occReturn, p, true);
+    TimeFunctions dtBeliefExact = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Conclude d, long[] occReturn, float[] confScale) ->
+            dtExact(derived, occReturn, p, false);
 
 
     /**
@@ -526,7 +528,13 @@ public interface TimeFunctions {
 
         Task t = p.task;
         Task b = p.belief;
+
         long tOcc = t.occurrence();
+        if (b!=null) {
+            if (t.isQuestOrQuestion() || tOcc==ETERNAL)
+                tOcc = b.occurrence(); //use belief time when task is a question, or task is eternal
+        }
+
         if (!taskOrBelief && b != null) {
             //if (b.occurrence()!=ETERNAL) {
             int derivedInT = dtTerm.subtermTime(derived);
@@ -1079,13 +1087,13 @@ public interface TimeFunctions {
     static long occInterpolate(@NotNull Task t, @Nullable Task b, PremiseEval p) {
 
         long to = t.occurrence();
-        if (b == null)
+        if (b == null) {
             return to;
+        }
 
         long bo = b.occurrence();
-        if (to == ETERNAL)
-            return bo;
-            //to = p.time(); //only un-eternalize task
+        if (t.isQuestOrQuestion() || to==ETERNAL)
+            return bo; //use belief time when task is a question, or task is eternal
 
         if (bo == ETERNAL)
             return to; //dont uneternalize belief, defer to task's occurrence

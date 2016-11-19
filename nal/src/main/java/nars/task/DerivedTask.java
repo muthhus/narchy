@@ -12,27 +12,68 @@ import nars.term.Termed;
 import nars.truth.Truth;
 import nars.truth.TruthDelta;
 import nars.util.Util;
+import nars.util.math.Interval;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import static nars.time.Tense.DTERNAL;
 
 
 /** TODO extend an ImmutableTask class */
 abstract public class DerivedTask extends MutableTask {
 
 
-    @Nullable
-    public volatile transient Premise premise;
+    @Nullable public volatile transient Premise premise;
+
+    //@Nullable long[] startEnd;
 
     //TODO should this also affect the Belief task?
 
-    public DerivedTask(@NotNull Termed<Compound> tc, char punct, @Nullable Truth truth, @NotNull PremiseEval p, long[] evidence) {
+    public DerivedTask(@NotNull Termed<Compound> tc, char punct, @Nullable Truth truth, @NotNull PremiseEval p, long[] evidence, long now, long occ) {
         super(tc, punct, truth);
 
+        time(now, occ);
         evidence(evidence);
+
+
+
+//        if (!isBeliefOrGoal() || tc.term().dt()!=DTERNAL) {
+//            //if this is a question or temporal relation use default method
+//            this.startEnd = null;
+//        } else {
+//            long defaultStart = start();
+//            long defaultEnd = end();
+//            long start, end;
+//            if (p.belief!=null && !p.task.isEternal() && !p.belief.isEternal()) {
+//                Interval i = Interval.union(
+//                        p.task.start(), p.task.end(), p.belief.start(), p.belief.end());
+//                start = i.a;
+//                end = i.b;
+//
+//            } else {
+//                start = p.task.start();
+//                end = p.task.end();
+//            }
+//
+//            if ((defaultStart == start) && (defaultEnd == end))
+//                this.startEnd = null; //use default
+//            else
+//                this.startEnd = new long[] { start, end };
+//        }
+
 
         this.premise = p.premise;
     }
 
+//    @Override
+//    public long start() {
+//        return startEnd == null ? super.start() : startEnd[0];
+//    }
+//
+//    @Override
+//    public long end() {
+//        return startEnd == null ? super.end() : startEnd[1];
+//    }
 
     @Override
     public final boolean isInput() {
@@ -83,8 +124,8 @@ abstract public class DerivedTask extends MutableTask {
 
     public static class DefaultDerivedTask extends DerivedTask {
 
-        public DefaultDerivedTask(@NotNull Termed<Compound> tc, @Nullable Truth truth, char punct, long[] evidence, @NotNull PremiseEval premise) {
-            super(tc, punct, truth, premise, evidence);
+        public DefaultDerivedTask(@NotNull Termed<Compound> tc, @Nullable Truth truth, char punct, long[] evidence, @NotNull PremiseEval premise, long now, long occ) {
+            super(tc, punct, truth, premise, evidence, now, occ);
         }
 
 

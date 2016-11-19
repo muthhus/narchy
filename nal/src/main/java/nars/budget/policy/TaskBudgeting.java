@@ -31,9 +31,10 @@ public class TaskBudgeting {
         float occam = occamGrowth(derived, baseBudget);
 
         final float quality =
-                baseBudget.qua() * occam * derivationQuality;
-//        if (quality < p.durMin)
-//            return null;
+                baseBudget.qua() * occam;// * derivationQuality;
+
+        if (quality < p.quaMin)
+            return null;
 
         float priority =
                 //nal.taskLink.priIfFiniteElseZero() * volRatioScale;
@@ -84,8 +85,8 @@ public class TaskBudgeting {
         int taskCompl = pp.task.complexity();
         if (parentBelief!=null) // && parentBelief.complexity() > parentComplexity)
             parentComplexity =
-                //Math.max(taskCompl, parentBelief.complexity());
-                Math.min(taskCompl, parentBelief.complexity());
+                //Math.min(taskCompl, parentBelief.complexity());
+                Math.max(taskCompl, parentBelief.complexity());
         else
             parentComplexity = taskCompl;
 

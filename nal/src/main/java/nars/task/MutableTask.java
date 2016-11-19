@@ -247,10 +247,21 @@ public class MutableTask extends AbstractTask {
         return this;
     }
 
+
+
     /** if p is NaN (indicating deletion), p <== 0 */
     @NotNull public final MutableTask budgetSafe(float p, float q) {
         priority = p;
         quality = q;
+//        if (p!=p)
+//            p = 0;
+//        setBudget(p, d, q);
+        return this;
+    }
+    /** if p is NaN (indicating deletion), p <== 0 */
+    @NotNull public final MutableTask budgetSafe(float p, NAR nar) {
+        priority = p;
+        quality = isQuestOrQuestion() ? nar.qualityDefault(punc()) : BudgetFunctions.truthToQuality(truth());
 //        if (p!=p)
 //            p = 0;
 //        setBudget(p, d, q);
