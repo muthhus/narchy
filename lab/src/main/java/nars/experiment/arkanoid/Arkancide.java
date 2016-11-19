@@ -85,8 +85,8 @@ public class Arkancide extends NAgents {
         Param.DEBUG = true;
 
         //runRT(Arkancide::new);
-        runRT(Arkancide::new, 25, 5);
-        //run(Arkancide::new, 120000);
+        //nRT(Arkancide::new, 25, 5);
+        run(Arkancide::new, 500);
     }
 
 

@@ -134,13 +134,10 @@ public interface Concept extends Termed {
 
     }
 
-
-    default void linkCapacity(@NotNull ConceptPolicy p) {
-
-        termlinks().setCapacity(p.linkCap(this, true));
-        tasklinks().setCapacity(p.linkCap(this, false));
+    default void linkCapacity(int termlinks, int tasklinks) {
+        termlinks().setCapacity(termlinks);
+        tasklinks().setCapacity(tasklinks);
     }
-
 
     void delete(NAR nar);
 

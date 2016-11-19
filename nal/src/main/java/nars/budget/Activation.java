@@ -147,6 +147,7 @@ public class Activation {
 
             /* insert termlink source to target */
             src.termlinks().put(targetTerm, in, scale, linkOverflow);
+
         }
 
         if (targetConcept != null && depth <= tasklinkDepth && in instanceof Task) {

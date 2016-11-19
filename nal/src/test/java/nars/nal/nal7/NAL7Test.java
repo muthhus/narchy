@@ -922,11 +922,34 @@ public class NAL7Test extends AbstractNALTest {
     @Test
     public void testReverseImpl() {
         test()
-                .log()
                 .believe("((x) ==>+5 (y))")
                 .believe("((y) ==>-5 (x))")
                 .mustBelieve(cycles, "((x) <=>+5 (y))", 1f, 0.81f)
                 .mustNotOutput(cycles, "((y) <=>+5 (x))", '.', ETERNAL);
+    }
+
+    @Test
+    public void testPreconditionCombine() {
+        test()
+                .believe("((x) ==>+5 (z))")
+                .believe("((y) ==>+5 (z))")
+                .mustBelieve(cycles, "( ((x) &&+0 (y)) ==>+5 (z))", 1f, 0.81f);
+    }
+    @Test
+    public void testPreconditionCombineVarying() { //may be equivalent to another case
+        test()
+                .believe("((x) ==>+5 (z))")
+                .believe("((y) ==>+3 (z))")
+                .mustBelieve(cycles, "( ((x) &&+2 (y)) ==>+3 (z))", 1f, 0.81f);
+    }
+
+    @Test
+    public void testPreconditionCombineNeg() { //may be equivalent to another case
+        test()
+                .log()
+                .believe("((x) ==>+5 (z))")
+                .believe("(--(y) ==>+5 (z))")
+                .mustBelieve(cycles, "( ((x) &&+0 --(y)) ==>+5 (z))", 1f, 0.81f);
     }
 
 //    @Test public void testTruthDecayOverTime0() {

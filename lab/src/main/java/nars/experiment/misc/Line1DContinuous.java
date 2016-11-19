@@ -56,16 +56,16 @@ public class Line1DContinuous extends NAgent {
             int ii = i;
             //hidden
             sensors.add(new SensorConcept(
-                    $.func("h", $.the(i)),
-                    //$.p($.the("h"), $.the(i)),
+                    //$.func("h", $.the(i)),
+                    $.p($.the("h"), $.the(i)),
                     n, ()->{
                 return ins[ii];
             }, (v) -> $.t(v, alpha)));
 
             //estimated
             sensors.add(new SensorConcept(
-                    $.func("e", $.the(i)),
-                    //$.p($.the("e"), $.the(i)),
+                    //$.func("e", $.the(i)),
+                    $.p($.the("e"), $.the(i)),
                     n, ()->{
                 return ins[size + ii];
             }, (v) -> $.t(v, alpha)));

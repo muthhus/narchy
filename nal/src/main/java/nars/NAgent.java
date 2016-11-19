@@ -3,12 +3,15 @@ package nars;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import nars.bag.Bag;
 import nars.budget.BudgetFunctions;
+import nars.budget.policy.ConceptPolicy;
 import nars.concept.ActionConcept;
 import nars.concept.Concept;
 import nars.concept.SensorConcept;
 import nars.nal.UtilityFunctions;
 import nars.nar.Default;
+import nars.table.BeliefTable;
 import nars.task.GeneratedTask;
 import nars.task.MutableTask;
 import nars.term.Compound;
@@ -38,6 +41,7 @@ import java.util.Random;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static nars.$.t;
+import static nars.Op.IMPL;
 import static nars.Symbols.BELIEF;
 import static nars.Symbols.GOAL;
 import static nars.time.Tense.ETERNAL;
@@ -52,6 +56,7 @@ abstract public class NAgent implements NSense, NAction {
 
 
     public static final Logger logger = LoggerFactory.getLogger(NAgent.class);
+    public static final int HAPPINESS_TERMLINK_CAPACITY_MULTIPLIER = 8;
 
     /**
      * general reward signal for this agent
@@ -164,7 +169,12 @@ abstract public class NAgent implements NSense, NAction {
                 nar,
                 rewardNormalized,
                 (x) -> t(x, rewardConf)
-        );
+        ) {
+            @Override
+            protected int termlinkMultiplier() {
+                return HAPPINESS_TERMLINK_CAPACITY_MULTIPLIER * super.termlinkMultiplier();
+            }
+        };
 
 
         joy = new SensorConcept(
@@ -424,8 +434,10 @@ abstract public class NAgent implements NSense, NAction {
             ((FasterList)predictors).addAll(
                     //new MutableTask($.seq($.varQuery(0), dur, action), '?', null).eternal(),
                     //new MutableTask($.impl($.varQuery(0), dur, action), '?', null).eternal(),
-                    new MutableTask($.impl(action, dur, happiness), '?', null).time(now, now),
-                    new MutableTask($.impl($.neg(action), dur, happiness), '?', null).time(now, now)
+                    new MutableTask($.seq(action, dur, happiness), '?', null).eternal(),
+                    new MutableTask($.seq($.neg(action), dur, happiness), '?', null).eternal(),
+                    new MutableTask($.impl(action, dur, happiness), '?', null).eternal(),
+                    new MutableTask($.impl($.neg(action), dur, happiness), '?', null).eternal()
                     //new MutableTask($.impl($.parallel($.varDep(0), action), dur, happiness), '?', null).time(now, now + dur),
                     //new MutableTask($.impl($.parallel($.varDep(0), $.neg( action )), dur, happiness), '?', null).time(now, now + dur)
             );
@@ -590,6 +602,23 @@ abstract public class NAgent implements NSense, NAction {
         for (int i = 0, predictorsSize = predictors.size(); i < predictorsSize; i++) {
             predictors.set(i, boost(predictors.get(i), pri));
         }
+
+//        Compound term = happy.term();
+//        happy.termlinks().forEach(tl -> {
+//            Term x = tl.get();
+//            if (x.op().temporal) {
+//                if (((Compound)x).containsTerm(term)) {
+//                    System.out.println(x);
+//                }
+//            }
+////            if (x.op()==IMPL) {
+////                Compound i = (Compound)x;
+////                int dt = i.dt();
+////                if (i.term(1).equals(term)) {
+////                    System.out.println(i);
+////                }
+////            }
+//        });
     }
 
     public float desireConf() {

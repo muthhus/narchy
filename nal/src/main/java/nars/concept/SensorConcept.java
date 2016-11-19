@@ -5,7 +5,6 @@ import nars.NAR;
 import nars.Narsese;
 import nars.Task;
 import nars.nal.UtilityFunctions;
-import nars.table.BeliefTable;
 import nars.table.DefaultBeliefTable;
 import nars.task.Revision;
 import nars.term.Compound;
@@ -32,7 +31,7 @@ import static nars.time.Tense.ETERNAL;
 /**
  * primarily a collector for believing time-changing input signals
  */
-public class SensorConcept extends WiredCompoundConcept implements FloatFunction<Term>, FloatSupplier, WiredCompoundConcept.Prioritizable, Consumer<Task>, Runnable {
+public class SensorConcept extends WiredConcept implements FloatFunction<Term>, FloatSupplier, WiredConcept.Prioritizable, Consumer<Task>, Runnable {
 
     @NotNull
     public final ScalarSignal sensor;

@@ -23,7 +23,7 @@ import org.jetbrains.annotations.NotNull;
  * to make them directly reflect the sensor concept as the authority.
  *
  * */
-public abstract class WiredCompoundConcept extends CompoundConcept<Compound> implements PermanentConcept {
+public abstract class WiredConcept extends CompoundConcept<Compound> implements PermanentConcept {
 
     @NotNull
     protected final NAR nar;
@@ -36,13 +36,26 @@ public abstract class WiredCompoundConcept extends CompoundConcept<Compound> imp
         void pri(FloatSupplier v);
     }
 
-    public WiredCompoundConcept(@NotNull Compound term, @NotNull NAR n) {
+    public WiredConcept(@NotNull Compound term, @NotNull NAR n) {
         super(term, n);
         this.nar = n;
         n.on(this);
     }
 
-//    @Override
+    @Override
+    public void linkCapacity(int termlinks, int tasklinks) {
+        super.linkCapacity(termlinks * termlinkMultiplier(), tasklinks * tasklinkMultiplier());
+    }
+
+    protected int termlinkMultiplier() {
+        return 1;
+    }
+
+    protected int tasklinkMultiplier() {
+        return 1;
+    }
+
+    //    @Override
 //    protected TermContainer buildTemplates(Compound term, NAR nar) {
 //        if (term.volume()==2 && term.op() == Op.PROD) {
 //            //special case. these are atom-like products of 1 term

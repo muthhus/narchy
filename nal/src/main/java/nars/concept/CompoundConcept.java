@@ -295,12 +295,13 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept, Ter
         ConceptPolicy current = this.policy;
         if (current != p) {
             this.policy = p;
-            linkCapacity(p);
+            linkCapacity( p.linkCap(this, true), p.linkCap(this, false));
 
             beliefCapacity(p, nar);
             questionCapacity(p, nar);
         }
     }
+
 
 
     protected void beliefCapacity(@NotNull ConceptPolicy p, NAR nar) {

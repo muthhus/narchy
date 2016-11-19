@@ -202,10 +202,10 @@
     //otherwise it will remain DTERNAL. using XTERNAL (&&+-) here is more trouble than its worth
 
     (P ==> M), (S ==> M), neqCom(S,P), time(dtCombinePre) |- ((P && S) ==>+- M), (Belief:Union)
-        (%P ==> %M), (%S ==> %M), neqCom(%S,%P), time(dtCombinePre) |- ((%P || %S) ==>+- %M), (Belief:Intersection)
+        (P ==> M), (S ==> M), neqCom(S,P), time(dtCombinePre) |- ((%P || %S) ==>+- M), (Belief:Intersection)
 
     (M ==> P), (M ==> S), neqCom(S,P), time(dtCombinePost) |- (M ==>+- (P && S)), (Belief:Intersection)
-        (%M ==> %P), (%M ==> %S), neqCom(%S,%P), time(dtCombinePost) |- (%M ==>+- (%P || %S)), (Belief:Union)
+        (M ==> P), (M ==> S), neqCom(S,P), time(dtCombinePost) |- (M ==>+- (%P || %S)), (Belief:Union)
 
 
 //    (D =/> R), (D =\> K), neq(R,K) |- (K =/> R), (Belief:Abduction),

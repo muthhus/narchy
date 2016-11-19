@@ -66,7 +66,7 @@ public class AtomConcept extends AtomicStringConstant implements Concept {
         ConceptPolicy current = this.policy;
         if (current!=p) {
             this.policy = p;
-            linkCapacity(p);
+            linkCapacity(p.linkCap(this, true),p.linkCap(this, false));
         }
     }
 

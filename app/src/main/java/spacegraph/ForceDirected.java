@@ -81,14 +81,10 @@ public class ForceDirected<X> implements spacegraph.phys.constraint.BroadConstra
     }
 
     protected void batch(List<Collidable> l) {
-
-
         for (int i = 0, lSize = l.size(); i < lSize; i++) {
             Collidable x = l.get(i);
-            for (int i1 = i + 1, lSize1 = l.size(); i1 < lSize1; i1++) {
-                Collidable y = l.get(i1);
-
-                repel(x, y, repelSpeed, minRepelDist, maxRepelDist);
+            for (int j = i + 1; j < lSize; j++) {
+                repel(x, l.get(j), repelSpeed, minRepelDist, maxRepelDist);
             }
         }
     }

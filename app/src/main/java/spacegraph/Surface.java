@@ -19,6 +19,7 @@ import static spacegraph.math.v3.v;
  */
 public class Surface {
 
+
     public enum Align {
 
 
@@ -240,6 +241,10 @@ public class Surface {
             }
         }
         return false;
+    }
+
+    public float radius() {
+        return Math.max(scaleLocal.x, scaleLocal.y);
     }
 
 }

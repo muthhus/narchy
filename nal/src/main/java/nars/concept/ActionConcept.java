@@ -1,7 +1,6 @@
 package nars.concept;
 
 import nars.*;
-import nars.task.GeneratedTask;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.truth.Truth;
@@ -15,11 +14,10 @@ import java.util.function.Consumer;
 
 import static nars.$.$;
 import static nars.$.t;
-import static nars.Symbols.GOAL;
 
 
 /** TODO make extend SensorConcept and utilize that for feedback control */
-public class ActionConcept extends WiredCompoundConcept implements WiredCompoundConcept.Prioritizable, Runnable, FloatFunction<Term>, Consumer<Task> {
+public class ActionConcept extends WiredConcept implements WiredConcept.Prioritizable, Runnable, FloatFunction<Term>, Consumer<Task> {
 
 
     /** relative temporal delta time for desire/belief prediction */

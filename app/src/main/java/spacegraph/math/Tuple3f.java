@@ -220,6 +220,13 @@ public abstract class Tuple3f implements java.io.Serializable, Cloneable {
     public final void add(Tuple3f t1) {
         set(this.x + t1.x, this.y + t1.y, this.z + t1.z);
     }
+    public final void add(Tuple3f t1, float minX, float minY, float maxX, float maxY) {
+        add(t1);
+        if (x < minX) x = minX;
+        if (y < minY) y = minY;
+        if (x > maxX) x = maxX;
+        if (y > maxY) y = maxY;
+    }
 
 
     public void add(float dx, float dy, float dz) {
