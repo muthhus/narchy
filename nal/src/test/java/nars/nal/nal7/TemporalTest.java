@@ -1,9 +1,6 @@
 package nars.nal.nal7;
 
-import nars.$;
-import nars.NAR;
-import nars.Op;
-import nars.Task;
+import nars.*;
 import nars.bag.Bag;
 import nars.bag.impl.ArrayBag;
 import nars.concept.CompoundConcept;
@@ -342,7 +339,7 @@ public class TemporalTest {
 
             BLink<Concept> link = cb.get(term);
             assertNotNull(link);
-            String q = "((a==>b)-->[pill])=$1.0000;0.5000;0.9000$";
+            String q = "((a==>b)-->[pill])=$1.0000;0.9000$";
             assertEquals(q, link.toString());
             //assertEquals(q, cc.toString());
         }
@@ -421,15 +418,17 @@ public class TemporalTest {
     }
     @Test public void testSubtermNonCommutivePosNeg() {
         Term ct = $("((d-->c) ==>-3 (a-->b))");
-        assertEquals(-3, ct.subtermTime($("(a-->b)")));
-        assertEquals(0, ct.subtermTime($("(d-->c)")));
+        assertEquals(0, ct.subtermTime($("(a-->b)")));
+        assertEquals(3, ct.subtermTime($("(d-->c)")));
     }
 
     @Test public void testNonCommutivityImplConcept() {
+        Param.DEBUG = true;
         NAR n = new Default();
 
-        n.input("(x ==>+5 y).", "(y ==>-5 x).");
-        n.next().next().next();
+        n.log();
+        n.input("((x) ==>+5 (y)).", "((y) ==>-5 (x)).");
+        n.run(25);
 
         TreeSet d = new TreeSet((x,y)-> x.toString().compareTo(y.toString()));
         n.forEachActiveConcept(d::add);

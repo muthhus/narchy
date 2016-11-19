@@ -41,8 +41,8 @@ public class RevectionTest {
 
     @Test
     public void testRevisionInequivalenceDueToTemporalSeparation() {
-        Task a = t(1f, 0.5f, -4);
-        Task b = t(0f, 0.5f, 4);
+        MutableTask a = t(1f, 0.5f, -4).evidence(1).dur(1);
+        MutableTask b = t(0f, 0.5f, 4).evidence(2).dur(1);
 
         Truth pt = TruthPolation.truth(0, a, b);
         @Nullable Truth rt = Revision.revise(a, b);
@@ -62,8 +62,8 @@ public class RevectionTest {
 
     @Test
     public void testPolation1() {
-        Task a = t(1f, 0.5f, 3);
-        Task b = t(0f, 0.5f, 6);
+        Task a = t(1f, 0.5f, 3).evidence(1).dur(1);
+        Task b = t(0f, 0.5f, 6).evidence(2).dur(1);
         for (int i = 0; i < 10; i++) {
             System.out.println(i + " " + TruthPolation.truth(i, a, b));
         }
@@ -84,11 +84,11 @@ public class RevectionTest {
 
     @Test
     public void testRevisionEquivalence4() {
-        Task a = t(0f, 0.1f, 3);
-        Task b = t(0f, 0.1f, 4);
-        Task c = t(1f, 0.1f, 5);
-        Task d = t(0f, 0.1f, 6);
-        Task e = t(0f, 0.1f, 7);
+        Task a = t(0f, 0.1f, 3).evidence(1).dur(1);
+        Task b = t(0f, 0.1f, 4).evidence(2).dur(1);
+        Task c = t(1f, 0.1f, 5).evidence(3).dur(1);
+        Task d = t(0f, 0.1f, 6).evidence(4).dur(1);
+        Task e = t(0f, 0.1f, 7).evidence(5).dur(1);
 
         for (int i = 0; i < 15; i++) {
             System.out.println(i + " " + TruthPolation.truth(i, a, b, c, d, e));

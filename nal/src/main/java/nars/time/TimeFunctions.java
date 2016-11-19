@@ -660,18 +660,51 @@ public interface TimeFunctions {
         Term bt = p.beliefTerm;
         int beliefDT = (bt instanceof Compound) ? ((Compound) bt.unneg()).dt() : DTERNAL;
 
+
         int eventDelta;
         if (taskDT == DTERNAL && beliefDT == DTERNAL) {
             eventDelta = DTERNAL;
         } else if (taskDT != DTERNAL && beliefDT != DTERNAL) {
 
-            Task belief = p.belief;
+            if (derived.size()!=2)
+                throw new RuntimeException("expectd arity=2");
 
-            if (belief != null && task.isBeliefOrGoal() && belief.isBeliefOrGoal()) {
-                eventDelta = chooseByConf(task, belief, p).dt();
+            //assume derived has 2 terms exactly
+            Term da = derived.term(0);
+            Term db = derived.term(1);
+
+            Compound tt = task.term();
+            int ta = tt.subtermTime(da);
+            int tb = tt.subtermTime(db);
+
+            Compound btc = (Compound)bt;
+            int ba = btc.subtermTime(da);
+            int bb = btc.subtermTime(db);
+
+            int dtT, dtB;
+            if (ta!=DTERNAL && tb!=DTERNAL && ba!=DTERNAL && bb!=DTERNAL) {
+                //compare between subterms both present in the premise
+                dtT = tb - ta;
+                dtB = bb - ba;
             } else {
-                eventDelta = taskDT;
+                //compare between one set of common subterms, the other is a new introduced term
+                if (ta==DTERNAL && ba==DTERNAL) {
+                    dtT = taskDT;
+                    dtB = beliefDT;
+                } else if (tb == DTERNAL && bb == DTERNAL) {
+                    dtT = taskDT;
+                    dtB = beliefDT;
+                } else {
+                    return null;
+                }
             }
+
+            Task chosen = chooseByConf(task, p.belief, p);
+            if (chosen == task)
+                eventDelta = dtT;
+            else
+                eventDelta = dtB;
+
 
         } else if (taskDT == DTERNAL) {
             eventDelta = beliefDT;

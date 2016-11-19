@@ -144,7 +144,7 @@ public class Revision {
         return solution;
     }
 
-    @Nullable public static Task mergeInterpolate(@NotNull Task a, @NotNull Task b, long when, long now, @NotNull Truth newTruth) {
+    @Nullable public static Task mergeInterpolate(@NotNull Task a, @NotNull Task b, long when, long now, @NotNull Truth newTruth, boolean mergeOrChoose) {
         assert (a.punc() == b.punc());
 
         float aw = a.isQuestOrQuestion() ? 0 : a.confWeight(); //question
@@ -156,7 +156,7 @@ public class Revision {
         Random rng = new XorShift128PlusRandom(Util.hashCombine(a.hashCode(), b.hashCode()) << 32 + Util.hashCombine((int) when, (int) now) * 31 + newTruth.hashCode());
 
         MutableFloat accumulatedDifference = new MutableFloat(0);
-        Compound cc = compoundOrNull( intermpolate(a.term(), b.term(), aProp, accumulatedDifference, 1f, rng) );
+        Compound cc = compoundOrNull( intermpolate(a.term(), b.term(), aProp, accumulatedDifference, 1f, rng, mergeOrChoose) );
         if (cc == null)
             return null;
 
@@ -292,7 +292,7 @@ public class Revision {
 //    }
 //
     @NotNull
-    public static Term intermpolate(@NotNull Term a, @NotNull Term b, float aProp, @NotNull MutableFloat accumulatedDifference, float curDepth, @NotNull Random rng) {
+    public static Term intermpolate(@NotNull Term a, @NotNull Term b, float aProp, @NotNull MutableFloat accumulatedDifference, float curDepth, @NotNull Random rng, boolean mergeOrChoose) {
         if (a.equals(b)) {
             return a;
         } else if (a instanceof Compound) {
@@ -303,7 +303,7 @@ public class Revision {
                 Compound ca = (Compound) a;
                 Compound cb = (Compound) b;
                 if (a.op().temporal && len == 2) {
-                    return dtMergeTemporal(ca, cb, aProp, accumulatedDifference, curDepth/2f, rng);
+                    return dtMergeTemporal(ca, cb, aProp, accumulatedDifference, curDepth/2f, rng, mergeOrChoose);
                 } else {
                     assert(ca.dt()== cb.dt());
 
@@ -311,7 +311,7 @@ public class Revision {
 
                     Term[] x = new Term[len];
                     for (int i = 0; i < len; i++) {
-                        x[i] = intermpolate(ca.term(i), cb.term(i), aProp, accumulatedDifference, curDepth/2f, rng);
+                        x[i] = intermpolate(ca.term(i), cb.term(i), aProp, accumulatedDifference, curDepth/2f, rng, mergeOrChoose);
                     }
 
                     return $.compound(
@@ -328,7 +328,7 @@ public class Revision {
     }
 
     @NotNull
-    private static Term dtMergeTemporal(@NotNull Compound a, @NotNull Compound b, float aProp, @NotNull MutableFloat accumulatedDifference, float depth, @NotNull Random rng) {
+    private static Term dtMergeTemporal(@NotNull Compound a, @NotNull Compound b, float aProp, @NotNull MutableFloat accumulatedDifference, float depth, @NotNull Random rng, boolean mergeOrChoose) {
 
         Term a0, a1, b0, b1;
         int adt = a.dt();
@@ -346,13 +346,14 @@ public class Revision {
 
         depth/=2f;
 
-        int dt =
-                //(choose(a, b, aProp, rng) == a) ? adt : bdt;
-                lerp(adt, bdt, aProp);
+        int dt = mergeOrChoose ?
+                (lerp(adt, bdt, aProp)) :
+                ((choose(a, b, aProp, rng) == a) ? adt : bdt);
+
 
         return $.compound(a.op(), dt,
-                intermpolate(a0, b0, aProp, accumulatedDifference, depth, rng),
-                intermpolate(a1, b1, aProp, accumulatedDifference, depth, rng));
+                intermpolate(a0, b0, aProp, accumulatedDifference, depth, rng, mergeOrChoose),
+                intermpolate(a1, b1, aProp, accumulatedDifference, depth, rng, mergeOrChoose));
 
     }
 
@@ -496,27 +497,19 @@ public class Revision {
     @NotNull
     public static Task chooseByConf(@NotNull Task t, @Nullable Task b, @NotNull PremiseEval p) {
 
-        if (b == null)
+        if ((b == null) || !b.isBeliefOrGoal())
             return t;
 
-        long to = t.occurrence();
-        long bo = b.occurrence();
+        float tw = t.confWeight();
+        float bw = b.confWeight();
 
-        if (to != ETERNAL && bo != ETERNAL) {
+        //randomize choice by confidence
+        return p.random.nextFloat() < tw/(tw+bw) ? t : b;
 
-            float tw = t.confWeight();
-            float bw = b.confWeight();
-
-            //randomize choice by confidence
-            return p.random.nextFloat() < tw/(tw+bw) ? t : b;
-
-        } else {
-            return bo != ETERNAL ? b : t;
-        }
     }
 
-    public static Term intermpolate(@NotNull Term a, @NotNull Term b, float aProp, @NotNull Random rng) {
-        return intermpolate(a, b, aProp, /* unused: */ new MutableFloat(),1,rng);
+    public static Term intermpolate(@NotNull Term a, @NotNull Term b, float aProp, @NotNull Random rng, boolean mergeOrChoose) {
+        return intermpolate(a, b, aProp, /* unused: */ new MutableFloat(),1,rng,mergeOrChoose);
     }
 
 //    /** get the task which occurrs nearest to the target time */

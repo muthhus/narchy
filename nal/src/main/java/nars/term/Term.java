@@ -245,7 +245,7 @@ public interface Term extends Termed, Termlike, Comparable<Termlike> {
 
             int firstIndex, lastIndex;
 
-            if (isCommutative()) {
+            //if (isCommutative()) {
                 //use the normalized order of the terms so that the first is always @ 0
 
                 if (dt < 0) {
@@ -258,16 +258,16 @@ public interface Term extends Termed, Termlike, Comparable<Termlike> {
                     firstIndex = 0;
                     lastIndex = 1;
                 }
-            } else {
-                firstIndex = 0;
-                lastIndex = 1;
-            }
+//            } else {
+//                firstIndex = 0;
+//                lastIndex = 1;
+//            }
 
-            Term first = c.term(firstIndex).unneg();
+            Term first = c.term(firstIndex);//.unneg();
             if (first.equalsIgnoringVariables(x))
                 return 0;
 
-            Term last = c.term(lastIndex).unneg();
+            Term last = c.term(lastIndex);//.unneg();
             if (last.equalsIgnoringVariables(x))
                 return dt;
 

@@ -192,7 +192,8 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, Sorted
         Term t = Revision.intermpolate(
                 newBelief.term(), oldBelief.term(),
                 aProp,
-                nar.random
+                nar.random,
+                true
         );
 
         return new RevisionTask( t,

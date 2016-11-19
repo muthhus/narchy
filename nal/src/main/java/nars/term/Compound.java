@@ -604,11 +604,11 @@ public interface Compound extends Term, IPair, TermContainer {
         if (other instanceof Variable)
             return true;
 
-        if (op() == NEG)
-            throw new UnsupportedOperationException("left hand side should already be unneg'd");
-
-        if (other.op()==NEG)
-            other = other.unneg();
+//        if (op() == NEG)
+//            throw new UnsupportedOperationException("left hand side should already be unneg'd");
+//
+//        if (other.op()==NEG)
+//            other = other.unneg();
 
         if (!(other instanceof Compound))
             return false;
@@ -617,10 +617,10 @@ public interface Compound extends Term, IPair, TermContainer {
 
         int s = size();
 
-        if ((((Compound) other).dt() == dt()) && (other.size() == s)) {
+        if ((other.size() == s) && (((Compound) other).dt() == dt())) {
             Compound o = (Compound) other;
             for (int i = 0; i < s; i++) {
-                if (!term(i).unneg().equalsIgnoringVariables(o.term(i)))
+                if (!term(i).equalsIgnoringVariables(o.term(i)))
                     return false;
             }
             return true;

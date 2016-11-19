@@ -76,7 +76,7 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
 
                             Task b = matchMerge(now, a, dur);
 
-                            Task c = (b != null && b != a) ? merge(a, b, now, null) : null;
+                            Task c = (b != null && b != a) ? merge(a, b, now) : null;
 
                             remove(a, nar);
 
@@ -147,7 +147,7 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
             before = truth(now, eternal);
 
             Task next;
-            if ((next = compress(input, now, eternal, nar)) != null) {
+            if ((next = compress(input, now, nar)) != null) {
 
                 add(input);
 
@@ -345,7 +345,7 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
      * frees one slot by removing 2 and projecting a new belief to their midpoint. returns the merged task
      */
     @Nullable
-    protected Task compress(@Nullable Task input, long now, @Nullable EternalTable eternal, @NotNull NAR nar) {
+    protected Task compress(@Nullable Task input, long now, @NotNull NAR nar) {
 
         int cap = capacity();
 
@@ -366,7 +366,7 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
 
         Task b = matchMerge(now, a, nar.time.dur());
         if (b != null && remove(b, nar)) {
-            return merge(a, b, now, eternal);
+            return merge(a, b, now);
         } else {
             return input;
         }
@@ -377,7 +377,7 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
      * t is the target time of the new merged task
      */
     @Nullable
-    private Task merge(@NotNull Task a, @NotNull Task b, long now, @Nullable EternalTable eternal) {
+    private Task merge(@NotNull Task a, @NotNull Task b, long now) {
 
         float ac = c2w(a.conf());
         float bc = c2w(b.conf());
@@ -392,7 +392,7 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
         Truth t = Revision.revise(a, p, b, Param.TRUTH_EPSILON /*nar.confMin*/);
 
         if (t != null)
-            return Revision.mergeInterpolate(a, b, mid, now, t);
+            return Revision.mergeInterpolate(a, b, mid, now, t, true);
 
         return null;
     }

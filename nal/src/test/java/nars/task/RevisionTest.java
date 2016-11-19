@@ -324,7 +324,7 @@ public class RevisionTest {
         Set<Term> ss = new TreeSet();
         Random rng = new XorShift128PlusRandom(1);
         for (int i = 0; i < 8 * (a.volume() + b.volume()); i++) {
-            ss.add(Revision.intermpolate(a, b, 0.5f, rng));
+            ss.add(Revision.intermpolate(a, b, 0.5f, rng,false));
         }
         System.out.println(ss);
         return ss;

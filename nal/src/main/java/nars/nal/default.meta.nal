@@ -306,8 +306,8 @@
         A, B, task(negative), task("."), time(dtAfterOrEternal), neqAndCom(A,B) |- varIntro(((--,%A) &&+- B)), (Belief:IntersectionN)
 
     //S || P:
-    %S, %P, time(dtAfter), task("."), neqCom(%P,%S) |- (--,((--,%S) &&+- (--,%P))), (Belief:Union)
-    %S, %P, time(dtAfter), task("."), neqCom(%P,%S) |- varIntro((--,((--,%S) &&+- (--,%P)))), (Belief:Union)
+    S, P, time(dtAfter), task("."), neqCom(P,S) |- (--,((--,%S) &&+- (--,%P))), (Belief:Union)
+    S, P, time(dtAfterOrEternal), task("."), neqAndCom(P,S) |- (--,varIntro(((--,%S) &&+- (--,%P)))), (Belief:Union)
 
 
 
