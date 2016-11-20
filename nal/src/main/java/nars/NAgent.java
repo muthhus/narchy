@@ -3,15 +3,10 @@ package nars;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
-import nars.bag.Bag;
-import nars.budget.BudgetFunctions;
-import nars.budget.policy.ConceptPolicy;
 import nars.concept.ActionConcept;
 import nars.concept.Concept;
 import nars.concept.SensorConcept;
-import nars.nal.UtilityFunctions;
 import nars.nar.Default;
-import nars.table.BeliefTable;
 import nars.task.GeneratedTask;
 import nars.task.MutableTask;
 import nars.term.Compound;
@@ -22,13 +17,10 @@ import nars.truth.Truth;
 import nars.util.Loop;
 import nars.util.Util;
 import nars.util.data.FloatParam;
-import nars.util.list.FasterList;
 import nars.util.math.FirstOrderDifferenceFloat;
 import nars.util.math.FloatNormalized;
 import nars.util.math.FloatPolarNormalized;
-import org.apache.commons.lang3.mutable.MutableFloat;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
-import org.eclipse.collections.api.tuple.primitive.FloatFloatPair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -41,7 +33,6 @@ import java.util.Random;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static nars.$.t;
-import static nars.Op.IMPL;
 import static nars.Symbols.BELIEF;
 import static nars.Symbols.GOAL;
 import static nars.time.Tense.ETERNAL;
@@ -56,7 +47,7 @@ abstract public class NAgent implements NSense, NAction {
 
 
     public static final Logger logger = LoggerFactory.getLogger(NAgent.class);
-    public static final int HAPPINESS_TERMLINK_CAPACITY_MULTIPLIER = 8;
+    public static final int HAPPINESS_TERMLINK_CAPACITY_MULTIPLIER = 1;
 
     /**
      * general reward signal for this agent
@@ -84,8 +75,8 @@ abstract public class NAgent implements NSense, NAction {
 
     public float alpha, gamma;
 
-    float curiosityFreqMin = 0.01f; //nyquist
-    float curiosityFreqMax = 0.5f;
+    float curiosityFreqMin = 0.1f; //nyquist
+    float curiosityFreqMax = 1f;
 
     class CuriosityPhasor {
         public float freq, phase;
@@ -94,21 +85,21 @@ abstract public class NAgent implements NSense, NAction {
             freq = curiosityFreqMin + (curiosityFreqMax - curiosityFreqMin) * r.nextFloat();
             phase = r.nextFloat() * (float)Math.PI;
         }
-        public void mutate() {
+
+        public float next() {
+
             float mutateRate = (curiosityFreqMax - curiosityFreqMin)/20f;
             freq = Util.clamp(freq + (nar.random.nextFloat() - 0.5f) * mutateRate, curiosityFreqMin, curiosityFreqMax);
-        }
-        public float next() {
-            mutate();
+
             return (float)Math.sin(freq * nar.time()/nar.time.dur()/(2*(float)Math.PI) + phase)/2f + 0.5f;
         }
     }
 
     final List<CuriosityPhasor> curiosityPhasor = $.newArrayList();
 
-    public final FloatParam epsilonProbability = new FloatParam(0.1f);
+    //public final FloatParam epsilonProbability = new FloatParam(0.1f);
 
-    public final FloatParam gammaEpsilonFactor = new FloatParam(0.5f);
+    public final FloatParam gammaEpsilonFactor = new FloatParam(0.1f);
 
     final int curiosityMonitorDuration = 8; //frames
     final DescriptiveStatistics avgActionDesire = new DescriptiveStatistics(curiosityMonitorDuration);
@@ -431,16 +422,16 @@ abstract public class NAgent implements NSense, NAction {
 //                );
             }
 
-            ((FasterList)predictors).addAll(
-                    //new MutableTask($.seq($.varQuery(0), dur, action), '?', null).eternal(),
-                    //new MutableTask($.impl($.varQuery(0), dur, action), '?', null).eternal(),
-                    new MutableTask($.seq(action, dur, happiness), '?', null).eternal(),
-                    new MutableTask($.seq($.neg(action), dur, happiness), '?', null).eternal(),
-                    new MutableTask($.impl(action, dur, happiness), '?', null).eternal(),
-                    new MutableTask($.impl($.neg(action), dur, happiness), '?', null).eternal()
-                    //new MutableTask($.impl($.parallel($.varDep(0), action), dur, happiness), '?', null).time(now, now + dur),
-                    //new MutableTask($.impl($.parallel($.varDep(0), $.neg( action )), dur, happiness), '?', null).time(now, now + dur)
-            );
+//            ((FasterList)predictors).addAll(
+//                    //new MutableTask($.seq($.varQuery(0), dur, action), '?', null).eternal(),
+//                    //new MutableTask($.impl($.varQuery(0), dur, action), '?', null).eternal(),
+//                    new MutableTask($.seq(action, dur, happiness), '?', null).eternal(),
+//                    new MutableTask($.seq($.neg(action), dur, happiness), '?', null).eternal(),
+//                    new MutableTask($.impl(action, dur, happiness), '?', null).eternal(),
+//                    new MutableTask($.impl($.neg(action), dur, happiness), '?', null).eternal()
+//                    //new MutableTask($.impl($.parallel($.varDep(0), action), dur, happiness), '?', null).time(now, now + dur),
+//                    //new MutableTask($.impl($.parallel($.varDep(0), $.neg( action )), dur, happiness), '?', null).time(now, now + dur)
+//            );
 
         }
 
@@ -464,11 +455,15 @@ abstract public class NAgent implements NSense, NAction {
         return this;
     }
 
+    @NotNull
+    public Loop runRT(float fps) {
+        return runRT(fps, -1);
+    }
     /**
      * run Real-time
      */
     @NotNull
-    public Loop runRT(float fps) {
+    public Loop runRT(float fps, int stopTime) {
 
         init();
 
@@ -487,6 +482,8 @@ abstract public class NAgent implements NSense, NAction {
 
                 now = nar.time();
 
+                if (stopTime > 0 && now > stopTime)
+                    stop();
             }
         };
 
@@ -523,24 +520,25 @@ abstract public class NAgent implements NSense, NAction {
         for (int i = 0, actionsSize = actions.size(); i < actionsSize; i++) {
             ActionConcept action = actions.get(i);
 
-            float motorEpsilonProbability = epsilonProbability.floatValue() * (1f - Math.min(1f, action.goalConf(now, 0) / gamma));
+            //float motorEpsilonProbability = epsilonProbability.floatValue() * (1f - Math.min(1f, action.goalConf(now, 0) / gamma));
 
 
-            if (nar.random.nextFloat() < motorEpsilonProbability) {
+            //if (nar.random.nextFloat() < motorEpsilonProbability) {
 
-                logger.info("curiosity: {} conf={}", action, action.goalConf(now, 0));
+                //logger.info("curiosity: {} conf={}", action, action.goalConf(now, 0));
 
                 float f = curiosityPhasor.get(i).next();
-                float cc = gamma * gammaEpsilonFactor;
+                float cc = gamma * gammaEpsilonFactor * (1f - Math.min(1f, action.goalConf(now, 0) / gamma));
                 Truth t = $.t(f, cc);
-                if (t!=null) {
-                    nar.inputLater(
-                            new GeneratedTask(action, GOAL, t)
-                                    .time(now, now)
-                                    .budgetByTruth(action.pri.asFloat())
-                                    .log("Curiosity")
-                    );
-                }
+                action.biasDesire(t);
+//                if (t!=null) {
+//                    nar.inputLater(
+//                            new GeneratedTask(action, GOAL, t)
+//                                    .time(now, now)
+//                                    .budgetByTruth(action.pri.asFloat())
+//                                    .log("Curiosity")
+//                    );
+//                }
 
                 //in order to auto-destruct corectly, the task needs to remove itself from the taskindex too
                 /* {
@@ -557,7 +555,7 @@ abstract public class NAgent implements NSense, NAction {
                     }
                 }*/
 
-            }
+            //}
 
             boost(action, actionBoost);
         }
@@ -599,8 +597,10 @@ abstract public class NAgent implements NSense, NAction {
                 //UtilityFunctions.aveAri(nar.priorityDefault('.'), nar.priorityDefault('!'))
                        ///* / (predictors.size()/predictorProbability)*/ * predictorPriFactor;
 
-        for (int i = 0, predictorsSize = predictors.size(); i < predictorsSize; i++) {
-            predictors.set(i, boost(predictors.get(i), pri));
+        if (pri > 0) {
+            for (int i = 0, predictorsSize = predictors.size(); i < predictorsSize; i++) {
+                predictors.set(i, boost(predictors.get(i), pri));
+            }
         }
 
 //        Compound term = happy.term();

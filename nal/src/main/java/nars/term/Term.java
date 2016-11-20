@@ -222,12 +222,17 @@ public interface Term extends Termed, Termlike, Comparable<Termlike> {
      */
     default int subtermTime(@NotNull Term x, int dt) {
 
+        Term ty = unneg();
         x = x.unneg(); //ignore polarity
 
-        if (unneg().equalsIgnoringVariables(x))
+        if (ty.equals(x)) //unneg().equalsIgnoringVariables(x))
             return 0;
 
-        if (!this.op().temporal)
+        if (!(ty instanceof Compound))
+            return DTERNAL;
+
+        Compound y = (Compound)ty;
+        if (!y.op().temporal)
             return DTERNAL;
 
         Compound c = ((Compound) this);
@@ -236,12 +241,12 @@ public interface Term extends Termed, Termlike, Comparable<Termlike> {
 
         if (dt == 0 || dt == DTERNAL) {
             //TODO search better, containsTerm wont work in all cases
-            for (Term y : ((Compound)this).terms()) {
-                int sdt = y.subtermTime(x);
+            for (Term yy : y.terms()) {
+                int sdt = yy.subtermTime(x);
                 if (sdt!=DTERNAL)
                     return sdt;
             }
-        } else if (this.size() == 2) {
+        } else if (y.size() == 2) {
 
             int firstIndex, lastIndex;
 
@@ -264,11 +269,11 @@ public interface Term extends Termed, Termlike, Comparable<Termlike> {
 //            }
 
             Term first = c.term(firstIndex);//.unneg();
-            if (first.equalsIgnoringVariables(x))
+            if (first.equals(x))///if (first.equalsIgnoringVariables(x))
                 return 0;
 
             Term last = c.term(lastIndex);//.unneg();
-            if (last.equalsIgnoringVariables(x))
+            if (last.equals(x)) //if (last.equalsIgnoringVariables(x))
                 return dt;
 
             int withinSubj = first.subtermTime(x);

@@ -1,6 +1,7 @@
 package nars.concept;
 
 import nars.*;
+import nars.task.Revision;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.truth.Truth;
@@ -32,6 +33,7 @@ public class ActionConcept extends WiredConcept implements WiredConcept.Prioriti
     @Nullable
     private Truth currentDesire;
     private boolean updateOnBeliefChange = false;
+    private Truth desireBias;
 
     @Override
     public void pri(FloatSupplier v) {
@@ -42,6 +44,10 @@ public class ActionConcept extends WiredConcept implements WiredConcept.Prioriti
     @Override
     public void accept(Task feedback) {
         nar.input(feedback);
+    }
+
+    public void biasDesire(Truth t) {
+        this.desireBias = t;
     }
 
 
@@ -161,16 +167,30 @@ public class ActionConcept extends WiredConcept implements WiredConcept.Prioriti
         boolean desireChange, beliefChange;
 
         @Nullable Truth d = this.goal(now + decisionDT);
+
+        if (desireBias!=null) {
+            //Truth d0 = d;
+            if (d!=null)
+                d = Revision.revise(desireBias, d);
+            else
+                d = desireBias;
+            //System.out.println("desire bias: " + d0 + " -> " + d);
+        } else {
+            //d = d; //unchanged
+        }
+
         this.currentDesire = d;
+
         desireChange = (d == null ^ lastDesire==null) || (d!=null && d.equals(lastDesire));
 
         @Nullable Truth b = this.belief(now + decisionDT);
         beliefChange = (b == null ^ lastBelief ==null) || (b!=null && b.equals(lastBelief));
 
+
+
         lastBelief = b; lastDesire = d;
 
         if (desireChange || (updateOnBeliefChange && beliefChange)) {
-        //if (beliefChange || desireChange)
 
             Truth f = this.motor.motor(b, d);
             if (f!=null) {

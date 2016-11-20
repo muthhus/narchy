@@ -13,6 +13,7 @@ import nars.nar.exe.Executioner;
 import nars.nar.exe.SingleThreadExecutioner;
 import nars.nar.util.DefaultConceptBuilder;
 import nars.remote.NAgents;
+import nars.task.DerivedTask;
 import nars.time.FrameTime;
 import nars.util.data.random.XorShift128PlusRandom;
 
@@ -39,7 +40,7 @@ public class Line1DContinuous extends NAgent {
     boolean print;
     private float yHidden;
     private float yEst;
-    float speed = 2f;
+    float speed = 5f;
     final float[] ins;
 
     public Line1DContinuous(NAR n, int size, IntToFloatFunction target) {
@@ -244,17 +245,18 @@ public class Line1DContinuous extends NAgent {
     public static void main(String[] args) {
 
         XorShift128PlusRandom rng = new XorShift128PlusRandom((int)(Math.random()*1000));
-        int conceptsPerCycle = 64;
+        int conceptsPerCycle = 4;
 
         final Executioner exe =
                 //new MultiThreadExecutioner(2, 2048);
                 new SingleThreadExecutioner();
 
-        Default nar = new Default(1024,
+        Default nar = new Default(128,
                 conceptsPerCycle, 1, 3, rng,
-                new CaffeineIndex(new DefaultConceptBuilder(), 1024*64, 12, false, exe),
-                new FrameTime(3f), exe
+                new CaffeineIndex(new DefaultConceptBuilder(), 1024*2, 12, false, exe),
+                new FrameTime(1f), exe
         );
+        nar.compoundVolumeMax.set(12);
 
 
         nar.beliefConfidence(0.9f);
@@ -262,27 +264,33 @@ public class Line1DContinuous extends NAgent {
 
         //nar.truthResolution.setValue(0.02f);
 
-        nar.compoundVolumeMax.set(24);
 
-        Line1DContinuous l = new Line1DContinuous(nar, 4,
-                sine(50)
-                //random(120)
+        Line1DContinuous l = new Line1DContinuous(nar, 6,
+                //sine(50)
+                random(16)
         );
 
         Vis.show((Default) l.nar, 16); //Vis.agentActions(l, 2000);
         NAgents.chart(l);
 
+        //nar.logSummaryGT(System.out, 0.5f);
+        nar.onTask(t -> {
+            if (t instanceof DerivedTask && t.isGoal())
+                System.out.println(t.proof());
+        });
+
         l.print = true;
-        l.run(1500);
+        l.runRT(15, 1500);
 
 
         NAR.printTasks(nar, true);
         NAR.printTasks(nar, false);
-        System.out.println("AVG SCORE=" + l.rewardSum()/ nar.time());
 
         l.predictors.forEach(p->{
            nar.concept(p).print();
         });
+        System.out.println("AVG SCORE=" + l.rewardSum()/ nar.time());
+
     }
 
 }

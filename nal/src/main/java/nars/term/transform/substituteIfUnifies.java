@@ -10,6 +10,7 @@ import org.jetbrains.annotations.Nullable;
 
 import static nars.term.Terms.equal;
 import static nars.time.Tense.DTERNAL;
+import static nars.time.Tense.ETERNAL;
 
 /**
  * substituteIfUnifies....(term, varFrom, varTo)
@@ -227,28 +228,39 @@ abstract public class substituteIfUnifies extends TermTransformOperator  {
             super("subIfUnifiesForward",parent);
         }
 
-        @Override
-        public @NotNull Term unify(@NotNull Term C, @NotNull Term A, @NotNull Term B) {
+        /** A must precede C in order to produce a result unified with B */
+        @Override public @NotNull Term unify(@NotNull Term C, @NotNull Term A, @NotNull Term B) {
             Compound decomposed = (Compound) parent.beliefTerm;
             int dt = decomposed.dt();
             if (dt == DTERNAL || dt == 0) {
                 //valid
+                return super.unify(C, A, B);
             } else {
                 //check C's position
+                int subtermTimeC = decomposed.subtermTime(C);
+                if (subtermTimeC==DTERNAL)
+                    subtermTimeC = 0;
+                int subtermTimeA = decomposed.subtermTime(A);
+                if (subtermTimeA==DTERNAL)
+                    subtermTimeA = 0;
 
-                if (decomposed.term(0).equals(C)) {
-                    if (dt < 0)
-                        return False;
-                } else if (decomposed.term(1).equals(C)) {
-                    if (dt > 0)
-                        return False;
-                } else {
-                    throw new RuntimeException("missing C in decomposed");
-                    //return False;
-                }
+                if (subtermTimeA < subtermTimeC)
+                    return super.unify(C, A, B);
+                else
+                    return super.unify(A, C, B);
+
+//                if (decomposed.term(0).equals(C)) {
+//                    if (dt < 0)
+//                        return False;
+//                } else if (decomposed.term(1).equals(C)) {
+//                    if (dt > 0)
+//                        return False;
+//                } else {
+//                    throw new RuntimeException("missing C in decomposed");
+//                    //return False;
+//                }
             }
 
-            return super.unify(C, A, B);
         }
 
         @Nullable

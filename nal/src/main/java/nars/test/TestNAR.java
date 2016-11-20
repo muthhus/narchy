@@ -396,6 +396,9 @@ public class TestNAR  {
 
     @NotNull
     public TestNAR mustNotOutput(long withinCycles, @NotNull String sentenceTerm, char punc, float freqMin, float freqMax, float confMin, float confMax, long occ) {
+        if (freqMin < 0 || freqMin > 1f || freqMax < 0 || freqMax > 1f || confMin < 0 || confMin > 1f || confMax < 0 || confMax > 1f || freqMin!=freqMin || freqMax!=freqMax)
+            throw new UnsupportedOperationException();
+
         return mustEmit(outputEvents,
                 nar.time(), nar.time() + withinCycles,
                 sentenceTerm, punc, freqMin, freqMax, confMin,

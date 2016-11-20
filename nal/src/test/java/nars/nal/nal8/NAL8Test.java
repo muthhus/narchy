@@ -568,12 +568,13 @@ public class NAL8Test extends AbstractNALTest {
     }
 
     @Test
-    public void temporal_goal_detachment_2_invalid()  {
+    public void temporal_goal_detachment_2()  {
         //this is the reverse case which should not be derived by decomposing the belief
         test()
                 .input("(hold)! :|:")
                 .inputAt(2, "( (hold) &&+5 (eat) ).") //should not decomposed by the goal task
-                .mustNotOutput(cycles, "(eat)", '!', ETERNAL, 15, 5)
+                .mustDesire(cycles,"(eat)", 1f, 0.81f, 5)
+                //.mustNotOutput(cycles, "(eat)", '!', ETERNAL, 15, 5)
         ;
     }
     @Test
@@ -757,12 +758,27 @@ public class NAL8Test extends AbstractNALTest {
 
     @Test public void testGoalConjunctionDecompose() {
         test()
-                
                 .goal("((x) &&+3 (y))", Tense.Present, 1f, 0.9f)
                 .mustDesire(cycles, "(x)", 1f, 0.81f, 0)
                 //.mustNotOutput(cycles, "(y)", '!', 3)
                 .mustNotOutput(cycles, "(y)", '!', ETERNAL);
     }
+
+//    @Test public void testSubIfUnifiesForwardWontDecomposeAntecedentGoal() {
+//
+//        /*
+//        $.32;.54$ (happy)! 1272-1272 %.56;.40% {1272-1272: 1;2;f;v} ((%1,(%2&&%3),task(positive),time(decomposeBelief),neqCom(%1,%3)),(subIfUnifiesForward(%3,%2,%1),((Strong-->Goal))))
+//
+//            $1.0;.90$ (happy)! :0: %1.0;.99% {0: f}
+//            $.56;.67$ (((happy) &&+2 #1) &&+37 #1). 45-45 %.56;.73% {45-45: 1;2;v} ((%1,%2,task(positive),task("."),time(dtAfterOrEternal),neqAndCom(%1,%2)),(varIntro((%1 &&+- %2)),((Intersection-->Belief))))
+//        */
+//        test()
+//                .goal("(happy)", Tense.Eternal, 1f, 0.9f)
+//                .input("(((happy) &&+2 #1) &&+37 #1). :|:")
+//                .mustNotOutput(cycles, "(happy)", '!', new long[] { (long)ETERNAL, 0, 2, 37, 39 } )
+//                ;
+//    }
+
 
     @Test public void testGoalConjunctionDecomposeNegative() {
         /*
