@@ -322,7 +322,7 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
             long xo = x.occurrence();
 
             return (1f + (1f - Math.abs(x.freq() - yf)))
-                    * (1f + (1f - y.conf(now)))
+                    * (1f + (1f - x.conf(now)))
                     * (1f + TruthPolation.evidenceDecay(1, dur, Math.abs(xo-yo)));
         };
 

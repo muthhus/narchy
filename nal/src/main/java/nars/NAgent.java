@@ -11,12 +11,14 @@ import nars.task.GeneratedTask;
 import nars.task.MutableTask;
 import nars.term.Compound;
 import nars.term.Term;
+import nars.time.Tense;
 import nars.time.Time;
 import nars.time.FrameTime;
 import nars.truth.Truth;
 import nars.util.Loop;
 import nars.util.Util;
 import nars.util.data.FloatParam;
+import nars.util.list.FasterList;
 import nars.util.math.FirstOrderDifferenceFloat;
 import nars.util.math.FloatNormalized;
 import nars.util.math.FloatPolarNormalized;
@@ -97,7 +99,7 @@ abstract public class NAgent implements NSense, NAction {
 
     final List<CuriosityPhasor> curiosityPhasor = $.newArrayList();
 
-    //public final FloatParam epsilonProbability = new FloatParam(0.1f);
+    public final FloatParam epsilonProbability = new FloatParam(0.1f);
 
     public final FloatParam gammaEpsilonFactor = new FloatParam(0.1f);
 
@@ -377,7 +379,8 @@ abstract public class NAgent implements NSense, NAction {
 
             predictors.add(
                     new MutableTask(happy, '!', 1f, rewardGamma)
-                            .eternal()
+                            //.eternal()
+                            .present(nar)
             );
 //                    happy.desire($.t(1f, rewardGamma),
 //                            nar.priorityDefault(Symbols.GOAL),
@@ -422,16 +425,16 @@ abstract public class NAgent implements NSense, NAction {
 //                );
             }
 
-//            ((FasterList)predictors).addAll(
-//                    //new MutableTask($.seq($.varQuery(0), dur, action), '?', null).eternal(),
-//                    //new MutableTask($.impl($.varQuery(0), dur, action), '?', null).eternal(),
-//                    new MutableTask($.seq(action, dur, happiness), '?', null).eternal(),
-//                    new MutableTask($.seq($.neg(action), dur, happiness), '?', null).eternal(),
-//                    new MutableTask($.impl(action, dur, happiness), '?', null).eternal(),
-//                    new MutableTask($.impl($.neg(action), dur, happiness), '?', null).eternal()
-//                    //new MutableTask($.impl($.parallel($.varDep(0), action), dur, happiness), '?', null).time(now, now + dur),
-//                    //new MutableTask($.impl($.parallel($.varDep(0), $.neg( action )), dur, happiness), '?', null).time(now, now + dur)
-//            );
+            ((FasterList)predictors).addAll(
+                    //new MutableTask($.seq($.varQuery(0), dur, action), '?', null).eternal(),
+                    //new MutableTask($.impl($.varQuery(0), dur, action), '?', null).eternal(),
+                    new MutableTask($.seq(action, dur, happiness), '?', null).eternal(),
+                    new MutableTask($.seq($.neg(action), dur, happiness), '?', null).eternal(),
+                    new MutableTask($.impl(action, dur, happiness), '?', null).eternal(),
+                    new MutableTask($.impl($.neg(action), dur, happiness), '?', null).eternal()
+                    //new MutableTask($.impl($.parallel($.varDep(0), action), dur, happiness), '?', null).time(now, now + dur),
+                    //new MutableTask($.impl($.parallel($.varDep(0), $.neg( action )), dur, happiness), '?', null).time(now, now + dur)
+            );
 
         }
 
@@ -520,25 +523,27 @@ abstract public class NAgent implements NSense, NAction {
         for (int i = 0, actionsSize = actions.size(); i < actionsSize; i++) {
             ActionConcept action = actions.get(i);
 
-            //float motorEpsilonProbability = epsilonProbability.floatValue() * (1f - Math.min(1f, action.goalConf(now, 0) / gamma));
+            float motorEpsilonProbability = epsilonProbability.floatValue() * (1f - Math.min(1f, action.goalConf(now, 0) / gamma));
 
 
-            //if (nar.random.nextFloat() < motorEpsilonProbability) {
+            if (nar.random.nextFloat() < motorEpsilonProbability) {
 
                 //logger.info("curiosity: {} conf={}", action, action.goalConf(now, 0));
 
                 float f = curiosityPhasor.get(i).next();
-                float cc = gamma * gammaEpsilonFactor * (1f - Math.min(1f, action.goalConf(now, 0) / gamma));
+                float cc = gamma * gammaEpsilonFactor;// * (1f - Math.min(1f, action.goalConf(now, 0) / gamma));
                 Truth t = $.t(f, cc);
-                action.biasDesire(t);
-//                if (t!=null) {
-//                    nar.inputLater(
-//                            new GeneratedTask(action, GOAL, t)
-//                                    .time(now, now)
-//                                    .budgetByTruth(action.pri.asFloat())
-//                                    .log("Curiosity")
-//                    );
-//                }
+
+                //action.biasDesire(t);
+
+                if (t!=null) {
+                    nar.inputLater(
+                            new GeneratedTask(action, GOAL, t)
+                                    .time(now, now)
+                                    .budgetByTruth(action.pri.asFloat())
+                                    .log("Curiosity")
+                    );
+                }
 
                 //in order to auto-destruct corectly, the task needs to remove itself from the taskindex too
                 /* {
@@ -555,7 +560,7 @@ abstract public class NAgent implements NSense, NAction {
                     }
                 }*/
 
-            //}
+            }
 
             boost(action, actionBoost);
         }
@@ -580,7 +585,7 @@ abstract public class NAgent implements NSense, NAction {
 //                }
 //            }
 
-            Truth d = a.desire();
+            Truth d = a.desireActual(now);
             if (d != null)
                 m += d.confWeight();
         }
@@ -602,6 +607,12 @@ abstract public class NAgent implements NSense, NAction {
                 predictors.set(i, boost(predictors.get(i), pri));
             }
         }
+
+//        Task beHappy = new MutableTask(happy, '!', 1f, nar).time(Tense.Present, nar).budgetByTruth(1f);
+//        beHappy.normalize(nar);
+//        for (ActionConcept a : actions) {
+//            a.tasklinks().put(beHappy);
+//        }
 
 //        Compound term = happy.term();
 //        happy.termlinks().forEach(tl -> {

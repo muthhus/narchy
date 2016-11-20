@@ -12,6 +12,7 @@ import nars.nal.meta.PremiseEval;
 import nars.term.Termed;
 import nars.time.Tense;
 import nars.truth.Truth;
+import nars.util.Util;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -22,16 +23,28 @@ import static nars.nal.UtilityFunctions.and;
  */
 public class TaskBudgeting {
 
-    public static @Nullable Budget derivation(float derivationQuality, @NotNull Termed derived, @NotNull PremiseEval p) {
+    public static @Nullable Budget derivation(@Nullable Truth truth, @NotNull Termed derived, @NotNull PremiseEval p) {
+        float derivationQuality;
+        if (truth == null) {
+            //question or quest:
+            derivationQuality = p.nar.qualityDefault(Symbols.QUESTION);
+        } else {
+            float minParentEvidence = p.task.isBeliefOrGoal() ? p.task.confWeight() : 0;
+            if (p.belief!=null)
+                minParentEvidence = Math.min(minParentEvidence, p.belief.confWeight());
+            float derivationEvi = truth.confWeight();
+            derivationQuality = derivationEvi / minParentEvidence;
+        }
+
 
         Premise baseBudget = p.premise;
 
         //Penalize by complexity: RELATIVE SIZE INCREASE METHOD
         /** occam factor */
-        float occam = occamGrowth(derived, baseBudget);
+        float occam = occamComplexityGrowthRelative(derived, baseBudget);
 
         final float quality =
-                baseBudget.qua() * occam * (0.5f + 0.5f * derivationQuality);
+                Util.clamp(baseBudget.qua() * occam * derivationQuality, 0f, 1f);
 
         if (quality < p.quaMin)
             return null;
@@ -79,7 +92,7 @@ public class TaskBudgeting {
 
     /** occam's razor: penalize relative complexity growth
      * @return a value between 0 and 1 that priority will be scaled by */
-    public static float occamGrowth(@NotNull Termed derived, @NotNull Premise pp) {
+    public static float occamComplexityGrowthRelative(@NotNull Termed derived, @NotNull Premise pp) {
         Task parentBelief = pp.belief;
         int parentComplexity;
         int taskCompl = pp.task.complexity();
@@ -94,24 +107,8 @@ public class TaskBudgeting {
         return parentComplexity / (1f + Math.max(parentComplexity, derivedComplexity));
     }
 
-    /**
-     * Backward logic with CompoundTerm conclusion, stronger case
-     */
-    @Nullable
-    public static Budget derivationBackward(@NotNull Termed content, @NotNull PremiseEval premise) {
-        return derivation(premise.nar.qualityDefault(Symbols.QUESTION), content, premise);
-    }
 
-    /**
-     * Forward logic with CompoundTerm conclusion
-     */
-    @Nullable
-    public static Budget derivationForward(@NotNull Truth truth, @NotNull Termed content, @NotNull PremiseEval premise) {
-        return derivation(
-                BudgetFunctions.truthToQuality(truth),
-                content,
-                premise);
-    }
+
 
     /**
      * Evaluate the quality of a belief as a solution to a problem, then reward

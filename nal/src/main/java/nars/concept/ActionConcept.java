@@ -217,6 +217,8 @@ public class ActionConcept extends WiredConcept implements WiredConcept.Prioriti
     @Nullable
     public Truth desire() { return currentDesire; }
 
+    /** the un-biased actual truth value */
+    public Truth desireActual(long when) { return goals().truth(when); }
 
 
 //    @NotNull

@@ -86,7 +86,7 @@ public class Arkancide extends NAgents {
 
         //runRT(Arkancide::new);
         //nRT(Arkancide::new, 25, 5);
-        run(Arkancide::new, 500);
+        run(Arkancide::new, 5500);
     }
 
 

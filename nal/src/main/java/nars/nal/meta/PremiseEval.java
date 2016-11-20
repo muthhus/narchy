@@ -314,9 +314,8 @@ public class PremiseEval extends Unify {
     @Nullable
     public final Budget budget(@Nullable Truth truth, @NotNull Termed derived) {
 
-        return (truth != null) ?
-                TaskBudgeting.derivationForward(truth, derived, this) :
-                TaskBudgeting.derivationBackward(derived, this);
+        return
+                TaskBudgeting.derivation(truth, derived, this);
     }
 
 

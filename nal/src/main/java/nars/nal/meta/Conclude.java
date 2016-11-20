@@ -232,6 +232,8 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
                 throw new InvalidTermException(o, DTERNAL, content.terms(), "untemporalization failed");
             }
             content = nar.normalize((Compound) ete);
+            if (content == null)
+                return;
         }
 
 
