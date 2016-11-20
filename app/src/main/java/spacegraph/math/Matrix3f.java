@@ -31,6 +31,8 @@
 
 package spacegraph.math;
 
+import spacegraph.phys.math.MatrixUtil;
+
 /**
  * A single precision floating point 3 by 3 matrix.
  * Primarily to support 3D rotations.
@@ -2312,4 +2314,10 @@ public final class Matrix3f implements java.io.Serializable, Cloneable {
         this.m22 = m22;
     }
 
+    public void setTransScale(float x, float y, float scale) {
+        MatrixUtil.setEulerZYX(this, x, y, 0);
+
+        //MatrixUtil.scale(this, scale);
+        setScale(scale);
+    }
 }

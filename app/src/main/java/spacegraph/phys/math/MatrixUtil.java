@@ -29,6 +29,7 @@ import spacegraph.math.Quat4f;
 import spacegraph.math.v3;
 import spacegraph.phys.BulletGlobals;
 
+import static spacegraph.math.v3.v;
 import static spacegraph.phys.math.VectorUtil.coord;
 import static spacegraph.phys.math.VectorUtil.setCoord;
 
@@ -44,7 +45,24 @@ public class MatrixUtil {
 		dest.m10 = mat.m10 * s.x;   dest.m11 = mat.m11 * s.y;   dest.m12 = mat.m12 * s.z;
 		dest.m20 = mat.m20 * s.x;   dest.m21 = mat.m21 * s.y;   dest.m22 = mat.m22 * s.z;
 	}
-	
+	public static void scale(Matrix3f dest, v3 s) {
+
+		float matm00 = dest.m00;
+		float matm01 = dest.m01;
+		float matm02 = dest.m02;
+		dest.m00 = matm00 * s.x;   dest.m01 = matm01 * s.y;   dest.m02 = matm02 * s.z;
+		float matm10 = dest.m10;
+		float matm11 = dest.m11;
+		float matm12 = dest.m12;
+		dest.m10 = matm10 * s.x;   dest.m11 = matm11 * s.y;   dest.m12 = matm12 * s.z;
+		float matm20 = dest.m20;
+		float matm21 = dest.m21;
+		float matm22 = dest.m22;
+		dest.m20 = matm20 * s.x;   dest.m21 = matm21 * s.y;   dest.m22 = matm22 * s.z;
+	}
+	public static void scale(Matrix3f dest, float s) {
+		scale(dest, v(s,s,s));
+	}
 	public static void absolute(Matrix3f mat) {
 		mat.m00 = Math.abs(mat.m00);
 		mat.m01 = Math.abs(mat.m01);

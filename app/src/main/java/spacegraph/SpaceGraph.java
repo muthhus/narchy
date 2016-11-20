@@ -209,7 +209,7 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
 
 
 
-    public synchronized final void display(GLAutoDrawable drawable) {
+    public synchronized void display(GLAutoDrawable drawable) {
 
         this.inputs.forEach( this::update );
 

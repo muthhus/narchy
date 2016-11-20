@@ -23,6 +23,7 @@
 
 package spacegraph.phys.math;
 
+import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.math.Quaternion;
 import spacegraph.math.*;
 
@@ -212,4 +213,10 @@ public final class Transform extends v3 {
 		tmpA.get(angle);
 		return tmpA;
 	}
+
+	public void setTransScale(float x, float y, float scale) {
+		set(x, y, 0);
+		scale(scale);
+	}
+
 }
