@@ -1,26 +1,17 @@
 package spacegraph;
 
-import com.jogamp.newt.event.*;
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GLAutoDrawable;
 import nars.$;
 import nars.util.list.FasterList;
 import org.eclipse.collections.api.block.predicate.primitive.IntObjectPredicate;
-import org.eclipse.collections.api.block.procedure.primitive.FloatProcedure;
-import org.eclipse.collections.impl.map.mutable.primitive.IntBooleanHashMap;
-import org.eclipse.collections.impl.map.mutable.primitive.IntObjectHashMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import spacegraph.input.FPSLook;
+import spacegraph.input.KeyXYZ;
+import spacegraph.input.OrbMouse;
 import spacegraph.math.v3;
-import spacegraph.phys.Collidable;
-import spacegraph.phys.Dynamic;
-import spacegraph.phys.collision.ClosestRay;
-import spacegraph.phys.collision.narrow.VoronoiSimplexSolver;
-import spacegraph.phys.constraint.Point2PointConstraint;
-import spacegraph.phys.constraint.TypedConstraint;
-import spacegraph.phys.math.MotionState;
-import spacegraph.phys.math.Transform;
-import spacegraph.phys.util.Motion;
+import spacegraph.phys.constraint.BroadConstraint;
 import spacegraph.render.JoglPhysics;
 
 import java.util.List;
@@ -28,9 +19,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
-import static com.jogamp.opengl.GL.*;
-import static com.jogamp.opengl.math.FloatUtil.sin;
-import static java.lang.Math.cos;
 import static spacegraph.math.v3.v;
 
 /**
@@ -107,14 +95,15 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
         return this;
     }
 
-    void _add(Ortho c) {
+    private void _add(Ortho c) {
         if (this.orthos.add(c))
             c.start(this);
     }
 
-    public void add(AbstractSpace<X,Spatial<X>> c) {
+    public SpaceGraph add(AbstractSpace<X,Spatial<X>> c) {
         if (inputs.add(c))
             c.start(this);
+        return this;
     }
 
     public void remove(AbstractSpace<X,?> c) {
@@ -160,10 +149,7 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
     public void init(GL2 gl) {
         super.init(gl);
 
-        addMouseListener(new FPSLook(this));
-        addMouseListener(new OrbMouse(this));
-        addKeyListener(new KeyXYZ(this));
-
+        initInput();
 
         for (Ortho f : preAdd) {
             _add(f);
@@ -173,6 +159,14 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
     }
 
 
+    protected void initInput() {
+
+        //default 3D input controls
+        addMouseListener(new FPSLook(this));
+        addMouseListener(new OrbMouse(this));
+        addKeyListener(new KeyXYZ(this));
+
+    }
 
 
     @Override final public void forEachIntSpatial(IntObjectPredicate<Spatial<X>> each) {
@@ -182,19 +176,19 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
         }
     }
 
+    @Override
+    protected void render() {
+        super.render();
+        renderHUD();
+    }
 
-
-    public synchronized void display(GLAutoDrawable drawable) {
+    @Override
+    protected void update() {
 
         this.inputs.forEach( this::update );
 
-        super.display(drawable);
-
-        renderHUD();
-
+        super.update();
     }
-
-
 
     protected void renderHUD() {
 
@@ -211,7 +205,7 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
     }
 
 
-    public final synchronized void update(AbstractSpace<X,Spatial<X>> s) {
+    final void update(AbstractSpace<X,Spatial<X>> s) {
 
         s.forEach(x -> x.update(this));
 
@@ -255,127 +249,13 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
         return win;
     }
 
-
-    public abstract static class SpaceMouse extends MouseAdapter {
-
-        public final JoglPhysics space;
-        public SpaceMouse(JoglPhysics g) {
-            this.space = g;
-        }
-    }
-    public abstract static class SpaceKeys extends KeyAdapter implements FrameListener {
-
-        public final JoglPhysics space;
-
-        //TODO merge these into one Map
-        final IntBooleanHashMap keyState = new IntBooleanHashMap();
-        final IntObjectHashMap<FloatProcedure> keyPressed = new IntObjectHashMap();
-        final IntObjectHashMap<FloatProcedure> keyReleased = new IntObjectHashMap();
-
-        public SpaceKeys(JoglPhysics g) {
-            this.space = g;
-
-
-            g.addFrameListener(this);
-        }
-
-        @Override
-        public void onFrame(JoglPhysics j) {
-            float dt = j.getLastFrameTime();
-            keyState.forEachKeyValue((k,s)->{
-                FloatProcedure f = (s) ? keyPressed.get(k) : keyReleased.get(k);
-                if (f!=null) {
-                    f.value(dt);
-                }
-            });
-        }
-
-        protected void watch(int keyCode, FloatProcedure ifPressed, FloatProcedure ifReleased) {
-            keyState.put(keyCode, false); //initialized
-            if (ifPressed!=null)
-                keyPressed.put(keyCode, ifPressed);
-            if (ifReleased!=null)
-                keyReleased.put(keyCode, ifReleased);
-        }
-
-        //TODO unwatch
-
-        @Override
-        public void keyReleased(KeyEvent e) {
-            setKey((int) e.getKeyCode(), false);
-        }
-
-        @Override
-        public void keyPressed(KeyEvent e) {
-            setKey((int) e.getKeyCode(), true);
-        }
-
-        protected void setKey(int c, boolean state) {
-            if (keyState.containsKey(c)) {
-                keyState.put(c, state);
-            }
-        }
+    public SpaceGraph with(BroadConstraint b) {
+        dyn.addBroadConstraint(b);
+        return this;
     }
 
-    /** simple XYZ control using keys (ex: numeric keypad) */
-    public static class KeyXYZ extends SpaceKeys {
 
-        public KeyXYZ(JoglPhysics g) {
-            super(g);
-
-
-            float speed = 2f;
-            watch(KeyEvent.VK_NUMPAD4, (dt)-> {
-                moveX(speed);
-            }, null);
-            watch(KeyEvent.VK_NUMPAD6, (dt)-> {
-                moveX(-speed);
-            }, null);
-            watch(KeyEvent.VK_NUMPAD8, (dt)-> {
-                moveY(speed);
-            }, null);
-            watch(KeyEvent.VK_NUMPAD2, (dt)-> {
-                moveY(-speed);
-            }, null);
-            watch(KeyEvent.VK_NUMPAD5, (dt)-> {
-                moveZ(speed);
-            }, null);
-            watch(KeyEvent.VK_NUMPAD0, (dt)-> {
-                moveZ(-speed);
-            }, null);
-
-        }
-
-        void moveX(float speed) {
-            v3 x = v(space.camFwd);
-            //System.out.println("x " + x);
-            x.cross(x, space.camUp);
-            x.normalize();
-            x.scale(-speed);
-            space.camPos.add(x);
-        }
-        void moveY(float speed) {
-            v3 y = v(space.camUp);
-            y.normalize();
-            y.scale(speed);
-            //System.out.println("y " + y);
-            space.camPos.add(y);
-        }
-        void moveZ(float speed) {
-            v3 z = v(space.camFwd);
-            //System.out.println("z " + z);
-            z.scale(speed);
-            space.camPos.add(z);
-        }
-
-        @Override
-        public void keyPressed(KeyEvent e) {
-            super.keyPressed(e);
-        }
-
-    }
-
-//    public static class PickDragMouse extends SpaceMouse {
+    //    public static class PickDragMouse extends SpaceMouse {
 //
 //        public PickDragMouse(JoglPhysics g) {
 //            super(g);
@@ -388,459 +268,4 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
 //        }
 //    }
 
-    public static class FPSLook extends SpaceMouse {
-
-        boolean dragging = false;
-        private int prevX, prevY;
-        float h = (float)Math.PI; //angle
-        float v = 0; //angle
-
-        public FPSLook(JoglPhysics g) {
-            super(g);
-        }
-
-        @Override
-        public void mouseReleased(MouseEvent e) {
-            dragging = false;
-        }
-
-
-        @Override
-        public void mouseDragged(MouseEvent e) {
-            short[] bd = e.getButtonsDown();
-            if (bd.length > 0 && bd[0] == 3 /* RIGHT */) {
-                if (!dragging) {
-                    prevX = e.getX();
-                    prevY = e.getY();
-                    dragging = true;
-                }
-
-                int x = e.getX();
-                int y = e.getY();
-
-                int dx = x - prevX;
-                int dy = y - prevY;
-
-                float angleSpeed = 0.001f;
-                h += -dx * angleSpeed;
-                v += -dy * angleSpeed;
-
-                v3 direction = v(
-                        (float)(cos(this.v) * sin(h)),
-                        (float)sin(this.v),
-                        (float)(cos(this.v) * cos(h))
-                );
-
-                //System.out.println("set direction: " + direction);
-
-                space.camFwd.set(direction);
-
-                prevX = x;
-                prevY = y;
-            }
-        }
-
-    }
-
-    public static class OrbMouse extends SpaceMouse implements KeyListener {
-
-        final ClosestRay rayCallback = new ClosestRay(((short)(1 << 7)));
-        // constraint for mouse picking
-        private int mouseDragPrevX, mouseDragPrevY;
-        private int mouseDragDX, mouseDragDY;
-        final v3 gOldPickingPos = v();
-        float gOldPickingDist = 0.f;
-
-        protected TypedConstraint pickConstraint = null;
-        protected Dynamic directDrag;
-        public Dynamic pickedBody = null; // for deactivation state
-        private Spatial pickedSpatial;
-        private Collidable picked;
-        private v3 hitPoint;
-        private final VoronoiSimplexSolver simplexSolver = new VoronoiSimplexSolver();
-
-
-        public OrbMouse(JoglPhysics g) {
-
-            super(g);
-            g.addKeyListener(this);
-
-        }
-
-        @Override
-        public void mouseWheelMoved(MouseEvent e) {
-            //System.out.println("wheel=" + Arrays.toString(e.getRotati on()));
-            float y = e.getRotation()[1];
-            if (y!=0) {
-                //space.setCameraDistance( space.cameraDistance.floatValue() + 0.1f * y );
-            }
-        }
-
-        private boolean mouseClick(int button, int x, int y) {
-
-            switch (button) {
-                case MouseEvent.BUTTON3: {
-                    ClosestRay c = mousePick(x, y);
-                    if (c.hasHit()) {
-                        Collidable co = c.collidable;
-                        System.out.println("zooming to " + co);
-
-                        //TODO compute new azi and ele that match the current viewing angle values by backcomputing the vector delta
-
-
-                        v3 objTarget = co.getWorldOrigin();
-
-                        space.camera(objTarget, co.shape().getBoundingRadius() * 1.25f + space.zNear * 1.25f);
-
-                    }
-                }
-                return true;
-
-
-//            case MouseEvent.BUTTON3: {
-//                shootBox(rayTo);
-//                break;
-//            }
-//            case MouseEvent.BUTTON2: {
-//                // apply an impulse
-//
-//                Vector3f rayTo = v(rayTo(x, y));
-//                CollisionWorld.ClosestRayResultCallback rayCallback = new CollisionWorld.ClosestRayResultCallback(camPos, rayTo);
-//
-//                dyn.rayTest(camPos, rayTo, rayCallback);
-//                if (rayCallback.hasHit()) {
-//                    RigidBody body = RigidBody.upcast(rayCallback.collisionObject);
-//                    if (body != null) {
-//                        body.setActivationState(CollisionObject.ACTIVE_TAG);
-//                        Vector3f impulse = v(rayTo);
-//                        impulse.normalize();
-//                        float impulseStrength = 10f;
-//                        impulse.scale(impulseStrength);
-//                        Vector3f relPos = v();
-//
-//                        relPos.sub(rayCallback.hitPointWorld, body.getCenterOfMassPosition(v()));
-//                        body.applyImpulse(impulse, relPos);
-//                    }
-//                }
-//
-//                break;
-//            }
-            }
-            return false;
-        }
-
-        private void pickConstrain(int button, int state, int x, int y) {
-
-            switch (button) {
-                case MouseEvent.BUTTON1: {
-
-                    if (state == 1) {
-                        mouseGrabOn(x,y);
-                    } else {
-                        mouseGrabOff();
-                    }
-                    break;
-                }
-                case MouseEvent.BUTTON2: {
-                    break;
-                }
-                case MouseEvent.BUTTON3: {
-                    break;
-                }
-            }
-        }
-
-        private void mouseGrabOff() {
-            if (pickConstraint != null) {
-                space.dyn.removeConstraint(pickConstraint);
-                pickConstraint = null;
-
-                pickedBody.forceActivationState(Collidable.ACTIVE_TAG);
-                pickedBody.setDeactivationTime(0f);
-                pickedBody = null;
-            }
-
-            if (directDrag != null) {
-                Object u = directDrag.data();
-
-                if (u instanceof SimpleSpatial) {
-                    ((SimpleSpatial) u).motionLock(false);
-                }
-
-                directDrag = null;
-            }
-        }
-
-
-
-        private void mouseGrabOn(int sx, int sy) {
-            // add a point to point constraint for picking
-            ClosestRay rayCallback = mousePick(sx, sy);
-
-            if (rayCallback.hasHit()) {
-                Dynamic body = Dynamic.ifDynamic(rayCallback.collidable);
-                if (body != null) {
-
-                    body.setActivationState(Collidable.DISABLE_DEACTIVATION);
-                    v3 pickPos = v(rayCallback.hitPointWorld);
-
-                    Transform tmpTrans = body.getCenterOfMassTransform(new Transform());
-                    tmpTrans.inverse();
-                    v3 localPivot = v(pickPos);
-                    tmpTrans.transform(localPivot);
-                    // save mouse position for dragging
-                    gOldPickingPos.set(rayCallback.rayToWorld);
-                    v3 eyePos = v(space.camPos);
-                    v3 tmp = v();
-                    tmp.sub(pickPos, eyePos);
-                    gOldPickingDist = tmp.length();
-
-
-                    // other exclusions?
-                    if (!(body.isStaticObject() || body.isKinematicObject())) {
-                        pickedBody = body;
-
-
-                        Point2PointConstraint p2p = new Point2PointConstraint(body, localPivot);
-                        space.dyn.addConstraint(p2p);
-                        pickConstraint = p2p;
-
-                        // very weak constraint for picking
-                        p2p.tau = 0.02f;
-                    } else {
-                        if (directDrag == null) {
-                            directDrag = body;
-
-                        }
-                    }
-
-                }
-            }
-            //}
-        }
-
-        public ClosestRay mousePick(int sx, int sy) {
-            return mousePick(space.rayTo(sx, sy));
-        }
-
-        public ClosestRay mousePick(v3 rayTo) {
-            ClosestRay r = this.rayCallback;
-            v3 camPos = space.camPos;
-
-            space.dyn.rayTest(camPos, rayTo, r.set(camPos, rayTo), simplexSolver);
-            return r;
-        }
-
-        @Deprecated /* TODO probably rewrite */ private boolean mouseMotionFunc(int x, int y, short[] buttons) {
-
-            v3 ray = space.rayTo(x, y);
-
-            //if (mouseDragDX == 0) { //if not already dragging somewhere "outside"
-
-            ClosestRay cray = mousePick(ray);
-
-            /*System.out.println(mouseTouch.collisionObject + " touched with " +
-                Arrays.toString(buttons) + " at " + mouseTouch.hitPointWorld
-            );*/
-
-            picked = cray.collidable;
-            if (picked != null) {
-                Object t = picked.data();
-                if (t instanceof Spatial) {
-                    pickedSpatial = ((Spatial) t);
-                    hitPoint = cray.hitPointWorld;
-                    if (pickedSpatial.onTouch(picked, cray, buttons)!=null) {
-                        //absorbed
-                        clearDrag();
-                        return true;
-                    }
-                } else {
-                    pickedSpatial = null;
-                }
-            } else {
-                pickedSpatial = null;
-            }
-
-            //}
-
-            if ((pickConstraint != null) || (directDrag != null)) {
-
-                // keep it at the same picking distance
-                v3 eyePos = v(space.camPos);
-                v3 dir = v();
-                dir.sub(ray, eyePos);
-                dir.normalize();
-                dir.scale(gOldPickingDist);
-
-                v3 newPos = v();
-                newPos.add(eyePos, dir);
-
-                if (directDrag != null) {
-                    //directly move the 'static' object
-
-                    Object u = directDrag.data();
-
-                    //System.out.println("DRAG: " + directDrag + " " + u + " -> " + newPos);
-
-                    if (u instanceof SimpleSpatial) {
-                        ((SimpleSpatial) u).motionLock(true);
-                    }
-
-                    MotionState mm = directDrag.getMotionState();
-                    if (mm instanceof Motion) {
-                        ((Motion) mm).center(newPos);
-                    }
-
-                    return true;
-                } else if (pickConstraint != null) {
-                    // move the constraint pivot
-                    Point2PointConstraint p2p = (Point2PointConstraint) pickConstraint;
-                    p2p.setPivotB(newPos);
-                    return true;
-                }
-
-            } else {
-
-                if (mouseDragPrevX >= 0) {
-
-
-                    ///only if ALT key is pressed (Maya style)
-                    //            if (m_modifierKeys & BT_ACTIVE_ALT)
-                    //            {
-                    //                if (m_mouseButtons & 4) {
-                    //                    btVector3 hor = getRayTo(0, 0) - getRayTo(1, 0);
-                    //                    btVector3 vert = getRayTo(0, 0) - getRayTo(0, 1);
-                    //                    btScalar multiplierX = btScalar(0.001);
-                    //                    btScalar multiplierY = btScalar(0.001);
-                    //                    if (m_ortho) {
-                    //                        multiplierX = 1;
-                    //                        multiplierY = 1;
-                    //                    }
-                    //
-                    //
-                    //                    m_cameraTargetPosition += hor * dx * multiplierX;
-                    //                    m_cameraTargetPosition += vert * dy * multiplierY;
-                    //                }
-                    //            }
-                    {
-
-                        for (short b : buttons) {
-                            switch (b) {
-                                case 1:
-                                    ClosestRay m = mousePick(x, y);
-                                    if (!m.hasHit()) {
-                                        //drag on background space
-                                        float px = mouseDragDX * 0.1f;
-                                        float py = mouseDragDY * 0.1f;
-
-                                        //TODO finish:
-
-                                        //Vector3f vx = v().cross(camDir, camUp);
-                                        //vx.normalize();
-                                        //System.out.println(px + " " + py + " " + camDir + " x " + camUp + " " + vx);
-
-                                        //camPosTarget.scaleAdd(px, vx);
-                                        //camPosTarget.scaleAdd(py, camUp);
-                                    }
-                                    return true;
-                                case 3:
-                                    //right mouse drag = rotate
-                                    //                        nextAzi += dx * btScalar(0.2);
-                                    //                        nextAzi = fmodf(nextAzi, btScalar(360.f));
-                                    //                        nextEle += dy * btScalar(0.2);
-                                    //                        nextEle = fmodf(nextEle, btScalar(180.f));
-                                    //space.azi.setValue(space.azi.floatValue() + mouseDragDX * 0.2f );
-                                    //nextAzi = fmodf(nextAzi, btScalar(360.f));
-                                    //space.ele.setValue(space.ele.floatValue() + mouseDragDY * (0.2f));
-                                    //nextEle = fmodf(nextEle, btScalar(180.f));
-                                    return true;
-                                case 2:
-                                    //middle mouse drag = zoom
-
-                                    //space.setCameraDistance( space.cameraDistance.floatValue() - mouseDragDY * 0.5f );
-                                    return true;
-                            }
-                        }
-                    }
-                }
-
-            }
-
-            return false;
-
-        }
-        public void mouseClicked(MouseEvent e) {
-            //overriden: called by mouseRelease
-        }
-
-        public void mouseEntered(MouseEvent e) {
-        }
-
-//        public void mouseExited(MouseEvent e) {
-//            clearDrag();
-//        }
-
-        @Deprecated public void clearDrag() {
-            mouseDragDX = mouseDragDY = 0; //clear drag
-            mouseDragPrevX = mouseDragPrevY = -1;
-        }
-
-
-        public void mousePressed(MouseEvent e) {
-            mouseDragDX = mouseDragDY = 0;
-
-            int x = e.getX();
-            int y = e.getY();
-            if (!mouseMotionFunc(x, y, e.getButtonsDown())) {
-                pickConstrain(e.getButton(), 1, x, y);
-            }
-        }
-
-        public void mouseReleased(MouseEvent e) {
-            int dragThresh = 1;
-            if (Math.abs(mouseDragDX) < dragThresh && mouseClick(e.getButton(), e.getX(), e.getY()))
-                return;
-
-            pickConstrain(e.getButton(), 0, e.getX(), e.getY());
-
-            clearDrag();
-        }
-
-        //
-        // MouseMotionListener
-        //
-        public void mouseDragged(MouseEvent e) {
-
-            int x = e.getX();
-            int y = e.getY();
-
-            if (mouseDragPrevX >= 0) {
-                mouseDragDX = (x) - mouseDragPrevX;
-                mouseDragDY = (y) - mouseDragPrevY;
-            }
-
-            mouseMotionFunc(x, y, e.getButtonsDown());
-
-            mouseDragPrevX = x;
-            mouseDragPrevY = y;
-        }
-
-        public void mouseMoved(MouseEvent e) {
-            mouseMotionFunc(e.getX(), e.getY(), e.getButtonsDown());
-        }
-
-        @Override
-        public void keyPressed(KeyEvent e) {
-            if (pickedSpatial !=null) {
-                pickedSpatial.onKey(picked, hitPoint, e.getKeyChar(), true);
-            }
-        }
-
-        @Override
-        public void keyReleased(KeyEvent e) {
-            if (pickedSpatial !=null) {
-                pickedSpatial.onKey(picked, hitPoint, e.getKeyChar(), false);
-            }
-        }
-    }
 }

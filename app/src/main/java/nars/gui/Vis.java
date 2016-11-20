@@ -27,6 +27,7 @@ import spacegraph.obj.widget.Label;
 import spacegraph.obj.widget.LabeledPane;
 import spacegraph.obj.widget.Plot2D;
 import spacegraph.render.Draw;
+import spacegraph.render.SpaceGraph2D;
 
 import java.util.List;
 
@@ -333,4 +334,15 @@ public class Vis {
         return s;
 
     }
+
+    public static SpaceGraph<Term> conceptsWindow2D(NAR nar, int maxNodes, int maxEdges) {
+        return new SpaceGraph2D(
+                new ConceptsSpace(nar, maxNodes, maxEdges).with(
+                    new Flatten()
+                    //new Spiral()
+                    //new FastOrganicLayout()
+                )
+        ).with(new ForceDirected());
+    }
+
 }

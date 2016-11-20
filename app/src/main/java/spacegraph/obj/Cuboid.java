@@ -38,6 +38,10 @@ public class Cuboid<X> extends SimpleSpatial<X> {
         this(x, front, w, h, (Math.min(w, h)/2f));
     }
 
+    public Cuboid(Surface front, float w, float h, float d) {
+        this((X)front, front, w, h, d);
+    }
+
     public Cuboid(X x, Surface front, float w, float h, float d) {
         super(x);
 
@@ -103,7 +107,7 @@ public class Cuboid<X> extends SimpleSpatial<X> {
 
         //float p = this.padding;
 
-        gl.glPushMatrix();
+        //gl.glPushMatrix();
 
         //float pp = 1f - (p / 2f);
         //float pp = 1f;
@@ -118,7 +122,7 @@ public class Cuboid<X> extends SimpleSpatial<X> {
         front.render(gl, v(1,1));
         gl.glDepthMask(true);
 
-        gl.glPopMatrix();
+        //gl.glPopMatrix();
 
     }
 

@@ -147,10 +147,17 @@ abstract public class JoglPhysics<X> extends JoglSpace implements GLEventListene
 
     protected GLSRT glsrt = null;
 
-    protected boolean useLight0 = true;
-    //protected boolean useLight1 = true;
+    final BiConsumer<Spatial, Collidable> render3D = (s, body) -> {
+        gl.glPushMatrix();
 
+        Draw.transform(gl, body.transform());
 
+        s.renderRelative(gl, body);
+
+        gl.glPopMatrix();
+    };
+
+    protected BiConsumer<Spatial, Collidable> renderer = render3D;
 
     public JoglPhysics() {
         super();
@@ -288,11 +295,13 @@ abstract public class JoglPhysics<X> extends JoglSpace implements GLEventListene
 //
 //        }
 
-        if (useLight0) {
+        {
             gl.glLightfv(gl.GL_LIGHT0, gl.GL_AMBIENT, light_ambient, 0);
             gl.glLightfv(gl.GL_LIGHT0, gl.GL_DIFFUSE, light_diffuse, 0);
             gl.glLightfv(gl.GL_LIGHT0, gl.GL_SPECULAR, light_specular, 0);
             gl.glLightfv(gl.GL_LIGHT0, gl.GL_POSITION, light_position0, 0);
+            gl.glEnable(gl.GL_LIGHTING);
+            gl.glEnable(gl.GL_LIGHT0);
         }
 
 
@@ -303,10 +312,7 @@ abstract public class JoglPhysics<X> extends JoglSpace implements GLEventListene
 //            gl.glLightfv(gl.GL_LIGHT1, gl.GL_POSITION, light_position1, 0);
 //        }
 
-        if (useLight0) {
-            gl.glEnable(gl.GL_LIGHTING);
-            gl.glEnable(gl.GL_LIGHT0);
-        }
+
     }
 
 
@@ -323,14 +329,10 @@ abstract public class JoglPhysics<X> extends JoglSpace implements GLEventListene
         //updateCamera();
 
     }
-
-    public void display(GLAutoDrawable drawable) {
-
-
-        gl.glClear(gl.GL_COLOR_BUFFER_BIT | gl.GL_DEPTH_BUFFER_BIT);
-
+    protected void update() {
 
         long dt = clock.getTimeThenReset();
+        lastFrameTime = dt/1000f;
 
         if (simulating) {
             // NOTE: SimpleDynamics world doesn't handle fixed-time-stepping
@@ -340,13 +342,21 @@ abstract public class JoglPhysics<X> extends JoglSpace implements GLEventListene
             );
         }
 
-        updateCamera();
-
-        forEachSpatial(x -> render(x));
-
-        lastFrameTime = dt/1000f;
         frameListeners.forEach(f-> f.onFrame(this));
+    }
 
+    public final void display(GLAutoDrawable drawable) {
+
+        render();
+        update();
+
+    }
+
+    protected void render() {
+        gl.glClear(gl.GL_COLOR_BUFFER_BIT | gl.GL_DEPTH_BUFFER_BIT);
+        updateCamera();
+        forEachSpatial(x -> render(x));
+        gl.glFlush();
     }
 
     /** in seconds */
@@ -368,8 +378,12 @@ abstract public class JoglPhysics<X> extends JoglSpace implements GLEventListene
 //    final Quat4f roll = new Quat4f(); //stack.quats.get();
 //    final Quat4f rot = new Quat4f(); //stack.quats.get();
 
-    public void updateCamera() {
-//        stack.vectors.push();
+    protected void updateCamera() {
+        perspective();
+    }
+
+    public void perspective() {
+        //        stack.vectors.push();
 //        stack.matrices.push();
 //        stack.quats.push();
 
@@ -428,8 +442,6 @@ abstract public class JoglPhysics<X> extends JoglSpace implements GLEventListene
 //        stack.vectors.pop();
 //        stack.matrices.pop();
 //        stack.quats.pop();
-
-
     }
 
     private final float[] matTmp = new float[16];
@@ -732,20 +744,11 @@ abstract public class JoglPhysics<X> extends JoglSpace implements GLEventListene
 
 
 
-
     public final void render(Spatial<?> s) {
 
         s.renderAbsolute(gl);
 
-        s.forEachBody(body -> {
-            gl.glPushMatrix();
-
-            Draw.transform(gl, body.transform());
-
-            s.renderRelative(gl, body);
-
-            gl.glPopMatrix();
-        });
+        s.forEachBody(b -> renderer.accept(s, b));
 
     }
 

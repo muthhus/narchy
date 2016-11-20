@@ -11,6 +11,7 @@ import spacegraph.obj.Cuboid;
 import spacegraph.obj.layout.Stacking;
 import spacegraph.obj.widget.console.VirtualConsole;
 import spacegraph.render.Draw;
+import spacegraph.render.SpaceGraph2D;
 
 import static spacegraph.obj.layout.Grid.*;
 
@@ -82,9 +83,11 @@ public abstract class Widget extends Stacking {
     public static void main(String[] args) {
 
 
-        SpaceGraph.window(widgetDemo(), 800, 600);
+        //SpaceGraph.window(widgetDemo(), 800, 600);
 
-        SpaceGraph dd = SpaceGraph.window(new Cuboid(widgetDemo(), 16, 8f).color(0.5f, 0.5f, 0.5f, 0.25f), 1000, 1000);
+        //SpaceGraph dd = SpaceGraph.window(new Cuboid(widgetDemo(), 16, 8f).color(0.5f, 0.5f, 0.5f, 0.25f), 1000, 1000);
+
+        new SpaceGraph2D(new Cuboid(widgetDemo(), 16, 8f, 0.1f).color(0.5f, 0.5f, 0.5f, 0.25f).move(0,0,0)).show(800, 600);
 
 //        SpaceGraph.window(col(
 //                new Slider(0.5f, 0, 1).on((s,v)->{
@@ -116,6 +119,7 @@ public abstract class Widget extends Stacking {
     public static Surface widgetDemo() {
         return grid(
                     new BaseSlider(.25f  /* pause */),
+                    grid(),
                     col(new CheckBox("ABC"),new CheckBox("XYZ")),
                         grid(new ScaleDebugLabel(), new ScaleDebugLabel(),
                                 row(new ScaleDebugLabel(), new ScaleDebugLabel()),

@@ -105,12 +105,12 @@ public class SimpleSpatial<X> extends AbstractSpatial<X> {
         move(p.x, p.y, p.z);
     }
 
-    public void move(float x, float y, float z) {
-        if (motionLock)
-            return;
-
-        transform().set(x,y,z);
-        reactivate();
+    public SimpleSpatial move(float x, float y, float z) {
+        if (!motionLock) {
+            transform().set(x, y, z);
+            reactivate();
+        }
+        return this;
     }
 
     /** interpolates rotation to the specified axis vector and rotation angle around it */
@@ -218,7 +218,7 @@ public class SimpleSpatial<X> extends AbstractSpatial<X> {
 
     protected void renderLabel(GL2 gl, float scale) {
         gl.glColor4f(1f, 1f, 1f, 1f);
-        gl.glLineWidth(3f);
+        gl.glLineWidth(1f);
         Draw.text(gl, marquee(), scale, 0, 0, 0.5f + 0.1f);
     }
 
