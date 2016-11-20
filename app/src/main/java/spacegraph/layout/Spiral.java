@@ -5,14 +5,14 @@ import spacegraph.*;
 /**
  * Created by me on 6/21/16.
  */
-public class Spiral<O> implements SpaceTransform<O> {
+public class Spiral<X> implements SpaceTransform<X> {
 
     float nodeSpeed = 0.3f;
     private int order;
 
 
     @Override
-    public void update(SpaceGraph<O> g, AbstractSpace<O, ?> src, float dt) {
+    public void update(SpaceGraph<X> g, AbstractSpace<X, Spatial<X>> src, float dt) {
         this.order = 0;
         src.forEach(this::update);
     }

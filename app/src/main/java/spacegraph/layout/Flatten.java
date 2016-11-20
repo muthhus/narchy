@@ -8,7 +8,7 @@ import java.util.function.Consumer;
 /**
  * TODO generalize to arbitrary plane sizes and orientations
  */
-public class Flatten<O> implements SpaceTransform<O>, Consumer<Spatial<O>> {
+public class Flatten<X> implements SpaceTransform<X>, Consumer<Spatial<X>> {
 
     private final Quat4f up;
     private final Quat4f tmp = new Quat4f();
@@ -18,12 +18,12 @@ public class Flatten<O> implements SpaceTransform<O>, Consumer<Spatial<O>> {
     }
 
     @Override
-    public void update(SpaceGraph<O> g, AbstractSpace<O, ?> src, float dt) {
+    public void update(SpaceGraph<X> g, AbstractSpace<X, Spatial<X>> src, float dt) {
         src.forEach(this);
     }
 
     @Override
-    public void accept(Spatial<O> ss) {
+    public void accept(Spatial<X> ss) {
 
         float[] f = new float[3];
         if (ss instanceof SimpleSpatial) {

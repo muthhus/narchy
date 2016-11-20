@@ -30,14 +30,15 @@ import java.util.function.Consumer;
 /**
  * thread-safe visualization of capacity-bound NAR data buffers
  */
-public class NARSpace<X, Y extends Spatial<X>> extends ListSpace<X, Y> {
+public abstract class NARSpace3D<X extends Term> extends ListSpace<X, Spatial<X>> {
 
     public static final @NotNull Atomic L = $.the("_l");
 
-    private final TriConsumer<NAR, SpaceGraph<X>, List<Y>> collect;
+    //private final TriConsumer<NAR, SpaceGraph<Term>, List<Spatial<X>>> collect;
     private On on;
 
     private NAR nar;
+    protected SpaceGraph<X> space;
 
     public static void main(String[] args) {
 
@@ -48,7 +49,7 @@ public class NARSpace<X, Y extends Spatial<X>> extends ListSpace<X, Y> {
 
         //new ArithmeticInduction(n);
 
-        newConceptWindow(n,  128, 5);
+        newConceptWindow(n, 128, 5);
 
         //n.run(20); //headstart
 
@@ -84,64 +85,66 @@ public class NARSpace<X, Y extends Spatial<X>> extends ListSpace<X, Y> {
 
     }
 
-    public static GLWindow newConceptWindow(NAR nn, int maxNodes, int maxEdges) {
+    public static GLWindow newConceptWindow(NAR nar, int maxNodes, int maxEdges) {
 
-        Bag<Pair<ConceptWidget,Term>> edges =
+        Bag<Pair<ConceptWidget, Term>> edges =
                 //new CurveBag(BudgetMerge.plusBlend, nn.random);
-            new HijackBag(maxEdges*maxNodes, 4, BudgetMerge.plusBlend, nn.random);
+                new HijackBag<>(maxEdges * maxNodes, 4, BudgetMerge.plusBlend, nar.random);
 
-        NARSpace<Term, Spatial<Term>> n = new NARSpace<>(nn, (nar, space, target) -> {
-            Bag<Concept> x =
-                    //nar instanceof Default ?
-                            ((Default) nar).core.active;
-                            //((Default2)nar).active;
+        NARSpace3D<Term> n = new NARSpace3D<Term>(nar, maxNodes) {
 
-            //System.out.println(((Default) nar).core.concepts.size() + " "+ ((Default) nar).index.size());
+            @Override
+            protected void get(List<Spatial<Term>> l) {
+                Bag<Concept> x =
+                        //nar instanceof Default ?
+                        ((Default) nar).core.active;
+                //((Default2)nar).active;
+
+                //System.out.println(((Default) nar).core.concepts.size() + " "+ ((Default) nar).index.size());
 
 
-            x.topWhile(b -> {
+                x.topWhile(b -> {
 
-                //Concept Core
-                Concept concept = b.get();
-                if (concept==null || !display(concept))
+                    //Concept Core
+                    Concept concept = b.get();
+                    if (concept == null || !display(concept))
+                        return true;
+
+                    ConceptWidget root = space.update(concept.term(),
+                            t -> new ConceptWidget(t, nar));
+
+                    //float bPri = root.pri = b.priIfFiniteElseZero();
+                    l.add(root);
+
+
+                    Consumer<BLink<? extends Termed>> absorb = tgt -> {
+                        Term tt = tgt.get().term();
+                        if (!tt.equals(root.key)) {
+                            edges.put(Tuples.pair(root, tt), tgt);
+                        }
+                    };
+
+                    //phase 1: collect
+                    root.clearEdges();
+                    concept.tasklinks().forEach(absorb);
+                    concept.termlinks().forEach(absorb);
+
+
                     return true;
 
-                ConceptWidget root = space.update(concept.term(),
-                        t -> new ConceptWidget(t, nar));
-
-                //float bPri = root.pri = b.priIfFiniteElseZero();
-                target.add(root);
+                }, maxNodes);
 
 
-                Consumer<BLink<? extends Termed>> absorb = tgt -> {
-                    Term tt = tgt.get().term();
-                    if (!tt.equals(root.key)) {
-                        edges.put(Tuples.pair(root, tt), tgt);
-                    }
-                };
-
-                //phase 1: collect
-                root.clearEdges();
-                concept.tasklinks().forEach(absorb);
-                concept.termlinks().forEach(absorb);
+                //phase 2: add edges
+                edges.forEach(eb -> {
+                    Pair<ConceptWidget, Term> ebt = eb.get();
+                    ebt.getOne().addEdge(space, ebt.getTwo(), eb);
+                });
+                edges.clear();
 
 
-
-                return true;
-
-            }, maxNodes);
-
-
-            //phase 2: add edges
-            edges.forEach(eb -> {
-                Pair<ConceptWidget, Term> ebt = eb.get();
-                ebt.getOne().addEdge(space, ebt.getTwo(), eb);
-            });
-            edges.clear();
-
-
-        }, maxNodes);
-
+            }
+        };
 
 
         SpaceGraph s = new SpaceGraph<>(
@@ -160,7 +163,7 @@ public class NARSpace<X, Y extends Spatial<X>> extends ListSpace<X, Y> {
                         new Flatten() {
                             protected void locate(SimpleSpatial s, float[] f) {
                                 super.locate(s, f);
-                                f[2] = 10 - ((Term)(s.key)).volume() * 6;
+                                f[2] = 10 - ((Term) (s.key)).volume() * 6;
                             }
                         }
 //                        //new Spiral()
@@ -168,8 +171,9 @@ public class NARSpace<X, Y extends Spatial<X>> extends ListSpace<X, Y> {
                 )
         );
 
-        s.dyn.addBroadConstraint(new ForceDirected());
+        s.dyn.addBroadConstraint(new
 
+                ForceDirected());
 
 
         return s.show(1300, 900);
@@ -241,23 +245,16 @@ public class NARSpace<X, Y extends Spatial<X>> extends ListSpace<X, Y> {
     //private final ConceptFilter eachConcept = new ConceptFilter();
 
 
-    public NARSpace(@Nullable TriConsumer<NAR, SpaceGraph<X>, List<Y>> collect, int capacity) {
+    public NARSpace3D(int capacity) {
         super();
         this.capacity = capacity;
-        this.collect = collect == null ? (TriConsumer<NAR, SpaceGraph<X>, List<Y>>) this : collect;
     }
 
-    public NARSpace(NAR nar, @Nullable TriConsumer<NAR, SpaceGraph<X>, List<Y>> collect, int capacity) {
-        this(collect, capacity);
-        start(nar);
-    }
-
-    public final synchronized void start(NAR nar) {
-        if (on != null)
-            throw new RuntimeException("already running");
+    public NARSpace3D(NAR nar, int capacity) {
+        this(capacity);
         this.nar = nar;
-        on = nar.onFrame(nn -> updateIfNotBusy(this::update));
     }
+
 
     @Override
     public final synchronized void stop() {
@@ -275,20 +272,22 @@ public class NARSpace<X, Y extends Spatial<X>> extends ListSpace<X, Y> {
         return nar.time();
     }
 
+    @Override
+    public void start(SpaceGraph<X> space) {
+        this.space = space;
+        on = nar.onFrame(nn -> updateIfNotBusy(this::get));
+    }
 
+    protected void get() {
 
-    protected void update(AbstractSpace _notused) {
-
-        this.space = _notused.space;
-
-        List<Y> prev = active;
+        List<Spatial<X>> prev = active;
 
         prev.forEach((y) -> y.preactivate(false));
 
-        FasterList<Y> next = new FasterList<>(capacity);
+        FasterList<Spatial<X>> next = new FasterList<>(capacity);
 
         //gather the items, preactivating them
-        collect.accept(nar, space, next);
+        get(next);
 
         //remove missing
         for (int i = 0, prevSize = prev.size(); i < prevSize; i++) {
@@ -302,5 +301,6 @@ public class NARSpace<X, Y extends Spatial<X>> extends ListSpace<X, Y> {
         this.active = next;
     }
 
+    abstract protected void get(List<Spatial<X>> l);
 
 }

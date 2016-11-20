@@ -41,9 +41,9 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
 
     final List<Ortho> orthos = new FasterList<>(1);
 
-    final List<AbstractSpace<X,?>> inputs = new FasterList<>(1);
+    final List<AbstractSpace<X,Spatial<X>>> inputs = new FasterList<>(1);
 
-    final Map<X,Spatial> atoms;
+    final Map<X, Spatial<X>> atoms;
 
     public SpaceGraph() {
         this(16 * 1024);
@@ -59,7 +59,7 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
 
         this.atoms =
                 //new NonBlockingHashMap(cacheCapacity);
-                new ConcurrentHashMap(cacheCapacity);
+                new ConcurrentHashMap<>(cacheCapacity);
                 //Caffeine.newBuilder()
                 //.softValues().build();
                 //.removalListener(this::onEvicted)
@@ -112,7 +112,7 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
             c.start(this);
     }
 
-    public void add(AbstractSpace<X,?> c) {
+    public void add(AbstractSpace<X,Spatial<X>> c) {
         if (inputs.add(c))
             c.start(this);
     }
@@ -123,16 +123,16 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
         }
     }
 
-    public <Y extends Spatial<?>> @NotNull Y update(X instance, Function<X, Y> materializer) {
+    public @NotNull <Y extends Spatial<X>>  Y update(X instance, Function<X, Y> materializer) {
         return getOrAdd(instance, materializer);
     }
-    public @NotNull <Y extends Spatial> Y update(Y t) {
-        t.preactivate(true);
-        return t;
-    }
 
-    public @NotNull <Y extends Spatial> Y getOrAdd(X t, Function<X, Y> materializer) {
-        return (Y) update(atoms.computeIfAbsent(t, materializer));
+
+
+    public @NotNull <Y extends Spatial<X>> Y getOrAdd(X x, Function<X, ? extends Y> materializer) {
+        Spatial<X> y = atoms.computeIfAbsent(x, materializer);
+        y.preactivate(true);
+        return (Y) y;
     }
 
     public @Nullable Spatial getIfActive(X t) {
@@ -202,8 +202,7 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
     @Override final public void forEachIntSpatial(IntObjectPredicate<Spatial<X>> each) {
         int n = 0;
         for (int i = 0, inputsSize = inputs.size(); i < inputsSize; i++) {
-            AbstractSpace s = inputs.get(i);
-            n += s.forEachIntSpatial(n, each);
+            n += inputs.get(i).forEachIntSpatial(n, each);
         }
     }
 
@@ -231,9 +230,9 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
     }
 
 
-    public final synchronized void update(AbstractSpace s) {
+    public final synchronized void update(AbstractSpace<X,Spatial<X>> s) {
 
-        //float dt = s.setBusy();
+        s.forEach(x -> x.update(this));
 
         s.update(this);
 
@@ -251,7 +250,7 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
     }
 
     public ListSpace<X,?> add(Spatial<X>... s) {
-        ListSpace<X, ?> l = new ListSpace(s);
+        ListSpace<X, Spatial<X>> l = new ListSpace<>(s);
         add(l);
         return l;
     }

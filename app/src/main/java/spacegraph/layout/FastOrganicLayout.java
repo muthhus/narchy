@@ -2,10 +2,7 @@ package spacegraph.layout;
 
 import nars.gui.ConceptWidget;
 import org.apache.commons.lang3.mutable.MutableFloat;
-import spacegraph.AbstractSpace;
-import spacegraph.EDraw;
-import spacegraph.SpaceGraph;
-import spacegraph.SpaceTransform;
+import spacegraph.*;
 
 import java.awt.*;
 
@@ -217,7 +214,7 @@ public class FastOrganicLayout<X> implements SpaceTransform<X> {
     }
 
     @Override
-    public void update(SpaceGraph<X> g, AbstractSpace<X,?> src, float dt) {
+    public void update(SpaceGraph<X> g, AbstractSpace<X, Spatial<X>> src, float dt) {
 
         int n = src.size();
 

@@ -26,10 +26,10 @@ public class ListSpace<X,Y extends Spatial<X>> extends AbstractSpace<X,Y> {
         Collections.addAll(active, xx);
     }
 
-    public ListSpace(Function<X,Y> materialize, X... xx) {
-        this();
-        set(materialize, xx);
-    }
+//    public ListSpace(Function<X,Y> materialize, X... xx) {
+//        this();
+//        set(materialize, xx);
+//    }
 
     @Override
     public final Iterator<Y> iterator() {
@@ -42,23 +42,23 @@ public class ListSpace<X,Y extends Spatial<X>> extends AbstractSpace<X,Y> {
     }
 
     @Override
-    public void start(SpaceGraph space) {
+    public void start(SpaceGraph<X> space) {
         super.start(space);
     }
 
 
-    public void set(Function<X, Y> materializer, X... items) {
-        set(Lists.newArrayList(items), materializer);
-    }
-
-    public void set(List<X> items, Function<X, Y> materializer) {
-        int n = 0;
-        FasterList<Y> v = new FasterList(items.size());
-        for (X x : items) {
-            v.add(space.update(x, materializer));
-        }
-        this.active = v;
-    }
+//    public void set(Function<X, Y> materializer, X... items) {
+//        set(Lists.newArrayList(items), materializer);
+//    }
+//
+//    public void set(List<X> items, Function<X, Y> materializer) {
+//        int n = 0;
+//        FasterList<Y> v = new FasterList<>(items.size());
+//        for (X x : items) {
+//            v.add(space.update(x, materializer));
+//        }
+//        this.active = v;
+//    }
 
     @Override
     public final int size() {

@@ -12,10 +12,9 @@ import java.util.function.Consumer;
  * @param X input "key" object type
  * @param Y visualized "value" spatial type
  */
-abstract public class AbstractSpace<X, Y extends Spatial<X>> implements Iterable<Y> {
+abstract public class AbstractSpace<X, Y> implements Iterable<Y> {
 
     //final AtomicBoolean busy = new AtomicBoolean(true);
-    public SpaceGraph<X> space;
     private long now;
     private float dt;
 
@@ -26,13 +25,15 @@ abstract public class AbstractSpace<X, Y extends Spatial<X>> implements Iterable
         return this;
     }
 
-    public void start(SpaceGraph space) {
-        this.space = space;
+    public void start(SpaceGraph<X> space) {
+
     }
 
     public void stop() {
-        this.space = null;
+
+
     }
+
 
 
     public float dt() {
@@ -42,10 +43,10 @@ abstract public class AbstractSpace<X, Y extends Spatial<X>> implements Iterable
     /**
      * for thread-safe usage
      */
-    public void updateIfNotBusy(Consumer<AbstractSpace<X,Y>> proc) {
+    public void updateIfNotBusy(Runnable proc) {
         float last = this.now;
         this.dt = (this.now = now()) - last;
-        proc.accept(this);
+        proc.run();
     }
 
     abstract public long now();
@@ -53,9 +54,6 @@ abstract public class AbstractSpace<X, Y extends Spatial<X>> implements Iterable
 
     /** needs to call update(space) for each active item */
     public void update(SpaceGraph<X> s) {
-
-
-        this.forEach(a -> a.update(s));
 
         List<SpaceTransform> ll = this.transforms;
         for (int i1 = 0, layoutSize = ll.size(); i1 < layoutSize; i1++) {
