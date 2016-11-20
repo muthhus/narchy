@@ -8,7 +8,6 @@ import nars.term.Term;
 import nars.term.Terms;
 import nars.term.visit.SubtermVisitorX;
 import nars.util.Util;
-import org.apache.commons.lang3.ArrayUtils;
 import org.eclipse.collections.api.block.predicate.primitive.IntObjectPredicate;
 import org.jetbrains.annotations.NotNull;
 

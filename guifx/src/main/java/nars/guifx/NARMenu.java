@@ -12,7 +12,7 @@ import nars.guifx.util.NSlider;
 import nars.rdfowl.NQuadsRDF;
 import nars.time.RealTime;
 import nars.util.Texts;
-import nars.util.event.Active;
+import nars.util.event.Ons;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
 import java.io.File;
@@ -248,7 +248,7 @@ public class NARMenu extends HBox {
 
 
         private final NAR nar;
-        private final Active regs;
+        private final Ons regs;
         //final AtomicBoolean pendingClockUpdate = new AtomicBoolean(false);
         ////TODO: public final SimpleBooleanProperty pendingClockUpdate
 
@@ -279,7 +279,7 @@ public class NARMenu extends HBox {
 
             nar = n;
 
-            regs = new Active().add(
+            regs = new Ons().add(
                     n.eventFrameStart.on(nn -> {
                         //System.out.println("frame: " + nn.time());
                         run();

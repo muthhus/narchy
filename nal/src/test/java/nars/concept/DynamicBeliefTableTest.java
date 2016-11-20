@@ -4,7 +4,6 @@ import nars.$;
 import nars.NAR;
 import nars.nar.Default;
 import nars.term.Compound;
-import nars.term.Term;
 import nars.truth.Truth;
 import org.junit.Test;
 

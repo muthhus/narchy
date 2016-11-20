@@ -5,7 +5,6 @@ import nars.Op;
 import nars.concept.Concept;
 import nars.term.Compound;
 import nars.term.Term;
-import nars.term.Termlike;
 import nars.term.container.TermContainer;
 import nars.term.container.TermVector1;
 import nars.term.var.Variable;

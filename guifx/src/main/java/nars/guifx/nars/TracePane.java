@@ -9,12 +9,12 @@ import javafx.scene.control.Label;
 import nars.$;
 import nars.NAR;
 import nars.guifx.LogPane;
+import nars.util.event.Ons;
+import nars.util.event.On;
+import nars.util.event.Topic;
 import nars.util.list.ArraySharingList;
 import nars.util.list.CircularArrayList;
 import nars.util.list.FasterList;
-import nars.util.event.Active;
-import nars.util.event.On;
-import nars.util.event.Topic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,7 +35,7 @@ public abstract class TracePane extends LogPane implements ChangeListener, Consu
      * threshold for minimum displayable priority
      */
     public final DoubleProperty volume;
-    private Active events;
+    private Ons events;
     private On reg;
     protected Node prev; //last node added
     //Pane cycleSet = null; //either displays one cycle header, or a range of cycles, including '...' waiting for next output while they queue

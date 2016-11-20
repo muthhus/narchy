@@ -32,9 +32,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static com.google.common.truth.Truth.assertThat;
+import static java.util.Collections.emptySet;
 import static objenome.out.Type.SET;
 import static objenome.out.Type.SET_VALUES;
-import static java.util.Collections.emptySet;
 import static org.junit.Assert.*;
 
 @RunWith(JUnit4.class)

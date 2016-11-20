@@ -1,8 +1,7 @@
 package objenome.example.simple;
 
-import objenome.in;
-
 import objenome.O;
+import objenome.in;
 
 public class CoffeeApp implements Runnable {
 

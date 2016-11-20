@@ -1,13 +1,9 @@
 package nars.term.container;
 
-import com.google.common.base.Joiner;
 import com.google.common.collect.Iterators;
 import nars.Op;
 import nars.term.Term;
 import nars.term.Termlike;
-import org.apache.commons.math3.exception.OutOfRangeException;
-import org.eclipse.collections.api.set.ImmutableSet;
-import org.eclipse.collections.api.set.MutableSet;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;

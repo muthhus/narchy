@@ -1,6 +1,6 @@
 package nars.experiment.invaders;
 
-import java.util.*;
+import java.util.ArrayList;
 public class Disassembler {
 //	public static void main(String [] args){
 //		CPU cpu = new CPU();

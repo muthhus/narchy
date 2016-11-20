@@ -11,7 +11,6 @@ import nars.term.container.TermSet;
 import nars.term.obj.IntTerm;
 import nars.term.obj.Termject.IntInterval;
 import org.eclipse.collections.api.list.primitive.ByteList;
-import org.eclipse.collections.api.set.MutableSet;
 import org.eclipse.collections.api.tuple.Pair;
 import org.eclipse.collections.impl.list.mutable.primitive.IntArrayList;
 import org.eclipse.collections.impl.set.mutable.primitive.ByteHashSet;

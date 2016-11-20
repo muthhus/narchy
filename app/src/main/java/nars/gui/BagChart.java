@@ -6,6 +6,7 @@ import nars.link.BLink;
 import nars.nar.Default;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import spacegraph.SpaceGraph;
 import spacegraph.layout.TreeChart;
 
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -25,7 +26,7 @@ public class BagChart<X> extends TreeChart<BLink<X>> implements BiConsumer<BLink
         Default d = new Default(1024,8,2,2);
         d.input("(a --> b). (b --> c).  (c --> d).");
 
-        Vis.show(d);
+        SpaceGraph.window(Vis.conceptsTreeChart(d, 512), 800, 600);
 
         d.loop(35f);
 

@@ -4,7 +4,6 @@ import nars.NAR;
 import nars.Param;
 import nars.Task;
 import nars.concept.Concept;
-import nars.link.BLink;
 import nars.nal.Premise;
 import nars.nal.meta.PremiseEval;
 import nars.term.Compound;
@@ -12,11 +11,8 @@ import nars.term.Termed;
 import nars.truth.Truth;
 import nars.truth.TruthDelta;
 import nars.util.Util;
-import nars.util.math.Interval;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import static nars.time.Tense.DTERNAL;
 
 
 /** TODO extend an ImmutableTask class */

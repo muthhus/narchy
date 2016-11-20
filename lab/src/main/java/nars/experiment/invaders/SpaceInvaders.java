@@ -1,7 +1,9 @@
 package nars.experiment.invaders;
 
-import java.io.*;
-import java.util.*;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
 public class SpaceInvaders {
 
 	public static void main(String [] args) throws Exception{

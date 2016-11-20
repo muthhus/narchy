@@ -1,6 +1,9 @@
 package nars.concept;
 
-import nars.*;
+import nars.NAR;
+import nars.Narsese;
+import nars.Symbols;
+import nars.Task;
 import nars.task.Revision;
 import nars.term.Compound;
 import nars.term.Term;

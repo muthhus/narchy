@@ -5,7 +5,6 @@ import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.TextCharacter;
 import com.googlecode.lanterna.terminal.virtual.DefaultVirtualTerminal;
 
-import java.io.IOException;
 import java.io.OutputStream;
 
 /**
@@ -50,7 +49,7 @@ public class VirtualConsole extends ConsoleSurface implements Appendable {
             }
 
             @Override
-            public void flush() throws IOException {
+            public void flush() {
                 term.flush();
             }
         };

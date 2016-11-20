@@ -7,7 +7,6 @@ import nars.$;
 import nars.NAR;
 import nars.NAgent;
 import nars.bag.Bag;
-import nars.concept.ActionConcept;
 import nars.concept.Concept;
 import nars.link.BLink;
 import nars.nar.Default;
@@ -18,11 +17,10 @@ import nars.truth.Truth;
 import nars.util.Iterative;
 import org.eclipse.collections.api.block.function.primitive.FloatFunction;
 import org.jetbrains.annotations.Nullable;
-import spacegraph.Ortho;
-import spacegraph.SpaceGraph;
-import spacegraph.Surface;
+import spacegraph.*;
+import spacegraph.layout.Flatten;
 import spacegraph.math.Color3f;
-import spacegraph.obj.CrosshairSurface;
+import spacegraph.math.v3;
 import spacegraph.obj.layout.Grid;
 import spacegraph.obj.layout.Stacking;
 import spacegraph.obj.widget.Label;
@@ -92,23 +90,9 @@ public class Vis {
         return new Grid(VERTICAL, s);
     }
 
-    public static void show(Default d) {
-        show(d, -1);
-    }
-
-    public static void show(Default d, int count) {
-
-        SpaceGraph<VirtualTerminal> s = new SpaceGraph<>();
-        SpaceGraph.window(grid(
-                concepts(d, count),
-                budgetHistogram(d, 16),
-                emotionPlots(d, 256)
-        ),1400, 800);
 
 
-    }
-
-    public static BagChart<Concept> concepts(final Default d, final int count) {
+    public static BagChart<Concept> conceptsTreeChart(final Default d, final int count) {
         long[] now = new long[] { d.time() };
         BagChart<Concept> tc = new BagChart<Concept>(d.core.active, count) {
 
@@ -312,5 +296,41 @@ public class Vis {
 
     public static LabeledPane pane(String k, Surface s) {
         return new LabeledPane(k, s);
+    }
+
+    public static SpaceGraph<Term> conceptsWindow3D(NAR nar, int maxNodes, int maxEdges) {
+
+
+        NARSpace n = new ConceptsSpace(nar, maxNodes, maxEdges);
+
+
+        SpaceGraph<Term> s = new SpaceGraph<Term>(
+
+                n.with(
+//                        new SpaceTransform<Term>() {
+//                            @Override
+//                            public void update(SpaceGraph<Term> g, AbstractSpace<Term, ?> src, float dt) {
+//                                float cDepth = -9f;
+//                                src.forEach(s -> {
+//                                    ((SimpleSpatial)s).moveZ(
+//                                            s.key.volume() * cDepth, 0.05f );
+//                                });
+//                            }
+//                        }
+                        new Flatten() {
+                            protected void locate(SimpleSpatial s, v3 f) {
+                                f.set(s.x(), s.y(), 10 - ((Term) (s.key)).volume() * 6);
+                            }
+                        }
+//                        //new Spiral()
+//                        //new FastOrganicLayout()
+                )
+        );
+
+        s.dyn.addBroadConstraint(new ForceDirected());
+
+
+        return s;
+
     }
 }

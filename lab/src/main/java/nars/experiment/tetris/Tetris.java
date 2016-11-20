@@ -1,10 +1,7 @@
 package nars.experiment.tetris;
 
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
 import nars.$;
 import nars.NAR;
-import nars.Param;
 import nars.concept.ActionConcept;
 import nars.concept.SensorConcept;
 import nars.experiment.tetris.impl.TetrisState;
@@ -25,11 +22,6 @@ import spacegraph.obj.widget.MatrixView;
 import java.util.List;
 
 import static nars.experiment.tetris.impl.TetrisState.*;
-import static spacegraph.SpaceGraph.window;
-import static spacegraph.obj.ControlSurface.newControlWindow;
-import static spacegraph.obj.layout.Grid.col;
-import static spacegraph.obj.layout.Grid.grid;
-import static spacegraph.obj.layout.Grid.row;
 
 /**
  * Created by me on 7/28/16.

@@ -1,5 +1,6 @@
 package nars.remote;
 
+import com.googlecode.lanterna.terminal.virtual.VirtualTerminal;
 import nars.$;
 import nars.NAR;
 import nars.NAgent;
@@ -14,9 +15,9 @@ import nars.nar.util.DefaultConceptBuilder;
 import nars.op.mental.Abbreviation;
 import nars.op.mental.Inperience;
 import nars.op.time.MySTMClustered;
-import nars.time.Time;
 import nars.time.FrameTime;
 import nars.time.RealTime;
+import nars.time.Time;
 import nars.truth.Truth;
 import nars.util.TaskStatistics;
 import nars.util.data.FloatParam;
@@ -29,9 +30,8 @@ import spacegraph.Surface;
 import spacegraph.obj.layout.Grid;
 import spacegraph.obj.widget.CheckBox;
 import spacegraph.obj.widget.FloatSlider;
-import spacegraph.obj.widget.ToggleButton;
 
-import java.awt.Container;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -312,11 +312,17 @@ abstract public class NAgents extends NAgent {
         });
     }
     public static void chart(NAgent a) {
+
         a.nar.runLater(()-> {
             window(
-                    row(
-                            new ReflectionSurface(a),
-                            //nar instanceof Default ? Vis.concepts((Default) nar, 128) : grid(/*blank*/),
+                    grid(
+                            new ReflectionSurface<>(a),
+
+                            Vis.emotionPlots(a.nar, 256),
+
+
+                            //conceptsTreeChart(d, count),
+                            //budgetHistogram(d, 16),
 
                             Vis.agentActions(a, 400),
                             Vis.beliefCharts(400, a.predictors, a.nar)

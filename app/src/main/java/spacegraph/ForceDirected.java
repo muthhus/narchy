@@ -50,11 +50,9 @@ public class ForceDirected<X> implements spacegraph.phys.constraint.BroadConstra
 
         //System.out.print("Force direct " + objects.size() + ": ");
         //final int[] count = {0};
-        b.forEach(objects.size() / clusters, objects, (l) -> {
-            batch(l);
-            //count[0] += l.size();
-            //System.out.print(l.size() + "  ");
-        });
+        //count[0] += l.size();
+//System.out.print(l.size() + "  ");
+        b.forEach(objects.size() / clusters, objects, this::batch);
         //System.out.println(" total=" + count[0]);
 
         for (Collidable c : objects) {
@@ -89,7 +87,7 @@ public class ForceDirected<X> implements spacegraph.phys.constraint.BroadConstra
         }
     }
 
-    private void attract(Collidable x, Collidable y, float speed, float idealDist) {
+    private static void attract(Collidable x, Collidable y, float speed, float idealDist) {
         SimpleSpatial xp = ((SimpleSpatial) x.data());
         SimpleSpatial yp = ((SimpleSpatial) y.data());
 
@@ -117,7 +115,7 @@ public class ForceDirected<X> implements spacegraph.phys.constraint.BroadConstra
 
     }
 
-    private void repel(Collidable x, Collidable y, float speed, float minDist, float maxDist) {
+    private static void repel(Collidable x, Collidable y, float speed, float minDist, float maxDist) {
         SimpleSpatial xp = ((SimpleSpatial) x.data());
         SimpleSpatial yp = ((SimpleSpatial) y.data());
 
@@ -125,9 +123,9 @@ public class ForceDirected<X> implements spacegraph.phys.constraint.BroadConstra
         delta.sub(xp.transform(), yp.transform());
 
         float len = delta.normalize();
-        len -= (xp.radius + yp.radius);
+        len += (xp.radius + yp.radius);
 
-        if (len <= minDist)
+        if ((len <= minDist) || (len >= maxDist))
             return;
 
         delta.scale(((speed * speed) / (1 + len * len)) / 2f);

@@ -11,7 +11,7 @@ import nars.link.BLink;
 import nars.nar.Default;
 import nars.term.Term;
 import nars.term.Termed;
-import nars.util.event.Active;
+import nars.util.event.Ons;
 
 import java.util.Collection;
 import java.util.List;
@@ -25,7 +25,7 @@ public class ConceptsSource extends GraphSource {
 
 
     public final NAR nar;
-    private Active regs;
+    private Ons regs;
 
     final int maxNodes = 128;
     final int maxNodeLinks = 8; //per type
@@ -139,7 +139,7 @@ public class ConceptsSource extends GraphSource {
                 throw new RuntimeException("already started");
 
 
-            regs = new Active(
+            regs = new Ons(
                     /*nar.memory.eventConceptActivated.on(
                             c -> refresh.set(true)
                     ),*/

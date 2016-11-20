@@ -41,9 +41,18 @@ import static spacegraph.phys.math.VectorUtil.setCoord;
 public class MatrixUtil {
 	
 	public static void scale(Matrix3f dest, Matrix3f mat, v3 s) {
-		dest.m00 = mat.m00 * s.x;   dest.m01 = mat.m01 * s.y;   dest.m02 = mat.m02 * s.z;
-		dest.m10 = mat.m10 * s.x;   dest.m11 = mat.m11 * s.y;   dest.m12 = mat.m12 * s.z;
-		dest.m20 = mat.m20 * s.x;   dest.m21 = mat.m21 * s.y;   dest.m22 = mat.m22 * s.z;
+		float sx = s.x;
+		dest.m00 = mat.m00 * sx;
+		dest.m10 = mat.m10 * sx;
+		dest.m20 = mat.m20 * sx;
+		float sy = s.y;
+		dest.m01 = mat.m01 * sy;
+		dest.m11 = mat.m11 * sy;
+		dest.m21 = mat.m21 * sy;
+		float sz = s.z;
+		dest.m02 = mat.m02 * sz;
+		dest.m12 = mat.m12 * sz;
+		dest.m22 = mat.m22 * sz;
 	}
 	public static void scale(Matrix3f dest, v3 s) {
 

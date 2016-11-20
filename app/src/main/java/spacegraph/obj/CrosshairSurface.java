@@ -34,18 +34,14 @@ public class CrosshairSurface extends Surface implements MouseListener {
 
         if (!mouseEnabled) {
             //HACK
-            space.window.addMouseListener(this);
+            space.addMouseListener(this);
             mouseEnabled = true;
         }
 
 
-
-        float cw = 175f; //TODO proportional to ortho width (pixels)
-        float ch = 175f; //TODO proportional to ortho height (pixels)
-
         //gl.glTranslatef(mx, my, 0);
-        float r, g, b;
-        r = g = b = 0.75f;
+        float g, b;
+        float r = g = b = 0.75f;
         if (pressed!=null && pressed.length > 0) {
             switch (pressed[0]) {
                 case 1:
@@ -62,6 +58,8 @@ public class CrosshairSurface extends Surface implements MouseListener {
         gl.glColor4f(r, g, b, 0.6f);
 
         gl.glLineWidth(4f);
+        float ch = 175f; //TODO proportional to ortho height (pixels)
+        float cw = 175f; //TODO proportional to ortho width (pixels)
         Draw.rectStroke(gl, smx-cw/2f, smy-ch/2f, cw, ch);
 
         float hl = 1.25f; //cross hair length
@@ -108,10 +106,9 @@ public class CrosshairSurface extends Surface implements MouseListener {
 
     private void update(MouseEvent e) {
         mx = e.getX();
-        GLWindow win = space.window;
         smx = ((float)mx) ;
         my = e.getY();
-        smy = (win.getHeight() - ((float)my)) ;
+        smy = (space.getHeight() - ((float)my)) ;
 
         pressed = e.getButtonsDown();
     }

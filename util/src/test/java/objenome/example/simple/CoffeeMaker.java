@@ -1,7 +1,7 @@
 package objenome.example.simple;
 
-import objenome.lazy;
 import objenome.in;
+import objenome.lazy;
 
 class CoffeeMaker {
   @in

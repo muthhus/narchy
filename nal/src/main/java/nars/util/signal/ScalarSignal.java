@@ -1,6 +1,9 @@
 package nars.util.signal;
 
-import nars.*;
+import nars.NAR;
+import nars.Param;
+import nars.Symbols;
+import nars.Task;
 import nars.task.MutableTask;
 import nars.term.Compound;
 import nars.term.Term;

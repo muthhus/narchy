@@ -16,15 +16,14 @@
  */
 package objenome.impl;
 
-import objenome.impl.loaders.DynamicLoader;
-import objenome.the;
 import objenome.O;
+import objenome.impl.loaders.DynamicLoader;
+import objenome.in;
 import objenome.out;
+import objenome.the;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-
-import objenome.in;
 
 import static com.google.common.truth.Truth.assertThat;
 

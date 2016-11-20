@@ -5,7 +5,6 @@ import org.eclipse.collections.api.block.predicate.primitive.IntObjectPredicate;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.function.Consumer;
 
 /**
  * maintains a set of objects which are used as input for representation in a SpaceGraph

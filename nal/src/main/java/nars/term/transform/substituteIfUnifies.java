@@ -10,7 +10,6 @@ import org.jetbrains.annotations.Nullable;
 
 import static nars.term.Terms.equal;
 import static nars.time.Tense.DTERNAL;
-import static nars.time.Tense.ETERNAL;
 
 /**
  * substituteIfUnifies....(term, varFrom, varTo)

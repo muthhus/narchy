@@ -65,7 +65,7 @@ public class MatrixView extends Surface {
                     float dz = view.update(x, y, gl);
                     Draw.rect(gl, x * dw, 1f - y * dh, dw, dh, dz);
                 } catch (Exception e) {
-                    logger.error("{}",e);
+                    logger.error(" {}",e);
                     return;
                 }
 

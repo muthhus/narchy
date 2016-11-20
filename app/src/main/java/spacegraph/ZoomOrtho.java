@@ -17,7 +17,7 @@ public class ZoomOrtho extends Ortho {
 
     final static short PAN_BUTTON = 3;
 
-    v2 panStart = null;
+    v2 panStart;
 
     public ZoomOrtho(Surface surface) {
         super(surface);
@@ -68,8 +68,7 @@ public class ZoomOrtho extends Ortho {
             int wx = window.getWidth();
             int wy = window.getHeight();
             if (sx/wx >= minZoom && sy/wy >= minZoom && sx/wx <= maxZoom && sy/wy <= maxZoom) {
-                float dsx = sx - psx;
-                float dsy = sy - psy;
+
                 s.set(sx, sy);
 
                 float epx, epy;
@@ -80,6 +79,9 @@ public class ZoomOrtho extends Ortho {
                     //TODO calculate correctly based on viewed center
                     epx = epy = 0; //zoom out from center
                 }
+
+                float dsx = sx - psx;
+                float dsy = sy - psy;
                 move(-dsx/2f + epx, -dsy/2f + epy); //centered on mouse
             }
         //}

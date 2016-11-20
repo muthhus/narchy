@@ -326,7 +326,7 @@ public class Pacman extends NAgent {
             grid(
                     //new CameraSensorView(pacman.pixels, nar),
                     Vis.agentActions(p, history),
-                    Vis.concepts(nar, 64),
+                    Vis.conceptsTreeChart(nar, 64),
                     col(
                             Vis.budgetHistogram(nar, 50),
                             Vis.conceptLinePlot(nar,

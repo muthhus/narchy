@@ -1,19 +1,16 @@
 package spacegraph;
 
-import com.google.common.collect.Lists;
 import nars.util.list.FasterList;
 import org.eclipse.collections.api.block.predicate.primitive.IntObjectPredicate;
 
 import java.util.Collections;
 import java.util.Iterator;
-import java.util.List;
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 /**
  * Created by me on 6/26/16.
  */
-public class ListSpace<X,Y extends Spatial<X>> extends AbstractSpace<X,Y> {
+public class ListSpace<X,Y> extends AbstractSpace<X,Y> {
 
     public FasterList<Y> active = new FasterList<>(0);
 

@@ -1,13 +1,11 @@
 package nars.nal.meta;
 
-import nars.Op;
 import nars.term.Term;
 import nars.term.compound.GenericCompound;
 import nars.term.container.TermVector;
 import org.jetbrains.annotations.NotNull;
 
 import static nars.Op.PROD;
-import static nars.time.Tense.DTERNAL;
 
 /**
  * just holds two terms, not really necessary. recycled

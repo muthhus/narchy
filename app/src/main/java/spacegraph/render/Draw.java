@@ -882,9 +882,10 @@ public enum Draw {
 
     public static final class HGlyph {
         /*int idx, verts, */
-        int leftPos, rightPos;
+        final int leftPos;
+        final int rightPos;
         //String spec;
-        byte[][] segments;
+        final byte[][] segments;
 
         // Hershey fonts use coordinates represented by characters'
         // integer values relative to ascii 'R'
@@ -1219,13 +1220,13 @@ public enum Draw {
         private final boolean lazy;
         private final Glyph[] glyphs;
         protected int characters;
-        protected int[] charWidth = new int[ 255 ];
+        protected final int[] charWidth = new int[ 255 ];
         protected int charHeight;
         protected int[][] chars;
         protected int lineHeight = 10;
         protected int kerning = 0;
         protected int wh;
-        public static int defaultChar = 32;
+        public static final int defaultChar = 32;
         private int textureHeight;
         private int textureWidth;
 

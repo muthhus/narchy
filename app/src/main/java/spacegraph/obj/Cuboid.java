@@ -96,7 +96,7 @@ public class Cuboid<X> extends SimpleSpatial<X> {
 
 
     @Override
-    protected final void renderRelative(GL2 gl, Dynamic body) {
+    public final void renderRelative(GL2 gl, Collidable body) {
         super.renderRelative(gl, body);
 
 
@@ -111,9 +111,9 @@ public class Cuboid<X> extends SimpleSpatial<X> {
         gl.glTranslatef(-0.5f, -0.5f, 0.5f + zOffset);
         //gl.glScalef(pp, pp, 1f);
 
-        Transform t = transform();
-        float tw = t.x;
-        float th = t.y;
+        //Transform t = transform();
+        //float tw = t.x;
+        //float th = t.y;
         gl.glDepthMask(false);
         front.render(gl, v(1,1));
         gl.glDepthMask(true);
@@ -123,7 +123,7 @@ public class Cuboid<X> extends SimpleSpatial<X> {
     }
 
     @Override
-    protected void renderAbsolute(GL2 gl) {
+    public void renderAbsolute(GL2 gl) {
         super.renderAbsolute(gl);
 
         //display pick location (debugging)

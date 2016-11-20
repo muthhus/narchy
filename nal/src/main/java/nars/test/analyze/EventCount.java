@@ -2,7 +2,7 @@ package nars.test.analyze;
 
 import nars.$;
 import nars.NAR;
-import nars.util.event.Active;
+import nars.util.event.Ons;
 import nars.util.event.Topic;
 import nars.util.meter.event.HitMeter;
 import org.jetbrains.annotations.NotNull;
@@ -18,7 +18,7 @@ public class EventCount {
     @NotNull
     public final Map<Object, HitMeter> eventMeters;
     @Nullable
-    private Active sub;
+    private Ons sub;
 
     public EventCount(@NotNull NAR nar) {
 

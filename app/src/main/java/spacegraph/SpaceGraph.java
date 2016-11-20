@@ -131,7 +131,7 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
 
     public @NotNull <Y extends Spatial<X>> Y getOrAdd(X x, Function<X, ? extends Y> materializer) {
         Spatial<X> y = atoms.computeIfAbsent(x, materializer);
-        y.preactivate(true);
+        y.reactivate(true);
         return (Y) y;
     }
 
@@ -170,30 +170,6 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
         }
         preAdd.clear();
 
-        //gl.glEnable(GL2.GL_TEXTURE_2D); // Enable Texture Mapping
-
-        gl.glClearColor(0.0f, 0.0f, 0.0f, 0f); // Black Background
-        gl.glClearDepth(1f); // Depth Buffer Setup
-
-        // Quick And Dirty Lighting (Assumes Light0 Is Set Up)
-        //gl.glEnable(GL2.GL_LIGHT0);
-
-        //gl.glEnable(GL2.GL_LIGHTING); // Enable Lighting
-
-
-        gl.glEnable(GL2.GL_BLEND);
-        //gl.glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        //gl.glBlendEquation(GL_FUNC_ADD);
-
-        gl.glBlendEquationSeparate(GL_FUNC_ADD, GL_FUNC_ADD);
-        gl.glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ZERO);
-
-        //gl.glHint(GL2.GL_PERSPECTIVE_CORRECTION_HINT, GL2.GL_NICEST); // Really Nice Perspective Calculations
-
-        //loadGLTexture(gl);
-
-//        gleem.start(Vec3f.Y_AXIS, window);
-//        gleem.attach(new DefaultHandleBoxManip(gleem).translate(0, 0, 0));
     }
 
 
@@ -221,11 +197,16 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
 
 
     protected void renderHUD() {
-        ortho();
 
-        GL2 gl = this.gl;
-        for (int i = 0, facialsSize = orthos.size(); i < facialsSize; i++) {
-            orthos.get(i).render(gl);
+        int facialsSize = orthos.size();
+        if (facialsSize > 0) {
+
+            ortho();
+
+            GL2 gl = this.gl;
+            for (int i = 0; i < facialsSize; i++) {
+                orthos.get(i).render(gl);
+            }
         }
     }
 

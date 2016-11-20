@@ -36,7 +36,6 @@ import spacegraph.phys.util.OArrayList;
 
 import java.util.function.BiConsumer;
 
-import static spacegraph.render.JoglPhysics.defaultRenderer;
 
 /**
  * RigidBody is the main class for rigid body objects. It is derived from
@@ -68,8 +67,8 @@ public class Dynamic<X> extends Collidable<X> {
 	private static final float MAX_ANGVEL = BulletGlobals.SIMD_HALF_PI;
 	
 	private final Matrix3f invInertiaTensorWorld = new Matrix3f();
-	private final v3 linearVelocity = new v3();
-	private final v3 angularVelocity = new v3();
+	public final v3 linearVelocity = new v3();
+	public final v3 angularVelocity = new v3();
 	private float inverseMass;
 	private float angularFactor;
 
@@ -172,9 +171,6 @@ public class Dynamic<X> extends Collidable<X> {
 		userObjectPointer = null;
 	}
 
-	public final Transform transform() {
-		return worldTransform;
-	}
 
 	public void proceedToTransform(Transform newTrans) {
 		setCenterOfMassTransform(newTrans);
@@ -468,6 +464,7 @@ public class Dynamic<X> extends Collidable<X> {
 		return out;
 	}
 
+
 	public v3 getLinearVelocity(v3 out) {
 		out.set(linearVelocity);
 		return out;
@@ -477,6 +474,8 @@ public class Dynamic<X> extends Collidable<X> {
 		out.set(angularVelocity);
 		return out;
 	}
+
+
 
 	public void setLinearVelocity(v3 lin_vel) {
 		assert (collisionFlags != CollisionFlags.STATIC_OBJECT);
@@ -629,22 +628,5 @@ public class Dynamic<X> extends Collidable<X> {
 	public int getNumConstraintRefs() {
 		return constraintRefs.size();
 	}
-
-
-	private BiConsumer<GL2,Dynamic> renderer = defaultRenderer;
-
-	public final BiConsumer<GL2,Dynamic> renderer() {
-		return renderer;
-	}
-	public final void renderer(GL2 gl) {
-		BiConsumer<GL2, Dynamic> r = this.renderer;
-		if (r !=null)
-			r.accept(gl, this);
-	}
-
-	public final void setRenderer(BiConsumer<GL2,Dynamic> renderer) {
-		this.renderer = renderer;
-	}
-
 
 }

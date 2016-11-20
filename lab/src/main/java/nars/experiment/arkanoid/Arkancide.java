@@ -7,8 +7,6 @@ import nars.Param;
 import nars.concept.ActionConcept;
 import nars.remote.NAgents;
 
-import static nars.$.t;
-
 public class Arkancide extends NAgents {
 
 

@@ -43,7 +43,6 @@ import spacegraph.render.Draw;
 import spacegraph.render.JoglPhysics;
 import spacegraph.render.JoglPhysics.ExtraGlobals;
 
-import static spacegraph.render.JoglPhysics.defaultRenderer;
 
 /**
  * @author jezek2
@@ -174,26 +173,26 @@ public class RagDoll  {
         this.head = bodies[BodyPart.BODYPART_HEAD.ordinal()] =
                 localCreateRigidBody(1f, tmpTrans, shapes[BodyPart.BODYPART_HEAD.ordinal()]);
 
-        head.setRenderer((Object gl, Object dd)->{
-            GL2 g = (GL2) gl;
-            Dynamic d = (Dynamic) dd;
-
-            defaultRenderer.accept(g, d); //HACK cast sucks
-
-            g.glPushMatrix();
-
-            Draw.transform(g, d.transform());
-
-            g.glColor4f((float)Math.random(),0.25f,1f,0.75f); //HACK cast sucks
-            g.glRotatef((float)Math.PI/2f, 0, 0, 1);
-            Draw.rect(g, -0.5f,-0.5f,1,1, 0.5f);
-
-            g.glPopMatrix();
-
-            g.glColor4f(0.75f,0.75f,0.75f,1f); //HACK restore white color
-
-        });
-
+//        head.setRenderer((Object gl, Object dd)->{
+//            GL2 g = (GL2) gl;
+//            Dynamic d = (Dynamic) dd;
+//
+//            defaultRenderer.accept(g, d); //HACK cast sucks
+//
+//            g.glPushMatrix();
+//
+//            Draw.transform(g, d.transform());
+//
+//            g.glColor4f((float)Math.random(),0.25f,1f,0.75f); //HACK cast sucks
+//            g.glRotatef((float)Math.PI/2f, 0, 0, 1);
+//            Draw.rect(g, -0.5f,-0.5f,1,1, 0.5f);
+//
+//            g.glPopMatrix();
+//
+//            g.glColor4f(0.75f,0.75f,0.75f,1f); //HACK restore white color
+//
+//        });
+//
 
         transform.setIdentity();
         transform.set(-0.18f * scale_ragdoll, 0.65f * scale_ragdoll, 0f);
@@ -248,9 +247,7 @@ public class RagDoll  {
 
         ///////////////////////////// SETTING THE CONSTRAINTS /////////////////////////////////////////////7777
         // Now setup the constraints
-        Generic6DofConstraint joint6DOF;
         Transform localA = stack.transforms.get(), localB = stack.transforms.get();
-        boolean useLinearReferenceFrameA = true;
         /// ******* SPINE HEAD ******** ///
         localA.setIdentity();
         localB.setIdentity();
@@ -259,7 +256,8 @@ public class RagDoll  {
 
         localB.set(0f, -0.14f * scale_ragdoll, 0f);
 
-        joint6DOF = new Generic6DofConstraint(bodies[BodyPart.BODYPART_SPINE.ordinal()], bodies[BodyPart.BODYPART_HEAD.ordinal()], localA, localB, useLinearReferenceFrameA);
+        boolean useLinearReferenceFrameA = true;
+        Generic6DofConstraint joint6DOF = new Generic6DofConstraint(bodies[BodyPart.BODYPART_SPINE.ordinal()], bodies[BodyPart.BODYPART_HEAD.ordinal()], localA, localB, useLinearReferenceFrameA);
 
         //#ifdef RIGID
         //joint6DOF->setAngularLowerLimit(btVector3(-SIMD_EPSILON,-SIMD_EPSILON,-SIMD_EPSILON));

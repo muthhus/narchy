@@ -5,12 +5,9 @@ import nars.$;
 import nars.Task;
 import nars.concept.DynamicConcept;
 import nars.truth.Truth;
-import org.apache.commons.math3.exception.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 
 import static nars.Param.TRUTH_EPSILON;

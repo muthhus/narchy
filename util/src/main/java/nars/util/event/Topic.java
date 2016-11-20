@@ -19,7 +19,7 @@ public interface Topic<V> {
     //List<Consumer<V>> all();
 
 
-    static Active all(Object obj, BiConsumer<String /* fieldName*/, Object /* value */> f) {
+    static Ons all(Object obj, BiConsumer<String /* fieldName*/, Object /* value */> f) {
         return all(obj, f, (key)->true);
     }
 
@@ -40,9 +40,9 @@ public interface Topic<V> {
     /** registers to all public Topic fields in an object
      * BiConsumer<String  fieldName, Object  value >
      * */
-    static Active all(Object obj, BiConsumer<String, Object> f, Predicate<String> includeKey) {
+    static Ons all(Object obj, BiConsumer<String, Object> f, Predicate<String> includeKey) {
 
-        Active s = new Active();
+        Ons s = new Ons();
 
         each(obj, (field) -> {
             String fieldName = field.getName();

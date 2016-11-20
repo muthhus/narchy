@@ -1,7 +1,7 @@
 package spacegraph;
 
 import com.jogamp.opengl.GL2;
-import spacegraph.phys.Dynamic;
+import spacegraph.phys.Collidable;
 import spacegraph.phys.shape.BoxShape;
 import spacegraph.phys.shape.CollisionShape;
 import spacegraph.render.Draw;
@@ -15,42 +15,12 @@ public abstract class AbstractSpatial<X> extends Spatial<X> {
         super(x);
     }
 
-    protected void renderAbsolute(GL2 gl) {
+    public void renderAbsolute(GL2 gl) {
         //blank
     }
 
-    @Override
-    public final void accept(GL2 gl, Dynamic body) {
+    public void renderRelative(GL2 gl, Collidable body) {
 
-        renderAbsolute(gl);
-
-        gl.glPushMatrix();
-
-        Draw.transform(gl, body.transform());
-
-        renderRelative(gl, body);
-
-
-
-        gl.glPopMatrix();
-    }
-
-    protected void renderRelative(GL2 gl, Dynamic body) {
-
-        renderShape(gl, body);
-
-    }
-
-    protected void renderRelativeAspect(GL2 gl) {
-
-    }
-
-    protected void colorshape(GL2 gl) {
-        gl.glColor4f(0.5f, 0.5f, 0.5f, 0.5f);
-    }
-
-
-    protected void renderShape(GL2 gl, Dynamic body) {
         colorshape(gl);
         Draw.draw(gl, body.shape());
 
@@ -62,13 +32,13 @@ public abstract class AbstractSpatial<X> extends Spatial<X> {
             BoxShape bshape = (BoxShape) shape;
 
             gl.glPushMatrix();
-            float sx, sy;
-            sx = bshape.x(); //HACK
-            sy = bshape.y(); //HACK
-            float tx, ty;
+
+            float sx = bshape.x(); //HACK
+            float sy = bshape.y(); //HACK
+
             //if (sx > sy) {
-            ty = sy;
-            tx = sy / sx;
+            float ty = sy;
+            float tx = sy / sx;
             //} else {
             //  tx = sx;
             //  ty = sx/sy;
@@ -84,5 +54,14 @@ public abstract class AbstractSpatial<X> extends Spatial<X> {
         }
 
     }
+
+    protected void renderRelativeAspect(GL2 gl) {
+
+    }
+
+    protected void colorshape(GL2 gl) {
+        gl.glColor4f(0.5f, 0.5f, 0.5f, 0.5f);
+    }
+
 
 }

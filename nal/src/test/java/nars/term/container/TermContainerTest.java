@@ -6,9 +6,7 @@ import nars.term.Term;
 import org.junit.Test;
 
 import static nars.$.$;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * Created by me on 3/1/16.

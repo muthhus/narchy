@@ -2,7 +2,6 @@ package nars.guifx.concept;
 
 import javafx.scene.effect.BlendMode;
 import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
 import nars.NAR;
 import nars.concept.Concept;
 import nars.guifx.chart.Plot2D;

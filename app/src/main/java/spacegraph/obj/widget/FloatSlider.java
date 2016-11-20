@@ -11,9 +11,9 @@ import spacegraph.render.Draw;
  */
 public class FloatSlider extends BaseSlider {
 
-    private float max;
-    private float min;
-    String label = null;
+    private final float max;
+    private final float min;
+    String label;
 
     public FloatSlider(float v, float min, float max) {
         super((v - min) / (max - min));
@@ -28,9 +28,7 @@ public class FloatSlider extends BaseSlider {
 
     public FloatSlider(FloatParam f) {
         this(f.floatValue(), f.min, f.max);
-        on((s,v)->{
-           f.setValue(v);
-        });
+        on((s,v)-> f.setValue(v));
     }
 
     public spacegraph.obj.widget.FloatSlider label(String label) {

@@ -38,15 +38,13 @@ public class Maze extends CompoundSpatial {
                 if (cc) {
 
 
-                    Dynamic b;
-                    b = Dynamics.newBody(
+                    Dynamic b = Dynamics.newBody(
                             1f, //mass
                             new BoxShape(0.9f, 0.9f, 0.9f), new Motion(),
                             +1, //group
                             -1//collidesWithOthersLikeThis ? -1 : -1 & ~(+1) //exclude collisions with self
                     );
                     b.setCenterOfMassTransform(new Transform(x, y, 0));
-                    b.setRenderer(this);
                     b.setData(this);
 
                     //b.setLinearFactor(1,1,0); //restricts movement to a 2D plane
@@ -69,7 +67,6 @@ public class Maze extends CompoundSpatial {
         CollisionShape groundShape = new BoxShape(v(20f, 20f, 10f));
         Dynamic ground = Dynamics.newBody(0f, groundShape, new Motion(), +1, -1);
         ground.setCenterOfMassTransform(new Transform(0, 0, -15f));
-        ground.setRenderer(this);
         ground.setData(this);
         add(ground);
 
@@ -104,22 +101,19 @@ public class Maze extends CompoundSpatial {
     protected CollisionShape terrain(int tesselation, float height, int seed, v3 scale) {
 
 
-        int count, countsq, countsqp, indCount = 0, nsscroll;
+        int count = tesselation;
+        int countsq = count * count;
+        int countsqp = countsq + (count * 2 + 1);
 
-        count = tesselation;
-        countsq = count * count;
-        countsqp = countsq + (count * 2 + 1);
-
-        nsscroll = seed;
+        int nsscroll = seed;
         v3[] pvert = new v3[countsqp];
 
-        ByteBuffer ind, vert;
-
         float hdim =  count * .5f;
-        float nscl = .09f;
+        ByteBuffer ind = ByteBuffer.allocateDirect(countsq * 24);
+        ByteBuffer vert = ByteBuffer.allocateDirect(countsqp * 12);
         float zscl = 7.5f;
-        ind = ByteBuffer.allocateDirect(countsq * 24);
-        vert = ByteBuffer.allocateDirect(countsqp * 12);
+        float nscl = .09f;
+        int indCount = 0;
         for (int a = 0; a < countsqp; a++) {
             int xi = a % (count + 1);
             int yi = (int) Math.floor(a / (count + 1));

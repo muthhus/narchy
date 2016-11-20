@@ -1,19 +1,13 @@
 package spacegraph.obj.layout;
 
 import com.jogamp.opengl.GL2;
-import spacegraph.SimpleSpatial;
 import spacegraph.SpaceGraph;
 import spacegraph.Surface;
 import spacegraph.math.v2;
 import spacegraph.math.v3;
-import spacegraph.obj.widget.PushButton;
 import spacegraph.obj.widget.Widget;
-import spacegraph.phys.Collidable;
-import spacegraph.phys.Dynamic;
 
 import java.util.List;
-
-import static spacegraph.math.v3.v;
 
 /**
  * 2D space of shapes, which can be managed and interacted with

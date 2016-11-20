@@ -10,9 +10,7 @@ import nars.concept.Concept;
 import nars.nar.Default;
 import nars.table.BeliefTable;
 import nars.term.Compound;
-import nars.term.Term;
 import nars.term.Terms;
-import nars.time.FrameTime;
 import nars.truth.Truth;
 import org.eclipse.collections.api.block.function.primitive.IntToObjectFunction;
 import spacegraph.SpaceGraph;
@@ -24,9 +22,8 @@ import java.util.List;
 
 import static java.util.stream.Collectors.toList;
 import static nars.$.$;
-import static nars.$.task;
-import static spacegraph.render.Draw.push;
 import static spacegraph.render.Draw.pop;
+import static spacegraph.render.Draw.push;
 
 /**
  * Tool for analyzing and tuning temporal dynamics among a set of specified concepts

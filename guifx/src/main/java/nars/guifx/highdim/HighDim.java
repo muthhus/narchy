@@ -13,8 +13,8 @@ import nars.guifx.util.TabX;
 import nars.link.BLink;
 import nars.nar.Default;
 import nars.util.Util;
-import nars.util.list.FasterList;
 import nars.util.data.random.XorShift128PlusRandom;
+import nars.util.list.FasterList;
 import nars.util.signal.Autoencoder;
 import org.jetbrains.annotations.NotNull;
 

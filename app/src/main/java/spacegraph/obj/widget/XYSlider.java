@@ -38,17 +38,16 @@ public class XYSlider extends Surface {
         float px = knob.x;
         float py = knob.y;
 
-        float knobSize = this.knobWidth;
-        float W = this.crosshairWidth;
-        float H = this.crosshairWidth;
-
         gl.glColor4f(0.75f, 0.75f, 0.75f, 0.75f);
+        float H = this.crosshairWidth;
         float h1 = py - H / 2f;
         Draw.rect(gl, 0, h1-H/2, 1, H); //horiz
+        float W = this.crosshairWidth;
         float w1 = px - W / 2f;
         Draw.rect(gl, w1-W/2, 0, W, 1); //vert
 
         //gl.glColor4f(0.2f, 0.8f, 0f, 0.75f);
+        float knobSize = this.knobWidth;
         Draw.rect(gl, w1-knobSize/2f, h1-knobSize/2f, knobSize, knobSize, 0); //knob
     }
 

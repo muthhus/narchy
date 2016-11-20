@@ -15,7 +15,6 @@
  */
 package objenome;
 
-import objenome.impl.loaders.DynamicLoader;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;

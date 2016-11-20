@@ -15,7 +15,7 @@ public class Webcam extends ImageCamera implements WebcamListener {
 
     private final com.github.sarxos.webcam.Webcam webcam;
     private final boolean showPreview;
-    private BufferedImage frame = null;
+    private BufferedImage frame;
     public ImagePanel gui;
 
     /** opens the default system webcam and tries to resize to the specified dimensions */

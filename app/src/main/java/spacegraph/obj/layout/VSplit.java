@@ -24,10 +24,10 @@ public class VSplit extends Layout {
 
         float margin = 0.0f;
         //float content = 1f - margin;
-        float x = margin/2f;
 
         Surface top = top();
         top.scale(1f, proportion);
+        float x = margin / 2f;
         top.translateLocal.set(x, 1f - proportion, 0);
 
         Surface bottom = bottom();

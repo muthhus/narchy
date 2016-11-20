@@ -1,9 +1,6 @@
 package spacegraph.obj.widget;
 
 import com.jogamp.opengl.GL2;
-import nars.util.Texts;
-import nars.util.Util;
-import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.Nullable;
 import spacegraph.SpaceGraph;
 import spacegraph.math.v2;
@@ -18,7 +15,7 @@ import static spacegraph.obj.layout.Grid.grid;
 public class BaseSlider extends Widget {
 
 
-    @Nullable SliderChange change = null;
+    @Nullable SliderChange change;
     private float p;
 
     public interface SliderChange {
@@ -43,9 +40,6 @@ public class BaseSlider extends Widget {
         //float margin = 0.1f;
         //float mh = margin / 2.0f;
 
-        float W = 1;
-        float H = 1;
-
         //gl.glLineWidth(mh * 2);
         //gl.glColor3f(0.5f, 0.5f, 0.5f);
         //ShapeDrawer.strokeRect(gl, 0, 0, W, H);
@@ -56,8 +50,10 @@ public class BaseSlider extends Widget {
         gl.glColor4f(1f - p, p, 0f, 0.8f);
         //g1.setFill(Color.ORANGE.deriveColor(70 * (p - 0.5), hp, 0.65f, 1.0f));
 
+        float W = 1;
         float barSize = W * p;
         //ShapeDrawer.rect(gl, mh/2, mh/2f, barSize - mh, H - mh);
+        float H = 1;
         Draw.rect(gl, 0, 0, barSize, H);
     }
 

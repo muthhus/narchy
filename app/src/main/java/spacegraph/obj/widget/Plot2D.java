@@ -3,7 +3,6 @@ package spacegraph.obj.widget;
 import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL2;
 import nars.$;
-import org.eclipse.collections.api.block.procedure.primitive.FloatProcedure;
 import org.eclipse.collections.impl.list.mutable.primitive.FloatArrayList;
 import spacegraph.Surface;
 import spacegraph.render.Draw;
@@ -15,7 +14,7 @@ import static nars.util.Texts.n2;
 
 public class Plot2D extends Surface {
     private final List<Series> series;
-    private String title = null;
+    private String title;
 
     public void setTitle(String title) {
         this.title = title;
@@ -248,14 +247,13 @@ public class Plot2D extends Surface {
 
             //float m = 0; //margin
 
-            float W = 1.0f;
-            float H = 1.0f;
-
             gl.glColor4f(0.5f,0.5f,0.5f, 0.75f); //gray
 
             gl.glLineWidth(1);
 
+            float W = 1.0f;
             Draw.line(gl, 0, 0, W, 0);
+            float H = 1.0f;
             Draw.line(gl, 0, H, W, H);
 
             Draw.text(gl, n2(minValue), 0.1f, 0, 0, 0, Draw.TextAlignment.Left);
@@ -274,18 +272,16 @@ public class Plot2D extends Surface {
 
                 int histSize = ss;
 
-                float dx = (W / histSize);
-
-                float x = 0;
-
                 //float py = 0;
 
                 gl.glLineWidth(2);
                 gl.glColor3fv(s.color, 0);
 
-                float ny = mid;
                 gl.glBegin(GL.GL_LINE_STRIP);
                 float range = maxValue - minValue;
+                float ny = mid;
+                float x = 0;
+                float dx = (W / histSize);
                 for (int i = 0; i < ss; i++) {
 
                     float v = ssh[i];

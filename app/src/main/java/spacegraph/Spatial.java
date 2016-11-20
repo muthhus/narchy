@@ -1,6 +1,7 @@
 package spacegraph;
 
 import com.jogamp.opengl.GL2;
+import nars.util.event.Ons;
 import org.jetbrains.annotations.Nullable;
 import spacegraph.math.v3;
 import spacegraph.phys.Collidable;
@@ -17,7 +18,7 @@ import java.util.function.Consumer;
  * volumetric subspace.
  * an atom (base unit) of spacegraph physics-simulated virtual matter
  */
-public abstract class Spatial<X> implements BiConsumer<GL2, Dynamic> {
+public abstract class Spatial<X> implements Active {
 
     public final X key;
     public final int hash;
@@ -48,6 +49,9 @@ public abstract class Spatial<X> implements BiConsumer<GL2, Dynamic> {
                 //(body!=null ? body.shape() : "shapeless")  +
                 ">";
     }
+
+
+
 
     @Override
     public final boolean equals(Object obj) {
@@ -87,7 +91,7 @@ public abstract class Spatial<X> implements BiConsumer<GL2, Dynamic> {
     }
 
 
-    public final void preactivate(boolean b) {
+    public final void reactivate(boolean b) {
         this.preactive = b;
     }
 
@@ -122,4 +126,7 @@ public abstract class Spatial<X> implements BiConsumer<GL2, Dynamic> {
 
     abstract public List<TypedConstraint> constraints();
 
+    public abstract void renderAbsolute(GL2 gl);
+
+    public abstract void renderRelative(GL2 gl, Collidable body);
 }

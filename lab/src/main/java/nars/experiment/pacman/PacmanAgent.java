@@ -1,10 +1,7 @@
 package nars.experiment.pacman;
 
 
-import nars.$;
 import nars.NAR;
-import nars.concept.ActionConcept;
-import nars.experiment.arkanoid.Arkanoid;
 import nars.remote.NAgents;
 
 public class PacmanAgent extends NAgents {

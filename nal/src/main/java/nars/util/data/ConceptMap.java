@@ -2,7 +2,7 @@ package nars.util.data;
 
 import nars.NAR;
 import nars.concept.Concept;
-import nars.util.event.Active;
+import nars.util.event.Ons;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -13,7 +13,7 @@ public abstract class ConceptMap {
 	@NotNull
 	public final NAR nar;
 
-	Active regs;
+	Ons regs;
 	int frame = -1;
 	protected int cycleInFrame = -1;
 
@@ -26,7 +26,7 @@ public abstract class ConceptMap {
 
 	protected ConceptMap(@NotNull NAR nar) {
 
-        regs = new Active(
+        regs = new Ons(
         nar.eventReset.on(n -> {
             frame = 0;
             reset();

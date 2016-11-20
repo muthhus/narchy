@@ -254,4 +254,12 @@ public class v3 extends Tuple3f implements java.io.Serializable {
     public void randomize(Random r, float scale) {
         set(r.nextFloat() * scale, r.nextFloat() * scale, r.nextFloat() * scale);
     }
+
+    public v3 scale(float mx, float my, float mz) {
+        x *= mx;
+        y *= my;
+        z *= mz;
+        return this;
+    }
+
 }

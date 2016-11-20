@@ -23,7 +23,6 @@
 
 package spacegraph.phys.math;
 
-import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.math.Quaternion;
 import spacegraph.math.*;
 

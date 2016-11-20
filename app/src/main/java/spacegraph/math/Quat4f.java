@@ -711,21 +711,18 @@ public class Quat4f extends Tuple4f implements java.io.Serializable {
                     - z_z * vecX
                     - y_y * vecX
                     + 2f * ( y*w*vecZ - z*w*vecY + y*x*vecY + z*x*vecZ );
-            ;
 
-            float oy =  y_y * vecY
+        float oy =  y_y * vecY
                     - z_z * vecY
                     + w_w * vecY
                     - x_x * vecY
                     + 2f * ( x*y*vecX + z*y*vecZ + w*z*vecX - x*w*vecZ );
-            ;
 
-            float oz =   z_z * vecZ
+        float oz =   z_z * vecZ
                     - y_y * vecZ
                     - x_x * vecZ
                     + w_w * vecZ
                     + 2f * ( x*z*vecX + y*z*vecY - w*y*vecX + w*x*vecY );
-            ;
         vecOut.set(ox, oy, oz);
         return vecOut;
 

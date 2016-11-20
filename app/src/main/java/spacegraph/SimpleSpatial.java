@@ -87,6 +87,10 @@ public class SimpleSpatial<X> extends AbstractSpatial<X> {
         move(center.x, center.y, Util.lerp(z, center.z, rate));
     }
 
+    public void move(v3 target, float rate) {
+        move(target.x, target.y, target.z, rate);
+    }
+
     public void move(float x, float y, float z, float rate) {
         v3 center = transform();
         move(
@@ -187,8 +191,7 @@ public class SimpleSpatial<X> extends AbstractSpatial<X> {
     }
 
     public Dynamic newBody(boolean collidesWithOthersLikeThis) {
-        Dynamic b;
-        b = Dynamics.newBody(
+        Dynamic b = Dynamics.newBody(
                 mass(), //mass
                 shape, motion,
                 +1, //group
@@ -216,7 +219,7 @@ public class SimpleSpatial<X> extends AbstractSpatial<X> {
     protected void renderLabel(GL2 gl, float scale) {
         gl.glColor4f(1f, 1f, 1f, 1f);
         gl.glLineWidth(3f);
-        Draw.text(gl, marquee(), scale, 0, 0, 0.5f);
+        Draw.text(gl, marquee(), scale, 0, 0, 0.5f + 0.1f);
     }
 
     public String marquee() {
@@ -259,7 +262,6 @@ public class SimpleSpatial<X> extends AbstractSpatial<X> {
     protected Dynamic create(Dynamics world) {
         Dynamic b = body = newBody(collidable());
         b.setData(this);
-        b.setRenderer(this);
         return b;
     }
 

@@ -1,7 +1,5 @@
 package nars.experiment.invaders;
 
-import java.util.*;
-
 public class Memory {
 	public int a, b,c,d,e,h,l; //8 bit registers
 	public int int_enable;

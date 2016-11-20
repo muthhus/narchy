@@ -11,8 +11,6 @@ import spacegraph.math.v3;
 import java.util.List;
 import java.util.Objects;
 
-import static spacegraph.math.v3.v;
-
 /**
  * planar subspace.
  * (fractal) 2D Surface embedded relative to a parent 2D surface or 3D space
@@ -99,10 +97,7 @@ public class Surface {
             return this;
 
         //2. test children reaction
-        if (children!=null)
-            return onChildTouching(hitPoint, buttons);
-        else
-            return null;
+        return children != null ? onChildTouching(hitPoint, buttons) : null;
     }
 
     protected final Surface onChildTouching(v2 hitPoint, short[] buttons) {

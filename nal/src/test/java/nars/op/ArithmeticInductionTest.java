@@ -1,7 +1,6 @@
 package nars.op;
 
 import nars.$;
-import nars.term.Term;
 import nars.term.obj.Termject;
 import org.junit.Ignore;
 import org.junit.Test;

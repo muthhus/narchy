@@ -1,11 +1,6 @@
 package objenome.meta;
 
 
-import objenome.ExtensionTest;
-import objenome.O;
-import objenome.impl.Binding;
-import objenome.impl.DaggerObjectGraph;
-import objenome.out;
 import org.junit.Test;
 
 

@@ -107,6 +107,10 @@ public class Collidable<X> {
 		this.hitFraction = 1f;
 	}
 
+	public final Transform transform() {
+		return worldTransform;
+	}
+
 	public boolean checkCollideWithOverride(Collidable co) {
 		return true;
 	}

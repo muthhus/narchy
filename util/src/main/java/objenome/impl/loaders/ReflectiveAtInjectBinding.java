@@ -18,8 +18,8 @@ package objenome.impl.loaders;
 import objenome.impl.Binding;
 import objenome.impl.Keys;
 import objenome.impl.Linker;
-
 import objenome.in;
+
 import javax.inject.Singleton;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.*;

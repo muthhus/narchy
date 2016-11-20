@@ -1,11 +1,9 @@
 package nars.table;
 
-import nars.$;
 import nars.NAR;
 import nars.Param;
 import nars.Task;
 import nars.concept.Concept;
-import nars.learn.microsphere.InterpolatingMicrosphere;
 import nars.task.Revision;
 import nars.task.TruthPolation;
 import nars.truth.Truth;
@@ -20,11 +18,7 @@ import java.util.Iterator;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-import static java.lang.Long.MAX_VALUE;
-import static java.lang.Long.MIN_VALUE;
-import static nars.time.Tense.ETERNAL;
 import static nars.truth.TruthFunctions.c2w;
-import static nars.truth.TruthFunctions.w2c;
 
 /**
  * stores the items unsorted; revection manages their ranking and removal

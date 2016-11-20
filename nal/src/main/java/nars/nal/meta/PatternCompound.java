@@ -14,7 +14,6 @@ import nars.term.container.TermContainer;
 import nars.term.mutate.Choose1;
 import nars.term.mutate.Choose2;
 import nars.term.subst.Unify;
-import org.eclipse.collections.api.set.MutableSet;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;

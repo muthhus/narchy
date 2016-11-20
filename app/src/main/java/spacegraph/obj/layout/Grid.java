@@ -2,7 +2,6 @@ package spacegraph.obj.layout;
 
 import com.google.common.collect.Iterables;
 import com.jogamp.opengl.GL2;
-import nars.util.Util;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import spacegraph.Surface;
 import spacegraph.math.v2;
@@ -122,7 +121,6 @@ public class Grid extends Layout {
         int i = 0;
         float content = 1f - margin;
 
-        float px;
         float dx = 1f/nx;
         float dxc = dx * content;
         float dy = 1f/ny;
@@ -133,7 +131,7 @@ public class Grid extends Layout {
 
         for (int y = 0; y < ny; y++) {
 
-            px = margin/2f;
+            float px = margin / 2f;
 
             for (int x = 0; x < nx; x++) {
                 //System.out.println("\t" + px + " " + py);

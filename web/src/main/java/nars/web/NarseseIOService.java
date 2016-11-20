@@ -10,7 +10,7 @@ import nars.bag.impl.CurveBag;
 import nars.budget.merge.BudgetMerge;
 import nars.link.BLink;
 import nars.nlp.Twenglish;
-import nars.util.event.Active;
+import nars.util.event.Ons;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spacegraph.web.WebsocketService;
@@ -33,7 +33,7 @@ public class NarseseIOService extends WebsocketService {
     public static final int OUTPUT_RATE = 4;
 
     private final NAR nar;
-    private Active active;
+    private Ons ons;
 
     final Bag<Task> output;
     final AtomicBoolean queued = new AtomicBoolean(false);
@@ -51,7 +51,7 @@ public class NarseseIOService extends WebsocketService {
     @Override
     public void onStart() {
 
-        active = new Active(
+        ons = new Ons(
                 nar.eventTaskProcess.on(this::output)
 //                nar.eventAnswer.on(t -> send(
 //                        "ANS: " + t)),
@@ -105,7 +105,7 @@ public class NarseseIOService extends WebsocketService {
 
     @Override
     public void onStop() {
-        active.off();
+        ons.off();
     }
 
     @Override

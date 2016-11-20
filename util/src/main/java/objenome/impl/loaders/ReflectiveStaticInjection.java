@@ -19,8 +19,8 @@ import objenome.impl.Binding;
 import objenome.impl.Keys;
 import objenome.impl.Linker;
 import objenome.impl.StaticInjection;
-
 import objenome.in;
+
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;

@@ -82,8 +82,9 @@ public class STMView  {
         s.add(new Ortho(
                     new Grid(
                         inputBagChart = new BagChart<Task>(stm.input, -1) {
+                            @NotNull
                             @Override
-                            protected ItemVis<BLink<Task>> newItem(BLink<Task> i) {
+                            protected ItemVis<BLink<Task>> newItem(@NotNull BLink<Task> i) {
                                 @Nullable Task ii = i.get();
                                 String label;
                                 if (ii != null)

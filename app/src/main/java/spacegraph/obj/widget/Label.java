@@ -2,7 +2,6 @@ package spacegraph.obj.widget;
 
 import com.jogamp.opengl.GL2;
 import spacegraph.Surface;
-import spacegraph.math.v2;
 import spacegraph.render.Draw;
 
 /**
@@ -24,8 +23,8 @@ public class Label extends Surface {
 
     @Override
     public void paint(GL2 gl) {
-        float dz = 0.1f;
         gl.glColor4f(1f,1f,1f,1f); //TODO color params
+        float dz = 0.1f;
         Draw.text(gl, value(), fontScale, 0.5f, 0.5f, dz);
     }
 

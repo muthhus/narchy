@@ -1,7 +1,7 @@
 package objenome.example.simple;
 
-import objenome.the;
 import objenome.out;
+import objenome.the;
 
 @the(complete = false, library = true)
 class PumpModule {

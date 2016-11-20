@@ -1,5 +1,7 @@
 package spacegraph.render;
 
+import com.jogamp.newt.NewtFactory;
+import com.jogamp.newt.Window;
 import com.jogamp.newt.event.*;
 import com.jogamp.newt.opengl.GLWindow;
 import com.jogamp.opengl.*;
@@ -17,6 +19,8 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+import static com.jogamp.opengl.fixedfunc.GLMatrixFunc.GL_PROJECTION;
+
 
 public abstract class JoglSpace implements GLEventListener, WindowListener {
 
@@ -27,7 +31,7 @@ public abstract class JoglSpace implements GLEventListener, WindowListener {
     public static final GLU glu = new GLU();
     public static final GLUT glut = new GLUT();
 
-    public GLWindow window;
+    protected GLWindow window;
     protected GL2 gl;
 
     public static GLWindow window(JoglSpace j) {
@@ -92,16 +96,15 @@ public abstract class JoglSpace implements GLEventListener, WindowListener {
     @Override
     public final void init(GLAutoDrawable drawable) {
         this.window = (GLWindow)drawable;
-        GL ggl = drawable.getGL();
 
-        init(this.gl = ggl.getGL2());
+        this.gl = drawable.getGL().getGL2();
+        printHardware();
 
+        init(gl);
     }
 
 
-    protected void init(GL2 gl2) {
-
-    }
+    abstract protected void init(GL2 gl);
 
 
     public void printHardware() {
@@ -117,10 +120,11 @@ public abstract class JoglSpace implements GLEventListener, WindowListener {
 
     public synchronized static GLCapabilitiesImmutable newDefaultConfig() {
 
+
         GLCapabilities config = new GLCapabilities(
                 //GLProfile.getMinimum(true)
-                GLProfile.getDefault()
-                //GLProfile.getMaximum(true)
+                //GLProfile.getDefault()
+                GLProfile.getMaximum(true)
 
         );
 
@@ -131,7 +135,7 @@ public abstract class JoglSpace implements GLEventListener, WindowListener {
 //        config.setTransparentAlphaValue(-1);
 
 
-        config.setHardwareAccelerated(true);
+//        config.setHardwareAccelerated(true);
 
 
 //        config.setAlphaBits(8);
@@ -149,10 +153,10 @@ public abstract class JoglSpace implements GLEventListener, WindowListener {
 
 
     public int getWidth() {
-        return window.getWidth();
+        return window.getSurfaceWidth();
     }
     public int getHeight() {
-        return window.getHeight();
+        return window.getSurfaceHeight();
     }
 
 
@@ -309,6 +313,36 @@ public abstract class JoglSpace implements GLEventListener, WindowListener {
         }
     }
 
+    // See http://www.lighthouse3d.com/opengl/glut/index.php?bmpfontortho
+    protected void ortho() {
+        int w = getWidth();
+        int h = getHeight();
+        gl.glViewport(0, 0, w, h);
+        gl.glMatrixMode(GL_PROJECTION);
+        gl.glLoadIdentity();
+
+        //gl.glOrtho(-2.0, 2.0, -2.0, 2.0, -1.5, 1.5);
+        gl.glOrtho(0, w, 0, h, -1.5, 1.5);
+
+//        // switch to projection mode
+//        gl.glMatrixMode(gl.GL_PROJECTION);
+//        // save previous matrix which contains the
+//        //settings for the perspective projection
+//        // gl.glPushMatrix();
+//        // reset matrix
+//        gl.glLoadIdentity();
+//        // set a 2D orthographic projection
+//        glu.gluOrtho2D(0f, screenWidth, 0f, screenHeight);
+//        // invert the y axis, down is positive
+//        //gl.glScalef(1f, -1f, 1f);
+//        // mover the origin from the bottom left corner
+//        // to the upper left corner
+//        //gl.glTranslatef(0f, -screenHeight, 0f);
+        gl.glMatrixMode(gl.GL_MODELVIEW);
+        //gl.glLoadIdentity();
+
+        //gl.glDisable(GL2.GL_DEPTH_TEST);
+    }
 
 //
 //    public void reshape2D(GLAutoDrawable arg0, int arg1, int arg2, int arg3, int arg4) {

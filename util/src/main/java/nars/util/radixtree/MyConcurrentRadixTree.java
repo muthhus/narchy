@@ -1,8 +1,8 @@
 package nars.util.radixtree;
 
 import nars.util.data.byt.ByteSeq;
-import nars.util.list.FasterList;
 import nars.util.data.sorted.SortedArray;
+import nars.util.list.FasterList;
 import org.eclipse.collections.api.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

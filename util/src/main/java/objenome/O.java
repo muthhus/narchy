@@ -16,7 +16,10 @@
  */
 package objenome;
 
-import objenome.impl.*;
+import objenome.impl.BindingsGroup;
+import objenome.impl.DaggerObjectGraph;
+import objenome.impl.Loader;
+import objenome.impl.SetBinding;
 import objenome.impl.loaders.DynamicLoader;
 
 import java.util.ArrayList;

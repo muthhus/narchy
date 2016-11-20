@@ -7,7 +7,7 @@ import nars.term.container.TermVector;
 import org.junit.Test;
 
 import static nars.Op.PROD;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 /**
  * Created by me on 11/16/16.

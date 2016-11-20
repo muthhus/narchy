@@ -21,11 +21,8 @@ import java.util.Arrays;
 import java.util.Objects;
 
 import static nars.$.t;
-import static nars.Op.EQUI;
-import static nars.Op.IMPL;
 import static nars.time.Tense.DTERNAL;
 import static nars.time.Tense.ETERNAL;
-import static nars.truth.TruthFunctions.w2c;
 
 /**
  * Default Task implementation

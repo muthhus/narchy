@@ -53,7 +53,7 @@ public class RetinaGrid extends SimpleSpatial {
     }
 
     @Override
-    protected void renderAbsolute(GL2 gl) {
+    public void renderAbsolute(GL2 gl) {
         for (RetinaPixel[] rr : retinas)
             for (RetinaPixel r : rr)
                 r.render(gl);

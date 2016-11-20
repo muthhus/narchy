@@ -1,12 +1,11 @@
 package nars.util.event;
 
+import nars.util.list.ArraySharingList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.ExecutorService;
 import java.util.function.Consumer;
-
-import nars.util.list.ArraySharingList;
 
 /**
  * single-thread synchronous (in-thread) event emitter with direct array access

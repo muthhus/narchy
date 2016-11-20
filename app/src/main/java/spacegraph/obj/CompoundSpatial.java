@@ -72,9 +72,7 @@ public abstract class CompoundSpatial<X> extends AbstractSpatial<X> {
     @Override
     public void forEachBody(Consumer<Collidable> c) {
         bodies.forEach(c);
-        spatials.forEach(s -> {
-            s.forEachBody(c);
-        });
+        spatials.forEach(s -> s.forEachBody(c));
     }
 
     @Override

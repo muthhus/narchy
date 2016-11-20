@@ -15,7 +15,7 @@ public abstract class ToggleButton extends AbstractButton {
         void onChange(spacegraph.obj.widget.ToggleButton t, boolean enabled);
     }
 
-    @Nullable ToggleAction action = null;
+    @Nullable ToggleAction action;
 
     public ToggleButton() {
         this(false);

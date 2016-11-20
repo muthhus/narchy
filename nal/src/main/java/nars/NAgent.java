@@ -11,9 +11,8 @@ import nars.task.GeneratedTask;
 import nars.task.MutableTask;
 import nars.term.Compound;
 import nars.term.Term;
-import nars.time.Tense;
-import nars.time.Time;
 import nars.time.FrameTime;
+import nars.time.Time;
 import nars.truth.Truth;
 import nars.util.Loop;
 import nars.util.Util;
@@ -33,7 +32,6 @@ import java.util.DoubleSummaryStatistics;
 import java.util.List;
 import java.util.Random;
 
-import static com.google.common.collect.Lists.newArrayList;
 import static nars.$.t;
 import static nars.Symbols.BELIEF;
 import static nars.Symbols.GOAL;

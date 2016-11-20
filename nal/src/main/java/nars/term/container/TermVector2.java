@@ -1,6 +1,5 @@
 package nars.term.container;
 
-import com.google.common.collect.Iterators;
 import nars.term.Term;
 import org.apache.commons.collections4.IteratorUtils;
 import org.jetbrains.annotations.NotNull;

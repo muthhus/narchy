@@ -6,7 +6,10 @@ import nars.term.Terms;
 import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Set;
+import java.util.TreeSet;
 
 public class TermSet {
 

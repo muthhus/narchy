@@ -14,9 +14,6 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 
 import static nars.$.t;
-import static nars.time.Tense.DTERNAL;
-import static nars.time.Tense.ETERNAL;
-import static nars.truth.TruthFunctions.w2c;
 
 /**
  * Mutable task with additional fluent api utility methods

@@ -466,7 +466,6 @@ public class IRCAgent extends IRC {
                 //"#nars"
         );
 
-        Vis.show(n, 256);
 
         bot.start();
 

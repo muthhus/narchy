@@ -140,8 +140,6 @@ abstract public class JoglPhysics<X> extends JoglSpace implements GLEventListene
     public float zFar = 400;
 
 
-    protected int screenWidth = 0;
-    protected int screenHeight = 0;
 
 
     protected boolean stepping = true;
@@ -213,11 +211,65 @@ abstract public class JoglPhysics<X> extends JoglSpace implements GLEventListene
     @Override
     protected void init(GL2 gl2) {
 
-        screenWidth = window.getWidth();
-        screenHeight = window.getHeight();
-
         window.addKeyListener(this);
 
+        initLighting();
+
+
+        gl.glEnable(GL_POINT_SPRITE);
+        gl.glEnable(GL_POINT_SMOOTH);
+        gl.glEnable(GL_LINE_SMOOTH);
+        gl.glEnable(GL_POLYGON_SMOOTH);
+        gl.glEnable(GL2.GL_MULTISAMPLE);
+
+        gl.glShadeModel(gl.GL_SMOOTH);
+
+        gl.glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
+        gl.glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
+
+        //https://www.sjbaker.org/steve/omniv/opengl_lighting.html
+        gl.glColorMaterial ( GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE ) ;
+        gl.glEnable(gl.GL_COLOR_MATERIAL);
+
+        //gl.glMaterialfv( GL2.GL_FRONT_AND_BACK, GL2.GL_SPECULAR, new float[] { 1, 1, 1, 1 }, 0);
+        //gl.glMaterialfv( GL2.GL_FRONT_AND_BACK, GL2.GL_EMISSION, new float[] { 0, 0, 0, 0 }, 0);
+
+        gl.glEnable(gl.GL_DEPTH_TEST);
+        gl.glDepthFunc(gl.GL_LEQUAL);
+
+
+        //gl.glEnable(GL2.GL_TEXTURE_2D); // Enable Texture Mapping
+
+        gl.glClearColor(0.0f, 0.0f, 0.0f, 0f); // Black Background
+        gl.glClearDepth(1f); // Depth Buffer Setup
+
+        // Quick And Dirty Lighting (Assumes Light0 Is Set Up)
+        //gl.glEnable(GL2.GL_LIGHT0);
+
+        //gl.glEnable(GL2.GL_LIGHTING); // Enable Lighting
+
+
+        gl.glEnable(GL2.GL_BLEND);
+        gl.glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        gl.glBlendEquation(GL_FUNC_ADD);
+
+
+        //gl.glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ZERO);
+        //gl.glBlendEquationSeparate(GL_FUNC_ADD, GL_FUNC_ADD);
+
+        //gl.glHint(GL2.GL_PERSPECTIVE_CORRECTION_HINT, GL2.GL_NICEST); // Really Nice Perspective Calculations
+
+        //loadGLTexture(gl);
+
+//        gleem.start(Vec3f.Y_AXIS, window);
+//        gleem.attach(new DefaultHandleBoxManip(gleem).translate(0, 0, 0));
+        // JAU
+        //gl.glEnable(gl.GL_CULL_FACE);
+        //gl.glCullFace(gl.GL_BACK);
+
+    }
+
+    protected void initLighting() {
         gl.glLightModelf(GL_LIGHT_MODEL_AMBIENT, 0.6f);
 
         float[] light_ambient = new float[]{0.3f, 0.3f, 0.3f, 1.0f};
@@ -235,8 +287,6 @@ abstract public class JoglPhysics<X> extends JoglSpace implements GLEventListene
 //            //gl.enableFixedFunctionEmulationMode(GLES2.FIXED_EMULATION_VERTEXCOLORTEXTURE);
 //
 //        }
-
-        printHardware();
 
         if (useLight0) {
             gl.glLightfv(gl.GL_LIGHT0, gl.GL_AMBIENT, light_ambient, 0);
@@ -257,37 +307,6 @@ abstract public class JoglPhysics<X> extends JoglSpace implements GLEventListene
             gl.glEnable(gl.GL_LIGHTING);
             gl.glEnable(gl.GL_LIGHT0);
         }
-//        if (useLight1) {
-//            gl.glEnable(gl.GL_LIGHT1);
-//        }
-
-
-        gl.glEnable(GL_POINT_SPRITE);
-        gl.glEnable(GL_POINT_SMOOTH);
-        gl.glEnable(GL_LINE_SMOOTH);
-        gl.glEnable(GL_POLYGON_SMOOTH);
-        //gl.glEnable(GL2.GL_MULTISAMPLE);
-
-        gl.glShadeModel(gl.GL_SMOOTH);
-
-        gl.glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
-        gl.glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
-
-        //https://www.sjbaker.org/steve/omniv/opengl_lighting.html
-        gl.glColorMaterial ( GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE ) ;
-        gl.glEnable(gl.GL_COLOR_MATERIAL);
-
-        //gl.glMaterialfv( GL2.GL_FRONT_AND_BACK, GL2.GL_SPECULAR, new float[] { 1, 1, 1, 1 }, 0);
-        //gl.glMaterialfv( GL2.GL_FRONT_AND_BACK, GL2.GL_EMISSION, new float[] { 0, 0, 0, 0 }, 0);
-
-        gl.glEnable(gl.GL_DEPTH_TEST);
-        gl.glDepthFunc(gl.GL_LEQUAL);
-
-
-        // JAU
-        //gl.glEnable(gl.GL_CULL_FACE);
-        //gl.glCullFace(gl.GL_BACK);
-
     }
 
 
@@ -298,8 +317,7 @@ abstract public class JoglPhysics<X> extends JoglSpace implements GLEventListene
                               int height) {
 
         height = (height == 0) ? 1 : height;
-        screenWidth = width;
-        screenHeight = height;
+
 
 
         //updateCamera();
@@ -386,7 +404,9 @@ abstract public class JoglPhysics<X> extends JoglSpace implements GLEventListene
 
         //gl.glFrustumf(-1.0f, 1.0f, -1.0f, 1.0f, 1.0f, 10000.0f);
         //glu.gluPerspective(45, (float) screenWidth / screenHeight, 4, 2000);
-        perspective(0, true, 45 * FloatUtil.PI / 180.0f, (float) screenWidth / screenHeight);
+        float aspect = ((float) getWidth())/ getHeight();
+
+        perspective(0, true, 45 * FloatUtil.PI / 180.0f, aspect);
 
 
 //        final v3 camDir = new v3();
@@ -642,7 +662,7 @@ abstract public class JoglPhysics<X> extends JoglSpace implements GLEventListene
 //    }
 
     public v3 rayTo(int x, int y) {
-        return rayTo(  -1f + 2 *  x / (float) screenWidth,   -1f + 2 * y / (float)screenHeight);
+        return rayTo(  -1f + 2 *  x / ((float) getWidth()),   -1f + 2 * y / ((float)getHeight()));
     }
 
     public v3 rayTo(float x, float y) {
@@ -711,63 +731,25 @@ abstract public class JoglPhysics<X> extends JoglSpace implements GLEventListene
     }
 
 
-    // See http://www.lighthouse3d.com/opengl/glut/index.php?bmpfontortho
-    public void ortho() {
-        gl.glViewport(0, 0, screenWidth, screenHeight);
-        gl.glMatrixMode(GL_PROJECTION);
-        gl.glLoadIdentity();
 
-        //gl.glOrtho(-2.0, 2.0, -2.0, 2.0, -1.5, 1.5);
-        gl.glOrtho(0, screenWidth, 0, screenHeight, -1.5, 1.5);
-
-//        // switch to projection mode
-//        gl.glMatrixMode(gl.GL_PROJECTION);
-//        // save previous matrix which contains the
-//        //settings for the perspective projection
-//        // gl.glPushMatrix();
-//        // reset matrix
-//        gl.glLoadIdentity();
-//        // set a 2D orthographic projection
-//        glu.gluOrtho2D(0f, screenWidth, 0f, screenHeight);
-//        // invert the y axis, down is positive
-//        //gl.glScalef(1f, -1f, 1f);
-//        // mover the origin from the bottom left corner
-//        // to the upper left corner
-//        //gl.glTranslatef(0f, -screenHeight, 0f);
-        gl.glMatrixMode(gl.GL_MODELVIEW);
-        //gl.glLoadIdentity();
-
-        //gl.glDisable(GL2.GL_DEPTH_TEST);
-    }
-
-
-    public static final BiConsumer<GL2,Dynamic> defaultRenderer = (gl, body) -> {
-
-        gl.glPushMatrix();
-        Draw.transform(gl, body.transform());
-        Draw.draw(gl, body.shape());
-        gl.glPopMatrix();
-
-/*
-//                if (body != null && body.getMotionState() != null) {
-//                    Motion myMotionState = (Motion) body.getMotionState();
-//                    m.set(myMotionState.t);
-//                } else {
-//                    body.getWorldTransform(m);
-//                }
- */
-
-    };
 
     public final void render(Spatial<?> s) {
-        s.forEachBody(this::render);
+
+        s.renderAbsolute(gl);
+
+        s.forEachBody(body -> {
+            gl.glPushMatrix();
+
+            Draw.transform(gl, body.transform());
+
+            s.renderRelative(gl, body);
+
+            gl.glPopMatrix();
+        });
+
     }
 
-    public final void render(Collidable<?> c) {
-        if (c instanceof Dynamic) {
-            ((Dynamic)c).renderer(gl);
-        }
-    }
+
 
 //    public void clientResetScene() {
 //        //#ifdef SHOW_NUM_DEEP_PENETRATIONS
@@ -812,14 +794,6 @@ abstract public class JoglPhysics<X> extends JoglSpace implements GLEventListene
 //			*/
 //        }
 //    }
-
-
-
-
-    public void drawString(CharSequence s, int x, int y, Color3f color) {
-        System.out.println(s); //HACK temporary
-        glsrt.drawString();
-    }
 
 }
 

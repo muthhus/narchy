@@ -9,9 +9,9 @@ import spacegraph.render.Draw;
  * Created by me on 11/12/16.
  */
 public abstract class AbstractButton extends Widget {
-    float depression = 0f; //how depresssed the button is, from 0= not touched, to 1=push through the screen
+    float depression; //how depresssed the button is, from 0= not touched, to 1=push through the screen
     private boolean pressed;
-    private boolean enabled = true;
+    private final boolean enabled = true;
 
     @Override
     protected void paintComponent(GL2 gl) {

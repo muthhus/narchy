@@ -93,10 +93,9 @@ public class TestP2PNode extends Cuboid {
     public static void main(String[] args) {
         SpaceGraph s = new SpaceGraph<>();
 
-        TestP2PNode a, b;
-        a = new TestP2PNode(5, 3);
+        TestP2PNode a = new TestP2PNode(5, 3);
         a.move(2, 0, 0);
-        b = new TestP2PNode(3, 4);
+        TestP2PNode b = new TestP2PNode(3, 4);
 
         TestP2PLink ab = new TestP2PLink(a, b);
 

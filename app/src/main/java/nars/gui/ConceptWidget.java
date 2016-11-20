@@ -17,7 +17,6 @@ import spacegraph.render.Draw;
 
 import java.util.List;
 
-import static nars.nal.UtilityFunctions.or;
 import static nars.util.Util.sqr;
 import static spacegraph.math.v3.v;
 
@@ -101,9 +100,13 @@ public class ConceptWidget extends SimpleSpatial<Term> {
 
         float p = pri;// = 1; //pri = key.priIfFiniteElseZero();
 
-        float nodeScale = ((1+p)*(1+p)) * 2f;//1f + 2f * p;
+
+        float minSize = 0.1f;
+        float maxSize = 4f;
+        //sqrt because the area will be the sqr of this dimension
+        float nodeScale = ((float)Math.sqrt(minSize+p * maxSize));//1f + 2f * p;
         //nodeScale /= Math.sqrt(tt.volume());
-        scale(nodeScale, nodeScale, nodeScale / 4f);
+        scale(nodeScale, nodeScale, 0.2f);
 
 
         Draw.hsb( (tt.op().ordinal()/16f), 0.75f + 0.25f * p, 0.5f  , 0.9f, shapeColor);
@@ -170,7 +173,7 @@ public class ConceptWidget extends SimpleSpatial<Term> {
 
         List<EDraw> ee = edges;
 
-        float maxAttraction = 0.2f;
+        float maxAttraction = 0.1f;
 
         float pri = l.priIfFiniteElseZero();
         if (pri > 0) {
@@ -182,11 +185,12 @@ public class ConceptWidget extends SimpleSpatial<Term> {
             EDraw z = new EDraw();
             z.target = target;
             z.width = width;
-            z.r = 0.25f + 0.7f * (pri * 1f / ((Term)target.key).volume());
+            //z.r = 0.25f + 0.7f * (pri * 1f / ((Term)target.key).volume());
+            z.r = 0;
             float qua = l.qua();
             z.g = 0.25f + 0.7f * (pri * qua);
             z.b = 0.25f + 0.7f * (pri * (1f-qua));
-            z.a = 0.5f + 0.5f * pri;
+            z.a = 0.1f + 0.9f * pri;
                     //0.9f;
             z.attraction = sqr(qua)*maxAttraction;
 
@@ -198,7 +202,7 @@ public class ConceptWidget extends SimpleSpatial<Term> {
     }
 
     @Override
-    protected void renderAbsolute(GL2 gl) {
+    public void renderAbsolute(GL2 gl) {
         renderEdges(gl);
     }
 

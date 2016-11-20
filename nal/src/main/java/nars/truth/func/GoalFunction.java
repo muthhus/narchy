@@ -5,7 +5,6 @@ import nars.NAR;
 import nars.Symbols;
 import nars.term.Term;
 import nars.truth.Truth;
-import nars.truth.TruthFunctions;
 import nars.truth.func.annotation.AllowOverlap;
 import nars.truth.func.annotation.SinglePremise;
 import org.jetbrains.annotations.NotNull;
