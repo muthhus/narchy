@@ -70,7 +70,6 @@ abstract public class NAgent implements NSense, NAction {
     public final List<SensorConcept> sensors = $.newArrayList();
     public final List<ActionConcept> actions = $.newArrayList();
 
-    public static final float predictorQuality = 0.9f;
 
 
     public float alpha, gamma;
@@ -664,7 +663,7 @@ abstract public class NAgent implements NSense, NAction {
         char pp = t.punc();
         if (t.occurrence() != ETERNAL) {
             s = new GeneratedTask(t.term(), pp, t.truth())
-                    .budgetSafe(p, predictorQuality)
+                    .budgetByTruth(p, nar)
                     .time(now, now + (t.occurrence() - t.creation()))
                     .log("Agent Predictor");
 
@@ -678,7 +677,7 @@ abstract public class NAgent implements NSense, NAction {
 //            if (t.isDeleted()) {
 //                //TODO check if dur or qua changed?
 //            }
-            t.budgetSafe(p, predictorQuality);
+            t.budgetByTruth(p, nar);
 
             nar.inputLater(t);
             return t;

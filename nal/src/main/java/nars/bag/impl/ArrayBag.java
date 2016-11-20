@@ -158,6 +158,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
 //                        map.putIfAbsent(k, k2);
 //                    }
 
+                //pressure -= w.priIfFiniteElseZero(); //release pressure
                 onRemoved(w);
                 w.delete();
 
@@ -398,7 +399,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
                 v.setBudget(vv); //update in-place
 
                 //release some pressure of how much priority existed already
-                pressure-=pBefore;
+                //pressure-=pBefore;
 
                 if ((o > 0) && (overflow != null))
                     overflow.add(o);

@@ -59,7 +59,9 @@ public class GjkEpaSolver {
 	
 	public static class Results {
 		public ResultsStatus status;
-		public final v3[] witnesses/*[2]*/ = { new v3(), new v3() };
+		//public final v3[] witnesses/*[2]*/ = { new v3(), new v3() };
+		public final v3 witness0 = new v3();
+		public final v3 witness1 = new v3();
 		public final v3 normal = new v3();
 		public float depth;
 		public int epa_iterations;
@@ -553,7 +555,8 @@ public class GjkEpaSolver {
 			tmp2.sub(c.w, a.w);
 			nrm.cross(tmp1, tmp2);
 
-			float len = nrm.length();
+			//float len = nrm.length();
+			float lenSq = nrm.lengthSquared();
 
 			tmp1.cross(a.w, b.w);
 			tmp2.cross(b.w, c.w);
@@ -567,7 +570,7 @@ public class GjkEpaSolver {
 			f.v[1] = b;
 			f.v[2] = c;
 			f.mark = 0;
-			f.n.scale(1f / (len > 0f ? len : cstInf), nrm);
+			f.n.scale(1f / (lenSq > 0f ? (float)Math.sqrt(lenSq) : cstInf), nrm);
 			f.d = Math.max(0, -f.n.dot(a.w));
 			return valid;
 		}
@@ -805,8 +808,8 @@ public class GjkEpaSolver {
                            Results results) {
 		
 		// Initialize
-		results.witnesses[0].set(0f, 0f, 0f);
-		results.witnesses[1].set(0f, 0f, 0f);
+		results.witness0.set(0f, 0f, 0f);
+		results.witness1.set(0f, 0f, 0f);
 		results.normal.set(0f, 0f, 0f);
 		results.depth = 0;
 		results.status = ResultsStatus.Separated;
@@ -829,8 +832,8 @@ public class GjkEpaSolver {
 					results.status = ResultsStatus.Penetrating;
 					results.normal.set(epa.normal);
 					results.depth = pd;
-					results.witnesses[0].set(epa.nearest[0]);
-					results.witnesses[1].set(epa.nearest[1]);
+					results.witness0.set(epa.nearest[0]);
+					results.witness1.set(epa.nearest[1]);
 					return (true);
 				}
 				else {

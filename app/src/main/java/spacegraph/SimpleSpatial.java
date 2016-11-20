@@ -270,8 +270,7 @@ public class SimpleSpatial<X> extends AbstractSpatial<X> {
     }
 
     @Override
-    public void stop(Dynamics s) {
-        super.stop(s);
+    public void stop() {
         body = null;
     }
 

@@ -72,8 +72,8 @@ public class Vis {
     public static Grid agentActions(NAgent a, long window) {
         List<Termed> ii = Lists.newArrayList();
         ii.addAll(a.actions);
-        ii.add(a.happy);
-        ii.add(a.joy);
+//        ii.add(a.happy);
+//        ii.add(a.joy);
 
         NAR nar = a.nar;
 

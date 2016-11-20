@@ -5,6 +5,7 @@ import nars.term.atom.Atom;
 import nars.truth.DefaultTruth;
 import nars.truth.Truth;
 import nars.util.Util;
+import nars.util.data.FloatParam;
 import nars.util.data.MutableInteger;
 import nars.util.data.Range;
 import org.apache.commons.lang3.mutable.MutableFloat;
@@ -22,7 +23,7 @@ public abstract class Param /*extends Container*/ implements Level {
     /** absolute limit for constructing terms in any context in which a NAR is not known, which could provide a limit.
      * typically a NAR instance's 'compoundVolumeMax' parameter will be lower than this */
     public static final int COMPOUND_VOLUME_MAX = 128;
-    public static final boolean ARITHMETIC_INDUCTION = false;
+    //public static final boolean ARITHMETIC_INDUCTION = false;
 
 
     /** whether derivation's concepts are cross-termlink'ed with the premise concept */
@@ -59,7 +60,7 @@ public abstract class Param /*extends Container*/ implements Level {
 
 
     /** average priority target for bag forgetting, between 0 and 1 usually 0.25..0.5 for balance */
-    public static final float BAG_THRESHOLD = 0.5f;
+    public static final float BAG_THRESHOLD = (0.5f);
 
     /** conjunctions over this length will be ineligible for 2nd-layer termlink templates. it can be decomposed however, and decompositions of this size or less will be eligible. */
     public static final int MAX_CONJ_SIZE_FOR_LAYER2_TEMPLATES = 3;
@@ -75,10 +76,9 @@ public abstract class Param /*extends Container*/ implements Level {
     /** how many times the desired selection size that bags should sample in case some of the selections are unused */
     public static float BAG_OVERSAMPLING = 2.0f;
 
-    public static boolean SENSOR_TASKS_SHARE_COMMON_EVIDENCE;
 
     /** used in linear interpolating link adjustments during feedback. set to zero to disable */
-    public final MutableFloat linkFeedbackRate = new MutableFloat(0.0f);
+    public final FloatParam linkFeedbackRate = new FloatParam(0.0f);
 
     /**
      * hard upper-bound limit on Compound term complexity;
@@ -219,6 +219,11 @@ public abstract class Param /*extends Container*/ implements Level {
     public static final float TESTS_TRUTH_ERROR_TOLERANCE = TRUTH_EPSILON;
 
 
+    /**
+     * global input activation multiplier, applied to both concepts and links
+     */
+    @NotNull
+    public FloatParam activationGlobal = new FloatParam(1f, 0f, 2f);
 
     ///** extra debugging checks */
     //public static final boolean DEBUG_PARANOID = false;
@@ -238,7 +243,6 @@ public abstract class Param /*extends Container*/ implements Level {
 //    public static float CURIOSITY_CONFIDENCE_THRESHOLD=0.8f;
 //    public static float CURIOSITY_DESIRE_CONFIDENCE_MUL=0.1f; //how much risk is the system allowed to take just to fullfill its hunger for knowledge?
 //    public static float CURIOSITY_DESIRE_PRIORITY_MUL=0.1f; //how much priority should curiosity have?
-//    public static float CURIOSITY_DESIRE_DURABILITY_MUL=0.3f; //how much durability should curiosity have?
 //    public static boolean CURIOSITY_FOR_OPERATOR_ONLY=false; //for Peis concern that it may be overkill to allow it for all <a =/> b> statement, so that a has to be an operator
 //    public static boolean CURIOSITY_ALSO_ON_LOW_CONFIDENT_HIGH_PRIORITY_BELIEF=true;
 //
@@ -259,11 +263,11 @@ public abstract class Param /*extends Container*/ implements Level {
 
     @NotNull
     @Range(min = 0, max = 1f)
-    public final MutableFloat confMin = new MutableFloat(TRUTH_EPSILON);
+    public final FloatParam confMin = new FloatParam(TRUTH_EPSILON);
 
     @NotNull
     @Range(min = 0, max = 1f)
-    public final MutableFloat truthResolution = new MutableFloat(TRUTH_EPSILON);
+    public final FloatParam truthResolution = new FloatParam(TRUTH_EPSILON);
 
 
     /*
@@ -277,9 +281,9 @@ public abstract class Param /*extends Container*/ implements Level {
 //    public final AtomicDouble newConceptThreshold = new AtomicDouble(0);
 
     /**
-     * budget durability threshold necessary to form a derived task.
+     * budget quality threshold necessary to form a derived task.
      */
-    public final MutableFloat quaMin = new MutableFloat(0);
+    public final FloatParam quaMin = new FloatParam(0);
 
 
     public float confidenceDefault(char punctuation) {
@@ -303,18 +307,12 @@ public abstract class Param /*extends Container*/ implements Level {
      * Default priority of input judgment
      */
     public float DEFAULT_BELIEF_PRIORITY = 0.5f;
-    /**
-     * Default durability of input judgment
-     */
-    public float DEFAULT_BELIEF_DURABILITY = 0.5f; //was 0.8 in 1.5.5; 0.5 after
+
     /**
      * Default priority of input question
      */
     public float DEFAULT_QUESTION_PRIORITY = 0.5f;
-    /**
-     * Default durability of input question
-     */
-    public float DEFAULT_QUESTION_DURABILITY = 0.5f;
+
 
 
     public static final int CONCEPT_FIRE_BATCH_SIZE = 4;
@@ -323,18 +321,12 @@ public abstract class Param /*extends Container*/ implements Level {
      * Default priority of input judgment
      */
     public float DEFAULT_GOAL_PRIORITY = 0.5f;
-    /**
-     * Default durability of input judgment
-     */
-    public float DEFAULT_GOAL_DURABILITY = 0.5f;
+
     /**
      * Default priority of input question
      */
     public float DEFAULT_QUEST_PRIORITY = 0.5f;
-    /**
-     * Default durability of input question
-     */
-    float DEFAULT_QUEST_DURABILITY = 0.5f;
+
 
     public float DEFAULT_QUESTION_QUALITY = 0.5f;
     public float DEFAULT_QUEST_QUALITY = DEFAULT_QUESTION_QUALITY;
@@ -359,22 +351,6 @@ public abstract class Param /*extends Container*/ implements Level {
         throw new RuntimeException("Unknown sentence type: " + punctuation);
     }
 
-    public float durabilityDefault(char punctuation) {
-        switch (punctuation) {
-            case BELIEF:
-                return DEFAULT_BELIEF_DURABILITY;
-            case QUEST:
-                return DEFAULT_QUEST_DURABILITY;
-            case QUESTION:
-                return DEFAULT_QUESTION_DURABILITY;
-            case GOAL:
-                return DEFAULT_GOAL_DURABILITY;
-
-            case COMMAND:
-                return 0;
-        }
-        throw new RuntimeException("Unknown sentence type: " + punctuation);
-    }
 
     @Deprecated public float qualityDefault(char punctuation) {
         switch (punctuation) {
@@ -513,13 +489,7 @@ public abstract class Param /*extends Container*/ implements Level {
     }
 
 
-    /** eternalize if... */
-    public static boolean eternalizeForgottenTemporal(Op op) {
-        return false;
-        //return op.statement;
-    }
 
-    public static final float ETERNALIZATION_CONFIDENCE_FACTOR = 0.5f;
 
 
 

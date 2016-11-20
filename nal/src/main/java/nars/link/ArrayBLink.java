@@ -4,7 +4,7 @@ import nars.budget.Budget;
 import nars.budget.Budgeted;
 import org.jetbrains.annotations.NotNull;
 
-import static nars.budget.Budget.validBudgetValue;
+import static nars.budget.Budget.validPriority;
 
 /**
  * Created by me on 9/6/16.
@@ -42,20 +42,20 @@ import static nars.budget.Budget.validBudgetValue;
     @NotNull
     @Override
     public Budget setBudget(float p, float q) {
-        f[0] = validBudgetValue(p);
-        f[1] = validBudgetValue(q);
+        f[0] = validPriority(p);
+        f[1] = validPriority(q);
         return this;
     }
 
     @Override
     public final void setPriority(float p) {
-        f[0] = validBudgetValue(p);
+        f[0] = validPriority(p);
     }
 
 
     @Override
     public final void setQuality(float q) {
-        f[1] = validBudgetValue(q);
+        f[1] = validPriority(q);
     }
 
     @Override

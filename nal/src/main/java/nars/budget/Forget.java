@@ -30,7 +30,7 @@ public final class Forget implements Consumer<BLink> {
     @Nullable
     public static Forget forget(float pressure, float existingMass, int size, float expectedAvgMass) {
 
-        float r = -((size * expectedAvgMass) - pressure - existingMass) / existingMass;
+        float r = pressure > 0 ? -((size * expectedAvgMass) - pressure - existingMass) / existingMass : 0;
 
         //float pressurePlusOversize = pressure + Math.max(0, expectedAvgMass * size - existingMass);
         //float r = (pressurePlusOversize) / (pressurePlusOversize + existingMass*4f /* momentum*/);

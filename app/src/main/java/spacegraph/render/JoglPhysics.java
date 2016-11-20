@@ -66,12 +66,13 @@ import static spacegraph.math.v3.v;
 abstract public class JoglPhysics<X> extends JoglSpace implements GLEventListener, KeyListener {
 
 
+    public static final float MAX_FPS = 60f;
     private final float cameraSpeed = 5f;
     private final float cameraRotateSpeed = 5f;
     private boolean simulating = true;
     private float lastFrameTime;
 
-    private int maxSubsteps = 8; //set to zero for variable timing
+    private int maxSubsteps = 0; //set to zero for variable timing
     private float aspect;
 
 
@@ -322,13 +323,11 @@ abstract public class JoglPhysics<X> extends JoglSpace implements GLEventListene
                               int width,
                               int height) {
 
-        height = (height == 0) ? 1 : height;
-
-
+        //height = (height == 0) ? 1 : height;
 
         //updateCamera();
-
     }
+
     protected void update() {
 
         long dt = clock.getTimeThenReset();
@@ -337,7 +336,7 @@ abstract public class JoglPhysics<X> extends JoglSpace implements GLEventListene
         if (simulating) {
             // NOTE: SimpleDynamics world doesn't handle fixed-time-stepping
             dyn.stepSimulation(
-                    Math.max(dt, 1000000f / 60f) / 1000000.f, maxSubsteps
+                    Math.max(dt, 1000000f / MAX_FPS) / 1000000.f, maxSubsteps
                     //clock.getTimeThenReset()
             );
         }

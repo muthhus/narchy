@@ -241,16 +241,7 @@ public abstract class Dynamics<X> extends Collisions<X> {
 
     @Override
     public final void forEachCollidable(IntObjectProcedure<Collidable<X>> each) {
-
-        OArrayList<Collidable> o = this.collidable;
-        int s = o.size();
-
-        for (int i = 0; i < s; i++) {
-            each.value(i, o.get(i));
-            //if (!each.(i, o.get(i)))
-              //  break;
-        }
-
+        this.collidable.forEachWithIndexProc(each::value);
     }
 
     /**
@@ -263,8 +254,8 @@ public abstract class Dynamics<X> extends Collisions<X> {
 
     protected final void inactivate(Spatial<X> s) {
         s.constraints().forEach(this::removeConstraint);
-        s.forEachBody(this::removeBody);
-        s.stop(this);
+        s.forEachBody(this::removing);
+        s.stop();
     }
 
     @Override

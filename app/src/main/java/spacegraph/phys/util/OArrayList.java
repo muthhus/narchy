@@ -24,6 +24,7 @@
 package spacegraph.phys.util;
 
 import org.eclipse.collections.api.block.predicate.primitive.IntObjectPredicate;
+import org.eclipse.collections.api.block.procedure.primitive.IntObjectProcedure;
 
 import java.io.Externalizable;
 import java.io.IOException;
@@ -71,6 +72,13 @@ public final class OArrayList<T> extends AbstractList<T> implements RandomAccess
 		for (int i = 0; i < s; i++) {
 			if (!each.accept(i, array[i]))
 				break;
+		}
+	}
+	public final void forEachWithIndexProc(IntObjectProcedure<? super T> each) {
+		int s = size();
+		T[] array = this.array;
+		for (int i = 0; i < s; i++) {
+			each.value(i, array[i]);
 		}
 	}
 

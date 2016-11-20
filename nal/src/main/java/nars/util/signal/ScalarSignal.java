@@ -42,7 +42,6 @@ public class ScalarSignal implements Consumer<NAR>, DoubleSupplier {
     private final FloatToObjectFunction<Truth> truthFloatFunction;
 
     public FloatSupplier pri;
-    public float dur;
 
     private float prevF = Float.NaN;
 
@@ -60,10 +59,10 @@ public class ScalarSignal implements Consumer<NAR>, DoubleSupplier {
 
 
     public ScalarSignal(@NotNull NAR n, @NotNull Termed t, FloatFunction<Term> value, FloatToObjectFunction<Truth> truthFloatFunction, Consumer<Task> target) {
-        this(n, t, value, truthFloatFunction, n.priorityDefault(Symbols.BELIEF), n.durabilityDefault(Symbols.BELIEF), target);
+        this(n, t, value, truthFloatFunction, n.priorityDefault(Symbols.BELIEF), target);
     }
 
-    public ScalarSignal(@NotNull NAR n, @NotNull Termed t, FloatFunction<Term> value, @Nullable FloatToObjectFunction<Truth> truthFloatFunction, float pri, float dur, Consumer<Task> target) {
+    public ScalarSignal(@NotNull NAR n, @NotNull Termed t, FloatFunction<Term> value, @Nullable FloatToObjectFunction<Truth> truthFloatFunction, float pri, Consumer<Task> target) {
 
         this.term = t.term();
         this.value = value;
@@ -71,7 +70,7 @@ public class ScalarSignal implements Consumer<NAR>, DoubleSupplier {
 
 
         pri(pri);
-        this.dur = dur;
+
         this.lastInputTime = n.time() - 1;
 
         this.prevF = Float.NaN;

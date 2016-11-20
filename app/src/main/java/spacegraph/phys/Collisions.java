@@ -161,9 +161,9 @@ public abstract class Collisions<X> {
 //		}));
 //	}
 
-	public final void removeBody(Collidable collidable) {
-		removing(collidable);
-	}
+//	public final void removeBody(Collidable collidable) {
+//		removing(collidable);
+//	}
 
 	/** must be called before removing from objects list */
 	protected final void removing(Collidable collidable) {
@@ -191,11 +191,6 @@ public abstract class Collisions<X> {
 	}
 	
 
-
-	protected final void updateSingleAabbIfActive(Collidable colObj) {
-		if (colObj.isActive())
-			updateSingleAabb(colObj);
-	}
 
 	// JAVA NOTE: ported from 2.74, missing contact threshold stuff
 	protected void updateSingleAabb(Collidable colObj) {

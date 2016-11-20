@@ -27,8 +27,8 @@ public interface Budget extends Budgeted {
     /**common instance for a 'Deleted budget'.*/
     Budget Deleted = new ROBudget(Float.NaN, 0);
 
-    /** common instance for a 'full budget'.*/
-    Budget One = new ROBudget(1f, 1f);
+//    /** common instance for a 'full budget'.*/
+//    Budget One = new ROBudget(1f, 1f);
 
     /** common instance for a 'half budget'.*/
     Budget Half = new ROBudget(0.5f, 0.5f);
@@ -122,13 +122,12 @@ public interface Budget extends Budgeted {
 
     final static class BudgetException extends SoftException {
         public BudgetException() {
-            super();
+            super("NaN");
+        }
+        public BudgetException(String message) {
+            super(message);
         }
 
-        @Override
-        public String getMessage() {
-            return "NaN";
-        }
     }
 
     /**
@@ -139,7 +138,7 @@ public interface Budget extends Budgeted {
      */
     void setPriority(float p);
 
-    public static float validBudgetValue(float p) {
+    public static float validPriority(float p) {
         if (p!=p /* fast NaN test */)
             throw new BudgetException();
         if (p > 1.0f)
@@ -149,11 +148,14 @@ public interface Budget extends Budgeted {
         return p;
     }
 
-    public static float validBudgetValueOrNaN(float p) {
+    public static float validQuality(float p) {
         if (p!=p /* fast NaN test */)
             return Float.NaN;
-        else
+        else {
+            if (p > 1f - Param.BUDGET_EPSILON)
+                throw new BudgetException("quality must be < 1.0");
             return unitize(p);
+        }
     }
 
    

@@ -3,8 +3,8 @@ package nars.budget;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import static nars.budget.Budget.validBudgetValue;
-import static nars.budget.Budget.validBudgetValueOrNaN;
+import static nars.budget.Budget.validPriority;
+import static nars.budget.Budget.validQuality;
 
 /**
  * Contains only the 3 p,d,q as floats.  For general purpose usage, you probably want to use UnitBudget
@@ -34,8 +34,8 @@ public class RawBudget implements Budget {
     }
 
     public RawBudget(float p, float q) {
-        this.priority = validBudgetValue(p);
-        this.quality = validBudgetValueOrNaN(q);
+        this.priority = validPriority(p);
+        this.quality = validQuality(q);
     }
 
 
@@ -126,14 +126,14 @@ public class RawBudget implements Budget {
     @NotNull
     @Override
     public final Budget setBudget(float p, float q) {
-        this.priority = validBudgetValue(p);
-        this.quality = validBudgetValue(q);
+        this.priority = validPriority(p);
+        this.quality = validPriority(q);
         return this;
     }
 
     @Override
     public final void setPriority(float p) {
-        this.priority = validBudgetValue(p);
+        this.priority = validPriority(p);
     }
 
 
@@ -146,7 +146,7 @@ public class RawBudget implements Budget {
      */
     @Override
     public final void setQuality(float q) {
-        this.quality = validBudgetValue(q);
+        this.quality = validPriority(q);
     }
 
 

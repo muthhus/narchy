@@ -60,7 +60,7 @@ abstract public class NAgents extends NAgent {
     }
 
     public static void run(Function<NAR, NAgents> init, int frames) {
-        Default nar = newMultiThreadNAR(3, new FrameTime(), true);
+        Default nar = newMultiThreadNAR(2, new FrameTime(), true);
         //Default nar = newNAR();
         //Default2 nar = newNAR2();
 
@@ -292,19 +292,25 @@ abstract public class NAgents extends NAgent {
     public static void chart(NAgents a) {
         NAR nar = a.nar;
         a.nar.runLater(()-> {
+
+            Vis.conceptsWindow2D(a.nar, 64, 7).show(1000, 800);
+
             window(
-                    row(
+                    grid(
                             grid(a.cam.values().stream().map(cs ->
                                     new CameraSensorView(cs, nar).align(Surface.Align.Center, cs.width, cs.height))
                                     .toArray(Surface[]::new)),
+
+                            Vis.emotionPlots(a.nar, 256),
 
                             new ReflectionSurface(a),
                             //nar instanceof Default ? Vis.concepts((Default) nar, 128) : grid(/*blank*/),
 
                             Vis.agentActions(a, 400),
-                            Vis.beliefCharts(400, a.predictors, a.nar)
+                            Vis.beliefCharts(400, a.predictors, a.nar),
+                            new ReflectionSurface(a.nar),
 
-                            //Vis.budgetHistogram(nar, 32),
+                            Vis.budgetHistogram(nar, 24)
                             /*Vis.conceptLinePlot(nar,
                                     Iterables.concat(a.actions, Lists.newArrayList(a.happy, a.joy)),
                                     2000)*/
@@ -314,6 +320,9 @@ abstract public class NAgents extends NAgent {
     public static void chart(NAgent a) {
 
         a.nar.runLater(()-> {
+
+            Vis.conceptsWindow2D(a.nar, 64, 7).show(1000, 800);
+
             window(
                     grid(
                             new ReflectionSurface<>(a),
@@ -325,9 +334,10 @@ abstract public class NAgents extends NAgent {
                             //budgetHistogram(d, 16),
 
                             Vis.agentActions(a, 400),
-                            Vis.beliefCharts(400, a.predictors, a.nar)
+                            Vis.beliefCharts(400, a.predictors, a.nar),
+                            new ReflectionSurface<>(a.nar),
 
-                            //Vis.budgetHistogram(nar, 32),
+                            Vis.budgetHistogram(a.nar, 24)
                             /*Vis.conceptLinePlot(nar,
                                     Iterables.concat(a.actions, Lists.newArrayList(a.happy, a.joy)),
                                     2000)*/

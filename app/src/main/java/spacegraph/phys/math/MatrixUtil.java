@@ -139,9 +139,11 @@ public class MatrixUtil {
 	}
 	
 	public static void transposeTransform(v3 dest, v3 vec, Matrix3f mat) {
-		dest.x = tdotx(mat, vec);
-		dest.y = tdoty(mat, vec);
-		dest.z = tdotz(mat, vec);
+		dest.set(
+			tdotx(mat, vec),
+			tdoty(mat, vec),
+			tdotz(mat, vec)
+		);
 	}
 	
 	public static void setRotation(Matrix3f dest, Quat4f q) {

@@ -103,24 +103,32 @@ public class BoxShape extends PolyhedralConvexShape {
 
 	@Override
 	public v3 localGetSupportingVertexWithoutMargin(v3 vec, v3 out) {
-		v3 halfExtents = getHalfExtentsWithoutMargin(out);
+		//v3 halfExtents = getHalfExtentsWithoutMargin(out);
+		v3 halfExtents = this.implicitShapeDimensions;
+		float hx = halfExtents.x;
+		float hy = halfExtents.y;
+		float hz = halfExtents.z;
 
 		out.set(
-				ScalarUtil.fsel(vec.x, halfExtents.x, -halfExtents.x),
-				ScalarUtil.fsel(vec.y, halfExtents.y, -halfExtents.y),
-				ScalarUtil.fsel(vec.z, halfExtents.z, -halfExtents.z));
+				ScalarUtil.fsel(vec.x, hx, -hx),
+				ScalarUtil.fsel(vec.y, hy, -hy),
+				ScalarUtil.fsel(vec.z, hz, -hz));
 		return out;
 	}
 
 	@Override
 	public void batchedUnitVectorGetSupportingVertexWithoutMargin(v3[] vectors, v3[] supportVerticesOut, int numVectors) {
-		v3 halfExtents = getHalfExtentsWithoutMargin(new v3());
+		//v3 halfExtents = getHalfExtentsWithoutMargin(new v3());
+		v3 halfExtents = this.implicitShapeDimensions;
+		float hx = halfExtents.x;
+		float hy = halfExtents.y;
+		float hz = halfExtents.z;
 
 		for (int i = 0; i < numVectors; i++) {
 			v3 vec = vectors[i];
-			supportVerticesOut[i].set(ScalarUtil.fsel(vec.x, halfExtents.x, -halfExtents.x),
-					ScalarUtil.fsel(vec.y, halfExtents.y, -halfExtents.y),
-					ScalarUtil.fsel(vec.z, halfExtents.z, -halfExtents.z));
+			supportVerticesOut[i].set(ScalarUtil.fsel(vec.x, hx, -hx),
+					ScalarUtil.fsel(vec.y, hy, -hy),
+					ScalarUtil.fsel(vec.z, hz, -hz));
 		}
 	}
 

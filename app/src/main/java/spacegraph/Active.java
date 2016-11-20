@@ -8,14 +8,13 @@ public interface Active {
     void reactivate(boolean b);
 
     boolean active();
+    boolean preactive();
 
     default void stopIfInactive() {
-        if (!active())
+        if (!preactive())
             stop();
     }
 
-    default void stop() {
-
-    }
+    void stop();
 
 }

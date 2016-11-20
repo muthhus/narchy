@@ -230,9 +230,7 @@ public class Collidable<X> {
 	}
 
 	public void broadphase(@Nullable Broadphasing broadphaseHandle) {
-		if (broadphaseHandle!=null && this.broadphaseHandle!=null)
-			throw new RuntimeException();
-		if (broadphaseHandle==null && this.broadphaseHandle==null)
+		if ((broadphaseHandle!=null && this.broadphaseHandle!=null) || (broadphaseHandle==null && this.broadphaseHandle==null))
 			throw new RuntimeException();
 		this.broadphaseHandle = broadphaseHandle;
 	}

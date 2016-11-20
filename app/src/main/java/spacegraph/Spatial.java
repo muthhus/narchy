@@ -90,6 +90,9 @@ public abstract class Spatial<X> implements Active {
         return preactive || order > -1;
     }
 
+    public final boolean preactive() {
+        return preactive;
+    }
 
     public final void reactivate(boolean b) {
         this.preactive = b;
@@ -110,15 +113,10 @@ public abstract class Spatial<X> implements Active {
         return false;
     }
 
-
-    public void stop(Dynamics s) {
-        order = -1;
-        preactive = false;
-    }
-
     /** schedules this node for removal from the engine, where it will call stop(s) to complete the removal */
     public void stop() {
         order = -1;
+        preactive = false;
     }
 
     //abstract public Iterable<Collidable> bodies();

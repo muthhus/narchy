@@ -37,6 +37,7 @@ import nars.time.Tense;
 import nars.time.Time;
 import nars.truth.Truth;
 import nars.util.Iterative;
+import nars.util.data.FloatParam;
 import nars.util.data.MutableInteger;
 import nars.util.event.DefaultTopic;
 import nars.util.event.On;
@@ -127,11 +128,6 @@ public abstract class NAR extends Param implements Level, Consumer<Task>, NARIn,
     int level;
 
 
-    /**
-     * global input activation multiplier, applied to both concepts and links
-     */
-    @NotNull
-    public MutableFloat activationGlobal = new MutableFloat(1f);
 
 
     private NARLoop loop;

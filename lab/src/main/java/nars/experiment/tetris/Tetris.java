@@ -631,7 +631,8 @@ public class Tetris extends NAgents {
 
 
         //t.run(runFrames);
-        t.run(20000);
+        //t.run(20000);
+        t.runRT(20f, 20000);
 
 //        NARController meta = new NARController(nar, loop, t);
 //

@@ -104,12 +104,20 @@ public class MutableTask extends AbstractTask {
 
     @NotNull
     public MutableTask budgetByTruth(float p) {
+        return budgetByTruth(p, null);
+    }
+
+    @NotNull
+    public MutableTask budgetByTruth(float p, @Nullable NAR nar) {
         float q;
         Truth t = truth();
         if (truth()!=null) {
             q = BudgetFunctions.truthToQuality(t);
         } else {
-            throw new RuntimeException("missing truth");
+            if (nar!=null) {
+                q = nar.qualityDefault(punc());
+            } else
+                throw new RuntimeException("missing truth");
         }
 
         setBudget(p, q);
