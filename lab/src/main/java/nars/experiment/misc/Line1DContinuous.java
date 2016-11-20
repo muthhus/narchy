@@ -271,7 +271,7 @@ public class Line1DContinuous extends NAgent {
         );
 
 
-        //NAgents.chart(l);
+        NAgents.chart(l);
         Vis.conceptsWindow2D(l.nar, 128, 16).show(1000, 800);
 
         //nar.logSummaryGT(System.out, 0.5f);

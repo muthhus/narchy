@@ -59,10 +59,14 @@ public class SpaceGraph2D<X> extends SpaceGraph<X> {
 
         float aspect = h/((float)w);
 
+        this.zNear = -scale;
+        this.zFar = scale;
+
         //gl.glOrtho(-2.0, 2.0, -2.0, 2.0, -1.5, 1.5);
         camWidth = scale;
         camHeight = aspect * scale;
-        gl.glOrtho(cx-camWidth/2f, cx+camWidth/2f, cy - camHeight/2f,cy + camHeight/2f, -1, 1);
+        gl.glOrtho(cx-camWidth/2f, cx+camWidth/2f, cy - camHeight/2f,cy + camHeight/2f,
+                zNear, zFar);
 
 //        // switch to projection mode
 //        gl.glMatrixMode(gl.GL_PROJECTION);
@@ -118,7 +122,7 @@ public class SpaceGraph2D<X> extends SpaceGraph<X> {
         addMouseListener(new OrbMouse(this) {
             @Override public ClosestRay mousePick(v3 rayTo) {
                 ClosestRay r = this.rayCallback;
-                v3 camPos = v(rayTo.x, rayTo.y, -rayTo.z); //directly down
+                v3 camPos = v(rayTo.x, rayTo.y, SpaceGraph2D.this.camPos.z); //directly down
 
                 space.dyn.rayTest(camPos, rayTo, r.set(camPos, rayTo), simplexSolver);
                 return r;
@@ -138,7 +142,7 @@ public class SpaceGraph2D<X> extends SpaceGraph<X> {
         return v(
                 camPos.x - camWidth/2 + (camWidth * x),
                 camPos.y-camHeight/2 + (camHeight * y),
-                -depth );
+                camPos.z-depth );
     }
 
 

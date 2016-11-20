@@ -190,7 +190,7 @@ public class ConceptWidget extends SimpleSpatial<Term> {
             float qua = l.qua();
             z.g = 0.25f + 0.7f * (qua);
             z.b = 0.25f + 0.7f * (1f-qua);
-            z.a = 0.1f + 0.9f * pri;
+            z.a = 0.1f + 0.5f * pri;
                     //0.9f;
             z.attraction = sqr(qua)*maxAttraction;
 

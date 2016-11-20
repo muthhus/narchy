@@ -320,7 +320,7 @@ public class Vis {
 //                        }
                         new Flatten() {
                             protected void locate(SimpleSpatial s, v3 f) {
-                                f.set(s.x(), s.y(), 10 - ((Term) (s.key)).volume() * 6);
+                                f.set(s.x(), s.y(), 10 - ((Term) (s.key)).volume() * 1);
                             }
                         }
 //                        //new Spiral()

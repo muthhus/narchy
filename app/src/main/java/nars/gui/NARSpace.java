@@ -100,10 +100,12 @@ public abstract class NARSpace<X extends Termed, Y extends Active> extends ListS
 
     public static void main(String[] args) {
 
-        Default n = new Default(1024, 16, 1, 3);
+        Default n = new Default(1024, 1, 1, 3);
         //Default2 n = new Default2();
         //n.nal(4);
 
+        //n.DEFAULT_BELIEF_PRIORITY = 0.1f;
+        n.activationGlobal.setValue(0.5f);
 
         //new ArithmeticInduction(n);
 
@@ -111,7 +113,6 @@ public abstract class NARSpace<X extends Termed, Y extends Active> extends ListS
 
         //n.run(20); //headstart
 
-        n.DEFAULT_BELIEF_PRIORITY = 0.1f;
 
 
         //n.log();
