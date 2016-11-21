@@ -7,9 +7,13 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import spacegraph.math.v2;
 import spacegraph.math.v3;
+import spacegraph.obj.widget.Label;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+
+import static spacegraph.math.v3.v;
 
 /**
  * planar subspace.
@@ -21,14 +25,19 @@ public class Surface {
     public enum Align {
 
 
-
-        /** 1:1, centered */
+        /**
+         * 1:1, centered
+         */
         Center,
 
-        /** 1:1, x=left, y=center */
+        /**
+         * 1:1, x=left, y=center
+         */
         LeftCenter,
 
-        /** 1:1, x=right, y=center */
+        /**
+         * 1:1, x=right, y=center
+         */
         RightCenter
 
         //TODO etc...
@@ -38,17 +47,20 @@ public class Surface {
     public final v2 scaleLocal;
 
     public Surface parent;
-    volatile public List<Surface> children;
 
-    /** not used unless aspect ratio is set to non-NaN value */
+    /**
+     * not used unless aspect ratio is set to non-NaN value
+     */
     Align align = Align.Center;
 
-    /** height/width target aspect ratio; if aspect is NaN, no adjustment applied */
+    /**
+     * height/width target aspect ratio; if aspect is NaN, no adjustment applied
+     */
     protected float aspect = Float.NaN;
 
     public Surface() {
         translateLocal = new v3();
-        scaleLocal = new v2(1f,1f);
+        scaleLocal = new v2(1f, 1f);
     }
 
     public Surface align(Align align) {
@@ -62,7 +74,7 @@ public class Surface {
     }
 
     public Surface align(Align align, float width, float height) {
-        return align(align, height/width);
+        return align(align, height / width);
     }
 
     public void setParent(Surface s) {
@@ -73,22 +85,13 @@ public class Surface {
         //nothing by default
     }
 
-    public void setChildren(Surface... s) {
-        setChildren(Lists.newArrayList(s));
-    }
 
-    public void setChildren(List<Surface> children) {
-        if (!Objects.equals(this.children, children)) {
-            this.children = children;
-            layout();
-        }
-    }
-
-    /** returns non-null if the event has been absorbed by a speciifc sub-surface
+    /**
+     * returns non-null if the event has been absorbed by a speciifc sub-surface
      * or null if nothing absorbed the gesture
      */
     @Nullable
-    public final Surface onTouch(v2 hitPoint, short[] buttons) {
+    public Surface onTouch(v2 hitPoint, short[] buttons) {
         //System.out.println(this + " " + hitPoint + " " + Arrays.toString(buttons));
 
         //1. test local reaction
@@ -96,39 +99,16 @@ public class Surface {
         if (b)
             return this;
 
-        //2. test children reaction
-        return children != null ? onChildTouching(hitPoint, buttons) : null;
-    }
-
-    protected final Surface onChildTouching(v2 hitPoint, short[] buttons) {
-        v2 subHit = new v2();
-
-        for (Surface c : children) {
-            //project to child's space
-            subHit.set(hitPoint);
-
-            float csx = c.scaleLocal.x;
-            float csy = c.scaleLocal.y;
-            subHit.sub(c.translateLocal.x, c.translateLocal.y);
-            subHit.scale(1f / csx, 1f / csy);
-
-            float hx = subHit.x, hy = subHit.y;
-            if (hx >= 0f && hx <= 1f && hy >= 0 && hy <= 1f) {
-                Surface s = c.onTouch(subHit, buttons);
-                if (s!=null)
-                    return s; //FIFO
-            }
-        }
-        return this;
+        return null;
     }
 
 
-    /** may be overridden to trap events on this surface (returning true), otherwise they pass through to any children */
+    /**
+     * may be overridden to trap events on this surface (returning true), otherwise they pass through to any children
+     */
     protected boolean onTouching(v2 hitPoint, short[] buttons) {
         return false;
     }
-
-
 
 
     protected void paint(GL2 gl) {
@@ -141,23 +121,25 @@ public class Surface {
 
         transform(gl, globalScale);
 
-
-        gl.glNormal3f(0,0,1);
+        //gl.glNormal3f(0,0,1);
 
         paint(gl);
 
-        List<? extends Surface> cc = this.children;
+        List<? extends Surface> cc = children();
         if (cc != null) {
-            v2 global = new v2();
-            global.set(scaleLocal);
-            global.scale(globalScale);
+            v2 childGlobal = new v2(globalScale);
+            childGlobal.scale(scaleLocal);
             for (int i = 0, childrenSize = cc.size(); i < childrenSize; i++) {
                 Surface child = cc.get(i);
-                child.render(gl, global);
+                child.render(gl, childGlobal);
             }
         }
 
         gl.glPopMatrix();
+    }
+
+    public List<Surface> children() {
+        return Collections.emptyList();
     }
 
 
@@ -170,19 +152,46 @@ public class Surface {
 
         float sx, sy;
 
-        if (aspect==aspect) {
-            float globalAspect = globalScale.y / globalScale.x;
-            float a = globalAspect / aspect;
-            if (a < 1f) {
-                sx = scale.x;
-                sy = scale.y * a;
+        if (Float.isFinite(aspect)) {
+            //float globalAspect = globalScale.y / globalScale.x;
+            //float apparentAspect = (globalScale.y * scale.y) / (globalScale.x * scale.x);
+
+            //float correction = ((scale.y) / (scale.x)) / aspect;
+
+            //if ((scale.y / scale.x) > aspect) {
+            float gAspect =
+                    globalScale.y / globalScale.x;
+                    //1f;
+//            float wAspect = gAspect * aspect;
+            float sa = scale.y / scale.x;
+            float aspect = this.aspect * gAspect;
+            if (aspect > sa) {
+                if (aspect > 1) {
+                    sy = sx = scale.x / aspect;
+                } else {
+                    sx = sy = scale.y * aspect;
+                }
             } else {
-                sx = scale.x;
-                sy = scale.y / a;
+                if (aspect > 1) {
+                    sx = sy = scale.y / aspect;
+                } else {
+                    sy = sx = scale.x * aspect;
+                }
             }
+//            } else {
+//                if (aspect > 1) {
+//                    sx = scale.x / aspect;
+//                    sy = sx;
+//                } else {
+//                    sy = scale.y * aspect;
+//                    sx = sy;
+//                }
+//            }
+
         } else {
             //consume entire area, regardless of aspect
-            sx = scale.x; sy = scale.y;
+            sx = scale.x;
+            sy = scale.y;
         }
 
         float tx = translate.x, ty = translate.y;
@@ -190,8 +199,8 @@ public class Surface {
 
             default:
             case Center:
-                tx += (scale.x - sx)/2f;
-                ty += (scale.y - sy)/2f;
+                tx += (scale.x - sx) / 2f;
+                ty += (scale.y - sy) / 2f;
                 break;
 
 
@@ -204,7 +213,7 @@ public class Surface {
 
 
     public static boolean leftButton(@NotNull short[] buttons) {
-        return buttons.length == 1 && buttons[0]==1;
+        return buttons.length == 1 && buttons[0] == 1;
     }
 
 
@@ -212,29 +221,21 @@ public class Surface {
         scaleLocal.set(x, y);
         return this;
     }
+
     public Surface pos(float x, float y) {
         translateLocal.set(x, y);
         return this;
     }
 
     public boolean onKey(KeyEvent e, boolean pressed) {
-        if (children!=null) {
-            for (Surface c : children) {
-                if (c.onKey(e, pressed))
-                    return true;
-            }
-        }
         return false;
     }
 
-    /** returns true if the event has been absorbed, false if it should continue propagating */
-    @Deprecated public boolean onKey(v2 hitPoint, char charCode, boolean pressed) {
-        if (children!=null) {
-            for (Surface c : children) {
-                if (c.onKey(hitPoint, charCode, pressed))
-                    return true;
-            }
-        }
+    /**
+     * returns true if the event has been absorbed, false if it should continue propagating
+     */
+    @Deprecated
+    public boolean onKey(v2 hitPoint, char charCode, boolean pressed) {
         return false;
     }
 

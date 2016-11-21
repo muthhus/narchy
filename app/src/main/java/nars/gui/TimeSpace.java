@@ -11,7 +11,7 @@
 //import nars.util.TriConsumer;
 //import nars.util.time.Between;
 //import nars.util.time.IntervalTree;
-//import spacegraph.ForceDirected;
+//import spacegraph.layout.ForceDirected;
 //import spacegraph.SimpleSpatial;
 //import spacegraph.SpaceGraph;
 //import spacegraph.Spatial;

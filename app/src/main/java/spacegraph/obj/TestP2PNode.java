@@ -1,6 +1,6 @@
 package spacegraph.obj;
 
-import spacegraph.ListSpace;
+import spacegraph.source.ListSpace;
 import spacegraph.SimpleSpatial;
 import spacegraph.SpaceGraph;
 import spacegraph.layout.Flatten;

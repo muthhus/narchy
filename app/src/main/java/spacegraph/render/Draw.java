@@ -33,7 +33,7 @@ import org.apache.commons.io.IOUtils;
 import org.eclipse.collections.impl.list.mutable.primitive.ByteArrayList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import spacegraph.EDraw;
+import spacegraph.obj.EDraw;
 import spacegraph.SimpleSpatial;
 import spacegraph.math.AxisAngle4f;
 import spacegraph.math.Quat4f;
@@ -943,7 +943,8 @@ public enum Draw {
 
                 gl.glBegin(GL2.GL_LINE_STRIP);
                 for (int j = 0; j < ss; ) {
-                    gl.glVertex2i(seg[j++], seg[j++]);
+                    //gl.glVertex2i(seg[j++], seg[j++]);
+                    gl.glVertex3f(seg[j++], seg[j++], 0);
                 }
                 gl.glEnd();
             }
@@ -1008,8 +1009,7 @@ public enum Draw {
 
         push(gl);
 
-        float dx = textStart(gl, scale, scale/1.25f, x, y, z);
-
+        textStart(gl, scale, scale, x, y, z);
 
         for (int i = 0; i < sl; i++) {
             textNext(gl, s.charAt(i), i);
@@ -1049,14 +1049,12 @@ public enum Draw {
     }
 
     /** call glPush before this, and after all textNext's. returns the character width to translate by to display the next character (left to right direction) */
-    public static float textStart(GL2 gl, float scaleX, float scaleY, float x, float y, float z) {
+    public static void textStart(GL2 gl, float scaleX, float scaleY, float x, float y, float z) {
 
         float sx = scaleX / 16f;
         float sy = scaleY / 20f;
         gl.glTranslatef(x, y, z);
         gl.glScalef(sx, sy, 1f);
-
-        return sx;
     }
 
     public static void textNext(GL2 gl, char c, float x) {

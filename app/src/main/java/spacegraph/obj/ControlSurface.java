@@ -60,7 +60,8 @@ public class ControlSurface extends LabeledPane {
 
 
 
-        bottom().setChildren(build(label, o, maxDepth, this.built));
+        children.set(1, build(label, o, maxDepth, this.built));
+
     }
 
 

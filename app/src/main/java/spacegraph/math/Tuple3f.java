@@ -31,7 +31,9 @@
 
 package spacegraph.math;
 
+import nars.util.Util;
 import org.jetbrains.annotations.Nullable;
+import spacegraph.phys.BulletGlobals;
 
 /**
  * A generic 3-element tuple that is represented by single precision-floating
@@ -137,7 +139,7 @@ public abstract class Tuple3f implements java.io.Serializable, Cloneable {
         set(x, y, 0);
     }
 
-    public final void setNegative(v3 v) {
+    public final void setNegative(Tuple3f v) {
         set(-v.x, -v.y, -v.z);
     }
 
@@ -354,10 +356,13 @@ public abstract class Tuple3f implements java.io.Serializable, Cloneable {
      */
     @Deprecated
     public boolean equals(@Nullable Tuple3f t1) { //TODO add an epsilon tolerance
-        if (t1 == null)
-            return false;
         //try {
-            return (this.x == t1.x && this.y == t1.y && this.z == t1.z);
+        //return (t1 != null) && ((this.x == t1.x) && (this.y == t1.y) && (this.z == t1.z));
+        return (this==t1) ||
+                ((t1 != null) &&
+                Util.equals(x, t1.x, BulletGlobals.SIMD_EPSILON) &&
+                Util.equals(y, t1.y, BulletGlobals.SIMD_EPSILON) &&
+                Util.equals(z, t1.z, BulletGlobals.SIMD_EPSILON));
         /*} catch (NullPointerException e2) {
             return false;
         }*/

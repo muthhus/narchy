@@ -1427,13 +1427,10 @@ public class GMatrix implements java.io.Serializable, Cloneable {
 	    }
 	    return true;
         }
-        catch (ClassCastException e1) {
+        catch (ClassCastException | NullPointerException e1) {
 	    return false;
 	}
-        catch (NullPointerException e2) {
-	    return false;
 	}
-    }
 
     /**
      * @deprecated Use epsilonEquals(GMatrix, double) instead

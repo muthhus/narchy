@@ -7,6 +7,7 @@ import nars.test.DeductiveMeshTest;
 import nars.util.event.On;
 import nars.util.list.FasterList;
 import spacegraph.*;
+import spacegraph.source.ListSpace;
 
 import java.util.List;
 

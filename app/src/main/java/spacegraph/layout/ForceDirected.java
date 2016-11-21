@@ -1,6 +1,9 @@
-package spacegraph;
+package spacegraph.layout;
 
 import nars.gui.ConceptWidget;
+import spacegraph.obj.EDraw;
+import spacegraph.SimpleSpatial;
+import spacegraph.Spatial;
 import spacegraph.math.v3;
 import spacegraph.phys.Collidable;
 import spacegraph.phys.Dynamic;

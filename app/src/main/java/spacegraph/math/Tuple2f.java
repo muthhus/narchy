@@ -31,6 +31,10 @@
 
 package spacegraph.math;
 
+import nars.util.Util;
+import org.jetbrains.annotations.NotNull;
+import spacegraph.phys.BulletGlobals;
+
 /**
  * A generic 2-element tuple that is represented by single-precision
  * floating point x,y coordinates.
@@ -319,13 +323,10 @@ public abstract class Tuple2f implements java.io.Serializable, Cloneable {
      * @param t1 the vector with which the comparison is made
      * @return true or false
      */
-    public boolean equals(Tuple2f t1) {
-        try {
-            return (this.x == t1.x && this.y == t1.y);
-        } catch (NullPointerException e2) {
-            return false;
-        }
-
+    public boolean equals(@NotNull Tuple2f t1) {
+        return (this == t1) || (
+                Util.equals(this.x, t1.x, BulletGlobals.SIMD_EPSILON) &&
+                Util.equals(this.y, t1.y, BulletGlobals.SIMD_EPSILON));
     }
 
     /**
@@ -340,9 +341,7 @@ public abstract class Tuple2f implements java.io.Serializable, Cloneable {
         try {
             Tuple2f t2 = (Tuple2f) t1;
             return (this.x == t2.x && this.y == t2.y);
-        } catch (NullPointerException e2) {
-            return false;
-        } catch (ClassCastException e1) {
+        } catch (NullPointerException | ClassCastException e2) {
             return false;
         }
 

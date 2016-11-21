@@ -284,10 +284,7 @@ public class AxisAngle4f implements java.io.Serializable, Cloneable {
             y = qy / mag;
             z = qz / mag;
 
-            if (angle)
-                this.angle = 2.0f * (float) (Math.atan2(mag, q1.getW()));
-            else
-                this.angle = 0;
+            this.angle = angle ? 2.0f * (float) (Math.atan2(mag, q1.getW())) : 0;
         } else {
             x = 0.0f;
             y = 1.0f;
@@ -487,9 +484,7 @@ public class AxisAngle4f implements java.io.Serializable, Cloneable {
             AxisAngle4f a2 = (AxisAngle4f) o1;
             return (this.x == a2.x && this.y == a2.y && this.z == a2.z
                     && this.angle == a2.angle);
-        } catch (NullPointerException e2) {
-            return false;
-        } catch (ClassCastException e1) {
+        } catch (NullPointerException | ClassCastException e2) {
             return false;
         }
 

@@ -19,7 +19,9 @@ public abstract class AbstractButton extends Widget {
         paintContent(gl);
     }
 
-    public abstract void paintContent(GL2 gl);
+    protected void paintContent(GL2 gl) {
+
+    }
 
     public void paintBack(GL2 gl) {
         float p = depression/2f;

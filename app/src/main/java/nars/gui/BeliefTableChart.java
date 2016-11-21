@@ -12,6 +12,7 @@ import spacegraph.Ortho;
 import spacegraph.SpaceGraph;
 import spacegraph.Surface;
 import spacegraph.obj.layout.Grid;
+import spacegraph.obj.widget.Label;
 import spacegraph.obj.widget.Widget;
 import spacegraph.render.Draw;
 
@@ -48,6 +49,7 @@ public class BeliefTableChart extends Widget {
     private BiFunction<Long, long[], long[]> rangeControl = (now, range) -> range; //default: no change
     float beliefTheta, goalTheta;
 
+    private final Label label;
 
     /**
      * (if > 0): draw additional projection wave to show truthpolation values for a set of evenly spaced points on the visible range
@@ -70,6 +72,8 @@ public class BeliefTableChart extends Widget {
         this.nar = n;
 
         this.range = range;
+
+        setChildren(label = new Label(term.toString()));
 
         redraw = new AtomicBoolean(false);
 
@@ -231,6 +235,7 @@ public class BeliefTableChart extends Widget {
 
         Concept cc = nar.concept(term);
         float cp;
+        String currentTermString = termString;
         if (cc != null) {
             cp = nar.activation(cc);
             draw(term, cc, gl, minT, maxT);
@@ -239,9 +244,10 @@ public class BeliefTableChart extends Widget {
             cp = 0;
             termString = term.toString();
         }
-        gl.glColor4f(0.75f, 0.75f, 0.75f, 0.8f + 0.2f * cp);
-        gl.glLineWidth(1);
-        Draw.text(gl, termString, (1f/termString.length()) * (0.5f + 0.25f * cp), 1 / 2f, 1 / 2f, 0);
+        label.set(termString);
+//        gl.glColor4f(0.75f, 0.75f, 0.75f, 0.8f + 0.2f * cp);
+//        gl.glLineWidth(1);
+//        Draw.text(gl, termString, (1f/termString.length()) * (0.5f + 0.25f * cp), 1 / 2f, 1 / 2f, 0);
     }
 
 

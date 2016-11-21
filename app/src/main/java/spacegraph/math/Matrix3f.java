@@ -1506,19 +1506,27 @@ public final class Matrix3f implements java.io.Serializable, Cloneable {
      * @param m1 the other matrix
      */
     public final void mul(Matrix3f m1) {
-        float m01, m02, m11, m12, m21, m22;
 
-        float m00 = this.m00 * m1.m00 + this.m01 * m1.m10 + this.m02 * m1.m20;
-        m01 = this.m00 * m1.m01 + this.m01 * m1.m11 + this.m02 * m1.m21;
-        m02 = this.m00 * m1.m02 + this.m01 * m1.m12 + this.m02 * m1.m22;
+        float m1m00 = m1.m00;
+        float m101 = m1.m10;
+        float m201 = m1.m20;
+        float m00 = this.m00 * m1m00 + this.m01 * m101 + this.m02 * m201;
+        float m1m01 = m1.m01;
+        float m111 = m1.m11;
+        float m211 = m1.m21;
+        float m01 = this.m00 * m1m01 + this.m01 * m111 + this.m02 * m211;
+        float m1m02 = m1.m02;
+        float m121 = m1.m12;
+        float m221 = m1.m22;
+        float m02 = this.m00 * m1m02 + this.m01 * m121 + this.m02 * m221;
 
-        float m10 = this.m10 * m1.m00 + this.m11 * m1.m10 + this.m12 * m1.m20;
-        m11 = this.m10 * m1.m01 + this.m11 * m1.m11 + this.m12 * m1.m21;
-        m12 = this.m10 * m1.m02 + this.m11 * m1.m12 + this.m12 * m1.m22;
+        float m10 = this.m10 * m1m00 + this.m11 * m101 + this.m12 * m201;
+        float m11 = this.m10 * m1m01 + this.m11 * m111 + this.m12 * m211;
+        float m12 = this.m10 * m1m02 + this.m11 * m121 + this.m12 * m221;
 
-        float m20 = this.m20 * m1.m00 + this.m21 * m1.m10 + this.m22 * m1.m20;
-        m21 = this.m20 * m1.m01 + this.m21 * m1.m11 + this.m22 * m1.m21;
-        m22 = this.m20 * m1.m02 + this.m21 * m1.m12 + this.m22 * m1.m22;
+        float m20 = this.m20 * m1m00 + this.m21 * m101 + this.m22 * m201;
+        float m21 = this.m20 * m1m01 + this.m21 * m111 + this.m22 * m211;
+        float m22 = this.m20 * m1m02 + this.m21 * m121 + this.m22 * m221;
 
         this.m00 = m00;
         this.m01 = m01;
@@ -1943,9 +1951,7 @@ public final class Matrix3f implements java.io.Serializable, Cloneable {
             return (this.m00 == m2.m00 && this.m01 == m2.m01 && this.m02 == m2.m02
                     && this.m10 == m2.m10 && this.m11 == m2.m11 && this.m12 == m2.m12
                     && this.m20 == m2.m20 && this.m21 == m2.m21 && this.m22 == m2.m22);
-        } catch (ClassCastException e1) {
-            return false;
-        } catch (NullPointerException e2) {
+        } catch (ClassCastException | NullPointerException e1) {
             return false;
         }
     }
@@ -2086,9 +2092,9 @@ public final class Matrix3f implements java.io.Serializable, Cloneable {
      * @param result the tuple into which the product is placed
      */
     public final void transform(Tuple3f t, Tuple3f result) {
-        float y, z;
+
         float x = m00 * t.x + m01 * t.y + m02 * t.z;
-        y = m10 * t.x + m11 * t.y + m12 * t.z;
+        float y = m10 * t.x + m11 * t.y + m12 * t.z;
         result.z = m20 * t.x + m21 * t.y + m22 * t.z;
         result.x = x;
         result.y = y;

@@ -481,10 +481,9 @@ public class AxisAngle4d implements java.io.Serializable, Cloneable {
            return(this.x == a2.x && this.y == a2.y && this.z == a2.z
             && this.angle == a2.angle);
         }
-        catch (NullPointerException e2) {return false;}
-        catch (ClassCastException e1) {return false;}
+        catch (NullPointerException | ClassCastException e2) {return false;}
 
-    }
+	}
 
 
    /**

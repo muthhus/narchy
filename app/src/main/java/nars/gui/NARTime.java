@@ -9,9 +9,12 @@ import nars.term.Term;
 import org.eclipse.collections.impl.map.mutable.primitive.LongObjectHashMap;
 import spacegraph.*;
 import spacegraph.layout.Flatten;
+import spacegraph.layout.ForceDirected;
+import spacegraph.obj.EDraw;
 import spacegraph.phys.shape.CollisionShape;
 import spacegraph.phys.shape.SphereShape;
 import spacegraph.render.Draw;
+import spacegraph.source.ListSpace;
 
 import java.util.HashMap;
 import java.util.Map;

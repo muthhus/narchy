@@ -34,7 +34,10 @@ public class Label extends Surface {
         this.value = newValue;
         int len = newValue.length();
         this.fontScale =
-                1f / (1f + len);
+                //1f / (0.5f + len);
+                0.5f;
+                //1f;
+        align(Align.Center, 1.5f / len);
                 //0.5f; //(1f/ConsoleSurface.fontWidth)/value.length();
 //        if (len > 0) {
 //            this.aspect = 0.5f; ///0.5f / len;
@@ -45,5 +48,10 @@ public class Label extends Surface {
 
     public String value() {
         return value;
+    }
+
+    @Override
+    public String toString() {
+        return "Label[" + value + ']';
     }
 }

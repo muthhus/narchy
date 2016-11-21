@@ -206,8 +206,7 @@ public abstract class Tuple3b implements java.io.Serializable, Cloneable {
            Tuple3b t2 = (Tuple3b) t1;
            return(this.x == t2.x && this.y == t2.y && this.z == t2.z);
         }
-        catch (NullPointerException e2) {return false;}
-        catch (ClassCastException e1) {return false;}
+        catch (NullPointerException | ClassCastException e2) {return false;}
 
     }
 

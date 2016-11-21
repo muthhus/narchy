@@ -1,7 +1,6 @@
 package spacegraph;
 
 import com.jogamp.opengl.GL2;
-import com.jogamp.opengl.GLAutoDrawable;
 import nars.$;
 import nars.util.list.FasterList;
 import org.eclipse.collections.api.block.predicate.primitive.IntObjectPredicate;
@@ -13,6 +12,7 @@ import spacegraph.input.OrbMouse;
 import spacegraph.math.v3;
 import spacegraph.phys.constraint.BroadConstraint;
 import spacegraph.render.JoglPhysics;
+import spacegraph.source.ListSpace;
 
 import java.util.List;
 import java.util.Map;

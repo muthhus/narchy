@@ -333,10 +333,7 @@ public abstract class Tuple4i implements java.io.Serializable, Cloneable {
 	    return(this.x == t2.x && this.y == t2.y &&
 		   this.z == t2.z && this.w == t2.w);
         }
-        catch (NullPointerException e2) {
-	    return false;
-	}
-        catch (ClassCastException e1) {
+        catch (NullPointerException | ClassCastException e2) {
 	    return false;
 	}
     }

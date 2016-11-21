@@ -678,8 +678,7 @@ public class GVector implements java.io.Serializable, Cloneable {
             }
 	    return true;
         }
-        catch (ClassCastException e1) { return false; }
-        catch (NullPointerException e2) { return false; }
+        catch (ClassCastException | NullPointerException e1) { return false; }
 
     }
 

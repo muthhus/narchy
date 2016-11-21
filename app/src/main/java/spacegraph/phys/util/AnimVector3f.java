@@ -82,24 +82,12 @@ public class AnimVector3f extends v3 implements Animated {
         }
     }
 
-    public void set(v3 v) {
-        //if invalidated, use the target value immediately
-        if (x != x) super.set(v);
-        target.set(v);
-    }
 
     @Override
     public void set(float x, float y, float z) {
         //if invalidated, use the target value immediately
         if (x != x) super.set(x, y, z);
         target.set(x, y, z);
-    }
-
-    @Override
-    public void set(float[] v) {
-        //if invalidated, use the target value immediately
-        if (x != x) super.set(v);
-        target.set(v);
     }
 
 }

@@ -1,4 +1,6 @@
-package spacegraph;
+package spacegraph.obj;
+
+import spacegraph.SimpleSpatial;
 
 /**
  * Drawn edge, lightweight

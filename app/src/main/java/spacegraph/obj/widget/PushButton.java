@@ -10,7 +10,7 @@ import java.util.function.Consumer;
  */
 public class PushButton extends AbstractButton {
 
-    private String text;
+    private Label text;
 
     @Nullable private Consumer<PushButton> onClick;
 
@@ -37,16 +37,9 @@ public class PushButton extends AbstractButton {
     }
 
     public void setText(String s) {
-        this.text = s;
+        setChildren(text = new Label(s));
     }
 
-
-    @Override
-    public void paintContent(GL2 gl) {
-        if (text!=null) {
-            label(gl, text);
-        }
-    }
 
     @Override
     protected void onClick() {

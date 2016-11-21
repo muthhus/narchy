@@ -2850,9 +2850,7 @@ public class Matrix4f implements java.io.Serializable, Cloneable {
                     && this.m21 == m2.m21 && this.m22 == m2.m22 && this.m23 == m2.m23
                     && this.m30 == m2.m30 && this.m31 == m2.m31 && this.m32 == m2.m32
                     && this.m33 == m2.m33);
-        } catch (ClassCastException e1) {
-            return false;
-        } catch (NullPointerException e2) {
+        } catch (ClassCastException | NullPointerException e1) {
             return false;
         }
     }

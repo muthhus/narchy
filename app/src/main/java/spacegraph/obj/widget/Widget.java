@@ -83,23 +83,13 @@ public abstract class Widget extends Stacking {
     public static void main(String[] args) {
 
 
-        //SpaceGraph.window(widgetDemo(), 800, 600);
+        SpaceGraph.window(widgetDemo(), 800, 600);
 
-        //SpaceGraph dd = SpaceGraph.window(new Cuboid(widgetDemo(), 16, 8f).color(0.5f, 0.5f, 0.5f, 0.25f), 1000, 1000);
-
-        new SpaceGraph2D(new Cuboid(widgetDemo(), 16, 8f, 0.1f).color(0.5f, 0.5f, 0.5f, 0.25f).move(0,0,0)).show(800, 600);
-
-//        SpaceGraph.window(col(
-//                new Slider(0.5f, 0, 1).on((s,v)->{
-//                    ortho1.scale(0.25f + 2f * v);
-//                    //dd.zNear = 0.1f + 2f * v;
-//                    //System.out.println("zNear=" + dd.zNear);
-//                }),
-//                new Slider(0.5f, 0, 1).on((s,v)->{
-//                    //dd.zFar = 10f + 200f * v;
-//                    //System.out.println("zFar=" + dd.zFar);
-//                })
-//        ), 100, 200);
+//        SpaceGraph dd = SpaceGraph.window(new Cuboid(widgetDemo(), 16, 8f).color(0.5f, 0.5f, 0.5f, 0.25f), 1000, 1000);
+//
+//        new SpaceGraph2D(
+//                new Cuboid(widgetDemo(), 16, 8f, 0.2f).color(0.5f, 0.5f, 0.5f, 0.25f).move(0,0,0)
+//        ).show(800, 600);
 
     }
 
@@ -122,8 +112,8 @@ public abstract class Widget extends Stacking {
                     grid(),
                     col(new CheckBox("ABC"),new CheckBox("XYZ")),
                         grid(new ScaleDebugLabel(), new ScaleDebugLabel(),
-                                row(new ScaleDebugLabel(), new ScaleDebugLabel()),
-                                col(new ScaleDebugLabel(), new ScaleDebugLabel())
+                                row(new PushButton("x"), new PushButton("xyz")),
+                                col(new ScaleDebugLabel(), new PushButton("sdjfjsdfk"))
                         ),
                         new PushButton("clickMe()", (p) -> {
                             p.setText(Texts.n2(Math.random()));

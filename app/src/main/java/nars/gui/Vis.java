@@ -2,7 +2,6 @@ package nars.gui;
 
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
-import com.googlecode.lanterna.terminal.virtual.VirtualTerminal;
 import nars.$;
 import nars.NAR;
 import nars.NAgent;
@@ -19,6 +18,7 @@ import org.eclipse.collections.api.block.function.primitive.FloatFunction;
 import org.jetbrains.annotations.Nullable;
 import spacegraph.*;
 import spacegraph.layout.Flatten;
+import spacegraph.layout.ForceDirected;
 import spacegraph.math.Color3f;
 import spacegraph.math.v3;
 import spacegraph.obj.layout.Grid;
@@ -326,7 +326,12 @@ public class Vis {
 //                        //new Spiral()
 //                        //new FastOrganicLayout()
                 )
-        );
+        ) {
+            @Override
+            protected void initLighting() {
+                //no
+            }
+        };
 
         s.dyn.addBroadConstraint(new ForceDirected());
 

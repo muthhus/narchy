@@ -17,12 +17,12 @@ public class SSH {
     public SSH(String user, String host, String pw, InputStream in, OutputStream out) throws JSchException {
 
 
-            JSch jsch = new JSch();
+        JSch jsch = new JSch();
 
-            //jsch.setKnownHosts("/home/foo/.ssh/known_hosts");
+        //jsch.setKnownHosts("/home/foo/.ssh/known_hosts");
 
-            session = jsch.getSession(user, host, 22);
-            session.setPassword(pw);
+        session = jsch.getSession(user, host, 22);
+        session.setPassword(pw);
 
 
 //            UserInfo ui = new MyUserInfo() {
@@ -49,23 +49,23 @@ public class SSH {
 //
 //            };
 
-            session.setUserInfo(new MyUserInfo());
+        session.setUserInfo(new MyUserInfo());
 
-            // It must not be recommended, but if you want to skip host-key check,
-            // invoke following,
-            session.setConfig("StrictHostKeyChecking", "no");
+        // It must not be recommended, but if you want to skip host-key check,
+        // invoke following,
+        session.setConfig("StrictHostKeyChecking", "no");
 
-            //session.connect();
-            session.connect(30000);   // making a connection with timeout.
+        //session.connect();
+        session.connect(30000);   // making a connection with timeout.
 
-            channel = (ChannelShell) session.openChannel("shell");
+        channel = (ChannelShell) session.openChannel("shell");
 
 
 
-            // Enable agent-forwarding.
-            //((ChannelShell)channel).setAgentForwarding(true);
+        // Enable agent-forwarding.
+        //((ChannelShell)channel).setAgentForwarding(true);
 
-            channel.setInputStream(in);
+        channel.setInputStream(in);
       /*
       // a hack for MS-DOS prompt on Windows.
       channel.setInputStream(new FilterInputStream(System.in){
@@ -75,11 +75,11 @@ public class SSH {
         });
        */
 
-            channel.setOutputStream(out);
+        channel.setOutputStream(out);
 
 
-            // Choose the pty-type "vt102".
-            channel.setPtyType("ansi");
+        // Choose the pty-type "vt102".
+        channel.setPtyType("ansi");
 
 
       /*
@@ -87,8 +87,8 @@ public class SSH {
       ((ChannelShell)channel).setEnv("LANG", "ja_JP.eucJP");
       */
 
-            //channel.connect();
-            channel.connect(3 * 1000);
+        //channel.connect();
+        channel.connect(3 * 1000);
 
 
 

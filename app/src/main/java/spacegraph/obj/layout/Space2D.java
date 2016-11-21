@@ -88,7 +88,7 @@ public class Space2D extends Layout {
     }
 
     public static void main(String[] args) {
-        SpaceGraph.window(new Space2D(Widget.widgetDemo().children) {
+        SpaceGraph.window(new Space2D(Widget.widgetDemo().children()) {
 
 
         }, 900, 700);

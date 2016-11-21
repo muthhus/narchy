@@ -153,7 +153,7 @@ public class GjkPairDetector extends DiscreteCollisionDetectorInterface {
             }
 
             // exit 0: the new point is already in the simplex, or we didn't come any closer
-            if (simplexSolver.inSimplex(w)) {
+            if (simplexSolver.inSimplex(w )) {
                 degenerateSimplex = 1;
                 checkSimplex = true;
                 break;

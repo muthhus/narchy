@@ -90,12 +90,12 @@ public class BoxCollision {
 		return vec3.x*mat.get(0, colindex) + vec3.y*mat.get(1, colindex) + vec3.z*mat.get(2, colindex);
 	}
 
-	/**
-	 * Compairison of transformation objects.
-	 */
-	public static boolean compareTransformsEqual(Transform t1, Transform t2) {
-		return t1.equals(t2);
-	}
+//	/**
+//	 * Compairison of transformation objects.
+//	 */
+//	public static boolean compareTransformsEqual(Transform t1, Transform t2) {
+//		return t1.equals(t2);
+//	}
 	
 	////////////////////////////////////////////////////////////////////////////
 

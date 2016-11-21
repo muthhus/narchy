@@ -375,8 +375,7 @@ public abstract class Tuple3d implements java.io.Serializable, Cloneable {
            Tuple3d t2 = (Tuple3d) t1;
            return(this.x == t2.x && this.y == t2.y && this.z == t2.z);
       }
-      catch (ClassCastException e1) {return false;}
-      catch (NullPointerException e2) {return false;}
+      catch (ClassCastException | NullPointerException e1) {return false;}
 
     }
 

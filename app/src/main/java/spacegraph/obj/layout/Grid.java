@@ -50,14 +50,14 @@ public class Grid extends Layout {
     public void transform(GL2 gl, v2 globalScale) {
         super.transform(gl, globalScale);
 
-        float xx = scaleLocal.x * globalScale.x;
-        float yy = scaleLocal.y * globalScale.y;
-        if (isGrid() && (lw!= xx || lh!= yy) ) {
-
-            layout();
-            lw = xx;
-            lh = yy;
-
+        if (!children.isEmpty() && isGrid())  {
+            float xx = scaleLocal.x * globalScale.x;
+            float yy = scaleLocal.y * globalScale.y;
+            if ((lw != xx) || (lh != yy)) {
+                layout();
+                lw = xx;
+                lh = yy;
+            }
         }
     }
 
@@ -75,6 +75,8 @@ public class Grid extends Layout {
 
     @Override
     public void layout() {
+
+        //lw = lh = Float.NaN; //invalidate to trigger next transform update
 
         int n = children.size();
         if (n == 0)
