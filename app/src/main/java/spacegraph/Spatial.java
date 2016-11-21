@@ -85,8 +85,8 @@ public abstract class Spatial<X> implements Active {
         }
     }
 
-    public final boolean active() {
-        return preactive || order > -1;
+    public boolean active() {
+        return preactive && order > -1;
     }
 
     public final boolean preactive() {
@@ -128,4 +128,5 @@ public abstract class Spatial<X> implements Active {
     public abstract void renderAbsolute(GL2 gl);
 
     public abstract void renderRelative(GL2 gl, Collidable body);
+
 }

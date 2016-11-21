@@ -212,7 +212,7 @@ public class ConceptWidget extends SimpleSpatial<Term> {
         int n = eee.size();
         for (int en = 0; en < n; en++) {
             EDraw f = eee.get(en);
-            if (f!=null)
+            //if (f!=null)
                 render(gl, f);
         }
     }

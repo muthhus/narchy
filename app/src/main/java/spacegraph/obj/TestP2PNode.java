@@ -1,16 +1,15 @@
 package spacegraph.obj;
 
+import spacegraph.phys.shape.SimpleBoxShape;
 import spacegraph.source.ListSpace;
 import spacegraph.SimpleSpatial;
 import spacegraph.SpaceGraph;
 import spacegraph.layout.Flatten;
-import spacegraph.math.v3;
 import spacegraph.obj.layout.Grid;
 import spacegraph.obj.widget.XYSlider;
 import spacegraph.phys.Dynamic;
 import spacegraph.phys.Dynamics;
 import spacegraph.phys.constraint.DistanceConstraint;
-import spacegraph.phys.shape.BoxShape;
 
 /**
  * Created by me on 7/23/16.
@@ -59,7 +58,7 @@ public class TestP2PNode extends Cuboid {
         protected Dynamic create(Dynamics world) {
             Dynamic l = super.create(world);
 
-            float w = ((BoxShape) body.shape()).x();
+            float w = ((SimpleBoxShape) body.shape()).x();
 
             p2p = new DistanceConstraint(
                     a.body, b.body, 5f, 0.75f, 0.1f, 0.75f

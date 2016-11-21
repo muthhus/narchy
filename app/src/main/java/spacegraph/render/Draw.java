@@ -169,7 +169,7 @@ public enum Draw {
             boolean useWireframeFallback = true;
             switch (shape.getShapeType()) {
                 case BOX_SHAPE_PROXYTYPE: {
-                    BoxShape boxShape = (BoxShape) shape;
+                    SimpleBoxShape boxShape = (SimpleBoxShape) shape;
                     boxShape.getHalfExtentsWithoutMargin(a);
                     //Vector3f halfExtent = stack.vectors.get();
                     gl.glScalef(2f * a.x, 2f * a.y, 2f * a.z);

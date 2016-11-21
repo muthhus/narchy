@@ -124,6 +124,7 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
         return (Y) y;
     }
 
+
     public @Nullable Spatial getIfActive(X t) {
         Spatial v = atoms.get(t);
         return v != null && v.active() ? v : null;

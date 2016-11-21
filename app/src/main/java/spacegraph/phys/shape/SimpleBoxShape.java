@@ -40,18 +40,26 @@ import spacegraph.phys.math.VectorUtil;
  *
  * @author jezek2
  */
-public class BoxShape extends SimpleBoxShape {
+public class SimpleBoxShape extends PolyhedralConvexShape {
 
-	public BoxShape(v3 boxHalfExtents) {
+	public SimpleBoxShape(v3 boxHalfExtents) {
 		this(boxHalfExtents.x*2f, boxHalfExtents.y*2f, boxHalfExtents.z*2f);
 	}
 
-	public BoxShape(float w, float h, float d) {
-		super(w, h, d);
+	public SimpleBoxShape(float w, float h, float d) {
+		super();
+
+		setMargin(0f);
+
+		//VectorUtil.mul(implicitShapeDimensions, boxHalfExtents, localScaling);
+		implicitShapeDimensions.set(w/2f, h/2f, d/2f); //localscaling is by default 1,1,1 anyway
+
+		/*float m = getMargin();
+
+		implicitShapeDimensions.add(-m, -m, -m);*/
 	}
 
 	public void size(float x, float y, float z) {
-		setMargin(0f); //is margin helpful?
 		implicitShapeDimensions.set(x/2f, y/2f, z/2f);
 	}
 
@@ -66,6 +74,11 @@ public class BoxShape extends SimpleBoxShape {
 		return halfExtents;
 	}
 
+	public final v3 getHalfExtentsWithoutMargin(v3 out) {
+		out.set(implicitShapeDimensions); // changed in Bullet 2.63: assume the scaling and margin are included
+		return out;
+	}
+
 	@Override
 	public BroadphaseNativeType getShapeType() {
 		return BroadphaseNativeType.BOX_SHAPE_PROXYTYPE;
@@ -75,15 +88,18 @@ public class BoxShape extends SimpleBoxShape {
 	public v3 localGetSupportingVertex(v3 vec, v3 out) {
 		v3 halfExtents = getHalfExtentsWithoutMargin(out);
 		
-		float margin = getMargin();
-		halfExtents.x += margin;
-		halfExtents.y += margin;
-		halfExtents.z += margin;
+//		float margin = getMargin();
+//		halfExtents.x += margin;
+//		halfExtents.y += margin;
+//		halfExtents.z += margin;
 
+		float hx = halfExtents.x;
+		float hy = halfExtents.y;
+		float hz = halfExtents.z;
 		out.set(
-				ScalarUtil.fsel(vec.x, halfExtents.x, -halfExtents.x),
-				ScalarUtil.fsel(vec.y, halfExtents.y, -halfExtents.y),
-				ScalarUtil.fsel(vec.z, halfExtents.z, -halfExtents.z));
+				ScalarUtil.fsel(vec.x, hx, -hx),
+				ScalarUtil.fsel(vec.y, hy, -hy),
+				ScalarUtil.fsel(vec.z, hz, -hz));
 		return out;
 	}
 
@@ -120,41 +136,50 @@ public class BoxShape extends SimpleBoxShape {
 
 	@Override
 	public SimpleBoxShape setMargin(float margin) {
-		// correct the implicitShapeDimensions for the margin
-		float m = getMargin();
-		v3 oldMargin = new v3(m, m,m);
+		if (margin!=0)
+			throw new UnsupportedOperationException();
 
-		v3 implicitShapeDimensionsWithMargin = new v3();
-		implicitShapeDimensionsWithMargin.add(implicitShapeDimensions, oldMargin);
-
-		super.setMargin(margin);
-
-		float n = getMargin();
-		v3 newMargin = new v3(n, n, n);
-		implicitShapeDimensions.sub(implicitShapeDimensionsWithMargin, newMargin);
 		return this;
+
+//		// correct the implicitShapeDimensions for the margin
+//		float m = getMargin();
+//		v3 oldMargin = new v3(m, m,m);
+//
+//		v3 implicitShapeDimensionsWithMargin = new v3();
+//		implicitShapeDimensionsWithMargin.add(implicitShapeDimensions, oldMargin);
+//
+//		super.setMargin(margin);
+//
+//		float n = getMargin();
+//		v3 newMargin = new v3(n, n, n);
+//		implicitShapeDimensions.sub(implicitShapeDimensionsWithMargin, newMargin);
+//		return this;
 	}
 
-	@Override
-	public void setLocalScaling(v3 scaling) {
-
-		float m = getMargin();
-		v3 oldMargin = new v3(m, m, m);
-
-		v3 implicitShapeDimensionsWithMargin = new v3();
-		implicitShapeDimensionsWithMargin.add(implicitShapeDimensions, oldMargin);
-		v3 unScaledImplicitShapeDimensionsWithMargin = new v3();
-		VectorUtil.div(unScaledImplicitShapeDimensionsWithMargin, implicitShapeDimensionsWithMargin, localScaling);
-
-		super.setLocalScaling(scaling);
-
-		VectorUtil.mul(implicitShapeDimensions, unScaledImplicitShapeDimensionsWithMargin, localScaling);
-		implicitShapeDimensions.sub(oldMargin);
-	}
+//	@Override
+//	public void setLocalScaling(v3 scaling) {
+//
+////		float m = getMargin();
+////		v3 oldMargin = new v3(m, m, m);
+////
+////		v3 implicitShapeDimensionsWithMargin = new v3();
+////		implicitShapeDimensionsWithMargin.add(implicitShapeDimensions, oldMargin);
+////		v3 unScaledImplicitShapeDimensionsWithMargin = new v3();
+////		VectorUtil.div(unScaledImplicitShapeDimensionsWithMargin, implicitShapeDimensionsWithMargin, localScaling);
+//
+//		super.setLocalScaling(scaling);
+////
+////		VectorUtil.mul(implicitShapeDimensions, unScaledImplicitShapeDimensionsWithMargin, localScaling);
+////		implicitShapeDimensions.sub(oldMargin);
+//	}
 
 	@Override
 	public void getAabb(Transform t, v3 aabbMin, v3 aabbMax) {
 		AabbUtil2.transformAabb(getHalfExtentsWithoutMargin(), getMargin(), t, aabbMin, aabbMax);
+	}
+
+	public final v3 getHalfExtentsWithoutMargin() {
+		return getHalfExtentsWithoutMargin(new v3());
 	}
 
 	@Override
@@ -201,11 +226,14 @@ public class BoxShape extends SimpleBoxShape {
 
 	@Override
 	public void getVertex(int i, v3 vtx) {
-		v3 halfExtents = getHalfExtentsWithoutMargin(new v3());
+		v3 halfExtents = getHalfExtentsWithoutMargin(); //getHalfExtentsWithoutMargin(new v3());
 
-		vtx.set(halfExtents.x * (1 - (i & 1)) - halfExtents.x * (i & 1),
-				halfExtents.y * (1 - ((i & 2) >> 1)) - halfExtents.y * ((i & 2) >> 1),
-				halfExtents.z * (1 - ((i & 4) >> 2)) - halfExtents.z * ((i & 4) >> 2));
+		float hx = halfExtents.x;
+		float hy = halfExtents.y;
+		float hz = halfExtents.z;
+		vtx.set(hx * (1 - (i & 1)) - hx * (i & 1),
+				hy * (1 - ((i & 2) >> 1)) - hy * ((i & 2) >> 1),
+				hz * (1 - ((i & 4) >> 2)) - hz * ((i & 4) >> 2));
 	}
 	
 	public void getPlaneEquation(Vector4f plane, int i, v3 tmp) {
@@ -300,8 +328,34 @@ public class BoxShape extends SimpleBoxShape {
 	}
 
 	@Override
+	public final boolean isInside(v3 pt, float tolerance) {
+		v3 halfExtents = getHalfExtentsWithoutMargin();
+
+		float px = pt.x;
+		float hx = halfExtents.x;
+		if (px <= (hx + tolerance)) {
+			if (px >= (-hx - tolerance)) {
+				float py = pt.y;
+				float hy = halfExtents.y;
+				if (py <= (hy + tolerance)) {
+					if (py >= (-hy - tolerance)) {
+						float pz = pt.z;
+						float hz = halfExtents.z;
+						if (pz <= (hz + tolerance)) {
+							if (pz >= (-hz - tolerance)) {
+								return true;
+							}
+						}
+					}
+				}
+			}
+		}
+		return false;
+	}
+
+	@Override
 	public String getName() {
-		return "Box";
+		return "SimpleBox";
 	}
 
 	@Override
@@ -333,5 +387,17 @@ public class BoxShape extends SimpleBoxShape {
 			default:
 				assert (false);
 		}
+	}
+
+	public final float x() {
+		return implicitShapeDimensions.x*2f;
+	}
+
+	public final float y() {
+		return implicitShapeDimensions.y*2f;
+	}
+
+	public final float z() {
+		return implicitShapeDimensions.z*2f;
 	}
 }

@@ -2,8 +2,8 @@ package spacegraph;
 
 import com.jogamp.opengl.GL2;
 import spacegraph.phys.Collidable;
-import spacegraph.phys.shape.BoxShape;
 import spacegraph.phys.shape.CollisionShape;
+import spacegraph.phys.shape.SimpleBoxShape;
 import spacegraph.render.Draw;
 
 /**
@@ -26,10 +26,10 @@ public abstract class AbstractSpatial<X> extends Spatial<X> {
 
         CollisionShape shape = body.shape();
 
-        if (shape instanceof BoxShape) {
+        if (shape instanceof SimpleBoxShape) {
             //render surface on BoxShape face
 
-            BoxShape bshape = (BoxShape) shape;
+            SimpleBoxShape bshape = (SimpleBoxShape) shape;
 
             gl.glPushMatrix();
 

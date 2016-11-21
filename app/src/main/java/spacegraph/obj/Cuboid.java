@@ -8,10 +8,9 @@ import spacegraph.input.Finger;
 import spacegraph.math.v2;
 import spacegraph.math.v3;
 import spacegraph.phys.Collidable;
-import spacegraph.phys.Dynamic;
 import spacegraph.phys.collision.ClosestRay;
 import spacegraph.phys.math.Transform;
-import spacegraph.phys.shape.BoxShape;
+import spacegraph.phys.shape.SimpleBoxShape;
 import spacegraph.render.Draw;
 
 import static spacegraph.math.v3.v;
@@ -80,7 +79,7 @@ public class Cuboid<X> extends SimpleSpatial<X> {
 //                this.thick = h.z;
 //            }
 
-        BoxShape shape = (BoxShape) body.shape();
+        SimpleBoxShape shape = (SimpleBoxShape) body.shape();
         float frontZ = shape.z() / 2;
         float zTolerance = frontZ / 4f;
 

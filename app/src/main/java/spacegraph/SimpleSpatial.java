@@ -10,12 +10,10 @@ import spacegraph.phys.Dynamic;
 import spacegraph.phys.Dynamics;
 import spacegraph.phys.constraint.TypedConstraint;
 import spacegraph.phys.math.Transform;
-import spacegraph.phys.shape.BoxShape;
 import spacegraph.phys.shape.CollisionShape;
-import spacegraph.phys.util.Motion;
+import spacegraph.phys.shape.SimpleBoxShape;
 import spacegraph.render.Draw;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -110,7 +108,7 @@ public class SimpleSpatial<X> extends AbstractSpatial<X> {
     public SimpleSpatial move(float x, float y, float z) {
         if (!motionLock) {
             transform().set(x, y, z);
-            //reactivate();
+            reactivate();
         }
         return this;
     }
@@ -136,11 +134,14 @@ public class SimpleSpatial<X> extends AbstractSpatial<X> {
         Quat4f current = transform().getRotation(tmp);
         current.interpolate(target, speed);
         transform().setRotation(current);
+
+        reactivate();
     }
 
 
     public void reactivate() {
-        body.activate(collidable());
+        if (body!=null)
+            body.activate(collidable());
     }
 
 
@@ -164,20 +165,21 @@ public class SimpleSpatial<X> extends AbstractSpatial<X> {
 
     public void scale(float sx, float sy, float sz) {
 
-        if (shape instanceof BoxShape)
-            ((BoxShape)shape).size(sx, sy, sz);
+        if (shape instanceof SimpleBoxShape)
+            ((SimpleBoxShape)shape).size(sx, sy, sz);
         else
             shape.setLocalScaling(v(sx,sy,sz));
 
         this.radius = Math.max(sx, Math.max(sy, sz));
 
+        reactivate();
     }
 
 
 
     //TODO make abstract
     protected CollisionShape newShape() {
-        return new BoxShape(v3.v(1, 1, 1));
+        return new SimpleBoxShape(v3.v(1, 1, 1));
     }
 
     public Dynamic newBody(boolean collidesWithOthersLikeThis) {
@@ -222,6 +224,8 @@ public class SimpleSpatial<X> extends AbstractSpatial<X> {
 //        super.start(order);
 //        reactivate();
 //    }
+
+
 
     public void motionLock(boolean b) {
         motionLock = b;
