@@ -21,11 +21,10 @@ import spacegraph.layout.Flatten;
 import spacegraph.layout.ForceDirected;
 import spacegraph.math.Color3f;
 import spacegraph.math.v3;
+import spacegraph.obj.CrosshairSurface;
 import spacegraph.obj.layout.Grid;
 import spacegraph.obj.layout.Stacking;
-import spacegraph.obj.widget.Label;
-import spacegraph.obj.widget.LabeledPane;
-import spacegraph.obj.widget.Plot2D;
+import spacegraph.obj.widget.*;
 import spacegraph.render.Draw;
 import spacegraph.render.SpaceGraph2D;
 
@@ -341,13 +340,35 @@ public class Vis {
     }
 
     public static SpaceGraph<Term> conceptsWindow2D(NAR nar, int maxNodes, int maxEdges) {
-        return new SpaceGraph2D(
-                new ConceptsSpace(nar, maxNodes, maxEdges).with(
-                    new Flatten()
-                    //new Spiral()
-                    //new FastOrganicLayout()
-                )
-        ).with(new ForceDirected());
+        Surface controls = grid(new PushButton("x"), new FloatSlider("z", 0, 0, 4 ))
+                .hide();
+
+
+        SpaceGraph<Term> s = new SpaceGraph2D<>()
+                .add(
+                        new Ortho(
+//                                new FloatSlider("~", 0, 0, 1f).on((slider, v) -> {
+//
+//                                }).scale(100, 100).pos(0f, 0f)
+                                new CheckBox("").on((cb, v) -> {
+                                    if (!v)
+                                        controls.hide();
+                                    else
+                                        controls.scale(200,200f).pos(300f,300f);
+                                }).scale(100, 100).pos(0f, 0f)
+
+                        ))
+                .add(new Ortho(controls))
+                .add(new ConceptsSpace(nar, maxNodes, maxEdges).with(
+                        new Flatten()
+                        //new Spiral()
+                        //new FastOrganicLayout()
+                        )
+                ).with(new ForceDirected());
+
+            s.add(new Ortho(new CrosshairSurface(s)));
+
+            return s;
     }
 
 }

@@ -341,7 +341,7 @@ public abstract class JoglSpace implements GLEventListener, WindowListener {
         gl.glMatrixMode(gl.GL_MODELVIEW);
         //gl.glLoadIdentity();
 
-        //gl.glDisable(GL2.GL_DEPTH_TEST);
+
     }
 
 //

@@ -74,7 +74,7 @@ public class Line1DContinuous extends NAgent {
 
         ActionConcept a;
 
-        actions.add(a = new ActionConcept("(leftright)", n, (b, d) -> {
+        actions.add(a = new ActionConcept("e(move)", n, (b, d) -> {
             if (d!=null) {
                 float v =
                         //d.expectation();

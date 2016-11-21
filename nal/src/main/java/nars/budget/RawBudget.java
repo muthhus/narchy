@@ -127,7 +127,7 @@ public class RawBudget implements Budget {
     @Override
     public final Budget setBudget(float p, float q) {
         this.priority = validPriority(p);
-        this.quality = validPriority(q);
+        this.quality = validQuality(q);
         return this;
     }
 

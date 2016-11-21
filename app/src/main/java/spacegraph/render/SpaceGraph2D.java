@@ -36,6 +36,10 @@ public class SpaceGraph2D<X> extends SpaceGraph<X> {
         gl.glPopMatrix();
     };
 
+    public SpaceGraph2D() {
+        super();
+    }
+
     public SpaceGraph2D(AbstractSpace<X, ?>... cc) {
         super(cc);
         renderer = renderer2D;

@@ -149,14 +149,17 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
     public void init(GL2 gl) {
         super.init(gl);
 
-        initInput();
 
         for (Ortho f : preAdd) {
             _add(f);
         }
         preAdd.clear();
 
+
+        initInput();
+
     }
+
 
 
     protected void initInput() {
@@ -197,10 +200,14 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
 
             ortho();
 
+            gl.glDisable(GL2.GL_DEPTH_TEST);
+
             GL2 gl = this.gl;
             for (int i = 0; i < facialsSize; i++) {
                 orthos.get(i).render(gl);
             }
+
+            gl.glEnable(GL2.GL_DEPTH_TEST);
         }
     }
 

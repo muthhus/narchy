@@ -234,14 +234,14 @@
     B, (A ==> C), task(positive), time(decomposeBelief) |- subIfUnifiesAny(C,A,B), (Belief:Deduction, Goal:Induction)
         B, ((--,%A) ==> C), task(negative), time(decomposeBelief) |- subIfUnifiesAny(C,A,B), (Belief:DeductionN, Goal:InductionN)
 
-    B, (C ==> A), task(positive), time(decomposeBelief) |- subIfUnifiesAny(C,A,B), (Belief:Abduction, Goal:Deduction)
+    B, (C ==> A), time(decomposeBelief) |- subIfUnifiesAny(C,A,B), (Belief:Abduction, Goal:Deduction)
         //B, (C ==> A), task(negative), belief(negative), time(decomposeBelief) |- subIfUnifiesAny(C,A,B), (Belief:AbductionPN, Goal:DeductionPN)
 
     B, (A <=> C), belief(positive), time(decomposeBelief), neqCom(B,C) |- subIfUnifiesAny(C,A,B), (Belief:Analogy, Goal:Strong)
         B, (A <=> C), belief(negative), time(decomposeBelief), neqCom(B,C) |- subIfUnifiesAny((--,%C),A,B), (Belief:AnalogyPN, Goal:StrongPN)
 
 
-    //these are only valid if A occurrs during or after C. the opposite is not logical and would also produce redundant results
+    //originally these were only valid if A occurrs during or after C. the opposite is not logical and would also produce redundant results
     B, (C && A), task(positive), time(decomposeBelief), neqCom(B,C), notImplEqui(C) |- subIfUnifiesAny(C,A,B), (Goal:Strong)
         B, (C && (--,%A)), task(negative), time(decomposeBelief), neqCom(B,C), notImplEqui(C) |- subIfUnifiesAny(C,A,B), (Goal:StrongN)
 
@@ -337,10 +337,10 @@
 //substitutionViaSimilarity
      X, (B<->C), neqCom(X,C), neq(X,B) |- substitute(X,B,C,strict), (Belief:Intersection, Goal:Intersection)
 
-//desire spreading by similarity
-     S, (S<->P) |- P, (Goal:Intersection)
-        %S, ((--,%S)<->P), task(negative)  |- P, (Goal:IntersectionN)
-        %S, ((--,%P)<->S), task(negative)  |- (--,%P), (Goal:IntersectionN)
+//desire spreading by similarity (was: Goal:Intersection)
+     S, (S<->P) |- P, (Goal:Strong)
+        S, ((--,%S)<->P), task(negative)  |- P, (Goal:StrongN)
+        S, ((--,%P)<->S), task(negative)  |- (--,%P), (Goal:StrongN)
 
 
 

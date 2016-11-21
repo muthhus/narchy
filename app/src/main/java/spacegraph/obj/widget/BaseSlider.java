@@ -1,6 +1,7 @@
 package spacegraph.obj.widget;
 
 import com.jogamp.opengl.GL2;
+import nars.util.Util;
 import org.jetbrains.annotations.Nullable;
 import spacegraph.SpaceGraph;
 import spacegraph.math.v2;
@@ -15,8 +16,11 @@ import static spacegraph.obj.layout.Grid.grid;
 public class BaseSlider extends Widget {
 
 
+    private static final float EPSILON = 0.001f;
+
     @Nullable SliderChange change;
     private float p;
+
 
     public interface SliderChange {
         void onChange(BaseSlider s, float value);
@@ -72,8 +76,8 @@ public class BaseSlider extends Widget {
     }
 
     public void _set(float p) {
-        float current = this.p;
-        if (current != p) {
+        float current = Util.unitize(this.p);
+        if (!Util.equals(current, p, EPSILON)) {
             this.p = p;
             if (change!=null)
                 change.onChange(this, value());

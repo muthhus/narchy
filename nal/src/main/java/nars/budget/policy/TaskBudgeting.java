@@ -1,9 +1,6 @@
 package nars.budget.policy;
 
-import nars.$;
-import nars.NAR;
-import nars.Symbols;
-import nars.Task;
+import nars.*;
 import nars.budget.Budget;
 import nars.budget.BudgetFunctions;
 import nars.budget.RawBudget;
@@ -46,7 +43,7 @@ public class TaskBudgeting {
         float occam = occamComplexityGrowthRelative(derived, baseBudget);
 
         final float quality =
-                Util.clamp(baseBudget.qua() * occam * derivationQuality, 0f, 1f);
+                Util.clamp(baseBudget.qua() * occam * derivationQuality, 0f, 1f- Param.BUDGET_EPSILON);
 
         if (quality < p.quaMin)
             return null;
@@ -97,16 +94,18 @@ public class TaskBudgeting {
     public static float occamComplexityGrowthRelative(@NotNull Termed derived, @NotNull Premise pp) {
         Task parentBelief = pp.belief;
         int parentComplexity;
-        int taskCompl = pp.task.complexity();
+        int taskCompl = pp.task.volume();
         if (parentBelief!=null) // && parentBelief.complexity() > parentComplexity)
             parentComplexity =
                 //Math.min(taskCompl, parentBelief.complexity());
-                Math.max(taskCompl, parentBelief.complexity());
+                Math.max(taskCompl, parentBelief.volume());
         else
             parentComplexity = taskCompl;
 
-        int derivedComplexity = derived.complexity();
-        return parentComplexity / (1f + Math.max(parentComplexity, derivedComplexity));
+        int derivedComplexity = derived.volume();
+        //return parentComplexity / (1f + Math.max(parentComplexity, derivedComplexity));
+        //return Math.max(1f, (parentComplexity/derivedComplexity));
+        return Math.max(1f, (parentComplexity/(1+derivedComplexity)));
     }
 
 

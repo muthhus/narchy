@@ -22,6 +22,7 @@ import static spacegraph.math.v3.v;
 public class Surface {
 
 
+
     public enum Align {
 
 
@@ -115,7 +116,11 @@ public class Surface {
 
     }
 
+
     public final void render(GL2 gl, v2 globalScale) {
+
+        if (scaleLocal.x!=scaleLocal.x)
+            return; //invisible
 
         gl.glPushMatrix();
 
@@ -234,6 +239,11 @@ public class Surface {
 
     public float radius() {
         return Math.max(scaleLocal.x, scaleLocal.y);
+    }
+
+    public Surface hide() {
+        scale(Float.NaN, Float.NaN);
+        return this;
     }
 
 }

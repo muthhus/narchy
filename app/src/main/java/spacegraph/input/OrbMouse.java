@@ -374,6 +374,7 @@ public class OrbMouse extends SpaceMouse implements KeyListener {
         int y = e.getY();
         if (!mouseMotionFunc(x, y, e.getButtonsDown())) {
             pickConstrain(e.getButton(), 1, x, y);
+            e.setConsumed(true);
         }
     }
 
@@ -400,14 +401,21 @@ public class OrbMouse extends SpaceMouse implements KeyListener {
             mouseDragDY = (y) - mouseDragPrevY;
         }
 
-        mouseMotionFunc(x, y, e.getButtonsDown());
+        if (mouseMotionFunc(x, y, e.getButtonsDown())) {
+            e.setConsumed(true);
+        }
 
         mouseDragPrevX = x;
         mouseDragPrevY = y;
+
+        e.setConsumed(true);
     }
 
     public void mouseMoved(MouseEvent e) {
-        mouseMotionFunc(e.getX(), e.getY(), e.getButtonsDown());
+
+        if (mouseMotionFunc(e.getX(), e.getY(), e.getButtonsDown())) {
+            e.setConsumed(true);
+        }
     }
 
     @Override

@@ -49,13 +49,14 @@ public class Finger {
         Surface s = root.onTouch(nextHit, nextButtonDown);
         if (s instanceof Widget) {
             on((Widget)s);
+            return s;
         } else {
             on(null);
+            return null;
         }
-        return s;
     }
 
-    private void on(@Nullable Widget touched) {
+    private boolean on(@Nullable Widget touched) {
 
         if (touching!=null && touched!=touching) {
             touching.touch(null);
@@ -63,8 +64,11 @@ public class Finger {
 
         touching = touched;
 
-        if (touching!=null)
+        if (touching!=null) {
             touching.touch(this);
+            return true;
+        }
+        return false;
     }
 
 
@@ -81,11 +85,16 @@ public class Finger {
 //        update(e, buttonsDown, window);
 //    }
 
-    public void update(@Nullable MouseEvent e, float x, float y, short[] buttonsDown) {
+    public boolean update(@Nullable MouseEvent e, float x, float y, short[] buttonsDown) {
         if (e == null) {
             off();
+            return false;
         } else {
-            on(v(x, y), buttonsDown);
+            if (on(v(x, y), buttonsDown)!=null) {
+                e.setConsumed(true);
+                return true;
+            }
+            return false;
         }
 
     }

@@ -171,10 +171,10 @@ public class Ortho implements WindowListener, KeyListener, MouseListener {
         updateMouse(e, e!=null ? e.getButtonsDown() : null);
     }
 
-    private void updateMouse(MouseEvent e, short[] buttonsDown) {
+    private boolean updateMouse(MouseEvent e, short[] buttonsDown) {
         float x, y;
 
-        if (e != null) {
+        if (e != null && !e.isConsumed()) {
 
             //screen coordinates
             float sx = e.getX();
@@ -186,14 +186,17 @@ public class Ortho implements WindowListener, KeyListener, MouseListener {
 
             x = (sx - surface.translateLocal.x) / (lx);
             y = (sy - surface.translateLocal.y) / (ly);
+            if (x >= 0 && y >= 0 && x<=1f && y<=1f) {
+                mouse.update(e, x, y, buttonsDown);
+                return true;
+            }
 
         }
-        else {
-            x = y = Float.NaN;
-        }
 
-        mouse.update(e, x, y, buttonsDown);
+        x = y = Float.NaN;
+        mouse.update(null, x, y, null);
 
+        return false;
     }
 
     @Override

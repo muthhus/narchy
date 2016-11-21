@@ -106,7 +106,7 @@ public abstract class NARSpace<X extends Termed, Y extends Active> extends ListS
         //n.nal(4);
 
         //n.DEFAULT_BELIEF_PRIORITY = 0.1f;
-        n.activationGlobal.setValue(0.5f);
+        //n.activationGlobal.setValue(0.5f);
 
         //new ArithmeticInduction(n);
 
