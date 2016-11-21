@@ -163,30 +163,23 @@ public class Surface {
                     globalScale.y / globalScale.x;
                     //1f;
 //            float wAspect = gAspect * aspect;
-            float sa = scale.y / scale.x;
-            float aspect = this.aspect * gAspect;
-            if (aspect > sa) {
-                if (aspect > 1) {
-                    sy = sx = scale.x / aspect;
+            float sa = this.aspect;
+            float aspect = (scale.y / scale.x) * gAspect;
+            if (aspect < sa) {
+                if (sa > 1) {
+                    sy = sx = scale.x / sa;
                 } else {
-                    sx = sy = scale.y * aspect;
+                    //sx = sy = scale.y * sa;
+                    sy = sx = scale.x * sa;
                 }
             } else {
-                if (aspect > 1) {
-                    sx = sy = scale.y / aspect;
+                if (sa > 1) {
+                    sx = sy = scale.y / sa;
                 } else {
-                    sy = sx = scale.x * aspect;
+                    sy = sx = scale.x * sa;
                 }
             }
-//            } else {
-//                if (aspect > 1) {
-//                    sx = scale.x / aspect;
-//                    sy = sx;
-//                } else {
-//                    sy = scale.y * aspect;
-//                    sx = sy;
-//                }
-//            }
+
 
         } else {
             //consume entire area, regardless of aspect

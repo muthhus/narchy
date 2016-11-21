@@ -9,27 +9,32 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public class CheckBox extends ToggleButton {
 
-    private final String text;
+    private String text;
+    private final Label label;
 
     public CheckBox(String text) {
         this.text = text;
+        setChildren(label = new Label(""));
+        set(false);
     }
+
     public CheckBox(String text, AtomicBoolean b) {
         this(text);
         set(b.get());
         on((button,value)->{
-            System.out.println(b + " " + value);
+            //System.out.println(b + " " + value);
             b.set(value);
         });
     }
 
     @Override
-    public void paintContent(GL2 gl) {
-        if (this.text != null) {
-            label(gl,
-                    (on() ? "[X] " : "[ ] ") +
-                            text);
-        }
-
+    public ToggleButton set(boolean on) {
+        label.set((on ? "[X] " : "[ ] ") + text);
+        return super.set(on);
     }
+
+    public void setText(String s) {
+        this.text = s;
+    }
+
 }

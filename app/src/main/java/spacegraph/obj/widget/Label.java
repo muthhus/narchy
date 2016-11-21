@@ -24,6 +24,7 @@ public class Label extends Surface {
     @Override
     public void paint(GL2 gl) {
         gl.glColor4f(1f,1f,1f,1f); //TODO color params
+        gl.glLineWidth(1.5f);
         float dz = 0.1f;
         Draw.text(gl, value(), fontScale, 0.5f, 0.5f, dz);
     }
