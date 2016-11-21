@@ -482,7 +482,7 @@ public class RagDoll  {
         //stack.vectors.push();
         //try {
 
-            Dynamic body = Dynamics.newBody(mass, shape, new Motion(), +1, -1);
+            Dynamic body = Dynamics.newBody(mass, shape, startTransform, +1, -1);
 
             body.setCenterOfMassTransform(startTransform);
 

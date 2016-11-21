@@ -39,20 +39,20 @@ public class TestP2PNode extends Cuboid {
             return false;
         }
 
-        @Override
-        protected void next(Dynamics world) {
-            v3 c = new v3(a.transform());
-            c.add(b.transform());
-            c.scale(0.5f);
-            move(c);
-
-            float dist = v3.dist(a.transform(), b.transform());
-            scale(dist, 1, 1);
-
-            a.body.activate();
-
-            b.body.activate();
-        }
+//        @Override
+//        protected void next(Dynamics world) {
+//            v3 c = new v3(a.transform());
+//            c.add(b.transform());
+//            c.scale(0.5f);
+//            move(c);
+//
+//            float dist = v3.dist(a.transform(), b.transform());
+//            scale(dist, 1, 1);
+//
+//            a.body.activate();
+//
+//            b.body.activate();
+//        }
 
 
         @Override

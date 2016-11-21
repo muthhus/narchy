@@ -40,11 +40,10 @@ public class Maze extends CompoundSpatial {
 
                     Dynamic b = Dynamics.newBody(
                             1f, //mass
-                            new BoxShape(0.9f, 0.9f, 0.9f), new Motion(),
+                            new BoxShape(0.9f, 0.9f, 0.9f), new Transform(x, y, 0),
                             +1, //group
                             -1//collidesWithOthersLikeThis ? -1 : -1 & ~(+1) //exclude collisions with self
                     );
-                    b.setCenterOfMassTransform(new Transform(x, y, 0));
                     b.setData(this);
 
                     //b.setLinearFactor(1,1,0); //restricts movement to a 2D plane
@@ -65,8 +64,7 @@ public class Maze extends CompoundSpatial {
 
 
         CollisionShape groundShape = new BoxShape(v(20f, 20f, 10f));
-        Dynamic ground = Dynamics.newBody(0f, groundShape, new Motion(), +1, -1);
-        ground.setCenterOfMassTransform(new Transform(0, 0, -15f));
+        Dynamic ground = Dynamics.newBody(0f, groundShape, new Transform(0,0,-15), +1, -1);
         ground.setData(this);
         add(ground);
 

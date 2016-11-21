@@ -256,7 +256,7 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
         return win;
     }
 
-    public SpaceGraph with(BroadConstraint b) {
+    @Deprecated public SpaceGraph with(BroadConstraint b) {
         dyn.addBroadConstraint(b);
         return this;
     }

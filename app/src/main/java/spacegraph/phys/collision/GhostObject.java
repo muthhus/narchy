@@ -45,10 +45,10 @@ import spacegraph.phys.util.OArrayList;
  */
 public class GhostObject extends Collidable {
 
-	protected OArrayList<Collidable> overlappingObjects = new OArrayList<>();
+	protected final OArrayList<Collidable> overlappingObjects = new OArrayList<>();
 
 	public GhostObject() {
-		super(CollidableType.GHOST_OBJECT);
+		super(CollidableType.GHOST_OBJECT, new Transform());
 	}
 
 	/**

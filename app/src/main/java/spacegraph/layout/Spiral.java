@@ -26,7 +26,7 @@ public class Spiral<X> implements SpaceTransform<X> {
         //float ni = n / (float) Math.E;
         //final float bn = 1f;
 
-        float baseRad = 10f;
+        float baseRad = 7f;
         float angleRate = 0.2f;
         //float p = v.pri;
 

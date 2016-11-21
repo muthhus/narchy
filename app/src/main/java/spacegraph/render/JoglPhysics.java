@@ -76,14 +76,14 @@ abstract public class JoglPhysics<X> extends JoglSpace implements GLEventListene
     private float aspect;
 
 
-    public void camera(v3 target, float distance) {
+    public void camera(v3 target, float radius) {
         v3 fwd = v();
 
         fwd.sub(target, camPos);
         fwd.normalize();
         camFwd.set(fwd);
 
-        fwd.scale(distance);
+        fwd.scale(radius * 1.25f + zNear * 1.25f);
         camPos.sub(target, fwd);
 
     }
@@ -148,17 +148,7 @@ abstract public class JoglPhysics<X> extends JoglSpace implements GLEventListene
 
     protected GLSRT glsrt = null;
 
-    final BiConsumer<Spatial, Collidable> render3D = (s, body) -> {
-        gl.glPushMatrix();
 
-        Draw.transform(gl, body.transform());
-
-        s.renderRelative(gl, body);
-
-        gl.glPopMatrix();
-    };
-
-    protected BiConsumer<Spatial, Collidable> renderer = render3D;
 
     public JoglPhysics() {
         super();
@@ -738,7 +728,7 @@ abstract public class JoglPhysics<X> extends JoglSpace implements GLEventListene
         int collisionFilterGroup = isDynamic ? 1 : 2;
         int collisionFilterMask = isDynamic ? -1 : -3;
 
-        return Dynamics.newBody(mass, shape, new Motion(startTransform), collisionFilterGroup, collisionFilterMask);
+        return Dynamics.newBody(mass, shape, startTransform, collisionFilterGroup, collisionFilterMask);
     }
 
 
@@ -747,7 +737,17 @@ abstract public class JoglPhysics<X> extends JoglSpace implements GLEventListene
 
         s.renderAbsolute(gl);
 
-        s.forEachBody(b -> renderer.accept(s, b));
+        s.forEachBody(body -> {
+
+            gl.glPushMatrix();
+
+            Draw.transform(gl, body.transform());
+
+            s.renderRelative(gl, body);
+
+            gl.glPopMatrix();
+
+        });
 
     }
 

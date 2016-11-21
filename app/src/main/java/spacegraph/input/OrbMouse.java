@@ -70,7 +70,7 @@ public class OrbMouse extends SpaceMouse implements KeyListener {
 
                     v3 objTarget = co.getWorldOrigin();
 
-                    space.camera(objTarget, co.shape().getBoundingRadius() * 1.25f + space.zNear * 1.25f);
+                    space.camera(objTarget, co.shape().getBoundingRadius());
 
                 }
             }
@@ -265,10 +265,11 @@ public class OrbMouse extends SpaceMouse implements KeyListener {
                     ((SimpleSpatial) u).motionLock(true);
                 }
 
-                MotionState mm = directDrag.getMotionState();
-                if (mm instanceof Motion) {
-                    ((Motion) mm).center(newPos);
-                }
+//                MotionState mm = directDrag.getMotionState();
+//                if (mm instanceof Motion) {
+//                    ((Motion) mm).center(newPos);
+//                }
+                directDrag.worldTransform.set(newPos);
 
                 return true;
             } else if (pickConstraint != null) {

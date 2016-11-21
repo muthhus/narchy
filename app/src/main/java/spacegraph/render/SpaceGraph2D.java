@@ -42,7 +42,6 @@ public class SpaceGraph2D<X> extends SpaceGraph<X> {
 
     public SpaceGraph2D(AbstractSpace<X, ?>... cc) {
         super(cc);
-        renderer = renderer2D;
     }
 
     public SpaceGraph2D(SimpleSpatial... x) {
@@ -132,6 +131,12 @@ public class SpaceGraph2D<X> extends SpaceGraph<X> {
                 return r;
             }
         });
+
+    }
+
+    @Override
+    public void camera(v3 target, float radius) {
+        camPos.set(target.x, target.y, radius * 1.25f * 2);
 
     }
 

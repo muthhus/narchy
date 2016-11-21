@@ -43,7 +43,7 @@ import static nars.budget.Budget.validPriority;
     @Override
     public Budget setBudget(float p, float q) {
         f[0] = validPriority(p);
-        f[1] = validPriority(q);
+        f[1] = Budget.validQuality(q);
         return this;
     }
 
@@ -55,7 +55,7 @@ import static nars.budget.Budget.validPriority;
 
     @Override
     public final void setQuality(float q) {
-        f[1] = validPriority(q);
+        f[1] = Budget.validQuality(q);
     }
 
     @Override

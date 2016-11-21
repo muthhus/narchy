@@ -25,6 +25,7 @@ package spacegraph.phys.constraint;
 
 import spacegraph.math.v3;
 import spacegraph.phys.Dynamic;
+import spacegraph.phys.math.Transform;
 import spacegraph.phys.solve.ContactSolverInfo;
 
 /**
@@ -37,7 +38,7 @@ public abstract class TypedConstraint {
 	//protected final BulletStack stack = BulletStack.get();
 	
 	// TODO: stack allocation
-	private static final Dynamic s_fixed = new Dynamic(0, null, null);
+	private static final Dynamic s_fixed = new Dynamic(0, new Transform(), null);
 	
 	@Deprecated protected static /*synchronized*/ Dynamic getFixed() {
 //		if (s_fixed == null) {

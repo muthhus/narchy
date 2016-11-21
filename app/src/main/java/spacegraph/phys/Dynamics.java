@@ -36,7 +36,6 @@ import spacegraph.phys.constraint.BroadConstraint;
 import spacegraph.phys.constraint.TypedConstraint;
 import spacegraph.phys.dynamics.ActionInterface;
 import spacegraph.phys.dynamics.InternalTickCallback;
-import spacegraph.phys.dynamics.vehicle.RaycastVehicle;
 import spacegraph.phys.math.*;
 import spacegraph.phys.shape.CollisionShape;
 import spacegraph.phys.shape.SphereShape;
@@ -83,7 +82,7 @@ public abstract class Dynamics<X> extends Collisions<X> {
     protected float localTime = 1f / 60f;
     protected boolean ownsIslandManager;
     protected boolean ownsConstrainer;
-    protected OArrayList<RaycastVehicle> vehicles = new OArrayList<RaycastVehicle>();
+    //protected OArrayList<RaycastVehicle> vehicles = new OArrayList<RaycastVehicle>();
     protected OArrayList<ActionInterface> actions = new OArrayList<ActionInterface>();
     protected int profileTimings;
     protected InternalTickCallback preTickCallback;
@@ -107,7 +106,7 @@ public abstract class Dynamics<X> extends Collisions<X> {
 
     }
 
-    public static Dynamic newBody(float mass, CollisionShape shape, MotionState motion, int group, int mask) {
+    public static Dynamic newBody(float mass, CollisionShape shape, Transform t, int group, int mask) {
         // rigidbody is dynamic if and only if mass is non zero, otherwise static
         boolean isDynamic = (mass != 0f);
         v3 localInertia = v(0, 0, 0);
@@ -115,9 +114,8 @@ public abstract class Dynamics<X> extends Collisions<X> {
             shape.calculateLocalInertia(mass, localInertia);
         }
 
-        RigidBodyBuilder c = new RigidBodyBuilder(mass, motion, shape, localInertia);
-
-        Dynamic body = new Dynamic(c);
+        Dynamic body = new Dynamic(mass, t, shape, localInertia);
+        body.setCenterOfMassTransform(t);
         body.group = (short)group;
         body.mask = (short)mask;
 
@@ -132,11 +130,11 @@ public abstract class Dynamics<X> extends Collisions<X> {
 	}
 
     protected void synchronizeMotionStates(boolean clear) {
-        Transform interpolatedTransform = new Transform();
-
-        Transform tmpTrans = new Transform();
-        v3 tmpLinVel = new v3();
-        v3 tmpAngVel = new v3();
+//        Transform interpolatedTransform = new Transform();
+//
+//        Transform tmpTrans = new Transform();
+//        v3 tmpLinVel = new v3();
+//        v3 tmpAngVel = new v3();
 
         // todo: iterate over awake simulation islands!
         OArrayList<Collidable> colliding = this.collidable;
@@ -147,18 +145,18 @@ public abstract class Dynamics<X> extends Collisions<X> {
                 continue;
             }
 
-            if (body.getMotionState() != null && !body.isStaticOrKinematicObject()) {
-                // we need to call the update at least once, even for sleeping objects
-                // otherwise the 'graphics' transform never updates properly
-                // so todo: add 'dirty' flag
-                //if (body->getActivationState() != ISLAND_SLEEPING)
-                TransformUtil.integrateTransform(
-                        body.getInterpolationWorldTransform(tmpTrans),
-                        body.getInterpolationLinearVelocity(tmpLinVel),
-                        body.getInterpolationAngularVelocity(tmpAngVel),
-                        localTime * body.getHitFraction(), interpolatedTransform);
-                body.getMotionState().setWorldTransform(interpolatedTransform);
-            }
+//            if (body.getMotionState() != null && !body.isStaticOrKinematicObject()) {
+//                // we need to call the update at least once, even for sleeping objects
+//                // otherwise the 'graphics' transform never updates properly
+//                // so todo: add 'dirty' flag
+//                //if (body->getActivationState() != ISLAND_SLEEPING)
+//                TransformUtil.integrateTransform(
+//                        body.getInterpolationWorldTransform(tmpTrans),
+//                        body.getInterpolationLinearVelocity(tmpLinVel),
+//                        body.getInterpolationAngularVelocity(tmpAngVel),
+//                        localTime * body.getHitFraction(), interpolatedTransform);
+//                body.getMotionState().setWorldTransform(interpolatedTransform);
+//            }
 
             if (clear) {
                 body.clearForces();
@@ -208,11 +206,11 @@ public abstract class Dynamics<X> extends Collisions<X> {
 
                 for (int i = 0; i < clampedSimulationSteps; i++) {
                     internalSingleStepSimulation(fixedTimeStep);
-                    synchronizeMotionStates(false);
+                    synchronizeMotionStates(i == clampedSimulationSteps-1);
                 }
             }
 
-            synchronizeMotionStates(true);
+            //synchronizeMotionStates(true);
 
             CProfileManager.incrementFrameCounter();
 
@@ -331,40 +329,40 @@ public abstract class Dynamics<X> extends Collisions<X> {
             v3 axle = new v3();
             v3 tmp = new v3();
 
-            for (i = 0; i < vehicles.size(); i++) {
-                //return array[index];
-                for (int v = 0; v < vehicles.get(i).getNumWheels(); v++) {
-                    wheelColor.set(0, 255, 255);
-                    //return array[index];
-                    if (vehicles.get(i).getWheelInfo(v).raycastInfo.isInContact) {
-                        wheelColor.set(0, 0, 255);
-                    } else {
-                        wheelColor.set(255, 0, 255);
-                    }
-
-                    //return array[index];
-                    wheelPosWS.set(vehicles.get(i).getWheelInfo(v).worldTransform);
-
-                    //return array[index];
-                    //return array[index];
-                    //return array[index];
-                    //return array[index];
-                    //return array[index];
-                    //return array[index];
-                    axle.set(
-                            vehicles.get(i).getWheelInfo(v).worldTransform.basis.get(0, vehicles.get(i).getRightAxis()),
-                            vehicles.get(i).getWheelInfo(v).worldTransform.basis.get(1, vehicles.get(i).getRightAxis()),
-                            vehicles.get(i).getWheelInfo(v).worldTransform.basis.get(2, vehicles.get(i).getRightAxis()));
-
-
-                    //m_vehicles[i]->getWheelInfo(v).m_raycastInfo.m_wheelAxleWS
-                    //debug wheels (cylinders)
-                    tmp.add(wheelPosWS, axle);
-                    debugDrawer.drawLine(wheelPosWS, tmp, wheelColor);
-                    //return array[index];
-                    debugDrawer.drawLine(wheelPosWS, vehicles.get(i).getWheelInfo(v).raycastInfo.contactPointWS, wheelColor);
-                }
-            }
+//            for (i = 0; i < vehicles.size(); i++) {
+//                //return array[index];
+//                for (int v = 0; v < vehicles.get(i).getNumWheels(); v++) {
+//                    wheelColor.set(0, 255, 255);
+//                    //return array[index];
+//                    if (vehicles.get(i).getWheelInfo(v).raycastInfo.isInContact) {
+//                        wheelColor.set(0, 0, 255);
+//                    } else {
+//                        wheelColor.set(255, 0, 255);
+//                    }
+//
+//                    //return array[index];
+//                    wheelPosWS.set(vehicles.get(i).getWheelInfo(v).worldTransform);
+//
+//                    //return array[index];
+//                    //return array[index];
+//                    //return array[index];
+//                    //return array[index];
+//                    //return array[index];
+//                    //return array[index];
+//                    axle.set(
+//                            vehicles.get(i).getWheelInfo(v).worldTransform.basis.get(0, vehicles.get(i).getRightAxis()),
+//                            vehicles.get(i).getWheelInfo(v).worldTransform.basis.get(1, vehicles.get(i).getRightAxis()),
+//                            vehicles.get(i).getWheelInfo(v).worldTransform.basis.get(2, vehicles.get(i).getRightAxis()));
+//
+//
+//                    //m_vehicles[i]->getWheelInfo(v).m_raycastInfo.m_wheelAxleWS
+//                    //debug wheels (cylinders)
+//                    tmp.add(wheelPosWS, axle);
+//                    debugDrawer.drawLine(wheelPosWS, tmp, wheelColor);
+//                    //return array[index];
+//                    debugDrawer.drawLine(wheelPosWS, vehicles.get(i).getWheelInfo(v).raycastInfo.contactPointWS, wheelColor);
+//                }
+//            }
 
             if (debugDrawer != null && debugDrawer.getDebugMode() != 0) {
                 for (i = 0; i < actions.size(); i++) {
@@ -416,18 +414,18 @@ public abstract class Dynamics<X> extends Collisions<X> {
         }
     }
 
-    protected void updateVehicles(float timeStep) {
-        BulletStats.pushProfile("updateVehicles");
-        try {
-            for (int i = 0; i < vehicles.size(); i++) {
-                //return array[index];
-                RaycastVehicle vehicle = vehicles.get(i);
-                vehicle.updateVehicle(timeStep);
-            }
-        } finally {
-            BulletStats.popProfile();
-        }
-    }
+//    protected void updateVehicles(float timeStep) {
+//        BulletStats.pushProfile("updateVehicles");
+//        try {
+//            for (int i = 0; i < vehicles.size(); i++) {
+//                //return array[index];
+//                RaycastVehicle vehicle = vehicles.get(i);
+//                vehicle.updateVehicle(timeStep);
+//            }
+//        } finally {
+//            BulletStats.popProfile();
+//        }
+//    }
 
     protected void updateActivationState(float timeStep) {
         BulletStats.pushProfile("updateActivationState");
@@ -493,11 +491,11 @@ public abstract class Dynamics<X> extends Collisions<X> {
     public void removeAction(ActionInterface action) {
         actions.remove(action);
     }
-
-
-    public void addVehicle(RaycastVehicle vehicle) {
-        vehicles.add(vehicle);
-    }
+//
+//
+//    public void addVehicle(RaycastVehicle vehicle) {
+//        vehicles.add(vehicle);
+//    }
 
 
     protected synchronized void internalSingleStepSimulation(float timeStep) {
@@ -524,7 +522,7 @@ public abstract class Dynamics<X> extends Collisions<X> {
 
             updateActions(timeStep);
 
-            updateVehicles(timeStep);
+            //updateVehicles(timeStep);
 
             updateActivationState(timeStep);
 
@@ -553,9 +551,9 @@ public abstract class Dynamics<X> extends Collisions<X> {
     }
 
 
-    public void removeVehicle(RaycastVehicle vehicle) {
-        vehicles.remove(vehicle);
-    }
+//    public void removeVehicle(RaycastVehicle vehicle) {
+//        vehicles.remove(vehicle);
+//    }
 
     private static int getConstraintIslandId(TypedConstraint lhs) {
         int islandId;

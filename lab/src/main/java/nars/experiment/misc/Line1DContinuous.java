@@ -251,12 +251,12 @@ public class Line1DContinuous extends NAgent {
                 //new MultiThreadExecutioner(2, 2048);
                 new SingleThreadExecutioner();
 
-        Default nar = new Default(256,
+        Default nar = new Default(512,
                 conceptsPerCycle, 1, 3, rng,
                 new CaffeineIndex(new DefaultConceptBuilder(), 1024*2, 12, false, exe),
                 new FrameTime(10f), exe
         );
-        nar.compoundVolumeMax.set(16);
+        nar.compoundVolumeMax.set(12);
 
 
         nar.beliefConfidence(0.9f);

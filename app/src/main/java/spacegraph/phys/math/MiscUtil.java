@@ -23,6 +23,7 @@
 
 package spacegraph.phys.math;
 
+import nars.util.Util;
 import spacegraph.phys.util.FloatArrayList;
 import spacegraph.phys.util.IntArrayList;
 import spacegraph.phys.util.OArrayList;
@@ -133,10 +134,6 @@ public class MiscUtil {
 			if (array[i] == obj) return i;
 		}
 		return -1;
-	}
-	
-	public static float GEN_clamped(float a, float lb, float ub) {
-		return a < lb ? lb : (ub < a ? ub : a);
 	}
 
 	private static <T> void downHeap(OArrayList<T> pArr, int k, int n, Comparator<T> comparator) {

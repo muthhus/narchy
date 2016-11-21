@@ -460,19 +460,16 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
     @Override
     public final Bag<V> commit() {
 
+        float p = this.pressure;
+        this.pressure = 0; //reset pressure accumulator
+
         if (!isEmpty()) {
             float existing = this.mass;
             Consumer<BLink> a;
-            if (existing == 0) {
-                a = null; //nothing to forget
-                this.pressure = 0; //reset pending accumulator
-            } else {
-                float p = this.pressure;
-                this.pressure = 0; //reset pending accumulator
 
+            a = Forget.forget(p, existing, capacity(), Param.BAG_THRESHOLD);
 
-                a = Forget.forget(p, existing, size());
-            }
+            //if (a!=null)
 
             commit(a);
         } else {

@@ -23,7 +23,7 @@
 
 package spacegraph.phys;
 
-import com.jogamp.opengl.GL2;
+import nars.util.Util;
 import spacegraph.math.Matrix3f;
 import spacegraph.math.Quat4f;
 import spacegraph.math.v3;
@@ -34,7 +34,7 @@ import spacegraph.phys.math.*;
 import spacegraph.phys.shape.CollisionShape;
 import spacegraph.phys.util.OArrayList;
 
-import java.util.function.BiConsumer;
+import static spacegraph.math.v3.v;
 
 
 /**
@@ -81,17 +81,17 @@ public class Dynamic<X> extends Collidable<X> {
 	private float linearDamping;
 	private float angularDamping;
 
-	private boolean additionalDamping;
-	private float additionalDampingFactor;
-	private float additionalLinearDampingThresholdSqr;
-	private float additionalAngularDampingThresholdSqr;
-	private float additionalAngularDampingFactor;
+//	private boolean additionalDamping;
+//	private float additionalDampingFactor;
+//	private float additionalLinearDampingThresholdSqr;
+//	private float additionalAngularDampingThresholdSqr;
+//	private float additionalAngularDampingFactor;
 
 	private float linearSleepingThreshold;
 	private float angularSleepingThreshold;
 
-	// optionalMotionState allows to automatic synchronize the world transform for active objects
-	private MotionState optionalMotionState;
+//	// optionalMotionState allows to automatic synchronize the world transform for active objects
+//	private MotionState optionalMotionState;
 
 	// keep track of typed constraints referencing this rigid body
 	private final OArrayList<TypedConstraint> constraintRefs = new OArrayList<>();
@@ -104,22 +104,12 @@ public class Dynamic<X> extends Collidable<X> {
 	public int debugBodyId;
 
 
-	public Dynamic(RigidBodyBuilder constructionInfo) {
-		super(CollidableType.RIGID_BODY);
-		setupRigidBody(constructionInfo);
+	public Dynamic(float mass, Transform t, CollisionShape collisionShape) {
+		this(mass, t, collisionShape, v());
 	}
 
-	public Dynamic(float mass, MotionState motionState, CollisionShape collisionShape) {
-		this(mass, motionState, collisionShape, new v3(0f, 0f, 0f));
-	}
-
-	public Dynamic(float mass, MotionState motionState, CollisionShape collisionShape, v3 localInertia) {
-		super(CollidableType.RIGID_BODY);
-		RigidBodyBuilder cinfo = new RigidBodyBuilder(mass, motionState, collisionShape, localInertia);
-		setupRigidBody(cinfo);
-	}
-
-	private void setupRigidBody(RigidBodyBuilder constructionInfo) {
+	public Dynamic(float mass, Transform t, CollisionShape collisionShape, v3 localInertia) {
+		super(CollidableType.RIGID_BODY, t);
 
 		linearVelocity.set(0f, 0f, 0f);
 		angularVelocity.set(0f, 0f, 0f);
@@ -127,40 +117,60 @@ public class Dynamic<X> extends Collidable<X> {
 		gravity.set(0f, 0f, 0f);
 		totalForce.set(0f, 0f, 0f);
 		totalTorque.set(0f, 0f, 0f);
+
+
+		float linearSleepingThreshold = 0.8f;
+		float angularSleepingThreshold = 1.0f;
+
+
 		linearDamping = 0f;
 		angularDamping = 0.5f;
-		linearSleepingThreshold = constructionInfo.linearSleepingThreshold;
-		angularSleepingThreshold = constructionInfo.angularSleepingThreshold;
-		optionalMotionState = constructionInfo.motionState;
+		this.linearSleepingThreshold = linearSleepingThreshold;
+		this.angularSleepingThreshold = angularSleepingThreshold;
+		//this.optionalMotionState = motionState;
 		contactSolverType = 0;
 		frictionSolverType = 0;
-		additionalDamping = constructionInfo.additionalDamping;
-		additionalDampingFactor = constructionInfo.additionalDampingFactor;
-		additionalLinearDampingThresholdSqr = constructionInfo.additionalLinearDampingThresholdSqr;
-		additionalAngularDampingThresholdSqr = constructionInfo.additionalAngularDampingThresholdSqr;
-		additionalAngularDampingFactor = constructionInfo.additionalAngularDampingFactor;
 
-		if (optionalMotionState != null)
-		{
-			optionalMotionState.getWorldTransform(worldTransform);
-		} else
-		{
-			worldTransform.set(constructionInfo.startWorldTransform);
-		}
+		/**
+		 * Additional damping can help avoiding lowpass jitter motion, help stability for ragdolls etc.
+		 * Such damping is undesirable, so once the overall simulation quality of the rigid body dynamics
+		 * system has improved, this should become obsolete.
+		 */
+//		float additionalDampingFactor = 0.005f;
+//		float additionalLinearDampingThresholdSqr = 0.01f;
+//		float additionalAngularDampingThresholdSqr = 0.01f;
+//		float additionalAngularDampingFactor = 0.01f;
+
+//		this.additionalDamping = false;
+//		this.additionalDampingFactor = additionalDampingFactor;
+//		this.additionalLinearDampingThresholdSqr = additionalLinearDampingThresholdSqr;
+//		this.additionalAngularDampingThresholdSqr = additionalAngularDampingThresholdSqr;
+//		this.additionalAngularDampingFactor = additionalAngularDampingFactor;
+
+//		if (optionalMotionState != null)
+//		{
+//			optionalMotionState.getWorldTransform(worldTransform);
+//		} else
+//		{
+			this.worldTransform.setIdentity();
+//		}
 
 		interpolationWorldTransform.set(worldTransform);
 		interpolationLinearVelocity.set(0f, 0f, 0f);
 		interpolationAngularVelocity.set(0f, 0f, 0f);
 
-		// moved to CollisionObject
-		friction = constructionInfo.friction;
-		restitution = constructionInfo.restitution;
 
-		setCollisionShape(constructionInfo.collisionShape);
+		/** Best simulation results when friction is non-zero. */
+		friction = 0.5f;
+
+		/** Best simulation results using zero restitution. */
+		restitution = 0f;
+
+		setCollisionShape(collisionShape);
 		debugBodyId = uniqueId++;
 
-		setMassProps(constructionInfo.mass, constructionInfo.localInertia);
-		setDamping(constructionInfo.linearDamping, constructionInfo.angularDamping);
+		setMassProps(mass, localInertia);
+		setDamping(0,0);
 		updateInertiaTensor();
 	}
 	
@@ -203,10 +213,10 @@ public class Dynamic<X> extends Collidable<X> {
 
 		//todo: clamp to some (user definable) safe minimum timestep, to limit maximum angular/linear velocities
 		if (timeStep != 0f) {
-			//if we use motionstate to synchronize world transforms, get the new kinematic/animated world transform
-            if (optionalMotionState != null) {
-                optionalMotionState.getWorldTransform(worldTransform);
-			}
+//			//if we use motionstate to synchronize world transforms, get the new kinematic/animated world transform
+//            if (optionalMotionState != null) {
+//                optionalMotionState.getWorldTransform(worldTransform);
+//			}
 			//Vector3f linVel = new Vector3f(), angVel = new Vector3f();
 
 			TransformUtil.calculateVelocity(interpolationWorldTransform, worldTransform, timeStep, linearVelocity, angularVelocity);
@@ -237,8 +247,8 @@ public class Dynamic<X> extends Collidable<X> {
 	}
 
 	public void setDamping(float lin_damping, float ang_damping) {
-		linearDamping = MiscUtil.GEN_clamped(lin_damping, 0f, 1f);
-		angularDamping = MiscUtil.GEN_clamped(ang_damping, 0f, 1f);
+		linearDamping = Util.clamp(lin_damping, 0f, 1f);
+		angularDamping = Util.clamp(ang_damping, 0f, 1f);
 	}
 
 	public float getLinearDamping() {
@@ -269,47 +279,49 @@ public class Dynamic<X> extends Collidable<X> {
 		//linearVelocity.scale(MiscUtil.GEN_clamped((1f - timeStep * linearDamping), 0f, 1f));
 		//angularVelocity.scale(MiscUtil.GEN_clamped((1f - timeStep * angularDamping), 0f, 1f));
 		//#else
-		linearVelocity.scale((float) Math.pow(1f - linearDamping, timeStep));
-		angularVelocity.scale((float) Math.pow(1f - angularDamping, timeStep));
+		if (linearDamping > 0)
+			linearVelocity.scale((float) Math.pow(1f - linearDamping, timeStep));
+		if (angularDamping > 0)
+			angularVelocity.scale((float) Math.pow(1f - angularDamping, timeStep));
 		//#endif
 
-		if (additionalDamping) {
-			// Additional damping can help avoiding lowpass jitter motion, help stability for ragdolls etc.
-			// Such damping is undesirable, so once the overall simulation quality of the rigid body dynamics system has improved, this should become obsolete
-			if ((angularVelocity.lengthSquared() < additionalAngularDampingThresholdSqr) &&
-					(linearVelocity.lengthSquared() < additionalLinearDampingThresholdSqr)) {
-				angularVelocity.scale(additionalDampingFactor);
-				linearVelocity.scale(additionalDampingFactor);
-			}
-
-			float speed = linearVelocity.length();
-			if (speed < linearDamping) {
-				float dampVel = 0.005f;
-				if (speed > dampVel) {
-					v3 dir = new v3(linearVelocity);
-					dir.normalize();
-					dir.scale(dampVel);
-					linearVelocity.sub(dir);
-				}
-				else {
-					linearVelocity.set(0f, 0f, 0f);
-				}
-			}
-
-			float angSpeed = angularVelocity.length();
-			if (angSpeed < angularDamping) {
-				float angDampVel = 0.005f;
-				if (angSpeed > angDampVel) {
-					v3 dir = new v3(angularVelocity);
-					dir.normalize();
-					dir.scale(angDampVel);
-					angularVelocity.sub(dir);
-				}
-				else {
-					angularVelocity.set(0f, 0f, 0f);
-				}
-			}
-		}
+//		if (additionalDamping) {
+//			// Additional damping can help avoiding lowpass jitter motion, help stability for ragdolls etc.
+//			// Such damping is undesirable, so once the overall simulation quality of the rigid body dynamics system has improved, this should become obsolete
+//			if ((angularVelocity.lengthSquared() < additionalAngularDampingThresholdSqr) &&
+//					(linearVelocity.lengthSquared() < additionalLinearDampingThresholdSqr)) {
+//				angularVelocity.scale(additionalDampingFactor);
+//				linearVelocity.scale(additionalDampingFactor);
+//			}
+//
+//			float speed = linearVelocity.length();
+//			if (speed < linearDamping) {
+//				float dampVel = 0.005f;
+//				if (speed > dampVel) {
+//					v3 dir = new v3(linearVelocity);
+//					dir.normalize();
+//					dir.scale(dampVel);
+//					linearVelocity.sub(dir);
+//				}
+//				else {
+//					linearVelocity.set(0f, 0f, 0f);
+//				}
+//			}
+//
+//			float angSpeed = angularVelocity.length();
+//			if (angSpeed < angularDamping) {
+//				float angDampVel = 0.005f;
+//				if (angSpeed > angDampVel) {
+//					v3 dir = new v3(angularVelocity);
+//					dir.normalize();
+//					dir.scale(angDampVel);
+//					angularVelocity.sub(dir);
+//				}
+//				else {
+//					angularVelocity.set(0f, 0f, 0f);
+//				}
+//			}
+//		}
 	}
 
 	public void setMassProps(float mass, v3 inertia) {
@@ -561,16 +573,16 @@ public class Dynamic<X> extends Collidable<X> {
 	}
 
 
-	public MotionState getMotionState() {
-		return optionalMotionState;
-	}
+//	public MotionState getMotionState() {
+//		return optionalMotionState;
+//	}
 
-	public void setMotionState(MotionState motionState) {
-		this.optionalMotionState = motionState;
-		if (optionalMotionState != null) {
-			motionState.getWorldTransform(worldTransform);
-		}
-	}
+//	public void setMotionState(MotionState motionState) {
+//		this.optionalMotionState = motionState;
+//		if (optionalMotionState != null) {
+//			motionState.getWorldTransform(worldTransform);
+//		}
+//	}
 
 	public void setAngularFactor(float angFac) {
 		angularFactor = angFac;

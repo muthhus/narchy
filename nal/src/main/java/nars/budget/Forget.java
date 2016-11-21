@@ -15,7 +15,7 @@ public final class Forget implements Consumer<BLink> {
 
     public final float r;
 
-    static final float maxEffectiveDurability = 1f;
+    static final float maxEffectiveQuality = 1f;
 
     public Forget(float r) {
         this.r = r;
@@ -28,36 +28,27 @@ public final class Forget implements Consumer<BLink> {
      forgetRate ~= -((capacity * avgMass) - pressure - existingMass) / existingMass
      */
     @Nullable
-    public static Forget forget(float pressure, float existingMass, int size, float expectedAvgMass) {
+    public static Forget forget(float pressure, float existingMass, int num, float expectedAvgMass) {
 
-        float r = pressure > 0 ? -((size * expectedAvgMass) - pressure - existingMass) / existingMass : 0;
+        float r = pressure > 0 ?
+                -((num * expectedAvgMass) - pressure - existingMass) / existingMass :
+                0;
 
         //float pressurePlusOversize = pressure + Math.max(0, expectedAvgMass * size - existingMass);
         //float r = (pressurePlusOversize) / (pressurePlusOversize + existingMass*4f /* momentum*/);
 
         //System.out.println(pressure + " " + existingMass + "\t" + r);
-
-        Forget f;
-        if (r >= Param.BUDGET_EPSILON)
-            f = new Forget(Util.unitize(r));
-        else
-            f = null;
-        return f;
-    }
-
-    @Nullable
-    public static Forget forget(float pressure, float existingMass, int siz) {
-        return forget(pressure, existingMass, siz, Param.BAG_THRESHOLD);
+        return r >= Param.BUDGET_EPSILON ? new Forget(Util.unitize(r)) : null;
     }
 
     @Override
     public void accept(@NotNull BLink bLink) {
         float p = bLink.pri();
-        if (p == p) {
-            float d = bLink.qua();
-            bLink.setPriority(p * (1f - (r * (1f - d * maxEffectiveDurability))));
-            //float d = or(bLink.dur(), bLink.qua());
-            //float d = Math.max(bLink.dur(), bLink.qua());
+        if ((p == p) && p > 0) {
+            float q = bLink.qua();
+            //bLink.setPriority(p * (1f - (r * (1f - q * maxEffectiveQuality))));
+            bLink.setPriority(p - (r * (1f - q * maxEffectiveQuality)));
+
         }
     }
 

@@ -67,7 +67,6 @@ public abstract class Spatial<X> implements Active {
     public boolean preactive;
 
 
-    /** returns true if this is an initialization cycle, or false if it is a subsequent one (already initialized) */
     public void update(SpaceGraph<X> s) {
         preactive = true;
     }
@@ -94,8 +93,10 @@ public abstract class Spatial<X> implements Active {
         return preactive;
     }
 
-    public final void reactivate(boolean b) {
+    public void reactivate(boolean b) {
+
         this.preactive = b;
+
     }
 
 

@@ -48,7 +48,7 @@ public class Collidable<X> {
 	public static final int WANTS_DEACTIVATION = 3;
 	public static final int DISABLE_DEACTIVATION = 4;
 	public static final int DISABLE_SIMULATION = 5;
-	protected final Transform worldTransform = new Transform();
+	public final Transform worldTransform;
 
 	///m_interpolationWorldTransform is used for CCD and interpolation
 	///it can be either previous or future (predicted) transform
@@ -65,7 +65,7 @@ public class Collidable<X> {
 	// rootCollisionShape is temporarily used to store the original collision shape
 	// The collisionShape might be temporarily replaced by a child collision shape during collision detection purposes
 	// If it is null, the collisionShape is not temporarily replaced.
-	protected CollisionShape rootCollisionShape;
+	//protected CollisionShape rootCollisionShape;
 
 	protected int collisionFlags;
 	protected int islandTag1;
@@ -93,11 +93,11 @@ public class Collidable<X> {
 	protected boolean checkCollideWith;
 
 
-	public Collidable() {
-		this(CollidableType.COLLISION_OBJECT);
+	public Collidable(Transform t) {
+		this(CollidableType.COLLISION_OBJECT, t);
 	}
 
-	public Collidable(CollidableType type) {
+	public Collidable(CollidableType type, Transform t) {
 		this.internalType = type;
 		this.collisionFlags = CollisionFlags.STATIC_OBJECT;
 		this.islandTag1 = -1;
@@ -105,6 +105,7 @@ public class Collidable<X> {
 		this.activationState1 = 1;
 		this.friction = 0.5f;
 		this.hitFraction = 1f;
+		this.worldTransform = t;
 	}
 
 	public final Transform transform() {
@@ -142,12 +143,12 @@ public class Collidable<X> {
 
 	public void setCollisionShape(CollisionShape collisionShape) {
 		this.collisionShape = collisionShape;
-		this.rootCollisionShape = collisionShape;
+		//this.rootCollisionShape = collisionShape;
 	}
 
-	public CollisionShape getRootCollisionShape() {
-		return rootCollisionShape;
-	}
+//	public CollisionShape getRootCollisionShape() {
+//		return rootCollisionShape;
+//	}
 
 	/**
 	 * Avoid using this internal API call.

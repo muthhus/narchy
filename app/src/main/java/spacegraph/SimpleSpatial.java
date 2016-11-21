@@ -27,7 +27,7 @@ public class SimpleSpatial<X> extends AbstractSpatial<X> {
 
 
     /** physics motion state */
-    public final Motion motion = new Motion();
+    //public final Motion motion = new Motion();
     private final String label;
     protected CollisionShape shape;
 
@@ -35,9 +35,10 @@ public class SimpleSpatial<X> extends AbstractSpatial<X> {
     public boolean motionLock;
 
     public float radius;
-    private List<Collidable> bodies = Collections.emptyList();
+
 
     public final float[] shapeColor;
+    private final Transform transform = new Transform();
 
     public SimpleSpatial(X x) {
         super(x);
@@ -74,7 +75,8 @@ public class SimpleSpatial<X> extends AbstractSpatial<X> {
 
     public final Transform transform() {
         Dynamic b = this.body;
-        return b == null ? motion.t : b.transform();
+        //return b == null ? motion.t : b.transform();
+        return transform;
     }
 
     public void moveX(float x, float rate) {
@@ -108,7 +110,7 @@ public class SimpleSpatial<X> extends AbstractSpatial<X> {
     public SimpleSpatial move(float x, float y, float z) {
         if (!motionLock) {
             transform().set(x, y, z);
-            reactivate();
+            //reactivate();
         }
         return this;
     }
@@ -138,21 +140,9 @@ public class SimpleSpatial<X> extends AbstractSpatial<X> {
 
 
     public void reactivate() {
-        Dynamic b = body;
-        if (b !=null/* && !b.isActive()*/)
-            b.activate(collidable());
+        body.activate(collidable());
     }
 
-    @Override
-    public void update(SpaceGraph<X> s) {
-        super.update(s);
-        if (body == null) {
-            next(s);
-        } else {
-            body.activate();
-        }
-
-    }
 
     public void moveDelta(v3 v, float speed) {
         moveDelta(v.x, v.y, v.z, speed);
@@ -193,7 +183,7 @@ public class SimpleSpatial<X> extends AbstractSpatial<X> {
     public Dynamic newBody(boolean collidesWithOthersLikeThis) {
         Dynamic b = Dynamics.newBody(
                 mass(), //mass
-                shape, motion,
+                shape, transform,//motion,
                 +1, //group
                 collidesWithOthersLikeThis ? -1 : -1 & ~(+1) //exclude collisions with self
         );
@@ -248,30 +238,23 @@ public class SimpleSpatial<X> extends AbstractSpatial<X> {
 
     @Override
     public void update(Dynamics world) {
-        if (bodies.isEmpty()) {
-            this.bodies = Collections.singletonList( create(world) );
-        } else {
-            next(world);
+        if (body == null) {
+            this.body = create(world);
         }
     }
 
-    protected void next(Dynamics world) {
 
-    }
 
     protected Dynamic create(Dynamics world) {
-        Dynamic b = body = newBody(collidable());
+        Dynamic b = newBody(collidable());
         b.setData(this);
         return b;
     }
 
-    protected void next(SpaceGraph<X> s) {
-
-    }
 
     @Override
     public void stop() {
-        body = null;
+        //body = null;
     }
 
     @Override
@@ -282,6 +265,8 @@ public class SimpleSpatial<X> extends AbstractSpatial<X> {
 
     @Override
     public void forEachBody(Consumer<Collidable> c) {
-        bodies.forEach(c);
+        Dynamic b = this.body;
+        if (b !=null)
+            c.accept(b);
     }
 }

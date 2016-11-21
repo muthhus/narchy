@@ -59,7 +59,7 @@ public abstract class Param /*extends Container*/ implements Level {
     public static final boolean BACKWARD_QUESTION_RULES = true;
 
 
-    /** average priority target for bag forgetting, between 0 and 1 usually 0.25..0.5 for balance */
+    /** average priority target for bag forgetting */
     public static final float BAG_THRESHOLD = (0.5f);
 
     /** conjunctions over this length will be ineligible for 2nd-layer termlink templates. it can be decomposed however, and decompositions of this size or less will be eligible. */
