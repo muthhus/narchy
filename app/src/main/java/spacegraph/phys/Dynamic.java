@@ -30,7 +30,9 @@ import spacegraph.math.v3;
 import spacegraph.phys.collision.CollidableType;
 import spacegraph.phys.collision.CollisionFlags;
 import spacegraph.phys.constraint.TypedConstraint;
-import spacegraph.phys.math.*;
+import spacegraph.phys.math.MatrixUtil;
+import spacegraph.phys.math.Transform;
+import spacegraph.phys.math.TransformUtil;
 import spacegraph.phys.shape.CollisionShape;
 import spacegraph.phys.util.OArrayList;
 

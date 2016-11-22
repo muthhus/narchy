@@ -26,7 +26,6 @@
 
 package spacegraph.obj;
 
-import com.jogamp.opengl.GL2;
 import spacegraph.math.v3;
 import spacegraph.phys.Dynamic;
 import spacegraph.phys.Dynamics;
@@ -38,8 +37,6 @@ import spacegraph.phys.shape.BoxShape;
 import spacegraph.phys.shape.CapsuleShape;
 import spacegraph.phys.shape.CollisionShape;
 import spacegraph.phys.util.BulletStack;
-import spacegraph.phys.util.Motion;
-import spacegraph.render.Draw;
 import spacegraph.render.JoglPhysics;
 import spacegraph.render.JoglPhysics.ExtraGlobals;
 

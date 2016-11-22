@@ -16,10 +16,12 @@ import nars.truth.Truth;
 import nars.util.Iterative;
 import org.eclipse.collections.api.block.function.primitive.FloatFunction;
 import org.jetbrains.annotations.Nullable;
-import spacegraph.*;
+import spacegraph.Ortho;
+import spacegraph.SimpleSpatial;
+import spacegraph.SpaceGraph;
+import spacegraph.Surface;
 import spacegraph.layout.Flatten;
 import spacegraph.layout.ForceDirected;
-import spacegraph.layout.Spiral;
 import spacegraph.math.Color3f;
 import spacegraph.math.v3;
 import spacegraph.obj.CrosshairSurface;
@@ -88,7 +90,7 @@ public class Vis {
             btRange[1] = now + window;
         });
         List<Surface> s = ii.stream().map(c -> new BeliefTableChart(nar, c, btRange)).collect(toList());
-        return new Grid(VERTICAL, s);
+        return new Grid(1/3f,s);
     }
 
 

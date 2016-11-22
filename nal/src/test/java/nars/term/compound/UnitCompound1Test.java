@@ -5,7 +5,6 @@ import nars.index.term.tree.TermKey;
 import nars.term.Compound;
 import nars.term.atom.Atomic;
 import nars.term.container.TermVector;
-import nars.util.Util;
 import org.junit.Test;
 
 import java.util.Arrays;

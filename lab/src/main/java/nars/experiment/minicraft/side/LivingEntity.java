@@ -21,8 +21,8 @@ public abstract class LivingEntity extends Entity {
 	public boolean facingRight = true;
 	public final Inventory inventory;
 	
-	protected static final float walkSpeed = .1f;
-	protected static final float swimSpeed = .04f;
+	protected static final float walkSpeed = .5f;
+	protected static final float swimSpeed = .08f;
 	protected final float armLength = 4.5f;
 	protected float moveDirection;
 	protected long ticksAlive;

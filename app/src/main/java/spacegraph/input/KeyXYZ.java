@@ -1,6 +1,5 @@
 package spacegraph.input;
 
-import com.jogamp.newt.event.KeyEvent;
 import spacegraph.math.v3;
 import spacegraph.render.JoglPhysics;
 

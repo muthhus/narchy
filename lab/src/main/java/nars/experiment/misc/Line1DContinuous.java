@@ -6,7 +6,6 @@ import nars.NAgent;
 import nars.Param;
 import nars.concept.ActionConcept;
 import nars.concept.SensorConcept;
-import nars.gui.Vis;
 import nars.index.term.map.CaffeineIndex;
 import nars.nar.Default;
 import nars.nar.exe.Executioner;

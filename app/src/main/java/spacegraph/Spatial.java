@@ -1,17 +1,14 @@
 package spacegraph;
 
 import com.jogamp.opengl.GL2;
-import nars.util.event.Ons;
 import org.jetbrains.annotations.Nullable;
 import spacegraph.math.v3;
 import spacegraph.phys.Collidable;
-import spacegraph.phys.Dynamic;
 import spacegraph.phys.Dynamics;
 import spacegraph.phys.collision.ClosestRay;
 import spacegraph.phys.constraint.TypedConstraint;
 
 import java.util.List;
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 /**

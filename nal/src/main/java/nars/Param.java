@@ -8,7 +8,6 @@ import nars.util.Util;
 import nars.util.data.FloatParam;
 import nars.util.data.MutableInteger;
 import nars.util.data.Range;
-import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

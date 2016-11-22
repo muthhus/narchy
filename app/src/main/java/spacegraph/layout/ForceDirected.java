@@ -9,7 +9,6 @@ import spacegraph.phys.Dynamic;
 import spacegraph.phys.collision.broad.Broadphase;
 import spacegraph.phys.util.OArrayList;
 
-import java.util.Collection;
 import java.util.List;
 
 import static spacegraph.math.v3.v;

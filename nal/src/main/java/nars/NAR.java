@@ -37,7 +37,6 @@ import nars.time.Tense;
 import nars.time.Time;
 import nars.truth.Truth;
 import nars.util.Iterative;
-import nars.util.data.FloatParam;
 import nars.util.data.MutableInteger;
 import nars.util.event.DefaultTopic;
 import nars.util.event.On;

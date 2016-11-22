@@ -107,10 +107,11 @@ abstract public class NAgent implements NSense, NAction {
 
     public float rewardValue;
 
+    /** scaled to 1/num predictors */
     float predictorProbability = 1f;
 
     public final List<MutableTask> predictors = $.newArrayList();
-    public final FloatParam predictorPriority = new FloatParam(1); //0.25f;
+    public final FloatParam predictorPriority = new FloatParam(1);
 
     public boolean trace = false;
 
@@ -599,6 +600,7 @@ abstract public class NAgent implements NSense, NAction {
                 //UtilityFunctions.aveAri(nar.priorityDefault('.'), nar.priorityDefault('!'))
                        ///* / (predictors.size()/predictorProbability)*/ * predictorPriFactor;
 
+
         if (pri > 0) {
             for (int i = 0, predictorsSize = predictors.size(); i < predictorsSize; i++) {
                 predictors.set(i, boost(predictors.get(i), pri));
@@ -656,7 +658,7 @@ abstract public class NAgent implements NSense, NAction {
 
     private MutableTask boost(@NotNull MutableTask t, float p) {
 
-        if (nar.random.nextFloat() > predictorProbability)
+        if (nar.random.nextFloat() > predictorProbability/ predictors.size())
             return t;
 
         MutableTask s;

@@ -1,7 +1,5 @@
 package spacegraph.obj;
 
-import spacegraph.phys.shape.SimpleBoxShape;
-import spacegraph.source.ListSpace;
 import spacegraph.SimpleSpatial;
 import spacegraph.SpaceGraph;
 import spacegraph.layout.Flatten;
@@ -10,6 +8,8 @@ import spacegraph.obj.widget.XYSlider;
 import spacegraph.phys.Dynamic;
 import spacegraph.phys.Dynamics;
 import spacegraph.phys.constraint.DistanceConstraint;
+import spacegraph.phys.shape.SimpleBoxShape;
+import spacegraph.source.ListSpace;
 
 /**
  * Created by me on 7/23/16.

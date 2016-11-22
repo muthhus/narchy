@@ -289,7 +289,7 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
     }
 
     final float rankTemporalByConfidence(@Nullable Task t, long when) {
-        return t == null ? -1 : t.confWeight(when);
+        return t == null ? -1 : t.confWeight(when) * (1f+t.range());
                 //* (t.dur()+1);
     }
 
@@ -302,22 +302,26 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
 
         //prefer (when selecting by minimum rank:)
         //  less freq delta
-        //  less confidence
         //  less time delta
         //  more time from now
+        //  less range
 
-        long yo = y.occurrence();
+        long yo = y.mid();
         float yf = y.freq();
 
         return x -> {
             if (x == y)
                 return Float.NEGATIVE_INFINITY;
 
-            long xo = x.occurrence();
+            long xo = x.mid();
+//            float xtc = x.conf(yo);
+//            if (xtc!=xtc) xtc = 0;
 
             return (1f + (1f - Math.abs(x.freq() - yf)))
-                    * (1f + (1f - x.conf(now)))
-                    * (1f + TruthPolation.evidenceDecay(1, dur, Math.abs(xo-yo)));
+                    //* (1f + (1f - xtc))
+                    * (1f + 1f/(1f+x.range()))
+                    * (1f + 1f/(1f+x.dur()))
+                    * (1f + TruthPolation.evidenceDecay(1, dur, Math.abs(xo - now) + Math.abs(xo-yo)));
         };
 
     }

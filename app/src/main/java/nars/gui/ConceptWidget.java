@@ -9,16 +9,15 @@ import nars.link.BLink;
 import nars.term.Term;
 import nars.term.Termed;
 import org.jetbrains.annotations.NotNull;
-import spacegraph.obj.EDraw;
 import spacegraph.SimpleSpatial;
 import spacegraph.SpaceGraph;
+import spacegraph.obj.EDraw;
 import spacegraph.phys.Dynamic;
 import spacegraph.render.Draw;
 
 import java.util.HashMap;
 import java.util.function.Consumer;
 
-import static nars.util.Util.sqr;
 import static spacegraph.math.v3.v;
 
 

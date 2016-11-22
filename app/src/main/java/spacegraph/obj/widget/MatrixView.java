@@ -9,15 +9,15 @@ import spacegraph.render.Draw;
 /**
  * Created by me on 7/29/16.
  */
-public class MatrixView extends Surface {
+public class MatrixView extends Widget {
 
     private static final Logger logger = LoggerFactory.getLogger(MatrixView.class);
 
     private final int w;
     private final int h;
-    private final ViewFunc view;
+    private final ViewFunction2D view;
 
-    public static ViewFunc arrayRenderer(float[][] ww) {
+    public static ViewFunction2D arrayRenderer(float[][] ww) {
         return (x, y, gl) -> {
             float v = ww[x][y];
             Draw.colorPolarized(gl, v);
@@ -25,7 +25,15 @@ public class MatrixView extends Surface {
         };
     }
 
-    public interface ViewFunc {
+    public interface ViewFunction1D {
+        /**
+         * updates the GL state for each visited matrix cell (ex: gl.glColor...)
+         * before a rectangle is drawn at the returned z-offset
+         */
+        float update(float x, GL2 gl);
+    }
+
+    public interface ViewFunction2D {
         /**
          * updates the GL state for each visited matrix cell (ex: gl.glColor...)
          * before a rectangle is drawn at the returned z-offset
@@ -36,17 +44,28 @@ public class MatrixView extends Surface {
     protected MatrixView(int w, int h) {
         this.w = w;
         this.h = h;
-        this.view = (ViewFunc)this;
+        this.view = (ViewFunction2D)this;
     }
 
-    public MatrixView(int w, int h, ViewFunc view) {
+    public MatrixView(int w, int h, ViewFunction2D view) {
         this.w = w;
         this.h = h;
         this.view = view;
     }
 
+    public MatrixView(double[] d, int stride, ViewFunction1D view) {
+        this((int)Math.ceil((float)Math.ceil(d.length/stride)), stride, (x, y, gl) -> {
+            int i = y * stride + x;
+            if (i < d.length)
+                return view.update((float)d[i], gl);
+            else
+                return Float.NaN;
+        });
+    }
+
+
     @Override
-    protected void paint(GL2 gl) {
+    protected void paintComponent(GL2 gl) {
 
         float h = this.h;
         float w = this.w;
@@ -75,6 +94,7 @@ public class MatrixView extends Surface {
 //            //border
 //            gl.glColor4f(1f, 1f, 1f, 1f);
 //            Draw.strokeRect(gl, 0, 0, tw + dw, th + dh);
+
     }
 
 

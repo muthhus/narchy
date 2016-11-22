@@ -1,7 +1,5 @@
 package spacegraph.render;
 
-import com.jogamp.newt.NewtFactory;
-import com.jogamp.newt.Window;
 import com.jogamp.newt.event.*;
 import com.jogamp.newt.opengl.GLWindow;
 import com.jogamp.opengl.*;

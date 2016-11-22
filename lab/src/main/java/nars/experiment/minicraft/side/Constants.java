@@ -61,7 +61,7 @@ public class Constants {
 	public static final int LIGHT_VALUE_TORCH = 13;
 	public static final int LIGHT_VALUE_SUN = 15;
 	// not final so that we can set it via command-line arg
-	public static boolean DEBUG;
-	public static final boolean DEBUG_VISIBILITY_ON = false;
+	public static boolean DEBUG = true;
+	public static final boolean DEBUG_VISIBILITY_ON = true;
 	public static final int LIGHT_VALUE_OPAQUE = 10000;
 }

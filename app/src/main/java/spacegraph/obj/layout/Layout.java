@@ -2,7 +2,6 @@ package spacegraph.obj.layout;
 
 import com.google.common.collect.Lists;
 import com.jogamp.newt.event.KeyEvent;
-import com.jogamp.opengl.GL2;
 import org.jetbrains.annotations.Nullable;
 import spacegraph.Surface;
 import spacegraph.math.v2;

@@ -5,7 +5,6 @@ import spacegraph.phys.Dynamic;
 import spacegraph.phys.Dynamics;
 import spacegraph.phys.math.Transform;
 import spacegraph.phys.shape.*;
-import spacegraph.phys.util.Motion;
 
 import java.nio.ByteBuffer;
 

@@ -31,7 +31,6 @@ import spacegraph.phys.collision.broad.BroadphaseNativeType;
 import spacegraph.phys.math.AabbUtil2;
 import spacegraph.phys.math.ScalarUtil;
 import spacegraph.phys.math.Transform;
-import spacegraph.phys.math.VectorUtil;
 
 /**
  * BoxShape is a box primitive around the origin, its sides axis aligned with length

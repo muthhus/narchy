@@ -3,17 +3,16 @@ package nars.gui;
 import nars.NAR;
 import nars.nar.Default;
 import nars.term.Term;
-import nars.term.Termed;
 import nars.test.DeductiveMeshTest;
 import nars.util.event.On;
 import nars.util.list.FasterList;
 import org.eclipse.collections.impl.set.mutable.UnifiedSet;
-import spacegraph.*;
+import spacegraph.Active;
+import spacegraph.SpaceGraph;
+import spacegraph.Spatial;
 import spacegraph.source.ListSpace;
 
 import java.util.Collection;
-import java.util.LinkedHashSet;
-import java.util.List;
 
 
 /**

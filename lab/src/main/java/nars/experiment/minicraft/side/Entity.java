@@ -16,7 +16,7 @@ public abstract class Entity implements java.io.Serializable {
 	private static final long serialVersionUID = 1L;
 	
 	protected static final float gravityAcceleration = .03f;
-	protected static final float waterAcceleration = .015f;
+	protected static final float waterAcceleration = .03f;
 	protected static final float maxWaterDY = .05f;
 	
 	public float x;

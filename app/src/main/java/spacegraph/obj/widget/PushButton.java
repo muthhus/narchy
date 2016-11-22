@@ -1,6 +1,5 @@
 package spacegraph.obj.widget;
 
-import com.jogamp.opengl.GL2;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Consumer;

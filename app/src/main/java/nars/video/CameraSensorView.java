@@ -11,7 +11,7 @@ import spacegraph.obj.widget.MatrixView;
  * displays a CameraSensor pixel data as perceived through its concepts (belief/goal state)
  * monochrome
  */
-public class CameraSensorView extends MatrixView implements MatrixView.ViewFunc {
+public class CameraSensorView extends MatrixView implements MatrixView.ViewFunction2D {
 
     private final Sensor2D cam;
     private final NAR nar;

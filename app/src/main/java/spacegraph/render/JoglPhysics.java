@@ -34,7 +34,6 @@ import nars.$;
 import org.eclipse.collections.api.block.predicate.primitive.IntObjectPredicate;
 import org.jetbrains.annotations.NotNull;
 import spacegraph.Spatial;
-import spacegraph.math.Color3f;
 import spacegraph.math.v3;
 import spacegraph.phys.Collidable;
 import spacegraph.phys.Dynamic;
@@ -49,11 +48,9 @@ import spacegraph.phys.math.DebugDrawModes;
 import spacegraph.phys.math.Transform;
 import spacegraph.phys.shape.CollisionShape;
 import spacegraph.phys.util.AnimVector3f;
-import spacegraph.phys.util.Motion;
 
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import static com.jogamp.opengl.GL.GL_NICEST;

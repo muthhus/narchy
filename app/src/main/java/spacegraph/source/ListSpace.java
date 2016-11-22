@@ -4,11 +4,9 @@ import nars.util.list.FasterList;
 import org.eclipse.collections.api.block.predicate.primitive.IntObjectPredicate;
 import spacegraph.AbstractSpace;
 import spacegraph.SpaceGraph;
-import spacegraph.Spatial;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.function.Consumer;
 
 

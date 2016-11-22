@@ -14,7 +14,6 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.atom.AtomicStringConstant;
-import nars.term.compound.GenericCompound;
 import nars.term.util.InvalidTermException;
 import nars.time.TimeFunctions;
 import nars.truth.Truth;

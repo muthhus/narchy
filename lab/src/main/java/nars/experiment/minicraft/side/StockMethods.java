@@ -12,6 +12,8 @@
 
 package nars.experiment.minicraft.side;
 
+import nars.util.Util;
+
 public final class StockMethods {
 	public static Boolean onScreen = true;
 	public static final Int2 pos = new Int2(0, 0);
@@ -53,23 +55,9 @@ public final class StockMethods {
 	 * @param x
 	 */
 	public static float smoothStep(float edge0, float edge1, float x) {
-		float t = clamp((x - edge0) / (edge1 - edge0), 0f, 1f);
+		float t = Util.clamp((x - edge0) / (edge1 - edge0), 0f, 1f);
 		return t * t * (3f - 2f * t);
 	}
 	
-	/**
-	 * Clamps x to values [a,b]
-	 * @param x
-	 * @param a
-	 * @param b
-	 */
-	public static float clamp(float x, float a, float b) {
-		if (x < a) {
-			return a;
-		} else if (x > b) {
-			return b;
-		} else {
-			return x;
-		}
-	}
+
 }

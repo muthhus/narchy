@@ -9,8 +9,11 @@ import java.util.Random;
 import static org.apache.commons.math3.util.MathArrays.scaleInPlace;
 
 public class SimpleLSTM extends AgentSupervised {
-	
-	private final double init_weight_range = 0.1;
+
+	public double[] out;
+	public double[] in;
+
+	private final double init_weight_range = 0.5;
 
 	private final int full_input_dimension;
 	private final int output_dimension;
@@ -39,11 +42,9 @@ public class SimpleLSTM extends AgentSupervised {
 	private double[] sumG;
 	private double[] actG;
 	private double[] actH;
-	private double[] full_hidden;
-	private double[] output;
-	private double[] deltaOutput;
+	public double[] full_hidden;
+	private double[] deltaOut;
 	private double[] deltaH;
-	private double[] full_input;
 
 	public SimpleLSTM(Random r, int input_dimension, int output_dimension, int cell_blocks)
 	{
@@ -136,10 +137,10 @@ public class SimpleLSTM extends AgentSupervised {
 		//setup input vector
 
 
-		if ((full_input == null) || (full_input.length != full_input_dimension)) {
-			full_input = new double[full_input_dimension];
+		if ((this.in == null) || (this.in.length != full_input_dimension)) {
+			this.in = new double[full_input_dimension];
 		}
-		final double[] full_input = this.full_input;
+		final double[] full_input = this.in;
 
 		int loc = 0;
 		for (int i = 0; i < input.length; ) {
@@ -159,7 +160,7 @@ public class SimpleLSTM extends AgentSupervised {
 			actG = new double[cell_blocks];
 			actH = new double[cell_blocks];
 			full_hidden = new double[cell_blocks + 1];
-			output = new double[output_dimension];
+			out = new double[output_dimension];
 		}
 		else {
 			//Arrays.fill(sumF, (double) 0); //not necessary since it's completely overwritten below
@@ -203,7 +204,7 @@ public class SimpleLSTM extends AgentSupervised {
 			for (int j = 0; j < cell_blocks + 1; j++)
 				s += wk[j] * full_hidden[j];
 
-			output[k] = s;
+			out[k] = s;
 			//output not squashed
 		}
 
@@ -240,8 +241,8 @@ public class SimpleLSTM extends AgentSupervised {
 			
 			//output to hidden
 
-			if ((deltaOutput == null) || (deltaOutput.length!=output_dimension)) {
-				deltaOutput = new double[output_dimension];
+			if ((deltaOut == null) || (deltaOut.length!=output_dimension)) {
+				deltaOut = new double[output_dimension];
 				deltaH = new double[cell_blocks];
 			}
 			else {
@@ -253,7 +254,7 @@ public class SimpleLSTM extends AgentSupervised {
 
 			for (int k = 0; k < output_dimension; k++) {
 
-				final double dok  = deltaOutput[k] = (target_output[k] - output[k]) * outputDeltaScale;
+				final double dok  = deltaOut[k] = (target_output[k] - out[k]) * outputDeltaScale;
 
 				final double[] wk = weightsOut[k];
 
@@ -282,7 +283,7 @@ public class SimpleLSTM extends AgentSupervised {
 		System.arraycopy(actH, 0, context, 0, cell_blocks);
 		
 		//give results
-		return output;
+		return out;
 	}
 
 	public static void updateWeights(double learningRate,

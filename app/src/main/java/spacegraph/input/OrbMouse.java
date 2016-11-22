@@ -12,9 +12,7 @@ import spacegraph.phys.collision.ClosestRay;
 import spacegraph.phys.collision.narrow.VoronoiSimplexSolver;
 import spacegraph.phys.constraint.Point2PointConstraint;
 import spacegraph.phys.constraint.TypedConstraint;
-import spacegraph.phys.math.MotionState;
 import spacegraph.phys.math.Transform;
-import spacegraph.phys.util.Motion;
 import spacegraph.render.JoglPhysics;
 
 import static spacegraph.math.v3.v;

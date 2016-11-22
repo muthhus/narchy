@@ -13,7 +13,7 @@ import java.util.Map;
 
 public abstract class SpriteStore {
 	/** The single instance of this class */
-	protected static SpriteStore single;
+	protected static final SpriteStore single = new AwtSpriteStore();
 	
 	/**
 	 * Get the single instance of this class
@@ -21,13 +21,13 @@ public abstract class SpriteStore {
 	 * @return The single instance of this class
 	 */
 	public static SpriteStore get() {
-		if (single == null) {
-			if (GraphicsHandler.awtMode) {
-				single = new AwtSpriteStore();
-			} else {
-				// android!
-			}
-		}
+//		if (single == null) {
+//			if (GraphicsHandler.awtMode) {
+//				single = ;
+//			} else {
+//				// android!
+//			}
+//		}
 		return single;
 	}
 

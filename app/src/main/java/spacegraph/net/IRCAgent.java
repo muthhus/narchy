@@ -5,7 +5,6 @@ import nars.$;
 import nars.NAR;
 import nars.Narsese;
 import nars.Task;
-import nars.gui.Vis;
 import nars.index.term.TermIndex;
 import nars.index.term.tree.TreeTermIndex;
 import nars.nal.nal8.operator.TermFunction;

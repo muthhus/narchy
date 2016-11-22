@@ -243,11 +243,11 @@ public class World implements java.io.Serializable {
 	
 	private int handResult(TileID[] breakType) {
 		if (breakType == null) {
-			return 50;
+			return 50/4;
 		} else if (breakType == breakWood) {
-			return 75;
+			return 75/4;
 		} else {
-			return 500;
+			return 500/4;
 		}
 	}
 	

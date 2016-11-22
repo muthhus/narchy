@@ -17,11 +17,7 @@ import spacegraph.render.JoglPhysics;
 import spacegraph.source.ListSpace;
 
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
-
-import static spacegraph.math.v3.v;
 
 /**
  * Created by me on 6/20/16.

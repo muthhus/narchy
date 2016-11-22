@@ -1,14 +1,10 @@
 package spacegraph.render;
 
 import com.jogamp.opengl.GL;
-import com.jogamp.opengl.GL2;
-import com.jogamp.opengl.GLAutoDrawable;
-import com.jogamp.opengl.fixedfunc.GLMatrixFunc;
 import spacegraph.AbstractSpace;
 import spacegraph.SimpleSpatial;
 import spacegraph.SpaceGraph;
 import spacegraph.Spatial;
-import spacegraph.input.KeyXY;
 import spacegraph.input.KeyXYZ;
 import spacegraph.input.OrbMouse;
 import spacegraph.math.v3;

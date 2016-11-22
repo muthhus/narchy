@@ -35,24 +35,25 @@ public class Tetris extends NAgents {
 
 
     public static final int tetris_width = 6;
-    public static final int tetris_height = 14;
-    public static final int TIME_PER_FALL = 4;
-    public static final int frameRate = 1;
-    public static final int PIXEL_RADIX = 3;
-    static boolean easy;
+    public static final int tetris_height = 16;
+    public static final int TIME_PER_FALL = 1;
+    public static final int PIXEL_RADIX = 2;
+    private int afterlife = TIME_PER_FALL * tetris_height * tetris_width;
+    static boolean easy = false;
 
 
 
     private final TetrisState state;
+
     //private final int visionSyncPeriod = 4; //16 * TIME_DILATION;
 
     public static class View {
 
         public TetrisVisualizer vis;
-        public Surface plot1;
-        //public ConsoleSurface term = new ConsoleSurface(40, 8);
-
-        public Surface plot2;
+//        public Surface plot1;
+//        //public ConsoleSurface term = new ConsoleSurface(40, 8);
+//
+//        public Surface plot2;
         //public Plot2D lstm;
     }
 
@@ -70,8 +71,8 @@ public class Tetris extends NAgents {
      * @param height
      * @param timePerFall larger is slower gravity
      */
-    public Tetris(NAR nar, int frameRate, int width, int height, int timePerFall) {
-        super(nar, frameRate);
+    public Tetris(NAR nar, int width, int height, int timePerFall) {
+        super(nar);
 
         state = new TetrisState(width, height, timePerFall) {
             @Override
@@ -85,6 +86,12 @@ public class Tetris extends NAgents {
                 } else {
                     return super.nextBlock(); //all blocks
                 }
+            }
+
+            @Override
+            protected void die() {
+                nar.time.tick(afterlife);
+                super.die();
             }
         };
         view.vis = new TetrisVisualizer(state, 64, false) {
@@ -120,6 +127,8 @@ public class Tetris extends NAgents {
         state.reset();
     }
 
+
+
     public static void actions(NAR nar, TetrisState state, List<ActionConcept> actions) {
         float alpha = nar.confidenceDefault('.');
 
@@ -133,7 +142,7 @@ public class Tetris extends NAgents {
 //        float actionThresholdLower = actionMargin / 1.5f;
 
 
-        actions.add(new ActionConcept("(leftright)", nar, (b, d) -> {
+        actions.add(new ActionConcept("tetris(leftright)", nar, (b, d) -> {
             if (d != null) {
                 float x = d.freq();
                 //System.out.println(d + " " + x);
@@ -156,7 +165,7 @@ public class Tetris extends NAgents {
         }));
 
         //if (rotate) {
-            actions.add(new ActionConcept("(rotate)", nar, (b, d) -> {
+            actions.add(new ActionConcept("tetris(rotate)", nar, (b, d) -> {
                 if (d != null) {
                     float r = d.freq();
                     if (r > actionThresholdHigh) {
@@ -356,7 +365,7 @@ public class Tetris extends NAgents {
     public static void main(String[] args) {
         //Param.DEBUG = true;
 
-        NAR nar = NAgents.newMultiThreadNAR(3, new FrameTime().dur(TIME_PER_FALL*4));
+        NAR nar = NAgents.newMultiThreadNAR(3, new FrameTime().dur(TIME_PER_FALL*2));
         //nar.linkFeedbackRate.setValue(0.05f);
 
 //        Random rng = new XorShift128PlusRandom(1);
@@ -445,16 +454,16 @@ public class Tetris extends NAgents {
         //new VariableCompressor(nar);
 
 
-        Tetris t = new Tetris(nar, frameRate, tetris_width, tetris_height, TIME_PER_FALL) {
+        Tetris t = new Tetris(nar, tetris_width, tetris_height, TIME_PER_FALL) {
             @Override
             protected void init() {
                 super.init();
-                view.plot1 =
-                        Vis.emotionPlots(nar, 256);
-
-
-                view.plot2 = Vis.agentBudgetPlot(this, 256);
-                SpaceGraph.window(new ControlSurface(view), 800, 600);
+//                view.plot1 =
+//                        Vis.emotionPlots(nar, 256);
+//
+//
+//                view.plot2 = Vis.agentBudgetPlot(this, 256);
+                SpaceGraph.window(view.vis, 800, 600);
                 NAgents.chart(this);
             }
         };
@@ -660,7 +669,7 @@ public class Tetris extends NAgents {
 //        });
     }
 
-    public MatrixView.ViewFunc sensorMatrixView(NAR nar, long whenRelative) {
+    public MatrixView.ViewFunction2D sensorMatrixView(NAR nar, long whenRelative) {
         return (x, y, g) -> {
 //            int rgb = cam.out.getRGB(x,y);
 //            float r = decodeRed(rgb);

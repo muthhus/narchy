@@ -7,7 +7,6 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Terms;
 import nars.term.compound.GenericCompound;
-import nars.term.compound.UnitCompound1;
 import nars.term.container.TermContainer;
 import nars.term.container.TermVector;
 import nars.term.transform.TermTransform;

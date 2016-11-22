@@ -746,4 +746,12 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
 
     /** duration time constant in which evidence diminishes at a time before start() and after end() */
     float dur();
+
+    default long mid() {
+        return Math.round((start()+end())/2L);
+    }
+    default long range() {
+        return Math.abs(end()-start());
+    }
+
 }

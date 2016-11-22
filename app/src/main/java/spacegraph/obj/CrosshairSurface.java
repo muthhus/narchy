@@ -2,7 +2,6 @@ package spacegraph.obj;
 
 import com.jogamp.newt.event.MouseEvent;
 import com.jogamp.newt.event.MouseListener;
-import com.jogamp.newt.opengl.GLWindow;
 import com.jogamp.opengl.GL2;
 import spacegraph.SpaceGraph;
 import spacegraph.Surface;

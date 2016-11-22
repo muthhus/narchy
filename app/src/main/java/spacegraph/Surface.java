@@ -1,19 +1,14 @@
 package spacegraph;
 
-import com.google.common.collect.Lists;
 import com.jogamp.newt.event.KeyEvent;
 import com.jogamp.opengl.GL2;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import spacegraph.math.v2;
 import spacegraph.math.v3;
-import spacegraph.obj.widget.Label;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
-
-import static spacegraph.math.v3.v;
 
 /**
  * planar subspace.

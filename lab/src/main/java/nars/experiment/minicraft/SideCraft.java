@@ -24,7 +24,7 @@ public class SideCraft extends NAgents {
     private PixelAutoClassifier camAE;
 
     public static void main(String[] args) {
-        runRT(SideCraft::new);
+        runRT(SideCraft::new, 30, 5);
     }
 
     public SideCraft(NAR nar) {
@@ -43,7 +43,7 @@ public class SideCraft extends NAgents {
 
         BufferedImage camBuffer = ((AwtGraphicsHandler) craft.gfx).buffer;
 
-        PixelBag cam = new PixelBag(camBuffer, 48, 48).addActions("cra", this);
+        PixelBag cam = new PixelBag(camBuffer, 48, 32).addActions("cra", this);
 
 
         camAE = new PixelAutoClassifier("cra", cam.pixels, 8, 8, 32, this);
@@ -62,22 +62,22 @@ public class SideCraft extends NAgents {
 //                ).into(this);
 
 //        InputHandler input = craft.input;
-        actionToggle("cra:(key,left)", (b) -> {
+        actionToggle("cra(key,left)", (b) -> {
             if (b) craft.player.startLeft(false /* slow */);
             else craft.player.stopLeft();
         });
-        actionToggle("cra:(key,right)", (b) -> {
+        actionToggle("cra(key,right)", (b) -> {
             if (b) craft.player.startRight(false /* slow */);
             else craft.player.stopRight();
         });
-        actionToggle("cra:(key,up)", (b) -> {
+        actionToggle("cra(key,up)", (b) -> {
             if (b) craft.player.startClimb();
             else craft.player.stopClimb();
         });
-        actionToggle("cra:(key,mouseL)", (b) -> craft.leftClick = b);
-        actionToggle("cra:(key,mouseR)", (b) -> craft.rightClick = b);
+        actionToggle("cra(key,mouseL)", (b) -> craft.leftClick = b);
+        actionToggle("cra(key,mouseR)", (b) -> craft.rightClick = b);
         float mSpeed = 45f;
-        actionBipolar("cra:(mouse,X)", (v) -> {
+        actionBipolar("cra(mouse,X)", (v) -> {
             int x = craft.screenMousePos.x;
             int xx = Util.clamp(x + v * mSpeed, 0, camBuffer.getWidth() - 1);
             if (xx != x) {
@@ -86,7 +86,7 @@ public class SideCraft extends NAgents {
             }
             return false;
         });
-        actionBipolar("cra:(mouse,Y)", (v) -> {
+        actionBipolar("cra(mouse,Y)", (v) -> {
             int y = craft.screenMousePos.y;
             int yy = Util.clamp(y + v * mSpeed, 0, camBuffer.getHeight() - 1);
             if (yy != y) {
@@ -107,11 +107,14 @@ public class SideCraft extends NAgents {
 
 
     float prevScore = 0;
+    final int gameFramesPerCycle = 1;
 
     @Override
     protected float act() {
 
-        float nextScore = craft.frame();
+        float nextScore = 0;
+        for (int i = 0; i < gameFramesPerCycle; i++)
+            nextScore = craft.frame();
         float ds = nextScore - prevScore;
         this.prevScore = nextScore;
         return ds;

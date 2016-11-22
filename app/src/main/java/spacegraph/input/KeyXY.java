@@ -1,10 +1,7 @@
 package spacegraph.input;
 
 import com.jogamp.newt.event.KeyEvent;
-import spacegraph.math.v3;
 import spacegraph.render.JoglPhysics;
-
-import static spacegraph.math.v3.v;
 
 /**
  * Created by me on 11/20/16.

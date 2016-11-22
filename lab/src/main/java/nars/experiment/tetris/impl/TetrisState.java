@@ -586,12 +586,15 @@ public class TetrisState {
         toVector(false, seen);
 
         if (gameOver()) {
-            reset();
+            die();
         }
 
 
     }
 
+    protected void die() {
+        reset();
+    }
 
 //    /*End of Tetris Helper Functions*/
 //

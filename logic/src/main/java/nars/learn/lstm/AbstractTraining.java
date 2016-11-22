@@ -8,7 +8,6 @@ import java.util.Random;
 import java.util.function.Consumer;
 
 public abstract class AbstractTraining {
-    public int batchsize = 400000000;
 
     public AbstractTraining(Random random, final int inputs, final int outputs) {
         this.random = random;

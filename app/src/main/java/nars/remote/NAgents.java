@@ -1,6 +1,5 @@
 package nars.remote;
 
-import com.googlecode.lanterna.terminal.virtual.VirtualTerminal;
 import nars.$;
 import nars.NAR;
 import nars.NAgent;
@@ -45,7 +44,6 @@ import java.util.stream.Stream;
 import static nars.$.t;
 import static spacegraph.SpaceGraph.window;
 import static spacegraph.obj.layout.Grid.grid;
-import static spacegraph.obj.layout.Grid.row;
 
 /**
  * Created by me on 9/19/16.
@@ -54,13 +52,17 @@ abstract public class NAgents extends NAgent {
 
     public final Map<String, CameraSensor> cam = new LinkedHashMap<>();
 
+    public NAgents(NAR nar) {
+        this(nar, 1);
+    }
+
     public NAgents(NAR nar, int reasonerFramesPerEnvironmentFrame) {
         super(nar, reasonerFramesPerEnvironmentFrame);
 
     }
 
     public static void run(Function<NAR, NAgents> init, int frames) {
-        Default nar = newMultiThreadNAR(2, new FrameTime(), true);
+        Default nar = newMultiThreadNAR(4, new FrameTime(), true);
         //Default nar = newNAR();
         //Default2 nar = newNAR2();
 
@@ -102,7 +104,7 @@ abstract public class NAgents extends NAgent {
 
     public static void runRT(Function<NAR, NAgents> init, float fps, int durFrames) {
 
-        Default nar = NAgents.newMultiThreadNAR(4, new RealTime.DS(true).dur(durFrames/fps), false);
+        Default nar = NAgents.newMultiThreadNAR(2, new RealTime.CS(true).dur(durFrames/fps), true);
         //Default nar = newNAR();
         //Alann nar = newAlann();
 
@@ -293,7 +295,7 @@ abstract public class NAgents extends NAgent {
         NAR nar = a.nar;
         a.nar.runLater(()-> {
 
-            Vis.conceptsWindow2D(a.nar, 256, 7).show(1000, 800);
+            //Vis.conceptsWindow2D(a.nar, 256, 7).show(1000, 800);
 
             window(
                     grid(

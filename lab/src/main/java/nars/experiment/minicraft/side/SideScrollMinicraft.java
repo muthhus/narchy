@@ -142,7 +142,7 @@ public class SideScrollMinicraft {
 			long delta = 0;
 			if (delay) {
 				ticksRunning++;
-				delta = SystemTimer.getTime() - lastLoopTime;
+				//delta = SystemTimer.getTime() - lastLoopTime;
 				lastLoopTime = SystemTimer.getTime();
 			}
 
@@ -341,15 +341,19 @@ public class SideScrollMinicraft {
 	}
 
 	public static void drawMouse(GraphicsHandler g, Int2 pos) {
-		g.setColor(Color.white);
-		g.fillOval(pos.x - 4, pos.y - 4, 8, 8);
-		g.setColor(Color.black);
-		g.fillOval(pos.x - 3, pos.y - 3, 6, 6);
+		g.setColor(Color.gray);
+		int w1 = 2 * 8;
+		g.fillOval(pos.x - w1/2, pos.y - w1/2, w1, w1);
+//		g.setColor(Color.black);
+//		int w0 = 4 * 6;
+//		g.fillOval(pos.x - w0/2, pos.y - w0/2, w0, w0);
 	}
 	
 	public static void drawTileBackground(GraphicsHandler g, Sprite sprite, int tileSize) {
-		for (int i = 0; i <= GraphicsHandler.getScreenWidth() / tileSize; i++) {
-			for (int j = 0; j <= GraphicsHandler.getScreenHeight() / tileSize; j++) {
+		int screenHeight = GraphicsHandler.getScreenHeight();
+		int screenWidth = GraphicsHandler.getScreenWidth();
+		for (int i = 0; i <= screenWidth / tileSize; i++) {
+			for (int j = 0; j <= screenHeight / tileSize; j++) {
 				sprite.draw(g, i * tileSize, j * tileSize, tileSize, tileSize);
 			}
 		}

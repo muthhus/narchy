@@ -3,7 +3,6 @@ package spacegraph.obj;
 import nars.gui.ConceptWidget;
 import nars.link.BLink;
 import spacegraph.SimpleSpatial;
-import spacegraph.Spatial;
 
 /**
  * Drawn edge, lightweight
