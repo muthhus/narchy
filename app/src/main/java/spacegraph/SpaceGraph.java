@@ -34,7 +34,7 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
     final Cache<X, Spatial<X>> atoms;
 
     public SpaceGraph() {
-        this(16 * 1024);
+        this(8 * 1024);
     }
 
     /**
@@ -119,15 +119,14 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
 
     public @NotNull  <Y extends Spatial<X>> Y getOrAdd(X x, Function<X, Y> materializer) {
         Spatial y = atoms.get(x, materializer);
-        //y.reactivate(true);
+        y.activate();
         return (Y) y;
     }
 
 
     public @Nullable Spatial getIfActive(X t) {
         Spatial v = atoms.getIfPresent(t);
-        //return v != null && v.active() ? v : null;
-        return v;
+        return v != null && v.preactive() ? v : null;
     }
 
 

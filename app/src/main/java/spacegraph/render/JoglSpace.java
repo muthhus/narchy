@@ -22,9 +22,9 @@ import static com.jogamp.opengl.fixedfunc.GLMatrixFunc.GL_PROJECTION;
 
 public abstract class JoglSpace implements GLEventListener, WindowListener {
 
-    final static int DEFAULT_FPS = 25;
+    final static int FPS_DEFAULT = 25;
     public static final int MIN_FPS = 3;
-    private static final MyFPSAnimator a = new MyFPSAnimator(JoglSpace.DEFAULT_FPS, MIN_FPS, 50);
+    private static final MyFPSAnimator a = new MyFPSAnimator(JoglSpace.FPS_DEFAULT, MIN_FPS, 50);
 
     public static final GLU glu = new GLU();
     public static final GLUT glut = new GLUT();

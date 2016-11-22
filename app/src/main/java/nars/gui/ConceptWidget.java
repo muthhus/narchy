@@ -9,10 +9,18 @@ import nars.link.BLink;
 import nars.term.Term;
 import nars.term.Termed;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import spacegraph.SimpleSpatial;
 import spacegraph.SpaceGraph;
+import spacegraph.Surface;
+import spacegraph.obj.Cuboid;
 import spacegraph.obj.EDraw;
+import spacegraph.obj.layout.Grid;
+import spacegraph.obj.widget.Label;
+import spacegraph.obj.widget.PushButton;
+import spacegraph.phys.Collidable;
 import spacegraph.phys.Dynamic;
+import spacegraph.phys.collision.ClosestRay;
 import spacegraph.render.Draw;
 
 import java.util.HashMap;
@@ -21,31 +29,22 @@ import java.util.function.Consumer;
 import static spacegraph.math.v3.v;
 
 
-public class ConceptWidget extends SimpleSpatial<Term> implements Consumer<BLink<? extends Termed>> {
-
-    //private final NAR nar;
+public class ConceptWidget extends Cuboid<Term> implements Consumer<BLink<? extends Termed>> {
 
     public final ArrayBag<TermEdge> edges;
     private final ConceptsSpace space;
 
-    /**
-     * cached .toString() of the key
-     */
-    public String label;
-
     public float pri;
-
-
 
     //caches a reference to the current concept
     public Concept concept;
 
-
     public ConceptWidget(Term x, ConceptsSpace space, int numEdges) {
-        super(x);
+        super(x, new Grid(new PushButton(x.toString())), 1, 1);
 
         this.pri = 0f;
         this.space = space;
+
 
 
         //float edgeActivationRate = 1f;
@@ -59,7 +58,6 @@ public class ConceptWidget extends SimpleSpatial<Term> implements Consumer<BLink
 //            this.edges.add(new EDraw());
 
     }
-
 
 
     @Override
@@ -81,6 +79,7 @@ public class ConceptWidget extends SimpleSpatial<Term> implements Consumer<BLink
                 SpaceGraph.r(initImpulseEpsilon),
                 SpaceGraph.r(initImpulseEpsilon)));
 
+        x.setDamping(0.99f, 0.9f);
         return x;
     }
 
@@ -91,6 +90,15 @@ public class ConceptWidget extends SimpleSpatial<Term> implements Consumer<BLink
             edges.clear();
             concept = null;
         }
+    }
+
+
+    @Nullable @Override public Surface onTouch(Collidable body, ClosestRay hitPoint, short[] buttons) {
+        Surface s = super.onTouch(body, hitPoint, buttons);
+        if (s!=null) {
+
+        }
+        return null;
     }
 
     public void commit() {
@@ -163,10 +171,10 @@ public class ConceptWidget extends SimpleSpatial<Term> implements Consumer<BLink
     }
 
 
-    @Override
-    protected void renderRelativeAspect(GL2 gl) {
-        renderLabel(gl, 0.05f);
-    }
+//    @Override
+//    protected void renderRelativeAspect(GL2 gl) {
+//        renderLabel(gl, 0.05f);
+//    }
 
 
 //    @Nullable

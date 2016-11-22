@@ -90,8 +90,6 @@ public abstract class NARSpace<X extends Term, Y extends Spatial<X>> extends Lis
 
         get(next);
 
-        //prev.forEach(Active::stopIfInactive); //remove missing
-
         //commit the changes
         this.active = new FasterList<>(next);
         next.clear();

@@ -36,6 +36,7 @@ import spacegraph.phys.math.TransformUtil;
 import spacegraph.phys.shape.CollisionShape;
 import spacegraph.phys.util.OArrayList;
 
+import static nars.util.Util.clamp;
 import static spacegraph.math.v3.v;
 
 
@@ -249,8 +250,8 @@ public class Dynamic<X> extends Collidable<X> {
 	}
 
 	public void setDamping(float lin_damping, float ang_damping) {
-		linearDamping = Util.clamp(lin_damping, 0f, 1f);
-		angularDamping = Util.clamp(ang_damping, 0f, 1f);
+		linearDamping = clamp(lin_damping, 0f, 1f);
+		angularDamping = clamp(ang_damping, 0f, 1f);
 	}
 
 	public float getLinearDamping() {

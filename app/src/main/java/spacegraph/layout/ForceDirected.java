@@ -1,7 +1,6 @@
 package spacegraph.layout;
 
 import nars.gui.ConceptWidget;
-import nars.util.list.FasterList;
 import spacegraph.SimpleSpatial;
 import spacegraph.Spatial;
 import spacegraph.math.v3;
@@ -9,7 +8,6 @@ import spacegraph.phys.Collidable;
 import spacegraph.phys.Dynamic;
 import spacegraph.phys.collision.broad.Broadphase;
 
-import java.util.Collection;
 import java.util.List;
 
 import static spacegraph.math.v3.v;
@@ -19,13 +17,15 @@ import static spacegraph.math.v3.v;
  */
 public class ForceDirected implements spacegraph.phys.constraint.BroadConstraint {
 
-    public static final int clusters = 1;
+    public static final int clusters =
+            1;
+            //13;
 
-    public float repelSpeed = 3f;
-    public float attractSpeed = 2f;
+    public float repelSpeed = 6f;
+    public float attractSpeed = 3f;
 
     private final float maxRepelDist = 2000f;
-    private final float attractDist = 1f;
+    private final float attractDistRads = 2f;
 
 //        public static class Edge<X> extends MutablePair<X,X> {
 //            public final X a, b;
@@ -69,7 +69,7 @@ public class ForceDirected implements spacegraph.phys.constraint.BroadConstraint
 
                             float ew = e.width;
                             float attractStrength = ew * e.attraction;
-                            attract(c, B.body, attractSpeed * attractStrength, attractDist);
+                            attract(c, B.body, attractSpeed * attractStrength, attractDistRads);
                         }
 
                 });
@@ -88,7 +88,7 @@ public class ForceDirected implements spacegraph.phys.constraint.BroadConstraint
         }
     }
 
-    private static void attract(Collidable x, Collidable y, float speed, float idealDist) {
+    private static void attract(Collidable x, Collidable y, float speed, float idealDistRads) {
         SimpleSpatial xp = ((SimpleSpatial) x.data());
         SimpleSpatial yp = ((SimpleSpatial) y.data());
 
@@ -97,8 +97,8 @@ public class ForceDirected implements spacegraph.phys.constraint.BroadConstraint
 
 
         float len = delta.normalize();
-        len -= (xp.radius + yp.radius);
-        if (len <= idealDist)
+        len -= idealDistRads * (xp.radius + yp.radius);
+        if (len <= 0)
             return;
 
         //float dd = (len - idealDist);

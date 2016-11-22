@@ -31,7 +31,6 @@ import com.jogamp.opengl.GLEventListener;
 import com.jogamp.opengl.GLException;
 import com.jogamp.opengl.math.FloatUtil;
 import nars.$;
-import org.eclipse.collections.api.block.predicate.primitive.IntObjectPredicate;
 import org.eclipse.collections.api.block.procedure.primitive.IntObjectProcedure;
 import org.jetbrains.annotations.NotNull;
 import spacegraph.Spatial;
@@ -65,14 +64,14 @@ import static spacegraph.math.v3.v;
 abstract public class JoglPhysics<X> extends JoglSpace implements GLEventListener, KeyListener {
 
 
-    public static final float MAX_FPS = 30f;
+
 
     private final float cameraSpeed = 5f;
     private final float cameraRotateSpeed = 5f;
     private boolean simulating = true;
     private float lastFrameTime;
 
-    private int maxSubsteps = 1; //set to zero for variable timing
+    private int maxSubsteps = 0; //set to zero for variable timing
     private float aspect;
 
 
@@ -323,7 +322,7 @@ abstract public class JoglPhysics<X> extends JoglSpace implements GLEventListene
         if (simulating) {
             // NOTE: SimpleDynamics world doesn't handle fixed-time-stepping
             dyn.stepSimulation(
-                    Math.max(dt, 1000000f / MAX_FPS) / 1000000.f, maxSubsteps
+                    Math.max(dt, 1000000f / FPS_DEFAULT) / 1000000.f, maxSubsteps
                     //clock.getTimeThenReset()
             );
         }
