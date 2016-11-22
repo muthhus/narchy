@@ -25,7 +25,8 @@ package spacegraph.phys.collision.broad;
 
 import spacegraph.phys.Collidable;
 import spacegraph.phys.collision.narrow.PersistentManifold;
-import spacegraph.phys.util.OArrayList;
+
+import java.util.Collection;
 
 /**
  * Dispatcher abstract class can be used in combination with broadphase to dispatch
@@ -59,7 +60,7 @@ public abstract class Intersecter {
 
 	public abstract PersistentManifold getManifoldByIndexInternal(int index);
 
-	public abstract OArrayList<PersistentManifold> getInternalManifoldPointer();
+	public abstract Collection<PersistentManifold> getInternalManifoldPointer();
 
 	//public abstract Object allocateCollisionAlgorithm(int size);
 

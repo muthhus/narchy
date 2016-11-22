@@ -42,6 +42,8 @@ import spacegraph.phys.math.TransformUtil;
 import spacegraph.phys.util.IntArrayList;
 import spacegraph.phys.util.OArrayList;
 
+import java.util.Collection;
+
 /**
  * SequentialImpulseConstraintSolver uses a Propagation Method and Sequentially applies impulses.
  * The approach is the 3D version of Erin Catto's GDC 2006 tutorial. See http://www.gphysics.com<p>
@@ -395,7 +397,7 @@ public class SequentialImpulseConstrainer extends Constrainer {
         solverConstraint.jacDiagABInv = denom;
     }
 
-    public float solveGroupCacheFriendlySetup(OArrayList<Collidable> bodies, int numBodies, OArrayList<PersistentManifold> manifoldPtr, int manifold_offset, int numManifolds, OArrayList<TypedConstraint> constraints, int constraints_offset, int numConstraints, ContactSolverInfo infoGlobal/*,btStackAlloc* stackAlloc*/) {
+    public float solveGroupCacheFriendlySetup(Collection<Collidable> bodies, int numBodies, OArrayList<PersistentManifold> manifoldPtr, int manifold_offset, int numManifolds, OArrayList<TypedConstraint> constraints, int constraints_offset, int numConstraints, ContactSolverInfo infoGlobal/*,btStackAlloc* stackAlloc*/) {
         BulletStats.pushProfile("solveGroupCacheFriendlySetup");
         try {
 
@@ -757,7 +759,7 @@ public class SequentialImpulseConstrainer extends Constrainer {
         }
     }
 
-    public float solveGroupCacheFriendlyIterations(OArrayList<Collidable> bodies, int numBodies, OArrayList<PersistentManifold> manifoldPtr, int manifold_offset, int numManifolds, OArrayList<TypedConstraint> constraints, int constraints_offset, int numConstraints, ContactSolverInfo infoGlobal/*,btStackAlloc* stackAlloc*/) {
+    public float solveGroupCacheFriendlyIterations(Collection<Collidable> bodies, int numBodies, Collection<PersistentManifold> manifoldPtr, int manifold_offset, int numManifolds, OArrayList<TypedConstraint> constraints, int constraints_offset, int numConstraints, ContactSolverInfo infoGlobal/*,btStackAlloc* stackAlloc*/) {
         BulletStats.pushProfile("solveGroupCacheFriendlyIterations");
         try {
             int numConstraintPool = tmpSolverConstraintPool.size();
@@ -867,7 +869,7 @@ public class SequentialImpulseConstrainer extends Constrainer {
         pool.set(swapi, tmp);
     }
 
-    public float solveGroupCacheFriendly(OArrayList<Collidable> bodies, int numBodies, OArrayList<PersistentManifold> manifoldPtr, int manifold_offset, int numManifolds, OArrayList<TypedConstraint> constraints, int constraints_offset, int numConstraints, ContactSolverInfo infoGlobal/*,btStackAlloc* stackAlloc*/) {
+    public float solveGroupCacheFriendly(Collection<Collidable> bodies, int numBodies, OArrayList<PersistentManifold> manifoldPtr, int manifold_offset, int numManifolds, OArrayList<TypedConstraint> constraints, int constraints_offset, int numConstraints, ContactSolverInfo infoGlobal/*,btStackAlloc* stackAlloc*/) {
         solveGroupCacheFriendlySetup(bodies, numBodies, manifoldPtr, manifold_offset, numManifolds, constraints, constraints_offset, numConstraints, infoGlobal/*, stackAlloc*/);
         solveGroupCacheFriendlyIterations(bodies, numBodies, manifoldPtr, manifold_offset, numManifolds, constraints, constraints_offset, numConstraints, infoGlobal/*, stackAlloc*/);
 
@@ -924,7 +926,7 @@ public class SequentialImpulseConstrainer extends Constrainer {
      * Sequentially applies impulses.
      */
     @Override
-    public float solveGroup(OArrayList<Collidable> bodies, int numBodies, OArrayList<PersistentManifold> manifoldPtr, int manifold_offset, int numManifolds, OArrayList<TypedConstraint> constraints, int constraints_offset, int numConstraints, ContactSolverInfo infoGlobal, Intersecter intersecter) {
+    public float solveGroup(Collection<Collidable> bodies, int numBodies, OArrayList<PersistentManifold> manifoldPtr, int manifold_offset, int numManifolds, OArrayList<TypedConstraint> constraints, int constraints_offset, int numConstraints, ContactSolverInfo infoGlobal, Intersecter intersecter) {
         BulletStats.pushProfile("solveGroup");
         try {
             // TODO: solver cache friendly

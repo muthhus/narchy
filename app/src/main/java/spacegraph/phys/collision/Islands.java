@@ -32,7 +32,9 @@ import spacegraph.phys.collision.narrow.PersistentManifold;
 import spacegraph.phys.math.MiscUtil;
 import spacegraph.phys.util.OArrayList;
 
+import java.util.Collection;
 import java.util.Comparator;
+import java.util.List;
 
 /**
  * SimulationIslandManager creates and handles simulation islands, using {@link UnionFind}.
@@ -52,7 +54,7 @@ public class Islands {
 	}
 
 	public void findUnions(Intersecter intersecter, Collisions colWorld) {
-		OArrayList<BroadphasePair> pairPtr = colWorld.getPairCache().getOverlappingPairArray();
+		OArrayList<BroadphasePair> pairPtr = colWorld.pairs().getOverlappingPairArray();
 		for (int i=0; i<pairPtr.size(); i++) {
 			//return array[index];
 			BroadphasePair collisionPair = pairPtr.get(i);
@@ -77,8 +79,9 @@ public class Islands {
 
 		initUnionFind(num);
 
-		colWorld.forEachCollidable((i, collidable)->{
-			collidable.setIslandTag(i);
+		final int[] i = {0};
+		colWorld.collidables().forEach((collidable)->{
+			collidable.setIslandTag(i[0]++);
 			collidable.setCompanionId(-1);
 			collidable.setHitFraction(1f);
 		});
@@ -88,7 +91,10 @@ public class Islands {
 
 	public final void storeIslandActivationState(Collisions<?> world) {
 		// put the islandId ('find' value) into m_tag
-		world.forEachCollidable(this::storeIslandActivationState);
+		int i = 0;
+		for (Collidable collidable : world.collidables()) {
+			storeIslandActivationState(i++, collidable);
+		}
     }
 
 	final boolean storeIslandActivationState(int i, Collidable c) {
@@ -110,7 +116,7 @@ public class Islands {
 		return islandId;
 	}
 
-	public <X> void buildIslands(Intersecter intersecter, OArrayList<Collidable> collidables) {
+	public void buildIslands(Intersecter intersecter, List<Collidable> collidables) {
 
 		//System.out.println("build islands");
 
@@ -246,7 +252,7 @@ public class Islands {
 		//System.err.println("error in island management: " + colObj0 + " " + colObj0.data());
 	}
 
-	public <X> void buildAndProcessIslands(Intersecter intersecter, OArrayList<Collidable> collidables, IslandCallback callback) {
+	public <X> void buildAndProcessIslands(Intersecter intersecter, List<Collidable> collidables, IslandCallback callback) {
 		buildIslands(intersecter, collidables);
 
 		int endIslandIndex = 1;
@@ -345,7 +351,7 @@ public class Islands {
 	////////////////////////////////////////////////////////////////////////////
 	
 	public static abstract class IslandCallback {
-		public abstract void processIsland(OArrayList<Collidable> bodies, OArrayList<PersistentManifold> manifolds, int manifolds_offset, int numManifolds, int islandId);
+		public abstract void processIsland(Collection<Collidable> bodies, OArrayList<PersistentManifold> manifolds, int manifolds_offset, int numManifolds, int islandId);
 	}
 	
 	private static final Comparator<PersistentManifold> persistentManifoldComparator = (lhs, rhs) -> getIslandId(lhs) < getIslandId(rhs)? -1 : +1;

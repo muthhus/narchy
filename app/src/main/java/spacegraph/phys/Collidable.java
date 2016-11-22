@@ -52,7 +52,7 @@ public class Collidable<X> {
 
 	///m_interpolationWorldTransform is used for CCD and interpolation
 	///it can be either previous or future (predicted) transform
-	protected final Transform interpolationWorldTransform = new Transform();
+	public final Transform interpolationWorldTransform = new Transform();
 	//those two are experimental: just added for bullet time effect, so you can still apply impulses (directly modifying velocities) 
 	//without destroying the continuous interpolated motion (which uses this interpolation velocities)
 	protected final v3 interpolationLinearVelocity = new v3();

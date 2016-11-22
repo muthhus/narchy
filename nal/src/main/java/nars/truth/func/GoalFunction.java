@@ -17,13 +17,6 @@ import static nars.truth.TruthFunctions.*;
 
 public enum GoalFunction implements TruthOperator {
 
-    @SinglePremise
-    Negation() {
-        @Override public @Nullable Truth apply(@Nullable final Truth T, @Nullable final Truth B, NAR m, float minConf) {
-            return negation(T, minConf);
-        }
-    },
-
     Strong() {
         @Nullable
         @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, NAR m, float minConf) {
@@ -38,10 +31,17 @@ public enum GoalFunction implements TruthOperator {
         }
     },
 
+    @SinglePremise
+    Negation() {
+        @Override public @Nullable Truth apply(@Nullable final Truth T, @Nullable final Truth B, NAR m, float minConf) {
+            return negation(T, minConf);
+        }
+    },
+
     Induction() {
         @Nullable
         @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, NAR m, float minConf) {
-            return B == null ? null : desireInd(T, B, minConf);
+            return (T == null || B == null) ? null : desireInd(T, B, minConf);
         }
     },
 

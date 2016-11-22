@@ -32,6 +32,7 @@ import com.jogamp.opengl.GLException;
 import com.jogamp.opengl.math.FloatUtil;
 import nars.$;
 import org.eclipse.collections.api.block.predicate.primitive.IntObjectPredicate;
+import org.eclipse.collections.api.block.procedure.primitive.IntObjectProcedure;
 import org.jetbrains.annotations.NotNull;
 import spacegraph.Spatial;
 import spacegraph.math.v3;
@@ -64,13 +65,13 @@ import static spacegraph.math.v3.v;
 abstract public class JoglPhysics<X> extends JoglSpace implements GLEventListener, KeyListener {
 
 
-    public static final float MAX_FPS = 60f;
+    public static final float MAX_FPS = 20f;
     private final float cameraSpeed = 5f;
     private final float cameraRotateSpeed = 5f;
     private boolean simulating = true;
     private float lastFrameTime;
 
-    private int maxSubsteps = 0; //set to zero for variable timing
+    private int maxSubsteps = 1; //set to zero for variable timing
     private float aspect;
 
 
@@ -95,6 +96,7 @@ abstract public class JoglPhysics<X> extends JoglSpace implements GLEventListene
     public void addFrameListener(FrameListener f) {
         frameListeners.add(f);
     }
+
     public void removeFrameListener(FrameListener f) {
         frameListeners.remove(f);
     }
@@ -109,14 +111,10 @@ abstract public class JoglPhysics<X> extends JoglSpace implements GLEventListene
     //protected final BulletStack stack = BulletStack.get();
 
 
-
-
     protected final Clock clock = new Clock();
 
     // this is the most important class
     public final @NotNull Dynamics<X> dyn;
-
-
 
 
     protected int debug = 0;
@@ -125,7 +123,7 @@ abstract public class JoglPhysics<X> extends JoglSpace implements GLEventListene
     public final v3 camPos;
     public final v3 camFwd;
     public final v3 camUp;
-//    public final MutableFloat cameraDistance;
+    //    public final MutableFloat cameraDistance;
 //    public final MutableFloat ele;
 //    public final MutableFloat azi;
     float top;
@@ -139,13 +137,10 @@ abstract public class JoglPhysics<X> extends JoglSpace implements GLEventListene
     public float zFar = 400;
 
 
-
-
     protected boolean stepping = true;
     protected int lastKey;
 
     protected GLSRT glsrt = null;
-
 
 
     public JoglPhysics() {
@@ -169,7 +164,7 @@ abstract public class JoglPhysics<X> extends JoglSpace implements GLEventListene
         dyn = new Dynamics<X>(dispatcher, broadphase) {
 
             @Override
-            public void forEachIntSpatial(IntObjectPredicate<Spatial<X>> each) {
+            public void forEachIntSpatial(IntObjectProcedure<Spatial<X>> each) {
                 JoglPhysics.this.forEachIntSpatial(each);
             }
 
@@ -183,17 +178,17 @@ abstract public class JoglPhysics<X> extends JoglSpace implements GLEventListene
         camFwd = new AnimVector3f(0, 0, -1, dyn, cameraRotateSpeed); //new AnimVector3f(0,0,1,dyn, 10f);
         camUp = new AnimVector3f(0, 1, 0, dyn, cameraRotateSpeed); //new AnimVector3f(0f, 1f, 0f, dyn, 1f);
 
-        dyn.setGravity(v(0, 0, 0));
 
     }
 
-    /** supplies the physics engine set of active physics objects at the beginning of each cycle */
-    public abstract void forEachIntSpatial(IntObjectPredicate<Spatial<X>> each);
+    /**
+     * supplies the physics engine set of active physics objects at the beginning of each cycle
+     */
+    public abstract void forEachIntSpatial(IntObjectProcedure<Spatial<X>> each);
 
     public final void forEachSpatial(Consumer<Spatial<X>> each) {
-        forEachIntSpatial((i,x)->{
+        forEachIntSpatial((i, x) -> {
             each.accept(x);
-            return true;
         });
     }
 
@@ -224,7 +219,7 @@ abstract public class JoglPhysics<X> extends JoglSpace implements GLEventListene
         gl.glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
 
         //https://www.sjbaker.org/steve/omniv/opengl_lighting.html
-        gl.glColorMaterial ( GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE ) ;
+        gl.glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
         gl.glEnable(gl.GL_COLOR_MATERIAL);
 
         //gl.glMaterialfv( GL2.GL_FRONT_AND_BACK, GL2.GL_SPECULAR, new float[] { 1, 1, 1, 1 }, 0);
@@ -320,25 +315,21 @@ abstract public class JoglPhysics<X> extends JoglSpace implements GLEventListene
 
     protected void update() {
 
-        if (busy.compareAndSet(false, true)) {
 
-            long dt = clock.getTimeThenReset();
-            lastFrameTime = dt / 1000f;
+        long dt = clock.getTimeThenReset();
+        lastFrameTime = dt / 1000f;
 
-            if (simulating) {
-                // NOTE: SimpleDynamics world doesn't handle fixed-time-stepping
-                dyn.stepSimulation(
-                        Math.max(dt, 1000000f / MAX_FPS) / 1000000.f, maxSubsteps
-                        //clock.getTimeThenReset()
-                );
-            }
-
-            frameListeners.forEach(f -> f.onFrame(this));
-
-            busy.set(false);
-        } else {
-            System.err.println("update overlap");
+        if (simulating) {
+            // NOTE: SimpleDynamics world doesn't handle fixed-time-stepping
+            dyn.stepSimulation(
+                    Math.max(dt, 1000000f / MAX_FPS) / 1000000.f, maxSubsteps
+                    //clock.getTimeThenReset()
+            );
         }
+
+        frameListeners.forEach(f -> f.onFrame(this));
+
+
     }
 
     public final void display(GLAutoDrawable drawable) {
@@ -355,7 +346,9 @@ abstract public class JoglPhysics<X> extends JoglSpace implements GLEventListene
         gl.glFlush();
     }
 
-    /** in seconds */
+    /**
+     * in seconds
+     */
     public float getLastFrameTime() {
         return lastFrameTime;
     }
@@ -414,7 +407,7 @@ abstract public class JoglPhysics<X> extends JoglSpace implements GLEventListene
 
         //gl.glFrustumf(-1.0f, 1.0f, -1.0f, 1.0f, 1.0f, 10000.0f);
         //glu.gluPerspective(45, (float) screenWidth / screenHeight, 4, 2000);
-        float aspect = ((float) getWidth())/ getHeight();
+        float aspect = ((float) getWidth()) / getHeight();
 
         perspective(0, true, 45 * FloatUtil.PI / 180.0f, aspect);
 
@@ -428,7 +421,7 @@ abstract public class JoglPhysics<X> extends JoglSpace implements GLEventListene
 //        glu.gluLookAt(camPos.x, camPos.y, camPos.z,
 //                camPosTarget.x, camPosTarget.y, camPosTarget.z,
 //                camUp.x, camUp.y, camUp.z);
-        glu.gluLookAt(camPos.x-camFwd.x, camPos.y-camFwd.y, camPos.z - camFwd.z,
+        glu.gluLookAt(camPos.x - camFwd.x, camPos.y - camFwd.y, camPos.z - camFwd.z,
                 camPos.x, camPos.y, camPos.z,
                 camUp.x, camUp.y, camUp.z);
 
@@ -447,7 +440,7 @@ abstract public class JoglPhysics<X> extends JoglSpace implements GLEventListene
 
         this.aspect = aspect;
 
-        tanFovV = (float)Math.tan(fovy_rad / 2f);
+        tanFovV = (float) Math.tan(fovy_rad / 2f);
 
         top = tanFovV * zNear; // use tangent of half-fov !
         right = aspect * top;    // aspect * fovhvTan.top * zNear
@@ -670,7 +663,7 @@ abstract public class JoglPhysics<X> extends JoglSpace implements GLEventListene
 //    }
 
     public v3 rayTo(int x, int y) {
-        return rayTo(  -1f + 2 *  x / ((float) getWidth()),   -1f + 2 * y / ((float)getHeight()));
+        return rayTo(-1f + 2 * x / ((float) getWidth()), -1f + 2 * y / ((float) getHeight()));
     }
 
     public v3 rayTo(float x, float y) {
@@ -682,12 +675,13 @@ abstract public class JoglPhysics<X> extends JoglSpace implements GLEventListene
         v3 hor = v().cross(camFwd, camUp);
         v3 ver = v().cross(hor, camFwd);
 
-        v3 center = v(camPos); center.addScaled(camFwd, depth);
+        v3 center = v(camPos);
+        center.addScaled(camFwd, depth);
 
         return (v3)
-            v(center)
-                .addScaled(hor, depth * tanFovV * aspect * x)
-                .addScaled(ver, depth * tanFovV *  -y);
+                v(center)
+                        .addScaled(hor, depth * tanFovV * aspect * x)
+                        .addScaled(ver, depth * tanFovV * -y);
     }
 
     /**
@@ -739,7 +733,6 @@ abstract public class JoglPhysics<X> extends JoglSpace implements GLEventListene
     }
 
 
-
     public final void render(Spatial<?> s) {
 
         s.renderAbsolute(gl);
@@ -757,7 +750,6 @@ abstract public class JoglPhysics<X> extends JoglSpace implements GLEventListene
         });
 
     }
-
 
 
 //    public void clientResetScene() {

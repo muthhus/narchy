@@ -65,15 +65,15 @@ public abstract class Param /*extends Container*/ implements Level {
     public static final int MAX_CONJ_SIZE_FOR_LAYER2_TEMPLATES = 3;
 
     /** 1 should work */
-    public static final int ACTIVATION_TERMLINK_DEPTH = 2;
-    public static final int ACTIVATION_TASKLINK_DEPTH = 2;
+    public static final int ACTIVATION_TERMLINK_DEPTH = 3;
+    public static final int ACTIVATION_TASKLINK_DEPTH = 3;
     public static final boolean ACTIVATE_TERMLINKS_IF_NO_TEMPLATE = false;
 
 
     public static boolean DEBUG_ANSWERS = true;
 
     /** how many times the desired selection size that bags should sample in case some of the selections are unused */
-    public static float BAG_OVERSAMPLING = 2.0f;
+    public static float BAG_OVERSAMPLING = 1.5f;
 
 
     /** used in linear interpolating link adjustments during feedback. set to zero to disable */

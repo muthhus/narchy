@@ -244,6 +244,7 @@ public class Arkanoid extends JFrame implements KeyListener {
 				velocityY = -BALL_VELOCITY;
 				x = paddle.x;
 				y = paddle.y - 50;
+				score--;
 				die();
 			}
 
@@ -347,7 +348,6 @@ public class Arkanoid extends JFrame implements KeyListener {
 
 	public void reset() {
 		initializeBricks(bricks);
-		score = 0;
 		ball.x = SCREEN_WIDTH / 2;
 		ball.y = SCREEN_HEIGHT / 2;
 		ball.setVelocityRandom();

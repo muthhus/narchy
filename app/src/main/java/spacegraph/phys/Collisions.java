@@ -23,7 +23,6 @@
 
 package spacegraph.phys;
 
-import org.eclipse.collections.api.block.predicate.primitive.IntObjectPredicate;
 import org.eclipse.collections.api.block.procedure.primitive.IntObjectProcedure;
 import org.jetbrains.annotations.NotNull;
 import spacegraph.Spatial;
@@ -38,6 +37,8 @@ import spacegraph.phys.math.TransformUtil;
 import spacegraph.phys.math.VectorUtil;
 import spacegraph.phys.shape.*;
 import spacegraph.phys.util.OArrayList;
+
+import java.util.Collection;
 
 import static spacegraph.math.v3.v;
 
@@ -86,15 +87,15 @@ public abstract class Collisions<X> {
 //	}
 
 	/** the boolean returned by the predicate decides if the value will remain in the source that provides the impl */
-	abstract public void forEachIntSpatial(IntObjectPredicate<Spatial<X>> each);
+	abstract public void forEachIntSpatial(IntObjectProcedure<Spatial<X>> each);
 
 	/** list of current colidables in the engine, aggregated from the spatials that are present */
-	abstract public OArrayList<Collidable> collidables();
+	abstract public Collection<Collidable> collidables();
 
-	abstract public void forEachCollidable(IntObjectProcedure<Collidable<X>> each);
+	//abstract public void forEachCollidable(IntObjectProcedure<Collidable<X>> each);
 
 
-	protected void on(Collidable c) {
+	protected boolean on(Collidable c) {
 		// check that the object isn't already added
 		//assert (!collisionObjects.contains(collisionObject));
 
@@ -115,7 +116,10 @@ public abstract class Collisions<X> {
 					c.group,
 					c.mask,
 					intersecter, null));
+			return true;
 		}
+
+		return false;
 
 	}
 
@@ -174,15 +178,15 @@ public abstract class Collisions<X> {
 			broadphase.getOverlappingPairCache().cleanProxyFromPairs(bp, intersecter);
 			broadphase.destroyProxy(bp, intersecter);
             collidable.broadphase(null);
-        } else {
+        } /*else {
         	//System.err.println(collidable + " missing broadphase");
 			throw new RuntimeException(collidable + " missing broadphase");
-		}
+		}*/
 	}
 
 
 	
-	public OverlappingPairCache getPairCache() {
+	public OverlappingPairCache pairs() {
 		return broadphase.getOverlappingPairCache();
 	}
 
@@ -233,7 +237,7 @@ public abstract class Collisions<X> {
 	public void updateAabbs() {
 		BulletStats.pushProfile("updateAabbs");
 		try {
-			forEachCollidable((i,b) -> updateAabbsIfActive(b));
+			collidables().forEach(this::updateAabbsIfActive);
 		}
 		finally {
 			BulletStats.popProfile();
@@ -531,16 +535,15 @@ public abstract class Collisions<X> {
 
 		Transform tmpTrans = new Transform();
 
-		OArrayList<Collidable> objs = collidables();
+		Collection<Collidable> objs = collidables();
 		int n = objs.size();
-		for (int i = 0; i < n; i++) {
+		for (Collidable collidable : objs) {
 			// terminate further ray tests, once the closestHitFraction reached zero
 			if (resultCallback.closestHitFraction == 0f) {
 				break;
 			}
 
 			//return array[index];
-			Collidable collidable = objs.get(i);
 			if (collidable !=null) {
 
 				Broadphasing broadphaseHandle = collidable.broadphase();
@@ -605,10 +608,7 @@ public abstract class Collisions<X> {
 		// go over all objects, and if the ray intersects their aabb + cast shape aabb,
 		// do a ray-shape query using convexCaster (CCD)
 
-		OArrayList<Collidable> ccc = collidables();
-		for (int i = 0; i < ccc.size(); i++) {
-			//return array[index];
-			Collidable collidable = ccc.get(i);
+		for (Collidable collidable : collidables()) {
 
 			// only perform raycast if filterMask matches
 			if (resultCallback.needsCollision(collidable.broadphase())) {

@@ -31,6 +31,8 @@ import spacegraph.phys.math.Transform;
 import spacegraph.phys.math.VectorUtil;
 import spacegraph.phys.util.OArrayList;
 
+import java.util.Collection;
+
 // JAVA NOTE: CompoundShape from 2.71
 
 /**
@@ -118,7 +120,7 @@ public class CompoundShape extends CollisionShape {
 		return out;
 	}
 
-	public OArrayList<CompoundShapeChild> getChildList() {
+	public Collection<CompoundShapeChild> getChildList() {
 		return children;
 	}
 

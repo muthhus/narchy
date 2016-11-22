@@ -48,8 +48,11 @@ public class PremiseEval extends Unify {
 
         if (t!=null) {
             t = dither(t);
-            assert(t!=null); //confMin should be greater than or equal to truthResolution
+            //assert(t!=null); //confMin should be greater than or equal to truthResolution
         }
+
+        if (t == null)
+            return false;
 
         return this.punct.set(new PremiseEval.TruthPuncEvidence(t, p, evidence))!=null;
     }
@@ -434,6 +437,8 @@ public class PremiseEval extends Unify {
     public long[] evidenceDouble() {
         if (evidenceDouble == null) {
             evidenceDouble = Stamp.zip(task.evidence(), belief.evidence());
+//            if ((task.cyclic() || belief.cyclic()) && Stamp.isCyclic(evidenceDouble))
+//                throw new RuntimeException("cyclic should not be propagated");
             //System.out.println(Arrays.toString(task.evidence()) + " " + Arrays.toString(belief.evidence()) + " -> " + Arrays.toString(evidenceDouble));
         }
 

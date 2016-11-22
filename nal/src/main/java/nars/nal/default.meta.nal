@@ -81,13 +81,13 @@
 //  corresponds to extensional union, and extensional intersection corresponds
 //  to intensional union.
 
-    (P --> M), (S --> M), notSet(S), notSet(P), neqCom(S,P) |- ((S | P) --> M), (Belief:Intersection, Permute:Backward)
-    (P --> M), (S --> M), notSet(S), notSet(P), neqCom(S,P) |- ((S & P) --> M), (Belief:Union, Permute:Backward)
-    (P --> M), (S --> M), notSet(S), notSet(P), neqCom(S,P) |- ((P ~ S) --> M), (Belief:Difference, Permute:Backward)
+    (P --> M), (S --> M), notSet(S), notSet(P), neqCom(S,P) |- ((S | P) --> M), (Belief:Intersection)
+    (P --> M), (S --> M), notSet(S), notSet(P), neqCom(S,P) |- ((S & P) --> M), (Belief:Union)
+    (P --> M), (S --> M), notSet(S), notSet(P), neqCom(S,P) |- ((P ~ S) --> M), (Belief:Difference)
 
-    (M --> P), (M --> S), notSet(S), notSet(P), neqCom(S,P) |- (M --> (P & S)), (Belief:Intersection, Permute:Backward)
-    (M --> P), (M --> S), notSet(S), notSet(P), neqCom(S,P) |- (M --> (P | S)), (Belief:Union, Permute:Backward)
-    (M --> P), (M --> S), notSet(S), notSet(P), neqCom(S,P) |- (M --> (P - S)), (Belief:Difference, Permute:Backward)
+    (M --> P), (M --> S), notSet(S), notSet(P), neqCom(S,P) |- (M --> (P & S)), (Belief:Intersection)
+    (M --> P), (M --> S), notSet(S), notSet(P), neqCom(S,P) |- (M --> (P | S)), (Belief:Union)
+    (M --> P), (M --> S), notSet(S), notSet(P), neqCom(S,P) |- (M --> (P - S)), (Belief:Difference)
 
 //raw product composition
 //    (A..+), (B..+) |- ((A..+) | (B..+)), (Belief:Intersection)
@@ -98,17 +98,26 @@
 //// inheritance decomposition ////////////////////////////////////////////////////////////////////////////////////
 //if (S --> M) is the case, and ((|,S,A..+) --> M) is not the case, then ((|,A..+) --> M) is not the case, hence Belief:DecomposePositiveNegativeNegative
 
-         (S --> M), ((|,S,A..+) --> M) |- ((|,A..+) --> M), (Belief:DecomposePositiveNegativeNegative)
-         (S --> M), ((&,S,A..+) --> M) |- ((&,A..+) --> M), (Belief:DecomposeNegativePositivePositive)
+     (S --> M), ((|,S,A..+) --> M) |- ((|,A..+) --> M), (Belief:DecomposePositiveNegativeNegative)
+     (S --> M), ((&,S,A..+) --> M) |- ((&,A..+) --> M), (Belief:DecomposeNegativePositivePositive)
 
-         (M --> S), (M --> (&,S,A..+)) |- (M --> (&,A..+)), (Belief:DecomposePositiveNegativeNegative)
-         (M --> S), (M --> (|,S,A..+)) |- (M --> (|,A..+)), (Belief:DecomposeNegativePositivePositive)
+     (M --> S), (M --> (&,S,A..+)) |- (M --> (&,A..+)), (Belief:DecomposePositiveNegativeNegative)
+     (M --> S), (M --> (|,S,A..+)) |- (M --> (|,A..+)), (Belief:DecomposeNegativePositivePositive)
 
-         (S --> M), ((S ~ P) --> M) |- (P --> M), (Belief:DecomposePositiveNegativePositive)
-         (S --> M), ((P ~ S) --> M) |- (P --> M), (Belief:DecomposeNegativeNegativeNegative)
+     (S --> M), ((S ~ P) --> M) |- (P --> M), (Belief:DecomposePositiveNegativePositive)
+     (S --> M), ((P ~ S) --> M) |- (P --> M), (Belief:DecomposeNegativeNegativeNegative)
 
-         (M --> S), (M --> (S - P)) |- (M --> P), (Belief:DecomposePositiveNegativePositive)
-         (M --> S), (M --> (P - S)) |- (M --> P), (Belief:DecomposeNegativeNegativeNegative)
+     (M --> S), (M --> (S - P)) |- (M --> P), (Belief:DecomposePositiveNegativePositive)
+     (M --> S), (M --> (P - S)) |- (M --> P), (Belief:DecomposeNegativeNegativeNegative)
+
+
+//NAL3 single premise inference
+
+    ((|,X,A..+) --> M), X |- ((|,A..+) --> M), (Belief:StructuralDeduction, Goal:StructuralDeduction)
+    (M --> (&,X,A..+)), X |- (M --> (&,A..+)), (Belief:StructuralDeduction, Goal:StructuralDeduction)
+
+    ((B ~ G) --> S), G |- (B --> S), (Belief:StructuralDeduction, Goal:StructuralDeduction)
+    (R --> (B - S)), S |- (R --> B), (Belief:StructuralDeduction, Goal:StructuralDeduction)
 
 
 //Set comprehension:
@@ -147,14 +156,6 @@
     (C --> [X,A..+]), [X,A..+], neqCom(X,C) |- (C --> [X]), (Belief:StructuralDeduction, Goal:StructuralDeduction)
     ({X,A..+} --> C), {X,A..+}, neqCom(X,C) |- ({X} --> C), (Belief:StructuralDeduction, Goal:StructuralDeduction)
     ([X,A..+] --> C), [X,A..+], neqCom(X,C) |- ([X] --> C), (Belief:StructuralDeduction, Goal:StructuralDeduction)
-
-//NAL3 single premise inference
-
-    ((|,X,A..+) --> M), (|,X,A..+), neqCom(X,M) |- (X --> M), (Belief:StructuralDeduction, Goal:StructuralDeduction)
-    (M --> (&,X,A..+)), (&,X,A..+), neqCom(X,M) |- (M --> X), (Belief:StructuralDeduction, Goal:StructuralDeduction)
-
-    ((B ~ G) --> S), S, neqCom(S,B) |- (B --> S), (Belief:StructuralDeduction, Goal:StructuralDeduction)
-    (R --> (B - S)), R, neqCom(S,B) |- (R --> B), (Belief:StructuralDeduction, Goal:StructuralDeduction)
 
 //// implication-based syllogism ////////////////////////////////////////////////////////////////////////////////////
 //       (A ==> B) ------- (B ==> C)

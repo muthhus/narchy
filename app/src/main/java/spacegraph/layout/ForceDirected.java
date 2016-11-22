@@ -1,14 +1,15 @@
 package spacegraph.layout;
 
 import nars.gui.ConceptWidget;
+import nars.util.list.FasterList;
 import spacegraph.SimpleSpatial;
 import spacegraph.Spatial;
 import spacegraph.math.v3;
 import spacegraph.phys.Collidable;
 import spacegraph.phys.Dynamic;
 import spacegraph.phys.collision.broad.Broadphase;
-import spacegraph.phys.util.OArrayList;
 
+import java.util.Collection;
 import java.util.List;
 
 import static spacegraph.math.v3.v;
@@ -47,7 +48,7 @@ public class ForceDirected implements spacegraph.phys.constraint.BroadConstraint
 //        }
 
     @Override
-    public void solve(Broadphase b, OArrayList<Collidable> objects, float timeStep) {
+    public void solve(Broadphase b, Collection<Collidable> objects, float timeStep) {
 
         //System.out.print("Force direct " + objects.size() + ": ");
         //final int[] count = {0};
@@ -78,7 +79,8 @@ public class ForceDirected implements spacegraph.phys.constraint.BroadConstraint
 
     }
 
-    protected void batch(List<Collidable> l) {
+    protected void batch(Collection<Collidable> c) {
+        List<Collidable> l = new FasterList(c);
         for (int i = 0, lSize = l.size(); i < lSize; i++) {
             Collidable x = l.get(i);
             for (int j = i + 1; j < lSize; j++) {

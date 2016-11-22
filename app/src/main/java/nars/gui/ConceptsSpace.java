@@ -7,6 +7,7 @@ import nars.nar.Default;
 import nars.term.Term;
 
 import java.util.Collection;
+import java.util.function.Function;
 
 public class ConceptsSpace extends NARSpace<Term, ConceptWidget> {
 
@@ -42,7 +43,8 @@ public class ConceptsSpace extends NARSpace<Term, ConceptWidget> {
             if (!display(ct))
                 return true;
 
-            ConceptWidget root = space.update(ct, t -> new ConceptWidget(t, this, maxEdgesPerNode));
+            Function<Term,ConceptWidget> materializer = t -> new ConceptWidget(t, this, maxEdgesPerNode);
+            ConceptWidget root = space.getOrAdd(ct, materializer);
             root.concept = concept;
 
             //float bPri = root.pri = b.priIfFiniteElseZero();

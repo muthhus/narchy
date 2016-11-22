@@ -36,6 +36,8 @@ import spacegraph.phys.math.TransformUtil;
 import spacegraph.phys.shape.ConvexShape;
 import spacegraph.phys.util.OArrayList;
 
+import java.util.Collection;
+
 /**
  * GhostObject can keep track of all objects that are overlapping. By default, this
  * overlap is based on the AABB. This is useful for creating a character controller,
@@ -168,7 +170,7 @@ public class GhostObject extends Collidable {
         //return array[index];
     }
 
-	public OArrayList<Collidable> getOverlappingPairs() {
+	public Collection<Collidable> getOverlappingPairs() {
 		return overlappingObjects;
 	}
 

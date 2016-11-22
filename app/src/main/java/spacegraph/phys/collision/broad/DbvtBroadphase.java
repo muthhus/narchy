@@ -30,6 +30,7 @@ import spacegraph.math.v3;
 import spacegraph.phys.Collidable;
 import spacegraph.phys.util.OArrayList;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -150,7 +151,7 @@ public class DbvtBroadphase extends Broadphase {
 		//btAlignedFree(proxy);
 	}
 
-	@Override public void forEach(int maxClusterPopulation, OArrayList<Collidable> all, Consumer<List<Collidable>> each) {
+	@Override public void forEach(int maxClusterPopulation, Collection<Collidable> all, Consumer<Collection<Collidable>> each) {
 		Node root = sets[0].root;
 		if (root == null)
 			return;
@@ -165,7 +166,7 @@ public class DbvtBroadphase extends Broadphase {
 		forEach(root, maxClusterPopulation, population, 0, each);
 	}
 
-	public int forEach(Node node, int maxClusterPopulation, int unvisited, int level, Consumer<List<Collidable>> each) {
+	public int forEach(Node node, int maxClusterPopulation, int unvisited, int level, Consumer<Collection<Collidable>> each) {
 
 
 		//HACK approximate cluster segmentation, a better one can be designed which will more evenly partition the set
@@ -180,7 +181,7 @@ public class DbvtBroadphase extends Broadphase {
 			}
 		} else {
 			//stop here and batch
-			List<Collidable> l = $.newArrayList(nodePop);
+			Collection<Collidable> l = $.newArrayList(nodePop);
 			node.leaves(l);
 			int ls = l.size();
 			if (ls > 0) {

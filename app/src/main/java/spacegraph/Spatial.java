@@ -65,23 +65,18 @@ public abstract class Spatial<X> implements Active {
     public boolean preactive;
 
 
-    public void update(SpaceGraph<X> s) {
-        preactive = true;
-    }
 
     public void update(Dynamics world) {
         //create and update any bodies and constraints
     }
 
-    public final boolean active(short nextOrder, Dynamics world) {
-        if (active()) {
-            this.order = nextOrder;
-            update(world);
-            return true;
-        } else {
-            return false;
-        }
-    }
+//    public final boolean isShown(short nextOrder, Dynamics world) {
+//        if (active()) {
+//            return true;
+//        } else {
+//            return false;
+//        }
+//    }
 
     public boolean active() {
         return preactive && order > -1;
@@ -113,9 +108,13 @@ public abstract class Spatial<X> implements Active {
     }
 
     /** schedules this node for removal from the engine, where it will call stop(s) to complete the removal */
-    public void stop() {
-        order = -1;
-        preactive = false;
+    @Override public boolean hide() {
+        if (order > -1 || preactive) {
+            order = -1;
+            preactive = false;
+            return true;
+        }
+        return false;
     }
 
     //abstract public Iterable<Collidable> bodies();
@@ -127,4 +126,7 @@ public abstract class Spatial<X> implements Active {
 
     public abstract void renderRelative(GL2 gl, Collidable body);
 
+    public void delete() {
+
+    }
 }

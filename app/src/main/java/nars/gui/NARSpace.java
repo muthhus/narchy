@@ -10,9 +10,11 @@ import org.eclipse.collections.impl.set.mutable.UnifiedSet;
 import spacegraph.Active;
 import spacegraph.SpaceGraph;
 import spacegraph.Spatial;
+import spacegraph.phys.Dynamics;
 import spacegraph.source.ListSpace;
 
 import java.util.Collection;
+import java.util.LinkedHashSet;
 
 
 /**
@@ -42,7 +44,9 @@ public abstract class NARSpace<X extends Term, Y extends Spatial<X>> extends Lis
     public NARSpace(int capacity) {
         super();
         this.capacity = capacity;
-        this.next = new UnifiedSet<>(capacity*2, 0.9f);
+        this.next =
+                new LinkedHashSet<>();
+                //new UnifiedSet<>(capacity*2, 0.9f);
 
     }
 
@@ -55,7 +59,7 @@ public abstract class NARSpace<X extends Term, Y extends Spatial<X>> extends Lis
     @Override
     public final void stop() {
         if (on!=null) {
-            next.forEach(Active::stop);
+            next.forEach(Active::hide);
             next.clear();
             on.off();
             on = null;
@@ -86,7 +90,7 @@ public abstract class NARSpace<X extends Term, Y extends Spatial<X>> extends Lis
 
         get(next);
 
-        prev.forEach(Active::stopIfInactive); //remove missing
+        //prev.forEach(Active::stopIfInactive); //remove missing
 
         //commit the changes
         this.active = new FasterList<>(next);
@@ -103,7 +107,7 @@ public abstract class NARSpace<X extends Term, Y extends Spatial<X>> extends Lis
 
     public static void main(String[] args) {
 
-        Default n = new Default(1024, 1, 1, 3);
+        Default n = new Default(1024, 16, 1, 3);
         //Default2 n = new Default2();
         //n.nal(4);
 
@@ -112,7 +116,7 @@ public abstract class NARSpace<X extends Term, Y extends Spatial<X>> extends Lis
 
         //new ArithmeticInduction(n);
 
-        Vis.conceptsWindow3D(n, 128, 5).show(800, 600);
+        Vis.conceptsWindow3D(n, 512, 12).show(800, 600);
 
         //n.run(20); //headstart
 

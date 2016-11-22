@@ -29,6 +29,8 @@ import spacegraph.phys.collision.narrow.PersistentManifold;
 import spacegraph.phys.constraint.TypedConstraint;
 import spacegraph.phys.util.OArrayList;
 
+import java.util.Collection;
+
 /**
  * Abstract class for constraint solvers.
  * 
@@ -43,7 +45,7 @@ public abstract class Constrainer {
 	/**
 	 * Solve a group of constraints.
 	 */
-	public abstract float solveGroup(OArrayList<Collidable> bodies, int numBodies, OArrayList<PersistentManifold> manifold, int manifold_offset, int numManifolds, OArrayList<TypedConstraint> constraints, int constraints_offset, int numConstraints, ContactSolverInfo info/*, btStackAlloc* stackAlloc*/, Intersecter intersecter);
+	public abstract float solveGroup(Collection<Collidable> bodies, int numBodies, OArrayList<PersistentManifold> manifold, int manifold_offset, int numManifolds, OArrayList<TypedConstraint> constraints, int constraints_offset, int numConstraints, ContactSolverInfo info/*, btStackAlloc* stackAlloc*/, Intersecter intersecter);
 
 	public void allSolved(ContactSolverInfo info /*, btStackAlloc* stackAlloc*/) {}
 

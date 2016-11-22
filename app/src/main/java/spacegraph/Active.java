@@ -17,11 +17,6 @@ public interface Active {
     boolean active();
     boolean preactive();
 
-    default void stopIfInactive() {
-        if (!preactive())
-            stop();
-    }
-
-    void stop();
+    boolean hide();
 
 }

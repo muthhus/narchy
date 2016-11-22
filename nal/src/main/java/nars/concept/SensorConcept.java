@@ -218,65 +218,65 @@ public class SensorConcept extends WiredConcept implements FloatFunction<Term>, 
     }
 
 
-//    public static void flatAttention(@NotNull Iterable<? extends Prioritizable> c, @NotNull MutableFloat p) {
-//        c.forEach( s -> s.pri(p::floatValue) );
+////    public static void flatAttention(@NotNull Iterable<? extends Prioritizable> c, @NotNull MutableFloat p) {
+////        c.forEach( s -> s.pri(p::floatValue) );
+////    }
+//
+//    private final class SensorBeliefTable extends DefaultBeliefTable {
+//
+//
+//        public SensorBeliefTable(int eCap, int tCap) {
+//            super(newEternalTable(eCap), newTemporalTable(tCap, nar));
+//        }
+//
+//        @Override
+//        public void clear(@NotNull NAR nar) {
+//            //TODO this will happen even if goal.clear is called, which shouldnt
+//            sensor.current = null;
+//            currentValue = Float.NaN;
+//            super.clear(nar);
+//        }
+//
+//
+//
+//        @Override
+//        public Truth truth(long when, long now) {
+//
+//            long lastSensorInputTime = sensor.lastInputTime;
+//
+//            Truth interpolated = super.truth(when, now);
+//
+//            //in the future after the last sensor input time..
+//
+//            long futureDT = when - lastSensorInputTime;
+//            if (when == ETERNAL || (futureDT > 0)) {
+//
+//                // Default implementation:
+//                /** provides a prediction truth for this sensor at a (> 0) time dtFuture in the future.
+//                 *  this could return the current sensor value, a sensor value which has decreased confidence,
+//                 *  or some more advanced machine-learning predictor.
+//                 */
+//                // use last sensor value with projected, and ultimately eternalized confidence
+//                Truth assumed = sensor.truth();
+//                if (assumed!=null) {
+//                    assumed = Revision.project(assumed, when, now, lastSensorInputTime, false);
+//                    if (assumed!=null) {
+//                        if (interpolated != null) {
+//                            //GUESS based on both
+//                            //return Truth.maxConf(assumed, interpolated);
+//                            //return interpolated;
+//                            return Revision.revise(assumed, interpolated);
+//                        } else if (interpolated == null) {
+//                            return assumed;
+//                        }
+//                    }
+//                }
+//
+//            }
+//
+//            return interpolated;
+//        }
+//
 //    }
-
-    private final class SensorBeliefTable extends DefaultBeliefTable {
-
-
-        public SensorBeliefTable(int eCap, int tCap) {
-            super(newEternalTable(eCap), newTemporalTable(tCap, nar));
-        }
-
-        @Override
-        public void clear(@NotNull NAR nar) {
-            //TODO this will happen even if goal.clear is called, which shouldnt
-            sensor.current = null;
-            currentValue = Float.NaN;
-            super.clear(nar);
-        }
-
-
-
-        @Override
-        public Truth truth(long when, long now) {
-
-            long lastSensorInputTime = sensor.lastInputTime;
-
-            Truth interpolated = super.truth(when, now);
-
-            //in the future after the last sensor input time..
-
-            long futureDT = when - lastSensorInputTime;
-            if (when == ETERNAL || (futureDT > 0)) {
-
-                // Default implementation:
-                /** provides a prediction truth for this sensor at a (> 0) time dtFuture in the future.
-                 *  this could return the current sensor value, a sensor value which has decreased confidence,
-                 *  or some more advanced machine-learning predictor.
-                 */
-                // use last sensor value with projected, and ultimately eternalized confidence
-                Truth assumed = sensor.truth();
-                if (assumed!=null) {
-                    assumed = Revision.project(assumed, when, now, lastSensorInputTime, false);
-                    if (assumed!=null) {
-                        if (interpolated != null) {
-                            //GUESS based on both
-                            //return Truth.maxConf(assumed, interpolated);
-                            //return interpolated;
-                            return Revision.revise(assumed, interpolated);
-                        } else if (interpolated == null) {
-                            return assumed;
-                        }
-                    }
-                }
-
-            }
-
-            return interpolated;
-        }
-
-    }
 
 }

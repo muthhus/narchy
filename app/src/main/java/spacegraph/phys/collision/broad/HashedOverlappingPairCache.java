@@ -282,7 +282,7 @@ public class HashedOverlappingPairCache extends OverlappingPairCache {
 	}
 
 	@Override
-	public int getNumOverlappingPairs() {
+	public int size() {
 		return overlappingPairArray.size();
 	}
 

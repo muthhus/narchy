@@ -37,7 +37,7 @@ public abstract class OverlappingPairCache extends OverlappingPairCallback {
 	
 	public abstract void cleanOverlappingPair(BroadphasePair pair, Intersecter intersecter);
 
-	public abstract int getNumOverlappingPairs();
+	public abstract int size();
 
 	public abstract void cleanProxyFromPairs(Broadphasing proxy, Intersecter intersecter);
 

@@ -84,6 +84,15 @@ public class ConceptWidget extends SimpleSpatial<Term> implements Consumer<BLink
         return x;
     }
 
+    @Override
+    public void delete() {
+        super.delete();
+        if (concept!=null) {
+            edges.clear();
+            concept = null;
+        }
+    }
+
     public void commit() {
 
         edges.commit();

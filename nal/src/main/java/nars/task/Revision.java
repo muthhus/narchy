@@ -76,53 +76,7 @@ public class Revision {
     }
 
 
-//    public static Task merge(@NotNull Task a, @NotNull Task b, long when, long now, @NotNull Truth newTruth, Concept concept) {
-//
-//        if (a.isBeliefOrGoal() && b.isBeliefOrGoal() && Term.equalAtemporally(a.term(), b.term())) {
-//            return mergeInterpolate(a, b, when, now, newTruth, concept);
-//
-//
-//        } else {
-//            return mergeSolution(a, b, when, now, newTruth);
-//
-//        }
-//    }
-
     public static Task mergeSolution(@NotNull Task a, @NotNull Task b, long when, long now, @NotNull Truth newTruth) {
-        //just project 'b' to 'a' time
-
-        //    @Nullable
-        //    default Task answerProjected(@NotNull Task question, @NotNull Memory memory) {
-        //
-        //        float termRelevance = Terms.termRelevance(term(), question.term());
-        //        if (termRelevance == 0)
-        //            return null;
-        //
-        //        long now = memory.time();
-        //
-        //        //TODO avoid creating new Truth instances
-        //        Truth solTruth = projectTruth(question.occurrence(), now, true);
-        //        if (solTruth == null)
-        //            return null;
-        //
-        //        //if truth instanceof ProjectedTruth, use its attached occ time (possibly eternal or temporal), otherwise assume it is this task's occurence time
-        //        long solutionOcc = solTruth instanceof ProjectedTruth ?
-        //                ((ProjectedTruth)solTruth).when : occurrence();
-        //
-        //        if (solTruth.conf() < conf()) return this;
-        //
-        //        solTruth = solTruth.confMult(termRelevance);
-        //                //* BeliefTable.relevance(this, solutionOcc, memory.duration()));
-        //                //solTruth.withConf( w2c(solTruth.conf())* termRelevance );
-        //
-        //        if (solTruth.conf() < conf())
-        //            return this;
-        //
-        //        Budget solutionBudget = solutionBudget(question, this, solTruth, memory);
-        //        if (solutionBudget == null)
-        //            return null;
-        //
-        //if ((!truth().equals(solTruth)) || (!newTerm.equals(term())) || (solutionOcc!= occCurrent)) {
 
         @NotNull Budget bb = b.budget();
 
@@ -192,111 +146,6 @@ public class Revision {
     }
 
 
-//    /**
-//     * heuristic which evaluates the semantic similarity of two terms
-//     * returning 1f if there is a complete match, 0f if there is
-//     * a totally separate meaning for each, and in-between if
-//     * some intermediate aspect is different (ex: temporal relation dt)
-//     * <p>
-//     * evaluates the terms recursively to compare internal 'dt'
-//     * produces a tuple (merged, difference amount), the difference amount
-//     * can be used to attenuate truth values, etc.
-//     * <p>
-//     * TODO threshold to stop early
-//     */
-//    public static FloatObjectPair<Compound> dtMerge(@NotNull Compound a, @NotNull Compound b, float aProp, Random rng) {
-//        if (a.equals(b)) {
-//            return PrimitiveTuples.pair(0f, a);
-//        }
-//
-//        MutableFloat accumulatedDifference = new MutableFloat(0);
-//        Term cc = dtMerge(a, b, aProp, accumulatedDifference, 1f, rng);
-//
-//
-//        //how far away from 0.5 the weight point is, reduces the difference value because less will have changed
-//        float weightDivergence = 1f - (Math.abs(aProp - 0.5f) * 2f);
-//
-//        return PrimitiveTuples.pair(accumulatedDifference.floatValue() * weightDivergence, cc);
-//
-//
-////            int at = a.dt();
-////            int bt = b.dt();
-////            if ((at != bt) && (at!=DTERNAL) && (bt!=DTERNAL)) {
-//////                if ((at == DTERNAL) || (bt == DTERNAL)) {
-//////                    //either is atemporal but not both
-//////                    return 0.5f;
-//////                }
-////
-//////                boolean symmetric = aop.isCommutative();
-//////
-//////                if (symmetric) {
-//////                    int ata = Math.abs(at);
-//////                    int bta = Math.abs(bt);
-//////                    return 1f - (ata / ((float) (ata + bta)));
-//////                } else {
-//////                    boolean ap = at >= 0;
-//////                    boolean bp = bt >= 0;
-//////                    if (ap ^ bp) {
-//////                        return 0; //opposite direction
-//////                    } else {
-//////                        //same direction
-////                        return 1f - (Math.abs(at - bt) / (1f + Math.abs(at + bt)));
-//////                    }
-//////                }
-////            }
-////        }
-////        return 1f;
-//    }
-
-
-//    /**
-//     * computes a value that indicates the amount of difference (>=0) in the internal 'dt' subterm structure of 2 temporal compounds
-//     */
-//    @NotNull
-//    public static float dtDifference(@Nullable Termed<Compound> a, @NotNull Termed<Compound> b) {
-//        if (a == null) return 0f;
-//
-//        MutableFloat f = new MutableFloat(0);
-//        dtDifference(a.term(), b.term(), f, 1f);
-//        return f.floatValue();
-//    }
-
-//    @NotNull
-//    private static void dtDifference(@NotNull Term a, @NotNull Term b, @NotNull MutableFloat accumulatedDifference, float depth) {
-//        if (a.op() == b.op()) {
-//            if (a.size() == 2 && b.size() == 2) {
-//
-//                if (a.equals(b))
-//                    return; //no difference
-//
-//                Compound aa = ((Compound) a);
-//                Compound bb = ((Compound) b);
-//
-//                dtCompare(aa, bb, 0.5f, accumulatedDifference, depth, null);
-//            }
-////            if (a.size() == b.size())
-////
-////                Term a0 = aa.term(0);
-////                if (a.size() == 2 && b0) {
-////                    Term b0 = bb.term(0);
-////
-////                    if (a0.op() == b0.op()) {
-////                        dtCompare((Compound) a0, (Compound) b0, 0.5f, accumulatedDifference, depth / 2f, null);
-////                    }
-////
-////                    Term a1 = aa.term(1);
-////                    Term b1 = bb.term(1);
-////
-////                    if (a1.op() == b1.op()) {
-////                        dtCompare((Compound) a1, (Compound) b1, 0.5f, accumulatedDifference, depth / 2f, null);
-////                    }
-////
-////                }
-////
-////            }
-//        } /* else: can not be compared anyway */
-//    }
-//
     @NotNull
     public static Term intermpolate(@NotNull Term a, @NotNull Term b, float aProp, @NotNull MutableFloat accumulatedDifference, float curDepth, @NotNull Random rng, boolean mergeOrChoose) {
         if (a.equals(b)) {
@@ -363,55 +212,6 @@ public class Revision {
 
     }
 
-//    private static void failIntermpolation(@NotNull Compound a, @NotNull Compound b) {
-//        throw new RuntimeException("interpolation failure: different or invalid internal structure and can not be compared:\n\t" + a + "\n\t" + b);
-//    }
-//
-//    private static int dtCompare(@NotNull Compound a, @NotNull Compound b, float aProp, @NotNull MutableFloat accumulatedDifference, float depth, @Nullable Random rng) {
-//        int newDT;
-//        int adt = a.dt();
-//        if (adt != b.dt()) {
-//
-//            int bdt = b.dt();
-//            if (adt != DTERNAL && bdt != DTERNAL) {
-//
-//                accumulatedDifference.add(Math.abs(adt - bdt) * depth);
-//
-//                //newDT = Math.round(Util.lerp(adt, bdt, aProp));
-//                if (rng != null)
-//                    newDT = choose(adt, bdt, aProp, rng);
-//                else
-//                    newDT = aProp > 0.5f ? adt : bdt;
-//
-//
-//            } else if (bdt != DTERNAL) {
-//                newDT = bdt;
-//                //accumulatedDifference.add(bdt * depth);
-//
-//            } else if (adt != DTERNAL) {
-//                newDT = adt;
-//                //accumulatedDifference.add(adt * depth);
-//            } else {
-//                throw new RuntimeException();
-//            }
-//        } else {
-//            newDT = adt;
-//        }
-//        return newDT;
-//    }
-
-//    static int choose(int x, int y, float xProp, @NotNull Random random) {
-//        return random.nextFloat() < xProp ? x : y;
-//    }
-
-//    private static Compound failStrongest(Compound a, Compound b, float aProp) {
-//        //logger.warn("interpolation failure: {} and {}", a, b);
-//        return strongest(a, b, aProp);
-//    }
-
-
-
-
     public static Term choose(Term a, Term b, float aBalance, @NotNull Random rng) {
         return (rng.nextFloat() < aBalance) ? a : b;
     }
@@ -440,65 +240,6 @@ public class Revision {
                         !Stamp.overlapping(newBelief, oldBelief);
     }
 
-//    /**
-//     * assumes the compounds are the same except for possible numeric metadata differences
-//     */
-//    public static @NotNull Compound intermpolate(@NotNull Termed<Compound> a, @NotNull Termed<Compound> b, float aConf, float bConf, @NotNull TermIndex index) {
-//        @NotNull Compound aterm = a.term();
-//        if (a.equals(b))
-//            return aterm;
-//
-//        float aWeight = c2w(aConf);
-//        float bWeight = c2w(bConf);
-//        float aProp = aWeight / (aWeight + bWeight);
-//
-//        @NotNull Compound bterm = b.term();
-//
-//        int dt = DTERNAL;
-//        int at = aterm.dt();
-//        if (at != DTERNAL) {
-//            int bt = bterm.dt();
-//            if (bt != DTERNAL) {
-//                dt = lerp(at, bt, aProp);
-//            }
-//        }
-//
-//
-//        Term r = index.the(a.op(), dt, aterm.terms());
-//        return !(r instanceof Compound) ? choose(aterm, bterm, aProp) : (Compound) r;
-//    }
-
-    @Nullable
-    public static ProjectedTruth project(@NotNull Truth t, long target, long now, long occ, boolean eternalizeIfWeaklyTemporal) {
-
-        if (occ == target)
-            return new ProjectedTruth(t, target);
-
-        float conf = t.conf();
-
-        float nextConf;
-
-
-        float projConf = nextConf = conf * projection(target, occ, now);
-
-        if (eternalizeIfWeaklyTemporal) {
-            float eternConf = eternalize(conf);
-
-            if (projConf < eternConf) {
-                nextConf = eternConf;
-                target = ETERNAL;
-            }
-        }
-
-        if (nextConf < Param.TRUTH_EPSILON)
-            return null;
-
-        float maxConf = 1f - Param.TRUTH_EPSILON;
-        if (nextConf > maxConf) //clip at max conf
-            nextConf = maxConf;
-
-        return new ProjectedTruth(t.freq(), nextConf, target);
-    }
 
     @NotNull
     public static Task chooseByConf(@NotNull Task t, @Nullable Task b, @NotNull PremiseEval p) {
@@ -639,3 +380,215 @@ public class Revision {
 //        }
 //        return null;
 //    }
+
+//    /**
+//     * assumes the compounds are the same except for possible numeric metadata differences
+//     */
+//    public static @NotNull Compound intermpolate(@NotNull Termed<Compound> a, @NotNull Termed<Compound> b, float aConf, float bConf, @NotNull TermIndex index) {
+//        @NotNull Compound aterm = a.term();
+//        if (a.equals(b))
+//            return aterm;
+//
+//        float aWeight = c2w(aConf);
+//        float bWeight = c2w(bConf);
+//        float aProp = aWeight / (aWeight + bWeight);
+//
+//        @NotNull Compound bterm = b.term();
+//
+//        int dt = DTERNAL;
+//        int at = aterm.dt();
+//        if (at != DTERNAL) {
+//            int bt = bterm.dt();
+//            if (bt != DTERNAL) {
+//                dt = lerp(at, bt, aProp);
+//            }
+//        }
+//
+//
+//        Term r = index.the(a.op(), dt, aterm.terms());
+//        return !(r instanceof Compound) ? choose(aterm, bterm, aProp) : (Compound) r;
+//    }
+
+//    @Nullable
+//    public static ProjectedTruth project(@NotNull Truth t, long target, long now, long occ, boolean eternalizeIfWeaklyTemporal) {
+//
+//        if (occ == target)
+//            return new ProjectedTruth(t, target);
+//
+//        float conf = t.conf();
+//
+//        float nextConf;
+//
+//
+//        float projConf = nextConf = conf * projection(target, occ, now);
+//
+//        if (eternalizeIfWeaklyTemporal) {
+//            float eternConf = eternalize(conf);
+//
+//            if (projConf < eternConf) {
+//                nextConf = eternConf;
+//                target = ETERNAL;
+//            }
+//        }
+//
+//        if (nextConf < Param.TRUTH_EPSILON)
+//            return null;
+//
+//        float maxConf = 1f - Param.TRUTH_EPSILON;
+//        if (nextConf > maxConf) //clip at max conf
+//            nextConf = maxConf;
+//
+//        return new ProjectedTruth(t.freq(), nextConf, target);
+//    }
+//    private static void failIntermpolation(@NotNull Compound a, @NotNull Compound b) {
+//        throw new RuntimeException("interpolation failure: different or invalid internal structure and can not be compared:\n\t" + a + "\n\t" + b);
+//    }
+//
+//    private static int dtCompare(@NotNull Compound a, @NotNull Compound b, float aProp, @NotNull MutableFloat accumulatedDifference, float depth, @Nullable Random rng) {
+//        int newDT;
+//        int adt = a.dt();
+//        if (adt != b.dt()) {
+//
+//            int bdt = b.dt();
+//            if (adt != DTERNAL && bdt != DTERNAL) {
+//
+//                accumulatedDifference.add(Math.abs(adt - bdt) * depth);
+//
+//                //newDT = Math.round(Util.lerp(adt, bdt, aProp));
+//                if (rng != null)
+//                    newDT = choose(adt, bdt, aProp, rng);
+//                else
+//                    newDT = aProp > 0.5f ? adt : bdt;
+//
+//
+//            } else if (bdt != DTERNAL) {
+//                newDT = bdt;
+//                //accumulatedDifference.add(bdt * depth);
+//
+//            } else if (adt != DTERNAL) {
+//                newDT = adt;
+//                //accumulatedDifference.add(adt * depth);
+//            } else {
+//                throw new RuntimeException();
+//            }
+//        } else {
+//            newDT = adt;
+//        }
+//        return newDT;
+//    }
+
+//    static int choose(int x, int y, float xProp, @NotNull Random random) {
+//        return random.nextFloat() < xProp ? x : y;
+//    }
+
+//    private static Compound failStrongest(Compound a, Compound b, float aProp) {
+//        //logger.warn("interpolation failure: {} and {}", a, b);
+//        return strongest(a, b, aProp);
+//    }
+
+
+//    /**
+//     * heuristic which evaluates the semantic similarity of two terms
+//     * returning 1f if there is a complete match, 0f if there is
+//     * a totally separate meaning for each, and in-between if
+//     * some intermediate aspect is different (ex: temporal relation dt)
+//     * <p>
+//     * evaluates the terms recursively to compare internal 'dt'
+//     * produces a tuple (merged, difference amount), the difference amount
+//     * can be used to attenuate truth values, etc.
+//     * <p>
+//     * TODO threshold to stop early
+//     */
+//    public static FloatObjectPair<Compound> dtMerge(@NotNull Compound a, @NotNull Compound b, float aProp, Random rng) {
+//        if (a.equals(b)) {
+//            return PrimitiveTuples.pair(0f, a);
+//        }
+//
+//        MutableFloat accumulatedDifference = new MutableFloat(0);
+//        Term cc = dtMerge(a, b, aProp, accumulatedDifference, 1f, rng);
+//
+//
+//        //how far away from 0.5 the weight point is, reduces the difference value because less will have changed
+//        float weightDivergence = 1f - (Math.abs(aProp - 0.5f) * 2f);
+//
+//        return PrimitiveTuples.pair(accumulatedDifference.floatValue() * weightDivergence, cc);
+//
+//
+////            int at = a.dt();
+////            int bt = b.dt();
+////            if ((at != bt) && (at!=DTERNAL) && (bt!=DTERNAL)) {
+//////                if ((at == DTERNAL) || (bt == DTERNAL)) {
+//////                    //either is atemporal but not both
+//////                    return 0.5f;
+//////                }
+////
+//////                boolean symmetric = aop.isCommutative();
+//////
+//////                if (symmetric) {
+//////                    int ata = Math.abs(at);
+//////                    int bta = Math.abs(bt);
+//////                    return 1f - (ata / ((float) (ata + bta)));
+//////                } else {
+//////                    boolean ap = at >= 0;
+//////                    boolean bp = bt >= 0;
+//////                    if (ap ^ bp) {
+//////                        return 0; //opposite direction
+//////                    } else {
+//////                        //same direction
+////                        return 1f - (Math.abs(at - bt) / (1f + Math.abs(at + bt)));
+//////                    }
+//////                }
+////            }
+////        }
+////        return 1f;
+//    }
+
+
+//    /**
+//     * computes a value that indicates the amount of difference (>=0) in the internal 'dt' subterm structure of 2 temporal compounds
+//     */
+//    @NotNull
+//    public static float dtDifference(@Nullable Termed<Compound> a, @NotNull Termed<Compound> b) {
+//        if (a == null) return 0f;
+//
+//        MutableFloat f = new MutableFloat(0);
+//        dtDifference(a.term(), b.term(), f, 1f);
+//        return f.floatValue();
+//    }
+
+//    @NotNull
+//    private static void dtDifference(@NotNull Term a, @NotNull Term b, @NotNull MutableFloat accumulatedDifference, float depth) {
+//        if (a.op() == b.op()) {
+//            if (a.size() == 2 && b.size() == 2) {
+//
+//                if (a.equals(b))
+//                    return; //no difference
+//
+//                Compound aa = ((Compound) a);
+//                Compound bb = ((Compound) b);
+//
+//                dtCompare(aa, bb, 0.5f, accumulatedDifference, depth, null);
+//            }
+////            if (a.size() == b.size())
+////
+////                Term a0 = aa.term(0);
+////                if (a.size() == 2 && b0) {
+////                    Term b0 = bb.term(0);
+////
+////                    if (a0.op() == b0.op()) {
+////                        dtCompare((Compound) a0, (Compound) b0, 0.5f, accumulatedDifference, depth / 2f, null);
+////                    }
+////
+////                    Term a1 = aa.term(1);
+////                    Term b1 = bb.term(1);
+////
+////                    if (a1.op() == b1.op()) {
+////                        dtCompare((Compound) a1, (Compound) b1, 0.5f, accumulatedDifference, depth / 2f, null);
+////                    }
+////
+////                }
+////
+////            }
+//        } /* else: can not be compared anyway */
+//    }
+//

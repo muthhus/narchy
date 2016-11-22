@@ -29,6 +29,8 @@ import spacegraph.phys.collision.broad.BroadphaseNativeType;
 import spacegraph.phys.math.VectorUtil;
 import spacegraph.phys.util.OArrayList;
 
+import java.util.Collection;
+
 /**
  * ConvexHullShape implements an implicit convex hull of an array of vertices.
  * Bullet provides a general and fast collision detector for convex shapes based
@@ -74,7 +76,7 @@ public class ConvexHullShape extends PolyhedralConvexShape {
 		return this;
 	}
 
-	public OArrayList<v3> getPoints() {
+	public Collection<v3> getPoints() {
 		return points;
 	}
 

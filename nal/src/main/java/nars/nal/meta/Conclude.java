@@ -236,7 +236,7 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
         }
 
 
-        DerivedTask d = derive(content, budget, nar.time(), occ, m, truth, ct.punc, ct.evidence);
+        DerivedTask d = derive(content, budget, nar.time(), occ, m, truth, ct);
         if (d != null)
             m.target.accept(d);
     }
@@ -246,7 +246,9 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
      * part 2
      */
     @Nullable
-    public final DerivedTask derive(@NotNull Termed<Compound> c, @NotNull Budget budget, long now, long occ, @NotNull PremiseEval p, Truth truth, char punc, long[] evidence) {
+    public final DerivedTask derive(@NotNull Termed<Compound> c, @NotNull Budget budget, long now, long occ, @NotNull PremiseEval p, Truth truth, PremiseEval.TruthPuncEvidence ct) {
+        char punc = ct.punc;
+        long[] evidence = ct.evidence;
 
         DerivedTask dt =
                 new DerivedTask.DefaultDerivedTask(c, truth, punc, evidence, p, now, occ);

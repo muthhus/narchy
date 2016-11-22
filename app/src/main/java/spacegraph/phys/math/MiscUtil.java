@@ -27,6 +27,7 @@ import spacegraph.phys.util.FloatArrayList;
 import spacegraph.phys.util.IntArrayList;
 import spacegraph.phys.util.OArrayList;
 
+import java.util.Collection;
 import java.util.Comparator;
 
 /**
@@ -36,7 +37,7 @@ import java.util.Comparator;
  */
 public class MiscUtil {
 
-	public static int getListCapacityForHash(OArrayList<?> list) {
+	public static int getListCapacityForHash(Collection<?> list) {
 		return getListCapacityForHash(list.size());
 	}
 	

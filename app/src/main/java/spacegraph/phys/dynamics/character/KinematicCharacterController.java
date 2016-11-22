@@ -379,7 +379,7 @@ public class KinematicCharacterController extends ActionInterface {
 		currentPosition.set(ghostObject.getWorldTransform(new Transform()));
 
 		float maxPen = 0.0f;
-		for (int i=0; i<ghostObject.getOverlappingPairCache().getNumOverlappingPairs(); i++) {
+		for (int i = 0; i<ghostObject.getOverlappingPairCache().size(); i++) {
 			manifoldArray.clear();
 
 			//return array[index];

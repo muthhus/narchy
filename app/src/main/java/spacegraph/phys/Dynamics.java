@@ -26,7 +26,8 @@ package spacegraph.phys;
 import nars.$;
 import nars.util.list.FasterList;
 import org.eclipse.collections.api.block.procedure.primitive.IntObjectProcedure;
-import spacegraph.Spatial;
+import org.jetbrains.annotations.Nullable;
+import spacegraph.math.Matrix3f;
 import spacegraph.math.v3;
 import spacegraph.phys.collision.Islands;
 import spacegraph.phys.collision.broad.*;
@@ -45,6 +46,7 @@ import spacegraph.phys.solve.SequentialImpulseConstrainer;
 import spacegraph.phys.util.Animated;
 import spacegraph.phys.util.OArrayList;
 
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.function.Consumer;
@@ -55,7 +57,7 @@ import static spacegraph.phys.Dynamic.ifDynamic;
 /**
  * DynamicsWorld is the interface class for several dynamics implementation,
  * basic, discrete, parallel, and continuous etc.
- * 
+ *
  * @author jezek2
  */
 public abstract class Dynamics<X> extends Collisions<X> {
@@ -69,15 +71,16 @@ public abstract class Dynamics<X> extends Collisions<X> {
     protected final Constrainer constrainer;
     protected final Islands islands;
     protected final OArrayList<TypedConstraint> constraints = new OArrayList<TypedConstraint>();
-    protected final v3 gravity = new v3(0f, -10f, 0f);
+    @Nullable
+    protected v3 gravity = null;
     //hold sthe current list of active bodies
-    private final OArrayList<Collidable> collidable = new OArrayList<>();
+    private Collection<Collidable> collidable = new OArrayList<>();
     private final OArrayList<TypedConstraint> sortedConstraints = new OArrayList<TypedConstraint>();
     private final InplaceSolverIslandCallback solverCallback = new InplaceSolverIslandCallback();
     protected InternalTickCallback internalTickCallback;
-	protected Object worldUserInfo;
-	
-	public final ContactSolverInfo solverInfo = new ContactSolverInfo();
+    protected Object worldUserInfo;
+
+    public final ContactSolverInfo solverInfo = new ContactSolverInfo();
     //for variable timesteps
     protected float localTime = 1f / 60f;
     protected boolean ownsIslandManager;
@@ -88,12 +91,13 @@ public abstract class Dynamics<X> extends Collisions<X> {
     protected InternalTickCallback preTickCallback;
     private float dt;
 
+
     public Dynamics(Intersecter intersecter, Broadphase broadphase) {
         this(intersecter, broadphase, null);
     }
 
     public Dynamics(Intersecter intersecter, Broadphase broadphase, Constrainer constrainer) {
-		super(intersecter, broadphase);
+        super(intersecter, broadphase);
         islands = new Islands();
         ownsIslandManager = true;
         if (constrainer == null) {
@@ -116,18 +120,18 @@ public abstract class Dynamics<X> extends Collisions<X> {
 
         Dynamic body = new Dynamic(mass, t, shape, localInertia);
         body.setCenterOfMassTransform(t);
-        body.group = (short)group;
-        body.mask = (short)mask;
+        body.group = (short) group;
+        body.mask = (short) mask;
 
         return body;
     }
 
 
-	public final int stepSimulation(float dt, int maxSubSteps) {
-		curDT = dt;
-		updateAnimations();
-		return stepSimulation(dt, maxSubSteps, 1f / 60f);
-	}
+    public final int stepSimulation(float dt, int maxSubSteps) {
+        curDT = dt;
+        updateAnimations();
+        return stepSimulation(dt, maxSubSteps, 1f / 60f);
+    }
 
     protected void synchronizeMotionStates(boolean clear) {
 //        Transform interpolatedTransform = new Transform();
@@ -137,10 +141,9 @@ public abstract class Dynamics<X> extends Collisions<X> {
 //        v3 tmpAngVel = new v3();
 
         // todo: iterate over awake simulation islands!
-        OArrayList<Collidable> colliding = this.collidable;
-        for (int i = 0, collidingSize = colliding.size(); i < collidingSize; i++) {
-            Dynamic body = ifDynamic(colliding.get(i));
+        for (Collidable ccc : collidable) {
 
+            Dynamic body = ifDynamic(ccc);
             if (body == null) {
                 continue;
             }
@@ -197,16 +200,16 @@ public abstract class Dynamics<X> extends Collisions<X> {
 
             this.dt = fixedTimeStep;
 
+            updateObjects();
+
             if (numSimulationSubSteps != 0) {
 
-                updateObjects();
-
                 // clamp the number of substeps, to prevent simulation grinding spiralling down to a halt
-                int clampedSimulationSteps = Math.min(numSimulationSubSteps,maxSubSteps);
+                int clampedSimulationSteps = Math.min(numSimulationSubSteps, maxSubSteps);
 
                 for (int i = 0; i < clampedSimulationSteps; i++) {
                     internalSingleStepSimulation(fixedTimeStep);
-                    synchronizeMotionStates(i == clampedSimulationSteps-1);
+                    synchronizeMotionStates(i == clampedSimulationSteps - 1);
                 }
             }
 
@@ -223,41 +226,65 @@ public abstract class Dynamics<X> extends Collisions<X> {
     }
 
     protected final void updateObjects() {
-        collidable.clear(); //populate in 'saveKinematicState'
+        Collection<Collidable> nextCollidables = $.newArrayList(collidable.size() /* estimate */);
+
         forEachIntSpatial((i, s) -> {
 
-            if (s.active((short)i, this)) {
-                reactivate(s);
-                return false; //dont remove
-            } else {
-                inactivate(s);
-                return true; //remove
-            }
+//            if (s.preactive()) {
+            s.order = (short) i;
+
+            s.update(this);
+
+            s.forEachBody(c -> {
+
+                Dynamic d = ifDynamic(c);
+                if (d != null) {
+
+                    on(d);
+
+                    nextCollidables.add(d);
+
+                    if (d.getActivationState() != Collidable.ISLAND_SLEEPING)
+                        d.saveKinematicState(dt); // to calculate velocities next frame
+
+                    if (gravity != null) {
+                        if (!d.isStaticOrKinematicObject())
+                            d.setGravity(gravity);
+
+                        if (d.isActive())
+                            d.applyGravity();
+                    }
+
+
+                } else {
+                    System.err.println("ignoring non-dynamic: " + c);
+                }
+            });
+
+            s.constraints().forEach(this::addConstraint);
+
+//            } else {
+//                if (s.hide()) {
+//                    s.constraints().forEach(this::removeConstraint);
+//                    s.forEachBody(this::removing);
+//                }
+//
+//            }
 
         });
+
+        //System.out.println(nextCollidables.size() + " " + pairs().size());
+
+        this.collidable = nextCollidables;
     }
+
+//    @Override
+//    public final void forEachCollidable(IntObjectProcedure<Collidable<X>> each) {
+//        this.collidable.forEachWithIndexProc(each::value);
+//    }
 
     @Override
-    public final void forEachCollidable(IntObjectProcedure<Collidable<X>> each) {
-        this.collidable.forEachWithIndexProc(each::value);
-    }
-
-    /**
-     * re-activates the spatial's components for this cycle
-     */
-    private void reactivate(Spatial<X> s) {
-        s.forEachBody(this::on);
-        s.constraints().forEach(this::addConstraint);
-    }
-
-    protected final void inactivate(Spatial<X> s) {
-        s.constraints().forEach(this::removeConstraint);
-        s.forEachBody(this::removing);
-        s.stop();
-    }
-
-    @Override
-    public OArrayList<Collidable> collidables() {
+    public final Collection<Collidable> collidables() {
         return collidable;
     }
 
@@ -288,10 +315,7 @@ public abstract class Dynamics<X> extends Collisions<X> {
             v3 maxAabb = new v3();
             v3 colorvec = new v3();
 
-            // todo: iterate over awake simulation islands!
-            for (i = 0; i < collidable.size(); i++) {
-                //return array[index];
-                Collidable colObj = collidable.get(i);
+            for (Collidable colObj : collidable) {
                 if (debugDrawer != null && (debugDrawer.getDebugMode() & DebugDrawModes.DRAW_WIREFRAME) != 0) {
                     v3 color = new v3();
                     color.set(255f, 255f, 255f);
@@ -373,34 +397,15 @@ public abstract class Dynamics<X> extends Collisions<X> {
         }
     }
 
-	public final void addConstraint(TypedConstraint constraint) {
-		addConstraint(constraint, false);
-	}
+    public final void addConstraint(TypedConstraint constraint) {
+        addConstraint(constraint, false);
+    }
+
+
 
     /**
      * enable/register the body in the engine
      */
-    @Override
-    protected final void on(Collidable c) {
-        collidable.add(c);
-
-        Dynamic d = ifDynamic(c);
-        if (d != null) {
-            if (d.getActivationState() != Collidable.ISLAND_SLEEPING)
-                d.saveKinematicState(dt); // to calculate velocities next frame
-
-            if (d.isActive())
-                d.applyGravity();
-        }
-
-        if (d.shape() != null) {
-            super.on(d);
-        }
-
-        if (!d.isStaticOrKinematicObject()) {
-            d.setGravity(gravity);
-        }
-    }
 
     public void updateActions(float timeStep) {
         BulletStats.pushProfile("updateActions");
@@ -432,9 +437,7 @@ public abstract class Dynamics<X> extends Collisions<X> {
         try {
             v3 tmp = new v3();
 
-            for (int i = 0; i < collidable.size(); i++) {
-                //return array[index];
-                Collidable colObj = collidable.get(i);
+            for (Collidable colObj : collidable) {
                 Dynamic body = ifDynamic(colObj);
                 if (body != null) {
                     body.updateDeactivation(timeStep);
@@ -483,14 +486,14 @@ public abstract class Dynamics<X> extends Collisions<X> {
     }
 
 
-    public void addAction(ActionInterface action) {
-        actions.add(action);
-    }
-
-
-    public void removeAction(ActionInterface action) {
-        actions.remove(action);
-    }
+//    public void addAction(ActionInterface action) {
+//        actions.add(action);
+//    }
+//
+//
+//    public void removeAction(ActionInterface action) {
+//        actions.remove(action);
+//    }
 //
 //
 //    public void addVehicle(RaycastVehicle vehicle) {
@@ -546,8 +549,8 @@ public abstract class Dynamics<X> extends Collisions<X> {
         }
     }
 
-    public void setGravity(v3 gravity) {
-        this.gravity.set(gravity);
+    public void setGravity(@Nullable v3 gravity) {
+        this.gravity = gravity;
     }
 
 
@@ -564,7 +567,9 @@ public abstract class Dynamics<X> extends Collisions<X> {
         return islandId;
     }
 
-    /** solve contact and other joint constraints */
+    /**
+     * solve contact and other joint constraints
+     */
     protected void solveConstraints(float timeStep, ContactSolverInfo solverInfo) {
 
         calculateSimulationIslands();
@@ -594,7 +599,7 @@ public abstract class Dynamics<X> extends Collisions<X> {
             constrainer.prepareSolve(getNumCollisionObjects(), ((Collisions) this).intersecter.getNumManifolds());
 
             // solve all the constraints for this island
-            islands.buildAndProcessIslands(intersecter, collidable, solverCallback);
+            islands.buildAndProcessIslands(intersecter, new FasterList<>(collidable), solverCallback);
 
             constrainer.allSolved(solverInfo /*, m_stackAlloc*/);
         } finally {
@@ -639,9 +644,7 @@ public abstract class Dynamics<X> extends Collisions<X> {
             Transform tmpTrans = new Transform();
 
             Transform predictedTrans = new Transform();
-            for (int i = 0; i < collidable.size(); i++) {
-                //return array[index];
-                Collidable colObj = collidable.get(i);
+            for (Collidable colObj : collidable) {
                 Dynamic body = ifDynamic(colObj);
                 if (body != null) {
                     body.setHitFraction(1f);
@@ -691,12 +694,12 @@ public abstract class Dynamics<X> extends Collisions<X> {
     protected void predictUnconstraintMotion(float timeStep) {
         BulletStats.pushProfile("predictUnconstraintMotion");
         try {
-            forEachCollidable((i,colObj)->{
+            collidables().forEach((colObj) -> {
                 Dynamic body = ifDynamic(colObj);
                 if (body != null && !body.isStaticOrKinematicObject() && body.isActive()) {
                     body.integrateVelocities(timeStep);
                     body.applyDamping(timeStep);
-                    body.predictIntegratedTransform(timeStep, body.getInterpolationWorldTransform(new Transform()));
+                    body.predictIntegratedTransform(timeStep, body.interpolationWorldTransform);
                 }
             });
         } finally {
@@ -777,19 +780,22 @@ public abstract class Dynamics<X> extends Collisions<X> {
         v3 start = new v3(worldTransform);
 
         tmp.set(1f, 0f, 0f);
-        worldTransform.basis.transform(tmp);
+
+        Matrix3f transformBasis = worldTransform.basis;
+
+        transformBasis.transform(tmp);
         tmp.add(start);
         tmp2.set(1f, 0f, 0f);
         debugDrawer.drawLine(start, tmp, tmp2);
 
         tmp.set(0f, 1f, 0f);
-        worldTransform.basis.transform(tmp);
+        transformBasis.transform(tmp);
         tmp.add(start);
         tmp2.set(0f, 1f, 0f);
         debugDrawer.drawLine(start, tmp, tmp2);
 
         tmp.set(0f, 0f, 1f);
-        worldTransform.basis.transform(tmp);
+        transformBasis.transform(tmp);
         tmp.add(start);
         tmp2.set(0f, 0f, 1f);
         debugDrawer.drawLine(start, tmp, tmp2);
@@ -961,15 +967,13 @@ public abstract class Dynamics<X> extends Collisions<X> {
     }
 
 
-
-
-	/**
-	 * Set the callback for when an internal tick (simulation substep) happens, optional user info.
-	 */
-	public void setInternalTickCallback(InternalTickCallback cb, Object worldUserInfo) {
-		this.internalTickCallback = cb;
-		this.worldUserInfo = worldUserInfo;
-	}
+    /**
+     * Set the callback for when an internal tick (simulation substep) happens, optional user info.
+     */
+    public void setInternalTickCallback(InternalTickCallback cb, Object worldUserInfo) {
+        this.internalTickCallback = cb;
+        this.worldUserInfo = worldUserInfo;
+    }
 
 //	public void setWorldUserInfo(Object worldUserInfo) {
 //		this.worldUserInfo = worldUserInfo;
@@ -979,24 +983,25 @@ public abstract class Dynamics<X> extends Collisions<X> {
 //		return worldUserInfo;
 //	}
 
-	private final List<Animated> animations = new FasterList();
+    private final List<Animated> animations = new FasterList();
 
-	public void addAnimation(Animated a) {
-		animations.add(a);
-	}
+    public void addAnimation(Animated a) {
+        animations.add(a);
+    }
 
-	private float curDT;
-	public final void updateAnimations() {
-		animations.removeIf(this::updateAnimation);
-	}
+    private float curDT;
 
-	private boolean updateAnimation(Animated animated) {
-		return !animated.animate(curDT); //invert for the 'removeIf'
-	}
+    public final void updateAnimations() {
+        animations.removeIf(this::updateAnimation);
+    }
 
-	public String summary() {
-		return this.toString() ;
-	}
+    private boolean updateAnimation(Animated animated) {
+        return !animated.animate(curDT); //invert for the 'removeIf'
+    }
+
+    public String summary() {
+        return this.toString();
+    }
 
     // JAVA NOTE: not part of the original api
     public ActionInterface getAction(int index) {
@@ -1022,7 +1027,7 @@ public abstract class Dynamics<X> extends Collisions<X> {
         }
 
         @Override
-        public void processIsland(OArrayList<Collidable> bodies, OArrayList<PersistentManifold> manifolds, int manifolds_offset, int numManifolds, int islandId) {
+        public void processIsland(Collection<Collidable> bodies, OArrayList<PersistentManifold> manifolds, int manifolds_offset, int numManifolds, int islandId) {
 
             if (islandId < 0) {
                 // we don't split islands, so all constraints/contact manifolds/bodies are passed into the solver regardless the island id

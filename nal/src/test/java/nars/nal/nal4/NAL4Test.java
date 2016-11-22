@@ -310,4 +310,17 @@ public class NAL4Test extends AbstractNALTest {
                 1.0f, 1.0f, 0.9f, 0.9f);
     }
 
+
+    @Test public void testIntersectionOfProductSubterms1() {
+        test()
+                .believe("f(x)",1.0f,0.9f)
+                .believe("f(y)",1.0f,0.9f)
+                .mustBelieve(CYCLES, "f:((x)&(y))", 1.0f, 0.81f);
+    }
+    @Test public void testIntersectionOfProductSubterms2() {
+        test()
+                .believe("f(x,z)",1.0f,0.9f)
+                .believe("f(y,z)",1.0f,0.9f)
+                .mustBelieve(CYCLES, "f:((x,z)&(y,z))", 1.0f, 0.81f);
+    }
 }

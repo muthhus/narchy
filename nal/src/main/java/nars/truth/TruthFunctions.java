@@ -23,7 +23,6 @@ package nars.truth;
 import nars.$;
 import nars.Param;
 import nars.nal.UtilityFunctions;
-import nars.time.Tense;
 import nars.util.Util;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -32,11 +31,13 @@ import java.util.List;
 
 import static java.lang.Math.abs;
 import static nars.$.t;
+import static nars.util.Util.clamp;
 
 /**
  * All truth-value (and desire-value) functions used in logic rules
  */
 public final class TruthFunctions extends UtilityFunctions {
+    public static final float MAX_CONF = 1f - Param.TRUTH_EPSILON;
 
     /* ----- Single argument functions, called in MatchingRules ----- */
     /**
@@ -236,34 +237,50 @@ public final class TruthFunctions extends UtilityFunctions {
         return t(f, c);
     }
 
-//    /**
-//     * {<M ==> S>, <M ==> P>} |- <S <=> P>
-//     * @param a Truth value of the first premise
-//     * @param b Truth value of the second premise
-//     * @return Truth value of the conclusion
-//     */
-//    @Nullable
-//    public static Truth comparisonBalanced(@NotNull Truth a, @NotNull Truth b, boolean invertA, float minConf) {
-//        float f1 = a.freq();
-//        if (invertA) f1 = 1 - f1;
-//
-//        float f2 = b.freq();
-//
-//        f1 = fb(f1);
-//        f2 = fb(f2);
-//
-//        float f0 = or(abs(f1), abs(f2));
-//        float c = w2c(and(f0, a.conf(), b.conf()));
-//        if (c < minConf)
-//            return null;
-//
-//        float f = (Util.equals(f0, 0f, Global.TRUTH_EPSILON)) ? 0.5f :
-//                ((and(f1, f2) / f0)/2f)+0.5f;
-//
-//        return t(f, c);
-//    }
+    /**
+     * A function specially designed for desire value [To be refined]
+     */
+    @Nullable public static Truth desireStrong(@NotNull Truth a, @NotNull Truth b, float minConf) {
+        float aFreq = a.freq();
+        float bFreq = b.freq();
+        float c = and(a.conf(), b.conf(), freqSimilarity(aFreq, bFreq));
+        return c < minConf ? null : desire(aFreq, bFreq, c);
+    }
 
-    /* ----- desire-value functions, called in SyllogisticRules ----- */
+    public static float freqSimilarity(float aFreq, float bFreq) {
+        return 1f-Math.abs(aFreq - bFreq);
+    }
+
+    /**
+     * A function specially designed for desire value [To be refined]
+     */
+    @Nullable public static Truth desireStrongOriginal(@NotNull Truth a, @NotNull Truth b, float minConf) {
+        float bFreq = b.freq();
+        float c = and(a.conf(), b.conf(), bFreq);
+        return c < minConf ? null : desire(a.freq(), bFreq, c);
+    }
+    /**
+     * A function specially designed for desire value [To be refined]
+     */
+    @Nullable public static Truth desireWeak(@NotNull Truth a, @NotNull Truth b, float minConf) {
+        float aFreq = a.freq();
+        float bFreq = b.freq();
+        float c = and(a.conf(), b.conf(), freqSimilarity(aFreq,bFreq), w2c(1.0f));
+        return c < minConf ? null : desire(aFreq, bFreq, c);
+    }
+    /**
+     * A function specially designed for desire value [To be refined]
+     */
+    @Nullable public static Truth desireWeakOriginal(@NotNull Truth a, @NotNull Truth b, float minConf) {
+        float bFreq = b.freq();
+        float c = and(a.conf(), b.conf(), bFreq, w2c(1.0f));
+        return c < minConf ? null : desire(a.freq(), bFreq, c);
+    }
+    @NotNull static Truth desire(float f1, float f2, float c) {
+        return t(and(f1, f2), c);
+    }
+
+
     /**
      * A function specially designed for desire value [To be refined]
      * @param a Truth value of the first premise
@@ -271,107 +288,9 @@ public final class TruthFunctions extends UtilityFunctions {
      * @return Truth value of the conclusion
      */
     @Nullable
-    public static Truth desireStrong(@NotNull Truth a, @NotNull Truth b, float minConf) {
-        float f2 = b.freq();
-        float c1 = a.conf();
-        float c2 = b.conf();
-        float c = and(c1, c2, f2);
-        return desire(minConf, a.freq(), f2, c);
-    }
-
-    /**
-     * A function specially designed for desire value [To be refined]
-     * @param a Truth value of the first premise
-     * @param b Truth value of the second premise
-     * @return Truth value of the conclusion
-     */
-    @Nullable
-    public static Truth desireWeak(@NotNull Truth a, @NotNull Truth b, float minConf) {
-        float f1 = a.freq();
-        float f2 = b.freq();
-        float c1 = a.conf();
-        float c2 = b.conf();
-        float c = and(c1, c2, f2, w2c(1.0f));
-        return desire(minConf, f1, f2, c);
-    }
-
-    public
-    @Nullable
-    static Truth desire(float minConf, float f1, float f2, float c) {
-        if (c < minConf)
-            return null;
-        else {
-
-            float f = and(f1, f2);
-            //float f = freqInterp(f1, f2, c1, c2);
-            return t(f, c);
-        }
-    }
-
-    /*static float avgPolar(float x, float y) {
-        return bf((fb(x) + fb(y)) / 2f);
-    }*/
-
-//    static float andPolar(float x, float y) {
-//        x = fb(x);
-//        y = fb(y);
-//        float xy = x * y;
-//        if (x < 0 && y < 0)
-//            xy = -xy;
-//        else if (x < 0 && y > 0)
-//            xy = 0f;
-//        else if (x > 0 && y < 0)
-//            xy = 0f;
-//        return bf(xy);
-//    }
-
-//    /** transforms a frequency into a weighting factor symmetric about f=0.5, where f=0.5 is zero and f=0 and f=1 are 1 */
-//    public static float f2w(float f) {
-//        return Math.abs(fb(f));
-//    }
-
-//    /** 0..1.0 in proportion to two frequency's multiplied magnitude toward the same polarity */
-//    public static float xnor(float a, float b) {
-//        return bf( fb(a) * fb(b) );
-//    }
-
-//    /** bipolar AND , symmetric about 0.5 */
-//    public static float andb(float a, float b) {
-//        float aa = fb(a);
-//        float bb = fb(b);
-//        float p = aa * bb;
-////        if ((aa < 0 && bb > 0) || ( aa > 0 && bb < 0)) {
-////            //opposite sign
-////        } else {
-////
-////        }
-//        if ((aa < 0) && (bb < 0)) {
-//            p = -p; //invert because
-//        }
-//
-//        return bf(p);
-//    }
-//    /** bipolarize a frequency value to -1..+1 */
-//    public static float fb(float f) {
-//        return (f - 0.5f) * 2f;
-//    }
-//    /** unipolarize a frequency value to 0..+1 */
-//    public static float bf(float f) {
-//        return (f/2f)+0.5f;
-//    }
-
-
-
-    /**
-     * A function specially designed for desire value [To be refined]
-     * @param v1 Truth value of the first premise
-     * @param v2 Truth value of the second premise
-     * @return Truth value of the conclusion
-     */
-    @Nullable
-    public static Truth desireDed(@NotNull Truth v1, @NotNull Truth v2, float minConf) {
-        float c = and(v1.conf(), v2.conf());
-        return c < minConf ? null : t(and(v1.freq(), v2.freq()), c);
+    public static Truth desireDed(@NotNull Truth a, @NotNull Truth b, float minConf) {
+        float abConf = and(a.conf(), b.conf());
+        return abConf < minConf ? null : t(and(a.freq(), b.freq()), abConf);
     }
 
     /**
@@ -381,9 +300,7 @@ public final class TruthFunctions extends UtilityFunctions {
      * @return Truth value of the conclusion
      */
     @Nullable
-    public static Truth desireInd(@Nullable Truth v1, @NotNull Truth v2, float minConf) {
-        if (v1 == null)
-            return null;
+    public static Truth desireInd(@NotNull Truth v1, @NotNull Truth v2, float minConf) {
         float c = w2c(and(v2.freq(), v1.conf(), v2.conf()));
         return c < minConf ? null : t(v1.freq(), c);
     }
@@ -397,27 +314,10 @@ public final class TruthFunctions extends UtilityFunctions {
      */
     @Nullable
     public static Truth union(@NotNull Truth a, @NotNull Truth b, float minConf) {
-
-        float f1 = a.freq();
-        float f2 = b.freq();
-        float c1 = a.conf();
-        float c2 = b.conf();
-
-//        //   or(and(f 1 , c 1 ), and(f 2 , c 2 ))
-//        // + and(not(f 1 ), c 1 , not(f 2 ), c 2 )
-//        //float cA = or(and(f1, c1), and(f2, c2));
-//        float cA = and(and(f1, c1), and(f2, c2));
-//        float cB = and( (1 - f1), c1, (1 - f2), c2);
-//        float c = Math.max(cA, cB);
-//        float c = confComposition(f1, f2, c1, c2);
-        //float c = or(and(f1, c1), and(f2, c2)) + and(1 - f1, 1 - f2, c1, c2);
-        float c = and(c1, c2);
-
-
-        return (c < minConf) ?
+        float abConf = and(a.conf(), b.conf());
+        return (abConf < minConf) ?
                 null :
-                t(or(f1, f2), c);
-
+                t(or(a.freq(), b.freq()), abConf);
     }
 
     /**
@@ -559,24 +459,12 @@ public final class TruthFunctions extends UtilityFunctions {
 
     }
 
-    @NotNull
-    public static ProjectedTruth eternalize(@NotNull Truth t) {
-        return new ProjectedTruth(
-                t.freq(),
-                eternalize(t.conf()),
-                Tense.ETERNAL
-        );
-    }
+
 
     public static float eternalize(float conf) {
         return w2c(conf);
     }
-    
-//    public static float temporalProjection(long sourceTime, long targetTime, long currentTime) {
-//        long den = (abs(sourceTime - currentTime) + abs(targetTime - currentTime));
-//        if (den == 0) return 1f;
-//        return abs(sourceTime - targetTime) / (float)den;
-//    }
+
 
     /**
      * A function to convert confidence to weight
@@ -584,14 +472,7 @@ public final class TruthFunctions extends UtilityFunctions {
      * @return The corresponding weight of evidence, a non-negative real number
      */
     public static float c2w(float c) {
-        //return Param.HORIZON * c / (1f - Math.min(c, 1.0f - Param.TRUTH_EPSILON));
-
-        if (c < 0)
-            throw new RuntimeException("negative conf");
-
-        //limit by maximum possible confidence value
-        c = Math.min(c, 1.0f - Param.TRUTH_EPSILON);
-
+        c = clamp(c, 0, MAX_CONF);
         return Param.HORIZON * c / (1f - c);
     }
 
@@ -601,14 +482,13 @@ public final class TruthFunctions extends UtilityFunctions {
      * @return The corresponding confidence, in [0, 1)
      */
     public static float w2c(float w) {
-        return Math.min(1f-Param.TRUTH_EPSILON, w / (w + Param.HORIZON));
+        return clamp(w / (w + Param.HORIZON), 0, MAX_CONF);
     }
 
     public static float confAnd(@NotNull Iterable<? extends Truthed> tt) {
         float c = 1f;
-        for (Truthed x : tt) {
+        for (Truthed x : tt)
             c *= x.conf();
-        }
         return c;
     }
 
@@ -616,17 +496,30 @@ public final class TruthFunctions extends UtilityFunctions {
         return 1.0f / (evidenceLength + 1);
     }
 
-    public static float projection(long sourceTime, long targetTime, long currentTime) {
-        if (sourceTime == targetTime) {
-            return 1f;
-        } else {
-            long denom = (abs(sourceTime - currentTime) + abs(targetTime - currentTime));
-            return denom == 0 ? 1f : (abs(sourceTime - targetTime)) / (float) denom;
-        }
-    }
-
-
     public static float expectation(float frequency, float confidence) {
         return (confidence * (frequency - 0.5f) + 0.5f);
     }
 }
+
+//    public static float projection(long sourceTime, long targetTime, long currentTime) {
+//        if (sourceTime == targetTime) {
+//            return 1f;
+//        } else {
+//            long denom = (abs(sourceTime - currentTime) + abs(targetTime - currentTime));
+//            return denom == 0 ? 1f : (abs(sourceTime - targetTime)) / (float) denom;
+//        }
+//    }
+
+//    @NotNull
+//    public static ProjectedTruth eternalize(@NotNull Truth t) {
+//        return new ProjectedTruth(
+//                t.freq(),
+//                eternalize(t.conf()),
+//                Tense.ETERNAL
+//        );
+//    }
+//    public static float temporalProjection(long sourceTime, long targetTime, long currentTime) {
+//        long den = (abs(sourceTime - currentTime) + abs(targetTime - currentTime));
+//        if (den == 0) return 1f;
+//        return abs(sourceTime - targetTime) / (float)den;
+//    }

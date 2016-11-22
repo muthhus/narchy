@@ -28,6 +28,7 @@ import spacegraph.phys.collision.broad.*;
 import spacegraph.phys.collision.narrow.PersistentManifold;
 import spacegraph.phys.util.OArrayList;
 
+import java.util.Collection;
 import java.util.Collections;
 
 /**
@@ -242,7 +243,7 @@ public class DefaultIntersecter extends Intersecter {
     }
 
 	@Override
-	public OArrayList<PersistentManifold> getInternalManifoldPointer() {
+	public Collection<PersistentManifold> getInternalManifoldPointer() {
 		return manifoldsPtr;
 	}
 	

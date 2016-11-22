@@ -2,10 +2,12 @@ package spacegraph;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.RemovalCause;
 import com.jogamp.opengl.GL2;
 import nars.$;
 import nars.util.list.FasterList;
 import org.eclipse.collections.api.block.predicate.primitive.IntObjectPredicate;
+import org.eclipse.collections.api.block.procedure.primitive.IntObjectProcedure;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import spacegraph.input.FPSLook;
@@ -43,16 +45,20 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
         super();
 
 
-        this.atoms =
+        Cache<X, Spatial<X>> atoms =
                 //new NonBlockingHashMap(cacheCapacity);
                 //new ConcurrentHashMap<>(cacheCapacity);
                 Caffeine.newBuilder()
                 //.softValues().build();
-                //.removalListener(this::onEvicted)
+                .removalListener((X k, Spatial<X> v, RemovalCause c) -> {
+                    v.hide();
+                    v.delete();
+                })
                 .maximumSize(cacheCapacity)
                 //.weakValues()
                 .build();
 
+        this.atoms = atoms;
 
     }
 
@@ -110,15 +116,10 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
         }
     }
 
-    public @NotNull <Y extends Spatial<X>> Y update(X instance, Function<X, Y> materializer) {
-        return getOrAdd(instance, materializer);
-    }
-
-
 
     public @NotNull  <Y extends Spatial<X>> Y getOrAdd(X x, Function<X, Y> materializer) {
         Spatial y = atoms.get(x, materializer);
-        y.reactivate(true);
+        //y.reactivate(true);
         return (Y) y;
     }
 
@@ -132,10 +133,6 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
 
     public SpaceGraph setGravity(v3 v) {
         dyn.setGravity(v);
-        dyn.forEachCollidable((i,c)->{
-            c.setGravity(v);
-            c.setActivationState(1);
-        });
         return this;
     }
 
@@ -171,7 +168,7 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
     }
 
 
-    @Override final public void forEachIntSpatial(IntObjectPredicate<Spatial<X>> each) {
+    @Override final public void forEachIntSpatial(IntObjectProcedure<Spatial<X>> each) {
         int n = 0;
         for (int i = 0, inputsSize = inputs.size(); i < inputsSize; i++) {
             n += inputs.get(i).forEachWithInt(n, each);
@@ -212,8 +209,6 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
 
 
     final void update(AbstractSpace<X,Spatial<X>> s) {
-
-        s.forEach(x -> x.update(this));
 
         s.update(this);
 

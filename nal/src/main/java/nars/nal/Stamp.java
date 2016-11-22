@@ -71,16 +71,14 @@ public interface Stamp {
 
         //how many items to exclude from each due to weighting
         int aMin = 0, bMin = 0;
-        if (aToB == 0.5f) {
-            //no adjustment necessary
-        } else if (aLen+bLen > maxLen) {
+        if (aLen+bLen > maxLen) {
             if (!newToOld)
                 throw new UnsupportedOperationException("reverse weighted not yet unimplemented");
 
             //find which ones to exclude from
 
             //usedA + usedB = maxLen
-            if (aToB < 0.5f) {
+            if (aToB <= 0.5f) {
                 int usedA = Math.max(1, (int) Math.floor(aToB * (aLen + bLen)));
                 if (usedA < aLen) {
                     if (bLen + usedA < maxLen)
@@ -384,22 +382,23 @@ public interface Stamp {
         final int extra = 1;
         int maxPer = Math.max(1, Math.round((float)maxLen / num)) + extra;
         LongHashSet l = new LongHashSet(maxLen);
-        final boolean[] cyclic = {false};
+        //final boolean[] cyclic = {false};
         s.forEach( (Stamp t) -> {
             long[] e = t.evidence();
             int el = e.length;
             for (int i = Math.max(0, el - maxPer); i < el; i++) {
                 long ee = e[i];
                 if (ee !=Long.MAX_VALUE) {
-                    if (!l.add(ee) || isCyclic(e))
-                        cyclic[0] = true;
+                    l.add(ee);
+//                    if (!l.add(ee) || isCyclic(e))
+//                        cyclic[0] = true;
                 }
             }
         } );
         int ls = l.size();
         long[] e = ArrayUtils.subarray(l.toSortedArray(), Math.max(0, ls - maxLen), ls);
-        if (cyclic[0])
-            e = cyclic(e);
+//        if (cyclic[0])
+//            e = cyclic(e);
         return e;
     }
 
@@ -417,7 +416,7 @@ public interface Stamp {
             return x;
 
         long[] y;
-        if (l == Param.STAMP_CAPACITY) {
+        if (l >= Param.STAMP_CAPACITY) {
             y = new long[Param.STAMP_CAPACITY];
             //shift left by one to leave the last entry free
             System.arraycopy(x, 1, y, 0, Param.STAMP_CAPACITY -1);

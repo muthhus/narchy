@@ -26,6 +26,7 @@ package spacegraph.phys.shape;
 import spacegraph.phys.util.OArrayList;
 
 import java.nio.ByteBuffer;
+import java.util.Collection;
 
 /**
  * TriangleIndexVertexArray allows to use multiple meshes, by indexing into existing
@@ -123,7 +124,7 @@ public class TriangleIndexVertexArray extends StridingMeshInterface {
 		return indexedMeshes.size();
 	}
 
-	public OArrayList<IndexedMesh> getIndexedMeshArray() {
+	public Collection<IndexedMesh> getIndexedMeshArray() {
 		return indexedMeshes;
 	}
 	

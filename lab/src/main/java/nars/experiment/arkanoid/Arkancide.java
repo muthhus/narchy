@@ -15,6 +15,7 @@ public class Arkancide extends NAgents {
     final int visW = 32;
     final int visH = 16;
 
+    final int afterlife = 60;
 
     float paddleSpeed = 40f;
 
@@ -25,15 +26,21 @@ public class Arkancide extends NAgents {
 
 
     public Arkancide(NAR nar) {
-        super(nar, 1 );
+        super(nar);
 
-        noid = new Arkanoid();
+        noid = new Arkanoid() {
+            @Override
+            protected void die() {
+                nar.time.tick(afterlife);
+                super.die();
+            }
+        };
 
-        senseNumberBi("noid(paddle,x)", ()->noid.paddle.x);
-        senseNumberBi("noid(ball,x)", ()->noid.ball.x);
-        senseNumberBi("noid(ball,y)", ()->noid.ball.y);
-        senseNumberBi("noid(ball,vx)", ()->noid.ball.velocityX);
-        senseNumberBi("noid(ball,vy)", ()->noid.ball.velocityY);
+        senseNumberBi("noid(paddle,x,p)", ()->noid.paddle.x);
+        senseNumberBi("noid(ball,x,p)", ()->noid.ball.x);
+        senseNumberBi("noid(ball,y,p)", ()->noid.ball.y);
+        senseNumberBi("noid(ball,x,v)", ()->noid.ball.velocityX);
+        senseNumberBi("noid(ball,y,v)", ()->noid.ball.velocityY);
 
         addCamera("noid", noid, visW, visH);
         //addCameraRetina("noid", noid, visW/2, visH/2, (v) -> t(v, alpha));
@@ -74,8 +81,8 @@ public class Arkancide extends NAgents {
         float nextScore = noid.next();
         float reward = nextScore - prevScore;
         this.prevScore = nextScore;
-        //if (reward == 0)
-            //return Float.NaN;
+        if (reward == 0)
+            return Float.NaN;
         return reward;
     }
 
@@ -84,7 +91,7 @@ public class Arkancide extends NAgents {
 
         //runRT(Arkancide::new);
         //nRT(Arkancide::new, 25, 5);
-        run(Arkancide::new, 5500);
+        runRT(Arkancide::new, 30, 7);
     }
 
 

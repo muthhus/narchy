@@ -255,11 +255,12 @@ public class SimpleSpatial<X> extends AbstractSpatial<X> {
         return b;
     }
 
-
-    @Override
-    public void stop() {
-        //body = null;
-    }
+//
+//    @Override
+//    public boolean stop() {
+//        if (super.stop()) {
+//        }
+//    }
 
     @Override
     public List<TypedConstraint> constraints() {

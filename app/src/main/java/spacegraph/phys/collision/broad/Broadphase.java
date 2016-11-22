@@ -25,8 +25,8 @@ package spacegraph.phys.collision.broad;
 
 import spacegraph.math.v3;
 import spacegraph.phys.Collidable;
-import spacegraph.phys.util.OArrayList;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -54,7 +54,7 @@ public abstract class Broadphase {
 
 	public abstract void printStats();
 
-	public void forEach(int maxClusterSize, OArrayList<Collidable> all, Consumer<List<Collidable>> each) {
+	public void forEach(int maxClusterSize, Collection<Collidable> all, Consumer<Collection<Collidable>> each) {
 		throw new UnsupportedOperationException();
 	}
 }
