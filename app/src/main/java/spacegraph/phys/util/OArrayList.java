@@ -25,6 +25,7 @@ package spacegraph.phys.util;
 
 import org.eclipse.collections.api.block.predicate.primitive.IntObjectPredicate;
 import org.eclipse.collections.api.block.procedure.primitive.IntObjectProcedure;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.Externalizable;
 import java.io.IOException;
@@ -45,7 +46,7 @@ public final class OArrayList<T> extends AbstractList<T> implements RandomAccess
 	private int size;
 
 	public OArrayList() {
-		this(16);
+		this(4);
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -55,7 +56,7 @@ public final class OArrayList<T> extends AbstractList<T> implements RandomAccess
 
 
 	public void addAll(T... v) {
-		if (size-1 + v.length >= array.length) {
+		if (size + v.length >= array.length) {
 			expand();
 			//HACK this might not have expanded enough, caution
 		}
@@ -98,28 +99,42 @@ public final class OArrayList<T> extends AbstractList<T> implements RandomAccess
 			expand();
 		}
 
+		T[] a = array;
 		int num = size - index;
 		if (num > 0) {
-			System.arraycopy(array, index, array, index+1, num);
+			System.arraycopy(a, index, a, index+1, num);
 		}
 
-		array[index] = value;
+		a[index] = value;
 		size++;
 	}
 
 	@Override
 	public T remove(int index) {
 		//if (index < 0 || index >= size) throw new IndexOutOfBoundsException();
-		T prev = array[index];
-		System.arraycopy(array, index+1, array, index, size-index-1);
-		array[size-1] = null;
-		size--;
+		T[] a = this.array;
+		T prev = a[index];
+		System.arraycopy(a, index+1, a, index, size-index-1);
+		a[--size] = null;
 		return prev;
     }
 
 	@Override
+	public boolean remove(Object o) {
+		if (isEmpty())
+			return false;
+		int i = indexOf(o);
+		if (i == -1)
+			return false;
+		remove(i);
+		return true;
+	}
+
+	@Override
 	public final boolean removeIf(Predicate<? super T> filter) {
 		int s = size();
+		if (s == 0)
+			return false;
 		int ps = s;
 		T[] a = this.array;
 		for (int i = 0; i < s; ) {
@@ -185,13 +200,16 @@ public final class OArrayList<T> extends AbstractList<T> implements RandomAccess
 	}
 
 	@Override
-	public int indexOf(Object o) {
+	public int indexOf(@NotNull Object o) {
 		int _size = size;
 		T[] _array = array;
 		for (int i=0; i<_size; i++) {
-			if (o == null? _array[i] == null : o.equals(_array[i])) {
+			T x = _array[i];
+			if (o.equals(x))
 				return i;
-			}
+			//if (o == null? _array[i] == null : o.equals(_array[i])) {
+				//return i;
+			//}
 		}
 		return -1;
 	}

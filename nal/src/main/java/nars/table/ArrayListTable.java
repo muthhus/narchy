@@ -28,10 +28,9 @@ abstract public class ArrayListTable<K, V> extends CollectorMap<K, V> implements
     abstract public int size();
 
     @Override
-    public final void forEachKey(@NotNull Consumer<? super K> each) {
+    public final void forEachKey(@NotNull Consumer<K> each) {
         forEach(t -> {
-            if (t != null)
-                each.accept(key(t));
+            each.accept(key(t));
         });
     }
 

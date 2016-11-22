@@ -28,6 +28,8 @@ public class TermVector1 implements TermContainer, Set<Term> {
         return 31 + the.hashCode(); //HACK consistent with Terms.hash(..)
     }
 
+
+
     @Override
     public boolean equals(@NotNull Object obj) {
         return

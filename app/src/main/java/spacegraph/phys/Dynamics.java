@@ -166,7 +166,7 @@ public abstract class Dynamics<X> extends Collisions<X> {
 
     }
 
-    public int stepSimulation(float timeStep, int maxSubSteps, float fixedTimeStep) {
+    int stepSimulation(float timeStep, int maxSubSteps, float fixedTimeStep) {
         startProfiling(timeStep);
 
         long t0 = System.nanoTime();

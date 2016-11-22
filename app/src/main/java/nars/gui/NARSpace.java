@@ -2,20 +2,24 @@ package nars.gui;
 
 import nars.NAR;
 import nars.nar.Default;
+import nars.term.Term;
 import nars.term.Termed;
 import nars.test.DeductiveMeshTest;
 import nars.util.event.On;
 import nars.util.list.FasterList;
+import org.eclipse.collections.impl.set.mutable.UnifiedSet;
 import spacegraph.*;
 import spacegraph.source.ListSpace;
 
+import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.List;
 
 
 /**
  * thread-safe visualization of capacity-bound NAR data buffers
  */
-public abstract class NARSpace<X extends Termed, Y extends Active> extends ListSpace<X, Y> {
+public abstract class NARSpace<X extends Term, Y extends Spatial<X>> extends ListSpace<X, Y> {
 
 
     //private final TriConsumer<NAR, SpaceGraph<Term>, List<Spatial<X>>> collect;
@@ -26,6 +30,7 @@ public abstract class NARSpace<X extends Termed, Y extends Active> extends ListS
 
 
     private final int capacity;
+    final Collection<Y> next;
 
     //public final MutableFloat maxPri = new MutableFloat(1.0f);
     //public final MutableFloat minPri = new MutableFloat(0.0f);
@@ -38,6 +43,8 @@ public abstract class NARSpace<X extends Termed, Y extends Active> extends ListS
     public NARSpace(int capacity) {
         super();
         this.capacity = capacity;
+        this.next = new UnifiedSet<>(capacity*2, 0.9f);
+
     }
 
     public NARSpace(NAR nar, int capacity) {
@@ -49,8 +56,8 @@ public abstract class NARSpace<X extends Termed, Y extends Active> extends ListS
     @Override
     public final void stop() {
         if (on!=null) {
-            if (active!=null)
-                active.forEach(Active::stop);
+            next.forEach(Active::stop);
+            next.clear();
             on.off();
             on = null;
         }
@@ -67,28 +74,24 @@ public abstract class NARSpace<X extends Termed, Y extends Active> extends ListS
     }
 
     @Override
-    public void start(SpaceGraph<X> space) {
+    public void start(SpaceGraph space) {
         this.space = space;
         on = nar.onFrame(nn -> updateIfNotBusy(this::update));
     }
 
     protected void update() {
 
-        List<Y> prev = active;
+        Collection<Y> prev = active;
 
-        prev.forEach((y) -> y.reactivate(false));
-
-        FasterList<Y> next = new FasterList<>(capacity);
+        prev.forEach(Active::deactivate);
 
         get(next);
 
-        //remove missing
-        for (int i = 0, prevSize = prev.size(); i < prevSize; i++) {
-            prev.get(i).stopIfInactive();
-        }
+        prev.forEach(Active::stopIfInactive); //remove missing
 
         //commit the changes
-        this.active = next;
+        this.active = new FasterList<>(next);
+        next.clear();
     }
 
     protected boolean display(X x) {
@@ -96,7 +99,7 @@ public abstract class NARSpace<X extends Termed, Y extends Active> extends ListS
         //return !(concept.term() instanceof Atomic);
     }
 
-    abstract protected void get(List<Y> displayNext);
+    abstract protected void get(Collection<Y> displayNext);
 
 
     public static void main(String[] args) {

@@ -50,13 +50,20 @@ public final class IntArrayList {
 
 	public int remove(int index) {
 		int s = this.size;
-		if (index >= s) throw new IndexOutOfBoundsException();
+		//if (index >= s) throw new IndexOutOfBoundsException();
 		int[] a = this.array;
 		int old = a[index];
 		if (index!= this.size -1)
 			System.arraycopy(a, index+1, a, index, s - index - 1);
 		this.size--;
 		return old;
+	}
+	public void removeQuick(int index) {
+		int s = this.size;
+		//if (index >= s) throw new IndexOutOfBoundsException();
+		int[] a = this.array;
+		if (index!= --this.size)
+			System.arraycopy(a, index+1, a, index, s - index - 1);
 	}
 
 	public int get(int index) {

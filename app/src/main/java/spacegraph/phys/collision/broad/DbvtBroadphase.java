@@ -114,22 +114,24 @@ public class DbvtBroadphase extends Broadphase {
 
 	private static DbvtProxy listremove(final DbvtProxy item, DbvtProxy list) {
 		DbvtProxy[] itemLinks = item.links;
-		if (itemLinks[0] != null) {
-			itemLinks[0].links[1] = itemLinks[1];
+		final DbvtProxy i0 = itemLinks[0];
+		final DbvtProxy i1 = itemLinks[1];
+		if (i0 != null) {
+			i0.links[1] = i1;
 		}
 		else {
-			list = itemLinks[1];
+			list = i1;
 		}
 
-		if (itemLinks[1] != null) {
-			itemLinks[1].links[0] = itemLinks[0];
+		if (i1 != null) {
+			i1.links[0] = i0;
 		}
 		return list;
 	}
 
 	@Override
     public Broadphasing createProxy(v3 aabbMin, v3 aabbMax, BroadphaseNativeType shapeType, Collidable userPtr, short collisionFilterGroup, short collisionFilterMask, Intersecter intersecter, Object multiSapProxy) {
-		DbvtProxy proxy = new DbvtProxy(userPtr, collisionFilterGroup, collisionFilterMask);
+		DbvtProxy proxy = new DbvtProxy(userPtr, collisionFilterGroup, collisionFilterMask, aabbMin, aabbMax);
 		DbvtAabbMm.FromMM(aabbMin, aabbMax, proxy.aabb);
 		proxy.leaf = sets[0].insert(proxy.aabb, proxy);
 		proxy.stage = stageCurrent;
@@ -141,18 +143,14 @@ public class DbvtBroadphase extends Broadphase {
 	@Override
     public void destroyProxy(Broadphasing absproxy, Intersecter intersecter) {
 		DbvtProxy proxy = (DbvtProxy)absproxy;
-		if (proxy.stage == STAGECOUNT) {
-			sets[1].remove(proxy.leaf);
-		}
-		else {
-			sets[0].remove(proxy.leaf);
-		}
-		stageRoots[proxy.stage] = listremove(proxy, stageRoots[proxy.stage]);
+		int stage = proxy.stage;
+		sets[(stage == STAGECOUNT) ? 1 : 0].remove(proxy.leaf);
+		stageRoots[stage] = listremove(proxy, stageRoots[stage]);
 		paircache.removeOverlappingPairsContainingProxy(proxy, intersecter);
 		//btAlignedFree(proxy);
 	}
 
-	@Override public <X> void forEach(int maxClusterPopulation, OArrayList<Collidable> all, Consumer<List<Collidable>> each) {
+	@Override public void forEach(int maxClusterPopulation, OArrayList<Collidable> all, Consumer<List<Collidable>> each) {
 		Node root = sets[0].root;
 		if (root == null)
 			return;
@@ -167,7 +165,7 @@ public class DbvtBroadphase extends Broadphase {
 		forEach(root, maxClusterPopulation, population, 0, each);
 	}
 
-	public <X> int forEach(Node node, int maxClusterPopulation, int unvisited, int level, Consumer<List<Collidable>> each) {
+	public int forEach(Node node, int maxClusterPopulation, int unvisited, int level, Consumer<List<Collidable>> each) {
 
 
 		//HACK approximate cluster segmentation, a better one can be designed which will more evenly partition the set
@@ -184,10 +182,11 @@ public class DbvtBroadphase extends Broadphase {
 			//stop here and batch
 			List<Collidable> l = $.newArrayList(nodePop);
 			node.leaves(l);
-			if (!l.isEmpty()) {
+			int ls = l.size();
+			if (ls > 0) {
 				each.accept(l);
 			}
-			unvisited -= l.size();
+			unvisited -= ls;
 		}
 
 		return unvisited;

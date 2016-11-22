@@ -17,7 +17,6 @@ import nars.util.Iterative;
 import org.eclipse.collections.api.block.function.primitive.FloatFunction;
 import org.jetbrains.annotations.Nullable;
 import spacegraph.*;
-import spacegraph.layout.FastOrganicLayout;
 import spacegraph.layout.Flatten;
 import spacegraph.layout.ForceDirected;
 import spacegraph.layout.Spiral;
@@ -306,7 +305,7 @@ public class Vis {
         NARSpace n = new ConceptsSpace(nar, maxNodes, maxEdges);
 
 
-        SpaceGraph<Term> s = new SpaceGraph<Term>(
+        SpaceGraph<Term> s = new SpaceGraph(
 
                 n.with(
 //                        new SpaceTransform<Term>() {

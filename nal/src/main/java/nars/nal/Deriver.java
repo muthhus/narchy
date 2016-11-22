@@ -26,8 +26,7 @@ public abstract class Deriver  {
 
     final static Logger logger = LoggerFactory.getLogger(Deriver.class);
 
-    @NotNull
-    public static TrieDeriver getDefaultDeriver() {
+    @NotNull public static TrieDeriver getDefaultDeriver() {
         synchronized (Deriver.class) {
             if (defaultRules == null) {
                 //synchronized(logger) {

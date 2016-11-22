@@ -217,7 +217,7 @@ public class HijackBag<X> implements Bag<X> {
     }
 
     @Override
-    public void put(X x, Budgeted b, float scale, @Nullable MutableFloat overflowing) {
+    public BLink<X> put(X x, Budgeted b, float scale, @Nullable MutableFloat overflowing) {
 
         float nP = b.pri() * scale;
         float[] f = putBag(x, nP);
@@ -246,6 +246,7 @@ public class HijackBag<X> implements Bag<X> {
             //onAdded(y);
         }
 
+        return null;
     }
 
     /**

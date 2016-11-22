@@ -385,12 +385,12 @@ public class HashedOverlappingPairCache extends OverlappingPairCache {
 		return pair.pProxy0.uid == proxyId1 && pair.pProxy1.uid == proxyId2;
 	}
 
-	public static int getHash(int seed, int hash) {
+	public static int getHash1(int seed, int hash) {
 		/** from clojure.Util */
 		return seed ^ ( hash + 0x9e3779b9 + (seed << 6) + (seed >> 2) );
 	}
 
-	public static int getHash0(int proxyId1, int proxyId2) {
+	public static int getHash(int proxyId1, int proxyId2) {
 
 		int key = (proxyId1) | (proxyId2 << 16);
 		// Thomas Wang's hash
@@ -405,8 +405,6 @@ public class HashedOverlappingPairCache extends OverlappingPairCache {
 	}
 
 	private BroadphasePair internalFindPair(Broadphasing proxy0, Broadphasing proxy1, int hash) {
-		int proxyId1 = proxy0.uid;
-		int proxyId2 = proxy1.uid;
 		//#if 0 // wrong, 'equalsPair' use unsorted uids, copy-past devil striked again. Nat.
 		//if (proxyId1 > proxyId2)
 		//	btSwap(proxyId1, proxyId2);
@@ -415,7 +413,7 @@ public class HashedOverlappingPairCache extends OverlappingPairCache {
 		int index = hashTable.get(hash);
 
 		//return array[index];
-		while (index != NULL_PAIR && !equalsPair(overlappingPairArray.get(index), proxyId1, proxyId2)) {
+		while (index != NULL_PAIR && !equalsPair(overlappingPairArray.get(index), proxy0.uid, proxy1.uid)) {
 			index = next.get(index);
 		}
 

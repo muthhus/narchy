@@ -1,47 +1,61 @@
 package nars.gui;
 
 import com.jogamp.opengl.GL2;
-import nars.$;
-import nars.NAR;
-import nars.budget.Budget;
+import nars.Task;
+import nars.bag.impl.ArrayBag;
+import nars.budget.merge.BudgetMerge;
+import nars.concept.Concept;
 import nars.link.BLink;
 import nars.term.Term;
 import nars.term.Termed;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import spacegraph.obj.EDraw;
 import spacegraph.SimpleSpatial;
 import spacegraph.SpaceGraph;
 import spacegraph.phys.Dynamic;
 import spacegraph.render.Draw;
 
-import java.util.List;
+import java.util.HashMap;
+import java.util.function.Consumer;
 
 import static nars.util.Util.sqr;
 import static spacegraph.math.v3.v;
 
 
-public class ConceptWidget extends SimpleSpatial<Term> {
+public class ConceptWidget extends SimpleSpatial<Term> implements Consumer<BLink<? extends Termed>> {
 
-    private final NAR nar;
+    //private final NAR nar;
 
+    public final ArrayBag<TermEdge> edges;
+    private final ConceptsSpace space;
 
-    /** cached .toString() of the key */
+    /**
+     * cached .toString() of the key
+     */
     public String label;
 
     public float pri;
 
-    public List<EDraw> edges;
 
 
+    //caches a reference to the current concept
+    public Concept concept;
 
 
-    public ConceptWidget(Term x, NAR nar) {
+    public ConceptWidget(Term x, ConceptsSpace space, int numEdges) {
         super(x);
-        this.nar = nar;
 
-        this.pri = 0.5f;
-        edges = $.newArrayList(0);
+        this.pri = 0f;
+        this.space = space;
+
+
+        //float edgeActivationRate = 1f;
+
+//        edges = //new HijackBag<>(maxEdges * maxNodes, 4, BudgetMerge.plusBlend, nar.random);
+        this.edges =
+            new ArrayBag<>(numEdges, BudgetMerge.avgBlend, new HashMap<>(numEdges));
+        edges.setCapacity(numEdges);
+
 //        for (int i = 0; i < edges; i++)
 //            this.edges.add(new EDraw());
 
@@ -54,15 +68,14 @@ public class ConceptWidget extends SimpleSpatial<Term> {
         Dynamic x = super.newBody(collidesWithOthersLikeThis);
 
 
-
-        int zOffset = -10;
+        //int zOffset = -10;
         final float initDistanceEpsilon = 10f;
         final float initImpulseEpsilon = 25f;
 
         //place in a random direction
         x.transform().set(SpaceGraph.r(initDistanceEpsilon),
                 SpaceGraph.r(initDistanceEpsilon),
-                SpaceGraph.r(initDistanceEpsilon) + zOffset);
+                SpaceGraph.r(initDistanceEpsilon));
 
         //impulse in a random direction
         x.impulse(v(SpaceGraph.r(initImpulseEpsilon),
@@ -72,45 +85,37 @@ public class ConceptWidget extends SimpleSpatial<Term> {
         return x;
     }
 
-    public void clearEdges() {
-        if (!edges.isEmpty())
-            this.edges = $.newArrayList(8);
-    }
+    public void commit() {
 
-    public int edgeCount() {
-        return edges.size();
-    }
+        edges.commit();
+        edges.forEachKey(TermEdge::clear);
 
+        Concept c = concept;
 
-    @Override
-    protected void renderRelativeAspect(GL2 gl) {
-        renderLabel(gl, 0.05f);
-    }
+        //phase 1: collect
+        c.tasklinks().forEach(this);
+        c.termlinks().forEach(this);
 
-
-    @Override
-    public void update(@NotNull SpaceGraph<Term> s) {
-        super.update(s);
+        edges.forEach(ff -> ff.get().update(ff));
 
         Term tt = key;
 
         //Budget b = instance;
 
-        this.pri = nar.activation(tt);
+        this.pri = space.nar.activation(tt);
 
         float p = pri;// = 1; //pri = key.priIfFiniteElseZero();
 
 
         float minSize = 0.1f;
-        float maxSize = 4f;
+        float maxSize = 16f;
         //sqrt because the area will be the sqr of this dimension
-        float nodeScale = ((float)Math.sqrt(minSize+p * maxSize));//1f + 2f * p;
+        float nodeScale = ((float) Math.sqrt(minSize + p * maxSize));//1f + 2f * p;
         //nodeScale /= Math.sqrt(tt.volume());
         scale(nodeScale, nodeScale, 0.2f);
 
 
-        Draw.hsb( (tt.op().ordinal()/16f), 0.75f + 0.25f * p, 0.5f  , 0.9f, shapeColor);
-
+        Draw.hsb((tt.op().ordinal() / 16f), 0.75f + 0.25f * p, 0.5f, 0.9f, shapeColor);
 
 
 //            float lastConceptForget = instance.getLastForgetTime();
@@ -146,60 +151,23 @@ public class ConceptWidget extends SimpleSpatial<Term> {
         //tasklinks.topWhile(linkAdder, maxEdges - edgeCount()); //fill remaining edges
 //        termlinks.topWhile(linkAdder, maxEdges - edgeCount()); //fill remaining edges
 
+
     }
 
 
-
-
-    boolean addEdge(SpaceGraph space, BLink<? extends Termed> ll) {
-
-        Termed gg = ll.get();
-        if (gg == null)
-            return true;
-        return addEdge(space, gg, ll)!=null;
-    }
-
-    @Nullable
-    public EDraw addEdge(@NotNull SpaceGraph space, @NotNull Termed gg, @NotNull  Budget ll) {
-        SimpleSpatial target = (SimpleSpatial) space.getIfActive(gg.term());
-        if (target == null)
-            return null;
-
-        return addEdge(ll, target);
+    @Override
+    protected void renderRelativeAspect(GL2 gl) {
+        renderLabel(gl, 0.05f);
     }
 
 
-    @Nullable public EDraw addEdge(@NotNull Budget l, @NotNull SimpleSpatial target) {
-
-        List<EDraw> ee = edges;
-
-        float maxAttraction = 0.1f;
-
-        float pri = l.priIfFiniteElseZero();
-        if (pri > 0) {
-
-            float minLineWidth = 1f;
-            float maxLineWidth = 5f;
-            float width = minLineWidth + (maxLineWidth - minLineWidth) * pri;
-
-            EDraw z = new EDraw();
-            z.target = target;
-            z.width = width;
-            //z.r = 0.25f + 0.7f * (pri * 1f / ((Term)target.key).volume());
-            z.r = 0;
-            float qua = l.qua();
-            z.g = 0.25f + 0.7f * (qua);
-            z.b = 0.25f + 0.7f * (1f-qua);
-            z.a = 0.1f + 0.5f * pri;
-                    //0.9f;
-            z.attraction = sqr(qua)*maxAttraction;
-
-            ee.add(z);
-            return z;
-        } else {
-            return null;
-        }
-    }
+//    @Nullable
+//    public EDraw addEdge(@NotNull Budget l, @NotNull ConceptWidget target) {
+//
+//        EDraw z = new TermEdge(target, l);
+//        edges.add(z);
+//        return z;
+//    }
 
     @Override
     public void renderAbsolute(GL2 gl) {
@@ -208,13 +176,11 @@ public class ConceptWidget extends SimpleSpatial<Term> {
 
 
     void renderEdges(GL2 gl) {
-        List<EDraw> eee = edges;
-        int n = eee.size();
-        for (int en = 0; en < n; en++) {
-            EDraw f = eee.get(en);
-            //if (f!=null)
+        edges.forEach(ff -> {
+            TermEdge f = ff.get();
+            if (f.a > 0)
                 render(gl, f);
-        }
+        });
     }
 
     public void render(@NotNull GL2 gl, @NotNull EDraw e) {
@@ -223,9 +189,94 @@ public class ConceptWidget extends SimpleSpatial<Term> {
 
         float width = e.width;
         if (width <= 1f) {
-            Draw.renderLineEdge(gl, this, e, 4f+width*2f);
+            Draw.renderLineEdge(gl, this, e, 4f + width * 2f);
         } else {
-            Draw.renderHalfTriEdge(gl, this, e, width*radius/18f, e.r*2f /* hack */);
+            Draw.renderHalfTriEdge(gl, this, e, width * radius / 18f, e.r * 2f /* hack */);
+        }
+    }
+
+    @Override
+    public void accept(BLink<? extends Termed> tgt) {
+        Termed ttt = tgt.get();
+        Term tt = ttt.term();
+        if (!tt.equals(key)) {
+            ConceptWidget at = (ConceptWidget) space.space.getIfActive(tt);
+            if (at!=null) {
+                TermEdge ate = new TermEdge(at);
+
+                BLink<TermEdge> x = edges.put(ate, tgt);
+                if (x!=null) {
+                    x.get().add(tgt, !(ttt instanceof Task));
+                }
+            }
+        }
+    }
+
+    public static class TermEdge extends EDraw<Term,ConceptWidget> implements Termed {
+
+        float termlinkPri, tasklinkPri;
+
+        private final int hash;
+
+        public TermEdge(@NotNull ConceptWidget target) {
+            super(target);
+            this.hash = target.key.hashCode();
+        }
+
+        protected void clear() {
+            termlinkPri = tasklinkPri = 0;
+        }
+
+        public void add(BLink b, boolean termOrTask) {
+            float p = b.pri();
+            if (termOrTask) {
+                termlinkPri += p;
+            } else {
+                tasklinkPri += p;
+            }
+        }
+
+        @NotNull
+        @Override
+        public Term term() {
+            return target.key;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            return this == o || target.key.equals(o);
+        }
+
+        @Override
+        public int hashCode() {
+            return hash;
+        }
+
+        @Override
+        public void update(BLink<TermEdge> ff) {
+
+            float priSum = (termlinkPri + tasklinkPri);
+
+            if (priSum >= 0) {
+
+                float priAvg = priSum/2f;
+
+                float minLineWidth = 1f;
+                float maxLineWidth = 5f;
+
+                this.width = minLineWidth + (maxLineWidth - minLineWidth) * priSum;
+                //z.r = 0.25f + 0.7f * (pri * 1f / ((Term)target.key).volume());
+                this.r = ff.qua();
+                this.g = 0.1f + 0.9f * (tasklinkPri);
+                this.b = 0.1f + 0.9f * (termlinkPri);
+                //this.a = 0.1f + 0.5f * pri;
+                this.a = priAvg;
+                //0.9f;
+
+                this.attraction = priSum * 0.1f;
+            } else {
+                this.a = 0;
+            }
         }
     }
 
@@ -306,7 +357,6 @@ public class ConceptWidget extends SimpleSpatial<Term> {
 //
 //
 //    }
-
 
 
 }

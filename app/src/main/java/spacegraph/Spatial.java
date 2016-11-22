@@ -55,6 +55,7 @@ public abstract class Spatial<X> implements Active {
 
     @Override
     public final boolean equals(Object obj) {
+
         return this == obj || key.equals(((Spatial) obj).key);
     }
 

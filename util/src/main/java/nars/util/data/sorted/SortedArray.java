@@ -499,23 +499,21 @@ public class SortedArray<E> implements Iterable<E> {
 			return -1;*/
 
 		int size = size();
-		if (size < binarySearchThreshold) {
-			return indexOfInternal(element);
-		}
+		if (size >= binarySearchThreshold) {
 
+            final int[] rightBorder = {0};
+            final int left = this.findInsertionIndex(cmp.rank(element), 0, size, rightBorder, cmp);
 
-        final int[] rightBorder = { 0 };
-		final int left = this.findInsertionIndex(cmp.rank(element), 0, size, rightBorder, cmp);
+            E[] l = this.list;
+            for (int index = left; index < rightBorder[0]; index++) {
+                if (element.equals(l[index])) {
+                    return index;// element is found
+                }
+            }
 
-        E[] l = this.list;
-		for (int index = left; index < rightBorder[0]; index++) {
-            if (element.equals(l[index])) {
-				return index;// element is found
-			}
-		}
-
-		//return -1;
-        //worst case, not found because not sorted:
+            //return -1;
+            //worst case, not found because not sorted:
+        }
         return indexOfInternal(element);
 
 	}
@@ -594,7 +592,7 @@ public class SortedArray<E> implements Iterable<E> {
      */
     private int findInsertionIndex(
             float elementRank, final int left, final int right,
-            @NotNull final int[] rightBorder, Ranker<E> cmp) {
+            @NotNull final int[] rightBorder, @NotNull Ranker<E> cmp) {
 
         assert(right >= left); //"right must be bigger or equals as the left"
 

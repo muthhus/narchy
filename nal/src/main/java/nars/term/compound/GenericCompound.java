@@ -24,7 +24,7 @@ public class GenericCompound implements Compound {
      * subterm vector
      */
     @NotNull
-    protected TermContainer subterms;
+    protected final TermContainer subterms;
 
 
     /**
@@ -82,6 +82,11 @@ public class GenericCompound implements Compound {
     }
 
 
+    @Override
+    public final int hashCodeSubTerms() {
+        return subterms.hashCode();
+    }
+
     @NotNull
     @Override
     public final TermContainer subterms() {
@@ -89,7 +94,10 @@ public class GenericCompound implements Compound {
     }
 
     @Override
-    public boolean equals(@Nullable Object that) {
+    public final boolean equals(@Nullable Object that) {
+
+        if (hash != that.hashCode())
+            return false;
 
         Compound cthat;
         if (that instanceof Compound) {
@@ -115,22 +123,23 @@ public class GenericCompound implements Compound {
             return false;
         }
 
-        //subterm sharing:
         TermContainer cs = cthat.subterms();
         TermContainer as = this.subterms;
-        if (as != cs) {
-            if (!as.equivalent(cs)) {
-                return false;
-            } else {
-                //share the subterms vector
-                if (cthat instanceof GenericCompound) {
-                    this.subterms = cs; //HACK cast sucks
-                }
-            }
-        }
+        //subterm sharing:
+//        if (as != cs) {
+//            if (!as.equivalent(cs)) {
+//                return false;
+//            } else {
+//                //share the subterms vector
+//                if (cthat instanceof GenericCompound) {
+//                    this.subterms = cs; //HACK cast sucks
+//                }
+//            }
+//        }
 
-//        if (hash != cthat.hashCode())
-//            return false;
+        if (!cs.equals(as))
+            return false;
+
 
         //return subterms.equals(cthat.subterms()) &&
         return

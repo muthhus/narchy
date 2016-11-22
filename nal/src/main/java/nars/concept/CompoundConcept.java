@@ -575,7 +575,7 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept, Ter
 
     @Override
     public final boolean equals(Object obj) {
-        return term == obj || this == obj || term.equals(obj);
+        return this == obj || term.equals(obj);
     }
 
     @Override

@@ -25,6 +25,7 @@ package spacegraph.phys;
 
 import org.eclipse.collections.api.block.predicate.primitive.IntObjectPredicate;
 import org.eclipse.collections.api.block.procedure.primitive.IntObjectProcedure;
+import org.jetbrains.annotations.NotNull;
 import spacegraph.Spatial;
 import spacegraph.math.Matrix3f;
 import spacegraph.math.Quat4f;
@@ -54,10 +55,10 @@ public abstract class Collisions<X> {
 	/** holds spatials which have not been added to 'objects' yet (beginning of next cycle) */
 	//protected FasterList<Spatial<X>> pendingAdd = $.newArrayList();
 
-	public final Intersecter intersecter;
-	protected final DispatcherInfo dispatchInfo = new DispatcherInfo();
+	@NotNull public final Intersecter intersecter;
+	@NotNull protected final DispatcherInfo dispatchInfo = new DispatcherInfo();
 	//protected btStackAlloc*	m_stackAlloc;
-	protected final Broadphase broadphase;
+	@NotNull protected final Broadphase broadphase;
 
 	/**
 	 * This constructor doesn't own the dispatcher and paircache/broadphase.
@@ -104,7 +105,7 @@ public abstract class Collisions<X> {
 			v3 maxAabb = new v3();
 
 			CollisionShape shape = c.shape();
-			shape.getAabb(c.getWorldTransform(new Transform()), minAabb, maxAabb);
+			shape.getAabb(c.worldTransform, minAabb, maxAabb);
 
 			c.broadphase(broadphase.createProxy(
 					minAabb,
@@ -135,12 +136,10 @@ public abstract class Collisions<X> {
 				BulletStats.popProfile();
 			}
 
-			Intersecter intersecter = this.intersecter;
+
             BulletStats.pushProfile("dispatchAllCollisionPairs");
             try {
-                if (intersecter != null) {
-                    intersecter.dispatchAllCollisionPairs(broadphase.getOverlappingPairCache(), dispatchInfo, this.intersecter);
-                }
+                intersecter.dispatchAllCollisionPairs(broadphase.getOverlappingPairCache(), dispatchInfo, this.intersecter);
             }
             finally {
                 BulletStats.popProfile();
@@ -176,7 +175,8 @@ public abstract class Collisions<X> {
 			broadphase.destroyProxy(bp, intersecter);
             collidable.broadphase(null);
         } else {
-        	System.err.println(collidable + " missing broadphase");
+        	//System.err.println(collidable + " missing broadphase");
+			throw new RuntimeException(collidable + " missing broadphase");
 		}
 	}
 

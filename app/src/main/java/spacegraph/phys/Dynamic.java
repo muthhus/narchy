@@ -592,12 +592,12 @@ public class Dynamic<X> extends Collidable<X> {
 		return angularFactor;
 	}
 
-	/**
-	 * Is this rigidbody added to a CollisionWorld/DynamicsWorld/Broadphase?
-	 */
-	public boolean isInWorld() {
-        return (broadphaseHandle != null);
-	}
+//	/**
+//	 * Is this rigidbody added to a CollisionWorld/DynamicsWorld/Broadphase?
+//	 */
+//	public boolean isInWorld() {
+//        return (broadphaseHandle != null);
+//	}
 
 	@Override
 	public boolean checkCollideWithOverride(Collidable co) {

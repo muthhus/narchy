@@ -316,14 +316,14 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
 //    }
 
     @Override
-    public final void put(@NotNull V key, @NotNull Budgeted b, float scale, @Nullable MutableFloat overflow) {
+    public final BLink<V> put(@NotNull V key, @NotNull Budgeted b, float scale, @Nullable MutableFloat overflow) {
 
         if (scale < Param.BUDGET_EPSILON)
-            return; //too weak
+            return null;
 
         float bp = b.pri();
         if (bp != bp) { //already deleted
-            return;
+            return null;
         }
 
         pressure += bp;
@@ -340,7 +340,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
                 if (vv == null) {
                     //it has been deleted
                     map.remove(key);
-                    return;
+                    return null;
                 }
 
                 float pBefore = vv.pri();
@@ -364,7 +364,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
                         int p = items.indexOf(v, this);
                         if (p == -1) {
                             //removed before this completed
-                            return;
+                            return null;
                         }
 
                         int s = items.size();
@@ -385,7 +385,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
                             if (rerank) {
 
                                 if (!items.remove(v, this))
-                                    return; //removed before this completed
+                                    return null;
 
                                 v.setPriority(pAfter); //the remainder of the budget will be set below
 
@@ -411,22 +411,23 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
 //                    //in case the merged item determined the min priority
 //                    this.minPri = pAfter;
 //                }
+                return v;
 
-                break;
             case +1:
 
                 v.setBudget(bp * scale, b.qua());
                 if (update(v)) {
                     onAdded(v); //success
+                    return v;
                 }
                 break;
 
             case -1:
                 //reject due to insufficient budget
-                //onRemoved(null);
                 break;
         }
 
+        return null;
     }
 
 //    /**

@@ -243,7 +243,8 @@ public final class Dbvt {
 		}
 	}
 
-	static Node[] sStkNN(Node a, Node b) { return new Node[] { a, b }; }
+	//static Node[] sStkNN(Node a, Node b) { return new Node[] { a, b }; }
+	static Node[] sStkNN(Node... x) { return x; }
 
 	public static void collideTT(Node root0, Node root1, ICollide policy, OArrayList<Node[]> stack) {
 		//DBVT_CHECKTYPE
@@ -558,9 +559,10 @@ public final class Dbvt {
 
 	public static int allocate(IntArrayList ifree, OArrayList<sStkNPS> stock, sStkNPS value) {
 		int i;
-		if (ifree.size() > 0) {
-			i = ifree.get(ifree.size() - 1);
-			ifree.remove(ifree.size() - 1);
+		int size = ifree.size();
+		if (size > 0) {
+			//i = ifree.get(size - 1);
+			i = ifree.remove(size - 1);
             //return array[index];
             stock.get(i).set(value);
 		}
@@ -585,9 +587,11 @@ public final class Dbvt {
 	// volume+edge lengths
 	private static float size(DbvtAabbMm a) {
 		v3 edges = a.lengths(new v3());
+
 		return (edges.x * edges.y * edges.z +
 		        edges.x + edges.y + edges.z);
 	}
+
 
 	private static void deletenode(Dbvt pdbvt, Node node) {
 		//btAlignedFree(pdbvt->m_free);
@@ -900,7 +904,7 @@ public final class Dbvt {
 		}
 
 		/** recursively collets all leaves  */
-		public final <X> void leaves(Collection<Collidable> l) {
+		public final void leaves(Collection<Collidable> l) {
 
 			if (data!=null) {
 				l.add(data.data);
@@ -939,8 +943,6 @@ public final class Dbvt {
 		public int mask;
 		public float value;
 
-
-
 		public sStkNPS(Node n, int m, float v) {
 			node = n;
 			mask = m;
@@ -964,8 +966,9 @@ public final class Dbvt {
 //		}
 //	}
 
-	public static class ICollide {
-		public void process(Node n1, Node n2) {
+	abstract public static class ICollide {
+		void process(Node n1, Node n2) {
+
 		}
 
 		public void process(Node n) {

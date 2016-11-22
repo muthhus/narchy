@@ -74,8 +74,8 @@ abstract public class NAgent implements NSense, NAction {
 
     public float alpha, gamma;
 
-    float curiosityFreqMin = 0.1f; //nyquist
-    float curiosityFreqMax = 1f;
+    float curiosityFreqMin = 0.5f;
+    float curiosityFreqMax = 1.5f;
 
     class CuriosityPhasor {
         public float freq, phase;

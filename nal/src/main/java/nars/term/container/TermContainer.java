@@ -458,29 +458,29 @@ public interface TermContainer extends Termlike, Iterable<Term> {
 //
 //    }
 
-    default boolean equivalent(@NotNull List<Term> sub) {
-        int s = size();
-        if (s == sub.size()) {
-            for (int i = 0; i < s; i++) {
-                if (!term(i).equals(sub.get(i)))
-                    return false;
-            }
-            return true;
-        }
-        return false;
-    }
-
-    default boolean equivalent(@NotNull Term[] sub) {
-        int s = size();
-        if (s == sub.length) {
-            for (int i = 0; i < s; i++) {
-                if (!term(i).equals(sub[i]))
-                    return false;
-            }
-            return true;
-        }
-        return false;
-    }
+//    default boolean equivalent(@NotNull List<Term> sub) {
+//        int s = size();
+//        if (s == sub.size()) {
+//            for (int i = 0; i < s; i++) {
+//                if (!term(i).equals(sub.get(i)))
+//                    return false;
+//            }
+//            return true;
+//        }
+//        return false;
+//    }
+//
+//    default boolean equivalent(@NotNull Term[] sub) {
+//        int s = size();
+//        if (s == sub.length) {
+//            for (int i = 0; i < s; i++) {
+//                if (!term(i).equals(sub[i]))
+//                    return false;
+//            }
+//            return true;
+//        }
+//        return false;
+//    }
     default boolean equivalent(@NotNull TermContainer sub) {
         if (hashCodeSubTerms() == sub.hashCodeSubTerms()) {
             int s = size();

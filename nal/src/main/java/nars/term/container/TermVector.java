@@ -208,6 +208,11 @@ public abstract class TermVector implements TermContainer {
         return hash;
     }
 
+    @Override
+    public final int hashCodeSubTerms() {
+        return hash;
+    }
+
     public final void visit(@NotNull SubtermVisitorX v, Compound parent) {
         int cl = size();
         for (int i = 0; i < cl; i++) {

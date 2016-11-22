@@ -5,13 +5,15 @@ import org.eclipse.collections.api.block.predicate.primitive.IntObjectPredicate;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Consumer;
 
 /**
  * maintains a set of objects which are used as input for representation in a SpaceGraph
  * @param X input "key" object type
  * @param Y visualized "value" spatial type
  */
-abstract public class AbstractSpace<X, Y> implements Iterable<Y> {
+abstract public class AbstractSpace<X, Y>  {
 
     //final AtomicBoolean busy = new AtomicBoolean(true);
     private long now;
@@ -33,19 +35,24 @@ abstract public class AbstractSpace<X, Y> implements Iterable<Y> {
 
     }
 
+    abstract public void forEach(Consumer<? super Y> var1);
 
 
     public float dt() {
         return dt;
     }
 
+    final AtomicBoolean busy = new AtomicBoolean(false);
     /**
      * for thread-safe usage
      */
     public void updateIfNotBusy(Runnable proc) {
-        float last = this.now;
-        this.dt = (this.now = now()) - last;
-        proc.run();
+        if (busy.compareAndSet(false, true)) {
+            float last = this.now;
+            this.dt = (this.now = now()) - last;
+            proc.run();
+            busy.set(false);
+        }
     }
 
     abstract public long now();
@@ -64,9 +71,7 @@ abstract public class AbstractSpace<X, Y> implements Iterable<Y> {
 
     public abstract int size();
 
-    /** get the i'th object in the display list; the order is allowed to change each frame but not in-between updates */
-    public abstract Y get(int i);
 
-    abstract public int forEachIntSpatial(int offset, IntObjectPredicate<Spatial<X>> each);
+    abstract public int forEachWithInt(int offset, IntObjectPredicate<Y> each);
 
 }

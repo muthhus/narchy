@@ -31,8 +31,8 @@ package spacegraph.phys.collision.broad;
  */
 public class DbvtLeafCollider extends Dbvt.ICollide {
 
-	public DbvtBroadphase pbp;
-	public DbvtProxy ppx;
+	public final DbvtBroadphase pbp;
+	public final DbvtProxy ppx;
 
 	public DbvtLeafCollider(DbvtBroadphase p, DbvtProxy px) {
 		this.pbp = p;

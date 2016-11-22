@@ -52,6 +52,7 @@ import spacegraph.phys.util.AnimVector3f;
 import spacegraph.phys.util.Motion;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
@@ -318,20 +319,29 @@ abstract public class JoglPhysics<X> extends JoglSpace implements GLEventListene
         //updateCamera();
     }
 
+    final AtomicBoolean busy = new AtomicBoolean(false);
+
     protected void update() {
 
-        long dt = clock.getTimeThenReset();
-        lastFrameTime = dt/1000f;
+        if (busy.compareAndSet(false, true)) {
 
-        if (simulating) {
-            // NOTE: SimpleDynamics world doesn't handle fixed-time-stepping
-            dyn.stepSimulation(
-                    Math.max(dt, 1000000f / MAX_FPS) / 1000000.f, maxSubsteps
-                    //clock.getTimeThenReset()
-            );
+            long dt = clock.getTimeThenReset();
+            lastFrameTime = dt / 1000f;
+
+            if (simulating) {
+                // NOTE: SimpleDynamics world doesn't handle fixed-time-stepping
+                dyn.stepSimulation(
+                        Math.max(dt, 1000000f / MAX_FPS) / 1000000.f, maxSubsteps
+                        //clock.getTimeThenReset()
+                );
+            }
+
+            frameListeners.forEach(f -> f.onFrame(this));
+
+            busy.set(false);
+        } else {
+            System.err.println("update overlap");
         }
-
-        frameListeners.forEach(f-> f.onFrame(this));
     }
 
     public final void display(GLAutoDrawable drawable) {

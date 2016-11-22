@@ -100,25 +100,24 @@ public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Iterable<BLink<
 
     /** always returns null, which is different semantics than the supermethod it overrides */
     @Override default @Nullable BLink<V> put(@NotNull V i, @NotNull BLink<V> b) {
-        put(i, b, 1f, null);
-        return null;
+        return put(i, b, 1f, null);
     }
 
-    default void put(@NotNull V i, @NotNull Budgeted b) {
-        put(i, b, 1f, null);
-    }
-
-
-    default void put(@NotNull V i, @NotNull Budgeted b, @Nullable MutableFloat overflowing) {
-        put(i, b, 1f, overflowing);
-    }
-
-    default void put(@NotNull V v, @NotNull BLink<V> b, @Nullable MutableFloat overflowing) {
-        put(v, b, 1f, overflowing);
+    default BLink<V> put(@NotNull V i, @NotNull Budgeted b) {
+        return put(i, b, 1f, null);
     }
 
 
-    void put(@NotNull V i, @NotNull Budgeted b, float scale, @Nullable MutableFloat overflowing);
+    default BLink<V> put(@NotNull V i, @NotNull Budgeted b, @Nullable MutableFloat overflowing) {
+        return put(i, b, 1f, overflowing);
+    }
+
+    default BLink<V> put(@NotNull V v, @NotNull BLink<V> b, @Nullable MutableFloat overflowing) {
+        return put(v, b, 1f, overflowing);
+    }
+
+
+    BLink<V> put(@NotNull V i, @NotNull Budgeted b, float scale, @Nullable MutableFloat overflowing);
 
 
 
@@ -463,7 +462,8 @@ public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Iterable<BLink<
         }
 
         @Override
-        public void put(@NotNull Object i, @NotNull Budgeted b, float scale, @Nullable MutableFloat overflowing) {
+        public BLink put(@NotNull Object i, @NotNull Budgeted b, float scale, @Nullable MutableFloat overflowing) {
+            return null;
         }
 
         @Override
@@ -574,7 +574,7 @@ public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Iterable<BLink<
     }
 
     @Override
-    default void forEachKey(Consumer<? super V> each) {
+    default void forEachKey(Consumer<V> each) {
         forEach(b -> each.accept(b.get()));
     }
 

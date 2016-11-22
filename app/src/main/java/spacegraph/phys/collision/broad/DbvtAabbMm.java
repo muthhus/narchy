@@ -38,13 +38,21 @@ import static spacegraph.phys.math.VectorUtil.coord;
  */
 public class DbvtAabbMm {
 
-	private final v3 mi = new v3();
-	private final v3 mx = new v3();
+	private final v3 mi;
+	private final v3 mx;
 
 	public DbvtAabbMm() {
+		mi = new v3();
+		mx = new v3();
+	}
+
+	public DbvtAabbMm(v3 mi, v3 mx) {
+		this.mi = mi;
+		this.mx = mx;
 	}
 
 	public DbvtAabbMm(DbvtAabbMm o) {
+		this();
 		set(o);
 	}
 	
@@ -75,7 +83,7 @@ public class DbvtAabbMm {
 		out.sub(mx, mi);
 		return out;
 	}
-	
+
 	public v3 extents(v3 out) {
 		out.sub(mx, mi);
 		out.scale(0.5f);

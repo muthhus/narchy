@@ -25,6 +25,7 @@
 
 package spacegraph.phys.collision.broad;
 
+import spacegraph.math.v3;
 import spacegraph.phys.Collidable;
 
 /**
@@ -33,13 +34,14 @@ import spacegraph.phys.Collidable;
  */
 public class DbvtProxy extends Broadphasing {
 
-	public final DbvtAabbMm aabb = new DbvtAabbMm();
+	public final DbvtAabbMm aabb;
 	public Dbvt.Node leaf;
 	public final DbvtProxy[] links = new DbvtProxy[2];
 	public int stage;
 
-	public DbvtProxy(Collidable userPtr, short collisionFilterGroup, short collisionFilterMask) {
+	public DbvtProxy(Collidable userPtr, short collisionFilterGroup, short collisionFilterMask, v3 min, v3 max) {
 		super(userPtr, collisionFilterGroup, collisionFilterMask);
+		this.aabb = new DbvtAabbMm(min, max);
 	}
 
 }

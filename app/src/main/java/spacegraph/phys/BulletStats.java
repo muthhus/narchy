@@ -64,17 +64,17 @@ public class BulletStats {
 	public static long stepSimulationTime;
 	public static long updateTime;
 	
-	private static boolean enableProfile;
+	private static final boolean enableProfile = false;
 	
 	////////////////////////////////////////////////////////////////////////////
 	
-	public static boolean isProfileEnabled() {
-		return enableProfile;
-	}
-
-	public static void setProfileEnabled(boolean b) {
-		enableProfile = b;
-	}
+//	public static boolean isProfileEnabled() {
+//		return enableProfile;
+//	}
+//
+//	public static void setProfileEnabled(boolean b) {
+//		enableProfile = b;
+//	}
 	
 	public static long profileGetTicks() {
 		long ticks = gProfileClock.getTimeMicroseconds();

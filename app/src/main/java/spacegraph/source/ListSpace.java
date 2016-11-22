@@ -6,16 +6,15 @@ import spacegraph.AbstractSpace;
 import spacegraph.SpaceGraph;
 import spacegraph.Spatial;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.function.Consumer;
 
-/**
- * Created by me on 6/26/16.
- */
+
 public class ListSpace<X,Y> extends AbstractSpace<X,Y> {
 
-    public FasterList<Y> active = new FasterList<>(0);
+    public Collection<Y> active = new FasterList<>(0);
 
     public ListSpace() {
         super();
@@ -31,11 +30,11 @@ public class ListSpace<X,Y> extends AbstractSpace<X,Y> {
 //        set(materialize, xx);
 //    }
 
-    @Override
-    public final Iterator<Y> iterator() {
-        return active.iterator();
-    }
-
+//    @Override
+//    public final Iterator<Y> iterator() {
+//        return active.iterator();
+//    }
+//
     @Override
     public final void forEach(Consumer<? super Y> action) {
         active.forEach(action);
@@ -47,32 +46,18 @@ public class ListSpace<X,Y> extends AbstractSpace<X,Y> {
     }
 
 
-//    public void set(Function<X, Y> materializer, X... items) {
-//        set(Lists.newArrayList(items), materializer);
-//    }
-//
-//    public void set(List<X> items, Function<X, Y> materializer) {
-//        int n = 0;
-//        FasterList<Y> v = new FasterList<>(items.size());
-//        for (X x : items) {
-//            v.add(space.update(x, materializer));
-//        }
-//        this.active = v;
-//    }
-
     @Override
     public final int size() {
         return active.size();
     }
 
-    @Override
-    public final Y get(int i) {
-        return active.get(i);
-    }
 
     @Override
-    public int forEachIntSpatial(int offset, IntObjectPredicate<Spatial<X>> each) {
-        return active.forEach(offset ,each);
+    public int forEachWithInt(int offset, IntObjectPredicate<Y> each) {
+        //return active.forEach(offset ,each);
+        int[] o = { offset };
+        active.forEach(x -> each.accept(o[0]++, x));
+        return o[0];
     }
 
     @Override
