@@ -211,7 +211,7 @@ public enum Draw {
                             if (tris > 0) {
                                 int index = 0;
                                 spacegraph.phys.util.IntArrayList idx = hull.getIndexPointer();
-                                OArrayList<v3> vtx = hull.getVertexPointer();
+                                FasterList<v3> vtx = hull.getVertexPointer();
 
                                 v3 normal = v();
                                 v3 tmp1 = v();

@@ -25,13 +25,13 @@
 
 package spacegraph.phys.math.convexhull;
 
+import nars.util.list.FasterList;
 import spacegraph.math.v3;
 import spacegraph.phys.BulletGlobals;
 import spacegraph.phys.math.MiscUtil;
 import spacegraph.phys.math.VectorUtil;
 import spacegraph.phys.shape.ShapeHull;
 import spacegraph.phys.util.IntArrayList;
-import spacegraph.phys.util.OArrayList;
 
 /**
  * HullLibrary class can create a convex hull from a collection of vertices, using
@@ -44,7 +44,7 @@ public class HullLibrary {
 
 	public final IntArrayList vertexIndexMapping = new IntArrayList();
 
-	private final OArrayList<Tri> tris = new OArrayList<>();
+	private final FasterList<Tri> tris = new FasterList<>();
 
 	/**
 	 * Converts point cloud to polygonal representation.
@@ -61,7 +61,7 @@ public class HullLibrary {
 		int vcount = desc.vcount;
 		if (vcount < 8) vcount = 8;
 
-		OArrayList<v3> vertexSource = new OArrayList<>();
+		FasterList<v3> vertexSource = new FasterList<>();
 		MiscUtil.resize(vertexSource, vcount, v3.class);
 
 		v3 scale = new v3();
@@ -82,7 +82,7 @@ public class HullLibrary {
 
 			if (ok) {
 				// re-index triangle mesh so it refers to only used vertices, rebuild a new vertex table.
-				OArrayList<v3> vertexScratch = new OArrayList<>();
+				FasterList<v3> vertexScratch = new FasterList<>();
 				MiscUtil.resize(vertexScratch, hr.vcount, v3.class);
 
 				bringOutYourDead(hr.vertices, hr.vcount, vertexScratch, ovcount, hr.indices, hr.indexCount);
@@ -184,7 +184,7 @@ public class HullLibrary {
 		return true;
 	}
 
-	private boolean computeHull(int vcount, OArrayList<v3> vertices, PHullResult result, int vlimit) {
+	private boolean computeHull(int vcount, FasterList<v3> vertices, PHullResult result, int vlimit) {
 		int[] tris_count = new int[1];
 		int ret = calchull(vertices, vcount, result.indices, tris_count, vlimit);
 		if (ret == 0) return false;
@@ -206,7 +206,7 @@ public class HullLibrary {
 	private void deAllocateTriangle(Tri tri) {
 		//return array[index];
 		assert (tris.get(tri.id) == tri);
-		tris.setQuick(tri.id, null);
+		tris.setFast(tri.id, null);
 	}
 
 	private void b2bfix(Tri s, Tri t) {
@@ -261,7 +261,7 @@ public class HullLibrary {
 		return (t.rise > epsilon) ? t : null;
 	}
 
-	private int calchull(OArrayList<v3> verts, int verts_count, IntArrayList tris_out, int[] tris_count, int vlimit) {
+	private int calchull(FasterList<v3> verts, int verts_count, IntArrayList tris_out, int[] tris_count, int vlimit) {
 		int rc = calchullgen(verts, verts_count, vlimit);
 		if (rc == 0) return 0;
 
@@ -289,7 +289,7 @@ public class HullLibrary {
 		return 1;
 	}
 
-	private int calchullgen(OArrayList<v3> verts, int verts_count, int vlimit) {
+	private int calchullgen(FasterList<v3> verts, int verts_count, int vlimit) {
 		if (verts_count < 4) return 0;
 
 		v3 tmp = new v3();
@@ -453,7 +453,7 @@ public class HullLibrary {
 		return 1;
 	}
 
-	private static Int4 findSimplex(OArrayList<v3> verts, int verts_count, IntArrayList allow, Int4 out) {
+	private static Int4 findSimplex(FasterList<v3> verts, int verts_count, IntArrayList allow, Int4 out) {
 		v3 tmp = new v3();
 		v3 tmp1 = new v3();
 		v3 tmp2 = new v3();
@@ -569,10 +569,11 @@ public class HullLibrary {
 	//After the hull is generated it give you back a set of polygon faces which index the *original* point cloud.
 	//The thing is, often times, there are many 'dead vertices' in the point cloud that are on longer referenced by the hull.
 	//The routine 'BringOutYourDead' find only the referenced vertices, copies them to an new buffer, and re-indexes the hull so that it is a minimal representation.
-	private void bringOutYourDead(OArrayList<v3> verts, int vcount, OArrayList<v3> overts, int[] ocount, IntArrayList indices, int indexcount) {
-		IntArrayList tmpIndices = new IntArrayList();
-		for (int i=0; i<vertexIndexMapping.size(); i++) {
-			tmpIndices.add(vertexIndexMapping.size());
+	private void bringOutYourDead(FasterList<v3> verts, int vcount, FasterList<v3> overts, int[] ocount, IntArrayList indices, int indexcount) {
+		int vs = vertexIndexMapping.size();
+		IntArrayList tmpIndices = new IntArrayList(vs);
+		for (int i=0; i< vs; i++) {
+			tmpIndices.add(vs);
 		}
 
 		IntArrayList usedIndices = new IntArrayList();
@@ -619,10 +620,10 @@ public class HullLibrary {
 	private static final float EPSILON = 0.000001f; /* close enough to consider two btScalaring point numbers to be 'the same'. */
 
 	private boolean cleanupVertices(int svcount,
-                                    OArrayList<v3> svertices,
+                                    FasterList<v3> svertices,
                                     int stride,
                                     int[] vcount, // output number of vertices
-                                    OArrayList<v3> vertices, // location to store the results.
+                                    FasterList<v3> vertices, // location to store the results.
                                     float normalepsilon,
                                     v3 scale) {
 
@@ -643,7 +644,7 @@ public class HullLibrary {
 		float[] bmin = { Float.MAX_VALUE, Float.MAX_VALUE, Float.MAX_VALUE };
 		float[] bmax = { -Float.MAX_VALUE, -Float.MAX_VALUE, -Float.MAX_VALUE };
 
-		OArrayList<v3> vtx_ptr = svertices;
+		FasterList<v3> vtx_ptr = svertices;
 		int vtx_idx = 0;
 
 		//	if ( 1 )
@@ -881,7 +882,7 @@ public class HullLibrary {
 		}
 	}
 
-	private static int maxdirfiltered(OArrayList<v3> p, int count, v3 dir, IntArrayList allow) {
+	private static int maxdirfiltered(FasterList<v3> p, int count, v3 dir, IntArrayList allow) {
 		assert (count != 0);
 		int m = -1;
 		for (int i=0; i<count; i++) {
@@ -897,7 +898,7 @@ public class HullLibrary {
 		return m;
 	}
 
-	private static int maxdirsterid(OArrayList<v3> p, int count, v3 dir, IntArrayList allow) {
+	private static int maxdirsterid(FasterList<v3> p, int count, v3 dir, IntArrayList allow) {
 		v3 tmp = new v3();
 		v3 tmp1 = new v3();
 		v3 tmp2 = new v3();
@@ -975,7 +976,7 @@ public class HullLibrary {
 		return out;
 	}
 
-	private static boolean above(OArrayList<v3> vertices, Int3 t, v3 p, float epsilon) {
+	private static boolean above(FasterList<v3> vertices, Int3 t, v3 p, float epsilon) {
 		//return array[index];
 		//return array[index];
 		//return array[index];
@@ -996,7 +997,7 @@ public class HullLibrary {
 		result.vertices = null;
 	}
 	
-	private static void addPoint(int[] vcount, OArrayList<v3> p, float x, float y, float z) {
+	private static void addPoint(int[] vcount, FasterList<v3> p, float x, float y, float z) {
 		// XXX, might be broken
 		//return array[index];
 		v3 dest = p.get(vcount[0]);

@@ -120,7 +120,7 @@ public class ConceptWidget extends SimpleSpatial<Term> implements Consumer<BLink
         //sqrt because the area will be the sqr of this dimension
         float nodeScale = ((float) Math.sqrt(minSize + p * maxSize));//1f + 2f * p;
         //nodeScale /= Math.sqrt(tt.volume());
-        scale(nodeScale, nodeScale, 0.2f);
+        scale(nodeScale, nodeScale, nodeScale);
 
 
         Draw.hsb((tt.op().ordinal() / 16f), 0.75f + 0.25f * p, 0.5f, 0.9f, shapeColor);

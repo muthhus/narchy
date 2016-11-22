@@ -23,6 +23,7 @@
 
 package spacegraph.phys.solve;
 
+import nars.util.list.FasterList;
 import spacegraph.math.Matrix3f;
 import spacegraph.math.v3;
 import spacegraph.phys.BulletGlobals;
@@ -73,8 +74,8 @@ public class SequentialImpulseConstrainer extends Constrainer {
     ////////////////////////////////////////////////////////////////////////////
 
     private final OArrayList<SolverBody> tmpSolverBodyPool = new OArrayList<>();
-    private final OArrayList<SolverConstraint> tmpSolverConstraintPool = new OArrayList<>();
-    private final OArrayList<SolverConstraint> tmpSolverFrictionConstraintPool = new OArrayList<>();
+    private final FasterList<SolverConstraint> tmpSolverConstraintPool = new FasterList<>();
+    private final FasterList<SolverConstraint> tmpSolverFrictionConstraintPool = new FasterList<>();
     private final IntArrayList orderTmpConstraintPool = new IntArrayList();
     private final IntArrayList orderFrictionConstraintPool = new IntArrayList();
 
@@ -397,7 +398,7 @@ public class SequentialImpulseConstrainer extends Constrainer {
         solverConstraint.jacDiagABInv = denom;
     }
 
-    public float solveGroupCacheFriendlySetup(Collection<Collidable> bodies, int numBodies, OArrayList<PersistentManifold> manifoldPtr, int manifold_offset, int numManifolds, OArrayList<TypedConstraint> constraints, int constraints_offset, int numConstraints, ContactSolverInfo infoGlobal/*,btStackAlloc* stackAlloc*/) {
+    public float solveGroupCacheFriendlySetup(Collection<Collidable> bodies, int numBodies, FasterList<PersistentManifold> manifoldPtr, int manifold_offset, int numManifolds, FasterList<TypedConstraint> constraints, int constraints_offset, int numConstraints, ContactSolverInfo infoGlobal/*,btStackAlloc* stackAlloc*/) {
         BulletStats.pushProfile("solveGroupCacheFriendlySetup");
         try {
 
@@ -759,7 +760,7 @@ public class SequentialImpulseConstrainer extends Constrainer {
         }
     }
 
-    public float solveGroupCacheFriendlyIterations(Collection<Collidable> bodies, int numBodies, Collection<PersistentManifold> manifoldPtr, int manifold_offset, int numManifolds, OArrayList<TypedConstraint> constraints, int constraints_offset, int numConstraints, ContactSolverInfo infoGlobal/*,btStackAlloc* stackAlloc*/) {
+    public float solveGroupCacheFriendlyIterations(Collection<Collidable> bodies, int numBodies, Collection<PersistentManifold> manifoldPtr, int manifold_offset, int numManifolds, FasterList<TypedConstraint> constraints, int constraints_offset, int numConstraints, ContactSolverInfo infoGlobal/*,btStackAlloc* stackAlloc*/) {
         BulletStats.pushProfile("solveGroupCacheFriendlyIterations");
         try {
             int numConstraintPool = tmpSolverConstraintPool.size();
@@ -869,7 +870,7 @@ public class SequentialImpulseConstrainer extends Constrainer {
         pool.set(swapi, tmp);
     }
 
-    public float solveGroupCacheFriendly(Collection<Collidable> bodies, int numBodies, OArrayList<PersistentManifold> manifoldPtr, int manifold_offset, int numManifolds, OArrayList<TypedConstraint> constraints, int constraints_offset, int numConstraints, ContactSolverInfo infoGlobal/*,btStackAlloc* stackAlloc*/) {
+    public float solveGroupCacheFriendly(Collection<Collidable> bodies, int numBodies, FasterList<PersistentManifold> manifoldPtr, int manifold_offset, int numManifolds, FasterList<TypedConstraint> constraints, int constraints_offset, int numConstraints, ContactSolverInfo infoGlobal/*,btStackAlloc* stackAlloc*/) {
         solveGroupCacheFriendlySetup(bodies, numBodies, manifoldPtr, manifold_offset, numManifolds, constraints, constraints_offset, numConstraints, infoGlobal/*, stackAlloc*/);
         solveGroupCacheFriendlyIterations(bodies, numBodies, manifoldPtr, manifold_offset, numManifolds, constraints, constraints_offset, numConstraints, infoGlobal/*, stackAlloc*/);
 
@@ -926,7 +927,7 @@ public class SequentialImpulseConstrainer extends Constrainer {
      * Sequentially applies impulses.
      */
     @Override
-    public float solveGroup(Collection<Collidable> bodies, int numBodies, OArrayList<PersistentManifold> manifoldPtr, int manifold_offset, int numManifolds, OArrayList<TypedConstraint> constraints, int constraints_offset, int numConstraints, ContactSolverInfo infoGlobal, Intersecter intersecter) {
+    public float solveGroup(Collection<Collidable> bodies, int numBodies, FasterList<PersistentManifold> manifoldPtr, int manifold_offset, int numManifolds, FasterList<TypedConstraint> constraints, int constraints_offset, int numConstraints, ContactSolverInfo infoGlobal, Intersecter intersecter) {
         BulletStats.pushProfile("solveGroup");
         try {
             // TODO: solver cache friendly

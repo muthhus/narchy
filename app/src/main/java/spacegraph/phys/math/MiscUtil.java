@@ -23,6 +23,7 @@
 
 package spacegraph.phys.math;
 
+import nars.util.list.FasterList;
 import spacegraph.phys.util.FloatArrayList;
 import spacegraph.phys.util.IntArrayList;
 import spacegraph.phys.util.OArrayList;
@@ -97,7 +98,7 @@ public class MiscUtil {
 			}
 
 			while (ls > size) {
-				list.removeQuick(--ls);
+				list.removeFast(--ls);
 			}
 
 
@@ -107,7 +108,7 @@ public class MiscUtil {
 	 * Resizes list to exact size, filling with new instances of given class type
 	 * when expanding.
 	 */
-	public static <T> void resize(OArrayList<T> list, int size, Class<T> valueCls) {
+	public static <T> void resize(FasterList<T> list, int size, Class<T> valueCls) {
 		try {
 			int ls = list.size();
 			while (ls < size) {
@@ -116,7 +117,7 @@ public class MiscUtil {
 			}
 
 			while (ls > size) {
-				list.removeQuick(--ls);
+				list.removeFast(--ls);
 			}
 		}
 		catch (IllegalAccessException | InstantiationException e) {
@@ -136,7 +137,7 @@ public class MiscUtil {
 		return -1;
 	}
 
-	private static <T> void downHeap(OArrayList<T> pArr, int k, int n, Comparator<T> comparator) {
+	private static <T> void downHeap(FasterList<T> pArr, int k, int n, Comparator<T> comparator) {
 		/*  PRE: a[k+1..N] is a heap */
 		/* POST:  a[k..N]  is a heap */
 
@@ -156,14 +157,14 @@ public class MiscUtil {
             if (comparator.compare(temp, pArr.get(child - 1)) < 0) {
 				/* move child up */
                 //return array[index];
-                pArr.setQuick(k - 1, pArr.get(child - 1));
+                pArr.setFast(k - 1, pArr.get(child - 1));
 				k = child;
 			}
 			else {
 				break;
 			}
 		}
-		pArr.setQuick(k - 1, temp);
+		pArr.setFast(k - 1, temp);
 	}
 
 	/**
@@ -171,7 +172,7 @@ public class MiscUtil {
 	 * 
 	 * Implementation from: http://www.csse.monash.edu.au/~lloyd/tildeAlgDS/Sort/Heap/
 	 */
-	public static <T> void heapSort(OArrayList<T> list, Comparator<T> comparator) {
+	public static <T> void heapSort(FasterList<T> list, Comparator<T> comparator) {
 		/* sort a[0..N-1],  N.B. 0 to N-1 */
 		int k;
 		int n = list.size();
@@ -189,12 +190,12 @@ public class MiscUtil {
 		}
 	}
 
-	private static <T> void swap(OArrayList<T> list, int index0, int index1) {
+	private static <T> void swap(FasterList<T> list, int index0, int index1) {
         //return array[index];
         T temp = list.get(index0);
         //return array[index];
-        list.setQuick(index0, list.get(index1));
-		list.setQuick(index1, temp);
+        list.setFast(index0, list.get(index1));
+		list.setFast(index1, temp);
 	}
 
 	private static  void swap(int[][] list, int index0, int index1) {
@@ -206,14 +207,14 @@ public class MiscUtil {
 	/**
 	 * Sorts list using quick sort.<p>
 	 */
-	public static <T> void quickSort(OArrayList<T> list, Comparator<T> comparator) {
+	public static <T> void quickSort(FasterList<T> list, Comparator<T> comparator) {
 		// don't sort 0 or 1 elements
 		if (list.size() > 1) {
 			quickSortInternal(list, comparator, 0, list.size() - 1);
 		}
 	}
 
-	private static <T> void quickSortInternal(OArrayList<T> list, Comparator<T> comparator, int lo, int hi) {
+	private static <T> void quickSortInternal(FasterList<T> list, Comparator<T> comparator, int lo, int hi) {
 		// lo is the lower index, hi is the upper index
 		// of the region of array a that is to be sorted
 		int i = lo, j = hi;

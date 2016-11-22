@@ -160,7 +160,7 @@ public class DefaultIntersecter extends Intersecter {
 		Collections.swap(manifoldsPtr, findIndex, manifoldsPtr.size()-1);
         //return array[index];
         manifoldsPtr.get(findIndex).index1a = findIndex;
-		manifoldsPtr.removeQuick(manifoldsPtr.size()-1);
+		manifoldsPtr.removeFast(manifoldsPtr.size()-1);
 
 	}
 

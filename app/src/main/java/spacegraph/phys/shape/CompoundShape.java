@@ -94,7 +94,7 @@ public class CompoundShape extends CollisionShape {
 			for (int i = 0; i < children.size(); i++) {
 				//return array[index];
 				if (children.get(i).childShape == shape) {
-					children.removeQuick(i);
+					children.removeFast(i);
 					done_removing = false;  // Do another iteration pass after removing from the vector
 					break;
 				}

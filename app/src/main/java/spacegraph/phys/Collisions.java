@@ -39,6 +39,7 @@ import spacegraph.phys.shape.*;
 import spacegraph.phys.util.OArrayList;
 
 import java.util.Collection;
+import java.util.List;
 
 import static spacegraph.math.v3.v;
 
@@ -90,7 +91,7 @@ public abstract class Collisions<X> {
 	abstract public void forEachIntSpatial(IntObjectProcedure<Spatial<X>> each);
 
 	/** list of current colidables in the engine, aggregated from the spatials that are present */
-	abstract public Collection<Collidable> collidables();
+	abstract public List<Collidable> collidables();
 
 	//abstract public void forEachCollidable(IntObjectProcedure<Collidable<X>> each);
 
@@ -535,8 +536,7 @@ public abstract class Collisions<X> {
 
 		Transform tmpTrans = new Transform();
 
-		Collection<Collidable> objs = collidables();
-		int n = objs.size();
+		List<Collidable> objs = collidables();
 		for (Collidable collidable : objs) {
 			// terminate further ray tests, once the closestHitFraction reached zero
 			if (resultCallback.closestHitFraction == 0f) {

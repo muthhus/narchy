@@ -23,6 +23,7 @@
 
 package spacegraph.phys.math.convexhull;
 
+import nars.util.list.FasterList;
 import spacegraph.math.v3;
 import spacegraph.phys.util.OArrayList;
 
@@ -40,7 +41,7 @@ public class HullDesc {
 	public int vcount;
 	
 	/** Array of vertices. */
-	public OArrayList<v3> vertices;
+	public FasterList<v3> vertices;
 	
 	/** Stride of each vertex, in bytes. */
 	int vertexStride = 3*4;       
@@ -57,11 +58,11 @@ public class HullDesc {
 	public HullDesc() {
 	}
 
-	public HullDesc(int flag, int vcount, OArrayList<v3> vertices) {
+	public HullDesc(int flag, int vcount, FasterList<v3> vertices) {
 		this(flag, vcount, vertices, 3*4);
 	}
 	
-	public HullDesc(int flag, int vcount, OArrayList<v3> vertices, int stride) {
+	public HullDesc(int flag, int vcount, FasterList<v3> vertices, int stride) {
 		this.flags = flag;
 		this.vcount = vcount;
 		this.vertices = vertices;

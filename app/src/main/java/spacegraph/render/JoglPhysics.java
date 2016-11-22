@@ -65,7 +65,8 @@ import static spacegraph.math.v3.v;
 abstract public class JoglPhysics<X> extends JoglSpace implements GLEventListener, KeyListener {
 
 
-    public static final float MAX_FPS = 20f;
+    public static final float MAX_FPS = 30f;
+
     private final float cameraSpeed = 5f;
     private final float cameraRotateSpeed = 5f;
     private boolean simulating = true;

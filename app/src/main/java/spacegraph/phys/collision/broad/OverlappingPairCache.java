@@ -23,6 +23,7 @@
 
 package spacegraph.phys.collision.broad;
 
+import nars.util.list.FasterList;
 import spacegraph.phys.util.OArrayList;
 
 /**
@@ -33,7 +34,7 @@ import spacegraph.phys.util.OArrayList;
  */
 public abstract class OverlappingPairCache extends OverlappingPairCallback {
 
-	public abstract OArrayList<BroadphasePair> getOverlappingPairArray();
+	public abstract FasterList<BroadphasePair> getOverlappingPairArray();
 	
 	public abstract void cleanOverlappingPair(BroadphasePair pair, Intersecter intersecter);
 

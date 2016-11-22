@@ -23,6 +23,7 @@
 
 package spacegraph.phys.collision;
 
+import nars.util.list.FasterList;
 import spacegraph.phys.BulletStats;
 import spacegraph.phys.Collidable;
 import spacegraph.phys.Collisions;
@@ -46,15 +47,15 @@ public class Islands {
 	//public final UnionFind find = new UnionFind();
 	public final UnionFind2 find = new UnionFind2();
 
-	private final OArrayList<PersistentManifold> islandmanifold = new OArrayList<>();
-	private final OArrayList<Collidable> islandBodies = new OArrayList<>();
+	private final FasterList<PersistentManifold> islandmanifold = new FasterList<>();
+	private final FasterList<Collidable> islandBodies = new FasterList<>();
 
 	public void initUnionFind(int n) {
 		find.reset(n);
 	}
 
 	public void findUnions(Intersecter intersecter, Collisions colWorld) {
-		OArrayList<BroadphasePair> pairPtr = colWorld.pairs().getOverlappingPairArray();
+		FasterList<BroadphasePair> pairPtr = colWorld.pairs().getOverlappingPairArray();
 		for (int i=0; i<pairPtr.size(); i++) {
 			//return array[index];
 			BroadphasePair collisionPair = pairPtr.get(i);
@@ -351,7 +352,7 @@ public class Islands {
 	////////////////////////////////////////////////////////////////////////////
 	
 	public static abstract class IslandCallback {
-		public abstract void processIsland(Collection<Collidable> bodies, OArrayList<PersistentManifold> manifolds, int manifolds_offset, int numManifolds, int islandId);
+		public abstract void processIsland(Collection<Collidable> bodies, FasterList<PersistentManifold> manifolds, int manifolds_offset, int numManifolds, int islandId);
 	}
 	
 	private static final Comparator<PersistentManifold> persistentManifoldComparator = (lhs, rhs) -> getIslandId(lhs) < getIslandId(rhs)? -1 : +1;

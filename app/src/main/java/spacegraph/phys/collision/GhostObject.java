@@ -80,8 +80,8 @@ public class GhostObject extends Collidable {
 		if (index != -1) {
             //return array[index];
 			int num = o.size();
-			o.setQuick(index, o.get(num - 1));
-			o.removeQuick(num -1);
+			o.setFast(index, o.get(num - 1));
+			o.removeFast(num -1);
 		}
 	}
 

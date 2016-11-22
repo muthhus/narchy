@@ -26,6 +26,7 @@
 
 package spacegraph.phys.collision.broad;
 
+import nars.util.list.FasterList;
 import spacegraph.math.v3;
 import spacegraph.phys.BulletStats;
 import spacegraph.phys.Collidable;
@@ -368,7 +369,7 @@ public abstract class AxisSweep3Internal extends Broadphase {
 	@Override
     public void update(Intersecter intersecter) {
 		if (pairCache.hasDeferredRemoval()) {
-			OArrayList<BroadphasePair> overlappingPairArray = pairCache.getOverlappingPairArray();
+			FasterList<BroadphasePair> overlappingPairArray = pairCache.getOverlappingPairArray();
 
 			// perform a sort, to find duplicates and to sort 'invalid' pairs to the end
 			MiscUtil.quickSort(overlappingPairArray, BroadphasePair.broadphasePairSortPredicate);

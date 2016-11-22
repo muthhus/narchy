@@ -23,6 +23,7 @@
 
 package spacegraph.phys.collision;
 
+import nars.util.list.FasterList;
 import spacegraph.phys.math.MiscUtil;
 import spacegraph.phys.util.OArrayList;
 
@@ -38,7 +39,7 @@ public class UnionFind {
 
 	// Optimization: could use short ints instead of ints (halving memory, would limit the number of rigid bodies to 64k, sounds reasonable).
 
-	private final OArrayList<Element> elements = new OArrayList<>();
+	private final FasterList<Element> elements = new FasterList<>();
 
 	/**
 	 * This is a special operation, destroying the content of UnionFind.

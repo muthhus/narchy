@@ -25,6 +25,7 @@
 
 package spacegraph.phys.shape;
 
+import nars.util.list.FasterList;
 import spacegraph.math.v3;
 import spacegraph.phys.math.MiscUtil;
 import spacegraph.phys.math.convexhull.HullDesc;
@@ -42,12 +43,12 @@ import spacegraph.phys.util.OArrayList;
  */
 public class ShapeHull {
 
-	protected OArrayList<v3> vertices = new OArrayList<>();
+	protected FasterList<v3> vertices = new FasterList<>();
 	protected IntArrayList indices = new IntArrayList();
 	protected int numIndices;
 	protected ConvexShape shape;
 
-	protected OArrayList<v3> unitSpherePoints = new OArrayList<>();
+	protected FasterList<v3> unitSpherePoints = new FasterList<>();
 
 	public ShapeHull(ConvexShape shape) {
 		this.shape = shape;
@@ -77,7 +78,7 @@ public class ShapeHull {
             }
         }
 
-		OArrayList<v3> supportPoints = new OArrayList<>();
+		FasterList<v3> supportPoints = new FasterList<>();
 		MiscUtil.resize(supportPoints, NUM_UNITSPHERE_POINTS + ConvexShape.MAX_PREFERRED_PENETRATION_DIRECTIONS * 2, v3.class);
 
 		for (int i=0; i<numSampleDirections; i++) {
@@ -135,7 +136,7 @@ public class ShapeHull {
 		return numIndices;
 	}
 
-	public OArrayList<v3> getVertexPointer() {
+	public FasterList<v3> getVertexPointer() {
 		return vertices;
 	}
 

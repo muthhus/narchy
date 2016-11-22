@@ -23,9 +23,9 @@
 
 package spacegraph.phys.math.convexhull;
 
+import nars.util.list.FasterList;
 import spacegraph.math.v3;
 import spacegraph.phys.util.IntArrayList;
-import spacegraph.phys.util.OArrayList;
 
 /**
  *
@@ -36,7 +36,7 @@ class PHullResult {
 	public int vcount;
 	public int indexCount;
 	public int faceCount;
-	public OArrayList<v3> vertices;
+	public FasterList<v3> vertices;
 	public IntArrayList indices = new IntArrayList();
 	
 }

@@ -23,11 +23,11 @@
 
 package spacegraph.phys.shape;
 
+import nars.util.list.FasterList;
 import spacegraph.math.v3;
 import spacegraph.phys.math.AabbUtil2;
 import spacegraph.phys.math.MiscUtil;
 import spacegraph.phys.math.VectorUtil;
-import spacegraph.phys.util.OArrayList;
 
 import java.io.Serializable;
 
@@ -59,8 +59,8 @@ public class OptimizedBvh implements Serializable {
 
 	////////////////////////////////////////////////////////////////////////////
 
-	private final OArrayList<OptimizedBvhNode> leafNodes = new OArrayList<>();
-	private final OArrayList<OptimizedBvhNode> contiguousNodes = new OArrayList<>();
+	private final FasterList<OptimizedBvhNode> leafNodes = new FasterList<>();
+	private final FasterList<OptimizedBvhNode> contiguousNodes = new FasterList<>();
 
 	private final QuantizedBvhNodes quantizedLeafNodes = new QuantizedBvhNodes();
 	private final QuantizedBvhNodes quantizedContiguousNodes = new QuantizedBvhNodes();
@@ -74,7 +74,7 @@ public class OptimizedBvh implements Serializable {
 	private final v3 bvhQuantization = new v3();
 	
 	protected TraversalMode traversalMode = TraversalMode.STACKLESS;
-	protected final OArrayList<BvhSubtreeInfo> SubtreeHeaders = new OArrayList<>();
+	protected final FasterList<BvhSubtreeInfo> SubtreeHeaders = new FasterList<>();
 	// This is only used for serialization so we don't have to add serialization directly to btAlignedObjectArray
 	protected int subtreeHeaderCount;
 
@@ -185,8 +185,8 @@ public class OptimizedBvh implements Serializable {
 			//return array[index];
 			OptimizedBvhNode tmp = leafNodes.get(i);
 			//return array[index];
-			leafNodes.setQuick(i, leafNodes.get(splitIndex));
-			leafNodes.setQuick(splitIndex, tmp);
+			leafNodes.setFast(i, leafNodes.get(splitIndex));
+			leafNodes.setFast(splitIndex, tmp);
 		}
 	}
 
@@ -202,9 +202,9 @@ public class OptimizedBvh implements Serializable {
 	}
 
 	private static class NodeTriangleCallback extends InternalTriangleIndexCallback {
-		public OArrayList<OptimizedBvhNode> triangleNodes;
+		public FasterList<OptimizedBvhNode> triangleNodes;
 
-		public NodeTriangleCallback(OArrayList<OptimizedBvhNode> triangleNodes) {
+		public NodeTriangleCallback(FasterList<OptimizedBvhNode> triangleNodes) {
 			this.triangleNodes = triangleNodes;
 		}
 

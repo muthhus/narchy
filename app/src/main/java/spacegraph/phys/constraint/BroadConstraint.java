@@ -4,9 +4,10 @@ import spacegraph.phys.Collidable;
 import spacegraph.phys.collision.broad.Broadphase;
 
 import java.util.Collection;
+import java.util.List;
 
 
 /** for applying NxN interactions */
 public interface BroadConstraint {
-    void solve(Broadphase b, Collection<Collidable> objects, float timeStep);
+    void solve(Broadphase b, List<Collidable> objects, float timeStep);
 }

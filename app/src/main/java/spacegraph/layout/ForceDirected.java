@@ -48,7 +48,7 @@ public class ForceDirected implements spacegraph.phys.constraint.BroadConstraint
 //        }
 
     @Override
-    public void solve(Broadphase b, Collection<Collidable> objects, float timeStep) {
+    public void solve(Broadphase b, List<Collidable> objects, float timeStep) {
 
         //System.out.print("Force direct " + objects.size() + ": ");
         //final int[] count = {0};
@@ -79,8 +79,7 @@ public class ForceDirected implements spacegraph.phys.constraint.BroadConstraint
 
     }
 
-    protected void batch(Collection<Collidable> c) {
-        List<Collidable> l = new FasterList(c);
+    protected void batch(List<Collidable> l) {
         for (int i = 0, lSize = l.size(); i < lSize; i++) {
             Collidable x = l.get(i);
             for (int j = i + 1; j < lSize; j++) {

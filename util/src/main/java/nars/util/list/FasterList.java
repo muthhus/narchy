@@ -63,6 +63,12 @@ public class FasterList<X> extends FastList<X> {
     }
 
 
+
+    public void clearHard() {
+        this.size = 0;
+        this.items = (X[]) ZERO_SIZED_ARRAY;
+    }
+
     public X removeLast() {
         return this.items[--size];
     }
@@ -272,5 +278,18 @@ public class FasterList<X> extends FastList<X> {
     public void addAll(X... x) {
         for (X y : x)
             add(y);
+    }
+
+    public final void setFast(int index, X t) {
+        items[index] = t;
+    }
+    public void removeFast(int index) {
+        X[] ii = items;
+        System.arraycopy(ii, index+1, ii, index, size - index - 1);
+        ii[--size] = null;
+    }
+
+    public int capacity() {
+        return items.length;
     }
 }

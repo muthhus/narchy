@@ -23,6 +23,7 @@
 
 package spacegraph.phys.collision.broad;
 
+import nars.util.list.FasterList;
 import spacegraph.phys.BulletStats;
 import spacegraph.phys.math.MiscUtil;
 import spacegraph.phys.util.IntArrayList;
@@ -37,7 +38,7 @@ public class HashedOverlappingPairCache extends OverlappingPairCache {
 
 	private static final int NULL_PAIR = 0xffffffff;
 
-	private final OArrayList<BroadphasePair> overlappingPairArray = new OArrayList<>();
+	private final FasterList<BroadphasePair> overlappingPairArray = new FasterList<>(4);
 	private OverlapFilterCallback overlapFilterCallback;
 	//private boolean blockedForChanges;
 
@@ -131,7 +132,7 @@ public class HashedOverlappingPairCache extends OverlappingPairCache {
 
 		// If the removed pair is the last pair, we are done.
 		if (lastPairIndex == pairIndex) {
-			overlappingPairArray.removeQuick(overlappingPairArray.size() - 1);
+			overlappingPairArray.removeFast(overlappingPairArray.size() - 1);
 			return userData;
 		}
 
@@ -167,7 +168,7 @@ public class HashedOverlappingPairCache extends OverlappingPairCache {
 		next.set(pairIndex, hashTable.get(lastHash));
 		hashTable.set(lastHash, pairIndex);
 
-		overlappingPairArray.removeQuick(overlappingPairArray.size() - 1);
+		overlappingPairArray.removeFast(overlappingPairArray.size() - 1);
 
 		return userData;
 	}
@@ -214,7 +215,7 @@ public class HashedOverlappingPairCache extends OverlappingPairCache {
 	}
 
 	@Override
-	public OArrayList<BroadphasePair> getOverlappingPairArray() {
+	public final FasterList<BroadphasePair> getOverlappingPairArray() {
 		return overlappingPairArray;
 	}
 
@@ -341,7 +342,7 @@ public class HashedOverlappingPairCache extends OverlappingPairCache {
 		pair.algorithm = null;
 		pair.userInfo = null;
 
-		overlappingPairArray.setQuick(overlappingPairArray.size() - 1, pair);
+		overlappingPairArray.setFast(overlappingPairArray.size() - 1, pair);
 
 		next.set(count, hashTable.get(hash));
 		hashTable.set(hash, count);

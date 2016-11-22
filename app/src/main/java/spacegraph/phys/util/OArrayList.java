@@ -161,7 +161,7 @@ public final class OArrayList<T> extends AbstractList<T> implements RandomAccess
 		array = newArray;
 	}
 
-	public void removeQuick(int index) {
+	public void removeFast(int index) {
 		System.arraycopy(array, index+1, array, index, size - index - 1);
 		array[--size] = null;
 	}
@@ -181,7 +181,7 @@ public final class OArrayList<T> extends AbstractList<T> implements RandomAccess
 		return old;
 	}
 
-	public void setQuick(int index, T value) {
+	public void setFast(int index, T value) {
 		array[index] = value;
 	}
 

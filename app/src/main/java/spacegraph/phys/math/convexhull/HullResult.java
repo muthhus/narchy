@@ -23,6 +23,7 @@
 
 package spacegraph.phys.math.convexhull;
 
+import nars.util.list.FasterList;
 import spacegraph.math.v3;
 import spacegraph.phys.util.IntArrayList;
 import spacegraph.phys.util.OArrayList;
@@ -45,7 +46,7 @@ public class HullResult {
 	public int numOutputVertices;
 	
 	/** Array of vertices. */
-	public final OArrayList<v3> outputVertices = new OArrayList<>();
+	public final FasterList<v3> outputVertices = new FasterList<>();
 	
 	/** Number of faces produced. */
 	public int numFaces;

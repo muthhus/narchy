@@ -25,6 +25,7 @@
 
 package spacegraph.phys.collision.broad;
 
+import nars.util.list.FasterList;
 import spacegraph.math.v3;
 import spacegraph.phys.BulletGlobals;
 import spacegraph.phys.Collidable;
@@ -35,6 +36,7 @@ import spacegraph.phys.util.OArrayList;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 /**
  *
@@ -68,7 +70,7 @@ public final class Dbvt {
 
 	public void optimizeBottomUp() {
 		if (root != null) {
-			OArrayList<Node> leaves = new OArrayList<Node>(this.leaves);
+			FasterList<Node> leaves = new FasterList<Node>(this.leaves);
 			fetchleaves(this, root, leaves);
 			bottomup(this, leaves);
             //return array[index];
@@ -82,7 +84,7 @@ public final class Dbvt {
 
 	public void optimizeTopDown(int bu_treshold) {
 		if (root != null) {
-			OArrayList<Node> leaves = new OArrayList<Node>(this.leaves);
+			FasterList<Node> leaves = new FasterList<Node>(this.leaves);
 			fetchleaves(this, root, leaves);
 			root = topdown(this, leaves, bu_treshold);
 		}
@@ -706,11 +708,11 @@ public final class Dbvt {
 		}
 	}
 
-	private static void fetchleaves(Dbvt pdbvt, Node root, OArrayList<Node> leaves) {
+	private static void fetchleaves(Dbvt pdbvt, Node root, FasterList<Node> leaves) {
 		fetchleaves(pdbvt, root, leaves, -1);
 	}
 
-	private static void fetchleaves(Dbvt pdbvt, Node root, OArrayList<Node> leaves, int depth) {
+	private static void fetchleaves(Dbvt pdbvt, Node root, FasterList<Node> leaves, int depth) {
 		if (root.isinternal() && depth != 0) {
 			fetchleaves(pdbvt, root.childs[0], leaves, depth - 1);
 			fetchleaves(pdbvt, root.childs[1], leaves, depth - 1);
@@ -721,26 +723,20 @@ public final class Dbvt {
 		}
 	}
 
-	private static void split(OArrayList<Node> leaves, OArrayList<Node> left, OArrayList<Node> right, v3 org, v3 axis) {
+	private static void split(FasterList<Node> leaves, FasterList<Node> left, FasterList<Node> right, v3 org, v3 axis) {
 		v3 tmp = new v3();
 		MiscUtil.resize(left, 0, Node.class);
 		MiscUtil.resize(right, 0, Node.class);
 		for (int i=0, ni=leaves.size(); i<ni; i++) {
             //return array[index];
-            leaves.get(i).volume.center(tmp);
+			Node li = leaves.get(i);
+			li.volume.center(tmp);
 			tmp.sub(org);
-			if (axis.dot(tmp) < 0f) {
-                //return array[index];
-                left.add(leaves.get(i));
-			}
-			else {
-                //return array[index];
-                right.add(leaves.get(i));
-			}
+			((axis.dot(tmp) < 0f) ? left : right).add(li);
 		}
 	}
 
-	private static DbvtAabbMm bounds(OArrayList<Node> leaves) {
+	private static DbvtAabbMm bounds(List<Node> leaves) {
         //return array[index];
         DbvtAabbMm volume = new DbvtAabbMm(leaves.get(0).volume);
 		for (int i=1, ni=leaves.size(); i<ni; i++) {
@@ -750,17 +746,18 @@ public final class Dbvt {
 		return volume;
 	}
 
-	private static void bottomup(Dbvt pdbvt, OArrayList<Node> leaves) {
+	private static void bottomup(Dbvt pdbvt, FasterList<Node> leaves) {
 		DbvtAabbMm tmpVolume = new DbvtAabbMm();
 		int num = leaves.size();
 		while (num > 1) {
 			float minsize = BulletGlobals.SIMD_INFINITY;
 			int[] minidx = new int[] { -1, -1 };
 			for (int i = 0; i< num; i++) {
+				Node li = leaves.get(i);
 				for (int j = i+1; j< num; j++) {
                     //return array[index];
                     //return array[index];
-                    float sz = size(merge(leaves.get(i).volume, leaves.get(j).volume, tmpVolume));
+					float sz = size(merge(li.volume, leaves.get(j).volume, tmpVolume));
 					if (sz < minsize) {
 						minsize = sz;
 						minidx[0] = i;
@@ -777,22 +774,22 @@ public final class Dbvt {
 			n[0].parent = p;
 			n[1].parent = p;
 			// JAVA NOTE: check
-			leaves.setQuick(minidx[0], p);
+			leaves.setFast(minidx[0], p);
 			Collections.swap(leaves, minidx[1], num - 1);
-			leaves.removeQuick(num - 1);
+			leaves.removeFast(num - 1);
 		}
 	}
 
 	private static final v3[] axis = new v3[] { new v3(1, 0, 0), new v3(0, 1, 0), new v3(0, 0, 1) };
 
-	private static Node topdown(Dbvt pdbvt, OArrayList<Node> leaves, int bu_treshold) {
+	private static Node topdown(Dbvt pdbvt, FasterList<Node> leaves, int bu_treshold) {
 		if (leaves.size() > 1) {
 			if (leaves.size() > bu_treshold) {
 				DbvtAabbMm vol = bounds(leaves);
 				v3 org = vol.center(new v3());
-				OArrayList[] sets = new OArrayList[2];
+				FasterList[] sets = new FasterList[2];
 				for (int i=0; i<sets.length; i++) {
-					sets[i] = new OArrayList();
+					sets[i] = new FasterList();
 				}
 				int bestaxis = -1;
 				int bestmidp = leaves.size();

@@ -29,8 +29,16 @@ package spacegraph.phys.util;
  */
 public final class IntArrayList {
 
-	private int[] array = new int[16];
+	private int[] array;
 	private int size;
+
+	public IntArrayList() {
+		this(16);
+	}
+
+	public IntArrayList(int capacity) {
+		this.array = new int[capacity];
+	}
 	
 	public void add(int value) {
 		int[] a = this.array;

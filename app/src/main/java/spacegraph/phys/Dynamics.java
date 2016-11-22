@@ -68,15 +68,18 @@ public abstract class Dynamics<X> extends Collisions<X> {
         lIslandId0 = getConstraintIslandId(lhs);
         return lIslandId0 < rIslandId0 ? -1 : +1;
     };
+
     protected final Constrainer constrainer;
     protected final Islands islands;
-    protected final OArrayList<TypedConstraint> constraints = new OArrayList<TypedConstraint>();
-    @Nullable
-    protected v3 gravity = null;
-    //hold sthe current list of active bodies
-    private Collection<Collidable> collidable = new OArrayList<>();
-    private final OArrayList<TypedConstraint> sortedConstraints = new OArrayList<TypedConstraint>();
-    private final InplaceSolverIslandCallback solverCallback = new InplaceSolverIslandCallback();
+    protected final List<TypedConstraint> constraints = $.newArrayList();
+    @Nullable protected v3 gravity = null;
+
+
+    volatile private List<Collidable> collidable = $.newArrayList();
+
+    final FasterList<BroadConstraint> broadConstraints = new FasterList<>(0);
+    final FasterList<TypedConstraint> sortedConstraints = new FasterList<>(0);
+    final InplaceSolverIslandCallback solverCallback = new InplaceSolverIslandCallback();
     protected InternalTickCallback internalTickCallback;
     protected Object worldUserInfo;
 
@@ -86,7 +89,7 @@ public abstract class Dynamics<X> extends Collisions<X> {
     protected boolean ownsIslandManager;
     protected boolean ownsConstrainer;
     //protected OArrayList<RaycastVehicle> vehicles = new OArrayList<RaycastVehicle>();
-    protected OArrayList<ActionInterface> actions = new OArrayList<ActionInterface>();
+    protected List<ActionInterface> actions = $.newArrayList();
     protected int profileTimings;
     protected InternalTickCallback preTickCallback;
     private float dt;
@@ -225,8 +228,11 @@ public abstract class Dynamics<X> extends Collisions<X> {
         }
     }
 
+
+
     protected final void updateObjects() {
-        Collection<Collidable> nextCollidables = $.newArrayList(collidable.size() /* estimate */);
+
+        List<Collidable> nextCollidables = $.newArrayList( collidable.size() );
 
         forEachIntSpatial((i, s) -> {
 
@@ -275,6 +281,8 @@ public abstract class Dynamics<X> extends Collisions<X> {
 
         //System.out.println(nextCollidables.size() + " " + pairs().size());
 
+
+        List<Collidable> prevCollidables = collidable;
         this.collidable = nextCollidables;
     }
 
@@ -284,7 +292,7 @@ public abstract class Dynamics<X> extends Collisions<X> {
 //    }
 
     @Override
-    public final Collection<Collidable> collidables() {
+    public final List<Collidable> collidables() {
         return collidable;
     }
 
@@ -537,7 +545,6 @@ public abstract class Dynamics<X> extends Collisions<X> {
         }
     }
 
-    final List<BroadConstraint> broadConstraints = $.newArrayList(0);
 
     public void addBroadConstraint(BroadConstraint b) {
         broadConstraints.add(b);
@@ -559,12 +566,9 @@ public abstract class Dynamics<X> extends Collisions<X> {
 //    }
 
     private static int getConstraintIslandId(TypedConstraint lhs) {
-        int islandId;
-
         Collidable rcolObj0 = lhs.getRigidBodyA();
         Collidable rcolObj1 = lhs.getRigidBodyB();
-        islandId = rcolObj0.getIslandTag() >= 0 ? rcolObj0.getIslandTag() : rcolObj1.getIslandTag();
-        return islandId;
+        return rcolObj0.getIslandTag() >= 0 ? rcolObj0.getIslandTag() : rcolObj1.getIslandTag();
     }
 
     /**
@@ -575,7 +579,6 @@ public abstract class Dynamics<X> extends Collisions<X> {
         calculateSimulationIslands();
 
         solverInfo.timeStep = timeStep;
-
 
         BulletStats.pushProfile("solveConstraints");
         try {
@@ -599,7 +602,7 @@ public abstract class Dynamics<X> extends Collisions<X> {
             constrainer.prepareSolve(getNumCollisionObjects(), ((Collisions) this).intersecter.getNumManifolds());
 
             // solve all the constraints for this island
-            islands.buildAndProcessIslands(intersecter, new FasterList<>(collidable), solverCallback);
+            islands.buildAndProcessIslands(intersecter, collidable, solverCallback);
 
             constrainer.allSolved(solverInfo /*, m_stackAlloc*/);
         } finally {
@@ -641,7 +644,7 @@ public abstract class Dynamics<X> extends Collisions<X> {
         BulletStats.pushProfile("integrateTransforms");
         try {
             v3 tmp = new v3();
-            Transform tmpTrans = new Transform();
+            //Transform tmpTrans = new Transform();
 
             Transform predictedTrans = new Transform();
             for (Collidable colObj : collidable) {
@@ -652,7 +655,9 @@ public abstract class Dynamics<X> extends Collisions<X> {
                     if (body.isActive() && (!body.isStaticOrKinematicObject())) {
                         body.predictIntegratedTransform(timeStep, predictedTrans);
 
-                        tmp.sub(predictedTrans, body.getWorldTransform(tmpTrans));
+                        Transform BW = body.worldTransform;
+
+                        tmp.sub(predictedTrans, BW);
                         float squareMotion = tmp.lengthSquared();
 
                         if (body.getCcdSquareMotionThreshold() != 0f && body.getCcdSquareMotionThreshold() < squareMotion) {
@@ -661,14 +666,15 @@ public abstract class Dynamics<X> extends Collisions<X> {
                                 if (body.shape().isConvex()) {
                                     BulletStats.gNumClampedCcdMotions++;
 
-                                    ClosestNotMeConvexResultCallback sweepResults = new ClosestNotMeConvexResultCallback(body, body.getWorldTransform(tmpTrans), predictedTrans, broadphase.getOverlappingPairCache(), intersecter);
+                                    ClosestNotMeConvexResultCallback sweepResults = new ClosestNotMeConvexResultCallback(body, BW, predictedTrans, broadphase.getOverlappingPairCache(), intersecter);
                                     //ConvexShape convexShape = (ConvexShape)body.getCollisionShape();
                                     SphereShape tmpSphere = new SphereShape(body.getCcdSweptSphereRadius()); //btConvexShape* convexShape = static_cast<btConvexShape*>(body->getCollisionShape());
 
-                                    sweepResults.collisionFilterGroup = body.broadphase().collisionFilterGroup;
-                                    sweepResults.collisionFilterMask = body.broadphase().collisionFilterMask;
+                                    Broadphasing bph = body.broadphase();
+                                    sweepResults.collisionFilterGroup = bph.collisionFilterGroup;
+                                    sweepResults.collisionFilterMask = bph.collisionFilterMask;
 
-                                    convexSweepTest(tmpSphere, body.getWorldTransform(tmpTrans), predictedTrans, sweepResults);
+                                    convexSweepTest(tmpSphere, BW, predictedTrans, sweepResults);
                                     // JAVA NOTE: added closestHitFraction test to prevent objects being stuck
                                     if (sweepResults.hasHit() && (sweepResults.closestHitFraction > 0.0001f)) {
                                         body.setHitFraction(sweepResults.closestHitFraction);
@@ -1012,12 +1018,12 @@ public abstract class Dynamics<X> extends Collisions<X> {
     private static class InplaceSolverIslandCallback extends Islands.IslandCallback {
         public ContactSolverInfo solverInfo;
         public Constrainer solver;
-        public OArrayList<TypedConstraint> sortedConstraints;
+        public FasterList<TypedConstraint> sortedConstraints;
         public int numConstraints;
         //public StackAlloc* m_stackAlloc;
         public Intersecter intersecter;
 
-        public void init(ContactSolverInfo solverInfo, Constrainer solver, OArrayList<TypedConstraint> sortedConstraints, int numConstraints, Intersecter intersecter) {
+        public void init(ContactSolverInfo solverInfo, Constrainer solver, FasterList<TypedConstraint> sortedConstraints, int numConstraints, Intersecter intersecter) {
             this.solverInfo = solverInfo;
             this.solver = solver;
             this.sortedConstraints = sortedConstraints;
@@ -1027,11 +1033,12 @@ public abstract class Dynamics<X> extends Collisions<X> {
         }
 
         @Override
-        public void processIsland(Collection<Collidable> bodies, OArrayList<PersistentManifold> manifolds, int manifolds_offset, int numManifolds, int islandId) {
+        public void processIsland(Collection<Collidable> bodies, FasterList<PersistentManifold> manifolds, int manifolds_offset, int numManifolds, int islandId) {
 
+            FasterList<TypedConstraint> sc = this.sortedConstraints;
             if (islandId < 0) {
                 // we don't split islands, so all constraints/contact manifolds/bodies are passed into the solver regardless the island id
-                solver.solveGroup(bodies, bodies.size(), manifolds, manifolds_offset, numManifolds, sortedConstraints, 0, numConstraints, solverInfo/*,m_stackAlloc*/, intersecter);
+                solver.solveGroup(bodies, bodies.size(), manifolds, manifolds_offset, numManifolds, sc, 0, numConstraints, solverInfo/*,m_stackAlloc*/, intersecter);
             } else {
                 // also add all non-contact constraints/joints for this island
                 //ObjectArrayList<TypedConstraint> startConstraint = null;
@@ -1042,7 +1049,7 @@ public abstract class Dynamics<X> extends Collisions<X> {
                 // find the first constraint for this island
                 for (i = 0; i < numConstraints; i++) {
                     //return array[index];
-                    if (getConstraintIslandId(sortedConstraints.get(i)) == islandId) {
+                    if (getConstraintIslandId(sc.get(i)) == islandId) {
                         //startConstraint = &m_sortedConstraints[i];
                         //startConstraint = sortedConstraints.subList(i, sortedConstraints.size());
                         startConstraint_idx = i;
@@ -1052,14 +1059,14 @@ public abstract class Dynamics<X> extends Collisions<X> {
                 // count the number of constraints in this island
                 for (; i < numConstraints; i++) {
                     //return array[index];
-                    if (getConstraintIslandId(sortedConstraints.get(i)) == islandId) {
+                    if (getConstraintIslandId(sc.get(i)) == islandId) {
                         numCurConstraints++;
                     }
                 }
 
                 // only call solveGroup if there is some work: avoid virtual function call, its overhead can be excessive
                 if ((numManifolds + numCurConstraints) > 0) {
-                    solver.solveGroup(bodies, bodies.size(), manifolds, manifolds_offset, numManifolds, sortedConstraints, startConstraint_idx, numCurConstraints, solverInfo/*,m_stackAlloc*/, intersecter);
+                    solver.solveGroup(bodies, bodies.size(), manifolds, manifolds_offset, numManifolds, sc, startConstraint_idx, numCurConstraints, solverInfo/*,m_stackAlloc*/, intersecter);
                 }
             }
         }

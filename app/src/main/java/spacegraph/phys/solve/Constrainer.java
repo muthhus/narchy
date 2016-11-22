@@ -23,6 +23,7 @@
 
 package spacegraph.phys.solve;
 
+import nars.util.list.FasterList;
 import spacegraph.phys.Collidable;
 import spacegraph.phys.collision.broad.Intersecter;
 import spacegraph.phys.collision.narrow.PersistentManifold;
@@ -45,7 +46,7 @@ public abstract class Constrainer {
 	/**
 	 * Solve a group of constraints.
 	 */
-	public abstract float solveGroup(Collection<Collidable> bodies, int numBodies, OArrayList<PersistentManifold> manifold, int manifold_offset, int numManifolds, OArrayList<TypedConstraint> constraints, int constraints_offset, int numConstraints, ContactSolverInfo info/*, btStackAlloc* stackAlloc*/, Intersecter intersecter);
+	public abstract float solveGroup(Collection<Collidable> bodies, int numBodies, FasterList<PersistentManifold> manifold, int manifold_offset, int numManifolds, FasterList<TypedConstraint> constraints, int constraints_offset, int numConstraints, ContactSolverInfo info/*, btStackAlloc* stackAlloc*/, Intersecter intersecter);
 
 	public void allSolved(ContactSolverInfo info /*, btStackAlloc* stackAlloc*/) {}
 

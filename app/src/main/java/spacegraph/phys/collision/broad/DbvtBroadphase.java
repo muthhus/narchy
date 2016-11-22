@@ -26,6 +26,7 @@
 package spacegraph.phys.collision.broad;
 
 import nars.$;
+import nars.util.list.FasterList;
 import spacegraph.math.v3;
 import spacegraph.phys.Collidable;
 import spacegraph.phys.util.OArrayList;
@@ -151,7 +152,7 @@ public class DbvtBroadphase extends Broadphase {
 		//btAlignedFree(proxy);
 	}
 
-	@Override public void forEach(int maxClusterPopulation, Collection<Collidable> all, Consumer<Collection<Collidable>> each) {
+	@Override public void forEach(int maxClusterPopulation, List<Collidable> all, Consumer<List<Collidable>> each) {
 		Node root = sets[0].root;
 		if (root == null)
 			return;
@@ -166,7 +167,7 @@ public class DbvtBroadphase extends Broadphase {
 		forEach(root, maxClusterPopulation, population, 0, each);
 	}
 
-	public int forEach(Node node, int maxClusterPopulation, int unvisited, int level, Consumer<Collection<Collidable>> each) {
+	public int forEach(Node node, int maxClusterPopulation, int unvisited, int level, Consumer<List<Collidable>> each) {
 
 
 		//HACK approximate cluster segmentation, a better one can be designed which will more evenly partition the set
@@ -181,7 +182,7 @@ public class DbvtBroadphase extends Broadphase {
 			}
 		} else {
 			//stop here and batch
-			Collection<Collidable> l = $.newArrayList(nodePop);
+			List<Collidable> l = $.newArrayList(nodePop);
 			node.leaves(l);
 			int ls = l.size();
 			if (ls > 0) {
@@ -267,7 +268,7 @@ public class DbvtBroadphase extends Broadphase {
 
 		// clean up:
 		//SPC(m_profiling.m_cleanup);
-		OArrayList<BroadphasePair> pairs = paircache.getOverlappingPairArray();
+		FasterList<BroadphasePair> pairs = paircache.getOverlappingPairArray();
 		if (!pairs.isEmpty()) {
 			for (int i=0, ni=pairs.size(); i<ni; i++) {
 				//return array[index];

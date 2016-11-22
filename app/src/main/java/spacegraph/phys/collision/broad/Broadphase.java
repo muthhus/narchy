@@ -54,7 +54,7 @@ public abstract class Broadphase {
 
 	public abstract void printStats();
 
-	public void forEach(int maxClusterSize, Collection<Collidable> all, Consumer<Collection<Collidable>> each) {
+	public void forEach(int maxClusterSize, List<Collidable> all, Consumer<List<Collidable>> each) {
 		throw new UnsupportedOperationException();
 	}
 }
