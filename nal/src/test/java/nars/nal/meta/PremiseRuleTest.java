@@ -123,18 +123,20 @@ public class PremiseRuleTest {
     @Test
     public void testPatternVarNormalization() {
 
-        Narsese p = Narsese.the();
+        //Narsese p = Narsese.the();
 
         //TODO test combination of lowercase and uppercase pattern terms
 //        TaskRule x = p.term("<<A --> b> |- (X & y)>");
 //
 //        assertEquals("((<%A --> b>), ((&, %X, y)))", x.toString());
 
-        PatternTermIndex i = new PatternTermIndex();
 
 
-        Compound y = rule("(S --> P), --%S |- (P --> S), (Belief:Conversion)");
+
+        Compound y = rule("(S --> P), (--,%S) |- (P --> S), (Belief:Conversion)");
         assertNotNull(y);
+
+        PatternTermIndex i = new PatternTermIndex();
         y = ((PremiseRule) y).normalizeRule(i);
         assertNotNull(y);
         printRecursive(y);

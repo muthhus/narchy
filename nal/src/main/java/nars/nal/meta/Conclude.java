@@ -199,7 +199,7 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
 //            }
 
             if (temporalized != content) {
-                ((GenericCompound) (content = temporalized)).setNormalized();
+                ((content = temporalized)).setNormalized();
             }
 
 

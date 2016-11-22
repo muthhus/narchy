@@ -1,7 +1,6 @@
 package spacegraph.layout;
 
 import nars.gui.ConceptWidget;
-import spacegraph.obj.EDraw;
 import spacegraph.SimpleSpatial;
 import spacegraph.Spatial;
 import spacegraph.math.v3;
@@ -10,6 +9,7 @@ import spacegraph.phys.Dynamic;
 import spacegraph.phys.collision.broad.Broadphase;
 import spacegraph.phys.util.OArrayList;
 
+import java.util.Collection;
 import java.util.List;
 
 import static spacegraph.math.v3.v;
@@ -17,15 +17,14 @@ import static spacegraph.math.v3.v;
 /**
  * Created by me on 8/24/16.
  */
-public class ForceDirected<X> implements spacegraph.phys.constraint.BroadConstraint {
+public class ForceDirected implements spacegraph.phys.constraint.BroadConstraint {
 
     public static final int clusters = 1;
 
-    public float repelSpeed = 1f;
+    public float repelSpeed = 3f;
     public float attractSpeed = 2f;
 
-    private final float minRepelDist = 0;
-    private final float maxRepelDist = 100f;
+    private final float maxRepelDist = 2000f;
     private final float attractDist = 1f;
 
 //        public static class Edge<X> extends MutablePair<X,X> {
@@ -84,7 +83,7 @@ public class ForceDirected<X> implements spacegraph.phys.constraint.BroadConstra
         for (int i = 0, lSize = l.size(); i < lSize; i++) {
             Collidable x = l.get(i);
             for (int j = i + 1; j < lSize; j++) {
-                repel(x, l.get(j), repelSpeed, minRepelDist, maxRepelDist);
+                repel(x, l.get(j), repelSpeed, maxRepelDist);
             }
         }
     }
@@ -98,26 +97,22 @@ public class ForceDirected<X> implements spacegraph.phys.constraint.BroadConstra
 
 
         float len = delta.normalize();
-        if (len <= 0)
+        len -= (xp.radius + yp.radius);
+        if (len <= idealDist)
             return;
 
-        len -= (xp.radius + yp.radius);
+        //float dd = (len - idealDist);
+        float dd = 0; //no attenuation over distance
 
-        if (len > idealDist) {
-            //float dd = (len - idealDist);
-            float dd = 0; //no attenuation over distance
+        delta.scale((-(speed * speed) / (1f + dd)) / 2f);
 
-            delta.scale((-(speed * speed) / (1f + dd)) / 2f);
-
-            ((Dynamic) x).impulse(delta);
-            delta.negate();
-            ((Dynamic) y).impulse(delta);
-
-        }
+        ((Dynamic) x).impulse(delta);
+        delta.negate();
+        ((Dynamic) y).impulse(delta);
 
     }
 
-    private static void repel(Collidable x, Collidable y, float speed, float minDist, float maxDist) {
+    private static void repel(Collidable x, Collidable y, float speed, float maxDist) {
         SimpleSpatial xp = ((SimpleSpatial) x.data());
         SimpleSpatial yp = ((SimpleSpatial) y.data());
 
@@ -125,9 +120,9 @@ public class ForceDirected<X> implements spacegraph.phys.constraint.BroadConstra
         delta.sub(xp.transform(), yp.transform());
 
         float len = delta.normalize();
-        len += (xp.radius + yp.radius);
+        len = Math.max(0,len + (xp.radius + yp.radius));
 
-        if ((len <= minDist) || (len >= maxDist))
+        if (len >= maxDist)
             return;
 
         delta.scale(((speed * speed) / (1 + len * len)) / 2f);

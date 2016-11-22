@@ -162,10 +162,13 @@ public interface ByteSeq {
                 throw new IllegalArgumentException("end " + end + " > length " + bytes.length);
             } else if(end < start) {
                 throw new IllegalArgumentException("end " + end + " < start " + start);
-            } else {
-                this.start = start;
-                this.end = end;
+            } else if (start == 0 && end == bytes.length) {
+                throw new IllegalArgumentException("window unnecessary");
             }
+
+            this.start = start;
+            this.end = end;
+
         }
 
         @Override

@@ -336,7 +336,7 @@ public abstract class TermIndex extends TermBuilder {
 
             //if (c!=null) {
             //c = compoundOrNull($.unneg((Compound) c));
-            ((GenericCompound) tgt).setNormalized();
+            ((Compound) tgt).setNormalized();
             //}
             return tgt;
         }

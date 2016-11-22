@@ -10,6 +10,7 @@ import nars.term.container.TermVector1;
 import nars.term.var.Variable;
 import nars.util.Util;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import static nars.time.Tense.DTERNAL;
 
@@ -24,7 +25,7 @@ public class UnitCompound1 extends TermVector1 implements Compound {
     public UnitCompound1(@NotNull Op op, @NotNull Term arg) {
         super(arg);
 
-        if (arg instanceof Variable)
+        if (arg.vars() > 0)
             throw new UnsupportedOperationException("variable argument not supported");
 
         this.op = op;
@@ -42,7 +43,7 @@ public class UnitCompound1 extends TermVector1 implements Compound {
     }
 
     @Override
-    public boolean equals(@NotNull Object that) {
+    public boolean equals(@Nullable Object that) {
         if (this == that) return true;
 
         Compound t;

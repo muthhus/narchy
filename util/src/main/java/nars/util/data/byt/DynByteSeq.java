@@ -80,7 +80,11 @@ public class DynByteSeq implements DataOutput, Appendable, ByteSeq {
 
     @Override
     public byte[] array() {
-        return Arrays.copyOfRange(bytes, 0, length());
+        byte[] b = bytes;
+        if (b.length == position)
+            return bytes;
+        else
+            return Arrays.copyOfRange(bytes, 0, length());
     }
 
     @Override

@@ -386,7 +386,7 @@ public interface Term extends Termed, Termlike, Comparable<Termlike> {
             Compound cx = (Compound)this;
             Compound cy = (Compound)y;
 
-            int diff3 = TermContainer.compare(cx,cy);
+            int diff3 = TermContainer.compare(cx.subterms(),cy.subterms());
             if (diff3 != 0)
                 return diff3;
 

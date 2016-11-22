@@ -18,7 +18,7 @@ import static nars.Op.CONJ;
 import static nars.time.Tense.DTERNAL;
 
 
-public class GenericCompound implements Compound {
+public class GenericCompound implements Compound  {
 
     /**
      * subterm vector
@@ -37,8 +37,8 @@ public class GenericCompound implements Compound {
      */
     public final int hash;
 
-    @NotNull
-    public final Op op;
+    @NotNull public final Op op;
+
 
     public transient boolean normalized;
 
@@ -58,28 +58,17 @@ public class GenericCompound implements Compound {
                 throw new InvalidTermException(op, dt, subterms.terms(), "Invalid dt value for operator " + op);
         }
 
+        this.op = op;
+
         this.subterms = subterms;
 
         this.normalized = subterms.constant();
-        this.op = op;
 
         this.dt = dt;
 
         this.hash = Util.hashCombine(subterms.hashCode(), op.ordinal(), dt);
     }
 
-    @NotNull
-    @Override
-    public final Op op() {
-        return op;
-    }
-
-
-    @NotNull
-    @Override
-    public String toString() {
-        return IO.Printer.stringify(this).toString();
-    }
 
 
     @Override
@@ -93,59 +82,6 @@ public class GenericCompound implements Compound {
         return subterms;
     }
 
-    @Override
-    public final boolean equals(@Nullable Object that) {
-
-        if (hash != that.hashCode())
-            return false;
-
-        Compound cthat;
-        if (that instanceof Compound) {
-
-            if (this == that)
-                return true;
-
-            cthat = (Compound)that;
-
-        } else if (that instanceof Concept /* Termed but not Task*/)  {
-            Term tthat = ((Termed) that).term();
-            if (tthat instanceof Compound) {
-
-                if (this == tthat)
-                    return true;
-
-                cthat = (Compound) tthat;
-
-            } else {
-                return false;
-            }
-        } else {
-            return false;
-        }
-
-        TermContainer cs = cthat.subterms();
-        TermContainer as = this.subterms;
-        //subterm sharing:
-//        if (as != cs) {
-//            if (!as.equivalent(cs)) {
-//                return false;
-//            } else {
-//                //share the subterms vector
-//                if (cthat instanceof GenericCompound) {
-//                    this.subterms = cs; //HACK cast sucks
-//                }
-//            }
-//        }
-
-        if (!cs.equals(as))
-            return false;
-
-
-        //return subterms.equals(cthat.subterms()) &&
-        return
-                (op == cthat.op()) && (dt == cthat.dt());
-
-    }
 
     @Override
     public final int hashCode() {
@@ -170,5 +106,66 @@ public class GenericCompound implements Compound {
         this.normalized = true;
     }
 
+    @NotNull
+    @Override
+    public final Op op() {
+        return op;
+    }
+
+
+    @NotNull
+    @Override
+    public String toString() {
+        return IO.Printer.stringify(this).toString();
+    }
+
+    @Override
+    public final boolean equals(@Nullable Object that) {
+
+        if (this == that)
+            return true;
+
+        if (that == null || hashCode() != that.hashCode())
+            return false;
+
+        Compound cthat;
+        if (that instanceof Compound) {
+
+
+            cthat = (Compound)that;
+
+        } else if (that instanceof Concept /* Termed but not Task*/)  {
+            Term tthat = ((Termed) that).term();
+            if (tthat instanceof Compound) {
+
+                if (this == tthat)
+                    return true;
+
+                cthat = (Compound) tthat;
+
+            } else {
+                return false;
+            }
+        } else {
+            return false;
+        }
+
+        //subterm sharing:
+//        if (as != cs) {
+//            if (!as.equivalent(cs)) {
+//                return false;
+//            } else {
+//                //share the subterms vector
+//                if (cthat instanceof GenericCompound) {
+//                    this.subterms = cs; //HACK cast sucks
+//                }
+//            }
+//        }
+
+        //return subterms.equals(cthat.subterms()) &&
+        return subterms.equivalent(cthat.subterms()) &&
+                (op == cthat.op()) && (dt == cthat.dt());
+
+    }
 
 }

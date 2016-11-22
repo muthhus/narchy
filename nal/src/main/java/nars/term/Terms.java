@@ -602,7 +602,7 @@ public class Terms   {
                     subsChanged ? newSubs : psubs);
 
             if (c.isNormalized())
-                ((GenericCompound)xx).setNormalized();
+                xx.setNormalized();
 
             //Termed exxist = get(xx, false); //early exit: atemporalized to a concept already, so return
             //if (exxist!=null)

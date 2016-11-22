@@ -1,13 +1,18 @@
 package nars.term.compound;
 
 import nars.$;
+import nars.index.term.tree.TermKey;
 import nars.term.Compound;
 import nars.term.atom.Atomic;
 import nars.term.container.TermVector;
+import nars.util.Util;
 import org.junit.Test;
+
+import java.util.Arrays;
 
 import static nars.Op.PROD;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Created by me on 11/16/16.
@@ -25,6 +30,7 @@ public class UnitCompound1Test {
         assertEquals(0, u.compareTo(g));
         assertEquals(0, g.compareTo(u));
         assertEquals(g.toString(), u.toString());
+        assertTrue(Arrays.equals(TermKey.term(g).array(), TermKey.term(u).array()));
     }
 
     @Test

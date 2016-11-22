@@ -562,7 +562,8 @@ public enum Draw {
     static public void renderHalfTriEdge(GL2 gl, SimpleSpatial src, EDraw e, float width, float twist) {
         SimpleSpatial tgt = e.target;
 
-        src.transform().getRotation(tmpQ);
+        Transform st = src.transform();
+        st.getRotation(tmpQ);
 
         if (twist != 0)
             tmpQ.setAngle(0, 1, 0, twist);
@@ -572,14 +573,16 @@ public enum Draw {
 
         //ww.normalize();
 
-        float sx = src.x();
-        float tx = tgt.x();
+        Transform tt = tgt.transform();
+
+        float sx = st.x;
+        float tx = tt.x;
         float dx = tx - sx;
-        float sy = src.y();
-        float ty = tgt.y();
+        float sy = st.y;
+        float ty = tt.y;
         float dy = ty - sy;
-        float sz = src.z();
-        float tz = tgt.z();
+        float sz = st.z;
+        float tz = tt.z;
         float dz = tz - sz;
         vv.set(dx, dy, dz);
 
