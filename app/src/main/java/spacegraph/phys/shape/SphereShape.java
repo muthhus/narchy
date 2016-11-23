@@ -35,6 +35,10 @@ import spacegraph.phys.math.Transform;
 public class SphereShape extends ConvexInternalShape {
 	
 	public SphereShape(float radius) {
+		setRadius(radius);
+	}
+
+	public void setRadius(float radius) {
 		implicitShapeDimensions.x = radius;
 		collisionMargin = radius;
 	}

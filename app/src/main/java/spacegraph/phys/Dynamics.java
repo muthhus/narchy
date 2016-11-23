@@ -445,7 +445,7 @@ public abstract class Dynamics<X> extends Collisions<X> {
         try {
             v3 tmp = new v3();
 
-            for (Collidable colObj : collidable) {
+            collidable.forEach(colObj -> {
                 Dynamic body = ifDynamic(colObj);
                 if (body != null) {
                     body.updateDeactivation(timeStep);
@@ -469,7 +469,7 @@ public abstract class Dynamics<X> extends Collisions<X> {
                         }
                     }
                 }
-            }
+            });
         } finally {
             BulletStats.popProfile();
         }
@@ -585,9 +585,7 @@ public abstract class Dynamics<X> extends Collisions<X> {
             // sorted version of all btTypedConstraint, based on islandId
 
             sortedConstraints.clear();
-            constraints.forEach((TypedConstraint c) -> {
-                sortedConstraints.add(c);
-            });
+            constraints.forEach((TypedConstraint c) -> sortedConstraints.add(c) );
 
             //Collections.sort(sortedConstraints, sortConstraintOnIslandPredicate);
             MiscUtil.quickSort(sortedConstraints, sortConstraintOnIslandPredicate);
@@ -643,10 +641,11 @@ public abstract class Dynamics<X> extends Collisions<X> {
     protected void integrateTransforms(float timeStep) {
         BulletStats.pushProfile("integrateTransforms");
         try {
-            v3 tmp = new v3();
-            //Transform tmpTrans = new Transform();
 
+            v3 tmp = new v3();
             Transform predictedTrans = new Transform();
+            SphereShape tmpSphere = new SphereShape(1);
+
             for (Collidable colObj : collidable) {
                 Dynamic body = ifDynamic(colObj);
                 if (body != null) {
@@ -660,7 +659,9 @@ public abstract class Dynamics<X> extends Collisions<X> {
                         tmp.sub(predictedTrans, BW);
                         float squareMotion = tmp.lengthSquared();
 
-                        if (body.getCcdSquareMotionThreshold() != 0f && body.getCcdSquareMotionThreshold() < squareMotion) {
+                        float motionThresh = body.getCcdSquareMotionThreshold();
+
+                        if (motionThresh != 0f && motionThresh < squareMotion) {
                             BulletStats.pushProfile("CCD motion clamping");
                             try {
                                 if (body.shape().isConvex()) {
@@ -668,7 +669,9 @@ public abstract class Dynamics<X> extends Collisions<X> {
 
                                     ClosestNotMeConvexResultCallback sweepResults = new ClosestNotMeConvexResultCallback(body, BW, predictedTrans, broadphase.getOverlappingPairCache(), intersecter);
                                     //ConvexShape convexShape = (ConvexShape)body.getCollisionShape();
-                                    SphereShape tmpSphere = new SphereShape(body.getCcdSweptSphereRadius()); //btConvexShape* convexShape = static_cast<btConvexShape*>(body->getCollisionShape());
+
+
+                                    tmpSphere.setRadius(body.getCcdSweptSphereRadius()); //btConvexShape* convexShape = static_cast<btConvexShape*>(body->getCollisionShape());
 
                                     Broadphasing bph = body.broadphase();
                                     sweepResults.collisionFilterGroup = bph.collisionFilterGroup;

@@ -1026,7 +1026,6 @@ public class SequentialImpulseConstrainer extends Constrainer {
         BulletStats.gTotalContactPoints += numpoints;
 
         v3 tmpVec = new v3();
-        Matrix3f tmpMat3 = new Matrix3f();
 
         v3 pos1 = new v3();
         v3 pos2 = new v3();
@@ -1051,8 +1050,8 @@ public class SequentialImpulseConstrainer extends Constrainer {
                 cp.getPositionWorldOnA(pos1);
                 cp.getPositionWorldOnB(pos2);
 
-                rel_pos1.sub(pos1, body0.getCenterOfMassPosition(tmpVec));
-                rel_pos2.sub(pos2, body1.getCenterOfMassPosition(tmpVec));
+                rel_pos1.sub(pos1, body0.worldTransform);
+                rel_pos2.sub(pos2, body1.worldTransform);
 
                 // this jacobian entry is re-used for all iterations
                 Matrix3f mat1 = body0.getCenterOfMassTransform(tt1).basis;
@@ -1064,8 +1063,8 @@ public class SequentialImpulseConstrainer extends Constrainer {
 
                 jac.init(mat1, mat2,
                         rel_pos1, rel_pos2, cp.normalWorldOnB,
-                        body0.getInvInertiaDiagLocal(new v3()), body0.getInvMass(),
-                        body1.getInvInertiaDiagLocal(new v3()), body1.getInvMass());
+                        body0.invInertiaLocal, body0.getInvMass(),
+                        body1.invInertiaLocal, body1.getInvMass());
 
                 float jacDiagAB = jac.Adiag;
 
@@ -1170,28 +1169,28 @@ public class SequentialImpulseConstrainer extends Constrainer {
                 torqueAxis0.cross(rel_pos1, cp.normalWorldOnB);
 
                 cpd.angularComponentA.set(torqueAxis0);
-                body0.getInvInertiaTensorWorld(tmpMat3).transform(cpd.angularComponentA);
+                body0.invInertiaTensorWorld.transform(cpd.angularComponentA);
 
                 torqueAxis1.cross(rel_pos2, cp.normalWorldOnB);
 
                 cpd.angularComponentB.set(torqueAxis1);
-                body1.getInvInertiaTensorWorld(tmpMat3).transform(cpd.angularComponentB);
+                body1.invInertiaTensorWorld.transform(cpd.angularComponentB);
                 ftorqueAxis0.cross(rel_pos1, cpd.frictionWorldTangential0);
 
                 cpd.frictionAngularComponent0A.set(ftorqueAxis0);
-                body0.getInvInertiaTensorWorld(tmpMat3).transform(cpd.frictionAngularComponent0A);
+                body0.invInertiaTensorWorld.transform(cpd.frictionAngularComponent0A);
                 ftorqueAxis1.cross(rel_pos1, cpd.frictionWorldTangential1);
 
                 cpd.frictionAngularComponent1A.set(ftorqueAxis1);
-                body0.getInvInertiaTensorWorld(tmpMat3).transform(cpd.frictionAngularComponent1A);
+                body0.invInertiaTensorWorld.transform(cpd.frictionAngularComponent1A);
                 ftorqueAxis0.cross(rel_pos2, cpd.frictionWorldTangential0);
 
                 cpd.frictionAngularComponent0B.set(ftorqueAxis0);
-                body1.getInvInertiaTensorWorld(tmpMat3).transform(cpd.frictionAngularComponent0B);
+                body1.invInertiaTensorWorld.transform(cpd.frictionAngularComponent0B);
                 ftorqueAxis1.cross(rel_pos2, cpd.frictionWorldTangential1);
 
                 cpd.frictionAngularComponent1B.set(ftorqueAxis1);
-                body1.getInvInertiaTensorWorld(tmpMat3).transform(cpd.frictionAngularComponent1B);
+                body1.invInertiaTensorWorld.transform(cpd.frictionAngularComponent1B);
 
                 ///
 

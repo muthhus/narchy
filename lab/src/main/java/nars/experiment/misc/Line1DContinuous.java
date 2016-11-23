@@ -279,7 +279,7 @@ public class Line1DContinuous extends NAgent {
         });
 
         l.print = true;
-        l.runRT(100, 15000).join();
+        l.runRT(15, 15000).join();
 
 
         NAR.printTasks(nar, true);

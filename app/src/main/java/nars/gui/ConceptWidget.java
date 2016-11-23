@@ -39,6 +39,7 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<BLink<? exte
     //caches a reference to the current concept
     public Concept concept;
 
+
     public ConceptWidget(Term x, ConceptsSpace space, int numEdges) {
         super(x, new Grid(new PushButton(x.toString())), 1, 1);
 
@@ -98,7 +99,7 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<BLink<? exte
         if (s!=null) {
 
         }
-        return null;
+        return s;
     }
 
     public void commit() {

@@ -69,14 +69,14 @@ public class Dynamic<X> extends Collidable<X> {
 
 	private static final float MAX_ANGVEL = BulletGlobals.SIMD_HALF_PI;
 	
-	private final Matrix3f invInertiaTensorWorld = new Matrix3f();
+	public final Matrix3f invInertiaTensorWorld = new Matrix3f();
 	public final v3 linearVelocity = new v3();
 	public final v3 angularVelocity = new v3();
 	private float inverseMass;
 	private float angularFactor;
 
 	private final v3 gravity = new v3();
-	private final v3 invInertiaLocal = new v3();
+	public final v3 invInertiaLocal = new v3();
 	private final v3 totalForce = new v3();
 	private final v3 totalTorque = new v3();
 
@@ -362,19 +362,14 @@ public class Dynamic<X> extends Collidable<X> {
 		angularVelocity.scaleAdd(step, tmp, angularVelocity);
 
 		// clamp angular velocity. collision calculations will fail on higher angular velocities	
-		float angvel = angularVelocity.length();
-		if (angvel * step > MAX_ANGVEL) {
+		float angvel = angularVelocity.lengthSquared();
+		if (angvel > Util.sqr(MAX_ANGVEL/step)) {
 			angularVelocity.scale((MAX_ANGVEL / step) / angvel);
 		}
 	}
 
 	public void setCenterOfMassTransform(Transform xform) {
-		if (isStaticOrKinematicObject()) {
-			interpolationWorldTransform.set(worldTransform);
-		}
-		else {
-			interpolationWorldTransform.set(xform);
-		}
+		interpolationWorldTransform.set(isStaticOrKinematicObject() ? worldTransform : xform);
 		getLinearVelocity(interpolationLinearVelocity);
 		getAngularVelocity(interpolationAngularVelocity);
 		worldTransform.set(xform);
@@ -463,18 +458,18 @@ public class Dynamic<X> extends Collidable<X> {
 
 		invInertiaTensorWorld.mul(mat1, mat2);
 	}
-	
-	public v3 getCenterOfMassPosition(v3 out) {
+
+	@Deprecated public v3 getCenterOfMassPosition(v3 out) {
 		out.set(worldTransform);
 		return out;
 	}
 
-	public Quat4f getOrientation(Quat4f out) {
+	@Deprecated public Quat4f getOrientation(Quat4f out) {
 		MatrixUtil.getRotation(worldTransform.basis, out);
 		return out;
 	}
 	
-	public Transform getCenterOfMassTransform(Transform out) {
+	@Deprecated public Transform getCenterOfMassTransform(Transform out) {
 		out.set(worldTransform);
 		return out;
 	}
@@ -523,13 +518,13 @@ public class Dynamic<X> extends Collidable<X> {
 
 	public float computeImpulseDenominator(v3 pos, v3 normal) {
 		v3 r0 = new v3();
-		r0.sub(pos, getCenterOfMassPosition(new v3()));
+		r0.sub(pos, worldTransform);
 
 		v3 c0 = new v3();
 		c0.cross(r0, normal);
 
 		v3 tmp = new v3();
-		MatrixUtil.transposeTransform(tmp, c0, getInvInertiaTensorWorld(new Matrix3f()));
+		MatrixUtil.transposeTransform(tmp, c0, invInertiaTensorWorld);
 
 		v3 vec = new v3();
 		vec.cross(tmp, r0);
@@ -539,17 +534,18 @@ public class Dynamic<X> extends Collidable<X> {
 
 	public float computeAngularImpulseDenominator(v3 axis) {
 		v3 vec = new v3();
-		MatrixUtil.transposeTransform(vec, axis, getInvInertiaTensorWorld(new Matrix3f()));
+		MatrixUtil.transposeTransform(vec, axis, invInertiaTensorWorld);
 		return axis.dot(vec);
 	}
 
 	public void updateDeactivation(float timeStep) {
-		if ((getActivationState() == ISLAND_SLEEPING) || (getActivationState() == DISABLE_DEACTIVATION)) {
+		int state = getActivationState();
+		if ((state == ISLAND_SLEEPING) || (state == DISABLE_DEACTIVATION)) {
 			return;
 		}
 
-		if ((getLinearVelocity(new v3()).lengthSquared() < linearSleepingThreshold * linearSleepingThreshold) &&
-				(getAngularVelocity(new v3()).lengthSquared() < angularSleepingThreshold * angularSleepingThreshold)) {
+		if ((linearVelocity.lengthSquared() < linearSleepingThreshold * linearSleepingThreshold) &&
+				(angularVelocity.lengthSquared() < angularSleepingThreshold * angularSleepingThreshold)) {
 			deactivationTime += timeStep;
 		}
 		else {
@@ -632,16 +628,16 @@ public class Dynamic<X> extends Collidable<X> {
 	
 	public void removeConstraintRef(TypedConstraint c) {
 		constraintRefs.remove(c);
-		checkCollideWith = (!constraintRefs.isEmpty());
+		checkCollideWith = !constraintRefs.isEmpty();
 	}
 
 	public TypedConstraint getConstraintRef(int index) {
 		return constraintRefs.get(index);
 		//return array[index];
 	}
-
-	public int getNumConstraintRefs() {
-		return constraintRefs.size();
-	}
+//
+//	public int getNumConstraintRefs() {
+//		return constraintRefs.size();
+//	}
 
 }
