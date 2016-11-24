@@ -16,6 +16,8 @@ import spacegraph.Surface;
 import spacegraph.obj.Cuboid;
 import spacegraph.obj.EDraw;
 import spacegraph.obj.layout.Grid;
+import spacegraph.obj.widget.CheckBox;
+import spacegraph.obj.widget.FloatSlider;
 import spacegraph.obj.widget.Label;
 import spacegraph.obj.widget.PushButton;
 import spacegraph.phys.Collidable;
@@ -27,6 +29,9 @@ import java.util.HashMap;
 import java.util.function.Consumer;
 
 import static spacegraph.math.v3.v;
+import static spacegraph.obj.layout.Grid.col;
+import static spacegraph.obj.layout.Grid.grid;
+import static spacegraph.obj.layout.Grid.row;
 
 
 public class ConceptWidget extends Cuboid<Term> implements Consumer<BLink<? extends Termed>> {
@@ -41,18 +46,25 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<BLink<? exte
 
 
     public ConceptWidget(Term x, ConceptsSpace space, int numEdges) {
-        super(x, new Grid(new PushButton(x.toString())), 1, 1);
+        super(x,1, 1);
+
 
         this.pri = 0f;
         this.space = space;
 
 
+        setFront(
+            col(new Label(x.toString()),
+                row(new FloatSlider( 0, 0, 4 ), new BeliefTableChart(space.nar, x))
+                    //new CheckBox("?")
+            )
+        );
 
         //float edgeActivationRate = 1f;
 
 //        edges = //new HijackBag<>(maxEdges * maxNodes, 4, BudgetMerge.plusBlend, nar.random);
         this.edges =
-            new ArrayBag<>(numEdges, BudgetMerge.avgBlend, new HashMap<>(numEdges));
+            new ArrayBag<>(numEdges, BudgetMerge.max, new HashMap<>(numEdges));
         edges.setCapacity(numEdges);
 
 //        for (int i = 0; i < edges; i++)

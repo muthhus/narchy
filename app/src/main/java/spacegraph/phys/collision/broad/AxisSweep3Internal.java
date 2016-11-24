@@ -32,7 +32,6 @@ import spacegraph.phys.BulletStats;
 import spacegraph.phys.Collidable;
 import spacegraph.phys.math.MiscUtil;
 import spacegraph.phys.math.VectorUtil;
-import spacegraph.phys.util.OArrayList;
 
 /**
  * AxisSweep3Internal is an internal base class that implements sweep and prune.

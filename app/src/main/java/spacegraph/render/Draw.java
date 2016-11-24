@@ -43,7 +43,6 @@ import spacegraph.phys.math.Transform;
 import spacegraph.phys.math.VectorUtil;
 import spacegraph.phys.shape.*;
 import spacegraph.phys.util.BulletStack;
-import spacegraph.phys.util.OArrayList;
 
 import java.io.IOException;
 import java.nio.charset.Charset;

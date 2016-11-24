@@ -24,7 +24,6 @@
 package spacegraph.phys.collision.broad;
 
 import nars.util.list.FasterList;
-import spacegraph.phys.util.OArrayList;
 
 /**
  * OverlappingPairCache provides an interface for overlapping pair management (add,

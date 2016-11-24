@@ -25,7 +25,6 @@ package spacegraph.phys;
 
 import nars.$;
 import nars.util.list.FasterList;
-import org.eclipse.collections.api.block.procedure.primitive.IntObjectProcedure;
 import org.jetbrains.annotations.Nullable;
 import spacegraph.math.Matrix3f;
 import spacegraph.math.v3;

@@ -27,7 +27,6 @@ import nars.util.list.FasterList;
 import spacegraph.phys.BulletStats;
 import spacegraph.phys.math.MiscUtil;
 import spacegraph.phys.util.IntArrayList;
-import spacegraph.phys.util.OArrayList;
 
 /**
  * Hash-space based {@link OverlappingPairCache}.

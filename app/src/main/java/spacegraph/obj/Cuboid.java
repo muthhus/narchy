@@ -2,6 +2,7 @@ package spacegraph.obj;
 
 import com.jogamp.opengl.GL2;
 import nars.util.Util;
+import org.jetbrains.annotations.Nullable;
 import spacegraph.SimpleSpatial;
 import spacegraph.Surface;
 import spacegraph.input.Finger;
@@ -21,13 +22,17 @@ import static spacegraph.math.v3.v;
  */
 public class Cuboid<X> extends SimpleSpatial<X> {
 
-    public final Surface front;
+    @Nullable
+    public Surface front;
     final float zOffset = 0.1f; //relative to scale
 
-    public final Finger mouseFront;
+    @Nullable public Finger mouseFront;
     private v3 mousePick;
     //private float padding;
 
+    public Cuboid(X x, float w, float h) {
+        this((X) x, null, w, h);
+    }
 
     public Cuboid(Surface front, float w, float h) {
         this((X) front, front, w, h);
@@ -44,13 +49,22 @@ public class Cuboid<X> extends SimpleSpatial<X> {
     public Cuboid(X x, Surface front, float w, float h, float d) {
         super(x);
 
-        this.front = front;
-
         scale(w, h, d);
 
-        front.setParent(null);
 
-        mouseFront = new Finger(front);
+
+        setFront(front);
+
+    }
+
+    public synchronized void setFront(Surface front) {
+        this.front = front;
+        if (front!=null) {
+            front.setParent(null);
+            mouseFront = new Finger(front);
+        } else {
+            mouseFront = null;
+        }
     }
 
     @Override
@@ -69,30 +83,32 @@ public class Cuboid<X> extends SimpleSpatial<X> {
         if (s0 != null)
             return s0;
 
-        Transform it = Transform.t(transform()).inverse();
-        v3 localPoint = it.transform(v(r.hitPointWorld));
+        if (front!=null) {
+            Transform it = Transform.t(transform()).inverse();
+            v3 localPoint = it.transform(v(r.hitPointWorld));
 
 
-//            //TODO maybe do this test with the normal vector of the hit ray
-//            if (this.thick!=this.thick) {
-//                Vector3f h = ((BoxShape) body.shape()).getHalfExtentsWithMargin(v());
-//                this.thick = h.z;
-//            }
+            //            //TODO maybe do this test with the normal vector of the hit ray
+            //            if (this.thick!=this.thick) {
+            //                Vector3f h = ((BoxShape) body.shape()).getHalfExtentsWithMargin(v());
+            //                this.thick = h.z;
+            //            }
 
-        SimpleBoxShape shape = (SimpleBoxShape) body.shape();
-        float frontZ = shape.z() / 2;
-        float zTolerance = frontZ / 4f;
+            SimpleBoxShape shape = (SimpleBoxShape) body.shape();
+            float frontZ = shape.z() / 2;
+            float zTolerance = frontZ / 4f;
 
-        if (Util.equals(localPoint.z, frontZ, zTolerance)) { //top surface only, ignore sides and back
+            if (Util.equals(localPoint.z, frontZ, zTolerance)) { //top surface only, ignore sides and back
 
-            this.mousePick = r.hitPointWorld;
+                this.mousePick = r.hitPointWorld;
 
-            //System.out.println(localPoint + " " + thick);
-            return mouseFront.on(new v2(localPoint.x / shape.x() + 0.5f, localPoint.y / shape.y() + 0.5f), buttons);
-        } else {
-            this.mousePick = null;
+                //System.out.println(localPoint + " " + thick);
+                return mouseFront.on(new v2(localPoint.x / shape.x() + 0.5f, localPoint.y / shape.y() + 0.5f), buttons);
+            } else {
+            }
         }
 
+        this.mousePick = null;
 
         return null;
     }
@@ -103,26 +119,27 @@ public class Cuboid<X> extends SimpleSpatial<X> {
         super.renderRelative(gl, body);
 
 
+        if (front!=null) {
 
-        //float p = this.padding;
+            //float p = this.padding;
 
-        //gl.glPushMatrix();
+            //gl.glPushMatrix();
 
-        //float pp = 1f - (p / 2f);
-        //float pp = 1f;
+            //float pp = 1f - (p / 2f);
+            //float pp = 1f;
 
-        gl.glTranslatef(-0.5f, -0.5f, 0.5f + zOffset);
-        //gl.glScalef(pp, pp, 1f);
+            gl.glTranslatef(-0.5f, -0.5f, 0.5f + zOffset);
+            //gl.glScalef(pp, pp, 1f);
 
-        //Transform t = transform();
-        //float tw = t.x;
-        //float th = t.y;
-        gl.glDepthMask(false);
-        front.render(gl, v(1,1));
-        gl.glDepthMask(true);
+            //Transform t = transform();
+            //float tw = t.x;
+            //float th = t.y;
+            gl.glDepthMask(false);
+            front.render(gl, v(1, 1));
+            gl.glDepthMask(true);
 
-        //gl.glPopMatrix();
-
+            //gl.glPopMatrix();
+        }
     }
 
     @Override

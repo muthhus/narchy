@@ -26,7 +26,6 @@ package spacegraph.phys.math.convexhull;
 import nars.util.list.FasterList;
 import spacegraph.math.v3;
 import spacegraph.phys.util.IntArrayList;
-import spacegraph.phys.util.OArrayList;
 
 /**
  * Contains resulting polygonal representation.<p>

@@ -1,10 +1,8 @@
 package spacegraph.source;
 
 import nars.util.list.FasterList;
-import org.eclipse.collections.api.block.predicate.primitive.IntObjectPredicate;
 import org.eclipse.collections.api.block.procedure.primitive.IntObjectProcedure;
 import spacegraph.AbstractSpace;
-import spacegraph.SpaceGraph;
 
 import java.util.Collection;
 import java.util.Collections;

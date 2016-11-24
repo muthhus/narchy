@@ -26,7 +26,6 @@ package spacegraph.phys.collision.broad;
 import spacegraph.math.v3;
 import spacegraph.phys.Collidable;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.function.Consumer;
 

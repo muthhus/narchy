@@ -31,7 +31,6 @@ import spacegraph.phys.collision.broad.BroadphasePair;
 import spacegraph.phys.collision.broad.Intersecter;
 import spacegraph.phys.collision.narrow.PersistentManifold;
 import spacegraph.phys.math.MiscUtil;
-import spacegraph.phys.util.OArrayList;
 
 import java.util.Collection;
 import java.util.Comparator;

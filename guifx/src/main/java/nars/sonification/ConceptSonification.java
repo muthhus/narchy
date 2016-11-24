@@ -1,13 +1,13 @@
 package nars.sonification;
 
 import nars.$;
-import nars.Audio;
+import spacegraph.audio.Audio;
 import nars.NAR;
 import nars.Task;
-import nars.audio.SoundProducer;
-import nars.audio.granular.Granulize;
-import nars.audio.sample.SampleLoader;
-import nars.audio.sample.SonarSample;
+import spacegraph.audio.SoundProducer;
+import spacegraph.audio.granular.Granulize;
+import spacegraph.audio.sample.SampleLoader;
+import spacegraph.audio.sample.SonarSample;
 import nars.budget.Budgeted;
 import nars.guifx.util.FrameReaction;
 import nars.nar.Default;

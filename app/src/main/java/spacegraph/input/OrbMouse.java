@@ -66,9 +66,7 @@ public class OrbMouse extends SpaceMouse implements KeyListener {
                     //TODO compute new azi and ele that match the current viewing angle values by backcomputing the vector delta
 
 
-                    v3 objTarget = co.getWorldOrigin();
-
-                    space.camera(objTarget, co.shape().getBoundingRadius());
+                    space.camera(co.getWorldOrigin(), co.shape().getBoundingRadius());
 
                 }
             }
@@ -203,6 +201,7 @@ public class OrbMouse extends SpaceMouse implements KeyListener {
     public ClosestRay mousePick(v3 rayTo) {
         ClosestRay r = this.rayCallback;
         v3 camPos = space.camPos;
+
 
         space.dyn.rayTest(camPos, rayTo, r.set(camPos, rayTo), simplexSolver);
         return r;

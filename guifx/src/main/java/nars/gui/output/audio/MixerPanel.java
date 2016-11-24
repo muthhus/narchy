@@ -2,9 +2,9 @@ package nars.gui.output.audio;
 
 import automenta.vivisect.swing.NPanel;
 import com.google.common.util.concurrent.AtomicDouble;
-import nars.Audio;
-import nars.Sound;
-import nars.audio.SoundListener;
+import spacegraph.audio.Audio;
+import spacegraph.audio.Sound;
+import spacegraph.audio.SoundListener;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;

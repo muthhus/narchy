@@ -343,7 +343,7 @@ public class Vis {
     }
 
     public static SpaceGraph<Term> conceptsWindow2D(NAR nar, int maxNodes, int maxEdges) {
-        Surface controls = grid(new PushButton("x"), new FloatSlider("z", 0, 0, 4 ))
+        Surface controls = col(new PushButton("x"), row(new FloatSlider("z", 0, 0, 4 )), new CheckBox("?"))
                 .hide();
 
 

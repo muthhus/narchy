@@ -36,9 +36,7 @@ import spacegraph.phys.math.Transform;
 import spacegraph.phys.math.TransformUtil;
 import spacegraph.phys.math.VectorUtil;
 import spacegraph.phys.shape.*;
-import spacegraph.phys.util.OArrayList;
 
-import java.util.Collection;
 import java.util.List;
 
 import static spacegraph.math.v3.v;

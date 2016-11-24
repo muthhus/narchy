@@ -28,7 +28,6 @@ import spacegraph.phys.Collidable;
 import spacegraph.phys.collision.broad.Intersecter;
 import spacegraph.phys.collision.narrow.PersistentManifold;
 import spacegraph.phys.constraint.TypedConstraint;
-import spacegraph.phys.util.OArrayList;
 
 import java.util.Collection;
 

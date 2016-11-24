@@ -4,7 +4,7 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.layout.BorderPane;
-import nars.Audio;
+import spacegraph.audio.Audio;
 import nars.NAR;
 import nars.sonification.ConceptSonification;
 

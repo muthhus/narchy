@@ -3,7 +3,6 @@ package spacegraph.obj.widget;
 import com.jogamp.opengl.GL2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import spacegraph.Surface;
 import spacegraph.render.Draw;
 
 /**

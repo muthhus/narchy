@@ -21,7 +21,7 @@ public class ForceDirected implements spacegraph.phys.constraint.BroadConstraint
             1;
             //13;
 
-    public float repelSpeed = 6f;
+    public float repelSpeed = 2f;
     public float attractSpeed = 3f;
 
     private final float maxRepelDist = 2000f;

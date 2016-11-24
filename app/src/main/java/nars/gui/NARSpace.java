@@ -105,7 +105,7 @@ public abstract class NARSpace<X extends Term, Y extends Spatial<X>> extends Lis
 
     public static void main(String[] args) {
 
-        Default n = new Default(1024, 16, 1, 3);
+        Default n = new Default(1024, 1, 1, 3);
         //Default2 n = new Default2();
         //n.nal(4);
 
@@ -114,7 +114,7 @@ public abstract class NARSpace<X extends Term, Y extends Spatial<X>> extends Lis
 
         //new ArithmeticInduction(n);
 
-        Vis.conceptsWindow3D(n, 512, 12).show(800, 600);
+        Vis.conceptsWindow2D(n, 32, 12).show(800, 600);
 
         //n.run(20); //headstart
 

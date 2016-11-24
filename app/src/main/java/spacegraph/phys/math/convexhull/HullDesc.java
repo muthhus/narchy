@@ -25,7 +25,6 @@ package spacegraph.phys.math.convexhull;
 
 import nars.util.list.FasterList;
 import spacegraph.math.v3;
-import spacegraph.phys.util.OArrayList;
 
 /**
  * Describes point cloud data and other input for conversion to polygonal representation.

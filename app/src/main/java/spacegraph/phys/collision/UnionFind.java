@@ -25,7 +25,6 @@ package spacegraph.phys.collision;
 
 import nars.util.list.FasterList;
 import spacegraph.phys.math.MiscUtil;
-import spacegraph.phys.util.OArrayList;
 
 import java.util.Comparator;
 

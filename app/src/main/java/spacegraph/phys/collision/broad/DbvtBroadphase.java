@@ -31,7 +31,6 @@ import spacegraph.math.v3;
 import spacegraph.phys.Collidable;
 import spacegraph.phys.util.OArrayList;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.function.Consumer;
 

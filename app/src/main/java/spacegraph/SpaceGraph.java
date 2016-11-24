@@ -6,7 +6,6 @@ import com.github.benmanes.caffeine.cache.RemovalCause;
 import com.jogamp.opengl.GL2;
 import nars.$;
 import nars.util.list.FasterList;
-import org.eclipse.collections.api.block.predicate.primitive.IntObjectPredicate;
 import org.eclipse.collections.api.block.procedure.primitive.IntObjectProcedure;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -81,10 +80,6 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
         add(o);
     }
 
-
-//    private void onEvicted(O k1, Spatial<O> v1, RemovalCause removalCause) {
-//        //..
-//    }
 
     final List<Ortho> preAdd = $.newArrayList();
 

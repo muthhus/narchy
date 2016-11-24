@@ -153,11 +153,16 @@ public class Line1DContinuous extends NAgent {
         //        ins[yEst] -= 0.5f;
         //2*size
         Arrays.fill(ins, 0f);
-        ins[Math.round(yHidden)] = 1f;
-        ins[Math.round(size + yEst)] = 1f;
+        float smoothing = 1/2f;
+        for (int i = 0; i < size; i++) {
+            ins[i] = Math.abs(yHidden - i)/(size*smoothing);
+            ins[i + this.size] = Math.abs(yEst - i)/(size*smoothing);
+        }
+//        ins[Math.round(yHidden)] = 1f;
+//        ins[Math.round(this.size + yEst)] = 1f;
 
 
-        float dist =  Math.abs(yHidden - yEst) / size;
+        float dist =  Math.abs(yHidden - yEst) / this.size;
 
         //float closeness = 1f - dist;
         //float reward = ((closeness*closeness*closeness) -0.5f)*2f;
@@ -192,7 +197,7 @@ public class Line1DContinuous extends NAgent {
 
 
 
-        if (yEst > size-1) yEst = size-1;
+        if (yEst > this.size -1) yEst = this.size -1;
         if (yEst < 0) yEst = 0;
 
 
@@ -201,7 +206,7 @@ public class Line1DContinuous extends NAgent {
 
             int colActual = Math.round(yHidden);
             int colEst = Math.round(yEst);
-            for (int i = 0; i < size; i++) {
+            for (int i = 0; i < this.size; i++) {
 
                 char c;
                 if (i == colActual && i == colEst) {
@@ -279,7 +284,7 @@ public class Line1DContinuous extends NAgent {
         });
 
         l.print = true;
-        l.runRT(15, 15000).join();
+        l.runRT(5, 15000).join();
 
 
         NAR.printTasks(nar, true);
