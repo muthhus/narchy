@@ -6,17 +6,13 @@ import nars.concept.ActionConcept;
 import nars.concept.SensorConcept;
 import nars.experiment.tetris.impl.TetrisState;
 import nars.experiment.tetris.impl.TetrisVisualizer;
-import nars.gui.Vis;
 import nars.remote.NAgents;
 import nars.term.Compound;
 import nars.time.FrameTime;
 import nars.truth.Truth;
 import nars.util.TaskStatistics;
 import org.jetbrains.annotations.NotNull;
-import spacegraph.SpaceGraph;
-import spacegraph.Surface;
 import spacegraph.math.v2;
-import spacegraph.obj.ControlSurface;
 import spacegraph.obj.widget.MatrixView;
 
 import java.util.List;
@@ -366,7 +362,7 @@ public class Tetris extends NAgents {
     public static void main(String[] args) {
         //Param.DEBUG = true;
 
-        NAR nar = NAgents.newMultiThreadNAR(3, new FrameTime().dur(TIME_PER_FALL*2));
+        NAR nar = NAgents.newMultiThreadNAR(2, new FrameTime().dur(TIME_PER_FALL*2));
         //nar.linkFeedbackRate.setValue(0.05f);
 
 //        Random rng = new XorShift128PlusRandom(1);

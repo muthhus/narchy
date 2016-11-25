@@ -6,11 +6,9 @@ import nars.term.Term;
 import nars.test.DeductiveMeshTest;
 import nars.util.event.On;
 import nars.util.list.FasterList;
-import org.eclipse.collections.impl.set.mutable.UnifiedSet;
 import spacegraph.Active;
 import spacegraph.SpaceGraph;
 import spacegraph.Spatial;
-import spacegraph.phys.Dynamics;
 import spacegraph.source.ListSpace;
 
 import java.util.Collection;
@@ -95,9 +93,9 @@ public abstract class NARSpace<X extends Term, Y extends Spatial<X>> extends Lis
         next.clear();
     }
 
+    /** override to filter items */
     protected boolean display(X x) {
         return true;
-        //return !(concept.term() instanceof Atomic);
     }
 
     abstract protected void get(Collection<Y> displayNext);

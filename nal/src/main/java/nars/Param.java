@@ -49,7 +49,7 @@ public abstract class Param /*extends Container*/ implements Level {
     /**
      * Maximum length of the evidental base of the Stamp, a power of 2
      */
-    public static final int STAMP_CAPACITY = 12;
+    public static final int STAMP_CAPACITY = 10;
 
 
     /**
@@ -64,7 +64,6 @@ public abstract class Param /*extends Container*/ implements Level {
     /** conjunctions over this length will be ineligible for 2nd-layer termlink templates. it can be decomposed however, and decompositions of this size or less will be eligible. */
     public static final int MAX_CONJ_SIZE_FOR_LAYER2_TEMPLATES = 3;
 
-    /** 1 should work */
     public static final int ACTIVATION_TERMLINK_DEPTH = 3;
     public static final int ACTIVATION_TASKLINK_DEPTH = 3;
     public static final boolean ACTIVATE_TERMLINKS_IF_NO_TEMPLATE = false;

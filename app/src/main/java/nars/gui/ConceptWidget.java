@@ -10,16 +10,12 @@ import nars.term.Term;
 import nars.term.Termed;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import spacegraph.SimpleSpatial;
 import spacegraph.SpaceGraph;
 import spacegraph.Surface;
 import spacegraph.obj.Cuboid;
 import spacegraph.obj.EDraw;
-import spacegraph.obj.layout.Grid;
-import spacegraph.obj.widget.CheckBox;
 import spacegraph.obj.widget.FloatSlider;
 import spacegraph.obj.widget.Label;
-import spacegraph.obj.widget.PushButton;
 import spacegraph.phys.Collidable;
 import spacegraph.phys.Dynamic;
 import spacegraph.phys.collision.ClosestRay;
@@ -30,7 +26,6 @@ import java.util.function.Consumer;
 
 import static spacegraph.math.v3.v;
 import static spacegraph.obj.layout.Grid.col;
-import static spacegraph.obj.layout.Grid.grid;
 import static spacegraph.obj.layout.Grid.row;
 
 
@@ -79,8 +74,8 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<BLink<? exte
 
 
         //int zOffset = -10;
-        final float initDistanceEpsilon = 10f;
-        final float initImpulseEpsilon = 25f;
+        final float initDistanceEpsilon = 40f;
+        final float initImpulseEpsilon = 5f;
 
         //place in a random direction
         x.transform().set(SpaceGraph.r(initDistanceEpsilon),
@@ -92,7 +87,7 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<BLink<? exte
                 SpaceGraph.r(initImpulseEpsilon),
                 SpaceGraph.r(initImpulseEpsilon)));
 
-        x.setDamping(0.99f, 0.9f);
+        x.setDamping(0.9f, 0.9f);
         return x;
     }
 

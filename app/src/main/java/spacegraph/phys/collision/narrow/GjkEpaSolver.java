@@ -48,7 +48,7 @@ Nov.2006
  */
 public class GjkEpaSolver {
 
-	protected final ArrayPool<float[]> floatArrays = ArrayPool.get(float.class);
+
 
 	public enum ResultsStatus {
 		Separated,		/* Shapes doesnt penetrate												*/ 
@@ -494,7 +494,9 @@ public class GjkEpaSolver {
 			//sa = pgjk->sa;
 		}
 		
-		public v3 GetCoordinates(Face face, v3 out) {
+		public v3 GetCoordinates(Face face) {
+			v3 out = new v3();
+
 			v3 tmp = new v3();
 			v3 tmp1 = new v3();
 			v3 tmp2 = new v3();
@@ -502,29 +504,25 @@ public class GjkEpaSolver {
 			v3 o = new v3();
 			o.scale(-face.d, face.n);
 
-			float[] a = floatArrays.getFixed(3);
 
 			tmp1.sub(face.v[0].w, o);
 			tmp2.sub(face.v[1].w, o);
 			tmp.cross(tmp1, tmp2);
-			a[0] = tmp.length();
+			out.x = tmp.length();
 
 			tmp1.sub(face.v[1].w, o);
 			tmp2.sub(face.v[2].w, o);
 			tmp.cross(tmp1, tmp2);
-			a[1] = tmp.length();
+			out.y = tmp.length();
 
 			tmp1.sub(face.v[2].w, o);
 			tmp2.sub(face.v[0].w, o);
 			tmp.cross(tmp1, tmp2);
-			a[2] = tmp.length();
+			out.z = tmp.length();
 
-			float sm = a[0] + a[1] + a[2];
+			float sm = out.x + out.y + out.z;
 
-			out.set(a[1], a[2], a[0]);
 			out.scale(1f / (sm > 0f ? sm : 1f));
-
-			floatArrays.release(a);
 
 			return out;
 		}
@@ -760,7 +758,7 @@ public class GjkEpaSolver {
 				}
 				/* Extract contact	*/
 				if (bestface != null) {
-					v3 b = GetCoordinates(bestface, new v3());
+					v3 b = GetCoordinates(bestface);
 					normal.set(bestface.n);
 					depth = Math.max(0, bestface.d);
 					for (int i = 0; i < 2; ++i) {

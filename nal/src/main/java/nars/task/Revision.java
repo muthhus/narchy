@@ -8,7 +8,6 @@ import nars.nal.Stamp;
 import nars.nal.meta.PremiseEval;
 import nars.term.Compound;
 import nars.term.Term;
-import nars.truth.ProjectedTruth;
 import nars.truth.Truth;
 import nars.truth.Truthed;
 import nars.util.Util;
@@ -24,8 +23,7 @@ import java.util.Random;
 import static nars.Op.NEG;
 import static nars.term.Terms.compoundOrNull;
 import static nars.time.Tense.DTERNAL;
-import static nars.time.Tense.ETERNAL;
-import static nars.truth.TruthFunctions.*;
+import static nars.truth.TruthFunctions.w2c;
 import static nars.util.Util.lerp;
 
 /**

@@ -120,7 +120,7 @@ public abstract class Spatial<X> implements Active {
     //abstract public Iterable<Collidable> bodies();
     abstract public void forEachBody(Consumer<Collidable> c);
 
-    abstract public List<TypedConstraint> constraints();
+    @Nullable abstract public List<TypedConstraint> constraints();
 
     public abstract void renderAbsolute(GL2 gl);
 

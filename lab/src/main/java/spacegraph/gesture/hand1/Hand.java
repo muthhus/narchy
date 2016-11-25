@@ -1,16 +1,13 @@
 package spacegraph.gesture.hand1;
 
-import java.awt.image.BufferedImage;
+import org.opencv.core.*;
+import org.opencv.imgproc.Imgproc;
+import org.opencv.imgproc.Moments;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.util.*;
-
-import com.github.sarxos.webcam.WebcamEvent;
-import org.opencv.core.*;
-import org.opencv.imgproc.*;
-
-import javax.swing.*;
 
 public class Hand {
 

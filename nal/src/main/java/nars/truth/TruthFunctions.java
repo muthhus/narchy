@@ -29,7 +29,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-import static java.lang.Math.abs;
 import static nars.$.t;
 import static nars.util.Util.clamp;
 

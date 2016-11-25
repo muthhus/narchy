@@ -1,7 +1,7 @@
 package nars.gui.output.audio;
 
-import spacegraph.audio.Audio;
 import nars.NAR;
+import spacegraph.audio.Audio;
 
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;

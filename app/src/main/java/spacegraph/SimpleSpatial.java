@@ -3,6 +3,7 @@ package spacegraph;
 import com.jogamp.opengl.GL2;
 import nars.$;
 import nars.util.Util;
+import org.jetbrains.annotations.Nullable;
 import spacegraph.math.Quat4f;
 import spacegraph.math.v3;
 import spacegraph.phys.Collidable;
@@ -57,7 +58,8 @@ public class SimpleSpatial<X> extends AbstractSpatial<X> {
     }
 
     public Dynamic body;
-    private final List<TypedConstraint> constraints = $.newArrayList(0);
+    @Nullable
+    private List<TypedConstraint> constraints = null;
 
     public SimpleSpatial color(float r, float g, float b) {
         return color(r, g, b, 1f);

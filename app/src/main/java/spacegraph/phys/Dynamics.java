@@ -266,7 +266,9 @@ public abstract class Dynamics<X> extends Collisions<X> {
                 }
             });
 
-            s.constraints().forEach(this::addConstraint);
+            List<TypedConstraint> cc = s.constraints();
+            if (cc!=null)
+                cc.forEach(this::addConstraint);
 
 //            } else {
 //                if (s.hide()) {

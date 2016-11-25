@@ -5,8 +5,6 @@ import nars.NAR;
 import nars.Narsese;
 import nars.Task;
 import nars.nal.UtilityFunctions;
-import nars.table.DefaultBeliefTable;
-import nars.task.Revision;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
@@ -25,7 +23,6 @@ import org.slf4j.LoggerFactory;
 import java.util.function.Consumer;
 
 import static nars.Symbols.BELIEF;
-import static nars.time.Tense.ETERNAL;
 
 
 /**

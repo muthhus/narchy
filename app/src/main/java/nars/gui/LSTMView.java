@@ -2,7 +2,6 @@ package nars.gui;
 
 import nars.learn.lstm.DistractedSequenceRecall;
 import nars.learn.lstm.SimpleLSTM;
-import nars.learn.lstm.test.LiveSTMTest;
 import nars.util.Util;
 import nars.util.data.random.XorShift128PlusRandom;
 import spacegraph.obj.layout.Grid;
@@ -11,7 +10,6 @@ import spacegraph.obj.widget.MatrixView;
 import java.util.Random;
 
 import static spacegraph.SpaceGraph.window;
-import static spacegraph.render.Draw.colorPolarized;
 
 /**
  * Created by me on 11/22/16.

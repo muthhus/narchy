@@ -23,9 +23,9 @@
  */
 
 package nars.learn.hmm;
-import java.text.*;
+
+import java.text.DecimalFormat;
 import java.util.Vector;
-import java.lang.Math;
 
 /**
  * This is a Hidden Markov Model implementation which internally provides

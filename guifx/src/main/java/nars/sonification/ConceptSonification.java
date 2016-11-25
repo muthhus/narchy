@@ -1,17 +1,17 @@
 package nars.sonification;
 
 import nars.$;
-import spacegraph.audio.Audio;
 import nars.NAR;
 import nars.Task;
-import spacegraph.audio.SoundProducer;
-import spacegraph.audio.granular.Granulize;
-import spacegraph.audio.sample.SampleLoader;
-import spacegraph.audio.sample.SonarSample;
 import nars.budget.Budgeted;
 import nars.guifx.util.FrameReaction;
 import nars.nar.Default;
 import nars.term.Term;
+import spacegraph.audio.Audio;
+import spacegraph.audio.SoundProducer;
+import spacegraph.audio.granular.Granulize;
+import spacegraph.audio.sample.SampleLoader;
+import spacegraph.audio.sample.SonarSample;
 
 import javax.sound.sampled.LineUnavailableException;
 import java.io.IOException;

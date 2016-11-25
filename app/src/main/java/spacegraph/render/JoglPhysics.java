@@ -342,7 +342,7 @@ abstract public class JoglPhysics<X> extends JoglSpace implements GLEventListene
     protected void render() {
         gl.glClear(gl.GL_COLOR_BUFFER_BIT | gl.GL_DEPTH_BUFFER_BIT);
         updateCamera();
-        forEachSpatial(x -> render(x));
+        forEachSpatial(this::render);
         gl.glFlush();
     }
 
@@ -735,9 +735,11 @@ abstract public class JoglPhysics<X> extends JoglSpace implements GLEventListene
 
     public final void render(Spatial<?> s) {
 
+
         s.renderAbsolute(gl);
 
         s.forEachBody(body -> {
+            GL2 gl = this.gl;
 
             gl.glPushMatrix();
 
