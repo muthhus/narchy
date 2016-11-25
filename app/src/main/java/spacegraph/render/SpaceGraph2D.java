@@ -26,7 +26,6 @@ public class SpaceGraph2D<X> extends SpaceGraph<X> {
 
 
     private OrbMouse orb;
-    public ClosestRay pickRay;
 
 
     public SpaceGraph2D() {
@@ -128,6 +127,8 @@ public class SpaceGraph2D<X> extends SpaceGraph<X> {
         addMouseListener(orb = new OrbMouse(this) {
 
 
+
+
             @Override
             public void mouseWheelMoved(MouseEvent e) {
                 float[] rotation = e.getRotation();
@@ -135,21 +136,10 @@ public class SpaceGraph2D<X> extends SpaceGraph<X> {
                 camera(camPos, Util.clamp(0.5f*camWidth *  (1f + -0.45f * rotation[1]), minWidth, maxWidth));
             }
 
-            @Override
-            public ClosestRay mousePick(v3 rayTo) {
-                ClosestRay r = this.rayCallback;
-                //v3 camPos = v(rayTo.x, rayTo.y, SpaceGraph2D.this.camPos.z); //directly down
-
-                //v3 camPos = space.camPos;
-
-
-                space.dyn.rayTest(v(), rayTo, pickRay = r.set(camPos, rayTo), simplexSolver);
-                return r;
-            }
-
         });
 
-        add(new AbstractSpatial(pickRay) {
+
+        add(new AbstractSpatial(orb + " view" /* HACK */) {
 
             @Override
             public void forEachBody(Consumer c) {
@@ -158,6 +148,7 @@ public class SpaceGraph2D<X> extends SpaceGraph<X> {
 
             @Override
             public void renderAbsolute(GL2 gl) {
+                ClosestRay pickRay = orb.pickRay;
                 if (pickRay!=null) {
                     gl.glLineWidth(10);
                     gl.glColor4f(0f, 0.25f, 1f, 0.5f);
@@ -181,19 +172,19 @@ public class SpaceGraph2D<X> extends SpaceGraph<X> {
 
     }
 
-    public v3 rayTo(int x, int y) {
-        float height = getHeight();
-        return rayTo( x / ((float) getWidth()), (height - y) / height);
-    }
+//    public v3 rayTo(int px, int py) {
+//        float height = getHeight();
+//        return rayTo( px / ((float) getWidth()), (height - py) / height);
+//    }
 
 
-    @Override
-    public v3 rayTo(float x, float y, float depth) {
-        return v(
-                camWidth * (-0.5f + x) * 2f,
-                camWidth / aspect * (-0.5f + y) * 2f,
-                0);
-    }
+//    @Override
+//    public v3 rayTo(float x, float y, float depth) {
+//        return v(
+//                camWidth * (-0.5f + x) * 2f,
+//                camWidth / aspect * (-0.5f + y) * 2f,
+//                0);
+//    }
 
 
     @Override

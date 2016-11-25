@@ -5,6 +5,8 @@ import com.jogamp.newt.event.KeyListener;
 import com.jogamp.newt.event.MouseEvent;
 import spacegraph.SimpleSpatial;
 import spacegraph.Spatial;
+import spacegraph.math.Matrix4f;
+import spacegraph.math.Vector4f;
 import spacegraph.math.v3;
 import spacegraph.phys.Collidable;
 import spacegraph.phys.Dynamic;
@@ -36,6 +38,7 @@ public class OrbMouse extends SpaceMouse implements KeyListener {
     public Collidable picked;
     public  v3 hitPoint;
     protected final VoronoiSimplexSolver simplexSolver = new VoronoiSimplexSolver();
+    public ClosestRay pickRay;
 
 
     public OrbMouse(JoglPhysics g) {
@@ -148,7 +151,7 @@ public class OrbMouse extends SpaceMouse implements KeyListener {
     }
 
 
-    private void mouseGrabOn(int sx, int sy) {
+    private ClosestRay mouseGrabOn(int sx, int sy) {
         // add a point to point constraint for picking
         ClosestRay rayCallback = mousePick(sx, sy);
 
@@ -191,31 +194,29 @@ public class OrbMouse extends SpaceMouse implements KeyListener {
 
             }
         }
+
+        return rayCallback;
         //}
     }
 
-    public ClosestRay mousePick(int sx, int sy) {
-        return mousePick(space.rayTo(sx, sy));
-    }
+//    public ClosestRay mousePick(int sx, int sy) {
+//        return mousePick(space.rayTo(sx, sy));
+//    }
+//
+//    public ClosestRay mousePick(v3 rayTo) {
+//        ClosestRay r = this.rayCallback;
+//
+//        //v3 camPos = v(rayTo.x, rayTo.y, space.camPos.z); //project directly upward
+//
+//        v3 camPos = space.camPos;
+//
+//        return r;
+//    }
 
-    public ClosestRay mousePick(v3 rayTo) {
-        ClosestRay r = this.rayCallback;
+    @Deprecated /* TODO probably rewrite */ private boolean mouseMotionFunc(int px, int py, short[] buttons) {
 
-        //v3 camPos = v(rayTo.x, rayTo.y, space.camPos.z); //project directly upward
 
-        v3 camPos = space.camPos;
-
-        space.dyn.rayTest(camPos, rayTo, r.set(camPos, rayTo), simplexSolver);
-        return r;
-    }
-
-    @Deprecated /* TODO probably rewrite */ private boolean mouseMotionFunc(int x, int y, short[] buttons) {
-
-        v3 ray = space.rayTo(x, y);
-
-        //if (mouseDragDX == 0) { //if not already dragging somewhere "outside"
-
-        ClosestRay cray = mousePick(ray);
+        ClosestRay cray = mousePick(px, py);
 
         /*System.out.println(mouseTouch.collisionObject + " touched with " +
             Arrays.toString(buttons) + " at " + mouseTouch.hitPointWorld
@@ -246,7 +247,7 @@ public class OrbMouse extends SpaceMouse implements KeyListener {
             // keep it at the same picking distance
             v3 eyePos = v(space.camPos);
             v3 dir = v();
-            dir.sub(ray, eyePos);
+            dir.sub(cray.rayFromWorld, eyePos);
             dir.normalize();
             dir.scale(gOldPickingDist);
 
@@ -306,21 +307,21 @@ public class OrbMouse extends SpaceMouse implements KeyListener {
                     for (short b : buttons) {
                         switch (b) {
                             case 1:
-                                ClosestRay m = mousePick(x, y);
-                                if (!m.hasHit()) {
-                                    //drag on background space
-                                    float px = mouseDragDX * 0.1f;
-                                    float py = mouseDragDY * 0.1f;
-
-                                    //TODO finish:
-
-                                    //Vector3f vx = v().cross(camDir, camUp);
-                                    //vx.normalize();
-                                    //System.out.println(px + " " + py + " " + camDir + " x " + camUp + " " + vx);
-
-                                    //camPosTarget.scaleAdd(px, vx);
-                                    //camPosTarget.scaleAdd(py, camUp);
-                                }
+//                                ClosestRay m = mousePick(x, y, null);
+//                                if (!m.hasHit()) {
+//                                    //drag on background space
+//                                    float px = mouseDragDX * 0.1f;
+//                                    float py = mouseDragDY * 0.1f;
+//
+//                                    //TODO finish:
+//
+//                                    //Vector3f vx = v().cross(camDir, camUp);
+//                                    //vx.normalize();
+//                                    //System.out.println(px + " " + py + " " + camDir + " x " + camUp + " " + vx);
+//
+//                                    //camPosTarget.scaleAdd(px, vx);
+//                                    //camPosTarget.scaleAdd(py, camUp);
+//                                }
                                 return true;
                             case 3:
                                 //right mouse drag = rotate
@@ -346,6 +347,42 @@ public class OrbMouse extends SpaceMouse implements KeyListener {
         }
 
         return false;
+
+    }
+
+    private ClosestRay mousePick(int px, int py) {
+        float x = (2.0f * px) / space.getWidth() - 1.0f;
+        float y = 1.0f - (2.0f * py) / space.getHeight();
+        float z = 1.0f;
+        Vector4f ray_eye = new Vector4f( x*2f, y*2f, -1.0f, 1.0f );
+
+        //https://capnramses.github.io/opengl/raycasting.html
+        Matrix4f viewMatrixInv = new Matrix4f(space.mat4f);
+        viewMatrixInv.invert();
+        viewMatrixInv.transform(ray_eye);
+        ray_eye.setZ(-1f);
+        ray_eye.setW(1f);
+
+        viewMatrixInv.transform(ray_eye);
+        v3 ray_wor = v(ray_eye.x, ray_eye.y, ray_eye.z);
+        ray_wor.normalize();
+        ray_wor.scale(1000f);
+
+
+
+        //if (mouseDragDX == 0) { //if not already dragging somewhere "outside"
+
+        //ray_wor.add(space.camPos);
+
+        v3 from = space.camPos;
+        v3 to = ray_wor;
+        to.add(from);
+
+        this.pickRay = rayCallback;
+
+        space.dyn.rayTest(from, to, rayCallback.set(from, to), simplexSolver);
+        return rayCallback;
+
 
     }
 

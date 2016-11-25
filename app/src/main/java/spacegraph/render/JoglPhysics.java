@@ -34,6 +34,8 @@ import nars.$;
 import org.eclipse.collections.api.block.procedure.primitive.IntObjectProcedure;
 import org.jetbrains.annotations.NotNull;
 import spacegraph.Spatial;
+import spacegraph.math.Matrix4f;
+import spacegraph.math.Vector4f;
 import spacegraph.math.v3;
 import spacegraph.phys.Collidable;
 import spacegraph.phys.Dynamic;
@@ -439,6 +441,8 @@ abstract public class JoglPhysics<X> extends JoglSpace implements GLEventListene
 
     private final float[] matTmp = new float[16];
 
+    public final float[] mat4f = new float[16];
+
     void perspective(final int m_off, final boolean initM,
                      final float fovy_rad, final float aspect) throws GLException {
 
@@ -455,7 +459,11 @@ abstract public class JoglPhysics<X> extends JoglSpace implements GLEventListene
 //                makeFrustum(matTmp, m_off, initM, left, right, bottom, top, zNear, zFar),
 //                0
 //        );
-        glu.gluPerspective(45, aspect, zNear, zFar);
+
+        //glu.gluPerspective(45, aspect, zNear, zFar);
+        gl.glMultMatrixf(FloatUtil.makePerspective(mat4f, 0, true, 45 * FloatUtil.PI / 180.0f, aspect, zNear, zFar), 0);
+
+
     }
 
 
@@ -666,8 +674,28 @@ abstract public class JoglPhysics<X> extends JoglSpace implements GLEventListene
 //        }
 //    }
 
-    public v3 rayTo(int x, int y) {
-        return rayTo(-1f + 2 * x / ((float) getWidth()), -1f + 2 * y / ((float) getHeight()));
+    public v3 rayTo(int px, int py) {
+        float x = (2.0f * px) / getWidth() - 1.0f;
+        float y = 1.0f - (2.0f * py) / getHeight();
+        float z = 1.0f;
+        v3 ray_nds = v(x, y, z);
+        Vector4f ray_eye = new Vector4f( x, y, -1.0f, 1.0f );
+
+        //https://capnramses.github.io/opengl/raycasting.html
+        Matrix4f viewMatrixInv = new Matrix4f(mat4f);
+        viewMatrixInv.invert();
+        viewMatrixInv.transform(ray_eye);
+        ray_eye.setZ(-1f);
+        ray_eye.setW(1f);
+
+        viewMatrixInv.transform(ray_eye);
+        v3 ray_wor = v(ray_eye.x, ray_eye.y, ray_eye.z);
+        ray_wor.normalize();
+
+
+        return ray_wor;
+
+        //return rayTo(-1f + 2 * x / ((float) getWidth()), -1f + 2 * y / ((float) getHeight()));
     }
 
     public v3 rayTo(float x, float y) {
