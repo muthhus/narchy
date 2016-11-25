@@ -74,8 +74,8 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<BLink<? exte
 
 
         //int zOffset = -10;
-        final float initDistanceEpsilon = 40f;
-        final float initImpulseEpsilon = 5f;
+        final float initDistanceEpsilon = 100f;
+        final float initImpulseEpsilon = 1f;
 
         //place in a random direction
         x.transform().set(SpaceGraph.r(initDistanceEpsilon),
@@ -126,9 +126,9 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<BLink<? exte
 
         //Budget b = instance;
 
-        this.pri = space.nar.activation(tt);
-
-        float p = pri;// = 1; //pri = key.priIfFiniteElseZero();
+        float p = space.nar.activation(tt);
+        p = (p == p) ? p : 0;// = 1; //pri = key.priIfFiniteElseZero();
+        this.pri = p;
 
 
         float minSize = 0.1f;

@@ -32,9 +32,9 @@ public class OrbMouse extends SpaceMouse implements KeyListener {
     protected TypedConstraint pickConstraint = null;
     protected Dynamic directDrag;
     public Dynamic pickedBody = null; // for deactivation state
-    private Spatial pickedSpatial;
-    private Collidable picked;
-    private v3 hitPoint;
+    public Spatial pickedSpatial;
+    public Collidable picked;
+    public  v3 hitPoint;
     protected final VoronoiSimplexSolver simplexSolver = new VoronoiSimplexSolver();
 
 
@@ -200,8 +200,10 @@ public class OrbMouse extends SpaceMouse implements KeyListener {
 
     public ClosestRay mousePick(v3 rayTo) {
         ClosestRay r = this.rayCallback;
-        v3 camPos = space.camPos;
 
+        //v3 camPos = v(rayTo.x, rayTo.y, space.camPos.z); //project directly upward
+
+        v3 camPos = space.camPos;
 
         space.dyn.rayTest(camPos, rayTo, r.set(camPos, rayTo), simplexSolver);
         return r;

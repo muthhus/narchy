@@ -72,7 +72,7 @@ abstract public class JoglPhysics<X> extends JoglSpace implements GLEventListene
     private float lastFrameTime;
 
     private int maxSubsteps = 0; //set to zero for variable timing
-    private float aspect;
+    protected float aspect;
 
 
     public void camera(v3 target, float radius) {
@@ -340,10 +340,14 @@ abstract public class JoglPhysics<X> extends JoglSpace implements GLEventListene
     }
 
     protected void render() {
-        gl.glClear(gl.GL_COLOR_BUFFER_BIT | gl.GL_DEPTH_BUFFER_BIT);
+        clear();
         updateCamera();
         forEachSpatial(this::render);
         gl.glFlush();
+    }
+
+    protected void clear() {
+        gl.glClear(gl.GL_COLOR_BUFFER_BIT | gl.GL_DEPTH_BUFFER_BIT);
     }
 
     /**

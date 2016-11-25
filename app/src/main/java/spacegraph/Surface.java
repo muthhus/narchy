@@ -114,7 +114,9 @@ public class Surface {
 
     public final void render(GL2 gl, v2 globalScale) {
 
-        if (scaleLocal.x!=scaleLocal.x)
+        v2 s = this.scaleLocal;
+        float scaleX = s.x;
+        if (scaleX != scaleX || scaleX <= 0)
             return; //invisible
 
         gl.glPushMatrix();
@@ -128,10 +130,9 @@ public class Surface {
         List<? extends Surface> cc = children();
         if (cc != null) {
             v2 childGlobal = new v2(globalScale);
-            childGlobal.scale(scaleLocal);
+            childGlobal.scale(s);
             for (int i = 0, childrenSize = cc.size(); i < childrenSize; i++) {
-                Surface child = cc.get(i);
-                child.render(gl, childGlobal);
+                cc.get(i).render(gl, childGlobal);
             }
         }
 

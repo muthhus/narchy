@@ -1,17 +1,20 @@
 package spacegraph.render;
 
+import com.jogamp.newt.event.MouseEvent;
 import com.jogamp.opengl.GL;
+import com.jogamp.opengl.GL2;
+import nars.util.Util;
 import spacegraph.AbstractSpace;
+import spacegraph.AbstractSpatial;
 import spacegraph.SimpleSpatial;
 import spacegraph.SpaceGraph;
-import spacegraph.Spatial;
 import spacegraph.input.KeyXYZ;
 import spacegraph.input.OrbMouse;
 import spacegraph.math.v3;
-import spacegraph.phys.Collidable;
 import spacegraph.phys.collision.ClosestRay;
 
-import java.util.function.BiConsumer;
+import java.util.Arrays;
+import java.util.function.Consumer;
 
 import static com.jogamp.opengl.fixedfunc.GLMatrixFunc.GL_PROJECTION;
 import static spacegraph.math.v3.v;
@@ -20,6 +23,10 @@ import static spacegraph.math.v3.v;
  * 2D ortho view of physics space
  */
 public class SpaceGraph2D<X> extends SpaceGraph<X> {
+
+
+    private OrbMouse orb;
+    public ClosestRay pickRay;
 
 
     public SpaceGraph2D() {
@@ -35,7 +42,7 @@ public class SpaceGraph2D<X> extends SpaceGraph<X> {
     }
 
 
-    float camWidth=1, camHeight=1;
+    float camWidth = 1, camHeight = 1;
 
 
     protected void ortho(float cx, float cy, float scale) {
@@ -46,7 +53,7 @@ public class SpaceGraph2D<X> extends SpaceGraph<X> {
         gl.glLoadIdentity();
 
 
-        float aspect = h/((float)w);
+        float aspect = h / ((float) w);
 
         this.zNear = -scale;
         this.zFar = scale;
@@ -54,7 +61,7 @@ public class SpaceGraph2D<X> extends SpaceGraph<X> {
         //gl.glOrtho(-2.0, 2.0, -2.0, 2.0, -1.5, 1.5);
         camWidth = scale;
         camHeight = aspect * scale;
-        gl.glOrtho(cx-camWidth/2f, cx+camWidth/2f, cy - camHeight/2f,cy + camHeight/2f,
+        gl.glOrtho(cx - camWidth / 2f, cx + camWidth / 2f, cy - camHeight / 2f, cy + camHeight / 2f,
                 zNear, zFar);
 
 //        // switch to projection mode
@@ -77,8 +84,6 @@ public class SpaceGraph2D<X> extends SpaceGraph<X> {
         //gl.glDisable(GL2.GL_DEPTH_TEST);
 
 
-
-
         //gl.glTranslatef(cx + w/2f, cy + h/2f, 0);
 
 //        float s = Math.min(w, h);
@@ -87,10 +92,12 @@ public class SpaceGraph2D<X> extends SpaceGraph<X> {
 
     boolean ortho;
 
+    float minWidth = 1f;
+    float maxWidth = 1000;
+
     @Override
     public void updateCamera() {
-        float minZoomArea = 1f;
-        float scale = camPos.z = Math.max(minZoomArea, camPos.z);
+        float scale = camPos.z = Math.max(minWidth, camPos.z);
 
         if (ortho) {
             //tan(A) = opposite/adjacent
@@ -100,70 +107,129 @@ public class SpaceGraph2D<X> extends SpaceGraph<X> {
         } else {
             super.updateCamera();
 
-            float aspect = getHeight()/((float)getWidth());
+            float aspect = getHeight() / ((float) getWidth());
 
 
             //gl.glOrtho(-2.0, 2.0, -2.0, 2.0, -1.5, 1.5);
-            camWidth = scale;
-            camHeight = aspect * scale;
+            camWidth = scale * 2f;
+            camHeight = aspect * scale * 2f;
         }
     }
 
-    @Override
-    protected void initLighting() {
-        //none
-    }
+//    @Override
+//    protected void initLighting() {
+//        //none
+//    }
 
     @Override
     protected void initInput() {
 
         addKeyListener(new KeyXYZ(this));
-        addMouseListener(new OrbMouse(this) {
-            @Override public ClosestRay mousePick(v3 rayTo) {
-                ClosestRay r = this.rayCallback;
-                v3 camPos = v(rayTo.x, rayTo.y, SpaceGraph2D.this.camPos.z); //directly down
+        addMouseListener(orb = new OrbMouse(this) {
 
-                space.dyn.rayTest(camPos, rayTo, r.set(camPos, rayTo), simplexSolver);
+
+            @Override
+            public void mouseWheelMoved(MouseEvent e) {
+                float[] rotation = e.getRotation();
+                System.out.println(Arrays.toString(rotation));
+                camera(camPos, Util.clamp(0.5f*camWidth *  (1f + -0.45f * rotation[1]), minWidth, maxWidth));
+            }
+
+            @Override
+            public ClosestRay mousePick(v3 rayTo) {
+                ClosestRay r = this.rayCallback;
+                //v3 camPos = v(rayTo.x, rayTo.y, SpaceGraph2D.this.camPos.z); //directly down
+
+                //v3 camPos = space.camPos;
+
+
+                space.dyn.rayTest(v(), rayTo, pickRay = r.set(camPos, rayTo), simplexSolver);
                 return r;
             }
+
+        });
+
+        add(new AbstractSpatial(pickRay) {
+
+            @Override
+            public void forEachBody(Consumer c) {
+
+            }
+
+            @Override
+            public void renderAbsolute(GL2 gl) {
+                if (pickRay!=null) {
+                    gl.glLineWidth(10);
+                    gl.glColor4f(0f, 0.25f, 1f, 0.5f);
+                    Draw.line(gl, pickRay.rayFromWorld, pickRay.rayToWorld);
+                    System.out.println(pickRay.rayFromWorld + " " + pickRay.rayToWorld);
+                }
+                if(orb.pickedSpatial!=null) {
+                    gl.glLineWidth(20);
+                    gl.glColor4f(1f, 0.5f, 0.5f, 0.5f);
+                    Draw.line(gl, orb.hitPoint, camPos);
+                }
+            }
+
         });
 
     }
 
     @Override
     public void camera(v3 target, float radius) {
-        camPos.set(target.x, target.y, radius * 1.25f * 2);
+        camPos.set(target.x, target.y, radius);
 
     }
 
     public v3 rayTo(int x, int y) {
         float height = getHeight();
-        return rayTo(  x / ((float) getWidth()),   (height-y) / height);
+        return rayTo( x / ((float) getWidth()), (height - y) / height);
     }
 
 
     @Override
     public v3 rayTo(float x, float y, float depth) {
         return v(
-                camPos.x - camWidth/2 + (camWidth * x),
-                camPos.y-camHeight/2 + (camHeight * y),
-                camPos.z-depth );
+                camWidth * (-0.5f + x) * 2f,
+                camWidth / aspect * (-0.5f + y) * 2f,
+                0);
     }
 
 
+    @Override
+    protected void clear() {
+//        gl.glClearAccum(0.5f, 0.5f, 0.5f, 1f);
+//        gl.glClearColor(0f, 0f, 0f, 1f);
+//        gl.glClear(GL.GL_DEPTH_BUFFER_BIT | GL.GL_COLOR_BUFFER_BIT);
+
+        //if(i == 0)
+            gl.glAccum(GL2.GL_LOAD, 0.8f);
+        //else
+            gl.glAccum(GL2.GL_ACCUM, 0.2f);
+
+//        i++;
+//
+//        if(i >= n) {
+//            i = 0;
+            gl.glAccum(GL2.GL_RETURN, 0.8f);
+        gl.glClear(GL.GL_DEPTH_BUFFER_BIT);
+            //gl.glSwapBuffers();
+//            wait_until_next(timestep);
+//        }
+    }
 
     public void clear(float opacity) {
 
         if (opacity < 1f) {
             //TODO use gl.clear faster than rendering this quad
+            ortho();
             gl.glColor4f(0, 0, 0, opacity);
             gl.glRectf(0, 0, getWidth(), getHeight());
         } else {
-            gl.glClearColor(0f,0f,0f,1f);
+            gl.glClearColor(0f, 0f, 0f, 1f);
             gl.glClear(GL.GL_COLOR_BUFFER_BIT);
         }
     }
-
 
 
 }

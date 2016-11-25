@@ -1,10 +1,15 @@
 package spacegraph;
 
 import com.jogamp.opengl.GL2;
+import org.jetbrains.annotations.Nullable;
 import spacegraph.phys.Collidable;
+import spacegraph.phys.constraint.TypedConstraint;
 import spacegraph.phys.shape.CollisionShape;
 import spacegraph.phys.shape.SimpleBoxShape;
 import spacegraph.render.Draw;
+
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Created by me on 9/13/16.
@@ -13,6 +18,12 @@ public abstract class AbstractSpatial<X> extends Spatial<X> {
 
     public AbstractSpatial(X x) {
         super(x);
+    }
+
+    @Nullable
+    @Override
+    public List<TypedConstraint> constraints() {
+        return Collections.emptyList();
     }
 
     public void renderAbsolute(GL2 gl) {
