@@ -22,16 +22,6 @@ import static spacegraph.math.v3.v;
 public class SpaceGraph2D<X> extends SpaceGraph<X> {
 
 
-    private final BiConsumer<Spatial, Collidable> renderer2D = (s,body)->{
-        gl.glPushMatrix();
-
-        Draw.transform(gl, body.transform());
-
-        s.renderRelative(gl, body);
-
-        gl.glPopMatrix();
-    };
-
     public SpaceGraph2D() {
         super();
     }
@@ -95,18 +85,28 @@ public class SpaceGraph2D<X> extends SpaceGraph<X> {
 //        gl.glScalef(scale*s,scale*s,1f);
     }
 
+    boolean ortho;
+
     @Override
     public void updateCamera() {
         float minZoomArea = 1f;
-        float z =  camPos.z;
-        if (z < minZoomArea)
-            camPos.z = z = minZoomArea;
+        float scale = camPos.z = Math.max(minZoomArea, camPos.z);
 
-        //tan(A) = opposite/adjacent
-        //tan(focus/2) = scale / Z
-        //scale = z * tan(focus/2)
-        float scale = z;// * 0.41f; //tan(pi/8)
-        ortho(camPos.x,camPos.y, scale);
+        if (ortho) {
+            //tan(A) = opposite/adjacent
+            //tan(focus/2) = scale / Z
+            //scale = z * tan(focus/2)
+            ortho(camPos.x, camPos.y, scale);
+        } else {
+            super.updateCamera();
+
+            float aspect = getHeight()/((float)getWidth());
+
+
+            //gl.glOrtho(-2.0, 2.0, -2.0, 2.0, -1.5, 1.5);
+            camWidth = scale;
+            camHeight = aspect * scale;
+        }
     }
 
     @Override
