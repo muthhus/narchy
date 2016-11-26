@@ -1,9 +1,19 @@
 package spacegraph.obj.widget.console;
 
+import com.googlecode.lanterna.TerminalPosition;
+import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.TextCharacter;
+import com.googlecode.lanterna.gui2.BasicWindow;
+import com.googlecode.lanterna.gui2.MultiWindowTextGUI;
+import com.googlecode.lanterna.gui2.SeparateTextGUIThread;
+import com.googlecode.lanterna.gui2.TextBox;
+import com.googlecode.lanterna.screen.TerminalScreen;
+import com.googlecode.lanterna.terminal.virtual.DefaultVirtualTerminal;
 import com.jogamp.opengl.GL2;
 import spacegraph.Surface;
 import spacegraph.render.Draw;
+
+import java.io.IOException;
 
 /**
  * Created by me on 4/1/16.
@@ -166,63 +176,63 @@ public abstract class ConsoleSurface extends Surface implements Appendable {
 
 
 
-//    public static class EditTerminal extends DefaultVirtualTerminal {
-//        public MultiWindowTextGUI gui;
-//
-//        public EditTerminal(int c, int r) {
-//            super(c, r);
-//
-//
-//            //term.clearScreen();
-//            new Thread(() -> {
-//
-//                try {
-//                    TerminalScreen screen = new TerminalScreen(this);
-//                    screen.startScreen();
-//                    gui = new MultiWindowTextGUI(
-//                            new SeparateTextGUIThread.Factory(),
-//                            screen);
-//
-//
-//                    setCursorVisible(true);
-//
-//                    gui.setBlockingIO(false);
-//                    gui.setEOFWhenNoWindows(false);
-//
-//
-//                    final BasicWindow window = new BasicWindow();
-//                    window.setPosition(new TerminalPosition(0,0));
-//                    window.setSize(new TerminalPosition(c-2,r-2));
-//
-//
-//                    TextBox t = new TextBox("", TextBox.Style.MULTI_LINE);
-//                    t.setPreferredSize(new TerminalPosition(c-3,r-3));
-//
-//                    t.takeFocus();
-//                    window.setComponent(t);
-//
-//
-//                    gui.addWindow(window);
-//                    gui.setActiveWindow(window);
-//
-//                    refresh();
-//                    gui.waitForWindowToClose(window);
-//
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                }
-//            }).start();
-//
-//        }
-//
-//        public void refresh() {
-//            try {
-//                gui.updateScreen();
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-//        }
-//    }
+    public static class EditTerminal extends DefaultVirtualTerminal {
+        public MultiWindowTextGUI gui;
+
+        public EditTerminal(int c, int r) {
+            super(new TerminalSize(c, r));
+
+
+            //term.clearScreen();
+            new Thread(() -> {
+
+                try {
+                    TerminalScreen screen = new TerminalScreen(this);
+                    screen.startScreen();
+                    gui = new MultiWindowTextGUI(
+                            new SeparateTextGUIThread.Factory(),
+                            screen);
+
+
+                    setCursorVisible(true);
+
+                    gui.setBlockingIO(true);
+                    gui.setEOFWhenNoWindows(false);
+
+
+                    final BasicWindow window = new BasicWindow();
+                    window.setPosition(new TerminalPosition(0,0));
+                    window.setSize(new TerminalSize(c-2,r-2));
+
+
+                    TextBox t = new TextBox("sdf", TextBox.Style.MULTI_LINE);
+                    t.setPreferredSize(new TerminalSize(c-3,r-3));
+
+                    t.takeFocus();
+                    window.setComponent(t);
+
+
+                    gui.addWindow(window);
+                    gui.setActiveWindow(window);
+
+                    commit();
+                    gui.waitForWindowToClose(window);
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }).start();
+
+        }
+
+        public void commit() {
+            try {
+                gui.updateScreen();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 
 //    public static class Demo extends DefaultVirtualTerminal {
 //        public Demo(int c, int r) {

@@ -28,6 +28,8 @@ import spacegraph.obj.CrosshairSurface;
 import spacegraph.obj.layout.Grid;
 import spacegraph.obj.layout.Stacking;
 import spacegraph.obj.widget.*;
+import spacegraph.obj.widget.console.ConsoleSurface;
+import spacegraph.obj.widget.console.ConsoleTerminal;
 import spacegraph.render.Draw;
 import spacegraph.render.SpaceGraph2D;
 
@@ -353,14 +355,17 @@ public class Vis {
 //                                new FloatSlider("~", 0, 0, 1f).on((slider, v) -> {
 //
 //                                }).scale(100, 100).pos(0f, 0f)
-                                new CheckBox("").on((cb, v) -> {
-                                    if (!v)
-                                        controls.hide();
-                                    else
-                                        controls.scale(200,200f).pos(300f,300f);
-                                }).scale(100, 100).pos(0f, 0f)
 
-                        ))
+                                new ConsoleTerminal(new ConsoleSurface.EditTerminal(40,20))
+
+//                                new CheckBox("").on((cb, v) -> {
+//                                    if (!v)
+//                                        controls.hide();
+//                                    else
+//                                        controls.scale(200,200f).pos(300f,300f);
+//                                }).scale(100, 100).pos(0f, 0f)
+
+                        ).scale(500,500))
                 .add(new Ortho(controls))
                 .add(new ConceptsSpace(nar, maxNodes, maxEdges).with(
                         new Flatten()

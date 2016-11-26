@@ -187,8 +187,8 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, Sorted
         }
 
 
-        final float newBeliefWeight = newBelief.confWeight();
-        float aProp = newBeliefWeight / ( newBeliefWeight + oldBelief.confWeight());
+        final float newBeliefWeight = newBelief.evi();
+        float aProp = newBeliefWeight / ( newBeliefWeight + oldBelief.evi());
         Term t = Revision.intermpolate(
                 newBelief.term(), oldBelief.term(),
                 aProp,

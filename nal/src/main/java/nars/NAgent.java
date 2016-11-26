@@ -585,7 +585,7 @@ abstract public class NAgent implements NSense, NAction {
 
             Truth d = a.desireActual(now);
             if (d != null)
-                m += d.confWeight();
+                m += d.evi();
         }
         m /= n;
         avgActionDesire.addValue(w2c(m)); //resulting from the previous frame

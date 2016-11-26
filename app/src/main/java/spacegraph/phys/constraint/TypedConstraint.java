@@ -68,7 +68,7 @@ public abstract class TypedConstraint {
 		this.type = type;
 		this.rbA = rbA;
 		this.rbB = rbB;
-		getFixed().setMassProps(0f, new v3(0f, 0f, 0f));
+		getFixed().setMass(0f, new v3(0f, 0f, 0f));
 	}
 	
 	public abstract void buildJacobian();

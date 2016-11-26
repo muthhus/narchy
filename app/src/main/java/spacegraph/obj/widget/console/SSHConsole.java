@@ -15,7 +15,7 @@ import java.io.PipedOutputStream;
 /**
  * Created by me on 11/13/16.
  */
-public class SSHConsole extends VirtualConsole  {
+public class SSHConsole extends ConsoleTerminal {
 
 
     public static void main(String[] args) throws IOException, JSchException {

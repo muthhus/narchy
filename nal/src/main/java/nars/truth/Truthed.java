@@ -48,7 +48,7 @@ public interface Truthed  {
     static float confWeightSum(@NotNull Iterable<? extends Truthed> beliefs) {
         float t = 0;
         for (Truthed s : beliefs)
-            t += s.truth().confWeight();
+            t += s.truth().evi();
         return t;
     }
 
@@ -65,7 +65,7 @@ public interface Truthed  {
     }
 
     /** confidence to weight */
-    default float confWeight() {
+    default float evi() {
         return c2w(conf());
     }
 

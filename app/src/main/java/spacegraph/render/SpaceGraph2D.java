@@ -194,15 +194,15 @@ public class SpaceGraph2D<X> extends SpaceGraph<X> {
 //        gl.glClear(GL.GL_DEPTH_BUFFER_BIT | GL.GL_COLOR_BUFFER_BIT);
 
         //if(i == 0)
-            gl.glAccum(GL2.GL_LOAD, 0.8f);
+            gl.glAccum(GL2.GL_LOAD, 0.5f);
         //else
-            gl.glAccum(GL2.GL_ACCUM, 0.2f);
+            gl.glAccum(GL2.GL_ACCUM, 0.5f);
 
 //        i++;
 //
 //        if(i >= n) {
 //            i = 0;
-            gl.glAccum(GL2.GL_RETURN, 0.8f);
+            gl.glAccum(GL2.GL_RETURN, 0.5f);
         gl.glClear(GL.GL_DEPTH_BUFFER_BIT);
             //gl.glSwapBuffers();
 //            wait_until_next(timestep);

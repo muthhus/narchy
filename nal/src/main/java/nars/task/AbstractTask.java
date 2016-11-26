@@ -547,7 +547,7 @@ public abstract class AbstractTask extends RawBudget implements Task, Temporal {
         long a = start();
 
         Truth t = truth();
-        float cw = t.confWeight();
+        float cw = t.evi();
         if (a == ETERNAL)
             return cw;
         else if (when == ETERNAL)// || when == now) && o == when) //optimization: if at the current time and when

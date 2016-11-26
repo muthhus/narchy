@@ -74,8 +74,6 @@ public class SimpleSpatial<X> extends AbstractSpatial<X> {
     }
 
     public final Transform transform() {
-        Dynamic b = this.body;
-        //return b == null ? motion.t : b.transform();
         return transform;
     }
 
@@ -172,7 +170,7 @@ public class SimpleSpatial<X> extends AbstractSpatial<X> {
         else
             shape.setLocalScaling(v(sx,sy,sz));
 
-        this.radius = Math.max(sx, Math.max(sy, sz));
+        this.radius = shape.getBoundingRadius();// Math.max(sx, Math.max(sy, sz));
 
         reactivate();
     }

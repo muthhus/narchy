@@ -1,6 +1,7 @@
 package nars.gui;
 
 import com.jogamp.opengl.GL2;
+import nars.NAR;
 import nars.Task;
 import nars.bag.impl.ArrayBag;
 import nars.budget.merge.BudgetMerge;
@@ -24,6 +25,7 @@ import spacegraph.render.Draw;
 import java.util.HashMap;
 import java.util.function.Consumer;
 
+import static nars.truth.TruthFunctions.w2c;
 import static spacegraph.math.v3.v;
 import static spacegraph.obj.layout.Grid.col;
 import static spacegraph.obj.layout.Grid.row;
@@ -34,17 +36,16 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<BLink<? exte
     public final ArrayBag<TermEdge> edges;
     private final ConceptsSpace space;
 
-    public float pri;
 
     //caches a reference to the current concept
     public Concept concept;
+    private ConceptVis conceptVis = new ConceptVis2();
 
 
     public ConceptWidget(Term x, ConceptsSpace space, int numEdges) {
         super(x,1, 1);
 
 
-        this.pri = 0f;
         this.space = space;
 
 
@@ -74,8 +75,8 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<BLink<? exte
 
 
         //int zOffset = -10;
-        final float initDistanceEpsilon = 100f;
-        final float initImpulseEpsilon = 1f;
+        final float initDistanceEpsilon = 500f;
+        final float initImpulseEpsilon = 0.5f;
 
         //place in a random direction
         x.transform().set(SpaceGraph.r(initDistanceEpsilon),
@@ -87,7 +88,7 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<BLink<? exte
                 SpaceGraph.r(initImpulseEpsilon),
                 SpaceGraph.r(initImpulseEpsilon)));
 
-        x.setDamping(0.9f, 0.9f);
+        x.setDamping(0.95f, 0.95f);
         return x;
     }
 
@@ -126,20 +127,7 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<BLink<? exte
 
         //Budget b = instance;
 
-        float p = space.nar.activation(tt);
-        p = (p == p) ? p : 0;// = 1; //pri = key.priIfFiniteElseZero();
-        this.pri = p;
-
-
-        float minSize = 0.1f;
-        float maxSize = 16f;
-        //sqrt because the area will be the sqr of this dimension
-        float nodeScale = ((float) Math.sqrt(minSize + p * maxSize));//1f + 2f * p;
-        //nodeScale /= Math.sqrt(tt.volume());
-        scale(nodeScale, nodeScale, nodeScale);
-
-
-        Draw.hsb((tt.op().ordinal() / 16f), 0.75f + 0.25f * p, 0.5f, 0.9f, shapeColor);
+        conceptVis.apply(this, tt);
 
 
 //            float lastConceptForget = instance.getLastForgetTime();
@@ -290,20 +278,85 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<BLink<? exte
 
                 this.width = minLineWidth + (maxLineWidth - minLineWidth) * priSum;
                 //z.r = 0.25f + 0.7f * (pri * 1f / ((Term)target.key).volume());
-                this.r = ff.qua();
-                this.g = 0.1f + 0.9f * (tasklinkPri);
-                this.b = 0.1f + 0.9f * (termlinkPri);
+                float qEst = ff.qua();
+                if (qEst!=qEst)
+                    qEst = 0f;
+
+                this.r = 0;
+
+                if (priSum > 0) {
+                    this.g = (tasklinkPri / priSum);
+                    this.b = (termlinkPri / priSum);
+                } else {
+                    this.g = this.b = 0.5f;
+                }
+
                 //this.a = 0.1f + 0.5f * pri;
-                this.a = priAvg;
+                this.a = 0.1f * 0.9f * priAvg;
                 //0.9f;
 
-                this.attraction = priSum * 0.1f;
+                this.attraction = priSum * 0.25f + 0.25f;
+                this.attractionDist = 1f + 1f * (1f - (qEst*qEst));
             } else {
                 this.a = 0;
+                this.attraction = 0;
+                this.attractionDist = Float.POSITIVE_INFINITY;
             }
         }
     }
 
+    public interface ConceptVis {
+        void apply(ConceptWidget w, Term tt);
+    }
+
+    public static class ConceptVis1 implements ConceptVis {
+
+        final float minSize = 0.1f;
+        final float maxSize = 16f;
+
+
+        public void apply(ConceptWidget conceptWidget, Term tt) {
+            float p = conceptWidget.space.nar.activation(tt);
+            p = (p == p) ? p : 0;// = 1; //pri = key.priIfFiniteElseZero();
+
+            //sqrt because the area will be the sqr of this dimension
+            float nodeScale = ((float) Math.sqrt(minSize + p * maxSize));//1f + 2f * p;
+            //nodeScale /= Math.sqrt(tt.volume());
+            conceptWidget.scale(nodeScale, nodeScale, nodeScale);
+
+
+            Draw.hsb((tt.op().ordinal() / 16f), 0.75f + 0.25f * p, 0.5f, 0.9f, conceptWidget.shapeColor);
+        }
+    }
+    public static class ConceptVis2 implements ConceptVis {
+
+        final float minSize = 0.1f;
+        final float maxSize = 16f;
+
+        public void apply(ConceptWidget conceptWidget, Term tt) {
+            ConceptsSpace space = conceptWidget.space;
+            NAR nar = space.nar;
+            float p = nar.activation(tt);
+            p = (p == p) ? p : 0;// = 1; //pri = key.priIfFiniteElseZero();
+
+            long now = space.now();
+            float b = conceptWidget.concept.beliefs().eviSum(now);
+            float g = conceptWidget.concept.goals().eviSum(now);
+            float ec = w2c((b + g)/2f);
+
+            float nodeScale = minSize + ec * maxSize;
+            //nodeScale /= Math.sqrt(tt.volume());
+            conceptWidget.scale(nodeScale, nodeScale, nodeScale);
+
+            //conceptWidget.body.setMass(1f + ec*0.5f);
+
+            Draw.hsb(
+                    (tt.op().ordinal() / 16f),
+                    0.25f + 0.75f * ec,
+                    0.15f + 0.85f * p,
+                    0.9f, conceptWidget.shapeColor);
+        }
+    }
 //        private class ConceptFilter implements Predicate<BLink<Concept>> {
 //
 //            int count;

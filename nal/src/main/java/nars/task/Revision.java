@@ -35,8 +35,8 @@ public class Revision {
 
     @Nullable
     public static Truth revise(@NotNull Truthed a, @NotNull Truthed b, float factor, float minConf) {
-        float w1 = a.confWeight() * factor;
-        float w2 = b.confWeight() * factor;
+        float w1 = a.evi() * factor;
+        float w2 = b.evi() * factor;
         float w = (w1 + w2);
         float c = w2c(w);
         return c < minConf ?
@@ -48,8 +48,8 @@ public class Revision {
     }
     @Nullable
     public static Truth revise(@NotNull Truthed a, float aFrequencyBalance, @NotNull Truthed b, float minConf) {
-        float w1 = a.confWeight();
-        float w2 = b.confWeight();
+        float w1 = a.evi();
+        float w2 = b.evi();
         float c = w2c(w1+w2);
 
         if (c >= minConf) {
@@ -100,8 +100,8 @@ public class Revision {
     @Nullable public static Task mergeInterpolate(@NotNull Task a, @NotNull Task b, long when, long now, @NotNull Truth newTruth, boolean mergeOrChoose) {
         assert (a.punc() == b.punc());
 
-        float aw = a.isQuestOrQuestion() ? 0 : a.confWeight(); //question
-        float bw = b.confWeight();
+        float aw = a.isQuestOrQuestion() ? 0 : a.evi(); //question
+        float bw = b.evi();
 
         float aProp = aw / (aw + bw);
 
@@ -245,8 +245,8 @@ public class Revision {
         if ((b == null) || !b.isBeliefOrGoal())
             return t;
 
-        float tw = t.confWeight();
-        float bw = b.confWeight();
+        float tw = t.evi();
+        float bw = b.evi();
 
         //randomize choice by confidence
         return p.random.nextFloat() < tw/(tw+bw) ? t : b;

@@ -155,7 +155,7 @@ public class TruthPolationLab extends VBox implements ChangeListener {
                 if (tc!=null) {
                     double x = dx * i;
                     double y = (1f - tc.freq()) * h;
-                    double r = 5 + tc.confWeight() * rad;
+                    double r = 5 + tc.evi() * rad;
 
                     x -= r / 2;
                     y -= r / 2;

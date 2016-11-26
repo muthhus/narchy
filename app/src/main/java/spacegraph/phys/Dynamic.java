@@ -172,7 +172,7 @@ public class Dynamic<X> extends Collidable<X> {
 		setCollisionShape(collisionShape);
 		debugBodyId = uniqueId++;
 
-		setMassProps(mass, localInertia);
+		setMass(mass, localInertia);
 		setDamping(0,0);
 		updateInertiaTensor();
 	}
@@ -327,7 +327,15 @@ public class Dynamic<X> extends Collidable<X> {
 //		}
 	}
 
-	public void setMassProps(float mass, v3 inertia) {
+	public void setMass(float mass, v3 inertia) {
+		setMass(mass);
+
+		invInertiaLocal.set(inertia.x != 0f ? 1f / inertia.x : 0f,
+				inertia.y != 0f ? 1f / inertia.y : 0f,
+				inertia.z != 0f ? 1f / inertia.z : 0f);
+	}
+
+	public void setMass(float mass) {
 		if (mass == 0f) {
 			collisionFlags |= CollisionFlags.STATIC_OBJECT;
 			inverseMass = 0f;
@@ -336,10 +344,6 @@ public class Dynamic<X> extends Collidable<X> {
 			collisionFlags &= (~CollisionFlags.STATIC_OBJECT);
 			inverseMass = 1f / mass;
 		}
-
-		invInertiaLocal.set(inertia.x != 0f ? 1f / inertia.x : 0f,
-				inertia.y != 0f ? 1f / inertia.y : 0f,
-				inertia.z != 0f ? 1f / inertia.z : 0f);
 	}
 
 	public float getInvMass() {

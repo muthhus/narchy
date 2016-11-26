@@ -1100,8 +1100,8 @@ public interface TimeFunctions {
 
         //if (to != ETERNAL && bo != ETERNAL) {
 
-        float tw = t.confWeight();
-        float bw = b.confWeight();
+        float tw = t.evi();
+        float bw = b.evi();
         return Util.lerp(to, bo, (tw) / (bw + tw));
 //        } else {
 //            return bo != ETERNAL ? bo : to;

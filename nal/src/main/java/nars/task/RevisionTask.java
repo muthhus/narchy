@@ -111,8 +111,8 @@ public class RevisionTask extends AnswerTask  {
 
         float newBeliefContribution;
         if (parentNewBelief.isBeliefOrGoal()) {
-            float newBeliefConf = parentNewBelief.confWeight();
-            newBeliefContribution = newBeliefConf / (newBeliefConf + parentOldBelief.confWeight());
+            float newBeliefConf = parentNewBelief.evi();
+            newBeliefContribution = newBeliefConf / (newBeliefConf + parentOldBelief.evi());
         } else {
             //question/quest
             newBeliefContribution = 0.5f;

@@ -9,7 +9,7 @@ import spacegraph.Surface;
 import spacegraph.input.Finger;
 import spacegraph.obj.Cuboid;
 import spacegraph.obj.layout.Stacking;
-import spacegraph.obj.widget.console.VirtualConsole;
+import spacegraph.obj.widget.console.ConsoleTerminal;
 import spacegraph.render.Draw;
 import spacegraph.render.SpaceGraph2D;
 
@@ -124,7 +124,7 @@ public abstract class Widget extends Stacking {
             );
     }
 
-    private static class DummyConsole extends VirtualConsole implements Runnable {
+    private static class DummyConsole extends ConsoleTerminal implements Runnable {
 
         public DummyConsole() {
             super(40, 20);

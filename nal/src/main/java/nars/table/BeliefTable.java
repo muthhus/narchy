@@ -365,6 +365,19 @@ public interface BeliefTable extends TaskTable {
     /** empties the table, carefully allownig the NAR to also remove the tasks forgotten here */
     void clear(NAR nar);
 
+    default float eviSum(long now) {
+
+        final float[] eSum = {0};
+        forEach(t -> {
+            Truth tt = t.truth(now);
+            if (tt!=null) {
+                eSum[0] += tt.evi();
+            }
+        });
+
+        return eSum[0];
+    }
+
 //    /** 2-element array containing running min/max range accumulator */
 //    void range(long[] t);
 

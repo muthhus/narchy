@@ -73,7 +73,7 @@ abstract public class JoglPhysics<X> extends JoglSpace implements GLEventListene
     private boolean simulating = true;
     private float lastFrameTime;
 
-    private int maxSubsteps = 0; //set to zero for variable timing
+    private int maxSubsteps = 2; //set to zero for variable timing
     protected float aspect;
 
 

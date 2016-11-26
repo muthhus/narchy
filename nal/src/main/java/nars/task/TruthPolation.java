@@ -62,7 +62,7 @@ public enum TruthPolation  {
         }
 
         if (topEternal!=null) {
-            float ew = topEternal.confWeight();
+            float ew = topEternal.evi();
             illumination += ew;
             weightedValue += ew * topEternal.freq();
         }

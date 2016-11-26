@@ -15,6 +15,9 @@ abstract public class EDraw<X,Y extends SimpleSpatial<X>> {
     /** additional attraction force multiplier */
     public float attraction = 1f;
 
+    /** proportional to radius */
+    public float attractionDist = 1f;
+
     public EDraw(Y target) {
         this.target = target;
     }

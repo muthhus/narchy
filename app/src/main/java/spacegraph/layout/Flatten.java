@@ -16,6 +16,8 @@ public class Flatten<X> implements SpaceTransform<X>, Consumer<Spatial<X>> {
 
     private final Quat4f up;
     private final Quat4f tmp = new Quat4f();
+    private float zTolerance = 0.5f;
+    private float zSpeed = 0.25f;
 
     public Flatten() {
         up = Quat4f.angle(0,0,1,0);
@@ -33,17 +35,24 @@ public class Flatten<X> implements SpaceTransform<X>, Consumer<Spatial<X>> {
             SimpleSpatial s = (SimpleSpatial) ss;
             v3 f = v();
             locate(s, f);
-            s.move(f, 0.5f );
+            s.move(f, 0.25f );
+
+            Dynamic b = s.body;
+            if (b == null)
+                return;
+
+            float tz = b.transform().z;
+            if (Math.abs(tz) > zTolerance) {
+                b.impulse(v( 0, 0, -tz*zSpeed));
+
+            }
             s.rotate(up, 0.5f, tmp);
 
             //eliminate z-component of linear velocity
-            Dynamic b = s.body;
-            if (b !=null) {
-                b.linearVelocity.scale(
-                        1f, 1f, 0.9f
-                );
-                b.angularVelocity.scale(0.9f);
-            }
+            b.linearVelocity.scale(
+                    1f, 1f, 0.9f
+            );
+            b.angularVelocity.scale(0.9f);
         }
     }
 

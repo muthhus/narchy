@@ -56,8 +56,8 @@ public class AnswerTask extends MutableTask {
 
     @NotNull
     public AnswerTask budget(@NotNull Task a, @NotNull Task b) {
-        float acw = a.confWeight();
-        float aMix = acw / (acw + b.confWeight());
+        float acw = a.evi();
+        float aMix = acw / (acw + b.evi());
         budget(a, b, aMix);
         //if (isDeleted())
             //throw new RuntimeException("budget mix resulted in deletion");

@@ -1,6 +1,7 @@
 package spacegraph.layout;
 
 import nars.gui.ConceptWidget;
+import nars.util.Util;
 import spacegraph.SimpleSpatial;
 import spacegraph.Spatial;
 import spacegraph.math.v3;
@@ -21,11 +22,11 @@ public class ForceDirected implements spacegraph.phys.constraint.BroadConstraint
             1;
             //13;
 
-    public float repelSpeed = 2f;
-    public float attractSpeed = 3f;
+    public float repelSpeed = 1f;
+    public float attractSpeed = 0.5f;
 
-    private final float maxRepelDist = 2000f;
-    private final float attractDistRads = 2f;
+    final v3 boundsMin, boundsMax;
+    final float maxRepelDist;
 
 //        public static class Edge<X> extends MutablePair<X,X> {
 //            public final X a, b;
@@ -47,14 +48,24 @@ public class ForceDirected implements spacegraph.phys.constraint.BroadConstraint
 //            graph.getEdge(x, y);
 //        }
 
+    public ForceDirected() {
+        float r = 300;
+        boundsMin = v(-r, -r, -r);
+        boundsMax = v(+r, +r, +r);
+        maxRepelDist = r/2f;
+
+    }
+
     @Override
     public void solve(Broadphase b, List<Collidable> objects, float timeStep) {
+
+        objects.forEach(c -> ((Spatial)c.data()).moveWithin(boundsMin, boundsMax));
 
         //System.out.print("Force direct " + objects.size() + ": ");
         //final int[] count = {0};
         //count[0] += l.size();
 //System.out.print(l.size() + "  ");
-        b.forEach(objects.size() / clusters, objects, this::batch);
+        b.forEach((int) Math.ceil((float)objects.size() / clusters), objects, this::batch);
         //System.out.println(" total=" + count[0]);
 
         for (Collidable c : objects) {
@@ -67,15 +78,15 @@ public class ForceDirected implements spacegraph.phys.constraint.BroadConstraint
 
                         if ((B.body != null)) {
 
-                            float ew = e.width;
-                            float attractStrength = ew * e.attraction;
-                            attract(c, B.body, attractSpeed * attractStrength, attractDistRads);
+                            attract(c, B.body, attractSpeed * e.attraction, e.attractionDist);
                         }
 
                 });
             }
 
         }
+
+
 
     }
 
@@ -120,23 +131,15 @@ public class ForceDirected implements spacegraph.phys.constraint.BroadConstraint
         delta.sub(xp.transform(), yp.transform());
 
         float len = delta.normalize();
-        len = Math.max(0,len + (xp.radius + yp.radius));
+        //len -= Math.max(0, (xp.radius + yp.radius));
 
         if (len >= maxDist)
             return;
 
-        delta.scale(((speed * speed) / (1 + len * len)) / 2f);
-
-        //experimental
-//            if (len > maxDist) {
-//                delta.negate(); //attract
-//            }
-
+        delta.scale(((speed) / Util.sqr(1 + len )) / 2f);
         ((Dynamic) x).impulse(delta);
-        //xp.moveDelta(delta, 0.5f);
         delta.negate();
         ((Dynamic) y).impulse(delta);
-        //yp.moveDelta(delta, 0.5f);
 
     }
 

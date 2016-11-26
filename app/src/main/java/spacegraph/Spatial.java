@@ -129,4 +129,14 @@ public abstract class Spatial<X> implements Active {
     public void delete() {
 
     }
+
+    public void moveWithin(v3 boundsMin, v3 boundsMax) {
+        forEachBody(b -> {
+            v3 t = b.worldTransform;
+            t.min(boundsMin);
+            t.max(boundsMax);
+        });
+    }
+
+
 }

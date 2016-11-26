@@ -26,12 +26,12 @@ public class TaskBudgeting {
             //question or quest:
             derivationQuality = p.nar.qualityDefault(Symbols.QUESTION);
         } else {
-            float premiseEvidence = p.task.isBeliefOrGoal() ? p.task.confWeight() : 0;
+            float premiseEvidence = p.task.isBeliefOrGoal() ? p.task.evi() : 0;
             if (p.belief!=null)
-                premiseEvidence = Math.max(premiseEvidence, p.belief.confWeight());
+                premiseEvidence = Math.max(premiseEvidence, p.belief.evi());
             if (premiseEvidence <= 0)
                 throw new RuntimeException("invalid premise evidence");
-            float derivationEvi = truth.confWeight();
+            float derivationEvi = truth.evi();
             derivationQuality = derivationEvi / premiseEvidence;
         }
 
