@@ -196,7 +196,7 @@ public abstract class ConsoleSurface extends Surface implements Appendable {
 
                     setCursorVisible(true);
 
-                    gui.setBlockingIO(true);
+                    gui.setBlockingIO(false);
                     gui.setEOFWhenNoWindows(false);
 
 

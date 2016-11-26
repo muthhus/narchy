@@ -151,10 +151,11 @@ public abstract class JoglSpace implements GLEventListener, WindowListener {
 
 
     public final int getWidth() {
-        return window.getSurfaceWidth();
+        return window.getWidth(); //getSurfaceWidth();
+
     }
     public final int getHeight() {
-        return window.getSurfaceHeight();
+        return window.getHeight(); //getSurfaceHeight();
     }
 
 
