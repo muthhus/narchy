@@ -9,6 +9,7 @@ import nars.concept.Concept;
 import nars.link.BLink;
 import nars.term.Term;
 import nars.term.Termed;
+import nars.util.Util;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import spacegraph.SpaceGraph;
@@ -75,7 +76,7 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<BLink<? exte
 
 
         //int zOffset = -10;
-        final float initDistanceEpsilon = 500f;
+        final float initDistanceEpsilon = 200f;
         final float initImpulseEpsilon = 0.5f;
 
         //place in a random direction
@@ -282,25 +283,26 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<BLink<? exte
                 if (qEst!=qEst)
                     qEst = 0f;
 
-                this.r = 0;
+
 
                 if (priSum > 0) {
-                    this.g = (tasklinkPri / priSum);
-                    this.b = (termlinkPri / priSum);
+                    this.r = 0.25f;
+                    this.g = 0.25f + 0.75f * (tasklinkPri / priSum);
+                    this.b = 0.25f + 0.75f * (termlinkPri / priSum);
                 } else {
-                    this.g = this.b = 0.5f;
+                    this.r = this.g = this.b = 0.5f;
                 }
 
                 //this.a = 0.1f + 0.5f * pri;
-                this.a = 0.1f * 0.9f * priAvg;
+                this.a = 0.5f * 0.5f * Math.max(tasklinkPri,termlinkPri);
                 //0.9f;
 
-                this.attraction = priSum * 0.25f + 0.25f;
-                this.attractionDist = 1f + 1f * (1f - (qEst*qEst));
+                this.attraction = qEst * 0.5f + 0.5f;
+                this.attractionDist = 1f + 2 * ( (1f - (qEst)));
             } else {
                 this.a = 0;
                 this.attraction = 0;
-                this.attractionDist = Float.POSITIVE_INFINITY;
+                this.attractionDist = 10000;
             }
         }
     }
@@ -325,12 +327,12 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<BLink<? exte
             conceptWidget.scale(nodeScale, nodeScale, nodeScale);
 
 
-            Draw.hsb((tt.op().ordinal() / 16f), 0.75f + 0.25f * p, 0.5f, 0.9f, conceptWidget.shapeColor);
+            Draw.hsb((tt.op().ordinal() / 16f), 0.75f + 0.25f * p, 0.75f, 0.9f, conceptWidget.shapeColor);
         }
     }
     public static class ConceptVis2 implements ConceptVis {
 
-        final float minSize = 0.1f;
+        final float minSize = 2f;
         final float maxSize = 16f;
 
         public void apply(ConceptWidget conceptWidget, Term tt) {
@@ -342,18 +344,21 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<BLink<? exte
             long now = space.now();
             float b = conceptWidget.concept.beliefs().eviSum(now);
             float g = conceptWidget.concept.goals().eviSum(now);
-            float ec = w2c((b + g)/2f);
+            float q = conceptWidget.concept.questions().priSum();
+            float ec = p + 0.5f * w2c((b + g + q)/2f);
 
             float nodeScale = minSize + ec * maxSize;
             //nodeScale /= Math.sqrt(tt.volume());
             conceptWidget.scale(nodeScale, nodeScale, nodeScale);
 
-            //conceptWidget.body.setMass(1f + ec*0.5f);
+            float density = 0.5f;
+            if (conceptWidget.body!=null)
+                conceptWidget.body.setMass(nodeScale*nodeScale*nodeScale*density);
 
             Draw.hsb(
                     (tt.op().ordinal() / 16f),
-                    0.25f + 0.75f * ec,
-                    0.15f + 0.85f * p,
+                    0.5f,
+                    0.3f + 0.7f * p,
                     0.9f, conceptWidget.shapeColor);
         }
     }

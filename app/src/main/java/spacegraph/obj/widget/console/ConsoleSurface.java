@@ -71,8 +71,8 @@ public abstract class ConsoleSurface extends Surface implements Appendable {
 
 
         //background extents
-        gl.glColor3f(0.25f, 0.25f, 0.25f);
-        Draw.rect(gl, 0, 0, cols, rows);
+        //gl.glColor3f(0.25f, 0.25f, 0.25f);
+        //Draw.rect(gl, 0, 0, cols, rows);
 
 
         gl.glLineWidth(3f);

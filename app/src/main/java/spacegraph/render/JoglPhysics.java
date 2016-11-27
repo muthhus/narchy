@@ -25,6 +25,7 @@ package spacegraph.render;
 
 import com.jogamp.newt.event.KeyEvent;
 import com.jogamp.newt.event.KeyListener;
+import com.jogamp.newt.event.WindowEvent;
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GLAutoDrawable;
 import com.jogamp.opengl.GLEventListener;
@@ -382,6 +383,9 @@ abstract public class JoglPhysics<X> extends JoglSpace implements GLEventListene
 //        stack.matrices.push();
 //        stack.quats.push();
 
+        if(gl == null)
+            return;
+
         gl.glMatrixMode(gl.GL_PROJECTION);
         gl.glLoadIdentity();
 
@@ -674,10 +678,12 @@ abstract public class JoglPhysics<X> extends JoglSpace implements GLEventListene
 //        }
 //    }
 
+
+
     public v3 rayTo(int px, int py) {
         float x = (2.0f * px) / getWidth() - 1.0f;
         float y = 1.0f - (2.0f * py) / getHeight();
-        float z = 1.0f;
+        float z = 0.0f;
         v3 ray_nds = v(x, y, z);
         Vector4f ray_eye = new Vector4f( x, y, -1.0f, 1.0f );
 
@@ -698,23 +704,23 @@ abstract public class JoglPhysics<X> extends JoglSpace implements GLEventListene
         //return rayTo(-1f + 2 * x / ((float) getWidth()), -1f + 2 * y / ((float) getHeight()));
     }
 
-    public v3 rayTo(float x, float y) {
-        return rayTo(x, y, zFar);
-    }
-
-    public v3 rayTo(float x, float y, float depth) {
-
-        v3 hor = v().cross(camFwd, camUp);
-        v3 ver = v().cross(hor, camFwd);
-
-        v3 center = v(camPos);
-        center.addScaled(camFwd, depth);
-
-        return (v3)
-                v(center)
-                        .addScaled(hor, depth * tanFovV * aspect * x)
-                        .addScaled(ver, depth * tanFovV * -y);
-    }
+//    public v3 rayTo(float x, float y) {
+//        return rayTo(x, y, zFar);
+//    }
+//
+//    public v3 rayTo(float x, float y, float depth) {
+//
+//        v3 hor = v().cross(camFwd, camUp);
+//        v3 ver = v().cross(hor, camFwd);
+//
+//        v3 center = v(camPos);
+//        center.addScaled(camFwd, depth);
+//
+//        return (v3)
+//                v(center)
+//                        .addScaled(hor, depth * tanFovV * aspect * x)
+//                        .addScaled(ver, depth * tanFovV * -y);
+//    }
 
     /**
      * Bullet's global variables and constants.
@@ -786,7 +792,7 @@ abstract public class JoglPhysics<X> extends JoglSpace implements GLEventListene
     }
 
 
-//    public void clientResetScene() {
+    //    public void clientResetScene() {
 //        //#ifdef SHOW_NUM_DEEP_PENETRATIONS
 ////		BulletGlobals.gNumDeepPenetrationChecks = 0;
 ////		BulletGlobals.gNumGjkChecks = 0;

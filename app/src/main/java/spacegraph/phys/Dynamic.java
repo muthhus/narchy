@@ -346,6 +346,10 @@ public class Dynamic<X> extends Collidable<X> {
 		}
 	}
 
+	public float mass() {
+		return 1f/inverseMass;
+	}
+
 	public float getInvMass() {
 		return inverseMass;
 	}
@@ -638,6 +642,14 @@ public class Dynamic<X> extends Collidable<X> {
 	public TypedConstraint getConstraintRef(int index) {
 		return constraintRefs.get(index);
 		//return array[index];
+	}
+
+	public void velAdd(v3 delta) {
+		linearVelocity.add(delta);
+	}
+
+	public void force(v3 delta) {
+		applyCentralForce(delta);
 	}
 //
 //	public int getNumConstraintRefs() {

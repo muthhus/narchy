@@ -200,7 +200,9 @@ public class SimpleSpatial<X> extends AbstractSpatial<X> {
     }
 
     public float mass() {
-        return 1f;
+        if (body == null)
+            return 1f;
+        return body.mass();
     }
 
 
@@ -245,6 +247,7 @@ public class SimpleSpatial<X> extends AbstractSpatial<X> {
         if (body == null) {
             this.body = create(world);
         }
+        reactivate(); //necessary?
     }
 
 

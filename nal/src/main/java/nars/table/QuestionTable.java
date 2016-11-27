@@ -78,4 +78,11 @@ public interface QuestionTable extends TaskTable {
 
         }
     };
+
+    default float priSum() {
+        final float[] p = {0};
+        forEach(t -> p[0] +=t.pri());
+        return p[0];
+    }
+
 }

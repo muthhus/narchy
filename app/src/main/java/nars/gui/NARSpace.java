@@ -103,7 +103,7 @@ public abstract class NARSpace<X extends Term, Y extends Spatial<X>> extends Lis
 
     public static void main(String[] args) {
 
-        Default n = new Default(1024, 1, 1, 3);
+        Default n = new Default(512, 4, 1, 3);
         //Default2 n = new Default2();
         //n.nal(4);
 
@@ -112,7 +112,7 @@ public abstract class NARSpace<X extends Term, Y extends Spatial<X>> extends Lis
 
         //new ArithmeticInduction(n);
 
-        Vis.conceptsWindow2D(n, 32, 12).show(800, 600);
+        Vis.conceptsWindow2D(n, 64, 12).show(800, 600);
 
         //n.run(20); //headstart
 
@@ -120,7 +120,7 @@ public abstract class NARSpace<X extends Term, Y extends Spatial<X>> extends Lis
 
         //n.log();
         //n.input("(a-->b).", "(b-->c).","(c-->d).", "(d-->e).");
-        new DeductiveMeshTest(n, new int[]{4, 4}, 16384);
+        new DeductiveMeshTest(n, new int[]{2, 2}, 16384);
 
         //new DeductiveChainTest(n, 10, 9999991, (x, y) -> $.p($.the(x), $.the(y)));
 

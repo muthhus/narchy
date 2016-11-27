@@ -286,34 +286,6 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
     }
 
 
-//    @Override
-//    public final void put(@NotNull V key, @NotNull Budgeted b, float scale, @Nullable MutableFloat overflow) {
-//
-//        float bp = b.pri();
-//        if (bp != bp) { //deleted
-//            putFail(key);
-//            return;
-//        }
-//
-//        float p = bp * scale;
-//
-//        BLink<V> existing = get(key);
-//        if (existing != null) {
-//            putExists(b, scale, existing, overflow);
-//        } else {
-//            //synchronized (map) {
-//
-//                if (minPriIfFull > p) {
-//                    putFail(key);
-//                    pending += p; //include failed input in pending
-//                } else {
-//                    putNewAndDeleteDisplaced(key, newLink(key, p, b.qua(), b.dur()));
-//                }
-//            //}
-//        }
-//
-//
-//    }
 
     @Override
     public final BLink<V> put(@NotNull V key, @NotNull Budgeted b, float scale, @Nullable MutableFloat overflow) {
@@ -424,6 +396,8 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
 
             case -1:
                 //reject due to insufficient budget
+                if (overflow!=null)
+                    overflow.add(bp);
                 break;
         }
 

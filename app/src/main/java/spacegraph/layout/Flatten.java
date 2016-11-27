@@ -14,13 +14,15 @@ import static spacegraph.math.v3.v;
  */
 public class Flatten<X> implements SpaceTransform<X>, Consumer<Spatial<X>> {
 
-    private final Quat4f up;
+    private final Quat4f up = Quat4f.angle(0,0,1,0);
     private final Quat4f tmp = new Quat4f();
-    private float zTolerance = 0.5f;
-    private float zSpeed = 0.25f;
+
+    private float zTolerance = 2f;
+
+    private float zSpeed = 1f;
+    float rotateRate = 0.25f;
 
     public Flatten() {
-        up = Quat4f.angle(0,0,1,0);
     }
 
     @Override
@@ -33,9 +35,9 @@ public class Flatten<X> implements SpaceTransform<X>, Consumer<Spatial<X>> {
 
         if (ss instanceof SimpleSpatial) {
             SimpleSpatial s = (SimpleSpatial) ss;
-            v3 f = v();
-            locate(s, f);
-            s.move(f, 0.25f );
+            //v3 f = v();
+            //locate(s, f);
+            //s.move(f, rate);
 
             Dynamic b = s.body;
             if (b == null)
@@ -43,15 +45,15 @@ public class Flatten<X> implements SpaceTransform<X>, Consumer<Spatial<X>> {
 
             float tz = b.transform().z;
             if (Math.abs(tz) > zTolerance) {
-                b.impulse(v( 0, 0, -tz*zSpeed));
-
+                b.force(v( 0, 0, -tz*zSpeed*b.mass()));
             }
-            s.rotate(up, 0.5f, tmp);
+            s.rotate(up, rotateRate, tmp);
 
-            //eliminate z-component of linear velocity
-            b.linearVelocity.scale(
-                    1f, 1f, 0.9f
-            );
+
+            //dampening: keep upright and eliminate z-component of linear velocity
+//            b.linearVelocity.scale(
+//                    1f, 1f, 0.9f
+//            );
             b.angularVelocity.scale(0.9f);
         }
     }
