@@ -671,7 +671,6 @@ public abstract class NAR extends Param implements Level, Consumer<Task>, NARIn,
             return null;
         }
 
-        input.budget().priMult(activationGlobal.floatValue());
         emotion.busy(input.pri());
 
         Task existing = tasks.addIfAbsent(input);

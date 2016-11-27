@@ -6,6 +6,7 @@ import com.jogamp.newt.event.MouseEvent;
 import spacegraph.SimpleSpatial;
 import spacegraph.Spatial;
 import spacegraph.math.Matrix4f;
+import spacegraph.math.SingularMatrixException;
 import spacegraph.math.Vector4f;
 import spacegraph.math.v3;
 import spacegraph.phys.Collidable;
@@ -351,13 +352,20 @@ public class OrbMouse extends SpaceMouse implements KeyListener {
     }
 
     private ClosestRay mousePick(int px, int py) {
-        float x = (2.0f * px) / space.getWidth() - 1.0f;
-        float y = 1.0f - (2.0f * py) / space.getHeight();
+        int ww = space.getWidth();
+        int hh = space.getHeight();
+        if (ww == 0 || hh == 0)
+            return null;
+
+        float x = (2.0f * px) / ww - 1.0f;
+        float y = 1.0f - (2.0f * py) / hh;
         float z = 1.0f;
         Vector4f ray_eye = new Vector4f( x*2f, y*2f, -1.0f, 1.0f );
 
         //https://capnramses.github.io/opengl/raycasting.html
+
         Matrix4f viewMatrixInv = new Matrix4f(space.mat4f);
+
         viewMatrixInv.invert();
         viewMatrixInv.transform(ray_eye);
         ray_eye.setZ(-1f);

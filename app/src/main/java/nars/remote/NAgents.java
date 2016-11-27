@@ -297,7 +297,7 @@ abstract public class NAgents extends NAgent {
         a.nar.runLater(()-> {
 
             //Vis.conceptsWindow2D(a.nar, Iterables.concat(a.predictors, a.actions, a.sensors) /* a.nar */,64 ,8).show(1000, 800);
-            Vis.conceptsWindow2D(a.nar, 64 ,8).show(1000, 800);
+            //Vis.conceptsWindow2D(a.nar, 16 ,4).show(1000, 800);
 
             window(
                     grid(
@@ -325,7 +325,7 @@ abstract public class NAgents extends NAgent {
 
         a.nar.runLater(()-> {
 
-            Vis.conceptsWindow2D(a.nar, 192, 12).show(1000, 800);
+            Vis.conceptsWindow2D(a.nar, 16, 4).show(1000, 800);
 
             window(
                     grid(

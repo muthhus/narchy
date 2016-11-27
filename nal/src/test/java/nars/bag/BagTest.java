@@ -78,6 +78,7 @@ public class BagTest {
     @Test
     public void testBudgetMerge() {
         ArrayBag<String> a = new ArrayBag(4, plusBlend, new HashMap<>(4));
+        assertEquals(0, a.size());
 
         a.put("x", new RawBudget(0.1f, 0.5f));
         a.put("x", new RawBudget(0.1f, 0.5f));
@@ -174,6 +175,7 @@ public class BagTest {
     void testScalePut(Bag<String> a) {
         a.put("x", new RawBudget(0.1f, 0.5f));
         a.put("x", new RawBudget(0.1f, 0.5f), 0.5f, null);
+        assertNotNull(a.get("x"));
         a.commit();
 
         assertEquals(0.15, a.get("x").pri(), 0.001f);

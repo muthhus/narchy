@@ -249,7 +249,7 @@ public class Line1DContinuous extends NAgent {
     public static void main(String[] args) {
 
         XorShift128PlusRandom rng = new XorShift128PlusRandom((int)(Math.random()*1000));
-        int conceptsPerCycle = 1;
+        int conceptsPerCycle = 16;
 
         final Executioner exe =
                 //new MultiThreadExecutioner(2, 2048);

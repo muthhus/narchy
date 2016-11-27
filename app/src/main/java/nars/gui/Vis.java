@@ -9,6 +9,7 @@ import nars.bag.Bag;
 import nars.concept.Concept;
 import nars.link.BLink;
 import nars.nar.Default;
+import nars.remote.NAgents;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.atom.Atomic;
@@ -382,6 +383,7 @@ public class Vis {
                 .hide();
 
 
+        ForceDirected fd;
         SpaceGraph<Term> s = new SpaceGraph2D<>()
 //                .add(
 //                        new Ortho(
@@ -404,9 +406,11 @@ public class Vis {
                         new Flatten()
                         //new Spiral()
                         //new FastOrganicLayout()
-                )).with(new ForceDirected());
+                )).with(fd = new ForceDirected());
 
             s.add(new Ortho(new CrosshairSurface(s)));
+
+            SpaceGraph.window(new NAgents.ReflectionSurface(fd), 500, 500);
 
             return s;
     }

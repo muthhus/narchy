@@ -408,7 +408,7 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept, Ter
 
         Activation a;
         if (accepted) {
-            a = new Activation(input, this, nar, 1f);
+            a = new Activation(input, this, nar, nar.activationGlobal.floatValue());
 
             if (delta != null) {
                 //beliefs/goals

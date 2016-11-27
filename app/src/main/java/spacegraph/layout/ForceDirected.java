@@ -2,6 +2,7 @@ package spacegraph.layout;
 
 import nars.gui.ConceptWidget;
 import nars.util.Util;
+import nars.util.data.FloatParam;
 import spacegraph.SimpleSpatial;
 import spacegraph.Spatial;
 import spacegraph.math.v3;
@@ -22,8 +23,9 @@ public class ForceDirected implements spacegraph.phys.constraint.BroadConstraint
             1;
             //13;
 
-    public float repel = 20f;
-    public float attraction = 30f;
+
+    public final FloatParam repel = new FloatParam(20f, 0, 100);
+    public final FloatParam attraction = new FloatParam(30f, 0, 100);
 
     final v3 boundsMin, boundsMax;
     final float maxRepelDist;
@@ -67,6 +69,7 @@ public class ForceDirected implements spacegraph.phys.constraint.BroadConstraint
 //System.out.print(l.size() + "  ");
         b.forEach((int) Math.ceil((float)objects.size() / clusters), objects, this::batch);
         //System.out.println(" total=" + count[0]);
+        float a = attraction.floatValue();
 
         for (Collidable c : objects) {
 
@@ -78,7 +81,7 @@ public class ForceDirected implements spacegraph.phys.constraint.BroadConstraint
 
                         if ((B.body != null)) {
 
-                            attract(c, B.body, attraction * e.attraction, e.attractionDist);
+                            attract(c, B.body, a * e.attraction, e.attractionDist);
                         }
 
                 });
@@ -94,7 +97,7 @@ public class ForceDirected implements spacegraph.phys.constraint.BroadConstraint
         for (int i = 0, lSize = l.size(); i < lSize; i++) {
             Collidable x = l.get(i);
             for (int j = i + 1; j < lSize; j++) {
-                repel(x, l.get(j), repel, maxRepelDist);
+                repel(x, l.get(j), repel.floatValue(), maxRepelDist);
             }
         }
     }
