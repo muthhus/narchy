@@ -21,7 +21,7 @@ public class TopCraft extends NAgents {
     private PixelAutoClassifier camAE = null;
 
     public static void main(String[] args) {
-        runRT(TopCraft::new);
+        runRT(TopCraft::new, 20, 5);
     }
 
     public TopCraft(NAR nar) {
