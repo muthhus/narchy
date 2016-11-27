@@ -642,15 +642,19 @@ public abstract class Tuple3f implements java.io.Serializable, Cloneable {
         }
     }
 
-    public void min(Tuple3f b) {
-        if (x < b.x) x = b.x;
-        if (y < b.y) y = b.y;
-        if (z < b.z) z = b.z;
+    public boolean min(Tuple3f b) {
+        boolean bb = false;
+        if (x < b.x) { x = b.x; bb = true; }
+        if (y < b.y) { y = b.y; bb = true; }
+        if (z < b.z) { z = b.z; bb = true; }
+        return bb;
     }
-    public void max(Tuple3f b) {
-        if (x > b.x) x = b.x;
-        if (y > b.y) y = b.y;
-        if (z > b.z) z = b.z;
+    public boolean max(Tuple3f b) {
+        boolean bb = false;
+        if (x > b.x) { x = b.x; bb = true; }
+        if (y > b.y) { y = b.y; bb = true; }
+        if (z > b.z) { z = b.z; bb = true; }
+        return bb;
     }
 
 

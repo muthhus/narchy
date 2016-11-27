@@ -6,6 +6,7 @@ import nars.Task;
 import nars.task.util.SoftException;
 import nars.util.Texts;
 import nars.util.Util;
+import org.apache.commons.lang3.mutable.MutableFloat;
 import org.fusesource.jansi.Ansi;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -105,7 +106,7 @@ public interface Budget extends Budgeted {
     }
 
     default void priAdd(float toAdd) {
-        setPriority(pri() + toAdd);
+        setPriority(priIfFiniteElseZero() + toAdd);
     }
     default void priSub(float toSubtract) {
         priAdd(-toSubtract);
@@ -118,6 +119,15 @@ public interface Budget extends Budgeted {
         return x;
     }
 
+    default void absorb(@Nullable MutableFloat overflow) {
+        if (overflow!=null) {
+            float taken = Math.min(overflow.floatValue(), 1f - priIfFiniteElseZero());
+            if (taken > Param.BUDGET_EPSILON) {
+                overflow.subtract(taken);
+                priAdd(taken);
+            }
+        }
+    }
 
 
     final static class BudgetException extends SoftException {

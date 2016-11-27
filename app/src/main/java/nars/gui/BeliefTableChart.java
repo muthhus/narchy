@@ -237,7 +237,7 @@ public class BeliefTableChart extends Widget {
         float cp;
         String currentTermString = termString;
         if (cc != null) {
-            cp = nar.activation(cc);
+            cp = nar.priority(cc);
             draw(term, cc, gl, minT, maxT);
             termString = cc.toString();
         } else {

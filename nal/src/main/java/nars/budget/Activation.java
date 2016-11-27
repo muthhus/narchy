@@ -139,25 +139,25 @@ public class Activation {
 
         if (!targetTerm.equals(sourceTerm)) {
 
-            Budget a;
-            if (linkOverflow.floatValue() > Param.BUDGET_EPSILON) {
-                a = new RawBudget(in.budget());
-                float remainingPri = 1f - a.pri();
-                float taken = Math.min(linkOverflow.floatValue(), remainingPri);
-                linkOverflow.subtract(taken);
-                a.priAdd(taken);
-            } else {
-                a = in.budget(); //unaffected
-            }
+//            Budget a;
+//            if (linkOverflow.floatValue() > Param.BUDGET_EPSILON) {
+//                a = new RawBudget(in.budget());
+//                float remainingPri = 1f - a.pri();
+//                float taken = Math.min(linkOverflow.floatValue(), remainingPri);
+//                linkOverflow.subtract(taken);
+//                a.priAdd(taken);
+//            } else {
+//                a = in.budget(); //unaffected
+//            }
 
             /* insert termlink target to source */
             //boolean alsoReverse = true;
             if (targetConcept != null /*&& alsoReverse*/) {
-                targetConcept.termlinks().put(sourceTerm, a, scale, linkOverflow);
+                targetConcept.termlinks().put(sourceTerm, in, scale, linkOverflow);
             }
 
             /* insert termlink source to target */
-            src.termlinks().put(targetTerm, a, scale, linkOverflow);
+            src.termlinks().put(targetTerm, in, scale, linkOverflow);
 
         }
 

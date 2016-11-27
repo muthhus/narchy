@@ -570,7 +570,7 @@ public enum Draw {
         ww.set(0, 0, 1);
         tmpQ.rotateVector(ww, ww);
 
-        //ww.normalize();
+        ww.normalize();
 
         Transform tt = tgt.transform();
 

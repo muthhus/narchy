@@ -246,7 +246,7 @@ public class Alann extends NAR {
     }
 
     @Override
-    public final float activation(@NotNull Termed concept) {
+    public final float priority(@NotNull Termed concept) {
         //TODO impl
         return 0;
     }

@@ -130,10 +130,10 @@ abstract public class ArrayListTable<K, V> extends CollectorMap<K, V> implements
     @Override
     public final boolean setCapacity(int newCapacity) {
         if (newCapacity != this.capacity) {
-            this.capacity = newCapacity;
-            //synchronized (_items()) {
+            synchronized (_items()) {
+                this.capacity = newCapacity;
                 commit();
-            //}
+            }
             return true;
         }
         return false;

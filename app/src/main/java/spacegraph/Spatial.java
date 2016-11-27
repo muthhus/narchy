@@ -4,6 +4,7 @@ import com.jogamp.opengl.GL2;
 import org.jetbrains.annotations.Nullable;
 import spacegraph.math.v3;
 import spacegraph.phys.Collidable;
+import spacegraph.phys.Dynamic;
 import spacegraph.phys.Dynamics;
 import spacegraph.phys.collision.ClosestRay;
 import spacegraph.phys.constraint.TypedConstraint;
@@ -133,10 +134,15 @@ public abstract class Spatial<X> implements Active {
     public void moveWithin(v3 boundsMin, v3 boundsMax) {
         forEachBody(b -> {
             v3 t = b.worldTransform;
-            t.min(boundsMin);
-            t.max(boundsMax);
+            if (t.min(boundsMin) || t.max(boundsMax)) {
+                ((Dynamic)b).linearVelocity.zero();
+            }
         });
     }
 
+
+    public float radius() {
+        return 0;
+    }
 
 }

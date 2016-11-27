@@ -132,7 +132,7 @@ public class SpaceGraph2D<X> extends SpaceGraph<X> {
             @Override
             public void mouseWheelMoved(MouseEvent e) {
                 float[] rotation = e.getRotation();
-                System.out.println(Arrays.toString(rotation));
+                //System.out.println(Arrays.toString(rotation));
                 camera(camPos, Util.clamp(0.5f*camWidth *  (1f + -0.45f * rotation[1]), minWidth, maxWidth));
             }
 
@@ -153,7 +153,7 @@ public class SpaceGraph2D<X> extends SpaceGraph<X> {
                     gl.glLineWidth(10);
                     gl.glColor4f(0f, 0.25f, 1f, 0.5f);
                     Draw.line(gl, pickRay.rayFromWorld, pickRay.rayToWorld);
-                    System.out.println(pickRay.rayFromWorld + " " + pickRay.rayToWorld);
+                    //System.out.println(pickRay.rayFromWorld + " " + pickRay.rayToWorld);
                 }
                 if(orb.pickedSpatial!=null) {
                     gl.glLineWidth(20);

@@ -200,7 +200,7 @@ public class SensorConcept extends WiredConcept implements FloatFunction<Term>, 
     /** adaptively sets the priority of a group of sensors via a function  */
     public static void activeAttention(@NotNull Iterable<? extends Prioritizable> c, @NotNull FloatToFloatFunction f, @NotNull NAR nar) {
         c.forEach( s -> s.pri(() -> {
-            return f.valueOf(nar.activation((Termed)s));
+            return f.valueOf(nar.priority((Termed)s));
         } ) );
     }
 

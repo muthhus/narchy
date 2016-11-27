@@ -15,11 +15,9 @@ import nars.term.atom.Atomic;
 import nars.truth.Truth;
 import nars.util.Iterative;
 import org.eclipse.collections.api.block.function.primitive.FloatFunction;
+import org.eclipse.collections.impl.map.mutable.primitive.ObjectFloatHashMap;
 import org.jetbrains.annotations.Nullable;
-import spacegraph.Ortho;
-import spacegraph.SimpleSpatial;
-import spacegraph.SpaceGraph;
-import spacegraph.Surface;
+import spacegraph.*;
 import spacegraph.layout.Flatten;
 import spacegraph.layout.ForceDirected;
 import spacegraph.math.Color3f;
@@ -33,7 +31,10 @@ import spacegraph.obj.widget.console.ConsoleTerminal;
 import spacegraph.render.Draw;
 import spacegraph.render.SpaceGraph2D;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.StreamSupport;
 
 import static java.util.stream.Collectors.toList;
 import static spacegraph.obj.layout.Grid.*;
@@ -236,7 +237,7 @@ public class Vis {
         for (Termed t : concepts) {
             Plot2D p = new Plot2D(plotHistory, Plot2D.Line /*BarWave*/);
             p.setTitle(t.toString());
-            p.add("P", () -> nar.activation(t), 0f, 1f);
+            p.add("P", () -> nar.priority(t), 0f, 1f);
             p.add("B", () -> nar.concept(t).beliefFreq(nar.time()), 0f, 1f);
             p.add("G", () -> nar.concept(t).goalFreq(nar.time()), 0f, 1f);
             grid.children.add(p);
@@ -345,34 +346,65 @@ public class Vis {
     }
 
     public static SpaceGraph<Term> conceptsWindow2D(NAR nar, int maxNodes, int maxEdges) {
+        return conceptsWindow(new ConceptsSpace(nar, maxNodes, maxEdges));
+    }
+    public static SpaceGraph<Term> conceptsWindow2D(NAR nar, Iterable<? extends Termed> terms, int max, int maxEdges) {
+        List<ConceptWidget> termWidgets = StreamSupport.stream(terms.spliterator(), false).map(x -> new ConceptWidget(nar, x.term(), maxEdges)).collect(toList());
+
+        NARSpace active = new NARSpace(nar) {
+
+            final ObjectFloatHashMap<Term> priCache = new ObjectFloatHashMap<>();
+            final FloatFunction<Term> termFloatFunction = k -> nar.priority(k);
+
+            @Override protected void get(Collection displayNext) {
+                Collections.sort(termWidgets, (a, b) -> {
+                    return Float.compare(
+                            priCache.getIfAbsentPutWithKey(b.key, termFloatFunction),
+                            priCache.getIfAbsentPutWithKey(a.key, termFloatFunction)
+                    );
+                });
+                priCache.clear();
+
+                for (int i = 0; i < max; i++) {
+                    ConceptWidget w = termWidgets.get(i);
+                    displayNext.add(w);
+                }
+            }
+        };
+
+        return conceptsWindow(
+                active
+        );
+    }
+
+    public static SpaceGraph<Term> conceptsWindow(AbstractSpace nn) {
         Surface controls = col(new PushButton("x"), row(new FloatSlider("z", 0, 0, 4 )), new CheckBox("?"))
                 .hide();
 
 
         SpaceGraph<Term> s = new SpaceGraph2D<>()
-                .add(
-                        new Ortho(
-//                                new FloatSlider("~", 0, 0, 1f).on((slider, v) -> {
+//                .add(
+//                        new Ortho(
+////                                new FloatSlider("~", 0, 0, 1f).on((slider, v) -> {
+////
+////                                }).scale(100, 100).pos(0f, 0f)
 //
-//                                }).scale(100, 100).pos(0f, 0f)
-
-                                new ConsoleTerminal(new ConsoleSurface.EditTerminal(40,20))
-
-//                                new CheckBox("").on((cb, v) -> {
-//                                    if (!v)
-//                                        controls.hide();
-//                                    else
-//                                        controls.scale(200,200f).pos(300f,300f);
-//                                }).scale(100, 100).pos(0f, 0f)
-
-                        ).scale(500,500))
+//                                new ConsoleTerminal(new ConsoleSurface.EditTerminal(40,20))
+//
+////                                new CheckBox("").on((cb, v) -> {
+////                                    if (!v)
+////                                        controls.hide();
+////                                    else
+////                                        controls.scale(200,200f).pos(300f,300f);
+////                                }).scale(100, 100).pos(0f, 0f)
+//
+//                        ).scale(500,500))
                 .add(new Ortho(controls))
-                .add(new ConceptsSpace(nar, maxNodes, maxEdges).with(
+                .add(nn.with(
                         new Flatten()
                         //new Spiral()
                         //new FastOrganicLayout()
-                        )
-                ).with(new ForceDirected());
+                )).with(new ForceDirected());
 
             s.add(new Ortho(new CrosshairSurface(s)));
 

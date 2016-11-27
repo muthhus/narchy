@@ -22,8 +22,8 @@ public class ForceDirected implements spacegraph.phys.constraint.BroadConstraint
             1;
             //13;
 
-    public float repel = 5f;
-    public float attraction = 1f;
+    public float repel = 20f;
+    public float attraction = 30f;
 
     final v3 boundsMin, boundsMax;
     final float maxRepelDist;
@@ -108,12 +108,12 @@ public class ForceDirected implements spacegraph.phys.constraint.BroadConstraint
 
 
         float len = delta.normalize();
-        len -= idealDistRads * (xp.radius + yp.radius);
+        len -= idealDistRads * (xp.radius() + yp.radius());
         if (len <= 0)
             return;
 
-        float dd = 0; //no attenuation over distance
-        delta.scale((-(speed * (xp.mass() + yp.mass()) ) / (1f + dd)) / 2f);
+
+        delta.scale((-(speed * (xp.mass() + yp.mass()) ) / (1f + len)) / 2f);
 
         ((Dynamic) x).force(delta);
         delta.negate();
@@ -130,7 +130,7 @@ public class ForceDirected implements spacegraph.phys.constraint.BroadConstraint
 
         float len = delta.normalize();
 
-        len -= (xp.radius + yp.radius);
+        len -= (xp.radius() + yp.radius());
 
         if (len >= maxDist)
             return;

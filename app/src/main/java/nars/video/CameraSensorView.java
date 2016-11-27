@@ -63,7 +63,7 @@ public class CameraSensorView extends MatrixView implements MatrixView.ViewFunct
             dr = dg = 0;
         }
 
-        float p = nar.activation(s);
+        float p = nar.priority(s);
 
         //p /= maxConceptPriority;
 

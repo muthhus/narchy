@@ -46,8 +46,8 @@ public final class Forget implements Consumer<BLink> {
         float p = bLink.pri();
         if ((p == p) && p > 0) {
             float q = bLink.qua();
-            //bLink.setPriority(p * (1f - (r * (1f - q * maxEffectiveQuality))));
-            bLink.setPriority(p - (r * (1f - q * maxEffectiveQuality)));
+            bLink.setPriority(p * (1f - (r * (1f - q * maxEffectiveQuality))));
+            //bLink.setPriority(p - (r * (1f - q * maxEffectiveQuality)));
 
         }
     }

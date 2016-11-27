@@ -37,10 +37,6 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
      */
     private volatile float pressure = 0;
 
-    /**
-     * mass as calculated in previous commit
-     */
-    private volatile float mass = 0;
     private static final Logger logger = LoggerFactory.getLogger(ArrayBag.class);
 
     public ArrayBag(@Deprecated int cap, BudgetMerge mergeFunction, @NotNull Map<V, BLink<V>> map) {
@@ -69,15 +65,17 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
         //List<BLink<V>> pendingRemoval;
         synchronized (items) {
             int additional = (toAdd != null) ? 1 : 0;
-
-            int s = size();
             int c = capacity();
 
-            if (s + additional > c) {
-                List<BLink<V>> pendingRemoval = $.newArrayList((s + additional) - c);
-                s = clean(toAdd, s, additional, pendingRemoval);
-                if (s + additional > c)
-                    return false; //throw new RuntimeException("overflow");
+            {
+                int s = size();
+
+                if (s + additional > c) {
+                    List<BLink<V>> pendingRemoval = $.newArrayList((s + additional) - c);
+                    s = clean(toAdd, s, additional, pendingRemoval);
+                    if (s + additional > c)
+                        return false; //throw new RuntimeException("overflow");
+                }
             }
 
             if (toAdd != null) {
@@ -97,7 +95,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
 //                }
 
                 int ss = size();
-                if (ss < capacity) {
+                if (ss < c) {
                     items.add(toAdd, this);
                     //items.addInternal(toAdd); //grows the list if necessary
                 } else {
@@ -107,7 +105,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
                 }
 
                 float p = toAdd.pri();
-                if (minPri < p) {
+                if (minPri > 0 && minPri < p) {
                     this.minPri = p;
                 }
 
@@ -172,9 +170,10 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
 
     private int removeWeakestUntilUnderCapacity(int s, @NotNull List<BLink<V>> toRemove, boolean pendingAddition) {
         SortedArray<BLink<V>> items = this.items;
-        while (!isEmpty() && ((s - capacity()) + (pendingAddition ? 1 : 0)) > 0) {
+        final int c = capacity;
+        while (!isEmpty() && ((s - c) + (pendingAddition ? 1 : 0)) > 0) {
             BLink<V> w = items.remove(s - 1);
-            if (w != null)
+            if (w != null) //skip over nulls
                 toRemove.add(w);
             s--;
         }
@@ -286,15 +285,12 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
     }
 
 
-
     @Override
     public final BLink<V> put(@NotNull V key, @NotNull Budgeted b, float scale, @Nullable MutableFloat overflow) {
 
-        if (scale < Param.BUDGET_EPSILON)
-            return null;
 
-        float bp = b.pri();
-        if (bp != bp) { //already deleted
+        float bp = b.priIfFiniteElseNeg1() * scale;
+        if (bp < 0) { //already deleted
             return null;
         }
 
@@ -304,14 +300,15 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
 
         BLink<V> v = map.compute(key, ii);
 
-
+        BLink<V> w = v;
         int r = ii.result;
         switch (r) {
             case 0:
                 Budget vv = v.clone();
                 if (vv == null) {
-                    //it has been deleted
+                    //it has been deleted.. TODO reinsert?
                     map.remove(key);
+                    pressure -= bp;
                     return null;
                 }
 
@@ -319,7 +316,9 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
 
                 //re-rank
                 float o;
+
                 o = mergeFunction.merge(vv, b, scale);
+
                 float pAfter = vv.pri();
                 int direction;
                 float pDelta = pAfter - pBefore;
@@ -333,38 +332,46 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
                 if (direction != 0) {
                     synchronized (items) {
 
-                        int p = items.indexOf(v, this);
-                        if (p == -1) {
+//                        int p = items.indexOf(v, this);
+//                        if (p == -1) {
+//                            //removed before this completed
+//                            pressure -= bp;
+//                            return null;
+//                        }
+
+//                        int s = items.size();
+//                        if (s > 1) {
+//                            BLink<V>[] x = items.array();
+//
+//
+//                            boolean rerank;
+//
+//                            if (direction > 0) {
+//                                float pAbove = p == 0 ? Float.POSITIVE_INFINITY : x[p - 1].priIfFiniteElseNeg1();
+//                                rerank = (pAbove < pAfter);
+//                            } else /*if (direction < 0)*/ {
+//                                float pBelow = p == (s - 1) ? Float.NEGATIVE_INFINITY : x[p + 1].priIfFiniteElseNeg1();
+//                                rerank = (pBelow > pAfter);
+//                            }
+//
+//                            if (rerank) {
+//
+//                                if (!items.remove(v, this)) {
+//                                    pressure -= bp;
+//                                    return null;
+//                                }
+//
+//                                v.setPriority(pAfter); //the remainder of the budget will be set below
+                        if (!update(v)) {
                             //removed before this completed
+                            if (overflow != null)
+                                overflow.add(bp);
+                            pressure -= bp;
                             return null;
+                            //throw new RuntimeException("update fault");
                         }
-
-                        int s = items.size();
-                        if (s > 1) {
-                            BLink<V>[] x = items.array();
-
-
-                            boolean rerank;
-
-                            if (direction > 0) {
-                                float pAbove = p == 0 ? Float.POSITIVE_INFINITY : x[p - 1].priIfFiniteElseNeg1();
-                                rerank = (pAbove < pAfter);
-                            } else /*if (direction < 0)*/ {
-                                float pBelow = p == (s - 1) ? Float.NEGATIVE_INFINITY : x[p + 1].priIfFiniteElseNeg1();
-                                rerank = (pBelow > pAfter);
-                            }
-
-                            if (rerank) {
-
-                                if (!items.remove(v, this))
-                                    return null;
-
-                                v.setPriority(pAfter); //the remainder of the budget will be set below
-
-                                if (!update(v))
-                                    throw new RuntimeException("update fault");
-                            }
-                        }
+//                            }
+//                        }
                     }
                 }
 
@@ -373,8 +380,11 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
                 //release some pressure of how much priority existed already
                 //pressure-=pBefore;
 
-                if ((o > 0) && (overflow != null))
-                    overflow.add(o);
+                if (o > 0) {
+                    if (overflow != null)
+                        overflow.add(o);
+                    pressure -= o;
+                }
 
 //                float pAfter = v.pri();
 //
@@ -383,25 +393,34 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
 //                    //in case the merged item determined the min priority
 //                    this.minPri = pAfter;
 //                }
-                return v;
 
             case +1:
 
-                v.setBudget(bp * scale, b.qua());
-                if (update(v)) {
-                    onAdded(v); //success
-                    return v;
+                v.setBudget(bp, b.qua());
+
+                synchronized (items) {
+                    if (update(v)) {
+                        onAdded(v); //success
+                        w = v;
+                    } else {
+                        w = null;
+                    }
                 }
                 break;
 
             case -1:
                 //reject due to insufficient budget
-                if (overflow!=null)
+                if (overflow != null) {
                     overflow.add(bp);
+                }
+                pressure -= bp;
+                w = null;
+
                 break;
         }
 
-        return null;
+
+        return w;
     }
 
 //    /**
@@ -435,23 +454,45 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
     @Override
     public final Bag<V> commit() {
 
-        float p = this.pressure;
 
-        if (!isEmpty()) {
-            float existing = this.mass;
-            Consumer<BLink> a;
+        synchronized (items) {
+            int s = size();
+            if (s > 0) {
+                float existing = this.mass();
+                Consumer<BLink> a;
 
-            a = Forget.forget(p, existing, capacity(), Param.BAG_THRESHOLD);
+                float p = this.pressure;
+                if (p > Param.BUDGET_EPSILON) {
 
-            if (a!=null)
-                this.pressure = 0; //reset pressure accumulator
+                    a = Forget.forget(p, existing, s, Param.BAG_THRESHOLD);
 
-            commit(a);
-        } else {
-            minPri = -1;
+                } else {
+                    a = null;
+                }
+
+                commit(a);
+            } else {
+                minPri = -1;
+            }
+
+            this.pressure = 0; //reset pressure accumulator
         }
 
+
         return this;
+    }
+
+    private float mass() {
+        float mass = 0;
+        synchronized (items) {
+            int iii = items.size();
+            for (int i = 0; i < iii; i++) {
+                BLink<V> x = get(i);
+                if (x != null)
+                    mass += x.priIfFiniteElseZero();
+            }
+        }
+        return mass;
     }
 
 
@@ -462,21 +503,21 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
     @Override
     public Bag<V> commit(@Nullable Consumer<BLink> each) {
 
-        int s = size();
-        if (s > 0) {
 
-            synchronized (items) {
+        synchronized (items) {
 
+
+            if (size() > 0) {
                 update(null);
 
-                int lowestUnsorted = updateExisting(each, s);
+
+                int lowestUnsorted = updateExisting(each);
 
                 if (lowestUnsorted != -1) {
-                    qsort(new int[24 /* estimate */], items.array(), 0 /*dirtyStart - 1*/, s - 1);
+                    qsort(new int[24 /* estimate */], items.array(), 0 /*dirtyStart - 1*/, size() - 1);
                 } // else: perfectly sorted
 
                 updateRange();
-
             }
 
         }
@@ -503,14 +544,14 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
     /**
      * returns the index of the lowest unsorted item
      */
-    private int updateExisting(@Nullable Consumer<BLink> each, int s) {
+    private int updateExisting(@Nullable Consumer<BLink> each) {
 //        int dirtyStart = -1;
         int lowestUnsorted = -1;
 
 
+        int s = size();
         BLink<V>[] l = items.array();
         int i = s - 1;
-        float m = 0;
         //@NotNull BLink<V> beneath = l[i]; //compares with self below to avoid a null check in subsequent iterations
         float beneath = Float.POSITIVE_INFINITY;
         for (; i >= 0; ) {
@@ -522,7 +563,6 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
             if (bCmp > 0) {
                 if (each != null)
                     each.accept(b);
-                m += bCmp;
             }
 
 
@@ -534,7 +574,6 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
             i--;
         }
 
-        this.mass = m;
 
         return lowestUnsorted;
     }
@@ -549,7 +588,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
         for (int s = items.size() - 1; s >= 0; s--) {
             BLink<V> x = (BLink<V>) l[s];
             if (x == null || x.isDeleted()) {
-                items.removeFast(s);
+                items.remove(s);
                 if (x != null)
                     removed.add(x);
                 removedFromMap++;
@@ -561,13 +600,22 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
 
     @Override
     public void clear() {
-        super.clear();
-        updateRange();
+        synchronized (items) {
+            //map is possibly shared with another bag. only remove the items from it which are present in items
+            items.forEach(x -> map.remove(x.get()));
+            items.clear();
+            updateRange();
+        }
     }
 
     private final void updateRange() {
         int s = size();
-        this.minPri = s > 0 ? get(s - 1).priIfFiniteElseNeg1() : -1;
+        try {
+            this.minPri = (s > 0 && s >= capacity()) ? get(s - 1).priIfFiniteElseNeg1() : -1;
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println();
+        }
     }
 
 

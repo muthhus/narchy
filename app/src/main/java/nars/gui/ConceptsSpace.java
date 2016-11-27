@@ -17,13 +17,10 @@ public class ConceptsSpace extends NARSpace<Term, ConceptWidget> {
     private final int maxEdgesPerNode;
 
     public ConceptsSpace(NAR nar, int maxNodes, int maxEdgesPerNode) {
-        super(nar, maxNodes);
+        super(nar);
         this.nar = nar;
         this.maxNodes = maxNodes;
         this.maxEdgesPerNode = maxEdgesPerNode;
-
-
-
     }
 
     @Override
@@ -35,6 +32,7 @@ public class ConceptsSpace extends NARSpace<Term, ConceptWidget> {
 
         //System.out.println(((Default) nar).core.concepts.size() + " "+ ((Default) nar).index.size());
 
+        Function<Term,ConceptWidget> materializer = materializer();
         x.topWhile(b -> {
 
             //Concept Core
@@ -43,7 +41,7 @@ public class ConceptsSpace extends NARSpace<Term, ConceptWidget> {
             if (!display(ct))
                 return true;
 
-            Function<Term,ConceptWidget> materializer = t -> new ConceptWidget(t, this, maxEdgesPerNode);
+
             ConceptWidget root = space.getOrAdd(ct, materializer);
             root.concept = concept;
 
@@ -53,15 +51,17 @@ public class ConceptsSpace extends NARSpace<Term, ConceptWidget> {
 
         }, maxNodes);
 
+    }
 
-
+    private Function<Term, ConceptWidget> materializer() {
+        return t -> new ConceptWidget(nar, t, maxEdgesPerNode);
     }
 
     @Override
     protected void update() {
         super.update();
 
-        active.forEach(ConceptWidget::commit);
+        active.forEach(c -> c.commit(this));
     }
 
 }

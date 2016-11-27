@@ -9,7 +9,6 @@ import nars.concept.Concept;
 import nars.link.BLink;
 import nars.term.Term;
 import nars.term.Termed;
-import nars.util.Util;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import spacegraph.SpaceGraph;
@@ -35,24 +34,20 @@ import static spacegraph.obj.layout.Grid.row;
 public class ConceptWidget extends Cuboid<Term> implements Consumer<BLink<? extends Termed>> {
 
     public final ArrayBag<TermEdge> edges;
-    private final ConceptsSpace space;
 
 
     //caches a reference to the current concept
     public Concept concept;
     private ConceptVis conceptVis = new ConceptVis2();
+    private transient ConceptsSpace space;
 
 
-    public ConceptWidget(Term x, ConceptsSpace space, int numEdges) {
-        super(x,1, 1);
-
-
-        this.space = space;
-
+    public ConceptWidget(NAR nar, Termed x, int numEdges) {
+        super(x.term(),1, 1);
 
         setFront(
             col(new Label(x.toString()),
-                row(new FloatSlider( 0, 0, 4 ), new BeliefTableChart(space.nar, x))
+                row(new FloatSlider( 0, 0, 4 ), new BeliefTableChart(nar, x))
                     //new CheckBox("?")
             )
         );
@@ -70,14 +65,15 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<BLink<? exte
     }
 
 
+
     @Override
     public Dynamic newBody(boolean collidesWithOthersLikeThis) {
         Dynamic x = super.newBody(collidesWithOthersLikeThis);
 
 
         //int zOffset = -10;
-        final float initDistanceEpsilon = 200f;
-        final float initImpulseEpsilon = 0.5f;
+        final float initDistanceEpsilon = 100f;
+        final float initImpulseEpsilon = 0.25f;
 
         //place in a random direction
         x.transform().set(SpaceGraph.r(initDistanceEpsilon),
@@ -89,7 +85,7 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<BLink<? exte
                 SpaceGraph.r(initImpulseEpsilon),
                 SpaceGraph.r(initImpulseEpsilon)));
 
-        x.setDamping(0.95f, 0.95f);
+        x.setDamping(0.9f, 0.9f);
         return x;
     }
 
@@ -111,7 +107,9 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<BLink<? exte
         return s;
     }
 
-    public void commit() {
+    public void commit(ConceptsSpace space) {
+
+        this.space = space;
 
         edges.commit();
         edges.forEachKey(TermEdge::clear);
@@ -204,7 +202,7 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<BLink<? exte
         if (width <= 1f) {
             Draw.renderLineEdge(gl, this, e, 4f + width * 2f);
         } else {
-            Draw.renderHalfTriEdge(gl, this, e, width * radius / 18f, e.r * 2f /* hack */);
+            Draw.renderHalfTriEdge(gl, this, e, width * radius() / 18f, e.r * 2f /* hack */);
         }
     }
 
@@ -272,10 +270,10 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<BLink<? exte
 
             if (priSum >= 0) {
 
-                float priAvg = priSum/2f;
+                //float priAvg = priSum/2f;
 
-                float minLineWidth = 1f;
-                float maxLineWidth = 5f;
+                float minLineWidth = 0f;
+                float maxLineWidth = 4f;
 
                 this.width = minLineWidth + (maxLineWidth - minLineWidth) * priSum;
                 //z.r = 0.25f + 0.7f * (pri * 1f / ((Term)target.key).volume());
@@ -294,11 +292,11 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<BLink<? exte
                 }
 
                 //this.a = 0.1f + 0.5f * pri;
-                this.a = 0.5f * 0.5f * Math.max(tasklinkPri,termlinkPri);
+                this.a = 0.25f * 0.75f * Math.max(tasklinkPri,termlinkPri);
                 //0.9f;
 
-                this.attraction = qEst * 0.5f + 0.5f;
-                this.attractionDist = 1f + 2 * ( (1f - (qEst)));
+                this.attraction = 1f + qEst;// * 0.5f + 0.5f;
+                this.attractionDist = 1.5f; //1f + 2 * ( (1f - (qEst)));
             } else {
                 this.a = 0;
                 this.attraction = 0;
@@ -318,7 +316,7 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<BLink<? exte
 
 
         public void apply(ConceptWidget conceptWidget, Term tt) {
-            float p = conceptWidget.space.nar.activation(tt);
+            float p = conceptWidget.space.nar.priority(tt);
             p = (p == p) ? p : 0;// = 1; //pri = key.priIfFiniteElseZero();
 
             //sqrt because the area will be the sqr of this dimension
@@ -338,7 +336,7 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<BLink<? exte
         public void apply(ConceptWidget conceptWidget, Term tt) {
             ConceptsSpace space = conceptWidget.space;
             NAR nar = space.nar;
-            float p = nar.activation(tt);
+            float p = nar.priority(tt);
             p = (p == p) ? p : 0;// = 1; //pri = key.priIfFiniteElseZero();
 
             long now = space.now();

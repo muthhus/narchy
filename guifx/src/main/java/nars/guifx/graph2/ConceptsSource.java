@@ -66,7 +66,7 @@ public class ConceptsSource extends GraphSource {
 
     @Override
     public void updateNode(SpaceGrapher g, Termed s, TermNode sn) {
-        sn.pri(nar.activation(s));
+        sn.pri(nar.priority(s));
         super.updateNode(g, s, sn);
     }
 

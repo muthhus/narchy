@@ -87,7 +87,7 @@ public class PremiseMatrix {
 
                         for (int j = 0; j < termsBufferSize && countPerTermlink < termlinks; j++, jl++) {
 
-                            Premise p = Premise.build(nar, c, now, task, taskLinkBudget, termsBuffer.get( jl % termsBufferSize ));
+                            Premise p = Premise.build(nar, c, now, task, termsBuffer.get( jl % termsBufferSize ).get().term() );
 
                             if (p != null) {
 

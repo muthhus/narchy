@@ -48,7 +48,7 @@ public class Terminal extends NAR {
 
 
     @Override
-    public float activation(@NotNull Termed termed) {
+    public float priority(@NotNull Termed termed) {
         return 0;
     }
 

@@ -28,7 +28,6 @@ public abstract class NARSpace<X extends Term, Y extends Spatial<X>> extends Lis
     protected SpaceGraph<X> space;
 
 
-    private final int capacity;
     final Collection<Y> next;
 
     //public final MutableFloat maxPri = new MutableFloat(1.0f);
@@ -39,17 +38,16 @@ public abstract class NARSpace<X extends Term, Y extends Spatial<X>> extends Lis
     //private final ConceptFilter eachConcept = new ConceptFilter();
 
 
-    public NARSpace(int capacity) {
+    public NARSpace() {
         super();
-        this.capacity = capacity;
         this.next =
                 new LinkedHashSet<>();
                 //new UnifiedSet<>(capacity*2, 0.9f);
 
     }
 
-    public NARSpace(NAR nar, int capacity) {
-        this(capacity);
+    public NARSpace(NAR nar) {
+        this();
         this.nar = nar;
     }
 
@@ -120,7 +118,7 @@ public abstract class NARSpace<X extends Term, Y extends Spatial<X>> extends Lis
 
         //n.log();
         //n.input("(a-->b).", "(b-->c).","(c-->d).", "(d-->e).");
-        new DeductiveMeshTest(n, new int[]{2, 2}, 16384);
+        new DeductiveMeshTest(n, new int[]{4, 4}, 16384);
 
         //new DeductiveChainTest(n, 10, 9999991, (x, y) -> $.p($.the(x), $.the(y)));
 

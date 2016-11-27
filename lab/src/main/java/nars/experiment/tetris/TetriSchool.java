@@ -144,7 +144,7 @@ public class TetriSchool extends NSchool implements Runnable {
                               g = c.getGreen()/256f,
                               b = c.getBlue()/256f;
 
-                        float pri = n.activation( t.cell(x, y) );
+                        float pri = n.priority( t.cell(x, y) );
                         gl.glColor3f(r * pri, g * pri, b * pri);
 
                         float m = 0.05f;

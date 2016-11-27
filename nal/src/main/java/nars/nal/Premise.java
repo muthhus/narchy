@@ -90,10 +90,8 @@ public final class Premise extends RawBudget implements Tasked {
      * patham9 especially try to understand the "temporal temporal" case
      * patham9 its using the result of higher confidence
      */
-    public static @Nullable Premise build(@NotNull NAR nar, @NotNull Concept c, long now, @NotNull Task task, @NotNull Budget taskLinkBudget,
-                                          @NotNull BLink<? extends Termed> termLink) {
-
-        Termed term = termLink.get();
+    public static @Nullable Premise build(@NotNull NAR nar, @NotNull Concept c, long now, @NotNull Task task,
+                                          Term term) {
 
         if (Terms.equalAtemporally(task.term(), term))
             return null;

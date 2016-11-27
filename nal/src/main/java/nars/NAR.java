@@ -1297,7 +1297,8 @@ public abstract class NAR extends Param implements Level, Consumer<Task>, NARIn,
     /**
      * gets a measure of the current priority of the concept
      */
-    abstract public float activation(@NotNull Termed termed);
+    abstract public float priority(@NotNull Termed termed);
+
 
     public Termed[] terms(String... terms) {
         return Stream.of(terms).map(this::term).toArray(Termed[]::new);

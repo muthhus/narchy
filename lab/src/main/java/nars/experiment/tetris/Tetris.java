@@ -694,7 +694,7 @@ public class Tetris extends NAgents {
                 }
             }
 
-            float p = nar.activation(s);
+            float p = nar.priority(s);
             g.glColor4f(dr, dg, bf, 0.5f + 0.5f * p);
 
             return b != null ? b.conf() : 0;

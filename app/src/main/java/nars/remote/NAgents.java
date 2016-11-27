@@ -1,5 +1,6 @@
 package nars.remote;
 
+import com.google.common.collect.Iterables;
 import nars.$;
 import nars.NAR;
 import nars.NAgent;
@@ -295,7 +296,8 @@ abstract public class NAgents extends NAgent {
         NAR nar = a.nar;
         a.nar.runLater(()-> {
 
-            Vis.conceptsWindow2D(a.nar, 72, 12).show(1000, 800);
+            //Vis.conceptsWindow2D(a.nar, Iterables.concat(a.predictors, a.actions, a.sensors) /* a.nar */,64 ,8).show(1000, 800);
+            Vis.conceptsWindow2D(a.nar, 64 ,8).show(1000, 800);
 
             window(
                     grid(
@@ -323,7 +325,7 @@ abstract public class NAgents extends NAgent {
 
         a.nar.runLater(()-> {
 
-            Vis.conceptsWindow2D(a.nar, 96, 12).show(1000, 800);
+            Vis.conceptsWindow2D(a.nar, 192, 12).show(1000, 800);
 
             window(
                     grid(

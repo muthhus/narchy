@@ -123,7 +123,7 @@ public class Default extends NAR {
     }
 
     @Override
-    public final float activation(@NotNull Termed concept) {
+    public final float priority(@NotNull Termed concept) {
         BLink<Concept> c = core.active.get(concept);
         return c != null ? c.priIfFiniteElseZero() : 0;
     }

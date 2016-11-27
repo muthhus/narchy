@@ -33,8 +33,6 @@ public class SimpleSpatial<X> extends AbstractSpatial<X> {
     /** prevents physics movement */
     public boolean motionLock;
 
-    public float radius;
-
 
     public final float[] shapeColor;
     private final Transform transform = new Transform();
@@ -170,7 +168,6 @@ public class SimpleSpatial<X> extends AbstractSpatial<X> {
         else
             shape.setLocalScaling(v(sx,sy,sz));
 
-        this.radius = shape.getBoundingRadius();// Math.max(sx, Math.max(sy, sz));
 
         reactivate();
     }
@@ -268,6 +265,12 @@ public class SimpleSpatial<X> extends AbstractSpatial<X> {
     @Override
     public List<TypedConstraint> constraints() {
         return constraints;
+    }
+
+
+    @Override
+    public float radius() {
+        return shape.getBoundingRadius();
     }
 
 

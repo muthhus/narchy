@@ -11,15 +11,19 @@ import java.util.function.Consumer;
 
 public class ListSpace<X,Y> extends AbstractSpace<X,Y> {
 
-    public Collection<Y> active = new FasterList<>(0);
+    public Collection<Y> active = Collections.emptyList();
 
     public ListSpace() {
         super();
     }
 
+    public ListSpace(Collection<Y> xx) {
+        this();
+        active = xx;
+    }
     public ListSpace(Y... xx) {
         this();
-        Collections.addAll(active, xx);
+        this.active = new FasterList<>(xx);
     }
 
     @Override

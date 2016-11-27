@@ -11,6 +11,6 @@ public class BudgetGraph extends Plot2D {
 
     public BudgetGraph(NAR nar, PlotVis p, int history, double w, double h, Termed term) {
         super(p, history, w, h);
-        add(term.toString() + ":pri", () -> nar.activation(term), 0, 1f);
+        add(term.toString() + ":pri", () -> nar.priority(term), 0, 1f);
     }
 }
