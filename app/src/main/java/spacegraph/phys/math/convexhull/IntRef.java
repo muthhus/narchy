@@ -27,10 +27,10 @@ package spacegraph.phys.math.convexhull;
  *
  * @author jezek2
  */
-abstract class IntRef {
+interface IntRef {
 
-	public abstract int get();
+	int get();
 	
-	public abstract void set(int value);
+	void set(int value);
 	
 }

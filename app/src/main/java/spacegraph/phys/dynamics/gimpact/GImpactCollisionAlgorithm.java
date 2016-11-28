@@ -115,22 +115,27 @@ public class GImpactCollisionAlgorithm extends CollisionAlgorithm {
 	public void gimpact_vs_gimpact(Collidable body0, Collidable body1, GImpactShape shape0, GImpactShape shape1) {
 		if (shape0.getGImpactShapeType() == ShapeType.TRIMESH_SHAPE) {
 			GImpactMeshShape meshshape0 = (GImpactMeshShape) shape0;
-			part0 = meshshape0.getMeshPartCount();
+
+			int part0 = meshshape0.getMeshPartCount();
 
 			while ((part0--) != 0) {
 				gimpact_vs_gimpact(body0, body1, meshshape0.getMeshPart(part0), shape1);
 			}
+
+			this.part0 = part0;
 
 			return;
 		}
 
 		if (shape1.getGImpactShapeType() == ShapeType.TRIMESH_SHAPE) {
 			GImpactMeshShape meshshape1 = (GImpactMeshShape) shape1;
-			part1 = meshshape1.getMeshPartCount();
+			int part1 = meshshape1.getMeshPartCount();
 
 			while ((part1--) != 0) {
 				gimpact_vs_gimpact(body0, body1, shape0, meshshape1.getMeshPart(part1));
 			}
+
+			this.part1 = part1;
 
 			return;
 		}
@@ -211,9 +216,10 @@ public class GImpactCollisionAlgorithm extends CollisionAlgorithm {
 	}
 
 	public void gimpact_vs_shape(Collidable body0, Collidable body1, GImpactShape shape0, CollisionShape shape1, boolean swapped) {
-		if (shape0.getGImpactShapeType() == ShapeType.TRIMESH_SHAPE) {
+		ShapeType s = shape0.getGImpactShapeType();
+		if (s == ShapeType.TRIMESH_SHAPE) {
 			GImpactMeshShape meshshape0 = (GImpactMeshShape) shape0;
-			part0 = meshshape0.getMeshPartCount();
+			int part0 = meshshape0.getMeshPartCount();
 
 			while ((part0--) != 0) {
 				gimpact_vs_shape(body0,
@@ -221,12 +227,13 @@ public class GImpactCollisionAlgorithm extends CollisionAlgorithm {
 						meshshape0.getMeshPart(part0),
 						shape1, swapped);
 			}
+			this.part0 = part0;
 
 			return;
 		}
 
 		//#ifdef GIMPACT_VS_PLANE_COLLISION
-		if (shape0.getGImpactShapeType() == ShapeType.TRIMESH_SHAPE_PART &&
+		if (s == ShapeType.TRIMESH_SHAPE_PART &&
 				shape1.getShapeType() == BroadphaseNativeType.STATIC_PLANE_PROXYTYPE) {
 			GImpactMeshShape.GImpactMeshShapePart shapepart = (GImpactMeshShape.GImpactMeshShapePart) shape0;
 			StaticPlaneShape planeshape = (StaticPlaneShape) shape1;
@@ -253,7 +260,8 @@ public class GImpactCollisionAlgorithm extends CollisionAlgorithm {
 
 		gimpact_vs_shape_find_pairs(orgtrans0, orgtrans1, shape0, shape1, collided_results);
 
-		if (collided_results.size() == 0) {
+		int cr = collided_results.size();
+		if (cr == 0) {
 			return;
 		}
 		shape0.lockChildShapes();
@@ -264,7 +272,7 @@ public class GImpactCollisionAlgorithm extends CollisionAlgorithm {
 
 		Transform tmpTrans = new Transform();
 
-		int i = collided_results.size();
+		int i = cr;
 
 		while ((i--) != 0) {
 			int child_index = collided_results.get(i);
@@ -331,11 +339,11 @@ public class GImpactCollisionAlgorithm extends CollisionAlgorithm {
 		tricallback.margin = shape1.getMargin();
 
 		// getting the trimesh AABB
-		Transform gimpactInConcaveSpace = new Transform();
+		Transform gimpactInConcaveSpace = body1.worldTransform; /*new Transform();
 
-		body1.getWorldTransform(gimpactInConcaveSpace);
+		body1.getWorldTransform(gimpactInConcaveSpace);*/
 		gimpactInConcaveSpace.inverse();
-		gimpactInConcaveSpace.mul(body0.getWorldTransform(new Transform()));
+		gimpactInConcaveSpace.mul(body0.worldTransform);
 
 		v3 minAABB = new v3(), maxAABB = new v3();
 		shape0.getAabb(gimpactInConcaveSpace, minAABB, maxAABB);
@@ -422,8 +430,8 @@ public class GImpactCollisionAlgorithm extends CollisionAlgorithm {
 	void collide_sat_triangles(Collidable body0, Collidable body1, GImpactMeshShape.GImpactMeshShapePart shape0, GImpactMeshShape.GImpactMeshShapePart shape1, PairSet pairs, int pair_count) {
 		v3 tmp = new v3();
 
-		Transform orgtrans0 = body0.getWorldTransform(new Transform());
-		Transform orgtrans1 = body1.getWorldTransform(new Transform());
+		Transform orgtrans0 = body0.worldTransform;
+		Transform orgtrans1 = body1.worldTransform;
 
 		PrimitiveTriangle ptri0 = new PrimitiveTriangle();
 		PrimitiveTriangle ptri1 = new PrimitiveTriangle();
@@ -573,8 +581,8 @@ public class GImpactCollisionAlgorithm extends CollisionAlgorithm {
 	}
 	
 	protected void gimpacttrimeshpart_vs_plane_collision(Collidable body0, Collidable body1, GImpactMeshShape.GImpactMeshShapePart shape0, StaticPlaneShape shape1, boolean swapped) {
-		Transform orgtrans0 = body0.getWorldTransform(new Transform());
-		Transform orgtrans1 = body1.getWorldTransform(new Transform());
+		Transform orgtrans0 = body0.worldTransform;
+		Transform orgtrans1 = body1.worldTransform;
 
 		StaticPlaneShape planeshape = shape1;
 		Vector4f plane = new Vector4f();

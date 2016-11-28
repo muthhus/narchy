@@ -39,7 +39,7 @@ public class Picking extends JoglSpace implements MouseListener {
     int cmd = UPDATE;
     int mouse_x, mouse_y;
 
-    private final GLU glu = new GLU();
+
 
     @Override
     public void init(GL2 gl) {

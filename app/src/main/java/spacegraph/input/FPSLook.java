@@ -50,7 +50,7 @@ public class FPSLook extends SpaceMouse {
 
             v3 direction = v(
                     (float) (cos(this.v) * sin(h)),
-                    (float) sin(this.v),
+                    sin(this.v),
                     (float) (cos(this.v) * cos(h))
             );
 

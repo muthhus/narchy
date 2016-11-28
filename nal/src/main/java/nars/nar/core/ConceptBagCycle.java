@@ -234,7 +234,7 @@ public class ConceptBagCycle {
 
                 Concept c = v.get();
                 sleep(c);
-                c.put(this, null);
+                //c.put(this, null);
 
                 //TODO clear BudgetSavings in the meta maps
             }); //HACK allow opportunity to process removals
@@ -249,27 +249,27 @@ public class ConceptBagCycle {
         public final void onAdded(@NotNull BLink<Concept> v) {
             Concept c = v.get();
 
-            float forgetPeriod = getForgetPeriod();
+            //float forgetPeriod = getForgetPeriod();
 
             nar.policy(c, conceptBuilder.awake());
-            BudgetSavings existing = c.get(this);
+            /*BudgetSavings existing = c.get(this);
             if (existing!=null) {
                 if (existing.isDeleted())
                     throw new UnsupportedOperationException();
 
-                /** cost at least 1 time unit. if zero time units are allowed then concepts could theoreticaly avoid the normal forgetting while being asleep during the same time frame */
+                // cost at least 1 time unit. if zero time units are allowed then concepts could theoreticaly avoid the normal forgetting while being asleep during the same time frame
                 float forgetScale = 1f - Math.max(1,(now - existing.savedAt)) / forgetPeriod;
                 if (forgetScale > 0) {
                     BudgetMerge.plusBlend.apply(v, existing, forgetScale);
                     c.put(this, null);
                 }
-            }
+            }*/
 
         }
 
-        private float getForgetPeriod() {
+        /*private float getForgetPeriod() {
             return (float) Math.ceil(1 + Math.sqrt(capacity()));
-        }
+        }*/
 
 
         @Override
@@ -277,12 +277,12 @@ public class ConceptBagCycle {
                 Concept c  = value.get();
                 sleep(c);
 
-                if (value.priIfFiniteElseNeg1() > Param.BUDGET_EPSILON) {
+                /*if (value.priIfFiniteElseNeg1() > Param.BUDGET_EPSILON) {
                     BudgetSavings s = new BudgetSavings(value, now);
                     if (!s.isDeleted()) {
                         c.put(this, s);
                     }
-                }
+                }*/
         }
 
         @Override

@@ -35,8 +35,8 @@ public class Label extends Surface {
         this.value = newValue;
         int len = newValue.length();
         this.fontScale =
-                //1f / (0.5f + len);
-                0.5f;
+                1f / (0.5f + len);
+                //0.5f;
                 //1f;
         align(Align.Center, 1.5f / len);
                 //0.5f; //(1f/ConsoleSurface.fontWidth)/value.length();

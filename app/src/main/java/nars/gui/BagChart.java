@@ -23,12 +23,12 @@ public class BagChart<X> extends TreeChart<BLink<X>> implements BiConsumer<BLink
     private final Bag<X> bag;
 
     public static void main(String[] args) {
-        Default d = new Default(1024,8,2,2);
+        Default d = new Default(1024,1,2,2);
         d.input("(a --> b). (b --> c).  (c --> d).");
 
-        SpaceGraph.window(Vis.conceptsTreeChart(d, 512), 800, 600);
+        SpaceGraph.window(Vis.conceptsTreeChart(d, 1024), 800, 600);
 
-        d.loop(35f);
+        d.loop(30f);
 
     }
 

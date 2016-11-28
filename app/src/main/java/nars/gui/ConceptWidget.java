@@ -85,7 +85,7 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<BLink<? exte
                 SpaceGraph.r(initImpulseEpsilon),
                 SpaceGraph.r(initImpulseEpsilon)));
 
-        x.setDamping(0.9f, 0.9f);
+        x.setDamping(0.5f, 0.5f);
         return x;
     }
 
@@ -200,7 +200,7 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<BLink<? exte
 
         float width = e.width;
         if (width <= 1f) {
-            Draw.renderLineEdge(gl, this, e, 4f + width * 2f);
+            Draw.renderLineEdge(gl, this, e, width * 2f);
         } else {
             Draw.renderHalfTriEdge(gl, this, e, width * radius() / 18f, e.r * 2f /* hack */);
         }
@@ -295,8 +295,8 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<BLink<? exte
                 this.a = 0.25f + 0.75f * Math.max(tasklinkPri,termlinkPri);
                 //0.9f;
 
-                this.attraction = priSum;// * 0.5f + 0.5f;
-                this.attractionDist = 1.5f; //1f + 2 * ( (1f - (qEst)));
+                this.attraction = 0.25f + priSum * 0.75f;// * 0.5f + 0.5f;
+                this.attractionDist = 2f; //1f + 2 * ( (1f - (qEst)));
             } else {
                 this.a = 0;
                 this.attraction = 0;

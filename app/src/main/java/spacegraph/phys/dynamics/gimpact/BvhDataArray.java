@@ -27,6 +27,7 @@
 
 package spacegraph.phys.dynamics.gimpact;
 
+import org.apache.commons.lang3.ArrayUtils;
 import spacegraph.math.v3;
 
 /**
@@ -37,8 +38,8 @@ class BvhDataArray {
 
 	private int size;
 	
-	float[] bound = new float[0];
-	int[] data = new int[0];
+	float[] bound = ArrayUtils.EMPTY_FLOAT_ARRAY;
+	int[] data = ArrayUtils.EMPTY_INT_ARRAY;
 
 	public int size() {
 		return size;
@@ -60,59 +61,65 @@ class BvhDataArray {
 	public void swap(int idx1, int idx2) {
 		int pos1 = idx1*6;
 		int pos2 = idx2*6;
-		
-		float b0 = bound[pos1+0];
-		float b1 = bound[pos1+1];
-		float b2 = bound[pos1+2];
-		float b3 = bound[pos1+3];
-		float b4 = bound[pos1+4];
-		float b5 = bound[pos1+5];
+
+		float[] b = this.bound;
+
+		float b0 = b[pos1+0];
+		float b1 = b[pos1+1];
+		float b2 = b[pos1+2];
+		float b3 = b[pos1+3];
+		float b4 = b[pos1+4];
+		float b5 = b[pos1+5];
 		int d = data[idx1];
 		
-		bound[pos1+0] = bound[pos2+0];
-		bound[pos1+1] = bound[pos2+1];
-		bound[pos1+2] = bound[pos2+2];
-		bound[pos1+3] = bound[pos2+3];
-		bound[pos1+4] = bound[pos2+4];
-		bound[pos1+5] = bound[pos2+5];
+		b[pos1+0] = b[pos2+0];
+		b[pos1+1] = b[pos2+1];
+		b[pos1+2] = b[pos2+2];
+		b[pos1+3] = b[pos2+3];
+		b[pos1+4] = b[pos2+4];
+		b[pos1+5] = b[pos2+5];
 		data[idx1] = data[idx2];
 
-		bound[pos2+0] = b0;
-		bound[pos2+1] = b1;
-		bound[pos2+2] = b2;
-		bound[pos2+3] = b3;
-		bound[pos2+4] = b4;
-		bound[pos2+5] = b5;
+		b[pos2+0] = b0;
+		b[pos2+1] = b1;
+		b[pos2+2] = b2;
+		b[pos2+3] = b3;
+		b[pos2+4] = b4;
+		b[pos2+5] = b5;
 		data[idx2] = d;
 	}
 	
 	public BoxCollision.AABB getBound(int idx, BoxCollision.AABB out) {
 		int pos = idx*6;
-		out.min.set(bound[pos+0], bound[pos+1], bound[pos+2]);
-		out.max.set(bound[pos+3], bound[pos+4], bound[pos+5]);
+		float[] b = this.bound;
+		out.min.set(b[pos++], b[pos++], b[pos++]);
+		out.max.set(b[pos++], b[pos++], b[pos]);
 		return out;
 	}
 
 	public v3 getBoundMin(int idx, v3 out) {
 		int pos = idx*6;
-		out.set(bound[pos+0], bound[pos+1], bound[pos+2]);
+		float[] b = this.bound;
+		out.set(b[pos++], b[pos++], b[pos]);
 		return out;
 	}
 
 	public v3 getBoundMax(int idx, v3 out) {
-		int pos = idx*6;
-		out.set(bound[pos+3], bound[pos+4], bound[pos+5]);
+		int pos = idx*6 + 3;
+		float[] b = this.bound;
+		out.set(b[pos++], b[pos++], b[pos]);
 		return out;
 	}
 	
 	public void setBound(int idx, BoxCollision.AABB aabb) {
 		int pos = idx*6;
-		bound[pos+0] = aabb.min.x;
-		bound[pos+1] = aabb.min.y;
-		bound[pos+2] = aabb.min.z;
-		bound[pos+3] = aabb.max.x;
-		bound[pos+4] = aabb.max.y;
-		bound[pos+5] = aabb.max.z;
+		float[] b = this.bound;
+		b[pos++] = aabb.min.x;
+		b[pos++] = aabb.min.y;
+		b[pos++] = aabb.min.z;
+		b[pos++] = aabb.max.x;
+		b[pos++] = aabb.max.y;
+		b[pos] =   aabb.max.z;
 	}
 	
 	public int getData(int idx) {

@@ -160,28 +160,23 @@ public class Surface {
             //float correction = ((scale.y) / (scale.x)) / aspect;
 
             //if ((scale.y / scale.x) > aspect) {
-            float gAspect =
-                    globalScale.y / globalScale.x;
-                    //1f;
-//            float wAspect = gAspect * aspect;
-            float sa = this.aspect;
-            float aspect = (scale.y / scale.x) * gAspect;
-            if (aspect < sa) {
-                if (sa > 1) {
-                    sy = sx = scale.x / sa;
-                } else {
-                    //sx = sy = scale.y * sa;
-                    sy = sx = scale.x * sa;
-                }
-            } else {
-                if (sa > 1) {
-                    sx = sy = scale.y / sa;
-                } else {
-                    sy = sx = scale.x * sa;
-                }
-            }
+//            float gAspect =
+//                    globalScale.y / globalScale.x;
+//                    //1f;
+////            float wAspect = gAspect * aspect;
+//            float aspect = this.aspect * (scale.y / scale.x) * gAspect;
+//            if (aspect < 1) {
+//                //sx = sy = scale.y * sa;
+//                sy = scale.y * aspect;
+//                sx = scale.x * aspect;
+//            } else {
+//                sx = scale.x / aspect;
+//                sy = scale.y / aspect;
+//            }
 
-
+            //consume entire area, regardless of aspect
+            sx = scale.x;
+            sy = scale.y;
         } else {
             //consume entire area, regardless of aspect
             sx = scale.x;

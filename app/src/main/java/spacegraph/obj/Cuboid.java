@@ -31,7 +31,7 @@ public class Cuboid<X> extends SimpleSpatial<X> {
     //private float padding;
 
     public Cuboid(X x, float w, float h) {
-        this((X) x, null, w, h);
+        this(x, null, w, h);
     }
 
     public Cuboid(Surface front, float w, float h) {
@@ -57,7 +57,7 @@ public class Cuboid<X> extends SimpleSpatial<X> {
 
     }
 
-    public synchronized void setFront(Surface front) {
+    public void setFront(Surface front) {
         this.front = front;
         if (front!=null) {
             front.setParent(null);

@@ -82,7 +82,7 @@ class Int3 {
 		return new MyIntRef(coord);
 	}
 
-	private final class MyIntRef extends IntRef {
+	public final class MyIntRef implements IntRef {
 		private final int coord;
 
 		public MyIntRef(int coord) {

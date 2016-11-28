@@ -117,8 +117,8 @@ public abstract class NARSpace<X extends Term, Y extends Spatial<X>> extends Lis
 
 
         //n.log();
-        //n.input("(a-->b).", "(b-->c).","(c-->d).", "(d-->e).");
-        new DeductiveMeshTest(n, new int[]{4, 4}, 16384);
+        n.input("(a-->b).", "(b-->c).","(c-->d).");
+        //new DeductiveMeshTest(n, new int[]{4, 4}, 16384);
 
         //new DeductiveChainTest(n, 10, 9999991, (x, y) -> $.p($.the(x), $.the(y)));
 
@@ -141,7 +141,7 @@ public abstract class NARSpace<X extends Term, Y extends Spatial<X>> extends Lis
 //                //.run(800);
 //
 
-        n.loop(15f);
+        n.loop(1f);
 
     }
 

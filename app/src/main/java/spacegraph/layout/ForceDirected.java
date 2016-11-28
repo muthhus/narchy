@@ -51,7 +51,7 @@ public class ForceDirected implements spacegraph.phys.constraint.BroadConstraint
 //        }
 
     public ForceDirected() {
-        float r = 200;
+        float r = 400;
         boundsMin = v(-r, -r, -r);
         boundsMax = v(+r, +r, +r);
         maxRepelDist = r;
@@ -94,10 +94,11 @@ public class ForceDirected implements spacegraph.phys.constraint.BroadConstraint
     }
 
     protected void batch(List<Collidable> l) {
+        float speed = repel.floatValue();
         for (int i = 0, lSize = l.size(); i < lSize; i++) {
             Collidable x = l.get(i);
             for (int j = i + 1; j < lSize; j++) {
-                repel(x, l.get(j), repel.floatValue(), maxRepelDist);
+                repel(x, l.get(j), speed, maxRepelDist);
             }
         }
     }
@@ -116,11 +117,11 @@ public class ForceDirected implements spacegraph.phys.constraint.BroadConstraint
             return;
 
 
-        delta.scale((-(speed * (xp.mass() + yp.mass()) ) / (1f + len)) / 2f);
+        delta.scale((-(speed * (xp.mass() /* + yp.mass()*/) ) / (1f + len)) );
 
         ((Dynamic) x).force(delta);
-        delta.negate();
-        ((Dynamic) y).force(delta);
+        //delta.negate();
+        //((Dynamic) y).force(delta);
 
     }
 

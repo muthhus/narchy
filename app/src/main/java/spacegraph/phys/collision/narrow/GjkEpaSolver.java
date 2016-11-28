@@ -467,7 +467,7 @@ public class GjkEpaSolver {
 		public Face next;
 	}
 	
-	protected class EPA {
+	protected static class EPA {
 		//protected final BulletStack stack = BulletStack.get();
 		
 		public GJK gjk;

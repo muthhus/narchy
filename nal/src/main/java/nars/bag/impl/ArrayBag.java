@@ -63,6 +63,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
         SortedArray<BLink<V>> items = this.items;
 
         //List<BLink<V>> pendingRemoval;
+        List<BLink<V>> pendingRemoval;
         synchronized (items) {
             int additional = (toAdd != null) ? 1 : 0;
             int c = capacity();
@@ -71,10 +72,12 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
                 int s = size();
 
                 if (s + additional > c) {
-                    List<BLink<V>> pendingRemoval = $.newArrayList((s + additional) - c);
+                    pendingRemoval = $.newArrayList((s + additional) - c);
                     s = clean(toAdd, s, additional, pendingRemoval);
                     if (s + additional > c)
                         return false; //throw new RuntimeException("overflow");
+                } else {
+                    pendingRemoval = null;
                 }
             }
 
@@ -104,16 +107,18 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
                     return false;
                 }
 
-                float p = toAdd.pri();
-                if (minPri > 0 && minPri < p) {
-                    this.minPri = p;
-                }
+//                float p = toAdd.pri();
+//                if (minPri < p && capacity()<=size()) {
+//                    this.minPri = p;
+//                }
 
 
             }
 
         }
 
+        if (pendingRemoval!=null)
+            clean2(pendingRemoval);
 
         return true;
 
@@ -138,6 +143,10 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
         //second step: if still not enough, do a hardcore removal of the lowest ranked items until quota is met
         s = removeWeakestUntilUnderCapacity(s, trash, toAdd != null);
 
+        return s;
+    }
+
+    private void clean2( List<BLink<V>> trash ) {
         int toRemoveSize = trash.size();
         if (toRemoveSize > 0) {
 
@@ -165,7 +174,6 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
         }
 
 
-        return s;
     }
 
     private int removeWeakestUntilUnderCapacity(int s, @NotNull List<BLink<V>> toRemove, boolean pendingAddition) {
@@ -401,12 +409,16 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
 
                 synchronized (items) {
                     if (update(v)) {
-                        onAdded(v); //success
+                        updateRange();
                         w = v;
                     } else {
                         w = null;
                     }
                 }
+
+                if (w!=null)
+                    onAdded(w); //success
+
                 break;
 
             case -1:
@@ -455,30 +467,19 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
     @Override
     public final Bag<V> commit() {
 
-
         synchronized (items) {
             int s = size();
             if (s > 0) {
-                float existing = this.mass();
-                Consumer<BLink> a;
-
-                float p = this.pressure;
-                if (p > Param.BUDGET_EPSILON) {
-
-                    a = Forget.forget(p, existing, s, Param.BAG_THRESHOLD);
-
-                } else {
-                    a = null;
-                }
+                Consumer<BLink> a = Forget.forget(this.pressure, this.mass(), s, Param.BAG_THRESHOLD);
+                if (a!=null)
+                    this.pressure = 0; //reset pressure accumulator
 
                 commit(a);
             } else {
                 minPri = -1;
+                this.pressure = 0; //reset pressure accumulator
             }
-
-            this.pressure = 0; //reset pressure accumulator
         }
-
 
         return this;
     }
@@ -611,12 +612,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
 
     private final void updateRange() {
         int s = size();
-        try {
-            this.minPri = (s > 0 && s >= capacity()) ? get(s - 1).priIfFiniteElseNeg1() : -1;
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.err.println();
-        }
+        this.minPri = (s > 0 && s >= capacity()) ? get(s - 1).priIfFiniteElseNeg1() : -1;
     }
 
 

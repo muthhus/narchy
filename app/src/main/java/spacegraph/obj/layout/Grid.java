@@ -18,7 +18,6 @@ import static nars.util.Util.lerp;
  */
 public class Grid extends Layout {
 
-    private final MutableFloat aspect = new MutableFloat(0f);
 
     public static final float HORIZONTAL = 0f;
     public static final float VERTICAL = Float.POSITIVE_INFINITY;
@@ -36,13 +35,13 @@ public class Grid extends Layout {
 
     public Grid(float aspect, Surface... children) {
         super();
-        this.aspect.setValue(aspect);
+        this.aspect = (aspect);
         setChildren(children);
     }
 
     public Grid(float aspect, List<Surface> children) {
         super();
-        this.aspect.setValue(aspect);
+        this.aspect = (aspect);
         setChildren(children);
     }
 
@@ -69,7 +68,7 @@ public class Grid extends Layout {
     }
 
     public boolean isGrid() {
-        float a = aspect.floatValue();
+        float a = aspect;
         return a!=0 && a!=Float.POSITIVE_INFINITY;
     }
 
@@ -82,7 +81,7 @@ public class Grid extends Layout {
         if (n == 0)
             return;
 
-        float a = aspect.floatValue();
+        float a = aspect;
         if ((n < 3) && !((a==0) || (a == Float.POSITIVE_INFINITY)))
             a = 0; //use linear layout for small n
 
