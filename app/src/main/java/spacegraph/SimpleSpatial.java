@@ -1,7 +1,6 @@
 package spacegraph;
 
 import com.jogamp.opengl.GL2;
-import nars.$;
 import nars.util.Util;
 import org.jetbrains.annotations.Nullable;
 import spacegraph.math.Quat4f;
@@ -11,6 +10,7 @@ import spacegraph.phys.Dynamic;
 import spacegraph.phys.Dynamics;
 import spacegraph.phys.constraint.TypedConstraint;
 import spacegraph.phys.math.Transform;
+import spacegraph.phys.shape.BoxShape;
 import spacegraph.phys.shape.CollisionShape;
 import spacegraph.phys.shape.SimpleBoxShape;
 import spacegraph.render.Draw;
@@ -163,8 +163,8 @@ public class SimpleSpatial<X> extends AbstractSpatial<X> {
 
     public void scale(float sx, float sy, float sz) {
 
-        if (shape instanceof SimpleBoxShape)
-            ((SimpleBoxShape)shape).size(sx, sy, sz);
+        if (shape instanceof BoxShape)
+            ((BoxShape)shape).size(sx, sy, sz);
         else
             shape.setLocalScaling(v(sx,sy,sz));
 
@@ -172,11 +172,10 @@ public class SimpleSpatial<X> extends AbstractSpatial<X> {
         reactivate();
     }
 
-
-
     //TODO make abstract
     protected CollisionShape newShape() {
-        return new SimpleBoxShape(v3.v(1, 1, 1));
+        //return new SimpleBoxShape(v3.v(1, 1, 1));
+        return new BoxShape(v3.v(1, 1, 1));
     }
 
     public Dynamic newBody(boolean collidesWithOthersLikeThis) {

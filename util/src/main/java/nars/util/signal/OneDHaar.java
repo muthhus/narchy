@@ -1,5 +1,7 @@
 package nars.util.signal;
 
+import nars.util.Util;
+
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -40,37 +42,11 @@ public enum OneDHaar {
         out.println();
     }
 
-    private static boolean isPowerOf2(int n) {
-        if (n < 1) {
-            return false;
-        } else {
-            double p_of_2 = (Math.log(n) / log2);
-            return Math.abs(p_of_2 - Math.round((int) p_of_2)) == 0;
-        }
-    }
-    
-    public static int largestPowerOf2NoGreaterThan(int i) {
-        if ( isPowerOf2(i) )
-            return i;
-        else {
-            int curr = i-1;
-            while ( curr > 0 ) {
-                if ( isPowerOf2(curr) ) {
-                    return curr;
-                }
-                else {
-                    --curr;
-                }
-            }
-            return 0;
-        }
-    }
-    
     public static double[] largestSubsignalOfPowerOf2(double[] signal) {
-        if ( isPowerOf2(signal.length) )
+        if ( Util.isPowerOf2(signal.length) )
             return signal;
         else {
-            int i = largestPowerOf2NoGreaterThan(signal.length);
+            int i = Util.largestPowerOf2NoGreaterThan(signal.length);
             if ( i == 0 ) return null;
             double[] subsignal = new double[i];
             arraycopy(signal, 0, subsignal, 0, i);
@@ -83,7 +59,7 @@ public enum OneDHaar {
         if (sample.length < 2) {
             return;
         }
-        if (!isPowerOf2(sample.length)) {
+        if (!Util.isPowerOf2(sample.length)) {
             return;
         }
         int num_sweeps = (int) (Math.log(sample.length) / log2);
@@ -106,7 +82,7 @@ public enum OneDHaar {
         if (sample.length < 2) {
             throw new RuntimeException(sample.length + " is not enough samples");
         }
-        if (!isPowerOf2(sample.length)) {
+        if (!Util.isPowerOf2(sample.length)) {
             throw new RuntimeException(sample.length + " is not power of 2");
         }
         int NUM_SAMPLE_VALS = sample.length; // number of values in the sample
@@ -136,7 +112,7 @@ public enum OneDHaar {
         if (sample.length < 2) {
             return;
         }
-        if (!isPowerOf2(sample.length)) {
+        if (!Util.isPowerOf2(sample.length)) {
             return;
         }
         int NUM_SAMPLE_VALS = sample.length; // number of values in the sample
@@ -227,7 +203,7 @@ public enum OneDHaar {
     private static void orderedFastHaarWaveletTransform(double[] signal) {
         int n = signal.length;
         // if n is not an integral power of 2, then return
-        if (!isPowerOf2(n)) {
+        if (!Util.isPowerOf2(n)) {
             return;
         }
         // compute the number of sweeps; e.g., if n = 8, then NUM_SWEEPS is 3.
@@ -304,7 +280,7 @@ public enum OneDHaar {
     private static void orderedNormalizedFastHaarWaveletTransform(double[] sample) {
         int n = sample.length;
         // if n is not an integral power of 2, then return
-        if (!isPowerOf2(n)) {
+        if (!Util.isPowerOf2(n)) {
             return;
         }
         // compute the number of sweeps; e.g., if n = 8, then NUM_SWEEPS is 3.
@@ -381,7 +357,7 @@ public enum OneDHaar {
     private static void orderedFastHaarWaveletTransformForNumIters(double[] signal, int num_iters) {
         int n = signal.length;
         // if n is not an integral power of 2, then return
-        if ( !isPowerOf2(n) ) return;
+        if ( !Util.isPowerOf2(n) ) return;
         // compute the number of sweeps; e.g., if n = 8, then NUM_SWEEPS is 3.
         int NUM_SWEEPS = (int) (Math.log(n) / Math.log(2.0));
         if ( num_iters > NUM_SWEEPS ) return;
@@ -433,7 +409,7 @@ public enum OneDHaar {
     private static void orderedNormalizedFastHaarWaveletTransformForNumIters(double[] sample, int num_iters) {
         int n = sample.length;
         // if n is not an integral power of 2, then return
-        if ( !isPowerOf2(n) ) return;
+        if ( !Util.isPowerOf2(n) ) return;
         // compute the number of sweeps; e.g., if n = 8, then NUM_SWEEPS is 3.
         int NUM_SWEEPS = (int) (Math.log(n) / Math.log(2.0));
         if ( num_iters > NUM_SWEEPS ) return;
@@ -482,7 +458,7 @@ public enum OneDHaar {
 
     private static void orderedFastInverseHaarWaveletTransform(double[] sample) {
         int n = sample.length;
-        if (n < 2 || !isPowerOf2(n)) {
+        if (n < 2 || !Util.isPowerOf2(n)) {
             return;
         }
         n = (int) (Math.log(n) / Math.log(2.0));
@@ -517,7 +493,7 @@ public enum OneDHaar {
     // same as above but does ordered FHWT for a specific number of iters.
     private static void orderedFastInverseHaarWaveletTransformForNumIters(double[] signal, int numIters) {
         int n = signal.length;
-        if (n < 2 || !isPowerOf2(n)) {
+        if (n < 2 || !Util.isPowerOf2(n)) {
             return;
         }
         n = (int) (Math.log(n) / Math.log(2.0));
@@ -561,7 +537,7 @@ public enum OneDHaar {
     // same as above but does ordered FHWT for a specific number of iters.
     public static void orderedFastInverseHaarWaveletTransformForNumIters(double[] signal, int numIters, double thresh) {
         int n = signal.length;
-        if (n < 2 || !isPowerOf2(n)) {
+        if (n < 2 || !Util.isPowerOf2(n)) {
             return;
         }
         n = (int) (Math.log(n) / Math.log(2.0));
@@ -586,7 +562,7 @@ public enum OneDHaar {
     // as specified on p. 21 in "Ripples in Mathematics."
     private static void orderedNormalizedFastInverseHaarWaveletTransform(double[] sample) {
         int n = sample.length;
-        if (n < 2 || !isPowerOf2(n)) {
+        if (n < 2 || !Util.isPowerOf2(n)) {
             return;
         }
         n = (int) (Math.log(n) / Math.log(2.0));
@@ -620,7 +596,7 @@ public enum OneDHaar {
     // same as orderedNormalizedFastInverseHaarWaveletTransform() but goes back for a specified number of iterations.
     private static void orderedNormalizedFastInverseHaarWaveletTransformForNumIters(double[] sample, int num_iters) {
         int n = sample.length;
-        if (n < 2 || !isPowerOf2(n)) {
+        if (n < 2 || !Util.isPowerOf2(n)) {
             return;
         }
         n = (int) (Math.log(n) / Math.log(2.0));
@@ -678,7 +654,7 @@ public enum OneDHaar {
     // be computed completely.
     public static void inPlaceFastInverseHaarWaveletTransformForNumIters(double[] sample, int num_iters) {
         int n = sample.length;
-        if (n < 2 || !isPowerOf2(n)) {
+        if (n < 2 || !Util.isPowerOf2(n)) {
             return;
         }
         n = (int) (Math.log(n) / Math.log(2.0));
@@ -704,7 +680,7 @@ public enum OneDHaar {
 
     public static void doNthIterOfInPlaceFastInverseHaarWaveletTransform(double[] sample, int iter_number) {
         int n = sample.length;
-        if (n < 2 || !isPowerOf2(n)) {
+        if (n < 2 || !Util.isPowerOf2(n)) {
             return;
         }
         n = (int) (Math.log(n) / Math.log(2.0));
@@ -727,7 +703,7 @@ public enum OneDHaar {
     // by applying fast inverse haar transform a given number of iterations.
     public static void reconstructSampleTransformedInPlaceForNumIters(double[] haar_transformed_sample, int num_iters) {
         int n = haar_transformed_sample.length;
-        if (n < 2 || !isPowerOf2(n)) {
+        if (n < 2 || !Util.isPowerOf2(n)) {
             return;
         }
         n = (int) (Math.log(n) / Math.log(2.0));
@@ -755,7 +731,7 @@ public enum OneDHaar {
     // sweep.
     public static void reconstructSampleTransformedInPlaceForNumItersWithOutput(double[] haar_transformed_sample, int num_iters) {
         int n = haar_transformed_sample.length;
-        if (n < 2 || !isPowerOf2(n)) {
+        if (n < 2 || !Util.isPowerOf2(n)) {
             return;
         }
         n = (int) (Math.log(n) / Math.log(2.0));
@@ -787,7 +763,7 @@ public enum OneDHaar {
     // transform.  
     public static void displayOrderedFreqsFromOrderedHaar(double[] ordered_sample, PrintStream out) {
         int n = ordered_sample.length;
-        if ((n < 2) || !isPowerOf2(n)) {
+        if ((n < 2) || !Util.isPowerOf2(n)) {
             return;
         }
         n = (int) (Math.log(n) / Math.log(2));
@@ -809,7 +785,7 @@ public enum OneDHaar {
     public static void displayOrderedFreqsFromInPlaceHaar(double[] in_place_sample, PrintStream out) {
         int n = in_place_sample.length;
         //System.out.println("N = " + n);
-        if (n < 2 || !isPowerOf2(n)) {
+        if (n < 2 || !Util.isPowerOf2(n)) {
             return;
         }
         if (n == 2) {
@@ -845,7 +821,7 @@ public enum OneDHaar {
     public static void displayOrderedFreqsFromInPlaceHaar(float[] in_place_sample, PrintStream out) {
         int n = in_place_sample.length;
         //System.out.println("N = " + n);
-        if (n < 2 || !isPowerOf2(n)) {
+        if (n < 2 || !Util.isPowerOf2(n)) {
             return;
         }
         if (n == 2) {

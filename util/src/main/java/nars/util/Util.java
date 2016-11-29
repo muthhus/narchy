@@ -21,6 +21,7 @@ import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Longs;
 import nars.util.data.LongString;
 import nars.util.list.FasterList;
+import nars.util.signal.OneDHaar;
 import org.apache.commons.lang3.ArrayUtils;
 import org.eclipse.collections.api.block.function.primitive.IntToFloatFunction;
 import org.eclipse.collections.api.tuple.Pair;
@@ -1377,4 +1378,29 @@ public enum Util { ;
         }
     }
 
+    public static int largestPowerOf2NoGreaterThan(int i) {
+        if ( isPowerOf2(i) )
+            return i;
+        else {
+            int curr = i-1;
+            while ( curr > 0 ) {
+                if ( isPowerOf2(curr) ) {
+                    return curr;
+                }
+                else {
+                    --curr;
+                }
+            }
+            return 0;
+        }
+    }
+
+    public static boolean isPowerOf2(int n) {
+        if (n < 1) {
+            return false;
+        } else {
+            double p_of_2 = (Math.log(n) / OneDHaar.log2);
+            return Math.abs(p_of_2 - Math.round((int) p_of_2)) == 0;
+        }
+    }
 }

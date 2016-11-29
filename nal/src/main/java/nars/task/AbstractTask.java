@@ -568,6 +568,8 @@ public abstract class AbstractTask extends RawBudget implements Task, Temporal {
                 if (dur!=dur)
                     throw new RuntimeException("NaN duration");
 
+                //dur *= evidence().length;
+
                 float dc = TruthPolation.evidenceDecay(cw, dur, delta);
                 if (eternalizable())
                     return Math.max(dc, t.eternalizedConf());

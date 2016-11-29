@@ -84,6 +84,10 @@ public class Plot2D extends Surface {
                 //mean += v;
             });
         }
+        public void range(float min, float max) {
+            minValue = min;
+            maxValue = max;
+        }
 
         protected void limit() {
             int over = size() - (this.capacity-1);
@@ -94,6 +98,7 @@ public class Plot2D extends Surface {
         public float[] array() {
             return items;
         }
+
     }
 
     private transient float minValue, maxValue;

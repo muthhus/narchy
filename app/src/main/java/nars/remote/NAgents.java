@@ -171,12 +171,12 @@ abstract public class NAgents extends NAgent {
                 //new SingleThreadExecutioner();
                 new MultiThreadExecutioner(threads, 16384 /* TODO chose a power of 2 number to scale proportionally to # of threads */);
 
-        int volMax = 32;
-        int conceptsPerCycle = 64;
+        int volMax = 40;
+        int conceptsPerCycle = 96;
 
 
         //Multi nar = new Multi(3,512,
-        Default nar = new Default(2048,
+        Default nar = new Default(1024,
                 conceptsPerCycle, 1, 3, rng,
                 //new CaffeineIndex(new DefaultConceptBuilder(rng), 1024*1024, volMax/2, false, exe)
                 new TreeTermIndex.L1TreeIndex(new DefaultConceptBuilder(), 4 * 1024 * 128, 32 * 1024, 4)
@@ -288,7 +288,6 @@ abstract public class NAgents extends NAgent {
 //        });
 
 
-        //nar.linkFeedbackRate.setValue(0.01f);
         return nar;
     }
 
@@ -325,7 +324,7 @@ abstract public class NAgents extends NAgent {
 
         a.nar.runLater(()-> {
 
-            Vis.conceptsWindow2D(a.nar, 16, 4).show(1000, 800);
+            Vis.conceptsWindow2D(a.nar, 64, 8).show(1000, 800);
 
             window(
                     grid(

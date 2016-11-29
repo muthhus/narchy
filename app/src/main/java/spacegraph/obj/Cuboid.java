@@ -11,6 +11,7 @@ import spacegraph.math.v3;
 import spacegraph.phys.Collidable;
 import spacegraph.phys.collision.ClosestRay;
 import spacegraph.phys.math.Transform;
+import spacegraph.phys.shape.BoxShape;
 import spacegraph.phys.shape.SimpleBoxShape;
 import spacegraph.render.Draw;
 
@@ -94,7 +95,7 @@ public class Cuboid<X> extends SimpleSpatial<X> {
             //                this.thick = h.z;
             //            }
 
-            SimpleBoxShape shape = (SimpleBoxShape) body.shape();
+            BoxShape shape = (BoxShape) body.shape();
             float frontZ = shape.z() / 2;
             float zTolerance = frontZ / 4f;
 

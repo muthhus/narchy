@@ -1,6 +1,6 @@
 package spacegraph.audio;
 
-import nars.util.signal.OneDHaar;
+import nars.util.Util;
 import org.apache.commons.math3.util.FastMath;
 
 /**
@@ -17,7 +17,7 @@ public class SineSource implements WaveSource {
     public SineSource(double freq) {
         this.freq = freq;
         //nyquist:
-        samples = OneDHaar.largestPowerOf2NoGreaterThan((int) Math.ceil(freq * 2));
+        samples = Util.largestPowerOf2NoGreaterThan((int) Math.ceil(freq * 2));
     }
 
     @Override

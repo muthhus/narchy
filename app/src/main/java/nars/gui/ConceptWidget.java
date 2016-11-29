@@ -284,15 +284,15 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<BLink<? exte
 
 
                 if (priSum > 0) {
-                    this.r = 0.25f;
-                    this.g = 0.25f + 0.75f * (tasklinkPri / priSum);
-                    this.b = 0.25f + 0.75f * (termlinkPri / priSum);
+                    this.r = 0.1f;
+                    this.g = 0.1f + 0.85f * (tasklinkPri / priSum);
+                    this.b = 0.1f + 0.85f * (termlinkPri / priSum);
                 } else {
                     this.r = this.g = this.b = 0.5f;
                 }
 
                 //this.a = 0.1f + 0.5f * pri;
-                this.a = 0.25f + 0.75f * Math.max(tasklinkPri,termlinkPri);
+                this.a = 0.25f + 0.5f * priSum/2f;
                 //0.9f;
 
                 this.attraction = 0.25f + priSum * 0.75f;// * 0.5f + 0.5f;
@@ -320,9 +320,9 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<BLink<? exte
             p = (p == p) ? p : 0;// = 1; //pri = key.priIfFiniteElseZero();
 
             //sqrt because the area will be the sqr of this dimension
-            float nodeScale = ((float) Math.sqrt(minSize + p * maxSize));//1f + 2f * p;
+            float nodeScale = (minSize + p * maxSize);//1f + 2f * p;
             //nodeScale /= Math.sqrt(tt.volume());
-            conceptWidget.scale(nodeScale, nodeScale, nodeScale);
+            conceptWidget.scale(nodeScale * 1.618f, nodeScale, nodeScale/1.618f);
 
 
             Draw.hsb((tt.op().ordinal() / 16f), 0.75f + 0.25f * p, 0.75f, 0.9f, conceptWidget.shapeColor);
@@ -349,9 +349,11 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<BLink<? exte
             //nodeScale /= Math.sqrt(tt.volume());
             conceptWidget.scale(nodeScale, nodeScale, nodeScale);
 
-            float density = 0.5f;
+
+            float minMass = 0.5f;
+            float maxMass = 4.5f;
             if (conceptWidget.body!=null)
-                conceptWidget.body.setMass(nodeScale*nodeScale*nodeScale*density);
+                conceptWidget.body.setMass(minMass + p*(maxMass-minMass));
 
             Draw.hsb(
                     (tt.op().ordinal() / 16f),
