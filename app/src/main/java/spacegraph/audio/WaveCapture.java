@@ -34,11 +34,10 @@ public class WaveCapture implements Runnable {
     private float[] samples;
 
 
-    private final int freqSamplesPerFrame = 64;
-    private final int freqOffset = 16;
+    public final int freqSamplesPerFrame = 16;
 
-    private final int historyFrames = 64;
-    private float[] history;
+    private final int historyFrames = 32;
+    public float[] history;
 
     private WaveSource source;
 
@@ -274,10 +273,10 @@ public class WaveCapture implements Runnable {
 
                 final Envelope uniform = (i,k)->{
                     float centerFreq = (0.5f + i) * bandWidth;
-                    return 1f/(1f + Math.abs(k - centerFreq)/(bandWidth*sensitivity));
+                    return 1f/(1f + Math.abs(k - centerFreq)/(bandWidth/sensitivity));
                 };
 
-                System.arraycopy(history, freqSamplesPerFrame, history, 0, lastFrameIdx);
+                System.arraycopy(history, 0, history, freqSamplesPerFrame, lastFrameIdx);
 
                 float[] h = WaveCapture.this.history;
 
@@ -287,15 +286,17 @@ public class WaveCapture implements Runnable {
 //                    h[n++] = freqSamples[f];
 //                    f+=freqSkip*2;
 //                }
-                for (int k = 0; k < samples; k++) {
-                    float fk = freqSamples[k];
-                    int n = lastFrameIdx;
-                    for (int i = 0; i < freqSamplesPerFrame; i++) {
-                        h[n++] = uniform.apply(i,k) * fk;
+                for (int i = 0; i < freqSamplesPerFrame; i++) {
+
+                    float s = 0;
+                    for (int k = 0; k < samples; k++) {
+                        float fk = freqSamples[k];
+                        s += uniform.apply(i,k) * fk;
                     }
+                    h[i] = s;
                 }
 
-                System.arraycopy(freqSamples, freqOffset, history, lastFrameIdx, freqSamplesPerFrame);
+                //System.arraycopy(freqSamples, 0, history, 0, freqSamplesPerFrame);
             }
 
         };
@@ -341,12 +342,11 @@ public class WaveCapture implements Runnable {
     }
 
     public static void main(String[] args) {
-        AudioSource audio = new AudioSource( 7, 25);
+        AudioSource audio = new AudioSource( 7, 20);
         WaveCapture au = new WaveCapture(
                 audio,
                 //new SineSource(128),
-                25);
-
+                20);
 
         SpaceGraph.window(row(
             au.newMonitorPane(),

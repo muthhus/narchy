@@ -36,7 +36,7 @@ public class CurveBag<V> extends ArrayBag<V> implements Bag<V> {
 
 
     public CurveBag(@NotNull BudgetMerge mergeFunction, Random rng) {
-        this(8, new CurveBag.NormalizedSampler(power2BagCurve, rng), mergeFunction, new ConcurrentHashMap<>());
+        this(8, new CurveBag.DirectSampler(power2BagCurve, rng), mergeFunction, new ConcurrentHashMap<>());
     }
 
 
@@ -110,7 +110,7 @@ public class CurveBag<V> extends ArrayBag<V> implements Bag<V> {
                 n = ss;
             } else {
                 //shift upward by the radius to be fair about what is being sampled. to start from the sample index is biased against lower ranked items because they will be selected in increasing values
-                int b = sampleIndex();
+                int b = sampleIndex(ss);
                 if (b + n > ss) {
                     b = ss - n;
                 }
@@ -376,9 +376,13 @@ public class CurveBag<V> extends ArrayBag<V> implements Bag<V> {
 
 
     public final int sampleIndex() {
-        int s = size();
+        return sampleIndex(size());
+    }
+
+    private final int sampleIndex(int s) {
         return s <= 1 ? 0 : index(sampler.sample(s), s);
     }
+
 
 
 //    /** provides a next index to sample from */

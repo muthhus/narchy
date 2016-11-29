@@ -69,7 +69,7 @@ public class Tetris extends NAgents {
      * @param timePerFall larger is slower gravity
      */
     public Tetris(NAR nar, int width, int height, int timePerFall) {
-        super(nar);
+        super("tetris", nar);
 
         state = new TetrisState(width, height, timePerFall) {
             @Override
@@ -157,8 +157,8 @@ public class Tetris extends NAgents {
                     //return $.t(0.5f, alpha); //no action taken or move ineffective
                 }
             }
-            //return $.t(0.5f, alpha); //no action taken or move ineffective
-            return null;
+            return $.t(0.5f, alpha); //no action taken or move ineffective
+            //return null;
         }));
 
         //if (rotate) {
@@ -179,8 +179,8 @@ public class Tetris extends NAgents {
                         //return $.t(0.5f, alpha); //no action taken or move ineffective
                     }
                 }
-                //return $.t(0.5f, alpha); //no action taken or move ineffective
-                return null;
+                return $.t(0.5f, alpha); //no action taken or move ineffective
+                //return null;
             }));
 //        } else {
 //            motorRotate = null;

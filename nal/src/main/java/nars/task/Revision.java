@@ -199,9 +199,16 @@ public class Revision {
 
         depth/=2f;
 
-        int dt = mergeOrChoose ?
-                (lerp(adt, bdt, aProp)) :
-                ((choose(a, b, aProp, rng) == a) ? adt : bdt);
+        int dt;
+        if (adt == DTERNAL)
+            dt = bdt;
+        else if (bdt == DTERNAL)
+            dt = adt;
+        else {
+            dt = mergeOrChoose ?
+                    (lerp(adt, bdt, aProp)) :
+                    ((choose(a, b, aProp, rng) == a) ? adt : bdt);
+        }
 
 
         return $.compound(a.op(), dt,

@@ -95,7 +95,7 @@ public class Cuboid<X> extends SimpleSpatial<X> {
             //                this.thick = h.z;
             //            }
 
-            BoxShape shape = (BoxShape) body.shape();
+            SimpleBoxShape shape = (SimpleBoxShape) body.shape();
             float frontZ = shape.z() / 2;
             float zTolerance = frontZ / 4f;
 

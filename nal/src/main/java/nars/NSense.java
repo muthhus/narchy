@@ -13,10 +13,8 @@ import org.jetbrains.annotations.NotNull;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.Collection;
-import java.util.function.BooleanSupplier;
-import java.util.function.DoubleSupplier;
-import java.util.function.IntSupplier;
-import java.util.function.Supplier;
+import java.util.List;
+import java.util.function.*;
 
 /**
  * Created by me on 9/30/16.
@@ -159,6 +157,16 @@ public interface NSense {
 //            e1.printStackTrace();
 //        }
     }
+
+    @NotNull
+    default List<SensorConcept> senseNumber(int from, int to, IntFunction<String> id, IntFunction<FloatSupplier> v) {
+        List<SensorConcept> l = $.newArrayList(to-from);
+        for (int i = from; i < to; i++) {
+            l.addAll( senseNumber(id.apply(i), v.apply(i)).sensors );
+        }
+        return l;
+    }
+
 
     @NotNull
     default FuzzyScalarConcepts senseNumber(String id, FloatSupplier v) {

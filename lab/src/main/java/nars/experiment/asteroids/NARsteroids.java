@@ -22,7 +22,7 @@ public class NARsteroids extends NAgents {
     }
 
     public NARsteroids(NAR nar) {
-        super(nar, 0);
+        super("ast", nar, 0);
 
         this.space = new Asteroids(false);
         int W = space.getWidth();

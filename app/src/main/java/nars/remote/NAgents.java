@@ -54,12 +54,15 @@ abstract public class NAgents extends NAgent {
     public final Map<String, CameraSensor> cam = new LinkedHashMap<>();
 
     public NAgents(NAR nar) {
-        this(nar, 1);
+        this("", nar);
     }
 
-    public NAgents(NAR nar, int reasonerFramesPerEnvironmentFrame) {
-        super(nar, reasonerFramesPerEnvironmentFrame);
+    public NAgents(String id, NAR nar) {
+        this(id, nar, 1);
+    }
 
+    public NAgents(String id, NAR nar, int reasonerFramesPerEnvironmentFrame) {
+        super(id, nar, reasonerFramesPerEnvironmentFrame);
     }
 
     public static void run(Function<NAR, NAgents> init, int frames) {
@@ -172,7 +175,7 @@ abstract public class NAgents extends NAgent {
                 new MultiThreadExecutioner(threads, 16384 /* TODO chose a power of 2 number to scale proportionally to # of threads */);
 
         int volMax = 40;
-        int conceptsPerCycle = 96;
+        int conceptsPerCycle = 32*threads;
 
 
         //Multi nar = new Multi(3,512,

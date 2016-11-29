@@ -15,7 +15,7 @@ public class PacmanAgent extends NAgents {
 
 
     public PacmanAgent(NAR nar) {
-        super(nar, 1);
+        super("pac", nar, 1);
 
         game = new PacmanGame();
 
@@ -25,16 +25,16 @@ public class PacmanAgent extends NAgents {
 //        senseNumber("(ball,vx)", ()-> game.ball.velocityX);
 //        senseNumber("(ball,vy)", ()-> game.ball.velocityY);
 //
-        addCamera("game", game, visW, visH);
+        addCamera("pac", game, visW, visH);
         //addCameraRetina("game", game, visW, visH);
 
         int speed = 10;
-        actionBipolar("move(x)", (f) -> {
+        actionBipolar("pac(move,x)", (f) -> {
             return game.pacman.move(game.board, 0, Math.round(f * speed)) > 0;
 
         });
 
-        actionBipolar("move(y)", (f) -> {
+        actionBipolar("pac(move,y)", (f) -> {
             return game.pacman.move(game.board, Math.round(f * speed), 0) > 0;
         });
 

@@ -64,6 +64,7 @@ abstract public class NAgent implements NSense, NAction {
     @NotNull
     public final FloatNormalized rewardNormalized;
     private final float actionBoost;
+    private final String id;
 
     public NAR nar;
 
@@ -134,11 +135,12 @@ abstract public class NAgent implements NSense, NAction {
     //private MutableFloat maxSensorPriority;
 
     public NAgent(@NotNull NAR nar) {
-        this(nar, 1);
+        this("", nar, 1);
     }
 
-    public NAgent(@NotNull NAR nar, int frameRate) {
+    public NAgent(String id, @NotNull NAR nar, int frameRate) {
 
+        this.id = id;
         this.nar = nar;
         alpha = this.nar.confidenceDefault(BELIEF);
         gamma = this.nar.confidenceDefault(GOAL);
@@ -154,9 +156,10 @@ abstract public class NAgent implements NSense, NAction {
 
         rewardNormalized = new FloatPolarNormalized(() -> rewardValue);
 
-        happy = new SensorConcept("" +
+
+        happy = new SensorConcept(
                 //"happy" + "(" + nar.self + ")", nar,
-                "(happy)",
+                "happy(" + id + ")",
                 nar,
                 rewardNormalized,
                 (x) -> t(x, rewardConf)
@@ -170,7 +173,7 @@ abstract public class NAgent implements NSense, NAction {
 
         joy = new SensorConcept(
                 //"joy" + "(" + nar.self + ")", nar,
-                "(joy)",
+                "change(" + happy.term() + ")",
                 nar,
                 new FloatPolarNormalized(
                         new FirstOrderDifferenceFloat(
@@ -377,8 +380,8 @@ abstract public class NAgent implements NSense, NAction {
 
             predictors.add(
                     new MutableTask(happy, '!', 1f, rewardGamma)
-                            .eternal()
-                            //.present(nar)
+                            //.eternal()
+                            .present(nar)
             );
 //                    happy.desire($.t(1f, rewardGamma),
 //                            nar.priorityDefault(Symbols.GOAL),

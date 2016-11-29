@@ -2,12 +2,12 @@ package spacegraph.obj.layout;
 
 import com.google.common.collect.Iterables;
 import com.jogamp.opengl.GL2;
-import org.apache.commons.lang3.mutable.MutableFloat;
 import spacegraph.Surface;
 import spacegraph.math.v2;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.function.Function;
 
 import static nars.util.Util.lerp;
 
@@ -180,15 +180,23 @@ public class Grid extends Layout {
     public static Grid grid(Surface... content) {
         return new Grid(content);
     }
+    public static <S> Grid grid(Collection<S> c, Function<S,Surface> builder) {
+        Surface ss [] = new Surface[c.size()];
+        int i = 0;
+        for (S x : c) {
+            ss[i++] = builder.apply(x);
+        }
+        return grid(ss);
+    }
 
-    public static Grid row(Collection<Surface> content) {
+    public static Grid row(Collection<? extends Surface> content) {
         return row(array(content));
     }
-    public static Grid col(Collection<Surface> content) {
+    public static Grid col(Collection<? extends Surface> content) {
         return col(array(content));
     }
 
-    static Surface[] array(Collection<Surface> content) {
+    static Surface[] array(Collection<? extends Surface> content) {
         return content.toArray(new Surface[content.size()]);
     }
 

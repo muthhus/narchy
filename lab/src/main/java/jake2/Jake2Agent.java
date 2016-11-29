@@ -83,7 +83,7 @@ public class Jake2Agent extends NAgents implements Runnable {
     final PlayerData player = new PlayerData();
 
     public Jake2Agent(NAR nar) {
-        super(nar, 1);
+        super("q", nar, 1);
 
 
         Sensor2D<PixelBag> qcam = addCameraRetina("q", screenshotter, 64, 64, (v) -> t(v, alpha));
@@ -94,28 +94,28 @@ public class Jake2Agent extends NAgents implements Runnable {
 
         senseFields("q", player);
 
-        actionToggle("(fore)", (x) -> CL_input.in_forward.state = x ? 1 : 0);
-        actionToggle("(back)", (x) -> CL_input.in_back.state = x ? 1 : 0);
+        actionToggle("q(fore)", (x) -> CL_input.in_forward.state = x ? 1 : 0);
+        actionToggle("q(back)", (x) -> CL_input.in_back.state = x ? 1 : 0);
 
         //actionToggle("(left)", (x) -> CL_input.in_left.state = x ? 1 : 0);
         //actionToggle("(right)", (x) -> CL_input.in_right.state = x ? 1 : 0);
-        actionToggle("(moveleft)", (x) -> CL_input.in_moveleft.state = x ? 1 : 0);
-        actionToggle("(moveright)", (x) -> CL_input.in_moveright.state = x ? 1 : 0);
-        actionToggle("(jump)", (x) -> CL_input.in_up.state = x ? 1 : 0);
-        actionBipolar("(lookyaw)", (x) -> {
+        actionToggle("q(moveleft)", (x) -> CL_input.in_moveleft.state = x ? 1 : 0);
+        actionToggle("q(moveright)", (x) -> CL_input.in_moveright.state = x ? 1 : 0);
+        actionToggle("q(jump)", (x) -> CL_input.in_up.state = x ? 1 : 0);
+        actionBipolar("q(lookyaw)", (x) -> {
             float yawSpeed = 10;
             cl.viewangles[Defines.YAW] += yawSpeed * x;
             //return CL_input.in_lookup.state = x ? 1 : 0;
             return true;
         });
-        actionBipolar("(lookpitch)", (x) -> {
+        actionBipolar("q(lookpitch)", (x) -> {
             float pitchSpeed = 20; //absolute
             cl.viewangles[Defines.PITCH] = pitchSpeed * x;
             //return CL_input.in_lookup.state = x ? 1 : 0;
             return true;
         });
         //actionToggle("(lookdown)", (x) -> CL_input.in_lookdown.state = x ? 1 : 0);
-        actionToggle("(attak)", (x) -> CL_input.in_attack.state = x ? 1 : 0);
+        actionToggle("q(attak)", (x) -> CL_input.in_attack.state = x ? 1 : 0);
 
         new Thread(this).start();
     }

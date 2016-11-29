@@ -638,6 +638,11 @@ public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Iterable<BLink<
         });
     }
 
+    default Bag<V> capacity(int i) {
+        setCapacity(i);
+        return this;
+    }
+
     //TODO default @NotNull Bag<V> move(int limit, @NotNull Bag target) {
 
 }

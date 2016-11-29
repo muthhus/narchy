@@ -39,7 +39,7 @@ public class commai extends NAgents {
     - Loop: accept reward, accept environment bit, send reply bit.
     */
     public commai(NAR nar) {
-        super(nar, 1);
+        super("commai", nar, 1);
 
         ctx = new ZContext();
         client = ctx.createSocket(ZMQ.PAIR);

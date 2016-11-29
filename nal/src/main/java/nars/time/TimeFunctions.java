@@ -215,6 +215,8 @@ public interface TimeFunctions {
 //                }
             }
 
+
+
             occReturn[0] = start;
 
             //HACK to handle commutive switching so that the dt is relative to the effective subject
@@ -641,6 +643,7 @@ public interface TimeFunctions {
     @NotNull
     static Compound deriveDT(@NotNull Compound derived, int polarity, @NotNull PremiseEval p, int eventDelta, @NotNull long[] occReturn) {
         int dt;
+
         dt = eventDelta == DTERNAL ? DTERNAL : eventDelta * polarity;
 
         return dt(derived, dt, p, occReturn);

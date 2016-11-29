@@ -598,6 +598,9 @@ public abstract class AbstractTask extends RawBudget implements Task, Temporal {
     @Override public long end() {
 
         //return occurrence();
+        long p = occurrence();
+        if (p == ETERNAL)
+            return ETERNAL;
 
         long dt = 0;
         if (op().temporal) {
@@ -605,7 +608,7 @@ public abstract class AbstractTask extends RawBudget implements Task, Temporal {
             if (dt==DTERNAL)
                 dt = 0;
         }
-        return occurrence()+dt;
+        return p + dt;
     }
 
     @Override

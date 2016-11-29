@@ -25,15 +25,15 @@ public class TopCraft extends NAgents {
     }
 
     public TopCraft(NAR nar) {
-        super(nar, 1);
+        super("cra", nar, 1);
 
         this.craft = new TopDownMinicraft();
 
-        pixels = addCameraRetina("see", ()->craft.image, 48,48, (v) -> $.t( v, alpha));
+        pixels = addCameraRetina("cra", ()->craft.image, 48,48, (v) -> $.t( v, alpha));
         //pixels = addFreqCamera("see", ()->craft.image, 64,64, (v) -> $.t( v, alpha));
 
         int nx = 8;
-        camAE = new PixelAutoClassifier("see", pixels.src.pixels, nx, nx,   (subX, subY) -> {
+        camAE = new PixelAutoClassifier("cra", pixels.src.pixels, nx, nx,   (subX, subY) -> {
             //context metadata: camera zoom, to give a sense of scale
             //return new float[]{subX / ((float) (nx - 1)), subY / ((float) (nx - 1)), pixels.src.Z};
             return new float[]{ pixels.src.Z};
@@ -41,20 +41,20 @@ public class TopCraft extends NAgents {
         window(camAE.newChart(), 500, 500);
 
 
-        senseSwitch("dir", ()->craft.player.dir, 0, 4);
-        sense("(stamina)", ()->(craft.player.stamina)/((float)craft.player.maxStamina));
-        sense("(health)", ()->(craft.player.health)/((float)craft.player.maxHealth));
+        senseSwitch("cra(dir)", ()->craft.player.dir, 0, 4);
+        sense("cra(stamina)", ()->(craft.player.stamina)/((float)craft.player.maxStamina));
+        sense("cra(health)", ()->(craft.player.health)/((float)craft.player.maxHealth));
 
         int tileMax = 13;
-        senseSwitch("(tile,here)", ()->craft.player.tile().id, 0, tileMax);
-        senseSwitch("(tile,up)", ()->craft.player.tile(0,1).id, 0, tileMax);
-        senseSwitch("(tile,down)", ()->craft.player.tile(0,-1).id, 0, tileMax);
-        senseSwitch("(tile,right)", ()->craft.player.tile(1,0).id, 0, tileMax);
-        senseSwitch("(tile,left)", ()->craft.player.tile(-1,0).id, 0, tileMax);
+        senseSwitch("cra(tile,here)", ()->craft.player.tile().id, 0, tileMax);
+        senseSwitch("cra(tile,up)", ()->craft.player.tile(0,1).id, 0, tileMax);
+        senseSwitch("cra(tile,down)", ()->craft.player.tile(0,-1).id, 0, tileMax);
+        senseSwitch("cra(tile,right)", ()->craft.player.tile(1,0).id, 0, tileMax);
+        senseSwitch("cra(tile,left)", ()->craft.player.tile(-1,0).id, 0, tileMax);
 
         InputHandler input = craft.input;
-        actionToggleRapid("(fire)", (b) -> input.attack.toggle(b), 16 );
-        actionTriState("(moveX)", (i)->{
+        actionToggleRapid("cra(fire)", (b) -> input.attack.toggle(b), 16 );
+        actionTriState("cra(moveX)", (i)->{
            boolean l = false, r = false;
            switch (i) {
                case -1: l = true;  break;
@@ -63,7 +63,7 @@ public class TopCraft extends NAgents {
            input.left.toggle(l);
            input.right.toggle(r);
         });
-        actionTriState("(moveY)", (i)->{
+        actionTriState("cra(moveY)", (i)->{
             boolean u = false, d = false;
             switch (i) {
                 case -1:  u = true;  break;
@@ -72,7 +72,7 @@ public class TopCraft extends NAgents {
             input.up.toggle(u);
             input.down.toggle(d);
         });
-        actionToggle("(menu)", (b) -> input.menu.toggle(b) );
+        actionToggle("cra(menu)", (b) -> input.menu.toggle(b) );
 
 //        Param.DEBUG = true;
 //        nar.onTask(t ->{

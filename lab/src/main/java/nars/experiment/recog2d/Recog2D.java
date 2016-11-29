@@ -61,7 +61,7 @@ public class Recog2D extends NAgents {
     }
 
     public Recog2D(NAR n) {
-        super(n, 8);
+        super("x", n, 8);
 
         w = 10;
         h = 12;

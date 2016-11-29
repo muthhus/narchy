@@ -43,7 +43,7 @@ public class Line1DContinuous extends NAgent {
     final float[] ins;
 
     public Line1DContinuous(NAR n, int size, IntToFloatFunction target) {
-        super(n);
+        super("x", n, 1);
         this.size = size;
         ins = new float[size*2];
         this.targetFunc = target;
@@ -56,16 +56,17 @@ public class Line1DContinuous extends NAgent {
             int ii = i;
             //hidden
             sensors.add(new SensorConcept(
-                    //$.func("h", $.the(i)),
-                    $.p($.the("h"), $.the(i)),
+                    $.func("h", $.the("x"), $.the( i)),
+                    //$.p($.the("h"), $.the(i)),
                     n, ()->{
                 return ins[ii];
             }, (v) -> $.t(v, alpha)));
 
             //estimated
             sensors.add(new SensorConcept(
+                    $.func("e", $.the("x"), $.the( i)),
                     //$.func("e", $.the(i)),
-                    $.p($.the("e"), $.the(i)),
+                    //$.p($.the("e"), $.the(i)),
                     n, ()->{
                 return ins[size + ii];
             }, (v) -> $.t(v, alpha)));
@@ -73,7 +74,7 @@ public class Line1DContinuous extends NAgent {
 
         ActionConcept a;
 
-        actions.add(a = new ActionConcept("e(move)", n, (b, d) -> {
+        actions.add(a = new ActionConcept("move(x)", n, (b, d) -> {
             if (d!=null) {
                 float v =
                         //d.expectation();
@@ -284,7 +285,8 @@ public class Line1DContinuous extends NAgent {
         });
 
         l.print = true;
-        l.runRT(5, 15000).join();
+        //l.runRT(5, 15000).join();
+        l.run(5000);
 
 
         NAR.printTasks(nar, true);

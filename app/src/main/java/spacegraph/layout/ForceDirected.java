@@ -24,8 +24,8 @@ public class ForceDirected implements spacegraph.phys.constraint.BroadConstraint
             //13;
 
 
-    public final FloatParam repel = new FloatParam(20f, 0, 100);
-    public final FloatParam attraction = new FloatParam(30f, 0, 100);
+    public final FloatParam repel = new FloatParam(4f, 0, 25);
+    public final FloatParam attraction = new FloatParam(6f, 0, 25);
 
     final v3 boundsMin, boundsMax;
     final float maxRepelDist;

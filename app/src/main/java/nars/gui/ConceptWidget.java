@@ -41,22 +41,26 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<BLink<? exte
     private ConceptVis conceptVis = new ConceptVis2();
     private transient ConceptsSpace space;
 
+    private static final float bagMomentum = 0.5f;
+
 
     public ConceptWidget(NAR nar, Termed x, int numEdges) {
         super(x.term(),1, 1);
 
         setFront(
-            col(new Label(x.toString()),
+            /*col(
+                    new Label(x.toString()),
                 row(new FloatSlider( 0, 0, 4 ), new BeliefTableChart(nar, x))
                     //new CheckBox("?")
-            )
+            )*/
+            new ConceptIcon(nar, x)
         );
 
         //float edgeActivationRate = 1f;
 
 //        edges = //new HijackBag<>(maxEdges * maxNodes, 4, BudgetMerge.plusBlend, nar.random);
         this.edges =
-            new ArrayBag<>(numEdges, BudgetMerge.max, new HashMap<>(numEdges));
+            new ArrayBag<>(numEdges, BudgetMerge.avgBlend, new HashMap<>(numEdges));
         edges.setCapacity(numEdges);
 
 //        for (int i = 0; i < edges; i++)
@@ -215,7 +219,7 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<BLink<? exte
             if (at!=null) {
                 TermEdge ate = new TermEdge(at);
 
-                BLink<TermEdge> x = edges.put(ate, tgt);
+                BLink<TermEdge> x = edges.put(ate, tgt, bagMomentum, null);
                 if (x!=null) {
                     x.get().add(tgt, !(ttt instanceof Task));
                 }
@@ -284,7 +288,7 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<BLink<? exte
 
 
                 if (priSum > 0) {
-                    this.r = 0.1f;
+                    this.r = qEst;
                     this.g = 0.1f + 0.85f * (tasklinkPri / priSum);
                     this.b = 0.1f + 0.85f * (termlinkPri / priSum);
                 } else {
@@ -292,7 +296,7 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<BLink<? exte
                 }
 
                 //this.a = 0.1f + 0.5f * pri;
-                this.a = 0.25f + 0.5f * priSum/2f;
+                this.a = 0.1f + 0.5f * Math.max(tasklinkPri, termlinkPri);
                 //0.9f;
 
                 this.attraction = 0.25f + priSum * 0.75f;// * 0.5f + 0.5f;
@@ -320,9 +324,8 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<BLink<? exte
             p = (p == p) ? p : 0;// = 1; //pri = key.priIfFiniteElseZero();
 
             //sqrt because the area will be the sqr of this dimension
-            float nodeScale = (minSize + p * maxSize);//1f + 2f * p;
-            //nodeScale /= Math.sqrt(tt.volume());
-            conceptWidget.scale(nodeScale * 1.618f, nodeScale, nodeScale/1.618f);
+            float nodeScale = (float) (minSize + Math.sqrt(p) * maxSize);//1f + 2f * p;
+            conceptWidget.scale(nodeScale, nodeScale, nodeScale);
 
 
             Draw.hsb((tt.op().ordinal() / 16f), 0.75f + 0.25f * p, 0.75f, 0.9f, conceptWidget.shapeColor);
@@ -345,15 +348,16 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<BLink<? exte
             float q = conceptWidget.concept.questions().priSum();
             float ec = p + 0.5f * w2c((b + g + q)/2f);
 
-            float nodeScale = minSize + ec * maxSize;
-            //nodeScale /= Math.sqrt(tt.volume());
-            conceptWidget.scale(nodeScale, nodeScale, nodeScale);
+            //sqrt because the area will be the sqr of this dimension
+            float nodeScale = (float) (minSize + ec * maxSize);//1f + 2f * p;
+            conceptWidget.scale(nodeScale*1.618f, nodeScale, nodeScale/1.618f);
 
 
-            float minMass = 0.5f;
-            float maxMass = 4.5f;
+
+            float minMass = 1f;
+            float maxMass = 25f;
             if (conceptWidget.body!=null)
-                conceptWidget.body.setMass(minMass + p*(maxMass-minMass));
+                conceptWidget.body.setMass(minMass + (ec)*(maxMass-minMass));
 
             Draw.hsb(
                     (tt.op().ordinal() / 16f),

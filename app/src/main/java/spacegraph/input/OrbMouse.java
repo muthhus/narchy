@@ -218,6 +218,8 @@ public class OrbMouse extends SpaceMouse implements KeyListener {
 
 
         ClosestRay cray = mousePick(px, py);
+        if (cray == null)
+            return false;
 
         /*System.out.println(mouseTouch.collisionObject + " touched with " +
             Arrays.toString(buttons) + " at " + mouseTouch.hitPointWorld
@@ -366,7 +368,11 @@ public class OrbMouse extends SpaceMouse implements KeyListener {
 
         Matrix4f viewMatrixInv = new Matrix4f(space.mat4f);
 
-        viewMatrixInv.invert();
+        try {
+            viewMatrixInv.invert();
+        } catch (SingularMatrixException e) {
+            return null;
+        }
         viewMatrixInv.transform(ray_eye);
         ray_eye.setZ(-1f);
         ray_eye.setW(1f);

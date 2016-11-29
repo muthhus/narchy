@@ -147,8 +147,8 @@ public class DefaultConceptBuilder implements ConceptBuilder {
         this.nar = nar;
 
         this.defaultCurveSampler =
-                //new CurveBag.DirectSampler(
-                new CurveBag.NormalizedSampler(
+                new CurveBag.DirectSampler(
+                //new CurveBag.NormalizedSampler(
                         //new CurveBag.DirectSampler(
                         //CurveBag.linearBagCurve,
                         CurveBag.power2BagCurve,

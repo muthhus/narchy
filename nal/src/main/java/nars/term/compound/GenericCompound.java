@@ -16,6 +16,7 @@ import org.jetbrains.annotations.Nullable;
 
 import static nars.Op.CONJ;
 import static nars.time.Tense.DTERNAL;
+import static nars.time.Tense.XTERNAL;
 
 
 public class GenericCompound implements Compound  {
@@ -57,6 +58,9 @@ public class GenericCompound implements Compound  {
             if (op != CONJ && (op.temporal && subterms.size()!=2))
                 throw new InvalidTermException(op, dt, subterms.terms(), "Invalid dt value for operator " + op);
         }
+
+//        if (dt!=XTERNAL && dt!=DTERNAL && Math.abs(dt) > 2000000)
+//            System.err.println("time oob");
 
         this.op = op;
 

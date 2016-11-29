@@ -163,19 +163,18 @@ public class SimpleSpatial<X> extends AbstractSpatial<X> {
 
     public void scale(float sx, float sy, float sz) {
 
-        if (shape instanceof BoxShape)
-            ((BoxShape)shape).size(sx, sy, sz);
+        if (shape instanceof SimpleBoxShape)
+            ((SimpleBoxShape)shape).size(sx, sy, sz);
         else
             shape.setLocalScaling(v(sx,sy,sz));
-
 
         reactivate();
     }
 
     //TODO make abstract
     protected CollisionShape newShape() {
-        //return new SimpleBoxShape(v3.v(1, 1, 1));
-        return new BoxShape(v3.v(1, 1, 1));
+        return new SimpleBoxShape(v3.v(1,1,1));
+        //return new BoxShape(v3.v(1, 1, 1));
     }
 
     public Dynamic newBody(boolean collidesWithOthersLikeThis) {
