@@ -77,9 +77,10 @@ public class WaveCapture implements Runnable {
 
         MatrixView freqHistory = new MatrixView(freqSamplesPerFrame, historyFrames, (x, y, g) -> {
             if (history == null)
-                return 0;
-            float v = (history[y * freqSamplesPerFrame + x]+1f)/2f;
-            g.glColor3f(1-v, v, 0);
+                return 0; //HACK
+            float v = (history[y * freqSamplesPerFrame + x]);
+            int kw = (int)(v*255);
+            g.glColor3f(kw >= 0 ? kw : 0, kw < 0 ? -kw : 0, 0);
             return 0;
         });
 
@@ -301,9 +302,9 @@ public class WaveCapture implements Runnable {
                 audio,
                 //new SineSource(128),
                 50);
-        audio.gain = 4f;
+        audio.gain = 1f;
 
-        new SpaceGraph(new Cuboid(au.newMonitorPane(), 16,8)).show(1200,1200);
+        SpaceGraph.window(au.newMonitorPane(),1200,1200);
 
 //            b.setScene(new Scene(au.newMonitorPane(), 500, 400));
 //            b.show();
