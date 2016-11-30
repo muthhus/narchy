@@ -34,7 +34,7 @@ public class BagChart<X> extends TreeChart<BLink<X>> implements BiConsumer<BLink
 
     public void update() {
         if (busy.compareAndSet(false, true)) {
-            update(1f, 1f, bag.size(), bag, this, i -> {
+            update(1f, 1f, bag, this, i -> {
                 @Nullable X ii = i.get();
                 return ii != null ? newItem(i) : null;
             });
@@ -42,7 +42,7 @@ public class BagChart<X> extends TreeChart<BLink<X>> implements BiConsumer<BLink
     }
 
     @NotNull protected ItemVis<BLink<X>> newItem(@NotNull BLink<X> i) {
-        return new ItemVis<>(i, label(i.get(), 13));
+        return new ItemVis<>(i, label(i.get(), 24));
     }
 
 

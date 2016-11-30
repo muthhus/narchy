@@ -1,9 +1,9 @@
 package nars.remote;
 
-import com.google.common.collect.Iterables;
 import nars.$;
 import nars.NAR;
 import nars.NAgent;
+import nars.bag.impl.Bagregate;
 import nars.gui.Vis;
 import nars.index.term.tree.TreeTermIndex;
 import nars.nar.Alann;
@@ -308,6 +308,9 @@ abstract public class NAgents extends NAgent {
                                     .toArray(Surface[]::new)),
 
                             Vis.emotionPlots(a.nar, 256),
+
+
+                            Vis.treeChart( a.nar, new Bagregate(((Default)a.nar).core.active, 16, 0.05f, 64) , 16),
 
                             new ReflectionSurface(a),
                             //nar instanceof Default ? Vis.concepts((Default) nar, 128) : grid(/*blank*/),

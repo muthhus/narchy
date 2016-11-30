@@ -48,7 +48,7 @@ abstract public class SortedListTable<V, L> extends ArrayListTable<V,L> implemen
     }
 
     @Override
-    public final int size() {
+    public int size() {
         return items.size();
     }
 

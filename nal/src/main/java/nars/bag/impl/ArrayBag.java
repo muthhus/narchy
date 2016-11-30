@@ -1,6 +1,5 @@
 package nars.bag.impl;
 
-import com.google.common.collect.Ordering;
 import nars.$;
 import nars.Param;
 import nars.bag.Bag;
@@ -10,6 +9,7 @@ import nars.budget.Forget;
 import nars.budget.RawBudget;
 import nars.budget.merge.BudgetMerge;
 import nars.link.BLink;
+import nars.util.data.FloatParam;
 import nars.util.data.sorted.SortedArray;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
@@ -17,10 +17,9 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Arrays;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -495,7 +494,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
     private float mass() {
         float mass = 0;
         synchronized (items) {
-            int iii = items.size();
+            int iii = size();
             for (int i = 0; i < iii; i++) {
                 BLink<V> x = get(i);
                 if (x != null)
@@ -598,7 +597,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
         SortedArray<BLink<V>> items = this.items;
         final Object[] l = items.array();
         int removedFromMap = 0;
-        for (int s = items.size() - 1; s >= 0; s--) {
+        for (int s = size() - 1; s >= 0; s--) {
             BLink<V> x = (BLink<V>) l[s];
             if (x == null || x.isDeleted()) {
                 items.removeFast(s);

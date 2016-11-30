@@ -139,7 +139,7 @@ public class Tetris extends NAgents {
 //        float actionThresholdLower = actionMargin / 1.5f;
 
 
-        actions.add(new ActionConcept("tetris(leftright)", nar, (b, d) -> {
+        actions.add(new ActionConcept("leftright(tetris)", nar, (b, d) -> {
             if (d != null) {
                 float x = d.freq();
                 //System.out.println(d + " " + x);
@@ -162,7 +162,7 @@ public class Tetris extends NAgents {
         }));
 
         //if (rotate) {
-            actions.add(new ActionConcept("tetris(rotate)", nar, (b, d) -> {
+            actions.add(new ActionConcept("rotate(tetris)", nar, (b, d) -> {
                 if (d != null) {
                     float r = d.freq();
                     if (r > actionThresholdHigh) {
@@ -202,12 +202,13 @@ public class Tetris extends NAgents {
                 Compound squareTerm =
                         //$.p(x, y);
 
-                        //$.inh(
-                        $.func($.the("tetris"),
-                        $.p(
-                          $.pRecurse($.radixArray(x, PIXEL_RADIX, state.width)),
-                              $.pRecurse($.radixArray(y, PIXEL_RADIX, state.height))
-                        )
+                        $.inh(
+                        //$.func(
+                                $.p(
+                                  $.pRecurse($.radixArray(x, PIXEL_RADIX, state.width)),
+                                      $.pRecurse($.radixArray(y, PIXEL_RADIX, state.height))
+                                ),
+                                $.the("tetris")
                         )
                                 //$.p(
                                         //$.the("tetris"))
@@ -460,7 +461,7 @@ public class Tetris extends NAgents {
 //
 //
 //                view.plot2 = Vis.agentBudgetPlot(this, 256);
-                window(view.vis, 800, 600);
+                window(view.vis, 300, 600);
                 NAgents.chart(this);
             }
         };

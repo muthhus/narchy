@@ -2,6 +2,7 @@ package nars.gui;
 
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import com.jogamp.opengl.GL2;
 import nars.$;
 import nars.NAR;
 import nars.NAgent;
@@ -94,14 +95,17 @@ public class Vis {
             btRange[1] = now + window;
         });
         List<Surface> s = ii.stream().map(c -> new BeliefTableChart(nar, c, btRange)).collect(toList());
-        return new Grid(1/3f,s);
+        return new Grid(1 / 3f, s);
     }
 
 
-
     public static BagChart<Concept> conceptsTreeChart(final Default d, final int count) {
-        long[] now = new long[] { d.time() };
-        BagChart<Concept> tc = new BagChart<Concept>(d.core.active, count) {
+        return treeChart(d, d.core.active, count);
+    }
+
+    public static BagChart<Concept> treeChart(NAR n, Bag<Concept> b, final int count) {
+        long[] now = new long[]{n.time()};
+        BagChart<Concept> tc = new BagChart<Concept>(b, count) {
 
             @Override
             public void accept(BLink<Concept> x, ItemVis<BLink<Concept>> y) {
@@ -146,11 +150,10 @@ public class Vis {
 
                 y.update(p, r, g, b);
 
-
             }
         };
 
-        d.onFrame(xx -> {
+        n.onFrame(xx -> {
 
             //if (s.window.isVisible()) {
             now[0] = xx.time();
@@ -187,7 +190,7 @@ public class Vis {
 
     public static Surface budgetHistogram(NAR nar, int bins) {
         if (nar instanceof Default) {
-            return budgetHistogram(((Default)nar).core.active, bins);
+            return budgetHistogram(((Default) nar).core.active, bins);
         } else { //if (nar instance)
             //return budgetHistogram(((Default2)nar).active, bins);
             return grid(); //TODO
@@ -200,7 +203,7 @@ public class Vis {
         double[] d = new double[bins];
         return //new GridSurface(VERTICAL,
                 Vis.pane("Concept Priority Distribution (0..1)", new HistogramChart(
-                        ()->bag.priHistogram(d), new Color3f(0.5f, 0.25f, 0f), new Color3f(1f, 0.5f, 0.1f)));
+                        () -> bag.priHistogram(d), new Color3f(0.5f, 0.25f, 0f), new Color3f(1f, 0.5f, 0.1f)));
 
 //                PanelSurface.of("Concept Durability Distribution (0..1)", new HistogramChart(nar, c -> {
 //                    if (c != null)
@@ -236,7 +239,21 @@ public class Vis {
         Grid grid = new Grid();
         List<Plot2D> plots = $.newArrayList();
         for (Termed t : concepts) {
-            Plot2D p = new Plot2D(plotHistory, Plot2D.Line /*BarWave*/);
+            Plot2D p = new Plot2D(plotHistory, Plot2D.Line /*BarWave*/) {
+
+                @Override
+                protected void paint(GL2 gl) {
+                    Concept concept = nar.concept(t);
+
+                    float b = 2f * (concept.beliefFreq(nar.time(), 0.5f) - 0.5f);
+                    backgroundColor[0] = b >= 0 ? b : 0;
+                    backgroundColor[1] = b < 0 ? -b : 0;
+                    backgroundColor[3] = 1f;
+
+                    super.paint(gl);
+                }
+
+            };
             p.setTitle(t.toString());
             p.add("P", () -> nar.priority(t), 0f, 1f);
             p.add("B", () -> nar.concept(t).beliefFreq(nar.time()), 0f, 1f);
@@ -296,7 +313,9 @@ public class Vis {
         return new Label(text);
     }
 
-    /** ordering: first is underneath, last is above */
+    /**
+     * ordering: first is underneath, last is above
+     */
     public static Stacking stacking(Surface... s) {
         return new Stacking(s);
     }
@@ -349,6 +368,7 @@ public class Vis {
     public static SpaceGraph<Term> conceptsWindow2D(NAR nar, int maxNodes, int maxEdges) {
         return conceptsWindow(new ConceptsSpace(nar, maxNodes, maxEdges));
     }
+
     public static SpaceGraph<Term> conceptsWindow2D(NAR nar, Iterable<? extends Termed> terms, int max, int maxEdges) {
         List<ConceptWidget> termWidgets = StreamSupport.stream(terms.spliterator(), false).map(x -> new ConceptWidget(nar, x.term(), maxEdges)).collect(toList());
 
@@ -357,7 +377,8 @@ public class Vis {
             final ObjectFloatHashMap<Term> priCache = new ObjectFloatHashMap<>();
             final FloatFunction<Term> termFloatFunction = k -> nar.priority(k);
 
-            @Override protected void get(Collection displayNext) {
+            @Override
+            protected void get(Collection displayNext) {
                 Collections.sort(termWidgets, (a, b) -> {
                     return Float.compare(
                             priCache.getIfAbsentPutWithKey(b.key, termFloatFunction),
@@ -379,7 +400,7 @@ public class Vis {
     }
 
     public static SpaceGraph<Term> conceptsWindow(AbstractSpace nn) {
-        Surface controls = col(new PushButton("x"), row(new FloatSlider("z", 0, 0, 4 )), new CheckBox("?"))
+        Surface controls = col(new PushButton("x"), row(new FloatSlider("z", 0, 0, 4)), new CheckBox("?"))
                 .hide();
 
 
@@ -408,11 +429,11 @@ public class Vis {
                         //new FastOrganicLayout()
                 )).with(fd = new ForceDirected());
 
-            s.add(new Ortho(new CrosshairSurface(s)));
+        s.add(new Ortho(new CrosshairSurface(s)));
 
-            SpaceGraph.window(new NAgents.ReflectionSurface(fd), 500, 500);
+        SpaceGraph.window(new NAgents.ReflectionSurface(fd), 500, 500);
 
-            return s;
+        return s;
     }
 
 }

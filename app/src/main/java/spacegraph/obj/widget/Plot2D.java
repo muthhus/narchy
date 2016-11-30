@@ -181,6 +181,10 @@ public class Plot2D extends Surface {
 //            pv.draw(series, g, minValue, maxValue);
 //        }
 
+        //background
+        gl.glColor4fv(backgroundColor, 0);
+        Draw.rect(gl, 0, 0, 1, 1);
+
         plotVis.draw(series, gl, minValue, maxValue);
 
         if (title!=null) {
@@ -241,12 +245,10 @@ public class Plot2D extends Surface {
         }
     };
 
+    public float[] backgroundColor = new float[] { 0, 0, 0, 0.75f };
+
     public static final PlotVis Line = (List<Series> series, GL2 gl, float minValue, float maxValue) -> {
 
-
-        //background
-        gl.glColor4f(0,0,0,0.75f);
-        Draw.rect(gl, 0, 0, 1, 1);
 
         if (minValue != maxValue) {
 

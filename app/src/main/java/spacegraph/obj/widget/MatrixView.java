@@ -24,6 +24,7 @@ public class MatrixView extends Widget {
         };
     }
 
+
     public interface ViewFunction1D {
         /**
          * updates the GL state for each visited matrix cell (ex: gl.glColor...)
@@ -52,6 +53,20 @@ public class MatrixView extends Widget {
         this.view = view;
     }
 
+    public MatrixView(float[] d, ViewFunction1D view) {
+        this(d, 1, view);
+    }
+
+    public MatrixView(float[] d, int stride, ViewFunction1D view) {
+        this((int)Math.ceil((float)Math.ceil(d.length/stride)), stride, (x, y, gl) -> {
+            int i = y * stride + x;
+            if (i < d.length)
+                return view.update((float)d[i], gl);
+            else
+                return Float.NaN;
+        });
+
+    }
     public MatrixView(double[] d, int stride, ViewFunction1D view) {
         this((int)Math.ceil((float)Math.ceil(d.length/stride)), stride, (x, y, gl) -> {
             int i = y * stride + x;
@@ -81,7 +96,7 @@ public class MatrixView extends Widget {
 
                 try {
                     float dz = view.update(x, y, gl);
-                    Draw.rect(gl, x * dw, 1f - y * dh, dw, dh, dz);
+                    Draw.rect(gl, x * dw, ( y) * dh, dw, dh, dz);
                 } catch (Exception e) {
                     logger.error(" {}",e);
                     return;

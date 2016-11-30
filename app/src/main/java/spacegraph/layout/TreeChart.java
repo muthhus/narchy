@@ -67,7 +67,6 @@ public class TreeChart<X> extends Surface {
 
 	public TreeChart(double width, double height, BiConsumer<X,ItemVis<X>> apply, X... i ) {
 		cache = Caffeine.newBuilder().maximumSize(1024).build();
-		update(width, height, Lists.newArrayList(i), apply );
 	}
 
 	@Override
@@ -82,31 +81,30 @@ public class TreeChart<X> extends Surface {
 	}
 
 	public void update(double width, double height, Iterable<X> children, BiConsumer<X, ItemVis<X>> update) {
-		update(width, height, 0, children, update, i -> new ItemVis<>(i, i.toString()));
+		update(width, height, children, update, i -> new ItemVis<>(i, i.toString()));
 	}
 
 
-	public void update(double width, double height, int estimatedSize, Iterable<X> nextChildren, BiConsumer<X, ItemVis<X>> update, Function<X, ItemVis<X>> itemBuilder) {
+	public void update(double width, double height, Iterable<X> nextChildren, BiConsumer<X, ItemVis<X>> update, Function<X, ItemVis<X>> itemBuilder) {
 		this.width = width;
 		this.height = height;
 		left = 0.0;
 		top = 0.0;
 
-		CircularFifoQueue<ItemVis<X>> newChildren = new CircularFifoQueue<>(1+estimatedSize);
+		CircularFifoQueue<ItemVis<X>> newChildren = new CircularFifoQueue<>(limit + 1);
 
-		int i = limit < 0 ? Integer.MAX_VALUE : limit;
+		final int[] i = {limit < 0 ? Integer.MAX_VALUE : limit};
 
-		for (X item : nextChildren) {
-			if (i-- <= 0)
-				break;
-			if (item==null)
-				continue;
+		nextChildren.forEach(item -> {
+			if (item == null || i[0]-- <= 0)
+				return; //TODO return false to stop the iteration
+
 			ItemVis<X> e = cache.get(item, itemBuilder);
 			if (e!=null) {
 				update.accept(item, e);
 				newChildren.add(e);
 			}
-		}
+		});
 
 		if (!newChildren.isEmpty()) {
 			layoutOrient = width > height ? LayoutOrient.VERTICAL : LayoutOrient.HORIZONTAL;
@@ -145,8 +143,7 @@ public class TreeChart<X> extends Surface {
 
 	private static FasterList<ItemVis> concat(Collection<ItemVis> row, ItemVis c) {
 		FasterList<ItemVis> concatRow = new FasterList<>(row.size()+1);
-		for (ItemVis i : row)
-			concatRow.add(i);
+		concatRow.addAll(row);
 		concatRow.add(c);
 		return concatRow;
 	}
@@ -393,20 +390,18 @@ public class TreeChart<X> extends Surface {
             }
 
 
-            float z = 0;
+            //float z = 0;
 
 			gl.glColor3f(r, g, b);
 			float m = 0.001f; //margin, space between cells
             Draw.rect(gl, left+m/2, top+m/2, width-m, height-m);
 
-            float labelSize = 0.15f; //Math.min(16, (float) (height * percent * 20f ) ); /// 4f * Math.min(0.5f,percent));
+            float labelSize = 1f/(1+label.length()); //Math.min(16, (float) (height * percent * 20f ) ); /// 4f * Math.min(0.5f,percent));
 
 			if ((labelSize*area > 0.0003f) && (labelSize*area < 0.2f)) {
 
 				gl.glLineWidth(1f);
 				gl.glColor3f(1,1,1);
-
-
 
 				Draw.text(gl, label,
 						labelSize*Math.min(width,height), //label size

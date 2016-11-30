@@ -37,7 +37,7 @@ public class WaveCapture implements Runnable {
     public final int freqSamplesPerFrame = 16;
 
     private final int historyFrames = 32;
-    public float[] history;
+    public float[] data;
 
     private WaveSource source;
 
@@ -45,6 +45,10 @@ public class WaveCapture implements Runnable {
      * called when next sample buffer is ready
      */
     final Topic<WaveCapture> nextReady = new DefaultTopic();
+
+    /** holds the normalized value of the latest data */
+    public float[] dataNorm = new float[freqSamplesPerFrame];
+
     //private final boolean normalizeDisplayedWave = false;
 
     synchronized void start(float FRAME_RATE) {
@@ -54,7 +58,7 @@ public class WaveCapture implements Runnable {
             exec = null;
         }
 
-        history = new float[historyFrames * freqSamplesPerFrame];
+        data = new float[historyFrames * freqSamplesPerFrame];
 
         if (FRAME_RATE > 0) {
             exec = new ScheduledThreadPoolExecutor(1);
@@ -78,9 +82,9 @@ public class WaveCapture implements Runnable {
 
 
         MatrixView freqHistory = new MatrixView(freqSamplesPerFrame, historyFrames, (x, y, g) -> {
-            if (history == null)
+            if (data == null)
                 return 0; //HACK
-            float kw = (history[y * freqSamplesPerFrame + x]);
+            float kw = (data[y * freqSamplesPerFrame + x]);
             //int kw = (int)(v*255);
             g.glColor3f(kw >= 0 ? kw : 0, kw < 0 ? -kw : 0, 0);
             return 0;
@@ -264,21 +268,21 @@ public class WaveCapture implements Runnable {
             }
 
             private void sampleFrequency(float[] freqSamples) {
-                int lastFrameIdx = history.length - freqSamplesPerFrame;
+                int lastFrameIdx = data.length - freqSamplesPerFrame;
 
                 int samples = freqSamples.length;
 
                 float bandWidth = ((float)samples) / freqSamplesPerFrame;
-                float sensitivity = 0.5f;
+                float sensitivity = 1f;
 
                 final Envelope uniform = (i,k)->{
                     float centerFreq = (0.5f + i) * bandWidth;
                     return 1f/(1f + Math.abs(k - centerFreq)/(bandWidth/sensitivity));
                 };
 
-                System.arraycopy(history, 0, history, freqSamplesPerFrame, lastFrameIdx);
+                System.arraycopy(data, 0, data, freqSamplesPerFrame, lastFrameIdx);
 
-                float[] h = WaveCapture.this.history;
+                float[] h = WaveCapture.this.data;
 
 //                int f = freqOffset;
 //                int freqSkip = 1;
@@ -286,6 +290,7 @@ public class WaveCapture implements Runnable {
 //                    h[n++] = freqSamples[f];
 //                    f+=freqSkip*2;
 //                }
+                float max = Float.NEGATIVE_INFINITY, min = Float.POSITIVE_INFINITY;
                 for (int i = 0; i < freqSamplesPerFrame; i++) {
 
                     float s = 0;
@@ -293,7 +298,18 @@ public class WaveCapture implements Runnable {
                         float fk = freqSamples[k];
                         s += uniform.apply(i,k) * fk;
                     }
+                    if (s > max)
+                        max = s;
+                    if (s < min)
+                        min = s;
+
                     h[i] = s;
+                }
+
+                if (max!=min) { //TODO epsilon check
+                    float range = max-min;
+                    for (int i = 0; i < freqSamplesPerFrame; i++)
+                        dataNorm[i] = (data[i]-min) / range;
                 }
 
                 //System.arraycopy(freqSamples, 0, history, 0, freqSamplesPerFrame);
