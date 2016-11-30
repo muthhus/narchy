@@ -296,7 +296,7 @@ public class HijackBag<X> implements Bag<X> {
     }
 
     @Override
-    public void topWhile(Predicate<? super BLink<X>> each, int n) {
+    public void forEachWhile(Predicate<? super BLink<X>> each, int n) {
         throw new UnsupportedOperationException("yet");
     }
 

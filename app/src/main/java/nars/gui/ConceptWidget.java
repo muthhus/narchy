@@ -15,8 +15,6 @@ import spacegraph.SpaceGraph;
 import spacegraph.Surface;
 import spacegraph.obj.Cuboid;
 import spacegraph.obj.EDraw;
-import spacegraph.obj.widget.FloatSlider;
-import spacegraph.obj.widget.Label;
 import spacegraph.phys.Collidable;
 import spacegraph.phys.Dynamic;
 import spacegraph.phys.collision.ClosestRay;
@@ -34,6 +32,7 @@ import static spacegraph.obj.layout.Grid.row;
 public class ConceptWidget extends Cuboid<Term> implements Consumer<BLink<? extends Termed>> {
 
     public final ArrayBag<TermEdge> edges;
+    private final ConceptIcon icon;
 
 
     //caches a reference to the current concept
@@ -53,7 +52,7 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<BLink<? exte
                 row(new FloatSlider( 0, 0, 4 ), new BeliefTableChart(nar, x))
                     //new CheckBox("?")
             )*/
-            new ConceptIcon(nar, x)
+            icon = new ConceptIcon(nar, x)
         );
 
         //float edgeActivationRate = 1f;
@@ -225,6 +224,12 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<BLink<? exte
                 }
             }
         }
+    }
+
+    public ConceptWidget setConcept(Concept concept, long when) {
+        this.concept = concept;
+        icon.update(concept, when);
+        return this;
     }
 
     public static class TermEdge extends EDraw<Term,ConceptWidget> implements Termed {

@@ -58,10 +58,10 @@ public interface Table<K,V> extends Iterable<V> {
      *
      * if n is -1, it will visit all items
      */
-    void topWhile(@NotNull Predicate<? super V> each, int n);
+    void forEachWhile(@NotNull Predicate<? super V> each, int n);
 
-    default void topWhile(@NotNull Predicate<? super V> action) {
-        topWhile(action, -1);
+    default void forEachWhile(@NotNull Predicate<? super V> action) {
+        forEachWhile(action, -1);
     }
 
 }

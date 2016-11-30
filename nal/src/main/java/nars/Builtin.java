@@ -90,7 +90,7 @@ public class Builtin extends FasterList<Concept> {
                         query = null;
                     }
 
-                    cbag.topWhile(c -> {
+                    cbag.forEachWhile(c -> {
                         String bs = c.get().toString();
                         if (query == null || bs.toLowerCase().contains(query)) {
                             b.append(c.get()).append('=').append(Texts.n2(c.pri())).append("  ");

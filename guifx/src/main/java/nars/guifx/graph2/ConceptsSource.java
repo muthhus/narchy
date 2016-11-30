@@ -110,9 +110,9 @@ public class ConceptsSource extends GraphSource {
         };
 
         max[0] = maxNodeLinks;
-        ((Concept) cc).termlinks().topWhile(linkUpdater);
+        ((Concept) cc).termlinks().forEachWhile(linkUpdater);
         max[0] = maxNodeLinks; //equal chance for both link types
-        ((Concept) cc).tasklinks().topWhile(linkUpdater);
+        ((Concept) cc).tasklinks().forEachWhile(linkUpdater);
 
         //sn.removeEdges(missing);
 
@@ -174,7 +174,7 @@ public class ConceptsSource extends GraphSource {
         //TODO use forEach witha predicate return to stop early
         eachConcept.reset();
         Bag<Concept> x = ((Default) nar).core.active;
-        x.topWhile(eachConcept);
+        x.forEachWhile(eachConcept);
 
 //        Iterable<Termed> _concepts = StreamSupport.stream(x.spliterator(), false).filter(cc -> {
 //

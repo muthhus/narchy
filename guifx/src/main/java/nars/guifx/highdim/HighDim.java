@@ -337,7 +337,7 @@ public class HighDim<T> extends Spacegraph {
 //        });
 
         node.clear();
-        items.topWhile(/*cap,*/ (T c) -> {
+        items.forEachWhile(/*cap,*/ (T c) -> {
             //T c = (T)cLink;//.get();
             //TODO find somethign more efficient
             //change[0] |=

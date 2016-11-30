@@ -276,7 +276,7 @@ public class Line1DContinuous extends NAgent {
         );
 
 
-        //NAgents.chart(l);
+        NAgents.chart(l);
 
         //nar.logSummaryGT(System.out, 0.5f);
         nar.onTask(t -> {
@@ -285,8 +285,8 @@ public class Line1DContinuous extends NAgent {
         });
 
         l.print = true;
-        //l.runRT(5, 15000).join();
-        l.run(2000);
+        l.runRT(5, 15000).join();
+        //l.run(2000);
 
 
         NAR.printTasks(nar, true);

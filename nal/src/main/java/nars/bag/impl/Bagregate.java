@@ -22,6 +22,10 @@ public class Bagregate<X> extends ArrayBag<X> {
     private final MutableFloat scale;
     final AtomicBoolean busy = new AtomicBoolean();
 
+    public Bagregate(@NotNull Bag<X> src, int capacity, float scale) {
+        this(src, capacity, scale, Integer.MAX_VALUE);
+    }
+
     public Bagregate(@NotNull Bag<X> src, int capacity, float scale, int iterationDepth) {
         super(capacity, BudgetMerge.plusBlend, new ConcurrentHashMap(capacity));
 
@@ -38,11 +42,17 @@ public class Bagregate<X> extends ArrayBag<X> {
 
         float scale = this.scale.floatValue();
         src.forEach(iterationDepth, x -> {
-            put(x.get(), x, scale, null);
+            if (include(x))
+                put(x.get(), x, scale, null);
         });
         commit();
 
         busy.set(false);
+    }
+
+    /** can be overridden to filter entry */
+    protected boolean include(BLink<X> x) {
+        return true;
     }
 
     @Override

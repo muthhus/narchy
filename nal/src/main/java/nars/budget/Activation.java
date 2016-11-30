@@ -153,11 +153,11 @@ public class Activation {
             /* insert termlink target to source */
             //boolean alsoReverse = true;
             if (targetConcept != null /*&& alsoReverse*/) {
-                targetConcept.termlinks().put(sourceTerm, in, scale, linkOverflow);
+                targetConcept.termlinks().put(sourceTerm, in, scale/2f, linkOverflow);
             }
 
             /* insert termlink source to target */
-            src.termlinks().put(targetTerm, in, scale, linkOverflow);
+            src.termlinks().put(targetTerm, in, scale/2f, linkOverflow);
 
         }
 

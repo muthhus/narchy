@@ -2,7 +2,9 @@ package nars.gui;
 
 import nars.NAR;
 import nars.bag.Bag;
+import nars.bag.impl.Bagregate;
 import nars.concept.Concept;
+import nars.link.BLink;
 import nars.nar.Default;
 import nars.term.Term;
 
@@ -15,41 +17,37 @@ public class ConceptsSpace extends NARSpace<Term, ConceptWidget> {
     public final NAR nar;
     private final int maxNodes;
     private final int maxEdgesPerNode;
+    final Bagregate<Concept> bag;
 
     public ConceptsSpace(NAR nar, int maxNodes, int maxEdgesPerNode) {
         super(nar);
         this.nar = nar;
         this.maxNodes = maxNodes;
         this.maxEdgesPerNode = maxEdgesPerNode;
+        bag = new Bagregate<>( ((Default)nar).core.active, maxNodes, 0.5f ) {
+            @Override
+            protected boolean include(BLink<Concept> x) {
+                return display(x.get().term());
+            }
+        };
     }
 
     @Override
     protected void get(Collection<ConceptWidget> displayNext) {
-        Bag<Concept> x =
-                //nar instanceof Default ?
-                ((Default) nar).core.active;
-        //((Default2)nar).active;
-
-        //System.out.println(((Default) nar).core.concepts.size() + " "+ ((Default) nar).index.size());
 
         Function<Term,ConceptWidget> materializer = materializer();
-        x.topWhile(b -> {
 
-            //Concept Core
+        long now = nar.time();
+
+        bag.forEach((BLink<Concept> b) ->{
+
             Concept concept = b.get();
-            Term ct = concept.term();
-            if (!display(ct))
-                return true;
 
+            displayNext.add(
+                space.getOrAdd(concept.term(), materializer).setConcept(concept, now)
+            );
 
-            ConceptWidget root = space.getOrAdd(ct, materializer);
-            root.concept = concept;
-
-            //float bPri = root.pri = b.priIfFiniteElseZero();
-            displayNext.add(root);
-            return true;
-
-        }, maxNodes);
+        });
 
     }
 

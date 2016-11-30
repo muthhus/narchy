@@ -232,7 +232,7 @@ public class WebServer /*extends PathHandler*/ {
                     query = null;
 //            }
 
-                    cbag.topWhile(c -> {
+                    cbag.forEachWhile(c -> {
                         String bs = c.get().toString();
                         if (query == null || bs.toLowerCase().contains(query)) {
                             b.add(p(c.get().term(),
