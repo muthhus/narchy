@@ -57,7 +57,9 @@ import static nars.time.Tense.DTERNAL;
  */
 public interface Compound extends Term, IPair, TermContainer {
 
-    /** if the compound tracks normalization state, this will set the flag internally */
+    /**
+     * if the compound tracks normalization state, this will set the flag internally
+     */
     default void setNormalized() {
     }
 
@@ -82,15 +84,17 @@ public interface Compound extends Term, IPair, TermContainer {
         return t;
     }
 
-    @NotNull default SortedSet<Term> recurseTermsToSortedSet() {
+    @NotNull
+    default SortedSet<Term> recurseTermsToSortedSet() {
         TreeSet<Term> t = new TreeSet();
         recurseTerms((x) -> t.add(x));
         return t;
     }
 
-    @NotNull default MutableBiMap<Term,Short> recurseTermsToBiMap() {
-        MutableBiMap<Term,Short> t = new HashBiMap(volume() /* estimate */); //BiMaps.mutable.empty();
-        recurseTerms((x) -> t.putIfAbsent(x, (short)t.size()));
+    @NotNull
+    default MutableBiMap<Term, Short> recurseTermsToBiMap() {
+        MutableBiMap<Term, Short> t = new HashBiMap(volume() /* estimate */); //BiMaps.mutable.empty();
+        recurseTerms((x) -> t.putIfAbsent(x, (short) t.size()));
         return t;
     }
 
@@ -124,7 +128,7 @@ public interface Compound extends Term, IPair, TermContainer {
     @NotNull
     default boolean termsToSetRecurse(int inStructure, @NotNull Collection<Term> t, boolean addOrRemoved) {
         final boolean[] r = {false};
-        recurseTerms((SubtermVisitor)(s) -> {
+        recurseTerms((SubtermVisitor) (s) -> {
 
             if (!addOrRemoved && r[0]) { //on removal we can exit early
                 return; //HACK todo make a visitor with a predicate termination condition rather than have to continue traversing
@@ -208,11 +212,10 @@ public interface Compound extends Term, IPair, TermContainer {
     }
 
 
-
     @Nullable
-    default <X> boolean pathsTo(@NotNull Function<Term,X> subterm, @NotNull BiPredicate<ByteList, X> receiver) {
+    default <X> boolean pathsTo(@NotNull Function<Term, X> subterm, @NotNull BiPredicate<ByteList, X> receiver) {
         X ss = subterm.apply(this);
-        if (ss!=null) {
+        if (ss != null) {
             if (!receiver.test(ByteLists.immutable.empty(), ss))
                 return false;
         }
@@ -220,52 +223,54 @@ public interface Compound extends Term, IPair, TermContainer {
     }
 
     @Nullable
-    static byte[] pathTo(@NotNull ByteArrayList p, Term superTerm, @NotNull Term target) {
-        if (superTerm instanceof Compound) {
-            Compound cc = (Compound) superTerm;
-            for (int i = 0; i < cc.size(); i++) {
-                Term s = cc.term(i);
-                if (s.equals(target)) {
-                    p.add((byte)i);
-                    return p.toArray();
-                }
-                if (s instanceof Compound) {
-                    Compound cs = (Compound) s;
-                    if (cs.containsTermRecursively(target)) {
-                        p.add((byte)i);
-                        return pathTo(p, cs, target);
-                    }
+    static byte[] pathTo(@NotNull ByteArrayList p, Compound superTerm, @NotNull Term target) {
+        if (superTerm.impossibleSubTerm(target))
+            return null;
+
+        int n = superTerm.size();
+        for (int i = 0; i < n; i++) {
+            Term s = superTerm.term(i);
+            if (s.equals(target)) {
+                p.add((byte) i);
+                return p.toArray();
+            }
+            if (s instanceof Compound) {
+                Compound cs = (Compound) s;
+                if (cs.containsTermRecursively(target)) {
+                    p.add((byte) i);
+                    return pathTo(p, cs, target);
                 }
             }
         }
+
         return null;
     }
 
     @Nullable
-    static <X> boolean pathsTo(@NotNull ByteArrayList p, Term superTerm, @NotNull Function<Term,X> subterm, @NotNull BiPredicate<ByteList, X> receiver) {
-        if (superTerm instanceof Compound) {
-            Compound cc = (Compound) superTerm;
+    static <X> boolean pathsTo(@NotNull ByteArrayList p, Compound superTerm, @NotNull Function<Term, X> subterm, @NotNull BiPredicate<ByteList, X> receiver) {
 
-            int ppp = p.size();
 
-            for (int i = 0; i < cc.size(); i++) {
-                Term s = cc.term(i);
-                X ss = subterm.apply(s);
+        int ppp = p.size();
 
-                p.add((byte)i);
+        int n = superTerm.size();
+        for (int i = 0; i < n; i++) {
+            Term s = superTerm.term(i);
+            X ss = subterm.apply(s);
 
-                if (ss!=null) {
-                    if (!receiver.test(p, ss))
-                        return false;
-                }
-                if (s instanceof Compound) {
-                    Compound cs = (Compound) s;
-                    if (!pathsTo(p, cs, subterm, receiver))
-                        return false;
-                }
-                p.removeAtIndex(ppp);
+            p.add((byte) i);
+
+            if (ss != null) {
+                if (!receiver.test(p, ss))
+                    return false;
             }
+            if (s instanceof Compound) {
+                Compound cs = (Compound) s;
+                if (!pathsTo(p, cs, subterm, receiver))
+                    return false;
+            }
+            p.removeAtIndex(ppp);
         }
+
         return true;
     }
 
@@ -286,12 +291,13 @@ public interface Compound extends Term, IPair, TermContainer {
      * @param subst the substitution context holding the match state
      * @return whether match was successful or not, possibly having modified subst regardless
      */
-    @Override default boolean unify(@NotNull Term ty, @NotNull Unify subst) {
+    @Override
+    default boolean unify(@NotNull Term ty, @NotNull Unify subst) {
 
 
         if (ty instanceof Compound) {
 
-            Compound y = (Compound)ty;
+            Compound y = (Compound) ty;
 
             Op op = op();
 
@@ -309,8 +315,8 @@ public interface Compound extends Term, IPair, TermContainer {
                         return
 
                                 Compound.commutative(op, xs) ?
-                                    subst.matchPermute(xsubs, ysubs) :
-                                    subst.matchLinear(xsubs, ysubs);
+                                        subst.matchPermute(xsubs, ysubs) :
+                                        subst.matchLinear(xsubs, ysubs);
 
                     }
 
@@ -617,7 +623,6 @@ public interface Compound extends Term, IPair, TermContainer {
             return false;
 
 
-
         int s = size();
 
         if ((other.size() == s) && (((Compound) other).dt() == dt())) {
@@ -659,7 +664,6 @@ public interface Compound extends Term, IPair, TermContainer {
 //        }
 //        return s;
 //    }
-
 
 
     //    public int countOccurrences(final Term t) {

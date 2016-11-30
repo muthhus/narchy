@@ -76,17 +76,13 @@ public class SortedArray<E> implements Iterable<E> {
         return previous;
     }
     public void removeFast(int index) {
-//        if (size < index)
-//            throw new ArrayIndexOutOfBoundsException(index);
-//            //return null;
-
         E[] list = this.list;
         int totalOffset = this.size - index - 1;
-        if (totalOffset > 0) {
+        if (totalOffset > 0)
             System.arraycopy(list , index + 1, list, index, totalOffset);
-        }
         list[--this.size] = null;
     }
+
 
     /** set the size as a quick way to remove null entries from the end */
     public void _setSize(int s) {

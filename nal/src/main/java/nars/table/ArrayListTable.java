@@ -132,7 +132,8 @@ abstract public class ArrayListTable<K, V> extends CollectorMap<K, V> implements
         if (newCapacity != this.capacity) {
             synchronized (_items()) {
                 this.capacity = newCapacity;
-                commit();
+                if (this.size() > newCapacity)
+                    commit();
             }
             return true;
         }

@@ -250,7 +250,7 @@ public class Line1DContinuous extends NAgent {
     public static void main(String[] args) {
 
         XorShift128PlusRandom rng = new XorShift128PlusRandom((int)(Math.random()*1000));
-        int conceptsPerCycle = 16;
+        int conceptsPerCycle = 32;
 
         final Executioner exe =
                 //new MultiThreadExecutioner(2, 2048);
@@ -261,7 +261,7 @@ public class Line1DContinuous extends NAgent {
                 new CaffeineIndex(new DefaultConceptBuilder(), 1024*2, 12, false, exe),
                 new FrameTime(10f), exe
         );
-        nar.compoundVolumeMax.set(12);
+        nar.compoundVolumeMax.set(24);
 
 
         nar.beliefConfidence(0.9f);
@@ -276,7 +276,7 @@ public class Line1DContinuous extends NAgent {
         );
 
 
-        NAgents.chart(l);
+        //NAgents.chart(l);
 
         //nar.logSummaryGT(System.out, 0.5f);
         nar.onTask(t -> {
@@ -286,7 +286,7 @@ public class Line1DContinuous extends NAgent {
 
         l.print = true;
         //l.runRT(5, 15000).join();
-        l.run(5000);
+        l.run(2000);
 
 
         NAR.printTasks(nar, true);

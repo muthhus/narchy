@@ -18,7 +18,7 @@ public class ArrayTermVector extends TermVector {
     @NotNull
     public final Term[] terms;
 
-     public ArrayTermVector(@NotNull Term... terms) {
+    public ArrayTermVector(@NotNull Term... terms) {
          super(terms);
          this.terms = terms;
     }
@@ -48,8 +48,6 @@ public class ArrayTermVector extends TermVector {
         for (int i = start; i < stop; i++)
             action.accept(tt[i]);
     }
-
-//---
 
     @Override
     public final void forEach(@NotNull Consumer<? super Term> action) {

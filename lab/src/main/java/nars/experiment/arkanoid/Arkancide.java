@@ -6,6 +6,7 @@ import nars.NAR;
 import nars.Param;
 import nars.concept.ActionConcept;
 import nars.remote.NAgents;
+import nars.util.math.FloatNormalized;
 
 public class Arkancide extends NAgents {
 
@@ -36,11 +37,11 @@ public class Arkancide extends NAgents {
             }
         };
 
-        senseNumberBi("noid(paddle,x,p)", ()->noid.paddle.x);
-        senseNumberBi("noid(ball,x,p)", ()->noid.ball.x);
-        senseNumberBi("noid(ball,y,p)", ()->noid.ball.y);
-        senseNumberBi("noid(ball,x,v)", ()->noid.ball.velocityX);
-        senseNumberBi("noid(ball,y,v)", ()->noid.ball.velocityY);
+        senseNumberBi("noid(paddle,x,p)", new FloatNormalized(()->noid.paddle.x));
+        senseNumberBi("noid(ball,x,p)", new FloatNormalized(()->noid.ball.x));
+        senseNumberBi("noid(ball,y,p)", new FloatNormalized(()->noid.ball.y));
+        senseNumberBi("noid(ball,x,v)", new FloatNormalized(()->noid.ball.velocityX));
+        senseNumberBi("noid(ball,y,v)", new FloatNormalized(()->noid.ball.velocityY));
 
         addCamera("noid", noid, visW, visH);
         //addCameraRetina("noid", noid, visW/2, visH/2, (v) -> t(v, alpha));

@@ -1,5 +1,6 @@
 package nars.bag.impl;
 
+import com.google.common.collect.Ordering;
 import nars.$;
 import nars.Param;
 import nars.bag.Bag;
@@ -16,6 +17,8 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiFunction;
@@ -64,22 +67,24 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
 
         //List<BLink<V>> pendingRemoval;
         List<BLink<V>> pendingRemoval;
+        boolean result;
         synchronized (items) {
             int additional = (toAdd != null) ? 1 : 0;
             int c = capacity();
 
-            {
-                int s = size();
+            int s = size();
 
+            if (s + additional > c) {
+                pendingRemoval = $.newArrayList((s + additional) - c);
+                s = clean(toAdd, s, additional, pendingRemoval);
                 if (s + additional > c) {
-                    pendingRemoval = $.newArrayList((s + additional) - c);
-                    s = clean(toAdd, s, additional, pendingRemoval);
-                    if (s + additional > c)
-                        return false; //throw new RuntimeException("overflow");
-                } else {
-                    pendingRemoval = null;
+                    clean2(pendingRemoval);
+                    return false; //throw new RuntimeException("overflow");
                 }
+            } else {
+                pendingRemoval = null;
             }
+
 
             if (toAdd != null) {
 
@@ -100,11 +105,12 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
                 int ss = size();
                 if (ss < c) {
                     items.add(toAdd, this);
+                    result = true;
                     //items.addInternal(toAdd); //grows the list if necessary
                 } else {
                     //throw new RuntimeException("list became full during insert");
                     map.remove(toAdd.get());
-                    return false;
+                    result = false;
                 }
 
 //                float p = toAdd.pri();
@@ -113,14 +119,16 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
 //                }
 
 
+            } else {
+                result = size() > 0;
             }
 
         }
 
-        if (pendingRemoval!=null)
+        if (pendingRemoval != null)
             clean2(pendingRemoval);
 
-        return true;
+        return result;
 
 //        if (toAdd != null) {
 //            synchronized (items) {
@@ -146,7 +154,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
         return s;
     }
 
-    private void clean2( List<BLink<V>> trash ) {
+    private void clean2(List<BLink<V>> trash) {
         int toRemoveSize = trash.size();
         if (toRemoveSize > 0) {
 
@@ -416,7 +424,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
                     }
                 }
 
-                if (w!=null)
+                if (w != null)
                     onAdded(w); //success
 
                 break;
@@ -471,7 +479,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
             int s = size();
             if (s > 0) {
                 Consumer<BLink> a = Forget.forget(this.pressure, this.mass(), s, Param.BAG_THRESHOLD);
-                if (a!=null)
+                if (a != null)
                     this.pressure = 0; //reset pressure accumulator
 
                 commit(a);
@@ -510,22 +518,26 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
 
 
             if (size() > 0) {
-                update(null);
+                if (update(null)) {
 
+                    int lowestUnsorted = updateExisting(each);
 
-                int lowestUnsorted = updateExisting(each);
+                    if (lowestUnsorted != -1) {
+                        sort(); //if not perfectly sorted already
+                    }
 
-                if (lowestUnsorted != -1) {
-                    qsort(new int[24 /* estimate */], items.array(), 0 /*dirtyStart - 1*/, size() - 1);
-                } // else: perfectly sorted
-
-                updateRange();
+                    updateRange();
+                }
             }
 
         }
 
 
         return this;
+    }
+
+    public void sort() {
+        qsort(new int[24 /* estimate */], items.array(), 0 /*dirtyStart - 1*/, size() - 1);
     }
 
 
@@ -583,14 +595,13 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
 
     private int removeDeleted(@NotNull List<BLink<V>> removed) {
 
-
         SortedArray<BLink<V>> items = this.items;
-        Object[] l = items.array();
+        final Object[] l = items.array();
         int removedFromMap = 0;
         for (int s = items.size() - 1; s >= 0; s--) {
             BLink<V> x = (BLink<V>) l[s];
             if (x == null || x.isDeleted()) {
-                items.remove(s);
+                items.removeFast(s);
                 if (x != null)
                     removed.add(x);
                 removedFromMap++;
