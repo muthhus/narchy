@@ -1,5 +1,6 @@
 package nars.nar;
 
+import nars.$;
 import nars.NAR;
 import nars.Param;
 import nars.budget.Budgeted;
@@ -29,6 +30,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Random;
 import java.util.function.Consumer;
 
@@ -70,7 +72,13 @@ public class Default extends NAR {
 
         quaMin.setValue(Param.BUDGET_EPSILON*16f);
 
-        Deriver d = Deriver.get("default.meta.nal");
+
+        List<Deriver> modules = $.newArrayList();
+        modules.add(Deriver.get("default.meta.nal"));
+        modules.add(Deriver.get("nal4.meta.nal"));
+
+        Deriver d = (x) -> modules.forEach(e -> e.accept(x));
+
         ConceptBagCycle c = new ConceptBagCycle(this, activeConcepts, d);
 
         c.termlinksFiredPerFiredConcept.set(termLinksPerConcept);

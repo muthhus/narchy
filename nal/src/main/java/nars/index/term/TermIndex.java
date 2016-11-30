@@ -5,7 +5,7 @@ import nars.Op;
 import nars.concept.Concept;
 import nars.concept.util.ConceptBuilder;
 import nars.concept.util.InvalidConceptException;
-import nars.nal.TermBuilder;
+import nars.index.TermBuilder;
 import nars.nal.meta.Derivation;
 import nars.nal.meta.match.EllipsisMatch;
 import nars.task.util.InvalidTaskException;

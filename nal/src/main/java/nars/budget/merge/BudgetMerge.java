@@ -12,7 +12,7 @@ import java.util.function.BiFunction;
 
 import static nars.Param.BUDGET_EPSILON;
 import static nars.budget.merge.BudgetMerge.PriMerge.*;
-import static nars.nal.UtilityFunctions.or;
+import static nars.util.UtilityFunctions.or;
 import static nars.util.Util.lerp;
 
 /**

@@ -1,4 +1,4 @@
-package nars.nal;
+package nars.op;
 
 import com.google.common.collect.*;
 import nars.$;

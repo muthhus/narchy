@@ -1,7 +1,7 @@
 package nars.io;
 
 import nars.*;
-import nars.nal.TermBuilder;
+import nars.index.TermBuilder;
 import nars.nar.Terminal;
 import nars.term.Compound;
 import nars.term.Term;

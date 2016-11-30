@@ -22,7 +22,7 @@ package nars.truth;
 
 import nars.$;
 import nars.Param;
-import nars.nal.UtilityFunctions;
+import nars.util.UtilityFunctions;
 import nars.util.Util;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

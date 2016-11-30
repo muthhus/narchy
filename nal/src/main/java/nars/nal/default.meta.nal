@@ -554,49 +554,6 @@
     (W --> (-,S,B)), (W --> B), neqCom(W,S), task("?") |- (W --> (-,S,B)), (Belief:BeliefStructuralDifference, Punctuation:Belief)
     ((~,S,B) --> W), (B --> W), neqCom(W,S), task("?") |- ((~,S,B) --> W), (Belief:BeliefStructuralDifference, Punctuation:Belief)
 
-////// NAL4 - Transformations between products and images: ////////////////////////////////////////////////////////////////////////////////////
-//Relations and transforming them into different representations so that arguments and the relation itself can become the subject or predicate
-
-    (B --> (/, M, A.._=B..+)), M |- ((A.._=B..+) --> M), (Belief:Identity, Goal:Identity)
-
-    ((A..B=_..+) --> M), B |- (B --> (/, M, A..B=_..+)), (Belief:Identity, Goal:Identity)
-
-    (M --> (A..B=_..+)), B |- ((\, M, A..B=_..+) --> B), (Belief:Identity, Goal:Identity)
-
-    ((\, M, A.._=B..+) --> B), M |- (M --> (A.._=B..+)), (Belief:Identity, Goal:Identity)
-
-//NAL4 experimental raw product transform
-//    (A..B=_..+), B |- (B --> (/, ?1, A..B=_..+)), (Belief:Identity, Goal:Identity)
-//    (A..B=_..+), B |- ((\, ?1, A..B=_..+) --> B), (Belief:Identity, Goal:Identity)
-
-
-//NAL4 backwards composition
-    ((/, %M, A.._=B..+) --> Z), (C --> B), task("?") |- ((/, %M, A.._=B..+) --> substitute((/, %M, A.._=B..+),B,C)), (Belief:BeliefStructuralDeduction, Punctuation:Belief)
-    ((\, N, A..+) --> Z), (N --> R), task("?") |- ((\, N, A..+) --> (\, R, A..+)), (Belief:BeliefStructuralDeduction, Punctuation:Belief)
-
-
-////composition on both sides of a statement  TODO - quests handling of these
-    ((A..+) <-> Z), (X <-> Y), task("?") |- ((A..+) <-> substitute((A..+),X,Y)), (Belief:BeliefStructuralDeduction, Punctuation:Belief)
-    ((A..+) --> Z), (X --> Y), task("?") |- ((A..+) --> substitute((A..+),X,Y)), (Belief:BeliefStructuralDeduction, Punctuation:Belief)
-
-
-
-
-
-//Recursion Force - TODO use varargs
-
-  //2
-//    ((A,B) --> Y), A |- ((A,B)-->((/,Y,_,B), B)), (Belief:StructuralDeduction, Goal:StructuralDeduction)
-//    ((A,B) --> Y), B |- ((A,B)-->(A, (/,Y,A,_))), (Belief:StructuralDeduction, Goal:StructuralDeduction)
-  //3
-//    ((A,B,C) --> Y), A |- ((A,B,C)-->((/,Y, _, B, C), B, C)), (Belief:StructuralDeduction, Goal:StructuralDeduction)
-//    ((A,B,C) --> Y), B |- ((A,B,C)-->(A, (/,Y, A, _, C), C)), (Belief:StructuralDeduction, Goal:StructuralDeduction)
-//    ((A,B,C) --> Y), C |- ((A,B,C)-->(A, B, (/,Y, A, B, _))), (Belief:StructuralDeduction, Goal:StructuralDeduction)
-
-//    ((/,%N,_,%A) --> %Z), (%B --> %A), task("?") |- ((/,%N,_,%A) --> (/,%N,_,%B)), (Belief:BeliefStructuralDeduction, Punctuation:Belief)
-//    ((\,%N,%A,_) --> %Z), (%N --> %R), task("?") |- ((\,%N,%A,_) --> (\,%R,%A,_)), (Belief:BeliefStructuralDeduction, Punctuation:Belief)
-
-
 
 
 

@@ -1,4 +1,4 @@
-package nars.nal;
+package nars.index;
 
 import nars.$;
 import nars.Op;

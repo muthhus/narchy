@@ -22,7 +22,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
-import static nars.nal.UtilityFunctions.or;
+import static nars.util.UtilityFunctions.or;
 import static nars.time.Tense.ETERNAL;
 
 /**

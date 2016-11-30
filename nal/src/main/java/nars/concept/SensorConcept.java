@@ -4,7 +4,7 @@ import nars.$;
 import nars.NAR;
 import nars.Narsese;
 import nars.Task;
-import nars.nal.UtilityFunctions;
+import nars.util.UtilityFunctions;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;

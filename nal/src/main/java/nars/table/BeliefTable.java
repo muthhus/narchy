@@ -16,7 +16,7 @@ import java.util.Collections;
 import java.util.Iterator;
 
 import static java.util.stream.StreamSupport.stream;
-import static nars.nal.UtilityFunctions.and;
+import static nars.util.UtilityFunctions.and;
 
 /**
  * A model storing, ranking, and projecting beliefs or goals (tasks with TruthValue).

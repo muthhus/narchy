@@ -14,8 +14,8 @@ import org.jetbrains.annotations.Nullable;
 import java.io.IOException;
 
 import static java.lang.Math.pow;
-import static nars.nal.UtilityFunctions.and;
-import static nars.nal.UtilityFunctions.or;
+import static nars.util.UtilityFunctions.and;
+import static nars.util.UtilityFunctions.or;
 import static nars.util.Util.lerp;
 import static nars.util.Util.unitize;
 

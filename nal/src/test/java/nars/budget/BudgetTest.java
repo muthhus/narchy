@@ -1,6 +1,6 @@
 package nars.budget;
 
-import nars.nal.UtilityFunctions;
+import nars.util.UtilityFunctions;
 import nars.util.Util;
 import nars.util.io.SparkLine;
 import org.junit.Test;

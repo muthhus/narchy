@@ -21,7 +21,7 @@ import org.jetbrains.annotations.Nullable;
 import static nars.$.terms;
 import static nars.Op.CONJ;
 import static nars.Op.NEG;
-import static nars.nal.TermBuilder.isTrueOrFalse;
+import static nars.index.TermBuilder.isTrueOrFalse;
 import static nars.task.Revision.chooseByConf;
 import static nars.time.Tense.*;
 import static nars.time.TimeFunctions.occInterpolate;
