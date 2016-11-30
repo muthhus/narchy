@@ -88,7 +88,7 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<BLink<? exte
                 SpaceGraph.r(initImpulseEpsilon),
                 SpaceGraph.r(initImpulseEpsilon)));
 
-        x.setDamping(0.5f, 0.5f);
+        x.setDamping(0.1f, 0.75f);
         return x;
     }
 
@@ -305,7 +305,7 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<BLink<? exte
                 //0.9f;
 
                 this.attraction = 0.25f + priSum * 0.75f;// * 0.5f + 0.5f;
-                this.attractionDist = 2f; //1f + 2 * ( (1f - (qEst)));
+                this.attractionDist = 0.25f; //1f + 2 * ( (1f - (qEst)));
             } else {
                 this.a = 0;
                 this.attraction = 0;

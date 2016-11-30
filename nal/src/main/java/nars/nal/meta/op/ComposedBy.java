@@ -1,7 +1,7 @@
 package nars.nal.meta.op;
 
 import nars.nal.meta.AtomicBoolCondition;
-import nars.nal.meta.PremiseEval;
+import nars.nal.meta.Derivation;
 import nars.term.Compound;
 import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
@@ -25,7 +25,7 @@ public final class ComposedBy extends AtomicBoolCondition {
 
 
     @Override
-    public boolean run(@NotNull PremiseEval p, int now) {
+    public boolean run(@NotNull Derivation p, int now) {
         Term container = this.container==0 ? p.taskTerm : p.beliefTerm;
         Term contained = this.contained==0 ? p.taskTerm : p.beliefTerm;
         if (container instanceof Compound) {

@@ -101,7 +101,7 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
      * false to stop it
      */
     @Override
-    public final boolean run(@NotNull PremiseEval m, int now) {
+    public final boolean run(@NotNull Derivation m, int now) {
 
         NAR nar = m.nar;
 
@@ -127,7 +127,7 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
     }
 
 
-    final void derive(@NotNull PremiseEval m, @NotNull Compound content, @NotNull PremiseEval.TruthPuncEvidence ct) {
+    final void derive(@NotNull Derivation m, @NotNull Compound content, @NotNull Derivation.TruthPuncEvidence ct) {
 
         Truth truth = ct.truth;
 
@@ -246,7 +246,7 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
      * part 2
      */
     @Nullable
-    public final DerivedTask derive(@NotNull Termed<Compound> c, @NotNull Budget budget, long now, long occ, @NotNull PremiseEval p, Truth truth, PremiseEval.TruthPuncEvidence ct) {
+    public final DerivedTask derive(@NotNull Termed<Compound> c, @NotNull Budget budget, long now, long occ, @NotNull Derivation p, Truth truth, Derivation.TruthPuncEvidence ct) {
         char punc = ct.punc;
         long[] evidence = ct.evidence;
 
@@ -297,7 +297,7 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
 
         private final @NotNull PremiseRule rule;
 
-        public RuleFeedbackDerivedTask(@NotNull Termed<Compound> tc, @Nullable Truth truth, char punct, long[] evidence, @NotNull PremiseEval premise, @NotNull PremiseRule rule, long now, long occ) {
+        public RuleFeedbackDerivedTask(@NotNull Termed<Compound> tc, @Nullable Truth truth, char punct, long[] evidence, @NotNull Derivation premise, @NotNull PremiseRule rule, long now, long occ) {
             super(tc, truth, punct, evidence, premise, now, occ);
             this.rule = rule;
         }

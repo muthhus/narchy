@@ -3,15 +3,22 @@ package nars.remote;
 import nars.$;
 import nars.NAR;
 import nars.NAgent;
+import nars.Task;
+import nars.bag.impl.ArrayBag;
 import nars.bag.impl.Bagregate;
+import nars.budget.merge.BudgetMerge;
+import nars.gui.BagChart;
 import nars.gui.Vis;
 import nars.index.term.tree.TreeTermIndex;
+import nars.link.BLink;
+import nars.link.DefaultBLink;
 import nars.nar.Alann;
 import nars.nar.Default;
 import nars.nar.Multi;
 import nars.nar.exe.Executioner;
 import nars.nar.exe.MultiThreadExecutioner;
 import nars.nar.util.DefaultConceptBuilder;
+import nars.op.Leak;
 import nars.op.mental.Abbreviation;
 import nars.op.mental.Inperience;
 import nars.op.time.MySTMClustered;
@@ -25,6 +32,7 @@ import nars.util.data.random.XorShift128PlusRandom;
 import nars.video.*;
 import objenome.O;
 import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunction;
+import org.jetbrains.annotations.NotNull;
 import spacegraph.SpaceGraph;
 import spacegraph.Surface;
 import spacegraph.obj.layout.Grid;
@@ -37,7 +45,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
@@ -296,6 +306,23 @@ abstract public class NAgents extends NAgent {
 
     public static void chart(NAgents a) {
         NAR nar = a.nar;
+
+        BagChart<Task> taskChart = new BagChart<Task>(new Leak<Task>(new ArrayBag<Task>(64, BudgetMerge.plusBlend, new ConcurrentHashMap<>()), 0f, a.nar) {
+
+
+            @Override
+            protected float onOut(@NotNull BLink<Task> b) {
+                return 0;
+            }
+
+            @Override
+            protected void in(@NotNull Task task, Consumer<BLink<Task>> each) {
+                each.accept(new DefaultBLink<>(task, task, 0.25f));
+            }
+
+        }.bag, 64);
+        a.nar.onFrame(f -> taskChart.update());
+
         a.nar.runLater(()-> {
 
             //Vis.conceptsWindow2D(a.nar, Iterables.concat(a.predictors, a.actions, a.sensors) /* a.nar */,64 ,8).show(1000, 800);
@@ -311,6 +338,8 @@ abstract public class NAgents extends NAgent {
 
 
                             Vis.treeChart( a.nar, new Bagregate(((Default)a.nar).core.active, 16, 0.05f, 64) , 16),
+
+                            taskChart,
 
                             new ReflectionSurface(a),
                             //nar instanceof Default ? Vis.concepts((Default) nar, 128) : grid(/*blank*/),

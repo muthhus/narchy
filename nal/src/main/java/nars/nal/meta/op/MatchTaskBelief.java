@@ -8,7 +8,7 @@ import nars.Op;
 import nars.index.term.PatternTermIndex;
 import nars.nal.meta.AtomicBoolCondition;
 import nars.nal.meta.BoolCondition;
-import nars.nal.meta.PremiseEval;
+import nars.nal.meta.Derivation;
 import nars.nal.meta.TaskBeliefPair;
 import nars.nal.meta.constraint.AndConstraint;
 import nars.nal.meta.constraint.MatchConstraint;
@@ -90,7 +90,7 @@ public class MatchTaskBelief extends AtomicBoolCondition {
 
 
     @Override
-    public boolean run(PremiseEval m, int now) {
+    public boolean run(Derivation m, int now) {
         throw new RuntimeException("this should not be called");
     }
 
@@ -312,7 +312,7 @@ public class MatchTaskBelief extends AtomicBoolCondition {
         }
 
         @Override
-        public boolean run(@NotNull PremiseEval m, int now) {
+        public boolean run(@NotNull Derivation m, int now) {
 
 
             Term maybeContainer = this.container==0 ? m.taskTerm : m.beliefTerm;

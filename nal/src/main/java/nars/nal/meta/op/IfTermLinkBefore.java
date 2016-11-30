@@ -2,7 +2,7 @@ package nars.nal.meta.op;
 
 import nars.Task;
 import nars.nal.meta.BoolCondition;
-import nars.nal.meta.PremiseEval;
+import nars.nal.meta.Derivation;
 import nars.term.Compound;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -38,7 +38,7 @@ public class IfTermLinkBefore extends events {
     }
 
     @Override
-    public boolean run(@NotNull PremiseEval m, int now) {
+    public boolean run(@NotNull Derivation m, int now) {
 
         Task belief = m.belief;
         if (belief == null && requireBelief())

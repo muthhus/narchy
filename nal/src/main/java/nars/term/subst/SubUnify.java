@@ -4,7 +4,7 @@ import nars.$;
 import nars.Op;
 import nars.Param;
 import nars.index.term.TermIndex;
-import nars.nal.meta.PremiseEval;
+import nars.nal.meta.Derivation;
 import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -19,7 +19,7 @@ import static nars.term.Term.False;
 public final class SubUnify extends Unify {
 
     private @Nullable Term xterm;
-    private @Nullable PremiseEval target;
+    private @Nullable Derivation target;
 
     @Nullable private Term result;
     int retries = Param.SubUnificationMatchRetries;
@@ -59,7 +59,7 @@ public final class SubUnify extends Unify {
     }
 
     @Nullable
-    public Term tryMatch(@Nullable PremiseEval target, @Nullable Term xterm, @NotNull Term x, @NotNull Term y) {
+    public Term tryMatch(@Nullable Derivation target, @Nullable Term xterm, @NotNull Term x, @NotNull Term y) {
         this.xterm = xterm;
         this.target = target;
         this.result = null;

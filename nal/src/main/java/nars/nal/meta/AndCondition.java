@@ -37,7 +37,7 @@ public final class AndCondition extends GenericCompound implements BoolCondition
 //    }
 
     @Override
-    public final boolean run(@NotNull PremiseEval m, int now) {
+    public final boolean run(@NotNull Derivation m, int now) {
         boolean result = true;
         int start = now;
         for (BoolCondition x : termCache) {

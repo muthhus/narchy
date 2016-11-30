@@ -10,7 +10,7 @@ import nars.concept.Concept;
 import nars.link.BLink;
 import nars.nal.Deriver;
 import nars.nal.Premise;
-import nars.nal.meta.PremiseEval;
+import nars.nal.meta.Derivation;
 import nars.term.Termed;
 import nars.util.list.FasterList;
 import org.jetbrains.annotations.NotNull;
@@ -91,7 +91,7 @@ public class PremiseMatrix {
 
                             if (p != null) {
 
-                                new PremiseEval(nar, deriver, p, target);
+                                deriver.accept(new Derivation(nar, p, target));
                                 countPerTermlink++;
                             }
 

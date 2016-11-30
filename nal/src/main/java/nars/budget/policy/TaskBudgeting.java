@@ -5,7 +5,7 @@ import nars.budget.Budget;
 import nars.budget.BudgetFunctions;
 import nars.budget.RawBudget;
 import nars.nal.Premise;
-import nars.nal.meta.PremiseEval;
+import nars.nal.meta.Derivation;
 import nars.term.Termed;
 import nars.time.Tense;
 import nars.truth.Truth;
@@ -20,7 +20,7 @@ import static nars.nal.UtilityFunctions.and;
  */
 public class TaskBudgeting {
 
-    public static @Nullable Budget derivation(@Nullable Truth truth, @NotNull Termed derived, @NotNull PremiseEval p) {
+    public static @Nullable Budget derivation(@Nullable Truth truth, @NotNull Termed derived, @NotNull Derivation p) {
         float derivationQuality;
         if (truth == null) {
             //question or quest:

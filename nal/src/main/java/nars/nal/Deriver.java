@@ -1,69 +1,84 @@
 package nars.nal;
 
+import com.github.benmanes.caffeine.cache.AsyncLoadingCache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import nars.nal.derive.TrieDeriver;
-import nars.nal.meta.PremiseEval;
+import nars.nal.meta.Derivation;
 import nars.nal.rule.PremiseRuleSet;
-import nars.util.Util;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+import java.util.function.Consumer;
+
 /**
- *
  * Implements a strategy for managing submitted derivation processes
  * ( via the run() methods )
- *
+ * <p>
  * Created by patrick.hammer on 30.07.2015.
  */
-public abstract class Deriver  {
+public interface Deriver extends Consumer<Derivation> {
 
     //@Deprecated public static final TermIndex terms = TermIndex.memory(16384);
 
-    private static TrieDeriver defaultDeriver;
+//    TrieDeriver defaultDeriver;
+//
+//    PremiseRuleSet defaultRules;
 
-    private static PremiseRuleSet defaultRules;
+    Logger logger = LoggerFactory.getLogger(Deriver.class);
 
-    final static Logger logger = LoggerFactory.getLogger(Deriver.class);
-
-    @NotNull public static TrieDeriver getDefaultDeriver() {
-        synchronized (Deriver.class) {
-            if (defaultRules == null) {
-                //synchronized(logger) {
-                if (defaultDeriver == null) { //double boiler
-                    Util.time(logger, "Rule parse", () -> {
-                        try {
-                            defaultRules = PremiseRuleSet
-                                    //.rulesCached("default.meta.nal");
-                                    .rules("default.meta.nal");
-                        } catch (Exception e) {
-                            logger.error("rule parse: {}", e);
-                            throw new RuntimeException(e);
-                        }
-                    });
-                    Util.time(logger, "Rule compile", () -> {
-                        defaultDeriver = new TrieDeriver(defaultRules);
-                    });
-                }
-                //}
-
-            }
-            return defaultDeriver;
+    AsyncLoadingCache<String, Deriver> derivers = Caffeine.newBuilder().buildAsync((s) -> {
+        try {
+            return new TrieDeriver(PremiseRuleSet.rules(s));
+        } catch (IOException e) {
+            return (Deriver) null;
         }
+    });
+
+    @NotNull
+    static Deriver get(String path) {
+        return derivers.synchronous().get(path);
     }
 
 
+//    @NotNull public static TrieDeriver getDefaultDeriver() {
+//        synchronized (Deriver.class) {
+//            if (defaultRules == null) {
+//                //synchronized(logger) {
+//                if (defaultDeriver == null) { //double boiler
+//                    Util.time(logger, "Rule parse", () -> {
+//                        try {
+//                            defaultRules = PremiseRuleSet
+//                                    //.rulesCached("default.meta.nal");
+//                                    .rules("default.meta.nal");
+//                        } catch (Exception e) {
+//                            logger.error("rule parse: {}", e);
+//                            throw new RuntimeException(e);
+//                        }
+//                    });
+//                    Util.time(logger, "Rule compile", () -> {
+//                        defaultDeriver = new TrieDeriver(defaultRules);
+//                    });
+//                }
+//                //}
+//
+//            }
+//            return defaultDeriver;
+//        }
+//    }
 
-    /**
-     * default set of rules, statically available
-     */
-    @Nullable
-    public final PremiseRuleSet rules;
 
-
-    public Deriver(@Nullable PremiseRuleSet rules) {
-        this.rules = rules;
-    }
+//    /**
+//     * default set of rules, statically available
+//     */
+//    @Nullable
+//    public final PremiseRuleSet rules;
+//
+//
+//    public Deriver(@Nullable PremiseRuleSet rules) {
+//        this.rules = rules;
+//    }
 
 
 //    //not ready yet
@@ -91,10 +106,8 @@ public abstract class Deriver  {
 //        );
 //    }
 
-    /** run an initialized rule matcher */
-    public abstract void run(@NotNull PremiseEval matcher);
-
-
+//    /** run an initialized rule matcher */
+//    public abstract void run(@NotNull PremiseEval matcher);
 
 
 //    public void load(Memory memory) {

@@ -51,7 +51,7 @@ public class Alann extends NAR {
 
     public final List<GraphPremiseBuilder> cores;
 
-    final static Deriver deriver = Deriver.getDefaultDeriver();
+    final static Deriver deriver = Deriver.get("default.meta.nal");
 
     public final class GraphPremiseBuilder implements Runnable {
 

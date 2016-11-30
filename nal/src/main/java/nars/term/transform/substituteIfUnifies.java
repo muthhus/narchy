@@ -1,7 +1,7 @@
 package nars.term.transform;
 
 import nars.Op;
-import nars.nal.meta.PremiseEval;
+import nars.nal.meta.Derivation;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.subst.SubUnify;
@@ -63,9 +63,9 @@ import static nars.time.Tense.DTERNAL;
 abstract public class substituteIfUnifies extends TermTransformOperator  {
 
     //private final OneMatchFindSubst subMatcher;
-    protected final PremiseEval parent; //parent matcher context
+    protected final Derivation parent; //parent matcher context
 
-    protected substituteIfUnifies(String id, PremiseEval parent) {
+    protected substituteIfUnifies(String id, Derivation parent) {
         super(id);
         this.parent = parent;
         //this.subMatcher = sub;
@@ -151,7 +151,7 @@ abstract public class substituteIfUnifies extends TermTransformOperator  {
     public static final class substituteIfUnifiesAny extends substituteIfUnifies {
 
 
-        public substituteIfUnifiesAny(PremiseEval parent) {
+        public substituteIfUnifiesAny(Derivation parent) {
             super("subIfUnifiesAny", parent);
         }
 
@@ -164,7 +164,7 @@ abstract public class substituteIfUnifies extends TermTransformOperator  {
     public static final class substituteIfUnifiesDep extends substituteIfUnifies {
 
 
-        public substituteIfUnifiesDep(PremiseEval parent) {
+        public substituteIfUnifiesDep(Derivation parent) {
             super("subIfUnifiesDep", parent);
         }
 
@@ -223,7 +223,7 @@ abstract public class substituteIfUnifies extends TermTransformOperator  {
      */
     public static final class substituteIfUnifiesForward extends substituteIfUnifies {
 
-        public substituteIfUnifiesForward(PremiseEval parent) {
+        public substituteIfUnifiesForward(Derivation parent) {
             super("subIfUnifiesForward",parent);
         }
 

@@ -29,6 +29,7 @@ public class Bagregate<X> extends ArrayBag<X> {
     public Bagregate(@NotNull Bag<X> src, int capacity, float scale, int iterationDepth) {
         super(capacity, BudgetMerge.plusBlend, new ConcurrentHashMap(capacity));
 
+
         this.src = src;
         this.scale = new FloatParam(scale);
         this.iterationDepth = iterationDepth;

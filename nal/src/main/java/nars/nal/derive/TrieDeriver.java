@@ -26,10 +26,11 @@ import java.util.stream.Collectors;
 /**
  * separates rules according to task/belief term type but otherwise involves significant redundancy we'll eliminate in other Deriver implementations
  */
-public class TrieDeriver extends Deriver {
+public class TrieDeriver implements Deriver {
 
     @NotNull
     public final BoolCondition[] roots;
+    public final PremiseRuleSet rules;
 
 
     /**
@@ -73,7 +74,7 @@ public class TrieDeriver extends Deriver {
     }
 
     public TrieDeriver(@NotNull PremiseRuleSet ruleset) {
-        super(ruleset);
+        this.rules = ruleset;
 
         //return Collections.unmodifiableList(premiseRules);
         final TermTrie<Term, PremiseRule> trie = new TermPremiseRuleTermTrie(ruleset);
@@ -98,7 +99,7 @@ public class TrieDeriver extends Deriver {
     }
 
     @Override
-    public final void run(@NotNull PremiseEval m) {
+    public final void accept(@NotNull Derivation m) {
         int now = m.now();
         for (BoolCondition r : roots) {
             r.run(m, now);

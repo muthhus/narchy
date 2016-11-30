@@ -38,6 +38,7 @@ public class BagChart<X> extends TreeChart<BLink<X>> implements BiConsumer<BLink
                 @Nullable X ii = i.get();
                 return ii != null ? newItem(i) : null;
             });
+            busy.set(false);
         }
     }
 
@@ -55,6 +56,7 @@ public class BagChart<X> extends TreeChart<BLink<X>> implements BiConsumer<BLink
 
     @Override
     protected void paint(GL2 gl) {
+        busy.set(true);
         super.paint(gl);
         busy.set(false);
     }

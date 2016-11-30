@@ -1,7 +1,7 @@
 package nars.nal.meta.op;
 
 import nars.nal.meta.AtomicBoolCondition;
-import nars.nal.meta.PremiseEval;
+import nars.nal.meta.Derivation;
 import nars.nal.meta.TaskBeliefSubterms;
 import nars.term.Compound;
 import nars.term.Term;
@@ -44,7 +44,7 @@ public abstract class SubtermPathCondition extends AtomicBoolCondition {
 
 
     @Nullable
-    public static Term resolve(@NotNull PremiseEval ff, int aOrB, @NotNull byte[] path) {
+    public static Term resolve(@NotNull Derivation ff, int aOrB, @NotNull byte[] path) {
         return resolve(aOrB == 0 ? ff.taskTerm : ff.beliefTerm, path);
     }
 
@@ -77,7 +77,7 @@ public abstract class SubtermPathCondition extends AtomicBoolCondition {
     }
 
     @Override
-    public boolean run(@NotNull PremiseEval ff, int now) {
+    public boolean run(@NotNull Derivation ff, int now) {
 
         Term ta;
         if ((ta = resolve(ff, a, aPath)) == null)

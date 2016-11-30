@@ -24,7 +24,7 @@ public final class PatternOpSwitch extends Atom /* TODO represent as some Generi
     }
 
     @Override
-    public boolean run(@NotNull PremiseEval m, int now) {
+    public boolean run(@NotNull Derivation m, int now) {
         BoolCondition p = proc[m.subOp(subterm)];
         if (p!=null) {
             p.run(m, now);

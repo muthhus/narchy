@@ -42,13 +42,13 @@ public class NARHear extends NAgent {
                 i -> $.func("f", $.the(i)).toString(),
 
         //        i -> () -> (Util.clamp(au.history[i], -1f, 1f)+1f)/2f); //raw bipolar
-                i -> () -> (Util.clamp(Math.abs(au.dataNorm[i]), 0f, 1f))); //absolute value unipolar
+                i -> () -> (Util.sqr(Util.clamp(au.data[i], 0f, 1f)))); //absolute value unipolar
 
-        freqInputs.forEach(s -> s.resolution(0.1f));
+        freqInputs.forEach(s -> s.resolution(0.05f));
 
-        Autoencoder ae = new Autoencoder(au.freqSamplesPerFrame, 32, new XorShift128PlusRandom(1));
+        Autoencoder ae = new Autoencoder(au.data.length, 16, new XorShift128PlusRandom(1));
         nar.onFrame(f->{
-            ae.train(au.dataNorm, 0.1f, 0.01f, 0.01f, false);
+            ae.train(au.data, 0.15f, 0.01f, 0.1f, true, true, true);
         });
 
         SpaceGraph.window(
@@ -58,7 +58,7 @@ public class NARHear extends NAgent {
                             new FloatSlider(audio.gain)
                     ),
                     new MatrixView(ae.W.length, ae.W[0].length, MatrixView.arrayRenderer(ae.W)),
-                    new MatrixView(ae.y, (v, gl) -> { Draw.colorPolarized(gl, -v); return 0; }),
+                    new MatrixView(ae.y, 4, (v, gl) -> { Draw.colorPolarized(gl, v); return 0; }),
                     Vis.conceptLinePlot(nar, freqInputs, 64)
                 ),
                 1200, 1200);

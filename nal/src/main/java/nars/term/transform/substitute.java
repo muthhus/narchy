@@ -2,7 +2,7 @@ package nars.term.transform;
 
 import com.google.common.base.Objects;
 import nars.$;
-import nars.nal.meta.PremiseEval;
+import nars.nal.meta.Derivation;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.subst.MapSubst;
@@ -12,11 +12,11 @@ import org.jetbrains.annotations.Nullable;
 
 public final class substitute extends TermTransformOperator  {
 
-    @NotNull private final PremiseEval parent;
+    @NotNull private final Derivation parent;
 
     final static Term STRICT = $.the("strict");
 
-    public substitute(@NotNull PremiseEval parent) {
+    public substitute(@NotNull Derivation parent) {
         super("substitute");
         this.parent = parent;
     }

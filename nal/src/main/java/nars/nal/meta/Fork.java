@@ -25,7 +25,7 @@ public final class Fork extends GenericCompound implements BoolCondition {
     }
 
     @Override
-    public boolean run(@NotNull PremiseEval m, int now) {
+    public boolean run(@NotNull Derivation m, int now) {
 
         for (BoolCondition s : termCache) {
             s.run(m, now);

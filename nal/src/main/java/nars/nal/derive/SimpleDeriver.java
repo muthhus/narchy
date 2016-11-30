@@ -4,7 +4,7 @@ import nars.$;
 import nars.nal.Deriver;
 import nars.nal.meta.BoolCondition;
 import nars.nal.meta.PostCondition;
-import nars.nal.meta.PremiseEval;
+import nars.nal.meta.Derivation;
 import nars.nal.rule.PremiseRule;
 import nars.nal.rule.PremiseRuleSet;
 import nars.term.Term;
@@ -13,13 +13,14 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 
 
-public class SimpleDeriver extends Deriver {
+public class SimpleDeriver implements Deriver {
 
     @NotNull
     private final List<List<Term>> unrolled;
+    private final PremiseRuleSet rules;
 
     public SimpleDeriver(@NotNull PremiseRuleSet rules) {
-        super(rules);
+        this.rules = rules;
 
         List<List<Term>> u = $.newArrayList();
         //return Collections.unmodifiableList(premiseRules);
@@ -33,7 +34,7 @@ public class SimpleDeriver extends Deriver {
     }
 
     @Override
-    public void run(@NotNull PremiseEval m) {
+    public void accept(@NotNull Derivation m) {
 
         int now = m.now();
 

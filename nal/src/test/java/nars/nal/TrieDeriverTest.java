@@ -20,7 +20,7 @@ import static org.junit.Assert.assertTrue;
  */
 public class TrieDeriverTest {
 
-    final static TrieDeriver d = Deriver.getDefaultDeriver();
+    final static TrieDeriver d = (TrieDeriver) Deriver.get("default.meta.nal");
 
     @Test public void printCompiledRuleTree() {
 

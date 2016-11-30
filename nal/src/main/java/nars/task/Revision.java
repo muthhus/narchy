@@ -5,7 +5,7 @@ import nars.Param;
 import nars.Task;
 import nars.budget.Budget;
 import nars.nal.Stamp;
-import nars.nal.meta.PremiseEval;
+import nars.nal.meta.Derivation;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.truth.Truth;
@@ -247,7 +247,7 @@ public class Revision {
 
 
     @NotNull
-    public static Task chooseByConf(@NotNull Task t, @Nullable Task b, @NotNull PremiseEval p) {
+    public static Task chooseByConf(@NotNull Task t, @Nullable Task b, @NotNull Derivation p) {
 
         if ((b == null) || !b.isBeliefOrGoal())
             return t;

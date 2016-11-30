@@ -246,9 +246,10 @@ public class Vis {
                     Concept concept = nar.concept(t);
 
                     float b = 2f * (concept.beliefFreq(nar.time(), 0.5f) - 0.5f);
-                    backgroundColor[0] = b >= 0 ? b : 0;
-                    backgroundColor[1] = b < 0 ? -b : 0;
-                    backgroundColor[3] = 1f;
+                    backgroundColor[0] = b < 0 ? -b : 0;
+                    backgroundColor[1] = b >= 0 ? b : 0;
+                    backgroundColor[3] = 0.75f;
+
 
                     super.paint(gl);
                 }

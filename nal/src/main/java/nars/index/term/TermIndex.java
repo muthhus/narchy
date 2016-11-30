@@ -6,7 +6,7 @@ import nars.concept.Concept;
 import nars.concept.util.ConceptBuilder;
 import nars.concept.util.InvalidConceptException;
 import nars.nal.TermBuilder;
-import nars.nal.meta.PremiseEval;
+import nars.nal.meta.Derivation;
 import nars.nal.meta.match.EllipsisMatch;
 import nars.task.util.InvalidTaskException;
 import nars.term.Compound;
@@ -203,13 +203,13 @@ public abstract class TermIndex extends TermBuilder {
 
 
         //no variables that could be substituted, so return this constant
-        if (f instanceof PremiseEval && src.vars() + src.varPattern() == 0) //shortcut for premise evaluation matching
+        if (f instanceof Derivation && src.vars() + src.varPattern() == 0) //shortcut for premise evaluation matching
             return src;
 
         int len = src.size();
         List<Term> sub = $.newArrayList(len /* estimate */);
 
-        boolean strict = f instanceof PremiseEval;
+        boolean strict = f instanceof Derivation;
 
         boolean changed = false;
         Compound crc = (Compound) src;

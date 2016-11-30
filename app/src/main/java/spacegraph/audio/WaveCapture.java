@@ -36,7 +36,7 @@ public class WaveCapture implements Runnable {
 
     public final int freqSamplesPerFrame = 16;
 
-    private final int historyFrames = 32;
+    private final int historyFrames = 16;
     public float[] data;
 
     private WaveSource source;

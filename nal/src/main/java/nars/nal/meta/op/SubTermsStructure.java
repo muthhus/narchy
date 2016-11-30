@@ -2,7 +2,7 @@ package nars.nal.meta.op;
 
 import nars.Op;
 import nars.nal.meta.AtomicBoolCondition;
-import nars.nal.meta.PremiseEval;
+import nars.nal.meta.Derivation;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -35,7 +35,7 @@ public final class SubTermsStructure extends AtomicBoolCondition {
     }
 
     @Override
-    public boolean run(@NotNull PremiseEval ff, int now) {
+    public boolean run(@NotNull Derivation ff, int now) {
         /*Compound t = ff.term;
         return !t.term(subterm).impossibleStructureMatch(bits);*/
         return ff.subTermsMatch(bits);

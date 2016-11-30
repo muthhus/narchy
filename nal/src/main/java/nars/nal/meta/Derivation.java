@@ -6,7 +6,6 @@ import nars.Param;
 import nars.Task;
 import nars.budget.Budget;
 import nars.budget.policy.TaskBudgeting;
-import nars.nal.Deriver;
 import nars.nal.Premise;
 import nars.nal.Stamp;
 import nars.nal.meta.constraint.MatchConstraint;
@@ -33,7 +32,7 @@ import static nars.time.Tense.DTERNAL;
 /**
  * evaluates a premise (task, belief, termlink, taskLink, ...) to derive 0 or more new tasks
  */
-public class PremiseEval extends Unify {
+public class Derivation extends Unify {
 
 
     /**
@@ -54,7 +53,7 @@ public class PremiseEval extends Unify {
         if (t == null)
             return false;
 
-        return this.punct.set(new PremiseEval.TruthPuncEvidence(t, p, evidence))!=null;
+        return this.punct.set(new Derivation.TruthPuncEvidence(t, p, evidence))!=null;
     }
 
     @Nullable public Truth dither(@NotNull Truth t) {
@@ -149,7 +148,7 @@ public class PremiseEval extends Unify {
     public final boolean cyclic;
 
 
-    public PremiseEval(@NotNull NAR nar, @NotNull Deriver deriver, @NotNull Premise p, @NotNull Consumer<Task> c) {
+    public Derivation(@NotNull NAR nar, @NotNull Premise p, @NotNull Consumer<Task> c) {
         super(nar.concepts, VAR_PATTERN, nar.random, Param.UnificationStackMax, Param.UnificationTermutesMax);
 
         this.nar = nar;
@@ -224,12 +223,6 @@ public class PremiseEval extends Unify {
 
         this.target = c;
 
-        //revert(start); //do this before starting in case the last execution was interrupted
-
-        deriver.run(this);
-
-        //this.conclusion = null; //forget a reference to the local field copy but return this instance
-        //this.evidenceDouble = this.evidenceSingle = null;
 
     }
 

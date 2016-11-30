@@ -1,7 +1,7 @@
 package nars.nal.meta.op;
 
 import nars.nal.meta.AtomicBoolCondition;
-import nars.nal.meta.PremiseEval;
+import nars.nal.meta.Derivation;
 import org.jetbrains.annotations.NotNull;
 
 /** matches the possibility that one half of the premise must be contained within the other.
@@ -11,7 +11,7 @@ import org.jetbrains.annotations.NotNull;
 final class TaskBeliefEqualCondition extends AtomicBoolCondition {
 
     @Override
-    public boolean run(@NotNull PremiseEval m, int now) {
+    public boolean run(@NotNull Derivation m, int now) {
         return m.taskTerm.equals(m.beliefTerm);
     }
 

@@ -2,7 +2,7 @@ package nars.nal.meta.op;
 
 import nars.Op;
 import nars.nal.meta.AtomicBoolCondition;
-import nars.nal.meta.PremiseEval;
+import nars.nal.meta.Derivation;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -38,7 +38,7 @@ public enum AbstractPatternOp  {
         }
 
         @Override
-        public boolean run(@NotNull PremiseEval ff, int now) {
+        public boolean run(@NotNull Derivation ff, int now) {
             return (subterm == 0 ? ff.termSub0op : ff.termSub1op) == opOrdinal;
         }
 
@@ -65,7 +65,7 @@ public enum AbstractPatternOp  {
         }
 
         @Override
-        public boolean run(@NotNull PremiseEval ff, int now) {
+        public boolean run(@NotNull Derivation ff, int now) {
             //the bit must not be set in the structure
             return (opBits & (subterm == 0 ? ff.termSub0opBit : ff.termSub1opBit)) == 0;
         }
@@ -92,7 +92,7 @@ public enum AbstractPatternOp  {
         }
 
         @Override
-        public boolean run(@NotNull PremiseEval ff, int now) {
+        public boolean run(@NotNull Derivation ff, int now) {
             //the bit must not be set in the structure
             return (opBits & (subterm == 0 ? ff.termSub0Struct : ff.termSub1Struct)) == 0;
         }

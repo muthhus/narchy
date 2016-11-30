@@ -7,6 +7,7 @@ import nars.concept.Concept;
 import nars.index.term.TermIndex;
 import nars.index.term.map.MapTermIndex;
 import nars.link.BLink;
+import nars.nal.Deriver;
 import nars.nal.nal8.AbstractOperator;
 import nars.nar.core.ConceptBagCycle;
 import nars.nar.exe.Executioner;
@@ -69,7 +70,8 @@ public class Default extends NAR {
 
         quaMin.setValue(Param.BUDGET_EPSILON*16f);
 
-        ConceptBagCycle c = new ConceptBagCycle(this, activeConcepts);
+        Deriver d = Deriver.get("default.meta.nal");
+        ConceptBagCycle c = new ConceptBagCycle(this, activeConcepts, d);
 
         c.termlinksFiredPerFiredConcept.set(termLinksPerConcept);
         c.tasklinksFiredPerFiredConcept.set(taskLinksPerConcept);

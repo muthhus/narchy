@@ -39,7 +39,7 @@ public class ConceptBagCycle {
 
     private static final Logger logger = LoggerFactory.getLogger(ConceptBagCycle.class);
 
-    final static Deriver deriver = Deriver.getDefaultDeriver();
+    final Deriver deriver;
 
     /**
      * concepts active in this cycle
@@ -75,9 +75,6 @@ public class ConceptBagCycle {
     @NotNull
     private final ConceptBuilder conceptBuilder;
 
-    //cached value for use in the next firing
-    private long now;
-
     final AtomicBoolean busy = new AtomicBoolean(false);
 
 //    private Comparator<? super BLink<Concept>> sortConceptLinks = (a, b) -> {
@@ -91,10 +88,11 @@ public class ConceptBagCycle {
     //private final CapacityLinkedHashMap<Premise,Premise> recent = new CapacityLinkedHashMap<>(256);
     //long novel=0, total=0;
 
-    public ConceptBagCycle(@NotNull NAR nar, int initialCapacity) {
+    public ConceptBagCycle(@NotNull NAR nar, int initialCapacity, Deriver deriver) {
 
         this.nar = nar;
 
+        this.deriver = deriver;
         this.conceptsFiredPerCycle = new MutableInteger(1);
         this.conceptsFiredPerBatch = new MutableInteger(Param.CONCEPT_FIRE_BATCH_SIZE);
         this.conceptBuilder = nar.concepts.conceptBuilder();
@@ -105,7 +103,6 @@ public class ConceptBagCycle {
         //nar.onFrame(this);
         nar.onFrame((n) -> {
             if (busy.compareAndSet(false, true)) {
-                now = nar.time();
 
                 //updae concept bag
                 active.commit();
