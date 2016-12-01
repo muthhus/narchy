@@ -4,12 +4,12 @@ import com.jogamp.newt.event.KeyEvent;
 import com.jogamp.newt.event.KeyListener;
 import com.jogamp.newt.event.MouseEvent;
 import org.jetbrains.annotations.Nullable;
-import spacegraph.SimpleSpatial;
 import spacegraph.Spatial;
 import spacegraph.math.Matrix4f;
 import spacegraph.math.SingularMatrixException;
 import spacegraph.math.Vector4f;
 import spacegraph.math.v3;
+import spacegraph.phys.BulletStats;
 import spacegraph.phys.Collidable;
 import spacegraph.phys.Dynamic;
 import spacegraph.phys.collision.ClosestRay;
@@ -31,11 +31,11 @@ public class OrbMouse extends SpaceMouse implements KeyListener {
     private int mouseDragPrevX, mouseDragPrevY;
     private int mouseDragDX, mouseDragDY;
     final v3 gOldPickingPos = v();
-    float gOldPickingDist = 0.f;
+    float gOldPickingDist;
 
-    protected TypedConstraint pickConstraint = null;
-    protected Dynamic directDrag;
-    public Dynamic pickedBody = null; // for deactivation state
+    protected TypedConstraint pickConstraint;
+//    protected Dynamic directDrag;
+    public Dynamic pickedBody; // for deactivation state
     public Spatial pickedSpatial;
     public Collidable picked;
     public  v3 hitPoint;
@@ -62,7 +62,7 @@ public class OrbMouse extends SpaceMouse implements KeyListener {
     private boolean mouseClick(int button, int x, int y) {
 
         switch (button) {
-            case MouseEvent.BUTTON3: {
+            case MouseEvent.BUTTON3:
                 ClosestRay c = mousePick(x, y);
                 if (c.hasHit()) {
                     Collidable co = c.collidable;
@@ -74,8 +74,7 @@ public class OrbMouse extends SpaceMouse implements KeyListener {
                     space.camera(co.getWorldOrigin(), co.shape().getBoundingRadius());
 
                 }
-            }
-            return true;
+                return true;
 
 
 //            case MouseEvent.BUTTON3: {
@@ -112,22 +111,21 @@ public class OrbMouse extends SpaceMouse implements KeyListener {
 
     private void pickConstrain(int button, int state, int x, int y) {
 
+        ClosestRay rayCallback = mousePick(x, y);
+
         switch (button) {
-            case MouseEvent.BUTTON1: {
+            case MouseEvent.BUTTON1:
 
                 if (state == 1) {
-                    mouseGrabOn(x, y);
+                    mouseGrabOn();
                 } else {
                     mouseGrabOff();
                 }
                 break;
-            }
-            case MouseEvent.BUTTON2: {
+            case MouseEvent.BUTTON2:
                 break;
-            }
-            case MouseEvent.BUTTON3: {
+            case MouseEvent.BUTTON3:
                 break;
-            }
         }
     }
 
@@ -141,60 +139,81 @@ public class OrbMouse extends SpaceMouse implements KeyListener {
             pickedBody = null;
         }
 
-        if (directDrag != null) {
-            Object u = directDrag.data();
-
-            if (u instanceof SimpleSpatial) {
-                ((SimpleSpatial) u).motionLock(false);
-            }
-
-            directDrag = null;
-        }
+//        if (directDrag != null) {
+//            Object u = directDrag.data();
+//
+//            if (u instanceof SimpleSpatial) {
+//                ((SimpleSpatial) u).motionLock(false);
+//            }
+//
+//            directDrag = null;
+//        }
     }
 
 
-    private ClosestRay mouseGrabOn(int sx, int sy) {
+    private ClosestRay mouseGrabOn() {
         // add a point to point constraint for picking
-        ClosestRay rayCallback = mousePick(sx, sy);
 
-        if (rayCallback.hasHit()) {
-            Dynamic body = Dynamic.ifDynamic(rayCallback.collidable);
-            if (body != null) {
+        if (pickConstraint == null && pickedBody!=null ) {
+            pickedBody.setActivationState(Collidable.DISABLE_DEACTIVATION);
 
-                body.setActivationState(Collidable.DISABLE_DEACTIVATION);
-                v3 pickPos = v(rayCallback.hitPointWorld);
+            Dynamic body = pickedBody;
+                v3 pickPos = new v3(rayCallback.hitPointWorld);
 
-                Transform tmpTrans = body.getCenterOfMassTransform(new Transform());
+                Transform tmpTrans = body.worldTransform;
                 tmpTrans.inverse();
-                v3 localPivot = v(pickPos);
+                v3 localPivot = new v3(pickPos);
                 tmpTrans.transform(localPivot);
+
+                Point2PointConstraint p2p = new Point2PointConstraint(body, localPivot);
+                p2p.impulseClamp = 3f;
+
                 // save mouse position for dragging
                 gOldPickingPos.set(rayCallback.rayToWorld);
-                v3 eyePos = v(space.camPos);
-                v3 tmp = v();
+                v3 eyePos = new v3(space.camPos);
+                v3 tmp = new v3();
                 tmp.sub(pickPos, eyePos);
                 gOldPickingDist = tmp.length();
+                // very weak constraint for picking
+                p2p.tau = 0.1f;
+
+                space.dyn.addConstraint(p2p);
+                pickConstraint = p2p;
+
+//                body.setActivationState(Collidable.DISABLE_DEACTIVATION);
+//                v3 pickPos = v(rayCallback.hitPointWorld);
+//
+//                Transform tmpTrans = body.getCenterOfMassTransform(new Transform());
+//                tmpTrans.inverse();
+//                v3 localPivot = v(pickPos);
+//                tmpTrans.transform(localPivot);
+//                // save mouse position for dragging
+//                gOldPickingPos.set(rayCallback.rayToWorld);
+//                v3 eyePos = v(space.camPos);
+//                v3 tmp = v();
+//                tmp.sub(pickPos, eyePos);
+//                gOldPickingDist = tmp.length();
+//
+//
+//                // other exclusions?
+//                if (!(body.isStaticObject() || body.isKinematicObject())) {
+//                    pickedBody = body;
+//
+//
+//                    Point2PointConstraint p2p = new Point2PointConstraint(body, localPivot);
+//                    space.dyn.addConstraint(p2p);
+//                    pickConstraint = p2p;
+//
+//                    // very weak constraint for picking
+//                    p2p.tau = 0.02f;
+//                } else {
+//                    if (directDrag == null) {
+//                        directDrag = body;
+//
+//                    }
+//                }
 
 
-                // other exclusions?
-                if (!(body.isStaticObject() || body.isKinematicObject())) {
-                    pickedBody = body;
-
-
-                    Point2PointConstraint p2p = new Point2PointConstraint(body, localPivot);
-                    space.dyn.addConstraint(p2p);
-                    pickConstraint = p2p;
-
-                    // very weak constraint for picking
-                    p2p.tau = 0.02f;
-                } else {
-                    if (directDrag == null) {
-                        directDrag = body;
-
-                    }
-                }
-
-            }
         }
 
         return rayCallback;
@@ -219,19 +238,17 @@ public class OrbMouse extends SpaceMouse implements KeyListener {
 
 
         ClosestRay cray = mousePick(px, py);
-        if (cray == null)
-            return false;
+
 
         /*System.out.println(mouseTouch.collisionObject + " touched with " +
             Arrays.toString(buttons) + " at " + mouseTouch.hitPointWorld
         );*/
 
-        picked = cray.collidable;
+        picked = cray!=null ? cray.collidable : null;
         if (picked != null) {
             Object t = picked.data();
             if (t instanceof Spatial) {
                 pickedSpatial = ((Spatial) t);
-                hitPoint = cray.hitPointWorld;
                 if (pickedSpatial.onTouch(picked, cray, buttons) != null) {
                     //absorbed
                     clearDrag();
@@ -241,113 +258,130 @@ public class OrbMouse extends SpaceMouse implements KeyListener {
                 pickedSpatial = null;
             }
         } else {
+//            if (pickedSpatial!=null) {
+//                if (pickedSpatial.onTouch(picked, cray, buttons)!=null) {
+//                    clearDrag();
+//                    return true;
+//                }
+//            }
             pickedSpatial = null;
         }
 
         //}
 
-        if ((pickConstraint != null) || (directDrag != null)) {
+        if ((pickConstraint != null) /*|| (directDrag != null)*/) {
 
-            // keep it at the same picking distance
-            v3 eyePos = v(space.camPos);
-            v3 dir = v();
-            dir.sub(cray.rayFromWorld, eyePos);
-            dir.normalize();
-            dir.scale(gOldPickingDist);
+//            // keep it at the same picking distance
+//            v3 eyePos = v(space.camPos);
+//            v3 dir = v();
+//            dir.sub(cray.rayFromWorld, eyePos);
+//            dir.normalize();
+//            dir.scale(gOldPickingDist);
+//
+//            v3 newPos = v();
+//            newPos.add(eyePos, dir);
 
-            v3 newPos = v();
-            newPos.add(eyePos, dir);
-
-            if (directDrag != null) {
-                //directly move the 'static' object
-
-                Object u = directDrag.data();
-
-                //System.out.println("DRAG: " + directDrag + " " + u + " -> " + newPos);
-
-                if (u instanceof SimpleSpatial) {
-                    ((SimpleSpatial) u).motionLock(true);
-                }
-
-//                MotionState mm = directDrag.getMotionState();
-//                if (mm instanceof Motion) {
-//                    ((Motion) mm).center(newPos);
+//            if (directDrag != null) {
+//                //directly move the 'static' object
+//
+//                Object u = directDrag.data();
+//
+//                //System.out.println("DRAG: " + directDrag + " " + u + " -> " + newPos);
+//
+//                if (u instanceof SimpleSpatial) {
+//                    ((SimpleSpatial) u).motionLock(true);
 //                }
-                directDrag.worldTransform.set(newPos);
+//
+////                MotionState mm = directDrag.getMotionState();
+////                if (mm instanceof Motion) {
+////                    ((Motion) mm).center(newPos);
+////                }
+//                directDrag.worldTransform.set(newPos);
+//
+//                return true;
+//            } else
 
-                return true;
-            } else if (pickConstraint != null) {
+
+
+                    v3 newRayTo = new v3(mousePick(px, py).rayToWorld); //HACK dont involve a complete ClosestRay
+                    v3 eyePos = new v3(space.camPos);
+                    v3 dir = new v3();
+                    dir.sub(newRayTo, eyePos);
+                    dir.normalize();
+                    dir.scale(gOldPickingDist);
+
+                    v3 newPos = new v3();
+                    newPos.add(eyePos, dir);
+
                 // move the constraint pivot
                 Point2PointConstraint p2p = (Point2PointConstraint) pickConstraint;
                 p2p.setPivotB(newPos);
                 return true;
-            }
+
 
         } else {
 
-            if (mouseDragPrevX >= 0) {
-
-
-                ///only if ALT key is pressed (Maya style)
-                //            if (m_modifierKeys & BT_ACTIVE_ALT)
-                //            {
-                //                if (m_mouseButtons & 4) {
-                //                    btVector3 hor = getRayTo(0, 0) - getRayTo(1, 0);
-                //                    btVector3 vert = getRayTo(0, 0) - getRayTo(0, 1);
-                //                    btScalar multiplierX = btScalar(0.001);
-                //                    btScalar multiplierY = btScalar(0.001);
-                //                    if (m_ortho) {
-                //                        multiplierX = 1;
-                //                        multiplierY = 1;
-                //                    }
-                //
-                //
-                //                    m_cameraTargetPosition += hor * dx * multiplierX;
-                //                    m_cameraTargetPosition += vert * dy * multiplierY;
-                //                }
-                //            }
-                {
-
-                    for (short b : buttons) {
-                        switch (b) {
-                            case 1:
-//                                ClosestRay m = mousePick(x, y, null);
-//                                if (!m.hasHit()) {
-//                                    //drag on background space
-//                                    float px = mouseDragDX * 0.1f;
-//                                    float py = mouseDragDY * 0.1f;
+//            if (mouseDragPrevX >= 0) {
 //
-//                                    //TODO finish:
 //
-//                                    //v3 vx = v().cross(camDir, camUp);
-//                                    //vx.normalize();
-//                                    //System.out.println(px + " " + py + " " + camDir + " x " + camUp + " " + vx);
+//                ///only if ALT key is pressed (Maya style)
+//                //            if (m_modifierKeys & BT_ACTIVE_ALT)
+//                //            {
+//                //                if (m_mouseButtons & 4) {
+//                //                    btVector3 hor = getRayTo(0, 0) - getRayTo(1, 0);
+//                //                    btVector3 vert = getRayTo(0, 0) - getRayTo(0, 1);
+//                //                    btScalar multiplierX = btScalar(0.001);
+//                //                    btScalar multiplierY = btScalar(0.001);
+//                //                    if (m_ortho) {
+//                //                        multiplierX = 1;
+//                //                        multiplierY = 1;
+//                //                    }
+//                //
+//                //
+//                //                    m_cameraTargetPosition += hor * dx * multiplierX;
+//                //                    m_cameraTargetPosition += vert * dy * multiplierY;
+//                //                }
+//                //            }
 //
-//                                    //camPosTarget.scaleAdd(px, vx);
-//                                    //camPosTarget.scaleAdd(py, camUp);
-//                                }
-                                return true;
-                            case 3:
-                                //right mouse drag = rotate
-                                //                        nextAzi += dx * btScalar(0.2);
-                                //                        nextAzi = fmodf(nextAzi, btScalar(360.f));
-                                //                        nextEle += dy * btScalar(0.2);
-                                //                        nextEle = fmodf(nextEle, btScalar(180.f));
-                                //space.azi.setValue(space.azi.floatValue() + mouseDragDX * 0.2f );
-                                //nextAzi = fmodf(nextAzi, btScalar(360.f));
-                                //space.ele.setValue(space.ele.floatValue() + mouseDragDY * (0.2f));
-                                //nextEle = fmodf(nextEle, btScalar(180.f));
-                                return true;
-                            case 2:
-                                //middle mouse drag = zoom
-
-                                //space.setCameraDistance( space.cameraDistance.floatValue() - mouseDragDY * 0.5f );
-                                return true;
-                        }
-                    }
-                }
-            }
-
+//                for (short b : buttons) {
+//                    switch (b) {
+//                        case 1:
+////                                ClosestRay m = mousePick(x, y, null);
+////                                if (!m.hasHit()) {
+////                                    //drag on background space
+////                                    float px = mouseDragDX * 0.1f;
+////                                    float py = mouseDragDY * 0.1f;
+////
+////                                    //TODO finish:
+////
+////                                    //v3 vx = v().cross(camDir, camUp);
+////                                    //vx.normalize();
+////                                    //System.out.println(px + " " + py + " " + camDir + " x " + camUp + " " + vx);
+////
+////                                    //camPosTarget.scaleAdd(px, vx);
+////                                    //camPosTarget.scaleAdd(py, camUp);
+////                                }
+//                            return true;
+//                        case 3:
+//                            //right mouse drag = rotate
+//                            //                        nextAzi += dx * btScalar(0.2);
+//                            //                        nextAzi = fmodf(nextAzi, btScalar(360.f));
+//                            //                        nextEle += dy * btScalar(0.2);
+//                            //                        nextEle = fmodf(nextEle, btScalar(180.f));
+//                            //space.azi.setValue(space.azi.floatValue() + mouseDragDX * 0.2f );
+//                            //nextAzi = fmodf(nextAzi, btScalar(360.f));
+//                            //space.ele.setValue(space.ele.floatValue() + mouseDragDY * (0.2f));
+//                            //nextEle = fmodf(nextEle, btScalar(180.f));
+//                            return true;
+//                        case 2:
+//                            //middle mouse drag = zoom
+//
+//                            //space.setCameraDistance( space.cameraDistance.floatValue() - mouseDragDY * 0.5f );
+//                            return true;
+//                    }
+//                }
+//            }
+//
         }
 
         return false;
@@ -366,7 +400,7 @@ public class OrbMouse extends SpaceMouse implements KeyListener {
 
         rayForward.scale(space.zFar);
 
-        v3 rightOffset = new v3();
+        //v3 rightOffset = new v3();
         v3 vertical = new v3(space.camUp);
 
         v3 hor = new v3();
@@ -381,7 +415,7 @@ public class OrbMouse extends SpaceMouse implements KeyListener {
         float ww = space.getWidth();
         float hh = space.getHeight();
 
-        float aspect = hh / (float)ww;
+        float aspect = hh / ww;
 
         hor.scale(2f * space.zFar * tanfov);
         vertical.scale(2f * space.zFar * tanfov);
@@ -396,9 +430,9 @@ public class OrbMouse extends SpaceMouse implements KeyListener {
         v3 rayToCenter = new v3();
         rayToCenter.add(rayFrom, rayForward);
         v3 dHor = new v3(hor);
-        dHor.scale(1f / (float) ww);
+        dHor.scale(1f / ww);
         v3 dVert = new v3(vertical);
-        dVert.scale(1.f / (float) hh);
+        dVert.scale(1f / hh);
 
         v3 tmp1 = new v3();
         v3 tmp2 = new v3();
@@ -415,10 +449,18 @@ public class OrbMouse extends SpaceMouse implements KeyListener {
         rayTo.add(tmp1);
         rayTo.sub(tmp2);
 
-        ClosestRay rayCallback = new ClosestRay(space.camPos, rayTo);
-        space.dyn.rayTest(space.camPos, rayTo, rayCallback, simplexSolver);
+        ClosestRay r = new ClosestRay(space.camPos, rayTo);
+        space.dyn.rayTest(space.camPos, rayTo, r, simplexSolver);
 
-        return rayCallback;
+        if (rayCallback.hasHit()) {
+            Dynamic body = Dynamic.ifDynamic(rayCallback.collidable);
+            if (body != null && (!(body.isStaticObject() || body.isKinematicObject()))) {
+                pickedBody = body;
+                hitPoint = r.hitPointWorld;
+            }
+        }
+
+        return r;
     }
 
     private v3 mousePick0(int px, int py) {
@@ -469,10 +511,12 @@ public class OrbMouse extends SpaceMouse implements KeyListener {
 
     }
 
+    @Override
     public void mouseClicked(MouseEvent e) {
         //overriden: called by mouseRelease
     }
 
+    @Override
     public void mouseEntered(MouseEvent e) {
     }
 
@@ -487,6 +531,7 @@ public class OrbMouse extends SpaceMouse implements KeyListener {
     }
 
 
+    @Override
     public void mousePressed(MouseEvent e) {
         mouseDragDX = mouseDragDY = 0;
 
@@ -498,19 +543,30 @@ public class OrbMouse extends SpaceMouse implements KeyListener {
         }
     }
 
+    @Override
     public void mouseReleased(MouseEvent e) {
         int dragThresh = 1;
-        if (Math.abs(mouseDragDX) < dragThresh && mouseClick(e.getButton(), e.getX(), e.getY()))
-            return;
+        boolean dragging = Math.abs(mouseDragDX) < dragThresh;
+        if (dragging && mouseClick(e.getButton(), e.getX(), e.getY())) {
 
-        pickConstrain(e.getButton(), 0, e.getX(), e.getY());
+        } else {
 
-        clearDrag();
+            int x = e.getX();
+            int y = e.getY();
+            if (!mouseMotionFunc(x, y, e.getButtonsDown())) {
+                pickConstrain(e.getButton(), 0, x, y);
+            }
+
+        }
+        if (dragging)
+            clearDrag();
     }
+
 
     //
     // MouseMotionListener
     //
+    @Override
     public void mouseDragged(MouseEvent e) {
 
         int x = e.getX();
@@ -531,6 +587,7 @@ public class OrbMouse extends SpaceMouse implements KeyListener {
         e.setConsumed(true);
     }
 
+    @Override
     public void mouseMoved(MouseEvent e) {
 
         if (mouseMotionFunc(e.getX(), e.getY(), e.getButtonsDown())) {

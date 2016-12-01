@@ -26,10 +26,7 @@ package spacegraph.render;
 import com.jogamp.newt.event.KeyEvent;
 import com.jogamp.newt.event.KeyListener;
 import com.jogamp.newt.event.WindowEvent;
-import com.jogamp.opengl.GL2;
-import com.jogamp.opengl.GLAutoDrawable;
-import com.jogamp.opengl.GLEventListener;
-import com.jogamp.opengl.GLException;
+import com.jogamp.opengl.*;
 import com.jogamp.opengl.math.FloatUtil;
 import nars.$;
 import org.eclipse.collections.api.block.procedure.primitive.IntObjectProcedure;
@@ -349,9 +346,38 @@ abstract public class JoglPhysics<X> extends JoglSpace implements GLEventListene
         gl.glFlush();
     }
 
+
     protected void clear() {
+        clearMotionBlur(0.5f);
+
+    }
+
+    protected void clearComplete() {
         gl.glClear(gl.GL_COLOR_BUFFER_BIT | gl.GL_DEPTH_BUFFER_BIT);
     }
+
+    protected void clearMotionBlur(float rate /* TODO */) {
+//        gl.glClearAccum(0.5f, 0.5f, 0.5f, 1f);
+//        gl.glClearColor(0f, 0f, 0f, 1f);
+//        gl.glClear(GL.GL_DEPTH_BUFFER_BIT | GL.GL_COLOR_BUFFER_BIT);
+
+        //if(i == 0)
+        gl.glAccum(GL2.GL_LOAD, 0.5f);
+        //else
+        gl.glAccum(GL2.GL_ACCUM, 0.5f);
+
+//        i++;
+//
+//        if(i >= n) {
+//            i = 0;
+        gl.glAccum(GL2.GL_RETURN, 0.75f);
+        gl.glClear(GL.GL_DEPTH_BUFFER_BIT);
+        //gl.glSwapBuffers();
+//            wait_until_next(timestep);
+//        }
+    }
+
+
 
     /**
      * in seconds

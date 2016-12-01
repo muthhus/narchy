@@ -80,36 +80,38 @@ public class Cuboid<X> extends SimpleSpatial<X> {
     @Override
     public Surface onTouch(Collidable body, ClosestRay r, short[] buttons) {
 
-        Surface s0 = super.onTouch(body, r, buttons);
-        if (s0 != null)
-            return s0;
-
-        if (front!=null) {
-            Transform it = Transform.t(transform()).inverse();
-            v3 localPoint = it.transform(v(r.hitPointWorld));
-
-
-            //            //TODO maybe do this test with the normal vector of the hit ray
-            //            if (this.thick!=this.thick) {
-            //                Vector3f h = ((BoxShape) body.shape()).getHalfExtentsWithMargin(v());
-            //                this.thick = h.z;
-            //            }
-
-            SimpleBoxShape shape = (SimpleBoxShape) body.shape();
-            float frontZ = shape.z() / 2;
-            float zTolerance = frontZ / 4f;
-
-            if (Util.equals(localPoint.z, frontZ, zTolerance)) { //top surface only, ignore sides and back
-
-                this.mousePick = r.hitPointWorld;
-
-                //System.out.println(localPoint + " " + thick);
-                return mouseFront.on(new v2(localPoint.x / shape.x() + 0.5f, localPoint.y / shape.y() + 0.5f), buttons);
-            } else {
-            }
+        if (body!=null) {
+            Surface s0 = super.onTouch(body, r, buttons);
+            if (s0 != null)
+                return s0;
         }
 
-        this.mousePick = null;
+            if (front != null) {
+                Transform it = Transform.t(transform()).inverse();
+                v3 localPoint = it.transform(v(r.hitPointWorld));
+
+                if (body!=null) {
+                    SimpleBoxShape shape = (SimpleBoxShape) body.shape();
+                    float frontZ = shape.z() / 2;
+                    float zTolerance = frontZ / 4f;
+
+                    if (Util.equals(localPoint.z, frontZ, zTolerance)) { //top surface only, ignore sides and back
+
+                        this.mousePick = r.hitPointWorld;
+
+                        //System.out.println(localPoint + " " + thick);
+                        return mouseFront.on(new v2(localPoint.x / shape.x() + 0.5f, localPoint.y / shape.y() + 0.5f), buttons);
+                        //return mouseFront.update(null, localPoint.x, localPoint.y, buttons);
+                    }
+                } else {
+
+                    if (mouseFront.off()) {
+
+                    }
+                }
+            }
+
+
 
         return null;
     }

@@ -187,40 +187,19 @@ public class SpaceGraph2D<X> extends SpaceGraph<X> {
 //    }
 
 
-    @Override
-    protected void clear() {
-//        gl.glClearAccum(0.5f, 0.5f, 0.5f, 1f);
-//        gl.glClearColor(0f, 0f, 0f, 1f);
-//        gl.glClear(GL.GL_DEPTH_BUFFER_BIT | GL.GL_COLOR_BUFFER_BIT);
 
-        //if(i == 0)
-            gl.glAccum(GL2.GL_LOAD, 0.5f);
-        //else
-            gl.glAccum(GL2.GL_ACCUM, 0.5f);
-
-//        i++;
+//    public void clear(float opacity) {
 //
-//        if(i >= n) {
-//            i = 0;
-            gl.glAccum(GL2.GL_RETURN, 0.75f);
-        gl.glClear(GL.GL_DEPTH_BUFFER_BIT);
-            //gl.glSwapBuffers();
-//            wait_until_next(timestep);
+//        if (opacity < 1f) {
+//            //TODO use gl.clear faster than rendering this quad
+//            ortho();
+//            gl.glColor4f(0, 0, 0, opacity);
+//            gl.glRectf(0, 0, getWidth(), getHeight());
+//        } else {
+//            gl.glClearColor(0f, 0f, 0f, 1f);
+//            gl.glClear(GL.GL_COLOR_BUFFER_BIT);
 //        }
-    }
-
-    public void clear(float opacity) {
-
-        if (opacity < 1f) {
-            //TODO use gl.clear faster than rendering this quad
-            ortho();
-            gl.glColor4f(0, 0, 0, opacity);
-            gl.glRectf(0, 0, getWidth(), getHeight());
-        } else {
-            gl.glClearColor(0f, 0f, 0f, 1f);
-            gl.glClear(GL.GL_COLOR_BUFFER_BIT);
-        }
-    }
+//    }
 
 
 }

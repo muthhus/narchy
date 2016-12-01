@@ -41,19 +41,21 @@ public class Finger {
         arraycopy(this.buttonDown, 0, prevButtonDown, 0, buttonDown.length);
 
         fill(this.buttonDown, false);
-        for (short s : nextButtonDown) {
-            if (s > 0) //ignore -1 values
-                this.buttonDown[ s - 1 /* start at zero=left button */] = true;
+        if (nextButtonDown!=null) {
+            for (short s : nextButtonDown) {
+                if (s > 0) //ignore -1 values
+                    this.buttonDown[s - 1 /* start at zero=left button */] = true;
+            }
         }
 
         Surface s = root.onTouch(nextHit, nextButtonDown);
         if (s instanceof Widget) {
-            on((Widget)s);
-            return s;
+            if (on((Widget)s))
+                return s;
         } else {
             on(null);
-            return null;
         }
+        return null;
     }
 
     private boolean on(@Nullable Widget touched) {
@@ -72,11 +74,13 @@ public class Finger {
     }
 
 
-    public void off() {
+    public boolean off() {
         if (touching!=null) {
             touching.touch(null);
             touching = null;
+            return true;
         }
+        return false;
     }
 
 //    public void update(@Nullable MouseEvent e, GLWindow window) {
@@ -85,19 +89,21 @@ public class Finger {
 //        update(e, buttonsDown, window);
 //    }
 
-    public boolean update(@Nullable MouseEvent e, float x, float y, short[] buttonsDown) {
-        if (e == null) {
+    public Surface update(@Nullable MouseEvent e, float x, float y, short[] buttonsDown) {
+        /*if (e == null) {
             off();
-            return false;
-        } else {
-            if (on(v(x, y), buttonsDown)!=null) {
+        } else {*/
+            Surface s;
+            if ((s = on(v(x, y), buttonsDown))!=null) {
                 e.setConsumed(true);
-                return true;
+                return s;
             }
-            return false;
-        }
 
+        //}
+
+        return null;
     }
+
     public void print() {
         System.out.println(root + " " + hit + " " + touching + " " + Arrays.toString(buttonDown));
     }

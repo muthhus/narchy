@@ -87,9 +87,9 @@ public abstract class Widget extends Stacking {
 
         SpaceGraph dd = SpaceGraph.window(new Cuboid(widgetDemo(), 16, 8f).color(0.5f, 0.5f, 0.5f, 0.25f), 1000, 1000);
 
-        new SpaceGraph2D(
-                new Cuboid(widgetDemo(), 16, 8f, 0.2f).color(0.5f, 0.5f, 0.5f, 0.25f).move(0,0,0)
-        ).show(800, 600);
+//        new SpaceGraph2D(
+//                new Cuboid(widgetDemo(), 16, 8f, 0.2f).color(0.5f, 0.5f, 0.5f, 0.25f).move(0,0,0)
+//        ).show(800, 600);
 
     }
 
