@@ -1,5 +1,6 @@
 package nars.budget;
 
+import nars.$;
 import nars.NAR;
 import nars.Param;
 import nars.Task;
@@ -9,9 +10,13 @@ import nars.term.Term;
 import nars.term.Termed;
 import nars.term.container.TermContainer;
 import org.apache.commons.lang3.mutable.MutableFloat;
+import org.eclipse.collections.api.collection.primitive.MutableFloatCollection;
+import org.eclipse.collections.api.tuple.primitive.ObjectFloatPair;
 import org.eclipse.collections.impl.map.mutable.primitive.ObjectFloatHashMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
 
 /**
  * Created by me on 8/22/16.
@@ -27,18 +32,103 @@ public class Activation {
     @NotNull
     public final Concept src;
 
-    public final ObjectFloatHashMap<Concept> concepts = new ObjectFloatHashMap<>();
+    public static class ObjectFloatHashMapPriorityAccumulator<X> implements PriorityAccumulator<X> {
+        public ObjectFloatHashMap<X> map;
+
+        public ObjectFloatHashMapPriorityAccumulator() {
+            commit();
+        }
+
+        @Override
+        @Nullable public Iterable<ObjectFloatPair<X>> commit() {
+            ObjectFloatHashMap<X> prevMap;
+            synchronized(this) {
+                prevMap = this.map;
+                if (prevMap != null && prevMap.isEmpty())
+                    return null; //keep map
+                this.map = new ObjectFloatHashMap();
+            }
+            return prevMap!=null ? postprocess(prevMap) : null;
+        }
+
+        static final class LightObjectFloatPair<Z> implements ObjectFloatPair<Z> {
+
+            private final float val;
+            private final Z the;
+
+            LightObjectFloatPair(Z the, float val) {
+                this.val = val;
+                this.the = the;
+            }
+
+            @Override
+            public Z getOne() {
+                return the;
+            }
+
+            @Override
+            public float getTwo() {
+                return val;
+            }
+
+            @Override
+            public int compareTo(ObjectFloatPair<Z> zObjectFloatPair) {
+                throw new UnsupportedOperationException();
+            }
+
+            @Override
+            public String toString() {
+                return the + "=" + val;
+            }
+        }
+
+        protected Iterable<ObjectFloatPair<X>> postprocess(ObjectFloatHashMap<X> m) {
+
+            final float idealAvgPri = 0.5f;
+            final float thresh = Param.BUDGET_EPSILON;
+
+            MutableFloatCollection values = m.values();
+            int n = m.size();
+            float normFactor = (float) ( (n * idealAvgPri )/ values.sum());
+
+            List<ObjectFloatPair<X>> l = $.newArrayList(n);
+            m.forEachKeyValue((k,v)->{
+                float vn = v * normFactor;
+                if (vn > thresh)
+                    l.add(new LightObjectFloatPair<>(k, vn));
+            });
+
+            m.clear(); //?<- helpful?
+
+            //System.out.println(this + " " + l);
+
+            return l; //m.keyValuesView();
+
+        }
+
+        @Override
+        public void add(X x, float v) {
+            if (v < Param.BUDGET_EPSILON) {
+                System.err.println("below threshold");
+            }
+            map.addToValue(x, v);
+        }
+    }
+
+    @Nullable public final PriorityAccumulator<Concept> conceptActivation;
+
     public final MutableFloat linkOverflow = new MutableFloat(0);
-    public final MutableFloat conceptOverflow = new MutableFloat(0);
+
     @NotNull
     private final NAR nar;
     private final float minScale; //cut-off limit for recursive spread
 
 
-    public Activation(@NotNull Budgeted in, float scale, @NotNull Concept src, @NotNull NAR nar, int termlinkDepth, int taskLinkDepth) {
+    public Activation(@NotNull Budgeted in, float scale, @NotNull Concept src, @NotNull NAR nar, int termlinkDepth, int taskLinkDepth, @Nullable PriorityAccumulator<Concept> conceptActivation) {
         this.nar = nar;
         this.in = in;
         this.src = src;
+        this.conceptActivation = conceptActivation;
         this.minScale = Param.BUDGET_EPSILON / (scale * in.pri());
         this.termlinkDepth = Math.max(taskLinkDepth, termlinkDepth);  //should be larger then TASKLINK_DEPTH_LIMIT because this resolves the Concept used for it in linkSubterms
         this.tasklinkDepth = taskLinkDepth;
@@ -47,30 +137,20 @@ public class Activation {
     /**
      * runs the task activation procedure
      */
-    public Activation(@NotNull Budgeted in, @NotNull Concept src, @NotNull Concept target, @NotNull NAR nar, float scale, int termlinkDepth, int taskLinkDepth) {
-        this(in, scale, src, nar, termlinkDepth, taskLinkDepth);
-
-        if (scale >= minScale) {
-            link(src, target, scale, 0);
-
-            if (!concepts.isEmpty()) {
-                //concepts.compact();
-                this.nar.activationAdd(concepts, this.in,
-                        scale,
-                        conceptOverflow);
-            }
-        }
+    public Activation(@NotNull Budgeted in, @NotNull Concept src, @NotNull Concept target, @NotNull NAR nar, float scale, int termlinkDepth, int taskLinkDepth, PriorityAccumulator<Concept> conceptActivation) {
+        this(in, scale, src, nar, termlinkDepth, taskLinkDepth, conceptActivation);
+        link(src, target, scale, 0);
     }
 
     /**
      * runs the task activation procedure
      */
-    public Activation(@NotNull Budgeted in, @NotNull Concept c, @NotNull NAR nar, float scale) {
-        this(in, c, c, nar, scale, Param.ACTIVATION_TERMLINK_DEPTH, Param.ACTIVATION_TASKLINK_DEPTH);
+    public Activation(@NotNull Budgeted in, @NotNull Concept c, @NotNull NAR nar, float scale, PriorityAccumulator<Concept> conceptActivation) {
+        this(in, c, c, nar, scale, Param.ACTIVATION_TERMLINK_DEPTH, Param.ACTIVATION_TASKLINK_DEPTH, conceptActivation);
     }
 
-    public Activation(@NotNull Task in, @NotNull NAR nar, float scale) {
-        this(in, in.concept(nar), nar, scale);
+    public Activation(@NotNull Task in, @NotNull NAR nar, float scale, PriorityAccumulator<Concept> conceptActivation) {
+        this(in, in.concept(nar), nar, scale, conceptActivation);
     }
 
 
@@ -94,7 +174,8 @@ public class Activation {
         if (targetConcept != null) {
 
             //System.out.println("+" + scale + " x " + targetConcept);
-            concepts.addToValue(targetConcept, subScale);
+            if (conceptActivation!=null)
+                conceptActivation.add(targetConcept, subScale);
 
             if (depth < termlinkDepth) {
 
@@ -137,7 +218,7 @@ public class Activation {
         Term sourceTerm = src.term();
         Term targetTerm = target.term();
 
-        if (!targetTerm.equals(sourceTerm)) {
+        if (((scale / 2f) >= minScale) && !targetTerm.equals(sourceTerm)) {
 
 //            Budget a;
 //            if (linkOverflow.floatValue() > Param.BUDGET_EPSILON) {

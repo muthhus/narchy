@@ -249,8 +249,8 @@ public interface Concept extends Termed {
      */
     default void crossLink(@NotNull Budgeted mine, @NotNull Budgeted theirs, @NotNull Concept them, float scale, @NotNull NAR nar) {
 
-        new Activation(theirs, this, them, nar, scale, 1, -1);
-        new Activation(mine, them, this, nar, scale, 1, -1);
+        new Activation(theirs, this, them, nar, scale, 1, -1, null);
+        new Activation(mine, them, this, nar, scale, 1, -1, null);
 
     }
 

@@ -3,7 +3,6 @@ package nars.nar;
 import nars.$;
 import nars.NAR;
 import nars.Param;
-import nars.budget.Budgeted;
 import nars.concept.Concept;
 import nars.index.term.TermIndex;
 import nars.index.term.map.MapTermIndex;
@@ -25,7 +24,7 @@ import nars.time.FrameTime;
 import nars.time.Time;
 import nars.util.data.random.XorShift128PlusRandom;
 import org.apache.commons.lang3.mutable.MutableFloat;
-import org.eclipse.collections.impl.map.mutable.primitive.ObjectFloatHashMap;
+import org.eclipse.collections.api.tuple.primitive.ObjectFloatPair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -128,8 +127,8 @@ public class Default extends NAR {
     }
 
     @Override
-    public final void activationAdd(@NotNull ObjectFloatHashMap<Concept> concepts, @NotNull Budgeted in, float activation, MutableFloat overflow) {
-        core.activate(concepts, in, activation, overflow);
+    public final void activationAdd(Iterable<ObjectFloatPair<Concept>> concepts, MutableFloat overflow) {
+        core.activate(concepts, overflow);
     }
 
     @Override

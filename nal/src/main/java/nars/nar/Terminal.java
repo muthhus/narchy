@@ -2,7 +2,6 @@ package nars.nar;
 
 import nars.NAR;
 import nars.Param;
-import nars.budget.Budgeted;
 import nars.concept.Concept;
 import nars.nar.exe.SingleThreadExecutioner;
 import nars.term.Termed;
@@ -10,7 +9,7 @@ import nars.time.FrameTime;
 import nars.time.Time;
 import nars.util.data.random.XORShiftRandom;
 import org.apache.commons.lang3.mutable.MutableFloat;
-import org.eclipse.collections.impl.map.mutable.primitive.ObjectFloatHashMap;
+import org.eclipse.collections.api.tuple.primitive.ObjectFloatPair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -74,7 +73,7 @@ public class Terminal extends NAR {
     }
 
     @Override
-    public void activationAdd(ObjectFloatHashMap<Concept> concepts, Budgeted in, float activation, MutableFloat overflow) {
+    public void activationAdd(Iterable<ObjectFloatPair<Concept>> concepts, MutableFloat overflow) {
         //nothing
     }
 

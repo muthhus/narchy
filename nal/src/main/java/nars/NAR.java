@@ -8,6 +8,7 @@ import nars.Narsese.NarseseException;
 import nars.budget.Activation;
 import nars.budget.Budget;
 import nars.budget.Budgeted;
+import nars.budget.PriorityAccumulator;
 import nars.budget.policy.ConceptPolicy;
 import nars.concept.Concept;
 import nars.concept.Functor;
@@ -43,8 +44,9 @@ import nars.util.event.On;
 import nars.util.event.Topic;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.apache.commons.math3.stat.Frequency;
+import org.eclipse.collections.api.map.primitive.ObjectFloatMap;
 import org.eclipse.collections.api.tuple.Twin;
-import org.eclipse.collections.impl.map.mutable.primitive.ObjectFloatHashMap;
+import org.eclipse.collections.api.tuple.primitive.ObjectFloatPair;
 import org.fusesource.jansi.Ansi;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -228,7 +230,6 @@ public abstract class NAR extends Param implements Level, Consumer<Task>, NARIn,
 
 
         this.self = self;
-
         (this.exe = exe).start(this);
 
 
@@ -732,7 +733,7 @@ public abstract class NAR extends Param implements Level, Consumer<Task>, NARIn,
             }
 
             //re-activate only
-            new Activation(existing, this, 1f);
+            new Activation(existing, this, 1f, accumulator());
 
         }
 
@@ -1421,6 +1422,23 @@ public abstract class NAR extends Param implements Level, Consumer<Task>, NARIn,
     }
 
 
+    final ThreadLocal<PriorityAccumulator<Concept>> priorityAccumulatrs = ThreadLocal.withInitial(()->{
+        Activation.ObjectFloatHashMapPriorityAccumulator<Concept> aa = new Activation.ObjectFloatHashMapPriorityAccumulator<Concept>();
+        onFrame(f -> {
+            Iterable<ObjectFloatPair<Concept>> y = aa.commit();
+            if (y!=null) {
+                activationAdd(y, null);
+            }
+        });
+        return aa;
+    });
+
+    public PriorityAccumulator<Concept> accumulator() {
+        PriorityAccumulator<Concept> v = priorityAccumulatrs.get();
+        return v;
+    }
+
+
 //    @Nullable
 //    public Term eval(@NotNull String x) throws NarseseException {
 //        return rt.eval((Termed)term(x));
@@ -1543,7 +1561,7 @@ public abstract class NAR extends Param implements Level, Consumer<Task>, NARIn,
     /**
      * batched concept activation
      */
-    abstract public void activationAdd(ObjectFloatHashMap<Concept> concepts, Budgeted in, float activation, MutableFloat overflow);
+    abstract public void activationAdd(Iterable<ObjectFloatPair<Concept>> concepts, @Nullable MutableFloat overflow);
 
 
 //    public final void activate(@NotNull Task t) {

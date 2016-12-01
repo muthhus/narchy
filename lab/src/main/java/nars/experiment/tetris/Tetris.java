@@ -8,6 +8,7 @@ import nars.experiment.tetris.impl.TetrisState;
 import nars.experiment.tetris.impl.TetrisVisualizer;
 import nars.remote.NAgents;
 import nars.term.Compound;
+import nars.term.atom.Atomic;
 import nars.time.FrameTime;
 import nars.truth.Truth;
 import nars.util.TaskStatistics;
@@ -40,8 +41,6 @@ public class Tetris extends NAgents {
     private static SensorConcept[][] concept;
     private int afterlife = TIME_PER_FALL * tetris_height * tetris_width;
     static boolean easy = false;
-
-
 
     private final TetrisState state;
 
@@ -223,6 +222,7 @@ public class Tetris extends NAgents {
 
         concept = new SensorConcept[state.width][state.height];
 
+        Atomic tetris = $.the("tetris");
         for (int y = 0; y < state.height; y++) {
             int yy = y;
             for (int x = 0; x < state.width; x++) {
@@ -237,7 +237,7 @@ public class Tetris extends NAgents {
 //                                      $.pRecurse($.radixArray(y, PIXEL_RADIX, state.height))
                                     x,y
                                 ),
-                                $.the("tetris")
+                                tetris
                         )
                                 //$.p(
                                         //$.the("tetris"))
@@ -255,7 +255,7 @@ public class Tetris extends NAgents {
 
                 )
                         //timing(0, visionSyncPeriod)
-                        ;
+                ;
 
 //                FloatSupplier defaultPri = s.sensor.pri;
 //                s.pri( () -> defaultPri.asFloat() * 0.25f );

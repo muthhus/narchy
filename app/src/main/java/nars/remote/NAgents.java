@@ -192,7 +192,7 @@ abstract public class NAgents extends NAgent {
         Default nar = new Default(2048,
                 conceptsPerCycle, 1, 2, rng,
                 //new CaffeineIndex(new DefaultConceptBuilder(rng), 1024*1024, volMax/2, false, exe)
-                new TreeTermIndex.L1TreeIndex(new DefaultConceptBuilder(), 4 * 1024 * 128, 32 * 1024, 2)
+                new TreeTermIndex.L1TreeIndex(new DefaultConceptBuilder(), 2 * 1024 * 128, 32 * 1024, 2)
 
                 ,
                 //new FrameClock()
@@ -307,7 +307,7 @@ abstract public class NAgents extends NAgent {
     public static void chart(NAgents a) {
         NAR nar = a.nar;
 
-        BagChart<Task> taskChart = new BagChart<Task>(new Leak<Task>(new ArrayBag<Task>(64, BudgetMerge.plusBlend, new ConcurrentHashMap<>()), 0f, a.nar) {
+        BagChart<Task> taskChart = new BagChart<Task>(new Leak<Task>(new ArrayBag<Task>(16, BudgetMerge.plusBlend, new ConcurrentHashMap<>()), 0f, a.nar) {
 
 
             @Override
@@ -317,10 +317,10 @@ abstract public class NAgents extends NAgent {
 
             @Override
             protected void in(@NotNull Task task, Consumer<BLink<Task>> each) {
-                each.accept(new DefaultBLink<>(task, task, 0.25f));
+                each.accept(new DefaultBLink<>(task, task, 0.1f));
             }
 
-        }.bag, 64);
+        }.bag, 16);
         a.nar.onFrame(f -> taskChart.update());
 
         a.nar.runLater(()-> {
@@ -337,7 +337,7 @@ abstract public class NAgents extends NAgent {
                             Vis.emotionPlots(a.nar, 256),
 
 
-                            Vis.treeChart( a.nar, new Bagregate(((Default)a.nar).core.active, 16, 0.05f, 64) , 16),
+                            Vis.treeChart( a.nar, new Bagregate(((Default)a.nar).core.active, 64, 0.05f, 256) , 64),
 
                             taskChart,
 

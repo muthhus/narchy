@@ -6,7 +6,7 @@ import nars.Param;
 import nars.bag.Bag;
 import nars.bag.impl.CurveBag;
 import nars.budget.Budget;
-import nars.budget.Budgeted;
+import nars.budget.ROBudget;
 import nars.budget.RawBudget;
 import nars.budget.merge.BudgetMerge;
 import nars.concept.Concept;
@@ -18,7 +18,8 @@ import nars.nar.util.PremiseMatrix;
 import nars.util.data.MutableInteger;
 import nars.util.data.Range;
 import org.apache.commons.lang3.mutable.MutableFloat;
-import org.eclipse.collections.impl.map.mutable.primitive.ObjectFloatHashMap;
+import org.eclipse.collections.api.map.primitive.ObjectFloatMap;
+import org.eclipse.collections.api.tuple.primitive.ObjectFloatPair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -167,9 +168,10 @@ public class ConceptBagCycle {
 
 
 
+    public static final Budget baseConceptBudget = new ROBudget(1f, 0.5f);
 
-    public void activate(@NotNull ObjectFloatHashMap<Concept> activations, @NotNull Budgeted in, float activation, MutableFloat overflow) {
-        this.active.put(activations, in, activation, overflow);
+    public void activate(Iterable<ObjectFloatPair<Concept>> activations, MutableFloat overflow) {
+        this.active.put(activations, baseConceptBudget, overflow);
     }
 
     static final class BudgetSavings extends RawBudget {

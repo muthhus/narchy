@@ -5,12 +5,12 @@ import nars.Param;
 import nars.Task;
 import nars.bag.Bag;
 import nars.bag.impl.CurveBag;
-import nars.budget.Budgeted;
 import nars.budget.merge.BudgetMerge;
 import nars.concept.Concept;
 import nars.index.term.tree.TreeTermIndex;
 import nars.link.BLink;
 import nars.nal.Deriver;
+import nars.nar.core.ConceptBagCycle;
 import nars.nar.exe.Executioner;
 import nars.nar.exe.MultiThreadExecutioner;
 import nars.nar.util.DefaultConceptBuilder;
@@ -21,7 +21,7 @@ import nars.time.FrameTime;
 import nars.time.Time;
 import nars.util.data.random.XorShift128PlusRandom;
 import org.apache.commons.lang3.mutable.MutableFloat;
-import org.eclipse.collections.impl.map.mutable.primitive.ObjectFloatHashMap;
+import org.eclipse.collections.api.tuple.primitive.ObjectFloatPair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -237,11 +237,12 @@ public class Alann extends NAR {
     }
 
     @Override
-    public final void activationAdd(@NotNull ObjectFloatHashMap<Concept> concepts, @NotNull Budgeted in, float activation, MutableFloat overflow) {
+    public final void activationAdd(Iterable<ObjectFloatPair<Concept>> concepts, MutableFloat overflow) {
         int numCores = cores.size();
 
-        concepts.forEachKeyValue((c,v)->{
-            cores.get(Math.abs(c.hashCode()) % numCores).terms.put(c, in, activation * v, overflow);
+        concepts.forEach((cv)->{
+            Concept c = cv.getOne();
+            cores.get(Math.abs(c.hashCode()) % numCores).terms.put(c, ConceptBagCycle.baseConceptBudget, cv.getTwo(), overflow);
         });
     }
 

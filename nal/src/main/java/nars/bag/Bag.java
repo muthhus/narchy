@@ -9,7 +9,8 @@ import nars.link.DependentBLink;
 import nars.util.Util;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.eclipse.collections.api.block.procedure.primitive.ObjectFloatProcedure;
-import org.eclipse.collections.impl.map.mutable.primitive.ObjectFloatHashMap;
+import org.eclipse.collections.api.map.primitive.ObjectFloatMap;
+import org.eclipse.collections.api.tuple.primitive.ObjectFloatPair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -467,7 +468,7 @@ public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Iterable<BLink<
         }
 
         @Override
-        public void put(ObjectFloatHashMap values, Budgeted in, float scale, MutableFloat overflow) {
+        public void put(@NotNull Iterable values, @NotNull Budgeted in, MutableFloat overflow) {
 
         }
 
@@ -578,13 +579,13 @@ public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Iterable<BLink<
         forEach(b -> each.accept(b.get()));
     }
 
-    default void put(@NotNull ObjectFloatHashMap<? extends V> values, @NotNull Budgeted in,/*, MutableFloat overflow*/float scale, MutableFloat overflow) {
+    default void put(@NotNull Iterable<ObjectFloatPair<V>> values, @NotNull Budgeted in, MutableFloat overflow) {
 
-        ObjectFloatProcedure<V> p = (k, v) -> {
-            put(k, in, v * scale, overflow);
+        Consumer<ObjectFloatPair<V>> p = (kv) -> {
+            put(kv.getOne(), in, kv.getTwo(), overflow);
         };
 
-        values.forEachKeyValue(p);
+        values.forEach(p);
     }
 
 

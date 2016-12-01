@@ -3,6 +3,7 @@ package nars.nar;
 import nars.NARLoop;
 import nars.Param;
 import nars.budget.Activation;
+import nars.concept.Concept;
 import nars.index.term.TermIndex;
 import nars.index.term.tree.TreeTermIndex;
 import nars.nar.exe.SingleThreadExecutioner;
@@ -79,7 +80,9 @@ public class Multi {
                         float p = pri * conn.link(ii, j);
                         if (p > Param.BUDGET_EPSILON) {
                             Default cj = core[j];
-                            cj.runLater(()->new Activation(tt, p, tt.concept(ci), cj, 2,2));
+                            Activation.ObjectFloatHashMapPriorityAccumulator<Concept> aa = new Activation.ObjectFloatHashMapPriorityAccumulator<>();
+                            cj.runLater(()->new Activation(tt, p, tt.concept(ci), cj, 2,2, aa));
+                            cj.activationAdd(aa.commit(), null);
                             //cj.core.active.add(tt.term(), p);
                         }
                     }
