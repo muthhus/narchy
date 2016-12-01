@@ -24,7 +24,7 @@ public class ForceDirected implements spacegraph.phys.constraint.BroadConstraint
             //13;
 
 
-    public final FloatParam repel = new FloatParam(50, 0, 100);
+    public final FloatParam repel = new FloatParam(80, 0, 100);
     public final FloatParam attraction = new FloatParam(0.001f, 0, 5);
 
     final v3 boundsMin, boundsMax;
@@ -146,11 +146,11 @@ public class ForceDirected implements spacegraph.phys.constraint.BroadConstraint
         float base = speed / ( Util.sqr( 1 + len ));
 
         v3 yx = v(delta);
-        yx.scale(yp.mass() * base );
+        yx.scale(xp.mass() * base );
         ((Dynamic) x).impulse(yx);
 
         v3 xy = v(delta);
-        xy.scale( -xp.mass() * base );
+        xy.scale( -yp.mass() * base );
         ((Dynamic) y).impulse(xy);
 
     }

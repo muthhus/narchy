@@ -84,12 +84,14 @@ public class Activation {
 
         protected Iterable<ObjectFloatPair<X>> postprocess(ObjectFloatHashMap<X> m) {
 
-            final float idealAvgPri = 0.5f;
+            //final float idealAvgPri = 0.5f;
             final float thresh = Param.BUDGET_EPSILON;
 
             MutableFloatCollection values = m.values();
             int n = m.size();
-            float normFactor = (float) ( (n * idealAvgPri )/ values.sum());
+            float normFactor =
+                    //(float) ( (n * idealAvgPri )/ values.sum());
+                    (float) ( 1f / values.sum());
 
             List<ObjectFloatPair<X>> l = $.newArrayList(n);
             m.forEachKeyValue((k,v)->{
@@ -108,9 +110,6 @@ public class Activation {
 
         @Override
         public void add(X x, float v) {
-            if (v < Param.BUDGET_EPSILON) {
-                System.err.println("below threshold");
-            }
             map.addToValue(x, v);
         }
     }

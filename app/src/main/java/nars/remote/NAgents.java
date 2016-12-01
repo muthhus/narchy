@@ -184,7 +184,7 @@ abstract public class NAgents extends NAgent {
                 //new SingleThreadExecutioner();
                 new MultiThreadExecutioner(threads, 16384 /* TODO chose a power of 2 number to scale proportionally to # of threads */);
 
-        int volMax = 23;
+        int volMax = 24;
         int conceptsPerCycle = 32*threads;
 
 
@@ -359,7 +359,7 @@ abstract public class NAgents extends NAgent {
 
         a.nar.runLater(()-> {
 
-            Vis.conceptsWindow2D(a.nar, 64, 8).show(1000, 800);
+            Vis.conceptsWindow3D(a.nar, 128, 6).show(1000, 800);
 
             window(
                     grid(

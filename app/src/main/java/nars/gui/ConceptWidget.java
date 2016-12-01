@@ -87,7 +87,7 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<BLink<? exte
                 SpaceGraph.r(initImpulseEpsilon),
                 SpaceGraph.r(initImpulseEpsilon)));
 
-        x.setDamping(0.1f, 0.75f);
+        x.setDamping(0.25f, 0.85f);
         return x;
     }
 
@@ -337,8 +337,8 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<BLink<? exte
     }
     public static class ConceptVis2 implements ConceptVis {
 
-        final float minSize = 1f;
-        final float maxSize = 8f;
+        final float minSize = 4f;
+        final float maxSize = 16f;
 
         public void apply(ConceptWidget conceptWidget, Term tt) {
             ConceptsSpace space = conceptWidget.space;
@@ -347,21 +347,23 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<BLink<? exte
             p = (p == p) ? p : 0;// = 1; //pri = key.priIfFiniteElseZero();
 
             long now = space.now();
-            float b = conceptWidget.concept.beliefs().eviSum(now);
-            float g = conceptWidget.concept.goals().eviSum(now);
-            float q = conceptWidget.concept.questions().priSum();
-            float ec = p + w2c((b + g + q)/2f);
+//            float b = conceptWidget.concept.beliefs().eviSum(now);
+//            float g = conceptWidget.concept.goals().eviSum(now);
+//            float q = conceptWidget.concept.questions().priSum();
+            float ec = p;// + w2c((b + g + q)/2f);
 
             //sqrt because the area will be the sqr of this dimension
             float nodeScale = (float) (minSize + Util.sqr(ec) * maxSize);//1f + 2f * p;
-            conceptWidget.scale(nodeScale*1.618f, nodeScale, nodeScale/1.618f);
+            float l = nodeScale * 1.618f;
+            float w = nodeScale;
+            float h = nodeScale / (1.618f * 2);
+            conceptWidget.scale(l, w, h);
 
 
 
-            float minMass = 1f;
-            float maxMass = 25f;
+            float density = 1f;
             if (conceptWidget.body!=null)
-                conceptWidget.body.setMass(minMass + (ec)*(maxMass-minMass));
+                conceptWidget.body.setMass(l*w*h*density);
 
             Draw.hsb(
                     (tt.op().ordinal() / 16f),

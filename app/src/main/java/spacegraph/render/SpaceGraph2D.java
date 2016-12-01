@@ -138,31 +138,31 @@ public class SpaceGraph2D<X> extends SpaceGraph<X> {
 
         });
 
-
-        add(new AbstractSpatial(orb + " view" /* HACK */) {
-
-            @Override
-            public void forEachBody(Consumer c) {
-
-            }
-
-            @Override
-            public void renderAbsolute(GL2 gl) {
-                ClosestRay pickRay = orb.pickRay;
-                if (pickRay!=null) {
-                    gl.glLineWidth(10);
-                    gl.glColor4f(0f, 0.25f, 1f, 0.5f);
-                    Draw.line(gl, pickRay.rayFromWorld, pickRay.rayToWorld);
-                    //System.out.println(pickRay.rayFromWorld + " " + pickRay.rayToWorld);
-                }
-                if(orb.pickedSpatial!=null) {
-                    gl.glLineWidth(20);
-                    gl.glColor4f(1f, 0.5f, 0.5f, 0.5f);
-                    Draw.line(gl, orb.hitPoint, camPos);
-                }
-            }
-
-        });
+//
+//        add(new AbstractSpatial(orb + " view" /* HACK */) {
+//
+//            @Override
+//            public void forEachBody(Consumer c) {
+//
+//            }
+//
+//            @Override
+//            public void renderAbsolute(GL2 gl) {
+//                ClosestRay pickRay = orb.pickRay;
+//                if (pickRay!=null) {
+//                    gl.glLineWidth(10);
+//                    gl.glColor4f(0f, 0.25f, 1f, 0.5f);
+//                    Draw.line(gl, pickRay.rayFromWorld, pickRay.rayToWorld);
+//                    //System.out.println(pickRay.rayFromWorld + " " + pickRay.rayToWorld);
+//                }
+//                if(orb.pickedSpatial!=null) {
+//                    gl.glLineWidth(20);
+//                    gl.glColor4f(1f, 0.5f, 0.5f, 0.5f);
+//                    Draw.line(gl, orb.hitPoint, camPos);
+//                }
+//            }
+//
+//        });
 
     }
 

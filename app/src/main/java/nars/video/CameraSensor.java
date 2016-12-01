@@ -51,7 +51,8 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
 
     @NotNull
     public static Compound coord(int x, int width) {
-        return $.pRecurse($.radixArray(x, radix, width));
+        //return $.pRecurse($.radixArray(x, radix, width));
+        return $.p($.radixArray(x, radix, width));
     }
 
     public List<SensorConcept> encode(Int2Function<Compound> cellTerm, FloatToObjectFunction<Truth> brightnessToTruth) {
@@ -63,7 +64,6 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
                 Compound cell = cellTerm.get(x, y);
 
                 int yy = y;
-                SensorConcept sss;
 
                 //monochrome only for now
                 FloatSupplier brightness = () -> src.brightness(xx, yy);
@@ -71,6 +71,7 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
 //                float dx = Math.abs(x - width/2f);
 //                float dy = Math.abs(y - height/2f);
 //                float cdist = (float) (Math.sqrt( dx*dx + dy*dy )-1) / (Math.max(width,height)/2f);
+                SensorConcept sss;
 
                 l.add(sss = new SensorConcept(cell, nar,
                         brightness,

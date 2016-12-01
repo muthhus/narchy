@@ -47,9 +47,9 @@ public class PixelBag implements Bitmap2D {
 
     public boolean vflip = false;
     public List<ActionConcept> actions;
-    private float fr;
-    private float fg;
-    private float fb;
+    private float fr=1f;
+    private float fg=1f;
+    private float fb=1f;
 
 
     public PixelBag(BufferedImage b, int px, int py) {
@@ -227,9 +227,9 @@ public class PixelBag implements Bitmap2D {
         actions.add( a.actionBipolar("see(" + termRoot + ",rx)", this::setXRelative) );
         actions.add( a.actionBipolar("see(" + termRoot + ",ry)", this::setYRelative) );
         actions.add( a.actionBipolar("see(" + termRoot + ",zoom)", this::setZoom) );
-        actions.add( a.actionBipolar("see(" + termRoot + ",fr)", this::setRedFilter) );
-        actions.add( a.actionBipolar("see(" + termRoot + ",fg)", this::setGreenFilter) );
-        actions.add( a.actionBipolar("see(" + termRoot + ",fb)", this::setBlueFilter) );
+//        actions.add( a.actionBipolar("see(" + termRoot + ",fr)", this::setRedFilter) );
+//        actions.add( a.actionBipolar("see(" + termRoot + ",fg)", this::setGreenFilter) );
+//        actions.add( a.actionBipolar("see(" + termRoot + ",fb)", this::setBlueFilter) );
         return this;
     }
 

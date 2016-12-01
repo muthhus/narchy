@@ -32,7 +32,7 @@ public class TaskBudgeting {
             if (premiseEvidence <= 0)
                 throw new RuntimeException("invalid premise evidence");
             float derivationEvi = truth.evi();
-            derivationQuality = derivationEvi / premiseEvidence;
+            derivationQuality = derivationEvi / (1 + premiseEvidence);
         }
 
 

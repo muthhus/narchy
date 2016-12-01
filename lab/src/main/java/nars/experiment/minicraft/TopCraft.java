@@ -17,7 +17,7 @@ import static spacegraph.SpaceGraph.window;
 public class TopCraft extends NAgents {
 
     private final TopDownMinicraft craft;
-    private Sensor2D<PixelBag> pixels;
+    private Sensor2D pixels;
     private PixelAutoClassifier camAE = null;
 
     public static void main(String[] args) {
@@ -41,20 +41,20 @@ public class TopCraft extends NAgents {
 //        window(camAE.newChart(), 500, 500);
 
 
-        senseSwitch("cra(dir)", ()->craft.player.dir, 0, 4);
-        sense("cra(stamina)", ()->(craft.player.stamina)/((float)craft.player.maxStamina));
-        sense("cra(health)", ()->(craft.player.health)/((float)craft.player.maxHealth));
+        senseSwitch("dir(cra)", ()->craft.player.dir, 0, 4);
+        sense("stamina(cra)", ()->(craft.player.stamina)/((float)craft.player.maxStamina));
+        sense("health(cra)", ()->(craft.player.health)/((float)craft.player.maxHealth));
 
         int tileMax = 13;
-        senseSwitch("cra(tile,here)", ()->craft.player.tile().id, 0, tileMax);
-        senseSwitch("cra(tile,up)", ()->craft.player.tile(0,1).id, 0, tileMax);
-        senseSwitch("cra(tile,down)", ()->craft.player.tile(0,-1).id, 0, tileMax);
-        senseSwitch("cra(tile,right)", ()->craft.player.tile(1,0).id, 0, tileMax);
-        senseSwitch("cra(tile,left)", ()->craft.player.tile(-1,0).id, 0, tileMax);
+        senseSwitch("tile(cra,here)", ()->craft.player.tile().id, 0, tileMax);
+        senseSwitch("tile(cra,up)", ()->craft.player.tile(0,1).id, 0, tileMax);
+        senseSwitch("tile(cra,down)", ()->craft.player.tile(0,-1).id, 0, tileMax);
+        senseSwitch("tile(cra,right)", ()->craft.player.tile(1,0).id, 0, tileMax);
+        senseSwitch("tile(cra,left)", ()->craft.player.tile(-1,0).id, 0, tileMax);
 
         InputHandler input = craft.input;
-        actionToggleRapid("cra(fire)", (b) -> input.attack.toggle(b), 16 );
-        actionTriState("cra(moveX)", (i)->{
+        actionToggleRapid("fire(cra)", (b) -> input.attack.toggle(b), 16 );
+        actionTriState("move(cra,X)", (i)->{
            boolean l = false, r = false;
            switch (i) {
                case -1: l = true;  break;
@@ -63,7 +63,7 @@ public class TopCraft extends NAgents {
            input.left.toggle(l);
            input.right.toggle(r);
         });
-        actionTriState("cra(moveY)", (i)->{
+        actionTriState("move(cra,Y)", (i)->{
             boolean u = false, d = false;
             switch (i) {
                 case -1:  u = true;  break;
@@ -72,7 +72,7 @@ public class TopCraft extends NAgents {
             input.up.toggle(u);
             input.down.toggle(d);
         });
-        actionToggle("cra(menu)", (b) -> input.menu.toggle(b) );
+        actionToggle("menu(cra)", (b) -> input.menu.toggle(b) );
 
 //        Param.DEBUG = true;
 //        nar.onTask(t ->{
