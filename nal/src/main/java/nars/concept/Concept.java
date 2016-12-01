@@ -59,7 +59,7 @@ public interface Concept extends Termed {
     /**
      * termlink templates; null if none exist
      */
-    @Nullable TermContainer templates();
+    @NotNull TermContainer templates();
 
     @Nullable Map<Object, Object> meta();
 

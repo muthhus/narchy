@@ -106,14 +106,20 @@ public final class Premise extends RawBudget implements Tasked {
 //        if (termLinkBudget == null)
 //            return null;
 
+
         Task belief = null;
 
         Concept beliefConcept = nar.concept(term);
         if (beliefConcept != null) {
 
+            //float dur = nar.time.dur();
+
             long when =
-                    task.occurrence();
+                    nar.random.nextBoolean() ?
+                        task.occurrence():
+                        now;
                     //now;
+                    //(long)(now + dur);
 
             belief = beliefConcept.beliefs().match(when, now, task); //in case of quest, proceed with matching belief
 

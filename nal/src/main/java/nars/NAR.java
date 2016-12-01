@@ -13,8 +13,8 @@ import nars.concept.Concept;
 import nars.concept.Functor;
 import nars.concept.OperationConcept;
 import nars.concept.util.InvalidConceptException;
+import nars.index.task.MapTaskIndex;
 import nars.index.task.TaskIndex;
-import nars.index.task.TreeTaskIndex;
 import nars.index.term.TermIndex;
 import nars.nal.Level;
 import nars.nal.nal8.AbstractOperator;
@@ -217,8 +217,8 @@ public abstract class NAR extends Param implements Level, Consumer<Task>, NARIn,
         this.concepts = concepts;
 
         this.tasks =
-                //new MapTaskIndex(exe.concurrent());
-                new TreeTaskIndex();
+                new MapTaskIndex(exe.concurrent());
+                //new TreeTaskIndex(); //Not working perfectly yet: confuses &&+ and ==>+ among other possible bugs
 
 
         self = Param.defaultSelf(); //default value

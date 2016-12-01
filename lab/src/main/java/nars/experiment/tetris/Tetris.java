@@ -14,11 +14,13 @@ import nars.util.TaskStatistics;
 import org.jetbrains.annotations.NotNull;
 import spacegraph.math.v2;
 import spacegraph.obj.widget.MatrixView;
+import spacegraph.render.Draw;
 
 import java.util.List;
 
 import static nars.experiment.tetris.impl.TetrisState.*;
 import static spacegraph.SpaceGraph.window;
+import static spacegraph.obj.layout.Grid.grid;
 
 /**
  * Created by me on 7/28/16.
@@ -33,8 +35,9 @@ public class Tetris extends NAgents {
 
     public static final int tetris_width = 6;
     public static final int tetris_height = 16;
-    public static final int TIME_PER_FALL = 1;
+    public static final int TIME_PER_FALL = 8;
     public static final int PIXEL_RADIX = 2;
+    private static SensorConcept[][] concept;
     private int afterlife = TIME_PER_FALL * tetris_height * tetris_width;
     static boolean easy = false;
 
@@ -44,9 +47,32 @@ public class Tetris extends NAgents {
 
     //private final int visionSyncPeriod = 4; //16 * TIME_DILATION;
 
-    public static class View {
+    public class View {
 
         public TetrisVisualizer vis;
+        public MatrixView vis2 = new MatrixView(tetris_width, tetris_height, (x,y,gl)->{
+            float r = nar.priority(concept[x][y]);
+            gl.glColor3f(r, 0, 0);
+            return 0f;
+        });
+        public MatrixView vis3 = new MatrixView(tetris_width, tetris_height, (x,y,gl)->{
+            float r = concept[x][y].beliefFreq(now, 0.5f);
+            gl.glColor3f(0, 0, r);
+            return 0f;
+        });
+        public MatrixView vis4 = new MatrixView(tetris_width, tetris_height, (x,y,gl)->{
+            long then = (long) (now + dur * 8);
+            Draw.colorPolarized(gl,
+                    concept[x][y].beliefFreq(then, 0.5f) -
+                            concept[x][y].beliefFreq(now, 0.5f) );
+            return 0f;
+        });
+//        public MatrixView vis4 = new MatrixView(tetris_width, tetris_height, (x,y,gl)->{
+//            float r = concept[x][y].goalFreq(now, 0.5f);
+//            gl.glColor3f(0, r, 0);
+//            return 0f;
+//        });
+
 //        public Surface plot1;
 //        //public ConsoleSurface term = new ConsoleSurface(40, 8);
 //
@@ -54,7 +80,7 @@ public class Tetris extends NAgents {
         //public Plot2D lstm;
     }
 
-    static final View view = new View();
+    final View view = new View();
 
 
     //private final ActionConcept motorRotate;
@@ -195,6 +221,8 @@ public class Tetris extends NAgents {
     public static void sensors(NAR nar, TetrisState state, List<SensorConcept> sensors) {
         float alpha = nar.confidenceDefault('.');
 
+        concept = new SensorConcept[state.width][state.height];
+
         for (int y = 0; y < state.height; y++) {
             int yy = y;
             for (int x = 0; x < state.width; x++) {
@@ -232,6 +260,7 @@ public class Tetris extends NAgents {
 //                FloatSupplier defaultPri = s.sensor.pri;
 //                s.pri( () -> defaultPri.asFloat() * 0.25f );
 
+                concept[x][y] = s;
                 sensors.add(s);
 
             }
@@ -364,7 +393,7 @@ public class Tetris extends NAgents {
     public static void main(String[] args) {
         //Param.DEBUG = true;
 
-        NAR nar = NAgents.newMultiThreadNAR(4, new FrameTime().dur(TIME_PER_FALL*4));
+        NAR nar = NAgents.newMultiThreadNAR(4, new FrameTime().dur(TIME_PER_FALL));
         //nar.linkFeedbackRate.setValue(0.05f);
 
 //        Random rng = new XorShift128PlusRandom(1);
@@ -462,7 +491,7 @@ public class Tetris extends NAgents {
 //
 //
 //                view.plot2 = Vis.agentBudgetPlot(this, 256);
-                window(view.vis, 300, 600);
+                window(grid(view.vis, view.vis2, view.vis3, view.vis4), 600, 600);
                 NAgents.chart(this);
             }
         };

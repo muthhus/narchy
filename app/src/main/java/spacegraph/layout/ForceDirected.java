@@ -119,9 +119,9 @@ public class ForceDirected implements spacegraph.phys.constraint.BroadConstraint
 
         v3 delta2 = v(delta);
 
-        delta.scale(-(speed * (xp.mass() /* + yp.mass()*/) ) * ( len) );
+        delta.scale((speed * (xp.mass() /* + yp.mass()*/) )  );
         ((Dynamic) x).force(delta);
-        delta2.scale((speed * (yp.mass() /* + yp.mass()*/) ) * ( len) );
+        delta2.scale(-(speed * (yp.mass() /* + yp.mass()*/) ) );
         ((Dynamic) y).force(delta2);
 
     }

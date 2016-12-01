@@ -43,7 +43,7 @@ public class ScalarSignal implements Consumer<NAR>, DoubleSupplier {
 
     public FloatSupplier pri;
 
-    private float prevF = Float.NaN;
+    public float currentValue = Float.NaN;
 
     boolean inputIfSame;
     int maxTimeBetweenUpdates;
@@ -73,7 +73,7 @@ public class ScalarSignal implements Consumer<NAR>, DoubleSupplier {
 
         this.lastInputTime = n.time() - 1;
 
-        this.prevF = Float.NaN;
+        this.currentValue = Float.NaN;
         this.target = target;
     }
 
@@ -111,7 +111,7 @@ public class ScalarSignal implements Consumer<NAR>, DoubleSupplier {
             if (!current.isDeleted()) {
                 current.setEnd(now);
             } else {
-                prevF = Float.NaN; //force re-input
+                currentValue = Float.NaN; //force re-input
             }
         }
 
@@ -120,7 +120,7 @@ public class ScalarSignal implements Consumer<NAR>, DoubleSupplier {
 
         float next = value.floatValueOf(term);
         if (next!=next) {
-            this.prevF = next;
+            this.currentValue = next;
             if (current!=null) {
                 current.setEnd(now);
                 current = null;
@@ -137,11 +137,11 @@ public class ScalarSignal implements Consumer<NAR>, DoubleSupplier {
 
         boolean tooSoon = (limitsMinTime && (timeSinceLastInput < minT));
         boolean lateEnough = (limitsMaxTime && (timeSinceLastInput >= maxT));
-        boolean different = (prevF!=prevF /* NaN */) || !Util.equals(f, prevF, Param.TRUTH_EPSILON);
+        boolean different = (currentValue != currentValue /* NaN */) || !Util.equals(f, currentValue, Param.TRUTH_EPSILON);
 
         if ((inputIfSame || different || lateEnough) && (!tooSoon)) {
 
-            SignalTask t = task(f, prevF, now, this.current);
+            SignalTask t = task(f, currentValue, now, this.current);
             if (t!=null) {
                 //Task prevStart = this.current;
 
@@ -154,7 +154,7 @@ public class ScalarSignal implements Consumer<NAR>, DoubleSupplier {
 
                 target.accept(this.current = t);
                 this.lastInputTime = now;
-                this.prevF = f;
+                this.currentValue = f;
             }
         }
 
@@ -239,7 +239,7 @@ public class ScalarSignal implements Consumer<NAR>, DoubleSupplier {
 
     @Override
     public double getAsDouble() {
-        return prevF;
+        return currentValue;
     }
 
 

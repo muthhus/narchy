@@ -184,15 +184,15 @@ abstract public class NAgents extends NAgent {
                 //new SingleThreadExecutioner();
                 new MultiThreadExecutioner(threads, 16384 /* TODO chose a power of 2 number to scale proportionally to # of threads */);
 
-        int volMax = 40;
+        int volMax = 23;
         int conceptsPerCycle = 32*threads;
 
 
         //Multi nar = new Multi(3,512,
-        Default nar = new Default(1024,
-                conceptsPerCycle, 1, 3, rng,
+        Default nar = new Default(2048,
+                conceptsPerCycle, 1, 2, rng,
                 //new CaffeineIndex(new DefaultConceptBuilder(rng), 1024*1024, volMax/2, false, exe)
-                new TreeTermIndex.L1TreeIndex(new DefaultConceptBuilder(), 4 * 1024 * 128, 32 * 1024, 4)
+                new TreeTermIndex.L1TreeIndex(new DefaultConceptBuilder(), 4 * 1024 * 128, 32 * 1024, 2)
 
                 ,
                 //new FrameClock()
@@ -224,7 +224,7 @@ abstract public class NAgents extends NAgent {
                 4, 16,
                 0.01f, 32);
 
-        new Inperience(nar, 0.01f);
+        new Inperience(nar, 0.02f);
 
 //        //causal accelerator
 //        nar.onTask(t -> {

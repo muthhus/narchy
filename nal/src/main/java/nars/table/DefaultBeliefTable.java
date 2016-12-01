@@ -171,7 +171,6 @@ public class DefaultBeliefTable implements BeliefTable {
 
         Task tmp = temporal.match(when, now, against);
 
-
         if (tmp == null) {
             return ete;
         } else {

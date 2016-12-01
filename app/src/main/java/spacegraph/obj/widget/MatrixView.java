@@ -96,7 +96,7 @@ public class MatrixView extends Widget {
 
                 try {
                     float dz = view.update(x, y, gl);
-                    Draw.rect(gl, x * dw, ( y) * dh, dw, dh, dz);
+                    Draw.rect(gl, x * dw, 1f - (y + 0.5f) * dh, dw, dh, dz);
                 } catch (Exception e) {
                     logger.error(" {}",e);
                     return;

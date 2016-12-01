@@ -123,6 +123,8 @@ abstract public class NAgent implements NSense, NAction {
     public final int frameRate;
 
     protected long now;
+    protected float dur;
+
 
 
     //private float curiosityAttention;
@@ -261,6 +263,7 @@ abstract public class NAgent implements NSense, NAction {
     private void doFrame() {
         //System.out.println(nar.conceptPriority(reward) + " " + nar.conceptPriority(dRewardSensor));
         now = nar.time();
+        dur = nar.time.dur();
 
         float r = rewardValue = act();
         if (r == r) {
@@ -290,9 +293,8 @@ abstract public class NAgent implements NSense, NAction {
         }
 
 
-        if (trace) {
+        if (trace)
             logger.info(summary());
-        }
     }
 
 
@@ -368,20 +370,13 @@ abstract public class NAgent implements NSense, NAction {
         @NotNull Compound happiness = happy.term();
 
         {
-            float rewardGamma =
-                    1.0f - Param.TRUTH_EPSILON
-                    //1.0f
-                    //gamma
-                    ;
 
-
-//            float happinssDurability =
-//                    nar.durabilityDefault(Symbols.GOAL);
 
             predictors.add(
-                    new MutableTask(happy, '!', 1f, rewardGamma)
-                            //.eternal()
-                            .present(nar)
+                    new MutableTask(happy, '!', 1f, nar.confidenceDefault('!'))
+                            .budgetByTruth(rewardPriority.floatValue())
+                            .eternal()
+                            //.present(nar)
             );
 //                    happy.desire($.t(1f, rewardGamma),
 //                            nar.priorityDefault(Symbols.GOAL),

@@ -25,8 +25,8 @@ public class PacmanAgent extends NAgents {
 //        senseNumber("(ball,vx)", ()-> game.ball.velocityX);
 //        senseNumber("(ball,vy)", ()-> game.ball.velocityY);
 //
-        addCamera("pac", game, visW, visH);
-        //addCameraRetina("game", game, visW, visH);
+        //addCamera("pac", game, visW, visH);
+        addCameraRetina("game", game, visW, visH);
 
         int speed = 10;
         actionBipolar("pac(move,x)", (f) -> {

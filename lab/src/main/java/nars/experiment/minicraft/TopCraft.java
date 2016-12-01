@@ -21,7 +21,7 @@ public class TopCraft extends NAgents {
     private PixelAutoClassifier camAE = null;
 
     public static void main(String[] args) {
-        runRT(TopCraft::new, 30, 60);
+        runRT(TopCraft::new, 60, 30);
     }
 
     public TopCraft(NAR nar) {
@@ -29,16 +29,16 @@ public class TopCraft extends NAgents {
 
         this.craft = new TopDownMinicraft();
 
-        pixels = addCameraRetina("cra", ()->craft.image, 48,48, (v) -> $.t( v, alpha));
+        pixels = addCameraRetina("cra", ()->craft.image, 32,32, (v) -> $.t( v, alpha));
         //pixels = addFreqCamera("see", ()->craft.image, 64,64, (v) -> $.t( v, alpha));
 
-        int nx = 8;
-        camAE = new PixelAutoClassifier("cra", pixels.src.pixels, nx, nx,   (subX, subY) -> {
-            //context metadata: camera zoom, to give a sense of scale
-            //return new float[]{subX / ((float) (nx - 1)), subY / ((float) (nx - 1)), pixels.src.Z};
-            return new float[]{ pixels.src.Z};
-        }, 24, this);
-        window(camAE.newChart(), 500, 500);
+//        int nx = 8;
+//        camAE = new PixelAutoClassifier("cra", pixels.src.pixels, nx, nx,   (subX, subY) -> {
+//            //context metadata: camera zoom, to give a sense of scale
+//            //return new float[]{subX / ((float) (nx - 1)), subY / ((float) (nx - 1)), pixels.src.Z};
+//            return new float[]{ pixels.src.Z};
+//        }, 24, this);
+//        window(camAE.newChart(), 500, 500);
 
 
         senseSwitch("cra(dir)", ()->craft.player.dir, 0, 4);

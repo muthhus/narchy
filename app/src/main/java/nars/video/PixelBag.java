@@ -47,6 +47,9 @@ public class PixelBag implements Bitmap2D {
 
     public boolean vflip = false;
     public List<ActionConcept> actions;
+    private float fr;
+    private float fg;
+    private float fb;
 
 
     public PixelBag(BufferedImage b, int px, int py) {
@@ -112,6 +115,9 @@ public class PixelBag implements Bitmap2D {
 
         float minClarity = 0.35f/frameRate, maxClarity = 1f/frameRate;
 
+        float fr = this.fr, fg = this.fg, fb = this.fb;
+        float fSum = fr + fg + fb;
+
         for (int ly = 0; ly < py; ly++) {
             float l = ly / pyf;
             int sy = Math.round(lerp(maxY, minY, !vflip ? l : 1f-l));
@@ -150,7 +156,7 @@ public class PixelBag implements Bitmap2D {
                     float R = Bitmap2D.decodeRed(RGB);
                     float G = Bitmap2D.decodeGreen(RGB);
                     float B = Bitmap2D.decodeBlue(RGB);
-                    v = (R + G + B) / 3f;
+                    v = (fr * R + fg * G + fb * B) / fSum;
                 }
                 pixels[lx][ly] = v;
             }
@@ -182,27 +188,50 @@ public class PixelBag implements Bitmap2D {
         return f/2f+0.5f;
     }
 
-    public boolean setZ(float f) {
+    public boolean setZoom(float f) {
         Z = u(f);
         return true;
     }
 
-    public boolean setY(float f) {
+    public boolean setYRelative(float f) {
         Y = u(f);
         return true;
     }
 
-    public boolean setX(float f) {
+    public boolean setXRelative(float f) {
         X = u(f);
         return true;
     }
 
+    public void setFilter(float r, float g, float b) {
+        this.fr = r;
+        this.fg = g;
+        this.fb = b;
+    }
+    public boolean setRedFilter(float f) {
+        this.fr = f;
+        return true;
+    }
+    public boolean setGreenFilter(float f) {
+        this.fr = f;
+        return true;
+    }
+    public boolean setBlueFilter(float f) {
+        this.fr = f;
+        return true;
+    }
+
+
     public PixelBag addActions(String termRoot, NAgent a) {
         actions = $.newArrayList(3);
-        actions.add( a.actionBipolar(termRoot + ":moveX", this::setX) );
-        actions.add( a.actionBipolar(termRoot + ":moveY", this::setY) );
-        actions.add( a.actionBipolar(termRoot + ":zoom", this::setZ) );
+        actions.add( a.actionBipolar("see(" + termRoot + ",rx)", this::setXRelative) );
+        actions.add( a.actionBipolar("see(" + termRoot + ",ry)", this::setYRelative) );
+        actions.add( a.actionBipolar("see(" + termRoot + ",zoom)", this::setZoom) );
+        actions.add( a.actionBipolar("see(" + termRoot + ",fr)", this::setRedFilter) );
+        actions.add( a.actionBipolar("see(" + termRoot + ",fg)", this::setGreenFilter) );
+        actions.add( a.actionBipolar("see(" + termRoot + ",fb)", this::setBlueFilter) );
         return this;
     }
 
 }
+
