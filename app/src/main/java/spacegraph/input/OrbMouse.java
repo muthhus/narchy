@@ -3,6 +3,7 @@ package spacegraph.input;
 import com.jogamp.newt.event.KeyEvent;
 import com.jogamp.newt.event.KeyListener;
 import com.jogamp.newt.event.MouseEvent;
+import org.jetbrains.annotations.Nullable;
 import spacegraph.SimpleSpatial;
 import spacegraph.Spatial;
 import spacegraph.math.Matrix4f;
@@ -84,7 +85,7 @@ public class OrbMouse extends SpaceMouse implements KeyListener {
 //            case MouseEvent.BUTTON2: {
 //                // apply an impulse
 //
-//                Vector3f rayTo = v(rayTo(x, y));
+//                v3 rayTo = v(rayTo(x, y));
 //                CollisionWorld.ClosestRayResultCallback rayCallback = new CollisionWorld.ClosestRayResultCallback(camPos, rayTo);
 //
 //                dyn.rayTest(camPos, rayTo, rayCallback);
@@ -92,11 +93,11 @@ public class OrbMouse extends SpaceMouse implements KeyListener {
 //                    RigidBody body = RigidBody.upcast(rayCallback.collisionObject);
 //                    if (body != null) {
 //                        body.setActivationState(CollisionObject.ACTIVE_TAG);
-//                        Vector3f impulse = v(rayTo);
+//                        v3 impulse = v(rayTo);
 //                        impulse.normalize();
 //                        float impulseStrength = 10f;
 //                        impulse.scale(impulseStrength);
-//                        Vector3f relPos = v();
+//                        v3 relPos = v();
 //
 //                        relPos.sub(rayCallback.hitPointWorld, body.getCenterOfMassPosition(v()));
 //                        body.applyImpulse(impulse, relPos);
@@ -318,7 +319,7 @@ public class OrbMouse extends SpaceMouse implements KeyListener {
 //
 //                                    //TODO finish:
 //
-//                                    //Vector3f vx = v().cross(camDir, camUp);
+//                                    //v3 vx = v().cross(camDir, camUp);
 //                                    //vx.normalize();
 //                                    //System.out.println(px + " " + py + " " + camDir + " x " + camUp + " " + vx);
 //
@@ -352,8 +353,75 @@ public class OrbMouse extends SpaceMouse implements KeyListener {
         return false;
 
     }
+    @Nullable
+    public ClosestRay mousePick(int x, int y) {
+//        float top = 1f;
+//        float bottom = -1f;
+//        float nearPlane = 1f;
+        float tanFov = (space.top - space.bottom) * 0.5f / space.zNear;
+        float fov = 2f * (float) Math.atan(tanFov);
 
-    private ClosestRay mousePick(int px, int py) {
+        v3 rayFrom = new v3(space.camPos);
+        v3 rayForward = new v3(space.camFwd);
+
+        rayForward.scale(space.zFar);
+
+        v3 rightOffset = new v3();
+        v3 vertical = new v3(space.camUp);
+
+        v3 hor = new v3();
+        // TODO: check: hor = rayForward.cross(vertical);
+        hor.cross(rayForward, vertical);
+        hor.normalize();
+        // TODO: check: vertical = hor.cross(rayForward);
+        vertical.cross(hor, rayForward);
+        vertical.normalize();
+
+        float tanfov = (float) Math.tan(0.5f * fov);
+        float ww = space.getWidth();
+        float hh = space.getHeight();
+
+        float aspect = hh / (float)ww;
+
+        hor.scale(2f * space.zFar * tanfov);
+        vertical.scale(2f * space.zFar * tanfov);
+
+        if (aspect < 1f) {
+            hor.scale(1f / aspect);
+        }
+        else {
+            vertical.scale(aspect);
+        }
+
+        v3 rayToCenter = new v3();
+        rayToCenter.add(rayFrom, rayForward);
+        v3 dHor = new v3(hor);
+        dHor.scale(1f / (float) ww);
+        v3 dVert = new v3(vertical);
+        dVert.scale(1.f / (float) hh);
+
+        v3 tmp1 = new v3();
+        v3 tmp2 = new v3();
+        tmp1.scale(0.5f, hor);
+        tmp2.scale(0.5f, vertical);
+
+        v3 rayTo = new v3();
+        rayTo.sub(rayToCenter, tmp1);
+        rayTo.add(tmp2);
+
+        tmp1.scale(x, dHor);
+        tmp2.scale(y, dVert);
+
+        rayTo.add(tmp1);
+        rayTo.sub(tmp2);
+
+        ClosestRay rayCallback = new ClosestRay(space.camPos, rayTo);
+        space.dyn.rayTest(space.camPos, rayTo, rayCallback, simplexSolver);
+
+        return rayCallback;
+    }
+
+    private v3 mousePick0(int px, int py) {
         int ww = space.getWidth();
         int hh = space.getHeight();
         if (ww == 0 || hh == 0)
@@ -392,10 +460,11 @@ public class OrbMouse extends SpaceMouse implements KeyListener {
         v3 to = ray_wor;
         to.add(from);
 
-        this.pickRay = rayCallback;
+        return to;
+        //this.pickRay = rayCallback;
 
-        space.dyn.rayTest(from, to, rayCallback.set(from, to), simplexSolver);
-        return rayCallback;
+//        space.dyn.rayTest(from, to, rayCallback.set(from, to), simplexSolver);
+//        return rayCallback;
 
 
     }

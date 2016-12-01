@@ -129,8 +129,8 @@ abstract public class JoglPhysics<X> extends JoglSpace implements GLEventListene
     //    public final MutableFloat cameraDistance;
 //    public final MutableFloat ele;
 //    public final MutableFloat azi;
-    float top;
-    float bottom;
+    public float top;
+    public float bottom;
     float tanFovV;
     //float fov;
     float left;
