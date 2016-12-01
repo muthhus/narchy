@@ -24,8 +24,8 @@ public class ForceDirected implements spacegraph.phys.constraint.BroadConstraint
             //13;
 
 
-    public final FloatParam repel = new FloatParam(40f, 0, 250);
-    public final FloatParam attraction = new FloatParam(60f, 0, 250);
+    public final FloatParam repel = new FloatParam(50, 0, 100);
+    public final FloatParam attraction = new FloatParam(0.001f, 0, 5);
 
     final v3 boundsMin, boundsMax;
     final float maxRepelDist;
@@ -108,21 +108,21 @@ public class ForceDirected implements spacegraph.phys.constraint.BroadConstraint
         SimpleSpatial yp = ((SimpleSpatial) y.data());
 
         v3 delta = v();
-        delta.sub(xp.transform(), yp.transform());
+        delta.sub(yp.transform(), xp.transform());
 
 
         float len = delta.normalize();
-        len -= idealDistRads * (xp.radius() + yp.radius());
-        if (len <= 0)
-            return;
+        //len -= idealDistRads * Math.max(xp.radius(), yp.radius());
+        //if (len <= 0)
+            //return;
 
 
-        v3 delta2 = v(delta);
+        //v3 delta2 = v(delta);
 
-        delta.scale((speed * (xp.mass() /* + yp.mass()*/) )  );
-        ((Dynamic) x).force(delta);
-        delta2.scale(-(speed * (yp.mass() /* + yp.mass()*/) ) );
-        ((Dynamic) y).force(delta2);
+        delta.scale((speed * (xp.mass() /* + yp.mass()*/) ) * len );
+        ((Dynamic) x).impulse(delta);
+//        delta2.scale(-(speed * (yp.mass() /* + yp.mass()*/) ) * len  );
+//        ((Dynamic) y).impulse(delta2);
 
     }
 
@@ -135,7 +135,7 @@ public class ForceDirected implements spacegraph.phys.constraint.BroadConstraint
 
         float len = delta.normalize();
 
-        len -= (xp.radius() + yp.radius());
+        //len -= (xp.radius() + yp.radius());
 
         if (len >= maxDist)
             return;
@@ -143,15 +143,15 @@ public class ForceDirected implements spacegraph.phys.constraint.BroadConstraint
             len = Math.max(0, len);
         }
 
-        float base = speed / (1 + Util.sqr(len ));
+        float base = speed / ( Util.sqr( 1 + len ));
 
         v3 yx = v(delta);
         yx.scale(yp.mass() * base );
-        ((Dynamic) x).force(yx);
+        ((Dynamic) x).impulse(yx);
 
         v3 xy = v(delta);
         xy.scale( -xp.mass() * base );
-        ((Dynamic) y).force(xy);
+        ((Dynamic) y).impulse(xy);
 
     }
 

@@ -73,9 +73,10 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
 
             int s = size();
 
-            if (s + additional > c) {
-                pendingRemoval = $.newArrayList((s + additional) - c);
-                s = clean(toAdd, s, additional, pendingRemoval);
+            int nextSize = s + additional;
+            if (nextSize > c) {
+                pendingRemoval = $.newArrayList(nextSize - c);
+                s = clean(toAdd, s, nextSize - c, pendingRemoval);
                 if (s + additional > c) {
                     clean2(pendingRemoval);
                     return false; //throw new RuntimeException("overflow");
@@ -142,15 +143,28 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
 
     }
 
-    private int clean(@Nullable BLink<V> toAdd, int s, int sizeThresh, List<BLink<V>> trash) {
+    private int clean(@Nullable BLink<V> toAdd, int s, int minRemoved, List<BLink<V>> trash) {
 
-        //first step: remove any nulls and deleted values
-        s -= removeDeleted(trash);
+        final int s0 = s;
+
+        if (cleanDeletedEntries()) {
+            //first step: remove any nulls and deleted values
+            s -= removeDeleted(trash, minRemoved);
+
+            if (s0 - s >= minRemoved)
+                return s;
+        }
 
         //second step: if still not enough, do a hardcore removal of the lowest ranked items until quota is met
         s = removeWeakestUntilUnderCapacity(s, trash, toAdd != null);
 
         return s;
+    }
+
+
+    /** return whether to clean deleted entries prior to removing any lowest ranked items */
+    protected boolean cleanDeletedEntries() {
+        return false;
     }
 
     private void clean2(List<BLink<V>> trash) {
@@ -592,12 +606,14 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
     }
 
 
-    private int removeDeleted(@NotNull List<BLink<V>> removed) {
+    private int removeDeleted(@NotNull List<BLink<V>> removed, int minRemoved) {
 
         SortedArray<BLink<V>> items = this.items;
         final Object[] l = items.array();
         int removedFromMap = 0;
-        for (int s = size() - 1; s >= 0; s--) {
+
+        //iterate in reverse since null entries should be more likely to gather at the end
+        for (int s = size() - 1; removedFromMap < minRemoved && s >= 0; s--) {
             BLink<V> x = (BLink<V>) l[s];
             if (x == null || x.isDeleted()) {
                 items.removeFast(s);

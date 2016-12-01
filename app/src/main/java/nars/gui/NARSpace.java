@@ -110,7 +110,7 @@ public abstract class NARSpace<X extends Term, Y extends Spatial<X>> extends Lis
 
         //new ArithmeticInduction(n);
 
-        Vis.conceptsWindow2D(n, 64, 12).show(800, 600);
+        Vis.conceptsWindow3D(n, 64, 12).show(800, 600);
 
         //n.run(20); //headstart
 
@@ -141,7 +141,7 @@ public abstract class NARSpace<X extends Term, Y extends Spatial<X>> extends Lis
 //                //.run(800);
 //
 
-        n.loop(1f);
+        n.loop(16f);
 
     }
 

@@ -25,6 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
@@ -55,7 +56,7 @@ public class DefaultConceptBuilder implements ConceptBuilder {
 
                 switch (a.op()) {
                     default:
-                        Map sharedMap = newBagMap();
+                        Map sharedMap = newBagMap(1);
                         return new AtomConcept(a, newCurveBag(sharedMap), newCurveBag(sharedMap));
                 }
 
@@ -94,7 +95,7 @@ public class DefaultConceptBuilder implements ConceptBuilder {
 //                map1; //shared
 //                //newBagMap(DEFAULT_CONCEPT_LINK_MAP_CAPACITY);
 
-        Map sharedMap = newBagMap();
+        Map sharedMap = newBagMap(t.volume());
         @NotNull Bag<Term> termbag = newCurveBag(sharedMap);
         @NotNull Bag<Task> taskbag = newCurveBag(sharedMap);
 
@@ -180,7 +181,7 @@ public class DefaultConceptBuilder implements ConceptBuilder {
                 //if (term.op() == INT || term.op() == INTRANGE) {
                 //Map m = newBagMap(DEFAULT_ATOM_LINK_MAP_CAPACITY);
 
-                Map sharedMap = newBagMap();
+                Map sharedMap = newBagMap(term.volume());
                 result = new TermjectConcept((Termject) term, newCurveBag(sharedMap), newCurveBag(sharedMap));
             }
 
@@ -226,7 +227,7 @@ public class DefaultConceptBuilder implements ConceptBuilder {
     }
 
     @NotNull
-    public Map newBagMap() {
+    public Map newBagMap(int volume) {
         //int defaultInitialCap = 0;
         float loadFactor = 0.9f;
 
@@ -237,7 +238,11 @@ public class DefaultConceptBuilder implements ConceptBuilder {
 //            //ConcurrentHashMapUnsafe(cap);
 //        } else {
 //            return new HashMap(defaultInitialCap, 1f);
-            return new SynchronizedUnifiedMap(0, loadFactor);
+            if (volume < 4) {
+                return new ConcurrentHashMap();
+            } else {
+                return new SynchronizedUnifiedMap(0, loadFactor);
+            }
         } else {
             return new UnifiedMap(0, loadFactor);
         }

@@ -28,7 +28,7 @@ import java.util.function.Predicate;
 import static nars.Param.TRUTH_EPSILON;
 
 
-public class CompoundConcept<T extends Compound> implements AbstractConcept, Termlike {
+public class CompoundConcept<T extends Compound> implements Concept, Termlike {
 
     @NotNull
     private final Bag<Task> taskLinks;
@@ -68,15 +68,14 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept, Ter
      * @param taskLinks
      */
     public CompoundConcept(@NotNull T term, @NotNull Bag<Term> termLinks, @NotNull Bag<Task> taskLinks, @NotNull NAR nar) {
+
         this.term = term;
-
-        this.templates = buildTemplates(term, nar);
-
         this.termLinks = termLinks;
         this.taskLinks = taskLinks;
 
-        this.policy = ConceptPolicy.Deleted;
 
+        this.templates = buildTemplates(term, nar);
+        this.policy = ConceptPolicy.Deleted;
     }
 
     protected TermContainer buildTemplates(@NotNull T term, @NotNull NAR nar) {
@@ -130,7 +129,7 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept, Ter
      * used for setting an explicit OperationConcept instance via java; activates it on initialization
      */
     public CompoundConcept(@NotNull T term, @NotNull NAR n) {
-        this(term, (DefaultConceptBuilder) n.concepts.conceptBuilder(), n, ((DefaultConceptBuilder) n.concepts.conceptBuilder()).newBagMap());
+        this(term, (DefaultConceptBuilder) n.concepts.conceptBuilder(), n, ((DefaultConceptBuilder) n.concepts.conceptBuilder()).newBagMap(term.volume()));
     }
 
     /**

@@ -9,6 +9,7 @@ import nars.concept.Concept;
 import nars.link.BLink;
 import nars.term.Term;
 import nars.term.Termed;
+import nars.util.Util;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import spacegraph.SpaceGraph;
@@ -25,8 +26,6 @@ import java.util.function.Consumer;
 
 import static nars.truth.TruthFunctions.w2c;
 import static spacegraph.math.v3.v;
-import static spacegraph.obj.layout.Grid.col;
-import static spacegraph.obj.layout.Grid.row;
 
 
 public class ConceptWidget extends Cuboid<Term> implements Consumer<BLink<? extends Termed>> {
@@ -201,11 +200,11 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<BLink<? exte
 
         gl.glColor4f(e.r, e.g, e.b, e.a);
 
-        float width = e.width;
-        if (width <= 1f) {
-            Draw.renderLineEdge(gl, this, e, width * 2f);
+        float width = e.width * radius();
+        if (width <= 0.01f) {
+            Draw.renderLineEdge(gl, this, e, width );
         } else {
-            Draw.renderHalfTriEdge(gl, this, e, width * radius() / 18f, e.r * 2f /* hack */);
+            Draw.renderHalfTriEdge(gl, this, e, width / 18f, e.r * 2f /* hack */);
         }
     }
 
@@ -338,8 +337,8 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<BLink<? exte
     }
     public static class ConceptVis2 implements ConceptVis {
 
-        final float minSize = 2f;
-        final float maxSize = 16f;
+        final float minSize = 1f;
+        final float maxSize = 8f;
 
         public void apply(ConceptWidget conceptWidget, Term tt) {
             ConceptsSpace space = conceptWidget.space;
@@ -351,10 +350,10 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<BLink<? exte
             float b = conceptWidget.concept.beliefs().eviSum(now);
             float g = conceptWidget.concept.goals().eviSum(now);
             float q = conceptWidget.concept.questions().priSum();
-            float ec = p + 0.5f * w2c((b + g + q)/2f);
+            float ec = p + w2c((b + g + q)/2f);
 
             //sqrt because the area will be the sqr of this dimension
-            float nodeScale = (float) (minSize + ec * maxSize);//1f + 2f * p;
+            float nodeScale = (float) (minSize + Util.sqr(ec) * maxSize);//1f + 2f * p;
             conceptWidget.scale(nodeScale*1.618f, nodeScale, nodeScale/1.618f);
 
 
@@ -366,8 +365,8 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<BLink<? exte
 
             Draw.hsb(
                     (tt.op().ordinal() / 16f),
-                    0.5f,
-                    0.3f + 0.7f * p,
+                    0.5f + 0.5f/tt.volume(),
+                    0.3f + 0.2f * p,
                     0.9f, conceptWidget.shapeColor);
         }
     }

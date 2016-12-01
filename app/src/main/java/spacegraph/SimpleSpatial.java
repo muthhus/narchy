@@ -205,16 +205,16 @@ public class SimpleSpatial<X> extends AbstractSpatial<X> {
         gl.glColor4fv(shapeColor, 0);
     }
 
-    protected void renderLabel(GL2 gl, float scale) {
-        gl.glColor4f(1f, 1f, 1f, 1f);
-        gl.glLineWidth(1f);
-        Draw.text(gl, marquee(), scale, 0, 0, 0.5f + 0.1f);
-    }
-
-    public String marquee() {
-        //TODO add animated scrolling marquee substring window
-        return label;
-    }
+//    protected void renderLabel(GL2 gl, float scale) {
+//        gl.glColor4f(1f, 1f, 1f, 1f);
+//        gl.glLineWidth(1f);
+//        Draw.text(gl, marquee(), scale, 0, 0, 0.5f + 0.1f);
+//    }
+//
+//    public String marquee() {
+//        //TODO add animated scrolling marquee substring window
+//        return label;
+//    }
 
 //    @Override
 //    public void start(short order) {

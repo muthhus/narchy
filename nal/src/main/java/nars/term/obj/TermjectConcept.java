@@ -6,7 +6,6 @@ import nars.Task;
 import nars.bag.Bag;
 import nars.budget.Activation;
 import nars.budget.policy.ConceptPolicy;
-import nars.concept.AbstractConcept;
 import nars.concept.Concept;
 import nars.table.BeliefTable;
 import nars.table.QuestionTable;
@@ -28,7 +27,7 @@ import java.util.function.Predicate;
 /**
  * Created by me on 7/28/16.
  */
-public class TermjectConcept<X> implements AbstractConcept, Termject<X> {
+public class TermjectConcept<X> implements Concept, Termject<X> {
 
     @NotNull
     private final Termject<X> termject;

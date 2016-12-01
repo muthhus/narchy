@@ -58,6 +58,8 @@ public class SimpleBoxShape extends PolyhedralConvexShape {
 		implicitShapeDimensions.add(-m, -m, -m);*/
 	}
 
+
+
 	public void size(float x, float y, float z) {
 		implicitShapeDimensions.set(x/2f, y/2f, z/2f);
 	}

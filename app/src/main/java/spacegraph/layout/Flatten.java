@@ -45,7 +45,7 @@ public class Flatten<X> implements SpaceTransform<X>, Consumer<Spatial<X>> {
 
             float tz = b.transform().z;
             if (Math.abs(tz) > zTolerance) {
-                b.force(v( 0, 0, -tz*zSpeed*b.mass()));
+                b.impulse(v( 0, 0, -tz*zSpeed*b.mass()));
             }
             s.rotate(up, rotateRate, tmp);
 
