@@ -394,7 +394,7 @@ public class Tetris extends NAgents {
         //Param.DEBUG = true;
 
         NAR nar = NAgents.newMultiThreadNAR(4, new FrameTime().dur(TIME_PER_FALL));
-        nar.termVolumeMax.setValue(12);
+        nar.termVolumeMax.setValue(16);
         //nar.linkFeedbackRate.setValue(0.05f);
 
 //        Random rng = new XorShift128PlusRandom(1);
@@ -500,7 +500,7 @@ public class Tetris extends NAgents {
         t.trace = true;
 
 
-        t.runRT(20f, 100).join();
+        t.runRT(20f, 1000).join();
 
 //        NARController meta = new NARController(nar, loop, t);
 //

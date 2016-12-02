@@ -143,7 +143,8 @@ public class Inperience extends Leak<Task> {
         if (task.isCommand() || task instanceof Abbreviation.AbbreviationTask || task instanceof InperienceTask) //no infinite loops in the present moment
             return;
 
-        each.accept(new DefaultBLink<>(task, task, 1f / tt.volume()));
+        if (!task.isDeleted())
+            each.accept(new DefaultBLink<>(task, task, 1f / tt.volume()));
 
         // if(OLD_BELIEVE_WANT_EVALUATE_WONDER_STRATEGY ||
         //         (!OLD_BELIEVE_WANT_EVALUATE_WONDER_STRATEGY && (task.sentence.punctuation==Symbols.QUESTION || task.sentence.punctuation==Symbols.QUEST))) {
