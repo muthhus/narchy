@@ -44,12 +44,12 @@ public class MySTMClustered extends STMClustered {
 
 
     public MySTMClustered(@NotNull NAR nar, int size, char punc, int maxGroupSize) {
-        this(nar, size, punc, maxGroupSize, true, 1);
+        this(nar, size, punc, maxGroupSize, false, 1);
     }
 
     public MySTMClustered(@NotNull NAR nar, int size, char punc, int maxGroupSize, boolean allowNonInput, int intinputsPerFrame) {
         this(nar, size, punc, maxGroupSize, maxGroupSize,
-                Math.round(((float) nar.compoundVolumeMax.intValue()) / (2)) /* estimate */
+                Math.round(((float) nar.termVolumeMax.intValue()) / (2)) /* estimate */
                 , allowNonInput,
                 intinputsPerFrame);
     }
@@ -149,7 +149,7 @@ public class MySTMClustered extends STMClustered {
                     }
 
                     float finalFreq = freq;
-                    int maxVol = nar.compoundVolumeMax.intValue();
+                    int maxVol = nar.termVolumeMax.intValue();
                     node.chunk(maxGroupSize, maxVol - 1).forEach(tt -> {
 
                         //Task[] uu = Stream.of(tt).filter(t -> t!=null).toArray(Task[]::new);

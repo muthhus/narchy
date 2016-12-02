@@ -35,8 +35,8 @@ public class Tetris extends NAgents {
 
 
     public static final int tetris_width = 6;
-    public static final int tetris_height = 16;
-    public static final int TIME_PER_FALL = 8;
+    public static final int tetris_height = 20;
+    public static final int TIME_PER_FALL = 16;
     public static final int PIXEL_RADIX = 2;
     private static SensorConcept[][] concept;
     private int afterlife = TIME_PER_FALL * tetris_height * tetris_width;
@@ -164,7 +164,7 @@ public class Tetris extends NAgents {
 //        float actionThresholdLower = actionMargin / 1.5f;
 
 
-        actions.add(new ActionConcept("leftright(tetris)", nar, (b, d) -> {
+        actions.add(new ActionConcept("moveX(tetris)", nar, (b, d) -> {
             if (d != null) {
                 float x = d.freq();
                 //System.out.println(d + " " + x);
@@ -234,8 +234,8 @@ public class Tetris extends NAgents {
                         //$.func(
                                 $.p(
 //                                  $.pRecurse($.radixArray(x, PIXEL_RADIX, state.width)), $.pRecurse($.radixArray(y, PIXEL_RADIX, state.height))
-                                  $.p($.radixArray(x, PIXEL_RADIX, state.width)), $.p($.radixArray(y, PIXEL_RADIX, state.height))
-//                                    x,y
+                                  //$.p($.radixArray(x, PIXEL_RADIX, state.width)), $.p($.radixArray(y, PIXEL_RADIX, state.height))
+                                    x,y
                                 ),
                                 tetris
                         )
@@ -394,6 +394,7 @@ public class Tetris extends NAgents {
         //Param.DEBUG = true;
 
         NAR nar = NAgents.newMultiThreadNAR(4, new FrameTime().dur(TIME_PER_FALL));
+        nar.termVolumeMax.setValue(12);
         //nar.linkFeedbackRate.setValue(0.05f);
 
 //        Random rng = new XorShift128PlusRandom(1);
@@ -496,180 +497,10 @@ public class Tetris extends NAgents {
             }
         };
 
-
-//                AutoClassifier ac = new AutoClassifier($.the("row"), nar, sensors,
-//                        tetris_width/2, 7 /* states */,
-//                        0.05f);
-//                view.autoenc = new MatrixView(ac.W.length, ac.W[0].length, arrayRenderer(ac.W));
-
-//                int totalSize = tetris_width*tetris_height;
-//                AutoClassifier bc = new AutoClassifier($.the("row4"), nar, sensors,
-//                        tetris_width*4, 16,
-//                        0.1f);
-
-//                newControlWindow(
-//                        new GridSurface(VERTICAL,
-//                                charted.stream().map(c -> new BeliefTableChart(nar, c)).collect(toList())
-//                        )
-//                );
-
-
-        //window(Vis.concepts(nar, 1024), 500, 500);
-
-        //STMView.show(stm, 800, 600);
-//
-//        window(
-//                col(
-//
-//                        //Vis.concepts(nar, 32),
-//                        //Vis.agentActions(t, 1200),
-//
-//                        Vis.budgetHistogram(nar, 24)
-//                        /*Vis.conceptLinePlot(nar,
-//                                Iterables.concat(t.actions, Lists.newArrayList(t.happy, t.joy)),
-//                                600)*/
-//                ), 1200, 900);
-
-
-
-            /*view.plot2 = new GridSurface(HORIZONTAL,
-                //conceptLinePlot(nar, Lists.newArrayList( t.happy, t.joy ), (c) -> nar.conceptPriority(c), 256),
-
-                conceptLinePlot(nar, t.actions, (c) -> {
-                    try {
-                        return nar.concept(c).goals().truth(nar.time()).freq();
-                    } catch (NullPointerException npe) {
-                        return 0.5f;
-                    }
-                }, 256)
-            );*/
-
-//                {
-//                    List<FloatSupplier> li = new ArrayList();
-//                    for (int i = 0; i < sensors.size(); i++) {
-//                        li.add(sensors.get(i).getInput());
-//                    }
-//
-//                    List<FloatSupplier> lo = new ArrayList();
-//                    RangeNormalizedFloat normReward = new RangeNormalizedFloat(() -> rewardValue);
-//                    lo.add(normReward);
-////
-////
-//                    LSTMPredictor lp = new LSTMPredictor(li, lo, 1);
-////
-//
-//                    double[] lpp = new double[2];
-//                    nar.onFrame(nn -> {
-//                        double[] p = lp.next();
-//                        System.arraycopy(p, 0, lpp, 0, p.length);
-//                        //System.out.println("LSTM: " + Texts.n4(p) + " , " + normReward.asFloat());
-//                    });
-//
-//                    view.lstm = new Plot2D(plotHistory, Plot2D.Line)
-//                            .add("Reward (actual)", () -> normReward.asFloat())
-//                            .add("Predicted", () -> lpp[0]);
-//
-//
-//                }
-
-
-//        nar.onFrame(f -> {
-//            //view.lstm.update();
-//            try {
-//                view.term.term.putLinePre(t.summary());
-//            } catch (IOException e1) {
-//            }
-//        });
-
-
-//                int window = 32;
-//                GridSurface camHistory = new GridSurface(HORIZONTAL,
-//                        new MatrixView(tetris_width, tetris_height, sensorMatrixView(nar, -window * 2)),
-//                        new MatrixView(tetris_width, tetris_height, sensorMatrixView(nar, -window)),
-//                        new MatrixView(tetris_width, tetris_height, sensorMatrixView(nar, 0)),
-//                        new MatrixView(tetris_width, tetris_height, sensorMatrixView(nar, +window)),
-//                        new MatrixView(tetris_width, tetris_height, sensorMatrixView(nar, +window * 2))
-//                );
-//                newControlWindow(12f,4f, new Object[] { camHistory } );
-
-        //newControlWindow(view);
-
-
-        //newControlWindow(2f,4f, new Object[] { new MatrixView(tetris_width, tetris_height, sensorMatrixView(nar, 0)) } );
-
-        //Vis.newBeliefChartWindow(t, 200);
-
-        //window(Vis.budgetHistogram(nar, 30), 500, 300);
-
-        //Arkancide.newBeliefChartWindow(nar, 200, nar.inputTask("(&&, ((happy) ==>+0 (joy)), ((joy) ==>+0 (happy)), ((happy) <=>+0 (joy))). :|:").term());
-
-//                BeliefTableChart.newBeliefChart(nar, Lists.newArrayList(
-//                        sensors.get(0),
-//                        sensors.get(1),
-//                        sensors.get(2),
-//                        sensors.get(3),
-//                        sensors.get(4),
-//                        sensors.get(5)
-//                ), 200);
-
-        //NARSpace.newConceptWindow((Default) nar, 32, 8);
-
-
         t.trace = true;
 
-//        Iterable<Termed> cheats = Iterables.concat(
-//                numericSensor(() -> t.currentX, nar, 0.3f,
-//                        "(cursor_x)")
-//                        //"(active,a)","(active,b)","(active,c)","(active,d)","(active,e)","(active,f)","(active,g)","(active,h)")
-//                        //"I(a)","I(b)","I(c)","I(d)","I(e)","I(f)","I(g)","I(h)")
-//                        //"(active,x)")
-//                        .resolution(0.5f / t.width),
-//                numericSensor(() -> t.currentY, nar, 0.3f,
-//                        "(cursor_y)")
-//                        //"active:(y,t)", "active:(y,b)")
-//                        //"(active,y)")
-//                        .resolution(0.5f / t.height)
-//        );
 
-//        NAgent n = new NAgent(nar) {
-//            @Override
-//            public void start(int inputs, int actions) {
-//                super.start(inputs, actions);
-//
-//                List<Termed> charted = new ArrayList(super.actions);
-//
-//                charted.add(sad);
-//                charted.add(happy);
-//                Iterables.addAll(charted, cheats);
-//
-//                if (nar instanceof Default) {
-//
-//                    new BeliefTableChart(nar, charted).show(600, 900);
-//
-//                    //BagChart.show((Default) nar, 128);
-//
-//                    //STMView.show(stm, 800, 600);
-//
-//
-//                    NARSpace.newConceptWindow((Default) nar, 128, 8);
-//                }
-//
-//
-//            }
-//
-//            @Override
-//            protected Collection<Task> perceive(Set<Task> inputs) {
-//                return super.perceive(inputs);
-//            }
-//        };
-
-
-        //addCamera(t, nar, 8, 8);
-
-
-        //t.run(runFrames);
-        //t.run(20000);
-        t.runRT(20f, 20000);
+        t.runRT(20f, 100).join();
 
 //        NARController meta = new NARController(nar, loop, t);
 //
@@ -684,8 +515,10 @@ public class Tetris extends NAgents {
         //nar.stop();
 
         //nar.index.print(System.out);
-        NAR.printTasks(nar, true);
-        NAR.printTasks(nar, false);
+        nar.tasks.forEach(System.out::println);
+
+        //NAR.printActiveTasks(nar, true);
+        //NAR.printActiveTasks(nar, false);
         nar.printConceptStatistics();
         new TaskStatistics().add(nar).print();
 
@@ -928,3 +761,173 @@ public class Tetris extends NAgents {
 ////    }
 
 }
+//                AutoClassifier ac = new AutoClassifier($.the("row"), nar, sensors,
+//                        tetris_width/2, 7 /* states */,
+//                        0.05f);
+//                view.autoenc = new MatrixView(ac.W.length, ac.W[0].length, arrayRenderer(ac.W));
+
+//                int totalSize = tetris_width*tetris_height;
+//                AutoClassifier bc = new AutoClassifier($.the("row4"), nar, sensors,
+//                        tetris_width*4, 16,
+//                        0.1f);
+
+//                newControlWindow(
+//                        new GridSurface(VERTICAL,
+//                                charted.stream().map(c -> new BeliefTableChart(nar, c)).collect(toList())
+//                        )
+//                );
+
+
+//window(Vis.concepts(nar, 1024), 500, 500);
+
+//STMView.show(stm, 800, 600);
+//
+//        window(
+//                col(
+//
+//                        //Vis.concepts(nar, 32),
+//                        //Vis.agentActions(t, 1200),
+//
+//                        Vis.budgetHistogram(nar, 24)
+//                        /*Vis.conceptLinePlot(nar,
+//                                Iterables.concat(t.actions, Lists.newArrayList(t.happy, t.joy)),
+//                                600)*/
+//                ), 1200, 900);
+
+
+
+            /*view.plot2 = new GridSurface(HORIZONTAL,
+                //conceptLinePlot(nar, Lists.newArrayList( t.happy, t.joy ), (c) -> nar.conceptPriority(c), 256),
+
+                conceptLinePlot(nar, t.actions, (c) -> {
+                    try {
+                        return nar.concept(c).goals().truth(nar.time()).freq();
+                    } catch (NullPointerException npe) {
+                        return 0.5f;
+                    }
+                }, 256)
+            );*/
+
+//                {
+//                    List<FloatSupplier> li = new ArrayList();
+//                    for (int i = 0; i < sensors.size(); i++) {
+//                        li.add(sensors.get(i).getInput());
+//                    }
+//
+//                    List<FloatSupplier> lo = new ArrayList();
+//                    RangeNormalizedFloat normReward = new RangeNormalizedFloat(() -> rewardValue);
+//                    lo.add(normReward);
+////
+////
+//                    LSTMPredictor lp = new LSTMPredictor(li, lo, 1);
+////
+//
+//                    double[] lpp = new double[2];
+//                    nar.onFrame(nn -> {
+//                        double[] p = lp.next();
+//                        System.arraycopy(p, 0, lpp, 0, p.length);
+//                        //System.out.println("LSTM: " + Texts.n4(p) + " , " + normReward.asFloat());
+//                    });
+//
+//                    view.lstm = new Plot2D(plotHistory, Plot2D.Line)
+//                            .add("Reward (actual)", () -> normReward.asFloat())
+//                            .add("Predicted", () -> lpp[0]);
+//
+//
+//                }
+
+
+//        nar.onFrame(f -> {
+//            //view.lstm.update();
+//            try {
+//                view.term.term.putLinePre(t.summary());
+//            } catch (IOException e1) {
+//            }
+//        });
+
+
+//                int window = 32;
+//                GridSurface camHistory = new GridSurface(HORIZONTAL,
+//                        new MatrixView(tetris_width, tetris_height, sensorMatrixView(nar, -window * 2)),
+//                        new MatrixView(tetris_width, tetris_height, sensorMatrixView(nar, -window)),
+//                        new MatrixView(tetris_width, tetris_height, sensorMatrixView(nar, 0)),
+//                        new MatrixView(tetris_width, tetris_height, sensorMatrixView(nar, +window)),
+//                        new MatrixView(tetris_width, tetris_height, sensorMatrixView(nar, +window * 2))
+//                );
+//                newControlWindow(12f,4f, new Object[] { camHistory } );
+
+//newControlWindow(view);
+
+
+//newControlWindow(2f,4f, new Object[] { new MatrixView(tetris_width, tetris_height, sensorMatrixView(nar, 0)) } );
+
+//Vis.newBeliefChartWindow(t, 200);
+
+//window(Vis.budgetHistogram(nar, 30), 500, 300);
+
+//Arkancide.newBeliefChartWindow(nar, 200, nar.inputTask("(&&, ((happy) ==>+0 (joy)), ((joy) ==>+0 (happy)), ((happy) <=>+0 (joy))). :|:").term());
+
+//                BeliefTableChart.newBeliefChart(nar, Lists.newArrayList(
+//                        sensors.get(0),
+//                        sensors.get(1),
+//                        sensors.get(2),
+//                        sensors.get(3),
+//                        sensors.get(4),
+//                        sensors.get(5)
+//                ), 200);
+
+//NARSpace.newConceptWindow((Default) nar, 32, 8);
+
+
+//        Iterable<Termed> cheats = Iterables.concat(
+//                numericSensor(() -> t.currentX, nar, 0.3f,
+//                        "(cursor_x)")
+//                        //"(active,a)","(active,b)","(active,c)","(active,d)","(active,e)","(active,f)","(active,g)","(active,h)")
+//                        //"I(a)","I(b)","I(c)","I(d)","I(e)","I(f)","I(g)","I(h)")
+//                        //"(active,x)")
+//                        .resolution(0.5f / t.width),
+//                numericSensor(() -> t.currentY, nar, 0.3f,
+//                        "(cursor_y)")
+//                        //"active:(y,t)", "active:(y,b)")
+//                        //"(active,y)")
+//                        .resolution(0.5f / t.height)
+//        );
+
+//        NAgent n = new NAgent(nar) {
+//            @Override
+//            public void start(int inputs, int actions) {
+//                super.start(inputs, actions);
+//
+//                List<Termed> charted = new ArrayList(super.actions);
+//
+//                charted.add(sad);
+//                charted.add(happy);
+//                Iterables.addAll(charted, cheats);
+//
+//                if (nar instanceof Default) {
+//
+//                    new BeliefTableChart(nar, charted).show(600, 900);
+//
+//                    //BagChart.show((Default) nar, 128);
+//
+//                    //STMView.show(stm, 800, 600);
+//
+//
+//                    NARSpace.newConceptWindow((Default) nar, 128, 8);
+//                }
+//
+//
+//            }
+//
+//            @Override
+//            protected Collection<Task> perceive(Set<Task> inputs) {
+//                return super.perceive(inputs);
+//            }
+//        };
+
+
+//addCamera(t, nar, 8, 8);
+
+
+//t.run(runFrames);
+//t.run(20000);

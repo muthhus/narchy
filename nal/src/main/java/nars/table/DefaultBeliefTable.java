@@ -160,7 +160,7 @@ public class DefaultBeliefTable implements BeliefTable {
      * get the most relevant belief/goal with respect to a specific time.
      */
     @Nullable
-    public Task match(long when, long now, @Nullable Task against) {
+    public Task match(long when, long now, @Nullable Task against, boolean noOverlap) {
 
         final Task ete = matchEternal();
         if (when == ETERNAL) {

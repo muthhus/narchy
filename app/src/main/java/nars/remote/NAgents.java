@@ -88,8 +88,8 @@ abstract public class NAgents extends NAgent {
 
         a.run(frames);
 
-        NAR.printTasks(nar, true);
-        NAR.printTasks(nar, false);
+        NAR.printActiveTasks(nar, true);
+        NAR.printActiveTasks(nar, false);
 
 //        nar.tasks.forEach(x -> {
 //            if (x.isQuestOrQuestion())
@@ -192,7 +192,7 @@ abstract public class NAgents extends NAgent {
         Default nar = new Default(2048,
                 conceptsPerCycle, 2, 4, rng,
                 //new CaffeineIndex(new DefaultConceptBuilder(rng), 1024*1024, volMax/2, false, exe)
-                new TreeTermIndex.L1TreeIndex(new DefaultConceptBuilder(), 20000, 32 * 1024, 2)
+                new TreeTermIndex.L1TreeIndex(new DefaultConceptBuilder(), 40000, 32 * 1024, 2)
 
                 ,
                 //new FrameClock()
@@ -215,7 +215,7 @@ abstract public class NAgents extends NAgent {
         nar.DEFAULT_QUEST_PRIORITY = 0.5f * p;
 
         nar.confMin.setValue(0.01f);
-        nar.compoundVolumeMax.setValue(volMax);
+        nar.termVolumeMax.setValue(volMax);
 
         MySTMClustered stm = new MySTMClustered(nar, 64, '.', 3, true, 6);
         MySTMClustered stmGoal = new MySTMClustered(nar, 32, '!', 2, true, 4);

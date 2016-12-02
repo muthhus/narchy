@@ -44,7 +44,6 @@ import nars.util.event.On;
 import nars.util.event.Topic;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.apache.commons.math3.stat.Frequency;
-import org.eclipse.collections.api.map.primitive.ObjectFloatMap;
 import org.eclipse.collections.api.tuple.Twin;
 import org.eclipse.collections.api.tuple.primitive.ObjectFloatPair;
 import org.fusesource.jansi.Ansi;
@@ -261,14 +260,14 @@ public abstract class NAR extends Param implements Level, Consumer<Task>, NARIn,
 
 
     @Deprecated
-    public static void printTasks(@NotNull NAR n, boolean beliefsOrGoals) {
-        printTasks(n, beliefsOrGoals, (t) -> {
+    public static void printActiveTasks(@NotNull NAR n, boolean beliefsOrGoals) {
+        printActiveTasks(n, beliefsOrGoals, (t) -> {
             System.out.println(t.proof());
         });
     }
 
     @Deprecated
-    public static void printTasks(@NotNull NAR n, boolean beliefsOrGoals, @NotNull Consumer<Task> e) {
+    public static void printActiveTasks(@NotNull NAR n, boolean beliefsOrGoals, @NotNull Consumer<Task> e) {
         TreeSet<Task> bt = new TreeSet<>((a, b) ->
                 //sort by name
                 //{ return a.term().toString().compareTo(b.term().toString()); }

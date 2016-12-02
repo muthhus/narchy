@@ -429,7 +429,7 @@ public class IRCAgent extends IRC {
         nar.DEFAULT_QUEST_PRIORITY = 0.5f * p;
 
         nar.confMin.setValue(0.02f);
-        nar.compoundVolumeMax.setValue(volMax);
+        nar.termVolumeMax.setValue(volMax);
 
 
 //        nar.inputLater(

@@ -2,6 +2,7 @@ package nars.concept;
 
 import nars.$;
 import nars.NAR;
+import nars.Task;
 import nars.nar.Default;
 import nars.term.Compound;
 import nars.truth.Truth;
@@ -83,26 +84,31 @@ public class DynamicBeliefTableTest {
             System.out.println( i + ": " + cc.belief(i) );
         }
 
-        Compound template = $("((x) &&+4 (y))");
-        System.out.println(template);
         DynamicConcept.DynamicBeliefTable xtable = (DynamicConcept.DynamicBeliefTable) ((cc).beliefs());
+        {
+            Compound template = $("((x) &&+4 (y))");
+            System.out.println(template);
 
-        assertEquals($.t(1f, 0.81f), xtable.truth(0, template, true).truth());
+            assertEquals($.t(1f, 0.81f), xtable.truth(0, template, true).truth());
 
-        for (int i = -4; i <= n.time()+4; i++) {
-            System.out.println( i + ": " + xtable.truth(i, template.dt(), true) + " " + xtable.generate(template, i));
+            for (int i = -4; i <= n.time() + 4; i++) {
+                System.out.println(i + ": " + xtable.truth(i, template.dt(), true) + " " + xtable.generate(template, i));
+            }
+        }
+
+        {
+            long when = 0;
+            for (int i = 0; i <= 8; i++) {
+                Compound template = $("((x) &&+"+ i + " (y))");
+                System.out.println( xtable.truth(when, template.dt(), true) + " " + xtable.generate(template, when));
+            }
+
+            assertEquals(0.81f, xtable.generate($("((x) &&+4 (y))"), 0).conf(), 0.01f); //best match to the input
+            assertEquals(0.45f, xtable.generate($("((x) &&+2 (y))"), 0).conf(), 0.01f);
+            assertEquals(0.23f, xtable.generate($("((x) &&+0 (y))"), 0).conf(), 0.01f);
         }
 
 
-        Truth now = cc.belief(n.time());
-        Truth t = $.t(1f, 0.57f);
-        assertNotNull(t);
-        assertEquals(t,now); //evidence decayed due to time
-
-        n.run(1);
-        cc.print();
-
-        //n.ask("(a:x && a:y)")
     }
 
 }

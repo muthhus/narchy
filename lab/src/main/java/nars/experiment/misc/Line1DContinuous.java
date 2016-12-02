@@ -261,7 +261,7 @@ public class Line1DContinuous extends NAgent {
                 new CaffeineIndex(new DefaultConceptBuilder(), 1024*2, 12, false, exe),
                 new FrameTime(10f), exe
         );
-        nar.compoundVolumeMax.set(19);
+        nar.termVolumeMax.set(19);
 
 
         nar.beliefConfidence(0.9f);
@@ -289,8 +289,8 @@ public class Line1DContinuous extends NAgent {
         //l.run(2000);
 
 
-        NAR.printTasks(nar, true);
-        NAR.printTasks(nar, false);
+        NAR.printActiveTasks(nar, true);
+        NAR.printActiveTasks(nar, false);
 
         l.predictors.forEach(p->{
            nar.concept(p).print();

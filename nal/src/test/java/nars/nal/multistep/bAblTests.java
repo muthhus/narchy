@@ -68,7 +68,7 @@ public class bAblTests extends AbstractNALTest {
 
         //(19) Path Finding
         TestNAR t = test();
-        t.nar.compoundVolumeMax.setValue(40); //larger than default
+        t.nar.termVolumeMax.setValue(40); //larger than default
 
         //.log()
                t.believe("<(&&, <( $1,$2) --> start>, <( $1,$B,$C) --> at>, <( $B,$2,$C2) --> at>) ==> (&&, <( id,$C,id,$C2) --> path>, <( $1,$2,$B) --> chunk>)>")

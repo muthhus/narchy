@@ -8,12 +8,14 @@ import nars.budget.BudgetFunctions;
 import nars.nal.Stamp;
 import nars.table.BeliefTable;
 import nars.table.DefaultBeliefTable;
+import nars.table.QuestionTable;
 import nars.task.RevisionTask;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.obj.Termject;
 import nars.truth.Truth;
+import nars.truth.TruthDelta;
 import nars.truth.Truthed;
 import nars.util.Util;
 import org.eclipse.collections.api.list.primitive.ByteList;
@@ -128,8 +130,18 @@ public class DynamicConcept extends CompoundConcept {
             this.beliefOrGoal = beliefOrGoal;
         }
 
+        @Override
+        public TruthDelta add(@NotNull Task input, @NotNull QuestionTable questions, @NotNull CompoundConcept<?> concept, @NotNull NAR nar) {
+            if (input.isInput()) {
+                return super.add(input, questions, concept, nar);
+            } else {
+                //do not insert but report that it was
+                Truth current = ((BeliefTable)tableFor(input.punc())).truth(input.occurrence(), nar.time());
+                return new TruthDelta(current, current);
+            }
+        }
 
-//        @Override
+        //        @Override
 //        public TruthDelta add(@NotNull Task input, @NotNull QuestionTable questions, @NotNull CompoundConcept<?> concept, @NotNull NAR nar) {
 //            //only allow input and dynamic belief tasks to be inserted; otherwise process a new dynamic result
 //            if (!input.isInput() && (!(input instanceof DynamicBeliefTask))) {
@@ -368,18 +380,18 @@ public class DynamicConcept extends CompoundConcept {
         }
 
         @Override
-        public @Nullable Task match(long when, long now, @Nullable Task target) {
+        public @Nullable Task match(long when, long now, @Nullable Task target, boolean noOverlap) {
             Compound template = target!=null ? target.term() : term();
 
             Task y = generate(template, when);
 
-            Task x = super.match(when, now, target);
+            Task x = super.match(when, now, target, noOverlap);
 
             if (x == null) return y;
             if (y == null) return x;
 
             //choose the non-overlapping one
-            if (target!=null) {
+            if (noOverlap && target!=null) {
                 if (Stamp.overlapping(x, target))
                     return y;
                 if (Stamp.overlapping(y, target))

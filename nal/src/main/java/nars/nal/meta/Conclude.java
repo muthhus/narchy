@@ -112,7 +112,7 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
 
                 if (r instanceof Compound) { //includes null test
 
-                    if (r.volume() < nar.compoundVolumeMax.intValue())
+                    if (r.volume() < nar.termVolumeMax.intValue())
 
                         derive(m, (Compound) r, m.punct.get()); //Term exceeds maximum volume
 

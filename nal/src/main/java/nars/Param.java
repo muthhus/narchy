@@ -59,7 +59,7 @@ public abstract class Param /*extends Container*/ implements Level {
 
 
     /** average priority target for bag forgetting */
-    public static final float BAG_THRESHOLD = (0.1f);
+    public static final float BAG_THRESHOLD = (0.5f);
 
     /** conjunctions over this length will be ineligible for 2nd-layer termlink templates. it can be decomposed however, and decompositions of this size or less will be eligible. */
     public static final int MAX_CONJ_SIZE_FOR_LAYER2_TEMPLATES = 3;
@@ -84,7 +84,7 @@ public abstract class Param /*extends Container*/ implements Level {
      * if this is exceeded it may indicate a recursively
      * malformed term due to a serious inference bug
      */
-    public final MutableInteger compoundVolumeMax = new MutableInteger(32);
+    public final MutableInteger termVolumeMax = new MutableInteger(32);
 
     /**
      * maximum changes logged in deriver's stack.

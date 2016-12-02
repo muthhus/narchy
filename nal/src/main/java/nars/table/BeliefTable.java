@@ -69,7 +69,7 @@ public interface BeliefTable extends TaskTable {
 
 
         @Override
-        public Task match(long when, long now, @Nullable Task against) {
+        public Task match(long when, long now, @Nullable Task against, boolean noOverlap) {
             return null;
         }
 
@@ -176,10 +176,10 @@ public interface BeliefTable extends TaskTable {
 
     @Nullable
     default Task match(long when, long now) {
-        return match(when, now, null);
+        return match(when, now, null, true);
     }
 
-    Task match(long when, long now, @Nullable Task against);
+    Task match(long when, long now, @Nullable Task against, boolean noOverlap);
 
 
     /**

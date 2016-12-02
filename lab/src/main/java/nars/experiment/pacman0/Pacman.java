@@ -221,7 +221,7 @@ public class Pacman extends NAgent {
         nar.linkFeedbackRate.setValue(0.1f);
 
         nar.confMin.setValue(0.04f);
-        nar.compoundVolumeMax.set(32);
+        nar.termVolumeMax.set(32);
 
         //nar.truthResolution.setValue(0.02f);
 
@@ -385,8 +385,8 @@ public class Pacman extends NAgent {
 //				runCycles,
 //				runDelay);
 
-        NAR.printTasks(nar, true);
-        NAR.printTasks(nar, false);
+        NAR.printActiveTasks(nar, true);
+        NAR.printActiveTasks(nar, false);
         //n.printActions();
         //nar.forEachActiveConcept(System.out::println);
 

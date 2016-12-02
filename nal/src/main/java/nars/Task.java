@@ -98,7 +98,7 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
         if (!t.isNormalized())
             return test(t, "Task Term is null or not a normalized Compound", safe);
         if (nar!=null) {
-            if (t.volume() > nar.compoundVolumeMax.intValue())
+            if (t.volume() > nar.termVolumeMax.intValue())
                 return test(t, "Term exceeds maximum volume", safe);
             if (!t.levelValid(nar.level()))
                 return test(t, "Term exceeds maximum NAL level", safe);

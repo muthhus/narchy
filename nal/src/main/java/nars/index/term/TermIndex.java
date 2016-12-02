@@ -146,7 +146,7 @@ public abstract class TermIndex extends TermBuilder {
 
     private int volumeMax(Op op) {
         if (nar!=null) {
-            return nar.compoundVolumeMax.intValue();
+            return nar.termVolumeMax.intValue();
         } else {
             return Param.COMPOUND_VOLUME_MAX;
         }

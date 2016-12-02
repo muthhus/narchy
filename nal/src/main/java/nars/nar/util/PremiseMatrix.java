@@ -11,6 +11,7 @@ import nars.link.BLink;
 import nars.nal.Deriver;
 import nars.nal.Premise;
 import nars.nal.meta.Derivation;
+import nars.table.BeliefTable;
 import nars.term.Termed;
 import nars.util.list.FasterList;
 import org.jetbrains.annotations.NotNull;
@@ -73,8 +74,8 @@ public class PremiseMatrix {
 
                         BLink<Task> taskLink = tasksBuffer.get( il % tasksBufferSize );
 
-                        Task task = taskLink.get();
-                        if (task.isDeleted())
+                        Task task = match(taskLink.get(), nar);
+                        if (task==null)
                             continue;
 
                         Budget taskLinkBudget = taskLink.clone(); //save a copy because in multithread, the original may be deleted in-between the sample result and now
@@ -123,5 +124,35 @@ public class PremiseMatrix {
         }
 
         return count;
+    }
+
+
+
+    /** attempt to revise / match a better premise task */
+    private static Task match(Task task, NAR nar) {
+
+        if (!task.isInput() && task.isBeliefOrGoal()) {
+            Concept c = task.concept(nar);
+
+            long when = task.occurrence();
+
+            if (c != null) {
+                BeliefTable table = (BeliefTable) c.tableFor(task.punc());
+                long now = nar.time();
+                Task revised = table.match(when, now, task, false);
+                if (revised!=null) {
+                    if (task.isDeleted() || task.conf() < revised.conf()) {
+                        task = revised;
+                    }
+                }
+
+            }
+
+        }
+
+        if (task.isDeleted())
+            return null;
+
+        return task;
     }
 }

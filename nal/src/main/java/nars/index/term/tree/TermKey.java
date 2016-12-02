@@ -30,6 +30,7 @@ public class TermKey extends DynByteSeq {
     final static Lz4Decompressor decompressor = new Lz4Decompressor();
     private final static float minCompressionRatio = 0.9f;
     private final static int MIN_COMPRESSION_INPUT = 16;
+    private static final boolean COMPRESS = false;
 
     /** term with volume byte prepended for sorting by volume */
     @NotNull
@@ -45,7 +46,7 @@ public class TermKey extends DynByteSeq {
             writeTermSeq(y, x, false);
 
             //int before = length();
-            if (c > 1 && y.compress(1)) {
+            if (COMPRESS && c > 1 && y.compress(1)) {
                 //int after = length();
                 //System.out.println(conceptualizable + "\t" + before + " -> " + after + "\t" + new String(array()));
             }
@@ -79,7 +80,8 @@ public class TermKey extends DynByteSeq {
 
             writeEvidence(this, task.evidence());
 
-            compress();
+            if (COMPRESS)
+                compress();
 
         } catch (IOException e) {
             throw new RuntimeException(e);

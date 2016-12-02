@@ -109,8 +109,8 @@ public class DeductiveMeshTest {
 
         n.onFrame(x -> {
             if (n.time() == 1000) {
-                NAR.printTasks(n, true);
-                NAR.printTasks(n, false);
+                NAR.printActiveTasks(n, true);
+                NAR.printActiveTasks(n, false);
                 System.out.println(Arrays.toString(n.core.active.priHistogram(new double[10])));
             }
         });
