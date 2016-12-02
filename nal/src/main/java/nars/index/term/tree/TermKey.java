@@ -37,14 +37,15 @@ public class TermKey extends DynByteSeq {
         TermKey y = new TermKey(x.volume() * 4 + 64 /* ESTIMATE */);
         try {
 
-            //volume byte: pre-sorts everything by volume from the root, so that items of certain sizes can
+            //volume byte: pre-sorts everything by complexity or volume from the root, so that items of certain sizes can
             //be selected
-            y.writeByte(x.volume());
+            int c = x.complexity();
+            y.writeByte(c);
 
             writeTermSeq(y, x, false);
 
             //int before = length();
-            if (x instanceof Compound && y.compress(1)) {
+            if (c > 1 && y.compress(1)) {
                 //int after = length();
                 //System.out.println(conceptualizable + "\t" + before + " -> " + after + "\t" + new String(array()));
             }

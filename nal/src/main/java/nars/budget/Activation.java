@@ -167,8 +167,10 @@ public class Activation {
     @Nullable
     Concept linkSubterm(@NotNull Termed target, float subScale, int depth) {
 
-    /* activate concept */
-        Concept targetConcept = nar.concept(target, true);
+        Concept targetConcept = nar.concept(target,
+                //dont create a concept if doesnt exist, below this depth
+                depth < Param.ACTIVATION_TERMLINK_DEPTH_CONCEPTUALIZE ? true : false
+        );
 
         if (targetConcept != null) {
 
@@ -176,7 +178,7 @@ public class Activation {
             if (conceptActivation!=null)
                 conceptActivation.add(targetConcept, subScale);
 
-            if (depth < termlinkDepth) {
+            if (depth + 1 < termlinkDepth) {
 
                 @NotNull TermContainer ttt = targetConcept.templates();
                 int n = ttt.size();

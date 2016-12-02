@@ -192,7 +192,7 @@ abstract public class NAgents extends NAgent {
         Default nar = new Default(2048,
                 conceptsPerCycle, 2, 4, rng,
                 //new CaffeineIndex(new DefaultConceptBuilder(rng), 1024*1024, volMax/2, false, exe)
-                new TreeTermIndex.L1TreeIndex(new DefaultConceptBuilder(), 150000, 32 * 1024, 2)
+                new TreeTermIndex.L1TreeIndex(new DefaultConceptBuilder(), 20000, 32 * 1024, 2)
 
                 ,
                 //new FrameClock()
