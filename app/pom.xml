@@ -175,7 +175,7 @@
 
         <dependency>
             <groupId>org.boofcv</groupId>
-            <artifactId>visualize</artifactId>
+            <artifactId>all</artifactId>
             <version>0.24.1</version>
             <scope>compile</scope>
         </dependency>

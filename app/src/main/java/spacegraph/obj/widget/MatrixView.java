@@ -58,17 +58,17 @@ public class MatrixView extends Widget {
     }
 
     public MatrixView(float[] d, int stride, ViewFunction1D view) {
-        this((int)Math.ceil((float)Math.ceil(d.length/stride)), stride, (x, y, gl) -> {
+        this((int)Math.floor(((float)d.length)/stride), stride, (x, y, gl) -> {
             int i = y * stride + x;
             if (i < d.length)
-                return view.update((float)d[i], gl);
+                return view.update(d[i], gl);
             else
                 return Float.NaN;
         });
 
     }
     public MatrixView(double[] d, int stride, ViewFunction1D view) {
-        this((int)Math.ceil((float)Math.ceil(d.length/stride)), stride, (x, y, gl) -> {
+        this((int)Math.floor(((float)d.length)/stride), stride, (x, y, gl) -> {
             int i = y * stride + x;
             if (i < d.length)
                 return view.update((float)d[i], gl);
@@ -96,7 +96,7 @@ public class MatrixView extends Widget {
 
                 try {
                     float dz = view.update(x, y, gl);
-                    Draw.rect(gl, x * dw, 1f - (y + 0.5f) * dh, dw, dh, dz);
+                    Draw.rect(gl, x * dw, 1f - (y + 1) * dh, dw, dh, dz);
                 } catch (Exception e) {
                     logger.error(" {}",e);
                     return;
