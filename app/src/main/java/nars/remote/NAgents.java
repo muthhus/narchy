@@ -76,7 +76,7 @@ abstract public class NAgents extends NAgent {
     }
 
     public static void run(Function<NAR, NAgents> init, int frames) {
-        Default nar = newMultiThreadNAR(4, new FrameTime(), true);
+        Default nar = newMultiThreadNAR(3, new FrameTime(), true);
         //Default nar = newNAR();
         //Default2 nar = newNAR2();
 
@@ -118,7 +118,7 @@ abstract public class NAgents extends NAgent {
 
     public static void runRT(Function<NAR, NAgents> init, float fps, int durFrames) {
 
-        Default nar = NAgents.newMultiThreadNAR(2, new RealTime.CS(true).dur(durFrames/fps), true);
+        Default nar = NAgents.newMultiThreadNAR(3, new RealTime.CS(true).dur(durFrames/fps), true);
         //Default nar = newNAR();
         //Alann nar = newAlann();
 
@@ -184,15 +184,15 @@ abstract public class NAgents extends NAgent {
                 //new SingleThreadExecutioner();
                 new MultiThreadExecutioner(threads, 16384 /* TODO chose a power of 2 number to scale proportionally to # of threads */);
 
-        int volMax = 24;
-        int conceptsPerCycle = 32*threads;
+        int volMax = 28;
+        int conceptsPerCycle = 24*threads;
 
 
         //Multi nar = new Multi(3,512,
         Default nar = new Default(2048,
-                conceptsPerCycle, 1, 2, rng,
+                conceptsPerCycle, 2, 4, rng,
                 //new CaffeineIndex(new DefaultConceptBuilder(rng), 1024*1024, volMax/2, false, exe)
-                new TreeTermIndex.L1TreeIndex(new DefaultConceptBuilder(), 2 * 1024 * 128, 32 * 1024, 2)
+                new TreeTermIndex.L1TreeIndex(new DefaultConceptBuilder(), 150000, 32 * 1024, 2)
 
                 ,
                 //new FrameClock()
@@ -205,8 +205,8 @@ abstract public class NAgents extends NAgent {
 //            }
         };
 
-        nar.beliefConfidence(0.9f);
-        nar.goalConfidence(0.9f);
+        nar.beliefConfidence(0.75f);
+        nar.goalConfidence(0.75f);
 
         float p = 0.5f;
         nar.DEFAULT_BELIEF_PRIORITY = 0.75f * p;
@@ -217,7 +217,7 @@ abstract public class NAgents extends NAgent {
         nar.confMin.setValue(0.01f);
         nar.compoundVolumeMax.setValue(volMax);
 
-        MySTMClustered stm = new MySTMClustered(nar, 128, '.', 3, true, 6);
+        MySTMClustered stm = new MySTMClustered(nar, 64, '.', 3, true, 6);
         MySTMClustered stmGoal = new MySTMClustered(nar, 32, '!', 2, true, 4);
 
         Abbreviation abbr = new Abbreviation(nar, "the",
@@ -317,7 +317,8 @@ abstract public class NAgents extends NAgent {
 
             @Override
             protected void in(@NotNull Task task, Consumer<BLink<Task>> each) {
-                each.accept(new DefaultBLink<>(task, task, 0.1f));
+                if (!task.isDeleted())
+                    each.accept(new DefaultBLink<>(task, task, 0.1f));
             }
 
         }.bag, 16);

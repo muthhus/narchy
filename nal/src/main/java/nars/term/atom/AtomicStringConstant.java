@@ -8,7 +8,6 @@ import org.jetbrains.annotations.NotNull;
 public abstract class AtomicStringConstant extends AtomicString {
 
     @NotNull public final String id;
-    public transient final int hash;
 
     protected AtomicStringConstant(@NotNull String id) {
         this(id, id.hashCode());
@@ -16,13 +15,9 @@ public abstract class AtomicStringConstant extends AtomicString {
 
     protected AtomicStringConstant(@NotNull String id, int hash) {
         this.id = id;
-        this.hash = hash;
     }
 
-    @Override
-    public final int hashCode() {
-        return hash;
-    }
+
 
     @NotNull
     @Override public final String toString() {
@@ -61,6 +56,6 @@ public abstract class AtomicStringConstant extends AtomicString {
         meta[4] ++; //volume
         meta[5] |= structure();
 
-        return hash;
+        return hashCode();
     }
 }

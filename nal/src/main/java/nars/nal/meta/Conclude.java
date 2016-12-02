@@ -236,6 +236,15 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
         }
 
 
+        if (truth!=null) {
+            float eFactor = nar.evidenceFactor.asFloat();
+            if (eFactor != 1) {
+                truth = truth.confWeightMult(eFactor);
+                if (truth == null)
+                    return; //excessive doubt
+            }
+        }
+
         DerivedTask d = derive(content, budget, nar.time(), occ, m, truth, ct);
         if (d != null)
             m.target.accept(d);
@@ -249,6 +258,7 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
     public final DerivedTask derive(@NotNull Termed<Compound> c, @NotNull Budget budget, long now, long occ, @NotNull Derivation p, Truth truth, Derivation.TruthPuncEvidence ct) {
         char punc = ct.punc;
         long[] evidence = ct.evidence;
+
 
         DerivedTask dt =
                 new DerivedTask.DefaultDerivedTask(c, truth, punc, evidence, p, now, occ);

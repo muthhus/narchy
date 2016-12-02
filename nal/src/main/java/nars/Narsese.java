@@ -2,13 +2,19 @@ package nars;
 
 import com.github.fge.grappa.Grappa;
 import com.github.fge.grappa.annotations.Cached;
+import com.github.fge.grappa.exceptions.GrappaException;
 import com.github.fge.grappa.matchers.MatcherType;
 import com.github.fge.grappa.matchers.base.AbstractMatcher;
+import com.github.fge.grappa.matchers.base.Matcher;
 import com.github.fge.grappa.parsers.BaseParser;
 import com.github.fge.grappa.rules.Rule;
 import com.github.fge.grappa.run.ParseRunner;
 import com.github.fge.grappa.run.ParsingResult;
 import com.github.fge.grappa.run.context.MatcherContext;
+import com.github.fge.grappa.run.events.MatchContextEvent;
+import com.github.fge.grappa.run.events.MatchFailureEvent;
+import com.github.fge.grappa.run.events.MatchSuccessEvent;
+import com.github.fge.grappa.run.events.PreMatchEvent;
 import com.github.fge.grappa.stack.ArrayValueStack;
 import com.github.fge.grappa.stack.ValueStack;
 import com.github.fge.grappa.support.Var;
@@ -48,11 +54,50 @@ public class Narsese extends BaseParser<Object> {
 
     public static final String NARSESE_TASK_TAG = "Narsese";
 
+    static class MyParseRunner extends ParseRunner {
+
+        /**
+         * Constructor
+         *
+         * @param rule the rule
+         */
+        public MyParseRunner(Rule rule) {
+            super(rule);
+        }
+
+        @Override
+        public boolean match(MatcherContext context) {
+            final Matcher matcher = context.getMatcher();
+
+            //final PreMatchEvent<T> preMatchEvent = new PreMatchEvent<>(context);
+            //bus.post(preMatchEvent);
+
+//            if (throwable != null)
+//                throw new GrappaException("parsing listener error (before match)",
+//                        throwable);
+
+            // FIXME: is there any case at all where context.getMatcher() is null?
+            @SuppressWarnings("ConstantConditions")
+            final boolean match = matcher.match(context);
+//
+//            final MatchContextEvent<T> postMatchEvent = match
+//                    ? new MatchSuccessEvent<>(context)
+//                    : new MatchFailureEvent<>(context);
+
+            //bus.post(postMatchEvent);
+
+//            if (throwable != null)
+//                throw new GrappaException("parsing listener error (after match)",
+//                        throwable);
+
+            return match;
+        }
+    }
 
     //These should be set to something like RecoveringParseRunner for performance
-    private final ParseRunner inputParser = new ParseRunner(Input());
-    private final ParseRunner singleTaskParser = new ParseRunner(Task());
-    private final ParseRunner singleTermParser = new ParseRunner(Term());
+    private final ParseRunner inputParser = new MyParseRunner(Input());
+    private final ParseRunner singleTaskParser = new MyParseRunner(Task());
+    private final ParseRunner singleTermParser = new MyParseRunner(Term());
     //private final ParseRunner singleTaskRuleParser = new ListeningParseRunner3(TaskRule());
 
     //private final Map<String,Term> termCache = new HashMap();

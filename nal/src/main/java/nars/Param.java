@@ -220,8 +220,9 @@ public abstract class Param /*extends Container*/ implements Level {
     /**
      * global input activation multiplier, applied to both concepts and links
      */
-    @NotNull
-    public FloatParam activationGlobal = new FloatParam(1f, 0f, 2f);
+    @NotNull public FloatParam priorityFactor = new FloatParam(1f, 0f, 2f);
+
+    @NotNull public FloatParam evidenceFactor = new FloatParam(1f, 0f, 2f);
 
     ///** extra debugging checks */
     //public static final boolean DEBUG_PARANOID = false;

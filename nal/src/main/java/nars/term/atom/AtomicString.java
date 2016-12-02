@@ -14,8 +14,9 @@ public abstract class AtomicString implements Atomic {
                 ||
                 (
                         (u instanceof Atomic) &&
-                        (toString().equals(u.toString()) &&
-                        (u instanceof AtomicString || op() == ((Atomic) u).op()))
+                        (u instanceof AtomicString || op() == ((Atomic) u).op())) &&
+                        (toString().equals(u.toString())
+
                 );
 
     }
@@ -27,7 +28,7 @@ public abstract class AtomicString implements Atomic {
     }
 
     @Override
-    public int hashCode() {
+    public final int hashCode() {
         return toString().hashCode();
     }
 

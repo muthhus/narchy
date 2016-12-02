@@ -45,34 +45,34 @@ public class TopCraft extends NAgents {
 
         this.craft = new TopDownMinicraft();
 
-        {
-            SequenceEncoder enc = null;
-            try {
-
-                enc = new SequenceEncoder(new File("/tmp/x.mp4"));
-
-                // GOP size will be supported in 0.2
-                // enc.getEncoder().setKeyInterval(25);
-
-                //for(...) {
-                //BufferedImage image = null; // ... // Obtain an image to encode
-
-                int w = 8, h = 64;
-                Picture p = Picture.create(w, h, ColorSpace.RGB);
-                int[] i = p.getPlaneData(0);
-                for (int k = 0; k < 100; k++) {
-                    for (int j = 0; j < i.length; j++)
-                        i[j] = (int)(Math.random()*(200));
-                    enc.encodeNativeFrame(p);
-                }
-
-
-                enc.finish();
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
+//        {
+//            SequenceEncoder enc = null;
+//            try {
+//
+//                enc = new SequenceEncoder(new File("/tmp/x.mp4"));
+//
+//                // GOP size will be supported in 0.2
+//                // enc.getEncoder().setKeyInterval(25);
+//
+//                //for(...) {
+//                //BufferedImage image = null; // ... // Obtain an image to encode
+//
+//                int w = 16, h = 16;
+//                Picture p = Picture.create(w, h, ColorSpace.RGB);
+//                int[] i = p.getPlaneData(0);
+//                for (int k = 0; k < 100; k++) {
+//                    for (int j = 0; j < i.length; j++)
+//                        i[j] = (int)(Math.random()*(200));
+//                    enc.encodeNativeFrame(p);
+//                }
+//
+//
+//                enc.finish();
+//
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//        }
         pixels = addCameraRetina("cra", ()->craft.image, 32,32, (v) -> $.t( v, alpha));
         //pixels = addFreqCamera("see", ()->craft.image, 64,64, (v) -> $.t( v, alpha));
 

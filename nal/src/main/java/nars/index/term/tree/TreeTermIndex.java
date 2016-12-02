@@ -22,8 +22,8 @@ import java.util.function.Consumer;
 public class TreeTermIndex extends TermIndex implements Consumer<NAR> {
 
     float maxFractionThatCanBeRemovedAtATime = 0.05f;
-    float descentRate = 0.35f;
-    int iterationLimit = 8; //TODO tune iterationLimit by the overflow amount
+    float descentRate = 0.5f;
+    //int iterationLimit = -1; //TODO tune iterationLimit by the overflow amount
 
     @NotNull
     public final TermTree concepts;
@@ -111,7 +111,7 @@ public class TreeTermIndex extends TermIndex implements Consumer<NAR> {
         try {
             MyConcurrentRadixTree.SearchResult s = null;
 
-            while ((iterationLimit-- > 0) && ((sizeEst() - sizeLimit) > maxConceptsThatCanBeRemovedAtATime)) {
+            while (/*(iterationLimit-- > 0) &&*/ ((sizeEst() - sizeLimit) > maxConceptsThatCanBeRemovedAtATime)) {
 
                 Random rng = nar.random;
 
@@ -128,7 +128,8 @@ public class TreeTermIndex extends TermIndex implements Consumer<NAR> {
                     if (subTreeSize > 0) {
                         //long preBatch = sizeEst();
                         concepts.removeHavingAcquiredWriteLock(s, true);
-                        //logger.info("  Forgot Batch {}", preBatch - sizeEst());
+                        //if (logger.isDebugEnabled())
+                          //  logger.info("  Forgot {}", preBatch - sizeEst());
                     }
 
                     s = null; //restart
@@ -152,10 +153,10 @@ public class TreeTermIndex extends TermIndex implements Consumer<NAR> {
         List<MyConcurrentRadixTree.Node> l = concepts.root.getOutgoingEdges();
         int levels = l.size();
 
-        //HEURISTIC: x^8 sharp curve
+        //HEURISTIC: x^n sharp curve
         float r = rng.nextFloat();
         r = (r * r); //r^2
-        r = (r * r); //r^4
+        //r = (r * r); //r^4
         //r = (r * r); //r^8
 
         return l.get( Math.round((levels - 1) * (1 - r)) );
@@ -210,7 +211,7 @@ public class TreeTermIndex extends TermIndex implements Consumer<NAR> {
         concepts.acquireWriteLock();
         try {
             @NotNull TermKey k = key(src);
-            Termed existing = concepts.get(k);
+            Termed existing = concepts.get(k); //TODO cache ref to where this resolved to accelerate the put() below
             if (!(existing instanceof PermanentConcept)) {
                 concepts.put(k, target);
             }
@@ -285,9 +286,7 @@ public class TreeTermIndex extends TermIndex implements Consumer<NAR> {
 
             Object o = L1.computeIfAbsent2(t,
                     createIfMissing ?
-                            ttt -> {
-                                return super.get(ttt, true);
-                            } :
+                            ttt -> super.get(ttt, true) :
                             ttt -> {
                                 Termed v = super.get(ttt, false);
                                 if (v == null)

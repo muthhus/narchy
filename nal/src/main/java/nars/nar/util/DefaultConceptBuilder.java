@@ -38,10 +38,10 @@ public class DefaultConceptBuilder implements ConceptBuilder {
 
     public DefaultConceptBuilder() {
 
-        this.sleep = new DefaultConceptPolicy("sleep", 6, 6, 1, 8, 4);
+        this.sleep = new DefaultConceptPolicy("sleep", 6, 6, 1, 16, 8);
         this.init = sleep;
 
-        this.awake = new DefaultConceptPolicy("awake", 12, 12, 3, 24, 24);
+        this.awake = new DefaultConceptPolicy("awake", 12, 12, 3, 32, 16);
     }
 
 //    private static final int DEFAULT_ATOM_LINK_MAP_CAPACITY = 128;
@@ -148,8 +148,8 @@ public class DefaultConceptBuilder implements ConceptBuilder {
         this.nar = nar;
 
         this.defaultCurveSampler =
-                new CurveBag.DirectSampler(
-                //new CurveBag.NormalizedSampler(
+                //new CurveBag.DirectSampler(
+                new CurveBag.NormalizedSampler(
                         //new CurveBag.DirectSampler(
                         //CurveBag.linearBagCurve,
                         CurveBag.power2BagCurve,

@@ -12,6 +12,7 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 /**
@@ -96,10 +97,12 @@ public class MultiThreadExecutioner extends Executioner {
                 ringSize /* ringbuffer size */,
                 exe,
                 ProducerType.MULTI,
+                //new LiteBlockingWaitStrategy()
+                new PhasedBackoffWaitStrategy(1,2, TimeUnit.MILLISECONDS, new LiteBlockingWaitStrategy())
                 //new SleepingWaitStrategy()
                 //new BlockingWaitStrategy()
                 //new LiteTimeoutBlockingWaitStrategy(0, TimeUnit.MILLISECONDS)
-                new LiteBlockingWaitStrategy()
+
         );
 
         this.ring = disruptor.getRingBuffer();

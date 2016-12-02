@@ -666,7 +666,7 @@ public class MyConcurrentRadixTree<X> implements /*RadixTree<X>,*/Serializable, 
                     return false;
                 }
 
-                List<X> reinsertions = new FasterList(0);
+                List<X> reinsertions = new FasterList<>(0);
 
                 if (v != null && v != VoidValue.SINGLETON) {
                     X xv = (X) v;
@@ -738,9 +738,11 @@ public class MyConcurrentRadixTree<X> implements /*RadixTree<X>,*/Serializable, 
                     // Create a list of the outgoing edges of the parent which will remain
                     // if we remove this child...
 
-                    FasterList<Node> newEdgesOfParent = new FasterList(0, new Node[ parent.getOutgoingEdges().size() ] );
+                    int cen = currentEdgesFromParent.size();
+
+                    FasterList<Node> newEdgesOfParent = new FasterList<>(0, new Node[cen] );
                     boolean differs = false;
-                    for (int i = 0, numParentEdges = currentEdgesFromParent.size(); i < numParentEdges; i++) {
+                    for (int i = 0; i < cen; i++) {
                         Node node = currentEdgesFromParent.get(i);
                         if (node != found) {
                             newEdgesOfParent.add(node);
