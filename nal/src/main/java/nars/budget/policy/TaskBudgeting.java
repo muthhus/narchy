@@ -97,15 +97,15 @@ public class TaskBudgeting {
         int taskCompl = pp.task.volume();
         if (parentBelief!=null) // && parentBelief.complexity() > parentComplexity)
             parentComplexity =
-                //Math.min(taskCompl, parentBelief.complexity());
-                Math.max(taskCompl, parentBelief.volume());
+                Math.min(taskCompl, parentBelief.volume());
+                //Math.max(taskCompl, parentBelief.volume());
         else
             parentComplexity = taskCompl;
 
         int derivedComplexity = derived.volume();
         //return parentComplexity / (1f + Math.max(parentComplexity, derivedComplexity));
         //return Math.max(1f, (parentComplexity/derivedComplexity));
-        return Math.max(1f, (parentComplexity/(1+derivedComplexity)));
+        return Math.max(1f, (parentComplexity/(derivedComplexity)));
     }
 
 

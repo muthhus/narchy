@@ -33,6 +33,7 @@ abstract public class Functor extends AtomConcept implements TermTransform, Perm
         return (Atom)the(termAtom);
     }
 
+
     /** creates a new functor from a term name and a lambda */
     public static Concept f(@NotNull String termAtom, @NotNull Function<Term[], Term> f) {
         return f(fName(termAtom), f);

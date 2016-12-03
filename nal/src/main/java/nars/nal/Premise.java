@@ -68,9 +68,7 @@ public final class Premise extends RawBudget implements Tasked {
         //use the belief's term and not the termlink because it is more specific if:
         // a) it contains temporal information that can be used in temporalization
         // b) a variable in the termlink was matched
-        this.term = belief != null ? belief.term() : termLink;
-
-        this.belief = belief;
+        this.term = (this.belief = belief) != null ? belief.term() : termLink;
 
         //this.conceptLink = conceptLink;
 

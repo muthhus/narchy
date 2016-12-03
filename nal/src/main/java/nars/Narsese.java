@@ -1226,8 +1226,9 @@ public class Narsese extends BaseParser<Object> {
         if (!(contentRaw instanceof Compound))
             throw new NarseseException("Invalid task term");
         Termed content = m.normalize((Compound) contentRaw);
-        if (content == null)
+        if (content == null) {
             throw new NarseseException("Task term unnormalizable: " + contentRaw);
+        }
 
         char punct = (Character) x[2];
 

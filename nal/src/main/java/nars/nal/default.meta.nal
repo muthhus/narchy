@@ -250,13 +250,6 @@
         //B, (C && (--,%A)), task(negative), time(decomposeBelief) |- subIfUnifiesForward(C,A,B), (Goal:StrongN)
 
 
-    //// propositional decomposition ////////////////////////////////////////////////////////////////////////////////////
-    //If S is the case, and (&&,S,A..+) is not the case, it can't be that (&&,A..+) is the case
-
-    S, (&&,S,A..+), time(decomposeBelief) |- (&&,A..+), (Belief:DecomposePositiveNegativeNegative)
-        //S, (||,S,A..+)                        |- (||,A..+), (Belief:DecomposeNegativePositivePositive)
-    S, (&&,(--,%S),A..+), time(decomposeBelief) |- (&&,A..+), (Belief:DecomposeNegativeNegativeNegative)
-        //S, (||,(--,%S),A..+)                        |- (||,A..+), (Belief:DecomposePositivePositivePositive)
 
 
 
@@ -343,6 +336,10 @@
         S, ((--,%S)<->P), task(negative)  |- P, (Goal:StrongN)
         S, ((--,%P)<->S), task(negative)  |- (--,%P), (Goal:StrongN)
 
+//desire spreading by equivalence
+     S, (S<=>P) |- P, (Goal:Strong)
+        S, (S<=>P), task(negative)  |- (--,%P), (Goal:StrongN)
+        S, ((--,%S)<=>P), task(negative)  |- P, (Goal:StrongN)
 
 
 
@@ -365,11 +362,18 @@
 //// multi-conditional syllogism ////////////////////////////////////////////////////////////////////////////////////
 //Inference about the pre/postconditions
 
-    Y, ((&&,X,A..+) ==> B), task(positive), time(dtBeliefExact), notImplEqui(A..+) |- subIfUnifiesAny(((&&,A..+) ==>+- B),X,Y), (Belief:Deduction)
-        Y, ((&&,(--,%X),A..+) ==> B), task(negative), time(dtBeliefExact), notImplEqui(A..+) |- subIfUnifiesAny(((&&,A..+) ==>+- B),X,Y), (Belief:DeductionN)
+    Y, ((&&,X,A..+) ==> B), time(dtBeliefExact), notImplEqui(A..+) |- subIfUnifiesAny(((&&,A..+) ==>+- B),X,Y), (Belief:Deduction)
+    Y, ((&&,(--,%X),A..+) ==> B), time(dtBeliefExact), notImplEqui(A..+) |- subIfUnifiesAny(((&&,A..+) ==>+- B),(--,%X),(--,%Y)), (Belief:DeductionN)
 
-    Y, (B ==> (&&,X,A..+)), task(positive), time(dtBeliefExact), notImplEqui(A..+) |- subIfUnifiesAny((B ==>+- (&&,A..+)),X,Y), (Belief:Deduction)
-        Y, (B ==> (&&,(--,%X),A..+)), task(negative), time(dtBeliefExact), notImplEqui(A..+) |- subIfUnifiesAny((B ==>+- (&&,A..+)),X,Y), (Belief:DeductionN)
+    Y, (B ==> (&&,X,A..+)), time(dtBeliefExact), notImplEqui(A..+) |- subIfUnifiesAny((B ==>+- (&&,A..+)),X,Y), (Belief:Deduction)
+    Y, (B ==> (&&,(--,%X),A..+)), time(dtBeliefExact), notImplEqui(A..+) |- subIfUnifiesAny((B ==>+- (&&,A..+)),(--,%X),(--,%Y)), (Belief:DeductionN)
+//// propositional decomposition ////////////////////////////////////////////////////////////////////////////////////
+//If S is the case, and (&&,S,A..+) is not the case, it can't be that (&&,A..+) is the case
+
+    S, (&&,S,A..+), time(decomposeBelief) |- (&&,A..+), (Belief:DecomposePositiveNegativeNegative)
+        //S, (||,S,A..+)                        |- (||,A..+), (Belief:DecomposeNegativePositivePositive)
+    S, (&&,(--,%S),A..+), time(decomposeBelief) |- (&&,A..+), (Belief:DecomposeNegativeNegativeNegative)
+        //S, (||,(--,%S),A..+)                        |- (||,A..+), (Belief:DecomposePositivePositivePositive)
 
 
 //conditional abduction

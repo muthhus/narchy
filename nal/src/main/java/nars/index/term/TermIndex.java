@@ -13,6 +13,7 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.Terms;
+import nars.term.atom.Atom;
 import nars.term.atom.Atomic;
 import nars.term.compound.ProtoCompound;
 import nars.term.container.TermContainer;
@@ -552,5 +553,15 @@ public abstract class TermIndex extends TermBuilder {
             value.delete(nar);
     }
 
+    @Override
+    protected @NotNull Term statement(@NotNull Op op, int dt, @NotNull Term subject, @NotNull Term predicate) {
+        if (predicate instanceof Atom && op == INH && transformImmediates() && !(predicate instanceof Concept)) {
+            //resolve atomic statement predicates in inheritance, for inline term rewriting
+            Termed existingPredicate = get(predicate);
+            if (existingPredicate!=null)
+                predicate = existingPredicate.term();
+        }
 
+        return super.statement(op, dt, subject, predicate);
+    }
 }

@@ -17,6 +17,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Created by me on 8/22/16.
@@ -32,23 +33,20 @@ public class Activation {
     @NotNull
     public final Concept src;
 
-    public static class ObjectFloatHashMapPriorityAccumulator<X> implements PriorityAccumulator<X> {
-        public ObjectFloatHashMap<X> map;
+    public static class ObjectFloatHashMapPriorityAccumulator<X> extends AtomicReference<ObjectFloatHashMap<X>> implements PriorityAccumulator<X> {
+
 
         public ObjectFloatHashMapPriorityAccumulator() {
+            super(null);
             commit();
         }
 
+        static final int INITIAL_SIZE = 64;
+
         @Override
         @Nullable public Iterable<ObjectFloatPair<X>> commit() {
-            ObjectFloatHashMap<X> prevMap;
-            synchronized(this) {
-                prevMap = this.map;
-                if (prevMap != null && prevMap.isEmpty())
-                    return null; //keep map
-                this.map = new ObjectFloatHashMap();
-            }
-            return prevMap!=null ? postprocess(prevMap) : null;
+            ObjectFloatHashMap<X> prevMap = this.getAndSet(new ObjectFloatHashMap<>(INITIAL_SIZE));
+            return prevMap!=null && !prevMap.isEmpty() ? postprocess(prevMap) : null;
         }
 
         static final class LightObjectFloatPair<Z> implements ObjectFloatPair<Z> {
@@ -110,7 +108,7 @@ public class Activation {
 
         @Override
         public void add(X x, float v) {
-            map.addToValue(x, v);
+            get().addToValue(x, v);
         }
     }
 

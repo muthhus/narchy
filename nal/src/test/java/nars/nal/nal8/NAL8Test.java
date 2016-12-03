@@ -950,9 +950,19 @@ public class NAL8Test extends AbstractNALTest {
     }
     @Test public void testNegatedGoalSimilaritySpreading() {
         test()
+                .log()
                 .input("--(R)!")
                 .input("((G) <-> (R)).")
-                .mustDesire(cycles, "(G)", 0.0f, 0.81f);
+                .mustDesire(cycles, "(G)", 0.0f, 0.81f); //mustNotActualy because <-> isnt symmetric
+    }
+
+
+    @Test public void testNegatedGoalEquivalenceSpreading() {
+        test()
+                .log()
+                .input("--(R)!")
+                .input("((G) <=> (R)).")
+                .mustDesire(cycles, "(G)", 0.0f, 0.81f); //but here yes
     }
 
     @Test public void testNegatedSubtermGoalSimilaritySpreading() {

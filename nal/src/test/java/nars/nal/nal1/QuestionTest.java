@@ -1,9 +1,6 @@
 package nars.nal.nal1;
 
-import nars.$;
-import nars.NAR;
-import nars.Narsese;
-import nars.Op;
+import nars.*;
 import nars.nar.Default;
 import nars.nar.Terminal;
 import nars.nar.util.Answerer;
@@ -191,17 +188,27 @@ public class QuestionTest {
         NAR n = new Default();
         n.log();
 
+        Param.DEBUG = true;
+
         n.on("odd", a->{
             if (a.length == 1 && a[0].op()== Op.INT) {
                 return ((IntTerm)a[0]).val() % 2 == 0 ? Term.False : Term.True;
             }
-            return Term.False;
+            return null; //$.f("odd", a[0]); //vars, etc.
         });
+        n.termVolumeMax.set(24);
         n.input(
             "({1,2,3,4} --> number).",
-            "((({$x} --> number) && odd($x)) <=> ODD($x))."
+            "((({#x} --> number) && odd(#x)) ==> ({#x} --> ODD)).",
+            "((({#x} --> number) && --odd(#x)) ==> ({#x} --> EVEN)).",
+            "(#x --> ODD)?",
+            "(#x --> EVEN)?",
+            "(1 --> ODD)?",
+            "(1 --> EVEN)?",
+            "(2 --> ODD)?",
+            "(2 --> EVEN)?"
         );
-        n.run(500);
+        n.run(2500);
 
     }
 
