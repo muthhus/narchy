@@ -22,8 +22,8 @@ package nars.budget;
 
 import nars.Task;
 import nars.budget.merge.BudgetMerge;
-import nars.util.UtilityFunctions;
 import nars.truth.Truthed;
+import nars.util.UtilityFunctions;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

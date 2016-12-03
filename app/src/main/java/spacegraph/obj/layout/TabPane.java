@@ -19,7 +19,6 @@ public class TabPane extends VSplit {
     private final List<ToggleButton> toggles;
     private final Map<String, Supplier<Surface>> builder;
     private final Map<String, Surface> built;
-    private final List<Surface> togglesShown;
     private final Grid header;
 
 
@@ -31,26 +30,23 @@ public class TabPane extends VSplit {
         this.builder = builder;
         this.built = new ConcurrentHashMap();
 
-        this.togglesShown = $.newArrayList();
+        final List<Surface> togglesShown = $.newArrayList();
         builder.forEach((k, v) -> {
             CheckBox c = (CheckBox) new CheckBox(k).on((cb, a) -> {
+                List<Surface> ts = header.children;
                 if (a) {
-                    togglesShown.remove( cb );
+                    ts.remove( cb );
                 } else {
-                    togglesShown.add( cb );
+                    ts.add( cb );
                 }
-                header.setChildren(togglesShown);
                 update(); //TODO safer asynch
             });
             toggles.add(c);
             togglesShown.add(c);
         });
 
-        split = 0.1f;
-
-        top(header);
-
         header.setChildren(togglesShown);
+
         update();
     }
 
@@ -63,8 +59,7 @@ public class TabPane extends VSplit {
                 }));
             }
         }
-        bottom(grid(newContent));
-        layout();
+        set(header, grid(newContent), 0.1f);
     }
 
     private final class Wrapped extends VSplit {
@@ -73,10 +68,7 @@ public class TabPane extends VSplit {
 
         public Wrapped(ToggleButton c, Surface x) {
             super();
-            split = 0.1f;
-            top(c);
-            bottom(x);
-            layout();
+            set(c, x, 0.1f);
         }
 
 //        @Override

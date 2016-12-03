@@ -1,8 +1,5 @@
 package nars.nlp;
 
-import java.util.Date;
-import java.util.List;
-
 /**
  * Created by me on 12/2/16.
  */

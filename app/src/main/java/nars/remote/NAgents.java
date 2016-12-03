@@ -37,7 +37,8 @@ import spacegraph.SpaceGraph;
 import spacegraph.Surface;
 import spacegraph.obj.layout.Grid;
 import spacegraph.obj.layout.TabPane;
-import spacegraph.obj.widget.*;
+import spacegraph.obj.widget.CheckBox;
+import spacegraph.obj.widget.FloatSlider;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;

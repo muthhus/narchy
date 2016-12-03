@@ -20,8 +20,8 @@ package spacegraph.index;
  * #L%
  */
 
-import org.junit.Test;
 import org.junit.Assert;
+import org.junit.Test;
 
 /**
  * Created by jcovert on 6/16/15.

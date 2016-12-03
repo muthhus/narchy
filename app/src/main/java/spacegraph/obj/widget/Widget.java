@@ -57,6 +57,11 @@ public class Widget extends Stacking {
 //            Draw.text(gl, s2, 0.025f, 0.5f, 1f, 0);
 //        }
 
+        {
+            Draw.colorHash(gl, getClass().hashCode(), 0.25f);
+            Draw.rect(gl, 0, 0, 1, 1);
+        }
+
         if (touchedBy != null) {
             Draw.colorHash(gl, getClass().hashCode(), 0.5f);
             //gl.glColor3f(1f, 1f, 0f);

@@ -11,7 +11,6 @@ import spacegraph.math.v3;
 import spacegraph.phys.Collidable;
 import spacegraph.phys.collision.ClosestRay;
 import spacegraph.phys.math.Transform;
-import spacegraph.phys.shape.BoxShape;
 import spacegraph.phys.shape.SimpleBoxShape;
 import spacegraph.render.Draw;
 

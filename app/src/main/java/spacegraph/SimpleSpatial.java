@@ -10,10 +10,8 @@ import spacegraph.phys.Dynamic;
 import spacegraph.phys.Dynamics;
 import spacegraph.phys.constraint.TypedConstraint;
 import spacegraph.phys.math.Transform;
-import spacegraph.phys.shape.BoxShape;
 import spacegraph.phys.shape.CollisionShape;
 import spacegraph.phys.shape.SimpleBoxShape;
-import spacegraph.render.Draw;
 
 import java.util.List;
 import java.util.function.Consumer;

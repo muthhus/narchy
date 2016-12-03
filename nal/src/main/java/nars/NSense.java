@@ -5,7 +5,6 @@ import nars.concept.SensorConcept;
 import nars.term.Compound;
 import nars.truth.Truth;
 import nars.util.Util;
-import nars.util.math.FloatNormalized;
 import nars.util.math.FloatSupplier;
 import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunction;
 import org.jetbrains.annotations.NotNull;

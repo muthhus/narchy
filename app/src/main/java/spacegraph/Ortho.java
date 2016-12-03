@@ -5,6 +5,7 @@ import com.jogamp.opengl.GL2;
 import org.apache.commons.lang3.ArrayUtils;
 import spacegraph.input.Finger;
 import spacegraph.math.v2;
+import spacegraph.phys.util.AnimVector2f;
 
 import static spacegraph.math.v3.v;
 
@@ -13,6 +14,7 @@ import static spacegraph.math.v3.v;
  */
 public class Ortho implements WindowListener, KeyListener, MouseListener {
 
+    protected final AnimVector2f translate;
     boolean visible;
 
     final Finger mouse;
@@ -27,19 +29,23 @@ public class Ortho implements WindowListener, KeyListener, MouseListener {
     final Surface surface;
     private boolean maximize;
     public SpaceGraph window;
+    protected AnimVector2f scale;
 
     public Ortho(Surface surface) {
         this.surface = surface;
         this.mouse = new Finger(surface);
+        this.scale = new AnimVector2f(3f);
+        this.translate = new AnimVector2f(3f);
     }
 
+
     public Ortho translate(float x, float y) {
-        surface.translateLocal.set(x, y, 0);
+        translate.set(x, y);
         return this;
     }
 
     public Ortho move(float x, float y) {
-        surface.translateLocal.add(x, y, 0);
+        translate.add(x, y);
         return this;
     }
 
@@ -48,11 +54,11 @@ public class Ortho implements WindowListener, KeyListener, MouseListener {
     }
 
     public v2 scale() {
-        return surface.scaleLocal;
+        return scale;
     }
 
     public Ortho scale(float sx, float sy) {
-        surface.scale(sx, sy);
+        scale.set(sx, sy);
         return this;
     }
 
@@ -61,15 +67,26 @@ public class Ortho implements WindowListener, KeyListener, MouseListener {
         s.addWindowListener(this);
         s.addMouseListener(this);
         s.addKeyListener(this);
+        s.dyn.addAnimation(scale);
+        s.dyn.addAnimation(translate);
         surface.layout();
         resized();
     }
 
+
     public void render(GL2 gl) {
+        gl.glPushMatrix();
+
+        gl.glTranslatef(translate.x, translate.y, 0);
+
+        surface.scaleLocal.set(scale);
+        //surface.translateLocal.set(translate.x, translate.y);
         surface.render(gl, v(1,1)
                 //(v2) v(window.getWidth(), window.getHeight())
                 //v(window.getWidth(),window.getHeight()).normalize().scale(Math.min(window.getWidth(),window.getHeight()))
         );
+
+        gl.glPopMatrix();
     }
 
     /**
@@ -181,11 +198,11 @@ public class Ortho implements WindowListener, KeyListener, MouseListener {
             float sy = window.getHeight() - e.getY();
 
             //screen to local
-            float lx = surface.scaleLocal.x;
-            float ly = surface.scaleLocal.y;
+            float lx = scale.x;
+            float ly = scale.y;
 
-            x = (sx - surface.translateLocal.x) / (lx);
-            y = (sy - surface.translateLocal.y) / (ly);
+            x = (sx - translate.x) / (lx);
+            y = (sy - translate.y) / (ly);
             if (x >= 0 && y >= 0 && x<=1f && y<=1f) {
                 mouse.update(e, x, y, buttonsDown);
                 return true;

@@ -32,7 +32,6 @@ import spacegraph.phys.math.QuaternionUtil;
 import spacegraph.phys.math.Transform;
 import spacegraph.phys.math.VectorUtil;
 import spacegraph.phys.shape.ConvexShape;
-import spacegraph.phys.util.ArrayPool;
 
 import java.util.Arrays;
 

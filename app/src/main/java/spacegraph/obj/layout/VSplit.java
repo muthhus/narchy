@@ -18,10 +18,16 @@ public class VSplit extends Layout {
     }
 
     public VSplit(Surface top, Surface bottom, float split) {
-        super(top, bottom);
-        this.split = split;
+        super(null,null);
+        set(top, bottom, split);
     }
 
+    public void set(Surface top, Surface bottom, float split) {
+        this.split = split;
+        top(top);
+        bottom(bottom);
+        layout();
+    }
 
     @Override
     public void layout() {

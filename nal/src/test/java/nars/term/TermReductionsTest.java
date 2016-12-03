@@ -9,8 +9,8 @@ import org.junit.Test;
 
 import static nars.$.*;
 import static nars.Op.CONJ;
-import static nars.io.NarseseTest.assertInvalid;
 import static nars.index.TermBuilder.imageUnwrap;
+import static nars.io.NarseseTest.assertInvalid;
 import static nars.term.Term.False;
 import static nars.term.Term.True;
 import static nars.term.TermTest.assertValid;

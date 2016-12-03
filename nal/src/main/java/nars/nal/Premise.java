@@ -22,8 +22,8 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
-import static nars.util.UtilityFunctions.or;
 import static nars.time.Tense.ETERNAL;
+import static nars.util.UtilityFunctions.or;
 
 /**
  * Defines the conditions used in an instance of a derivation

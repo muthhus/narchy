@@ -2,6 +2,7 @@ package spacegraph;
 
 import com.jogamp.newt.event.MouseEvent;
 import spacegraph.math.v2;
+import spacegraph.phys.util.AnimVector2f;
 
 import static spacegraph.math.v3.v;
 
@@ -60,9 +61,9 @@ public class ZoomOrtho extends Ortho {
         //if (mouse.touching == null) {
             //System.out.println(Arrays.toString(e.getRotation()) + " " + e.getRotationScale());
             float zoomMult = 1f + -e.getRotation()[1] * zoomRate;
-            v2 s = scale();
-            float psx = s.x;
-            float psy = s.y;
+            AnimVector2f s = this.scale;
+            float psx = s.target.x;
+            float psy = s.target.y;
             float sx = psx * zoomMult;
             float sy = psy * zoomMult;
             int wx = window.getWidth();
@@ -73,11 +74,14 @@ public class ZoomOrtho extends Ortho {
 
                 float epx, epy;
                 if (zoomMult > 1f) {
+                    //TODO fix
                     epx = -psx / 4f * ((float) e.getX() / wx - 0.5f);
                     epy = psy / 4f * ((float) e.getY() / wy - 0.5f);
                 } else {
                     //TODO calculate correctly based on viewed center
-                    epx = epy = 0; //zoom out from center
+//                    epx = -translate.target.x; //zoom out from center
+//                    epy = -translate.target.y;
+                    epx = epy = 0;
                 }
 
                 float dsx = sx - psx;

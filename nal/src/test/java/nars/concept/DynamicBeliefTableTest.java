@@ -2,7 +2,6 @@ package nars.concept;
 
 import nars.$;
 import nars.NAR;
-import nars.Task;
 import nars.nar.Default;
 import nars.term.Compound;
 import nars.truth.Truth;

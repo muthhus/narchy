@@ -114,7 +114,7 @@ public abstract class Tuple2f implements java.io.Serializable, Cloneable {
      * @param x the x coordinate
      * @param y the y coordinate
      */
-    public final void set(float x, float y) {
+    public void set(float x, float y) {
         this.x = x;
         this.y = y;
     }

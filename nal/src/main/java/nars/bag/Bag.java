@@ -8,8 +8,6 @@ import nars.link.DefaultBLink;
 import nars.link.DependentBLink;
 import nars.util.Util;
 import org.apache.commons.lang3.mutable.MutableFloat;
-import org.eclipse.collections.api.block.procedure.primitive.ObjectFloatProcedure;
-import org.eclipse.collections.api.map.primitive.ObjectFloatMap;
 import org.eclipse.collections.api.tuple.primitive.ObjectFloatPair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

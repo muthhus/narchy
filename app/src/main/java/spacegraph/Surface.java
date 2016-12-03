@@ -18,6 +18,7 @@ public class Surface {
 
     protected v2 scaleGlobal;
 
+
     public enum Align {
 
 
@@ -111,6 +112,10 @@ public class Surface {
 
     }
 
+    public Surface move(float dx, float dy) {
+        translateLocal.add(dx, dy,0);
+        return this;
+    }
 
     public final void render(GL2 gl, v2 globalScale) {
 
@@ -135,7 +140,7 @@ public class Surface {
             childGlobal.scale(s);
             for (int i = 0, childrenSize = cc.size(); i < childrenSize; i++) {
                 Surface ss = cc.get(i);
-                if (s!=null)
+                if (ss!=null)
                     ss.render(gl, childGlobal);
             }
         }
@@ -197,7 +202,6 @@ public class Surface {
 
         }
 
-        //globalScale.set(sx, sy);
         gl.glTranslatef(tx, ty, translate.z);
         gl.glScalef(sx, sy, 1f);
     }

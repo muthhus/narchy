@@ -1,23 +1,15 @@
 package spacegraph.render;
 
 import com.jogamp.newt.event.MouseEvent;
-import com.jogamp.opengl.GL;
-import com.jogamp.opengl.GL2;
 import nars.util.Util;
 import spacegraph.AbstractSpace;
-import spacegraph.AbstractSpatial;
 import spacegraph.SimpleSpatial;
 import spacegraph.SpaceGraph;
 import spacegraph.input.KeyXYZ;
 import spacegraph.input.OrbMouse;
 import spacegraph.math.v3;
-import spacegraph.phys.collision.ClosestRay;
-
-import java.util.Arrays;
-import java.util.function.Consumer;
 
 import static com.jogamp.opengl.fixedfunc.GLMatrixFunc.GL_PROJECTION;
-import static spacegraph.math.v3.v;
 
 /**
  * 2D ortho view of physics space

@@ -8,10 +8,10 @@ import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.input.KeyType;
 import com.googlecode.lanterna.terminal.virtual.DefaultVirtualTerminal;
 import com.jogamp.newt.event.KeyEvent;
-import spacegraph.math.v2;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Created by me on 11/14/16.
@@ -83,7 +83,7 @@ public class ConsoleTerminal extends ConsoleSurface implements Appendable {
     public boolean onKey(KeyEvent e, boolean pressed) {
 
         //return super.onKey(e, pressed);
-        EditTerminal eterm = (EditTerminal) this.term;
+        DefaultVirtualTerminal eterm = (DefaultVirtualTerminal) this.term;
 
         int cc = e.getKeyCode();
         if (pressed && cc== 13) {
@@ -134,14 +134,25 @@ public class ConsoleTerminal extends ConsoleSurface implements Appendable {
 //            ));
         }
 
-        this.term.flush();
-        try {
+        AtomicBoolean busy = new AtomicBoolean(false);
+        if (busy.compareAndSet(false,true)) {
+
+            //this.term.flush();
+
+            if (eterm instanceof ConsoleTerminal.EditTerminal) {
+                try {
+                    EditTerminal ee = (EditTerminal) eterm;
+                    ee.gui.processInput();
+                    busy.set(false);
+                    ee.gui.updateScreen();
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                    busy.set(false);
+                }
+            }
 
 
-            eterm.gui.processInput();
-            eterm.gui.updateScreen();
-        } catch (IOException e1) {
-            e1.printStackTrace();
+
         }
 
         return true;

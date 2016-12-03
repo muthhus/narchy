@@ -18,7 +18,6 @@ import nars.nar.util.PremiseMatrix;
 import nars.util.data.MutableInteger;
 import nars.util.data.Range;
 import org.apache.commons.lang3.mutable.MutableFloat;
-import org.eclipse.collections.api.map.primitive.ObjectFloatMap;
 import org.eclipse.collections.api.tuple.primitive.ObjectFloatPair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

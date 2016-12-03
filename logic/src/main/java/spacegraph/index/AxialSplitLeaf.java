@@ -21,7 +21,6 @@ package spacegraph.index;
  */
 
 import java.util.Arrays;
-import java.util.Comparator;
 
 /**
  * Fast RTree split suggested by Yufei Tao taoyf@cse.cuhk.edu.hk

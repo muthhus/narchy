@@ -9,7 +9,6 @@ import nars.budget.Forget;
 import nars.budget.RawBudget;
 import nars.budget.merge.BudgetMerge;
 import nars.link.BLink;
-import nars.util.data.FloatParam;
 import nars.util.data.sorted.SortedArray;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
@@ -19,7 +18,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Predicate;

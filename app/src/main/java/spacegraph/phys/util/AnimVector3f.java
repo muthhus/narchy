@@ -37,7 +37,8 @@ public class AnimVector3f extends v3 implements Animated {
     @Override
     public boolean animate(float dt) {
 
-        if (x!=x) {
+        float px = this.x;
+        if (px != px) {
             //invalidated
             super.set(target);
         } else {
@@ -82,12 +83,13 @@ public class AnimVector3f extends v3 implements Animated {
         }
     }
 
-
     @Override
     public void set(float x, float y, float z) {
-        //if invalidated, use the target value immediately
-        if (x != x) super.set(x, y, z);
-        target.set(x, y, z);
+        float px = this.x;
+        if (px != px || x!=x)
+            super.set(x, y, z); //initialization: if invalidated, use the target value immediately
+
+        target.set(x, y, z); //interpolation
     }
 
 }

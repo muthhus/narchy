@@ -25,7 +25,6 @@ package spacegraph.render;
 
 import com.jogamp.newt.event.KeyEvent;
 import com.jogamp.newt.event.KeyListener;
-import com.jogamp.newt.event.WindowEvent;
 import com.jogamp.opengl.*;
 import com.jogamp.opengl.math.FloatUtil;
 import nars.$;

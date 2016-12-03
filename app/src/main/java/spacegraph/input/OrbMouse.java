@@ -9,7 +9,6 @@ import spacegraph.math.Matrix4f;
 import spacegraph.math.SingularMatrixException;
 import spacegraph.math.Vector4f;
 import spacegraph.math.v3;
-import spacegraph.phys.BulletStats;
 import spacegraph.phys.Collidable;
 import spacegraph.phys.Dynamic;
 import spacegraph.phys.collision.ClosestRay;

@@ -24,28 +24,33 @@ public abstract class ConsoleSurface extends Surface implements Appendable {
     /**
      * height/width of each cell
      */
-    final float charAspect = 1.25f;
+    final float charAspect = 1f;
     private int cols, rows;
 
 
     /**
      * percent of each grid cell width filled with the character
      */
-    float charScaleX = 0.75f;
+    float charScaleX = 0.85f;
 
     /**
      * percent of each grid cell height filled with the character
      */
-    float charScaleY = 0.6f;
+    float charScaleY = 0.85f;
 
 
-    float bgAlpha = 0.5f;
+    float bgAlpha = 0.35f;
     float fgAlpha = 0.9f;
 
 
     public ConsoleSurface(int cols, int rows) {
+        resize(cols, rows);
+    }
+
+    public void resize(int cols, int rows) {
         this.cols = cols;
         this.rows = rows;
+        align(Align.Center, cols/1.5f, rows);
     }
 
 
@@ -75,7 +80,7 @@ public abstract class ConsoleSurface extends Surface implements Appendable {
         //Draw.rect(gl, 0, 0, cols, rows);
 
 
-        gl.glLineWidth(3f);
+        gl.glLineWidth(2f);
 
 
         for (int row = 0; row < rows; row++) {
@@ -139,7 +144,8 @@ public abstract class ConsoleSurface extends Surface implements Appendable {
         gl.glColor4f(1f, 0.7f, 0f, 0.4f + p * 0.4f);
 
         Draw.rect(gl,
-                (float) (curx) + m/2f, (rows - 1 - cury) + m / 2f,
+                (float) (curx) + m/2f,
+                (rows - 1 - cury),
                 (float) (1 - m), (1 - m)
                 , -dz
         );

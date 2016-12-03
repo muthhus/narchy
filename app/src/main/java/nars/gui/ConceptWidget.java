@@ -24,7 +24,6 @@ import spacegraph.render.Draw;
 import java.util.HashMap;
 import java.util.function.Consumer;
 
-import static nars.truth.TruthFunctions.w2c;
 import static spacegraph.math.v3.v;
 
 

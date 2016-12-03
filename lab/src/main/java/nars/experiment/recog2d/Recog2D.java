@@ -7,7 +7,6 @@ import nars.$;
 import nars.NAR;
 import nars.Param;
 import nars.concept.Concept;
-import nars.concept.SensorConcept;
 import nars.gui.BeliefTableChart;
 import nars.learn.MLP;
 import nars.remote.NAgents;

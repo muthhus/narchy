@@ -1,7 +1,5 @@
 package spacegraph.index;
 
-import nars.util.math.Interval;
-
 /**
  * Created by me on 12/2/16.
  */

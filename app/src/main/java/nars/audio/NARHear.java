@@ -19,7 +19,8 @@ import spacegraph.render.Draw;
 
 import java.util.List;
 
-import static spacegraph.obj.layout.Grid.*;
+import static spacegraph.obj.layout.Grid.grid;
+import static spacegraph.obj.layout.Grid.row;
 
 /**
  * Created by me on 11/29/16.

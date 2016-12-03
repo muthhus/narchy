@@ -1046,7 +1046,7 @@ public enum Draw {
 
             push(gl);
 
-            float sx = scaleX / 16f;
+            float sx = scaleX / 20f;
             float sy = scaleY / 20f;
             gl.glScalef(sx, sy, 1f);
 
@@ -1072,7 +1072,7 @@ public enum Draw {
 
         int ci = c - 32; //ASCII to index
         if (ci >= 0 && (ci < fontMono.length)) {
-            fontMono[ci].draw(gl, x*16);
+            fontMono[ci].draw(gl, x*20);
         }
 
     }
