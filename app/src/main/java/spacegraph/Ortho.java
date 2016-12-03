@@ -58,11 +58,11 @@ public class Ortho implements WindowListener, KeyListener, MouseListener {
 
     public void start(SpaceGraph s) {
         this.window = s;
-        resized();
         s.addWindowListener(this);
         s.addMouseListener(this);
         s.addKeyListener(this);
         surface.layout();
+        resized();
     }
 
     public void render(GL2 gl) {

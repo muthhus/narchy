@@ -201,8 +201,8 @@ public class Surface {
     }
 
 
-    public static boolean leftButton(@NotNull short[] buttons) {
-        return buttons.length == 1 && buttons[0] == 1;
+    public static boolean leftButton(short[] buttons) {
+        return buttons!=null && buttons.length == 1 && buttons[0] == 1;
     }
 
 

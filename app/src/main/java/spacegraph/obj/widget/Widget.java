@@ -7,18 +7,18 @@ import org.jetbrains.annotations.Nullable;
 import spacegraph.SpaceGraph;
 import spacegraph.Surface;
 import spacegraph.input.Finger;
+import spacegraph.math.v2;
 import spacegraph.obj.Cuboid;
 import spacegraph.obj.layout.Stacking;
 import spacegraph.obj.widget.console.ConsoleTerminal;
 import spacegraph.render.Draw;
-import spacegraph.render.SpaceGraph2D;
 
 import static spacegraph.obj.layout.Grid.*;
 
 /**
  * Base class for GUI widgets, similarly designed to JComponent
  */
-public abstract class Widget extends Stacking {
+public class Widget extends Stacking {
 
     @Nullable Finger touchedBy;
 
@@ -39,6 +39,13 @@ public abstract class Widget extends Stacking {
 //
 //    }
 
+    public Widget() {
+
+    }
+
+    public Widget(Surface... child) {
+        setChildren(child);
+    }
 
     @Override
     protected void paint(GL2 gl) {
@@ -50,10 +57,12 @@ public abstract class Widget extends Stacking {
         }
 
         paintComponent(gl);
+    }
+
+    protected void paintComponent(GL2 gl) {
 
     }
 
-    protected abstract void paintComponent(GL2 gl);
 
 
 //    @Override
@@ -77,6 +86,9 @@ public abstract class Widget extends Stacking {
 
     public void touch(@Nullable Finger finger) {
         touchedBy = finger;
+        if (finger == null) {
+            onTouch(null,null);
+        }
     }
 
 

@@ -442,7 +442,7 @@ public class Tetris extends NAgents {
         nar.termVolumeMax.setValue(16);
         //nar.linkFeedbackRate.setValue(0.05f);
 
-        newTimeWindow(nar);
+        //newTimeWindow(nar);
 
 
 //        Random rng = new XorShift128PlusRandom(1);

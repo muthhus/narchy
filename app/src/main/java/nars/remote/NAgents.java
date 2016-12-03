@@ -38,9 +38,8 @@ import spacegraph.SpaceGraph;
 import spacegraph.Surface;
 import spacegraph.obj.layout.Grid;
 import spacegraph.obj.layout.TileTab;
-import spacegraph.obj.widget.CheckBox;
-import spacegraph.obj.widget.FloatSlider;
-import spacegraph.obj.widget.PushButton;
+import spacegraph.obj.widget.*;
+import spacegraph.obj.widget.Label;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -331,36 +330,34 @@ abstract public class NAgents extends NAgent {
 
             //Vis.conceptsWindow2D(a.nar, Iterables.concat(a.predictors, a.actions, a.sensors) /* a.nar */,64 ,8).show(1000, 800);
             //Vis.conceptsWindow2D(a.nar, 16 ,4).show(1000, 800);
-
-            window( new TileTab(Maps.mutable.of(
-                "x", () -> {
-                    return new PushButton("x");
-                },
-                "y", () -> {
-                    return new PushButton("y");
-                }
-            )), 800, 600);
+//
+//            window( new Widget(new TileTab(Maps.mutable.of(
+//                "x", () -> new PushButton("x"),
+//                "y", () -> new PushButton("y"),
+//                "dsf", () -> grid(new Label("y"), new Label("xy"), new Label("xyzxcv"))
+//            ))), 800, 600);
             window(
-                    grid(
-                            grid(a.cam.values().stream().map(cs ->
+                    new TileTab(Map.of(
+                            "control", () -> new ReflectionSurface(a.nar),
+                            "input", () -> grid(a.cam.values().stream().map(cs ->
                                     new CameraSensorView(cs, nar).align(Surface.Align.Center, cs.width, cs.height))
                                     .toArray(Surface[]::new)),
+                            "inputEdit",()->Vis.newInputEditor(a.nar),
+                            "concepts", ()->
+                                    Vis.treeChart( a.nar, new Bagregate(((Default)a.nar).core.active, 64, 0.05f, 256) , 64),
+                            "conceptBudget", ()->
+                                    Vis.budgetHistogram(nar, 24),
+                            "tasks", ()-> taskChart,
+                            "agent", ()-> Vis.emotionPlots(a.nar, 256),
+                            "agentControl", ()-> new ReflectionSurface(a),
+                            "agentActions", ()-> Vis.agentActions(a, 400),
+                            "agentPredict", ()-> Vis.beliefCharts(400, a.predictors, a.nar)
 
-                            Vis.emotionPlots(a.nar, 256),
+                    )
 
-
-                            Vis.treeChart( a.nar, new Bagregate(((Default)a.nar).core.active, 64, 0.05f, 256) , 64),
-
-                            taskChart,
-
-                            new ReflectionSurface(a),
                             //nar instanceof Default ? Vis.concepts((Default) nar, 128) : grid(/*blank*/),
 
-                            Vis.agentActions(a, 400),
-                            Vis.beliefCharts(400, a.predictors, a.nar),
-                            new ReflectionSurface(a.nar),
 
-                            Vis.budgetHistogram(nar, 24)
                             /*Vis.conceptLinePlot(nar,
                                     Iterables.concat(a.actions, Lists.newArrayList(a.happy, a.joy)),
                                     2000)*/

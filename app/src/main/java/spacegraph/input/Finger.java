@@ -50,17 +50,20 @@ public class Finger {
 
         Surface s = root.onTouch(nextHit, nextButtonDown);
         if (s instanceof Widget) {
-            if (on((Widget)s))
-                return s;
+            if (!on((Widget)s))
+                s = null;
         } else {
-            on(null);
+            s = null;
         }
-        return null;
+
+        if (s!=null)
+            on((Widget)s);
+        return s;
     }
 
     private boolean on(@Nullable Widget touched) {
 
-        if (touching!=null && touched!=touching) {
+        if (touched!=touching && touching!=null) {
             touching.touch(null);
         }
 
@@ -95,7 +98,8 @@ public class Finger {
         } else {*/
             Surface s;
             if ((s = on(v(x, y), buttonsDown))!=null) {
-                e.setConsumed(true);
+                if (e!=null)
+                    e.setConsumed(true);
                 return s;
             }
 

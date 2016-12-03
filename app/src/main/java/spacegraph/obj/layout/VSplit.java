@@ -33,13 +33,13 @@ public class VSplit extends Layout {
         Surface top = top();
         if (top != null) {
             top.scale(1f, proportion);
-            top.translateLocal.set(x, 1f - proportion, 0);
+            top.translateLocal.set(x,  1f - (proportion), 0);
         }
 
         Surface bottom = bottom();
         if (bottom!=null) {
             bottom.scale(1f, 1f - proportion);
-            bottom.translateLocal.set(x, proportion, 0);
+            bottom.translateLocal.set(x, -proportion/2f, 0);
         }
 
     }

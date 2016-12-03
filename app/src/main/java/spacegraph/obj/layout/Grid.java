@@ -45,20 +45,6 @@ public class Grid extends Layout {
         setChildren(children);
     }
 
-    @Override
-    public void transform(GL2 gl, v2 globalScale) {
-        super.transform(gl, globalScale);
-
-        if (!children.isEmpty() && isGrid())  {
-            float xx = scaleLocal.x * globalScale.x;
-            float yy = scaleLocal.y * globalScale.y;
-            if ((lw != xx) || (lh != yy)) {
-                layout();
-                lw = xx;
-                lh = yy;
-            }
-        }
-    }
 
     /** previous scale */
     float lw, lh;
@@ -73,9 +59,23 @@ public class Grid extends Layout {
     }
 
     @Override
-    public void layout() {
+    public void transform(GL2 gl, v2 globalScale) {
+        super.transform(gl, globalScale);
 
-        //lw = lh = Float.NaN; //invalidate to trigger next transform update
+        if (!children.isEmpty() && isGrid())  {
+            float xx = scaleLocal.x * globalScale.x;
+            float yy = scaleLocal.y * globalScale.y;
+            //if ((lw != xx) || (lh != yy)) {
+                layout();
+                lw = xx;
+                lh = yy;
+            //}
+        }
+    }
+
+    @Override
+    public void layout() {
+        super.layout();
 
         int n = children.size();
         if (n == 0)
@@ -173,7 +173,7 @@ public class Grid extends Layout {
     }
 
 
-    public static Grid grid(Iterable<Surface> content) {
+    public static Grid grid(Iterable<? extends Surface> content) {
         return grid( Iterables.toArray(content, Surface.class ) );
     }
 

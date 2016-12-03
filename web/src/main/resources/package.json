@@ -1,5 +1,10 @@
 {
-  "name"    : "narchyjs",
-  "version" : "0.1.0",
-  "main"    : "main.js"
+  "name": "narchyjs",
+  "version": "0.1.0",
+  "main": "main.js",
+  "dependencies": {
+    "hyper": "0.0.2",
+    "hyperterm-window": "^1.0.1",
+    "react": "^15.4.1"
+  }
 }

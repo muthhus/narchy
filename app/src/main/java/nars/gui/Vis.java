@@ -60,6 +60,9 @@ public class Vis {
         new SpaceGraph().add(new Ortho(chart).maximize()).show(800, 600);
     }
 
+    public static Surface newInputEditor(NAR nar) {
+        return new ConsoleTerminal(new ConsoleSurface.EditTerminal(40,6));
+    }
 
     public static Grid agentActions(NAR nar, Iterable<? extends Termed> cc, long window) {
         long[] btRange = new long[2];

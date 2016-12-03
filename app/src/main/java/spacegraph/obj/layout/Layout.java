@@ -52,6 +52,13 @@ abstract public class Layout extends Surface {
     }
 
     protected final Surface onChildTouching(v2 hitPoint, short[] buttons) {
+        if (hitPoint == null) {
+            for (Surface c : children) {
+                c.onTouch(null, null);
+            }
+            return null;
+        }
+
         v2 subHit = new v2();
 
         for (Surface c : children) {
