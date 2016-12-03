@@ -86,7 +86,7 @@ public class BeliefTableChart extends Widget {
 
         //setAutoSwapBufferMode(true);
 
-        n.onFrame(nn -> {
+        n.onCycle(nn -> {
             update();
         });
 
@@ -104,7 +104,7 @@ public class BeliefTableChart extends Widget {
 
     public static List<Surface> beliefTableCharts(NAR nar, Collection<? extends Termed> terms, long window) {
         long[] btRange = new long[2];
-        nar.onFrame(nn -> {
+        nar.onCycle(nn -> {
             long now = nn.time();
             btRange[0] = now - window;
             btRange[1] = now + window;

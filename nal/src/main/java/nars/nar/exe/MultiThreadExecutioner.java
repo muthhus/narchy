@@ -159,8 +159,8 @@ public class MultiThreadExecutioner extends Executioner {
             }
         }*/
 
-        synchronized (nar.eventFrameStart) {
-            Consumer[] vv = nar.eventFrameStart.getCachedNullTerminatedArray();
+        synchronized (nar.eventCycleStart) {
+            Consumer[] vv = nar.eventCycleStart.getCachedNullTerminatedArray();
             if (vv != null) {
                 for (int i = 0; ; ) {
                     Consumer c = vv[i++];

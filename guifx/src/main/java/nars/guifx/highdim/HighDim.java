@@ -411,7 +411,7 @@ public class HighDim<T> extends Spacegraph {
 
             HighDim<BLink<Concept>> dim = new HighDim(64, new AEConcept1());
 
-            n.onFrame(N -> {
+            n.onCycle(N -> {
                 dim.commit(((Default) N).core.active);
                 //System.out.println(dim.node + " free=" + dim.free.size());
             });

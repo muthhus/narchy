@@ -3,12 +3,14 @@ package nars.nal.nal1;
 import nars.$;
 import nars.NAR;
 import nars.Narsese;
+import nars.Op;
 import nars.nar.Default;
 import nars.nar.Terminal;
 import nars.nar.util.Answerer;
 import nars.nar.util.OperationAnswerer;
 import nars.term.Compound;
 import nars.term.Term;
+import nars.term.obj.IntTerm;
 import nars.test.DeductiveMeshTest;
 import nars.test.TestNAR;
 import nars.util.TaskStatistics;
@@ -184,6 +186,24 @@ public class QuestionTest {
 //        assertTrue(withTime.getSum() < 2 * withOutTime.getSum()); //less than half, considering that a search "diameter" becomes a "radius" by providing the answer end-point
     }
 
+
+    @Test public void testMathBackchain() {
+        NAR n = new Default();
+        n.log();
+
+        n.on("odd", a->{
+            if (a.length == 1 && a[0].op()== Op.INT) {
+                return ((IntTerm)a[0]).val() % 2 == 0 ? Term.False : Term.True;
+            }
+            return Term.False;
+        });
+        n.input(
+            "({1,2,3,4} --> number).",
+            "((({$x} --> number) && odd($x)) <=> ODD($x))."
+        );
+        n.run(500);
+
+    }
 
 //    @Test public void testSaneBudgeting() {
 //        Param.DEBUG = true;

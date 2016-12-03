@@ -11,7 +11,6 @@ import nars.term.Term;
 import nars.term.Termed;
 import nars.util.Util;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import spacegraph.SpaceGraph;
 import spacegraph.Surface;
 import spacegraph.obj.Cuboid;
@@ -20,6 +19,7 @@ import spacegraph.phys.Collidable;
 import spacegraph.phys.Dynamic;
 import spacegraph.phys.collision.ClosestRay;
 import spacegraph.render.Draw;
+import spacegraph.render.JoglPhysics;
 
 import java.util.HashMap;
 import java.util.function.Consumer;
@@ -100,8 +100,8 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<BLink<? exte
     }
 
 
-    @Nullable @Override public Surface onTouch(Collidable body, ClosestRay hitPoint, short[] buttons) {
-        Surface s = super.onTouch(body, hitPoint, buttons);
+    @Override public Surface onTouch(Collidable body, ClosestRay hitPoint, short[] buttons, JoglPhysics space) {
+        Surface s = super.onTouch(body, hitPoint, buttons, space);
         if (s!=null) {
 
         }

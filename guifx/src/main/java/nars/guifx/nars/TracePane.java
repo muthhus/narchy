@@ -189,7 +189,7 @@ public abstract class TracePane extends LogPane implements ChangeListener, Consu
     }
     public void appear() {
         if (reg==null && events == null) {
-            reg = nar.eventFrameStart.on(this);
+            reg = nar.eventCycleStart.on(this);
             events = Topic.all(nar, this::output,
                     (k) -> {
                         switch (k) {

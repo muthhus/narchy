@@ -28,7 +28,7 @@ public abstract class ConceptsListPane extends LogPane {
 
         now = n.time();
 
-        n.onFrame(nn-> {
+        n.onCycle(nn-> {
             if (displayed!=null)
                 displayed.forEach(this::update);
         });

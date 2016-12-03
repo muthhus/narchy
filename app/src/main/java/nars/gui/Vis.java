@@ -68,7 +68,7 @@ public class Vis {
 
     public static Grid agentActions(NAR nar, Iterable<? extends Termed> cc, long window) {
         long[] btRange = new long[2];
-        nar.onFrame(nn -> {
+        nar.onCycle(nn -> {
             long now = nn.time();
             btRange[0] = now - window;
             btRange[1] = now + window;
@@ -94,7 +94,7 @@ public class Vis {
 
     public static Grid beliefCharts(long window, List<? extends Termed> ii, NAR nar) {
         long[] btRange = new long[2];
-        nar.onFrame(nn -> {
+        nar.onCycle(nn -> {
             long now = nn.time();
             btRange[0] = now - window;
             btRange[1] = now + window;
@@ -158,7 +158,7 @@ public class Vis {
             }
         };
 
-        n.onFrame(xx -> {
+        n.onCycle(xx -> {
 
             //if (s.window.isVisible()) {
             now[0] = xx.time();
@@ -183,7 +183,7 @@ public class Vis {
             }
         };
 
-        d.onFrame(xx -> {
+        d.onCycle(xx -> {
 
             //if (s.window.isVisible()) {
             tc.update();
@@ -231,7 +231,7 @@ public class Vis {
         }
         grid.layout();
 
-        nar.onFrame(f -> {
+        nar.onCycle(f -> {
             plots.forEach(Plot2D::update);
         });
 
@@ -269,7 +269,7 @@ public class Vis {
         }
         grid.layout();
 
-        nar.onFrame(f -> {
+        nar.onCycle(f -> {
             plots.forEach(Plot2D::update);
         });
 
@@ -304,7 +304,7 @@ public class Vis {
 //                Plot2D plot4 = new Plot2D(plotHistory, Plot2D.Line);
 //                plot4.add("Errr", ()->nar.emotion.errr.getSum());
 
-        nar.onFrame(f -> {
+        nar.onCycle(f -> {
             //plot.update();
             plot1.update();
             plot2.update();

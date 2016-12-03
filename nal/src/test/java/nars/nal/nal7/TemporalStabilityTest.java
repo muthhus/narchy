@@ -20,7 +20,7 @@ abstract public class TemporalStabilityTest {
     public void test(int cycles, @NotNull NAR n) {
 
         //n.log();
-        n.onFrame(f -> {
+        n.onCycle(f -> {
 
             TimeMap m = new TimeMap(n);
             //Set<Between<Long>> times = m.keySetSorted();

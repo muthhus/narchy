@@ -107,7 +107,7 @@ public class DeductiveMeshTest {
         n.logSummaryGT(System.out, 0.1f);
 
 
-        n.onFrame(x -> {
+        n.onCycle(x -> {
             if (n.time() == 1000) {
                 NAR.printActiveTasks(n, true);
                 NAR.printActiveTasks(n, false);

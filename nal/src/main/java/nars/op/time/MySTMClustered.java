@@ -10,7 +10,7 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.truth.TruthFunctions;
 import nars.util.data.MutableInteger;
-import nars.util.event.DefaultTopic;
+import nars.util.event.ArrayTopic;
 import nars.util.event.Topic;
 import org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples;
 import org.jetbrains.annotations.NotNull;
@@ -29,7 +29,7 @@ public class MySTMClustered extends STMClustered {
 
     private static final Logger logger = LoggerFactory.getLogger(MySTMClustered.class);
 
-    public final Topic<Task> generate = new DefaultTopic<>();
+    public final Topic<Task> generate = new ArrayTopic<>();
 
     private final int maxGroupSize;
     private final int maxInputVolume;

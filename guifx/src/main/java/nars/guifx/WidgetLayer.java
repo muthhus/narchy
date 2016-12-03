@@ -48,7 +48,7 @@ public class WidgetLayer extends MDICanvas {
         nar = ide.nar;
 
 
-        nar.onFrame((n) -> runLater(this::update));
+        nar.onCycle((n) -> runLater(this::update));
 
         runLater(this::update);
 

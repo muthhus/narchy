@@ -15,11 +15,14 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 
-/** TODO extend an ImmutableTask class */
+/**
+ * TODO extend an ImmutableTask class
+ */
 abstract public class DerivedTask extends MutableTask {
 
 
-    @Nullable public volatile transient Premise premise;
+    @Nullable
+    public volatile transient Premise premise;
 
     //@Nullable long[] startEnd;
 
@@ -30,7 +33,6 @@ abstract public class DerivedTask extends MutableTask {
 
         time(now, occ);
         evidence(evidence);
-
 
 
 //        if (!isBeliefOrGoal() || tc.term().dt()!=DTERNAL) {
@@ -104,7 +106,6 @@ abstract public class DerivedTask extends MutableTask {
 //    }
 
 
-
     @Override
     public boolean delete() {
         if (super.delete()) {
@@ -130,12 +131,12 @@ abstract public class DerivedTask extends MutableTask {
 
             if (delta == null) {
 
-                negativeFeedback(nar);
+                //negativeFeedback(nar);
 
             } else {
 
                 feedbackToPremiseConcepts(nar);
-                feedbackToPremiseLinks(delta, deltaConfidence, deltaSatisfaction, nar);
+                feedbackToPremiseLinks(deltaConfidence, deltaSatisfaction, nar);
 
             }
 
@@ -144,14 +145,14 @@ abstract public class DerivedTask extends MutableTask {
             }
         }
 
-        private void negativeFeedback(@NotNull NAR nar) {
-            feedback(1f - priIfFiniteElseZero() /* HEURISTIC */, nar);
-            //delete(); //delete will happen soon after this
-        }
+//        private void negativeFeedback(@NotNull NAR nar) {
+//            feedback(1f - priIfFiniteElseZero() /* HEURISTIC */, nar);
+//            //delete(); //delete will happen soon after this
+//        }
 
         private void feedbackToPremiseConcepts(@NotNull NAR nar) {
             Concept thisConcept = concept(nar);
-            if (thisConcept!=null) {
+            if (thisConcept != null) {
                 Premise p;
                 if ((p = premise) != null)
                     feedbackToPremiseConcepts(thisConcept, nar, p.concept);
@@ -162,17 +163,22 @@ abstract public class DerivedTask extends MutableTask {
         }
 
         private void feedbackToPremiseConcepts(@NotNull Concept thisConcept, @NotNull NAR nar, @Nullable Termed p) {
-            if (p!=null) {
+            if (p == null)
+                return;
+
+            boolean tasklinked = Param.DERIVATION_TASKLINKED;
+            boolean termlinked = Param.DERIVATION_TERMLINKED;
+            if (tasklinked || termlinked) {
                 Concept parentConcept = nar.concept(p);
-                if (parentConcept!=null) {
+                if (parentConcept != null) {
 
                     //TODO use CrossLink or other Activation's here?
 
-                    if (Param.DERIVATION_TASKLINKED) {
+                    if (tasklinked) {
                         parentConcept.tasklinks().put(this);
                     }
 
-                    if (Param.DERIVATION_TERMLINKED && !thisConcept.equals(parentConcept)) {
+                    if (termlinked && !thisConcept.equals(parentConcept)) {
                         parentConcept.termlinks().put(thisConcept.term(), budget());
                         thisConcept.termlinks().put(parentConcept.term(), budget());
                     }
@@ -181,46 +187,36 @@ abstract public class DerivedTask extends MutableTask {
             }
         }
 
-        public void feedbackToPremiseLinks(TruthDelta delta, float deltaConfidence, float deltaSatisfaction, @NotNull NAR nar) {
+        public void feedbackToPremiseLinks(float deltaConfidence, float deltaSatisfaction, @NotNull NAR nar) {
 
 
                 /* HEURISTIC */
-                float confBoost = Math.abs(deltaConfidence);
-                float satisBoost =
-                        //Math.abs(deltaSatisfaction);
-                        Math.abs(deltaSatisfaction);
 
-                float boost =
-                        //1f + or(Math.abs(deltaConfidence), Math.abs(deltaSatisfaction));
-                        //1f + deltaConfidence * Math.abs(deltaSatisfaction);
-                        //1f + Math.max(deltaConfidence, deltaSatisfaction);
-                        1f + confBoost/2f + satisBoost/2f;
+            float boost = 0f;
+            boost += nar.linkFeedbackRate.floatValue()/2f * Math.abs(deltaConfidence);
+            boost += nar.linkFeedbackRate.floatValue()/2f * Math.abs(deltaSatisfaction);
 
-                feedback(boost, nar);
+//            float boost =
+//                    //1f + or(Math.abs(deltaConfidence), Math.abs(deltaSatisfaction));
+//                    //1f + deltaConfidence * Math.abs(deltaSatisfaction);
+//                    //1f + Math.max(deltaConfidence, deltaSatisfaction);
+//                    1f + confBoost / 2f + satisBoost / 2f;
 
 
-        }
+            if (!Util.equals(boost, 0f, Param.BUDGET_EPSILON)) {
 
-        void feedback(float score, @NotNull NAR nar) {
+                @Nullable Premise premise1 = this.premise;
+                if (premise1 != null) {
 
-            //reduce the score factor intensity by lerping it closer to 1.0
-            score = Util.lerp(score, 1f, nar.linkFeedbackRate.floatValue());
+                    float b = boost;
 
-            if (!Util.equals(score, 1f, Param.BUDGET_EPSILON)) {
-
-                @Nullable Premise premise = this.premise;
-                if (premise != null) {
-
-                    float b = score;
-
-                    Concept c = nar.concept(premise.concept, b);
+                    Concept c = nar.concept(premise1.concept, b);
 
                     if (c != null) {
-                        c.termlinks().mul(premise.term, b);
+                        c.termlinks().add(premise1.term, b);
                         //c.tasklinks().boost(premise.task, score);
-                        nar.concept(c.term(), b);
+                        //nar.concept(c.term(), b);
                     }
-
 
 
                 }
@@ -228,6 +224,7 @@ abstract public class DerivedTask extends MutableTask {
                 //budget().priMult(score);
 
             }
+
 
         }
 

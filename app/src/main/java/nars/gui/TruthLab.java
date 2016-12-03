@@ -48,7 +48,7 @@ public class TruthLab extends Grid {
         this.concepts = Lists.newArrayList(x);
         this.views = concepts.stream().map(xx -> new ConceptTimeline(xx, showBeliefs)).collect(toList());
 
-        n.onFrame(this::update);
+        n.onCycle(this::update);
 
         update(n);
     }

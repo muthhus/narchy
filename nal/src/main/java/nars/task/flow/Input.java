@@ -75,7 +75,7 @@ public interface Input extends Source<Task> {
             }
         };
 
-        reg[0] = n.eventFrameStart.on(inputNext);
+        reg[0] = n.eventCycleStart.on(inputNext);
 
         inputNext.accept(n);//first input
     }

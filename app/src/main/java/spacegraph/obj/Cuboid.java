@@ -6,6 +6,7 @@ import org.jetbrains.annotations.Nullable;
 import spacegraph.SimpleSpatial;
 import spacegraph.Surface;
 import spacegraph.input.Finger;
+import spacegraph.math.Quat4f;
 import spacegraph.math.v2;
 import spacegraph.math.v3;
 import spacegraph.phys.Collidable;
@@ -13,6 +14,7 @@ import spacegraph.phys.collision.ClosestRay;
 import spacegraph.phys.math.Transform;
 import spacegraph.phys.shape.SimpleBoxShape;
 import spacegraph.render.Draw;
+import spacegraph.render.JoglPhysics;
 
 import static spacegraph.math.v3.v;
 
@@ -77,13 +79,32 @@ public class Cuboid<X> extends SimpleSpatial<X> {
     }
 
     @Override
-    public Surface onTouch(Collidable body, ClosestRay r, short[] buttons) {
+    public Surface onTouch(Collidable body, ClosestRay r, short[] buttons, JoglPhysics space) {
 
         if (body!=null) {
-            Surface s0 = super.onTouch(body, r, buttons);
+
+            //rotate to match camera's orientation (billboarding)
+            Object d = body.data();
+            if (d instanceof SimpleSpatial) {
+                SimpleSpatial sd = (SimpleSpatial)d;
+                //Quat4f target = Quat4f.angle(-space.camFwd.x, -space.camFwd.y, -space.camFwd.z, 0);
+                Quat4f target = new Quat4f();
+                // TODO somehow use the object's local transformation ? sd.transform().getRotation(...);
+                target.setAngle( -space.camFwd.x, -space.camFwd.y, -space.camFwd.z, 0.01f);
+
+                target.normalize();
+
+                //System.out.print("rotating: " + sd.transform().getRotation(new Quat4f()));
+                sd.rotate(target, 0.2f, new Quat4f());
+                //System.out.println("  : " + sd.transform().getRotation(new Quat4f()));
+            }
+
+            Surface s0 = super.onTouch(body, r, buttons, space);
             if (s0 != null)
                 return s0;
         }
+
+
 
             if (front != null) {
                 Transform it = Transform.t(transform()).inverse();

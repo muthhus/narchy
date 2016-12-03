@@ -39,7 +39,7 @@ import nars.time.Time;
 import nars.truth.Truth;
 import nars.util.Iterative;
 import nars.util.data.MutableInteger;
-import nars.util.event.DefaultTopic;
+import nars.util.event.ArrayTopic;
 import nars.util.event.On;
 import nars.util.event.Topic;
 import org.apache.commons.lang3.mutable.MutableFloat;
@@ -91,17 +91,16 @@ import static org.fusesource.jansi.Ansi.ansi;
  */
 public abstract class NAR extends Param implements Level, Consumer<Task>, NARIn, NAROut, Iterative<NAR> {
 
-    public static final Logger logger = LoggerFactory.getLogger(NAR.class);
-
+    static final Logger logger = LoggerFactory.getLogger(NAR.class);
     static final Set<String> logEvents = Sets.newHashSet("eventTaskProcess", "eventAnswer", "eventExecute");
-    public static final String VERSION = "NARchy v?.?";
+    static final String VERSION = "NARchy v?.?";
 
     public final Executioner exe;
     @NotNull
     public final Random random;
-    public final transient Topic<NAR> eventReset = new DefaultTopic<>();
-    public final transient DefaultTopic<NAR> eventFrameStart = new DefaultTopic<>();
-    public final transient Topic<Task> eventTaskProcess = new DefaultTopic<>();
+    public final transient Topic<NAR> eventReset = new ArrayTopic<>();
+    public final transient ArrayTopic<NAR> eventCycleStart = new ArrayTopic<>();
+    public final transient Topic<Task> eventTaskProcess = new ArrayTopic<>();
     @NotNull
     public final transient Emotion emotion;
     @NotNull
@@ -196,13 +195,6 @@ public abstract class NAR extends Param implements Level, Consumer<Task>, NARIn,
 
     @Nullable
     public final Compound normalize(@NotNull Compound t) {
-
-////        //TODO debug only
-//        if (random.nextFloat() < 0.001f) {
-//            logger.info("normalization cache: {}", index.normalizations.summary());
-//            logger.info("term cache: {}", index.terms.summary());
-//        }
-
         return concepts.normalize(t);
     }
 
@@ -250,6 +242,8 @@ public abstract class NAR extends Param implements Level, Consumer<Task>, NARIn,
 
 
         concepts.start(this);
+
+
 
         for (Concept t : Builtin.statik)
             on(t);
@@ -809,7 +803,7 @@ public abstract class NAR extends Param implements Level, Consumer<Task>, NARIn,
     public final On onExecution(@NotNull Atomic op, @NotNull Consumer<OperationConcept> each) {
         On o = concept(op, true)
                 .<Topic<OperationConcept>>meta(Execution.class,
-                        (k, v) -> v != null ? v : new DefaultTopic<>())
+                        (k, v) -> v != null ? v : new ArrayTopic<>())
                 .on(each);
         concepts.set(op);
         //this.on.add(o);
@@ -1147,7 +1141,7 @@ public abstract class NAR extends Param implements Level, Consumer<Task>, NARIn,
         } else {
             //future
 
-            onFrame(m -> {
+            onCycle(m -> {
                 //if (timeCondition.test(m.time())) {
                 if (m.time() == time) {
                     m.input(x);
@@ -1235,7 +1229,7 @@ public abstract class NAR extends Param implements Level, Consumer<Task>, NARIn,
 
     @NotNull
     public NAR stopIf(@NotNull BooleanSupplier stopCondition) {
-        onFrame(n -> {
+        onCycle(n -> {
             if (stopCondition.getAsBoolean()) stop();
         });
         return this;
@@ -1247,23 +1241,23 @@ public abstract class NAR extends Param implements Level, Consumer<Task>, NARIn,
      * must be run per control frame.
      */
     @NotNull
-    public final On onFrame(@NotNull Consumer<NAR> each) {
+    public final On onCycle(@NotNull Consumer<NAR> each) {
         On r;
         /*on.add(*/
-        r = eventFrameStart.on(each);//);
+        r = eventCycleStart.on(each);//);
         return r;
     }
 
     @NotNull
-    public final On onFrame(@NotNull Runnable each) {
-        return onFrame((ignored) -> {
+    public final On onCycle(@NotNull Runnable each) {
+        return onCycle((ignored) -> {
             each.run();
         });
     }
 
     @NotNull
-    public NAR eachFrame(@NotNull Consumer<NAR> each) {
-        onFrame(each);
+    @Deprecated public NAR eachCycle(@NotNull Consumer<NAR> each) {
+        onCycle(each);
         return this;
     }
 
@@ -1346,7 +1340,9 @@ public abstract class NAR extends Param implements Level, Consumer<Task>, NARIn,
         Concept existing = concept(c.term());
         if ((existing !=null) && (existing!=c))
             throw new RuntimeException("concept already indexed for term: " + c.term());
+
         concepts.set(c);
+
         return c;
     }
 
@@ -1390,7 +1386,7 @@ public abstract class NAR extends Param implements Level, Consumer<Task>, NARIn,
      * if the concept is active, returns the Concept while applying the boost factor to its budget
      */
     @Nullable
-    abstract public Concept concept(Termed termed, float boost);
+    abstract public Concept concept(Termed termed, float priToAdd);
 
     @Override
     public final int level() {
@@ -1423,7 +1419,7 @@ public abstract class NAR extends Param implements Level, Consumer<Task>, NARIn,
 
     final ThreadLocal<PriorityAccumulator<Concept>> priorityAccumulatrs = ThreadLocal.withInitial(()->{
         Activation.ObjectFloatHashMapPriorityAccumulator<Concept> aa = new Activation.ObjectFloatHashMapPriorityAccumulator<Concept>();
-        onFrame(f -> {
+        onCycle(f -> {
             Iterable<ObjectFloatPair<Concept>> y = aa.commit();
             if (y!=null) {
                 activationAdd(y, null);

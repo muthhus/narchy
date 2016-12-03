@@ -45,7 +45,7 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
 
             , brightnessToTruth));
 
-        agent.nar.onFrame(this);
+        agent.nar.onCycle(this);
     }
 
 

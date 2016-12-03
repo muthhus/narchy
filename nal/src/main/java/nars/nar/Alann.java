@@ -228,10 +228,10 @@ public class Alann extends NAR {
 
 
     @Override
-    public final Concept concept(@NotNull Termed term, float boost) {
+    public final Concept concept(@NotNull Termed term, float priToAdd) {
         Concept c = concept(term);
         if (c!=null) {
-            cores.get(Math.abs(term.hashCode()) % cores.size()).terms.add(term, boost);
+            cores.get(Math.abs(term.hashCode()) % cores.size()).terms.add(term, priToAdd);
         }
         return c;
     }

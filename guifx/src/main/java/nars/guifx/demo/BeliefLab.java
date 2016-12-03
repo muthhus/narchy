@@ -37,7 +37,7 @@ public class BeliefLab {
 
         Concept c = nar.concept("y:x");
 
-        nar.onFrame(n-> {
+        nar.onCycle(n-> {
 
             //random eternals
             if (enableEternals) {

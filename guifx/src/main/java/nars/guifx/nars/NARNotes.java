@@ -49,7 +49,7 @@ public class NARNotes extends BorderPane {
 
         tasks = new Taskversation<>(n, this::addTask);
 
-        n.onFrame(nn -> {
+        n.onCycle(nn -> {
            tasks.each().forEach(Note::update);
         });
         //TextField filterText = new TextField();

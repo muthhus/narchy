@@ -22,7 +22,7 @@ public class CameraSensorView extends MatrixView implements MatrixView.ViewFunct
         super(cam.width, cam.height);
         this.cam = cam;
         this.nar = nar;
-        nar.onFrame(nn -> {
+        nar.onCycle(nn -> {
             now = nn.time();
             maxConceptPriority = nar instanceof Default ? ((Default) nar).core.active.priMax() : 1; //HACK TODO cache this
         });

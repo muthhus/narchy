@@ -143,7 +143,7 @@ public class ConceptsSource extends GraphSource {
                     /*nar.memory.eventConceptActivated.on(
                             c -> refresh.set(true)
                     ),*/
-                    nar.eventFrameStart.on(h -> {
+                    nar.eventCycleStart.on(h -> {
                         //refresh.set(true);
                         updateGraph();
                     })

@@ -130,16 +130,17 @@ public class DynamicConcept extends CompoundConcept {
             this.beliefOrGoal = beliefOrGoal;
         }
 
-        @Override
-        public TruthDelta add(@NotNull Task input, @NotNull QuestionTable questions, @NotNull CompoundConcept<?> concept, @NotNull NAR nar) {
-            if (input.isInput()) {
-                return super.add(input, questions, concept, nar);
-            } else {
-                //do not insert but report that it was
-                Truth current = ((BeliefTable)tableFor(input.punc())).truth(input.occurrence(), nar.time());
-                return new TruthDelta(current, current);
-            }
-        }
+//might be dangerous because the task will get indexed but never deleted by its concept (this):
+//        @Override
+//        public TruthDelta add(@NotNull Task input, @NotNull QuestionTable questions, @NotNull CompoundConcept<?> concept, @NotNull NAR nar) {
+//            if (input.isInput()) {
+//                return super.add(input, questions, concept, nar);
+//            } else {
+//                //do not insert but report that it was
+//                Truth current = ((BeliefTable)tableFor(input.punc())).truth(input.occurrence(), nar.time());
+//                return new TruthDelta(current, current);
+//            }
+//        }
 
         //        @Override
 //        public TruthDelta add(@NotNull Task input, @NotNull QuestionTable questions, @NotNull CompoundConcept<?> concept, @NotNull NAR nar) {

@@ -14,7 +14,7 @@ public abstract class FrameReaction implements Consumer<NAR> {
     private On reg;
 
     protected FrameReaction(@NotNull NAR n) {
-        reg = n.onFrame(this);
+        reg = n.onCycle(this);
     }
 
     public void off() {

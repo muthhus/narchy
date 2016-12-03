@@ -14,7 +14,7 @@ public class NARPlot extends PlotBox {
     public NARPlot(NAR n, Plot2D... charts) {
         super(charts);
         this.nar = n;
-        n.onFrame((nn) -> update());
+        n.onCycle((nn) -> update());
 
     }
 }

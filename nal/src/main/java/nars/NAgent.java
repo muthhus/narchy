@@ -448,7 +448,7 @@ abstract public class NAgent implements NSense, NAction {
 
         nar.runLater(() -> {
 
-            nar.onFrame(nn -> frame());
+            nar.onCycle(nn -> frame());
         });
         nar.run(cycles);
         return this;

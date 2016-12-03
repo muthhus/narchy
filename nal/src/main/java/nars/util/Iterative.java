@@ -9,5 +9,5 @@ import java.util.function.Consumer;
  * Created by me on 10/20/16.
  */
 public interface Iterative<X> {
-    @NotNull On onFrame(Consumer<X> x);
+    @NotNull On onCycle(Consumer<X> x);
 }

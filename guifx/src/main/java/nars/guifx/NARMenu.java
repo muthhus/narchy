@@ -221,7 +221,7 @@ public class NARMenu extends HBox {
                     new VBox(clockTextField, busyPlot)
             );
 
-            nar.onFrame(n -> {
+            nar.onCycle(n -> {
                 busyPlot.update();
                 String s = clockText();
                 runLater(()->display(s));
@@ -280,7 +280,7 @@ public class NARMenu extends HBox {
             nar = n;
 
             regs = new Ons().add(
-                    n.eventFrameStart.on(nn -> {
+                    n.eventCycleStart.on(nn -> {
                         //System.out.println("frame: " + nn.time());
                         run();
                     }),

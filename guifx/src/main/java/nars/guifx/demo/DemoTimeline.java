@@ -27,7 +27,7 @@ public class DemoTimeline {
                     TaskAxis model = new TaskAxis();
                     HighDim<Task> dim = new HighDim<>(32, model);
 
-                    n.onFrame(N -> {
+                    n.onCycle(N -> {
                         dim.clear();
                         N.forEachConceptTask(true, false, false, false, false, 3, (t) -> {
                             if (!t.isEternal() && dim.hasCapacity())

@@ -32,7 +32,7 @@ public class SingleThreadExecutioner extends Executioner {
             pending.removeFirst().run();
         }
 
-        nar.eventFrameStart.emit(nar);
+        nar.eventCycleStart.emit(nar);
 
     }
 

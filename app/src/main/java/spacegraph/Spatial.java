@@ -8,6 +8,7 @@ import spacegraph.phys.Dynamic;
 import spacegraph.phys.Dynamics;
 import spacegraph.phys.collision.ClosestRay;
 import spacegraph.phys.constraint.TypedConstraint;
+import spacegraph.render.JoglPhysics;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -99,7 +100,7 @@ public abstract class Spatial<X> implements Active {
     }
 
     /** returns true if the event has been absorbed, false if it should continue propagating */
-    public @Nullable Surface onTouch(Collidable body, ClosestRay hitPoint, short[] buttons) {
+    public Surface onTouch(Collidable body, ClosestRay hitPoint, short[] buttons, JoglPhysics space) {
         return null;
     }
 

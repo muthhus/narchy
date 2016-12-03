@@ -352,7 +352,7 @@ public class STMClustered extends STM {
 
         now = nar.time();
 
-        nar.onFrame((nn) -> {
+        nar.onCycle((nn) -> {
             iterate();
         });
     }

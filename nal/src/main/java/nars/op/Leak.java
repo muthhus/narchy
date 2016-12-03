@@ -32,7 +32,7 @@ public abstract class Leak</* TODO: A, */B>  {
         n.onTask(task -> {
             in(task, bag::putLink);
         });
-        n.onFrame(this::next);
+        n.onCycle(this::next);
     }
 
     /** transduce an input to a series of created BLink's to be inserted */

@@ -66,7 +66,7 @@ public class VectorMapTest {
 
         n.run(16);
 
-        n.onFrame(nn -> {
+        n.onCycle(nn -> {
             long t = n.time();
             if (t % 100 != 0) return;
 

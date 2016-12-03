@@ -67,7 +67,7 @@ public class TreeTermIndex extends TermIndex implements Consumer<NAR> {
     @Override
     public void start(@NotNull NAR nar) {
         super.start(nar);
-        nar.onFrame(this);
+        nar.onCycle(this);
     }
 
     //    //1. decide how many items to remove, if any
@@ -208,11 +208,12 @@ public class TreeTermIndex extends TermIndex implements Consumer<NAR> {
     @Override
     public void set(@NotNull Term src, Termed target) {
 
+        @NotNull TermKey k = key(src);
+
         concepts.acquireWriteLock();
         try {
-            @NotNull TermKey k = key(src);
             Termed existing = concepts.get(k); //TODO cache ref to where this resolved to accelerate the put() below
-            if (!(existing instanceof PermanentConcept)) {
+            if (existing!=target && !(existing instanceof PermanentConcept)) {
                 concepts.put(k, target);
             }
         } finally {

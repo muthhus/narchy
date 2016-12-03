@@ -10,9 +10,9 @@ import java.util.function.Consumer;
 /**
  * single-thread synchronous (in-thread) event emitter with direct array access
  */
-public class DefaultTopic<V> extends ArraySharingList<Consumer<V>> implements Topic<V> {
+public class ArrayTopic<V> extends ArraySharingList<Consumer<V>> implements Topic<V> {
 
-    private static final Logger logger = LoggerFactory.getLogger(DefaultTopic.class);
+    private static final Logger logger = LoggerFactory.getLogger(ArrayTopic.class);
 
     //TODO extract this to Topics and a graph metamodel of the events
 
@@ -48,7 +48,7 @@ public class DefaultTopic<V> extends ArraySharingList<Consumer<V>> implements To
 //    }
 
 
-    public DefaultTopic() {
+    public ArrayTopic() {
         super(Consumer[]::new);
         //this.id = id;
         //register(this);

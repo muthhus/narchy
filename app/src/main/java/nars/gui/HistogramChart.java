@@ -37,7 +37,7 @@ public class HistogramChart extends Surface {
         this.dark = dark;
         this.light = light;
 
-        nar.onFrame(nn -> {
+        nar.onCycle(nn -> {
             ((Default) nn).core.active.forEach(c -> {
                 float p = meter.floatValueOf(c);
                 int b = Util.bin(p, bins - 1);

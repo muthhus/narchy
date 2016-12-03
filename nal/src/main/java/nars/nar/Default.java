@@ -122,8 +122,8 @@ public class Default extends NAR {
 
     @Nullable
     @Override
-    public final Concept concept(Termed term, float boost) {
-        return core.active.mul(term, boost);
+    public final Concept concept(Termed term, float priToAdd) {
+        return core.active.add(term, priToAdd);
     }
 
     @Override

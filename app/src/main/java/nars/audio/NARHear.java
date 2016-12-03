@@ -48,7 +48,7 @@ public class NARHear extends NAgent {
         freqInputs.forEach(s -> s.resolution(0.05f));
 
         Autoencoder ae = new Autoencoder(au.data.length, 16, new XorShift128PlusRandom(1));
-        nar.onFrame(f->{
+        nar.onCycle(f->{
             ae.train(au.data, 0.15f, 0.01f, 0.1f, true, true, true);
         });
 

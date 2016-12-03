@@ -2,7 +2,7 @@ package spacegraph.audio;
 
 import com.jogamp.opengl.GL2;
 import nars.util.Util;
-import nars.util.event.DefaultTopic;
+import nars.util.event.ArrayTopic;
 import nars.util.event.Topic;
 import nars.util.signal.OneDHaar;
 import org.eclipse.collections.impl.list.mutable.primitive.FloatArrayList;
@@ -44,7 +44,7 @@ public class WaveCapture implements Runnable {
     /**
      * called when next sample buffer is ready
      */
-    final Topic<WaveCapture> nextReady = new DefaultTopic();
+    final Topic<WaveCapture> nextReady = new ArrayTopic();
 
     /** holds the normalized value of the latest data */
     public float[] dataNorm = new float[freqSamplesPerFrame];

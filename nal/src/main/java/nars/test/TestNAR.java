@@ -190,7 +190,7 @@ public class TestNAR  {
 
         public EarlyExit(int checkResolution) {
             this.checkResolution = checkResolution;
-            nar.onFrame(this);
+            nar.onCycle(this);
         }
 
         @Override

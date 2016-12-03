@@ -70,7 +70,7 @@ public abstract class NARSpace<X extends Term, Y extends Spatial<X>> extends Lis
     @Override
     public void start(SpaceGraph space) {
         this.space = space;
-        on = nar.onFrame(nn -> updateIfNotBusy(this::update));
+        on = nar.onCycle(nn -> updateIfNotBusy(this::update));
     }
 
     protected void update() {

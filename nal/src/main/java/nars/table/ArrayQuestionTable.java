@@ -10,6 +10,8 @@ import nars.concept.Concept;
 import org.eclipse.collections.impl.list.mutable.MultiReaderFastList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Comparator;
 import java.util.Iterator;
@@ -26,6 +28,7 @@ import java.util.function.Consumer;
 public class ArrayQuestionTable  implements QuestionTable, Comparator<Task> {
 
     protected int capacity;
+    static final Logger logger = LoggerFactory.getLogger(ArrayQuestionTable.class);
 
     @NotNull
     private final MultiReaderFastList<Task> list;
@@ -152,7 +155,7 @@ public class ArrayQuestionTable  implements QuestionTable, Comparator<Task> {
             if (Param.DEBUG_ANSWERS && !sameConcept) {
                 //if (q.term().equals(a.term()))
                 //if (!sameConcept) {
-                NAR.logger.debug("Q&A: {}\t{}", q, a);
+                logger.debug("Q&A: {}\t{}", q, a);
                 //} else {
                 //  nar.logger.debug("Q&A: {}\t{}", q, a.truth());
                 //}

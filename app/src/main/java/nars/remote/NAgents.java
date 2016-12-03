@@ -323,7 +323,7 @@ abstract public class NAgents extends NAgent {
             }
 
         }.bag, 16);
-        a.nar.onFrame(f -> taskChart.update());
+        a.nar.onCycle(f -> taskChart.update());
 
         a.nar.runLater(()-> {
 

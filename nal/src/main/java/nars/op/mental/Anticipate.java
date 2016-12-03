@@ -68,7 +68,7 @@ public final class Anticipate {
     public Anticipate(@NotNull NAR nar) {
         this.nar = nar;
 
-        nar.eventFrameStart.on(c -> updateAnticipations());
+        nar.eventCycleStart.on(c -> updateAnticipations());
         nar.eventTaskProcess.on(this::onInput);
     }
 

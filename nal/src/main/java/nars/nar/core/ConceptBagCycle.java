@@ -101,7 +101,7 @@ public class ConceptBagCycle {
 
 
         //nar.onFrame(this);
-        nar.onFrame((n) -> {
+        nar.onCycle((n) -> {
             if (busy.compareAndSet(false, true)) {
 
                 //updae concept bag

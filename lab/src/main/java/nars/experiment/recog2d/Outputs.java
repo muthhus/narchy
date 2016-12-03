@@ -140,7 +140,7 @@ public class Outputs {
 
 
 
-        a.nar.onFrame(nn -> {
+        a.nar.onCycle(nn -> {
             long now = nar.time();
             out.forEach((cc, nnn) -> {
 

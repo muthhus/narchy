@@ -185,7 +185,7 @@ public class Recog2D extends NAgents {
                     }
                 }).toArray(Surface[]::new)));
 
-        nar.onFrame(() -> {
+        nar.onCycle(() -> {
 
             if (nar.time() % imagePeriod == 0) {
                 nextImage();

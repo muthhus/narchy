@@ -347,7 +347,7 @@ abstract public class JoglPhysics<X> extends JoglSpace implements GLEventListene
 
 
     protected void clear() {
-        clearMotionBlur(0.5f);
+        clearMotionBlur(0.35f);
 
     }
 
@@ -361,15 +361,15 @@ abstract public class JoglPhysics<X> extends JoglSpace implements GLEventListene
 //        gl.glClear(GL.GL_DEPTH_BUFFER_BIT | GL.GL_COLOR_BUFFER_BIT);
 
         //if(i == 0)
-        gl.glAccum(GL2.GL_LOAD, 0.5f);
+        gl.glAccum(GL2.GL_LOAD, rate);
         //else
-        gl.glAccum(GL2.GL_ACCUM, 0.5f);
+        gl.glAccum(GL2.GL_ACCUM, 1f-rate);
 
 //        i++;
 //
 //        if(i >= n) {
 //            i = 0;
-        gl.glAccum(GL2.GL_RETURN, 0.75f);
+        gl.glAccum(GL2.GL_RETURN, rate);
         gl.glClear(GL.GL_DEPTH_BUFFER_BIT);
         //gl.glSwapBuffers();
 //            wait_until_next(timestep);

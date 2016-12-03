@@ -102,7 +102,7 @@ public class PixelAutoClassifier extends Autoencoder implements Consumer<NAR> {
             }
         }
 
-        agent.nar.onFrame(this);
+        agent.nar.onCycle(this);
 
     }
 
