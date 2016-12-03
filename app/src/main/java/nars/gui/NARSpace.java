@@ -38,16 +38,11 @@ public abstract class NARSpace<X extends Term, Y extends Spatial<X>> extends Lis
     //private final ConceptFilter eachConcept = new ConceptFilter();
 
 
-    public NARSpace() {
+
+    public NARSpace(NAR nar) {
         super();
         this.next =
                 new LinkedHashSet<>();
-                //new UnifiedSet<>(capacity*2, 0.9f);
-
-    }
-
-    public NARSpace(NAR nar) {
-        this();
         this.nar = nar;
     }
 

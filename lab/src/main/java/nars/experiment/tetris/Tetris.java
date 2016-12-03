@@ -6,6 +6,8 @@ import nars.concept.ActionConcept;
 import nars.concept.SensorConcept;
 import nars.experiment.tetris.impl.TetrisState;
 import nars.experiment.tetris.impl.TetrisVisualizer;
+import nars.gui.ConceptWidget;
+import nars.gui.NARSpace;
 import nars.remote.NAgents;
 import nars.term.Compound;
 import nars.term.atom.Atomic;
@@ -13,10 +15,17 @@ import nars.time.FrameTime;
 import nars.truth.Truth;
 import nars.util.TaskStatistics;
 import org.jetbrains.annotations.NotNull;
+import spacegraph.LogIndex;
+import spacegraph.SimpleSpatial;
+import spacegraph.SpaceGraph;
+import spacegraph.Spatial;
+import spacegraph.index.Rect1D;
+import spacegraph.layout.Flatten;
 import spacegraph.math.v2;
 import spacegraph.obj.widget.MatrixView;
 import spacegraph.render.Draw;
 
+import java.util.Collection;
 import java.util.List;
 
 import static nars.experiment.tetris.impl.TetrisState.*;
@@ -49,21 +58,21 @@ public class Tetris extends NAgents {
     public class View {
 
         public TetrisVisualizer vis;
-        public MatrixView vis2 = new MatrixView(tetris_width, tetris_height, (x,y,gl)->{
+        public MatrixView vis2 = new MatrixView(tetris_width, tetris_height, (x, y, gl) -> {
             float r = nar.priority(concept[x][y]);
             gl.glColor3f(r, 0, 0);
             return 0f;
         });
-        public MatrixView vis3 = new MatrixView(tetris_width, tetris_height, (x,y,gl)->{
+        public MatrixView vis3 = new MatrixView(tetris_width, tetris_height, (x, y, gl) -> {
             float r = concept[x][y].beliefFreq(now, 0.5f);
             gl.glColor3f(0, 0, r);
             return 0f;
         });
-        public MatrixView vis4 = new MatrixView(tetris_width, tetris_height, (x,y,gl)->{
+        public MatrixView vis4 = new MatrixView(tetris_width, tetris_height, (x, y, gl) -> {
             long then = (long) (now + dur * 8);
             Draw.colorPolarized(gl,
                     concept[x][y].beliefFreq(then, 0.5f) -
-                            concept[x][y].beliefFreq(now, 0.5f) );
+                            concept[x][y].beliefFreq(now, 0.5f));
             return 0f;
         });
 //        public MatrixView vis4 = new MatrixView(tetris_width, tetris_height, (x,y,gl)->{
@@ -150,7 +159,6 @@ public class Tetris extends NAgents {
     }
 
 
-
     public static void actions(NAR nar, TetrisState state, List<ActionConcept> actions) {
         float alpha = nar.confidenceDefault('.');
 
@@ -187,26 +195,26 @@ public class Tetris extends NAgents {
         }));
 
         //if (rotate) {
-            actions.add(new ActionConcept("rotate(tetris)", nar, (b, d) -> {
-                if (d != null) {
-                    float r = d.freq();
-                    if (r > actionThresholdHigh) {
-                        if (state.take_action(CW))
-                            //return d; //legal move
-                            //return d.withConf(gamma);
-                            return $.t(1, alpha);
-                    } else if (r < actionThresholdLow) {
-                        if (state.take_action(CCW))
-                            //return d; //legal move
-                            //return d.withConf(gamma);
-                            return $.t(0, alpha);
-                    } else {
-                        //return $.t(0.5f, alpha); //no action taken or move ineffective
-                    }
+        actions.add(new ActionConcept("rotate(tetris)", nar, (b, d) -> {
+            if (d != null) {
+                float r = d.freq();
+                if (r > actionThresholdHigh) {
+                    if (state.take_action(CW))
+                        //return d; //legal move
+                        //return d.withConf(gamma);
+                        return $.t(1, alpha);
+                } else if (r < actionThresholdLow) {
+                    if (state.take_action(CCW))
+                        //return d; //legal move
+                        //return d.withConf(gamma);
+                        return $.t(0, alpha);
+                } else {
+                    //return $.t(0.5f, alpha); //no action taken or move ineffective
                 }
-                return $.t(0.5f, alpha); //no action taken or move ineffective
-                //return null;
-            }));
+            }
+            return $.t(0.5f, alpha); //no action taken or move ineffective
+            //return null;
+        }));
 //        } else {
 //            motorRotate = null;
 //        }
@@ -231,18 +239,18 @@ public class Tetris extends NAgents {
                         //$.p(x, y);
 
                         $.inh(
-                        //$.func(
+                                //$.func(
                                 $.p(
 //                                  $.pRecurse($.radixArray(x, PIXEL_RADIX, state.width)), $.pRecurse($.radixArray(y, PIXEL_RADIX, state.height))
-                                  //$.p($.radixArray(x, PIXEL_RADIX, state.width)), $.p($.radixArray(y, PIXEL_RADIX, state.height))
-                                    x,y
+                                        //$.p($.radixArray(x, PIXEL_RADIX, state.width)), $.p($.radixArray(y, PIXEL_RADIX, state.height))
+                                        x, y
                                 ),
                                 tetris
                         )
-                                //$.p(
-                                        //$.the("tetris"))
-                                        //, $.the(state.time)))
-                                ;
+                        //$.p(
+                        //$.the("tetris"))
+                        //, $.the(state.time)))
+                        ;
 
                 //$.p($.pRadix(x, 4, state.width), $.pRadix(y, 4, state.height));
                 int index = yy * state.width + xx;
@@ -255,7 +263,7 @@ public class Tetris extends NAgents {
 
                 )
                         //timing(0, visionSyncPeriod)
-                ;
+                        ;
 
 //                FloatSupplier defaultPri = s.sensor.pri;
 //                s.pri( () -> defaultPri.asFloat() * 0.25f );
@@ -389,6 +397,43 @@ public class Tetris extends NAgents {
     }
 
 
+    public static void newTimeWindow(NAR n) {
+        LogIndex li = new LogIndex();
+
+        final int cap = 90;
+        long start = System.currentTimeMillis();
+        long end = start + 5000;
+        float width = 2f;
+        SpaceGraph s = new SpaceGraph(
+                new NARSpace(n) {
+                    @Override
+                    protected void get(Collection displayNext) {
+                        li.search(new Rect1D.DefaultRect1D(start, end), x -> {
+                            if (displayNext.size() > cap) {
+                                return false;
+                            }
+                            Spatial w = space.getOrAdd(x, t -> new ConceptWidget(n, $.the(t.toString()), 1));
+
+                            ((SimpleSpatial)w).moveX((-0.5f + (float)(x.from() - start)/(end-start)) * width, 0.8f);
+                            //((SimpleSpatial)w).moveY(0, 0.4f);
+                            //((SimpleSpatial)w).moveZ(0, 0.4f);
+                            displayNext.add(w);
+                            return true;
+                        });
+                    }
+                }.with(
+                        new Flatten()
+                        //new Spiral()
+                        //new FastOrganicLayout()
+                )
+        );
+//        ForceDirected forceDirect = new ForceDirected();
+//        //forceDirect.repelSpeed = 0.5f;
+//        s.dyn.addBroadConstraint(forceDirect);
+
+
+        s.show(1300, 900);
+    }
 
     public static void main(String[] args) {
         //Param.DEBUG = true;
@@ -396,6 +441,9 @@ public class Tetris extends NAgents {
         NAR nar = NAgents.newMultiThreadNAR(4, new FrameTime().dur(TIME_PER_FALL));
         nar.termVolumeMax.setValue(16);
         //nar.linkFeedbackRate.setValue(0.05f);
+
+        newTimeWindow(nar);
+
 
 //        Random rng = new XorShift128PlusRandom(1);
 //        //Multi nar = new Multi(3,512,
@@ -500,7 +548,7 @@ public class Tetris extends NAgents {
         t.trace = true;
 
 
-        t.runRT(20f, 1000).join();
+        t.runRT(20f, 10).join();
 
 //        NARController meta = new NARController(nar, loop, t);
 //
@@ -509,7 +557,6 @@ public class Tetris extends NAgents {
 //                newBeliefChart(meta, 200)
 //
 //        ));
-
 
 
         //nar.stop();
@@ -521,6 +568,7 @@ public class Tetris extends NAgents {
         //NAR.printActiveTasks(nar, false);
         nar.printConceptStatistics();
         new TaskStatistics().add(nar).print();
+
 
         //NAR.printTasks(meta.nar, true);
         //NAR.printTasks(meta.nar, false);

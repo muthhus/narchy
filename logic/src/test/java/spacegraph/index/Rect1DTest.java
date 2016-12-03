@@ -4,7 +4,7 @@ import org.eclipse.collections.impl.list.mutable.primitive.DoubleArrayList;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.util.Arrays;
+import static org.junit.Assert.assertEquals;
 
 /**
  * Created by me on 12/2/16.
@@ -13,7 +13,7 @@ public class Rect1DTest {
     @Test
     public void centroidTest() {
 
-        Rect1D rect = new Rect1D(0, 4);
+        Rect1D rect = new Rect1D.DefaultRect1D(0, 4);
 
         HyperPoint centroid = rect.getCentroid();
         double x = centroid.getCoord(0);
@@ -31,7 +31,7 @@ public class Rect1DTest {
         final int entryCount = 20;
 
         //for (RTree.Split type : RTree.Split.values()) {
-            RTree<Double> t = new RTree<Double>((x)->new Rect1D(x,x), 2, 3, RTree.Split.LINEAR);
+            RTree<Double> t = new RTree<>((x) -> new Rect1D.DefaultRect1D(x, x), 2, 3, RTree.Split.LINEAR);
             for (int i = 0; i < entryCount; i++) {
                 t.add((double)(i*i));
             }
@@ -42,7 +42,9 @@ public class Rect1DTest {
             System.out.println(s);
 
             DoubleArrayList d = new DoubleArrayList();
-            t.search(new Rect1D(1, 101), d::add);
+            t.search(new Rect1D.DefaultRect1D(1, 101), d::add);
+
+            assertEquals(10, d.size());
 
             System.out.println(d);
 

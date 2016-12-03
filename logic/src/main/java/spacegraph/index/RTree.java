@@ -34,7 +34,7 @@ import java.util.function.Predicate;
  * <p>
  * Created by jcairns on 4/30/15.</p>
  */
-public final class RTree<T> implements SpatialSearch<T> {
+public class RTree<T> implements SpatialSearch<T> {
     private static final double EPSILON = 1e-12;
 
     private final int mMin;

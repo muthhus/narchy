@@ -79,7 +79,14 @@ public class SimpleSpatial<X> extends AbstractSpatial<X> {
         v3 center = transform();
         move(Util.lerp(x, center.x, rate), center.y, center.z);
     }
-    //TODO moveY
+
+
+    public void moveY(float y, float rate) {
+        v3 center = transform();
+        move(center.x, Util.lerp(y, center.y, rate), center.z);
+    }
+
+
     public void moveZ(float z, float rate) {
         v3 center = transform();
         move(center.x, center.y, Util.lerp(z, center.z, rate));

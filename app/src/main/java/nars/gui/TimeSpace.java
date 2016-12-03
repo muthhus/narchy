@@ -23,7 +23,7 @@
 //import java.util.function.Function;
 //
 //
-//public class TimeSpace extends NARSpace3D<Term> implements TriConsumer<NAR, SpaceGraph, List<Spatial>>, Function<Object,Spatial> {
+//public class TimeSpace extends NARSpace {
 //
 //    final IntervalTree<Long,Object> data = new IntervalTree<>();
 //    private final int capacity;
@@ -31,6 +31,11 @@
 //    private long minT, maxT;
 //    float dx = 1f;
 //    private long now;
+//
+//    @Override
+//    protected void get(Collection displayNext) {
+//
+//    }
 //
 //    public static void main(String[] args) {
 //

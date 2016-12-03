@@ -4,36 +4,36 @@ import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.AppenderBase;
 
 abstract public class DefaultConsoleAppender extends AppenderBase<ILoggingEvent> {
-  static int DEFAULT_LIMIT = 16;
-  int counter;
-  int limit = DEFAULT_LIMIT;
+//  static int DEFAULT_LIMIT = 16;
+//  int counter;
+//  int limit = DEFAULT_LIMIT;
   
   //PatternLayoutEncoder encoder;
-  
-  public void setLimit(int limit) {
-    this.limit = limit;
-  }
-
-  public int getLimit() {
-    return limit;
-  }
-  
-  @Override
-  public void start() {
-//    if (this.encoder == null) {
-//      addError("No encoder set for the appender named ["+ name +"].");
-//      return;
-//    }
 //
-//    try {
-//      encoder.init(System.out);
-//    } catch (IOException e) {
-//    }
-    super.start();
-  }
+//  public void setLimit(int limit) {
+//    this.limit = limit;
+//  }
+//
+//  public int getLimit() {
+//    return limit;
+//  }
+  
+//  @Override
+//  public void start() {
+////    if (this.encoder == null) {
+////      addError("No encoder set for the appender named ["+ name +"].");
+////      return;
+////    }
+////
+////    try {
+////      encoder.init(System.out);
+////    } catch (IOException e) {
+////    }
+//    super.start();
+//  }
 
-  @Override
-  abstract public void append(ILoggingEvent event);
+//  @Override
+//  abstract public void append(ILoggingEvent event);
 
 //    if (counter >= limit) {
 //      return;

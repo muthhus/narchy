@@ -36,8 +36,8 @@ abstract public class Layout extends Surface {
 
     public void setChildren(List<Surface> children) {
         if (!Objects.equals(this.children, children)) {
-            this.children = children;
-            layout();
+            if ((this.children = children)!=null)
+                layout();
         }
     }
 
