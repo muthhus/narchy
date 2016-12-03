@@ -12,6 +12,7 @@ import nars.test.DeductiveMeshTest;
 import nars.test.TestNAR;
 import nars.util.TaskStatistics;
 import org.jetbrains.annotations.NotNull;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -184,7 +185,8 @@ public class QuestionTest {
     }
 
 
-    @Test public void testMathBackchain() {
+    @Test @Ignore
+    public void testMathBackchain() {
         NAR n = new Default();
         n.log();
 
@@ -201,12 +203,12 @@ public class QuestionTest {
             "({1,2,3,4} --> number).",
             "((({#x} --> number) && odd(#x)) ==> ({#x} --> ODD)).",
             "((({#x} --> number) && --odd(#x)) ==> ({#x} --> EVEN)).",
-            "(#x --> ODD)?",
-            "(#x --> EVEN)?",
-            "(1 --> ODD)?",
-            "(1 --> EVEN)?",
-            "(2 --> ODD)?",
-            "(2 --> EVEN)?"
+            "({#x} --> ODD)?",
+            "({#x} --> EVEN)?"
+//            "(1 --> ODD)?",
+//            "(1 --> EVEN)?",
+//            "(2 --> ODD)?",
+//            "(2 --> EVEN)?"
         );
         n.run(2500);
 

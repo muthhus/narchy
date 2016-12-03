@@ -337,9 +337,11 @@
         S, ((--,%P)<->S), task(negative)  |- (--,%P), (Goal:StrongN)
 
 //desire spreading by equivalence
-     S, (S<=>P) |- P, (Goal:Strong)
-        S, (S<=>P), task(negative)  |- (--,%P), (Goal:StrongN)
-        S, ((--,%S)<=>P), task(negative)  |- P, (Goal:StrongN)
+     S, (S<=>P), task(positive), belief(positive) |-      P,  (Goal:Strong)
+     S, (S<=>P), task(positive), belief(negative) |- (--,%P), (Goal:StrongN)
+     S, (S<=>P), task(negative), belief(positive) |- (--,%P), (Goal:StrongN)
+     S, (S<=>P), task(negative), belief(negative) |- (--,%P), (Goal:Strong)
+
 
 
 

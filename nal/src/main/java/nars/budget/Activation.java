@@ -181,7 +181,7 @@ public class Activation {
                 @NotNull TermContainer ttt = targetConcept.templates();
                 int n = ttt.size();
                 if (n > 0) {
-                    float subScale1 = subScale / n;
+                    float subScale1 = /*Param.TERMLINK_TEMPLATE_PRIORITY_FACTOR **/ subScale / n;
                     if (subScale1 >= minScale) { //TODO use a min bound to prevent the iteration ahead of time
                         for (int i = 0; i < n; i++)
                             link(targetConcept, ttt.term(i), subScale1, depth + 1); //Link the peer termlink bidirectionally

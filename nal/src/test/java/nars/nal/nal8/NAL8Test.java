@@ -237,9 +237,8 @@ public class NAL8Test extends AbstractNALTest {
     @Test public void goal_deduction_equi_neg_posneg()  {
 
         test()
-                
                 .input("--(R)! :|:")
-                .input("((S) <=>+5 --(R)).") //internally, this reduces to --(S ==> R)
+                .input("((S) <=>+5 --(R)).") //internally, this reduces to --(S <=> R)
                 .mustDesire(cycles, "(S)", 1.0f, 0.81f, -5);
 
     }
@@ -953,16 +952,22 @@ public class NAL8Test extends AbstractNALTest {
                 .log()
                 .input("--(R)!")
                 .input("((G) <-> (R)).")
-                .mustDesire(cycles, "(G)", 0.0f, 0.81f); //mustNotActualy because <-> isnt symmetric
+                .mustNotOutput(cycles, "(G)", '!', ETERNAL); // because <-> isnt symmetric
     }
 
-
+    @Test public void testPosGoalEquivalenceSpreading() {
+        test()
+                .log()
+                .input("(R)!")
+                .input("((G) <=> (R)).")
+                .mustDesire(cycles, "(G)", 1.0f, 0.81f);
+    }
     @Test public void testNegatedGoalEquivalenceSpreading() {
         test()
                 .log()
                 .input("--(R)!")
                 .input("((G) <=> (R)).")
-                .mustDesire(cycles, "(G)", 0.0f, 0.81f); //but here yes
+                .mustDesire(cycles, "(G)", 0.0f, 0.81f);
     }
 
     @Test public void testNegatedSubtermGoalSimilaritySpreading() {

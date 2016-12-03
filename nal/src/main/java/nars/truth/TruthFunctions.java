@@ -236,6 +236,11 @@ public final class TruthFunctions extends UtilityFunctions {
         return t(f, c);
     }
 
+    public static float freqSimilarity(float aFreq, float bFreq) {
+
+        return 1f - Math.abs(aFreq - bFreq);
+    }
+
     /**
      * A function specially designed for desire value [To be refined]
      */
@@ -246,9 +251,7 @@ public final class TruthFunctions extends UtilityFunctions {
         return c < minConf ? null : desire(aFreq, bFreq, c);
     }
 
-    public static float freqSimilarity(float aFreq, float bFreq) {
-        return 1f-Math.abs(aFreq - bFreq);
-    }
+
 
     /**
      * A function specially designed for desire value [To be refined]
