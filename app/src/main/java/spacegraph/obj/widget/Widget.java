@@ -7,7 +7,6 @@ import org.jetbrains.annotations.Nullable;
 import spacegraph.SpaceGraph;
 import spacegraph.Surface;
 import spacegraph.input.Finger;
-import spacegraph.math.v2;
 import spacegraph.obj.Cuboid;
 import spacegraph.obj.layout.Stacking;
 import spacegraph.obj.widget.console.ConsoleTerminal;
@@ -50,13 +49,23 @@ public class Widget extends Stacking {
     @Override
     protected void paint(GL2 gl) {
 
+//        /*if (Param.DEBUG)*/ {
+//            Draw.colorHash(gl, hashCode(), 0.5f);
+//            String s = "g:" + scaleGlobal;
+//            Draw.text(gl, s, 0.025f, 0.5f, 0, 0);
+//            String s2 = "l:" + scaleLocal;
+//            Draw.text(gl, s2, 0.025f, 0.5f, 1f, 0);
+//        }
+
         if (touchedBy != null) {
-            gl.glColor3f(1f, 1f, 0f);
+            Draw.colorHash(gl, getClass().hashCode(), 0.5f);
+            //gl.glColor3f(1f, 1f, 0f);
             gl.glLineWidth(4);
             Draw.rectStroke(gl, 0, 0, 1, 1);
         }
 
         paintComponent(gl);
+
     }
 
     protected void paintComponent(GL2 gl) {

@@ -2,7 +2,6 @@ package spacegraph;
 
 import com.jogamp.newt.event.KeyEvent;
 import com.jogamp.opengl.GL2;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import spacegraph.math.v2;
 import spacegraph.math.v3;
@@ -17,6 +16,7 @@ import java.util.List;
 public class Surface {
 
 
+    protected v2 scaleGlobal;
 
     public enum Align {
 
@@ -114,10 +114,12 @@ public class Surface {
 
     public final void render(GL2 gl, v2 globalScale) {
 
+
         v2 s = this.scaleLocal;
         float scaleX = s.x;
         if (scaleX != scaleX || scaleX <= 0)
             return; //invisible
+
 
         gl.glPushMatrix();
 
@@ -129,10 +131,12 @@ public class Surface {
 
         List<? extends Surface> cc = children();
         if (cc != null) {
-            v2 childGlobal = new v2(globalScale);
+            v2 childGlobal = new v2(this.scaleGlobal);
             childGlobal.scale(s);
             for (int i = 0, childrenSize = cc.size(); i < childrenSize; i++) {
-                cc.get(i).render(gl, childGlobal);
+                Surface ss = cc.get(i);
+                if (s!=null)
+                    ss.render(gl, childGlobal);
             }
         }
 
@@ -147,6 +151,8 @@ public class Surface {
     public void transform(GL2 gl, v2 globalScale) {
         final Surface c = this;
 
+        this.scaleGlobal = globalScale;
+
         v3 translate = c.translateLocal;
 
         v2 scale = c.scaleLocal;
@@ -154,29 +160,25 @@ public class Surface {
         float sx, sy;
 
         if (Float.isFinite(aspect)) {
-            //float globalAspect = globalScale.y / globalScale.x;
-            //float apparentAspect = (globalScale.y * scale.y) / (globalScale.x * scale.x);
+            float globalAspect = globalScale.y / globalScale.x;
+            float targetAspect = aspect/globalAspect;
+            if (targetAspect < 1) {
+//                //wider, shrink y
+                //System.out.println(this + " " + globalScale + " " + apparentAspect + " "+  targetAspect );
 
-            //float correction = ((scale.y) / (scale.x)) / aspect;
+                //sy = scale.y / targetAspect;
+                sx = scale.x;
+                sy = scale.y * targetAspect;
+                //System.out.println("   " + this + " " + globalScale + " " + (sy/sx) + "<- " + sx + "," + sy );
 
-            //if ((scale.y / scale.x) > aspect) {
-//            float gAspect =
-//                    globalScale.y / globalScale.x;
-//                    //1f;
-////            float wAspect = gAspect * aspect;
-//            float aspect = this.aspect * (scale.y / scale.x) * gAspect;
-//            if (aspect < 1) {
-//                //sx = sy = scale.y * sa;
-//                sy = scale.y * aspect;
-//                sx = scale.x * aspect;
-//            } else {
-//                sx = scale.x / aspect;
-//                sy = scale.y / aspect;
-//            }
+            } else {
+                //sy = scale.y;
+                //sx = scale.y / targetAspect;
+                sx = scale.x / targetAspect;
+                sy = scale.y;
+            }
 
-            //consume entire area, regardless of aspect
-            sx = scale.x;
-            sy = scale.y;
+
         } else {
             //consume entire area, regardless of aspect
             sx = scale.x;

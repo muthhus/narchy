@@ -32,14 +32,12 @@ import nars.util.data.random.XorShift128PlusRandom;
 import nars.video.*;
 import objenome.O;
 import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunction;
-import org.eclipse.collections.impl.factory.Maps;
 import org.jetbrains.annotations.NotNull;
 import spacegraph.SpaceGraph;
 import spacegraph.Surface;
 import spacegraph.obj.layout.Grid;
-import spacegraph.obj.layout.TileTab;
+import spacegraph.obj.layout.TabPane;
 import spacegraph.obj.widget.*;
-import spacegraph.obj.widget.Label;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -337,7 +335,7 @@ abstract public class NAgents extends NAgent {
 //                "dsf", () -> grid(new Label("y"), new Label("xy"), new Label("xyzxcv"))
 //            ))), 800, 600);
             window(
-                    new TileTab(Map.of(
+                    new TabPane(Map.of(
                             "control", () -> new ReflectionSurface(a.nar),
                             "input", () -> grid(a.cam.values().stream().map(cs ->
                                     new CameraSensorView(cs, nar).align(Surface.Align.Center, cs.width, cs.height))

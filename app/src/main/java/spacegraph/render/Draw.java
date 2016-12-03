@@ -697,9 +697,16 @@ public enum Draw {
         }
         gl.glColor3f(r, g, b);
     }
-
     public static void colorHash(Object x, float[] color) {
-        Draw.hsb((x.hashCode()%500) / 500f * 360.0f, 0.7f, 0.7f, 1f, color);
+        colorHash(x.hashCode(), color, 1f);
+    }
+    public static void colorHash(int hash, float[] color, float alpha) {
+        Draw.hsb((hash%500) / 500f * 360.0f, 0.7f, 0.7f, alpha, color);
+    }
+    public static void colorHash(GL2 gl, int hash, float alpha) {
+        float[] f = new float[4];
+        colorHash(hash, f, alpha);
+        gl.glColor4fv(f, 0);
     }
 
 
@@ -961,10 +968,14 @@ public enum Draw {
     }
 
     public static void text(GL2 gl, CharSequence s, float scale, float x, float y, float z) {
-        text(gl, s, scale, x, y, z, TextAlignment.Center);
+        text(gl, s, scale, scale, x, y, z, TextAlignment.Center);
     }
 
     public static void text(GL2 gl, CharSequence s, float scale, float x, float y, float z, TextAlignment a) {
+        text(gl, s, scale, scale, x, y, z, a);
+    }
+
+    public static void text(GL2 gl, CharSequence s, float scaleX, float scaleY, float x, float y, float z, TextAlignment a) {
 //        int l = s.length();
 //
 //
@@ -996,7 +1007,7 @@ public enum Draw {
         if (sl == 0)
             return;
 
-        float totalWidth = sl * scale;
+        float totalWidth = sl * scaleX;
         switch (a) {
             case Left:
                 //nothing
@@ -1011,7 +1022,7 @@ public enum Draw {
 
         push(gl);
 
-        textStart(gl, scale, scale, x, y, z);
+        textStart(gl, scaleX, scaleY, x, y, z);
 
         for (int i = 0; i < sl; i++) {
             textNext(gl, s.charAt(i), i);
@@ -1025,7 +1036,7 @@ public enum Draw {
     }
 
     public static void text(GL2 gl, char c, float scale, float x, float y, float z) {
-        text(gl, c, scale, scale/1.25f, x, y, z);
+        text(gl, c, scale, scale, x, y, z);
     }
 
     public static void text(GL2 gl, char c, float scaleX, float scaleY, float x, float y, float z) {
@@ -1053,10 +1064,8 @@ public enum Draw {
     /** call glPush before this, and after all textNext's. returns the character width to translate by to display the next character (left to right direction) */
     public static void textStart(GL2 gl, float scaleX, float scaleY, float x, float y, float z) {
 
-        float sx = scaleX / 16f;
-        float sy = scaleY / 20f;
         gl.glTranslatef(x, y, z);
-        gl.glScalef(sx, sy, 1f);
+        gl.glScalef(scaleX/20f, scaleY/20f, 1f);
     }
 
     public static void textNext(GL2 gl, char c, float x) {

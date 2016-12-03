@@ -26,7 +26,7 @@ public class Label extends Surface {
         gl.glColor4f(1f,1f,1f,1f); //TODO color params
         gl.glLineWidth(1.5f);
         float dz = 0.1f;
-        Draw.text(gl, value(), fontScale, 0.5f, 0.5f, dz);
+        Draw.text(gl, value(), fontScale, 1f, 0.5f, 0.5f, dz, Draw.TextAlignment.Center);
     }
 
     public void set(String newValue) {
@@ -35,10 +35,10 @@ public class Label extends Surface {
         this.value = newValue;
         int len = newValue.length();
         this.fontScale =
-                1f / (0.5f + len);
+                1f / (len);
                 //0.5f;
-                //1f;
-        align(Align.Center, 1.5f / len);
+                //0.5f;
+        align(Align.Center, 1.25f / len);
                 //0.5f; //(1f/ConsoleSurface.fontWidth)/value.length();
 //        if (len > 0) {
 //            this.aspect = 0.5f; ///0.5f / len;

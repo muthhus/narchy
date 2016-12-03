@@ -24,6 +24,7 @@ public class Grid extends Layout {
     public static final float SQUARE = 0.5f;
 
     float margin = 0.05f;
+    float gridAspect = Float.NaN;
 
     public Grid(Surface... children) {
         this(SQUARE, children);
@@ -35,13 +36,13 @@ public class Grid extends Layout {
 
     public Grid(float aspect, Surface... children) {
         super();
-        this.aspect = (aspect);
+        this.gridAspect = (aspect);
         setChildren(children);
     }
 
     public Grid(float aspect, List<Surface> children) {
         super();
-        this.aspect = (aspect);
+        this.gridAspect = (aspect);
         setChildren(children);
     }
 
@@ -54,7 +55,7 @@ public class Grid extends Layout {
     }
 
     public boolean isGrid() {
-        float a = aspect;
+        float a = gridAspect;
         return a!=0 && a!=Float.POSITIVE_INFINITY;
     }
 
@@ -81,7 +82,7 @@ public class Grid extends Layout {
         if (n == 0)
             return;
 
-        float a = aspect;
+        float a = gridAspect;
         if ((n < 3) && !((a==0) || (a == Float.POSITIVE_INFINITY)))
             a = 0; //use linear layout for small n
 

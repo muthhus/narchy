@@ -7,7 +7,7 @@ import spacegraph.Surface;
  */
 public class VSplit extends Layout {
 
-    public float proportion; //0.5f = middle, 0.0 = all top, 1.0 = all bottom
+    public float split; //0.5f = middle, 0.0 = all top, 1.0 = all bottom
 
     public VSplit() {
         this(null, null);
@@ -17,9 +17,9 @@ public class VSplit extends Layout {
         this(top, bottom, 0.5f);
     }
 
-    public VSplit(Surface top, Surface bottom, float proportion) {
+    public VSplit(Surface top, Surface bottom, float split) {
         super(top, bottom);
-        this.proportion = proportion;
+        this.split = split;
     }
 
 
@@ -32,14 +32,14 @@ public class VSplit extends Layout {
 
         Surface top = top();
         if (top != null) {
-            top.scale(1f, proportion);
-            top.translateLocal.set(x,  1f - (proportion), 0);
+            top.scale(1f, split);
+            top.translateLocal.set(x,  1f - (split), 0);
         }
 
         Surface bottom = bottom();
         if (bottom!=null) {
-            bottom.scale(1f, 1f - proportion);
-            bottom.translateLocal.set(x, -proportion/2f, 0);
+            bottom.scale(1f, 1f - split);
+            bottom.translateLocal.set(x, -split /2f, 0);
         }
 
     }
