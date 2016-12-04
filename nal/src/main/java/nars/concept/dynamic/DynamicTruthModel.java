@@ -32,7 +32,7 @@ abstract public class DynamicTruthModel {
     /**
      * N-ary intersection truth function of subterms
      */
-    public static final DynamicTruthModel Intersection = new IntersectionTruth(null) {
+    public static final DynamicTruthModel Intersection = new Intersection(null) {
         @NotNull @Override public Term[] components(Compound superterm) {
             return superterm.terms();
         }
@@ -99,7 +99,13 @@ abstract public class DynamicTruthModel {
             }
         }
 
+
 //        //if (template instanceof Compound) {
+        return commit(d);
+    }
+
+    /** override for postprocessing */
+    protected DynTruth commit(DynTruth d) {
         return d;
     }
 
@@ -175,11 +181,30 @@ abstract public class DynamicTruthModel {
     }
 
 
-    public static class IntersectionTruth extends DynamicTruthModel {
+    /** conf is multiplied, freq is OR'd */
+    public static class Union extends DynamicTruthModel.Intersection {
+
+        public Union(Term[] comp) {
+            super(comp);
+        }
+
+        @Override
+        public float f(float freq) {
+            return 1f - freq;
+        }
+
+        @Override
+        protected DynTruth commit(DynTruth d) {
+            d.freq = 1f - d.freq;
+            return d;
+        }
+    }
+
+    public static class Intersection extends DynamicTruthModel {
 
         private final Term[] comp;
 
-        public IntersectionTruth(Term[] comp) {
+        public Intersection(Term[] comp) {
             this.comp = comp;
         }
 
@@ -187,7 +212,7 @@ abstract public class DynamicTruthModel {
         protected boolean add(DynTruth d, Truth truth, float confMin) {
 
             //specific to Truth.Intersection:
-            d.conf *= truth.conf();
+            d.conf *= c(truth.conf());
             if (d.conf < confMin)
                 return false;
 
@@ -195,6 +220,14 @@ abstract public class DynamicTruthModel {
 
             return true;
 
+        }
+
+        public float f(float freq) {
+            return freq;
+        }
+
+        public float c(float conf) {
+            return conf;
         }
 
 

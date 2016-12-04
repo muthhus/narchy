@@ -28,7 +28,7 @@ public class DynamicBeliefTable extends DefaultBeliefTable {
     final DynamicTruthModel model;
     private final boolean beliefOrGoal;
 
-    static final boolean rejectDerivations = true;
+    static final boolean rejectDerivations = false;
 
 
     public DynamicBeliefTable(DynamicConcept dynamicConcept, DynamicTruthModel model, boolean beliefOrGoal, int eCap, int tCap, NAR nar) {

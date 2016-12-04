@@ -113,18 +113,42 @@ public class DefaultConceptBuilder implements ConceptBuilder {
 //                    return new OperationConcept(t, termbag, taskbag, nar);
 
 
-                //(P --> M), (S --> M), notSet(S), notSet(P), neqCom(S,P) |- ((S | P) --> M), (Belief:Intersection)
                 Term subj = t.term(0);
                 Term pred = t.term(1);
 
-                if ((subj.op() == Op.SECTi) && (pred.op().atomic)) {
-                    Compound csubj = (Compound) subj;
-                    int s = csubj.size();
-                    Term[] x = new Term[s];
-                    for (int i = 0; i < s; i++)
-                        x[i] = $.inh(csubj.term(i), pred);
+                Op so = subj.op();
+                Op po = pred.op();
+                if (po.atomic || po.image || po == so.PROD) {
+                    if ((so == Op.SECTi) || (so == Op.SECTe)) {
+                        //(P --> M), (S --> M), notSet(S), notSet(P), neqCom(S,P) |- ((S | P) --> M), (Belief:Intersection)
+                        //(P --> M), (S --> M), notSet(S), notSet(P), neqCom(S,P) |- ((S & P) --> M), (Belief:Union)
+                        Compound csubj = (Compound) subj;
+                        int s = csubj.size();
+                        Term[] x = new Term[s];
+                        for (int i = 0; i < s; i++)
+                            x[i] = $.inh(csubj.term(i), pred);
 
-                    dmt = new DynamicTruthModel.IntersectionTruth(x);
+                        switch(so) {
+                            case SECTi: dmt = new DynamicTruthModel.Intersection(x); break;
+                            case SECTe: dmt = new DynamicTruthModel.Union(x); break;
+                        }
+                    }
+                } else if (so.atomic || so.image || so == so.PROD) {
+                    if ((so == Op.SECTi) || (so == Op.SECTe)) {
+                        //(M --> P), (M --> S), notSet(S), notSet(P), neqCom(S,P) |- (M --> (P & S)), (Belief:Intersection)
+                        //(M --> P), (M --> S), notSet(S), notSet(P), neqCom(S,P) |- (M --> (P | S)), (Belief:Union)                        Compound csubj = (Compound) subj;
+                        Compound cpred = (Compound) pred;
+                        int s = cpred.size();
+                        Term[] x = new Term[s];
+                        for (int i = 0; i < s; i++)
+                            x[i] = $.inh(subj, cpred.term(i));
+
+                        switch(so) {
+                            case SECTi: dmt = new DynamicTruthModel.Union(x); break;
+                            case SECTe: dmt = new DynamicTruthModel.Intersection(x); break;
+                        }
+                    }
+
                 }
 
                 break;
