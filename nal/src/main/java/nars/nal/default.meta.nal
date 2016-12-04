@@ -238,8 +238,13 @@
     B, (C ==> A), time(decomposeBelief) |- subIfUnifiesAny(C,A,B), (Belief:Abduction, Goal:Deduction)
         //B, (C ==> A), task(negative), belief(negative), time(decomposeBelief) |- subIfUnifiesAny(C,A,B), (Belief:AbductionPN, Goal:DeductionPN)
 
-    B, (A <=> C), belief(positive), time(decomposeBelief), neqCom(B,C) |- subIfUnifiesAny(C,A,B), (Belief:Analogy, Goal:Strong)
-        B, (A <=> C), belief(negative), time(decomposeBelief), neqCom(B,C) |- subIfUnifiesAny((--,%C),A,B), (Belief:AnalogyPN, Goal:StrongPN)
+    B, (A <=> C), belief(positive), time(decomposeBelief), neqCom(B,C) |- subIfUnifiesAny(C,A,B), (Belief:Analogy, Goal:Deduction)
+        B, (A <=> C), belief(negative), time(decomposeBelief), neqCom(B,C) |- subIfUnifiesAny((--,%C),A,B), (Belief:AnalogyPN, Goal:DeductionPN)
+            ////desire spreading by equivalence
+            //     S, (S<=>P), task(positive), belief(positive) |-      P,  (Goal:Strong)
+            //     S, (S<=>P), task(positive), belief(negative) |- (--,%P), (Goal:StrongN)
+            //     S, (S<=>P), task(negative), belief(positive) |- (--,%P), (Goal:StrongN)
+            //     S, (S<=>P), task(negative), belief(negative) |- (--,%P), (Goal:Strong)
 
 
     //originally these were only valid if A occurrs during or after C. the opposite is not logical and would also produce redundant results
@@ -336,11 +341,6 @@
         S, ((--,%S)<->P), task(negative)  |- P, (Goal:StrongN)
         S, ((--,%P)<->S), task(negative)  |- (--,%P), (Goal:StrongN)
 
-//desire spreading by equivalence
-     S, (S<=>P), task(positive), belief(positive) |-      P,  (Goal:Strong)
-     S, (S<=>P), task(positive), belief(negative) |- (--,%P), (Goal:StrongN)
-     S, (S<=>P), task(negative), belief(positive) |- (--,%P), (Goal:StrongN)
-     S, (S<=>P), task(negative), belief(negative) |- (--,%P), (Goal:Strong)
 
 
 

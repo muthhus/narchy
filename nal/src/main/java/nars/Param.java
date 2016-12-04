@@ -50,7 +50,7 @@ public abstract class Param /*extends Container*/ implements Level {
     /**
      * Maximum length of the evidental base of the Stamp, a power of 2
      */
-    public static final int STAMP_CAPACITY = 10;
+    public static final int STAMP_CAPACITY = 16;
 
 
     /**
