@@ -9,7 +9,10 @@ import nars.bag.impl.experimental.HijackBag;
 import nars.budget.merge.BudgetMerge;
 import nars.budget.policy.ConceptPolicy;
 import nars.budget.policy.DefaultConceptPolicy;
-import nars.concept.*;
+import nars.concept.AtomConcept;
+import nars.concept.CompoundConcept;
+import nars.concept.Concept;
+import nars.concept.OperationConcept;
 import nars.concept.dynamic.DynamicConcept;
 import nars.concept.dynamic.DynamicTruthModel;
 import nars.concept.util.ConceptBuilder;
@@ -132,12 +135,7 @@ public class DefaultConceptBuilder implements ConceptBuilder {
 
     }
 
-    final static DynamicTruthModel x = new DynamicTruthModel() {
-        @Override
-        protected DynTruth eval(Map<Term, Truth> e, long when, boolean stamp, NAR n) {
-            return null;
-        }
-    };
+    final static DynamicTruthModel x = new DynamicTruthModel.Intersection();
 
     /**
      * use average blend so that reactivations of adjusted task budgets can be applied repeatedly without inflating the link budgets they activate; see CompoundConcept.process

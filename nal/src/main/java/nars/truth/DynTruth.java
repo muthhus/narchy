@@ -1,6 +1,9 @@
 package nars.truth;
 
-import nars.*;
+import nars.$;
+import nars.Op;
+import nars.Symbols;
+import nars.Task;
 import nars.budget.Budget;
 import nars.budget.BudgetFunctions;
 import nars.concept.dynamic.DynamicBeliefTask;
@@ -17,20 +20,21 @@ import static nars.Op.CONJ;
  * Created by me on 12/4/16.
  */
 public final class DynTruth implements Truthed {
-    //@NotNull private final List<Truth> t;
-    @Nullable
-    public final List<Task> e;
-    private final float confMin;
 
-    float freq, conf; //running product
+    @Nullable public final List<Task> e;
+    public Truthed truth;
 
-    public DynTruth(Op o, float confMin, List<Task> e) {
-        if (o != CONJ)
-            throw new UnsupportedOperationException("aggregate truth for " + o + " not implemented or not applicable");
-        this.confMin = confMin;
+    public float freq;
+    public float conf; //running product
+
+    public DynTruth(List<Task> e) {
         //this.t = t;
         this.e = e;
-        freq = conf = 1f;
+        this.truth = null;
+    }
+
+    public void setTruth(Truthed truth) {
+        this.truth = truth;
     }
 
     @NotNull
@@ -57,17 +61,6 @@ public final class DynTruth implements Truthed {
         return conf <= 0 ? null : $.t(freq, conf);
     }
 
-    public boolean add(@Nullable Truth truth) {
-        if (truth == null)
-            return false;
-
-        //specific to Truth.Intersection:
-        conf *= truth.conf();
-        if (conf < confMin)
-            return false;
-        freq *= truth.freq();
-        return true;
-    }
 
     @Override
     public String toString() {

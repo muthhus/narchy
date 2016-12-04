@@ -5,6 +5,7 @@ import nars.NAR;
 import nars.concept.dynamic.DynamicBeliefTable;
 import nars.nar.Default;
 import nars.term.Compound;
+import nars.truth.DynTruth;
 import nars.truth.Truth;
 import org.junit.Test;
 
@@ -74,22 +75,24 @@ public class DynamicBeliefTableTest {
         NAR n = new Default();
         n.believe($("(x)"), (long)0, 1f, 0.9f);
         n.believe($("(y)"), (long)4, 1f, 0.9f);
-        n.run(1);
+        n.run(2);
         CompoundConcept cc = (CompoundConcept) n.concept($("((x) && (y))"), true);
-        cc.print();
-
-
-        System.out.println("Instantaneous");
-        for (int i = -4; i <= n.time()+4; i++) {
-            System.out.println( i + ": " + cc.belief(i) );
-        }
+//        cc.print();
+//
+//
+//        System.out.println("Instantaneous");
+//        for (int i = -4; i <= n.time()+4; i++) {
+//            System.out.println( i + ": " + cc.belief(i) );
+//        }
 
         DynamicBeliefTable xtable = (DynamicBeliefTable) ((cc).beliefs());
         {
             Compound template = $("((x) &&+4 (y))");
             System.out.println(template);
 
-            assertEquals($.t(1f, 0.81f), xtable.truth(0, template, true).truth());
+            DynTruth xt = xtable.truth(0, template, true);
+            assertNotNull(xt);
+            assertEquals($.t(1f, 0.81f), xt.truth());
 
             for (int i = -4; i <= n.time() + 4; i++) {
                 System.out.println(i + ": " + xtable.truth(i, template.dt(), true) + " " + xtable.generate(template, i));

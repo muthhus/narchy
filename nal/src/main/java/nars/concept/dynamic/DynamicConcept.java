@@ -1,6 +1,6 @@
 package nars.concept.dynamic;
 
-import nars.*;
+import nars.NAR;
 import nars.bag.Bag;
 import nars.concept.CompoundConcept;
 import nars.term.Compound;
