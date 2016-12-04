@@ -1,32 +1,23 @@
 package nars.concept.dynamic;
 
-import com.google.common.collect.Iterators;
 import nars.$;
 import nars.NAR;
-import nars.Op;
 import nars.Task;
 import nars.budget.Budget;
-import nars.concept.Concept;
+import nars.concept.CompoundConcept;
 import nars.nal.Stamp;
-import nars.table.BeliefTable;
 import nars.table.DefaultBeliefTable;
+import nars.table.QuestionTable;
+import nars.task.DerivedTask;
 import nars.term.Compound;
-import nars.term.Term;
-import nars.term.obj.Termject;
 import nars.truth.DynTruth;
 import nars.truth.Truth;
+import nars.truth.TruthDelta;
 import nars.util.Util;
-import org.eclipse.collections.api.list.primitive.ByteList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
 import static nars.Param.TRUTH_EPSILON;
-import static nars.time.Tense.DTERNAL;
 
 /**
  * Created by me on 12/4/16.
@@ -37,12 +28,22 @@ public class DynamicBeliefTable extends DefaultBeliefTable {
     final DynamicTruthModel model;
     private final boolean beliefOrGoal;
 
+    static final boolean rejectDerivations = true;
+
+
     public DynamicBeliefTable(DynamicConcept dynamicConcept, DynamicTruthModel model, boolean beliefOrGoal, int eCap, int tCap, NAR nar) {
 
         super(dynamicConcept.newEternalTable(eCap), dynamicConcept.newTemporalTable(tCap, nar));
         this.dynamicConcept = dynamicConcept;
         this.model = model;
         this.beliefOrGoal = beliefOrGoal;
+    }
+
+    @Override
+    public TruthDelta add(@NotNull Task input, @NotNull QuestionTable questions, @NotNull CompoundConcept<?> concept, @NotNull NAR nar) {
+        if (rejectDerivations && !input.isInput())
+            return null;
+        return super.add(input, questions, concept, nar);
     }
 
     @Nullable
