@@ -80,22 +80,45 @@ import java.util.List;
 public class ExampleStereoTwoViewsOneCamera {
 
     // Disparity calculation parameters
-    private static final int minDisparity = 15;
-    private static final int maxDisparity = 100;
+    private static final int minDisparity = 5;
+    private static final int maxDisparity = 95;
+
+    static class Frame {
+        InterleavedU8 cam;
+        GrayF32 distorted;
+        BufferedImage out;
+
+        public Frame(int pw, int ph, Webcam w) {
+            cam = new InterleavedU8(pw, ph, 3);
+            w.getImageBytes(ByteBuffer.wrap(cam.data));
+            //distorted = ConvertImage.average(cam, null);
+            distorted = ConvertImage.convert(ConvertImage.average(cam, null), (GrayF32) null);
+
+        }
+    }
 
     public static void main(String args[]) {
 
 
         // Camera parameters
         IntrinsicParameters intrinsic = new IntrinsicParameters(); //CalibrationIO.load(new File(calibDir , "intrinsic.yaml"));
-        intrinsic.setFx(701.0116882676376);
-        intrinsic.setFy(698.6537946928421);
 
 
-        intrinsic.setCx(308.4551818095542);
-        intrinsic.setCy(246.84300560315452);
-        intrinsic.setWidth(640);
-        intrinsic.setHeight(480);
+
+        intrinsic.setWidth(176);
+        intrinsic.setHeight(144);
+
+        intrinsic.setCx(intrinsic.getWidth()/2f);
+        intrinsic.setCy(intrinsic.getHeight()/2f);
+
+        intrinsic.setFx(intrinsic.getWidth());
+        intrinsic.setFy(intrinsic.getHeight());
+//        intrinsic.setFx(701.0116882676376);
+//        intrinsic.setFy(698.6537946928421);
+        //intrinsic.setCx(308.4551818095542);
+        //intrinsic.setCy(246.84300560315452);
+
+
         intrinsic.setSkew(0);
         intrinsic.setRadial(new double[]{-0.25559248570886445, 0.09997127476560613});
         intrinsic.setT1(0);
@@ -115,47 +138,54 @@ public class ExampleStereoTwoViewsOneCamera {
         ShowImages.showWindow(gui, "Point Cloud");
 
         // display the results
-        AssociationPanel panel = new AssociationPanel(20);
-        ShowImages.showWindow(panel, "Inlier Features");
+        AssociationPanel assoPanel = new AssociationPanel(20);
+        assoPanel.setPreferredSize(new Dimension(800, 800));
+        ShowImages.showWindow(assoPanel, "Inlier Features");
 
         Webcam w = Webcam.getDefault();
+        w.setViewSize(new Dimension(intrinsic.getWidth(),intrinsic.getHeight()));
         w.open(false);
 
-        InterleavedU8
-                prev = null, next = null;
+        int history = 1;
+        final Deque<Frame> frames = new ArrayDeque();
 
 
 
-        BufferedImage outPrev = null, outNext = null;
+
+        //BufferedImage outPrev = null, outNext = null;
 
         while (true) {
-            synchronized (w) {
+            synchronized (frames) {
                 if (w.isImageNew()) {
 
-                    System.out.println("snap");
+                    boolean diffed = false;
+
 
                     int pw = (int) w.getViewSize().getWidth();
                     int ph = (int) w.getViewSize().getHeight();
-                    intrinsic.setWidth(pw);
-                    intrinsic.setHeight(ph);
+//                    intrinsic.setWidth(pw);
+//                    intrinsic.setHeight(ph);
 
-                    if (next == null || next.getWidth()!=pw || next.getHeight()!=ph)
-                        next = new InterleavedU8(pw, ph, 3);
+                    //if (next == null || next.getWidth()!=pw || next.getHeight()!=ph)
+                    Frame next = new Frame(pw, ph, w);
 
-                    w.getImageBytes(ByteBuffer.wrap(next.data));
 
-                    if (prev != null) {
+
+                    for (Frame prev : frames) {
+
+                        ModelMatcher<Se3_F64, AssociatedPair> epipolarMotion =
+                                FactoryMultiViewRobust.essentialRansac(new ConfigEssential(intrinsic),
+                                        new ConfigRansac(200, 0.5));
 
                         // Input images with lens distortion
-
-                        GrayU8 distortedPrev = ConvertImage.average(prev, null);
-                        GrayU8 distortedNext = ConvertImage.average(next, null);
+                        //GrayU8 distortedPrev = ConvertImage.average(prev, null);
+                        //GrayU8 distortedNext = ConvertImage.average(next, null);
 
                         // matched features between the two images
                         List<AssociatedPair> matchedFeatures = ExampleFundamentalMatrix.computeMatches(
-                                ConvertImage.convert(distortedPrev, (GrayF32) null),
-                                ConvertImage.convert(distortedNext, (GrayF32) null),
-                                panel);
+                                prev.distorted,
+                                next.distorted,
+                                assoPanel);
 
                         // convert from pixel coordinates into normalized image coordinates
                         List<AssociatedPair> matchedCalibrated = convertToNormalizedCoordinates(matchedFeatures, intrinsic);
@@ -164,9 +194,6 @@ public class ExampleStereoTwoViewsOneCamera {
                         //List<AssociatedPair> inliers = new ArrayList<>();
 
                         //Se3_F64 leftToRight = estimateCameraMotion(intrinsic, matchedCalibrated, inliers);
-                        ModelMatcher<Se3_F64, AssociatedPair> epipolarMotion =
-                                FactoryMultiViewRobust.essentialRansac(new ConfigEssential(intrinsic),
-                                        new ConfigRansac(200, 0.5));
 
                         Se3_F64 leftToRight;
                         if (!epipolarMotion.process(matchedCalibrated)) {
@@ -180,31 +207,31 @@ public class ExampleStereoTwoViewsOneCamera {
 
                         if (leftToRight != null) {
 
-                            drawInliers(panel, prev, next, intrinsic, epipolarMotion.getMatchSet());
+                            drawInliers(assoPanel, prev.cam, next.cam, intrinsic, epipolarMotion.getMatchSet());
 
                             // Rectify and remove lens distortion for stereo processing
                             DenseMatrix64F rectifiedK = new DenseMatrix64F(3, 3);
-                            GrayU8 rectifiedPrev = distortedPrev.createSameShape();
-                            GrayU8 rectifiedNext = distortedNext.createSameShape();
+                            GrayF32 rectifiedPrev = prev.distorted.createSameShape();
+                            GrayF32 rectifiedNext = next.distorted.createSameShape();
 
 
-                            rectifyImages(distortedPrev, distortedNext, leftToRight, intrinsic, rectifiedPrev, rectifiedNext, rectifiedK);
+                            rectifyImages(prev.distorted, next.distorted, leftToRight, intrinsic, rectifiedPrev, rectifiedNext, rectifiedK);
 
                             // compute disparity
-                            StereoDisparity<GrayS16, GrayF32> disparityAlg =
+                            StereoDisparity<GrayF32, GrayF32> disparityAlg =
                                     FactoryStereoDisparity.regionSubpixelWta(DisparityAlgorithms.RECT_FIVE,
-                                            minDisparity, maxDisparity, 5, 5, 40, 1, 0.1, GrayS16.class);
+                                            minDisparity, maxDisparity, 5, 5, 40, 1, 0.5, GrayF32.class);
 
                             // Apply the Laplacian across the image to add extra resistance to changes in lighting or camera gain
-                            GrayS16 derivPrev = new GrayS16(rectifiedPrev.width, rectifiedPrev.height);
+                            GrayF32 derivPrev = new GrayF32(rectifiedPrev.width, rectifiedPrev.height);
                             LaplacianEdge.process(rectifiedPrev, derivPrev);
-                            GrayS16 derivNext = new GrayS16(rectifiedNext.width, rectifiedNext.height);
+                            GrayF32 derivNext = new GrayF32(rectifiedNext.width, rectifiedNext.height);
                             LaplacianEdge.process(rectifiedNext, derivNext);
 
                             disparityAlg.process(derivPrev, derivNext);
 
-                            outPrev = grayToBuffered(rectifiedPrev, outPrev);
-                            outNext = grayToBuffered(rectifiedNext, outNext);
+                            prev.out = grayToBuffered(rectifiedPrev, prev.out);
+                            next.out = grayToBuffered(rectifiedNext, next.out);
 //                            rpp.setImages(outPrev, outNext);
 //                            rpp.repaint();
 
@@ -212,8 +239,9 @@ public class ExampleStereoTwoViewsOneCamera {
 
 
                             gui.configure(baseline, rectifiedK, new DoNothingTransform_F64(), minDisparity, maxDisparity);
-                            gui.process(disparityAlg.getDisparity(), outPrev);
+                            gui.process(disparityAlg.getDisparity(), prev.out);
 
+                            diffed = true;
                             //showPointCloud(disparity, outPrev, leftToRight, rectifiedK, minDisparity, maxDisparity);
 
                             System.out.println("Total found " + matchedCalibrated.size() + "\t" + " cloud points=" + gui.view.cloud.size());
@@ -223,12 +251,23 @@ public class ExampleStereoTwoViewsOneCamera {
                         }
 
 
+
                     }
 
-                    prev = next;
+                    if (diffed || frames.isEmpty()) {
+
+                        gui.render();
+
+                        System.out.println("snap");
+
+                        while (frames.size() + 1 > history)
+                            frames.removeFirst();
+
+                        frames.addLast(next);
+                    }
                 }
 
-                Util.sleep(20);
+                //Util.sleep(20);
 
             }
         }
@@ -236,8 +275,7 @@ public class ExampleStereoTwoViewsOneCamera {
 
     }
 
-
-    public static BufferedImage grayToBuffered(GrayU8 src, BufferedImage dst) {
+    public static BufferedImage grayToBuffered(GrayF32 src, BufferedImage dst) {
 
         if (dst == null || dst.getWidth() != src.getWidth() || dst.getHeight() != src.getHeight())
             dst = new BufferedImage(src.getWidth(), src.getHeight(), BufferedImage.TYPE_INT_RGB);
@@ -245,21 +283,40 @@ public class ExampleStereoTwoViewsOneCamera {
         final int width = dst.getWidth();
         final int height = dst.getHeight();
 
-        byte[] data = src.data;
+        float[] data = src.data;
         for (int y = 0; y < height; y++) {
             int indexSrc = src.startIndex + src.stride * y;
-
             for (int x = 0; x < width; x++) {
-                int v = data[indexSrc++] & 0xFF;
-
-                int argb = v << 16 | v << 8 | v;
-
-                dst.setRGB(x, y, argb);
+                int v = (int)(data[indexSrc++]*256);
+                dst.setRGB(x, y, v << 16 | v << 8 | v);
             }
         }
 
         return dst;
     }
+//    public static BufferedImage grayToBuffered(GrayU8 src, BufferedImage dst) {
+//
+//        if (dst == null || dst.getWidth() != src.getWidth() || dst.getHeight() != src.getHeight())
+//            dst = new BufferedImage(src.getWidth(), src.getHeight(), BufferedImage.TYPE_INT_RGB);
+//
+//        final int width = dst.getWidth();
+//        final int height = dst.getHeight();
+//
+//        byte[] data = src.data;
+//        for (int y = 0; y < height; y++) {
+//            int indexSrc = src.startIndex + src.stride * y;
+//
+//            for (int x = 0; x < width; x++) {
+//                int v = data[indexSrc++] & 0xFF;
+//
+//                int argb = v << 16 | v << 8 | v;
+//
+//                dst.setRGB(x, y, argb);
+//            }
+//        }
+//
+//        return dst;
+//    }
 //
 //    /**
 //     * Estimates the camera motion robustly using RANSAC and a set of associated points.
@@ -307,12 +364,12 @@ public class ExampleStereoTwoViewsOneCamera {
      * @param rectifiedK     Output camera calibration matrix for rectified camera
      * @param model
      */
-    public static void rectifyImages(GrayU8 distortedLeft,
-                                     GrayU8 distortedRight,
+    public static void rectifyImages(GrayF32 distortedLeft,
+                                     GrayF32 distortedRight,
                                      Se3_F64 leftToRight,
                                      IntrinsicParameters intrinsic,
-                                     GrayU8 rectifiedLeft,
-                                     GrayU8 rectifiedRight,
+                                     GrayF32 rectifiedLeft,
+                                     GrayF32 rectifiedRight,
                                      DenseMatrix64F rectifiedK) {
         RectifyCalibrated rectifyAlg = RectifyImageOps.createCalibrated();
 
@@ -333,9 +390,9 @@ public class ExampleStereoTwoViewsOneCamera {
         RectifyImageOps.allInsideLeft(intrinsic, rect1, rect2, rectifiedK);
 
         // undistorted and rectify images
-        ImageDistort<GrayU8, GrayU8> distortLeft =
+        ImageDistort<GrayF32, GrayF32> distortLeft =
                 RectifyImageOps.rectifyImage(intrinsic, rect1, BorderType.SKIP, distortedLeft.getImageType());
-        ImageDistort<GrayU8, GrayU8> distortRight =
+        ImageDistort<GrayF32, GrayF32> distortRight =
                 RectifyImageOps.rectifyImage(intrinsic, rect2, BorderType.SKIP, distortedRight.getImageType());
 
         distortLeft.apply(distortedLeft, rectifiedLeft);
@@ -527,10 +584,11 @@ public class ExampleStereoTwoViewsOneCamera {
 
             findMatches.associate(panel, left, right);
 
-            List<AssociatedPair> matches = new ArrayList<>();
             FastQueue<AssociatedIndex> matchIndexes = associate.getMatches();
 
-            for (int i = 0; i < matchIndexes.size; i++) {
+            int mis = matchIndexes.size;
+            List<AssociatedPair> matches = new ArrayList<>(mis);
+            for (int i = 0; i < mis; i++) {
                 AssociatedIndex a = matchIndexes.get(i);
                 AssociatedPair p = new AssociatedPair(findMatches.pointsA.get(a.src), findMatches.pointsB.get(a.dst));
                 matches.add(p);
@@ -611,12 +669,14 @@ public class ExampleStereoTwoViewsOneCamera {
 //            T inputB = ConvertImage.convert(imageB, null, imageType);
 
             // stores the location of detected interest points
-            pointsA = new ArrayList<>();
-            pointsB = new ArrayList<>();
+            int initialSize = 100;
+
+            pointsA = new ArrayList<>(initialSize);
+            pointsB = new ArrayList<>(initialSize);
 
             // stores the description of detected interest points
-            FastQueue<TD> descA = UtilFeature.createQueue(detDesc, 100);
-            FastQueue<TD> descB = UtilFeature.createQueue(detDesc, 100);
+            FastQueue<TD> descA = UtilFeature.createQueue(detDesc, initialSize);
+            FastQueue<TD> descB = UtilFeature.createQueue(detDesc, initialSize);
 
             // describe each image using interest points
             describeImage(inputA, pointsA, descA);
@@ -642,7 +702,7 @@ public class ExampleStereoTwoViewsOneCamera {
             detDesc.detect(input);
 
             for (int i = 0; i < detDesc.getNumberOfFeatures(); i++) {
-                points.add(detDesc.getLocation(i).copy());
+                points.add(detDesc.getLocation(i));//.copy());
                 descs.grow().setTo(detDesc.getDescription(i));
             }
         }
@@ -685,7 +745,7 @@ public class ExampleStereoTwoViewsOneCamera {
      */
     public static class DisparityPointCloudViewer extends JPanel {
         final Deque<ColorPoint3D> cloud = new ArrayDeque<ColorPoint3D>();
-        final int capacity = 20000;
+        final int capacity = 2000;
 
         // distance between the two camera centers
         double baseline;
@@ -750,56 +810,59 @@ public class ExampleStereoTwoViewsOneCamera {
 
         }
 
-        /**
-         * Given the disparity image compute the 3D location of valid points and save pixel colors
-         * at that point
-         *
-         * @param disparity Disparity image
-         * @param color     Color image of left camera
-         */
-        public void process(ImageGray disparity, BufferedImage color) {
-            if (disparity instanceof GrayU8)
-                process((GrayU8) disparity, color);
-            else
-                process((GrayF32) disparity, color);
-        }
+//        /**
+//         * Given the disparity image compute the 3D location of valid points and save pixel colors
+//         * at that point
+//         *
+//         * @param disparity Disparity image
+//         * @param color     Color image of left camera
+//         */
+//        public void process(GrayF32 disparity, BufferedImage color) {
+////            if (disparity instanceof GrayU8)
+////                process((GrayU8) disparity, color);
+////            else
+//                process((GrayF32) disparity, color);
+//        }
 
-        private void process(GrayU8 disparity, BufferedImage img) {
-
-            trim();
-
-            synchronized(cloud) {
-                for (int y = 0; y < disparity.height; y++) {
-                    int index = disparity.startIndex + disparity.stride * y;
-
-                    for (int x = 0; x < disparity.width; x++) {
-                        int value = disparity.data[index++] & 0xFF;
-
-                        if (value >= rangeDisparity)
-                            continue;
-
-                        value += minDisparity;
-
-                        if (value == 0)
-                            continue;
-
-
-                        ColorPoint3D p = cloud.size() > capacity ? cloud.removeFirst() : new ColorPoint3D();
-
-                        // Note that this will be in the rectified left camera's reference frame.
-                        // An additional rotation is needed to put it into the original left camera frame.
-                        p.z = baseline * focalLengthX / value;
-                        p.x = p.z * (x - centerX) / focalLengthX;
-                        p.y = p.z * (y - centerY) / focalLengthY;
-
-                        getColor(disparity, img, x, y, p);
-
-                        cloud.addLast(p);
-
-                    }
-                }
-            }
-        }
+//        private void process(GrayU8 disparity, BufferedImage img) {
+//
+//            trim();
+//
+//            synchronized(cloud) {
+//                for (int y = 0; y < disparity.height; y++) {
+//                    int index = disparity.startIndex + disparity.stride * y;
+//
+//                    for (int x = 0; x < disparity.width; x++) {
+//                        int value = disparity.data[index++] & 0xFF;
+//
+//                        if (value >= rangeDisparity)
+//                            continue;
+//
+//                        value += minDisparity;
+//
+//                        if (value == 0)
+//                            continue;
+//
+//                        double zz = baseline * focalLengthX / value;
+//                        if (zz <= 0)
+//                            continue;
+//
+//                        ColorPoint3D p = cloud.size() > capacity ? cloud.removeFirst() : new ColorPoint3D();
+//
+//                        // Note that this will be in the rectified left camera's reference frame.
+//                        // An additional rotation is needed to put it into the original left camera frame.
+//                        p.z = zz;
+//                        p.x = p.z * (x - centerX) / focalLengthX;
+//                        p.y = p.z * (y - centerY) / focalLengthY;
+//
+//                        getColor(disparity, img, x, y, p);
+//
+//                        cloud.addLast(p);
+//
+//                    }
+//                }
+//            }
+//        }
 
         private void trim() {
             //cloud.reset();
@@ -827,8 +890,11 @@ public class ExampleStereoTwoViewsOneCamera {
                     if (value == 0)
                         continue;
 
+
                     ColorPoint3D p = cloud.size() > capacity ? cloud.removeFirst() : new ColorPoint3D();
 
+                    // Note that this will be in the rectified left camera's reference frame.
+                    // An additional rotation is needed to put it into the original left camera frame.
                     p.z = baseline * focalLengthX / value;
                     p.x = p.z * (x - centerX) / focalLengthX;
                     p.y = p.z * (y - centerY) / focalLengthY;
@@ -842,11 +908,11 @@ public class ExampleStereoTwoViewsOneCamera {
 
         private void getColor(ImageBase disparity, BufferedImage color, int x, int y, ColorPoint3D p) {
             rectifiedToColor.compute(x, y, colorPt);
-            if (BoofMiscOps.checkInside(disparity, colorPt.x, colorPt.y, 0)) {
+            //if (BoofMiscOps.checkInside(disparity, colorPt.x, colorPt.y, 0)) {
                 p.rgb = color.getRGB((int) colorPt.x, (int) colorPt.y);
-            } else {
-                p.rgb = 0x000000;
-            }
+            //} else {
+              //  p.rgb = 0x000000;
+            //}
         }
 
         @Override
@@ -1052,9 +1118,13 @@ public class ExampleStereoTwoViewsOneCamera {
         /**
          * Updates the view, must be called in a GUI thread
          */
-        public void process(ImageGray disparity, BufferedImage color) {
+        public void process(GrayF32 disparity, BufferedImage color) {
             view.process(disparity, color);
 
+
+        }
+
+        public void render() {
             tiltSlider.removeChangeListener(this);
             tiltSlider.setValue(view.tiltAngle);
             tiltSlider.addChangeListener(this);

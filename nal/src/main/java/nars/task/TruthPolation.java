@@ -3,7 +3,7 @@ package nars.task;
 import com.google.common.collect.Lists;
 import nars.$;
 import nars.Task;
-import nars.concept.DynamicConcept;
+import nars.concept.dynamic.DynamicBeliefTask;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -51,7 +51,7 @@ public enum TruthPolation  {
         // microsphere's facets.
         for (int i1 = 0, tasksSize = tasks.size(); i1 < tasksSize; i1++) {
             Task t = tasks.get(i1);
-            if (t instanceof DynamicConcept.DynamicBeliefTask)
+            if (t instanceof DynamicBeliefTask)
                 continue; //ignore dynamic belief tasks
 
             float tw = t.confWeight(when);

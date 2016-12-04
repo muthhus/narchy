@@ -2,6 +2,7 @@ package nars.concept;
 
 import nars.$;
 import nars.NAR;
+import nars.concept.dynamic.DynamicBeliefTable;
 import nars.nar.Default;
 import nars.term.Compound;
 import nars.truth.Truth;
@@ -83,7 +84,7 @@ public class DynamicBeliefTableTest {
             System.out.println( i + ": " + cc.belief(i) );
         }
 
-        DynamicConcept.DynamicBeliefTable xtable = (DynamicConcept.DynamicBeliefTable) ((cc).beliefs());
+        DynamicBeliefTable xtable = (DynamicBeliefTable) ((cc).beliefs());
         {
             Compound template = $("((x) &&+4 (y))");
             System.out.println(template);

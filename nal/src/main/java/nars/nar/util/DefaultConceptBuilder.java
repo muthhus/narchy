@@ -10,6 +10,8 @@ import nars.budget.merge.BudgetMerge;
 import nars.budget.policy.ConceptPolicy;
 import nars.budget.policy.DefaultConceptPolicy;
 import nars.concept.*;
+import nars.concept.dynamic.DynamicConcept;
+import nars.concept.dynamic.DynamicTruthModel;
 import nars.concept.util.ConceptBuilder;
 import nars.term.Compound;
 import nars.term.Term;
@@ -18,6 +20,8 @@ import nars.term.atom.Atomic;
 import nars.term.obj.Termject;
 import nars.term.obj.TermjectConcept;
 import nars.term.var.Variable;
+import nars.truth.DynTruth;
+import nars.truth.Truth;
 import org.eclipse.collections.impl.map.mutable.UnifiedMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -118,14 +122,22 @@ public class DefaultConceptBuilder implements ConceptBuilder {
 
         }
 
+
         return
                 (!dynamic) ?
                         new CompoundConcept<>(t, termbag, taskbag, nar)
                         :
-                        new DynamicConcept(t, termbag, taskbag, nar)
+                        new DynamicConcept(t, x, x, termbag, taskbag, nar)
                 ;
 
     }
+
+    final static DynamicTruthModel x = new DynamicTruthModel() {
+        @Override
+        protected DynTruth eval(Map<Term, Truth> e, long when, boolean stamp, NAR n) {
+            return null;
+        }
+    };
 
     /**
      * use average blend so that reactivations of adjusted task budgets can be applied repeatedly without inflating the link budgets they activate; see CompoundConcept.process
