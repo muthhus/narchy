@@ -30,39 +30,17 @@ abstract public class DynamicTruthModel {
 
 
     /**
-     * N-ary intersection truth function
+     * N-ary intersection truth function of subterms
      */
-    public static final DynamicTruthModel Intersection = new DynamicTruthModel() {
-
-        @Override
-        protected boolean add(DynTruth d, Truth truth, float confMin) {
-
-            //specific to Truth.Intersection:
-            d.conf *= truth.conf();
-            if (d.conf < confMin)
-                return false;
-
-            d.freq *= truth.freq();
-
-            return true;
-
-        }
-
-
-
-        @Override
-        protected DynTruth eval(Compound template, long when, boolean stamp, NAR n) {
-
-            DynTruth d = new DynTruth(stamp? $.newArrayList(0) : null);
-            d.freq = d.conf = 1f;
-            return d;
-
+    public static final DynamicTruthModel Intersection = new IntersectionTruth(null) {
+        @NotNull @Override public Term[] components(Compound superterm) {
+            return superterm.terms();
         }
     };
 
     @Nullable public DynTruth eval(Compound superterm, boolean beliefOrGoal, long when, long now, boolean stamp, NAR n) {
 
-        Term[] inputs = superterm.terms();
+        Term[] inputs = components(superterm);
 
         DynTruth d = eval(superterm, when, stamp, n);
 
@@ -124,6 +102,8 @@ abstract public class DynamicTruthModel {
 //        //if (template instanceof Compound) {
         return d;
     }
+
+    abstract public @NotNull Term[] components(Compound superterm);
 
     protected abstract DynTruth eval(Compound template, long when, boolean stamp, NAR n);
 
@@ -195,4 +175,42 @@ abstract public class DynamicTruthModel {
     }
 
 
+    public static class IntersectionTruth extends DynamicTruthModel {
+
+        private final Term[] comp;
+
+        public IntersectionTruth(Term[] comp) {
+            this.comp = comp;
+        }
+
+        @Override
+        protected boolean add(DynTruth d, Truth truth, float confMin) {
+
+            //specific to Truth.Intersection:
+            d.conf *= truth.conf();
+            if (d.conf < confMin)
+                return false;
+
+            d.freq *= truth.freq();
+
+            return true;
+
+        }
+
+
+        @NotNull
+        @Override
+        public Term[] components(Compound superterm) {
+            return comp;
+        }
+
+        @Override
+        protected DynTruth eval(Compound template, long when, boolean stamp, NAR n) {
+
+            DynTruth d = new DynTruth(stamp? $.newArrayList(0) : null);
+            d.freq = d.conf = 1f;
+            return d;
+
+        }
+    }
 }

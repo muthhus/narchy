@@ -1,5 +1,6 @@
 package nars.nar.util;
 
+import nars.$;
 import nars.NAR;
 import nars.Op;
 import nars.Task;
@@ -12,7 +13,6 @@ import nars.budget.policy.DefaultConceptPolicy;
 import nars.concept.AtomConcept;
 import nars.concept.CompoundConcept;
 import nars.concept.Concept;
-import nars.concept.OperationConcept;
 import nars.concept.dynamic.DynamicConcept;
 import nars.concept.dynamic.DynamicTruthModel;
 import nars.concept.util.ConceptBuilder;
@@ -23,8 +23,6 @@ import nars.term.atom.Atomic;
 import nars.term.obj.Termject;
 import nars.term.obj.TermjectConcept;
 import nars.term.var.Variable;
-import nars.truth.DynTruth;
-import nars.truth.Truth;
 import org.eclipse.collections.impl.map.mutable.UnifiedMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -111,8 +109,24 @@ public class DefaultConceptBuilder implements ConceptBuilder {
         switch (t.op()) {
 
             case INH:
-                if (Op.isOperation(t))
-                    return new OperationConcept(t, termbag, taskbag, nar);
+//                if (Op.isOperation(t))
+//                    return new OperationConcept(t, termbag, taskbag, nar);
+
+
+                //(P --> M), (S --> M), notSet(S), notSet(P), neqCom(S,P) |- ((S | P) --> M), (Belief:Intersection)
+                Term subj = t.term(0);
+                Term pred = t.term(1);
+
+                if ((subj.op() == Op.SECTi) && (pred.op().atomic)) {
+                    Compound csubj = (Compound) subj;
+                    int s = csubj.size();
+                    Term[] x = new Term[s];
+                    for (int i = 0; i < s; i++)
+                        x[i] = $.inh(csubj.term(i), pred);
+
+                    dmt = new DynamicTruthModel.IntersectionTruth(x);
+                }
+
                 break;
 
             case CONJ:
