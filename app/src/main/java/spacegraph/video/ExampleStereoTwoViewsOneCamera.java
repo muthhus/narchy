@@ -24,12 +24,11 @@ import boofcv.factory.feature.detdesc.FactoryDetectDescribe;
 import boofcv.factory.feature.disparity.DisparityAlgorithms;
 import boofcv.factory.feature.disparity.FactoryStereoDisparity;
 import boofcv.factory.geo.*;
-import boofcv.gui.d3.PointCloudTiltPanel;
+import boofcv.gui.d3.ColorPoint3D;
 import boofcv.gui.feature.AssociationPanel;
 import boofcv.gui.image.ShowImages;
-import boofcv.gui.image.VisualizeImageData;
 import boofcv.gui.stereo.RectifiedPairPanel;
-import boofcv.io.image.ConvertRaster;
+import boofcv.misc.BoofMiscOps;
 import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.distort.DoNothingTransform_F64;
 import boofcv.struct.distort.PointTransform_F64;
@@ -39,9 +38,17 @@ import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.image.*;
 import com.github.sarxos.webcam.Webcam;
+import georegression.geometry.ConvertRotation3D_F64;
+import georegression.geometry.GeometryMath_F64;
+import georegression.struct.EulerType;
 import georegression.struct.point.Point2D_F64;
+import georegression.struct.point.Point3D_F64;
+import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
+import georegression.transform.se.SePointOps_F64;
 import nars.util.Util;
+import nars.util.list.CircularArrayList;
+import objenome.impl.ArrayQueue;
 import org.ddogleg.fitting.modelset.ModelFitter;
 import org.ddogleg.fitting.modelset.ModelManager;
 import org.ddogleg.fitting.modelset.ModelMatcher;
@@ -49,10 +56,16 @@ import org.ddogleg.fitting.modelset.ransac.Ransac;
 import org.ddogleg.struct.FastQueue;
 import org.ejml.data.DenseMatrix64F;
 
+import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import java.awt.*;
+import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.nio.ByteBuffer;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Deque;
 import java.util.List;
 
 
@@ -71,9 +84,7 @@ public class ExampleStereoTwoViewsOneCamera {
     private static final int maxDisparity = 100;
 
     public static void main(String args[]) {
-        // specify location of images and calibration
-//        String calibDir = UtilIO.pathExample("calibration/mono/Sony_DSC-HX5V_Chess/");
-//        String imageDir = UtilIO.pathExample("stereo/");
+
 
         // Camera parameters
         IntrinsicParameters intrinsic = new IntrinsicParameters(); //CalibrationIO.load(new File(calibDir , "intrinsic.yaml"));
@@ -86,92 +97,150 @@ public class ExampleStereoTwoViewsOneCamera {
         intrinsic.setWidth(640);
         intrinsic.setHeight(480);
         intrinsic.setSkew(0);
-        intrinsic.setRadial(new double[] { -0.25559248570886445, 0.09997127476560613 });
+        intrinsic.setRadial(new double[]{-0.25559248570886445, 0.09997127476560613});
         intrinsic.setT1(0);
         intrinsic.setT2(0);
 
+//        RectifiedPairPanel rpp = new RectifiedPairPanel(true);
+//        rpp.setSize(500, 500);
+//        rpp.setPreferredSize(new Dimension(800, 800));
+//        ShowImages.showWindow(rpp, "Rectification");
 
-//
-//		// Input images from the camera moving left to right
-//		BufferedImage origLeft = UtilImageIO.loadImage(imageDir , "mono_wall_01.jpg");
-//		BufferedImage origRight = UtilImageIO.loadImage(imageDir, "mono_wall_02.jpg");
+        //BufferedImage visualized = VisualizeImageData.disparity(disparity, null, minDisparity, maxDisparity, 0);
+        //ShowImages.showWindow(visualized, "Disparity");
+
+        PointCloudTiltPanel gui = new PointCloudTiltPanel();
+        gui.setSize(800, 800);
+        gui.setPreferredSize(new Dimension(800, 800));
+        ShowImages.showWindow(gui, "Point Cloud");
+
+        // display the results
+        AssociationPanel panel = new AssociationPanel(20);
+        ShowImages.showWindow(panel, "Inlier Features");
 
         Webcam w = Webcam.getDefault();
         w.open(false);
 
-        InterleavedU8 origLeft = new InterleavedU8((int)w.getViewSize().getWidth(), (int)w.getViewSize().getHeight(), 3);
-        InterleavedU8 origRight = new InterleavedU8((int)w.getViewSize().getWidth(), (int)w.getViewSize().getHeight(), 3);
+        InterleavedU8
+                prev = null, next = null;
 
-        System.out.println("taking left");
-        w.getImageBytes(ByteBuffer.wrap(origLeft.data));
 
-        Util.sleep(1000);
 
-        System.out.println("taking right");
-        w.getImageBytes(ByteBuffer.wrap(origRight.data));
+        BufferedImage outPrev = null, outNext = null;
 
-        // Input images with lens distortion
+        while (true) {
+            synchronized (w) {
+                if (w.isImageNew()) {
 
-        GrayU8 distortedLeft = ConvertImage.average(origLeft, null);
-        GrayU8 distortedRight = ConvertImage.average(origRight, null);
+                    System.out.println("snap");
 
-        // matched features between the two images
-        List<AssociatedPair> matchedFeatures = ExampleFundamentalMatrix.computeMatches(
-                ConvertImage.convert(distortedLeft,(GrayF32)null),
-                ConvertImage.convert(distortedRight,(GrayF32)null)
-        );
+                    int pw = (int) w.getViewSize().getWidth();
+                    int ph = (int) w.getViewSize().getHeight();
+                    intrinsic.setWidth(pw);
+                    intrinsic.setHeight(ph);
 
-        // convert from pixel coordinates into normalized image coordinates
-        List<AssociatedPair> matchedCalibrated = convertToNormalizedCoordinates(matchedFeatures, intrinsic);
+                    if (next == null || next.getWidth()!=pw || next.getHeight()!=ph)
+                        next = new InterleavedU8(pw, ph, 3);
 
-        // Robustly estimate camera motion
-        List<AssociatedPair> inliers = new ArrayList<>();
-        Se3_F64 leftToRight = estimateCameraMotion(intrinsic, matchedCalibrated, inliers);
+                    w.getImageBytes(ByteBuffer.wrap(next.data));
 
-        drawInliers(origLeft, origRight, intrinsic, inliers);
+                    if (prev != null) {
 
-        // Rectify and remove lens distortion for stereo processing
-        DenseMatrix64F rectifiedK = new DenseMatrix64F(3, 3);
-        GrayU8 rectifiedLeft = distortedLeft.createSameShape();
-        GrayU8 rectifiedRight = distortedRight.createSameShape();
+                        // Input images with lens distortion
 
-        rectifyImages(distortedLeft, distortedRight, leftToRight, intrinsic, rectifiedLeft, rectifiedRight, rectifiedK);
+                        GrayU8 distortedPrev = ConvertImage.average(prev, null);
+                        GrayU8 distortedNext = ConvertImage.average(next, null);
 
-        // compute disparity
-        StereoDisparity<GrayS16, GrayF32> disparityAlg =
-                FactoryStereoDisparity.regionSubpixelWta(DisparityAlgorithms.RECT_FIVE,
-                        minDisparity, maxDisparity, 5, 5, 20, 1, 0.1, GrayS16.class);
+                        // matched features between the two images
+                        List<AssociatedPair> matchedFeatures = ExampleFundamentalMatrix.computeMatches(
+                                ConvertImage.convert(distortedPrev, (GrayF32) null),
+                                ConvertImage.convert(distortedNext, (GrayF32) null),
+                                panel);
 
-        // Apply the Laplacian across the image to add extra resistance to changes in lighting or camera gain
-        GrayS16 derivLeft = new GrayS16(rectifiedLeft.width, rectifiedLeft.height);
-        GrayS16 derivRight = new GrayS16(rectifiedLeft.width, rectifiedLeft.height);
-        LaplacianEdge.process(rectifiedLeft, derivLeft);
-        LaplacianEdge.process(rectifiedRight, derivRight);
+                        // convert from pixel coordinates into normalized image coordinates
+                        List<AssociatedPair> matchedCalibrated = convertToNormalizedCoordinates(matchedFeatures, intrinsic);
 
-        // process and return the results
-        disparityAlg.process(derivLeft, derivRight);
-        GrayF32 disparity = disparityAlg.getDisparity();
+                        // Robustly estimate camera motion
+                        //List<AssociatedPair> inliers = new ArrayList<>();
 
-        // show results
-        BufferedImage visualized = VisualizeImageData.disparity(disparity, null, minDisparity, maxDisparity, 0);
+                        //Se3_F64 leftToRight = estimateCameraMotion(intrinsic, matchedCalibrated, inliers);
+                        ModelMatcher<Se3_F64, AssociatedPair> epipolarMotion =
+                                FactoryMultiViewRobust.essentialRansac(new ConfigEssential(intrinsic),
+                                        new ConfigRansac(200, 0.5));
 
-        BufferedImage outLeft = new BufferedImage(rectifiedLeft.getWidth(), rectifiedLeft.getHeight(), BufferedImage.TYPE_INT_RGB);
-        grayToBuffered(rectifiedLeft, outLeft);
+                        Se3_F64 leftToRight;
+                        if (!epipolarMotion.process(matchedCalibrated)) {
+                            leftToRight = null; ///throw new RuntimeException("Motion estimation failed");
+                        } else {
+                            // save inlier set for debugging purposes
+                            //inliers.addAll(epipolarMotion.getMatchSet());
 
-        BufferedImage outRight = new BufferedImage(rectifiedRight.getWidth(), rectifiedRight.getHeight(), BufferedImage.TYPE_INT_RGB);
-        grayToBuffered(rectifiedRight, outRight);
+                            leftToRight = epipolarMotion.getModelParameters();
+                        }
 
-        ShowImages.showWindow(new RectifiedPairPanel(true, outLeft, outRight), "Rectification");
-        ShowImages.showWindow(visualized, "Disparity");
+                        if (leftToRight != null) {
 
-        showPointCloud(disparity, outLeft, leftToRight, rectifiedK, minDisparity, maxDisparity);
+                            drawInliers(panel, prev, next, intrinsic, epipolarMotion.getMatchSet());
 
-        System.out.println("Total found " + matchedCalibrated.size());
-        System.out.println("Total Inliers " + inliers.size());
+                            // Rectify and remove lens distortion for stereo processing
+                            DenseMatrix64F rectifiedK = new DenseMatrix64F(3, 3);
+                            GrayU8 rectifiedPrev = distortedPrev.createSameShape();
+                            GrayU8 rectifiedNext = distortedNext.createSameShape();
+
+
+                            rectifyImages(distortedPrev, distortedNext, leftToRight, intrinsic, rectifiedPrev, rectifiedNext, rectifiedK);
+
+                            // compute disparity
+                            StereoDisparity<GrayS16, GrayF32> disparityAlg =
+                                    FactoryStereoDisparity.regionSubpixelWta(DisparityAlgorithms.RECT_FIVE,
+                                            minDisparity, maxDisparity, 5, 5, 40, 1, 0.1, GrayS16.class);
+
+                            // Apply the Laplacian across the image to add extra resistance to changes in lighting or camera gain
+                            GrayS16 derivPrev = new GrayS16(rectifiedPrev.width, rectifiedPrev.height);
+                            LaplacianEdge.process(rectifiedPrev, derivPrev);
+                            GrayS16 derivNext = new GrayS16(rectifiedNext.width, rectifiedNext.height);
+                            LaplacianEdge.process(rectifiedNext, derivNext);
+
+                            disparityAlg.process(derivPrev, derivNext);
+
+                            outPrev = grayToBuffered(rectifiedPrev, outPrev);
+                            outNext = grayToBuffered(rectifiedNext, outNext);
+//                            rpp.setImages(outPrev, outNext);
+//                            rpp.repaint();
+
+                            double baseline = leftToRight.getT().norm();
+
+
+                            gui.configure(baseline, rectifiedK, new DoNothingTransform_F64(), minDisparity, maxDisparity);
+                            gui.process(disparityAlg.getDisparity(), outPrev);
+
+                            //showPointCloud(disparity, outPrev, leftToRight, rectifiedK, minDisparity, maxDisparity);
+
+                            System.out.println("Total found " + matchedCalibrated.size() + "\t" + " cloud points=" + gui.view.cloud.size());
+                            //System.out.println(Arrays.toString(gui.view.cloud.data));
+
+
+                        }
+
+
+                    }
+
+                    prev = next;
+                }
+
+                Util.sleep(20);
+
+            }
+        }
+
+
     }
 
 
-    public static void grayToBuffered(GrayU8 src, BufferedImage dst) {
+    public static BufferedImage grayToBuffered(GrayU8 src, BufferedImage dst) {
+
+        if (dst == null || dst.getWidth() != src.getWidth() || dst.getHeight() != src.getHeight())
+            dst = new BufferedImage(src.getWidth(), src.getHeight(), BufferedImage.TYPE_INT_RGB);
 
         final int width = dst.getWidth();
         final int height = dst.getHeight();
@@ -189,29 +258,21 @@ public class ExampleStereoTwoViewsOneCamera {
             }
         }
 
+        return dst;
     }
-
-    /**
-     * Estimates the camera motion robustly using RANSAC and a set of associated points.
-     *
-     * @param intrinsic   Intrinsic camera parameters
-     * @param matchedNorm set of matched point features in normalized image coordinates
-     * @param inliers     OUTPUT: Set of inlier features from RANSAC
-     * @return Found camera motion.  Note translation has an arbitrary scale
-     */
-    public static Se3_F64 estimateCameraMotion(IntrinsicParameters intrinsic,
-                                               List<AssociatedPair> matchedNorm, List<AssociatedPair> inliers) {
-        ModelMatcher<Se3_F64, AssociatedPair> epipolarMotion =
-                FactoryMultiViewRobust.essentialRansac(new ConfigEssential(intrinsic), new ConfigRansac(200, 0.5));
-
-        if (!epipolarMotion.process(matchedNorm))
-            throw new RuntimeException("Motion estimation failed");
-
-        // save inlier set for debugging purposes
-        inliers.addAll(epipolarMotion.getMatchSet());
-
-        return epipolarMotion.getModelParameters();
-    }
+//
+//    /**
+//     * Estimates the camera motion robustly using RANSAC and a set of associated points.
+//     *
+//     * @param intrinsic   Intrinsic camera parameters
+//     * @param matchedNorm set of matched point features in normalized image coordinates
+//     * @param inliers     OUTPUT: Set of inlier features from RANSAC
+//     * @return Found camera motion.  Note translation has an arbitrary scale
+//     */
+//    public static Se3_F64 estimateCameraMotion(IntrinsicParameters intrinsic,
+//                                               List<AssociatedPair> matchedNorm, List<AssociatedPair> inliers) {
+//
+//    }
 
     /**
      * Convert a set of associated point features from pixel coordinates into normalized image coordinates.
@@ -244,6 +305,7 @@ public class ExampleStereoTwoViewsOneCamera {
      * @param rectifiedLeft  Output rectified image for left camera.
      * @param rectifiedRight Output rectified image for right camera.
      * @param rectifiedK     Output camera calibration matrix for rectified camera
+     * @param model
      */
     public static void rectifyImages(GrayU8 distortedLeft,
                                      GrayU8 distortedRight,
@@ -257,7 +319,8 @@ public class ExampleStereoTwoViewsOneCamera {
         // original camera calibration matrices
         DenseMatrix64F K = PerspectiveOps.calibrationMatrix(intrinsic, null);
 
-        rectifyAlg.process(K, new Se3_F64(), K, leftToRight);
+        Se3_F64 motion = new Se3_F64();
+        rectifyAlg.process(K, motion, K, leftToRight);
 
         // rectification matrix for each image
         DenseMatrix64F rect1 = rectifyAlg.getRect1();
@@ -282,7 +345,7 @@ public class ExampleStereoTwoViewsOneCamera {
     /**
      * Draw inliers for debugging purposes.  Need to convert from normalized to pixel coordinates.
      */
-    public static void drawInliers(InterleavedU8 left, InterleavedU8 right, IntrinsicParameters intrinsic,
+    public static void drawInliers(AssociationPanel panel, InterleavedU8 left, InterleavedU8 right, IntrinsicParameters intrinsic,
                                    List<AssociatedPair> normalized) {
         PointTransform_F64 n_to_p = LensDistortionOps.transformPoint(intrinsic).distort_F64(false, true);
 
@@ -297,32 +360,57 @@ public class ExampleStereoTwoViewsOneCamera {
             pixels.add(p);
         }
 
-        // display the results
-        AssociationPanel panel = new AssociationPanel(20);
+
         panel.setAssociation(pixels);
+        panel.setImages(interleavedToBuffered(left, null), interleavedToBuffered(right, null));
+        panel.repaint();
 
-
-        //panel.setImages(new BufferedImage(left.data), right);
-
-        ShowImages.showWindow(panel, "Inlier Features");
     }
 
-    /**
-     * Show results as a point cloud
-     */
-    public static void showPointCloud(ImageGray disparity, BufferedImage left,
-                                      Se3_F64 motion, DenseMatrix64F rectifiedK,
-                                      int minDisparity, int maxDisparity) {
-        PointCloudTiltPanel gui = new PointCloudTiltPanel();
+    public static BufferedImage interleavedToBuffered(InterleavedU8 src, BufferedImage dst) {
 
-        double baseline = motion.getT().norm();
+        if (src.getNumBands() != 3)
+            throw new IllegalArgumentException("src must have three bands");
 
-        gui.configure(baseline, rectifiedK, new DoNothingTransform_F64(), minDisparity, maxDisparity);
-        gui.process(disparity, left);
-        gui.setPreferredSize(new Dimension(left.getWidth(), left.getHeight()));
+        if (dst == null || dst.getWidth() != src.getWidth() || dst.getHeight() != src.getHeight()) {
+            dst = new BufferedImage(src.getWidth(), src.getHeight(), BufferedImage.TYPE_INT_RGB);
+        }
 
-        ShowImages.showWindow(gui, "Point Cloud");
+        final int width = dst.getWidth();
+        final int height = dst.getHeight();
+
+        for (int y = 0; y < height; y++) {
+            int indexSrc = src.startIndex + src.stride * y;
+
+            for (int x = 0; x < width; x++) {
+                int c1 = src.data[indexSrc++] & 0xFF;
+                int c2 = src.data[indexSrc++] & 0xFF;
+                int c3 = src.data[indexSrc++] & 0xFF;
+
+                int argb = c1 << 16 | c2 << 8 | c3;
+
+                dst.setRGB(x, y, argb);
+            }
+        }
+
+        return dst;
     }
+//    /**
+//     * Show results as a point cloud
+//     */
+//    public static void showPointCloud(ImageGray disparity, BufferedImage left,
+//                                      Se3_F64 motion, DenseMatrix64F rectifiedK,
+//                                      int minDisparity, int maxDisparity) {
+//        PointCloudTiltPanel gui = new PointCloudTiltPanel();
+//
+//        double baseline = motion.getT().norm();
+//
+//        gui.configure(baseline, rectifiedK, new DoNothingTransform_F64(), minDisparity, maxDisparity);
+//        gui.process(disparity, left);
+//        gui.setPreferredSize(new Dimension(left.getWidth(), left.getHeight()));
+//
+//        ShowImages.showWindow(gui, "Point Cloud");
+//    }
 
 	/*
  * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
@@ -426,7 +514,7 @@ public class ExampleStereoTwoViewsOneCamera {
          * Use the associate point feature example to create a list of {@link AssociatedPair} for use in computing the
          * fundamental matrix.
          */
-        public static List<AssociatedPair> computeMatches(GrayF32 left, GrayF32 right) {
+        public static List<AssociatedPair> computeMatches(GrayF32 left, GrayF32 right, AssociationPanel panel) {
             DetectDescribePoint detDesc = FactoryDetectDescribe.surfStable(
                     new ConfigFastHessian(1, 2, 200, 1, 9, 4, 4), null, null, GrayF32.class);
 //		DetectDescribePoint detDesc = FactoryDetectDescribe.sift(null,new ConfigSiftDetector(2,0,200,5),null,null);
@@ -437,7 +525,7 @@ public class ExampleStereoTwoViewsOneCamera {
             ExampleAssociatePoints<GrayF32, BrightFeature> findMatches =
                     new ExampleAssociatePoints<>(detDesc, associate, GrayF32.class);
 
-            findMatches.associate(left, right);
+            findMatches.associate(panel, left, right);
 
             List<AssociatedPair> matches = new ArrayList<>();
             FastQueue<AssociatedIndex> matchIndexes = associate.getMatches();
@@ -484,6 +572,7 @@ public class ExampleStereoTwoViewsOneCamera {
 //            ShowImages.showWindow(panel, "Inlier Pairs");
 //        }
     }
+
     /**
      * After interest points have been detected in two images the next step is to associate the two
      * sets of images so that the relationship can be found.  This is done by computing descriptors for
@@ -517,8 +606,7 @@ public class ExampleStereoTwoViewsOneCamera {
         /**
          * Detect and associate point features in the two images.  Display the results.
          */
-        public void associate( T inputA , T inputB )
-        {
+        public void associate(AssociationPanel panel, T inputA, T inputB) {
 //            T inputA = ConvertBufferedImage.convertFromSingle(imageA, null, imageType);
 //            T inputB = ConvertImage.convert(imageB, null, imageType);
 
@@ -527,12 +615,12 @@ public class ExampleStereoTwoViewsOneCamera {
             pointsB = new ArrayList<>();
 
             // stores the description of detected interest points
-            FastQueue<TD> descA = UtilFeature.createQueue(detDesc,100);
-            FastQueue<TD> descB = UtilFeature.createQueue(detDesc,100);
+            FastQueue<TD> descA = UtilFeature.createQueue(detDesc, 100);
+            FastQueue<TD> descB = UtilFeature.createQueue(detDesc, 100);
 
             // describe each image using interest points
-            describeImage(inputA,pointsA,descA);
-            describeImage(inputB,pointsB,descB);
+            describeImage(inputA, pointsA, descA);
+            describeImage(inputB, pointsB, descB);
 
             // Associate features between the two images
             associate.setSource(descA);
@@ -540,22 +628,21 @@ public class ExampleStereoTwoViewsOneCamera {
             associate.associate();
 
             // display the results
-            AssociationPanel panel = new AssociationPanel(20);
-            panel.setAssociation(pointsA,pointsB,associate.getMatches());
-            //panel.setImages(imageA,imageB);
+            panel.setAssociation(pointsA, pointsB, associate.getMatches());
+            panel.repaint();
+            //panel.setImages(grayToBuffered(imageA,null);,imageB);
 
-            ShowImages.showWindow(panel,"Associated Features",true);
+            //ShowImages.showWindow(panel,"Associated Features",true);
         }
 
         /**
          * Detects features inside the two images and computes descriptions at those points.
          */
-        private void describeImage(T input, List<Point2D_F64> points, FastQueue<TD> descs )
-        {
+        private void describeImage(T input, List<Point2D_F64> points, FastQueue<TD> descs) {
             detDesc.detect(input);
 
-            for( int i = 0; i < detDesc.getNumberOfFeatures(); i++ ) {
-                points.add( detDesc.getLocation(i).copy() );
+            for (int i = 0; i < detDesc.getNumberOfFeatures(); i++) {
+                points.add(detDesc.getLocation(i).copy());
                 descs.grow().setTo(detDesc.getDescription(i));
             }
         }
@@ -582,4 +669,486 @@ public class ExampleStereoTwoViewsOneCamera {
 //            app.associate(imageA,imageB);
 //        }
     }
+
+
+    /**
+     * <p>
+     * Renders a 3D point cloud using a perspective pin hole camera model.
+     * </p>
+     * <p>
+     * <p>
+     * Rendering speed is improved by first rendering onto a grid and only accepting the highest
+     * (closest to viewing camera) point as being visible.
+     * </p>
+     *
+     * @author Peter Abeles
+     */
+    public static class DisparityPointCloudViewer extends JPanel {
+        final Deque<ColorPoint3D> cloud = new ArrayDeque<ColorPoint3D>();
+        final int capacity = 20000;
+
+        // distance between the two camera centers
+        double baseline;
+
+        // intrinsic camera parameters
+        DenseMatrix64F K;
+        double focalLengthX;
+        double focalLengthY;
+        double centerX;
+        double centerY;
+
+        // minimum disparity
+        int minDisparity;
+        // maximum minus minimum disparity
+        int rangeDisparity;
+
+        // How far out it should zoom.
+        double range = 1;
+
+        // view offset
+        double offsetX;
+        double offsetY;
+
+        // Data structure that contains the visible point at each pixel
+        // size = width*height, row major format
+        Pixel data[] = new Pixel[0];
+
+        // tilt angle in degrees
+        public int tiltAngle;
+        public double radius = 5;
+
+        // converts from rectified pixels into color image pixels
+        PointTransform_F64 rectifiedToColor;
+        // storage for color image coordinate
+        Point2D_F64 colorPt = new Point2D_F64();
+
+
+        /**
+         * Stereo and intrinsic camera parameters
+         *
+         * @param baseline         Stereo baseline (world units)
+         * @param K                Intrinsic camera calibration matrix of rectified camera
+         * @param rectifiedToColor Transform from rectified pixels to the color image pixels.
+         * @param minDisparity     Minimum disparity that's computed (pixels)
+         * @param maxDisparity     Maximum disparity that's computed (pixels)
+         */
+        public void configure(double baseline,
+                              DenseMatrix64F K,
+                              PointTransform_F64 rectifiedToColor,
+                              int minDisparity, int maxDisparity) {
+            this.K = K;
+            this.rectifiedToColor = rectifiedToColor;
+            this.baseline = baseline;
+            this.focalLengthX = K.get(0, 0);
+            this.focalLengthY = K.get(1, 1);
+            this.centerX = K.get(0, 2);
+            this.centerY = K.get(1, 2);
+            this.minDisparity = minDisparity;
+
+            this.rangeDisparity = maxDisparity - minDisparity;
+
+
+        }
+
+        /**
+         * Given the disparity image compute the 3D location of valid points and save pixel colors
+         * at that point
+         *
+         * @param disparity Disparity image
+         * @param color     Color image of left camera
+         */
+        public void process(ImageGray disparity, BufferedImage color) {
+            if (disparity instanceof GrayU8)
+                process((GrayU8) disparity, color);
+            else
+                process((GrayF32) disparity, color);
+        }
+
+        private void process(GrayU8 disparity, BufferedImage img) {
+
+            trim();
+
+            synchronized(cloud) {
+                for (int y = 0; y < disparity.height; y++) {
+                    int index = disparity.startIndex + disparity.stride * y;
+
+                    for (int x = 0; x < disparity.width; x++) {
+                        int value = disparity.data[index++] & 0xFF;
+
+                        if (value >= rangeDisparity)
+                            continue;
+
+                        value += minDisparity;
+
+                        if (value == 0)
+                            continue;
+
+
+                        ColorPoint3D p = cloud.size() > capacity ? cloud.removeFirst() : new ColorPoint3D();
+
+                        // Note that this will be in the rectified left camera's reference frame.
+                        // An additional rotation is needed to put it into the original left camera frame.
+                        p.z = baseline * focalLengthX / value;
+                        p.x = p.z * (x - centerX) / focalLengthX;
+                        p.y = p.z * (y - centerY) / focalLengthY;
+
+                        getColor(disparity, img, x, y, p);
+
+                        cloud.addLast(p);
+
+                    }
+                }
+            }
+        }
+
+        private void trim() {
+            //cloud.reset();
+//            int toRemove = cloud.size() - maxPoints;
+//            for (int i = 0; i < toRemove; i++) {
+//                cloud.removeFirst();
+//            }
+        }
+
+        private void process(GrayF32 disparity, BufferedImage img) {
+
+            trim();
+
+            for (int y = 0; y < disparity.height; y++) {
+                int index = disparity.startIndex + disparity.stride * y;
+
+                for (int x = 0; x < disparity.width; x++) {
+                    float value = disparity.data[index++];
+
+                    if (value >= rangeDisparity)
+                        continue;
+
+                    value += minDisparity;
+
+                    if (value == 0)
+                        continue;
+
+                    ColorPoint3D p = cloud.size() > capacity ? cloud.removeFirst() : new ColorPoint3D();
+
+                    p.z = baseline * focalLengthX / value;
+                    p.x = p.z * (x - centerX) / focalLengthX;
+                    p.y = p.z * (y - centerY) / focalLengthY;
+
+                    getColor(disparity, img, x, y, p);
+
+                    cloud.addLast(p);
+                }
+            }
+        }
+
+        private void getColor(ImageBase disparity, BufferedImage color, int x, int y, ColorPoint3D p) {
+            rectifiedToColor.compute(x, y, colorPt);
+            if (BoofMiscOps.checkInside(disparity, colorPt.x, colorPt.y, 0)) {
+                p.rgb = color.getRGB((int) colorPt.x, (int) colorPt.y);
+            } else {
+                p.rgb = 0x000000;
+            }
+        }
+
+        @Override
+        public void paintComponent(Graphics g) {
+            //super.paintComponent(g);
+
+            Pixel[] d = this.data;
+            if (d.length == 0)
+                return;
+
+            int width = getWidth();
+            int h = getHeight();
+
+            int r = 2;
+            int w = r * 2 + 1;
+
+            Graphics2D g2 = (Graphics2D) g;
+
+            int index = 0;
+            for (int y = 0; y < h; y++) {
+                for (int x = 0; x < width; x++) {
+                    Pixel p = d[index++];
+                    if (p.rgb == -1)
+                        continue;
+
+                    g2.setColor(new Color(p.rgb));
+                    g2.fillRect(x - r, y - r, w, w);
+                }
+            }
+        }
+
+        private void projectScene() {
+            int w = getWidth();
+            int h = getHeight();
+
+            int N = w * h;
+
+            Pixel[] data = this.data;
+            if (data.length < N) {
+                data = this.data = new Pixel[N];
+                for (int i = 0; i < N; i++)
+                    data[i] = new Pixel();
+            } else {
+                for (int i = 0; i < N; i++)
+                    data[i].fade();
+            }
+
+            Se3_F64 pose = createWorldToCamera();
+            Point3D_F64 cameraPt = new Point3D_F64();
+            Point2D_F64 pixel = new Point2D_F64();
+
+            synchronized(cloud) {
+                for (ColorPoint3D p : cloud) {
+
+                    SePointOps_F64.transform(pose, p, cameraPt);
+                    double cz = cameraPt.z;
+
+                    pixel.x = cameraPt.x / cz;
+                    pixel.y = cameraPt.y / cz;
+
+                    GeometryMath_F64.mult(K, pixel, pixel);
+
+                    int x = (int) pixel.x;
+                    int y = (int) pixel.y;
+
+                    if (x < 0 || y < 0 || x >= w || y >= h)
+                        continue;
+
+                    Pixel d = data[y * w + x];
+                    if (d.height > cz) {
+                        d.height = cz;
+                        d.rgb = p.rgb;
+                    }
+                }
+            }
+
+            //this.data = data;
+        }
+
+        public Se3_F64 createWorldToCamera() {
+            // pick an appropriate amount of motion for the scene
+            double z = baseline * focalLengthX / (minDisparity + rangeDisparity);
+
+            double adjust = baseline / 20.0;
+
+            Vector3D_F64 rotPt = new Vector3D_F64(offsetX * adjust, offsetY * adjust, z * range);
+
+            double radians = tiltAngle * Math.PI / 180.0;
+            DenseMatrix64F R = ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, radians, 0, 0, null);
+
+            Se3_F64 a = new Se3_F64(R, rotPt);
+
+            return a;
+        }
+
+        /**
+         * Contains information on visible pixels
+         */
+        private static class Pixel {
+            // the pixel's height.  used to see if it is closer to the  camera or not
+            public double height;
+            // Color of the pixel
+            public int rgb;
+
+            private Pixel() {
+                reset();
+            }
+
+            public void reset() {
+                height = Double.MAX_VALUE;
+                rgb = -1;
+            }
+
+            public void fade() {
+                reset();
+            }
+        }
+    }
+
+    /**
+     * Provides a simplified set of controls for changing the view in a {@link DisparityPointCloudViewer}.
+     * Uses the mouse to move the camera in its local X,Y plane.  Widgets in the control bar
+     * allow the user to change the camera's tilt and distance from the origin.
+     *
+     * @author Peter Abeles
+     */
+    public static class PointCloudTiltPanel extends JPanel
+            implements ActionListener, ChangeListener, MouseListener, MouseMotionListener {
+        // Point cloud viewer
+        DisparityPointCloudViewer view;
+
+        // when pressed sets the view to "home"
+        JButton homeButton;
+        // Adjusts the amount of zoom
+        JSpinner rangeSpinner;
+        // Tilts the camera up and down
+        JSlider tiltSlider;
+
+        // bounds on scale adjustment
+        double minRange;
+        double maxRange = 20;
+
+        // previous mouse location
+        int prevX;
+        int prevY;
+
+        public PointCloudTiltPanel() {
+            super(new BorderLayout());
+
+            addMouseListener(this);
+            addMouseMotionListener(this);
+
+            view = new DisparityPointCloudViewer();
+            view.setSize(800, 800);
+
+            JToolBar toolBar = createToolBar();
+
+            add(toolBar, BorderLayout.PAGE_START);
+            add(view, BorderLayout.CENTER);
+        }
+
+        private JToolBar createToolBar() {
+            JToolBar toolBar = new JToolBar("Controls");
+
+            homeButton = new JButton("Home");
+            homeButton.addActionListener(this);
+
+            rangeSpinner = new JSpinner(new SpinnerNumberModel(view.range, minRange, maxRange, 0.2));
+
+            rangeSpinner.addChangeListener(this);
+            rangeSpinner.setMaximumSize(rangeSpinner.getPreferredSize());
+
+            tiltSlider = new JSlider(JSlider.HORIZONTAL,
+                    -120, 120, view.tiltAngle);
+            tiltSlider.addChangeListener(this);
+            tiltSlider.setMajorTickSpacing(60);
+            tiltSlider.setPaintLabels(true);
+
+            toolBar.add(homeButton);
+            toolBar.add(new JToolBar.Separator(new Dimension(10, 1)));
+            toolBar.add(new JLabel("Range:"));
+            toolBar.add(rangeSpinner);
+            toolBar.add(new JToolBar.Separator(new Dimension(10, 1)));
+            toolBar.add(new JLabel("Tilt Angle:"));
+            toolBar.add(tiltSlider);
+
+            return toolBar;
+        }
+
+        /**
+         * Specified intrinsic camera parameters and disparity settings
+         *
+         * @param baseline Stereo baseline
+         * @param K        rectified camera calibration matrix
+         */
+        public void configure(double baseline,
+                              DenseMatrix64F K,
+                              PointTransform_F64 rectifiedToColor,
+                              int minDisparity, int maxDisparity) {
+            view.configure(baseline, K, rectifiedToColor, minDisparity, maxDisparity);
+        }
+
+        /**
+         * Updates the view, must be called in a GUI thread
+         */
+        public void process(ImageGray disparity, BufferedImage color) {
+            view.process(disparity, color);
+
+            tiltSlider.removeChangeListener(this);
+            tiltSlider.setValue(view.tiltAngle);
+            tiltSlider.addChangeListener(this);
+
+            update();
+            repaint();
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+
+            if (e.getSource() == homeButton) {
+                view.offsetX = 0;
+                view.offsetY = 0;
+                view.tiltAngle = 0;
+                view.range = 1;
+
+                tiltSlider.removeChangeListener(this);
+                tiltSlider.setValue(view.tiltAngle);
+                tiltSlider.addChangeListener(this);
+
+                rangeSpinner.removeChangeListener(this);
+                rangeSpinner.setValue(view.range);
+                rangeSpinner.addChangeListener(this);
+            }
+
+            update();
+        }
+
+        public void update() {
+            view.projectScene();
+            view.repaint();
+        }
+
+        @Override
+        public void stateChanged(ChangeEvent e) {
+
+            if (e.getSource() == rangeSpinner) {
+                view.range = ((Number) rangeSpinner.getValue()).doubleValue();
+            } else if (e.getSource() == tiltSlider) {
+                view.tiltAngle = ((Number) tiltSlider.getValue()).intValue();
+            }
+            update();
+        }
+
+        @Override
+        public synchronized void mouseClicked(MouseEvent e) {
+
+            double range = view.range;
+            if (e.isShiftDown())
+                range *= 0.75;
+            else
+                range *= 1.25;
+
+            if (range < minRange) range = minRange;
+            if (range > maxRange) range = maxRange;
+            rangeSpinner.setValue(range);
+        }
+
+        @Override
+        public void mousePressed(MouseEvent e) {
+            prevX = e.getX();
+            prevY = e.getY();
+        }
+
+        @Override
+        public void mouseReleased(MouseEvent e) {
+        }
+
+        @Override
+        public void mouseEntered(MouseEvent e) {
+        }
+
+        @Override
+        public void mouseExited(MouseEvent e) {
+        }
+
+        @Override
+        public void mouseDragged(MouseEvent e) {
+            final int deltaX = e.getX() - prevX;
+            final int deltaY = e.getY() - prevY;
+
+            view.offsetX += deltaX;
+            view.offsetY += deltaY;
+
+            prevX = e.getX();
+            prevY = e.getY();
+
+            update();
+        }
+
+        @Override
+        public void mouseMoved(MouseEvent e) {
+        }
+    }
+
 }
