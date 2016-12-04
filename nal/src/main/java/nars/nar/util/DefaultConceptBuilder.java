@@ -106,7 +106,7 @@ public class DefaultConceptBuilder implements ConceptBuilder {
         @NotNull Bag<Term> termbag = newCurveBag(sharedMap);
         @NotNull Bag<Task> taskbag = newCurveBag(sharedMap);
 
-        boolean dynamic = false;
+        DynamicTruthModel dmt = null;
 
         switch (t.op()) {
 
@@ -116,8 +116,17 @@ public class DefaultConceptBuilder implements ConceptBuilder {
                 break;
 
             case CONJ:
-                if (t.vars() == 0)
-                    dynamic = true;
+                //allow variables onlyif they are not themselves direct subterms of this
+                boolean dynamicConj = true;
+                for (Term x : t.terms()) {
+                    if (x instanceof Variable) {
+                        dynamicConj = false;
+                        break;
+                    }
+                }
+                if (dynamicConj) {
+                    dmt = DynamicTruthModel.Intersection;
+                }
                 break;
 
             case NEG:
@@ -127,15 +136,12 @@ public class DefaultConceptBuilder implements ConceptBuilder {
 
 
         return
-                (!dynamic) ?
+                dmt != null ?
+                        new DynamicConcept(t, dmt, dmt, termbag, taskbag, nar) :
                         new CompoundConcept<>(t, termbag, taskbag, nar)
-                        :
-                        new DynamicConcept(t, x, x, termbag, taskbag, nar)
                 ;
-
     }
 
-    final static DynamicTruthModel x = new DynamicTruthModel.Intersection();
 
     /**
      * use average blend so that reactivations of adjusted task budgets can be applied repeatedly without inflating the link budgets they activate; see CompoundConcept.process

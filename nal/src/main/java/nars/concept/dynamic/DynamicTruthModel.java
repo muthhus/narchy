@@ -32,16 +32,10 @@ abstract public class DynamicTruthModel {
     /**
      * N-ary intersection truth function
      */
-    public static class Intersection extends DynamicTruthModel {
-
-        private float confMin;
-
-        public Intersection() {
-
-        }
+    public static final DynamicTruthModel Intersection = new DynamicTruthModel() {
 
         @Override
-        protected boolean add(DynTruth d, Truth truth) {
+        protected boolean add(DynTruth d, Truth truth, float confMin) {
 
             //specific to Truth.Intersection:
             d.conf *= truth.conf();
@@ -59,20 +53,20 @@ abstract public class DynamicTruthModel {
         @Override
         protected DynTruth eval(Compound template, long when, boolean stamp, NAR n) {
 
-            this.confMin = n.confMin.floatValue();
-
             DynTruth d = new DynTruth(stamp? $.newArrayList(0) : null);
             d.freq = d.conf = 1f;
             return d;
 
         }
-    }
+    };
 
     @Nullable public DynTruth eval(Compound superterm, boolean beliefOrGoal, long when, long now, boolean stamp, NAR n) {
 
         Term[] inputs = superterm.terms();
 
         DynTruth d = eval(superterm, when, stamp, n);
+
+        float confMin = n.confMin.floatValue();
 
         for (int i = 0; i < inputs.length; i++) {
             Term subterm = inputs[i];
@@ -95,18 +89,21 @@ abstract public class DynamicTruthModel {
                 if (tableDynamic) {
                     boolean evi = d.e != null;
                     @Nullable DynTruth ndt = ((DynamicBeliefTable) table).truth(when + dt, now, (Compound) subterm, evi);
-                    //already negated via the parameter
-                    Truth ntt = ndt.truth();
-                    if (ntt != null && add(d, ntt.negated(negated))) {
-                        if (d.e != null) {
-                            d.e.addAll(ndt.e);
+                    if (ndt!=null) {
+                        Truth ntt = ndt.truth();
+                        if (ntt != null && add(d, ntt.negated(negated), confMin)) {
+                            if (d.e != null) {
+                                d.e.addAll(ndt.e);
+                            }
+                        } else {
+                            return null;
                         }
                     } else {
                         return null;
                     }
                 } else {
                     nt = table.truth(when + dt, now);
-                    if (nt != null && add(d, nt.negated(negated))) {
+                    if (nt != null && add(d, nt.negated(negated), confMin)) {
                         if (d.e != null) {
                             Task bt = table.match(when + dt, now);
                             if (bt != null) {
@@ -130,7 +127,7 @@ abstract public class DynamicTruthModel {
 
     protected abstract DynTruth eval(Compound template, long when, boolean stamp, NAR n);
 
-    protected abstract boolean add(DynTruth d, Truth t);
+    protected abstract boolean add(DynTruth d, Truth t, float confMin);
 
 
     /**
