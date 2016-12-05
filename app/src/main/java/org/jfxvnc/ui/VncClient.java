@@ -14,17 +14,17 @@
 package org.jfxvnc.ui;
 
 import com.airhacks.afterburner.injection.Injector;
-import javafx.beans.property.DoubleProperty;
-import javafx.beans.property.SimpleDoubleProperty;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.PixelReader;
 import javafx.scene.image.WritableImage;
 import javafx.scene.layout.Pane;
 import nars.util.FX;
+import nars.video.PixelBag;
 import org.jfxvnc.net.rfb.codec.security.SecurityType;
 import org.jfxvnc.ui.service.VncRenderService;
 import org.slf4j.LoggerFactory;
 import spacegraph.SpaceGraph;
+import spacegraph.Surface;
 import spacegraph.obj.widget.MatrixView;
 
 import static nars.video.Bitmap2D.*;
@@ -37,14 +37,11 @@ public class VncClient {
     private final static org.slf4j.Logger logger = LoggerFactory.getLogger(VncClient.class);
 
 
-    private final DoubleProperty sceneWidthProperty = new SimpleDoubleProperty(1024);
-    private final DoubleProperty sceneHeightProperty = new SimpleDoubleProperty(768);
-
     private PixelReader reader;
     public WritableImage image;
 
 
-    public VncClient(String host, int port) {
+    public VncClient(String host, int port /* TODO password, etc */ ) {
 
         Injector.setLogger(logger::trace);
 
@@ -121,26 +118,53 @@ public class VncClient {
 //        }, 800, 800);
 
 
+    }
+
+    public void newFXWindow() {
         FX.run(()->{
             FX.newWindow("x", new Pane(new ImageView(image)));
         });
+    }
 
-
+    public Surface newSurface() {
+        //TODO
         int pw = 200;
         int ph = 200;
-        SpaceGraph.window(new MatrixView(pw, ph, (x, y, gl) -> {
+        return new MatrixView(pw, ph, (x, y, gl) -> {
             final PixelReader reader = this.reader;
             if (reader !=null) {
                 int argb = reader.getArgb(x, y);
                 gl.glColor3f(decodeRed(argb), decodeGreen(argb), decodeBlue(argb));
             }
             return 0;
-        }), 800, 800);
+        });
+    }
 
+    public PixelBag newSensor(int pw, int ph) {
+        return new PixelBag(pw, ph) {
+
+            @Override
+            public int sw() {
+                return image==null ? 0 : (int) image.getWidth();
+            }
+
+            @Override
+            public int sh() {
+                return image==null ? 0 : (int) image.getHeight();
+            }
+
+            @Override
+            public int rgb(int sx, int sy) {
+                return reader.getArgb(sx, sy);
+            }
+        };
     }
 
     public static void main(String[] args) {
-        new VncClient("localhost", 5901);
+        VncClient v = new VncClient("localhost", 5901);
+        v.newFXWindow();
+
+        SpaceGraph.window(v.newSurface(), 800, 800);
     }
 
 

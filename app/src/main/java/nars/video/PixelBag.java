@@ -16,9 +16,8 @@ import static nars.util.Util.lerp;
 /**
  * 2D flat Raytracing Retina
  */
-public class PixelBag implements Bitmap2D {
+public abstract class PixelBag implements Bitmap2D {
 
-    final Supplier<BufferedImage> source;
     private final int px;
     private final int py;
 
@@ -52,12 +51,37 @@ public class PixelBag implements Bitmap2D {
     private float fb=1f;
 
 
-    public PixelBag(BufferedImage b, int px, int py) {
-        this(()->b, px, py);
+    public static PixelBag of(Supplier<BufferedImage> bb, int px, int py) {
+        return new PixelBag(px, py) {
+
+            public BufferedImage b;
+
+            @Override
+            public int sw() {
+                return b.getWidth();
+            }
+
+            @Override
+            public int sh() {
+                return b.getHeight();
+            }
+
+            @Override
+            public void update(float frameRate) {
+                b = bb.get();
+                if (b != null)
+                    super.update(frameRate);
+
+            }
+
+            @Override
+            public int rgb(int sx, int sy) {
+                return b.getRGB(sx, sy);
+            }
+        };
     }
 
-    public PixelBag(Supplier<BufferedImage> b, int px, int py) {
-        this.source = b;
+    public PixelBag(int px, int py) {
         this.px = px;
         this.py = py;
         this.pixels = new float[px][py];
@@ -65,17 +89,17 @@ public class PixelBag implements Bitmap2D {
         this.Z = 1f;
     }
 
+    /** source width, in pixels */
+    abstract public int sw();
+
+    /** source height, in pixels */
+    abstract public int sh();
+
     @Override
     public void update(float frameRate) {
 
-
-
-        final BufferedImage b = this.source.get();
-        if (b == null)
-            return;
-        
-        int sw = b.getWidth();
-        int sh = b.getHeight();
+        int sw = sw();
+        int sh = sh();
 
         float ew = max(Z * sw * maxZoomOut, pixMin);
         float eh = max(Z * sh * maxZoomOut, pixMin);
@@ -152,7 +176,7 @@ public class PixelBag implements Bitmap2D {
                     v = 0;
                 } else {
                     //pixel value
-                    int RGB = b.getRGB(sx, sy);
+                    int RGB = rgb(sx, sy);
                     float R = Bitmap2D.decodeRed(RGB);
                     float G = Bitmap2D.decodeGreen(RGB);
                     float B = Bitmap2D.decodeBlue(RGB);
@@ -162,6 +186,8 @@ public class PixelBag implements Bitmap2D {
             }
         }
     }
+
+    abstract public int rgb(int sx, int sy);
 
     @Override
     public void see(EachPixelRGB p) {
