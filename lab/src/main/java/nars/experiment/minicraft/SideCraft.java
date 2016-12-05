@@ -43,7 +43,7 @@ public class SideCraft extends NAgents {
 
         BufferedImage camBuffer = ((AwtGraphicsHandler) craft.gfx).buffer;
 
-        PixelBag cam = new PixelBag(camBuffer, 48, 32).addActions("cra", this);
+        PixelBag cam = PixelBag.of(()->camBuffer, 48, 32).addActions("cra", this);
 
 
         camAE = new PixelAutoClassifier("cra", cam.pixels, 8, 8, 32, this);

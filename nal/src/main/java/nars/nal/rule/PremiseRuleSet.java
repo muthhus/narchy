@@ -324,7 +324,7 @@ public class PremiseRuleSet {
 
         then.accept(r);
 
-        if (Param.SWAP_RULES && r.allowForward && permuteSwap(r)) {
+        if (Param.PERMUTE_SWAPPED_RULES && r.allowForward && permuteSwap(r)) {
             PremiseRule bSwap = r.swapPermutation(index);
             if (bSwap != null)
                 then.accept(add(bSwap, src + ":forward", ur, index));

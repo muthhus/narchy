@@ -25,8 +25,7 @@ public abstract class PixelBag implements Bitmap2D {
 
     /**
      * Z = 0: zoomed in all the way
-     *   = 1: zoomed out all the way
-     *
+     * = 1: zoomed out all the way
      */
     float X = 0f;
     float Y = 0f;
@@ -41,14 +40,16 @@ public abstract class PixelBag implements Bitmap2D {
 
     private int pixMin = 5;
 
-    /** increase >1 to allow zoom out beyond input size (ex: thumbnail size) */
+    /**
+     * increase >1 to allow zoom out beyond input size (ex: thumbnail size)
+     */
     float maxZoomOut = 1;
 
     public boolean vflip = false;
     public List<ActionConcept> actions;
-    private float fr=1f;
-    private float fg=1f;
-    private float fb=1f;
+    private float fr = 1f;
+    private float fg = 1f;
+    private float fb = 1f;
 
 
     public static PixelBag of(Supplier<BufferedImage> bb, int px, int py) {
@@ -89,10 +90,14 @@ public abstract class PixelBag implements Bitmap2D {
         this.Z = 1f;
     }
 
-    /** source width, in pixels */
+    /**
+     * source width, in pixels
+     */
     abstract public int sw();
 
-    /** source height, in pixels */
+    /**
+     * source height, in pixels
+     */
     abstract public int sh();
 
     @Override
@@ -118,33 +123,38 @@ public abstract class PixelBag implements Bitmap2D {
             mh = sh - eh;
         }
 
-        float minX = (X*mw);
+        float minX = (X * mw);
         float maxX = minX + ew;
-        float minY = (Y*mh);
+        float minY = (Y * mh);
         float maxY = minY + eh;
 
 //        System.out.println(X + "," + Y + "," + Z + ": [" + (minX+maxX)/2f + "@" + minX + "," + maxX + "::"
 //                                                         + (minY+maxY)/2f + "@" + minY + "," + maxY + "] <- aspect=" + eh + "/" + ew);
 
-        float cx = px/2f;
-        float cy = py/2f;
+        float cx = px / 2f;
+        float cy = py / 2f;
 
 
         //not perfect calculation, because it doesnt account for max/min min/max differences due to non-square dimensions
         //but suffices for now
-        float maxCenterDistanceSq = Math.max(cx,cy) * Math.max(cx, cy) * 2;
+        float maxCenterDistanceSq = Math.max(cx, cy) * Math.max(cx, cy) * 2;
 
-        float pxf = px-1;
-        float pyf = py-1;
+        float pxf = px - 1;
+        float pyf = py - 1;
 
-        float minClarity = 0.35f/frameRate, maxClarity = 1f/frameRate;
+        float minClarity = 0.35f / frameRate, maxClarity = 1f / frameRate;
 
         float fr = this.fr, fg = this.fg, fb = this.fb;
         float fSum = fr + fg + fb;
 
+        float xRange = maxX-minX;
+        float yRange = maxY-minY;
+
+        int supersampling = Math.max((int) Math.ceil(xRange / px / 2f), (int) Math.ceil(yRange / py / 2f));
+
         for (int ly = 0; ly < py; ly++) {
             float l = ly / pyf;
-            int sy = Math.round(lerp(maxY, minY, !vflip ? l : 1f-l));
+            int sy = Math.round(lerp(maxY, minY, !vflip ? l : 1f - l));
 
             float dy = Math.abs(ly - cy);
             float yDistFromCenterSq = dy * dy;
@@ -162,26 +172,28 @@ public abstract class PixelBag implements Bitmap2D {
 //                int lx = round((px - 1) * x);
 //                int ly = round((py - 1) * y);
                 float dx = Math.abs(lx - cx);
-                float distFromCenterSq = dx*dx + yDistFromCenterSq; //manhattan distance from center
+                float distFromCenterSq = dx * dx + yDistFromCenterSq; //manhattan distance from center
 
-                float clarity = lerp(minClarity, maxClarity, distFromCenterSq/maxCenterDistanceSq);
+                float clarity = lerp(minClarity, maxClarity, distFromCenterSq / maxCenterDistanceSq);
                 if (rng.nextFloat() > clarity)
                     continue;
 
                 //project to the viewed image plane
-                int sx = Math.round(lerp(maxX, minX, lx/pxf));
+                int sx = Math.round(lerp(maxX, minX, lx / pxf));
 
-                float v;
-                if (sx < 0 || sx > sw-1 || sy < 0 || sy > sh-1) {
-                    v = 0;
-                } else {
-                    //pixel value
-                    int RGB = rgb(sx, sy);
-                    float R = Bitmap2D.decodeRed(RGB);
-                    float G = Bitmap2D.decodeGreen(RGB);
-                    float B = Bitmap2D.decodeBlue(RGB);
-                    v = (fr * R + fg * G + fb * B) / fSum;
+                int samples = 0;
+                float R = 0, G = 0, B = 0;
+                for (int esx = Math.max(0, sx - supersampling); esx < Math.min(sw - 1, sx + supersampling); esx++) {
+                    for (int esy = Math.max(0, sy - supersampling); esy < Math.min(sh - 1, sy + supersampling); esy++) {
+
+                        int RGB = rgb(esx, esy);
+                        R += Bitmap2D.decodeRed(RGB);
+                        G += Bitmap2D.decodeGreen(RGB);
+                        B += Bitmap2D.decodeBlue(RGB);
+                        samples++;
+                    }
                 }
+                float v = (samples == 0) ? 0.5f : (fr * R + fg * G + fb * B) / fSum / samples;
                 pixels[lx][ly] = v;
             }
         }
@@ -211,7 +223,7 @@ public abstract class PixelBag implements Bitmap2D {
     }
 
     static float u(float f) {
-        return f/2f+0.5f;
+        return f / 2f + 0.5f;
     }
 
     public boolean setZoom(float f) {
@@ -234,14 +246,17 @@ public abstract class PixelBag implements Bitmap2D {
         this.fg = g;
         this.fb = b;
     }
+
     public boolean setRedFilter(float f) {
         this.fr = f;
         return true;
     }
+
     public boolean setGreenFilter(float f) {
         this.fr = f;
         return true;
     }
+
     public boolean setBlueFilter(float f) {
         this.fr = f;
         return true;
@@ -250,9 +265,9 @@ public abstract class PixelBag implements Bitmap2D {
 
     public PixelBag addActions(String termRoot, NAgent a) {
         actions = $.newArrayList(3);
-        actions.add( a.actionBipolar("see(" + termRoot + ",rx)", this::setXRelative) );
-        actions.add( a.actionBipolar("see(" + termRoot + ",ry)", this::setYRelative) );
-        actions.add( a.actionBipolar("see(" + termRoot + ",zoom)", this::setZoom) );
+        actions.add(a.actionBipolar("see(" + termRoot + ",rx)", this::setXRelative));
+        actions.add(a.actionBipolar("see(" + termRoot + ",ry)", this::setYRelative));
+        actions.add(a.actionBipolar("see(" + termRoot + ",zoom)", this::setZoom));
 //        actions.add( a.actionBipolar("see(" + termRoot + ",fr)", this::setRedFilter) );
 //        actions.add( a.actionBipolar("see(" + termRoot + ",fg)", this::setGreenFilter) );
 //        actions.add( a.actionBipolar("see(" + termRoot + ",fb)", this::setBlueFilter) );

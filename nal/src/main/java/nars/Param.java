@@ -116,15 +116,15 @@ public abstract class Param /*extends Container*/ implements Level {
     /**
      * swap task and belief in eligible rules ("forward" permutation)
      */
-    public static final boolean SWAP_RULES = true;
+    public static final boolean PERMUTE_SWAPPED_RULES = true;
     /**
      * minimum difference necessary to indicate a significant modification in budget float number components
      */
     public static final float BUDGET_EPSILON = 0.0005f;
 
 
-    public static final int DEFAULT_WIRED_CONCEPT_BELIEFS = 24;
-    public static final int DEFAULT_WIRED_CONCEPT_GOALS = 24;
+    public static final int DEFAULT_WIRED_CONCEPT_BELIEFS = 12;
+    public static final int DEFAULT_WIRED_CONCEPT_GOALS = 12;
 
     /** size of each thread's normalization cache, in entries */
     public static final int NORMALIZATION_CACHE_SIZE = 16*1024;

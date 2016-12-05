@@ -18,8 +18,14 @@ import javafx.scene.image.ImageView;
 import javafx.scene.image.PixelReader;
 import javafx.scene.image.WritableImage;
 import javafx.scene.layout.Pane;
+import nars.NAgent;
+import nars.nar.Default;
+import nars.remote.NAgents;
+import nars.time.RealTime;
 import nars.util.FX;
+import nars.util.Loop;
 import nars.video.PixelBag;
+import org.jetbrains.annotations.NotNull;
 import org.jfxvnc.net.rfb.codec.security.SecurityType;
 import org.jfxvnc.ui.service.VncRenderService;
 import org.slf4j.LoggerFactory;
@@ -27,6 +33,7 @@ import spacegraph.SpaceGraph;
 import spacegraph.Surface;
 import spacegraph.obj.widget.MatrixView;
 
+import static nars.$.t;
 import static nars.video.Bitmap2D.*;
 
 /**
@@ -162,9 +169,36 @@ public class VncClient {
 
     public static void main(String[] args) {
         VncClient v = new VncClient("localhost", 5901);
+
+        //1.
         v.newFXWindow();
 
+        //2.
         SpaceGraph.window(v.newSurface(), 800, 800);
+
+        Default nar = NAgents.newMultiThreadNAR(4, new RealTime.CS(true).dur(0.25f));
+
+        NAgents a = new NAgents(nar) {
+
+            {
+                PixelBag pb = v.newSensor(64, 64);
+                pb.addActions("vnc", this);
+
+                addCamera("vnc", pb, (v) -> t(v, alpha));
+            }
+
+            @Override
+            protected float act() {
+                return 0;
+            }
+
+
+        };
+        NAgents.chart(a);
+
+        a.runRT(55f);
+
+
     }
 
 
