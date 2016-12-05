@@ -27,7 +27,7 @@ public class ClientCutText implements InputEvent {
 
   @Override
   public String toString() {
-    return "ClientCutText [text=" + text + "]";
+    return "ClientCutText [text=" + text + ']';
   }
 
 }

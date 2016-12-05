@@ -13,14 +13,13 @@
  *******************************************************************************/
 package org.jfxvnc.net.rfb.codec.decoder.rect;
 
-import java.util.List;
-import java.util.stream.IntStream;
-
+import io.netty.buffer.ByteBuf;
+import io.netty.channel.ChannelHandlerContext;
 import org.jfxvnc.net.rfb.codec.PixelFormat;
 import org.jfxvnc.net.rfb.render.rect.CursorImageRect;
 
-import io.netty.buffer.ByteBuf;
-import io.netty.channel.ChannelHandlerContext;
+import java.util.List;
+import java.util.stream.IntStream;
 
 public class CursorRectDecoder extends RawRectDecoder {
 

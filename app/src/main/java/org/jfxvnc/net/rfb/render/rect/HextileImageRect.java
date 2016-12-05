@@ -13,10 +13,10 @@
  *******************************************************************************/
 package org.jfxvnc.net.rfb.render.rect;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import nars.util.list.FasterList;
 import org.jfxvnc.net.rfb.codec.Encoding;
+
+import java.util.List;
 
 public class HextileImageRect extends ImageRect {
 
@@ -24,7 +24,7 @@ public class HextileImageRect extends ImageRect {
 
   public HextileImageRect(int x, int y, int width, int height) {
     super(x, y, width, height);
-    rects = new ArrayList<>();
+    rects = new FasterList<>(0);
   }
 
   public List<RawImageRect> getRects() {
@@ -38,13 +38,13 @@ public class HextileImageRect extends ImageRect {
 
   @Override
   public boolean release() {
-    rects.forEach(r -> r.release());
+    rects.forEach(RawImageRect::release);
     return true;
   }
 
   @Override
   public String toString() {
     return "HextileImageRect [x=" + x + ", y=" + y + ", width=" + width + ", height=" + height + ", rects.count=" + (rects != null ? rects.size() : "null")
-        + "]";
+        + ']';
   }
 }

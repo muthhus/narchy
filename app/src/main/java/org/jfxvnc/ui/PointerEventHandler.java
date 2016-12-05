@@ -13,21 +13,16 @@
  *******************************************************************************/
 package org.jfxvnc.ui;
 
-import org.jfxvnc.net.rfb.codec.encoder.InputEventListener;
-import org.jfxvnc.net.rfb.codec.encoder.KeyButtonMap;
-import org.jfxvnc.net.rfb.codec.encoder.PointerEvent;
-
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.DoubleProperty;
-import javafx.beans.property.ReadOnlyIntegerProperty;
-import javafx.beans.property.ReadOnlyIntegerWrapper;
-import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.*;
 import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
+import org.jfxvnc.net.rfb.codec.encoder.InputEventListener;
+import org.jfxvnc.net.rfb.codec.encoder.KeyButtonMap;
+import org.jfxvnc.net.rfb.codec.encoder.PointerEvent;
 
-public class PointerEventHandler implements KeyButtonMap {
+public class PointerEventHandler {
 
   private double zoomLevel = 1.0;
   private InputEventListener listener;
@@ -113,7 +108,7 @@ public class PointerEventHandler implements KeyButtonMap {
 
   private void sendScrollEvents(ScrollEvent event) {
     fire(
-        new PointerEvent(event.getDeltaY() > 0 ? (byte) 8 : (byte) 16, (int) Math.floor(event.getX() / zoomLevel), (int) Math.floor(event.getY() / zoomLevel)));
+        new PointerEvent((byte) (event.getDeltaY() > 0 ? 8 : 16), (int) Math.floor(event.getX() / zoomLevel), (int) Math.floor(event.getY() / zoomLevel)));
   }
 
   private synchronized void fire(PointerEvent msg) {

@@ -13,13 +13,12 @@
  *******************************************************************************/
 package org.jfxvnc.net.rfb.codec.security.vncauth;
 
-import java.util.List;
-
-import org.jfxvnc.net.rfb.codec.security.RfbSecurityDecoder;
-
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
+import org.jfxvnc.net.rfb.codec.security.RfbSecurityDecoder;
+
+import java.util.List;
 
 public class VncAuthDecoder extends ByteToMessageDecoder implements RfbSecurityDecoder {
 

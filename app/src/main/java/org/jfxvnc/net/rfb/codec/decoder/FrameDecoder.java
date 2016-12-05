@@ -13,10 +13,10 @@
  *******************************************************************************/
 package org.jfxvnc.net.rfb.codec.decoder;
 
-import java.util.List;
-
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
+
+import java.util.List;
 
 public interface FrameDecoder {
 

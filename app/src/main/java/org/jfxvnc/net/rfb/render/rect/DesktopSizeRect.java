@@ -29,7 +29,7 @@ public class DesktopSizeRect extends ImageRect {
 
   @Override
   public String toString() {
-    return "DesktopSizeRect [width=" + width + ", height=" + height + "]";
+    return "DesktopSizeRect [width=" + width + ", height=" + height + ']';
   }
 
 }

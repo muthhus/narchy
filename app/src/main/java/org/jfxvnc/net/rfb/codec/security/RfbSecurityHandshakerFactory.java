@@ -19,10 +19,10 @@ public class RfbSecurityHandshakerFactory {
 
   public RfbSecurityHandshakerFactory() {}
 
-  public RfbSecurityHandshaker newRfbSecurityHandshaker(SecurityType securityType) {
+  public static RfbSecurityHandshaker newRfbSecurityHandshaker(SecurityType securityType) {
 
     if (securityType == SecurityType.VNC_Auth) {
-      return new VncAuthHandshaker(securityType);
+      return new VncAuthHandshaker(SecurityType.VNC_Auth);
     }
 
     return null;

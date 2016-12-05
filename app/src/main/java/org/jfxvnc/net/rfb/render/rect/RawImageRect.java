@@ -13,9 +13,8 @@
  *******************************************************************************/
 package org.jfxvnc.net.rfb.render.rect;
 
-import org.jfxvnc.net.rfb.codec.Encoding;
-
 import io.netty.buffer.ByteBuf;
+import org.jfxvnc.net.rfb.codec.Encoding;
 
 public class RawImageRect extends ImageRect {
 
@@ -54,12 +53,12 @@ public class RawImageRect extends ImageRect {
 
   @Override
   public boolean release() {
-    return pixels != null ? pixels.release() : true;
+    return pixels == null || pixels.release();
   }
 
   @Override
   public String toString() {
     return "RawImageRect [x=" + x + ", y=" + y + ", width=" + width + ", height=" + height + ", pixels.capacity="
-        + (pixels != null ? pixels.capacity() : "null") + ", scanlineStride=" + scanlineStride + "]";
+        + (pixels != null ? pixels.capacity() : "null") + ", scanlineStride=" + scanlineStride + ']';
   }
 }

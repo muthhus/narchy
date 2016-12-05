@@ -41,6 +41,6 @@ public class CopyImageRect extends ImageRect {
 
   @Override
   public String toString() {
-    return "CopyImageRect [x=" + x + ", y=" + y + ", width=" + width + ", height=" + height + ", srcX=" + srcX + ", srcY=" + srcY + "]";
+    return "CopyImageRect [x=" + x + ", y=" + y + ", width=" + width + ", height=" + height + ", srcX=" + srcX + ", srcY=" + srcY + ']';
   }
 }

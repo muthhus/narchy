@@ -58,10 +58,7 @@ public class HistoryEntry implements Comparable<HistoryEntry>, Serializable {
     } else if (!host.equals(other.host)) {
       return false;
     }
-    if (port != other.port) {
-      return false;
-    }
-    return true;
+    return port == other.port;
   }
 
   public String getPassword() {
@@ -98,7 +95,7 @@ public class HistoryEntry implements Comparable<HistoryEntry>, Serializable {
 
   @Override
   public String toString() {
-    return host + ":" + port + (serverName != null ? " (" + serverName + ")" : "");
+    return host + ':' + port + (serverName != null ? " (" + serverName + ')' : "");
   }
 
   @Override

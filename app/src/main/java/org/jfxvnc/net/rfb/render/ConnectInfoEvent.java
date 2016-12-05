@@ -13,13 +13,13 @@
  *******************************************************************************/
 package org.jfxvnc.net.rfb.render;
 
-import java.util.Arrays;
-
 import org.jfxvnc.net.rfb.codec.Encoding;
 import org.jfxvnc.net.rfb.codec.PixelFormat;
 import org.jfxvnc.net.rfb.codec.ProtocolVersion;
 import org.jfxvnc.net.rfb.codec.decoder.ServerDecoderEvent;
 import org.jfxvnc.net.rfb.codec.security.SecurityType;
+
+import java.util.Arrays;
 
 public class ConnectInfoEvent implements ServerDecoderEvent {
 
@@ -129,7 +129,7 @@ public class ConnectInfoEvent implements ServerDecoderEvent {
         + frameHeight + ", frameWidth=" + frameWidth + ", "
         + (supportedEncodings != null ? "supportedEncodings=" + Arrays.toString(supportedEncodings) + ", " : "")
         + (serverPF != null ? "serverPF=" + serverPF + ", " : "") + (clientPF != null ? "clientPF=" + clientPF + ", " : "") + "security=" + security + ", "
-        + (connectionType != null ? "connectionType=" + connectionType : "") + "]";
+        + (connectionType != null ? "connectionType=" + connectionType : "") + ']';
   }
 
 }

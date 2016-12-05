@@ -13,19 +13,18 @@
  *******************************************************************************/
 package org.jfxvnc.net.rfb.render;
 
-import org.jfxvnc.net.rfb.codec.PixelFormat;
-import org.jfxvnc.net.rfb.codec.ProtocolVersion;
-import org.jfxvnc.net.rfb.codec.security.SecurityType;
-
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.StringProperty;
+import org.jfxvnc.net.rfb.codec.PixelFormat;
+import org.jfxvnc.net.rfb.codec.ProtocolVersion;
+import org.jfxvnc.net.rfb.codec.security.SecurityType;
 
 public interface ProtocolConfiguration {
 
-  final int DEFAULT_PORT = 5900;
-  final int DEFAULT_LISTENING_PORT = 5500;
+  int DEFAULT_PORT = 5900;
+  int DEFAULT_LISTENING_PORT = 5500;
 
   /**
    * VNC server name or IP address

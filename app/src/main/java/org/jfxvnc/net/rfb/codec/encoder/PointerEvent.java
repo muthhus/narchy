@@ -41,7 +41,7 @@ public class PointerEvent implements InputEvent {
 
   @Override
   public String toString() {
-    return "PointerEvent [buttonMask=" + buttonMask + ", xPos=" + xPos + ", yPos=" + yPos + "]";
+    return "PointerEvent [buttonMask=" + buttonMask + ", xPos=" + xPos + ", yPos=" + yPos + ']';
   }
 
 }

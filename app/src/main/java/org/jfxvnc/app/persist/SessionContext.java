@@ -13,29 +13,7 @@
  *******************************************************************************/
 package org.jfxvnc.app.persist;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.OutputStream;
-import java.nio.file.FileSystems;
-import java.nio.file.Files;
-import java.nio.file.LinkOption;
-import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
-import java.util.Optional;
-import java.util.Properties;
-
-
-import org.slf4j.LoggerFactory;
-
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.DoubleProperty;
-import javafx.beans.property.FloatProperty;
-import javafx.beans.property.IntegerProperty;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.Property;
-import javafx.beans.property.StringProperty;
+import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
@@ -44,6 +22,12 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.TitledPane;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.paint.Color;
+import org.slf4j.LoggerFactory;
+
+import java.io.*;
+import java.nio.file.*;
+import java.util.Optional;
+import java.util.Properties;
 
 public class SessionContext {
 
@@ -65,8 +49,8 @@ public class SessionContext {
 
   public void setSession(String name) {
     this.name = name;
-    propPath = FileSystems.getDefault().getPath(System.getProperty("user.home"), "." + name + ".properties");
-    streamPath = FileSystems.getDefault().getPath(System.getProperty("user.home"), "." + name + ".history");
+    propPath = FileSystems.getDefault().getPath(System.getProperty("user.home"), '.' + name + ".properties");
+    streamPath = FileSystems.getDefault().getPath(System.getProperty("user.home"), '.' + name + ".history");
   }
 
   public Properties getProperties() {
@@ -105,9 +89,7 @@ public class SessionContext {
     if (value != null) {
       property.set(Boolean.valueOf(value));
     }
-    property.addListener(o -> {
-      props.setProperty(propertyName, property.getValue().toString());
-    });
+    property.addListener(o -> props.setProperty(propertyName, property.getValue().toString()));
   }
 
   @SuppressWarnings("unchecked")
@@ -122,9 +104,7 @@ public class SessionContext {
         ((ObjectProperty<Object>) property).set(value);
       }
     }
-    property.addListener(o -> {
-      props.setProperty(propertyName, property.getValue().toString());
-    });
+    property.addListener(o -> props.setProperty(propertyName, property.getValue().toString()));
   }
 
   public void bind(final DoubleProperty property, final String propertyName) {
@@ -132,9 +112,7 @@ public class SessionContext {
     if (value != null) {
       property.set(Double.valueOf(value));
     }
-    property.addListener(o -> {
-      props.setProperty(propertyName, property.getValue().toString());
-    });
+    property.addListener(o -> props.setProperty(propertyName, property.getValue().toString()));
   }
 
   public void bind(final ToggleGroup toggleGroup, final String propertyName) {
@@ -179,9 +157,7 @@ public class SessionContext {
       }
     } catch (Exception ignored) {
     }
-    combo.getSelectionModel().selectedIndexProperty().addListener(o -> {
-      props.setProperty(propertyName, Integer.toString(combo.getSelectionModel().getSelectedIndex()));
-    });
+    combo.getSelectionModel().selectedIndexProperty().addListener(o -> props.setProperty(propertyName, Integer.toString(combo.getSelectionModel().getSelectedIndex())));
   }
 
   public void bind(final StringProperty property, final String propertyName) {
@@ -190,9 +166,7 @@ public class SessionContext {
       property.set(value);
     }
 
-    property.addListener(o -> {
-      props.setProperty(propertyName, property.getValue());
-    });
+    property.addListener(o -> props.setProperty(propertyName, property.getValue()));
   }
 
   /**

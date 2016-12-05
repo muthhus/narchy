@@ -13,18 +13,15 @@
  *******************************************************************************/
 package org.jfxvnc.net.rfb.codec;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
-
+import io.netty.buffer.ByteBuf;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelPipeline;
+import io.netty.handler.codec.MessageToMessageDecoder;
+import io.netty.handler.ssl.SslContext;
+import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
 import org.jfxvnc.net.rfb.codec.decoder.FrameDecoderHandler;
 import org.jfxvnc.net.rfb.codec.decoder.ServerDecoderEvent;
-import org.jfxvnc.net.rfb.codec.encoder.ClientCutTextEncoder;
-import org.jfxvnc.net.rfb.codec.encoder.KeyButtonEventEncoder;
-import org.jfxvnc.net.rfb.codec.encoder.PixelFormatEncoder;
-import org.jfxvnc.net.rfb.codec.encoder.PointerEventEncoder;
-import org.jfxvnc.net.rfb.codec.encoder.PreferedEncoding;
-import org.jfxvnc.net.rfb.codec.encoder.PreferedEncodingEncoder;
+import org.jfxvnc.net.rfb.codec.encoder.*;
 import org.jfxvnc.net.rfb.codec.handshaker.event.ServerInitEvent;
 import org.jfxvnc.net.rfb.exception.ProtocolException;
 import org.jfxvnc.net.rfb.render.ConnectInfoEvent;
@@ -35,30 +32,23 @@ import org.jfxvnc.net.rfb.render.rect.ImageRect;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.ByteBufUtil;
-import io.netty.buffer.Unpooled;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelPipeline;
-import io.netty.handler.codec.MessageToMessageDecoder;
-import io.netty.handler.ssl.SslContext;
-import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
-
-import javax.net.ssl.SSLContext;
+import java.util.Arrays;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class ProtocolHandler extends MessageToMessageDecoder<Object> {
 
-  private static Logger logger = LoggerFactory.getLogger(ProtocolHandler.class);
+  private static final Logger logger = LoggerFactory.getLogger(ProtocolHandler.class);
 
   private final ProtocolConfiguration config;
 
   private ServerInitEvent serverInit;
 
-  private RenderProtocol render;
+  private final RenderProtocol render;
   
   private final RenderCallback voidCallback = () -> {};
   
-  private final AtomicReference<ProtocolState> state = new AtomicReference<ProtocolState>(ProtocolState.HANDSHAKE_STARTED);
+  private final AtomicReference<ProtocolState> state = new AtomicReference<>(ProtocolState.HANDSHAKE_STARTED);
 
   private SslContext sslContext;
 
@@ -185,7 +175,7 @@ public class ProtocolHandler extends MessageToMessageDecoder<Object> {
     return new PreferedEncoding(enc);
   }
 
-  public void sendFramebufferUpdateRequest(ChannelHandlerContext ctx, boolean incremental, int x, int y, int w, int h) {
+  public static void sendFramebufferUpdateRequest(ChannelHandlerContext ctx, boolean incremental, int x, int y, int w, int h) {
     ByteBuf buf = ctx.alloc().buffer(10, 10);
     buf.writeByte(ClientEventType.FRAMEBUFFER_UPDATE_REQUEST);
     buf.writeByte(incremental ? 1 : 0);

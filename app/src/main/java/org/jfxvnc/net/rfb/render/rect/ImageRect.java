@@ -17,10 +17,10 @@ import org.jfxvnc.net.rfb.codec.Encoding;
 
 public abstract class ImageRect {
 
-  protected final int x;
-  protected final int y;
-  protected final int width;
-  protected final int height;
+  public final int x;
+  public final int y;
+  public final int width;
+  public final int height;
 
   public ImageRect(int x, int y, int width, int height) {
     this.x = x;
@@ -36,34 +36,6 @@ public abstract class ImageRect {
 
 
   /**
-   * @return the X coordinate of the image rectangular
-   */
-  public int getX() {
-    return x;
-  }
-
-  /**
-   * @return the Y coordinate of the image rectangular
-   */
-  public int getY() {
-    return y;
-  }
-
-  /**
-   * @return the width of the image rectangular
-   */
-  public int getWidth() {
-    return width;
-  }
-
-  /**
-   * @return the height of the image rectangular
-   */
-  public int getHeight() {
-    return height;
-  }
-
-  /**
    * Release the image buffer
    * 
    * @return if successful
@@ -74,7 +46,7 @@ public abstract class ImageRect {
 
   @Override
   public String toString() {
-    return "ImageRect [x=" + x + ", y=" + y + ", width=" + width + ", height=" + height + "]";
+    return "ImageRect [x=" + x + ", y=" + y + ", width=" + width + ", height=" + height + ']';
   }
 
 }

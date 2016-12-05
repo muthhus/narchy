@@ -27,7 +27,7 @@ public class ServerCutTextEvent implements ServerDecoderEvent {
 
   @Override
   public String toString() {
-    return "ServerCutText [text=" + text + "]";
+    return "ServerCutText [text=" + text + ']';
   }
 
 }

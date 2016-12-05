@@ -13,11 +13,9 @@
  *******************************************************************************/
 package org.jfxvnc.net.rfb.codec.handshaker;
 
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.List;
-
+import io.netty.buffer.ByteBuf;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.handler.codec.ReplayingDecoder;
 import org.jfxvnc.net.rfb.codec.PixelFormat;
 import org.jfxvnc.net.rfb.codec.handshaker.event.SecurityResultEvent;
 import org.jfxvnc.net.rfb.codec.handshaker.event.SecurityTypesEvent;
@@ -28,13 +26,14 @@ import org.jfxvnc.net.rfb.exception.SecurityException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.netty.buffer.ByteBuf;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.handler.codec.ReplayingDecoder;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.List;
 
 class RfbClient38Decoder extends ReplayingDecoder<RfbClient38Decoder.State> implements RfbClientDecoder {
 
-  private static Logger logger = LoggerFactory.getLogger(RfbClient38Decoder.class);
+  private static final Logger logger = LoggerFactory.getLogger(RfbClient38Decoder.class);
 
   protected final Charset ASCII = StandardCharsets.US_ASCII;
 
@@ -118,7 +117,7 @@ class RfbClient38Decoder extends ReplayingDecoder<RfbClient38Decoder.State> impl
     ctx.fireExceptionCaught(new ProtocolException(new String(text, ASCII)));
   }
 
-  private PixelFormat parsePixelFormat(ByteBuf m) {
+  private static PixelFormat parsePixelFormat(ByteBuf m) {
 
     PixelFormat pf = new PixelFormat();
 

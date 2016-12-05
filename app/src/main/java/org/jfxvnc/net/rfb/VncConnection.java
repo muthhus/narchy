@@ -41,14 +41,11 @@ public class VncConnection {
   private EventLoopGroup bossGroup;
 
   public VncConnection() {
-    this(new ThreadFactory() {
-      @Override
-      public Thread newThread(Runnable r) {
-        Thread t = new Thread(r);
-        t.setName("vnc-connection-" + t.getId());
-        t.setDaemon(true);
-        return t;
-      }
+    this(r -> {
+      Thread t = new Thread(r);
+      t.setName("vnc-connection-" + t.getId());
+      t.setDaemon(true);
+      return t;
     });
   }
 

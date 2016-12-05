@@ -148,7 +148,7 @@ public class PixelFormat {
   @Override
   public String toString() {
     return "PixelFormat [bitPerPixel=" + bitPerPixel + ", depth=" + depth + ", bigEndian=" + bigEndian + ", trueColor=" + trueColor + ", redMax=" + redMax
-        + ", greenMax=" + greenMax + ", blueMax=" + blueMax + ", redShift=" + redShift + ", greenShift=" + greenShift + ", blueShift=" + blueShift + "]";
+        + ", greenMax=" + greenMax + ", blueMax=" + blueMax + ", redShift=" + redShift + ", greenShift=" + greenShift + ", blueShift=" + blueShift + ']';
   }
 
   @Override
@@ -195,8 +195,6 @@ public class PixelFormat {
       return false;
     if (redShift != other.redShift)
       return false;
-    if (trueColor != other.trueColor)
-      return false;
-    return true;
+      return trueColor == other.trueColor;
   }
 }

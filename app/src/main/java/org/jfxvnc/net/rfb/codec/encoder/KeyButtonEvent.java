@@ -68,7 +68,7 @@ public class KeyButtonEvent implements InputEvent {
 
   @Override
   public String toString() {
-    return "KeyEvent [isDown=" + isDown + ", key=" + key + "]";
+    return "KeyEvent [isDown=" + isDown + ", key=" + key + ']';
   }
 
 }

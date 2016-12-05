@@ -13,15 +13,15 @@
  *******************************************************************************/
 package org.jfxvnc.net.rfb.codec.decoder;
 
-import java.util.List;
-
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
+
+import java.util.List;
 
 class ColourMapEntriesDecoder implements FrameDecoder {
 
   enum State {
-    INIT, READ_MAP;
+    INIT, READ_MAP
   }
 
   private State state = State.INIT;

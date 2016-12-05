@@ -13,10 +13,6 @@
  *******************************************************************************/
 package org.jfxvnc.ui;
 
-import org.jfxvnc.net.rfb.codec.encoder.ClientCutText;
-import org.jfxvnc.net.rfb.codec.encoder.InputEventListener;
-import org.jfxvnc.net.rfb.codec.encoder.KeyButtonMap;
-
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -28,8 +24,11 @@ import javafx.beans.property.StringProperty;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 import javafx.util.Duration;
+import org.jfxvnc.net.rfb.codec.encoder.ClientCutText;
+import org.jfxvnc.net.rfb.codec.encoder.InputEventListener;
+import org.jfxvnc.net.rfb.codec.encoder.KeyButtonMap;
 
-public class CutTextEventHandler implements KeyButtonMap {
+public class CutTextEventHandler {
 
   private InputEventListener listener;
 

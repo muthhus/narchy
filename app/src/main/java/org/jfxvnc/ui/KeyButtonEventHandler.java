@@ -13,18 +13,17 @@
  *******************************************************************************/
 package org.jfxvnc.ui;
 
-import org.jfxvnc.net.rfb.codec.encoder.InputEventListener;
-import org.jfxvnc.net.rfb.codec.encoder.KeyButtonEvent;
-import org.jfxvnc.net.rfb.codec.encoder.KeyButtonMap;
-
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import org.jfxvnc.net.rfb.codec.encoder.InputEventListener;
+import org.jfxvnc.net.rfb.codec.encoder.KeyButtonEvent;
+import org.jfxvnc.net.rfb.codec.encoder.KeyButtonMap;
 
-public class KeyButtonEventHandler implements KeyButtonMap {
+public class KeyButtonEventHandler {
 
   private InputEventListener listener;
 
@@ -123,97 +122,97 @@ public class KeyButtonEventHandler implements KeyButtonMap {
   private boolean sendSpecialKeyEvents(KeyEvent event, boolean isDown) {
     switch (event.getCode()) {
       case PRINTSCREEN:
-        fire(new KeyButtonEvent(isDown, RFB_Print));
+        fire(new KeyButtonEvent(isDown, KeyButtonMap.RFB_Print));
         return true;
       case INSERT:
-        fire(new KeyButtonEvent(isDown, RFB_Insert));
+        fire(new KeyButtonEvent(isDown, KeyButtonMap.RFB_Insert));
         return true;
       case UNDO:
-        fire(new KeyButtonEvent(isDown, RFB_Undo));
+        fire(new KeyButtonEvent(isDown, KeyButtonMap.RFB_Undo));
         return true;
       case AGAIN:
-        fire(new KeyButtonEvent(isDown, RFB_Redo));
+        fire(new KeyButtonEvent(isDown, KeyButtonMap.RFB_Redo));
         return true;
       case FIND:
-        fire(new KeyButtonEvent(isDown, RFB_Find));
+        fire(new KeyButtonEvent(isDown, KeyButtonMap.RFB_Find));
         return true;
       case CANCEL:
-        fire(new KeyButtonEvent(isDown, RFB_Cancel));
+        fire(new KeyButtonEvent(isDown, KeyButtonMap.RFB_Cancel));
         return true;
       case HELP:
-        fire(new KeyButtonEvent(isDown, RFB_Help));
+        fire(new KeyButtonEvent(isDown, KeyButtonMap.RFB_Help));
         return true;
       case STOP:
-        fire(new KeyButtonEvent(isDown, RFB_Break));
+        fire(new KeyButtonEvent(isDown, KeyButtonMap.RFB_Break));
         return true;
       case MODECHANGE:
-        fire(new KeyButtonEvent(isDown, RFB_Mode_switch));
+        fire(new KeyButtonEvent(isDown, KeyButtonMap.RFB_Mode_switch));
         return true;
       case NUM_LOCK:
-        fire(new KeyButtonEvent(isDown, RFB_Num_Lock));
+        fire(new KeyButtonEvent(isDown, KeyButtonMap.RFB_Num_Lock));
         return true;
       case BACK_SPACE:
-        fire(new KeyButtonEvent(isDown, RFB_BackSpace));
+        fire(new KeyButtonEvent(isDown, KeyButtonMap.RFB_BackSpace));
         return true;
       case TAB:
-        fire(new KeyButtonEvent(isDown, RFB_Tab));
+        fire(new KeyButtonEvent(isDown, KeyButtonMap.RFB_Tab));
         return true;
       case CLEAR:
-        fire(new KeyButtonEvent(isDown, RFB_Clear));
+        fire(new KeyButtonEvent(isDown, KeyButtonMap.RFB_Clear));
         return true;
       case ENTER:
-        fire(new KeyButtonEvent(isDown, RFB_Return));
+        fire(new KeyButtonEvent(isDown, KeyButtonMap.RFB_Return));
         return true;
       case PAUSE:
-        fire(new KeyButtonEvent(isDown, RFB_Pause));
+        fire(new KeyButtonEvent(isDown, KeyButtonMap.RFB_Pause));
         return true;
       case SCROLL_LOCK:
-        fire(new KeyButtonEvent(isDown, RFB_Scroll_Lock));
+        fire(new KeyButtonEvent(isDown, KeyButtonMap.RFB_Scroll_Lock));
         return true;
       case ESCAPE:
-        fire(new KeyButtonEvent(isDown, RFB_Escape));
+        fire(new KeyButtonEvent(isDown, KeyButtonMap.RFB_Escape));
         return true;
       case DELETE:
-        fire(new KeyButtonEvent(isDown, RFB_Delete));
+        fire(new KeyButtonEvent(isDown, KeyButtonMap.RFB_Delete));
         return true;
       case SPACE:
-        fire(new KeyButtonEvent(isDown, RFB_space));
+        fire(new KeyButtonEvent(isDown, KeyButtonMap.RFB_space));
         return true;
       case CAPS:
-        fire(new KeyButtonEvent(isDown, RFB_Caps_Lock));
+        fire(new KeyButtonEvent(isDown, KeyButtonMap.RFB_Caps_Lock));
         return true;
       case CHANNEL_DOWN:
-        fire(new KeyButtonEvent(isDown, RFB_N));
+        fire(new KeyButtonEvent(isDown, KeyButtonMap.RFB_N));
         return true;
       case NUMPAD0:
-        fire(new KeyButtonEvent(isDown, RFB_KP_0));
+        fire(new KeyButtonEvent(isDown, KeyButtonMap.RFB_KP_0));
         return true;
       case NUMPAD1:
-        fire(new KeyButtonEvent(isDown, RFB_KP_1));
+        fire(new KeyButtonEvent(isDown, KeyButtonMap.RFB_KP_1));
         return true;
       case NUMPAD2:
-        fire(new KeyButtonEvent(isDown, RFB_KP_2));
+        fire(new KeyButtonEvent(isDown, KeyButtonMap.RFB_KP_2));
         return true;
       case NUMPAD3:
-        fire(new KeyButtonEvent(isDown, RFB_KP_3));
+        fire(new KeyButtonEvent(isDown, KeyButtonMap.RFB_KP_3));
         return true;
       case NUMPAD4:
-        fire(new KeyButtonEvent(isDown, RFB_KP_4));
+        fire(new KeyButtonEvent(isDown, KeyButtonMap.RFB_KP_4));
         return true;
       case NUMPAD5:
-        fire(new KeyButtonEvent(isDown, RFB_KP_5));
+        fire(new KeyButtonEvent(isDown, KeyButtonMap.RFB_KP_5));
         return true;
       case NUMPAD6:
-        fire(new KeyButtonEvent(isDown, RFB_KP_6));
+        fire(new KeyButtonEvent(isDown, KeyButtonMap.RFB_KP_6));
         return true;
       case NUMPAD7:
-        fire(new KeyButtonEvent(isDown, RFB_KP_7));
+        fire(new KeyButtonEvent(isDown, KeyButtonMap.RFB_KP_7));
         return true;
       case NUMPAD8:
-        fire(new KeyButtonEvent(isDown, RFB_KP_8));
+        fire(new KeyButtonEvent(isDown, KeyButtonMap.RFB_KP_8));
         return true;
       case NUMPAD9:
-        fire(new KeyButtonEvent(isDown, RFB_KP_9));
+        fire(new KeyButtonEvent(isDown, KeyButtonMap.RFB_KP_9));
         return true;
       default:
         return false;
@@ -223,49 +222,49 @@ public class KeyButtonEventHandler implements KeyButtonMap {
   private void sendNavigationKeyEvents(KeyEvent event, boolean isDown) {
     switch (event.getCode()) {
       case HOME:
-        fire(new KeyButtonEvent(isDown, RFB_Home));
+        fire(new KeyButtonEvent(isDown, KeyButtonMap.RFB_Home));
         break;
       case KP_UP:
-        fire(new KeyButtonEvent(isDown, RFB_KP_Up));
+        fire(new KeyButtonEvent(isDown, KeyButtonMap.RFB_KP_Up));
         break;
       case KP_RIGHT:
-        fire(new KeyButtonEvent(isDown, RFB_KP_Right));
+        fire(new KeyButtonEvent(isDown, KeyButtonMap.RFB_KP_Right));
         break;
       case KP_DOWN:
-        fire(new KeyButtonEvent(isDown, RFB_KP_Down));
+        fire(new KeyButtonEvent(isDown, KeyButtonMap.RFB_KP_Down));
         break;
       case KP_LEFT:
-        fire(new KeyButtonEvent(isDown, RFB_KP_Left));
+        fire(new KeyButtonEvent(isDown, KeyButtonMap.RFB_KP_Left));
         break;
       case UP:
-        fire(new KeyButtonEvent(isDown, RFB_Up));
+        fire(new KeyButtonEvent(isDown, KeyButtonMap.RFB_Up));
         break;
       case RIGHT:
-        fire(new KeyButtonEvent(isDown, RFB_Right));
+        fire(new KeyButtonEvent(isDown, KeyButtonMap.RFB_Right));
         break;
       case DOWN:
-        fire(new KeyButtonEvent(isDown, RFB_Down));
+        fire(new KeyButtonEvent(isDown, KeyButtonMap.RFB_Down));
         break;
       case LEFT:
-        fire(new KeyButtonEvent(isDown, RFB_Left));
+        fire(new KeyButtonEvent(isDown, KeyButtonMap.RFB_Left));
         break;
       case TRACK_PREV:
-        fire(new KeyButtonEvent(isDown, RFB_PreviousCandidate));
+        fire(new KeyButtonEvent(isDown, KeyButtonMap.RFB_PreviousCandidate));
         break;
       case PAGE_UP:
-        fire(new KeyButtonEvent(isDown, RFB_Page_Up));
+        fire(new KeyButtonEvent(isDown, KeyButtonMap.RFB_Page_Up));
         break;
       case TRACK_NEXT:
-        fire(new KeyButtonEvent(isDown, RFB_Next));
+        fire(new KeyButtonEvent(isDown, KeyButtonMap.RFB_Next));
         break;
       case PAGE_DOWN:
-        fire(new KeyButtonEvent(isDown, RFB_Page_Down));
+        fire(new KeyButtonEvent(isDown, KeyButtonMap.RFB_Page_Down));
         break;
       case END:
-        fire(new KeyButtonEvent(isDown, RFB_End));
+        fire(new KeyButtonEvent(isDown, KeyButtonMap.RFB_End));
         break;
       case BEGIN:
-        fire(new KeyButtonEvent(isDown, RFB_Begin));
+        fire(new KeyButtonEvent(isDown, KeyButtonMap.RFB_Begin));
         break;
       default:
         break;
@@ -275,40 +274,40 @@ public class KeyButtonEventHandler implements KeyButtonMap {
   private void sendFunctionKeyEvents(KeyEvent event, boolean isDown) {
     switch (event.getCode()) {
       case F1:
-        fire(new KeyButtonEvent(isDown, RFB_F1));
+        fire(new KeyButtonEvent(isDown, KeyButtonMap.RFB_F1));
         break;
       case F2:
-        fire(new KeyButtonEvent(isDown, RFB_F2));
+        fire(new KeyButtonEvent(isDown, KeyButtonMap.RFB_F2));
         break;
       case F3:
-        fire(new KeyButtonEvent(isDown, RFB_F3));
+        fire(new KeyButtonEvent(isDown, KeyButtonMap.RFB_F3));
         break;
       case F4:
-        fire(new KeyButtonEvent(isDown, RFB_F4));
+        fire(new KeyButtonEvent(isDown, KeyButtonMap.RFB_F4));
         break;
       case F5:
-        fire(new KeyButtonEvent(isDown, RFB_F5));
+        fire(new KeyButtonEvent(isDown, KeyButtonMap.RFB_F5));
         break;
       case F6:
-        fire(new KeyButtonEvent(isDown, RFB_F6));
+        fire(new KeyButtonEvent(isDown, KeyButtonMap.RFB_F6));
         break;
       case F7:
-        fire(new KeyButtonEvent(isDown, RFB_F7));
+        fire(new KeyButtonEvent(isDown, KeyButtonMap.RFB_F7));
         break;
       case F8:
-        fire(new KeyButtonEvent(isDown, RFB_F8));
+        fire(new KeyButtonEvent(isDown, KeyButtonMap.RFB_F8));
         break;
       case F9:
-        fire(new KeyButtonEvent(isDown, RFB_F9));
+        fire(new KeyButtonEvent(isDown, KeyButtonMap.RFB_F9));
         break;
       case F10:
-        fire(new KeyButtonEvent(isDown, RFB_F10));
+        fire(new KeyButtonEvent(isDown, KeyButtonMap.RFB_F10));
         break;
       case F11:
-        fire(new KeyButtonEvent(isDown, RFB_F11));
+        fire(new KeyButtonEvent(isDown, KeyButtonMap.RFB_F11));
         break;
       case F12:
-        fire(new KeyButtonEvent(isDown, RFB_F12));
+        fire(new KeyButtonEvent(isDown, KeyButtonMap.RFB_F12));
         break;
       default:
         break;
@@ -318,28 +317,30 @@ public class KeyButtonEventHandler implements KeyButtonMap {
   private void sendModifierKeyEvents(KeyEvent event, boolean isDown) {
     switch (event.getCode()) {
       case SHIFT:
-        fire(new KeyButtonEvent(isDown, RFB_Shift_L));
+        fire(new KeyButtonEvent(isDown, KeyButtonMap.RFB_Shift_L));
         break;
       case CONTROL:
-        fire(new KeyButtonEvent(isDown, RFB_Control_L));
+        fire(new KeyButtonEvent(isDown, KeyButtonMap.RFB_Control_L));
         break;
       case META:
-        fire(new KeyButtonEvent(isDown, RFB_Meta_L));
+        fire(new KeyButtonEvent(isDown, KeyButtonMap.RFB_Meta_L));
         break;
       case ALT:
-        fire(new KeyButtonEvent(isDown, RFB_Alt_L));
+        fire(new KeyButtonEvent(isDown, KeyButtonMap.RFB_Alt_L));
         break;
       case ALT_GRAPH:
-        fire(new KeyButtonEvent(isDown, RFB_Alt_R));
+        fire(new KeyButtonEvent(isDown, KeyButtonMap.RFB_Alt_R));
         break;
       default:
         break;
     }
   }
 
-  private synchronized void fire(KeyButtonEvent msg) {
+  private void fire(KeyButtonEvent msg) {
     if (listener != null) {
-      listener.sendInputEvent(msg);
+      synchronized (this) {
+        listener.sendInputEvent(msg);
+      }
     }
   }
 

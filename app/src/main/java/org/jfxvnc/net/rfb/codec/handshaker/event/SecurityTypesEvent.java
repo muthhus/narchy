@@ -13,9 +13,9 @@
  *******************************************************************************/
 package org.jfxvnc.net.rfb.codec.handshaker.event;
 
-import java.util.Arrays;
-
 import org.jfxvnc.net.rfb.codec.security.SecurityType;
+
+import java.util.Arrays;
 
 public class SecurityTypesEvent implements HandshakeEvent {
 
@@ -38,7 +38,7 @@ public class SecurityTypesEvent implements HandshakeEvent {
 
   @Override
   public String toString() {
-    return "SecurityTypesEvent [response=" + response + ", " + (securityTypes != null ? "securityTypes=" + Arrays.toString(securityTypes) : "") + "]";
+    return "SecurityTypesEvent [response=" + response + ", " + (securityTypes != null ? "securityTypes=" + Arrays.toString(securityTypes) : "") + ']';
   }
 
 }

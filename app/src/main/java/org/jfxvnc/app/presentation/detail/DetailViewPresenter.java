@@ -13,22 +13,20 @@
  *******************************************************************************/
 package org.jfxvnc.app.presentation.detail;
 
-import java.net.URL;
-import java.util.ResourceBundle;
-
-import javax.inject.Inject;
-
+import javafx.application.Platform;
+import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
+import javafx.scene.control.Accordion;
+import javafx.scene.control.TitledPane;
 import org.jfxvnc.app.persist.SessionContext;
 import org.jfxvnc.app.presentation.about.AboutView;
 import org.jfxvnc.app.presentation.connect.ConnectView;
 import org.jfxvnc.app.presentation.info.InfoView;
 import org.jfxvnc.ui.service.VncRenderService;
 
-import javafx.application.Platform;
-import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
-import javafx.scene.control.Accordion;
-import javafx.scene.control.TitledPane;
+import javax.inject.Inject;
+import java.net.URL;
+import java.util.ResourceBundle;
 
 public class DetailViewPresenter implements Initializable {
 

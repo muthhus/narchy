@@ -25,9 +25,9 @@ public class ProtocolVersion implements Comparable<ProtocolVersion> {
 
   private final Pattern VERSION_PAT = Pattern.compile("RFB ([0-9]{3}).([0-9]{3})");
 
-  private int majorVersion;
+  private final int majorVersion;
 
-  private int minorVersion;
+  private final int minorVersion;
 
   /**
    * RFB protocol parser (RFB ([0-9]{3}).([0-9]{3}))

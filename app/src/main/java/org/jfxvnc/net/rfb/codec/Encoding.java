@@ -86,7 +86,7 @@ public enum Encoding {
 
   private final int type;
 
-  private Encoding(int type) {
+  Encoding(int type) {
     this.type = type;
   }
 

@@ -43,7 +43,7 @@ public enum ServerEvent {
 
   private final int type;
 
-  private ServerEvent(int type) {
+  ServerEvent(int type) {
     this.type = type;
   }
 

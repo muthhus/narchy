@@ -13,16 +13,15 @@
  *******************************************************************************/
 package org.jfxvnc.net.rfb.codec;
 
-import org.jfxvnc.net.rfb.render.ProtocolConfiguration;
-import org.jfxvnc.net.rfb.render.RenderProtocol;
-
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.socket.SocketChannel;
+import org.jfxvnc.net.rfb.render.ProtocolConfiguration;
+import org.jfxvnc.net.rfb.render.RenderProtocol;
 
 public class ProtocolInitializer extends ChannelInitializer<SocketChannel> {
-  private RenderProtocol render;
-  private ProtocolConfiguration config;
+  private final RenderProtocol render;
+  private final ProtocolConfiguration config;
 
   public ProtocolInitializer(RenderProtocol render, ProtocolConfiguration config) {
     super();

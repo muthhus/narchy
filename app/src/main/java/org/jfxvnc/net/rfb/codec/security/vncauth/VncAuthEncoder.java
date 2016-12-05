@@ -13,26 +13,24 @@
  *******************************************************************************/
 package org.jfxvnc.net.rfb.codec.security.vncauth;
 
-import java.nio.charset.StandardCharsets;
-import java.security.spec.KeySpec;
-
-import javax.crypto.Cipher;
-import javax.crypto.SecretKey;
-import javax.crypto.SecretKeyFactory;
-import javax.crypto.spec.DESKeySpec;
-
+import io.netty.buffer.ByteBuf;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.handler.codec.MessageToByteEncoder;
 import org.jfxvnc.net.rfb.codec.security.RfbSecurityEncoder;
 import org.jfxvnc.net.rfb.exception.ProtocolException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.netty.buffer.ByteBuf;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.handler.codec.MessageToByteEncoder;
+import javax.crypto.Cipher;
+import javax.crypto.SecretKey;
+import javax.crypto.SecretKeyFactory;
+import javax.crypto.spec.DESKeySpec;
+import java.nio.charset.StandardCharsets;
+import java.security.spec.KeySpec;
 
 public class VncAuthEncoder extends MessageToByteEncoder<VncAuthSecurityMessage> implements RfbSecurityEncoder {
 
-  private static Logger logger = LoggerFactory.getLogger(VncAuthEncoder.class);
+  private static final Logger logger = LoggerFactory.getLogger(VncAuthEncoder.class);
 
   @Override
   protected void encode(ChannelHandlerContext ctx, VncAuthSecurityMessage msg, ByteBuf out) throws Exception {
@@ -41,7 +39,7 @@ public class VncAuthEncoder extends MessageToByteEncoder<VncAuthSecurityMessage>
     out.writeBytes(enc);
   }
 
-  private byte[] encryptPassword(VncAuthSecurityMessage msg) throws ProtocolException {
+  private static byte[] encryptPassword(VncAuthSecurityMessage msg) throws ProtocolException {
     if (msg.getChallenge().length != 16)
       throw new ProtocolException("invalid challenge length " + msg.getChallenge().length);
     try {
@@ -65,7 +63,7 @@ public class VncAuthEncoder extends MessageToByteEncoder<VncAuthSecurityMessage>
     }
   }
 
-  private byte reverseBitsByte(byte b) {
+  private static byte reverseBitsByte(byte b) {
     byte f = 0;
     for (int position = 7; position >= 0; position--) {
       f += ((b & 1) << position);

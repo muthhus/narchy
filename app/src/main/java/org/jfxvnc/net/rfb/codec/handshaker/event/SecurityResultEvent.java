@@ -41,6 +41,6 @@ public class SecurityResultEvent implements HandshakeEvent {
 
   @Override
   public String toString() {
-    return "SecurityResultEvent [passed=" + passed + (throwable != null ? ", throwable=" + throwable.getMessage() : "") + "]";
+    return "SecurityResultEvent [passed=" + passed + (throwable != null ? ", throwable=" + throwable.getMessage() : "") + ']';
   }
 }

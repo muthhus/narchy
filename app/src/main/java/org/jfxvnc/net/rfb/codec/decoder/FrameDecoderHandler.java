@@ -13,21 +13,20 @@
  *******************************************************************************/
 package org.jfxvnc.net.rfb.codec.decoder;
 
-import java.util.EnumMap;
-import java.util.List;
-
+import io.netty.buffer.ByteBuf;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.handler.codec.ByteToMessageDecoder;
 import org.jfxvnc.net.rfb.codec.Encoding;
 import org.jfxvnc.net.rfb.codec.PixelFormat;
 import org.jfxvnc.net.rfb.codec.ServerEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.netty.buffer.ByteBuf;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.handler.codec.ByteToMessageDecoder;
+import java.util.EnumMap;
+import java.util.List;
 
 public class FrameDecoderHandler extends ByteToMessageDecoder {
-  private static Logger logger = LoggerFactory.getLogger(FrameDecoderHandler.class);
+  private static final Logger logger = LoggerFactory.getLogger(FrameDecoderHandler.class);
 
   private final EnumMap<ServerEvent, FrameDecoder> frameDecoder = new EnumMap<>(ServerEvent.class);
 
@@ -48,7 +47,7 @@ public class FrameDecoderHandler extends ByteToMessageDecoder {
   }
 
   public Encoding[] getSupportedEncodings() {
-    return ((FramebufferUpdateRectDecoder) frameDecoder.get(ServerEvent.FRAMEBUFFER_UPDATE)).getSupportedEncodings();
+    return FramebufferUpdateRectDecoder.getSupportedEncodings();
   }
 
   public boolean isPixelFormatSupported() {

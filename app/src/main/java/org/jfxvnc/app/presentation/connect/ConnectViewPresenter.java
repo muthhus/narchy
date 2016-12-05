@@ -13,12 +13,15 @@
  *******************************************************************************/
 package org.jfxvnc.app.presentation.connect;
 
-import java.net.URL;
-import java.util.Optional;
-import java.util.ResourceBundle;
-
-import javax.inject.Inject;
-
+import javafx.application.Platform;
+import javafx.beans.binding.Bindings;
+import javafx.beans.property.StringProperty;
+import javafx.collections.FXCollections;
+import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
+import javafx.scene.control.*;
+import javafx.util.StringConverter;
+import javafx.util.converter.NumberStringConverter;
 import org.jfxvnc.app.persist.HistoryEntry;
 import org.jfxvnc.app.persist.SessionContext;
 import org.jfxvnc.net.rfb.codec.ProtocolVersion;
@@ -27,20 +30,10 @@ import org.jfxvnc.net.rfb.render.ConnectInfoEvent;
 import org.jfxvnc.net.rfb.render.ProtocolConfiguration;
 import org.jfxvnc.ui.service.VncRenderService;
 
-import javafx.application.Platform;
-import javafx.beans.binding.Bindings;
-import javafx.beans.property.StringProperty;
-import javafx.collections.FXCollections;
-import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
-import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.ListView;
-import javafx.scene.control.PasswordField;
-import javafx.scene.control.TextField;
-import javafx.util.StringConverter;
-import javafx.util.converter.NumberStringConverter;
+import javax.inject.Inject;
+import java.net.URL;
+import java.util.Optional;
+import java.util.ResourceBundle;
 
 public class ConnectViewPresenter implements Initializable {
 
@@ -100,9 +93,7 @@ public class ConnectViewPresenter implements Initializable {
 
     clearBtn.setOnAction(a -> historyList.getItems().clear());
     securityCombo.getItems().addAll(FXCollections.observableArrayList(SecurityType.NONE, SecurityType.VNC_Auth));
-    securityCombo.getSelectionModel().selectedItemProperty().addListener((l, a, b) -> {
-      prop.securityProperty().set(b != null ? b : SecurityType.UNKNOWN);
-    });
+    securityCombo.getSelectionModel().selectedItemProperty().addListener((l, a, b) -> prop.securityProperty().set(b != null ? b : SecurityType.UNKNOWN));
 
     pwdField.disableProperty().bind(Bindings.equal(SecurityType.NONE, securityCombo.getSelectionModel().selectedItemProperty()));
 

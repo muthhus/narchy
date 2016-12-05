@@ -13,13 +13,12 @@
  *******************************************************************************/
 package org.jfxvnc.net.rfb.codec.encoder;
 
-import java.util.Arrays;
-
-import org.jfxvnc.net.rfb.codec.ClientEventType;
-
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
+import org.jfxvnc.net.rfb.codec.ClientEventType;
+
+import java.util.Arrays;
 
 public class PreferedEncodingEncoder extends MessageToByteEncoder<PreferedEncoding> {
 

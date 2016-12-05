@@ -13,13 +13,7 @@
  *******************************************************************************/
 package org.jfxvnc.app;
 
-import org.jfxvnc.app.persist.SessionContext;
-import org.jfxvnc.app.presentation.MainView;
-import org.jfxvnc.ui.service.VncRenderService;
-import org.slf4j.LoggerFactory;
-
 import com.airhacks.afterburner.injection.Injector;
-
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
@@ -31,6 +25,10 @@ import javafx.beans.property.StringProperty;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
+import org.jfxvnc.app.persist.SessionContext;
+import org.jfxvnc.app.presentation.MainView;
+import org.jfxvnc.ui.service.VncRenderService;
+import org.slf4j.LoggerFactory;
 
 /**
  * /usr/bin/qemu-system-x86_64 -boot c  -m 512 -hda '/home/me/img/Linux.qcow' -cdrom  '/home/me/Downloads/cm-x86-13.0-rc1.iso' -net nic,vlan=0 -net user,vlan=0 -localtime -vnc :1 -monitor stdio

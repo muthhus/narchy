@@ -58,7 +58,7 @@ public class FrameRect {
 
   @Override
   public String toString() {
-    return "FrameRect [x=" + x + ", y=" + y + ", width=" + width + ", height=" + height + ", " + (encoding != null ? "encoding=" + encoding : "") + "]";
+    return "FrameRect [x=" + x + ", y=" + y + ", width=" + width + ", height=" + height + ", " + (encoding != null ? "encoding=" + encoding : "") + ']';
   }
 
 }

@@ -13,21 +13,20 @@
  *******************************************************************************/
 package org.jfxvnc.net.rfb.codec.decoder.rect;
 
-import java.util.List;
-import java.util.zip.DataFormatException;
-import java.util.zip.Inflater;
-
+import io.netty.buffer.ByteBuf;
+import io.netty.channel.ChannelHandlerContext;
 import org.jfxvnc.net.rfb.codec.PixelFormat;
 import org.jfxvnc.net.rfb.render.rect.ZlibImageRect;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.netty.buffer.ByteBuf;
-import io.netty.channel.ChannelHandlerContext;
+import java.util.List;
+import java.util.zip.DataFormatException;
+import java.util.zip.Inflater;
 
 public class ZlibRectDecoder extends RawRectDecoder {
 
-  private static Logger logger = LoggerFactory.getLogger(ZlibRectDecoder.class);
+  private static final Logger logger = LoggerFactory.getLogger(ZlibRectDecoder.class);
 
   private final Inflater inflater;
   private boolean initialized;

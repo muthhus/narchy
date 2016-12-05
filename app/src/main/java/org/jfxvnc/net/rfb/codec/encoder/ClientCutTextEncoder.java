@@ -13,14 +13,13 @@
  *******************************************************************************/
 package org.jfxvnc.net.rfb.codec.encoder;
 
-import java.nio.charset.StandardCharsets;
-import java.util.List;
-
-import org.jfxvnc.net.rfb.codec.ClientEventType;
-
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageEncoder;
+import org.jfxvnc.net.rfb.codec.ClientEventType;
+
+import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 public class ClientCutTextEncoder extends MessageToMessageEncoder<ClientCutText> {
 

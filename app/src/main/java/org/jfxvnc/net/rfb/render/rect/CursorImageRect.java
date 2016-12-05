@@ -13,9 +13,8 @@
  *******************************************************************************/
 package org.jfxvnc.net.rfb.render.rect;
 
-import org.jfxvnc.net.rfb.codec.Encoding;
-
 import io.netty.buffer.ByteBuf;
+import org.jfxvnc.net.rfb.codec.Encoding;
 
 public class CursorImageRect extends RawImageRect {
 
@@ -39,7 +38,7 @@ public class CursorImageRect extends RawImageRect {
   @Override
   public String toString() {
     return "CursorImageRect [hotspotX=" + x + ", hotspotY=" + y + ", width=" + width + ", height=" + height + ", pixels.capacity="
-        + (pixels != null ? pixels.capacity() : "null") + "]";
+        + (pixels != null ? pixels.capacity() : "null") + ']';
   }
 
 }

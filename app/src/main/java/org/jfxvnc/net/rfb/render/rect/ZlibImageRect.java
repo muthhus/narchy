@@ -13,9 +13,8 @@
  *******************************************************************************/
 package org.jfxvnc.net.rfb.render.rect;
 
-import org.jfxvnc.net.rfb.codec.Encoding;
-
 import io.netty.buffer.ByteBuf;
+import org.jfxvnc.net.rfb.codec.Encoding;
 
 public class ZlibImageRect extends RawImageRect {
 
@@ -31,6 +30,6 @@ public class ZlibImageRect extends RawImageRect {
   @Override
   public String toString() {
     return "ZlibRawImageRect [x=" + x + ", y=" + y + ", width=" + width + ", height=" + height + ", pixels.capacity="
-        + (pixels != null ? pixels.capacity() : "null") + ", scanLine=" + scanlineStride + "]";
+        + (pixels != null ? pixels.capacity() : "null") + ", scanLine=" + scanlineStride + ']';
   }
 }

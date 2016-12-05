@@ -13,20 +13,6 @@
  *******************************************************************************/
 package org.jfxvnc.app.presentation.info;
 
-import java.net.URL;
-import java.text.MessageFormat;
-import java.util.Arrays;
-import java.util.ResourceBundle;
-
-import javax.inject.Inject;
-
-import org.jfxvnc.app.persist.SessionContext;
-import org.jfxvnc.net.rfb.codec.PixelFormat;
-import org.jfxvnc.net.rfb.render.ConnectInfoEvent;
-import org.jfxvnc.net.rfb.render.rect.ImageRect;
-import org.jfxvnc.ui.service.VncRenderService;
-import org.slf4j.LoggerFactory;
-
 import javafx.application.Platform;
 import javafx.beans.property.LongProperty;
 import javafx.beans.property.SimpleLongProperty;
@@ -37,6 +23,18 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
+import org.jfxvnc.app.persist.SessionContext;
+import org.jfxvnc.net.rfb.codec.PixelFormat;
+import org.jfxvnc.net.rfb.render.ConnectInfoEvent;
+import org.jfxvnc.net.rfb.render.rect.ImageRect;
+import org.jfxvnc.ui.service.VncRenderService;
+import org.slf4j.LoggerFactory;
+
+import javax.inject.Inject;
+import java.net.URL;
+import java.text.MessageFormat;
+import java.util.Arrays;
+import java.util.ResourceBundle;
 
 /**
  * VNC information screen

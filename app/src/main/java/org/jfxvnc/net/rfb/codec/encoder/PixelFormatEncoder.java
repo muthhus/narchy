@@ -13,12 +13,11 @@
  *******************************************************************************/
 package org.jfxvnc.net.rfb.codec.encoder;
 
-import org.jfxvnc.net.rfb.codec.ClientEventType;
-import org.jfxvnc.net.rfb.codec.PixelFormat;
-
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
+import org.jfxvnc.net.rfb.codec.ClientEventType;
+import org.jfxvnc.net.rfb.codec.PixelFormat;
 
 public class PixelFormatEncoder extends MessageToByteEncoder<PixelFormat> {
 

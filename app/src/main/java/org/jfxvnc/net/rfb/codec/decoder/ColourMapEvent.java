@@ -42,6 +42,6 @@ public class ColourMapEvent implements ServerDecoderEvent {
 
   @Override
   public String toString() {
-    return "ColourMapEvent [firstColor=" + firstColor + ", numberOfColor=" + numberOfColor + ", colors.capacity=" + colors.capacity() + "]";
+    return "ColourMapEvent [firstColor=" + firstColor + ", numberOfColor=" + numberOfColor + ", colors.capacity=" + colors.capacity() + ']';
   }
 }

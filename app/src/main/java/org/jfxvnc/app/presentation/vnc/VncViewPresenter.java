@@ -13,21 +13,19 @@
  *******************************************************************************/
 package org.jfxvnc.app.presentation.vnc;
 
-import java.net.URL;
-import java.util.ResourceBundle;
-
-import javax.inject.Inject;
-
-import org.jfxvnc.app.persist.SessionContext;
-import org.jfxvnc.ui.control.VncImageView;
-import org.jfxvnc.ui.service.VncRenderService;
-
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.effect.BoxBlur;
 import javafx.scene.effect.Effect;
+import org.jfxvnc.app.persist.SessionContext;
+import org.jfxvnc.ui.control.VncImageView;
+import org.jfxvnc.ui.service.VncRenderService;
+
+import javax.inject.Inject;
+import java.net.URL;
+import java.util.ResourceBundle;
 
 public class VncViewPresenter implements Initializable {
 

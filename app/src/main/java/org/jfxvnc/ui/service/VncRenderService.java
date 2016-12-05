@@ -13,8 +13,7 @@
  *******************************************************************************/
 package org.jfxvnc.ui.service;
 
-import java.util.function.BiConsumer;
-
+import javafx.beans.property.*;
 import org.jfxvnc.net.rfb.VncConnection;
 import org.jfxvnc.net.rfb.codec.ProtocolState;
 import org.jfxvnc.net.rfb.codec.decoder.BellEvent;
@@ -29,17 +28,7 @@ import org.jfxvnc.net.rfb.render.RenderProtocol;
 import org.jfxvnc.net.rfb.render.rect.ImageRect;
 import org.slf4j.LoggerFactory;
 
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.DoubleProperty;
-import javafx.beans.property.IntegerProperty;
-import javafx.beans.property.ReadOnlyBooleanProperty;
-import javafx.beans.property.ReadOnlyBooleanWrapper;
-import javafx.beans.property.ReadOnlyObjectProperty;
-import javafx.beans.property.ReadOnlyObjectWrapper;
-import javafx.beans.property.ReadOnlyStringProperty;
-import javafx.beans.property.ReadOnlyStringWrapper;
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleDoubleProperty;
+import java.util.function.BiConsumer;
 
 public class VncRenderService implements RenderProtocol {
 

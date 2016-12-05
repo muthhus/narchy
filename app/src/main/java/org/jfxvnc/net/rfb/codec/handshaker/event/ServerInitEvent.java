@@ -61,7 +61,7 @@ public class ServerInitEvent implements HandshakeEvent {
   @Override
   public String toString() {
     return "ServerInitEvent [frameBufferWidth=" + frameBufferWidth + ", frameBufferHeight=" + frameBufferHeight + ", pixelFormat=" + pixelFormat
-        + ", serverName=" + serverName + "]";
+        + ", serverName=" + serverName + ']';
   }
 
 }

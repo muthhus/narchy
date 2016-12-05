@@ -13,23 +13,22 @@
  *******************************************************************************/
 package org.jfxvnc.net.rfb.codec.decoder.rect;
 
-import java.util.List;
-
+import io.netty.buffer.ByteBuf;
+import io.netty.channel.ChannelHandlerContext;
 import org.jfxvnc.net.rfb.codec.PixelFormat;
 import org.jfxvnc.net.rfb.render.rect.HextileImageRect;
 import org.jfxvnc.net.rfb.render.rect.RawImageRect;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.netty.buffer.ByteBuf;
-import io.netty.channel.ChannelHandlerContext;
+import java.util.List;
 
 public class HextileDecoder extends RawRectDecoder {
 
-  private static Logger logger = LoggerFactory.getLogger(HextileDecoder.class);
+  private static final Logger logger = LoggerFactory.getLogger(HextileDecoder.class);
 
   enum State {
-    INIT, INIT_PART, ADD_TILE, NEXT_TILE, RAW, BG_FILL, FG_FILL, INIT_SUBRECT, ANY_SUBRECT;
+    INIT, INIT_PART, ADD_TILE, NEXT_TILE, RAW, BG_FILL, FG_FILL, INIT_SUBRECT, ANY_SUBRECT
   }
 
   private State state = State.INIT;
@@ -40,10 +39,10 @@ public class HextileDecoder extends RawRectDecoder {
   public static final int ANY_SUBRECT = 8;
   public static final int SUBRECT_COLORED = 16;
 
-  private int bytesPerPixel;
+  private final int bytesPerPixel;
 
-  private int yPos = 0;
-  private int xPos = 0;
+  private int yPos;
+  private int xPos;
 
 
   private HextileRect partRect;
@@ -295,7 +294,7 @@ public class HextileDecoder extends RawRectDecoder {
 
     @Override
     public String toString() {
-      return "HextileRect [x=" + x + ", y=" + y + ", x2=" + x2 + ", y2=" + y2 + ", getWidth()=" + getWidth() + ", getHeight()=" + getHeight() + "]";
+      return "HextileRect [x=" + x + ", y=" + y + ", x2=" + x2 + ", y2=" + y2 + ", getWidth()=" + getWidth() + ", getHeight()=" + getHeight() + ']';
     }
 
   }

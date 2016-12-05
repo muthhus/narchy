@@ -14,19 +14,6 @@
 package org.jfxvnc.app.presentation;
 
 
-import java.awt.Toolkit;
-import java.net.URL;
-import java.text.MessageFormat;
-import java.util.ResourceBundle;
-
-import javax.inject.Inject;
-
-import org.jfxvnc.app.persist.SessionContext;
-import org.jfxvnc.app.presentation.detail.DetailView;
-import org.jfxvnc.app.presentation.vnc.VncView;
-import org.jfxvnc.net.rfb.render.ProtocolConfiguration;
-import org.jfxvnc.ui.service.VncRenderService;
-
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
@@ -40,12 +27,20 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.ProgressIndicator;
-import javafx.scene.control.Slider;
-import javafx.scene.control.SplitPane;
-import javafx.scene.control.ToggleButton;
+import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 import javafx.util.Duration;
+import org.jfxvnc.app.persist.SessionContext;
+import org.jfxvnc.app.presentation.detail.DetailView;
+import org.jfxvnc.app.presentation.vnc.VncView;
+import org.jfxvnc.net.rfb.render.ProtocolConfiguration;
+import org.jfxvnc.ui.service.VncRenderService;
+
+import javax.inject.Inject;
+import java.awt.*;
+import java.net.URL;
+import java.text.MessageFormat;
+import java.util.ResourceBundle;
 
 public class MainViewPresenter implements Initializable {
 
@@ -82,7 +77,7 @@ public class MainViewPresenter implements Initializable {
   @FXML
   private SplitPane splitPane;
 
-  private volatile long lastPing = 0;
+  private volatile long lastPing;
 
 
   private final static PseudoClass CONNECT_CLASS = PseudoClass.getPseudoClass("connect");
@@ -113,10 +108,10 @@ public class MainViewPresenter implements Initializable {
     gearBtn.setSelected(true);
 
     connectBtn.textProperty().bind(Bindings.createStringBinding(
-        () -> service.listeningModeProperty().get() ? rb.getString("button.listening") : rb.getString("button.connect"), service.listeningModeProperty()));
+        () -> rb.getString(service.listeningModeProperty().get() ? "button.listening" : "button.connect"), service.listeningModeProperty()));
 
     disconnectBtn.textProperty().bind(Bindings.createStringBinding(
-        () -> service.listeningModeProperty().get() ? rb.getString("button.cancel") : rb.getString("button.disconnect"), service.listeningModeProperty()));
+        () -> rb.getString(service.listeningModeProperty().get() ? "button.cancel" : "button.disconnect"), service.listeningModeProperty()));
     disconnectBtn.disableProperty().bind(connectBtn.disabledProperty().not());
 
     fullScreenBtn.selectedProperty().bindBidirectional(service.fullSceenProperty());

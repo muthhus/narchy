@@ -13,29 +13,24 @@
  *******************************************************************************/
 package org.jfxvnc.net.rfb.codec.handshaker;
 
-import java.util.concurrent.atomic.AtomicBoolean;
-
+import io.netty.buffer.Unpooled;
+import io.netty.channel.*;
 import org.jfxvnc.net.rfb.codec.ProtocolHandshakeHandler;
 import org.jfxvnc.net.rfb.codec.ProtocolVersion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.netty.buffer.Unpooled;
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelPipeline;
-import io.netty.channel.ChannelPromise;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public abstract class RfbClientHandshaker {
 
-  private static Logger logger = LoggerFactory.getLogger(RfbClientHandshaker.class);
+  private static final Logger logger = LoggerFactory.getLogger(RfbClientHandshaker.class);
 
   public abstract RfbClientDecoder newRfbClientDecoder();
 
   public abstract RfbClientEncoder newRfbClientEncoder();
 
-  private AtomicBoolean handshakeComplete = new AtomicBoolean(false);
+  private final AtomicBoolean handshakeComplete = new AtomicBoolean(false);
 
   private final ProtocolVersion version;
 

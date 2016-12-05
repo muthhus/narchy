@@ -13,12 +13,11 @@
  *******************************************************************************/
 package org.jfxvnc.net.rfb.codec.handshaker;
 
-import org.jfxvnc.net.rfb.codec.handshaker.event.HandshakeEvent;
-import org.jfxvnc.net.rfb.codec.handshaker.event.SharedEvent;
-
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
+import org.jfxvnc.net.rfb.codec.handshaker.event.HandshakeEvent;
+import org.jfxvnc.net.rfb.codec.handshaker.event.SharedEvent;
 
 public class RfbClient33Encoder extends MessageToByteEncoder<HandshakeEvent> implements RfbClientEncoder {
 

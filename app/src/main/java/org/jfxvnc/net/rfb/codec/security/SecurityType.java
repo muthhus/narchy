@@ -23,7 +23,7 @@ public enum SecurityType {
 
   private final int type;
 
-  private SecurityType(int type) {
+  SecurityType(int type) {
     this.type = type;
   }
 

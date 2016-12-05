@@ -13,11 +13,11 @@
  *******************************************************************************/
 package org.jfxvnc.net.rfb.codec.security.vncauth;
 
-import java.util.Arrays;
-
 import org.jfxvnc.net.rfb.codec.security.RfbSecurityMessage;
 import org.jfxvnc.net.rfb.codec.security.SecurityType;
 import org.jfxvnc.net.rfb.render.ProtocolConfiguration;
+
+import java.util.Arrays;
 
 public class VncAuthSecurityMessage implements RfbSecurityMessage {
 
@@ -44,7 +44,7 @@ public class VncAuthSecurityMessage implements RfbSecurityMessage {
 
   @Override
   public String toString() {
-    return "VncAuthSecurityMessage [challenge=" + Arrays.toString(challenge) + ", password=" + Arrays.toString(password) + "]";
+    return "VncAuthSecurityMessage [challenge=" + Arrays.toString(challenge) + ", password=" + Arrays.toString(password) + ']';
   }
 
   @Override

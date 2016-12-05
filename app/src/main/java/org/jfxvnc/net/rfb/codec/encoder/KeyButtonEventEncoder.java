@@ -13,11 +13,10 @@
  *******************************************************************************/
 package org.jfxvnc.net.rfb.codec.encoder;
 
-import org.jfxvnc.net.rfb.codec.ClientEventType;
-
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
+import org.jfxvnc.net.rfb.codec.ClientEventType;
 
 public class KeyButtonEventEncoder extends MessageToByteEncoder<KeyButtonEvent> {
 

@@ -13,8 +13,10 @@
  *******************************************************************************/
 package org.jfxvnc.net.rfb.codec;
 
-import java.util.Arrays;
-
+import io.netty.buffer.Unpooled;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.channel.ChannelPipeline;
 import org.jfxvnc.net.rfb.codec.decoder.ProtocolVersionDecoder;
 import org.jfxvnc.net.rfb.codec.handshaker.RfbClientHandshaker;
 import org.jfxvnc.net.rfb.codec.handshaker.RfbClientHandshakerFactory;
@@ -31,14 +33,11 @@ import org.jfxvnc.net.rfb.render.ProtocolConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.netty.buffer.Unpooled;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelInboundHandlerAdapter;
-import io.netty.channel.ChannelPipeline;
+import java.util.Arrays;
 
 public class ProtocolHandshakeHandler extends ChannelInboundHandlerAdapter {
 
-  private static Logger logger = LoggerFactory.getLogger(ProtocolHandshakeHandler.class);
+  private static final Logger logger = LoggerFactory.getLogger(ProtocolHandshakeHandler.class);
 
   private RfbClientHandshaker handshaker;
 
@@ -99,7 +98,7 @@ public class ProtocolHandshakeHandler extends ChannelInboundHandlerAdapter {
     }
 
     RfbClientHandshakerFactory hsFactory = new RfbClientHandshakerFactory();
-    handshaker = hsFactory.newRfbClientHandshaker(version);
+    handshaker = RfbClientHandshakerFactory.newRfbClientHandshaker(version);
     handshaker.handshake(ctx.channel()).addListener((future) -> {
       if (!future.isSuccess()) {
         ctx.fireExceptionCaught(future.cause());
@@ -128,14 +127,14 @@ public class ProtocolHandshakeHandler extends ChannelInboundHandlerAdapter {
 
     if (userSecType == SecurityType.NONE) {
       logger.debug("none security type available");
-      ctx.writeAndFlush(Unpooled.buffer(1).writeByte(userSecType.getType()));
+      ctx.writeAndFlush(Unpooled.buffer(1).writeByte(SecurityType.NONE.getType()));
       ctx.pipeline().fireUserEventTriggered(ProtocolState.SECURITY_COMPLETE);
       return;
     }
 
     RfbSecurityHandshakerFactory secFactory = new RfbSecurityHandshakerFactory();
 
-    secHandshaker = secFactory.newRfbSecurityHandshaker(userSecType);
+    secHandshaker = RfbSecurityHandshakerFactory.newRfbSecurityHandshaker(userSecType);
     if (secHandshaker == null) {
       ctx.fireExceptionCaught(new ProtocolException(String.format("Authentication: '%s' is not supported yet", userSecType)));
       return;
