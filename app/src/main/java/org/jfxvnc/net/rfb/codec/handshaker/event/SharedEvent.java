@@ -15,14 +15,14 @@ package org.jfxvnc.net.rfb.codec.handshaker.event;
 
 public class SharedEvent implements HandshakeEvent {
 
-  private final boolean shared;
+    private final boolean shared;
 
-  public SharedEvent(boolean shared) {
-    this.shared = shared;
-  }
+    public SharedEvent(boolean shared) {
+        this.shared = shared;
+    }
 
-  public boolean isShared() {
-    return shared;
-  }
+    public boolean isShared() {
+        return shared;
+    }
 
 }

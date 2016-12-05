@@ -22,58 +22,58 @@ import java.util.List;
 
 public class RawRectDecoder implements FrameRectDecoder {
 
-  protected final boolean bigEndian;
-  protected final int bpp;
-  protected int capacity;
-  protected FrameRect rect;
-  protected PixelFormat pixelFormat;
+    protected final boolean bigEndian;
+    protected final int bpp;
+    protected int capacity;
+    protected FrameRect rect;
+    protected final PixelFormat pixelFormat;
 
-  protected final int redPos;
-  protected final int bluePos;
+    protected final int redPos;
+    protected final int bluePos;
 
-  public RawRectDecoder(PixelFormat pixelFormat) {
-    this.pixelFormat = pixelFormat;
-    this.bigEndian = pixelFormat.isBigEndian();
-    this.redPos = bigEndian ? 0 : 2;
-    this.bluePos = bigEndian ? 2 : 0;
-    this.bpp = pixelFormat.getBytePerPixel();
-  }
-
-  @Override
-  public boolean decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) throws Exception {
-    if (!in.isReadable(capacity)) {
-      return false;
+    public RawRectDecoder(PixelFormat pixelFormat) {
+        this.pixelFormat = pixelFormat;
+        this.bigEndian = pixelFormat.isBigEndian();
+        this.redPos = bigEndian ? 0 : 2;
+        this.bluePos = bigEndian ? 2 : 0;
+        this.bpp = pixelFormat.getBytePerPixel();
     }
 
-    sendRect(ctx, in.readSlice(capacity).retain(), out);
-    return true;
-  }
+    @Override
+    public boolean decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) throws Exception {
+        if (!in.isReadable(capacity)) {
+            return false;
+        }
 
-  @Override
-  public void setRect(FrameRect rect) {
-    this.rect = rect;
-    this.capacity = rect.getWidth() * rect.getHeight() * bpp;
-  }
-
-  protected void sendRect(ChannelHandlerContext ctx, ByteBuf frame, List<Object> out) {
-    if (bpp == 1) {
-      out.add(new RawImageRect(rect.getX(), rect.getY(), rect.getWidth(), rect.getHeight(), frame.copy(), rect.getWidth()));
-      return;
+        sendRect(ctx, in.readSlice(capacity).retain(), out);
+        return true;
     }
 
-    // reduce 4 byte to 3 byte
-    int size = (capacity * 3) / 4;
-    ByteBuf pixels = ctx.alloc().buffer(size);
-    byte[] buffer = new byte[3];
-    while (pixels.isWritable()) {
-      buffer[redPos] = frame.readByte();
-      buffer[1] = frame.readByte();
-      buffer[bluePos] = frame.readByte();
-      pixels.writeBytes(buffer);
-      frame.skipBytes(1);
+    @Override
+    public void setRect(FrameRect rect) {
+        this.rect = rect;
+        this.capacity = rect.getWidth() * rect.getHeight() * bpp;
     }
-    frame.release();
-    out.add(new RawImageRect(rect.getX(), rect.getY(), rect.getWidth(), rect.getHeight(), pixels, rect.getWidth() * 3));
 
-  }
+    protected void sendRect(ChannelHandlerContext ctx, ByteBuf frame, List<Object> out) {
+        if (bpp == 1) {
+            out.add(new RawImageRect(rect.getX(), rect.getY(), rect.getWidth(), rect.getHeight(), frame.copy(), rect.getWidth()));
+            return;
+        }
+
+        // reduce 4 byte to 3 byte
+        int size = (capacity * 3) / 4;
+        ByteBuf pixels = ctx.alloc().buffer(size);
+        byte[] buffer = new byte[3];
+        while (pixels.isWritable()) {
+            buffer[redPos] = frame.readByte();
+            buffer[1] = frame.readByte();
+            buffer[bluePos] = frame.readByte();
+            pixels.writeBytes(buffer);
+            frame.skipBytes(1);
+        }
+        frame.release();
+        out.add(new RawImageRect(rect.getX(), rect.getY(), rect.getWidth(), rect.getHeight(), pixels, rect.getWidth() * 3));
+
+    }
 }

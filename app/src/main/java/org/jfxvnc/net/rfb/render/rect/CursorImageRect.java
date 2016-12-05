@@ -18,27 +18,27 @@ import org.jfxvnc.net.rfb.codec.Encoding;
 
 public class CursorImageRect extends RawImageRect {
 
-  public CursorImageRect(int x, int y, int width, int height, ByteBuf pixels) {
-    super(x, y, width, height, pixels, 1);
-  }
+    public CursorImageRect(int x, int y, int width, int height, ByteBuf pixels) {
+        super(x, y, width, height, pixels, 1);
+    }
 
-  public int getHotspotX() {
-    return x;
-  }
+    public int getHotspotX() {
+        return x;
+    }
 
-  public int getHotspotY() {
-    return y;
-  }
+    public int getHotspotY() {
+        return y;
+    }
 
-  @Override
-  public Encoding getEncoding() {
-    return Encoding.CURSOR;
-  }
+    @Override
+    public Encoding getEncoding() {
+        return Encoding.CURSOR;
+    }
 
-  @Override
-  public String toString() {
-    return "CursorImageRect [hotspotX=" + x + ", hotspotY=" + y + ", width=" + width + ", height=" + height + ", pixels.capacity="
-        + (pixels != null ? pixels.capacity() : "null") + ']';
-  }
+    @Override
+    public String toString() {
+        return "CursorImageRect [hotspotX=" + x + ", hotspotY=" + y + ", width=" + width + ", height=" + height + ", pixels.capacity="
+                + (pixels != null ? pixels.capacity() : "null") + ']';
+    }
 
 }

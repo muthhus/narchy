@@ -15,5 +15,5 @@ package org.jfxvnc.net.rfb.render;
 
 public interface RenderCallback {
 
-  void renderComplete();
+    void renderComplete();
 }

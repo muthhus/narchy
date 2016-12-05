@@ -18,18 +18,18 @@ import org.jfxvnc.net.rfb.codec.Encoding;
 
 public class ZlibImageRect extends RawImageRect {
 
-  public ZlibImageRect(int x, int y, int width, int height, ByteBuf pixels, int scanlineStride) {
-    super(x, y, width, height, pixels, scanlineStride);
-  }
+    public ZlibImageRect(int x, int y, int width, int height, ByteBuf pixels, int scanlineStride) {
+        super(x, y, width, height, pixels, scanlineStride);
+    }
 
-  @Override
-  public Encoding getEncoding() {
-    return Encoding.ZLIB;
-  }
+    @Override
+    public Encoding getEncoding() {
+        return Encoding.ZLIB;
+    }
 
-  @Override
-  public String toString() {
-    return "ZlibRawImageRect [x=" + x + ", y=" + y + ", width=" + width + ", height=" + height + ", pixels.capacity="
-        + (pixels != null ? pixels.capacity() : "null") + ", scanLine=" + scanlineStride + ']';
-  }
+    @Override
+    public String toString() {
+        return "ZlibRawImageRect [x=" + x + ", y=" + y + ", width=" + width + ", height=" + height + ", pixels.capacity="
+                + (pixels != null ? pixels.capacity() : "null") + ", scanLine=" + scanlineStride + ']';
+    }
 }

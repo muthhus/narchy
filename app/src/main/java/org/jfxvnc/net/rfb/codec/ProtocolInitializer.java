@@ -20,20 +20,20 @@ import org.jfxvnc.net.rfb.render.ProtocolConfiguration;
 import org.jfxvnc.net.rfb.render.RenderProtocol;
 
 public class ProtocolInitializer extends ChannelInitializer<SocketChannel> {
-  private final RenderProtocol render;
-  private final ProtocolConfiguration config;
+    private final RenderProtocol render;
+    private final ProtocolConfiguration config;
 
-  public ProtocolInitializer(RenderProtocol render, ProtocolConfiguration config) {
-    super();
-    this.render = render;
-    this.config = config;
-  }
+    public ProtocolInitializer(RenderProtocol render, ProtocolConfiguration config) {
+        super();
+        this.render = render;
+        this.config = config;
+    }
 
-  @Override
-  public void initChannel(SocketChannel ch) throws Exception {
-    ChannelPipeline pipeline = ch.pipeline();
-    // pipeline.addLast(new LoggingHandler(LogLevel.DEBUG));
-    pipeline.addLast(new ProtocolHandler(render, config));
+    @Override
+    public void initChannel(SocketChannel ch) throws Exception {
+        ChannelPipeline pipeline = ch.pipeline();
+        // pipeline.addLast(new LoggingHandler(LogLevel.DEBUG));
+        pipeline.addLast(new ProtocolHandler(render, config));
 
-  }
+    }
 }

@@ -17,19 +17,19 @@ import org.jfxvnc.net.rfb.codec.Encoding;
 
 public class DesktopSizeRect extends ImageRect {
 
-  public DesktopSizeRect(int x, int y, int width, int height) {
-    super(x, y, width, height);
+    public DesktopSizeRect(int x, int y, int width, int height) {
+        super(x, y, width, height);
 
-  }
+    }
 
-  @Override
-  public Encoding getEncoding() {
-    return Encoding.DESKTOP_SIZE;
-  }
+    @Override
+    public Encoding getEncoding() {
+        return Encoding.DESKTOP_SIZE;
+    }
 
-  @Override
-  public String toString() {
-    return "DesktopSizeRect [width=" + width + ", height=" + height + ']';
-  }
+    @Override
+    public String toString() {
+        return "DesktopSizeRect [width=" + width + ", height=" + height + ']';
+    }
 
 }

@@ -33,100 +33,100 @@ import java.util.List;
 
 class RfbClient33Decoder extends ReplayingDecoder<RfbClient33Decoder.State> implements RfbClientDecoder {
 
-  private static final Logger logger = LoggerFactory.getLogger(RfbClient33Decoder.class);
+    private static final Logger logger = LoggerFactory.getLogger(RfbClient33Decoder.class);
 
-  protected final Charset ASCII = StandardCharsets.US_ASCII;
+    protected final Charset ASCII = StandardCharsets.US_ASCII;
 
-  public RfbClient33Decoder() {
-    super(State.SEC_TYPES);
-  }
+    public RfbClient33Decoder() {
+        super(State.SEC_TYPES);
+    }
 
-  enum State {
-    SEC_TYPES, VNC_AUTH, SEC_RESULT, SERVER_INIT
-  }
+    enum State {
+        SEC_TYPES, VNC_AUTH, SEC_RESULT, SERVER_INIT
+    }
 
-  @Override
-  protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) throws Exception {
-    switch (state()) {
-      case SEC_TYPES:
-        int type = in.readInt();
-        SecurityType securityType = SecurityType.valueOf(type);
-        logger.debug("supported security type: {}", securityType);
-        checkpoint(securityType == SecurityType.VNC_Auth ? State.VNC_AUTH : State.SERVER_INIT);
-        out.add(new SecurityTypesEvent(false, securityType));
-        break;
-      case VNC_AUTH:
-        byte[] challenge = new byte[16];
-        in.readBytes(challenge);
-        out.add(new VncAuthSecurityMessage(challenge));
-        checkpoint(State.SEC_RESULT);
-        break;
-      case SEC_RESULT:
-        int secResult = in.readInt();
-        logger.debug("server login {}", secResult == 0 ? "succeed" : "failed");
-        if (secResult == 1) {
-          int length = in.readInt();
-          if (length == 0) {
-            out.add(new SecurityResultEvent(false, new ProtocolException("decode error message failed")));
-            return;
-          }
-          byte[] text = new byte[length];
-          in.readBytes(text);
-          out.add(new SecurityResultEvent(false, new SecurityException(new String(text, ASCII))));
-          return;
+    @Override
+    protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) throws Exception {
+        switch (state()) {
+            case SEC_TYPES:
+                int type = in.readInt();
+                SecurityType securityType = SecurityType.valueOf(type);
+                logger.debug("supported security type: {}", securityType);
+                checkpoint(securityType == SecurityType.VNC_Auth ? State.VNC_AUTH : State.SERVER_INIT);
+                out.add(new SecurityTypesEvent(false, securityType));
+                break;
+            case VNC_AUTH:
+                byte[] challenge = new byte[16];
+                in.readBytes(challenge);
+                out.add(new VncAuthSecurityMessage(challenge));
+                checkpoint(State.SEC_RESULT);
+                break;
+            case SEC_RESULT:
+                int secResult = in.readInt();
+                logger.debug("server login {}", secResult == 0 ? "succeed" : "failed");
+                if (secResult == 1) {
+                    int length = in.readInt();
+                    if (length == 0) {
+                        out.add(new SecurityResultEvent(false, new ProtocolException("decode error message failed")));
+                        return;
+                    }
+                    byte[] text = new byte[length];
+                    in.readBytes(text);
+                    out.add(new SecurityResultEvent(false, new SecurityException(new String(text, ASCII))));
+                    return;
+                }
+                out.add(new SecurityResultEvent(true));
+                checkpoint(State.SERVER_INIT);
+                break;
+            case SERVER_INIT:
+                ServerInitEvent initMsg = new ServerInitEvent();
+
+                initMsg.setFrameBufferWidth(in.readUnsignedShort());
+                initMsg.setFrameBufferHeight(in.readUnsignedShort());
+
+                initMsg.setPixelFormat(parsePixelFormat(in));
+
+                byte[] name = new byte[in.readInt()];
+                in.readBytes(name);
+
+                initMsg.setServerName(new String(name, ASCII));
+                out.add(initMsg);
+                break;
+            default:
+                break;
         }
-        out.add(new SecurityResultEvent(true));
-        checkpoint(State.SERVER_INIT);
-        break;
-      case SERVER_INIT:
-        ServerInitEvent initMsg = new ServerInitEvent();
-
-        initMsg.setFrameBufferWidth(in.readUnsignedShort());
-        initMsg.setFrameBufferHeight(in.readUnsignedShort());
-
-        initMsg.setPixelFormat(parsePixelFormat(in));
-
-        byte[] name = new byte[in.readInt()];
-        in.readBytes(name);
-
-        initMsg.setServerName(new String(name, ASCII));
-        out.add(initMsg);
-        break;
-      default:
-        break;
-    }
-  }
-
-  protected void decodeErrorMessage(ChannelHandlerContext ctx, ByteBuf in) {
-    if (!in.isReadable()) {
-      ctx.fireExceptionCaught(new ProtocolException("decode error message failed"));
-      return;
     }
 
-    byte[] reason = new byte[actualReadableBytes()];
-    in.readBytes(reason);
-    String error = new String(reason, ASCII);
-    ctx.fireExceptionCaught(new ProtocolException(error.trim()));
-  }
+    protected void decodeErrorMessage(ChannelHandlerContext ctx, ByteBuf in) {
+        if (!in.isReadable()) {
+            ctx.fireExceptionCaught(new ProtocolException("decode error message failed"));
+            return;
+        }
 
-  protected static PixelFormat parsePixelFormat(ByteBuf m) {
+        byte[] reason = new byte[actualReadableBytes()];
+        in.readBytes(reason);
+        String error = new String(reason, ASCII);
+        ctx.fireExceptionCaught(new ProtocolException(error.trim()));
+    }
 
-    PixelFormat pf = new PixelFormat();
+    protected static PixelFormat parsePixelFormat(ByteBuf m) {
 
-    pf.setBitPerPixel(m.readUnsignedByte());
-    pf.setDepth(m.readUnsignedByte());
-    pf.setBigEndian(m.readUnsignedByte() == 1);
-    pf.setTrueColor(m.readUnsignedByte() == 1);
-    pf.setRedMax(m.readUnsignedShort());
-    pf.setGreenMax(m.readUnsignedShort());
-    pf.setBlueMax(m.readUnsignedShort());
+        PixelFormat pf = new PixelFormat();
 
-    pf.setRedShift(m.readUnsignedByte());
-    pf.setGreenShift(m.readUnsignedByte());
-    pf.setBlueShift(m.readUnsignedByte());
-    m.skipBytes(3);
+        pf.setBitPerPixel(m.readUnsignedByte());
+        pf.setDepth(m.readUnsignedByte());
+        pf.setBigEndian(m.readUnsignedByte() == 1);
+        pf.setTrueColor(m.readUnsignedByte() == 1);
+        pf.setRedMax(m.readUnsignedShort());
+        pf.setGreenMax(m.readUnsignedShort());
+        pf.setBlueMax(m.readUnsignedShort());
 
-    return pf;
-  }
+        pf.setRedShift(m.readUnsignedByte());
+        pf.setGreenShift(m.readUnsignedByte());
+        pf.setBlueShift(m.readUnsignedByte());
+        m.skipBytes(3);
+
+        return pf;
+    }
 
 }

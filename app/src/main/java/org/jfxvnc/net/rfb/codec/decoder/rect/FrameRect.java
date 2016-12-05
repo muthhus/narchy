@@ -17,48 +17,48 @@ import org.jfxvnc.net.rfb.codec.Encoding;
 
 public class FrameRect {
 
-  private final int x, y, width, height;
-  private final Encoding encoding;
+    private final int x, y, width, height;
+    private final Encoding encoding;
 
-  public FrameRect(int x, int y, int width, int height, Encoding encoding) {
-    this.x = x;
-    this.y = y;
-    this.width = width;
-    this.height = height;
-    this.encoding = encoding;
-  }
+    public FrameRect(int x, int y, int width, int height, Encoding encoding) {
+        this.x = x;
+        this.y = y;
+        this.width = width;
+        this.height = height;
+        this.encoding = encoding;
+    }
 
-  public int getX() {
-    return x;
-  }
+    public int getX() {
+        return x;
+    }
 
-  public int getY() {
-    return y;
-  }
+    public int getY() {
+        return y;
+    }
 
-  public int getX2() {
-    return x + width;
-  }
+    public int getX2() {
+        return x + width;
+    }
 
-  public int getY2() {
-    return y + height;
-  }
-  
-  public int getWidth() {
-    return width;
-  }
+    public int getY2() {
+        return y + height;
+    }
 
-  public int getHeight() {
-    return height;
-  }
+    public int getWidth() {
+        return width;
+    }
 
-  public Encoding getEncoding() {
-    return encoding;
-  }
+    public int getHeight() {
+        return height;
+    }
 
-  @Override
-  public String toString() {
-    return "FrameRect [x=" + x + ", y=" + y + ", width=" + width + ", height=" + height + ", " + (encoding != null ? "encoding=" + encoding : "") + ']';
-  }
+    public Encoding getEncoding() {
+        return encoding;
+    }
+
+    @Override
+    public String toString() {
+        return "FrameRect [x=" + x + ", y=" + y + ", width=" + width + ", height=" + height + ", " + (encoding != null ? "encoding=" + encoding : "") + ']';
+    }
 
 }

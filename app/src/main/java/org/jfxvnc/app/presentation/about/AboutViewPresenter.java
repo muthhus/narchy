@@ -22,30 +22,30 @@ import java.util.ResourceBundle;
 
 public class AboutViewPresenter implements Initializable {
 
-  @FXML
-  private TextArea build;
-  @FXML
-  private TextArea license;
-  @FXML
-  private TextArea thirdLicense;
+    @FXML
+    private TextArea build;
+    @FXML
+    private TextArea license;
+    @FXML
+    private TextArea thirdLicense;
 
-  @Override
-  public void initialize(URL location, ResourceBundle resources) {
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
 
-    String version = AboutViewPresenter.class.getPackage().getImplementationVersion();
-    appendBuildLine(String.format("JavaFX VNC (%s)", version != null ? version : "DEV"));
-    appendBuildLine("Copyright © 2015 - comtel2000");
-    appendBuildLine(null);
-    appendBuildLine(System.getProperty("java.runtime.name"));
-    appendBuildLine(String.format("Version:\t%s (%s)", System.getProperty("java.runtime.version"), System.getProperty("java.vendor")));
-    appendBuildLine(String.format("OS: \t%s (%s) %s", System.getProperty("os.name"), System.getProperty("os.arch"), System.getProperty("os.version")));
+        String version = AboutViewPresenter.class.getPackage().getImplementationVersion();
+        appendBuildLine(String.format("JavaFX VNC (%s)", version != null ? version : "DEV"));
+        appendBuildLine("Copyright © 2015 - comtel2000");
+        appendBuildLine(null);
+        appendBuildLine(System.getProperty("java.runtime.name"));
+        appendBuildLine(String.format("Version:\t%s (%s)", System.getProperty("java.runtime.version"), System.getProperty("java.vendor")));
+        appendBuildLine(String.format("OS: \t%s (%s) %s", System.getProperty("os.name"), System.getProperty("os.arch"), System.getProperty("os.version")));
 
-  }
-
-  private void appendBuildLine(String text) {
-    if (text != null) {
-      build.appendText(text);
     }
-    build.appendText(System.lineSeparator());
-  }
+
+    private void appendBuildLine(String text) {
+        if (text != null) {
+            build.appendText(text);
+        }
+        build.appendText(System.lineSeparator());
+    }
 }

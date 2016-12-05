@@ -17,51 +17,52 @@ import org.jfxvnc.net.rfb.codec.PixelFormat;
 
 public class ServerInitEvent implements HandshakeEvent {
 
-  private int frameBufferWidth;
-  private int frameBufferHeight;
+    private int frameBufferWidth;
+    private int frameBufferHeight;
 
-  private PixelFormat pixelFormat;
+    private PixelFormat pixelFormat;
 
-  private String serverName;
+    private String serverName;
 
-  public ServerInitEvent() {}
+    public ServerInitEvent() {
+    }
 
-  public int getFrameBufferWidth() {
-    return frameBufferWidth;
-  }
+    public int getFrameBufferWidth() {
+        return frameBufferWidth;
+    }
 
-  public void setFrameBufferWidth(int frameBufferWidth) {
-    this.frameBufferWidth = frameBufferWidth;
-  }
+    public void setFrameBufferWidth(int frameBufferWidth) {
+        this.frameBufferWidth = frameBufferWidth;
+    }
 
-  public int getFrameBufferHeight() {
-    return frameBufferHeight;
-  }
+    public int getFrameBufferHeight() {
+        return frameBufferHeight;
+    }
 
-  public void setFrameBufferHeight(int frameBufferHeight) {
-    this.frameBufferHeight = frameBufferHeight;
-  }
+    public void setFrameBufferHeight(int frameBufferHeight) {
+        this.frameBufferHeight = frameBufferHeight;
+    }
 
-  public PixelFormat getPixelFormat() {
-    return pixelFormat;
-  }
+    public PixelFormat getPixelFormat() {
+        return pixelFormat;
+    }
 
-  public void setPixelFormat(PixelFormat pixelFormat) {
-    this.pixelFormat = pixelFormat;
-  }
+    public void setPixelFormat(PixelFormat pixelFormat) {
+        this.pixelFormat = pixelFormat;
+    }
 
-  public String getServerName() {
-    return serverName;
-  }
+    public String getServerName() {
+        return serverName;
+    }
 
-  public void setServerName(String serverName) {
-    this.serverName = serverName;
-  }
+    public void setServerName(String serverName) {
+        this.serverName = serverName;
+    }
 
-  @Override
-  public String toString() {
-    return "ServerInitEvent [frameBufferWidth=" + frameBufferWidth + ", frameBufferHeight=" + frameBufferHeight + ", pixelFormat=" + pixelFormat
-        + ", serverName=" + serverName + ']';
-  }
+    @Override
+    public String toString() {
+        return "ServerInitEvent [frameBufferWidth=" + frameBufferWidth + ", frameBufferHeight=" + frameBufferHeight + ", pixelFormat=" + pixelFormat
+                + ", serverName=" + serverName + ']';
+    }
 
 }

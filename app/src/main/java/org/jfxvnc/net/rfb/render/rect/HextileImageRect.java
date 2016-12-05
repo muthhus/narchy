@@ -20,31 +20,31 @@ import java.util.List;
 
 public class HextileImageRect extends ImageRect {
 
-  protected final List<RawImageRect> rects;
+    protected final List<RawImageRect> rects;
 
-  public HextileImageRect(int x, int y, int width, int height) {
-    super(x, y, width, height);
-    rects = new FasterList<>(0);
-  }
+    public HextileImageRect(int x, int y, int width, int height) {
+        super(x, y, width, height);
+        rects = new FasterList<>(0);
+    }
 
-  public List<RawImageRect> getRects() {
-    return rects;
-  }
+    public List<RawImageRect> getRects() {
+        return rects;
+    }
 
-  @Override
-  public Encoding getEncoding() {
-    return Encoding.HEXTILE;
-  }
+    @Override
+    public Encoding getEncoding() {
+        return Encoding.HEXTILE;
+    }
 
-  @Override
-  public boolean release() {
-    rects.forEach(RawImageRect::release);
-    return true;
-  }
+    @Override
+    public boolean release() {
+        rects.forEach(RawImageRect::release);
+        return true;
+    }
 
-  @Override
-  public String toString() {
-    return "HextileImageRect [x=" + x + ", y=" + y + ", width=" + width + ", height=" + height + ", rects.count=" + (rects != null ? rects.size() : "null")
-        + ']';
-  }
+    @Override
+    public String toString() {
+        return "HextileImageRect [x=" + x + ", y=" + y + ", width=" + width + ", height=" + height + ", rects.count=" + (rects != null ? rects.size() : "null")
+                + ']';
+    }
 }

@@ -19,85 +19,77 @@ import java.util.regex.Pattern;
 
 public class ProtocolVersion implements Comparable<ProtocolVersion> {
 
-  public final static ProtocolVersion RFB_3_3 = new ProtocolVersion(3, 3);
-  public final static ProtocolVersion RFB_3_7 = new ProtocolVersion(3, 7);
-  public final static ProtocolVersion RFB_3_8 = new ProtocolVersion(3, 8);
+    public final static ProtocolVersion RFB_3_3 = new ProtocolVersion(3, 3);
+    public final static ProtocolVersion RFB_3_7 = new ProtocolVersion(3, 7);
+    public final static ProtocolVersion RFB_3_8 = new ProtocolVersion(3, 8);
 
-  private final Pattern VERSION_PAT = Pattern.compile("RFB ([0-9]{3}).([0-9]{3})");
+    private final Pattern VERSION_PAT = Pattern.compile("RFB ([0-9]{3}).([0-9]{3})");
 
-  private final int majorVersion;
+    public final int majorVersion;
 
-  private final int minorVersion;
+    public final int minorVersion;
 
-  /**
-   * RFB protocol parser (RFB ([0-9]{3}).([0-9]{3}))
-   * 
-   * @param version String
-   */
-  public ProtocolVersion(String version) {
-    if (version == null) {
-      throw new IllegalArgumentException("null can not parsed to version");
+    /**
+     * RFB protocol parser (RFB ([0-9]{3}).([0-9]{3}))
+     *
+     * @param version String
+     */
+    public ProtocolVersion(String version) {
+        if (version == null) {
+            throw new IllegalArgumentException("null can not parsed to version");
+        }
+        Matcher versionMatcher = VERSION_PAT.matcher(version);
+        if (versionMatcher.find()) {
+            majorVersion = Integer.parseInt(versionMatcher.group(1));
+            minorVersion = Integer.parseInt(versionMatcher.group(2));
+        } else {
+            throw new IllegalArgumentException("version: " + version + " not supported");
+        }
     }
-    Matcher versionMatcher = VERSION_PAT.matcher(version);
-    if (versionMatcher.find()) {
-      majorVersion = Integer.parseInt(versionMatcher.group(1));
-      minorVersion = Integer.parseInt(versionMatcher.group(2));
-    } else {
-      throw new IllegalArgumentException("version: " + version + " not supported");
+
+    public ProtocolVersion(int major, int minor) {
+        majorVersion = major;
+        minorVersion = minor;
     }
-  }
 
-  public ProtocolVersion(int major, int minor) {
-    majorVersion = major;
-    minorVersion = minor;
-  }
-
-  public int getMajorVersion() {
-    return majorVersion;
-  }
-
-  public int getMinorVersion() {
-    return minorVersion;
-  }
-
-  public boolean isGreaterThan(ProtocolVersion o) {
-    return compareTo(o) > 0;
-  }
-
-  public boolean isGreaterThan(String v) {
-    return compareTo(new ProtocolVersion(v)) > 0;
-  }
-
-  @Override
-  public boolean equals(Object obj) {
-    if (obj == null || !(obj instanceof ProtocolVersion)) {
-      return false;
+    public boolean isGreaterThan(ProtocolVersion o) {
+        return compareTo(o) > 0;
     }
-    return compareTo((ProtocolVersion) obj) == 0;
-  }
 
-  @Override
-  public int compareTo(ProtocolVersion v) {
-    if (majorVersion == v.getMajorVersion() && minorVersion == v.getMinorVersion()) {
-      return 0;
+    public boolean isGreaterThan(String v) {
+        return compareTo(new ProtocolVersion(v)) > 0;
     }
-    if (majorVersion > v.getMajorVersion() || (majorVersion == v.getMajorVersion() && minorVersion > v.getMinorVersion())) {
-      return 1;
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null || !(obj instanceof ProtocolVersion)) {
+            return false;
+        }
+        return compareTo((ProtocolVersion) obj) == 0;
     }
-    return -1;
-  }
 
-  /**
-   * encoded ASCII bytes include LF
-   * 
-   * @return expected RFB version bytes
-   */
-  public byte[] getBytes() {
-    return String.format("RFB %03d.%03d\n", majorVersion, minorVersion).getBytes(StandardCharsets.US_ASCII);
-  }
+    @Override
+    public int compareTo(ProtocolVersion v) {
+        if (majorVersion == v.majorVersion && minorVersion == v.minorVersion) {
+            return 0;
+        }
+        if (majorVersion > v.majorVersion || (majorVersion == v.majorVersion && minorVersion > v.minorVersion)) {
+            return 1;
+        }
+        return -1;
+    }
 
-  @Override
-  public String toString() {
-    return String.format("RFB %03d.%03d", majorVersion, minorVersion);
-  }
+    /**
+     * encoded ASCII bytes include LF
+     *
+     * @return expected RFB version bytes
+     */
+    public byte[] getBytes() {
+        return String.format("RFB %03d.%03d\n", majorVersion, minorVersion).getBytes(StandardCharsets.US_ASCII);
+    }
+
+    @Override
+    public String toString() {
+        return String.format("RFB %03d.%03d", majorVersion, minorVersion);
+    }
 }

@@ -22,51 +22,51 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public abstract class RfbSecurityHandshaker {
 
-  public abstract RfbSecurityDecoder newSecurityDecoder();
+    public abstract RfbSecurityDecoder newSecurityDecoder();
 
-  public abstract RfbSecurityEncoder newSecurityEncoder();
+    public abstract RfbSecurityEncoder newSecurityEncoder();
 
-  private final AtomicBoolean handshakeComplete = new AtomicBoolean(false);
+    private final AtomicBoolean handshakeComplete = new AtomicBoolean(false);
 
-  private final SecurityType securityType;
+    private final SecurityType securityType;
 
-  public RfbSecurityHandshaker(SecurityType securityType) {
-    this.securityType = securityType;
-  }
-
-  public boolean isHandshakeComplete() {
-    return handshakeComplete.get();
-  }
-
-  private void setHandshakeComplete() {
-    handshakeComplete.set(true);
-  }
-
-  public ChannelFuture handshake(Channel channel, boolean sendResponse) {
-    return handshake(channel, sendResponse, channel.newPromise());
-  }
-
-  public final ChannelFuture handshake(Channel channel, boolean sendResponse, ChannelPromise promise) {
-    ChannelPipeline p = channel.pipeline();
-    ChannelHandlerContext ctx = p.context(RfbClientDecoder.class);
-    p.addBefore(ctx.name(), "rfb-security-decoder", newSecurityDecoder());
-
-    ChannelHandlerContext ctx2 = p.context(RfbClientEncoder.class);
-    p.addBefore(ctx2.name(), "rfb-security-encoder", newSecurityEncoder());
-    if (!sendResponse) {
-      return promise.setSuccess();
+    public RfbSecurityHandshaker(SecurityType securityType) {
+        this.securityType = securityType;
     }
-    channel.writeAndFlush(Unpooled.buffer(1).writeByte(securityType.getType()), promise);
-    return promise;
-  }
 
-  public final void finishHandshake(Channel channel, RfbSecurityMessage message) {
-    setHandshakeComplete();
+    public boolean isHandshakeComplete() {
+        return handshakeComplete.get();
+    }
 
-    ChannelPipeline p = channel.pipeline();
-    p.remove("rfb-security-decoder");
-    p.remove("rfb-security-encoder");
+    private void setHandshakeComplete() {
+        handshakeComplete.set(true);
+    }
 
-  }
+    public ChannelFuture handshake(Channel channel, boolean sendResponse) {
+        return handshake(channel, sendResponse, channel.newPromise());
+    }
+
+    public final ChannelFuture handshake(Channel channel, boolean sendResponse, ChannelPromise promise) {
+        ChannelPipeline p = channel.pipeline();
+        ChannelHandlerContext ctx = p.context(RfbClientDecoder.class);
+        p.addBefore(ctx.name(), "rfb-security-decoder", newSecurityDecoder());
+
+        ChannelHandlerContext ctx2 = p.context(RfbClientEncoder.class);
+        p.addBefore(ctx2.name(), "rfb-security-encoder", newSecurityEncoder());
+        if (!sendResponse) {
+            return promise.setSuccess();
+        }
+        channel.writeAndFlush(Unpooled.buffer(1).writeByte(securityType.getType()), promise);
+        return promise;
+    }
+
+    public final void finishHandshake(Channel channel, RfbSecurityMessage message) {
+        setHandshakeComplete();
+
+        ChannelPipeline p = channel.pipeline();
+        p.remove("rfb-security-decoder");
+        p.remove("rfb-security-encoder");
+
+    }
 
 }

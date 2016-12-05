@@ -44,147 +44,147 @@ import java.util.ResourceBundle;
 
 public class MainViewPresenter implements Initializable {
 
-  @Inject
-  SessionContext ctx;
+    @Inject
+    SessionContext ctx;
 
-  @Inject
-  VncRenderService service;
+    @Inject
+    VncRenderService service;
 
-  @FXML
-  BorderPane mainPane;
+    @FXML
+    BorderPane mainPane;
 
-  @FXML
-  private Label statusLabel;
+    @FXML
+    private Label statusLabel;
 
-  @FXML
-  private ProgressIndicator progress;
+    @FXML
+    private ProgressIndicator progress;
 
-  @FXML
-  private Button connectBtn;
+    @FXML
+    private Button connectBtn;
 
-  @FXML
-  private Button disconnectBtn;
+    @FXML
+    private Button disconnectBtn;
 
-  @FXML
-  private ToggleButton gearBtn;
+    @FXML
+    private ToggleButton gearBtn;
 
-  @FXML
-  private Slider zoomSlider;
+    @FXML
+    private Slider zoomSlider;
 
-  @FXML
-  private ToggleButton fullScreenBtn;
+    @FXML
+    private ToggleButton fullScreenBtn;
 
-  @FXML
-  private SplitPane splitPane;
+    @FXML
+    private SplitPane splitPane;
 
-  private volatile long lastPing;
+    private volatile long lastPing;
 
 
-  private final static PseudoClass CONNECT_CLASS = PseudoClass.getPseudoClass("connect");
-  private final static PseudoClass ONLINE_CLASS = PseudoClass.getPseudoClass("online");
+    private static PseudoClass CONNECT_CLASS = PseudoClass.getPseudoClass("connect");
+    private static PseudoClass ONLINE_CLASS = PseudoClass.getPseudoClass("online");
 
-  private final static PseudoClass WINDOW_CLASS = PseudoClass.getPseudoClass("window");
+    private static PseudoClass WINDOW_CLASS = PseudoClass.getPseudoClass("window");
 
-  private final StringProperty statusProperty = new SimpleStringProperty("-", "mainview.status");
+    private StringProperty statusProperty = new SimpleStringProperty("-", "mainview.status");
 
-  @Override
-  public void initialize(URL location, ResourceBundle rb) {
+    @Override
+    public void initialize(URL location, ResourceBundle rb) {
 
-    ctx.addBinding(statusProperty);
+        ctx.addBinding(statusProperty);
 
-    VncView vncView = new VncView();
-    DetailView detailView = new DetailView();
+        VncView vncView = new VncView();
+        DetailView detailView = new DetailView();
 
-    splitPane.getItems().addAll(vncView.getView(), detailView.getView());
-    splitPane.getDividers().get(0).setPosition(1.0);
+        splitPane.getItems().addAll(vncView.getView(), detailView.getView());
+        splitPane.getDividers().get(0).setPosition(1.0);
 
-    statusLabel.textProperty().bind(statusProperty);
+        statusLabel.textProperty().bind(statusProperty);
 
-    gearBtn.selectedProperty().addListener(l -> {
-      SplitPane.Divider divider = splitPane.getDividers().get(0);
-      KeyValue value = new KeyValue(divider.positionProperty(), gearBtn.isSelected() ? 0.80 : 1.0);
-      new Timeline(new KeyFrame(Duration.seconds(0.2), value)).play();
-    });
-    gearBtn.setSelected(true);
+        gearBtn.selectedProperty().addListener(l -> {
+            SplitPane.Divider divider = splitPane.getDividers().get(0);
+            KeyValue value = new KeyValue(divider.positionProperty(), gearBtn.isSelected() ? 0.80 : 1.0);
+            new Timeline(new KeyFrame(Duration.seconds(0.2), value)).play();
+        });
+        gearBtn.setSelected(true);
 
-    connectBtn.textProperty().bind(Bindings.createStringBinding(
-        () -> rb.getString(service.listeningModeProperty().get() ? "button.listening" : "button.connect"), service.listeningModeProperty()));
+        connectBtn.textProperty().bind(Bindings.createStringBinding(
+                () -> rb.getString(service.listeningModeProperty().get() ? "button.listening" : "button.connect"), service.listeningModeProperty()));
 
-    disconnectBtn.textProperty().bind(Bindings.createStringBinding(
-        () -> rb.getString(service.listeningModeProperty().get() ? "button.cancel" : "button.disconnect"), service.listeningModeProperty()));
-    disconnectBtn.disableProperty().bind(connectBtn.disabledProperty().not());
+        disconnectBtn.textProperty().bind(Bindings.createStringBinding(
+                () -> rb.getString(service.listeningModeProperty().get() ? "button.cancel" : "button.disconnect"), service.listeningModeProperty()));
+        disconnectBtn.disableProperty().bind(connectBtn.disabledProperty().not());
 
-    fullScreenBtn.selectedProperty().bindBidirectional(service.fullSceenProperty());
-    fullScreenBtn.selectedProperty().addListener((l, o, n) -> fullScreenBtn.pseudoClassStateChanged(WINDOW_CLASS, n));
+        fullScreenBtn.selectedProperty().bindBidirectional(service.fullSceenProperty());
+        fullScreenBtn.selectedProperty().addListener((l, o, n) -> fullScreenBtn.pseudoClassStateChanged(WINDOW_CLASS, n));
 
-    progress.visibleProperty().bind(service.connectingProperty());
-    zoomSlider.valueProperty().bindBidirectional(service.zoomLevelProperty());
+        progress.visibleProperty().bind(service.connectingProperty());
+        zoomSlider.valueProperty().bindBidirectional(service.zoomLevelProperty());
 
-    vncView.getView().setOnScroll(e -> service.zoomLevelProperty().set(service.zoomLevelProperty().get() + (e.getDeltaY() > 0.0 ? 0.01 : -0.01)));
+        vncView.getView().setOnScroll(e -> service.zoomLevelProperty().set(service.zoomLevelProperty().get() + (e.getDeltaY() > 0.0 ? 0.01 : -0.01)));
 
-    service.zoomLevelProperty()
-        .addListener((l, o, z) -> statusProperty.set(MessageFormat.format(rb.getString("status.zoom.scale"), Math.floor(z.doubleValue() * 100))));
+        service.zoomLevelProperty()
+                .addListener((l, o, z) -> statusProperty.set(MessageFormat.format(rb.getString("status.zoom.scale"), Math.floor(z.doubleValue() * 100))));
 
-    service.protocolStateProperty().addListener((l, o, event) -> Platform.runLater(() -> {
-      switch (event) {
-        case LISTENING:
-          statusProperty.set(rb.getString("status.listening"));
-          break;
-        case CLOSED:
-          statusProperty.set(rb.getString("status.closed"));
-          break;
-        case HANDSHAKE_STARTED:
-          ProtocolConfiguration config = service.getConfiguration();
-          statusProperty.set(MessageFormat.format(rb.getString("status.try.connect"), config.hostProperty().get(), config.portProperty().get()));
-          break;
-        case HANDSHAKE_COMPLETE:
-          statusProperty.set(rb.getString("status.open"));
-          gearBtn.setSelected(false);
-          break;
-        case SECURITY_FAILED:
-          statusProperty.set(rb.getString("status.auth.failed"));
-          break;
-        case SECURITY_COMPLETE:
-          statusProperty.set(rb.getString("status.auth.done"));
-          break;
-        default:
-          break;
-      }
+        service.protocolStateProperty().addListener((l, o, event) -> Platform.runLater(() -> {
+            switch (event) {
+                case LISTENING:
+                    statusProperty.set(rb.getString("status.listening"));
+                    break;
+                case CLOSED:
+                    statusProperty.set(rb.getString("status.closed"));
+                    break;
+                case HANDSHAKE_STARTED:
+                    ProtocolConfiguration config = service.getConfiguration();
+                    statusProperty.set(MessageFormat.format(rb.getString("status.try.connect"), config.hostProperty().get(), config.portProperty().get()));
+                    break;
+                case HANDSHAKE_COMPLETE:
+                    statusProperty.set(rb.getString("status.open"));
+                    gearBtn.setSelected(false);
+                    break;
+                case SECURITY_FAILED:
+                    statusProperty.set(rb.getString("status.auth.failed"));
+                    break;
+                case SECURITY_COMPLETE:
+                    statusProperty.set(rb.getString("status.auth.done"));
+                    break;
+                default:
+                    break;
+            }
 
-    }));
+        }));
 
-    service.connectedProperty().addListener((l, o, n) -> Platform.runLater(() -> connectBtn.setDisable(n)));
+        service.connectedProperty().addListener((l, o, n) -> Platform.runLater(() -> connectBtn.setDisable(n)));
 
-    service.connectingProperty().addListener((l, o, n) -> Platform.runLater(() -> gearBtn.pseudoClassStateChanged(CONNECT_CLASS, n)));
-    service.onlineProperty().addListener((l, o, n) -> Platform.runLater(() -> gearBtn.pseudoClassStateChanged(ONLINE_CLASS, n)));
+        service.connectingProperty().addListener((l, o, n) -> Platform.runLater(() -> gearBtn.pseudoClassStateChanged(CONNECT_CLASS, n)));
+        service.onlineProperty().addListener((l, o, n) -> Platform.runLater(() -> gearBtn.pseudoClassStateChanged(ONLINE_CLASS, n)));
 
-    service.exceptionCaughtProperty().addListener((l, o, n) -> Platform.runLater(() -> {
-      // Notifications.create().owner(mainPane).position(Pos.TOP_CENTER).text(n.getMessage()).showError();
-      statusProperty.set(n.getMessage());
-    }));
+        service.exceptionCaughtProperty().addListener((l, o, n) -> Platform.runLater(() -> {
+            // Notifications.create().owner(mainPane).position(Pos.TOP_CENTER).text(n.getMessage()).showError();
+            statusProperty.set(n.getMessage());
+        }));
 
-    service.bellProperty().addListener(l -> bell());
+        service.bellProperty().addListener(l -> bell());
 
-  }
-
-  @FXML
-  void connect(ActionEvent event) {
-    service.connect();
-  }
-
-  @FXML
-  void disconnect(ActionEvent event) {
-    service.disconnect();
-  }
-
-  private void bell() {
-    long time = System.currentTimeMillis();
-    if (lastPing > time - 2000) {
-      return;
     }
-    lastPing = time;
-    Toolkit.getDefaultToolkit().beep();
-    Platform.runLater(() -> statusProperty.set("Bell"));
-  }
+
+    @FXML
+    void connect(ActionEvent event) {
+        service.connect();
+    }
+
+    @FXML
+    void disconnect(ActionEvent event) {
+        service.disconnect();
+    }
+
+    private void bell() {
+        long time = System.currentTimeMillis();
+        if (lastPing > time - 2000) {
+            return;
+        }
+        lastPing = time;
+        Toolkit.getDefaultToolkit().beep();
+        Platform.runLater(() -> statusProperty.set("Bell"));
+    }
 
 }

@@ -37,151 +37,154 @@ import java.util.ResourceBundle;
 
 public class ConnectViewPresenter implements Initializable {
 
-  @Inject
-  SessionContext ctx;
+    @Inject
+    SessionContext ctx;
 
-  @Inject
-  VncRenderService con;
+    @Inject
+    VncRenderService con;
 
-  @FXML
-  private TextField ipField;
-  @FXML
-  private TextField portField;
-  @FXML
-  private CheckBox sslCB;
-  @FXML
-  private CheckBox sharedCB;
-  @FXML
-  private CheckBox forceRfb33CB;
+    @FXML
+    private TextField ipField;
+    @FXML
+    private TextField portField;
+    @FXML
+    private CheckBox sslCB;
+    @FXML
+    private CheckBox sharedCB;
+    @FXML
+    private CheckBox forceRfb33CB;
 
-  @FXML
-  private TextField listeningPortField;
-  @FXML
-  private CheckBox listeningCB;
+    @FXML
+    private TextField listeningPortField;
+    @FXML
+    private CheckBox listeningCB;
 
-  @FXML
-  private TextField userField;
-  @FXML
-  private PasswordField pwdField;
-  @FXML
-  private CheckBox rawCB;
-  @FXML
-  private CheckBox copyrectCB;
-  @FXML
-  private CheckBox hextileCB;
-  @FXML
-  private CheckBox cursorCB;
-  @FXML
-  private ListView<HistoryEntry> historyList;
-  @FXML
-  private Button clearBtn;
+    @FXML
+    private TextField userField;
+    @FXML
+    private PasswordField pwdField;
+    @FXML
+    private CheckBox rawCB;
+    @FXML
+    private CheckBox copyrectCB;
+    @FXML
+    private CheckBox hextileCB;
+    @FXML
+    private CheckBox cursorCB;
+    @FXML
+    private ListView<HistoryEntry> historyList;
+    @FXML
+    private Button clearBtn;
 
-  @FXML
-  ComboBox<SecurityType> securityCombo;
+    @FXML
 
-  @FXML
-  CheckBox desktopCB;
+    ComboBox<SecurityType> securityCombo;
 
-  @FXML
-  CheckBox zlibCB;
+    @FXML
 
-  @Override
-  public void initialize(URL location, ResourceBundle resources) {
+    CheckBox desktopCB;
 
-    ProtocolConfiguration prop = con.getConfiguration();
-    historyList.setItems(ctx.getHistory());
+    @FXML
 
-    clearBtn.setOnAction(a -> historyList.getItems().clear());
-    securityCombo.getItems().addAll(FXCollections.observableArrayList(SecurityType.NONE, SecurityType.VNC_Auth));
-    securityCombo.getSelectionModel().selectedItemProperty().addListener((l, a, b) -> prop.securityProperty().set(b != null ? b : SecurityType.UNKNOWN));
+    CheckBox zlibCB;
 
-    pwdField.disableProperty().bind(Bindings.equal(SecurityType.NONE, securityCombo.getSelectionModel().selectedItemProperty()));
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
 
-    prop.hostProperty().bindBidirectional(ipField.textProperty());
-    StringConverter<Number> converter = new NumberStringConverter("#");
-    Bindings.bindBidirectional(portField.textProperty(), prop.portProperty(), converter);
+        ProtocolConfiguration prop = con.getConfiguration();
+        historyList.setItems(ctx.getHistory());
 
-    prop.passwordProperty().bindBidirectional(pwdField.textProperty());
-    prop.sslProperty().bindBidirectional(sslCB.selectedProperty());
-    prop.sharedProperty().bindBidirectional(sharedCB.selectedProperty());
-    forceRfb33CB.setSelected(prop.versionProperty().get() == ProtocolVersion.RFB_3_3);
-    forceRfb33CB.selectedProperty().addListener((l, a, b) -> prop.versionProperty().set(b ? ProtocolVersion.RFB_3_3 : ProtocolVersion.RFB_3_8));
-    listeningCB.selectedProperty().bindBidirectional(con.listeningModeProperty());
-    Bindings.bindBidirectional(listeningPortField.textProperty(), con.listeningPortProperty(), converter);
-    listeningPortField.disableProperty().bind(listeningCB.selectedProperty().not());
+        clearBtn.setOnAction(a -> historyList.getItems().clear());
+        securityCombo.getItems().addAll(FXCollections.observableArrayList(SecurityType.NONE, SecurityType.VNC_Auth));
+        securityCombo.getSelectionModel().selectedItemProperty().addListener((l, a, b) -> prop.securityProperty().set(b != null ? b : SecurityType.UNKNOWN));
 
-    prop.rawEncProperty().bindBidirectional(rawCB.selectedProperty());
-    prop.copyRectEncProperty().bindBidirectional(copyrectCB.selectedProperty());
-    prop.hextileEncProperty().bindBidirectional(hextileCB.selectedProperty());
+        pwdField.disableProperty().bind(Bindings.equal(SecurityType.NONE, securityCombo.getSelectionModel().selectedItemProperty()));
 
-    prop.clientCursorProperty().bindBidirectional(cursorCB.selectedProperty());
-    prop.desktopSizeProperty().bindBidirectional(desktopCB.selectedProperty());
-    prop.zlibEncProperty().bindBidirectional(zlibCB.selectedProperty());
+        prop.hostProperty().bindBidirectional(ipField.textProperty());
+        StringConverter<Number> converter = new NumberStringConverter("#");
+        Bindings.bindBidirectional(portField.textProperty(), prop.portProperty(), converter);
 
-    portField.textProperty().addListener((observable, oldValue, newValue) -> {
-      if (newValue != null && !newValue.isEmpty() && !newValue.matches("[0-9]+")) {
-        if (!oldValue.matches("[0-9]+")) {
-          ((StringProperty) observable).setValue("");
-          return;
+        prop.passwordProperty().bindBidirectional(pwdField.textProperty());
+        prop.sslProperty().bindBidirectional(sslCB.selectedProperty());
+        prop.sharedProperty().bindBidirectional(sharedCB.selectedProperty());
+        forceRfb33CB.setSelected(prop.versionProperty().get() == ProtocolVersion.RFB_3_3);
+        forceRfb33CB.selectedProperty().addListener((l, a, b) -> prop.versionProperty().set(b ? ProtocolVersion.RFB_3_3 : ProtocolVersion.RFB_3_8));
+        listeningCB.selectedProperty().bindBidirectional(con.listeningModeProperty());
+        Bindings.bindBidirectional(listeningPortField.textProperty(), con.listeningPortProperty(), converter);
+        listeningPortField.disableProperty().bind(listeningCB.selectedProperty().not());
+
+        prop.rawEncProperty().bindBidirectional(rawCB.selectedProperty());
+        prop.copyRectEncProperty().bindBidirectional(copyrectCB.selectedProperty());
+        prop.hextileEncProperty().bindBidirectional(hextileCB.selectedProperty());
+
+        prop.clientCursorProperty().bindBidirectional(cursorCB.selectedProperty());
+        prop.desktopSizeProperty().bindBidirectional(desktopCB.selectedProperty());
+        prop.zlibEncProperty().bindBidirectional(zlibCB.selectedProperty());
+
+        portField.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue != null && !newValue.isEmpty() && !newValue.matches("[0-9]+")) {
+                if (!oldValue.matches("[0-9]+")) {
+                    ((StringProperty) observable).setValue("");
+                    return;
+                }
+                ((StringProperty) observable).setValue(oldValue);
+            }
+        });
+
+        con.connectingProperty().addListener((l, a, b) -> Platform.runLater(() -> ipField.getParent().setDisable(b)));
+
+        ctx.bind(ipField.textProperty(), "hostField");
+        ctx.bind(portField.textProperty(), "portField");
+        ctx.bind(userField.textProperty(), "userField");
+        ctx.bind(pwdField.textProperty(), "pwdField");
+        ctx.bind(securityCombo, "authType");
+        ctx.bind(sslCB.selectedProperty(), "useSSL");
+        ctx.bind(sharedCB.selectedProperty(), "useSharedView");
+        ctx.bind(forceRfb33CB.selectedProperty(), "forceRfb33");
+        ctx.bind(listeningCB.selectedProperty(), "listeningMode");
+        ctx.bind(listeningPortField.textProperty(), "listeningPortField");
+
+        ctx.bind(rawCB.selectedProperty(), "useRaw");
+        ctx.bind(copyrectCB.selectedProperty(), "useCopyRect");
+        ctx.bind(hextileCB.selectedProperty(), "useHextile");
+        ctx.bind(cursorCB.selectedProperty(), "useCursor");
+        ctx.bind(desktopCB.selectedProperty(), "useDesktopSize");
+        ctx.bind(zlibCB.selectedProperty(), "useZlib");
+
+        if (securityCombo.getSelectionModel().getSelectedIndex() < 0) {
+            securityCombo.getSelectionModel().select(SecurityType.VNC_Auth);
         }
-        ((StringProperty) observable).setValue(oldValue);
-      }
-    });
 
-    con.connectingProperty().addListener((l, a, b) -> Platform.runLater(() -> ipField.getParent().setDisable(b)));
+        historyList.getSelectionModel().selectedItemProperty().addListener((l, a, b) -> updateData(b));
+        con.connectInfoProperty().addListener((l, a, b) -> Platform.runLater(() -> addToHistory(b)));
 
-    ctx.bind(ipField.textProperty(), "hostField");
-    ctx.bind(portField.textProperty(), "portField");
-    ctx.bind(userField.textProperty(), "userField");
-    ctx.bind(pwdField.textProperty(), "pwdField");
-    ctx.bind(securityCombo, "authType");
-    ctx.bind(sslCB.selectedProperty(), "useSSL");
-    ctx.bind(sharedCB.selectedProperty(), "useSharedView");
-    ctx.bind(forceRfb33CB.selectedProperty(), "forceRfb33");
-    ctx.bind(listeningCB.selectedProperty(), "listeningMode");
-    ctx.bind(listeningPortField.textProperty(), "listeningPortField");
-
-    ctx.bind(rawCB.selectedProperty(), "useRaw");
-    ctx.bind(copyrectCB.selectedProperty(), "useCopyRect");
-    ctx.bind(hextileCB.selectedProperty(), "useHextile");
-    ctx.bind(cursorCB.selectedProperty(), "useCursor");
-    ctx.bind(desktopCB.selectedProperty(), "useDesktopSize");
-    ctx.bind(zlibCB.selectedProperty(), "useZlib");
-
-    if (securityCombo.getSelectionModel().getSelectedIndex() < 0) {
-      securityCombo.getSelectionModel().select(SecurityType.VNC_Auth);
     }
 
-    historyList.getSelectionModel().selectedItemProperty().addListener((l, a, b) -> updateData(b));
-    con.connectInfoProperty().addListener((l, a, b) -> Platform.runLater(() -> addToHistory(b)));
+    private void updateData(HistoryEntry e) {
+        if (e == null) {
+            return;
+        }
+        ipField.setText(e.host);
+        portField.setText(Integer.toString(e.port));
+        pwdField.setText(e.getPassword());
+        securityCombo.getSelectionModel().select(SecurityType.valueOf(e.getSecurityType()));
 
-  }
-
-  private void updateData(HistoryEntry e) {
-    if (e == null) {
-      return;
     }
-    ipField.setText(e.getHost());
-    portField.setText(Integer.toString(e.getPort()));
-    pwdField.setText(e.getPassword());
-    securityCombo.getSelectionModel().select(SecurityType.valueOf(e.getSecurityType()));
 
-  }
+    private void addToHistory(ConnectInfoEvent info) {
+        if (info == null) {
+            return;
+        }
+        ProtocolConfiguration prop = con.getConfiguration();
+        final HistoryEntry e = new HistoryEntry(prop.hostProperty().get(), prop.portProperty().get());
 
-  private void addToHistory(ConnectInfoEvent info) {
-    if (info == null) {
-      return;
+        Optional<HistoryEntry> opt = historyList.getItems().stream().filter(h -> h.equals(e)).findAny();
+        if (!opt.isPresent()) {
+            historyList.getItems().add(e);
+        }
+        opt.orElse(e).setPassword(prop.passwordProperty().get());
+        opt.orElse(e).setSecurityType(prop.securityProperty().get().getType());
+        opt.orElse(e).setServerName(info.getServerName());
     }
-    ProtocolConfiguration prop = con.getConfiguration();
-    final HistoryEntry e = new HistoryEntry(prop.hostProperty().get(), prop.portProperty().get());
-
-    Optional<HistoryEntry> opt = historyList.getItems().stream().filter(h -> h.equals(e)).findAny();
-    if (!opt.isPresent()) {
-      historyList.getItems().add(e);
-    }
-    opt.orElse(e).setPassword(prop.passwordProperty().get());
-    opt.orElse(e).setSecurityType(prop.securityProperty().get().getType());
-    opt.orElse(e).setServerName(info.getServerName());
-  }
 
 }

@@ -15,32 +15,32 @@ package org.jfxvnc.net.rfb.codec.handshaker.event;
 
 public class SecurityResultEvent implements HandshakeEvent {
 
-  private final boolean passed;
-  private Throwable throwable;
+    private final boolean passed;
+    private Throwable throwable;
 
-  public SecurityResultEvent(boolean passed) {
-    this.passed = passed;
-  }
+    public SecurityResultEvent(boolean passed) {
+        this.passed = passed;
+    }
 
-  public SecurityResultEvent(boolean passed, Throwable t) {
-    this.passed = passed;
-    this.setThrowable(t);
-  }
+    public SecurityResultEvent(boolean passed, Throwable t) {
+        this.passed = passed;
+        this.setThrowable(t);
+    }
 
-  public boolean isPassed() {
-    return passed;
-  }
+    public boolean isPassed() {
+        return passed;
+    }
 
-  public Throwable getThrowable() {
-    return throwable;
-  }
+    public Throwable getThrowable() {
+        return throwable;
+    }
 
-  public void setThrowable(Throwable throwable) {
-    this.throwable = throwable;
-  }
+    public void setThrowable(Throwable throwable) {
+        this.throwable = throwable;
+    }
 
-  @Override
-  public String toString() {
-    return "SecurityResultEvent [passed=" + passed + (throwable != null ? ", throwable=" + throwable.getMessage() : "") + ']';
-  }
+    @Override
+    public String toString() {
+        return "SecurityResultEvent [passed=" + passed + (throwable != null ? ", throwable=" + throwable.getMessage() : "") + ']';
+    }
 }

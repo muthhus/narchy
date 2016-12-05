@@ -21,36 +21,36 @@ import java.util.Arrays;
 
 public class VncAuthSecurityMessage implements RfbSecurityMessage {
 
-  private final byte[] challenge;
-  private byte[] password;
-  private ProtocolConfiguration config;
+    private final byte[] challenge;
+    private byte[] password;
+    private ProtocolConfiguration config;
 
-  public VncAuthSecurityMessage(byte[] challenge) {
-    this.challenge = challenge;
-  }
+    public VncAuthSecurityMessage(byte[] challenge) {
+        this.challenge = challenge;
+    }
 
-  public byte[] getChallenge() {
-    return challenge;
-  }
+    public byte[] getChallenge() {
+        return challenge;
+    }
 
-  public String getPassword() {
-    return config.passwordProperty().get();
-  }
+    public String getPassword() {
+        return config.passwordProperty().get();
+    }
 
-  @Override
-  public SecurityType getSecurityType() {
-    return SecurityType.VNC_Auth;
-  }
+    @Override
+    public SecurityType getSecurityType() {
+        return SecurityType.VNC_Auth;
+    }
 
-  @Override
-  public String toString() {
-    return "VncAuthSecurityMessage [challenge=" + Arrays.toString(challenge) + ", password=" + Arrays.toString(password) + ']';
-  }
+    @Override
+    public String toString() {
+        return "VncAuthSecurityMessage [challenge=" + Arrays.toString(challenge) + ", password=" + Arrays.toString(password) + ']';
+    }
 
-  @Override
-  public void setCredentials(ProtocolConfiguration config) {
-    this.config = config;
+    @Override
+    public void setCredentials(ProtocolConfiguration config) {
+        this.config = config;
 
-  }
+    }
 
 }

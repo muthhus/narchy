@@ -26,70 +26,70 @@ import java.util.EnumMap;
 import java.util.List;
 
 public class FrameDecoderHandler extends ByteToMessageDecoder {
-  private static final Logger logger = LoggerFactory.getLogger(FrameDecoderHandler.class);
+    private static final Logger logger = LoggerFactory.getLogger(FrameDecoderHandler.class);
 
-  private final EnumMap<ServerEvent, FrameDecoder> frameDecoder = new EnumMap<>(ServerEvent.class);
+    private final EnumMap<ServerEvent, FrameDecoder> frameDecoder = new EnumMap<>(ServerEvent.class);
 
-  enum State {
-    NEXT, FRAME
-  }
-
-  private State state = State.NEXT;
-
-  private ServerEvent serverEvent;
-
-  public FrameDecoderHandler(PixelFormat pixelFormat) {
-
-    frameDecoder.put(ServerEvent.SET_COLOR_MAP_ENTRIES, new ColourMapEntriesDecoder());
-    frameDecoder.put(ServerEvent.BELL, new BellDecoder());
-    frameDecoder.put(ServerEvent.SERVER_CUT_TEXT, new ServerCutTextDecoder());
-    frameDecoder.put(ServerEvent.FRAMEBUFFER_UPDATE, new FramebufferUpdateRectDecoder(pixelFormat));
-  }
-
-  public Encoding[] getSupportedEncodings() {
-    return FramebufferUpdateRectDecoder.getSupportedEncodings();
-  }
-
-  public boolean isPixelFormatSupported() {
-    return ((FramebufferUpdateRectDecoder) frameDecoder.get(ServerEvent.FRAMEBUFFER_UPDATE)).isPixelFormatSupported();
-  }
-
-  @Override
-  protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) throws Exception {
-    if (!in.isReadable()) {
-      return;
+    enum State {
+        NEXT, FRAME
     }
 
-    FrameDecoder decoder;
-    switch (state) {
-      case NEXT:
-        serverEvent = ServerEvent.valueOf(in.getUnsignedByte(0));
-        decoder = frameDecoder.get(serverEvent);
+    private State state = State.NEXT;
 
-        if (decoder == null) {
-          logger.error("not handled server message type: {} ({})", serverEvent, in.getUnsignedByte(0));
-          in.skipBytes(in.readableBytes());
-          return;
-        }
-        if (!decoder.decode(ctx, in, out)) {
-          state = State.FRAME;
-        }
-      case FRAME:
-        decoder = frameDecoder.get(serverEvent);
+    private ServerEvent serverEvent;
 
-        if (decoder == null) {
-          logger.error("not handled server message type: {} ({})", serverEvent, in.getUnsignedByte(0));
-          in.skipBytes(in.readableBytes());
-          return;
-        }
-        if (decoder.decode(ctx, in, out)) {
-          state = State.NEXT;
-        }
-        break;
-      default:
-        logger.warn("unknown state: {}", state);
-        break;
+    public FrameDecoderHandler(PixelFormat pixelFormat) {
+
+        frameDecoder.put(ServerEvent.SET_COLOR_MAP_ENTRIES, new ColourMapEntriesDecoder());
+        frameDecoder.put(ServerEvent.BELL, new BellDecoder());
+        frameDecoder.put(ServerEvent.SERVER_CUT_TEXT, new ServerCutTextDecoder());
+        frameDecoder.put(ServerEvent.FRAMEBUFFER_UPDATE, new FramebufferUpdateRectDecoder(pixelFormat));
     }
-  }
+
+    public static Encoding[] getSupportedEncodings() {
+        return FramebufferUpdateRectDecoder.getSupportedEncodings();
+    }
+
+    public boolean isPixelFormatSupported() {
+        return ((FramebufferUpdateRectDecoder) frameDecoder.get(ServerEvent.FRAMEBUFFER_UPDATE)).isPixelFormatSupported();
+    }
+
+    @Override
+    protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) throws Exception {
+        if (!in.isReadable()) {
+            return;
+        }
+
+        FrameDecoder decoder;
+        switch (state) {
+            case NEXT:
+                serverEvent = ServerEvent.valueOf(in.getUnsignedByte(0));
+                decoder = frameDecoder.get(serverEvent);
+
+                if (decoder == null) {
+                    logger.error("not handled server message type: {} ({})", serverEvent, in.getUnsignedByte(0));
+                    in.skipBytes(in.readableBytes());
+                    return;
+                }
+                if (!decoder.decode(ctx, in, out)) {
+                    state = State.FRAME;
+                }
+            case FRAME:
+                decoder = frameDecoder.get(serverEvent);
+
+                if (decoder == null) {
+                    logger.error("not handled server message type: {} ({})", serverEvent, in.getUnsignedByte(0));
+                    in.skipBytes(in.readableBytes());
+                    return;
+                }
+                if (decoder.decode(ctx, in, out)) {
+                    state = State.NEXT;
+                }
+                break;
+            default:
+                logger.warn("unknown state: {}", state);
+                break;
+        }
+    }
 
 }

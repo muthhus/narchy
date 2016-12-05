@@ -19,32 +19,32 @@ import org.jfxvnc.net.rfb.render.ProtocolConfiguration;
 
 public class SampleVncClient {
 
-  public static void main(String[] args) throws Exception {
+    public static void main(String[] args) throws NumberFormatException {
 
-    VncConnection connector = new VncConnection();
-    ProtocolConfiguration config = connector.getConfiguration();
-    
-    if (args != null && args.length >= 3) {
-      config.securityProperty().set(SecurityType.VNC_Auth);
-      config.hostProperty().set(args[0]);
-      config.portProperty().set(Integer.parseInt(args[1]));
-      config.passwordProperty().set(args[2]);
-      config.sharedProperty().set(Boolean.TRUE);
-    } else {
-      System.err.println("arguments missing (host port password)");
-      config.securityProperty().set(SecurityType.VNC_Auth);
-      config.hostProperty().set("127.0.0.1");
-      config.portProperty().set(32774);
-      config.passwordProperty().set("vnc");
-      config.sharedProperty().set(Boolean.TRUE);
+        VncConnection connector = new VncConnection();
+        ProtocolConfiguration config = connector.getConfiguration();
+
+        if (args != null && args.length >= 3) {
+            config.securityProperty().set(SecurityType.VNC_Auth);
+            config.hostProperty().set(args[0]);
+            config.portProperty().set(Integer.parseInt(args[1]));
+            config.passwordProperty().set(args[2]);
+            config.sharedProperty().set(Boolean.TRUE);
+        } else {
+            System.err.println("arguments missing (host port password)");
+            config.securityProperty().set(SecurityType.VNC_Auth);
+            config.hostProperty().set("127.0.0.1");
+            config.portProperty().set(32774);
+            config.passwordProperty().set("vnc");
+            config.sharedProperty().set(Boolean.TRUE);
+        }
+
+        connector.connect().whenComplete((c, th) -> {
+            if (th != null) {
+                th.printStackTrace();
+            }
+            c.disconnect();
+        }).join();
+
     }
-
-    connector.connect().whenComplete((c, th) -> {
-      if (th != null){
-        th.printStackTrace();
-      }
-      c.disconnect();
-    }).join();
-    
-  }
 }

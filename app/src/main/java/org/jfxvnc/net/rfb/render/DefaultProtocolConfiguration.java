@@ -20,98 +20,98 @@ import org.jfxvnc.net.rfb.codec.security.SecurityType;
 
 public class DefaultProtocolConfiguration implements ProtocolConfiguration {
 
-  private final ObjectProperty<ProtocolVersion> versionProperty = new SimpleObjectProperty<>(ProtocolVersion.RFB_3_8);
-  private final ObjectProperty<PixelFormat> clientPixelFormatProperty = new SimpleObjectProperty<>(PixelFormat.RGB_888);
-  private final ObjectProperty<SecurityType> securityProperty = new SimpleObjectProperty<>(SecurityType.VNC_Auth);
+    private final ObjectProperty<ProtocolVersion> versionProperty = new SimpleObjectProperty<>(ProtocolVersion.RFB_3_8);
+    private final ObjectProperty<PixelFormat> clientPixelFormatProperty = new SimpleObjectProperty<>(PixelFormat.RGB_888);
+    private final ObjectProperty<SecurityType> securityProperty = new SimpleObjectProperty<>(SecurityType.VNC_Auth);
 
-  private final StringProperty host = new SimpleStringProperty("127.0.0.1");
-  private final IntegerProperty port = new SimpleIntegerProperty(DEFAULT_PORT);
-  private final IntegerProperty listeningPort = new SimpleIntegerProperty(DEFAULT_LISTENING_PORT);
-  private final StringProperty password = new SimpleStringProperty();
-  private final BooleanProperty shared = new SimpleBooleanProperty(true);
-  private final BooleanProperty ssl = new SimpleBooleanProperty(false);
+    private final StringProperty host = new SimpleStringProperty("127.0.0.1");
+    private final IntegerProperty port = new SimpleIntegerProperty(DEFAULT_PORT);
+    private final IntegerProperty listeningPort = new SimpleIntegerProperty(DEFAULT_LISTENING_PORT);
+    private final StringProperty password = new SimpleStringProperty();
+    private final BooleanProperty shared = new SimpleBooleanProperty(true);
+    private final BooleanProperty ssl = new SimpleBooleanProperty(false);
 
-  private final BooleanProperty rawEnc = new SimpleBooleanProperty(true);
-  private final BooleanProperty copyRectEnc = new SimpleBooleanProperty(true);
-  private final BooleanProperty hextileEnc = new SimpleBooleanProperty(false);
-  private final BooleanProperty zlibEnc = new SimpleBooleanProperty(false);
-  private final BooleanProperty clientCursor = new SimpleBooleanProperty(false);
-  private final BooleanProperty desktopSize = new SimpleBooleanProperty(true);
+    private final BooleanProperty rawEnc = new SimpleBooleanProperty(true);
+    private final BooleanProperty copyRectEnc = new SimpleBooleanProperty(true);
+    private final BooleanProperty hextileEnc = new SimpleBooleanProperty(false);
+    private final BooleanProperty zlibEnc = new SimpleBooleanProperty(false);
+    private final BooleanProperty clientCursor = new SimpleBooleanProperty(false);
+    private final BooleanProperty desktopSize = new SimpleBooleanProperty(true);
 
-  @Override
-  public StringProperty hostProperty() {
-    return host;
-  }
+    @Override
+    public StringProperty hostProperty() {
+        return host;
+    }
 
-  @Override
-  public IntegerProperty portProperty() {
-    return port;
-  }
+    @Override
+    public IntegerProperty portProperty() {
+        return port;
+    }
 
-  @Override
-  public IntegerProperty listeningPortProperty() {
-    return listeningPort;
-  }
-  
-  @Override
-  public StringProperty passwordProperty() {
-    return password;
-  }
+    @Override
+    public IntegerProperty listeningPortProperty() {
+        return listeningPort;
+    }
 
-  @Override
-  public BooleanProperty sslProperty() {
-    return ssl;
-  }
+    @Override
+    public StringProperty passwordProperty() {
+        return password;
+    }
 
-  @Override
-  public ObjectProperty<SecurityType> securityProperty() {
-    return securityProperty;
-  }
+    @Override
+    public BooleanProperty sslProperty() {
+        return ssl;
+    }
 
-  @Override
-  public BooleanProperty sharedProperty() {
-    return shared;
-  }
+    @Override
+    public ObjectProperty<SecurityType> securityProperty() {
+        return securityProperty;
+    }
 
-  @Override
-  public ObjectProperty<ProtocolVersion> versionProperty() {
-    return versionProperty;
-  }
+    @Override
+    public BooleanProperty sharedProperty() {
+        return shared;
+    }
 
-  @Override
-  public ObjectProperty<PixelFormat> clientPixelFormatProperty() {
-    return clientPixelFormatProperty;
-  }
+    @Override
+    public ObjectProperty<ProtocolVersion> versionProperty() {
+        return versionProperty;
+    }
 
-  @Override
-  public BooleanProperty rawEncProperty() {
-    return rawEnc;
-  }
+    @Override
+    public ObjectProperty<PixelFormat> clientPixelFormatProperty() {
+        return clientPixelFormatProperty;
+    }
 
-  @Override
-  public BooleanProperty copyRectEncProperty() {
-    return copyRectEnc;
-  }
+    @Override
+    public BooleanProperty rawEncProperty() {
+        return rawEnc;
+    }
 
-  @Override
-  public BooleanProperty hextileEncProperty() {
-    return hextileEnc;
-  }
+    @Override
+    public BooleanProperty copyRectEncProperty() {
+        return copyRectEnc;
+    }
 
-  @Override
-  public BooleanProperty clientCursorProperty() {
-    return clientCursor;
-  }
+    @Override
+    public BooleanProperty hextileEncProperty() {
+        return hextileEnc;
+    }
 
-  @Override
-  public BooleanProperty desktopSizeProperty() {
-    return desktopSize;
-  }
+    @Override
+    public BooleanProperty clientCursorProperty() {
+        return clientCursor;
+    }
 
-  @Override
-  public BooleanProperty zlibEncProperty() {
-    return zlibEnc;
-  }
+    @Override
+    public BooleanProperty desktopSizeProperty() {
+        return desktopSize;
+    }
+
+    @Override
+    public BooleanProperty zlibEncProperty() {
+        return zlibEnc;
+    }
 
 
 }

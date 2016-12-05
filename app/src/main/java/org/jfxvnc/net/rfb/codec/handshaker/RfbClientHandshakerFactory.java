@@ -17,16 +17,17 @@ import org.jfxvnc.net.rfb.codec.ProtocolVersion;
 
 public class RfbClientHandshakerFactory {
 
-  public RfbClientHandshakerFactory() {}
-
-  public static RfbClientHandshaker newRfbClientHandshaker(ProtocolVersion version) {
-
-    if (version.equals(ProtocolVersion.RFB_3_8) || version.isGreaterThan(ProtocolVersion.RFB_3_8)) {
-      return new RfbClient38Handshaker(version);
+    public RfbClientHandshakerFactory() {
     }
 
-    return new RfbClient33Handshaker(version);
+    public static RfbClientHandshaker newRfbClientHandshaker(ProtocolVersion version) {
 
-  }
+        if (version.equals(ProtocolVersion.RFB_3_8) || version.isGreaterThan(ProtocolVersion.RFB_3_8)) {
+            return new RfbClient38Handshaker(version);
+        }
+
+        return new RfbClient33Handshaker(version);
+
+    }
 
 }

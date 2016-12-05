@@ -17,5 +17,5 @@ import java.util.EventListener;
 
 public interface InputEventListener extends EventListener {
 
-  void sendInputEvent(InputEvent event);
+    void sendInputEvent(InputEvent event);
 }

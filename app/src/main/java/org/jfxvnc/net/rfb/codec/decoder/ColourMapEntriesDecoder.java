@@ -20,36 +20,37 @@ import java.util.List;
 
 class ColourMapEntriesDecoder implements FrameDecoder {
 
-  enum State {
-    INIT, READ_MAP
-  }
-
-  private State state = State.INIT;
-  private int firstColor, numberOfColor, bufferSize;
-
-  public ColourMapEntriesDecoder() {}
-
-  @Override
-  public boolean decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) throws Exception {
-    if (state == State.INIT) {
-      if (!in.isReadable(12)) {
-        return false;
-      }
-      in.skipBytes(2);
-      firstColor = in.readUnsignedShort();
-      numberOfColor = in.readUnsignedShort();
-      bufferSize = (numberOfColor - firstColor) * 6;
-      state = State.READ_MAP;
-    }
-    if (state == State.READ_MAP) {
-      if (!in.isReadable(bufferSize)) {
-        return false;
-      }
-      state = State.INIT;
-      return out.add(new ColourMapEvent(firstColor, numberOfColor, in.readSlice(bufferSize).retain()));
+    enum State {
+        INIT, READ_MAP
     }
 
-    return false;
-  }
+    private State state = State.INIT;
+    private int firstColor, numberOfColor, bufferSize;
+
+    public ColourMapEntriesDecoder() {
+    }
+
+    @Override
+    public boolean decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) throws Exception {
+        if (state == State.INIT) {
+            if (!in.isReadable(12)) {
+                return false;
+            }
+            in.skipBytes(2);
+            firstColor = in.readUnsignedShort();
+            numberOfColor = in.readUnsignedShort();
+            bufferSize = (numberOfColor - firstColor) * 6;
+            state = State.READ_MAP;
+        }
+        if (state == State.READ_MAP) {
+            if (!in.isReadable(bufferSize)) {
+                return false;
+            }
+            state = State.INIT;
+            return out.add(new ColourMapEvent(firstColor, numberOfColor, in.readSlice(bufferSize).retain()));
+        }
+
+        return false;
+    }
 
 }

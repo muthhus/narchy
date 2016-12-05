@@ -30,31 +30,31 @@ import java.util.ResourceBundle;
 
 public class DetailViewPresenter implements Initializable {
 
-  @Inject
-  SessionContext ctx;
+    @Inject
+    SessionContext ctx;
 
-  @Inject
-  VncRenderService con;
+    @Inject
+    VncRenderService con;
 
-  @FXML
-  private Accordion detailPane;
+    @FXML
+    private Accordion detailPane;
 
-  @Override
-  public void initialize(URL location, ResourceBundle resources) {
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
 
-    ConnectView connectView = new ConnectView();
-    InfoView infoView = new InfoView();
-    AboutView aboutView = new AboutView();
-    detailPane.setMinWidth(0.0);
-    detailPane.getPanes().addAll((TitledPane) connectView.getView(), (TitledPane) infoView.getView(), (TitledPane) aboutView.getView());
-    detailPane.setExpandedPane((TitledPane) connectView.getView());
+        ConnectView connectView = new ConnectView();
+        InfoView infoView = new InfoView();
+        AboutView aboutView = new AboutView();
+        detailPane.setMinWidth(0.0);
+        detailPane.getPanes().addAll((TitledPane) connectView.getView(), (TitledPane) infoView.getView(), (TitledPane) aboutView.getView());
+        detailPane.setExpandedPane((TitledPane) connectView.getView());
 
-    detailPane.expandedPaneProperty().addListener((observable, oldValue, newValue) -> Platform.runLater(() -> {
-      if (detailPane.getExpandedPane() == null) {
-        // keep first view open
-        detailPane.setExpandedPane(detailPane.getPanes().get(0));
-      }
-    }));
-  }
+        detailPane.expandedPaneProperty().addListener((observable, oldValue, newValue) -> Platform.runLater(() -> {
+            if (detailPane.getExpandedPane() == null) {
+                // keep first view open
+                detailPane.setExpandedPane(detailPane.getPanes().get(0));
+            }
+        }));
+    }
 
 }

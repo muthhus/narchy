@@ -21,22 +21,22 @@ import org.jfxvnc.net.rfb.codec.PixelFormat;
 
 public class PixelFormatEncoder extends MessageToByteEncoder<PixelFormat> {
 
-  @Override
-  protected void encode(ChannelHandlerContext ctx, PixelFormat pf, ByteBuf out) throws Exception {
-    out.writeByte(ClientEventType.SET_PIXEL_FORMAT);
-    out.writeZero(3); // padding
-    out.writeByte(pf.getBitPerPixel());
-    out.writeByte(pf.getDepth());
-    out.writeBoolean(pf.isBigEndian());
-    out.writeBoolean(pf.isTrueColor());
-    out.writeShort(pf.getRedMax());
-    out.writeShort(pf.getGreenMax());
-    out.writeShort(pf.getBlueMax());
-    out.writeByte(pf.getRedShift());
-    out.writeByte(pf.getGreenShift());
-    out.writeByte(pf.getBlueShift());
-    out.writeZero(3); // padding
+    @Override
+    protected void encode(ChannelHandlerContext ctx, PixelFormat pf, ByteBuf out) throws Exception {
+        out.writeByte(ClientEventType.SET_PIXEL_FORMAT);
+        out.writeZero(3); // padding
+        out.writeByte(pf.getBitPerPixel());
+        out.writeByte(pf.getDepth());
+        out.writeBoolean(pf.isBigEndian());
+        out.writeBoolean(pf.isTrueColor());
+        out.writeShort(pf.getRedMax());
+        out.writeShort(pf.getGreenMax());
+        out.writeShort(pf.getBlueMax());
+        out.writeByte(pf.getRedShift());
+        out.writeByte(pf.getGreenShift());
+        out.writeByte(pf.getBlueShift());
+        out.writeZero(3); // padding
 
-    ctx.pipeline().remove(this);
-  }
+        ctx.pipeline().remove(this);
+    }
 }

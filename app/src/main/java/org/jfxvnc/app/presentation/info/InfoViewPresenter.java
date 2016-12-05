@@ -38,170 +38,169 @@ import java.util.ResourceBundle;
 
 /**
  * VNC information screen
- * 
- * @author comtel
  *
+ * @author comtel
  */
 public class InfoViewPresenter implements Initializable {
 
-  private final static org.slf4j.Logger logger = LoggerFactory.getLogger(InfoViewPresenter.class);
+    private static org.slf4j.Logger logger = LoggerFactory.getLogger(InfoViewPresenter.class);
 
-  @Inject
-  SessionContext ctx;
-  
-  @Inject
-  VncRenderService con;
+    @Inject
+    SessionContext ctx;
 
-  private final StatisticsImageListener imgListener = new StatisticsImageListener();
+    @Inject
+    VncRenderService con;
 
-  private final LongProperty totalCount = new SimpleLongProperty(0);
-  private final LongProperty rawCount = new SimpleLongProperty(0);
-  private final LongProperty copyRectCount = new SimpleLongProperty(0);
-  private final LongProperty hextileCount = new SimpleLongProperty(0);
-  private final LongProperty zlibCount = new SimpleLongProperty(0);
-  private final LongProperty cursorCount = new SimpleLongProperty(0);
-  private final LongProperty desktopCount = new SimpleLongProperty(0);
+    private StatisticsImageListener imgListener = new StatisticsImageListener();
 
-  @FXML
-  private Label infoName;
-  @FXML
-  private Label infoHost;
-  @FXML
-  private Label infoPixelformat;
-  @FXML
-  private Label infoPixelformatDef;
-  @FXML
-  private Label infoEncoding;
-  @FXML
-  private Label infoProtocol;
-  @FXML
-  private Label infoSecurity;
-  @FXML
-  private Label infoConnectType;
-  @FXML
-  private Label infoSize;
+    private LongProperty totalCount = new SimpleLongProperty(0);
+    private LongProperty rawCount = new SimpleLongProperty(0);
+    private LongProperty copyRectCount = new SimpleLongProperty(0);
+    private LongProperty hextileCount = new SimpleLongProperty(0);
+    private LongProperty zlibCount = new SimpleLongProperty(0);
+    private LongProperty cursorCount = new SimpleLongProperty(0);
+    private LongProperty desktopCount = new SimpleLongProperty(0);
 
-  @FXML
-  private Label rawrect;
-  @FXML
-  private Label copyrect;
-  @FXML
-  private Label hextilerect;
-  @FXML
-  private Label zlibrect;
-  @FXML
-  private Label cursor;
-  @FXML
-  private Label desktop;
-  @FXML
-  private Label total;
-  @FXML
-  private CheckBox enableCB;
+    @FXML
+    private Label infoName;
+    @FXML
+    private Label infoHost;
+    @FXML
+    private Label infoPixelformat;
+    @FXML
+    private Label infoPixelformatDef;
+    @FXML
+    private Label infoEncoding;
+    @FXML
+    private Label infoProtocol;
+    @FXML
+    private Label infoSecurity;
+    @FXML
+    private Label infoConnectType;
+    @FXML
+    private Label infoSize;
 
-  @Override
-  public void initialize(URL location, ResourceBundle resources) {
-
-    con.connectInfoProperty().addListener((l, a, b) -> Platform.runLater(() -> updateDetails(b)));
-    enableCB.selectedProperty().addListener((l, a, ena) -> {
-      con.imageProperty().removeListener(imgListener);
-      if (ena) {
-        con.imageProperty().addListener(imgListener);
-      }
-
-    });
-
-    total.textProperty().bind(totalCount.asString());
-    rawrect.textProperty().bind(rawCount.asString());
-    zlibrect.textProperty().bind(zlibCount.asString());
-    copyrect.textProperty().bind(copyRectCount.asString());
-    total.textProperty().bind(totalCount.asString());
-    hextilerect.textProperty().bind(hextileCount.asString());
-    cursor.textProperty().bind(cursorCount.asString());
-    desktop.textProperty().bind(desktopCount.asString());
-  }
-
-  private void updateDetails(ConnectInfoEvent cd) {
-    if (cd == null) {
-      resetServerData();
-      return;
-    }
-    infoName.setText(cd.getServerName());
-    infoSize.setText(String.format("%d x %d", cd.getFrameWidth(), cd.getFrameHeight()));
-    infoProtocol.setText(cd.getRfbProtocol().getMajorVersion() + "." + cd.getRfbProtocol().getMinorVersion());
-    infoHost.setText(cd.getRemoteAddress());
-    infoPixelformat.setText(getPixelFormatReadable(cd.getClientPF()));
-    infoPixelformatDef.setText(getPixelFormatReadable(cd.getServerPF()));
-    infoEncoding.setText(Arrays.toString(cd.getSupportedEncodings()));
-    infoSecurity.setText(String.valueOf(cd.getSecurity()));
-    infoConnectType.setText(cd.getConnectionType());
-  }
-
-  private void resetServerData() {
-    logger.debug("reset fields");
-    infoName.setText("-");
-    infoHost.setText("-");
-    infoPixelformat.setText("-");
-    infoPixelformatDef.setText("-");
-    infoEncoding.setText("-");
-    infoProtocol.setText("-");
-    infoSecurity.setText("-");
-    infoConnectType.setText("-");
-    infoSize.setText("-");
-  }
-
-  public static String getPixelFormatReadable(PixelFormat pf) {
-    return MessageFormat.format("depth {0} ({1}bpp) {2}-endian shift(r{3},g{4},b{5})", pf.getDepth(), pf.getBitPerPixel(),
-        (pf.isBigEndian() ? "big" : "little"), pf.getRedShift(), pf.getGreenShift(), pf.getBlueShift());
-  }
-
-  class StatisticsImageListener implements ChangeListener<ImageRect> {
+    @FXML
+    private Label rawrect;
+    @FXML
+    private Label copyrect;
+    @FXML
+    private Label hextilerect;
+    @FXML
+    private Label zlibrect;
+    @FXML
+    private Label cursor;
+    @FXML
+    private Label desktop;
+    @FXML
+    private Label total;
+    @FXML
+    private CheckBox enableCB;
 
     @Override
-    public void changed(ObservableValue<? extends ImageRect> observable, ImageRect oldValue, ImageRect newValue) {
-      if (newValue == null) {
-        return;
-      }
+    public void initialize(URL location, ResourceBundle resources) {
 
-      Platform.runLater(() -> {
-        totalCount.set(totalCount.get() + 1);
+        con.connectInfoProperty().addListener((l, a, b) -> Platform.runLater(() -> updateDetails(b)));
+        enableCB.selectedProperty().addListener((l, a, ena) -> {
+            con.imageProperty().removeListener(imgListener);
+            if (ena) {
+                con.imageProperty().addListener(imgListener);
+            }
 
-        switch (newValue.getEncoding()) {
-          case RAW:
-            rawCount.set(rawCount.get() + 1);
-            break;
-          case ZLIB:
-            zlibCount.set(zlibCount.get() + 1);
-            break;
-          case HEXTILE:
-            hextileCount.set(hextileCount.get() + 1);
-            break;
-          case COPY_RECT:
-            copyRectCount.set(copyRectCount.get() + 1);
-            break;
-          case CURSOR:
-            cursorCount.set(cursorCount.get() + 1);
-            break;
-          case DESKTOP_SIZE:
-            desktopCount.set(desktopCount.get() + 1);
-            break;
-          default:
-            break;
-        }
-      });
+        });
+
+        total.textProperty().bind(totalCount.asString());
+        rawrect.textProperty().bind(rawCount.asString());
+        zlibrect.textProperty().bind(zlibCount.asString());
+        copyrect.textProperty().bind(copyRectCount.asString());
+        total.textProperty().bind(totalCount.asString());
+        hextilerect.textProperty().bind(hextileCount.asString());
+        cursor.textProperty().bind(cursorCount.asString());
+        desktop.textProperty().bind(desktopCount.asString());
     }
 
-  }
+    private void updateDetails(ConnectInfoEvent cd) {
+        if (cd == null) {
+            resetServerData();
+            return;
+        }
+        infoName.setText(cd.getServerName());
+        infoSize.setText(String.format("%d x %d", cd.getFrameWidth(), cd.getFrameHeight()));
+      infoProtocol.setText(cd.getRfbProtocol().majorVersion + "." + cd.getRfbProtocol().minorVersion);
+        infoHost.setText(cd.getRemoteAddress());
+        infoPixelformat.setText(getPixelFormatReadable(cd.getClientPF()));
+        infoPixelformatDef.setText(getPixelFormatReadable(cd.getServerPF()));
+        infoEncoding.setText(Arrays.toString(cd.getSupportedEncodings()));
+        infoSecurity.setText(String.valueOf(cd.getSecurity()));
+        infoConnectType.setText(cd.getConnectionType());
+    }
 
-  @FXML
-  public void reset(ActionEvent event) {
-    totalCount.set(0);
-    rawCount.set(0);
-    copyRectCount.set(0);
-    hextileCount.set(0);
-    zlibCount.set(0);
-    cursorCount.set(0);
-    desktopCount.set(0);
+    private void resetServerData() {
+        logger.debug("reset fields");
+        infoName.setText("-");
+        infoHost.setText("-");
+        infoPixelformat.setText("-");
+        infoPixelformatDef.setText("-");
+        infoEncoding.setText("-");
+        infoProtocol.setText("-");
+        infoSecurity.setText("-");
+        infoConnectType.setText("-");
+        infoSize.setText("-");
+    }
 
-  }
+    public static String getPixelFormatReadable(PixelFormat pf) {
+        return MessageFormat.format("depth {0} ({1}bpp) {2}-endian shift(r{3},g{4},b{5})", pf.getDepth(), pf.getBitPerPixel(),
+                (pf.isBigEndian() ? "big" : "little"), pf.getRedShift(), pf.getGreenShift(), pf.getBlueShift());
+    }
+
+    class StatisticsImageListener implements ChangeListener<ImageRect> {
+
+        @Override
+        public void changed(ObservableValue<? extends ImageRect> observable, ImageRect oldValue, ImageRect newValue) {
+            if (newValue == null) {
+                return;
+            }
+
+            Platform.runLater(() -> {
+                totalCount.set(totalCount.get() + 1);
+
+                switch (newValue.getEncoding()) {
+                    case RAW:
+                        rawCount.set(rawCount.get() + 1);
+                        break;
+                    case ZLIB:
+                        zlibCount.set(zlibCount.get() + 1);
+                        break;
+                    case HEXTILE:
+                        hextileCount.set(hextileCount.get() + 1);
+                        break;
+                    case COPY_RECT:
+                        copyRectCount.set(copyRectCount.get() + 1);
+                        break;
+                    case CURSOR:
+                        cursorCount.set(cursorCount.get() + 1);
+                        break;
+                    case DESKTOP_SIZE:
+                        desktopCount.set(desktopCount.get() + 1);
+                        break;
+                    default:
+                        break;
+                }
+            });
+        }
+
+    }
+
+    @FXML
+    public void reset(ActionEvent event) {
+        totalCount.set(0);
+        rawCount.set(0);
+        copyRectCount.set(0);
+        hextileCount.set(0);
+        zlibCount.set(0);
+        cursorCount.set(0);
+        desktopCount.set(0);
+
+    }
 
 }

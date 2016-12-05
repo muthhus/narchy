@@ -15,19 +15,19 @@ package org.jfxvnc.net.rfb.codec.encoder;
 
 public class ClientCutText implements InputEvent {
 
-  private final String text;
+    private final String text;
 
-  public ClientCutText(String text) {
-    this.text = text;
-  }
+    public ClientCutText(String text) {
+        this.text = text;
+    }
 
-  public String getText() {
-    return text;
-  }
+    public String getText() {
+        return text;
+    }
 
-  @Override
-  public String toString() {
-    return "ClientCutText [text=" + text + ']';
-  }
+    @Override
+    public String toString() {
+        return "ClientCutText [text=" + text + ']';
+    }
 
 }

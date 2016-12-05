@@ -26,70 +26,70 @@ import java.util.zip.Inflater;
 
 public class ZlibRectDecoder extends RawRectDecoder {
 
-  private static final Logger logger = LoggerFactory.getLogger(ZlibRectDecoder.class);
+    private static final Logger logger = LoggerFactory.getLogger(ZlibRectDecoder.class);
 
-  private final Inflater inflater;
-  private boolean initialized;
+    private final Inflater inflater;
+    private boolean initialized;
 
-  public ZlibRectDecoder(PixelFormat pixelFormat) {
-    super(pixelFormat);
-    initialized = false;
-    inflater = new Inflater();
-  }
-
-  @Override
-  public boolean decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) throws Exception {
-    if (!initialized) {
-      if (!in.isReadable(4)) {
-        return false;
-      }
-      capacity = (int) in.readUnsignedInt();
-      initialized = true;
+    public ZlibRectDecoder(PixelFormat pixelFormat) {
+        super(pixelFormat);
+        initialized = false;
+        inflater = new Inflater();
     }
-    return super.decode(ctx, in, out);
-  }
 
-  @Override
-  public void setRect(FrameRect rect) {
-    this.rect = rect;
-  }
-
-  @Override
-  protected void sendRect(ChannelHandlerContext ctx, ByteBuf frame, List<Object> out) {
-    initialized = false;
-    if (frame.hasArray()) {
-      inflater.setInput(frame.array(), 0, frame.capacity());
-    } else {
-      byte[] array = new byte[frame.readableBytes()];
-      frame.getBytes(frame.readerIndex(), array);
-      inflater.setInput(array);
+    @Override
+    public boolean decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) throws Exception {
+        if (!initialized) {
+            if (!in.isReadable(4)) {
+                return false;
+            }
+            capacity = (int) in.readUnsignedInt();
+            initialized = true;
+        }
+        return super.decode(ctx, in, out);
     }
-    byte[] result = new byte[rect.getWidth() * rect.getHeight() * bpp];
-    try {
-      int resultLength = inflater.inflate(result);
-      if (resultLength != result.length) {
-        logger.error("incorrect zlib ({}/{})", resultLength, result.length);
-        return;
-      }
 
-      if (bpp == 1) {
-        out.add(new ZlibImageRect(rect.getX(), rect.getY(), rect.getWidth(), rect.getHeight(), frame.copy(), rect.getWidth()));
-        return;
-      }
-
-      int i = 0;
-      ByteBuf pixels = ctx.alloc().buffer(result.length - (result.length / 4));
-      while (pixels.isWritable()) {
-        pixels.writeByte(result[i + redPos] & 0xFF);
-        pixels.writeByte(result[i + 1] & 0xFF);
-        pixels.writeByte(result[i + bluePos] & 0xFF);
-        i += 4;
-      }
-      out.add(new ZlibImageRect(rect.getX(), rect.getY(), rect.getWidth(), rect.getHeight(), pixels, rect.getWidth() * 3));
-
-    } catch (DataFormatException e) {
-      logger.error(e.getMessage(), e);
-      return;
+    @Override
+    public void setRect(FrameRect rect) {
+        this.rect = rect;
     }
-  }
+
+    @Override
+    protected void sendRect(ChannelHandlerContext ctx, ByteBuf frame, List<Object> out) {
+        initialized = false;
+        if (frame.hasArray()) {
+            inflater.setInput(frame.array(), 0, frame.capacity());
+        } else {
+            byte[] array = new byte[frame.readableBytes()];
+            frame.getBytes(frame.readerIndex(), array);
+            inflater.setInput(array);
+        }
+        byte[] result = new byte[rect.getWidth() * rect.getHeight() * bpp];
+        try {
+            int resultLength = inflater.inflate(result);
+            if (resultLength != result.length) {
+                logger.error("incorrect zlib ({}/{})", resultLength, result.length);
+                return;
+            }
+
+            if (bpp == 1) {
+                out.add(new ZlibImageRect(rect.getX(), rect.getY(), rect.getWidth(), rect.getHeight(), frame.copy(), rect.getWidth()));
+                return;
+            }
+
+            int i = 0;
+            ByteBuf pixels = ctx.alloc().buffer(result.length - (result.length / 4));
+            while (pixels.isWritable()) {
+                pixels.writeByte(result[i + redPos] & 0xFF);
+                pixels.writeByte(result[i + 1] & 0xFF);
+                pixels.writeByte(result[i + bluePos] & 0xFF);
+                i += 4;
+            }
+            out.add(new ZlibImageRect(rect.getX(), rect.getY(), rect.getWidth(), rect.getHeight(), pixels, rect.getWidth() * 3));
+
+        } catch (DataFormatException e) {
+            logger.error(e.getMessage(), e);
+            return;
+        }
+    }
 }

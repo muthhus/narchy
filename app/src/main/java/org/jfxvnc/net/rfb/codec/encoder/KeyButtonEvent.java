@@ -43,32 +43,31 @@ package org.jfxvnc.net.rfb.codec.encoder;
  * Meta (right) 0xffe8<br>
  * Alt (left) 0xffe9<br>
  * Alt (right) 0xffea<br>
- * 
- * @author comtel
  *
+ * @author comtel
  */
 public class KeyButtonEvent implements InputEvent {
 
-  private final boolean isDown;
+    private final boolean isDown;
 
-  private final int key;
+    private final int key;
 
-  public KeyButtonEvent(boolean isDown, int key) {
-    this.isDown = isDown;
-    this.key = key;
-  }
+    public KeyButtonEvent(boolean isDown, int key) {
+        this.isDown = isDown;
+        this.key = key;
+    }
 
-  public boolean isDown() {
-    return isDown;
-  }
+    public boolean isDown() {
+        return isDown;
+    }
 
-  public int getKey() {
-    return key;
-  }
+    public int getKey() {
+        return key;
+    }
 
-  @Override
-  public String toString() {
-    return "KeyEvent [isDown=" + isDown + ", key=" + key + ']';
-  }
+    @Override
+    public String toString() {
+        return "KeyEvent [isDown=" + isDown + ", key=" + key + ']';
+    }
 
 }

@@ -23,113 +23,113 @@ import java.util.Arrays;
 
 public class ConnectInfoEvent implements ServerDecoderEvent {
 
-  String remoteAddress;
+    String remoteAddress;
 
-  String serverName;
+    String serverName;
 
-  ProtocolVersion rfbProtocol;
+    ProtocolVersion rfbProtocol;
 
-  int frameHeight;
-  int frameWidth;
+    int frameHeight;
+    int frameWidth;
 
-  Encoding[] supportedEncodings;
+    Encoding[] supportedEncodings;
 
-  PixelFormat serverPF;
+    PixelFormat serverPF;
 
-  PixelFormat clientPF;
+    PixelFormat clientPF;
 
-  SecurityType security;
+    SecurityType security;
 
-  String connectionType;
+    String connectionType;
 
-  public String getServerName() {
-    return serverName;
-  }
+    public String getServerName() {
+        return serverName;
+    }
 
-  public void setServerName(String serverName) {
-    this.serverName = serverName;
-  }
+    public void setServerName(String serverName) {
+        this.serverName = serverName;
+    }
 
-  public ProtocolVersion getRfbProtocol() {
-    return rfbProtocol;
-  }
+    public ProtocolVersion getRfbProtocol() {
+        return rfbProtocol;
+    }
 
-  public void setRfbProtocol(ProtocolVersion rfbProtocol) {
-    this.rfbProtocol = rfbProtocol;
-  }
+    public void setRfbProtocol(ProtocolVersion rfbProtocol) {
+        this.rfbProtocol = rfbProtocol;
+    }
 
-  public int getFrameHeight() {
-    return frameHeight;
-  }
+    public int getFrameHeight() {
+        return frameHeight;
+    }
 
-  public void setFrameHeight(int frameHeight) {
-    this.frameHeight = frameHeight;
-  }
+    public void setFrameHeight(int frameHeight) {
+        this.frameHeight = frameHeight;
+    }
 
-  public int getFrameWidth() {
-    return frameWidth;
-  }
+    public int getFrameWidth() {
+        return frameWidth;
+    }
 
-  public void setFrameWidth(int frameWidth) {
-    this.frameWidth = frameWidth;
-  }
+    public void setFrameWidth(int frameWidth) {
+        this.frameWidth = frameWidth;
+    }
 
-  public Encoding[] getSupportedEncodings() {
-    return supportedEncodings;
-  }
+    public Encoding[] getSupportedEncodings() {
+        return supportedEncodings;
+    }
 
-  public void setSupportedEncodings(Encoding[] supportedEncodings) {
-    this.supportedEncodings = supportedEncodings;
-  }
+    public void setSupportedEncodings(Encoding[] supportedEncodings) {
+        this.supportedEncodings = supportedEncodings;
+    }
 
-  public PixelFormat getServerPF() {
-    return serverPF;
-  }
+    public PixelFormat getServerPF() {
+        return serverPF;
+    }
 
-  public void setServerPF(PixelFormat serverPF) {
-    this.serverPF = serverPF;
-  }
+    public void setServerPF(PixelFormat serverPF) {
+        this.serverPF = serverPF;
+    }
 
-  public PixelFormat getClientPF() {
-    return clientPF;
-  }
+    public PixelFormat getClientPF() {
+        return clientPF;
+    }
 
-  public void setClientPF(PixelFormat clientPF) {
-    this.clientPF = clientPF;
-  }
+    public void setClientPF(PixelFormat clientPF) {
+        this.clientPF = clientPF;
+    }
 
-  public SecurityType getSecurity() {
-    return security;
-  }
+    public SecurityType getSecurity() {
+        return security;
+    }
 
-  public void setSecurity(SecurityType securityType) {
-    this.security = securityType;
-  }
+    public void setSecurity(SecurityType securityType) {
+        this.security = securityType;
+    }
 
-  public String getRemoteAddress() {
-    return remoteAddress;
-  }
+    public String getRemoteAddress() {
+        return remoteAddress;
+    }
 
-  public void setRemoteAddress(String adr) {
-    this.remoteAddress = adr;
-  }
+    public void setRemoteAddress(String adr) {
+        this.remoteAddress = adr;
+    }
 
-  public String getConnectionType() {
-    return connectionType;
-  }
+    public String getConnectionType() {
+        return connectionType;
+    }
 
-  public void setConnectionType(String connectionType) {
-    this.connectionType = connectionType;
-  }
+    public void setConnectionType(String connectionType) {
+        this.connectionType = connectionType;
+    }
 
-  @Override
-  public String toString() {
-    return "ConnectInfoEvent [" + (remoteAddress != null ? "remoteAddress=" + remoteAddress + ", " : "")
-        + (serverName != null ? "serverName=" + serverName + ", " : "") + (rfbProtocol != null ? "rfbProtocol=" + rfbProtocol + ", " : "") + "frameHeight="
-        + frameHeight + ", frameWidth=" + frameWidth + ", "
-        + (supportedEncodings != null ? "supportedEncodings=" + Arrays.toString(supportedEncodings) + ", " : "")
-        + (serverPF != null ? "serverPF=" + serverPF + ", " : "") + (clientPF != null ? "clientPF=" + clientPF + ", " : "") + "security=" + security + ", "
-        + (connectionType != null ? "connectionType=" + connectionType : "") + ']';
-  }
+    @Override
+    public String toString() {
+        return "ConnectInfoEvent [" + (remoteAddress != null ? "remoteAddress=" + remoteAddress + ", " : "")
+                + (serverName != null ? "serverName=" + serverName + ", " : "") + (rfbProtocol != null ? "rfbProtocol=" + rfbProtocol + ", " : "") + "frameHeight="
+                + frameHeight + ", frameWidth=" + frameWidth + ", "
+                + (supportedEncodings != null ? "supportedEncodings=" + Arrays.toString(supportedEncodings) + ", " : "")
+                + (serverPF != null ? "serverPF=" + serverPF + ", " : "") + (clientPF != null ? "clientPF=" + clientPF + ", " : "") + "security=" + security + ", "
+                + (connectionType != null ? "connectionType=" + connectionType : "") + ']';
+    }
 
 }

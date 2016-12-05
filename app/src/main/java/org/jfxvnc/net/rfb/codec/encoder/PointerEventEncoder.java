@@ -20,18 +20,18 @@ import org.jfxvnc.net.rfb.codec.ClientEventType;
 
 public class PointerEventEncoder extends MessageToByteEncoder<PointerEvent> {
 
-  @Override
-  protected void encode(ChannelHandlerContext ctx, PointerEvent msg, ByteBuf out) throws Exception {
-    ByteBuf buf = ctx.alloc().buffer(6);
-    try {
-      buf.writeByte(ClientEventType.POINTER_EVENT);
-      buf.writeByte(msg.getButtonMask());
-      buf.writeShort(msg.getxPos());
-      buf.writeShort(msg.getyPos());
-      out.writeBytes(buf);
-    } finally {
-      buf.release();
+    @Override
+    protected void encode(ChannelHandlerContext ctx, PointerEvent msg, ByteBuf out) throws Exception {
+        ByteBuf buf = ctx.alloc().buffer(6);
+        try {
+            buf.writeByte(ClientEventType.POINTER_EVENT);
+            buf.writeByte(msg.getButtonMask());
+            buf.writeShort(msg.getxPos());
+            buf.writeShort(msg.getyPos());
+            out.writeBytes(buf);
+        } finally {
+            buf.release();
+        }
     }
-  }
 
 }

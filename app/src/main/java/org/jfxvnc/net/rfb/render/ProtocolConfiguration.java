@@ -23,120 +23,120 @@ import org.jfxvnc.net.rfb.codec.security.SecurityType;
 
 public interface ProtocolConfiguration {
 
-  int DEFAULT_PORT = 5900;
-  int DEFAULT_LISTENING_PORT = 5500;
+    int DEFAULT_PORT = 5900;
+    int DEFAULT_LISTENING_PORT = 5500;
 
-  /**
-   * VNC server name or IP address
-   * 
-   * @return host
-   */
-  StringProperty hostProperty();
+    /**
+     * VNC server name or IP address
+     *
+     * @return host
+     */
+    StringProperty hostProperty();
 
-  /**
-   * VNC server port (default: 5900)
-   * 
-   * @return port
-   */
-  IntegerProperty portProperty();
+    /**
+     * VNC server port (default: 5900)
+     *
+     * @return port
+     */
+    IntegerProperty portProperty();
 
-  /**
-   * listening mode to accept incoming connection requests (default: 5500)
-   * 
-   * @return listening port
-   */
-  IntegerProperty listeningPortProperty();
+    /**
+     * listening mode to accept incoming connection requests (default: 5500)
+     *
+     * @return listening port
+     */
+    IntegerProperty listeningPortProperty();
 
-  /**
-   * VNC authentication password
-   * 
-   * @return password
-   */
-  StringProperty passwordProperty();
+    /**
+     * VNC authentication password
+     *
+     * @return password
+     */
+    StringProperty passwordProperty();
 
-  /**
-   * Enable SSL/TLS transfer
-   * 
-   * @return SSL/TLS enabled
-   */
-  BooleanProperty sslProperty();
+    /**
+     * Enable SSL/TLS transfer
+     *
+     * @return SSL/TLS enabled
+     */
+    BooleanProperty sslProperty();
 
-  /**
-   * Security Type {@link SecurityType}
-   * 
-   * @return current {@link SecurityType}
-   * @see SecurityType
-   */
-  ObjectProperty<SecurityType> securityProperty();
+    /**
+     * Security Type {@link SecurityType}
+     *
+     * @return current {@link SecurityType}
+     * @see SecurityType
+     */
+    ObjectProperty<SecurityType> securityProperty();
 
-  /**
-   * VNC connection shared by other clients
-   * 
-   * @return shared
-   */
-  BooleanProperty sharedProperty();
+    /**
+     * VNC connection shared by other clients
+     *
+     * @return shared
+     */
+    BooleanProperty sharedProperty();
 
-  /**
-   * Used Protocol Version {@link ProtocolVersion}
-   * 
-   * @return current {@link ProtocolVersion}
-   */
-  ObjectProperty<ProtocolVersion> versionProperty();
+    /**
+     * Used Protocol Version {@link ProtocolVersion}
+     *
+     * @return current {@link ProtocolVersion}
+     */
+    ObjectProperty<ProtocolVersion> versionProperty();
 
-  /**
-   * Used PixelFormat {@link PixelFormat}
-   * 
-   * @return current {@link PixelFormat}
-   * @see PixelFormat
-   */
-  ObjectProperty<PixelFormat> clientPixelFormatProperty();
+    /**
+     * Used PixelFormat {@link PixelFormat}
+     *
+     * @return current {@link PixelFormat}
+     * @see PixelFormat
+     */
+    ObjectProperty<PixelFormat> clientPixelFormatProperty();
 
-  /**
-   * Activate RAW encoding
-   * 
-   * @return raw enabled
-   * @see org.jfxvnc.net.rfb.codec.Encoding
-   */
-  BooleanProperty rawEncProperty();
+    /**
+     * Activate RAW encoding
+     *
+     * @return raw enabled
+     * @see org.jfxvnc.net.rfb.codec.Encoding
+     */
+    BooleanProperty rawEncProperty();
 
-  /**
-   * Activate COPY RECT encoding
-   * 
-   * @return raw enabled
-   * @see org.jfxvnc.net.rfb.codec.Encoding
-   */
-  BooleanProperty copyRectEncProperty();
+    /**
+     * Activate COPY RECT encoding
+     *
+     * @return raw enabled
+     * @see org.jfxvnc.net.rfb.codec.Encoding
+     */
+    BooleanProperty copyRectEncProperty();
 
-  /**
-   * Activate Hextile encoding
-   * 
-   * @return Hextile enabled
-   * @see org.jfxvnc.net.rfb.codec.Encoding
-   */
-  BooleanProperty hextileEncProperty();
+    /**
+     * Activate Hextile encoding
+     *
+     * @return Hextile enabled
+     * @see org.jfxvnc.net.rfb.codec.Encoding
+     */
+    BooleanProperty hextileEncProperty();
 
-  /**
-   * Activate Cursor pseudo encoding
-   * 
-   * @return Cursor enabled
-   * @see org.jfxvnc.net.rfb.codec.Encoding
-   */
-  BooleanProperty clientCursorProperty();
+    /**
+     * Activate Cursor pseudo encoding
+     *
+     * @return Cursor enabled
+     * @see org.jfxvnc.net.rfb.codec.Encoding
+     */
+    BooleanProperty clientCursorProperty();
 
-  /**
-   * Activate Desktop Resize pseudo encoding
-   * 
-   * @return Desktop Resize enabled
-   * @see org.jfxvnc.net.rfb.codec.Encoding
-   */
-  BooleanProperty desktopSizeProperty();
+    /**
+     * Activate Desktop Resize pseudo encoding
+     *
+     * @return Desktop Resize enabled
+     * @see org.jfxvnc.net.rfb.codec.Encoding
+     */
+    BooleanProperty desktopSizeProperty();
 
-  /**
-   * Activate Zlib pseudo encoding
-   * 
-   * @return Zlib enabled
-   * @see org.jfxvnc.net.rfb.codec.Encoding
-   */
-  BooleanProperty zlibEncProperty();
+    /**
+     * Activate Zlib pseudo encoding
+     *
+     * @return Zlib enabled
+     * @see org.jfxvnc.net.rfb.codec.Encoding
+     */
+    BooleanProperty zlibEncProperty();
 
 }

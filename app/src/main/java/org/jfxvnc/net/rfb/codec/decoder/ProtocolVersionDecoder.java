@@ -24,24 +24,24 @@ import java.util.List;
 
 public class ProtocolVersionDecoder extends ByteToMessageDecoder {
 
-  protected final Charset ASCII = StandardCharsets.US_ASCII;
+    protected final Charset ASCII = StandardCharsets.US_ASCII;
 
-  private final static int length = 12;
+    private final static int length = 12;
 
-  public ProtocolVersionDecoder() {
-    setSingleDecode(true);
-  }
-
-  @Override
-  protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) throws Exception {
-    if (!in.isReadable(length)) {
-      return;
+    public ProtocolVersionDecoder() {
+        setSingleDecode(true);
     }
-    byte[] rfb = new byte[length];
-    in.readBytes(rfb);
-    String rfbVersion = new String(rfb, ASCII);
-    out.add(new ProtocolVersion(rfbVersion));
-    ctx.pipeline().remove(this);
-  }
+
+    @Override
+    protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) throws Exception {
+        if (!in.isReadable(length)) {
+            return;
+        }
+        byte[] rfb = new byte[length];
+        in.readBytes(rfb);
+        String rfbVersion = new String(rfb, ASCII);
+        out.add(new ProtocolVersion(rfbVersion));
+        ctx.pipeline().remove(this);
+    }
 
 }

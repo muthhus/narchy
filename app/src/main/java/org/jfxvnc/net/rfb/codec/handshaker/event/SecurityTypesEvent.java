@@ -19,26 +19,26 @@ import java.util.Arrays;
 
 public class SecurityTypesEvent implements HandshakeEvent {
 
-  private final boolean response;
+    private final boolean response;
 
-  private final SecurityType[] securityTypes;
+    private final SecurityType[] securityTypes;
 
-  public SecurityTypesEvent(boolean response, SecurityType... securityTypes) {
-    this.response = response;
-    this.securityTypes = securityTypes;
-  }
+    public SecurityTypesEvent(boolean response, SecurityType... securityTypes) {
+        this.response = response;
+        this.securityTypes = securityTypes;
+    }
 
-  public SecurityType[] getSecurityTypes() {
-    return securityTypes;
-  }
+    public SecurityType[] getSecurityTypes() {
+        return securityTypes;
+    }
 
-  public boolean isResponse() {
-    return response;
-  }
+    public boolean isResponse() {
+        return response;
+    }
 
-  @Override
-  public String toString() {
-    return "SecurityTypesEvent [response=" + response + ", " + (securityTypes != null ? "securityTypes=" + Arrays.toString(securityTypes) : "") + ']';
-  }
+    @Override
+    public String toString() {
+        return "SecurityTypesEvent [response=" + response + ", " + (securityTypes != null ? "securityTypes=" + Arrays.toString(securityTypes) : "") + ']';
+    }
 
 }

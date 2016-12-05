@@ -20,6 +20,7 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.atom.Atomic;
+import nars.term.container.TermContainer;
 import nars.term.obj.Termject;
 import nars.term.obj.TermjectConcept;
 import nars.term.var.Variable;
@@ -128,15 +129,23 @@ public class DefaultConceptBuilder implements ConceptBuilder {
                         //(P --> M), (S --> M), notSet(S), notSet(P), neqCom(S,P) |- ((S & P) --> M), (Belief:Union)
                         //(P --> M), (S --> M), notSet(S), notSet(P), neqCom(S,P) |- ((P ~ S) --> M), (Belief:Difference)
                         Compound csubj = (Compound) subj;
-                        int s = csubj.size();
-                        Term[] x = new Term[s];
-                        for (int i = 0; i < s; i++)
-                            x[i] = $.inh(csubj.term(i), pred);
+                        if (validUnwrappableSubterms(csubj.subterms())) {
+                            int s = csubj.size();
+                            Term[] x = new Term[s];
+                            for (int i = 0; i < s; i++)
+                                x[i] = $.inh(csubj.term(i), pred);
 
-                        switch(so) {
-                            case SECTi: dmt = new DynamicTruthModel.Intersection(x); break;
-                            case SECTe: dmt = new DynamicTruthModel.Union(x); break;
-                            case DIFFi: dmt = new DynamicTruthModel.Difference(x[0], x[1]); break;
+                            switch (so) {
+                                case SECTi:
+                                    dmt = new DynamicTruthModel.Intersection(x);
+                                    break;
+                                case SECTe:
+                                    dmt = new DynamicTruthModel.Union(x);
+                                    break;
+                                case DIFFi:
+                                    dmt = new DynamicTruthModel.Difference(x[0], x[1]);
+                                    break;
+                            }
                         }
                     }
                 } else if (so.atomic || so.image || so == so.PROD) {
@@ -145,14 +154,23 @@ public class DefaultConceptBuilder implements ConceptBuilder {
                         //(M --> P), (M --> S), notSet(S), notSet(P), neqCom(S,P) |- (M --> (P | S)), (Belief:Union)
                         //(M --> P), (M --> S), notSet(S), notSet(P), neqCom(S,P) |- (M --> (P - S)), (Belief:Difference)
                         Compound cpred = (Compound) pred;
-                        int s = cpred.size();
-                        Term[] x = new Term[s];
-                        for (int i = 0; i < s; i++)
-                            x[i] = $.inh(subj, cpred.term(i));
+                        if (validUnwrappableSubterms(cpred.subterms())) {
+                            int s = cpred.size();
+                            Term[] x = new Term[s];
+                            for (int i = 0; i < s; i++)
+                                x[i] = $.inh(subj, cpred.term(i));
 
-                        switch(so) {
-                            case SECTi: dmt = new DynamicTruthModel.Union(x); break;
-                            case SECTe: dmt = new DynamicTruthModel.Intersection(x); break;
+                            switch (so) {
+                                case SECTi:
+                                    dmt = new DynamicTruthModel.Union(x);
+                                    break;
+                                case SECTe:
+                                    dmt = new DynamicTruthModel.Intersection(x);
+                                    break;
+                                case DIFFe:
+                                    dmt = new DynamicTruthModel.Difference(x[0], x[1]);
+                                    break;
+                            }
                         }
                     }
 
@@ -162,14 +180,7 @@ public class DefaultConceptBuilder implements ConceptBuilder {
 
             case CONJ:
                 //allow variables onlyif they are not themselves direct subterms of this
-                boolean dynamicConj = true;
-                for (Term x : t.terms()) {
-                    if (x instanceof Variable) {
-                        dynamicConj = false;
-                        break;
-                    }
-                }
-                if (dynamicConj) {
+                if (validUnwrappableSubterms(t.subterms())) {
                     dmt = DynamicTruthModel.Intersection;
                 }
                 break;
@@ -185,6 +196,10 @@ public class DefaultConceptBuilder implements ConceptBuilder {
                         new DynamicConcept(t, dmt, dmt, termbag, taskbag, nar) :
                         new CompoundConcept<>(t, termbag, taskbag, nar)
                 ;
+    }
+
+    private boolean validUnwrappableSubterms(@NotNull TermContainer subterms) {
+        return !subterms.or(x -> x instanceof Variable);
     }
 
 

@@ -21,27 +21,27 @@ import java.util.List;
 
 class ServerCutTextDecoder implements FrameDecoder {
 
-  @Override
-  public boolean decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) throws Exception {
+    @Override
+    public boolean decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) throws Exception {
 
-    if (!in.isReadable(8)) {
-      return false;
+        if (!in.isReadable(8)) {
+            return false;
+        }
+
+        in.markReaderIndex();
+
+        in.skipBytes(4);
+        int length = in.readInt();
+
+        if (!in.isReadable(length)) {
+            in.resetReaderIndex();
+            return false;
+        }
+
+        byte[] text = new byte[length];
+        in.readBytes(text);
+        out.add(new ServerCutTextEvent(new String(text, StandardCharsets.ISO_8859_1)));
+        return true;
     }
-
-    in.markReaderIndex();
-
-    in.skipBytes(4);
-    int length = in.readInt();
-
-    if (!in.isReadable(length)) {
-      in.resetReaderIndex();
-      return false;
-    }
-
-    byte[] text = new byte[length];
-    in.readBytes(text);
-    out.add(new ServerCutTextEvent(new String(text, StandardCharsets.ISO_8859_1)));
-    return true;
-  }
 
 }

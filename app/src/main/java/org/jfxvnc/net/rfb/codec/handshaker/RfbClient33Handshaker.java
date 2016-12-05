@@ -17,18 +17,18 @@ import org.jfxvnc.net.rfb.codec.ProtocolVersion;
 
 class RfbClient33Handshaker extends RfbClientHandshaker {
 
-  public RfbClient33Handshaker(ProtocolVersion version) {
-    super(version);
-  }
+    public RfbClient33Handshaker(ProtocolVersion version) {
+        super(version);
+    }
 
-  @Override
-  public RfbClientDecoder newRfbClientDecoder() {
-    return new RfbClient33Decoder();
-  }
+    @Override
+    public RfbClientDecoder newRfbClientDecoder() {
+        return new RfbClient33Decoder();
+    }
 
-  @Override
-  public RfbClientEncoder newRfbClientEncoder() {
-    return new RfbClient33Encoder();
-  }
+    @Override
+    public RfbClientEncoder newRfbClientEncoder() {
+        return new RfbClient33Encoder();
+    }
 
 }

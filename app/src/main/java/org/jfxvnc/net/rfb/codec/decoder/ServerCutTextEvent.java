@@ -15,19 +15,19 @@ package org.jfxvnc.net.rfb.codec.decoder;
 
 public class ServerCutTextEvent implements ServerDecoderEvent {
 
-  private final String text;
+    private final String text;
 
-  public ServerCutTextEvent(String text) {
-    this.text = text;
-  }
+    public ServerCutTextEvent(String text) {
+        this.text = text;
+    }
 
-  public String getText() {
-    return text;
-  }
+    public String getText() {
+        return text;
+    }
 
-  @Override
-  public String toString() {
-    return "ServerCutText [text=" + text + ']';
-  }
+    @Override
+    public String toString() {
+        return "ServerCutText [text=" + text + ']';
+    }
 
 }

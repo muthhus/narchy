@@ -17,30 +17,30 @@ import org.jfxvnc.net.rfb.codec.Encoding;
 
 public class CopyImageRect extends ImageRect {
 
-  protected final int srcX;
-  protected final int srcY;
+    protected final int srcX;
+    protected final int srcY;
 
-  public CopyImageRect(int x, int y, int width, int height, int srcx, int srcy) {
-    super(x, y, width, height);
-    this.srcX = srcx;
-    this.srcY = srcy;
-  }
+    public CopyImageRect(int x, int y, int width, int height, int srcx, int srcy) {
+        super(x, y, width, height);
+        this.srcX = srcx;
+        this.srcY = srcy;
+    }
 
-  public int getSrcX() {
-    return srcX;
-  }
+    public int getSrcX() {
+        return srcX;
+    }
 
-  public int getSrcY() {
-    return srcY;
-  }
+    public int getSrcY() {
+        return srcY;
+    }
 
-  @Override
-  public Encoding getEncoding() {
-    return Encoding.COPY_RECT;
-  }
+    @Override
+    public Encoding getEncoding() {
+        return Encoding.COPY_RECT;
+    }
 
-  @Override
-  public String toString() {
-    return "CopyImageRect [x=" + x + ", y=" + y + ", width=" + width + ", height=" + height + ", srcX=" + srcX + ", srcY=" + srcY + ']';
-  }
+    @Override
+    public String toString() {
+        return "CopyImageRect [x=" + x + ", y=" + y + ", width=" + width + ", height=" + height + ", srcX=" + srcX + ", srcY=" + srcY + ']';
+    }
 }

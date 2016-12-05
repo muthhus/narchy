@@ -45,8 +45,8 @@ public class RfbVersionTest {
     assertTrue(v3.isGreaterThan(v2));
     assertFalse(v2.isGreaterThan(v3));
 
-    assertEquals(3, v3.getMajorVersion());
-    assertEquals(8, v3.getMinorVersion());
+      assertEquals(3, v3.majorVersion);
+    assertEquals(8, v3.minorVersion);
     assertEquals(ProtocolVersion.RFB_3_8, v3);
 
     ProtocolVersion v4 = new ProtocolVersion("RFB 004.002\n");
@@ -55,8 +55,8 @@ public class RfbVersionTest {
     assertTrue(v4.isGreaterThan(v2));
     assertFalse(v2.isGreaterThan(v4));
 
-    assertEquals(4, v4.getMajorVersion());
-    assertEquals(2, v4.getMinorVersion());
+      assertEquals(4, v4.majorVersion);
+    assertEquals(2, v4.minorVersion);
 
     ProtocolVersion v5 = new ProtocolVersion("RFB 003.889\n");
     assertNotNull(v5);

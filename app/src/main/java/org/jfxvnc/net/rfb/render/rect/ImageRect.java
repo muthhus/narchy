@@ -17,36 +17,36 @@ import org.jfxvnc.net.rfb.codec.Encoding;
 
 public abstract class ImageRect {
 
-  public final int x;
-  public final int y;
-  public final int width;
-  public final int height;
+    public final int x;
+    public final int y;
+    public final int width;
+    public final int height;
 
-  public ImageRect(int x, int y, int width, int height) {
-    this.x = x;
-    this.y = y;
-    this.width = width;
-    this.height = height;
-  }
+    public ImageRect(int x, int y, int width, int height) {
+        this.x = x;
+        this.y = y;
+        this.width = width;
+        this.height = height;
+    }
 
-  /**
-   * @return the image {@link Encoding} type
-   */
-  public abstract Encoding getEncoding();
+    /**
+     * @return the image {@link Encoding} type
+     */
+    public abstract Encoding getEncoding();
 
 
-  /**
-   * Release the image buffer
-   * 
-   * @return if successful
-   */
-  public boolean release() {
-    return true;
-  }
+    /**
+     * Release the image buffer
+     *
+     * @return if successful
+     */
+    public boolean release() {
+        return true;
+    }
 
-  @Override
-  public String toString() {
-    return "ImageRect [x=" + x + ", y=" + y + ", width=" + width + ", height=" + height + ']';
-  }
+    @Override
+    public String toString() {
+        return "ImageRect [x=" + x + ", y=" + y + ", width=" + width + ", height=" + height + ']';
+    }
 
 }

@@ -20,16 +20,17 @@ import java.util.List;
 
 public class BellDecoder implements FrameDecoder {
 
-  public BellDecoder() {}
-
-  @Override
-  public boolean decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) throws Exception {
-    if (!in.isReadable(1)) {
-      return false;
+    public BellDecoder() {
     }
-    in.skipBytes(1);
-    out.add(new BellEvent());
-    return true;
-  }
+
+    @Override
+    public boolean decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) throws Exception {
+        if (!in.isReadable(1)) {
+            return false;
+        }
+        in.skipBytes(1);
+        out.add(new BellEvent());
+        return true;
+    }
 
 }

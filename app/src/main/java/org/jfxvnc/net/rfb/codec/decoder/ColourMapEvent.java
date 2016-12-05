@@ -17,31 +17,31 @@ import io.netty.buffer.ByteBuf;
 
 public class ColourMapEvent implements ServerDecoderEvent {
 
-  private final int firstColor;
-  private final int numberOfColor;
-  private final ByteBuf colors;
+    private final int firstColor;
+    private final int numberOfColor;
+    private final ByteBuf colors;
 
-  public ColourMapEvent(int firstColor, int numberOfColor, ByteBuf colors) {
-    this.firstColor = firstColor;
-    this.numberOfColor = numberOfColor;
-    this.colors = colors;
-  }
+    public ColourMapEvent(int firstColor, int numberOfColor, ByteBuf colors) {
+        this.firstColor = firstColor;
+        this.numberOfColor = numberOfColor;
+        this.colors = colors;
+    }
 
-  public int getFirstColor() {
-    return firstColor;
-  }
+    public int getFirstColor() {
+        return firstColor;
+    }
 
-  public int getNumberOfColor() {
-    return numberOfColor;
-  }
+    public int getNumberOfColor() {
+        return numberOfColor;
+    }
 
-  public ByteBuf getColors() {
-    return colors;
-  }
+    public ByteBuf getColors() {
+        return colors;
+    }
 
 
-  @Override
-  public String toString() {
-    return "ColourMapEvent [firstColor=" + firstColor + ", numberOfColor=" + numberOfColor + ", colors.capacity=" + colors.capacity() + ']';
-  }
+    @Override
+    public String toString() {
+        return "ColourMapEvent [firstColor=" + firstColor + ", numberOfColor=" + numberOfColor + ", colors.capacity=" + colors.capacity() + ']';
+    }
 }

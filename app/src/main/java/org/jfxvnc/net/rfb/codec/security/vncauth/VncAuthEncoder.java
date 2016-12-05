@@ -30,46 +30,46 @@ import java.security.spec.KeySpec;
 
 public class VncAuthEncoder extends MessageToByteEncoder<VncAuthSecurityMessage> implements RfbSecurityEncoder {
 
-  private static final Logger logger = LoggerFactory.getLogger(VncAuthEncoder.class);
+    private static final Logger logger = LoggerFactory.getLogger(VncAuthEncoder.class);
 
-  @Override
-  protected void encode(ChannelHandlerContext ctx, VncAuthSecurityMessage msg, ByteBuf out) throws Exception {
-    byte[] enc = encryptPassword(msg);
-    logger.debug("VNC Auth encrypted: {}", enc);
-    out.writeBytes(enc);
-  }
-
-  private static byte[] encryptPassword(VncAuthSecurityMessage msg) throws ProtocolException {
-    if (msg.getChallenge().length != 16)
-      throw new ProtocolException("invalid challenge length " + msg.getChallenge().length);
-    try {
-      byte[] keyBytes = new byte[DESKeySpec.DES_KEY_LEN];
-      byte[] pwdBytes = String.valueOf(msg.getPassword()).getBytes(StandardCharsets.US_ASCII);
-
-      for (int i = 0; i < keyBytes.length; i++) {
-        keyBytes[i] = i < pwdBytes.length ? reverseBitsByte(pwdBytes[i]) : 0;
-      }
-
-      KeySpec desKeySpec = new DESKeySpec(keyBytes);
-      SecretKeyFactory secretKeyFactory = SecretKeyFactory.getInstance("DES");
-      SecretKey secretKey = secretKeyFactory.generateSecret(desKeySpec);
-      Cipher cipher = Cipher.getInstance("DES/ECB/NoPadding");
-      cipher.init(Cipher.ENCRYPT_MODE, secretKey);
-
-      return cipher.doFinal(msg.getChallenge());
-
-    } catch (Exception e) {
-      throw new ProtocolException("encrypt password failed", e);
+    @Override
+    protected void encode(ChannelHandlerContext ctx, VncAuthSecurityMessage msg, ByteBuf out) throws ProtocolException {
+        byte[] enc = encryptPassword(msg);
+        logger.debug("VNC Auth encrypted: {}", enc);
+        out.writeBytes(enc);
     }
-  }
 
-  private static byte reverseBitsByte(byte b) {
-    byte f = 0;
-    for (int position = 7; position >= 0; position--) {
-      f += ((b & 1) << position);
-      b >>= 1;
+    private static byte[] encryptPassword(VncAuthSecurityMessage msg) throws ProtocolException {
+        if (msg.getChallenge().length != 16)
+            throw new ProtocolException("invalid challenge length " + msg.getChallenge().length);
+        try {
+            byte[] keyBytes = new byte[DESKeySpec.DES_KEY_LEN];
+            byte[] pwdBytes = String.valueOf(msg.getPassword()).getBytes(StandardCharsets.US_ASCII);
+
+            for (int i = 0; i < keyBytes.length; i++) {
+                keyBytes[i] = i < pwdBytes.length ? reverseBitsByte(pwdBytes[i]) : 0;
+            }
+
+            KeySpec desKeySpec = new DESKeySpec(keyBytes);
+            SecretKeyFactory secretKeyFactory = SecretKeyFactory.getInstance("DES");
+            SecretKey secretKey = secretKeyFactory.generateSecret(desKeySpec);
+            Cipher cipher = Cipher.getInstance("DES/ECB/NoPadding");
+            cipher.init(Cipher.ENCRYPT_MODE, secretKey);
+
+            return cipher.doFinal(msg.getChallenge());
+
+        } catch (Exception e) {
+            throw new ProtocolException("encrypt password failed", e);
+        }
     }
-    return f;
-  }
+
+    private static byte reverseBitsByte(byte b) {
+        byte f = 0;
+        for (int position = 7; position >= 0; position--) {
+            f += ((b & 1) << position);
+            b >>= 1;
+        }
+        return f;
+    }
 
 }

@@ -22,14 +22,14 @@ import java.util.List;
 
 public class VncAuthDecoder extends ByteToMessageDecoder implements RfbSecurityDecoder {
 
-  @Override
-  protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) throws Exception {
-    if (!in.isReadable(16)) {
-      return;
+    @Override
+    protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) throws Exception {
+        if (!in.isReadable(16)) {
+            return;
+        }
+        byte[] challenge = new byte[16];
+        in.readBytes(challenge);
+        out.add(new VncAuthSecurityMessage(challenge));
     }
-    byte[] challenge = new byte[16];
-    in.readBytes(challenge);
-    out.add(new VncAuthSecurityMessage(challenge));
-  }
 
 }

@@ -17,14 +17,14 @@ import org.jfxvnc.net.rfb.codec.Encoding;
 
 public class PreferedEncoding {
 
-  private final Encoding[] encodings;
+    private final Encoding[] encodings;
 
-  public PreferedEncoding(Encoding[] encodings) {
-    this.encodings = encodings;
-  }
+    public PreferedEncoding(Encoding[] encodings) {
+        this.encodings = encodings;
+    }
 
-  public Encoding[] getEncodings() {
-    return encodings;
-  }
+    public Encoding[] getEncodings() {
+        return encodings;
+    }
 
 }

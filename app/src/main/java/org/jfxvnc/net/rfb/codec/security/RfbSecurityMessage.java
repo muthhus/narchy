@@ -17,8 +17,8 @@ import org.jfxvnc.net.rfb.render.ProtocolConfiguration;
 
 public interface RfbSecurityMessage {
 
-  SecurityType getSecurityType();
+    SecurityType getSecurityType();
 
-  void setCredentials(ProtocolConfiguration config);
+    void setCredentials(ProtocolConfiguration config);
 
 }

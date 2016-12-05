@@ -15,7 +15,7 @@ package org.jfxvnc.net.rfb.codec;
 
 /**
  * Encoding types
- * 
+ * <p>
  * <code>
  * 0 Raw<br>
  * 1 CopyRect<br>
@@ -48,58 +48,57 @@ package org.jfxvnc.net.rfb.codec;
  * -763 to -768 TurboVNC subsampling level<br>
  * 0x574d5600 to 0x574d56ff VMWare<br>
  * </code>
- *
  */
 public enum Encoding {
 
-  UNKNOWN(Integer.MIN_VALUE),
+    UNKNOWN(Integer.MIN_VALUE),
 
-  RAW(0),
+    RAW(0),
 
-  COPY_RECT(1),
+    COPY_RECT(1),
 
-  RRE(2),
+    RRE(2),
 
-  CO_RRE(4),
+    CO_RRE(4),
 
-  HEXTILE(5),
+    HEXTILE(5),
 
-  ZLIB(6),
+    ZLIB(6),
 
-  TIGHT(7),
+    TIGHT(7),
 
-  ZLIB_HEX(8),
+    ZLIB_HEX(8),
 
-  TRLE(15),
+    TRLE(15),
 
-  ZRLE(16),
+    ZRLE(16),
 
-  H_ZYWRLE(17),
+    H_ZYWRLE(17),
 
-  AW_XZ(18),
+    AW_XZ(18),
 
-  AW_XZYW(19),
+    AW_XZYW(19),
 
-  DESKTOP_SIZE(-223),
+    DESKTOP_SIZE(-223),
 
-  CURSOR(-239);
+    CURSOR(-239);
 
-  private final int type;
+    private final int type;
 
-  Encoding(int type) {
-    this.type = type;
-  }
-
-  public static Encoding valueOf(int type) {
-    for (Encoding e : values()) {
-      if (e.type == type) {
-        return e;
-      }
+    Encoding(int type) {
+        this.type = type;
     }
-    return UNKNOWN;
-  }
 
-  public int getType() {
-    return type;
-  }
+    public static Encoding valueOf(int type) {
+        for (Encoding e : values()) {
+            if (e.type == type) {
+                return e;
+            }
+        }
+        return UNKNOWN;
+    }
+
+    public int getType() {
+        return type;
+    }
 }

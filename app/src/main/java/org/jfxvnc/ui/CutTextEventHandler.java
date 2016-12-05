@@ -26,71 +26,70 @@ import javafx.scene.input.ClipboardContent;
 import javafx.util.Duration;
 import org.jfxvnc.net.rfb.codec.encoder.ClientCutText;
 import org.jfxvnc.net.rfb.codec.encoder.InputEventListener;
-import org.jfxvnc.net.rfb.codec.encoder.KeyButtonMap;
 
 public class CutTextEventHandler {
 
-  private InputEventListener listener;
+    private InputEventListener listener;
 
-  private Timeline clipTask;
-  private Clipboard clipboard;
+    private Timeline clipTask;
+    private Clipboard clipboard;
 
-  private final StringProperty clipTextProperty = new SimpleStringProperty();
-  private final BooleanProperty enabled = new SimpleBooleanProperty(false);
+    private final StringProperty clipTextProperty = new SimpleStringProperty();
+    private final BooleanProperty enabled = new SimpleBooleanProperty(false);
 
-  public CutTextEventHandler() {
+    public CutTextEventHandler() {
 
-    Platform.runLater(() -> {
-      clipboard = Clipboard.getSystemClipboard();
-      clipTask = new Timeline(new KeyFrame(Duration.millis(500), (event) -> {
-        if (clipboard.hasString()) {
-          String newString = clipboard.getString();
-          if (newString == null) {
-            return;
-          }
-          if (clipTextProperty.get() == null) {
-            clipTextProperty.set(newString);
-            return;
-          }
-          if (newString != null && !clipTextProperty.get().equals(newString)) {
-            fire(new ClientCutText(newString.replace("\r\n", "\n")));
-            clipTextProperty.set(newString);
-          }
-        }
-      }));
-      clipTask.setCycleCount(Animation.INDEFINITE);
-    });
+        Platform.runLater(() -> {
+            clipboard = Clipboard.getSystemClipboard();
+            clipTask = new Timeline(new KeyFrame(Duration.millis(500), (event) -> {
+                if (clipboard.hasString()) {
+                    String newString = clipboard.getString();
+                    if (newString == null) {
+                        return;
+                    }
+                    if (clipTextProperty.get() == null) {
+                        clipTextProperty.set(newString);
+                        return;
+                    }
+                    if (newString != null && !clipTextProperty.get().equals(newString)) {
+                        fire(new ClientCutText(newString.replace("\r\n", "\n")));
+                        clipTextProperty.set(newString);
+                    }
+                }
+            }));
+            clipTask.setCycleCount(Animation.INDEFINITE);
+        });
 
-    enabled.addListener((l, o, n) -> Platform.runLater(() -> {
-      if (n) {
-        clipTask.play();
-      } else {
-        clipTask.stop();
-        clipTextProperty.set(null);
-      }
-    }));
-  }
-
-  public void setInputEventListener(InputEventListener listener) {
-    this.listener = listener;
-  }
-
-  public void addClipboardText(String text) {
-    Platform.runLater(() -> {
-      ClipboardContent content = new ClipboardContent();
-      content.putString(text);
-      clipboard.setContent(content);
-    });
-  }
-
-  public BooleanProperty enabledProperty() {
-    return enabled;
-  }
-
-  private void fire(ClientCutText msg) {
-    if (listener != null) {
-      listener.sendInputEvent(msg);
+        enabled.addListener((l, o, n) -> Platform.runLater(() -> {
+            if (n) {
+                clipTask.play();
+            } else {
+                clipTask.stop();
+                clipTextProperty.set(null);
+            }
+        }));
     }
-  }
+
+    public void setInputEventListener(InputEventListener listener) {
+        this.listener = listener;
+    }
+
+    public void addClipboardText(String text) {
+        Platform.runLater(() -> {
+            ClipboardContent content = new ClipboardContent();
+            content.putString(text);
+            clipboard.setContent(content);
+        });
+    }
+
+    public BooleanProperty enabledProperty() {
+        return enabled;
+    }
+
+    private void fire(ClientCutText msg) {
+        if (listener != null) {
+            listener.sendInputEvent(msg);
+        }
+    }
 
 }

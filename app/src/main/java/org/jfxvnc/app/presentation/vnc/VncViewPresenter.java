@@ -29,39 +29,39 @@ import java.util.ResourceBundle;
 
 public class VncViewPresenter implements Initializable {
 
-  @Inject
-  SessionContext ctx;
+    @Inject
+    SessionContext ctx;
 
-  @Inject
-  VncRenderService con;
+    @Inject
+    VncRenderService con;
 
-  @FXML
-  private ScrollPane scrollPane;
+    @FXML
+    private ScrollPane scrollPane;
 
-  private final Effect blurEffect = new BoxBlur();
+    private final Effect blurEffect = new BoxBlur();
 
-  private VncImageView vncView;
+    private VncImageView vncView;
 
-  @Override
-  public void initialize(URL location, ResourceBundle resources) {
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
 
-    vncView = new VncImageView();
-    scrollPane.setContent(vncView);
-    con.setEventConsumer(vncView);
-    con.serverCutTextProperty().addListener((l, old, text) -> vncView.addClipboardText(text));
-    
-    con.onlineProperty().addListener((l, old, online) -> Platform.runLater(() -> {
-      vncView.setDisable(!online);
-      vncView.setEffect(online ? null : blurEffect);
-    }));
+        vncView = new VncImageView();
+        scrollPane.setContent(vncView);
+        con.setEventConsumer(vncView);
+        con.serverCutTextProperty().addListener((l, old, text) -> vncView.addClipboardText(text));
 
-    con.inputEventListenerProperty().addListener(l -> vncView.registerInputEventListener(con.inputEventListenerProperty().get()));
-    con.getConfiguration().clientCursorProperty().addListener((l, a, b) -> vncView.setUseClientCursor(b));
+        con.onlineProperty().addListener((l, old, online) -> Platform.runLater(() -> {
+            vncView.setDisable(!online);
+            vncView.setEffect(online ? null : blurEffect);
+        }));
 
-    vncView.setOnZoom(e -> con.zoomLevelProperty().set(e.getTotalZoomFactor()));
+        con.inputEventListenerProperty().addListener(l -> vncView.registerInputEventListener(con.inputEventListenerProperty().get()));
+        con.getConfiguration().clientCursorProperty().addListener((l, a, b) -> vncView.setUseClientCursor(b));
 
-    con.zoomLevelProperty().addListener((l, old, zoom) -> vncView.zoomLevelProperty().set(zoom.doubleValue()));
+        vncView.setOnZoom(e -> con.zoomLevelProperty().set(e.getTotalZoomFactor()));
 
-  }
+        con.zoomLevelProperty().addListener((l, old, zoom) -> vncView.zoomLevelProperty().set(zoom.doubleValue()));
+
+    }
 
 }

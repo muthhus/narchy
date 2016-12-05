@@ -18,47 +18,47 @@ import org.jfxvnc.net.rfb.codec.Encoding;
 
 public class RawImageRect extends ImageRect {
 
-  protected final ByteBuf pixels;
-  protected final int scanlineStride;
+    protected final ByteBuf pixels;
+    protected final int scanlineStride;
 
-  public RawImageRect(int x, int y, int width, int height, ByteBuf pixels, int scanlineStride) {
-    super(x, y, width, height);
-    this.pixels = pixels;
-    this.scanlineStride = scanlineStride;
-  }
+    public RawImageRect(int x, int y, int width, int height, ByteBuf pixels, int scanlineStride) {
+        super(x, y, width, height);
+        this.pixels = pixels;
+        this.scanlineStride = scanlineStride;
+    }
 
-  /**
-   * Returns a byte buffer of a pixel data
-   * 
-   * @return pixels
-   */
-  public ByteBuf getPixels() {
-    return pixels;
-  }
+    /**
+     * Returns a byte buffer of a pixel data
+     *
+     * @return pixels
+     */
+    public ByteBuf getPixels() {
+        return pixels;
+    }
 
-  /**
-   * Returns the distance between the pixel data for the start of one row of data in the buffer to
-   * the start of the next row of data.
-   * 
-   * @return scanlineStride
-   */
-  public int getScanlineStride() {
-    return scanlineStride;
-  }
+    /**
+     * Returns the distance between the pixel data for the start of one row of data in the buffer to
+     * the start of the next row of data.
+     *
+     * @return scanlineStride
+     */
+    public int getScanlineStride() {
+        return scanlineStride;
+    }
 
-  @Override
-  public Encoding getEncoding() {
-    return Encoding.RAW;
-  }
+    @Override
+    public Encoding getEncoding() {
+        return Encoding.RAW;
+    }
 
-  @Override
-  public boolean release() {
-    return pixels == null || pixels.release();
-  }
+    @Override
+    public boolean release() {
+        return pixels == null || pixels.release();
+    }
 
-  @Override
-  public String toString() {
-    return "RawImageRect [x=" + x + ", y=" + y + ", width=" + width + ", height=" + height + ", pixels.capacity="
-        + (pixels != null ? pixels.capacity() : "null") + ", scanlineStride=" + scanlineStride + ']';
-  }
+    @Override
+    public String toString() {
+        return "RawImageRect [x=" + x + ", y=" + y + ", width=" + width + ", height=" + height + ", pixels.capacity="
+                + (pixels != null ? pixels.capacity() : "null") + ", scanlineStride=" + scanlineStride + ']';
+    }
 }

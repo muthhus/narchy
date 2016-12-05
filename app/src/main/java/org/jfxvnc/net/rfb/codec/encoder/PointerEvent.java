@@ -15,33 +15,33 @@ package org.jfxvnc.net.rfb.codec.encoder;
 
 public class PointerEvent implements InputEvent {
 
-  private final byte buttonMask;
+    private final byte buttonMask;
 
-  private final int xPos;
-  private final int yPos;
+    private final int xPos;
+    private final int yPos;
 
-  public PointerEvent(byte buttonMask, int xPos, int yPos) {
-    super();
-    this.buttonMask = buttonMask;
-    this.xPos = xPos;
-    this.yPos = yPos;
-  }
+    public PointerEvent(byte buttonMask, int xPos, int yPos) {
+        super();
+        this.buttonMask = buttonMask;
+        this.xPos = xPos;
+        this.yPos = yPos;
+    }
 
-  public byte getButtonMask() {
-    return buttonMask;
-  }
+    public byte getButtonMask() {
+        return buttonMask;
+    }
 
-  public int getxPos() {
-    return xPos;
-  }
+    public int getxPos() {
+        return xPos;
+    }
 
-  public int getyPos() {
-    return yPos;
-  }
+    public int getyPos() {
+        return yPos;
+    }
 
-  @Override
-  public String toString() {
-    return "PointerEvent [buttonMask=" + buttonMask + ", xPos=" + xPos + ", yPos=" + yPos + ']';
-  }
+    @Override
+    public String toString() {
+        return "PointerEvent [buttonMask=" + buttonMask + ", xPos=" + xPos + ", yPos=" + yPos + ']';
+    }
 
 }

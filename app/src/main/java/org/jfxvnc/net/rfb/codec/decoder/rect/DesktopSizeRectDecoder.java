@@ -22,19 +22,20 @@ import java.util.List;
 
 public class DesktopSizeRectDecoder implements FrameRectDecoder {
 
-  private FrameRect rect;
+    private FrameRect rect;
 
-  public DesktopSizeRectDecoder(PixelFormat pixelFormat) {}
+    public DesktopSizeRectDecoder(PixelFormat pixelFormat) {
+    }
 
-  @Override
-  public boolean decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) throws Exception {
-    out.add(new DesktopSizeRect(rect.getX(), rect.getY(), rect.getWidth(), rect.getHeight()));
-    return true;
-  }
+    @Override
+    public boolean decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) throws Exception {
+        out.add(new DesktopSizeRect(rect.getX(), rect.getY(), rect.getWidth(), rect.getHeight()));
+        return true;
+    }
 
-  @Override
-  public void setRect(FrameRect rect) {
-    this.rect = rect;
-  }
+    @Override
+    public void setRect(FrameRect rect) {
+        this.rect = rect;
+    }
 
 }

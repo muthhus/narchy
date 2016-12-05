@@ -17,16 +17,17 @@ import org.jfxvnc.net.rfb.codec.security.vncauth.VncAuthHandshaker;
 
 public class RfbSecurityHandshakerFactory {
 
-  public RfbSecurityHandshakerFactory() {}
-
-  public static RfbSecurityHandshaker newRfbSecurityHandshaker(SecurityType securityType) {
-
-    if (securityType == SecurityType.VNC_Auth) {
-      return new VncAuthHandshaker(SecurityType.VNC_Auth);
+    public RfbSecurityHandshakerFactory() {
     }
 
-    return null;
+    public static RfbSecurityHandshaker newRfbSecurityHandshaker(SecurityType securityType) {
 
-  }
+        if (securityType == SecurityType.VNC_Auth) {
+            return new VncAuthHandshaker(SecurityType.VNC_Auth);
+        }
+
+        return null;
+
+    }
 
 }

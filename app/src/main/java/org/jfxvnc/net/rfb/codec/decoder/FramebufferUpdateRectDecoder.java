@@ -29,125 +29,125 @@ import java.util.List;
 
 class FramebufferUpdateRectDecoder implements FrameDecoder {
 
-  private static final Logger logger = LoggerFactory.getLogger(FramebufferUpdateRectDecoder.class);
+    private static final Logger logger = LoggerFactory.getLogger(FramebufferUpdateRectDecoder.class);
 
-  private final PixelFormat pixelFormat;
+    private final PixelFormat pixelFormat;
 
-  private int numberRects, currentRect;
+    private int numberRects, currentRect;
 
-  private final EnumMap<Encoding, FrameRectDecoder> frameRectDecoder = new EnumMap<>(Encoding.class);
+    private final EnumMap<Encoding, FrameRectDecoder> frameRectDecoder = new EnumMap<>(Encoding.class);
 
-  private State state;
+    private State state;
 
-  private FrameRect rect;
+    private FrameRect rect;
 
-  enum State {
-    INIT, NEW_RECT, READ_RECT
-  }
-
-  public FramebufferUpdateRectDecoder(PixelFormat pixelFormat) {
-    this.pixelFormat = pixelFormat;
-    state = State.INIT;
-    registerFrameRectDecoder();
-  }
-
-  private void registerFrameRectDecoder() {
-
-    frameRectDecoder.put(Encoding.ZLIB, new ZlibRectDecoder(pixelFormat));
-    frameRectDecoder.put(Encoding.COPY_RECT, new CopyRectDecoder(pixelFormat));
-    frameRectDecoder.put(Encoding.HEXTILE, new HextileDecoder(pixelFormat));
-    frameRectDecoder.put(Encoding.RAW, new RawRectDecoder(pixelFormat));
-    frameRectDecoder.put(Encoding.CURSOR, new CursorRectDecoder(pixelFormat));
-    frameRectDecoder.put(Encoding.DESKTOP_SIZE, new DesktopSizeRectDecoder(pixelFormat));
-  }
-
-  public static Encoding[] getSupportedEncodings() {
-    return new Encoding[] {Encoding.ZLIB, Encoding.COPY_RECT, Encoding.HEXTILE, Encoding.RAW, Encoding.CURSOR, Encoding.DESKTOP_SIZE};
-  }
-
-  public boolean isPixelFormatSupported() {
-    logger.debug("is pixelformat supported: {}", pixelFormat);
-    return true;// PixelFormat.RGB_888.equals(pixelFormat);
-  }
-
-  @Override
-  public boolean decode(ChannelHandlerContext ctx, ByteBuf m, List<Object> out) throws Exception {
-
-    if (state == State.INIT) {
-      logger.trace("init readable {} bytes", m.readableBytes());
-      if (!m.isReadable()) {
-        return false;
-      }
-      if (m.getByte(0) != ServerEvent.FRAMEBUFFER_UPDATE.getType()) {
-        logger.error("no FBU type!!! {}", m.getByte(0));
-        ctx.fireChannelReadComplete();
-        return false;
-      }
-      if (!m.isReadable(4)) {
-        return false;
-      }
-      m.skipBytes(2); // padding
-      numberRects = m.readUnsignedShort();
-      currentRect = 0;
-      logger.trace("number of rectangles: {}", numberRects);
-      if (numberRects < 1) {
-        return true;
-      }
-      state = State.NEW_RECT;
+    enum State {
+        INIT, NEW_RECT, READ_RECT
     }
 
-    if (state == State.NEW_RECT) {
-      if (!readRect(ctx, m, out)) {
-        return false;
-      }
-      state = State.READ_RECT;
-    }
-
-    FrameRectDecoder dec = frameRectDecoder.get(rect.getEncoding());
-    if (dec == null) {
-      throw new ProtocolException("Encoding not supported: " + rect.getEncoding());
-    }
-    dec.setRect(rect);
-    if (!dec.decode(ctx, m, out)) {
-      return false;
-    }
-
-    if (currentRect == numberRects) {
-      state = State.INIT;
-      ctx.fireUserEventTriggered(ProtocolState.FBU_REQUEST);
-      return true;
-    }
-
-    if (!readRect(ctx, m, out)) {
-      state = State.NEW_RECT;
-    }
-    return false;
-  }
-
-  
-  private boolean readRect(ChannelHandlerContext ctx, ByteBuf m, List<Object> out) {
-    if (!m.isReadable(12)) {
-      return false;
-    }
-    int x = m.readUnsignedShort();
-    int y = m.readUnsignedShort();
-    int w = m.readUnsignedShort();
-    int h = m.readUnsignedShort();
-    int enc = m.readInt();
-
-    rect = new FrameRect(x, y, w, h, Encoding.valueOf(enc));
-    currentRect++;
-    logger.trace("{}of{} - ({}) {}", currentRect, numberRects, rect, enc);
-
-    if (w == 0 || h == 0) {
-      if (currentRect == numberRects) {
+    public FramebufferUpdateRectDecoder(PixelFormat pixelFormat) {
+        this.pixelFormat = pixelFormat;
         state = State.INIT;
-        ctx.fireUserEventTriggered(ProtocolState.FBU_REQUEST);
-        return true;
-      }
-      return false;
+        registerFrameRectDecoder();
     }
-    return true;
-  }
+
+    private void registerFrameRectDecoder() {
+
+        frameRectDecoder.put(Encoding.ZLIB, new ZlibRectDecoder(pixelFormat));
+        frameRectDecoder.put(Encoding.COPY_RECT, new CopyRectDecoder(pixelFormat));
+        frameRectDecoder.put(Encoding.HEXTILE, new HextileDecoder(pixelFormat));
+        frameRectDecoder.put(Encoding.RAW, new RawRectDecoder(pixelFormat));
+        frameRectDecoder.put(Encoding.CURSOR, new CursorRectDecoder(pixelFormat));
+        frameRectDecoder.put(Encoding.DESKTOP_SIZE, new DesktopSizeRectDecoder(pixelFormat));
+    }
+
+    public static Encoding[] getSupportedEncodings() {
+        return new Encoding[]{Encoding.ZLIB, Encoding.COPY_RECT, Encoding.HEXTILE, Encoding.RAW, Encoding.CURSOR, Encoding.DESKTOP_SIZE};
+    }
+
+    public boolean isPixelFormatSupported() {
+        logger.debug("is pixelformat supported: {}", pixelFormat);
+        return true;// PixelFormat.RGB_888.equals(pixelFormat);
+    }
+
+    @Override
+    public boolean decode(ChannelHandlerContext ctx, ByteBuf m, List<Object> out) throws Exception, ProtocolException {
+
+        if (state == State.INIT) {
+            logger.trace("init readable {} bytes", m.readableBytes());
+            if (!m.isReadable()) {
+                return false;
+            }
+            if (m.getByte(0) != ServerEvent.FRAMEBUFFER_UPDATE.getType()) {
+                logger.error("no FBU type!!! {}", m.getByte(0));
+                ctx.fireChannelReadComplete();
+                return false;
+            }
+            if (!m.isReadable(4)) {
+                return false;
+            }
+            m.skipBytes(2); // padding
+            numberRects = m.readUnsignedShort();
+            currentRect = 0;
+            logger.trace("number of rectangles: {}", numberRects);
+            if (numberRects < 1) {
+                return true;
+            }
+            state = State.NEW_RECT;
+        }
+
+        if (state == State.NEW_RECT) {
+            if (!readRect(ctx, m, out)) {
+                return false;
+            }
+            state = State.READ_RECT;
+        }
+
+        FrameRectDecoder dec = frameRectDecoder.get(rect.getEncoding());
+        if (dec == null) {
+            throw new ProtocolException("Encoding not supported: " + rect.getEncoding());
+        }
+        dec.setRect(rect);
+        if (!dec.decode(ctx, m, out)) {
+            return false;
+        }
+
+        if (currentRect == numberRects) {
+            state = State.INIT;
+            ctx.fireUserEventTriggered(ProtocolState.FBU_REQUEST);
+            return true;
+        }
+
+        if (!readRect(ctx, m, out)) {
+            state = State.NEW_RECT;
+        }
+        return false;
+    }
+
+
+    private boolean readRect(ChannelHandlerContext ctx, ByteBuf m, List<Object> out) {
+        if (!m.isReadable(12)) {
+            return false;
+        }
+        int x = m.readUnsignedShort();
+        int y = m.readUnsignedShort();
+        int w = m.readUnsignedShort();
+        int h = m.readUnsignedShort();
+        int enc = m.readInt();
+
+        rect = new FrameRect(x, y, w, h, Encoding.valueOf(enc));
+        currentRect++;
+        logger.trace("{}of{} - ({}) {}", currentRect, numberRects, rect, enc);
+
+        if (w == 0 || h == 0) {
+            if (currentRect == numberRects) {
+                state = State.INIT;
+                ctx.fireUserEventTriggered(ProtocolState.FBU_REQUEST);
+                return true;
+            }
+            return false;
+        }
+        return true;
+    }
 
 }

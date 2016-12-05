@@ -20,18 +20,18 @@ import org.jfxvnc.net.rfb.codec.security.SecurityType;
 
 public class VncAuthHandshaker extends RfbSecurityHandshaker {
 
-  public VncAuthHandshaker(SecurityType securityType) {
-    super(securityType);
-  }
+    public VncAuthHandshaker(SecurityType securityType) {
+        super(securityType);
+    }
 
-  @Override
-  public RfbSecurityDecoder newSecurityDecoder() {
-    return new VncAuthDecoder();
-  }
+    @Override
+    public RfbSecurityDecoder newSecurityDecoder() {
+        return new VncAuthDecoder();
+    }
 
-  @Override
-  public RfbSecurityEncoder newSecurityEncoder() {
-    return new VncAuthEncoder();
-  }
+    @Override
+    public RfbSecurityEncoder newSecurityEncoder() {
+        return new VncAuthEncoder();
+    }
 
 }

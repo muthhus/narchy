@@ -24,59 +24,59 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public abstract class RfbClientHandshaker {
 
-  private static final Logger logger = LoggerFactory.getLogger(RfbClientHandshaker.class);
+    private static final Logger logger = LoggerFactory.getLogger(RfbClientHandshaker.class);
 
-  public abstract RfbClientDecoder newRfbClientDecoder();
+    public abstract RfbClientDecoder newRfbClientDecoder();
 
-  public abstract RfbClientEncoder newRfbClientEncoder();
+    public abstract RfbClientEncoder newRfbClientEncoder();
 
-  private final AtomicBoolean handshakeComplete = new AtomicBoolean(false);
+    private final AtomicBoolean handshakeComplete = new AtomicBoolean(false);
 
-  private final ProtocolVersion version;
+    private final ProtocolVersion version;
 
-  public RfbClientHandshaker(ProtocolVersion version) {
-    this.version = version;
-  }
+    public RfbClientHandshaker(ProtocolVersion version) {
+        this.version = version;
+    }
 
-  public boolean isHandshakeComplete() {
-    return handshakeComplete.get();
-  }
+    public boolean isHandshakeComplete() {
+        return handshakeComplete.get();
+    }
 
-  private void setHandshakeComplete() {
-    handshakeComplete.set(true);
-  }
+    private void setHandshakeComplete() {
+        handshakeComplete.set(true);
+    }
 
-  public ChannelFuture handshake(Channel channel) {
-    return handshake(channel, channel.newPromise());
-  }
+    public ChannelFuture handshake(Channel channel) {
+        return handshake(channel, channel.newPromise());
+    }
 
-  public final ChannelFuture handshake(Channel channel, final ChannelPromise promise) {
+    public final ChannelFuture handshake(Channel channel, final ChannelPromise promise) {
 
-    channel.writeAndFlush(Unpooled.wrappedBuffer(version.getBytes())).addListener((ChannelFuture future) -> {
-      if (!future.isSuccess()) {
-        promise.setFailure(future.cause());
-        return;
-      }
+        channel.writeAndFlush(Unpooled.wrappedBuffer(version.getBytes())).addListener((ChannelFuture future) -> {
+            if (!future.isSuccess()) {
+                promise.setFailure(future.cause());
+                return;
+            }
 
-      ChannelPipeline p = future.channel().pipeline();
-      ChannelHandlerContext ctx = p.context(ProtocolHandshakeHandler.class);
-      p.addBefore(ctx.name(), "rfb-handshake-decoder", newRfbClientDecoder());
-      p.addBefore(ctx.name(), "rfb-handshake-encoder", newRfbClientEncoder());
-      promise.setSuccess();
+            ChannelPipeline p = future.channel().pipeline();
+            ChannelHandlerContext ctx = p.context(ProtocolHandshakeHandler.class);
+            p.addBefore(ctx.name(), "rfb-handshake-decoder", newRfbClientDecoder());
+            p.addBefore(ctx.name(), "rfb-handshake-encoder", newRfbClientEncoder());
+            promise.setSuccess();
 
-    });
-    return promise;
-  }
+        });
+        return promise;
+    }
 
-  public final void finishHandshake(Channel channel, ProtocolVersion response) {
-    setHandshakeComplete();
+    public final void finishHandshake(Channel channel, ProtocolVersion response) {
+        setHandshakeComplete();
 
-    ChannelPipeline p = channel.pipeline();
-    p.remove("rfb-handshake-decoder");
-    p.remove("rfb-handshake-encoder");
+        ChannelPipeline p = channel.pipeline();
+        p.remove("rfb-handshake-decoder");
+        p.remove("rfb-handshake-encoder");
 
-    logger.debug("server {} - client {}", version, response);
+        logger.debug("server {} - client {}", version, response);
 
-  }
+    }
 
 }

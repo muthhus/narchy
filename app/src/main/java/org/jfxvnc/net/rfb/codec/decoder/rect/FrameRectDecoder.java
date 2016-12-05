@@ -17,6 +17,6 @@ import org.jfxvnc.net.rfb.codec.decoder.FrameDecoder;
 
 public interface FrameRectDecoder extends FrameDecoder {
 
-  void setRect(FrameRect rect);
+    void setRect(FrameRect rect);
 
 }

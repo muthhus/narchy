@@ -22,26 +22,27 @@ import java.util.List;
 
 public class CopyRectDecoder implements FrameRectDecoder {
 
-  private FrameRect rect;
+    private FrameRect rect;
 
-  public CopyRectDecoder(PixelFormat pixelFormat) {}
-
-  @Override
-  public boolean decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) throws Exception {
-
-    if (!in.isReadable(4)) {
-      return false;
+    public CopyRectDecoder(PixelFormat pixelFormat) {
     }
-    int sryX = in.readShort();
-    int srcY = in.readShort();
 
-    out.add(new CopyImageRect(rect.getX(), rect.getY(), rect.getWidth(), rect.getHeight(), sryX, srcY));
-    return true;
-  }
+    @Override
+    public boolean decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) throws Exception {
 
-  @Override
-  public void setRect(FrameRect rect) {
-    this.rect = rect;
-  }
+        if (!in.isReadable(4)) {
+            return false;
+        }
+        int sryX = in.readShort();
+        int srcY = in.readShort();
+
+        out.add(new CopyImageRect(rect.getX(), rect.getY(), rect.getWidth(), rect.getHeight(), sryX, srcY));
+        return true;
+    }
+
+    @Override
+    public void setRect(FrameRect rect) {
+        this.rect = rect;
+    }
 
 }
