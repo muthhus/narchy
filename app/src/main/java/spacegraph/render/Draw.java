@@ -27,6 +27,7 @@ package spacegraph.render;
 import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.util.ImmModeSink;
+import com.jogamp.opengl.util.texture.Texture;
 import nars.$;
 import nars.util.list.FasterList;
 import org.apache.commons.io.IOUtils;
@@ -49,6 +50,7 @@ import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.List;
 
+import static com.jogamp.opengl.GL.GL_TEXTURE;
 import static com.jogamp.opengl.util.gl2.GLUT.STROKE_MONO_ROMAN;
 import static spacegraph.math.v3.v;
 import static spacegraph.render.JoglSpace.glut;
@@ -474,6 +476,7 @@ public enum Draw {
         gl.glEnd();
     }
 
+
     public static void rectStroke(GL2 gl, float x1, float y1, float w, float h) {
         gl.glBegin(GL2.GL_LINE_STRIP);
         gl.glVertex2f(x1, y1);
@@ -500,18 +503,47 @@ public enum Draw {
 //        gl.glEnd();
     }
 
+
+
     public static void rect(GL2 gl, float x1, float y1, float w, float h, float z) {
         if (z == 0) {
             rect(gl, x1, y1, w, h);
         } else {
             //TODO maybe translate z then call above method?
             gl.glBegin(GL2.GL_QUADS);
+            gl.glNormal3f(0,0,1);
             gl.glVertex3f(x1, y1, z);
             gl.glVertex3f(x1 + w, y1, z);
             gl.glVertex3f(x1 + w, y1 + h, z);
             gl.glVertex3f(x1, y1 + h, z);
             gl.glEnd();
         }
+    }
+    public static void rectTex(GL2 gl, float x1, float y1, float w, float h, float z) {
+
+//        gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_LINEAR);
+//        gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_LINEAR);
+
+//        //TextureIO.newTexture()
+//        texture.enable(gl);
+//        texture.bind(gl);
+//        gl.glEnable(GL_TEXTURE);
+
+        gl.glBegin(GL2.GL_QUADS);
+
+        gl.glNormal3f(0,0,1);
+        gl.glTexCoord2f(0.0f, 0.0f);
+        gl.glVertex3f(x1, y1, z);
+        gl.glTexCoord2f(1.0f, 0.0f);
+        gl.glVertex3f(x1 + w, y1, z);
+        gl.glTexCoord2f(1.0f, 1.0f);
+        gl.glVertex3f(x1 + w, y1 + h, z);
+        gl.glTexCoord2f(0.0f, 1.0f);
+        gl.glVertex3f(x1, y1 + h, z);
+        gl.glEnd();
+
+        gl.glDisable(GL_TEXTURE);
+
     }
 
     /**

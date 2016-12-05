@@ -30,7 +30,7 @@ public class VncCanvas implements BiConsumer<ServerDecoderEvent, ImageRect> {
 
     private final static org.slf4j.Logger logger = LoggerFactory.getLogger(VncCanvas.class);
 
-    private WritableImage vncImage;
+    public WritableImage vncImage;
 
 //    private PointerEventHandler pointerHandler;
 //    private CutTextEventHandler cutTextHandler;
@@ -166,7 +166,7 @@ public class VncCanvas implements BiConsumer<ServerDecoderEvent, ImageRect> {
 
     }
 
-    private void setImage(WritableImage vncImage) {
+    protected void setImage(WritableImage vncImage) {
         this.vncImage = vncImage;
     }
 

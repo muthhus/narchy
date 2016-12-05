@@ -217,6 +217,8 @@ public class Activation {
         Term sourceTerm = src.term();
         Term targetTerm = target.term();
 
+
+
         if (((scale / 2f) >= minScale) && !targetTerm.equals(sourceTerm)) {
 
 //            Budget a;
@@ -232,13 +234,21 @@ public class Activation {
 
             /* insert termlink target to source */
             //boolean alsoReverse = true;
+            float tlFlow = Param.ACTIVATION_TERMLINK_BALANCE;
+
             if (targetConcept != null /*&& alsoReverse*/) {
-                targetConcept.termlinks().put(sourceTerm, in, scale/2f, linkOverflow);
+
+                final float tlForward = scale * tlFlow;
+                if (tlForward >= minScale)
+                    targetConcept.termlinks().put(sourceTerm, in, tlForward, linkOverflow);
             }
 
             /* insert termlink source to target */
-            src.termlinks().put(targetTerm, in, scale/2f, linkOverflow);
+            final float tlReverse = scale * (1f - tlFlow);
+            if (tlReverse >= minScale)
+                src.termlinks().put(targetTerm, in, tlReverse, linkOverflow);
 
+            //System.out.println(src + "<-" + sourceTerm + " -> " + target + "<-" + targetTerm);
         }
 
         if (targetConcept != null && depth <= tasklinkDepth && in instanceof Task) {
