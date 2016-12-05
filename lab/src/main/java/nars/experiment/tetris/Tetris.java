@@ -44,8 +44,8 @@ public class Tetris extends NAgents {
 
 
     public static final int tetris_width = 6;
-    public static final int tetris_height = 20;
-    public static final int TIME_PER_FALL = 16;
+    public static final int tetris_height = 12;
+    public static final int TIME_PER_FALL = 4;
     public static final int PIXEL_RADIX = 2;
     private static SensorConcept[][] concept;
     private int afterlife = TIME_PER_FALL * tetris_height * tetris_width;

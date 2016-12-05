@@ -69,7 +69,7 @@ abstract public class DynamicTruthModel {
                     @Nullable DynTruth ndt = ((DynamicBeliefTable) table).truth(when + dt, now, (Compound) subterm, evi);
                     if (ndt!=null) {
                         Truth ntt = ndt.truth();
-                        if (ntt != null && add(d, ntt.negated(negated), confMin)) {
+                        if (ntt != null && add(i, d, ntt.negated(negated), confMin)) {
                             if (d.e != null) {
                                 d.e.addAll(ndt.e);
                             }
@@ -81,7 +81,7 @@ abstract public class DynamicTruthModel {
                     }
                 } else {
                     nt = table.truth(when + dt, now);
-                    if (nt != null && add(d, nt.negated(negated), confMin)) {
+                    if (nt != null && add(i, d, nt.negated(negated), confMin)) {
                         if (d.e != null) {
                             Task bt = table.match(when + dt, now);
                             if (bt != null) {
@@ -111,9 +111,17 @@ abstract public class DynamicTruthModel {
 
     abstract public @NotNull Term[] components(Compound superterm);
 
-    protected abstract DynTruth eval(Compound template, long when, boolean stamp, NAR n);
+    //protected abstract DynTruth eval(Compound template, long when, boolean stamp, NAR n);
 
-    protected abstract boolean add(DynTruth d, Truth t, float confMin);
+    protected DynTruth eval(Compound template, long when, boolean stamp, NAR n) {
+
+        DynTruth d = new DynTruth(stamp? $.newArrayList(0) : null);
+        d.freq = d.conf = 1f;
+        return d;
+
+    }
+
+    protected abstract boolean add(int subterm, DynTruth d, Truth t, float confMin);
 
 
     /**
@@ -209,7 +217,7 @@ abstract public class DynamicTruthModel {
         }
 
         @Override
-        protected boolean add(DynTruth d, Truth truth, float confMin) {
+        protected boolean add(int subterm, DynTruth d, Truth truth, float confMin) {
 
             //specific to Truth.Intersection:
             d.conf *= c(truth.conf());
@@ -237,13 +245,42 @@ abstract public class DynamicTruthModel {
             return comp;
         }
 
+    }
+
+    public static class Difference extends DynamicTruthModel {
+        private final Term[] components;
+        private Truth tx, ty;
+
+        public Difference(Term x, Term y) {
+            super();
+            this.components = new Term[] { x, y };
+        }
+
+        @NotNull
         @Override
-        protected DynTruth eval(Compound template, long when, boolean stamp, NAR n) {
+        public Term[] components(Compound superterm) {
+            return components;
+        }
 
-            DynTruth d = new DynTruth(stamp? $.newArrayList(0) : null);
-            d.freq = d.conf = 1f;
+        @Override
+        protected DynTruth commit(DynTruth d) {
+            //intersection(a, b.negated(), minConf);
+            d.freq = tx.freq() * (1f - ty.freq());
+            d.conf = tx.conf() * ty.conf();
             return d;
+        }
 
+        @Override
+        protected boolean add(int subterm, DynTruth d, Truth t, float confMin) {
+            if (subterm == 0)
+                tx = t;
+            else {
+                ty = t;
+                if (t.conf() * tx.conf() < confMin) //early termination check
+                    return false;
+            }
+
+            return true;
         }
     }
 }

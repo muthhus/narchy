@@ -27,8 +27,6 @@ import boofcv.factory.geo.*;
 import boofcv.gui.d3.ColorPoint3D;
 import boofcv.gui.feature.AssociationPanel;
 import boofcv.gui.image.ShowImages;
-import boofcv.gui.stereo.RectifiedPairPanel;
-import boofcv.misc.BoofMiscOps;
 import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.distort.DoNothingTransform_F64;
 import boofcv.struct.distort.PointTransform_F64;
@@ -36,25 +34,28 @@ import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.BrightFeature;
 import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.geo.AssociatedPair;
-import boofcv.struct.image.*;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageGray;
+import boofcv.struct.image.InterleavedU8;
 import com.github.sarxos.webcam.Webcam;
+import com.jogamp.opengl.GL2;
 import georegression.geometry.ConvertRotation3D_F64;
-import georegression.geometry.GeometryMath_F64;
 import georegression.struct.EulerType;
 import georegression.struct.point.Point2D_F64;
-import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
-import georegression.transform.se.SePointOps_F64;
 import nars.util.Util;
 import nars.util.list.CircularArrayList;
-import objenome.impl.ArrayQueue;
 import org.ddogleg.fitting.modelset.ModelFitter;
 import org.ddogleg.fitting.modelset.ModelManager;
 import org.ddogleg.fitting.modelset.ModelMatcher;
 import org.ddogleg.fitting.modelset.ransac.Ransac;
 import org.ddogleg.struct.FastQueue;
 import org.ejml.data.DenseMatrix64F;
+import spacegraph.AbstractSpatial;
+import spacegraph.SpaceGraph;
+import spacegraph.render.Draw;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -63,10 +64,9 @@ import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.nio.ByteBuffer;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Deque;
+import java.util.*;
 import java.util.List;
+import java.util.function.Consumer;
 
 
 /**
@@ -80,8 +80,8 @@ import java.util.List;
 public class ExampleStereoTwoViewsOneCamera {
 
     // Disparity calculation parameters
-    private static final int minDisparity = 5;
-    private static final int maxDisparity = 95;
+    private static final int minDisparity = 15;
+    private static final int maxDisparity = 50;
 
     static class Frame {
         InterleavedU8 cam;
@@ -139,7 +139,7 @@ public class ExampleStereoTwoViewsOneCamera {
 
         // display the results
         AssociationPanel assoPanel = new AssociationPanel(20);
-        assoPanel.setPreferredSize(new Dimension(800, 800));
+        assoPanel.setPreferredSize(new Dimension(800, 200));
         ShowImages.showWindow(assoPanel, "Inlier Features");
 
         Webcam w = Webcam.getDefault();
@@ -152,7 +152,12 @@ public class ExampleStereoTwoViewsOneCamera {
 
 
 
+
         //BufferedImage outPrev = null, outNext = null;
+
+        ModelMatcher<Se3_F64, AssociatedPair> epipolarMotion =
+                FactoryMultiViewRobust.essentialRansac(new ConfigEssential(intrinsic),
+                        new ConfigRansac(100, 0.5));
 
         while (true) {
             synchronized (frames) {
@@ -170,12 +175,8 @@ public class ExampleStereoTwoViewsOneCamera {
                     Frame next = new Frame(pw, ph, w);
 
 
-
                     for (Frame prev : frames) {
 
-                        ModelMatcher<Se3_F64, AssociatedPair> epipolarMotion =
-                                FactoryMultiViewRobust.essentialRansac(new ConfigEssential(intrinsic),
-                                        new ConfigRansac(200, 0.5));
 
                         // Input images with lens distortion
                         //GrayU8 distortedPrev = ConvertImage.average(prev, null);
@@ -207,7 +208,9 @@ public class ExampleStereoTwoViewsOneCamera {
 
                         if (leftToRight != null) {
 
-                            drawInliers(assoPanel, prev.cam, next.cam, intrinsic, epipolarMotion.getMatchSet());
+                            if (prev.cam!=null && next.cam!=null)
+                                drawInliers(assoPanel, prev.cam, next.cam, intrinsic, epipolarMotion.getMatchSet());
+
 
                             // Rectify and remove lens distortion for stereo processing
                             DenseMatrix64F rectifiedK = new DenseMatrix64F(3, 3);
@@ -220,7 +223,7 @@ public class ExampleStereoTwoViewsOneCamera {
                             // compute disparity
                             StereoDisparity<GrayF32, GrayF32> disparityAlg =
                                     FactoryStereoDisparity.regionSubpixelWta(DisparityAlgorithms.RECT_FIVE,
-                                            minDisparity, maxDisparity, 5, 5, 40, 1, 0.5, GrayF32.class);
+                                            minDisparity, maxDisparity, 3, 3, 40, 1, 0.1, GrayF32.class);
 
                             // Apply the Laplacian across the image to add extra resistance to changes in lighting or camera gain
                             GrayF32 derivPrev = new GrayF32(rectifiedPrev.width, rectifiedPrev.height);
@@ -267,7 +270,7 @@ public class ExampleStereoTwoViewsOneCamera {
                     }
                 }
 
-                //Util.sleep(20);
+                Util.sleep(20);
 
             }
         }
@@ -743,9 +746,10 @@ public class ExampleStereoTwoViewsOneCamera {
      *
      * @author Peter Abeles
      */
-    public static class DisparityPointCloudViewer extends JPanel {
-        final Deque<ColorPoint3D> cloud = new ArrayDeque<ColorPoint3D>();
-        final int capacity = 2000;
+    public static class DisparityPointCloudViewer extends AbstractSpatial {
+
+        final int capacity = 8000;
+        final CircularArrayList<ColorPoint3D> cloud = new CircularArrayList<ColorPoint3D>(capacity);
 
         // distance between the two camera centers
         double baseline;
@@ -771,7 +775,7 @@ public class ExampleStereoTwoViewsOneCamera {
 
         // Data structure that contains the visible point at each pixel
         // size = width*height, row major format
-        Pixel data[] = new Pixel[0];
+        //Pixel data[] = new Pixel[0];
 
         // tilt angle in degrees
         public int tiltAngle;
@@ -781,6 +785,11 @@ public class ExampleStereoTwoViewsOneCamera {
         PointTransform_F64 rectifiedToColor;
         // storage for color image coordinate
         Point2D_F64 colorPt = new Point2D_F64();
+        private int w, h;
+
+        public DisparityPointCloudViewer() {
+            super(UUID.randomUUID());
+        }
 
 
         /**
@@ -872,7 +881,15 @@ public class ExampleStereoTwoViewsOneCamera {
 //            }
         }
 
+
+        @Override
+        public void forEachBody(Consumer c) {
+
+        }
+
         private void process(GrayF32 disparity, BufferedImage img) {
+            w = img.getWidth();
+            h = img.getHeight();
 
             trim();
 
@@ -890,8 +907,8 @@ public class ExampleStereoTwoViewsOneCamera {
                     if (value == 0)
                         continue;
 
-
-                    ColorPoint3D p = cloud.size() > capacity ? cloud.removeFirst() : new ColorPoint3D();
+                    boolean cap = cloud.size() >= capacity;
+                    ColorPoint3D p = cap ? cloud.removeFirst() : new ColorPoint3D();
 
                     // Note that this will be in the rectified left camera's reference frame.
                     // An additional rotation is needed to put it into the original left camera frame.
@@ -915,82 +932,93 @@ public class ExampleStereoTwoViewsOneCamera {
             //}
         }
 
+
         @Override
-        public void paintComponent(Graphics g) {
-            //super.paintComponent(g);
+        public void renderAbsolute(GL2 gl) {
 
-            Pixel[] d = this.data;
-            if (d.length == 0)
-                return;
 
-            int width = getWidth();
-            int h = getHeight();
+            if ((w > 0) && (h > 0)) {
+                /*synchronized (cloud)*/ {
+                    float scale = 1f/100f;
+                    float dw = 1f / w;
+                    float dh = 1f / h;
+                    cloud.forEach(p->{
 
-            int r = 2;
-            int w = r * 2 + 1;
+                        int rgb = p.rgb;
+                        gl.glColor3f( 0.5f + 0.5f *(rgb & 0xff)/256f,
+                                ((rgb & 0xff00) >> 8)/256f,
+                                ((rgb & 0xff0000) >> 16)/256f);
+                        Draw.rect(gl, scale * (float) p.x, scale * (float) p.y, dw,  dh
+                                ,scale * (float) p.z);
 
-            Graphics2D g2 = (Graphics2D) g;
-
-            int index = 0;
-            for (int y = 0; y < h; y++) {
-                for (int x = 0; x < width; x++) {
-                    Pixel p = d[index++];
-                    if (p.rgb == -1)
-                        continue;
-
-                    g2.setColor(new Color(p.rgb));
-                    g2.fillRect(x - r, y - r, w, w);
-                }
-            }
-        }
-
-        private void projectScene() {
-            int w = getWidth();
-            int h = getHeight();
-
-            int N = w * h;
-
-            Pixel[] data = this.data;
-            if (data.length < N) {
-                data = this.data = new Pixel[N];
-                for (int i = 0; i < N; i++)
-                    data[i] = new Pixel();
-            } else {
-                for (int i = 0; i < N; i++)
-                    data[i].fade();
-            }
-
-            Se3_F64 pose = createWorldToCamera();
-            Point3D_F64 cameraPt = new Point3D_F64();
-            Point2D_F64 pixel = new Point2D_F64();
-
-            synchronized(cloud) {
-                for (ColorPoint3D p : cloud) {
-
-                    SePointOps_F64.transform(pose, p, cameraPt);
-                    double cz = cameraPt.z;
-
-                    pixel.x = cameraPt.x / cz;
-                    pixel.y = cameraPt.y / cz;
-
-                    GeometryMath_F64.mult(K, pixel, pixel);
-
-                    int x = (int) pixel.x;
-                    int y = (int) pixel.y;
-
-                    if (x < 0 || y < 0 || x >= w || y >= h)
-                        continue;
-
-                    Pixel d = data[y * w + x];
-                    if (d.height > cz) {
-                        d.height = cz;
-                        d.rgb = p.rgb;
-                    }
+                    });
                 }
             }
 
-            //this.data = data;
+//            int r = 2;
+//            int w = r * 2 + 1;
+
+
+//            int index = 0;
+//            for (int y = 0; y < h; y++) {
+//                for (int x = 0; x < w; x++) {
+//                    Pixel p = d[index++];
+//                    if (p.rgb == -1)
+//                        continue;
+//
+//                    Draw.rect(gl, );
+//                    g2.setColor(new Color(p.rgb));
+//                    g2.fillRect(x - r, y - r, w, w);
+//                }
+//            }
         }
+
+//        private void projectScene() {
+//
+//
+//            int N = w * h;
+//
+//            Pixel[] data = this.data;
+//            if (data.length < N) {
+//                data = this.data = new Pixel[N];
+//                for (int i = 0; i < N; i++)
+//                    data[i] = new Pixel();
+//            } else {
+//                for (int i = 0; i < N; i++)
+//                    data[i].fade();
+//            }
+//
+//            Se3_F64 pose = createWorldToCamera();
+//            Point3D_F64 cameraPt = new Point3D_F64();
+//            Point2D_F64 pixel = new Point2D_F64();
+//
+//            synchronized(cloud) {
+//                for (ColorPoint3D p : cloud) {
+//
+//                    SePointOps_F64.transform(pose, p, cameraPt);
+//                    double cz = cameraPt.z;
+//
+//                    pixel.x = cameraPt.x / cz;
+//                    pixel.y = cameraPt.y / cz;
+//
+//                    GeometryMath_F64.mult(K, pixel, pixel);
+//
+//                    int x = (int) pixel.x;
+//                    int y = (int) pixel.y;
+//
+//                    if (x < 0 || y < 0 || x >= w || y >= h)
+//                        continue;
+//
+//                    Pixel d = data[y * w + x];
+//                    if (d.height > cz) {
+//                        d.height = cz;
+//                        d.rgb = p.rgb;
+//                    }
+//                }
+//            }
+//
+//            //this.data = data;
+//        }
 
         public Se3_F64 createWorldToCamera() {
             // pick an appropriate amount of motion for the scene
@@ -1007,6 +1035,8 @@ public class ExampleStereoTwoViewsOneCamera {
 
             return a;
         }
+
+
 
         /**
          * Contains information on visible pixels
@@ -1066,12 +1096,14 @@ public class ExampleStereoTwoViewsOneCamera {
             addMouseMotionListener(this);
 
             view = new DisparityPointCloudViewer();
-            view.setSize(800, 800);
+            //view.setSize(800, 800);
 
             JToolBar toolBar = createToolBar();
 
             add(toolBar, BorderLayout.PAGE_START);
-            add(view, BorderLayout.CENTER);
+
+            SpaceGraph.window(view, 800, 800);
+            //add(view, BorderLayout.CENTER);
         }
 
         private JToolBar createToolBar() {
@@ -1119,6 +1151,7 @@ public class ExampleStereoTwoViewsOneCamera {
          * Updates the view, must be called in a GUI thread
          */
         public void process(GrayF32 disparity, BufferedImage color) {
+
             view.process(disparity, color);
 
 
@@ -1155,8 +1188,8 @@ public class ExampleStereoTwoViewsOneCamera {
         }
 
         public void update() {
-            view.projectScene();
-            view.repaint();
+//            view.projectScene();
+//            view.repaint();
         }
 
         @Override

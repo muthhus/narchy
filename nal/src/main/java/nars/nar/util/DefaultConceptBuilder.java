@@ -34,6 +34,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
+import static nars.Op.DIFFe;
+
 //import org.eclipse.collections.impl.map.mutable.ConcurrentHashMapUnsafe;
 
 /**
@@ -116,12 +118,15 @@ public class DefaultConceptBuilder implements ConceptBuilder {
                 Term subj = t.term(0);
                 Term pred = t.term(1);
 
+
+
                 Op so = subj.op();
                 Op po = pred.op();
                 if (po.atomic || po.image || po == so.PROD) {
-                    if ((so == Op.SECTi) || (so == Op.SECTe)) {
+                    if ((so == Op.SECTi) || (so == Op.SECTe) || (so == Op.DIFFi)) {
                         //(P --> M), (S --> M), notSet(S), notSet(P), neqCom(S,P) |- ((S | P) --> M), (Belief:Intersection)
                         //(P --> M), (S --> M), notSet(S), notSet(P), neqCom(S,P) |- ((S & P) --> M), (Belief:Union)
+                        //(P --> M), (S --> M), notSet(S), notSet(P), neqCom(S,P) |- ((P ~ S) --> M), (Belief:Difference)
                         Compound csubj = (Compound) subj;
                         int s = csubj.size();
                         Term[] x = new Term[s];
@@ -131,12 +136,14 @@ public class DefaultConceptBuilder implements ConceptBuilder {
                         switch(so) {
                             case SECTi: dmt = new DynamicTruthModel.Intersection(x); break;
                             case SECTe: dmt = new DynamicTruthModel.Union(x); break;
+                            case DIFFi: dmt = new DynamicTruthModel.Difference(x[0], x[1]); break;
                         }
                     }
                 } else if (so.atomic || so.image || so == so.PROD) {
-                    if ((so == Op.SECTi) || (so == Op.SECTe)) {
+                    if ((so == Op.SECTi) || (so == Op.SECTe) || (so == DIFFe)) {
                         //(M --> P), (M --> S), notSet(S), notSet(P), neqCom(S,P) |- (M --> (P & S)), (Belief:Intersection)
-                        //(M --> P), (M --> S), notSet(S), notSet(P), neqCom(S,P) |- (M --> (P | S)), (Belief:Union)                        Compound csubj = (Compound) subj;
+                        //(M --> P), (M --> S), notSet(S), notSet(P), neqCom(S,P) |- (M --> (P | S)), (Belief:Union)
+                        //(M --> P), (M --> S), notSet(S), notSet(P), neqCom(S,P) |- (M --> (P - S)), (Belief:Difference)
                         Compound cpred = (Compound) pred;
                         int s = cpred.size();
                         Term[] x = new Term[s];

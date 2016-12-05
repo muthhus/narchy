@@ -1,6 +1,8 @@
 //package nars.guifx.remote;
 //
 ////import com.airhacks.afterburner.injection.Injector;
+//
+//import com.airhacks.afterburner.injection.Injector;
 //import javafx.application.Application;
 //import javafx.application.Platform;
 //import javafx.beans.binding.Bindings;
@@ -12,10 +14,10 @@
 //import javafx.scene.Scene;
 //import javafx.scene.layout.Pane;
 //import javafx.stage.Stage;
+//import org.jfxvnc.app.persist.SessionContext;
+//import org.jfxvnc.app.presentation.MainView;
 //import org.jfxvnc.net.rfb.render.DefaultProtocolConfiguration;
 //import org.jfxvnc.net.rfb.render.ProtocolConfiguration;
-//import org.jfxvnc.ui.persist.SessionContext;
-//import org.jfxvnc.ui.presentation.MainView;
 //import org.jfxvnc.ui.service.VncRenderService;
 //
 //import java.util.logging.Logger;
@@ -68,7 +70,7 @@
 //
 //        // Injector.setModelOrService(Stage.class, stage);
 //        //Injector.setModelOrService(ProtocolConfiguration.class, Injector.instantiateModelOrService(DefaultProtocolConfiguration.class));
-//        Injector.setModelOrService(ProtocolConfiguration.class, new DefaultProtocolConfiguration());
+//        //Injector.setModelOrService(ProtocolConfiguration.class, new DefaultProtocolConfiguration());
 //
 //        VncRenderService vncService = Injector.instantiateModelOrService(VncRenderService.class);
 //
@@ -115,7 +117,7 @@
 //        VncRenderService vncService = Injector.instantiateModelOrService(VncRenderService.class);
 //
 //        vncService.fullSceenProperty().addListener((l, a, b) -> Platform.runLater(() -> { /* stage.setFullScreen(b) */ } ));
-//        vncService.restartProperty().addListener(l -> vncService.restart());
+//        //vncService.restartProperty().addListener(l -> vncService.restart());
 //        vncService.connectInfoProperty().addListener((l, a, b) -> Platform.runLater(() -> headerProperty.set(b.getServerName())));
 ////        vncService.onlineProperty().addListener((l, a, b) -> Platform.runLater(() -> {
 ////            stage.getIcons().add(b ? onlineImg : offlineImg);

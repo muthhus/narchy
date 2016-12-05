@@ -101,11 +101,34 @@
         <!--<scope>compile</scope>-->
         <!--</dependency>-->
 
+        <!--<dependency>-->
+        <!--<groupId>org.jfxvnc</groupId>-->
+        <!--<artifactId>jfxvnc-net</artifactId>-->
+        <!--<version>1.0.1</version>-->
+        <!--<scope>compile</scope>-->
+        <!--</dependency>-->
+        <!--<dependency>-->
+        <!--<groupId>org.jfxvnc</groupId>-->
+        <!--<artifactId>jfxvnc-ui</artifactId>-->
+        <!--<version>1.0.1</version>-->
+        <!--<scope>compile</scope>-->
+        <!--</dependency><dependency>-->
+        <!--<groupId>org.jfxvnc</groupId>-->
+        <!--<artifactId>jfxvnc-app</artifactId>-->
+        <!--<version>1.0.1</version>-->
+        <!--<scope>compile</scope>-->
+        <!--</dependency>-->
         <dependency>
-            <groupId>org.jfxvnc</groupId>
-            <artifactId>jfxvnc-net</artifactId>
-            <version>1.0.1</version>
-            <scope>compile</scope>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-all</artifactId>
+            <version>5.0.0.Alpha2</version>
+        </dependency>
+
+        <!-- temporary -->
+        <dependency>
+            <groupId>com.airhacks</groupId>
+            <artifactId>afterburner.fx</artifactId>
+            <version>1.7.0</version>
         </dependency>
 
         <dependency>
@@ -243,6 +266,16 @@
     </dependencies>
 
     <build>
+
+
+        <resources>
+            <resource>
+                <directory>src/main/java</directory>
+                <includes>
+                    <include>automenta/rdp/keymapping/keymaps/*</include>
+                </includes>
+            </resource>
+        </resources>
         <plugins>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
