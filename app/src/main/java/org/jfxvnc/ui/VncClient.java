@@ -164,7 +164,6 @@ public class VncClient {
 
             imageView.registerInputEventListener(vncService.inputEventListenerProperty().get());
 
-
         });
     }
 

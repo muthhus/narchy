@@ -7,6 +7,7 @@ import javafx.beans.property.SimpleDoubleProperty;
 import javafx.geometry.Dimension2D;
 import javafx.scene.Cursor;
 import javafx.scene.ImageCursor;
+import javafx.scene.canvas.Canvas;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.PixelFormat;
 import javafx.scene.image.PixelReader;
@@ -51,6 +52,7 @@ public class VncImageView extends ImageView implements BiConsumer<ServerDecoderE
         setPreserveRatio(true);
         registerListener();
     }
+
 
     public void registerListener() {
 
@@ -164,6 +166,13 @@ public class VncImageView extends ImageView implements BiConsumer<ServerDecoderE
         } finally {
             rect.release();
         }
+
+        renderOverlay(image);
+    }
+
+
+    private void renderOverlay(WritableImage image) {
+        //TODO
     }
 
     public void registerInputEventListener(InputEventListener listener) {

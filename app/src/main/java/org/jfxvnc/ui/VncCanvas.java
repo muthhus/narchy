@@ -96,7 +96,9 @@ public class VncCanvas implements BiConsumer<ServerDecoderEvent, ImageRect> {
 
     private void render(ImageRect rect) {
         try {
-            if (vncImage == null) {
+            final WritableImage img = vncImage.get();
+
+            if (img == null) {
                 logger.error("canvas image has not been initialized");
                 return;
             }
@@ -105,23 +107,23 @@ public class VncCanvas implements BiConsumer<ServerDecoderEvent, ImageRect> {
                     HextileImageRect hextileRect = (HextileImageRect) rect;
                     //PixelWriter writer = vncImage.getPixelWriter();
                     for (RawImageRect rawRect : hextileRect.getRects()) {
-                        vncImage.get().getPixelWriter().setPixels(rawRect.x, rawRect.y, rawRect.width, rawRect.height, pixelFormat.get(),
+                        img.getPixelWriter().setPixels(rawRect.x, rawRect.y, rawRect.width, rawRect.height, pixelFormat.get(),
                                 rawRect.getPixels().nioBuffer(), rawRect.getScanlineStride());
                     }
                     break;
                 case RAW:
                 case ZLIB:
                     RawImageRect rawRect = (RawImageRect) rect;
-                    vncImage.get().getPixelWriter().setPixels(rawRect.x, rawRect.y, rawRect.width, rawRect.height, pixelFormat.get(),
+                    img.getPixelWriter().setPixels(rawRect.x, rawRect.y, rawRect.width, rawRect.height, pixelFormat.get(),
                             rawRect.getPixels().nioBuffer(), rawRect.getScanlineStride());
                     break;
                 case COPY_RECT:
                     CopyImageRect copyImageRect = (CopyImageRect) rect;
-                    PixelReader reader = vncImage.get().getPixelReader();
+                    PixelReader reader = img.getPixelReader();
                     WritableImage copyRect = new WritableImage(copyImageRect.width, copyImageRect.height);
                     copyRect.getPixelWriter().setPixels(0, 0, copyImageRect.width, copyImageRect.height, reader, copyImageRect.getSrcX(),
                             copyImageRect.getSrcY());
-                    vncImage.get().getPixelWriter().setPixels(copyImageRect.x, copyImageRect.y, copyImageRect.width, copyImageRect.height,
+                    img.getPixelWriter().setPixels(copyImageRect.x, copyImageRect.y, copyImageRect.width, copyImageRect.height,
                             copyRect.getPixelReader(), 0, 0);
                     break;
                 case CURSOR:
@@ -148,7 +150,7 @@ public class VncCanvas implements BiConsumer<ServerDecoderEvent, ImageRect> {
                     setImage(new WritableImage(rect.width, rect.height));
                     break;
                 default:
-                    logger.error("not supported encoding rect: {}", rect);
+                    logger.error("unsupported encoding {}", rect);
                     break;
             }
         } catch (Exception e) {
