@@ -28,8 +28,8 @@ public class PointerEventHandler {
     private InputEventListener listener;
 
     private final BooleanProperty enabled = new SimpleBooleanProperty(false);
-    private final EventHandler<MouseEvent> mouseEventHandler;
-    private final EventHandler<ScrollEvent> scrollEventHandler;
+    public final EventHandler<MouseEvent> mouseEventHandler;
+    public final EventHandler<ScrollEvent> scrollEventHandler;
 
     private final ReadOnlyIntegerWrapper xPosProperty = new ReadOnlyIntegerWrapper(0);
     private final ReadOnlyIntegerWrapper yPosProperty = new ReadOnlyIntegerWrapper(0);

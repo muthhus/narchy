@@ -336,7 +336,7 @@ public class KeyButtonEventHandler {
         }
     }
 
-    private void fire(KeyButtonEvent msg) {
+    protected void fire(KeyButtonEvent msg) {
         if (listener != null) {
             synchronized (this) {
                 listener.sendInputEvent(msg);

@@ -33,7 +33,7 @@ public class DefaultProtocolConfiguration implements ProtocolConfiguration {
 
     private final BooleanProperty rawEnc = new SimpleBooleanProperty(true);
     private final BooleanProperty copyRectEnc = new SimpleBooleanProperty(true);
-    private final BooleanProperty hextileEnc = new SimpleBooleanProperty(false);
+    private final BooleanProperty hextileEnc = new SimpleBooleanProperty(true);
     private final BooleanProperty zlibEnc = new SimpleBooleanProperty(false);
     private final BooleanProperty clientCursor = new SimpleBooleanProperty(false);
     private final BooleanProperty desktopSize = new SimpleBooleanProperty(true);

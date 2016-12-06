@@ -23,7 +23,10 @@ import nars.remote.NAgents;
 import nars.time.RealTime;
 import nars.util.FX;
 import nars.video.PixelBag;
+import org.jfxvnc.net.rfb.codec.decoder.ServerDecoderEvent;
+import org.jfxvnc.net.rfb.codec.encoder.KeyButtonEvent;
 import org.jfxvnc.net.rfb.codec.security.SecurityType;
+import org.jfxvnc.net.rfb.render.rect.ImageRect;
 import org.jfxvnc.ui.control.VncImageView;
 import org.jfxvnc.ui.service.VncRenderService;
 import org.slf4j.LoggerFactory;
@@ -60,6 +63,13 @@ public class VncClient {
         vncService.connect();
 
         renderer = new VncCanvas() {
+
+            @Override
+            public void accept(ServerDecoderEvent event, ImageRect rect) {
+                super.accept(event, rect);
+                //System.out.println(event + " " + rect);
+            }
+
 
             @Override
             protected void setImage(WritableImage vncImage) {
@@ -129,8 +139,16 @@ public class VncClient {
 
     public void newFXWindow() {
         FX.run(()->{
-            final VncImageView imageView = new VncImageView();
+            final VncImageView imageView = new VncImageView() {
+
+                @Override
+                protected void onFired(KeyButtonEvent msg) {
+                    System.out.println("KEY: " + msg);
+                }
+            };
+
             //vncService.inputEventListenerProperty().addListener(l -> );
+
 
             renderer.vncImage.addListener((images, prev, next)->{
                 if (next!=null)
@@ -145,6 +163,7 @@ public class VncClient {
             FX.newWindow("x", new BorderPane(scrolled((imageView))));
 
             imageView.registerInputEventListener(vncService.inputEventListenerProperty().get());
+
 
         });
     }

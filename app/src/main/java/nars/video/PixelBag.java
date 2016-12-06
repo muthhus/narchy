@@ -38,12 +38,13 @@ public abstract class PixelBag implements Bitmap2D {
 
     public final float[][] pixels;
 
-    private int pixMin = 5;
+    /* > 0 */
+    float minZoomOut = 0.2f;
 
     /**
      * increase >1 to allow zoom out beyond input size (ex: thumbnail size)
      */
-    float maxZoomOut = 1;
+    float maxZoomOut = 1f;
 
     public boolean vflip = false;
     public List<ActionConcept> actions;
@@ -106,8 +107,8 @@ public abstract class PixelBag implements Bitmap2D {
         int sw = sw();
         int sh = sh();
 
-        float ew = max(Z * sw * maxZoomOut, pixMin);
-        float eh = max(Z * sh * maxZoomOut, pixMin);
+        float ew = max(Z * sw * maxZoomOut, sw * minZoomOut);
+        float eh = max(Z * sh * maxZoomOut, sh * minZoomOut);
 
 
         //margin size

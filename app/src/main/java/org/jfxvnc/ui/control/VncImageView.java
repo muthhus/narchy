@@ -14,6 +14,7 @@ import javafx.scene.image.WritableImage;
 import org.jfxvnc.net.rfb.codec.decoder.ColourMapEvent;
 import org.jfxvnc.net.rfb.codec.decoder.ServerDecoderEvent;
 import org.jfxvnc.net.rfb.codec.encoder.InputEventListener;
+import org.jfxvnc.net.rfb.codec.encoder.KeyButtonEvent;
 import org.jfxvnc.net.rfb.render.ConnectInfoEvent;
 import org.jfxvnc.net.rfb.render.rect.*;
 import org.jfxvnc.ui.CutTextEventHandler;
@@ -30,11 +31,11 @@ public class VncImageView extends ImageView implements BiConsumer<ServerDecoderE
 
     private final static org.slf4j.Logger logger = LoggerFactory.getLogger(VncImageView.class);
 
-    private WritableImage vncImage;
+    private WritableImage image;
 
-    private PointerEventHandler pointerHandler;
-    private CutTextEventHandler cutTextHandler;
-    private KeyButtonEventHandler keyHandler;
+    public PointerEventHandler pointer;
+    public CutTextEventHandler cutText;
+    public KeyButtonEventHandler keys;
 
     private ImageCursor remoteCursor;
 
@@ -102,7 +103,7 @@ public class VncImageView extends ImageView implements BiConsumer<ServerDecoderE
 
     private void render(ImageRect rect) {
         try {
-            if (vncImage == null) {
+            if (image == null) {
                 logger.error("canvas image has not been initialized");
                 return;
             }
@@ -111,23 +112,23 @@ public class VncImageView extends ImageView implements BiConsumer<ServerDecoderE
                     HextileImageRect hextileRect = (HextileImageRect) rect;
                     //PixelWriter writer = vncImage.getPixelWriter();
                     for (RawImageRect rawRect : hextileRect.getRects()) {
-                        vncImage.getPixelWriter().setPixels(rawRect.x, rawRect.y, rawRect.width, rawRect.height, pixelFormat.get(),
+                        image.getPixelWriter().setPixels(rawRect.x, rawRect.y, rawRect.width, rawRect.height, pixelFormat.get(),
                                 rawRect.getPixels().nioBuffer(), rawRect.getScanlineStride());
                     }
                     break;
                 case RAW:
                 case ZLIB:
                     RawImageRect rawRect = (RawImageRect) rect;
-                    vncImage.getPixelWriter().setPixels(rawRect.x, rawRect.y, rawRect.width, rawRect.height, pixelFormat.get(),
+                    image.getPixelWriter().setPixels(rawRect.x, rawRect.y, rawRect.width, rawRect.height, pixelFormat.get(),
                             rawRect.getPixels().nioBuffer(), rawRect.getScanlineStride());
                     break;
                 case COPY_RECT:
                     CopyImageRect copyImageRect = (CopyImageRect) rect;
-                    PixelReader reader = vncImage.getPixelReader();
+                    PixelReader reader = image.getPixelReader();
                     WritableImage copyRect = new WritableImage(copyImageRect.width, copyImageRect.height);
                     copyRect.getPixelWriter().setPixels(0, 0, copyImageRect.width, copyImageRect.height, reader, copyImageRect.getSrcX(),
                             copyImageRect.getSrcY());
-                    vncImage.getPixelWriter().setPixels(copyImageRect.x, copyImageRect.y, copyImageRect.width, copyImageRect.height,
+                    image.getPixelWriter().setPixels(copyImageRect.x, copyImageRect.y, copyImageRect.width, copyImageRect.height,
                             copyRect.getPixelReader(), 0, 0);
                     break;
                 case CURSOR:
@@ -151,8 +152,8 @@ public class VncImageView extends ImageView implements BiConsumer<ServerDecoderE
                     break;
                 case DESKTOP_SIZE:
                     logger.debug("resize image: {}", rect);
-                    vncImage = new WritableImage(rect.width, rect.height);
-                    setImage(vncImage);
+                    image = new WritableImage(rect.width, rect.height);
+                    setImage(image);
                     break;
                 default:
                     logger.error("not supported encoding rect: {}", rect);
@@ -167,43 +168,53 @@ public class VncImageView extends ImageView implements BiConsumer<ServerDecoderE
 
     public void registerInputEventListener(InputEventListener listener) {
         Objects.requireNonNull(listener, "input listener must not be null");
-        if (pointerHandler == null) {
+        if (pointer == null) {
 
-            pointerHandler = new PointerEventHandler();
-            pointerHandler.register(this);
-            pointerHandler.registerZoomLevel(zoomLevelProperty());
-            pointerHandler.enabledProperty().bind(disabledProperty().not());
+            pointer = new PointerEventHandler();
+            pointer.register(this);
+            pointer.registerZoomLevel(zoomLevelProperty());
+            pointer.enabledProperty().bind(disabledProperty().not());
         }
-        pointerHandler.setInputEventListener(listener);
+        pointer.setInputEventListener(listener);
 
-        if (keyHandler == null) {
-            keyHandler = new KeyButtonEventHandler();
-            keyHandler.register(getScene());
-            keyHandler.enabledProperty().bind(disabledProperty().not());
+        if (keys == null) {
+            keys = new KeyButtonEventHandler() {
+                @Override
+                protected void fire(KeyButtonEvent msg) {
+                    super.fire(msg);
+                    onFired(msg);
+                }
+            };
+            keys.register(getScene());
+            keys.enabledProperty().bind(disabledProperty().not());
         }
-        keyHandler.setInputEventListener(listener);
+        keys.setInputEventListener(listener);
 
-        if (cutTextHandler == null) {
-            cutTextHandler = new CutTextEventHandler();
-            cutTextHandler.enabledProperty().bind(disabledProperty().not());
+        if (cutText == null) {
+            cutText = new CutTextEventHandler();
+            cutText.enabledProperty().bind(disabledProperty().not());
         }
-        cutTextHandler.setInputEventListener(listener);
+        cutText.setInputEventListener(listener);
+    }
+
+    protected void onFired(KeyButtonEvent msg) {
+
     }
 
     public void unregisterInputEventListener() {
-        if (pointerHandler != null) {
-            pointerHandler.unregister(this);
-            pointerHandler = null;
+        if (pointer != null) {
+            pointer.unregister(this);
+            pointer = null;
         }
 
-        if (keyHandler != null) {
-            keyHandler.unregister(getScene());
-            keyHandler = null;
+        if (keys != null) {
+            keys.unregister(getScene());
+            keys = null;
         }
 
-        if (cutTextHandler != null) {
-            cutTextHandler.setInputEventListener(null);
-            cutTextHandler = null;
+        if (cutText != null) {
+            cutText.setInputEventListener(null);
+            cutText = null;
         }
     }
 
@@ -226,15 +237,15 @@ public class VncImageView extends ImageView implements BiConsumer<ServerDecoderE
     }
 
     public boolean addClipboardText(String text) {
-        if (cutTextHandler != null) {
-            cutTextHandler.addClipboardText(text);
+        if (cutText != null) {
+            cutText.addClipboardText(text);
             return true;
         }
         return false;
     }
 
     public void setConnectInfoEvent(ConnectInfoEvent e) {
-        setImage(vncImage = new WritableImage(e.getFrameWidth(), e.getFrameHeight()));
+        setImage(image = new WritableImage(e.getFrameWidth(), e.getFrameHeight()));
         setFitHeight(getImage().getHeight() * zoomLevelProperty().get());
         pixelFormat.set(DEFAULT_PIXELFORMAT);
     }
