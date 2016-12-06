@@ -1,25 +1,23 @@
 package org.jfxvnc.ui;
 
 import io.netty.buffer.ByteBuf;
-import javafx.application.Platform;
 import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.geometry.Dimension2D;
 import javafx.scene.Cursor;
 import javafx.scene.ImageCursor;
-import javafx.scene.image.ImageView;
 import javafx.scene.image.PixelFormat;
 import javafx.scene.image.PixelReader;
 import javafx.scene.image.WritableImage;
 import org.jfxvnc.net.rfb.codec.decoder.ColourMapEvent;
 import org.jfxvnc.net.rfb.codec.decoder.ServerDecoderEvent;
-import org.jfxvnc.net.rfb.codec.encoder.InputEventListener;
 import org.jfxvnc.net.rfb.render.ConnectInfoEvent;
 import org.jfxvnc.net.rfb.render.rect.*;
 import org.slf4j.LoggerFactory;
 
 import java.nio.ByteBuffer;
-import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiConsumer;
 
@@ -30,7 +28,7 @@ public class VncCanvas implements BiConsumer<ServerDecoderEvent, ImageRect> {
 
     private final static org.slf4j.Logger logger = LoggerFactory.getLogger(VncCanvas.class);
 
-    public WritableImage vncImage;
+    public final ObjectProperty<WritableImage> vncImage = new SimpleObjectProperty<>(null);
 
 //    private PointerEventHandler pointerHandler;
 //    private CutTextEventHandler cutTextHandler;
@@ -107,23 +105,23 @@ public class VncCanvas implements BiConsumer<ServerDecoderEvent, ImageRect> {
                     HextileImageRect hextileRect = (HextileImageRect) rect;
                     //PixelWriter writer = vncImage.getPixelWriter();
                     for (RawImageRect rawRect : hextileRect.getRects()) {
-                        vncImage.getPixelWriter().setPixels(rawRect.x, rawRect.y, rawRect.width, rawRect.height, pixelFormat.get(),
+                        vncImage.get().getPixelWriter().setPixels(rawRect.x, rawRect.y, rawRect.width, rawRect.height, pixelFormat.get(),
                                 rawRect.getPixels().nioBuffer(), rawRect.getScanlineStride());
                     }
                     break;
                 case RAW:
                 case ZLIB:
                     RawImageRect rawRect = (RawImageRect) rect;
-                    vncImage.getPixelWriter().setPixels(rawRect.x, rawRect.y, rawRect.width, rawRect.height, pixelFormat.get(),
+                    vncImage.get().getPixelWriter().setPixels(rawRect.x, rawRect.y, rawRect.width, rawRect.height, pixelFormat.get(),
                             rawRect.getPixels().nioBuffer(), rawRect.getScanlineStride());
                     break;
                 case COPY_RECT:
                     CopyImageRect copyImageRect = (CopyImageRect) rect;
-                    PixelReader reader = vncImage.getPixelReader();
+                    PixelReader reader = vncImage.get().getPixelReader();
                     WritableImage copyRect = new WritableImage(copyImageRect.width, copyImageRect.height);
                     copyRect.getPixelWriter().setPixels(0, 0, copyImageRect.width, copyImageRect.height, reader, copyImageRect.getSrcX(),
                             copyImageRect.getSrcY());
-                    vncImage.getPixelWriter().setPixels(copyImageRect.x, copyImageRect.y, copyImageRect.width, copyImageRect.height,
+                    vncImage.get().getPixelWriter().setPixels(copyImageRect.x, copyImageRect.y, copyImageRect.width, copyImageRect.height,
                             copyRect.getPixelReader(), 0, 0);
                     break;
                 case CURSOR:
@@ -167,7 +165,7 @@ public class VncCanvas implements BiConsumer<ServerDecoderEvent, ImageRect> {
     }
 
     protected void setImage(WritableImage vncImage) {
-        this.vncImage = vncImage;
+        this.vncImage.set( vncImage );
     }
 
 //    public void registerInputEventListener(InputEventListener listener) {

@@ -142,7 +142,7 @@ public abstract class PixelBag implements Bitmap2D {
         float pxf = px - 1;
         float pyf = py - 1;
 
-        float minClarity = 0.35f / frameRate, maxClarity = 1f / frameRate;
+        float minClarity = 0.15f / frameRate, maxClarity = 1f / frameRate;
 
         float fr = this.fr, fg = this.fg, fb = this.fb;
         float fSum = fr + fg + fb;
@@ -150,7 +150,7 @@ public abstract class PixelBag implements Bitmap2D {
         float xRange = maxX-minX;
         float yRange = maxY-minY;
 
-        int supersampling = Math.max((int) Math.ceil(xRange / px / 2f), (int) Math.ceil(yRange / py / 2f));
+        int supersampling = Math.min((int) Math.floor(xRange / px / 2f), (int) Math.floor(yRange / py / 2f));
 
         for (int ly = 0; ly < py; ly++) {
             float l = ly / pyf;
@@ -183,8 +183,8 @@ public abstract class PixelBag implements Bitmap2D {
 
                 int samples = 0;
                 float R = 0, G = 0, B = 0;
-                for (int esx = Math.max(0, sx - supersampling); esx < Math.min(sw - 1, sx + supersampling); esx++) {
-                    for (int esy = Math.max(0, sy - supersampling); esy < Math.min(sh - 1, sy + supersampling); esy++) {
+                for (int esx = Math.max(0, sx - supersampling); esx <= Math.min(sw - 1, sx + supersampling); esx++) {
+                    for (int esy = Math.max(0, sy - supersampling); esy <= Math.min(sh - 1, sy + supersampling); esy++) {
 
                         int RGB = rgb(esx, esy);
                         R += Bitmap2D.decodeRed(RGB);

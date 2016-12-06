@@ -17,16 +17,14 @@ import com.airhacks.afterburner.injection.Injector;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.PixelReader;
 import javafx.scene.image.WritableImage;
-import javafx.scene.layout.Pane;
-import nars.NAgent;
+import javafx.scene.layout.BorderPane;
 import nars.nar.Default;
 import nars.remote.NAgents;
 import nars.time.RealTime;
 import nars.util.FX;
-import nars.util.Loop;
 import nars.video.PixelBag;
-import org.jetbrains.annotations.NotNull;
 import org.jfxvnc.net.rfb.codec.security.SecurityType;
+import org.jfxvnc.ui.control.VncImageView;
 import org.jfxvnc.ui.service.VncRenderService;
 import org.slf4j.LoggerFactory;
 import spacegraph.SpaceGraph;
@@ -34,6 +32,7 @@ import spacegraph.Surface;
 import spacegraph.obj.widget.MatrixView;
 
 import static nars.$.t;
+import static nars.util.FX.scrolled;
 import static nars.video.Bitmap2D.*;
 
 /**
@@ -42,9 +41,11 @@ import static nars.video.Bitmap2D.*;
 public class VncClient {
 
     private final static org.slf4j.Logger logger = LoggerFactory.getLogger(VncClient.class);
+    private final VncCanvas renderer;
+    private final VncRenderService vncService;
 
 
-    private PixelReader reader;
+    private PixelReader vncReader;
     public WritableImage image;
 
 
@@ -52,23 +53,22 @@ public class VncClient {
 
         Injector.setLogger(logger::trace);
 
-        VncRenderService vncService = Injector.instantiateModelOrService(VncRenderService.class);
+        vncService = Injector.instantiateModelOrService(VncRenderService.class);
         vncService.getConfiguration().hostProperty().set(host);
         vncService.getConfiguration().portProperty().set(port);
         vncService.getConfiguration().securityProperty().set(SecurityType.NONE);
         vncService.connect();
 
-        VncCanvas view = new VncCanvas() {
-
+        renderer = new VncCanvas() {
 
             @Override
             protected void setImage(WritableImage vncImage) {
                 super.setImage(vncImage);
                 image = vncImage;
-                reader = vncImage.getPixelReader();
+                vncReader = vncImage.getPixelReader();
             }
         };
-        vncService.setEventConsumer(view);
+        vncService.setEventConsumer(renderer);
 
 //        SpaceGraph.window(new Surface() {
 //
@@ -129,7 +129,23 @@ public class VncClient {
 
     public void newFXWindow() {
         FX.run(()->{
-            FX.newWindow("x", new Pane(new ImageView(image)));
+            final VncImageView imageView = new VncImageView();
+            //vncService.inputEventListenerProperty().addListener(l -> );
+
+            renderer.vncImage.addListener((images, prev, next)->{
+                if (next!=null)
+                    imageView.setImage(next);
+            });
+
+            imageView.setImage(image);
+
+//            imageView.setScaleX(2);
+//            imageView.setScaleY(2);
+
+            FX.newWindow("x", new BorderPane(scrolled((imageView))));
+
+            imageView.registerInputEventListener(vncService.inputEventListenerProperty().get());
+
         });
     }
 
@@ -138,7 +154,7 @@ public class VncClient {
         int pw = 200;
         int ph = 200;
         return new MatrixView(pw, ph, (x, y, gl) -> {
-            final PixelReader reader = this.reader;
+            final PixelReader reader = this.vncReader;
             if (reader !=null) {
                 int argb = reader.getArgb(x, y);
                 gl.glColor3f(decodeRed(argb), decodeGreen(argb), decodeBlue(argb));
@@ -150,20 +166,11 @@ public class VncClient {
     public PixelBag newSensor(int pw, int ph) {
         return new PixelBag(pw, ph) {
 
-            @Override
-            public int sw() {
-                return image==null ? 0 : (int) image.getWidth();
-            }
+            @Override public int sw() { return image==null ? 0 : (int) image.getWidth(); }
 
-            @Override
-            public int sh() {
-                return image==null ? 0 : (int) image.getHeight();
-            }
+            @Override public int sh() { return image==null ? 0 : (int) image.getHeight(); }
 
-            @Override
-            public int rgb(int sx, int sy) {
-                return reader.getArgb(sx, sy);
-            }
+            @Override public int rgb(int sx, int sy) { return vncReader.getArgb(sx, sy); }
         };
     }
 
