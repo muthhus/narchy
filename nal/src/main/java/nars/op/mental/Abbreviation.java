@@ -1,5 +1,6 @@
 package nars.op.mental;
 
+import jcog.data.MutableInteger;
 import nars.*;
 import nars.bag.impl.CurveBag;
 import nars.budget.Activation;
@@ -23,7 +24,6 @@ import nars.term.container.TermContainer;
 import nars.term.container.TermVector;
 import nars.term.subst.Unify;
 import nars.truth.TruthDelta;
-import nars.util.data.MutableInteger;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;

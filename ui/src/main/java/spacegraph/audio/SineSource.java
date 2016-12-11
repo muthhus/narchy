@@ -1,6 +1,6 @@
 package spacegraph.audio;
 
-import nars.util.Util;
+import jcog.Util;
 import org.apache.commons.math3.util.FastMath;
 
 /**

@@ -1,5 +1,6 @@
 package nars.term.transform;
 
+import jcog.data.random.XorShift128PlusRandom;
 import nars.$;
 import nars.Op;
 import nars.Param;
@@ -17,7 +18,6 @@ import nars.term.Termed;
 import nars.term.atom.Atomic;
 import nars.term.subst.Unify;
 import nars.term.var.Variable;
-import nars.util.data.random.XorShift128PlusRandom;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.junit.Ignore;

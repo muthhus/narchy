@@ -1,7 +1,7 @@
 package spacegraph.render;
 
 import com.jogamp.newt.event.MouseEvent;
-import nars.util.Util;
+import jcog.Util;
 import spacegraph.AbstractSpace;
 import spacegraph.SimpleSpatial;
 import spacegraph.SpaceGraph;

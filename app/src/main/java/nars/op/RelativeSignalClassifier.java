@@ -1,7 +1,7 @@
 package nars.op;
 
+import jcog.math.FloatSupplier;
 import nars.term.Compound;
-import nars.util.math.FloatSupplier;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
 import java.util.function.IntConsumer;

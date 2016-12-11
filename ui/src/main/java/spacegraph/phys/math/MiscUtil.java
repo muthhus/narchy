@@ -23,7 +23,7 @@
 
 package spacegraph.phys.math;
 
-import nars.util.list.FasterList;
+import jcog.list.FasterList;
 import spacegraph.phys.util.FloatArrayList;
 import spacegraph.phys.util.IntArrayList;
 import spacegraph.phys.util.OArrayList;

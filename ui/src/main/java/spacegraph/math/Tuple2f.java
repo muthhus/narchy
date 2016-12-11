@@ -31,7 +31,7 @@
 
 package spacegraph.math;
 
-import nars.util.Util;
+import jcog.Util;
 import org.jetbrains.annotations.NotNull;
 import spacegraph.phys.BulletGlobals;
 

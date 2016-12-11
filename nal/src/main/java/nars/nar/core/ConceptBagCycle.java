@@ -1,5 +1,7 @@
 package nars.nar.core;
 
+import jcog.data.MutableInteger;
+import jcog.data.Range;
 import nars.$;
 import nars.NAR;
 import nars.Param;
@@ -15,8 +17,6 @@ import nars.link.BLink;
 import nars.nal.Deriver;
 import nars.nar.util.DefaultConceptBuilder;
 import nars.nar.util.PremiseMatrix;
-import nars.util.data.MutableInteger;
-import nars.util.data.Range;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.eclipse.collections.api.tuple.primitive.ObjectFloatPair;
 import org.jetbrains.annotations.NotNull;

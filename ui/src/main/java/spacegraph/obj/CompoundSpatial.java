@@ -1,6 +1,6 @@
 package spacegraph.obj;
 
-import nars.util.list.FasterList;
+import jcog.list.FasterList;
 import spacegraph.AbstractSpatial;
 import spacegraph.Spatial;
 import spacegraph.phys.Collidable;

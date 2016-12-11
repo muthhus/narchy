@@ -1,5 +1,6 @@
 package nars.concept.dynamic;
 
+import jcog.Util;
 import nars.$;
 import nars.NAR;
 import nars.Task;
@@ -12,7 +13,6 @@ import nars.term.Compound;
 import nars.truth.DynTruth;
 import nars.truth.Truth;
 import nars.truth.TruthDelta;
-import nars.util.Util;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

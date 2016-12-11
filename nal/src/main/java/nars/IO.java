@@ -4,6 +4,7 @@ import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
+import jcog.Hack;
 import nars.budget.Budgeted;
 import nars.index.term.TermIndex;
 import nars.task.MutableTask;
@@ -19,7 +20,6 @@ import nars.term.var.AbstractVariable;
 import nars.term.var.GenericVariable;
 import nars.truth.Truth;
 import nars.truth.Truthed;
-import nars.util.Hack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

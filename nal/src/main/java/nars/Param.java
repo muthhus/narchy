@@ -1,13 +1,13 @@
 package nars;
 
+import jcog.Util;
+import jcog.data.FloatParam;
+import jcog.data.MutableInteger;
+import jcog.data.Range;
 import nars.nal.Level;
 import nars.term.atom.Atom;
 import nars.truth.DefaultTruth;
 import nars.truth.Truth;
-import nars.util.Util;
-import nars.util.data.FloatParam;
-import nars.util.data.MutableInteger;
-import nars.util.data.Range;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

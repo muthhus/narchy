@@ -4,7 +4,7 @@ package nars.experiment.minicraft.side;
 //AdvancedTimer;
 
 
-import nars.util.Util;
+import jcog.Util;
 
 /**
  * A wrapper class that provides timing methods. This class

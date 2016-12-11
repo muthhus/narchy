@@ -1,14 +1,14 @@
 package nars.util.signal;
 
+import jcog.Texts;
+import jcog.Util;
+import jcog.math.FloatNormalized;
+import jcog.math.FloatPolarNormalized;
 import nars.NAR;
 import nars.concept.FuzzyScalarConcepts;
 import nars.concept.SensorConcept;
 import nars.nar.Default;
 import nars.nar.Terminal;
-import nars.util.Texts;
-import nars.util.Util;
-import nars.util.math.FloatNormalized;
-import nars.util.math.FloatPolarNormalized;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.eclipse.collections.api.block.predicate.primitive.FloatPredicate;
 import org.junit.Test;

@@ -1,13 +1,13 @@
 package nars.term.container;
 
 import com.google.common.base.Joiner;
+import jcog.Util;
 import nars.Op;
 import nars.Param;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Terms;
 import nars.term.visit.SubtermVisitorX;
-import nars.util.Util;
 import org.eclipse.collections.api.block.predicate.primitive.IntObjectPredicate;
 import org.jetbrains.annotations.NotNull;
 

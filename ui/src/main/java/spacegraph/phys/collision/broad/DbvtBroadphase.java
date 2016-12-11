@@ -25,7 +25,7 @@
 
 package spacegraph.phys.collision.broad;
 
-import nars.util.list.FasterList;
+import jcog.list.FasterList;
 import spacegraph.math.v3;
 import spacegraph.phys.Collidable;
 import spacegraph.phys.util.OArrayList;

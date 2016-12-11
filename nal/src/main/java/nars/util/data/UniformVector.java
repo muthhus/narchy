@@ -7,7 +7,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
 
-import static nars.util.Texts.n2;
+import static jcog.Texts.n2;
 
 /**
  * Represents a changing 1-dimensional array of double[], each element normalized to 0..1.0

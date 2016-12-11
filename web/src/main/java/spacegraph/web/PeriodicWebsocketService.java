@@ -1,7 +1,7 @@
 package spacegraph.web;
 
-import nars.util.Util;
-import nars.util.data.MutableInteger;
+import jcog.Util;
+import jcog.data.MutableInteger;
 
 /**
  *

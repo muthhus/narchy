@@ -1,7 +1,7 @@
 package spacegraph.obj;
 
 import com.jogamp.opengl.GL2;
-import nars.util.Util;
+import jcog.Util;
 import org.jetbrains.annotations.Nullable;
 import spacegraph.SimpleSpatial;
 import spacegraph.Surface;

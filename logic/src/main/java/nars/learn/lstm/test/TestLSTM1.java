@@ -1,8 +1,8 @@
 package nars.learn.lstm.test;
 
+import jcog.data.random.XorShift128PlusRandom;
 import nars.learn.lstm.DistractedSequenceRecall;
 import nars.learn.lstm.SimpleLSTM;
-import nars.util.data.random.XorShift128PlusRandom;
 
 import java.util.Random;
 

@@ -1,7 +1,7 @@
 package nars.learn.lstm;
 
 
-import nars.util.Util;
+import jcog.Util;
 
 import java.util.List;
 import java.util.Random;

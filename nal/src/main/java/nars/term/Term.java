@@ -21,6 +21,8 @@
 package nars.term;
 
 
+import jcog.Hack;
+import jcog.data.array.IntArrays;
 import nars.$;
 import nars.Op;
 import nars.term.atom.Atomic;
@@ -31,8 +33,6 @@ import nars.term.var.AbstractVariable;
 import nars.term.var.Variable;
 import nars.term.visit.SubtermVisitor;
 import nars.term.visit.SubtermVisitorX;
-import nars.util.Hack;
-import nars.util.data.array.IntArrays;
 import org.eclipse.collections.api.list.primitive.ByteList;
 import org.eclipse.collections.impl.factory.primitive.ByteLists;
 import org.eclipse.collections.impl.list.mutable.primitive.ByteArrayList;

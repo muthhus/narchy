@@ -1,6 +1,7 @@
 package nars.term.transform;
 
 import com.google.common.collect.Lists;
+import jcog.data.random.XorShift128PlusRandom;
 import nars.Op;
 import nars.Param;
 import nars.nal.meta.match.Ellipsis;
@@ -11,7 +12,6 @@ import nars.term.mutate.CommutivePermutations;
 import nars.term.mutate.Termutator;
 import nars.term.subst.Unify;
 import nars.term.var.Variable;
-import nars.util.data.random.XorShift128PlusRandom;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 

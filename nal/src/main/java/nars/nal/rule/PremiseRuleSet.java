@@ -1,6 +1,7 @@
 package nars.nal.rule;
 
 import com.google.common.collect.Lists;
+import jcog.Util;
 import nars.$;
 import nars.IO;
 import nars.Param;
@@ -8,7 +9,6 @@ import nars.index.term.PatternTermIndex;
 import nars.nal.Deriver;
 import nars.term.Compound;
 import nars.term.Term;
-import nars.util.Util;
 import org.eclipse.collections.api.tuple.Pair;
 import org.eclipse.collections.impl.tuple.Tuples;
 import org.jetbrains.annotations.NotNull;

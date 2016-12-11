@@ -1,5 +1,7 @@
 package nars.video;
 
+import jcog.Util;
+import jcog.signal.Autoencoder;
 import nars.$;
 import nars.NAR;
 import nars.NAgent;
@@ -7,8 +9,6 @@ import nars.Symbols;
 import nars.concept.SensorConcept;
 import nars.term.Compound;
 import nars.term.Term;
-import nars.util.Util;
-import nars.util.signal.Autoencoder;
 import spacegraph.Surface;
 import spacegraph.obj.widget.MatrixView;
 

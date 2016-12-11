@@ -1,6 +1,7 @@
 package nars.bag;
 
 import com.google.common.collect.Iterators;
+import jcog.data.random.XorShift128PlusRandom;
 import nars.Param;
 import nars.bag.impl.ArrayBag;
 import nars.bag.impl.CurveBag;
@@ -9,7 +10,6 @@ import nars.budget.Budget;
 import nars.budget.RawBudget;
 import nars.budget.merge.BudgetMerge;
 import nars.link.BLink;
-import nars.util.data.random.XorShift128PlusRandom;
 import org.apache.commons.math3.random.EmpiricalDistribution;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.eclipse.collections.impl.list.mutable.primitive.DoubleArrayList;
@@ -23,8 +23,8 @@ import java.util.List;
 import java.util.Random;
 import java.util.function.DoubleSupplier;
 
+import static jcog.Texts.n4;
 import static nars.budget.merge.BudgetMerge.plusBlend;
-import static nars.util.Texts.n4;
 import static org.junit.Assert.*;
 
 /**

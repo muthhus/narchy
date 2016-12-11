@@ -1,7 +1,7 @@
 package spacegraph.audio.granular;
 
-import nars.util.data.MutableDouble;
-import nars.util.data.random.XorShift128PlusRandom;
+import jcog.data.MutableDouble;
+import jcog.data.random.XorShift128PlusRandom;
 import spacegraph.audio.SoundProducer;
 import spacegraph.audio.sample.SonarSample;
 

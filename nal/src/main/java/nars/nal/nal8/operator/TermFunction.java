@@ -1,5 +1,6 @@
 package nars.nal.nal8.operator;
 
+import jcog.Texts;
 import nars.$;
 import nars.Narsese;
 import nars.Op;
@@ -17,7 +18,6 @@ import nars.term.var.Variable;
 import nars.time.Tense;
 import nars.truth.DefaultTruth;
 import nars.truth.Truth;
-import nars.util.Texts;
 import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

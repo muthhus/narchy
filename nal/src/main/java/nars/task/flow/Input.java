@@ -19,10 +19,10 @@
 
 package nars.task.flow;
 
+import jcog.data.buffer.Source;
+import jcog.event.On;
 import nars.NAR;
 import nars.Task;
-import nars.util.data.buffer.Source;
-import nars.util.event.On;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

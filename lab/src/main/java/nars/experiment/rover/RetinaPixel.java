@@ -1,7 +1,7 @@
 package nars.experiment.rover;
 
 import com.jogamp.opengl.GL2;
-import nars.util.Util;
+import jcog.Util;
 import spacegraph.SimpleSpatial;
 import spacegraph.math.v3;
 import spacegraph.phys.Collisions;

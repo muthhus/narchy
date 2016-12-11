@@ -1,9 +1,9 @@
 package nars.bag.impl.experimental;
 
-import nars.util.data.linkedlist.DD;
-import nars.util.data.linkedlist.DDList;
-import nars.util.data.linkedlist.DDNodePool;
-import nars.util.math.Distributor;
+import jcog.data.linkedlist.DD;
+import jcog.data.linkedlist.DDList;
+import jcog.data.linkedlist.DDNodePool;
+import jcog.math.Distributor;
 import org.apache.commons.math3.stat.descriptive.moment.Mean;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

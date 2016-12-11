@@ -1,5 +1,6 @@
 package nars.web;
 
+import jcog.data.MutableInteger;
 import nars.IO;
 import nars.NAR;
 import nars.bag.Bag;
@@ -7,7 +8,6 @@ import nars.concept.Concept;
 import nars.link.BLink;
 import nars.nar.Default;
 import nars.term.Term;
-import nars.util.data.MutableInteger;
 import spacegraph.web.PeriodicWebsocketService;
 
 import java.io.ByteArrayOutputStream;

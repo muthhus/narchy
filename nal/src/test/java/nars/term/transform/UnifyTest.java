@@ -1,12 +1,12 @@
 package nars.term.transform;
 
+import jcog.data.random.XorShift128PlusRandom;
 import nars.$;
 import nars.Op;
 import nars.Param;
 import nars.term.Term;
 import nars.term.subst.Subst;
 import nars.term.subst.Unify;
-import nars.util.data.random.XorShift128PlusRandom;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 

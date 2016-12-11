@@ -1,8 +1,8 @@
 package nars.op.time;
 
+import jcog.data.MutableInteger;
 import nars.NAR;
 import nars.Task;
-import nars.util.data.MutableInteger;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Consumer;

@@ -1,11 +1,11 @@
 package nars.experiment.minicraft;
 
+import jcog.Util;
 import nars.$;
 import nars.NAR;
 import nars.experiment.minicraft.side.SideScrollMinicraft;
 import nars.experiment.minicraft.side.awtgraphics.AwtGraphicsHandler;
 import nars.remote.NAgents;
-import nars.util.Util;
 import nars.video.PixelAutoClassifier;
 import nars.video.PixelBag;
 import nars.video.Sensor2D;

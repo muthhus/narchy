@@ -21,6 +21,7 @@ package nars.experiment.pacman0;
 
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import jcog.data.random.XorShift128PlusRandom;
 import nars.$;
 import nars.NAR;
 import nars.NAgent;
@@ -35,7 +36,6 @@ import nars.nar.util.DefaultConceptBuilder;
 import nars.op.time.MySTMClustered;
 import nars.time.FrameTime;
 import nars.truth.Truth;
-import nars.util.data.random.XorShift128PlusRandom;
 import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunction;
 import org.jetbrains.annotations.Nullable;
 

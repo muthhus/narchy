@@ -1,5 +1,6 @@
 package nars.budget.policy;
 
+import jcog.Util;
 import nars.*;
 import nars.budget.Budget;
 import nars.budget.BudgetFunctions;
@@ -9,7 +10,6 @@ import nars.nal.meta.Derivation;
 import nars.term.Termed;
 import nars.time.Tense;
 import nars.truth.Truth;
-import nars.util.Util;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

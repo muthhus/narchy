@@ -13,7 +13,7 @@ import java.util.Random;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-import static nars.util.Util.clamp;
+import static jcog.Util.clamp;
 
 /**
  * Bag which stores items, sorted, in one array.

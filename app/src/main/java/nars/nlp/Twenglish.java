@@ -17,14 +17,14 @@
 package nars.nlp;
 
 import com.google.common.collect.Lists;
+import jcog.io.Twokenize;
+import jcog.io.Twokenize.Span;
 import nars.$;
 import nars.NAR;
 import nars.Narsese;
 import nars.task.MutableTask;
 import nars.term.Term;
 import nars.term.atom.Atom;
-import nars.util.io.Twokenize;
-import nars.util.io.Twokenize.Span;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

@@ -1,12 +1,12 @@
 package nars.op.time;
 
+import jcog.data.MutableInteger;
+import jcog.event.On;
 import nars.$;
 import nars.NAR;
 import nars.Task;
 import nars.concept.Concept;
 import nars.term.Term;
-import nars.util.data.MutableInteger;
-import nars.util.event.On;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayDeque;

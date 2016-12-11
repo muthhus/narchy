@@ -23,7 +23,7 @@
 
 package spacegraph.phys.solve;
 
-import nars.util.list.FasterList;
+import jcog.list.FasterList;
 import spacegraph.phys.Collidable;
 import spacegraph.phys.collision.broad.Intersecter;
 import spacegraph.phys.collision.narrow.PersistentManifold;

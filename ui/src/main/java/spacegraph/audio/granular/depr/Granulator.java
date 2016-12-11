@@ -1,6 +1,6 @@
 package spacegraph.audio.granular.depr;
 
-import nars.util.data.random.XORShiftRandom;
+import jcog.data.random.XORShiftRandom;
 
 import java.util.ArrayList;
 import java.util.LinkedList;

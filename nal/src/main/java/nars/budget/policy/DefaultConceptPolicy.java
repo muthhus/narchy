@@ -1,9 +1,9 @@
 package nars.budget.policy;
 
+import jcog.Util;
+import jcog.data.MutableInteger;
 import nars.concept.CompoundConcept;
 import nars.concept.Concept;
-import nars.util.Util;
-import nars.util.data.MutableInteger;
 import org.jetbrains.annotations.NotNull;
 
 /**

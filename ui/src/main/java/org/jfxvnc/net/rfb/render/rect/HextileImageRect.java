@@ -13,7 +13,7 @@
  *******************************************************************************/
 package org.jfxvnc.net.rfb.render.rect;
 
-import nars.util.list.FasterList;
+import jcog.list.FasterList;
 import org.jfxvnc.net.rfb.codec.Encoding;
 
 import java.util.List;

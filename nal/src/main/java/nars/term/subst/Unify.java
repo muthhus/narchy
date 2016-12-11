@@ -1,5 +1,9 @@
 package nars.term.subst;
 
+import jcog.list.LimitedFasterList;
+import jcog.version.VersionMap;
+import jcog.version.Versioned;
+import jcog.version.Versioning;
 import nars.Op;
 import nars.index.term.TermIndex;
 import nars.nal.meta.constraint.MatchConstraint;
@@ -11,10 +15,6 @@ import nars.term.mutate.Termunator;
 import nars.term.mutate.Termutator;
 import nars.term.var.CommonVariable;
 import nars.term.var.Variable;
-import nars.util.list.LimitedFasterList;
-import nars.util.version.VersionMap;
-import nars.util.version.Versioned;
-import nars.util.version.Versioning;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

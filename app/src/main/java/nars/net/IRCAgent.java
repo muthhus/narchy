@@ -1,6 +1,9 @@
 package nars.net;
 
 import com.github.fge.grappa.exceptions.GrappaException;
+import jcog.Wiki;
+import jcog.data.random.XorShift128PlusRandom;
+import jcog.event.On;
 import nars.$;
 import nars.NAR;
 import nars.Narsese;
@@ -21,9 +24,6 @@ import nars.term.var.Variable;
 import nars.time.RealTime;
 import nars.time.Tense;
 import nars.util.Loop;
-import nars.util.Wiki;
-import nars.util.data.random.XorShift128PlusRandom;
-import nars.util.event.On;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

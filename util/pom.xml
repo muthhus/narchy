@@ -3,15 +3,11 @@
          xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>opennars</groupId>
-    <artifactId>util</artifactId>
-    <version>1.8-SNAPSHOT</version>
+    <groupId>automenta</groupId>
+    <artifactId>jcog</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
     <packaging>jar</packaging>
-    <parent>
-        <groupId>opennars</groupId>
-        <artifactId>narchy</artifactId>
-        <version>1.8-SNAPSHOT</version>
-    </parent>
+
     <inceptionYear>2016</inceptionYear>
     <licenses>
         <license>
@@ -20,6 +16,86 @@
             <distribution>repo</distribution>
         </license>
     </licenses>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+        <maven.compiler.source>1.9</maven.compiler.source>
+        <maven.compiler.target>1.9</maven.compiler.target>
+    </properties>
+
+
+
+    <reporting>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>2.10.3</version>
+                <configuration>
+                    <failOnError>false</failOnError>
+                    <force>true</force>
+                </configuration>
+            </plugin>
+        </plugins>
+    </reporting>
+
+    <build>
+
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <version>2.19.1</version>
+                    <configuration>
+
+                        <skipTests>true</skipTests> <!-- WARNING -->
+
+                        <testFailureIgnore>true</testFailureIgnore>
+                        <disableXmlReport>true</disableXmlReport>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+        <plugins>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.5.1</version>
+                <configuration>
+
+                    <!--<showWarnings>true</showWarnings>-->
+                    <!--<verbose>true</verbose>-->
+                    <useIncrementalCompilation>true</useIncrementalCompilation>
+
+                    <!--<fork>true</fork>-->
+                    <source>1.9</source>
+                    <target>1.9</target>
+                    <!--<useIncrementalCompilation>true</useIncrementalCompilation>-->
+
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>1.5.0</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.0.0</version>
+            </plugin>
+            <!--<plugin>-->
+            <!--<groupId>org.apache.maven.plugins</groupId>-->
+            <!--<artifactId>maven-site-plugin</artifactId>-->
+            <!--<version>3.5.1</version>-->
+            <!--</plugin>-->
+
+        </plugins>
+    </build>
+
 
 
     <dependencies>

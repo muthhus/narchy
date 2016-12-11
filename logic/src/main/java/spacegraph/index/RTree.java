@@ -20,7 +20,7 @@ package spacegraph.index;
  * #L%
  */
 
-import nars.util.Util;
+import jcog.Util;
 
 import java.util.function.Consumer;
 import java.util.function.Predicate;

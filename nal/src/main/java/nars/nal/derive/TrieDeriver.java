@@ -1,6 +1,8 @@
 package nars.nal.derive;
 
 import com.google.common.collect.Lists;
+import jcog.Util;
+import jcog.trie.TrieNode;
 import nars.$;
 import nars.Op;
 import nars.nal.Deriver;
@@ -10,8 +12,6 @@ import nars.nal.meta.op.MatchTermPrototype;
 import nars.nal.rule.PremiseRule;
 import nars.nal.rule.PremiseRuleSet;
 import nars.term.Term;
-import nars.util.Util;
-import nars.util.trie.TrieNode;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

@@ -1,5 +1,6 @@
 package nars.util;
 
+import jcog.Util;
 import nars.NAR;
 import nars.Task;
 import nars.concept.Concept;

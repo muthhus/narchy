@@ -1,5 +1,7 @@
 package nars.task;
 
+import jcog.Util;
+import jcog.data.array.LongArrays;
 import nars.*;
 import nars.budget.BudgetFunctions;
 import nars.budget.RawBudget;
@@ -11,8 +13,6 @@ import nars.term.Termed;
 import nars.time.Tense;
 import nars.truth.Truth;
 import nars.truth.TruthDelta;
-import nars.util.Util;
-import nars.util.data.array.LongArrays;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

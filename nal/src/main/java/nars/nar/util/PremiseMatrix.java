@@ -1,5 +1,6 @@
 package nars.nar.util;
 
+import jcog.list.FasterList;
 import nars.$;
 import nars.NAR;
 import nars.Param;
@@ -13,7 +14,6 @@ import nars.nal.Premise;
 import nars.nal.meta.Derivation;
 import nars.table.BeliefTable;
 import nars.term.Termed;
-import nars.util.list.FasterList;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

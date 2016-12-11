@@ -2,7 +2,7 @@ package spacegraph.obj.widget;
 
 import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL2;
-import nars.util.list.FasterList;
+import jcog.list.FasterList;
 import org.eclipse.collections.impl.list.mutable.primitive.FloatArrayList;
 import spacegraph.Surface;
 import spacegraph.render.Draw;
@@ -10,7 +10,7 @@ import spacegraph.render.Draw;
 import java.util.List;
 import java.util.function.DoubleSupplier;
 
-import static nars.util.Texts.n2;
+import static jcog.Texts.n2;
 
 public class Plot2D extends Surface {
     private final List<Series> series;

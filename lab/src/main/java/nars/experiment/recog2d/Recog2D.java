@@ -3,6 +3,7 @@ package nars.experiment.recog2d;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.jogamp.opengl.GL2;
+import jcog.Util;
 import nars.$;
 import nars.NAR;
 import nars.Param;
@@ -12,7 +13,6 @@ import nars.learn.MLP;
 import nars.remote.NAgents;
 import nars.time.Tense;
 import nars.truth.Truth;
-import nars.util.Util;
 import nars.video.PixelBag;
 import nars.video.Sensor2D;
 import spacegraph.SpaceGraph;
@@ -28,7 +28,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import static nars.util.Texts.n2;
+import static jcog.Texts.n2;
 import static spacegraph.obj.layout.Grid.col;
 import static spacegraph.obj.layout.Grid.row;
 

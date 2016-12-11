@@ -1,8 +1,8 @@
 package nars.nal;
 
+import jcog.meter.FunctionMeter;
+import jcog.meter.event.DoubleMeter;
 import nars.NAR;
-import nars.util.meter.FunctionMeter;
-import nars.util.meter.event.DoubleMeter;
 
 
 public class EventValueControlSensor extends ControlSensor {

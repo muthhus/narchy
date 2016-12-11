@@ -24,12 +24,12 @@ package nars.op.mental;
 
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;
+import jcog.Util;
 import nars.*;
 import nars.task.MutableTask;
 import nars.task.Temporal;
 import nars.term.Compound;
 import nars.truth.DefaultTruth;
-import nars.util.Util;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Iterator;

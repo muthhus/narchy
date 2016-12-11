@@ -23,7 +23,7 @@
 
 package spacegraph.phys.shape;
 
-import nars.util.list.FasterList;
+import jcog.list.FasterList;
 import spacegraph.math.v3;
 import spacegraph.phys.math.AabbUtil2;
 import spacegraph.phys.math.MiscUtil;

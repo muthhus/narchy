@@ -23,7 +23,7 @@
 
 package spacegraph.phys.collision;
 
-import nars.util.list.FasterList;
+import jcog.list.FasterList;
 import spacegraph.phys.BulletStats;
 import spacegraph.phys.Collidable;
 import spacegraph.phys.Collisions;

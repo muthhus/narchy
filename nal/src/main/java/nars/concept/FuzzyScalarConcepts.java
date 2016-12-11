@@ -2,10 +2,10 @@ package nars.concept;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.Iterators;
+import jcog.math.FloatSupplier;
 import nars.$;
 import nars.NAR;
 import nars.Symbols;
-import nars.util.math.FloatSupplier;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 

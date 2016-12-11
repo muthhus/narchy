@@ -1,11 +1,11 @@
 package nars.budget;
 
+import jcog.Texts;
+import jcog.Util;
 import nars.Param;
 import nars.Symbols;
 import nars.Task;
 import nars.task.util.SoftException;
-import nars.util.Texts;
-import nars.util.Util;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.fusesource.jansi.Ansi;
 import org.jetbrains.annotations.NotNull;
@@ -14,8 +14,8 @@ import org.jetbrains.annotations.Nullable;
 import java.io.IOException;
 
 import static java.lang.Math.pow;
-import static nars.util.Util.lerp;
-import static nars.util.Util.unitize;
+import static jcog.Util.lerp;
+import static jcog.Util.unitize;
 import static nars.util.UtilityFunctions.and;
 import static nars.util.UtilityFunctions.or;
 

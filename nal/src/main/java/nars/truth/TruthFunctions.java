@@ -20,17 +20,17 @@
  */
 package nars.truth;
 
+import jcog.Util;
 import nars.$;
 import nars.Param;
-import nars.util.Util;
 import nars.util.UtilityFunctions;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
+import static jcog.Util.clamp;
 import static nars.$.t;
-import static nars.util.Util.clamp;
 
 /**
  * All truth-value (and desire-value) functions used in logic rules

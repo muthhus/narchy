@@ -1,6 +1,7 @@
 package nars.test.condition;
 
 
+import jcog.Texts;
 import nars.$;
 import nars.NAR;
 import nars.Symbols;
@@ -10,7 +11,6 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Terms;
 import nars.truth.Truthed;
-import nars.util.Texts;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;

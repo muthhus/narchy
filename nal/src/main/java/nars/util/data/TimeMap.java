@@ -1,8 +1,8 @@
 package nars.util.data;
 
+import jcog.time.IntervalTree;
 import nars.NAR;
 import nars.Task;
-import nars.util.time.IntervalTree;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Consumer;

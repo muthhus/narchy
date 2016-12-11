@@ -2,6 +2,7 @@ package nars.web;
 
 import io.undertow.websockets.core.BufferedTextMessage;
 import io.undertow.websockets.core.WebSocketChannel;
+import jcog.event.Ons;
 import nars.IO;
 import nars.NAR;
 import nars.Task;
@@ -10,7 +11,6 @@ import nars.bag.impl.CurveBag;
 import nars.budget.merge.BudgetMerge;
 import nars.link.BLink;
 import nars.nlp.Twenglish;
-import nars.util.event.Ons;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spacegraph.web.WebsocketService;

@@ -12,7 +12,7 @@
 
 package nars.experiment.minicraft.side;
 
-import nars.util.Util;
+import jcog.Util;
 
 public final class StockMethods {
 	public static Boolean onScreen = true;

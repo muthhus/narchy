@@ -1,9 +1,9 @@
 package nars.index.task;
 
+import jcog.data.byt.ByteSeq;
+import jcog.radixtree.MyConcurrentRadixTree;
 import nars.Task;
 import nars.index.term.tree.TermKey;
-import nars.util.data.byt.ByteSeq;
-import nars.util.radixtree.MyConcurrentRadixTree;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

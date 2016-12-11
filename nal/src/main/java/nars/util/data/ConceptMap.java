@@ -1,8 +1,8 @@
 package nars.util.data;
 
+import jcog.event.Ons;
 import nars.NAR;
 import nars.concept.Concept;
-import nars.util.event.Ons;
 import org.jetbrains.annotations.NotNull;
 
 /**

@@ -1,11 +1,11 @@
 package nars.gui;
 
 import com.jogamp.opengl.GL2;
+import jcog.Util;
 import nars.NAR;
 import nars.concept.Concept;
 import nars.link.BLink;
 import nars.nar.Default;
-import nars.util.Util;
 import org.eclipse.collections.api.block.function.primitive.FloatFunction;
 import spacegraph.Surface;
 import spacegraph.math.Color3f;

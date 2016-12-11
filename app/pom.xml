@@ -30,9 +30,9 @@
             <scope>compile</scope>
         </dependency>
         <dependency>
-            <groupId>opennars</groupId>
-            <artifactId>ui</artifactId>
-            <version>1.8-SNAPSHOT</version>
+            <groupId>automenta</groupId>
+            <artifactId>spacegraph</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
 

@@ -1,5 +1,7 @@
 package nars.net.gnutella;
 
+import jcog.Util;
+import jcog.map.CapacityLinkedHashMap;
 import nars.budget.Budget;
 import nars.net.gnutella.message.Message;
 import nars.net.gnutella.message.PingMessage;
@@ -7,8 +9,6 @@ import nars.net.gnutella.message.PongMessage;
 import nars.net.gnutella.message.QueryMessage;
 import nars.net.gnutella.thread.DownloadThread;
 import nars.net.gnutella.thread.ServerThread;
-import nars.util.Util;
-import nars.util.map.CapacityLinkedHashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

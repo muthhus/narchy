@@ -20,13 +20,13 @@
  */
 package nars.nal;
 
+import jcog.data.LongString;
 import nars.Param;
 import nars.Symbols;
 import nars.Task;
 import nars.table.TemporalBeliefTable;
 import nars.time.Tense;
 import nars.truth.TruthFunctions;
-import nars.util.data.LongString;
 import org.apache.commons.lang3.ArrayUtils;
 import org.eclipse.collections.api.set.primitive.LongSet;
 import org.eclipse.collections.impl.factory.primitive.LongSets;

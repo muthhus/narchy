@@ -1,7 +1,7 @@
 package nars.learn.ql;
 
-import nars.util.data.random.XorShift128PlusRandom;
-import nars.util.signal.Autoencoder;
+import jcog.data.random.XorShift128PlusRandom;
+import jcog.signal.Autoencoder;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.function.BiFunction;

@@ -25,7 +25,7 @@
 
 package spacegraph.phys.shape;
 
-import nars.util.list.FasterList;
+import jcog.list.FasterList;
 import spacegraph.math.v3;
 import spacegraph.phys.math.MiscUtil;
 import spacegraph.phys.math.convexhull.HullDesc;

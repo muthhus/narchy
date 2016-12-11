@@ -1,5 +1,8 @@
 package nars.op.time;
 
+import jcog.data.MutableInteger;
+import jcog.event.ArrayTopic;
+import jcog.event.Topic;
 import nars.$;
 import nars.NAR;
 import nars.Task;
@@ -9,9 +12,6 @@ import nars.task.GeneratedTask;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.truth.TruthFunctions;
-import nars.util.data.MutableInteger;
-import nars.util.event.ArrayTopic;
-import nars.util.event.Topic;
 import org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

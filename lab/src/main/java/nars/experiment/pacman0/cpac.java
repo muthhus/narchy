@@ -19,7 +19,7 @@
 
 package nars.experiment.pacman0;
 
-import nars.util.Util;
+import jcog.Util;
 
 import java.awt.*;
 

@@ -1,11 +1,11 @@
 package nars.gui;
 
+import jcog.event.On;
+import jcog.list.FasterList;
 import nars.NAR;
 import nars.nar.Default;
 import nars.term.Term;
 import nars.test.DeductiveMeshTest;
-import nars.util.event.On;
-import nars.util.list.FasterList;
 import spacegraph.Active;
 import spacegraph.SpaceGraph;
 import spacegraph.Spatial;

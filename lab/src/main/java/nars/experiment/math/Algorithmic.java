@@ -1,8 +1,8 @@
 package nars.experiment.math;
 
+import jcog.data.random.XorShift128PlusRandom;
 import nars.experiment.misc.DiscreteEnvironment;
 import nars.learn.Agent;
-import nars.util.data.random.XorShift128PlusRandom;
 import org.eclipse.collections.api.tuple.Twin;
 import org.eclipse.collections.impl.tuple.Tuples;
 

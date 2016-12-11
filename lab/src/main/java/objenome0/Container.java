@@ -1,6 +1,6 @@
 package objenome0;
 
-import nars.util.list.FasterList;
+import jcog.list.FasterList;
 import objenome0.solution.dependency.*;
 import objenome0.util.InjectionUtils;
 import objenome0.util.InjectionUtils.Provider;

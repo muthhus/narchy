@@ -1,5 +1,6 @@
 package nars.table;
 
+import jcog.data.sorted.SortedArray;
 import nars.NAR;
 import nars.Param;
 import nars.Task;
@@ -11,7 +12,6 @@ import nars.task.RevisionTask;
 import nars.term.Term;
 import nars.truth.Truth;
 import nars.truth.TruthDelta;
-import nars.util.data.sorted.SortedArray;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

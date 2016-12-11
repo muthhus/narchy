@@ -82,13 +82,10 @@
 
 
     <modules>
-        <module>util</module>
         <module>logic</module>
         <module>nal</module>
         <module>app</module>
         <module>lab</module>
-        <module>ui</module>
-        <!--<module>guifx</module>-->
         <module>web</module>
         <module>perf</module>
     </modules>

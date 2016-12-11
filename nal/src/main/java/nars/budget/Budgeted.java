@@ -1,8 +1,8 @@
 package nars.budget;
 
+import jcog.Util;
 import nars.NAR;
 import nars.Param;
-import nars.util.Util;
 import org.jetbrains.annotations.NotNull;
 
 import static nars.budget.Budget.aveGeo;

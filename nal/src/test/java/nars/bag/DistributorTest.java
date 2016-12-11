@@ -1,6 +1,6 @@
 package nars.bag;
 
-import nars.util.math.Distributor;
+import jcog.math.Distributor;
 import org.eclipse.collections.impl.list.mutable.primitive.DoubleArrayList;
 import org.junit.Test;
 

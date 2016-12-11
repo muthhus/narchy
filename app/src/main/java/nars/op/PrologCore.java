@@ -1,6 +1,8 @@
 package nars.op;
 
 import alice.tuprolog.*;
+import jcog.Util;
+import jcog.data.Range;
 import nars.$;
 import nars.NAR;
 import nars.Op;
@@ -12,8 +14,6 @@ import nars.term.Term;
 import nars.term.atom.Atomic;
 import nars.term.var.Variable;
 import nars.truth.Truth;
-import nars.util.Util;
-import nars.util.data.Range;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

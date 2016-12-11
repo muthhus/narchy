@@ -4,7 +4,7 @@ import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.googlecode.lanterna.terminal.virtual.VirtualTerminal;
 import com.jogamp.opengl.GL2;
-import nars.util.list.FasterList;
+import jcog.list.FasterList;
 import org.apache.commons.collections4.queue.CircularFifoQueue;
 import spacegraph.Ortho;
 import spacegraph.SpaceGraph;

@@ -1,7 +1,7 @@
 package spacegraph.obj.widget;
 
 import com.jogamp.opengl.GL2;
-import nars.util.Util;
+import jcog.Util;
 import org.jetbrains.annotations.Nullable;
 import spacegraph.SpaceGraph;
 import spacegraph.math.v2;

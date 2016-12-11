@@ -1,10 +1,10 @@
 package nars.concept;
 
+import jcog.math.FloatSupplier;
 import nars.NAR;
 import nars.Param;
 import nars.budget.policy.ConceptPolicy;
 import nars.term.Compound;
-import nars.util.math.FloatSupplier;
 import org.jetbrains.annotations.NotNull;
 
 /**

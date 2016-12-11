@@ -1,10 +1,10 @@
 package nars.test.analyze;
 
+import jcog.event.Ons;
+import jcog.event.Topic;
+import jcog.meter.event.HitMeter;
 import nars.$;
 import nars.NAR;
-import nars.util.event.Ons;
-import nars.util.event.Topic;
-import nars.util.meter.event.HitMeter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

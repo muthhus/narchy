@@ -21,7 +21,7 @@
  */
 package objenome0.solver.evolve;
 
-import nars.util.list.FasterList;
+import jcog.list.FasterList;
 
 import java.util.Collection;
 import java.util.List;

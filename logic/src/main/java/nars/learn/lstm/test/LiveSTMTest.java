@@ -1,7 +1,7 @@
 package nars.learn.lstm.test;
 
+import jcog.Texts;
 import nars.learn.lstm.Interaction;
-import nars.util.Texts;
 
 import java.util.Arrays;
 

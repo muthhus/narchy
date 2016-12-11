@@ -1,9 +1,9 @@
 package nars.video;
 
+import jcog.data.random.XorShift128PlusRandom;
 import nars.$;
 import nars.NAgent;
 import nars.concept.ActionConcept;
-import nars.util.data.random.XorShift128PlusRandom;
 
 import java.awt.image.BufferedImage;
 import java.util.List;
@@ -11,7 +11,7 @@ import java.util.Random;
 import java.util.function.Supplier;
 
 import static java.lang.Math.max;
-import static nars.util.Util.lerp;
+import static jcog.Util.lerp;
 
 /**
  * 2D flat Raytracing Retina

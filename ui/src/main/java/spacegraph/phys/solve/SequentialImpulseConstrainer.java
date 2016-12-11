@@ -23,7 +23,7 @@
 
 package spacegraph.phys.solve;
 
-import nars.util.list.FasterList;
+import jcog.list.FasterList;
 import spacegraph.math.Matrix3f;
 import spacegraph.math.v3;
 import spacegraph.phys.BulletGlobals;

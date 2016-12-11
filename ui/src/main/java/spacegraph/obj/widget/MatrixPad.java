@@ -1,6 +1,6 @@
 package spacegraph.obj.widget;
 
-import nars.util.list.FasterList;
+import jcog.list.FasterList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spacegraph.Surface;

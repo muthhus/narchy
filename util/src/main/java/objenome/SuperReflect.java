@@ -35,7 +35,7 @@
  */
 package objenome;
 
-import nars.util.TriConsumer;
+import jcog.TriConsumer;
 
 import java.lang.reflect.*;
 import java.util.Arrays;

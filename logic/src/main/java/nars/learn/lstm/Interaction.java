@@ -1,6 +1,6 @@
 package nars.learn.lstm;
 
-import nars.util.Texts;
+import jcog.Texts;
 
 import java.util.Arrays;
 

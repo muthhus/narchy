@@ -1,6 +1,6 @@
 package spacegraph.phys.util;
 
-import nars.util.Util;
+import jcog.Util;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.Nullable;
 import spacegraph.math.v2;

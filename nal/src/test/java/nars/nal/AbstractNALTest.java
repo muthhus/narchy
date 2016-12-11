@@ -15,7 +15,7 @@ import org.junit.Ignore;
 import java.util.List;
 import java.util.function.Supplier;
 
-import static nars.util.data.LabeledSupplier.supply;
+import static jcog.data.LabeledSupplier.supply;
 
 /**
  * Created by me on 2/10/15.

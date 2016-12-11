@@ -1,5 +1,6 @@
 package nars.concept;
 
+import jcog.Util;
 import nars.NAR;
 import nars.Symbols;
 import nars.Task;
@@ -17,7 +18,6 @@ import nars.term.container.TermContainer;
 import nars.term.container.TermSet;
 import nars.truth.Truth;
 import nars.truth.TruthDelta;
-import nars.util.Util;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

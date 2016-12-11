@@ -1,5 +1,7 @@
 package nars.concept;
 
+import jcog.Util;
+import jcog.math.FloatSupplier;
 import nars.$;
 import nars.NAR;
 import nars.Narsese;
@@ -8,9 +10,7 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.truth.Truth;
-import nars.util.Util;
 import nars.util.UtilityFunctions;
-import nars.util.math.FloatSupplier;
 import nars.util.signal.ScalarSignal;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.eclipse.collections.api.block.function.primitive.FloatFunction;

@@ -1,8 +1,8 @@
 package spacegraph.obj.widget;
 
 import com.jogamp.opengl.GL2;
-import nars.util.Texts;
-import nars.util.Util;
+import jcog.Texts;
+import jcog.Util;
 import org.jetbrains.annotations.Nullable;
 import spacegraph.SpaceGraph;
 import spacegraph.Surface;

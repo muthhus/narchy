@@ -1,6 +1,6 @@
 package spacegraph.source;
 
-import nars.util.list.FasterList;
+import jcog.list.FasterList;
 import org.eclipse.collections.api.block.procedure.primitive.IntObjectProcedure;
 import spacegraph.AbstractSpace;
 

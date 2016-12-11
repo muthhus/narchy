@@ -23,7 +23,7 @@
 
 package spacegraph.phys;
 
-import nars.util.Util;
+import jcog.Util;
 import spacegraph.math.Matrix3f;
 import spacegraph.math.Quat4f;
 import spacegraph.math.v3;
@@ -36,7 +36,7 @@ import spacegraph.phys.math.TransformUtil;
 import spacegraph.phys.shape.CollisionShape;
 import spacegraph.phys.util.OArrayList;
 
-import static nars.util.Util.clamp;
+import static jcog.Util.clamp;
 import static spacegraph.math.v3.v;
 
 

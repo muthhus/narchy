@@ -1,5 +1,7 @@
 package nars.table;
 
+import jcog.Util;
+import jcog.list.MultiRWFasterList;
 import nars.NAR;
 import nars.Param;
 import nars.Task;
@@ -8,8 +10,6 @@ import nars.task.Revision;
 import nars.task.TruthPolation;
 import nars.truth.Truth;
 import nars.truth.TruthDelta;
-import nars.util.Util;
-import nars.util.list.MultiRWFasterList;
 import org.eclipse.collections.api.block.function.Function;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

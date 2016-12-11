@@ -1,7 +1,7 @@
 package spacegraph.obj;
 
-import nars.util.Texts;
-import nars.util.list.FasterList;
+import jcog.Texts;
+import jcog.list.FasterList;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import spacegraph.Ortho;
 import spacegraph.SpaceGraph;

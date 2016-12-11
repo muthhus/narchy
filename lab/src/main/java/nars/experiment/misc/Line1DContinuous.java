@@ -1,5 +1,6 @@
 package nars.experiment.misc;
 
+import jcog.data.random.XorShift128PlusRandom;
 import nars.$;
 import nars.NAR;
 import nars.NAgent;
@@ -14,7 +15,6 @@ import nars.nar.util.DefaultConceptBuilder;
 import nars.remote.NAgents;
 import nars.task.DerivedTask;
 import nars.time.FrameTime;
-import nars.util.data.random.XorShift128PlusRandom;
 
 import java.util.Arrays;
 

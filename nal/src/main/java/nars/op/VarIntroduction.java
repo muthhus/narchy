@@ -1,9 +1,9 @@
 package nars.op;
 
+import jcog.Util;
 import nars.$;
 import nars.term.Compound;
 import nars.term.Term;
-import nars.util.Util;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

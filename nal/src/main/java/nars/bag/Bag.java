@@ -1,12 +1,12 @@
 package nars.bag;
 
+import jcog.Util;
 import nars.$;
 import nars.budget.Budget;
 import nars.budget.Budgeted;
 import nars.link.BLink;
 import nars.link.DefaultBLink;
 import nars.link.DependentBLink;
-import nars.util.Util;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.eclipse.collections.api.tuple.primitive.ObjectFloatPair;
 import org.jetbrains.annotations.NotNull;

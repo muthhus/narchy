@@ -1,5 +1,7 @@
 package nars;
 
+import jcog.Texts;
+import jcog.list.FasterList;
 import nars.bag.Bag;
 import nars.concept.Concept;
 import nars.concept.PermanentConcept;
@@ -10,8 +12,6 @@ import nars.op.data.intersect;
 import nars.op.data.reflect;
 import nars.op.data.union;
 import nars.term.atom.Atom;
-import nars.util.Texts;
-import nars.util.list.FasterList;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.*;

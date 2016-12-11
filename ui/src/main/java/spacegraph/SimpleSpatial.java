@@ -1,7 +1,7 @@
 package spacegraph;
 
 import com.jogamp.opengl.GL2;
-import nars.util.Util;
+import jcog.Util;
 import org.jetbrains.annotations.Nullable;
 import spacegraph.math.Quat4f;
 import spacegraph.math.v3;

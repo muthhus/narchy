@@ -1,10 +1,10 @@
 package nars.task;
 
+import jcog.data.random.XorShift128PlusRandom;
 import nars.$;
 import nars.Param;
 import nars.truth.Truth;
 import nars.truth.TruthFunctions;
-import nars.util.data.random.XorShift128PlusRandom;
 import org.junit.Test;
 
 import static nars.$.t;

@@ -1,5 +1,7 @@
 package nars.test;
 
+import jcog.event.Topic;
+import jcog.meter.event.HitMeter;
 import nars.$;
 import nars.NAR;
 import nars.Param;
@@ -11,8 +13,6 @@ import nars.test.condition.ExecutionCondition;
 import nars.test.condition.NARCondition;
 import nars.test.condition.TemporalTaskCondition;
 import nars.time.Tense;
-import nars.util.event.Topic;
-import nars.util.meter.event.HitMeter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;

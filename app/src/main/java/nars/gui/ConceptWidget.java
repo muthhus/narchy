@@ -1,6 +1,7 @@
 package nars.gui;
 
 import com.jogamp.opengl.GL2;
+import jcog.Util;
 import nars.NAR;
 import nars.Task;
 import nars.bag.impl.ArrayBag;
@@ -9,7 +10,6 @@ import nars.concept.Concept;
 import nars.link.BLink;
 import nars.term.Term;
 import nars.term.Termed;
-import nars.util.Util;
 import org.jetbrains.annotations.NotNull;
 import spacegraph.SpaceGraph;
 import spacegraph.Surface;

@@ -1,6 +1,6 @@
 package nars.util;
 
-import nars.util.event.On;
+import jcog.event.On;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Consumer;

@@ -1,5 +1,9 @@
 package nars.term;
 
+import jcog.Texts;
+import jcog.Util;
+import jcog.data.sorted.SortedList;
+import jcog.list.FasterList;
 import nars.$;
 import nars.Op;
 import nars.term.compound.GenericCompound;
@@ -7,10 +11,6 @@ import nars.term.compound.Statement;
 import nars.term.container.ArrayTermVector;
 import nars.term.container.TermContainer;
 import nars.term.container.TermVector;
-import nars.util.Texts;
-import nars.util.Util;
-import nars.util.data.sorted.SortedList;
-import nars.util.list.FasterList;
 import org.eclipse.collections.api.block.predicate.primitive.IntObjectPredicate;
 import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.api.set.ImmutableSet;

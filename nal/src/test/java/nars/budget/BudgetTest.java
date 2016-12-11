@@ -1,8 +1,8 @@
 package nars.budget;
 
-import nars.util.Util;
+import jcog.Util;
+import jcog.io.SparkLine;
 import nars.util.UtilityFunctions;
-import nars.util.io.SparkLine;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

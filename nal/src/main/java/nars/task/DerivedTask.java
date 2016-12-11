@@ -1,5 +1,6 @@
 package nars.task;
 
+import jcog.Util;
 import nars.NAR;
 import nars.Param;
 import nars.Task;
@@ -10,7 +11,6 @@ import nars.term.Compound;
 import nars.term.Termed;
 import nars.truth.Truth;
 import nars.truth.TruthDelta;
-import nars.util.Util;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

@@ -1,6 +1,7 @@
 package nars.nal.meta;
 
 import com.google.common.base.Joiner;
+import jcog.Texts;
 import nars.NAR;
 import nars.Op;
 import nars.Param;
@@ -18,7 +19,6 @@ import nars.term.util.InvalidTermException;
 import nars.time.TimeFunctions;
 import nars.truth.Truth;
 import nars.truth.TruthDelta;
-import nars.util.Texts;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

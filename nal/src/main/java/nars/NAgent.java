@@ -3,6 +3,12 @@ package nars;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import jcog.Util;
+import jcog.data.FloatParam;
+import jcog.list.FasterList;
+import jcog.math.FirstOrderDifferenceFloat;
+import jcog.math.FloatNormalized;
+import jcog.math.FloatPolarNormalized;
 import nars.concept.ActionConcept;
 import nars.concept.Concept;
 import nars.concept.SensorConcept;
@@ -15,12 +21,6 @@ import nars.time.FrameTime;
 import nars.time.Time;
 import nars.truth.Truth;
 import nars.util.Loop;
-import nars.util.Util;
-import nars.util.data.FloatParam;
-import nars.util.list.FasterList;
-import nars.util.math.FirstOrderDifferenceFloat;
-import nars.util.math.FloatNormalized;
-import nars.util.math.FloatPolarNormalized;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -32,13 +32,13 @@ import java.util.DoubleSummaryStatistics;
 import java.util.List;
 import java.util.Random;
 
+import static jcog.Texts.n2;
+import static jcog.Texts.n4;
 import static nars.$.t;
 import static nars.Symbols.BELIEF;
 import static nars.Symbols.GOAL;
 import static nars.time.Tense.ETERNAL;
 import static nars.truth.TruthFunctions.w2c;
-import static nars.util.Texts.n2;
-import static nars.util.Texts.n4;
 
 /**
  * explicit management of sensor concepts and motor functions

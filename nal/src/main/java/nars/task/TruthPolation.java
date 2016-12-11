@@ -10,10 +10,10 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
+import static jcog.Util.sqr;
 import static nars.Param.TRUTH_EPSILON;
 import static nars.truth.TruthFunctions.c2w;
 import static nars.truth.TruthFunctions.w2c;
-import static nars.util.Util.sqr;
 
 /**
  * Truth Interpolation and Extrapolation of Temporal Beliefs/Goals

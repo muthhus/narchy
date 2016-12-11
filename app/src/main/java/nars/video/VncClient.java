@@ -17,10 +17,10 @@ import com.airhacks.afterburner.injection.Injector;
 import javafx.scene.image.PixelReader;
 import javafx.scene.image.WritableImage;
 import javafx.scene.layout.BorderPane;
+import jcog.FX;
 import nars.nar.Default;
 import nars.remote.NAgents;
 import nars.time.RealTime;
-import nars.util.FX;
 import org.jfxvnc.net.rfb.codec.decoder.ServerDecoderEvent;
 import org.jfxvnc.net.rfb.codec.encoder.KeyButtonEvent;
 import org.jfxvnc.net.rfb.codec.security.SecurityType;
@@ -33,8 +33,8 @@ import spacegraph.SpaceGraph;
 import spacegraph.Surface;
 import spacegraph.obj.widget.MatrixView;
 
+import static jcog.FX.scrolled;
 import static nars.$.t;
-import static nars.util.FX.scrolled;
 import static nars.video.Bitmap2D.*;
 
 /**

@@ -1,7 +1,7 @@
 package nars.index.term.tree;
 
+import jcog.radixtree.MyConcurrentRadixTree;
 import nars.nar.util.DefaultConceptBuilder;
-import nars.util.radixtree.MyConcurrentRadixTree;
 import org.junit.Test;
 
 import java.util.List;

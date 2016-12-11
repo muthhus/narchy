@@ -1,9 +1,9 @@
 package nars.bag.impl;
 
+import jcog.data.FloatParam;
 import nars.bag.Bag;
 import nars.budget.merge.BudgetMerge;
 import nars.link.BLink;
-import nars.util.data.FloatParam;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 

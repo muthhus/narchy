@@ -23,7 +23,7 @@
 
 package spacegraph.phys.math.convexhull;
 
-import nars.util.list.FasterList;
+import jcog.list.FasterList;
 import spacegraph.math.v3;
 import spacegraph.phys.util.IntArrayList;
 

@@ -1,5 +1,8 @@
 package nars.audio;
 
+import jcog.Util;
+import jcog.data.random.XorShift128PlusRandom;
+import jcog.signal.Autoencoder;
 import nars.$;
 import nars.NAR;
 import nars.NAgent;
@@ -7,9 +10,6 @@ import nars.concept.SensorConcept;
 import nars.gui.Vis;
 import nars.remote.NAgents;
 import nars.time.RealTime;
-import nars.util.Util;
-import nars.util.data.random.XorShift128PlusRandom;
-import nars.util.signal.Autoencoder;
 import spacegraph.SpaceGraph;
 import spacegraph.audio.AudioSource;
 import spacegraph.audio.WaveCapture;

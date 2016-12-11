@@ -1,9 +1,9 @@
 package spacegraph.obj.widget;
 
 import com.jogamp.opengl.GL2;
-import nars.util.Texts;
-import nars.util.Util;
-import nars.util.data.FloatParam;
+import jcog.Texts;
+import jcog.Util;
+import jcog.data.FloatParam;
 import spacegraph.render.Draw;
 
 /**

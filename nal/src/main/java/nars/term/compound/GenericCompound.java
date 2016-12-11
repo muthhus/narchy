@@ -1,5 +1,6 @@
 package nars.term.compound;
 
+import jcog.Util;
 import nars.IO;
 import nars.Op;
 import nars.Param;
@@ -10,7 +11,6 @@ import nars.term.Termed;
 import nars.term.container.TermContainer;
 import nars.term.util.InvalidTermException;
 import nars.time.Tense;
-import nars.util.Util;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

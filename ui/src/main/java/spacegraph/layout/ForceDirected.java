@@ -1,7 +1,7 @@
 package spacegraph.layout;
 
-import nars.util.Util;
-import nars.util.data.FloatParam;
+import jcog.Util;
+import jcog.data.FloatParam;
 import spacegraph.SimpleSpatial;
 import spacegraph.Spatial;
 import spacegraph.math.v3;

@@ -1,10 +1,10 @@
 package nars.index.term.tree;
 
+import jcog.data.byt.ByteSeq;
+import jcog.radixtree.MyConcurrentRadixTree;
 import nars.$;
 import nars.term.Term;
 import nars.term.Termed;
-import nars.util.data.byt.ByteSeq;
-import nars.util.radixtree.MyConcurrentRadixTree;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Function;

@@ -1,5 +1,6 @@
 package nars.nar;
 
+import jcog.data.random.XorShift128PlusRandom;
 import nars.NAR;
 import nars.Param;
 import nars.Task;
@@ -19,7 +20,6 @@ import nars.op.time.STMTemporalLinkage;
 import nars.term.Termed;
 import nars.time.FrameTime;
 import nars.time.Time;
-import nars.util.data.random.XorShift128PlusRandom;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.eclipse.collections.api.tuple.primitive.ObjectFloatPair;
 import org.jetbrains.annotations.NotNull;

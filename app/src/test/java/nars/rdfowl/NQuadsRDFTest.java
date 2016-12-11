@@ -1,5 +1,6 @@
 package nars.rdfowl;
 
+import jcog.data.random.XorShift128PlusRandom;
 import nars.NAR;
 import nars.Param;
 import nars.index.term.tree.TreeTermIndex;
@@ -8,7 +9,6 @@ import nars.nar.exe.Executioner;
 import nars.nar.exe.SingleThreadExecutioner;
 import nars.nar.util.DefaultConceptBuilder;
 import nars.time.FrameTime;
-import nars.util.data.random.XorShift128PlusRandom;
 import org.junit.Ignore;
 import org.junit.Test;
 

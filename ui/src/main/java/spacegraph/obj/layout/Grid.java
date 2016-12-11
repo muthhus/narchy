@@ -9,7 +9,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.function.Function;
 
-import static nars.util.Util.lerp;
+import static jcog.Util.lerp;
 
 /** TODO parameterize DX/DY to choose between row, column, or grid of arbitrary aspect ratio
        aspect ratio=0: row (x)

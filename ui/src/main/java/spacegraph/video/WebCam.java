@@ -3,7 +3,7 @@ package spacegraph.video;
 import boofcv.io.webcamcapture.UtilWebcamCapture;
 import com.jogamp.opengl.GL2;
 import javafx.scene.image.WritableImage;
-import nars.util.data.Range;
+import jcog.data.Range;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

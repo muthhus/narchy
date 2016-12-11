@@ -1,6 +1,7 @@
 package nars.experiment.tetris;
 
 import com.jogamp.opengl.GL2;
+import jcog.Util;
 import nars.$;
 import nars.NAR;
 import nars.NSchool;
@@ -9,7 +10,6 @@ import nars.experiment.tetris.impl.TetrisState;
 import nars.remote.NAgents;
 import nars.term.Termed;
 import nars.time.RealTime;
-import nars.util.Util;
 import spacegraph.Ortho;
 import spacegraph.SpaceGraph;
 import spacegraph.Surface;

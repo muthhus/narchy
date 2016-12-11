@@ -1,14 +1,14 @@
 package nars.truth;
 
+import jcog.Util;
 import nars.NAR;
 import nars.Param;
-import nars.util.Util;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 
-import static nars.util.Util.clampround;
+import static jcog.Util.clampround;
 
 
 public class DefaultTruth implements Truth  {

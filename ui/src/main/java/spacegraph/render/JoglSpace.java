@@ -6,7 +6,7 @@ import com.jogamp.opengl.*;
 import com.jogamp.opengl.glu.GLU;
 import com.jogamp.opengl.util.FPSAnimator;
 import com.jogamp.opengl.util.gl2.GLUT;
-import nars.util.Util;
+import jcog.Util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

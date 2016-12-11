@@ -22,7 +22,7 @@
  */
 
 package spacegraph.phys;
-import nars.util.list.FasterList;
+import jcog.list.FasterList;
 import org.jetbrains.annotations.Nullable;
 import spacegraph.math.Matrix3f;
 import spacegraph.math.v3;

@@ -1,5 +1,6 @@
 package nars.concept;
 
+import jcog.event.Topic;
 import nars.$;
 import nars.NAR;
 import nars.Narsese;
@@ -10,7 +11,6 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.term.container.TermContainer;
 import nars.truth.TruthDelta;
-import nars.util.event.Topic;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

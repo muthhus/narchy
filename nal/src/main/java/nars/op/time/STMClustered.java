@@ -1,5 +1,7 @@
 package nars.op.time;
 
+import jcog.Util;
+import jcog.data.MutableInteger;
 import nars.NAR;
 import nars.Task;
 import nars.bag.Bag;
@@ -12,8 +14,6 @@ import nars.link.BLink;
 import nars.link.DependentBLink;
 import nars.truth.Truth;
 import nars.truth.Truthed;
-import nars.util.Util;
-import nars.util.data.MutableInteger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

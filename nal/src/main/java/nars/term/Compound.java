@@ -20,6 +20,10 @@
  */
 package nars.term;
 
+import jcog.Util;
+import jcog.data.array.IntArrays;
+import jcog.data.sexpression.IPair;
+import jcog.data.sexpression.Pair;
 import nars.$;
 import nars.IO;
 import nars.Op;
@@ -29,10 +33,6 @@ import nars.term.var.Variable;
 import nars.term.visit.SubtermVisitor;
 import nars.term.visit.SubtermVisitorX;
 import nars.time.Tense;
-import nars.util.Util;
-import nars.util.data.array.IntArrays;
-import nars.util.data.sexpression.IPair;
-import nars.util.data.sexpression.Pair;
 import org.eclipse.collections.api.bimap.MutableBiMap;
 import org.eclipse.collections.api.list.primitive.ByteList;
 import org.eclipse.collections.impl.bimap.mutable.HashBiMap;

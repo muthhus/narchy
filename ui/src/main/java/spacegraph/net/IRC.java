@@ -1,17 +1,13 @@
 package spacegraph.net;
 
-import ch.qos.logback.classic.Level;
 import com.google.common.collect.ImmutableSortedSet;
 import org.eclipse.collections.impl.factory.Iterables;
 import org.pircbotx.Channel;
 import org.pircbotx.Configuration;
-import org.pircbotx.InputParser;
 import org.pircbotx.PircBotX;
 import org.pircbotx.exception.IrcException;
 import org.pircbotx.hooks.ListenerAdapter;
-import org.pircbotx.hooks.managers.ThreadedListenerManager;
 import org.pircbotx.output.OutputIRC;
-import org.pircbotx.output.OutputRaw;
 
 import java.io.IOException;
 

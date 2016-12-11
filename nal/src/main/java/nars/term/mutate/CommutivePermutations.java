@@ -1,9 +1,9 @@
 package nars.term.mutate;
 
+import jcog.Util;
 import nars.term.container.ShuffledSubterms;
 import nars.term.container.TermContainer;
 import nars.term.subst.Unify;
-import nars.util.Util;
 import org.jetbrains.annotations.NotNull;
 
 /**

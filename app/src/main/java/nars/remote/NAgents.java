@@ -1,5 +1,7 @@
 package nars.remote;
 
+import jcog.data.FloatParam;
+import jcog.data.random.XorShift128PlusRandom;
 import nars.$;
 import nars.NAR;
 import nars.NAgent;
@@ -27,8 +29,6 @@ import nars.time.RealTime;
 import nars.time.Time;
 import nars.truth.Truth;
 import nars.util.TaskStatistics;
-import nars.util.data.FloatParam;
-import nars.util.data.random.XorShift128PlusRandom;
 import nars.video.*;
 import objenome.O;
 import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunction;

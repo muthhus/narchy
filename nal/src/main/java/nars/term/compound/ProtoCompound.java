@@ -1,8 +1,8 @@
 package nars.term.compound;
 
+import jcog.Util;
 import nars.Op;
 import nars.term.Term;
-import nars.util.Util;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;

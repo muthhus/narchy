@@ -1,13 +1,13 @@
 package nars.net.gnutella.thread;
 
 import com.google.common.io.ByteStreams;
+import jcog.Util;
 import nars.bag.impl.ArrayBag;
 import nars.budget.Budget;
 import nars.budget.merge.BudgetMerge;
 import nars.net.gnutella.GnutellaConstants;
 import nars.net.gnutella.Peer;
 import nars.net.gnutella.message.Message;
-import nars.util.Util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

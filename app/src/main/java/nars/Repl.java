@@ -1,7 +1,7 @@
 package nars;
 
+import jcog.Util;
 import nars.nar.Default;
-import nars.util.Util;
 import org.fusesource.jansi.AnsiConsole;
 import org.jline.reader.EndOfFileException;
 import org.jline.reader.LineReader;

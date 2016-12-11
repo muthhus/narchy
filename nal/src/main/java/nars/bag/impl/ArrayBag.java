@@ -1,5 +1,6 @@
 package nars.bag.impl;
 
+import jcog.data.sorted.SortedArray;
 import nars.$;
 import nars.Param;
 import nars.bag.Bag;
@@ -9,7 +10,6 @@ import nars.budget.Forget;
 import nars.budget.RawBudget;
 import nars.budget.merge.BudgetMerge;
 import nars.link.BLink;
-import nars.util.data.sorted.SortedArray;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

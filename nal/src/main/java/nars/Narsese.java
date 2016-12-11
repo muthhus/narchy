@@ -13,6 +13,7 @@ import com.github.fge.grappa.run.context.MatcherContext;
 import com.github.fge.grappa.stack.ArrayValueStack;
 import com.github.fge.grappa.stack.ValueStack;
 import com.github.fge.grappa.support.Var;
+import jcog.Texts;
 import nars.index.TermBuilder;
 import nars.index.term.TermIndex;
 import nars.nal.meta.match.Ellipsis;
@@ -28,7 +29,6 @@ import nars.term.var.Variable;
 import nars.time.Tense;
 import nars.truth.DefaultTruth;
 import nars.truth.Truth;
-import nars.util.Texts;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

@@ -1,8 +1,8 @@
 package nars;
 
+import jcog.meter.event.FloatGuage;
 import nars.term.Compound;
 import nars.term.Term;
-import nars.util.meter.event.FloatGuage;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;

@@ -1,5 +1,6 @@
 package nars.nar;
 
+import jcog.data.random.XorShift128PlusRandom;
 import nars.NARLoop;
 import nars.Param;
 import nars.budget.Activation;
@@ -10,7 +11,6 @@ import nars.nar.exe.SingleThreadExecutioner;
 import nars.nar.util.DefaultConceptBuilder;
 import nars.time.RealTime;
 import nars.time.Time;
-import nars.util.data.random.XorShift128PlusRandom;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

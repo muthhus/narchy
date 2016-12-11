@@ -1,5 +1,7 @@
 package nars.task;
 
+import jcog.Util;
+import jcog.data.random.XorShift128PlusRandom;
 import nars.$;
 import nars.Param;
 import nars.Task;
@@ -10,8 +12,6 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.truth.Truth;
 import nars.truth.Truthed;
-import nars.util.Util;
-import nars.util.data.random.XorShift128PlusRandom;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -20,11 +20,11 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Random;
 
+import static jcog.Util.lerp;
 import static nars.Op.NEG;
 import static nars.term.Terms.compoundOrNull;
 import static nars.time.Tense.DTERNAL;
 import static nars.truth.TruthFunctions.w2c;
-import static nars.util.Util.lerp;
 
 /**
  * Revision / Projection / Revection Utilities

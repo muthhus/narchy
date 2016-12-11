@@ -1,6 +1,6 @@
 package spacegraph.obj.layout;
 
-import nars.util.list.FasterList;
+import jcog.list.FasterList;
 import spacegraph.Surface;
 import spacegraph.obj.widget.CheckBox;
 import spacegraph.obj.widget.ToggleButton;

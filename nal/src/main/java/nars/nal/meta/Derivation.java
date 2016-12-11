@@ -1,5 +1,6 @@
 package nars.nal.meta;
 
+import jcog.version.Versioned;
 import nars.NAR;
 import nars.Op;
 import nars.Param;
@@ -17,7 +18,6 @@ import nars.term.subst.Unify;
 import nars.term.transform.substitute;
 import nars.truth.DefaultTruth;
 import nars.truth.Truth;
-import nars.util.version.Versioned;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

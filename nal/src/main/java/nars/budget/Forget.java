@@ -1,8 +1,8 @@
 package nars.budget;
 
+import jcog.Util;
 import nars.Param;
 import nars.link.BLink;
-import nars.util.Util;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

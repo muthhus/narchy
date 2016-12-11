@@ -1,8 +1,8 @@
 package spacegraph.audio;
 
 import com.google.common.base.Joiner;
-import nars.util.Util;
-import nars.util.data.FloatParam;
+import jcog.Util;
+import jcog.data.FloatParam;
 
 import javax.sound.sampled.*;
 import java.nio.ByteBuffer;

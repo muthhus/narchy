@@ -1,12 +1,12 @@
 package nars.experiment.arkanoid;
 
 
+import jcog.math.FloatNormalized;
 import nars.$;
 import nars.NAR;
 import nars.Param;
 import nars.concept.ActionConcept;
 import nars.remote.NAgents;
-import nars.util.math.FloatNormalized;
 
 public class Arkancide extends NAgents {
 

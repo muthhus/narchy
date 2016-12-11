@@ -1,5 +1,6 @@
 package nars.index.term;
 
+import jcog.map.nbhm.HijacKache;
 import nars.*;
 import nars.Op;
 import nars.concept.Concept;
@@ -23,7 +24,6 @@ import nars.term.transform.CompoundTransform;
 import nars.term.transform.TermTransform;
 import nars.term.transform.VariableNormalization;
 import nars.term.util.InvalidTermException;
-import nars.util.map.nbhm.HijacKache;
 import org.eclipse.collections.api.list.primitive.ByteList;
 import org.eclipse.collections.impl.factory.Maps;
 import org.jetbrains.annotations.NotNull;

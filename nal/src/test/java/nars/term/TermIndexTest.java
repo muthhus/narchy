@@ -1,5 +1,6 @@
 package nars.term;
 
+import jcog.data.random.XorShift128PlusRandom;
 import nars.$;
 import nars.NAR;
 import nars.Task;
@@ -9,7 +10,6 @@ import nars.nar.Default;
 import nars.nar.Terminal;
 import nars.nar.util.DefaultConceptBuilder;
 import nars.term.atom.Atomic;
-import nars.util.data.random.XorShift128PlusRandom;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Ignore;
 import org.junit.Test;
