@@ -31,7 +31,6 @@ package nars.guifx;
 
 import javafx.animation.Timeline;
 import javafx.animation.Transition;
-import javafx.beans.property.*;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;

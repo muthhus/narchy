@@ -4,9 +4,7 @@ import automenta.vivisect.surfaceplotter.JSurfacePanel;
 import automenta.vivisect.surfaceplotter.Mapper;
 import automenta.vivisect.surfaceplotter.ProgressiveSurfaceModel;
 
-import javax.swing.*;
 import javax.swing.event.ChangeEvent;
-import java.awt.*;
 
 /**
  * @author User #1

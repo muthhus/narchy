@@ -497,7 +497,7 @@ public final class TruthFunctions extends UtilityFunctions {
     }
 
     public static float originality(int evidenceLength) {
-        return evidenceLength / (evidenceLength + 1f);
+        return 1.0f / (evidenceLength + 1);
     }
 
     public static float expectation(float frequency, float confidence) {

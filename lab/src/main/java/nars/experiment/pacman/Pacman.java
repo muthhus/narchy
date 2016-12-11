@@ -2,7 +2,6 @@ package nars.experiment.pacman;
 
 import java.awt.*;
 
-
 class Pacman extends Organism {
 	int mouthAngle=0;
 	final int MAX_MOUTH_ANGLE=75;

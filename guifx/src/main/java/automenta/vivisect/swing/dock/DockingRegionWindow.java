@@ -15,8 +15,6 @@
  */
 package automenta.vivisect.swing.dock;
 
-import javax.swing.*;
-import java.awt.*;
 import java.util.EventObject;
 
 import static javax.swing.SwingUtilities.getWindowAncestor;

@@ -27,8 +27,6 @@ package automenta.vivisect.swing;
 //import automenta.vivisect.swing.property.propertysheet.PropertySheet;
 //import automenta.vivisect.swing.property.propertysheet.PropertySheetPanel;
 
-import javax.swing.*;
-
 /**
  * Auto-reflect an object into a Swing PropertySheetPage
  */

@@ -7,8 +7,6 @@ package jurls.examples.menu;
 
 import jurls.core.approximation.*;
 
-import javax.swing.*;
-
 /**
  * 
  * @author thorsten2

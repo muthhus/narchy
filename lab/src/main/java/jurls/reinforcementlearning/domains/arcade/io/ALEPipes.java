@@ -19,8 +19,6 @@ package jurls.reinforcementlearning.domains.arcade.io;
 
 import jurls.reinforcementlearning.domains.arcade.screen.ScreenMatrix;
 
-import java.io.*;
-
 /**
  * Class that communicates with ALE via pipes.
  *  The protocol used here is ALE 0.3.

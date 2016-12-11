@@ -25,7 +25,6 @@ import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
-import javafx.scene.control.*;
 import javafx.scene.effect.ColorAdjust;
 
 import static org.jewelsea.willow.util.ResourceUtil.getString;

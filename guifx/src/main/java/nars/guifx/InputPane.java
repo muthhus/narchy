@@ -1,7 +1,6 @@
 package nars.guifx;
 
 import javafx.geometry.Side;
-import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import nars.NAR;

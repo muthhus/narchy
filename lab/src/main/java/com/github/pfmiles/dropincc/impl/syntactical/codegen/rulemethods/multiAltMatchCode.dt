@@ -1,7 +1,0 @@
-int startPoint = -1;// TODO only needed when backtracking
-switch (rulePredict({0}DfaStart, arg, "{0}")) '{'
-{1}
-default:
-    throw new DropinccException("No viable alternative found in rule: {0}, at position: " + lexer.getCurrentPosition() + ", upcoming sequence: "
-            + lexer.getAheadTokensRepr() + "...");
-'}'

@@ -1,7 +1,8 @@
 package cleargl;
 
-import java.nio.FloatBuffer;
 import com.jogamp.opengl.GL;
+
+import java.nio.FloatBuffer;
 
 public class GLUniform implements GLInterface {
 	private final GLProgram mGlProgram;

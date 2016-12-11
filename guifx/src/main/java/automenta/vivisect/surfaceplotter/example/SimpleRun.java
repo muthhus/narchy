@@ -3,8 +3,6 @@ package automenta.vivisect.surfaceplotter.example;
 import automenta.vivisect.surfaceplotter.JSurfacePanel;
 import automenta.vivisect.surfaceplotter.surface.ArraySurfaceModel;
 
-import javax.swing.*;
-import java.awt.*;
 import java.util.Random;
 
 public class SimpleRun {

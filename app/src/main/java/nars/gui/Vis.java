@@ -358,10 +358,10 @@ public class Vis {
 //                        //new FastOrganicLayout()
                 )
         ) {
-            @Override
-            protected void initLighting() {
-                //no
-            }
+//            @Override
+//            protected void initLighting() {
+//                //no
+//            }
         };
 
         s.dyn.addBroadConstraint(new ForceDirected());

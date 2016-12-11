@@ -1,9 +1,10 @@
 package cleargl;
 
-import java.nio.FloatBuffer;
-import java.util.Arrays;
 import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GLException;
+
+import java.nio.FloatBuffer;
+import java.util.Arrays;
 
 public class GLVertexAttributeArray implements
 		GLCloseable,

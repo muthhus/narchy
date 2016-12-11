@@ -1,7 +1,5 @@
 package automenta.vivisect.swing;
 
-import javax.swing.*;
-import java.awt.*;
 import java.awt.event.HierarchyEvent;
 import java.awt.event.HierarchyListener;
 

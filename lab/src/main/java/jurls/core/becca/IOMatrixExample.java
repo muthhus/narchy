@@ -7,9 +7,7 @@ package jurls.core.becca;
 
 import jurls.core.utils.MatrixImage;
 
-import javax.swing.*;
 import javax.swing.border.EmptyBorder;
-import java.awt.*;
 
 /**
  *

@@ -13,9 +13,6 @@
  *******************************************************************************/
 package org.jfxvnc.net.rfb.codec.handshaker;
 
-import io.netty.buffer.ByteBuf;
-import io.netty.channel.ChannelHandlerContext;
-
 public class RfbClient38Encoder extends RfbClient33Encoder {
 
 }

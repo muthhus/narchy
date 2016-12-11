@@ -17,9 +17,6 @@ package automenta.vivisect.swing.dock;
 
 import automenta.vivisect.swing.dock.DockingRegionContainer.MinMaxRecord;
 
-import javax.swing.*;
-import java.awt.*;
-
 /**
  * 
  * @author kitfox

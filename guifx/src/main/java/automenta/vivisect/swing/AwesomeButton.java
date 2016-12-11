@@ -2,8 +2,6 @@ package automenta.vivisect.swing;
 
 import nars.Video;
 
-import javax.swing.*;
-
 /**
  * Button using FontAwesome icon as a label
  */

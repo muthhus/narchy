@@ -25,8 +25,6 @@
  *----------------------------------------------------------------------------------------*/
 package automenta.vivisect.surfaceplotter.surface;
 
-import java.awt.*;
-
 /**
  * The class <code>SurfaceVertex</code> represents a surfaceVertex in 3D space.
  * 

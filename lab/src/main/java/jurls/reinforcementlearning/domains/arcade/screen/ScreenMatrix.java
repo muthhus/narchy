@@ -17,8 +17,6 @@
  */
 package jurls.reinforcementlearning.domains.arcade.screen;
 
-import java.io.*;
-
 /** Encapsulates screen matrix data. Also provides basic save/load operations on
  *   screen data.
  *

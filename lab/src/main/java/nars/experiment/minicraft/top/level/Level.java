@@ -1,7 +1,6 @@
 package nars.experiment.minicraft.top.level;
 
 
-
 import nars.experiment.minicraft.top.entity.*;
 import nars.experiment.minicraft.top.gfx.Screen;
 import nars.experiment.minicraft.top.level.levelgen.LevelGen;

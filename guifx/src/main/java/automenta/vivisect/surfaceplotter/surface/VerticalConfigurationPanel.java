@@ -10,9 +10,7 @@ import automenta.vivisect.surfaceplotter.beans.JBindedRadioButton;
 import automenta.vivisect.surfaceplotter.beans.JScrollablePanel;
 import automenta.vivisect.surfaceplotter.beans.ModelSource;
 
-import javax.swing.*;
 import javax.swing.border.EmptyBorder;
-import java.awt.*;
 
 /**
  * A Vertical Configuration panel for the {@link DefaultSurfaceModel}.

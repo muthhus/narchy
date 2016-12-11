@@ -11,8 +11,6 @@ import javafx.scene.control.TabPane;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 
-import java.util.*;
-
 public class TabPaneDetacher {
 
     private TabPane tabPane;

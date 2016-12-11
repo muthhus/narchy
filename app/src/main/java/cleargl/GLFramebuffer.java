@@ -1,10 +1,11 @@
 package cleargl;
 
+import com.jogamp.opengl.GL;
+import com.jogamp.opengl.GL4;
+
 import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.List;
-import com.jogamp.opengl.GL;
-import com.jogamp.opengl.GL4;
 
 /**
  * <Description>

@@ -199,37 +199,37 @@
         <dependency>
             <groupId>org.boofcv</groupId>
             <artifactId>all</artifactId>
-            <version>0.24.1</version>
+            <version>0.26</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.boofcv</groupId>
             <artifactId>sfm</artifactId>
-            <version>0.24.1</version>
+            <version>0.26</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.boofcv</groupId>
             <artifactId>geo</artifactId>
-            <version>0.24.1</version>
+            <version>0.26</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.boofcv</groupId>
             <artifactId>io</artifactId>
-            <version>0.24.1</version>
+            <version>0.26</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.boofcv</groupId>
             <artifactId>ip</artifactId>
-            <version>0.24.1</version>
+            <version>0.26</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.boofcv</groupId>
             <artifactId>WebcamCapture</artifactId>
-            <version>0.24.1</version>
+            <version>0.26</version>
             <scope>compile</scope>
         </dependency>
 
@@ -263,6 +263,14 @@
             <artifactId>jeromq</artifactId>
             <version>0.3.6</version>
         </dependency>
+
+        <!-- https://mvnrepository.com/artifact/org.infinispan/infinispan-core -->
+        <dependency>
+            <groupId>org.infinispan</groupId>
+            <artifactId>infinispan-core</artifactId>
+            <version>9.0.0.Beta1</version>
+        </dependency>
+
     </dependencies>
 
     <build>

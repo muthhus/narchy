@@ -15,8 +15,6 @@
  */
 package automenta.vivisect.swing.dock;
 
-import javax.swing.*;
-import java.awt.*;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;

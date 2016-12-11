@@ -106,7 +106,7 @@ public class SND_JAVA extends Globals {
 		DataLine.Info dinfo = new DataLine.Info(SourceDataLine.class, format);
 		
 		try {
-			line = (SourceDataLine)AudioSystem.getLine(dinfo);
+			line = (SourceDataLine) AudioSystem.getLine(dinfo);
 		} catch (LineUnavailableException e4) {
 			return false; 
 		}

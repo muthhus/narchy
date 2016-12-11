@@ -3,7 +3,6 @@ package automenta.vivisect.surfaceplotter;
 import automenta.vivisect.surfaceplotter.surface.AbstractSurfaceModel;
 import automenta.vivisect.surfaceplotter.surface.SurfaceVertex;
 
-import javax.swing.*;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 

@@ -18,7 +18,6 @@ package automenta.vivisect.dimensionalize;
  import org.apache.commons.math3.linear.ArrayRealVector;
  import org.eclipse.collections.impl.map.mutable.primitive.ObjectDoubleHashMap;
 
- import java.util.*;
  import java.util.Map.Entry;
  import java.util.concurrent.ExecutionException;
  import java.util.concurrent.Future;

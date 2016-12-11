@@ -7,8 +7,6 @@ package jurls.reinforcementlearning.domains.follow;
 
 import jurls.reinforcementlearning.domains.RLEnvironment;
 
-import javax.swing.*;
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;

@@ -17,7 +17,6 @@ import javax.sound.sampled.LineUnavailableException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.*;
 
 /**
  * Sonifies the activity of concepts being activated and forgotten

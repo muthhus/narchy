@@ -1,10 +1,9 @@
 package cleargl.util.recorder;
 
-import java.awt.Component;
-import java.io.File;
-
-import javax.swing.JFileChooser;
+import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
+import java.awt.*;
+import java.io.File;
 
 public class FolderChooser extends JFileChooser
 {

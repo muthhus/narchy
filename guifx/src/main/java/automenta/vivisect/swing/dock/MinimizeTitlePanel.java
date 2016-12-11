@@ -23,9 +23,7 @@ package automenta.vivisect.swing.dock;
 
 import automenta.vivisect.swing.dock.DockingRegionContainer.MinMaxRecord;
 
-import javax.swing.*;
 import javax.swing.border.BevelBorder;
-import java.awt.*;
 import java.awt.event.ActionEvent;
 
 import static javax.swing.BorderFactory.createBevelBorder;

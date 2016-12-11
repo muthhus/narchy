@@ -23,7 +23,6 @@ package org.jewelsea.willow.sidebar;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Side;
-import javafx.scene.control.*;
 import javafx.scene.effect.ColorAdjust;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.Dragboard;

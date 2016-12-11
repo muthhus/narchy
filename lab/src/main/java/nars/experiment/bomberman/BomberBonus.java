@@ -1,13 +1,13 @@
 package nars.experiment.bomberman;
 
-import java.awt.*;
-
 /**
  * File:         BomberBonus
  * Copyright:    Copyright (c) 2001
  * @author Sammy Leong
  * @version 1.0
  */
+
+import java.awt.*;
 
 /**
  * This class creates the bonuses in the game.

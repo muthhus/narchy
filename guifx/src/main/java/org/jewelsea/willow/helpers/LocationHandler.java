@@ -24,7 +24,6 @@ package org.jewelsea.willow.helpers;
 import javafx.scene.web.WebView;
 import javafx.stage.FileChooser;
 
-import java.io.*;
 import java.net.URL;
 
 import static org.jewelsea.willow.util.ResourceUtil.getString;

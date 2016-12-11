@@ -14,7 +14,6 @@
 package org.jfxvnc.ui;
 
 import com.airhacks.afterburner.injection.Injector;
-import javafx.scene.image.ImageView;
 import javafx.scene.image.PixelReader;
 import javafx.scene.image.WritableImage;
 import javafx.scene.layout.BorderPane;

@@ -1,27 +1,18 @@
 package cleargl;
 
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.Graphics2D;
-import java.awt.RenderingHints;
-import java.awt.Transparency;
+import com.jogamp.opengl.GL;
+import com.jogamp.opengl.GL2ES3;
+
+import javax.swing.*;
+import java.awt.*;
 import java.awt.color.ColorSpace;
-import java.awt.image.BufferedImage;
-import java.awt.image.ColorModel;
-import java.awt.image.ComponentColorModel;
-import java.awt.image.DataBuffer;
-import java.awt.image.DataBufferByte;
-import java.awt.image.Raster;
-import java.awt.image.WritableRaster;
+import java.awt.image.*;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.util.HashMap;
 import java.util.Hashtable;
-import javax.swing.JLabel;
-import com.jogamp.opengl.GL;
-import com.jogamp.opengl.GL2ES3;
 
 /**
  * Created by ulrik on 11/02/15.

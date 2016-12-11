@@ -3,8 +3,6 @@ package automenta.vivisect.surfaceplotter.surface;
 import automenta.vivisect.surfaceplotter.surface.SurfaceModel.PlotColor;
 import automenta.vivisect.surfaceplotter.surface.SurfaceModel.PlotType;
 
-import java.awt.*;
-
 
 /** A simple {@link SurfaceColor} implementations that uses two ColorMode per plot type. 
 

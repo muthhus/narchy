@@ -43,7 +43,7 @@ public class PongModel extends JPanel implements ActionListener, MouseListener, 
 	// Constructor
 	public PongModel(Player player1, Player player2) {
 		super ();
-		setBackground (new Color (0, 0, 0));
+		setBackground (new Color(0, 0, 0));
 		
 		this.player1 = player1;
 		this.player2 = player2;

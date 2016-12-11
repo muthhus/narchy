@@ -9,7 +9,6 @@ import nars.guifx.graph3.Xform;
 import nars.guifx.util.ColorArray;
 import org.eclipse.collections.impl.set.mutable.UnifiedSet;
 
-import java.util.*;
 import java.util.function.Consumer;
 
 import static javafx.application.Platform.runLater;

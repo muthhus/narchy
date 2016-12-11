@@ -12,22 +12,22 @@ import java.awt.*;
 
 public class BomberFire extends Thread {
     /** map object */
-    private BomberMap map = null;
+    private BomberMap map;
     /** map grid handle */
-    private int[][] grid = null;
+    private int[][] grid;
     /** position */
-    private int x = 0;
-    private int y = 0;
+    private int x;
+    private int y;
     /** fire type */
-    private int type = 0;
+    private int type;
     /** frame count */
-    private int frame = 0;
+    private int frame;
     /** owner */
-    private int owner = 0;
+    private int owner;
     /** bomb sprite image handles */
-    private static Image[][] images = null;
+    private static Image[][] images;
     /** rendering hints */
-    private static Object hints = null;
+    private static Object hints;
 
     static {
         /** if java runtime is Java 2 */
@@ -45,7 +45,7 @@ public class BomberFire extends Thread {
              RenderingHints.VALUE_ANTIALIAS_ON);
             h.put(RenderingHints.KEY_COLOR_RENDERING,
              RenderingHints.VALUE_COLOR_RENDER_QUALITY);
-            hints = (RenderingHints)h;
+            hints = h;
         }
     }
 
@@ -56,7 +56,7 @@ public class BomberFire extends Thread {
         this.y = y;
         this.type = type;
         this.owner = owner - 1;
-        this.images = BomberMap.fireImages;
+        images = BomberMap.fireImages;
 
         if (type == BomberMap.FIRE_BRICK)
            grid[x >> BomberMain.shiftCount][y >> BomberMain.shiftCount] =
@@ -78,6 +78,7 @@ public class BomberFire extends Thread {
     /**
      * Main loop.
      */
+    @Override
     public void run() {
         while (true) {
             /** draw the fire */

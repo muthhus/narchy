@@ -33,7 +33,6 @@
 package nars.guifx.graph3;
 
 import javafx.event.EventHandler;
-import javafx.scene.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;

@@ -1,7 +1,6 @@
 
 package automenta.vivisect.surfaceplotter.beans;
 
-import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
 

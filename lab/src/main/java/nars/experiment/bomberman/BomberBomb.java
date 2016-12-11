@@ -1,13 +1,13 @@
 package nars.experiment.bomberman;
 
-import java.awt.*;
-
 /**
  * File:         BomberBomb
  * Copyright:    Copyright (c) 2001
  * @author Sammy Leong
  * @version 1.0
  */
+
+import java.awt.*;
 
 /**
  * This class creates the bombs in the game.

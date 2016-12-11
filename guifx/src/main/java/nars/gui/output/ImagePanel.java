@@ -1,8 +1,6 @@
 package nars.gui.output;
 
-import javax.swing.*;
 import javax.swing.border.LineBorder;
-import java.awt.*;
 import java.awt.image.BufferedImage;
 
 /**

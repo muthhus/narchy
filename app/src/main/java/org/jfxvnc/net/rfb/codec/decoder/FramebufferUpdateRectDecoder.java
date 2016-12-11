@@ -105,7 +105,10 @@ class FramebufferUpdateRectDecoder implements FrameDecoder {
 
         FrameRectDecoder dec = frameRectDecoder.get(rect.getEncoding());
         if (dec == null) {
-            throw new ProtocolException("Encoding not supported: " + rect.getEncoding());
+            //throw new ProtocolException("Encoding not supported: " + rect.getEncoding());
+            //System.err.println("Encoding not supported: " + rect.getEncoding());
+            logger.warn("Encoding not supported: {}", rect);
+            return false;
         }
         dec.setRect(rect);
         if (!dec.decode(ctx, m, out)) {

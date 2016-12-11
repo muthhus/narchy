@@ -1,9 +1,5 @@
 package automenta.vivisect.surfaceplotter.beans;
 
-import javax.swing.*;
-import java.awt.*;
-
-
 /** A scrollpane suitable for gridbag layout.
  * <p>When a GridBagLayout has not enough room to layout its component, it moves
  * from preferredsize to minimum size. Standard scrollpane have a very small minimumsize, and it DOES not depend on the viewport view.

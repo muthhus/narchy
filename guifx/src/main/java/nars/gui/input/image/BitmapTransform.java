@@ -1,6 +1,5 @@
 package nars.gui.input.image;
 
-import java.awt.*;
 import java.awt.image.BufferedImage;
 
 /**

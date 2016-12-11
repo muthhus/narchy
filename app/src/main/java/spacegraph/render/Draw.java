@@ -27,7 +27,6 @@ package spacegraph.render;
 import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.util.ImmModeSink;
-import com.jogamp.opengl.util.texture.Texture;
 import nars.$;
 import nars.util.list.FasterList;
 import org.apache.commons.io.IOUtils;

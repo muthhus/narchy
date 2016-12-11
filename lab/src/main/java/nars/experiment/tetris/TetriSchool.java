@@ -182,7 +182,7 @@ public class TetriSchool extends NSchool implements Runnable {
 
                     grid(
 
-                        new CheckBox("play").on((c,e)->{
+                        new CheckBox("play").on((c, e)->{
                             school.updatePeriodMS = (e ? 200 : 10000);
                         }).set(true),
 

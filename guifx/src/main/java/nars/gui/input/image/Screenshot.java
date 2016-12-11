@@ -2,8 +2,6 @@ package nars.gui.input.image;
 
 import nars.gui.output.BitmapPanel;
 
-import javax.swing.*;
-import java.awt.*;
 import java.awt.image.BufferedImage;
 
 /**

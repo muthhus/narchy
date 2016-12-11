@@ -17,23 +17,23 @@ import java.util.Vector;
  */
 public class BomberMap extends JPanel {
     /** frame object */
-    private BomberMain main = null;
+    private BomberMain main;
     /** game over flag */
-    private boolean gameOver = false;
+    private boolean gameOver;
     /** background color */
-    private Color backgroundColor = null;
+    private Color backgroundColor;
     /** the map grid array */
-    public int[][] grid = null;
+    public int[][] grid;
     /** fire grid */
-    public boolean[][] fireGrid = null;
+    public boolean[][] fireGrid;
     /** bomb grid */
-    public BomberBomb[][] bombGrid = null;
+    public BomberBomb[][] bombGrid;
     /** bonus grid */
-    public BomberBonus[][] bonusGrid = null;
+    public BomberBonus[][] bonusGrid;
     /** bombs */
-    private Vector bombs = null;
+    private Vector bombs;
     /** bonuses */
-    private Vector bonuses = null;
+    private Vector bonuses;
 
     /**
      * Bomb info class
@@ -43,8 +43,8 @@ public class BomberMap extends JPanel {
             r = (x >> BomberMain.shiftCount);
             c = (y >> BomberMain.shiftCount);
         }
-        public int r = 0;
-        public int c = 0;
+        public int r;
+        public int c;
     }
 
     /**
@@ -55,20 +55,20 @@ public class BomberMap extends JPanel {
             r = (x >> BomberMain.shiftCount);
             c = (y >> BomberMain.shiftCount);
         }
-        public int r = 0;
-        public int c = 0;
+        public int r;
+        public int c;
     }
 
     /** image handles for the map images */
-    private static Image[][] mapImages = null;
+    private static Image[][] mapImages;
     /** bomb images */
-    public static Image[] bombImages = null;
+    public static Image[] bombImages;
     /** fire images */
-    public static Image[][] fireImages = null;
+    public static Image[][] fireImages;
     /** fire brick images */
-    public static Image[][] fireBrickImages = null;
+    public static Image[][] fireBrickImages;
     /** bonus images */
-    public static Image[][] bonusImages = null;
+    public static Image[][] bonusImages;
     /** fire type enumerations */
     public static final int FIRE_CENTER = 0;
     public static final int FIRE_VERTICAL = 1;
@@ -86,13 +86,13 @@ public class BomberMap extends JPanel {
     public static final int BRICK = 1;
     public static final int BOMB = 3;
     /** random level generator */
-    private static BomberRandInt levelRand = null;
+    private static BomberRandInt levelRand;
     /** random bonus generator */
-    private static BomberRandInt bonusRand = null;
+    private static BomberRandInt bonusRand;
     /** current level */
-    public static int level = 0;
+    public static int level;
     /** rendering hints */
-    private static Object hints = null;
+    private static Object hints;
 
     static {
         /** if java runtime is Java 2 */
@@ -110,7 +110,7 @@ public class BomberMap extends JPanel {
              RenderingHints.VALUE_ANTIALIAS_ON);
             h.put(RenderingHints.KEY_COLOR_RENDERING,
              RenderingHints.VALUE_COLOR_RENDER_QUALITY);
-            hints = (RenderingHints)h;
+            hints = h;
         }
 
         /** create the level random generator */
@@ -143,7 +143,7 @@ public class BomberMap extends JPanel {
                 new File(strs[0]).getCanonicalPath());
                 mapImages[i][1] = Toolkit.getDefaultToolkit().getImage(
                 new File(strs[1]).getCanonicalPath());
-                if (i == 0) mapImages[i][2] = null;
+                if (i == 0) mapImages[0][2] = null;
                 else
                     mapImages[i][2] = Toolkit.getDefaultToolkit().getImage(
                     new File(strs[2]).getCanonicalPath());
@@ -168,7 +168,7 @@ public class BomberMap extends JPanel {
                 else if (t == FIRE_EAST) str += "E";
                 else if (t == FIRE_WEST) str += "W";
                 else if (t == FIRE_SOUTH) str += "S";
-                if (t == FIRE_BRICK) fireImages[t][i] = null;
+                if (t == FIRE_BRICK) fireImages[FIRE_BRICK][i] = null;
                 else {
                     str += (i + 1) + ".gif";
                     fireImages[t][i] = Toolkit.getDefaultToolkit().getImage(
@@ -272,7 +272,7 @@ public class BomberMap extends JPanel {
         /** double buffer on */
         setDoubleBuffered(true);
 
-        setBounds(0, 0, 17 << main.shiftCount, 17 << main.shiftCount);
+        setBounds(0, 0, 17 << BomberMain.shiftCount, 17 << BomberMain.shiftCount);
         setOpaque(false);
         /** add the map to the bottom layer */
         main.getLayeredPane().add(this, 1000);
@@ -520,6 +520,7 @@ public class BomberMap extends JPanel {
      * Drawing method.
      * @param graphics graphics handle
      */
+     @Override
      public synchronized void paint(Graphics graphics) {
         Graphics g = graphics;
         /** if java runtime is Java 2 */

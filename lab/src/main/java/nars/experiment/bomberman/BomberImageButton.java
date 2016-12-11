@@ -1,14 +1,14 @@
 package nars.experiment.bomberman;
 
-import javax.swing.*;
-import java.awt.*;
-
 /**
  * File:         BomberImagePanel.java
  * Copyright:    Copyright (c) 2001
  * @author Sammy Leong
  * @version 1.0
  */
+
+import javax.swing.*;
+import java.awt.*;
 
 /**
  * This class creates a custom image button object.

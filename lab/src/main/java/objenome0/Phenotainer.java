@@ -90,7 +90,7 @@ public class Phenotainer extends Container {
     
     protected <T> Class<? extends T> instance(Class<? extends T> c) throws CannotCompileException, NotFoundException, IOException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
         
-        CtClass parent = ClassPool.getDefault().get(c.getName()); 
+        CtClass parent = ClassPool.getDefault().get(c.getName());
         
         String newClassName = c.getName() + '_' + (classSerial++) + SetMethodsGPEvolved.DYNAMIC_SUFFIX;
         CtClass newImp = ClassPool.getDefault().makeClass(newClassName);

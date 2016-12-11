@@ -87,7 +87,7 @@
         <module>nal</module>
         <module>app</module>
         <module>lab</module>
-        <module>guifx</module>
+        <!--<module>guifx</module>-->
         <module>web</module>
         <module>perf</module>
     </modules>

@@ -2,10 +2,8 @@ package nars.gui.output;
 
 import nars.Video;
 
-import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
-import java.awt.*;
 
 
 

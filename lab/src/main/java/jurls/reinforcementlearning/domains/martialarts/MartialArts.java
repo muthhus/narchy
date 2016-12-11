@@ -8,8 +8,6 @@ package jurls.reinforcementlearning.domains.martialarts;
 import jurls.reinforcementlearning.domains.RLEnvironment;
 
 import javax.imageio.ImageIO;
-import javax.swing.*;
-import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;

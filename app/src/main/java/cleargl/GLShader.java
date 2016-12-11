@@ -1,5 +1,10 @@
 package cleargl;
 
+import com.jogamp.opengl.GL;
+import com.jogamp.opengl.GL2ES2;
+import com.jogamp.opengl.GL3;
+import com.jogamp.opengl.GLException;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -8,10 +13,6 @@ import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Scanner;
 import java.util.stream.Collectors;
-import com.jogamp.opengl.GL;
-import com.jogamp.opengl.GL2ES2;
-import com.jogamp.opengl.GL3;
-import com.jogamp.opengl.GLException;
 
 public class GLShader implements GLInterface, GLCloseable {
 	private final GL mGL;

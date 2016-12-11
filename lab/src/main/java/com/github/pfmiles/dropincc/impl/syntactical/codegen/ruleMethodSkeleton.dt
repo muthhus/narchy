@@ -1,5 +1,0 @@
-public Object {0}(Object arg) '{'
-    Object ret = null;
-    {1}
-    return ret;
-'}'

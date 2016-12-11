@@ -19,7 +19,6 @@ import javafx.scene.Node;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import org.jfxvnc.net.rfb.codec.encoder.InputEventListener;
-import org.jfxvnc.net.rfb.codec.encoder.KeyButtonMap;
 import org.jfxvnc.net.rfb.codec.encoder.PointerEvent;
 
 public class PointerEventHandler {

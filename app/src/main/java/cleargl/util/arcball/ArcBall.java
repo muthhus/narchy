@@ -1,7 +1,6 @@
 package cleargl.util.arcball;
 
 import cleargl.GLMatrix;
-
 import com.jogamp.opengl.math.Quaternion;
 
 public class ArcBall

@@ -42,7 +42,7 @@ public class cpac
 	Graphics graphics;
 
 	// the pac image
-	Image [][] imagePac;
+	Image[][] imagePac;
 
 	// the knowledge of the maze
 	cmaze maze;

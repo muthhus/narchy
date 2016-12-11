@@ -15,8 +15,6 @@
  */
 package automenta.vivisect.swing.dock;
 
-import javax.swing.*;
-import java.awt.*;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.util.ArrayList;

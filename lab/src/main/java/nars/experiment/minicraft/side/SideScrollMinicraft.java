@@ -13,7 +13,6 @@
 package nars.experiment.minicraft.side;
 
 import nars.experiment.minicraft.side.awtgraphics.AwtEventsHandler;
-import nars.experiment.minicraft.side.awtgraphics.AwtGraphicsHandler;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -60,7 +59,7 @@ public class SideScrollMinicraft {
 		menu = new MainMenu(this);
 		gfx = GraphicsHandler.get();
 		gfx.init(this);
-		input = new AwtEventsHandler(this, ((AwtGraphicsHandler)gfx).canvas);
+		input = new AwtEventsHandler(this);
 		System.gc();
 	}
 	

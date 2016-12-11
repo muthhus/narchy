@@ -1,11 +1,12 @@
 package cleargl;
 
-import java.io.IOException;
-import java.util.HashMap;
 import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL2ES2;
 import com.jogamp.opengl.GL3;
 import com.jogamp.opengl.GLException;
+
+import java.io.IOException;
+import java.util.HashMap;
 
 public class GLProgram implements GLInterface, GLCloseable {
 	private GL mGL;

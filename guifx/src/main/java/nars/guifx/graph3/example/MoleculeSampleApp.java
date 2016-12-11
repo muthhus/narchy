@@ -33,7 +33,6 @@
 package nars.guifx.graph3.example;
 
 import javafx.application.Application;
-import javafx.scene.*;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.Box;

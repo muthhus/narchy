@@ -20,9 +20,7 @@ package automenta.vivisect.swing;
 import com.google.common.util.concurrent.AtomicDouble;
 import nars.Video;
 
-import javax.swing.*;
 import javax.swing.border.LineBorder;
-import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;

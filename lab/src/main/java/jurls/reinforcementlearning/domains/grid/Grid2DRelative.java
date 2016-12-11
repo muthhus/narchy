@@ -1,7 +1,5 @@
 package jurls.reinforcementlearning.domains.grid;
 
-import javax.swing.*;
-import java.awt.*;
 import java.awt.image.BufferedImage;
 
 

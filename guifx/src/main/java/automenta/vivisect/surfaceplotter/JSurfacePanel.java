@@ -12,8 +12,6 @@ import automenta.vivisect.surfaceplotter.surface.SurfaceModel.PlotColor;
 import automenta.vivisect.surfaceplotter.surface.SurfaceModel.PlotType;
 import automenta.vivisect.surfaceplotter.surface.VerticalConfigurationPanel;
 
-import javax.swing.*;
-import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;

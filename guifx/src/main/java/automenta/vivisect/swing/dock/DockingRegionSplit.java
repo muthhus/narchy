@@ -15,9 +15,6 @@
  */
 package automenta.vivisect.swing.dock;
 
-import javax.swing.*;
-import java.awt.*;
-
 import static javax.swing.SwingUtilities.convertPoint;
 
 /**

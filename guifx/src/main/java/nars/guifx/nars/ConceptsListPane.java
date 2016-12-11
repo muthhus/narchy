@@ -6,7 +6,6 @@ import nars.NAR;
 import nars.concept.Concept;
 import nars.guifx.LogPane;
 
-import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static javafx.application.Platform.runLater;

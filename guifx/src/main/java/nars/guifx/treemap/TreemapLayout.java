@@ -5,8 +5,6 @@ import javafx.scene.Parent;
 import javafx.scene.layout.AnchorPane;
 import nars.guifx.util.paint.ColorGroup;
 
-import java.util.*;
-
 /**
  * http://www.win.tue.nl/~vanwijk/stm.pdf
  *

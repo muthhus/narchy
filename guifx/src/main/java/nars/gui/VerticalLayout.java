@@ -1,7 +1,5 @@
 package nars.gui;
 
-import java.awt.*;
-
 /*
  * $Id: VerticalLayout.java 542 2005-10-10 18:03:15Z rbair $
  *

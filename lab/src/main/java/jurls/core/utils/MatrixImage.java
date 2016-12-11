@@ -22,8 +22,6 @@ import jurls.core.brain.NeuroMap;
 import jurls.core.brain.NeuroMap.InputOutput;
 import org.apache.commons.math3.linear.RealMatrix;
 
-import javax.swing.*;
-import java.awt.*;
 import java.awt.image.BufferedImage;
 
 /**

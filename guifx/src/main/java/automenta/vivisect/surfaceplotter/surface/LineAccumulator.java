@@ -27,7 +27,6 @@
  */
 package automenta.vivisect.surfaceplotter.surface;
 
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 

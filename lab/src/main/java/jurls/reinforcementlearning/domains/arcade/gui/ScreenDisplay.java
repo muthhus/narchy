@@ -17,8 +17,6 @@
  */
 package jurls.reinforcementlearning.domains.arcade.gui;
 
-import javax.swing.*;
-import java.awt.*;
 import java.awt.image.BufferedImage;
 
 /** Displays the current Atari frame in a simple GUI.

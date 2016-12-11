@@ -5,9 +5,6 @@ package nars.gui;
  * @author me
  */
 
-import javax.swing.*;
-import java.awt.*;
-
 /**
  *  FlowLayout subclass that fully supports wrapping of components.
  */

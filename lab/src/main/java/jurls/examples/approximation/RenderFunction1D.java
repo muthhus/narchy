@@ -5,8 +5,6 @@
  */
 package jurls.examples.approximation;
 
-import java.awt.*;
-
 /**
  * 
  * @author thorsten

@@ -11,8 +11,11 @@ import objenome0.goal.DecideNumericValue.DecideDoubleValue;
 import objenome0.goal.DecideNumericValue.DecideIntegerValue;
 import objenome0.goal.DevelopMethod;
 import objenome0.problem.Problem;
-import objenome0.solution.dependency.*;
+import objenome0.solution.dependency.Builder;
+import objenome0.solution.dependency.ClassBuilder;
 import objenome0.solution.dependency.ClassBuilder.DependencyKey;
+import objenome0.solution.dependency.ConstructorDependency;
+import objenome0.solution.dependency.Scope;
 import objenome0.solver.IncompleteSolutionException;
 import objenome0.solver.RandomSolver;
 import objenome0.solver.Solution;
@@ -57,12 +60,12 @@ public class Multitainer extends AbstractPrototainer implements AbstractMultitai
     }
         
     @Override
-    public DecideImplementationClass any(Class abstractClass, Scope scope, Class<?>... klasses) {
+    public objenome0.solution.dependency.DecideImplementationClass any(Class abstractClass, Scope scope, Class<?>... klasses) {
         if (abstractClass == null)
             throw new RuntimeException("abstractClass is null");        
         
-        return (DecideImplementationClass)usable(abstractClass, scope, 
-                new DecideImplementationClass(abstractClass, Lists.newArrayList( klasses ) ));
+        return (objenome0.solution.dependency.DecideImplementationClass)usable(abstractClass, scope,
+                new objenome0.solution.dependency.DecideImplementationClass(abstractClass, Lists.newArrayList( klasses ) ));
     }
 
     public Builder any(Object key, Class<?>[] klasses) {
@@ -129,12 +132,12 @@ public class Multitainer extends AbstractPrototainer implements AbstractMultitai
 
             Builder bv = getBuilder(dk.key);
 
-            if (bv instanceof DecideImplementationClass) {
+            if (bv instanceof objenome0.solution.dependency.DecideImplementationClass) {
 
                 problems.add((Problem)bv);
 
                 //recurse for each choice
-                getProblems(((DecideImplementationClass)bv).implementors, nextPath, problems);
+                getProblems(((objenome0.solution.dependency.DecideImplementationClass)bv).implementors, nextPath, problems);
             }
             else if (bv!=null) {
                 //System.out.println("  Class Builder Init Value Builder: "+ cb + " " + bv);
@@ -198,8 +201,8 @@ public class Multitainer extends AbstractPrototainer implements AbstractMultitai
         else {
             
         
-            if (b instanceof DecideImplementationClass) {
-                DecideImplementationClass mcb = (DecideImplementationClass)b;
+            if (b instanceof objenome0.solution.dependency.DecideImplementationClass) {
+                objenome0.solution.dependency.DecideImplementationClass mcb = (objenome0.solution.dependency.DecideImplementationClass)b;
                 path.add(mcb);
 
                 problems.add(mcb);

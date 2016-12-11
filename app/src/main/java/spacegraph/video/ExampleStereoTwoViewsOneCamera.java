@@ -27,9 +27,9 @@ import boofcv.factory.geo.*;
 import boofcv.gui.d3.ColorPoint3D;
 import boofcv.gui.feature.AssociationPanel;
 import boofcv.gui.image.ShowImages;
-import boofcv.struct.calib.IntrinsicParameters;
-import boofcv.struct.distort.DoNothingTransform_F64;
-import boofcv.struct.distort.PointTransform_F64;
+import boofcv.struct.calib.CameraPinholeRadial;
+import boofcv.struct.distort.DoNothing2Transform2_F64;
+import boofcv.struct.distort.Point2Transform2_F64;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.BrightFeature;
 import boofcv.struct.feature.TupleDesc;
@@ -80,7 +80,7 @@ import java.util.function.Consumer;
 public class ExampleStereoTwoViewsOneCamera {
 
     // Disparity calculation parameters
-    private static final int minDisparity = 15;
+    private static final int minDisparity = 3;
     private static final int maxDisparity = 50;
 
     static class Frame {
@@ -101,9 +101,7 @@ public class ExampleStereoTwoViewsOneCamera {
 
 
         // Camera parameters
-        IntrinsicParameters intrinsic = new IntrinsicParameters(); //CalibrationIO.load(new File(calibDir , "intrinsic.yaml"));
-
-
+        CameraPinholeRadial intrinsic = new CameraPinholeRadial(); //CalibrationIO.load(new File(calibDir , "intrinsic.yaml"));
 
         intrinsic.setWidth(176);
         intrinsic.setHeight(144);
@@ -241,7 +239,7 @@ public class ExampleStereoTwoViewsOneCamera {
                             double baseline = leftToRight.getT().norm();
 
 
-                            gui.configure(baseline, rectifiedK, new DoNothingTransform_F64(), minDisparity, maxDisparity);
+                            gui.configure(baseline, rectifiedK, new DoNothing2Transform2_F64(), minDisparity, maxDisparity);
                             gui.process(disparityAlg.getDisparity(), prev.out);
 
                             diffed = true;
@@ -337,9 +335,9 @@ public class ExampleStereoTwoViewsOneCamera {
     /**
      * Convert a set of associated point features from pixel coordinates into normalized image coordinates.
      */
-    public static List<AssociatedPair> convertToNormalizedCoordinates(List<AssociatedPair> matchedFeatures, IntrinsicParameters intrinsic) {
+    public static List<AssociatedPair> convertToNormalizedCoordinates(List<AssociatedPair> matchedFeatures, CameraPinholeRadial intrinsic) {
 
-        PointTransform_F64 p_to_n = LensDistortionOps.transformPoint(intrinsic).undistort_F64(true, false);
+        Point2Transform2_F64 p_to_n = LensDistortionOps.transformPoint(intrinsic).undistort_F64(true, false);
 
         List<AssociatedPair> calibratedFeatures = new ArrayList<>();
 
@@ -370,7 +368,7 @@ public class ExampleStereoTwoViewsOneCamera {
     public static void rectifyImages(GrayF32 distortedLeft,
                                      GrayF32 distortedRight,
                                      Se3_F64 leftToRight,
-                                     IntrinsicParameters intrinsic,
+                                     CameraPinholeRadial intrinsic,
                                      GrayF32 rectifiedLeft,
                                      GrayF32 rectifiedRight,
                                      DenseMatrix64F rectifiedK) {
@@ -405,9 +403,9 @@ public class ExampleStereoTwoViewsOneCamera {
     /**
      * Draw inliers for debugging purposes.  Need to convert from normalized to pixel coordinates.
      */
-    public static void drawInliers(AssociationPanel panel, InterleavedU8 left, InterleavedU8 right, IntrinsicParameters intrinsic,
+    public static void drawInliers(AssociationPanel panel, InterleavedU8 left, InterleavedU8 right, CameraPinholeRadial intrinsic,
                                    List<AssociatedPair> normalized) {
-        PointTransform_F64 n_to_p = LensDistortionOps.transformPoint(intrinsic).distort_F64(false, true);
+        Point2Transform2_F64 n_to_p = LensDistortionOps.transformPoint(intrinsic).distort_F64(false, true);
 
         List<AssociatedPair> pixels = new ArrayList<>();
 
@@ -782,7 +780,7 @@ public class ExampleStereoTwoViewsOneCamera {
         public double radius = 5;
 
         // converts from rectified pixels into color image pixels
-        PointTransform_F64 rectifiedToColor;
+        Point2Transform2_F64 rectifiedToColor;
         // storage for color image coordinate
         Point2D_F64 colorPt = new Point2D_F64();
         private int w, h;
@@ -803,7 +801,7 @@ public class ExampleStereoTwoViewsOneCamera {
          */
         public void configure(double baseline,
                               DenseMatrix64F K,
-                              PointTransform_F64 rectifiedToColor,
+                              Point2Transform2_F64 rectifiedToColor,
                               int minDisparity, int maxDisparity) {
             this.K = K;
             this.rectifiedToColor = rectifiedToColor;
@@ -1142,7 +1140,7 @@ public class ExampleStereoTwoViewsOneCamera {
          */
         public void configure(double baseline,
                               DenseMatrix64F K,
-                              PointTransform_F64 rectifiedToColor,
+                              Point2Transform2_F64 rectifiedToColor,
                               int minDisparity, int maxDisparity) {
             view.configure(baseline, K, rectifiedToColor, minDisparity, maxDisparity);
         }

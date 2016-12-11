@@ -33,12 +33,10 @@ import javafx.beans.value.ChangeListener;
 import javafx.embed.swing.SwingNode;
 import javafx.scene.Node;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.TransferMode;
-import javafx.scene.layout.*;
 import javafx.scene.text.FontSmoothingType;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
@@ -46,7 +44,6 @@ import javafx.util.Duration;
 import org.jewelsea.willow.navigation.NavTools;
 import org.jewelsea.willow.util.DebugUtil;
 
-import javax.swing.*;
 import java.util.HashMap;
 import java.util.Map;
 

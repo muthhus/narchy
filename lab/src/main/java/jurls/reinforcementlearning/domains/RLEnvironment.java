@@ -7,8 +7,6 @@ package jurls.reinforcementlearning.domains;
 
 import automenta.vivisect.swing.NWindow;
 
-import java.awt.*;
-
 /**
  * Reinforcement Learning interface
  * @author thorsten

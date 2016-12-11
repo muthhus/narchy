@@ -2,7 +2,6 @@ package nars.guifx.util;
 
 import com.google.common.collect.Lists;
 import javafx.scene.Node;
-import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;

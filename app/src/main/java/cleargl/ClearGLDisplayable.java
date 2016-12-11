@@ -1,12 +1,12 @@
 package cleargl;
 
-import java.awt.Component;
-import java.io.PrintStream;
 import com.jogamp.nativewindow.WindowClosingProtocol.WindowClosingMode;
 import com.jogamp.newt.event.KeyListener;
 import com.jogamp.newt.event.MouseListener;
 import com.jogamp.newt.event.WindowAdapter;
 import com.jogamp.opengl.GLException;
+
+import java.io.PrintStream;
 
 public interface ClearGLDisplayable extends GLCloseable {
 

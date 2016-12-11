@@ -15,6 +15,7 @@ import spacegraph.SpaceGraph;
 import spacegraph.Surface;
 import spacegraph.obj.Cuboid;
 import spacegraph.obj.EDraw;
+import spacegraph.obj.widget.PushButton;
 import spacegraph.phys.Collidable;
 import spacegraph.phys.Dynamic;
 import spacegraph.phys.collision.ClosestRay;
@@ -30,7 +31,6 @@ import static spacegraph.math.v3.v;
 public class ConceptWidget extends Cuboid<Term> implements Consumer<BLink<? extends Termed>> {
 
     public final ArrayBag<TermEdge> edges;
-    private final ConceptIcon icon;
 
 
     //caches a reference to the current concept
@@ -44,14 +44,19 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<BLink<? exte
     public ConceptWidget(NAR nar, Termed x, int numEdges) {
         super(x.term(),1, 1);
 
-        setFront(
-            /*col(
-                    new Label(x.toString()),
-                row(new FloatSlider( 0, 0, 4 ), new BeliefTableChart(nar, x))
-                    //new CheckBox("?")
-            )*/
-            icon = new ConceptIcon(nar, x)
-        );
+//        setFront(
+//            /*col(
+//                    new Label(x.toString()),
+//                row(new FloatSlider( 0, 0, 4 ), new BeliefTableChart(nar, x))
+//                    //new CheckBox("?")
+//            )*/
+//            icon = new ConceptIcon(nar, x)
+//        );
+
+        final PushButton icon = new PushButton(x.toString(), (z) -> {
+            setFront(new BeliefTableChart(nar, x).scale(4,4));
+        });
+        setFront(icon);
 
         //float edgeActivationRate = 1f;
 
@@ -226,7 +231,7 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<BLink<? exte
 
     public ConceptWidget setConcept(Concept concept, long when) {
         this.concept = concept;
-        icon.update(concept, when);
+        //icon.update(concept, when);
         return this;
     }
 

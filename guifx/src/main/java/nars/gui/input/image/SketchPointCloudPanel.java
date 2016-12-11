@@ -3,8 +3,6 @@ package nars.gui.input.image;
 import automenta.vivisect.swing.NWindow;
 import nars.NAR;
 
-import java.awt.*;
-import java.awt.event.*;
 import java.util.ArrayList;
 
 

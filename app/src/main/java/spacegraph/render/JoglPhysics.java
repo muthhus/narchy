@@ -262,7 +262,8 @@ abstract public class JoglPhysics<X> extends JoglSpace implements GLEventListene
     protected void initLighting() {
         gl.glLightModelf(GL_LIGHT_MODEL_AMBIENT, 0.6f);
 
-        float[] light_ambient = new float[]{0.3f, 0.3f, 0.3f, 1.0f};
+        final float a = 0.7f;
+        float[] light_ambient = new float[]{a, a, a, 1.0f};
         float[] light_diffuse = new float[]{0.5f, 0.5f, 0.5f, 0.5f};
         //float[] light_specular = new float[]{1.0f, 1.0f, 1.0f, 1.0f};
         float[] light_specular = new float[]{0.5f, 0.5f, 0.5f, 0.5f};

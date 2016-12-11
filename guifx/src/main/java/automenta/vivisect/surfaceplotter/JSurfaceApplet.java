@@ -1,8 +1,5 @@
 package automenta.vivisect.surfaceplotter;
 
-import javax.swing.*;
-import java.awt.*;
-
 public class JSurfaceApplet extends JApplet {
 
 	

@@ -5,8 +5,6 @@
  */
 package jurls.examples.menu;
 
-import javax.swing.*;
-
 /**
  *
  * @author thorsten2

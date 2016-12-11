@@ -2,7 +2,6 @@ package nars.guifx.demo;
 
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import nars.$;
 import nars.NAR;
 import nars.guifx.graph2.TermEdge;
 import nars.guifx.graph2.TermNode;

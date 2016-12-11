@@ -7,8 +7,6 @@ package jurls.examples.approximation;
 
 import jurls.core.approximation.ParameterizedFunction;
 
-import java.awt.*;
-
 /**
  *
  * @author thorsten

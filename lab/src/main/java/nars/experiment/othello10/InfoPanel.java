@@ -2,7 +2,9 @@ package nars.experiment.othello10;/*
  * �쐬��: 2004/12/18
  *
  */
+
 import javax.swing.*;
+
 /**
  * @author mori
  *  

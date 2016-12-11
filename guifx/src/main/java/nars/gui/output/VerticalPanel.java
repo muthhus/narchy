@@ -7,8 +7,6 @@ package nars.gui.output;
 import automenta.vivisect.swing.NPanel;
 import nars.gui.VerticalLayout;
 
-import javax.swing.*;
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;

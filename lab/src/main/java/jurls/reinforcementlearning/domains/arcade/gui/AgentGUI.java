@@ -17,7 +17,6 @@
  */
 package jurls.reinforcementlearning.domains.arcade.gui;
 
-import javax.swing.*;
 import java.awt.image.BufferedImage;
 
 /** GUI for the Java ALE agent.

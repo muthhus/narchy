@@ -11,8 +11,6 @@ import jurls.core.approximation.ParameterizedFunctionGenerator;
 import jurls.core.brain.Brain;
 import jurls.core.reinforcementlearning.*;
 
-import javax.swing.*;
-
 /**
  * 
  * @author thorsten2

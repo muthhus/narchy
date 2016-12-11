@@ -13,7 +13,6 @@ import nars.guifx.util.FrameReaction;
 import nars.guifx.util.NSlider;
 import nars.util.FX;
 
-import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
 

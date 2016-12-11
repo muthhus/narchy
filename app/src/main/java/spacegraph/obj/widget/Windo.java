@@ -3,10 +3,7 @@ package spacegraph.obj.widget;
 import spacegraph.SpaceGraph;
 import spacegraph.Surface;
 import spacegraph.math.v2;
-import spacegraph.obj.layout.Layout;
 import spacegraph.obj.layout.VSplit;
-
-import static spacegraph.obj.layout.Grid.row;
 
 /**
  * draggable panel

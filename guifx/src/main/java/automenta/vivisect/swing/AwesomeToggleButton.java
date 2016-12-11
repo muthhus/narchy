@@ -2,9 +2,6 @@ package automenta.vivisect.swing;
 
 import nars.Video;
 
-import javax.swing.*;
-import java.awt.*;
-
 
 /** ToggleButton with FontAwesome icon */
 public class AwesomeToggleButton extends JToggleButton {

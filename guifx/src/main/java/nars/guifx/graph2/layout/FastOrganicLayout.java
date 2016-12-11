@@ -9,7 +9,6 @@ import nars.util.data.Range;
 import nars.util.list.FasterList;
 import org.eclipse.collections.impl.map.mutable.primitive.ObjectIntHashMap;
 
-import java.awt.*;
 import java.util.List;
 
 /**

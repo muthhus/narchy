@@ -8,7 +8,6 @@ import nars.concept.CompoundConcept;
 import nars.nal.Stamp;
 import nars.table.DefaultBeliefTable;
 import nars.table.QuestionTable;
-import nars.task.DerivedTask;
 import nars.term.Compound;
 import nars.truth.DynTruth;
 import nars.truth.Truth;

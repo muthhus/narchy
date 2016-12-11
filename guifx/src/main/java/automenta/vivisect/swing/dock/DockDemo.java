@@ -2,8 +2,6 @@ package automenta.vivisect.swing.dock;
 
 import automenta.vivisect.swing.NWindow;
 
-import javax.swing.*;
-
 /**
  * 
  * @author me

@@ -1,10 +1,11 @@
 package cleargl;
 
-import java.nio.Buffer;
-import java.util.Arrays;
 import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL2ES3;
 import com.jogamp.opengl.GLException;
+
+import java.nio.Buffer;
+import java.util.Arrays;
 
 public class GLPixelBufferObject implements GLInterface, GLCloseable {
 	private final GLInterface mGLInterface;

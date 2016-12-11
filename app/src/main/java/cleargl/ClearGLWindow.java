@@ -1,30 +1,18 @@
 package cleargl;
 
-import java.awt.Component;
-import java.io.PrintStream;
-import java.util.ArrayList;
-import java.util.List;
-
 import com.jogamp.nativewindow.CapabilitiesImmutable;
 import com.jogamp.nativewindow.WindowClosingProtocol.WindowClosingMode;
-import com.jogamp.newt.Display;
-import com.jogamp.newt.MonitorDevice;
-import com.jogamp.newt.NewtFactory;
-import com.jogamp.newt.Screen;
-import com.jogamp.newt.Window;
+import com.jogamp.newt.*;
 import com.jogamp.newt.event.KeyListener;
 import com.jogamp.newt.event.MouseListener;
 import com.jogamp.newt.event.WindowAdapter;
 import com.jogamp.newt.opengl.GLWindow;
-import com.jogamp.opengl.DefaultGLCapabilitiesChooser;
-import com.jogamp.opengl.GL;
-import com.jogamp.opengl.GLAutoDrawable;
-import com.jogamp.opengl.GLCapabilities;
-import com.jogamp.opengl.GLCapabilitiesChooser;
-import com.jogamp.opengl.GLCapabilitiesImmutable;
-import com.jogamp.opengl.GLException;
-import com.jogamp.opengl.GLProfile;
+import com.jogamp.opengl.*;
 import com.jogamp.opengl.util.FPSAnimator;
+
+import java.io.PrintStream;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ClearGLWindow implements ClearGLDisplayable
 {

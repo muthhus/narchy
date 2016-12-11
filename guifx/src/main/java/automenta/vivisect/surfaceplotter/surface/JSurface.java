@@ -33,11 +33,8 @@ import automenta.vivisect.surfaceplotter.DefaultSurfaceModel;
 import automenta.vivisect.surfaceplotter.surface.SurfaceModel.PlotType;
 
 import javax.imageio.ImageIO;
-import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import java.awt.*;
-import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;

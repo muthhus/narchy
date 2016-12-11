@@ -2,14 +2,13 @@ package nars.experiment.minicraft.side.awtgraphics;
 
 import nars.experiment.minicraft.side.SideScrollMinicraft;
 
-import java.awt.*;
 import java.awt.event.*;
 
 
 public class AwtEventsHandler {
 	final SideScrollMinicraft game;
 	
-	public AwtEventsHandler(SideScrollMinicraft game, Canvas canvas) {
+	public AwtEventsHandler(SideScrollMinicraft game) {
 		this.game = game;
 		// add a key input system (defined below) to our canvas
 		// so we can respond to key pressed

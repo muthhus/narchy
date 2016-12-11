@@ -13,8 +13,6 @@ import jurls.examples.approximation.RenderParameterizedFunction1D;
 import jurls.examples.menu.ApproximatorMenu;
 import jurls.examples.menu.ObjectListMenu;
 
-import javax.swing.*;
-import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 

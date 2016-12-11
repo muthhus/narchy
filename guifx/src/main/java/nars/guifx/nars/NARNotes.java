@@ -1,7 +1,6 @@
 package nars.guifx.nars;
 
 import javafx.geometry.Insets;
-import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import nars.NAR;
 import nars.Task;

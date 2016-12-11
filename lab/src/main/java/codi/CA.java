@@ -1,5 +1,6 @@
 package codi;
 
+
 import nars.util.data.random.XorShift128PlusRandom;
 
 import javax.swing.*;

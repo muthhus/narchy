@@ -21,8 +21,7 @@ import java.util.Vector;
  * @author Sammy Leong
  * @version 1.0
  */
-public class SoundPlayer extends JPanel
-implements Runnable, LineListener, MetaEventListener, ActionListener
+public class SoundPlayer extends JPanel implements Runnable, LineListener, MetaEventListener, ActionListener
 {
     /** sound object list */
     public Vector sounds = new Vector();

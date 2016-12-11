@@ -1,7 +1,6 @@
 package nars.truth;
 
 import nars.$;
-import nars.Op;
 import nars.Symbols;
 import nars.Task;
 import nars.budget.Budget;
@@ -13,8 +12,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
-
-import static nars.Op.CONJ;
 
 /**
  * Created by me on 12/4/16.

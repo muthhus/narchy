@@ -5,8 +5,6 @@
  */
 package jurls.reinforcementlearning.domains;
 
-import javax.swing.*;
-
 /**
  *
  * @author thorsten
