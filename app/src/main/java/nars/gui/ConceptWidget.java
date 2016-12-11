@@ -275,7 +275,6 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<BLink<? exte
             return hash;
         }
 
-        @Override
         public void update(BLink<TermEdge> ff) {
 
             float priSum = (termlinkPri + tasklinkPri);

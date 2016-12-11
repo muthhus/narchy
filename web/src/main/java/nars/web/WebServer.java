@@ -36,8 +36,8 @@ import static io.undertow.UndertowOptions.ENABLE_HTTP2;
 import static io.undertow.UndertowOptions.ENABLE_SPDY;
 import static java.util.zip.Deflater.BEST_COMPRESSION;
 import static nars.$.*;
-import static spacegraph.net.IRCAgent.hear;
-import static spacegraph.net.IRCAgent.newRealtimeNAR;
+import static nars.net.IRCAgent.hear;
+import static nars.net.IRCAgent.newRealtimeNAR;
 
 
 public class WebServer /*extends PathHandler*/ {

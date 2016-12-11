@@ -15,7 +15,7 @@ import nars.time.FrameTime;
 import nars.truth.Truth;
 import nars.util.TaskStatistics;
 import org.jetbrains.annotations.NotNull;
-import spacegraph.LogIndex;
+import nars.video.LogIndex;
 import spacegraph.SimpleSpatial;
 import spacegraph.SpaceGraph;
 import spacegraph.Spatial;
