@@ -26,12 +26,12 @@ import spacegraph.Surface;
 import spacegraph.layout.Flatten;
 import spacegraph.layout.ForceDirected;
 import spacegraph.math.Color3f;
-import spacegraph.obj.CrosshairSurface;
-import spacegraph.obj.layout.Grid;
-import spacegraph.obj.layout.Stacking;
-import spacegraph.obj.widget.*;
-import spacegraph.obj.widget.console.ConsoleSurface;
-import spacegraph.obj.widget.console.ConsoleTerminal;
+import spacegraph.space.CrosshairSurface;
+import spacegraph.space.layout.Grid;
+import spacegraph.space.layout.Stacking;
+import spacegraph.space.widget.*;
+import spacegraph.space.widget.console.ConsoleSurface;
+import spacegraph.space.widget.console.ConsoleTerminal;
 import spacegraph.render.Draw;
 import spacegraph.render.SpaceGraph2D;
 
@@ -41,7 +41,7 @@ import java.util.List;
 import java.util.stream.StreamSupport;
 
 import static java.util.stream.Collectors.toList;
-import static spacegraph.obj.layout.Grid.*;
+import static spacegraph.space.layout.Grid.*;
 
 /**
  * SpaceGraph-based visualization utilities for NAR analysis

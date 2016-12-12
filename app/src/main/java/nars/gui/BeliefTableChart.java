@@ -11,9 +11,9 @@ import nars.truth.TruthWave;
 import spacegraph.Ortho;
 import spacegraph.SpaceGraph;
 import spacegraph.Surface;
-import spacegraph.obj.layout.Grid;
-import spacegraph.obj.widget.Label;
-import spacegraph.obj.widget.Widget;
+import spacegraph.space.layout.Grid;
+import spacegraph.space.widget.Label;
+import spacegraph.space.widget.Widget;
 import spacegraph.render.Draw;
 
 import java.util.Collection;
@@ -24,7 +24,7 @@ import java.util.function.BiFunction;
 import static java.lang.Math.PI;
 import static java.util.stream.Collectors.toList;
 import static nars.time.Tense.ETERNAL;
-import static spacegraph.obj.layout.Grid.VERTICAL;
+import static spacegraph.space.layout.Grid.VERTICAL;
 
 
 public class BeliefTableChart extends Widget {

@@ -4,7 +4,7 @@ import com.jogamp.newt.event.MouseEvent;
 import org.jetbrains.annotations.Nullable;
 import spacegraph.Surface;
 import spacegraph.math.v2;
-import spacegraph.obj.widget.Widget;
+import spacegraph.space.widget.Widget;
 
 import java.util.Arrays;
 

@@ -17,8 +17,8 @@ import nars.video.PixelBag;
 import nars.video.Sensor2D;
 import spacegraph.SpaceGraph;
 import spacegraph.Surface;
-import spacegraph.obj.layout.Grid;
-import spacegraph.obj.widget.Plot2D;
+import spacegraph.space.layout.Grid;
+import spacegraph.space.widget.Plot2D;
 import spacegraph.render.Draw;
 
 import java.awt.*;
@@ -29,8 +29,8 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static jcog.Texts.n2;
-import static spacegraph.obj.layout.Grid.col;
-import static spacegraph.obj.layout.Grid.row;
+import static spacegraph.space.layout.Grid.col;
+import static spacegraph.space.layout.Grid.row;
 
 /**
  * Created by me on 10/8/16.

@@ -8,7 +8,7 @@ import io.undertow.websockets.WebSocketConnectionCallback;
 import io.undertow.websockets.extensions.PerMessageDeflateHandshake;
 import jcog.Texts;
 import jcog.Util;
-import jcog.Wiki;
+import nars.Wiki;
 import jcog.data.MutableInteger;
 import nars.bag.Bag;
 import nars.concept.Concept;

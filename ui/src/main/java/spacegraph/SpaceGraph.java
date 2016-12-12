@@ -14,7 +14,7 @@ import spacegraph.input.OrbMouse;
 import spacegraph.math.v3;
 import spacegraph.phys.constraint.BroadConstraint;
 import spacegraph.render.JoglPhysics;
-import spacegraph.source.ListSpace;
+import spacegraph.space.ListSpace;
 
 import java.util.List;
 import java.util.function.Function;

@@ -1,7 +1,7 @@
 package nars.net;
 
 import com.github.fge.grappa.exceptions.GrappaException;
-import jcog.Wiki;
+import nars.Wiki;
 import jcog.data.random.XorShift128PlusRandom;
 import jcog.event.On;
 import nars.$;

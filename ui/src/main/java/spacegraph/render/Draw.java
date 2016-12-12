@@ -36,7 +36,7 @@ import spacegraph.SimpleSpatial;
 import spacegraph.math.AxisAngle4f;
 import spacegraph.math.Quat4f;
 import spacegraph.math.v3;
-import spacegraph.obj.EDraw;
+import spacegraph.space.EDraw;
 import spacegraph.phys.collision.broad.BroadphaseNativeType;
 import spacegraph.phys.math.Transform;
 import spacegraph.phys.math.VectorUtil;
@@ -540,7 +540,7 @@ public enum Draw {
         gl.glVertex3f(x1, y1 + h, z);
         gl.glEnd();
 
-        gl.glDisable(GL_TEXTURE);
+        //gl.glDisable(GL_TEXTURE);
 
     }
 

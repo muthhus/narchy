@@ -13,10 +13,10 @@ import nars.time.RealTime;
 import spacegraph.Ortho;
 import spacegraph.SpaceGraph;
 import spacegraph.Surface;
-import spacegraph.obj.CrosshairSurface;
-import spacegraph.obj.widget.*;
-import spacegraph.obj.widget.console.ConsoleSurface;
-import spacegraph.obj.widget.console.ConsoleTerminal;
+import spacegraph.space.CrosshairSurface;
+import spacegraph.space.widget.*;
+import spacegraph.space.widget.console.ConsoleSurface;
+import spacegraph.space.widget.console.ConsoleTerminal;
 import spacegraph.render.Draw;
 
 import java.awt.*;
@@ -26,7 +26,7 @@ import static nars.experiment.tetris.TetriSchool.TrainingPanel.newTrainingPanel;
 import static nars.gui.Vis.label;
 import static nars.gui.Vis.stacking;
 import static spacegraph.SpaceGraph.window;
-import static spacegraph.obj.layout.Grid.*;
+import static spacegraph.space.layout.Grid.*;
 
 public class TetriSchool extends NSchool implements Runnable {
 

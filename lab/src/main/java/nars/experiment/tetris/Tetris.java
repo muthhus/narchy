@@ -22,7 +22,7 @@ import spacegraph.Spatial;
 import spacegraph.index.Rect1D;
 import spacegraph.layout.Flatten;
 import spacegraph.math.v2;
-import spacegraph.obj.widget.MatrixView;
+import spacegraph.space.widget.MatrixView;
 import spacegraph.render.Draw;
 
 import java.util.Collection;
@@ -30,7 +30,7 @@ import java.util.List;
 
 import static nars.experiment.tetris.impl.TetrisState.*;
 import static spacegraph.SpaceGraph.window;
-import static spacegraph.obj.layout.Grid.grid;
+import static spacegraph.space.layout.Grid.grid;
 
 /**
  * Created by me on 7/28/16.

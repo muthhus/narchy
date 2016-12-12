@@ -42,8 +42,8 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Random;
 
 import static spacegraph.SpaceGraph.window;
-import static spacegraph.obj.layout.Grid.col;
-import static spacegraph.obj.layout.Grid.grid;
+import static spacegraph.space.layout.Grid.col;
+import static spacegraph.space.layout.Grid.grid;
 
 /**
  * the java application class of pacman 

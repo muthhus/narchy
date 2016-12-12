@@ -1,9 +1,19 @@
 package spacegraph.video;
 
 import boofcv.io.webcamcapture.UtilWebcamCapture;
+import com.jogamp.common.nio.ByteBufferInputStream;
+import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL2;
+import com.jogamp.opengl.fixedfunc.GLLightingFunc;
+import com.jogamp.opengl.util.texture.Texture;
+import com.jogamp.opengl.util.texture.TextureIO;
+import com.jogamp.opengl.util.texture.spi.DDSImage;
+import com.jogamp.opengl.util.texture.spi.JPEGImage;
+import com.jogamp.opengl.util.texture.spi.TGAImage;
 import javafx.scene.image.WritableImage;
 import jcog.data.Range;
+import jcog.event.ArrayTopic;
+import jcog.event.Topic;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,15 +23,21 @@ import spacegraph.render.Draw;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 
 public class WebCam implements Runnable {
 
-    private final int width, height;
+    private int width;
+    private int height;
     //private SourceDataLine mLine;
     // private ShortBuffer audioSamples;
     public com.github.sarxos.webcam.Webcam webcam;
+
+    final Topic<WebCam> eventChange = new ArrayTopic();
 
     boolean running = true;
 
@@ -104,6 +120,17 @@ public class WebCam implements Runnable {
     public Surface surface() {
         return new Surface() {
 
+            public Texture texture = null;
+            final AtomicBoolean updated = new AtomicBoolean();
+
+
+            {
+                eventChange.on(x -> {
+                    updated.set(true);
+
+                });
+
+            }
             /**
              * TODO use GL textures
              */
@@ -111,27 +138,58 @@ public class WebCam implements Runnable {
             protected void paint(GL2 gl) {
                 super.paint(gl);
 
+                if (updated.compareAndSet(true, false)) {
+                    try {
+                        //DDSImage di = DDSImage.createFromData(DDSImage.D3DFMT_R8G8B8, width, height, new ByteBuffer[]{image.asReadOnlyBuffer()});
+                        //JPEGImage di = JPEGImage.read(new ByteBufferInputStream(image.asReadOnlyBuffer()));
+                        TGAImage di = TGAImage.createFromData(width, height, false, true, image.asReadOnlyBuffer());
+                        final String target = "/var/tmp/x.tga";
+                        //di.
+                        //di.write(target);
 
-                float y = 0;
-                int w = width;
-                float dx = 1f / w;
-                int h = height;
-                float dy = 1f / h;
-                int k = 0;
-                final byte[] img = image.array();
-                for (int j = 0; j < h; j++) {
-                    float x = 0;
-                    for (int i = 0; i < w; i++) {
-                        byte r = img[k++];
-                        byte g = img[k++];
-                        byte b = img[k++];
+                        di.write(target);
 
-                        gl.glColor3ub(r, g, b);
-                        Draw.rect(gl, x, y, dx, dy);
-                        x += dx;
+                        Texture oldTexture = texture;
+                        texture = TextureIO.newTexture(new File(target), true);
+                        if (oldTexture!=null) {
+                            oldTexture.destroy(gl);
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
                     }
-                    y += dy;
                 }
+
+                if (texture!=null) {
+                    texture.enable(gl);
+                    texture.bind(gl);
+                    //gl.glShadeModel(GLLightingFunc.GL_SMOOTH);
+                    //gl.glEnable(GL.GL_BLEND);
+                    //gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE);
+                    Draw.rectTex(gl, 0, 0, 1, 1, 0);
+                    texture.disable(gl);
+                }
+
+
+//                float y = 0;
+//                int w = width;
+//                float dx = 1f / w;
+//                int h = height;
+//                float dy = 1f / h;
+//                int k = 0;
+//                final byte[] img = image.array();
+//                for (int j = 0; j < h; j++) {
+//                    float x = 0;
+//                    for (int i = 0; i < w; i++) {
+//                        byte r = img[k++];
+//                        byte g = img[k++];
+//                        byte b = img[k++];
+//
+//                        gl.glColor3ub(r, g, b);
+//                        Draw.rect(gl, x, y, dx, dy);
+//                        x += dx;
+//                    }
+//                    y += dy;
+//                }
 
 
             }
@@ -166,15 +224,29 @@ public class WebCam implements Runnable {
 
     }
 
-    @Override
-    public void run() {
+    /** synchronous run loop */
+    @Override public void run() {
         while (running) {
-            //if (webcam.isOpen() && webcam.isImageNew()) {
+            if (webcam.isOpen() && webcam.isImageNew()) {
 
-            image.rewind();
-            webcam.getImageBytes(image);
+                image.rewind();
 
-            image.rewind();
+                Dimension viewSize = webcam.getViewSize();
+                if (viewSize!=null) {
+                    width = (int) viewSize.getWidth();
+                    height = (int) viewSize.getHeight();
+
+                    webcam.getImageBytes(image);
+
+                    image.rewind();
+
+                    eventChange.emit(this);
+
+                } else {
+                    width = height = 0;
+                }
+
+            }
 
 //                BufferedImage bimage = process(webcam.getImage());
 //

@@ -35,10 +35,10 @@ import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunctio
 import org.jetbrains.annotations.NotNull;
 import spacegraph.SpaceGraph;
 import spacegraph.Surface;
-import spacegraph.obj.layout.Grid;
-import spacegraph.obj.layout.TabPane;
-import spacegraph.obj.widget.CheckBox;
-import spacegraph.obj.widget.FloatSlider;
+import spacegraph.space.layout.Grid;
+import spacegraph.space.layout.TabPane;
+import spacegraph.space.widget.CheckBox;
+import spacegraph.space.widget.FloatSlider;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -55,7 +55,7 @@ import java.util.stream.Stream;
 
 import static nars.$.t;
 import static spacegraph.SpaceGraph.window;
-import static spacegraph.obj.layout.Grid.grid;
+import static spacegraph.space.layout.Grid.grid;
 
 /**
  * Created by me on 9/19/16.

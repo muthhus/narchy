@@ -9,7 +9,7 @@ import nars.test.DeductiveMeshTest;
 import spacegraph.Active;
 import spacegraph.SpaceGraph;
 import spacegraph.Spatial;
-import spacegraph.source.ListSpace;
+import spacegraph.space.ListSpace;
 
 import java.util.Collection;
 import java.util.LinkedHashSet;

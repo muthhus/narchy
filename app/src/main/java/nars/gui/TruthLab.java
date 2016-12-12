@@ -15,7 +15,7 @@ import nars.truth.Truth;
 import org.eclipse.collections.api.block.function.primitive.IntToObjectFunction;
 import spacegraph.SpaceGraph;
 import spacegraph.Surface;
-import spacegraph.obj.layout.Grid;
+import spacegraph.space.layout.Grid;
 import spacegraph.render.Draw;
 
 import java.util.List;

@@ -3,7 +3,7 @@ package nars.experiment.rover;
 import nars.nar.Default;
 import spacegraph.SimpleSpatial;
 import spacegraph.SpaceGraph;
-import spacegraph.obj.Maze;
+import spacegraph.space.Maze;
 import spacegraph.phys.Dynamic;
 import spacegraph.phys.Dynamics;
 import spacegraph.phys.constraint.HingeConstraint;

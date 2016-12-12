@@ -2,7 +2,7 @@ package nars.video;
 
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.spi.ILoggingEvent;
-import jcog.DefaultConsoleAppender;
+import nars.decide.DefaultConsoleAppender;
 import nars.$;
 import spacegraph.index.RTree;
 import spacegraph.index.Rect1D;
