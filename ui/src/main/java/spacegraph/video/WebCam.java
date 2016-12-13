@@ -115,7 +115,7 @@ public class WebCam {
             Thread t = new Thread(() -> {
 
                 while (running) {
-                    if (webcam.isOpen() && webcam.isImageNew()) {
+                    if (/*webcam.isOpen() && */webcam.isImageNew()) {
 
                         image.rewind();
 
@@ -146,7 +146,7 @@ public class WebCam {
 //            }
 
                     try {
-                        Thread.sleep((long) (1000.0 / fps));
+                        Thread.sleep((long) (1000.0f / fps));
                     } catch (InterruptedException e) {
                     }
                 }
