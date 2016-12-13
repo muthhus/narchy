@@ -13,7 +13,7 @@
 <?import javafx.scene.text.Font?>
 
 
-<BorderPane fx:id="mainPane" xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jfxvnc.app.presentation.MainViewPresenter">
+<BorderPane fx:id="mainPane" xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1" fx:controller="spacegraph.net.vnc.app.presentation.MainViewPresenter">
    <bottom>
       <HBox alignment="CENTER" prefHeight="30.0" prefWidth="800.0" spacing="15.0" styleClass="status-bar">
          <children>

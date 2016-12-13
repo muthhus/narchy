@@ -60,7 +60,7 @@ class FramebufferUpdateRectDecoder implements FrameDecoder {
         frameRectDecoder.put(Encoding.CURSOR, new CursorRectDecoder(pixelFormat));
         frameRectDecoder.put(Encoding.DESKTOP_SIZE, new DesktopSizeRectDecoder(pixelFormat));
     
-    frameRectDecoder.put(Encoding.UNKNOWN, new UnknownRectDecoder(pixelFormat));
+    //frameRectDecoder.put(Encoding.UNKNOWN, new UnknownRectDecoder(pixelFormat));
     }
 
   public static Encoding[] getSupportedEncodings() {

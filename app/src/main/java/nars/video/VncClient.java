@@ -13,9 +13,13 @@
  *******************************************************************************/
 package nars.video;
 
+import boofcv.struct.image.InterleavedU8;
 import com.airhacks.afterburner.injection.Injector;
+import com.jogamp.opengl.GL2;
+import com.jogamp.opengl.util.texture.Texture;
 import javafx.scene.image.PixelReader;
 import javafx.scene.image.WritableImage;
+import javafx.scene.image.WritablePixelFormat;
 import javafx.scene.layout.BorderPane;
 import nars.FX;
 import nars.nar.Default;
@@ -31,11 +35,13 @@ import spacegraph.net.vnc.ui.service.VncRenderService;
 import org.slf4j.LoggerFactory;
 import spacegraph.SpaceGraph;
 import spacegraph.Surface;
+import spacegraph.render.Draw;
 import spacegraph.space.widget.MatrixView;
 
 import static nars.FX.scrolled;
 import static nars.$.t;
 import static nars.video.Bitmap2D.*;
+import static nars.video.VideoBag.EventTimeline.tgaTexture;
 
 /**
  * /usr/bin/qemu-system-x86_64 -boot c  -m 512 -hda '/home/me/img/Linux.qcow' -cdrom  '/home/me/Downloads/cm-x86-13.0-rc1.iso' -net nic,vlan=0 -net user,vlan=0 -localtime -vnc :1 -monitor stdio
@@ -59,6 +65,8 @@ public class VncClient {
         vncService.getConfiguration().hostProperty().set(host);
         vncService.getConfiguration().portProperty().set(port);
         vncService.getConfiguration().securityProperty().set(SecurityType.NONE);
+        //vncService.getConfiguration().securityProperty().set(SecurityType.VNC_Auth);
+        //vncService.getConfiguration().passwordProperty().set("admin");
         vncService.connect();
 
         renderer = new VncCanvas() {
@@ -161,23 +169,65 @@ public class VncClient {
 
             FX.newWindow("x", new BorderPane(scrolled((imageView))));
 
-            imageView.registerInputEventListener(vncService.inputEventListenerProperty().get());
+            //imageView.registerInputEventListener(vncService.inputEventListenerProperty().get());
 
         });
     }
 
     public Surface newSurface() {
-        //TODO
-        int pw = 200;
-        int ph = 200;
-        return new MatrixView(pw, ph, (x, y, gl) -> {
-            final PixelReader reader = this.vncReader;
-            if (reader !=null) {
-                int argb = reader.getArgb(x, y);
-                gl.glColor3f(decodeRed(argb), decodeGreen(argb), decodeBlue(argb));
+//        //TODO
+//        int pw = 200;
+//        int ph = 200;
+//        return new MatrixView(pw, ph, (x, y, gl) -> {
+//            final PixelReader reader = this.vncReader;
+//            if (reader !=null) {
+//                int argb = reader.getArgb(x, y);
+//                gl.glColor3f(decodeRed(argb), decodeGreen(argb), decodeBlue(argb));
+//            }
+//            return 0;
+//        });
+
+        return new Surface() {
+
+            Texture texture = null;
+
+            @Override
+            protected void paint(GL2 gl) {
+                super.paint(gl);
+
+                //VideoBag.Frame f = ff.get();
+
+                Texture tt = texture;
+                if (tt!=null) {
+                    tt.destroy(gl);
+                    tt = null;
+                }
+
+                if (vncReader!=null) {
+
+
+
+                    int ww = (int)renderer.vncImage.get().getWidth();
+                    int hh = (int)renderer.vncImage.get().getHeight();
+                    byte[] data = new byte[ww * hh * 4];
+                    vncReader.getPixels(0,0,ww,hh, WritablePixelFormat.getByteBgraInstance(), data, 0, ww*4);
+
+                    tt = tgaTexture(ww, hh, true, data);
+
+                    texture = tt;
+
+                }
+
+                float xx = 0, yy = 0;
+                float sc = 1f;
+                if (tt!=null) {
+                    Draw.rectTex(gl, tt, xx, yy, sc, sc, 0);
+                } else {
+                    Draw.colorPolarized(gl, 0.5f);
+                    Draw.rect(gl, xx, yy, sc, sc);
+                }
             }
-            return 0;
-        });
+        };
     }
 
     public PixelBag newSensor(int pw, int ph) {
@@ -200,27 +250,27 @@ public class VncClient {
         //2.
         SpaceGraph.window(v.newSurface(), 800, 800);
 
-        Default nar = NAgents.newMultiThreadNAR(4, new RealTime.CS(true).dur(0.25f));
-
-        NAgents a = new NAgents(nar) {
-
-            {
-                PixelBag pb = v.newSensor(64, 64);
-                pb.addActions("vnc", this);
-
-                addCamera("vnc", pb, (v) -> t(v, alpha));
-            }
-
-            @Override
-            protected float act() {
-                return 0;
-            }
-
-
-        };
-        NAgents.chart(a);
-
-        a.runRT(55f);
+//        Default nar = NAgents.newMultiThreadNAR(2, new RealTime.CS(true).dur(0.25f));
+//
+//        NAgents a = new NAgents(nar) {
+//
+//            {
+//                PixelBag pb = v.newSensor(64, 64);
+//                pb.addActions("vnc", this);
+//
+//                addCamera("vnc", pb, (v) -> t(v, alpha));
+//            }
+//
+//            @Override
+//            protected float act() {
+//                return 0;
+//            }
+//
+//
+//        };
+//        NAgents.chart(a);
+//
+//        a.runRT(55f);
 
 
     }

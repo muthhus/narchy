@@ -11,7 +11,7 @@
  * or implied. See the License for the specific language governing permissions and limitations under
  * the License.
  *******************************************************************************/
-package spacegraph.net.vnc.app.presentation.about;
+package spacegraph.net.vnc.app.about;
 
 import com.airhacks.afterburner.views.FXMLView;
 

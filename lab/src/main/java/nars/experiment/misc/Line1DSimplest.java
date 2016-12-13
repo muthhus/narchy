@@ -38,7 +38,7 @@ public class Line1DSimplest extends NAgent {
 
 
     public Line1DSimplest(NAR n, IntToFloatFunction target) {
-        super("x", n, 1);
+        super("x", n, 16);
 
         this.targetFunc = target;
 
@@ -118,7 +118,7 @@ public class Line1DSimplest extends NAgent {
                 new CaffeineIndex(new DefaultConceptBuilder(), 1024*2, 12, false, exe),
                 new FrameTime(dur), exe
         );
-        nar.termVolumeMax.set(5);
+        nar.termVolumeMax.set(9);
 
 
         nar.beliefConfidence(0.9f);

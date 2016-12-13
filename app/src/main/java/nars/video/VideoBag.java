@@ -284,32 +284,11 @@ public class VideoBag {
                 if (tt == null) {
 
 
-
-                    //MyByteArrayOutputStream os = new MyByteArrayOutputStream(16 * 1024);
-
                     byte[] data = ((InterleavedU8)f.image).data;
 
-                    TGAImage tga = TGAImage.createFromData(f.getWidth(), f.getHeight(), false, true, ByteBuffer.wrap(data));
+                    tt = tgaTexture(f.width, f.height, false, data);
 
-
-
-//                    PngWriter pp = new PngWriter(os, new ImageInfo(f.getWidth(), f.getHeight(), 8, false));
-//
-//                    pp.setCompLevel(2 /* relatively fast */);
-//                    byte[] bb = new byte[f.getWidth() * 3];
-//                    for (int h = 0; h < f.getHeight(); h++) {
-//                        System.arraycopy(data, bb.length * h, bb, 0, bb.length);
-//                        pp.writeRowByte(bb.clone(), h);
-//                    }
-//                    pp.end();
-
-                    try {
-                        f.texture = tt = TextureIO.newTexture(new ByteArrayInputStream(tga.output().array()), true, TextureIO.TGA);
-                        logger.info("{} {}", f, /*os.size(), */f.texture);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                        tt = f.texture = null;
-                    }
+                    f.texture = tt;
 
                 }
 
@@ -324,6 +303,29 @@ public class VideoBag {
                     Draw.rect(gl, xx, yy, scale, scale);
                 }
             });
+        }
+
+        public static Texture tgaTexture(int width, int height, boolean alpha, byte[] data) {
+
+//                    PngWriter pp = new PngWriter(os, new ImageInfo(f.getWidth(), f.getHeight(), 8, false));
+//
+//                    pp.setCompLevel(2 /* relatively fast */);
+//                    byte[] bb = new byte[f.getWidth() * 3];
+//                    for (int h = 0; h < f.getHeight(); h++) {
+//                        System.arraycopy(data, bb.length * h, bb, 0, bb.length);
+//                        pp.writeRowByte(bb.clone(), h);
+//                    }
+//                    pp.end();
+
+            Texture tt;
+            try {
+                TGAImage tga = TGAImage.createFromData(width, height, alpha, true, ByteBuffer.wrap(data));
+                tt = TextureIO.newTexture(new ByteArrayInputStream(tga.output().array()), false, TextureIO.TGA);
+            } catch (IOException e) {
+                e.printStackTrace();
+                tt = null;
+            }
+            return tt;
         }
 
 

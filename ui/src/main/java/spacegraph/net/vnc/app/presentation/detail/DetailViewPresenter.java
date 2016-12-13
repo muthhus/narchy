@@ -19,7 +19,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Accordion;
 import javafx.scene.control.TitledPane;
 import spacegraph.net.vnc.app.persist.SessionContext;
-import spacegraph.net.vnc.app.presentation.about.AboutView;
+import spacegraph.net.vnc.app.about.AboutView;
 import spacegraph.net.vnc.app.presentation.connect.ConnectView;
 import spacegraph.net.vnc.app.presentation.info.InfoView;
 import spacegraph.net.vnc.ui.service.VncRenderService;
@@ -44,9 +44,10 @@ public class DetailViewPresenter implements Initializable {
 
         ConnectView connectView = new ConnectView();
         InfoView infoView = new InfoView();
-        AboutView aboutView = new AboutView();
+        //AboutView aboutView = new AboutView();
         detailPane.setMinWidth(0.0);
-        detailPane.getPanes().addAll((TitledPane) connectView.getView(), (TitledPane) infoView.getView(), (TitledPane) aboutView.getView());
+        detailPane.getPanes().addAll((TitledPane) connectView.getView(), (TitledPane) infoView.getView());
+            //, (TitledPane) aboutView.getView()
         detailPane.setExpandedPane((TitledPane) connectView.getView());
 
         detailPane.expandedPaneProperty().addListener((observable, oldValue, newValue) -> Platform.runLater(() -> {

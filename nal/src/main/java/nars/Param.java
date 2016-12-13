@@ -60,7 +60,7 @@ public abstract class Param /*extends Container*/ implements Level {
 
 
     /** average priority target for bag forgetting */
-    public static final float BAG_THRESHOLD = (0.1f);
+    public static final float BAG_THRESHOLD = (0.5f);
 
     /** conjunctions over this length will be ineligible for 2nd-layer termlink templates. it can be decomposed however, and decompositions of this size or less will be eligible. */
     public static final int MAX_CONJ_SIZE_FOR_LAYER2_TEMPLATES = 3;
@@ -120,11 +120,11 @@ public abstract class Param /*extends Container*/ implements Level {
     /**
      * minimum difference necessary to indicate a significant modification in budget float number components
      */
-    public static final float BUDGET_EPSILON = 0.0005f;
+    public static final float BUDGET_EPSILON = 0.001f;
 
 
-    public static final int DEFAULT_WIRED_CONCEPT_BELIEFS = 12;
-    public static final int DEFAULT_WIRED_CONCEPT_GOALS = 12;
+    public static final int DEFAULT_WIRED_CONCEPT_BELIEFS = 16;
+    public static final int DEFAULT_WIRED_CONCEPT_GOALS = 16;
 
     /** size of each thread's normalization cache, in entries */
     public static final int NORMALIZATION_CACHE_SIZE = 16*1024;

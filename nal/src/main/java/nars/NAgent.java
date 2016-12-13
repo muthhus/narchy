@@ -97,7 +97,7 @@ abstract public class NAgent implements NSense, NAction {
 
     final List<CuriosityPhasor> curiosityPhasor = $.newArrayList();
 
-    public final FloatParam epsilonProbability = new FloatParam(0.1f);
+    public final FloatParam epsilonProbability = new FloatParam(0.05f);
 
     public final FloatParam gammaEpsilonFactor = new FloatParam(0.1f);
 
@@ -423,10 +423,20 @@ abstract public class NAgent implements NSense, NAction {
 
             ((FasterList)predictors).addAll(
 
-                    new MutableTask($.seq(action, dur, happiness), '?', null).eternal(),
-                    new MutableTask($.seq($.neg(action), dur, happiness), '?', null).eternal()
-                    //new MutableTask($.impl(action, dur, happiness), '?', null).eternal(),
-                    //new MutableTask($.impl($.neg(action), dur, happiness), '?', null).eternal()
+                    new MutableTask($.seq(action, dur, happiness), '?', null)
+                            //.present(nar),
+                            .budgetByTruth(1f,nar)
+                            .eternal(),
+                    new MutableTask($.seq($.neg(action), dur, happiness), '?', null)
+                            //.present(nar)
+                            .budgetByTruth(1f,nar)
+                            .eternal()
+//                    new MutableTask($.impl(action, dur, happiness), '?', null)
+//                            .present(nar),
+//                            //.eternal(),
+//                    new MutableTask($.impl($.neg(action), dur, happiness), '?', null)
+//                            .present(nar)
+//                            //.eternal()
 
 
                     //new MutableTask($.seq($.varQuery(0), dur, action), '?', null).eternal(),

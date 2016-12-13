@@ -11,7 +11,7 @@
 <?import java.net.URL?>
 
 <TitledPane expanded="true" text="%connect.header" xmlns="http://javafx.com/javafx/8"
-	xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jfxvnc.app.presentation.connect.ConnectViewPresenter">
+	xmlns:fx="http://javafx.com/fxml/1" fx:controller="spacegraph.net.vnc.app.presentation.connect.ConnectViewPresenter">
 	<content>
 		<ScrollPane fitToWidth="true" prefHeight="800.0"
 			prefViewportWidth="400.0">
