@@ -74,9 +74,11 @@ public class PremiseMatrix {
 
                         BLink<Task> taskLink = tasksBuffer.get( il % tasksBufferSize );
 
-                        Task task = match(taskLink.get(), nar);
+                        Task task =
+                                taskLink.get();
+                        /*match(taskLink.get(), nar);
                         if (task==null)
-                            continue;
+                            continue;*/
 
                         Budget taskLinkBudget = taskLink.clone(); //save a copy because in multithread, the original may be deleted in-between the sample result and now
                         if (taskLinkBudget == null)

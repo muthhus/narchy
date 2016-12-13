@@ -773,11 +773,11 @@ public class UnificationTest {
     @Test
     public void depvarImage() {
         test(Op.VAR_PATTERN,
-                "<A --> (/, _, %X)>",
-                "<A --> (/, _, #B)>", true);
+                "<A --> (/, z, _, %X)>",
+                "<A --> (/, z, _, #B)>", true);
         test(Op.VAR_PATTERN,
-                "<%A --> (/, _, B)>",
-                "<#A --> (/, _, B)>", true);
+                "<%A --> (/, z, _, B)>",
+                "<#A --> (/, z, _, B)>", true);
     }
     @Test
     public void testImage2ShouldNotMatch() {
@@ -789,14 +789,14 @@ public class UnificationTest {
     @Test
     public void ellipsisImage1() {
         test(Op.VAR_PATTERN,
-                "<A --> (/,_, %X..+)>",
-                "<A --> (/,_, B)>", true);
+                "<A --> (/, z, _, %X..+)>",
+                "<A --> (/, z, _, B)>", true);
     }
     @Test
     public void ellipsisImage2() {
         test(Op.VAR_PATTERN,
-                "<A --> (/,_, %X..+)>",
-                "<A --> (/,_, B,C)>", true);
+                "<A --> (/, z, _, %X..+)>",
+                "<A --> (/, z, _, B,C)>", true);
 
     }
 
@@ -817,15 +817,15 @@ public class UnificationTest {
     @Test
     public void testEllipsisImage2c() {
         test(Op.VAR_PATTERN,
-                "<A --> (/,_, B, %X..+)>",
-                "<A --> (/,_, B, C, D)>", true);
+                "<A --> (/, z, _, B, %X..+)>",
+                "<A --> (/, z, _, B, C, D)>", true);
     }
 
     @Test
     public void testEllipsisImage2d() {
         test(Op.VAR_PATTERN,
-                "<A --> (/,_, E, %X..+)>",
-                "<A --> (/,_, B, C, D)>", false);
+                "<A --> (/, z, _, E, %X..+)>",
+                "<A --> (/, z, _, B, C, D)>", false);
     }
 
     @Test

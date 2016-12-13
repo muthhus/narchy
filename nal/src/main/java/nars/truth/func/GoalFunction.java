@@ -20,14 +20,14 @@ public enum GoalFunction implements TruthOperator {
     Strong() {
         @Nullable
         @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, NAR m, float minConf) {
-            return (T == null || B == null) ? null : desireStrongNew(T, B, minConf);
+            return (T == null || B == null) ? null : desireStrongOriginal(T, B, minConf);
         }
     },
 
     Weak() {
         @Nullable
         @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, NAR m, float minConf) {
-            return (T == null || B == null) ? null : desireWeakNew(T, B, minConf);
+            return (T == null || B == null) ? null : desireWeakOriginal(T, B, minConf);
         }
     },
 

@@ -143,4 +143,33 @@ public class DynamicBeliefTableTest {
 
     }
 
+    @Test public void testDynamicProductImageIntensional() {
+        NAR n = new Default();
+
+        n.believe($("(f-->(x,y))"), (long)0, 1f, 0.9f);
+
+        CompoundConcept prod = (CompoundConcept) n.concept($("(f-->(x, y))"), false);
+        Truth t = prod.belief(n.time());
+        System.out.println(t);
+
+        CompoundConcept imgX = (CompoundConcept) n.concept($("((\\,f,_,y)-->x)"), true);
+        assertTrue(imgX.beliefs().isEmpty());
+        assertEquals(t, imgX.belief(n.time()));
+
+
+        CompoundConcept imgY = (CompoundConcept) n.concept($("((\\,f,x,_)-->y)"), true);
+        assertTrue(imgY.beliefs().isEmpty());
+        assertEquals(t, imgY.belief(n.time()));
+
+
+
+        n.run(16); //by now, structural decomposition should have also had the opportunity to derive the image
+
+        Truth t2 = prod.belief(n.time());
+
+        assertEquals(t2, imgX.belief(n.time()));
+        assertEquals(t2, imgY.belief(n.time()));
+
+    }
+
 }

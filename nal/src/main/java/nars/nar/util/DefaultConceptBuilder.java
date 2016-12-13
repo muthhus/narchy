@@ -49,7 +49,7 @@ public class DefaultConceptBuilder implements ConceptBuilder {
         this.sleep = new DefaultConceptPolicy("sleep", 6, 6, 1, 16, 8);
         this.init = sleep;
 
-        this.awake = new DefaultConceptPolicy("awake", 12, 12, 3, 32, 16);
+        this.awake = new DefaultConceptPolicy("awake", 12, 12, 3, 32, 24);
     }
 
 //    private static final int DEFAULT_ATOM_LINK_MAP_CAPACITY = 128;
@@ -122,7 +122,8 @@ public class DefaultConceptBuilder implements ConceptBuilder {
 
                 Op so = subj.op();
                 Op po = pred.op();
-                if (po.atomic || po.image || po == so.PROD) {
+
+                if (dmt == null && (po.atomic || po.image || po == so.PROD)) {
                     if ((so == Op.SECTi) || (so == Op.SECTe) || (so == Op.DIFFi)) {
                         //(P --> M), (S --> M), notSet(S), notSet(P), neqCom(S,P) |- ((S | P) --> M), (Belief:Intersection)
                         //(P --> M), (S --> M), notSet(S), notSet(P), neqCom(S,P) |- ((S & P) --> M), (Belief:Union)
@@ -162,7 +163,10 @@ public class DefaultConceptBuilder implements ConceptBuilder {
                         if (b!=null)
                             dmt = new DynamicTruthModel.Identity(t, b);
                     }
-                } else if (so.atomic || so.image || so == so.PROD) {
+
+                }
+
+                if (dmt == null && (so.atomic || so.image || so == so.PROD)) {
                     if ((so == Op.SECTi) || (so == Op.SECTe) || (so == DIFFe)) {
                         //(M --> P), (M --> S), notSet(S), notSet(P), neqCom(S,P) |- (M --> (P & S)), (Belief:Intersection)
                         //(M --> P), (M --> S), notSet(S), notSet(P), neqCom(S,P) |- (M --> (P | S)), (Belief:Union)
@@ -186,6 +190,21 @@ public class DefaultConceptBuilder implements ConceptBuilder {
                                     break;
                             }
                         }
+                    } else if (so.image) {
+                        Compound img = (Compound) subj;
+                        Term[] ee = new Term[img.size()];
+
+                        int relation = img.dt();
+                        int s = ee.length;
+                        for (int j = 1, i = 0; i < s;) {
+                            if (j == relation)
+                                ee[i++] = pred;
+                            if (i < s)
+                                ee[i++] = img.term(j++);
+                        }
+                        Compound b = $.inh(img.term(0),$.p(ee));
+                        if (b!=null)
+                            dmt = new DynamicTruthModel.Identity(t, b);
                     }
 
                 }

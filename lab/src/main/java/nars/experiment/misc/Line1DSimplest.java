@@ -44,9 +44,9 @@ public class Line1DSimplest extends NAgent {
 
         this.trace = false;
 
-        //senseNumber("in(x)", ()->yHidden);
+        senseNumber("in(x)", ()->yHidden);
 
-        senseNumber(()->yHidden, "lo(x)", "hi(x)");
+        //senseNumber(()->yHidden, "lo(x)", "hi(x)");
 
         out = action("out(x)", (b,d)->{
             if (d!=null)
@@ -60,7 +60,11 @@ public class Line1DSimplest extends NAgent {
     @Override
     protected float act() {
 
-        yHidden = unitize(targetFunc.valueOf((int) now));
+        yHidden = unitize(
+                Math.round(
+                    targetFunc.valueOf((int) now)
+                )
+        );
 
         float dist =  Math.abs(yHidden - yEst);
 
@@ -114,7 +118,7 @@ public class Line1DSimplest extends NAgent {
                 new CaffeineIndex(new DefaultConceptBuilder(), 1024*2, 12, false, exe),
                 new FrameTime(dur), exe
         );
-        nar.termVolumeMax.set(10);
+        nar.termVolumeMax.set(5);
 
 
         nar.beliefConfidence(0.9f);
@@ -124,14 +128,15 @@ public class Line1DSimplest extends NAgent {
 
 
         Line1DSimplest l = new Line1DSimplest(nar,
-                sine(8)
+                sine(32)
                 //random(256)
         );
 
 
+
         //NAgents.chart(l);
 
-        //nar.logSummaryGT(System.out, 0.5f);
+        nar.logSummaryGT(System.out, 0.01f);
 
 //        nar.onTask(t -> {
 //            if (t instanceof DerivedTask && t.isGoal())
@@ -141,12 +146,13 @@ public class Line1DSimplest extends NAgent {
 
         l.print = true;
         //l.runRT(25, 15000).join();
-        l.run(128);
+        l.run(1024);
 
 
         NAR.printActiveTasks(nar, true);
         NAR.printActiveTasks(nar, false);
 
+        l.actions.forEach(a -> a.print());
 //
 //        l.predictors.forEach(p->{
 //           nar.concept(p).print();

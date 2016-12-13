@@ -582,7 +582,9 @@ public abstract class AbstractTask extends RawBudget implements Task, Temporal {
     }
 
     public boolean eternalizable() {
-        return term.vars() > 0;
+        //return term.vars() > 0;
+        return false;
+
         //return term.varIndep() > 0;
         //Op op = term.op();
         //return op ==IMPL || op ==EQUI || term.vars() > 0;

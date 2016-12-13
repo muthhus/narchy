@@ -30,6 +30,7 @@ import java.util.Collection;
 import java.util.List;
 
 import static nars.experiment.tetris.impl.TetrisState.*;
+import static spacegraph.SpaceGraph.window;
 
 /**
  * Created by me on 7/28/16.
@@ -617,7 +618,7 @@ public class Tetris extends NAgents {
 //
 //
 //                view.plot2 = Vis.agentBudgetPlot(this, 256);
-            //window(grid(view.vis, view.vis2, view.vis3, view.vis4), 600, 600);
+            window(view, 600, 600);
             NAgents.chart(this);
         }
     }
