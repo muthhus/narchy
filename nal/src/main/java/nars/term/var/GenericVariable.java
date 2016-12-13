@@ -2,6 +2,7 @@ package nars.term.var;
 
 import nars.$;
 import nars.Op;
+import nars.term.Termlike;
 import nars.term.atom.AtomicString;
 import org.jetbrains.annotations.NotNull;
 
@@ -24,21 +25,26 @@ public class GenericVariable extends AtomicString implements Variable {
     }
 
     @Override
-    public int id() {
+    public final int id() {
         throw new UnsupportedOperationException();
     }
 
     final @Override public boolean equals(Object u) {
         if (this == u) return true;
 
+//        if (u instanceof AbstractVariable)
+//            if (u.toString().equals(str))
+//                System.out.println(this + " and " + u + " equal by string");
+//            //throw new UnsupportedOperationException();
+//        }
+
         //prevent comparison with AbstractVariable
         if (u instanceof GenericVariable) {
-            GenericVariable tu = (GenericVariable) u;
-            return str.equals(tu.str);
+            return str.equals(((GenericVariable) u).str);
         }
+
         return false;
     }
-
 
 
     @Override
@@ -48,33 +54,33 @@ public class GenericVariable extends AtomicString implements Variable {
 
     @NotNull
     @Override
-    public Op op() {
+    public final Op op() {
         return type;
     }
 
 
     @Override
-    public int varIndep() {
+    public final int varIndep() {
         return type == Op.VAR_INDEP ? 1 : 0;
     }
 
     @Override
-    public int varDep() {
+    public final int varDep() {
         return type == Op.VAR_DEP ? 1 : 0;
     }
 
     @Override
-    public int varQuery() {
+    public final int varQuery() {
         return type == Op.VAR_QUERY ? 1 : 0;
     }
 
     @Override
-    public int varPattern() {
+    public final int varPattern() {
         return type == Op.VAR_PATTERN ? 1 : 0;
     }
 
     @Override
-    public int vars() {
+    public final int vars() {
         // pattern variable hidden in the count 0
         return type == Op.VAR_PATTERN ? 0 : 1;
     }
@@ -86,7 +92,7 @@ public class GenericVariable extends AtomicString implements Variable {
 
     @NotNull
     @Override
-    public String toString() {
+    public final String toString() {
         return str;
     }
 

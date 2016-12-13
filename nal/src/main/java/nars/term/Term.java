@@ -393,13 +393,22 @@ public interface Term extends Termed, Termlike, Comparable<Termlike> {
 
             return cx.dt() - cy.dt();
 
-        } else if ((this instanceof AbstractVariable) && (y instanceof AbstractVariable)) {
-            //hashcode serves as the ordering too
-            //return Integer.compare(this.hashCode(), y.hashCode());
-            return hashCode() - y.hashCode();
         } else if ((this instanceof Atomic) && (y instanceof Atomic)) {
+
+            if ((this instanceof AbstractVariable) && (y instanceof AbstractVariable)) {
+                //hashcode serves as the ordering too
+                return hashCode() - y.hashCode();
+            }
+
             //if the op is the same, it is required to be a subclass of Atomic
             //which should have an ordering determined by its toString()
+
+            boolean gx = this instanceof GenericVariable;
+            boolean gy = y instanceof GenericVariable;
+            if (gx && !gy)
+                return -1;
+            else if (!gx && gy)
+                return +1;
 
             //return this.toString().compareTo((/*(Atomic)*/y).toString());
             return Hack.compare(toString(), y.toString());

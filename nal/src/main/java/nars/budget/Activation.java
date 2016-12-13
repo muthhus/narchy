@@ -85,22 +85,20 @@ public class Activation {
             //final float idealAvgPri = 0.5f;
             final float thresh = Param.BUDGET_EPSILON;
 
-            MutableFloatCollection values = m.values();
+            //MutableFloatCollection values = m.values();
             int n = m.size();
             float normFactor =
                     //(float) ( (n * idealAvgPri )/ values.sum());
-                    (float) ( 1f / values.sum());
+                    (float) ( 1f / m.sum());
 
             List<ObjectFloatPair<X>> l = $.newArrayList(n);
             m.forEachKeyValue((k,v)->{
                 float vn = v * normFactor;
-                if (vn > thresh)
+                if (vn >= thresh)
                     l.add(new LightObjectFloatPair<>(k, vn));
             });
 
-            m.clear(); //?<- helpful?
-
-            //System.out.println(this + " " + l);
+            //m.clear(); //?<- helpful?
 
             return l; //m.keyValuesView();
 

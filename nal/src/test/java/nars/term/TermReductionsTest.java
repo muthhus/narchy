@@ -473,7 +473,7 @@ public class TermReductionsTest {
     }
 
     @Test public void testConegatedConjunctionTerms01() {
-        assertEquals(False, $.parallel($("#1"), $("(--,#1)")));
+        assertEquals(False, $.parallel($.varDep(1), $.neg($.varDep(1))));
     }
 
     @Test public void testConegatedConjunctionTerms1() {

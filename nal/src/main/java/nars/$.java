@@ -224,6 +224,13 @@ public enum $ {
     }
 
     public static @NotNull Variable v(@NotNull Op type, @NotNull String name) {
+
+//        if (name.length()==1) {
+//            char c = name.charAt(0);
+//            if (c >= '1' && c <= '9')
+//                return $.v(type, c-'0'); //explicit use of normalized var
+//        }
+
         return new GenericVariable(type, name);
     }
 
@@ -402,8 +409,8 @@ public enum $ {
     }
 
     /** normalized variable */
-    public static @NotNull AbstractVariable v(@NotNull Op type, int counter) {
-        return AbstractVariable.cached(type, counter);
+    public static @NotNull AbstractVariable v(@NotNull Op type, int id) {
+        return AbstractVariable.cached(type, id);
     }
 
     @Nullable
