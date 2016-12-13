@@ -29,26 +29,25 @@ import java.nio.ByteBuffer;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 
-public class WebCam implements Runnable {
+public class WebCam {
 
-    private int width;
-    private int height;
+    public int width;
+    public int height;
     //private SourceDataLine mLine;
     // private ShortBuffer audioSamples;
     public com.github.sarxos.webcam.Webcam webcam;
 
-    final Topic<WebCam> eventChange = new ArrayTopic();
+    public final Topic<WebCam> eventChange = new ArrayTopic();
 
     boolean running = true;
 
-    final int fps = 15;
 
     @Range(min = 0, max = 1)
     public final MutableFloat cpuThrottle = new MutableFloat(0.5f);
 
 
     final static Logger logger = LoggerFactory.getLogger(WebCam.class);
-    private ByteBuffer image;
+    public ByteBuffer image;
 
 
     public WebCam(int w, int h) {
@@ -107,13 +106,60 @@ public class WebCam implements Runnable {
 //
 //        getChildren().add(wcon);
 
-        try {
 
-            new Thread(this).start();
+    }
 
-        } catch (Exception e) {
+    public Thread loop(float fps) {
+        //try {
+
+            Thread t = new Thread(() -> {
+
+                while (running) {
+                    if (webcam.isOpen() && webcam.isImageNew()) {
+
+                        image.rewind();
+
+                        Dimension viewSize = webcam.getViewSize();
+                        if (viewSize != null) {
+                            width = (int) viewSize.getWidth();
+                            height = (int) viewSize.getHeight();
+
+                            webcam.getImageBytes(image);
+
+                            image.rewind();
+
+                            eventChange.emit(this);
+
+                        } else {
+                            width = height = 0;
+                        }
+
+                    }
+
+//                BufferedImage bimage = process(webcam.getImage());
+//
+//                //TODO blit the image directly, this is likely not be the most efficient:
+//                image = SwingFXUtils.toFXImage(bimage, image);
+//
+//                WritableImage finalImage = process(image);
+//                runLater(() -> view.setImage(finalImage));
+//            }
+
+                    try {
+                        Thread.sleep((long) (1000.0 / fps));
+                    } catch (InterruptedException e) {
+                    }
+                }
+
+
+            });
+            t.start();
+            return t;
+
+        //} catch (Exception e) {
             //getChildren().add(new Label(e.toString()));
-        }
+            //return null;
+        //}
 
     }
 
@@ -131,6 +177,7 @@ public class WebCam implements Runnable {
                 });
 
             }
+
             /**
              * TODO use GL textures
              */
@@ -144,14 +191,12 @@ public class WebCam implements Runnable {
                         //JPEGImage di = JPEGImage.read(new ByteBufferInputStream(image.asReadOnlyBuffer()));
                         TGAImage di = TGAImage.createFromData(width, height, false, true, image.asReadOnlyBuffer());
                         final String target = "/var/tmp/x.tga";
-                        //di.
-                        //di.write(target);
 
                         di.write(target);
 
                         Texture oldTexture = texture;
                         texture = TextureIO.newTexture(new File(target), true);
-                        if (oldTexture!=null) {
+                        if (oldTexture != null) {
                             oldTexture.destroy(gl);
                         }
                     } catch (IOException e) {
@@ -159,14 +204,8 @@ public class WebCam implements Runnable {
                     }
                 }
 
-                if (texture!=null) {
-                    texture.enable(gl);
-                    texture.bind(gl);
-                    //gl.glShadeModel(GLLightingFunc.GL_SMOOTH);
-                    //gl.glEnable(GL.GL_BLEND);
-                    //gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE);
-                    Draw.rectTex(gl, 0, 0, 1, 1, 0);
-                    texture.disable(gl);
+                if (texture != null) {
+                    Draw.rectTex(gl, texture, 0, 0, 1, 1, 0);
                 }
 
 
@@ -200,9 +239,11 @@ public class WebCam implements Runnable {
 
     public static void main(String[] args) {
 
+        final WebCam w = new WebCam(320, 200);
         SpaceGraph.window(
                 //new Cuboid(new WebcamSurface(320, 200),4,4), 1200, 1200);
-                new WebCam(320, 200).surface(), 1200, 1200);
+                w.surface(), 1200, 1200);
+        w.loop(10);
 
 
 //        NARfx.run((a, b) -> {
@@ -221,47 +262,6 @@ public class WebCam implements Runnable {
 //
 //        });
 
-
-    }
-
-    /** synchronous run loop */
-    @Override public void run() {
-        while (running) {
-            if (webcam.isOpen() && webcam.isImageNew()) {
-
-                image.rewind();
-
-                Dimension viewSize = webcam.getViewSize();
-                if (viewSize!=null) {
-                    width = (int) viewSize.getWidth();
-                    height = (int) viewSize.getHeight();
-
-                    webcam.getImageBytes(image);
-
-                    image.rewind();
-
-                    eventChange.emit(this);
-
-                } else {
-                    width = height = 0;
-                }
-
-            }
-
-//                BufferedImage bimage = process(webcam.getImage());
-//
-//                //TODO blit the image directly, this is likely not be the most efficient:
-//                image = SwingFXUtils.toFXImage(bimage, image);
-//
-//                WritableImage finalImage = process(image);
-//                runLater(() -> view.setImage(finalImage));
-//            }
-
-            try {
-                Thread.sleep((long) (1000.0 / fps));
-            } catch (InterruptedException e) {
-            }
-        }
 
     }
 

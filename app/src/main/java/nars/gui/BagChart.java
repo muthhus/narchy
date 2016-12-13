@@ -47,6 +47,11 @@ public class BagChart<X> extends TreeChart<BLink<X>> implements BiConsumer<BLink
     }
 
 
+    //TODO
+//    public BagChart(@NotNull Bag<X> b) {
+//        this(b, -1);
+//    }
+
     public BagChart(@NotNull Bag<X> b, int limit) {
         super();
         this.bag = b;

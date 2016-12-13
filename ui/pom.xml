@@ -256,12 +256,12 @@
             </exclusions>
         </dependency>
 
-        <!-- https://mvnrepository.com/artifact/org.ocpsoft.prettytime/prettytime -->
-        <dependency>
-            <groupId>org.ocpsoft.prettytime</groupId>
-            <artifactId>prettytime</artifactId>
-            <version>4.0.1.Final</version>
-        </dependency>
+        <!--&lt;!&ndash; https://mvnrepository.com/artifact/org.ocpsoft.prettytime/prettytime &ndash;&gt;-->
+        <!--<dependency>-->
+            <!--<groupId>org.ocpsoft.prettytime</groupId>-->
+            <!--<artifactId>prettytime</artifactId>-->
+            <!--<version>4.0.1.Final</version>-->
+        <!--</dependency>-->
 
 
         <dependency>

@@ -27,6 +27,7 @@ package spacegraph.render;
 import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.util.ImmModeSink;
+import com.jogamp.opengl.util.texture.Texture;
 import jcog.list.FasterList;
 import org.apache.commons.io.IOUtils;
 import org.eclipse.collections.impl.list.mutable.primitive.ByteArrayList;
@@ -36,19 +37,18 @@ import spacegraph.SimpleSpatial;
 import spacegraph.math.AxisAngle4f;
 import spacegraph.math.Quat4f;
 import spacegraph.math.v3;
-import spacegraph.space.EDraw;
 import spacegraph.phys.collision.broad.BroadphaseNativeType;
 import spacegraph.phys.math.Transform;
 import spacegraph.phys.math.VectorUtil;
 import spacegraph.phys.shape.*;
 import spacegraph.phys.util.BulletStack;
+import spacegraph.space.EDraw;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.List;
 
-import static com.jogamp.opengl.GL.GL_TEXTURE;
 import static com.jogamp.opengl.util.gl2.GLUT.STROKE_MONO_ROMAN;
 import static spacegraph.math.v3.v;
 import static spacegraph.render.JoglSpace.glut;
@@ -517,15 +517,13 @@ public enum Draw {
             gl.glEnd();
         }
     }
-    public static void rectTex(GL2 gl, float x1, float y1, float w, float h, float z) {
+    public static void rectTex(GL2 gl, Texture texture, float x1, float y1, float w, float h, float z) {
 
 //        gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_LINEAR);
 //        gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_LINEAR);
 
-//        //TextureIO.newTexture()
-//        texture.enable(gl);
-//        texture.bind(gl);
-//        gl.glEnable(GL_TEXTURE);
+        texture.enable(gl);
+        texture.bind(gl);
 
         gl.glBegin(GL2.GL_QUADS);
 
@@ -540,7 +538,7 @@ public enum Draw {
         gl.glVertex3f(x1, y1 + h, z);
         gl.glEnd();
 
-        //gl.glDisable(GL_TEXTURE);
+        texture.disable(gl);
 
     }
 

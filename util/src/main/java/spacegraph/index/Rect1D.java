@@ -94,4 +94,6 @@ public abstract class Rect1D<X extends Comparable<X>> implements HyperRect<X> {
     public double perimeter() {
         return getRange(0);
     }
+
+
 }

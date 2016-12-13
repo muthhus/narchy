@@ -25,7 +25,7 @@ package spacegraph.index;
  *
  * Created by jcairns on 4/30/15.
  */
-public interface HyperRect<X extends Comparable<X>> {
+public interface HyperRect<X extends Comparable<X>>  {
 
     /**
      * Calculate the resulting mbr when combining param HyperRect with this HyperRect
@@ -104,4 +104,5 @@ public interface HyperRect<X extends Comparable<X>> {
      * @return - perimeter
      */
     double perimeter();
+
 }
