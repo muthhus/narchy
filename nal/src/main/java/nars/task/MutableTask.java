@@ -154,7 +154,7 @@ public class MutableTask extends AbstractTask {
 
     @NotNull
     public MutableTask eternal() {
-        setEternal();
+        setOccurrence(Tense.ETERNAL);
         return this;
     }
 

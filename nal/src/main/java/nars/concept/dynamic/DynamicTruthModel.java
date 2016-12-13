@@ -9,6 +9,7 @@ import nars.concept.Concept;
 import nars.table.BeliefTable;
 import nars.term.Compound;
 import nars.term.Term;
+import nars.term.Terms;
 import nars.term.obj.Termject;
 import nars.truth.DynTruth;
 import nars.truth.Truth;
@@ -32,7 +33,7 @@ abstract public class DynamicTruthModel {
     /**
      * N-ary intersection truth function of subterms
      */
-    public static final DynamicTruthModel Intersection = new Intersection(null) {
+    public static final DynamicTruthModel Intersection = new Intersection() {
         @NotNull
         @Override
         public Term[] components(Compound superterm) {
@@ -50,7 +51,9 @@ abstract public class DynamicTruthModel {
         float confMin = n.confMin.floatValue();
 
         for (int i = 0; i < inputs.length; i++) {
-            Term subterm = inputs[i];
+            @NotNull Term subterm = inputs[i];
+            if (subterm == null)
+                throw new NullPointerException();
 
             boolean negated = subterm.op() == Op.NEG;
             if (negated)
@@ -72,7 +75,7 @@ abstract public class DynamicTruthModel {
                     @Nullable DynTruth ndt = ((DynamicBeliefTable) table).truth(when + dt, now, (Compound) subterm, evi);
                     if (ndt != null) {
                         Truth ntt = ndt.truth();
-                        if (ntt != null && add(i, d, ntt.negated(negated), confMin)) {
+                        if (ntt != null && add(i, d, ntt.negIf(negated), confMin)) {
                             if (d.e != null) {
                                 d.e.addAll(ndt.e);
                             }
@@ -84,7 +87,7 @@ abstract public class DynamicTruthModel {
                     }
                 } else {
                     nt = table.truth(when + dt, now);
-                    if (nt != null && add(i, d, nt.negated(negated), confMin)) {
+                    if (nt != null && add(i, d, nt.negIf(negated), confMin)) {
                         if (d.e != null) {
                             Task bt = table.match(when + dt, now);
                             if (bt != null) {
@@ -199,7 +202,7 @@ abstract public class DynamicTruthModel {
      */
     public static class Union extends DynamicTruthModel.Intersection {
 
-        public Union(Term[] comp) {
+        public Union(@NotNull Term... comp) {
             super(comp);
         }
 
@@ -217,9 +220,13 @@ abstract public class DynamicTruthModel {
 
     public static class Intersection extends DynamicTruthModel {
 
-        private final Term[] comp;
+        @NotNull private final Term[] comp;
 
-        public Intersection(Term[] comp) {
+        protected Intersection() {
+            this.comp = Terms.empty;
+        }
+
+        public Intersection(@NotNull Term... comp) {
             this.comp = comp;
         }
 

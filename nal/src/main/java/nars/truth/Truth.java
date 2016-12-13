@@ -277,7 +277,7 @@ public interface Truth extends Truthed {
     }
 
     @NotNull
-    default Truth negated(boolean negate) {
+    default Truth negIf(boolean negate) {
         return negate ? negated() : this;
     }
 

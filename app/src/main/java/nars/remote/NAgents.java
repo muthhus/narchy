@@ -30,8 +30,6 @@ import nars.time.Time;
 import nars.truth.Truth;
 import nars.util.TaskStatistics;
 import nars.video.*;
-import objenome.O;
-import objenome.SuperReflect;
 import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunction;
 import org.jetbrains.annotations.NotNull;
 import spacegraph.SpaceGraph;
@@ -43,6 +41,7 @@ import spacegraph.space.widget.FloatSlider;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.lang.reflect.Field;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -446,24 +445,34 @@ abstract public class NAgents extends NAgent {
 
         private final X x;
 
-        public ReflectionSurface(@NotNull X x) {
+        public ReflectionSurface(@NotNull X x)  {
             this.x = x;
 
             List<Surface> l = $.newArrayList();
 
 
-            SuperReflect.fields(x, (String k, Class c, SuperReflect v) -> {
+            Class cc = x.getClass();
+            for (Field f : cc.getFields()) {
+            //SuperReflect.fields(x, (String k, Class c, SuperReflect v) -> {
 
-                if (c == FloatParam.class) {
-                    FloatParam f = v.get();
-                    l.add(col(Vis.label(k), new FloatSlider(f) ));
-                } else if (c == AtomicBoolean.class) {
-                    l.add(new CheckBox(k, v.get()));
+                try {
+                    String k = f.getName();
+                    Class c = f.getType();
+
+                    if (c == FloatParam.class) {
+                        FloatParam p = (FloatParam) f.get(x);
+                        l.add(col(Vis.label(k), new FloatSlider(p) ));
+                    } else if (c == AtomicBoolean.class) {
+                        AtomicBoolean p = (AtomicBoolean) f.get(x);
+                        l.add(new CheckBox(k, p));
+                    }
+                    /*else {
+                        l.add(new PushButton(k));
+                    }*/
+                }catch (Throwable t) {
+                    t.printStackTrace();
                 }
-                /*else {
-                    l.add(new PushButton(k));
-                }*/
-            });
+            }
             setChildren(l);
         }
     }

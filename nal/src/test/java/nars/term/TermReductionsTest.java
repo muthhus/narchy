@@ -462,6 +462,20 @@ public class TermReductionsTest {
         assertInvalid("(a ==> (&&, a, b, c))");
     }
 
+    @Test public void testConegatedConjunctionTerms0() {
+        assertEquals(False, $("(#1 && (--,#1))"));
+        assertEquals(False, $("(&&, #1, (--,#1), (x))"));
+
+        assertTrue( $("(#1 &&+1 (--,#1))") instanceof Compound);
+        assertTrue( $("((x) &&+1 --(x))") instanceof Compound);
+
+
+    }
+
+    @Test public void testConegatedConjunctionTerms01() {
+        assertEquals(False, $.parallel($("#1"), $("(--,#1)")));
+    }
+
     @Test public void testConegatedConjunctionTerms1() {
         assertEquals($("(&&,(x),--(y),--(z))"), $("((x) && --((y) && (z)))"));
     }

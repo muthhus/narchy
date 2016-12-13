@@ -37,24 +37,27 @@ public class Arkancide extends NAgents {
             }
         };
 
-        senseNumberBi("noid(paddle,x,p)", new FloatNormalized(()->noid.paddle.x));
-        senseNumberBi("noid(ball,x,p)", new FloatNormalized(()->noid.ball.x));
-        senseNumberBi("noid(ball,y,p)", new FloatNormalized(()->noid.ball.y));
-        senseNumberBi("noid(ball,x,v)", new FloatNormalized(()->noid.ball.velocityX));
-        senseNumberBi("noid(ball,y,v)", new FloatNormalized(()->noid.ball.velocityY));
+        senseNumberBi("x(noid:paddle)", new FloatNormalized(()->noid.paddle.x));
+        senseNumberBi("x(noid:ball)", new FloatNormalized(()->noid.ball.x));
+        senseNumberBi("y(noid:ball)", new FloatNormalized(()->noid.ball.y));
+        senseNumberBi("vx(noid:ball)", new FloatNormalized(()->noid.ball.velocityX));
+        senseNumberBi("vy(noid:ball)", new FloatNormalized(()->noid.ball.velocityY));
 
         addCamera("noid", noid, visW, visH);
         //addCameraRetina("noid", noid, visW/2, visH/2, (v) -> t(v, alpha));
 
         action(new ActionConcept(
-                //"happy:noid(paddle,x)"
-                "noid(leftright)"
+                "dx(noid:paddle)"
                 , nar, (b,d)->{
+
+            float pct;
             if (d!=null) {
-                float pct = noid.paddle.moveTo(d.freq(), paddleSpeed ); //* d.conf());
-                return $.t(pct, gamma);
+                pct = noid.paddle.moveTo(d.freq(), paddleSpeed ); //* d.conf());
+            } else {
+                pct = noid.paddle.x / noid.SCREEN_WIDTH; //unchanged
             }
-            return null; //$.t(0.5f, alpha);
+            return $.t(pct, nar.confidenceDefault('.'));
+            //return null; //$.t(0.5f, alpha);
         }));
 //        action(new ActionConcept(
 //                //"happy:noid(paddle,x)"

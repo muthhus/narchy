@@ -85,7 +85,7 @@ public class ExampleVisualOdometryMonocularPlane {
                     @Override
                     public GrayU8 next() {
                         InterleavedU8 i = new InterleavedU8(w.width, w.height, 3);
-                        i.data = w.image;
+                        i.data = w.iimage.data;
 
                         GrayU8 o = new GrayU8(w.width, w.height);
                         ColorRgb.rgbToGray_Weighted(i, o);

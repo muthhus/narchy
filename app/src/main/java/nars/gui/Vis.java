@@ -19,13 +19,12 @@ import nars.util.Iterative;
 import org.eclipse.collections.api.block.function.primitive.FloatFunction;
 import org.eclipse.collections.impl.map.mutable.primitive.ObjectFloatHashMap;
 import org.jetbrains.annotations.Nullable;
-import spacegraph.AbstractSpace;
-import spacegraph.Ortho;
-import spacegraph.SpaceGraph;
-import spacegraph.Surface;
+import spacegraph.*;
 import spacegraph.layout.Flatten;
 import spacegraph.layout.ForceDirected;
 import spacegraph.math.Color3f;
+import spacegraph.phys.Collidable;
+import spacegraph.phys.collision.broad.Broadphase;
 import spacegraph.space.CrosshairSurface;
 import spacegraph.space.layout.Grid;
 import spacegraph.space.layout.Stacking;
@@ -277,10 +276,10 @@ public class Vis {
     }
 
 
-    public static Grid agentBudgetPlot(NAgent t, int history) {
-        return conceptLinePlot(t.nar,
-                Iterables.concat(t.actions, Lists.newArrayList(t.happy, t.joy)), history);
-    }
+//    public static Grid agentBudgetPlot(NAgent t, int history) {
+//        return conceptLinePlot(t.nar,
+//                Iterables.concat(t.actions, Lists.newArrayList(t.happy, t.joy)), history);
+//    }
 
     public static Grid emotionPlots(NAR nar, int plotHistory) {
 //        Plot2D plot = new Plot2D(plotHistory, Plot2D.Line);
@@ -364,7 +363,7 @@ public class Vis {
 //            }
         };
 
-        s.dyn.addBroadConstraint(new ForceDirected());
+        s.dyn.addBroadConstraint(new MyForceDirected());
 
 
         return s;
@@ -433,7 +432,7 @@ public class Vis {
                         new Flatten()
                         //new Spiral()
                         //new FastOrganicLayout()
-                )).with(fd = new ForceDirected());
+                )).with(fd = new MyForceDirected());
 
         s.add(new Ortho(new CrosshairSurface(s)));
 
@@ -442,4 +441,30 @@ public class Vis {
         return s;
     }
 
+    private static class MyForceDirected extends ForceDirected {
+        @Override
+        public void solve(Broadphase b, List<Collidable> objects, float timeStep) {
+            super.solve(b, objects, timeStep);
+
+            float a = attraction.floatValue();
+
+            for (Collidable c : objects) {
+
+                Spatial A = ((Spatial) c.data());
+                if (A instanceof ConceptWidget) {
+                    ((ConceptWidget) A).edges.forEachKey(e -> {
+
+                        ConceptWidget B = e.target;
+
+                        if ((B.body != null)) {
+
+                            attract(c, B.body, a * e.attraction, e.attractionDist);
+                        }
+
+                    });
+                }
+
+            }
+        }
+    }
 }

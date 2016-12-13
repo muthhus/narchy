@@ -47,6 +47,11 @@ public abstract class WiredConcept extends CompoundConcept<Compound> implements 
         super.linkCapacity(termlinks * termlinkMultiplier(), tasklinks * tasklinkMultiplier());
     }
 
+//    @Override
+//    protected void beliefCapacity(@NotNull ConceptPolicy p, NAR nar) {
+//        beliefCapacity(1, beliefCapacity, 1, goalCapacity, nar);
+//    }
+
     protected int termlinkMultiplier() {
         return 1;
     }
@@ -160,11 +165,6 @@ public abstract class WiredConcept extends CompoundConcept<Compound> implements 
 //        //logger.error("Sensor concept rejected derivation:\n {}\npredicted={} derived={}", belief.explanation(), belief(belief.occurrence()), belief.truth());
 //
 //    }
-
-    @Override
-    protected void beliefCapacity(@NotNull ConceptPolicy p, NAR nar) {
-        beliefCapacity(0, beliefCapacity, 1, goalCapacity, nar);
-    }
 
 //    @Override
 //    protected @NotNull BeliefTable newBeliefTable() {

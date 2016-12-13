@@ -22,6 +22,7 @@ import nars.bag.impl.ArrayBag;
 import nars.budget.merge.BudgetMerge;
 import nars.gui.BagChart;
 import nars.link.BLink;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spacegraph.SpaceGraph;
@@ -64,11 +65,11 @@ public class VideoBag {
         public final int width, height;
         public Texture texture;
 
-        public Frame(long when, ImageBase i) {
+        public Frame(long when, @NotNull ImageBase i) {
             this(when, i, i.getWidth(), i.getHeight());
         }
 
-        public Frame(long when, ImageBase i, int width, int height) {
+        public Frame(long when, @NotNull ImageBase i, int width, int height) {
             this.t = when;
             this.image = i;
             this.width = width;
@@ -131,7 +132,7 @@ public class VideoBag {
             //hornSchunck(null, GrayU8.class);
                     broxWarping(null, GrayU8.class);
 
-    public boolean put(InterleavedU8 current) {
+    public boolean put(@NotNull InterleavedU8 current) {
 
         boolean added;
         if (busy.compareAndSet(false, true)) {
@@ -241,7 +242,8 @@ public class VideoBag {
 //                current.data = c.image.clone();
 
                 //exe.execute(() -> {
-                bag.put(cam.iimage);
+                if (cam.iimage!=null)
+                    bag.put(cam.iimage);
                 //});
 
 
@@ -271,6 +273,8 @@ public class VideoBag {
             //reclaim deleted textures
             while (!bag.textureTrash.isEmpty()) {
                 Frame ff = bag.textureTrash.remove();
+                ((InterleavedU8)ff.image).data = null;
+                ff.texture.disable(gl);
                 ff.texture.destroy(gl);
                 ff.texture = null;
             }
@@ -286,9 +290,11 @@ public class VideoBag {
 
                     byte[] data = ((InterleavedU8)f.image).data;
 
+
                     tt = tgaTexture(f.width, f.height, false, data);
 
                     f.texture = tt;
+
 
                 }
 
@@ -307,15 +313,6 @@ public class VideoBag {
 
         public static Texture tgaTexture(int width, int height, boolean alpha, byte[] data) {
 
-//                    PngWriter pp = new PngWriter(os, new ImageInfo(f.getWidth(), f.getHeight(), 8, false));
-//
-//                    pp.setCompLevel(2 /* relatively fast */);
-//                    byte[] bb = new byte[f.getWidth() * 3];
-//                    for (int h = 0; h < f.getHeight(); h++) {
-//                        System.arraycopy(data, bb.length * h, bb, 0, bb.length);
-//                        pp.writeRowByte(bb.clone(), h);
-//                    }
-//                    pp.end();
 
             Texture tt;
             try {

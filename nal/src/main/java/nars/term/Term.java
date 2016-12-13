@@ -30,6 +30,7 @@ import nars.term.atom.AtomicSingleton;
 import nars.term.container.TermContainer;
 import nars.term.subst.Unify;
 import nars.term.var.AbstractVariable;
+import nars.term.var.GenericVariable;
 import nars.term.var.Variable;
 import nars.term.visit.SubtermVisitor;
 import nars.term.visit.SubtermVisitorX;
@@ -392,11 +393,11 @@ public interface Term extends Termed, Termlike, Comparable<Termlike> {
 
             return cx.dt() - cy.dt();
 
-        } else if (this instanceof AbstractVariable) {
+        } else if ((this instanceof AbstractVariable) && (y instanceof AbstractVariable)) {
             //hashcode serves as the ordering too
             //return Integer.compare(this.hashCode(), y.hashCode());
             return hashCode() - y.hashCode();
-        } else if (this instanceof Atomic) {
+        } else if ((this instanceof Atomic) && (y instanceof Atomic)) {
             //if the op is the same, it is required to be a subclass of Atomic
             //which should have an ordering determined by its toString()
 

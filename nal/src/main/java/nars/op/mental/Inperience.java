@@ -256,7 +256,7 @@ public class Inperience extends Leak<Task> {
 
         if (tr != null) {
             neg = tr.isNegative();
-            arg[k] = tr.expTerm(tr.negated(neg).expectation(), conceptCreationExpectation);
+            arg[k] = tr.expTerm(tr.negIf(neg).expectation(), conceptCreationExpectation);
             //arg[k++] = tr.freqTerm(tr.freq(), 0.66f);
             //arg[k++] = tr.confTerm(tr.conf(), 0.5f);
         } else {

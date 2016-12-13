@@ -55,11 +55,11 @@ abstract public class NAgent implements NSense, NAction {
     @NotNull
     public final SensorConcept happy;
 
-    /**
-     * d(happy)/dt = change in happiness over time (ie. first-order difference of happiness signal)
-     */
-    @Nullable
-    public final SensorConcept joy;
+//    /**
+//     * d(happy)/dt = change in happiness over time (ie. first-order difference of happiness signal)
+//     */
+//    @Nullable
+//    public final SensorConcept joy;
 
     @NotNull
     public final FloatNormalized rewardNormalized;
@@ -97,7 +97,7 @@ abstract public class NAgent implements NSense, NAction {
 
     final List<CuriosityPhasor> curiosityPhasor = $.newArrayList();
 
-    public final FloatParam epsilonProbability = new FloatParam(0.05f);
+    public final FloatParam epsilonProbability = new FloatParam(0.1f);
 
     public final FloatParam gammaEpsilonFactor = new FloatParam(0.1f);
 
@@ -173,6 +173,7 @@ abstract public class NAgent implements NSense, NAction {
         };
 
 
+        /*
         joy = new SensorConcept(
                 //"joy" + "(" + nar.self + ")", nar,
                 "change(" + happy.term() + ")",
@@ -184,6 +185,7 @@ abstract public class NAgent implements NSense, NAction {
                 ),
                 (x) -> t(x, rewardConf)
         );
+        */
 
     }
 
@@ -277,7 +279,7 @@ abstract public class NAgent implements NSense, NAction {
         if (load < 1) {
 
             happy.run();
-            joy.run();
+            //joy.run();
 
 
             nar.runLater(sensors, SensorConcept::run, 4);
@@ -356,7 +358,7 @@ abstract public class NAgent implements NSense, NAction {
         sensors.forEach(s -> s.pri(sensorPriority));
         actions.forEach(s -> s.pri(actionPriority));
         happy.pri(rewardPriority);
-        joy.pri(rewardPriority);
+        //joy.pri(rewardPriority);
 
         //SensorConcept.flatAttention(p, minSensorPriority);
 
@@ -595,12 +597,11 @@ abstract public class NAgent implements NSense, NAction {
 //                }
 //            }
 
-            Truth d = a.desireActual(now);
+            Truth d = a.goals().truth(now);
             if (d != null)
                 m += d.evi();
         }
-        m /= n;
-        avgActionDesire.addValue(w2c(m)); //resulting from the previous frame
+        avgActionDesire.addValue(w2c(m/n)); //resulting from the previous frame
 
         nar.runLater(actions, ActionConcept::run, 1);
     }

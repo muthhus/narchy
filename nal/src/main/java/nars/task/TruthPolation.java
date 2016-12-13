@@ -45,11 +45,18 @@ public enum TruthPolation  {
     @Nullable
     public static Truth truth(@Nullable Task topEternal, long when, @NotNull List<Task> tasks) {
 
+
+        int tasksSize = tasks.size();
+        if (tasksSize == 0)
+            return null;
+        if (tasksSize == 1)
+            return tasks.get(0).truth(when);
+
         float weightedValue = 0, illumination = 0;
 
         // Contribution of each sample point to the illumination of the
         // microsphere's facets.
-        for (int i1 = 0, tasksSize = tasks.size(); i1 < tasksSize; i1++) {
+        for (int i1 = 0; i1 < tasksSize; i1++) {
             Task t = tasks.get(i1);
             if (t instanceof DynamicBeliefTask)
                 continue; //ignore dynamic belief tasks

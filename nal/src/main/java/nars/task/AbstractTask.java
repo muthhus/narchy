@@ -256,6 +256,8 @@ public abstract class AbstractTask extends RawBudget implements Task, Temporal {
 
     }
 
+
+
     //    /** if validated and entered into the system. can be overridden in subclasses to handle this event
 //     *  isnt called for Command tasks currently; they will be executed right away anyway
 //     * */
@@ -348,11 +350,11 @@ public abstract class AbstractTask extends RawBudget implements Task, Temporal {
     }
 
 
-    @Override
-    public final boolean isAnticipated() {
-        return isBelief() && !isEternal() &&
-                (/*state() == TaskState.Anticipated ||*/ isInput());
-    }
+//    @Override
+//    public final boolean isAnticipated() {
+//        return isBelief() && !isEternal() &&
+//                (/*state() == TaskState.Anticipated ||*/ isInput());
+//    }
 
     /** the evidence should be sorted and de-duplicaed prior to calling this */
     @NotNull protected Task setEvidence(@Nullable long... evidentialSet) {
@@ -565,8 +567,8 @@ public abstract class AbstractTask extends RawBudget implements Task, Temporal {
                 long delta = Math.abs(nearest - when);
 
                 float dur = dur();
-                if (dur!=dur)
-                    throw new RuntimeException("NaN duration");
+                /*if (dur!=dur)
+                    throw new RuntimeException("NaN duration");*/
 
                 //dur *= evidence().length;
 
@@ -583,9 +585,10 @@ public abstract class AbstractTask extends RawBudget implements Task, Temporal {
 
     public boolean eternalizable() {
         //return term.vars() > 0;
-        return false;
+        return term.varIndep() > 0;
+        //return false;
 
-        //return term.varIndep() > 0;
+
         //Op op = term.op();
         //return op ==IMPL || op ==EQUI || term.vars() > 0;
         //return op.statement || term.vars() > 0;

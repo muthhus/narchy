@@ -155,14 +155,14 @@ public abstract class TermIndex extends TermBuilder {
 
     @NotNull private final Term _the(@NotNull Op o, int dt, @NotNull Term[] u) {
         try {
-            Term t =super.the(o, dt, u);
-            return t == null ? False : t;
+            return super.the(o, dt, u);
+            //return t == null ? False : t;
         } catch (@NotNull InvalidTermException | InvalidTaskException x) {
             if (Param.DEBUG_EXTRA) {
-                logger.warn("Termizer: {x} : {} {} {}", x, o, dt, u);
+                logger.warn("{x} : {} {} {}", x, o, dt, u);
             }
         } catch (Throwable e) {
-            logger.error("Termizer: {x} : {} {} {}",  e, o, dt, u);
+            logger.error("{x} : {} {} {}",  e, o, dt, u);
         }
         return False; //place a False placeholder so that a repeat call will not have to discover this manually
     }
@@ -214,14 +214,14 @@ public abstract class TermIndex extends TermBuilder {
 
         boolean changed = false;
         Compound crc = (Compound) src;
-        Term[] cct = crc.terms();
+
 
         //use COMPOUND_VOLUME_MAX instead of trying for the nar's to provide construction head-room that can allow terms
         //to reduce and potentially meet the requirement
         int volLimit = Param.COMPOUND_VOLUME_MAX-1; /* -1 for the wrapping compound contribution of +1 volume if succesful */
         int volSum = 0, volAt = 0, subAt = 0;
         for (int i = 0; i < len; i++) {
-            Term t = cct[i];
+            Term t = crc.term(i);
             Term u = transform(t, f);
 
 

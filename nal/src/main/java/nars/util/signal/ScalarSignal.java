@@ -120,11 +120,9 @@ public class ScalarSignal implements Consumer<NAR>, DoubleSupplier {
 
         float next = value.floatValueOf(term);
         if (next!=next) {
-            this.currentValue = next;
-            if (current!=null) {
-                current.setEnd(now);
-                current = null;
-            }
+            this.currentValue = Float.NaN;
+            this.current = null;
+
             return; //all
         }// ow the value function to prevent input by returning NaN
 

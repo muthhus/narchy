@@ -46,6 +46,27 @@ public class Revision {
                     c
                 );
     }
+
+    @Nullable
+    public static Truth revise(@NotNull Iterable<? extends Truthed> aa, float minConf) {
+        float f = 0;
+        float w = 0;
+        for (Truthed x : aa) {
+            float e = x.evi();
+            w += e;
+            f += x.freq() * e;
+        }
+        if (w <= 0)
+            return null;
+
+        float c = w2c(w);
+        return c < minConf ? null :
+                $.t(
+                  (f) / w,
+                    c
+                );
+    }
+
     @Nullable
     public static Truth revise(@NotNull Truthed a, float aFrequencyBalance, @NotNull Truthed b, float minConf) {
         float w1 = a.evi();

@@ -791,9 +791,14 @@ public class Terms   {
 
     /** a Set is already duplicate free, so just sort it */
     public static Term[] sorted(Set<Term> s) {
+
+        //1. deduplicated
         Term[] x = s.toArray(new Term[s.size()]);
-        if ((x.length > 2) && (!(s instanceof SortedSet)))
+
+        //2. sorted
+        if ((x.length >= 2) && (!(s instanceof SortedSet)))
             Arrays.sort(x);
+
         return x;
     }
 

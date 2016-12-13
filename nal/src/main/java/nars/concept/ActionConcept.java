@@ -1,23 +1,24 @@
 package nars.concept;
 
 import jcog.math.FloatSupplier;
-import nars.NAR;
-import nars.Narsese;
-import nars.Symbols;
-import nars.Task;
+import nars.*;
 import nars.task.Revision;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.truth.Truth;
+import nars.truth.TruthFunctions;
 import nars.util.signal.ScalarSignal;
 import org.eclipse.collections.api.block.function.primitive.FloatFunction;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.List;
 import java.util.function.Consumer;
 
 import static nars.$.$;
 import static nars.$.t;
+import static nars.Op.IMPL;
+import static nars.Op.NEG;
 
 
 /** TODO make extend SensorConcept and utilize that for feedback control */
@@ -33,25 +34,20 @@ public class ActionConcept extends WiredConcept implements WiredConcept.Prioriti
     private float currentFeedback;
 
     public FloatSupplier pri;
-    @Nullable
-    private Truth currentDesire;
+
     private boolean updateOnBeliefChange = false;
-    private Truth desireBias;
 
     @Override
     public void pri(FloatSupplier v) {
         this.pri = v;
     }
-    private Truth lastDesire, lastBelief;
+    private Truth lastGoal, lastBelief;
 
     @Override
     public void accept(Task feedback) {
         nar.input(feedback);
     }
 
-    public void biasDesire(Truth t) {
-        this.desireBias = t;
-    }
 
 
     /** determines the feedback belief when desire or belief has changed in a MotorConcept
@@ -95,6 +91,7 @@ public class ActionConcept extends WiredConcept implements WiredConcept.Prioriti
         //assert (Op.isOperation(this));
 
         this.motor = motor;
+        this.goals = newBeliefTable(nar, false); //pre-create
 
         //this.commonEvidence = Param.SENSOR_TASKS_SHARE_COMMON_EVIDENCE ? new long[] { n.time.nextStamp() } : LongArrays.EMPTY_ARRAY;
 
@@ -113,7 +110,78 @@ public class ActionConcept extends WiredConcept implements WiredConcept.Prioriti
         return this.currentFeedback;
     }
 
+
+    Truth[] truthLinked(long when, long now, float minConf) {
+        List<Truth> belief = $.newArrayList(0);
+        List<Truth> goal = $.newArrayList(0);
+
+        termlinks().forEach(tll->{
+            Term t = tll.get();
+            if (t.op() == IMPL) {
+                //    B, (A ==> C), task(positive), time(decomposeBelief) |- subIfUnifiesAny(C,A,B), (Belief:Deduction, Goal:Induction)
+
+                Compound ct = (Compound) t;
+                Term postCondition = ct.term(1);
+                if (postCondition.equals(term())) {
+                    //a termlink to an implication in which the postcondition is this concept
+                    Concept implConcept = nar.concept(t);
+                    if (implConcept!=null) {
+
+                        Truth it = implConcept.belief(when, now); //belief truth of the implication
+                        if (it!=null) {
+
+                            Term preCondition = ct.term(0);
+                            boolean preCondNegated = preCondition.op()==NEG;
+
+
+                            Concept preconditionConcept = nar.concept(preCondition);
+                            if (preconditionConcept != null) {
+
+                                //belief = deduction(pbt, it)
+                                Truth pbt = preconditionConcept.belief(when, now);
+                                if (pbt!=null) {
+                                    Truth y = TruthFunctions.deduction(pbt.negIf(preCondNegated), it, minConf);
+                                    if (y!=null)
+                                        belief.add(y);
+                                }
+
+                                //goal = induction(pgt, it)
+                                Truth pgt = preconditionConcept.goal(when, now);
+                                if (pgt!=null) {
+                                    Truth y = TruthFunctions.induction(pgt.negIf(preCondNegated), it, minConf);
+                                    if (y!=null)
+                                        goal.add(y);
+                                }
+
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        return new Truth[] {Revision.revise(belief, minConf), Revision.revise(goal, minConf)};
+    }
+
+
+
 //    @Override
+//    protected BeliefTable newBeliefTable(NAR nar, boolean beliefOrGoal, int eCap, int tCap) {
+//        if (beliefOrGoal) {
+//            //belief
+//            return super.newBeliefTable(nar, beliefOrGoal, eCap, tCap);
+//        } else {
+//            //goal
+//            return new DefaultBeliefTable(
+//                    newEternalTable(eCap),
+//                    newTemporalTable(tCap, nar)
+//            ) {
+//
+//        }
+//
+//    }
+
+    //    @Override
 //    public boolean validBelief(@NotNull Task t, @NotNull NAR nar) {
 //        if (!t.isEternal() && t.occurrence() > nar.time() + 1) {
 //            System.err.println("prediction detected: " + (t.occurrence() - nar.time()));
@@ -128,6 +196,7 @@ public class ActionConcept extends WiredConcept implements WiredConcept.Prioriti
 //        }
 //        return true;
 //    }
+
 
 //    @Override
 //    public @NotNull Task filterGoals(@NotNull Task t, @NotNull NAR nar, List<Task> displaced) {
@@ -167,33 +236,35 @@ public class ActionConcept extends WiredConcept implements WiredConcept.Prioriti
     public void run() {
         long now = nar.time();
 
-        boolean desireChange, beliefChange;
 
-        @Nullable Truth d = this.goal(now + decisionDT);
+        long then = now + decisionDT;
 
-        if (desireBias!=null) {
-            //Truth d0 = d;
-            if (d!=null)
-                d = Revision.revise(desireBias, d);
-            else
-                d = desireBias;
-            //System.out.println("desire bias: " + d0 + " -> " + d);
-        } else {
-            //d = d; //unchanged
+        Truth[] td = truthLinked(then, now, nar.confMin.floatValue());
+        Truth tdb = td[0];
+
+        @Nullable Truth b = this.belief(then, now);
+        if (tdb != null) {
+            b = (b != null) ? Revision.revise(b, tdb) : tdb;
         }
 
-        this.currentDesire = d;
-
-        desireChange = (d == null ^ lastDesire==null) || (d!=null && d.equals(lastDesire));
-
-        @Nullable Truth b = this.belief(now + decisionDT);
-        beliefChange = (b == null ^ lastBelief ==null) || (b!=null && b.equals(lastBelief));
-
+        @Nullable Truth d = this.goal(then, now);
+        Truth tdg = td[1];
+        if (tdg!=null) {
+            d = (d != null) ? Revision.revise(d, tdg) : tdg;
+        }
 
 
-        lastBelief = b; lastDesire = d;
 
-        if (desireChange || (updateOnBeliefChange && beliefChange)) {
+        boolean noDesire = d == null;
+        boolean goalChange =   (noDesire ^ lastGoal == null) || (!noDesire && !d.equals(lastGoal));
+        lastGoal = d;
+
+        boolean noBelief = b == null;
+        boolean beliefChange = (noBelief ^ lastBelief == null) || (!noBelief && !b.equals(lastBelief));
+        lastBelief = b;
+
+
+        if (goalChange || (updateOnBeliefChange && beliefChange)) {
 
             Truth f = this.motor.motor(b, d);
             if (f!=null) {
@@ -216,12 +287,6 @@ public class ActionConcept extends WiredConcept implements WiredConcept.Prioriti
         feedback.accept(nar);
     }
 
-
-    @Nullable
-    public Truth desire() { return currentDesire; }
-
-    /** the un-biased actual truth value */
-    public Truth desireActual(long when) { return goals().truth(when); }
 
 
 //    @NotNull

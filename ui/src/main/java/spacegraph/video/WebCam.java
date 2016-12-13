@@ -48,7 +48,7 @@ public class WebCam {
     public InterleavedU8 iimage = null;
 
     final static Logger logger = LoggerFactory.getLogger(WebCam.class);
-    public byte[] image;
+    //public byte[] image;
 
 
     public WebCam(int w, int h) {
@@ -65,8 +65,6 @@ public class WebCam {
         Dimension dim = webcam.getViewSize();
         width = (int) dim.getWidth();
         height = (int) dim.getHeight();
-        image = new byte[0];
-
 
 
         //default behavior:
@@ -91,27 +89,29 @@ public class WebCam {
             public void webcamImageObtained(WebcamEvent we) {
 
 
+
                 Dimension viewSize = webcam.getViewSize();
                 if (viewSize != null) {
                     width = (int) viewSize.getWidth();
                     height = (int) viewSize.getHeight();
 
-                    //if (iimage == null || iimage.width!=width || iimage.height!=height) {
+                    BufferedImage nextImage = we.getImage();
+                    if (nextImage!=null) {
+                        //if (iimage == null || iimage.width!=width || iimage.height!=height) {
                         InterleavedU8 iimage = new InterleavedU8(width, height, 3);
-                    //}
-
-                    convertFromInterleaved(we.getImage(), iimage);
-
-                    //int[] output = we.getImage().getRGB(0, 0, width, height, null, 0, width * 3);
-
-                    //webcam.getgetImageBytes(image);
-
-                    eventChange.emit(we);
 
 
-                    WebCam.this.iimage = iimage;
-                    WebCam.this.image = iimage.data;
+                        convertFromInterleaved(nextImage, iimage);
 
+                        //int[] output = we.getImage().getRGB(0, 0, width, height, null, 0, width * 3);
+
+                        //webcam.getgetImageBytes(image);
+
+                        WebCam.this.iimage = iimage;
+                        ///WebCam.this.image = iimage.data;
+
+                        eventChange.emit(we);
+                    }
                 } else {
                     width = height = 0;
                 }
@@ -254,7 +254,7 @@ public class WebCam {
                     try {
                         //DDSImage di = DDSImage.createFromData(DDSImage.D3DFMT_R8G8B8, width, height, new ByteBuffer[]{image.asReadOnlyBuffer()});
                         //JPEGImage di = JPEGImage.read(new ByteBufferInputStream(image.asReadOnlyBuffer()));
-                        TGAImage di = TGAImage.createFromData(width, height, false, true, ByteBuffer.wrap(image));
+                        TGAImage di = TGAImage.createFromData(width, height, false, true, ByteBuffer.wrap(iimage.data));
                         final String target = "/var/tmp/x.tga";
 
                         di.write(target);

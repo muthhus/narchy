@@ -36,6 +36,7 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 
 import static nars.Op.DIFFe;
+import static nars.Op.PROD;
 
 //import org.eclipse.collections.impl.map.mutable.ConcurrentHashMapUnsafe;
 
@@ -123,7 +124,7 @@ public class DefaultConceptBuilder implements ConceptBuilder {
                 Op so = subj.op();
                 Op po = pred.op();
 
-                if (dmt == null && (po.atomic || po.image || po == so.PROD)) {
+                if (dmt == null && (po.atomic || po.image || po == PROD)) {
                     if ((so == Op.SECTi) || (so == Op.SECTe) || (so == Op.DIFFi)) {
                         //(P --> M), (S --> M), notSet(S), notSet(P), neqCom(S,P) |- ((S | P) --> M), (Belief:Intersection)
                         //(P --> M), (S --> M), notSet(S), notSet(P), neqCom(S,P) |- ((S & P) --> M), (Belief:Union)
@@ -132,19 +133,26 @@ public class DefaultConceptBuilder implements ConceptBuilder {
                         if (validUnwrappableSubterms(csubj.subterms())) {
                             int s = csubj.size();
                             Term[] x = new Term[s];
-                            for (int i = 0; i < s; i++)
-                                x[i] = $.inh(csubj.term(i), pred);
+                            boolean valid = true;
+                            for (int i = 0; i < s; i++) {
+                                if ((x[i] = $.inh(csubj.term(i), pred)) == null) {
+                                    valid = false;
+                                    break;
+                                }
+                            }
 
-                            switch (so) {
-                                case SECTi:
-                                    dmt = new DynamicTruthModel.Intersection(x);
-                                    break;
-                                case SECTe:
-                                    dmt = new DynamicTruthModel.Union(x);
-                                    break;
-                                case DIFFi:
-                                    dmt = new DynamicTruthModel.Difference(x[0], x[1]);
-                                    break;
+                            if (valid) {
+                                switch (so) {
+                                    case SECTi:
+                                        dmt = new DynamicTruthModel.Intersection(x);
+                                        break;
+                                    case SECTe:
+                                        dmt = new DynamicTruthModel.Union(x);
+                                        break;
+                                    case DIFFi:
+                                        dmt = new DynamicTruthModel.Difference(x[0], x[1]);
+                                        break;
+                                }
                             }
                         }
                     } else if (po.image) {
@@ -166,8 +174,8 @@ public class DefaultConceptBuilder implements ConceptBuilder {
 
                 }
 
-                if (dmt == null && (so.atomic || so.image || so == so.PROD)) {
-                    if ((so == Op.SECTi) || (so == Op.SECTe) || (so == DIFFe)) {
+                if (dmt == null && (so.atomic || so.image || so == PROD)) {
+                    if ((po == Op.SECTi) || (po == Op.SECTe) || (po == DIFFe)) {
                         //(M --> P), (M --> S), notSet(S), notSet(P), neqCom(S,P) |- (M --> (P & S)), (Belief:Intersection)
                         //(M --> P), (M --> S), notSet(S), notSet(P), neqCom(S,P) |- (M --> (P | S)), (Belief:Union)
                         //(M --> P), (M --> S), notSet(S), notSet(P), neqCom(S,P) |- (M --> (P - S)), (Belief:Difference)
@@ -175,19 +183,26 @@ public class DefaultConceptBuilder implements ConceptBuilder {
                         if (validUnwrappableSubterms(cpred.subterms())) {
                             int s = cpred.size();
                             Term[] x = new Term[s];
-                            for (int i = 0; i < s; i++)
-                                x[i] = $.inh(subj, cpred.term(i));
+                            boolean valid = true;
+                            for (int i = 0; i < s; i++) {
+                                if ((x[i] = $.inh(subj, cpred.term(i)))==null) {
+                                    valid = false;
+                                    break;
+                                }
+                            }
 
-                            switch (so) {
-                                case SECTi:
-                                    dmt = new DynamicTruthModel.Union(x);
-                                    break;
-                                case SECTe:
-                                    dmt = new DynamicTruthModel.Intersection(x);
-                                    break;
-                                case DIFFe:
-                                    dmt = new DynamicTruthModel.Difference(x[0], x[1]);
-                                    break;
+                            if (valid) {
+                                switch (po) {
+                                    case SECTi:
+                                        dmt = new DynamicTruthModel.Union(x);
+                                        break;
+                                    case SECTe:
+                                        dmt = new DynamicTruthModel.Intersection(x);
+                                        break;
+                                    case DIFFe:
+                                        dmt = new DynamicTruthModel.Difference(x[0], x[1]);
+                                        break;
+                                }
                             }
                         }
                     } else if (so.image) {

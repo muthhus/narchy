@@ -68,25 +68,7 @@ public class ForceDirected implements spacegraph.phys.constraint.BroadConstraint
 //System.out.print(l.size() + "  ");
         b.forEach((int) Math.ceil((float)objects.size() / clusters), objects, this::batch);
         //System.out.println(" total=" + count[0]);
-        float a = attraction.floatValue();
 
-//        for (Collidable c : objects) {
-//
-//            Spatial A = ((Spatial) c.data());
-//            if (A instanceof ConceptWidget) {
-//                ((ConceptWidget) A).edges.forEachKey(e -> {
-//
-//                        ConceptWidget B = e.target;
-//
-//                        if ((B.body != null)) {
-//
-//                            attract(c, B.body, a * e.attraction, e.attractionDist);
-//                        }
-//
-//                });
-//            }
-//
-//        }
 
 
 
@@ -102,7 +84,7 @@ public class ForceDirected implements spacegraph.phys.constraint.BroadConstraint
         }
     }
 
-    private static void attract(Collidable x, Collidable y, float speed, float idealDistRads) {
+    protected static void attract(Collidable x, Collidable y, float speed, float idealDistRads) {
         SimpleSpatial xp = ((SimpleSpatial) x.data());
         SimpleSpatial yp = ((SimpleSpatial) y.data());
 

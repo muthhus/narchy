@@ -522,6 +522,7 @@ public enum Draw {
 //        gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_LINEAR);
 //        gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_LINEAR);
 
+
         texture.enable(gl);
         texture.bind(gl);
 
@@ -1113,8 +1114,8 @@ public enum Draw {
         List<String> lines;
         try {
             String font =
-                    "meteorology";
-                    //"rowmans";
+                    //"meteorology";
+                    "rowmans";
             lines = IOUtils.readLines(Draw.class.getClassLoader().getResourceAsStream("spacegraph/font/hershey/" + font + ".jhf"), Charset.defaultCharset());
 
             String scratch = "";
