@@ -294,11 +294,7 @@ public class Plot2D extends Surface {
                     float v = ssh[i];
                     if (v==v) {
                         ny = ypos(minValue, range, v);
-
-                        //if (i > 0) {
                         gl.glVertex2f(x, ny);
-                        //Draw.line(gl, x - dx, py, x, ny);
-                        //}
                     }
 
                     x += dx;

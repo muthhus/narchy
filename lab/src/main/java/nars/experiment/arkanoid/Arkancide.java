@@ -27,7 +27,7 @@ public class Arkancide extends NAgents {
 
 
     public Arkancide(NAR nar) {
-        super(nar);
+        super("noid", nar);
 
         noid = new Arkanoid() {
             @Override
@@ -37,17 +37,17 @@ public class Arkancide extends NAgents {
             }
         };
 
-        senseNumberBi("x(noid:paddle)", new FloatNormalized(()->noid.paddle.x));
-        senseNumberBi("x(noid:ball)", new FloatNormalized(()->noid.ball.x));
-        senseNumberBi("y(noid:ball)", new FloatNormalized(()->noid.ball.y));
-        senseNumberBi("vx(noid:ball)", new FloatNormalized(()->noid.ball.velocityX));
-        senseNumberBi("vy(noid:ball)", new FloatNormalized(()->noid.ball.velocityY));
+        senseNumberBi("x(noid,paddle)", new FloatNormalized(()->noid.paddle.x));
+        senseNumberBi("x(noid,ball)", new FloatNormalized(()->noid.ball.x));
+        senseNumberBi("y(noid,ball)", new FloatNormalized(()->noid.ball.y));
+        senseNumberBi("vx(noid,ball)", new FloatNormalized(()->noid.ball.velocityX));
+        senseNumberBi("vy(noid,ball)", new FloatNormalized(()->noid.ball.velocityY));
 
-        addCamera("noid", noid, visW, visH);
-        //addCameraRetina("noid", noid, visW/2, visH/2, (v) -> t(v, alpha));
+        addCamera("cam(noid)", noid, visW, visH);
+        addCameraRetina("zoom(cam(noid))", noid, visW/2, visH/2, (v) -> $.t(v, alpha));
 
         action(new ActionConcept(
-                "dx(noid:paddle)"
+                "dx(noid,paddle)"
                 , nar, (b,d)->{
 
             float pct;
