@@ -1,14 +1,14 @@
 package spacegraph.video;
 
-import boofcv.io.webcamcapture.UtilWebcamCapture;
-import com.jogamp.common.nio.ByteBufferInputStream;
-import com.jogamp.opengl.GL;
+import boofcv.io.image.ConvertBufferedImage;
+import boofcv.io.image.ConvertRaster;
+import boofcv.struct.image.InterleavedU8;
+import com.github.sarxos.webcam.Webcam;
+import com.github.sarxos.webcam.WebcamEvent;
+import com.github.sarxos.webcam.WebcamListener;
 import com.jogamp.opengl.GL2;
-import com.jogamp.opengl.fixedfunc.GLLightingFunc;
 import com.jogamp.opengl.util.texture.Texture;
 import com.jogamp.opengl.util.texture.TextureIO;
-import com.jogamp.opengl.util.texture.spi.DDSImage;
-import com.jogamp.opengl.util.texture.spi.JPEGImage;
 import com.jogamp.opengl.util.texture.spi.TGAImage;
 import javafx.scene.image.WritableImage;
 import jcog.data.Range;
@@ -27,6 +27,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Consumer;
 
 
 public class WebCam {
@@ -37,17 +38,17 @@ public class WebCam {
     // private ShortBuffer audioSamples;
     public com.github.sarxos.webcam.Webcam webcam;
 
-    public final Topic<WebCam> eventChange = new ArrayTopic();
+    public final Topic<WebcamEvent> eventChange = new ArrayTopic();
 
-    boolean running = true;
 
 
     @Range(min = 0, max = 1)
     public final MutableFloat cpuThrottle = new MutableFloat(0.5f);
 
+    public InterleavedU8 iimage = null;
 
     final static Logger logger = LoggerFactory.getLogger(WebCam.class);
-    public ByteBuffer image;
+    public byte[] image;
 
 
     public WebCam(int w, int h) {
@@ -57,111 +58,175 @@ public class WebCam {
 
 
         // Open a webcam at a resolution close to 640x480
-        webcam = UtilWebcamCapture.openDefault(w, h);
+        webcam = Webcam.getDefault();
+        if (!webcam.open(true))
+            throw new RuntimeException("webcam not open");
+
         Dimension dim = webcam.getViewSize();
         width = (int) dim.getWidth();
         height = (int) dim.getHeight();
-        image = ByteBuffer.allocate(width * height * 3 /* RGB */);
-
-        //getChildren().add(view);
+        image = new byte[0];
 
 
-//        try {
-//            final int audioFPS = 10;
-//            WaveCapture au = new WaveCapture(new AudioSource(0, audioFPS), audioFPS);
-//            Surface mp = au.newMonitorPane();
-//            //mp.setAlignment(Pos.BOTTOM_RIGHT);
-//
-//            //widthProperty().multiply(0.5);
-//            //mp.setFillWidth(true);
-//
-//
-//            //mp.widthProperty()
-//
-//            //mp.maxWidth(Double.MAX_VALUE);
-//            //mp.maxHeight(Double.MAX_VALUE);
-//            //getChildren().add(mp);
-//        } catch (Exception e) {
-//            logger.error("{}", e);
-//            //getChildren().add(new Label(e.toString()));
-//        }
+
+        //default behavior:
+        webcam.addWebcamListener(new WebcamListener() {
+
+            @Override
+            public void webcamOpen(WebcamEvent we) {
+
+            }
+
+            @Override
+            public void webcamClosed(WebcamEvent we) {
+
+            }
+
+            @Override
+            public void webcamDisposed(WebcamEvent we) {
+
+            }
+
+            @Override
+            public void webcamImageObtained(WebcamEvent we) {
 
 
-        // Create the panel used to display the image and
-        //ImagePanel gui = new ImagePanel();
-        //gui.setPreferredSize(webcam.getViewSize());
+                Dimension viewSize = webcam.getViewSize();
+                if (viewSize != null) {
+                    width = (int) viewSize.getWidth();
+                    height = (int) viewSize.getHeight();
 
-//        BorderPane control = new POJOPane(this);
-//        //control.setStyle("-fx-background-color: gray");
-//        control.setStyle("-fx-text-fill: gray");
-//        //control.setBlendMode(BlendMode.EXCLUSION);
-//        control.setOpacity(0.92);
-//
-//        VBox wcon = new VBox(control);
-//        wcon.prefWidth(150);
-//        wcon.maxWidth(150);
-//        wcon.setFillWidth(false);
-//        wcon.setAlignment(Pos.CENTER_LEFT);
-//        //wcon.(150);
-//
-//        getChildren().add(wcon);
+                    //if (iimage == null || iimage.width!=width || iimage.height!=height) {
+                        InterleavedU8 iimage = new InterleavedU8(width, height, 3);
+                    //}
+
+                    convertFromInterleaved(we.getImage(), iimage);
+
+                    //int[] output = we.getImage().getRGB(0, 0, width, height, null, 0, width * 3);
+
+                    //webcam.getgetImageBytes(image);
+
+                    eventChange.emit(we);
 
 
-    }
+                    WebCam.this.iimage = iimage;
+                    WebCam.this.image = iimage.data;
 
-    public Thread loop(float fps) {
-        //try {
-
-            Thread t = new Thread(() -> {
-
-                while (running) {
-                    if (/*webcam.isOpen() && */webcam.isImageNew()) {
-
-                        image.rewind();
-
-                        Dimension viewSize = webcam.getViewSize();
-                        if (viewSize != null) {
-                            width = (int) viewSize.getWidth();
-                            height = (int) viewSize.getHeight();
-
-                            webcam.getImageBytes(image);
-
-                            image.rewind();
-
-                            eventChange.emit(this);
-
-                        } else {
-                            width = height = 0;
-                        }
-
-                    }
-
-//                BufferedImage bimage = process(webcam.getImage());
-//
-//                //TODO blit the image directly, this is likely not be the most efficient:
-//                image = SwingFXUtils.toFXImage(bimage, image);
-//
-//                WritableImage finalImage = process(image);
-//                runLater(() -> view.setImage(finalImage));
-//            }
-
-                    try {
-                        Thread.sleep((long) (1000.0f / fps));
-                    } catch (InterruptedException e) {
-                    }
+                } else {
+                    width = height = 0;
                 }
 
+            }
+        });
 
-            });
-            t.start();
-            return t;
-
-        //} catch (Exception e) {
-            //getChildren().add(new Label(e.toString()));
-            //return null;
-        //}
 
     }
+    public static void convertFromInterleaved(BufferedImage src, InterleavedU8 dst) {
+
+        final int width = src.getWidth();
+        final int height = src.getHeight();
+
+        if (dst.getNumBands() == 3) {
+
+            byte[] dd = dst.data;
+            for (int y = 0; y < height; y++) {
+                int indexDst = dst.startIndex + y * dst.stride;
+                for (int x = 0; x < width; x++) {
+                    int argb = src.getRGB(x, y);
+
+                    dd[indexDst++] = (byte) (argb >>> 16);
+                    dd[indexDst++] = (byte) (argb >>> 8);
+                    dd[indexDst++] = (byte) argb;
+                }
+            }
+        } else if( dst.getNumBands() == 1 ){
+            //ConvertRaster.bufferedToGray(src, dst);
+        //} else {
+            throw new IllegalArgumentException("Unsupported number of input bands");
+        }
+    }
+
+    public void on(WebcamListener wl) {
+        webcam.addWebcamListener(wl);
+    }
+
+    public void on(Consumer<BufferedImage> wl) {
+        on(new WebcamListener() {
+            @Override
+            public void webcamOpen(WebcamEvent we) {
+
+            }
+
+            @Override
+            public void webcamClosed(WebcamEvent we) {
+
+            }
+
+            @Override
+            public void webcamDisposed(WebcamEvent we) {
+
+            }
+
+            @Override
+            public void webcamImageObtained(WebcamEvent we) {
+                wl.accept(we.getImage());
+            }
+        });
+    }
+
+//    public Thread loop(float fps) {
+//        //try {
+//
+//            Thread t = new Thread(() -> {
+//
+//                while (running) {
+//                    if (/*webcam.isOpen() && */webcam.isImageNew()) {
+//
+//                        image.rewind();
+//
+//                        Dimension viewSize = webcam.getViewSize();
+//                        if (viewSize != null) {
+//                            width = (int) viewSize.getWidth();
+//                            height = (int) viewSize.getHeight();
+//
+//                            webcam.getImageBytes(image);
+//
+//                            image.rewind();
+//
+//                            eventChange.emit(this);
+//
+//                        } else {
+//                            width = height = 0;
+//                        }
+//
+//                    }
+//
+////                BufferedImage bimage = process(webcam.getImage());
+////
+////                //TODO blit the image directly, this is likely not be the most efficient:
+////                image = SwingFXUtils.toFXImage(bimage, image);
+////
+////                WritableImage finalImage = process(image);
+////                runLater(() -> view.setImage(finalImage));
+////            }
+//
+//                    try {
+//                        Thread.sleep((long) (1000.0f / fps));
+//                    } catch (InterruptedException e) {
+//                    }
+//                }
+//
+//
+//            });
+//            t.start();
+//            return t;
+//
+//        //} catch (Exception e) {
+//            //getChildren().add(new Label(e.toString()));
+//            //return null;
+//        //}
+//
+//    }
 
     public Surface surface() {
         return new Surface() {
@@ -189,7 +254,7 @@ public class WebCam {
                     try {
                         //DDSImage di = DDSImage.createFromData(DDSImage.D3DFMT_R8G8B8, width, height, new ByteBuffer[]{image.asReadOnlyBuffer()});
                         //JPEGImage di = JPEGImage.read(new ByteBufferInputStream(image.asReadOnlyBuffer()));
-                        TGAImage di = TGAImage.createFromData(width, height, false, true, image.asReadOnlyBuffer());
+                        TGAImage di = TGAImage.createFromData(width, height, false, true, ByteBuffer.wrap(image));
                         final String target = "/var/tmp/x.tga";
 
                         di.write(target);
@@ -243,7 +308,7 @@ public class WebCam {
         SpaceGraph.window(
                 //new Cuboid(new WebcamSurface(320, 200),4,4), 1200, 1200);
                 w.surface(), 1200, 1200);
-        w.loop(10);
+        //w.loop(10);
 
 
 //        NARfx.run((a, b) -> {

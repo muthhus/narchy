@@ -36,7 +36,6 @@ public class ExampleVisualOdometryMonocularPlane {
         //String directory = UtilIO.pathExample("vo/drc/");
 
         WebCam w = new WebCam(320, 200);
-        w.loop(10f);
 
 
         CameraPinholeRadial intrinsic = new CameraPinholeRadial(); //CalibrationIO.load(new File(calibDir , "intrinsic.yaml"));
@@ -86,7 +85,7 @@ public class ExampleVisualOdometryMonocularPlane {
                     @Override
                     public GrayU8 next() {
                         InterleavedU8 i = new InterleavedU8(w.width, w.height, 3);
-                        i.data = w.image.array();
+                        i.data = w.image;
 
                         GrayU8 o = new GrayU8(w.width, w.height);
                         ColorRgb.rgbToGray_Weighted(i, o);
