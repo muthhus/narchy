@@ -246,7 +246,7 @@ public final class TruthFunctions extends UtilityFunctions {
     /**
      * A function specially designed for desire value [To be refined]
      */
-    @Nullable public static Truth desireStrong(@NotNull Truth a, @NotNull Truth b, float minConf) {
+    @Nullable public static Truth desireStrongNew(@NotNull Truth a, @NotNull Truth b, float minConf) {
         float aFreq = a.freq();
         float bFreq = b.freq();
         float c = and(a.conf(), b.conf(), freqSimilarity(aFreq, bFreq));
@@ -266,7 +266,7 @@ public final class TruthFunctions extends UtilityFunctions {
     /**
      * A function specially designed for desire value [To be refined]
      */
-    @Nullable public static Truth desireWeak(@NotNull Truth a, @NotNull Truth b, float minConf) {
+    @Nullable public static Truth desireWeakNew(@NotNull Truth a, @NotNull Truth b, float minConf) {
         float aFreq = a.freq();
         float bFreq = b.freq();
         float c = and(a.conf(), b.conf(), freqSimilarity(aFreq,bFreq), w2c(1.0f));

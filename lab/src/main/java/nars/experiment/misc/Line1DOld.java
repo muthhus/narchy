@@ -12,7 +12,7 @@ import static java.lang.System.out;
 /**
  * Created by me on 5/4/16.
  */
-public class Line1D implements DiscreteEnvironment {
+public class Line1DOld implements DiscreteEnvironment {
 
 
     private final IntToFloatFunction targetFunc;
@@ -22,7 +22,7 @@ public class Line1D implements DiscreteEnvironment {
     private int yHidden;
     private int yEst;
 
-    public Line1D(int size, IntToFloatFunction target) {
+    public Line1DOld(int size, IntToFloatFunction target) {
         this.size = size;
         this.targetFunc = target;
     }

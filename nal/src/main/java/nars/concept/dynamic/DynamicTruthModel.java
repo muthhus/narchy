@@ -33,12 +33,15 @@ abstract public class DynamicTruthModel {
      * N-ary intersection truth function of subterms
      */
     public static final DynamicTruthModel Intersection = new Intersection(null) {
-        @NotNull @Override public Term[] components(Compound superterm) {
+        @NotNull
+        @Override
+        public Term[] components(Compound superterm) {
             return superterm.terms();
         }
     };
 
-    @Nullable public DynTruth eval(Compound superterm, boolean beliefOrGoal, long when, long now, boolean stamp, NAR n) {
+    @Nullable
+    public DynTruth eval(Compound superterm, boolean beliefOrGoal, long when, long now, boolean stamp, NAR n) {
 
         Term[] inputs = components(superterm);
 
@@ -67,7 +70,7 @@ abstract public class DynamicTruthModel {
                 if (tableDynamic) {
                     boolean evi = d.e != null;
                     @Nullable DynTruth ndt = ((DynamicBeliefTable) table).truth(when + dt, now, (Compound) subterm, evi);
-                    if (ndt!=null) {
+                    if (ndt != null) {
                         Truth ntt = ndt.truth();
                         if (ntt != null && add(i, d, ntt.negated(negated), confMin)) {
                             if (d.e != null) {
@@ -104,7 +107,9 @@ abstract public class DynamicTruthModel {
         return commit(d);
     }
 
-    /** override for postprocessing */
+    /**
+     * override for postprocessing
+     */
     protected DynTruth commit(DynTruth d) {
         return d;
     }
@@ -115,7 +120,7 @@ abstract public class DynamicTruthModel {
 
     protected DynTruth eval(Compound template, long when, boolean stamp, NAR n) {
 
-        DynTruth d = new DynTruth(stamp? $.newArrayList(0) : null);
+        DynTruth d = new DynTruth(stamp ? $.newArrayList(0) : null);
         d.freq = d.conf = 1f;
         return d;
 
@@ -189,7 +194,9 @@ abstract public class DynamicTruthModel {
     }
 
 
-    /** conf is multiplied, freq is OR'd */
+    /**
+     * conf is multiplied, freq is OR'd
+     */
     public static class Union extends DynamicTruthModel.Intersection {
 
         public Union(Term[] comp) {
@@ -253,7 +260,7 @@ abstract public class DynamicTruthModel {
 
         public Difference(Term x, Term y) {
             super();
-            this.components = new Term[] { x, y };
+            this.components = new Term[]{x, y};
         }
 
         @NotNull
@@ -281,6 +288,32 @@ abstract public class DynamicTruthModel {
             }
 
             return true;
+        }
+    }
+
+    public static class Identity extends DynamicTruthModel {
+
+        @NotNull private final Term[] components;
+
+        public Identity(@NotNull Compound proxy, @NotNull Compound base) {
+            this.components = new Term[] { base };
+        }
+
+        @NotNull
+        @Override
+        public Term[] components(Compound superterm) {
+            return components;
+        }
+
+        @Override
+        protected boolean add(int subterm, @NotNull DynTruth d, @NotNull Truth t, float confMin) {
+            float c = t.conf();
+            if (c >= confMin) {
+                d.conf = c;
+                d.freq = t.freq();
+                return true;
+            }
+            return false;
         }
     }
 }

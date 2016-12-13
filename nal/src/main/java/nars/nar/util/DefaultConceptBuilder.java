@@ -120,7 +120,6 @@ public class DefaultConceptBuilder implements ConceptBuilder {
                 Term pred = t.term(1);
 
 
-
                 Op so = subj.op();
                 Op po = pred.op();
                 if (po.atomic || po.image || po == so.PROD) {
@@ -147,6 +146,21 @@ public class DefaultConceptBuilder implements ConceptBuilder {
                                     break;
                             }
                         }
+                    } else if (po.image) {
+                        Compound img = (Compound) pred;
+                        Term[] ee = new Term[img.size()];
+
+                        int relation = img.dt();
+                        int s = ee.length;
+                        for (int j = 1, i = 0; i < s;) {
+                            if (j == relation)
+                                ee[i++] = subj;
+                            if (i < s)
+                                ee[i++] = img.term(j++);
+                        }
+                        Compound b = $.inh($.p(ee), img.term(0));
+                        if (b!=null)
+                            dmt = new DynamicTruthModel.Identity(t, b);
                     }
                 } else if (so.atomic || so.image || so == so.PROD) {
                     if ((so == Op.SECTi) || (so == Op.SECTe) || (so == DIFFe)) {

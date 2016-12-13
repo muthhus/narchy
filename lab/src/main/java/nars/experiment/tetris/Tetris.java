@@ -22,15 +22,14 @@ import spacegraph.Spatial;
 import spacegraph.index.Rect1D;
 import spacegraph.layout.Flatten;
 import spacegraph.math.v2;
-import spacegraph.space.widget.MatrixView;
 import spacegraph.render.Draw;
+import spacegraph.space.layout.Grid;
+import spacegraph.space.widget.MatrixView;
 
 import java.util.Collection;
 import java.util.List;
 
 import static nars.experiment.tetris.impl.TetrisState.*;
-import static spacegraph.SpaceGraph.window;
-import static spacegraph.space.layout.Grid.grid;
 
 /**
  * Created by me on 7/28/16.
@@ -55,26 +54,27 @@ public class Tetris extends NAgents {
 
     //private final int visionSyncPeriod = 4; //16 * TIME_DILATION;
 
-    public class View {
+    public final Grid view = new Grid(
+                    new MatrixView(tetris_width, tetris_height, (x, y, gl) -> {
+                        float r = nar.priority(concept[x][y]);
+                        gl.glColor3f(r, 0, 0);
+                        return 0f;
+                    }),
+                    new MatrixView(tetris_width, tetris_height, (x, y, gl) -> {
+                        float r = concept[x][y].beliefFreq(now, 0.5f);
+                        gl.glColor3f(0, 0, r);
+                        return 0f;
+                    }),
+                    new MatrixView(tetris_width, tetris_height, (x, y, gl) -> {
+                        long then = (long) (now + dur * 8);
+                        Draw.colorPolarized(gl,
+                                concept[x][y].beliefFreq(then, 0.5f) -
+                                        concept[x][y].beliefFreq(now, 0.5f));
+                        return 0f;
+                    })
 
-        public TetrisVisualizer vis;
-        public MatrixView vis2 = new MatrixView(tetris_width, tetris_height, (x, y, gl) -> {
-            float r = nar.priority(concept[x][y]);
-            gl.glColor3f(r, 0, 0);
-            return 0f;
-        });
-        public MatrixView vis3 = new MatrixView(tetris_width, tetris_height, (x, y, gl) -> {
-            float r = concept[x][y].beliefFreq(now, 0.5f);
-            gl.glColor3f(0, 0, r);
-            return 0f;
-        });
-        public MatrixView vis4 = new MatrixView(tetris_width, tetris_height, (x, y, gl) -> {
-            long then = (long) (now + dur * 8);
-            Draw.colorPolarized(gl,
-                    concept[x][y].beliefFreq(then, 0.5f) -
-                            concept[x][y].beliefFreq(now, 0.5f));
-            return 0f;
-        });
+        );
+
 //        public MatrixView vis4 = new MatrixView(tetris_width, tetris_height, (x,y,gl)->{
 //            float r = concept[x][y].goalFreq(now, 0.5f);
 //            gl.glColor3f(0, r, 0);
@@ -85,49 +85,50 @@ public class Tetris extends NAgents {
 //        //public ConsoleSurface term = new ConsoleSurface(40, 8);
 //
 //        public Surface plot2;
-        //public Plot2D lstm;
-    }
-
-    final View view = new View();
+            //public Plot2D lstm;
 
 
-    //private final ActionConcept motorRotate;
-    //private MotorConcept motorDown;
-    //private final ActionConcept motorLeftRight;
-
-    //private final boolean rotate = !easy;
-
-    /**
-     * @param width
-     * @param height
-     * @param timePerFall larger is slower gravity
-     */
-    public Tetris(NAR nar, int width, int height, int timePerFall) {
-        super("tetris", nar);
-
-        state = new TetrisState(width, height, timePerFall) {
-            @Override
-            protected int nextBlock() {
+        //final View view = new View();
 
 
-                if (easy) {
-                    //EASY MODE
-                    return 1; //square blocks
-                    //return 0; //long blocks
-                } else {
-                    return super.nextBlock(); //all blocks
+        //private final ActionConcept motorRotate;
+        //private MotorConcept motorDown;
+        //private final ActionConcept motorLeftRight;
+
+        //private final boolean rotate = !easy;
+
+        /**
+         * @param width
+         * @param height
+         * @param timePerFall larger is slower gravity
+         */
+        public Tetris(NAR nar, int width, int height, int timePerFall) {
+            super("tetris", nar);
+
+            state = new TetrisState(width, height, timePerFall) {
+                @Override
+                protected int nextBlock() {
+
+
+                    if (easy) {
+                        //EASY MODE
+                        return 1; //square blocks
+                        //return 0; //long blocks
+                    } else {
+                        return super.nextBlock(); //all blocks
+                    }
                 }
-            }
 
-            @Override
-            protected void die() {
-                nar.time.tick(afterlife);
-                super.die();
-            }
-        };
-        view.vis = new TetrisVisualizer(state, 64, false) {
-            @Override
-            public boolean onKey(v2 hitPoint, char charCode, boolean pressed) {
+                @Override
+                protected void die() {
+                    nar.time.tick(afterlife);
+                    super.die();
+                }
+            };
+
+            view.children().add( new TetrisVisualizer(state, 64, false) {
+                @Override
+                public boolean onKey(v2 hitPoint, char charCode, boolean pressed) {
 //
 //                switch (charCode) {
 //                    case 'a':
@@ -146,134 +147,135 @@ public class Tetris extends NAgents {
 //                        break;
 //                }
 
-                return true;
-            }
-        };
+                    return true;
+                }
+            });
+            view.layout();
 
 
-        sensors(nar, state, sensors);
+            sensors(nar, state, sensors);
 
-        actions(nar, state, actions);
+            actions(nar, state, actions);
 
-        state.reset();
-    }
+            state.reset();
+        }
 
 
-    public static void actions(NAR nar, TetrisState state, List<ActionConcept> actions) {
-        float alpha = nar.confidenceDefault('.');
+        public static void actions(NAR nar, TetrisState state, List<ActionConcept> actions) {
+            float alpha = nar.confidenceDefault('.');
 
-        float actionMargin =
-                0.33f; //divides the range into 3 sections: left/nothing/right
-        //0.25f;
+            float actionMargin =
+                    0.33f; //divides the range into 3 sections: left/nothing/right
+            //0.25f;
 
-        float actionThresholdHigh = 1f - actionMargin;
-        float actionThresholdLow = actionMargin;
+            float actionThresholdHigh = 1f - actionMargin;
+            float actionThresholdLow = actionMargin;
 //        float actionThresholdHigher = 1f - actionMargin / 1.5f;
 //        float actionThresholdLower = actionMargin / 1.5f;
 
 
-        actions.add(new ActionConcept("moveX(tetris)", nar, (b, d) -> {
-            if (d != null) {
-                float x = d.freq();
-                //System.out.println(d + " " + x);
-                if (x > actionThresholdHigh) {
-                    if (state.take_action(RIGHT))
-                        //return d; //legal move
-                        //return d.withConf(gamma);
-                        return $.t(1, alpha);
-                } else if (x < actionThresholdLow) {
-                    if (state.take_action(LEFT))
-                        //return d; //legal move
-                        //return d.withConf(gamma);
-                        return $.t(0, alpha);
-                } else {
-                    //return $.t(0.5f, alpha); //no action taken or move ineffective
+            actions.add(new ActionConcept("moveX(tetris)", nar, (b, d) -> {
+                if (d != null) {
+                    float x = d.freq();
+                    //System.out.println(d + " " + x);
+                    if (x > actionThresholdHigh) {
+                        if (state.take_action(RIGHT))
+                            //return d; //legal move
+                            //return d.withConf(gamma);
+                            return $.t(1, alpha);
+                    } else if (x < actionThresholdLow) {
+                        if (state.take_action(LEFT))
+                            //return d; //legal move
+                            //return d.withConf(gamma);
+                            return $.t(0, alpha);
+                    } else {
+                        //return $.t(0.5f, alpha); //no action taken or move ineffective
+                    }
                 }
-            }
-            return $.t(0.5f, alpha); //no action taken or move ineffective
-            //return null;
-        }));
+                return $.t(0.5f, alpha); //no action taken or move ineffective
+                //return null;
+            }));
 
-        //if (rotate) {
-        actions.add(new ActionConcept("rotate(tetris)", nar, (b, d) -> {
-            if (d != null) {
-                float r = d.freq();
-                if (r > actionThresholdHigh) {
-                    if (state.take_action(CW))
-                        //return d; //legal move
-                        //return d.withConf(gamma);
-                        return $.t(1, alpha);
-                } else if (r < actionThresholdLow) {
-                    if (state.take_action(CCW))
-                        //return d; //legal move
-                        //return d.withConf(gamma);
-                        return $.t(0, alpha);
-                } else {
-                    //return $.t(0.5f, alpha); //no action taken or move ineffective
+            //if (rotate) {
+            actions.add(new ActionConcept("rotate(tetris)", nar, (b, d) -> {
+                if (d != null) {
+                    float r = d.freq();
+                    if (r > actionThresholdHigh) {
+                        if (state.take_action(CW))
+                            //return d; //legal move
+                            //return d.withConf(gamma);
+                            return $.t(1, alpha);
+                    } else if (r < actionThresholdLow) {
+                        if (state.take_action(CCW))
+                            //return d; //legal move
+                            //return d.withConf(gamma);
+                            return $.t(0, alpha);
+                    } else {
+                        //return $.t(0.5f, alpha); //no action taken or move ineffective
+                    }
                 }
-            }
-            return $.t(0.5f, alpha); //no action taken or move ineffective
-            //return null;
-        }));
+                return $.t(0.5f, alpha); //no action taken or move ineffective
+                //return null;
+            }));
 //        } else {
 //            motorRotate = null;
 //        }
 
-        //actions.add(motorDown = new MotorConcept("(down)", nar));
+            //actions.add(motorDown = new MotorConcept("(down)", nar));
 //        if (downMotivation > actionThresholdHigh) {
 //            state.take_action(FALL);
 //        }
-    }
+        }
 
-    public static void sensors(NAR nar, TetrisState state, List<SensorConcept> sensors) {
-        float alpha = nar.confidenceDefault('.');
+        public static void sensors(NAR nar, TetrisState state, List<SensorConcept> sensors) {
+            float alpha = nar.confidenceDefault('.');
 
-        concept = new SensorConcept[state.width][state.height];
+            concept = new SensorConcept[state.width][state.height];
 
-        Atomic tetris = $.the("tetris");
-        for (int y = 0; y < state.height; y++) {
-            int yy = y;
-            for (int x = 0; x < state.width; x++) {
-                int xx = x;
-                Compound squareTerm =
-                        //$.p(x, y);
+            Atomic tetris = $.the("tetris");
+            for (int y = 0; y < state.height; y++) {
+                int yy = y;
+                for (int x = 0; x < state.width; x++) {
+                    int xx = x;
+                    Compound squareTerm =
+                            //$.p(x, y);
 
-                        $.inh(
-                                //$.func(
-                                $.p(
+                            $.inh(
+                                    //$.func(
+                                    $.p(
 //                                  $.pRecurse($.radixArray(x, PIXEL_RADIX, state.width)), $.pRecurse($.radixArray(y, PIXEL_RADIX, state.height))
-                                        //$.p($.radixArray(x, PIXEL_RADIX, state.width)), $.p($.radixArray(y, PIXEL_RADIX, state.height))
-                                        x, y
-                                ),
-                                tetris
-                        )
-                        //$.p(
-                        //$.the("tetris"))
-                        //, $.the(state.time)))
-                        ;
+                                            //$.p($.radixArray(x, PIXEL_RADIX, state.width)), $.p($.radixArray(y, PIXEL_RADIX, state.height))
+                                            x, y
+                                    ),
+                                    tetris
+                            )
+                            //$.p(
+                            //$.the("tetris"))
+                            //, $.the(state.time)))
+                            ;
 
-                //$.p($.pRadix(x, 4, state.width), $.pRadix(y, 4, state.height));
-                int index = yy * state.width + xx;
-                @NotNull SensorConcept s = new SensorConcept(squareTerm, nar,
-                        () -> state.seen[index] > 0 ? 1f : 0f,
+                    //$.p($.pRadix(x, 4, state.width), $.pRadix(y, 4, state.height));
+                    int index = yy * state.width + xx;
+                    @NotNull SensorConcept s = new SensorConcept(squareTerm, nar,
+                            () -> state.seen[index] > 0 ? 1f : 0f,
 
-                        //null //disable input
+                            //null //disable input
 
-                        (v) -> $.t(v, alpha)
+                            (v) -> $.t(v, alpha)
 
-                )
-                        //timing(0, visionSyncPeriod)
-                        ;
+                    )
+                            //timing(0, visionSyncPeriod)
+                            ;
 
 //                FloatSupplier defaultPri = s.sensor.pri;
 //                s.pri( () -> defaultPri.asFloat() * 0.25f );
 
-                concept[x][y] = s;
-                sensors.add(s);
+                    concept[x][y] = s;
+                    sensors.add(s);
 
+                }
             }
         }
-    }
 
 //    //TODO
 //    public static class NARCam {
@@ -388,61 +390,61 @@ public class Tetris extends NAgents {
 //    }
 
 
-    @Override
-    public float act() {
+        @Override
+        public float act() {
 
-        state.next();
+            state.next();
 
-        return state.score;
-    }
+            return state.score;
+        }
 
 
-    public static void newTimeWindow(NAR n) {
-        LogIndex li = new LogIndex();
+        public static void newTimeWindow(NAR n) {
+            LogIndex li = new LogIndex();
 
-        final int cap = 90;
-        long start = System.currentTimeMillis();
-        long end = start + 5000;
-        float width = 2f;
-        SpaceGraph s = new SpaceGraph(
-                new NARSpace(n) {
-                    @Override
-                    protected void get(Collection displayNext) {
-                        li.search(new Rect1D.DefaultRect1D(start, end), x -> {
-                            if (displayNext.size() > cap) {
-                                return false;
-                            }
-                            Spatial w = space.getOrAdd(x, t -> new ConceptWidget(n, $.the(t.toString()), 1));
+            final int cap = 90;
+            long start = System.currentTimeMillis();
+            long end = start + 5000;
+            float width = 2f;
+            SpaceGraph s = new SpaceGraph(
+                    new NARSpace(n) {
+                        @Override
+                        protected void get(Collection displayNext) {
+                            li.search(new Rect1D.DefaultRect1D(start, end), x -> {
+                                if (displayNext.size() > cap) {
+                                    return false;
+                                }
+                                Spatial w = space.getOrAdd(x, t -> new ConceptWidget(n, $.the(t.toString()), 1));
 
-                            ((SimpleSpatial)w).moveX((-0.5f + (float)(x.from() - start)/(end-start)) * width, 0.8f);
-                            //((SimpleSpatial)w).moveY(0, 0.4f);
-                            //((SimpleSpatial)w).moveZ(0, 0.4f);
-                            displayNext.add(w);
-                            return true;
-                        });
-                    }
-                }.with(
-                        new Flatten()
-                        //new Spiral()
-                        //new FastOrganicLayout()
-                )
-        );
+                                ((SimpleSpatial) w).moveX((-0.5f + (float) (x.from() - start) / (end - start)) * width, 0.8f);
+                                //((SimpleSpatial)w).moveY(0, 0.4f);
+                                //((SimpleSpatial)w).moveZ(0, 0.4f);
+                                displayNext.add(w);
+                                return true;
+                            });
+                        }
+                    }.with(
+                            new Flatten()
+                            //new Spiral()
+                            //new FastOrganicLayout()
+                    )
+            );
 //        ForceDirected forceDirect = new ForceDirected();
 //        //forceDirect.repelSpeed = 0.5f;
 //        s.dyn.addBroadConstraint(forceDirect);
 
 
-        s.show(1300, 900);
-    }
+            s.show(1300, 900);
+        }
 
-    public static void main(String[] args) {
-        //Param.DEBUG = true;
+        public static void main(String[] args) {
+            //Param.DEBUG = true;
 
-        NAR nar = NAgents.newMultiThreadNAR(4, new FrameTime().dur(TIME_PER_FALL));
-        nar.termVolumeMax.setValue(16);
-        //nar.linkFeedbackRate.setValue(0.05f);
+            NAR nar = NAgents.newMultiThreadNAR(4, new FrameTime().dur(TIME_PER_FALL));
+            nar.termVolumeMax.setValue(16);
+            //nar.linkFeedbackRate.setValue(0.05f);
 
-        //newTimeWindow(nar);
+            //newTimeWindow(nar);
 
 
 //        Random rng = new XorShift128PlusRandom(1);
@@ -528,27 +530,15 @@ public class Tetris extends NAgents {
 //        MySTMClustered stm = new MySTMClustered(nar, 64, '.', 4, true, 8);
 //        MySTMClustered stmGoal = new MySTMClustered(nar, 16, '!', 2, true, 4);
 
-        //new VariableCompressor(nar);
+            //new VariableCompressor(nar);
 
 
-        Tetris t = new Tetris(nar, tetris_width, tetris_height, TIME_PER_FALL) {
-            @Override
-            protected void init() {
-                super.init();
-//                view.plot1 =
-//                        Vis.emotionPlots(nar, 256);
-//
-//
-//                view.plot2 = Vis.agentBudgetPlot(this, 256);
-                window(grid(view.vis, view.vis2, view.vis3, view.vis4), 600, 600);
-                NAgents.chart(this);
-            }
-        };
+            Tetris t = new MyTetris(nar);
 
-        t.trace = true;
+            t.trace = true;
 
 
-        t.runRT(20f, 10000).join();
+            t.runRT(20f, 10000).join();
 
 //        NARController meta = new NARController(nar, loop, t);
 //
@@ -559,58 +549,77 @@ public class Tetris extends NAgents {
 //        ));
 
 
-        //nar.stop();
+            //nar.stop();
 
-        //nar.index.print(System.out);
-        nar.tasks.forEach(System.out::println);
+            //nar.index.print(System.out);
+            nar.tasks.forEach(System.out::println);
 
-        //NAR.printActiveTasks(nar, true);
-        //NAR.printActiveTasks(nar, false);
-        nar.printConceptStatistics();
-        new TaskStatistics().add(nar).print();
+            //NAR.printActiveTasks(nar, true);
+            //NAR.printActiveTasks(nar, false);
+            nar.printConceptStatistics();
+            new TaskStatistics().add(nar).print();
 
 
-        //NAR.printTasks(meta.nar, true);
-        //NAR.printTasks(meta.nar, false);
+            //NAR.printTasks(meta.nar, true);
+            //NAR.printTasks(meta.nar, false);
 //        nar.forEachActiveConcept(c -> {
 //            if (c.volume() < 12)
 //                c.print();
 //        });
-    }
+        }
 
-    public MatrixView.ViewFunction2D sensorMatrixView(NAR nar, long whenRelative) {
-        return (x, y, g) -> {
+        public MatrixView.ViewFunction2D sensorMatrixView(NAR nar, long whenRelative) {
+            return (x, y, g) -> {
 //            int rgb = cam.out.getRGB(x,y);
 //            float r = decodeRed(rgb);
 //            if (r > 0)
 //                System.out.println(x + " "+ y + " " + r);
 //            g.glColor3f(r,0,0);
 
-            SensorConcept s = sensors.get(y * tetris_width + x);
+                SensorConcept s = sensors.get(y * tetris_width + x);
 
-            Truth b = s.beliefs().truth(now + whenRelative);
-            float bf = b != null ? b.freq() : 0.5f;
-            Truth dt = s.goals().truth(now + whenRelative);
-            float dr, dg;
-            if (dt == null) {
-                dr = dg = 0;
-            } else {
-                float f = dt.freq();
-                float c = dt.conf();
-                if (f > 0.5f) {
-                    dr = 0;
-                    dg = (f - 0.5f) * 2f;// * c;
+                Truth b = s.beliefs().truth(now + whenRelative);
+                float bf = b != null ? b.freq() : 0.5f;
+                Truth dt = s.goals().truth(now + whenRelative);
+                float dr, dg;
+                if (dt == null) {
+                    dr = dg = 0;
                 } else {
-                    dg = 0;
-                    dr = (0.5f - f) * 2f;// * c;
+                    float f = dt.freq();
+                    float c = dt.conf();
+                    if (f > 0.5f) {
+                        dr = 0;
+                        dg = (f - 0.5f) * 2f;// * c;
+                    } else {
+                        dg = 0;
+                        dr = (0.5f - f) * 2f;// * c;
+                    }
                 }
-            }
 
-            float p = nar.priority(s);
-            g.glColor4f(dr, dg, bf, 0.5f + 0.5f * p);
+                float p = nar.priority(s);
+                g.glColor4f(dr, dg, bf, 0.5f + 0.5f * p);
 
-            return b != null ? b.conf() : 0;
-        };
+                return b != null ? b.conf() : 0;
+            };
+        }
+
+    public static class MyTetris extends Tetris {
+
+        public MyTetris(NAR nar) {
+            super(nar, Tetris.tetris_width, Tetris.tetris_height, Tetris.TIME_PER_FALL);
+        }
+
+        @Override
+        protected void init() {
+            super.init();
+//                view.plot1 =
+//                        Vis.emotionPlots(nar, 256);
+//
+//
+//                view.plot2 = Vis.agentBudgetPlot(this, 256);
+            //window(grid(view.vis, view.vis2, view.vis3, view.vis4), 600, 600);
+            NAgents.chart(this);
+        }
     }
 
 
@@ -808,7 +817,7 @@ public class Tetris extends NAgents {
 ////        });
 ////    }
 
-}
+    }
 //                AutoClassifier ac = new AutoClassifier($.the("row"), nar, sensors,
 //                        tetris_width/2, 7 /* states */,
 //                        0.05f);

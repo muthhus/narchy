@@ -66,7 +66,7 @@ abstract public class NAgent implements NSense, NAction {
     private final float actionBoost;
     private final String id;
 
-    public NAR nar;
+    public final NAR nar;
 
     public final List<SensorConcept> sensors = $.newArrayList();
     public final List<ActionConcept> actions = $.newArrayList();
@@ -422,12 +422,16 @@ abstract public class NAgent implements NSense, NAction {
             }
 
             ((FasterList)predictors).addAll(
+
+                    new MutableTask($.seq(action, dur, happiness), '?', null).eternal(),
+                    new MutableTask($.seq($.neg(action), dur, happiness), '?', null).eternal()
+                    //new MutableTask($.impl(action, dur, happiness), '?', null).eternal(),
+                    //new MutableTask($.impl($.neg(action), dur, happiness), '?', null).eternal()
+
+
                     //new MutableTask($.seq($.varQuery(0), dur, action), '?', null).eternal(),
                     //new MutableTask($.impl($.varQuery(0), dur, action), '?', null).eternal(),
-                    new MutableTask($.seq(action, dur, happiness), '?', null).eternal(),
-                    new MutableTask($.seq($.neg(action), dur, happiness), '?', null).eternal(),
-                    new MutableTask($.impl(action, dur, happiness), '?', null).eternal(),
-                    new MutableTask($.impl($.neg(action), dur, happiness), '?', null).eternal()
+
                     //new MutableTask($.impl($.parallel($.varDep(0), action), dur, happiness), '?', null).time(now, now + dur),
                     //new MutableTask($.impl($.parallel($.varDep(0), $.neg( action )), dur, happiness), '?', null).time(now, now + dur)
             );

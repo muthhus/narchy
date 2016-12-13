@@ -329,6 +329,14 @@ public class SuperReflect {
         }
     }
 
+    public interface OnField {
+        public void accept(String fieldName, Class type, SuperReflect value);
+    }
+
+    public static void fields(Object instance, OnField r) {
+        fields(instance.getClass(), instance, r);
+    }
+
     /**
      * Get a Map containing field names and wrapped values for the fields'
      * values.
@@ -344,19 +352,28 @@ public class SuperReflect {
      *
      * @return A map containing field names and wrapped values.
      */
-    public void fields(TriConsumer<String,Class,SuperReflect> r) {
+    public static void fields(Class type, Object instance, OnField r) {
         //Map<String, Supplier<SuperReflect>> result = new LinkedHashMap<>();
-        Set<String> visited = new HashSet();
-        Class<?> type = type();
+        Set<String> visited = new HashSet<>();
+
+
+        SuperReflect ii = on(instance);
+
+        boolean isClass = instance instanceof Class;
 
         do {
-            for (Field field : type.getDeclaredFields()) {
-                if (!isClass ^ Modifier.isStatic(field.getModifiers())) {
-                    String name = field.getName();
+            try {
+                for (Field field : type.getDeclaredFields()) {
+                    if (!isClass ^ Modifier.isStatic(field.getModifiers())) {
+                        String name = field.getName();
 
-                    if (visited.add(name))
-                        r.accept(name, field.getType(), field(name));
+                        if (visited.add(name))
+                            r.accept(name, field.getType(), ii.field(name));
+                    }
                 }
+            } catch (NoSuchMethodError e) {
+                //???
+                break;
             }
 
             type = type.getSuperclass();

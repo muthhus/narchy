@@ -31,6 +31,7 @@ import nars.truth.Truth;
 import nars.util.TaskStatistics;
 import nars.video.*;
 import objenome.O;
+import objenome.SuperReflect;
 import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunction;
 import org.jetbrains.annotations.NotNull;
 import spacegraph.SpaceGraph;
@@ -337,7 +338,8 @@ abstract public class NAgents extends NAgent {
 //            ))), 800, 600);
             window(
                     new TabPane(Map.of(
-                            "control", () -> new ReflectionSurface(a.nar),
+                            "agent", ()-> new ReflectionSurface(a),
+                            //"control", () -> new ReflectionSurface(a.nar),
                             "input", () -> grid(a.cam.values().stream().map(cs ->
                                     new CameraSensorView(cs, nar).align(Surface.Align.Center, cs.width, cs.height))
                                     .toArray(Surface[]::new)),
@@ -347,8 +349,7 @@ abstract public class NAgents extends NAgent {
                             "conceptBudget", ()->
                                     Vis.budgetHistogram(nar, 24),
                             "tasks", ()-> taskChart,
-                            "agent", ()-> Vis.emotionPlots(a.nar, 256),
-                            "agentControl", ()-> new ReflectionSurface(a),
+                            "agentCharts", ()-> Vis.emotionPlots(a.nar, 256),
                             "agentActions", ()-> Vis.agentActions(a, 400),
                             "agentPredict", ()-> Vis.beliefCharts(400, a.predictors, a.nar)
 
@@ -445,11 +446,13 @@ abstract public class NAgents extends NAgent {
 
         private final X x;
 
-        public ReflectionSurface(X x) {
+        public ReflectionSurface(@NotNull X x) {
             this.x = x;
 
             List<Surface> l = $.newArrayList();
-            O.in(x).fields((k,c,v) -> {
+
+
+            SuperReflect.fields(x, (String k, Class c, SuperReflect v) -> {
 
                 if (c == FloatParam.class) {
                     FloatParam f = v.get();
