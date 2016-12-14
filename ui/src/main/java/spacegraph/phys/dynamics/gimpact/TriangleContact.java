@@ -30,8 +30,9 @@ package spacegraph.phys.dynamics.gimpact;
 import spacegraph.math.Vector4f;
 import spacegraph.math.v3;
 import spacegraph.phys.BulletGlobals;
-import spacegraph.phys.util.ArrayPool;
 import spacegraph.phys.util.OArrayList;
+
+import static spacegraph.phys.BulletGlobals.SIMD_EPSILON;
 
 /**
  *
@@ -39,14 +40,14 @@ import spacegraph.phys.util.OArrayList;
  */
 public class TriangleContact {
 	
-	private final ArrayPool<int[]> intArrays = ArrayPool.get(int.class);
+	//private final ArrayPool<int[]> intArrays = ArrayPool.get(int.class);
 	
 	public static final int MAX_TRI_CLIPPING = 16;
 
     public float penetration_depth;
     public int point_count;
     public final Vector4f separating_normal = new Vector4f();
-    public v3[] points = new v3[MAX_TRI_CLIPPING];
+    public final v3[] points = new v3[MAX_TRI_CLIPPING];
 
 	public TriangleContact() {
 		for (int i=0; i<points.length; i++) {
@@ -75,26 +76,31 @@ public class TriangleContact {
 	/**
 	 * Classify points that are closer.
 	 */
-	public void merge_points(Vector4f plane, float margin, OArrayList<v3> points, int point_count) {
+	public void merge_points(Vector4f plane, float margin, OArrayList<v3> points, int pointsPending) {
 		this.point_count = 0;
 		penetration_depth = -1000.0f;
 
-		int[] point_indices = intArrays.getFixed(MAX_TRI_CLIPPING);
+		short[] point_indices = new short[Math.min(pointsPending, MAX_TRI_CLIPPING)];
 
-		for (int _k = 0; _k < point_count; _k++) {
+		final float penetratinDepthMinusEpsilon = penetration_depth - SIMD_EPSILON;
+
+		for (short _k = 0; _k < pointsPending; _k++) {
             //return array[index];
             float _dist = -ClipPolygon.distance_point_plane(plane, points.get(_k)) + margin;
 
 			if (_dist >= 0.0f) {
+				int target;
 				if (_dist > penetration_depth) {
 					penetration_depth = _dist;
-					point_indices[0] = _k;
 					this.point_count = 1;
+					target = 0;
+				} else if (_dist >= penetratinDepthMinusEpsilon) {
+					target = this.point_count++;
+				} else {
+					continue;
 				}
-				else if ((_dist + BulletGlobals.SIMD_EPSILON) >= penetration_depth) {
-					point_indices[this.point_count] = _k;
-					this.point_count++;
-				}
+
+				point_indices[target] = _k;
 			}
 		}
 
@@ -103,7 +109,7 @@ public class TriangleContact {
             this.points[_k].set(points.get(point_indices[_k]));
 		}
 		
-		intArrays.release(point_indices);
+		//intArrays.release(point_indices);
 	}
 
 }

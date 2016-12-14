@@ -17,7 +17,7 @@ public class Ortho implements WindowListener, KeyListener, MouseListener {
     protected final AnimVector2f translate;
     boolean visible;
 
-    final Finger mouse;
+    final Finger finger;
 
 
 //    public static void main(String[] args) {
@@ -31,11 +31,16 @@ public class Ortho implements WindowListener, KeyListener, MouseListener {
     public SpaceGraph window;
     protected AnimVector2f scale;
 
-    public Ortho(Surface surface) {
-        this.surface = surface;
-        this.mouse = new Finger(surface);
+    public Ortho(Surface content) {
+
+        this.surface = content;
+        this.finger = newFinger(content);
         this.scale = new AnimVector2f(3f);
         this.translate = new AnimVector2f(3f);
+    }
+
+    protected Finger newFinger(Surface content) {
+        return new Finger(content);
     }
 
 
@@ -204,14 +209,14 @@ public class Ortho implements WindowListener, KeyListener, MouseListener {
             x = (sx - translate.x) / (lx);
             y = (sy - translate.y) / (ly);
             if (x >= 0 && y >= 0 && x<=1f && y<=1f) {
-                mouse.update(e, x, y, buttonsDown);
+                finger.update(e, x, y, buttonsDown);
                 return true;
             }
 
         }
 
         x = y = Float.NaN;
-        mouse.update(null, x, y, null);
+        finger.update(null, x, y, null);
 
         return false;
     }

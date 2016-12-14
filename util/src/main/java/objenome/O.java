@@ -75,7 +75,14 @@ public abstract class O {
      * @throws IllegalArgumentException if the runtime type of {@code instance} is
      *                                  not one of this object graph's {@link the#in injectable types}.
      */
-    public abstract <T> T with(T instance);
+    public abstract <T> O with(T instance);
+
+    public <T> O with(T... instances) {
+        for (T t : instances)
+            with(t);
+        return this;
+    }
+
 
     /**
      * Returns a new object graph that includes all of the objects in this graph,
@@ -125,6 +132,10 @@ public abstract class O {
                 //new FailoverLoader(),
                 new DynamicLoader(),
                 modules);
+    }
+
+    public static O start() {
+        return of( new Object[] { } );
     }
 
     /** more specific than of, includes the method by which something can be derived from (a Loader 'strategy') */

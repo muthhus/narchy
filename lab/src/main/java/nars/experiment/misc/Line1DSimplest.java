@@ -1,22 +1,20 @@
 package nars.experiment.misc;
 
 import jcog.Util;
-import jcog.data.random.XorShift128PlusRandom;
 import nars.$;
 import nars.NAR;
 import nars.NAgent;
 import nars.Param;
 import nars.concept.ActionConcept;
-import nars.index.term.map.CaffeineIndex;
 import nars.nar.Default;
-import nars.nar.exe.Executioner;
-import nars.nar.exe.SingleThreadExecutioner;
-import nars.nar.util.DefaultConceptBuilder;
 import nars.remote.NAgents;
-import nars.time.FrameTime;
+import objenome.InvocationLogger;
 
 import static jcog.Texts.n2;
 import static jcog.Util.unitize;
+import static org.mockito.Answers.CALLS_REAL_METHODS;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.withSettings;
 
 
 /**
@@ -40,19 +38,22 @@ public class Line1DSimplest extends NAgent {
 
 
     public Line1DSimplest(NAR n, IntToFloatFunction target) {
-        super("x", n, 1);
+        super("", n, 1);
 
         this.targetFunc = target;
 
         this.trace = false;
 
-        senseNumber("in(x)", () -> yHidden);
+        senseNumber("(in)", () -> yHidden);
 
         //senseNumber(()->yHidden, "lo(x)", "hi(x)");
 
-        out = action("out(x)", (b, d) -> {
+        out = action("(out)", (b, d) -> {
             if (d != null) {
-                yEst = Util.lerp(d.freq(), yEst, d.conf());
+                yEst = unitize(
+                        Util.lerp(d.freq(), yEst, 0.5f + 0.5f * d.conf())
+                        //d.freq()
+                );
             }
             return $.t(yEst, nar.confidenceDefault('.'));
         });
@@ -65,7 +66,7 @@ public class Line1DSimplest extends NAgent {
 
         yHidden = unitize(
                 //Math.round(
-                        targetFunc.valueOf((int) now)
+                targetFunc.valueOf((int) now)
                 //)
         );
 
@@ -75,15 +76,15 @@ public class Line1DSimplest extends NAgent {
         //float reward = ((closeness*closeness*closeness) -0.5f)*2f;
         //float reward = dist < speed ? (0.5f/(1f+dist)) : -dist;
         float reward =
-                -dist * 2f + 1f;
+                1f - dist;
         //(1f-dist)*(1f-dist);
         //1f / (1+dist*dist);
 
         //reward = Util.sqr(reward); //sharpen
-
+        reward = reward * 2f - 1f; //normalize to -1..+1
 
         if (print) {
-            String a = n2(yHidden) + ",  " + n2(yEst);
+            String a = "rew=" + reward + "(dist=" + dist + "), tgt=" + n2(yHidden) + ",  cur=" + n2(yEst);
             System.out.println(a
                     //+ "\t" + summary());
             );
@@ -107,22 +108,32 @@ public class Line1DSimplest extends NAgent {
         //return 0.5f + 0.5f * (float)Math.tan(t / (targetPeriod)) + (float)Math.random()*0.1f;
     }
 
+
+
     public static void main(String[] args) {
 
-        XorShift128PlusRandom rng = new XorShift128PlusRandom((int) (Math.random() * 1000));
+        //XorShift128PlusRandom rng = new XorShift128PlusRandom((int) (Math.random() * 1000));
 
-        float dur = 16;
+        float dur = 8;
 
-        final Executioner exe =
-                //new MultiThreadExecutioner(2, 2048);
-                new SingleThreadExecutioner();
-
-        Default nar = new Default(512,
-                16, 1, 3, rng,
-                new CaffeineIndex(new DefaultConceptBuilder(), 1024 * 2, 12, false, exe),
-                new FrameTime(dur), exe
+        Default nar = mock(Default.class, withSettings()
+                        .useConstructor()
+                        //.name("nar")
+                        .defaultAnswer(CALLS_REAL_METHODS)
+                        .invocationListeners(new InvocationLogger())
         );
-        nar.termVolumeMax.set(12);
+
+
+
+//        final Executioner exe =
+//                //new MultiThreadExecutioner(2, 2048);
+//                new SingleThreadExecutioner();
+//        Default nar = new Default(1024,
+//                4, 1, 3, rng,
+//                new CaffeineIndex(new DefaultConceptBuilder(), 1024 * 16, 12, false, exe),
+//                new FrameTime(dur), exe
+//        );
+        nar.termVolumeMax.set(13);
 
 
 //        nar.DEFAULT_BELIEF_PRIORITY = 0.5f;
@@ -136,8 +147,8 @@ public class Line1DSimplest extends NAgent {
 
 
         Line1DSimplest l = new Line1DSimplest(nar,
-                sine(4 * dur)
-                //random(256)
+                //sine(16 * dur)
+                random(64 * dur)
         );
 
 
@@ -149,19 +160,16 @@ public class Line1DSimplest extends NAgent {
 
         //nar.logSummaryGT(System.out, 0.0f);
 
-        //nar.input("$0.9;0.9$ out(x)! :|: %1.00;0.01%");
-        //nar.input("$0.9;0.9$ out(x)! :|: %0.00;0.01%");
-
-        //1. in > out: increase out
-        String inMinOut = "((x)-->(in-out))";
-        nar.input("$0.99;0.99$ (" + inMinOut + " ==>+0 out(x)). %1.00;0.75%");
-
-        //2. out > in: decrease out
-        String outMinIn = "((x)-->(out-in))";  //"--" + inMinOut; //reverse
-        nar.input("$0.99;0.99$ (" + outMinIn + " ==>+0 out(x)). %0.00;0.75%");
-
-        //3. out==in: stable
-        nar.input("$0.99;0.99$ ( --((x)-->(in-out)) ==>+0 out(x)). %0.50;0.9%");
+//        //1. in > out: increase out
+//        String inMinOut = "((x)-->(in-out))";
+//        nar.input("$0.99;0.99$ (" + inMinOut + " ==>+0 out(x)). %1.00;0.7%");
+//
+//        //2. out > in: decrease out
+//        String outMinIn = "((x)-->(out-in))";  //"--" + inMinOut; //reverse
+//        nar.input("$0.99;0.99$ (" + outMinIn + " ==>+0 out(x)). %0.00;0.7%");
+//
+//        //3. out==in: stable
+//        nar.input("$0.99;0.99$ ( --((x)-->(in-out)) ==>+0 out(x)). %0.50;0.8%");
 
 //        nar.onCycle(nn -> {
 ////            Concept b = nar.concept("out(x)");
@@ -186,7 +194,7 @@ public class Line1DSimplest extends NAgent {
 
         l.print = true;
         //l.runRT(25, 15000).join();
-        l.run(14096);
+        l.run(114096);
 
 //
 //        NAR.printActiveTasks(nar, true);

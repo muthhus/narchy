@@ -151,14 +151,14 @@ public class DaggerObjectGraph extends O {
     }
 
     @Override
-    public <T> T with(T instance) {
+    public <T> O with(T instance) {
         String membersKey = Keys.getMembersKey(instance.getClass());
         ClassLoader classLoader = instance.getClass().getClassLoader();
         @SuppressWarnings("unchecked") // The linker matches keys to bindings by their type.
                 Binding<T> binding =
                 (Binding<T>) getInjectableTypeBinding(classLoader, membersKey, membersKey);
         binding.injectMembers(instance);
-        return instance;
+        return this;
     }
 
     /**

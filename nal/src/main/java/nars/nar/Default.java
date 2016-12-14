@@ -23,6 +23,7 @@ import nars.op.time.STMTemporalLinkage;
 import nars.term.Termed;
 import nars.time.FrameTime;
 import nars.time.Time;
+import objenome.O;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.eclipse.collections.api.tuple.primitive.ObjectFloatPair;
 import org.jetbrains.annotations.NotNull;
@@ -69,22 +70,10 @@ public class Default extends NAR {
         super(time, index, random, Param.defaultSelf(), exe);
 
 
-        quaMin.setValue(Param.BUDGET_EPSILON*16f);
 
 
-        List<Deriver> modules = $.newArrayList();
-        modules.add(Deriver.get("default.meta.nal"));
-        modules.add(Deriver.get("nal4.meta.nal"));
 
-        Deriver d = (x) -> modules.forEach(e -> e.accept(x));
-
-        ConceptBagCycle c = new ConceptBagCycle(this, activeConcepts, d);
-
-        c.termlinksFiredPerFiredConcept.set(termLinksPerConcept);
-        c.tasklinksFiredPerFiredConcept.set(taskLinksPerConcept);
-        c.conceptsFiredPerCycle.set(conceptsFirePerCycle);
-
-        this.core = c;
+        this.core = newCore(activeConcepts, termLinksPerConcept, taskLinksPerConcept, conceptsFirePerCycle);
 
 
         int level = level();
@@ -101,6 +90,26 @@ public class Default extends NAR {
 
         }
 
+
+    }
+
+    protected ConceptBagCycle newCore(int activeConcepts, int termLinksPerConcept, int taskLinksPerConcept, int conceptsFirePerCycle) {
+
+        ConceptBagCycle c = new ConceptBagCycle(this, newDeriver(), activeConcepts);
+
+        c.termlinksFiredPerFiredConcept.set(termLinksPerConcept);
+        c.tasklinksFiredPerFiredConcept.set(taskLinksPerConcept);
+        c.conceptsFiredPerCycle.set(conceptsFirePerCycle);
+
+        return c;
+    }
+
+    protected Deriver newDeriver() {
+        List<Deriver> modules = $.newArrayList();
+        modules.add(Deriver.get("default.meta.nal"));
+        modules.add(Deriver.get("nal4.meta.nal"));
+
+        return (x) -> modules.forEach(e -> e.accept(x));
     }
 
     @Nullable

@@ -88,7 +88,11 @@ public class ConceptBagCycle {
     //private final CapacityLinkedHashMap<Premise,Premise> recent = new CapacityLinkedHashMap<>(256);
     //long novel=0, total=0;
 
-    public ConceptBagCycle(@NotNull NAR nar, int initialCapacity, Deriver deriver) {
+    public ConceptBagCycle(@NotNull NAR nar, Deriver deriver) {
+        this(nar, deriver, 1);
+    }
+
+    public ConceptBagCycle(@NotNull NAR nar, Deriver deriver, int initialCapacity) {
 
         this.nar = nar;
 

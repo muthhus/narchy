@@ -180,7 +180,9 @@ public interface Compound extends Term, IPair, TermContainer {
     @Override
     default void recurseTerms(@NotNull SubtermVisitor v) {
         v.accept(this);
-        subterms().forEach(a -> a.recurseTerms(v));
+        for (Term x : terms())
+            x.recurseTerms(v);
+        //subterms().forEach(a -> a.recurseTerms(v));
     }
 
     @Override

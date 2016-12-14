@@ -287,7 +287,7 @@ public abstract class Param /*extends Container*/ implements Level {
     /**
      * budget quality threshold necessary to form a derived task.
      */
-    public final FloatParam quaMin = new FloatParam(0);
+    public final FloatParam quaMin = new FloatParam(Param.BUDGET_EPSILON*1f);
 
 
     public float confidenceDefault(char punctuation) {

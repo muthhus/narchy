@@ -81,7 +81,7 @@ public final class LazyInjectionTest {
   }
 
   @Test public void getLazyDoesNotCauseStaticsToBeLoaded() {
-    @the(The = LazyInjectStatics.class)
+    @the(the = LazyInjectStatics.class)
     class TestModule {
     }
 

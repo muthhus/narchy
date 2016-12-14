@@ -517,14 +517,23 @@ public enum Draw {
             gl.glEnd();
         }
     }
-    public static void rectTex(GL2 gl, Texture texture, float x1, float y1, float w, float h, float z) {
+    public static void rectTex(GL2 gl, Texture tt, float x1, float y1, float w, float h, float z) {
 
 //        gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_LINEAR);
 //        gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_LINEAR);
 
 
-        texture.enable(gl);
-        texture.bind(gl);
+
+
+        //tt.bind(gl);
+//        glTexImage2D(GL_TEXTURE_2D, 0,GL_RGB, width, height, 0, GL_BGR, GL_UNSIGNED_BYTE, data);
+//
+//        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+//        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+
+        //gl.glPushMatrix();
+
+        tt.bind(gl);
 
         gl.glBegin(GL2.GL_QUADS);
 
@@ -539,7 +548,8 @@ public enum Draw {
         gl.glVertex3f(x1, y1 + h, z);
         gl.glEnd();
 
-        texture.disable(gl);
+        //gl.glFlush();
+        //gl.glPopMatrix();
 
     }
 

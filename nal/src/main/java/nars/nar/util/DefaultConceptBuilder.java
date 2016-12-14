@@ -1,5 +1,7 @@
 package nars.nar.util;
 
+import jcog.map.SynchronizedHashMap;
+import jcog.map.SynchronizedUnifiedMap;
 import nars.$;
 import nars.NAR;
 import nars.Op;
@@ -32,7 +34,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.BiFunction;
 import java.util.function.Function;
 
 import static nars.Op.DIFFe;
@@ -363,7 +364,9 @@ public class DefaultConceptBuilder implements ConceptBuilder {
 //        } else {
 //            return new HashMap(defaultInitialCap, 1f);
             if (volume < 3) {
-                return new ConcurrentHashMap();
+                return new ConcurrentHashMap(8);
+            } else if (volume < 5){
+                return new SynchronizedHashMap(2, loadFactor);
             } else {
                 return new SynchronizedUnifiedMap(0, loadFactor);
             }
@@ -373,20 +376,4 @@ public class DefaultConceptBuilder implements ConceptBuilder {
 
     }
 
-    public static final class SynchronizedUnifiedMap<K, V> extends UnifiedMap<K, V> {
-
-        public SynchronizedUnifiedMap(int cap, float loadFactor) {
-            super(cap, loadFactor);
-        }
-
-        @Override
-        public synchronized V remove(Object key) {
-            return super.remove(key);
-        }
-
-        @Override
-        public synchronized V compute(K key, BiFunction<? super K, ? super V, ? extends V> remappingFunction) {
-            return super.compute(key, remappingFunction);
-        }
-    }
 }

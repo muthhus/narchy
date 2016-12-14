@@ -58,7 +58,7 @@ public final class ModuleTest {
         static String s;
     }
 
-    @the(The = TestStaticInjection.class)
+    @the(the = TestStaticInjection.class)
     static class ModuleWithStaticInjection {
     }
 
@@ -213,7 +213,7 @@ public final class ModuleTest {
             O.via(new DynamicLoader(), new ChildModuleMissingModuleAnnotation());
         } catch (IllegalArgumentException e) {
             assertThat(e.getMessage())
-                    .contains("No @Module on objenome.ModuleTest$ModuleMissingModuleAnnotation");
+                    .contains("No @the on objenome.ModuleTest$ModuleMissingModuleAnnotation");
         }
     }
 

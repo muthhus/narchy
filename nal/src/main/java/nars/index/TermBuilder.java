@@ -599,8 +599,9 @@ public abstract class TermBuilder {
         assert (dt == 0 || dt == DTERNAL); //throw new RuntimeException("should only have been called with dt==0 or dt==DTERNAL");
 
 
-        TreeSet<Term> s = //new UnifiedSet<>(u.length);
-            new TreeSet();
+        Set<Term> s =
+            new UnifiedSet<>(u.length);
+            //new TreeSet();
         if (!flatten(op, u, dt, s))
             return False;
 
@@ -633,14 +634,14 @@ public abstract class TermBuilder {
      * @param innerDT will either 0 or DTERNAL (commutive relation)
      */
     private @NotNull Set<Term> junctionGroupNonDTSubterms(@NotNull Set<Term> s, int innerDT) {
-        Set<Term> outer = new TreeSet<>(); //TODO use UnifiedSet when GenericVariable doesnt need compareTo
+        Set<Term> outer = new UnifiedSet<>(0);
         Iterator<Term> ss = s.iterator();
         while (ss.hasNext()) {
             Term x = ss.next();
             if (isTrue(x)) {
                 ss.remove();
             } else if (isFalse(x)) {
-                return null;
+                return Collections.emptySet();
             } else {
                 switch (x.op()) {
                     case CONJ:
@@ -700,9 +701,8 @@ public abstract class TermBuilder {
      *
      * @param dt will be either 0 or DTERNAL (commutive relation)
      *
-     * TODO generalize to allow Collection<Term> but due to GenericVariable , compareTo must be done not equals/hash
      */
-    private boolean flatten(@NotNull Op op, @NotNull Term[] u, int dt, @NotNull TreeSet<Term> s) {
+    private boolean flatten(@NotNull Op op, @NotNull Term[] u, int dt, @NotNull Set<Term> s) {
 
         for (Term x : u) {
 

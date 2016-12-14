@@ -94,8 +94,8 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
     }
 
     private void _add(Ortho c) {
-        if (this.orthos.add(c))
-            c.start(this);
+        this.orthos.add( c);
+        c.start(this);
     }
 
     public SpaceGraph add(AbstractSpace<X,Spatial<X>> c) {

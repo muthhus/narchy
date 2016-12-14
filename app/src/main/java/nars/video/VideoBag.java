@@ -105,7 +105,7 @@ public class VideoBag {
     }
 
     public VideoBag(int initialCapacity) {
-        bag = new ArrayBag<>(initialCapacity, BudgetMerge.avgBlend, new ConcurrentHashMap<>()) {
+        bag = new ArrayBag<Frame>(initialCapacity, BudgetMerge.avgBlend, new ConcurrentHashMap<>()) {
             @Override
             public void onAdded(BLink<Frame> v) {
                 index.add(v.get());
@@ -270,13 +270,14 @@ public class VideoBag {
             super.paint(gl);
 
 
-            //reclaim deleted textures
+//            //reclaim deleted textures
             while (!bag.textureTrash.isEmpty()) {
                 Frame ff = bag.textureTrash.remove();
-                ((InterleavedU8)ff.image).data = null;
-                ff.texture.disable(gl);
-                ff.texture.destroy(gl);
-                ff.texture = null;
+//                ((InterleavedU8)ff.image).data = null;
+//                System.out.println("destroying: " + ff.texture.getTextureObject());
+//                ff.texture.disable(gl);
+//                ff.texture.destroy(gl);
+//                ff.texture = null;
             }
 
             long now = System.currentTimeMillis();
@@ -293,21 +294,30 @@ public class VideoBag {
 
                     tt = tgaTexture(f.width, f.height, false, data);
 
-                    f.texture = tt;
+                    System.out.println("creating: " + tt.getTextureObject());
 
+                    tt.enable(gl);
+                    tt.bind(gl);
+
+
+                    f.texture = tt;
 
                 }
 
                 float pp = ff.priIfFiniteElseZero();
                 float xx = scale * (f.t - now) / 1000f ;
                 float yy = (float) Math.sin(f.t);
-                if (tt!=null) {
+                //if (tt!=null) {
                     float sc = scale * (1f + pp);
                     Draw.rectTex(gl, tt, xx, yy, sc, sc, 0);
-                } else {
-                    Draw.colorPolarized(gl, 0.25f + 0.75f * pp);
-                    Draw.rect(gl, xx, yy, scale, scale);
-                }
+//                } else {
+//                    Draw.colorPolarized(gl, 0.25f + 0.75f * pp);
+//                    Draw.rect(gl, xx, yy, scale, scale);
+//                }
+
+                tt.disable(gl);
+                tt.destroy(gl);
+                f.texture = null;
             });
         }
 
@@ -317,7 +327,7 @@ public class VideoBag {
             Texture tt;
             try {
                 TGAImage tga = TGAImage.createFromData(width, height, alpha, true, ByteBuffer.wrap(data));
-                tt = TextureIO.newTexture(new ByteArrayInputStream(tga.output().array()), false, TextureIO.TGA);
+                tt = TextureIO.newTexture(new ByteArrayInputStream(tga.output().array()), true, TextureIO.TGA);
             } catch (IOException e) {
                 e.printStackTrace();
                 tt = null;

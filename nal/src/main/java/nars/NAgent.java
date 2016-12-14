@@ -101,9 +101,9 @@ abstract public class NAgent implements NSense, NAction {
 
     public final FloatParam gammaEpsilonFactor = new FloatParam(0.1f);
 
-    final int curiosityMonitorDuration = 8; //frames
-    final DescriptiveStatistics avgActionDesire = new DescriptiveStatistics(curiosityMonitorDuration);
-    final DescriptiveStatistics rewardWindow = new DescriptiveStatistics(curiosityMonitorDuration);
+    //final int curiosityMonitorDuration; //frames
+    final DescriptiveStatistics avgActionDesire;
+    final DescriptiveStatistics rewardWindow;
 
 
     public float rewardValue;
@@ -156,7 +156,7 @@ abstract public class NAgent implements NSense, NAction {
 
         float rewardConf = alpha;
 
-        rewardNormalized = new FloatPolarNormalized(() -> rewardValue);
+        rewardNormalized = new FloatPolarNormalized(() -> rewardValue).radius(1);
 
 
         happy = new SensorConcept(
@@ -172,6 +172,9 @@ abstract public class NAgent implements NSense, NAction {
             }
         };
 
+        int curiosityMonitorDuration = Math.round(nar.time.dur() * 2f); //TODO handle changing duration value
+        avgActionDesire = new DescriptiveStatistics(curiosityMonitorDuration);
+        rewardWindow = new DescriptiveStatistics(curiosityMonitorDuration);
 
         /*
         joy = new SensorConcept(

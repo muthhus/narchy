@@ -154,12 +154,7 @@ public class ArrayPool<T> {
 	
 	////////////////////////////////////////////////////////////////////////////
 	
-	private static final ThreadLocal<Map> threadLocal = new ThreadLocal<>() {
-		@Override
-		protected Map initialValue() {
-			return new HashMap();
-		}
-	};
+	private static final ThreadLocal<Map> threadLocal = ThreadLocal.withInitial(HashMap::new);
 	
 	/**
 	 * Returns per-thread array pool for given type, or create one if it doesn't exist.

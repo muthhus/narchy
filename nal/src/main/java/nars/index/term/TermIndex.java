@@ -370,7 +370,7 @@ public abstract class TermIndex extends TermBuilder {
     }
 
     @NotNull
-    public TermContainer transform(TermContainer src, Compound superterm, @NotNull CompoundTransform t) {
+    public TermContainer transform(@NotNull TermContainer src, Compound superterm, @NotNull CompoundTransform t) {
 
         int modifications = 0;
 
@@ -378,9 +378,10 @@ public abstract class TermIndex extends TermBuilder {
 
         Term[] target = new Term[s];
 
+        Term[] xx = src.terms();
         for (int i = 0; i < s; i++) {
 
-            Term x = src.term(i), y;
+            Term x = xx[i], y;
 
             if (t.test(x)) {
                 y = t.apply(superterm, x);
@@ -405,12 +406,12 @@ public abstract class TermIndex extends TermBuilder {
 
 
     @Nullable
-    public Term transform(@NotNull Compound src, @NotNull ByteList path, Term replacement) {
+    public Term transform(@NotNull Compound src, @NotNull ByteList path, @NotNull Term replacement) {
         return transform(src, path, 0, replacement);
     }
 
     @Nullable
-    public Term transform(@NotNull Term src, @NotNull ByteList path, int depth, Term replacement) {
+    public Term transform(@NotNull Term src, @NotNull ByteList path, int depth, @NotNull Term replacement) {
         int ps = path.size();
         if (ps == depth)
             return replacement;
@@ -425,16 +426,19 @@ public abstract class TermIndex extends TermBuilder {
 
         Term[] target = new Term[n];
 
-        for (int i = 0; i < n; i++) {
+
+        for (int i = 0; i < n;) {
             Term x = csrc.term(i);
-            if (path.get(depth) != i)
+            Term y;
+            if (path.get(depth) != i) {
                 //unchanged subtree
-                target[i] = x;
-            else {
+                y = x;
+            } else {
                 //replacement is in this subtree
-                target[i] = transform(x, path, depth + 1, replacement);
+                y = transform(x, path, depth + 1, replacement);
             }
 
+            target[i++] = y;
         }
 
         return the(csrc.op(), csrc.dt(), target);

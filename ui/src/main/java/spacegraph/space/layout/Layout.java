@@ -5,6 +5,8 @@ import com.jogamp.newt.event.KeyEvent;
 import org.jetbrains.annotations.Nullable;
 import spacegraph.Surface;
 import spacegraph.math.v2;
+import spacegraph.math.v3;
+import spacegraph.space.widget.Windo;
 
 import java.util.List;
 import java.util.Objects;
@@ -15,6 +17,8 @@ import java.util.Objects;
  public class Layout extends Surface {
 
     volatile public List<Surface> children;
+
+    protected boolean clipTouchBounds = true;
 
     public Layout(Surface... children) {
         this(Lists.newArrayList(children));
@@ -59,29 +63,38 @@ import java.util.Objects;
             return null;
         }
 
-        float tx = translateLocal.x;
-        float ty = translateLocal.y;
+//        float tx = translateLocal.x;
+//        float ty = translateLocal.y;
 
 
         for (Surface c : children) {
 
-            float csx = c.scaleLocal.x;
-            if (csx!=csx || csx < 0)
+            v2 sc = c.scaleLocal;
+            float csx = sc.x;
+            float csy = sc.y;
+            if (csx!=csx || csx <= 0 || csy!=csy || csy <= 0)
                 continue;
 
-            v2 subHit = new v2();
+            v3 tc = c.translateLocal;
+
 
             //project to child's space
-            subHit.set(hitPoint);
+            v2 subHit = new v2(hitPoint);
+            subHit.sub(tc.x, tc.y );
 
-            float csy = c.scaleLocal.y;
-            subHit.sub(c.translateLocal.x, c.translateLocal.y );
             subHit.scale(1f / csx, 1f / csy);
+
             //subHit.sub(tx, ty);
-            //.out.println(tx + " " + ty + "   " + subHit);
+
+            if (this instanceof Windo.Desktop)
+                System.out.println(c + " in " + this + ": " + subHit + " <- " + hitPoint + " " + tc.x + "," + tc.y + " " + scaleLocal);
+
 
             float hx = subHit.x, hy = subHit.y;
-            if (hx >= 0f && hx <= 1f && hy >= 0 && hy <= 1f) {
+            if (!clipTouchBounds || ( hx >= 0f && hx <= 1f && hy >= 0 && hy <= 1f) ) {
+                //subHit.add(c.translateLocal.x*csx, c.translateLocal.y*csy);
+
+
                 Surface s = c.onTouch(subHit, buttons);
                 if (s!=null)
                     return s; //FIFO

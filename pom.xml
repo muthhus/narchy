@@ -48,14 +48,12 @@
                 <version>3.5.1</version>
                 <configuration>
 
-                    <!--<showWarnings>true</showWarnings>-->
-                    <!--<verbose>true</verbose>-->
+                    <showWarnings>false</showWarnings>
                     <useIncrementalCompilation>true</useIncrementalCompilation>
-
-                    <!--<fork>true</fork>-->
+                    <fork>true</fork>
                     <source>1.9</source>
                     <target>1.9</target>
-                    <!--<useIncrementalCompilation>true</useIncrementalCompilation>-->
+
 
                 </configuration>
             </plugin>

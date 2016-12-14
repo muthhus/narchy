@@ -43,7 +43,7 @@ public final class InjectStaticsTest {
   }
 
   @Test public void injectStatics() {
-    @the(The = InjectsOneField.class)
+    @the(the = InjectsOneField.class)
     class TestModule {
       @out
       String provideString() {
@@ -59,7 +59,7 @@ public final class InjectStaticsTest {
 
   @Test public void instanceFieldsNotInjectedByInjectStatics() {
     @the(
-        The = InjectsStaticAndNonStatic.class,
+        the = InjectsStaticAndNonStatic.class,
         in = InjectsStaticAndNonStatic.class)
     class TestModule {
       @out
@@ -80,7 +80,7 @@ public final class InjectStaticsTest {
 
   @Test public void staticFieldsNotInjectedByInjectMembers() {
     @the(
-        The = InjectsStaticAndNonStatic.class,
+        the = InjectsStaticAndNonStatic.class,
         in = InjectsStaticAndNonStatic.class)
     class TestModule {
       @out

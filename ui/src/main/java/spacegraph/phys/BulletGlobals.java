@@ -26,7 +26,6 @@ package spacegraph.phys;
 import spacegraph.phys.collision.ContactAddedCallback;
 import spacegraph.phys.collision.ContactDestroyedCallback;
 import spacegraph.phys.collision.ContactProcessedCallback;
-import spacegraph.phys.util.ArrayPool;
 
 
 /**
@@ -122,9 +121,9 @@ public class BulletGlobals {
 	/**
 	 * Cleans all current thread specific settings and caches.
 	 */
-	public static void cleanCurrentThread() {
-		threadLocal.remove();
-		ArrayPool.cleanCurrentThread();
-	}
+//	public static void cleanCurrentThread() {
+//		threadLocal.remove();
+//		ArrayPool.cleanCurrentThread();
+//	}
 
 }

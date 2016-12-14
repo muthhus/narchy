@@ -21,6 +21,7 @@ import objenome.impl.*;
 import objenome.lazy;
 import objenome.out;
 import objenome.the;
+import org.jetbrains.annotations.NotNull;
 
 import javax.inject.Provider;
 import javax.inject.Singleton;
@@ -59,11 +60,14 @@ public final class DynamicLoader extends Loader {
 
     //TODO: Reduce the complexity of this and/or replace with a mock or fake.
     public static class DynamicModuleAdapter<M> extends ModuleAdapter<M> {
-      protected DynamicModuleAdapter(Class<M> moduleClass, the annotation) {
+
+      private static final boolean STRICT = true;
+
+      protected DynamicModuleAdapter(@NotNull Class<M> moduleClass, @NotNull the annotation) {
         super(
             moduleClass,
             injectableTypesToKeys(annotation.in()),
-            annotation.The(),
+            annotation.the(),
             annotation.override(),
             annotation.extend(),
             annotation.complete(),
@@ -119,7 +123,7 @@ public final class DynamicLoader extends Loader {
                   handleSetBindings(bindings, module, method, key, key, library);
                   break;
                 default:
-                  throw new AssertionError("Unknown @Provides type " + out.type());
+                  throw new AssertionError("Unknown @out type " + out.type());
               }
             }
           }
@@ -158,7 +162,7 @@ public final class DynamicLoader extends Loader {
       }
 
       @Override public String toString() {
-        return "TestingModuleAdapter[" + this.moduleClass.getName() + ']';
+        return "DynamicModuleAdapter[" + this.moduleClass.getName() + ']';
       }
 
       /**
@@ -166,14 +170,14 @@ public final class DynamicLoader extends Loader {
        */
       public static <M> ModuleAdapter<M> create(Class<M> moduleClass) {
         the annotation = moduleClass.getAnnotation(the.class);
-        if (annotation == null) {
-          throw new IllegalArgumentException("No @Module on " + moduleClass.getName());
+        if (annotation == null && STRICT) {
+          throw new IllegalArgumentException("No @the on " + moduleClass.getName());
         }
         if (!moduleClass.getSuperclass().equals(Object.class)) {
           throw new IllegalArgumentException(
               "Modules must not extend from other classes: " + moduleClass.getName());
         }
-        return new DynamicModuleAdapter<M>(moduleClass, annotation);
+        return new DynamicModuleAdapter<>(moduleClass, annotation);
       }
 
       /**

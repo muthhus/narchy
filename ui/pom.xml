@@ -281,6 +281,24 @@
 
     <build>
 
+        <plugins>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.5.1</version>
+                <configuration>
+
+                    <showWarnings>false</showWarnings>
+                    <useIncrementalCompilation>true</useIncrementalCompilation>
+                    <fork>true</fork>
+                    <source>1.9</source>
+                    <target>1.9</target>
+
+
+                </configuration>
+            </plugin>
+        </plugins>
 
         <resources>
             <resource>

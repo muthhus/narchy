@@ -52,7 +52,7 @@ public @interface the {
      */
     Class<?>[] in() default {};
 
-    Class<?>[] The() default {};
+    Class<?>[] the() default {};
 
     /**
      * True if {@code @Provides} methods from this module are permitted to

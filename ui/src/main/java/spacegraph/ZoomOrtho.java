@@ -1,8 +1,11 @@
 package spacegraph;
 
 import com.jogamp.newt.event.MouseEvent;
+import com.jogamp.opengl.GL2;
+import spacegraph.input.Finger;
 import spacegraph.math.v2;
 import spacegraph.phys.util.AnimVector2f;
+import spacegraph.render.Draw;
 
 import static spacegraph.math.v3.v;
 
@@ -22,6 +25,41 @@ public class ZoomOrtho extends Ortho {
 
     public ZoomOrtho(Surface surface) {
         super(surface);
+    }
+
+    @Override
+    protected Finger newFinger(Surface content) {
+        return new DebugFinger(content);
+    }
+
+    class DebugFinger extends Finger {
+
+        final Surface overlay = new Surface() {
+
+            @Override
+            protected void paint(GL2 gl) {
+                super.paint(gl);
+
+                gl.glColor4f(1f,1f, 0f, 0.85f);
+                gl.glLineWidth(3f);
+                Draw.rectStroke(gl, 0,0,10,5);
+            }
+        };
+
+        public DebugFinger(Surface root) {
+            super(root);
+        }
+
+        protected void start() {
+            //window.add(new Ortho(overlay).maximize());
+        }
+    }
+
+
+    @Override
+    public void start(SpaceGraph s) {
+        super.start(s);
+        ((DebugFinger) finger).start();
     }
 
     @Override
