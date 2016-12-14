@@ -16,7 +16,7 @@
     "fastdom": "latest",
     "jsoneditor": "latest",
     "d3": "latest",
-    "cesium": "latest"
+    "cesium": "AnalyticalGraphicsInc/cesium#master"
   },
   "keywords": [
     "nars",

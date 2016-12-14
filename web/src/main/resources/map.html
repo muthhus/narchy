@@ -1,0 +1,111 @@
+<html>
+<head>
+    <!--<style>-->
+    <!--@import url(../templates/bucket.css);-->
+
+    <!--</style>-->
+
+
+    <!-- Use correct character set. -->
+    <meta charset="utf-8">
+
+    <!-- Tell IE to use the latest, best version. -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <!-- Make the application on mobile take up the full browser screen and disable user scaling. -->
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
+
+    <title></title>
+
+    <style>
+
+      @import url(lib/cesium/Build/CesiumUnminified/Widgets/CesiumWidget/CesiumWidget.css);
+      html, body, #cesiumContainer {
+          width: 100%; height: 100%; margin: 0; padding: 0; overflow: hidden;
+      }
+
+
+    </style>
+    <script type="text/javascript" src="lib/cesium/ThirdParty/requirejs-2.1.20/require.js"></script>
+
+    <script type="text/javascript" src="lib/cesium/Build/CesiumUnminified/Cesium.js"></script>
+
+</head>
+
+<body>
+
+<div id="cesiumContainer" class="fullSize"></div>
+<div id="loadingOverlay"><h1>Loading...</h1></div>
+<div id="toolbar"></div>
+<div id="credits"></div>
+
+<script id="cesium_sandcastle_script">
+'use strict';
+
+function startup(Cesium) {
+
+    // Cesium.CesiumWidget is similar to Cesium.Viewer, but
+    // is trimmed down.  It is just a widget for the 3D globe;
+    // it does not include the animation, imagery selection,
+    // and other widgets, nor does it depend on the third-party
+    // Knockout library.
+
+    // https://github.com/AnalyticalGraphicsInc/cesium/blob/1.28/Source/Widgets/CesiumWidget/CesiumWidget.js#L203
+    var widget = new Cesium.CesiumWidget('cesiumContainer', {
+        'imageryProvider':
+            Cesium.createOpenStreetMapImageryProvider({
+                url : 'https://a.tile.openstreetmap.org/'
+            }),
+        'skyBox': false,
+        'skyAtmosphere': false,
+        'targetFrameRate': 30,
+        'contextOptions': {
+            /*
+            The default values are: {
+                webgl : {
+                alpha : false, depth : true, stencil : false, antialias : true, premultipliedAlpha : true, preserveDrawingBuffer : false, failIfMajorPerformanceCaveat : false }, allowTextureFilterAnisotropic : true }
+            */
+        },
+        'creditContainer': 'credits',
+        'shadows': false
+
+    });
+
+    //1.0 is normal, < 1.0 is lo-res
+    widget.resolutionScale =
+        1.0;
+        //0.5;
+
+    var baseLayers = widget.imageryLayers;
+    baseLayers.add(
+            /*new Cesium.ImageryLayer(new Cesium.BingMapsImageryProvider({
+                    url : 'https://dev.virtualearth.net',
+                    mapStyle: Cesium.BingMapsStyle.ROAD,
+                    alpha: 0.5*/
+            new Cesium.ImageryLayer(new Cesium.BingMapsImageryProvider({
+                url : 'https://dev.virtualearth.net',
+                mapStyle: Cesium.BingMapsStyle.AERIAL
+            }))
+    );
+
+    baseLayers._layers[0].alpha =
+        baseLayers._layers[1].alpha =
+            0.5;
+}
+
+if (typeof Cesium !== "undefined") startup(Cesium);
+else if (typeof require === "function") require(["Cesium"], startup);
+
+
+
+
+
+
+
+</script>
+
+</body>
+
+
+</html>
