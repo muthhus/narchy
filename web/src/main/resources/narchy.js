@@ -126,7 +126,6 @@ function decodeTasks(e, m) {
             case '@':
             case ';': {
                 const pri = d.getFloat32(j); j += 4;
-                const dur = d.getFloat32(j); j += 4;
                 const qua = d.getFloat32(j); j += 4;
 
                 const whenLow = d.getInt32(j); j += 4;
@@ -143,13 +142,12 @@ function decodeTasks(e, m) {
                 const termStrLen = d.getInt16(j); j += 2;
                 const term = decoder.decode(m.slice(j, j + termStrLen)); j += termStrLen;
 
-                //console.log(term, punct, pri, when, freq, conf);
+                console.log(term, punct, pri, when, freq, conf);
 
                 e.emit('task', {
                     term: term,
                     punc: punct,
                     pri: pri,
-                    dur: dur,
                     qua: qua,
                     when: when,
                     freq: freq,
@@ -230,7 +228,6 @@ function graphConcepts(tgt) {
 
         if (p >= 0) {
             x.pri = p;
-            x.dur = d.getFloat32(j); j+=4;
             x.qua = d.getFloat32(j); j+=4;
 
             const termStrLen = d.getInt16(j); j += 2;
@@ -390,7 +387,7 @@ function taskFeed(socket) {
                 d.className = 'command';
                 break;
         }
-        d.style.opacity = 0.5 + 0.5 * x.dur;
+        d.style.opacity = 0.5 + 0.5 * x.qua;
         d.style.fontSize = fontSize;
         d.innerText = label;
         return d;
@@ -694,8 +691,7 @@ function TopTable(s) {
 
     function row(c) {
         const pri = c.pri; //c[1] / 1000.0;
-        const dur = c.dur; //c[2] / 1000.0;
-        const qua = c.qua; //c[3] / 1000.0;
+        const qua = c.qua; //c[2] / 1000.0;
 
         const e = document.createElement('span');
 
@@ -703,7 +699,6 @@ function TopTable(s) {
         e.style.fontSize = parseInt(70.0 + 2 * 100.0*pri) + '%';
         e.style.color = 'rgb(' +
             parseInt(128 + 128 * pri) + ',' +
-            parseInt(64 + 192 * dur) + ',' +
             parseInt(64 + 192 * qua) +
             ')';
         e.innerText = c.term;//[0];

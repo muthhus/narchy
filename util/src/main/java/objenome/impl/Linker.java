@@ -58,7 +58,7 @@ public final class Linker {
      * of completion of the {@link #linkAll()} method, as well as a place to reference the final,
      * fully linked map of bindings.
      */
-    private volatile Map<String, Binding<?>> linkedBindings = null;
+    private volatile Map<String, Binding<?>> linkedBindings;
 
     private final Loader plugin;
 

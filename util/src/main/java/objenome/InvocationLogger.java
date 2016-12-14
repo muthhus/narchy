@@ -12,7 +12,7 @@ import java.util.Arrays;
 public class InvocationLogger implements InvocationListener {
     private Logger logger;
 
-    private int mockInvocationsCounter = 0;
+    private int mockInvocationsCounter;
 
     public InvocationLogger() {
     }

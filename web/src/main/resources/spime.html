@@ -1,0 +1,43 @@
+<html>
+<head>
+    <title></title>
+
+    <script src="lib/labjs/LAB.min.js"></script>
+
+</head>
+
+<body class="max"></body>
+
+<script>
+
+    $LAB
+        .script("lib/lodash/dist/lodash.min.js")
+        .script("lib/jquery/dist/jquery.min.js")
+        .script("lib/fastdom/fastdom.min.js")
+        .script("lib/jquery-ui/jquery-ui.min.js")
+        .script("EventEmitter.js")
+        .script("ReconnectingWebsocket.js")
+        //.script("spacegraph.js")
+        .script("narchy.js")
+        .wait(function() {
+
+
+             var s = null; //HACK
+             s = NARSocket('terminal', decodeTasks, {
+                onopen: () => {
+                    //return dock(s, $('body'));
+                    $('body').append( taskFeed(s) );
+                }
+            });
+
+        });
+
+</script>
+
+<style type="text/css">
+
+    @import url("spacegraph.dark.css");
+    @import url("spacegraph.css");
+    @import url("index.css");
+
+</style>

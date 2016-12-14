@@ -135,7 +135,7 @@ public abstract class O {
     }
 
     public static O start() {
-        return of( new Object[] { } );
+        return of();
     }
 
     /** more specific than of, includes the method by which something can be derived from (a Loader 'strategy') */

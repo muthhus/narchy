@@ -891,14 +891,14 @@ public class NonBlockingHashMap<TypeK, TypeV>
         // table to the new table.  Workers are not required to finish any chunk;
         // the ConcurrentAutoTable simply wraps and work is copied duplicately until somebody
         // somewhere completes the count.
-        volatile long _copyIdx = 0;
+        volatile long _copyIdx;
         static private final AtomicLongFieldUpdater<CHM> _copyIdxUpdater =
                 AtomicLongFieldUpdater.newUpdater(CHM.class, "_copyIdx");
 
         // Work-done reporting.  Used to efficiently signal when we can move to
         // the new table.  From 0 to len(oldkvs) refers to copying from the old
         // table to the new.
-        volatile long _copyDone= 0;
+        volatile long _copyDone;
         static private final AtomicLongFieldUpdater<CHM> _copyDoneUpdater =
                 AtomicLongFieldUpdater.newUpdater(CHM.class, "_copyDone");
 

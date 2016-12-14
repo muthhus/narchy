@@ -34,6 +34,7 @@ import java.util.function.Function;
      *
      * @return HyperRect impl for this entry
      */
+    @Override
     HyperRect apply(T t);
 
 

@@ -89,6 +89,7 @@ public class ConcurrentMapStream<K, V> extends ConcurrentHashMap<K, ConcurrentMa
 //            return this.count.get();
 //        }
 //
+        @Override
         public int compareTo(RankedItem<T> o) {
             double x = o.doubleValue();
             double y = doubleValue();

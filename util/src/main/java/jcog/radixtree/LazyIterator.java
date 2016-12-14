@@ -13,7 +13,7 @@ import java.util.NoSuchElementException;
  */
 public abstract class LazyIterator<T> implements Iterator<T> {
 
-    T next = null;
+    T next;
 
     enum State { READY, NOT_READY, DONE, FAILED }
 

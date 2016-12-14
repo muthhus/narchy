@@ -176,7 +176,7 @@ public class SortedArray<E> implements Iterable<E> {
 
 
     public interface Ranker<X> {
-        public float rank(X x);
+        float rank(X x);
     }
 
     public void addBinary(E element, int s, Ranker<E> cmp) {

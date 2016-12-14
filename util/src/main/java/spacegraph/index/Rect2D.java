@@ -140,14 +140,10 @@ public class Rect2D<X extends Comparable<X>> implements HyperRect<X> {
     public boolean intersects(final HyperRect r) {
         final Rect2D r2 = (Rect2D)r;
 
-        if(min.x > r2.max.x ||
+        return !(min.x > r2.max.x ||
                 r2.min.x > max.x ||
                 min.y > r2.max.y ||
-                r2.min.y > max.y) {
-            return false;
-        }
-
-        return true;
+                r2.min.y > max.y);
     }
 
     @Override

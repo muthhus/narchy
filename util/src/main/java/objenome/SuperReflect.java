@@ -35,8 +35,6 @@
  */
 package objenome;
 
-import jcog.TriConsumer;
-
 import java.lang.reflect.*;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -236,7 +234,7 @@ public class SuperReflect {
         }
     }
 
-    private void set(Field field, Object value) throws NoSuchFieldException, IllegalAccessException {
+    private void set(Field field, Object value) throws IllegalAccessException {
         try {
             removeFinals(field);
         } catch (NoSuchFieldException e) {
@@ -269,7 +267,7 @@ public class SuperReflect {
      * @see #field(String)
      */
     public <T> T get(String name) throws SuperReflectException {
-        return field(name).<T>get();
+        return field(name).get();
     }
 
     /**
@@ -330,7 +328,7 @@ public class SuperReflect {
     }
 
     public interface OnField {
-        public void accept(String fieldName, Class type, SuperReflect value);
+        void accept(String fieldName, Class type, SuperReflect value);
     }
 
     public static void fields(Object instance, OnField r) {
