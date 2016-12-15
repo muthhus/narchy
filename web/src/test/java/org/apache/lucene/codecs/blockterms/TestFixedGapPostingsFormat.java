@@ -28,7 +28,7 @@ import org.apache.lucene.util.TestUtil;
 public class TestFixedGapPostingsFormat extends BasePostingsFormatTestCase {
 
 static {
-    PostingsFormat.register(LuceneFixedGap.class);
+    PostingsFormat.the(LuceneFixedGap.class);
 }
 
   private final Codec codec = TestUtil.alwaysPostingsFormat(new LuceneFixedGap(TestUtil.nextInt(random(), 1, 1000)));

@@ -1,5 +1,6 @@
 package org.apache.lucene.util;
 
+import org.apache.commons.collections.list.UnmodifiableList;
 import org.apache.lucene.codecs.Codec;
 import org.apache.lucene.codecs.DocValuesFormat;
 import org.apache.lucene.codecs.PostingsFormat;
@@ -153,11 +154,16 @@ public class TestUtil0 {
         }
     }
 
+    final static Class unmodList = Collections.unmodifiableList(Collections.emptyList()).getClass();
+    final static Class unmodSet = Collections.unmodifiableSet(Collections.emptySet()).getClass();
+
     /**
      * Checks that the provided collection is read-only.
-     * @see #checkIterator(Iterator)
      */
     public static <T> void checkReadOnly(Collection<T> coll) {
+        if (coll.getClass() == unmodList || coll.getClass() == unmodSet )
+            return;
+
         int size = 0;
         for (Iterator<?> it = coll.iterator(); it.hasNext(); ) {
             it.next();

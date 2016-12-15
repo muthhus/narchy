@@ -361,9 +361,12 @@ public abstract class StringHelper {
    *  in the returned {@link BytesRef}, throwing {@code IllegalArgumentException}
    *  if any int value is out of bounds for a byte. */
   public static BytesRef intsRefToBytesRef(IntsRef ints) {
-    byte[] bytes = new byte[ints.length];
-    for(int i=0;i<ints.length;i++) {
-      int x = ints.ints[ints.offset+i];
+    int len = ints.length;
+    byte[] bytes = new byte[len];
+    int offset = ints.offset;
+    int[] ii = ints.ints;
+    for(int i = 0; i< len; i++) {
+      int x = ii[offset +i];
       if (x < 0 || x > 255) {
         throw new IllegalArgumentException("int at pos=" + i + " with value=" + x + " is out-of-bounds for byte");
       }
@@ -379,7 +382,7 @@ public abstract class StringHelper {
   public static int compare(int count, byte[] a, int aOffset, byte[] b, int bOffset) {
     // TODO: dedup this w/ BytesRef.compareTo?
     for(int i=0;i<count;i++) {
-      int cmp = (a[aOffset+i]&0xff) - (b[bOffset+i]&0xff);
+      int cmp = (a[aOffset++]&0xff) - (b[bOffset++]&0xff);
       if (cmp != 0) {
         return cmp;
       }

@@ -48,8 +48,9 @@ import org.apache.lucene.util.NamedSPILoader;
  */
 public abstract class PostingsFormat implements NamedSPILoader.NamedSPI {
 
-    public static void register(Class<? extends PostingsFormat> c) {
-        Holder.getLoader().register(c);
+    public static void the(Class<? extends PostingsFormat>... cc) {
+        for (Class c : cc)
+            Holder.getLoader().register(c);
     }
 
     /**

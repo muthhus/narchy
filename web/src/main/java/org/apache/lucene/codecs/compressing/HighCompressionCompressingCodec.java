@@ -16,8 +16,12 @@
  */
 package org.apache.lucene.codecs.compressing;
 
+import org.apache.lucene.codecs.Codec;
+import org.apache.lucene.codecs.lucene70.Lucene70Codec;
+
 /** CompressionCodec that uses {@link CompressionMode#HIGH_COMPRESSION} */
 public class HighCompressionCompressingCodec extends CompressingCodec {
+
 
   /** Constructor that allows to configure the chunk size. */
   public HighCompressionCompressingCodec(int chunkSize, int maxDocsPerChunk, boolean withSegmentSuffix, int blockSize) {

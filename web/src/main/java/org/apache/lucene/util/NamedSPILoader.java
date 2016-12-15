@@ -71,14 +71,16 @@ public final class NamedSPILoader<S extends NamedSPILoader.NamedSPI> implements 
             final Class<? extends S> c = loader.next();
             try {
                 final S service = c.newInstance();
-                final String name = service.getName();
+
                 // only add the first one for each name, later services will be ignored
                 // this allows to place services before others in classpath to make
                 // them used instead of others
-                services.computeIfAbsent(name, (n) -> {
-                    checkServiceName(n);
-                    return service;
-                });
+                services.put(service.getName(), (S)c.newInstance());
+
+//                services.computeIfAbsent(name, (n) -> {
+//                    checkServiceName(n);
+//                    return service;
+//                });
 
             } catch (Exception e) {
                 throw new ServiceConfigurationError("Cannot instantiate SPI class: " + c.getName(), e);
@@ -96,7 +98,10 @@ public final class NamedSPILoader<S extends NamedSPILoader.NamedSPI> implements 
     }
 
     public void register(Class c, S s) {
-        services.put(c.getSimpleName(), s);
+        register(c.getSimpleName(), s);
+    }
+    public void register(String name, S s) {
+        services.put(name, s);
     }
 
     /**

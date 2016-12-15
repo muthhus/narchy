@@ -16,6 +16,7 @@
  */
 package org.apache.lucene.codecs.compressing;
 
+import org.apache.lucene.codecs.Codec;
 import org.apache.lucene.codecs.FilterCodec;
 import org.apache.lucene.codecs.StoredFieldsFormat;
 import org.apache.lucene.codecs.TermVectorsFormat;
@@ -94,6 +95,7 @@ public abstract class CompressingCodec extends FilterCodec {
     super(name, TestUtil0.getDefaultCodec());
     this.storedFieldsFormat = new CompressingStoredFieldsFormat(name, segmentSuffix, compressionMode, chunkSize, maxDocsPerChunk, blockSize);
     this.termVectorsFormat = new CompressingTermVectorsFormat(name, segmentSuffix, compressionMode, chunkSize, blockSize);
+    Codec.the(this);
   }
   
   /**

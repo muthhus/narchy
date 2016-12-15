@@ -2758,7 +2758,7 @@ public abstract class BaseDocValuesFormatTestCase extends BaseIndexFileFormatTes
     for (int i = 0; i < 10; i++) {
       final DirectoryReader r = DirectoryReader.open(dir);
       final CountDownLatch startingGun = new CountDownLatch(1);
-      Thread threads[] = new Thread[TestUtil.nextInt(random(), 4, 10)];
+      Thread threads[] = new Thread[TestUtil.nextInt(random(), 3, 7)];
       for (int tid = 0; tid < threads.length; tid++) {
         threads[tid] = new Thread() {
           @Override

@@ -41,12 +41,7 @@ import org.apache.lucene.store.ChecksumIndexInput;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.IOContext;
 import org.apache.lucene.store.IndexInput;
-import org.apache.lucene.util.Accountable;
-import org.apache.lucene.util.Accountables;
-import org.apache.lucene.util.ArrayUtil;
-import org.apache.lucene.util.BytesRef;
-import org.apache.lucene.util.IOUtils;
-import org.apache.lucene.util.LongsRef;
+import org.apache.lucene.util.*;
 import org.apache.lucene.util.packed.BlockPackedReaderIterator;
 import org.apache.lucene.util.packed.PackedInts;
 
@@ -684,7 +679,7 @@ public final class CompressingTermVectorsReader extends TermVectorsReader implem
 
     @Override
     public Iterator<String> iterator() {
-      return new Iterator<String>() {
+      return new Iterator<>() {
         int i = 0;
         @Override
         public boolean hasNext() {
@@ -915,7 +910,7 @@ public final class CompressingTermVectorsReader extends TermVectorsReader implem
 
     @Override
     public long ord() throws IOException {
-      throw new UnsupportedOperationException();
+      throw new WeakUnsupportedOperationException();
     }
 
     @Override

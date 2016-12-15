@@ -37,7 +37,7 @@ package org.apache.lucene.codecs;
  *   }
  * </pre>
  * 
- * <p><em>Please note:</em> Don't call {@link Codec#forName} from
+ * <p><em>Please note:</em> Don't call {@link Codec#the} from
  * the no-arg constructor of your own codec. When the SPI framework
  * loads your own Codec as SPI component, SPI has not yet fully initialized!
  * If you want to extend another Codec, instantiate it directly by calling

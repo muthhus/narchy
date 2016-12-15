@@ -249,7 +249,7 @@ abstract class BaseIndexFileFormatTestCase extends LuceneTestCase {
     IndexWriterConfig cfg = newIndexWriterConfig(new MockAnalyzer(random()));
     IndexWriter w = new IndexWriter(dir, cfg);
     // we need to index enough documents so that constant overhead doesn't dominate
-    final int numDocs = 10000 + random().nextInt(10000);
+    final int numDocs = 2000 + random().nextInt(2000);
     LeafReader reader1 = null;
     for (int i = 0; i < numDocs; ++i) {
       Document d = new Document();

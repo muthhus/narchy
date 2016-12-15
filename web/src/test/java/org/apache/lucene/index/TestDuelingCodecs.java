@@ -59,7 +59,7 @@ public class TestDuelingCodecs extends LuceneTestCase {
     // as this gives the best overall coverage. when we have more
     // codecs we should probably pick 2 from Codec.availableCodecs()
     
-    leftCodec = Codec.forName("SimpleText");
+    leftCodec = Codec.the("SimpleText");
     rightCodec = new RandomCodec(random());
 
     leftDir = newFSDirectory(createTempDir("leftDir"));

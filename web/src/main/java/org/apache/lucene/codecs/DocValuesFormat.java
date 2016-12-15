@@ -117,6 +117,10 @@ public abstract class DocValuesFormat implements NamedSPILoader.NamedSPI {
     //return Codec.forName(name, "ValuesFormat");
     return Holder.getLoader().lookup(name);
   }
+
+  public static void the(DocValuesFormat d) {
+      Holder.getLoader().register(d.getName(), d);
+  }
   
   /** returns a list of all available format names */
   public static Set<String> availableDocValuesFormats() {

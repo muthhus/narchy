@@ -17,10 +17,7 @@
 package org.apache.lucene.codecs;
 
 
-import org.apache.lucene.codecs.asserting.AssertingCodec;
-import org.apache.lucene.codecs.compressing.HighCompressionCompressingCodec;
 import org.apache.lucene.codecs.lucene70.Lucene70Codec;
-import org.apache.lucene.codecs.simpletext.SimpleTextCodec;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.util.NamedSPILoader;
 import org.jetbrains.annotations.NotNull;
@@ -32,107 +29,140 @@ import java.util.Set;
 /**
  * Encodes/decodes an inverted index segment.
  * <p>
- * Note, when extending this class, the name ({@link #getName}) is 
+ * Note, when extending this class, the name ({@link #getName}) is
  * written into the index. In order for the segment to be read, the
- * name must resolve to your implementation via {@link #forName(String)}.
- * This method uses Java's 
+ * name must resolve to your implementation via {@link #the(String)}.
+ * This method uses Java's
  * {@link ServiceLoader Service Provider Interface} (SPI) to resolve codec names.
  * <p>
  * If you implement your own codec, make sure that it has a no-arg constructor
  * so SPI can load it.
+ *
  * @see ServiceLoader
  */
 public abstract class Codec implements NamedSPILoader.NamedSPI {
 
-  /**
-   * This static holder class prevents classloading deadlock by delaying
-   * init of default codecs and available codecs until needed.
-   */
-  private static final class Holder {
-    private static final NamedSPILoader<Codec> LOADER = new NamedSPILoader<>(Codec.class);
-    
-    private Holder() {}
-    
-    static NamedSPILoader<Codec> getLoader() {
-      if (LOADER == null) {
-        throw new IllegalStateException("You tried to lookup a Codec by name before all Codecs could be initialized. "+
-          "This likely happens if you call Codec#forName from a Codec's ctor.");
-      }
-      return LOADER;
+
+    /**
+     * This static holder class prevents classloading deadlock by delaying
+     * init of default codecs and available codecs until needed.
+     */
+    private static final class Holder {
+        private static final NamedSPILoader<Codec> LOADER = new NamedSPILoader<>(Codec.class);
+
+        private Holder() {
+        }
+
+        static NamedSPILoader<Codec> getLoader() {
+            if (LOADER == null) {
+                throw new IllegalStateException("You tried to lookup a Codec by name before all Codecs could be initialized. " +
+                        "This likely happens if you call Codec#forName from a Codec's ctor.");
+            }
+            return LOADER;
+        }
+
+        // TODO: should we use this, or maybe a system property is better?
+        static Codec defaultCodec =
+                new Lucene70Codec();
+        //LOADER.lookup("Lucene70");
     }
-    
-    // TODO: should we use this, or maybe a system property is better?
-    static Codec defaultCodec =
-            new Lucene70Codec();
-            //LOADER.lookup("Lucene70");
-  }
 
-  private final String name;
+    private final String name;
 
-  /**
-   * Creates a new codec.
-   * <p>
-   * The provided name will be written into the index segment: in order to
-   * for the segment to be read this class should be registered with Java's
-   * SPI mechanism (registered in META-INF/ of your jar file, etc).
-   * @param name must be all ascii alphanumeric, and less than 128 characters in length.
-   */
-  protected Codec(String name) {
-    NamedSPILoader.checkServiceName(name);
-    this.name = name;
-  }
-  
-  /** Returns this codec's name */
-  @Override
-  public final String getName() {
-    return name;
-  }
-  
-  /** Encodes/decodes postings */
-  public abstract PostingsFormat postingsFormat();
-
-  /** Encodes/decodes docvalues */
-  public abstract DocValuesFormat docValuesFormat();
-  
-  /** Encodes/decodes stored fields */
-  public abstract StoredFieldsFormat storedFieldsFormat();
-  
-  /** Encodes/decodes term vectors */
-  public abstract TermVectorsFormat termVectorsFormat();
-  
-  /** Encodes/decodes field infos file */
-  public abstract FieldInfosFormat fieldInfosFormat();
-  
-  /** Encodes/decodes segment info file */
-  public abstract SegmentInfoFormat segmentInfoFormat();
-  
-  /** Encodes/decodes document normalization values */
-  public abstract NormsFormat normsFormat();
-
-  /** Encodes/decodes live docs */
-  public abstract LiveDocsFormat liveDocsFormat();
-  
-  /** Encodes/decodes compound files */
-  public abstract CompoundFormat compoundFormat();
-
-  /** Encodes/decodes points index */
-  public abstract PointsFormat pointsFormat();
-  
-  /** looks up a codec by name */
-  public static Codec forName(String name) {
-    //HACK
-    switch (name) {
-        case "Lucene70": return new Lucene70Codec();
-        case "SimpleText": return new SimpleTextCodec();
-        case "Asserting": return new AssertingCodec();
-        case "HighCompressionCompressing": return new HighCompressionCompressingCodec();
+    /**
+     * Creates a new codec.
+     * <p>
+     * The provided name will be written into the index segment: in order to
+     * for the segment to be read this class should be registered with Java's
+     * SPI mechanism (registered in META-INF/ of your jar file, etc).
+     *
+     * @param name must be all ascii alphanumeric, and less than 128 characters in length.
+     */
+    protected Codec(String name) {
+        NamedSPILoader.checkServiceName(name);
+        this.name = name;
     }
-    return Holder.getLoader().lookup(name);
-  }
 
-  public void register(Class<? extends Codec> c) {
-      Holder.getLoader().register(c);
-  }
+    /**
+     * Returns this codec's name
+     */
+    @Override
+    public final String getName() {
+        return name;
+    }
+
+    /**
+     * Encodes/decodes postings
+     */
+    public abstract PostingsFormat postingsFormat();
+
+    /**
+     * Encodes/decodes docvalues
+     */
+    public abstract DocValuesFormat docValuesFormat();
+
+    /**
+     * Encodes/decodes stored fields
+     */
+    public abstract StoredFieldsFormat storedFieldsFormat();
+
+    /**
+     * Encodes/decodes term vectors
+     */
+    public abstract TermVectorsFormat termVectorsFormat();
+
+    /**
+     * Encodes/decodes field infos file
+     */
+    public abstract FieldInfosFormat fieldInfosFormat();
+
+    /**
+     * Encodes/decodes segment info file
+     */
+    public abstract SegmentInfoFormat segmentInfoFormat();
+
+    /**
+     * Encodes/decodes document normalization values
+     */
+    public abstract NormsFormat normsFormat();
+
+    /**
+     * Encodes/decodes live docs
+     */
+    public abstract LiveDocsFormat liveDocsFormat();
+
+    /**
+     * Encodes/decodes compound files
+     */
+    public abstract CompoundFormat compoundFormat();
+
+    /**
+     * Encodes/decodes points index
+     */
+    public abstract PointsFormat pointsFormat();
+
+    /**
+     * looks up a codec by name
+     */
+    public static Codec the(String name) {
+        return Holder.getLoader().lookup(name);
+    }
+
+    public static void the(Class<? extends Codec>... cc) {
+
+        for (Class c : cc) {
+            try {
+                Holder.getLoader().register(c.getSimpleName().substring(0, c.getSimpleName().length() - 5), (Codec)c.newInstance());
+            } catch (Throwable e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+    }
+
+    public static void the(Codec c) {
+        Holder.getLoader().register(c.getName(), c);
+    }
 
 //  @Deprecated public static <X> X forName(String name, String type) {
 //    try {
@@ -145,51 +175,55 @@ public abstract class Codec implements NamedSPILoader.NamedSPI {
 //    }
 //  }
 
-  /** returns a list of all available codec names */
-  public static Set<String> availableCodecs() {
-    return Holder.getLoader().availableServices();
-  }
-  
-  /** 
-   * Reloads the codec list from the given {@link ClassLoader}.
-   * Changes to the codecs are visible after the method ends, all
-   * iterators ({@link #availableCodecs()},...) stay consistent. 
-   * 
-   * <p><b>NOTE:</b> Only new codecs are added, existing ones are
-   * never removed or replaced.
-   * 
-   * <p><em>This method is expensive and should only be called for discovery
-   * of new codecs on the given classpath/classloader!</em>
-   */
-  public static void reloadCodecs(ClassLoader classloader) {
-    Holder.getLoader().reload(classloader);
-  }
-    
-  /** expert: returns the default codec used for newly created
-   *  {@link IndexWriterConfig}s.
-   */
-  @NotNull
-  public static Codec getDefault() {
+    /**
+     * returns a list of all available codec names
+     */
+    public static Set<String> availableCodecs() {
+        return Holder.getLoader().availableServices();
+    }
+
+    /**
+     * Reloads the codec list from the given {@link ClassLoader}.
+     * Changes to the codecs are visible after the method ends, all
+     * iterators ({@link #availableCodecs()},...) stay consistent.
+     * <p>
+     * <p><b>NOTE:</b> Only new codecs are added, existing ones are
+     * never removed or replaced.
+     * <p>
+     * <p><em>This method is expensive and should only be called for discovery
+     * of new codecs on the given classpath/classloader!</em>
+     */
+    public static void reloadCodecs(ClassLoader classloader) {
+        Holder.getLoader().reload(classloader);
+    }
+
+    /**
+     * expert: returns the default codec used for newly created
+     * {@link IndexWriterConfig}s.
+     */
+    @NotNull
+    public static Codec getDefault() {
 //    if (Holder.defaultCodec == null) {
 //      throw new IllegalStateException("You tried to lookup the default Codec before all Codecs could be initialized. "+
 //        "This likely happens if you try to get it from a Codec's ctor.");
 //    }
-    return Holder.defaultCodec;
-  }
-  
-  /** expert: sets the default codec used for newly created
-   *  {@link IndexWriterConfig}s.
-   */
-  public static void setDefault(@NotNull Codec codec) {
-    Holder.defaultCodec = Objects.requireNonNull(codec);
-  }
+        return Holder.defaultCodec;
+    }
 
-  /**
-   * returns the codec's name. Subclasses can override to provide
-   * more detail (such as parameters).
-   */
-  @Override
-  public String toString() {
-    return name;
-  }
+    /**
+     * expert: sets the default codec used for newly created
+     * {@link IndexWriterConfig}s.
+     */
+    public static void setDefault(@NotNull Codec codec) {
+        Holder.defaultCodec = Objects.requireNonNull(codec);
+    }
+
+    /**
+     * returns the codec's name. Subclasses can override to provide
+     * more detail (such as parameters).
+     */
+    @Override
+    public String toString() {
+        return name;
+    }
 }

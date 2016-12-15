@@ -190,7 +190,7 @@ final class TestRuleSetupAndRestoreClassEnv extends AbstractBeforeAfterRule {
     } else if ("Lucene70".equals(TEST_CODEC) || ("random".equals(TEST_CODEC) && randomVal == 5 && !shouldAvoidCodec("Lucene70"))) {
       codec = new Lucene70Codec(RandomPicks.randomFrom(random, Lucene50StoredFieldsFormat.Mode.values()));
     } else if (!"random".equals(TEST_CODEC)) {
-      codec = Codec.forName(TEST_CODEC);
+      codec = Codec.the(TEST_CODEC);
     } else if ("random".equals(TEST_POSTINGSFORMAT)) {
       codec = new RandomCodec(random, avoidCodecs);
     } else {

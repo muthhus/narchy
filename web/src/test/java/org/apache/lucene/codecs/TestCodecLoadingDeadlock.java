@@ -17,6 +17,15 @@
 package org.apache.lucene.codecs;
 
 
+import com.carrotsearch.randomizedtesting.RandomizedContext;
+import com.carrotsearch.randomizedtesting.RandomizedRunner;
+import org.apache.lucene.util.LuceneTestCase;
+import org.apache.lucene.util.NamedThreadFactory;
+import org.junit.Assert;
+import org.junit.Ignore;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Locale;
@@ -28,18 +37,10 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.IntStream;
 
-import org.apache.lucene.util.LuceneTestCase;
-import org.apache.lucene.util.NamedThreadFactory;
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-
-import com.carrotsearch.randomizedtesting.RandomizedContext;
-import com.carrotsearch.randomizedtesting.RandomizedRunner;
-
 /* WARNING: This test does *not* extend LuceneTestCase to prevent static class
  * initialization when spawned as subprocess (and please let default codecs alive)! */
 
+@Ignore
 @RunWith(RandomizedRunner.class)
 public class TestCodecLoadingDeadlock extends Assert {
   
@@ -47,7 +48,8 @@ public class TestCodecLoadingDeadlock extends Assert {
   public void testDeadlock() throws Exception {
     LuceneTestCase.assumeFalse("This test fails on UNIX with Turkish default locale (https://issues.apache.org/jira/browse/LUCENE-6036)",
       new Locale("tr").getLanguage().equals(Locale.getDefault().getLanguage()));
-    
+
+
     // pick random codec names for stress test in separate process:
     final Random rnd = RandomizedContext.current().getRandom();
     Set<String> avail;
@@ -92,7 +94,7 @@ public class TestCodecLoadingDeadlock extends Assert {
             Codec.getDefault();
             break;
           case 1:
-            Codec.forName(codecName);
+            Codec.the(codecName);
             break;
           case 2:
             PostingsFormat.forName(pfName);

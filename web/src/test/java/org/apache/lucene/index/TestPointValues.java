@@ -33,7 +33,6 @@ import org.apache.lucene.document.StringField;
 import org.apache.lucene.document.Field.Store;
 import org.apache.lucene.index.PointValues.IntersectVisitor;
 import org.apache.lucene.index.PointValues.Relation;
-import org.apache.lucene.index.PointValues;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.store.RAMDirectory;
@@ -397,7 +396,7 @@ public class TestPointValues extends LuceneTestCase {
   public void testDifferentCodecs1() throws Exception {
     Directory dir = newDirectory();
     IndexWriterConfig iwc = new IndexWriterConfig(new MockAnalyzer(random()));
-    iwc.setCodec(Codec.forName("Lucene70"));
+    iwc.setCodec(Codec.the("Lucene70"));
     IndexWriter w = new IndexWriter(dir, iwc);
     Document doc = new Document();
     doc.add(new IntPoint("int", 1));
@@ -405,7 +404,7 @@ public class TestPointValues extends LuceneTestCase {
     w.close();
     
     iwc = new IndexWriterConfig(new MockAnalyzer(random()));
-    iwc.setCodec(Codec.forName("SimpleText"));
+    iwc.setCodec(Codec.the("SimpleText"));
     w = new IndexWriter(dir, iwc);
     doc = new Document();
     doc.add(new IntPoint("int", 1));
@@ -420,7 +419,7 @@ public class TestPointValues extends LuceneTestCase {
   public void testDifferentCodecs2() throws Exception {
     Directory dir = newDirectory();
     IndexWriterConfig iwc = new IndexWriterConfig(new MockAnalyzer(random()));
-    iwc.setCodec(Codec.forName("SimpleText"));
+    iwc.setCodec(Codec.the("SimpleText"));
     IndexWriter w = new IndexWriter(dir, iwc);
     Document doc = new Document();
     doc.add(new IntPoint("int", 1));
@@ -428,7 +427,7 @@ public class TestPointValues extends LuceneTestCase {
     w.close();
     
     iwc = new IndexWriterConfig(new MockAnalyzer(random()));
-    iwc.setCodec(Codec.forName("Lucene70"));
+    iwc.setCodec(Codec.the("Lucene70"));
     w = new IndexWriter(dir, iwc);
     doc = new Document();
     doc.add(new IntPoint("int", 1));

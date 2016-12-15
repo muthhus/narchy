@@ -17,21 +17,18 @@
 package org.apache.lucene.codecs.blocktree;
 
 
-import java.io.IOException;
-import java.io.PrintStream;
-
 import org.apache.lucene.codecs.BlockTermState;
 import org.apache.lucene.index.PostingsEnum;
 import org.apache.lucene.index.TermState;
 import org.apache.lucene.index.TermsEnum;
 import org.apache.lucene.store.ByteArrayDataInput;
 import org.apache.lucene.store.IndexInput;
-import org.apache.lucene.util.ArrayUtil;
-import org.apache.lucene.util.BytesRef;
-import org.apache.lucene.util.BytesRefBuilder;
-import org.apache.lucene.util.RamUsageEstimator;
+import org.apache.lucene.util.*;
 import org.apache.lucene.util.fst.FST;
 import org.apache.lucene.util.fst.Util;
+
+import java.io.IOException;
+import java.io.PrintStream;
 
 /** Iterates through terms in this field.  This implementation skips
  *  any auto-prefix terms it encounters. */
@@ -1039,6 +1036,6 @@ final class SegmentTermsEnum extends TermsEnum {
 
   @Override
   public long ord() {
-    throw new UnsupportedOperationException();
+    throw new WeakUnsupportedOperationException();
   }
 }

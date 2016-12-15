@@ -84,14 +84,6 @@ import static org.apache.lucene.index.PostingsEnum.POSITIONS;
 
 public abstract class BasePostingsFormatTestCase extends BaseIndexFileFormatTestCase {
 
-  static {
-    try {
-      Class.forName("LuceneFixedGapPostingsFormat");
-    } catch (ClassNotFoundException e) {
-      e.printStackTrace();
-    }
-
-  }
   static RandomPostingsTester postingsTester;
 
   // TODO maybe instead of @BeforeClass just make a single test run: build postings & index & test it?

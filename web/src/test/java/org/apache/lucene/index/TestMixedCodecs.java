@@ -50,7 +50,7 @@ public class TestMixedCodecs extends LuceneTestCase {
           // Make sure we aggressively mix in SimpleText
           // since it has different impls for all codec
           // formats...
-          iwc.setCodec(Codec.forName("SimpleText"));
+          iwc.setCodec(Codec.the("SimpleText"));
         }
         if (w != null) {
           w.close();

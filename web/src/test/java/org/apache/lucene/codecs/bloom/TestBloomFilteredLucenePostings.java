@@ -36,7 +36,11 @@ import org.apache.lucene.util.TestUtil;
 public final class TestBloomFilteredLucenePostings extends PostingsFormat {
   
   private BloomFilteringPostingsFormat delegate;
-  
+
+  static {
+    PostingsFormat.the(TestBloomFilteredLucenePostings.class);
+  }
+
   // Special class used to avoid OOM exceptions where Junit tests create many
   // fields.
   static class LowMemoryBloomFactory extends BloomFilterFactory {

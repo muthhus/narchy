@@ -1314,7 +1314,6 @@ public final class CheckIndex implements Closeable {
         }
       }
 
-      final TermsEnum termsEnum = terms.iterator();
 
       boolean hasOrd = true;
       final long termCountStart = status.delTermCount + status.termCount;
@@ -1324,6 +1323,8 @@ public final class CheckIndex implements Closeable {
       long sumTotalTermFreq = 0;
       long sumDocFreq = 0;
       FixedBitSet visitedDocs = new FixedBitSet(maxDoc);
+
+      final TermsEnum termsEnum = terms.iterator();
       while(true) {
         
         final BytesRef term = termsEnum.next();
@@ -1460,10 +1461,10 @@ public final class CheckIndex implements Closeable {
               }
               if (hasOffsets) {
                 int startOffset = postings.startOffset();
-                int endOffset = postings.endOffset();
                 // NOTE: we cannot enforce any bounds whatsoever on vectors... they were a free-for-all before?
                 // but for offsets in the postings lists these checks are fine: they were always enforced by IndexWriter
                 if (!isVectors) {
+                  int endOffset = postings.endOffset();
                   if (startOffset < 0) {
                     throw new RuntimeException("term " + term + ": doc " + doc + ": pos " + pos + ": startOffset " + startOffset + " is out of bounds");
                   }

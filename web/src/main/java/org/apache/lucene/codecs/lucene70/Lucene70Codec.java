@@ -50,6 +50,11 @@ import org.apache.lucene.codecs.perfield.PerFieldPostingsFormat;
  * @lucene.experimental
  */
 public class Lucene70Codec extends Codec {
+
+  static {
+      Codec.the(Lucene70Codec.class);
+  }
+
   private final TermVectorsFormat vectorsFormat = new Lucene50TermVectorsFormat();
   private final FieldInfosFormat fieldInfosFormat = new Lucene60FieldInfosFormat();
   private final SegmentInfoFormat segmentInfosFormat = new Lucene62SegmentInfoFormat();

@@ -27,14 +27,14 @@ public class TestNamedSPILoader extends LuceneTestCase {
   
   public void testLookup() {
     String currentName = TestUtil.getDefaultCodec().getName();
-    Codec codec = Codec.forName(currentName);
+    Codec codec = Codec.the(currentName);
     assertEquals(currentName, codec.getName());
   }
   
   // we want an exception if it's not found.
   public void testBogusLookup() {
     expectThrows(IllegalArgumentException.class, () -> {
-      Codec.forName("dskfdskfsdfksdfdsf");
+      Codec.the("dskfdskfsdfksdfdsf");
     });
   }
   

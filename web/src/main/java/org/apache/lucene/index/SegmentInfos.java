@@ -393,7 +393,7 @@ public final class SegmentInfos implements Cloneable, Iterable<SegmentCommitInfo
   private static Codec readCodec(DataInput input, boolean unsupportedAllowed) throws IOException {
     final String name = input.readString();
     try {
-      return Codec.forName(name);
+      return Codec.the(name);
     } catch (IllegalArgumentException e) {
       // give better error messages if we can, first check if this is a legacy codec
       if (unsupportedCodecs.contains(name)) {

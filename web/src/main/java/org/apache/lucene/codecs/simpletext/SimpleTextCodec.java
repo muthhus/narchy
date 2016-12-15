@@ -36,6 +36,11 @@ import org.apache.lucene.codecs.TermVectorsFormat;
  * @lucene.experimental
  */
 public final class SimpleTextCodec extends Codec {
+
+  static {
+    Codec.the(SimpleTextCodec.class);
+  }
+
   private final PostingsFormat postings = new SimpleTextPostingsFormat();
   private final StoredFieldsFormat storedFields = new SimpleTextStoredFieldsFormat();
   private final SegmentInfoFormat segmentInfos = new SimpleTextSegmentInfoFormat();

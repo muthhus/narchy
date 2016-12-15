@@ -26,6 +26,10 @@ import org.apache.lucene.util.TestUtil0;
  */
 public class AssertingCodec extends FilterCodec {
 
+  static {
+    Codec.the(AssertingCodec.class);
+  }
+
   private final PostingsFormat postings = new PerFieldPostingsFormat() {
     @Override
     public PostingsFormat getPostingsFormatForField(String field) {

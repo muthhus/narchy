@@ -554,7 +554,13 @@ public class MockDirectoryWrapper extends BaseDirectoryWrapper {
 
   void maybeThrowIOException(String message) throws IOException {
     if (randomState.nextDouble() < randomIOExceptionRate) {
-      IOException ioe = new IOException("a random IOException" + (message == null ? "" : " (" + message + ")"));
+      IOException ioe = new IOException("a random IOException" + (message == null ? "" : " (" + message + ")")) {
+        @Override
+        public synchronized Throwable fillInStackTrace() {
+          //return super.fillInStackTrace();
+          return this;
+        }
+      };
       if (LuceneTestCase.VERBOSE) {
         System.out.println(Thread.currentThread().getName() + ": MockDirectoryWrapper: now throw random exception" + (message == null ? "" : " (" + message + ")"));
         ioe.printStackTrace(System.out);
