@@ -147,7 +147,7 @@ public class TestIndexingSequenceNumbers extends LuceneTestCase {
 
   @Slow
   public void testStressConcurrentCommit() throws Exception {
-    final int opCount = atLeast(10000);
+    final int opCount = TestUtil.nextInt(random(), 10000, 15000);
     final int idCount = TestUtil.nextInt(random(), 10, 1000);
 
     Directory dir = newDirectory();

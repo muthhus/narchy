@@ -76,7 +76,7 @@ public final class OrdsSegmentTermsEnum extends TermsEnum {
 
     //if (DEBUG) System.out.println("BTTR.init seg=" + segment);
     stack = new OrdsSegmentTermsEnumFrame[0];
-        
+
     // Used to hold seek by TermState, or cached seek
     staticFrame = new OrdsSegmentTermsEnumFrame(this, -1);
 
@@ -91,7 +91,7 @@ public final class OrdsSegmentTermsEnum extends TermsEnum {
     for(int arcIdx=0;arcIdx<arcs.length;arcIdx++) {
       arcs[arcIdx] = new FST.Arc<>();
     }
-    
+
     currentFrame = staticFrame;
     final FST.Arc<Output> arc;
     if (fr.index != null) {
@@ -112,7 +112,7 @@ public final class OrdsSegmentTermsEnum extends TermsEnum {
     //System.out.println();
     // computeBlockStats().print(System.out);
   }
-      
+
   // Not private to avoid synthetic access$NNN methods
   void initIndexInput() {
     if (this.in == null) {
@@ -272,7 +272,7 @@ public final class OrdsSegmentTermsEnum extends TermsEnum {
       assert arc.isFinal();
       output = arc.output;
       targetUpto = 0;
-          
+
       OrdsSegmentTermsEnumFrame lastFrame = stack[0];
       assert validIndexPrefix <= term.length();
 
@@ -407,7 +407,7 @@ public final class OrdsSegmentTermsEnum extends TermsEnum {
         // if (DEBUG) {
         //   System.out.println("    index: index exhausted label=" + ((char) targetLabel) + " " + toHex(targetLabel));
         // }
-            
+
         validIndexPrefix = currentFrame.prefix;
         //validIndexPrefix = targetUpto;
 
@@ -425,7 +425,7 @@ public final class OrdsSegmentTermsEnum extends TermsEnum {
 
         currentFrame.loadBlock();
 
-        final SeekStatus result = currentFrame.scanToTerm(target, true);            
+        final SeekStatus result = currentFrame.scanToTerm(target, true);
         if (result == SeekStatus.FOUND) {
           // if (DEBUG) {
           //   System.out.println("  return FOUND term=" + term.utf8ToString() + " " + term);
@@ -477,7 +477,7 @@ public final class OrdsSegmentTermsEnum extends TermsEnum {
 
     currentFrame.loadBlock();
 
-    final SeekStatus result = currentFrame.scanToTerm(target, true);            
+    final SeekStatus result = currentFrame.scanToTerm(target, true);
     if (result == SeekStatus.FOUND) {
       // if (DEBUG) {
       //   System.out.println("  return FOUND term=" + term.utf8ToString() + " " + term);
@@ -497,7 +497,7 @@ public final class OrdsSegmentTermsEnum extends TermsEnum {
     if (fr.index == null) {
       throw new IllegalStateException("terms index was not loaded");
     }
-   
+
     term.grow(1+target.length);
 
     assert clearEOF();
@@ -530,7 +530,7 @@ public final class OrdsSegmentTermsEnum extends TermsEnum {
       assert arc.isFinal();
       output = arc.output;
       targetUpto = 0;
-          
+
       OrdsSegmentTermsEnumFrame lastFrame = stack[0];
       assert validIndexPrefix <= term.length();
 
@@ -665,7 +665,7 @@ public final class OrdsSegmentTermsEnum extends TermsEnum {
         // if (DEBUG) {
         //   System.out.println("    index: index exhausted label=" + ((char) targetLabel) + " " + toHex(targetLabel));
         // }
-            
+
         validIndexPrefix = currentFrame.prefix;
         //validIndexPrefix = targetUpto;
 
@@ -956,7 +956,7 @@ public final class OrdsSegmentTermsEnum extends TermsEnum {
     }
     positioned = true;
   }
-      
+
   @Override
   public TermState termState() throws IOException {
     assert !eof;
@@ -1030,12 +1030,11 @@ public final class OrdsSegmentTermsEnum extends TermsEnum {
   }
 
   private final FST.Arc<Output> arc = new FST.Arc<>();
-  
+
   // TODO: this is similar to Util.getByOutput ... can we refactor/share?
   /** Specialized getByOutput that can understand the ranges (startOrd to endOrd) we use here, not just startOrd. */
   private InputOutput getByOutput(long targetOrd) throws IOException {
 
-    final IntsRefBuilder result = new IntsRefBuilder();
 
     fr.index.getFirstArc(arc);
     Output output = arc.output;
@@ -1051,6 +1050,8 @@ public final class OrdsSegmentTermsEnum extends TermsEnum {
     */
 
     // System.out.println("reverseLookup seg=" + fr.parent.segment + " output=" + targetOrd);
+
+    final IntsRefBuilder result = new IntsRefBuilder();
 
     while (true) {
       // System.out.println("  loop: output=" + output.startOrd + "-" + (Long.MAX_VALUE-output.endOrd) + " upto=" + upto + " arc=" + arc + " final?=" + arc.isFinal());
@@ -1068,7 +1069,7 @@ public final class OrdsSegmentTermsEnum extends TermsEnum {
       if (FST.targetHasArcs(arc)) {
         // System.out.println("  targetHasArcs");
         result.grow(1+upto);
-        
+
         fr.index.readFirstRealTargetArc(arc.target, arc, fstReader);
 
         if (arc.bytesPerArc != 0) {

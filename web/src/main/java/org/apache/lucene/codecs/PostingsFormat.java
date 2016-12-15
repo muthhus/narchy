@@ -133,21 +133,7 @@ public abstract class PostingsFormat implements NamedSPILoader.NamedSPI {
      * looks up a format by name
      */
     public static PostingsFormat forName(String name) {
-        //HACK
-        switch (name) {
-            case "Lucene50":
-                return new Lucene50PostingsFormat();
-            case "Asserting":
-                return new AssertingPostingsFormat();
-            case "BlockTreeOrds":
-                return new BlockTreeOrdsPostingsFormat();
-            case "Memory":
-                return new MemoryPostingsFormat();
-            case "RAMOnly":
-                return new RAMOnlyPostingsFormat();
-        }
 
-        //return Codec.forName(name, "PostingsFormat");
         return Holder.getLoader().lookup(name);
     }
 

@@ -120,7 +120,7 @@ public class TestLucene70DocValuesFormat extends BaseCompressingDocValuesFormatT
   public void testTermsEnumFixedWidth() throws Exception {
     int numIterations = atLeast(1);
     for (int i = 0; i < numIterations; i++) {
-      doTestTermsEnumRandom(TestUtil.nextInt(random(), 1025, 5121), () -> TestUtil.randomSimpleString(random(), 10, 10));
+      doTestTermsEnumRandom(TestUtil.nextInt(random(), 1025, 2000), () -> TestUtil.randomSimpleString(random(), 10, 10));
     }
   }
   
@@ -128,7 +128,7 @@ public class TestLucene70DocValuesFormat extends BaseCompressingDocValuesFormatT
   public void testTermsEnumVariableWidth() throws Exception {
     int numIterations = atLeast(1);
     for (int i = 0; i < numIterations; i++) {
-      doTestTermsEnumRandom(TestUtil.nextInt(random(), 1025, 5121), () -> TestUtil.randomSimpleString(random(), 1, 500));
+      doTestTermsEnumRandom(TestUtil.nextInt(random(), 1025, 2000), () -> TestUtil.randomSimpleString(random(), 1, 500));
     }
   }
   
@@ -136,14 +136,14 @@ public class TestLucene70DocValuesFormat extends BaseCompressingDocValuesFormatT
   public void testTermsEnumRandomMany() throws Exception {
     int numIterations = atLeast(1);
     for (int i = 0; i < numIterations; i++) {
-      doTestTermsEnumRandom(TestUtil.nextInt(random(), 1025, 8121), () -> TestUtil.randomSimpleString(random(), 1, 500));
+      doTestTermsEnumRandom(TestUtil.nextInt(random(), 1025, 2000), () -> TestUtil.randomSimpleString(random(), 1, 500));
     }
   }
 
   public void testTermsEnumLongSharedPrefixes() throws Exception {
     int numIterations = atLeast(1);
     for (int i = 0; i < numIterations; i++) {
-      doTestTermsEnumRandom(TestUtil.nextInt(random(), 1025, 5121), () -> {
+      doTestTermsEnumRandom(TestUtil.nextInt(random(), 1025, 2000), () -> {
         char[] chars = new char[random().nextInt(500)];
         Arrays.fill(chars, 'a');
         if (chars.length > 0) {

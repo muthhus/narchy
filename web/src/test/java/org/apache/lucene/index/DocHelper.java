@@ -274,7 +274,7 @@ class DocHelper {
   }
 
   public static int numFields(Document doc) {
-    return doc.getFields().size();
+    return doc.size();
   }
 
   public static Document createDocument(int n, String indexName, int numFields) {

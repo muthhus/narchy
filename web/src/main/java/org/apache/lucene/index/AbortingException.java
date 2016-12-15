@@ -23,7 +23,6 @@ package org.apache.lucene.index;
 class AbortingException extends Exception {
   private AbortingException(Throwable cause) {
     super(cause);
-    assert cause instanceof AbortingException == false;
   }
 
   public static AbortingException wrap(Throwable t) {
@@ -32,5 +31,10 @@ class AbortingException extends Exception {
     } else {
       return new AbortingException(t);
     }
+  }
+
+  @Override
+  public synchronized Throwable fillInStackTrace() {
+    return this; //super.fillInStackTrace();
   }
 }

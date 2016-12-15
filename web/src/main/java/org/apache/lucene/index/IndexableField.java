@@ -34,6 +34,8 @@ import org.apache.lucene.util.BytesRef;
 
 public interface IndexableField {
 
+  IndexableField[] empty = new IndexableField[0];
+
   /** Field name */
   public String name();
 

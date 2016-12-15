@@ -152,7 +152,7 @@ public abstract class Codec implements NamedSPILoader.NamedSPI {
 
         for (Class c : cc) {
             try {
-                Holder.getLoader().register(c.getSimpleName().substring(0, c.getSimpleName().length() - 5), (Codec)c.newInstance());
+                the((Codec)c.newInstance());
             } catch (Throwable e) {
                 throw new RuntimeException(e);
             }

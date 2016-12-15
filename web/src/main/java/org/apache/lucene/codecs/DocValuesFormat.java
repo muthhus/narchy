@@ -108,17 +108,11 @@ public abstract class DocValuesFormat implements NamedSPILoader.NamedSPI {
   
   /** looks up a format by name */
   public static DocValuesFormat forName(String name) {
-    //HACK
-    switch (name) {
-      case "Lucene70": return new Lucene70DocValuesFormat();
-      case "Asserting": return new AssertingDocValuesFormat();
-    }
-
-    //return Codec.forName(name, "ValuesFormat");
     return Holder.getLoader().lookup(name);
   }
 
-  public static void the(DocValuesFormat d) {
+  public static void the(DocValuesFormat... dd) {
+    for (DocValuesFormat d : dd)
       Holder.getLoader().register(d.getName(), d);
   }
   

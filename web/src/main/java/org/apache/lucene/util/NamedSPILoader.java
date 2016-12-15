@@ -17,11 +17,9 @@
 package org.apache.lucene.util;
 
 
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
-import java.util.LinkedHashMap;
 import java.util.Set;
 import java.util.ServiceConfigurationError;
 import java.util.concurrent.ConcurrentHashMap;
@@ -91,14 +89,14 @@ public final class NamedSPILoader<S extends NamedSPILoader.NamedSPI> implements 
 
     public void register(Class<? extends S> c) {
         try {
-            register(c, c.newInstance());
+            register(c.newInstance());
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }
     }
 
-    public void register(Class c, S s) {
-        register(c.getSimpleName(), s);
+    public void register(S s) {
+        register(s.getName(), s);
     }
     public void register(String name, S s) {
         services.put(name, s);

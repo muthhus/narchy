@@ -2029,7 +2029,7 @@ public final class CheckIndex implements Closeable {
         Document doc = visitor.getDocument();
         if (liveDocs == null || liveDocs.get(j)) {
           status.docCount++;
-          status.totFields += doc.getFields().size();
+          status.totFields += doc.size();
         }
       }      
 

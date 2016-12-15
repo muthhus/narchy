@@ -506,13 +506,13 @@ public abstract class BasePointsFormatTestCase extends BaseIndexFileFormatTestCa
   }
 
   public void testRandomBinaryMedium() throws Exception {
-    doTestRandomBinary(10000);
+    doTestRandomBinary(2000);
   }
 
   @Nightly
   public void testRandomBinaryBig() throws Exception {
     assumeFalse("too slow with SimpleText", Codec.getDefault().getName().equals("SimpleText"));
-    doTestRandomBinary(200000);
+    doTestRandomBinary(100000);
   }
 
   private void doTestRandomBinary(int count) throws Exception {

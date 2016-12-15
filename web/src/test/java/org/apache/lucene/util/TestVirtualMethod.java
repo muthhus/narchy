@@ -23,6 +23,10 @@ public class TestVirtualMethod extends LuceneTestCase {
   private static final VirtualMethod<TestVirtualMethod> protectedTestMethod =
     new VirtualMethod<>(TestVirtualMethod.class, "protectedTest", int.class);
 
+  public TestVirtualMethod() {
+
+  }
+
   public void publicTest(String test) {}
   protected void protectedTest(int test) {}
   

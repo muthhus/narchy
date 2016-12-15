@@ -33,11 +33,15 @@ import org.apache.lucene.codecs.Codec;
 import org.apache.lucene.codecs.DocValuesFormat;
 import org.apache.lucene.codecs.PostingsFormat;
 import org.apache.lucene.codecs.asserting.AssertingCodec;
+import org.apache.lucene.codecs.asserting.AssertingDocValuesFormat;
+import org.apache.lucene.codecs.asserting.AssertingPostingsFormat;
+import org.apache.lucene.codecs.blocktreeords.BlockTreeOrdsPostingsFormat;
 import org.apache.lucene.codecs.bloom.BloomFilteringPostingsFormat;
+import org.apache.lucene.codecs.cheapbastard.CheapBastardCodec;
 import org.apache.lucene.codecs.compressing.HighCompressionCompressingCodec;
-import org.apache.lucene.codecs.memory.DirectPostingsFormat;
-import org.apache.lucene.codecs.memory.FSTPostingsFormat;
-import org.apache.lucene.codecs.memory.MemoryDocValuesFormat;
+import org.apache.lucene.codecs.lucene50.Lucene50PostingsFormat;
+import org.apache.lucene.codecs.lucene70.Lucene70DocValuesFormat;
+import org.apache.lucene.codecs.memory.*;
 import org.apache.lucene.codecs.mockrandom.MockRandomPostingsFormat;
 import org.apache.lucene.document.*;
 import org.apache.lucene.document.Field.Store;
@@ -168,12 +172,27 @@ public abstract class LuceneTestCase extends Assert {
      */
     public static final String SYSPROP_FAILFAST = "tests.failfast";
 
+    /*@Before public void initServices()*/
     static {
         //HACK register SPI manually
-        Codec.the(AssertingCodec.class, HighCompressionCompressingCodec.class);
-        DocValuesFormat.the(new MemoryDocValuesFormat());
+        Codec.the(AssertingCodec.class, HighCompressionCompressingCodec.class, CheapBastardCodec.class);
+        DocValuesFormat.the(
+                new MemoryDocValuesFormat(),
+                new AssertingDocValuesFormat(),
+                new Lucene70DocValuesFormat(),
+                new DirectDocValuesFormat()
+        );
         PostingsFormat.the(
-                DirectPostingsFormat.class, BloomFilteringPostingsFormat.class, FSTPostingsFormat.class
+                DirectPostingsFormat.class,
+                BloomFilteringPostingsFormat.class,
+                FSTPostingsFormat.class,
+                FSTOrdPostingsFormat.class,
+                Lucene50PostingsFormat.class,
+                AssertingPostingsFormat.class,
+                BlockTreeOrdsPostingsFormat.class,
+                MemoryPostingsFormat.class,
+                RAMOnlyPostingsFormat.class,
+                MockRandomPostingsFormat.class
                 );
 
 

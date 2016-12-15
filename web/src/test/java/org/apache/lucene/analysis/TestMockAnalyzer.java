@@ -16,32 +16,25 @@
  */
 package org.apache.lucene.analysis;
 
+import org.apache.lucene.codecs.Codec;
+import org.apache.lucene.codecs.cheapbastard.CheapBastardCodec;
+import org.apache.lucene.document.Document;
+import org.apache.lucene.document.Field;
+import org.apache.lucene.document.FieldType;
+import org.apache.lucene.index.*;
+import org.apache.lucene.util.BytesRef;
+import org.apache.lucene.util.TestUtil;
+import org.apache.lucene.util.automaton.*;
+
 import java.io.Reader;
 import java.io.StringReader;
 import java.util.Arrays;
 import java.util.Random;
 
-import org.apache.lucene.document.Document;
-import org.apache.lucene.document.Field;
-import org.apache.lucene.document.FieldType;
-import org.apache.lucene.index.PostingsEnum;
-import org.apache.lucene.index.Fields;
-import org.apache.lucene.index.IndexOptions;
-import org.apache.lucene.index.LeafReader;
-import org.apache.lucene.index.RandomIndexWriter;
-import org.apache.lucene.index.Terms;
-import org.apache.lucene.index.TermsEnum;
-import org.apache.lucene.util.BytesRef;
-import org.apache.lucene.util.TestUtil;
-import org.apache.lucene.util.automaton.Automata;
-import org.apache.lucene.util.automaton.AutomatonTestUtil;
-import org.apache.lucene.util.automaton.CharacterRunAutomaton;
-import org.apache.lucene.util.automaton.Operations;
-import org.apache.lucene.util.automaton.RegExp;
-
 import static org.apache.lucene.util.automaton.Operations.DEFAULT_MAX_DETERMINIZED_STATES;
 
 public class TestMockAnalyzer extends BaseTokenStreamTestCase {
+
 
   /** Test a configuration that behaves a lot like WhitespaceAnalyzer */
   public void testWhitespace() throws Exception {

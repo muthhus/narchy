@@ -1041,10 +1041,10 @@ public class TestDirectoryReader extends LuceneTestCase {
     DirectoryReader r = writer.getReader();
     writer.close();
     Set<String> fieldsToLoad = new HashSet<>();
-    assertEquals(0, r.document(0, fieldsToLoad).getFields().size());
+    assertEquals(0, r.document(0, fieldsToLoad).size());
     fieldsToLoad.add("field1");
     Document doc2 = r.document(0, fieldsToLoad);
-    assertEquals(1, doc2.getFields().size());
+    assertEquals(1, doc2.size());
     assertEquals("foobar", doc2.get("field1"));
     r.close();
     dir.close();
