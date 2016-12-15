@@ -17,12 +17,6 @@
 package org.apache.lucene.codecs.memory;
 
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.NoSuchElementException;
-
 import org.apache.lucene.codecs.CodecUtil;
 import org.apache.lucene.codecs.DocValuesConsumer;
 import org.apache.lucene.codecs.DocValuesProducer;
@@ -32,34 +26,24 @@ import org.apache.lucene.index.IndexFileNames;
 import org.apache.lucene.index.SegmentWriteState;
 import org.apache.lucene.store.ByteArrayDataOutput;
 import org.apache.lucene.store.IndexOutput;
-import org.apache.lucene.util.ArrayUtil;
-import org.apache.lucene.util.BytesRef;
-import org.apache.lucene.util.IOUtils;
-import org.apache.lucene.util.IntsRefBuilder;
-import org.apache.lucene.util.MathUtil;
+import org.apache.lucene.util.*;
 import org.apache.lucene.util.fst.Builder;
-import org.apache.lucene.util.fst.FST.INPUT_TYPE;
 import org.apache.lucene.util.fst.FST;
+import org.apache.lucene.util.fst.FST.INPUT_TYPE;
 import org.apache.lucene.util.fst.PositiveIntOutputs;
 import org.apache.lucene.util.fst.Util;
 import org.apache.lucene.util.packed.BlockPackedWriter;
 import org.apache.lucene.util.packed.MonotonicBlockPackedWriter;
-import org.apache.lucene.util.packed.PackedInts.FormatAndBits;
 import org.apache.lucene.util.packed.PackedInts;
+import org.apache.lucene.util.packed.PackedInts.FormatAndBits;
 
-import static org.apache.lucene.codecs.memory.MemoryDocValuesProducer.BLOCK_COMPRESSED;
-import static org.apache.lucene.codecs.memory.MemoryDocValuesProducer.BLOCK_SIZE;
-import static org.apache.lucene.codecs.memory.MemoryDocValuesProducer.BYTES;
-import static org.apache.lucene.codecs.memory.MemoryDocValuesProducer.DELTA_COMPRESSED;
-import static org.apache.lucene.codecs.memory.MemoryDocValuesProducer.FST;
-import static org.apache.lucene.codecs.memory.MemoryDocValuesProducer.GCD_COMPRESSED;
-import static org.apache.lucene.codecs.memory.MemoryDocValuesProducer.NUMBER;
-import static org.apache.lucene.codecs.memory.MemoryDocValuesProducer.SORTED_NUMERIC;
-import static org.apache.lucene.codecs.memory.MemoryDocValuesProducer.SORTED_NUMERIC_SINGLETON;
-import static org.apache.lucene.codecs.memory.MemoryDocValuesProducer.SORTED_SET;
-import static org.apache.lucene.codecs.memory.MemoryDocValuesProducer.SORTED_SET_SINGLETON;
-import static org.apache.lucene.codecs.memory.MemoryDocValuesProducer.TABLE_COMPRESSED;
-import static org.apache.lucene.codecs.memory.MemoryDocValuesProducer.VERSION_CURRENT;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
+
+import static org.apache.lucene.codecs.memory.MemoryDocValuesProducer.*;
 
 /**
  * Writer for {@link MemoryDocValuesFormat}

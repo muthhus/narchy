@@ -16,13 +16,13 @@
  */
 package org.apache.lucene.codecs.cranky;
 
-import java.io.IOException;
-import java.util.Random;
-
 import org.apache.lucene.codecs.SegmentInfoFormat;
 import org.apache.lucene.index.SegmentInfo;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.IOContext;
+
+import java.io.IOException;
+import java.util.Random;
 
 class CrankySegmentInfoFormat extends SegmentInfoFormat {
   final SegmentInfoFormat delegate;

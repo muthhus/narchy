@@ -17,15 +17,10 @@
 package org.apache.lucene.search;
 
 
-import java.io.IOException;
-
-import org.apache.lucene.index.DocValues;
-import org.apache.lucene.index.IndexReader;
-import org.apache.lucene.index.LeafReaderContext;
-import org.apache.lucene.index.SortedSetDocValues;
-import org.apache.lucene.index.Terms;
-import org.apache.lucene.index.TermsEnum;
+import org.apache.lucene.index.*;
 import org.apache.lucene.util.LongBitSet;
+
+import java.io.IOException;
 
 /**
  * Rewrites MultiTermQueries into a filter, using DocValues for term enumeration.

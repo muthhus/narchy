@@ -17,15 +17,6 @@
 package org.apache.lucene.codecs.compressing;
 
 
-import static org.apache.lucene.util.BitUtil.zigZagDecode;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-
 import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.index.SegmentInfo;
 import org.apache.lucene.store.IndexInput;
@@ -34,6 +25,11 @@ import org.apache.lucene.util.Accountables;
 import org.apache.lucene.util.ArrayUtil;
 import org.apache.lucene.util.RamUsageEstimator;
 import org.apache.lucene.util.packed.PackedInts;
+
+import java.io.IOException;
+import java.util.*;
+
+import static org.apache.lucene.util.BitUtil.zigZagDecode;
 
 /**
  * Random-access reader for {@link CompressingStoredFieldsIndexWriter}.

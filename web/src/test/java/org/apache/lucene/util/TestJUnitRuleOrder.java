@@ -16,20 +16,14 @@
  */
 package org.apache.lucene.util;
 
-import java.util.Arrays;
-import java.util.Stack;
-
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.*;
 import org.junit.rules.TestRule;
 import org.junit.runner.Description;
 import org.junit.runner.JUnitCore;
 import org.junit.runners.model.Statement;
+
+import java.util.Arrays;
+import java.util.Stack;
 
 /**
  * This verifies that JUnit {@link Rule}s are invoked before 

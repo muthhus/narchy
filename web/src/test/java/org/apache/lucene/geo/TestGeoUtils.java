@@ -16,10 +16,10 @@
  */
 package org.apache.lucene.geo;
 
-import java.util.Locale;
-
 import org.apache.lucene.util.LuceneTestCase;
 import org.apache.lucene.util.SloppyMath;
+
+import java.util.Locale;
 
 /**
  * Tests class for methods in GeoUtils

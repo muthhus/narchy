@@ -17,14 +17,11 @@
 package org.apache.lucene.util;
 
 
-import static org.apache.lucene.util.SloppyMath.cos;
-import static org.apache.lucene.util.SloppyMath.asin;
-import static org.apache.lucene.util.SloppyMath.haversinMeters;
-import static org.apache.lucene.util.SloppyMath.haversinSortKey;
+import org.apache.lucene.geo.GeoTestUtil;
 
 import java.util.Random;
 
-import org.apache.lucene.geo.GeoTestUtil;
+import static org.apache.lucene.util.SloppyMath.*;
 
 
 public class TestSloppyMath extends LuceneTestCase {

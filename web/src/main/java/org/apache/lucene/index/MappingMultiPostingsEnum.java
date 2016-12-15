@@ -17,11 +17,11 @@
 package org.apache.lucene.index;
 
 
+import org.apache.lucene.util.BytesRef;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.apache.lucene.util.BytesRef;
 
 /**
  * Exposes flex API, merged from flex API of sub-segments,

@@ -16,12 +16,12 @@
  */
 package org.apache.lucene.analysis;
 
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.apache.lucene.analysis.tokenattributes.PayloadAttribute;
 import org.apache.lucene.util.BytesRef;
+
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
 /** Simple payload filter that sets the payload as pos: XXXX */
 public final class SimplePayloadFilter extends TokenFilter {

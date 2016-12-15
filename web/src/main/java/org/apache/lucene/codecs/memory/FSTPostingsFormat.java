@@ -17,19 +17,14 @@
 package org.apache.lucene.codecs.memory;
 
 
-
-import java.io.IOException;
-
-import org.apache.lucene.codecs.FieldsConsumer;
-import org.apache.lucene.codecs.FieldsProducer;
-import org.apache.lucene.codecs.PostingsFormat;
-import org.apache.lucene.codecs.PostingsReaderBase;
-import org.apache.lucene.codecs.PostingsWriterBase;
+import org.apache.lucene.codecs.*;
 import org.apache.lucene.codecs.lucene50.Lucene50PostingsReader;
 import org.apache.lucene.codecs.lucene50.Lucene50PostingsWriter;
 import org.apache.lucene.index.SegmentReadState;
 import org.apache.lucene.index.SegmentWriteState;
 import org.apache.lucene.util.IOUtils;
+
+import java.io.IOException;
 
 /**
  * FST term dict + Lucene50PBF

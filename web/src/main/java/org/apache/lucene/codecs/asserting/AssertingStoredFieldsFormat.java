@@ -16,21 +16,17 @@
  */
 package org.apache.lucene.codecs.asserting;
 
-import java.io.IOException;
-import java.util.Collection;
-
 import org.apache.lucene.codecs.StoredFieldsFormat;
 import org.apache.lucene.codecs.StoredFieldsReader;
 import org.apache.lucene.codecs.StoredFieldsWriter;
-import org.apache.lucene.index.FieldInfo;
-import org.apache.lucene.index.FieldInfos;
-import org.apache.lucene.index.IndexableField;
-import org.apache.lucene.index.SegmentInfo;
-import org.apache.lucene.index.StoredFieldVisitor;
+import org.apache.lucene.index.*;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.IOContext;
 import org.apache.lucene.util.Accountable;
 import org.apache.lucene.util.TestUtil0;
+
+import java.io.IOException;
+import java.util.Collection;
 
 /**
  * Just like the default stored fields format but with additional asserts.

@@ -16,10 +16,10 @@
  */
 package org.apache.lucene.search;
 
+import org.apache.lucene.index.IndexReader;
+
 import java.io.IOException;
 import java.util.Random;
-
-import org.apache.lucene.index.IndexReader;
 
 /** Assertion-enabled query. */
 public final class AssertingQuery extends Query {

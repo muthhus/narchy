@@ -17,11 +17,11 @@
 package org.apache.lucene.codecs.lucene50;
 
 
-import java.io.IOException;
-import java.util.Arrays;
-
 import org.apache.lucene.codecs.MultiLevelSkipListReader;
 import org.apache.lucene.store.IndexInput;
+
+import java.io.IOException;
+import java.util.Arrays;
 
 import static org.apache.lucene.codecs.lucene50.Lucene50PostingsFormat.BLOCK_SIZE;
 
@@ -53,8 +53,8 @@ import static org.apache.lucene.codecs.lucene50.Lucene50PostingsFormat.BLOCK_SIZ
  *
  */
 final class Lucene50SkipReader extends MultiLevelSkipListReader {
-  private long docPointer[];
-  private long posPointer[];
+  private final long[] docPointer;
+  private final long[] posPointer;
   private long payPointer[];
   private int posBufferUpto[];
   private int payloadByteUpto[];

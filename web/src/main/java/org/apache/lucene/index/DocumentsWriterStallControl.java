@@ -16,11 +16,11 @@
  */
 package org.apache.lucene.index;
 
-import java.util.IdentityHashMap;
-import java.util.Map;
-
 import org.apache.lucene.index.DocumentsWriterPerThreadPool.ThreadState;
 import org.apache.lucene.util.ThreadInterruptedException;
+
+import java.util.IdentityHashMap;
+import java.util.Map;
 
 /**
  * Controls the health status of a {@link DocumentsWriter} sessions. This class

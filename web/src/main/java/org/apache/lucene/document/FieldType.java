@@ -17,7 +17,7 @@
 package org.apache.lucene.document;
 
 
-import org.apache.lucene.analysis.Analyzer; // javadocs
+import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.index.DocValuesType;
 import org.apache.lucene.index.IndexOptions;
 import org.apache.lucene.index.IndexableFieldType;

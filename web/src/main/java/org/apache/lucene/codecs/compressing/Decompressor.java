@@ -17,10 +17,10 @@
 package org.apache.lucene.codecs.compressing;
 
 
-import java.io.IOException;
-
 import org.apache.lucene.store.DataInput;
 import org.apache.lucene.util.BytesRef;
+
+import java.io.IOException;
 
 /**
  * A decompressor.

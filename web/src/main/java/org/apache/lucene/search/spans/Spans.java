@@ -17,12 +17,12 @@
 package org.apache.lucene.search.spans;
 
 
-import java.io.IOException;
-
 import org.apache.lucene.search.DocIdSetIterator;
 import org.apache.lucene.search.Scorer;
 import org.apache.lucene.search.TwoPhaseIterator;
 import org.apache.lucene.search.similarities.Similarity.SimScorer;
+
+import java.io.IOException;
 
 /** Iterates through combinations of start/end positions per-doc.
  *  Each start/end position represents a range of term positions within the current document.

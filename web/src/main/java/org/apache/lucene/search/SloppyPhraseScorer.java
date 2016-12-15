@@ -17,17 +17,12 @@
 package org.apache.lucene.search;
 
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.similarities.Similarity;
 import org.apache.lucene.util.FixedBitSet;
+
+import java.io.IOException;
+import java.util.*;
 
 final class SloppyPhraseScorer extends Scorer {
 

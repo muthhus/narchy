@@ -17,10 +17,6 @@
 package org.apache.lucene.codecs.blocktreeords;
 
 
-import java.io.IOException;
-import java.util.Collection;
-import java.util.Collections;
-
 import org.apache.lucene.codecs.blocktreeords.FSTOrdsOutputs.Output;
 import org.apache.lucene.index.FieldInfo;
 import org.apache.lucene.index.IndexOptions;
@@ -33,6 +29,10 @@ import org.apache.lucene.util.Accountables;
 import org.apache.lucene.util.BytesRef;
 import org.apache.lucene.util.automaton.CompiledAutomaton;
 import org.apache.lucene.util.fst.FST;
+
+import java.io.IOException;
+import java.util.Collection;
+import java.util.Collections;
 
 /** BlockTree's implementation of {@link Terms}. */
 final class OrdsFieldReader extends Terms implements Accountable {

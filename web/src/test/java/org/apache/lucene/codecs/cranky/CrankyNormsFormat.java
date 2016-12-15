@@ -16,15 +16,15 @@
  */
 package org.apache.lucene.codecs.cranky;
 
-import java.io.IOException;
-import java.util.Random;
-
 import org.apache.lucene.codecs.NormsConsumer;
 import org.apache.lucene.codecs.NormsFormat;
 import org.apache.lucene.codecs.NormsProducer;
 import org.apache.lucene.index.FieldInfo;
 import org.apache.lucene.index.SegmentReadState;
 import org.apache.lucene.index.SegmentWriteState;
+
+import java.io.IOException;
+import java.util.Random;
 
 class CrankyNormsFormat extends NormsFormat {
   final NormsFormat delegate;

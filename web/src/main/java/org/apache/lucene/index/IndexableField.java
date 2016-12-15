@@ -17,13 +17,13 @@
 package org.apache.lucene.index;
 
 
-import java.io.Reader;
-
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.search.similarities.ClassicSimilarity;
 import org.apache.lucene.search.similarities.Similarity;
 import org.apache.lucene.util.BytesRef;
+
+import java.io.Reader;
 
 // TODO: how to handle versioning here...?
 

@@ -17,10 +17,10 @@
 package org.apache.lucene.util;
 
 
+import com.carrotsearch.randomizedtesting.generators.RandomPicks;
+
 import java.math.BigInteger;
 import java.util.Arrays;
-
-import com.carrotsearch.randomizedtesting.generators.RandomPicks;
 
 public class TestMathUtil extends LuceneTestCase {
 

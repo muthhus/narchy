@@ -29,10 +29,11 @@
 
 package org.apache.lucene.util.automaton;
 
-import java.util.*;
-
 import org.apache.lucene.util.BytesRef;
 import org.apache.lucene.util.StringHelper;
+
+import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  * Construction of basic automata.

@@ -17,12 +17,12 @@
 package org.apache.lucene.store;
 
 
+import org.apache.lucene.util.BitUtil;
+import org.apache.lucene.util.BytesRef;
+
 import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
-
-import org.apache.lucene.util.BitUtil;
-import org.apache.lucene.util.BytesRef;
 
 /**
  * Abstract base class for performing write operations of Lucene's low-level
@@ -32,6 +32,8 @@ import org.apache.lucene.util.BytesRef;
  * thread safe (it keeps internal state like file position).
  */
 public abstract class DataOutput {
+
+
 
   /** Writes a single byte.
    * <p>
@@ -259,15 +261,15 @@ public abstract class DataOutput {
     writeBytes(utf8Result.bytes, utf8Result.offset, utf8Result.length);
   }
 
-  private static int COPY_BUFFER_SIZE = 16384;
-  private byte[] copyBuffer;
+
+  private final static int COPY_BUFFER_BYTES = 8192;
 
   /** Copy numBytes bytes from input to ourself. */
   public void copyBytes(DataInput input, long numBytes) throws IOException {
     assert numBytes >= 0: "numBytes=" + numBytes;
     long left = numBytes;
-    if (copyBuffer == null)
-      copyBuffer = new byte[COPY_BUFFER_SIZE];
+    int COPY_BUFFER_SIZE = (int)Math.min(COPY_BUFFER_BYTES, numBytes);
+    byte[] copyBuffer = new byte[COPY_BUFFER_SIZE];
     while(left > 0) {
       final int toCopy;
       if (left > COPY_BUFFER_SIZE)

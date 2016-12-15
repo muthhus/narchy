@@ -16,10 +16,6 @@
  */
 package org.apache.lucene.index;
 
-import java.io.IOException;
-import java.util.Iterator;
-import java.util.Objects;
-
 import org.apache.lucene.index.PointValues.IntersectVisitor;
 import org.apache.lucene.index.PointValues.Relation;
 import org.apache.lucene.search.DocIdSetIterator;
@@ -28,6 +24,10 @@ import org.apache.lucene.util.BytesRef;
 import org.apache.lucene.util.StringHelper;
 import org.apache.lucene.util.VirtualMethod;
 import org.apache.lucene.util.automaton.CompiledAutomaton;
+
+import java.io.IOException;
+import java.util.Iterator;
+import java.util.Objects;
 
 /**
  * A {@link FilterLeafReader} that can be used to apply

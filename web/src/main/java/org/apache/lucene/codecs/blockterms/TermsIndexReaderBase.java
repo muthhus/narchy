@@ -17,12 +17,12 @@
 package org.apache.lucene.codecs.blockterms;
 
 
-import java.io.Closeable;
-import java.io.IOException;
-
 import org.apache.lucene.index.FieldInfo;
 import org.apache.lucene.util.Accountable;
 import org.apache.lucene.util.BytesRef;
+
+import java.io.Closeable;
+import java.io.IOException;
 
 
 // TODO

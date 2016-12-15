@@ -16,10 +16,7 @@
  */
 package org.apache.lucene.index;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
+import com.carrotsearch.randomizedtesting.generators.RandomPicks;
 import org.apache.lucene.analysis.MockAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.NumericDocValuesField;
@@ -28,7 +25,9 @@ import org.apache.lucene.store.RAMDirectory;
 import org.apache.lucene.util.TestUtil;
 import org.apache.lucene.util.packed.PackedInts;
 
-import com.carrotsearch.randomizedtesting.generators.RandomPicks;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 /** Extends {@link BaseDocValuesFormatTestCase} to add compression checks. */
 public abstract class BaseCompressingDocValuesFormatTestCase extends BaseDocValuesFormatTestCase {

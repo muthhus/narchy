@@ -17,14 +17,12 @@
 package org.apache.lucene.util;
 
 
+import org.apache.lucene.util.ByteBlockPool.*;
+
 import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicLong;
 
-import org.apache.lucene.util.ByteBlockPool.DirectAllocator;
-
-import static org.apache.lucene.util.ByteBlockPool.BYTE_BLOCK_MASK;
-import static org.apache.lucene.util.ByteBlockPool.BYTE_BLOCK_SHIFT;
-import static org.apache.lucene.util.ByteBlockPool.BYTE_BLOCK_SIZE;
+import static org.apache.lucene.util.ByteBlockPool.*;
 
 /**
  * {@link BytesRefHash} is a special purpose hash-map like data-structure
@@ -59,7 +57,7 @@ public final class BytesRefHash {
   private int lastCount = -1;
   private int[] ids;
   private final BytesStartArray bytesStartArray;
-  private Counter bytesUsed;
+  private final Counter bytesUsed;
 
   /**
    * Creates a new {@link BytesRefHash} with a {@link ByteBlockPool} using a

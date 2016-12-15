@@ -16,10 +16,10 @@
  */
 package org.apache.lucene.util;
 
-import java.util.concurrent.atomic.AtomicInteger;
-
 import org.junit.runner.notification.Failure;
 import org.junit.runner.notification.RunListener;
+
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * A {@link RunListener} that detects suite/ test failures. We need it because failures

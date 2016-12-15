@@ -17,13 +17,13 @@
 package org.apache.lucene.util.packed;
 
 
-import static org.apache.lucene.util.packed.PackedInts.checkBlockSize;
-import static org.apache.lucene.util.packed.PackedInts.numBlocks;
-
 import org.apache.lucene.util.Accountable;
 import org.apache.lucene.util.ArrayUtil;
 import org.apache.lucene.util.LongValues;
 import org.apache.lucene.util.RamUsageEstimator;
+
+import static org.apache.lucene.util.packed.PackedInts.checkBlockSize;
+import static org.apache.lucene.util.packed.PackedInts.numBlocks;
 
 /**
  * Base implementation for {@link PagedMutable} and {@link PagedGrowableWriter}.

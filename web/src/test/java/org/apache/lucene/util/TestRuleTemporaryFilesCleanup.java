@@ -16,6 +16,13 @@
  */
 package org.apache.lucene.util;
 
+import com.carrotsearch.randomizedtesting.RandomizedContext;
+import com.carrotsearch.randomizedtesting.rules.TestRuleAdapter;
+import org.apache.lucene.mockfile.*;
+import org.apache.lucene.util.LuceneTestCase.SuppressFileSystems;
+import org.apache.lucene.util.LuceneTestCase.SuppressFsync;
+import org.apache.lucene.util.LuceneTestCase.SuppressTempFileChecks;
+
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.FileSystem;
@@ -23,27 +30,7 @@ import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.spi.FileSystemProvider;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Random;
-import java.util.Set;
-
-import org.apache.lucene.mockfile.DisableFsyncFS;
-import org.apache.lucene.mockfile.ExtrasFS;
-import org.apache.lucene.mockfile.HandleLimitFS;
-import org.apache.lucene.mockfile.LeakFS;
-import org.apache.lucene.mockfile.ShuffleFS;
-import org.apache.lucene.mockfile.VerboseFS;
-import org.apache.lucene.util.LuceneTestCase.SuppressFileSystems;
-import org.apache.lucene.util.LuceneTestCase.SuppressFsync;
-import org.apache.lucene.util.LuceneTestCase.SuppressTempFileChecks;
-
-import com.carrotsearch.randomizedtesting.RandomizedContext;
-import com.carrotsearch.randomizedtesting.rules.TestRuleAdapter;
+import java.util.*;
 
 /**
  * Checks and cleans up temporary files.

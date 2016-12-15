@@ -16,8 +16,6 @@
  */
 package org.apache.lucene.codecs.bloom;
 
-import java.io.IOException;
-
 import org.apache.lucene.search.DocIdSetIterator;
 import org.apache.lucene.store.DataInput;
 import org.apache.lucene.store.DataOutput;
@@ -25,6 +23,8 @@ import org.apache.lucene.util.Accountable;
 import org.apache.lucene.util.BytesRef;
 import org.apache.lucene.util.FixedBitSet;
 import org.apache.lucene.util.RamUsageEstimator;
+
+import java.io.IOException;
 
 /**
  * <p>
@@ -70,9 +70,9 @@ public class FuzzySet implements Accountable {
   public enum ContainsResult {
     MAYBE, NO
   };
-  private HashFunction hashFunction;
-  private FixedBitSet filter;
-  private int bloomSize;
+  private final HashFunction hashFunction;
+  private final FixedBitSet filter;
+  private final int bloomSize;
   
   //The sizes of BitSet used are all numbers that, when expressed in binary form,
   //are all ones. This is to enable fast downsizing from one bitset to another

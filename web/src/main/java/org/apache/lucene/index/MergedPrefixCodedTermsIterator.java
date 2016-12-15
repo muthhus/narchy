@@ -17,11 +17,11 @@
 package org.apache.lucene.index;
 
 
-import java.util.List;
-
 import org.apache.lucene.index.PrefixCodedTerms.TermIterator;
 import org.apache.lucene.util.BytesRef;
 import org.apache.lucene.util.PriorityQueue;
+
+import java.util.List;
 
 /** Merges multiple {@link FieldTermIterator}s */
 class MergedPrefixCodedTermsIterator extends FieldTermIterator {

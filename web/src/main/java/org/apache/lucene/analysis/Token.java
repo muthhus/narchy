@@ -20,11 +20,7 @@ package org.apache.lucene.analysis;
 import org.apache.lucene.analysis.tokenattributes.FlagsAttribute;
 import org.apache.lucene.analysis.tokenattributes.PackedTokenAttributeImpl;
 import org.apache.lucene.analysis.tokenattributes.PayloadAttribute;
-import org.apache.lucene.util.Attribute;
-import org.apache.lucene.util.AttributeFactory;
-import org.apache.lucene.util.AttributeImpl;
-import org.apache.lucene.util.AttributeReflector;
-import org.apache.lucene.util.BytesRef;
+import org.apache.lucene.util.*;
 
 /** 
   A Token is an occurrence of a term from the text of a field.  It consists of

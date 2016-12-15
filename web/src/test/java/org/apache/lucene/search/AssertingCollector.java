@@ -16,10 +16,10 @@
  */
 package org.apache.lucene.search;
 
+import org.apache.lucene.index.LeafReaderContext;
+
 import java.io.IOException;
 import java.util.Random;
-
-import org.apache.lucene.index.LeafReaderContext;
 
 /**
  * A collector that asserts that it is used correctly.

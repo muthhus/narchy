@@ -16,8 +16,7 @@
  */
 package org.apache.lucene.util;
 
-import java.util.Collections;
-
+import com.carrotsearch.randomizedtesting.RandomizedTest;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
@@ -29,7 +28,8 @@ import org.junit.Test;
 import org.junit.runner.JUnitCore;
 import org.junit.runner.Result;
 import org.junit.runner.notification.Failure;
-import com.carrotsearch.randomizedtesting.RandomizedTest;
+
+import java.util.Collections;
 
 // LUCENE-4456: Test that we fail if there are unreferenced files
 public class TestFailIfUnreferencedFiles extends WithNestedTests {

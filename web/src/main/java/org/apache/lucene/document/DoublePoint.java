@@ -16,15 +16,15 @@
  */
 package org.apache.lucene.document;
 
-import java.util.Arrays;
-import java.util.Collection;
-
 import org.apache.lucene.index.PointValues;
 import org.apache.lucene.search.PointInSetQuery;
 import org.apache.lucene.search.PointRangeQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.util.BytesRef;
 import org.apache.lucene.util.NumericUtils;
+
+import java.util.Arrays;
+import java.util.Collection;
 
 /** 
  * An indexed {@code double} field for fast range filters.  If you also

@@ -17,10 +17,10 @@
 package org.apache.lucene.search;
 
 
+import org.apache.lucene.index.Terms;
+import org.apache.lucene.index.TermsEnum;
 import org.apache.lucene.util.Attribute;
-import org.apache.lucene.util.AttributeSource; // javadocs only
-import org.apache.lucene.index.TermsEnum; // javadocs only
-import org.apache.lucene.index.Terms; // javadocs only
+import org.apache.lucene.util.AttributeSource;
 
 /** Add this {@link Attribute} to a {@link TermsEnum} returned by {@link MultiTermQuery#getTermsEnum(Terms,AttributeSource)}
  * and update the boost on each returned term. This enables to control the boost factor

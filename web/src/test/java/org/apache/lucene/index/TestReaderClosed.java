@@ -17,8 +17,6 @@
 package org.apache.lucene.index;
 
 
-import java.util.concurrent.RejectedExecutionException;
-
 import org.apache.lucene.analysis.MockAnalyzer;
 import org.apache.lucene.analysis.MockTokenizer;
 import org.apache.lucene.document.Document;
@@ -29,6 +27,8 @@ import org.apache.lucene.store.AlreadyClosedException;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.util.LuceneTestCase;
 import org.apache.lucene.util.TestUtil;
+
+import java.util.concurrent.RejectedExecutionException;
 
 public class TestReaderClosed extends LuceneTestCase {
   private DirectoryReader reader;

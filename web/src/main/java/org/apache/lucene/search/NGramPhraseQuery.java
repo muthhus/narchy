@@ -17,11 +17,11 @@
 package org.apache.lucene.search;
 
 
-import java.io.IOException;
-import java.util.Objects;
-
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.Term;
+
+import java.io.IOException;
+import java.util.Objects;
 
 /**
  * This is a {@link PhraseQuery} which is optimized for n-gram phrase query.

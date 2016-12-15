@@ -20,16 +20,12 @@ package org.apache.lucene.util.automaton;
 //import java.io.IOException;
 //import java.io.PrintWriter;
 
+import org.apache.lucene.util.*;
+
 import java.util.Arrays;
 import java.util.BitSet;
 import java.util.HashSet;
 import java.util.Set;
-
-import org.apache.lucene.util.Accountable;
-import org.apache.lucene.util.ArrayUtil;
-import org.apache.lucene.util.InPlaceMergeSorter;
-import org.apache.lucene.util.RamUsageEstimator;
-import org.apache.lucene.util.Sorter;
 
 
 

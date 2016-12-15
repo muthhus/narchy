@@ -16,24 +16,8 @@
  */
 package org.apache.lucene.codecs.mockrandom;
 
-import java.io.IOException;
-import java.util.Random;
-
-import org.apache.lucene.codecs.CodecUtil;
-import org.apache.lucene.codecs.FieldsConsumer;
-import org.apache.lucene.codecs.FieldsProducer;
-import org.apache.lucene.codecs.PostingsFormat;
-import org.apache.lucene.codecs.PostingsReaderBase;
-import org.apache.lucene.codecs.PostingsWriterBase;
-import org.apache.lucene.codecs.TermStats;
-import org.apache.lucene.codecs.blockterms.BlockTermsReader;
-import org.apache.lucene.codecs.blockterms.BlockTermsWriter;
-import org.apache.lucene.codecs.blockterms.FixedGapTermsIndexReader;
-import org.apache.lucene.codecs.blockterms.FixedGapTermsIndexWriter;
-import org.apache.lucene.codecs.blockterms.TermsIndexReaderBase;
-import org.apache.lucene.codecs.blockterms.TermsIndexWriterBase;
-import org.apache.lucene.codecs.blockterms.VariableGapTermsIndexReader;
-import org.apache.lucene.codecs.blockterms.VariableGapTermsIndexWriter;
+import org.apache.lucene.codecs.*;
+import org.apache.lucene.codecs.blockterms.*;
 import org.apache.lucene.codecs.blocktree.BlockTreeTermsReader;
 import org.apache.lucene.codecs.blocktree.BlockTreeTermsWriter;
 import org.apache.lucene.codecs.blocktreeords.OrdsBlockTreeTermsReader;
@@ -53,6 +37,9 @@ import org.apache.lucene.store.IndexOutput;
 import org.apache.lucene.util.BytesRef;
 import org.apache.lucene.util.LuceneTestCase;
 import org.apache.lucene.util.TestUtil;
+
+import java.io.IOException;
+import java.util.Random;
 
 /**
  * Randomly combines terms index impl w/ postings impls.

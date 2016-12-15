@@ -17,11 +17,10 @@
 package org.apache.lucene.util.automaton;
 
 
-import java.util.*;
-
+import com.carrotsearch.randomizedtesting.generators.RandomNumbers;
 import org.apache.lucene.util.*;
 
-import com.carrotsearch.randomizedtesting.generators.RandomNumbers;
+import java.util.*;
 
 import static org.apache.lucene.util.automaton.Operations.DEFAULT_MAX_DETERMINIZED_STATES;
 

@@ -17,10 +17,10 @@
 package org.apache.lucene.util;
 
 
+import java.util.Random;
+
 import static org.apache.lucene.util.RamUsageEstimator.*;
 import static org.apache.lucene.util.RamUsageTester.sizeOf;
-
-import java.util.Random;
 
 public class TestRamUsageEstimator extends LuceneTestCase {
   public void testSanity() {

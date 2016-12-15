@@ -16,28 +16,12 @@
  */
 package org.apache.lucene.index;
 
-import java.io.IOException;
-import java.nio.file.Path;
-import java.util.Collections;
-import java.util.EnumSet;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicLong;
-
-import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.CannedTokenStream;
-import org.apache.lucene.analysis.MockAnalyzer;
-import org.apache.lucene.analysis.MockTokenizer;
-import org.apache.lucene.analysis.Token;
+import org.apache.lucene.analysis.*;
 import org.apache.lucene.codecs.FieldsConsumer;
 import org.apache.lucene.codecs.FieldsProducer;
 import org.apache.lucene.codecs.FilterCodec;
 import org.apache.lucene.codecs.PostingsFormat;
-import org.apache.lucene.document.Document;
-import org.apache.lucene.document.Field;
-import org.apache.lucene.document.FieldType;
-import org.apache.lucene.document.StringField;
-import org.apache.lucene.document.TextField;
+import org.apache.lucene.document.*;
 import org.apache.lucene.index.TermsEnum.SeekStatus;
 import org.apache.lucene.search.DocIdSetIterator;
 import org.apache.lucene.search.IndexSearcher;
@@ -51,12 +35,15 @@ import org.apache.lucene.util.TestUtil;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 
-import static org.apache.lucene.index.PostingsEnum.ALL;
-import static org.apache.lucene.index.PostingsEnum.FREQS;
-import static org.apache.lucene.index.PostingsEnum.NONE;
-import static org.apache.lucene.index.PostingsEnum.OFFSETS;
-import static org.apache.lucene.index.PostingsEnum.PAYLOADS;
-import static org.apache.lucene.index.PostingsEnum.POSITIONS;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.util.Collections;
+import java.util.EnumSet;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicLong;
+
+import static org.apache.lucene.index.PostingsEnum.*;
 
 /**
  * Abstract class to do basic tests for a postings format.

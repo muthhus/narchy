@@ -19,11 +19,11 @@ package org.apache.lucene.store;
 import java.io.EOFException;
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.nio.channels.ClosedChannelException; // javadoc @link
+import java.nio.channels.ClosedChannelException;
 import java.nio.channels.FileChannel;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
-import java.util.concurrent.Future; // javadoc
+import java.util.concurrent.Future;
 
 /**
  * An {@link FSDirectory} implementation that uses java.nio's FileChannel's

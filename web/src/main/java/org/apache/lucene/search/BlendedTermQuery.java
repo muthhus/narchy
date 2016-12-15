@@ -17,18 +17,14 @@
 package org.apache.lucene.search;
 
 
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
-
-import org.apache.lucene.index.IndexReader;
-import org.apache.lucene.index.LeafReaderContext;
-import org.apache.lucene.index.Term;
-import org.apache.lucene.index.TermContext;
-import org.apache.lucene.index.TermState;
+import org.apache.lucene.index.*;
 import org.apache.lucene.search.BooleanClause.Occur;
 import org.apache.lucene.util.ArrayUtil;
 import org.apache.lucene.util.InPlaceMergeSorter;
+
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * A {@link Query} that blends index statistics across multiple terms.

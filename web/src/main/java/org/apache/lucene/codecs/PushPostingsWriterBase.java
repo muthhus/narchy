@@ -17,14 +17,14 @@
 package org.apache.lucene.codecs;
 
 
-import java.io.IOException;
-
-import org.apache.lucene.index.PostingsEnum;
 import org.apache.lucene.index.FieldInfo;
 import org.apache.lucene.index.IndexOptions;
+import org.apache.lucene.index.PostingsEnum;
 import org.apache.lucene.index.TermsEnum;
 import org.apache.lucene.util.BytesRef;
 import org.apache.lucene.util.FixedBitSet;
+
+import java.io.IOException;
 
 /**
  * Extension of {@link PostingsWriterBase}, adding a push

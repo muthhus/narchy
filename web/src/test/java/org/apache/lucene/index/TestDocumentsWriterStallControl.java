@@ -16,15 +16,15 @@
  */
 package org.apache.lucene.index;
 
+import org.apache.lucene.util.LuceneTestCase;
+import org.apache.lucene.util.ThreadInterruptedException;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
-
-import org.apache.lucene.util.LuceneTestCase;
-import org.apache.lucene.util.ThreadInterruptedException;
 
 /**
  * Tests for {@link DocumentsWriterStallControl}

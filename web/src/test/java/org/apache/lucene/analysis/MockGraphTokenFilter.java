@@ -16,11 +16,11 @@
  */
 package org.apache.lucene.analysis;
 
-import java.io.IOException;
-import java.util.Random;
-
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.apache.lucene.util.TestUtil;
+
+import java.io.IOException;
+import java.util.Random;
 
 // TODO: sometimes remove tokens too...?
 

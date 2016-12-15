@@ -17,17 +17,17 @@
 package org.apache.lucene.util.packed;
 
 
-import static org.apache.lucene.util.packed.AbstractBlockPackedWriter.MAX_BLOCK_SIZE;
-import static org.apache.lucene.util.packed.AbstractBlockPackedWriter.MIN_BLOCK_SIZE;
-import static org.apache.lucene.util.packed.PackedInts.checkBlockSize;
-import static org.apache.lucene.util.packed.PackedInts.numBlocks;
-
-import java.io.IOException;
-
 import org.apache.lucene.store.IndexInput;
 import org.apache.lucene.util.Accountable;
 import org.apache.lucene.util.LongValues;
 import org.apache.lucene.util.RamUsageEstimator;
+
+import java.io.IOException;
+
+import static org.apache.lucene.util.packed.AbstractBlockPackedWriter.MAX_BLOCK_SIZE;
+import static org.apache.lucene.util.packed.AbstractBlockPackedWriter.MIN_BLOCK_SIZE;
+import static org.apache.lucene.util.packed.PackedInts.checkBlockSize;
+import static org.apache.lucene.util.packed.PackedInts.numBlocks;
 
 /**
  * Provides random access to a stream written with

@@ -17,10 +17,10 @@
 package org.apache.lucene.index;
 
 
+import org.apache.lucene.util.BytesRef;
+
 import java.io.IOException;
 import java.util.Arrays;
-
-import org.apache.lucene.util.BytesRef;
 
 /** 
  * This class contains utility methods and constants for DocValues

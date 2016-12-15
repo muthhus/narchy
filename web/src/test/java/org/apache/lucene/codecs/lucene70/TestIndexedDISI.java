@@ -16,10 +16,6 @@
  */
 package org.apache.lucene.codecs.lucene70;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.lucene.search.DocIdSetIterator;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.IOContext;
@@ -29,6 +25,10 @@ import org.apache.lucene.util.BitSetIterator;
 import org.apache.lucene.util.FixedBitSet;
 import org.apache.lucene.util.LuceneTestCase;
 import org.apache.lucene.util.TestUtil;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class TestIndexedDISI extends LuceneTestCase {
 

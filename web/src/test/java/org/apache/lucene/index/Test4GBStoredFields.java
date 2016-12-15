@@ -17,6 +17,8 @@
 package org.apache.lucene.index;
 
 
+import com.carrotsearch.randomizedtesting.annotations.TimeoutSuite;
+import com.carrotsearch.randomizedtesting.generators.RandomNumbers;
 import org.apache.lucene.analysis.MockAnalyzer;
 import org.apache.lucene.codecs.compressing.CompressingCodec;
 import org.apache.lucene.document.Document;
@@ -26,11 +28,8 @@ import org.apache.lucene.store.MMapDirectory;
 import org.apache.lucene.store.MockDirectoryWrapper;
 import org.apache.lucene.util.BytesRef;
 import org.apache.lucene.util.LuceneTestCase;
-import org.apache.lucene.util.TimeUnits;
 import org.apache.lucene.util.LuceneTestCase.SuppressCodecs;
-
-import com.carrotsearch.randomizedtesting.annotations.TimeoutSuite;
-import com.carrotsearch.randomizedtesting.generators.RandomNumbers;
+import org.apache.lucene.util.TimeUnits;
 
 /**
  * This test creates an index with one segment that is a little larger than 4GB.

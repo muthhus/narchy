@@ -17,10 +17,10 @@
 package org.apache.lucene.search;
 
 
+import org.apache.lucene.util.PriorityQueue;
+
 import java.util.Arrays;
 import java.util.Iterator;
-
-import org.apache.lucene.util.PriorityQueue;
 
 /**
  * A priority queue of DocIdSetIterators that orders by current doc ID.

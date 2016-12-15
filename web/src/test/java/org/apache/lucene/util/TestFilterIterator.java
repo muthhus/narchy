@@ -18,11 +18,7 @@ package org.apache.lucene.util;
 
 import org.apache.lucene.util.filter.FilterIterator;
 
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.NoSuchElementException;
+import java.util.*;
 
 public class TestFilterIterator extends LuceneTestCase {
 

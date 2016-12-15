@@ -21,9 +21,9 @@ import org.apache.lucene.util.Version;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.HashMap;
 
 /** This {@link MergePolicy} is used for upgrading all existing segments of
   * an index when calling {@link IndexWriter#forceMerge(int)}.

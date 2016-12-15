@@ -16,29 +16,12 @@
  */
 package org.apache.lucene.codecs.bloom;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-
 import org.apache.lucene.codecs.CodecUtil;
 import org.apache.lucene.codecs.FieldsConsumer;
 import org.apache.lucene.codecs.FieldsProducer;
 import org.apache.lucene.codecs.PostingsFormat;
 import org.apache.lucene.codecs.bloom.FuzzySet.ContainsResult;
-import org.apache.lucene.index.PostingsEnum;
-import org.apache.lucene.index.FieldInfo;
-import org.apache.lucene.index.Fields;
-import org.apache.lucene.index.IndexFileNames;
-import org.apache.lucene.index.SegmentReadState;
-import org.apache.lucene.index.SegmentWriteState;
-import org.apache.lucene.index.Terms;
-import org.apache.lucene.index.TermsEnum;
+import org.apache.lucene.index.*;
 import org.apache.lucene.store.ChecksumIndexInput;
 import org.apache.lucene.store.DataOutput;
 import org.apache.lucene.store.IndexOutput;
@@ -47,6 +30,10 @@ import org.apache.lucene.util.Accountables;
 import org.apache.lucene.util.BytesRef;
 import org.apache.lucene.util.IOUtils;
 import org.apache.lucene.util.automaton.CompiledAutomaton;
+
+import java.io.IOException;
+import java.util.*;
+import java.util.Map.Entry;
 
 /**
  * <p>
@@ -219,8 +206,8 @@ public final class BloomFilteringPostingsFormat extends PostingsFormat {
     }
     
     class BloomFilteredTerms extends Terms {
-      private Terms delegateTerms;
-      private FuzzySet filter;
+      private final Terms delegateTerms;
+      private final FuzzySet filter;
       
       public BloomFilteredTerms(Terms terms, FuzzySet filter) {
         this.delegateTerms = terms;
@@ -405,9 +392,9 @@ public final class BloomFilteringPostingsFormat extends PostingsFormat {
   }
   
   class BloomFilteredFieldsConsumer extends FieldsConsumer {
-    private FieldsConsumer delegateFieldsConsumer;
-    private Map<FieldInfo,FuzzySet> bloomFilters = new HashMap<>();
-    private SegmentWriteState state;
+    private final FieldsConsumer delegateFieldsConsumer;
+    private final Map<FieldInfo,FuzzySet> bloomFilters = new HashMap<>();
+    private final SegmentWriteState state;
     
     public BloomFilteredFieldsConsumer(FieldsConsumer fieldsConsumer,
         SegmentWriteState state) {

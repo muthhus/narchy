@@ -16,9 +16,6 @@
  */
 package org.apache.lucene.document;
 
-import java.util.Arrays;
-import java.util.Comparator;
-
 import org.apache.lucene.index.IndexableFieldType;
 import org.apache.lucene.index.PointValues;
 import org.apache.lucene.search.MatchNoDocsQuery;
@@ -27,6 +24,9 @@ import org.apache.lucene.search.PointRangeQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.util.BytesRef;
 import org.apache.lucene.util.StringHelper;
+
+import java.util.Arrays;
+import java.util.Comparator;
 
 /** 
  * An indexed binary field for fast range filters.  If you also

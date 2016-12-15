@@ -17,9 +17,9 @@
 package org.apache.lucene.search;
 
 
-import java.io.IOException;
-
 import org.apache.lucene.util.LuceneTestCase;
+
+import java.io.IOException;
 
 public class TestCachingCollector extends LuceneTestCase {
 

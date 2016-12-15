@@ -16,18 +16,13 @@
  */
 package org.apache.lucene.util.bkd;
 
+import com.carrotsearch.randomizedtesting.annotations.TimeoutSuite;
 import org.apache.lucene.index.CheckIndex;
-import org.apache.lucene.store.Directory;
-import org.apache.lucene.store.FSDirectory;
-import org.apache.lucene.store.IOContext;
-import org.apache.lucene.store.IndexInput;
-import org.apache.lucene.store.IndexOutput;
-import org.apache.lucene.util.LuceneTestCase.Monster;
+import org.apache.lucene.store.*;
 import org.apache.lucene.util.LuceneTestCase;
+import org.apache.lucene.util.LuceneTestCase.Monster;
 import org.apache.lucene.util.NumericUtils;
 import org.apache.lucene.util.TimeUnits;
-
-import com.carrotsearch.randomizedtesting.annotations.TimeoutSuite;
 
 // e.g. run like this: ant test -Dtestcase=Test2BBKDPoints -Dtests.nightly=true -Dtests.verbose=true -Dtests.monster=true
 // 

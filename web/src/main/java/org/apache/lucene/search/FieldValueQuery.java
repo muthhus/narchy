@@ -17,14 +17,10 @@
 package org.apache.lucene.search;
 
 
+import org.apache.lucene.index.*;
+
 import java.io.IOException;
 import java.util.Objects;
-
-import org.apache.lucene.index.DocValuesType;
-import org.apache.lucene.index.FieldInfo;
-import org.apache.lucene.index.FieldInfos;
-import org.apache.lucene.index.LeafReader;
-import org.apache.lucene.index.LeafReaderContext;
 
 /**
  * A {@link Query} that matches documents that have a value for a given field

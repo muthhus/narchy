@@ -17,8 +17,6 @@
 package org.apache.lucene.index;
 
 
-import java.io.IOException;
-
 import org.apache.lucene.analysis.MockAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
@@ -27,6 +25,8 @@ import org.apache.lucene.store.MockDirectoryWrapper;
 import org.apache.lucene.util.Constants;
 import org.apache.lucene.util.LuceneTestCase;
 import org.apache.lucene.util.LuceneTestCase.SuppressFileSystems;
+
+import java.io.IOException;
 
 /** LUCENE-5574 */
 @SuppressFileSystems("WindowsFS") // the bug doesn't happen on windows.

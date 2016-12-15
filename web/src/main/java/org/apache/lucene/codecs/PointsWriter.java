@@ -17,12 +17,12 @@
 package org.apache.lucene.codecs;
 
 
-import java.io.Closeable;
-import java.io.IOException;
-
 import org.apache.lucene.index.FieldInfo;
 import org.apache.lucene.index.MergeState;
 import org.apache.lucene.index.PointValues;
+
+import java.io.Closeable;
+import java.io.IOException;
 
 /** Abstract API to write points
  *

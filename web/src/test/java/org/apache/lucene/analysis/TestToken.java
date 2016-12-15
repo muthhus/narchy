@@ -18,12 +18,7 @@ package org.apache.lucene.analysis;
 
 
 import org.apache.lucene.analysis.tokenattributes.*;
-import org.apache.lucene.util.AttributeReflector;
-import org.apache.lucene.util.LuceneTestCase;
-import org.apache.lucene.util.Attribute;
-import org.apache.lucene.util.AttributeImpl;
-import org.apache.lucene.util.BytesRef;
-import org.apache.lucene.util.TestUtil;
+import org.apache.lucene.util.*;
 
 import java.io.StringReader;
 import java.util.HashMap;

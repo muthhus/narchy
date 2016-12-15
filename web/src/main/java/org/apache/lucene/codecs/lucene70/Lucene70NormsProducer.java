@@ -16,26 +16,20 @@
  */
 package org.apache.lucene.codecs.lucene70;
 
-import static org.apache.lucene.codecs.lucene70.Lucene70NormsFormat.VERSION_CURRENT;
-import static org.apache.lucene.codecs.lucene70.Lucene70NormsFormat.VERSION_START;
+import org.apache.lucene.codecs.CodecUtil;
+import org.apache.lucene.codecs.NormsProducer;
+import org.apache.lucene.index.*;
+import org.apache.lucene.store.ChecksumIndexInput;
+import org.apache.lucene.store.IndexInput;
+import org.apache.lucene.store.RandomAccessInput;
+import org.apache.lucene.util.IOUtils;
 
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.lucene.codecs.CodecUtil;
-import org.apache.lucene.codecs.NormsProducer;
-import org.apache.lucene.index.CorruptIndexException;
-import org.apache.lucene.index.DocValues;
-import org.apache.lucene.index.FieldInfo;
-import org.apache.lucene.index.FieldInfos;
-import org.apache.lucene.index.IndexFileNames;
-import org.apache.lucene.index.NumericDocValues;
-import org.apache.lucene.index.SegmentReadState;
-import org.apache.lucene.store.ChecksumIndexInput;
-import org.apache.lucene.store.IndexInput;
-import org.apache.lucene.store.RandomAccessInput;
-import org.apache.lucene.util.IOUtils;
+import static org.apache.lucene.codecs.lucene70.Lucene70NormsFormat.VERSION_CURRENT;
+import static org.apache.lucene.codecs.lucene70.Lucene70NormsFormat.VERSION_START;
 
 /**
  * Reader for {@link Lucene70NormsFormat}

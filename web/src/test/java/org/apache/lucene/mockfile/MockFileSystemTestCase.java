@@ -16,6 +16,11 @@
  */
 package org.apache.lucene.mockfile;
 
+import org.apache.lucene.util.Constants;
+import org.apache.lucene.util.LuceneTestCase;
+import org.apache.lucene.util.LuceneTestCase.SuppressFileSystems;
+import org.apache.lucene.util.filter.FilterPath;
+
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URI;
@@ -23,11 +28,6 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
-
-import org.apache.lucene.util.Constants;
-import org.apache.lucene.util.filter.FilterPath;
-import org.apache.lucene.util.LuceneTestCase;
-import org.apache.lucene.util.LuceneTestCase.SuppressFileSystems;
 
 /** 
  * Base class for testing mockfilesystems. This tests things

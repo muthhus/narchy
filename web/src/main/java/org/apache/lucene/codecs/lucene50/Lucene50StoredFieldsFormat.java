@@ -17,9 +17,6 @@
 package org.apache.lucene.codecs.lucene50;
 
 
-import java.io.IOException;
-import java.util.Objects;
-
 import org.apache.lucene.codecs.CodecUtil;
 import org.apache.lucene.codecs.StoredFieldsFormat;
 import org.apache.lucene.codecs.StoredFieldsReader;
@@ -34,6 +31,9 @@ import org.apache.lucene.store.DataOutput;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.IOContext;
 import org.apache.lucene.util.packed.PackedInts;
+
+import java.io.IOException;
+import java.util.Objects;
 
 /**
  * Lucene 5.0 stored fields format.

@@ -17,14 +17,14 @@
 package org.apache.lucene.index;
 
 
+import org.apache.lucene.store.Directory;
+import org.apache.lucene.store.MergeInfo;
+import org.apache.lucene.store.RateLimiter;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
-import org.apache.lucene.store.Directory;
-import org.apache.lucene.store.MergeInfo;
-import org.apache.lucene.store.RateLimiter;
 
 /**
  * <p>Expert: a MergePolicy determines the sequence of
@@ -238,7 +238,7 @@ public abstract class MergePolicy {
   /** Exception thrown if there are any problems while
    *  executing a merge. */
   public static class MergeException extends RuntimeException {
-    private Directory dir;
+    private final Directory dir;
 
     /** Create a {@code MergeException}. */
     public MergeException(String message, Directory dir) {

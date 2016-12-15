@@ -17,9 +17,10 @@
 package org.apache.lucene.store;
 
 
-import java.io.*;
-
-import org.apache.lucene.store.DataInput;
+import java.io.Closeable;
+import java.io.EOFException;
+import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * A {@link DataInput} wrapping a plain {@link InputStream}.

@@ -17,7 +17,7 @@
 package org.apache.lucene.index;
 
 
-import org.apache.lucene.search.MultiTermQuery;  // javadocs
+import org.apache.lucene.search.MultiTermQuery;
 import org.apache.lucene.util.BytesRef;
 
 /**

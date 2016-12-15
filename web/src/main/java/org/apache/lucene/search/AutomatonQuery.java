@@ -17,8 +17,6 @@
 package org.apache.lucene.search;
 
 
-import java.io.IOException;
-
 import org.apache.lucene.index.Term;
 import org.apache.lucene.index.Terms;
 import org.apache.lucene.index.TermsEnum;
@@ -26,6 +24,8 @@ import org.apache.lucene.util.AttributeSource;
 import org.apache.lucene.util.automaton.Automaton;
 import org.apache.lucene.util.automaton.CompiledAutomaton;
 import org.apache.lucene.util.automaton.Operations;
+
+import java.io.IOException;
 
 /**
  * A {@link Query} that will match terms against a finite-state machine.

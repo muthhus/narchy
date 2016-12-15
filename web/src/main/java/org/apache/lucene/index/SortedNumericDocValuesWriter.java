@@ -17,9 +17,6 @@
 package org.apache.lucene.index;
 
 
-import java.io.IOException;
-import java.util.Arrays;
-
 import org.apache.lucene.codecs.DocValuesConsumer;
 import org.apache.lucene.search.DocIdSetIterator;
 import org.apache.lucene.util.ArrayUtil;
@@ -28,11 +25,14 @@ import org.apache.lucene.util.RamUsageEstimator;
 import org.apache.lucene.util.packed.PackedInts;
 import org.apache.lucene.util.packed.PackedLongValues;
 
+import java.io.IOException;
+import java.util.Arrays;
+
 /** Buffers up pending long[] per doc, sorts, then flushes when segment flushes. */
 class SortedNumericDocValuesWriter extends DocValuesWriter {
-  private PackedLongValues.Builder pending; // stream of all values
-  private PackedLongValues.Builder pendingCounts; // count of values per doc
-  private DocsWithFieldSet docsWithField;
+  private final PackedLongValues.Builder pending; // stream of all values
+  private final PackedLongValues.Builder pendingCounts; // count of values per doc
+  private final DocsWithFieldSet docsWithField;
   private final Counter iwBytesUsed;
   private long bytesUsed; // this only tracks differences in 'pending' and 'pendingCounts'
   private final FieldInfo fieldInfo;

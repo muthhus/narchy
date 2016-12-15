@@ -17,8 +17,6 @@
 package org.apache.lucene.index;
 
 
-import java.io.IOException;
-
 import org.apache.lucene.util.BytesRef;
 import org.apache.lucene.util.BytesRefBuilder;
 import org.apache.lucene.util.IntsRefBuilder;
@@ -27,6 +25,8 @@ import org.apache.lucene.util.automaton.Automaton;
 import org.apache.lucene.util.automaton.ByteRunAutomaton;
 import org.apache.lucene.util.automaton.CompiledAutomaton;
 import org.apache.lucene.util.automaton.Transition;
+
+import java.io.IOException;
 
 /**
  * A FilteredTermsEnum that enumerates terms based upon what is accepted by a
@@ -125,7 +125,7 @@ public class AutomatonTermsEnum extends FilteredTermsEnum {
     }
   }
 
-  private Transition transition = new Transition();
+  private final Transition transition = new Transition();
 
   /**
    * Sets the enum to operate in linear fashion, as we have found

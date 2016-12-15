@@ -16,13 +16,9 @@
  */
 package org.apache.lucene.analysis;
 
-import java.io.IOException;
+import org.apache.lucene.analysis.tokenattributes.*;
 
-import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
-import org.apache.lucene.analysis.tokenattributes.OffsetAttribute;
-import org.apache.lucene.analysis.tokenattributes.PayloadAttribute;
-import org.apache.lucene.analysis.tokenattributes.PositionIncrementAttribute;
-import org.apache.lucene.analysis.tokenattributes.PositionLengthAttribute;
+import java.io.IOException;
 
 /**
  * TokenStream from a canned list of Tokens.

@@ -16,6 +16,8 @@
  */
 package org.apache.lucene.util;
 
+import org.apache.lucene.util.filter.*;
+
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
@@ -24,15 +26,13 @@ import java.nio.channels.AsynchronousFileChannel;
 import java.nio.channels.FileChannel;
 import java.nio.channels.SeekableByteChannel;
 import java.nio.file.DirectoryStream;
+import java.nio.file.DirectoryStream.Filter;
 import java.nio.file.FileSystem;
 import java.nio.file.OpenOption;
 import java.nio.file.Path;
-import java.nio.file.DirectoryStream.Filter;
 import java.nio.file.attribute.FileAttribute;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
-
-import org.apache.lucene.util.filter.*;
 
 /** 
  * Base class for tracking file handles.

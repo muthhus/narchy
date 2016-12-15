@@ -17,11 +17,11 @@
 package org.apache.lucene.search.similarities;
 
 
-import java.util.List;
-
 import org.apache.lucene.search.Explanation;
 import org.apache.lucene.search.similarities.AfterEffect.NoAfterEffect;
 import org.apache.lucene.search.similarities.Normalization.NoNormalization;
+
+import java.util.List;
 
 /**
  * Implements the <em>divergence from randomness (DFR)</em> framework

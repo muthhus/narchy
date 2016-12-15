@@ -16,18 +16,18 @@
  */
 package org.apache.lucene.search;
 
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.Objects;
-
+import org.apache.lucene.document.IntPoint;
+import org.apache.lucene.index.LeafReader;
+import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.index.PointValues;
 import org.apache.lucene.index.PointValues.IntersectVisitor;
 import org.apache.lucene.index.PointValues.Relation;
-import org.apache.lucene.document.IntPoint;    // javadocs
-import org.apache.lucene.index.LeafReader;
-import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.util.DocIdSetBuilder;
 import org.apache.lucene.util.StringHelper;
+
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.Objects;
 
 /** 
  * Abstract class for range queries against single or multidimensional points such as

@@ -17,13 +17,13 @@
 package org.apache.lucene.codecs;
 
 
-import java.io.Closeable;
-import java.io.IOException;
-import java.util.Arrays;
-
 import org.apache.lucene.store.BufferedIndexInput;
 import org.apache.lucene.store.IndexInput;
 import org.apache.lucene.util.MathUtil;
+
+import java.io.Closeable;
+import java.io.IOException;
+import java.util.Arrays;
 
 /**
  * This abstract class reads skip lists with multiple levels.
@@ -50,23 +50,23 @@ public abstract class MultiLevelSkipListReader implements Closeable {
   // the skipInterval. The top level can not contain more than
   // skipLevel entries, the second top level can not contain more
   // than skipLevel^2 entries and so forth.
-  private int numberOfLevelsToBuffer = 1;
+  private final int numberOfLevelsToBuffer = 1;
   
   private int docCount;
 
   /** skipStream for each level. */
-  private IndexInput[] skipStream;
+  private final IndexInput[] skipStream;
 
   /** The start pointer of each skip level. */
-  private long skipPointer[];
+  private final long[] skipPointer;
 
   /**  skipInterval of each level. */
-  private int skipInterval[];
+  private final int[] skipInterval;
 
   /** Number of docs skipped per level.
    * It's possible for some values to overflow a signed int, but this has been accounted for.
    */
-  private int[] numSkipped;
+  private final int[] numSkipped;
 
   /** Doc id of current skip entry per level. */
   protected int[] skipDoc;            
@@ -75,13 +75,13 @@ public abstract class MultiLevelSkipListReader implements Closeable {
   private int lastDoc;
 
   /** Child pointer of current skip entry per level. */
-  private long[] childPointer;
+  private final long[] childPointer;
 
   /** childPointer of last read skip entry with docId &lt;=
    *  target. */
   private long lastChildPointer;
   
-  private boolean inputIsBuffered;
+  private final boolean inputIsBuffered;
   private final int skipMultiplier;
 
   /** Creates a {@code MultiLevelSkipListReader}. */
@@ -268,7 +268,7 @@ public abstract class MultiLevelSkipListReader implements Closeable {
   /** used to buffer the top skip levels */
   private final static class SkipBuffer extends IndexInput {
     private byte[] data;
-    private long pointer;
+    private final long pointer;
     private int pos;
     
     SkipBuffer(IndexInput input, int length) throws IOException {

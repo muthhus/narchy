@@ -17,17 +17,11 @@
 package org.apache.lucene.index;
 
 
-import java.io.IOException;
-import java.util.Collections;
-import java.util.IdentityHashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
-import java.util.SortedMap;
-import java.util.TreeMap;
-
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.util.Bits;
+
+import java.io.IOException;
+import java.util.*;
 
 /** An {@link LeafReader} which reads multiple, parallel indexes.  Each index
  * added must have the same number of documents, but typically each contains

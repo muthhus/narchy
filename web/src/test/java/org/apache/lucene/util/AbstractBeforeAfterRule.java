@@ -16,8 +16,6 @@
  */
 package org.apache.lucene.util;
 
-import java.util.ArrayList;
-
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.rules.RuleChain;
@@ -25,6 +23,8 @@ import org.junit.rules.TestRule;
 import org.junit.runner.Description;
 import org.junit.runners.model.MultipleFailureException;
 import org.junit.runners.model.Statement;
+
+import java.util.ArrayList;
 
 /**
  * A {@link TestRule} that guarantees the execution of {@link #after} even

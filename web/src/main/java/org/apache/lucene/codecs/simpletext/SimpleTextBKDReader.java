@@ -16,23 +16,16 @@
  */
 package org.apache.lucene.codecs.simpletext;
 
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-
-import org.apache.lucene.codecs.simpletext.SimpleTextUtil;
 import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.index.PointValues;
 import org.apache.lucene.store.IndexInput;
-import org.apache.lucene.util.Accountable;
-import org.apache.lucene.util.BytesRef;
-import org.apache.lucene.util.BytesRefBuilder;
-import org.apache.lucene.util.RamUsageEstimator;
-import org.apache.lucene.util.StringHelper;
+import org.apache.lucene.util.*;
 import org.apache.lucene.util.bkd.BKDReader;
 
-import static org.apache.lucene.codecs.simpletext.SimpleTextPointsWriter.BLOCK_COUNT;
-import static org.apache.lucene.codecs.simpletext.SimpleTextPointsWriter.BLOCK_DOC_ID;
-import static org.apache.lucene.codecs.simpletext.SimpleTextPointsWriter.BLOCK_VALUE;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+
+import static org.apache.lucene.codecs.simpletext.SimpleTextPointsWriter.*;
 
 /** Forked from {@link BKDReader} and simplified/specialized for SimpleText's usage */
 

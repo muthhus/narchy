@@ -17,25 +17,19 @@
 package org.apache.lucene.index;
 
 
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-
 import org.apache.lucene.codecs.Codec;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.search.DocIdSetIterator;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.IOContext;
 import org.apache.lucene.store.MergeInfo;
-import org.apache.lucene.util.BytesRef;
-import org.apache.lucene.util.FixedBitSet;
-import org.apache.lucene.util.InfoStream;
-import org.apache.lucene.util.LuceneTestCase;
-import org.apache.lucene.util.StringHelper;
-import org.apache.lucene.util.TestUtil;
-import org.apache.lucene.util.Version;
+import org.apache.lucene.util.*;
 import org.apache.lucene.util.packed.PackedLongValues;
+
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
 
 public class TestSegmentMerger extends LuceneTestCase {
   //The variables for the new merged segment

@@ -17,6 +17,7 @@
 package org.apache.lucene.search;
 
 
+import junit.framework.Assert;
 import org.apache.lucene.analysis.MockAnalyzer;
 import org.apache.lucene.analysis.MockTokenizer;
 import org.apache.lucene.document.Document;
@@ -32,8 +33,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.IOException;
-
-import junit.framework.Assert;
 
 public class TestMultiTermConstantScore extends BaseTestRangeFilter {
 

@@ -16,13 +16,13 @@
  */
 package org.apache.lucene.util;
 
-import static org.apache.lucene.util.BaseBitSetTestCase.randomSet;
+import org.apache.lucene.search.DocIdSet;
+import org.apache.lucene.search.DocIdSetIterator;
 
 import java.io.IOException;
 import java.util.BitSet;
 
-import org.apache.lucene.search.DocIdSet;
-import org.apache.lucene.search.DocIdSetIterator;
+import static org.apache.lucene.util.BaseBitSetTestCase.randomSet;
 
 /** Base test class for {@link DocIdSet}s. */
 public abstract class BaseDocIdSetTestCase<T extends DocIdSet> extends LuceneTestCase {

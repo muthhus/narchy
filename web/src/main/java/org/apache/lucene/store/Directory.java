@@ -17,13 +17,13 @@
 package org.apache.lucene.store;
 
 
+import org.apache.lucene.util.IOUtils;
+
 import java.io.Closeable;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.NoSuchFileException;
-import java.util.Collection; // for javadocs
-
-import org.apache.lucene.util.IOUtils;
+import java.util.Collection;
 
 /** A Directory is a flat list of files.  Files may be written once, when they
  * are created.  Once a file is created it may only be opened for read, or

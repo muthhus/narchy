@@ -17,7 +17,8 @@
 package org.apache.lucene.search.spans;
 
 
-import org.apache.lucene.search.*;
+import org.apache.lucene.search.BaseExplanationTestCase;
+import org.apache.lucene.search.BoostQuery;
 
 /**
  * TestExplanations subclass focusing on span queries

@@ -17,15 +17,15 @@
 package org.apache.lucene.index;
 
 
-import java.io.IOException;
-import java.util.Iterator;
-import java.util.Objects;
-
 import org.apache.lucene.search.QueryCache;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.util.AttributeSource;
 import org.apache.lucene.util.Bits;
 import org.apache.lucene.util.BytesRef;
+
+import java.io.IOException;
+import java.util.Iterator;
+import java.util.Objects;
 
 /**  A <code>FilterLeafReader</code> contains another LeafReader, which it
  * uses as its basic source of data, possibly transforming the data along the

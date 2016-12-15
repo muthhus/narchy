@@ -16,12 +16,15 @@
  */
 package org.apache.lucene.index;
 
-import org.apache.lucene.util.*;
-import org.apache.lucene.store.*;
 import org.apache.lucene.analysis.MockAnalyzer;
-import org.apache.lucene.document.*;
+import org.apache.lucene.document.Document;
+import org.apache.lucene.document.Field;
 import org.apache.lucene.index.IndexWriterConfig.OpenMode;
-import org.apache.lucene.search.*;
+import org.apache.lucene.search.IndexSearcher;
+import org.apache.lucene.store.Directory;
+import org.apache.lucene.store.MockDirectoryWrapper;
+import org.apache.lucene.util.English;
+import org.apache.lucene.util.LuceneTestCase;
 
 public class TestStressIndexing extends LuceneTestCase {
   private static abstract class TimedThread extends Thread {

@@ -16,12 +16,7 @@
  */
 package org.apache.lucene.search.similarities;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 
 /**
  * Similarity implementation that randomizes Similarity implementations

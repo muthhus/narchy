@@ -16,21 +16,17 @@
  */
 package org.apache.lucene.mockfile;
 
+import org.apache.lucene.util.InfoStream;
+import org.apache.lucene.util.filter.FilterPath;
+
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URI;
 import java.nio.channels.AsynchronousFileChannel;
 import java.nio.channels.FileChannel;
 import java.nio.channels.SeekableByteChannel;
-import java.nio.file.FileSystem;
-import java.nio.file.Files;
-import java.nio.file.NoSuchFileException;
-import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
+import java.nio.file.*;
 import java.util.concurrent.atomic.AtomicBoolean;
-
-import org.apache.lucene.util.filter.FilterPath;
-import org.apache.lucene.util.InfoStream;
 
 /** Basic tests for VerboseFS */
 public class TestVerboseFS extends MockFileSystemTestCase {

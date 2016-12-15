@@ -16,10 +16,10 @@
  */
 package org.apache.lucene.store;
 
-import java.io.IOException;
-
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.util.TestUtil;
+
+import java.io.IOException;
 
 /**
  * Calls check index on close.

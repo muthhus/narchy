@@ -17,10 +17,6 @@
 package org.apache.lucene.codecs.simpletext;
 
 
-import java.io.IOException;
-import java.util.BitSet;
-import java.util.Collection;
-
 import org.apache.lucene.codecs.LiveDocsFormat;
 import org.apache.lucene.index.IndexFileNames;
 import org.apache.lucene.index.SegmentCommitInfo;
@@ -28,14 +24,11 @@ import org.apache.lucene.store.ChecksumIndexInput;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.IOContext;
 import org.apache.lucene.store.IndexOutput;
-import org.apache.lucene.util.ArrayUtil;
-import org.apache.lucene.util.Bits;
-import org.apache.lucene.util.BytesRef;
-import org.apache.lucene.util.BytesRefBuilder;
-import org.apache.lucene.util.CharsRefBuilder;
-import org.apache.lucene.util.IOUtils;
-import org.apache.lucene.util.MutableBits;
-import org.apache.lucene.util.StringHelper;
+import org.apache.lucene.util.*;
+
+import java.io.IOException;
+import java.util.BitSet;
+import java.util.Collection;
 
 /**
  * reads/writes plaintext live docs

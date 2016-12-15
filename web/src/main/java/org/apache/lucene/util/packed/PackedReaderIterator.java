@@ -17,12 +17,12 @@
 package org.apache.lucene.util.packed;
 
 
+import org.apache.lucene.store.DataInput;
+import org.apache.lucene.util.LongsRef;
+
 import java.io.EOFException;
 import java.io.IOException;
 import java.util.Arrays;
-
-import org.apache.lucene.store.DataInput;
-import org.apache.lucene.util.LongsRef;
 
 final class PackedReaderIterator extends PackedInts.ReaderIteratorImpl {
 

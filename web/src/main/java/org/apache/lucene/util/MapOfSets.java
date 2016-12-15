@@ -17,11 +17,10 @@
 package org.apache.lucene.util;
 
 
-
-import java.util.Set;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Helper class for keeping Lists of Objects associated with keys. <b>WARNING: THIS CLASS IS NOT THREAD SAFE</b>

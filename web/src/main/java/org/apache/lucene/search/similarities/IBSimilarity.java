@@ -17,10 +17,10 @@
 package org.apache.lucene.search.similarities;
 
 
-import java.util.List;
-
 import org.apache.lucene.search.Explanation;
 import org.apache.lucene.search.similarities.Normalization.NoNormalization;
+
+import java.util.List;
 
 /**
  * Provides a framework for the family of information-based models, as described

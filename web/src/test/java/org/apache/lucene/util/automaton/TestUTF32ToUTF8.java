@@ -17,18 +17,13 @@
 package org.apache.lucene.util.automaton;
 
 
+import org.apache.lucene.util.*;
+import org.apache.lucene.util.fst.Util;
+
 import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
-
-import org.apache.lucene.util.BytesRef;
-import org.apache.lucene.util.IntsRef;
-import org.apache.lucene.util.IntsRefBuilder;
-import org.apache.lucene.util.LuceneTestCase;
-import org.apache.lucene.util.TestUtil;
-import org.apache.lucene.util.UnicodeUtil;
-import org.apache.lucene.util.fst.Util;
 
 public class TestUTF32ToUTF8 extends LuceneTestCase {
   

@@ -18,11 +18,11 @@
  */
 package org.apache.lucene.util.packed;
 
-import java.io.IOException;
-import java.util.Arrays;
-
 import org.apache.lucene.store.DataInput;
 import org.apache.lucene.util.RamUsageEstimator;
+
+import java.io.IOException;
+import java.util.Arrays;
 
 /**
  * This class is similar to {@link Packed64} except that it trades space for

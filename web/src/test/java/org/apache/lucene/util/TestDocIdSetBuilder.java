@@ -17,13 +17,13 @@
 package org.apache.lucene.util;
 
 
-import java.io.IOException;
-
 import org.apache.lucene.index.PointValues;
 import org.apache.lucene.index.Terms;
 import org.apache.lucene.index.TermsEnum;
 import org.apache.lucene.search.DocIdSet;
 import org.apache.lucene.search.DocIdSetIterator;
+
+import java.io.IOException;
 
 
 public class TestDocIdSetBuilder extends LuceneTestCase {

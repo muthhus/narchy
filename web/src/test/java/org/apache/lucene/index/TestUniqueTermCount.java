@@ -17,10 +17,6 @@
 package org.apache.lucene.index;
 
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashSet;
-
 import org.apache.lucene.analysis.MockAnalyzer;
 import org.apache.lucene.analysis.MockTokenizer;
 import org.apache.lucene.document.Document;
@@ -31,6 +27,10 @@ import org.apache.lucene.search.similarities.Similarity;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.util.LuceneTestCase;
 import org.apache.lucene.util.TestUtil;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashSet;
 
 /**
  * Tests the uniqueTermCount statistic in FieldInvertState

@@ -17,11 +17,11 @@
 package org.apache.lucene.analysis;
 
 
-import java.io.IOException;
-import java.io.Reader;
-
 import org.apache.lucene.util.AttributeFactory;
 import org.apache.lucene.util.AttributeSource;
+
+import java.io.IOException;
+import java.io.Reader;
 
 /** A Tokenizer is a TokenStream whose input is a Reader.
   <p>

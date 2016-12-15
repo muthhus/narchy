@@ -17,10 +17,10 @@
 package org.apache.lucene.index;
 
 
-import java.io.IOException;
-
 import org.apache.lucene.index.IndexWriter.IndexReaderWarmer;
 import org.apache.lucene.util.InfoStream;
+
+import java.io.IOException;
 
 /** 
  * A very simple merged segment warmer that just ensures 

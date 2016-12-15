@@ -17,18 +17,14 @@
 package org.apache.lucene.search;
 
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-
 import org.apache.lucene.search.spans.Spans;
 import org.apache.lucene.util.ArrayUtil;
 import org.apache.lucene.util.BitSet;
 import org.apache.lucene.util.BitSetIterator;
 import org.apache.lucene.util.CollectionUtil;
+
+import java.io.IOException;
+import java.util.*;
 
 /** A conjunction of DocIdSetIterators.
  * This iterates over the doc ids that are present in each given DocIdSetIterator.

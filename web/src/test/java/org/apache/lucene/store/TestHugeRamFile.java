@@ -17,10 +17,10 @@
 package org.apache.lucene.store;
 
 
+import org.apache.lucene.util.LuceneTestCase;
+
 import java.io.IOException;
 import java.util.HashMap;
-
-import org.apache.lucene.util.LuceneTestCase;
 
 /** Test huge RAMFile with more than Integer.MAX_VALUE bytes. */
 public class TestHugeRamFile extends LuceneTestCase {

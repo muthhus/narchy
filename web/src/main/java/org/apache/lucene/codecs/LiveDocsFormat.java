@@ -17,14 +17,14 @@
 package org.apache.lucene.codecs;
 
 
-import java.io.IOException;
-import java.util.Collection;
-
 import org.apache.lucene.index.SegmentCommitInfo;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.IOContext;
 import org.apache.lucene.util.Bits;
 import org.apache.lucene.util.MutableBits;
+
+import java.io.IOException;
+import java.util.Collection;
 
 /** Format for live/deleted documents
  * @lucene.experimental */

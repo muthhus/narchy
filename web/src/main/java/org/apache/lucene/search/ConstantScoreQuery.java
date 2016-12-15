@@ -17,14 +17,14 @@
 package org.apache.lucene.search;
 
 
+import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.index.LeafReaderContext;
+import org.apache.lucene.util.Bits;
+
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Objects;
-
-import org.apache.lucene.index.IndexReader;
-import org.apache.lucene.index.LeafReaderContext;
-import org.apache.lucene.util.Bits;
 
 /**
  * A query that wraps another query and simply returns a constant score equal to

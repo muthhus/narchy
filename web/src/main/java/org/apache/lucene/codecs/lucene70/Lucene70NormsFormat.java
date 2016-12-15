@@ -16,8 +16,6 @@
  */
 package org.apache.lucene.codecs.lucene70;
 
-import java.io.IOException;
-
 import org.apache.lucene.codecs.CodecUtil;
 import org.apache.lucene.codecs.NormsConsumer;
 import org.apache.lucene.codecs.NormsFormat;
@@ -25,6 +23,8 @@ import org.apache.lucene.codecs.NormsProducer;
 import org.apache.lucene.index.SegmentReadState;
 import org.apache.lucene.index.SegmentWriteState;
 import org.apache.lucene.store.DataOutput;
+
+import java.io.IOException;
 
 /**
  * Lucene 7.0 Score normalization format.

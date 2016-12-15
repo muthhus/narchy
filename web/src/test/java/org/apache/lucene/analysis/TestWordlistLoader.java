@@ -17,13 +17,11 @@
 package org.apache.lucene.analysis;
 
 
+import org.apache.lucene.util.LuceneTestCase;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
-
-import org.apache.lucene.util.LuceneTestCase;
-
-import org.apache.lucene.analysis.WordlistLoader;
 
 public class TestWordlistLoader extends LuceneTestCase {
 

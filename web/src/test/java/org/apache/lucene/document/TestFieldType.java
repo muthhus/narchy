@@ -17,13 +17,13 @@
 package org.apache.lucene.document;
 
 
-import java.lang.reflect.Method;
+import com.carrotsearch.randomizedtesting.generators.RandomPicks;
 import org.apache.lucene.index.DocValuesType;
 import org.apache.lucene.index.IndexOptions;
 import org.apache.lucene.index.PointValues;
 import org.apache.lucene.util.LuceneTestCase;
 
-import com.carrotsearch.randomizedtesting.generators.RandomPicks;
+import java.lang.reflect.Method;
 
 /** simple testcases for concrete impl of IndexableFieldType */
 public class TestFieldType extends LuceneTestCase {

@@ -17,12 +17,12 @@
 package org.apache.lucene.search.similarities;
 
 
-import java.util.List;
-import java.util.Locale;
-
 import org.apache.lucene.search.CollectionStatistics;
 import org.apache.lucene.search.Explanation;
 import org.apache.lucene.search.TermStatistics;
+
+import java.util.List;
+import java.util.Locale;
 
 /**
  * Abstract superclass for language modeling Similarities. The following inner

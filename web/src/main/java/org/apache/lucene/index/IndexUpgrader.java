@@ -19,15 +19,11 @@ package org.apache.lucene.index;
 
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
-import org.apache.lucene.util.CommandLineUtil;
-import org.apache.lucene.util.InfoStream;
-import org.apache.lucene.util.PrintStreamInfoStream;
-import org.apache.lucene.util.SuppressForbidden;
-import org.apache.lucene.util.Version;
+import org.apache.lucene.util.*;
 
 import java.io.IOException;
-import java.nio.file.Paths;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Collection;
 
 /**

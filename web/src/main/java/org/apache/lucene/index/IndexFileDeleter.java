@@ -17,28 +17,19 @@
 package org.apache.lucene.index;
 
 
-import java.io.Closeable;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.nio.file.NoSuchFileException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
-import java.util.regex.Matcher;
-
 import org.apache.lucene.store.AlreadyClosedException;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.util.CollectionUtil;
 import org.apache.lucene.util.Constants;
 import org.apache.lucene.util.IOUtils;
 import org.apache.lucene.util.InfoStream;
+
+import java.io.Closeable;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.nio.file.NoSuchFileException;
+import java.util.*;
+import java.util.regex.Matcher;
 
 /*
  * This class keeps track of each SegmentInfos instance that
@@ -82,21 +73,21 @@ final class IndexFileDeleter implements Closeable {
   /* Reference count for all files in the index.
    * Counts how many existing commits reference a file.
    **/
-  private Map<String, RefCount> refCounts = new HashMap<>();
+  private final Map<String, RefCount> refCounts = new HashMap<>();
 
   /* Holds all commits (segments_N) currently in the index.
    * This will have just 1 commit if you are using the
    * default delete policy (KeepOnlyLastCommitDeletionPolicy).
    * Other policies may leave commit points live for longer
    * in which case this list would be longer than 1: */
-  private List<CommitPoint> commits = new ArrayList<>();
+  private final List<CommitPoint> commits = new ArrayList<>();
 
   /* Holds files we had incref'd from the previous
    * non-commit checkpoint: */
   private final List<String> lastFiles = new ArrayList<>();
 
   /* Commits that the IndexDeletionPolicy have decided to delete: */
-  private List<CommitPoint> commitsToDelete = new ArrayList<>();
+  private final List<CommitPoint> commitsToDelete = new ArrayList<>();
 
   private final InfoStream infoStream;
   private final Directory directoryOrig; // for commit point metadata

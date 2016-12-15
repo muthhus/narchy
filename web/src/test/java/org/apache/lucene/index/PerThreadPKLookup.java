@@ -16,14 +16,14 @@
  */
 package org.apache.lucene.index;
 
+import org.apache.lucene.util.Bits;
+import org.apache.lucene.util.BytesRef;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-
-import org.apache.lucene.util.Bits;
-import org.apache.lucene.util.BytesRef;
 
 /** Utility class to do efficient primary-key (only 1 doc contains the
  *  given term) lookups by segment, re-using the enums.  This class is

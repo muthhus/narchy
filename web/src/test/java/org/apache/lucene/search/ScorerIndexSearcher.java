@@ -16,13 +16,13 @@
  */
 package org.apache.lucene.search;
 
-import java.io.IOException;
-import java.util.List;
-import java.util.concurrent.ExecutorService;
-
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.util.Bits;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.concurrent.ExecutorService;
 
 /**
  * An {@link IndexSearcher} that always uses the {@link Scorer} API, never {@link BulkScorer}.

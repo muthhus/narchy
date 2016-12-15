@@ -17,8 +17,6 @@
 package org.apache.lucene.codecs.lucene70;
 
 
-import java.io.IOException;
-
 import org.apache.lucene.codecs.DocValuesConsumer;
 import org.apache.lucene.codecs.DocValuesFormat;
 import org.apache.lucene.codecs.DocValuesProducer;
@@ -29,6 +27,8 @@ import org.apache.lucene.index.SegmentWriteState;
 import org.apache.lucene.store.DataOutput;
 import org.apache.lucene.util.SmallFloat;
 import org.apache.lucene.util.packed.DirectWriter;
+
+import java.io.IOException;
 
 /**
  * Lucene 7.0 DocValues format.

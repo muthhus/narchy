@@ -17,14 +17,14 @@
 package org.apache.lucene.search.spans;
 
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Map;
-
 import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.index.TermContext;
 import org.apache.lucene.search.IndexSearcher;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Map;
 
 /** Keep matches that contain another SpanScorer. */
 public final class SpanContainingQuery extends SpanContainQuery {

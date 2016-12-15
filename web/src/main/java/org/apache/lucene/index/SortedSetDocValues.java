@@ -17,9 +17,9 @@
 package org.apache.lucene.index;
 
 
-import java.io.IOException;
-
 import org.apache.lucene.util.BytesRef;
+
+import java.io.IOException;
 
 /**
  * A multi-valued version of {@link SortedDocValues}.

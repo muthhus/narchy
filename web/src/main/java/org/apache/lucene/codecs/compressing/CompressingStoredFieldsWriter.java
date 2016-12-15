@@ -17,32 +17,17 @@
 package org.apache.lucene.codecs.compressing;
 
 
-import java.io.IOException;
-import java.util.Arrays;
-
 import org.apache.lucene.codecs.CodecUtil;
 import org.apache.lucene.codecs.StoredFieldsReader;
 import org.apache.lucene.codecs.StoredFieldsWriter;
 import org.apache.lucene.codecs.compressing.CompressingStoredFieldsReader.SerializedDocument;
-import org.apache.lucene.index.CorruptIndexException;
-import org.apache.lucene.index.FieldInfo;
-import org.apache.lucene.index.FieldInfos;
-import org.apache.lucene.index.IndexFileNames;
-import org.apache.lucene.index.IndexableField;
-import org.apache.lucene.index.MergeState;
-import org.apache.lucene.index.SegmentInfo;
-import org.apache.lucene.store.DataOutput;
-import org.apache.lucene.store.Directory;
-import org.apache.lucene.store.GrowableByteArrayDataOutput;
-import org.apache.lucene.store.IOContext;
-import org.apache.lucene.store.IndexInput;
-import org.apache.lucene.store.IndexOutput;
-import org.apache.lucene.util.ArrayUtil;
-import org.apache.lucene.util.BitUtil;
-import org.apache.lucene.util.Bits;
-import org.apache.lucene.util.BytesRef;
-import org.apache.lucene.util.IOUtils;
+import org.apache.lucene.index.*;
+import org.apache.lucene.store.*;
+import org.apache.lucene.util.*;
 import org.apache.lucene.util.packed.PackedInts;
+
+import java.io.IOException;
+import java.util.Arrays;
 
 /**
  * {@link StoredFieldsWriter} impl for {@link CompressingStoredFieldsFormat}.

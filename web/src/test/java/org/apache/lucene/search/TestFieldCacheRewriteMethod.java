@@ -17,10 +17,10 @@
 package org.apache.lucene.search;
 
 
-import java.io.IOException;
-
 import org.apache.lucene.index.Term;
 import org.apache.lucene.util.automaton.RegExp;
+
+import java.io.IOException;
 
 /**
  * Tests the FieldcacheRewriteMethod with random regular expressions

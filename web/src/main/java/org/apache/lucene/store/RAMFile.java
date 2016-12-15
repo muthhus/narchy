@@ -17,10 +17,10 @@
 package org.apache.lucene.store;
 
 
+import org.apache.lucene.util.Accountable;
+
 import java.util.ArrayList;
 import java.util.Arrays;
-
-import org.apache.lucene.util.Accountable;
 
 /** 
  * Represents a file in RAM as a list of byte[] buffers.

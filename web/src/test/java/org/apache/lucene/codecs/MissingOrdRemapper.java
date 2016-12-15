@@ -16,9 +16,9 @@
  */
 package org.apache.lucene.codecs;
 
-import java.util.Iterator;
-
 import org.apache.lucene.util.BytesRef;
+
+import java.util.Iterator;
 
 /** 
  * a utility class to write missing values for SORTED as if they were the empty string

@@ -17,10 +17,10 @@
 package org.apache.lucene.util;
 
 
-import java.io.IOException;
-
 import org.apache.lucene.search.DocIdSet;
 import org.apache.lucene.search.DocIdSetIterator;
+
+import java.io.IOException;
 
 /**
  * This {@link DocIdSet} encodes the negation of another {@link DocIdSet}.

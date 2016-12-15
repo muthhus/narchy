@@ -18,6 +18,7 @@ package org.apache.lucene.search.similarities;
 
 
 import org.apache.lucene.search.Explanation;
+
 import static org.apache.lucene.search.similarities.SimilarityBase.log2;
 
 /**

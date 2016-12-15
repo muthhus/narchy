@@ -16,17 +16,13 @@
  */
 package org.apache.lucene.analysis.tokenattributes;
 
-import java.nio.CharBuffer;
+import org.apache.lucene.util.*;
 
-import org.apache.lucene.util.ArrayUtil;
-import org.apache.lucene.util.AttributeImpl;
-import org.apache.lucene.util.AttributeReflector;
-import org.apache.lucene.util.BytesRef;
-import org.apache.lucene.util.BytesRefBuilder;
+import java.nio.CharBuffer;
 
 /** Default implementation of {@link CharTermAttribute}. */
 public class CharTermAttributeImpl extends AttributeImpl implements CharTermAttribute, TermToBytesRefAttribute, Cloneable {
-  private static int MIN_BUFFER_SIZE = 10;
+  private static final int MIN_BUFFER_SIZE = 10;
   
   private char[] termBuffer = new char[ArrayUtil.oversize(MIN_BUFFER_SIZE, Character.BYTES)];
   private int termLength = 0;

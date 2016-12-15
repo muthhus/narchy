@@ -16,12 +16,12 @@
  */
 package org.apache.lucene.index;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.lucene.util.FixedBitSet;
 import org.apache.lucene.util.LuceneTestCase;
 import org.apache.lucene.util.TestUtil;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.apache.lucene.search.DocIdSetIterator.NO_MORE_DOCS;
 

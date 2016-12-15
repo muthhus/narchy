@@ -17,10 +17,10 @@
 package org.apache.lucene.search;
 
 
-import java.util.Arrays;
-
 import org.apache.lucene.index.Term;
 import org.junit.Test;
+
+import java.util.Arrays;
 
 /**
  * TestExplanations subclass focusing on basic query types

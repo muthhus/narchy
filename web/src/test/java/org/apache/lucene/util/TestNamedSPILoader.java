@@ -16,9 +16,9 @@
  */
 package org.apache.lucene.util;
 
-import java.util.Set;
-
 import org.apache.lucene.codecs.Codec;
+
+import java.util.Set;
 
 
 // TODO: maybe we should test this with mocks, but it's easy

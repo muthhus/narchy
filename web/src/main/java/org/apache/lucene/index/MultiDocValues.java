@@ -17,22 +17,17 @@
 package org.apache.lucene.index;
 
 
+import org.apache.lucene.index.MultiTermsEnum.TermsEnumIndex;
+import org.apache.lucene.index.MultiTermsEnum.TermsEnumWithSlice;
+import org.apache.lucene.util.*;
+import org.apache.lucene.util.packed.PackedInts;
+import org.apache.lucene.util.packed.PackedLongValues;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-
-import org.apache.lucene.index.MultiTermsEnum.TermsEnumIndex;
-import org.apache.lucene.index.MultiTermsEnum.TermsEnumWithSlice;
-import org.apache.lucene.util.Accountable;
-import org.apache.lucene.util.Accountables;
-import org.apache.lucene.util.BytesRef;
-import org.apache.lucene.util.InPlaceMergeSorter;
-import org.apache.lucene.util.LongValues;
-import org.apache.lucene.util.RamUsageEstimator;
-import org.apache.lucene.util.packed.PackedInts;
-import org.apache.lucene.util.packed.PackedLongValues;
 
 /**
  * A wrapper for CompositeIndexReader providing access to DocValues.

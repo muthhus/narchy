@@ -16,12 +16,12 @@
  */
 package org.apache.lucene.analysis;
 
-import java.io.IOException;
-import java.util.Random;
-
 import org.apache.lucene.analysis.tokenattributes.PositionIncrementAttribute;
 import org.apache.lucene.analysis.tokenattributes.PositionLengthAttribute;
 import org.apache.lucene.util.TestUtil;
+
+import java.io.IOException;
+import java.util.Random;
 
 // TODO: maybe, instead to be more "natural", we should make
 // a MockRemovesTokensTF, ideally subclassing FilteringTF

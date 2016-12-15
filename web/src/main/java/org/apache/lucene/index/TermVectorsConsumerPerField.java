@@ -16,12 +16,12 @@
  */
 package org.apache.lucene.index;
 
-import java.io.IOException;
-
 import org.apache.lucene.analysis.tokenattributes.OffsetAttribute;
 import org.apache.lucene.analysis.tokenattributes.PayloadAttribute;
 import org.apache.lucene.codecs.TermVectorsWriter;
 import org.apache.lucene.util.BytesRef;
+
+import java.io.IOException;
 
 final class TermVectorsConsumerPerField extends TermsHashPerField {
 

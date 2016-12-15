@@ -16,21 +16,11 @@
  */
 package org.apache.lucene.codecs.perfield;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-
 import org.apache.lucene.codecs.FieldsProducer;
-import org.apache.lucene.index.DocValuesType;
-import org.apache.lucene.index.FieldInfo;
-import org.apache.lucene.index.FieldInfos;
-import org.apache.lucene.index.IndexOptions;
-import org.apache.lucene.index.MergeState;
-import org.apache.lucene.index.Terms;
+import org.apache.lucene.index.*;
+
+import java.io.IOException;
+import java.util.*;
 
 /**
  * Utility class to update the {@link MergeState} instance to be restricted to a set of fields.

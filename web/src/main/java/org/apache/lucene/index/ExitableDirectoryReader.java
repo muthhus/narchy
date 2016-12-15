@@ -34,7 +34,7 @@ import java.io.IOException;
  */
 public class ExitableDirectoryReader extends FilterDirectoryReader {
   
-  private QueryTimeout queryTimeout;
+  private final QueryTimeout queryTimeout;
 
   /**
    * Exception that is thrown to prematurely terminate a term enumeration.
@@ -52,7 +52,7 @@ public class ExitableDirectoryReader extends FilterDirectoryReader {
    * Wrapper class for a SubReaderWrapper that is used by the ExitableDirectoryReader.
    */
   public static class ExitableSubReaderWrapper extends SubReaderWrapper {
-    private QueryTimeout queryTimeout;
+    private final QueryTimeout queryTimeout;
 
     /** Constructor **/
     public ExitableSubReaderWrapper(QueryTimeout queryTimeout) {
@@ -70,7 +70,7 @@ public class ExitableDirectoryReader extends FilterDirectoryReader {
    */
   public static class ExitableFilterAtomicReader extends FilterLeafReader {
 
-    private QueryTimeout queryTimeout;
+    private final QueryTimeout queryTimeout;
     
     /** Constructor **/
     public ExitableFilterAtomicReader(LeafReader in, QueryTimeout queryTimeout) {
@@ -106,7 +106,7 @@ public class ExitableDirectoryReader extends FilterDirectoryReader {
    */
   public static class ExitableFields extends FilterFields {
     
-    private QueryTimeout queryTimeout;
+    private final QueryTimeout queryTimeout;
 
     /** Constructor **/
     public ExitableFields(Fields fields, QueryTimeout queryTimeout) {
@@ -129,7 +129,7 @@ public class ExitableDirectoryReader extends FilterDirectoryReader {
    */
   public static class ExitableTerms extends FilterTerms {
 
-    private QueryTimeout queryTimeout;
+    private final QueryTimeout queryTimeout;
     
     /** Constructor **/
     public ExitableTerms(Terms terms, QueryTimeout queryTimeout) {
@@ -154,7 +154,7 @@ public class ExitableDirectoryReader extends FilterDirectoryReader {
    */
   public static class ExitableTermsEnum extends FilterTermsEnum {
 
-    private QueryTimeout queryTimeout;
+    private final QueryTimeout queryTimeout;
     
     /** Constructor **/
     public ExitableTermsEnum(TermsEnum termsEnum, QueryTimeout queryTimeout) {

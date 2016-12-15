@@ -17,9 +17,6 @@
 package org.apache.lucene.index;
 
 
-import java.util.Random;
-import java.util.concurrent.TimeUnit;
-
 import com.carrotsearch.randomizedtesting.annotations.TimeoutSuite;
 import org.apache.lucene.analysis.MockAnalyzer;
 import org.apache.lucene.document.Document;
@@ -34,6 +31,9 @@ import org.apache.lucene.util.LuceneTestCase.SuppressCodecs;
 import org.apache.lucene.util.LuceneTestCase.SuppressSysoutChecks;
 import org.apache.lucene.util.TestUtil;
 import org.apache.lucene.util.TimeUnits;
+
+import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 @SuppressCodecs({"SimpleText", "Memory", "Direct"})
 @TimeoutSuite(millis = 80 * TimeUnits.HOUR) // effectively no limit

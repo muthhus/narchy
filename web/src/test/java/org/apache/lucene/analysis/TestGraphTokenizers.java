@@ -16,7 +16,6 @@
  */
 package org.apache.lucene.analysis;
 
-import org.apache.commons.math3.random.RandomGenerator;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.apache.lucene.analysis.tokenattributes.OffsetAttribute;
 import org.apache.lucene.analysis.tokenattributes.PositionIncrementAttribute;

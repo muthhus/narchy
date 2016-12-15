@@ -16,16 +16,12 @@
  */
 package org.apache.lucene.util.bkd;
 
+import org.apache.lucene.codecs.CodecUtil;
+import org.apache.lucene.store.*;
+import org.apache.lucene.util.LongBitSet;
+
 import java.io.EOFException;
 import java.io.IOException;
-
-import org.apache.lucene.codecs.CodecUtil;
-import org.apache.lucene.store.ChecksumIndexInput;
-import org.apache.lucene.store.Directory;
-import org.apache.lucene.store.IOContext;
-import org.apache.lucene.store.IndexInput;
-import org.apache.lucene.store.IndexOutput;
-import org.apache.lucene.util.LongBitSet;
 
 /** Reads points from disk in a fixed-with format, previously written with {@link OfflinePointWriter}.
  *
@@ -39,7 +35,7 @@ public final class OfflinePointReader extends PointReader {
   private long ord;
   private int docID;
   // true if ords are written as long (8 bytes), else 4 bytes
-  private boolean longOrds;
+  private final boolean longOrds;
   private boolean checked;
 
   // File name we are reading

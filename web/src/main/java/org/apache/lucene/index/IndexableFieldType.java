@@ -17,7 +17,7 @@
 package org.apache.lucene.index;
 
 
-import org.apache.lucene.analysis.Analyzer; // javadocs
+import org.apache.lucene.analysis.Analyzer;
 
 /** 
  * Describes the properties of a field.

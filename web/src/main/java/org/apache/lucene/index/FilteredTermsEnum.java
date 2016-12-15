@@ -17,10 +17,10 @@
 package org.apache.lucene.index;
 
 
-import java.io.IOException;
-
-import org.apache.lucene.util.BytesRef;
 import org.apache.lucene.util.AttributeSource;
+import org.apache.lucene.util.BytesRef;
+
+import java.io.IOException;
 
 /**
  * Abstract class for enumerating a subset of all terms. 

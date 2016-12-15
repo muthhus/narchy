@@ -16,14 +16,14 @@
  */
 package org.apache.lucene.store;
 
+import org.apache.lucene.document.Document;
+import org.apache.lucene.index.RandomIndexWriter;
+
 import java.io.EOFException;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
-
-import org.apache.lucene.document.Document;
-import org.apache.lucene.index.RandomIndexWriter;
 
 public class TestMockDirectoryWrapper extends BaseDirectoryTestCase {
   

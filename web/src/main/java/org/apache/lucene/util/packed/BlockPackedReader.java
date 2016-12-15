@@ -17,20 +17,17 @@
 package org.apache.lucene.util.packed;
 
 
-import static org.apache.lucene.util.BitUtil.zigZagDecode;
-import static org.apache.lucene.util.packed.AbstractBlockPackedWriter.BPV_SHIFT;
-import static org.apache.lucene.util.packed.AbstractBlockPackedWriter.MAX_BLOCK_SIZE;
-import static org.apache.lucene.util.packed.AbstractBlockPackedWriter.MIN_BLOCK_SIZE;
-import static org.apache.lucene.util.packed.AbstractBlockPackedWriter.MIN_VALUE_EQUALS_0;
-import static org.apache.lucene.util.packed.BlockPackedReaderIterator.readVLong;
-import static org.apache.lucene.util.packed.PackedInts.checkBlockSize;
-import static org.apache.lucene.util.packed.PackedInts.numBlocks;
-
-import java.io.IOException;
-
 import org.apache.lucene.store.IndexInput;
 import org.apache.lucene.util.Accountable;
 import org.apache.lucene.util.LongValues;
+
+import java.io.IOException;
+
+import static org.apache.lucene.util.BitUtil.zigZagDecode;
+import static org.apache.lucene.util.packed.AbstractBlockPackedWriter.*;
+import static org.apache.lucene.util.packed.BlockPackedReaderIterator.readVLong;
+import static org.apache.lucene.util.packed.PackedInts.checkBlockSize;
+import static org.apache.lucene.util.packed.PackedInts.numBlocks;
 
 /**
  * Provides random access to a stream written with {@link BlockPackedWriter}.

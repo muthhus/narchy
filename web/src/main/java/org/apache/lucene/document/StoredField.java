@@ -16,8 +16,8 @@
  */
 package org.apache.lucene.document;
 
-import org.apache.lucene.index.IndexReader; // javadocs
-import org.apache.lucene.search.IndexSearcher; // javadocs
+import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.util.BytesRef;
 
 /** A field whose value is stored so that {@link

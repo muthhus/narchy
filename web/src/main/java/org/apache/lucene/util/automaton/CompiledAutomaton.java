@@ -16,19 +16,15 @@
  */
 package org.apache.lucene.util.automaton;
 
-  
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.apache.lucene.index.SingleTermsEnum;
 import org.apache.lucene.index.Terms;
 import org.apache.lucene.index.TermsEnum;
-import org.apache.lucene.util.BytesRef;
-import org.apache.lucene.util.BytesRefBuilder;
-import org.apache.lucene.util.IntsRef;
-import org.apache.lucene.util.StringHelper;
-import org.apache.lucene.util.UnicodeUtil;
+import org.apache.lucene.util.*;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Immutable class holding compiled details for a given
@@ -253,7 +249,7 @@ public class CompiledAutomaton {
     sinkState = findSinkState(this.automaton);
   }
 
-  private Transition transition = new Transition();
+  private final Transition transition = new Transition();
   
   //private static final boolean DEBUG = BlockTreeTermsWriter.DEBUG;
 

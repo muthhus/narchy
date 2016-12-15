@@ -16,11 +16,11 @@
  */
 package org.apache.lucene.analysis;
 
-import java.nio.charset.StandardCharsets;
-
 import org.apache.lucene.analysis.tokenattributes.CharTermAttributeImpl;
 import org.apache.lucene.util.AttributeFactory;
 import org.apache.lucene.util.BytesRef;
+
+import java.nio.charset.StandardCharsets;
 
 /**
  * Extension of {@link CharTermAttributeImpl} that encodes the term

@@ -17,15 +17,15 @@
 package org.apache.lucene.search.spans;
 
 
-import java.io.IOException;
-import java.util.Collection;
-import java.util.Map;
-import java.util.TreeMap;
-
 import org.apache.lucene.index.Term;
 import org.apache.lucene.index.TermContext;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
+
+import java.io.IOException;
+import java.util.Collection;
+import java.util.Map;
+import java.util.TreeMap;
 
 /** Base class for span-based queries. */
 public abstract class SpanQuery extends Query {

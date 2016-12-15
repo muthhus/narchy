@@ -17,15 +17,15 @@
 package org.apache.lucene.document;
 
 
+import org.apache.lucene.search.PrefixQuery;
+import org.apache.lucene.search.TermRangeQuery;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
-
-import org.apache.lucene.search.PrefixQuery;
-import org.apache.lucene.search.TermRangeQuery;
 
 /**
  * Provides support for converting dates to strings and vice-versa.

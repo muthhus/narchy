@@ -17,8 +17,6 @@
 package org.apache.lucene.codecs.blocktreeords;
 
 
-import java.io.IOException;
-
 import org.apache.lucene.codecs.BlockTermState;
 import org.apache.lucene.codecs.blocktreeords.FSTOrdsOutputs.Output;
 import org.apache.lucene.index.IndexOptions;
@@ -27,6 +25,8 @@ import org.apache.lucene.store.ByteArrayDataInput;
 import org.apache.lucene.util.ArrayUtil;
 import org.apache.lucene.util.BytesRef;
 import org.apache.lucene.util.fst.FST;
+
+import java.io.IOException;
 
 final class OrdsSegmentTermsEnumFrame {
   // Our index in stack[]:

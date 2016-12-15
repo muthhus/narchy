@@ -17,9 +17,9 @@
 package org.apache.lucene.util.packed;
 
 
-import java.io.IOException;
-
 import org.apache.lucene.store.DataOutput;
+
+import java.io.IOException;
 
 /**
  * A {@link DataOutput} wrapper to write unaligned, variable-length packed

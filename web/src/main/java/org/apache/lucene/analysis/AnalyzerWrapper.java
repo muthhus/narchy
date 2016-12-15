@@ -17,9 +17,9 @@
 package org.apache.lucene.analysis;
 
 
-import java.io.Reader;
-
 import org.apache.lucene.util.AttributeFactory;
+
+import java.io.Reader;
 
 /**
  * Extension to {@link Analyzer} suitable for Analyzers which wrap

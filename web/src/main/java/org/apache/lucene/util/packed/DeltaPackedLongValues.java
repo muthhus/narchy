@@ -17,10 +17,10 @@
 package org.apache.lucene.util.packed;
 
 
-import java.util.Arrays;
-
 import org.apache.lucene.util.RamUsageEstimator;
 import org.apache.lucene.util.packed.PackedInts.Reader;
+
+import java.util.Arrays;
 
 class DeltaPackedLongValues extends PackedLongValues {
 

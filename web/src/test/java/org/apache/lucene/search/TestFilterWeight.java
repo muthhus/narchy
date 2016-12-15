@@ -16,11 +16,11 @@
  */
 package org.apache.lucene.search;
 
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-
 import org.apache.lucene.util.LuceneTestCase;
 import org.junit.Test;
+
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 
 public class TestFilterWeight extends LuceneTestCase {
 

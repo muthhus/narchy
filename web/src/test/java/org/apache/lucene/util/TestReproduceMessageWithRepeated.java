@@ -16,11 +16,10 @@
  */
 package org.apache.lucene.util;
 
+import com.carrotsearch.randomizedtesting.annotations.Repeat;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.JUnitCore;
-
-import com.carrotsearch.randomizedtesting.annotations.Repeat;
 
 /**
  * Test reproduce message is right with {@link Repeat} annotation.

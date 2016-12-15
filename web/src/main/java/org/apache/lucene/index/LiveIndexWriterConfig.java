@@ -17,9 +17,6 @@
 package org.apache.lucene.index;
 
 
-import java.util.Collections;
-import java.util.Set;
-
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.codecs.Codec;
 import org.apache.lucene.index.DocumentsWriterPerThread.IndexingChain;
@@ -29,6 +26,9 @@ import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.similarities.Similarity;
 import org.apache.lucene.util.InfoStream;
+
+import java.util.Collections;
+import java.util.Set;
 
 /**
  * Holds all the configuration used by {@link IndexWriter} with few setters for

@@ -17,9 +17,9 @@
 package org.apache.lucene.util.packed;
 
 
-import java.io.IOException;
-
 import org.apache.lucene.store.DataInput;
+
+import java.io.IOException;
 
 /**
  * A {@link DataInput} wrapper to read unaligned, variable-length packed

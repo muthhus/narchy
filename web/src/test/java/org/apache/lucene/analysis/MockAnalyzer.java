@@ -16,12 +16,12 @@
  */
 package org.apache.lucene.analysis;
 
+import org.apache.lucene.util.LuceneTestCase;
+import org.apache.lucene.util.automaton.CharacterRunAutomaton;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
-
-import org.apache.lucene.util.LuceneTestCase;
-import org.apache.lucene.util.automaton.CharacterRunAutomaton;
 
 /**
  * Analyzer for testing

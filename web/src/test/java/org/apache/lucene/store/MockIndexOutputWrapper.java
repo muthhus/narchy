@@ -16,10 +16,10 @@
  */
 package org.apache.lucene.store;
 
+import org.apache.lucene.util.LuceneTestCase;
+
 import java.io.Closeable;
 import java.io.IOException;
-
-import org.apache.lucene.util.LuceneTestCase;
 
 /**
  * Used by MockRAMDirectory to create an output stream that

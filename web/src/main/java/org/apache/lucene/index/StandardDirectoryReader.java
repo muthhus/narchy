@@ -17,19 +17,13 @@
 package org.apache.lucene.index;
 
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.lucene.store.AlreadyClosedException;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.IOContext;
 import org.apache.lucene.util.IOUtils;
+
+import java.io.IOException;
+import java.util.*;
 
 /** Default implementation of {@link DirectoryReader}. */
 public final class StandardDirectoryReader extends DirectoryReader {
@@ -399,7 +393,7 @@ public final class StandardDirectoryReader extends DirectoryReader {
   }
 
   static final class ReaderCommit extends IndexCommit {
-    private String segmentsFileName;
+    private final String segmentsFileName;
     Collection<String> files;
     Directory dir;
     long generation;

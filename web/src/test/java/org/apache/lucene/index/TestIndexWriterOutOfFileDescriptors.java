@@ -17,19 +17,19 @@
 package org.apache.lucene.index;
 
 
-import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
-
 import org.apache.lucene.analysis.MockAnalyzer;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.IOContext;
 import org.apache.lucene.store.MockDirectoryWrapper;
 import org.apache.lucene.util.LineFileDocs;
-import org.apache.lucene.util.LuceneTestCase.SuppressFileSystems;
 import org.apache.lucene.util.LuceneTestCase;
+import org.apache.lucene.util.LuceneTestCase.SuppressFileSystems;
 import org.apache.lucene.util.PrintStreamInfoStream;
 import org.apache.lucene.util.TestUtil;
+
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 
 @SuppressFileSystems("WindowsFS")
 public class TestIndexWriterOutOfFileDescriptors extends LuceneTestCase {

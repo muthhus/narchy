@@ -17,10 +17,6 @@
 package org.apache.lucene.index;
 
 
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.Map;
-
 import org.apache.lucene.codecs.TermVectorsWriter;
 import org.apache.lucene.store.FlushInfo;
 import org.apache.lucene.store.IOContext;
@@ -28,6 +24,10 @@ import org.apache.lucene.util.ArrayUtil;
 import org.apache.lucene.util.BytesRef;
 import org.apache.lucene.util.IOUtils;
 import org.apache.lucene.util.RamUsageEstimator;
+
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.Map;
 
 final class TermVectorsConsumer extends TermsHash {
 

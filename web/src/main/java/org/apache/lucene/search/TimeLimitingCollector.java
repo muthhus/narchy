@@ -17,11 +17,11 @@
 package org.apache.lucene.search;
 
 
-import java.io.IOException;
-
 import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.util.Counter;
 import org.apache.lucene.util.ThreadInterruptedException;
+
+import java.io.IOException;
 
 /**
  * The {@link TimeLimitingCollector} is used to timeout search requests that
@@ -35,9 +35,9 @@ public class TimeLimitingCollector implements Collector {
   /** Thrown when elapsed search time exceeds allowed search time. */
   @SuppressWarnings("serial")
   public static class TimeExceededException extends RuntimeException {
-    private long timeAllowed;
-    private long timeElapsed;
-    private int lastDocCollected;
+    private final long timeAllowed;
+    private final long timeElapsed;
+    private final int lastDocCollected;
     private TimeExceededException(long timeAllowed, long timeElapsed, int lastDocCollected) {
       super("Elapsed time: " + timeElapsed + ".  Exceeded allowed search time: " + timeAllowed + " ms.");
       this.timeAllowed = timeAllowed;
@@ -236,7 +236,7 @@ public class TimeLimitingCollector implements Collector {
     //   afford losing a tick or two.
     //
     // See section 17 of the Java Language Specification for details.
-    private volatile long time = 0;
+    private final long time = 0;
     private volatile boolean stop = false;
     private volatile long resolution;
     final Counter counter;

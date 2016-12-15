@@ -16,12 +16,10 @@
  */
 package org.apache.lucene.index;
 
-import static org.apache.lucene.util.RamUsageEstimator.NUM_BYTES_ARRAY_HEADER;
-import static org.apache.lucene.util.RamUsageEstimator.NUM_BYTES_OBJECT_HEADER;
-import static org.apache.lucene.util.RamUsageEstimator.NUM_BYTES_OBJECT_REF;
-
 import org.apache.lucene.document.NumericDocValuesField;
 import org.apache.lucene.util.BytesRef;
+
+import static org.apache.lucene.util.RamUsageEstimator.*;
 
 /** An in-place update to a DocValues field. */
 abstract class DocValuesUpdate {

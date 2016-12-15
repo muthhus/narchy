@@ -17,11 +17,11 @@
 package org.apache.lucene.index;
 
 
-import java.io.IOException;
-
 import org.apache.lucene.search.DocIdSetIterator;
 import org.apache.lucene.util.AttributeSource;
 import org.apache.lucene.util.BytesRef;
+
+import java.io.IOException;
 
 /** Iterates through the postings.
  *  NOTE: you must first call {@link #nextDoc} before using

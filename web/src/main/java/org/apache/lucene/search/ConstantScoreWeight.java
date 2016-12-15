@@ -17,11 +17,11 @@
 package org.apache.lucene.search;
 
 
-import java.io.IOException;
-import java.util.Set;
-
 import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.index.Term;
+
+import java.io.IOException;
+import java.util.Set;
 
 /**
  * A Weight that has a constant score equal to the boost of the wrapped query.

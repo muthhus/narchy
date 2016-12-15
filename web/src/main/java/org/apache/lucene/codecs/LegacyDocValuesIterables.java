@@ -17,16 +17,11 @@
 
 package org.apache.lucene.codecs;
 
+import org.apache.lucene.index.*;
+import org.apache.lucene.util.BytesRef;
+
 import java.io.IOException;
 import java.util.Iterator;
-
-import org.apache.lucene.index.BinaryDocValues;
-import org.apache.lucene.index.FieldInfo;
-import org.apache.lucene.index.NumericDocValues;
-import org.apache.lucene.index.SortedDocValues;
-import org.apache.lucene.index.SortedNumericDocValues;
-import org.apache.lucene.index.SortedSetDocValues;
-import org.apache.lucene.util.BytesRef;
 
 import static org.apache.lucene.index.SortedSetDocValues.NO_MORE_ORDS;
 import static org.apache.lucene.search.DocIdSetIterator.NO_MORE_DOCS;

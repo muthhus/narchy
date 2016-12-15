@@ -17,10 +17,10 @@
 package org.apache.lucene.search;
 
 
-import java.io.IOException;
-
 import org.apache.lucene.index.PostingsEnum;
 import org.apache.lucene.search.similarities.Similarity;
+
+import java.io.IOException;
 
 /** Expert: A <code>Scorer</code> for documents matching a <code>Term</code>.
  */

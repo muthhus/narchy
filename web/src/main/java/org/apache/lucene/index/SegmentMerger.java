@@ -17,19 +17,13 @@
 package org.apache.lucene.index;
 
 
-import java.io.IOException;
-import java.util.List;
-
-import org.apache.lucene.codecs.Codec;
-import org.apache.lucene.codecs.DocValuesConsumer;
-import org.apache.lucene.codecs.FieldsConsumer;
-import org.apache.lucene.codecs.NormsConsumer;
-import org.apache.lucene.codecs.PointsWriter;
-import org.apache.lucene.codecs.StoredFieldsWriter;
-import org.apache.lucene.codecs.TermVectorsWriter;
+import org.apache.lucene.codecs.*;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.IOContext;
 import org.apache.lucene.util.InfoStream;
+
+import java.io.IOException;
+import java.util.List;
 
 /**
  * The SegmentMerger class combines two or more Segments, represented by an

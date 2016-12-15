@@ -17,10 +17,10 @@
 package org.apache.lucene.index;
 
 
-import java.io.IOException;
-
 import org.apache.lucene.store.Directory;
 import org.junit.Test;
+
+import java.io.IOException;
 
 public class TestCheckIndex extends BaseTestCheckIndex {
   private Directory directory;

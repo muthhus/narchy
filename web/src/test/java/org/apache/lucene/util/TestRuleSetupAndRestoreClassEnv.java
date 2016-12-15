@@ -16,13 +16,8 @@
  */
 package org.apache.lucene.util;
 
-import java.io.PrintStream;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Locale;
-import java.util.Random;
-import java.util.TimeZone;
-
+import com.carrotsearch.randomizedtesting.RandomizedContext;
+import com.carrotsearch.randomizedtesting.generators.RandomPicks;
 import org.apache.lucene.codecs.Codec;
 import org.apache.lucene.codecs.DocValuesFormat;
 import org.apache.lucene.codecs.PostingsFormat;
@@ -38,23 +33,13 @@ import org.apache.lucene.codecs.simpletext.SimpleTextCodec;
 import org.apache.lucene.index.RandomCodec;
 import org.apache.lucene.search.similarities.RandomSimilarity;
 import org.apache.lucene.search.similarities.Similarity;
-import org.apache.lucene.util.LuceneTestCase.SuppressCodecs;
+import org.apache.lucene.util.LuceneTestCase.*;
 import org.junit.internal.AssumptionViolatedException;
 
-import com.carrotsearch.randomizedtesting.RandomizedContext;
-import com.carrotsearch.randomizedtesting.generators.RandomPicks;
+import java.io.PrintStream;
+import java.util.*;
 
-import static org.apache.lucene.util.LuceneTestCase.INFOSTREAM;
-import static org.apache.lucene.util.LuceneTestCase.LiveIWCFlushMode;
-import static org.apache.lucene.util.LuceneTestCase.TEST_CODEC;
-import static org.apache.lucene.util.LuceneTestCase.TEST_DOCVALUESFORMAT;
-import static org.apache.lucene.util.LuceneTestCase.TEST_POSTINGSFORMAT;
-import static org.apache.lucene.util.LuceneTestCase.VERBOSE;
-import static org.apache.lucene.util.LuceneTestCase.assumeFalse;
-import static org.apache.lucene.util.LuceneTestCase.localeForLanguageTag;
-import static org.apache.lucene.util.LuceneTestCase.random;
-import static org.apache.lucene.util.LuceneTestCase.randomLocale;
-import static org.apache.lucene.util.LuceneTestCase.randomTimeZone;
+import static org.apache.lucene.util.LuceneTestCase.*;
 
 /**
  * Setup and restore suite-level environment (fine grained junk that 

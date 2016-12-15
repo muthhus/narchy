@@ -17,25 +17,12 @@
 package org.apache.lucene.codecs.blocktree;
 
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.TreeMap;
-
 import org.apache.lucene.codecs.CodecUtil;
 import org.apache.lucene.codecs.FieldsProducer;
 import org.apache.lucene.codecs.PostingsReaderBase;
-import org.apache.lucene.index.CorruptIndexException;
-import org.apache.lucene.index.FieldInfo;
-import org.apache.lucene.index.IndexFileNames;
-import org.apache.lucene.index.IndexOptions;
-import org.apache.lucene.index.SegmentReadState;
-import org.apache.lucene.index.Terms;
-import org.apache.lucene.search.PrefixQuery;  // javadocs
-import org.apache.lucene.search.TermRangeQuery;  // javadocs
+import org.apache.lucene.index.*;
+import org.apache.lucene.search.PrefixQuery;
+import org.apache.lucene.search.TermRangeQuery;
 import org.apache.lucene.store.IndexInput;
 import org.apache.lucene.util.Accountable;
 import org.apache.lucene.util.Accountables;
@@ -43,6 +30,9 @@ import org.apache.lucene.util.BytesRef;
 import org.apache.lucene.util.IOUtils;
 import org.apache.lucene.util.fst.ByteSequenceOutputs;
 import org.apache.lucene.util.fst.Outputs;
+
+import java.io.IOException;
+import java.util.*;
 
 /** A block-based terms index and dictionary that assigns
  *  terms to variable length blocks according to how they

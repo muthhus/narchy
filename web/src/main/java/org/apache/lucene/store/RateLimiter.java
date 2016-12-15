@@ -17,9 +17,9 @@
 package org.apache.lucene.store;
 
 
-import java.io.IOException;
-
 import org.apache.lucene.util.ThreadInterruptedException;
+
+import java.io.IOException;
 
 /** Abstract base class to rate limit IO.  Typically implementations are
  *  shared across multiple IndexInputs or IndexOutputs (for example

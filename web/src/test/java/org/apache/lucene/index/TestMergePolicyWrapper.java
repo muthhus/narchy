@@ -16,10 +16,10 @@
  */
 package org.apache.lucene.index;
 
+import org.apache.lucene.util.LuceneTestCase;
+
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-
-import org.apache.lucene.util.LuceneTestCase;
 
 public class TestMergePolicyWrapper extends LuceneTestCase {
 

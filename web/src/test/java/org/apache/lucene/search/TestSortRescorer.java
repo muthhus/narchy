@@ -17,10 +17,6 @@
 package org.apache.lucene.search;
 
 
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.Comparator;
-
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.NumericDocValuesField;
@@ -32,6 +28,10 @@ import org.apache.lucene.search.similarities.ClassicSimilarity;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.util.LuceneTestCase;
 import org.apache.lucene.util.TestUtil;
+
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.Comparator;
 
 public class TestSortRescorer extends LuceneTestCase {
   IndexSearcher searcher;

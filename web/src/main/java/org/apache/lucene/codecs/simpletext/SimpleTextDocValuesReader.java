@@ -17,6 +17,17 @@
 package org.apache.lucene.codecs.simpletext;
 
 
+import org.apache.lucene.codecs.DocValuesProducer;
+import org.apache.lucene.index.*;
+import org.apache.lucene.search.DocIdSetIterator;
+import org.apache.lucene.store.BufferedChecksumIndexInput;
+import org.apache.lucene.store.ChecksumIndexInput;
+import org.apache.lucene.store.IndexInput;
+import org.apache.lucene.util.BytesRef;
+import org.apache.lucene.util.BytesRefBuilder;
+import org.apache.lucene.util.RamUsageEstimator;
+import org.apache.lucene.util.StringHelper;
+
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -29,27 +40,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.function.IntFunction;
 
-import org.apache.lucene.codecs.DocValuesProducer;
-import org.apache.lucene.index.*;
-import org.apache.lucene.index.NumericDocValues;
-import org.apache.lucene.search.DocIdSetIterator;
-import org.apache.lucene.store.BufferedChecksumIndexInput;
-import org.apache.lucene.store.ChecksumIndexInput;
-import org.apache.lucene.store.IndexInput;
-import org.apache.lucene.util.BytesRef;
-import org.apache.lucene.util.BytesRefBuilder;
-import org.apache.lucene.util.RamUsageEstimator;
-import org.apache.lucene.util.StringHelper;
-
-import static org.apache.lucene.codecs.simpletext.SimpleTextDocValuesWriter.END;
-import static org.apache.lucene.codecs.simpletext.SimpleTextDocValuesWriter.FIELD;
-import static org.apache.lucene.codecs.simpletext.SimpleTextDocValuesWriter.LENGTH;
-import static org.apache.lucene.codecs.simpletext.SimpleTextDocValuesWriter.MAXLENGTH;
-import static org.apache.lucene.codecs.simpletext.SimpleTextDocValuesWriter.MINVALUE;
-import static org.apache.lucene.codecs.simpletext.SimpleTextDocValuesWriter.NUMVALUES;
-import static org.apache.lucene.codecs.simpletext.SimpleTextDocValuesWriter.ORDPATTERN;
-import static org.apache.lucene.codecs.simpletext.SimpleTextDocValuesWriter.PATTERN;
-import static org.apache.lucene.codecs.simpletext.SimpleTextDocValuesWriter.TYPE;
+import static org.apache.lucene.codecs.simpletext.SimpleTextDocValuesWriter.*;
 
 class SimpleTextDocValuesReader extends DocValuesProducer {
 

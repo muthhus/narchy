@@ -17,13 +17,13 @@
 package org.apache.lucene.index;
 
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-
 import org.apache.lucene.util.ByteBlockPool;
 import org.apache.lucene.util.Counter;
 import org.apache.lucene.util.IntBlockPool;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 /** This class is passed each token produced by the analyzer
  *  on each field during indexing, and it stores these

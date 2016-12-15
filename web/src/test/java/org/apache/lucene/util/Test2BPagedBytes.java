@@ -17,14 +17,10 @@
 package org.apache.lucene.util;
 
 
-import java.util.Random;
-
-import org.apache.lucene.store.BaseDirectoryWrapper;
-import org.apache.lucene.store.IOContext;
-import org.apache.lucene.store.IndexInput;
-import org.apache.lucene.store.IndexOutput;
-import org.apache.lucene.store.MockDirectoryWrapper;
+import org.apache.lucene.store.*;
 import org.apache.lucene.util.LuceneTestCase.Monster;
+
+import java.util.Random;
 
 @Monster("You must increase heap to > 2 G to run this")
 public class Test2BPagedBytes extends LuceneTestCase {

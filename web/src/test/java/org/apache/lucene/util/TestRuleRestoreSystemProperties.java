@@ -16,12 +16,12 @@
  */
 package org.apache.lucene.util;
 
+import com.carrotsearch.randomizedtesting.rules.SystemPropertiesRestoreRule;
+import com.carrotsearch.randomizedtesting.rules.TestRuleAdapter;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import com.carrotsearch.randomizedtesting.rules.SystemPropertiesRestoreRule;
-import com.carrotsearch.randomizedtesting.rules.TestRuleAdapter;
 
 /**
  * Restore a given set of system properties to a snapshot taken at the beginning

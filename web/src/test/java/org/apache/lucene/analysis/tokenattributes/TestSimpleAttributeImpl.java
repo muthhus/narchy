@@ -17,8 +17,8 @@
 package org.apache.lucene.analysis.tokenattributes;
 
 
-import org.apache.lucene.util.TestUtil;
 import org.apache.lucene.util.LuceneTestCase;
+import org.apache.lucene.util.TestUtil;
 
 import java.util.Collections;
 import java.util.HashMap;

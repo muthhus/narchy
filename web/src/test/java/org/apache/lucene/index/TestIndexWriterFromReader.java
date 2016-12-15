@@ -17,16 +17,16 @@
 package org.apache.lucene.index;
 
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.store.AlreadyClosedException;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.util.IOUtils;
 import org.apache.lucene.util.LuceneTestCase;
+
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 public class TestIndexWriterFromReader extends LuceneTestCase {
 

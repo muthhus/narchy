@@ -17,14 +17,14 @@
 package org.apache.lucene.search;
 
 
+import org.apache.lucene.store.AlreadyClosedException;
+
 import java.io.Closeable;
 import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
-
-import org.apache.lucene.store.AlreadyClosedException;
 
 /**
  * Utility class to safely share instances of a certain type across multiple

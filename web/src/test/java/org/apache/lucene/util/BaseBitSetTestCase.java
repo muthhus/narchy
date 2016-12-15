@@ -16,13 +16,13 @@
  */
 package org.apache.lucene.util;
 
-import java.io.IOException;
-import java.util.Collection;
-import java.util.Collections;
-
 import org.apache.lucene.search.DocIdSet;
 import org.apache.lucene.search.DocIdSetIterator;
 import org.junit.Ignore;
+
+import java.io.IOException;
+import java.util.Collection;
+import java.util.Collections;
 
 /**
  * Base test case for BitSets.

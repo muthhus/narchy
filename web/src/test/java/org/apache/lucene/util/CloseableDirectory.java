@@ -16,10 +16,10 @@
  */
 package org.apache.lucene.util;
 
-import java.io.Closeable;
-
 import org.apache.lucene.store.BaseDirectoryWrapper;
 import org.junit.Assert;
+
+import java.io.Closeable;
 
 /**
  * Attempts to close a {@link BaseDirectoryWrapper}.

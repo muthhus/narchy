@@ -17,9 +17,9 @@
 package org.apache.lucene.search;
 
 
-import java.io.IOException;
-
 import org.apache.lucene.util.FrequencyTrackingRingBuffer;
+
+import java.io.IOException;
 
 /**
  * A {@link QueryCachingPolicy} that tracks usage statistics of recently-used

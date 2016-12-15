@@ -16,25 +16,18 @@
  */
 package org.apache.lucene.search;
 
-import java.io.IOException;
-import java.util.AbstractCollection;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.NoSuchElementException;
 import org.apache.lucene.document.IntPoint;
 import org.apache.lucene.index.LeafReader;
 import org.apache.lucene.index.LeafReaderContext;
+import org.apache.lucene.index.PointValues;
 import org.apache.lucene.index.PointValues.IntersectVisitor;
 import org.apache.lucene.index.PointValues.Relation;
-import org.apache.lucene.index.PointValues;
-import org.apache.lucene.index.PrefixCodedTerms.TermIterator;
 import org.apache.lucene.index.PrefixCodedTerms;
-import org.apache.lucene.util.BytesRef;
-import org.apache.lucene.util.BytesRefBuilder;
-import org.apache.lucene.util.BytesRefIterator;
-import org.apache.lucene.util.DocIdSetBuilder;
-import org.apache.lucene.util.StringHelper;
+import org.apache.lucene.index.PrefixCodedTerms.TermIterator;
+import org.apache.lucene.util.*;
+
+import java.io.IOException;
+import java.util.*;
 
 /**
  * Abstract query class to find all documents whose single or multi-dimensional point values, previously indexed with e.g. {@link IntPoint},
@@ -158,7 +151,7 @@ public abstract class PointInSetQuery extends Query {
   private class MergePointVisitor implements IntersectVisitor {
 
     private final DocIdSetBuilder result;
-    private TermIterator iterator;
+    private final TermIterator iterator;
     private BytesRef nextQueryPoint;
     private final BytesRef scratch = new BytesRef();
     private final PrefixCodedTerms sortedPackedPoints;

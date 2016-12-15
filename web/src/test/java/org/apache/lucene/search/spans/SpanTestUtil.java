@@ -16,12 +16,12 @@
  */
 package org.apache.lucene.search.spans;
 
-import java.io.IOException;
-
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.QueryUtils;
 
-import static org.junit.Assert.*;
+import java.io.IOException;
+
+import static org.junit.Assert.assertEquals;
 
 /** Some utility methods used for testing span queries */
 public class SpanTestUtil {

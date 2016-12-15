@@ -16,15 +16,15 @@
  */
 package org.apache.lucene.codecs.lucene70;
 
-import java.io.DataInput;
-import java.io.IOException;
-
 import org.apache.lucene.search.DocIdSetIterator;
 import org.apache.lucene.store.IndexInput;
 import org.apache.lucene.store.IndexOutput;
 import org.apache.lucene.util.BitSetIterator;
 import org.apache.lucene.util.FixedBitSet;
 import org.apache.lucene.util.RoaringDocIdSet;
+
+import java.io.DataInput;
+import java.io.IOException;
 
 /**
  * Disk-based implementation of a {@link DocIdSetIterator} which can return

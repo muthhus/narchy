@@ -16,14 +16,14 @@
  */
 package org.apache.lucene.search.similarities;
 
-import java.io.IOException;
-
 import org.apache.lucene.index.FieldInvertState;
 import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.search.CollectionStatistics;
 import org.apache.lucene.search.Explanation;
 import org.apache.lucene.search.TermStatistics;
 import org.apache.lucene.util.BytesRef;
+
+import java.io.IOException;
 
 /**
  * Simple similarity that gives terms a score that is equal to their query

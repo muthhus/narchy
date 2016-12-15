@@ -17,8 +17,9 @@
 package org.apache.lucene.util;
 
 
-import org.apache.lucene.index.IndexWriter; // javadocs
-import org.apache.lucene.index.SegmentInfos; // javadocs
+import org.apache.lucene.index.IndexWriter;
+import org.apache.lucene.index.SegmentInfos;
+
 import java.io.Closeable;
 
 /** 

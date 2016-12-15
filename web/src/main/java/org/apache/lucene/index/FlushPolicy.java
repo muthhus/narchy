@@ -16,11 +16,11 @@
  */
 package org.apache.lucene.index;
 
-import java.util.Iterator;
-
 import org.apache.lucene.index.DocumentsWriterPerThreadPool.ThreadState;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.util.InfoStream;
+
+import java.util.Iterator;
 
 /**
  * {@link FlushPolicy} controls when segments are flushed from a RAM resident

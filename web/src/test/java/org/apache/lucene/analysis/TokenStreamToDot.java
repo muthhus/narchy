@@ -16,13 +16,13 @@
  */
 package org.apache.lucene.analysis;
 
-import java.io.PrintWriter;
-import java.io.IOException;
-
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.apache.lucene.analysis.tokenattributes.OffsetAttribute;
 import org.apache.lucene.analysis.tokenattributes.PositionIncrementAttribute;
 import org.apache.lucene.analysis.tokenattributes.PositionLengthAttribute;
+
+import java.io.IOException;
+import java.io.PrintWriter;
 
 /** Consumes a TokenStream and outputs the dot (graphviz) string (graph). */
 public class TokenStreamToDot {

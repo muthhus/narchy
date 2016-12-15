@@ -17,9 +17,9 @@
 package org.apache.lucene.index;
 
 
-import java.util.regex.Pattern;
-
 import org.apache.lucene.codecs.Codec;
+
+import java.util.regex.Pattern;
 
 /**
  * This class contains useful constants representing filenames and extensions

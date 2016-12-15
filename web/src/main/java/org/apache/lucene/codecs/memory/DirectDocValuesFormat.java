@@ -17,15 +17,15 @@
 package org.apache.lucene.codecs.memory;
 
 
-import java.io.IOException;
-
 import org.apache.lucene.codecs.DocValuesConsumer;
 import org.apache.lucene.codecs.DocValuesFormat;
 import org.apache.lucene.codecs.DocValuesProducer;
-import org.apache.lucene.document.SortedSetDocValuesField; // javadocs
+import org.apache.lucene.document.SortedSetDocValuesField;
 import org.apache.lucene.index.SegmentReadState;
 import org.apache.lucene.index.SegmentWriteState;
 import org.apache.lucene.util.ArrayUtil;
+
+import java.io.IOException;
 
 /** In-memory docvalues format that does no (or very little)
  *  compression.  Indexed values are stored on disk, but

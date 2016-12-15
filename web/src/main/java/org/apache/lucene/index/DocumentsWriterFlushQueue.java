@@ -16,13 +16,13 @@
  */
 package org.apache.lucene.index;
 
+import org.apache.lucene.index.DocumentsWriterPerThread.FlushedSegment;
+
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantLock;
-
-import org.apache.lucene.index.DocumentsWriterPerThread.FlushedSegment;
 
 /**
  * @lucene.internal 

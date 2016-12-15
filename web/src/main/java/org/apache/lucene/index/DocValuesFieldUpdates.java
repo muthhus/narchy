@@ -17,11 +17,11 @@
 package org.apache.lucene.index;
 
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.apache.lucene.search.DocIdSetIterator;
 import org.apache.lucene.util.packed.PagedGrowableWriter;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Holds updates of a single DocValues field, for a set of documents.

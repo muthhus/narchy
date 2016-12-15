@@ -16,9 +16,9 @@
  */
 package org.apache.lucene.analysis;
 
-import java.io.IOException;
-
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
+
+import java.io.IOException;
 
 /** A lowercasing {@link TokenFilter}. */
 public final class MockLowerCaseFilter extends TokenFilter {

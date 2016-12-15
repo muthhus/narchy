@@ -16,15 +16,15 @@
  */
 package org.apache.lucene.util;
 
+import com.carrotsearch.randomizedtesting.ClassModel;
+import com.carrotsearch.randomizedtesting.ClassModel.MethodModel;
+import com.carrotsearch.randomizedtesting.TestMethodProvider;
+
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
-
-import com.carrotsearch.randomizedtesting.ClassModel;
-import com.carrotsearch.randomizedtesting.ClassModel.MethodModel;
-import com.carrotsearch.randomizedtesting.TestMethodProvider;
 
 /**
  * Backwards compatible test* method provider (public, non-static).

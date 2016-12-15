@@ -17,17 +17,10 @@
 package org.apache.lucene.util;
 
 
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.NoSuchElementException;
-import java.util.Objects;
-import java.util.Set;
+import org.apache.lucene.analysis.TokenStream;
 
-import org.apache.lucene.analysis.TokenStream; // for javadocs
+import java.util.*;
+import java.util.Map.Entry;
 
 /**
  * An AttributeSource contains a list of different {@link AttributeImpl}s,

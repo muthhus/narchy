@@ -17,11 +17,11 @@
 package org.apache.lucene.index;
 
 
-import java.io.IOException;
-import java.util.Objects;
-
 import org.apache.lucene.store.DataInput;
 import org.apache.lucene.store.DataOutput;
+
+import java.io.IOException;
+import java.util.Objects;
 
 /**
  * This exception is thrown when Lucene detects

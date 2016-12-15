@@ -17,13 +17,13 @@
 package org.apache.lucene.search;
 
 
-import java.io.IOException;
-import java.util.concurrent.ExecutorService; // javadocs
-
 import org.apache.lucene.index.IndexReader;
-import org.apache.lucene.index.IndexWriter; // javadocs
-import org.apache.lucene.index.IndexWriterConfig; // javadocs
-import org.apache.lucene.search.similarities.Similarity; // javadocs
+import org.apache.lucene.index.IndexWriter;
+import org.apache.lucene.index.IndexWriterConfig;
+import org.apache.lucene.search.similarities.Similarity;
+
+import java.io.IOException;
+import java.util.concurrent.ExecutorService;
 
 /**
  * Factory class used by {@link SearcherManager} to

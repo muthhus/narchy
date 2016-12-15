@@ -17,41 +17,20 @@
 package org.apache.lucene.search.spans;
 
 
-import java.io.IOException;
-import java.util.List;
-
 import org.apache.lucene.analysis.MockAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
-import org.apache.lucene.index.DirectoryReader;
-import org.apache.lucene.index.IndexReader;
-import org.apache.lucene.index.IndexReaderContext;
-import org.apache.lucene.index.IndexWriter;
-import org.apache.lucene.index.IndexWriterConfig;
-import org.apache.lucene.index.LeafReaderContext;
-import org.apache.lucene.index.RandomIndexWriter;
-import org.apache.lucene.index.ReaderUtil;
-import org.apache.lucene.index.Term;
-import org.apache.lucene.search.CheckHits;
-import org.apache.lucene.search.DocIdSetIterator;
-import org.apache.lucene.search.FuzzyQuery;
-import org.apache.lucene.search.IndexSearcher;
-import org.apache.lucene.search.PrefixQuery;
-import org.apache.lucene.search.Query;
-import org.apache.lucene.search.Scorer;
-import org.apache.lucene.search.TermQuery;
+import org.apache.lucene.index.*;
+import org.apache.lucene.search.*;
 import org.apache.lucene.search.similarities.ClassicSimilarity;
 import org.apache.lucene.search.similarities.Similarity;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.util.LuceneTestCase;
 
-import static org.apache.lucene.search.spans.SpanTestUtil.assertFinished;
-import static org.apache.lucene.search.spans.SpanTestUtil.assertNext;
-import static org.apache.lucene.search.spans.SpanTestUtil.spanNearOrderedQuery;
-import static org.apache.lucene.search.spans.SpanTestUtil.spanNearUnorderedQuery;
-import static org.apache.lucene.search.spans.SpanTestUtil.spanNotQuery;
-import static org.apache.lucene.search.spans.SpanTestUtil.spanOrQuery;
-import static org.apache.lucene.search.spans.SpanTestUtil.spanTermQuery;
+import java.io.IOException;
+import java.util.List;
+
+import static org.apache.lucene.search.spans.SpanTestUtil.*;
 
 public class TestSpans extends LuceneTestCase {
   private IndexSearcher searcher;

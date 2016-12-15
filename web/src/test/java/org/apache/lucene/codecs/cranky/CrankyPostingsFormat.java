@@ -16,15 +16,15 @@
  */
 package org.apache.lucene.codecs.cranky;
 
-import java.io.IOException;
-import java.util.Random;
-
 import org.apache.lucene.codecs.FieldsConsumer;
 import org.apache.lucene.codecs.FieldsProducer;
 import org.apache.lucene.codecs.PostingsFormat;
 import org.apache.lucene.index.Fields;
 import org.apache.lucene.index.SegmentReadState;
 import org.apache.lucene.index.SegmentWriteState;
+
+import java.io.IOException;
+import java.util.Random;
 
 class CrankyPostingsFormat extends PostingsFormat {
   final PostingsFormat delegate;

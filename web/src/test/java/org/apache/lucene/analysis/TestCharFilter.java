@@ -17,11 +17,11 @@
 package org.apache.lucene.analysis;
 
 
+import org.apache.lucene.util.LuceneTestCase;
+
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
-
-import org.apache.lucene.util.LuceneTestCase;
 
 public class TestCharFilter extends LuceneTestCase {
 

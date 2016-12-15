@@ -16,9 +16,6 @@
  */
 package org.apache.lucene.util.bkd;
 
-import java.io.IOException;
-import java.util.Arrays;
-
 import org.apache.lucene.index.PointValues.IntersectVisitor;
 import org.apache.lucene.index.PointValues.Relation;
 import org.apache.lucene.store.Directory;
@@ -27,6 +24,9 @@ import org.apache.lucene.store.IndexInput;
 import org.apache.lucene.store.IndexOutput;
 import org.apache.lucene.util.LuceneTestCase;
 import org.apache.lucene.util.TestUtil;
+
+import java.io.IOException;
+import java.util.Arrays;
 
 public class TestDocIdsWriter extends LuceneTestCase {
 

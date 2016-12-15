@@ -17,6 +17,14 @@
 package org.apache.lucene.codecs.compressing;
 
 
+import org.apache.lucene.codecs.CodecUtil;
+import org.apache.lucene.codecs.TermVectorsReader;
+import org.apache.lucene.index.*;
+import org.apache.lucene.store.*;
+import org.apache.lucene.util.*;
+import org.apache.lucene.util.packed.BlockPackedReaderIterator;
+import org.apache.lucene.util.packed.PackedInts;
+
 import java.io.Closeable;
 import java.io.IOException;
 import java.util.Collection;
@@ -24,39 +32,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-import org.apache.lucene.codecs.CodecUtil;
-import org.apache.lucene.codecs.TermVectorsReader;
-import org.apache.lucene.index.CorruptIndexException;
-import org.apache.lucene.index.PostingsEnum;
-import org.apache.lucene.index.FieldInfo;
-import org.apache.lucene.index.FieldInfos;
-import org.apache.lucene.index.Fields;
-import org.apache.lucene.index.IndexFileNames;
-import org.apache.lucene.index.SegmentInfo;
-import org.apache.lucene.index.Terms;
-import org.apache.lucene.index.TermsEnum;
-import org.apache.lucene.store.AlreadyClosedException;
-import org.apache.lucene.store.ByteArrayDataInput;
-import org.apache.lucene.store.ChecksumIndexInput;
-import org.apache.lucene.store.Directory;
-import org.apache.lucene.store.IOContext;
-import org.apache.lucene.store.IndexInput;
-import org.apache.lucene.util.*;
-import org.apache.lucene.util.packed.BlockPackedReaderIterator;
-import org.apache.lucene.util.packed.PackedInts;
-
-import static org.apache.lucene.codecs.compressing.CompressingTermVectorsWriter.CODEC_SFX_DAT;
-import static org.apache.lucene.codecs.compressing.CompressingTermVectorsWriter.CODEC_SFX_IDX;
-import static org.apache.lucene.codecs.compressing.CompressingTermVectorsWriter.FLAGS_BITS;
-import static org.apache.lucene.codecs.compressing.CompressingTermVectorsWriter.OFFSETS;
-import static org.apache.lucene.codecs.compressing.CompressingTermVectorsWriter.PACKED_BLOCK_SIZE;
-import static org.apache.lucene.codecs.compressing.CompressingTermVectorsWriter.PAYLOADS;
-import static org.apache.lucene.codecs.compressing.CompressingTermVectorsWriter.POSITIONS;
-import static org.apache.lucene.codecs.compressing.CompressingTermVectorsWriter.VECTORS_EXTENSION;
-import static org.apache.lucene.codecs.compressing.CompressingTermVectorsWriter.VECTORS_INDEX_EXTENSION;
-import static org.apache.lucene.codecs.compressing.CompressingTermVectorsWriter.VERSION_CHUNK_STATS;
-import static org.apache.lucene.codecs.compressing.CompressingTermVectorsWriter.VERSION_CURRENT;
-import static org.apache.lucene.codecs.compressing.CompressingTermVectorsWriter.VERSION_START;
+import static org.apache.lucene.codecs.compressing.CompressingTermVectorsWriter.*;
 
 /**
  * {@link TermVectorsReader} for {@link CompressingTermVectorsFormat}.

@@ -17,9 +17,6 @@
 package org.apache.lucene.codecs.simpletext;
 
 
-import java.io.IOException;
-import java.util.Locale;
-
 import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.store.ChecksumIndexInput;
 import org.apache.lucene.store.DataInput;
@@ -28,6 +25,9 @@ import org.apache.lucene.store.IndexOutput;
 import org.apache.lucene.util.BytesRef;
 import org.apache.lucene.util.BytesRefBuilder;
 import org.apache.lucene.util.StringHelper;
+
+import java.io.IOException;
+import java.util.Locale;
 
 class SimpleTextUtil {
     public final static byte NEWLINE = 10;

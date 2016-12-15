@@ -17,9 +17,6 @@
 package org.apache.lucene.index;
 
 
-import java.util.HashSet;
-import java.util.Set;
-
 import org.apache.lucene.analysis.MockAnalyzer;
 import org.apache.lucene.codecs.Codec;
 import org.apache.lucene.document.Document;
@@ -27,6 +24,9 @@ import org.apache.lucene.document.Field;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.util.LuceneTestCase;
 import org.apache.lucene.util.TestUtil;
+
+import java.util.HashSet;
+import java.util.Set;
 
 public class TestMixedCodecs extends LuceneTestCase {
 

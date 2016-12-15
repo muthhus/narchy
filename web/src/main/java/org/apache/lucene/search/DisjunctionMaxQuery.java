@@ -16,19 +16,12 @@
  */
 package org.apache.lucene.search;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
-
-import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.index.Term;
+
+import java.io.IOException;
+import java.util.*;
 
 /**
  * A query that generates the union of documents produced by its subqueries, and that scores each document with the maximum

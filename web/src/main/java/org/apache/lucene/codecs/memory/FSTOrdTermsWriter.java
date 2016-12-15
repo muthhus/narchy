@@ -17,22 +17,11 @@
 package org.apache.lucene.codecs.memory;
 
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.lucene.codecs.BlockTermState;
 import org.apache.lucene.codecs.CodecUtil;
 import org.apache.lucene.codecs.FieldsConsumer;
 import org.apache.lucene.codecs.PostingsWriterBase;
-import org.apache.lucene.index.FieldInfo;
-import org.apache.lucene.index.FieldInfos;
-import org.apache.lucene.index.Fields;
-import org.apache.lucene.index.IndexFileNames;
-import org.apache.lucene.index.IndexOptions;
-import org.apache.lucene.index.SegmentWriteState;
-import org.apache.lucene.index.Terms;
-import org.apache.lucene.index.TermsEnum;
+import org.apache.lucene.index.*;
 import org.apache.lucene.store.DataOutput;
 import org.apache.lucene.store.IndexOutput;
 import org.apache.lucene.store.RAMOutputStream;
@@ -44,6 +33,10 @@ import org.apache.lucene.util.fst.Builder;
 import org.apache.lucene.util.fst.FST;
 import org.apache.lucene.util.fst.PositiveIntOutputs;
 import org.apache.lucene.util.fst.Util;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 /** 
  * FST-based term dict, using ord as FST output.
@@ -301,9 +294,9 @@ public class FSTOrdTermsWriter extends FieldsConsumer {
     private long lastBlockStatsFP;
     private long lastBlockMetaLongsFP;
     private long lastBlockMetaBytesFP;
-    private long[] lastBlockLongs;
+    private final long[] lastBlockLongs;
 
-    private long[] lastLongs;
+    private final long[] lastLongs;
     private long lastMetaBytesFP;
 
     TermsWriter(FieldInfo fieldInfo) {

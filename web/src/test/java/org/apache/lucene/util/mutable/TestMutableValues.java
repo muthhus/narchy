@@ -16,8 +16,8 @@
  */
 package org.apache.lucene.util.mutable;
 
-import org.apache.lucene.util.LuceneTestCase;
 import org.apache.lucene.util.BytesRef;
+import org.apache.lucene.util.LuceneTestCase;
 
 /**
  * Simple test of the basic contract of the various {@link MutableValue} implementaitons.

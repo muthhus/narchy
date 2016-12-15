@@ -17,10 +17,10 @@
 package org.apache.lucene.codecs.compressing;
 
 
+import com.carrotsearch.randomizedtesting.generators.RandomNumbers;
+
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-
-import com.carrotsearch.randomizedtesting.generators.RandomNumbers;
 
 public abstract class AbstractTestLZ4CompressionMode extends AbstractTestCompressionMode {
 

@@ -17,9 +17,9 @@
 package org.apache.lucene.index;
 
 
-import java.io.IOException;
-
 import org.apache.lucene.codecs.DocValuesConsumer;
+
+import java.io.IOException;
 
 abstract class DocValuesWriter {
   abstract void finish(int numDoc);

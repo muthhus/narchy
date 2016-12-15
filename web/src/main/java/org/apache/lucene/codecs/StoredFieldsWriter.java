@@ -16,24 +16,18 @@
  */
 package org.apache.lucene.codecs;
 
+import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.analysis.TokenStream;
+import org.apache.lucene.document.StoredField;
+import org.apache.lucene.index.*;
+import org.apache.lucene.util.BytesRef;
+
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.TokenStream;
-import org.apache.lucene.document.StoredField;
-import org.apache.lucene.index.DocIDMerger;
-import org.apache.lucene.index.FieldInfo;
-import org.apache.lucene.index.FieldInfos;
-import org.apache.lucene.index.IndexableField;
-import org.apache.lucene.index.IndexableFieldType;
-import org.apache.lucene.index.MergeState;
-import org.apache.lucene.index.StoredFieldVisitor;
-import org.apache.lucene.util.BytesRef;
 
 import static org.apache.lucene.search.DocIdSetIterator.NO_MORE_DOCS;
 

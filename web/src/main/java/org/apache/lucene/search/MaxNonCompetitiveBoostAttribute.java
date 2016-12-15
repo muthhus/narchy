@@ -17,10 +17,10 @@
 package org.apache.lucene.search;
 
 
+import org.apache.lucene.index.Terms;
 import org.apache.lucene.util.Attribute;
-import org.apache.lucene.util.AttributeSource; // javadocs only
+import org.apache.lucene.util.AttributeSource;
 import org.apache.lucene.util.BytesRef;
-import org.apache.lucene.index.Terms; // javadocs only
 
 /** Add this {@link Attribute} to a fresh {@link AttributeSource} before calling
  * {@link MultiTermQuery#getTermsEnum(Terms,AttributeSource)}.

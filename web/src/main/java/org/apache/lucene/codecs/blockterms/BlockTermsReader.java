@@ -17,35 +17,17 @@
 package org.apache.lucene.codecs.blockterms;
 
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.TreeMap;
-
 import org.apache.lucene.codecs.BlockTermState;
 import org.apache.lucene.codecs.CodecUtil;
 import org.apache.lucene.codecs.FieldsProducer;
 import org.apache.lucene.codecs.PostingsReaderBase;
-import org.apache.lucene.index.CorruptIndexException;
-import org.apache.lucene.index.PostingsEnum;
-import org.apache.lucene.index.FieldInfo;
-import org.apache.lucene.index.IndexFileNames;
-import org.apache.lucene.index.IndexOptions;
-import org.apache.lucene.index.SegmentReadState;
-import org.apache.lucene.index.TermState;
-import org.apache.lucene.index.Terms;
-import org.apache.lucene.index.TermsEnum;
+import org.apache.lucene.index.*;
 import org.apache.lucene.store.ByteArrayDataInput;
 import org.apache.lucene.store.IndexInput;
-import org.apache.lucene.util.Accountable;
-import org.apache.lucene.util.Accountables;
-import org.apache.lucene.util.ArrayUtil;
-import org.apache.lucene.util.BytesRef;
-import org.apache.lucene.util.BytesRefBuilder;
-import org.apache.lucene.util.RamUsageEstimator;
+import org.apache.lucene.util.*;
+
+import java.io.IOException;
+import java.util.*;
 
 /** Handles a terms dict, but decouples all details of
  *  doc/freqs/positions reading to an instance of {@link
@@ -311,7 +293,7 @@ public class BlockTermsReader extends FieldsProducer {
       private boolean seekPending;
 
       private byte[] termSuffixes;
-      private ByteArrayDataInput termSuffixesReader = new ByteArrayDataInput();
+      private final ByteArrayDataInput termSuffixesReader = new ByteArrayDataInput();
 
       /* Common prefix used for all terms in this block. */
       private int termBlockPrefix;
@@ -323,7 +305,7 @@ public class BlockTermsReader extends FieldsProducer {
       private final ByteArrayDataInput freqReader = new ByteArrayDataInput();
       private int metaDataUpto;
 
-      private long[] longs;
+      private final long[] longs;
       private byte[] bytes;
       private ByteArrayDataInput bytesReader;
 

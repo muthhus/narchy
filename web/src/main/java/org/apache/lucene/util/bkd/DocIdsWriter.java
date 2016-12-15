@@ -16,11 +16,11 @@
  */
 package org.apache.lucene.util.bkd;
 
-import java.io.IOException;
-
 import org.apache.lucene.index.PointValues.IntersectVisitor;
 import org.apache.lucene.store.DataOutput;
 import org.apache.lucene.store.IndexInput;
+
+import java.io.IOException;
 
 class DocIdsWriter {
 

@@ -17,12 +17,12 @@
 package org.apache.lucene.search;
 
 
+import org.apache.lucene.util.PriorityQueue;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-
-import org.apache.lucene.util.PriorityQueue;
 
 /**
  * Base class for Scorers that score disjunctions.

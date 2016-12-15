@@ -17,11 +17,11 @@
 package org.apache.lucene.util;
 
 
-import java.io.IOException;
-import java.util.Arrays;
-
 import org.apache.lucene.search.DocIdSet;
 import org.apache.lucene.search.DocIdSetIterator;
+
+import java.io.IOException;
+import java.util.Arrays;
 
 /**
  * {@link DocIdSet} implementation inspired from http://roaringbitmap.org/

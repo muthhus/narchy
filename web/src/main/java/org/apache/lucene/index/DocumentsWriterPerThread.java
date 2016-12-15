@@ -16,15 +16,6 @@
  */
 package org.apache.lucene.index;
 
-import java.io.IOException;
-import java.text.NumberFormat;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Locale;
-import java.util.Set;
-import java.util.concurrent.atomic.AtomicLong;
-
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.codecs.Codec;
 import org.apache.lucene.index.DocumentsWriterDeleteQueue.DeleteSlice;
@@ -35,12 +26,12 @@ import org.apache.lucene.store.IOContext;
 import org.apache.lucene.store.TrackingDirectoryWrapper;
 import org.apache.lucene.util.ByteBlockPool.Allocator;
 import org.apache.lucene.util.ByteBlockPool.DirectTrackingAllocator;
-import org.apache.lucene.util.Counter;
-import org.apache.lucene.util.InfoStream;
-import org.apache.lucene.util.IntBlockPool;
-import org.apache.lucene.util.MutableBits;
-import org.apache.lucene.util.StringHelper;
-import org.apache.lucene.util.Version;
+import org.apache.lucene.util.*;
+
+import java.io.IOException;
+import java.text.NumberFormat;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicLong;
 
 import static org.apache.lucene.util.ByteBlockPool.BYTE_BLOCK_MASK;
 import static org.apache.lucene.util.ByteBlockPool.BYTE_BLOCK_SIZE;

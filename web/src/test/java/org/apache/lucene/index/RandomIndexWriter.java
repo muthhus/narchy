@@ -16,22 +16,17 @@
  */
 package org.apache.lucene.index;
 
-import java.io.Closeable;
-import java.io.IOException;
-import java.util.Iterator;
-import java.util.Random;
-
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.MockAnalyzer;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.store.Directory;
-import org.apache.lucene.util.BytesRef;
-import org.apache.lucene.util.IOUtils;
-import org.apache.lucene.util.InfoStream;
-import org.apache.lucene.util.LuceneTestCase;
-import org.apache.lucene.util.NullInfoStream;
-import org.apache.lucene.util.TestUtil;
+import org.apache.lucene.util.*;
+
+import java.io.Closeable;
+import java.io.IOException;
+import java.util.Iterator;
+import java.util.Random;
 
 /** Silly class that randomizes the indexing experience.  EG
  *  it may swap in a different merge policy/scheduler; may

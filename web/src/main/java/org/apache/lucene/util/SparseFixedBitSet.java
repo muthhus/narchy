@@ -17,10 +17,10 @@
 package org.apache.lucene.util;
 
 
+import org.apache.lucene.search.DocIdSetIterator;
+
 import java.io.IOException;
 import java.util.Arrays;
-
-import org.apache.lucene.search.DocIdSetIterator;
 
 /**
  * A bit set that only stores longs that have at least one bit which is set.

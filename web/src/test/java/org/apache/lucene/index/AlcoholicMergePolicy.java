@@ -16,14 +16,10 @@
  */
 package org.apache.lucene.index;
 
-import java.io.IOException;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
-import java.util.Locale;
-import java.util.Random;
-import java.util.TimeZone;
-
 import org.apache.lucene.util.TestUtil;
+
+import java.io.IOException;
+import java.util.*;
 
 /** 
  * <p>

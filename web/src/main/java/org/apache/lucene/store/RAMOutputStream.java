@@ -17,14 +17,14 @@
 package org.apache.lucene.store;
 
 
+import org.apache.lucene.util.Accountable;
+import org.apache.lucene.util.Accountables;
+
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.zip.CRC32;
 import java.util.zip.Checksum;
-
-import org.apache.lucene.util.Accountable;
-import org.apache.lucene.util.Accountables;
 
 /**
  * A memory-resident {@link IndexOutput} implementation.

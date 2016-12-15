@@ -17,17 +17,12 @@
 package org.apache.lucene.store;
 
 
+import org.apache.lucene.util.IOUtils;
+
 import java.io.IOException;
 import java.nio.file.AtomicMoveNotSupportedException;
 import java.nio.file.NoSuchFileException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import org.apache.lucene.util.IOUtils;
+import java.util.*;
 
 /**
  * Expert: A Directory instance that switches files between

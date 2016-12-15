@@ -16,13 +16,13 @@
  */
 package org.apache.lucene.util;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.junit.internal.AssumptionViolatedException;
 import org.junit.rules.TestRule;
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A rule for marking failed tests and suites.

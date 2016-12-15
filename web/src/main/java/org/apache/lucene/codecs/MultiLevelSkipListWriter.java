@@ -17,11 +17,11 @@
 package org.apache.lucene.codecs;
 
 
-import java.io.IOException;
-
 import org.apache.lucene.store.IndexOutput;
 import org.apache.lucene.store.RAMOutputStream;
 import org.apache.lucene.util.MathUtil;
+
+import java.io.IOException;
 
 /**
  * This abstract class writes skip lists with multiple levels.
@@ -56,10 +56,10 @@ public abstract class MultiLevelSkipListWriter {
   protected int numberOfSkipLevels;
   
   /** the skip interval in the list with level = 0 */
-  private int skipInterval;
+  private final int skipInterval;
 
   /** skipInterval used for level &gt; 0 */
-  private int skipMultiplier;
+  private final int skipMultiplier;
   
   /** for every skip level a different buffer is used  */
   private RAMOutputStream[] skipBuffer;

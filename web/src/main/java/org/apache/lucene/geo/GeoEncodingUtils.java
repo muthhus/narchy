@@ -18,12 +18,7 @@ package org.apache.lucene.geo;
 
 import org.apache.lucene.util.NumericUtils;
 
-import static org.apache.lucene.geo.GeoUtils.MAX_LAT_INCL;
-import static org.apache.lucene.geo.GeoUtils.MAX_LON_INCL;
-import static org.apache.lucene.geo.GeoUtils.MIN_LON_INCL;
-import static org.apache.lucene.geo.GeoUtils.MIN_LAT_INCL;
-import static org.apache.lucene.geo.GeoUtils.checkLatitude;
-import static org.apache.lucene.geo.GeoUtils.checkLongitude;
+import static org.apache.lucene.geo.GeoUtils.*;
 
 /**
  * reusable geopoint encoding methods

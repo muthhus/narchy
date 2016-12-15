@@ -17,12 +17,12 @@
 package org.apache.lucene.util;
 
 
+import com.carrotsearch.randomizedtesting.annotations.Repeat;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
-
-import com.carrotsearch.randomizedtesting.annotations.Repeat;
 
 public class TestMergedIterator extends LuceneTestCase {
   private static final int REPEATS = 2;

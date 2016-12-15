@@ -17,6 +17,9 @@
 package org.apache.lucene.util;
 
 
+import org.apache.lucene.codecs.CodecUtil;
+import org.apache.lucene.store.*;
+
 import java.io.Closeable;
 import java.io.EOFException;
 import java.io.IOException;
@@ -24,14 +27,6 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
-
-import org.apache.lucene.codecs.CodecUtil;
-import org.apache.lucene.store.ChecksumIndexInput;
-import org.apache.lucene.store.Directory;
-import org.apache.lucene.store.IOContext;
-import org.apache.lucene.store.IndexInput;
-import org.apache.lucene.store.IndexOutput;
-import org.apache.lucene.store.TrackingDirectoryWrapper;
 
 /**
  * On-disk sorting of byte arrays. Each byte array (entry) is a composed of the following
@@ -172,7 +167,7 @@ public class OfflineSorter {
   private final Counter bufferBytesUsed = Counter.newCounter();
   private final SortableBytesRefArray buffer;
   SortInfo sortInfo;
-  private int maxTempFiles;
+  private final int maxTempFiles;
   private final Comparator<BytesRef> comparator;
   
   /** Default comparator: sorts in binary (codepoint) order */

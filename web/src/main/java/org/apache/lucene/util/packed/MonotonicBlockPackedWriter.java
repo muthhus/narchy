@@ -17,12 +17,12 @@
 package org.apache.lucene.util.packed;
 
 
-import static org.apache.lucene.util.packed.MonotonicBlockPackedReader.expected;
+import org.apache.lucene.store.DataOutput;
+import org.apache.lucene.util.BitUtil;
 
 import java.io.IOException;
 
-import org.apache.lucene.store.DataOutput;
-import org.apache.lucene.util.BitUtil;
+import static org.apache.lucene.util.packed.MonotonicBlockPackedReader.expected;
 
 /**
  * A writer for large monotonically increasing sequences of positive longs.

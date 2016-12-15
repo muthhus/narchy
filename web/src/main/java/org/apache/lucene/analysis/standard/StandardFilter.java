@@ -17,10 +17,10 @@
 package org.apache.lucene.analysis.standard;
 
 
-import java.io.IOException;
-
 import org.apache.lucene.analysis.TokenFilter;
 import org.apache.lucene.analysis.TokenStream;
+
+import java.io.IOException;
 
 /**
  * Normalizes tokens extracted with {@link StandardTokenizer}.

@@ -17,19 +17,13 @@
 package org.apache.lucene.codecs.simpletext;
 
 
-import java.io.IOException;
-
 import org.apache.lucene.codecs.FieldsConsumer;
-import org.apache.lucene.index.PostingsEnum;
-import org.apache.lucene.index.FieldInfo;
-import org.apache.lucene.index.FieldInfos;
-import org.apache.lucene.index.Fields;
-import org.apache.lucene.index.SegmentWriteState;
-import org.apache.lucene.index.Terms;
-import org.apache.lucene.index.TermsEnum;
+import org.apache.lucene.index.*;
 import org.apache.lucene.store.IndexOutput;
 import org.apache.lucene.util.BytesRef;
 import org.apache.lucene.util.BytesRefBuilder;
+
+import java.io.IOException;
 
 class SimpleTextFieldsWriter extends FieldsConsumer {
 

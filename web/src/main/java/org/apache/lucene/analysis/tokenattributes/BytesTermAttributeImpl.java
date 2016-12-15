@@ -17,11 +17,11 @@
 package org.apache.lucene.analysis.tokenattributes;
 
 
-import java.util.Objects;
-
 import org.apache.lucene.util.AttributeImpl;
 import org.apache.lucene.util.AttributeReflector;
 import org.apache.lucene.util.BytesRef;
+
+import java.util.Objects;
 
 /** Implementation class for {@link BytesTermAttribute}.
  * @lucene.internal

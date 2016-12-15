@@ -17,10 +17,13 @@
 package org.apache.lucene.index;
 
 
-import org.apache.lucene.store.*;
-import org.apache.lucene.analysis.*;
-import org.apache.lucene.document.*;
-import org.apache.lucene.util.*;
+import org.apache.lucene.analysis.MockAnalyzer;
+import org.apache.lucene.document.Document;
+import org.apache.lucene.document.Field;
+import org.apache.lucene.store.Directory;
+import org.apache.lucene.util.BytesRef;
+import org.apache.lucene.util.LuceneTestCase;
+import org.apache.lucene.util.TestUtil;
 
 public class TestFlex extends LuceneTestCase {
 

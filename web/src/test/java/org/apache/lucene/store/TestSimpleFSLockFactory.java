@@ -17,10 +17,10 @@
 package org.apache.lucene.store;
 
 
+import org.apache.lucene.util.IOUtils;
+
 import java.io.IOException;
 import java.nio.file.Path;
-
-import org.apache.lucene.util.IOUtils;
 
 /** Simple tests for SimpleFSLockFactory */
 public class TestSimpleFSLockFactory extends BaseLockFactoryTestCase {

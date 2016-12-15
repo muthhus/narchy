@@ -16,12 +16,12 @@
  */
 package org.apache.lucene.index;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.lucene.util.Counter;
 import org.apache.lucene.util.IntBlockPool;
 import org.apache.lucene.util.LuceneTestCase;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * tests basic {@link IntBlockPool} functionality

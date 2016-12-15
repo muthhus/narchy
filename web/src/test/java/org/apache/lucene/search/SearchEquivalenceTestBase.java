@@ -16,9 +16,6 @@
  */
 package org.apache.lucene.search;
 
-import java.util.BitSet;
-import java.util.Random;
-
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.MockAnalyzer;
 import org.apache.lucene.analysis.MockTokenizer;
@@ -38,6 +35,9 @@ import org.apache.lucene.util.automaton.Automata;
 import org.apache.lucene.util.automaton.CharacterRunAutomaton;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+
+import java.util.BitSet;
+import java.util.Random;
 
 /**
  * Simple base class for checking search equivalence.

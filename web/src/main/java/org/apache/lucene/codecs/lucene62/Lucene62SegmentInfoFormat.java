@@ -16,29 +16,16 @@
  */
 package org.apache.lucene.codecs.lucene62;
 
+import org.apache.lucene.codecs.CodecUtil;
+import org.apache.lucene.codecs.SegmentInfoFormat;
+import org.apache.lucene.index.*;
+import org.apache.lucene.search.*;
+import org.apache.lucene.store.*;
+import org.apache.lucene.util.Version;
+
 import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
-
-import org.apache.lucene.codecs.CodecUtil;
-import org.apache.lucene.codecs.SegmentInfoFormat;
-import org.apache.lucene.index.CorruptIndexException;
-import org.apache.lucene.index.IndexFileNames;
-import org.apache.lucene.index.IndexWriter; // javadocs
-import org.apache.lucene.index.SegmentInfo; // javadocs
-import org.apache.lucene.index.SegmentInfos; // javadocs
-import org.apache.lucene.search.Sort;
-import org.apache.lucene.search.SortField;
-import org.apache.lucene.search.SortedNumericSelector;
-import org.apache.lucene.search.SortedNumericSortField;
-import org.apache.lucene.search.SortedSetSelector;
-import org.apache.lucene.search.SortedSetSortField;
-import org.apache.lucene.store.ChecksumIndexInput;
-import org.apache.lucene.store.DataOutput; // javadocs
-import org.apache.lucene.store.Directory;
-import org.apache.lucene.store.IOContext;
-import org.apache.lucene.store.IndexOutput;
-import org.apache.lucene.util.Version;
 
 /**
  * Lucene 6.2 Segment info format.

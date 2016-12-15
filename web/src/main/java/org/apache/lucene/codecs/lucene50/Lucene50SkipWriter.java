@@ -17,11 +17,11 @@
 package org.apache.lucene.codecs.lucene50;
 
 
+import org.apache.lucene.codecs.MultiLevelSkipListWriter;
+import org.apache.lucene.store.IndexOutput;
+
 import java.io.IOException;
 import java.util.Arrays;
-
-import org.apache.lucene.store.IndexOutput;
-import org.apache.lucene.codecs.MultiLevelSkipListWriter;
 
 /**
  * Write skip lists with multiple levels, and support skip within block ints.
@@ -44,8 +44,8 @@ import org.apache.lucene.codecs.MultiLevelSkipListWriter;
  *
  */
 final class Lucene50SkipWriter extends MultiLevelSkipListWriter {
-  private int[] lastSkipDoc;
-  private long[] lastSkipDocPointer;
+  private final int[] lastSkipDoc;
+  private final long[] lastSkipDocPointer;
   private long[] lastSkipPosPointer;
   private long[] lastSkipPayPointer;
   private int[] lastPayloadByteUpto;

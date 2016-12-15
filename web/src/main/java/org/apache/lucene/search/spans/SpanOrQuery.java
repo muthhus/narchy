@@ -17,29 +17,20 @@
 package org.apache.lucene.search.spans;
 
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.index.TermContext;
-import org.apache.lucene.search.DisiPriorityQueue;
-import org.apache.lucene.search.DisiWrapper;
-import org.apache.lucene.search.DisjunctionDISIApproximation;
-import org.apache.lucene.search.IndexSearcher;
-import org.apache.lucene.search.Query;
-import org.apache.lucene.search.TwoPhaseIterator;
+import org.apache.lucene.search.*;
+
+import java.io.IOException;
+import java.util.*;
 
 
 /** Matches the union of its clauses.
  */
 public final class SpanOrQuery extends SpanQuery {
-  private List<SpanQuery> clauses;
+  private final List<SpanQuery> clauses;
   private String field;
 
   /** Construct a SpanOrQuery merging the provided clauses.

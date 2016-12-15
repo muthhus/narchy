@@ -17,13 +17,13 @@
 package org.apache.lucene.search;
 
 
+import org.apache.lucene.index.IndexWriter;
+import org.apache.lucene.util.ThreadInterruptedException;
+
 import java.io.Closeable;
 import java.io.IOException;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
-
-import org.apache.lucene.index.IndexWriter;
-import org.apache.lucene.util.ThreadInterruptedException;
 
 /** Utility class that runs a thread to manage periodicc
  *  reopens of a {@link ReferenceManager}, with methods to wait for a specific

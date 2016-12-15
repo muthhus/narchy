@@ -16,21 +16,7 @@
  */
 package org.apache.lucene.index;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.Set;
-
-import org.apache.lucene.codecs.DocValuesFormat;
-import org.apache.lucene.codecs.PointsFormat;
-import org.apache.lucene.codecs.PointsReader;
-import org.apache.lucene.codecs.PointsWriter;
-import org.apache.lucene.codecs.PostingsFormat;
+import org.apache.lucene.codecs.*;
 import org.apache.lucene.codecs.asserting.AssertingCodec;
 import org.apache.lucene.codecs.asserting.AssertingDocValuesFormat;
 import org.apache.lucene.codecs.asserting.AssertingPointsFormat;
@@ -42,18 +28,16 @@ import org.apache.lucene.codecs.blocktreeords.BlockTreeOrdsPostingsFormat;
 import org.apache.lucene.codecs.bloom.TestBloomFilteredLucenePostings;
 import org.apache.lucene.codecs.lucene60.Lucene60PointsReader;
 import org.apache.lucene.codecs.lucene60.Lucene60PointsWriter;
-import org.apache.lucene.codecs.memory.DirectDocValuesFormat;
-import org.apache.lucene.codecs.memory.DirectPostingsFormat;
-import org.apache.lucene.codecs.memory.FSTOrdPostingsFormat;
-import org.apache.lucene.codecs.memory.FSTPostingsFormat;
-import org.apache.lucene.codecs.memory.MemoryDocValuesFormat;
-import org.apache.lucene.codecs.memory.MemoryPostingsFormat;
+import org.apache.lucene.codecs.memory.*;
 import org.apache.lucene.codecs.mockrandom.MockRandomPostingsFormat;
 import org.apache.lucene.index.PointValues.IntersectVisitor;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.util.LuceneTestCase;
 import org.apache.lucene.util.TestUtil;
 import org.apache.lucene.util.bkd.BKDWriter;
+
+import java.io.IOException;
+import java.util.*;
 
 /**
  * Codec that assigns per-field random postings formats.

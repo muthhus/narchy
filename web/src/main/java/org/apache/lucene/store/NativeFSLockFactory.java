@@ -17,6 +17,9 @@
 package org.apache.lucene.store;
 
 
+import org.apache.lucene.util.IOUtils;
+
+import java.io.IOException;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
 import java.nio.file.Files;
@@ -24,12 +27,9 @@ import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileTime;
-import java.io.IOException;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
-
-import org.apache.lucene.util.IOUtils;
 
 /**
  * <p>Implements {@link LockFactory} using native OS file

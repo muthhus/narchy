@@ -16,12 +16,15 @@
  */
 package org.apache.lucene.index;
 
-import java.nio.file.Path;
-
 import org.apache.lucene.analysis.MockAnalyzer;
 import org.apache.lucene.document.*;
-import org.apache.lucene.store.*;
-import org.apache.lucene.util.*;
+import org.apache.lucene.store.Directory;
+import org.apache.lucene.store.MockDirectoryWrapper;
+import org.apache.lucene.store.RAMDirectory;
+import org.apache.lucene.util.English;
+import org.apache.lucene.util.LuceneTestCase;
+
+import java.nio.file.Path;
 
 public class TestAtomicUpdate extends LuceneTestCase {
   

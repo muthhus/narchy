@@ -17,8 +17,6 @@
 package org.apache.lucene.codecs.simpletext;
 
 
-import java.io.IOException;
-
 import org.apache.lucene.codecs.TermVectorsFormat;
 import org.apache.lucene.codecs.TermVectorsReader;
 import org.apache.lucene.codecs.TermVectorsWriter;
@@ -26,6 +24,8 @@ import org.apache.lucene.index.FieldInfos;
 import org.apache.lucene.index.SegmentInfo;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.IOContext;
+
+import java.io.IOException;
 
 /**
  * plain text term vectors format.

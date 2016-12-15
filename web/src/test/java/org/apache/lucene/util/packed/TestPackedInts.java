@@ -17,32 +17,17 @@
 package org.apache.lucene.util.packed;
 
 
-import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.LongBuffer;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Locale;
-import java.util.Random;
-
+import com.carrotsearch.randomizedtesting.generators.RandomNumbers;
 import org.apache.lucene.codecs.CodecUtil;
-import org.apache.lucene.store.ByteArrayDataInput;
-import org.apache.lucene.store.DataInput;
-import org.apache.lucene.store.Directory;
-import org.apache.lucene.store.IOContext;
-import org.apache.lucene.store.IndexInput;
-import org.apache.lucene.store.IndexOutput;
-import org.apache.lucene.store.RAMDirectory;
-import org.apache.lucene.util.LongValues;
-import org.apache.lucene.util.LongsRef;
-import org.apache.lucene.util.LuceneTestCase;
-import org.apache.lucene.util.RamUsageTester;
-import org.apache.lucene.util.TestUtil;
+import org.apache.lucene.store.*;
+import org.apache.lucene.util.*;
 import org.apache.lucene.util.packed.PackedInts.Reader;
 import org.junit.Ignore;
 
-import com.carrotsearch.randomizedtesting.generators.RandomNumbers;
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.LongBuffer;
+import java.util.*;
 
 public class TestPackedInts extends LuceneTestCase {
 

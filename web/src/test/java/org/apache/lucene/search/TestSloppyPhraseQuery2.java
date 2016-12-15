@@ -17,10 +17,10 @@
 package org.apache.lucene.search;
 
 
-import java.util.Random;
-
 import org.apache.lucene.index.Term;
 import org.apache.lucene.util.TestUtil;
+
+import java.util.Random;
 
 /**
  * random sloppy phrase query tests

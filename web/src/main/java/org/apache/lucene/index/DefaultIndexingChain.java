@@ -17,28 +17,18 @@
 package org.apache.lucene.index;
 
 
+import org.apache.lucene.analysis.TokenStream;
+import org.apache.lucene.codecs.*;
+import org.apache.lucene.document.FieldType;
+import org.apache.lucene.search.similarities.Similarity;
+import org.apache.lucene.store.IOContext;
+import org.apache.lucene.util.*;
+import org.apache.lucene.util.BytesRefHash.MaxBytesLengthExceededException;
+
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-
-import org.apache.lucene.analysis.TokenStream;
-import org.apache.lucene.codecs.DocValuesConsumer;
-import org.apache.lucene.codecs.DocValuesFormat;
-import org.apache.lucene.codecs.NormsConsumer;
-import org.apache.lucene.codecs.NormsFormat;
-import org.apache.lucene.codecs.PointsFormat;
-import org.apache.lucene.codecs.PointsWriter;
-import org.apache.lucene.codecs.StoredFieldsWriter;
-import org.apache.lucene.document.FieldType;
-import org.apache.lucene.search.similarities.Similarity;
-import org.apache.lucene.store.IOContext;
-import org.apache.lucene.util.ArrayUtil;
-import org.apache.lucene.util.BytesRef;
-import org.apache.lucene.util.BytesRefHash.MaxBytesLengthExceededException;
-import org.apache.lucene.util.Counter;
-import org.apache.lucene.util.IOUtils;
-import org.apache.lucene.util.RamUsageEstimator;
 
 /** Default general purpose indexing chain, which handles
  *  indexing all types of fields. */

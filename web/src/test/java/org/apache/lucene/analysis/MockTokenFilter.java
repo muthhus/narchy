@@ -16,16 +16,16 @@
  */
 package org.apache.lucene.analysis;
 
-import static org.apache.lucene.util.automaton.Automata.makeEmpty;
-import static org.apache.lucene.util.automaton.Automata.makeString;
+import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
+import org.apache.lucene.analysis.tokenattributes.PositionIncrementAttribute;
+import org.apache.lucene.util.automaton.CharacterRunAutomaton;
+import org.apache.lucene.util.automaton.Operations;
 
 import java.io.IOException;
 import java.util.Arrays;
 
-import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
-import org.apache.lucene.analysis.tokenattributes.PositionIncrementAttribute;
-import org.apache.lucene.util.automaton.Operations;
-import org.apache.lucene.util.automaton.CharacterRunAutomaton;
+import static org.apache.lucene.util.automaton.Automata.makeEmpty;
+import static org.apache.lucene.util.automaton.Automata.makeString;
 
 /**
  * A tokenfilter for testing that removes terms accepted by a DFA.

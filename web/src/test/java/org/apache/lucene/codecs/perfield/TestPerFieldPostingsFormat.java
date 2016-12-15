@@ -17,12 +17,12 @@
 package org.apache.lucene.codecs.perfield;
 
 
-import java.util.Collections;
-import java.util.Random;
-
 import org.apache.lucene.codecs.Codec;
 import org.apache.lucene.index.BasePostingsFormatTestCase;
 import org.apache.lucene.index.RandomCodec;
+
+import java.util.Collections;
+import java.util.Random;
 
 /**
  * Basic tests of PerFieldPostingsFormat

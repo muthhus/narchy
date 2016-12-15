@@ -16,12 +16,7 @@
  */
 package org.apache.lucene.search;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 /** Expert: Describes the score computation for document and query. */
 public final class Explanation {

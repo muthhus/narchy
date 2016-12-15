@@ -16,11 +16,10 @@
  */
 package org.apache.lucene.index;
 
-import java.io.IOException;
-
-import org.apache.lucene.index.IndexReader.ReaderClosedListener;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.util.Bits;
+
+import java.io.IOException;
 
 /** {@code LeafReader} is an abstract class, providing an interface for accessing an
  index.  Search of an index is done entirely through this abstract interface,

@@ -17,8 +17,6 @@
 package org.apache.lucene.search.spans;
 
 
-import java.io.IOException;
-
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.StringField;
@@ -29,6 +27,8 @@ import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.QueryUtils;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.util.LuceneTestCase;
+
+import java.io.IOException;
 
 /** Basic tests for SpanTermQuery */
 public class TestSpanTermQuery extends LuceneTestCase {

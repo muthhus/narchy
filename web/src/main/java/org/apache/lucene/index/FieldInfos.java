@@ -17,15 +17,9 @@
 package org.apache.lucene.index;
 
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.SortedMap;
-import java.util.TreeMap;
-
 import org.apache.lucene.util.ArrayUtil;
+
+import java.util.*;
 
 /** 
  * Collection of {@link FieldInfo}s (accessible by number or by name).

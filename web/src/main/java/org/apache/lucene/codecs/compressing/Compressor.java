@@ -17,9 +17,9 @@
 package org.apache.lucene.codecs.compressing;
 
 
-import java.io.IOException;
-
 import org.apache.lucene.store.DataOutput;
+
+import java.io.IOException;
 
 /**
  * A data compressor.

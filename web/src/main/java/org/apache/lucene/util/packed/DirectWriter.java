@@ -17,11 +17,11 @@
 package org.apache.lucene.util.packed;
 
 
+import org.apache.lucene.store.IndexOutput;
+
 import java.io.EOFException;
 import java.io.IOException;
 import java.util.Arrays;
-
-import org.apache.lucene.store.IndexOutput;
 
 /** 
  * Class for writing packed integers to be directly read from Directory.

@@ -49,7 +49,7 @@ public class RegexpQuery extends AutomatonQuery {
   /**
    * A provider that provides no named automata
    */
-  private static AutomatonProvider defaultProvider = new AutomatonProvider() {
+  private static final AutomatonProvider defaultProvider = new AutomatonProvider() {
     @Override
     public Automaton getAutomaton(String name) {
       return null;

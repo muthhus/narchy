@@ -17,13 +17,12 @@
 package org.apache.lucene.util;
 
 
-import java.util.LinkedList;
-import java.util.List;
-
+import com.carrotsearch.randomizedtesting.generators.RandomNumbers;
 import org.apache.lucene.util.LuceneTestCase.Slow;
 import org.apache.lucene.util.packed.PackedInts;
 
-import com.carrotsearch.randomizedtesting.generators.RandomNumbers;
+import java.util.LinkedList;
+import java.util.List;
 
 @Slow
 public class TestTimSorterWorstCase extends LuceneTestCase {

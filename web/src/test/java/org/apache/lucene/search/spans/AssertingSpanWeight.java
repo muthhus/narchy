@@ -16,16 +16,16 @@
  */
 package org.apache.lucene.search.spans;
 
-import java.io.IOException;
-import java.util.Map;
-import java.util.Set;
-
 import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.index.TermContext;
 import org.apache.lucene.search.Explanation;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.similarities.Similarity;
+
+import java.io.IOException;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Wraps a SpanWeight with additional asserts

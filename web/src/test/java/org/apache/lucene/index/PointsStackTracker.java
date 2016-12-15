@@ -17,11 +17,11 @@
 
 package org.apache.lucene.index;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.lucene.index.PointValues.IntersectVisitor;
 import org.apache.lucene.util.StringHelper;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /** Simple utility class to track the current BKD stack based solely on calls to {@link IntersectVisitor#compare}. */
 public class PointsStackTracker {

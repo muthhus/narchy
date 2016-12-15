@@ -16,9 +16,6 @@
  */
 package org.apache.lucene.codecs.asserting;
 
-import java.io.IOException;
-import java.util.Collection;
-
 import org.apache.lucene.codecs.LiveDocsFormat;
 import org.apache.lucene.index.SegmentCommitInfo;
 import org.apache.lucene.store.Directory;
@@ -26,6 +23,9 @@ import org.apache.lucene.store.IOContext;
 import org.apache.lucene.util.Bits;
 import org.apache.lucene.util.MutableBits;
 import org.apache.lucene.util.TestUtil0;
+
+import java.io.IOException;
+import java.util.Collection;
 
 /**
  * Just like the default live docs format but with additional asserts.

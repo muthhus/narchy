@@ -17,20 +17,16 @@
 package org.apache.lucene.index;
 
 
-import java.io.Closeable;
-import java.io.IOException;
-import java.util.Collections;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.WeakHashMap;
-import java.util.concurrent.atomic.AtomicInteger;
-
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.DocumentStoredFieldVisitor;
 import org.apache.lucene.store.AlreadyClosedException;
-import org.apache.lucene.util.Bits;  // javadocs
+import org.apache.lucene.util.Bits;
 import org.apache.lucene.util.IOUtils;
+
+import java.io.Closeable;
+import java.io.IOException;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  IndexReader is an abstract class, providing an interface for accessing a

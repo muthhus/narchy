@@ -17,11 +17,11 @@
 package org.apache.lucene.util;
 
 
-import java.io.IOException;
-import java.util.Arrays;
-
 import org.apache.lucene.search.DocIdSet;
 import org.apache.lucene.search.DocIdSetIterator;
+
+import java.io.IOException;
+import java.util.Arrays;
 
 /**
  * BitSet of fixed length (numBits), backed by accessible ({@link #getBits})

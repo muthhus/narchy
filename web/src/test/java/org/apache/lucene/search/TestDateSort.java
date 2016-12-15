@@ -17,8 +17,6 @@
 package org.apache.lucene.search;
 
 
-import java.util.Arrays;
-
 import org.apache.lucene.document.DateTools;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
@@ -29,6 +27,8 @@ import org.apache.lucene.index.Term;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.util.BytesRef;
 import org.apache.lucene.util.LuceneTestCase;
+
+import java.util.Arrays;
 
 /**
  * Test date sorting, i.e. auto-sorting of fields with type "long".

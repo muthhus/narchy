@@ -16,16 +16,16 @@
  */
 package org.apache.lucene.codecs.cranky;
 
-import java.io.IOException;
-import java.util.Collection;
-import java.util.Random;
-
 import org.apache.lucene.codecs.LiveDocsFormat;
 import org.apache.lucene.index.SegmentCommitInfo;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.IOContext;
 import org.apache.lucene.util.Bits;
 import org.apache.lucene.util.MutableBits;
+
+import java.io.IOException;
+import java.util.Collection;
+import java.util.Random;
 
 class CrankyLiveDocsFormat extends LiveDocsFormat {
   final LiveDocsFormat delegate;

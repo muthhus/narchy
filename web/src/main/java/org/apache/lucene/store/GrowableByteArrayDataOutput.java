@@ -17,11 +17,10 @@
 
 package org.apache.lucene.store;
 
-import java.io.IOException;
-
-import org.apache.lucene.store.DataOutput;
 import org.apache.lucene.util.ArrayUtil;
 import org.apache.lucene.util.UnicodeUtil;
+
+import java.io.IOException;
 
 /**
  * A {@link DataOutput} that can be used to build a byte[].

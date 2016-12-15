@@ -17,8 +17,6 @@
 package org.apache.lucene.index;
 
 
-import java.io.IOException;
-
 import org.apache.lucene.codecs.NormsConsumer;
 import org.apache.lucene.codecs.NormsProducer;
 import org.apache.lucene.search.DocIdSetIterator;
@@ -26,12 +24,14 @@ import org.apache.lucene.util.Counter;
 import org.apache.lucene.util.packed.PackedInts;
 import org.apache.lucene.util.packed.PackedLongValues;
 
+import java.io.IOException;
+
 /** Buffers up pending long per doc, then flushes when
  *  segment flushes. */
 class NormValuesWriter {
 
-  private DocsWithFieldSet docsWithField;
-  private PackedLongValues.Builder pending;
+  private final DocsWithFieldSet docsWithField;
+  private final PackedLongValues.Builder pending;
   private final Counter iwBytesUsed;
   private long bytesUsed;
   private final FieldInfo fieldInfo;

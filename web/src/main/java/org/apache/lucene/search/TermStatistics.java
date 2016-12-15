@@ -17,7 +17,7 @@
 package org.apache.lucene.search;
 
 
-import org.apache.lucene.index.TermsEnum; // javadocs
+import org.apache.lucene.index.TermsEnum;
 import org.apache.lucene.util.BytesRef;
 /**
  * Contains statistics for a specific term

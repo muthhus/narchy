@@ -17,14 +17,10 @@
 package org.apache.lucene.index;
 
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Map;
-import java.io.IOException;
-
 import org.apache.lucene.store.Directory;
+
+import java.io.IOException;
+import java.util.*;
 
 /**
  * An {@link IndexDeletionPolicy} that wraps any other

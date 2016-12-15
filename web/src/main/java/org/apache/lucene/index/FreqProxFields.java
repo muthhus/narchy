@@ -17,16 +17,16 @@
 package org.apache.lucene.index;
 
 
+import org.apache.lucene.index.FreqProxTermsWriterPerField.FreqProxPostingsArray;
+import org.apache.lucene.util.AttributeSource;
+import org.apache.lucene.util.BytesRef;
+import org.apache.lucene.util.BytesRefBuilder;
+
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.apache.lucene.index.FreqProxTermsWriterPerField.FreqProxPostingsArray;
-import org.apache.lucene.util.AttributeSource;
-import org.apache.lucene.util.BytesRef;
-import org.apache.lucene.util.BytesRefBuilder;
 
 /** Implements limited (iterators only, no stats) {@link
  *  Fields} interface over the in-RAM buffered

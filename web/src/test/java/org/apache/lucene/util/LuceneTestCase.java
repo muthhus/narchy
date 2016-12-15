@@ -35,6 +35,7 @@ import org.apache.lucene.codecs.PostingsFormat;
 import org.apache.lucene.codecs.asserting.AssertingCodec;
 import org.apache.lucene.codecs.asserting.AssertingDocValuesFormat;
 import org.apache.lucene.codecs.asserting.AssertingPostingsFormat;
+import org.apache.lucene.codecs.blockterms.LuceneFixedGap;
 import org.apache.lucene.codecs.blocktreeords.BlockTreeOrdsPostingsFormat;
 import org.apache.lucene.codecs.bloom.BloomFilteringPostingsFormat;
 import org.apache.lucene.codecs.cheapbastard.CheapBastardCodec;
@@ -187,6 +188,7 @@ public abstract class LuceneTestCase extends Assert {
                 BloomFilteringPostingsFormat.class,
                 FSTPostingsFormat.class,
                 FSTOrdPostingsFormat.class,
+                LuceneFixedGap.class,
                 Lucene50PostingsFormat.class,
                 AssertingPostingsFormat.class,
                 BlockTreeOrdsPostingsFormat.class,

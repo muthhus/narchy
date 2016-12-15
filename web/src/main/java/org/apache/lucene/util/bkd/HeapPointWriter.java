@@ -16,13 +16,13 @@
  */
 package org.apache.lucene.util.bkd;
 
+import org.apache.lucene.util.ArrayUtil;
+import org.apache.lucene.util.BytesRef;
+
 import java.io.Closeable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
-import org.apache.lucene.util.ArrayUtil;
-import org.apache.lucene.util.BytesRef;
 
 /** Utility class to write new points into in-heap arrays.
  *

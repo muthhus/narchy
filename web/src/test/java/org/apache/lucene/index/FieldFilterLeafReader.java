@@ -16,12 +16,12 @@
  */
 package org.apache.lucene.index;
 
+import org.apache.lucene.util.filter.FilterIterator;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Set;
-
-import org.apache.lucene.util.filter.FilterIterator;
 
 /**
  * A {@link FilterLeafReader} that exposes only a subset

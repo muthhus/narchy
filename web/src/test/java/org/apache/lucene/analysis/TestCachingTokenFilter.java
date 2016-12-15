@@ -17,10 +17,6 @@
 package org.apache.lucene.analysis;
 
 
-
-import java.io.IOException;
-import java.util.concurrent.atomic.AtomicInteger;
-
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.apache.lucene.analysis.tokenattributes.OffsetAttribute;
 import org.apache.lucene.document.Document;
@@ -32,6 +28,9 @@ import org.apache.lucene.index.RandomIndexWriter;
 import org.apache.lucene.search.DocIdSetIterator;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.util.BytesRef;
+
+import java.io.IOException;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class TestCachingTokenFilter extends BaseTokenStreamTestCase {
   private String[] tokens = new String[] {"term1", "term2", "term3", "term2"};

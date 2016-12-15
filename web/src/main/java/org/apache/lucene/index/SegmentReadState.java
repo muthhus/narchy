@@ -17,8 +17,8 @@
 package org.apache.lucene.index;
 
 
-import org.apache.lucene.codecs.PostingsFormat; // javadocs
-import org.apache.lucene.codecs.perfield.PerFieldPostingsFormat; // javadocs
+import org.apache.lucene.codecs.PostingsFormat;
+import org.apache.lucene.codecs.perfield.PerFieldPostingsFormat;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.IOContext;
 

@@ -17,9 +17,8 @@
 package org.apache.lucene.search.spans;
 
 
-
-import org.apache.lucene.search.Query;
 import org.apache.lucene.search.CheckHits;
+import org.apache.lucene.search.Query;
 
 
 /**

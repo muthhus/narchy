@@ -17,12 +17,12 @@
 package org.apache.lucene.codecs;
 
 
-import java.io.IOException;
-
-import org.apache.lucene.index.FieldInfos; // javadocs
+import org.apache.lucene.index.FieldInfos;
 import org.apache.lucene.index.SegmentInfo;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.IOContext;
+
+import java.io.IOException;
 
 /**
  * Encodes/decodes {@link FieldInfos}

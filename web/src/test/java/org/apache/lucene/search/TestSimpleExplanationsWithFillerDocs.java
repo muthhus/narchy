@@ -16,17 +16,16 @@
  */
 package org.apache.lucene.search;
 
-import java.util.Arrays;
-
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
-import org.apache.lucene.index.Term;
 import org.apache.lucene.index.RandomIndexWriter;
-import org.apache.lucene.util.TestUtil;
+import org.apache.lucene.index.Term;
 import org.apache.lucene.util.LuceneTestCase.Slow;
-
-import org.junit.BeforeClass;
+import org.apache.lucene.util.TestUtil;
 import org.junit.Assume;
+import org.junit.BeforeClass;
+
+import java.util.Arrays;
 
 
 /**

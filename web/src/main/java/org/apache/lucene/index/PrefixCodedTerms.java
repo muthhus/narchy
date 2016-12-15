@@ -16,9 +16,6 @@
  */
 package org.apache.lucene.index;
 
-import java.io.IOException;
-import java.util.Objects;
-
 import org.apache.lucene.store.IndexInput;
 import org.apache.lucene.store.RAMFile;
 import org.apache.lucene.store.RAMInputStream;
@@ -26,6 +23,9 @@ import org.apache.lucene.store.RAMOutputStream;
 import org.apache.lucene.util.Accountable;
 import org.apache.lucene.util.BytesRef;
 import org.apache.lucene.util.BytesRefBuilder;
+
+import java.io.IOException;
+import java.util.Objects;
 
 /**
  * Prefix codes term instances (prefixes are shared)
@@ -53,10 +53,10 @@ public class PrefixCodedTerms implements Accountable {
   
   /** Builds a PrefixCodedTerms: call add repeatedly, then finish. */
   public static class Builder {
-    private RAMFile buffer = new RAMFile();
-    private RAMOutputStream output = new RAMOutputStream(buffer, false);
-    private Term lastTerm = new Term("");
-    private BytesRefBuilder lastTermBytes = new BytesRefBuilder();
+    private final RAMFile buffer = new RAMFile();
+    private final RAMOutputStream output = new RAMOutputStream(buffer, false);
+    private final Term lastTerm = new Term("");
+    private final BytesRefBuilder lastTermBytes = new BytesRefBuilder();
     private long size;
 
     /** Sole constructor. */

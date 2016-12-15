@@ -17,14 +17,14 @@
 package org.apache.lucene.index;
 
 
-import java.util.Set;
-import java.util.concurrent.ExecutorService;
-
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.MockDirectoryWrapper;
 import org.apache.lucene.util.LuceneTestCase.SuppressCodecs;
 import org.junit.Before;
+
+import java.util.Set;
+import java.util.concurrent.ExecutorService;
 
 // TODO
 //   - mix in forceMerge, addIndexes

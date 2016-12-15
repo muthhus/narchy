@@ -16,18 +16,14 @@
  */
 package org.apache.lucene.codecs.blockterms;
 
-import java.io.IOException;
-
-import org.apache.lucene.codecs.FieldsConsumer;
-import org.apache.lucene.codecs.FieldsProducer;
-import org.apache.lucene.codecs.PostingsFormat;
-import org.apache.lucene.codecs.PostingsReaderBase;
-import org.apache.lucene.codecs.PostingsWriterBase;
-import org.apache.lucene.codecs.lucene50.Lucene50PostingsFormat; // javadocs
+import org.apache.lucene.codecs.*;
+import org.apache.lucene.codecs.lucene50.Lucene50PostingsFormat;
 import org.apache.lucene.codecs.lucene50.Lucene50PostingsReader;
 import org.apache.lucene.codecs.lucene50.Lucene50PostingsWriter;
 import org.apache.lucene.index.SegmentReadState;
 import org.apache.lucene.index.SegmentWriteState;
+
+import java.io.IOException;
 
 // TODO: we could make separate base class that can wrap
 // any PostingsFormat and make it ord-able...

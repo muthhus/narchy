@@ -16,49 +16,15 @@
  */
 package org.apache.lucene.codecs.memory;
 
-import java.io.IOException;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.SortedMap;
-import java.util.TreeMap;
-
-import org.apache.lucene.codecs.CodecUtil;
-import org.apache.lucene.codecs.FieldsConsumer;
-import org.apache.lucene.codecs.FieldsProducer;
-import org.apache.lucene.codecs.PostingsFormat;
-import org.apache.lucene.codecs.TermStats;
-import org.apache.lucene.index.CorruptIndexException;
-import org.apache.lucene.index.PostingsEnum;
-import org.apache.lucene.index.FieldInfo;
-import org.apache.lucene.index.FieldInfos;
-import org.apache.lucene.index.Fields;
-import org.apache.lucene.index.IndexFileNames;
-import org.apache.lucene.index.IndexOptions;
-import org.apache.lucene.index.SegmentReadState;
-import org.apache.lucene.index.SegmentWriteState;
-import org.apache.lucene.index.Terms;
-import org.apache.lucene.index.TermsEnum;
-import org.apache.lucene.store.ByteArrayDataInput;
-import org.apache.lucene.store.ChecksumIndexInput;
-import org.apache.lucene.store.IOContext;
-import org.apache.lucene.store.IndexInput;
-import org.apache.lucene.store.IndexOutput;
-import org.apache.lucene.store.RAMOutputStream;
-import org.apache.lucene.util.Accountable;
-import org.apache.lucene.util.Accountables;
-import org.apache.lucene.util.ArrayUtil;
-import org.apache.lucene.util.BytesRef;
-import org.apache.lucene.util.FixedBitSet;
-import org.apache.lucene.util.IOUtils;
-import org.apache.lucene.util.IntsRefBuilder;
-import org.apache.lucene.util.fst.Builder;
-import org.apache.lucene.util.fst.ByteSequenceOutputs;
-import org.apache.lucene.util.fst.BytesRefFSTEnum;
-import org.apache.lucene.util.fst.FST;
-import org.apache.lucene.util.fst.Util;
+import org.apache.lucene.codecs.*;
+import org.apache.lucene.index.*;
+import org.apache.lucene.store.*;
+import org.apache.lucene.util.*;
+import org.apache.lucene.util.fst.*;
 import org.apache.lucene.util.packed.PackedInts;
+
+import java.io.IOException;
+import java.util.*;
 
 // TODO: would be nice to somehow allow this to act like
 // InstantiatedIndex, by never writing to disk; ie you write
@@ -262,7 +228,7 @@ public final class MemoryPostingsFormat extends PostingsFormat {
     }
   }
 
-  private static String EXTENSION = "ram";
+  private static final String EXTENSION = "ram";
   private static final String CODEC_NAME = "MemoryPostings";
   private static final int VERSION_START = 1;
   private static final int VERSION_CURRENT = VERSION_START;
@@ -722,7 +688,7 @@ public final class MemoryPostingsFormat extends PostingsFormat {
     private int docFreq;
     private long totalTermFreq;
     private BytesRefFSTEnum.InputOutput<BytesRef> current;
-    private BytesRef postingsSpare = new BytesRef();
+    private final BytesRef postingsSpare = new BytesRef();
 
     public FSTTermsEnum(FieldInfo field, FST<BytesRef> fst) {
       this.field = field;

@@ -17,15 +17,15 @@
 package org.apache.lucene.index;
 
 
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.Set;
-import java.util.TreeSet;
-
 import org.apache.lucene.index.PrefixCodedTerms.TermIterator;
 import org.apache.lucene.util.BytesRef;
 import org.apache.lucene.util.LuceneTestCase;
 import org.apache.lucene.util.TestUtil;
+
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.Set;
+import java.util.TreeSet;
 
 public class TestPrefixCodedTerms extends LuceneTestCase {
   

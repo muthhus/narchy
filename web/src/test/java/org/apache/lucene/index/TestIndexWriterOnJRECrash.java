@@ -16,6 +16,12 @@
  */
 package org.apache.lucene.index;
 
+import com.carrotsearch.randomizedtesting.SeedUtils;
+import org.apache.lucene.store.BaseDirectoryWrapper;
+import org.apache.lucene.util.Constants;
+import org.apache.lucene.util.SuppressForbidden;
+import org.apache.lucene.util.TestUtil;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -23,22 +29,11 @@ import java.io.PrintStream;
 import java.lang.ProcessBuilder.Redirect;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.nio.file.FileVisitResult;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.SimpleFileVisitor;
+import java.nio.file.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.atomic.AtomicBoolean;
-
-import org.apache.lucene.store.BaseDirectoryWrapper;
-import org.apache.lucene.util.Constants;
-import org.apache.lucene.util.SuppressForbidden;
-import org.apache.lucene.util.TestUtil;
-
-import com.carrotsearch.randomizedtesting.SeedUtils;
 
 /**
  * Runs TestNRTThreads in a separate process, crashes the JRE in the middle

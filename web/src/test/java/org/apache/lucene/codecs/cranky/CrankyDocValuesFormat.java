@@ -16,15 +16,15 @@
  */
 package org.apache.lucene.codecs.cranky;
 
-import java.io.IOException;
-import java.util.Random;
-
 import org.apache.lucene.codecs.DocValuesConsumer;
 import org.apache.lucene.codecs.DocValuesFormat;
 import org.apache.lucene.codecs.DocValuesProducer;
 import org.apache.lucene.index.FieldInfo;
 import org.apache.lucene.index.SegmentReadState;
 import org.apache.lucene.index.SegmentWriteState;
+
+import java.io.IOException;
+import java.util.Random;
 
 class CrankyDocValuesFormat extends DocValuesFormat {
   final DocValuesFormat delegate;

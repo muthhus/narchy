@@ -16,11 +16,11 @@
  */
 package org.apache.lucene.util;
 
-import java.io.BufferedReader;
-import java.io.Closeable;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import org.apache.lucene.document.*;
+import org.apache.lucene.index.IndexOptions;
+import org.apache.lucene.index.IndexableField;
+
+import java.io.*;
 import java.nio.channels.Channels;
 import java.nio.channels.SeekableByteChannel;
 import java.nio.charset.CharsetDecoder;
@@ -32,17 +32,6 @@ import java.nio.file.Paths;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.zip.GZIPInputStream;
-
-import org.apache.lucene.document.Document;
-import org.apache.lucene.document.Field;
-import org.apache.lucene.document.FieldType;
-import org.apache.lucene.document.IntPoint;
-import org.apache.lucene.document.NumericDocValuesField;
-import org.apache.lucene.document.SortedDocValuesField;
-import org.apache.lucene.document.StringField;
-import org.apache.lucene.document.TextField;
-import org.apache.lucene.index.IndexOptions;
-import org.apache.lucene.index.IndexableField;
 
 /** Minimal port of benchmark's LneDocSource +
  * DocMaker, so tests can enum docs from a line file created

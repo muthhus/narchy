@@ -17,13 +17,13 @@
 package org.apache.lucene.search.spans;
 
 
-import java.io.IOException;
-import java.util.Objects;
-
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.search.BoostQuery;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
+
+import java.io.IOException;
+import java.util.Objects;
 
 /**
  * Counterpart of {@link BoostQuery} for spans.

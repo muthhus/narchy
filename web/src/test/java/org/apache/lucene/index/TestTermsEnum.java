@@ -17,9 +17,6 @@
 package org.apache.lucene.index;
 
 
-import java.io.IOException;
-import java.util.*;
-
 import org.apache.lucene.analysis.MockAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
@@ -35,6 +32,9 @@ import org.apache.lucene.util.automaton.Automata;
 import org.apache.lucene.util.automaton.Automaton;
 import org.apache.lucene.util.automaton.CompiledAutomaton;
 import org.apache.lucene.util.automaton.RegExp;
+
+import java.io.IOException;
+import java.util.*;
 
 @SuppressCodecs({ "SimpleText", "Memory", "Direct" })
 public class TestTermsEnum extends LuceneTestCase {

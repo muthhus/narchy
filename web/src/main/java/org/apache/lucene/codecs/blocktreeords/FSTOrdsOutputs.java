@@ -17,14 +17,14 @@
 package org.apache.lucene.codecs.blocktreeords;
 
 
-import java.io.IOException;
-
 import org.apache.lucene.store.DataInput;
 import org.apache.lucene.store.DataOutput;
 import org.apache.lucene.util.BytesRef;
 import org.apache.lucene.util.RamUsageEstimator;
 import org.apache.lucene.util.StringHelper;
 import org.apache.lucene.util.fst.Outputs;
+
+import java.io.IOException;
 
 /** A custom FST outputs implementation that stores block data
  *  (BytesRef), long ordStart, long numTerms. */

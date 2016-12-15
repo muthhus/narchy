@@ -17,10 +17,10 @@
 package org.apache.lucene.util.bkd;
 
 
+import org.apache.lucene.util.LongBitSet;
+
 import java.io.Closeable;
 import java.io.IOException;
-
-import org.apache.lucene.util.LongBitSet;
 
 /** One pass iterator through all points previously written with a
  *  {@link PointWriter}, abstracting away whether points a read

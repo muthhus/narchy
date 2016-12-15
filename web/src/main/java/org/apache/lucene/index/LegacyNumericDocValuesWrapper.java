@@ -17,9 +17,9 @@
 
 package org.apache.lucene.index;
 
-import java.io.IOException;
-
 import org.apache.lucene.util.Bits;
+
+import java.io.IOException;
 
 /**
  * Wraps a {@link LegacyNumericDocValues} into a {@link NumericDocValues}.

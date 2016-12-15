@@ -17,25 +17,21 @@
 package org.apache.lucene.index;
 
 
-import java.io.FilePermission;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.PropertyPermission;
-
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.MockAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
-import org.apache.lucene.search.IndexSearcher;
-import org.apache.lucene.search.PhraseQuery;
-import org.apache.lucene.search.Query;
-import org.apache.lucene.search.TermQuery;
-import org.apache.lucene.search.TopDocs;
+import org.apache.lucene.search.*;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.util.LuceneTestCase;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+
+import java.io.FilePermission;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.PropertyPermission;
 
 public class TestReadOnlyIndex extends LuceneTestCase {
 

@@ -17,21 +17,14 @@
 package org.apache.lucene.index;
 
 
-import java.io.IOException;
-import java.util.Collections;
-
-import org.apache.lucene.codecs.Codec;
-import org.apache.lucene.codecs.DocValuesProducer;
-import org.apache.lucene.codecs.FieldInfosFormat;
-import org.apache.lucene.codecs.FieldsProducer;
-import org.apache.lucene.codecs.NormsProducer;
-import org.apache.lucene.codecs.PointsReader;
-import org.apache.lucene.codecs.StoredFieldsReader;
-import org.apache.lucene.codecs.TermVectorsReader;
+import org.apache.lucene.codecs.*;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.IOContext;
 import org.apache.lucene.util.Bits;
+
+import java.io.IOException;
+import java.util.Collections;
 
 /**
  * IndexReader implementation over a single segment. 

@@ -215,6 +215,20 @@
       <!--</plugin>-->
 
     </plugins>
+
+
+    <resources>
+      <resource>
+        <directory>src/test/java</directory>
+        <includes>
+          <include>**/*.txt</include>
+          <include>**/*.xsl</include>
+          <include>**/*.xml</include>
+          <include>**/*.properties</include>
+        </includes>
+      </resource>
+
+    </resources>
   </build>
 
 </project>

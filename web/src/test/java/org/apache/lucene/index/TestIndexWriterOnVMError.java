@@ -17,36 +17,22 @@
 package org.apache.lucene.index;
 
 
+import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.analysis.MockTokenizer;
+import org.apache.lucene.analysis.MockVariableLengthPayloadFilter;
+import org.apache.lucene.analysis.TokenStream;
+import org.apache.lucene.document.*;
+import org.apache.lucene.store.AlreadyClosedException;
+import org.apache.lucene.store.MockDirectoryWrapper;
+import org.apache.lucene.store.MockDirectoryWrapper.Failure;
+import org.apache.lucene.util.*;
+import org.apache.lucene.util.LuceneTestCase.SuppressCodecs;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.Arrays;
 import java.util.Random;
-
-import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.MockTokenizer;
-import org.apache.lucene.analysis.MockVariableLengthPayloadFilter;
-import org.apache.lucene.analysis.TokenStream;
-import org.apache.lucene.document.BinaryDocValuesField;
-import org.apache.lucene.document.Document;
-import org.apache.lucene.document.Field;
-import org.apache.lucene.document.FieldType;
-import org.apache.lucene.document.IntPoint;
-import org.apache.lucene.document.NumericDocValuesField;
-import org.apache.lucene.document.SortedDocValuesField;
-import org.apache.lucene.document.SortedNumericDocValuesField;
-import org.apache.lucene.document.SortedSetDocValuesField;
-import org.apache.lucene.document.StoredField;
-import org.apache.lucene.document.TextField;
-import org.apache.lucene.store.AlreadyClosedException;
-import org.apache.lucene.store.MockDirectoryWrapper.Failure;
-import org.apache.lucene.store.MockDirectoryWrapper;
-import org.apache.lucene.util.BytesRef;
-import org.apache.lucene.util.IOUtils;
-import org.apache.lucene.util.LuceneTestCase;
-import org.apache.lucene.util.LuceneTestCase.SuppressCodecs;
-import org.apache.lucene.util.Rethrow;
-import org.apache.lucene.util.TestUtil;
 
 /** 
  * Causes a bunch of fake VM errors and checks that no other exceptions are delivered instead,

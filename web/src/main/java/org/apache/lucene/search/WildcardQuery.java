@@ -17,13 +17,13 @@
 package org.apache.lucene.search;
 
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.lucene.index.Term;
 import org.apache.lucene.util.automaton.Automata;
 import org.apache.lucene.util.automaton.Automaton;
 import org.apache.lucene.util.automaton.Operations;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /** Implements the wildcard search query. Supported wildcards are <code>*</code>, which
  * matches any character sequence (including the empty one), and <code>?</code>,

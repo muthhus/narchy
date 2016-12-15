@@ -16,22 +16,14 @@
  */
 package org.apache.lucene.geo;
 
-import java.util.Random;
-
 import org.apache.lucene.util.LuceneTestCase;
 import org.apache.lucene.util.NumericUtils;
 import org.apache.lucene.util.TestUtil;
 
-import static org.apache.lucene.geo.GeoEncodingUtils.decodeLatitude;
-import static org.apache.lucene.geo.GeoEncodingUtils.decodeLongitude;
-import static org.apache.lucene.geo.GeoEncodingUtils.encodeLatitude;
-import static org.apache.lucene.geo.GeoEncodingUtils.encodeLatitudeCeil;
-import static org.apache.lucene.geo.GeoEncodingUtils.encodeLongitude;
-import static org.apache.lucene.geo.GeoEncodingUtils.encodeLongitudeCeil;
-import static org.apache.lucene.geo.GeoUtils.MAX_LAT_INCL;
-import static org.apache.lucene.geo.GeoUtils.MAX_LON_INCL;
-import static org.apache.lucene.geo.GeoUtils.MIN_LAT_INCL;
-import static org.apache.lucene.geo.GeoUtils.MIN_LON_INCL;
+import java.util.Random;
+
+import static org.apache.lucene.geo.GeoEncodingUtils.*;
+import static org.apache.lucene.geo.GeoUtils.*;
 
 /**
  Tests methods in {@link GeoEncodingUtils}

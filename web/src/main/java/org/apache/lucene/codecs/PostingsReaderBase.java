@@ -17,15 +17,15 @@
 package org.apache.lucene.codecs;
 
 
-import java.io.Closeable;
-import java.io.IOException;
-
-import org.apache.lucene.index.PostingsEnum;
 import org.apache.lucene.index.FieldInfo;
+import org.apache.lucene.index.PostingsEnum;
 import org.apache.lucene.index.SegmentReadState;
 import org.apache.lucene.store.DataInput;
 import org.apache.lucene.store.IndexInput;
 import org.apache.lucene.util.Accountable;
+
+import java.io.Closeable;
+import java.io.IOException;
 
 /** The core terms dictionaries (BlockTermsReader,
  *  BlockTreeTermsReader) interact with a single instance

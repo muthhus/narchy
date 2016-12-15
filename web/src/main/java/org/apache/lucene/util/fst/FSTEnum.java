@@ -17,10 +17,10 @@
 package org.apache.lucene.util.fst;
 
 
-import java.io.IOException;
-
 import org.apache.lucene.util.ArrayUtil;
 import org.apache.lucene.util.RamUsageEstimator;
+
+import java.io.IOException;
 
 /** Can next() and advance() through the terms in an FST
  *

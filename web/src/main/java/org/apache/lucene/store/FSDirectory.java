@@ -17,33 +17,20 @@
 package org.apache.lucene.store;
 
 
+import org.apache.lucene.index.IndexFileNames;
+import org.apache.lucene.util.Constants;
+import org.apache.lucene.util.IOUtils;
+
 import java.io.FileNotFoundException;
 import java.io.FilterOutputStream;
 import java.io.IOException;
-import java.nio.channels.ClosedChannelException; // javadoc @link
-import java.nio.file.DirectoryStream;
-import java.nio.file.FileAlreadyExistsException;
-import java.nio.file.Files;
-import java.nio.file.NoSuchFileException;
-import java.nio.file.OpenOption;
-import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
-import java.nio.file.StandardOpenOption;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.nio.channels.ClosedChannelException;
+import java.nio.file.*;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
-
-import org.apache.lucene.index.IndexFileNames;
-import org.apache.lucene.util.Constants;
-import org.apache.lucene.util.IOUtils;
 
 /**
  * Base class for Directory implementations that store index

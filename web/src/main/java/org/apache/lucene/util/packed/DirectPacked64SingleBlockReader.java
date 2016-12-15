@@ -17,9 +17,9 @@
 package org.apache.lucene.util.packed;
 
 
-import java.io.IOException;
-
 import org.apache.lucene.store.IndexInput;
+
+import java.io.IOException;
 
 final class DirectPacked64SingleBlockReader extends PackedInts.ReaderImpl {
 

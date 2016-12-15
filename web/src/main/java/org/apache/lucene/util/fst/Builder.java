@@ -17,12 +17,12 @@
 package org.apache.lucene.util.fst;
 
 
-import java.io.IOException;
-
 import org.apache.lucene.util.ArrayUtil;
 import org.apache.lucene.util.IntsRef;
 import org.apache.lucene.util.IntsRefBuilder;
-import org.apache.lucene.util.fst.FST.INPUT_TYPE; // javadoc
+import org.apache.lucene.util.fst.FST.INPUT_TYPE;
+
+import java.io.IOException;
 
 // TODO: could we somehow stream an FST to disk while we
 // build it?

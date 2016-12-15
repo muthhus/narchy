@@ -19,9 +19,7 @@ package org.apache.lucene.index;
 
 import java.io.IOException;
 
-import static org.apache.lucene.index.FilterLeafReader.FilterFields;
-import static org.apache.lucene.index.FilterLeafReader.FilterTerms;
-import static org.apache.lucene.index.FilterLeafReader.FilterTermsEnum;
+import static org.apache.lucene.index.FilterLeafReader.*;
 
 /** A {@link Fields} implementation that merges multiple
  *  Fields into one, and maps around deleted documents.

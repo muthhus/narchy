@@ -16,11 +16,11 @@
  */
 package org.apache.lucene.search;
 
-import java.io.IOException;
-import java.util.Set;
-
 import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.index.Term;
+
+import java.io.IOException;
+import java.util.Set;
 
 /**
  * A {@code FilterWeight} contains another {@code Weight} and implements

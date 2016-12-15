@@ -17,16 +17,13 @@
 package org.apache.lucene.codecs;
 
 
-import java.io.IOException;
-import java.util.ServiceLoader;
-import java.util.Set;
-
-import org.apache.lucene.codecs.asserting.AssertingDocValuesFormat;
-import org.apache.lucene.codecs.lucene50.Lucene50PostingsFormat;
-import org.apache.lucene.codecs.lucene70.Lucene70DocValuesFormat;
 import org.apache.lucene.index.SegmentReadState;
 import org.apache.lucene.index.SegmentWriteState;
 import org.apache.lucene.util.NamedSPILoader;
+
+import java.io.IOException;
+import java.util.ServiceLoader;
+import java.util.Set;
 
 /** 
  * Encodes/decodes per-document values.

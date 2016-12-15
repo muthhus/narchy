@@ -17,9 +17,6 @@
 package org.apache.lucene.search;
 
 
-import java.io.IOException;
-import java.util.Set;
-
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.MockAnalyzer;
 import org.apache.lucene.analysis.MockTokenizer;
@@ -33,6 +30,9 @@ import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig.OpenMode;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.util.LuceneTestCase;
+
+import java.io.IOException;
+import java.util.Set;
 
 
 public class TestTermRangeQuery extends LuceneTestCase {

@@ -17,18 +17,14 @@
 package org.apache.lucene.analysis.standard;
 
 
+import org.apache.lucene.analysis.*;
+import org.apache.lucene.util.BytesRef;
+import org.apache.lucene.util.TestUtil;
+
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.Arrays;
 import java.util.Random;
-
-import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.BaseTokenStreamTestCase;
-import org.apache.lucene.analysis.MockGraphTokenFilter;
-import org.apache.lucene.analysis.TokenStream;
-import org.apache.lucene.analysis.Tokenizer;
-import org.apache.lucene.util.BytesRef;
-import org.apache.lucene.util.TestUtil;
 
 public class TestStandardAnalyzer extends BaseTokenStreamTestCase {
 

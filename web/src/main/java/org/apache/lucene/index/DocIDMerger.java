@@ -17,11 +17,11 @@
 
 package org.apache.lucene.index;
 
+import org.apache.lucene.search.DocIdSetIterator;
+import org.apache.lucene.util.PriorityQueue;
+
 import java.io.IOException;
 import java.util.List;
-
-import org.apache.lucene.search.DocIdSetIterator; // javadocs
-import org.apache.lucene.util.PriorityQueue;
 
 import static org.apache.lucene.search.DocIdSetIterator.NO_MORE_DOCS;
 

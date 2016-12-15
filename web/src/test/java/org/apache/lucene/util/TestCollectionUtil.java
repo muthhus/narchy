@@ -17,12 +17,7 @@
 package org.apache.lucene.util;
 
 
-import java.util.Arrays;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 public class TestCollectionUtil extends LuceneTestCase {
 

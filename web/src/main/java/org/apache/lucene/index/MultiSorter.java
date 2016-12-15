@@ -17,9 +17,6 @@
 
 package org.apache.lucene.index;
 
-import java.io.IOException;
-import java.util.List;
-
 import org.apache.lucene.index.MergeState.DocMap;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
@@ -28,6 +25,9 @@ import org.apache.lucene.util.LongValues;
 import org.apache.lucene.util.PriorityQueue;
 import org.apache.lucene.util.packed.PackedInts;
 import org.apache.lucene.util.packed.PackedLongValues;
+
+import java.io.IOException;
+import java.util.List;
 
 @SuppressWarnings({"unchecked","rawtypes"})
 final class MultiSorter {

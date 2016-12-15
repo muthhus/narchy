@@ -17,10 +17,9 @@
 package org.apache.lucene.util.packed;
 
 
+import org.apache.lucene.store.IndexOutput;
 
 import java.io.IOException;
-
-import org.apache.lucene.store.IndexOutput;
 
 /**
  * Write monotonically-increasing sequences of integers. This writer splits

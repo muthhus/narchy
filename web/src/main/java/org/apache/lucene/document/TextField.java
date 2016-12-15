@@ -17,10 +17,10 @@
 package org.apache.lucene.document;
 
 
-import java.io.Reader;
-
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.index.IndexOptions;
+
+import java.io.Reader;
 
 /** A field that is indexed and tokenized, without term
  *  vectors.  For example this would be used on a 'body'

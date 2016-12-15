@@ -17,12 +17,12 @@
 package org.apache.lucene.util.packed;
 
 
-import static org.apache.lucene.util.packed.PackedInts.checkBlockSize;
+import org.apache.lucene.store.DataOutput;
 
 import java.io.IOException;
 import java.util.Arrays;
 
-import org.apache.lucene.store.DataOutput;
+import static org.apache.lucene.util.packed.PackedInts.checkBlockSize;
 
 abstract class AbstractBlockPackedWriter {
 

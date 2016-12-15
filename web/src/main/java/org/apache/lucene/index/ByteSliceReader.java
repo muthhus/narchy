@@ -17,11 +17,11 @@
 package org.apache.lucene.index;
 
 
-import java.io.IOException;
-
 import org.apache.lucene.store.DataInput;
 import org.apache.lucene.store.DataOutput;
 import org.apache.lucene.util.ByteBlockPool;
+
+import java.io.IOException;
 
 /* IndexInput that knows how to read the byte slices written
  * by Posting and PostingVector.  We read the bytes in

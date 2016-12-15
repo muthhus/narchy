@@ -16,10 +16,10 @@
  */
 package org.apache.lucene.search;
 
-import java.util.Arrays;
-
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.BooleanClause.Occur;
+
+import java.util.Arrays;
 
 
 /**

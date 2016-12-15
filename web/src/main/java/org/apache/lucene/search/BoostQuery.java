@@ -17,10 +17,10 @@
 package org.apache.lucene.search;
 
 
+import org.apache.lucene.index.IndexReader;
+
 import java.io.IOException;
 import java.util.Objects;
-
-import org.apache.lucene.index.IndexReader;
 
 /**
  * A {@link Query} wrapper that allows to give a boost to the wrapped query.

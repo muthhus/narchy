@@ -17,10 +17,10 @@
 package org.apache.lucene.util.fst;
 
 
-import java.io.IOException;
-
 import org.apache.lucene.util.packed.PackedInts;
 import org.apache.lucene.util.packed.PagedGrowableWriter;
+
+import java.io.IOException;
 
 // Used to dedup states (lookup already-frozen states)
 final class NodeHash<T> {

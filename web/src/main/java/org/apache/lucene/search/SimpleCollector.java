@@ -17,9 +17,9 @@
 package org.apache.lucene.search;
 
 
-import java.io.IOException;
-
 import org.apache.lucene.index.LeafReaderContext;
+
+import java.io.IOException;
 
 /**
  * Base {@link Collector} implementation that is used to collect all contexts.

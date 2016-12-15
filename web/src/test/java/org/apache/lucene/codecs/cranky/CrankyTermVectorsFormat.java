@@ -16,9 +16,6 @@
  */
 package org.apache.lucene.codecs.cranky;
 
-import java.io.IOException;
-import java.util.Random;
-
 import org.apache.lucene.codecs.TermVectorsFormat;
 import org.apache.lucene.codecs.TermVectorsReader;
 import org.apache.lucene.codecs.TermVectorsWriter;
@@ -30,6 +27,9 @@ import org.apache.lucene.store.DataInput;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.IOContext;
 import org.apache.lucene.util.BytesRef;
+
+import java.io.IOException;
+import java.util.Random;
 
 class CrankyTermVectorsFormat extends TermVectorsFormat {
   final TermVectorsFormat delegate;

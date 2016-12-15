@@ -17,28 +17,12 @@
 package org.apache.lucene.codecs.simpletext;
 
 
-import java.io.IOException;
-
 import org.apache.lucene.codecs.StoredFieldsReader;
-import org.apache.lucene.index.FieldInfo;
-import org.apache.lucene.index.FieldInfos;
-import org.apache.lucene.index.IndexFileNames;
-import org.apache.lucene.index.SegmentInfo;
-import org.apache.lucene.index.StoredFieldVisitor;
-import org.apache.lucene.store.AlreadyClosedException;
-import org.apache.lucene.store.BufferedChecksumIndexInput;
-import org.apache.lucene.store.ChecksumIndexInput;
-import org.apache.lucene.store.Directory;
-import org.apache.lucene.store.IOContext;
-import org.apache.lucene.store.IndexInput;
-import org.apache.lucene.util.ArrayUtil;
-import org.apache.lucene.util.BytesRef;
-import org.apache.lucene.util.BytesRefBuilder;
-import org.apache.lucene.util.CharsRef;
-import org.apache.lucene.util.CharsRefBuilder;
-import org.apache.lucene.util.IOUtils;
-import org.apache.lucene.util.RamUsageEstimator;
-import org.apache.lucene.util.StringHelper;
+import org.apache.lucene.index.*;
+import org.apache.lucene.store.*;
+import org.apache.lucene.util.*;
+
+import java.io.IOException;
 
 import static org.apache.lucene.codecs.simpletext.SimpleTextStoredFieldsWriter.*;
 
@@ -57,8 +41,8 @@ public class SimpleTextStoredFieldsReader extends StoredFieldsReader {
 
   private long offsets[]; /* docid -> offset in .fld file */
   private IndexInput in;
-  private BytesRefBuilder scratch = new BytesRefBuilder();
-  private CharsRefBuilder scratchUTF16 = new CharsRefBuilder();
+  private final BytesRefBuilder scratch = new BytesRefBuilder();
+  private final CharsRefBuilder scratchUTF16 = new CharsRefBuilder();
   private final FieldInfos fieldInfos;
 
   public SimpleTextStoredFieldsReader(Directory directory, SegmentInfo si, FieldInfos fn, IOContext context) throws IOException {

@@ -17,13 +17,13 @@
 package org.apache.lucene.store;
 
 
+import org.junit.Test;
+
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.Set;
-
-import org.junit.Test;
 
 public class TestFilterDirectory extends BaseDirectoryTestCase {
 

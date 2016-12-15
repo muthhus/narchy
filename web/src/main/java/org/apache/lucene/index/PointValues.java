@@ -16,18 +16,13 @@
  */
 package org.apache.lucene.index;
 
+import org.apache.lucene.document.*;
+import org.apache.lucene.util.StringHelper;
+import org.apache.lucene.util.bkd.BKDWriter;
+
 import java.io.IOException;
 import java.math.BigInteger;
 import java.net.InetAddress;
-
-import org.apache.lucene.document.BinaryPoint;
-import org.apache.lucene.document.DoublePoint;
-import org.apache.lucene.document.Field;
-import org.apache.lucene.document.FloatPoint;
-import org.apache.lucene.document.IntPoint;
-import org.apache.lucene.document.LongPoint;
-import org.apache.lucene.util.StringHelper;
-import org.apache.lucene.util.bkd.BKDWriter;
 
 /** 
  * Access to indexed numeric values.

@@ -17,13 +17,7 @@
 package org.apache.lucene.util.bkd;
 
 import org.apache.lucene.codecs.MutablePointValues;
-import org.apache.lucene.util.BytesRef;
-import org.apache.lucene.util.IntroSelector;
-import org.apache.lucene.util.IntroSorter;
-import org.apache.lucene.util.MSBRadixSorter;
-import org.apache.lucene.util.RadixSelector;
-import org.apache.lucene.util.Selector;
-import org.apache.lucene.util.StringHelper;
+import org.apache.lucene.util.*;
 import org.apache.lucene.util.packed.PackedInts;
 
 /** Utility APIs for sorting and partitioning buffered points.

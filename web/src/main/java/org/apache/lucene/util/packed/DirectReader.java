@@ -17,10 +17,10 @@
 package org.apache.lucene.util.packed;
 
 
-import java.io.IOException;
-
 import org.apache.lucene.store.RandomAccessInput;
 import org.apache.lucene.util.LongValues;
+
+import java.io.IOException;
 
 /** 
  * Retrieves an instance previously written by {@link DirectWriter} 

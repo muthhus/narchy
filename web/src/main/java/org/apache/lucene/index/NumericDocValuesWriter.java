@@ -17,22 +17,22 @@
 package org.apache.lucene.index;
 
 
-import java.io.IOException;
-
 import org.apache.lucene.codecs.DocValuesConsumer;
 import org.apache.lucene.search.DocIdSetIterator;
 import org.apache.lucene.util.Counter;
 import org.apache.lucene.util.packed.PackedInts;
 import org.apache.lucene.util.packed.PackedLongValues;
 
+import java.io.IOException;
+
 /** Buffers up pending long per doc, then flushes when
  *  segment flushes. */
 class NumericDocValuesWriter extends DocValuesWriter {
 
-  private PackedLongValues.Builder pending;
+  private final PackedLongValues.Builder pending;
   private final Counter iwBytesUsed;
   private long bytesUsed;
-  private DocsWithFieldSet docsWithField;
+  private final DocsWithFieldSet docsWithField;
   private final FieldInfo fieldInfo;
   private int lastDocID = -1;
 

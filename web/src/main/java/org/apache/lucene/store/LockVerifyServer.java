@@ -17,6 +17,9 @@
 package org.apache.lucene.store;
 
 
+import org.apache.lucene.util.IOUtils;
+import org.apache.lucene.util.SuppressForbidden;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -24,9 +27,6 @@ import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.concurrent.CountDownLatch;
-
-import org.apache.lucene.util.IOUtils;
-import org.apache.lucene.util.SuppressForbidden;
 
 /**
  * Simple standalone server that must be running when you

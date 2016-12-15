@@ -17,8 +17,8 @@
 
 package org.apache.lucene.mockfile;
 
-import org.apache.lucene.util.filter.FilterPath;
 import org.apache.lucene.util.VirusCheckingFS;
+import org.apache.lucene.util.filter.FilterPath;
 
 import java.io.IOException;
 import java.io.OutputStream;

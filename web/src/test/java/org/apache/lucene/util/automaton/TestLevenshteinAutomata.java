@@ -17,10 +17,10 @@
 package org.apache.lucene.util.automaton;
 
 
+import org.apache.lucene.util.LuceneTestCase;
+
 import java.util.ArrayList;
 import java.util.List;
-
-import org.apache.lucene.util.LuceneTestCase;
 
 import static org.apache.lucene.util.automaton.Operations.DEFAULT_MAX_DETERMINIZED_STATES;
 

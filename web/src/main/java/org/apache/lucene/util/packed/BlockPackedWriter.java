@@ -17,11 +17,11 @@
 package org.apache.lucene.util.packed;
 
 
-import static org.apache.lucene.util.BitUtil.zigZagEncode;
+import org.apache.lucene.store.DataOutput;
 
 import java.io.IOException;
 
-import org.apache.lucene.store.DataOutput;
+import static org.apache.lucene.util.BitUtil.zigZagEncode;
 
 /**
  * A writer for large sequences of longs.

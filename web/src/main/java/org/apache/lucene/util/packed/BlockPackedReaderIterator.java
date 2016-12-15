@@ -17,20 +17,17 @@
 package org.apache.lucene.util.packed;
 
 
-import static org.apache.lucene.util.BitUtil.zigZagDecode;
-import static org.apache.lucene.util.packed.AbstractBlockPackedWriter.BPV_SHIFT;
-import static org.apache.lucene.util.packed.AbstractBlockPackedWriter.MAX_BLOCK_SIZE;
-import static org.apache.lucene.util.packed.AbstractBlockPackedWriter.MIN_BLOCK_SIZE;
-import static org.apache.lucene.util.packed.AbstractBlockPackedWriter.MIN_VALUE_EQUALS_0;
-import static org.apache.lucene.util.packed.PackedInts.checkBlockSize;
+import org.apache.lucene.store.DataInput;
+import org.apache.lucene.store.IndexInput;
+import org.apache.lucene.util.LongsRef;
 
 import java.io.EOFException;
 import java.io.IOException;
 import java.util.Arrays;
 
-import org.apache.lucene.store.DataInput;
-import org.apache.lucene.store.IndexInput;
-import org.apache.lucene.util.LongsRef;
+import static org.apache.lucene.util.BitUtil.zigZagDecode;
+import static org.apache.lucene.util.packed.AbstractBlockPackedWriter.*;
+import static org.apache.lucene.util.packed.PackedInts.checkBlockSize;
 
 /**
  * Reader for sequences of longs written with {@link BlockPackedWriter}.

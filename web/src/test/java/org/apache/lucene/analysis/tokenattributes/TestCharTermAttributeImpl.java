@@ -18,13 +18,13 @@ package org.apache.lucene.analysis.tokenattributes;
 
 
 import org.apache.lucene.util.AttributeImpl;
-import org.apache.lucene.util.LuceneTestCase;
 import org.apache.lucene.util.BytesRef;
+import org.apache.lucene.util.LuceneTestCase;
 import org.apache.lucene.util.TestUtil;
 
 import java.nio.CharBuffer;
-import java.util.HashMap;
 import java.util.Formatter;
+import java.util.HashMap;
 import java.util.Locale;
 import java.util.regex.Pattern;
 

@@ -16,9 +16,9 @@
  */
 package org.apache.lucene.store;
 
-import java.io.IOException;
-
 import org.apache.lucene.util.ThreadInterruptedException;
+
+import java.io.IOException;
 
 /**
  * Takes a while to open files: gives testThreadInterruptDeadlock

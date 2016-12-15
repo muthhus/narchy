@@ -16,24 +16,18 @@
  */
 package org.apache.lucene.mockfile;
 
+import org.apache.lucene.util.Constants;
+import org.apache.lucene.util.WindowsFS;
+import org.apache.lucene.util.filter.FilterPath;
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.lang.Exception;
-import java.lang.RuntimeException;
 import java.net.URI;
-import java.nio.file.FileSystem;
-import java.nio.file.Files;
-import java.nio.file.NoSuchFileException;
-import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
+import java.nio.file.*;
 import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.atomic.AtomicBoolean;
-
-import org.apache.lucene.util.filter.FilterPath;
-import org.apache.lucene.util.WindowsFS;
-import org.apache.lucene.util.Constants;
 
 /** Basic tests for WindowsFS */
 public class TestWindowsFS extends MockFileSystemTestCase {

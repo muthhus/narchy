@@ -16,20 +16,12 @@
  */
 package org.apache.lucene.search;
 
-import java.io.IOException;
-
-import org.apache.lucene.index.IndexReader;
-import org.apache.lucene.index.Term;
-import org.apache.lucene.index.TermContext;
-import org.apache.lucene.index.TermState;
-import org.apache.lucene.index.TermsEnum;
+import org.apache.lucene.index.*;
 import org.apache.lucene.search.MultiTermQuery.RewriteMethod;
-import org.apache.lucene.util.ArrayUtil;
-import org.apache.lucene.util.ByteBlockPool;
-import org.apache.lucene.util.BytesRef;
+import org.apache.lucene.util.*;
 import org.apache.lucene.util.BytesRefHash.DirectBytesStartArray;
-import org.apache.lucene.util.BytesRefHash;
-import org.apache.lucene.util.RamUsageEstimator;
+
+import java.io.IOException;
 
 /** 
  * Base rewrite method that translates each term into a query, and keeps

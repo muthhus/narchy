@@ -17,10 +17,10 @@
 package org.apache.lucene.search;
 
 
+import org.apache.lucene.util.LuceneTestCase;
+
 import java.util.HashMap;
 import java.util.Map;
-
-import org.apache.lucene.util.LuceneTestCase;
 
 public class TestMultiset extends LuceneTestCase {
 

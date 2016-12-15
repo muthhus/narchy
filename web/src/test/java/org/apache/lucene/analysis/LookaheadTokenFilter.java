@@ -16,15 +16,15 @@
  */
 package org.apache.lucene.analysis;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.lucene.analysis.tokenattributes.OffsetAttribute;
 import org.apache.lucene.analysis.tokenattributes.PositionIncrementAttribute;
 import org.apache.lucene.analysis.tokenattributes.PositionLengthAttribute;
 import org.apache.lucene.util.AttributeSource;
 import org.apache.lucene.util.RollingBuffer;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 // TODO: cut SynFilter over to this
 // TODO: somehow add "nuke this input token" capability...

@@ -16,16 +16,12 @@
  */
 package org.apache.lucene.util.bkd;
 
+import org.apache.lucene.codecs.MutablePointValues;
+import org.apache.lucene.util.*;
+
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Comparator;
-
-import org.apache.lucene.codecs.MutablePointValues;
-import org.apache.lucene.util.ArrayUtil;
-import org.apache.lucene.util.BytesRef;
-import org.apache.lucene.util.LuceneTestCase;
-import org.apache.lucene.util.StringHelper;
-import org.apache.lucene.util.TestUtil;
 
 public class TestMutablePointsReaderUtils extends LuceneTestCase {
 

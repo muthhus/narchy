@@ -17,18 +17,12 @@
 package org.apache.lucene.search;
 
 
-import java.io.IOException;
-import java.util.Objects;
-
-import org.apache.lucene.index.FilteredTermsEnum; // javadocs
-import org.apache.lucene.index.IndexReader;
-import org.apache.lucene.index.SingleTermsEnum;   // javadocs
-import org.apache.lucene.index.Term;
-import org.apache.lucene.index.TermContext;
-import org.apache.lucene.index.Terms;
-import org.apache.lucene.index.TermsEnum;
+import org.apache.lucene.index.*;
 import org.apache.lucene.search.BooleanQuery.Builder;
 import org.apache.lucene.util.AttributeSource;
+
+import java.io.IOException;
+import java.util.Objects;
 
 /**
  * An abstract {@link Query} that matches documents

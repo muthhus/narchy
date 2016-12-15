@@ -17,10 +17,10 @@
 package org.apache.lucene.index;
 
 
+import org.apache.lucene.util.BytesRef;
+
 import java.io.IOException;
 import java.util.Arrays;
-
-import org.apache.lucene.util.BytesRef;
 
 /**
  * Exposes {@link PostingsEnum}, merged from {@link PostingsEnum}

@@ -17,9 +17,9 @@
 package org.apache.lucene.search;
 
 
-import java.io.IOException;
-
 import org.apache.lucene.index.IndexReader;
+
+import java.io.IOException;
 
 /** The abstract base class for queries.
     <p>Instantiable subclasses are:

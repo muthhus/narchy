@@ -16,8 +16,8 @@
  */
 package org.apache.lucene.search;
 
-import org.apache.lucene.index.IndexReader; // javadocs
-import org.apache.lucene.index.Terms;       // javadocs
+import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.index.Terms;
 
 
 /**

@@ -17,11 +17,9 @@
 package org.apache.lucene.analysis;
 
 
-import java.io.IOException;
-
-import org.apache.lucene.analysis.TokenFilter;
-import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.tokenattributes.PositionIncrementAttribute;
+
+import java.io.IOException;
 
 /**
  * Abstract base class for TokenFilters that may remove tokens.

@@ -17,12 +17,12 @@
 package org.apache.lucene.index;
 
 
-import java.io.IOException;
-
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.ReferenceManager;
 import org.apache.lucene.search.SearcherManager;
 import org.apache.lucene.store.Directory;
+
+import java.io.IOException;
 
 /**
  * Utility class to safely share {@link DirectoryReader} instances across

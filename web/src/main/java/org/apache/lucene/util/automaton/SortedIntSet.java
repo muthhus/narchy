@@ -16,9 +16,10 @@
  */
 package org.apache.lucene.util.automaton;
 
-import java.util.TreeMap;
-import java.util.Map;
 import org.apache.lucene.util.ArrayUtil;
+
+import java.util.Map;
+import java.util.TreeMap;
 
 // Just holds a set of int[] states, plus a corresponding
 // int[] count per state.  Used by

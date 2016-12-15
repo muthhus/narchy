@@ -17,15 +17,15 @@
 package org.apache.lucene.codecs.blocktree;
 
 
-import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
-import java.io.UnsupportedEncodingException;
-import java.util.Locale;
-
 import org.apache.lucene.codecs.PostingsReaderBase;
 import org.apache.lucene.util.ArrayUtil;
 import org.apache.lucene.util.BytesRef;
 import org.apache.lucene.util.IOUtils;
+
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
+import java.io.UnsupportedEncodingException;
+import java.util.Locale;
 
 /**
  * BlockTree statistics for a single field 

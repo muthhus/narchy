@@ -17,12 +17,12 @@
 package org.apache.lucene.util;
 
 
-import java.io.IOException;
-import java.util.Arrays;
-
 import org.apache.lucene.store.DataInput;
 import org.apache.lucene.store.DataOutput;
 import org.apache.lucene.store.IndexInput;
+
+import java.io.IOException;
+import java.util.Arrays;
 
 /** Represents a logical byte[] as a series of pages.  You
  *  can write-once into the logical byte[] (append only),

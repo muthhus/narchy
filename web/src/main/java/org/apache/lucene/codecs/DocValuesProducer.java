@@ -17,16 +17,11 @@
 package org.apache.lucene.codecs;
 
 
+import org.apache.lucene.index.*;
+import org.apache.lucene.util.Accountable;
+
 import java.io.Closeable;
 import java.io.IOException;
-
-import org.apache.lucene.index.BinaryDocValues;
-import org.apache.lucene.index.FieldInfo;
-import org.apache.lucene.index.NumericDocValues;
-import org.apache.lucene.index.SortedDocValues;
-import org.apache.lucene.index.SortedNumericDocValues;
-import org.apache.lucene.index.SortedSetDocValues;
-import org.apache.lucene.util.Accountable;
 
 /** Abstract API that produces numeric, binary, sorted, sortedset,
  *  and sortednumeric docvalues.

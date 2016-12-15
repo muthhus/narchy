@@ -16,12 +16,12 @@
  */
 package org.apache.lucene.analysis;
 
+import org.apache.lucene.util.BytesRef;
+import org.apache.lucene.util.LuceneTestCase;
+
 import java.io.IOException;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
-
-import org.apache.lucene.util.BytesRef;
-import org.apache.lucene.util.LuceneTestCase;
 
 public class TestDelegatingAnalyzerWrapper extends LuceneTestCase {
 

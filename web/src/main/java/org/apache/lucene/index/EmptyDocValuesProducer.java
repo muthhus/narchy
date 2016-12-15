@@ -17,9 +17,9 @@
 
 package org.apache.lucene.index;
 
-import java.io.IOException;
-
 import org.apache.lucene.codecs.DocValuesProducer;
+
+import java.io.IOException;
 
 /** Abstrast base class implementing a {@link DocValuesProducer} that has no doc values. */
 public abstract class EmptyDocValuesProducer extends DocValuesProducer {

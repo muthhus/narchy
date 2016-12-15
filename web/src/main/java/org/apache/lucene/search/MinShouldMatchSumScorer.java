@@ -17,17 +17,15 @@
 package org.apache.lucene.search;
 
 
+import org.apache.lucene.util.PriorityQueue;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.lucene.util.PriorityQueue;
-
-import static org.apache.lucene.search.DisiPriorityQueue.leftNode;
-import static org.apache.lucene.search.DisiPriorityQueue.parentNode;
-import static org.apache.lucene.search.DisiPriorityQueue.rightNode;
+import static org.apache.lucene.search.DisiPriorityQueue.*;
 
 /**
  * A {@link Scorer} for {@link BooleanQuery} when

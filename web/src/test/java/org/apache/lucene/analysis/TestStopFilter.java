@@ -16,17 +16,13 @@
  */
 package org.apache.lucene.analysis;
 
+import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
+import org.apache.lucene.analysis.tokenattributes.PositionIncrementAttribute;
+import org.apache.lucene.util.English;
+
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
-
-import org.apache.lucene.analysis.BaseTokenStreamTestCase;
-import org.apache.lucene.analysis.MockTokenizer;
-import org.apache.lucene.analysis.TokenStream;
-import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
-import org.apache.lucene.analysis.tokenattributes.PositionIncrementAttribute;
-import org.apache.lucene.analysis.CharArraySet;
-import org.apache.lucene.util.English;
 
 public class TestStopFilter extends BaseTokenStreamTestCase {
   

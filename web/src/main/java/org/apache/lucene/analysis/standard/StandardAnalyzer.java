@@ -17,17 +17,12 @@
 package org.apache.lucene.analysis.standard;
 
 
+import org.apache.lucene.analysis.*;
+
 import java.io.IOException;
 import java.io.Reader;
 import java.util.Arrays;
 import java.util.List;
-
-import org.apache.lucene.analysis.CharArraySet;
-import org.apache.lucene.analysis.LowerCaseFilter;
-import org.apache.lucene.analysis.StopFilter;
-import org.apache.lucene.analysis.StopwordAnalyzerBase;
-import org.apache.lucene.analysis.TokenStream;
-import org.apache.lucene.analysis.WordlistLoader;
 
 /**
  * Filters {@link StandardTokenizer} with {@link StandardFilter}, {@link

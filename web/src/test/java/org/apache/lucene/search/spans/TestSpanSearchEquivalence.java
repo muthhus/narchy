@@ -19,13 +19,9 @@ package org.apache.lucene.search.spans;
 
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.BooleanClause.Occur;
-import org.apache.lucene.search.BooleanQuery;
-import org.apache.lucene.search.PhraseQuery;
-import org.apache.lucene.search.Query;
-import org.apache.lucene.search.SearchEquivalenceTestBase;
-import org.apache.lucene.search.TermQuery;
+import org.apache.lucene.search.*;
 
-import static org.apache.lucene.search.spans.SpanTestUtil.*;
+import static org.apache.lucene.search.spans.SpanTestUtil.spanQuery;
 
 /**
  * Basic equivalence tests for span queries

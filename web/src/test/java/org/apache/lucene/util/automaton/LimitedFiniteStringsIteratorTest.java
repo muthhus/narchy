@@ -17,13 +17,13 @@
 package org.apache.lucene.util.automaton;
 
 
-import java.util.List;
-
 import org.apache.lucene.util.IntsRef;
 import org.apache.lucene.util.IntsRefBuilder;
 import org.apache.lucene.util.LuceneTestCase;
 import org.apache.lucene.util.TestUtil;
 import org.apache.lucene.util.fst.Util;
+
+import java.util.List;
 
 import static org.apache.lucene.util.automaton.FiniteStringsIteratorTest.getFiniteStrings;
 

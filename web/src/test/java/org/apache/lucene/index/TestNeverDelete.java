@@ -17,16 +17,16 @@
 package org.apache.lucene.index;
 
 
-import java.nio.file.Path;
-import java.util.HashSet;
-import java.util.Set;
-
 import org.apache.lucene.analysis.MockAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.store.BaseDirectoryWrapper;
 import org.apache.lucene.util.LuceneTestCase;
 import org.apache.lucene.util.TestUtil;
+
+import java.nio.file.Path;
+import java.util.HashSet;
+import java.util.Set;
 
 // Make sure if you use NoDeletionPolicy that no file
 // referenced by a commit point is ever deleted

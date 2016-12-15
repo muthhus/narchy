@@ -17,12 +17,12 @@
 package org.apache.lucene.search;
 
 
+import org.apache.lucene.util.Bits;
+import org.apache.lucene.util.PriorityQueue;
+
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
-
-import org.apache.lucene.util.Bits;
-import org.apache.lucene.util.PriorityQueue;
 
 /**
  * {@link BulkScorer} that is used for pure disjunctions and disjunctions

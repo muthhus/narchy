@@ -16,16 +16,12 @@
  */
 package org.apache.lucene.codecs;
 
+import org.apache.lucene.index.*;
+
 import java.io.Closeable;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.apache.lucene.index.DocIDMerger;
-import org.apache.lucene.index.FieldInfo;
-import org.apache.lucene.index.MergeState;
-import org.apache.lucene.index.NumericDocValues;
-import org.apache.lucene.index.SegmentWriteState;
 
 /** 
  * Abstract API that consumes normalization values.  

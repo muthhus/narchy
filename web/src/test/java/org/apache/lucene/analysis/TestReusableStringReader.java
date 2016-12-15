@@ -16,9 +16,9 @@
  */
 package org.apache.lucene.analysis;
 
-import java.nio.CharBuffer;
-
 import org.apache.lucene.util.LuceneTestCase;
+
+import java.nio.CharBuffer;
 
 public class TestReusableStringReader extends LuceneTestCase {
   

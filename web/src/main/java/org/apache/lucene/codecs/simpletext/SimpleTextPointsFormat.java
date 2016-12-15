@@ -17,13 +17,13 @@
 package org.apache.lucene.codecs.simpletext;
 
 
-import java.io.IOException;
-
 import org.apache.lucene.codecs.PointsFormat;
 import org.apache.lucene.codecs.PointsReader;
 import org.apache.lucene.codecs.PointsWriter;
 import org.apache.lucene.index.SegmentReadState;
 import org.apache.lucene.index.SegmentWriteState;
+
+import java.io.IOException;
 
 /** For debugging, curiosity, transparency only!!  Do not
  *  use this codec in production.

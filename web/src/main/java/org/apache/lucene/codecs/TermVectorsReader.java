@@ -17,12 +17,12 @@
 package org.apache.lucene.codecs;
 
 
-import java.io.Closeable;
-import java.io.IOException;
-
-import org.apache.lucene.analysis.tokenattributes.OffsetAttribute; // javadocs
+import org.apache.lucene.analysis.tokenattributes.OffsetAttribute;
 import org.apache.lucene.index.Fields;
 import org.apache.lucene.util.Accountable;
+
+import java.io.Closeable;
+import java.io.IOException;
 
 /**
  * Codec API for reading term vectors:

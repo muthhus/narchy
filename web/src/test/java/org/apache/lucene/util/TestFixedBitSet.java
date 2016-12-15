@@ -17,10 +17,10 @@
 package org.apache.lucene.util;
 
 
+import org.apache.lucene.search.DocIdSetIterator;
+
 import java.io.IOException;
 import java.util.Random;
-
-import org.apache.lucene.search.DocIdSetIterator;
 
 public class TestFixedBitSet extends BaseBitSetTestCase<FixedBitSet> {
 

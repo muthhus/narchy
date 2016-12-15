@@ -17,14 +17,14 @@
 package org.apache.lucene.codecs.blocktree;
 
 
-import java.io.IOException;
-
 import org.apache.lucene.index.PostingsEnum;
 import org.apache.lucene.search.DocIdSetIterator;
 import org.apache.lucene.util.BitSet;
 import org.apache.lucene.util.BitSetIterator;
 import org.apache.lucene.util.BytesRef;
-import org.apache.lucene.util.FixedBitSet; // javadocs
+import org.apache.lucene.util.FixedBitSet;
+
+import java.io.IOException;
 
 /** Takes a {@link FixedBitSet} and creates a DOCS {@link PostingsEnum} from it. */
 

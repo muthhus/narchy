@@ -16,9 +16,10 @@
  */
 package org.apache.lucene.search;
 
+import org.apache.lucene.index.LeafReaderContext;
+
 import java.io.IOException;
 import java.util.Random;
-import org.apache.lucene.index.LeafReaderContext;
 
 class AssertingWeight extends FilterWeight {
 

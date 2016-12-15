@@ -16,10 +16,10 @@
  */
 package org.apache.lucene.util;
 
-import java.io.IOException;
-
 import org.apache.lucene.store.DataInput;
 import org.apache.lucene.store.IndexOutput;
+
+import java.io.IOException;
 
 /**
  * Intentionally slow IndexOutput for testing.

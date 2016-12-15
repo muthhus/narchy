@@ -17,13 +17,13 @@
 package org.apache.lucene.store;
 
 
-import java.io.IOException;
-import java.nio.file.Path;
-
 import org.apache.lucene.analysis.MockAnalyzer;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.index.IndexWriterConfig.OpenMode;
+
+import java.io.IOException;
+import java.nio.file.Path;
 
 /** Simple tests for SingleInstanceLockFactory */
 public class TestSingleInstanceLockFactory extends BaseLockFactoryTestCase {

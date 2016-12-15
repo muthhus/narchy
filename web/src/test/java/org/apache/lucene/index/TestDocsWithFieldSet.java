@@ -16,11 +16,11 @@
  */
 package org.apache.lucene.index;
 
-import java.io.IOException;
-
 import org.apache.lucene.search.DocIdSetIterator;
 import org.apache.lucene.util.LuceneTestCase;
 import org.apache.lucene.util.TestUtil;
+
+import java.io.IOException;
 
 public class TestDocsWithFieldSet extends LuceneTestCase {
 

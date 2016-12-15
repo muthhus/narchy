@@ -17,16 +17,12 @@
 package org.apache.lucene.codecs;
 
 
+import org.apache.lucene.index.*;
+
 import java.io.Closeable;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.apache.lucene.index.Fields;
-import org.apache.lucene.index.MappedMultiFields;
-import org.apache.lucene.index.MergeState;
-import org.apache.lucene.index.MultiFields;
-import org.apache.lucene.index.ReaderSlice;
 
 /** 
  * Abstract API that consumes terms, doc, freq, prox, offset and

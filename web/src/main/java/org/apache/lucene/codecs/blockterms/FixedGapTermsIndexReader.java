@@ -17,25 +17,17 @@
 package org.apache.lucene.codecs.blockterms;
 
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-
 import org.apache.lucene.codecs.CodecUtil;
 import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.index.FieldInfo;
 import org.apache.lucene.index.IndexFileNames;
 import org.apache.lucene.index.SegmentReadState;
 import org.apache.lucene.store.IndexInput;
-import org.apache.lucene.util.Accountable;
-import org.apache.lucene.util.Accountables;
-import org.apache.lucene.util.BytesRef;
-import org.apache.lucene.util.IOUtils;
-import org.apache.lucene.util.PagedBytes;
+import org.apache.lucene.util.*;
 import org.apache.lucene.util.packed.MonotonicBlockPackedReader;
+
+import java.io.IOException;
+import java.util.*;
 
 /** 
  * TermsIndexReader for simple every Nth terms indexes.

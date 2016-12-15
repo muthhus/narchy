@@ -17,8 +17,6 @@
 package org.apache.lucene.codecs.blocktreeords;
 
 
-import java.io.IOException;
-
 import org.apache.lucene.codecs.blocktreeords.FSTOrdsOutputs.Output;
 import org.apache.lucene.index.PostingsEnum;
 import org.apache.lucene.index.TermState;
@@ -31,6 +29,8 @@ import org.apache.lucene.util.StringHelper;
 import org.apache.lucene.util.automaton.CompiledAutomaton;
 import org.apache.lucene.util.automaton.RunAutomaton;
 import org.apache.lucene.util.fst.FST;
+
+import java.io.IOException;
 
 // NOTE: cannot seek!
 final class OrdsIntersectTermsEnum extends TermsEnum {

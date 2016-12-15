@@ -16,10 +16,10 @@
  */
 package org.apache.lucene.analysis;
 
+import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
+
 import java.io.IOException;
 import java.util.Random;
-
-import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 
 /**
  * Uses {@link LookaheadTokenFilter} to randomly peek at future tokens.

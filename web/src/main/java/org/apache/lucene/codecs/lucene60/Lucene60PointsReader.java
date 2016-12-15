@@ -17,15 +17,6 @@
 package org.apache.lucene.codecs.lucene60;
 
 
-import java.io.Closeable;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.lucene.codecs.CodecUtil;
 import org.apache.lucene.codecs.PointsReader;
 import org.apache.lucene.index.FieldInfo;
@@ -38,6 +29,10 @@ import org.apache.lucene.util.Accountable;
 import org.apache.lucene.util.Accountables;
 import org.apache.lucene.util.IOUtils;
 import org.apache.lucene.util.bkd.BKDReader;
+
+import java.io.Closeable;
+import java.io.IOException;
+import java.util.*;
 
 /** Reads point values previously written with {@link Lucene60PointsWriter} */
 public class Lucene60PointsReader extends PointsReader implements Closeable {

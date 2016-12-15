@@ -17,15 +17,15 @@
 
 package org.apache.lucene.util;
 
+import org.apache.lucene.index.IndexWriter;
+import org.apache.lucene.util.filter.FilterFileSystemProvider;
+
 import java.io.IOException;
 import java.nio.file.AccessDeniedException;
 import java.nio.file.FileSystem;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.concurrent.atomic.AtomicLong;
-
-import org.apache.lucene.index.IndexWriter;
-import org.apache.lucene.util.filter.FilterFileSystemProvider;
 
 /** 
  * Acts like a virus checker on Windows, where random programs may open the files you just wrote in an unfriendly

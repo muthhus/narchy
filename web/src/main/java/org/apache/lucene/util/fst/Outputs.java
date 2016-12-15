@@ -17,11 +17,11 @@
 package org.apache.lucene.util.fst;
 
 
-import java.io.IOException;
-
 import org.apache.lucene.store.DataInput;
 import org.apache.lucene.store.DataOutput;
 import org.apache.lucene.util.Accountable;
+
+import java.io.IOException;
 
 /**
  * Represents the outputs for an FST, providing the basic

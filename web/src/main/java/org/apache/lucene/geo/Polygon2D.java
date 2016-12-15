@@ -16,12 +16,11 @@
  */
 package org.apache.lucene.geo;
 
-import java.util.Arrays;
-import java.util.Comparator;
-
-import org.apache.lucene.geo.Polygon;
 import org.apache.lucene.index.PointValues.Relation;
 import org.apache.lucene.util.ArrayUtil;
+
+import java.util.Arrays;
+import java.util.Comparator;
 
 /**
  * 2D polygon implementation represented as a balanced interval tree of edges.

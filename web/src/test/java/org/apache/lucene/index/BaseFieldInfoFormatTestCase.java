@@ -16,14 +16,6 @@
  */
 package org.apache.lucene.index;
 
-import java.io.IOException;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Random;
-import java.util.Set;
-
 import org.apache.lucene.codecs.Codec;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.FieldType;
@@ -37,6 +29,9 @@ import org.apache.lucene.store.MockDirectoryWrapper.FakeIOException;
 import org.apache.lucene.util.StringHelper;
 import org.apache.lucene.util.TestUtil;
 import org.apache.lucene.util.Version;
+
+import java.io.IOException;
+import java.util.*;
 
 /**
  * Abstract class to do basic tests for fis format.

@@ -17,12 +17,12 @@
 package org.apache.lucene.store;
 
 
+import org.apache.lucene.util.IOUtils;
+import org.apache.lucene.util.TestUtil;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-
-import org.apache.lucene.util.IOUtils;
-import org.apache.lucene.util.TestUtil;
 
 /** Simple tests for NativeFSLockFactory */
 public class TestNativeFSLockFactory extends BaseLockFactoryTestCase {

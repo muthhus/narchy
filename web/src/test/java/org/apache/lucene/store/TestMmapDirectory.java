@@ -17,12 +17,12 @@
 package org.apache.lucene.store;
 
 
+import org.junit.Ignore;
+
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Random;
 import java.util.concurrent.CountDownLatch;
-
-import org.junit.Ignore;
 
 /**
  * Tests MMapDirectory

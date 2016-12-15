@@ -17,12 +17,12 @@
 package org.apache.lucene.codecs.compressing;
 
 
-import java.io.IOException;
-import java.util.Arrays;
-
 import org.apache.lucene.store.DataInput;
 import org.apache.lucene.store.DataOutput;
 import org.apache.lucene.util.packed.PackedInts;
+
+import java.io.IOException;
+import java.util.Arrays;
 
 /**
  * LZ4 compression and decompression routines.

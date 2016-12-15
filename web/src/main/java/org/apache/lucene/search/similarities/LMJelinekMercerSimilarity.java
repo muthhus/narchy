@@ -17,10 +17,10 @@
 package org.apache.lucene.search.similarities;
 
 
+import org.apache.lucene.search.Explanation;
+
 import java.util.List;
 import java.util.Locale;
-
-import org.apache.lucene.search.Explanation;
 
 /**
  * Language model based on the Jelinek-Mercer smoothing method. From Chengxiang

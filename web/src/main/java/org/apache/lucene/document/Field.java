@@ -17,9 +17,6 @@
 package org.apache.lucene.document;
 
 
-import java.io.IOException;
-import java.io.Reader;
-
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.tokenattributes.BytesTermAttribute;
@@ -29,6 +26,9 @@ import org.apache.lucene.index.IndexOptions;
 import org.apache.lucene.index.IndexableField;
 import org.apache.lucene.index.IndexableFieldType;
 import org.apache.lucene.util.BytesRef;
+
+import java.io.IOException;
+import java.io.Reader;
 
 /**
  * Expert: directly create a field for a document.  Most

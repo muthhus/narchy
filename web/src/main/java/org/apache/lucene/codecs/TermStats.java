@@ -17,7 +17,7 @@
 package org.apache.lucene.codecs;
 
 
-import org.apache.lucene.index.TermsEnum; // javadocs
+import org.apache.lucene.index.TermsEnum;
 
 /**
  * Holder for per-term statistics.

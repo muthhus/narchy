@@ -17,10 +17,10 @@
 package org.apache.lucene.index;
 
 
+import org.apache.lucene.util.InfoStream;
+
 import java.io.Closeable;
 import java.io.IOException;
-
-import org.apache.lucene.util.InfoStream;
 
 /** <p>Expert: {@link IndexWriter} uses an instance
  *  implementing this interface to execute the merges

@@ -17,17 +17,11 @@
 package org.apache.lucene.store;
 
 
+import org.apache.lucene.util.BitUtil;
+
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
-import java.util.TreeSet;
-
-import org.apache.lucene.util.BitUtil;
+import java.util.*;
 
 /**
  * Abstract base class for performing read operations of Lucene's low-level

@@ -17,12 +17,12 @@
 package org.apache.lucene.util.automaton;
 
 
-import java.util.*;
-
 import org.apache.lucene.util.ArrayUtil;
 import org.apache.lucene.util.BytesRef;
 import org.apache.lucene.util.CharsRef;
 import org.apache.lucene.util.UnicodeUtil;
+
+import java.util.*;
 
 /**
  * Builds a minimal, deterministic {@link Automaton} that accepts a set of 
@@ -201,7 +201,7 @@ public final class DaciukMihovAutomatonBuilder {
   /**
    * Root automaton state.
    */
-  private State root = new State();
+  private final State root = new State();
   
   /**
    * Previous sequence added to the automaton in {@link #add(CharsRef)}.

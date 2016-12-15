@@ -17,12 +17,12 @@
 package org.apache.lucene.search;
 
 
+import org.apache.lucene.index.PostingsEnum;
+import org.apache.lucene.search.similarities.Similarity;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.apache.lucene.index.PostingsEnum;
-import org.apache.lucene.search.similarities.Similarity;
 
 final class ExactPhraseScorer extends Scorer {
 
@@ -44,7 +44,7 @@ final class ExactPhraseScorer extends Scorer {
 
   private final Similarity.SimScorer docScorer;
   private final boolean needsScores;
-  private float matchCost;
+  private final float matchCost;
 
   ExactPhraseScorer(Weight weight, PhraseQuery.PostingsAndFreq[] postings,
                     Similarity.SimScorer docScorer, boolean needsScores,

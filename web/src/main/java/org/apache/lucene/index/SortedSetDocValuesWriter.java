@@ -16,29 +16,25 @@
  */
 package org.apache.lucene.index;
 
-import static org.apache.lucene.util.ByteBlockPool.BYTE_BLOCK_SIZE;
+import org.apache.lucene.codecs.DocValuesConsumer;
+import org.apache.lucene.search.DocIdSetIterator;
+import org.apache.lucene.util.*;
+import org.apache.lucene.util.BytesRefHash.DirectBytesStartArray;
+import org.apache.lucene.util.packed.PackedInts;
+import org.apache.lucene.util.packed.PackedLongValues;
 
 import java.io.IOException;
 import java.util.Arrays;
 
-import org.apache.lucene.codecs.DocValuesConsumer;
-import org.apache.lucene.search.DocIdSetIterator;
-import org.apache.lucene.util.ArrayUtil;
-import org.apache.lucene.util.ByteBlockPool;
-import org.apache.lucene.util.BytesRef;
-import org.apache.lucene.util.BytesRefHash.DirectBytesStartArray;
-import org.apache.lucene.util.BytesRefHash;
-import org.apache.lucene.util.Counter;
-import org.apache.lucene.util.packed.PackedInts;
-import org.apache.lucene.util.packed.PackedLongValues;
+import static org.apache.lucene.util.ByteBlockPool.BYTE_BLOCK_SIZE;
 
 /** Buffers up pending byte[]s per doc, deref and sorting via
  *  int ord, then flushes when segment flushes. */
 class SortedSetDocValuesWriter extends DocValuesWriter {
   final BytesRefHash hash;
-  private PackedLongValues.Builder pending; // stream of all termIDs
-  private PackedLongValues.Builder pendingCounts; // termIDs per doc
-  private DocsWithFieldSet docsWithField;
+  private final PackedLongValues.Builder pending; // stream of all termIDs
+  private final PackedLongValues.Builder pendingCounts; // termIDs per doc
+  private final DocsWithFieldSet docsWithField;
   private final Counter iwBytesUsed;
   private long bytesUsed; // this only tracks differences in 'pending' and 'pendingCounts'
   private final FieldInfo fieldInfo;

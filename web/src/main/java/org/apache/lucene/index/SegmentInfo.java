@@ -17,22 +17,15 @@
 package org.apache.lucene.index;
 
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
-import java.util.regex.Matcher;
-
 import org.apache.lucene.codecs.Codec;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.TrackingDirectoryWrapper;
 import org.apache.lucene.util.StringHelper;
 import org.apache.lucene.util.Version;
+
+import java.util.*;
+import java.util.regex.Matcher;
 
 /**
  * Information about a segment such as its name, directory, and files related
@@ -77,7 +70,7 @@ public final class SegmentInfo {
   // The format expected is "x.y" - "2.x" for pre-3.0 indexes (or null), and
   // specific versions afterwards ("3.0.0", "3.1.0" etc.).
   // see o.a.l.util.Version.
-  private Version version;
+  private final Version version;
 
   void setDiagnostics(Map<String, String> diagnostics) {
     this.diagnostics = Objects.requireNonNull(diagnostics);

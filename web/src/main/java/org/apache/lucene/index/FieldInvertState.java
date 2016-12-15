@@ -16,7 +16,7 @@
  */
 package org.apache.lucene.index;
 
-import org.apache.lucene.analysis.TokenStream; // javadocs
+import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.tokenattributes.OffsetAttribute;
 import org.apache.lucene.analysis.tokenattributes.PayloadAttribute;
 import org.apache.lucene.analysis.tokenattributes.PositionIncrementAttribute;

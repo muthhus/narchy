@@ -16,16 +16,16 @@
  */
 package org.apache.lucene.codecs.lucene50;
 
-import java.io.IOException;
-import java.util.Arrays;
-
 import org.apache.lucene.store.DataInput;
 import org.apache.lucene.store.DataOutput;
 import org.apache.lucene.store.IndexInput;
 import org.apache.lucene.store.IndexOutput;
+import org.apache.lucene.util.packed.PackedInts;
 import org.apache.lucene.util.packed.PackedInts.Decoder;
 import org.apache.lucene.util.packed.PackedInts.FormatAndBits;
-import org.apache.lucene.util.packed.PackedInts;
+
+import java.io.IOException;
+import java.util.Arrays;
 
 import static org.apache.lucene.codecs.lucene50.Lucene50PostingsFormat.BLOCK_SIZE;
 

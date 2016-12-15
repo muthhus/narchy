@@ -17,19 +17,15 @@
 package org.apache.lucene.index;
 
 
-import java.io.IOException;
-
 import org.apache.lucene.codecs.DocValuesConsumer;
 import org.apache.lucene.search.DocIdSetIterator;
 import org.apache.lucene.store.DataInput;
 import org.apache.lucene.store.DataOutput;
-import org.apache.lucene.util.ArrayUtil;
-import org.apache.lucene.util.BytesRef;
-import org.apache.lucene.util.BytesRefBuilder;
-import org.apache.lucene.util.Counter;
-import org.apache.lucene.util.PagedBytes;
+import org.apache.lucene.util.*;
 import org.apache.lucene.util.packed.PackedInts;
 import org.apache.lucene.util.packed.PackedLongValues;
+
+import java.io.IOException;
 
 /** Buffers up pending byte[] per doc, then flushes when
  *  segment flushes. */
@@ -46,7 +42,7 @@ class BinaryDocValuesWriter extends DocValuesWriter {
 
   private final Counter iwBytesUsed;
   private final PackedLongValues.Builder lengths;
-  private DocsWithFieldSet docsWithField;
+  private final DocsWithFieldSet docsWithField;
   private final FieldInfo fieldInfo;
   private long bytesUsed;
   private int lastDocID = -1;

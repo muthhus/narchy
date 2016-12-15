@@ -17,15 +17,15 @@
 package org.apache.lucene.index;
 
 
+import org.apache.lucene.codecs.FieldsConsumer;
+import org.apache.lucene.util.CollectionUtil;
+import org.apache.lucene.util.IOUtils;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-
-import org.apache.lucene.codecs.FieldsConsumer;
-import org.apache.lucene.util.CollectionUtil;
-import org.apache.lucene.util.IOUtils;
 
 final class FreqProxTermsWriter extends TermsHash {
 

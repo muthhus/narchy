@@ -17,15 +17,15 @@
 
 package org.apache.lucene.analysis;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.apache.lucene.analysis.tokenattributes.OffsetAttribute;
 import org.apache.lucene.analysis.tokenattributes.PositionIncrementAttribute;
 import org.apache.lucene.analysis.tokenattributes.PositionLengthAttribute;
 import org.apache.lucene.util.AttributeSource;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 /** adds synonym of "dog" for "dogs", and synonym of "cavy" for "guinea pig". */
 public class MockSynonymFilter extends TokenFilter {

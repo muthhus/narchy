@@ -16,12 +16,12 @@
  */
 package org.apache.lucene.search;
 
-import java.io.IOException;
-import java.util.Random;
 import com.carrotsearch.randomizedtesting.generators.RandomNumbers;
-
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.LeafReaderContext;
+
+import java.io.IOException;
+import java.util.Random;
 
 /**
  * A {@link Query} that adds random approximations to its scorers.

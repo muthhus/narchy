@@ -16,13 +16,13 @@
  */
 package org.apache.lucene.search.spans;
 
-import java.io.IOException;
-import java.util.Objects;
-
 import org.apache.lucene.index.PostingsEnum;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.DocIdSetIterator;
 import org.apache.lucene.search.similarities.Similarity;
+
+import java.io.IOException;
+import java.util.Objects;
 
 /**
  * Expert:

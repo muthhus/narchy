@@ -17,16 +17,16 @@
 package org.apache.lucene.search;
 
 
+import org.apache.lucene.index.DirectoryReader;
+import org.apache.lucene.store.AlreadyClosedException;
+import org.apache.lucene.util.IOUtils;
+
 import java.io.Closeable;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
-
-import org.apache.lucene.index.DirectoryReader;
-import org.apache.lucene.store.AlreadyClosedException;
-import org.apache.lucene.util.IOUtils;
 
 /**
  * Keeps track of current plus old IndexSearchers, closing

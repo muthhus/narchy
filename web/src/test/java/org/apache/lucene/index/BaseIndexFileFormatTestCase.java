@@ -16,55 +16,18 @@
  */
 package org.apache.lucene.index;
 
+import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.analysis.MockAnalyzer;
+import org.apache.lucene.codecs.*;
+import org.apache.lucene.codecs.mockrandom.MockRandomPostingsFormat;
+import org.apache.lucene.document.*;
+import org.apache.lucene.store.*;
+import org.apache.lucene.util.*;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.IdentityHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.MockAnalyzer;
-import org.apache.lucene.codecs.Codec;
-import org.apache.lucene.codecs.DocValuesConsumer;
-import org.apache.lucene.codecs.DocValuesProducer;
-import org.apache.lucene.codecs.FieldsConsumer;
-import org.apache.lucene.codecs.FieldsProducer;
-import org.apache.lucene.codecs.NormsConsumer;
-import org.apache.lucene.codecs.NormsProducer;
-import org.apache.lucene.codecs.StoredFieldsReader;
-import org.apache.lucene.codecs.StoredFieldsWriter;
-import org.apache.lucene.codecs.TermVectorsReader;
-import org.apache.lucene.codecs.TermVectorsWriter;
-import org.apache.lucene.codecs.mockrandom.MockRandomPostingsFormat;
-import org.apache.lucene.document.Document;
-import org.apache.lucene.document.Field;
-import org.apache.lucene.document.FieldType;
-import org.apache.lucene.document.NumericDocValuesField;
-import org.apache.lucene.document.TextField;
-import org.apache.lucene.store.AlreadyClosedException;
-import org.apache.lucene.store.Directory;
-import org.apache.lucene.store.FlushInfo;
-import org.apache.lucene.store.IOContext;
-import org.apache.lucene.store.IndexInput;
-import org.apache.lucene.store.MockDirectoryWrapper;
-import org.apache.lucene.util.BytesRef;
-import org.apache.lucene.util.CloseableThreadLocal;
-import org.apache.lucene.util.IOUtils;
-import org.apache.lucene.util.InfoStream;
-import org.apache.lucene.util.LuceneTestCase;
-import org.apache.lucene.util.RamUsageEstimator;
-import org.apache.lucene.util.RamUsageTester;
-import org.apache.lucene.util.Rethrow;
-import org.apache.lucene.util.StringHelper;
-import org.apache.lucene.util.TestUtil;
-import org.apache.lucene.util.Version;
+import java.util.*;
 
 /**
  * Common tests to all index formats.

@@ -17,11 +17,10 @@
 package org.apache.lucene.util;
 
 
-import java.util.Comparator;
-
+import com.carrotsearch.randomizedtesting.RandomizedRunner;
 import org.junit.runner.RunWith;
 
-import com.carrotsearch.randomizedtesting.RandomizedRunner;
+import java.util.Comparator;
 
 @RunWith(RandomizedRunner.class)
 public class TestInPlaceMergeSorter extends BaseSortTestCase {

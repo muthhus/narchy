@@ -17,10 +17,10 @@
 package org.apache.lucene.search;
 
 
-import java.io.IOException;
-
 import org.apache.lucene.util.Accountable;
 import org.apache.lucene.util.Bits;
+
+import java.io.IOException;
 
 /**
  * A DocIdSet contains a set of doc ids. Implementing classes must

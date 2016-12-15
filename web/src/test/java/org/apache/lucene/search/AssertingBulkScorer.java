@@ -16,13 +16,12 @@
  */
 package org.apache.lucene.search;
 
-import java.io.IOException;
-import java.util.Random;
-
+import com.carrotsearch.randomizedtesting.generators.RandomNumbers;
 import org.apache.lucene.index.PostingsEnum;
 import org.apache.lucene.util.Bits;
 
-import com.carrotsearch.randomizedtesting.generators.RandomNumbers;
+import java.io.IOException;
+import java.util.Random;
 
 /** Wraps a Scorer with additional checks */
 final class AssertingBulkScorer extends BulkScorer {

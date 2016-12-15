@@ -16,15 +16,15 @@
  */
 package org.apache.lucene.util.bkd;
 
-import java.io.Closeable;
-import java.io.IOException;
-import java.util.List;
-
 import org.apache.lucene.codecs.CodecUtil;
 import org.apache.lucene.store.ChecksumIndexInput;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.IOContext;
 import org.apache.lucene.store.IndexOutput;
+
+import java.io.Closeable;
+import java.io.IOException;
+import java.util.List;
 
 /** Writes points to disk in a fixed-with format.
  *
@@ -39,7 +39,7 @@ public final class OfflinePointWriter implements PointWriter {
   long count;
   private boolean closed;
   // true if ords are written as long (8 bytes), else 4 bytes
-  private boolean longOrds;
+  private final boolean longOrds;
   private OfflinePointReader sharedReader;
   private long nextSharedRead;
   final long expectedCount;

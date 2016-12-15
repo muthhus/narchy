@@ -16,11 +16,11 @@
  */
 package org.apache.lucene.index;
 
+import org.apache.lucene.store.Directory;
+
+import java.io.IOException;
 import java.util.Collection;
 import java.util.Map;
-import java.io.IOException;
-
-import org.apache.lucene.store.Directory;
 
 /**
  * <p>Expert: represents a single commit into an index as seen by the

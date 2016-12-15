@@ -17,21 +17,17 @@
 package org.apache.lucene.index;
 
 
-import java.io.IOException;
-import java.lang.reflect.Field;
-import java.util.HashMap;
-
 import org.apache.lucene.analysis.MockAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.SortedDocValuesField;
 import org.apache.lucene.document.SortedSetDocValuesField;
 import org.apache.lucene.index.MultiDocValues.OrdinalMap;
 import org.apache.lucene.store.Directory;
-import org.apache.lucene.util.BytesRef;
-import org.apache.lucene.util.LongValues;
-import org.apache.lucene.util.LuceneTestCase;
-import org.apache.lucene.util.RamUsageTester;
-import org.apache.lucene.util.TestUtil;
+import org.apache.lucene.util.*;
+
+import java.io.IOException;
+import java.lang.reflect.Field;
+import java.util.HashMap;
 
 public class TestOrdinalMap extends LuceneTestCase {
 

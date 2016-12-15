@@ -17,9 +17,9 @@
 package org.apache.lucene.util;
 
 
-import java.io.IOException;
-
 import org.apache.lucene.search.DocIdSetIterator;
+
+import java.io.IOException;
 
 public class TestSparseFixedBitSet extends BaseBitSetTestCase<SparseFixedBitSet> {
 

@@ -17,8 +17,6 @@
 package org.apache.lucene.codecs.simpletext;
 
 
-import java.io.IOException;
-
 import org.apache.lucene.codecs.TermVectorsWriter;
 import org.apache.lucene.index.FieldInfo;
 import org.apache.lucene.index.FieldInfos;
@@ -29,6 +27,8 @@ import org.apache.lucene.store.IndexOutput;
 import org.apache.lucene.util.BytesRef;
 import org.apache.lucene.util.BytesRefBuilder;
 import org.apache.lucene.util.IOUtils;
+
+import java.io.IOException;
 
 /**
  * Writes plain-text term vectors.
@@ -59,7 +59,7 @@ public class SimpleTextTermVectorsWriter extends TermVectorsWriter {
   private final Directory directory;
   private final String segment;
   private IndexOutput out;
-  private int numDocsWritten = 0;
+  private int numDocsWritten;
   private final BytesRefBuilder scratch = new BytesRefBuilder();
   private boolean offsets;
   private boolean positions;

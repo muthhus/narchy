@@ -16,9 +16,6 @@
  */
 package org.apache.lucene.codecs.compressing;
 
-import org.apache.lucene.codecs.Codec;
-import org.apache.lucene.codecs.lucene70.Lucene70Codec;
-
 /** CompressionCodec that uses {@link CompressionMode#HIGH_COMPRESSION} */
 public class HighCompressionCompressingCodec extends CompressingCodec {
 

@@ -16,10 +16,10 @@
  */
 package org.apache.lucene.search.spans;
 
-import java.lang.reflect.Method;
-
 import org.apache.lucene.util.LuceneTestCase;
 import org.junit.Test;
+
+import java.lang.reflect.Method;
 
 public class TestFilterSpans extends LuceneTestCase {
 

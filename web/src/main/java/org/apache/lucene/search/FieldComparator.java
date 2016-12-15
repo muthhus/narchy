@@ -17,16 +17,11 @@
 package org.apache.lucene.search;
 
 
-
-import java.io.IOException;
-
-import org.apache.lucene.index.BinaryDocValues;
-import org.apache.lucene.index.DocValues;
-import org.apache.lucene.index.LeafReaderContext;
-import org.apache.lucene.index.NumericDocValues;
-import org.apache.lucene.index.SortedDocValues;
+import org.apache.lucene.index.*;
 import org.apache.lucene.util.BytesRef;
 import org.apache.lucene.util.BytesRefBuilder;
+
+import java.io.IOException;
 
 /**
  * Expert: a FieldComparator compares hits so as to determine their

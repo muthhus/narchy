@@ -16,12 +16,11 @@
  */
 package org.apache.lucene.search;
 
-import java.io.IOException;
+import junit.framework.AssertionFailedError;
 import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.index.Term;
 
-
-import junit.framework.AssertionFailedError;
+import java.io.IOException;
 
 /** 
  * Tests that the {@link BaseExplanationTestCase} helper code, as well as 

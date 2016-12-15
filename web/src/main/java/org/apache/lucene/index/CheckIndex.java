@@ -17,28 +17,7 @@
 package org.apache.lucene.index;
 
 
-import java.io.Closeable;
-import java.io.IOException;
-import java.io.PrintStream;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.text.NumberFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Deque;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-
-import org.apache.lucene.codecs.Codec;
-import org.apache.lucene.codecs.DocValuesProducer;
-import org.apache.lucene.codecs.NormsProducer;
-import org.apache.lucene.codecs.PointsReader;
-import org.apache.lucene.codecs.PostingsFormat;
-import org.apache.lucene.codecs.StoredFieldsReader;
-import org.apache.lucene.codecs.TermVectorsReader;
+import org.apache.lucene.codecs.*;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.DocumentStoredFieldVisitor;
 import org.apache.lucene.index.CheckIndex.Status.DocValuesStatus;
@@ -46,25 +25,18 @@ import org.apache.lucene.search.DocIdSetIterator;
 import org.apache.lucene.search.LeafFieldComparator;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
-import org.apache.lucene.store.AlreadyClosedException;
-import org.apache.lucene.store.Directory;
-import org.apache.lucene.store.FSDirectory;
-import org.apache.lucene.store.IOContext;
-import org.apache.lucene.store.IndexInput;
-import org.apache.lucene.store.Lock;
-import org.apache.lucene.util.Accountables;
-import org.apache.lucene.util.Bits;
-import org.apache.lucene.util.BytesRef;
-import org.apache.lucene.util.BytesRefBuilder;
-import org.apache.lucene.util.CommandLineUtil;
-import org.apache.lucene.util.FixedBitSet;
-import org.apache.lucene.util.IOUtils;
-import org.apache.lucene.util.LongBitSet;
-import org.apache.lucene.util.StringHelper;
-import org.apache.lucene.util.SuppressForbidden;
-import org.apache.lucene.util.Version;
+import org.apache.lucene.store.*;
+import org.apache.lucene.util.*;
 import org.apache.lucene.util.automaton.Automata;
 import org.apache.lucene.util.automaton.CompiledAutomaton;
+
+import java.io.Closeable;
+import java.io.IOException;
+import java.io.PrintStream;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.text.NumberFormat;
+import java.util.*;
 
 import static org.apache.lucene.search.DocIdSetIterator.NO_MORE_DOCS;
 
@@ -82,8 +54,8 @@ import static org.apache.lucene.search.DocIdSetIterator.NO_MORE_DOCS;
 public final class CheckIndex implements Closeable {
 
   private PrintStream infoStream;
-  private Directory dir;
-  private Lock writeLock;
+  private final Directory dir;
+  private final Lock writeLock;
   private volatile boolean closed;
 
   /**

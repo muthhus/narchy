@@ -17,10 +17,10 @@
 package org.apache.lucene.search;
 
 
-import java.io.IOException;
-
 import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.util.PriorityQueue;
+
+import java.io.IOException;
 
 /**
  * Expert: A hit queue for sorting by hits by terms in more than one field.

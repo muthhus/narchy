@@ -17,10 +17,6 @@
 package org.apache.lucene.codecs.simpletext;
 
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-
 import org.apache.lucene.codecs.PointsReader;
 import org.apache.lucene.codecs.PointsWriter;
 import org.apache.lucene.index.FieldInfo;
@@ -32,6 +28,10 @@ import org.apache.lucene.index.SegmentWriteState;
 import org.apache.lucene.store.IndexOutput;
 import org.apache.lucene.util.BytesRef;
 import org.apache.lucene.util.BytesRefBuilder;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 class SimpleTextPointsWriter extends PointsWriter {
 
@@ -89,6 +89,7 @@ class SimpleTextPointsWriter extends PointsWriter {
             throw new IllegalStateException();
           }
 
+          @Override
           public void visit(int docID, byte[] packedValue) throws IOException {
             writer.add(packedValue, docID);
           }

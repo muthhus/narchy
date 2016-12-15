@@ -17,18 +17,14 @@
 package org.apache.lucene.codecs.simpletext;
 
 
-import java.io.IOException;
-import java.util.Collection;
-
 import org.apache.lucene.codecs.NormsConsumer;
 import org.apache.lucene.codecs.NormsFormat;
 import org.apache.lucene.codecs.NormsProducer;
-import org.apache.lucene.index.EmptyDocValuesProducer;
-import org.apache.lucene.index.FieldInfo;
-import org.apache.lucene.index.NumericDocValues;
-import org.apache.lucene.index.SegmentReadState;
-import org.apache.lucene.index.SegmentWriteState;
+import org.apache.lucene.index.*;
 import org.apache.lucene.util.Accountable;
+
+import java.io.IOException;
+import java.util.Collection;
 
 /**
  * plain-text norms format.

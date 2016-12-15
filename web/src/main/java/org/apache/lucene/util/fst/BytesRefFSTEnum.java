@@ -17,10 +17,10 @@
 package org.apache.lucene.util.fst;
 
 
-import java.io.IOException;
-
 import org.apache.lucene.util.ArrayUtil;
 import org.apache.lucene.util.BytesRef;
+
+import java.io.IOException;
 
 /** Enumerates all input (BytesRef) + output pairs in an
  *  FST.

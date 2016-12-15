@@ -16,14 +16,17 @@
  */
 package org.apache.lucene.store;
 
- 
-import static java.lang.invoke.MethodHandles.*;
-import static java.lang.invoke.MethodType.methodType;
+
+import org.apache.lucene.store.ByteBufferGuard.BufferCleaner;
+import org.apache.lucene.util.Constants;
+import org.apache.lucene.util.SuppressForbidden;
 
 import java.io.IOException;
+import java.lang.invoke.MethodHandle;
+import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
 import java.nio.MappedByteBuffer;
-import java.nio.channels.ClosedChannelException; // javadoc @link
+import java.nio.channels.ClosedChannelException;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileChannel.MapMode;
 import java.nio.file.Path;
@@ -33,12 +36,9 @@ import java.security.PrivilegedAction;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.concurrent.Future;
-import java.lang.invoke.MethodHandle;
-import java.lang.reflect.Method;
 
-import org.apache.lucene.store.ByteBufferGuard.BufferCleaner;
-import org.apache.lucene.util.Constants;
-import org.apache.lucene.util.SuppressForbidden;
+import static java.lang.invoke.MethodHandles.*;
+import static java.lang.invoke.MethodType.methodType;
 
 /** File-based {@link Directory} implementation that uses
  *  mmap for reading, and {@link

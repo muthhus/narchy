@@ -17,11 +17,11 @@
 package org.apache.lucene.codecs;
 
 
-import java.io.IOException;
-
 import org.apache.lucene.index.PointValues;
 import org.apache.lucene.index.SegmentReadState;
 import org.apache.lucene.index.SegmentWriteState;
+
+import java.io.IOException;
 
 /** 
  * Encodes/decodes indexed points.

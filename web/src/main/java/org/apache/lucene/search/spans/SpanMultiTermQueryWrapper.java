@@ -17,20 +17,16 @@
 package org.apache.lucene.search.spans;
 
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.index.TermContext;
 import org.apache.lucene.search.BooleanClause.Occur;
-import org.apache.lucene.search.IndexSearcher;
-import org.apache.lucene.search.MultiTermQuery;
-import org.apache.lucene.search.Query;
-import org.apache.lucene.search.ScoringRewrite;
-import org.apache.lucene.search.TopTermsRewrite;
+import org.apache.lucene.search.*;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 /**
  * Wraps any {@link MultiTermQuery} as a {@link SpanQuery}, 

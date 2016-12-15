@@ -16,10 +16,10 @@
  */
 package org.apache.lucene.index;
 
+import org.apache.lucene.store.DataInput;
+
 import java.io.IOException;
 import java.util.Objects;
-
-import org.apache.lucene.store.DataInput;
 
 /**
  * This exception is thrown when Lucene detects

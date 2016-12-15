@@ -17,11 +17,11 @@
 package org.apache.lucene.search;
 
 
+import org.apache.lucene.util.BytesRef;
+
 import java.io.IOException;
 import java.util.Comparator;
 import java.util.Objects;
-
-import org.apache.lucene.util.BytesRef;
 
 /**
  * Stores information about how to sort documents by terms in an individual

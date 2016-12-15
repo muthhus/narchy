@@ -16,10 +16,10 @@
  */
 package org.apache.lucene.search.spans;
 
-import java.io.IOException;
-
 import org.apache.lucene.search.DocIdSetIterator;
 import org.apache.lucene.search.TwoPhaseIterator;
+
+import java.io.IOException;
 
 /** 
  * Wraps a Spans with additional asserts

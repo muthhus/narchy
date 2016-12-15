@@ -16,11 +16,9 @@
  */
 package org.apache.lucene.util;
 
-import org.apache.lucene.util.LuceneTestCase;
-import org.junit.Ignore;
-
 import com.carrotsearch.randomizedtesting.RandomizedTest;
 import com.carrotsearch.randomizedtesting.annotations.Timeout;
+import org.junit.Ignore;
 
 public class TestWorstCaseTestBehavior extends LuceneTestCase {
   @Ignore

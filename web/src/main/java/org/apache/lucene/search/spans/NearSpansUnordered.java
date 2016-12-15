@@ -17,12 +17,12 @@
 package org.apache.lucene.search.spans;
 
 
+import org.apache.lucene.search.TwoPhaseIterator;
+import org.apache.lucene.util.PriorityQueue;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.apache.lucene.search.TwoPhaseIterator;
-import org.apache.lucene.util.PriorityQueue;
 
 /**
  * Similar to {@link NearSpansOrdered}, but for the unordered case.
@@ -32,10 +32,10 @@ import org.apache.lucene.util.PriorityQueue;
  */
 public class NearSpansUnordered extends ConjunctionSpans {
 
-  private List<SpansCell> subSpanCells; // in query order
+  private final List<SpansCell> subSpanCells; // in query order
   private final int allowedSlop;
 
-  private SpanPositionQueue spanPositionQueue;
+  private final SpanPositionQueue spanPositionQueue;
 
   public NearSpansUnordered(int allowedSlop, List<Spans> subSpans)
   throws IOException {

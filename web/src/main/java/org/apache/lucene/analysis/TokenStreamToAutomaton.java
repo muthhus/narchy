@@ -17,8 +17,6 @@
 package org.apache.lucene.analysis;
 
 
-import java.io.IOException;
-
 import org.apache.lucene.analysis.tokenattributes.OffsetAttribute;
 import org.apache.lucene.analysis.tokenattributes.PositionIncrementAttribute;
 import org.apache.lucene.analysis.tokenattributes.PositionLengthAttribute;
@@ -26,6 +24,8 @@ import org.apache.lucene.analysis.tokenattributes.TermToBytesRefAttribute;
 import org.apache.lucene.util.BytesRef;
 import org.apache.lucene.util.RollingBuffer;
 import org.apache.lucene.util.automaton.Automaton;
+
+import java.io.IOException;
 
 // TODO: maybe also toFST?  then we can translate atts into FST outputs/weights
 

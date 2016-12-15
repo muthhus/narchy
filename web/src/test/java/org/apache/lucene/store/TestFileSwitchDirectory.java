@@ -17,21 +17,16 @@
 package org.apache.lucene.store;
 
 
+import org.apache.lucene.analysis.MockAnalyzer;
+import org.apache.lucene.codecs.compressing.CompressingStoredFieldsWriter;
+import org.apache.lucene.index.*;
+import org.apache.lucene.util.TestUtil;
+
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
-
-import org.apache.lucene.analysis.MockAnalyzer;
-import org.apache.lucene.codecs.compressing.CompressingStoredFieldsWriter;
-import org.apache.lucene.index.DirectoryReader;
-import org.apache.lucene.index.IndexNotFoundException;
-import org.apache.lucene.index.IndexReader;
-import org.apache.lucene.index.IndexWriter;
-import org.apache.lucene.index.IndexWriterConfig;
-import org.apache.lucene.index.TestIndexWriterReader;
-import org.apache.lucene.util.TestUtil;
 
 public class TestFileSwitchDirectory extends BaseDirectoryTestCase {
 

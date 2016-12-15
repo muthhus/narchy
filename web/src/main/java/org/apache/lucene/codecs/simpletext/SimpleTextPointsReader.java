@@ -17,17 +17,8 @@
 package org.apache.lucene.codecs.simpletext;
 
 
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.Map;
-
 import org.apache.lucene.codecs.PointsReader;
-import org.apache.lucene.index.CorruptIndexException;
-import org.apache.lucene.index.FieldInfo;
-import org.apache.lucene.index.IndexFileNames;
-import org.apache.lucene.index.PointValues;
-import org.apache.lucene.index.SegmentReadState;
+import org.apache.lucene.index.*;
 import org.apache.lucene.store.BufferedChecksumIndexInput;
 import org.apache.lucene.store.ChecksumIndexInput;
 import org.apache.lucene.store.IOContext;
@@ -37,21 +28,12 @@ import org.apache.lucene.util.BytesRefBuilder;
 import org.apache.lucene.util.IOUtils;
 import org.apache.lucene.util.StringHelper;
 
-import static org.apache.lucene.codecs.simpletext.SimpleTextPointsWriter.BLOCK_FP;
-import static org.apache.lucene.codecs.simpletext.SimpleTextPointsWriter.BYTES_PER_DIM;
-import static org.apache.lucene.codecs.simpletext.SimpleTextPointsWriter.DOC_COUNT;
-import static org.apache.lucene.codecs.simpletext.SimpleTextPointsWriter.FIELD_COUNT;
-import static org.apache.lucene.codecs.simpletext.SimpleTextPointsWriter.FIELD_FP;
-import static org.apache.lucene.codecs.simpletext.SimpleTextPointsWriter.FIELD_FP_NAME;
-import static org.apache.lucene.codecs.simpletext.SimpleTextPointsWriter.INDEX_COUNT;
-import static org.apache.lucene.codecs.simpletext.SimpleTextPointsWriter.MAX_LEAF_POINTS;
-import static org.apache.lucene.codecs.simpletext.SimpleTextPointsWriter.MAX_VALUE;
-import static org.apache.lucene.codecs.simpletext.SimpleTextPointsWriter.MIN_VALUE;
-import static org.apache.lucene.codecs.simpletext.SimpleTextPointsWriter.NUM_DIMS;
-import static org.apache.lucene.codecs.simpletext.SimpleTextPointsWriter.POINT_COUNT;
-import static org.apache.lucene.codecs.simpletext.SimpleTextPointsWriter.SPLIT_COUNT;
-import static org.apache.lucene.codecs.simpletext.SimpleTextPointsWriter.SPLIT_DIM;
-import static org.apache.lucene.codecs.simpletext.SimpleTextPointsWriter.SPLIT_VALUE;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.Map;
+
+import static org.apache.lucene.codecs.simpletext.SimpleTextPointsWriter.*;
 
 class SimpleTextPointsReader extends PointsReader {
 

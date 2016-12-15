@@ -17,10 +17,6 @@
 package org.apache.lucene.codecs.blocktree;
 
 
-import java.io.IOException;
-import java.util.Collection;
-import java.util.Collections;
-
 import org.apache.lucene.index.FieldInfo;
 import org.apache.lucene.index.IndexOptions;
 import org.apache.lucene.index.Terms;
@@ -34,6 +30,10 @@ import org.apache.lucene.util.RamUsageEstimator;
 import org.apache.lucene.util.automaton.CompiledAutomaton;
 import org.apache.lucene.util.fst.ByteSequenceOutputs;
 import org.apache.lucene.util.fst.FST;
+
+import java.io.IOException;
+import java.util.Collection;
+import java.util.Collections;
 
 /**
  * BlockTree's implementation of {@link Terms}.

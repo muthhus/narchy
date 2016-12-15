@@ -17,16 +17,15 @@
 package org.apache.lucene.codecs.compressing;
 
 
-import java.io.IOException;
-import java.util.Arrays;
-
+import com.carrotsearch.randomizedtesting.generators.RandomNumbers;
 import org.apache.lucene.store.ByteArrayDataInput;
 import org.apache.lucene.store.ByteArrayDataOutput;
 import org.apache.lucene.util.BytesRef;
 import org.apache.lucene.util.LuceneTestCase;
 import org.apache.lucene.util.TestUtil;
 
-import com.carrotsearch.randomizedtesting.generators.RandomNumbers;
+import java.io.IOException;
+import java.util.Arrays;
 
 public abstract class AbstractTestCompressionMode extends LuceneTestCase {
 

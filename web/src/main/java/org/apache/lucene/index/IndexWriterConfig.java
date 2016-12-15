@@ -17,11 +17,6 @@
 package org.apache.lucene.index;
 
 
-import java.io.PrintStream;
-import java.util.Arrays;
-import java.util.EnumSet;
-import java.util.stream.Collectors;
-
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.codecs.Codec;
@@ -31,8 +26,13 @@ import org.apache.lucene.search.SortField;
 import org.apache.lucene.search.similarities.Similarity;
 import org.apache.lucene.util.InfoStream;
 import org.apache.lucene.util.PrintStreamInfoStream;
-import org.apache.lucene.util.SetOnce.AlreadySetException;
 import org.apache.lucene.util.SetOnce;
+import org.apache.lucene.util.SetOnce.AlreadySetException;
+
+import java.io.PrintStream;
+import java.util.Arrays;
+import java.util.EnumSet;
+import java.util.stream.Collectors;
 
 /**
  * Holds all the configuration that is used to create an {@link IndexWriter}.
@@ -107,7 +107,7 @@ public final class IndexWriterConfig extends LiveIndexWriterConfig {
   
   // indicates whether this config instance is already attached to a writer.
   // not final so that it can be cloned properly.
-  private SetOnce<IndexWriter> writer = new SetOnce<>();
+  private final SetOnce<IndexWriter> writer = new SetOnce<>();
   
   /**
    * Sets the {@link IndexWriter} this config is attached to.

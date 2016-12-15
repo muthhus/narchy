@@ -17,9 +17,9 @@
 package org.apache.lucene.search;
 
 
-import java.io.IOException;
-
 import org.apache.lucene.index.LeafReaderContext;
+
+import java.io.IOException;
 
 /**
  * <p>Expert: Collectors are primarily meant to be used to

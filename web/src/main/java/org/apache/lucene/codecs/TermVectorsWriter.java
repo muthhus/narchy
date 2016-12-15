@@ -16,24 +16,17 @@
  */
 package org.apache.lucene.codecs;
 
+import org.apache.lucene.index.*;
+import org.apache.lucene.search.DocIdSetIterator;
+import org.apache.lucene.store.DataInput;
+import org.apache.lucene.util.BytesRef;
+import org.apache.lucene.util.BytesRefBuilder;
+
 import java.io.Closeable;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-
-import org.apache.lucene.index.DocIDMerger;
-import org.apache.lucene.index.FieldInfo;
-import org.apache.lucene.index.FieldInfos;
-import org.apache.lucene.index.Fields;
-import org.apache.lucene.index.MergeState;
-import org.apache.lucene.index.PostingsEnum;
-import org.apache.lucene.index.Terms;
-import org.apache.lucene.index.TermsEnum;
-import org.apache.lucene.search.DocIdSetIterator;
-import org.apache.lucene.store.DataInput;
-import org.apache.lucene.util.BytesRef;
-import org.apache.lucene.util.BytesRefBuilder;
 
 import static org.apache.lucene.search.DocIdSetIterator.NO_MORE_DOCS;
 
@@ -74,16 +67,16 @@ public abstract class TermVectorsWriter implements Closeable {
   public abstract void startDocument(int numVectorFields) throws IOException;
 
   /** Called after a doc and all its fields have been added. */
-  public void finishDocument() throws IOException {};
+  public void finishDocument() throws IOException {}
 
-  /** Called before writing the terms of the field.
+    /** Called before writing the terms of the field.
    *  {@link #startTerm(BytesRef, int)} will be called <code>numTerms</code> times. */
   public abstract void startField(FieldInfo info, int numTerms, boolean positions, boolean offsets, boolean payloads) throws IOException;
 
   /** Called after a field and all its terms have been added. */
-  public void finishField() throws IOException {};
+  public void finishField() throws IOException {}
 
-  /** Adds a term and its term frequency <code>freq</code>.
+    /** Adds a term and its term frequency <code>freq</code>.
    * If this field has positions and/or offsets enabled, then
    * {@link #addPosition(int, int, int, BytesRef)} will be called 
    * <code>freq</code> times respectively.

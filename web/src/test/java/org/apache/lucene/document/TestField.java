@@ -17,9 +17,6 @@
 package org.apache.lucene.document;
 
 
-import java.io.StringReader;
-import java.nio.charset.StandardCharsets;
-
 import org.apache.lucene.analysis.CannedTokenStream;
 import org.apache.lucene.analysis.Token;
 import org.apache.lucene.index.IndexReader;
@@ -31,6 +28,9 @@ import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.util.BytesRef;
 import org.apache.lucene.util.LuceneTestCase;
+
+import java.io.StringReader;
+import java.nio.charset.StandardCharsets;
 
 // sanity check some basics of fields
 public class TestField extends LuceneTestCase {

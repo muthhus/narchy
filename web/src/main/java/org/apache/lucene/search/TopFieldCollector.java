@@ -17,11 +17,11 @@
 package org.apache.lucene.search;
 
 
-import java.io.IOException;
-
 import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.search.FieldValueHitQueue.Entry;
 import org.apache.lucene.util.PriorityQueue;
+
+import java.io.IOException;
 
 /**
  * A {@link Collector} that sorts by {@link SortField} using

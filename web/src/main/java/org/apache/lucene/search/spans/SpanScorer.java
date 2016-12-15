@@ -17,13 +17,13 @@
 package org.apache.lucene.search.spans;
 
 
-import java.io.IOException;
-import java.util.Objects;
-
 import org.apache.lucene.search.DocIdSetIterator;
 import org.apache.lucene.search.Scorer;
 import org.apache.lucene.search.TwoPhaseIterator;
 import org.apache.lucene.search.similarities.Similarity;
+
+import java.io.IOException;
+import java.util.Objects;
 
 /**
  * A basic {@link Scorer} over {@link Spans}.

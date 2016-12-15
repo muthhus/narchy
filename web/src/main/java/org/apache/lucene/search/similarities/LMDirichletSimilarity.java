@@ -17,10 +17,10 @@
 package org.apache.lucene.search.similarities;
 
 
+import org.apache.lucene.search.Explanation;
+
 import java.util.List;
 import java.util.Locale;
-
-import org.apache.lucene.search.Explanation;
 
 /**
  * Bayesian smoothing using Dirichlet priors. From Chengxiang Zhai and John

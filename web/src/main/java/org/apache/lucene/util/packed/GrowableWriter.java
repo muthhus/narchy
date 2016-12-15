@@ -17,10 +17,10 @@
 package org.apache.lucene.util.packed;
 
 
-import java.io.IOException;
-
 import org.apache.lucene.store.DataOutput;
 import org.apache.lucene.util.RamUsageEstimator;
+
+import java.io.IOException;
 
 /**     
  * Implements {@link PackedInts.Mutable}, but grows the

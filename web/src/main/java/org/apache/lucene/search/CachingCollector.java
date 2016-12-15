@@ -16,13 +16,13 @@
  */
 package org.apache.lucene.search;
 
+import org.apache.lucene.index.LeafReaderContext;
+import org.apache.lucene.util.ArrayUtil;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
-import org.apache.lucene.index.LeafReaderContext;
-import org.apache.lucene.util.ArrayUtil;
 
 /**
  * Caches all docs, and optionally also scores, coming from

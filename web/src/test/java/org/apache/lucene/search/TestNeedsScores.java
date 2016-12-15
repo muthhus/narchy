@@ -17,10 +17,6 @@
 package org.apache.lucene.search;
 
 
-import java.io.IOException;
-import java.util.Set;
-import java.util.Objects;
-
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.TextField;
@@ -31,6 +27,10 @@ import org.apache.lucene.index.Term;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.util.IOUtils;
 import org.apache.lucene.util.LuceneTestCase;
+
+import java.io.IOException;
+import java.util.Objects;
+import java.util.Set;
 
 public class TestNeedsScores extends LuceneTestCase {
   Directory dir;

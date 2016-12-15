@@ -18,7 +18,6 @@ package org.apache.lucene.codecs.lucene70;
 
 
 import org.apache.lucene.codecs.Codec;
-import org.apache.lucene.codecs.lucene70.Lucene70Codec;
 import org.apache.lucene.index.BaseNormsFormatTestCase;
 
 /**

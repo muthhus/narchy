@@ -17,9 +17,9 @@
 package org.apache.lucene.index;
 
 
-import java.io.IOException;
-
 import org.apache.lucene.util.BytesRef;
+
+import java.io.IOException;
 
 /**
  * A per-document set of presorted byte[] values.

@@ -16,8 +16,6 @@
  */
 package org.apache.lucene.analysis;
 
-import org.apache.lucene.codecs.Codec;
-import org.apache.lucene.codecs.cheapbastard.CheapBastardCodec;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.FieldType;

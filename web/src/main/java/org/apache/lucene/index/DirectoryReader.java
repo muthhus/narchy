@@ -17,15 +17,15 @@
 package org.apache.lucene.index;
 
 
+import org.apache.lucene.search.SearcherManager;
+import org.apache.lucene.store.Directory;
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.NoSuchFileException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
-import org.apache.lucene.search.SearcherManager; // javadocs
-import org.apache.lucene.store.Directory;
 
 /** DirectoryReader is an implementation of {@link CompositeReader}
  that can read indexes in a {@link Directory}. 

@@ -17,18 +17,13 @@
 package org.apache.lucene.util;
 
 
-import java.util.BitSet;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map.Entry;
-import java.util.Map;
-import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeSet;
-
 import org.apache.lucene.util.BytesRefHash.MaxBytesLengthExceededException;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.util.BitSet;
+import java.util.*;
+import java.util.Map.Entry;
 
 public class TestBytesRefHash extends LuceneTestCase {
 

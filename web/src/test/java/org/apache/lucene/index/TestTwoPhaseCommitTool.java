@@ -17,10 +17,10 @@
 package org.apache.lucene.index;
 
 
+import org.apache.lucene.util.LuceneTestCase;
+
 import java.io.IOException;
 import java.util.Map;
-
-import org.apache.lucene.util.LuceneTestCase;
 
 public class TestTwoPhaseCommitTool extends LuceneTestCase {
 

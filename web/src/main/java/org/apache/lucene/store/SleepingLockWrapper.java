@@ -17,9 +17,9 @@
 package org.apache.lucene.store;
 
 
-import java.io.IOException;
-
 import org.apache.lucene.util.ThreadInterruptedException;
+
+import java.io.IOException;
 
 /** 
  * Directory that wraps another, and that sleeps and retries

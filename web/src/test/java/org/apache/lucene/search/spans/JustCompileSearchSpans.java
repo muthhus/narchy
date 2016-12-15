@@ -17,9 +17,9 @@
 package org.apache.lucene.search.spans;
 
 
-import java.io.IOException;
-
 import org.apache.lucene.search.IndexSearcher;
+
+import java.io.IOException;
 
 /**
  * Holds all implementations of classes in the o.a.l.s.spans package as a

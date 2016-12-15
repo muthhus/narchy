@@ -17,11 +17,11 @@
 package org.apache.lucene.util.automaton;
 
 
+import org.apache.lucene.util.UnicodeUtil;
+
 import java.util.Iterator;
 import java.util.SortedSet;
 import java.util.TreeSet;
-
-import org.apache.lucene.util.UnicodeUtil;
 
 /**
  * Class to construct DFAs that match a word within some edit distance.

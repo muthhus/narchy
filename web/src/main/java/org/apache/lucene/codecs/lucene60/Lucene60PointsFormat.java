@@ -17,14 +17,14 @@
 package org.apache.lucene.codecs.lucene60;
 
 
-import java.io.IOException;
-
 import org.apache.lucene.codecs.CodecUtil;
 import org.apache.lucene.codecs.PointsFormat;
 import org.apache.lucene.codecs.PointsReader;
 import org.apache.lucene.codecs.PointsWriter;
 import org.apache.lucene.index.SegmentReadState;
 import org.apache.lucene.index.SegmentWriteState;
+
+import java.io.IOException;
 
 /**
  * Lucene 6.0 point format, which encodes dimensional values in a block KD-tree structure

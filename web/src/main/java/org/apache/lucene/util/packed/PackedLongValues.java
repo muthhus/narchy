@@ -17,14 +17,14 @@
 package org.apache.lucene.util.packed;
 
 
-import static org.apache.lucene.util.packed.PackedInts.checkBlockSize;
-
-import java.util.Arrays;
-
 import org.apache.lucene.util.Accountable;
 import org.apache.lucene.util.ArrayUtil;
 import org.apache.lucene.util.LongValues;
 import org.apache.lucene.util.RamUsageEstimator;
+
+import java.util.Arrays;
+
+import static org.apache.lucene.util.packed.PackedInts.checkBlockSize;
 
 /**
  * Utility class to compress integers into a {@link LongValues} instance.

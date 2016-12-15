@@ -96,7 +96,7 @@ class BinaryDocValuesFieldUpdates extends DocValuesFieldUpdates {
 
   private PagedMutable docs;
   private PagedGrowableWriter offsets, lengths;
-  private BytesRefBuilder values;
+  private final BytesRefBuilder values;
   private int size;
   private final int bitsPerValue;
   

@@ -16,14 +16,14 @@
  */
 package org.apache.lucene.analysis;
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.apache.lucene.analysis.tokenattributes.OffsetAttribute;
 import org.apache.lucene.analysis.tokenattributes.PositionIncrementAttribute;
 import org.apache.lucene.analysis.tokenattributes.PositionLengthAttribute;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 // TODO: rename to OffsetsXXXTF?  ie we only validate
 // offsets (now anyway...)

@@ -1,6 +1,5 @@
 package org.apache.lucene.util;
 
-import org.apache.commons.collections.list.UnmodifiableList;
 import org.apache.lucene.codecs.Codec;
 import org.apache.lucene.codecs.DocValuesFormat;
 import org.apache.lucene.codecs.PostingsFormat;

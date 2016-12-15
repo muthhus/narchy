@@ -16,25 +16,20 @@
  */
 package org.apache.lucene.mockfile;
 
+import org.apache.lucene.util.IOUtils;
+import org.apache.lucene.util.InfoStream;
+import org.apache.lucene.util.filter.FilterFileSystemProvider;
+
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.channels.AsynchronousFileChannel;
 import java.nio.channels.FileChannel;
 import java.nio.channels.SeekableByteChannel;
-import java.nio.file.CopyOption;
-import java.nio.file.FileSystem;
-import java.nio.file.LinkOption;
-import java.nio.file.OpenOption;
-import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
+import java.nio.file.*;
 import java.nio.file.attribute.FileAttribute;
 import java.util.Arrays;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
-
-import org.apache.lucene.util.filter.FilterFileSystemProvider;
-import org.apache.lucene.util.IOUtils;
-import org.apache.lucene.util.InfoStream;
 
 /** 
  * FileSystem that records all major destructive filesystem activities.

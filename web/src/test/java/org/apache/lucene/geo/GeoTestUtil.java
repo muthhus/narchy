@@ -16,16 +16,15 @@
  */
 package org.apache.lucene.geo;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Random;
-
+import com.carrotsearch.randomizedtesting.RandomizedContext;
 import org.apache.lucene.util.NumericUtils;
 import org.apache.lucene.util.SloppyMath;
 import org.apache.lucene.util.TestUtil;
 
-import com.carrotsearch.randomizedtesting.RandomizedContext;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Random;
 
 /** static methods for testing geo */
 public class GeoTestUtil {

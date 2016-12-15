@@ -16,6 +16,15 @@
  */
 package org.apache.lucene.codecs.simpletext;
 
+import org.apache.lucene.codecs.CodecUtil;
+import org.apache.lucene.codecs.MutablePointValues;
+import org.apache.lucene.index.MergeState;
+import org.apache.lucene.index.PointValues.IntersectVisitor;
+import org.apache.lucene.index.PointValues.Relation;
+import org.apache.lucene.store.*;
+import org.apache.lucene.util.*;
+import org.apache.lucene.util.bkd.*;
+
 import java.io.Closeable;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -24,51 +33,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.function.IntFunction;
 
-import org.apache.lucene.codecs.CodecUtil;
-import org.apache.lucene.codecs.MutablePointValues;
-import org.apache.lucene.index.MergeState;
-import org.apache.lucene.index.PointValues.IntersectVisitor;
-import org.apache.lucene.index.PointValues.Relation;
-import org.apache.lucene.store.ChecksumIndexInput;
-import org.apache.lucene.store.Directory;
-import org.apache.lucene.store.IOContext;
-import org.apache.lucene.store.IndexOutput;
-import org.apache.lucene.store.TrackingDirectoryWrapper;
-import org.apache.lucene.util.ArrayUtil;
-import org.apache.lucene.util.BytesRef;
-import org.apache.lucene.util.BytesRefBuilder;
-import org.apache.lucene.util.BytesRefComparator;
-import org.apache.lucene.util.FixedBitSet;
-import org.apache.lucene.util.IOUtils;
-import org.apache.lucene.util.LongBitSet;
-import org.apache.lucene.util.MSBRadixSorter;
-import org.apache.lucene.util.NumericUtils;
-import org.apache.lucene.util.OfflineSorter;
-import org.apache.lucene.util.PriorityQueue;
-import org.apache.lucene.util.StringHelper;
-import org.apache.lucene.util.bkd.BKDWriter;
-import org.apache.lucene.util.bkd.HeapPointWriter;
-import org.apache.lucene.util.bkd.MutablePointsReaderUtils;
-import org.apache.lucene.util.bkd.OfflinePointReader;
-import org.apache.lucene.util.bkd.OfflinePointWriter;
-import org.apache.lucene.util.bkd.PointReader;
-import org.apache.lucene.util.bkd.PointWriter;
-
-import static org.apache.lucene.codecs.simpletext.SimpleTextPointsWriter.BLOCK_COUNT;
-import static org.apache.lucene.codecs.simpletext.SimpleTextPointsWriter.BLOCK_DOC_ID;
-import static org.apache.lucene.codecs.simpletext.SimpleTextPointsWriter.BLOCK_FP;
-import static org.apache.lucene.codecs.simpletext.SimpleTextPointsWriter.BLOCK_VALUE;
-import static org.apache.lucene.codecs.simpletext.SimpleTextPointsWriter.BYTES_PER_DIM;
-import static org.apache.lucene.codecs.simpletext.SimpleTextPointsWriter.DOC_COUNT;
-import static org.apache.lucene.codecs.simpletext.SimpleTextPointsWriter.INDEX_COUNT;
-import static org.apache.lucene.codecs.simpletext.SimpleTextPointsWriter.MAX_LEAF_POINTS;
-import static org.apache.lucene.codecs.simpletext.SimpleTextPointsWriter.MAX_VALUE;
-import static org.apache.lucene.codecs.simpletext.SimpleTextPointsWriter.MIN_VALUE;
-import static org.apache.lucene.codecs.simpletext.SimpleTextPointsWriter.NUM_DIMS;
-import static org.apache.lucene.codecs.simpletext.SimpleTextPointsWriter.POINT_COUNT;
-import static org.apache.lucene.codecs.simpletext.SimpleTextPointsWriter.SPLIT_COUNT;
-import static org.apache.lucene.codecs.simpletext.SimpleTextPointsWriter.SPLIT_DIM;
-import static org.apache.lucene.codecs.simpletext.SimpleTextPointsWriter.SPLIT_VALUE;
+import static org.apache.lucene.codecs.simpletext.SimpleTextPointsWriter.*;
 
 
 // TODO

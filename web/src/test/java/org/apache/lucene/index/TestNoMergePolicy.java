@@ -17,12 +17,12 @@
 package org.apache.lucene.index;
 
 
+import org.junit.Test;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
-
-import org.junit.Test;
 
 public class TestNoMergePolicy extends BaseMergePolicyTestCase {
 

@@ -17,8 +17,6 @@
 package org.apache.lucene.codecs.simpletext;
 
 
-import java.io.IOException;
-
 import org.apache.lucene.codecs.StoredFieldsWriter;
 import org.apache.lucene.index.FieldInfo;
 import org.apache.lucene.index.FieldInfos;
@@ -31,6 +29,8 @@ import org.apache.lucene.util.BytesRef;
 import org.apache.lucene.util.BytesRefBuilder;
 import org.apache.lucene.util.IOUtils;
 
+import java.io.IOException;
+
 /**
  * Writes plain-text stored fields.
  * <p>
@@ -38,7 +38,7 @@ import org.apache.lucene.util.IOUtils;
  * @lucene.experimental
  */
 public class SimpleTextStoredFieldsWriter extends StoredFieldsWriter {
-  private int numDocsWritten = 0;
+  private int numDocsWritten;
   private final Directory directory;
   private final String segment;
   private IndexOutput out;

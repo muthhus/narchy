@@ -16,9 +16,7 @@
  */
 package org.apache.lucene.geo;
 
-import static org.apache.lucene.util.SloppyMath.TO_RADIANS;
-import static org.apache.lucene.util.SloppyMath.cos;
-import static org.apache.lucene.util.SloppyMath.haversinMeters;
+import static org.apache.lucene.util.SloppyMath.*;
 
 /**
  * Basic reusable geo-spatial utility methods

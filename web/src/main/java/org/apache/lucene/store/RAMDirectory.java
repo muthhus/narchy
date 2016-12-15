@@ -17,22 +17,17 @@
 package org.apache.lucene.store;
 
 
+import org.apache.lucene.index.IndexFileNames;
+import org.apache.lucene.util.Accountable;
+import org.apache.lucene.util.Accountables;
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
-
-import org.apache.lucene.index.IndexFileNames;
-import org.apache.lucene.util.Accountable;
-import org.apache.lucene.util.Accountables;
 
 /**
  * A memory-resident {@link Directory} implementation.  Locking

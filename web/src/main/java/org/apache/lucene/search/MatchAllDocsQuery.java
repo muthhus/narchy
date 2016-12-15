@@ -17,10 +17,10 @@
 package org.apache.lucene.search;
 
 
-import java.io.IOException;
-
 import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.util.Bits;
+
+import java.io.IOException;
 
 /**
  * A query that matches all documents.

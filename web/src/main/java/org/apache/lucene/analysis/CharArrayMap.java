@@ -17,14 +17,7 @@
 package org.apache.lucene.analysis;
 
 
-import java.util.Arrays;
-import java.util.AbstractMap;
-import java.util.AbstractSet;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
-
-import org.apache.lucene.analysis.CharacterUtils;
+import java.util.*;
 
 /**
  * A simple class that stores key Strings as char[]'s in a
@@ -40,7 +33,7 @@ public class CharArrayMap<V> extends AbstractMap<Object,V> {
   private static final CharArrayMap<?> EMPTY_MAP = new EmptyCharArrayMap<>();
 
   private final static int INIT_SIZE = 8;
-  private boolean ignoreCase;  
+  private final boolean ignoreCase;
   private int count;
   char[][] keys; // package private because used in CharArraySet's non Set-conform CharArraySetIterator
   V[] values; // package private because used in CharArraySet's non Set-conform CharArraySetIterator

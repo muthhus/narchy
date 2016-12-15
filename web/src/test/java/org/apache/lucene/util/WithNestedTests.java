@@ -16,35 +16,22 @@
  */
 package org.apache.lucene.util;
 
-import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
-import java.io.UnsupportedEncodingException;
-import java.nio.charset.StandardCharsets;
-import java.util.List;
-
-import org.apache.lucene.util.FailureMarker;
-import org.apache.lucene.util.IOUtils;
-import org.apache.lucene.util.LuceneTestCase;
-import org.apache.lucene.util.TestRuleIgnoreAfterMaxFailures;
-import org.apache.lucene.util.TestRuleIgnoreTestSuites;
-import org.apache.lucene.util.TestRuleMarkFailure;
-import org.apache.lucene.util.TestRuleRestoreSystemProperties;
+import com.carrotsearch.randomizedtesting.RandomizedRunner;
+import com.carrotsearch.randomizedtesting.RandomizedTest;
+import com.carrotsearch.randomizedtesting.SysGlobals;
+import com.carrotsearch.randomizedtesting.rules.TestRuleAdapter;
 import org.apache.lucene.util.LuceneTestCase.SuppressSysoutChecks;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Assume;
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Rule;
+import org.junit.*;
 import org.junit.rules.RuleChain;
 import org.junit.rules.TestRule;
 import org.junit.runner.Result;
 import org.junit.runner.notification.Failure;
 
-import com.carrotsearch.randomizedtesting.RandomizedRunner;
-import com.carrotsearch.randomizedtesting.RandomizedTest;
-import com.carrotsearch.randomizedtesting.SysGlobals;
-import com.carrotsearch.randomizedtesting.rules.TestRuleAdapter;
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 /**
  * An abstract test class that prepares nested test classes to run.

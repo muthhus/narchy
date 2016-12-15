@@ -17,22 +17,17 @@
 package org.apache.lucene.codecs.lucene50;
 
 
-import static org.apache.lucene.codecs.lucene50.Lucene50PostingsFormat.BLOCK_SIZE;
-import static org.apache.lucene.codecs.lucene50.ForUtil.MAX_DATA_SIZE;
-import static org.apache.lucene.codecs.lucene50.ForUtil.MAX_ENCODED_SIZE;
+import com.carrotsearch.randomizedtesting.generators.RandomNumbers;
+import org.apache.lucene.store.*;
+import org.apache.lucene.util.LuceneTestCase;
+import org.apache.lucene.util.packed.PackedInts;
 
 import java.io.IOException;
 import java.util.Arrays;
 
-import org.apache.lucene.store.Directory;
-import org.apache.lucene.store.IOContext;
-import org.apache.lucene.store.IndexInput;
-import org.apache.lucene.store.IndexOutput;
-import org.apache.lucene.store.RAMDirectory;
-import org.apache.lucene.util.LuceneTestCase;
-import org.apache.lucene.util.packed.PackedInts;
-
-import com.carrotsearch.randomizedtesting.generators.RandomNumbers;
+import static org.apache.lucene.codecs.lucene50.ForUtil.MAX_DATA_SIZE;
+import static org.apache.lucene.codecs.lucene50.ForUtil.MAX_ENCODED_SIZE;
+import static org.apache.lucene.codecs.lucene50.Lucene50PostingsFormat.BLOCK_SIZE;
 
 public class TestForUtil extends LuceneTestCase {
 

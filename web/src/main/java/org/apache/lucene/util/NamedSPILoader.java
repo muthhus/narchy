@@ -17,11 +17,7 @@
 package org.apache.lucene.util;
 
 
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
-import java.util.ServiceConfigurationError;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**

@@ -17,9 +17,9 @@
 package org.apache.lucene.search.similarities;
 
 
-import java.util.List;
-
 import org.apache.lucene.search.Explanation;
+
+import java.util.List;
 
 /**
  * Axiomatic approaches for IR. From Hui Fang and Chengxiang Zhai

@@ -17,9 +17,6 @@
 package org.apache.lucene.codecs.memory;
 
 
-import java.io.IOException;
-import java.util.Arrays;
-
 import org.apache.lucene.index.FieldInfo;
 import org.apache.lucene.index.IndexOptions;
 import org.apache.lucene.store.DataInput;
@@ -27,6 +24,9 @@ import org.apache.lucene.store.DataOutput;
 import org.apache.lucene.util.Accountable;
 import org.apache.lucene.util.RamUsageEstimator;
 import org.apache.lucene.util.fst.Outputs;
+
+import java.io.IOException;
+import java.util.Arrays;
 
 /**
  * An FST {@link Outputs} implementation for 

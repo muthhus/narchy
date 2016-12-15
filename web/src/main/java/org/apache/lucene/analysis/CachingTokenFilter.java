@@ -22,8 +22,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.lucene.util.AttributeSource;
-
 /**
  * This class can be used if the token attributes of a TokenStream
  * are intended to be consumed more than once. It caches

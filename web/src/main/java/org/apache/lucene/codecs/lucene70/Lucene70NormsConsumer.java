@@ -16,10 +16,6 @@
  */
 package org.apache.lucene.codecs.lucene70;
 
-import static org.apache.lucene.codecs.lucene70.Lucene70NormsFormat.VERSION_CURRENT;
-
-import java.io.IOException;
-
 import org.apache.lucene.codecs.CodecUtil;
 import org.apache.lucene.codecs.NormsConsumer;
 import org.apache.lucene.codecs.NormsProducer;
@@ -30,6 +26,10 @@ import org.apache.lucene.index.SegmentWriteState;
 import org.apache.lucene.search.DocIdSetIterator;
 import org.apache.lucene.store.IndexOutput;
 import org.apache.lucene.util.IOUtils;
+
+import java.io.IOException;
+
+import static org.apache.lucene.codecs.lucene70.Lucene70NormsFormat.VERSION_CURRENT;
 
 /**
  * Writer for {@link Lucene70NormsFormat}

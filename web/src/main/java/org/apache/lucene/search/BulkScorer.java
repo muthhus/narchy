@@ -17,9 +17,9 @@
 package org.apache.lucene.search;
 
 
-import java.io.IOException;
-
 import org.apache.lucene.util.Bits;
+
+import java.io.IOException;
 
 /** This class is used to score a range of documents at
  *  once, and is returned by {@link Weight#bulkScorer}.  Only

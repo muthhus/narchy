@@ -16,20 +16,9 @@
  */
 package org.apache.lucene.geo;
 
-import static java.lang.Math.PI;
-import static java.lang.Math.max;
-import static java.lang.Math.min;
-import static org.apache.lucene.geo.GeoUtils.checkLatitude;
-import static org.apache.lucene.geo.GeoUtils.checkLongitude;
-import static org.apache.lucene.geo.GeoUtils.MAX_LAT_INCL;
-import static org.apache.lucene.geo.GeoUtils.MIN_LAT_INCL;
-import static org.apache.lucene.geo.GeoUtils.MAX_LAT_RADIANS;
-import static org.apache.lucene.geo.GeoUtils.MAX_LON_RADIANS;
-import static org.apache.lucene.geo.GeoUtils.MIN_LAT_RADIANS;
-import static org.apache.lucene.geo.GeoUtils.MIN_LON_RADIANS;
-import static org.apache.lucene.geo.GeoUtils.EARTH_MEAN_RADIUS_METERS;
-import static org.apache.lucene.geo.GeoUtils.sloppySin;
-import static org.apache.lucene.util.SloppyMath.TO_DEGREES;
+import static java.lang.Math.*;
+import static org.apache.lucene.geo.GeoUtils.*;
+import static org.apache.lucene.util.SloppyMath.*;
 import static org.apache.lucene.util.SloppyMath.asin;
 import static org.apache.lucene.util.SloppyMath.cos;
 import static org.apache.lucene.util.SloppyMath.toDegrees;

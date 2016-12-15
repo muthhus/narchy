@@ -16,22 +16,14 @@
  */
 package org.apache.lucene.index;
 
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.Comparator;
-
-import org.apache.lucene.search.DocIdSetIterator;
-import org.apache.lucene.search.FieldComparator;
-import org.apache.lucene.search.Scorer;
-import org.apache.lucene.search.Sort;
-import org.apache.lucene.search.SortField;
-import org.apache.lucene.search.SortedNumericSelector;
-import org.apache.lucene.search.SortedNumericSortField;
-import org.apache.lucene.search.SortedSetSelector;
-import org.apache.lucene.search.SortedSetSortField;
+import org.apache.lucene.search.*;
 import org.apache.lucene.util.TimSorter;
 import org.apache.lucene.util.packed.PackedInts;
 import org.apache.lucene.util.packed.PackedLongValues;
+
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.Comparator;
 
 import static org.apache.lucene.search.DocIdSetIterator.NO_MORE_DOCS;
 

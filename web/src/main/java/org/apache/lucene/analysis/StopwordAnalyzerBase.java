@@ -16,14 +16,13 @@
  */
 package org.apache.lucene.analysis;
 
+import org.apache.lucene.util.IOUtils;
+
 import java.io.IOException;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-
-import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.util.IOUtils;
 
 /**
  * Base class for Analyzers that need to make use of stopword sets. 

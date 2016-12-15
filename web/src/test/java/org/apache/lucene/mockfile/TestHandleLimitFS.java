@@ -16,6 +16,9 @@
  */
 package org.apache.lucene.mockfile;
 
+import org.apache.lucene.util.IOUtils;
+import org.apache.lucene.util.filter.FilterPath;
+
 import java.io.Closeable;
 import java.io.IOException;
 import java.net.URI;
@@ -24,9 +27,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.apache.lucene.util.filter.FilterPath;
-import org.apache.lucene.util.IOUtils;
 
 /** Basic tests for HandleLimitFS */
 public class TestHandleLimitFS extends MockFileSystemTestCase {

@@ -17,8 +17,6 @@
 package org.apache.lucene.codecs.blocktree;
 
 
-import java.io.IOException;
-
 import org.apache.lucene.codecs.BlockTermState;
 import org.apache.lucene.index.IndexOptions;
 import org.apache.lucene.store.ByteArrayDataInput;
@@ -26,6 +24,8 @@ import org.apache.lucene.util.ArrayUtil;
 import org.apache.lucene.util.BytesRef;
 import org.apache.lucene.util.automaton.Transition;
 import org.apache.lucene.util.fst.FST;
+
+import java.io.IOException;
 
 // TODO: can we share this with the frame in STE?
 final class IntersectTermsEnumFrame {

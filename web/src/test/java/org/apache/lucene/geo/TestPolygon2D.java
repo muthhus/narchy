@@ -16,12 +16,10 @@
  */
 package org.apache.lucene.geo;
 
-import static org.apache.lucene.geo.GeoTestUtil.nextLatitude;
-import static org.apache.lucene.geo.GeoTestUtil.nextLongitude;
-import static org.apache.lucene.geo.GeoTestUtil.nextPolygon;
-
 import org.apache.lucene.index.PointValues.Relation;
 import org.apache.lucene.util.LuceneTestCase;
+
+import static org.apache.lucene.geo.GeoTestUtil.*;
 
 /** Test Polygon2D impl */
 public class TestPolygon2D extends LuceneTestCase {

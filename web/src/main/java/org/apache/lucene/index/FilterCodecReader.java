@@ -17,16 +17,11 @@
 package org.apache.lucene.index;
 
 
-import java.util.Objects;
-
-import org.apache.lucene.codecs.DocValuesProducer;
-import org.apache.lucene.codecs.FieldsProducer;
-import org.apache.lucene.codecs.NormsProducer;
-import org.apache.lucene.codecs.PointsReader;
-import org.apache.lucene.codecs.StoredFieldsReader;
-import org.apache.lucene.codecs.TermVectorsReader;
+import org.apache.lucene.codecs.*;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.util.Bits;
+
+import java.util.Objects;
 
 /** 
  * A <code>FilterCodecReader</code> contains another CodecReader, which it

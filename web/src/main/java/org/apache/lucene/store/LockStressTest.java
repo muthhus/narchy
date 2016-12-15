@@ -17,6 +17,8 @@
 package org.apache.lucene.store;
 
 
+import org.apache.lucene.util.SuppressForbidden;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -25,8 +27,6 @@ import java.net.Socket;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Random;
-
-import org.apache.lucene.util.SuppressForbidden;
 
 /**
  * Simple standalone tool that forever acquires and releases a

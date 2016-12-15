@@ -17,14 +17,14 @@
 package org.apache.lucene.search;
 
 
-import java.io.IOException;
-import java.util.Set;
-
 import org.apache.lucene.index.FieldInvertState;
 import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.similarities.Similarity;
 import org.apache.lucene.util.PriorityQueue;
+
+import java.io.IOException;
+import java.util.Set;
 
 /**
  * Holds all implementations of classes in the o.a.l.search package as a
