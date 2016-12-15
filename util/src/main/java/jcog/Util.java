@@ -1330,7 +1330,7 @@ public enum Util { ;
         return f * f;
     }
 
-    public static CharSequence uuid64() {
+    public static CharSequence uuid128() {
         UUID u = UUID.randomUUID();
         long a = u.getLeastSignificantBits();
         long b = u.getMostSignificantBits();
@@ -1339,7 +1339,7 @@ public enum Util { ;
         LongString.append(sb, b);
         return sb.toString();
     }
-    public static CharSequence uuid32() {
+    public static CharSequence uuid64() {
         UUID u = UUID.randomUUID();
         long a = u.getLeastSignificantBits();
         long b = u.getMostSignificantBits();

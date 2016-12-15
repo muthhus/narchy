@@ -33,7 +33,7 @@ public abstract class Param /*extends Container*/ implements Level {
     //    //TODO use 'I' for SELf, it is 3 characters shorter
 //    public static final Atom DEFAULT_SELF = (Atom) $.the("I");
     public static Atom defaultSelf() {
-        return $.quote("I_" + Util.uuid32());
+        return $.quote("I_" + Util.uuid64());
     }
 
 

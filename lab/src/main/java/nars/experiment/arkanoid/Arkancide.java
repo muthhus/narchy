@@ -44,7 +44,7 @@ public class Arkancide extends NAgents {
         senseNumberBi("vy(noid,ball)", new FloatNormalized(()->noid.ball.velocityY));
 
         addCamera("cam(noid)", noid, visW, visH);
-        addCameraRetina("zoom(cam(noid))", noid, visW/2, visH/2, (v) -> $.t(v, alpha));
+        //addCameraRetina("zoom(cam(noid))", noid, visW/2, visH/2, (v) -> $.t(v, alpha));
 
         action(new ActionConcept(
                 "dx(noid,paddle)"

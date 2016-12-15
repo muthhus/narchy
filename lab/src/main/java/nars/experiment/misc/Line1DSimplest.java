@@ -120,7 +120,7 @@ public class Line1DSimplest extends NAgent {
                         .useConstructor()
                         //.name("nar")
                         .defaultAnswer(CALLS_REAL_METHODS)
-                        .invocationListeners(new InvocationLogger())
+                        //.invocationListeners(new InvocationLogger())
         );
 
 
