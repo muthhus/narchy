@@ -68,9 +68,9 @@ public class Revision {
     }
 
     @Nullable
-    public static Truth revise(@NotNull Truthed a, float aFrequencyBalance, @NotNull Truthed b, float minConf) {
-        float w1 = a.evi();
-        float w2 = b.evi();
+    public static Truth revise(@NotNull Truthed a, float aFrequencyBalance, @NotNull Truthed b, float evidenceFactor, float minConf) {
+        float w1 = a.evi() * evidenceFactor;
+        float w2 = b.evi() * evidenceFactor;
         float c = w2c(w1+w2);
 
         if (c >= minConf) {

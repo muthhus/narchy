@@ -96,7 +96,7 @@ public class Default extends NAR {
 
         ConceptBagCycle c = new ConceptBagCycle(this, newDeriver(), activeConcepts);
 
-        c.termlinksFiredPerFiredConcept.set(termLinksPerConcept);
+        c.termlinksFiredPerFiredConcept.set(1, termLinksPerConcept);
         c.tasklinksFiredPerFiredConcept.set(taskLinksPerConcept);
         c.conceptsFiredPerCycle.set(conceptsFirePerCycle);
 

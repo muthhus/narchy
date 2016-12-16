@@ -28,7 +28,7 @@ public class ActionConcept extends WiredConcept implements WiredConcept.Prioriti
     /** relative temporal delta time for desire/belief prediction */
     static final int decisionDT = 0;
 
-    final ScalarSignal feedback;
+    public final ScalarSignal feedback;
     private float feedbackConf = 0;
 
     private float currentFeedback;

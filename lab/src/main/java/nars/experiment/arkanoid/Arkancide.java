@@ -37,28 +37,34 @@ public class Arkancide extends NAgents {
             }
         };
 
-        senseNumberBi("x(noid,paddle)", new FloatNormalized(()->noid.paddle.x));
-        senseNumberBi("x(noid,ball)", new FloatNormalized(()->noid.ball.x));
-        senseNumberBi("y(noid,ball)", new FloatNormalized(()->noid.ball.y));
+        float resX = Math.max(0.01f, 1f/visW); //dont need more resolution than 1/pixel_width
+        float resY = Math.max(0.01f, 1f/visH); //dont need more resolution than 1/pixel_width
+
+        senseNumberBi("x(noid,paddle)", new FloatNormalized(()->noid.paddle.x)).resolution(resX);
+        senseNumberBi("x(noid,ball)", new FloatNormalized(()->noid.ball.x)).resolution(resX);
+        senseNumberBi("y(noid,ball)", new FloatNormalized(()->noid.ball.y)).resolution(resY);
         senseNumberBi("vx(noid,ball)", new FloatNormalized(()->noid.ball.velocityX));
         senseNumberBi("vy(noid,ball)", new FloatNormalized(()->noid.ball.velocityY));
 
         addCamera("cam(noid)", noid, visW, visH);
         //addCameraRetina("zoom(cam(noid))", noid, visW/2, visH/2, (v) -> $.t(v, alpha));
 
-        action(new ActionConcept(
+
+        ActionConcept a = new ActionConcept(
                 "dx(noid,paddle)"
-                , nar, (b,d)->{
+                , nar, (b, d) -> {
 
             float pct;
-            if (d!=null) {
-                pct = noid.paddle.moveTo(d.freq(), paddleSpeed ); //* d.conf());
+            if (d != null) {
+                pct = noid.paddle.moveTo(d.freq(), paddleSpeed); //* d.conf());
             } else {
                 pct = noid.paddle.x / noid.SCREEN_WIDTH; //unchanged
             }
             return $.t(pct, nar.confidenceDefault('.'));
             //return null; //$.t(0.5f, alpha);
-        }));
+        });
+        a.feedback.resolution(resX);
+        action(a);
 //        action(new ActionConcept(
 //                //"happy:noid(paddle,x)"
 //                "(leftright)"
@@ -91,11 +97,11 @@ public class Arkancide extends NAgents {
     }
 
     public static void main(String[] args) {
-        Param.DEBUG = true;
+        //Param.DEBUG = true;
 
         //runRT(Arkancide::new);
         //nRT(Arkancide::new, 25, 5);
-        runRT(Arkancide::new, 30, 7);
+        runRT(Arkancide::new, 60, 5);
     }
 
 

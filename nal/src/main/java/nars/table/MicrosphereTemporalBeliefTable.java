@@ -2,10 +2,11 @@ package nars.table;
 
 import jcog.Util;
 import jcog.list.MultiRWFasterList;
+import nars.$;
 import nars.NAR;
-import nars.Param;
 import nars.Task;
 import nars.concept.Concept;
+import nars.nal.Stamp;
 import nars.task.Revision;
 import nars.task.TruthPolation;
 import nars.truth.Truth;
@@ -15,10 +16,9 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Iterator;
+import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
-
-import static nars.truth.TruthFunctions.c2w;
 
 /**
  * stores the items unsorted; revection manages their ranking and removal
@@ -53,57 +53,60 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
 
             this.capacity = newCapacity;
 
-            synchronized (list) {
+            int toRemove = list.size() - newCapacity;
+            if (toRemove > 0) {
+
                 clean(nar);
 
-                int toRemove = list.size() - newCapacity;
+                toRemove = list.size() - newCapacity;
                 if (toRemove > 0) {
-                    //compress until under-capacity
-                    list.withWriteLockAndDelegate((l) -> {
 
-                        float dur = nar.time.dur();
+                    List<Task> merged = $.newArrayList(0);
+                    List<Task> trash = $.newArrayList(0);
 
-                        while (list.size() > capacity) {
-                            long now = nar.time();
+                    synchronized (list) {
 
-                            Task a = matchWeakest(now);
 
-                            Task b = matchMerge(now, a, dur);
+                        //compress until under-capacity
+                        list.withWriteLockAndDelegate((l) -> {
 
-                            Task c = (b != null && b != a) ? merge(a, b, now) : null;
+                            float dur = nar.time.dur();
 
-                            remove(a, nar);
+                            float confMin = nar.confMin.floatValue();
 
-                            if (c != null) {
-                                remove(b, nar);
+                            while (list.size() > capacity) {
+                                long now = nar.time();
 
-                                addMerged(c, nar);
+                                Task a = matchWeakest(now);
+
+                                Task b = matchMerge(now, a, dur);
+
+                                Task c = (b != null && b != a) ? merge(a, b, now, confMin) : null;
+
+                                removeLater(a, trash);
+
+                                if (c != null) {
+                                    removeLater(b, trash);
+
+                                    add(c);
+                                    merged.add(c);
+                                }
+
                             }
 
-                        }
+                        });
 
-                    });
+                    }
+
+                    nar.tasks.change(merged, trash);
+
                 }
             }
-//            for (int i = 0; i < toRemove && nullAttempts > 0; ) {
-//
-//                Task ww = matchWeakest(now); //read-lock
-//                if (ww!=null) {
-//                    remove(ww, trash);
-//                    i++;
-//                } else {
-//                    nullAttempts--;
-//                }
-//            }
+
         }
 
     }
 
-    /** inserts the task into the table, and silently inserts it into the nar's active tasks */
-    private void addMerged(Task c, NAR nar) {
-        this.add(c);
-        nar.tasks.addIfAbsent(c);
-    }
 
     @Override
     public final int size() {
@@ -121,7 +124,6 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
     }
 
 
-
     @Nullable
     @Override
     public final TruthDelta add(@NotNull Task input, EternalTable eternal, Concept concept, @NotNull NAR nar) {
@@ -133,6 +135,9 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
         //the result of compression is processed separately
         final TruthDelta[] delta = new TruthDelta[1];
 
+        Task[] merged = new Task[1];
+        Task[] trash = new Task[2];
+
         list.withWriteLockAndDelegate(l -> {
             final Truth before;
 
@@ -141,12 +146,14 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
             before = truth(now, eternal);
 
             Task next;
-            if ((next = compress(input, now, nar)) != null) {
+            if ((next = compress(input, now, nar, trash)) != null) {
 
                 add(input);
+                //this will be inserted to the index in a callee method
 
                 if (next != input /*&& list.size() + 1 <= cap*/) {
-                    addMerged(next, nar);
+                    add(next);
+                    merged[0] = next;
                 }
 
                 final Truth after = truth(now, eternal);
@@ -154,23 +161,23 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
             }
         });
 
+
+        //update the index outside of the atomic procedure
+        for (Task x : trash)
+            if (x!=null)
+                nar.tasks.remove(x);
+
+        for (Task x : merged)
+            if (x!=null)
+                nar.tasks.addIfAbsent(x);
+
         return delta[0];
     }
 
     private void add(@NotNull Task x) {
-        if (list.add(x)) {
-//            long o = x.occurrence();
-//            if (minT!=MAX_VALUE) {
-//                if (o < minT) minT = o;
-//            }
-//            if (maxT!= MIN_VALUE) {
-//                if (o > maxT) maxT = o;
-//            }
-        } else {
-            throw new UnsupportedOperationException("couldnt add?");
-        }
+        boolean added = list.add(x);
+        assert added;
     }
-
 
 
 //    /** HACK use of volatiles here is a hack. it may rarely cause the bag to experience flashbacks. proper locking can solve this */
@@ -205,39 +212,43 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
 //    }
 
     @Override
-    public boolean removeIf(@NotNull Predicate<? super Task> o, @NotNull  NAR nar) {
-        return list.removeIf(((Predicate<Task>) t -> {
+    public boolean removeIf(@NotNull Predicate<? super Task> o, @NotNull NAR nar) {
+
+        List<Task> toUnindex = $.newArrayList(0);
+
+        boolean r = list.removeIf(((Predicate<Task>) t -> {
             if (o.test(t)) {
-                remove( t, nar );
+                toUnindex.add(t);
+                t.delete();
                 return true;
             }
             return false;
         }));
+
+        //unindex the tasks outside of the atomic procedure
+        if (r) {
+            for (Task x : toUnindex) {
+                nar.tasks.remove(x);
+            }
+            return true;
+        }
+        return false;
     }
-
-
-    private void onRemoved(@NotNull Task t, NAR nar) {
-//        if (minT != MAX_VALUE) {
-//            long o = t.occurrence();
-//            if ((minT == o) || (maxT == o)) {
-//                invalidateDuration();
-//            }
-//        }
-
-        nar.tasks.remove(t);
-    }
-
-//    private void invalidateDuration() {
-//        //invalidate
-//        minT = MAX_VALUE;
-//        maxT = MIN_VALUE;
-//    }
 
 
     @Override
     public final boolean isFull() {
         return size() == capacity();
     }
+
+
+    //    private void invalidateDuration() {
+//        //invalidate
+//        minT = MAX_VALUE;
+//        maxT = MIN_VALUE;
+//    }
+
+
 
 //    @Override
 //    public void minTime(long minT) {
@@ -262,24 +273,14 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
 //    }
 
 
-
-    private final boolean remove(@NotNull Task x, @NotNull NAR nar) {
+    private final boolean removeLater(@NotNull Task x, List<Task> trash) {
         if (list.remove(x)) {
-            onRemoved(x, nar);
+            x.delete();
+            trash.add(x);
             return true;
         }
         return false;
     }
-
-
-//    @Override
-//    public final boolean remove(Object object) {
-//        if (super.remove(object)) {
-//            invalidRangeIfLimit((Task)object);
-//            return true;
-//        }
-//        return false;
-//    }
 
 
     public Task matchWeakest(long now) {
@@ -287,16 +288,19 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
     }
 
     final float rankTemporalByConfidence(@Nullable Task t, long when) {
-        return t == null ? -1 : t.confWeight(when) * (1f+t.range());
-                //* (t.dur()+1);
+        return t == null ? -1 : t.confWeight(when) * (1f + t.range());
+        //* (t.dur()+1);
     }
 
     public Task matchMerge(long now, @NotNull Task toMergeWith, float dur) {
-        return list.maxBy(rankMatchMerge( toMergeWith, now, dur ));
+        return list.maxBy(rankMatchMerge(toMergeWith, now, dur));
     }
 
-    /** max value given to the ideal match for the provided task to be merged with */
-    @NotNull public Function<Task, Float> rankMatchMerge(@NotNull Task y, long now, float dur) {
+    /**
+     * max value given to the ideal match for the provided task to be merged with
+     */
+    @NotNull
+    public Function<Task, Float> rankMatchMerge(@NotNull Task y, long now, float dur) {
 
         //prefer (when selecting by minimum rank:)
         //  less freq delta
@@ -317,9 +321,9 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
 
             return (1f + (1f - Math.abs(x.freq() - yf)))
                     //* (1f + (1f - xtc))
-                    * (1f + 1f/(1f+x.range()))
-                    * (1f + 1f/(1f+x.dur()))
-                    * (1f + TruthPolation.evidenceDecay(1, dur, Math.abs(xo - now) + Math.abs(xo-yo)));
+                    * (1f + 1f / (1f + x.range()))
+                    * (1f + 1f / (1f + x.dur()))
+                    * (1f + TruthPolation.evidenceDecay(1, dur, Math.abs(xo - now) + Math.abs(xo - yo)));
         };
 
     }
@@ -336,12 +340,11 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
 //    }
 
 
-
     /**
      * frees one slot by removing 2 and projecting a new belief to their midpoint. returns the merged task
      */
     @Nullable
-    protected Task compress(@Nullable Task input, long now, @NotNull NAR nar) {
+    protected Task compress(@Nullable Task input, long now, @NotNull NAR nar, Task[] trash) {
 
         int cap = capacity();
 
@@ -359,11 +362,18 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
             return null;
         }
 
+        a.delete();
+        list.remove(a);
+        trash[0] = a;
+
         Task b = matchMerge(now, a, nar.time.dur());
         if (b != null) {
-            Task merged = merge(a, b, now);
-            remove(a, nar);
-            remove(b, nar);
+            Task merged = merge(a, b, now, nar.confMin.floatValue());
+
+            b.delete();
+            list.remove(b);
+            trash[1] = b;
+
             return merged;
         } else {
             return input;
@@ -375,22 +385,24 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
      * t is the target time of the new merged task
      */
     @Nullable
-    private Task merge(@NotNull Task a, @NotNull Task b, long now) {
+    private Task merge(@NotNull Task a, @NotNull Task b, long now, float confMin) {
 
-        float ac = c2w(a.conf());
-        float bc = c2w(b.conf());
-        long mid = (long) Math.round(Util.lerp(a.occurrence(), b.occurrence(), (double)ac / (ac + bc)));
+        float ac = a.evi();
+        float bc = b.evi();
 
-//        float f =
+        float f =
 //                //more evidence overlap indicates redundant information, so reduce the confWeight (measure of evidence) by this amount
 //                //TODO weight the contributed overlap amount by the relative confidence provided by each task
-//                //1f - Stamp.overlapFraction(a.evidence(), b.evidence())/2f;
+                1f - Stamp.overlapFraction(a.evidence(), b.evidence()) / 2f;
 //                1f;
-        float p = ac/(ac+bc);
-        Truth t = Revision.revise(a, p, b, Param.TRUTH_EPSILON /*nar.confMin*/);
 
-        if (t != null)
+        float p = ac / (ac + bc);
+        Truth t = Revision.revise(a, p, b, f, confMin);
+
+        if (t != null) {
+            long mid = (long) Math.round(Util.lerp(a.occurrence(), b.occurrence(), (double) ac / (ac + bc)));
             return Revision.mergeInterpolate(a, b, mid, now, t, true);
+        }
 
         return null;
     }
@@ -401,9 +413,8 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
     public final Task match(long when, long now, @Nullable Task against) {
 
 
-
         //if (against == null) {
-            return list.maxBy(x -> rankTemporalByConfidence(x, when));
+        return list.maxBy(x -> rankTemporalByConfidence(x, when));
 //
 //        } else {
 //            long then = when != ETERNAL ? when : now;
@@ -424,7 +435,7 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
         Task topEternal = eternal.strongest();
 
         final Truth[] t = new Truth[1];
-        list.withReadLockAndDelegate((l)->{
+        list.withReadLockAndDelegate((l) -> {
             t[0] = TruthPolation.truth(topEternal, when, l);
         });
 

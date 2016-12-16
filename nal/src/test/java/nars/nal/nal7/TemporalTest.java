@@ -434,7 +434,10 @@ public class TemporalTest {
         n.forEachActiveConcept(d::add);
 
         //2 unique impl concepts created
-        assertEquals("[(#1==>x), (#1==>y), ((--,(y==>#1))&&(--,(#1==>y))), ((x==>#1)&&(#1==>x)), (x<=>y), (x==>#1), (x==>y), (y==>#1), (y==>x), x, y]", d.toString());
+        assertEquals(
+                //"[(#1==>x), (#1==>y), ((--,(y==>#1))&&(--,(#1==>y))), ((x==>#1)&&(#1==>x)), (x<=>y), (x==>#1), (x==>y), (y==>#1), (y==>x), x, y]"
+                "[((x)<=>(y)), ((x)==>(y)), ((y)==>(x)), (x), (y), x, y]"
+                , d.toString());
     }
 
     @Test public void testCommutivity() {

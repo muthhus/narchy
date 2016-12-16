@@ -40,4 +40,14 @@ abstract public class TaskIndex {
 
     abstract public void forEach(Consumer<Task> each);
 
+    public void change(List<Task> toAdd, List<Task> toRemove) {
+        remove(toRemove);
+        addIfAbsent(toAdd);
+    }
+
+    public void addIfAbsent(List<Task> toAdd) {
+        for (int i = 0, toAddSize = toAdd.size(); i < toAddSize; i++) {
+            addIfAbsent(toAdd.get(i));
+        }
+    }
 }

@@ -1,5 +1,6 @@
 package nars.nar.core;
 
+import jcog.data.MutableIntRange;
 import jcog.data.MutableInteger;
 import jcog.data.Range;
 import nars.$;
@@ -67,8 +68,8 @@ public class ConceptBagCycle {
     @Range(min = 0, max = 16, unit = "TaskLink") //TODO use float percentage
     public final MutableInteger tasklinksFiredPerFiredConcept = new MutableInteger(1);
 
-    @Range(min = 0, max = 16, unit = "TermLink")
-    public final MutableInteger termlinksFiredPerFiredConcept = new MutableInteger(1);
+    //@Range(min = 0, max = 16, unit = "TermLink")
+    public final MutableIntRange termlinksFiredPerFiredConcept = new MutableIntRange(1, 1);
 
 
 
@@ -129,15 +130,20 @@ public class ConceptBagCycle {
 
 
                             int _tasklinks = tasklinksFiredPerFiredConcept.intValue();
-                            int _termlinks = termlinksFiredPerFiredConcept.intValue();
 
                             for (int i = 0, toFireSize = toFire.size(); i < toFireSize; i++) {
-                                Concept c = toFire.get(i).get();
-                                PremiseMatrix.run(c, this.nar,
-                                        _tasklinks, _termlinks,
-                                        this.nar::input, //input them within the current thread here
-                                        deriver
-                                );
+                                BLink<Concept> cl = toFire.get(i);
+                                int _termlinks = termlinksFiredPerFiredConcept.lerp(cl.pri());
+                                if (_termlinks > 0) {
+
+                                    Concept c = cl.get();
+
+                                    PremiseMatrix.run(c, this.nar,
+                                            _tasklinks, _termlinks,
+                                            this.nar::input, //input them within the current thread here
+                                            deriver
+                                    );
+                                }
                             }
                         });
 

@@ -1,0 +1,58 @@
+package jcog.data;
+
+import jcog.Util;
+
+/**
+ * Analogous to MutableInteger, but a pair of integers in sorted order
+ */
+public class MutableIntRange {
+
+    int lo, hi;
+
+
+    public MutableIntRange(int lo, int hi) {
+        set(lo, hi);
+    }
+
+    public int lo() {
+        return lo;
+    }
+
+    public int hi() {
+        return hi;
+    }
+
+    public void lo(int lo) {
+        set(lo, hi);
+    }
+
+    @Override
+    public String toString() {
+        return "[" + lo + ".." + hi + ']';
+    }
+
+    public void hi(int hi) {
+        set(lo, hi);
+    }
+
+    public void set(int lo, int hi) {
+        if (lo <= hi) {
+            this.lo = lo;
+            this.hi = hi;
+        }  else {
+            this.lo = hi;
+            this.hi = lo;
+        }
+    }
+
+    public int lerp(float x) {
+        if (x < 0 || x > 1)
+            throw new UnsupportedOperationException("out of range");
+
+        int l = lo;
+        int h = hi;
+        if (l == h) return l;
+        else return Util.lerp(lo, hi, x);
+    }
+
+}

@@ -164,7 +164,8 @@ public class Alann extends NAR {
         super(time,
                 new TreeTermIndex.L1TreeIndex(new DefaultConceptBuilder(), 1024 * 1024, 1024 * 32, 2),
                 new XorShift128PlusRandom(1), Param.defaultSelf(),
-                auxThreads == 1 ? new SynchronousExecutor() : new MultiThreadExecutioner(auxThreads, 512 * auxThreads).sync(false)
+                auxThreads == 1 ? new SynchronousExecutor() :
+                        new MultiThreadExecutioner(auxThreads, 512 * auxThreads).sync(true)
         );
 
         quaMin.setValue(BUDGET_EPSILON * 2f);
