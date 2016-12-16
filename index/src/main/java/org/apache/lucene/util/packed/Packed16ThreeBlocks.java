@@ -56,7 +56,7 @@ final class Packed16ThreeBlocks extends PackedInts.MutableImpl {
 
   @Override
   public int get(int index, long[] arr, int off, int len) {
-    assert len > 0 : "len must be > 0 (got " + len + ")";
+    assert len > 0 : "len must be > 0 (got " + len + ')';
     assert index >= 0 && index < valueCount;
     assert off + len <= arr.length;
 
@@ -77,7 +77,7 @@ final class Packed16ThreeBlocks extends PackedInts.MutableImpl {
 
   @Override
   public int set(int index, long[] arr, int off, int len) {
-    assert len > 0 : "len must be > 0 (got " + len + ")";
+    assert len > 0 : "len must be > 0 (got " + len + ')';
     assert index >= 0 && index < valueCount;
     assert off + len <= arr.length;
 
@@ -120,6 +120,6 @@ final class Packed16ThreeBlocks extends PackedInts.MutableImpl {
   @Override
   public String toString() {
     return getClass().getSimpleName() + "(bitsPerValue=" + bitsPerValue
-        + ",size=" + size() + ",blocks=" + blocks.length + ")";
+        + ",size=" + size() + ",blocks=" + blocks.length + ')';
   }
 }

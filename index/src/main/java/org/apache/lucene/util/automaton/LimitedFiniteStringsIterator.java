@@ -41,7 +41,7 @@ public class LimitedFiniteStringsIterator extends FiniteStringsIterator {
   /**
    * Number of generated finite strings.
    */
-  private int count = 0;
+  private int count;
 
   /**
    * Constructor.

@@ -100,6 +100,6 @@ public final class BlockPackedReader extends LongValues implements Accountable {
   @Override
   public String toString() {
     long avgBPV = subReaders.length == 0 ? 0 : sumBPV / subReaders.length;
-    return getClass().getSimpleName() + "(blocksize=" + (1<<blockShift) + ",size=" + valueCount + ",avgBPV=" + avgBPV + ")";
+    return getClass().getSimpleName() + "(blocksize=" + (1<<blockShift) + ",size=" + valueCount + ",avgBPV=" + avgBPV + ')';
   }
 }

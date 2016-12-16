@@ -131,7 +131,7 @@ class Packed64 extends PackedInts.MutableImpl {
 
   @Override
   public int get(int index, long[] arr, int off, int len) {
-    assert len > 0 : "len must be > 0 (got " + len + ")";
+    assert len > 0 : "len must be > 0 (got " + len + ')';
     assert index >= 0 && index < valueCount;
     len = Math.min(len, valueCount - index);
     assert off + len <= arr.length;
@@ -195,7 +195,7 @@ class Packed64 extends PackedInts.MutableImpl {
 
   @Override
   public int set(int index, long[] arr, int off, int len) {
-    assert len > 0 : "len must be > 0 (got " + len + ")";
+    assert len > 0 : "len must be > 0 (got " + len + ')';
     assert index >= 0 && index < valueCount;
     len = Math.min(len, valueCount - index);
     assert off + len <= arr.length;
@@ -239,7 +239,7 @@ class Packed64 extends PackedInts.MutableImpl {
   @Override
   public String toString() {
     return "Packed64(bitsPerValue=" + bitsPerValue + ",size="
-            + size() + ",blocks=" + blocks.length + ")";
+            + size() + ",blocks=" + blocks.length + ')';
   }
 
   @Override

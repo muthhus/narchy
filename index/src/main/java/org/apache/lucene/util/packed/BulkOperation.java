@@ -23,7 +23,7 @@ package org.apache.lucene.util.packed;
  * Efficient sequential read/write of packed integers.
  */
 abstract class BulkOperation implements PackedInts.Decoder, PackedInts.Encoder {
-  private static final BulkOperation[] packedBulkOps = new BulkOperation[] {
+  private static final BulkOperation[] packedBulkOps = {
     new BulkOperationPacked1(),
     new BulkOperationPacked2(),
     new BulkOperationPacked3(),
@@ -91,7 +91,7 @@ abstract class BulkOperation implements PackedInts.Decoder, PackedInts.Encoder {
   };
 
   // NOTE: this is sparse (some entries are null):
-  private static final BulkOperation[] packedSingleBlockBulkOps = new BulkOperation[] {
+  private static final BulkOperation[] packedSingleBlockBulkOps = {
     new BulkOperationPackedSingleBlock(1),
     new BulkOperationPackedSingleBlock(2),
     new BulkOperationPackedSingleBlock(3),
@@ -140,7 +140,7 @@ abstract class BulkOperation implements PackedInts.Decoder, PackedInts.Encoder {
     }
   }
 
-  protected int writeLong(long block, byte[] blocks, int blocksOffset) {
+  protected static int writeLong(long block, byte[] blocks, int blocksOffset) {
     for (int j = 1; j <= 8; ++j) {
       blocks[blocksOffset++] = (byte) (block >>> (64 - (j << 3)));
     }

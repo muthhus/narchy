@@ -32,7 +32,7 @@ import java.util.Arrays;
 abstract class Packed64SingleBlock extends PackedInts.MutableImpl {
 
   public static final int MAX_SUPPORTED_BITS_PER_VALUE = 32;
-  private static final int[] SUPPORTED_BITS_PER_VALUE = new int[] {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 16, 21, 32};
+  private static final int[] SUPPORTED_BITS_PER_VALUE = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 16, 21, 32};
 
   public static boolean isSupported(int bitsPerValue) {
     return Arrays.binarySearch(SUPPORTED_BITS_PER_VALUE, bitsPerValue) >= 0;
@@ -68,7 +68,7 @@ abstract class Packed64SingleBlock extends PackedInts.MutableImpl {
 
   @Override
   public int get(int index, long[] arr, int off, int len) {
-    assert len > 0 : "len must be > 0 (got " + len + ")";
+    assert len > 0 : "len must be > 0 (got " + len + ')';
     assert index >= 0 && index < valueCount;
     len = Math.min(len, valueCount - index);
     assert off + len <= arr.length;
@@ -112,7 +112,7 @@ abstract class Packed64SingleBlock extends PackedInts.MutableImpl {
 
   @Override
   public int set(int index, long[] arr, int off, int len) {
-    assert len > 0 : "len must be > 0 (got " + len + ")";
+    assert len > 0 : "len must be > 0 (got " + len + ')';
     assert index >= 0 && index < valueCount;
     len = Math.min(len, valueCount - index);
     assert off + len <= arr.length;
@@ -202,7 +202,7 @@ abstract class Packed64SingleBlock extends PackedInts.MutableImpl {
   @Override
   public String toString() {
     return getClass().getSimpleName() + "(bitsPerValue=" + bitsPerValue
-        + ",size=" + size() + ",blocks=" + blocks.length + ")";
+        + ",size=" + size() + ",blocks=" + blocks.length + ')';
   }
 
   public static Packed64SingleBlock create(DataInput in,

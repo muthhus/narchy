@@ -87,7 +87,7 @@ abstract class AbstractBlockPackedWriter {
   void addBlockOfZeros() throws IOException {
     checkNotFinished();
     if (off != 0 && off != values.length) {
-      throw new IllegalStateException("" + off);
+      throw new IllegalStateException(String.valueOf(off));
     }
     if (off == values.length) {
       flush();

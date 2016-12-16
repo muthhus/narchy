@@ -298,8 +298,8 @@ public final class DaciukMihovAutomatonBuilder {
     
     Automaton.Builder a = new Automaton.Builder();
     convert(a,
-        builder.complete(), 
-        new IdentityHashMap<State,Integer>());
+        builder.complete(),
+            new IdentityHashMap<>());
 
     return a.finish();
   }
@@ -335,7 +335,7 @@ public final class DaciukMihovAutomatonBuilder {
    * Add a suffix of <code>current</code> starting at <code>fromIndex</code>
    * (inclusive) to state <code>state</code>.
    */
-  private void addSuffix(State state, CharSequence current, int fromIndex) {
+  private static void addSuffix(State state, CharSequence current, int fromIndex) {
     final int len = current.length();
     while (fromIndex < len) {
       int cp = Character.codePointAt(current, fromIndex);

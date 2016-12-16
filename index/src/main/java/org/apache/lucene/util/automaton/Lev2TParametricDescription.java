@@ -84,44 +84,44 @@ class Lev2TParametricDescription extends ParametricDescription {
   }
     
   // 1 vectors; 3 states per vector; array length = 3
-  private final static long[] toStates0 = new long[] /*2 bits per value */ {
+  private final static long[] toStates0 = {
     0x23L
   };
-  private final static long[] offsetIncrs0 = new long[] /*1 bits per value */ {
+  private final static long[] offsetIncrs0 = {
     0x0L
   };
     
   // 2 vectors; 5 states per vector; array length = 10
-  private final static long[] toStates1 = new long[] /*3 bits per value */ {
+  private final static long[] toStates1 = {
     0x13688b44L
   };
-  private final static long[] offsetIncrs1 = new long[] /*1 bits per value */ {
+  private final static long[] offsetIncrs1 = {
     0x3e0L
   };
     
   // 4 vectors; 13 states per vector; array length = 52
-  private final static long[] toStates2 = new long[] /*4 bits per value */ {
+  private final static long[] toStates2 = {
     0x60dbb0b05200b504L,0x5233217627062227L,0x2355543214323235L,0x4354L
   };
-  private final static long[] offsetIncrs2 = new long[] /*2 bits per value */ {
+  private final static long[] offsetIncrs2 = {
     0x555080a800002000L,0x5555555555L
   };
     
   // 8 vectors; 28 states per vector; array length = 224
-  private final static long[] toStates3 = new long[] /*5 bits per value */ {
+  private final static long[] toStates3 = {
     0xe701c02940059404L,0xa010162000a50000L,0xb02c8c40a1416288L,0xa821032310858c0L,
     0x314423980d28b201L,0x5281e528847788e0L,0xa23980d308c2280eL,0x1e3294b1a962278cL,
     0x8c41309e2288e528L,0x11444409021aca21L,0x11a4624886b1086bL,0x2a6258941d6240c4L,
     0x5024a50b489074adL,0x14821aca520c411aL,0x5888b5890b594a44L,0x941d6520c411a465L,
     0x8b589075ad6a62d4L,0x1a5055a4L
   };
-  private final static long[] offsetIncrs3 = new long[] /*2 bits per value */ {
+  private final static long[] offsetIncrs3 = {
     0x30c30200002000L,0x2a0030f3c3fc333cL,0x233a00328282a820L,0x5555555532b283a8L,
     0x5555555555555555L,0x5555555555555555L,0x5555555555555555L
   };
     
   // 16 vectors; 45 states per vector; array length = 720
-  private final static long[] toStates4 = new long[] /*6 bits per value */ {
+  private final static long[] toStates4 = {
     0x3801450002c5004L,0xc500014b00000e38L,0x51451401402L,0x0L,
     0x518000b14010000L,0x9f1c20828e20230L,0x219f0df0830a70c2L,0x8200008208208200L,
     0x805050160800800L,0x3082098602602643L,0x4564014250508064L,0x850051420000831L,
@@ -140,7 +140,7 @@ class Lev2TParametricDescription extends ParametricDescription {
     0xe2c22072cb2ca30bL,0x452c70d720538910L,0x8b2cb2d708e3891L,0x81cb1440c204b24eL,
     0xda44e38e28c2ca24L,0x1dc6da6585d660e4L,0xe2cb5d338e5d914eL,0x38938238L
   };
-  private final static long[] offsetIncrs4 = new long[] /*3 bits per value */ {
+  private final static long[] offsetIncrs4 = {
     0x3002000000080000L,0x20c060L,0x8149000004000000L,0x4024924110824824L,
     0xdb6030c360002082L,0x6c36c06c301b0d80L,0xb01861b0000db0dbL,0x1b7036209188e06dL,
     0x800920006d86db7L,0x4920c2402402490L,0x49000208249009L,0x4908128128124804L,
@@ -153,7 +153,7 @@ class Lev2TParametricDescription extends ParametricDescription {
   };
     
   // 32 vectors; 45 states per vector; array length = 1440
-  private final static long[] toStates5 = new long[] /*6 bits per value */ {
+  private final static long[] toStates5 = {
     0x3801450002c5004L,0xc500014b00000e38L,0x51451401402L,0x0L,
     0x514000b14010000L,0x550000038e00e0L,0x264518500600b180L,0x8208208208208208L,
     0x2c50040820820L,0x70820a38808c0146L,0xc37c20c29c30827cL,0x20820820800867L,
@@ -189,7 +189,7 @@ class Lev2TParametricDescription extends ParametricDescription {
     0x6996175983936913L,0x74ce39764538771bL,0xc204e24e08e38b2dL,0x28c2ca2481cb1440L,
     0x85d660e4da44e38eL,0x698607e975c6da65L,0xa6ca6aa699e7864aL
   };
-  private final static long[] offsetIncrs5 = new long[] /*3 bits per value */ {
+  private final static long[] offsetIncrs5 = {
     0x3002000000080000L,0x20c060L,0x100000004000000L,0xdb6db6db50603018L,
     0xa480000200002db6L,0x1249208841241240L,0x4000010000104120L,0x2492c42092092052L,
     0xc30d800096592d9L,0xb01b0c06c36036d8L,0x186c00036c36db0dL,0xad860361b01b6c06L,

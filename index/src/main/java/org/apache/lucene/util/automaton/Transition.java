@@ -45,7 +45,7 @@ public class Transition {
 
   @Override
   public String toString() {
-    return source + " --> " + dest + " " + (char) min + "-" + (char) max;
+    return source + " --> " + dest + ' ' + (char) min + '-' + (char) max;
   }
 }
 

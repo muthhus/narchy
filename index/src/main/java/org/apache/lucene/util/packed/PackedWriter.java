@@ -55,7 +55,7 @@ final class PackedWriter extends PackedInts.Writer {
   }
 
   @Override
-  public void add(long v) throws IOException {
+  public void add(long v) throws IOException, EOFException {
     assert PackedInts.unsignedBitsRequired(v) <= bitsPerValue;
     assert !finished;
     if (valueCount != -1 && written >= valueCount) {

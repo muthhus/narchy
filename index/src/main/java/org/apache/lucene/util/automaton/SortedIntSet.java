@@ -106,7 +106,7 @@ final class SortedIntSet {
         map.put(num, count-1);
       }
       // Fall back to simple arrays once we touch zero again
-      if (map.size() == 0) {
+      if (map.isEmpty()) {
         useTreeMap = false;
         upto = 0;
       }

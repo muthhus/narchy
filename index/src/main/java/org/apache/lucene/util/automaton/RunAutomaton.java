@@ -64,13 +64,13 @@ public abstract class RunAutomaton {
           int max;
           if (j + 1 < points.length) max = (points[j + 1] - 1);
           else max = maxInterval;
-          b.append(" ");
+          b.append(' ');
           Automaton.appendCharString(min, b);
           if (min != max) {
-            b.append("-");
+            b.append('-');
             Automaton.appendCharString(max, b);
           }
-          b.append(" -> ").append(k).append("\n");
+          b.append(" -> ").append(k).append('\n');
         }
       }
     }
@@ -195,7 +195,6 @@ public abstract class RunAutomaton {
     if (size != other.size) return false;
     if (!Arrays.equals(points, other.points)) return false;
     if (!Arrays.equals(accept, other.accept)) return false;
-    if (!Arrays.equals(transitions, other.transitions)) return false;
-    return true;
+      return Arrays.equals(transitions, other.transitions);
   }
 }

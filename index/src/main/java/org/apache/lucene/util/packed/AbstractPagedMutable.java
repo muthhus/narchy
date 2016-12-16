@@ -159,7 +159,7 @@ abstract class AbstractPagedMutable<T extends AbstractPagedMutable<T>> extends L
 
   @Override
   public final String toString() {
-    return getClass().getSimpleName() + "(size=" + size() + ",pageSize=" + pageSize() + ")";
+    return getClass().getSimpleName() + "(size=" + size() + ",pageSize=" + pageSize() + ')';
   }
 
 }

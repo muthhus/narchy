@@ -47,9 +47,9 @@ public class CompiledAutomaton {
     SINGLE, 
     /** Catch-all for any other automata. */
     NORMAL
-  };
+  }
 
-  /** If simplify is true this will be the "simplified" type; else, this is NORMAL */
+    /** If simplify is true this will be the "simplified" type; else, this is NORMAL */
   public final AUTOMATON_TYPE type;
 
   /** 
@@ -402,7 +402,7 @@ public class CompiledAutomaton {
                 return output.get();
               }
               // pop
-              if (stack.size() == 0) {
+              if (stack.isEmpty()) {
                 //if (DEBUG) System.out.println("  pop ord=" + idx + " return null");
                 return null;
               } else {

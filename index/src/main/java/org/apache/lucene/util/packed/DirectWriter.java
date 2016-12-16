@@ -67,7 +67,7 @@ public final class DirectWriter {
   }
   
   /** Adds a value to this writer */
-  public void add(long l) throws IOException {
+  public void add(long l) throws IOException, EOFException {
     assert bitsPerValue == 64 || (l >= 0 && l <= PackedInts.maxValue(bitsPerValue)) : bitsPerValue;
     assert !finished;
     if (count >= numValues) {
@@ -151,7 +151,7 @@ public final class DirectWriter {
     return roundBits(PackedInts.unsignedBitsRequired(maxValue));
   }
 
-  final static int SUPPORTED_BITS_PER_VALUE[] = new int[] {
+  final static int SUPPORTED_BITS_PER_VALUE[] = {
     1, 2, 4, 8, 12, 16, 20, 24, 28, 32, 40, 48, 56, 64
   };
 }

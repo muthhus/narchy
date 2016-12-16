@@ -74,9 +74,9 @@ public class PackedInts {
    */
   public static void checkVersion(int version) {
     if (version < VERSION_START) {
-      throw new IllegalArgumentException("Version is too old, should be at least " + VERSION_START + " (got " + version + ")");
+      throw new IllegalArgumentException("Version is too old, should be at least " + VERSION_START + " (got " + version + ')');
     } else if (version > VERSION_CURRENT) {
-      throw new IllegalArgumentException("Version is too new, should be at most " + VERSION_CURRENT + " (got " + version + ")");
+      throw new IllegalArgumentException("Version is too new, should be at most " + VERSION_CURRENT + " (got " + version + ')');
     }
   }
 
@@ -144,7 +144,7 @@ public class PackedInts {
       this.id = id;
     }
 
-    public int id;
+    public final int id;
 
     /**
      * Returns the ID of the format.
@@ -216,7 +216,7 @@ public class PackedInts {
 
     @Override
     public String toString() {
-      return "FormatAndBits(format=" + format + " bitsPerValue=" + bitsPerValue + ")";
+      return "FormatAndBits(format=" + format + " bitsPerValue=" + bitsPerValue + ')';
     }
   }
 
@@ -457,7 +457,7 @@ public class PackedInts {
      * the actual number of values that have been read.
      */
     public int get(int index, long[] arr, int off, int len) {
-      assert len > 0 : "len must be > 0 (got " + len + ")";
+      assert len > 0 : "len must be > 0 (got " + len + ')';
       assert index >= 0 && index < size();
       assert off + len <= arr.length;
 
@@ -552,7 +552,7 @@ public class PackedInts {
      * set.
      */
     public int set(int index, long[] arr, int off, int len) {
-      assert len > 0 : "len must be > 0 (got " + len + ")";
+      assert len > 0 : "len must be > 0 (got " + len + ')';
       assert index >= 0 && index < size();
       len = Math.min(len, size() - index);
       assert off + len <= arr.length;
@@ -646,7 +646,7 @@ public class PackedInts {
 
     @Override
     public String toString() {
-      return getClass().getSimpleName() + "(valueCount=" + valueCount + ",bitsPerValue=" + bitsPerValue + ")";
+      return getClass().getSimpleName() + "(valueCount=" + valueCount + ",bitsPerValue=" + bitsPerValue + ')';
     }
   }
 
@@ -667,7 +667,7 @@ public class PackedInts {
 
     @Override
     public int get(int index, long[] arr, int off, int len) {
-      assert len > 0 : "len must be > 0 (got " + len + ")";
+      assert len > 0 : "len must be > 0 (got " + len + ')';
       assert index >= 0 && index < valueCount;
       len = Math.min(len, valueCount - index);
       Arrays.fill(arr, off, off + len, 0);
@@ -1076,7 +1076,7 @@ public class PackedInts {
    */
   public static int bitsRequired(long maxValue) {
     if (maxValue < 0) {
-      throw new IllegalArgumentException("maxValue must be non-negative (got: " + maxValue + ")");
+      throw new IllegalArgumentException("maxValue must be non-negative (got: " + maxValue + ')');
     }
     return unsignedBitsRequired(maxValue);
   }

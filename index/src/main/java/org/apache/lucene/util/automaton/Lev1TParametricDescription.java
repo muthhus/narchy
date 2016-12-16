@@ -72,34 +72,34 @@ class Lev1TParametricDescription extends ParametricDescription {
   }
     
   // 1 vectors; 2 states per vector; array length = 2
-  private final static long[] toStates0 = new long[] /*2 bits per value */ {
+  private final static long[] toStates0 = {
     0x2L
   };
-  private final static long[] offsetIncrs0 = new long[] /*1 bits per value */ {
+  private final static long[] offsetIncrs0 = {
     0x0L
   };
     
   // 2 vectors; 3 states per vector; array length = 6
-  private final static long[] toStates1 = new long[] /*2 bits per value */ {
+  private final static long[] toStates1 = {
     0xa43L
   };
-  private final static long[] offsetIncrs1 = new long[] /*1 bits per value */ {
+  private final static long[] offsetIncrs1 = {
     0x38L
   };
     
   // 4 vectors; 6 states per vector; array length = 24
-  private final static long[] toStates2 = new long[] /*3 bits per value */ {
+  private final static long[] toStates2 = {
     0x3453491482140003L,0x6dL
   };
-  private final static long[] offsetIncrs2 = new long[] /*2 bits per value */ {
+  private final static long[] offsetIncrs2 = {
     0x555555a20000L
   };
     
   // 8 vectors; 6 states per vector; array length = 48
-  private final static long[] toStates3 = new long[] /*3 bits per value */ {
+  private final static long[] toStates3 = {
     0x21520854900c0003L,0x5b4d19a24534916dL,0xda34L
   };
-  private final static long[] offsetIncrs3 = new long[] /*2 bits per value */ {
+  private final static long[] offsetIncrs3 = {
     0x5555ae0a20fc0000L,0x55555555L
   };
   

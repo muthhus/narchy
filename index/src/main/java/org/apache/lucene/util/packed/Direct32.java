@@ -74,7 +74,7 @@ final class Direct32 extends PackedInts.MutableImpl {
 
   @Override
   public int get(int index, long[] arr, int off, int len) {
-    assert len > 0 : "len must be > 0 (got " + len + ")";
+    assert len > 0 : "len must be > 0 (got " + len + ')';
     assert index >= 0 && index < valueCount;
     assert off + len <= arr.length;
 
@@ -87,7 +87,7 @@ final class Direct32 extends PackedInts.MutableImpl {
 
   @Override
   public int set(int index, long[] arr, int off, int len) {
-    assert len > 0 : "len must be > 0 (got " + len + ")";
+    assert len > 0 : "len must be > 0 (got " + len + ')';
     assert index >= 0 && index < valueCount;
     assert off + len <= arr.length;
 

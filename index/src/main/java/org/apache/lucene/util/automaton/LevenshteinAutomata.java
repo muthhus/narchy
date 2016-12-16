@@ -44,7 +44,7 @@ public class LevenshteinAutomata {
   /* the ranges outside of alphabet */
   final int rangeLower[];
   final int rangeUpper[];
-  int numRanges = 0;
+  int numRanges;
   
   ParametricDescription descriptions[]; 
   
@@ -254,9 +254,9 @@ public class LevenshteinAutomata {
      */
     int size() {
       return minErrors.length * (w+1);
-    };
+    }
 
-    /**
+      /**
      * Returns true if the <code>state</code> in any Levenshtein DFA is an accept state (final state).
      */
     boolean isAccept(int absState) {
@@ -281,7 +281,7 @@ public class LevenshteinAutomata {
      */
     abstract int transition(int state, int position, int vector);
 
-    private final static long[] MASKS = new long[] {0x1,0x3,0x7,0xf,
+    private final static long[] MASKS = {0x1,0x3,0x7,0xf,
                                                     0x1f,0x3f,0x7f,0xff,
                                                     0x1ff,0x3ff,0x7ff,0xfff,
                                                     0x1fff,0x3fff,0x7fff,0xffff,
@@ -298,7 +298,7 @@ public class LevenshteinAutomata {
                                                     0x1ffffffffffffffL,0x3ffffffffffffffL,0x7ffffffffffffffL,0xfffffffffffffffL,
                                                     0x1fffffffffffffffL,0x3fffffffffffffffL,0x7fffffffffffffffL};
   
-    protected int unpack(long[] data, int index, int bitsPerValue) {
+    protected static int unpack(long[] data, int index, int bitsPerValue) {
       final long bitLoc = bitsPerValue * index;
       final int dataLoc = (int) (bitLoc >> 6);
       final int bitStart = (int) (bitLoc & 63);

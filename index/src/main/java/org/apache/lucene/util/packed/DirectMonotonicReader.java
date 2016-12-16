@@ -92,7 +92,7 @@ public final class DirectMonotonicReader {
   /**
    * Retrieves an instance from the specified slice.
    */
-  public static LongValues getInstance(Meta meta, RandomAccessInput data) throws IOException {
+  public static LongValues getInstance(Meta meta, RandomAccessInput data) {
     final LongValues[] readers = new LongValues[meta.numBlocks];
     for (int i = 0; i < meta.mins.length; ++i) {
       if (meta.bpvs[i] == 0) {

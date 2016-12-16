@@ -48,7 +48,7 @@ final class PackedReaderIterator extends PackedInts.ReaderIteratorImpl {
   }
 
   @Override
-  public LongsRef next(int count) throws IOException {
+  public LongsRef next(int count) throws IOException, EOFException {
     assert nextValues.length >= 0;
     assert count > 0;
     assert nextValues.offset + nextValues.length <= nextValues.longs.length;

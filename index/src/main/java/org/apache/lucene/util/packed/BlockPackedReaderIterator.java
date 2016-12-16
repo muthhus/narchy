@@ -102,7 +102,7 @@ public final class BlockPackedReaderIterator {
   }
 
   /** Skip exactly <code>count</code> values. */
-  public void skip(long count) throws IOException {
+  public void skip(long count) throws IOException, EOFException {
     assert count >= 0;
     if (ord + count > valueCount || ord + count < 0) {
       throw new EOFException();
@@ -162,7 +162,7 @@ public final class BlockPackedReaderIterator {
   }
 
   /** Read the next value. */
-  public long next() throws IOException {
+  public long next() throws IOException, EOFException {
     if (ord == valueCount) {
       throw new EOFException();
     }
@@ -175,7 +175,7 @@ public final class BlockPackedReaderIterator {
   }
 
   /** Read between <tt>1</tt> and <code>count</code> values. */
-  public LongsRef next(int count) throws IOException {
+  public LongsRef next(int count) throws IOException, EOFException {
     assert count > 0;
     if (ord == valueCount) {
       throw new EOFException();
