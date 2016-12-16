@@ -16,17 +16,17 @@
  */
 package org.apache.lucene.queries.function;
 
-import java.io.IOException;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
-
 import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.Explanation;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.Weight;
+
+import java.io.IOException;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 
 /**
  * A Query wrapping a {@link ValueSource} that matches docs in which the values in the value source match a configured

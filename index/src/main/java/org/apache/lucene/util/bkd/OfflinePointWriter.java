@@ -136,6 +136,6 @@ public final class OfflinePointWriter implements PointWriter {
 
   @Override
   public String toString() {
-    return "OfflinePointWriter(count=" + count + " tempFileName=" + name + ")";
+    return "OfflinePointWriter(count=" + count + " tempFileName=" + name + ')';
   }
 }

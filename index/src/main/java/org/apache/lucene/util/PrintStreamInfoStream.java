@@ -46,7 +46,7 @@ public class PrintStreamInfoStream extends InfoStream {
   
   @Override
   public void message(String component, String message) {
-    stream.println(component + " " + messageID + " [" + getTimestamp() + "; " + Thread.currentThread().getName() + "]: " + message);    
+    stream.println(component + ' ' + messageID + " [" + getTimestamp() + "; " + Thread.currentThread().getName() + "]: " + message);
   }
 
   @Override

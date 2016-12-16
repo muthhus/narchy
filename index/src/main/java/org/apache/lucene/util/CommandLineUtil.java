@@ -99,8 +99,8 @@ public final class CommandLineUtil {
           + " implementation must not be null or empty");
     }
     
-    if (clazzName.indexOf(".") == -1) {// if not fully qualified, assume .store
-      clazzName = Directory.class.getPackage().getName() + "." + clazzName;
+    if (!clazzName.contains(".")) {// if not fully qualified, assume .store
+      clazzName = Directory.class.getPackage().getName() + '.' + clazzName;
     }
     return clazzName;
   }
@@ -131,8 +131,8 @@ public final class CommandLineUtil {
    * @throws IllegalAccessException If the constructor does not have public visibility.
    * @throws InvocationTargetException If the constructor throws an exception
    */
-  public static FSDirectory newFSDirectory(Class<? extends FSDirectory> clazz, Path path, LockFactory lf) 
-      throws ReflectiveOperationException {
+  public static FSDirectory newFSDirectory(Class<? extends FSDirectory> clazz, Path path, LockFactory lf)
+          throws NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
     // Assuming every FSDirectory has a ctor(Path):
     Constructor<? extends FSDirectory> ctor = clazz.getConstructor(Path.class, LockFactory.class);
     return ctor.newInstance(path, lf);

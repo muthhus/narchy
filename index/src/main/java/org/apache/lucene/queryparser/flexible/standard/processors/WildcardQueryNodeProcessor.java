@@ -16,10 +16,6 @@
  */
 package org.apache.lucene.queryparser.flexible.standard.processors;
 
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.queryparser.flexible.core.QueryNodeException;
 import org.apache.lucene.queryparser.flexible.core.nodes.FieldQueryNode;
@@ -35,6 +31,10 @@ import org.apache.lucene.queryparser.flexible.standard.nodes.WildcardQueryNode;
 import org.apache.lucene.queryparser.flexible.standard.parser.StandardSyntaxParser;
 import org.apache.lucene.search.PrefixQuery;
 import org.apache.lucene.util.BytesRef;
+
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * The {@link StandardSyntaxParser} creates {@link PrefixWildcardQueryNode} nodes which

@@ -16,12 +16,12 @@
  */
 package org.apache.lucene.queryparser.flexible.core.nodes;
 
-import java.util.List;
-
-import org.apache.lucene.queryparser.flexible.messages.MessageImpl;
 import org.apache.lucene.queryparser.flexible.core.QueryNodeError;
 import org.apache.lucene.queryparser.flexible.core.messages.QueryParserMessages;
 import org.apache.lucene.queryparser.flexible.core.parser.EscapeQuerySyntax;
+import org.apache.lucene.queryparser.flexible.messages.MessageImpl;
+
+import java.util.List;
 
 /**
  * A {@link BoostQueryNode} boosts the QueryNode tree which is under this node.

@@ -21,7 +21,7 @@ import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.util.Bits;
 
 import java.io.IOException;
-import java.util.List;
+import java.util.Collection;
 import java.util.concurrent.ExecutorService;
 
 /**
@@ -43,7 +43,7 @@ public class ScorerIndexSearcher extends IndexSearcher {
   }
 
   @Override
-  protected void search(List<LeafReaderContext> leaves, Weight weight, Collector collector) throws IOException {
+  protected void search(Collection<LeafReaderContext> leaves, Weight weight, Collector collector) throws IOException {
     for (LeafReaderContext ctx : leaves) { // search each subreader
       // we force the use of Scorer (not BulkScorer) to make sure
       // that the scorer passed to LeafCollector.setScorer supports

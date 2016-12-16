@@ -16,14 +16,14 @@
  */
 package org.apache.lucene.facet.taxonomy;
 
-import java.io.IOException;
-import java.util.Map;
-
 import org.apache.lucene.facet.FacetResult;
 import org.apache.lucene.facet.FacetsConfig;
 import org.apache.lucene.facet.FacetsConfig.DimConfig;
 import org.apache.lucene.facet.LabelAndValue;
 import org.apache.lucene.facet.TopOrdAndFloatQueue;
+
+import java.io.IOException;
+import java.util.Map;
 
 /** Base class for all taxonomy-based facets that aggregate
  *  to a per-ords float[]. */

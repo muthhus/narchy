@@ -73,6 +73,8 @@ public final class IOUtils {
         if (object != null) {
           object.close();
         }
+      } catch (IOException e) {
+          e.printStackTrace();
       } catch (Throwable t) {
         addSuppressed(th, t);
         if (th == null) {
@@ -105,7 +107,9 @@ public final class IOUtils {
         if (object != null) {
           object.close();
         }
-      } catch (Throwable t) {
+      } catch (IOException e) {
+          e.printStackTrace();
+      } catch (Throwable ignored) {
       }
     }
   }
@@ -179,6 +183,8 @@ public final class IOUtils {
     for(String name : files) {
       try {
         dir.deleteFile(name);
+      } catch (IOException e) {
+          e.printStackTrace();
       } catch (Throwable ignored) {
         // ignore
       }
@@ -205,6 +211,8 @@ public final class IOUtils {
       if (name != null) {
         try {
           dir.deleteFile(name);
+        } catch (IOException e) {
+            e.printStackTrace();
         } catch (Throwable t) {
           addSuppressed(th, t);
           if (th == null) {
@@ -240,6 +248,8 @@ public final class IOUtils {
       if (name != null) {
         try {
           Files.delete(name);
+        } catch (IOException e) {
+            e.printStackTrace();
         } catch (Throwable ignored) {
           // ignore
         }
@@ -277,6 +287,8 @@ public final class IOUtils {
         if (file != null) {
           Files.deleteIfExists(file);
         }
+      } catch (IOException e) {
+          e.printStackTrace();
       } catch (Throwable t) {
         addSuppressed(th, t);
         if (th == null) {
@@ -295,7 +307,7 @@ public final class IOUtils {
    * of directories) cannot be removed.
    */
   public static void rm(Path... locations) throws IOException {
-    LinkedHashMap<Path,Throwable> unremoved = rm(new LinkedHashMap<Path,Throwable>(), locations);
+    LinkedHashMap<Path,Throwable> unremoved = rm(new LinkedHashMap<>(), locations);
     if (!unremoved.isEmpty()) {
       StringBuilder b = new StringBuilder("Could not remove the following files (in the order of attempts):\n");
       for (Map.Entry<Path,Throwable> kv : unremoved.entrySet()) {
@@ -303,7 +315,7 @@ public final class IOUtils {
          .append(kv.getKey().toAbsolutePath())
          .append(": ")
          .append(kv.getValue())
-         .append("\n");
+         .append('\n');
       }
       throw new IOException(b.toString());
     }
@@ -315,41 +327,41 @@ public final class IOUtils {
         // TODO: remove this leniency!
         if (location != null && Files.exists(location)) {
           try {
-            Files.walkFileTree(location, new FileVisitor<Path>() {            
-              @Override
-              public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
-                return FileVisitResult.CONTINUE;
-              }
-              
-              @Override
-              public FileVisitResult postVisitDirectory(Path dir, IOException impossible) throws IOException {
-                assert impossible == null;
-                
-                try {
-                  Files.delete(dir);
-                } catch (IOException e) {
-                  unremoved.put(dir, e);
+            Files.walkFileTree(location, new FileVisitor<>() {
+                @Override
+                public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) {
+                    return FileVisitResult.CONTINUE;
                 }
-                return FileVisitResult.CONTINUE;
-              }
-              
-              @Override
-              public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-                try {
-                  Files.delete(file);
-                } catch (IOException exc) {
-                  unremoved.put(file, exc);
+
+                @Override
+                public FileVisitResult postVisitDirectory(Path dir, IOException impossible) {
+                    assert impossible == null;
+
+                    try {
+                        Files.delete(dir);
+                    } catch (IOException e) {
+                        unremoved.put(dir, e);
+                    }
+                    return FileVisitResult.CONTINUE;
                 }
-                return FileVisitResult.CONTINUE;
-              }
-              
-              @Override
-              public FileVisitResult visitFileFailed(Path file, IOException exc) throws IOException {
-                if (exc != null) {
-                  unremoved.put(file, exc);
+
+                @Override
+                public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
+                    try {
+                        Files.delete(file);
+                    } catch (IOException exc) {
+                        unremoved.put(file, exc);
+                    }
+                    return FileVisitResult.CONTINUE;
                 }
-                return FileVisitResult.CONTINUE;
-              }
+
+                @Override
+                public FileVisitResult visitFileFailed(Path file, IOException exc) {
+                    if (exc != null) {
+                        unremoved.put(file, exc);
+                    }
+                    return FileVisitResult.CONTINUE;
+                }
             });
           } catch (IOException impossible) {
             throw new AssertionError("visitor threw exception", impossible);
@@ -459,10 +471,13 @@ public final class IOUtils {
 
     try {
       return spinsLinux(path);
-    } catch (Exception exc) {
+    } catch (IOException e) {
+        e.printStackTrace();
+    } catch (Exception ignored) {
       // our crazy heuristics can easily trigger SecurityException, AIOOBE, etc ...
-      return true;
+
     }
+    return true;
   }
   
   // following methods are package-private for testing ONLY

@@ -16,8 +16,6 @@
  */
 package org.apache.lucene.queryparser.flexible.standard.processors;
 
-import java.util.List;
-
 import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 import org.apache.lucene.queryparser.flexible.core.processors.QueryNodeProcessorImpl;
 import org.apache.lucene.queryparser.flexible.standard.config.StandardQueryConfigHandler.ConfigurationKeys;
@@ -25,6 +23,8 @@ import org.apache.lucene.queryparser.flexible.standard.nodes.AbstractRangeQueryN
 import org.apache.lucene.queryparser.flexible.standard.nodes.RegexpQueryNode;
 import org.apache.lucene.queryparser.flexible.standard.nodes.WildcardQueryNode;
 import org.apache.lucene.search.MultiTermQuery;
+
+import java.util.List;
 
 /**
  * This processor instates the default

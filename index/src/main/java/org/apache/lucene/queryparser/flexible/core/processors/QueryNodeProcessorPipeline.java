@@ -16,11 +16,11 @@
  */
 package org.apache.lucene.queryparser.flexible.core.processors;
 
-import java.util.*;
-
 import org.apache.lucene.queryparser.flexible.core.QueryNodeException;
 import org.apache.lucene.queryparser.flexible.core.config.QueryConfigHandler;
 import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
+
+import java.util.*;
 
 /**
  * A {@link QueryNodeProcessorPipeline} class should be used to build a query

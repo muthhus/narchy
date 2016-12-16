@@ -16,13 +16,6 @@
  */
 package org.apache.lucene.facet.taxonomy;
 
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.concurrent.atomic.AtomicBoolean;
-
 import org.apache.lucene.facet.FacetTestCase;
 import org.apache.lucene.facet.SlowRAMDirectory;
 import org.apache.lucene.facet.taxonomy.directory.DirectoryTaxonomyReader;
@@ -30,6 +23,13 @@ import org.apache.lucene.facet.taxonomy.directory.DirectoryTaxonomyWriter;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.util.LuceneTestCase.SuppressCodecs;
 import org.junit.Test;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 @SuppressCodecs("SimpleText")
 public class TestTaxonomyCombined extends FacetTestCase {

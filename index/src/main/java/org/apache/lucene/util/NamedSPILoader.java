@@ -27,7 +27,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public final class NamedSPILoader<S extends NamedSPILoader.NamedSPI> implements Iterable<S> {
 
-    private final Map<String, S> services = new ConcurrentHashMap<String, S>();
+    private final Map<String, S> services = new ConcurrentHashMap<>();
     private final Class<S> clazz;
 
     public NamedSPILoader(Class<S> clazz) {
@@ -69,13 +69,15 @@ public final class NamedSPILoader<S extends NamedSPILoader.NamedSPI> implements 
                 // only add the first one for each name, later services will be ignored
                 // this allows to place services before others in classpath to make
                 // them used instead of others
-                services.put(service.getName(), (S)c.newInstance());
+                services.put(service.getName(), c.newInstance());
 
 //                services.computeIfAbsent(name, (n) -> {
 //                    checkServiceName(n);
 //                    return service;
 //                });
 
+            } catch (InstantiationException e) {
+                e.printStackTrace();
             } catch (Exception e) {
                 throw new ServiceConfigurationError("Cannot instantiate SPI class: " + c.getName(), e);
             }
@@ -86,6 +88,8 @@ public final class NamedSPILoader<S extends NamedSPILoader.NamedSPI> implements 
     public void register(Class<? extends S> c) {
         try {
             register(c.newInstance());
+        } catch (InstantiationException e) {
+            e.printStackTrace();
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }

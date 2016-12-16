@@ -16,12 +16,12 @@
  */
 package org.apache.lucene.facet.taxonomy;
 
+import org.apache.lucene.store.AlreadyClosedException;
+
 import java.io.Closeable;
 import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
-
-import org.apache.lucene.store.AlreadyClosedException;
 
 /**
  * TaxonomyReader is the read-only interface with which the faceted-search

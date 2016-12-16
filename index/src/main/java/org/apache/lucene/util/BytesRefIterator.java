@@ -38,11 +38,5 @@ public interface BytesRefIterator {
   public BytesRef next() throws IOException;
   
   /** Singleton BytesRefIterator that iterates over 0 BytesRefs. */
-  public static final BytesRefIterator EMPTY = new BytesRefIterator() {
-
-    @Override
-    public BytesRef next() {
-      return null;
-    }
-  };
+  public static final BytesRefIterator EMPTY = () -> null;
 }

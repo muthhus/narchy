@@ -16,18 +16,18 @@
  */
 package org.apache.lucene.queryparser.flexible.standard.builders;
 
-import java.util.List;
-
-import org.apache.lucene.queryparser.flexible.messages.MessageImpl;
 import org.apache.lucene.queryparser.flexible.core.QueryNodeException;
 import org.apache.lucene.queryparser.flexible.core.builders.QueryTreeBuilder;
 import org.apache.lucene.queryparser.flexible.core.messages.QueryParserMessages;
 import org.apache.lucene.queryparser.flexible.core.nodes.AnyQueryNode;
 import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
+import org.apache.lucene.queryparser.flexible.messages.MessageImpl;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
-import org.apache.lucene.search.Query;
 import org.apache.lucene.search.BooleanQuery.TooManyClauses;
+import org.apache.lucene.search.Query;
+
+import java.util.List;
 
 /**
  * Builds a BooleanQuery of SHOULD clauses, possibly with

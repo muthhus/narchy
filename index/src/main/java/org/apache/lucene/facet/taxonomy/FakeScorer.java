@@ -16,10 +16,10 @@
  */
 package org.apache.lucene.facet.taxonomy;
 
-import java.io.IOException;
-
 import org.apache.lucene.search.DocIdSetIterator;
 import org.apache.lucene.search.Scorer;
+
+import java.io.IOException;
 
 class FakeScorer extends Scorer {
 

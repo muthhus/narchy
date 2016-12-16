@@ -74,7 +74,7 @@ public final class Constants {
       if (datamodel != null) {
         is64Bit = datamodel.contains("64");
       }
-    } catch (SecurityException ex) {}
+    } catch (SecurityException ignored) {}
     if (datamodel == null) {
       if (OS_ARCH != null && OS_ARCH.contains("64")) {
         is64Bit = true;

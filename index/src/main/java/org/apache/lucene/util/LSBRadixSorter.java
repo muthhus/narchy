@@ -17,6 +17,8 @@
 package org.apache.lucene.util;
 
 
+import org.apache.commons.lang3.ArrayUtils;
+
 import java.util.Arrays;
 
 /**
@@ -29,7 +31,7 @@ public final class LSBRadixSorter {
   private static final int HISTOGRAM_SIZE = 256;
 
   private final int[] histogram = new int[HISTOGRAM_SIZE];
-  private int[] buffer = new int[0];
+  private int[] buffer = ArrayUtils.EMPTY_INT_ARRAY;
 
   private static void buildHistogram(int[] array, int len, int[] histogram, int shift) {
     for (int i = 0; i < len; ++i) {

@@ -16,21 +16,17 @@
  */
 package org.apache.lucene.replicator;
 
-import java.io.InputStream;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.lucene.document.Document;
-import org.apache.lucene.index.IndexFileNames;
-import org.apache.lucene.index.IndexWriter;
-import org.apache.lucene.index.IndexWriterConfig;
-import org.apache.lucene.index.KeepOnlyLastCommitDeletionPolicy;
-import org.apache.lucene.index.SnapshotDeletionPolicy;
+import org.apache.lucene.index.*;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.IOContext;
 import org.apache.lucene.store.IndexInput;
 import org.apache.lucene.util.IOUtils;
 import org.junit.Test;
+
+import java.io.InputStream;
+import java.util.List;
+import java.util.Map;
 
 public class IndexRevisionTest extends ReplicatorTestCase {
   

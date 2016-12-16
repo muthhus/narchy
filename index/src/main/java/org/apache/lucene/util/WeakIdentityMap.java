@@ -165,54 +165,55 @@ public final class WeakIdentityMap<K,V> {
     final Iterator<IdentityWeakReference> iterator = backingStore.keySet().iterator();
     // IMPORTANT: Don't use oal.util.FilterIterator here:
     // We need *strong* reference to current key after setNext()!!!
-    return new Iterator<K>() {
-      // holds strong reference to next element in backing iterator:
-      private Object next = null;
-      // the backing iterator was already consumed:
-      private boolean nextIsSet = false;
-    
-      @Override
-      public boolean hasNext() {
-        return nextIsSet || setNext();
-      }
-      
-      @Override @SuppressWarnings("unchecked")
-      public K next() {
-        if (!hasNext()) {
-          throw new NoSuchElementException();
+    return new Iterator<>() {
+        // holds strong reference to next element in backing iterator:
+        private Object next = null;
+        // the backing iterator was already consumed:
+        private boolean nextIsSet = false;
+
+        @Override
+        public boolean hasNext() {
+            return nextIsSet || setNext();
         }
-        assert nextIsSet;
-        try {
-          return (K) next;
-        } finally {
-           // release strong reference and invalidate current value:
-          nextIsSet = false;
-          next = null;
-        }
-      }
-      
-      @Override
-      public void remove() {
-        throw new UnsupportedOperationException();
-      }
-      
-      private boolean setNext() {
-        assert !nextIsSet;
-        while (iterator.hasNext()) {
-          next = iterator.next().get();
-          if (next == null) {
-            // the key was already GCed, we can remove it from backing map:
-            iterator.remove();
-          } else {
-            // unfold "null" special value:
-            if (next == NULL) {
-              next = null;
+
+        @Override
+        @SuppressWarnings("unchecked")
+        public K next() {
+            if (!hasNext()) {
+                throw new NoSuchElementException();
             }
-            return nextIsSet = true;
-          }
+            assert nextIsSet;
+            try {
+                return (K) next;
+            } finally {
+                // release strong reference and invalidate current value:
+                nextIsSet = false;
+                next = null;
+            }
         }
-        return false;
-      }
+
+        @Override
+        public void remove() {
+            throw new UnsupportedOperationException();
+        }
+
+        private boolean setNext() {
+            assert !nextIsSet;
+            while (iterator.hasNext()) {
+                next = iterator.next().get();
+                if (next == null) {
+                    // the key was already GCed, we can remove it from backing map:
+                    iterator.remove();
+                } else {
+                    // unfold "null" special value:
+                    if (next == NULL) {
+                        next = null;
+                    }
+                    return nextIsSet = true;
+                }
+            }
+            return false;
+        }
     };
   }
   

@@ -17,12 +17,12 @@
 
 package org.apache.lucene.replicator.nrt;
 
+import org.apache.lucene.document.Document;
+
 import java.io.Closeable;
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.ReentrantLock;
-
-import org.apache.lucene.document.Document;
 
 /** Parent JVM hold this "wrapper" to refer to each child JVM.  This is roughly equivalent e.g. to a client-side "sugar" API. */
 class NodeProcess implements Closeable {

@@ -16,15 +16,11 @@
  */
 package org.apache.lucene.queryparser.flexible.standard.nodes;
 
-import java.util.ArrayList;
-
-import org.apache.lucene.queryparser.flexible.core.nodes.FieldValuePairQueryNode;
-import org.apache.lucene.queryparser.flexible.core.nodes.FieldableNode;
-import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
-import org.apache.lucene.queryparser.flexible.core.nodes.QueryNodeImpl;
-import org.apache.lucene.queryparser.flexible.core.nodes.RangeQueryNode;
+import org.apache.lucene.queryparser.flexible.core.nodes.*;
 import org.apache.lucene.queryparser.flexible.core.parser.EscapeQuerySyntax;
 import org.apache.lucene.queryparser.flexible.core.util.StringUtils;
+
+import java.util.ArrayList;
 
 /**
  * This class should be extended by nodes intending to represent range queries.

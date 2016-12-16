@@ -16,15 +16,15 @@
  */
 package org.apache.lucene.facet.taxonomy;
 
-import java.io.IOException;
-import java.io.PrintStream;
-import java.nio.file.Paths;
-
 import org.apache.lucene.facet.taxonomy.TaxonomyReader.ChildrenIterator;
 import org.apache.lucene.facet.taxonomy.directory.DirectoryTaxonomyReader;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.util.SuppressForbidden;
+
+import java.io.IOException;
+import java.io.PrintStream;
+import java.nio.file.Paths;
 
 /** Prints how many ords are under each dimension. */
 

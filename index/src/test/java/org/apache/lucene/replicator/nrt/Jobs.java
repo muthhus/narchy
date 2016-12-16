@@ -17,11 +17,11 @@
 
 package org.apache.lucene.replicator.nrt;
 
+import org.apache.lucene.store.AlreadyClosedException;
+
 import java.io.Closeable;
 import java.io.IOException;
 import java.util.PriorityQueue;
-
-import org.apache.lucene.store.AlreadyClosedException;
 
 /** Runs CopyJob(s) in background thread; each ReplicaNode has an instance of this
  *  running.  At a given there could be one NRT copy job running, and multiple

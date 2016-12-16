@@ -16,10 +16,10 @@
  */
 package org.apache.lucene.replicator;
 
+import org.apache.lucene.store.IndexInput;
+
 import java.io.IOException;
 import java.io.InputStream;
-
-import org.apache.lucene.store.IndexInput;
 
 /** 
  * An {@link InputStream} which wraps an {@link IndexInput}.

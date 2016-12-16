@@ -16,14 +16,13 @@
  */
 package org.apache.lucene.queryparser.flexible.standard.config;
 
-import java.util.Map;
-
-import org.apache.lucene.document.DateTools;
 import org.apache.lucene.document.DateTools.Resolution;
-import org.apache.lucene.queryparser.flexible.standard.config.StandardQueryConfigHandler.ConfigurationKeys;
 import org.apache.lucene.queryparser.flexible.core.config.FieldConfig;
 import org.apache.lucene.queryparser.flexible.core.config.FieldConfigListener;
 import org.apache.lucene.queryparser.flexible.core.config.QueryConfigHandler;
+import org.apache.lucene.queryparser.flexible.standard.config.StandardQueryConfigHandler.ConfigurationKeys;
+
+import java.util.Map;
 
 /**
  * This listener listens for every field configuration request and assign a

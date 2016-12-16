@@ -16,6 +16,8 @@
  */
 package org.apache.lucene.replicator;
 
+import org.apache.lucene.store.AlreadyClosedException;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -23,8 +25,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
-
-import org.apache.lucene.store.AlreadyClosedException;
 
 /**
  * A {@link Replicator} implementation for use by the side that publishes

@@ -17,6 +17,10 @@
 
 package org.apache.lucene.facet.taxonomy.writercache;
 
+import org.apache.lucene.facet.FacetTestCase;
+import org.apache.lucene.facet.taxonomy.FacetLabel;
+import org.junit.Test;
+
 import java.nio.ByteBuffer;
 import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CodingErrorAction;
@@ -26,10 +30,6 @@ import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
-
-import org.apache.lucene.facet.FacetTestCase;
-import org.apache.lucene.facet.taxonomy.FacetLabel;
-import org.junit.Test;
 
 public class TestCompactLabelToOrdinal extends FacetTestCase {
 

@@ -15,11 +15,12 @@
  * limitations under the License.
  */
 package org.apache.lucene.queryparser.surround.query;
-import java.io.IOException;
-import java.util.Objects;
 
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.search.Query;
+
+import java.io.IOException;
+import java.util.Objects;
 
 abstract class RewriteQuery<SQ extends SrndQuery> extends Query {
   protected final SQ srndQuery;

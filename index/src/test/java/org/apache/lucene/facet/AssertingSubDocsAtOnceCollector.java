@@ -16,12 +16,12 @@
  */
 package org.apache.lucene.facet;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.lucene.search.Scorer;
 import org.apache.lucene.search.Scorer.ChildScorer;
 import org.apache.lucene.search.SimpleCollector;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /** Verifies in collect() that all child subScorers are on
  *  the collected doc. */

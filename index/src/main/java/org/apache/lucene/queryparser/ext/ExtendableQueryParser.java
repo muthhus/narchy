@@ -17,9 +17,9 @@
 package org.apache.lucene.queryparser.ext;
 
 import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.queryparser.ext.Extensions.Pair;
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.queryparser.classic.QueryParser;
+import org.apache.lucene.queryparser.ext.Extensions.Pair;
 import org.apache.lucene.search.Query;
 
 /**

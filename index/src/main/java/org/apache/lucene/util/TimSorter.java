@@ -47,7 +47,7 @@ public abstract class TimSorter extends Sorter {
   int minRun;
   int to;
   int stackSize;
-  int[] runEnds;
+  final int[] runEnds;
 
   /**
    * Create a new {@link TimSorter}.

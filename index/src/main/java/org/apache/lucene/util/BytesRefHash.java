@@ -17,8 +17,6 @@
 package org.apache.lucene.util;
 
 
-import org.apache.lucene.util.ByteBlockPool.*;
-
 import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -158,7 +156,7 @@ public final class BytesRefHash {
     final int[] compact = compact();
     new StringMSBRadixSorter() {
 
-      BytesRef scratch = new BytesRef();
+      final BytesRef scratch = new BytesRef();
 
       @Override
       protected void swap(int i, int j) {

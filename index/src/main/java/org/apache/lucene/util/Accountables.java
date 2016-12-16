@@ -73,14 +73,14 @@ public class Accountables {
    * will not be able to cast or manipulate the resource in any way.
    */
   public static Accountable namedAccountable(String description, Accountable in) {
-    return namedAccountable(description + " [" + in + "]", in.getChildResources(), in.ramBytesUsed());
+    return namedAccountable(description + " [" + in + ']', in.getChildResources(), in.ramBytesUsed());
   }
   
   /** 
    * Returns an accountable with the provided description and bytes.
    */
   public static Accountable namedAccountable(String description, long bytes) {
-    return namedAccountable(description, Collections.<Accountable>emptyList(), bytes);
+    return namedAccountable(description, Collections.emptyList(), bytes);
   }
   
   /** 
@@ -95,14 +95,9 @@ public class Accountables {
   public static Collection<Accountable> namedAccountables(String prefix, Map<?,? extends Accountable> in) {
     List<Accountable> resources = new ArrayList<>();
     for (Map.Entry<?,? extends Accountable> kv : in.entrySet()) {
-      resources.add(namedAccountable(prefix + " '" + kv.getKey() + "'", kv.getValue()));
+      resources.add(namedAccountable(prefix + " '" + kv.getKey() + '\'', kv.getValue()));
     }
-    Collections.sort(resources, new Comparator<Accountable>() {
-      @Override
-      public int compare(Accountable o1, Accountable o2) {
-        return o1.toString().compareTo(o2.toString());
-      }
-    });
+    resources.sort((o1, o2) -> o1.toString().compareTo(o2.toString()));
     return Collections.unmodifiableList(resources);
   }
   

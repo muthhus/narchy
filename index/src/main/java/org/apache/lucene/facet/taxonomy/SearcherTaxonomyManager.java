@@ -16,8 +16,6 @@
  */
 package org.apache.lucene.facet.taxonomy;
 
-import java.io.IOException;
-
 import org.apache.lucene.facet.taxonomy.directory.DirectoryTaxonomyReader;
 import org.apache.lucene.facet.taxonomy.directory.DirectoryTaxonomyWriter;
 import org.apache.lucene.index.DirectoryReader;
@@ -29,6 +27,8 @@ import org.apache.lucene.search.SearcherFactory;
 import org.apache.lucene.search.SearcherManager;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.util.IOUtils;
+
+import java.io.IOException;
 
 /**
  * Manages near-real-time reopen of both an IndexSearcher

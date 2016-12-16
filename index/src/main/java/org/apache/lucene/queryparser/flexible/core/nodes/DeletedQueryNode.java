@@ -17,7 +17,6 @@
 package org.apache.lucene.queryparser.flexible.core.nodes;
 
 import org.apache.lucene.queryparser.flexible.core.parser.EscapeQuerySyntax;
-
 import org.apache.lucene.queryparser.flexible.core.processors.RemoveDeletedQueryNodesProcessor;
 
 /**

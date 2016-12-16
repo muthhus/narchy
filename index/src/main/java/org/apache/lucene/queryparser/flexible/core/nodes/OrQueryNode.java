@@ -16,10 +16,10 @@
  */
 package org.apache.lucene.queryparser.flexible.core.nodes;
 
+import org.apache.lucene.queryparser.flexible.core.parser.EscapeQuerySyntax;
+
 import java.util.Iterator;
 import java.util.List;
-
-import org.apache.lucene.queryparser.flexible.core.parser.EscapeQuerySyntax;
 
 /**
  * A {@link OrQueryNode} represents an OR boolean operation performed on a list

@@ -16,24 +16,19 @@
  */
 package org.apache.lucene.facet.range;
 
-import java.io.IOException;
-import java.util.Collections;
-import java.util.List;
-
 import org.apache.lucene.facet.Facets;
-import org.apache.lucene.facet.FacetsCollector.MatchingDocs;
 import org.apache.lucene.facet.FacetsCollector;
+import org.apache.lucene.facet.FacetsCollector.MatchingDocs;
 import org.apache.lucene.index.IndexReaderContext;
 import org.apache.lucene.index.ReaderUtil;
 import org.apache.lucene.queries.function.FunctionValues;
 import org.apache.lucene.queries.function.ValueSource;
 import org.apache.lucene.queries.function.valuesource.LongFieldSource;
-import org.apache.lucene.search.DocIdSet;
-import org.apache.lucene.search.DocIdSetIterator;
-import org.apache.lucene.search.IndexSearcher;
-import org.apache.lucene.search.Query;
-import org.apache.lucene.search.Scorer;
-import org.apache.lucene.search.Weight;
+import org.apache.lucene.search.*;
+
+import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
 
 /** {@link Facets} implementation that computes counts for
  *  dynamic long ranges from a provided {@link ValueSource},

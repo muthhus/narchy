@@ -16,14 +16,14 @@
  */
 package org.apache.lucene.queryparser.flexible.standard.processors;
 
-import java.util.List;
-
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.queryparser.flexible.core.QueryNodeException;
 import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 import org.apache.lucene.queryparser.flexible.core.processors.QueryNodeProcessorImpl;
 import org.apache.lucene.queryparser.flexible.standard.config.StandardQueryConfigHandler.ConfigurationKeys;
 import org.apache.lucene.queryparser.flexible.standard.nodes.RegexpQueryNode;
+
+import java.util.List;
 
 /** Processor for Regexp queries. */
 public class RegexpQueryNodeProcessor extends QueryNodeProcessorImpl {

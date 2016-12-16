@@ -59,7 +59,7 @@ public class VirusCheckingFS extends FilterFileSystemProvider {
   }
 
   @Override
-  public void delete(Path path) throws IOException {
+  public void delete(Path path) throws IOException, AccessDeniedException {
 
     // Fake but deterministic and hopefully portable like-randomness:
     long hash = state.incrementAndGet() * path.getFileName().hashCode();
@@ -71,7 +71,7 @@ public class VirusCheckingFS extends FilterFileSystemProvider {
       /*if (LuceneTestCase.VERBOSE) {
         System.out.println("NOTE: VirusCheckingFS now refusing to delete " + path);
       }*/
-      throw new AccessDeniedException("VirusCheckingFS is randomly refusing to delete file \"" + path + "\"");
+      throw new AccessDeniedException("VirusCheckingFS is randomly refusing to delete file \"" + path + '"');
     }
     super.delete(path);
   }

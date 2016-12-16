@@ -151,7 +151,7 @@ public final class ArrayUtil {
     }
 
     if (minTargetSize > MAX_ARRAY_LENGTH) {
-      throw new IllegalArgumentException("requested array size " + minTargetSize + " exceeds maximum array in java (" + MAX_ARRAY_LENGTH + ")");
+      throw new IllegalArgumentException("requested array size " + minTargetSize + " exceeds maximum array in java (" + MAX_ARRAY_LENGTH + ')');
     }
 
     // asymptotic exponential growth by 1/8th, favors

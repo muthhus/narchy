@@ -16,12 +16,12 @@
  */
 package org.apache.lucene.queryparser.flexible.core.processors;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.lucene.queryparser.flexible.core.QueryNodeException;
 import org.apache.lucene.queryparser.flexible.core.config.QueryConfigHandler;
 import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * <p>

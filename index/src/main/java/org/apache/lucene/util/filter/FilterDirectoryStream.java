@@ -61,19 +61,21 @@ public class FilterDirectoryStream implements DirectoryStream<Path> {
   @Override
   public Iterator<Path> iterator() {
     final Iterator<Path> delegateIterator = delegate.iterator();
-    return new Iterator<Path>() {
-      @Override
-      public boolean hasNext() {
-        return delegateIterator.hasNext();
-      }
-      @Override
-      public Path next() {
-        return new FilterPath(delegateIterator.next(), fileSystem);
-      }
-      @Override
-      public void remove() {
-        delegateIterator.remove();
-      }
+    return new Iterator<>() {
+        @Override
+        public boolean hasNext() {
+            return delegateIterator.hasNext();
+        }
+
+        @Override
+        public Path next() {
+            return new FilterPath(delegateIterator.next(), fileSystem);
+        }
+
+        @Override
+        public void remove() {
+            delegateIterator.remove();
+        }
     };
   }
 }

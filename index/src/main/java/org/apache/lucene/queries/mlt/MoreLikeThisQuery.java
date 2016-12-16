@@ -25,8 +25,8 @@ import org.apache.lucene.search.Query;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.Arrays;
-import java.util.Set;
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * A simple wrapper for MoreLikeThis for use in scenarios where a Query object is required eg

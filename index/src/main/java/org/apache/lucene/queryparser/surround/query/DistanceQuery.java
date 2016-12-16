@@ -15,15 +15,16 @@
  * limitations under the License.
  */
 package org.apache.lucene.queryparser.surround.query;
-import java.util.List;
-import java.util.Iterator;
-import java.io.IOException;
 
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.search.MatchNoDocsQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.spans.SpanNearQuery;
 import org.apache.lucene.search.spans.SpanQuery;
+
+import java.io.IOException;
+import java.util.Iterator;
+import java.util.List;
 
 /** Factory for NEAR queries */
 public class DistanceQuery extends ComposedQuery implements DistanceSubQuery {

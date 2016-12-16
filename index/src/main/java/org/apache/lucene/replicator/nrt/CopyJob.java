@@ -17,17 +17,13 @@
 
 package org.apache.lucene.replicator.nrt;
 
-import java.io.IOException;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicLong;
-
 import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.util.IOUtils;
+
+import java.io.IOException;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicLong;
 
 /** Handles copying one set of files, e.g. all files for a new NRT point, or files for pre-copying a merged segment.
  *  This notifies the caller via OnceDone when the job finishes or failed.

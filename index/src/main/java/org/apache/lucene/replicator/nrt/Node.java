@@ -17,15 +17,6 @@
 
 package org.apache.lucene.replicator.nrt;
 
-import java.io.Closeable;
-import java.io.EOFException;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.PrintStream;
-import java.nio.file.NoSuchFileException;
-import java.util.Locale;
-import java.util.Map;
-
 import org.apache.lucene.codecs.CodecUtil;
 import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.index.DirectoryReader;
@@ -35,6 +26,11 @@ import org.apache.lucene.search.SearcherFactory;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.IOContext;
 import org.apache.lucene.store.IndexInput;
+
+import java.io.*;
+import java.nio.file.NoSuchFileException;
+import java.util.Locale;
+import java.util.Map;
 
 /** Common base class for {@link PrimaryNode} and {@link ReplicaNode}.
  *

@@ -365,9 +365,9 @@ public class QueryBuilder {
       
       if (positionIncrement > 0 && multiTerms.size() > 0) {
         if (enablePositionIncrements) {
-          mpqb.add(multiTerms.toArray(new Term[0]), position);
+          mpqb.add(multiTerms.toArray(new Term[multiTerms.size()]), position);
         } else {
-          mpqb.add(multiTerms.toArray(new Term[0]));
+          mpqb.add(multiTerms.toArray(new Term[multiTerms.size()]));
         }
         multiTerms.clear();
       }
@@ -376,9 +376,9 @@ public class QueryBuilder {
     }
     
     if (enablePositionIncrements) {
-      mpqb.add(multiTerms.toArray(new Term[0]), position);
+      mpqb.add(multiTerms.toArray(new Term[multiTerms.size()]), position);
     } else {
-      mpqb.add(multiTerms.toArray(new Term[0]));
+      mpqb.add(multiTerms.toArray(new Term[multiTerms.size()]));
     }
     return mpqb.build();
   }

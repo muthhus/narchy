@@ -16,16 +16,12 @@
  */
 package org.apache.lucene.queries.function;
 
+import org.apache.lucene.index.LeafReaderContext;
+import org.apache.lucene.search.*;
+
 import java.io.IOException;
 import java.util.IdentityHashMap;
 import java.util.Map;
-
-import org.apache.lucene.index.LeafReaderContext;
-import org.apache.lucene.search.FieldComparator;
-import org.apache.lucene.search.FieldComparatorSource;
-import org.apache.lucene.search.IndexSearcher;
-import org.apache.lucene.search.SimpleFieldComparator;
-import org.apache.lucene.search.SortField;
 
 /**
  * Instantiates {@link FunctionValues} for a particular reader.

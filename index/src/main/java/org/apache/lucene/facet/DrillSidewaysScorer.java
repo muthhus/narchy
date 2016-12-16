@@ -16,21 +16,15 @@
  */
 package org.apache.lucene.facet;
 
+import org.apache.lucene.index.LeafReaderContext;
+import org.apache.lucene.index.PostingsEnum;
+import org.apache.lucene.search.*;
+import org.apache.lucene.util.Bits;
+import org.apache.lucene.util.FixedBitSet;
+
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
-
-import org.apache.lucene.index.LeafReaderContext;
-import org.apache.lucene.index.PostingsEnum;
-import org.apache.lucene.search.BulkScorer;
-import org.apache.lucene.search.Collector;
-import org.apache.lucene.search.DocIdSetIterator;
-import org.apache.lucene.search.LeafCollector;
-import org.apache.lucene.search.Scorer;
-import org.apache.lucene.search.TwoPhaseIterator;
-import org.apache.lucene.search.Weight;
-import org.apache.lucene.util.Bits;
-import org.apache.lucene.util.FixedBitSet;
 
 class DrillSidewaysScorer extends BulkScorer {
 

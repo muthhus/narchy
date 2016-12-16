@@ -178,7 +178,7 @@ public class OfflineSorter {
    * 
    * @see BufferSize#automatic()
    */
-  public OfflineSorter(Directory dir, String tempFileNamePrefix) throws IOException {
+  public OfflineSorter(Directory dir, String tempFileNamePrefix) {
     this(dir, tempFileNamePrefix, DEFAULT_COMPARATOR, BufferSize.automatic(), MAX_TEMPFILES, -1);
   }
   
@@ -187,7 +187,7 @@ public class OfflineSorter {
    * 
    * @see BufferSize#automatic()
    */
-  public OfflineSorter(Directory dir, String tempFileNamePrefix, Comparator<BytesRef> comparator) throws IOException {
+  public OfflineSorter(Directory dir, String tempFileNamePrefix, Comparator<BytesRef> comparator) {
     this(dir, tempFileNamePrefix, comparator, BufferSize.automatic(), MAX_TEMPFILES, -1);
   }
 
@@ -347,7 +347,7 @@ public class OfflineSorter {
       segmentsToMerge = segments;
     }
 
-    PriorityQueue<FileAndTop> queue = new PriorityQueue<FileAndTop>(segmentsToMerge.size()) {
+    PriorityQueue<FileAndTop> queue = new PriorityQueue<>(segmentsToMerge.size()) {
       @Override
       protected boolean lessThan(FileAndTop a, FileAndTop b) {
         return comparator.compare(a.current, b.current) < 0;
@@ -368,6 +368,8 @@ public class OfflineSorter {
         BytesRef item = null;
         try {
           item = streams[i].next();
+        } catch (IOException e) {
+          e.printStackTrace();
         } catch (Throwable t) {
           verifyChecksum(t, streams[i]);
         }
@@ -384,6 +386,8 @@ public class OfflineSorter {
         writer.write(top.current);
         try {
           top.current = streams[top.fd].next();
+        } catch (IOException e) {
+          e.printStackTrace();
         } catch (Throwable t) {
           verifyChecksum(t, streams[top.fd]);
         }
@@ -424,6 +428,8 @@ public class OfflineSorter {
         BytesRef item = null;
         try {
           item = reader.next();
+        } catch (IOException e) {
+          e.printStackTrace();
         } catch (Throwable t) {
           verifyChecksum(t, reader);
         }
@@ -437,6 +443,8 @@ public class OfflineSorter {
         BytesRef item = null;
         try {
           item = reader.next();
+        } catch (IOException e) {
+          e.printStackTrace();
         } catch (Throwable t) {
           verifyChecksum(t, reader);
         }
@@ -558,6 +566,7 @@ public class OfflineSorter {
      * the header of the next sequence. Returns <code>true</code> otherwise.
      * @throws EOFException if the file ends before the full sequence is read.
      */
+    @Override
     public BytesRef next() throws IOException {
       if (in.getFilePointer() >= end) {
         return null;

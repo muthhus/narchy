@@ -16,17 +16,17 @@
  */
 package org.apache.lucene.replicator.http;
 
-import java.io.DataInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.concurrent.Callable;
-
 import org.apache.http.HttpResponse;
 import org.apache.http.conn.HttpClientConnectionManager;
 import org.apache.lucene.replicator.Replicator;
 import org.apache.lucene.replicator.Revision;
 import org.apache.lucene.replicator.SessionToken;
 import org.apache.lucene.replicator.http.ReplicationService.ReplicationAction;
+
+import java.io.DataInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.concurrent.Callable;
 
 /**
  * An HTTP implementation of {@link Replicator}. Assumes the API supported by

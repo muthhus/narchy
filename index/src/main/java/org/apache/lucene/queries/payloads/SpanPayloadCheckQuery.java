@@ -15,26 +15,18 @@
  * limitations under the License.
  */
 package org.apache.lucene.queries.payloads;
+
+import org.apache.lucene.index.*;
+import org.apache.lucene.search.IndexSearcher;
+import org.apache.lucene.search.similarities.Similarity;
+import org.apache.lucene.search.spans.*;
+import org.apache.lucene.search.spans.FilterSpans.AcceptStatus;
+import org.apache.lucene.util.BytesRef;
+
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import org.apache.lucene.index.LeafReaderContext;
-import org.apache.lucene.index.PostingsEnum;
-import org.apache.lucene.index.Term;
-import org.apache.lucene.index.TermContext;
-import org.apache.lucene.index.Terms;
-import org.apache.lucene.search.IndexSearcher;
-import org.apache.lucene.search.similarities.Similarity;
-import org.apache.lucene.search.spans.FilterSpans;
-import org.apache.lucene.search.spans.FilterSpans.AcceptStatus;
-import org.apache.lucene.search.spans.SpanCollector;
-import org.apache.lucene.search.spans.SpanQuery;
-import org.apache.lucene.search.spans.SpanScorer;
-import org.apache.lucene.search.spans.SpanWeight;
-import org.apache.lucene.search.spans.Spans;
-import org.apache.lucene.util.BytesRef;
 
 /**
  * Only return those matches that have a specific payload at the given position.

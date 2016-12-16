@@ -16,9 +16,9 @@
  */
 package org.apache.lucene.queryparser.xml.builders;
 
+import org.apache.lucene.queryparser.xml.ParserException;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.spans.SpanQuery;
-import org.apache.lucene.queryparser.xml.ParserException;
 import org.w3c.dom.Element;
 
 import java.util.HashMap;

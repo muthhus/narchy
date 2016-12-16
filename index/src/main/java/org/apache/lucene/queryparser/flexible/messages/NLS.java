@@ -19,12 +19,7 @@ package org.apache.lucene.queryparser.flexible.messages;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.text.MessageFormat;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Locale;
-import java.util.Map;
-import java.util.MissingResourceException;
-import java.util.ResourceBundle;
+import java.util.*;
 
 /**
  * MessageBundles classes extend this class, to implement a bundle.

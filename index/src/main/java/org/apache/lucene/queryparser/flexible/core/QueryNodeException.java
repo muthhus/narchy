@@ -16,14 +16,14 @@
  */
 package org.apache.lucene.queryparser.flexible.core;
 
-import java.util.Locale;
-
+import org.apache.lucene.queryparser.flexible.core.messages.QueryParserMessages;
+import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 import org.apache.lucene.queryparser.flexible.messages.Message;
 import org.apache.lucene.queryparser.flexible.messages.MessageImpl;
 import org.apache.lucene.queryparser.flexible.messages.NLS;
 import org.apache.lucene.queryparser.flexible.messages.NLSException;
-import org.apache.lucene.queryparser.flexible.core.messages.QueryParserMessages;
-import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
+
+import java.util.Locale;
 
 /**
  * <p>

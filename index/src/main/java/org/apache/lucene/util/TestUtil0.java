@@ -111,7 +111,7 @@ public class TestUtil0 {
                 try {
                     iterator.remove();
                     throw new AssertionError("broken iterator (supports remove): " + iterator);
-                } catch (UnsupportedOperationException expected) {
+                } catch (UnsupportedOperationException ignored) {
                     // ok
                 }
             }
@@ -120,7 +120,7 @@ public class TestUtil0 {
         try {
             iterator.next();
             throw new AssertionError("broken iterator (allows next() when hasNext==false) " + iterator);
-        } catch (NoSuchElementException expected) {
+        } catch (NoSuchElementException ignored) {
             // ok
         }
     }
@@ -141,14 +141,14 @@ public class TestUtil0 {
             try {
                 iterator.remove();
                 throw new AssertionError("broken iterator (supports remove): " + iterator);
-            } catch (UnsupportedOperationException expected) {
+            } catch (UnsupportedOperationException ignored) {
                 // ok
             }
         }
         try {
             iterator.next();
             throw new AssertionError("broken iterator (allows next() when hasNext==false) " + iterator);
-        } catch (NoSuchElementException expected) {
+        } catch (NoSuchElementException ignored) {
             // ok
         }
     }
@@ -177,7 +177,7 @@ public class TestUtil0 {
             try {
                 coll.remove(coll.iterator().next());
                 throw new AssertionError("broken collection (supports remove): " + coll);
-            } catch (UnsupportedOperationException e) {
+            } catch (UnsupportedOperationException ignored) {
                 // ok
             }
         }
@@ -185,14 +185,14 @@ public class TestUtil0 {
         try {
             coll.add(null);
             throw new AssertionError("broken collection (supports add): " + coll);
-        } catch (UnsupportedOperationException e) {
+        } catch (UnsupportedOperationException ignored) {
             // ok
         }
 
         try {
             coll.addAll(Collections.singleton(null));
             throw new AssertionError("broken collection (supports addAll): " + coll);
-        } catch (UnsupportedOperationException e) {
+        } catch (UnsupportedOperationException ignored) {
             // ok
         }
 
@@ -443,7 +443,7 @@ public class TestUtil0 {
             switch(val) {
                 case 0: sb.append("<p>"); break;
                 case 1: {
-                    sb.append("<");
+                    sb.append('<');
                     sb.append("    ".substring(nextInt(random, 0, 4)));
                     sb.append(randomSimpleString(random));
                     for (int j = 0 ; j < nextInt(random, 0, 10) ; ++j) {
@@ -469,7 +469,7 @@ public class TestUtil0 {
                     sb.append(">".substring(nextInt(random, 0, 1)));
                     break;
                 }
-                case 3: sb.append(">"); break;
+                case 3: sb.append('>'); break;
                 case 4: sb.append("</p>"); break;
                 case 5: sb.append("<!--"); break;
                 case 6: sb.append("<!--#"); break;
@@ -477,13 +477,13 @@ public class TestUtil0 {
                 case 8: sb.append("</script>"); break;
                 case 9: sb.append("<?"); break;
                 case 10: sb.append("?>"); break;
-                case 11: sb.append("\""); break;
+                case 11: sb.append('"'); break;
                 case 12: sb.append("\\\""); break;
-                case 13: sb.append("'"); break;
+                case 13: sb.append('\''); break;
                 case 14: sb.append("\\'"); break;
                 case 15: sb.append("-->"); break;
                 case 16: {
-                    sb.append("&");
+                    sb.append('&');
                     switch(nextInt(random, 0, 2)) {
                         case 0: sb.append(randomSimpleString(random)); break;
                         case 1: sb.append(HTML_CHAR_ENTITIES[random.nextInt(HTML_CHAR_ENTITIES.length)]); break;
@@ -508,17 +508,17 @@ public class TestUtil0 {
                     break;
                 }
 
-                case 19: sb.append(";"); break;
+                case 19: sb.append(';'); break;
                 case 20: sb.append(nextInt(random, 0, Integer.MAX_VALUE - 1)); break;
-                case 21: sb.append("\n"); break;
+                case 21: sb.append('\n'); break;
                 case 22: sb.append("          ".substring(nextInt(random, 0, 10))); break;
                 case 23: {
-                    sb.append("<");
+                    sb.append('<');
                     if (0 == nextInt(random, 0, 3)) {
                         sb.append("          ".substring(nextInt(random, 1, 10)));
                     }
                     if (0 == nextInt(random, 0, 1)) {
-                        sb.append("/");
+                        sb.append('/');
                         if (0 == nextInt(random, 0, 3)) {
                             sb.append("          ".substring(nextInt(random, 1, 10)));
                         }
@@ -921,7 +921,7 @@ public class TestUtil0 {
                 // ignore bugs in Sun's regex impl
                 try {
                     replacement = p.matcher(nonBmpString).replaceAll("_");
-                } catch (StringIndexOutOfBoundsException jdkBug) {
+                } catch (StringIndexOutOfBoundsException ignored) {
                     System.out.println("WARNING: your jdk is buggy!");
                     System.out.println("Pattern.compile(\"" + p.pattern() +
                             "\").matcher(\"AB\\uD840\\uDC00C\").replaceAll(\"_\"); should not throw IndexOutOfBounds!");
@@ -956,8 +956,8 @@ public class TestUtil0 {
      */
     private final static List<String> ops = Arrays.asList(
             ".", "?",
-            "{0," + maxRecursionBound + "}",  // bounded replacement for '*'
-            "{1," + maxRecursionBound + "}",  // bounded replacement for '+'
+            "{0," + maxRecursionBound + '}',  // bounded replacement for '*'
+            "{1," + maxRecursionBound + '}',  // bounded replacement for '+'
             "(",
             ")",
             "-",
@@ -1004,8 +1004,8 @@ public class TestUtil0 {
             return "(null)";
         } else {
             try {
-                return br.utf8ToString() + " " + br.toString();
-            } catch (AssertionError | IllegalArgumentException t) {
+                return br.utf8ToString() + ' ' + br.toString();
+            } catch (AssertionError | IllegalArgumentException ignored) {
                 // If BytesRef isn't actually UTF8, or it's eg a
                 // prefix of UTF8 that ends mid-unicode-char, we
                 // fallback to hex:

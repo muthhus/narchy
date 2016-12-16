@@ -21,7 +21,7 @@ import org.apache.lucene.index.IndexReaderContext;
 import org.apache.lucene.index.LeafReaderContext;
 
 import java.io.IOException;
-import java.util.List;
+import java.util.Collection;
 import java.util.Random;
 import java.util.concurrent.ExecutorService;
 
@@ -67,7 +67,7 @@ public class AssertingIndexSearcher extends IndexSearcher {
   }
 
   @Override
-  protected void search(List<LeafReaderContext> leaves, Weight weight, Collector collector) throws IOException {
+  protected void search(Collection<LeafReaderContext> leaves, Weight weight, Collector collector) throws IOException {
     assert weight instanceof AssertingWeight;
     super.search(leaves, weight, AssertingCollector.wrap(random, collector));
   }

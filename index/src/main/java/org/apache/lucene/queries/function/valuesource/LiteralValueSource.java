@@ -15,6 +15,7 @@
  * limitations under the License.
  */
 package org.apache.lucene.queries.function.valuesource;
+
 import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.queries.function.FunctionValues;
 import org.apache.lucene.queries.function.ValueSource;
@@ -22,8 +23,8 @@ import org.apache.lucene.queries.function.docvalues.StrDocValues;
 import org.apache.lucene.util.BytesRef;
 import org.apache.lucene.util.BytesRefBuilder;
 
-import java.util.Map;
 import java.io.IOException;
+import java.util.Map;
 
 
 /**

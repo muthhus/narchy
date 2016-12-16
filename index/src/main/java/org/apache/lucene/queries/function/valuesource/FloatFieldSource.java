@@ -16,18 +16,18 @@
  */
 package org.apache.lucene.queries.function.valuesource;
 
-import java.io.IOException;
-import java.util.Map;
-
 import org.apache.lucene.index.DocValues;
 import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.index.NumericDocValues;
 import org.apache.lucene.queries.function.FunctionValues;
 import org.apache.lucene.queries.function.docvalues.FloatDocValues;
-import org.apache.lucene.search.SortField.Type;
 import org.apache.lucene.search.SortField;
+import org.apache.lucene.search.SortField.Type;
 import org.apache.lucene.util.mutable.MutableValue;
 import org.apache.lucene.util.mutable.MutableValueFloat;
+
+import java.io.IOException;
+import java.util.Map;
 
 /**
  * Obtains float field values from {@link org.apache.lucene.index.LeafReader#getNumericDocValues} and makes those

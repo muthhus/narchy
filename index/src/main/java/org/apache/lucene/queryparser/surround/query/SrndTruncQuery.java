@@ -15,18 +15,14 @@
  * limitations under the License.
  */
 package org.apache.lucene.queryparser.surround.query;
-import org.apache.lucene.index.Term;
-import org.apache.lucene.index.TermsEnum;
-import org.apache.lucene.index.Terms;
+
+import org.apache.lucene.index.*;
 import org.apache.lucene.util.BytesRef;
 import org.apache.lucene.util.StringHelper;
-import org.apache.lucene.index.IndexReader;
-import org.apache.lucene.index.MultiFields;
 
 import java.io.IOException;
-
-import java.util.regex.Pattern;
 import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Query that matches wildcards

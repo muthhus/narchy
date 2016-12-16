@@ -16,10 +16,10 @@
  */
 package org.apache.lucene.facet.taxonomy.writercache;
 
+import org.apache.lucene.facet.taxonomy.FacetLabel;
+
 import java.util.Iterator;
 import java.util.NoSuchElementException;
-
-import org.apache.lucene.facet.taxonomy.FacetLabel;
 
 /**
  * HashMap to store colliding labels. See {@link CompactLabelToOrdinal} for

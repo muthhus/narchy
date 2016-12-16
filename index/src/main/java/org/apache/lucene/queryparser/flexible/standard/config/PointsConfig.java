@@ -16,9 +16,9 @@
  */
 package org.apache.lucene.queryparser.flexible.standard.config;
 
-import java.text.NumberFormat;
-
 import org.apache.lucene.index.PointValues;
+
+import java.text.NumberFormat;
 
 /**
  * This class holds the configuration used to parse numeric queries and create

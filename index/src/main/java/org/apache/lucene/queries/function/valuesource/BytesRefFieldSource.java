@@ -16,20 +16,16 @@
  */
 package org.apache.lucene.queries.function.valuesource;
 
-import java.io.IOException;
-import java.util.Map;
-
-import org.apache.lucene.index.BinaryDocValues;
-import org.apache.lucene.index.DocValues;
-import org.apache.lucene.index.DocValuesType;
-import org.apache.lucene.index.FieldInfo;
-import org.apache.lucene.index.LeafReaderContext;
+import org.apache.lucene.index.*;
 import org.apache.lucene.queries.function.FunctionValues;
 import org.apache.lucene.queries.function.docvalues.DocTermsIndexDocValues;
 import org.apache.lucene.util.BytesRef;
 import org.apache.lucene.util.BytesRefBuilder;
 import org.apache.lucene.util.mutable.MutableValue;
 import org.apache.lucene.util.mutable.MutableValueStr;
+
+import java.io.IOException;
+import java.util.Map;
 
 /**
  * An implementation for retrieving {@link FunctionValues} instances for string based fields.

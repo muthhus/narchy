@@ -206,12 +206,7 @@ public abstract class FilterFileSystemProvider extends FileSystemProvider {
 
   @Override
   public DirectoryStream<Path> newDirectoryStream(Path dir, final Filter<? super Path> filter) throws IOException {
-    Filter<Path> wrappedFilter = new Filter<Path>() {
-      @Override
-      public boolean accept(Path entry) throws IOException {
-        return filter.accept(new FilterPath(entry, fileSystem));
-      }
-    };
+    Filter<Path> wrappedFilter = entry -> filter.accept(new FilterPath(entry, fileSystem));
     return new FilterDirectoryStream(delegate.newDirectoryStream(toDelegate(dir), wrappedFilter), fileSystem);
   }
 
@@ -257,6 +252,6 @@ public abstract class FilterFileSystemProvider extends FileSystemProvider {
 
   @Override
   public String toString() {
-    return getClass().getSimpleName() + "(" + delegate + ")";
+    return getClass().getSimpleName() + '(' + delegate + ')';
   }
 }

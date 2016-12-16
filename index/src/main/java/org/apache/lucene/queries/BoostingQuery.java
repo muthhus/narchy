@@ -16,14 +16,14 @@
  */
 package org.apache.lucene.queries;
 
-import java.io.IOException;
-import java.util.Objects;
-import java.util.Set;
-
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.*;
+
+import java.io.IOException;
+import java.util.Objects;
+import java.util.Set;
 
 /**
  * The BoostingQuery class can be used to effectively demote results that match a given query. 

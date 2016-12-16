@@ -16,10 +16,10 @@
  */
 package org.apache.lucene.facet.taxonomy;
 
-import java.io.IOException;
-
 import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.util.IntsRef;
+
+import java.io.IOException;
 
 /** Provides per-document ordinals. */
 

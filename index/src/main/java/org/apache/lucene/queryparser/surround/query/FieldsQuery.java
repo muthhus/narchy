@@ -15,11 +15,12 @@
  * limitations under the License.
  */
 package org.apache.lucene.queryparser.surround.query;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Iterator;
 
 import org.apache.lucene.search.Query;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * Forms an OR query of the provided query across multiple fields.

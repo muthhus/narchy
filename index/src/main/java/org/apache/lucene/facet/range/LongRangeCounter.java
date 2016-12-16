@@ -16,11 +16,7 @@
  */
 package org.apache.lucene.facet.range;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /** Counts how many times each range was seen;
  *  per-hit it's just a binary search ({@link #add})

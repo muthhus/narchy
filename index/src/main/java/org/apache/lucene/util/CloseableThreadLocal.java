@@ -55,7 +55,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class CloseableThreadLocal<T> implements Closeable {
 
-  private ThreadLocal<WeakReference<T>> t = new ThreadLocal<>();
+  private ThreadLocal<WeakReference> t = new ThreadLocal<>();
 
   // Use a WeakHashMap so that if a Thread exits and is
   // GC'able, its entry may be removed:

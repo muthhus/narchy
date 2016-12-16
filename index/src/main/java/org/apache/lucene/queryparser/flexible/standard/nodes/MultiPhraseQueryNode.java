@@ -16,14 +16,14 @@
  */
 package org.apache.lucene.queryparser.flexible.standard.nodes;
 
-import java.util.List;
-
 import org.apache.lucene.queryparser.flexible.core.nodes.FieldableNode;
 import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 import org.apache.lucene.queryparser.flexible.core.nodes.QueryNodeImpl;
 import org.apache.lucene.queryparser.flexible.core.parser.EscapeQuerySyntax;
 import org.apache.lucene.search.MultiPhraseQuery;
 import org.apache.lucene.search.PhraseQuery;
+
+import java.util.List;
 
 /**
  * A {@link MultiPhraseQueryNode} indicates that its children should be used to

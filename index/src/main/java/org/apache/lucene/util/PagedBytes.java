@@ -137,7 +137,7 @@ public final class PagedBytes implements Accountable {
 
     @Override
     public String toString() {
-      return "PagedBytes(blocksize=" + blockSize + ")";
+      return "PagedBytes(blocksize=" + blockSize + ')';
     }
   }
 
@@ -257,7 +257,7 @@ public final class PagedBytes implements Accountable {
   // TODO: this really needs to be refactored into fieldcacheimpl!
   public long copyUsingLengthPrefix(BytesRef bytes) {
     if (bytes.length >= 32768) {
-      throw new IllegalArgumentException("max length is 32767 (got " + bytes.length + ")");
+      throw new IllegalArgumentException("max length is 32767 (got " + bytes.length + ')');
     }
 
     if (upto + bytes.length + 2 > blockSize) {

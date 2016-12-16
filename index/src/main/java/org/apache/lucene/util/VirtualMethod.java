@@ -63,10 +63,10 @@ public final class VirtualMethod<C> {
   private final Class<C> baseClass;
   private final String method;
   private final Class<?>[] parameters;
-  private final ClassValue<Integer> distanceOfClass = new ClassValue<Integer>() {
+  private final ClassValue<Integer> distanceOfClass = new ClassValue<>() {
     @Override
     protected Integer computeValue(Class<?> subclazz) {
-      return Integer.valueOf(reflectImplementationDistance(subclazz));
+      return reflectImplementationDistance(subclazz);
     }
   };
 
@@ -97,7 +97,7 @@ public final class VirtualMethod<C> {
    * @return 0 iff not overridden, else the distance to the base class
    */
   public int getImplementationDistance(final Class<? extends C> subclazz) {
-    return distanceOfClass.get(subclazz).intValue();
+    return distanceOfClass.get(subclazz);
   }
   
   /**
@@ -122,7 +122,7 @@ public final class VirtualMethod<C> {
         try {
           clazz.getDeclaredMethod(method, parameters);
           overridden = true;
-        } catch (NoSuchMethodException nsme) {
+        } catch (NoSuchMethodException ignored) {
         }
       }
       

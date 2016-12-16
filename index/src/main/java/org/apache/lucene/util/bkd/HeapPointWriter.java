@@ -161,6 +161,6 @@ public final class HeapPointWriter implements PointWriter {
 
   @Override
   public String toString() {
-    return "HeapPointWriter(count=" + nextWrite + " alloc=" + docIDs.length + ")";
+    return "HeapPointWriter(count=" + nextWrite + " alloc=" + docIDs.length + ')';
   }
 }

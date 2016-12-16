@@ -50,35 +50,7 @@ public final class MutablePointsReaderUtils {
 
       @Override
       protected org.apache.lucene.util.Sorter getFallbackSorter(int k) {
-        return new IntroSorter() {
-
-          final BytesRef pivot = new BytesRef();
-          final BytesRef scratch = new BytesRef();
-          int pivotDoc;
-
-          @Override
-          protected void swap(int i, int j) {
-            reader.swap(i, j);
-          }
-
-          @Override
-          protected void setPivot(int i) {
-            reader.getValue(i, pivot);
-            pivotDoc = reader.getDocID(i);
-          }
-
-          @Override
-          protected int comparePivot(int j) {
-            if (k < packedBytesLength) {
-              reader.getValue(j, scratch);
-              int cmp = StringHelper.compare(packedBytesLength - k, pivot.bytes, pivot.offset + k, scratch.bytes, scratch.offset + k);
-              if (cmp != 0) {
-                return cmp;
-              }
-            }
-            return pivotDoc - reader.getDocID(j);
-          }
-        };
+        return new MyIntroSorter(reader, k, packedBytesLength);
       }
 
     }.sort(from, to);
@@ -134,34 +106,7 @@ public final class MutablePointsReaderUtils {
 
       @Override
       protected Selector getFallbackSelector(int k) {
-        return new IntroSelector() {
-
-          final BytesRef pivot = scratch1;
-          int pivotDoc;
-
-          @Override
-          protected void swap(int i, int j) {
-            reader.swap(i, j);
-          }
-
-          @Override
-          protected void setPivot(int i) {
-            reader.getValue(i, pivot);
-            pivotDoc = reader.getDocID(i);
-          }
-
-          @Override
-          protected int comparePivot(int j) {
-            if (k < cmpBytes) {
-              reader.getValue(j, scratch2);
-              int cmp = StringHelper.compare(cmpBytes - k, pivot.bytes, pivot.offset + offset + k, scratch2.bytes, scratch2.offset + offset + k);
-              if (cmp != 0) {
-                return cmp;
-              }
-            }
-            return pivotDoc - reader.getDocID(j);
-          }
-        };
+        return new MyIntroSelector(scratch1, reader, k, cmpBytes, scratch2, offset);
       }
 
       @Override
@@ -180,4 +125,90 @@ public final class MutablePointsReaderUtils {
       }
     }.select(from, to, mid);
   }
+
+    private static class MyIntroSorter extends IntroSorter {
+
+        final BytesRef pivot;
+        final BytesRef scratch;
+        private final MutablePointValues reader;
+        private final int k;
+        private final int packedBytesLength;
+        int pivotDoc;
+
+        public MyIntroSorter(MutablePointValues reader, int k, int packedBytesLength) {
+            this.reader = reader;
+            this.k = k;
+            this.packedBytesLength = packedBytesLength;
+            pivot = new BytesRef();
+            scratch = new BytesRef();
+        }
+
+        @Override
+        protected void swap(int i, int j) {
+          reader.swap(i, j);
+        }
+
+        @Override
+        protected void setPivot(int i) {
+          reader.getValue(i, pivot);
+          pivotDoc = reader.getDocID(i);
+        }
+
+        @Override
+        protected int comparePivot(int j) {
+          if (k < packedBytesLength) {
+            reader.getValue(j, scratch);
+            int cmp = StringHelper.compare(packedBytesLength - k, pivot.bytes, pivot.offset + k, scratch.bytes, scratch.offset + k);
+            if (cmp != 0) {
+              return cmp;
+            }
+          }
+          return pivotDoc - reader.getDocID(j);
+        }
+    }
+
+    private static class MyIntroSelector extends IntroSelector {
+
+        final BytesRef pivot;
+        private final BytesRef scratch1;
+        private final MutablePointValues reader;
+        private final int k;
+        private final int cmpBytes;
+        private final BytesRef scratch2;
+        private final int offset;
+        int pivotDoc;
+
+        public MyIntroSelector(BytesRef scratch1, MutablePointValues reader, int k, int cmpBytes, BytesRef scratch2, int offset) {
+            this.scratch1 = scratch1;
+            this.reader = reader;
+            this.k = k;
+            this.cmpBytes = cmpBytes;
+            this.scratch2 = scratch2;
+            this.offset = offset;
+            pivot = scratch1;
+        }
+
+        @Override
+        protected void swap(int i, int j) {
+          reader.swap(i, j);
+        }
+
+        @Override
+        protected void setPivot(int i) {
+          reader.getValue(i, pivot);
+          pivotDoc = reader.getDocID(i);
+        }
+
+        @Override
+        protected int comparePivot(int j) {
+          if (k < cmpBytes) {
+            reader.getValue(j, scratch2);
+            int cmp = StringHelper.compare(cmpBytes - k, pivot.bytes, pivot.offset + offset + k, scratch2.bytes, scratch2.offset + offset + k);
+            if (cmp != 0) {
+              return cmp;
+            }
+          }
+          return pivotDoc - reader.getDocID(j);
+        }
+    }
 }

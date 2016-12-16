@@ -16,10 +16,10 @@
  */
 package org.apache.lucene.queryparser.flexible.core.processors;
 
-import java.util.List;
-
 import org.apache.lucene.queryparser.flexible.core.QueryNodeException;
 import org.apache.lucene.queryparser.flexible.core.nodes.*;
+
+import java.util.List;
 
 /**
  * <p>

@@ -17,11 +17,11 @@
 
 package org.apache.lucene.replicator.nrt;
 
+import org.apache.lucene.index.SegmentInfos;
+
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
-
-import org.apache.lucene.index.SegmentInfos;
 
 /** Holds incRef'd file level details for one point-in-time segment infos on the primary node.
  *

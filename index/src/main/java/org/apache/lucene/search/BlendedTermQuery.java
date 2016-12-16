@@ -24,7 +24,7 @@ import org.apache.lucene.util.InPlaceMergeSorter;
 
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.List;
+import java.util.Collection;
 
 /**
  * A {@link Query} that blends index statistics across multiple terms.
@@ -294,7 +294,7 @@ public final class BlendedTermQuery extends Query {
   }
 
   private static TermContext adjustFrequencies(TermContext ctx, int artificialDf, long artificialTtf) {
-    List<LeafReaderContext> leaves = ctx.topReaderContext.leaves();
+    Collection<LeafReaderContext> leaves = ctx.topReaderContext.leaves();
     final int len;
     if (leaves == null) {
       len = 1;

@@ -15,15 +15,16 @@
  * limitations under the License.
  */
 package org.apache.lucene.queries.function.valuesource;
+
 import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.queries.function.FunctionValues;
 import org.apache.lucene.queries.function.ValueSource;
 import org.apache.lucene.queries.function.docvalues.FloatDocValues;
 import org.apache.lucene.search.IndexSearcher;
 
-import java.util.Map;
-import java.util.Arrays;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Map;
 
 
 /**

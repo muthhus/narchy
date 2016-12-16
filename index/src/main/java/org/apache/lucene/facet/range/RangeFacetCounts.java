@@ -16,14 +16,14 @@
  */
 package org.apache.lucene.facet.range;
 
-import java.io.IOException;
-import java.util.Collections;
-import java.util.List;
-
 import org.apache.lucene.facet.FacetResult;
 import org.apache.lucene.facet.Facets;
 import org.apache.lucene.facet.LabelAndValue;
 import org.apache.lucene.search.Query;
+
+import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
 
 /** Base class for range faceting.
  *

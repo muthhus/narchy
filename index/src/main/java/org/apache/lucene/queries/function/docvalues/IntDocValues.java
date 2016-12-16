@@ -16,14 +16,14 @@
  */
 package org.apache.lucene.queries.function.docvalues;
 
-import java.io.IOException;
-
 import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.queries.function.FunctionValues;
 import org.apache.lucene.queries.function.ValueSource;
 import org.apache.lucene.queries.function.ValueSourceScorer;
 import org.apache.lucene.util.mutable.MutableValue;
 import org.apache.lucene.util.mutable.MutableValueInt;
+
+import java.io.IOException;
 
 /**
  * Abstract {@link FunctionValues} implementation which supports retrieving int values.

@@ -16,20 +16,16 @@
  */
 package org.apache.lucene.queries.function.valuesource;
 
-import java.io.IOException;
-import java.util.Map;
-
-import org.apache.lucene.index.PostingsEnum;
-import org.apache.lucene.index.Fields;
-import org.apache.lucene.index.LeafReaderContext;
-import org.apache.lucene.index.Terms;
-import org.apache.lucene.index.TermsEnum;
+import org.apache.lucene.index.*;
 import org.apache.lucene.queries.function.FunctionValues;
 import org.apache.lucene.queries.function.docvalues.FloatDocValues;
 import org.apache.lucene.search.DocIdSetIterator;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.similarities.TFIDFSimilarity;
 import org.apache.lucene.util.BytesRef;
+
+import java.io.IOException;
+import java.util.Map;
 
 /** 
  * Function that returns {@link TFIDFSimilarity#tf(float)}

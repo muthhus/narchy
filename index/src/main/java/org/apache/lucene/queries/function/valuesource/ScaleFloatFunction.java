@@ -24,7 +24,7 @@ import org.apache.lucene.queries.function.docvalues.FloatDocValues;
 import org.apache.lucene.search.IndexSearcher;
 
 import java.io.IOException;
-import java.util.List;
+import java.util.Collection;
 import java.util.Map;
 
 /**
@@ -60,7 +60,7 @@ public class ScaleFloatFunction extends ValueSource {
   }
 
   private ScaleInfo createScaleInfo(Map context, LeafReaderContext readerContext) throws IOException {
-    final List<LeafReaderContext> leaves = ReaderUtil.getTopLevelContext(readerContext).leaves();
+    final Collection<LeafReaderContext> leaves = ReaderUtil.getTopLevelContext(readerContext).leaves();
 
     float minVal = Float.POSITIVE_INFINITY;
     float maxVal = Float.NEGATIVE_INFINITY;

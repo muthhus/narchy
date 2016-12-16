@@ -94,21 +94,21 @@ public class FilterFileSystem extends FileSystem {
     final Iterable<Path> roots = delegate.getRootDirectories();
     return () -> {
       final Iterator<Path> iterator = roots.iterator();
-      return new Iterator<Path>() {
-        @Override
-        public boolean hasNext() {
-          return iterator.hasNext();
-        }
+      return new Iterator<>() {
+          @Override
+          public boolean hasNext() {
+              return iterator.hasNext();
+          }
 
-        @Override
-        public Path next() {
-          return new FilterPath(iterator.next(), FilterFileSystem.this);
-        }
-        
-        @Override
-        public void remove() {
-          iterator.remove();
-        }
+          @Override
+          public Path next() {
+              return new FilterPath(iterator.next(), FilterFileSystem.this);
+          }
+
+          @Override
+          public void remove() {
+              iterator.remove();
+          }
       };
     };
   }
@@ -118,21 +118,22 @@ public class FilterFileSystem extends FileSystem {
     final Iterable<FileStore> fileStores = delegate.getFileStores();
     return () -> {
       final Iterator<FileStore> iterator = fileStores.iterator();
-      return new Iterator<FileStore>() {
-        @Override
-        public boolean hasNext() {
-          return iterator.hasNext();
-        }
+      return new Iterator<>() {
+          @Override
+          public boolean hasNext() {
+              return iterator.hasNext();
+          }
 
-        @Override
-        public FileStore next() {
-          return new FilterFileStore(iterator.next(), parent.getScheme()) {};
-        }
-        
-        @Override
-        public void remove() {
-          iterator.remove();
-        }
+          @Override
+          public FileStore next() {
+              return new FilterFileStore(iterator.next(), parent.getScheme()) {
+              };
+          }
+
+          @Override
+          public void remove() {
+              iterator.remove();
+          }
       };
     };
   }

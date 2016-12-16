@@ -16,15 +16,15 @@
  */
 package org.apache.lucene.facet.taxonomy;
 
-import java.util.Arrays;
-
-import org.apache.lucene.document.Document; // javadocs
+import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.FieldType;
 import org.apache.lucene.facet.FacetField;
 import org.apache.lucene.facet.Facets;
 import org.apache.lucene.index.IndexOptions;
 import org.apache.lucene.util.BytesRef;
+
+import java.util.Arrays;
 
 /** Add an instance of this to your {@link Document} to add
  *  a facet label associated with an arbitrary byte[].

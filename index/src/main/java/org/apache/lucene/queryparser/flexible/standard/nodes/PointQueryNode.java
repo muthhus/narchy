@@ -16,15 +16,15 @@
  */
 package org.apache.lucene.queryparser.flexible.standard.nodes;
 
-import java.text.NumberFormat;
-import java.util.Locale;
-
 import org.apache.lucene.queryparser.flexible.core.nodes.FieldQueryNode;
 import org.apache.lucene.queryparser.flexible.core.nodes.FieldValuePairQueryNode;
 import org.apache.lucene.queryparser.flexible.core.nodes.QueryNodeImpl;
 import org.apache.lucene.queryparser.flexible.core.parser.EscapeQuerySyntax;
 import org.apache.lucene.queryparser.flexible.core.parser.EscapeQuerySyntax.Type;
 import org.apache.lucene.queryparser.flexible.standard.config.PointsConfig;
+
+import java.text.NumberFormat;
+import java.util.Locale;
 
 /**
  * This query node represents a field query that holds a point value. It is

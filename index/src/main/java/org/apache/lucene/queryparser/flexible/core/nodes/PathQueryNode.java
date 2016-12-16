@@ -16,12 +16,12 @@
  */
 package org.apache.lucene.queryparser.flexible.core.nodes;
 
+import org.apache.lucene.queryparser.flexible.core.parser.EscapeQuerySyntax;
+import org.apache.lucene.queryparser.flexible.core.parser.EscapeQuerySyntax.Type;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-
-import org.apache.lucene.queryparser.flexible.core.parser.EscapeQuerySyntax;
-import org.apache.lucene.queryparser.flexible.core.parser.EscapeQuerySyntax.Type;
 
 /**
  * A {@link PathQueryNode} is used to store queries like

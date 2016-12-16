@@ -16,12 +16,12 @@
  */
 package org.apache.lucene.queries.function;
 
-import java.io.IOException;
-
 import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.search.DocIdSetIterator;
 import org.apache.lucene.search.Scorer;
 import org.apache.lucene.search.TwoPhaseIterator;
+
+import java.io.IOException;
 
 /**
  * {@link Scorer} which returns the result of {@link FunctionValues#floatVal(int)} as

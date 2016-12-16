@@ -29,7 +29,7 @@ public final class LongsRef implements Comparable<LongsRef>, Cloneable {
   public static final long[] EMPTY_LONGS = new long[0];
 
   /** The contents of the LongsRef. Should never be {@code null}. */
-  public long[] longs;
+  public final long[] longs;
   /** Offset of first valid long. */
   public int offset;
   /** Length of used longs. */

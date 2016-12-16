@@ -15,12 +15,13 @@
  * limitations under the License.
  */
 package org.apache.lucene.queryparser.surround.query;
-import java.util.List;
-import java.util.Iterator;
-import org.apache.lucene.search.Query;
+
 import org.apache.lucene.search.BooleanClause;
+import org.apache.lucene.search.Query;
 
 import java.io.IOException;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * Factory for disjunctions

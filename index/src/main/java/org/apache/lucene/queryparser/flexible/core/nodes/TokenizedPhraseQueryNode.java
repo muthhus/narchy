@@ -16,9 +16,9 @@
  */
 package org.apache.lucene.queryparser.flexible.core.nodes;
 
-import java.util.List;
-
 import org.apache.lucene.queryparser.flexible.core.parser.EscapeQuerySyntax;
+
+import java.util.List;
 
 /**
  * A {@link TokenizedPhraseQueryNode} represents a node created by a code that

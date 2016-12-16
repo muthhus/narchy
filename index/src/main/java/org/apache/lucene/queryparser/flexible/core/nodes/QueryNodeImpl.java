@@ -16,17 +16,11 @@
  */
 package org.apache.lucene.queryparser.flexible.core.nodes;
 
-import java.util.ArrayList;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.ResourceBundle;
-
-import org.apache.lucene.queryparser.flexible.messages.NLS;
 import org.apache.lucene.queryparser.flexible.core.messages.QueryParserMessages;
 import org.apache.lucene.queryparser.flexible.core.util.StringUtils;
+import org.apache.lucene.queryparser.flexible.messages.NLS;
+
+import java.util.*;
 
 /**
  * A {@link QueryNodeImpl} is the default implementation of the interface

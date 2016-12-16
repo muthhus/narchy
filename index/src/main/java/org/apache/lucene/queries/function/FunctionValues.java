@@ -16,14 +16,14 @@
  */
 package org.apache.lucene.queries.function;
 
-import java.io.IOException;
-
 import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.search.Explanation;
 import org.apache.lucene.search.Scorer;
 import org.apache.lucene.util.BytesRefBuilder;
 import org.apache.lucene.util.mutable.MutableValue;
 import org.apache.lucene.util.mutable.MutableValueFloat;
+
+import java.io.IOException;
 
 /**
  * Represents field values as different types.

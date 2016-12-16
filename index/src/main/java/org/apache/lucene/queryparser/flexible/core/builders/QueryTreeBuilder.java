@@ -16,15 +16,15 @@
  */
 package org.apache.lucene.queryparser.flexible.core.builders;
 
-import java.util.HashMap;
-import java.util.List;
-
-import org.apache.lucene.queryparser.flexible.messages.MessageImpl;
 import org.apache.lucene.queryparser.flexible.core.QueryNodeException;
 import org.apache.lucene.queryparser.flexible.core.messages.QueryParserMessages;
 import org.apache.lucene.queryparser.flexible.core.nodes.FieldableNode;
 import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
+import org.apache.lucene.queryparser.flexible.messages.MessageImpl;
 import org.apache.lucene.queryparser.flexible.standard.parser.EscapeQuerySyntaxImpl;
+
+import java.util.HashMap;
+import java.util.List;
 
 /**
  * This class should be used when there is a builder for each type of node.

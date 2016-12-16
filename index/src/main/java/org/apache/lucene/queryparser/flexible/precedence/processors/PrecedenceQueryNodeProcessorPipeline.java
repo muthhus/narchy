@@ -16,10 +16,10 @@
  */
 package org.apache.lucene.queryparser.flexible.precedence.processors;
 
+import org.apache.lucene.queryparser.flexible.core.config.QueryConfigHandler;
 import org.apache.lucene.queryparser.flexible.precedence.PrecedenceQueryParser;
 import org.apache.lucene.queryparser.flexible.standard.processors.BooleanQuery2ModifierNodeProcessor;
 import org.apache.lucene.queryparser.flexible.standard.processors.StandardQueryNodeProcessorPipeline;
-import org.apache.lucene.queryparser.flexible.core.config.QueryConfigHandler;
 
 /**
  * <p>

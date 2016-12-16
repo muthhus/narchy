@@ -53,7 +53,7 @@ public abstract class AttributeFactory {
   public static final AttributeFactory DEFAULT_ATTRIBUTE_FACTORY = new DefaultAttributeFactory();
   
   private static final class DefaultAttributeFactory extends AttributeFactory {
-    private final ClassValue<MethodHandle> constructors = new ClassValue<MethodHandle>() {
+    private final ClassValue<MethodHandle> constructors = new ClassValue<>() {
       @Override
       protected MethodHandle computeValue(Class<?> attClass) {
         return findAttributeImplCtor(findImplClass(attClass.asSubclass(Attribute.class)));
@@ -75,7 +75,7 @@ public abstract class AttributeFactory {
     private Class<? extends AttributeImpl> findImplClass(Class<? extends Attribute> attClass) {
       try {
         return Class.forName(attClass.getName() + "Impl", true, attClass.getClassLoader()).asSubclass(AttributeImpl.class);
-      } catch (ClassNotFoundException cnfe) {
+      } catch (ClassNotFoundException ignored) {
         throw new IllegalArgumentException("Cannot find implementing class for: " + attClass.getName());
       }      
     }
@@ -133,7 +133,7 @@ public abstract class AttributeFactory {
    */
   public static <A extends AttributeImpl> AttributeFactory getStaticImplementation(AttributeFactory delegate, Class<A> clazz) {
     final MethodHandle constr = findAttributeImplCtor(clazz);
-    return new StaticImplementationAttributeFactory<A>(delegate, clazz) {
+    return new StaticImplementationAttributeFactory<>(delegate, clazz) {
       @Override
       protected A createInstance() {
         try {

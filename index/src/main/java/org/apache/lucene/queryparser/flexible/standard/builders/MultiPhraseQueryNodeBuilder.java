@@ -16,10 +16,6 @@
  */
 package org.apache.lucene.queryparser.flexible.standard.builders;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.TreeMap;
-
 import org.apache.lucene.index.Term;
 import org.apache.lucene.queryparser.flexible.core.QueryNodeException;
 import org.apache.lucene.queryparser.flexible.core.builders.QueryTreeBuilder;
@@ -28,6 +24,10 @@ import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 import org.apache.lucene.queryparser.flexible.standard.nodes.MultiPhraseQueryNode;
 import org.apache.lucene.search.MultiPhraseQuery;
 import org.apache.lucene.search.TermQuery;
+
+import java.util.LinkedList;
+import java.util.List;
+import java.util.TreeMap;
 
 /**
  * Builds a {@link MultiPhraseQuery} object from a {@link MultiPhraseQueryNode}

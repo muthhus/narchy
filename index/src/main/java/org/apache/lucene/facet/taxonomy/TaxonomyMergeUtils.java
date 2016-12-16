@@ -16,18 +16,14 @@
  */
 package org.apache.lucene.facet.taxonomy;
 
-import java.io.IOException;
-import java.util.List;
-
 import org.apache.lucene.facet.FacetsConfig;
 import org.apache.lucene.facet.taxonomy.directory.DirectoryTaxonomyWriter;
 import org.apache.lucene.facet.taxonomy.directory.DirectoryTaxonomyWriter.OrdinalMap;
-import org.apache.lucene.index.LeafReaderContext;
-import org.apache.lucene.index.DirectoryReader;
-import org.apache.lucene.index.IndexWriter;
-import org.apache.lucene.index.CodecReader;
-import org.apache.lucene.index.SlowCodecReaderWrapper;
+import org.apache.lucene.index.*;
 import org.apache.lucene.store.Directory;
+
+import java.io.IOException;
+import java.util.List;
 
 /**
  * Utility methods for merging index and taxonomy directories.

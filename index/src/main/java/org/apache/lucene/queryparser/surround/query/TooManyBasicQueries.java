@@ -15,7 +15,8 @@
  * limitations under the License.
  */
 package org.apache.lucene.queryparser.surround.query;
-import java.io.IOException; /* subclass to be usable from within Query.rewrite() */
+
+import java.io.IOException;
 
 /**
  * Exception thrown when {@link BasicQueryFactory} would exceed the limit

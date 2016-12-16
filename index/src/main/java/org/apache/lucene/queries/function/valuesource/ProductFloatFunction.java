@@ -16,10 +16,10 @@
  */
 package org.apache.lucene.queries.function.valuesource;
 
-import java.io.IOException;
-
 import org.apache.lucene.queries.function.FunctionValues;
 import org.apache.lucene.queries.function.ValueSource;
+
+import java.io.IOException;
 
 /**
  * <code>ProductFloatFunction</code> returns the product of its components.

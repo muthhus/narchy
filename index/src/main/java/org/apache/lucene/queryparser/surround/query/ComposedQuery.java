@@ -15,11 +15,12 @@
  * limitations under the License.
  */
 package org.apache.lucene.queryparser.surround.query;
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Iterator;
 
 import org.apache.lucene.search.Query;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 /** Base class for composite queries (such as AND/OR/NOT) */
 public abstract class ComposedQuery extends SrndQuery { 

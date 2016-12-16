@@ -15,10 +15,11 @@
  * limitations under the License.
  */
 package org.apache.lucene.queryparser.surround.query;
-import java.io.IOException;
 
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.search.Query;
+
+import java.io.IOException;
 
 class DistanceRewriteQuery extends RewriteQuery<DistanceQuery> {
 

@@ -16,14 +16,14 @@
  */
 package org.apache.lucene.facet;
 
-import java.io.IOException;
-import java.util.Random;
-
 import org.apache.lucene.store.IOContext;
 import org.apache.lucene.store.IndexInput;
 import org.apache.lucene.store.IndexOutput;
 import org.apache.lucene.store.RAMDirectory;
 import org.apache.lucene.util.ThreadInterruptedException;
+
+import java.io.IOException;
+import java.util.Random;
 
 /**
  * Test utility - slow directory

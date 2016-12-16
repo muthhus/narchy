@@ -208,21 +208,21 @@ public class FilterPath implements Path {
   @Override
   public Iterator<Path> iterator() {
     final Iterator<Path> iterator = delegate.iterator();
-    return new Iterator<Path>() {
-      @Override
-      public boolean hasNext() {
-        return iterator.hasNext();
-      }
+    return new Iterator<>() {
+        @Override
+        public boolean hasNext() {
+            return iterator.hasNext();
+        }
 
-      @Override
-      public Path next() {
-        return wrap(iterator.next());
-      }
+        @Override
+        public Path next() {
+            return wrap(iterator.next());
+        }
 
-      @Override
-      public void remove() {
-        iterator.remove();
-      }
+        @Override
+        public void remove() {
+            iterator.remove();
+        }
     };
   }
 

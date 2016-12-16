@@ -16,17 +16,12 @@
  */
 package org.apache.lucene.queryparser.classic;
 
+import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.search.*;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
-import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.search.BooleanClause;
-import org.apache.lucene.search.BooleanQuery;
-import org.apache.lucene.search.BoostQuery;
-import org.apache.lucene.search.MultiPhraseQuery;
-import org.apache.lucene.search.PhraseQuery;
-import org.apache.lucene.search.Query;
 
 /**
  * A QueryParser which constructs queries to search multiple fields.

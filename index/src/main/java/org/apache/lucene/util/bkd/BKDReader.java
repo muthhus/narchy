@@ -53,7 +53,7 @@ public final class BKDReader extends PointValues implements Accountable {
   final long[] leafBlockFPs;
 
   /** Caller must pre-seek the provided {@link IndexInput} to the index location that {@link BKDWriter#finish} returned */
-  public BKDReader(IndexInput in) throws IOException {
+  public BKDReader(IndexInput in) throws IOException, CorruptIndexException {
     version = CodecUtil.checkHeader(in, BKDWriter.CODEC_NAME, BKDWriter.VERSION_START, BKDWriter.VERSION_CURRENT);
     numDims = in.readVInt();
     maxPointsInLeafNode = in.readVInt();
@@ -173,6 +173,7 @@ public final class BKDReader extends PointValues implements Accountable {
     }
 
     /** Clone, but you are not allowed to pop up past the point where the clone happened. */
+    @Override
     public abstract IndexTree clone();
     
     public void pushRight() {
@@ -478,6 +479,7 @@ public final class BKDReader extends PointValues implements Accountable {
     }
   }
 
+  @Override
   public void intersect(IntersectVisitor visitor) throws IOException {
     intersect(getIntersectState(visitor), minPackedValue, maxPackedValue);
   }
@@ -585,7 +587,7 @@ public final class BKDReader extends PointValues implements Accountable {
     }
   }
 
-  private void visitCompressedDocValues(int[] commonPrefixLengths, byte[] scratchPackedValue, IndexInput in, int[] docIDs, int count, IntersectVisitor visitor, int compressedDim) throws IOException {
+  private void visitCompressedDocValues(int[] commonPrefixLengths, byte[] scratchPackedValue, IndexInput in, int[] docIDs, int count, IntersectVisitor visitor, int compressedDim) throws IOException, CorruptIndexException {
     // the byte at `compressedByteOffset` is compressed using run-length compression,
     // other suffix bytes are stored verbatim
     final int compressedByteOffset = compressedDim * bytesPerDim + commonPrefixLengths[compressedDim];
@@ -608,7 +610,7 @@ public final class BKDReader extends PointValues implements Accountable {
     }
   }
 
-  private int readCompressedDim(IndexInput in) throws IOException {
+  private int readCompressedDim(IndexInput in) throws IOException, CorruptIndexException {
     int compressedDim = in.readByte();
     if (compressedDim < -1 || compressedDim >= numDims) {
       throw new CorruptIndexException("Got compressedDim="+compressedDim, in);

@@ -16,12 +16,12 @@
  */
 package org.apache.lucene.queryparser.flexible.standard.parser;
 
-import java.util.Locale;
-
-import org.apache.lucene.queryparser.flexible.messages.MessageImpl;
 import org.apache.lucene.queryparser.flexible.core.messages.QueryParserMessages;
 import org.apache.lucene.queryparser.flexible.core.parser.EscapeQuerySyntax;
 import org.apache.lucene.queryparser.flexible.core.util.UnescapedCharSequence;
+import org.apache.lucene.queryparser.flexible.messages.MessageImpl;
+
+import java.util.Locale;
 
 /**
  * Implementation of {@link EscapeQuerySyntax} for the standard lucene

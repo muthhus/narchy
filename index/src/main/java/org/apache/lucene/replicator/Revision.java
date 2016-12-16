@@ -16,12 +16,12 @@
  */
 package org.apache.lucene.replicator;
 
+import org.apache.lucene.store.IndexInput;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
-
-import org.apache.lucene.store.IndexInput;
 
 /**
  * A revision comprises lists of files that come from different sources and need

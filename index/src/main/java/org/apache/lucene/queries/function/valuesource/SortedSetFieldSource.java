@@ -16,9 +16,6 @@
  */
 package org.apache.lucene.queries.function.valuesource;
 
-import java.io.IOException;
-import java.util.Map;
-
 import org.apache.lucene.index.DocValues;
 import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.index.SortedDocValues;
@@ -28,6 +25,9 @@ import org.apache.lucene.queries.function.docvalues.DocTermsIndexDocValues;
 import org.apache.lucene.search.SortField;
 import org.apache.lucene.search.SortedSetSelector;
 import org.apache.lucene.search.SortedSetSortField;
+
+import java.io.IOException;
+import java.util.Map;
 
 /**
  * Retrieves {@link FunctionValues} instances for multi-valued string based fields.

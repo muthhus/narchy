@@ -534,7 +534,7 @@ public final class UnicodeUtil {
                       w += 2;
                   }
                   break;
-              } catch (IndexOutOfBoundsException ex) {
+              } catch (IndexOutOfBoundsException ignored) {
                   int newlen = (int) (Math.ceil((double) codePoints.length * (w + 2)
                           / (r - offset + 1)));
                   char[] temp = new char[newlen];
@@ -569,7 +569,7 @@ public final class UnicodeUtil {
           }
         }
         
-        sb.append("0x" + Integer.toHexString(ch));
+        sb.append("0x").append(Integer.toHexString(ch));
       }
     }
     return sb.toString();

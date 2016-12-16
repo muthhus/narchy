@@ -16,11 +16,11 @@
  */
 package org.apache.lucene.facet.sortedset;
 
-import java.io.IOException;
-import java.util.Map;
-
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.SortedSetDocValues;
+
+import java.io.IOException;
+import java.util.Map;
 
 /** Wraps a {@link IndexReader} and resolves ords
  *  using existing {@link SortedSetDocValues} APIs without a

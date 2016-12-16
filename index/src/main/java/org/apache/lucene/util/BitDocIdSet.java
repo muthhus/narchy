@@ -68,7 +68,7 @@ public class BitDocIdSet extends DocIdSet {
 
   @Override
   public String toString() {
-    return getClass().getSimpleName() + "(set=" + set + ",cost=" + cost + ")";
+    return getClass().getSimpleName() + "(set=" + set + ",cost=" + cost + ')';
   }
 
 }

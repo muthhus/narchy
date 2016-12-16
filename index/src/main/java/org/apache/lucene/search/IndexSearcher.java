@@ -278,10 +278,11 @@ public class IndexSearcher {
    * Each {@link LeafSlice} is executed in a single thread. By default there
    * will be one {@link LeafSlice} per leaf ({@link LeafReaderContext}).
    */
-  protected LeafSlice[] slices(List<LeafReaderContext> leaves) {
+  protected LeafSlice[] slices(Collection<LeafReaderContext> leaves) {
     LeafSlice[] slices = new LeafSlice[leaves.size()];
-    for (int i = 0; i < slices.length; i++) {
-      slices[i] = new LeafSlice(leaves.get(i));
+    int i = 0;
+    for (LeafReaderContext l : leaves) {
+      slices[i++] = new LeafSlice(l);
     }
     return slices;
   }
@@ -621,7 +622,7 @@ public class IndexSearcher {
    * @throws BooleanQuery.TooManyClauses If a query would exceed 
    *         {@link BooleanQuery#getMaxClauseCount()} clauses.
    */
-  protected void search(List<LeafReaderContext> leaves, Weight weight, Collector collector)
+  protected void search(Collection<LeafReaderContext> leaves, Weight weight, Collector collector)
       throws IOException {
 
     // TODO: should we make this

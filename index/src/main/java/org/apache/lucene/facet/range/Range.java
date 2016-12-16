@@ -16,7 +16,7 @@
  */
 package org.apache.lucene.facet.range;
 
-import org.apache.lucene.facet.DrillDownQuery; // javadocs
+import org.apache.lucene.facet.DrillDownQuery;
 import org.apache.lucene.queries.function.ValueSource;
 import org.apache.lucene.search.Query;
 

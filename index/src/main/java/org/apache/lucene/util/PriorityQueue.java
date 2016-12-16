@@ -292,27 +292,27 @@ public abstract class PriorityQueue<T> implements Iterable<T> {
    * @lucene.internal
    */
   protected final Object[] getHeapArray() {
-    return (Object[]) heap;
+    return heap;
   }
 
   @Override
   public Iterator<T> iterator() {
-    return new Iterator<T>() {
+    return new Iterator<>() {
 
-      int i = 1;
+        int i = 1;
 
-      @Override
-      public boolean hasNext() {
-        return i <= size;
-      }
-
-      @Override
-      public T next() {
-        if (hasNext() == false) {
-          throw new NoSuchElementException();
+        @Override
+        public boolean hasNext() {
+            return i <= size;
         }
-        return heap[i++];
-      }
+
+        @Override
+        public T next() {
+            if (hasNext() == false) {
+                throw new NoSuchElementException();
+            }
+            return heap[i++];
+        }
 
     };
   }

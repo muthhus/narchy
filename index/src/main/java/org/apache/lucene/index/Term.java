@@ -129,23 +129,26 @@ public final class Term extends BytesRef {
             return true;
         if (obj == null)
             return false;
-        if (!(obj instanceof BytesRef)) {
-            if (getClass() != obj.getClass())
-                return false;
-            Term other = (Term) obj;
-            if (field == null) {
-                if (other.field != null)
+        if (obj instanceof BytesRef) {
+            if (obj instanceof Term) {
+                if (getClass() != obj.getClass())
                     return false;
-            } else if (!field.equals(other.field))
+                Term other = (Term) obj;
+                if (field == null) {
+                    if (other.field != null)
+                        return false;
+                } else if (!field.equals(other.field))
+                    return false;
+            }
+            /*if (bytes == null) {
+                //if (obj != null)
+                    return false;
+            } else */
+            if (!super.equals(obj))
                 return false;
+            return true;
         }
-        /*if (bytes == null) {
-            //if (obj != null)
-                return false;
-        } else */
-        if (!super.equals(obj))
-            return false;
-        return true;
+        return false;
     }
 
     @Override

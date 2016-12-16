@@ -107,7 +107,7 @@ public abstract class HandleTrackingFS extends FilterFileSystemProvider {
 
       @Override
       public String toString() {
-        return "InputStream(" + path.toString() + ")";
+        return "InputStream(" + path.toString() + ')';
       }
 
       @Override
@@ -144,7 +144,7 @@ public abstract class HandleTrackingFS extends FilterFileSystemProvider {
       
       @Override
       public String toString() {
-        return "OutputStream(" + path.toString() + ")";
+        return "OutputStream(" + path.toString() + ')';
       }
       
       @Override
@@ -181,7 +181,7 @@ public abstract class HandleTrackingFS extends FilterFileSystemProvider {
 
       @Override
       public String toString() {
-        return "FileChannel(" + path.toString() + ")";
+        return "FileChannel(" + path.toString() + ')';
       }
       
       @Override
@@ -218,7 +218,7 @@ public abstract class HandleTrackingFS extends FilterFileSystemProvider {
 
       @Override
       public String toString() {
-        return "AsynchronousFileChannel(" + path.toString() + ")";
+        return "AsynchronousFileChannel(" + path.toString() + ')';
       }
       
       @Override
@@ -255,7 +255,7 @@ public abstract class HandleTrackingFS extends FilterFileSystemProvider {
 
       @Override
       public String toString() {
-        return "SeekableByteChannel(" + path.toString() + ")";
+        return "SeekableByteChannel(" + path.toString() + ')';
       }
       
       @Override
@@ -274,12 +274,7 @@ public abstract class HandleTrackingFS extends FilterFileSystemProvider {
 
   @Override
   public DirectoryStream<Path> newDirectoryStream(Path dir, Filter<? super Path> filter) throws IOException {
-    Filter<Path> wrappedFilter = new Filter<Path>() {
-      @Override
-      public boolean accept(Path entry) throws IOException {
-        return filter.accept(new FilterPath(entry, fileSystem));
-      }
-    };
+    Filter<Path> wrappedFilter = entry -> filter.accept(new FilterPath(entry, fileSystem));
     DirectoryStream<Path> stream = delegate.newDirectoryStream(toDelegate(dir), wrappedFilter);
     stream = new FilterDirectoryStream(stream, fileSystem) {
       
@@ -299,7 +294,7 @@ public abstract class HandleTrackingFS extends FilterFileSystemProvider {
       
       @Override
       public String toString() {
-        return "DirectoryStream(" + dir + ")";
+        return "DirectoryStream(" + dir + ')';
       }
       
       @Override

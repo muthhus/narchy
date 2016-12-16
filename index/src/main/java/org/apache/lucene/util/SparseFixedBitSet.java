@@ -135,6 +135,7 @@ public class SparseFixedBitSet extends BitSet implements Bits, Accountable {
   /**
    * Set the bit at index <tt>i</tt>.
    */
+  @Override
   public void set(int i) {
     assert consistent(i);
     final int i4096 = i >>> 12;
@@ -192,6 +193,7 @@ public class SparseFixedBitSet extends BitSet implements Bits, Accountable {
   /**
    * Clear the bit at index <tt>i</tt>.
    */
+  @Override
   public void clear(int i) {
     assert consistent(i);
     final int i4096 = i >>> 12;

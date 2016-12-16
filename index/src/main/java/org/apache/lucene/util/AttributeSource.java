@@ -112,27 +112,27 @@ public class AttributeSource {
   public final Iterator<AttributeImpl> getAttributeImplsIterator() {
     final State initState = getCurrentState();
     if (initState != null) {
-      return new Iterator<AttributeImpl>() {
-        private State state = initState;
-      
-        @Override
-        public void remove() {
-          throw new UnsupportedOperationException();
-        }
-        
-        @Override
-        public AttributeImpl next() {
-          if (state == null)
-            throw new NoSuchElementException();
-          final AttributeImpl att = state.attribute;
-          state = state.next;
-          return att;
-        }
-        
-        @Override
-        public boolean hasNext() {
-          return state != null;
-        }
+      return new Iterator<>() {
+          private State state = initState;
+
+          @Override
+          public void remove() {
+              throw new UnsupportedOperationException();
+          }
+
+          @Override
+          public AttributeImpl next() {
+              if (state == null)
+                  throw new NoSuchElementException();
+              final AttributeImpl att = state.attribute;
+              state = state.next;
+              return att;
+          }
+
+          @Override
+          public boolean hasNext() {
+              return state != null;
+          }
       };
     } else {
       return Collections.<AttributeImpl>emptySet().iterator();
@@ -140,24 +140,24 @@ public class AttributeSource {
   }
   
   /** a cache that stores all interfaces for known implementation classes for performance (slow reflection) */
-  private static final ClassValue<Class<? extends Attribute>[]> implInterfaces = new ClassValue<Class<? extends Attribute>[]>() {
-    @Override
-    protected Class<? extends Attribute>[] computeValue(Class<?> clazz) {
-      final Set<Class<? extends Attribute>> intfSet = new LinkedHashSet<>();
-      // find all interfaces that this attribute instance implements
-      // and that extend the Attribute interface
-      do {
-        for (Class<?> curInterface : clazz.getInterfaces()) {
-          if (curInterface != Attribute.class && Attribute.class.isAssignableFrom(curInterface)) {
-            intfSet.add(curInterface.asSubclass(Attribute.class));
-          }
-        }
-        clazz = clazz.getSuperclass();
-      } while (clazz != null);
-      @SuppressWarnings({"unchecked", "rawtypes"}) final Class<? extends Attribute>[] a =
-          intfSet.toArray(new Class[intfSet.size()]);
-      return a;
-    }
+  private static final ClassValue<Class<? extends Attribute>[]> implInterfaces = new ClassValue<>() {
+      @Override
+      protected Class<? extends Attribute>[] computeValue(Class<?> clazz) {
+          final Set<Class<? extends Attribute>> intfSet = new LinkedHashSet<>();
+          // find all interfaces that this attribute instance implements
+          // and that extend the Attribute interface
+          do {
+              for (Class<?> curInterface : clazz.getInterfaces()) {
+                  if (curInterface != Attribute.class && Attribute.class.isAssignableFrom(curInterface)) {
+                      intfSet.add(curInterface.asSubclass(Attribute.class));
+                  }
+              }
+              clazz = clazz.getSuperclass();
+          } while (clazz != null);
+          @SuppressWarnings({"unchecked", "rawtypes"}) final Class<? extends Attribute>[] a =
+                  intfSet.toArray(new Class[intfSet.size()]);
+          return a;
+      }
   };
   
   static Class<? extends Attribute>[] getAttributeInterfaces(final Class<? extends AttributeImpl> clazz) {
@@ -378,17 +378,14 @@ public class AttributeSource {
    */
   public final String reflectAsString(final boolean prependAttClass) {
     final StringBuilder buffer = new StringBuilder();
-    reflectWith(new AttributeReflector() {
-      @Override
-      public void reflect(Class<? extends Attribute> attClass, String key, Object value) {
-        if (buffer.length() > 0) {
-          buffer.append(',');
-        }
-        if (prependAttClass) {
-          buffer.append(attClass.getName()).append('#');
-        }
-        buffer.append(key).append('=').append((value == null) ? "null" : value);
+    reflectWith((attClass, key, value) -> {
+      if (buffer.length() > 0) {
+        buffer.append(',');
       }
+      if (prependAttClass) {
+        buffer.append(attClass.getName()).append('#');
+      }
+      buffer.append(key).append('=').append((value == null) ? "null" : value);
     });
     return buffer.toString();
   }
@@ -459,6 +456,6 @@ public class AttributeSource {
    */
   @Override
   public String toString() {
-    return getClass().getSimpleName() + '@' + Integer.toHexString(System.identityHashCode(this)) + " " + reflectAsString(false);
+    return getClass().getSimpleName() + '@' + Integer.toHexString(System.identityHashCode(this)) + ' ' + reflectAsString(false);
   }
 }

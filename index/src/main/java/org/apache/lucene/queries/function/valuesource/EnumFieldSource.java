@@ -16,9 +16,6 @@
  */
 package org.apache.lucene.queries.function.valuesource;
 
-import java.io.IOException;
-import java.util.Map;
-
 import org.apache.lucene.index.DocValues;
 import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.index.NumericDocValues;
@@ -27,6 +24,9 @@ import org.apache.lucene.queries.function.ValueSourceScorer;
 import org.apache.lucene.queries.function.docvalues.IntDocValues;
 import org.apache.lucene.util.mutable.MutableValue;
 import org.apache.lucene.util.mutable.MutableValueInt;
+
+import java.io.IOException;
+import java.util.Map;
 
 /**
  * Obtains int field values from {@link org.apache.lucene.index.LeafReader#getNumericDocValues} and makes

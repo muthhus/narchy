@@ -16,9 +16,6 @@
  */
 package org.apache.lucene.facet;
 
-import java.util.List;
-import java.util.Random;
-
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field.Store;
 import org.apache.lucene.document.StringField;
@@ -35,6 +32,9 @@ import org.apache.lucene.search.MultiCollector;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.util.IOUtils;
+
+import java.util.List;
+import java.util.Random;
 
 public class TestRandomSamplingFacetsCollector extends FacetTestCase {
   

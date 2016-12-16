@@ -89,7 +89,7 @@ public final class OfflinePointReader extends PointReader {
     }
     try {
       in.readBytes(packedValue, 0, packedValue.length);
-    } catch (EOFException eofe) {
+    } catch (EOFException ignored) {
       assert countLeft == -1;
       return false;
     }

@@ -64,10 +64,10 @@ public class WindowsFS extends HandleTrackingFS {
       // if we concurrently delete or move this file.
       Integer v = openFiles.get(key);
       if (v != null) {
-        v = Integer.valueOf(v.intValue()+1);
+        v = v.intValue() + 1;
         openFiles.put(key, v);
       } else {
-        openFiles.put(key, Integer.valueOf(1));
+        openFiles.put(key, 1);
       }
     }
   }
@@ -79,10 +79,10 @@ public class WindowsFS extends HandleTrackingFS {
       Integer v = openFiles.get(key);
       assert v != null;
       if (v != null) {
-        if (v.intValue() == 1) {
+        if (v == 1) {
           openFiles.remove(key);
         } else {
-          v = Integer.valueOf(v.intValue()-1);
+          v = v.intValue() - 1;
           openFiles.put(key, v);
         }
       }
@@ -97,6 +97,8 @@ public class WindowsFS extends HandleTrackingFS {
     Object key = null;
     try {
       key = getKey(path);
+    } catch (IOException e) {
+        e.printStackTrace();
     } catch (Throwable ignore) {
       // we don't care if the file doesn't exist
     } 

@@ -16,6 +16,9 @@
  */
 package org.apache.lucene.facet.taxonomy.writercache;
 
+import org.apache.lucene.facet.FacetTestCase;
+import org.junit.Test;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.nio.ByteBuffer;
@@ -24,10 +27,6 @@ import java.nio.charset.CodingErrorAction;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-
-import org.apache.lucene.facet.FacetTestCase;
-
-import org.junit.Test;
 
 public class TestCharBlockArray extends FacetTestCase {
 

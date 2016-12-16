@@ -16,10 +16,10 @@
  */
 package org.apache.lucene.queryparser.flexible.core.config;
 
-import java.util.LinkedList;
-
 import org.apache.lucene.queryparser.flexible.core.processors.QueryNodeProcessor;
 import org.apache.lucene.queryparser.flexible.core.util.StringUtils;
+
+import java.util.LinkedList;
 
 /**
  * This class can be used to hold any query configuration and no field

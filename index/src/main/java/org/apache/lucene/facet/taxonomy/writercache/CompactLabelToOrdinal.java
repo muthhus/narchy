@@ -16,17 +16,12 @@
  */
 package org.apache.lucene.facet.taxonomy.writercache;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
+import org.apache.lucene.facet.taxonomy.FacetLabel;
+
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Iterator;
-
-import org.apache.lucene.facet.taxonomy.FacetLabel;
 
 /**
  * This is a very efficient LabelToOrdinal implementation that uses a

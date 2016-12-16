@@ -16,11 +16,10 @@
  */
 package org.apache.lucene.facet.taxonomy.writercache;
 
+import org.apache.lucene.facet.taxonomy.FacetLabel;
+
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
-
-import org.apache.lucene.facet.taxonomy.FacetLabel;
-import org.apache.lucene.facet.taxonomy.writercache.TaxonomyWriterCache;
 
 /**
  * {@link TaxonomyWriterCache} using {@link CompactLabelToOrdinal}. Although

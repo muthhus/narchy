@@ -16,8 +16,6 @@
  */
 package org.apache.lucene.queries.function.docvalues;
 
-import java.io.IOException;
-
 import org.apache.lucene.index.DocValues;
 import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.index.SortedDocValues;
@@ -29,6 +27,8 @@ import org.apache.lucene.util.BytesRefBuilder;
 import org.apache.lucene.util.CharsRefBuilder;
 import org.apache.lucene.util.mutable.MutableValue;
 import org.apache.lucene.util.mutable.MutableValueStr;
+
+import java.io.IOException;
 
 /**
  * Serves as base class for FunctionValues based on DocTermsIndex.

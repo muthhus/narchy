@@ -16,19 +16,15 @@
  */
 package org.apache.lucene.facet.taxonomy;
 
+import org.apache.lucene.codecs.DocValuesFormat;
+import org.apache.lucene.index.BinaryDocValues;
+import org.apache.lucene.index.LeafReaderContext;
+import org.apache.lucene.util.*;
+
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Map;
 import java.util.WeakHashMap;
-
-import org.apache.lucene.codecs.DocValuesFormat;
-import org.apache.lucene.index.BinaryDocValues;
-import org.apache.lucene.index.LeafReaderContext;
-import org.apache.lucene.util.Accountable;
-import org.apache.lucene.util.Accountables;
-import org.apache.lucene.util.ArrayUtil;
-import org.apache.lucene.util.IntsRef;
-import org.apache.lucene.util.RamUsageEstimator;
 
 /**
  * A per-segment cache of documents' facet ordinals. Every

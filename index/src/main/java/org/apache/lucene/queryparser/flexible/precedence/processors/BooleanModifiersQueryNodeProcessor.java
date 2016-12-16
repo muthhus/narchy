@@ -16,17 +16,16 @@
  */
 package org.apache.lucene.queryparser.flexible.precedence.processors;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.apache.lucene.queryparser.flexible.precedence.PrecedenceQueryParser;
-import org.apache.lucene.queryparser.flexible.standard.config.StandardQueryConfigHandler;
-import org.apache.lucene.queryparser.flexible.standard.config.StandardQueryConfigHandler.ConfigurationKeys;
-import org.apache.lucene.queryparser.flexible.standard.config.StandardQueryConfigHandler.Operator;
 import org.apache.lucene.queryparser.flexible.core.QueryNodeException;
 import org.apache.lucene.queryparser.flexible.core.nodes.*;
-import org.apache.lucene.queryparser.flexible.core.processors.QueryNodeProcessorImpl;
 import org.apache.lucene.queryparser.flexible.core.nodes.ModifierQueryNode.Modifier;
+import org.apache.lucene.queryparser.flexible.core.processors.QueryNodeProcessorImpl;
+import org.apache.lucene.queryparser.flexible.precedence.PrecedenceQueryParser;
+import org.apache.lucene.queryparser.flexible.standard.config.StandardQueryConfigHandler.ConfigurationKeys;
+import org.apache.lucene.queryparser.flexible.standard.config.StandardQueryConfigHandler.Operator;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * <p>

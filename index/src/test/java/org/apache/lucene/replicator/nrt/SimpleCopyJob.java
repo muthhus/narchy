@@ -17,13 +17,10 @@
 
 package org.apache.lucene.replicator.nrt;
 
-import java.io.IOException;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
 import org.apache.lucene.util.IOUtils;
+
+import java.io.IOException;
+import java.util.*;
 
 /** Handles one set of files that need copying, either because we have a
  *  new NRT point, or we are pre-copying merged files for merge warming. */

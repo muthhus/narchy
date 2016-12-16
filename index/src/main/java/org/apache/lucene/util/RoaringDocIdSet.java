@@ -182,7 +182,7 @@ public class RoaringDocIdSet extends DocIdSet {
         }
 
         @Override
-        public int nextDoc() throws IOException {
+        public int nextDoc() {
           if (++i >= docIDs.length) {
             return doc = NO_MORE_DOCS;
           }
@@ -200,7 +200,7 @@ public class RoaringDocIdSet extends DocIdSet {
         }
 
         @Override
-        public int advance(int target) throws IOException {
+        public int advance(int target) {
           // binary search
           int lo = i + 1;
           int hi = docIDs.length - 1;
@@ -261,7 +261,7 @@ public class RoaringDocIdSet extends DocIdSet {
     DocIdSetIterator sub = null;
     int doc;
 
-    Iterator() throws IOException {
+    Iterator() {
       doc = -1;
       block = -1;
       sub = DocIdSetIterator.empty();
@@ -331,6 +331,6 @@ public class RoaringDocIdSet extends DocIdSet {
 
   @Override
   public String toString() {
-    return "RoaringDocIdSet(cardinality=" + cardinality + ")";
+    return "RoaringDocIdSet(cardinality=" + cardinality + ')';
   }
 }

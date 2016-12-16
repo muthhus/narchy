@@ -16,11 +16,11 @@
  */
 package org.apache.lucene.queryparser.flexible.core.nodes;
 
-import org.apache.lucene.search.PhraseQuery; // javadocs
-import org.apache.lucene.queryparser.flexible.messages.MessageImpl;
 import org.apache.lucene.queryparser.flexible.core.QueryNodeError;
 import org.apache.lucene.queryparser.flexible.core.messages.QueryParserMessages;
 import org.apache.lucene.queryparser.flexible.core.parser.EscapeQuerySyntax;
+import org.apache.lucene.queryparser.flexible.messages.MessageImpl;
+import org.apache.lucene.search.PhraseQuery;
 
 /**
  * Query node for {@link PhraseQuery}'s slop factor.

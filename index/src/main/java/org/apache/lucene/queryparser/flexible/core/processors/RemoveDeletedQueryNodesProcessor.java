@@ -16,13 +16,13 @@
  */
 package org.apache.lucene.queryparser.flexible.core.processors;
 
-import java.util.Iterator;
-import java.util.List;
-
 import org.apache.lucene.queryparser.flexible.core.QueryNodeException;
 import org.apache.lucene.queryparser.flexible.core.nodes.DeletedQueryNode;
 import org.apache.lucene.queryparser.flexible.core.nodes.MatchNoDocsQueryNode;
 import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
+
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * A {@link QueryNodeProcessorPipeline} class removes every instance of

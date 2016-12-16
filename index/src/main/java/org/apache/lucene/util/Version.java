@@ -129,7 +129,7 @@ public final class Version {
 
     StrictStringTokenizer tokens = new StrictStringTokenizer(version, '.');
     if (tokens.hasMoreTokens() == false) {
-      throw new ParseException("Version is not in form major.minor.bugfix(.prerelease) (got: " + version + ")", 0);
+      throw new ParseException("Version is not in form major.minor.bugfix(.prerelease) (got: " + version + ')', 0);
     }
 
     int major;
@@ -137,13 +137,13 @@ public final class Version {
     try {
       major = Integer.parseInt(token);
     } catch (NumberFormatException nfe) {
-      ParseException p = new ParseException("Failed to parse major version from \"" + token + "\" (got: " + version + ")", 0);
+      ParseException p = new ParseException("Failed to parse major version from \"" + token + "\" (got: " + version + ')', 0);
       p.initCause(nfe);
       throw p;
     }
 
     if (tokens.hasMoreTokens() == false) {
-      throw new ParseException("Version is not in form major.minor.bugfix(.prerelease) (got: " + version + ")", 0);
+      throw new ParseException("Version is not in form major.minor.bugfix(.prerelease) (got: " + version + ')', 0);
     }
 
     int minor;
@@ -151,7 +151,7 @@ public final class Version {
     try {
       minor = Integer.parseInt(token);
     } catch (NumberFormatException nfe) {
-      ParseException p = new ParseException("Failed to parse minor version from \"" + token + "\" (got: " + version + ")", 0);
+      ParseException p = new ParseException("Failed to parse minor version from \"" + token + "\" (got: " + version + ')', 0);
       p.initCause(nfe);
       throw p;
     }
@@ -164,7 +164,7 @@ public final class Version {
       try {
         bugfix = Integer.parseInt(token);
       } catch (NumberFormatException nfe) {
-        ParseException p = new ParseException("Failed to parse bugfix version from \"" + token + "\" (got: " + version + ")", 0);
+        ParseException p = new ParseException("Failed to parse bugfix version from \"" + token + "\" (got: " + version + ')', 0);
         p.initCause(nfe);
         throw p;
       }
@@ -174,17 +174,17 @@ public final class Version {
         try {
           prerelease = Integer.parseInt(token);
         } catch (NumberFormatException nfe) {
-          ParseException p = new ParseException("Failed to parse prerelease version from \"" + token + "\" (got: " + version + ")", 0);
+          ParseException p = new ParseException("Failed to parse prerelease version from \"" + token + "\" (got: " + version + ')', 0);
           p.initCause(nfe);
           throw p;
         }
         if (prerelease == 0) {
-          throw new ParseException("Invalid value " + prerelease + " for prerelease; should be 1 or 2 (got: " + version + ")", 0);
+          throw new ParseException("Invalid value " + prerelease + " for prerelease; should be 1 or 2 (got: " + version + ')', 0);
         }
 
         if (tokens.hasMoreTokens()) {
           // Too many tokens!
-          throw new ParseException("Version is not in form major.minor.bugfix(.prerelease) (got: " + version + ")", 0);
+          throw new ParseException("Version is not in form major.minor.bugfix(.prerelease) (got: " + version + ')', 0);
         }
       }
     }
@@ -272,7 +272,7 @@ public final class Version {
       throw new IllegalArgumentException("Illegal prerelease version: " + prerelease);
     }
     if (prerelease != 0 && (minor != 0 || bugfix != 0)) {
-      throw new IllegalArgumentException("Prerelease version only supported with major release (got prerelease: " + prerelease + ", minor: " + minor + ", bugfix: " + bugfix + ")");
+      throw new IllegalArgumentException("Prerelease version only supported with major release (got prerelease: " + prerelease + ", minor: " + minor + ", bugfix: " + bugfix + ')');
     }
 
     encodedValue = major << 18 | minor << 10 | bugfix << 2 | prerelease;
@@ -290,9 +290,9 @@ public final class Version {
   @Override
   public String toString() {
     if (prerelease == 0) {
-      return "" + major + "." + minor + "." + bugfix;
+      return major + "." + minor + '.' + bugfix;
     }
-    return "" + major + "." + minor + "." + bugfix + "." + prerelease;
+    return major + "." + minor + '.' + bugfix + '.' + prerelease;
   }
 
   @Override

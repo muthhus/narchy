@@ -17,11 +17,6 @@
 
 package org.apache.lucene.facet.taxonomy.directory;
 
-import java.io.IOException;
-import java.util.HashSet;
-import java.util.Random;
-import java.util.concurrent.atomic.AtomicInteger;
-
 import org.apache.lucene.facet.FacetTestCase;
 import org.apache.lucene.facet.taxonomy.FacetLabel;
 import org.apache.lucene.facet.taxonomy.directory.DirectoryTaxonomyWriter.DiskOrdinalMap;
@@ -30,6 +25,11 @@ import org.apache.lucene.facet.taxonomy.directory.DirectoryTaxonomyWriter.Ordina
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.util.IOUtils;
 import org.apache.lucene.util.TestUtil;
+
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.Random;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class TestAddTaxonomy extends FacetTestCase {
 

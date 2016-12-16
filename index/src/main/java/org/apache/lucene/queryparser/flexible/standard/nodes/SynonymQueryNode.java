@@ -16,10 +16,10 @@
  */
 package org.apache.lucene.queryparser.flexible.standard.nodes;
 
-import java.util.List;
-
 import org.apache.lucene.queryparser.flexible.core.nodes.BooleanQueryNode;
 import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
+
+import java.util.List;
 
 /** {@link QueryNode} for clauses that are synonym of each other. */
 public class SynonymQueryNode extends BooleanQueryNode {

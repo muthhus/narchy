@@ -16,23 +16,13 @@
  */
 package org.apache.lucene.replicator.http;
 
-import java.io.IOException;
-import java.nio.file.Path;
-import java.util.Collections;
-
 import org.apache.http.impl.conn.BasicHttpClientConnectionManager;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.index.SnapshotDeletionPolicy;
-import org.apache.lucene.replicator.IndexReplicationHandler;
-import org.apache.lucene.replicator.IndexRevision;
-import org.apache.lucene.replicator.LocalReplicator;
-import org.apache.lucene.replicator.PerSessionDirectoryFactory;
-import org.apache.lucene.replicator.ReplicationClient;
-import org.apache.lucene.replicator.Replicator;
-import org.apache.lucene.replicator.ReplicatorTestCase;
+import org.apache.lucene.replicator.*;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.util.IOUtils;
 import org.eclipse.jetty.server.Server;
@@ -40,6 +30,10 @@ import org.eclipse.jetty.servlet.ServletHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.io.IOException;
+import java.nio.file.Path;
+import java.util.Collections;
 
 public class HttpReplicatorTest extends ReplicatorTestCase {
   private Path clientWorkDir;

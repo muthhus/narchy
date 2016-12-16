@@ -16,12 +16,12 @@
  */
 package org.apache.lucene.facet.taxonomy;
 
+import org.apache.lucene.index.IndexWriter;
+import org.apache.lucene.index.TwoPhaseCommit;
+
 import java.io.Closeable;
 import java.io.IOException;
 import java.util.Map;
-
-import org.apache.lucene.index.IndexWriter;
-import org.apache.lucene.index.TwoPhaseCommit;
 
 /**
  * TaxonomyWriter is the interface which the faceted-search library uses

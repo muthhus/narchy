@@ -137,12 +137,12 @@ public final class RamUsageEstimator {
   static {
     primitiveSizes.put(boolean.class, 1);
     primitiveSizes.put(byte.class, 1);
-    primitiveSizes.put(char.class, Integer.valueOf(Character.BYTES));
-    primitiveSizes.put(short.class, Integer.valueOf(Short.BYTES));
-    primitiveSizes.put(int.class, Integer.valueOf(Integer.BYTES));
-    primitiveSizes.put(float.class, Integer.valueOf(Float.BYTES));
-    primitiveSizes.put(double.class, Integer.valueOf(Double.BYTES));
-    primitiveSizes.put(long.class, Integer.valueOf(Long.BYTES));
+    primitiveSizes.put(char.class, Character.BYTES);
+    primitiveSizes.put(short.class, Short.BYTES);
+    primitiveSizes.put(int.class, Integer.BYTES);
+    primitiveSizes.put(float.class, Float.BYTES);
+    primitiveSizes.put(double.class, Double.BYTES);
+    primitiveSizes.put(long.class, Long.BYTES);
   }
 
   /**
@@ -182,7 +182,7 @@ public final class RamUsageEstimator {
             compressedOops = Boolean.parseBoolean(
                 vmOption.getClass().getMethod("getValue").invoke(vmOption).toString()
             );
-          } catch (ReflectiveOperationException | RuntimeException e) {
+          } catch (ReflectiveOperationException | RuntimeException ignored) {
             isHotspot = false;
           }
           try {
@@ -190,11 +190,11 @@ public final class RamUsageEstimator {
             objectAlignment = Integer.parseInt(
                 vmOption.getClass().getMethod("getValue").invoke(vmOption).toString()
             );
-          } catch (ReflectiveOperationException | RuntimeException e) {
+          } catch (ReflectiveOperationException | RuntimeException ignored) {
             isHotspot = false;
           }
         }
-      } catch (ReflectiveOperationException | RuntimeException e) {
+      } catch (ReflectiveOperationException | RuntimeException ignored) {
         isHotspot = false;
       }
       JVM_IS_HOTSPOT_64BIT = isHotspot;
@@ -333,12 +333,7 @@ public final class RamUsageEstimator {
     // Walk type hierarchy
     for (;clazz != null; clazz = clazz.getSuperclass()) {
       final Class<?> target = clazz;
-      final Field[] fields = AccessController.doPrivileged(new PrivilegedAction<Field[]>() {
-        @Override
-        public Field[] run() {
-          return target.getDeclaredFields();
-        }
-      });
+      final Field[] fields = AccessController.doPrivileged((PrivilegedAction<Field[]>) () -> target.getDeclaredFields());
       for (Field f : fields) {
         if (!Modifier.isStatic(f.getModifiers())) {
           size = adjustForField(size, f);

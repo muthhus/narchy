@@ -15,8 +15,6 @@
  * limitations under the License.
  */
 package org.apache.lucene.queryparser.xml.builders;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.apache.lucene.queryparser.xml.DOMUtils;
 import org.apache.lucene.queryparser.xml.ParserException;
@@ -27,6 +25,9 @@ import org.apache.lucene.search.Query;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Builder for {@link DisjunctionMaxQuery}

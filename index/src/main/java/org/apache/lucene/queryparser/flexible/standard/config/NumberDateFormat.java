@@ -16,11 +16,7 @@
  */
 package org.apache.lucene.queryparser.flexible.standard.config;
 
-import java.text.DateFormat;
-import java.text.FieldPosition;
-import java.text.Format;
-import java.text.NumberFormat;
-import java.text.ParsePosition;
+import java.text.*;
 import java.util.Date;
 
 /**

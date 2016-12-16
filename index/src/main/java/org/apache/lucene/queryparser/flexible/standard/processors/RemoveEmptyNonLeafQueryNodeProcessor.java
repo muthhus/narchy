@@ -16,15 +16,15 @@
  */
 package org.apache.lucene.queryparser.flexible.standard.processors;
 
-import java.util.LinkedList;
-import java.util.List;
-
 import org.apache.lucene.queryparser.flexible.core.QueryNodeException;
 import org.apache.lucene.queryparser.flexible.core.nodes.GroupQueryNode;
 import org.apache.lucene.queryparser.flexible.core.nodes.MatchNoDocsQueryNode;
 import org.apache.lucene.queryparser.flexible.core.nodes.ModifierQueryNode;
 import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 import org.apache.lucene.queryparser.flexible.core.processors.QueryNodeProcessorImpl;
+
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * This processor removes every {@link QueryNode} that is not a leaf and has not

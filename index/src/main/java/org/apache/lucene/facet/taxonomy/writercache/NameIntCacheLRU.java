@@ -16,10 +16,11 @@
  */
 package org.apache.lucene.facet.taxonomy.writercache;
 
+import org.apache.lucene.facet.taxonomy.FacetLabel;
+
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
-import org.apache.lucene.facet.taxonomy.FacetLabel;
 
 /**
  * An an LRU cache of mapping from name to int.

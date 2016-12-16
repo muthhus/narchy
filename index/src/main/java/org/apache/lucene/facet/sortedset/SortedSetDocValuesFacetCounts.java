@@ -16,35 +16,20 @@
  */
 package org.apache.lucene.facet.sortedset;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.lucene.facet.FacetResult;
-import org.apache.lucene.facet.Facets;
+import org.apache.lucene.facet.*;
 import org.apache.lucene.facet.FacetsCollector.MatchingDocs;
-import org.apache.lucene.facet.FacetsCollector;
-import org.apache.lucene.facet.FacetsConfig;
-import org.apache.lucene.facet.LabelAndValue;
-import org.apache.lucene.facet.TopOrdAndIntQueue;
 import org.apache.lucene.facet.sortedset.SortedSetDocValuesReaderState.OrdRange;
-import org.apache.lucene.index.IndexReader;
-import org.apache.lucene.index.LeafReader;
-import org.apache.lucene.index.LeafReaderContext;
+import org.apache.lucene.index.*;
 import org.apache.lucene.index.MultiDocValues.MultiSortedSetDocValues;
-import org.apache.lucene.index.MultiDocValues;
-import org.apache.lucene.index.ReaderUtil;
-import org.apache.lucene.index.SortedSetDocValues;
 import org.apache.lucene.search.ConjunctionDISI;
 import org.apache.lucene.search.DocIdSetIterator;
 import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.util.Bits;
 import org.apache.lucene.util.BytesRef;
 import org.apache.lucene.util.LongValues;
+
+import java.io.IOException;
+import java.util.*;
 
 /** Compute facets counts from previously
  *  indexed {@link SortedSetDocValuesFacetField},
