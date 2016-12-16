@@ -320,8 +320,10 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
      * for question tasks: when an answer appears.
      * return false if this question is finished and should be removed from a table containing it
      */
-    default boolean onAnswered(Task answer) {
-        return true;
+    default void onAnswered(Task answer, NAR nar) {
+        if (isInput()) {
+            nar.logger.info("{} :Question|Answer: {}", this, answer);
+        }
     }
 
 

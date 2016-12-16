@@ -95,28 +95,7 @@ public class Revision {
     }
 
 
-    public static Task mergeSolution(@NotNull Task a, @NotNull Task b, long when, long now, @NotNull Truth newTruth) {
 
-        @NotNull Budget bb = b.budget();
-
-        if (bb.isDeleted()) return null;
-
-        Task solution = new AnswerTask(b.term() /* question term in case it has different temporality */,
-                b, a, newTruth, now, when, 0.5f)
-                .log("Projected Answer")
-                .budget(bb)
-                //.state(state())
-                //.setEvidence(evidence())
-
-                //.log("Projected from " + this)
-                ;
-
-
-        ////TODO avoid adding repeat & equal Solution instances
-        //solution.log(new Solution(question));
-
-        return solution;
-    }
 
     @Nullable public static Task mergeInterpolate(@NotNull Task a, @NotNull Task b, long when, long now, @NotNull Truth newTruth, boolean mergeOrChoose) {
         assert (a.punc() == b.punc());

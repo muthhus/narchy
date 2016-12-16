@@ -4,6 +4,8 @@ import nars.NAR;
 import nars.Task;
 import nars.budget.Budgeted;
 import nars.concept.CompoundConcept;
+import nars.task.AnswerTask;
+import nars.task.MutableTask;
 import nars.truth.Truth;
 import nars.truth.TruthDelta;
 import nars.truth.TruthFunctions;
@@ -376,6 +378,25 @@ public interface BeliefTable extends TaskTable {
         });
 
         return eSum[0];
+    }
+
+    default Task answer(long when, long now, @NotNull Task question, boolean noOverlap, float minConf) {
+        Task answer = match(when, now, question, noOverlap);
+        if (answer!=null) {
+            if (answer.occurrence()==when) {
+                return answer;
+            } else {
+
+                Truth truth = answer.truth(when);
+                if (truth == null || truth.conf() < minConf)
+                    return null;
+
+                Task answerProj = AnswerTask.answer(question, answer, when, now, truth);
+
+                return answerProj;
+            }
+        }
+        return null;
     }
 
 //    /** 2-element array containing running min/max range accumulator */

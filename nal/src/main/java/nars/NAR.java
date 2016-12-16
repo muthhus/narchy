@@ -635,7 +635,7 @@ public abstract class NAR extends Param implements Level, Consumer<Task>, NARIn,
      * exposes the memory to an input, derived, or immediate task.
      * the memory then delegates it to its controller
      * <p>
-     * return true if the task was processed
+     * returns the Concept (non-null) if the task was processed
      * if the task was a command, it will return false even if executed
      */
     @Nullable
@@ -1077,8 +1077,9 @@ public abstract class NAR extends Param implements Level, Consumer<Task>, NARIn,
         @NotNull MutableTask t;
         inputLater(t = new MutableTask(term, punc, null) {
             @Override
-            public boolean onAnswered(Task answer) {
-                return eachAnswer.test(answer);
+            public void onAnswered(Task answer, NAR nar) {
+                super.onAnswered(answer, nar);
+                eachAnswer.test(answer);
             }
         }.occurr(occ));
         return t;
@@ -1128,12 +1129,12 @@ public abstract class NAR extends Param implements Level, Consumer<Task>, NARIn,
         return this;
     }
 
-    public void inputAt(long time, @NotNull Collection<Task> x) {
+    public void inputAt(long when, @NotNull Collection<Task> x) {
         long now = time();
-        if (time < now) {
+        if (when < now) {
             //past
             throw new RuntimeException("can not input at a past time");
-        } else if (time == now) {
+        } else if (when == now) {
             //current cycle
             input(x);
         } else {
@@ -1141,7 +1142,7 @@ public abstract class NAR extends Param implements Level, Consumer<Task>, NARIn,
 
             onCycle(m -> {
                 //if (timeCondition.test(m.time())) {
-                if (m.time() == time) {
+                if (m.time() == when) {
                     m.input(x);
                     //this.off.off();
                 }

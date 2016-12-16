@@ -1,12 +1,14 @@
 package nars.budget;
 
 import nars.NAR;
+import nars.Op;
 import nars.Param;
 import nars.Task;
 import nars.bag.Bag;
 import nars.concept.Concept;
 import nars.term.Term;
 import nars.term.Termed;
+import nars.term.atom.Atomic;
 import nars.term.container.TermContainer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -80,13 +82,13 @@ public class DepthFirstActivation extends Activation {
 
             if (depth + 1 < termlinkDepth) {
 
-                @NotNull TermContainer ttt = targetConcept.templates();
-                int n = ttt.size();
+                @NotNull TermContainer templates = targetConcept.templates();
+                int n = templates.size();
                 if (n > 0) {
                     float subScale1 = /*Param.TERMLINK_TEMPLATE_PRIORITY_FACTOR **/ subScale / n;
                     if (subScale1 >= minScale) { //TODO use a min bound to prevent the iteration ahead of time
                         for (int i = 0; i < n; i++)
-                            link(targetConcept, ttt.term(i), subScale1, depth + 1); //Link the peer termlink bidirectionally
+                            link(targetConcept, templates.term(i), subScale1, depth + 1); //Link the peer termlink bidirectionally
                     }
                 } else {
                     if (Param.ACTIVATE_TERMLINKS_IF_NO_TEMPLATE) {
@@ -114,31 +116,25 @@ public class DepthFirstActivation extends Activation {
 
     protected final void link(@NotNull Concept src, @NotNull Termed target, float scale, int depth) {
 
+        if (scale < minScale)
+            return;
+
         Concept targetConcept = linkSubterm(target, scale, depth);
 
         Term sourceTerm = src.term();
         Term targetTerm = target.term();
 
+        if (canSelfTermlink(sourceTerm) && targetTerm.equals(sourceTerm)) {
 
+            //self termlink
+            src.termlinks().put(targetTerm, in, scale, linkOverflow);
 
-        if (((scale / 2f) >= minScale) && !targetTerm.equals(sourceTerm)) {
+        } else {
 
-//            Budget a;
-//            if (linkOverflow.floatValue() > Param.BUDGET_EPSILON) {
-//                a = new RawBudget(in.budget());
-//                float remainingPri = 1f - a.pri();
-//                float taken = Math.min(linkOverflow.floatValue(), remainingPri);
-//                linkOverflow.subtract(taken);
-//                a.priAdd(taken);
-//            } else {
-//                a = in.budget(); //unaffected
-//            }
-
-            /* insert termlink target to source */
-            //boolean alsoReverse = true;
+            // insert termlink target to source
             float tlFlow = Param.ACTIVATION_TERMLINK_BALANCE;
 
-            if (targetConcept != null /*&& alsoReverse*/) {
+            if (targetConcept != null) {
 
                 final float tlForward = scale * tlFlow;
                 if (tlForward >= minScale)
@@ -153,10 +149,21 @@ public class DepthFirstActivation extends Activation {
             //System.out.println(src + "<-" + sourceTerm + " -> " + target + "<-" + targetTerm);
         }
 
+
         if (targetConcept != null && depth <= tasklinkDepth && in instanceof Task) {
             targetConcept.tasklinks().put((Task) in, in, scale, null);
         }
 
+
+    }
+
+    private boolean canSelfTermlink(Term sourceTerm) {
+
+        if (sourceTerm instanceof Atomic)
+            return false;
+
+        Op o = src.op();
+        return !o.image;
     }
 
 

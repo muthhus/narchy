@@ -44,8 +44,10 @@ So it can be useful for a more easy to understand rewrite of this class TODO
 public abstract class Unify extends Termunator implements Subst {
 
 
-    public final Random random;
-    public final Op type;
+    @NotNull public final Random random;
+
+    @Nullable public final Op type;
+
     @NotNull
     private final List<Termutator> termutes;
 
@@ -94,7 +96,7 @@ public abstract class Unify extends Termunator implements Subst {
 //    }
 
 
-    protected Unify(TermIndex index, Op type, Random random, int stackMax, int termutesMax) {
+    protected Unify(TermIndex index, @Nullable Op type, Random random, int stackMax, int termutesMax) {
         this(index, type, random, new Versioning(stackMax), termutesMax );
     }
 
@@ -117,7 +119,7 @@ public abstract class Unify extends Termunator implements Subst {
             return true;        }
     }
 
-    protected Unify(TermIndex index, Op type, Random random, @NotNull Versioning versioning, int termutesMax) {
+    protected Unify(TermIndex index, @Nullable Op type, Random random, @NotNull Versioning versioning, int termutesMax) {
         super();
 
         this.termutes = new LimitedFasterList(termutesMax);

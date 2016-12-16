@@ -771,7 +771,10 @@ public class Terms   {
         return equal(a.term(), b.term(), false, false);
     }
 
-    /** equal atemporally AND with any outer negations removed */
+    /** equal atemporally AND with any outer negations removed
+     * @param samePolarity whether the top-level polarity should be ignored (auto-unnegate)
+     *
+     */
     public static boolean equal(@NotNull Term a, @NotNull Term b, boolean sameTemporality, boolean samePolarity) {
         if (a == b)
             return true;

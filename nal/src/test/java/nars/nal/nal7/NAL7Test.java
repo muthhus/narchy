@@ -4,6 +4,7 @@ import nars.$;
 import nars.NAR;
 import nars.nal.AbstractNALTest;
 import nars.test.TestNAR;
+import nars.time.FrameTime;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -845,20 +846,30 @@ public class NAL7Test extends AbstractNALTest {
 
     @Test
     public void testPrediction1() {
-        test()
-                //
-                .inputAt(0, "$0.1$ (x). :|:")
-                .inputAt(4, "$0.1$ (y). :|:")
-//
-                .inputAt(10, "$0.1$ (x). :|:")
-                .inputAt(14, "$0.1$ (y). :|:")
-//
-//                .inputAt(12, "(x). :|:")
-//                .inputAt(16, "(y). :|:")
 
-                .inputAt(20, "(x). :|:")
+        int n1 = 0; //time of 3rd repeat
 
-                .mustBelieve(24, "(y)", 1f, 0.59f, 24)
+        int n2 = 100; //time of 3rd repeat
+
+        int n3 = 200; //time of 3rd repeat
+
+        int eventDT = 50;
+
+        TestNAR t = test();
+        ((FrameTime)t.nar.time).dur(eventDT);
+
+        t
+                .log()
+                .inputAt(n1, "(x). :|:")
+                .inputAt(n1 + eventDT, "(y). :|:")
+//
+                .inputAt(n2, "(x). :|:")
+                .inputAt(n2 + eventDT, "(y). :|:")
+
+                .inputAt(n3, "(x). :|:")
+                .inputAt(n3, $.task($("(y)"), '?', null).budgetSafe(1f, 0.9f).time(n3, n3 + eventDT))
+
+                .mustBelieve(n3+eventDT, "(y)", 1f, 0.5f, n3 + eventDT)
         ;
     }
 

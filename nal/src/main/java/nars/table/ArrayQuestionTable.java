@@ -141,7 +141,9 @@ public class ArrayQuestionTable  implements QuestionTable, Comparator<Task> {
 
         @NotNull Budget qBudget = q.budget();
         @NotNull Budget aBudget = a.budget();
-        if (!qBudget.isDeleted() && !aBudget.isDeleted() && q.onAnswered(a)) {
+        if (!qBudget.isDeleted() && !aBudget.isDeleted() ) {
+
+            q.onAnswered(a, nar);
 
             BudgetFunctions.transferPri(qBudget, aBudget, factor);
 //            if (!qEtern) {

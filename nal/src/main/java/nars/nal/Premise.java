@@ -9,6 +9,7 @@ import nars.budget.Budget;
 import nars.budget.RawBudget;
 import nars.concept.Concept;
 import nars.link.BLink;
+import nars.table.BeliefTable;
 import nars.task.Tasked;
 import nars.term.Compound;
 import nars.term.Term;
@@ -22,7 +23,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
-import static nars.time.Tense.ETERNAL;
 import static nars.util.UtilityFunctions.or;
 
 /**
@@ -89,10 +89,8 @@ public final class Premise extends RawBudget implements Tasked {
      * patham9 its using the result of higher confidence
      */
     public static @Nullable Premise build(@NotNull NAR nar, @NotNull Concept c, long now, @NotNull Task task,
-                                          Term term) {
+                                          Term beliefTerm) {
 
-        if (Terms.equalAtemporally(task.term(), term))
-            return null;
 //        if (Terms.equalSubTermsInRespectToImageAndProduct(task.term(), term))
 //            return null;
 
@@ -107,7 +105,7 @@ public final class Premise extends RawBudget implements Tasked {
 
         Task belief = null;
 
-        Concept beliefConcept = nar.concept(term);
+        Concept beliefConcept = nar.concept(beliefTerm);
         if (beliefConcept != null) {
 
             //float dur = nar.time.dur();
@@ -119,14 +117,28 @@ public final class Premise extends RawBudget implements Tasked {
                     //now;
                     //(long)(now + dur);
 
-            belief = beliefConcept.beliefs().match(when, now, task, true); //in case of quest, proceed with matching belief
 
-//            if (task.isQuestOrQuestion()) {
-//
-//                //TODO is this correct handling for quests? this means a belief task may be a goal which may contradict deriver semantics
-//                BeliefTable table = task.isQuest() ? beliefConcept.goals() : beliefConcept.beliefs();
-//
-//                belief = table.match(task, now);
+            if (beliefTerm instanceof Compound && task.isQuestOrQuestion()) {
+
+                if (unifiable(task.term(), (Compound)beliefTerm, nar)) {
+
+                    BeliefTable table = task.isQuest() ? beliefConcept.goals() : beliefConcept.beliefs();
+
+                    Task answered = table.answer(when, now, task, true, nar.confMin.floatValue());
+                    if (answered!=null && nar.input(answered)!=null) {
+                        task.onAnswered(answered, nar);
+                        belief = answered;
+                    }
+
+
+                }
+
+
+            }
+
+            if (belief == null)
+                belief = beliefConcept.beliefs().match(when, now, task, true); //in case of quest, proceed with matching belief
+
 //                if (belief != null) {
 //                    //try {
 //                    Task answered = answer(nar, task, belief, beliefConcept);
@@ -178,54 +190,75 @@ public final class Premise extends RawBudget implements Tasked {
                 //aveAri(taskLinkBudget.pri(), termLinkBudget.pri());
                 //nar.conceptPriority(c);
 
-        return new Premise(c, task, term.term(), belief, pri, qua);
+        return new Premise(c, task, beliefTerm, belief, pri, qua);
     }
 
-    @Nullable
-    private static Task answer(@NotNull NAR nar, @NotNull Task question, @NotNull Task answer, @NotNull Concept answerConcept) {
+    private static boolean unifiable(@NotNull Compound a, @NotNull Compound b, NAR nar) {
 
-        long taskOcc = question.occurrence();
+        if (a.op() != b.op())
+            return false; //no chance
 
-        //project the belief to the question's time
-        if (taskOcc != ETERNAL) {
-            answer = answerConcept.merge(question, answer, taskOcc, nar);
-        }
+        if (Terms.equalAtemporally(a, b))
+            return true;
 
-        if (answer != null) { //may have become null as a result of projection
+        int varsTotal = a.vars() + a.varPattern() + b.vars() + b.varPattern();
+        if (varsTotal == 0)
+            return false; //since they are inequal, if there are no variables present then nothing would unify anyway
 
-            //attempt to Unify any Query variables; answer if unifies
-            if (question.term().hasVarQuery()) {
-                matchQueryQuestion(nar, question, answer, answerConcept);
-            } else if (answerConcept instanceof Compound && Terms.equalAtemporally(question, answerConcept)) {
-                matchAnswer(nar, question, answer, answerConcept);
-            }
+        List<Termed> result = $.newArrayList(0);
+        new UnifySubst(null /* all variables */, nar, result, Param.QUERY_ANSWERS_PER_MATCH)
+                .unifyAll(
+                    a, b
+                );
 
-
-        }
-
-        return answer;
+        return !result.isEmpty();
     }
 
-    static void matchAnswer(@NotNull NAR nar, @NotNull Task q, Task a, @NotNull Concept answerConcept) {
+//    @Nullable
+//    private static Task answer(@NotNull NAR nar, @NotNull Task question, @NotNull Task answer, @NotNull Concept answerConcept) {
+//
+//        long taskOcc = question.occurrence();
+//
+//        //project the belief to the question's time
+//        if (taskOcc != ETERNAL) {
+//            answer = answerConcept.merge(question, answer, taskOcc, nar);
+//        }
+//
+//        if (answer != null) { //may have become null as a result of projection
+//
+//            //attempt to Unify any Query variables; answer if unifies
+//            if (question.term().hasVarQuery()) {
+//                matchQueryQuestion(nar, question, answer, answerConcept);
+//            } else if (answerConcept instanceof Compound && Terms.equalAtemporally(question, answerConcept)) {
+//                matchAnswer(nar, question, answer, answerConcept);
+//            }
+//
+//
+//        }
+//
+//        return answer;
+//    }
+
+    //static void matchAnswer(@NotNull NAR nar, @NotNull Task q, Task a, @NotNull Concept answerConcept) {
 //        @Nullable Concept questionConcept = nar.concept(q);
 //        if (questionConcept != null) {
 //            List<Task> displ = $.newArrayList(0);
 //            ((QuestionTable) questionConcept.tableFor(q.punc())).answer(a, answerConcept, nar, displ);
 //            nar.tasks.remove(displ);
 //        }
-    }
+    //}
 
-    static void matchQueryQuestion(@NotNull NAR nar, @NotNull Task task, @NotNull Task belief, @NotNull Concept answerConcept) {
-        List<Termed> result = $.newArrayList(Param.QUERY_ANSWERS_PER_MATCH);
-        new UnifySubst(Op.VAR_QUERY, nar, result, Param.QUERY_ANSWERS_PER_MATCH)
-                .unifyAll(
-                        task.term(), belief.term()
-                );
-
-        if (!result.isEmpty()) {
-            matchAnswer(nar, task, belief, answerConcept);
-        }
-    }
+//    static void matchQueryQuestion(@NotNull NAR nar, @NotNull Task task, @NotNull Task belief, @NotNull Concept answerConcept) {
+//        List<Termed> result = $.newArrayList(Param.QUERY_ANSWERS_PER_MATCH);
+//        new UnifySubst(Op.VAR_QUERY, nar, result, Param.QUERY_ANSWERS_PER_MATCH)
+//                .unifyAll(
+//                        task.term(), belief.term()
+//                );
+//
+//        if (!result.isEmpty()) {
+//            matchAnswer(nar, task, belief, answerConcept);
+//        }
+//    }
 
 
     @NotNull

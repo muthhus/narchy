@@ -221,13 +221,13 @@ public interface Concept extends Termed {
         }
     }
 
-    default @Nullable Task merge(@NotNull Task x, @NotNull Task y, long when, @NotNull NAR nar) {
-        long now = nar.time();
-        Truth truth = ((BeliefTable) tableFor(y.punc())).truth(when, now);
-        if (truth == null)
-            return null;
-        return Revision.mergeSolution(x, y, when, now, truth);
-    }
+//    default @Nullable Task merge(@NotNull Task x, @NotNull Task y, long when, @NotNull NAR nar) {
+//        long now = nar.time();
+//        Truth truth = ((BeliefTable) tableFor(y.punc())).truth(when, now);
+//        if (truth == null)
+//            return null;
+//        return Revision.answer(x, y, when, now, truth);
+//    }
 
 
     /**
