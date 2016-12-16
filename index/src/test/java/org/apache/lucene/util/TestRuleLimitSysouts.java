@@ -48,8 +48,8 @@ public class TestRuleLimitSysouts extends TestRuleAdapter {
   @Inherited
   @Retention(RetentionPolicy.RUNTIME)
   @Target(ElementType.TYPE)
-  public static @interface Limit {
-    public int bytes();
+  public @interface Limit {
+    int bytes();
   }
 
   private final static AtomicInteger bytesWritten = new AtomicInteger();
@@ -174,12 +174,8 @@ public class TestRuleLimitSysouts extends TestRuleAdapter {
         target.isAnnotationPresent(SuppressSysoutChecks.class)) {
       return false;
     }
-    
-    if (!target.isAnnotationPresent(Limit.class)) {
-      return false;
-    }
 
-    return true;
+    return target.isAnnotationPresent(Limit.class);
   }
 
   /**

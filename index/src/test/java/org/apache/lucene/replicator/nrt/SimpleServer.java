@@ -209,7 +209,8 @@ public class SimpleServer extends LuceneTestCase {
 
   public void test() throws Exception {
 
-    int id = Integer.parseInt(System.getProperty("tests.nrtreplication.nodeid"));
+    String ids = System.getProperty("tests.nrtreplication.nodeid");
+    int id = ids != null ? Integer.parseInt(ids) : 0;
     Thread.currentThread().setName("main child " + id);
     Path indexPath = Paths.get(System.getProperty("tests.nrtreplication.indexpath"));
     boolean isPrimary = System.getProperty("tests.nrtreplication.isPrimary") != null;

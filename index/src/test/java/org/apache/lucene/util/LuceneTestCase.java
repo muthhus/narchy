@@ -150,7 +150,7 @@ import static org.apache.lucene.search.DocIdSetIterator.NO_MORE_DOCS;
 @ThreadLeakFilters(defaultFilters = true, filters = {
         QuickPatchThreadsFilter.class
 })
-@TestRuleLimitSysouts.Limit(bytes = TestRuleLimitSysouts.DEFAULT_SYSOUT_BYTES_THRESHOLD)
+@TestRuleLimitSysouts.Limit(bytes = TestRuleLimitSysouts.DEFAULT_SYSOUT_BYTES_THRESHOLD * 16)
 public abstract class LuceneTestCase extends Assert {
 
     // --------------------------------------------------------------------
@@ -2773,7 +2773,7 @@ public abstract class LuceneTestCase extends Assert {
             if (expectedType.isInstance(e)) {
                 return expectedType.cast(e);
             }
-            AssertionFailedError assertion = new AssertionFailedError("Unexpected exception type, expected " + expectedType.getSimpleName());
+            AssertionFailedError assertion = new AssertionFailedError("Unexpected exception type " + e + "; expected " + expectedType.getSimpleName());
             assertion.initCause(e);
             throw assertion;
         }

@@ -18,6 +18,7 @@ package org.apache.lucene.util;
 
 
 import org.apache.commons.lang3.ArrayUtils;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
 
@@ -72,10 +73,11 @@ public class BytesRef implements Comparable<BytesRef>, Cloneable {
         assert isValid();
     }
 
-    public BytesRef(BytesRef deepCopied) {
-        this.bytes = deepCopyOfBytes(deepCopied);
+    public BytesRef(@Nullable BytesRef deepCopied) {
+        boolean nulll = deepCopied != null;
+        this.bytes = nulll ? deepCopyOfBytes(deepCopied) : null;
         this.offset = 0;
-        this.length = deepCopied.length;
+        this.length = nulll ? deepCopied.length : 0;
     }
 
     /**

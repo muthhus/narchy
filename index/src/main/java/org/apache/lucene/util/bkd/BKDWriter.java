@@ -177,7 +177,7 @@ public class BKDWriter implements Closeable {
 
     protected BKDWriter(int maxDoc, Directory tempDir, String tempFileNamePrefix, int numDims, int bytesPerDim,
                         int maxPointsInLeafNode, double maxMBSortInHeap, long totalPointCount,
-                        boolean singleValuePerDoc, boolean longOrds, long offlineSorterBufferMB, int offlineSorterMaxTempFiles) {
+                        boolean singleValuePerDoc, boolean longOrds, long offlineSorterBufferMB, int offlineSorterMaxTempFiles) throws IOException {
         verifyParams(numDims, maxPointsInLeafNode, maxMBSortInHeap, totalPointCount);
         // We use tracking dir to deal with removing files on exception, so each place that
         // creates temp files doesn't need crazy try/finally/sucess logic:
@@ -378,12 +378,12 @@ public class BKDWriter implements Closeable {
                         int i = 0;
 
                         @Override
-                        public void visit(int docID) {
+                        public void visit(int docID) throws IOException {
                             throw new UnsupportedOperationException();
                         }
 
                         @Override
-                        public void visit(int docID, byte[] packedValue) {
+                        public void visit(int docID, byte[] packedValue) throws IOException {
                             assert docID == state.scratchDocIDs[i];
                             System.arraycopy(packedValue, 0, packedValues, i * bkd.packedBytesLength, bkd.packedBytesLength);
                             i++;
@@ -934,7 +934,7 @@ public class BKDWriter implements Closeable {
 
                 /** We write/read fixed-byte-width file that {@link OfflinePointReader} can read. */
                 @Override
-                protected ByteSequencesReader getReader(ChecksumIndexInput in, String name) {
+                protected ByteSequencesReader getReader(ChecksumIndexInput in, String name) throws IOException {
                     return new ByteSequencesReader(in, name) {
                         final BytesRef scratch = new BytesRef(new byte[bytesPerDoc]);
 
@@ -1260,7 +1260,7 @@ public class BKDWriter implements Closeable {
         }
     }
 
-    private static long getLeftMostLeafBlockFP(long[] leafBlockFPs, int nodeID) {
+    private long getLeftMostLeafBlockFP(long[] leafBlockFPs, int nodeID) {
         int nodeIDIn = nodeID;
         // TODO: can we do this cheaper, e.g. a closed form solution instead of while loop?  Or
         // change the recursion while packing the index to return this left-most leaf block FP
@@ -1441,8 +1441,6 @@ public class BKDWriter implements Closeable {
                 // Subtract 1 from rightCount because we already did the first value above (so we could record the split value):
                 reader.markOrds(rightCount - 1, ordBitSet);
             }
-        } catch (IOException e) {
-            e.printStackTrace();
         } catch (Throwable t) {
             verifyChecksum(t, source.writer);
         }
@@ -1496,14 +1494,12 @@ public class BKDWriter implements Closeable {
                 writer.append(reader.packedValue(), reader.ord(), reader.docID());
             }
             return new PathSlice(writer, 0, count);
-        } catch (IOException e) {
-            e.printStackTrace();
         } catch (Throwable t) {
             verifyChecksum(t, source.writer);
-        }
 
-        // Dead code but javac disagrees:
-        return null;
+            // Dead code but javac disagrees:
+            return null;
+        }
     }
 
     /* Recursively reorders the provided reader and writes the bkd-tree on the fly; this method is used
@@ -1819,8 +1815,6 @@ public class BKDWriter implements Closeable {
 
                     leftSlices[dim] = new PathSlice(leftPointWriter, 0, leftCount);
                     rightSlices[dim] = new PathSlice(rightPointWriter, 0, rightCount);
-                } catch (IOException e) {
-                    e.printStackTrace();
                 } catch (Throwable t) {
                     verifyChecksum(t, slices[dim].writer);
                 }
@@ -1855,7 +1849,7 @@ public class BKDWriter implements Closeable {
 
     // only called from assert
     private boolean valuesInOrderAndBounds(int count, int sortedDim, byte[] minPackedValue, byte[] maxPackedValue,
-                                           IntFunction<BytesRef> values, int[] docs, int docsOffset) {
+                                           IntFunction<BytesRef> values, int[] docs, int docsOffset) throws IOException {
         byte[] lastPackedValue = new byte[packedBytesLength];
         int lastDoc = -1;
         for (int i = 0; i < count; i++) {
