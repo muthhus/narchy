@@ -255,7 +255,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
 
     @Override
     public final float rank(BLink x) {
-        return -cmp(x);
+        return -pCmp(x);
     }
 
     //    @Override
@@ -275,18 +275,18 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
      * true iff o1 > o2
      */
     static final boolean cmpGT(@Nullable BLink o1, @Nullable BLink o2) {
-        return cmpGT(o1, cmp(o2));
+        return cmpGT(o1, pCmp(o2));
     }
 
     static final boolean cmpGT(@Nullable BLink o1, float o2) {
-        return (cmp(o1) < o2);
+        return (pCmp(o1) < o2);
     }
 
     /**
      * true iff o1 > o2
      */
     static final boolean cmpGT(float o1, @Nullable BLink o2) {
-        return (o1 < cmp(o2));
+        return (o1 < pCmp(o2));
     }
 
 
@@ -294,18 +294,18 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
      * true iff o1 < o2
      */
     static final boolean cmpLT(@Nullable BLink o1, @Nullable BLink o2) {
-        return cmpLT(o1, cmp(o2));
+        return cmpLT(o1, pCmp(o2));
     }
 
     static final boolean cmpLT(@Nullable BLink o1, float o2) {
-        return (cmp(o1) > o2);
+        return (pCmp(o1) > o2);
     }
 
     /**
      * gets the scalar float value used in a comparison of BLink's
      * essentially the same as b.priIfFiniteElseNeg1 except it also includes a null test. otherwise they are interchangeable
      */
-    static float cmp(@Nullable Budgeted b) {
+    static float pCmp(@Nullable Budgeted b) {
         return (b == null) ? -1f : b.priActive(-1);
 
 //        float p = b.pri();
@@ -693,7 +693,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
                 for (j = left + 1; j <= right; j++) {
                     swap = c[j];
                     i = j - 1;
-                    float swapV = cmp(swap);
+                    float swapV = pCmp(swap);
                     while (i >= left && cmpGT(c[i], swapV)) {
                         swap(c, i + 1, i);
 //                        BLink x = c[i];
@@ -730,7 +730,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
 
                 {
                     BLink temp = c[i];
-                    float tempV = cmp(temp);
+                    float tempV = pCmp(temp);
 
                     while (true) {
                         while (cmpLT(c[++i], tempV)) ;

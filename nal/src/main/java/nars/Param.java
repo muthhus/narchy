@@ -207,8 +207,6 @@ public abstract class Param /*extends Container*/ implements Level {
 //    public static float ETERNALIZE_FORGOTTEN_TEMPORAL_TASKS_CONFIDENCE_FACTOR = 1f;
 
 
-    /** if false, then revection will be budgeted with parent's budget mix, otherwise it will have dur/qua mixed but priority set to zero to not trigger linking */
-    public static boolean REVECTION_PRIORITY_ZERO;
 
 
     private Truth defaultGoalTruth, defaultBeliefTruth;

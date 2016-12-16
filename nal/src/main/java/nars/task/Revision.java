@@ -154,16 +154,7 @@ public class Revision {
                 evidence
         ).budget(a, b, aProp);
 
-        if (t == null)
-            return null;
-
-        t.dur( lerp(a.dur(), b.dur(), aw/(aw+bw)) );
-
-        if (Param.REVECTION_PRIORITY_ZERO)
-            t.setPriority(0);
-
-        t.log("Revection Merge");
-        return t;
+        return (t == null) ? null : t.dur(lerp(a.dur(), b.dur(), aw / (aw + bw))).log("Revection Merge");
     }
 
 

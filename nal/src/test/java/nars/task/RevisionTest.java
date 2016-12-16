@@ -234,15 +234,15 @@ public class RevisionTest {
 
         printTaskLinks(b);        System.out.println("--------");
 
-        //System.out.println("Beliefs: "); b.print();
-        //System.out.println("\tSum Priority: " + b.priSum());
+        System.out.println("Beliefs: "); b.print();
+        System.out.println("\tSum Priority: " + b.priSum());
 
 
 
 
         float beliefAfter2;
         assertEquals(1.0f, beliefAfter2 = b.priSum(), 0.25f /* large delta to allow for forgetting */);
-        assertEquals(2 * linksBeforeRevisionLink, tasklinks.priSum(), 0.15f);
+        assertEquals(linksBeforeRevisionLink, tasklinks.priSum(), 0.01f);
 
         assertEquals(0.71f, b.beliefs().topEternalTruth(null).conf(), 0.06f); //the revised task on top
 
@@ -260,7 +260,7 @@ public class RevisionTest {
         //without tasklink balancing: 1.24 - 0.97
         //with balancing: 1.10 - 0.97
         float tolerance = 0.14f; //where does the additional budget come from? but at least the tasklink balancing results in less inflation
-        assertEquals(2f * linksBeforeRevisionLink, tasklinks.priSum(), tolerance); //CONSERVED LINK BUDGET
+        assertEquals( linksBeforeRevisionLink, tasklinks.priSum(), tolerance); //CONSERVED LINK BUDGET
 
     }
 

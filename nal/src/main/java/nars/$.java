@@ -500,7 +500,7 @@ public enum $ {
         logEncoder.setContext(loggerContext);
         //logEncoder.setPattern("\\( %highlight(%level),%green(%thread),%yellow(%logger{0}) \\): \"%message\".%n");
         logEncoder.setPattern("\\( %green(%thread),%highlight(%logger{0}) \\): \"%message\".%n");
-        logEncoder.setImmediateFlush(false);
+        //logEncoder.setImmediateFlush(false);
         logEncoder.start();
 
 
@@ -508,7 +508,7 @@ public enum $ {
             ConsoleAppender c = new ConsoleAppender();
             c.setContext(loggerContext);
             c.setEncoder(logEncoder);
-            c.setWithJansi(true);
+            //c.setWithJansi(true);
             c.start();
 
             LOG.addAppender(c);
