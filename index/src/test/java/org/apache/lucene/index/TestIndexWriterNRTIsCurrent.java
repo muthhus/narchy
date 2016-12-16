@@ -98,12 +98,14 @@ public class TestIndexWriterNRTIsCurrent extends LuceneTestCase {
         for (int i = 0; i < numOps && !holder.stop; i++) {
           float nextOp = random.nextFloat();
           if (nextOp < 0.3) {
-            term.set("id", new BytesRef("1"));
+            //term.set("id", new BytesRef("1"));
+            term = new Term("id", new BytesRef("1"));
             writer.updateDocument(term, doc);
           } else if (nextOp < 0.5) {
             writer.addDocument(doc);
           } else {
-            term.set("id", new BytesRef("1"));
+            //term.set("id", new BytesRef("1"));
+            term = new Term("id", new BytesRef("1"));
             writer.deleteDocuments(term);
           }
           if (holder.reader != currentReader) {

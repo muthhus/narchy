@@ -44,6 +44,7 @@ import org.apache.lucene.codecs.lucene50.Lucene50PostingsFormat;
 import org.apache.lucene.codecs.lucene70.Lucene70DocValuesFormat;
 import org.apache.lucene.codecs.memory.*;
 import org.apache.lucene.codecs.mockrandom.MockRandomPostingsFormat;
+import org.apache.lucene.codecs.simpletext.SimpleTextCodec;
 import org.apache.lucene.document.*;
 import org.apache.lucene.document.Field.Store;
 import org.apache.lucene.index.*;
@@ -176,7 +177,12 @@ public abstract class LuceneTestCase extends Assert {
     /*@Before public void initServices()*/
     static {
         //HACK register SPI manually
-        Codec.the(AssertingCodec.class, HighCompressionCompressingCodec.class, CheapBastardCodec.class);
+        Codec.the(
+                AssertingCodec.class,
+                HighCompressionCompressingCodec.class,
+                CheapBastardCodec.class,
+                SimpleTextCodec.class
+        );
         DocValuesFormat.the(
                 new MemoryDocValuesFormat(),
                 new AssertingDocValuesFormat(),

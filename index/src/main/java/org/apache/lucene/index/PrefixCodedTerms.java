@@ -32,6 +32,7 @@ import java.util.Objects;
  * @lucene.internal
  */
 public class PrefixCodedTerms implements Accountable {
+  public static final Term EMPTY_TERM = new Term("");
   final RAMFile buffer;
   private final long size;
   private long delGen;
@@ -55,7 +56,7 @@ public class PrefixCodedTerms implements Accountable {
   public static class Builder {
     private final RAMFile buffer = new RAMFile();
     private final RAMOutputStream output = new RAMOutputStream(buffer, false);
-    private final Term lastTerm = new Term("");
+    private Term lastTerm = new Term("");
     private final BytesRefBuilder lastTermBytes = new BytesRefBuilder();
     private long size;
 
@@ -69,10 +70,11 @@ public class PrefixCodedTerms implements Accountable {
 
     /** add a term.  This fully consumes in the incoming {@link BytesRef}. */
     public void add(String field, BytesRef bytes) {
-      assert lastTerm.equals(new Term("")) || new Term(field, bytes).compareTo(lastTerm) > 0;
+
+      assert lastTerm.equals(EMPTY_TERM) || new Term(field, bytes).compareTo(lastTerm) > 0;
 
       try {
-        int prefix = sharedPrefix(lastTerm.bytes, bytes);
+        int prefix = sharedPrefix(lastTerm, bytes);
         int suffix = bytes.length - prefix;
         if (field.equals(lastTerm.field)) {
           output.writeVInt(prefix << 1);
@@ -83,8 +85,9 @@ public class PrefixCodedTerms implements Accountable {
         output.writeVInt(suffix);
         output.writeBytes(bytes.bytes, bytes.offset + prefix, suffix);
         lastTermBytes.copyBytes(bytes);
-        lastTerm.bytes = lastTermBytes.get();
-        lastTerm.field = field;
+        lastTerm = new Term(field, lastTermBytes);
+//        lastTerm.bytes = lastTermBytes.get();
+//        lastTerm.field = field;
         size += 1;
       } catch (IOException e) {
         throw new RuntimeException(e);

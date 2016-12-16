@@ -17,10 +17,12 @@
 package org.apache.lucene.util;
 
 
+import org.apache.commons.lang3.ArrayUtils;
+
 public class TestBytesRef extends LuceneTestCase {
   public void testEmpty() {
     BytesRef b = new BytesRef();
-    assertEquals(BytesRef.EMPTY_BYTES, b.bytes);
+    assertEquals(ArrayUtils.EMPTY_BYTE_ARRAY, b.bytes);
     assertEquals(0, b.offset);
     assertEquals(0, b.length);
   }

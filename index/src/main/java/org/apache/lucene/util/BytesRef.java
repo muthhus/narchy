@@ -17,6 +17,8 @@
 package org.apache.lucene.util;
 
 
+import org.apache.commons.lang3.ArrayUtils;
+
 import java.util.Arrays;
 
 /**
@@ -35,11 +37,7 @@ import java.util.Arrays;
  * are sorted lexicographically, numerically treating elements as unsigned.
  * This is identical to Unicode codepoint order.
  */
-public final class BytesRef implements Comparable<BytesRef>, Cloneable {
-    /**
-     * An empty byte array for convenience
-     */
-    public static final byte[] EMPTY_BYTES = new byte[0];
+public class BytesRef implements Comparable<BytesRef>, Cloneable {
 
     /**
      * The contents of the BytesRef. Should never be {@code null}.
@@ -60,7 +58,7 @@ public final class BytesRef implements Comparable<BytesRef>, Cloneable {
      * Create a BytesRef with {@link #EMPTY_BYTES}
      */
     public BytesRef() {
-        this(EMPTY_BYTES);
+        this(ArrayUtils.EMPTY_BYTE_ARRAY);
     }
 
     /**
@@ -72,6 +70,12 @@ public final class BytesRef implements Comparable<BytesRef>, Cloneable {
         this.offset = offset;
         this.length = length;
         assert isValid();
+    }
+
+    public BytesRef(BytesRef deepCopied) {
+        this.bytes = deepCopyOfBytes(deepCopied);
+        this.offset = 0;
+        this.length = deepCopied.length;
     }
 
     /**
@@ -114,7 +118,7 @@ public final class BytesRef implements Comparable<BytesRef>, Cloneable {
         if (length == other.length) {
             final byte[] thisBytes = this.bytes;
             final byte[] otherBytes = other.bytes;
-            if (thisBytes == otherBytes)
+            if (thisBytes == otherBytes && offset == other.offset)
                 return true;
             int otherUpto = other.offset;
             final int end = offset + length;
@@ -180,17 +184,21 @@ public final class BytesRef implements Comparable<BytesRef>, Cloneable {
      */
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append('[');
+        return toHexString();
+    }
+
+    public String toHexString() {
+        int offset = this.offset;
         final int end = offset + length;
+        StringBuilder sb = new StringBuilder(2 + (end - offset) * 2 ).append('[');
+        byte[] bytes = this.bytes;
         for (int i = offset; i < end; i++) {
             if (i > offset) {
                 sb.append(' ');
             }
             sb.append(Integer.toHexString(bytes[i] & 0xff));
         }
-        sb.append(']');
-        return sb.toString();
+        return sb.append(']').toString();
     }
 
     /**
@@ -230,10 +238,14 @@ public final class BytesRef implements Comparable<BytesRef>, Cloneable {
      */
     public static BytesRef deepCopyOf(BytesRef other) {
         BytesRef copy = new BytesRef();
-        copy.bytes = Arrays.copyOfRange(other.bytes, other.offset, other.offset + other.length);
+        copy.bytes = deepCopyOfBytes(other);
         copy.offset = 0;
         copy.length = other.length;
         return copy;
+    }
+
+    public static byte[] deepCopyOfBytes(BytesRef other) {
+        return Arrays.copyOfRange(other.bytes, other.offset, other.offset + other.length);
     }
 
     /**

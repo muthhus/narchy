@@ -17,7 +17,7 @@
 package org.apache.lucene.store;
 
 
-import org.apache.lucene.util.BytesRef;
+import org.apache.commons.lang3.ArrayUtils;
 
 /**
  * DataOutput backed by a byte array.
@@ -40,7 +40,7 @@ public class ByteArrayDataOutput extends DataOutput {
   }
 
   public ByteArrayDataOutput() {
-    reset(BytesRef.EMPTY_BYTES);
+    reset(ArrayUtils.EMPTY_BYTE_ARRAY);
   }
 
   public void reset(byte[] bytes) {

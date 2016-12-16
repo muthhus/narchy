@@ -18,6 +18,7 @@ package org.apache.lucene.facet.taxonomy;
 
 import java.io.IOException;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.lucene.facet.FacetsConfig;
 import org.apache.lucene.index.BinaryDocValues;
 import org.apache.lucene.index.DocValues;
@@ -66,7 +67,7 @@ public class DocValuesOrdinalsReader extends OrdinalsReader {
         if (values.docID() == docID) {
           bytes = values.binaryValue();
         } else {
-          bytes = new BytesRef(BytesRef.EMPTY_BYTES);
+          bytes = new BytesRef(ArrayUtils.EMPTY_BYTE_ARRAY);
         }
         decode(bytes, ordinals);
       }

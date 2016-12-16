@@ -80,7 +80,7 @@ public class BytesRefBuilder {
   /**
    * Append the provided bytes to this builder.
    */
-  public void append(byte[] b, int off, int len) {
+  public final void append(byte[] b, int off, int len) {
     grow(ref.length + len);
     System.arraycopy(b, off, ref.bytes, ref.length, len);
     ref.length += len;
@@ -89,7 +89,7 @@ public class BytesRefBuilder {
   /**
    * Append the provided bytes to this builder.
    */
-  public void append(BytesRef ref) {
+  public final void append(BytesRef ref) {
     append(ref.bytes, ref.offset, ref.length);
   }
 
@@ -120,7 +120,7 @@ public class BytesRefBuilder {
    * Replace the content of this builder with the provided bytes. Equivalent to
    * calling {@link #clear()} and then {@link #append(BytesRef)}.
    */
-  public void copyBytes(BytesRef ref) {
+  public final void copyBytes(BytesRef ref) {
     clear();
     append(ref);
   }

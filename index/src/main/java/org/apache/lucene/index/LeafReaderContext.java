@@ -29,7 +29,7 @@ public final class LeafReaderContext extends IndexReaderContext {
   /** The readers absolute doc base */
   public final int docBase;
   
-  private final LeafReader reader;
+  public final LeafReader reader;
   private final List<LeafReaderContext> leaves;
   
   /**
