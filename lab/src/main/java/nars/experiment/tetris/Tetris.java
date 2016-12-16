@@ -46,10 +46,10 @@ public class Tetris extends NAgents {
 
     public static final int tetris_width = 6;
     public static final int tetris_height = 12;
-    public static final int TIME_PER_FALL = 4;
+    public static final int TIME_PER_FALL = 1;
     public static final int PIXEL_RADIX = 2;
     private static SensorConcept[][] concept;
-    private int afterlife = TIME_PER_FALL * tetris_height * tetris_width;
+    //private int afterlife = TIME_PER_FALL * tetris_height * tetris_width;
     static boolean easy = false;
 
     private final TetrisState state;
@@ -63,15 +63,28 @@ public class Tetris extends NAgents {
                         return 0f;
                     }),
                     new MatrixView(tetris_width, tetris_height, (x, y, gl) -> {
-                        float r = concept[x][y].beliefFreq(now, 0.5f);
-                        gl.glColor3f(0, 0, r);
+                        SensorConcept cxy = concept[x][y];
+                        long now = this.now;
+                        float r = cxy.beliefFreq(now, 0.5f);
+                        float g = cxy.goalFreq(now, 0.5f);
+                        gl.glColor3f(0, g, r);
                         return 0f;
                     }),
                     new MatrixView(tetris_width, tetris_height, (x, y, gl) -> {
                         long then = (long) (now + dur * 8);
-                        Draw.colorPolarized(gl,
-                                concept[x][y].beliefFreq(then, 0.5f) -
-                                        concept[x][y].beliefFreq(now, 0.5f));
+                        Truth f = concept[x][y].belief(then);
+                        float fr, co;
+                        if (f == null) {
+                            fr = 0.5f;
+                            co = 0;
+                        } else {
+                            fr = f.freq();
+                            co = f.conf();
+                        }
+                        gl.glColor4f(0, fr, 0, 0.25f + 0.75f * co);
+//                        Draw.colorPolarized(gl,
+//                                concept[x][y].beliefFreq(then, 0.5f) -
+//                                        concept[x][y].beliefFreq(now, 0.5f));
                         return 0f;
                     })
 
@@ -123,12 +136,12 @@ public class Tetris extends NAgents {
 
                 @Override
                 protected void die() {
-                    nar.time.tick(afterlife);
+                    //nar.time.tick(afterlife);
                     super.die();
                 }
             };
 
-            view.children().add( new TetrisVisualizer(state, 64, false) {
+            view.children().add( new TetrisVisualizer(state, 2, false) {
                 @Override
                 public boolean onKey(v2 hitPoint, char charCode, boolean pressed) {
 //
@@ -445,9 +458,9 @@ public class Tetris extends NAgents {
 
             NAR nar =
                     //NAgents.newMultiThreadNAR(4, new FrameTime().dur(TIME_PER_FALL));
-                    new Alann(new FrameTime().dur(TIME_PER_FALL), 4);
+                    new Alann(new FrameTime().dur(TIME_PER_FALL*2), 4);
 
-            nar.termVolumeMax.setValue(13);
+            nar.termVolumeMax.setValue(16);
             //nar.linkFeedbackRate.setValue(0.05f);
 
             //newTimeWindow(nar);
