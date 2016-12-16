@@ -16,7 +16,6 @@ import nars.link.BLink;
 import nars.link.DefaultBLink;
 import nars.nar.Alann;
 import nars.nar.Default;
-import nars.nar.Multi;
 import nars.nar.exe.Executioner;
 import nars.nar.exe.MultiThreadExecutioner;
 import nars.nar.util.DefaultConceptBuilder;
@@ -155,27 +154,6 @@ abstract public class NAgents extends NAgent {
                 Vis.items(c.terms, nar, 16)).toArray(Surface[]::new)), 900, 700);
 
         return nar;
-    }
-
-    private static Default newNAR3(int cores) {
-        Multi m = new Multi(cores, (i, j) -> {
-            //feedforward
-            if (i + 1 == j)
-                return 0.9f; //decay
-
-            //if ((i + 1) % cores == j)
-            // return 0.9f / (j - i);
-
-            return 0;
-            //return Math.random() < 0.5f ? 0.8f : 0f;
-        });
-
-        Default in = m.core[0];
-
-        SpaceGraph.window(grid(Stream.of(m.core).map(c ->
-                Vis.items(c.core.active, c, 32)).toArray(Surface[]::new)), 900, 700);
-
-        return in;
     }
 
 

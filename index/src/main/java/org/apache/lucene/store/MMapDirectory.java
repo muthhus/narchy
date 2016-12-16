@@ -312,7 +312,7 @@ public class MMapDirectory extends FSDirectory {
   /**
    * <code>true</code>, if this platform supports unmapping mmapped files.
    */
-  public static final boolean UNMAP_SUPPORTED;
+  public static boolean UNMAP_SUPPORTED;
   
   /**
    * if {@link #UNMAP_SUPPORTED} is {@code false}, this contains the reason why unmapping is not supported.

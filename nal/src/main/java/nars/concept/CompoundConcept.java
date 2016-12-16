@@ -6,6 +6,7 @@ import nars.Symbols;
 import nars.Task;
 import nars.bag.Bag;
 import nars.budget.Activation;
+import nars.budget.DepthFirstActivation;
 import nars.budget.merge.BudgetMerge;
 import nars.budget.policy.ConceptPolicy;
 import nars.link.TermLinkBuilder;
@@ -407,7 +408,7 @@ public class CompoundConcept<T extends Compound> implements Concept, Termlike {
 
         Activation a;
         if (accepted) {
-            a = new Activation(input, this, nar, nar.priorityFactor.floatValue(), nar.accumulator());
+            a = new DepthFirstActivation(input, this, nar, nar.priorityFactor.floatValue(), nar.accumulator());
 
             if (delta != null) {
                 //beliefs/goals

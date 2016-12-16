@@ -28,6 +28,7 @@ import nars.Task;
 import nars.bag.Bag;
 import nars.budget.Activation;
 import nars.budget.Budgeted;
+import nars.budget.DepthFirstActivation;
 import nars.budget.policy.ConceptPolicy;
 import nars.link.BLink;
 import nars.table.BeliefTable;
@@ -249,8 +250,8 @@ public interface Concept extends Termed {
      */
     default void crossLink(@NotNull Budgeted mine, @NotNull Budgeted theirs, @NotNull Concept them, float scale, @NotNull NAR nar) {
 
-        new Activation(theirs, this, them, nar, scale, 1, -1, null);
-        new Activation(mine, them, this, nar, scale, 1, -1, null);
+        new DepthFirstActivation(theirs, this, them, nar, scale, 1, -1, null);
+        new DepthFirstActivation(mine, them, this, nar, scale, 1, -1, null);
 
     }
 

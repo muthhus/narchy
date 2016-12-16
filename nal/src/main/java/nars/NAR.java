@@ -9,10 +9,7 @@ import jcog.event.ArrayTopic;
 import jcog.event.On;
 import jcog.event.Topic;
 import nars.Narsese.NarseseException;
-import nars.budget.Activation;
-import nars.budget.Budget;
-import nars.budget.Budgeted;
-import nars.budget.PriorityAccumulator;
+import nars.budget.*;
 import nars.budget.policy.ConceptPolicy;
 import nars.concept.Concept;
 import nars.concept.Functor;
@@ -727,7 +724,7 @@ public abstract class NAR extends Param implements Level, Consumer<Task>, NARIn,
             }
 
             //re-activate only
-            new Activation(existing, this, 1f, accumulator());
+            new DepthFirstActivation(existing, this, 1f, accumulator());
 
         }
 
@@ -1419,7 +1416,7 @@ public abstract class NAR extends Param implements Level, Consumer<Task>, NARIn,
 
 
     final ThreadLocal<PriorityAccumulator<Concept>> priorityAccumulatrs = ThreadLocal.withInitial(()->{
-        Activation.ObjectFloatHashMapPriorityAccumulator<Concept> aa = new Activation.ObjectFloatHashMapPriorityAccumulator<Concept>();
+        ObjectFloatHashMapPriorityAccumulator<Concept> aa = new ObjectFloatHashMapPriorityAccumulator<Concept>();
         onCycle(f -> {
             Iterable<ObjectFloatPair<Concept>> y = aa.commit();
             if (y!=null) {
