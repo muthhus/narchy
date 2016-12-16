@@ -128,26 +128,21 @@ abstract public class ArrayListTable<K, V> extends CollectorMap<K, V> implements
      * returns whether the capacity has changed
      */
     @Override
-    public final boolean setCapacity(int newCapacity) {
-        if (newCapacity != this.capacity) {
-            synchronized (_items()) {
-                this.capacity = newCapacity;
-                if (this.size() > newCapacity)
-                    commit();
-            }
-            return true;
-        }
-        return false;
+    public boolean setCapacity(int newCapacity) {
+        this.capacity = newCapacity;
+        return true;
     }
 
-    /** a commit should invoke update(null) when its finished
-     * @return this instance, HACK due to inheritance fuckup
-     * */
-    @NotNull
-    protected abstract Object commit();
+
+
+//    /** a commit should invoke update(null) when its finished
+//     * @return this instance, HACK due to inheritance fuckup
+//     * */
+//    @NotNull
+//    protected abstract Object commit();
 
     /** if v is non-null it will be added after making capacity for it */
-    protected abstract boolean update(@Nullable V v);
+    protected abstract boolean updateItems(@Nullable V v);
 
 
 //    @Override

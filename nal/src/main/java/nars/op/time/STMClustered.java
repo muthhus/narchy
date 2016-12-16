@@ -309,9 +309,8 @@ public class STMClustered extends STM {
         this.input = new ArrayBag<>(capacity.intValue(), BudgetMerge.avgBlend, new ConcurrentHashMap<>(capacity.intValue())) {
 
             @NotNull
-            @Override
-            public Bag<Task> commit(Consumer<BLink> each) {
-                super.commit(each);
+            public Bag<Task> update(Consumer<BLink> each) {
+                super.update(each);
                 forEach(t -> {
                     if (t != null) {
                         TLink tt = (TLink) t;

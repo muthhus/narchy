@@ -4,7 +4,7 @@ import jcog.map.nbhm.HijacKache;
 import nars.Param;
 import nars.bag.Bag;
 import nars.budget.Budgeted;
-import nars.budget.Forget;
+import nars.budget.control.Forget;
 import nars.budget.merge.BudgetMerge;
 import nars.link.ArrayBLink;
 import nars.link.BLink;
@@ -16,6 +16,7 @@ import java.util.Iterator;
 import java.util.Random;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Predicate;
 
 import static jcog.map.nbhm.HijacKache.*;
@@ -456,11 +457,9 @@ public class HijackBag<X> implements Bag<X> {
     }
 
 
-
     @NotNull
     @Override
-    public Bag<X> commit() {
-
+    public Bag<X> commit(Function<Bag, Consumer<BLink>> update) {
         final float[] mass = {0};
 
         final int[] count = {0};
@@ -482,22 +481,21 @@ public class HijackBag<X> implements Bag<X> {
 
         float existingMass = mass[0];
 
-        Forget f;
-        if (existingMass > 0 && pressure > 0) {
-            float p = this.pressure;
-            f = Forget.forget(p, existingMass, count[0], Param.BAG_THRESHOLD);
-        } else {
-            f = null;
-        }
+//        Forget f;
+//        if (existingMass > 0 && pressure > 0) {
+//            float p = this.pressure;
+//            f = Forget.forget(p, existingMass, count[0], Param.BAG_THRESHOLD);
+//        } else {
+//            f = null;
+//        }
 
         this.pressure = 0;
 
-        return commit(f);
+        return update(update!=null ? update.apply(this) : null);
     }
 
     @NotNull
-    @Override
-    public Bag<X> commit(@Nullable Consumer<BLink> each) {
+    public Bag<X> update(@Nullable Consumer<BLink> each) {
         if (each != null && !isEmpty())
             forEach(each);
 

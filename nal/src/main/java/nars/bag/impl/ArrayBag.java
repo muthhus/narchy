@@ -2,11 +2,9 @@ package nars.bag.impl;
 
 import jcog.data.sorted.SortedArray;
 import nars.$;
-import nars.Param;
 import nars.bag.Bag;
 import nars.budget.Budget;
 import nars.budget.Budgeted;
-import nars.budget.Forget;
 import nars.budget.RawBudget;
 import nars.budget.merge.BudgetMerge;
 import nars.link.BLink;
@@ -20,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Predicate;
 
 
@@ -35,7 +34,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
     /**
      * inbound pressure sum since last commit
      */
-    private volatile float pressure = 0;
+    public volatile float pressure = 0;
 
     private static final Logger logger = LoggerFactory.getLogger(ArrayBag.class);
 
@@ -46,6 +45,21 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
         this.capacity = cap;
     }
 
+    /**
+     * returns whether the capacity has changed
+     */
+    @Override
+    public final boolean setCapacity(int newCapacity) {
+        if (newCapacity != this.capacity) {
+            synchronized (_items()) {
+                this.capacity = newCapacity;
+                if (this.size() > newCapacity)
+                    commit(null);
+            }
+            return true;
+        }
+        return false;
+    }
 
     @Override
     public final boolean isEmpty() {
@@ -57,7 +71,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
      * returns true unless failed to add during 'add' operation
      */
     @Override
-    protected boolean update(@Nullable BLink<V> toAdd) {
+    protected boolean updateItems(@Nullable BLink<V> toAdd) {
 
 
         SortedArray<BLink<V>> items = this.items;
@@ -429,7 +443,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
                 v.setBudget(bp, b.qua());
 
                 synchronized (items) {
-                    if (update(v)) {
+                    if (updateItems(v)) {
                         updateRange();
                         w = v;
                     } else {
@@ -484,32 +498,27 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
         throw new UnsupportedOperationException();
     }
 
-    @NotNull
-    @Override
-    public final Bag<V> commit() {
+
+
+
+
+    @NotNull public final Bag<V> commit(@Nullable Function<Bag, Consumer<BLink>> update) {
 
         synchronized (items) {
-            int s = size();
-            if (s > 0) {
-                Consumer<BLink> a = Forget.forget(this.pressure, this.mass(), s, Param.BAG_THRESHOLD);
-                if (a != null)
-                    this.pressure = 0; //reset pressure accumulator
 
-                commit(a);
-            } else {
-                minPri = -1;
-            }
+            update( update!=null ? update.apply(this) : null );
+
         }
 
         return this;
     }
 
-    private float mass() {
+    public float mass() {
         float mass = 0;
         synchronized (items) {
             int iii = size();
             for (int i = 0; i < iii; i++) {
-                BLink<V> x = get(i);
+                BLink x = get(i);
                 if (x != null)
                     mass += x.priIfFiniteElseZero();
             }
@@ -522,17 +531,18 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
      * applies the 'each' consumer and commit simultaneously, noting the range of items that will need sorted
      */
     @NotNull
-    @Override
-    public Bag<V> commit(@Nullable Consumer<BLink> each) {
+    protected Bag<V> update(@Nullable Consumer<BLink> each) {
+
+        if (each != null)
+            this.pressure = 0; //reset pressure accumulator
 
 
         synchronized (items) {
 
-
             if (size() > 0) {
-                if (update(null)) {
+                if (updateItems(null)) {
 
-                    int lowestUnsorted = updateExisting(each);
+                    int lowestUnsorted = updateBudget(each);
 
                     if (lowestUnsorted != -1) {
                         sort(); //if not perfectly sorted already
@@ -540,6 +550,8 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
 
                     updateRange();
                 }
+            } else {
+                minPri = -1;
             }
 
         }
@@ -570,7 +582,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
     /**
      * returns the index of the lowest unsorted item
      */
-    private int updateExisting(@Nullable Consumer<BLink> each) {
+    private int updateBudget(@Nullable Consumer<BLink> each) {
 //        int dirtyStart = -1;
         int lowestUnsorted = -1;
 

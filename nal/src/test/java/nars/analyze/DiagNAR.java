@@ -5,7 +5,7 @@
 //import nars.Global;
 //import nars.NAR;
 //import nars.bag.BLink;
-//import nars.budget.Forget;
+//import nars.budget.control.Forget;
 //import nars.concept.Concept;
 //import nars.concept.DefaultConceptProcess;
 //import nars.nal.Deriver;

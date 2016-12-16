@@ -56,8 +56,8 @@ public class CurveBag<V> extends ArrayBag<V> implements Bag<V> {
 
     @NotNull
     @Override
-    public Bag<V> commit(@Nullable Consumer<BLink> each) {
-        super.commit(each);
+    public Bag<V> update(@Nullable Consumer<BLink> each) {
+        super.update(each);
         sampler.commit(this);
 
         return this;

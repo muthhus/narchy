@@ -1,19 +1,19 @@
 package nars.nar;
 
 import com.google.common.collect.Lists;
+import jcog.Util;
 import jcog.data.random.XorShift128PlusRandom;
 import nars.$;
 import nars.NAR;
 import nars.Param;
-import nars.Task;
 import nars.bag.Bag;
 import nars.bag.impl.CurveBag;
-import nars.budget.Budget;
 import nars.budget.merge.BudgetMerge;
 import nars.concept.Concept;
 import nars.index.term.tree.TreeTermIndex;
 import nars.link.BLink;
 import nars.nal.Deriver;
+import nars.nar.exe.MultiThreadExecutioner;
 import nars.nar.exe.SynchronousExecutor;
 import nars.nar.util.DefaultConceptBuilder;
 import nars.nar.util.PremiseMatrix;
@@ -28,7 +28,6 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -60,16 +59,9 @@ public class Alann extends NAR {
     final AtomicBoolean running = new AtomicBoolean(false);
     private ExecutorService coreExe = null;
 
-    public final class GraphPremiseBuilder implements Runnable {
+    public final class GraphPremiseBuilder {
 
-        /**
-         * how many tasklinks to absorb on a visit
-         */
-        public static final int TASKLINK_COLLECTION_RATE = 1;
-
-        Concept here;
-
-        private BLink<? extends Termed> linkHere;
+        private BLink<Concept> current;
 
         public final Bag<Concept> terms =
                 //new HijackBag<>(128, 3, blend, random);
@@ -82,25 +74,10 @@ public class Alann extends NAR {
 //                //new HijackBag<>(128, 3, blend, random);
 //                new CurveBag(64, new CurveBag.NormalizedSampler(power2BagCurve, random), blend, new HashMap(64));
 
-        int iterations = 16;
-        int tasklinksFiring = 1;
-        int termlinksFiring = 3;
+        int fireTaskLinks = 1;
+        int fireTermLinksMin = 1;
+        int fireTermLinksMax = 4;
 
-
-
-        /**
-         * a value which should be less than 1.0,
-         * indicating the preference for the current value vs. a tendency to move
-         */
-        float momentum = 0.5f;
-
-
-        @Override
-        public void run() {
-            for (int i = 0; i < Math.round(iterations * exe.load()); i++) {
-                iterate();
-            }
-        }
 
         public void loop() {
             while (true) {
@@ -119,35 +96,30 @@ public class Alann extends NAR {
 
         void iterate() {
 
-            //decide whether to remain here
-            boolean move;
-            if (here != null) {
-                move = (random.nextFloat() > (momentum) * linkHere.priIfFiniteElseZero());
-            } else {
-                move = true;
+
+            BLink<? extends Termed> next = go();
+
+            if (next == null) {
+                //seed(seedRate);
+                go();
             }
 
-            if (move) {
-
-                BLink<? extends Termed> next = go();
-
-                if (next == null) {
-                    //seed(seedRate);
-                    go();
-                }
-            }
-
-            if (here != null) {
+            if (current != null) {
 
 //                float conceptVisitCost = 1f - (1f / terms.size());
 //                terms.mul(here, conceptVisitCost);
 
+                Concept here = current.get();
+
+                int fireTermLinks = (int) Math.ceil(Util.lerp(fireTermLinksMax, fireTermLinksMin, current.pri()));
+
                 PremiseMatrix.run(here, Alann.this,
-                        tasklinksFiring, termlinksFiring,
+                        fireTaskLinks,
+                        fireTermLinks,
                         Alann.this::input, //input them within the current thread here
                         deriver,
                         here.tasklinks(), //this.tasklinks,
-                        terms
+                        here.termlinks()
                 );
             }
 
@@ -159,24 +131,20 @@ public class Alann extends NAR {
             BLink<Concept> next = terms.commit().sample();
             if (next != null) {
 
-                Concept d = concept(next.get());
-                if (d != null) {
+                Concept d = next.get(); //concept(next.get());
 
-                    d.policy(concepts.conceptBuilder().awake(), Alann.this);
+                d.policy(concepts.conceptBuilder().awake(), Alann.this);
 
-                    //d.termlinks().commit().transfer(2, terms);
-                    //d.tasklinks().commit().copy(tasklinks, TASKLINK_COLLECTION_RATE);
+                //d.termlinks().commit().transfer(2, terms);
+                //d.tasklinks().commit().copy(tasklinks, TASKLINK_COLLECTION_RATE);
 
-                    this.here = d;
-                    this.linkHere = next;
-
-                }
+                this.current = next;
             }
             return next;
         }
 
         void print() {
-            logger.info("at: {}", here);
+            logger.info("at: {}", current);
             //out.println("\nlocal:"); local.print();
             out.println("\nconcepts: " + terms.size() + "/" + terms.capacity());
             terms.print();
@@ -184,17 +152,20 @@ public class Alann extends NAR {
 //            tasklinks.print();
         }
 
-        public int duty() {
-            return tasklinksFiring * termlinksFiring * iterations; /* * expected hit rate */
-        }
 
     }
 
 
     public Alann(@NotNull Time time, int cores) {
+        this(time, cores, Runtime.getRuntime().availableProcessors()-1, 1);
+    }
+
+    public Alann(@NotNull Time time, int cores, int coreThreads, int auxThreads) {
         super(time,
                 new TreeTermIndex.L1TreeIndex(new DefaultConceptBuilder(), 1024 * 1024, 1024 * 32, 2),
-                new XorShift128PlusRandom(1), Param.defaultSelf(), new SynchronousExecutor());
+                new XorShift128PlusRandom(1), Param.defaultSelf(),
+                auxThreads == 1 ? new SynchronousExecutor() : new MultiThreadExecutioner(auxThreads, 512 * auxThreads).sync(false)
+        );
 
         quaMin.setValue(BUDGET_EPSILON * 2f);
 
@@ -212,7 +183,7 @@ public class Alann extends NAR {
         this.cores = range(0, cores).mapToObj(i -> new GraphPremiseBuilder()).collect(toList());
 
         runLater(() -> {
-            start(Runtime.getRuntime().availableProcessors());
+            start(coreThreads);
         });
 
     }
@@ -255,7 +226,6 @@ public class Alann extends NAR {
         //int perCore = (int)Math.ceil((float)maxNodes / s);
 
 
-
         return () -> {
             Iterator[] coreBags = cores.stream().map(x -> x.terms.iterator()).toArray(Iterator[]::new);
             return IteratorUtils.zippingIterator(coreBags);
@@ -269,7 +239,6 @@ public class Alann extends NAR {
         }
         System.out.println();
     }
-
 
 
     /**
@@ -296,7 +265,9 @@ public class Alann extends NAR {
         return c;
     }
 
-    /** which core is handling a term */
+    /**
+     * which core is handling a term
+     */
     public GraphPremiseBuilder core(@NotNull Termed term) {
         return cores.get(Math.abs(term.hashCode()) % cores.size());
     }

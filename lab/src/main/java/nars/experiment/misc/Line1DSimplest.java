@@ -120,7 +120,7 @@ public class Line1DSimplest extends NAgent {
                         //.invocationListeners(new InvocationLogger())
         );*/
 
-        NAR nar = new Alann(new FrameTime(), 2 );
+        NAR nar = new Alann(new FrameTime(), 4, 2, 2 );
 
 
 
@@ -137,8 +137,8 @@ public class Line1DSimplest extends NAgent {
 
 //        nar.DEFAULT_BELIEF_PRIORITY = 0.5f;
 //        nar.DEFAULT_GOAL_PRIORITY = 0.5f;
-        nar.beliefConfidence(0.8f);
-        nar.goalConfidence(0.8f);
+        nar.beliefConfidence(0.5f);
+        nar.goalConfidence(0.5f);
 
         //nar.quaMin.setValue(0.5f);
 
@@ -195,7 +195,7 @@ public class Line1DSimplest extends NAgent {
         //l.runRT(25, 15000).join();
 
 
-        l.runRT(16f);
+        l.runRT(30f);
 
 //
 //        NAR.printActiveTasks(nar, true);

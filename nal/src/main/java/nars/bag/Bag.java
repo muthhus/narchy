@@ -2,8 +2,11 @@ package nars.bag;
 
 import jcog.Util;
 import nars.$;
+import nars.Param;
+import nars.bag.impl.ArrayBag;
 import nars.budget.Budget;
 import nars.budget.Budgeted;
+import nars.budget.control.Forget;
 import nars.link.BLink;
 import nars.link.DefaultBLink;
 import nars.link.DependentBLink;
@@ -215,12 +218,7 @@ public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Iterable<BLink<
         return y.pri();
     }
 
-    /**
-     * commits the next set of changes and updates any sorting
-     * should return this bag
-     */
-    @NotNull
-    Bag<V> commit();
+
 
     /**
      * implements the Consumer<V> interface; invokes a put()
@@ -437,8 +435,17 @@ public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Iterable<BLink<
         a.forEach(this::put);
     }
 
-    @NotNull Bag<V> commit(@Nullable Consumer<BLink> each);
+    @Deprecated default Bag<V> commit() {
+        return commit((b)->{
+            return Forget.forget(((ArrayBag)b).pressure, ((ArrayBag)b).mass(), b.size(), Param.BAG_THRESHOLD);
+        });
+    }
 
+    /**
+     * commits the next set of changes and updates budgeting
+     * @return this bag
+     */
+    @NotNull Bag<V> commit(Function<Bag,Consumer<BLink>> update);
 
 
     @Nullable Bag EMPTY = new Bag() {
@@ -512,9 +519,10 @@ public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Iterable<BLink<
             return false;
         }
 
+
         @NotNull
         @Override
-        public Bag commit(@Nullable Consumer each) {
+        public Bag commit(Function update) {
             return this;
         }
 
