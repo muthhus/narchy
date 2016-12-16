@@ -304,7 +304,7 @@ public class VideoBag {
 
                 }
 
-                float pp = ff.priIfFiniteElseZero();
+                float pp = ff.priActive(0);
                 float xx = scale * (f.t - now) / 1000f ;
                 float yy = (float) Math.sin(f.t);
                 //if (tt!=null) {

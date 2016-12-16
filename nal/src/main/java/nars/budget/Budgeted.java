@@ -17,7 +17,7 @@ public interface Budgeted  {
     static float priSum(@NotNull Iterable<? extends Budgeted> c) {
         float totalPriority = 0;
         for (Budgeted i : c)
-            totalPriority += i.priIfFiniteElseZero();
+            totalPriority += i.priActive(0);
         return totalPriority;
     }
 
@@ -73,9 +73,12 @@ public interface Budgeted  {
     }
 
     float pri();
-    float priIfFiniteElseZero();
-    float priIfFiniteElseNeg1();
 
+
+    default float priActive(float valueIfInactive) {
+        float p = pri();
+        return p == p ? p : valueIfInactive;
+    }
 
     boolean isDeleted();
 

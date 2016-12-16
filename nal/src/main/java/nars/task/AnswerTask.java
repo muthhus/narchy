@@ -1,5 +1,6 @@
 package nars.task;
 
+import jcog.Util;
 import nars.NAR;
 import nars.Task;
 import nars.budget.merge.BudgetMerge;
@@ -54,25 +55,23 @@ public class AnswerTask extends MutableTask {
         return bBelief;
     }
 
-    @NotNull
+    @Nullable
     public AnswerTask budget(@NotNull Task a, @NotNull Task b) {
-        float acw = a.evi();
-        float aMix = acw / (acw + b.evi());
-        budget(a, b, aMix);
-        //if (isDeleted())
-            //throw new RuntimeException("budget mix resulted in deletion");
-        return this;
+        float ae = a.evi();
+        return budget(a, b, ae / (ae + b.evi()));
     }
 
-    @NotNull
-    public AnswerTask budget(@NotNull Task a, @NotNull Task b, float aMix) {
-        if (!b.isDeleted() && !a.isDeleted()) {
-            budgetSafe(b.budget());
-            BudgetMerge.plusBlend.merge(budget(), a.budget(), aMix);
-        } else {
-            delete();
-        }
-        return this;
+    @Nullable
+    public final AnswerTask budget(@NotNull Task a, @NotNull Task b, float aMix) {
+        float priSum = a.pri() + b.pri();
+        boolean deleted = priSum != priSum;
+        float newPri = !deleted ? Util.unitize(priSum) : Float.NaN;
+
+        budgetSafe(
+            newPri,
+            !deleted ? Util.lerp(a.qua(), b.qua(), aMix) : 0
+        );
+        return !deleted ? this : null;
     }
 
     @Override
@@ -82,7 +81,10 @@ public class AnswerTask extends MutableTask {
 
     @Override
     public boolean delete() {
-        unlink();
-        return super.delete();
+        if (super.delete()) {
+            unlink();
+            return true;
+        }
+        return false;
     }
 }

@@ -208,7 +208,8 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
     public boolean removeIf(@NotNull Predicate<? super Task> o, @NotNull  NAR nar) {
         return list.removeIf(((Predicate<Task>) t -> {
             if (o.test(t)) {
-                onRemoved( t, nar );
+                remove( t, nar );
+                return true;
             }
             return false;
         }));
@@ -261,9 +262,6 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
 //    }
 
 
-    public boolean remove(@NotNull Object object) {
-        return list.remove(object);
-    }
 
     private final boolean remove(@NotNull Task x, @NotNull NAR nar) {
         if (list.remove(x)) {
@@ -351,20 +349,22 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
             return input; //no need for compression
         }
 
-
         //return rankTemporalByConfidenceAndOriginality(t, when, now, -1);
         float inputRank = input != null ? rankTemporalByConfidence(input, now) : Float.POSITIVE_INFINITY;
 
         Task a = matchWeakest(now);
         //return rankTemporalByConfidenceAndOriginality(t, when, now, -1);
-        if (a == null || inputRank <= rankTemporalByConfidence(a, now) || !remove(a, nar)) {
-            //dont continue if the input was too weak, or there was a problem removing a (like it got removed already by a different thread or something)
+        if (a == null || inputRank <= rankTemporalByConfidence(a, now)) {
+            //dont continue if the input was too weak
             return null;
         }
 
         Task b = matchMerge(now, a, nar.time.dur());
-        if (b != null && remove(b, nar)) {
-            return merge(a, b, now);
+        if (b != null) {
+            Task merged = merge(a, b, now);
+            remove(a, nar);
+            remove(b, nar);
+            return merged;
         } else {
             return input;
         }
@@ -431,17 +431,8 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
         return t[0];
     }
 
-    private boolean clean(NAR nar) {
-        return list.removeIf(x -> {
-            if (x == null) {
-                return true;
-            } else if (x.isDeleted()) {
-                onRemoved(x, nar);
-                return true;
-            } else {
-                return false;
-            }
-        });
+    private final boolean clean(NAR nar) {
+        return removeIf(Task::isDeleted, nar);
     }
 
 

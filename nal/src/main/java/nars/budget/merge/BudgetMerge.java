@@ -60,10 +60,10 @@ public interface BudgetMerge extends BiFunction<Budget, Budget, Budget> {
      * */
     static float blend(@NotNull Budget tgt, @NotNull Budgeted src, float sScale, @NotNull PriMerge priMerge) {
 
-        float tPri = tgt.priIfFiniteElseZero();
-        boolean hasTP = tPri >= BUDGET_EPSILON;
-        float sPri = src.priIfFiniteElseZero();
-        boolean hasSP = sPri >= BUDGET_EPSILON && sScale >= BUDGET_EPSILON;
+        float tPri = tgt.priActive(-1);
+        boolean hasTP = tPri >= 0;
+        float sPri = src.priActive(-1);
+        boolean hasSP = sPri >= 0 && sScale >= BUDGET_EPSILON;
 
         if (!hasSP) {
             if (hasTP) {
@@ -221,7 +221,7 @@ public interface BudgetMerge extends BiFunction<Budget, Budget, Budget> {
      * */
     BudgetMerge max = (tgt, src, srcScaleIgnored) -> {
         tgt.setBudget(
-            Util.max(src.priIfFiniteElseZero(), tgt.priIfFiniteElseZero()),
+            Util.max(src.priActive(0), tgt.priActive(0)),
                 Util.max(src.qua(), tgt.qua()));
         return 0;
     };

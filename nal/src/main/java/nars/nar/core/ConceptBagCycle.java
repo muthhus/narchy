@@ -9,7 +9,6 @@ import nars.bag.Bag;
 import nars.bag.impl.CurveBag;
 import nars.budget.Budget;
 import nars.budget.ROBudget;
-import nars.budget.RawBudget;
 import nars.budget.merge.BudgetMerge;
 import nars.concept.Concept;
 import nars.concept.util.ConceptBuilder;
@@ -17,6 +16,7 @@ import nars.link.BLink;
 import nars.nal.Deriver;
 import nars.nar.util.DefaultConceptBuilder;
 import nars.nar.util.PremiseMatrix;
+import nars.term.Termed;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.eclipse.collections.api.tuple.primitive.ObjectFloatPair;
 import org.jetbrains.annotations.NotNull;
@@ -87,10 +87,6 @@ public class ConceptBagCycle {
 
     //private final CapacityLinkedHashMap<Premise,Premise> recent = new CapacityLinkedHashMap<>(256);
     //long novel=0, total=0;
-
-    public ConceptBagCycle(@NotNull NAR nar, Deriver deriver) {
-        this(nar, deriver, 1);
-    }
 
     public ConceptBagCycle(@NotNull NAR nar, Deriver deriver, int initialCapacity) {
 
@@ -167,25 +163,29 @@ public class ConceptBagCycle {
     }
 
 
-
-
-
-
     public static final Budget baseConceptBudget = new ROBudget(1f, 0.5f);
 
-    public void activate(Iterable<ObjectFloatPair<Concept>> activations, MutableFloat overflow) {
+    public void priorityAdd(Iterable<ObjectFloatPair<Concept>> activations, MutableFloat overflow) {
         this.active.put(activations, baseConceptBudget, overflow);
     }
 
-    static final class BudgetSavings extends RawBudget {
-        public final long savedAt;
+    public float priority(@NotNull Termed concept, float valueIfInactive) {
+        BLink c = active.get(concept);
+        if (c == null) return valueIfInactive;
+        float p = c.priActive(valueIfInactive);
 
-        public BudgetSavings(@NotNull Budget value, long savedAt) {
-            super(value);
-            this.savedAt = savedAt;
-        }
-
+        return c != null ? c.pri() : Float.NaN;
     }
+
+//    static final class BudgetSavings extends RawBudget {
+//        public final long savedAt;
+//
+//        public BudgetSavings(@NotNull Budget value, long savedAt) {
+//            super(value);
+//            this.savedAt = savedAt;
+//        }
+//
+//    }
 
 
     /** extends CurveBag to invoke entrance/exit event handler lambda */

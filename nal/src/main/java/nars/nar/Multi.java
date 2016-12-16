@@ -67,7 +67,7 @@ public class Multi {
 
             ci.onTask(tt -> {
 
-                float pri = tt.priIfFiniteElseZero();
+                float pri = tt.priActive(0);
                 if (pri > Param.BUDGET_EPSILON) {
 
                     logger.info("task: {}", tt);
@@ -82,7 +82,7 @@ public class Multi {
                             Default cj = core[j];
                             Activation.ObjectFloatHashMapPriorityAccumulator<Concept> aa = new Activation.ObjectFloatHashMapPriorityAccumulator<>();
                             cj.runLater(()->new Activation(tt, p, tt.concept(ci), cj, 2,2, aa));
-                            cj.conceptActivate(aa.commit(), null);
+                            cj.priorityAdd(aa.commit(), null);
                             //cj.core.active.add(tt.term(), p);
                         }
                     }

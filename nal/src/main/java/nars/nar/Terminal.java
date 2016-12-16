@@ -49,7 +49,7 @@ public class Terminal extends NAR {
 
 
     @Override
-    public float priority(@NotNull Termed termed) {
+    public float priority(@NotNull Termed termed, float valueIfInactive) {
         return 0;
     }
 
@@ -80,7 +80,7 @@ public class Terminal extends NAR {
     }
 
     @Override
-    public void conceptActivate(Iterable<ObjectFloatPair<Concept>> concepts, MutableFloat overflow) {
+    public void priorityAdd(Iterable<ObjectFloatPair<Concept>> concepts, MutableFloat overflow) {
         //nothing
     }
 

@@ -2,6 +2,8 @@ package nars.budget;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static nars.budget.Budget.validPriority;
 import static nars.budget.Budget.validQuality;
@@ -22,6 +24,8 @@ public class RawBudget implements Budget {
      * The overall (context-independent) evaluation
      */
     protected float quality;
+
+    private static final Logger logger = LoggerFactory.getLogger(RawBudget.class);
 
     public RawBudget() {
     }
@@ -56,15 +60,7 @@ public class RawBudget implements Budget {
         return priority;
     }
 
-    @Override
-    public final float priIfFiniteElseZero() {
-        float p = pri(); return /*Float.isFinite(p)*/ (p==p) ? p : 0;
-    }
 
-    @Override
-    public final float priIfFiniteElseNeg1() {
-        float p = pri(); return /*Float.isFinite(p)*/ (p==p) ? p : -1;
-    }
 
 
     @Override
@@ -95,6 +91,7 @@ public class RawBudget implements Budget {
             this.priority = Float.NaN;
             return true;
         }
+        //logger.warn("alredy deleted");
 //            throw new RuntimeException("Already Deleted");
         return false;
     }

@@ -1,6 +1,5 @@
 package nars.gui;
 
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.jogamp.opengl.GL2;
 import nars.$;
@@ -260,7 +259,7 @@ public class Vis {
 
             };
             p.setTitle(t.toString());
-            p.add("P", () -> nar.priority(t), 0f, 1f);
+            p.add("P", () -> nar.priority(t, Float.NaN), 0f, 1f);
             p.add("B", () -> nar.concept(t).beliefFreq(nar.time()), 0f, 1f);
             p.add("G", () -> nar.concept(t).goalFreq(nar.time()), 0f, 1f);
             grid.children.add(p);
@@ -380,7 +379,7 @@ public class Vis {
         NARSpace active = new NARSpace(nar) {
 
             final ObjectFloatHashMap<Term> priCache = new ObjectFloatHashMap<>();
-            final FloatFunction<Term> termFloatFunction = k -> nar.priority(k);
+            final FloatFunction<Term> termFloatFunction = k -> nar.priority(k, Float.NaN);
 
             @Override
             protected void get(Collection displayNext) {

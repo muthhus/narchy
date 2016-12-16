@@ -58,13 +58,4 @@ public final class ROBudget implements Budget {
     }
 
 
-    @Override
-    public float priIfFiniteElseZero() {
-        return pri();
-    }
-
-    @Override
-    public float priIfFiniteElseNeg1() {
-        return pri();
-    }
 }

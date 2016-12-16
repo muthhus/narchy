@@ -23,15 +23,6 @@ import static nars.budget.Budget.validPriority;
         this.f = f;
     }
 
-    @Override
-    public final float priIfFiniteElseZero() {
-        float p = f[0]; return /*Float.isFinite(p)*/ (p==p) ? p : 0;
-    }
-
-    @Override
-    public final float priIfFiniteElseNeg1() {
-        float p = f[0]; return /*Float.isFinite(p)*/ (p==p) ? p : -1;
-    }
 
     @Override
     public final X get() {

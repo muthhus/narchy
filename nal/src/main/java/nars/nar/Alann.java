@@ -273,7 +273,7 @@ public class Alann extends NAR {
     }
 
     @Override
-    public final void conceptActivate(Iterable<ObjectFloatPair<Concept>> concepts, MutableFloat overflow) {
+    public final void priorityAdd(Iterable<ObjectFloatPair<Concept>> concepts, MutableFloat overflow) {
 
 
         concepts.forEach((cv) -> {
@@ -288,7 +288,7 @@ public class Alann extends NAR {
     }
 
     @Override
-    public final float priority(@NotNull Termed concept) {
+    public final float priority(@NotNull Termed concept, float valueIfInactive) {
         //TODO impl
         Bag<Concept> cc = core(concept).terms;
         return cc.pri(concept, Float.NaN);

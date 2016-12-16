@@ -648,7 +648,7 @@ public abstract class NAR extends Param implements Level, Consumer<Task>, NARIn,
         try {
             input.normalize(this); //accept into input buffer for eventual processing
         } catch (@NotNull InvalidTaskException | InvalidTermException | Budget.BudgetException e) {
-            emotion.frustration(input.priIfFiniteElseZero());
+            emotion.frustration(input.priActive(0));
             emotion.eror();
 
             input.delete();
@@ -731,7 +731,7 @@ public abstract class NAR extends Param implements Level, Consumer<Task>, NARIn,
 
         }
 
-        emotion.frustration(input.priIfFiniteElseZero());
+        emotion.frustration(input.priActive(0));
 
         return null;
     }
@@ -1291,7 +1291,7 @@ public abstract class NAR extends Param implements Level, Consumer<Task>, NARIn,
     /**
      * gets a measure of the current priority of the concept
      */
-    abstract public float priority(@NotNull Termed termed);
+    abstract public float priority(@NotNull Termed termed, float valueIfInactive);
 
 
     public Termed[] terms(String... terms) {
@@ -1423,7 +1423,7 @@ public abstract class NAR extends Param implements Level, Consumer<Task>, NARIn,
         onCycle(f -> {
             Iterable<ObjectFloatPair<Concept>> y = aa.commit();
             if (y!=null) {
-                conceptActivate(y, null);
+                priorityAdd(y, null);
             }
         });
         return aa;
@@ -1559,7 +1559,7 @@ public abstract class NAR extends Param implements Level, Consumer<Task>, NARIn,
     /**
      * batched concept activation
      */
-    abstract public void conceptActivate(Iterable<ObjectFloatPair<Concept>> concepts, @Nullable MutableFloat overflow);
+    abstract public void priorityAdd(Iterable<ObjectFloatPair<Concept>> concepts, @Nullable MutableFloat overflow);
 
 
 //    public final void activate(@NotNull Task t) {

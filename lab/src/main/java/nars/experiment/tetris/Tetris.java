@@ -23,7 +23,6 @@ import spacegraph.Spatial;
 import spacegraph.index.Rect1D;
 import spacegraph.layout.Flatten;
 import spacegraph.math.v2;
-import spacegraph.render.Draw;
 import spacegraph.space.layout.Grid;
 import spacegraph.space.widget.MatrixView;
 
@@ -58,7 +57,7 @@ public class Tetris extends NAgents {
 
     public final Grid view = new Grid(
                     new MatrixView(tetris_width, tetris_height, (x, y, gl) -> {
-                        float r = nar.priority(concept[x][y]);
+                        float r = nar.priority(concept[x][y], Float.NaN);
                         gl.glColor3f(r, 0, 0);
                         return 0f;
                     }),
@@ -615,7 +614,7 @@ public class Tetris extends NAgents {
                     }
                 }
 
-                float p = nar.priority(s);
+                float p = nar.priority(s, Float.NaN);
                 g.glColor4f(dr, dg, bf, 0.5f + 0.5f * p);
 
                 return b != null ? b.conf() : 0;

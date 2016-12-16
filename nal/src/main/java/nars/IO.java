@@ -148,7 +148,7 @@ public class IO {
     }
 
     public static void writeBudget(@NotNull DataOutput out, @NotNull Budgeted t) throws IOException {
-        out.writeFloat(t.priIfFiniteElseZero());
+        out.writeFloat(t.priActive(0));
         out.writeFloat(t.qua());
     }
 

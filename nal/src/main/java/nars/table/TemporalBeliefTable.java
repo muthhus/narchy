@@ -31,5 +31,9 @@ public interface TemporalBeliefTable extends TaskTable {
 
     boolean isFull();
 
+    default void clear(NAR nar) {
+        removeIf((Task x)->true, nar);
+    }
+
     //void range(long[] t);
 }

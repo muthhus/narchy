@@ -139,8 +139,8 @@ public class Default extends NAR {
     }
 
     @Override
-    public final void conceptActivate(Iterable<ObjectFloatPair<Concept>> concepts, MutableFloat overflow) {
-        core.activate(concepts, overflow);
+    public final void priorityAdd(Iterable<ObjectFloatPair<Concept>> concepts, MutableFloat overflow) {
+        core.priorityAdd(concepts, overflow);
     }
 
     @Override
@@ -149,9 +149,8 @@ public class Default extends NAR {
     }
 
     @Override
-    public final float priority(@NotNull Termed concept) {
-        BLink<Concept> c = core.active.get(concept);
-        return c != null ? c.priIfFiniteElseZero() : 0;
+    public final float priority(@NotNull Termed concept, float valueIfInactive) {
+        return core.priority(concept, valueIfInactive);
     }
 
 

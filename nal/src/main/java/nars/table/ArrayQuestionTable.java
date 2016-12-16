@@ -347,7 +347,7 @@ public class ArrayQuestionTable  implements QuestionTable, Comparator<Task> {
     public int compare(@NotNull Task o1, @NotNull Task o2) {
 
         //return Float.compare(o2.qua(), o1.qua());
-        return Float.compare(o2.priIfFiniteElseNeg1(), o1.priIfFiniteElseNeg1());
+        return Float.compare(o2.priActive(-1), o1.priActive(-1));
     }
 
     //    @Override

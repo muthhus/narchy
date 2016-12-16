@@ -57,7 +57,7 @@ public class DefaultBeliefTable implements BeliefTable {
         if (!eternal.isEmpty())
             throw new UnsupportedOperationException("eternal clear impl soon");
 
-        temporal.removeIf((Task x)->true, nar);
+        temporal.clear(nar);
     }
 
     @NotNull
@@ -79,7 +79,7 @@ public class DefaultBeliefTable implements BeliefTable {
     @Override
     public float priSum() {
         final float[] total = {0};
-        Consumer<Task> totaler = t -> total[0] += t.priIfFiniteElseZero();
+        Consumer<Task> totaler = t -> total[0] += t.priActive(0);
         eternal.forEach(totaler);
         temporal.forEach(totaler);
         return total[0];

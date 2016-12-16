@@ -148,13 +148,15 @@ public class Revision {
 
 
 
-        RevisionTask t = new RevisionTask(cc, a.punc(),
+        MutableTask t = new RevisionTask(cc, a.punc(),
                 newTruth,
                 now, when,
                 evidence
-        );
+        ).budget(a, b, aProp);
 
-        t.budget(a, b, aProp);
+        if (t == null)
+            return null;
+
         t.dur( lerp(a.dur(), b.dur(), aw/(aw+bw)) );
 
         if (Param.REVECTION_PRIORITY_ZERO)

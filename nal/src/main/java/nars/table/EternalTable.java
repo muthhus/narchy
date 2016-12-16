@@ -7,6 +7,7 @@ import nars.Task;
 import nars.concept.CompoundConcept;
 import nars.concept.Concept;
 import nars.task.AnswerTask;
+import nars.task.MutableTask;
 import nars.task.Revision;
 import nars.task.RevisionTask;
 import nars.term.Term;
@@ -188,7 +189,7 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, Sorted
 
 
         final float newBeliefWeight = newBelief.evi();
-        float aProp = newBeliefWeight / ( newBeliefWeight + oldBelief.evi());
+        float aProp = newBeliefWeight / (newBeliefWeight + oldBelief.evi());
         Term t = Revision.intermpolate(
                 newBelief.term(), oldBelief.term(),
                 aProp,
@@ -196,22 +197,27 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, Sorted
                 true
         );
 
-        return new RevisionTask( t,
+        MutableTask r = new RevisionTask(t,
                 newBelief, oldBelief,
                 conclusion,
                 nar.time(),
                 ETERNAL,
-                (CompoundConcept)concept
-            ).budget(oldBelief, newBelief)
-             .log("Insertion Revision");
+                (CompoundConcept) concept
+        ).budget(oldBelief, newBelief);
+
+        if (r == null)
+            return null;
+
+        return r.log("Insertion Revision");
     }
 
-    @Nullable public Task put(@NotNull final Task incoming) {
+    @Nullable
+    public Task put(@NotNull final Task incoming) {
         Task displaced = null;
 
         if (size() == capacity()) {
             Task weakestPresent = weakest();
-            if (weakestPresent!=null) {
+            if (weakestPresent != null) {
                 if (rank(weakestPresent) <= rank(incoming)) {
                     displaced = removeWeakest();
                 } else {
@@ -280,7 +286,6 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, Sorted
             }
 
 
-
             //Finally try inserting this task.  If successful, it will be returned for link activation etc
             TruthDelta delta = insert(input, nar);
             if (revised != null) {
@@ -324,7 +329,7 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, Sorted
 
         if (displaced == input) {
             return null; //rejected
-        } else if (displaced!=null) {
+        } else if (displaced != null) {
             TaskTable.removeTask(displaced,
                     "Displaced", nar
                     //"Displaced by " + incoming,
