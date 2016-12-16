@@ -208,7 +208,7 @@ public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Iterable<BLink<
 
     }
 
-    default float pri(@NotNull V x, float valueIfMissing) {
+    default float pri(@NotNull Object x, float valueIfMissing) {
         BLink y = get(x);
         if (y==null || y.isDeleted())
             return valueIfMissing;

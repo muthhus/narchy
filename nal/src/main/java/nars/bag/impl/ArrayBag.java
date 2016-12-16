@@ -223,12 +223,14 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
     }
 
     @Override
-    public V mul(Object key, float boost) {
+    public V mul(Object key, float factor) {
         BLink<V> c = map.get(key);
-        if (c != null && !c.isDeleted()) {
-            //float dur = c.dur();
+        if (c != null) {
             float pBefore = c.pri();
-            c.priMult(boost);
+            if (pBefore!=pBefore)
+                return null; //already deleted
+
+            c.priMult(factor);
             float delta = c.pri() - pBefore;
             pressure += delta;// * dur;
             return c.get();
@@ -496,7 +498,6 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
                 commit(a);
             } else {
                 minPri = -1;
-                this.pressure = 0; //reset pressure accumulator
             }
         }
 

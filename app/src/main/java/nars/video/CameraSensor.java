@@ -37,11 +37,13 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
         agent.sensors.addAll(
             encode((x,y)->
 
-                $.func(root,
-                    (radix > 1 ?
+                //$.func(root,
+                $.inh(
+                    root,
+                    $.p(radix > 1 ?
                         new Term[] { coord(x, width), coord(y, height) } :
                         new Term[] { $.the(x), $.the(y) }
-                    ))
+                ))
 
             , brightnessToTruth));
 

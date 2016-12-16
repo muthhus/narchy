@@ -2,17 +2,18 @@ package nars.nar;
 
 import com.google.common.collect.Lists;
 import jcog.data.random.XorShift128PlusRandom;
+import nars.$;
 import nars.NAR;
 import nars.Param;
 import nars.Task;
 import nars.bag.Bag;
 import nars.bag.impl.CurveBag;
+import nars.budget.Budget;
 import nars.budget.merge.BudgetMerge;
 import nars.concept.Concept;
 import nars.index.term.tree.TreeTermIndex;
 import nars.link.BLink;
 import nars.nal.Deriver;
-import nars.nar.core.ConceptBagCycle;
 import nars.nar.exe.SynchronousExecutor;
 import nars.nar.util.DefaultConceptBuilder;
 import nars.nar.util.PremiseMatrix;
@@ -74,19 +75,18 @@ public class Alann extends NAR {
                 //new HijackBag<>(128, 3, blend, random);
                 new CurveBag(64, new CurveBag.NormalizedSampler(power2BagCurve, random), blend, new ConcurrentHashMap(64));
 
-        /**
-         * the tasklink bag is only modified and accessed by the core, locally, so it does not need to have a concurrent Map
-         */
-        public final Bag<Task> tasklinks =
-                //new HijackBag<>(128, 3, blend, random);
-                new CurveBag(64, new CurveBag.NormalizedSampler(power2BagCurve, random), blend, new HashMap(64));
+//        /**
+//         * the tasklink bag is only modified and accessed by the core, locally, so it does not need to have a concurrent Map
+//         */
+//        public final Bag<Task> tasklinks =
+//                //new HijackBag<>(128, 3, blend, random);
+//                new CurveBag(64, new CurveBag.NormalizedSampler(power2BagCurve, random), blend, new HashMap(64));
 
         int iterations = 16;
         int tasklinksFiring = 1;
         int termlinksFiring = 3;
 
-        /* a cost (reduction) applied to the local 'term' bag */
-        private float conceptVisitCost = 0.5f;
+
 
         /**
          * a value which should be less than 1.0,
@@ -139,13 +139,15 @@ public class Alann extends NAR {
 
             if (here != null) {
 
-                terms.mul(here, conceptVisitCost);
+//                float conceptVisitCost = 1f - (1f / terms.size());
+//                terms.mul(here, conceptVisitCost);
 
                 PremiseMatrix.run(here, Alann.this,
                         tasklinksFiring, termlinksFiring,
                         Alann.this::input, //input them within the current thread here
                         deriver,
-                        this.tasklinks, terms
+                        here.tasklinks(), //this.tasklinks,
+                        terms
                 );
             }
 
@@ -163,7 +165,7 @@ public class Alann extends NAR {
                     d.policy(concepts.conceptBuilder().awake(), Alann.this);
 
                     //d.termlinks().commit().transfer(2, terms);
-                    d.tasklinks().commit().copy(tasklinks, TASKLINK_COLLECTION_RATE);
+                    //d.tasklinks().commit().copy(tasklinks, TASKLINK_COLLECTION_RATE);
 
                     this.here = d;
                     this.linkHere = next;
@@ -176,10 +178,10 @@ public class Alann extends NAR {
         void print() {
             logger.info("at: {}", here);
             //out.println("\nlocal:"); local.print();
-            out.println("\ntermlinks:");
+            out.println("\nconcepts: " + terms.size() + "/" + terms.capacity());
             terms.print();
-            out.println("\ntasklinks:");
-            tasklinks.print();
+//            out.println("\ntasklinks:");
+//            tasklinks.print();
         }
 
         public int duty() {
@@ -251,11 +253,24 @@ public class Alann extends NAR {
     public Iterable<? extends BLink<Concept>> conceptsActive(int maxNodes) {
         //int s = cores.size();
         //int perCore = (int)Math.ceil((float)maxNodes / s);
+
+
+
         return () -> {
             Iterator[] coreBags = cores.stream().map(x -> x.terms.iterator()).toArray(Iterator[]::new);
             return IteratorUtils.zippingIterator(coreBags);
+            //return new RoundRobinIterator<>(coreBags);
         };
     }
+
+    public void print() {
+        for (GraphPremiseBuilder core : cores) {
+            core.print();
+        }
+        System.out.println();
+    }
+
+
 
     /**
      * NAL7 plugins
@@ -276,33 +291,113 @@ public class Alann extends NAR {
     public final Concept concept(@NotNull Termed term, float priToAdd) {
         Concept c = concept(term);
         if (c != null) {
-            cores.get(Math.abs(term.hashCode()) % cores.size()).terms.add(term, priToAdd);
+            core(term).terms.add(term, priToAdd);
         }
         return c;
     }
 
+    /** which core is handling a term */
+    public GraphPremiseBuilder core(@NotNull Termed term) {
+        return cores.get(Math.abs(term.hashCode()) % cores.size());
+    }
+
     @Override
     public final void conceptActivate(Iterable<ObjectFloatPair<Concept>> concepts, MutableFloat overflow) {
-        int numCores = cores.size();
+
 
         concepts.forEach((cv) -> {
             Concept c = cv.getOne();
-            cores.get(Math.abs(c.hashCode()) % numCores).terms.put(c, ConceptBagCycle.baseConceptBudget, cv.getTwo(), overflow);
+            float scale = cv.getTwo();
+
+            float p = scale;
+            float q = 1f / (1f + c.complexity());
+
+            core(c).terms.put(c, $.b(p, q), 1f, overflow);
         });
     }
 
     @Override
     public final float priority(@NotNull Termed concept) {
         //TODO impl
-        return 0;
+        Bag<Concept> cc = core(concept).terms;
+        return cc.pri(concept, Float.NaN);
     }
 
 
     @NotNull
     @Override
     public NAR forEachActiveConcept(@NotNull Consumer<Concept> recip) {
-        //TODO impl
+        conceptsActive(Integer.MAX_VALUE).forEach(x -> recip.accept(x.get()));
         return this;
     }
 
 }
+
+
+//public static class RoundRobinIterator<X> implements Iterator<X> {
+//
+//    //Define the iterator position in the overall list of iterators
+//    //and the list of iterators itself.
+//    private Iterator<Iterator<X>> iter;
+//    private List<Iterator<X>> iterators;
+//
+//    //The next value to be returned.  If null, the next value has
+//    //not been located yet.
+//    private X nextValue;
+//
+//    public RoundRobinIterator(Iterator<X>[] iterators) {
+//
+//        //Gets an iterator over a list of iterators.
+//        this.iterators = Lists.newArrayList(iterators);
+//        iter = this.iterators.iterator();
+//        this.nextValue = null;
+//    }
+//
+//    @Override
+//    public X next() {
+//        if (!hasNext())
+//            throw new NoSuchElementException();
+//        X n = nextValue;
+//        nextValue = null;
+//        return n;
+//    }
+//
+//    @Override
+//    public boolean hasNext() {
+//        return nextValue != null || setNext();
+//    }
+//
+//    private boolean setNext() {
+//
+//        //If we've already found the next element, do nothing.
+//        if (nextValue != null) return true;
+//
+//        //Loop until we determine the next element or that no elements remain.
+//        while (true) {
+//
+//            //If we're at the end of the list of iterators, restart at the beginning, assuming
+//            //any of the contained lists have remaining elements.
+//            if (!iter.hasNext()) {
+//                if (!iterators.isEmpty()) iter = iterators.iterator();
+//                else return false;
+//            }
+//
+//            //Get the next iterator from the list of iterators, assuming we're
+//            //not at the last one already.
+//            if (iter.hasNext()) {
+//                Iterator<X> currentIter = iter.next();
+//
+//                //If the iterator we are positioned at has more elements left in its
+//                //sub-list, then take the next element and return it.  If no elements remain
+//                //then remove the iterator from the round-robin iterator list for good.
+//                if (currentIter.hasNext()) {
+//                    nextValue = currentIter.next();
+//                    return true;
+//                }
+//                else {
+//                    iter.remove();
+//                }
+//            }
+//        }
+//    }
+//}

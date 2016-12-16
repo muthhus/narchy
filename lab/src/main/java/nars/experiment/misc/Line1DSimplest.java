@@ -8,7 +8,7 @@ import nars.Param;
 import nars.concept.ActionConcept;
 import nars.nar.Alann;
 import nars.remote.NAgents;
-import nars.time.RealTime;
+import nars.time.FrameTime;
 
 import static jcog.Texts.n2;
 import static jcog.Util.unitize;
@@ -120,7 +120,7 @@ public class Line1DSimplest extends NAgent {
                         //.invocationListeners(new InvocationLogger())
         );*/
 
-        NAR nar = new Alann(new RealTime.CS(true).dur(0.25f), 8 );
+        NAR nar = new Alann(new FrameTime(), 2 );
 
 
 
@@ -195,7 +195,7 @@ public class Line1DSimplest extends NAgent {
         //l.runRT(25, 15000).join();
 
 
-        l.runRT(10f);
+        l.runRT(16f);
 
 //
 //        NAR.printActiveTasks(nar, true);

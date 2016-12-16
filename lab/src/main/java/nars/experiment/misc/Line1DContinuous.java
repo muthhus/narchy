@@ -27,7 +27,7 @@ import static java.lang.System.out;
 public class Line1DContinuous extends NAgent {
 
     static {
-        Param.DEBUG = true;
+        Param.DEBUG = false;
     }
 
     public interface IntToFloatFunction {
@@ -259,7 +259,7 @@ public class Line1DContinuous extends NAgent {
         Default nar = new Default(1024,
                 conceptsPerCycle, 2, 8, rng,
                 new CaffeineIndex(new DefaultConceptBuilder(), 1024*2, 12, false, exe),
-                new FrameTime(10f), exe
+                new FrameTime(1f), exe
         );
         nar.termVolumeMax.set(19);
 

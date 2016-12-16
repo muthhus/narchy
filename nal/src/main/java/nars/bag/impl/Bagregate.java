@@ -1,5 +1,6 @@
 package nars.bag.impl;
 
+import com.google.common.collect.Lists;
 import jcog.data.FloatParam;
 import nars.bag.Bag;
 import nars.budget.merge.BudgetMerge;
@@ -23,7 +24,7 @@ public class Bagregate<X> extends ArrayBag<X> {
     final AtomicBoolean busy = new AtomicBoolean();
 
     public Bagregate(@NotNull Iterable<? extends BLink<X>> src, int capacity, float scale) {
-        super(capacity, BudgetMerge.plusBlend, new ConcurrentHashMap(capacity));
+        super(capacity, BudgetMerge.plusBlend, new ConcurrentHashMap<>(capacity));
 
         this.src = src;
         this.scale = new FloatParam(scale);
@@ -43,8 +44,8 @@ public class Bagregate<X> extends ArrayBag<X> {
         while (ss.hasNext() && count < limit) {
             BLink<X> x = ss.next();
             if (include(x)) {
-                put(x.get(), x, scale, null);
-                count++;
+                if (put(x.get(), x, scale, null)!=null)
+                    count++;
             }
         }
 
