@@ -10,7 +10,7 @@ import nars.concept.SensorConcept;
 import nars.index.term.map.CaffeineIndex;
 import nars.nar.Default;
 import nars.nar.exe.Executioner;
-import nars.nar.exe.SingleThreadExecutioner;
+import nars.nar.exe.SynchronousExecutor;
 import nars.nar.util.DefaultConceptBuilder;
 import nars.remote.NAgents;
 import nars.task.DerivedTask;
@@ -254,7 +254,7 @@ public class Line1DContinuous extends NAgent {
 
         final Executioner exe =
                 //new MultiThreadExecutioner(2, 2048);
-                new SingleThreadExecutioner();
+                new SynchronousExecutor();
 
         Default nar = new Default(1024,
                 conceptsPerCycle, 2, 8, rng,

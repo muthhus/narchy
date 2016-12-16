@@ -12,7 +12,7 @@ import nars.nal.Deriver;
 import nars.nal.nal8.AbstractOperator;
 import nars.nar.core.ConceptBagCycle;
 import nars.nar.exe.Executioner;
-import nars.nar.exe.SingleThreadExecutioner;
+import nars.nar.exe.SynchronousExecutor;
 import nars.nar.util.DefaultConceptBuilder;
 import nars.op.data.*;
 import nars.op.mental.doubt;
@@ -23,7 +23,6 @@ import nars.op.time.STMTemporalLinkage;
 import nars.term.Termed;
 import nars.time.FrameTime;
 import nars.time.Time;
-import objenome.O;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.eclipse.collections.api.tuple.primitive.ObjectFloatPair;
 import org.jetbrains.annotations.NotNull;
@@ -63,7 +62,7 @@ public class Default extends NAR {
 
 
     public Default(int activeConcepts, int conceptsFirePerCycle, int taskLinksPerConcept, int termLinksPerConcept, @NotNull Random random, @NotNull TermIndex index, @NotNull Time time) {
-        this(activeConcepts, conceptsFirePerCycle, taskLinksPerConcept, termLinksPerConcept, random, index, time, new SingleThreadExecutioner());
+        this(activeConcepts, conceptsFirePerCycle, taskLinksPerConcept, termLinksPerConcept, random, index, time, new SynchronousExecutor());
     }
 
     public Default(int activeConcepts, int conceptsFirePerCycle, int taskLinksPerConcept, int termLinksPerConcept, @NotNull Random random, @NotNull TermIndex index, @NotNull Time time, Executioner exe) {
@@ -136,8 +135,13 @@ public class Default extends NAR {
     }
 
     @Override
-    public final void activationAdd(Iterable<ObjectFloatPair<Concept>> concepts, MutableFloat overflow) {
+    public final void conceptActivate(Iterable<ObjectFloatPair<Concept>> concepts, MutableFloat overflow) {
         core.activate(concepts, overflow);
+    }
+
+    @Override
+    public Iterable<? extends BLink<Concept>> conceptsActive(int maxNodes) {
+        return core.active;
     }
 
     @Override

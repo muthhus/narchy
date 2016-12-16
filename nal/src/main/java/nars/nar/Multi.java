@@ -7,7 +7,7 @@ import nars.budget.Activation;
 import nars.concept.Concept;
 import nars.index.term.TermIndex;
 import nars.index.term.tree.TreeTermIndex;
-import nars.nar.exe.SingleThreadExecutioner;
+import nars.nar.exe.SynchronousExecutor;
 import nars.nar.util.DefaultConceptBuilder;
 import nars.time.RealTime;
 import nars.time.Time;
@@ -50,7 +50,7 @@ public class Multi {
         this.loop = new NARLoop[numCores];
         for (int i = 0; i < numCores; i++) {
             Random random = new XorShift128PlusRandom(i);
-            SingleThreadExecutioner exe = new SingleThreadExecutioner() {
+            SynchronousExecutor exe = new SynchronousExecutor() {
 
                 @Override
                 public boolean concurrent() {
@@ -82,7 +82,7 @@ public class Multi {
                             Default cj = core[j];
                             Activation.ObjectFloatHashMapPriorityAccumulator<Concept> aa = new Activation.ObjectFloatHashMapPriorityAccumulator<>();
                             cj.runLater(()->new Activation(tt, p, tt.concept(ci), cj, 2,2, aa));
-                            cj.activationAdd(aa.commit(), null);
+                            cj.conceptActivate(aa.commit(), null);
                             //cj.core.active.add(tt.term(), p);
                         }
                     }

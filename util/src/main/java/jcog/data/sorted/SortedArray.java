@@ -268,7 +268,11 @@ public class SortedArray<E> implements Iterable<E> {
     @Override
     public Iterator<E> iterator() {
         //throw new UnsupportedOperationException();
-        return new ArrayIterator(list, 0, size());
+        int s = size();
+        if (s == 0)
+            return Collections.emptyIterator();
+        else
+            return new ArrayIterator(list, 0, s);
     }
 
 

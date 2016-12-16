@@ -4,7 +4,8 @@ import jcog.data.random.XORShiftRandom;
 import nars.NAR;
 import nars.Param;
 import nars.concept.Concept;
-import nars.nar.exe.SingleThreadExecutioner;
+import nars.link.BLink;
+import nars.nar.exe.SynchronousExecutor;
 import nars.term.Termed;
 import nars.time.FrameTime;
 import nars.time.Time;
@@ -13,6 +14,7 @@ import org.eclipse.collections.api.tuple.primitive.ObjectFloatPair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Collections;
 import java.util.Random;
 import java.util.function.Consumer;
 
@@ -34,7 +36,7 @@ public class Terminal extends NAR {
         this(capacity, new XORShiftRandom(1), new FrameTime());
     }
     public Terminal(int capacity, @NotNull Random random, @NotNull Time c) {
-        super(c, new Default.DefaultTermTermIndex(capacity), random, Param.defaultSelf(), new SingleThreadExecutioner());
+        super(c, new Default.DefaultTermTermIndex(capacity), random, Param.defaultSelf(), new SynchronousExecutor());
 
 
     }
@@ -73,7 +75,12 @@ public class Terminal extends NAR {
     }
 
     @Override
-    public void activationAdd(Iterable<ObjectFloatPair<Concept>> concepts, MutableFloat overflow) {
+    public Iterable<? extends BLink<Concept>> conceptsActive(int maxNodes) {
+        return Collections.emptyList();
+    }
+
+    @Override
+    public void conceptActivate(Iterable<ObjectFloatPair<Concept>> concepts, MutableFloat overflow) {
         //nothing
     }
 

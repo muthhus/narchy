@@ -6,7 +6,7 @@ import nars.Param;
 import nars.index.term.tree.TreeTermIndex;
 import nars.nar.Default;
 import nars.nar.exe.Executioner;
-import nars.nar.exe.SingleThreadExecutioner;
+import nars.nar.exe.SynchronousExecutor;
 import nars.nar.util.DefaultConceptBuilder;
 import nars.time.FrameTime;
 import org.junit.Ignore;
@@ -41,7 +41,7 @@ public class NQuadsRDFTest {
 
         Random rng = new XorShift128PlusRandom(1);
         //Multi nar = new Multi(3,512,
-        Executioner e = new SingleThreadExecutioner();
+        Executioner e = new SynchronousExecutor();
         Default n = new Default(1024,
                 72, 2, 2, rng,
                 //new CaffeineIndex(new DefaultConceptBuilder(rng), DEFAULT_INDEX_WEIGHT, false, e),

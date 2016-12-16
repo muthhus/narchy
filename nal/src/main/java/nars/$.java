@@ -5,7 +5,6 @@ import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.encoder.PatternLayoutEncoder;
 import ch.qos.logback.classic.net.SyslogAppender;
-import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.ConsoleAppender;
 import jcog.Util;
 import jcog.list.FasterList;
@@ -483,57 +482,67 @@ public enum $ {
     //}
 
     @NotNull
-    public static final Logger logRoot;
+    public static final Logger LOG;
 
-    /** NALogging non-axiomatic logging encoder. log events expressed in NAL terms */
-    @NotNull
-    public static final PatternLayoutEncoder logEncoder;
+
 
     static {
         Thread.currentThread().setName("$");
 
         //http://logback.qos.ch/manual/layouts.html
 
-        logRoot = (Logger) LoggerFactory.getLogger(org.slf4j.Logger.ROOT_LOGGER_NAME);
-        logEncoder = new PatternLayoutEncoder();
+        LOG = (Logger) LoggerFactory.getLogger(org.slf4j.Logger.ROOT_LOGGER_NAME);
+        LoggerContext loggerContext = LOG.getLoggerContext();
+        // we are not interested in auto-configuration
+        loggerContext.reset();
 
-        try {
-
-            LoggerContext loggerContext = logRoot.getLoggerContext();
-            // we are not interested in auto-configuration
-            loggerContext.reset();
-
-            logEncoder.setContext(loggerContext);
-            //logEncoder.setPattern("\\( %highlight(%level),%green(%thread),%yellow(%logger{0}) \\): \"%message\".%n");
-            logEncoder.setPattern("\\( %green(%thread),%highlight(%logger{0}) \\): \"%message\".%n");
-            logEncoder.start();
+        PatternLayoutEncoder logEncoder = new PatternLayoutEncoder();
+        logEncoder.setContext(loggerContext);
+        //logEncoder.setPattern("\\( %highlight(%level),%green(%thread),%yellow(%logger{0}) \\): \"%message\".%n");
+        logEncoder.setPattern("\\( %green(%thread),%highlight(%logger{0}) \\): \"%message\".%n");
+        logEncoder.setImmediateFlush(false);
+        logEncoder.start();
 
 
-            ConsoleAppender<ILoggingEvent> appender = new ConsoleAppender<>();
-            appender.setContext(loggerContext);
-            appender.setEncoder(logEncoder);
-            appender.start();
-            logRoot.addAppender(appender);
+        {
+            ConsoleAppender c = new ConsoleAppender();
+            c.setContext(loggerContext);
+            c.setEncoder(logEncoder);
+            c.setWithJansi(true);
+            c.start();
 
+            LOG.addAppender(c);
+        }
 
-            //---TEMPORARY---
-            SyslogAppender syslog = new SyslogAppender();
-            syslog.setPort(10010);
-            syslog.setFacility("LOCAL6");
-            syslog.setContext(loggerContext);
-            syslog.setCharset(Charset.forName("UTF8"));
-            syslog.start();
+//            SyslogAppender syslog = new SyslogAppender();
+//            syslog.setPort(5000);
+//            syslog.setFacility("LOCAL6");
+//            syslog.setContext(loggerContext);
+//            syslog.setCharset(Charset.forName("UTF8"));
+//            syslog.start();
+//            LOG.addAppender(syslog);
 
-            logRoot.addAppender(syslog);
+//            SocketAppender sa = new SocketAppender();
+//            sa.setName("socketlog");
+//            sa.setContext(loggerContext);
+//            sa.setQueueSize(1);
+//            sa.setEventDelayLimit(Duration.buildByMilliseconds(100));
+//            sa.setRemoteHost("localhost");
+//            sa.setPort(4560);
+//            sa.setIncludeCallerData(true);
+//            sa.setReconnectionDelay(Duration.buildByMilliseconds(200));
+//            sa.start();
+//            LOG.addAppender(sa);
 
 //        logRoot.debug("Message 1");
 //        logRoot.info("Message 1");
 //        logRoot.warn("Message 2");
 //        logRoot.error("Message 2");
 
-        } catch (Throwable t) {
-            System.err.println("Logging Disabled: " + t);
-        }
+
+//        } catch (Throwable t) {
+//            System.err.println("Logging Disabled: " + t);
+//        }
     }
 
 

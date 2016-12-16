@@ -7,6 +7,7 @@ import nars.link.BLink;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Iterator;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
@@ -17,22 +18,15 @@ import java.util.function.Consumer;
  */
 public class Bagregate<X> extends ArrayBag<X> {
 
-    private final Bag<X> src;
-    private final int iterationDepth;
+    private final Iterable<? extends BLink<X>> src;
     private final MutableFloat scale;
     final AtomicBoolean busy = new AtomicBoolean();
 
-    public Bagregate(@NotNull Bag<X> src, int capacity, float scale) {
-        this(src, capacity, scale, Integer.MAX_VALUE);
-    }
-
-    public Bagregate(@NotNull Bag<X> src, int capacity, float scale, int iterationDepth) {
+    public Bagregate(@NotNull Iterable<? extends BLink<X>> src, int capacity, float scale) {
         super(capacity, BudgetMerge.plusBlend, new ConcurrentHashMap(capacity));
-
 
         this.src = src;
         this.scale = new FloatParam(scale);
-        this.iterationDepth = iterationDepth;
 
         update();
     }
@@ -42,10 +36,18 @@ public class Bagregate<X> extends ArrayBag<X> {
             return;
 
         float scale = this.scale.floatValue();
-        src.forEach(iterationDepth, x -> {
-            if (include(x))
+
+        Iterator<? extends BLink<X>> ss = src.iterator();
+        int count = 0;
+        int limit = capacity;
+        while (ss.hasNext() && count < limit) {
+            BLink<X> x = ss.next();
+            if (include(x)) {
                 put(x.get(), x, scale, null);
-        });
+                count++;
+            }
+        }
+
         commit();
 
         busy.set(false);

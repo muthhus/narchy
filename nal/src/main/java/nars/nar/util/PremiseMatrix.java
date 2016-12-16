@@ -40,14 +40,12 @@ public class PremiseMatrix {
     public static int run(@NotNull Concept c, @NotNull NAR nar, int tasklinks, int termlinks, @NotNull Consumer<Task> target, @NotNull Deriver deriver, @NotNull Bag<Task> tasklinkBag, @NotNull Bag<? extends Termed> termlinkBag) {
         int count = 0;
 
-        try {
 
             c.commit();
 
             int tasklinksSampled = (int)Math.ceil(tasklinks * Param.BAG_OVERSAMPLING);
 
             FasterList<BLink<Task>> tasksBuffer = (FasterList)$.newArrayList(tasklinksSampled);
-
             tasklinkBag.sample(tasklinksSampled, tasksBuffer::addIfNotNull);
 
             int tasksBufferSize = tasksBuffer.size();
@@ -117,13 +115,15 @@ public class PremiseMatrix {
             }
 
 
-        } catch (RuntimeException e) {
+        /*
+        catch (RuntimeException e) {
 
             //if (Param.DEBUG)
                 e.printStackTrace();
 
             logger.error("run {}", e);
         }
+         */
 
         return count;
     }

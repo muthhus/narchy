@@ -8,6 +8,7 @@ import nars.experiment.tetris.impl.TetrisState;
 import nars.experiment.tetris.impl.TetrisVisualizer;
 import nars.gui.ConceptWidget;
 import nars.gui.NARSpace;
+import nars.nar.Alann;
 import nars.remote.NAgents;
 import nars.term.Compound;
 import nars.term.atom.Atomic;
@@ -243,12 +244,13 @@ public class Tetris extends NAgents {
 
                             $.inh(
                                     //$.func(
+                                    $.p(tetris),
                                     $.p(
 //                                  $.pRecurse($.radixArray(x, PIXEL_RADIX, state.width)), $.pRecurse($.radixArray(y, PIXEL_RADIX, state.height))
                                             //$.p($.radixArray(x, PIXEL_RADIX, state.width)), $.p($.radixArray(y, PIXEL_RADIX, state.height))
                                             x, y
-                                    ),
-                                    tetris
+                                    )
+
                             )
                             //$.p(
                             //$.the("tetris"))
@@ -441,8 +443,11 @@ public class Tetris extends NAgents {
         public static void main(String[] args) {
             //Param.DEBUG = true;
 
-            NAR nar = NAgents.newMultiThreadNAR(4, new FrameTime().dur(TIME_PER_FALL));
-            nar.termVolumeMax.setValue(16);
+            NAR nar =
+                    //NAgents.newMultiThreadNAR(4, new FrameTime().dur(TIME_PER_FALL));
+                    new Alann(new FrameTime().dur(TIME_PER_FALL), 4);
+
+            nar.termVolumeMax.setValue(13);
             //nar.linkFeedbackRate.setValue(0.05f);
 
             //newTimeWindow(nar);

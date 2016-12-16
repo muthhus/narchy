@@ -27,7 +27,6 @@ public class Hack {
   public static final Unsafe unsafe;
   public static final Field sbval;
   public static final Field String_value;
-  public static final long svo;
 
   private Hack() { } // dummy private constructor
 
@@ -52,25 +51,21 @@ public class Hack {
   //Add reflection for String value access
   static {
     Field sv = null, sbv = null;
-    long svov = 0;
+    //long svov = 0;
     try {
       sv = String.class.getDeclaredField("value");
-      svov = unsafe.objectFieldOffset(sv);
-
-      //o = String.class.getDeclaredField("offset");
-      sbv = StringBuilder.class.getSuperclass().getDeclaredField("value");
-
       sv.setAccessible(true);
+      //svov = unsafe.objectFieldOffset(sv);
 
+      sbv = StringBuilder.class.getSuperclass().getDeclaredField("value");
       sbv.setAccessible(true);
-      //o.setAccessible(true);
+
     } catch (Exception ex) {
       ex.printStackTrace();
       System.exit(1);
     }
     String_value = sv;
     sbval = sbv;
-    svo = svov;
   }
 
   private static final long _Bbase  = unsafe.arrayBaseOffset(byte[].class);
@@ -90,7 +85,8 @@ public class Hack {
 
   public static byte[] bytes(String s) {
 
-      return (byte[])unsafe.getObject(s, svo);
+      //return (byte[])unsafe.getObject(s, svo);
+      return s.getBytes();
 
 //        try {
 //            return (byte[]) String_value.get(s);

@@ -492,16 +492,13 @@ abstract public class NAgent implements NSense, NAction {
 
                 now = nar.time();
 
-                doFrame();
+                if (stopTime > 0 && now > stopTime)
+                    stop();
 
-                now = nar.time();
+                doFrame();
 
                 nar.run(1);
 
-                now = nar.time();
-
-                if (stopTime > 0 && now > stopTime)
-                    stop();
             }
         };
 

@@ -9,7 +9,7 @@ import java.util.ArrayDeque;
 /**
  * Created by me on 8/16/16.
  */
-public class SingleThreadExecutioner extends Executioner {
+public class SynchronousExecutor extends Executioner {
 
     final ArrayDeque<Runnable> pending = new ArrayDeque<>(128 );
 
@@ -38,7 +38,13 @@ public class SingleThreadExecutioner extends Executioner {
 
     @Override
     public final void run(@NotNull Runnable r) {
-        pending.add/*Last*/(r);
+        //pending.add/*Last*/(r);
+
+        try {
+            r.run();
+        } catch (Throwable t) {
+            nar.logger.error("{} {}", r, t);
+        }
     }
 
     @Override

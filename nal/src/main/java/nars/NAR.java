@@ -21,6 +21,7 @@ import nars.concept.util.InvalidConceptException;
 import nars.index.task.MapTaskIndex;
 import nars.index.task.TaskIndex;
 import nars.index.term.TermIndex;
+import nars.link.BLink;
 import nars.nal.Level;
 import nars.nal.nal8.AbstractOperator;
 import nars.nal.nal8.Execution;
@@ -91,7 +92,7 @@ import static org.fusesource.jansi.Ansi.ansi;
  */
 public abstract class NAR extends Param implements Level, Consumer<Task>, NARIn, NAROut, Iterative<NAR> {
 
-    static final Logger logger = LoggerFactory.getLogger(NAR.class);
+    public static final Logger logger = LoggerFactory.getLogger(NAR.class);
     static final Set<String> logEvents = Sets.newHashSet("eventTaskProcess", "eventAnswer", "eventExecute");
     static final String VERSION = "NARchy v?.?";
 
@@ -1422,7 +1423,7 @@ public abstract class NAR extends Param implements Level, Consumer<Task>, NARIn,
         onCycle(f -> {
             Iterable<ObjectFloatPair<Concept>> y = aa.commit();
             if (y!=null) {
-                activationAdd(y, null);
+                conceptActivate(y, null);
             }
         });
         return aa;
@@ -1432,6 +1433,8 @@ public abstract class NAR extends Param implements Level, Consumer<Task>, NARIn,
         PriorityAccumulator<Concept> v = priorityAccumulatrs.get();
         return v;
     }
+
+    public abstract Iterable<? extends BLink<Concept>> conceptsActive(int maxNodes);
 
 
 //    @Nullable
@@ -1556,7 +1559,7 @@ public abstract class NAR extends Param implements Level, Consumer<Task>, NARIn,
     /**
      * batched concept activation
      */
-    abstract public void activationAdd(Iterable<ObjectFloatPair<Concept>> concepts, @Nullable MutableFloat overflow);
+    abstract public void conceptActivate(Iterable<ObjectFloatPair<Concept>> concepts, @Nullable MutableFloat overflow);
 
 
 //    public final void activate(@NotNull Task t) {

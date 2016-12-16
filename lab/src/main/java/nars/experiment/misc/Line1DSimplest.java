@@ -6,15 +6,12 @@ import nars.NAR;
 import nars.NAgent;
 import nars.Param;
 import nars.concept.ActionConcept;
-import nars.nar.Default;
+import nars.nar.Alann;
 import nars.remote.NAgents;
-import objenome.InvocationLogger;
+import nars.time.RealTime;
 
 import static jcog.Texts.n2;
 import static jcog.Util.unitize;
-import static org.mockito.Answers.CALLS_REAL_METHODS;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.withSettings;
 
 
 /**
@@ -23,7 +20,7 @@ import static org.mockito.Mockito.withSettings;
 public class Line1DSimplest extends NAgent {
 
     static {
-        Param.DEBUG = true;
+        Param.DEBUG = false;
     }
 
     private float yHidden = 0.5f, yEst = 0.5f;
@@ -116,12 +113,14 @@ public class Line1DSimplest extends NAgent {
 
         float dur = 8;
 
-        Default nar = mock(Default.class, withSettings()
+        /*NAR nar = mock(Default.class, withSettings()
                         .useConstructor()
                         //.name("nar")
                         .defaultAnswer(CALLS_REAL_METHODS)
                         //.invocationListeners(new InvocationLogger())
-        );
+        );*/
+
+        NAR nar = new Alann(new RealTime.CS(true).dur(0.25f), 8 );
 
 
 
@@ -194,7 +193,9 @@ public class Line1DSimplest extends NAgent {
 
         l.print = true;
         //l.runRT(25, 15000).join();
-        l.run(114096);
+
+
+        l.runRT(10f);
 
 //
 //        NAR.printActiveTasks(nar, true);

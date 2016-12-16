@@ -119,9 +119,9 @@ abstract public class NAgents extends NAgent {
 
     public static void runRT(Function<NAR, NAgents> init, float fps, int durFrames) {
 
-        Default nar = NAgents.newMultiThreadNAR(3, new RealTime.CS(true).dur(durFrames/fps), true);
-        //Default nar = newNAR();
-        //Alann nar = newAlann();
+        //NAR nar = NAgents.newMultiThreadNAR(3, new RealTime.CS(true).dur(durFrames/fps), true);
+        //NAR nar = newNAR();
+        NAR nar = newAlann(durFrames/fps);
 
         NAgents a = init.apply(nar);
         a.trace = true;
@@ -139,8 +139,8 @@ abstract public class NAgents extends NAgent {
         return d;
     }
 
-    public static Alann newAlann() {
-        Alann nar = new Alann(new RealTime.DS(true));
+    public static Alann newAlann(float dur) {
+        Alann nar = new Alann(new RealTime.CS(true).dur(dur ), 8 );
 
         MySTMClustered stm = new MySTMClustered(nar, 128, '.', 3, true, 6);
         MySTMClustered stmGoal = new MySTMClustered(nar, 32, '!', 2, true, 4);
@@ -344,7 +344,7 @@ abstract public class NAgents extends NAgent {
                                     .toArray(Surface[]::new)),
                             "inputEdit",()->Vis.newInputEditor(a.nar),
                             "concepts", ()->
-                                    Vis.treeChart( a.nar, new Bagregate(((Default)a.nar).core.active, 64, 0.05f, 256) , 64),
+                                    Vis.treeChart( a.nar, new Bagregate(a.nar.conceptsActive(64), 64, 0.05f) , 64),
                             "conceptBudget", ()->
                                     Vis.budgetHistogram(nar, 24),
                             "tasks", ()-> taskChart,

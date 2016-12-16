@@ -1,5 +1,6 @@
 package nars.nar;
 
+import com.google.common.collect.Lists;
 import jcog.data.random.XorShift128PlusRandom;
 import nars.NAR;
 import nars.Param;
@@ -12,14 +13,13 @@ import nars.index.term.tree.TreeTermIndex;
 import nars.link.BLink;
 import nars.nal.Deriver;
 import nars.nar.core.ConceptBagCycle;
-import nars.nar.exe.Executioner;
-import nars.nar.exe.MultiThreadExecutioner;
+import nars.nar.exe.SynchronousExecutor;
 import nars.nar.util.DefaultConceptBuilder;
 import nars.nar.util.PremiseMatrix;
 import nars.op.time.STMTemporalLinkage;
 import nars.term.Termed;
-import nars.time.FrameTime;
 import nars.time.Time;
+import org.apache.commons.collections4.IteratorUtils;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.eclipse.collections.api.tuple.primitive.ObjectFloatPair;
 import org.jetbrains.annotations.NotNull;
@@ -28,8 +28,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
@@ -53,9 +56,14 @@ public class Alann extends NAR {
 
     final static Deriver deriver = Deriver.get("default.meta.nal");
 
+    final AtomicBoolean running = new AtomicBoolean(false);
+    private ExecutorService coreExe = null;
+
     public final class GraphPremiseBuilder implements Runnable {
 
-        /** how many tasklinks to absorb on a visit */
+        /**
+         * how many tasklinks to absorb on a visit
+         */
         public static final int TASKLINK_COLLECTION_RATE = 1;
 
         Concept here;
@@ -66,7 +74,9 @@ public class Alann extends NAR {
                 //new HijackBag<>(128, 3, blend, random);
                 new CurveBag(64, new CurveBag.NormalizedSampler(power2BagCurve, random), blend, new ConcurrentHashMap(64));
 
-        /** the tasklink bag is only modified and accessed by the core, locally, so it does not need to have a concurrent Map */
+        /**
+         * the tasklink bag is only modified and accessed by the core, locally, so it does not need to have a concurrent Map
+         */
         public final Bag<Task> tasklinks =
                 //new HijackBag<>(128, 3, blend, random);
                 new CurveBag(64, new CurveBag.NormalizedSampler(power2BagCurve, random), blend, new HashMap(64));
@@ -78,8 +88,10 @@ public class Alann extends NAR {
         /* a cost (reduction) applied to the local 'term' bag */
         private float conceptVisitCost = 0.5f;
 
-        /** a value which should be less than 1.0,
-         * indicating the preference for the current value vs. a tendency to move */
+        /**
+         * a value which should be less than 1.0,
+         * indicating the preference for the current value vs. a tendency to move
+         */
         float momentum = 0.5f;
 
 
@@ -90,24 +102,26 @@ public class Alann extends NAR {
             }
         }
 
-        public  void loop() {
+        public void loop() {
             while (true) {
-                try {
-                    //run();
-                    iterate();
-                } catch (Throwable t) {
-                    logger.error("run: {}", t);
-                }
+                iterateSafe();
             }
         }
 
+        public void iterateSafe() {
+            try {
+                iterate();
+            } catch (Throwable t) {
+                logger.error("run: {}", t);
+            }
+        }
 
 
         void iterate() {
 
             //decide whether to remain here
             boolean move;
-            if (here !=null) {
+            if (here != null) {
                 move = (random.nextFloat() > (momentum) * linkHere.priIfFiniteElseZero());
             } else {
                 move = true;
@@ -162,8 +176,10 @@ public class Alann extends NAR {
         void print() {
             logger.info("at: {}", here);
             //out.println("\nlocal:"); local.print();
-            out.println("\ntermlinks:"); terms.print();
-            out.println("\ntasklinks:"); tasklinks.print();
+            out.println("\ntermlinks:");
+            terms.print();
+            out.println("\ntasklinks:");
+            tasklinks.print();
         }
 
         public int duty() {
@@ -172,21 +188,11 @@ public class Alann extends NAR {
 
     }
 
-    public Alann() {
-        this(new FrameTime());
-    }
 
-    public Alann(Time time) {
-        this(time,
-                //new SingleThreadExecutioner()
-                new MultiThreadExecutioner(2, 1024*16).sync(false),
-                4
-        );
-    }
-
-    public Alann(@NotNull Time time, Executioner exe, int cores) {
-        super(time, new TreeTermIndex.L1TreeIndex(new DefaultConceptBuilder(), 1024*1024, 16384, 3),
-                new XorShift128PlusRandom(1), Param.defaultSelf(), exe);
+    public Alann(@NotNull Time time, int cores) {
+        super(time,
+                new TreeTermIndex.L1TreeIndex(new DefaultConceptBuilder(), 1024 * 1024, 1024 * 32, 2),
+                new XorShift128PlusRandom(1), Param.defaultSelf(), new SynchronousExecutor());
 
         quaMin.setValue(BUDGET_EPSILON * 2f);
 
@@ -203,18 +209,57 @@ public class Alann extends NAR {
 
         this.cores = range(0, cores).mapToObj(i -> new GraphPremiseBuilder()).collect(toList());
 
-        AtomicBoolean running = new AtomicBoolean(false);
-        runLater(()-> {
-           if (running.compareAndSet(false,true)) {
-               for (GraphPremiseBuilder b : this.cores)
-                   new Thread(b::loop).start();
-           }
+        runLater(() -> {
+            start(Runtime.getRuntime().availableProcessors());
         });
 
     }
 
 
-    /** NAL7 plugins */
+    public synchronized void start(int threads) {
+
+
+        if (running.compareAndSet(false, true)) {
+            List<List<GraphPremiseBuilder>> ll = Lists.partition(cores, (int) Math.ceil(((float) cores.size()) / threads));
+            coreExe =
+                    //Executors.newCachedThreadPool();
+                    Executors.newFixedThreadPool(threads);
+            for (List<GraphPremiseBuilder> l : ll) {
+                int s = l.size();
+                if (s == 1) {
+                    coreExe.execute(l.get(0)::loop);
+                } else {
+                    coreExe.execute(loop(l.toArray(new GraphPremiseBuilder[s])));
+                }
+
+            }
+
+        }
+    }
+
+    @NotNull Runnable loop(@NotNull GraphPremiseBuilder[] group) {
+        return () -> {
+            while (true) {
+                for (GraphPremiseBuilder g : group) {
+                    g.iterateSafe();
+                }
+            }
+        };
+    }
+
+    @Override
+    public Iterable<? extends BLink<Concept>> conceptsActive(int maxNodes) {
+        //int s = cores.size();
+        //int perCore = (int)Math.ceil((float)maxNodes / s);
+        return () -> {
+            Iterator[] coreBags = cores.stream().map(x -> x.terms.iterator()).toArray(Iterator[]::new);
+            return IteratorUtils.zippingIterator(coreBags);
+        };
+    }
+
+    /**
+     * NAL7 plugins
+     */
     protected void initNAL7() {
 
         STMTemporalLinkage stmLinkage = new STMTemporalLinkage(this, 2);
@@ -230,17 +275,17 @@ public class Alann extends NAR {
     @Override
     public final Concept concept(@NotNull Termed term, float priToAdd) {
         Concept c = concept(term);
-        if (c!=null) {
+        if (c != null) {
             cores.get(Math.abs(term.hashCode()) % cores.size()).terms.add(term, priToAdd);
         }
         return c;
     }
 
     @Override
-    public final void activationAdd(Iterable<ObjectFloatPair<Concept>> concepts, MutableFloat overflow) {
+    public final void conceptActivate(Iterable<ObjectFloatPair<Concept>> concepts, MutableFloat overflow) {
         int numCores = cores.size();
 
-        concepts.forEach((cv)->{
+        concepts.forEach((cv) -> {
             Concept c = cv.getOne();
             cores.get(Math.abs(c.hashCode()) % numCores).terms.put(c, ConceptBagCycle.baseConceptBudget, cv.getTwo(), overflow);
         });
