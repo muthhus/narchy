@@ -1,4 +1,4 @@
-package nars.budget;
+package nars.budget.util;
 
 
 import org.eclipse.collections.api.tuple.primitive.ObjectFloatPair;

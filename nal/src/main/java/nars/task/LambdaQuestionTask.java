@@ -2,10 +2,14 @@ package nars.task;
 
 import nars.NAR;
 import nars.Task;
+import nars.bag.impl.ArrayBag;
+import nars.budget.merge.BudgetMerge;
 import nars.term.Compound;
 import nars.term.Termed;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
@@ -13,33 +17,34 @@ import java.util.function.Predicate;
  * Question task which accepts a callback to be invoked on answers
  */
 public class LambdaQuestionTask extends MutableTask {
-    private
-    @NotNull
-    final Predicate<Task> eachAnswer;
 
-    boolean includeRepeats = false;
+    private @NotNull final BiConsumer<LambdaQuestionTask /* Q */, Task /* A */ > eachAnswer;
 
-    public LambdaQuestionTask(@NotNull Termed<Compound> term, char punc, long occ, @NotNull Consumer<Task> eachAnswer) {
-        this(term, punc, occ, (t) -> {
-            eachAnswer.accept(t);
-            return true;
+    final ArrayBag<Task> answers;
+
+    public LambdaQuestionTask(@NotNull Termed<Compound> term, char punc, long occ, int history, @NotNull Consumer<Task> eachAnswer) {
+        this(term, punc, occ, history, (q, a) -> {
+            eachAnswer.accept(a);
         });
     }
 
-    public LambdaQuestionTask(@NotNull Termed<Compound> term, char punc, long occ, @NotNull Predicate<Task> eachAnswer) {
+    public LambdaQuestionTask(@NotNull Termed<Compound> term, char punc, long occ, int history, @NotNull BiConsumer<LambdaQuestionTask, Task> eachAnswer) {
         super(term, punc, null);
-        occurr(occ);
+        this.answers = new ArrayBag<>(history, BudgetMerge.max, new ConcurrentHashMap<>(history));
         this.eachAnswer = eachAnswer;
+        occurr(occ);
     }
 
     @Override
     public Task onAnswered(Task answer, NAR nar) {
-        super.onAnswered(answer, nar);
-        if (includeRepeats || !answer.isDeleted()) {
-            if (!eachAnswer.test(answer)) {
-                return null;
-            }
+        //answer = super.onAnswered(answer, nar);
+
+        boolean novel = !answers.contains(answer);
+        answers.put(answer);
+        if (novel) {
+            eachAnswer.accept(this, answer);
         }
+
         return answer;
     }
 }

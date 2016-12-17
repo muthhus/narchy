@@ -3,9 +3,8 @@ package nars.table;
 import nars.NAR;
 import nars.Task;
 import nars.budget.Budget;
-import nars.budget.BudgetFunctions;
+import nars.budget.util.BudgetFunctions;
 import nars.budget.Budgeted;
-import nars.budget.RawBudget;
 import nars.concept.CompoundConcept;
 import nars.concept.dynamic.DynamicBeliefTable;
 import nars.task.AnswerTask;
@@ -263,8 +262,8 @@ public interface BeliefTable extends TaskTable {
             if (answerBudget.isDeleted())
                 return null;
 
-            //require EXACT term, in case of differing dt structure
-            if (!answer.term().equals(question.term()))
+            //require EXACT term (except for variables) but otherwise requiring exact same dt structure
+            if (!answer.term().equalsIgnoringVariables(question.term()))
                 return null;
 
             //project if different occurrence
@@ -285,7 +284,7 @@ public interface BeliefTable extends TaskTable {
         }
 
         //transfer budget from question to answer
-        BudgetFunctions.transferPri(qBudget, answerBudget, answer.conf());
+        BudgetFunctions.transferPri(qBudget, answer.budget(), answer.conf());
 
 
         return answer;

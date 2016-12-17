@@ -28,21 +28,23 @@ public class FastPutsLinkedMap<K, V> extends AbstractMap<K, V> implements Serial
     public void compact() {
         int size = 0;
 
-        LinkedEntry<K, V> entry = header.next;
-        LinkedEntry<K, V> newerEntry;
-        LinkedEntry<K, V> next;
-        while (entry != header) {
-            size++;
-            next = entry.next;
-            newerEntry = getEntry(entry.getKey());
-            if (newerEntry != null && newerEntry != entry) {
-                remove(entry);
-                size--;
+        synchronized(header) {
+            LinkedEntry<K, V> entry = header.next;
+            LinkedEntry<K, V> newerEntry;
+            LinkedEntry<K, V> next;
+            while (entry != header) {
+                size++;
+                next = entry.next;
+                newerEntry = getEntry(entry.getKey());
+                if (newerEntry != null && newerEntry != entry) {
+                    remove(entry);
+                    size--;
+                }
+                entry = next;
             }
-            entry = next;
-        }
 
-        this.size = size;
+            this.size = size;
+        }
     }
 
     @Override
@@ -62,11 +64,8 @@ public class FastPutsLinkedMap<K, V> extends AbstractMap<K, V> implements Serial
             return 0;
         }
 
-        if (size > 0) {
-            return size;
-        }
-
-        compact(); // Updates size
+        if (size <= 0)
+            compact(); // Updates size
 
         return size;
     }
@@ -74,10 +73,7 @@ public class FastPutsLinkedMap<K, V> extends AbstractMap<K, V> implements Serial
     @Override
     public V get(Object key) {
         LinkedEntry<K, V> entry = getEntry(key);
-        if (entry != null) {
-            return entry.getValue();
-        }
-        return null;
+        return (entry != null) ? entry.getValue() : null;
     }
 
     @Override
@@ -135,7 +131,7 @@ public class FastPutsLinkedMap<K, V> extends AbstractMap<K, V> implements Serial
     @Override
     public Set<Map.Entry<K, V>> entrySet() {
         if (entrySet == null) {
-            entrySet = new AbstractSet<Map.Entry<K, V>>() {
+            entrySet = new AbstractSet<>() {
                 @Override
                 public Iterator<Map.Entry<K, V>> iterator() {
                     compact();

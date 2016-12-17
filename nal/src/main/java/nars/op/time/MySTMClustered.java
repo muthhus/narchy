@@ -6,7 +6,7 @@ import jcog.event.Topic;
 import nars.$;
 import nars.NAR;
 import nars.Task;
-import nars.budget.BudgetFunctions;
+import nars.budget.util.BudgetFunctions;
 import nars.nal.Stamp;
 import nars.task.GeneratedTask;
 import nars.term.Compound;

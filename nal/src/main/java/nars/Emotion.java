@@ -17,11 +17,11 @@ public final class Emotion implements Serializable {
 
     /** priority rate of Task processing attempted */
     @NotNull
-    public final FloatGuage busy;
+    public final FloatGuage busyMass;
 
-    /** priority rate of Task processing which had no effect */
+    /** priority rate of Task processing which affected concepts */
     @NotNull
-    public final FloatGuage frustration;
+    public final FloatGuage learn;
 
     /** task priority overflow rate */
     @NotNull
@@ -44,7 +44,7 @@ public final class Emotion implements Serializable {
     public final FloatGuage errr;
 
 
-    private transient final Logger logger;
+    //private transient final Logger logger;
 
     /** alertness, % active concepts change per cycle */
     @NotNull
@@ -55,9 +55,9 @@ public final class Emotion implements Serializable {
     public Emotion() {
         super();
 
-        logger = LoggerFactory.getLogger(Emotion.class);
+        //logger = LoggerFactory.getLogger(Emotion.class);
 
-        this.busy = new FloatGuage("busy");
+        this.busyMass = new FloatGuage("busy");
 
         this.happy = new FloatGuage("happy");
         this.sad = new FloatGuage("sad");
@@ -65,7 +65,7 @@ public final class Emotion implements Serializable {
         this.confident = new FloatGuage("confidence");
 
         this.stress = new FloatGuage("stress");
-        this.frustration = new FloatGuage("frustration");
+        this.learn = new FloatGuage("learn");
         this.alert = new FloatGuage("alert");
         this.errr = new FloatGuage("error");
 
@@ -76,9 +76,9 @@ public final class Emotion implements Serializable {
     public void frame() {
         happy.clear();
         sad.clear();
-        busy.clear();
+        busyMass.clear();
         stress.clear();
-        frustration.clear();
+        learn.clear();
         alert.clear();
         errr.clear();
         confident.clear();
@@ -86,15 +86,12 @@ public final class Emotion implements Serializable {
 
     /** percentage of business which was not frustration */
     public float learning() {
-        double b = busy.getSum();
-        if (b == 0)
-            return 0;
-        return 1f - (float)(frustration.getSum() / b);
+        return (float) (learn.getSum()/ busyMass.getSum());
     }
 
     /** joy = first derivative of happiness, delta happiness / delta business */
     public float joy() {
-        double b = busy.getSum();
+        double b = busyMass.getSum();
         if (b == 0)
             return 0;
         return (float)(happy() / b);
@@ -161,7 +158,7 @@ public final class Emotion implements Serializable {
     }
 
     @Deprecated public void busy(float pri) {
-        busy.accept( pri );
+        busyMass.accept( pri );
     }
 
 
@@ -171,9 +168,9 @@ public final class Emotion implements Serializable {
             stress.accept( v );
     }
 
-    @Deprecated public void frustration(float pri) {
+    @Deprecated public void learn(float pri) {
 
-        frustration.accept( pri );
+        learn.accept( pri );
 
     }
 

@@ -1,46 +1,51 @@
 package jcog.math;
 
+import org.eclipse.collections.api.block.procedure.primitive.FloatProcedure;
+
 import java.io.Serializable;
-import java.util.function.DoubleConsumer;
 
 /**
- * DoubleSummaryStatistics in java.util can't be cleared
+ * floatSummaryStatistics in java.util can't be cleared
  * wtf
  * anyway we'll add stdev calcluation to this and it will
  * serve as a lighter weight replacement for Apache
  * Commons Math SummaryStatistics which also is undesirable
  *
  */
-public class DoubleSummaryReusableStatistics implements DoubleConsumer, Serializable {
+public class FloatSummaryReusableStatistics implements FloatProcedure, Serializable {
     protected long count;
-    protected double sum;
-    //private double sumCompensation; // Low order bits of sum
-//    private double simpleSum; // Used to compute right sum for non-finite inputs
-    protected double min;
-    protected double max;
+    protected float sum;
+    //private float sumCompensation; // Low order bits of sum
+//    private float simpleSum; // Used to compute right sum for non-finite inputs
+    protected float min;
+    protected float max;
 
     /**
      * Construct an empty instance with zero count, zero sum,
-     * {@code Double.POSITIVE_INFINITY} min, {@code Double.NEGATIVE_INFINITY}
+     * {@code float.POSITIVE_INFINITY} min, {@code float.NEGATIVE_INFINITY}
      * max and zero average.
      */
-    public DoubleSummaryReusableStatistics() {
+    public FloatSummaryReusableStatistics() {
         clear();
+    }
+
+    @Override
+    public final void value(float each) {
+        accept(each);
     }
 
     public final void clear() {
         count = 0;
         sum = 0;
-        min = Double.POSITIVE_INFINITY;
-        max = Double.NEGATIVE_INFINITY;
+        min = Float.POSITIVE_INFINITY;
+        max = Float.NEGATIVE_INFINITY;
     }
     /**
      * Records another value into the summary information.
      *
      * @param value the input value
      */
-    @Override
-    public final void accept(double value) {
+    public final void accept(float value) {
         ++count;
         //simpleSum += value;
         sum += value;
@@ -50,12 +55,12 @@ public class DoubleSummaryReusableStatistics implements DoubleConsumer, Serializ
     }
 
 //    /**
-//     * Incorporate a new double value using Kahan summation /
+//     * Incorporate a new float value using Kahan summation /
 //     * compensated summation.
 //     */
-//    private final void sumWithCompensation(double value) {
-//        double tmp = value - sumCompensation;
-//        double velvel = sum + tmp; // Little wolf of rounding error
+//    private final void sumWithCompensation(float value) {
+//        float tmp = value - sumCompensation;
+//        float velvel = sum + tmp; // Little wolf of rounding error
 //        sumCompensation = (velvel - sum) - tmp;
 //        sum = velvel;
 //    }
@@ -84,7 +89,7 @@ public class DoubleSummaryReusableStatistics implements DoubleConsumer, Serializ
      *
      * In particular, this method may be implemented using compensated
      * summation or other technique to reduce the error bound in the
-     * numerical sum compared to a simple summation of {@code double}
+     * numerical sum compared to a simple summation of {@code float}
      * values.
      *
      * @apiNote Values sorted by increasing absolute magnitude tend to yield
@@ -92,12 +97,12 @@ public class DoubleSummaryReusableStatistics implements DoubleConsumer, Serializ
      *
      * @return the sum of values, or zero if none
      */
-    public final double getSum() {
+    public final float getSum() {
         return sum;
 
 //        // Better error bounds to add both terms as the final sum
-//        double tmp =  sum + sumCompensation;
-//        if (Double.isNaN(tmp) && Double.isInfinite(simpleSum))
+//        float tmp =  sum + sumCompensation;
+//        if (float.isNaN(tmp) && float.isInfinite(simpleSum))
 //            // If the compensated sum is spuriously NaN from
 //            // accumulating one or more same-signed infinite values,
 //            // return the correctly-signed infinity stored in
@@ -108,30 +113,30 @@ public class DoubleSummaryReusableStatistics implements DoubleConsumer, Serializ
     }
 
     /**
-     * Returns the minimum recorded value, {@code Double.NaN} if any recorded
-     * value was NaN or {@code Double.POSITIVE_INFINITY} if no values were
+     * Returns the minimum recorded value, {@code float.NaN} if any recorded
+     * value was NaN or {@code float.POSITIVE_INFINITY} if no values were
      * recorded. Unlike the numerical comparison operators, this method
      * considers negative zero to be strictly smaller than positive zero.
      *
-     * @return the minimum recorded value, {@code Double.NaN} if any recorded
-     * value was NaN or {@code Double.POSITIVE_INFINITY} if no values were
+     * @return the minimum recorded value, {@code float.NaN} if any recorded
+     * value was NaN or {@code float.POSITIVE_INFINITY} if no values were
      * recorded
      */
-    public final double getMin() {
+    public final float getMin() {
         return min;
     }
 
     /**
-     * Returns the maximum recorded value, {@code Double.NaN} if any recorded
-     * value was NaN or {@code Double.NEGATIVE_INFINITY} if no values were
+     * Returns the maximum recorded value, {@code float.NaN} if any recorded
+     * value was NaN or {@code float.NEGATIVE_INFINITY} if no values were
      * recorded. Unlike the numerical comparison operators, this method
      * considers negative zero to be strictly smaller than positive zero.
      *
-     * @return the maximum recorded value, {@code Double.NaN} if any recorded
-     * value was NaN or {@code Double.NEGATIVE_INFINITY} if no values were
+     * @return the maximum recorded value, {@code float.NaN} if any recorded
+     * value was NaN or {@code float.NEGATIVE_INFINITY} if no values were
      * recorded
      */
-    public final double getMax() {
+    public final float getMax() {
         return max;
     }
 
@@ -154,9 +159,9 @@ public class DoubleSummaryReusableStatistics implements DoubleConsumer, Serializ
      *
      * @return the arithmetic mean of values, or zero if none
      */
-    public final double getAverage() {
+    public final float getAverage() {
         long c = getCount();
-        return c > 0 ? getSum() / c : 0.0d;
+        return c > 0 ? getSum() / c : 0.0f;
     }
 
     /**
@@ -178,9 +183,9 @@ public class DoubleSummaryReusableStatistics implements DoubleConsumer, Serializ
                 getMax());
     }
 
-    public final double normalize(double n) {
-        double min = getMin();
-        double max = getMax();
+    public final float normalize(float n) {
+        float min = getMin();
+        float max = getMax();
         if (min == max) return n;
 
         return (n - min) / (max-min);

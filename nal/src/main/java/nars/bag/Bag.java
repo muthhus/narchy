@@ -100,7 +100,6 @@ public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Iterable<BLink<
 //        return new BLink(v, 0,0,0);
     }
 
-    /** always returns null, which is different semantics than the supermethod it overrides */
     @Override default @Nullable BLink<V> put(@NotNull V i, @NotNull BLink<V> b) {
         return put(i, b, 1f, null);
     }

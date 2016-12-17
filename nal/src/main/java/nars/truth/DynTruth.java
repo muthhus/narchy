@@ -4,7 +4,7 @@ import nars.$;
 import nars.Symbols;
 import nars.Task;
 import nars.budget.Budget;
-import nars.budget.BudgetFunctions;
+import nars.budget.util.BudgetFunctions;
 import nars.concept.dynamic.DynamicBeliefTask;
 import nars.nal.Stamp;
 import nars.term.Compound;

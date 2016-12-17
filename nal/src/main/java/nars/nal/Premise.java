@@ -16,7 +16,6 @@ import nars.term.Term;
 import nars.term.Termed;
 import nars.term.Terms;
 import nars.term.subst.UnifySubst;
-import org.apache.commons.lang3.ObjectUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -130,11 +129,11 @@ public final class Premise extends RawBudget implements Tasked {
 
                         taskBudget = task.budget().clone(); //update the task budget, since the question may have been deprioritized as a result of the answer
 
-                        boolean novel = nar.input(answered)!=null;
+                        boolean processed = nar.input(answered)!=null;
 
                         answered = task.onAnswered(answered, nar);
 
-                        if (novel && answered!=null) {
+                        if (answered!=null) {
                             if (answered.punc() == Symbols.BELIEF)
                                 belief = answered;
                         }

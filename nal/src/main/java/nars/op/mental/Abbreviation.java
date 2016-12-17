@@ -3,7 +3,7 @@ package nars.op.mental;
 import jcog.data.MutableInteger;
 import nars.*;
 import nars.bag.impl.CurveBag;
-import nars.budget.Activation;
+import nars.budget.control.Activation;
 import nars.budget.Budget;
 import nars.budget.merge.BudgetMerge;
 import nars.concept.AtomConcept;

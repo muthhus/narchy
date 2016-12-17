@@ -38,9 +38,8 @@ public class TuffySmokesTest {
             //n.input(t + "?");
         }
 
-        n.ask("<?x --> [Cancer]>", ETERNAL, c -> {
-            System.out.println(c.proof());
-            return true;
+        n.ask("<?x --> [Cancer]>", ETERNAL, (q,a) -> {
+            System.out.println(a.proof());
         });
     }
 

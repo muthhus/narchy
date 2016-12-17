@@ -1,11 +1,11 @@
 package jcog.meter.event;
 
-import jcog.math.DoubleSummaryReusableStatistics;
+import jcog.math.FloatSummaryReusableStatistics;
 
 /**
  * Sums guaged objects, and returns
  */
-public class FloatGuage extends DoubleSummaryReusableStatistics {
+public class FloatGuage extends FloatSummaryReusableStatistics {
 
     public final String id;
 

@@ -1,7 +1,6 @@
 package nars.nal.nal1;
 
 import nars.*;
-import nars.concept.Concept;
 import nars.nar.Default;
 import nars.nar.Terminal;
 import nars.nar.util.Answerer;
@@ -20,6 +19,7 @@ import java.util.Arrays;
 import java.util.DoubleSummaryStatistics;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiFunction;
 import java.util.function.IntFunction;
 
@@ -45,7 +45,7 @@ public class QuestionTest {
 
     /** question to answer matching */
     public void testQuestionAnswer(int cycles, @NotNull String belief, @NotNull String question, @NotNull String expectedSolution) {
-        AtomicBoolean ok = new AtomicBoolean(false);
+        AtomicInteger ok = new AtomicInteger(0);
 
 
         Term expectedSolutionTerm = $.$(expectedSolution);
@@ -56,16 +56,15 @@ public class QuestionTest {
 
         nar
                 .believe(belief, 1.0f, 0.9f)
-                .ask(question, ETERNAL, b -> {
-                    if (b.punc() == '.' && b.term().equals(expectedSolutionTerm))
-                        ok.set(true);
-                    return false;
+                .ask(question, ETERNAL,(q,a) -> {
+                    if (a.punc() == '.' && a.term().equals(expectedSolutionTerm))
+                        ok.incrementAndGet();
                 });
 
 
         nar.run(cycles);
 
-        assertTrue(ok.get());
+        assertEquals(1, ok.get());
 
 //           .onAnswer(question, a -> { //.en("What is a type of swimmer?")
 //

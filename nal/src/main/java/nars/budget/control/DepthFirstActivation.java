@@ -1,10 +1,12 @@
-package nars.budget;
+package nars.budget.control;
 
 import nars.NAR;
 import nars.Op;
 import nars.Param;
 import nars.Task;
 import nars.bag.Bag;
+import nars.budget.Budgeted;
+import nars.budget.util.PriorityAccumulator;
 import nars.concept.Concept;
 import nars.term.Term;
 import nars.term.Termed;
@@ -27,8 +29,8 @@ public class DepthFirstActivation extends Activation {
     @Nullable public final PriorityAccumulator<Concept> conceptActivation;
 
 
-    public DepthFirstActivation(@NotNull Budgeted in, float scale, @NotNull Concept src, @NotNull NAR nar, int termlinkDepth, int taskLinkDepth, @Nullable PriorityAccumulator<Concept> conceptActivation) {
-        super(nar, in, scale, src);
+    DepthFirstActivation(@NotNull Budgeted in, float scale, @NotNull Concept src, @NotNull NAR nar, int termlinkDepth, int taskLinkDepth, @Nullable PriorityAccumulator<Concept> conceptActivation) {
+        super(in, scale, src, nar);
         this.in = in;
         this.conceptActivation = conceptActivation;
         this.termlinkDepth = Math.max(taskLinkDepth, termlinkDepth);  //should be larger then TASKLINK_DEPTH_LIMIT because this resolves the Concept used for it in linkSubterms
@@ -38,20 +40,21 @@ public class DepthFirstActivation extends Activation {
     /**
      * runs the task activation procedure
      */
-    public DepthFirstActivation(@NotNull Budgeted in, @NotNull Concept src, @NotNull Concept target, @NotNull NAR nar, float scale, int termlinkDepth, int taskLinkDepth, PriorityAccumulator<Concept> conceptActivation) {
-        this(in, scale, src, nar, termlinkDepth, taskLinkDepth, conceptActivation);
+    public DepthFirstActivation(@NotNull Budgeted in, @NotNull Concept src, @NotNull Concept target, @NotNull NAR nar, float scale, int termlinkDepth, int taskLinkDepth) {
+        this(in, scale, src, nar, termlinkDepth, taskLinkDepth, nar.accumulator());
         link(src, target, scale, 0);
+        nar.emotion.stress(linkOverflow);
     }
 
     /**
      * runs the task activation procedure
      */
-    public DepthFirstActivation(@NotNull Budgeted in, @NotNull Concept c, @NotNull NAR nar, float scale, PriorityAccumulator<Concept> conceptActivation) {
-        this(in, c, c, nar, scale, Param.ACTIVATION_TERMLINK_DEPTH, Param.ACTIVATION_TASKLINK_DEPTH, conceptActivation);
+    public DepthFirstActivation(@NotNull Budgeted in, @NotNull Concept c, @NotNull NAR nar, float scale) {
+        this(in, c, c, nar, scale, Param.ACTIVATION_TERMLINK_DEPTH, Param.ACTIVATION_TASKLINK_DEPTH);
     }
 
-    public DepthFirstActivation(@NotNull Task in, @NotNull NAR nar, float scale, PriorityAccumulator<Concept> conceptActivation) {
-        this(in, in.concept(nar), nar, scale, conceptActivation);
+    public DepthFirstActivation(@NotNull Task t, @NotNull NAR nar, float scale) {
+        this(t, t.concept(nar), nar, scale);
     }
 
 

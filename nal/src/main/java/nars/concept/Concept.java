@@ -26,15 +26,14 @@ import nars.NAR;
 import nars.Symbols;
 import nars.Task;
 import nars.bag.Bag;
-import nars.budget.Activation;
+import nars.budget.control.Activation;
 import nars.budget.Budgeted;
-import nars.budget.DepthFirstActivation;
+import nars.budget.control.DepthFirstActivation;
 import nars.budget.policy.ConceptPolicy;
 import nars.link.BLink;
 import nars.table.BeliefTable;
 import nars.table.QuestionTable;
 import nars.table.TaskTable;
-import nars.task.Revision;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.container.TermContainer;
@@ -241,21 +240,14 @@ public interface Concept extends Termed {
         if (other == null || other.equals(this))
             return null; //null or same concept
 
-        crossLink(src, tgt, other, scale, nar);
+        //TODO make a custom CrossLinkActivation
+        new DepthFirstActivation(tgt, this, other, nar, scale, 1, -1);
+        new DepthFirstActivation(src, other, this, nar, scale, 1, -1);
+
         return other;
     }
 
-    /**
-     * termlinks only
-     */
-    default void crossLink(@NotNull Budgeted mine, @NotNull Budgeted theirs, @NotNull Concept them, float scale, @NotNull NAR nar) {
-
-        new DepthFirstActivation(theirs, this, them, nar, scale, 1, -1, null);
-        new DepthFirstActivation(mine, them, this, nar, scale, 1, -1, null);
-
-    }
-
-//    /** link to a specific peer */
+    //    /** link to a specific peer */
 //    static <T> void linkPeer(@NotNull Bag<T> bag, @NotNull T x, @NotNull Budget b, float q) {
 //        //@NotNull Bag<Termed> bag = termlinks();
 //        BLink<? extends T> existing = bag.get(x);

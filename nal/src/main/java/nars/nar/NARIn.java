@@ -11,6 +11,7 @@ import nars.term.Termed;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
@@ -26,25 +27,25 @@ public interface NARIn {
     NAR nar();
 
     @Nullable
-    default Task ask(@NotNull String questionTerm, long occ, @NotNull Predicate<Task> eachAnswer) throws Narsese.NarseseException {
+    default Task ask(@NotNull String questionTerm, long occ, @NotNull BiConsumer<LambdaQuestionTask,Task> eachAnswer) throws Narsese.NarseseException {
         return ask(term(questionTerm), occ, eachAnswer);
     }
 
     @Nullable
-    default Task ask(@NotNull Termed<Compound> term, long occ, @NotNull Predicate<Task> eachAnswer) {
+    default Task ask(@NotNull Termed<Compound> term, long occ, @NotNull BiConsumer<LambdaQuestionTask,Task> eachAnswer) {
         return ask(term, occ, Symbols.QUESTION, eachAnswer);
     }
 
     @Nullable
-    default LambdaQuestionTask ask(@NotNull Termed<Compound> term, long occ, char punc /* question or quest */, @NotNull Predicate<Task> eachAnswer) {
+    default LambdaQuestionTask ask(@NotNull Termed<Compound> term, long occ, char punc /* question or quest */, @NotNull BiConsumer<LambdaQuestionTask, Task> eachAnswer) {
         assert(punc == Symbols.QUESTION || punc == Symbols.QUEST);
-        return inputAndGet( new LambdaQuestionTask(term, punc, occ, eachAnswer) );
+        return inputAndGet( new LambdaQuestionTask(term, punc, occ, 16, eachAnswer) );
     }
 
     @Nullable
     default LambdaQuestionTask ask(@NotNull Termed<Compound> term, long occ, char punc /* question or quest */, @NotNull Consumer<Task> eachAnswer) {
         assert(punc == Symbols.QUESTION || punc == Symbols.QUEST);
-        return inputAndGet( new LambdaQuestionTask(term, punc, occ, eachAnswer) );
+        return inputAndGet( new LambdaQuestionTask(term, punc, occ, 16, eachAnswer) );
     }
 
     @NotNull

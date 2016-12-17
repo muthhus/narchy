@@ -53,12 +53,11 @@ public class QuestTest {
     }
 
     public void question(NAR nar, AtomicBoolean valid) {
-        nar.ask($("a:?b@"), ETERNAL, '@', a -> {
+        nar.ask($("a:?b@"), ETERNAL, '@', (q,a) -> {
             //System.out.println("answer: " + a);
             //System.out.println(" " + a.getLog());
             if (a.toString().contains("(b-->a)!"))
                 valid.set(true);
-            return true;
         });
     }
 

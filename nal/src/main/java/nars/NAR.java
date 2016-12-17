@@ -9,8 +9,14 @@ import jcog.event.ArrayTopic;
 import jcog.event.On;
 import jcog.event.Topic;
 import nars.Narsese.NarseseException;
-import nars.budget.*;
+import nars.budget.Budget;
+import nars.budget.Budgeted;
+import nars.budget.control.Activation;
+import nars.budget.control.DepthFirstActivation;
 import nars.budget.policy.ConceptPolicy;
+import nars.budget.util.ObjectFloatHashMapPriorityAccumulator;
+import nars.budget.util.PriorityAccumulator;
+import nars.concept.CompoundConcept;
 import nars.concept.Concept;
 import nars.concept.Functor;
 import nars.concept.OperationConcept;
@@ -26,7 +32,6 @@ import nars.nar.NARIn;
 import nars.nar.NAROut;
 import nars.nar.exe.Executioner;
 import nars.table.BeliefTable;
-import nars.task.LambdaQuestionTask;
 import nars.task.MutableTask;
 import nars.task.util.InvalidTaskException;
 import nars.term.Compound;
@@ -636,7 +641,6 @@ public abstract class NAR extends Param implements Level, Consumer<Task>, NARIn,
         try {
             input.normalize(this); //accept into input buffer for eventual processing
         } catch (@NotNull InvalidTaskException | InvalidTermException | Budget.BudgetException e) {
-            emotion.frustration(input.priSafe(0));
             emotion.eror();
 
             input.delete();
@@ -654,14 +658,10 @@ public abstract class NAR extends Param implements Level, Consumer<Task>, NARIn,
             return null;
         }
 
-        emotion.busy(input.pri());
+        emotion.busy(input.priSafe(0));
 
         Task existing = tasks.addIfAbsent(input);
-        if (existing!=null && existing.isDeleted()) {
-            //allow the new one to replace it
-            tasks.remove(existing);
-            existing = null;
-        }
+
         if (existing == null) {
 
             if (time instanceof FrameTime) {
@@ -674,28 +674,30 @@ public abstract class NAR extends Param implements Level, Consumer<Task>, NARIn,
                 Concept c = input.concept(this);
 
                 Activation a = c.process(input, this);
-
-
                 if (a != null) {
 
-                    emotion.stress(a.linkOverflow);
-
                     eventTaskProcess.emit(input); //signal any additional processes
-                    //eventTaskProcess.emitAsync(inputted, concurrency, runWorker);
+
+                    emotion.learn(input.priSafe(0));
 
                     return c; //SUCCESSFULLY PROCESSED
+
+                } else {
+
+                    return null;
+
                 }
 
 
-            } catch (@NotNull InvalidConceptException | InvalidTermException | InvalidTaskException | Budget.BudgetException e) {
-
-                //input.feedback(null, Float.NaN, Float.NaN, this);
-                if (Param.DEBUG)
-                    logger.warn("task process: {} {}", e, input);
+            } catch (InvalidConceptException | InvalidTermException | InvalidTaskException | Budget.BudgetException e) {
 
                 tasks.remove(input);
 
                 emotion.eror();
+
+                //input.feedback(null, Float.NaN, Float.NaN, this);
+                if (Param.DEBUG)
+                    logger.warn("task process: {} {}", e, input);
             }
         } else {
 
@@ -707,19 +709,22 @@ public abstract class NAR extends Param implements Level, Consumer<Task>, NARIn,
                     DuplicateMerge.merge(existing.budget(), input, 1f);
                     input.feedback(null, Float.NaN, Float.NaN, this);
                 } else {
+                    //this may never get called due to the replacement above
                     //attempt to revive deleted task
                     existing.budget().set(input.budget());
                 }
 
                 input.delete("Duplicate");
+
+                //re-activate only
+                Concept c = existing.concept(this);
+                if (c!=null) {
+                    ((CompoundConcept)c).activateTask(existing, this);
+                }
+
             }
 
-            //re-activate only
-            new DepthFirstActivation(existing, this, 1f, accumulator());
-
         }
-
-        emotion.frustration(input.priSafe(0));
 
         return null;
     }

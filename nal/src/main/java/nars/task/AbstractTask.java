@@ -3,7 +3,7 @@ package nars.task;
 import jcog.Util;
 import jcog.data.array.LongArrays;
 import nars.*;
-import nars.budget.BudgetFunctions;
+import nars.budget.util.BudgetFunctions;
 import nars.budget.RawBudget;
 import nars.concept.util.InvalidConceptException;
 import nars.task.util.InvalidTaskException;

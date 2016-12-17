@@ -288,8 +288,8 @@ public class Vis {
         plot1.add("Conf", () -> nar.emotion.confident.getSum());
 
         Plot2D plot2 = new Plot2D(plotHistory, Plot2D.Line);
-        plot2.add("Busy", () -> nar.emotion.busy.getSum());
-        plot2.add("Lern", () -> nar.emotion.busy.getSum() - nar.emotion.frustration.getSum());
+        plot2.add("Busy", () -> nar.emotion.busyMass.getSum());
+        plot2.add("Lern", () -> nar.emotion.busyMass.getSum() - nar.emotion.learn.getSum());
 
         Plot2D plot3 = new Plot2D(plotHistory, Plot2D.Line);
         plot3.add("Strs", () -> nar.emotion.stress.getSum());

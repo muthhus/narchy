@@ -3,7 +3,7 @@ package nars.task;
 import nars.NAR;
 import nars.Task;
 import nars.bag.Bag;
-import nars.budget.BudgetFunctions;
+import nars.budget.util.BudgetFunctions;
 import nars.concept.Concept;
 import nars.term.Compound;
 import nars.term.Termed;

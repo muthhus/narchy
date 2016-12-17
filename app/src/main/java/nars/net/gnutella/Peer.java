@@ -1,7 +1,7 @@
 package nars.net.gnutella;
 
 import jcog.Util;
-import jcog.map.CapacityLinkedHashMap;
+import jcog.map.MRUCache;
 import nars.budget.Budget;
 import nars.net.gnutella.message.Message;
 import nars.net.gnutella.message.PingMessage;
@@ -55,7 +55,7 @@ public class Peer {
 
     final int maxConnections = 5;
 
-    public final Map<String, Message> messageCache = new CapacityLinkedHashMap(4096);
+    public final Map<String, Message> messageCache = new MRUCache(4096);
     public final InetSocketAddress address;
     private final ConcurrentHashMap<String, Collection<InetSocketAddress>> firstPongsFromNeighbors;
     public final PeerModel model;

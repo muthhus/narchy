@@ -3,7 +3,7 @@
 //import jcog.data.random.XorShift128PlusRandom;
 //import nars.NARLoop;
 //import nars.Param;
-//import nars.budget.DepthFirstActivation;
+//import nars.budget.control.DepthFirstActivation;
 //import nars.budget.ObjectFloatHashMapPriorityAccumulator;
 //import nars.concept.Concept;
 //import nars.index.term.TermIndex;

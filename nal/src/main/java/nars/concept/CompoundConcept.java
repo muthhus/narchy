@@ -5,8 +5,8 @@ import nars.NAR;
 import nars.Symbols;
 import nars.Task;
 import nars.bag.Bag;
-import nars.budget.Activation;
-import nars.budget.DepthFirstActivation;
+import nars.budget.control.Activation;
+import nars.budget.control.DepthFirstActivation;
 import nars.budget.merge.BudgetMerge;
 import nars.budget.policy.ConceptPolicy;
 import nars.link.TermLinkBuilder;
@@ -408,7 +408,7 @@ public class CompoundConcept<T extends Compound> implements Concept, Termlike {
 
         Activation a;
         if (accepted) {
-            a = new DepthFirstActivation(input, this, nar, nar.priorityFactor.floatValue(), nar.accumulator());
+            a = activateTask(input, nar);
 
             if (delta != null) {
                 //beliefs/goals
@@ -433,6 +433,10 @@ public class CompoundConcept<T extends Compound> implements Concept, Termlike {
         }
 
         return a;
+    }
+
+    public DepthFirstActivation activateTask(@NotNull Task input, @NotNull NAR nar) {
+        return new DepthFirstActivation(input, this, nar, nar.priorityFactor.floatValue());
     }
 
     /**

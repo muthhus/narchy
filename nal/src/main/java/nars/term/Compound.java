@@ -621,16 +621,17 @@ public interface Compound extends Term, IPair, TermContainer {
 //        if (other.op()==NEG)
 //            other = other.unneg();
 
-        if (!(other instanceof Compound))
+        if (!(other.op() == op()))
             return false;
-
 
         int s = size();
 
         if ((other.size() == s) && (((Compound) other).dt() == dt())) {
             Compound o = (Compound) other;
+            Term[] a = terms();
+            Term[] b = o.terms();
             for (int i = 0; i < s; i++) {
-                if (!term(i).equalsIgnoringVariables(o.term(i)))
+                if (!a[i].equalsIgnoringVariables(b[i]))
                     return false;
             }
             return true;

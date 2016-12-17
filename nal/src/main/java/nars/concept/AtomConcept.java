@@ -4,7 +4,7 @@ import nars.NAR;
 import nars.Op;
 import nars.Task;
 import nars.bag.Bag;
-import nars.budget.Activation;
+import nars.budget.control.Activation;
 import nars.budget.policy.ConceptPolicy;
 import nars.table.BeliefTable;
 import nars.table.QuestionTable;

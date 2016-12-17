@@ -3,7 +3,7 @@ package nars.budget.policy;
 import jcog.Util;
 import nars.*;
 import nars.budget.Budget;
-import nars.budget.BudgetFunctions;
+import nars.budget.util.BudgetFunctions;
 import nars.budget.RawBudget;
 import nars.nal.Premise;
 import nars.nal.meta.Derivation;

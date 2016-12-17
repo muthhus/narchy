@@ -17,38 +17,40 @@ import java.util.WeakHashMap;
  * http://stackoverflow.com/a/11731495
  */
 public class RUCache<K, V> {
-    final Map<K, V> MRUdata;
-    final Map<K, V> LRUdata;
+    final Map<K, V> mru;
+    final Map<K, V> lru;
 
     public RUCache(final int capacity) {
-        LRUdata = new WeakHashMap<K, V>();
+        lru = new WeakHashMap<K, V>(capacity);
 
-        MRUdata = new CapacityLinkedHashMap<>(capacity) {
+        mru = new MRUCache<K,V>(capacity) {
             @Override
             protected void overflow(Map.Entry<K, V> entry) {
-                LRUdata.put(entry.getKey(), entry.getValue());
+                lru.put(entry.getKey(), entry.getValue());
             }
         };
     }
 
-    public synchronized V tryGet(K k) {
-        Map<K, V> MRU = MRUdata;
-        return MRU.compute(k, (key, value) -> {
-            if (value != null)
-                return value;
-            else {
-                value = LRUdata.remove(key);
-                if (value != null) {
-                    MRU.put(key, value);
+    public V get(K k) {
+        synchronized (mru) {
+            return mru.compute(k, (key, value) -> {
+                if (value != null)
+                    return value;
+                else {
+                    if ((value = lru.remove(key)) != null)
+                        mru.put(key, value);
+                    return value;
                 }
-                return value;
-            }
-        });
+            });
+        }
     }
 
-    public synchronized void set(K key, V value) {
-        LRUdata.remove(key);
-        MRUdata.put(key, value);
+    public void put(K key, V value) {
+        synchronized (mru) {
+            lru.remove(key);
+            mru.put(key, value);
+        }
     }
+
 
 }

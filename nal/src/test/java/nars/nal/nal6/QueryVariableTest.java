@@ -39,12 +39,11 @@ public class QueryVariableTest {
         Default nar = new Default();
         Termed beliefTerm = nar.term(beliefString);
         nar.believe(beliefTerm, 1f, 0.9f);
-        nar.ask(question, Tense.ETERNAL, (Task a)-> {
+        nar.ask(question, Tense.ETERNAL, (q,a)-> {
             if (a.term().equals(beliefTerm)) {
                 valid.set(true);
-                return false;
+                q.delete();
             }
-            return true;
         });
         nar.run(time);
         assertTrue(valid.get());
@@ -82,9 +81,8 @@ public class QueryVariableTest {
                 .input("<a <-> b>. %1.0;0.5%",
                         "<b --> a>. %1.0;0.5%")
                 .stopIf(b::get)
-                .ask(question, ETERNAL, (Task t) -> {
+                .ask(question, ETERNAL, (q, a) -> {
                     b.set(true);
-                    return false;
                 });
 
         nar.run(cyclesAfterQuestion);

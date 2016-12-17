@@ -6,14 +6,19 @@ import java.util.Map;
 /**
  * Created by me on 6/28/16.
  */
-public class CapacityLinkedHashMap<K, V> extends LinkedHashMap<K, V> {
-    private final int capacity;
+public class MRUCache<K, V> extends LinkedHashMap<K, V> {
 
-    public CapacityLinkedHashMap(int capacity) {
+    private int capacity;
+
+    public MRUCache(int capacity) {
         super(capacity + 1, 1.0f, true);
         this.capacity = capacity;
     }
 
+
+    public void setCapacity(int capacity) {
+        this.capacity = capacity;
+    }
 
     @Override
     protected boolean removeEldestEntry(Map.Entry<K, V> entry) {

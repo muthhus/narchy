@@ -73,9 +73,8 @@ public class DeductiveMeshTest {
     }
 
     public void ask(@NotNull TestNAR n, Compound term) {
-        n.nar.ask(term, ETERNAL, a -> {
+        n.nar.ask(term, ETERNAL, (q,a) -> {
             System.out.println(a.proof());
-            return true;
         });
     }
 
