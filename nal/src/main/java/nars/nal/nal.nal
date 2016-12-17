@@ -9,27 +9,6 @@
 // Statement about Statement: (A --> B) ==> (X --> Y): If A is true, so is/will be B
 // --> is a relation in meaning of terms, while ==> is a relation of truth between statements.
 
-//Set Definition Similarity to Inheritance
-
-    ({S} <-> {P}), {S} |- ({S} --> {P}), (Belief:Identity, Permute:Backward)
-    ([S] <-> [P]), [S] |- ([S] --> [P]), (Belief:Identity, Permute:Backward)
-
-
-//Set Definition Unwrap
-
-    ({S} <-> {P}), S |- (S <-> P), (Belief:Identity)
-    ([S] <-> [P]), S |- (S <-> P), (Belief:Identity)
-
-//Nothing is more specific than a instance, so its similar
-
-    (S --> {P}),  S  |- (S <-> {P}), (Belief:Identity)
-    //(S --> {P}), {P} |- (S <-> {P}), (Belief:Identity, Permute:Backward)
-
-//nothing is more general than a property, so its similar
-
-    //([S] --> P), [S] |- ([S] <-> P), (Belief:Identity, Permute:Backward)
-    ([S] --> P),  P  |- ([S] <-> P), (Belief:Identity)
-
 
 
 // "If not smoking lets you be healthy, being not healthy may be the result of smoking"
@@ -74,88 +53,7 @@
     (P --> M), (S <-> M), neqCom(S,P) |- (P --> S), (Belief:Analogy, Goal:Strong)
     (M <-> P), (S <-> M), neqCom(S,P) |- (S <-> P), (Belief:Resemblance, Goal:Strong)
 
-//// inheritance composition ////////////////////////////////////////////////////////////////////////////////////
-//If P and S are in the intension/extension of M, then union/difference and intersection can be built:
-//The duality of extension and intension in NAL corresponds to the
-//  duality of intersection and union in set theory — intensional intersection
-//  corresponds to extensional union, and extensional intersection corresponds
-//  to intensional union.
 
-    (P --> M), (S --> M), notSet(S), notSet(P), neqCom(S,P) |- ((S | P) --> M), (Belief:Intersection)
-    (P --> M), (S --> M), notSet(S), notSet(P), neqCom(S,P) |- ((S & P) --> M), (Belief:Union)
-    (P --> M), (S --> M), notSet(S), notSet(P), neqCom(S,P) |- ((P ~ S) --> M), (Belief:Difference)
-
-    (M --> P), (M --> S), notSet(S), notSet(P), neqCom(S,P) |- (M --> (P & S)), (Belief:Intersection)
-    (M --> P), (M --> S), notSet(S), notSet(P), neqCom(S,P) |- (M --> (P | S)), (Belief:Union)
-    (M --> P), (M --> S), notSet(S), notSet(P), neqCom(S,P) |- (M --> (P - S)), (Belief:Difference)
-
-//raw product composition
-//    (A..+), (B..+) |- ((A..+) | (B..+)), (Belief:Intersection)
-//    (A..+), (B..+) |- ((A..+) & (B..+)), (Belief:Union)
-//    (A..+), (B..+) |- ((A..+) ~ (B..+)), (Belief:Difference)
-//raw product decomposition ?
-
-//// inheritance decomposition ////////////////////////////////////////////////////////////////////////////////////
-//if (S --> M) is the case, and ((|,S,A..+) --> M) is not the case, then ((|,A..+) --> M) is not the case, hence Belief:DecomposePositiveNegativeNegative
-
-     (S --> M), ((|,S,A..+) --> M) |- ((|,A..+) --> M), (Belief:DecomposePositiveNegativeNegative)
-     (S --> M), ((&,S,A..+) --> M) |- ((&,A..+) --> M), (Belief:DecomposeNegativePositivePositive)
-
-     (M --> S), (M --> (&,S,A..+)) |- (M --> (&,A..+)), (Belief:DecomposePositiveNegativeNegative)
-     (M --> S), (M --> (|,S,A..+)) |- (M --> (|,A..+)), (Belief:DecomposeNegativePositivePositive)
-
-     (S --> M), ((S ~ P) --> M) |- (P --> M), (Belief:DecomposePositiveNegativePositive)
-     (S --> M), ((P ~ S) --> M) |- (P --> M), (Belief:DecomposeNegativeNegativeNegative)
-
-     (M --> S), (M --> (S - P)) |- (M --> P), (Belief:DecomposePositiveNegativePositive)
-     (M --> S), (M --> (P - S)) |- (M --> P), (Belief:DecomposeNegativeNegativeNegative)
-
-
-//NAL3 single premise inference
-
-    ((|,X,A..+) --> M), X |- ((|,A..+) --> M), (Belief:StructuralDeduction, Goal:StructuralDeduction)
-    (M --> (&,X,A..+)), X |- (M --> (&,A..+)), (Belief:StructuralDeduction, Goal:StructuralDeduction)
-
-    ((B ~ G) --> S), G |- (B --> S), (Belief:StructuralDeduction, Goal:StructuralDeduction)
-    (R --> (B - S)), S |- (R --> B), (Belief:StructuralDeduction, Goal:StructuralDeduction)
-
-
-//Set comprehension:
-
-//(C --> A), (C --> B), set_ext(A), union(A,B,R) |- (C --> R), (Truth:Union)
-//(C --> A), (C --> B), set_ext(A), intersection(A,B,R) |- (C --> R), (Truth:Intersection)
-    (C --> A), (C --> B), setext(A,B) |- (C --> union(A,B)), (Belief:Union)
-    (C --> A), (C --> B), setext(A,B) |- (C --> intersect(A,B)), (Belief:Intersection)
-    (C --> A), (C --> B), setext(A,B) |- (C --> differ(A,B)), (Belief:Difference)
-
-//(C --> A), (C --> B), set_int(A), union(A,B,R) |- (C --> R), (Truth:Intersection)
-//(C --> A), (C --> B), set_int(A), intersection(A,B,R) |- (C --> R), (Truth:Union)
-    (C --> A), (C --> B), setint(A,B) |- (C --> union(A,B)), (Belief:Intersection)
-    (C --> A), (C --> B), setint(A,B) |- (C --> intersect(A,B)), (Belief:Union)
-    (C --> A), (C --> B), setint(A,B) |- (C --> differ(A,B)), (Belief:Difference)
-
-//(A --> C), (B --> C), set_ext(A), union(A,B,R) |- (R --> C), (Truth:Intersection)
-//(A --> C), (B --> C), set_ext(A), intersection(A,B,R) |- (R --> C), (Truth:Union)
-    (A --> C), (B --> C), setext(A,B) |- (intersect(A,B) --> C), (Belief:Union)
-    (A --> C), (B --> C), setext(A,B) |- (union(A,B) --> C), (Belief:Intersection)
-    (A --> C), (B --> C), setext(A,B) |- (differ(A,B) --> C), (Belief:Difference)
-
-//(A --> C), (B --> C), set_int(A), union(A,B,R) |- (R --> C), (Truth:Union)
-//(A --> C), (B --> C), set_int(A), intersection(A,B,R) |- (R --> C), (Truth:Intersection)
-    (A --> C), (B --> C), setint(A,B) |- (union(A,B) --> C), (Belief:Union)
-    (A --> C), (B --> C), setint(A,B) |- (intersect(A,B) --> C), (Belief:Intersection)
-    (A --> C), (B --> C), setint(A,B) |- (differ(A,B) --> C), (Belief:Difference)
-
-//Set element takeout:
-
-//    (C --> {X,A..+}), C |- (C --> {X}), (Belief:StructuralDeduction)
-//    (C --> [X,A..+]), C |- (C --> [X]), (Belief:StructuralDeduction)
-//    ({X,A..+} --> C), C |- ({X} --> C), (Belief:StructuralDeduction)
-//    ([X,A..+] --> C), C |- ([X] --> C), (Belief:StructuralDeduction)
-    (C --> {X,A..+}), X, neqCom(X,C) |- (C --> {X}), (Belief:StructuralDeduction, Goal:StructuralDeduction)
-    (C --> [X,A..+]), X, neqCom(X,C) |- (C --> [X]), (Belief:StructuralDeduction, Goal:StructuralDeduction)
-    ({X,A..+} --> C), X, neqCom(X,C) |- ({X} --> C), (Belief:StructuralDeduction, Goal:StructuralDeduction)
-    ([X,A..+] --> C), X, neqCom(X,C) |- ([X] --> C), (Belief:StructuralDeduction, Goal:StructuralDeduction)
 
 //// implication-based syllogism ////////////////////////////////////////////////////////////////////////////////////
 //       (A ==> B) ------- (B ==> C)

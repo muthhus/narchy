@@ -50,8 +50,8 @@ public interface Deriver extends Consumer<Derivation> {
 //                    Util.time(logger, "Rule parse", () -> {
 //                        try {
 //                            defaultRules = PremiseRuleSet
-//                                    //.rulesCached("default.meta.nal");
-//                                    .rules("default.meta.nal");
+//                                    //.rulesCached("nal.nal");
+//                                    .rules("nal.nal");
 //                        } catch (Exception e) {
 //                            logger.error("rule parse: {}", e);
 //                            throw new RuntimeException(e);

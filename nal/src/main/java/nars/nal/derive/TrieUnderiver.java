@@ -86,6 +86,6 @@ public class TrieUnderiver implements Underiver {
     }
 
     public static void main(String[] args) {
-        new TrieUnderiver((TrieDeriver)Deriver.get("default.meta.nal"));
+        new TrieUnderiver((TrieDeriver)Deriver.get("nal.nal"));
     }
 }

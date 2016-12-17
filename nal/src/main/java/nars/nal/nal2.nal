@@ -1,0 +1,44 @@
+//Set Definition Similarity to Inheritance
+    ({S} <-> {P}), {S} |- ({S} --> {P}), (Belief:Identity)
+    ([S] <-> [P]), [S] |- ([S] --> [P]), (Belief:Identity)
+
+
+//Set Definition Unwrap
+    ({S} <-> {P}), S |- (S <-> P), (Belief:Identity)
+    ([S] <-> [P]), S |- (S <-> P), (Belief:Identity)
+
+//Nothing is more specific than a instance, so its similar
+    (S --> {P}),  S  |- (S <-> {P}), (Belief:Identity)
+
+//nothing is more general than a property, so its similar
+    ([S] --> P),  P  |- ([S] <-> P), (Belief:Identity)
+
+
+
+//Set Composition
+//  'setext()' and 'setint()' predicates used here instead of ordinary term pattern matching for efficiency reasons
+
+    (C --> A), (C --> B), setext(A,B) |- (C --> union(A,B)), (Belief:Union)
+    (C --> A), (C --> B), setext(A,B) |- (C --> intersect(A,B)), (Belief:Intersection)
+    (C --> A), (C --> B), setext(A,B) |- (C --> differ(A,B)), (Belief:Difference)
+
+    (C --> A), (C --> B), setint(A,B) |- (C --> union(A,B)), (Belief:Intersection)
+    (C --> A), (C --> B), setint(A,B) |- (C --> intersect(A,B)), (Belief:Union)
+    (C --> A), (C --> B), setint(A,B) |- (C --> differ(A,B)), (Belief:Difference)
+
+    (A --> C), (B --> C), setext(A,B) |- (intersect(A,B) --> C), (Belief:Union)
+    (A --> C), (B --> C), setext(A,B) |- (union(A,B) --> C), (Belief:Intersection)
+    (A --> C), (B --> C), setext(A,B) |- (differ(A,B) --> C), (Belief:Difference)
+
+    (A --> C), (B --> C), setint(A,B) |- (union(A,B) --> C), (Belief:Union)
+    (A --> C), (B --> C), setint(A,B) |- (intersect(A,B) --> C), (Belief:Intersection)
+    (A --> C), (B --> C), setint(A,B) |- (differ(A,B) --> C), (Belief:Difference)
+
+//Set Decomposition
+
+    (C --> {X,A..+}), X, neqCom(X,C) |- (C --> {X}), (Belief:StructuralDeduction, Goal:StructuralDeduction)
+    (C --> [X,A..+]), X, neqCom(X,C) |- (C --> [X]), (Belief:StructuralDeduction, Goal:StructuralDeduction)
+    ({X,A..+} --> C), X, neqCom(X,C) |- ({X} --> C), (Belief:StructuralDeduction, Goal:StructuralDeduction)
+    ([X,A..+] --> C), X, neqCom(X,C) |- ([X] --> C), (Belief:StructuralDeduction, Goal:StructuralDeduction)
+
+

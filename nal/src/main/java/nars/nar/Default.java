@@ -109,8 +109,11 @@ public class Default extends NAR {
 
     public static Deriver newDefaultDeriver() {
         List<Deriver> modules = $.newArrayList();
-        modules.add(Deriver.get("default.meta.nal"));
-        modules.add(Deriver.get("nal4.meta.nal"));
+        modules.add(Deriver.get( "nal.nal"));
+        modules.add(Deriver.get("nal2.nal"));
+        modules.add(Deriver.get("nal3.nal"));
+        modules.add(Deriver.get("nal4.nal"));
+
 
         return (x) -> modules.forEach(e -> e.accept(x));
     }
