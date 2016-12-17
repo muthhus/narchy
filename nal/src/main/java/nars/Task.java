@@ -92,18 +92,24 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
      * otherwise returns null
      */
     @Nullable
-    static boolean taskContentValid(@NotNull Compound t, char punc, @Nullable NAR nar, boolean safe) {
+    static boolean taskContentValid(@NotNull Compound t, char punc, @NotNull NAR nar, boolean safe) {
+        return taskContentValid(t, punc, nar.level(), nar.termVolumeMax.intValue(), safe);
+    }
 
-
+    @Nullable
+    static boolean taskContentValid(@NotNull Compound t, char punc, int nalLevel, int maxVol, boolean safe) {
         if (!t.isNormalized())
             return test(t, "Task Term is null or not a normalized Compound", safe);
-        if (nar!=null) {
-            if (t.volume() > nar.termVolumeMax.intValue())
-                return test(t, "Term exceeds maximum volume", safe);
-            if (!t.levelValid(nar.level()))
-                return test(t, "Term exceeds maximum NAL level", safe);
-        }
+        if (t.volume() > maxVol)
+            return test(t, "Term exceeds maximum volume", safe);
+        if (!t.levelValid(nalLevel))
+            return test(t, "Term exceeds maximum NAL level", safe);
 
+        return taskStatementValid(t, punc, safe);
+    }
+
+    /** call this directly instead of taskContentValid if the level, volume, and normalization have already been tested */
+    @Nullable static boolean taskStatementValid(@NotNull Compound t, char punc, boolean safe) {
         /* A statement sentence is not allowed to have a independent variable as subj or pred"); */
         Op op = t.op();
 
@@ -191,8 +197,6 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
      * @return Whether the two are equivalent
      */
     boolean equivalentTo(@NotNull Task that, boolean punctuation, boolean term, boolean truth, boolean stamp, boolean creationTime);
-
-
 
 
 //
@@ -293,9 +297,10 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
         return n.concept(term(), true);
     }
 
-    /** called if this task is entered into a concept's belief tables
-     *  TODO what about for questions/quests
-     * */
+    /**
+     * called if this task is entered into a concept's belief tables
+     * TODO what about for questions/quests
+     */
     void feedback(TruthDelta delta, float deltaConfidence, float deltaSatisfaction, NAR nar);
 
     @NotNull
@@ -318,8 +323,8 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
 
     /**
      * for question tasks: when an answer appears.
-     *
-     *
+     * <p>
+     * <p>
      * return the input task, or a modification of it to use a customized matched premise belief. or null to
      * to cancel any matched premise belief.
      */
@@ -384,7 +389,7 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
         }
     }
 
-    default @Nullable Appendable appendTo(@Nullable Appendable  sb, /**@Nullable*/NAR memory) throws IOException {
+    default @Nullable Appendable appendTo(@Nullable Appendable sb, /**@Nullable*/NAR memory) throws IOException {
         if (sb == null) sb = new StringBuilder();
         return appendTo(sb, memory, false);
     }
@@ -412,7 +417,7 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
 
     @Nullable
     @Deprecated
-    default Appendable appendTo(Appendable  buffer, /**@Nullable*/NAR memory, boolean showStamp) throws IOException {
+    default Appendable appendTo(Appendable buffer, /**@Nullable*/NAR memory, boolean showStamp) throws IOException {
         boolean notCommand = punc() != Symbols.COMMAND;
         return appendTo(buffer, memory, true, showStamp && notCommand,
                 notCommand, //budget
@@ -421,7 +426,7 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
     }
 
     @Nullable
-    default Appendable  appendTo(@Nullable Appendable buffer, /**@Nullable*/@Nullable NAR memory, boolean term, boolean showStamp, boolean showBudget, boolean showLog) throws IOException {
+    default Appendable appendTo(@Nullable Appendable buffer, /**@Nullable*/@Nullable NAR memory, boolean term, boolean showStamp, boolean showBudget, boolean showLog) throws IOException {
 
         String contentName;
         if (term) {
@@ -476,7 +481,7 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
             buffer = new StringBuilder(stringLength);
         else {
             if (buffer instanceof StringBuilder)
-                ((StringBuilder)buffer).ensureCapacity(stringLength);
+                ((StringBuilder) buffer).ensureCapacity(stringLength);
         }
 
 
@@ -615,7 +620,6 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
     }
 
 
-
     default String getTense(long currentTime, int duration) {
 
         long ot = occurrence();
@@ -633,7 +637,6 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
                 return Symbols.TENSE_PRESENT;
         }
     }
-
 
 
     @Override
@@ -711,7 +714,8 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
         return term().dt();
     }
 
-    @NotNull default ImmutableLongSet evidenceSet() {
+    @NotNull
+    default ImmutableLongSet evidenceSet() {
         return LongSets.immutable.of(evidence());
     }
 
@@ -722,9 +726,10 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
     }
 
 
-    @Nullable default Truth truth(long when, float minConf) {
+    @Nullable
+    default Truth truth(long when, float minConf) {
         float cw = confWeight(when);
-        if (cw==cw && cw > 0) {
+        if (cw == cw && cw > 0) {
 
             float conf = w2c(cw);
             if (conf > minConf) {
@@ -734,7 +739,8 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
         return null;
     }
 
-    @Nullable default Truth truth(long when) {
+    @Nullable
+    default Truth truth(long when) {
         return truth(when, Param.TRUTH_EPSILON);
     }
 
@@ -745,16 +751,20 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
     float confWeight(long when);
 
     long start();
+
     long end();
 
-    /** duration time constant in which evidence diminishes at a time before start() and after end() */
+    /**
+     * duration time constant in which evidence diminishes at a time before start() and after end()
+     */
     float dur();
 
     default long mid() {
-        return Math.round((start()+end())/2L);
+        return Math.round((start() + end()) / 2L);
     }
+
     default long range() {
-        return Math.abs(end()-start());
+        return Math.abs(end() - start());
     }
 
 }

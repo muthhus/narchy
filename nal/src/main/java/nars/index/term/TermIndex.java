@@ -325,7 +325,6 @@ public abstract class TermIndex extends TermBuilder {
     @Nullable
     public final Compound normalize(@NotNull Compound src) {
 
-
         if (src.isNormalized()) {
             return src; //c = t; //already normalized
         } else {

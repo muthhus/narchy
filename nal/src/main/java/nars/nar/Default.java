@@ -109,7 +109,7 @@ public class Default extends NAR {
     }
 
     public static Deriver newDefaultDeriver() {
-        List<Deriver> modules = Deriver.get(
+        Deriver[] modules = Deriver.get(
             "nal1.nal",
             "nal2.nal",
             "nal3.nal",
@@ -119,7 +119,10 @@ public class Default extends NAR {
             "nal.nal" //DEPRECATED
         );
 
-        return (x) -> modules.forEach(e -> e.accept(x));
+        return (x) -> {
+            for (Deriver d : modules)
+                d.accept(x);
+        };
     }
 
     @Nullable

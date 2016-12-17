@@ -99,11 +99,11 @@ public class TrieDeriver implements Deriver {
     }
 
     @Override
-    public final void accept(@NotNull Derivation m) {
-        int now = m.now();
+    public final void accept(@NotNull Derivation d) {
+        int now = d.now();
         for (BoolCondition r : roots) {
-            r.run(m, now);
-            m.revert(now);
+            r.run(d, now);
+            d.revert(now);
         }
     }
 

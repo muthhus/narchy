@@ -37,7 +37,6 @@ public class NQuadsRDFTest {
     @Ignore
     @Test
     public void testSchema1() throws Exception {
-        Param.DEBUG_ANSWERS = true;
 
         Random rng = new XorShift128PlusRandom(1);
         //Multi nar = new Multi(3,512,

@@ -5,6 +5,15 @@
 
 
 
+//// similarity from inheritance ////////////////////////////////////////////////////////////////////////////////////
+//If S is a special case of P, and P is a special case of S, then S and P are similar
+
+    (S --> P), (P --> S) |- (S <-> P), (Belief:Intersection, Goal:Strong)
+
+//// inheritance from similarty <- todo check why this one was missing ////////////////////////////////////////////////////////////////////////////////////
+
+    (S <-> P), (P --> S) |- (S --> P), (Belief:ReduceConjunction, Goal:Strong)
+
 
 
 //// inheritance-based syllogism ////////////////////////////////////////////////////////////////////////////////////
@@ -20,15 +29,6 @@
     (A --> B), (A --> C), neqCom(B,C) |- (C --> B), (Belief:Abduction, Goal:Weak, Permute:Backward)
     (A --> C), (B --> C), neqCom(A,B) |- (A --> B), (Belief:Induction, Goal:Weak, Permute:Backward)
     (A --> B), (B --> C), neqCom(A,C) |- (C --> A), (Belief:Exemplification, Goal:Weak, Permute:Backward)
-
-//// similarity from inheritance ////////////////////////////////////////////////////////////////////////////////////
-//If S is a special case of P, and P is a special case of S, then S and P are similar
-
-    (S --> P), (P --> S), neqCom(S,P) |- (S <-> P), (Belief:Intersection, Goal:Strong)
-
-//// inheritance from similarty <- todo check why this one was missing ////////////////////////////////////////////////////////////////////////////////////
-
-    (S <-> P), (P --> S), neqCom(S,P) |- (S --> P), (Belief:ReduceConjunction, Goal:Strong)
 
 //// similarity-based syllogism ////////////////////////////////////////////////////////////////////////////////////
 //If P and S are a special case of M, then they might be similar (weak),

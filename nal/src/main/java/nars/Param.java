@@ -22,6 +22,9 @@ public abstract class Param /*extends Container*/ implements Level {
     /** absolute limit for constructing terms in any context in which a NAR is not known, which could provide a limit.
      * typically a NAR instance's 'compoundVolumeMax' parameter will be lower than this */
     public static final int COMPOUND_VOLUME_MAX = 128;
+
+
+
     //public static final boolean ARITHMETIC_INDUCTION = false;
 
 
@@ -74,7 +77,7 @@ public abstract class Param /*extends Container*/ implements Level {
     public static final boolean ACTIVATE_TERMLINKS_IF_NO_TEMPLATE = false;
 
 
-    public static boolean DEBUG_ANSWERS = true;
+    //public static final boolean PREMISE_LOG = true;
 
     /** how many times the desired selection size that bags should sample in case some of the selections are unused */
     public static float BAG_OVERSAMPLING = 1.5f;

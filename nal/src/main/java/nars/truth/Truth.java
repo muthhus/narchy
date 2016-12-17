@@ -33,6 +33,7 @@ import org.jetbrains.annotations.Nullable;
 import java.io.IOException;
 import java.util.Comparator;
 
+import static jcog.Util.clampround;
 import static nars.truth.TruthFunctions.c2w;
 import static nars.truth.TruthFunctions.w2c;
 
@@ -305,6 +306,12 @@ public interface Truth extends Truthed {
         if (b == null)
             return a;
         return a.conf() >= b.conf() ? a : b;
+    }
+
+    default Truth dither(float res) {
+        float f = clampround(freq(), res);
+        float c = Util.clamp(clampround(conf(), res), res, 1f - res);
+        return $.t(f, c);
     }
 
 

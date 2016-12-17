@@ -7,6 +7,7 @@ package nars.nal;
 import nars.*;
 import nars.budget.Budget;
 import nars.budget.RawBudget;
+import nars.budget.util.BudgetFunctions;
 import nars.concept.Concept;
 import nars.link.BLink;
 import nars.table.BeliefTable;
@@ -34,9 +35,6 @@ import static nars.util.UtilityFunctions.or;
  */
 public final class Premise extends RawBudget implements Tasked {
     private static final Logger logger = LoggerFactory.getLogger(Premise.class);
-
-
-    //@NotNull private final Term concept;
 
     @NotNull
     public final Task task;
@@ -88,8 +86,10 @@ public final class Premise extends RawBudget implements Tasked {
      * patham9 especially try to understand the "temporal temporal" case
      * patham9 its using the result of higher confidence
      */
-    public static @Nullable Premise build(@NotNull NAR nar, @NotNull Concept c, long now, @NotNull Task task,
-                                          Term beliefTerm) {
+    public static Premise tryPremise(@NotNull Concept c, @NotNull Task task, Term beliefTerm, long now, @NotNull NAR nar) {
+
+        //if (Param.PREMISE_LOG)
+            //logger.info("try: { concept:\"{}\",\ttask:\"{}\",\tbeliefTerm:\"{}\" }", c, task, beliefTerm);
 
 //        if (Terms.equalSubTermsInRespectToImageAndProduct(task.term(), term))
 //            return null;
@@ -108,11 +108,10 @@ public final class Premise extends RawBudget implements Tasked {
         Concept beliefConcept = nar.concept(beliefTerm);
         if (beliefConcept != null) {
 
-            //float dur = nar.time.dur();
 
             long when =
+                    task.occurrence();
                     //nar.random.nextBoolean() ?
-                        task.occurrence();
                       // : now;
                     //now;
                     //(long)(now + dur);
@@ -127,10 +126,17 @@ public final class Premise extends RawBudget implements Tasked {
                     Task answered = table.answer(when, now, task, nar.confMin.floatValue());
                     if (answered!=null) {
 
-                        taskBudget = task.budget().clone(); //update the task budget, since the question may have been deprioritized as a result of the answer
+                        boolean exists = !nar.tasks.contains(answered);
+                        if (!exists) {
+                            //transfer budget from question to answer
+                            BudgetFunctions.transferPri(task.budget(), answered.budget(), answered.conf());
 
-                        boolean processed = nar.input(answered)!=null;
+                            taskBudget = task.budget().clone(); //update the task budget, since the question may have been deprioritized as a result of the answer
 
+                            boolean processed = nar.input(answered) != null;
+                        }
+
+                        //need to call this to handle pre-existing tasks matched to a newer question
                         answered = task.onAnswered(answered, nar);
 
                         if (answered!=null) {
@@ -279,9 +285,9 @@ public final class Premise extends RawBudget implements Tasked {
 
 
     @NotNull
-    public final Termed<?> beliefTerm() {
+    public final Term beliefTerm() {
         Task x = belief();
-        return x == null ? term : x;
+        return x == null ? term : x.term();
     }
 
     @Nullable

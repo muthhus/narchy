@@ -283,10 +283,6 @@ public interface BeliefTable extends TaskTable {
 
         }
 
-        //transfer budget from question to answer
-        BudgetFunctions.transferPri(qBudget, answer.budget(), answer.conf());
-
-
         return answer;
     }
 

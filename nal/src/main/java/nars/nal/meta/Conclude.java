@@ -43,8 +43,6 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
 
     public final static Logger logger = LoggerFactory.getLogger(Conclude.class);
 
-    @Deprecated
-    public final boolean eternalize;
 
     @NotNull
     public final PremiseRule rule;
@@ -61,7 +59,7 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
 
 
     public Conclude(@NotNull PremiseRule rule, @NotNull Term term,
-                    @Deprecated boolean eternalize, @NotNull TimeFunctions time) {
+                    @NotNull TimeFunctions time) {
         super("Derive(" +
                 Joiner.on(',').join(
                         term,
@@ -82,7 +80,6 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
         //this.uniquePatternVar = Terms.unique(term, (Term x) -> x.op() == VAR_PATTERN);
         this.time = time;
 
-        this.eternalize = eternalize;
 
     }
 
@@ -110,16 +107,23 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
             try {
                 Term r = m.index.transform(this.conclusionPattern, m);
 
-                if (r instanceof Compound) { //includes null test
+                if (r instanceof Compound && r.volume() < nar.termVolumeMax.intValue()) {
 
-                    if (r.volume() < nar.termVolumeMax.intValue())
+                    Derivation.TruthPuncEvidence ct = m.punct.get();
+                    Truth truth = ct.truth;
 
-                        derive(m, (Compound) r, m.punct.get()); //Term exceeds maximum volume
-
+                    //note: the budget function used here should not depend on the truth's frequency. btw, it may be inverted below
+                    Budget budget = m.budget(truth, r);
+                    if (budget != null) {
+                        Compound rr = nar.normalize((Compound) r);
+                        if (rr != null && Task.taskStatementValid(rr, ct.punc, !Param.DEBUG)) {
+                            derive(m, rr, truth, budget, ct);
+                        }
+                    }
                 }
             } catch (@NotNull InvalidTermException | InvalidTaskException e) {
                 if (Param.DEBUG_EXTRA)
-                    logger.warn("{} {}", m, e.toString());
+                    logger.warn("{} {}", m, e.getMessage());
             }
         }
 
@@ -127,24 +131,9 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
     }
 
 
-    final void derive(@NotNull Derivation m, @NotNull Compound content, @NotNull Derivation.TruthPuncEvidence ct) {
-
-        Truth truth = ct.truth;
-
-
-        //note: the budget function used here should not depend on the truth's frequency. btw, it may be inverted below
-        Budget budget = m.budget(truth, content);
-        if (budget == null)
-            return; //INSUFFICIENT BUDGET
+    final void derive(@NotNull Derivation m, @NotNull Compound content, Truth truth, Budget budget, @NotNull Derivation.TruthPuncEvidence ct) {
 
         NAR nar = m.nar;
-
-        content = nar.normalize(content); //TODO why isnt this sometimes normalized by here
-        if (content == null)
-            return; //somehow became null
-
-        if (!Task.taskContentValid(content, ct.punc, nar, !Param.DEBUG))
-            return;
 
         Op o = content.op();
         if (o == NEG) {

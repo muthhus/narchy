@@ -376,7 +376,7 @@ public class PremiseRule extends GenericCompound {
 
         Conclude der = new Conclude(rule, p.pattern,
                 /*anticipate,*/
-                eternalize, temporalizer);
+                temporalizer);
 
         String beliefLabel = belief != null ? belief.toString() : "_";
         String desireLabel = desire != null ? desire.toString() : "_";

@@ -14,7 +14,7 @@ import static nars.time.Tense.ETERNAL;
 @RunWith(Parameterized.class)
 public class NAL1Test extends AbstractNALTest {
 
-    final int withinCycles = 200;
+    final int CYCLES = 50;
 
     public NAL1Test(Supplier<NAR> b) {
         super(b);
@@ -59,7 +59,7 @@ public class NAL1Test extends AbstractNALTest {
         String belief = "<bird --> swimmer>";
 
         test()
-                .log()
+
                 .mustBelieve(4, belief, 0.87f, 0.91f)
                 .believe(belief)                 //.en("bird is a type of swimmer.");
                 .believe(belief, 0.10f, 0.60f)                 //.en("bird is probably not a type of swimmer."); //.en("bird is very likely to be a type of swimmer.");*/
@@ -82,7 +82,7 @@ public class NAL1Test extends AbstractNALTest {
     @Test
     public void abduction()  {
 
-        int time = withinCycles;
+        int time = CYCLES;
 
 //                .believe("<sport --> competition>")
 //                .believe("<chess --> competition>", 0.90f, Global.DEFAULT_JUDGMENT_CONFIDENCE)
@@ -91,7 +91,7 @@ public class NAL1Test extends AbstractNALTest {
 //        //.en("chess is a type of competition.");
 
         test()
-                .log()
+                
                 .believe("<sport --> competition>", 1f, 0.9f)
                 .believe("<chess --> competition>", 0.90f, 0.9f)
                 .mustBelieve(time, "<chess --> sport>", 1f, 0.42f)
@@ -112,10 +112,10 @@ public class NAL1Test extends AbstractNALTest {
         test()
             .believe("<swan --> swimmer>", 0.90f, 0.9f) //.en("Swan is a type of swimmer.");
             .believe("<swan --> bird>") //.en("Swan is a type of bird.");
-            .mustBelieve(withinCycles, "<bird --> swimmer>", 0.90f, 0.45f) //.en("I guess bird is a type of swimmer.");
-            .mustNotOutput(withinCycles, "<bird --> swimmer>", '.', 1f, 1f, 0.41f, 0.43f, ETERNAL) //test for correct ordering of the premise wrt truth value function
-            .mustBelieve(withinCycles, "<swimmer --> bird>", 1.0f, 0.42f)
-            .mustNotOutput(withinCycles, "<swimmer --> bird>", '.', 0.9f, 0.9f, 0.44f, 0.46f, ETERNAL) //test for correct ordering of the premise wrt truth value function
+            .mustBelieve(CYCLES, "<bird --> swimmer>", 0.90f, 0.45f) //.en("I guess bird is a type of swimmer.");
+            .mustNotOutput(CYCLES, "<bird --> swimmer>", '.', 1f, 1f, 0.41f, 0.43f, ETERNAL) //test for correct ordering of the premise wrt truth value function
+            .mustBelieve(CYCLES, "<swimmer --> bird>", 1.0f, 0.42f)
+            .mustNotOutput(CYCLES, "<swimmer --> bird>", '.', 0.9f, 0.9f, 0.44f, 0.46f, ETERNAL) //test for correct ordering of the premise wrt truth value function
             ;
     }
 
@@ -124,11 +124,11 @@ public class NAL1Test extends AbstractNALTest {
     @Test public void induction() {
         //(A --> C), (B --> C), neq(A,B) |- (B --> A), (Belief:Induction, Desire:Weak, Derive:AllowBackward)
         test()
-                .log()
+
                 .believe("<parakeet --> bird>", 0.90f, 0.9f) //.en("Swan is a type of swimmer.");
                 .believe("<pteradactyl --> bird>") //.en("Swan is a type of bird.");
-                .mustBelieve(withinCycles, "<parakeet --> pteradactyl>", 1, 0.42f)
-                .mustBelieve(withinCycles, "<pteradactyl --> parakeet>", 0.9f, 0.45f)
+                .mustBelieve(CYCLES, "<parakeet --> pteradactyl>", 1, 0.42f)
+                .mustBelieve(CYCLES, "<pteradactyl --> parakeet>", 0.9f, 0.45f)
         ;
     }
 
@@ -137,10 +137,10 @@ public class NAL1Test extends AbstractNALTest {
     public void exemplification()  {
 
         test()
-            .log()
+
             .believe("<robin --> bird>")
             .believe("<bird --> animal>")
-            .mustOutput(withinCycles, "<animal --> robin>. %1.00;0.4475%");
+            .mustOutput(CYCLES, "<animal --> robin>. %1.00;0.4475%");
     }
 
 
@@ -150,7 +150,7 @@ public class NAL1Test extends AbstractNALTest {
         TestNAR test = test();
         test.believe("<bird --> swimmer>")
             .ask("<swimmer --> bird>") //.en("Is swimmer a type of bird?");
-            .mustOutput(withinCycles, "<swimmer --> bird>. %1.00;0.47%");
+            .mustOutput(CYCLES, "<swimmer --> bird>. %1.00;0.47%");
     }
 
 
@@ -158,16 +158,13 @@ public class NAL1Test extends AbstractNALTest {
 
     @Test
     public void backwardInference()  {
-        long time = withinCycles;
 
+        test()
 
-        TestNAR test = test();
-        test.nar.log();
-        test
-                .believe("<bird --> swimmer>", 1.0f, 0.8f)
-                .ask("<?1 --> swimmer>")
-                .mustOutput(time, "<?1 --> bird>?") //.en("What is a type of bird?");
-                .mustOutput(time, "<bird --> ?1>?") //.en("What is the type of bird?");
+                .believe("<bird --> swimmer>", 1.0f, 0.8f) //Bird is a type of swimmer
+                .ask(    "<?1 --> swimmer>") //What is a type of swimmer?
+                .mustOutput(5, "<?1 --> bird>?") //.en("What is a type of bird?");
+                .mustOutput(5, "<bird --> ?1>?") //.en("What is the type of bird?");
         ;
     }
 

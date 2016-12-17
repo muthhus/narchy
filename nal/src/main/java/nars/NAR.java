@@ -135,6 +135,7 @@ public abstract class NAR extends Param implements Level, Consumer<Task>, NARIn,
 
     private NARLoop loop;
 
+
     //private final Collection<Object> on = $.newArrayList(); //registered handlers, for strong-linking them when using soft-index
 
     public final void printConceptStatistics() {

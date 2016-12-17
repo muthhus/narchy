@@ -40,19 +40,10 @@ public class Derivation extends Unify {
      */
     @NotNull
     public final Premise premise;
-    private final float truthResolution;
+    public final float truthResolution;
     public float quaMin;
 
     public boolean setPunct(@Nullable Truth t, char p, long[] evidence) {
-
-        if (t!=null) {
-            t = dither(t);
-            //assert(t!=null); //confMin should be greater than or equal to truthResolution
-        }
-
-        if (t == null)
-            return false;
-
         return this.punct.set(new Derivation.TruthPuncEvidence(t, p, evidence))!=null;
     }
 
@@ -175,7 +166,7 @@ public class Derivation extends Unify {
 
         Task belief;
         this.belief = belief = p.belief();
-        this.beliefTerm = p.beliefTerm().term();
+        this.beliefTerm = p.beliefTerm();
         if (beliefTerm.op()==NEG) {
             throw new RuntimeException("negated belief term");
         }
@@ -208,13 +199,13 @@ public class Derivation extends Unify {
 
         this.termSub0Struct = taskTerm.structure();
 
-        @NotNull Op tOp = taskTerm.op();
+        Op tOp = taskTerm.op();
         this.termSub0op = tOp.ordinal();
         this.termSub0opBit = tOp.bit;
 
-        this.termSub1Struct = p.beliefTerm().term().structure();
+        this.termSub1Struct = beliefTerm.structure();
 
-        @NotNull Op bOp = p.beliefTerm().term().op();
+        Op bOp = beliefTerm.op();
         this.termSub1op = bOp.ordinal();
         this.termSub1opBit = bOp.bit;
 

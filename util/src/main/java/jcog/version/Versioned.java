@@ -24,9 +24,10 @@ public class Versioned<X> extends FasterList<X> {
         this.context = context;
     }
 
-    public Versioned(X constValue) {
-        super(1);
-        add(constValue);
+    public Versioned(X... constValue) {
+        super();
+        this.items = constValue;
+        this.size = constValue.length;
         this.context = null;
     }
 

@@ -41,7 +41,8 @@ public final class AndCondition extends GenericCompound implements BoolCondition
         boolean result = true;
         int start = now;
         for (BoolCondition x : termCache) {
-            if (!x.run(m, now)) {
+            boolean b = x.run(m, now);
+            if (!b) {
                 result = false;
                 break;
             }

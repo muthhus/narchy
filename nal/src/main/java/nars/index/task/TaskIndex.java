@@ -12,8 +12,6 @@ import java.util.function.Consumer;
  */
 abstract public class TaskIndex {
 
-
-
     /**
      *
      * @param x
@@ -50,4 +48,6 @@ abstract public class TaskIndex {
             addIfAbsent(toAdd.get(i));
         }
     }
+
+    abstract public boolean contains(Task t);
 }

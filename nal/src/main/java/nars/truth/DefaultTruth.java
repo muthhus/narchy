@@ -1,6 +1,7 @@
 package nars.truth;
 
 import jcog.Util;
+import nars.$;
 import nars.NAR;
 import nars.Param;
 import org.jetbrains.annotations.NotNull;
@@ -130,6 +131,7 @@ public class DefaultTruth implements Truth  {
         float c = clampround(t.conf(), res);
         return c > res ? new DefaultTruth(clampround(t.freq(), res), Util.clamp(c,res,1f-res), res) : null;
     }
+
 
 
     /*    public float getEpsilon() {

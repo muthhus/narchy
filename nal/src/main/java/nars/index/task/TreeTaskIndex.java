@@ -18,6 +18,11 @@ public class TreeTaskIndex extends TaskIndex {
     public final MyConcurrentRadixTree<Task> tasks = new MyConcurrentRadixTree<>();
 
     @Override
+    public boolean contains(Task t) {
+        return tasks.getValueForExactKey(key(t))!=null;
+    }
+
+    @Override
     public @Nullable final Task addIfAbsent(@NotNull Task x) {
 
         Task y = tasks.putIfAbsent(key(x), x);

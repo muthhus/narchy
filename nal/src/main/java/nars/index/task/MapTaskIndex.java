@@ -45,6 +45,10 @@ public final class MapTaskIndex extends TaskIndex {
 //        this.tasksMap = tasks.asMap();
     }
 
+    @Override
+    public final boolean contains(Task t) {
+        return tasks.containsKey(t);
+    }
 
     public void removeDeleted() {
         Iterator<Task> ii = tasks.values().iterator();
