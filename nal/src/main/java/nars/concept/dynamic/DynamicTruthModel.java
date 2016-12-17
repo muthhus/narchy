@@ -68,15 +68,15 @@ abstract public class DynamicTruthModel {
 
                 int dt = superterm.subtermTime(subterm);
                 if (dt == DTERNAL) dt = 0;
+                boolean evi = d.e != null;
 
-                @Nullable Truth nt;
+                Truth nt;
                 if (tableDynamic) {
-                    boolean evi = d.e != null;
-                    @Nullable DynTruth ndt = ((DynamicBeliefTable) table).truth(when + dt, now, (Compound) subterm, evi);
+                    DynTruth ndt = ((DynamicBeliefTable) table).truth(when + dt, now, (Compound) subterm, evi);
                     if (ndt != null) {
                         Truth ntt = ndt.truth();
                         if (ntt != null && add(i, d, ntt.negIf(negated), confMin)) {
-                            if (d.e != null) {
+                            if (evi) {
                                 d.e.addAll(ndt.e);
                             }
                         } else {
@@ -88,18 +88,20 @@ abstract public class DynamicTruthModel {
                 } else {
                     nt = table.truth(when + dt, now);
                     if (nt != null && add(i, d, nt.negIf(negated), confMin)) {
-                        if (d.e != null) {
+                        if (evi) {
+                            //HACK this is a crude approximation
                             Task bt = table.match(when + dt, now);
-                            if (bt != null) {
-                                d.e.add(bt); //HACK this doesnt include the non-top tasks which may contribute to the evaluated truth during truthpolation
+                            if (bt == null) {
+                                return null; //missing
                             }
+
+                            d.e.add(bt);
                         }
                     } else {
                         return null;
                     }
                 }
-                /*if (u!=null)
-                    u = u.negated( t.op() == NEG );*/
+
             } else {
                 return null;
             }

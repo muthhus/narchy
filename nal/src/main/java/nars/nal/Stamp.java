@@ -375,6 +375,7 @@ public interface Stamp {
     }
 
     static long[] zip(@NotNull Collection<? extends Stamp> s) {
+        assert(!s.isEmpty());
         return zip(s, s.size(), Param.STAMP_CAPACITY);
     }
 

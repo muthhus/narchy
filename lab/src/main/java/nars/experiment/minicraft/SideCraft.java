@@ -46,8 +46,8 @@ public class SideCraft extends NAgents {
         PixelBag cam = PixelBag.of(()->camBuffer, 48, 32).addActions("cra", this);
 
 
-        camAE = new PixelAutoClassifier("cra", cam.pixels, 8, 8, 32, this);
-        window(camAE.newChart(), 500, 500);
+        //camAE = new PixelAutoClassifier("cra", cam.pixels, 8, 8, 32, this);
+        //window(camAE.newChart(), 500, 500);
 
 
         pixels = addCamera("cra", cam, (v) -> $.t(v, alpha));

@@ -49,7 +49,9 @@ public final class DynTruth implements Truthed {
 
     @Nullable
     public long[] evidence() {
-        return e == null ? null : Stamp.zip(e);
+
+        //return e == null ? null :
+        return Stamp.zip(e);
     }
 
     @Override
