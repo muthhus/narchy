@@ -127,14 +127,14 @@ public class TermIOTest {
 
     @Test
     public void testTaskSerialization() {
-        assertEqualSerialize(nar.inputTask("<a-->b>."));
-        assertEqualSerialize(nar.inputTask("<a-->(b==>c)>!"));
-        assertEqualSerialize(nar.inputTask("<a-->(b==>c)>?"));
-        assertEqualSerialize(nar.inputTask("$0.1;0.2;0.4$ (b-->c)! %1.0;0.8%"));
+        assertEqualSerialize(nar.inputAndGet("<a-->b>."));
+        assertEqualSerialize(nar.inputAndGet("<a-->(b==>c)>!"));
+        assertEqualSerialize(nar.inputAndGet("<a-->(b==>c)>?"));
+        assertEqualSerialize(nar.inputAndGet("$0.1;0.2;0.4$ (b-->c)! %1.0;0.8%"));
     }
 
     @Test public void testTaskSerialization2() {
-        assertEqualSerialize(nar.inputTask("$0.3;0.2;0.1$ (a-->(bd))! %1.0;0.8%"));
+        assertEqualSerialize(nar.inputAndGet("$0.3;0.2;0.1$ (a-->(bd))! %1.0;0.8%"));
     }
 
     @Test public void testNARTaskDump() throws Exception {

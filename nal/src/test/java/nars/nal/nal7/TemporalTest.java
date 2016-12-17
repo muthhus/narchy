@@ -33,7 +33,7 @@ public class TemporalTest {
 
 
     @Test public void parsedCorrectOccurrenceTime() {
-        Task t = n.inputTask("<a --> b>. :\\:");
+        Task t = n.inputAndGet("<a --> b>. :\\:");
         assertEquals(0, t.creation());
         assertEquals(-(1 /*n.duration()*/), t.occurrence());
     }
@@ -69,9 +69,9 @@ public class TemporalTest {
 
     @Test public void testAtemporalizationSharesNonTemporalSubterms() {
 
-        Task a = n.inputTask("((x) ==>+10 (y)).");
-        Task c = n.inputTask("((x) ==>+9 (y)).");
-        Task b = n.inputTask("((x) <-> (y)).");
+        Task a = n.inputAndGet("((x) ==>+10 (y)).");
+        Task c = n.inputAndGet("((x) ==>+9 (y)).");
+        Task b = n.inputAndGet("((x) <-> (y)).");
         n.next();
 
         @NotNull Compound aa = a.term();

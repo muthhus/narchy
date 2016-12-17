@@ -215,24 +215,40 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
     @Override
     public boolean removeIf(@NotNull Predicate<? super Task> o, @NotNull NAR nar) {
 
-        List<Task> toUnindex = $.newArrayList(0);
 
-        boolean r = list.removeIf(((Predicate<Task>) t -> {
-            if (o.test(t)) {
-                toUnindex.add(t);
-                t.delete();
+        if (list.ifNotEmptyAcquireWriteLock()) {
+            List<Task> toUnindex = null;
+
+            try {
+                toUnindex = $.newArrayList(0);
+
+                List<Task> _toUnindex = toUnindex;
+                boolean r = list.internal().removeIf(((Predicate<Task>) t -> {
+                    if (o.test(t)) {
+                        _toUnindex.add(t);
+                        t.delete();
+                        return true;
+                    }
+                    return false;
+                }));
+
+                if (!r)
+                    toUnindex = null;
+
+
+            } finally {
+                list.unlockWriteLock();
+            }
+
+            //unindex the tasks outside of the atomic procedure
+            if (toUnindex != null) {
+                for (Task x : toUnindex) {
+                    nar.tasks.remove(x);
+                }
                 return true;
             }
-            return false;
-        }));
-
-        //unindex the tasks outside of the atomic procedure
-        if (r) {
-            for (Task x : toUnindex) {
-                nar.tasks.remove(x);
-            }
-            return true;
         }
+
         return false;
     }
 
@@ -289,8 +305,7 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
     }
 
     final float rankTemporalByConfidence(@Nullable Task t, long when) {
-        return t == null ? -1 : t.confWeight(when) * (1f + t.range());
-        //* (t.dur()+1);
+        return t == null ? -1 : t.confWeight(when) * (1f + t.range()); //approximately integrates the confidence over time
     }
 
     public Task matchMerge(long now, @NotNull Task toMergeWith, float dur) {
@@ -415,16 +430,20 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
 
         Task result = null;
         if (list.ifNotEmptyAcquireReadLock()) {
-            MutableList<Task> l = list.internal();
-            switch (l.size()) {
-                case 0:
-                    throw new RuntimeException("should not reach here");
-                case 1:
-                    result = l.get(0); //special case avoid creating the lambda
-                default:
-                    result = l.maxBy(x -> rankTemporalByConfidence(x, when));
+            try {
+                MutableList<Task> l = list.internal();
+                switch (l.size()) {
+                    case 0:
+                        throw new RuntimeException("should not reach here");
+                    case 1:
+                        result = l.get(0); //special case avoid creating the lambda
+                    default:
+                        result = l.maxBy(x -> rankTemporalByConfidence(x, when));
+                }
+
+            }finally {
+                list.unlockReadLock();
             }
-            list.unlockReadLock();
         }
 
         return result;
@@ -450,10 +469,11 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
 
         Truth result = null;
         if (list.ifNotEmptyAcquireReadLock()) {
-
-            result = TruthPolation.truth(eternal.match(), when, list.internal());
-
-            list.unlockReadLock();
+            try {
+                result = TruthPolation.truth(eternal.match(), when, list.internal());
+            } finally {
+                list.unlockReadLock();
+            }
         }
 
         return result;

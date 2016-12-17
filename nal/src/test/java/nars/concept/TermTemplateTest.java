@@ -18,7 +18,7 @@ public class TermTemplateTest {
     @Test
     public void testTemplate1() {
         NAR n = new Default();
-        Task t = n.inputTask("((($3-->(/,REPR,_,$4))&&($1-->(/,REPR,_,$2)))==>({($1,$2),($3,$4)}-->REPR)).");
+        Task t = n.inputAndGet("((($3-->(/,REPR,_,$4))&&($1-->(/,REPR,_,$2)))==>({($1,$2),($3,$4)}-->REPR)).");
         n.next();
 
         n.concepts.print(System.out);

@@ -26,6 +26,7 @@ import nars.nar.NARIn;
 import nars.nar.NAROut;
 import nars.nar.exe.Executioner;
 import nars.table.BeliefTable;
+import nars.task.LambdaQuestionTask;
 import nars.task.MutableTask;
 import nars.task.util.InvalidTaskException;
 import nars.term.Compound;
@@ -318,21 +319,6 @@ public abstract class NAR extends Param implements Level, Consumer<Task>, NARIn,
 
 
     /**
-     * inputs a task, only if the parsed text is valid; returns null if invalid
-     */
-    @Deprecated
-    @NotNull
-    public Task inputTask(@NotNull String taskText) {
-        return inputTask(Narsese.the().task(taskText, this));
-    }
-
-    @Nullable
-    public Task inputTask(@NotNull Task t) {
-        input(t);
-        return t;
-    }
-
-    /**
      * parses and forms a Task from a string but doesnt input it
      */
     @Nullable
@@ -365,13 +351,18 @@ public abstract class NAR extends Param implements Level, Consumer<Task>, NARIn,
     }
 
     @NotNull
-    public <T extends Term> Termed<T> term(@NotNull String t) throws NarseseException {
+    public Termed term(@NotNull String t) throws NarseseException {
         Termed x = concepts.parse(t);
         if (x == null) {
             //if a NarseseException was not already thrown, this indicates that it parsed but the index failed to provide its output
             throw new NarseseException("Unindexed: " + t);
         }
-        return (T) x;
+        return x;
+    }
+
+    @Override
+    public final NAR nar() {
+        return this;
     }
 
     /**
@@ -1062,29 +1053,7 @@ public abstract class NAR extends Param implements Level, Consumer<Task>, NARIn,
     }
 
 
-    @Nullable
-    public Task ask(@NotNull String question, long occ, @NotNull Predicate<Task> eachAnswer) throws NarseseException {
-        return ask(term(question), occ, eachAnswer);
-    }
 
-    @Nullable
-    public Task ask(@NotNull Termed<Compound> term, long occ, @NotNull Predicate<Task> eachAnswer) {
-        return ask(term, occ, Symbols.QUESTION, eachAnswer);
-    }
-
-    @Nullable
-    public Task ask(@NotNull Termed<Compound> term, long occ, char punc /* question or quest */, @NotNull Predicate<Task> eachAnswer) {
-        @NotNull MutableTask t;
-        inputLater(t = new MutableTask(term, punc, null) {
-            @Override
-            public Task onAnswered(Task answer, NAR nar) {
-                super.onAnswered(answer, nar);
-                eachAnswer.test(answer);
-                return answer;
-            }
-        }.occurr(occ));
-        return t;
-    }
 
 //    /**
 //     * inputs the question and observes answer events for a solution

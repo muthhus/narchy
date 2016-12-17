@@ -258,7 +258,7 @@ public class TermTest {
 
 
         try {
-            Task x = n.inputTask(t + '.');
+            Task x = n.inputAndGet(t + '.');
             assertFalse(t + " is invalid compound term", true);
         } catch (Throwable tt) {
             assertTrue(true);

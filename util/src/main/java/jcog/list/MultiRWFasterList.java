@@ -73,7 +73,15 @@ public class MultiRWFasterList<T>  extends AbstractMultiReaderMutableCollection<
         super.acquireReadLock();
         return true;
     }
+    /** note: this is a semi-volatile operation and relies on the delegate list implementation to allow concurrent isEmpty() */
+    public boolean ifNotEmptyAcquireWriteLock() {
 
+        if (delegate.isEmpty())
+            return false;
+
+        super.acquireWriteLock();
+        return true;
+    }
 
     @Override
     public void acquireReadLock() {
@@ -85,9 +93,15 @@ public class MultiRWFasterList<T>  extends AbstractMultiReaderMutableCollection<
         super.unlockReadLock();
     }
 
-
     @Override
-    public boolean removeIf(java.util.function.Predicate<? super T> filter) {
+    public void unlockWriteLock() {
+        super.unlockWriteLock();
+    }
+
+    /** note: this is a semi-volatile operation and relies on the delegate list implementation to allow concurrent isEmpty()*/
+    @Override public boolean removeIf(java.util.function.Predicate<? super T> filter) {
+        if (delegate.isEmpty())
+            return false;
         this.acquireWriteLock();
         try {
             return delegate.removeIf(filter);
@@ -96,14 +110,21 @@ public class MultiRWFasterList<T>  extends AbstractMultiReaderMutableCollection<
         }
     }
 
-    @Override
-    public void forEach(Consumer<? super T> action) {
+    /** note: this is a semi-volatile operation and relies on the delegate list implementation to allow concurrent isEmpty()*/
+    @Override public void forEach(Consumer<? super T> action) {
+        if (delegate.isEmpty())
+            return;
+
         this.acquireReadLock();
         try {
             delegate.forEach(action);
         } finally {
             this.unlockReadLock();
         }
+    }
+
+    @Override public void each(Procedure<? super T> procedure) {
+        throw new UnsupportedOperationException();
     }
 
     //adds isEmpty() test inside the lock

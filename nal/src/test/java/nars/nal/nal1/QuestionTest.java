@@ -1,6 +1,7 @@
 package nars.nal.nal1;
 
 import nars.*;
+import nars.concept.Concept;
 import nars.nar.Default;
 import nars.nar.Terminal;
 import nars.nar.util.Answerer;
@@ -30,7 +31,7 @@ import static org.junit.Assert.*;
  */
 public class QuestionTest {
 
-    final int withinCycles = 16;
+    final int withinCycles = 64;
 
     @Test
     public void whQuestionUnifyQueryVar() throws Narsese.NarseseException {
@@ -51,16 +52,16 @@ public class QuestionTest {
 
         NAR nar = new Default();
         nar.nal(1);
-        //nar.log();
+        nar.log();
 
         nar
                 .believe(belief, 1.0f, 0.9f)
-                .next()
                 .ask(question, ETERNAL, b -> {
                     if (b.punc() == '.' && b.term().equals(expectedSolutionTerm))
                         ok.set(true);
                     return false;
                 });
+
 
         nar.run(cycles);
 

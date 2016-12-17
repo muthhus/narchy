@@ -43,7 +43,7 @@ public class TaskTest {
         for (float f = 0; f < 1.0f; f += 0.3f)
             for (float c = 0.01f; c < 1.0f; c += 0.3f) {
                 t.add(
-                    n.inputTask($.task("a:b", '.',f, c))
+                    n.inputAndGet($.task("a:b", '.',f, c))
                 );
                 count++;
             }
@@ -89,11 +89,11 @@ public class TaskTest {
 
         Param.DEBUG = true;
 
-        Task x = n.inputTask("<a --> b>.");
+        Task x = n.inputAndGet("<a --> b>.");
         assertArrayEquals(new long[]{1}, x.evidence());
         n.next();
 
-        Task y = n.inputTask("<b --> c>.");
+        Task y = n.inputAndGet("<b --> c>.");
         assertArrayEquals(new long[]{2}, y.evidence());
         n.next();
 
@@ -103,7 +103,7 @@ public class TaskTest {
 
         n.run(10);
 
-        Task q = n.inputTask("<c --> d>.");
+        Task q = n.inputAndGet("<c --> d>.");
         assertArrayEquals(new long[]{5}, q.evidence());
 
     }

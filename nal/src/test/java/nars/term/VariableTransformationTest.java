@@ -63,7 +63,7 @@ public class VariableTransformationTest {
         System.out.println(task);
 
 
-        Task t2 = n.inputTask(t + '.');
+        Task t2 = n.inputAndGet(t + '.');
         System.out.println(t2);
 
         //TextOutput.out(n);

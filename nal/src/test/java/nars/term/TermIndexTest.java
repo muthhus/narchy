@@ -33,8 +33,8 @@ public class TermIndexTest {
 
         String term = "<a --> b>.";
 
-        Task t1 = t.inputTask(term);
-        Task t2 = t.inputTask(term);
+        Task t1 = t.inputAndGet(term);
+        Task t2 = t.inputAndGet(term);
         t.next();
 
         testShared(t.concept(t1), t.concept(t2));

@@ -1,7 +1,61 @@
 package nars.nar;
 
+import nars.NAR;
+import nars.Narsese;
+import nars.Symbols;
+import nars.Task;
+import nars.concept.Concept;
+import nars.task.LambdaQuestionTask;
+import nars.term.Compound;
+import nars.term.Termed;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.function.Consumer;
+import java.util.function.Predicate;
+
 /**
- * Created by me on 10/20/16.
+ * NAR Input methods
  */
 public interface NARIn {
+
+    Concept input(Task t);
+
+    Termed term(@NotNull String t) throws Narsese.NarseseException;
+
+    NAR nar();
+
+    @Nullable
+    default Task ask(@NotNull String questionTerm, long occ, @NotNull Predicate<Task> eachAnswer) throws Narsese.NarseseException {
+        return ask(term(questionTerm), occ, eachAnswer);
+    }
+
+    @Nullable
+    default Task ask(@NotNull Termed<Compound> term, long occ, @NotNull Predicate<Task> eachAnswer) {
+        return ask(term, occ, Symbols.QUESTION, eachAnswer);
+    }
+
+    @Nullable
+    default LambdaQuestionTask ask(@NotNull Termed<Compound> term, long occ, char punc /* question or quest */, @NotNull Predicate<Task> eachAnswer) {
+        assert(punc == Symbols.QUESTION || punc == Symbols.QUEST);
+        return inputAndGet( new LambdaQuestionTask(term, punc, occ, eachAnswer) );
+    }
+
+    @Nullable
+    default LambdaQuestionTask ask(@NotNull Termed<Compound> term, long occ, char punc /* question or quest */, @NotNull Consumer<Task> eachAnswer) {
+        assert(punc == Symbols.QUESTION || punc == Symbols.QUEST);
+        return inputAndGet( new LambdaQuestionTask(term, punc, occ, eachAnswer) );
+    }
+
+    @NotNull
+    default Task inputAndGet(@NotNull String taskText) {
+        return inputAndGet(Narsese.the().task(taskText, nar()));
+    }
+
+    @NotNull default <T extends Task> T inputAndGet(@NotNull T t) {
+        input(t);
+        return t;
+    }
+
+
 }

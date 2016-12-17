@@ -207,6 +207,11 @@ public abstract class AbstractTask extends RawBudget implements Task, Temporal {
             invalidate();
         }
 
+        // assign a unique stamp if none specified (input)
+        if (evidence.length == 0)
+            setEvidence(nar.time.nextStamp());
+
+
         // if a task has an unperceived creationTime,
         // set it to the memory's current time here,
         // and adjust occurenceTime if it's not eternal
@@ -222,19 +227,19 @@ public abstract class AbstractTask extends RawBudget implements Task, Temporal {
         }
 
 
+        //if quality is not specified (NaN), then this means to assign the default budgeting according to the task's punctuation
         float q = qua();
-        if (q!=q /* fast NaN test */) {
+        if (q!=q) {
+
+            setPriority(nar.priorityDefault(punc));
 
             if (isBeliefOrGoal()) {
                 setQuality(BudgetFunctions.truthToQuality(truth()));
             } else {
-                setQuality(punc == Symbols.QUESTION ? nar.DEFAULT_QUESTION_QUALITY : nar.DEFAULT_QUEST_QUALITY);
+                setQuality(nar.qualityDefault(punc));
             }
         }
 
-        //finally, assign a unique stamp if none specified (input)
-        if (evidence.length == 0)
-            setEvidence(nar.time.nextStamp());
 
         if (dur!=dur) {
             //assign default duration from NAR
