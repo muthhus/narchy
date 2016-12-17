@@ -199,22 +199,21 @@ public final class Premise extends RawBudget implements Tasked {
         return new Premise(c, task, beliefTerm, belief, pri, qua);
     }
 
-    private static boolean unifiable(@NotNull Compound a, @NotNull Compound b, NAR nar) {
+    private static boolean unifiable(@NotNull Compound q, @NotNull Compound a, NAR nar) {
 
-        if (a.op() != b.op())
+        if (q.op() != a.op())
             return false; //no chance
 
-        if (Terms.equalAtemporally(a, b))
+        if (Terms.equal(q, a, false, true /* no need to unneg, task content is already non-negated */))
             return true;
 
-        int varsTotal = a.vars() + a.varPattern() + b.vars() + b.varPattern();
-        if (varsTotal == 0)
-            return false; //since they are inequal, if there are no variables present then nothing would unify anyway
+        if ((q.vars() == 0) && (q.varPattern() == 0))
+            return false; //since they are inequal, if the question has no variables then nothing would unify anyway
 
         List<Termed> result = $.newArrayList(0);
         new UnifySubst(null /* all variables */, nar, result, Param.QUERY_ANSWERS_PER_MATCH)
                 .unifyAll(
-                    a, b
+                    q, a
                 );
 
         return !result.isEmpty();

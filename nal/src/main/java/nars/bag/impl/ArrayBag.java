@@ -306,7 +306,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
      * essentially the same as b.priIfFiniteElseNeg1 except it also includes a null test. otherwise they are interchangeable
      */
     static float pCmp(@Nullable Budgeted b) {
-        return (b == null) ? -1f : b.priSafe(-1);
+        return (b == null) ? -2f : b.priSafe(-1); //sort nulls beneath
 
 //        float p = b.pri();
 //        return p == p ? p : -1f;
@@ -444,7 +444,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
 
                 synchronized (items) {
                     if (updateItems(v)) {
-                        updateRange();
+                        //updateRange();
                         w = v;
                     } else {
                         w = null;
@@ -536,7 +536,6 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
         if (each != null)
             this.pressure = 0; //reset pressure accumulator
 
-
         synchronized (items) {
 
             if (size() > 0) {
@@ -547,8 +546,6 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
                     if (lowestUnsorted != -1) {
                         sort(); //if not perfectly sorted already
                     }
-
-                    updateRange();
                 }
             } else {
                 minPri = -1;
@@ -561,7 +558,11 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
     }
 
     public void sort() {
-        qsort(new int[24 /* estimate */], items.array(), 0 /*dirtyStart - 1*/, size() - 1);
+        int s = size();
+
+        qsort(new short[16 /* estimate */], items.array(), (short)0 /*dirtyStart - 1*/, (short)(s - 1));
+
+        this.minPri = (s > 0 && s >= capacity()) ? get(s - 1).priSafe(-1) : -1;
     }
 
 
@@ -643,13 +644,8 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
             //map is possibly shared with another bag. only remove the items from it which are present in items
             items.forEach(x -> map.remove(x.get()));
             items.clear();
-            updateRange();
+            minPri = -1;
         }
-    }
-
-    private final void updateRange() {
-        int s = size();
-        this.minPri = (s > 0 && s >= capacity()) ? get(s - 1).priSafe(-1) : -1;
     }
 
 
@@ -683,22 +679,19 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
      * http://kosbie.net/cmu/summer-08/15-100/handouts/IterativeQuickSort.java
      */
 
-    public static void qsort(int[] stack, BLink[] c, int left, int right) {
+    public static void qsort(short[] stack, BLink[] c, short left, short right) {
         int stack_pointer = -1;
         while (true) {
-            int i, j;
+            short i, j;
             if (right - left <= 7) {
                 BLink swap;
                 //bubble sort on a region of right less than 8?
-                for (j = left + 1; j <= right; j++) {
+                for (j = (short) (left + 1); j <= right; j++) {
                     swap = c[j];
-                    i = j - 1;
+                    i = (short) (j - 1);
                     float swapV = pCmp(swap);
                     while (i >= left && cmpGT(c[i], swapV)) {
-                        swap(c, i + 1, i);
-//                        BLink x = c[i];
-//                        c[i] = c[i + 1];
-//                        c[i + 1] = x;
+                        swap(c, (short)(i + 1), i);
                         i--;
                     }
                     c[i + 1] = swap;
@@ -712,8 +705,8 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
             } else {
                 BLink swap;
 
-                int median = (left + right) >> 1;
-                i = left + 1;
+                short median = (short)((left + right) / 2);
+                i = (short) (left + 1);
                 j = right;
 
                 swap(c, i, median);
@@ -745,14 +738,14 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
                     c[j] = temp;
                 }
 
-                int a, b;
+                short a, b;
                 if ((right - i + 1) >= (j - left)) {
                     a = i;
                     b = right;
-                    right = j - 1;
+                    right = (short) (j - 1);
                 } else {
                     a = left;
-                    b = j - 1;
+                    b = (short) (j - 1);
                     left = i;
                 }
 
@@ -762,7 +755,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
         }
     }
 
-    public static void swap(BLink[] c, int x, int y) {
+    public static void swap(BLink[] c, short x, short y) {
         BLink swap;
         swap = c[y];
         c[y] = c[x];

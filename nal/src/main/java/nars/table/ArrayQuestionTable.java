@@ -99,7 +99,9 @@ public class ArrayQuestionTable  implements QuestionTable, Comparator<Task> {
                         result[0] = null;
                         return;
                     } else {
-                        trash[0] = l.remove(sizeStart - 1);
+                        Task weakest = l.remove(sizeStart - 1);
+                        weakest.delete();
+                        trash[0] = weakest;
 //                        float removedPri = remove(list, sizeStart - 1, "Table Pop", n);
 //                        if (removedPri == removedPri) //not deleted
 //                            t.budget().setPriority(Math.max(t.pri(), removedPri)); //utilize at least its priority since theyre sorted by other factor
