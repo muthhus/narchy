@@ -16,9 +16,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintStream;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Iterator;
+import java.util.*;
 
 import static java.util.stream.StreamSupport.stream;
 import static nars.time.Tense.ETERNAL;
@@ -47,8 +45,26 @@ public interface BeliefTable extends TaskTable {
         }
 
         @Override
-        public void capacity(int eternals, int temporals, NAR nar) {
+        public void capacity(int eternals, int temporals, NAR nar) {        }
 
+        @Override
+        public @Nullable Task match(long now) {
+            return null;
+        }
+
+        @Override
+        public @Nullable Task match(long when, long now) {
+            return null;
+        }
+
+        @Override
+        public float priSum() {
+            return 0;
+        }
+
+        @Override
+        public float eviSum(long now) {
+            return 0;
         }
 
         @Override
@@ -79,11 +95,27 @@ public interface BeliefTable extends TaskTable {
             return null;
         }
 
+        @Override
+        public void print(@NotNull PrintStream out) {
+
+        }
+
+        @Override
+        public Spliterator<Task> spliterator() {
+            return Spliterators.emptySpliterator();
+        }
 
         @Override
         public Task match(long when, long now, @Nullable Task against, boolean noOverlap) {
             return null;
         }
+
+        @Override
+        public float freq(long when) {
+            return Float.NaN;
+        }
+
+
 
         @Nullable
         @Override
@@ -95,12 +127,6 @@ public interface BeliefTable extends TaskTable {
         public void clear(NAR nar) {
 
         }
-
-//        @Override
-//        public void range(long[] t) {
-//
-//        }
-
 
     };
 
@@ -218,14 +244,23 @@ public interface BeliefTable extends TaskTable {
         Budget qBudget = question.budget();
 
         Task answer;
+        Budget answerBudget;
         if (this instanceof DynamicBeliefTable) {
             answer = ((DynamicBeliefTable) this).generate(question.term(), when);
             if (answer == null)
                 return null;
 
+            answerBudget = answer.budget().clone();
+            if (answerBudget == null)
+                return null;
+
         } else {
             answer = match(when, now, question, false);
             if (answer == null)
+                return null;
+
+            answerBudget = answer.budget().clone();
+            if (answerBudget.isDeleted())
                 return null;
 
             //require EXACT term, in case of differing dt structure
@@ -244,13 +279,14 @@ public interface BeliefTable extends TaskTable {
                         question,
                         aProj, now, when, 0.5f)
                             .log("Answer Projected")
-                            .budget(answer.budget());
+                            .budget(answerBudget);
             }
 
         }
 
         //transfer budget from question to answer
-        BudgetFunctions.transferPri(qBudget, answer.budget(), answer.conf());
+        BudgetFunctions.transferPri(qBudget, answerBudget, answer.conf());
+
 
         return answer;
     }

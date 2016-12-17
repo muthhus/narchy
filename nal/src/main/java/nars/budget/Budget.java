@@ -109,7 +109,16 @@ public interface Budget extends Budgeted {
         setPriority(priSafe(0) + toAdd);
     }
     default void priSub(float toSubtract) {
-        priAdd(-toSubtract);
+        float p = pri();
+
+        if (p!=p)
+            throw new BudgetException();
+
+        p -= toSubtract;
+        if (p < -Param.BUDGET_EPSILON)
+            throw new BudgetException("Budget Underflow");
+
+        setPriority(p);
     }
 
     @NotNull
@@ -140,7 +149,6 @@ public interface Budget extends Budgeted {
         public BudgetException(String message) {
             super(message);
         }
-
     }
 
     /**

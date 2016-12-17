@@ -12,6 +12,7 @@ import nars.task.TruthPolation;
 import nars.truth.Truth;
 import nars.truth.TruthDelta;
 import org.eclipse.collections.api.block.function.Function;
+import org.eclipse.collections.api.list.MutableList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -412,9 +413,23 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
     @Override
     public final Task match(long when, @Deprecated long now, @Nullable Task against) {
 
+        Task result = null;
+        if (list.ifNotEmptyAcquireReadLock()) {
+            MutableList<Task> l = list.internal();
+            switch (l.size()) {
+                case 0:
+                    throw new RuntimeException("should not reach here");
+                case 1:
+                    result = l.get(0); //special case avoid creating the lambda
+                default:
+                    result = l.maxBy(x -> rankTemporalByConfidence(x, when));
+            }
+            list.unlockReadLock();
+        }
+
+        return result;
 
         //if (against == null) {
-        return list.maxBy(x -> rankTemporalByConfidence(x, when));
 //
 //        } else {
 //            long then = when != ETERNAL ? when : now;
@@ -432,14 +447,16 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
     @Nullable
     @Override
     public final Truth truth(long when, long now, @Nullable EternalTable eternal) {
-        Task topEternal = eternal.match();
 
-        final Truth[] t = new Truth[1];
-        list.withReadLockAndDelegate((l) -> {
-            t[0] = TruthPolation.truth(topEternal, when, l);
-        });
+        Truth result = null;
+        if (list.ifNotEmptyAcquireReadLock()) {
 
-        return t[0];
+            result = TruthPolation.truth(eternal.match(), when, list.internal());
+
+            list.unlockReadLock();
+        }
+
+        return result;
     }
 
     private final boolean clean(NAR nar) {

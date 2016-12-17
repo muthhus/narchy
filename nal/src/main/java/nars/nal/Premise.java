@@ -16,6 +16,7 @@ import nars.term.Term;
 import nars.term.Termed;
 import nars.term.Terms;
 import nars.term.subst.UnifySubst;
+import org.apache.commons.lang3.ObjectUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -127,18 +128,20 @@ public final class Premise extends RawBudget implements Tasked {
                     Task answered = table.answer(when, now, task, nar.confMin.floatValue());
                     if (answered!=null) {
 
+                        taskBudget = task.budget().clone(); //update the task budget, since the question may have been deprioritized as a result of the answer
+
                         boolean novel = nar.input(answered)!=null;
 
-                        task.onAnswered(answered, nar, novel);
+                        answered = task.onAnswered(answered, nar);
 
-                        if (answered.punc()==Symbols.BELIEF)
-                            belief = answered;
+                        if (novel && answered!=null) {
+                            if (answered.punc() == Symbols.BELIEF)
+                                belief = answered;
+                        }
 
-                        taskBudget = task.budget().clone(); //update the task budget, since the question may have been deprioritized as a result of the answer
                     }
 
                 }
-
 
             }
 
@@ -216,7 +219,10 @@ public final class Premise extends RawBudget implements Tasked {
                     q, a
                 );
 
-        return !result.isEmpty();
+        if (result.isEmpty())
+            return false;
+
+        return true;
     }
 
 //    @Nullable

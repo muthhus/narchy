@@ -6,9 +6,7 @@ import nars.concept.Concept;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 /** task table used for storing Questions and Quests.
  *  simpler than Belief/Goal tables
@@ -43,6 +41,16 @@ public interface QuestionTable extends TaskTable {
         @Override
         public Iterator<Task> iterator() {
             return Collections.emptyIterator();
+        }
+
+        @Override
+        public Spliterator<Task> spliterator() {
+            return Spliterators.emptySpliterator();
+        }
+
+        @Override
+        public float priSum() {
+            return 0;
         }
 
         @Nullable

@@ -430,29 +430,22 @@ abstract public class NAgent implements NSense, NAction {
 
             ((FasterList)predictors).addAll(
 
-                    new PredictionTask($.seq(action, dur, happiness), '?')
-                        .present(nar)
-                        .budgetByTruth(1f,nar),
+                    new PredictionTask($.seq(action, dur, happiness), '?').present(nar),
+                    new PredictionTask($.seq($.neg(action), dur, happiness), '?').present(nar),
 
-                    new PredictionTask($.seq($.neg(action), dur, happiness), '?')
-                        .present(nar)
-                        .budgetByTruth(1f,nar),
+                    new PredictionTask($.seq($.parallel(action, $.varQuery("x")), dur, happiness), '?').present(nar),
+                    new PredictionTask($.seq($.parallel($.neg(action), $.varQuery("x")), dur, happiness), '?').present(nar),
 
-                    new PredictionTask($.impl(action, dur, happiness), '?')
-                        .present(nar)
-                        .budgetByTruth(1f,nar),
+                    new PredictionTask($.impl(action, dur, happiness), '?').present(nar),
+                    new PredictionTask($.impl($.neg(action), dur, happiness), '?').present(nar)
+                        
 
-                    new PredictionTask($.impl($.neg(action), dur, happiness), '?')
-                        .present(nar)
-                        .budgetByTruth(1f,nar),
-
-                    new PredictionTask($.seq(action, dur, varQuery(1)), '@')
-                        .present(nar)
-                        .budgetByTruth(1f,nar),
-
-                    new PredictionTask($.seq($.neg(action), dur, varQuery(1)), '@')
-                        .present(nar)
-                        .budgetByTruth(1f,nar)
+//                    new PredictionTask($.seq(action, dur, varQuery(1)), '@')
+//                        .present(nar),
+//
+//
+//                    new PredictionTask($.seq($.neg(action), dur, varQuery(1)), '@')
+//                        .present(nar)
 
 //                    new MutableTask($.impl(action, dur, happiness), '?', null)
 //                            .present(nar),
@@ -750,9 +743,12 @@ abstract public class NAgent implements NSense, NAction {
         }
 
         @Override
-        public void onAnswered(Task answer, NAR nar, boolean novel) {
-            long lag = answer.creation() - creation();
-            nar.logger.info("Prediction:\t{}\n\t{}\tlag={}", this, answer, lag);
+        public Task onAnswered(Task answer, NAR nar) {
+            if (!answer.isDeleted()) {
+                long lag = answer.creation() - creation();
+                nar.logger.info("Prediction:\t{}\n\t{}\tlag={}", this, answer, lag);
+            }
+            return answer;
         }
     }
 

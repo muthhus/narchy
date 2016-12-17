@@ -221,15 +221,16 @@ public final class BudgetFunctions extends UtilityFunctions {
 
         float priToSend = from.priSafe(0) * s;
         if (priToSend > 0) {
-            float afterReceived = to.pri() + priToSend;
+            float afterReceived = to.priSafe(0) + priToSend;
             float overflow = afterReceived - 1f;
 
             //cap at 1, and only transfer what is necessary to reach it
             if (overflow > 0)
                 priToSend -= overflow;
 
-            to.priAdd(priToSend);
+            //subtract first to ensure the funds are available
             from.priSub(priToSend);
+            to.priAdd(priToSend);
         }
     }
 

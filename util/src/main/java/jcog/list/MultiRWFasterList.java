@@ -48,114 +48,121 @@ import static org.eclipse.collections.impl.factory.Iterables.mList;
  * extension of org.eclipse collections MultiRWFasterList
  */
 public class MultiRWFasterList<T>  extends AbstractMultiReaderMutableCollection<T>
-        implements RandomAccess, Externalizable, MutableList<T>
-    {
-        private static final long serialVersionUID = 1L;
+        implements RandomAccess, Externalizable, MutableList<T> {
+    private static final long serialVersionUID = 1L;
 
-        private transient ReadWriteLock lock;
-        private MutableList<T> delegate;
+    private transient ReadWriteLock lock;
+    private MutableList<T> delegate;
 
 
-        public <E> E[] toArray(IntToObjectFunction<E[]> arrayBuilder, int extraSize)
-        {
-            this.acquireReadLock();
-            try {
-                return delegate.toArray(arrayBuilder.apply(delegate.size()+extraSize));
-            } finally {
-                this.unlockReadLock();
-            }
+    public <E> E[] toArray(IntToObjectFunction<E[]> arrayBuilder, int extraSize) {
+        this.acquireReadLock();
+        try {
+            return delegate.toArray(arrayBuilder.apply(delegate.size() + extraSize));
+        } finally {
+            this.unlockReadLock();
         }
+    }
+
+    /** note: this is a semi-volatile operation and relies on the delegate list implementation to allow concurrent isEmpty() */
+    public boolean ifNotEmptyAcquireReadLock() {
+
+        if (delegate.isEmpty())
+            return false;
+
+        super.acquireReadLock();
+        return true;
+    }
 
 
-        @Override
-        public boolean removeIf(java.util.function.Predicate<? super T> filter) {
-            this.acquireWriteLock();
-            try {
-                return delegate.removeIf(filter);
-            } finally {
-                this.unlockWriteLock();
-            }
+    @Override
+    public void acquireReadLock() {
+        super.acquireReadLock();
+    }
+
+    @Override
+    public void unlockReadLock() {
+        super.unlockReadLock();
+    }
+
+
+    @Override
+    public boolean removeIf(java.util.function.Predicate<? super T> filter) {
+        this.acquireWriteLock();
+        try {
+            return delegate.removeIf(filter);
+        } finally {
+            this.unlockWriteLock();
         }
+    }
 
-        @Override
-        public void forEach(Consumer<? super T> action) {
-            this.acquireReadLock();
-            try {
-                delegate.forEach(action);
-            } finally {
-                this.unlockReadLock();
-            }
+    @Override
+    public void forEach(Consumer<? super T> action) {
+        this.acquireReadLock();
+        try {
+            delegate.forEach(action);
+        } finally {
+            this.unlockReadLock();
         }
+    }
 
-        //adds isEmpty() test inside the lock
-        @Nullable
-        @Override public <V extends Comparable<? super V>> T maxBy(Function<? super T, ? extends V> function)
-        {
-            this.acquireReadLock();
-            try
-            {
-                MutableList<T> d = getDelegate();
-                return !d.isEmpty() ? d.maxBy(function) : null;
-            }
-            finally
-            {
-                this.unlockReadLock();
-            }
+    //adds isEmpty() test inside the lock
+    @Nullable
+    @Override
+    public <V extends Comparable<? super V>> T maxBy(Function<? super T, ? extends V> function) {
+        this.acquireReadLock();
+        try {
+            MutableList<T> d = getDelegate();
+            return !d.isEmpty() ? d.maxBy(function) : null;
+        } finally {
+            this.unlockReadLock();
         }
+    }
 
-        /**
-         * @deprecated Empty default constructor used for serialization.
-         */
+    /**
+     * @deprecated Empty default constructor used for serialization.
+     */
     @SuppressWarnings("UnusedDeclaration")
     @Deprecated
-    public MultiRWFasterList()
-        {
-            // For Externalizable use only
-        }
+    public MultiRWFasterList() {
+        // For Externalizable use only
+    }
 
-    private MultiRWFasterList(MutableList<T> newDelegate)
-        {
-            this(newDelegate, new ReentrantReadWriteLock());
-        }
+    private MultiRWFasterList(MutableList<T> newDelegate) {
+        this(newDelegate, new ReentrantReadWriteLock());
+    }
 
-    private MultiRWFasterList(MutableList<T> newDelegate, ReadWriteLock newLock)
-        {
-            this.lock = newLock;
-            this.delegate = newDelegate;
-        }
+    private MultiRWFasterList(MutableList<T> newDelegate, ReadWriteLock newLock) {
+        this.lock = newLock;
+        this.delegate = newDelegate;
+    }
 
-        public static <T> MultiRWFasterList<T> newList()
-        {
-            return new MultiRWFasterList<>(new FasterList());
-        }
+    public static <T> MultiRWFasterList<T> newList() {
+        return new MultiRWFasterList<>(new FasterList<>());
+    }
 
-        public static <T> MultiRWFasterList<T> newList(int capacity)
-        {
-            return new MultiRWFasterList<>(new FasterList(capacity));
-        }
+    public static <T> MultiRWFasterList<T> newList(int capacity) {
+        return new MultiRWFasterList<>(new FasterList<>(capacity));
+    }
 
 
-        @Override
-        protected MutableList<T> getDelegate()
-        {
-            return this.delegate;
-        }
+    @Override
+    protected MutableList<T> getDelegate() {
+        return this.delegate;
+    }
 
-        @Override
-        protected ReadWriteLock getLock()
-        {
-            return this.lock;
-        }
+    @Override
+    protected ReadWriteLock getLock() {
+        return this.lock;
+    }
 
-        UntouchableMutableList<T> asReadUntouchable()
-        {
-            return new UntouchableMutableList<>(this.delegate.asUnmodifiable());
-        }
+    UntouchableMutableList<T> asReadUntouchable() {
+        return new UntouchableMutableList<>(this.delegate.asUnmodifiable());
+    }
 
-        UntouchableMutableList<T> asWriteUntouchable()
-        {
-            return new UntouchableMutableList<>(this.delegate);
-        }
+    UntouchableMutableList<T> asWriteUntouchable() {
+        return new UntouchableMutableList<>(this.delegate);
+    }
 
     public void withReadLockAndDelegate(Procedure<MutableList<T>> procedure)
     {
@@ -1026,6 +1033,11 @@ public class MultiRWFasterList<T>  extends AbstractMultiReaderMutableCollection<
     {
         this.delegate = (MutableList<T>) in.readObject();
         this.lock = new ReentrantReadWriteLock();
+    }
+
+    /** direct access to delegate, use with caution */
+    public MutableList<T> internal() {
+        return delegate;
     }
 
     // Exposed for testing

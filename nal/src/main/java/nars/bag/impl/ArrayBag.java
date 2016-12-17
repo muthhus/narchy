@@ -878,7 +878,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
                 //result=0
                 return existing;
             } else {
-                if (size() >= capacity && minPri > pri) {
+                if (pri < minPri /* accept if pri == minPri  */) {
                     this.result = -1;
                     return null;
                 } else {

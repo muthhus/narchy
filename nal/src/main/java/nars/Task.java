@@ -318,12 +318,17 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
 
     /**
      * for question tasks: when an answer appears.
-     * return false if this question is finished and should be removed from a table containing it
+     * the answer will be deleted if it already exists in the system, this is how implementations can
+     * filter novel tasks from repeats.
+     *
+     * return the input task, or a modification of it to use a customized matched premise belief. or null to
+     * to cancel any matched premise belief.
      */
-    default void onAnswered(Task answer, NAR nar, boolean novel) {
-        if (isInput()) {
+    default Task onAnswered(Task answer, NAR nar) {
+        if (!answer.isDeleted() && isInput()) {
             nar.logger.info("Q&A:\t{}\n\t{}", this, answer);
         }
+        return answer;
     }
 
 

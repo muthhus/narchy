@@ -89,8 +89,7 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, Sorted
 
     public final Task match() {
         Object[] l = this.list;
-        if (l.length == 0) return null;
-        return (Task) l[0];
+        return (l.length == 0) ? null : (Task) l[0];
     }
 
     public final Task weakest() {
