@@ -19,29 +19,6 @@ import org.jetbrains.annotations.Nullable;
 public class AnswerTask extends MutableTask {
 
 
-    public static Task answer(@NotNull Task question, Budget bb, @NotNull Task answer, long when, long now, @NotNull Truth newTruth) {
-
-        Task solution = new AnswerTask(
-                answer,
-                answer,
-                question,
-                newTruth, now, when, 0.5f)
-                .log("Answer Projected")
-                .budget(bb)
-                //.state(state())
-                //.setEvidence(evidence())
-
-                //.log("Projected from " + this)
-                ;
-
-
-        ////TODO avoid adding repeat & equal Solution instances
-        //solution.log(new Solution(question));
-
-        return solution;
-    }
-
-
     @Nullable
     protected Task aBelief, bBelief;
 
@@ -51,8 +28,8 @@ public class AnswerTask extends MutableTask {
         time(creationTime, occTime);
     }
 
-    public AnswerTask(@NotNull Termed<Compound> term, @NotNull Task aBelief, @NotNull Task bBelief, Truth conclusion, long creationTime, long occTime, float aMix) {
-        this(term, aBelief.punc(), conclusion, creationTime, occTime, Stamp.zip(aBelief.evidence(), bBelief.evidence(), aMix));
+    public AnswerTask(@NotNull Termed<Compound> term, @NotNull Task aBelief, @NotNull Task bBelief, Truth conclusion, long creationTime, long occTime, float evidenceBalance) {
+        this(term, aBelief.punc(), conclusion, creationTime, occTime, Stamp.zip(aBelief.evidence(), bBelief.evidence(), evidenceBalance));
 
         this.aBelief = aBelief;
         this.bBelief = bBelief;

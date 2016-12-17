@@ -17,7 +17,7 @@ public interface Budgeted  {
     static float priSum(@NotNull Iterable<? extends Budgeted> c) {
         float totalPriority = 0;
         for (Budgeted i : c)
-            totalPriority += i.priActive(0);
+            totalPriority += i.priSafe(0);
         return totalPriority;
     }
 
@@ -75,7 +75,7 @@ public interface Budgeted  {
     float pri();
 
 
-    default float priActive(float valueIfInactive) {
+    default float priSafe(float valueIfInactive) {
         float p = pri();
         return p == p ? p : valueIfInactive;
     }

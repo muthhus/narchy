@@ -410,7 +410,7 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
 
     @Nullable
     @Override
-    public final Task match(long when, long now, @Nullable Task against) {
+    public final Task match(long when, @Deprecated long now, @Nullable Task against) {
 
 
         //if (against == null) {
@@ -432,7 +432,7 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
     @Nullable
     @Override
     public final Truth truth(long when, long now, @Nullable EternalTable eternal) {
-        Task topEternal = eternal.strongest();
+        Task topEternal = eternal.match();
 
         final Truth[] t = new Truth[1];
         list.withReadLockAndDelegate((l) -> {

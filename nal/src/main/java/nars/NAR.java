@@ -645,7 +645,7 @@ public abstract class NAR extends Param implements Level, Consumer<Task>, NARIn,
         try {
             input.normalize(this); //accept into input buffer for eventual processing
         } catch (@NotNull InvalidTaskException | InvalidTermException | Budget.BudgetException e) {
-            emotion.frustration(input.priActive(0));
+            emotion.frustration(input.priSafe(0));
             emotion.eror();
 
             input.delete();
@@ -728,7 +728,7 @@ public abstract class NAR extends Param implements Level, Consumer<Task>, NARIn,
 
         }
 
-        emotion.frustration(input.priActive(0));
+        emotion.frustration(input.priSafe(0));
 
         return null;
     }

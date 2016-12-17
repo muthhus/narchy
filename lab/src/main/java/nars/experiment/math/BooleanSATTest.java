@@ -121,7 +121,9 @@ public class BooleanSATTest {
         Task t = nar.ask(ss[0]);
         queries.put(t.term(), unknown);
         nar.onCycle(nn -> {
-            Truth current = t.concept(nn).beliefs().topEternalTruth(unknown);
+            Truth current = t.concept(nn).beliefs().matchEternal().truth();
+            if (current == null) current = unknown;
+
             Truth prev = queries.put(t.term(), current);
             if (!Objects.equals(current,prev))
                 updateScore();
@@ -134,7 +136,8 @@ public class BooleanSATTest {
         Task t = query(s);
 
         nar.onCycle(nn -> {
-            Truth tt = t.concept(nn).beliefs().topEternalTruth(unknown);
+            Truth tt = t.concept(nn).beliefs().matchEternal().truth();
+            if (tt == null) tt = unknown;
             if ((tt.isNegative() && actual) || (tt.isPositive() && !actual)) {
                 logger.error("Condition violated: " + t + " === " + actual);
                 //assert(false);

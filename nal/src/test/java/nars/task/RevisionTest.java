@@ -219,7 +219,7 @@ public class RevisionTest {
 
         Bag<Task> tasklinks = b.concept().tasklinks();
 
-        assertEquals(0.5f, b.beliefs().topEternalTruth(null).conf(), 0.01f);
+        assertEquals(0.5f, b.beliefs().matchEternal().truth().conf(), 0.01f);
 
         printTaskLinks(b);        System.out.println("--------");
 
@@ -244,7 +244,7 @@ public class RevisionTest {
         assertEquals(1.0f, beliefAfter2 = b.priSum(), 0.25f /* large delta to allow for forgetting */);
         assertEquals(linksBeforeRevisionLink, tasklinks.priSum(), 0.01f);
 
-        assertEquals(0.71f, b.beliefs().topEternalTruth(null).conf(), 0.06f); //the revised task on top
+        assertEquals(0.71f, b.beliefs().matchEternal().truth().conf(), 0.06f); //the revised task on top
 
         b.print();
 

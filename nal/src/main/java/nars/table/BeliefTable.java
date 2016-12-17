@@ -3,10 +3,12 @@ package nars.table;
 import nars.NAR;
 import nars.Task;
 import nars.budget.Budget;
+import nars.budget.BudgetFunctions;
 import nars.budget.Budgeted;
+import nars.budget.RawBudget;
 import nars.concept.CompoundConcept;
+import nars.concept.dynamic.DynamicBeliefTable;
 import nars.task.AnswerTask;
-import nars.task.MutableTask;
 import nars.truth.Truth;
 import nars.truth.TruthDelta;
 import nars.truth.TruthFunctions;
@@ -19,7 +21,9 @@ import java.util.Collections;
 import java.util.Iterator;
 
 import static java.util.stream.StreamSupport.stream;
+import static nars.time.Tense.ETERNAL;
 import static nars.util.UtilityFunctions.and;
+import static nars.util.UtilityFunctions.or;
 
 /**
  * A model storing, ranking, and projecting beliefs or goals (tasks with TruthValue).
@@ -45,6 +49,11 @@ public interface BeliefTable extends TaskTable {
         @Override
         public void capacity(int eternals, int temporals, NAR nar) {
 
+        }
+
+        @Override
+        public Task answer(long when, long now, @NotNull Task question, float minConf) {
+            return null;
         }
 
         @Override
@@ -119,45 +128,6 @@ public interface BeliefTable extends TaskTable {
         return rankEternalByConfAndOriginality(conf, TruthFunctions.originality(hypotheticalEvidenceLength));
     }
 
-//    /** returns value <= 1f */
-//    static float relevance(@NotNull Task t, long time, float ageFactor) {
-//        return relevance(t.occurrence(), time, ageFactor);
-//    }
-
-//    default Task top(Task query, long now) {
-//
-//        switch (size()) {
-//            case 0: return null;
-//            case 1: return top();
-//            default:
-//                //TODO re-use the Ranker
-//                return top(new SolutionQualityMatchingOrderRanker(query, now));
-//        }
-//
-//    }
-
-//    /** temporal relevance; returns a value <= 1.0f; */
-//    static float relevance(long from, long to, float ageFactor) {
-//        //assert(from!=Tense.ETERNAL);
-//        /*if (from == Tense.ETERNAL)
-//            return Float.NaN;*/
-//
-//        return relevance(Math.abs(from - to), ageFactor);
-//    }
-
-    //    @NotNull
-//    static Task stronger(@NotNull Task a, @NotNull Task b) {
-//        return a.conf() > b.conf() ? a : b;
-//    }
-
-//    static float rankTemporalByConfidenceAndOriginality(@NotNull Task t, long when, long now, float bestSoFar) {
-//        return rankTemporalByConfidence(t, when, now, bestSoFar) * t.originality();
-//    }
-
-    //    static float rankTemporalByOriginality(@NotNull Task b, long when) {
-//        return BeliefTable.rankEternalByOriginality(b) *
-//                BeliefTable.relevance(b, when, 1);
-//    }
 
     /**
      * attempt to insert a task; returns what was input or null if nothing changed (rejected)
@@ -167,92 +137,21 @@ public interface BeliefTable extends TaskTable {
     @Nullable TruthDelta add(@NotNull Task input, @NotNull QuestionTable questions, CompoundConcept<?> concept, @NotNull NAR nar);
 
 
-//    @Nullable
-//    default Task top(@NotNull NAR nar) {
-//        return top(nar.time());
-//    }
+    @Nullable Task match(long when, long now, @Nullable Task against, boolean noOverlap);
 
-    @Nullable
-    default Task match(long now) {
+    @Nullable default Task match(long now) {
         return match(now, now);
     }
 
-    @Nullable
-    default Task match(long when, long now) {
+    @Nullable default Task match(long when, long now) {
         return match(when, now, null, true);
     }
 
-    Task match(long when, long now, @Nullable Task against, boolean noOverlap);
-
-
-    /**
-     * get the top-ranking eternal belief/goal; null if no eternal beliefs known
-     */
-    @Deprecated @Nullable Task matchEternal();
+    @Nullable default Task matchEternal() {  return match(ETERNAL, ETERNAL, null, false);    }
 
 
 
 
-
-
-    /* when does projecting to now not play a role? I guess there is no case,
-    //wo we use just one ranker anymore, the normal solution ranker which takes
-    //occurence time, originality and confidence into account,
-    //and in case of question var, the truth expectation and complexity instead of confidence
-    Ranker BeliefConfidenceOrOriginality = (belief, bestToBeat) -> {
-        final float confidence = belief.getTruth().getConfidence();
-        final float originality = belief.getOriginality();
-        return or(confidence, originality);
-    };*/
-
-
-//    /** computes the truth/desire as an aggregate of projections of all
-//     * beliefs to current time
-//     */
-//    default float getMeanProjectedExpectation(long time, int dur) {
-//        int size = size();
-//        if (size == 0) return 0;
-//
-//        float[] d = {0};
-//        forEach(t -> d[0] +=
-//                relevance(t, time, dur) //projectionQuality(t.freq(), t.conf(), t, time, time, false)
-//                * t.expectation());
-//
-//        float dd = d[0];
-//
-//        if (dd == 0) return 0;
-//
-//        return dd / size;
-//
-//    }
-
-    @Nullable
-    default Truth topEternalTruth(@Nullable Truth ifNone) {
-        Task t = matchEternal();
-        return t == null ? ifNone : t.truth();
-    }
-
-
-//    static float projectionQuality(float freq, float conf, @NotNull Task t, long targetTime, long currentTime, boolean problemHasQueryVar) {
-////        float freq = getFrequency();
-////        float conf = getConfidence();
-//
-//        long taskOcc = t.occurrence();
-//
-//        if (!Tense.isEternal(taskOcc) && (targetTime != taskOcc)) {
-//            conf = TruthFunctions.eternalize(conf);
-//            if (targetTime != Tense.ETERNAL) {
-//                float factor = TruthFunctions.temporalProjection(taskOcc, targetTime, currentTime);
-//                float projectedConfidence = factor * t.conf();
-//                if (projectedConfidence > conf) {
-//                    conf = projectedConfidence;
-//                }
-//            }
-//        }
-//
-//        return problemHasQueryVar ? Truth.expectation(freq, conf) / t.term().complexity() : conf;
-//
-//    }
 
     default void print(@NotNull PrintStream out) {
         this.forEach(t -> out.println(t + " " + Arrays.toString(t.evidence()) + ' ' + t.log()));
@@ -262,46 +161,16 @@ public interface BeliefTable extends TaskTable {
         print(System.out);
     }
 
-//    /** simple metric that guages the level of inconsistency (ex: variance) aggregated by contained belief states.
-//     *  returns 0 if no tasks exist */
-//    default float coherence() {
-//        //TODO
-//        return 0;
-//    }
+    /** simple metric that guages the level of inconsistency (ex: variance) aggregated by contained belief states.
+     *  returns 0 if no tasks exist */
+    default float coherence() {
+        throw new UnsupportedOperationException("TODO");
+    }
 
     default float priSum() {
         return (float) stream(spliterator(), false)
                 .mapToDouble(Budgeted::pri).sum();
     }
-
-//    /**
-//     * get a random belief, weighted by their sentences confidences
-//     */
-//    @Nullable
-//    default Task randomByConf(boolean eternal, @NotNull Random rng) {
-//
-//        if (isEmpty()) return null;
-//
-//        float totalConfidence = confSum();
-//        float r = rng.nextFloat() * totalConfidence;
-//
-//
-//        for (Task x : this) {
-//            r -= x.truth().conf();
-//            if (r < 0)
-//                return x;
-//        }
-//
-//        return null;
-//    }
-
-
-//    default float confMax() {
-//        return confMax(0f, 1f);
-//    }
-//
-//    float confMax(float minFreq, float maxFreq);
-
 
     /**
      * estimates the current truth value from the top task, projected to the specified 'when' time;
@@ -310,42 +179,8 @@ public interface BeliefTable extends TaskTable {
     @Nullable Truth truth(long when, long now);
 
 
-    @Nullable
-    default Truth truth(long when) {
-        return truth(when, when);
-    }
+    @Nullable default Truth truth(long when) {   return truth(when, when);    }
 
-//    /**
-//     * finds the strongest matching belief for the given term (and its possible 'dt' value) and the given occurrence time.
-//     * <p>
-//     * TODO consider similarity of any of term's recursive 'dt' temporality in ranking
-//     */
-//    @Nullable
-//    default Task match(@NotNull Task target, long now) {
-//
-//        int size = size();
-//        if (size == 0)
-//            return null;
-//
-//
-//        long occ = target.occurrence();
-//        return top(occ, now, target);
-//
-////        do {
-////
-////            Task belief = top( occ );
-////
-////            if (belief == null) {
-////                return null;
-////            } else if (belief.isDeleted()) {
-////                remove(belief);
-////            } else {
-////                return belief;
-////            }
-////
-////        } while (size-- > 0);
-////        return null;
-//    }
 
     default float expectation(long when) {
         Truth t = truth(when);
@@ -357,15 +192,12 @@ public interface BeliefTable extends TaskTable {
         return t != null ? t.motivation() : 0;
     }
 
-    /**
-     * returns 0.5 if no truth can be determined
-     */
     default float freq(long when) {
         Truth t = truth(when);
-        return t != null ? t.freq() : 0.5f;
+        return t != null ? t.freq() : Float.NaN;
     }
 
-    /** empties the table, carefully allownig the NAR to also remove the tasks forgotten here */
+    /** empties the table, an unindexes them in the NAR */
     void clear(NAR nar);
 
     default float eviSum(long now) {
@@ -381,28 +213,46 @@ public interface BeliefTable extends TaskTable {
         return eSum[0];
     }
 
-    default Task answer(long when, long now, @NotNull Task question, boolean noOverlap, float minConf) {
+    default Task answer(long when, long now, @NotNull Task question, float minConf) {
 
-        @NotNull Budget qBudget = question.budget().clone();
+        Budget qBudget = question.budget();
 
-        if (qBudget.isDeleted()) return null;
+        Task answer;
+        if (this instanceof DynamicBeliefTable) {
+            answer = ((DynamicBeliefTable) this).generate(question.term(), when);
+            if (answer == null)
+                return null;
 
-        Task answer = match(when, now, question, noOverlap);
-        if (answer!=null) {
-            if (answer.occurrence()==when) {
-                return answer;
-            } else {
+        } else {
+            answer = match(when, now, question, false);
+            if (answer == null)
+                return null;
 
-                Truth truth = answer.truth(when);
-                if (truth == null || truth.conf() < minConf)
+            //require EXACT term, in case of differing dt structure
+            if (!answer.term().equals(question.term()))
+                return null;
+
+            //project if different occurrence
+            if (answer.occurrence() != when) {
+                Truth aProj = answer.truth(when, minConf);
+                if (aProj == null)
                     return null;
 
-                Task answerProj = AnswerTask.answer(question, qBudget, answer, when, now, truth);
-
-                return answerProj;
+                answer = new AnswerTask(
+                        answer,
+                        answer,
+                        question,
+                        aProj, now, when, 0.5f)
+                            .log("Answer Projected")
+                            .budget(answer.budget());
             }
+
         }
-        return null;
+
+        //transfer budget from question to answer
+        BudgetFunctions.transferPri(qBudget, answer.budget(), answer.conf());
+
+        return answer;
     }
 
 //    /** 2-element array containing running min/max range accumulator */
@@ -610,3 +460,96 @@ public interface BeliefTable extends TaskTable {
 //        return t.sentence;
 //    }
 }
+//    /** returns value <= 1f */
+//    static float relevance(@NotNull Task t, long time, float ageFactor) {
+//        return relevance(t.occurrence(), time, ageFactor);
+//    }
+
+//    default Task top(Task query, long now) {
+//
+//        switch (size()) {
+//            case 0: return null;
+//            case 1: return top();
+//            default:
+//                //TODO re-use the Ranker
+//                return top(new SolutionQualityMatchingOrderRanker(query, now));
+//        }
+//
+//    }
+
+//    /** temporal relevance; returns a value <= 1.0f; */
+//    static float relevance(long from, long to, float ageFactor) {
+//        //assert(from!=Tense.ETERNAL);
+//        /*if (from == Tense.ETERNAL)
+//            return Float.NaN;*/
+//
+//        return relevance(Math.abs(from - to), ageFactor);
+//    }
+
+//    @NotNull
+//    static Task stronger(@NotNull Task a, @NotNull Task b) {
+//        return a.conf() > b.conf() ? a : b;
+//    }
+
+//    static float rankTemporalByConfidenceAndOriginality(@NotNull Task t, long when, long now, float bestSoFar) {
+//        return rankTemporalByConfidence(t, when, now, bestSoFar) * t.originality();
+//    }
+
+//    static float rankTemporalByOriginality(@NotNull Task b, long when) {
+//        return BeliefTable.rankEternalByOriginality(b) *
+//                BeliefTable.relevance(b, when, 1);
+//    }
+
+
+
+    /* when does projecting to now not play a role? I guess there is no case,
+    //wo we use just one ranker anymore, the normal solution ranker which takes
+    //occurence time, originality and confidence into account,
+    //and in case of question var, the truth expectation and complexity instead of confidence
+    Ranker BeliefConfidenceOrOriginality = (belief, bestToBeat) -> {
+        final float confidence = belief.getTruth().getConfidence();
+        final float originality = belief.getOriginality();
+        return or(confidence, originality);
+    };*/
+
+
+//    /** computes the truth/desire as an aggregate of projections of all
+//     * beliefs to current time
+//     */
+//    default float getMeanProjectedExpectation(long time, int dur) {
+//        int size = size();
+//        if (size == 0) return 0;
+//
+//        float[] d = {0};
+//        forEach(t -> d[0] +=
+//                relevance(t, time, dur) //projectionQuality(t.freq(), t.conf(), t, time, time, false)
+//                * t.expectation());
+//
+//        float dd = d[0];
+//
+//        if (dd == 0) return 0;
+//
+//        return dd / size;
+//
+//    }
+//    static float projectionQuality(float freq, float conf, @NotNull Task t, long targetTime, long currentTime, boolean problemHasQueryVar) {
+////        float freq = getFrequency();
+////        float conf = getConfidence();
+//
+//        long taskOcc = t.occurrence();
+//
+//        if (!Tense.isEternal(taskOcc) && (targetTime != taskOcc)) {
+//            conf = TruthFunctions.eternalize(conf);
+//            if (targetTime != Tense.ETERNAL) {
+//                float factor = TruthFunctions.temporalProjection(taskOcc, targetTime, currentTime);
+//                float projectedConfidence = factor * t.conf();
+//                if (projectedConfidence > conf) {
+//                    conf = projectedConfidence;
+//                }
+//            }
+//        }
+//
+//        return problemHasQueryVar ? Truth.expectation(freq, conf) / t.term().complexity() : conf;
+//
+//    }
+

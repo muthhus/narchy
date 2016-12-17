@@ -75,15 +75,6 @@ public class RevisionTask extends AnswerTask  {
 //
 
 
-    @Override
-    public boolean delete() {
-        if (super.delete()) {
-            unlink();
-            return true;
-        }
-        return false;
-    }
-
 
     /** According to the relative improvement in truth quality of the revision, de-prioritize the premise tasks and associated links */
     @Override

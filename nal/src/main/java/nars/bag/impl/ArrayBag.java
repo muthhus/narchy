@@ -306,7 +306,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
      * essentially the same as b.priIfFiniteElseNeg1 except it also includes a null test. otherwise they are interchangeable
      */
     static float pCmp(@Nullable Budgeted b) {
-        return (b == null) ? -1f : b.priActive(-1);
+        return (b == null) ? -1f : b.priSafe(-1);
 
 //        float p = b.pri();
 //        return p == p ? p : -1f;
@@ -332,7 +332,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
     public final BLink<V> put(@NotNull V key, @NotNull Budgeted b, float scale, @Nullable MutableFloat overflow) {
 
 
-        float bp = b.priActive(-1) * scale;
+        float bp = b.priSafe(-1) * scale;
         if (bp < 0) { //already deleted
             return null;
         }
@@ -520,7 +520,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
             for (int i = 0; i < iii; i++) {
                 BLink x = get(i);
                 if (x != null)
-                    mass += x.priActive(0);
+                    mass += x.priSafe(0);
             }
         }
         return mass;
@@ -596,7 +596,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
             BLink<V> b = l[i];
 
             float bCmp;
-            bCmp = b != null ? b.priActive(-1) : -2; //sort nulls to the end of the end
+            bCmp = b != null ? b.priSafe(-1) : -2; //sort nulls to the end of the end
 
             if (bCmp > 0) {
                 if (each != null)
@@ -649,7 +649,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
 
     private final void updateRange() {
         int s = size();
-        this.minPri = (s > 0 && s >= capacity()) ? get(s - 1).priActive(-1) : -1;
+        this.minPri = (s > 0 && s >= capacity()) ? get(s - 1).priSafe(-1) : -1;
     }
 
 

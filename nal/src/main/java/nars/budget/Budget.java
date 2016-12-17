@@ -106,7 +106,7 @@ public interface Budget extends Budgeted {
     }
 
     default void priAdd(float toAdd) {
-        setPriority(priActive(0) + toAdd);
+        setPriority(priSafe(0) + toAdd);
     }
     default void priSub(float toSubtract) {
         priAdd(-toSubtract);
@@ -121,7 +121,7 @@ public interface Budget extends Budgeted {
 
     default void absorb(@Nullable MutableFloat overflow) {
         if (overflow!=null) {
-            float taken = Math.min(overflow.floatValue(), 1f - priActive(0));
+            float taken = Math.min(overflow.floatValue(), 1f - priSafe(0));
             if (taken > Param.BUDGET_EPSILON) {
                 overflow.subtract(taken);
                 priAdd(taken);
@@ -216,7 +216,7 @@ public interface Budget extends Budgeted {
 
     default boolean equals(Budgeted b, float epsilon) {
         return
-                Util.equals(priActive(-1), b.priActive(-1), epsilon) &&
+                Util.equals(priSafe(-1), b.priSafe(-1), epsilon) &&
                 Util.equals(qua(), qua(), epsilon);
 
     }

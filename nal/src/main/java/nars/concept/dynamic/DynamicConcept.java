@@ -10,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
 public class DynamicConcept extends CompoundConcept {
 
     @NotNull
-    @Deprecated public final NAR nar;
+    @Deprecated final NAR nar;
 
     public DynamicConcept(@NotNull Compound term, DynamicTruthModel beliefModel, DynamicTruthModel goalModel, @NotNull Bag termLinks, @NotNull Bag taskLinks, @NotNull NAR nar) {
         super(term, termLinks, taskLinks, nar);

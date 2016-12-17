@@ -721,20 +721,20 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
     }
 
 
-    @Nullable default Truth truth(long when) {
+    @Nullable default Truth truth(long when, float minConf) {
         float cw = confWeight(when);
         if (cw==cw && cw > 0) {
 
-            return $.t(freq(),
-                    //Math.max(
-                    w2c(cw)
-                    //    t.eternalizedConf()
-                    //)
-            );
-        } else {
-            return null;
+            float conf = w2c(cw);
+            if (conf > minConf) {
+                return $.t(freq(), conf);
+            }
         }
+        return null;
+    }
 
+    @Nullable default Truth truth(long when) {
+        return truth(when, Param.TRUTH_EPSILON);
     }
 
     /**

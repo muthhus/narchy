@@ -47,13 +47,18 @@ public class DynamicBeliefTable extends DefaultBeliefTable {
 
     @Nullable
     public DynamicBeliefTask generate(@NotNull Compound template, long when) {
-        return generate(template, when, null);
+        return generate(template, when, dynamicConcept.nar.time(), null);
     }
 
     @Nullable
-    public DynamicBeliefTask generate(@NotNull Compound template, long when, @Nullable Budget b) {
+    public DynamicBeliefTask generate(@NotNull Compound template, long when, long now) {
+        return generate(template, when, now, null);
+    }
+
+    @Nullable
+    public DynamicBeliefTask generate(@NotNull Compound template, long when, long now, @Nullable Budget b) {
         DynTruth yy = truth(when, template, true);
-        return yy != null ? yy.task(template, beliefOrGoal, dynamicConcept.nar.time(), when, b) : null;
+        return yy != null ? yy.task(template, beliefOrGoal, now, when, b) : null;
     }
 
     @Override
@@ -64,7 +69,7 @@ public class DynamicBeliefTable extends DefaultBeliefTable {
     }
 
     @Nullable
-    protected DynTruth dyntruth(long when, long now, boolean evidence) {
+    DynTruth dyntruth(long when, long now, boolean evidence) {
         return truth(when, now, dynamicConcept.term(), evidence);
     }
 

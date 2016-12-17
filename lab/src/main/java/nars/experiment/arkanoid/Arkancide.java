@@ -40,18 +40,18 @@ public class Arkancide extends NAgents {
         float resX = Math.max(0.01f, 1f/visW); //dont need more resolution than 1/pixel_width
         float resY = Math.max(0.01f, 1f/visH); //dont need more resolution than 1/pixel_width
 
-        senseNumberBi("x(noid,paddle)", new FloatNormalized(()->noid.paddle.x)).resolution(resX);
-        senseNumberBi("x(noid,ball)", new FloatNormalized(()->noid.ball.x)).resolution(resX);
-        senseNumberBi("y(noid,ball)", new FloatNormalized(()->noid.ball.y)).resolution(resY);
-        senseNumberBi("vx(noid,ball)", new FloatNormalized(()->noid.ball.velocityX));
-        senseNumberBi("vy(noid,ball)", new FloatNormalized(()->noid.ball.velocityY));
+        senseNumberBi( "x(paddle)", new FloatNormalized(()->noid.paddle.x)).resolution(resX);
+        senseNumberBi( "x(ball)", new FloatNormalized(()->noid.ball.x)).resolution(resX);
+        senseNumberBi( "y(ball)", new FloatNormalized(()->noid.ball.y)).resolution(resY);
+        senseNumberBi("vx(ball)", new FloatNormalized(()->noid.ball.velocityX));
+        senseNumberBi("vy(ball)", new FloatNormalized(()->noid.ball.velocityY));
 
-        addCamera("cam(noid)", noid, visW, visH);
+        addCamera("cam", noid, visW, visH);
         //addCameraRetina("zoom(cam(noid))", noid, visW/2, visH/2, (v) -> $.t(v, alpha));
 
 
         ActionConcept a = new ActionConcept(
-                "dx(noid,paddle)"
+                "dx(paddle)"
                 , nar, (b, d) -> {
 
             float pct;

@@ -178,7 +178,7 @@ public class ConceptBagCycle {
     public float priority(@NotNull Termed concept, float valueIfInactive) {
         BLink c = active.get(concept);
         if (c == null) return valueIfInactive;
-        float p = c.priActive(valueIfInactive);
+        float p = c.priSafe(valueIfInactive);
 
         return c != null ? c.pri() : Float.NaN;
     }

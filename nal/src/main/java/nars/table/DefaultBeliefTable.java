@@ -40,15 +40,9 @@ public class DefaultBeliefTable implements BeliefTable {
     @Override
     public Truth truth(long when, long now) {
 
-        final Truth tt;
+        Truth tt = temporal.truth(when, now, eternal);
 
-        tt = temporal.truth(when, now, eternal);
-
-        if (tt != null) {
-            return tt;
-        } else {
-            return eternal.truth();
-        }
+        return (tt != null) ? tt : eternal.truth();
 
     }
 
@@ -79,7 +73,7 @@ public class DefaultBeliefTable implements BeliefTable {
     @Override
     public float priSum() {
         final float[] total = {0};
-        Consumer<Task> totaler = t -> total[0] += t.priActive(0);
+        Consumer<Task> totaler = t -> total[0] += t.priSafe(0);
         eternal.forEach(totaler);
         temporal.forEach(totaler);
         return total[0];
@@ -97,7 +91,8 @@ public class DefaultBeliefTable implements BeliefTable {
 
     @Override
     public int capacity() {
-        return eternal.capacity() + temporal.capacity();
+        throw new UnsupportedOperationException("doesnt make sense to call this");
+        //return eternal.capacity() + temporal.capacity();
     }
 
     @Override
@@ -149,11 +144,6 @@ public class DefaultBeliefTable implements BeliefTable {
 //    }
 
 
-    @Nullable
-    @Override
-    public final Task matchEternal() {
-        return eternal.strongest();
-    }
 
 
     /**
@@ -162,25 +152,30 @@ public class DefaultBeliefTable implements BeliefTable {
     @Nullable
     public Task match(long when, long now, @Nullable Task against, boolean noOverlap) {
 
-        final Task ete = matchEternal();
+        final Task ete = eternal.match();
         if (when == ETERNAL) {
             if (ete != null) {
                 return ete;
             }
         }
 
-        Task tmp = temporal.match(when, now, against);
+        if (now!=ETERNAL) {
 
-        if (tmp == null) {
-            return ete;
-        } else {
-            if (ete == null) {
-                return tmp;
+            Task tmp = temporal.match(when, now, against);
+
+            if (tmp == null) {
+                return ete;
             } else {
-                return (ete.confWeight(when) > tmp.confWeight(when)) ?
-                        ete : tmp;
+                if (ete == null) {
+                    return tmp;
+                } else {
+                    return (ete.confWeight(when) > tmp.confWeight(when)) ?
+                            ete : tmp;
+                }
             }
         }
+
+        return null;
 
     }
 
