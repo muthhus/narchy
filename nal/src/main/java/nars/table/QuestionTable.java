@@ -27,8 +27,8 @@ public interface QuestionTable extends TaskTable {
 
 
 
-    /** called when a new answer appears */
-    void answer(@NotNull Task result, Concept answerConcept, @NotNull NAR nar, @NotNull List<Task> displ);
+//    /** called when a new answer appears */
+//    void answer(@NotNull Task result, Concept answerConcept, @NotNull NAR nar, @NotNull List<Task> displ);
 
 //    {
 //        for (Task a : this) {
@@ -72,11 +72,6 @@ public interface QuestionTable extends TaskTable {
         }
 
 
-
-        @Override
-        public void answer(Task result, Concept answerConcept, NAR nar, List<Task> displ) {
-
-        }
     };
 
     default float priSum() {

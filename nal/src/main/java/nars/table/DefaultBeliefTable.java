@@ -90,9 +90,9 @@ public class DefaultBeliefTable implements BeliefTable {
     }
 
     @Override
-    public int capacity() {
-        throw new UnsupportedOperationException("doesnt make sense to call this");
-        //return eternal.capacity() + temporal.capacity();
+    @Deprecated public int capacity() {
+        //throw new UnsupportedOperationException("doesnt make sense to call this");
+        return eternal.capacity() + temporal.capacity();
     }
 
     @Override

@@ -6,7 +6,6 @@ import com.google.common.collect.Lists;
 import jcog.Util;
 import jcog.data.FloatParam;
 import jcog.list.FasterList;
-import jcog.math.FirstOrderDifferenceFloat;
 import jcog.math.FloatNormalized;
 import jcog.math.FloatPolarNormalized;
 import nars.concept.ActionConcept;
@@ -751,7 +750,7 @@ abstract public class NAgent implements NSense, NAction {
         }
 
         @Override
-        public void onAnswered(Task answer, NAR nar) {
+        public void onAnswered(Task answer, NAR nar, boolean novel) {
             long lag = answer.creation() - creation();
             nar.logger.info("Prediction:\t{}\n\t{}\tlag={}", this, answer, lag);
         }

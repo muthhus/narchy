@@ -1077,8 +1077,8 @@ public abstract class NAR extends Param implements Level, Consumer<Task>, NARIn,
         @NotNull MutableTask t;
         inputLater(t = new MutableTask(term, punc, null) {
             @Override
-            public void onAnswered(Task answer, NAR nar) {
-                super.onAnswered(answer, nar);
+            public void onAnswered(Task answer, NAR nar, boolean novel) {
+                super.onAnswered(answer, nar, novel);
                 eachAnswer.test(answer);
             }
         }.occurr(occ));

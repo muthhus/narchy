@@ -125,9 +125,15 @@ public final class Premise extends RawBudget implements Tasked {
                 if (!table.isEmpty() && unifiable(task.term(), (Compound)beliefTerm, nar)) {
 
                     Task answered = table.answer(when, now, task, nar.confMin.floatValue());
-                    if (answered!=null && nar.input(answered)!=null) {
-                        task.onAnswered(answered, nar);
-                        belief = answered;
+                    if (answered!=null) {
+
+                        boolean novel = nar.input(answered)!=null;
+
+                        task.onAnswered(answered, nar, novel);
+
+                        if (answered.punc()==Symbols.BELIEF)
+                            belief = answered;
+
                         taskBudget = task.budget().clone(); //update the task budget, since the question may have been deprioritized as a result of the answer
                     }
 

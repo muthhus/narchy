@@ -11,6 +11,8 @@ import org.junit.runners.Parameterized;
 
 import java.util.function.Supplier;
 
+import static nars.time.Tense.ETERNAL;
+
 /**
  *   <neutralization --> (acid,base)>" //en("Neutralization is a relation between an acid and a base. ");
  //     <(\,neutralization,_,base) --> acid> //en("Something that can neutralize a base is an acid.");
@@ -138,21 +140,21 @@ public class NAL4Test extends AbstractNALTest {
 
     }
 
-    @Ignore @Test
+    @Test
     public void composition_on_both_sides_of_a_statement()  {
         TestNAR tester = test();
         tester.believe("<bird --> animal>",1.0f,0.9f); //en("Bird is a type of animal.");
         tester.askAt(CYCLES/2, "<(bird,plant) --> ?x>"); //en("What is the relation between a bird and a plant?");
         tester.mustBelieve(CYCLES, "<(bird,plant) --> (animal,plant)>", 1.0f, 0.81f); //en("The relation between bird and plant is a type of relation between animal and plant.");
     }
-    @Ignore @Test
+    @Test
     public void composition_on_both_sides_of_a_statement_question_simultaneous()  {
         TestNAR tester = test();
         tester.believe("<bird --> animal>",1.0f,0.9f); //en("Bird is a type of animal.");
         tester.ask("<(bird,plant) --> ?x>"); //en("What is the relation between a bird and a plant?");
         tester.mustBelieve(CYCLES*2, "<(bird,plant) --> (animal,plant)>", 1.0f, 0.81f); //en("The relation between bird and plant is a type of relation between animal and plant.");
     }
-    @Ignore @Test
+    @Test
     public void composition_on_both_sides_of_a_statement_2()  {
         TestNAR tester = test();
         tester.believe("<bird --> animal>",1.0f,0.9f); //en("Bird is a type of animal.");
@@ -248,9 +250,23 @@ public class NAL4Test extends AbstractNALTest {
     }
 
 
+    @Test public void testQuestionDeductionLoopPrevention() {
+        // neq(X,(A..+)) condition on the nal4 rule prevents this:
+        /*
+        $0.0;.39$ ((x,z)-->?1). :12: %1.0;.81% {12: 1;2} ((((%1073742337..+)-->%2),(%3-->%4),task("?")),(((%1073742337..+)-->substitute((%1073742337..+),%3,%4)),((BeliefStructuralDeduction-->Belief),(Belief-->Punctuation))))
+            $0.0;.50$ ((x,z)-->?1)? :10: {10: 2} Narsese
+            $0.0;.40$ ((x,z)-->?1). :12: %1.0;.90% {12: 1} Dynamic
+            */
 
-    @Ignore
-    @Test public void testRecursionForce1() {
+        test()
+                .log()
+                .believe("((x,z)-->?1)")
+                .ask( "((x,z)-->?1)")
+                .mustNotOutput(CYCLES*10, "((x,z)-->?1)", '.', 0f, 1f, 0, 0.81f, ETERNAL);
+
+    }
+
+    @Ignore @Test public void testRecursionForce1() {
         //    ((X,Z) --> Y), X |- ((X,Z)-->((/,Y,_,Z),Z)), (Belief:StructuralDeduction, Desire:StructuralDeduction)
         TestNAR t = test();
 
@@ -258,7 +274,7 @@ public class NAL4Test extends AbstractNALTest {
             //.log()
         t   .believe("(x-->(/,y,_,z))")
             .askAt(10, "((x,z)-->?a)")
-            .mustBelieve(750, "((x,z)-->((/,y,_,z),z))", 1f, 0.81f);
+            .mustBelieve(1750, "((x,z)-->((/,y,_,z),z))", 1f, 0.81f);
             //.mustBelieve(750, "((x,z)-->(x,(/,y,x,_)))", 1f, 0.81f);
 
     }
