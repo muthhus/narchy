@@ -2,6 +2,7 @@ package nars.nal;
 
 import com.github.benmanes.caffeine.cache.AsyncLoadingCache;
 import com.github.benmanes.caffeine.cache.Caffeine;
+import com.google.common.collect.Lists;
 import nars.nal.derive.TrieDeriver;
 import nars.nal.meta.Derivation;
 import nars.nal.rule.PremiseRuleSet;
@@ -10,7 +11,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.function.Consumer;
+
+import static java.util.stream.Collectors.toList;
 
 /**
  * Implements a strategy for managing submitted derivation processes
@@ -39,6 +43,10 @@ public interface Deriver extends Consumer<Derivation> {
     @NotNull
     static Deriver get(String path) {
         return derivers.synchronous().get(path);
+    }
+    @NotNull
+    static List<Deriver> get(String... paths) {
+        return Lists.newArrayList(paths).stream().map(path -> derivers.synchronous().get(path)).collect(toList());
     }
 
 

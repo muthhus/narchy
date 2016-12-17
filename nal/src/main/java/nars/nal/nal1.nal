@@ -1,0 +1,46 @@
+//The rules of NAL, can be interpreted by considering the intiution behind the following two relations:
+// Statement:                 (A --> B):               A can stand for B
+// Statement about Statement: (A --> B) ==> (X --> Y): If A is true, so is/will be B
+// --> is a relation in meaning of terms, while ==> is a relation of truth between statements.
+
+
+
+
+
+//// inheritance-based syllogism ////////////////////////////////////////////////////////////////////////////////////
+//       (A --> B) ------- (B --> C)
+//            \               /
+//             \             /
+//              \           /
+//               \         /
+//                (A --> C)
+//If A is a special case of B, and B is a special case of C, so is A a special case of C (strong), the other variations are hypotheses (weak)
+
+    (A --> B), (B --> C), neqCom(A,C) |- (A --> C), (Belief:Deduction, Goal:Strong, Permute:Backward)
+    (A --> B), (A --> C), neqCom(B,C) |- (C --> B), (Belief:Abduction, Goal:Weak, Permute:Backward)
+    (A --> C), (B --> C), neqCom(A,B) |- (A --> B), (Belief:Induction, Goal:Weak, Permute:Backward)
+    (A --> B), (B --> C), neqCom(A,C) |- (C --> A), (Belief:Exemplification, Goal:Weak, Permute:Backward)
+
+//// similarity from inheritance ////////////////////////////////////////////////////////////////////////////////////
+//If S is a special case of P, and P is a special case of S, then S and P are similar
+
+    (S --> P), (P --> S), neqCom(S,P) |- (S <-> P), (Belief:Intersection, Goal:Strong)
+
+//// inheritance from similarty <- todo check why this one was missing ////////////////////////////////////////////////////////////////////////////////////
+
+    (S <-> P), (P --> S), neqCom(S,P) |- (S --> P), (Belief:ReduceConjunction, Goal:Strong)
+
+//// similarity-based syllogism ////////////////////////////////////////////////////////////////////////////////////
+//If P and S are a special case of M, then they might be similar (weak),
+//also if P and S are a general case of M
+
+    (P --> M), (S --> M), neqCom(S,P) |- (P <-> S), (Belief:Comparison, Goal:Weak)
+    (M --> P), (M --> S), neqCom(S,P) |- (P <-> S), (Belief:Comparison, Goal:Weak)
+
+//If M is a special case of P and S and M are similar, then S is also a special case of P (strong)
+
+    (M --> P), (S <-> M), neqCom(S,P) |- (S --> P), (Belief:Analogy, Goal:Strong)
+    (P --> M), (S <-> M), neqCom(S,P) |- (P --> S), (Belief:Analogy, Goal:Strong)
+    (M <-> P), (S <-> M), neqCom(S,P) |- (S <-> P), (Belief:Resemblance, Goal:Strong)
+
+

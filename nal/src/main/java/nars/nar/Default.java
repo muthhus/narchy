@@ -1,5 +1,6 @@
 package nars.nar;
 
+import com.google.common.collect.Lists;
 import jcog.data.random.XorShift128PlusRandom;
 import nars.$;
 import nars.NAR;
@@ -108,12 +109,15 @@ public class Default extends NAR {
     }
 
     public static Deriver newDefaultDeriver() {
-        List<Deriver> modules = $.newArrayList();
-        modules.add(Deriver.get( "nal.nal"));
-        modules.add(Deriver.get("nal2.nal"));
-        modules.add(Deriver.get("nal3.nal"));
-        modules.add(Deriver.get("nal4.nal"));
-
+        List<Deriver> modules = Deriver.get(
+            "nal1.nal",
+            "nal2.nal",
+            "nal3.nal",
+            "nal4.nal",
+            "nal6.nal",
+            "induction.nal",
+            "nal.nal" //DEPRECATED
+        );
 
         return (x) -> modules.forEach(e -> e.accept(x));
     }
