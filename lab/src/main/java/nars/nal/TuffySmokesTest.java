@@ -3,7 +3,9 @@ package nars.nal;
 import nars.NAR;
 import nars.concept.Concept;
 import nars.nar.Default;
+import nars.task.LambdaQuestionTask;
 
+import static nars.$.$;
 import static nars.time.Tense.ETERNAL;
 
 /**
@@ -11,9 +13,11 @@ import static nars.time.Tense.ETERNAL;
  */
 public class TuffySmokesTest {
 
-    static void question(NAR n) {
+    static NAR n;
+
+    static void print() {
         for (String name : new String[]{"Edward", "Anna", "Bob", "Frank", "Gary", "Helen"}) {
-            String t = "<" + name + " --> [Cancer]>";
+            String t = "<" + name + " --> Cancer>";
             //n.input(t + "?");
             Concept c = n.concept(t);
 
@@ -37,10 +41,6 @@ public class TuffySmokesTest {
             }
             //n.input(t + "?");
         }
-
-        n.ask("<?x --> [Cancer]>", ETERNAL, (q,a) -> {
-            System.out.println(a.proof());
-        });
     }
 
     static void input(NAR n) {
@@ -51,12 +51,12 @@ public class TuffySmokesTest {
         n.input("<(Gary&Helen) --> Friends>. %1.00;0.99%");
         n.input("<(Gary&Frank) --> Friends>. %0.00;0.99%"); //NOT
 
-        n.input("<Anna --> [Smokes]>. %1.00;0.99%");
-        n.input("<Edward --> [Smokes]>. %1.00;0.99%");
-        n.input("<Gary --> [Smokes]>. %0.00;0.99%");  //NOT
-        n.input("<Frank --> [Smokes]>. %0.00;0.99%"); //NOT
-        n.input("<Helen --> [Smokes]>. %0.00;0.99%"); //NOT
-        n.input("<Bob --> [Smokes]>. %0.00;0.99%"); //NOT
+        n.input("<Anna --> Smokes>. %1.00;0.99%");
+        n.input("<Edward --> Smokes>. %1.00;0.99%");
+        n.input("<Gary --> Smokes>. %0.00;0.99%");  //NOT
+        n.input("<Frank --> Smokes>. %0.00;0.99%"); //NOT
+        n.input("<Helen --> Smokes>. %0.00;0.99%"); //NOT
+        n.input("<Bob --> Smokes>. %0.00;0.99%"); //NOT
     }
 
     static void axioms(NAR n) {
@@ -68,48 +68,48 @@ public class TuffySmokesTest {
 
         // !Smokes(a1) || cancer(a1) rewritten: Smokes(a1) => cancer(a1) or
         // !cancer(a1) => !Smokes(a1)
-        n.input("(<$1 --> [Smokes]> ==> <$1 --> [Cancer]>). %1.00;0.50%");
-        n.input("((--,<$1 --> [Smokes]>) ==> (--, <$1 --> [Cancer]>)). %1.00;0.50%");
-        //n.input("((--, <$1 --> [Smokes]>) ==> <$1 --> [Cancer]>). %1.00;0.50%");
+        n.input("(<$1 --> Smokes> ==> <$1 --> Cancer>). %1.00;0.90%");
+        //n.input("((--,<$1 --> Smokes>) ==> (--, <$1 --> Cancer>)). %1.00;0.90%");
+        //n.input("((--, <$1 --> Smokes>) ==> <$1 --> Cancer>). %1.00;0.50%");
 
-        //n.input("<(--,<$1 --> [Cancer]>) ==> (--,<$1 --> [Smokes]>)>. %1.00;0.90%");
+        //n.input("<(--,<$1 --> Cancer>) ==> (--,<$1 --> Smokes>)>. %1.00;0.90%");
 
         // !Friends(a1,a2) || !Smokes(a1) || Smokes(a2)
         // rewritten:
         // Friends(a1,a2) => (!Smokes(a1) || Smokes(a2)) 1.
-        //n.input("<<{$1,$2} --> Friends> <=> (||,<$2 --> [Smokes]>,(--,<$1 --> [Smokes]>))>. %1.00;0.40%");
-        n.input("(<($1&$2) --> Friends> ==> (<$2 --> [Smokes]> && (--,<$1 --> [Smokes]>))). %1.00;0.40%");
+        //n.input("<<{$1,$2} --> Friends> <=> (||,<$2 --> Smokes>,(--,<$1 --> Smokes>))>. %1.00;0.40%");
+        n.input("(< --(($1&$2) --> Friends)  ==> (($2-->Smokes) && (--,($1-->Smokes)))). %1.00;0.90%");
 
 
         // and contraposition:
         // !(!Smokes(a1) || Smokes(a2)) => !Friends(a1,a2)
         // (Smokes(a1) && !Smokes(a2)) => !Friends(a1,a2) 2.
-        //n.input("<(&&,<$1 --> [Smokes]>,(--,<$2 --> [Smokes]>)) ==> (--,<{$1,$2} --> Friends>)>. %1.00;0.90%");
+        //n.input("<(&&,<$1 --> Smokes>,(--,<$2 --> Smokes>)) ==> (--,<{$1,$2} --> Friends>)>. %1.00;0.90%");
 
         // !Friends(a1,a2) || !Smokes(a2) || Smokes(a1)
-        //n.input("<<{$1,$2} --> Friends> ==> (||,<$2 --> [Smokes]>,(--,<$1 --> [Smokes]>))>. %1.00;0.90%");
+        //n.input("<<{$1,$2} --> Friends> ==> (||,<$2 --> Smokes>,(--,<$1 --> Smokes>))>. %1.00;0.90%");
 
         // !Friends(a1,a2) || !Smokes(a1) || Smokes(a2)
         // rewritten2:
         // Smokes(a1) => (Smokes(a2) || !Friends(a1,a2))
-        //n.input("<<$1 --> [Smokes]> ==> (||,<$2 --> [Smokes]>,(--,<{$1,$2} --> Friends>))>. %1.00;0.90%");
+        //n.input("<<$1 --> Smokes> ==> (||,<$2 --> Smokes>,(--,<{$1,$2} --> Friends>))>. %1.00;0.90%");
 
         // and contraposition:
         // !(Smokes(a2) || !Friends(a1,a2)) => !Smokes(a1)
         // (!Smokes(a2) && Friends(a1,a2)) => !Smokes(a1)
-        //n.input("<(&&,(--,<$2 --> [Smokes]>),<{$1,$2} --> Friends>) ==> (--,<$1 --> [Smokes]>)>. %1.00;0.90%");
+        //n.input("<(&&,(--,<$2 --> Smokes>),<{$1,$2} --> Friends>) ==> (--,<$1 --> Smokes>)>. %1.00;0.90%");
 
         // !Friends(a1,a2) || !Smokes(a1) || Smokes(a2)
         // rewritten2:
         // !Smokes(a2) => (!Friends(a1,a2) || !Smokes(a1))
-        //n.input("<(--,<$2 --> [Smokes]>) ==> (||,(--,<{$1,$2} --> Friends>),(--,<$1 --> [Smokes]>))>. %1.00;0.90%");
+        //n.input("<(--,<$2 --> Smokes>) ==> (||,(--,<{$1,$2} --> Friends>),(--,<$1 --> Smokes>))>. %1.00;0.90%");
 
         // and contraposition:
         // !(!Friends(a1,a2) || !Smokes(a1)) => Smokes(a2)
         // (Friends(a1,a2) && Smokes(a1)) => Smokes(a2)
-        //n.input("<(&&,<{$1,$2} --> Friends>,<$1 -->  [Smokes]>) ==> <$2 --> [Smokes]>>.");
+        //n.input("<(&&,<{$1,$2} --> Friends>,<$1 -->  Smokes>) ==> <$2 --> Smokes>>.");
 
-        // n.input("<#x --> [Cancer]>?");
+        // n.input("<#x --> Cancer>?");
 
     }
 
@@ -119,12 +119,12 @@ public class TuffySmokesTest {
 
         //Global.DEBUG = true;
 
-        NAR n = new Default(1000, 3, 2, 2);
+        n = new Default(1000, 300, 2, 2);
         //n.conceptActivation.setValue(0.75f);
         //n.conceptRemembering.setValue(12);
 
         //n.cyclesPerFrame.set(8);
-        n.logSummaryGT(System.out, 0.15f);
+        n.logSummaryGT(System.out, 0f);
 
         //new PrologCore(n);
 
@@ -132,12 +132,13 @@ public class TuffySmokesTest {
         System.err.println();
 
         axioms(n);
-        n.run(50);
         input(n);
-        n.run(250);
-        question(n);
-        n.run(1250);
-        question(n);
+        n.input(new LambdaQuestionTask($("(?x --> Cancer)"), '?', ETERNAL, 16, (q, a) -> {
+            System.out.println(a.proof());
+        }).budgetSafe(1f,0.99f));
+        n.run(250);  print();
+        n.run(250);  print();
+        n.run(250);  print();
 
         //}
 
@@ -151,10 +152,10 @@ public class TuffySmokesTest {
         // n.run(5500);
 
         // Result:
-        // Solved <Anna --> [Cancer]>. %1.00;0.50%
-        // Solved <Edward --> [Cancer]>. %1.00;0.25%
-        // Solved <Frank --> [Cancer]>. %1.00;0.03%
-        // Solved <Bob --> [Cancer]>. %1.00;0.20%
+        // Solved <Anna --> Cancer>. %1.00;0.50%
+        // Solved <Edward --> Cancer>. %1.00;0.25%
+        // Solved <Frank --> Cancer>. %1.00;0.03%
+        // Solved <Bob --> Cancer>. %1.00;0.20%
         //
         // Which gives:
         //

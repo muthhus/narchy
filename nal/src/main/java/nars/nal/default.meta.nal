@@ -152,10 +152,10 @@
 //    (C --> [X,A..+]), C |- (C --> [X]), (Belief:StructuralDeduction)
 //    ({X,A..+} --> C), C |- ({X} --> C), (Belief:StructuralDeduction)
 //    ([X,A..+] --> C), C |- ([X] --> C), (Belief:StructuralDeduction)
-    (C --> {X,A..+}), {X,A..+}, neqCom(X,C) |- (C --> {X}), (Belief:StructuralDeduction, Goal:StructuralDeduction)
-    (C --> [X,A..+]), [X,A..+], neqCom(X,C) |- (C --> [X]), (Belief:StructuralDeduction, Goal:StructuralDeduction)
-    ({X,A..+} --> C), {X,A..+}, neqCom(X,C) |- ({X} --> C), (Belief:StructuralDeduction, Goal:StructuralDeduction)
-    ([X,A..+] --> C), [X,A..+], neqCom(X,C) |- ([X] --> C), (Belief:StructuralDeduction, Goal:StructuralDeduction)
+    (C --> {X,A..+}), X, neqCom(X,C) |- (C --> {X}), (Belief:StructuralDeduction, Goal:StructuralDeduction)
+    (C --> [X,A..+]), X, neqCom(X,C) |- (C --> [X]), (Belief:StructuralDeduction, Goal:StructuralDeduction)
+    ({X,A..+} --> C), X, neqCom(X,C) |- ({X} --> C), (Belief:StructuralDeduction, Goal:StructuralDeduction)
+    ([X,A..+] --> C), X, neqCom(X,C) |- ([X] --> C), (Belief:StructuralDeduction, Goal:StructuralDeduction)
 
 //// implication-based syllogism ////////////////////////////////////////////////////////////////////////////////////
 //       (A ==> B) ------- (B ==> C)

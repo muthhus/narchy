@@ -42,7 +42,18 @@ public class DepthFirstActivation extends Activation {
      */
     public DepthFirstActivation(@NotNull Budgeted in, @NotNull Concept src, @NotNull Concept target, @NotNull NAR nar, float scale, int termlinkDepth, int taskLinkDepth) {
         this(in, scale, src, nar, termlinkDepth, taskLinkDepth, nar.accumulator());
+
+        //self links
+        float selfScale = scale / src.templates().size();
+        termlink(src, src.term(), selfScale);
+        if (in instanceof Task) {
+            tasklink(src, (Task)in, selfScale);
+        }
+
+        //child links (recurse)
         link(src, target, scale, 0);
+
+
         nar.emotion.stress(linkOverflow);
     }
 
@@ -72,10 +83,12 @@ public class DepthFirstActivation extends Activation {
     @Nullable
     Concept linkSubterm(@NotNull Termed target, float subScale, int depth) {
 
+
         Concept targetConcept = nar.concept(target,
                 //dont create a concept if doesnt exist, below this depth
                 depth < Param.ACTIVATION_TERMLINK_DEPTH_CONCEPTUALIZE ? true : false
         );
+
 
         if (targetConcept != null) {
 
@@ -127,47 +140,41 @@ public class DepthFirstActivation extends Activation {
         Term sourceTerm = src.term();
         Term targetTerm = target.term();
 
-        if (canSelfTermlink(sourceTerm) && targetTerm.equals(sourceTerm)) {
-
-            //self termlink
-            src.termlinks().put(targetTerm, in, scale, linkOverflow);
-
-        } else {
+        if (!targetTerm.equals(sourceTerm)) {
 
             // insert termlink target to source
-            float tlFlow = Param.ACTIVATION_TERMLINK_BALANCE;
-
-            if (targetConcept != null) {
-
-                final float tlForward = scale * tlFlow;
-                if (tlForward >= minScale)
-                    targetConcept.termlinks().put(sourceTerm, in, tlForward, linkOverflow);
-            }
+            //float tlFlow = Param.ACTIVATION_TERMLINK_BALANCE;
 
             /* insert termlink source to target */
-            final float tlReverse = scale * (1f - tlFlow);
+            final float tlReverse = scale;
             if (tlReverse >= minScale)
-                src.termlinks().put(targetTerm, in, tlReverse, linkOverflow);
+                termlink(src, targetTerm, tlReverse);
+
+
+            if (targetConcept != null) {
+                final float tlForward = scale;
+                if (tlForward >= minScale)
+                    termlink(targetConcept, sourceTerm, tlForward);
+            }
 
             //System.out.println(src + "<-" + sourceTerm + " -> " + target + "<-" + targetTerm);
+
+
+            if (targetConcept != null && in instanceof Task && depth <= tasklinkDepth) {
+                tasklink(targetConcept, (Task)in, scale);
+            }
         }
-
-
-        if (targetConcept != null && depth <= tasklinkDepth && in instanceof Task) {
-            targetConcept.tasklinks().put((Task) in, in, scale, null);
-        }
-
 
     }
 
-    private boolean canSelfTermlink(Term sourceTerm) {
-
-        if (sourceTerm instanceof Atomic)
-            return false;
-
-        Op o = src.op();
-        return !o.image;
+    protected void tasklink(Concept target, @NotNull Task t, float scale) {
+        target.tasklinks().put(t, t, scale, null);
     }
+
+    protected void termlink(Concept from, Term to, float scale) {
+        from.termlinks().put(to, in, scale, linkOverflow);
+    }
+
 
 
 }
