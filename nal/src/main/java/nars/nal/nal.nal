@@ -11,10 +11,6 @@
 
 
 
-// "If not smoking lets you be healthy, being not healthy may be the result of smoking"
-//    ( (--,%S) ==> P),  P, neqRec(S,P), notEqui(P), time(dtTaskExact) |- ( (--,%P) ==>+- S), (Belief:Contraposition, Permute:Backward)
-//    ( (--,%S) ==> P),  S, neq(S,P), neq((--,%S),P), neqRec(S,P), notEqui(S), time(dtTaskExact) |- ( (--,%P) ==>+- S), (Belief:Contraposition, Permute:Backward)
-
 
 
 //// inheritance-based syllogism ////////////////////////////////////////////////////////////////////////////////////
@@ -92,7 +88,16 @@
 
     (M ==> P), (S <=> M), notImplEqui(S), notEqui(P), neqCom(S,P), time(dtTminB) |- (S ==>+- P), (Belief:Analogy)
 
-    (P ==> M), (S <=> M), notImplEqui(S), notEqui(P), neqCom(S,P), time(dtTminB) |- (P ==>+- S), (Belief:Analogy)
+    (P ==> M), (S <=> M), notImplEqui(P), notEqui(S), neqCom(S,P), time(dtTminB) |- (P ==>+- S), (Belief:Analogy)
+
+
+// Contraposition
+// "If not smoking lets you be healthy, being not healthy may be the result of smoking"
+// original:	    ( --S ==> P),   P |- ( --P ==> S), (Truth:Contraposition, Derive:AllowBackward)
+// original:	    ( --S ==> P), --S |- ( --P ==> S), (Truth:Contraposition, Derive:AllowBackward)
+
+    ( (--,%S) ==> P),  P, time(dtTaskExact) |- ( (--,%P) ==>+- S), (Belief:Contraposition)
+    ( (--,%S) ==> P),  S, time(dtTaskExact) |- ( (--,%P) ==>+- S), (Belief:Contraposition)
 
 
 //// implication-based composition ////////////////////////////////////////////////////////////////////////////////////
