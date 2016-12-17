@@ -731,7 +731,7 @@ public interface TimeFunctions {
 
         occReturn[0] = p.occurrenceTarget(earliestOccurrence);
 
-        if (pre) {
+        if (pre && derived.term(0) instanceof Compound) {
             //set subterm 0's DT
 
 
@@ -752,7 +752,7 @@ public interface TimeFunctions {
                     $.negIf(newPresub, neg),
                     derived.term(1) );
         }
-        if (post) {
+        if (post && derived.term(1) instanceof Compound) {
             //set subterm 1's DT
             Term newSubterm1 = terms.the((Compound) derived.term(1),
                     ((taskDT != DTERNAL) && (beliefDT != DTERNAL)) ? (taskDT - beliefDT) : DTERNAL);

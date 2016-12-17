@@ -19,11 +19,7 @@ import org.jetbrains.annotations.Nullable;
 public class AnswerTask extends MutableTask {
 
 
-    public static Task answer(@NotNull Task question, @NotNull Task answer, long when, long now, @NotNull Truth newTruth) {
-
-        @NotNull Budget bb = answer.budget();
-
-        if (bb.isDeleted()) return null;
+    public static Task answer(@NotNull Task question, Budget bb, @NotNull Task answer, long when, long now, @NotNull Truth newTruth) {
 
         Task solution = new AnswerTask(
                 answer,

@@ -17,6 +17,7 @@ import nars.task.GeneratedTask;
 import nars.task.MutableTask;
 import nars.term.Compound;
 import nars.term.Term;
+import nars.term.Termed;
 import nars.time.FrameTime;
 import nars.time.Time;
 import nars.truth.Truth;
@@ -35,6 +36,7 @@ import java.util.Random;
 import static jcog.Texts.n2;
 import static jcog.Texts.n4;
 import static nars.$.t;
+import static nars.$.varQuery;
 import static nars.Symbols.BELIEF;
 import static nars.Symbols.GOAL;
 import static nars.time.Tense.ETERNAL;
@@ -426,16 +428,33 @@ abstract public class NAgent implements NSense, NAction {
 //                );
             }
 
+
             ((FasterList)predictors).addAll(
 
-                    new MutableTask($.seq(action, dur, happiness), '?', null)
-                            //.present(nar),
-                            .budgetByTruth(1f,nar)
-                            .eternal(),
-                    new MutableTask($.seq($.neg(action), dur, happiness), '?', null)
-                            //.present(nar)
-                            .budgetByTruth(1f,nar)
-                            .eternal()
+                    new PredictionTask($.seq(action, dur, happiness), '?')
+                        .present(nar)
+                        .budgetByTruth(1f,nar),
+
+                    new PredictionTask($.seq($.neg(action), dur, happiness), '?')
+                        .present(nar)
+                        .budgetByTruth(1f,nar),
+
+                    new PredictionTask($.impl(action, dur, happiness), '?')
+                        .present(nar)
+                        .budgetByTruth(1f,nar),
+
+                    new PredictionTask($.impl($.neg(action), dur, happiness), '?')
+                        .present(nar)
+                        .budgetByTruth(1f,nar),
+
+                    new PredictionTask($.seq(action, dur, varQuery(1)), '@')
+                        .present(nar)
+                        .budgetByTruth(1f,nar),
+
+                    new PredictionTask($.seq($.neg(action), dur, varQuery(1)), '@')
+                        .present(nar)
+                        .budgetByTruth(1f,nar)
+
 //                    new MutableTask($.impl(action, dur, happiness), '?', null)
 //                            .present(nar),
 //                            //.eternal(),
@@ -677,10 +696,10 @@ abstract public class NAgent implements NSense, NAction {
         MutableTask s;
         char pp = t.punc();
         if (t.occurrence() != ETERNAL) {
-            s = new GeneratedTask(t.term(), pp, t.truth())
-                    .budgetByTruth(p, nar)
-                    .time(now, now + (t.occurrence() - t.creation()))
-                    .log("Agent Predictor");
+            s = (t instanceof PredictionTask) ? new PredictionTask(t.term(), pp) : new MutableTask(t.term(), pp, t.truth());
+            s.budgetByTruth(p, nar)
+                .time(now, now + (t.occurrence() - t.creation()))
+                .log("Agent Predictor");
 
             //s.evidence(t)
 
@@ -724,5 +743,18 @@ abstract public class NAgent implements NSense, NAction {
         return Float.NaN;
     }
 
+    public static class PredictionTask extends GeneratedTask {
+
+        public PredictionTask(@NotNull Termed<Compound> term, char punct) {
+            super(term, punct, null);
+            assert(punct == Symbols.QUESTION || punct == Symbols.QUEST);
+        }
+
+        @Override
+        public void onAnswered(Task answer, NAR nar) {
+            long lag = answer.creation() - creation();
+            nar.logger.info("Prediction:\t{}\n\t{}\tlag={}", this, answer, lag);
+        }
+    }
 
 }

@@ -322,7 +322,7 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
      */
     default void onAnswered(Task answer, NAR nar) {
         if (isInput()) {
-            nar.logger.info("{} :Question|Answer: {}", this, answer);
+            nar.logger.info("Q&A:\t{}\n\t{}", this, answer);
         }
     }
 

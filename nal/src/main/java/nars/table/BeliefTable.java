@@ -2,6 +2,7 @@ package nars.table;
 
 import nars.NAR;
 import nars.Task;
+import nars.budget.Budget;
 import nars.budget.Budgeted;
 import nars.concept.CompoundConcept;
 import nars.task.AnswerTask;
@@ -381,6 +382,11 @@ public interface BeliefTable extends TaskTable {
     }
 
     default Task answer(long when, long now, @NotNull Task question, boolean noOverlap, float minConf) {
+
+        @NotNull Budget qBudget = question.budget().clone();
+
+        if (qBudget.isDeleted()) return null;
+
         Task answer = match(when, now, question, noOverlap);
         if (answer!=null) {
             if (answer.occurrence()==when) {
@@ -391,7 +397,7 @@ public interface BeliefTable extends TaskTable {
                 if (truth == null || truth.conf() < minConf)
                     return null;
 
-                Task answerProj = AnswerTask.answer(question, answer, when, now, truth);
+                Task answerProj = AnswerTask.answer(question, qBudget, answer, when, now, truth);
 
                 return answerProj;
             }
