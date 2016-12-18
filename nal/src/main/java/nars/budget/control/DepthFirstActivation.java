@@ -6,13 +6,14 @@ import nars.Task;
 import nars.budget.Budgeted;
 import nars.budget.util.PriorityAccumulator;
 import nars.concept.Concept;
+import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.container.TermContainer;
+import org.eclipse.collections.api.block.function.primitive.FloatToFloatFunction;
+import org.eclipse.collections.impl.map.mutable.primitive.ObjectFloatHashMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import static jcog.Texts.n2;
 
 /**
  * Created by me on 8/22/16.
@@ -43,7 +44,7 @@ public class DepthFirstActivation extends Activation {
     public DepthFirstActivation(@NotNull Budgeted in, float scale, @NotNull Concept src, int termlinkDepth, int taskLinkDepth, @NotNull NAR nar) {
         this(in, scale, src, nar, termlinkDepth, taskLinkDepth, nar.accumulator());
 
-        linkSubterm(src, src, scale, 0);
+        link(src, scale, 0);
 
         nar.emotion.stress(linkOverflow);
     }
@@ -57,56 +58,132 @@ public class DepthFirstActivation extends Activation {
     }
 
 
-//    public void linkTermLinks(Concept src, float scale) {
-//        src.termlinks().forEach(n -> {
-//            Term nn = n.get();
-//            if (nn!=null)
-//                link(src, nn, scale, 0);
-//        });
-//    }
-
-    /**
-     * crosslinks termlinks
-     */
     @Nullable
-    Concept linkSubterm(Concept srcConcept, @NotNull Concept targetConcept, float subScale, int depth) {
+    void link(@NotNull Concept targetConcept, float subScale, int depth) {
 
+        if (in instanceof Task && depth <= tasklinkDepth)
+            tasklink((Task) in, targetConcept, subScale);
 
-        if (in instanceof Task && depth <= tasklinkDepth) {
-            tasklink(targetConcept, (Task) in, subScale);
-        }
+        if (depth <= termlinkDepth)
+            termlink(targetConcept, subScale, depth);
+    }
 
-        if (depth <= termlinkDepth) {
+    protected void termlink(@NotNull Concept targetConcept, float subScale, int depth) {
 
-            //System.out.println("+" + scale + " x " + targetConcept);
-            if (conceptActivation != null && depth <= Param.ACTIVATION_CONCEPT_ACTIVATION_DEPTH)
-                conceptActivation.add(targetConcept, subScale);
+        termCrosslink(targetConcept, subScale);
 
-            link(srcConcept, targetConcept, subScale);
+        if (conceptActivation != null)
+            conceptActivation.add(targetConcept, subScale);
 
-            @NotNull TermContainer templates = targetConcept.templates();
-            int n = templates.size();
+        if (!(targetConcept.term() instanceof Compound))
+            return;
 
-            float tlScale = /*Param.TERMLINK_TEMPLATE_PRIORITY_FACTOR **/ subScale / (n);
-            if (tlScale >= minScale) { //TODO use a min bound to prevent the iteration ahead of time
+        @NotNull TermContainer templates =
+            ((Compound)targetConcept.term()).subterms();
 
+        int n = templates.size();
 
-                boolean activateTemplate = (depth + 1) < Param.ACTIVATION_CONCEPTUALIZE_DEPTH ? true : false;
-                for (int i = 0; i < n; i++) {
+        float tlScale = /*Param.TERMLINK_TEMPLATE_PRIORITY_FACTOR **/ subScale / (n);
+        if (tlScale >= minScale) { //TODO use a min bound to prevent the iteration ahead of time
 
-                    Term tt = templates.term(i);
-                    Concept tc = nar.concept(tt, activateTemplate );
-                    if (tc!=null) {
-                        linkSubterm(targetConcept, tc, tlScale, depth + 1);
-                    } else {
-                        //just link to the term
-                        link(targetConcept, tt, tlScale);
-                    }
+            boolean activateTemplate = (depth + 1) < Param.ACTIVATION_CONCEPTUALIZE_DEPTH ? true : false;
+            for (int i = 0; i < n; i++) {
+
+                Term tt = templates.term(i);
+                Concept tc = nar.concept(tt, activateTemplate);
+                if (tc != null) {
+                    link(tc, tlScale, depth + 1); //link and recurse to the concept
+                } else {
+                    termlink(origin, tt, tlScale); //just link to the term
                 }
-
             }
 
+        }
+    }
 
+    protected final void termCrosslink(@NotNull Termed tgt, float scale) {
+        termCrosslink(tgt, scale, scale);
+    }
+
+    protected final void termCrosslink(@NotNull Termed tgt, float tlForward, float tlReverse) {
+
+        //System.out.println( "\t" + origin + " " + src + " " + tgt + " "+ n2(scale));
+
+        Term srcTerm = origin.term();
+        Term tgtTerm = tgt.term();
+
+
+        /* insert termlink source to target */
+        if (tlForward > 0)
+            termlink(origin, tgtTerm, tlForward);
+
+        if (tgt instanceof Concept && !srcTerm.equals(tgtTerm) && tlReverse > 0) {
+            termlink((Concept)tgt, srcTerm, tlReverse);
+        }
+
+    }
+
+    protected void tasklink(@NotNull Task src, Concept target, float scale) {
+        target.tasklinks().put(src, src, scale, null);
+    }
+
+    protected void termlink(Concept from, Term to, float scale) {
+        from.termlinks().put(to, in, scale, linkOverflow);
+    }
+
+
+    public static class SpreadingActivation extends DepthFirstActivation {
+
+        private ObjectFloatHashMap<Term> spread;
+        boolean post = false;
+
+        public SpreadingActivation(@NotNull Budgeted in, @NotNull Concept c, @NotNull NAR nar, float scale) {
+            this(in, scale, c, Param.ACTIVATION_TERMLINK_DEPTH, Param.ACTIVATION_TASKLINK_DEPTH, nar);
+        }
+
+        public SpreadingActivation(@NotNull Budgeted in, float scale, @NotNull Concept src, int termlinkDepth, int taskLinkDepth, @NotNull NAR nar) {
+            super(in, scale, src, termlinkDepth, taskLinkDepth, nar);
+
+            if (spread!=null) {
+                post = true;
+
+                //System.out.println(in + ":");
+                spread.forEachKeyValue((k, v) -> {
+                    //System.out.println("\t" + k + " " + v);
+
+                    Termed kk = nar.concept(k /* TODO conceptualize? */);
+                    if (kk==null) {
+                        kk = k;
+                    } else {
+                        super.tasklink((Task) in, (Concept) kk, v);
+                    }
+                    super.termCrosslink(kk, v);
+                });
+            }
+        }
+
+        @Override
+        protected void tasklink(@NotNull Task src, Concept target, float scale) {
+
+        }
+
+        protected void termlink(@NotNull Concept src, Term target, float scale) {
+            if (!post) {
+                if (spread == null)
+                    spread = new ObjectFloatHashMap<>(); //HACK
+
+                FloatToFloatFunction updater = (v) -> Math.max(v, scale);
+                spread.updateValue(target.term(), 0, updater);
+            } else {
+                super.termlink(src, target, scale);
+            }
+
+        }
+
+    }
+
+
+}
 
 
             /*else {
@@ -124,48 +201,3 @@ public class DepthFirstActivation extends Activation {
                     }
                 }
             }*/
-
-        }
-
-
-        return targetConcept;
-    }
-
-    protected final void link(@NotNull Concept src, @NotNull Termed tgt, float scale) {
-
-        //System.out.println( "\t" + origin + " " + src + " " + tgt + " "+ n2(scale));
-
-        Term srcTerm = src.term();
-        Term tgtTerm = tgt.term();
-
-
-        // insert termlink target to source
-        //float tlFlow = Param.ACTIVATION_TERMLINK_BALANCE;
-
-            /* insert termlink source to target */
-        final float tlReverse = scale;
-        if (tlReverse >= minScale)
-            termlink(src, tgtTerm, tlReverse);
-
-
-        if (tgt instanceof Concept && !srcTerm.equals(tgtTerm)) {
-            final float tlForward = scale;
-            if (tlForward >= minScale)
-                termlink((Concept)tgt, srcTerm, tlForward);
-        }
-
-        //System.out.println(src + "<-" + sourceTerm + " -> " + target + "<-" + targetTerm);
-
-
-    }
-
-    protected void tasklink(Concept target, @NotNull Task t, float scale) {
-        target.tasklinks().put(t, t, scale, null);
-    }
-
-    protected void termlink(Concept from, Term to, float scale) {
-        from.termlinks().put(to, in, scale, linkOverflow);
-    }
-
-
-}

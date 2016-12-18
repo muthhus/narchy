@@ -436,7 +436,8 @@ public class CompoundConcept<T extends Compound> implements Concept, Termlike {
     }
 
     public DepthFirstActivation activateTask(@NotNull Task input, @NotNull NAR nar) {
-        return new DepthFirstActivation(input, this, nar, nar.priorityFactor.floatValue());
+        //return new DepthFirstActivation(input, this, nar, nar.priorityFactor.floatValue());
+        return new DepthFirstActivation.SpreadingActivation(input, this, nar, nar.priorityFactor.floatValue());
     }
 
     /**
