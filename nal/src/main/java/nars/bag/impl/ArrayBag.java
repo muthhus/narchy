@@ -681,6 +681,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
 
     public static void qsort(short[] stack, BLink[] c, short left, short right) {
         int stack_pointer = -1;
+        int cLenMin1 = c.length-1;
         while (true) {
             short i, j;
             if (right - left <= 7) {
@@ -726,7 +727,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
                     float tempV = pCmp(temp);
 
                     while (true) {
-                        while (cmpLT(c[++i], tempV)) ;
+                        while (i < cLenMin1 && cmpLT(c[++i], tempV)) ;
                         while (cmpGT(c[--j], tempV)) ;
                         if (j < i) {
                             break;

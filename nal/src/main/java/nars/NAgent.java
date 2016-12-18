@@ -430,15 +430,18 @@ abstract public class NAgent implements NSense, NAction {
 
             ((FasterList)predictors).addAll(
 
+
+
+                    new PredictionTask($.impl(action, dur, happiness), '?').present(nar),
+                    new PredictionTask($.impl($.neg(action), dur, happiness), '?').present(nar),
+
                     new PredictionTask($.seq(action, dur, happiness), '?').present(nar),
                     new PredictionTask($.seq($.neg(action), dur, happiness), '?').present(nar),
 
-                    new PredictionTask($.seq($.parallel(action, $.varQuery("x")), dur, happiness), '?').present(nar),
-                    new PredictionTask($.seq($.parallel($.neg(action), $.varQuery("x")), dur, happiness), '?').present(nar),
+                    new PredictionTask($.seq($.varQuery("x"), 0, $.seq(action, dur, happiness)), '?').eternal(),
+                    new PredictionTask($.seq($.varQuery("x"), 0, $.seq($.neg(action), dur, happiness)), '?').eternal()
 
-                    new PredictionTask($.impl(action, dur, happiness), '?').present(nar),
-                    new PredictionTask($.impl($.neg(action), dur, happiness), '?').present(nar)
-                        
+
 
 //                    new PredictionTask($.seq(action, dur, varQuery(1)), '@')
 //                        .present(nar),

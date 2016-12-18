@@ -65,7 +65,18 @@ public class Alann extends NAR {
 
         public final Bag<Concept> terms =
                 //new HijackBag<>(128, 3, blend, random);
-                new CurveBag(64, new CurveBag.NormalizedSampler(power2BagCurve, random), blend, new ConcurrentHashMap(64));
+                new CurveBag<Concept>(64, new CurveBag.NormalizedSampler(power2BagCurve, random), blend, new ConcurrentHashMap(64)) {
+
+                    @Override
+                    public void onAdded(BLink<Concept> value) {
+                        value.get().policy(concepts.conceptBuilder().awake(), Alann.this);
+                    }
+
+                    @Override
+                    public void onRemoved(@NotNull BLink<Concept> value) {
+                        value.get().policy(concepts.conceptBuilder().sleep(), Alann.this);
+                    }
+                };
 
 //        /**
 //         * the tasklink bag is only modified and accessed by the core, locally, so it does not need to have a concurrent Map
@@ -131,9 +142,8 @@ public class Alann extends NAR {
             BLink<Concept> next = terms.commit().sample();
             if (next != null) {
 
-                Concept d = next.get(); //concept(next.get());
+                //Concept d = next.get(); //concept(next.get());
 
-                d.policy(concepts.conceptBuilder().awake(), Alann.this);
 
                 //d.termlinks().commit().transfer(2, terms);
                 //d.tasklinks().commit().copy(tasklinks, TASKLINK_COLLECTION_RATE);

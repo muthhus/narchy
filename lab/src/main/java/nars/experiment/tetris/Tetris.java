@@ -45,7 +45,7 @@ public class Tetris extends NAgents {
 
     public static final int tetris_width = 6;
     public static final int tetris_height = 12;
-    public static final int TIME_PER_FALL = 2;
+    public static final int TIME_PER_FALL = 4;
     public static final int PIXEL_RADIX = 2;
     private static SensorConcept[][] concept;
     //private int afterlife = TIME_PER_FALL * tetris_height * tetris_width;
@@ -459,7 +459,7 @@ public class Tetris extends NAgents {
                     //NAgents.newMultiThreadNAR(4, new FrameTime().dur(TIME_PER_FALL));
                     new Alann(new FrameTime().dur(TIME_PER_FALL*2), 8, 3, 2);
 
-            nar.termVolumeMax.setValue(16);
+            nar.termVolumeMax.setValue(20);
             //nar.linkFeedbackRate.setValue(0.05f);
 
             //newTimeWindow(nar);
@@ -556,7 +556,7 @@ public class Tetris extends NAgents {
             t.trace = true;
 
 
-            t.runRT(20f, 10000).join();
+            t.runRT(30f, 10000).join();
 
 //        NARController meta = new NARController(nar, loop, t);
 //
