@@ -21,7 +21,7 @@ public abstract class Param /*extends Container*/ implements Level {
 
     /** absolute limit for constructing terms in any context in which a NAR is not known, which could provide a limit.
      * typically a NAR instance's 'compoundVolumeMax' parameter will be lower than this */
-    public static final int COMPOUND_VOLUME_MAX = 96;
+    public static final int COMPOUND_VOLUME_MAX = 72;
 
 
 
@@ -103,7 +103,7 @@ public abstract class Param /*extends Container*/ implements Level {
     public static final float UnificationMatchesMax = 4, UnificationMatchesMin = 2;
 
 
-    public static final boolean FILTER_CONCEPTS_WITHOUT_ATOMS = false;
+    public static final boolean FILTER_CONCEPTS_WITHOUT_ATOMS = true;
 
     /**
      * max # of chained termutes which can be active

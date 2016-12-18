@@ -76,7 +76,7 @@ public enum TermLinkBuilder {
         } else {
 
             Term u = t;
-            t = nar.concepts.conceptualizable(t);
+            t = nar.concepts.conceptualizable(t, true);
             if (t!=null) {
                 if (!target.add(t))
                     return; //already added

@@ -460,7 +460,7 @@ public abstract class TermIndex extends TermBuilder {
     @Nullable
     public final Concept concept(@NotNull Term term, boolean createIfMissing) {
 
-        term = conceptualizable(term);
+        term = conceptualizable(term, false);
         if (term == null)
             return null;
 
@@ -481,7 +481,7 @@ public abstract class TermIndex extends TermBuilder {
     }
 
     @Nullable
-    public Term conceptualizable(@NotNull Term term) {
+    public Term conceptualizable(@NotNull Term term, boolean forTermlink) {
         Term termPre;
         do {
 //            //shouldnt need to check for this here
@@ -505,11 +505,11 @@ public abstract class TermIndex extends TermBuilder {
 
                     if (term instanceof Compound) {
 
-                        if (Param.FILTER_CONCEPTS_WITHOUT_ATOMS) {
+                        if (!forTermlink && Param.FILTER_CONCEPTS_WITHOUT_ATOMS) {
                             if (!term.hasAny(Op.ATOM.bit | Op.INT.bit))
                                 return null;
                         } else {
-                            //just test for 0-length compounds, example: ()
+                            //only filter 0-length compounds, example: ()
                             if (term.size() == 0)
                                 return null;
                         }
