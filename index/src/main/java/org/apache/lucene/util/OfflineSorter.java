@@ -347,7 +347,7 @@ public class OfflineSorter {
       segmentsToMerge = segments;
     }
 
-    PriorityQueue<FileAndTop> queue = new PriorityQueue<>(segmentsToMerge.size()) {
+    PriorityQueue<FileAndTop> queue = new PriorityQueue<FileAndTop>(segmentsToMerge.size()) {
       @Override
       protected boolean lessThan(FileAndTop a, FileAndTop b) {
         return comparator.compare(a.current, b.current) < 0;

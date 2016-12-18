@@ -135,9 +135,11 @@ public final class Premise extends RawBudget implements Tasked {
                         boolean exists = nar.tasks.contains(answered);
                         if (!exists) {
                             //transfer budget from question to answer
-                            BudgetFunctions.transferPri(task.budget(), answered.budget(), answered.conf());
+                            BudgetFunctions.transferPri(task.budget(), answered.budget(),
+                                answered.conf() * (1f - taskBudget.qua()) //proportion of the taskBudget which the answer receives as a boost
+                            );
 
-                            taskBudget = task.budget().clone(); //update the task budget, since the question may have been deprioritized as a result of the answer
+                            taskBudget = task.budget().clone();
 
                             boolean processed = nar.input(answered) != null;
                         }

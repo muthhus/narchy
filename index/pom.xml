@@ -32,6 +32,13 @@
             <scope>test</scope>
         </dependency>
 
+        <!-- https://mvnrepository.com/artifact/io.baratine/baratine -->
+        <dependency>
+            <groupId>io.baratine</groupId>
+            <artifactId>baratine</artifactId>
+            <version>1.0.1</version>
+        </dependency>
+
 
         <dependency>
             <groupId>junit</groupId>

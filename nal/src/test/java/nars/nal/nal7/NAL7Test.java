@@ -404,7 +404,7 @@ public class NAL7Test extends AbstractNALTest {
         tester.inputAt(2, "<John --> (/,enter,_,room)>. :|:");
 
         //note: this result is reversed (pred equiv direction AND the occurrence time) from the original NAL7 test but its semantics are equivalent
-        tester.mustBelieve(cycles * 2,
+        tester.mustBelieve(cycles * 3,
                 "(<$1 --> (/, enter, _, room)> <=>-2 <$1 --> (/, open, _, door)>)",
                 1.00f, 0.45f,
                 0
@@ -963,17 +963,17 @@ public class NAL7Test extends AbstractNALTest {
                 .mustBelieve(cycles, "( ((x) &&+0 --(y)) ==>+5 (z))", 1f, 0.81f);
     }
 
-    @Test public void testBackwardImplicationGeneration() {
-        test()
-                .log()
-                .inputAt(0, "(a). :|:")
-                .inputAt(10, "(b). :|:")
-                .inputAt(20, "(c). :|:")
-                .inputAt(30, "(d). :|:")
-                .mustBelieve(cycles, "( ((TODO) &&+0 --(y)) ==>+5 (z))", 1f, 0.81f);
-
-
-    }
+//    @Test public void testBackwardImplicationGeneration() {
+//        test()
+//                .log()
+//                .inputAt(0, "(a). :|:")
+//                .inputAt(10, "(b). :|:")
+//                .inputAt(20, "(c). :|:")
+//                .inputAt(30, "(d). :|:")
+//                .mustBelieve(cycles, "( ((TODO) &&+0 --(y)) ==>+5 (z))", 1f, 0.81f);
+//
+//
+//    }
 
 //    @Test public void testTruthDecayOverTime0() {
 //        testTruthDecayOverTime(0, 0.81f, 0.005f);

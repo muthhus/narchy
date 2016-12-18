@@ -63,7 +63,7 @@ public final class VirtualMethod<C> {
   private final Class<C> baseClass;
   private final String method;
   private final Class<?>[] parameters;
-  private final ClassValue<Integer> distanceOfClass = new ClassValue<>() {
+  private final ClassValue<Integer> distanceOfClass = new ClassValue<Integer>() {
     @Override
     protected Integer computeValue(Class<?> subclazz) {
       return reflectImplementationDistance(subclazz);

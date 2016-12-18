@@ -172,7 +172,8 @@ public class Alann extends NAR {
 
     public Alann(@NotNull Time time, int cores, int coreThreads, int auxThreads) {
         super(time,
-                new TreeTermIndex.L1TreeIndex(new DefaultConceptBuilder(), 1024 * 1024, 1024 * 32, 2),
+                new TreeTermIndex.L1TreeIndex(new DefaultConceptBuilder(), 512 * 1024,
+                        1024 * 32, 3),
                 new XorShift128PlusRandom(1), Param.defaultSelf(),
                 auxThreads == 1 ? new SynchronousExecutor() :
                         new MultiThreadExecutioner(auxThreads, 1024 * auxThreads).sync(true)

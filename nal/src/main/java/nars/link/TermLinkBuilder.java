@@ -46,6 +46,7 @@ public enum TermLinkBuilder {
                 return 1;
 
             case INH:
+                return 2;
             case SIM:
                 return 2;
 
@@ -53,7 +54,7 @@ public enum TermLinkBuilder {
             case EQUI:
                 return (host.vars() > 0) ? 3 : 2;
             case CONJ:
-                return (host.vars() > 0) && (host.size() < Param.MAX_CONJ_SIZE_FOR_LAYER2_TEMPLATES) ? 3 : 2;
+                return (host.vars() > 0) && (host.size() <= Param.MAX_CONJ_SIZE_FOR_LAYER2_TEMPLATES) ? 3 : 2;
 
             default:
                 throw new UnsupportedOperationException("unhandled operator type: " + host.op());

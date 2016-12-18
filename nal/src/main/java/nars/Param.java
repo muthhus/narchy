@@ -71,7 +71,7 @@ public abstract class Param /*extends Container*/ implements Level {
     /** adjuts this between 0 and 1. 0=fully backward, 0.5=balanced, 1=fully forward */
     //public static final float ACTIVATION_TERMLINK_BALANCE = 0.5f;
 
-    public static final int ACTIVATION_TERMLINK_DEPTH = 3;
+    public static final int ACTIVATION_TERMLINK_DEPTH = 1;
     public static final int ACTIVATION_TERMLINK_DEPTH_CONCEPTUALIZE = 2;
     public static final int ACTIVATION_TASKLINK_DEPTH = 2;
     public static final boolean ACTIVATE_TERMLINKS_IF_NO_TEMPLATE = false;
