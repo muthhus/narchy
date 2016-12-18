@@ -81,7 +81,7 @@ public abstract class Param /*extends Container*/ implements Level {
     public static final int ACTIVATION_CONCEPTUALIZE_DEPTH = 2;
     public static final int ACTIVATION_CONCEPT_ACTIVATION_DEPTH = 2;
     public static final int ACTIVATION_TASKLINK_DEPTH = 1;
-    public static final boolean ACTIVATE_TERMLINKS_IF_NO_TEMPLATE = false;
+    //public static final boolean ACTIVATE_TERMLINKS_IF_NO_TEMPLATE = false;
 
 
     //public static final boolean PREMISE_LOG = true;

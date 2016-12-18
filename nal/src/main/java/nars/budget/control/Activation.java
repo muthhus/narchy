@@ -13,7 +13,7 @@ import org.jetbrains.annotations.NotNull;
 abstract public class Activation {
 
     @NotNull
-    public final Concept src;
+    public final Concept origin;
     final MutableFloat linkOverflow = new MutableFloat(0);
 
     @NotNull
@@ -21,10 +21,10 @@ abstract public class Activation {
     final float minScale; //cut-off limit for recursive spread
     protected final Budgeted in;
 
-    public Activation(@NotNull Budgeted in, float scale, @NotNull Concept src, @NotNull NAR nar) {
+    public Activation(@NotNull Budgeted in, float scale, @NotNull Concept origin, @NotNull NAR nar) {
         this.nar = nar;
         this.in = in;
         this.minScale = Param.BUDGET_EPSILON / (scale * in.pri());
-        this.src = src;
+        this.origin = origin;
     }
 }

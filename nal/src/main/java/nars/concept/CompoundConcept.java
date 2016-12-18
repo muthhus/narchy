@@ -412,7 +412,7 @@ public class CompoundConcept<T extends Compound> implements Concept, Termlike {
 
             if (delta != null) {
                 //beliefs/goals
-                feedback(input, delta, (CompoundConcept) a.src, nar);
+                feedback(input, delta, (CompoundConcept) a.origin, nar);
             } else {
                 //questions/quests
                 input.feedback(delta, 0, 0, nar);

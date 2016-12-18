@@ -23,7 +23,7 @@ public interface TemporalBeliefTable extends TaskTable {
     /** return null if wasnt added */
     @Nullable TruthDelta add(@NotNull Task input, EternalTable eternal, Concept concept, @NotNull NAR nar);
 
-    boolean removeIf(@NotNull Predicate<? super Task> o, NAR nar);
+    //boolean removeIf(@NotNull Predicate<? super Task> o, NAR nar);
 
 
 
@@ -31,9 +31,8 @@ public interface TemporalBeliefTable extends TaskTable {
 
     boolean isFull();
 
-    default void clear(NAR nar) {
-        removeIf((Task x)->true, nar);
-    }
+    void clear(NAR nar);
+
 
     //void range(long[] t);
 }

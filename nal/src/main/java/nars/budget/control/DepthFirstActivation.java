@@ -3,7 +3,6 @@ package nars.budget.control;
 import nars.NAR;
 import nars.Param;
 import nars.Task;
-import nars.bag.Bag;
 import nars.budget.Budgeted;
 import nars.budget.util.PriorityAccumulator;
 import nars.concept.Concept;
@@ -12,6 +11,8 @@ import nars.term.Termed;
 import nars.term.container.TermContainer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import static jcog.Texts.n2;
 
 /**
  * Created by me on 8/22/16.
@@ -24,7 +25,8 @@ public class DepthFirstActivation extends Activation {
     @NotNull
     public final Budgeted in;
 
-    @Nullable public final PriorityAccumulator<Concept> conceptActivation;
+    @Nullable
+    public final PriorityAccumulator<Concept> conceptActivation;
 
 
     DepthFirstActivation(@NotNull Budgeted in, float scale, @NotNull Concept src, @NotNull NAR nar, int termlinkDepth, int taskLinkDepth, @Nullable PriorityAccumulator<Concept> conceptActivation) {
@@ -41,7 +43,7 @@ public class DepthFirstActivation extends Activation {
     public DepthFirstActivation(@NotNull Budgeted in, float scale, @NotNull Concept src, int termlinkDepth, int taskLinkDepth, @NotNull NAR nar) {
         this(in, scale, src, nar, termlinkDepth, taskLinkDepth, nar.accumulator());
 
-        linkSubterm(src, scale, 0);
+        linkSubterm(src, src, scale, 0);
 
         nar.emotion.stress(linkOverflow);
     }
@@ -53,8 +55,6 @@ public class DepthFirstActivation extends Activation {
     public DepthFirstActivation(@NotNull Budgeted in, @NotNull Concept c, @NotNull NAR nar, float scale) {
         this(in, scale, c, Param.ACTIVATION_TERMLINK_DEPTH, Param.ACTIVATION_TASKLINK_DEPTH, nar);
     }
-
-
 
 
 //    public void linkTermLinks(Concept src, float scale) {
@@ -69,38 +69,47 @@ public class DepthFirstActivation extends Activation {
      * crosslinks termlinks
      */
     @Nullable
-    Concept linkSubterm(@NotNull Termed target, float subScale, int depth) {
-
-        Concept targetConcept = nar.concept(target,
-                //dont create a concept if doesnt exist, below this depth
-                depth < Param.ACTIVATION_CONCEPTUALIZE_DEPTH ? true : false
-        );
-
-        if (targetConcept == null) {
-            return targetConcept;
-        }
+    Concept linkSubterm(Concept srcConcept, @NotNull Concept targetConcept, float subScale, int depth) {
 
 
         if (in instanceof Task && depth <= tasklinkDepth) {
-            tasklink(targetConcept, (Task)in, subScale);
+            tasklink(targetConcept, (Task) in, subScale);
         }
 
         if (depth <= termlinkDepth) {
 
             //System.out.println("+" + scale + " x " + targetConcept);
-            if (conceptActivation!=null && depth <= Param.ACTIVATION_CONCEPT_ACTIVATION_DEPTH)
+            if (conceptActivation != null && depth <= Param.ACTIVATION_CONCEPT_ACTIVATION_DEPTH)
                 conceptActivation.add(targetConcept, subScale);
 
+            link(srcConcept, targetConcept, subScale);
 
             @NotNull TermContainer templates = targetConcept.templates();
             int n = templates.size();
-            if (n > 0) {
-                float subScale1 = /*Param.TERMLINK_TEMPLATE_PRIORITY_FACTOR **/ subScale / n;
-                if (subScale1 >= minScale) { //TODO use a min bound to prevent the iteration ahead of time
-                    for (int i = 0; i < n; i++)
-                        link(targetConcept, templates.term(i), subScale1, depth + 1); //Link the peer termlink bidirectionally
+
+            float tlScale = /*Param.TERMLINK_TEMPLATE_PRIORITY_FACTOR **/ subScale / (n);
+            if (tlScale >= minScale) { //TODO use a min bound to prevent the iteration ahead of time
+
+
+                boolean activateTemplate = (depth + 1) < Param.ACTIVATION_CONCEPTUALIZE_DEPTH ? true : false;
+                for (int i = 0; i < n; i++) {
+
+                    Term tt = templates.term(i);
+                    Concept tc = nar.concept(tt, activateTemplate );
+                    if (tc!=null) {
+                        linkSubterm(targetConcept, tc, tlScale, depth + 1);
+                    } else {
+                        //just link to the term
+                        link(targetConcept, tt, tlScale);
+                    }
                 }
-            } else {
+
+            }
+
+
+
+
+            /*else {
                 if (Param.ACTIVATE_TERMLINKS_IF_NO_TEMPLATE) {
                     Bag<Term> bbb = targetConcept.termlinks();
                     n = bbb.size();
@@ -114,7 +123,7 @@ public class DepthFirstActivation extends Activation {
                         }
                     }
                 }
-            }
+            }*/
 
         }
 
@@ -122,35 +131,30 @@ public class DepthFirstActivation extends Activation {
         return targetConcept;
     }
 
-    protected final void link(@NotNull Concept src, @NotNull Termed target, float scale, int depth) {
+    protected final void link(@NotNull Concept src, @NotNull Termed tgt, float scale) {
 
-        Term sourceTerm = src.term();
-        Term targetTerm = target.term();
-        assert(!targetTerm.equals(sourceTerm));
+        //System.out.println( "\t" + origin + " " + src + " " + tgt + " "+ n2(scale));
 
-        if (scale < minScale)
-            return;
-
-        Concept targetConcept = linkSubterm(target, scale, depth);
+        Term srcTerm = src.term();
+        Term tgtTerm = tgt.term();
 
 
-
-            // insert termlink target to source
-            //float tlFlow = Param.ACTIVATION_TERMLINK_BALANCE;
+        // insert termlink target to source
+        //float tlFlow = Param.ACTIVATION_TERMLINK_BALANCE;
 
             /* insert termlink source to target */
-            final float tlReverse = scale;
-            if (tlReverse >= minScale)
-                termlink(src, targetTerm, tlReverse);
+        final float tlReverse = scale;
+        if (tlReverse >= minScale)
+            termlink(src, tgtTerm, tlReverse);
 
 
-            if (targetConcept != null) {
-                final float tlForward = scale;
-                if (tlForward >= minScale)
-                    termlink(targetConcept, sourceTerm, tlForward);
-            }
+        if (tgt instanceof Concept && !srcTerm.equals(tgtTerm)) {
+            final float tlForward = scale;
+            if (tlForward >= minScale)
+                termlink((Concept)tgt, srcTerm, tlForward);
+        }
 
-            //System.out.println(src + "<-" + sourceTerm + " -> " + target + "<-" + targetTerm);
+        //System.out.println(src + "<-" + sourceTerm + " -> " + target + "<-" + targetTerm);
 
 
     }
@@ -162,7 +166,6 @@ public class DepthFirstActivation extends Activation {
     protected void termlink(Concept from, Term to, float scale) {
         from.termlinks().put(to, in, scale, linkOverflow);
     }
-
 
 
 }

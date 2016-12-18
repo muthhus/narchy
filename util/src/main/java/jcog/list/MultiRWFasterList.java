@@ -179,6 +179,7 @@ public class MultiRWFasterList<T>  extends AbstractMultiReaderMutableCollection<
 
     UntouchableMutableList<T> asReadUntouchable() {
         return new UntouchableMutableList<>(this.delegate.asUnmodifiable());
+
     }
 
     UntouchableMutableList<T> asWriteUntouchable() {
@@ -190,9 +191,9 @@ public class MultiRWFasterList<T>  extends AbstractMultiReaderMutableCollection<
         this.acquireReadLock();
         try
         {
-            UntouchableMutableList<T> list = this.asReadUntouchable();
-            procedure.value(list);
-            list.becomeUseless();
+            //UntouchableMutableList<T> list = this.asReadUntouchable();
+            procedure.value(delegate);
+            //list.becomeUseless();
         }
         finally
         {
@@ -205,15 +206,32 @@ public class MultiRWFasterList<T>  extends AbstractMultiReaderMutableCollection<
         this.acquireWriteLock();
         try
         {
-            UntouchableMutableList<T> list = this.asWriteUntouchable();
-            procedure.value(list);
-            list.becomeUseless();
+            //MutableList<T> list = this.asWriteUntouchable();
+            procedure.value(delegate);
+            //list.becomeUseless();
         }
         finally
         {
             this.unlockWriteLock();
         }
     }
+
+    public void ifNotEmptyWithWriteLockAndDelegate(Procedure<MutableList<T>> procedure)
+    {
+        MutableList<T> d = this.delegate;
+        if (!d.isEmpty()) {
+            this.acquireWriteLock();
+            try {
+                //MutableList<T> list = this.asWriteUntouchable();
+
+                procedure.value(d);
+                //list.becomeUseless();
+            } finally {
+                this.unlockWriteLock();
+            }
+        }
+    }
+
 
     @Override
     public MutableList<T> asSynchronized()
