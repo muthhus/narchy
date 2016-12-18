@@ -305,7 +305,7 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
     }
 
     final float rankTemporalByConfidence(@Nullable Task t, long when) {
-        return t == null ? -1 : t.confWeight(when) * (1f + t.range()); //approximately integrates the confidence over time
+        return t == null ? -1 : t.conf(when) * (1f + t.range()); //approximately integrates the confidence over time
     }
 
     public Task matchMerge(long now, @NotNull Task toMergeWith, float dur) {
