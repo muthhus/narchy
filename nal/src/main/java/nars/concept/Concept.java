@@ -27,7 +27,6 @@ import nars.Symbols;
 import nars.Task;
 import nars.bag.Bag;
 import nars.budget.control.Activation;
-import nars.budget.Budgeted;
 import nars.budget.control.DepthFirstActivation;
 import nars.budget.policy.ConceptState;
 import nars.link.BLink;
@@ -228,24 +227,6 @@ public interface Concept extends Termed {
 //        return Revision.answer(x, y, when, now, truth);
 //    }
 
-
-    /**
-     * @param src task with a term equal to this concept's
-     * @param tgt task with a term equal to another concept's
-     * @return true if the tgt task's concept is different from this Concept, in which case a crossLink has been applied. false otherwise
-     */
-    @Nullable
-    default Concept crossLink(@NotNull Budgeted src, @NotNull Task tgt, float scale, @NotNull NAR nar) {
-        Concept other = tgt.concept(nar);
-        if (other == null || other.equals(this))
-            return null; //null or same concept
-
-        //TODO make a custom CrossLinkActivation
-        new DepthFirstActivation(tgt, this, other, nar, scale, 1, -1);
-        new DepthFirstActivation(src, other, this, nar, scale, 1, -1);
-
-        return other;
-    }
 
     //    /** link to a specific peer */
 //    static <T> void linkPeer(@NotNull Bag<T> bag, @NotNull T x, @NotNull Budget b, float q) {

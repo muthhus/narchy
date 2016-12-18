@@ -14,6 +14,8 @@ import java.util.Deque;
 import java.util.Iterator;
 import java.util.List;
 
+import static nars.budget.control.Crosslink.crossLink;
+
 /**
  * Short-term Memory Belief Event Induction.
  * Creates links between sequences of perceived events
@@ -98,7 +100,7 @@ public final class STMTemporalLinkage extends STM {
         if (!queued.isEmpty()) {
             nar.runLater(()-> {
                 for (int i = 0, queuedSize = queued.size(); i < queuedSize; i++) {
-                    concept.crossLink(t, queued.get(i), strength, nar);
+                    crossLink(concept, t, queued.get(i), strength, nar);
                 }
             });
         }

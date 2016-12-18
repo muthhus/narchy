@@ -31,7 +31,7 @@ public class QueryVariableTest {
 
     void testQuestionAnswer(@NotNull String beliefString, @NotNull String question) {
 
-        int time = 32;
+        int time = 64;
 
         AtomicBoolean valid = new AtomicBoolean();
 

@@ -21,9 +21,14 @@ public abstract class Param /*extends Container*/ implements Level {
 
     /** absolute limit for constructing terms in any context in which a NAR is not known, which could provide a limit.
      * typically a NAR instance's 'compoundVolumeMax' parameter will be lower than this */
-    public static final int COMPOUND_VOLUME_MAX = 72;
+    public static final int COMPOUND_VOLUME_MAX = 48;
 
-
+    /**
+     * hard upper-bound limit on Compound term complexity;
+     * if this is exceeded it may indicate a recursively
+     * malformed term due to a serious inference bug
+     */
+    public final MutableInteger termVolumeMax = new MutableInteger(28);
 
     //public static final boolean ARITHMETIC_INDUCTION = false;
 
@@ -71,9 +76,11 @@ public abstract class Param /*extends Container*/ implements Level {
     /** adjuts this between 0 and 1. 0=fully backward, 0.5=balanced, 1=fully forward */
     //public static final float ACTIVATION_TERMLINK_BALANCE = 0.5f;
 
-    public static final int ACTIVATION_TERMLINK_DEPTH = 1;
-    public static final int ACTIVATION_TERMLINK_DEPTH_CONCEPTUALIZE = 2;
-    public static final int ACTIVATION_TASKLINK_DEPTH = 2;
+    /** note: depth=0 means the concept itself, and increasing numbers are recursion iterations in the activation traversal pattern */
+    public static final int ACTIVATION_TERMLINK_DEPTH = 2;
+    public static final int ACTIVATION_CONCEPTUALIZE_DEPTH = 2;
+    public static final int ACTIVATION_CONCEPT_ACTIVATION_DEPTH = 2;
+    public static final int ACTIVATION_TASKLINK_DEPTH = 1;
     public static final boolean ACTIVATE_TERMLINKS_IF_NO_TEMPLATE = false;
 
 
@@ -84,12 +91,7 @@ public abstract class Param /*extends Container*/ implements Level {
     /** used in linear interpolating link adjustments during feedback. set to zero to disable */
     public final FloatParam linkFeedbackRate = new FloatParam(0.0f);
 
-    /**
-     * hard upper-bound limit on Compound term complexity;
-     * if this is exceeded it may indicate a recursively
-     * malformed term due to a serious inference bug
-     */
-    public final MutableInteger termVolumeMax = new MutableInteger(32);
+
 
     /**
      * maximum changes logged in deriver's stack.

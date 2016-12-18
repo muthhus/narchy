@@ -22,12 +22,12 @@ abstract public class Executioner implements Executor {
             throw new RuntimeException("already started");
         }
     }
-    public void stop() {
+    public synchronized void stop() {
         if (this.nar != null) {
             this.nar = null;
-        } else {
+        } /*else {
             throw new RuntimeException("not already started");
-        }
+        }*/
     }
 
     abstract public void next(@NotNull NAR nar);
