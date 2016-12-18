@@ -89,7 +89,7 @@ public class DepthFirstActivation extends Activation {
             boolean activateTemplate = (depth + 1) < Param.ACTIVATION_CONCEPTUALIZE_DEPTH ? true : false;
             for (int i = 0; i < n; i++) {
 
-                Term tt = templates.term(i);
+                Term tt = templates.term(i).unneg();
                 Concept tc = nar.concept(tt, activateTemplate);
                 if (tc != null) {
                     link(tc, tlScale, depth + 1); //link and recurse to the concept
@@ -163,20 +163,34 @@ public class DepthFirstActivation extends Activation {
         }
 
         @Override
+        @Nullable void link(@NotNull Concept targetConcept, float subScale, int depth) {
+            if (depth == 0)
+                spread = new ObjectFloatHashMap<>(); //HACK
+
+            super.link(targetConcept, subScale, depth);
+        }
+
+        @Override
         protected void tasklink(@NotNull Task src, Concept target, float scale) {
 
         }
 
         protected void termlink(@NotNull Concept src, Term target, float scale) {
-            if (!post) {
-                if (spread == null)
-                    spread = new ObjectFloatHashMap<>(); //HACK
 
-                FloatToFloatFunction updater = (v) -> Math.max(v, scale);
-                spread.updateValue(target.term(), 0, updater);
-            } else {
-                super.termlink(src, target, scale);
-            }
+
+                if (!post) {
+                    //FloatToFloatFunction updater = (v) -> Math.max(v, scale);
+                    //spread.updateValue(targett, 0, updater);
+//                    Term targetConcept = nar.concepts.conceptualizable(target, true);
+//                    if (targetConcept == null)
+//                        targetConcept = target;
+
+                    spread.addToValue(target, scale);
+
+                } else {
+                    super.termlink(src, target, scale);
+                }
+
 
         }
 
