@@ -179,11 +179,6 @@ public class TermjectConcept<X> implements Concept, Termject<X> {
         return termLinks;
     }
 
-    @NotNull
-    @Override
-    public final TermContainer templates() {
-        return Terms.NoSubterms;
-    }
 
     @Override
     public @Nullable Map<Object, Object> meta() {

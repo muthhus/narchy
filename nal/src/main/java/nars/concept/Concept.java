@@ -27,7 +27,6 @@ import nars.Symbols;
 import nars.Task;
 import nars.bag.Bag;
 import nars.budget.control.Activation;
-import nars.budget.control.DepthFirstActivation;
 import nars.budget.policy.ConceptState;
 import nars.link.BLink;
 import nars.table.BeliefTable;
@@ -35,7 +34,6 @@ import nars.table.QuestionTable;
 import nars.table.TaskTable;
 import nars.term.Term;
 import nars.term.Termed;
-import nars.term.container.TermContainer;
 import nars.truth.Truth;
 import org.eclipse.collections.impl.map.mutable.UnifiedMap;
 import org.jetbrains.annotations.NotNull;
@@ -54,11 +52,6 @@ public interface Concept extends Termed {
     @NotNull Bag<Task> tasklinks();
 
     @NotNull Bag<Term> termlinks();
-
-    /**
-     * termlink templates; null if none exist
-     */
-    @NotNull TermContainer templates();
 
     @Nullable Map<Object, Object> meta();
 
@@ -393,8 +386,7 @@ public interface Concept extends Termed {
                 //out.append("TermLinkTemplates: ");
                 //out.appendln(termlinkTemplates());
 
-                out.append("\n TermLinks: " + termlinks().size() + '/' + termlinks().capacity() +
-                        "\tTemplates: " + this.templates()).append('\n');
+                out.append("\n TermLinks: " + termlinks().size() + '/' + termlinks().capacity() ).append('\n');
 
                 termlinks().forEach(printBagItem);
             }

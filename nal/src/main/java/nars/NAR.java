@@ -13,8 +13,6 @@ import nars.budget.Budget;
 import nars.budget.Budgeted;
 import nars.budget.control.Activation;
 import nars.budget.policy.ConceptState;
-import nars.budget.util.ObjectFloatHashMapPriorityAccumulator;
-import nars.budget.util.PriorityAccumulator;
 import nars.concept.CompoundConcept;
 import nars.concept.Concept;
 import nars.concept.Functor;
@@ -1391,22 +1389,6 @@ public abstract class NAR extends Param implements Level, Consumer<Task>, NARIn,
     }
 
 
-    final ThreadLocal<PriorityAccumulator<Concept>> priorityAccumulatrs = ThreadLocal.withInitial(()->{
-        ObjectFloatHashMapPriorityAccumulator<Concept> aa = new ObjectFloatHashMapPriorityAccumulator<Concept>();
-        onCycle(f -> {
-            Iterable<ObjectFloatPair<Concept>> y = aa.commit();
-            if (y!=null) {
-                priorityAdd(y, null);
-            }
-        });
-        return aa;
-    });
-
-    public PriorityAccumulator<Concept> accumulator() {
-        PriorityAccumulator<Concept> v = priorityAccumulatrs.get();
-        return v;
-    }
-
     public abstract Iterable<? extends BLink<Concept>> conceptsActive(int maxNodes);
 
 
@@ -1532,7 +1514,7 @@ public abstract class NAR extends Param implements Level, Consumer<Task>, NARIn,
     /**
      * batched concept activation
      */
-    abstract public void priorityAdd(Iterable<ObjectFloatPair<Concept>> concepts, @Nullable MutableFloat overflow);
+    abstract public void activate(Iterable<ObjectFloatPair<Concept>> concepts, @Nullable MutableFloat overflow);
 
 
 //    public final void activate(@NotNull Task t) {

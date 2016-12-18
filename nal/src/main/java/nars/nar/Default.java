@@ -149,7 +149,7 @@ public class Default extends NAR {
     }
 
     @Override
-    public final void priorityAdd(Iterable<ObjectFloatPair<Concept>> concepts, MutableFloat overflow) {
+    public final void activate(Iterable<ObjectFloatPair<Concept>> concepts, MutableFloat overflow) {
         core.priorityAdd(concepts, overflow);
     }
 

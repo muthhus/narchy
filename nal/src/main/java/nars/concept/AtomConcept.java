@@ -53,10 +53,6 @@ public class AtomConcept extends AtomicStringConstant implements Concept {
         return op;
     }
 
-    /** typically atoms wont have termlink templates although some custom implementations might */
-    @Override public @Nullable TermContainer templates() {
-        return Terms.NoSubterms;
-    }
 
     @Override
     public ConceptState state() {

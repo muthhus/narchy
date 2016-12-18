@@ -6,17 +6,14 @@ import nars.Symbols;
 import nars.Task;
 import nars.bag.Bag;
 import nars.budget.control.Activation;
-import nars.budget.control.DepthFirstActivation;
+import nars.budget.control.SpreadingActivation;
 import nars.budget.merge.BudgetMerge;
 import nars.budget.policy.ConceptState;
-import nars.link.TermLinkBuilder;
 import nars.nar.util.DefaultConceptBuilder;
 import nars.table.*;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termlike;
-import nars.term.container.TermContainer;
-import nars.term.container.TermSet;
 import nars.truth.Truth;
 import nars.truth.TruthDelta;
 import org.jetbrains.annotations.NotNull;
@@ -40,8 +37,6 @@ public class CompoundConcept<T extends Compound> implements Concept, Termlike {
      * how incoming budget is merged into its existing duplicate quest/question
      */
 
-    @NotNull
-    private final TermContainer templates;
 
     @NotNull
     private final T term;
@@ -75,15 +70,10 @@ public class CompoundConcept<T extends Compound> implements Concept, Termlike {
         this.taskLinks = taskLinks;
 
 
-        this.templates = buildTemplates(term, nar);
         this.policy = ConceptState.Deleted;
     }
 
-    protected TermContainer buildTemplates(@NotNull T term, @NotNull NAR nar) {
-        TermContainer tt = TermSet.the(TermLinkBuilder.components(term, nar));
-        TermContainer ts = term.subterms();
-        return tt.equals(ts) ? ts : nar.concepts.intern(tt); //re-use the term's own subterms as the termlink templates if they are equal
-    }
+
 
     @NotNull
     @Override
@@ -103,11 +93,6 @@ public class CompoundConcept<T extends Compound> implements Concept, Termlike {
         throw new UnsupportedOperationException();
     }
 
-    @NotNull
-    @Override
-    public final TermContainer templates() {
-        return templates;
-    }
 
     @Override
     public @Nullable Map<Object, Object> meta() {
@@ -351,15 +336,6 @@ public class CompoundConcept<T extends Compound> implements Concept, Termlike {
     }
 
 
-//    @Override
-//    public boolean link(float scale, @Deprecated Budgeted src, float minScale, @NotNull NAR nar, @NotNull Activation activation) {
-//        if (AbstractConcept.link(this, scale, minScale, activation)) {
-//            activation.linkTerms(this, templates.terms(), scale, minScale, nar);
-//            return true;
-//        }
-//
-//        return false;
-//    }
 
 
     public static final BudgetMerge DuplicateMerge = BudgetMerge.max; //this should probably always be max otherwise incoming duplicates may decrease the existing priority
@@ -435,9 +411,9 @@ public class CompoundConcept<T extends Compound> implements Concept, Termlike {
         return a;
     }
 
-    public DepthFirstActivation activateTask(@NotNull Task input, @NotNull NAR nar) {
+    public Activation activateTask(@NotNull Task input, @NotNull NAR nar) {
         //return new DepthFirstActivation(input, this, nar, nar.priorityFactor.floatValue());
-        return new DepthFirstActivation.SpreadingActivation(input, this, nar, nar.priorityFactor.floatValue());
+        return new SpreadingActivation(input, this, nar, nar.priorityFactor.floatValue());
     }
 
     /**

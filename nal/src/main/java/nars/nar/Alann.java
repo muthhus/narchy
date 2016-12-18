@@ -285,7 +285,7 @@ public class Alann extends NAR {
     }
 
     @Override
-    public final void priorityAdd(Iterable<ObjectFloatPair<Concept>> concepts, MutableFloat overflow) {
+    public final void activate(Iterable<ObjectFloatPair<Concept>> concepts, MutableFloat overflow) {
 
 
         concepts.forEach((cv) -> {

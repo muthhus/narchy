@@ -283,10 +283,12 @@ public class Abbreviation/*<S extends Term>*/ extends Leak<CompoundConcept> {
             abbreviated.put(Concept.Savior.class, this);
 
             this.abbr = abbreviated;
-            Term[] tl = ArrayUtils.add(abbreviated.templates().terms(), abbreviated.term());
-            if (additionalTerms.length > 0)
-                tl = ArrayUtils.addAll(tl, additionalTerms);
-            this.templates = TermVector.the(tl);
+
+//            Term[] tl = ArrayUtils.add(abbreviated.templates().terms(), abbreviated.term());
+//            if (additionalTerms.length > 0)
+//                tl = ArrayUtils.addAll(tl, additionalTerms);
+//            this.templates = TermVector.the(tl);
+
             //rewriteLinks(nar);
         }
 
@@ -328,11 +330,6 @@ public class Abbreviation/*<S extends Term>*/ extends Leak<CompoundConcept> {
         public void delete(NAR nar) {
             abbr.delete(nar);
             super.delete(nar);
-        }
-
-        @Override
-        public @Nullable TermContainer templates() {
-            return templates;
         }
 
 //        @Override

@@ -80,7 +80,7 @@ public class Terminal extends NAR {
     }
 
     @Override
-    public void priorityAdd(Iterable<ObjectFloatPair<Concept>> concepts, MutableFloat overflow) {
+    public void activate(Iterable<ObjectFloatPair<Concept>> concepts, MutableFloat overflow) {
         //nothing
     }
 

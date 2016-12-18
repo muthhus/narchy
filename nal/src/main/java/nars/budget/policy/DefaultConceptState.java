@@ -81,7 +81,7 @@ public final class DefaultConceptState extends ConceptState {
         float complexityFactor = v / 8; //(nar.compoundVolumeMax.intValue()/2f); //HEURISTIC
         complexityFactor = Math.min(complexityFactor, 1f); //clip at +1
 
-        return Math.max(Util.lerp(min, max, complexityFactor), 1 + c.templates().size()); //at least enough for its templates
+        return Util.lerp(min, max, complexityFactor); //at least enough for its templates
     }
 
     @Override
