@@ -1,5 +1,6 @@
 package nars.bag.impl;
 
+import nars.Param;
 import nars.bag.Bag;
 import nars.budget.merge.BudgetMerge;
 import nars.link.BLink;
@@ -54,16 +55,14 @@ public class CurveBag<V> extends ArrayBag<V> implements Bag<V> {
 //    }
 
 
-    @NotNull
-    @Override
-    public Bag<V> update(@Nullable Consumer<BLink> each) {
-        super.update(each);
-        sampler.commit(this);
 
-        return this;
+    @Override
+    public void sort() {
+        super.sort();
+        sampler.commit(this);
     }
 
-//    public @Nullable BLink<V> peekNext(boolean remove) {
+    //    public @Nullable BLink<V> peekNext(boolean remove) {
 //
 //        synchronized (map) {
 //            while (!isEmpty()) {
@@ -88,6 +87,25 @@ public class CurveBag<V> extends ArrayBag<V> implements Bag<V> {
 //    }
 
 
+    /** simplified one item sample */
+    @Nullable @Override public BLink<V> sample() {
+        synchronized (items) {
+            int s = size();
+            while (s > 0) {
+                int i = sampleIndex(s);
+                BLink<V> b = get(i);
+                if (b.isDeleted()) {
+                    if (removeItem(b)!=null)
+                        s--;
+                    //then try again
+                } else {
+                    return b;
+                }
+            }
+        }
+        return null;
+    }
+
     /**
      * optimized batch fill, using consecutive array elements, also ensuring uniqueness
      * returns the instance for fluentcy
@@ -96,11 +114,31 @@ public class CurveBag<V> extends ArrayBag<V> implements Bag<V> {
     @Override
     public CurveBag<V> sample(int n, @NotNull Predicate<? super BLink<V>> target) {
 
+        //sampleIterative(n, target);
+        sampleMulti(n, target);
+
+        return this;
+    }
+
+    /** doesnt quite work yet; can get stuck in infinite loop  */
+    private void sampleIterative(int n, @NotNull Predicate<? super BLink<V>> target) {
+        for (int i = 0; i < n; i++) {
+
+            BLink<V> next;
+            do {
+                next = sample();
+            } while (next!=null && !target.test(next));
+
+        }
+    }
+
+    @NotNull
+    private void sampleMulti(int n, @NotNull Predicate<? super BLink<V>> target) {
         synchronized (items) {
 
             int ss = size();
             if (ss == 0)
-                return this;
+                return;
 
             final int begin, end;
             if (ss <= n) {
@@ -126,27 +164,40 @@ public class CurveBag<V> extends ArrayBag<V> implements Bag<V> {
                     n--;
             }
 
-            for (int i = begin - 1; n > 0 && i >= 0; i--) {
-                //scan upwards for any remaining
-                if (trySample(target, l[i]))
-                    n--;
-            }
+            if (n > 0) {
+                //scan upwrads and downwrads alternating until all items iterated
+                int dones = 0;
 
-            for (int i = end + 1; n > 0 && i < ss; i++) {
-                //scan downwards for any remaining
-                if (trySample(target, l[i]))
-                    n--;
+                for (int upwards = begin - 1, downwards = end + 1; (n > 0) && (dones!=3); ) {
+                    //scan upwards for any remaining
+                    if (upwards >= 0) {
+                        if (trySample(target, l[upwards--])) {
+                            if (--n == 0)
+                                break;
+                        }
+                    } else {
+                        dones |= 1; //bit 0
+                    }
+
+                    if (downwards < ss) {
+                        if (trySample(target, l[downwards++])) {
+                            if (--n == 0)
+                                break;
+                        }
+                    } else {
+                        dones |= 2; //bit 1
+                    }
+                }
+
             }
 
         }
 
-        return this;
+        return;
         //System.out.println("(of " + ss + ") select " + n + ": " + begin + ".." + end + " = " + target);
-
     }
 
-    public boolean trySample(@NotNull Predicate<? super BLink<V>> target, BLink<V> vbLink) {
-        BLink<V> b = vbLink;
+    public static boolean trySample(@NotNull Predicate target, BLink b) {
         return (!b.isDeleted() && target.test(b));
     }
 
@@ -426,6 +477,7 @@ public class CurveBag<V> extends ArrayBag<V> implements Bag<V> {
      */
     public static final class NormalizedSampler extends CurveSampler {
 
+        private static final float MIN_DYNAMIC_RANGE = /*(float) Math.sqrt*/(Param.BUDGET_EPSILON) /* heuristic */;
         private float range;
 
         public NormalizedSampler(CurveBag.BagCurve curve, Random random) {
@@ -435,21 +487,25 @@ public class CurveBag<V> extends ArrayBag<V> implements Bag<V> {
 
         @Override
         protected void commit(@NotNull CurveBag bag) {
-            synchronized (bag._items()) {
-                float max = bag.priMax();
-                float min = bag.priMin();
-                this.range = max - min;
-            }
+            float max = bag.priMax();
+            float min = bag.priMin();
+            this.range = max - min;
         }
 
         @Override
         float sample(int size) {
-            float dynamicRange = (range);
-            float uniform = random.nextFloat();
-            float curved = curve.valueOf(uniform);
 
-            return ((1f - dynamicRange) * uniform) +
-                    (dynamicRange * curved);
+
+            float dynamicRange = (range);
+
+            float uniform = random.nextFloat();
+            if (dynamicRange < MIN_DYNAMIC_RANGE) {
+                //if there is not enough dynamic range (variation from max to min) then just choose randomly (no curve)
+                return uniform;
+            } else {
+                return ((1f - dynamicRange) * uniform) +
+                        (dynamicRange * curve.valueOf(uniform));
+            }
         }
     }
 

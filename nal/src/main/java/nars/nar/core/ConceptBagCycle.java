@@ -3,6 +3,7 @@ package nars.nar.core;
 import jcog.data.MutableIntRange;
 import jcog.data.MutableInteger;
 import jcog.data.Range;
+import jcog.meter.event.HitMissMeter;
 import nars.$;
 import nars.NAR;
 import nars.Param;
@@ -17,6 +18,7 @@ import nars.link.BLink;
 import nars.nal.Deriver;
 import nars.nar.util.DefaultConceptBuilder;
 import nars.nar.util.PremiseMatrix;
+import nars.task.DerivedTask;
 import nars.term.Termed;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.eclipse.collections.api.tuple.primitive.ObjectFloatPair;
@@ -28,6 +30,7 @@ import org.slf4j.LoggerFactory;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Consumer;
 
 /**
  * The default deterministic memory cycle implementation that is currently used as a standard
@@ -35,7 +38,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  *
  * multithreading granularity at the concept (outermost loop)
  */
-public class ConceptBagCycle {
+public class ConceptBagCycle implements Consumer<DerivedTask> {
 
 
     private static final Logger logger = LoggerFactory.getLogger(ConceptBagCycle.class);
@@ -71,12 +74,11 @@ public class ConceptBagCycle {
     //@Range(min = 0, max = 16, unit = "TermLink")
     public final MutableIntRange termlinksFiredPerFiredConcept = new MutableIntRange(1, 1);
 
-
-
-    @NotNull
-    private final ConceptBuilder conceptBuilder;
+    @NotNull private final ConceptBuilder conceptBuilder;
 
     final AtomicBoolean busy = new AtomicBoolean(false);
+
+    public final HitMissMeter meter = new HitMissMeter(ConceptBagCycle.class.getSimpleName());
 
 //    private Comparator<? super BLink<Concept>> sortConceptLinks = (a, b) -> {
 //        Concept A = a.get();
@@ -140,7 +142,7 @@ public class ConceptBagCycle {
 
                                     PremiseMatrix.run(c, this.nar,
                                             _tasklinks, _termlinks,
-                                            this.nar::input, //input them within the current thread here
+                                            this, //input them within the current thread here
                                             deriver
                                     );
                                 }
@@ -157,6 +159,17 @@ public class ConceptBagCycle {
         });
         nar.eventReset.on((n)->active.clear());
 
+    }
+
+    @Override
+    public void accept(DerivedTask d) {
+        if (!nar.tasks.contains(d)) { //prefilter
+            if (nar.input(d)!=null) {
+                meter.hit();
+                return;
+            }
+        }
+        meter.miss();
     }
 
     /** called when a concept is displaced from the concept bag */

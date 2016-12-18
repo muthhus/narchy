@@ -5,7 +5,7 @@ import nars.Op;
 import nars.Task;
 import nars.bag.Bag;
 import nars.budget.control.Activation;
-import nars.budget.policy.ConceptPolicy;
+import nars.budget.policy.ConceptState;
 import nars.table.BeliefTable;
 import nars.table.QuestionTable;
 import nars.term.Term;
@@ -24,7 +24,7 @@ public class AtomConcept extends AtomicStringConstant implements Concept {
     private final Bag<Term> termLinks;
     private final Bag<Task> taskLinks;
     @Nullable
-    private ConceptPolicy policy;
+    private ConceptState state;
 
     @NotNull
     private final Op op;
@@ -43,6 +43,8 @@ public class AtomConcept extends AtomicStringConstant implements Concept {
 
         this.termLinks = termLinks;
         this.taskLinks = taskLinks;
+
+        this.state = ConceptState.Deleted;
     }
 
     @NotNull
@@ -57,15 +59,15 @@ public class AtomConcept extends AtomicStringConstant implements Concept {
     }
 
     @Override
-    public ConceptPolicy policy() {
-        return policy;
+    public ConceptState state() {
+        return state;
     }
 
     @Override
-    public void policy(@NotNull ConceptPolicy p, NAR nar) {
-        ConceptPolicy current = this.policy;
+    public void state(@NotNull ConceptState p, NAR nar) {
+        ConceptState current = this.state;
         if (current!=p) {
-            this.policy = p;
+            this.state = p;
             linkCapacity(p.linkCap(this, true),p.linkCap(this, false));
         }
     }

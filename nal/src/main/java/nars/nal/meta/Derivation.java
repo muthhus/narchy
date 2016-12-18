@@ -11,6 +11,7 @@ import nars.nal.Premise;
 import nars.nal.Stamp;
 import nars.nal.meta.constraint.MatchConstraint;
 import nars.op.DepIndepVarIntroduction;
+import nars.task.DerivedTask;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
@@ -41,7 +42,8 @@ public class Derivation extends Unify {
     @NotNull
     public final Premise premise;
     public final float truthResolution;
-    public float quaMin;
+    public final float quaMin;
+    public final float premiseEvidence;
 
     public boolean setPunct(@Nullable Truth t, char p, long[] evidence) {
         return this.punct.set(new Derivation.TruthPuncEvidence(t, p, evidence))!=null;
@@ -135,17 +137,18 @@ public class Derivation extends Unify {
     private long[] evidenceDouble, evidenceSingle;
 
     @Nullable
-    public final Consumer<Task> target;
+    public final Consumer<DerivedTask> target;
     public final boolean cyclic;
 
 
-    public Derivation(@NotNull NAR nar, @NotNull Premise p, @NotNull Consumer<Task> c) {
+    public Derivation(@NotNull NAR nar, @NotNull Premise p, @NotNull Consumer<DerivedTask> c) {
         super(nar.concepts, VAR_PATTERN, nar.random, Param.UnificationStackMax, Param.UnificationTermutesMax);
 
         this.nar = nar;
         this.truthResolution = nar.truthResolution.floatValue();
         this.confMin = Math.max(truthResolution, nar.confMin.floatValue());
         this.quaMin = nar.quaMin.floatValue();
+
 
         //occDelta = new Versioned(this);
         //tDelta = new Versioned(this);
@@ -211,9 +214,12 @@ public class Derivation extends Unify {
 
         this.temporal = temporal(task, belief);
 
-
         this.target = c;
 
+        float premiseEvidence = task.isBeliefOrGoal() ? task.evi() : 0;
+        if (belief!=null)
+            premiseEvidence = Math.max(premiseEvidence, belief.evi());
+        this.premiseEvidence = premiseEvidence;
 
     }
 

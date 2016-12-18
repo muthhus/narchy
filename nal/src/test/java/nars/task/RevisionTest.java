@@ -6,7 +6,7 @@ import nars.NAR;
 import nars.Param;
 import nars.Task;
 import nars.bag.Bag;
-import nars.budget.policy.DefaultConceptPolicy;
+import nars.budget.policy.DefaultConceptState;
 import nars.nar.Default;
 import nars.term.Compound;
 import nars.term.Term;
@@ -40,7 +40,7 @@ public class RevisionTest {
         */
 
         //}
-        ((DefaultConceptPolicy)d.concepts.conceptBuilder().awake()).beliefsMaxEte.set(maxBeliefs);
+        ((DefaultConceptState)d.concepts.conceptBuilder().awake()).beliefsMaxEte.set(maxBeliefs);
         return d;
     }
 

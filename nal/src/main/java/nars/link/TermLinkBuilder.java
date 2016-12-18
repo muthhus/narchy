@@ -4,28 +4,28 @@ import nars.NAR;
 import nars.Param;
 import nars.term.Compound;
 import nars.term.Term;
+import nars.term.atom.Atomic;
 import nars.term.var.Variable;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
-import java.util.TreeSet;
+import java.util.HashSet;
+import java.util.Set;
 
 
 public enum TermLinkBuilder {
     ;
 
 
-    @NotNull public static TreeSet<Term> components(@NotNull Compound host, @NotNull NAR nar) {
+    @NotNull public static Set<Term> components(@NotNull Compound host, @NotNull NAR nar) {
 
-        TreeSet<Term> components = new TreeSet<>(//new LinkedHashSet<>(
-            //host.complexity() /* estimate */
-        );
+        Set<Term> components =
+                //new TreeSet<>();
+                new HashSet<>(host.complexity());
 
-
-        for (int i = 0, ii = host.size(); i < ii; i++) {
-
-            components(host.term(i), levels(host), components, nar);
-
+        int hostLevels = levels(host);
+        for (int i = 0, s = host.size(); i < s; i++) {
+            components(host.term(i), hostLevels, components, nar);
         }
         return components;
     }
@@ -67,25 +67,29 @@ public enum TermLinkBuilder {
      */
     protected static void components(@NotNull Term t, int level, @NotNull Collection<Term> target, @NotNull NAR nar) {
 
-        //t = $.unneg(t);
+        t = t.unneg();
 
-        if (t instanceof Variable) {
+        if (t instanceof Atomic) {
 
-            //should these even be added?
-            target.add(t);
+            target.add(t); //any case when these should not be added?
 
         } else {
 
+            Term u = t;
             t = nar.concepts.conceptualizable(t);
+            if (t!=null) {
+                if (!target.add(t))
+                    return; //already added
+            } else {
+                t = u;
+            }
 
-            if (t != null && target.add(t)) { //do not descend on repeats
+            level--;
 
-                level--;
-                if (level > 0 && t instanceof Compound) {
-                    Compound cct = (Compound) t;
-                    for (int i = 0, ii = cct.size(); i < ii; i++) {
-                        components(cct.term(i), level, target, nar);
-                    }
+            if ((level > 0 && t instanceof Compound)) {
+                Compound cct = (Compound) t;
+                for (int i = 0, ii = cct.size(); i < ii; i++) {
+                    components(cct.term(i), level, target, nar);
                 }
             }
 

@@ -474,7 +474,7 @@ public abstract class TermIndex extends TermBuilder {
 
         Concept cc = (Concept) c;
         if (cc.isDeleted()) {
-            cc.policy(conceptBuilder().init(), nar);
+            cc.state(conceptBuilder().init(), nar);
         }
 
         return cc;
@@ -497,16 +497,22 @@ public abstract class TermIndex extends TermBuilder {
                 case VAR_PATTERN:
                     //throw new InvalidConceptException((Compound)term, "variables can not be conceptualized");
                     return null;
+
                 case NEG:
-                    term = term.unneg();
-                    break;
+                    term = term.unneg(); //fallthru
 
                 default:
 
                     if (term instanceof Compound) {
 
-                        if (term.size() == 0)
-                            return null; //example: ()
+                        if (Param.FILTER_CONCEPTS_WITHOUT_ATOMS) {
+                            if (!term.hasAny(Op.ATOM.bit | Op.INT.bit))
+                                return null;
+                        } else {
+                            //just test for 0-length compounds, example: ()
+                            if (term.size() == 0)
+                                return null;
+                        }
 
                         term = normalize((Compound) term);
                     }

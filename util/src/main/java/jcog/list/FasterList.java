@@ -265,6 +265,15 @@ public class FasterList<X> extends FastList<X> {
         return false;
     }
 
+    /** slow: use a set */
+    public final boolean addIfNotPresent(@Nullable X x) {
+        if (!contains(x)) {
+            add(x);
+            return true;
+        }
+        return false;
+    }
+
     public int forEach(int offset, IntObjectPredicate each) {
         int n = offset;
         for (Object j : items) {
@@ -292,4 +301,10 @@ public class FasterList<X> extends FastList<X> {
     public int capacity() {
         return items.length;
     }
+
+    public <E> E[] arrayClone(Class<? extends E> type) {
+        E [] array = (E []) Array.newInstance(type, size);
+        return toArray(array);
+    }
+
 }

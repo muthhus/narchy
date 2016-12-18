@@ -105,19 +105,24 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
         if (rule.minNAL <= nar.level()) { //HACK
 
             try {
+                //TODO make a variation of transform which can terminate early if exceeds a minimum budget threshold
+                //  which is already determined bythe constructed term's growing complexity) in m.budget()
                 Term r = m.index.transform(this.conclusionPattern, m);
-
-                if (r instanceof Compound && r.volume() < nar.termVolumeMax.intValue()) {
+                if (r instanceof Compound) {
 
                     Derivation.TruthPuncEvidence ct = m.punct.get();
-                    Truth truth = ct.truth;
 
-                    //note: the budget function used here should not depend on the truth's frequency. btw, it may be inverted below
-                    Budget budget = m.budget(truth, r);
-                    if (budget != null) {
-                        Compound rr = nar.normalize((Compound) r);
-                        if (rr != null && Task.taskStatementValid(rr, ct.punc, !Param.DEBUG)) {
-                            derive(m, rr, truth, budget, ct);
+                    if (r.volume() < nar.termVolumeMax.intValue() && Task.taskStatementValid((Compound) r, ct.punc, !Param.DEBUG)) {
+
+                        Truth truth = ct.truth;
+
+                        //note: the budget function used here should not depend on the truth's frequency. btw, it may be inverted below
+                        Budget budget = m.budget(truth, r);
+                        if (budget != null) {
+                            Compound rr = nar.normalize((Compound) r);
+                            if (rr != null) {
+                                derive(m, rr, truth, budget, ct); //continue to stage 2
+                            }
                         }
                     }
                 }
@@ -131,6 +136,9 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
     }
 
 
+    /**
+     * 2nd-stage
+     */
     final void derive(@NotNull Derivation m, @NotNull Compound content, Truth truth, Budget budget, @NotNull Derivation.TruthPuncEvidence ct) {
 
         NAR nar = m.nar;
@@ -141,7 +149,7 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
             if (content == null)
                 return; //??
 
-            if (truth!=null)
+            if (truth != null)
                 truth = truth.negated();
             o = content.op();
         }
@@ -164,7 +172,7 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
             );
 
             //temporalization failure, could not determine temporal attributes. seems this can happen normally
-            if ((temporalized == null) /*|| (Math.abs(occReturn[0]) > 2047483628)*/ /* long cast here due to integer wraparound */ ) {
+            if ((temporalized == null) /*|| (Math.abs(occReturn[0]) > 2047483628)*/ /* long cast here due to integer wraparound */) {
 //                if (temporalized!=null) {
 //                    //FOR DEBUGGING, re-run it
 //                    Compound temporalized2 = this.time.compute(content,
@@ -225,7 +233,7 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
         }
 
 
-        if (truth!=null) {
+        if (truth != null) {
             float eFactor = nar.evidenceFactor.asFloat();
             if (eFactor != 1) {
                 truth = truth.confWeightMult(eFactor);

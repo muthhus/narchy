@@ -1,7 +1,7 @@
 package nars.concept.util;
 
 import nars.NAR;
-import nars.budget.policy.ConceptPolicy;
+import nars.budget.policy.ConceptState;
 import nars.term.Term;
 import nars.term.Termed;
 import org.jetbrains.annotations.NotNull;
@@ -16,9 +16,9 @@ public interface ConceptBuilder extends Function<Term, Termed> {
 
 
 
-    @NotNull ConceptPolicy init();
-    @NotNull ConceptPolicy awake();
-    @NotNull ConceptPolicy sleep();
+    @NotNull ConceptState init();
+    @NotNull ConceptState awake();
+    @NotNull ConceptState sleep();
 
     void start(NAR nar);
 
@@ -35,17 +35,17 @@ public interface ConceptBuilder extends Function<Term, Termed> {
         }
 
         @Override
-        public @NotNull ConceptPolicy init() {
+        public @NotNull ConceptState init() {
             return null;
         }
 
         @Override
-        public @NotNull ConceptPolicy awake() {
+        public @NotNull ConceptState awake() {
             return null;
         }
 
         @Override
-        public @NotNull ConceptPolicy sleep() {
+        public @NotNull ConceptState sleep() {
             return null;
         }
 

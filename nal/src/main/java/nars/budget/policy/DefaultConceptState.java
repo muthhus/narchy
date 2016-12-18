@@ -9,7 +9,7 @@ import org.jetbrains.annotations.NotNull;
 /**
  * Created by me on 5/11/16.
  */
-public final class DefaultConceptPolicy extends ConceptPolicy {
+public final class DefaultConceptState extends ConceptState {
 
     public final MutableInteger beliefsMaxEte, goalsMaxEte;
     public final MutableInteger questionsMax;
@@ -19,7 +19,7 @@ public final class DefaultConceptPolicy extends ConceptPolicy {
     private final MutableInteger goalsMaxTemp;
 
     /** minimum of 3 beliefs per belief table. for eternal, this allows revision between two goals to produce a third  */
-    public DefaultConceptPolicy(String id, int beliefsCapTotal, int goalsCapTotal, int questionsMax, int termlinksCapacity, int taskLinksCapacity) {
+    public DefaultConceptState(String id, int beliefsCapTotal, int goalsCapTotal, int questionsMax, int termlinksCapacity, int taskLinksCapacity) {
         this(   id,
                 new MutableInteger(Math.max(3, beliefsCapTotal / 4)), //belief ete ~1/4
                 new MutableInteger(Math.max(3, goalsCapTotal   / 4)),   //goal ete  ~1/4
@@ -31,9 +31,9 @@ public final class DefaultConceptPolicy extends ConceptPolicy {
         );
     }
 
-    DefaultConceptPolicy(String id, MutableInteger beliefsMaxEte, MutableInteger goalsMaxEte,
-                         MutableInteger beliefsMaxTemp, MutableInteger goalsMaxTemp,
-                         MutableInteger questionsMax, @NotNull MutableInteger termlinksCapacity, @NotNull MutableInteger taskLinksCapacity) {
+    DefaultConceptState(String id, MutableInteger beliefsMaxEte, MutableInteger goalsMaxEte,
+                        MutableInteger beliefsMaxTemp, MutableInteger goalsMaxTemp,
+                        MutableInteger questionsMax, @NotNull MutableInteger termlinksCapacity, @NotNull MutableInteger taskLinksCapacity) {
         super("___" + id);
         this.beliefsMaxEte = beliefsMaxEte;
         this.beliefsMaxTemp = beliefsMaxTemp;

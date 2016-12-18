@@ -10,8 +10,8 @@ import nars.bag.Bag;
 import nars.bag.impl.CurveBag;
 import nars.bag.impl.experimental.HijackBag;
 import nars.budget.merge.BudgetMerge;
-import nars.budget.policy.ConceptPolicy;
-import nars.budget.policy.DefaultConceptPolicy;
+import nars.budget.policy.ConceptState;
+import nars.budget.policy.DefaultConceptState;
 import nars.concept.AtomConcept;
 import nars.concept.CompoundConcept;
 import nars.concept.Concept;
@@ -48,10 +48,10 @@ public class DefaultConceptBuilder implements ConceptBuilder {
 
     public DefaultConceptBuilder() {
 
-        this.sleep = new DefaultConceptPolicy("sleep", 6, 6, 1, 16, 8);
+        this.sleep = new DefaultConceptState("sleep", 6, 6, 1, 16, 8);
         this.init = sleep;
 
-        this.awake = new DefaultConceptPolicy("awake", 12, 12, 3, 32, 24);
+        this.awake = new DefaultConceptState("awake", 12, 12, 3, 32, 24);
     }
 
 //    private static final int DEFAULT_ATOM_LINK_MAP_CAPACITY = 128;
@@ -84,11 +84,11 @@ public class DefaultConceptBuilder implements ConceptBuilder {
 
 
     @NotNull
-    private final ConceptPolicy init;
+    private final ConceptState init;
     @NotNull
-    private final ConceptPolicy awake;
+    private final ConceptState awake;
     @NotNull
-    private final ConceptPolicy sleep;
+    private final ConceptState sleep;
     private NAR nar;
 
 
@@ -335,19 +335,19 @@ public class DefaultConceptBuilder implements ConceptBuilder {
 
     @NotNull
     @Override
-    public ConceptPolicy init() {
+    public ConceptState init() {
         return init;
     }
 
     @NotNull
     @Override
-    public ConceptPolicy awake() {
+    public ConceptState awake() {
         return awake;
     }
 
     @NotNull
     @Override
-    public ConceptPolicy sleep() {
+    public ConceptState sleep() {
         return sleep;
     }
 

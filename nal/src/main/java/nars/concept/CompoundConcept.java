@@ -8,7 +8,7 @@ import nars.bag.Bag;
 import nars.budget.control.Activation;
 import nars.budget.control.DepthFirstActivation;
 import nars.budget.merge.BudgetMerge;
-import nars.budget.policy.ConceptPolicy;
+import nars.budget.policy.ConceptState;
 import nars.link.TermLinkBuilder;
 import nars.nar.util.DefaultConceptBuilder;
 import nars.table.*;
@@ -58,7 +58,7 @@ public class CompoundConcept<T extends Compound> implements Concept, Termlike {
     private @Nullable Map meta;
 
     @NotNull
-    private transient ConceptPolicy policy;
+    private transient ConceptState policy;
 
 
     /**
@@ -76,7 +76,7 @@ public class CompoundConcept<T extends Compound> implements Concept, Termlike {
 
 
         this.templates = buildTemplates(term, nar);
-        this.policy = ConceptPolicy.Deleted;
+        this.policy = ConceptState.Deleted;
     }
 
     protected TermContainer buildTemplates(@NotNull T term, @NotNull NAR nar) {
@@ -283,13 +283,13 @@ public class CompoundConcept<T extends Compound> implements Concept, Termlike {
 
 
     @Override
-    public final ConceptPolicy policy() {
+    public final ConceptState state() {
         return policy;
     }
 
     @Override
-    public final void policy(@NotNull ConceptPolicy p, NAR nar) {
-        ConceptPolicy current = this.policy;
+    public final void state(@NotNull ConceptState p, NAR nar) {
+        ConceptState current = this.policy;
         if (current != p) {
             this.policy = p;
             linkCapacity( p.linkCap(this, true), p.linkCap(this, false));
@@ -301,7 +301,7 @@ public class CompoundConcept<T extends Compound> implements Concept, Termlike {
 
 
 
-    protected void beliefCapacity(@NotNull ConceptPolicy p, NAR nar) {
+    protected void beliefCapacity(@NotNull ConceptState p, NAR nar) {
 
         int be = p.beliefCap(this, true, true);
         int bt = p.beliefCap(this, true, false);
@@ -319,7 +319,7 @@ public class CompoundConcept<T extends Compound> implements Concept, Termlike {
 
     }
 
-    protected void questionCapacity(@NotNull ConceptPolicy p, NAR nar) {
+    protected void questionCapacity(@NotNull ConceptState p, NAR nar) {
         questions().capacity((byte) p.questionCap(true), nar);
         quests().capacity((byte) p.questionCap(false), nar);
     }

@@ -99,13 +99,15 @@ abstract public class ArrayListTable<K, V> extends CollectorMap<K, V> implements
 
     /**
      * Take out the first or last E in a level from the itemTable
-     *
+     * TODO make protected/private should only be called in synchronized (items)
      * @return The first Item
      */
-    @NotNull
     public final V removeItem(int index) {
 
         V ii = get(index);
+        if (ii == null)
+            return null;
+
         /*if (ii == null)
             throw new RuntimeException("invalid index: " + index + ", size=" + size());*/
 

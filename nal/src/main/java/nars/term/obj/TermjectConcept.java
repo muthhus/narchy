@@ -5,7 +5,7 @@ import nars.Op;
 import nars.Task;
 import nars.bag.Bag;
 import nars.budget.control.Activation;
-import nars.budget.policy.ConceptPolicy;
+import nars.budget.policy.ConceptState;
 import nars.concept.Concept;
 import nars.table.BeliefTable;
 import nars.table.QuestionTable;
@@ -33,7 +33,7 @@ public class TermjectConcept<X> implements Concept, Termject<X> {
     private final Termject<X> termject;
     private final Bag<Term> termLinks;
     private final Bag<Task> taskLinks;
-    private ConceptPolicy policy;
+    private ConceptState policy;
 
     public TermjectConcept(@NotNull Termject<X> t, Bag<Term> termLinks, Bag<Task> taskLinks) {
         this.termject = t;
@@ -212,12 +212,12 @@ public class TermjectConcept<X> implements Concept, Termject<X> {
 
 
     @Override
-    public @Nullable ConceptPolicy policy() {
+    public @Nullable ConceptState state() {
         return policy;
     }
 
     @Override
-    public void policy(@NotNull ConceptPolicy c, NAR nar) {
+    public void state(@NotNull ConceptState c, NAR nar) {
         this.policy = c;
     }
 

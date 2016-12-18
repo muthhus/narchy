@@ -108,10 +108,15 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
         return taskStatementValid(t, punc, safe);
     }
 
-    /** call this directly instead of taskContentValid if the level, volume, and normalization have already been tested */
+    /** call this directly instead of taskContentValid if the level, volume, and normalization have already been tested.
+     * these can all be tested prenormalization, because normalization will not affect the result
+     * */
     @Nullable static boolean taskStatementValid(@NotNull Compound t, char punc, boolean safe) {
         /* A statement sentence is not allowed to have a independent variable as subj or pred"); */
         Op op = t.op();
+
+        if (Param.FILTER_CONCEPTS_WITHOUT_ATOMS && !t.hasAny(Op.ATOM.bit | Op.INT.bit))
+            return false;
 
         switch (t.varIndep()) {
             case 0:

@@ -17,6 +17,7 @@
 package org.apache.lucene.search;
 
 
+import jcog.list.ConcurrentArrayList;
 import org.apache.lucene.store.AlreadyClosedException;
 
 import java.io.Closeable;
@@ -275,14 +276,14 @@ public abstract class ReferenceManager<G> implements Closeable {
   }
 
   private void notifyRefreshListenersBefore() throws IOException {
-    for (RefreshListener refreshListener : refreshListeners) {
-      refreshListener.beforeRefresh();
+    for (int i = 0, refreshListenersSize = refreshListeners.size(); i < refreshListenersSize; i++) {
+      refreshListeners.get(i).beforeRefresh();
     }
   }
 
   private void notifyRefreshListenersRefreshed(boolean didRefresh) throws IOException {
-    for (RefreshListener refreshListener : refreshListeners) {
-      refreshListener.afterRefresh(didRefresh);
+    for (int i = 0, refreshListenersSize = refreshListeners.size(); i < refreshListenersSize; i++) {
+      refreshListeners.get(i).afterRefresh(didRefresh);
     }
   }
 

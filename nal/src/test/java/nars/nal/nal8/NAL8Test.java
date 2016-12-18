@@ -19,7 +19,7 @@ import static org.junit.Assert.assertEquals;
 @RunWith(Parameterized.class)
 public class NAL8Test extends AbstractNALTest {
 
-    final int cycles = 70;
+    final int cycles = 250;
 
     public NAL8Test(Supplier<NAR> b) { super(b); }
 

@@ -13,6 +13,7 @@ import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import static nars.truth.TruthFunctions.w2c;
 import static nars.util.UtilityFunctions.and;
 
 /**
@@ -26,13 +27,7 @@ public class TaskBudgeting {
             //question or quest:
             derivationQuality = p.nar.qualityDefault(Symbols.QUESTION);
         } else {
-            float premiseEvidence = p.task.isBeliefOrGoal() ? p.task.evi() : 0;
-            if (p.belief!=null)
-                premiseEvidence = Math.max(premiseEvidence, p.belief.evi());
-            if (premiseEvidence <= 0)
-                throw new RuntimeException("invalid premise evidence");
-            float derivationEvi = truth.evi();
-            derivationQuality = derivationEvi / (1 + premiseEvidence);
+            derivationQuality = truth.conf() / w2c(p.premiseEvidence);
         }
 
 

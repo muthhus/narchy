@@ -118,13 +118,13 @@ public class LinkageTest extends AbstractNALTest {
 
 
         @Nullable Concept p1 = nar.concept(premise1);
-        assertNotNull(p1.policy());
+        assertNotNull(p1.state());
         p1.print();
 
         boolean passed = linksIndirectly(nar, premise2, p1);
 
         @Nullable Concept p2 = nar.concept(premise2);
-        assertNotNull(p2.policy());
+        assertNotNull(p2.state());
         p2.print();
 
         boolean passed2 = linksIndirectly(nar, premise1, p2);

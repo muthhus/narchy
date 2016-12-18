@@ -10,9 +10,9 @@ import org.jetbrains.annotations.NotNull;
  *      --budget (time)
  *      --memory (space)
  */
-public abstract class ConceptPolicy extends AtomicStringConstant {
+public abstract class ConceptState extends AtomicStringConstant {
 
-    protected ConceptPolicy(@NotNull String id) {
+    protected ConceptState(@NotNull String id) {
         super(id);
     }
 
@@ -30,7 +30,7 @@ public abstract class ConceptPolicy extends AtomicStringConstant {
     public abstract int questionCap(boolean questionOrQuest);
 
 
-    public static final ConceptPolicy Deleted = new ConceptPolicy("deleted") {
+    public static final ConceptState Deleted = new ConceptState("deleted") {
 
 
         @Override

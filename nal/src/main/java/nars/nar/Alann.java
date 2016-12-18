@@ -69,12 +69,12 @@ public class Alann extends NAR {
 
                     @Override
                     public void onAdded(BLink<Concept> value) {
-                        value.get().policy(concepts.conceptBuilder().awake(), Alann.this);
+                        value.get().state(concepts.conceptBuilder().awake(), Alann.this);
                     }
 
                     @Override
                     public void onRemoved(@NotNull BLink<Concept> value) {
-                        value.get().policy(concepts.conceptBuilder().sleep(), Alann.this);
+                        value.get().state(concepts.conceptBuilder().sleep(), Alann.this);
                     }
                 };
 

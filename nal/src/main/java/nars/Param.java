@@ -21,7 +21,7 @@ public abstract class Param /*extends Container*/ implements Level {
 
     /** absolute limit for constructing terms in any context in which a NAR is not known, which could provide a limit.
      * typically a NAR instance's 'compoundVolumeMax' parameter will be lower than this */
-    public static final int COMPOUND_VOLUME_MAX = 128;
+    public static final int COMPOUND_VOLUME_MAX = 96;
 
 
 
@@ -66,7 +66,7 @@ public abstract class Param /*extends Container*/ implements Level {
     public static final float BAG_THRESHOLD = (0.5f);
 
     /** conjunctions over this length will be ineligible for 2nd-layer termlink templates. it can be decomposed however, and decompositions of this size or less will be eligible. */
-    public static final int MAX_CONJ_SIZE_FOR_LAYER2_TEMPLATES = 3;
+    public static final int MAX_CONJ_SIZE_FOR_LAYER2_TEMPLATES = 2;
 
     /** adjuts this between 0 and 1. 0=fully backward, 0.5=balanced, 1=fully forward */
     //public static final float ACTIVATION_TERMLINK_BALANCE = 0.5f;
@@ -79,8 +79,6 @@ public abstract class Param /*extends Container*/ implements Level {
 
     //public static final boolean PREMISE_LOG = true;
 
-    /** how many times the desired selection size that bags should sample in case some of the selections are unused */
-    public static float BAG_OVERSAMPLING = 1.5f;
 
 
     /** used in linear interpolating link adjustments during feedback. set to zero to disable */
@@ -104,6 +102,8 @@ public abstract class Param /*extends Container*/ implements Level {
      */
     public static final float UnificationMatchesMax = 4, UnificationMatchesMin = 2;
 
+
+    public static final boolean FILTER_CONCEPTS_WITHOUT_ATOMS = false;
 
     /**
      * max # of chained termutes which can be active

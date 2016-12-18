@@ -12,8 +12,7 @@ import nars.Narsese.NarseseException;
 import nars.budget.Budget;
 import nars.budget.Budgeted;
 import nars.budget.control.Activation;
-import nars.budget.control.DepthFirstActivation;
-import nars.budget.policy.ConceptPolicy;
+import nars.budget.policy.ConceptState;
 import nars.budget.util.ObjectFloatHashMapPriorityAccumulator;
 import nars.budget.util.PriorityAccumulator;
 import nars.concept.CompoundConcept;
@@ -167,7 +166,7 @@ public abstract class NAR extends Param implements Level, Consumer<Task>, NARIn,
             rootOp.addValue(c.op());
             clazz.addValue(c.getClass().toString());
 
-            @Nullable ConceptPolicy p = c.policy();
+            @Nullable ConceptState p = c.state();
             policy.addValue(p != null ? p.toString() : "null");
 
             if (!(c instanceof TermTransform)) {
@@ -1375,12 +1374,12 @@ public abstract class NAR extends Param implements Level, Consumer<Task>, NARIn,
         level = newLevel;
     }
 
-    public final void policy(@NotNull Concept c, @NotNull ConceptPolicy p) {
+    public final void policy(@NotNull Concept c, @NotNull ConceptState p) {
 
-        @Nullable ConceptPolicy prev = c.policy();
+        @Nullable ConceptState prev = c.state();
         if (prev != p) {
 
-            c.policy(p, this);
+            c.state(p, this);
 
             concepts.onPolicyChanged(c);
         }

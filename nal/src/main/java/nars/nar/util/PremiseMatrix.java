@@ -13,7 +13,8 @@ import nars.nal.Deriver;
 import nars.nal.Premise;
 import nars.nal.meta.Derivation;
 import nars.table.BeliefTable;
-import nars.term.Termed;
+import nars.task.DerivedTask;
+import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,88 +32,78 @@ public class PremiseMatrix {
     public static int run(@NotNull Concept c,
                           @NotNull NAR nar,
                           int tasklinks, int termlinks,
-                          @NotNull Consumer<Task> target,
+                          @NotNull Consumer<DerivedTask> target,
                           @NotNull Deriver deriver) {
 
         return run(c, nar, tasklinks, termlinks, target, deriver, c.tasklinks(), c.termlinks());
     }
 
-    public static int run(@NotNull Concept c, @NotNull NAR nar, int tasklinks, int termlinks, @NotNull Consumer<Task> target, @NotNull Deriver deriver, @NotNull Bag<Task> tasklinkBag, @NotNull Bag<? extends Termed> termlinkBag) {
+    public static int run(@NotNull Concept c, @NotNull NAR nar, int tasklinks, int termlinks, @NotNull Consumer<DerivedTask> target, @NotNull Deriver deriver, @NotNull Bag<Task> tasklinkBag, @NotNull Bag<? extends Term> termlinkBag) {
         int count = 0;
 
 
-            c.commit();
+        c.commit();
 
-            int tasklinksSampled = (int)Math.ceil(tasklinks * Param.BAG_OVERSAMPLING);
+        int tasklinksSampled = (int) Math.ceil(tasklinks);
 
-            FasterList<BLink<Task>> tasksBuffer = (FasterList)$.newArrayList(tasklinksSampled);
-            tasklinkBag.sample(tasklinksSampled, tasksBuffer::addIfNotNull);
+        FasterList<BLink<Task>> tasksBuffer = (FasterList) $.newArrayList(tasklinksSampled);
+        tasklinkBag.sample(tasklinksSampled, tasksBuffer::add);
 
-            int tasksBufferSize = tasksBuffer.size();
-            if (tasksBufferSize > 0) {
+        int tasksBufferSize = tasksBuffer.size();
+        if (tasksBufferSize > 0) {
 
-                int termlinksSampled = (int)Math.ceil(termlinks * Param.BAG_OVERSAMPLING);
+            int termlinksSampled = (int) Math.ceil(termlinks);
 
-                FasterList<BLink<? extends Termed>> termsBuffer = (FasterList)$.newArrayList(termlinksSampled);
-                termlinkBag.sample(termlinksSampled, termsBuffer::addIfNotNull);
+            FasterList<BLink<? extends Term>> termsBuffer = (FasterList) $.newArrayList(termlinksSampled);
+            termlinkBag.sample(termlinksSampled, termsBuffer::add);
 
 
-                int termsBufferSize = termsBuffer.size();
-                if (termsBufferSize > 0) {
+            int termsBufferSize = termsBuffer.size();
+            if (termsBufferSize > 0) {
 
-                    //current termlink counter, as it cycles through what has been sampled, give it a random starting position
-                    int jl = nar.random.nextInt(termsBufferSize);
+                //current termlink counter, as it cycles through what has been sampled, give it a random starting position
+                int jl = nar.random.nextInt(termsBufferSize);
 
-                    //random starting position
-                    int il = nar.random.nextInt(tasksBufferSize);
+                //random starting position
+                int il = nar.random.nextInt(tasksBufferSize);
 
-                    int countPerTasklink = 0;
+                int countPerTasklink = 0;
 
-                    for (int i = 0; i < tasksBufferSize && countPerTasklink < tasklinks; i++, il++) {
+                long now = nar.time();
 
-                        BLink<Task> taskLink = tasksBuffer.get( il % tasksBufferSize );
+                for (int i = 0; i < tasksBufferSize && countPerTasklink < tasklinks; i++, il++) {
 
-                        Task task =
-                                taskLink.get();
-                        /*match(taskLink.get(), nar);
-                        if (task==null)
-                            continue;*/
+                    BLink<Task> taskLink = tasksBuffer.get(il % tasksBufferSize);
 
-                        Budget taskLinkBudget = taskLink.clone(); //save a copy because in multithread, the original may be deleted in-between the sample result and now
-                        if (taskLinkBudget == null)
-                            continue;
+                    Task task = taskLink.get(); /*match(taskLink.get(), nar); if (task==null) continue;*/
 
-                        long now = nar.time();
+                    int countPerTermlink = 0;
 
-                        int countPerTermlink = 0;
+                    for (int j = 0; j < termsBufferSize && countPerTermlink < termlinks; j++, jl++) {
 
-                        for (int j = 0; j < termsBufferSize && countPerTermlink < termlinks; j++, jl++) {
-
-                            Premise p = Premise.tryPremise(c, task, termsBuffer.get( jl % termsBufferSize ).get().term(), now, nar);
-
-                            if (p != null) {
-
-                                deriver.accept(new Derivation(nar, p, target));
-                                countPerTermlink++;
-                            }
-
+                        Premise p = Premise.tryPremise(c, task, termsBuffer.get(jl % termsBufferSize).get(), now, nar);
+                        if (p != null) {
+                            deriver.accept(new Derivation(nar, p, target));
+                            countPerTermlink++;
                         }
-
-                        countPerTasklink+= countPerTermlink > 0 ? 1 : 0;
 
                     }
 
-                    count+=countPerTasklink;
+                    countPerTasklink += countPerTermlink > 0 ? 1 : 0;
 
-                } else {
-                    if (Param.DEBUG_EXTRA)
-                        logger.warn("{} has zero termlinks", c);
                 }
+
+                count += countPerTasklink;
 
             } else {
                 if (Param.DEBUG_EXTRA)
-                    logger.warn("{} has zero tasklinks", c);
+                    logger.warn("{} has zero termlinks", c);
             }
+
+        } else {
+            if (Param.DEBUG_EXTRA)
+                logger.warn("{} has zero tasklinks", c);
+        }
 
 
         /*
@@ -129,32 +120,33 @@ public class PremiseMatrix {
     }
 
 
-
-    /** attempt to revise / match a better premise task */
-    private static Task match(Task task, NAR nar) {
-
-        if (!task.isInput() && task.isBeliefOrGoal()) {
-            Concept c = task.concept(nar);
-
-            long when = task.occurrence();
-
-            if (c != null) {
-                BeliefTable table = (BeliefTable) c.tableFor(task.punc());
-                long now = nar.time();
-                Task revised = table.match(when, now, task, false);
-                if (revised!=null) {
-                    if (task.isDeleted() || task.conf() < revised.conf()) {
-                        task = revised;
-                    }
-                }
-
-            }
-
-        }
-
-        if (task.isDeleted())
-            return null;
-
-        return task;
-    }
+//    /**
+//     * attempt to revise / match a better premise task
+//     */
+//    private static Task match(Task task, NAR nar) {
+//
+//        if (!task.isInput() && task.isBeliefOrGoal()) {
+//            Concept c = task.concept(nar);
+//
+//            long when = task.occurrence();
+//
+//            if (c != null) {
+//                BeliefTable table = (BeliefTable) c.tableFor(task.punc());
+//                long now = nar.time();
+//                Task revised = table.match(when, now, task, false);
+//                if (revised != null) {
+//                    if (task.isDeleted() || task.conf() < revised.conf()) {
+//                        task = revised;
+//                    }
+//                }
+//
+//            }
+//
+//        }
+//
+//        if (task.isDeleted())
+//            return null;
+//
+//        return task;
+//    }
 }

@@ -29,7 +29,7 @@ import nars.bag.Bag;
 import nars.budget.control.Activation;
 import nars.budget.Budgeted;
 import nars.budget.control.DepthFirstActivation;
-import nars.budget.policy.ConceptPolicy;
+import nars.budget.policy.ConceptState;
 import nars.link.BLink;
 import nars.table.BeliefTable;
 import nars.table.QuestionTable;
@@ -144,7 +144,7 @@ public interface Concept extends Termed {
 
     static void delete(@NotNull Concept c, @NotNull NAR nar) {
         List<Task> removed = $.newArrayList();
-        c.policy(ConceptPolicy.Deleted, nar);
+        c.state(ConceptState.Deleted, nar);
         nar.tasks.remove(removed);
 
         c.termlinks().clear();
@@ -162,7 +162,7 @@ public interface Concept extends Termed {
     }
 
     default boolean isDeleted()  {
-        return policy() == ConceptPolicy.Deleted;
+        return state() == ConceptState.Deleted;
     }
 
 
@@ -431,9 +431,9 @@ public interface Concept extends Termed {
 
     }
 
-    @Nullable ConceptPolicy policy();
+    @NotNull ConceptState state();
 
-    void policy(@NotNull ConceptPolicy c, @NotNull NAR nar);
+    void state(@NotNull ConceptState c, @NotNull NAR nar);
 
     default void commit() {
         tasklinks().commit();
