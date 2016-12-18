@@ -19,7 +19,7 @@ import static org.junit.Assert.assertEquals;
 @RunWith(Parameterized.class)
 public class NAL8Test extends AbstractNALTest {
 
-    final int cycles = 170;
+    final int cycles = 70;
 
     public NAL8Test(Supplier<NAR> b) { super(b); }
 
@@ -881,7 +881,7 @@ public class NAL8Test extends AbstractNALTest {
             .goal("(reward)")
             .believe("((good) ==> (reward))", 1, 0.9f)
             .believe("((--,(bad)) ==> (reward))", 1, 0.9f)
-            .mustDesire(cycles, "(bad)", 0.0f, 0.81f);
+            .mustDesire(cycles*5, "(bad)", 0.0f, 0.81f);
 
     }
 

@@ -46,7 +46,7 @@ public interface Deriver extends Consumer<Derivation> {
     }
     @NotNull
     static Deriver[] get(String... paths) {
-        return Lists.newArrayList(paths).stream().map(path -> derivers.synchronous().get(path)).toArray(Deriver[]::new);
+        return Lists.newArrayList(paths).parallelStream().map(path -> derivers.synchronous().get(path)).toArray(Deriver[]::new);
     }
 
 

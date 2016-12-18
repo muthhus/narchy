@@ -963,6 +963,18 @@ public class NAL7Test extends AbstractNALTest {
                 .mustBelieve(cycles, "( ((x) &&+0 --(y)) ==>+5 (z))", 1f, 0.81f);
     }
 
+    @Test public void testBackwardImplicationGeneration() {
+        test()
+                .log()
+                .inputAt(0, "(a). :|:")
+                .inputAt(10, "(b). :|:")
+                .inputAt(20, "(c). :|:")
+                .inputAt(30, "(d). :|:")
+                .mustBelieve(cycles, "( ((TODO) &&+0 --(y)) ==>+5 (z))", 1f, 0.81f);
+
+
+    }
+
 //    @Test public void testTruthDecayOverTime0() {
 //        testTruthDecayOverTime(0, 0.81f, 0.005f);
 //    }

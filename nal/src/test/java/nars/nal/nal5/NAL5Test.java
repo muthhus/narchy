@@ -22,7 +22,7 @@ public class NAL5Test extends AbstractNALTest {
         return AbstractNALTest.nars(5);
     }
 
-    final int cycles = 550;
+    final int cycles = 1000;
 
     @Test public void revision(){
         test()
@@ -291,7 +291,7 @@ public class NAL5Test extends AbstractNALTest {
 
 
     @Test
-    public void contraposition(){
+    public void contraposition1(){
         TestNAR tester = test();
 
         /*
@@ -311,6 +311,9 @@ public class NAL5Test extends AbstractNALTest {
     }
 
 
+
+
+
     @Test
     public void conditional_deduction(){
         TestNAR tester = test();
@@ -326,7 +329,7 @@ public class NAL5Test extends AbstractNALTest {
         TestNAR tester = test();
         tester.believe("<(&&,<robin --> [chirping]>,<robin --> [flying]>,<robin --> [withWings]>) ==> <robin --> bird>>"); //.en("If robin can fly, has wings, and chirps, then robin is a bird");
         tester.believe("<robin --> [flying]>"); //.en("robin can fly.");
-        tester.mustBelieve(cycles," <(&&,<robin --> [chirping]>,<robin --> [withWings]>) ==> <robin --> bird>>",1.00f,0.81f); //.en("If robin has wings and chirps then robin is a bird.");
+        tester.mustBelieve(cycles*8," <(&&,<robin --> [chirping]>,<robin --> [withWings]>) ==> <robin --> bird>>",1.00f,0.81f); //.en("If robin has wings and chirps then robin is a bird.");
 
     }
 

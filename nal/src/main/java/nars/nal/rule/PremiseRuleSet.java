@@ -90,7 +90,14 @@ public class PremiseRuleSet {
     public static PremiseRuleSet rules(String name) throws IOException {
 
         PatternTermIndex p = new PatternTermIndex(1024);
-        return new PremiseRuleSet(parse(load(Deriver.class.getResourceAsStream(name).readAllBytes()), p), p);
+        PremiseRuleSet rs = new PremiseRuleSet(parse(load(Deriver.class.getResourceAsStream(name).readAllBytes()), p), p);
+
+        logger.info("{} totalRules={}, uniqueComponents={}", name, rs.rules.size(), rs.patterns.size());
+        if (rs.errors[0] > 0) {
+            logger.warn("\t{} errors={}", name, rs.errors[0]);
+        }
+
+        return rs;
     }
 
     static Stream<Pair<Compound, String>> load(@NotNull PatternTermIndex p, @NotNull URL path) {
@@ -134,11 +141,6 @@ public class PremiseRuleSet {
         this.rules = permute(parsed, patterns).distinct().collect(toList());
 
         this.patterns = patterns;
-
-        logger.info("indexed {} total rules, consisting of {} unique components", rules.size(), patterns.size());
-        if (errors[0] > 0) {
-            logger.warn("\trule errors: {}", errors[0]);
-        }
     }
 
 
