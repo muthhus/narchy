@@ -23,13 +23,13 @@ public class UnifySubst extends Unify {
     public final NAR memory;
 
 
-    final Collection<Termed> target;
+    final Collection<Term> target;
     final int maxMatches;
     private Term a;
 
     int matches;
 
-    public UnifySubst(Op varType, @NotNull NAR memory, Collection<Termed> target, int maxMatches) {
+    public UnifySubst(Op varType, @NotNull NAR memory, Collection<Term> target, int maxMatches) {
         super(memory.concepts, varType, memory.random, Param.SubUnificationStackMax, Param.SubUnificationTermutesMax);
 
         this.memory = memory;

@@ -3,11 +3,11 @@ package nars.table;
 import nars.NAR;
 import nars.Task;
 import nars.budget.Budget;
-import nars.budget.util.BudgetFunctions;
 import nars.budget.Budgeted;
 import nars.concept.CompoundConcept;
 import nars.concept.dynamic.DynamicBeliefTable;
 import nars.task.AnswerTask;
+import nars.term.Compound;
 import nars.truth.Truth;
 import nars.truth.TruthDelta;
 import nars.truth.TruthFunctions;
@@ -20,7 +20,6 @@ import java.util.*;
 import static java.util.stream.StreamSupport.stream;
 import static nars.time.Tense.ETERNAL;
 import static nars.util.UtilityFunctions.and;
-import static nars.util.UtilityFunctions.or;
 
 /**
  * A model storing, ranking, and projecting beliefs or goals (tasks with TruthValue).
@@ -67,7 +66,7 @@ public interface BeliefTable extends TaskTable {
         }
 
         @Override
-        public Task answer(long when, long now, @NotNull Task question, float minConf) {
+        public Task answer(long when, long now, @NotNull Task question, Compound template, float minConf) {
             return null;
         }
 
@@ -238,14 +237,14 @@ public interface BeliefTable extends TaskTable {
         return eSum[0];
     }
 
-    default Task answer(long when, long now, @NotNull Task question, float minConf) {
+    default Task answer(long when, long now, @NotNull Task question, Compound template, float minConf) {
 
         Budget qBudget = question.budget();
 
         Task answer;
         Budget answerBudget;
         if (this instanceof DynamicBeliefTable) {
-            answer = ((DynamicBeliefTable) this).generate(question.term(), when);
+            answer = ((DynamicBeliefTable) this).generate(template, when);
             if (answer == null)
                 return null;
 
@@ -262,9 +261,9 @@ public interface BeliefTable extends TaskTable {
             if (answerBudget.isDeleted())
                 return null;
 
-            //require EXACT term (except for variables) but otherwise requiring exact same dt structure
-            if (!answer.term().equalsIgnoringVariables(question.term()))
-                return null;
+//            //require EXACT term (except for variables) but otherwise requiring exact same dt structure
+//            if (!answer.term().equalsIgnoringVariables(question.term()))
+//                return null;
 
             //project if different occurrence
             if (answer.occurrence() != when) {

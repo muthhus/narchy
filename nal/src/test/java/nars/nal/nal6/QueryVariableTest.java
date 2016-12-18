@@ -37,6 +37,7 @@ public class QueryVariableTest {
 
 
         Default nar = new Default();
+        nar.log();
         Termed beliefTerm = nar.term(beliefString);
         nar.believe(beliefTerm, 1f, 0.9f);
         nar.ask(question, Tense.ETERNAL, (q,a)-> {
@@ -69,23 +70,18 @@ public class QueryVariableTest {
                 "<a --> b>" /* unknown solution to be derived */ :
                 "<b --> a>" /* existing solution, to test finding existing solutions */;
 
-        NAR n = new Default(100, 1, 1, 3);
-        n.nal(2);
-        //.trace()
-        n.input("<a <-> b>. %1.0;0.5%",
-                "<b --> a>. %1.0;0.5%").run(cyclesBeforeQuestion);
 
-        NAR nar = new Default(100, 1, 1, 3);
+        NAR n = new Default(100, 1, 1, 3);
         n.nal(2);
         n.log()
                 .input("<a <-> b>. %1.0;0.5%",
                         "<b --> a>. %1.0;0.5%")
+                .run(cyclesBeforeQuestion)
                 .stopIf(b::get)
                 .ask(question, ETERNAL, (q, a) -> {
                     b.set(true);
                 });
-
-        nar.run(cyclesAfterQuestion);
+        n.run(cyclesAfterQuestion);
 
         assertTrue(b.get());
 

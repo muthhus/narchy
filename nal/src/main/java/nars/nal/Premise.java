@@ -4,7 +4,10 @@
  */
 package nars.nal;
 
-import nars.*;
+import nars.$;
+import nars.NAR;
+import nars.Symbols;
+import nars.Task;
 import nars.budget.Budget;
 import nars.budget.RawBudget;
 import nars.budget.util.BudgetFunctions;
@@ -16,6 +19,7 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.Terms;
+import nars.term.subst.Unify;
 import nars.term.subst.UnifySubst;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -24,6 +28,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
+import static nars.term.Terms.compoundOrNull;
 import static nars.util.UtilityFunctions.or;
 
 /**
@@ -89,7 +94,7 @@ public final class Premise extends RawBudget implements Tasked {
     public static Premise tryPremise(@NotNull Concept c, @NotNull Task task, Term beliefTerm, long now, @NotNull NAR nar) {
 
         //if (Param.PREMISE_LOG)
-            //logger.info("try: { concept:\"{}\",\ttask:\"{}\",\tbeliefTerm:\"{}\" }", c, task, beliefTerm);
+        //logger.info("try: { concept:\"{}\",\ttask:\"{}\",\tbeliefTerm:\"{}\" }", c, task, beliefTerm);
 
 //        if (Terms.equalSubTermsInRespectToImageAndProduct(task.term(), term))
 //            return null;
@@ -105,28 +110,29 @@ public final class Premise extends RawBudget implements Tasked {
 
         Task belief = null;
 
-        Concept beliefConcept = nar.concept(beliefTerm);
-        if (beliefConcept != null) {
+
+        long when =
+                task.occurrence();
+        //nar.random.nextBoolean() ?
+        // : now;
+        //now;
+        //(long)(now + dur);
+
+        if (beliefTerm instanceof Compound && task.isQuestOrQuestion()) {
+
+            Compound answerTerm = unify(task.term(), (Compound) beliefTerm, nar);
+            if (answerTerm != null) {
+
+                Concept answerConcept = nar.concept(answerTerm);
+                if (answerConcept != null) {
+
+                    BeliefTable table = task.isQuest() ? answerConcept.goals() : answerConcept.beliefs();
 
 
-            long when =
-                    task.occurrence();
-                    //nar.random.nextBoolean() ?
-                      // : now;
-                    //now;
-                    //(long)(now + dur);
+                    Task answered = table.answer(when, now, task, answerTerm, nar.confMin.floatValue());
+                    if (answered != null) {
 
-
-            if (beliefTerm instanceof Compound && task.isQuestOrQuestion()) {
-
-                BeliefTable table = task.isQuest() ? beliefConcept.goals() : beliefConcept.beliefs();
-
-                if (!table.isEmpty() && unifiable(task.term(), (Compound)beliefTerm, nar)) {
-
-                    Task answered = table.answer(when, now, task, nar.confMin.floatValue());
-                    if (answered!=null) {
-
-                        boolean exists = !nar.tasks.contains(answered);
+                        boolean exists = nar.tasks.contains(answered);
                         if (!exists) {
                             //transfer budget from question to answer
                             BudgetFunctions.transferPri(task.budget(), answered.budget(), answered.conf());
@@ -139,19 +145,23 @@ public final class Premise extends RawBudget implements Tasked {
                         //need to call this to handle pre-existing tasks matched to a newer question
                         answered = task.onAnswered(answered, nar);
 
-                        if (answered!=null) {
+                        if (answered != null) {
                             if (answered.punc() == Symbols.BELIEF)
                                 belief = answered;
                         }
-
                     }
-
                 }
-
             }
 
-            if (belief == null)
+        }
+
+        if (belief == null) {
+            Concept beliefConcept = nar.concept(beliefTerm);
+            if (beliefConcept != null) {
+
                 belief = beliefConcept.beliefs().match(when, now, task, true); //in case of quest, proceed with matching belief
+            }
+        }
 
 //                if (belief != null) {
 //                    //try {
@@ -180,7 +190,6 @@ public final class Premise extends RawBudget implements Tasked {
 //                belief = beliefConcept.beliefs().match(task, now);
 //
 //            }
-        }
 
 
         Budget beliefBudget;
@@ -201,33 +210,32 @@ public final class Premise extends RawBudget implements Tasked {
 
         float pri =
                 belief == null ? taskBudget.pri() : or(taskBudget.pri(), beliefBudget.pri());
-                //aveAri(taskLinkBudget.pri(), termLinkBudget.pri());
-                //nar.conceptPriority(c);
+        //aveAri(taskLinkBudget.pri(), termLinkBudget.pri());
+        //nar.conceptPriority(c);
 
         return new Premise(c, task, beliefTerm, belief, pri, qua);
     }
 
-    private static boolean unifiable(@NotNull Compound q, @NotNull Compound a, NAR nar) {
+    @Nullable
+    private static Compound unify(@NotNull Compound q, @NotNull Compound a, NAR nar) {
 
         if (q.op() != a.op())
-            return false; //no chance
+            return null; //no chance
 
         if (Terms.equal(q, a, false, true /* no need to unneg, task content is already non-negated */))
-            return true;
+            return q;
 
         if ((q.vars() == 0) && (q.varPattern() == 0))
-            return false; //since they are inequal, if the question has no variables then nothing would unify anyway
+            return null; //since they are inequal, if the question has no variables then nothing would unify anyway
 
-        List<Termed> result = $.newArrayList(0);
-        new UnifySubst(null /* all variables */, nar, result, Param.QUERY_ANSWERS_PER_MATCH)
-                .unifyAll(
-                    q, a
-                );
+        List<Term> result = $.newArrayList(0);
+        new UnifySubst(null /* all variables */, nar, result, 1 /*Param.QUERY_ANSWERS_PER_MATCH*/)
+                .unifyAll(q, a);
 
         if (result.isEmpty())
-            return false;
+            return null;
 
-        return true;
+        return compoundOrNull(result.get(0));
     }
 
 //    @Nullable

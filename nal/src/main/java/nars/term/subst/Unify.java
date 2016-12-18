@@ -169,8 +169,9 @@ public abstract class Unify extends Termunator implements Subst {
         return xy.get(t);
     }
 
-    public final void unifyAll(@NotNull Term x, @NotNull Term y) {
+    public final Unify unifyAll(@NotNull Term x, @NotNull Term y) {
         unify(x, y, false, true);
+        return this;
     }
 
 

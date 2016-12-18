@@ -155,7 +155,7 @@ public abstract class Param /*extends Container*/ implements Level {
 
 
 
-    public static int QUERY_ANSWERS_PER_MATCH = 1;
+    //public static int QUERY_ANSWERS_PER_MATCH = 1;
     //public static boolean REDUCE_TRUTH_BY_TEMPORAL_DISTANCE;
 
 
