@@ -95,17 +95,19 @@ abstract public class substituteIfUnifies extends TermTransformOperator  {
 //            throw new UnsupportedOperationException();
 //        }
 
-        Compound  term = (Compound) a[0];
+        Term term = (Compound) a[0];
         Term x = a[1];
         Term y = a[2];
 
         return unify(term, x, y);
     }
 
-    public @NotNull Term unify(@NotNull Compound term, @NotNull Term x, @NotNull Term y) {
+    public @NotNull Term unify(@NotNull Term term, @NotNull Term x, @NotNull Term y) {
 
         if (forwardOnly()) {
-            int dt = term.dt();
+            if (!(term instanceof Compound))
+                return False;
+            int dt = ((Compound)term).dt();
             if (!(dt == DTERNAL || dt == 0 || term.subtermTime( x ) == 0))
                 return False;
         }

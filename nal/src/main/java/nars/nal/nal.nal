@@ -6,6 +6,7 @@
      //     NOTE: the multi-term decomposition allows the superset of subterms without overlap. if they are chosen only one at a time, then overlap will prevent their recombination to the aforementioned superset result so it is incomplete. thus only the ellipsis form is necessary
 
      (&&,X,A..+), X, time(decomposeTaskSubset) |- (&&,A..+), (Belief:StructuralDeduction, Goal:StructuralDeduction)
+        (&&,(--,%X),A..+), X, time(decomposeTaskSubset) |- (&&,A..+), (Belief:StructuralDeduction, Goal:StructuralDeduction)
      (&&,X,A..+), B, task("!"), time(decomposeTaskSubset) |- subIfUnifiesForward((&&,A..+),X,B), (Goal:Strong)
         (&&,(--,%X),A..+), B,  task("!"), time(decomposeTaskSubset), belief(negative) |- subIfUnifiesForward((&&,A..+),X,B), (Goal:StrongPN)
         // ^ this negation handling is not quite right
