@@ -452,12 +452,8 @@ public abstract class Unify extends Termunator implements Subst {
 //    }
 
     @Nullable
-    public final Term resolve(@NotNull Term t) {
-        //TODO make a half resolve that only does xy?
-        Term x = transform(t, this);
-        if (x == True || x == False)
-            return null;
-        return x;
+    public final Term resolve(@NotNull Term x) {
+        return transform(x, this);
     }
 
 
@@ -637,6 +633,11 @@ public abstract class Unify extends Termunator implements Subst {
     public final boolean putXY(@NotNull Term x /* usually a Variable */, @NotNull Term y) {
         return reassignerXY.compute(x, y);
     }
+
+//    @Override public final void cache(@NotNull Term x, @NotNull Term y) {
+//        //DISABLED
+//        //xy.tryPut(x, y);
+//    }
 
 
 //    public final boolean replaceXY(Term x /* usually a Variable */, @NotNull Versioned<Term> y) {

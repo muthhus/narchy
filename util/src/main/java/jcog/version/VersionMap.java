@@ -139,7 +139,7 @@ public class VersionMap<X,Y> extends AbstractMap<X, Y>  {
     }
 
     @NotNull
-    public final Versioned<Y> newEntry(X k) {
+    public final Versioned<Y> newEntry(X keyIgnoredk) {
         return new Versioned(context, elementStackSize);
         //return cache(k) ? new Versioned(context) :
         //return new RemovingVersionedEntry(k);

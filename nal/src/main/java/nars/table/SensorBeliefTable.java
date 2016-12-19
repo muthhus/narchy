@@ -34,18 +34,18 @@ public class SensorBeliefTable extends DefaultBeliefTable  {
 
         long now = nar.time();
 
-        boolean authentic = input instanceof ScalarSignal.SignalTask;
-        if (authentic) {
-            //invalidate existing derived beliefs which precede a sensor input
-            temporal.removeIf((t)->{
-                if (t instanceof DerivedTask && t.end() <= input.occurrence())
-                    return true;
-                return false;
-            }, nar);
+        boolean local = input instanceof ScalarSignal.SignalTask;
+        if (local) {
+//            //invalidate existing derived beliefs which precede a sensor input
+//            temporal.removeIf((t)->{
+//                if (t instanceof DerivedTask && t.end() <= input.occurrence())
+//                    return true;
+//                return false;
+//            }, nar);
         } else if (!input.isInput()) {
 
             if (input.isEternal()) {
-                logger.info("reject non-authentic eternal override:\n{}", input.proof());
+                logger.warn("reject non-authentic eternal override:\n{}", input.proof());
                 return null; //reject non-input eternal derivations
             }
 
@@ -62,7 +62,7 @@ public class SensorBeliefTable extends DefaultBeliefTable  {
                 //touches past
                 Truth computedTruth = truth(input.end());
                 if (computedTruth!=null && computedTruth.conf() >= input.conf()) {
-                    logger.info("reject derived signal:\n{}", input);//.proof());
+                    //logger.info("reject derived signal:\n{}", input);//.proof());
                     return null;
                 }
             }
@@ -74,12 +74,11 @@ public class SensorBeliefTable extends DefaultBeliefTable  {
 
         boolean added = d != null;
 
-        if (authentic && !added) {
+        if (local && !added) {
             logger.warn("rejected authentic signal:{}", input);
-            //super.add(input, questions, concept, nar);
         }
 
-        if (refresh && added)
+        if (!local && refresh && added)
             sensorConcept.sensor.invalidate();
 
         return d;

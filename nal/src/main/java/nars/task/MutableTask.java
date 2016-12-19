@@ -95,10 +95,14 @@ public class MutableTask extends AbstractTask {
 
     @NotNull
     public final MutableTask present(@NotNull NAR nar) {
-        return present(nar.time());
+        return time(nar.time());
+    }
+    @NotNull
+    public final MutableTask time(@NotNull NAR nar, int dt) {
+        return time(nar.time() + dt);
     }
 
-    @NotNull public final MutableTask present(long when) {
+    @NotNull public final MutableTask time(long when) {
         return MutableTask.this.time(when, when);
     }
 

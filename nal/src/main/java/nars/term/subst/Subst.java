@@ -13,8 +13,11 @@ public interface Subst  {
      * used as a quick test to prevent transform initializations */
     boolean isEmpty();
 
-    @Nullable
-    Term xy(Term t);
+    @Nullable Term xy(Term t);
+
+//    /** suggests to this to store a cached result, which can be ignored if the impl chooses */
+//    void cache(@NotNull Term x /* usually a Variable */, @NotNull Term y);
+
 
 //    @NotNull
 //    default Term termOrOriginal(@NotNull Term t) {

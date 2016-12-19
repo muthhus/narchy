@@ -1,5 +1,6 @@
 package nars.index.term;
 
+import jcog.Util;
 import jcog.map.nbhm.HijacKache;
 import nars.*;
 import nars.Op;
@@ -184,23 +185,17 @@ public abstract class TermIndex extends TermBuilder {
             return y; //an assigned substitution, whether a variable or other type of term
 
         Op op = src.op();
-
-        if (src instanceof Atomic) {
-
-            if (op.var) {
-                if (op == VAR_PATTERN)
-                    return null; //unassigned pattern variable
-                else
-                    return src; //unassigned but literal non-pattern var
-            } else {
-
-                Termed existing = get(src); //reresolve
-                if (existing != null)
-                    return existing.term();
-                else
-                    return src;
-            }
+        switch (op) {
+            case ATOM:
+            case INT:
+            case VAR_DEP:
+            case VAR_INDEP:
+            case VAR_QUERY:
+                return src; //unassigned literal atom or non-pattern var
+            case VAR_PATTERN:
+                return null; //unassigned pattern variable
         }
+
 
 
         //no variables that could be substituted, so return this constant
@@ -235,8 +230,7 @@ public abstract class TermIndex extends TermBuilder {
 
                 if (u == null) {
 
-                    if (strict)
-                        return null;
+                    if (strict) { return null; }
 
                     sub.add(t); //keep value
 
@@ -251,15 +245,25 @@ public abstract class TermIndex extends TermBuilder {
 
             for (; volAt < subAt; volAt++) {
                 volSum+=sub.get(volAt).volume();
-                if (volSum > volLimit) {
-                    //HARD VOLUME LIMIT REACHED
-                    return null;
-                }
+                if (volSum > volLimit) { return null; } //HARD VOLUME LIMIT REACHED
             }
         }
 
-        return changed ? the(crc, sub) : crc;
+        Term transformed;
+        int ss = sub.size();
+        if (!changed || (ss==len && crc.equalTerms(sub)))
+            transformed = crc;
+        else {
+            transformed = the(crc.op(), crc.dt(), sub.toArray(new Term[ss]));
+        }
+
+//        //cache the result
+//        if (transformed!=null) //TODO store false for 'null' result
+//            f.cache(src, transformed);
+
+        return transformed;
     }
+
 
     @NotNull
     public final Term the(@NotNull Compound csrc, @NotNull TermContainer newSubs) {
@@ -269,7 +273,6 @@ public abstract class TermIndex extends TermBuilder {
             return the(csrc, newSubs.terms());
         }
     }
-
     @NotNull
     public final Term the(@NotNull Compound csrc, @NotNull Term... args) {
         return the(csrc.op(), csrc.dt(), args);
@@ -345,7 +348,10 @@ public abstract class TermIndex extends TermBuilder {
 
     @Nullable
     public Term the(@NotNull Compound src, @NotNull List<Term> newSubs) {
-        return the(src, newSubs.toArray(new Term[newSubs.size()]));
+        if (src.size() == newSubs.size() && src.equalTerms(newSubs) )
+            return src;
+        else
+            return the(src.op(), src.dt(), newSubs.toArray(new Term[newSubs.size()]));
     }
 
 

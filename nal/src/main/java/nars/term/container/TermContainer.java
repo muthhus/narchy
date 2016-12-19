@@ -292,6 +292,17 @@ public interface TermContainer extends Termlike, Iterable<Term> {
         return true;
     }
 
+    default boolean equalTerms(@NotNull List<Term> c) {
+        int s = size();
+        if (s !=c.size())
+            return false;
+        for (int i = 0; i < s; i++) {
+            if (!term(i).equals(c.get(i)))
+                return false;
+        }
+        return true;
+    }
+
 
     void copyInto(Collection<Term> target);
 

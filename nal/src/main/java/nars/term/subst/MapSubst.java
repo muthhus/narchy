@@ -30,6 +30,11 @@ public class MapSubst implements Subst {
 
     }
 
+//    @Override
+//    public void cache(@NotNull Term x, @NotNull Term y) {
+//        //ignored
+//    }
+
     @Override
     public void clear() {
         xy.clear();

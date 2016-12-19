@@ -44,7 +44,7 @@ public abstract class feel extends AbstractOperator {
 
         return
             new MutableTask(content, Symbols.BELIEF, t(value, 0.99f))
-                .present(nar.time())
+                .time(nar.time())
         ;
     }
 
