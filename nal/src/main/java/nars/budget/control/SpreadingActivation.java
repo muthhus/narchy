@@ -69,7 +69,8 @@ public class SpreadingActivation extends Activation {
 
                 tasklink(ckk, v);
 
-                conceptActivation.add(new LightObjectFloatPair<>(ckk, v));
+                float conceptActivationRate = 1f;
+                conceptActivation.add(new LightObjectFloatPair<>(ckk, v * conceptActivationRate));
 
             } else {
                 kk = k;
@@ -90,7 +91,7 @@ public class SpreadingActivation extends Activation {
 
         float thisScale = scale;
 
-        if (targetTerm instanceof Compound && ((depth + 1) < termlinkDepth)) {
+        if (targetTerm instanceof Compound && ((depth + 1) <= termlinkDepth)) {
 
             TermContainer children = ((Compound) targetTerm).subterms();
             int n = children.size();
@@ -120,7 +121,7 @@ public class SpreadingActivation extends Activation {
 
         if (tgt instanceof Concept) {
             Term originTerm = origin.term();
-            if (!originTerm.equals(tgtTerm) && tlReverse > 0) {
+            if (tlReverse > 0 && !originTerm.equals(tgtTerm)) {
                 termlink((Concept) tgt, originTerm, tlReverse);
             }
         }
