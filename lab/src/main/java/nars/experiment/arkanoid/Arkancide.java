@@ -10,9 +10,19 @@ import nars.remote.NAgents;
 
 public class Arkancide extends NAgents {
 
+    public static void main(String[] args) {
+        Param.DEBUG = true;
 
-//    final int visW = 48;
-//    final int visH = 24;
+        //runRT(Arkancide::new);
+        //nRT(Arkancide::new, 25, 5);
+
+        NAR nar = runRT(Arkancide::new, 50, 10);
+
+        nar.beliefConfidence(0.75f);
+        nar.goalConfidence(0.75f);
+    }
+
+
     final int visW = 32;
     final int visH = 16;
 
@@ -50,9 +60,7 @@ public class Arkancide extends NAgents {
         //addCameraRetina("zoom(cam(noid))", noid, visW/2, visH/2, (v) -> $.t(v, alpha));
 
 
-        ActionConcept a = new ActionConcept(
-                "dx(paddle)"
-                , nar, (b, d) -> {
+        action(new ActionConcept( "dx(paddle)" , nar, (b, d) -> {
 
             float pct;
             if (d != null) {
@@ -62,28 +70,7 @@ public class Arkancide extends NAgents {
             }
             return $.t(pct, nar.confidenceDefault('.'));
             //return null; //$.t(0.5f, alpha);
-        });
-        a.feedback.resolution(resX);
-        action(a);
-
-//        action(new ActionConcept(
-//                //"happy:noid(paddle,x)"
-//                "(leftright)"
-//                , nar, (b,d)->{
-//            if (d!=null) {
-//                //TODO add limits for feedback, dont just return the value
-//                //do this with a re-usable feedback interface because this kind of acton -> limitation detection will be common
-//                float pct = noid.paddle.move((d.freq() - 0.5f) * paddleSpeed);
-////                if (pct > 0)
-////                    return $.t(d.freq(), gamma*pct);
-//                    //return $.t(Util.lerp(d.freq(), 0.5f, pct), alpha);
-//
-//                return $.t(d.freq(), gamma);
-//
-//            }
-//            return null; //$.t(0.5f, alpha);
-//        }));
-
+        }).feedbackResolution(resX));
 
     }
 
@@ -95,14 +82,6 @@ public class Arkancide extends NAgents {
         if (reward == 0)
             return Float.NaN;
         return reward;
-    }
-
-    public static void main(String[] args) {
-        //Param.DEBUG = true;
-
-        //runRT(Arkancide::new);
-        //nRT(Arkancide::new, 25, 5);
-        runRT(Arkancide::new, 50, 25);
     }
 
 

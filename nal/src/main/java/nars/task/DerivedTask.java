@@ -31,6 +31,8 @@ abstract public class DerivedTask extends MutableTask {
     public DerivedTask(@NotNull Termed<Compound> tc, char punct, @Nullable Truth truth, @NotNull Derivation p, long[] evidence, long now, long occ) {
         super(tc, punct, truth);
 
+        this.premise = p.premise;
+
         time(now, occ);
         evidence(evidence);
 
@@ -60,7 +62,6 @@ abstract public class DerivedTask extends MutableTask {
 //        }
 
 
-        this.premise = p.premise;
     }
 
 //    @Override

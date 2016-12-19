@@ -1,18 +1,17 @@
 package nars.concept;
 
-import jcog.Util;
 import jcog.math.FloatSupplier;
 import nars.$;
 import nars.NAR;
 import nars.Narsese;
 import nars.Task;
+import nars.table.BeliefTable;
+import nars.table.SensorBeliefTable;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.truth.Truth;
-import nars.util.UtilityFunctions;
 import nars.util.signal.ScalarSignal;
-import org.apache.commons.lang3.mutable.MutableFloat;
 import org.eclipse.collections.api.block.function.primitive.FloatFunction;
 import org.eclipse.collections.api.block.function.primitive.FloatToFloatFunction;
 import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunction;
@@ -52,20 +51,12 @@ public class SensorConcept extends WiredConcept implements FloatFunction<Term>, 
         this.sensor = new ScalarSignal(n, this, this, truth, this);
 
         this.signal = signal;
+        this.beliefs = new SensorBeliefTable(this, newEternalTable(0),  newTemporalTable(1 /* N/A */));
 
-        pri(() -> nar.priorityDefault(BELIEF));
-
-
+        pri(() -> n.priorityDefault(BELIEF));
     }
 
 
-
-    protected final void input(@NotNull Task t) {
-//        if (autoupdate())
-//            nar.inputLater(t);
-//        else
-        nar.input(t);
-    }
 
 
 
@@ -180,20 +171,16 @@ public class SensorConcept extends WiredConcept implements FloatFunction<Term>, 
         return currentValue;
     }
 
-//    @Override
-//    protected BeliefTable newBeliefTable(NAR nar, boolean beliefOrGoal, int eCap, int tCap) {
-//        return new SensorBeliefTable(eCap, tCap);
+
+
+//    public static void activeAttention(@NotNull Iterable<? extends Prioritizable> c, @NotNull MutableFloat min, @NotNull MutableFloat limit, @NotNull NAR nar) {
+//
+//        activeAttention(c,
+//                //(cp) -> Util.lerp( limit.floatValue(), min.floatValue(), cp) //direct pri -> pri mapping
+//                (cp) -> Util.lerp(limit.floatValue(), min.floatValue(),
+//                            UtilityFunctions.sawtoothCurved(cp))
+//                , nar);
 //    }
-
-
-    public static void activeAttention(@NotNull Iterable<? extends Prioritizable> c, @NotNull MutableFloat min, @NotNull MutableFloat limit, @NotNull NAR nar) {
-
-        activeAttention(c,
-                //(cp) -> Util.lerp( limit.floatValue(), min.floatValue(), cp) //direct pri -> pri mapping
-                (cp) -> Util.lerp(limit.floatValue(), min.floatValue(),
-                            UtilityFunctions.sawtoothCurved(cp))
-                , nar);
-    }
 
 
 

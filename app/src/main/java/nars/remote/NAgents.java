@@ -112,11 +112,11 @@ abstract public class NAgents extends NAgent {
         runRT(init, 10);
     }
 
-    public static void runRT(Function<NAR, NAgents> init, float fps) {
-        runRT(init, fps, 1);
+    public static NAR runRT(Function<NAR, NAgents> init, float fps) {
+        return runRT(init, fps, 1);
     }
 
-    public static void runRT(Function<NAR, NAgents> init, float fps, int durFrames) {
+    public static NAR runRT(Function<NAR, NAgents> init, float fps, int durFrames) {
 
         //NAR nar = NAgents.newMultiThreadNAR(3, new RealTime.CS(true).dur(durFrames/fps), true);
         //NAR nar = newNAR();
@@ -128,6 +128,7 @@ abstract public class NAgents extends NAgent {
 
         a.runRT(fps).join();
 
+        return nar;
 
 
     }
@@ -152,6 +153,7 @@ abstract public class NAgents extends NAgent {
 
         SpaceGraph.window(grid(nar.cores.stream().map(c ->
                 Vis.items(c.terms, nar, 16)).toArray(Surface[]::new)), 900, 700);
+
 
         return nar;
     }

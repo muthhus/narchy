@@ -48,6 +48,10 @@ public class ActionConcept extends WiredConcept implements WiredConcept.Prioriti
         nar.input(feedback);
     }
 
+    public ActionConcept feedbackResolution(float res) {
+        feedback.resolution(res);
+        return this;
+    }
 
 
     /** determines the feedback belief when desire or belief has changed in a MotorConcept

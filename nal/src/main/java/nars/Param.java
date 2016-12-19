@@ -483,15 +483,15 @@ public abstract class Param /*extends Container*/ implements Level {
     /**
      * sets the default input goal confidence
      */
-    public void goalConfidence(float v) {
-        defaultGoalTruth = new DefaultTruth(1.0f, v);
+    public void goalConfidence(float theDefaultValue) {
+        defaultGoalTruth = new DefaultTruth(1.0f, theDefaultValue);
     }
 
     /**
      * sets the default input belief confidence
      */
-    public void beliefConfidence(float v) {
-        defaultBeliefTruth = new DefaultTruth(1.0f, v);
+    public void beliefConfidence(float theDefaultValue) {
+        defaultBeliefTruth = new DefaultTruth(1.0f, theDefaultValue);
     }
 
 

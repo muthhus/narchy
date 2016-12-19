@@ -120,7 +120,7 @@ public class ScalarSignal implements Consumer<NAR>, DoubleSupplier {
 
         float next = value.floatValueOf(term);
         if (next!=next) {
-            this.currentValue = Float.NaN;
+            invalidate();
             this.current = null;
 
             return; //all
@@ -171,8 +171,9 @@ public class ScalarSignal implements Consumer<NAR>, DoubleSupplier {
         return this;
     }
 
-
-
+    public void invalidate() {
+        this.currentValue = Float.NaN;
+    }
 
 
 //    protected float conf(float v) {
@@ -182,7 +183,7 @@ public class ScalarSignal implements Consumer<NAR>, DoubleSupplier {
 //        return v;
 //    }
 
-    static class SignalTask extends MutableTask {
+    public static class SignalTask extends MutableTask {
 
         long end;
 

@@ -188,6 +188,7 @@ public abstract class TermBuilder {
         }
     }
 
+
     @NotNull
     public Term productNormalize(@NotNull Term u) {
         boolean neg = u.op() == NEG;

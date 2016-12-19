@@ -186,36 +186,39 @@ public interface TimeFunctions {
 
         if (beliefStart != ETERNAL && taskStart != ETERNAL) {
 
-            long beliefEnd = p.belief.end();
-            long taskEnd = p.task.end();
+            dt = (int) (beliefStart - taskStart); //TODO check valid int/long conversion
+            long start = p.occurrenceTarget(earliestOccurrence);
 
-            long start;
-
-            if (beliefEnd == beliefStart && taskEnd == taskStart) {
-
-                //HACK the original calculation, involving point events
-
-                dt = (int) (beliefStart - taskStart); //TODO check valid int/long conversion
-                start = p.occurrenceTarget(earliestOccurrence);
-
-
-            } else {
-
-//                switch (derived.op()) {
-//                    case CONJ:
-                        Interval i = Interval.union(taskStart, taskEnd, beliefStart, beliefEnd);
-                        start = i.a;
-                        dt = (int) i.length();
-//                        break;
-//                    default:
-//                        dt = (int) (beliefStart - taskStart); //TODO check valid int/long conversion
-//                        start = p.occurrenceTarget(earliestOccurrence);
-//                        break;
-
-//                }
-            }
-
-
+//            long beliefEnd = p.belief.end();
+//            long taskEnd = p.task.end();
+//
+//            long start;
+//
+//            if (beliefEnd == beliefStart && taskEnd == taskStart) {
+//
+//                //HACK the original calculation, involving point events
+//
+//                dt = (int) (beliefStart - taskStart); //TODO check valid int/long conversion
+//                start = p.occurrenceTarget(earliestOccurrence);
+//
+//
+//            } else {
+//
+////                switch (derived.op()) {
+////                    case CONJ:
+//                        Interval i = Interval.union(taskStart, taskEnd, beliefStart, beliefEnd);
+//                        start = i.a;
+//                        dt = (int) i.length();
+////                        break;
+////                    default:
+////                        dt = (int) (beliefStart - taskStart); //TODO check valid int/long conversion
+////                        start = p.occurrenceTarget(earliestOccurrence);
+////                        break;
+//
+////                }
+//            }
+//
+//
 
             occReturn[0] = start;
 
@@ -372,7 +375,7 @@ public interface TimeFunctions {
 
                 @Nullable Term rDerived = resolve(p, derived);
 
-                if (rDecomposed!=null && rDerived!=null && occDecomposed != ETERNAL) {
+                if (rDecomposed!=null && rDerived!=null && (occDecomposed != ETERNAL)) {
 
                     int dt = rDecomposed.subtermTime(rDerived);
                     if (dt != DTERNAL)
@@ -428,7 +431,8 @@ public interface TimeFunctions {
 
     @Nullable
     static Term resolve(@NotNull Derivation p, @NotNull Term t) {
-        return p.resolve(/*productNormalize*/(t));
+        return p.resolve($.terms.productNormalize(t));
+        //return r!=null ? r) : null;
     }
 
     @Nullable

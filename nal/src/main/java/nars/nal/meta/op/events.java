@@ -4,6 +4,7 @@ import nars.Task;
 import nars.nal.meta.AtomicBoolCondition;
 import nars.nal.meta.BoolCondition;
 import nars.nal.meta.Derivation;
+import nars.term.Compound;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -77,6 +78,22 @@ abstract public class events extends AtomicBoolCondition {
         }
 
     };
+//    /** true if the belief term is in the earliest position of a conjunction.
+//     * for parallel and eternal, automatically true.
+//     *  */
+//    public static BoolCondition beliefTermEarliest = new events() {
+//        @Override
+//        public @NotNull String toString() {
+//            return "beliefTermEarliest";
+//        }
+//
+//        @Override
+//        public boolean run(Derivation p, int now) {
+//            Compound taskTerm = p.taskTerm;
+//            int dt = taskTerm.dt();
+//            return (dt == DTERNAL || dt == 0 || taskTerm.subtermTime( p.beliefTerm ) == 0);
+//        }
+//    };
 
 
 //    public static final BoolCondition taskConjDecomposable = new AtomicBoolCondition() {

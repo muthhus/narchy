@@ -19,7 +19,7 @@ import static org.junit.Assert.assertEquals;
 @RunWith(Parameterized.class)
 public class NAL8Test extends AbstractNALTest {
 
-    final int cycles = 150;
+    final int cycles = 550;
 
     public NAL8Test(Supplier<NAR> b) { super(b); }
 
@@ -32,6 +32,8 @@ public class NAL8Test extends AbstractNALTest {
     @Test
     public void subsent_1()  {
         TestNAR tester = test();
+
+        tester.log();
 
         //TODO decide correct parentheses ordering
 
@@ -161,12 +163,14 @@ public class NAL8Test extends AbstractNALTest {
     public void condition_goal_deductionWithVariableElimination()  {
 
         test()
-                
-                .input("at(SELF,{t003}). :|:")
-                //.input("goto({t003}). :|:")
+
+                .log()
+                //.input("at(SELF,{t003}). :|:")
+                .input("goto({t003}). :|:")
                 .inputAt(10, "(goto(#1) &&+5 at(SELF,#1))!")
 
-                .mustDesire(cycles, "goto({t003})", 1.0f, 0.81f, -5)
+                //.mustDesire(cycles, "goto({t003})", 1.0f, 0.81f, -5)
+                .mustDesire(cycles, "at(SELF,{t003})", 1.0f, 0.81f, 5)
                 //.mustNotOutput(cycles, "goto({t003})", '!', -5) //??
                 ;
     }
@@ -230,7 +234,8 @@ public class NAL8Test extends AbstractNALTest {
                 
                 .input("g(x)! :|:")
                 .input("(f($1) <=>+5 --g($1)).") //internally, this reduces to --(S ==> R)
-                .mustDesire(cycles, "f(x)", 0.0f, 0.81f, -5);
+                .mustDesire(cycles, "f(x)", 0.0f, 0.81f, -5)
+                .mustNotOutput(cycles, "goto({t003})", '!', 0);
 
     }
 
@@ -448,6 +453,7 @@ public class NAL8Test extends AbstractNALTest {
     @Test
     public void subgoal_2_inner_dt()  {
         test()
+            .log()
             .input("(hold:(SELF,{t002}) &&+5 (at(SELF,{t001}) &&+5 open({t001})))! :|:")
             .mustDesire(cycles, "hold:(SELF,{t002})", 1.0f, 0.81f, 0)
             .mustNotOutput(cycles, "hold:(SELF,{t002})", '!', ETERNAL);
@@ -757,11 +763,14 @@ public class NAL8Test extends AbstractNALTest {
 
     @Test public void testGoalConjunctionDecompose() {
         test()
+                .log()
                 .goal("((x) &&+3 (y))", Tense.Present, 1f, 0.9f)
                 .mustDesire(cycles, "(x)", 1f, 0.81f, 0)
                 //.mustNotOutput(cycles, "(y)", '!', 3)
                 .mustNotOutput(cycles, "(y)", '!', ETERNAL);
     }
+
+
 
 //    @Test public void testSubIfUnifiesForwardWontDecomposeAntecedentGoal() {
 //

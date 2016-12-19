@@ -95,16 +95,22 @@ abstract public class substituteIfUnifies extends TermTransformOperator  {
 //            throw new UnsupportedOperationException();
 //        }
 
-        Term term = a[0];
+        Compound  term = (Compound) a[0];
         Term x = a[1];
         Term y = a[2];
 
         return unify(term, x, y);
     }
 
-    public @NotNull Term unify(@NotNull Term term, @NotNull Term x, @NotNull Term y) {
-        @Nullable Op op = unifying();
+    public @NotNull Term unify(@NotNull Compound term, @NotNull Term x, @NotNull Term y) {
 
+        if (forwardOnly()) {
+            int dt = term.dt();
+            if (!(dt == DTERNAL || dt == 0 || term.subtermTime( x ) == 0))
+                return False;
+        }
+
+        @Nullable Op op = unifying();
         boolean hasAnyOp = op == null || (x.hasAny(op) && term.hasAny(op));
 
         if (!hasAnyOp && mustSubstitute()) {
@@ -148,7 +154,12 @@ abstract public class substituteIfUnifies extends TermTransformOperator  {
         }
     }
 
-    public static final class substituteIfUnifiesAny extends substituteIfUnifies {
+    protected boolean forwardOnly() {
+        return false;
+    }
+
+
+    public static class substituteIfUnifiesAny extends substituteIfUnifies {
 
 
         public substituteIfUnifiesAny(Derivation parent) {
@@ -227,44 +238,13 @@ abstract public class substituteIfUnifies extends TermTransformOperator  {
             super("subIfUnifiesForward",parent);
         }
 
-        /** A must precede C in order to produce a result unified with B */
-        @Override public @NotNull Term unify(@NotNull Term C, @NotNull Term A, @NotNull Term B) {
-            Compound decomposed = (Compound) parent.beliefTerm;
-            int dt = decomposed.dt();
-            if (dt == DTERNAL || dt == 0) {
-                //valid
-                return super.unify(C, A, B);
-            } else {
-                //check C's position
-                int subtermTimeC = decomposed.subtermTime(C);
-                if (subtermTimeC==DTERNAL)
-                    subtermTimeC = 0;
-                int subtermTimeA = decomposed.subtermTime(A);
-                if (subtermTimeA==DTERNAL)
-                    subtermTimeA = 0;
-
-                if (subtermTimeA < subtermTimeC)
-                    return super.unify(C, A, B);
-                else
-                    return super.unify(A, C, B);
-
-//                if (decomposed.term(0).equals(C)) {
-//                    if (dt < 0)
-//                        return False;
-//                } else if (decomposed.term(1).equals(C)) {
-//                    if (dt > 0)
-//                        return False;
-//                } else {
-//                    throw new RuntimeException("missing C in decomposed");
-//                    //return False;
-//                }
-            }
-
+        @Override
+        protected boolean forwardOnly() {
+            return true;
         }
 
-        @Nullable
         @Override
-        public Op unifying() {
+        protected @Nullable Op unifying() {
             return null;
         }
     }

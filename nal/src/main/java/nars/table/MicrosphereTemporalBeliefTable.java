@@ -230,6 +230,24 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
             copy.forEach(t -> nar.tasks.remove(t));
     }
 
+    public boolean removeIf(Predicate<Task> o, @NotNull NAR nar) {
+        List<Task> trash = $.newArrayList(0);
+        boolean r = list.removeIf(((Predicate<Task>) t -> {
+            if (o.test(t)) {
+                trash.add(t);
+                return true;
+            }
+            return false;
+        }));
+
+        if (r) {
+            nar.tasks.remove(trash);
+            return true;
+        }
+
+        return false;
+    }
+
 
     boolean removeIfDeleted(MutableList<Task> l, List<Task> trash) {
         boolean r = l.removeIf(((Predicate<Task>) t -> {
@@ -290,12 +308,12 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
     }
 
 
-    private Function<Task, Float> temporalConfidence(long now) {
-        return x -> rankTemporalByConfidence(x, now);
+    private Function<Task, Float> temporalConfidence(long when) {
+        return x -> rankTemporalByConfidence(x, when);
     }
 
     final float rankTemporalByConfidence(@Nullable Task t, long when) {
-        return t == null ? -1 : t.conf(when) * (1f + t.range()); //approximately integrates the confidence over time
+        return t == null ? -1 : t.conf(when);
     }
 
     Task matchMerge(MutableList<Task> l, long now, @NotNull Task toMergeWith, float dur) {
@@ -362,7 +380,7 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
 
         Task a = l.minBy(temporalConfidence(now));
         //return rankTemporalByConfidenceAndOriginality(t, when, now, -1);
-        if (a == null || inputRank <= rankTemporalByConfidence(a, now)) {
+        if (a == null || inputRank < rankTemporalByConfidence(a, now)) {
             //dont continue if the input was too weak
             return null;
         }
@@ -372,10 +390,12 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
         Task b = matchMerge(l, now, a, dur);
         if (b != null) {
             Task merged = merge(a, b, now, confMin);
-
-            removeLater(l, b, trash);
-
-            return merged;
+            if (merged == null) {
+                return input;
+            } else {
+                removeLater(l, b, trash);
+                return merged;
+            }
         } else {
             return input;
         }

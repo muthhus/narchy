@@ -5,6 +5,7 @@ import nars.NAR;
 import nars.Symbols;
 import nars.term.Term;
 import nars.truth.Truth;
+import nars.truth.TruthFunctions;
 import nars.truth.func.annotation.AllowOverlap;
 import nars.truth.func.annotation.SinglePremise;
 import org.jetbrains.annotations.NotNull;
@@ -93,16 +94,17 @@ public enum GoalFunction implements TruthOperator {
         }
     },
 
-//    @AllowOverlap @SinglePremise
-//    StructuralStrong() {
-//        @Nullable
-//        @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, NAR m, float minConf) {
-//            return TruthFunctions.desireStrong(T, defaultTruth(m), minConf);
-//        }
-//    },
+    @AllowOverlap
+    @SinglePremise
+    StructuralStrong() {
+        @Nullable
+        @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, NAR m, float minConf) {
+            return TruthFunctions.desireStrongNew(T, defaultTruth(m), minConf);
+        }
+    },
 
     @SinglePremise
-    //@AllowOverlap
+    @AllowOverlap
     StructuralDeduction() {
         @Nullable
         @Override public Truth apply(@Nullable final Truth T, final Truth B, @NotNull NAR m, float minConf) {

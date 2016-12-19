@@ -32,7 +32,7 @@ public class DynamicBeliefTable extends DefaultBeliefTable {
 
     public DynamicBeliefTable(DynamicConcept dynamicConcept, DynamicTruthModel model, boolean beliefOrGoal, int eCap, int tCap, NAR nar) {
 
-        super(dynamicConcept.newEternalTable(eCap), dynamicConcept.newTemporalTable(tCap, nar));
+        super(dynamicConcept.newEternalTable(eCap), dynamicConcept.newTemporalTable(tCap));
         this.dynamicConcept = dynamicConcept;
         this.model = model;
         this.beliefOrGoal = beliefOrGoal;

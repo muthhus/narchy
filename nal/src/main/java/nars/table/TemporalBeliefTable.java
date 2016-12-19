@@ -33,6 +33,8 @@ public interface TemporalBeliefTable extends TaskTable {
 
     void clear(NAR nar);
 
+    boolean removeIf(Predicate<Task> o, @NotNull NAR nar);
+
 
     //void range(long[] t);
 }

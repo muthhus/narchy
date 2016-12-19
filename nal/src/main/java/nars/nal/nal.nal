@@ -5,14 +5,39 @@
      //structural decompose any component of a conjunction.
      //     NOTE: the multi-term decomposition allows the superset of subterms without overlap. if they are chosen only one at a time, then overlap will prevent their recombination to the aforementioned superset result so it is incomplete. thus only the ellipsis form is necessary
 
-     (&&,X,A..+), X, time(decomposeTaskSubset) |-                   (&&,A..+), (Belief:StructuralDeduction,Goal:StructuralDeduction)
-        (&&,(--,%X),A..+), X, time(decomposeTaskSubset) |-       (&&,A..+), (Belief:StructuralDeduction,Goal:StructuralDeduction)
+     (&&,X,A..+), X, time(decomposeTaskSubset) |- (&&,A..+), (Belief:StructuralDeduction, Goal:StructuralDeduction)
+     (&&,X,A..+), B, task("!"), time(decomposeTaskSubset) |- subIfUnifiesForward((&&,A..+),X,B), (Goal:Strong)
+        (&&,(--,%X),A..+), B,  task("!"), time(decomposeTaskSubset), belief(negative) |- subIfUnifiesForward((&&,A..+),X,B), (Goal:StrongPN)
+        // ^ this negation handling is not quite right
+
 
      (&&,X,A..+), X, time(decomposeTaskSubset), task("?@") |- (&&,A..+), ()
         (&&,(--,%X),A..+), X, time(decomposeTaskSubset), task("?@") |- (&&,A..+), ()
 
-     (&&,X,A..+), B, time(decomposeTaskSubset) |- subIfUnifiesDep((&&,A..+),X,B), (Belief:AnonymousAnalogy, Goal:Strong)
-         //TODO: negation form for this?
+     B, (&&,X,A..+), time(decomposeBelief) |- subIfUnifiesDep((&&,A..+),X,B), (Belief:AnonymousAnalogy, Goal:Strong)
+
+///// conjunction decompose
+//
+//    (&&,A_1..n), A_1 |- A_1, (Truth:StructuralDeduction, Desire:StructuralStrong)
+//    (&/,A_1..n), A_1 |- A_1, (Truth:StructuralDeduction, Desire:StructuralStrong)
+//    (&|,A_1..n), A_1 |- A_1, (Truth:StructuralDeduction, Desire:StructuralStrong)
+//    (&/,B,A_1..n), B, task("!") |- (&/,A_1..n), (Truth:Deduction, Desire:Strong, SequenceIntervals:FromPremises)
+//
+////// propositional decomposition ////////////////////////////////////////////////////////////////////////////////////
+////If S is the case, and (&&,S,A_1..n) is not the case, it can't be that (&&,A_1..n) is the case
+//
+//    S, (&/,S,A_1..n) |- (&/,A_1..n), (Truth:DecomposePositiveNegativeNegative, SequenceIntervals:FromPremises)
+//    S, (&|,S,A_1..n) |- (&|,A_1..n), (Truth:DecomposePositiveNegativeNegative)
+//    S, (&&,S,A_1..n) |- (&&,A_1..n), (Truth:DecomposePositiveNegativeNegative)
+//    S, (||,S,A_1..n) |- (||,A_1..n), (Truth:DecomposeNegativePositivePositive)
+//
+////Additional for negation: https://groups.google.com/forum/#!topic/open-nars/g-7r0jjq2Vc
+//
+//    S, (&/,(--,S),A_1..n) |- (&/,A_1..n), (Truth:DecomposeNegativeNegativeNegative, SequenceIntervals:FromPremises)
+//    S, (&|,(--,S),A_1..n) |- (&|,A_1..n), (Truth:DecomposeNegativeNegativeNegative)
+//    S, (&&,(--,S),A_1..n) |- (&&,A_1..n), (Truth:DecomposeNegativeNegativeNegative)
+//    S, (||,(--,S),A_1..n) |- (||,A_1..n), (Truth:DecomposePositivePositivePositive)
+
 
 //disjunction
     (&&,(--,%B),(--,%A)), B, task("?") |- (||,%B,%A), (Belief:BeliefStructuralDeduction, Punctuation:Belief)
