@@ -96,7 +96,7 @@ public abstract class NARSpace<X extends Term, Y extends Spatial<X>> extends Lis
 
     public static void main(String[] args) {
 
-        Default n = new Default(512, 4, 1, 3);
+        Default n = new Default(512, 1, 1, 3);
         //Default2 n = new Default2();
         //n.nal(4);
 

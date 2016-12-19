@@ -65,6 +65,7 @@ public class Arkancide extends NAgents {
         });
         a.feedback.resolution(resX);
         action(a);
+
 //        action(new ActionConcept(
 //                //"happy:noid(paddle,x)"
 //                "(leftright)"
@@ -101,7 +102,7 @@ public class Arkancide extends NAgents {
 
         //runRT(Arkancide::new);
         //nRT(Arkancide::new, 25, 5);
-        runRT(Arkancide::new, 60, 5);
+        runRT(Arkancide::new, 50, 25);
     }
 
 

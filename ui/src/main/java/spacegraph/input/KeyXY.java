@@ -7,7 +7,7 @@ import spacegraph.render.JoglPhysics;
  * Created by me on 11/20/16.
  */
 public class KeyXY extends SpaceKeys {
-    protected float speed = 4f;
+    protected float speed = 16f;
 
     public KeyXY(JoglPhysics g) {
         super(g);

@@ -211,20 +211,16 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
     }
 
 
-    List<Task> removeIf(MutableList<Task> l, @NotNull Predicate<? super Task> o, @NotNull NAR nar) {
-
-        final List<Task> toUnindex = $.newArrayList(0);
-
+    boolean removeIfDeleted(MutableList<Task> l, @NotNull NAR nar, List<Task> trash) {
         boolean r = l.removeIf(((Predicate<Task>) t -> {
-            if (o.test(t)) {
-                toUnindex.add(t);
-                t.delete();
+            if (t.isDeleted()) {
+                trash.add(t);
                 return true;
             }
             return false;
         }));
 
-        return toUnindex;
+        return false;
     }
 
 
@@ -351,17 +347,13 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
             return null;
         }
 
-        a.delete();
-        l.remove(a);
-        trash.add(a);
+        removeLater(l, a, trash);
 
         Task b = matchMerge(l, now, a, nar.time.dur());
         if (b != null) {
             Task merged = merge(a, b, now, nar.confMin.floatValue());
 
-            b.delete();
-            l.remove(b);
-            trash.add(b);
+            removeLater(l, b, trash);
 
             return merged;
         } else {
@@ -453,12 +445,7 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
     }
 
     private final boolean clean(MutableList<Task> l, NAR nar, List<Task> trash) {
-        List<Task> removed = removeIf(l, Task::isDeleted, nar);
-        if (!removed.isEmpty()) {
-            trash.addAll(removed);
-            return true;
-        }
-        return false;
+        return removeIfDeleted(l, nar, trash);
     }
 
 

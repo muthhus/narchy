@@ -78,7 +78,7 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<BLink<? exte
 
 
         //int zOffset = -10;
-        final float initDistanceEpsilon = 100f;
+        final float initDistanceEpsilon = 50f;
         final float initImpulseEpsilon = 0.25f;
 
         //place in a random direction
@@ -204,11 +204,11 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<BLink<? exte
 
         gl.glColor4f(e.r, e.g, e.b, e.a);
 
-        float width = e.width * radius();
-        if (width <= 0.01f) {
+        float width = e.width;// * radius();
+        if (width <= 0.1f) {
             Draw.renderLineEdge(gl, this, e, width );
         } else {
-            Draw.renderHalfTriEdge(gl, this, e, width / 18f, e.r * 2f /* hack */);
+            Draw.renderHalfTriEdge(gl, this, e, width / 9f, e.r * 2f /* hack */);
         }
     }
 
@@ -283,8 +283,8 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<BLink<? exte
 
                 //float priAvg = priSum/2f;
 
-                float minLineWidth = 0.1f;
-                float maxLineWidth = 4f;
+                float minLineWidth = 0.5f;
+                float maxLineWidth = 8f;
 
                 this.width = minLineWidth + (maxLineWidth - minLineWidth) * priSum;
                 //z.r = 0.25f + 0.7f * (pri * 1f / ((Term)target.key).volume());
@@ -323,7 +323,7 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<BLink<? exte
     public static class ConceptVis1 implements ConceptVis {
 
         final float minSize = 0.1f;
-        final float maxSize = 16f;
+        final float maxSize = 6f;
 
 
         public void apply(ConceptWidget conceptWidget, Term tt) {
@@ -340,8 +340,8 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<BLink<? exte
     }
     public static class ConceptVis2 implements ConceptVis {
 
-        final float minSize = 4f;
-        final float maxSize = 16f;
+        final float minSize = 2f;
+        final float maxSize = 8f;
 
         public void apply(ConceptWidget conceptWidget, Term tt) {
             ConceptsSpace space = conceptWidget.space;
@@ -349,14 +349,14 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<BLink<? exte
             float p = nar.priority(tt, Float.NaN);
             p = (p == p) ? p : 0;// = 1; //pri = key.priIfFiniteElseZero();
 
-            long now = space.now();
+            //long now = space.now();
 //            float b = conceptWidget.concept.beliefs().eviSum(now);
 //            float g = conceptWidget.concept.goals().eviSum(now);
 //            float q = conceptWidget.concept.questions().priSum();
             float ec = p;// + w2c((b + g + q)/2f);
 
             //sqrt because the area will be the sqr of this dimension
-            float nodeScale = (float) (minSize + Util.sqr(ec) * maxSize);//1f + 2f * p;
+            float nodeScale = (float) (minSize + Math.sqrt(ec) * maxSize);//1f + 2f * p;
             float l = nodeScale * 1.618f;
             float w = nodeScale;
             float h = nodeScale / (1.618f * 2);

@@ -345,7 +345,7 @@ abstract public class NAgents extends NAgent {
 
         a.nar.runLater(()-> {
 
-            Vis.conceptsWindow3D(a.nar, 128, 6).show(1000, 800);
+            Vis.conceptsWindow3D(a.nar, 64, 12).show(1000, 800);
 
             window(
                     grid(

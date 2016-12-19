@@ -195,7 +195,7 @@ public class Line1DSimplest extends NAgent {
         //l.runRT(25, 15000).join();
 
 
-        l.runRT(30f);
+        l.runRT(5f);
 
 //
 //        NAR.printActiveTasks(nar, true);

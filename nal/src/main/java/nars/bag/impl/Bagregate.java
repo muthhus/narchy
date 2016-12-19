@@ -43,7 +43,7 @@ public class Bagregate<X> extends ArrayBag<X> {
         int limit = capacity;
         while (ss.hasNext() && count < limit) {
             BLink<X> x = ss.next();
-            if (include(x)) {
+            if (x!=null && include(x)) {
                 if (put(x.get(), x, scale, null)!=null)
                     count++;
             }

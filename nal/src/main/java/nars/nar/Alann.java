@@ -65,7 +65,7 @@ public class Alann extends NAR {
 
         public final Bag<Concept> terms =
                 //new HijackBag<>(128, 3, blend, random);
-                new CurveBag<Concept>(64, new CurveBag.NormalizedSampler(power2BagCurve, random), blend, new ConcurrentHashMap(64)) {
+                new CurveBag<Concept>(32, new CurveBag.NormalizedSampler(power2BagCurve, random), blend, new ConcurrentHashMap(64)) {
 
                     @Override
                     public void onAdded(BLink<Concept> value) {

@@ -21,14 +21,14 @@ public abstract class Param /*extends Container*/ implements Level {
 
     /** absolute limit for constructing terms in any context in which a NAR is not known, which could provide a limit.
      * typically a NAR instance's 'compoundVolumeMax' parameter will be lower than this */
-    public static final int COMPOUND_VOLUME_MAX = 48;
+    public static final int COMPOUND_VOLUME_MAX = 64;
 
     /**
      * hard upper-bound limit on Compound term complexity;
      * if this is exceeded it may indicate a recursively
      * malformed term due to a serious inference bug
      */
-    public final MutableInteger termVolumeMax = new MutableInteger(28);
+    public final MutableInteger termVolumeMax = new MutableInteger(COMPOUND_VOLUME_MAX / 2 );
 
     //public static final boolean ARITHMETIC_INDUCTION = false;
 

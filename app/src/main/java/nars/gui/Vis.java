@@ -22,16 +22,17 @@ import spacegraph.*;
 import spacegraph.layout.Flatten;
 import spacegraph.layout.ForceDirected;
 import spacegraph.math.Color3f;
+import spacegraph.math.v3;
 import spacegraph.phys.Collidable;
 import spacegraph.phys.collision.broad.Broadphase;
+import spacegraph.render.Draw;
+import spacegraph.render.SpaceGraph2D;
 import spacegraph.space.CrosshairSurface;
 import spacegraph.space.layout.Grid;
 import spacegraph.space.layout.Stacking;
 import spacegraph.space.widget.*;
 import spacegraph.space.widget.console.ConsoleSurface;
 import spacegraph.space.widget.console.ConsoleTerminal;
-import spacegraph.render.Draw;
-import spacegraph.render.SpaceGraph2D;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -347,11 +348,11 @@ public class Vis {
 //                                });
 //                            }
 //                        }
-//                        new Flatten() {
-//                            protected void locate(SimpleSpatial s, v3 f) {
-//                                f.set(s.x(), s.y(), 10 - ((Term) (s.key)).volume() * 1);
-//                            }
-//                        }
+                        new Flatten() {
+                            protected void locate(SimpleSpatial s, v3 f) {
+                                f.set(s.x(), s.y(), 10 - ((Term) (s.key)).volume() * 1);
+                            }
+                        }
 //                        //new Spiral()
 //                        //new FastOrganicLayout()
                 )
