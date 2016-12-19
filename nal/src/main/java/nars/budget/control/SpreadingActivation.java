@@ -19,7 +19,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 
 /**
- * Created by me on 8/22/16.
+ * activation from a point source to its subterm components (termlink templates)
  */
 public class SpreadingActivation extends Activation {
 
@@ -27,16 +27,9 @@ public class SpreadingActivation extends Activation {
 
     @NotNull public final Budgeted in;
 
-    public final ObjectFloatHashMap<Term> spread = new ObjectFloatHashMap<>();
+    public final ObjectFloatHashMap<Term> spread;
 
     final static float parentRetention = 0.5f;
-
-    SpreadingActivation(@NotNull Budgeted in, float scale, @NotNull Concept src, @NotNull NAR nar, int termlinkDepth) {
-        super(in, scale, src, nar);
-        this.in = in;
-        this.termlinkDepth = termlinkDepth;  //should be larger then TASKLINK_DEPTH_LIMIT because this resolves the Concept used for it in linkSubterms
-    }
-
 
     /**
      * runs the task activation procedure
@@ -49,9 +42,14 @@ public class SpreadingActivation extends Activation {
      * unidirectional task activation procedure
      */
     public SpreadingActivation(@NotNull Budgeted in, float scale, @NotNull Concept src, int termlinkDepth, @NotNull NAR nar) {
-        this(in, scale, src, nar, termlinkDepth);
+        super(in, scale, src, nar);
+        this.in = in;
+        this.termlinkDepth = termlinkDepth;  //should be larger then TASKLINK_DEPTH_LIMIT because this resolves the Concept used for it in linkSubterms
 
-        link(src.term(), scale, 0);
+        Term srcTerm = src.term();
+        spread = new ObjectFloatHashMap<>(srcTerm.volume());
+
+        link(srcTerm, scale, 0);
 
         //PriorityAccumulator<Concept> conceptActivation = nar.accumulator();
 
@@ -91,18 +89,20 @@ public class SpreadingActivation extends Activation {
 
         float thisScale = scale;
 
-        if (targetTerm instanceof Compound && ((depth + 1) <= termlinkDepth)) {
+        int nextDepth = depth + 1;
+        if (targetTerm instanceof Compound && (nextDepth <= termlinkDepth)) {
 
-            TermContainer children = ((Compound) targetTerm).subterms();
-            int n = children.size();
+            int n = targetTerm.size();
+            if (n > 0) {
+                float childScale = ((1f - parentRetention) * scale) / (n);
+                if (childScale >= minScale) {
+                    Compound targetCompound = (Compound) targetTerm;
+                    Term[] children = targetCompound.terms();
+                    for (Term t : children)
+                        link(t.unneg(), childScale, nextDepth); //link and recurse to the concept
 
-            float childScale = ((1f-parentRetention) * scale) / (n);
-            if ( childScale >= minScale) {
-                Term[] tt = children.terms();
-                for (Term t : tt)
-                    link(t.unneg(), childScale, depth + 1); //link and recurse to the concept
-
-                thisScale = scale * parentRetention;
+                    thisScale = scale * parentRetention;
+                }
             }
         }
 

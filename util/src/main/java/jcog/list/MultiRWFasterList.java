@@ -47,7 +47,7 @@ import static org.eclipse.collections.impl.factory.Iterables.mList;
 /**
  * extension of org.eclipse collections MultiRWFasterList
  */
-public class MultiRWFasterList<T>  extends AbstractMultiReaderMutableCollection<T>
+public class MultiRWFasterList<T> extends AbstractMultiReaderMutableCollection<T>
         implements RandomAccess, Externalizable, MutableList<T> {
     private static final long serialVersionUID = 1L;
 
@@ -64,7 +64,9 @@ public class MultiRWFasterList<T>  extends AbstractMultiReaderMutableCollection<
         }
     }
 
-    /** note: this is a semi-volatile operation and relies on the delegate list implementation to allow concurrent isEmpty() */
+    /**
+     * note: this is a semi-volatile operation and relies on the delegate list implementation to allow concurrent isEmpty()
+     */
     public boolean ifNotEmptyAcquireReadLock() {
 
         if (delegate.isEmpty())
@@ -73,7 +75,10 @@ public class MultiRWFasterList<T>  extends AbstractMultiReaderMutableCollection<
         super.acquireReadLock();
         return true;
     }
-    /** note: this is a semi-volatile operation and relies on the delegate list implementation to allow concurrent isEmpty() */
+
+    /**
+     * note: this is a semi-volatile operation and relies on the delegate list implementation to allow concurrent isEmpty()
+     */
     public boolean ifNotEmptyAcquireWriteLock() {
 
         if (delegate.isEmpty())
@@ -98,8 +103,11 @@ public class MultiRWFasterList<T>  extends AbstractMultiReaderMutableCollection<
         super.unlockWriteLock();
     }
 
-    /** note: this is a semi-volatile operation and relies on the delegate list implementation to allow concurrent isEmpty()*/
-    @Override public boolean removeIf(java.util.function.Predicate<? super T> filter) {
+    /**
+     * note: this is a semi-volatile operation and relies on the delegate list implementation to allow concurrent isEmpty()
+     */
+    @Override
+    public boolean removeIf(java.util.function.Predicate<? super T> filter) {
         if (delegate.isEmpty())
             return false;
         this.acquireWriteLock();
@@ -110,8 +118,11 @@ public class MultiRWFasterList<T>  extends AbstractMultiReaderMutableCollection<
         }
     }
 
-    /** note: this is a semi-volatile operation and relies on the delegate list implementation to allow concurrent isEmpty()*/
-    @Override public void forEach(Consumer<? super T> action) {
+    /**
+     * note: this is a semi-volatile operation and relies on the delegate list implementation to allow concurrent isEmpty()
+     */
+    @Override
+    public void forEach(Consumer<? super T> action) {
         if (delegate.isEmpty())
             return;
 
@@ -123,7 +134,8 @@ public class MultiRWFasterList<T>  extends AbstractMultiReaderMutableCollection<
         }
     }
 
-    @Override public void each(Procedure<? super T> procedure) {
+    @Override
+    public void each(Procedure<? super T> procedure) {
         throw new UnsupportedOperationException();
     }
 
@@ -186,260 +198,203 @@ public class MultiRWFasterList<T>  extends AbstractMultiReaderMutableCollection<
         return new UntouchableMutableList<>(this.delegate);
     }
 
-    public void withReadLockAndDelegate(Procedure<MutableList<T>> procedure)
-    {
+    public void withReadLockAndDelegate(Procedure<MutableList<T>> procedure) {
         this.acquireReadLock();
-        try
-        {
+        try {
             //UntouchableMutableList<T> list = this.asReadUntouchable();
             procedure.value(delegate);
             //list.becomeUseless();
-        }
-        finally
-        {
+        } finally {
             this.unlockReadLock();
         }
     }
 
-    public void withWriteLockAndDelegate(Procedure<MutableList<T>> procedure)
-    {
+    public void withWriteLockAndDelegate(Procedure<MutableList<T>> procedure) {
         this.acquireWriteLock();
-        try
-        {
+        try {
             //MutableList<T> list = this.asWriteUntouchable();
 
             procedure.value(delegate);
             //list.becomeUseless();
-        }
-        finally
-        {
-            this.unlockWriteLock();
-        }
-    }
-
-    public void ifNotEmptyWithWriteLockAndDelegate(Procedure<MutableList<T>> procedure)
-    {
-        this.acquireWriteLock();
-        try {
-
-            if (!delegate.isEmpty())
-                procedure.value(delegate);
-
         } finally {
             this.unlockWriteLock();
         }
     }
 
-//    public void ifNotEmptyWithWriteLockAndDelegate(Procedure<MutableList<T>> procedure)
-//    {
-//        MutableList<T> d = this.delegate;
-//        if (!d.isEmpty()) {
-//            this.acquireWriteLock();
-//            try {
-//                //MutableList<T> list = this.asWriteUntouchable();
-//
-//                procedure.value(d);
-//                //list.becomeUseless();
-//            } finally {
-//                this.unlockWriteLock();
-//            }
-//        }
-//    }
+    public <Y> Y ifNotEmptyWriteWith(Function<MutableList<T>, Y> procedure) {
+        Y result = null;
 
+        //this.acquireReadLock();
+        //try {
+
+                this.acquireWriteLock();
+                try {
+                    if (!delegate.isEmpty())
+                        result = procedure.apply(delegate);
+                } finally {
+                    this.unlockWriteLock();
+                }
+
+        //} finally {
+        //    this.unlockReadLock();
+        //}
+
+        return result;
+    }
+
+    public <Y> Y ifNotEmptyReadWith(Function<MutableList<T>, Y> procedure) {
+        Y result = null;
+
+        this.acquireReadLock();
+        try {
+            MutableList<T> d = this.delegate;
+            if (!d.isEmpty()) {
+                result = procedure.apply(d);
+            }
+        } finally {
+            this.unlockReadLock();
+        }
+
+        return result;
+    }
 
     @Override
-    public MutableList<T> asSynchronized()
-    {
+    public MutableList<T> asSynchronized() {
         this.acquireReadLock();
-        try
-        {
+        try {
             return SynchronizedMutableList.of(this);
-        }
-        finally
-        {
+        } finally {
             this.unlockReadLock();
         }
     }
 
     @Override
-    public MutableList<T> asUnmodifiable()
-    {
+    public MutableList<T> asUnmodifiable() {
         this.acquireReadLock();
-        try
-        {
+        try {
             return UnmodifiableMutableList.of(this);
-        }
-        finally
-        {
+        } finally {
             this.unlockReadLock();
         }
     }
 
     @Override
-    public ImmutableList<T> toImmutable()
-    {
+    public ImmutableList<T> toImmutable() {
         this.acquireReadLock();
-        try
-        {
+        try {
             return Lists.immutable.withAll(this.delegate);
-        }
-        finally
-        {
+        } finally {
             this.unlockReadLock();
         }
     }
 
     @Override
-    public MutableList<T> clone()
-    {
+    public MutableList<T> clone() {
         this.acquireReadLock();
-        try
-        {
+        try {
             return new MultiRWFasterList<>(this.delegate.clone());
-        }
-        finally
-        {
+        } finally {
             this.unlockReadLock();
         }
     }
 
     @Override
-    public <V> MutableList<V> collect(Function<? super T, ? extends V> function)
-    {
+    public <V> MutableList<V> collect(Function<? super T, ? extends V> function) {
         this.acquireReadLock();
-        try
-        {
+        try {
             return this.delegate.collect(function);
-        }
-        finally
-        {
+        } finally {
             this.unlockReadLock();
         }
     }
 
     @Override
-    public MutableBooleanList collectBoolean(BooleanFunction<? super T> booleanFunction)
-    {
+    public MutableBooleanList collectBoolean(BooleanFunction<? super T> booleanFunction) {
         this.acquireReadLock();
-        try
-        {
+        try {
             return this.delegate.collectBoolean(booleanFunction);
-        }
-        finally
-        {
+        } finally {
             this.unlockReadLock();
         }
     }
 
     @Override
-    public MutableByteList collectByte(ByteFunction<? super T> byteFunction)
-    {
+    public MutableByteList collectByte(ByteFunction<? super T> byteFunction) {
         this.acquireReadLock();
-        try
-        {
+        try {
             return this.delegate.collectByte(byteFunction);
-        }
-        finally
-        {
+        } finally {
             this.unlockReadLock();
         }
     }
 
     @Override
-    public MutableCharList collectChar(CharFunction<? super T> charFunction)
-    {
+    public MutableCharList collectChar(CharFunction<? super T> charFunction) {
         this.acquireReadLock();
-        try
-        {
+        try {
             return this.delegate.collectChar(charFunction);
-        }
-        finally
-        {
+        } finally {
             this.unlockReadLock();
         }
     }
 
     @Override
-    public MutableDoubleList collectDouble(DoubleFunction<? super T> doubleFunction)
-    {
+    public MutableDoubleList collectDouble(DoubleFunction<? super T> doubleFunction) {
         this.acquireReadLock();
-        try
-        {
+        try {
             return this.delegate.collectDouble(doubleFunction);
-        }
-        finally
-        {
+        } finally {
             this.unlockReadLock();
         }
     }
 
     @Override
-    public MutableFloatList collectFloat(FloatFunction<? super T> floatFunction)
-    {
+    public MutableFloatList collectFloat(FloatFunction<? super T> floatFunction) {
         this.acquireReadLock();
-        try
-        {
+        try {
             return this.delegate.collectFloat(floatFunction);
-        }
-        finally
-        {
+        } finally {
             this.unlockReadLock();
         }
     }
 
     @Override
-    public MutableIntList collectInt(IntFunction<? super T> intFunction)
-    {
+    public MutableIntList collectInt(IntFunction<? super T> intFunction) {
         this.acquireReadLock();
-        try
-        {
+        try {
             return this.delegate.collectInt(intFunction);
-        }
-        finally
-        {
+        } finally {
             this.unlockReadLock();
         }
     }
 
     @Override
-    public MutableLongList collectLong(LongFunction<? super T> longFunction)
-    {
+    public MutableLongList collectLong(LongFunction<? super T> longFunction) {
         this.acquireReadLock();
-        try
-        {
+        try {
             return this.delegate.collectLong(longFunction);
-        }
-        finally
-        {
+        } finally {
             this.unlockReadLock();
         }
     }
 
     @Override
-    public MutableShortList collectShort(ShortFunction<? super T> shortFunction)
-    {
+    public MutableShortList collectShort(ShortFunction<? super T> shortFunction) {
         this.acquireReadLock();
-        try
-        {
+        try {
             return this.delegate.collectShort(shortFunction);
-        }
-        finally
-        {
+        } finally {
             this.unlockReadLock();
         }
     }
 
     @Override
     public <V> MutableList<V> flatCollect(
-            Function<? super T, ? extends Iterable<V>> function)
-    {
+            Function<? super T, ? extends Iterable<V>> function) {
         this.acquireReadLock();
-        try
-        {
+        try {
             return this.delegate.flatCollect(function);
-        }
-        finally
-        {
+        } finally {
             this.unlockReadLock();
         }
     }
@@ -447,15 +402,11 @@ public class MultiRWFasterList<T>  extends AbstractMultiReaderMutableCollection<
     @Override
     public <V> MutableList<V> collectIf(
             Predicate<? super T> predicate,
-            Function<? super T, ? extends V> function)
-    {
+            Function<? super T, ? extends V> function) {
         this.acquireReadLock();
-        try
-        {
+        try {
             return this.delegate.collectIf(predicate, function);
-        }
-        finally
-        {
+        } finally {
             this.unlockReadLock();
         }
     }
@@ -463,35 +414,26 @@ public class MultiRWFasterList<T>  extends AbstractMultiReaderMutableCollection<
     @Override
     public <P, V> MutableList<V> collectWith(
             Function2<? super T, ? super P, ? extends V> function,
-            P parameter)
-    {
+            P parameter) {
         this.acquireReadLock();
-        try
-        {
+        try {
             return this.delegate.collectWith(function, parameter);
-        }
-        finally
-        {
+        } finally {
             this.unlockReadLock();
         }
     }
 
     @Override
-    public MutableList<T> newEmpty()
-    {
+    public MutableList<T> newEmpty() {
         return MultiRWFasterList.newList();
     }
 
     @Override
-    public MutableList<T> reject(Predicate<? super T> predicate)
-    {
+    public MutableList<T> reject(Predicate<? super T> predicate) {
         this.acquireReadLock();
-        try
-        {
+        try {
             return this.delegate.reject(predicate);
-        }
-        finally
-        {
+        } finally {
             this.unlockReadLock();
         }
     }
@@ -499,44 +441,32 @@ public class MultiRWFasterList<T>  extends AbstractMultiReaderMutableCollection<
     @Override
     public <P> MutableList<T> rejectWith(
             Predicate2<? super T, ? super P> predicate,
-            P parameter)
-    {
+            P parameter) {
         this.acquireReadLock();
-        try
-        {
+        try {
             return this.delegate.rejectWith(predicate, parameter);
-        }
-        finally
-        {
+        } finally {
             this.unlockReadLock();
         }
     }
 
     @Override
-    public MutableList<T> tap(Procedure<? super T> procedure)
-    {
+    public MutableList<T> tap(Procedure<? super T> procedure) {
         this.acquireReadLock();
-        try
-        {
+        try {
             this.forEach(procedure);
             return this;
-        }
-        finally
-        {
+        } finally {
             this.unlockReadLock();
         }
     }
 
     @Override
-    public MutableList<T> select(Predicate<? super T> predicate)
-    {
+    public MutableList<T> select(Predicate<? super T> predicate) {
         this.acquireReadLock();
-        try
-        {
+        try {
             return this.delegate.select(predicate);
-        }
-        finally
-        {
+        } finally {
             this.unlockReadLock();
         }
     }
@@ -544,363 +474,267 @@ public class MultiRWFasterList<T>  extends AbstractMultiReaderMutableCollection<
     @Override
     public <P> MutableList<T> selectWith(
             Predicate2<? super T, ? super P> predicate,
-            P parameter)
-    {
+            P parameter) {
         this.acquireReadLock();
-        try
-        {
+        try {
             return this.delegate.selectWith(predicate, parameter);
-        }
-        finally
-        {
+        } finally {
             this.unlockReadLock();
         }
     }
 
     @Override
-    public PartitionMutableList<T> partition(Predicate<? super T> predicate)
-    {
+    public PartitionMutableList<T> partition(Predicate<? super T> predicate) {
         this.acquireReadLock();
-        try
-        {
+        try {
             return this.delegate.partition(predicate);
-        }
-        finally
-        {
+        } finally {
             this.unlockReadLock();
         }
     }
 
     @Override
-    public <P> PartitionMutableList<T> partitionWith(Predicate2<? super T, ? super P> predicate, P parameter)
-    {
+    public <P> PartitionMutableList<T> partitionWith(Predicate2<? super T, ? super P> predicate, P parameter) {
         this.acquireReadLock();
-        try
-        {
+        try {
             return this.delegate.partitionWith(predicate, parameter);
-        }
-        finally
-        {
+        } finally {
             this.unlockReadLock();
         }
     }
 
     @Override
-    public <S> MutableList<S> selectInstancesOf(Class<S> clazz)
-    {
+    public <S> MutableList<S> selectInstancesOf(Class<S> clazz) {
         this.acquireReadLock();
-        try
-        {
+        try {
             return this.delegate.selectInstancesOf(clazz);
-        }
-        finally
-        {
+        } finally {
             this.unlockReadLock();
         }
     }
 
     @Override
-    public MutableList<T> distinct()
-    {
+    public MutableList<T> distinct() {
         this.acquireReadLock();
-        try
-        {
+        try {
             return this.delegate.distinct();
-        }
-        finally
-        {
+        } finally {
             this.unlockReadLock();
         }
     }
 
     @Override
-    public MutableList<T> distinct(HashingStrategy<? super T> hashingStrategy)
-    {
+    public MutableList<T> distinct(HashingStrategy<? super T> hashingStrategy) {
         this.acquireReadLock();
-        try
-        {
+        try {
             return this.delegate.distinct(hashingStrategy);
-        }
-        finally
-        {
+        } finally {
             this.unlockReadLock();
         }
     }
 
     @Override
-    public MutableList<T> sortThis()
-    {
+    public MutableList<T> sortThis() {
         this.acquireWriteLock();
-        try
-        {
+        try {
             this.delegate.sortThis();
             return this;
-        }
-        finally
-        {
+        } finally {
             this.unlockWriteLock();
         }
     }
 
     @Override
-    public MutableList<T> sortThis(Comparator<? super T> comparator)
-    {
+    public MutableList<T> sortThis(Comparator<? super T> comparator) {
         this.acquireWriteLock();
-        try
-        {
+        try {
             this.delegate.sortThis(comparator);
             return this;
-        }
-        finally
-        {
+        } finally {
             this.unlockWriteLock();
         }
     }
 
     @Override
     public <V extends Comparable<? super V>> MutableList<T> sortThisBy(
-            Function<? super T, ? extends V> function)
-    {
+            Function<? super T, ? extends V> function) {
         this.acquireWriteLock();
-        try
-        {
+        try {
             this.delegate.sortThisBy(function);
             return this;
-        }
-        finally
-        {
+        } finally {
             this.unlockWriteLock();
         }
     }
 
     @Override
-    public MutableList<T> sortThisByInt(IntFunction<? super T> function)
-    {
+    public MutableList<T> sortThisByInt(IntFunction<? super T> function) {
         this.acquireWriteLock();
-        try
-        {
+        try {
             this.delegate.sortThisByInt(function);
             return this;
-        }
-        finally
-        {
+        } finally {
             this.unlockWriteLock();
         }
     }
 
     @Override
-    public MutableList<T> sortThisByBoolean(BooleanFunction<? super T> function)
-    {
+    public MutableList<T> sortThisByBoolean(BooleanFunction<? super T> function) {
         this.acquireWriteLock();
-        try
-        {
+        try {
             this.delegate.sortThisByBoolean(function);
             return this;
-        }
-        finally
-        {
+        } finally {
             this.unlockWriteLock();
         }
     }
 
     @Override
-    public MutableList<T> sortThisByChar(CharFunction<? super T> function)
-    {
+    public MutableList<T> sortThisByChar(CharFunction<? super T> function) {
         this.acquireWriteLock();
-        try
-        {
+        try {
             this.delegate.sortThisByChar(function);
             return this;
-        }
-        finally
-        {
+        } finally {
             this.unlockWriteLock();
         }
     }
 
     @Override
-    public MutableList<T> sortThisByByte(ByteFunction<? super T> function)
-    {
+    public MutableList<T> sortThisByByte(ByteFunction<? super T> function) {
         this.acquireWriteLock();
-        try
-        {
+        try {
             this.delegate.sortThisByByte(function);
             return this;
-        }
-        finally
-        {
+        } finally {
             this.unlockWriteLock();
         }
     }
 
     @Override
-    public MutableList<T> sortThisByShort(ShortFunction<? super T> function)
-    {
+    public MutableList<T> sortThisByShort(ShortFunction<? super T> function) {
         this.acquireWriteLock();
-        try
-        {
+        try {
             this.delegate.sortThisByShort(function);
             return this;
-        }
-        finally
-        {
+        } finally {
             this.unlockWriteLock();
         }
     }
 
     @Override
-    public MutableList<T> sortThisByFloat(FloatFunction<? super T> function)
-    {
+    public MutableList<T> sortThisByFloat(FloatFunction<? super T> function) {
         this.acquireWriteLock();
-        try
-        {
+        try {
             this.delegate.sortThisByFloat(function);
             return this;
-        }
-        finally
-        {
+        } finally {
             this.unlockWriteLock();
         }
     }
 
     @Override
-    public MutableList<T> sortThisByLong(LongFunction<? super T> function)
-    {
+    public MutableList<T> sortThisByLong(LongFunction<? super T> function) {
         this.acquireWriteLock();
-        try
-        {
+        try {
             this.delegate.sortThisByLong(function);
             return this;
-        }
-        finally
-        {
+        } finally {
             this.unlockWriteLock();
         }
     }
 
     @Override
-    public MutableList<T> sortThisByDouble(DoubleFunction<? super T> function)
-    {
+    public MutableList<T> sortThisByDouble(DoubleFunction<? super T> function) {
         this.acquireWriteLock();
-        try
-        {
+        try {
             this.delegate.sortThisByDouble(function);
             return this;
-        }
-        finally
-        {
+        } finally {
             this.unlockWriteLock();
         }
     }
 
     @Override
-    public MutableList<T> subList(int fromIndex, int toIndex)
-    {
+    public MutableList<T> subList(int fromIndex, int toIndex) {
         this.acquireReadLock();
-        try
-        {
+        try {
             return new MultiRWFasterList<>(this.delegate.subList(fromIndex, toIndex), this.lock);
-        }
-        finally
-        {
+        } finally {
             this.unlockReadLock();
         }
     }
 
     @Override
-    public boolean equals(Object o)
-    {
+    public boolean equals(Object o) {
         this.acquireReadLock();
-        try
-        {
+        try {
             return this.delegate.equals(o);
-        }
-        finally
-        {
+        } finally {
             this.unlockReadLock();
         }
     }
 
     @Override
-    public int hashCode()
-    {
+    public int hashCode() {
         this.acquireReadLock();
-        try
-        {
+        try {
             return this.delegate.hashCode();
-        }
-        finally
-        {
+        } finally {
             this.unlockReadLock();
         }
     }
 
     @Override
-    public T get(int index)
-    {
+    public T get(int index) {
         this.acquireReadLock();
-        try
-        {
+        try {
             return this.delegate.get(index);
-        }
-        finally
-        {
+        } finally {
             this.unlockReadLock();
         }
     }
 
     @Override
-    public int indexOf(Object o)
-    {
+    public int indexOf(Object o) {
         this.acquireReadLock();
-        try
-        {
+        try {
             return this.delegate.indexOf(o);
-        }
-        finally
-        {
+        } finally {
             this.unlockReadLock();
         }
     }
 
     @Override
-    public int lastIndexOf(Object o)
-    {
+    public int lastIndexOf(Object o) {
         this.acquireReadLock();
-        try
-        {
+        try {
             return this.delegate.lastIndexOf(o);
-        }
-        finally
-        {
+        } finally {
             this.unlockReadLock();
         }
     }
 
     @Override
-    public MutableList<T> with(T element)
-    {
+    public MutableList<T> with(T element) {
         this.add(element);
         return this;
     }
 
     @Override
-    public MutableList<T> without(T element)
-    {
+    public MutableList<T> without(T element) {
         this.remove(element);
         return this;
     }
 
     @Override
-    public MutableList<T> withAll(Iterable<? extends T> elements)
-    {
+    public MutableList<T> withAll(Iterable<? extends T> elements) {
         this.addAllIterable(elements);
         return this;
     }
 
     @Override
-    public MutableList<T> withoutAll(Iterable<? extends T> elements)
-    {
+    public MutableList<T> withoutAll(Iterable<? extends T> elements) {
         this.removeAllIterable(elements);
         return this;
     }
@@ -921,8 +755,7 @@ public class MultiRWFasterList<T>  extends AbstractMultiReaderMutableCollection<
      * </pre>
      */
     @Override
-    public ListIterator<T> listIterator()
-    {
+    public ListIterator<T> listIterator() {
         throw new UnsupportedOperationException(
                 "ListIterator is not supported for MultiRWFasterList.  "
                         + "If you would like to use a ListIterator, you must either use withReadLockAndDelegate() or withWriteLockAndDelegate().");
@@ -944,151 +777,116 @@ public class MultiRWFasterList<T>  extends AbstractMultiReaderMutableCollection<
      * </pre>
      */
     @Override
-    public ListIterator<T> listIterator(int index)
-    {
+    public ListIterator<T> listIterator(int index) {
         throw new UnsupportedOperationException(
                 "ListIterator is not supported for MultiRWFasterList.  "
                         + "If you would like to use a ListIterator, you must either use withReadLockAndDelegate() or withWriteLockAndDelegate().");
     }
 
     @Override
-    public T remove(int index)
-    {
+    public T remove(int index) {
         this.acquireWriteLock();
-        try
-        {
+        try {
             return this.delegate.remove(index);
-        }
-        finally
-        {
+        } finally {
             this.unlockWriteLock();
         }
     }
 
     @Override
-    public T set(int index, T element)
-    {
+    public T set(int index, T element) {
         this.acquireWriteLock();
-        try
-        {
+        try {
             return this.delegate.set(index, element);
-        }
-        finally
-        {
+        } finally {
             this.unlockWriteLock();
         }
     }
 
     @Override
-    public boolean addAll(int index, Collection<? extends T> collection)
-    {
+    public boolean addAll(int index, Collection<? extends T> collection) {
         this.acquireWriteLock();
-        try
-        {
+        try {
             return this.delegate.addAll(index, collection);
-        }
-        finally
-        {
+        } finally {
             this.unlockWriteLock();
         }
     }
 
     @Override
-    public void add(int index, T element)
-    {
+    public void add(int index, T element) {
         this.acquireWriteLock();
-        try
-        {
+        try {
             this.delegate.add(index, element);
-        }
-        finally
-        {
+        } finally {
             this.unlockWriteLock();
         }
     }
 
     @Override
-    public <S> boolean corresponds(OrderedIterable<S> other, Predicate2<? super T, ? super S> predicate)
-    {
+    public <S> boolean corresponds(OrderedIterable<S> other, Predicate2<? super T, ? super S> predicate) {
         this.acquireReadLock();
-        try
-        {
+        try {
             return this.delegate.corresponds(other, predicate);
-        }
-        finally
-        {
+        } finally {
             this.unlockReadLock();
         }
     }
 
     @Override
-    public void forEach(int startIndex, int endIndex, Procedure<? super T> procedure)
-    {
+    public void forEach(int startIndex, int endIndex, Procedure<? super T> procedure) {
         this.acquireReadLock();
-        try
-        {
+        try {
             this.delegate.forEach(startIndex, endIndex, procedure);
-        }
-        finally
-        {
+        } finally {
             this.unlockReadLock();
         }
     }
 
     @Override
-    public int binarySearch(T key, Comparator<? super T> comparator)
-    {
+    public int binarySearch(T key, Comparator<? super T> comparator) {
         this.acquireReadLock();
-        try
-        {
+        try {
             return Collections.binarySearch(this, key, comparator);
-        }
-        finally
-        {
+        } finally {
             this.unlockReadLock();
         }
     }
 
     @Override
-    public int binarySearch(T key)
-    {
+    public int binarySearch(T key) {
         this.acquireReadLock();
-        try
-        {
+        try {
             return Collections.binarySearch((List<? extends Comparable<? super T>>) this, key);
-        }
-        finally
-        {
+        } finally {
             this.unlockReadLock();
         }
     }
 
     @Override
-    public void reverseForEach(Procedure<? super T> procedure)
-    {
-        this.withReadLockRun(() -> this.getDelegate().reverseForEach(procedure));
+    public void reverseForEach(Procedure<? super T> procedure) {
+        this.withReadLockRun(() -> delegate.reverseForEach(procedure));
     }
 
     @Override
-    public void forEachWithIndex(int fromIndex, int toIndex, ObjectIntProcedure<? super T> objectIntProcedure)
-    {
-        this.withReadLockRun(() -> this.getDelegate().forEachWithIndex(fromIndex, toIndex, objectIntProcedure));
+    public void forEachWithIndex(int fromIndex, int toIndex, ObjectIntProcedure<? super T> objectIntProcedure) {
+        this.withReadLockRun(() -> delegate.forEachWithIndex(fromIndex, toIndex, objectIntProcedure));
     }
 
     @Override
-    public void writeExternal(ObjectOutput out) throws IOException
-    {
+    public void writeExternal(ObjectOutput out) throws IOException {
         out.writeObject(this.delegate);
     }
 
     @Override
-    public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException
-    {
+    public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
         this.delegate = (MutableList<T>) in.readObject();
         this.lock = new ReentrantReadWriteLock();
     }
 
-    /** direct access to delegate, use with caution */
+    /**
+     * direct access to delegate, use with caution
+     */
     public MutableList<T> internal() {
         return delegate;
     }
@@ -1097,466 +895,393 @@ public class MultiRWFasterList<T>  extends AbstractMultiReaderMutableCollection<
 
     static final class UntouchableMutableList<T>
             extends UntouchableMutableCollection<T>
-            implements MutableList<T>
-    {
+            implements MutableList<T> {
         private final MutableList<UntouchableListIterator<T>> requestedIterators = mList();
         private final MutableList<UntouchableMutableList<T>> requestedSubLists = mList();
 
-        private UntouchableMutableList(MutableList<T> delegate)
-        {
+        private UntouchableMutableList(MutableList<T> delegate) {
             this.delegate = delegate;
         }
 
         @Override
-        public MutableList<T> with(T element)
-        {
+        public MutableList<T> with(T element) {
             this.add(element);
             return this;
         }
 
         @Override
-        public MutableList<T> without(T element)
-        {
+        public MutableList<T> without(T element) {
             this.remove(element);
             return this;
         }
 
         @Override
-        public MutableList<T> withAll(Iterable<? extends T> elements)
-        {
+        public MutableList<T> withAll(Iterable<? extends T> elements) {
             this.addAllIterable(elements);
             return this;
         }
 
         @Override
-        public MutableList<T> withoutAll(Iterable<? extends T> elements)
-        {
+        public MutableList<T> withoutAll(Iterable<? extends T> elements) {
             this.removeAllIterable(elements);
             return this;
         }
 
         @Override
-        public MutableList<T> asSynchronized()
-        {
+        public MutableList<T> asSynchronized() {
             throw new UnsupportedOperationException("Cannot call asSynchronized() on " + this.getClass().getSimpleName());
         }
 
         @Override
-        public MutableList<T> asUnmodifiable()
-        {
+        public MutableList<T> asUnmodifiable() {
             throw new UnsupportedOperationException("Cannot call asUnmodifiable() on " + this.getClass().getSimpleName());
         }
 
         @Override
-        public LazyIterable<T> asLazy()
-        {
+        public LazyIterable<T> asLazy() {
             return LazyIterate.adapt(this);
         }
 
         @Override
-        public ImmutableList<T> toImmutable()
-        {
+        public ImmutableList<T> toImmutable() {
             return this.getDelegate().toImmutable();
         }
 
         @Override
-        public MutableList<T> clone()
-        {
+        public MutableList<T> clone() {
             return this.getDelegate().clone();
         }
 
         @Override
-        public <V> MutableList<V> collect(Function<? super T, ? extends V> function)
-        {
+        public <V> MutableList<V> collect(Function<? super T, ? extends V> function) {
             return this.getDelegate().collect(function);
         }
 
         @Override
-        public MutableBooleanList collectBoolean(BooleanFunction<? super T> booleanFunction)
-        {
+        public MutableBooleanList collectBoolean(BooleanFunction<? super T> booleanFunction) {
             return this.getDelegate().collectBoolean(booleanFunction);
         }
 
         @Override
-        public <R extends MutableBooleanCollection> R collectBoolean(BooleanFunction<? super T> booleanFunction, R target)
-        {
+        public <R extends MutableBooleanCollection> R collectBoolean(BooleanFunction<? super T> booleanFunction, R target) {
             return this.getDelegate().collectBoolean(booleanFunction, target);
         }
 
         @Override
-        public MutableByteList collectByte(ByteFunction<? super T> byteFunction)
-        {
+        public MutableByteList collectByte(ByteFunction<? super T> byteFunction) {
             return this.getDelegate().collectByte(byteFunction);
         }
 
         @Override
-        public <R extends MutableByteCollection> R collectByte(ByteFunction<? super T> byteFunction, R target)
-        {
+        public <R extends MutableByteCollection> R collectByte(ByteFunction<? super T> byteFunction, R target) {
             return this.getDelegate().collectByte(byteFunction, target);
         }
 
         @Override
-        public MutableCharList collectChar(CharFunction<? super T> charFunction)
-        {
+        public MutableCharList collectChar(CharFunction<? super T> charFunction) {
             return this.getDelegate().collectChar(charFunction);
         }
 
         @Override
-        public <R extends MutableCharCollection> R collectChar(CharFunction<? super T> charFunction, R target)
-        {
+        public <R extends MutableCharCollection> R collectChar(CharFunction<? super T> charFunction, R target) {
             return this.getDelegate().collectChar(charFunction, target);
         }
 
         @Override
-        public MutableDoubleList collectDouble(DoubleFunction<? super T> doubleFunction)
-        {
+        public MutableDoubleList collectDouble(DoubleFunction<? super T> doubleFunction) {
             return this.getDelegate().collectDouble(doubleFunction);
         }
 
         @Override
-        public <R extends MutableDoubleCollection> R collectDouble(DoubleFunction<? super T> doubleFunction, R target)
-        {
+        public <R extends MutableDoubleCollection> R collectDouble(DoubleFunction<? super T> doubleFunction, R target) {
             return this.getDelegate().collectDouble(doubleFunction, target);
         }
 
         @Override
-        public MutableFloatList collectFloat(FloatFunction<? super T> floatFunction)
-        {
+        public MutableFloatList collectFloat(FloatFunction<? super T> floatFunction) {
             return this.getDelegate().collectFloat(floatFunction);
         }
 
         @Override
-        public <R extends MutableFloatCollection> R collectFloat(FloatFunction<? super T> floatFunction, R target)
-        {
+        public <R extends MutableFloatCollection> R collectFloat(FloatFunction<? super T> floatFunction, R target) {
             return this.getDelegate().collectFloat(floatFunction, target);
         }
 
         @Override
-        public MutableIntList collectInt(IntFunction<? super T> intFunction)
-        {
+        public MutableIntList collectInt(IntFunction<? super T> intFunction) {
             return this.getDelegate().collectInt(intFunction);
         }
 
         @Override
-        public <R extends MutableIntCollection> R collectInt(IntFunction<? super T> intFunction, R target)
-        {
+        public <R extends MutableIntCollection> R collectInt(IntFunction<? super T> intFunction, R target) {
             return this.getDelegate().collectInt(intFunction, target);
         }
 
         @Override
-        public MutableLongList collectLong(LongFunction<? super T> longFunction)
-        {
+        public MutableLongList collectLong(LongFunction<? super T> longFunction) {
             return this.getDelegate().collectLong(longFunction);
         }
 
         @Override
-        public <R extends MutableLongCollection> R collectLong(LongFunction<? super T> longFunction, R target)
-        {
+        public <R extends MutableLongCollection> R collectLong(LongFunction<? super T> longFunction, R target) {
             return this.getDelegate().collectLong(longFunction, target);
         }
 
         @Override
-        public MutableShortList collectShort(ShortFunction<? super T> shortFunction)
-        {
+        public MutableShortList collectShort(ShortFunction<? super T> shortFunction) {
             return this.getDelegate().collectShort(shortFunction);
         }
 
         @Override
-        public <R extends MutableShortCollection> R collectShort(ShortFunction<? super T> shortFunction, R target)
-        {
+        public <R extends MutableShortCollection> R collectShort(ShortFunction<? super T> shortFunction, R target) {
             return this.getDelegate().collectShort(shortFunction, target);
         }
 
         @Override
-        public <V> MutableList<V> flatCollect(Function<? super T, ? extends Iterable<V>> function)
-        {
+        public <V> MutableList<V> flatCollect(Function<? super T, ? extends Iterable<V>> function) {
             return this.getDelegate().flatCollect(function);
         }
 
         @Override
         public <V> MutableList<V> collectIf(
                 Predicate<? super T> predicate,
-                Function<? super T, ? extends V> function)
-        {
+                Function<? super T, ? extends V> function) {
             return this.getDelegate().collectIf(predicate, function);
         }
 
         @Override
         public <P, V> MutableList<V> collectWith(
                 Function2<? super T, ? super P, ? extends V> function,
-                P parameter)
-        {
+                P parameter) {
             return this.getDelegate().collectWith(function, parameter);
         }
 
         @Override
-        public int detectIndex(Predicate<? super T> predicate)
-        {
+        public int detectIndex(Predicate<? super T> predicate) {
             return this.getDelegate().detectIndex(predicate);
         }
 
         @Override
-        public int detectLastIndex(Predicate<? super T> predicate)
-        {
+        public int detectLastIndex(Predicate<? super T> predicate) {
             return this.getDelegate().detectLastIndex(predicate);
         }
 
         @Override
-        public <V> MutableListMultimap<V, T> groupBy(Function<? super T, ? extends V> function)
-        {
+        public <V> MutableListMultimap<V, T> groupBy(Function<? super T, ? extends V> function) {
             return this.getDelegate().groupBy(function);
         }
 
         @Override
-        public <V> MutableListMultimap<V, T> groupByEach(Function<? super T, ? extends Iterable<V>> function)
-        {
+        public <V> MutableListMultimap<V, T> groupByEach(Function<? super T, ? extends Iterable<V>> function) {
             return this.getDelegate().groupByEach(function);
         }
 
         @Override
-        public <V> MutableMap<V, T> groupByUniqueKey(Function<? super T, ? extends V> function)
-        {
+        public <V> MutableMap<V, T> groupByUniqueKey(Function<? super T, ? extends V> function) {
             return this.getDelegate().groupByUniqueKey(function);
         }
 
         @Override
-        public <S> boolean corresponds(OrderedIterable<S> other, Predicate2<? super T, ? super S> predicate)
-        {
+        public <S> boolean corresponds(OrderedIterable<S> other, Predicate2<? super T, ? super S> predicate) {
             return this.getDelegate().corresponds(other, predicate);
         }
 
         @Override
-        public void forEach(int fromIndex, int toIndex, Procedure<? super T> procedure)
-        {
+        public void forEach(int fromIndex, int toIndex, Procedure<? super T> procedure) {
             this.getDelegate().forEach(fromIndex, toIndex, procedure);
         }
 
         @Override
-        public void reverseForEach(Procedure<? super T> procedure)
-        {
+        public void reverseForEach(Procedure<? super T> procedure) {
             this.getDelegate().reverseForEach(procedure);
         }
 
         @Override
-        public void forEachWithIndex(int fromIndex, int toIndex, ObjectIntProcedure<? super T> objectIntProcedure)
-        {
+        public void forEachWithIndex(int fromIndex, int toIndex, ObjectIntProcedure<? super T> objectIntProcedure) {
             this.getDelegate().forEachWithIndex(fromIndex, toIndex, objectIntProcedure);
         }
 
         @Override
-        public MutableList<T> newEmpty()
-        {
+        public MutableList<T> newEmpty() {
             return this.getDelegate().newEmpty();
         }
 
         @Override
-        public MutableList<T> reject(Predicate<? super T> predicate)
-        {
+        public MutableList<T> reject(Predicate<? super T> predicate) {
             return this.getDelegate().reject(predicate);
         }
 
         @Override
-        public MutableList<T> distinct()
-        {
+        public MutableList<T> distinct() {
             return this.getDelegate().distinct();
         }
 
         @Override
-        public MutableList<T> distinct(HashingStrategy<? super T> hashingStrategy)
-        {
+        public MutableList<T> distinct(HashingStrategy<? super T> hashingStrategy) {
             return this.getDelegate().distinct(hashingStrategy);
         }
 
         @Override
         public <P> MutableList<T> rejectWith(
                 Predicate2<? super T, ? super P> predicate,
-                P parameter)
-        {
+                P parameter) {
             return this.getDelegate().rejectWith(predicate, parameter);
         }
 
         @Override
-        public MutableList<T> tap(Procedure<? super T> procedure)
-        {
+        public MutableList<T> tap(Procedure<? super T> procedure) {
             this.forEach(procedure);
             return this;
         }
 
         @Override
-        public MutableList<T> select(Predicate<? super T> predicate)
-        {
+        public MutableList<T> select(Predicate<? super T> predicate) {
             return this.getDelegate().select(predicate);
         }
 
         @Override
         public <P> MutableList<T> selectWith(
                 Predicate2<? super T, ? super P> predicate,
-                P parameter)
-        {
+                P parameter) {
             return this.getDelegate().selectWith(predicate, parameter);
         }
 
         @Override
-        public PartitionMutableList<T> partition(Predicate<? super T> predicate)
-        {
+        public PartitionMutableList<T> partition(Predicate<? super T> predicate) {
             return this.getDelegate().partition(predicate);
         }
 
         @Override
-        public <P> PartitionMutableList<T> partitionWith(Predicate2<? super T, ? super P> predicate, P parameter)
-        {
+        public <P> PartitionMutableList<T> partitionWith(Predicate2<? super T, ? super P> predicate, P parameter) {
             return this.getDelegate().partitionWith(predicate, parameter);
         }
 
         @Override
-        public <S> MutableList<S> selectInstancesOf(Class<S> clazz)
-        {
+        public <S> MutableList<S> selectInstancesOf(Class<S> clazz) {
             return this.getDelegate().selectInstancesOf(clazz);
         }
 
         @Override
-        public MutableList<T> sortThis()
-        {
+        public MutableList<T> sortThis() {
             this.getDelegate().sortThis();
             return this;
         }
 
         @Override
-        public MutableList<T> sortThis(Comparator<? super T> comparator)
-        {
+        public MutableList<T> sortThis(Comparator<? super T> comparator) {
             this.getDelegate().sortThis(comparator);
             return this;
         }
 
         @Override
-        public MutableList<T> toReversed()
-        {
+        public MutableList<T> toReversed() {
             return this.getDelegate().toReversed();
         }
 
         @Override
-        public MutableList<T> reverseThis()
-        {
+        public MutableList<T> reverseThis() {
             this.getDelegate().reverseThis();
             return this;
         }
 
         @Override
-        public MutableList<T> shuffleThis()
-        {
+        public MutableList<T> shuffleThis() {
             this.getDelegate().shuffleThis();
             return this;
         }
 
         @Override
-        public MutableList<T> shuffleThis(Random rnd)
-        {
+        public MutableList<T> shuffleThis(Random rnd) {
             this.getDelegate().shuffleThis(rnd);
             return this;
         }
 
         @Override
-        public MutableStack<T> toStack()
-        {
+        public MutableStack<T> toStack() {
             return ArrayStack.newStack(this.delegate);
         }
 
         @Override
-        public <V extends Comparable<? super V>> MutableList<T> sortThisBy(Function<? super T, ? extends V> function)
-        {
+        public <V extends Comparable<? super V>> MutableList<T> sortThisBy(Function<? super T, ? extends V> function) {
             this.getDelegate().sortThisBy(function);
             return this;
         }
 
         @Override
-        public MutableList<T> sortThisByInt(IntFunction<? super T> function)
-        {
+        public MutableList<T> sortThisByInt(IntFunction<? super T> function) {
             this.getDelegate().sortThisByInt(function);
             return this;
         }
 
         @Override
-        public MutableList<T> sortThisByBoolean(BooleanFunction<? super T> function)
-        {
+        public MutableList<T> sortThisByBoolean(BooleanFunction<? super T> function) {
             this.getDelegate().sortThisByBoolean(function);
             return this;
         }
 
         @Override
-        public MutableList<T> sortThisByChar(CharFunction<? super T> function)
-        {
+        public MutableList<T> sortThisByChar(CharFunction<? super T> function) {
             this.getDelegate().sortThisByChar(function);
             return this;
         }
 
         @Override
-        public MutableList<T> sortThisByByte(ByteFunction<? super T> function)
-        {
+        public MutableList<T> sortThisByByte(ByteFunction<? super T> function) {
             this.getDelegate().sortThisByByte(function);
             return this;
         }
 
         @Override
-        public MutableList<T> sortThisByShort(ShortFunction<? super T> function)
-        {
+        public MutableList<T> sortThisByShort(ShortFunction<? super T> function) {
             this.getDelegate().sortThisByShort(function);
             return this;
         }
 
         @Override
-        public MutableList<T> sortThisByFloat(FloatFunction<? super T> function)
-        {
+        public MutableList<T> sortThisByFloat(FloatFunction<? super T> function) {
             this.getDelegate().sortThisByFloat(function);
             return this;
         }
 
         @Override
-        public MutableList<T> sortThisByLong(LongFunction<? super T> function)
-        {
+        public MutableList<T> sortThisByLong(LongFunction<? super T> function) {
             this.getDelegate().sortThisByLong(function);
             return this;
         }
 
         @Override
-        public MutableList<T> sortThisByDouble(DoubleFunction<? super T> function)
-        {
+        public MutableList<T> sortThisByDouble(DoubleFunction<? super T> function) {
             this.getDelegate().sortThisByDouble(function);
             return this;
         }
 
         @Override
-        public MutableList<T> take(int count)
-        {
+        public MutableList<T> take(int count) {
             return this.getDelegate().take(count);
         }
 
         @Override
-        public MutableList<T> takeWhile(Predicate<? super T> predicate)
-        {
+        public MutableList<T> takeWhile(Predicate<? super T> predicate) {
             return this.getDelegate().takeWhile(predicate);
         }
 
         @Override
-        public MutableList<T> drop(int count)
-        {
+        public MutableList<T> drop(int count) {
             return this.getDelegate().drop(count);
         }
 
         @Override
-        public MutableList<T> dropWhile(Predicate<? super T> predicate)
-        {
+        public MutableList<T> dropWhile(Predicate<? super T> predicate) {
             return this.getDelegate().dropWhile(predicate);
         }
 
         @Override
-        public PartitionMutableList<T> partitionWhile(Predicate<? super T> predicate)
-        {
+        public PartitionMutableList<T> partitionWhile(Predicate<? super T> predicate) {
             return this.getDelegate().partitionWhile(predicate);
         }
 
         @Override
-        public MutableList<T> subList(int fromIndex, int toIndex)
-        {
+        public MutableList<T> subList(int fromIndex, int toIndex) {
             UntouchableMutableList<T> subList = new UntouchableMutableList<>(
                     this.getDelegate().subList(fromIndex, toIndex));
             this.requestedSubLists.add(subList);
@@ -1564,462 +1289,355 @@ public class MultiRWFasterList<T>  extends AbstractMultiReaderMutableCollection<
         }
 
         @Override
-        public Iterator<T> iterator()
-        {
+        public Iterator<T> iterator() {
             UntouchableListIterator<T> iterator = new UntouchableListIterator<>(this.delegate.iterator());
             this.requestedIterators.add(iterator);
             return iterator;
         }
 
         @Override
-        public void add(int index, T element)
-        {
+        public void add(int index, T element) {
             this.getDelegate().add(index, element);
         }
 
         @Override
-        public boolean addAll(int index, Collection<? extends T> collection)
-        {
+        public boolean addAll(int index, Collection<? extends T> collection) {
             return this.getDelegate().addAll(index, collection);
         }
 
         @Override
-        public T get(int index)
-        {
+        public T get(int index) {
             return this.getDelegate().get(index);
         }
 
         @Override
-        public int indexOf(Object o)
-        {
+        public int indexOf(Object o) {
             return this.getDelegate().indexOf(o);
         }
 
         @Override
-        public int lastIndexOf(Object o)
-        {
+        public int lastIndexOf(Object o) {
             return this.getDelegate().lastIndexOf(o);
         }
 
         @Override
-        public ListIterator<T> listIterator()
-        {
+        public ListIterator<T> listIterator() {
             UntouchableListIterator<T> iterator = new UntouchableListIterator<>(this.getDelegate().listIterator());
             this.requestedIterators.add(iterator);
             return iterator;
         }
 
         @Override
-        public ListIterator<T> listIterator(int index)
-        {
+        public ListIterator<T> listIterator(int index) {
             UntouchableListIterator<T> iterator = new UntouchableListIterator<>(this.getDelegate().listIterator(index));
             this.requestedIterators.add(iterator);
             return iterator;
         }
 
         @Override
-        public T remove(int index)
-        {
+        public T remove(int index) {
             return this.getDelegate().remove(index);
         }
 
         @Override
-        public T set(int index, T element)
-        {
+        public T set(int index, T element) {
             return this.getDelegate().set(index, element);
         }
 
         @Override
-        public <S> MutableList<Pair<T, S>> zip(Iterable<S> that)
-        {
+        public <S> MutableList<Pair<T, S>> zip(Iterable<S> that) {
             return this.getDelegate().zip(that);
         }
 
         @Override
-        public MutableList<Pair<T, Integer>> zipWithIndex()
-        {
+        public MutableList<Pair<T, Integer>> zipWithIndex() {
             return this.getDelegate().zipWithIndex();
         }
 
         @Override
-        public LazyIterable<T> asReversed()
-        {
+        public LazyIterable<T> asReversed() {
             return ReverseIterable.adapt(this);
         }
 
         @Override
-        public ParallelListIterable<T> asParallel(ExecutorService executorService, int batchSize)
-        {
+        public ParallelListIterable<T> asParallel(ExecutorService executorService, int batchSize) {
             return new ListIterableParallelIterable<>(this, executorService, batchSize);
         }
 
         @Override
-        public int binarySearch(T key, Comparator<? super T> comparator)
-        {
+        public int binarySearch(T key, Comparator<? super T> comparator) {
             return Collections.binarySearch(this, key, comparator);
         }
 
         @Override
-        public int binarySearch(T key)
-        {
+        public int binarySearch(T key) {
             return Collections.binarySearch((List<? extends Comparable<? super T>>) this, key);
         }
 
-        public void becomeUseless()
-        {
+        public void becomeUseless() {
             this.delegate = null;
             this.requestedSubLists.each(UntouchableMutableList::becomeUseless);
             this.requestedIterators.each(UntouchableListIterator::becomeUseless);
         }
 
-        private MutableList<T> getDelegate()
-        {
+        private MutableList<T> getDelegate() {
             return (MutableList<T>) this.delegate;
         }
     }
 
     private static final class UntouchableListIterator<T>
-            implements ListIterator<T>
-    {
+            implements ListIterator<T> {
         private Iterator<T> delegate;
 
-        private UntouchableListIterator(Iterator<T> newDelegate)
-        {
+        private UntouchableListIterator(Iterator<T> newDelegate) {
             this.delegate = newDelegate;
         }
 
         @Override
-        public void add(T o)
-        {
+        public void add(T o) {
             ((ListIterator<T>) this.delegate).add(o);
         }
 
         @Override
-        public boolean hasNext()
-        {
+        public boolean hasNext() {
             return this.delegate.hasNext();
         }
 
         @Override
-        public boolean hasPrevious()
-        {
+        public boolean hasPrevious() {
             return ((ListIterator<T>) this.delegate).hasPrevious();
         }
 
         @Override
-        public T next()
-        {
+        public T next() {
             return this.delegate.next();
         }
 
         @Override
-        public int nextIndex()
-        {
+        public int nextIndex() {
             return ((ListIterator<T>) this.delegate).nextIndex();
         }
 
         @Override
-        public T previous()
-        {
+        public T previous() {
             return ((ListIterator<T>) this.delegate).previous();
         }
 
         @Override
-        public int previousIndex()
-        {
+        public int previousIndex() {
             return ((ListIterator<T>) this.delegate).previousIndex();
         }
 
         @Override
-        public void remove()
-        {
+        public void remove() {
             this.delegate.remove();
         }
 
         @Override
-        public void set(T o)
-        {
+        public void set(T o) {
             ((ListIterator<T>) this.delegate).set(o);
         }
 
-        public void becomeUseless()
-        {
+        public void becomeUseless() {
             this.delegate = null;
         }
     }
 
     @Override
-    public int detectIndex(Predicate<? super T> predicate)
-    {
+    public int detectIndex(Predicate<? super T> predicate) {
         this.acquireReadLock();
-        try
-        {
+        try {
             return this.getDelegate().detectIndex(predicate);
-        }
-        finally
-        {
+        } finally {
             this.unlockReadLock();
         }
     }
 
     @Override
-    public int detectLastIndex(Predicate<? super T> predicate)
-    {
+    public int detectLastIndex(Predicate<? super T> predicate) {
         this.acquireReadLock();
-        try
-        {
+        try {
             return this.getDelegate().detectLastIndex(predicate);
-        }
-        finally
-        {
+        } finally {
             this.unlockReadLock();
         }
     }
 
     @Override
-    public <V> MutableListMultimap<V, T> groupBy(Function<? super T, ? extends V> function)
-    {
+    public <V> MutableListMultimap<V, T> groupBy(Function<? super T, ? extends V> function) {
         this.acquireReadLock();
-        try
-        {
+        try {
             return this.delegate.groupBy(function);
-        }
-        finally
-        {
+        } finally {
             this.unlockReadLock();
         }
     }
 
     @Override
-    public <V> MutableListMultimap<V, T> groupByEach(Function<? super T, ? extends Iterable<V>> function)
-    {
+    public <V> MutableListMultimap<V, T> groupByEach(Function<? super T, ? extends Iterable<V>> function) {
         this.acquireReadLock();
-        try
-        {
+        try {
             return this.delegate.groupByEach(function);
-        }
-        finally
-        {
+        } finally {
             this.unlockReadLock();
         }
     }
 
     @Override
-    public <V> MutableMap<V, T> groupByUniqueKey(Function<? super T, ? extends V> function)
-    {
+    public <V> MutableMap<V, T> groupByUniqueKey(Function<? super T, ? extends V> function) {
         this.acquireReadLock();
-        try
-        {
+        try {
             return this.delegate.groupByUniqueKey(function);
-        }
-        finally
-        {
+        } finally {
             this.unlockReadLock();
         }
     }
 
     @Override
-    public <S> MutableList<Pair<T, S>> zip(Iterable<S> that)
-    {
+    public <S> MutableList<Pair<T, S>> zip(Iterable<S> that) {
         this.acquireReadLock();
-        try
-        {
+        try {
             return this.delegate.zip(that);
-        }
-        finally
-        {
+        } finally {
             this.unlockReadLock();
         }
     }
 
     @Override
-    public MutableList<Pair<T, Integer>> zipWithIndex()
-    {
+    public MutableList<Pair<T, Integer>> zipWithIndex() {
         this.acquireReadLock();
-        try
-        {
+        try {
             return this.delegate.zipWithIndex();
-        }
-        finally
-        {
+        } finally {
             this.unlockReadLock();
         }
     }
 
     @Override
-    public MutableList<T> toReversed()
-    {
+    public MutableList<T> toReversed() {
         this.acquireReadLock();
-        try
-        {
+        try {
             return this.delegate.toReversed();
-        }
-        finally
-        {
+        } finally {
             this.unlockReadLock();
         }
     }
 
     @Override
-    public MutableList<T> reverseThis()
-    {
+    public MutableList<T> reverseThis() {
         this.acquireWriteLock();
-        try
-        {
+        try {
             this.delegate.reverseThis();
             return this;
-        }
-        finally
-        {
+        } finally {
             this.unlockWriteLock();
         }
     }
 
     @Override
-    public MutableList<T> shuffleThis()
-    {
+    public MutableList<T> shuffleThis() {
         this.acquireWriteLock();
-        try
-        {
+        try {
             this.delegate.shuffleThis();
             return this;
-        }
-        finally
-        {
+        } finally {
             this.unlockWriteLock();
         }
     }
 
     @Override
-    public MutableList<T> shuffleThis(Random rnd)
-    {
+    public MutableList<T> shuffleThis(Random rnd) {
         this.acquireWriteLock();
-        try
-        {
+        try {
             this.delegate.shuffleThis(rnd);
             return this;
-        }
-        finally
-        {
+        } finally {
             this.unlockWriteLock();
         }
     }
 
     @Override
-    public MutableStack<T> toStack()
-    {
+    public MutableStack<T> toStack() {
         this.acquireReadLock();
-        try
-        {
+        try {
             return this.delegate.toStack();
-        }
-        finally
-        {
+        } finally {
             this.unlockReadLock();
         }
     }
 
     @Override
-    public RichIterable<RichIterable<T>> chunk(int size)
-    {
+    public RichIterable<RichIterable<T>> chunk(int size) {
         this.acquireReadLock();
-        try
-        {
+        try {
             return this.delegate.chunk(size);
-        }
-        finally
-        {
+        } finally {
             this.unlockReadLock();
         }
     }
 
     @Override
-    public MutableList<T> take(int count)
-    {
+    public MutableList<T> take(int count) {
         this.acquireReadLock();
-        try
-        {
+        try {
             return this.delegate.take(count);
-        }
-        finally
-        {
+        } finally {
             this.unlockReadLock();
         }
     }
 
     @Override
-    public MutableList<T> takeWhile(Predicate<? super T> predicate)
-    {
+    public MutableList<T> takeWhile(Predicate<? super T> predicate) {
         this.acquireReadLock();
-        try
-        {
+        try {
             return this.delegate.takeWhile(predicate);
-        }
-        finally
-        {
+        } finally {
             this.unlockReadLock();
         }
     }
 
     @Override
-    public MutableList<T> drop(int count)
-    {
+    public MutableList<T> drop(int count) {
         this.acquireReadLock();
-        try
-        {
+        try {
             return this.delegate.drop(count);
-        }
-        finally
-        {
+        } finally {
             this.unlockReadLock();
         }
     }
 
     @Override
-    public MutableList<T> dropWhile(Predicate<? super T> predicate)
-    {
+    public MutableList<T> dropWhile(Predicate<? super T> predicate) {
         this.acquireReadLock();
-        try
-        {
+        try {
             return this.delegate.dropWhile(predicate);
-        }
-        finally
-        {
+        } finally {
             this.unlockReadLock();
         }
     }
 
     @Override
-    public PartitionMutableList<T> partitionWhile(Predicate<? super T> predicate)
-    {
+    public PartitionMutableList<T> partitionWhile(Predicate<? super T> predicate) {
         this.acquireReadLock();
-        try
-        {
+        try {
             return this.delegate.partitionWhile(predicate);
-        }
-        finally
-        {
+        } finally {
             this.unlockReadLock();
         }
     }
 
     @Override
-    public LazyIterable<T> asReversed()
-    {
+    public LazyIterable<T> asReversed() {
         this.acquireReadLock();
-        try
-        {
+        try {
             return ReverseIterable.adapt(this);
-        }
-        finally
-        {
+        } finally {
             this.unlockReadLock();
         }
     }
 
     @Override
-    public ParallelListIterable<T> asParallel(ExecutorService executorService, int batchSize)
-    {
+    public ParallelListIterable<T> asParallel(ExecutorService executorService, int batchSize) {
         return new MultiReaderParallelListIterable<>(this.delegate.asParallel(executorService, batchSize), this.lock);
     }
 }
