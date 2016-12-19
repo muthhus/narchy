@@ -19,7 +19,7 @@ import static org.junit.Assert.assertEquals;
 @RunWith(Parameterized.class)
 public class NAL8Test extends AbstractNALTest {
 
-    final int cycles = 550;
+    final int cycles = 150;
 
     public NAL8Test(Supplier<NAR> b) { super(b); }
 
@@ -735,19 +735,22 @@ public class NAL8Test extends AbstractNALTest {
 
         TestNAR t = test();
         t
-                
                 .goal("(x)")
                 .believe("((x)==>(y))")
                 .mustDesire(cycles, "(y)", 1f, 0.45f);
     }
 
-    @Test public void testDeiredImplDelayed() {
-
-
+    @Test public void testDeiredConjDelayed() {
         test()
-                
                 .believe("(x)", Tense.Present, 1f, 0.9f)
-                .goal("((x)&&+3(y))")
+                .goal("((x) &&+3 (y))")
+                .mustDesire(cycles, "(y)", 1f, 0.81f, 3)
+                .mustNotOutput(cycles*3, "(y)", '!', ETERNAL);
+    }
+    @Test public void testDeiredConjDelayedNeg() {
+        test()
+                .believe("(x)", Tense.Present, 0f, 0.9f)
+                .goal("(--(x) &&+3 (y))")
                 .mustDesire(cycles, "(y)", 1f, 0.81f, 3)
                 .mustNotOutput(cycles*3, "(y)", '!', ETERNAL);
     }
@@ -763,7 +766,6 @@ public class NAL8Test extends AbstractNALTest {
 
     @Test public void testGoalConjunctionDecompose() {
         test()
-                .log()
                 .goal("((x) &&+3 (y))", Tense.Present, 1f, 0.9f)
                 .mustDesire(cycles, "(x)", 1f, 0.81f, 0)
                 //.mustNotOutput(cycles, "(y)", '!', 3)

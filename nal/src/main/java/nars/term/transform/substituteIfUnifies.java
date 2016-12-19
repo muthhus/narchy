@@ -95,7 +95,7 @@ abstract public class substituteIfUnifies extends TermTransformOperator  {
 //            throw new UnsupportedOperationException();
 //        }
 
-        Term term = (Compound) a[0];
+        Term term = a[0];
         Term x = a[1];
         Term y = a[2];
 
