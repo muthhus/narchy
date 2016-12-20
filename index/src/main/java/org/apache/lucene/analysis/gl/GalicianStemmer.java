@@ -17,9 +17,9 @@
 package org.apache.lucene.analysis.gl;
 
 
-import java.util.Map;
-
 import org.apache.lucene.analysis.pt.RSLPStemmerBase;
+
+import java.util.Map;
 
 /**
  * Galician stemmer implementing "Regras do lematizador para o galego".

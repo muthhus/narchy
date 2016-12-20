@@ -1,7 +1,6 @@
 package nars.time;
 
 import jcog.Util;
-import jcog.math.Interval;
 import nars.$;
 import nars.Op;
 import nars.Param;

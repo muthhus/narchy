@@ -16,20 +16,16 @@
  */
 package org.apache.lucene.analysis.pattern;
 
+import org.apache.lucene.analysis.*;
+import org.apache.lucene.analysis.charfilter.MappingCharFilter;
+import org.apache.lucene.analysis.charfilter.NormalizeCharMap;
+import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
+
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
-
-import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.BaseTokenStreamTestCase;
-import org.apache.lucene.analysis.CharFilter;
-import org.apache.lucene.analysis.TokenStream;
-import org.apache.lucene.analysis.Tokenizer;
-import org.apache.lucene.analysis.charfilter.MappingCharFilter;
-import org.apache.lucene.analysis.charfilter.NormalizeCharMap;
-import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 
 public class TestPatternTokenizer extends BaseTokenStreamTestCase 
 {

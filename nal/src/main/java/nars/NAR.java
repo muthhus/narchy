@@ -334,7 +334,7 @@ public abstract class NAR extends Param implements Level, Consumer<Task>, NARIn,
     @NotNull
     public List<Task> tasks(@NotNull String parse) {
         return tasks(parse, (o) -> {
-            logger.error("unparsed: {}", o);
+            logger.error("unparsed: \"{}\": {}", parse, o);
         });
     }
 
@@ -349,7 +349,7 @@ public abstract class NAR extends Param implements Level, Consumer<Task>, NARIn,
     @NotNull
     public List<Task> input(@NotNull String text) throws NarseseException {
         List<Task> lt = tasks(text);
-        input(lt);
+        lt.forEach(this::input);
         return lt;
     }
 
@@ -1127,7 +1127,7 @@ public abstract class NAR extends Param implements Level, Consumer<Task>, NARIn,
     @NotNull
     public NAR forEachConceptTask(@NotNull Consumer<Task> each, boolean includeConceptBeliefs, boolean includeConceptQuestions, boolean includeConceptGoals, boolean includeConceptQuests) {
         forEachConcept(c -> {
-            c.forEachTask(each, includeConceptBeliefs, includeConceptQuestions, includeConceptGoals, includeConceptQuests);
+            c.forEachTask(includeConceptBeliefs, includeConceptQuestions, includeConceptGoals, includeConceptQuests, each);
         });
         return this;
     }

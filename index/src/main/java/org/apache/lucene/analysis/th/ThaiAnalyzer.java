@@ -16,17 +16,11 @@
  */
 package org.apache.lucene.analysis.th;
 
+import org.apache.lucene.analysis.*;
+import org.apache.lucene.analysis.core.DecimalDigitFilter;
+
 import java.io.IOException;
 import java.io.Reader;
-
-import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.CharArraySet;
-import org.apache.lucene.analysis.LowerCaseFilter;
-import org.apache.lucene.analysis.StopFilter;
-import org.apache.lucene.analysis.StopwordAnalyzerBase;
-import org.apache.lucene.analysis.TokenStream;
-import org.apache.lucene.analysis.Tokenizer;
-import org.apache.lucene.analysis.core.DecimalDigitFilter;
 
 /**
  * {@link Analyzer} for Thai language. It uses {@link java.text.BreakIterator} to break words.

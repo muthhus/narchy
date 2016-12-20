@@ -23,12 +23,12 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
+import org.slf4j.LoggerFactory;
 import spacegraph.net.vnc.app.persist.SessionContext;
 import spacegraph.net.vnc.rfb.codec.PixelFormat;
 import spacegraph.net.vnc.rfb.render.ConnectInfoEvent;
 import spacegraph.net.vnc.rfb.render.rect.ImageRect;
 import spacegraph.net.vnc.ui.service.VncRenderService;
-import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.net.URL;

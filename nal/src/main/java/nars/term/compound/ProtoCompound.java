@@ -60,7 +60,7 @@ public interface ProtoCompound {
 
             RawProtoCompound that = (RawProtoCompound) o;
 
-            return (dt == that.dt) && (op == that.op) && Util.equals(args, that.args);
+            return (dt == that.dt) && (op == that.op) && Arrays.equals(args, that.args);
         }
 
         @NotNull

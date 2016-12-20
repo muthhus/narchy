@@ -1,13 +1,9 @@
 package nars.net;
 
 import com.github.fge.grappa.exceptions.GrappaException;
-import nars.Wiki;
 import jcog.data.random.XorShift128PlusRandom;
 import jcog.event.On;
-import nars.$;
-import nars.NAR;
-import nars.Narsese;
-import nars.Task;
+import nars.*;
 import nars.index.term.TermIndex;
 import nars.index.term.tree.TreeTermIndex;
 import nars.nal.nal8.operator.TermFunction;

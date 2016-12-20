@@ -14,6 +14,7 @@
 package spacegraph.net.vnc.ui.service;
 
 import javafx.beans.property.*;
+import org.slf4j.LoggerFactory;
 import spacegraph.net.vnc.rfb.VncConnection;
 import spacegraph.net.vnc.rfb.codec.ProtocolState;
 import spacegraph.net.vnc.rfb.codec.decoder.BellEvent;
@@ -26,7 +27,6 @@ import spacegraph.net.vnc.rfb.render.ProtocolConfiguration;
 import spacegraph.net.vnc.rfb.render.RenderCallback;
 import spacegraph.net.vnc.rfb.render.RenderProtocol;
 import spacegraph.net.vnc.rfb.render.rect.ImageRect;
-import org.slf4j.LoggerFactory;
 
 import java.util.function.BiConsumer;
 

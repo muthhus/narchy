@@ -13,7 +13,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
-import java.util.function.Predicate;
 
 /**
  * NAR Input methods

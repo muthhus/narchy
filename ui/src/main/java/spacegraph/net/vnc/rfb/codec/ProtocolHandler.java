@@ -19,6 +19,8 @@ import io.netty.channel.ChannelPipeline;
 import io.netty.handler.codec.MessageToMessageDecoder;
 import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import spacegraph.net.vnc.rfb.codec.decoder.FrameDecoderHandler;
 import spacegraph.net.vnc.rfb.codec.decoder.ServerDecoderEvent;
 import spacegraph.net.vnc.rfb.codec.encoder.*;
@@ -29,8 +31,6 @@ import spacegraph.net.vnc.rfb.render.ProtocolConfiguration;
 import spacegraph.net.vnc.rfb.render.RenderCallback;
 import spacegraph.net.vnc.rfb.render.RenderProtocol;
 import spacegraph.net.vnc.rfb.render.rect.ImageRect;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
 import java.util.List;

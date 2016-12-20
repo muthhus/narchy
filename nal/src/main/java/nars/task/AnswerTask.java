@@ -3,8 +3,6 @@ package nars.task;
 import jcog.Util;
 import nars.NAR;
 import nars.Task;
-import nars.budget.Budget;
-import nars.budget.merge.BudgetMerge;
 import nars.nal.Stamp;
 import nars.term.Compound;
 import nars.term.Termed;

@@ -17,13 +17,8 @@
 package org.apache.lucene.analysis.wikipedia;
 
 import org.apache.lucene.analysis.Tokenizer;
-import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
-import org.apache.lucene.analysis.tokenattributes.FlagsAttribute;
-import org.apache.lucene.analysis.tokenattributes.OffsetAttribute;
-import org.apache.lucene.analysis.tokenattributes.PositionIncrementAttribute;
-import org.apache.lucene.analysis.tokenattributes.TypeAttribute;
+import org.apache.lucene.analysis.tokenattributes.*;
 import org.apache.lucene.util.AttributeFactory;
-import org.apache.lucene.util.AttributeSource;
 
 import java.io.IOException;
 import java.util.*;

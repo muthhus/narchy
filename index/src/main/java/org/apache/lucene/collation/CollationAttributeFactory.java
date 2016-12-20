@@ -17,11 +17,11 @@
 package org.apache.lucene.collation;
 
 
-import java.text.Collator;
-
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.collation.tokenattributes.CollatedTermAttributeImpl;
 import org.apache.lucene.util.AttributeFactory;
+
+import java.text.Collator;
 
 /**
  * <p>

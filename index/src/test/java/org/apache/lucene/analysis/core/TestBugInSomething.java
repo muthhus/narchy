@@ -16,23 +16,7 @@
  */
 package org.apache.lucene.analysis.core;
 
-import java.io.IOException;
-import java.io.Reader;
-import java.io.StringReader;
-import java.nio.CharBuffer;
-import java.util.Arrays;
-import java.util.HashSet;
-
-import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.BaseTokenStreamTestCase;
-import org.apache.lucene.analysis.CharArraySet;
-import org.apache.lucene.analysis.CharFilter;
-import org.apache.lucene.analysis.MockCharFilter;
-import org.apache.lucene.analysis.MockTokenFilter;
-import org.apache.lucene.analysis.MockTokenizer;
-import org.apache.lucene.analysis.TokenFilter;
-import org.apache.lucene.analysis.TokenStream;
-import org.apache.lucene.analysis.Tokenizer;
+import org.apache.lucene.analysis.*;
 import org.apache.lucene.analysis.charfilter.MappingCharFilter;
 import org.apache.lucene.analysis.charfilter.NormalizeCharMap;
 import org.apache.lucene.analysis.commongrams.CommonGramsFilter;
@@ -42,6 +26,13 @@ import org.apache.lucene.analysis.ngram.NGramTokenFilter;
 import org.apache.lucene.analysis.shingle.ShingleFilter;
 import org.apache.lucene.analysis.wikipedia.WikipediaTokenizer;
 import org.apache.lucene.util.LuceneTestCase.SuppressCodecs;
+
+import java.io.IOException;
+import java.io.Reader;
+import java.io.StringReader;
+import java.nio.CharBuffer;
+import java.util.Arrays;
+import java.util.HashSet;
 
 
 @SuppressCodecs("Direct")

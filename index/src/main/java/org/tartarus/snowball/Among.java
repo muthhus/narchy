@@ -49,7 +49,7 @@ import java.util.Locale;
  * </ul>
  */
 public final class Among {
-  
+
   public Among(String s, int substring_i, int result,
                String methodname, MethodHandles.Lookup methodobject) {
     this.s_size = s.length();
@@ -76,8 +76,8 @@ public final class Among {
   final char[] s; /* search string */
   final int substring_i; /* index to longest matching substring */
   final int result;      /* result of the lookup */
-  
+
   // Make sure this is not accessible outside package for Java security reasons!
   final MethodHandle method; /* method to use if substring matches */
-  
+
 }

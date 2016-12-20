@@ -94,62 +94,6 @@ public interface ByteSeq {
     }
 
 
-    class RawByteSeq implements ByteSeq /*implements CharSequence*/ {
-        public final byte[] bytes;
-
-//        protected RawByteSeq(int capacity) {
-//            this(new byte[capacity]);
-//        }
-
-        public RawByteSeq(byte[] bytes) {
-            this.bytes = bytes;
-        }
-
-        public RawByteSeq(String s) {
-            this(s.getBytes());
-        }
-
-        @Override
-        public void toArray(byte[] c, int offset) {
-            System.arraycopy(bytes, 0, c, offset, length());
-        }
-
-        @Override
-        public byte[] array() {
-            return bytes;
-        }
-
-        @Override
-        public int length() {
-            return bytes.length;
-        }
-
-        @Override
-        public byte at(int index) {
-            return this.bytes[index];
-        }
-
-        @Override
-        public ByteSeq subSequence(int start, int end) {
-            return subSeq(start, end);
-        }
-
-        public ByteSeq subSeq(int start, int end) {
-            if (end-start == 1)
-                return new OneByteSeq(at(start));
-
-            if (start == 0 && end == length())
-                return this; //no change
-
-            return new WindowByteSeq(bytes, start, end);
-        }
-
-        public String toString() {
-            return new String(bytes);
-        }
-
-    }
-
     final class WindowByteSeq extends RawByteSeq /*implements CharSequence*/ {
         final int start;
         final int end;

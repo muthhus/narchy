@@ -17,7 +17,6 @@
 package org.apache.lucene.search;
 
 
-import jcog.list.ConcurrentArrayList;
 import org.apache.lucene.store.AlreadyClosedException;
 
 import java.io.Closeable;

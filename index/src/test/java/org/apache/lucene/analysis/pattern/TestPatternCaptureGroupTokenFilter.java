@@ -17,14 +17,10 @@
 package org.apache.lucene.analysis.pattern;
 
 
+import org.apache.lucene.analysis.*;
+
 import java.io.StringReader;
 import java.util.regex.Pattern;
-
-import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.BaseTokenStreamTestCase;
-import org.apache.lucene.analysis.MockTokenizer;
-import org.apache.lucene.analysis.TokenStream;
-import org.apache.lucene.analysis.Tokenizer;
 
 public class TestPatternCaptureGroupTokenFilter extends BaseTokenStreamTestCase {
 

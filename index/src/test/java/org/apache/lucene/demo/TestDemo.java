@@ -17,12 +17,12 @@
 package org.apache.lucene.demo;
 
 
+import org.apache.lucene.util.LuceneTestCase;
+
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
-
-import org.apache.lucene.util.LuceneTestCase;
 
 public class TestDemo extends LuceneTestCase {
 

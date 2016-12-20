@@ -17,6 +17,8 @@ import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.ChannelPipeline;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import spacegraph.net.vnc.rfb.codec.decoder.ProtocolVersionDecoder;
 import spacegraph.net.vnc.rfb.codec.handshaker.RfbClientHandshaker;
 import spacegraph.net.vnc.rfb.codec.handshaker.RfbClientHandshakerFactory;
@@ -30,8 +32,6 @@ import spacegraph.net.vnc.rfb.codec.security.RfbSecurityMessage;
 import spacegraph.net.vnc.rfb.codec.security.SecurityType;
 import spacegraph.net.vnc.rfb.exception.ProtocolException;
 import spacegraph.net.vnc.rfb.render.ProtocolConfiguration;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
 

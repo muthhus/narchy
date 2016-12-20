@@ -17,12 +17,12 @@
 package org.apache.lucene.analysis.util;
 
 
-import java.io.Reader;
-import java.io.StringReader;
-
 import org.apache.lucene.analysis.MockTokenizer;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.Tokenizer;
+
+import java.io.Reader;
+import java.io.StringReader;
 
 /**
  * Simple tests to ensure the French elision filter factory is working.

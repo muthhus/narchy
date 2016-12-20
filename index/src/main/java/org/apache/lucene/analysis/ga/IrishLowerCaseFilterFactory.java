@@ -17,13 +17,12 @@
 package org.apache.lucene.analysis.ga;
 
 
-import java.util.Map;
-
 import org.apache.lucene.analysis.TokenStream;
-import org.apache.lucene.analysis.ga.IrishLowerCaseFilter;
 import org.apache.lucene.analysis.util.AbstractAnalysisFactory;
 import org.apache.lucene.analysis.util.MultiTermAwareComponent;
 import org.apache.lucene.analysis.util.TokenFilterFactory;
+
+import java.util.Map;
 
 /** 
  * Factory for {@link IrishLowerCaseFilter}. 

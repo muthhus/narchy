@@ -16,6 +16,10 @@
  */
 package org.apache.lucene.analysis.miscellaneous;
 
+import org.apache.lucene.analysis.*;
+import org.apache.lucene.analysis.core.KeywordTokenizer;
+import org.junit.Test;
+
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
@@ -23,15 +27,8 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.BaseTokenStreamTestCase;
-import org.apache.lucene.analysis.CharArraySet;
-import org.apache.lucene.analysis.MockTokenizer;
-import org.apache.lucene.analysis.Tokenizer;
-import org.apache.lucene.analysis.core.KeywordTokenizer;
-import org.junit.Test;
-
-import static org.apache.lucene.analysis.miscellaneous.CapitalizationFilter.*;
+import static org.apache.lucene.analysis.miscellaneous.CapitalizationFilter.DEFAULT_MAX_TOKEN_LENGTH;
+import static org.apache.lucene.analysis.miscellaneous.CapitalizationFilter.DEFAULT_MAX_WORD_COUNT;
 
 /** Tests {@link CapitalizationFilter} */
 public class TestCapitalizationFilter extends BaseTokenStreamTestCase {  

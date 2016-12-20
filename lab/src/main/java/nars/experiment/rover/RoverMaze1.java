@@ -3,13 +3,13 @@ package nars.experiment.rover;
 import nars.nar.Default;
 import spacegraph.SimpleSpatial;
 import spacegraph.SpaceGraph;
-import spacegraph.space.Maze;
 import spacegraph.phys.Dynamic;
 import spacegraph.phys.Dynamics;
 import spacegraph.phys.constraint.HingeConstraint;
 import spacegraph.phys.shape.BoxShape;
 import spacegraph.phys.shape.CollisionShape;
 import spacegraph.phys.shape.CylinderShape;
+import spacegraph.space.Maze;
 
 import static spacegraph.math.v3.v;
 

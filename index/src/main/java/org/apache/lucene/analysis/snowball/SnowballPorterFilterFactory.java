@@ -17,9 +17,6 @@
 package org.apache.lucene.analysis.snowball;
 
 
-import java.io.IOException;
-import java.util.Map;
-
 import org.apache.lucene.analysis.CharArraySet;
 import org.apache.lucene.analysis.TokenFilter;
 import org.apache.lucene.analysis.TokenStream;
@@ -28,6 +25,9 @@ import org.apache.lucene.analysis.util.ResourceLoader;
 import org.apache.lucene.analysis.util.ResourceLoaderAware;
 import org.apache.lucene.analysis.util.TokenFilterFactory;
 import org.tartarus.snowball.SnowballProgram;
+
+import java.io.IOException;
+import java.util.Map;
 
 /**
  * Factory for {@link SnowballFilter}, with configurable language

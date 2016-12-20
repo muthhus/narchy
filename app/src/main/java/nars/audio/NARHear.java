@@ -13,9 +13,9 @@ import nars.time.RealTime;
 import spacegraph.SpaceGraph;
 import spacegraph.audio.AudioSource;
 import spacegraph.audio.WaveCapture;
+import spacegraph.render.Draw;
 import spacegraph.space.widget.FloatSlider;
 import spacegraph.space.widget.MatrixView;
-import spacegraph.render.Draw;
 
 import java.util.List;
 

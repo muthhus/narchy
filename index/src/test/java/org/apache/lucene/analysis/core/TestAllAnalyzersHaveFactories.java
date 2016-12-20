@@ -17,49 +17,21 @@
 package org.apache.lucene.analysis.core;
 
 
-import java.io.Reader;
-import java.io.StringReader;
-import java.lang.reflect.Modifier;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.IdentityHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import org.apache.lucene.analysis.CachingTokenFilter;
-import org.apache.lucene.analysis.CharFilter;
-import org.apache.lucene.analysis.CrankyTokenFilter;
-import org.apache.lucene.analysis.MockCharFilter;
-import org.apache.lucene.analysis.MockFixedLengthPayloadFilter;
-import org.apache.lucene.analysis.MockGraphTokenFilter;
-import org.apache.lucene.analysis.MockHoleInjectingTokenFilter;
-import org.apache.lucene.analysis.MockLowerCaseFilter;
-import org.apache.lucene.analysis.MockRandomLookaheadTokenFilter;
-import org.apache.lucene.analysis.MockSynonymFilter;
-import org.apache.lucene.analysis.MockTokenFilter;
-import org.apache.lucene.analysis.MockTokenizer;
-import org.apache.lucene.analysis.MockVariableLengthPayloadFilter;
-import org.apache.lucene.analysis.SimplePayloadFilter;
-import org.apache.lucene.analysis.TokenFilter;
-import org.apache.lucene.analysis.TokenStream;
-import org.apache.lucene.analysis.Tokenizer;
-import org.apache.lucene.analysis.ValidatingTokenFilter;
+import org.apache.lucene.analysis.*;
 import org.apache.lucene.analysis.miscellaneous.PatternKeywordMarkerFilter;
 import org.apache.lucene.analysis.miscellaneous.SetKeywordMarkerFilter;
 import org.apache.lucene.analysis.path.ReversePathHierarchyTokenizer;
 import org.apache.lucene.analysis.sinks.TeeSinkTokenFilter;
 import org.apache.lucene.analysis.snowball.SnowballFilter;
 import org.apache.lucene.analysis.sr.SerbianNormalizationRegularFilter;
-import org.apache.lucene.analysis.util.CharFilterFactory;
-import org.apache.lucene.analysis.util.ResourceLoader;
-import org.apache.lucene.analysis.util.ResourceLoaderAware;
-import org.apache.lucene.analysis.util.StringMockResourceLoader;
-import org.apache.lucene.analysis.util.TokenFilterFactory;
-import org.apache.lucene.analysis.util.TokenizerFactory;
+import org.apache.lucene.analysis.util.*;
 import org.apache.lucene.util.LuceneTestCase;
 import org.apache.lucene.util.Version;
+
+import java.io.Reader;
+import java.io.StringReader;
+import java.lang.reflect.Modifier;
+import java.util.*;
 
 /**
  * Tests that any newly added Tokenizers/TokenFilters/CharFilters have a

@@ -17,7 +17,7 @@
 package org.apache.lucene.analysis.util;
 
 
-import java.text.BreakIterator; // javadoc
+import java.text.BreakIterator;
 import java.text.CharacterIterator;
 import java.util.Locale;
 

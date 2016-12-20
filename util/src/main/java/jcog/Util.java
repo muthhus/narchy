@@ -346,7 +346,7 @@ public enum Util { ;
    /* End Of  P. J. Weinberger Hash Function */
 
 
-    public static long ELFHash(String str) {
+    public static long hashELF(String str) {
         long hash = 0;
         long x = 0;
 
@@ -399,16 +399,16 @@ public enum Util { ;
 
 
     public static int ELFHashNonZero(byte[] str, int seed) {
-        int i  = (int) ELFHash(str, seed);
+        int i  = (int) hashELF(str, seed);
         if (i == 0) i = 1;
         return i;
     }
 
-    public static long ELFHash(byte[] str, long seed) {
+    public static long hashELF(byte[] str, long seed) {
 
         long hash = seed;
 
-        int len = str.length;
+        //int len = str.length;
 
         for (byte aStr : str) {
             hash = (hash << 4) + aStr;
@@ -422,7 +422,22 @@ public enum Util { ;
 
         return hash;
     }
+    public static long hashELF(byte[] str, long seed, int start, int end) {
 
+        long hash = seed;
+
+        for (int i = start; i < end; i++) {
+            hash = (hash << 4) + str[i];
+
+            long x;
+            if ((x = hash & 0xF0000000L) != 0) {
+                hash ^= (x >> 24);
+            }
+            hash &= ~x;
+        }
+
+        return hash;
+    }
 
 
     public static long BKDRHash(String str) {
@@ -1064,20 +1079,6 @@ public enum Util { ;
             if (y > max) max = y;
         }
         return new float[] { min, max/*, sum */};
-    }
-
-    /** slightly more streamlined variatoin of Arrays.equals which assumes there are no null values */
-    public static boolean equals(@NotNull Object[] a, @NotNull Object[] b) {
-        if (a == b) return true;
-        int al = a.length;
-        if (al == b.length) {
-            for (int i = 0; i < al; i++) {
-                if (!a[i].equals(b[i]))
-                    return false;
-            }
-            return true;
-        }
-        return false;
     }
 
     public static void time(Logger logger, String procName, Runnable procedure) {

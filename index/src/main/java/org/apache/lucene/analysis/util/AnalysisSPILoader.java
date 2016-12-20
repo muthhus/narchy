@@ -17,17 +17,10 @@
 package org.apache.lucene.analysis.util;
 
 
-import java.lang.reflect.InvocationTargetException;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Objects;
-import java.util.LinkedHashMap;
-import java.util.Set;
-import java.util.ServiceConfigurationError;
-
 import org.apache.lucene.util.SPIClassIterator;
+
+import java.lang.reflect.InvocationTargetException;
+import java.util.*;
 
 /**
  * Helper class for loading named SPIs from classpath (e.g. Tokenizers, TokenStreams).

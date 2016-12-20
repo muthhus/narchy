@@ -16,21 +16,16 @@
  */
 package org.apache.lucene.analysis.pattern;
 
+import org.apache.lucene.analysis.*;
+import org.apache.lucene.util.TestUtil;
+import org.junit.Ignore;
+
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
 import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.BaseTokenStreamTestCase;
-import org.apache.lucene.analysis.CharFilter;
-import org.apache.lucene.analysis.MockTokenizer;
-import org.apache.lucene.analysis.TokenStream;
-import org.apache.lucene.analysis.Tokenizer;
-import org.apache.lucene.util.TestUtil;
-import org.junit.Ignore;
 
 /**
  * Tests {@link PatternReplaceCharFilter}

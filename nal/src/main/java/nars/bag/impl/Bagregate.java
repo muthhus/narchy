@@ -1,8 +1,6 @@
 package nars.bag.impl;
 
-import com.google.common.collect.Lists;
 import jcog.data.FloatParam;
-import nars.bag.Bag;
 import nars.budget.merge.BudgetMerge;
 import nars.link.BLink;
 import org.apache.commons.lang3.mutable.MutableFloat;

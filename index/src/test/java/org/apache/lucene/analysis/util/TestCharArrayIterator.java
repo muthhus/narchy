@@ -17,12 +17,12 @@
 package org.apache.lucene.analysis.util;
 
 
+import org.apache.lucene.util.LuceneTestCase;
+import org.apache.lucene.util.TestUtil;
+
 import java.text.BreakIterator;
 import java.text.CharacterIterator;
 import java.util.Locale;
-
-import org.apache.lucene.util.LuceneTestCase;
-import org.apache.lucene.util.TestUtil;
 
 public class TestCharArrayIterator extends LuceneTestCase {
   

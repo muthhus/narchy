@@ -17,18 +17,14 @@
 package org.apache.lucene.analysis.core;
 
 
+import org.apache.lucene.analysis.*;
+import org.apache.lucene.analysis.LowerCaseFilter;
+import org.apache.lucene.analysis.StopFilter;
+import org.apache.lucene.analysis.standard.StandardAnalyzer;
+
 import java.io.IOException;
 import java.io.Reader;
 import java.nio.file.Path;
-
-import org.apache.lucene.analysis.CharArraySet;
-import org.apache.lucene.analysis.LowerCaseFilter;
-import org.apache.lucene.analysis.StopFilter;
-import org.apache.lucene.analysis.StopwordAnalyzerBase;
-import org.apache.lucene.analysis.TokenStream;
-import org.apache.lucene.analysis.Tokenizer;
-import org.apache.lucene.analysis.WordlistLoader;
-import org.apache.lucene.analysis.standard.StandardAnalyzer;
 
 /** 
  * Filters {@link LetterTokenizer} with {@link LowerCaseFilter} and {@link StopFilter}.

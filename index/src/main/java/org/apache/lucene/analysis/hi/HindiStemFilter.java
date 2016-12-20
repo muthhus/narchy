@@ -17,12 +17,12 @@
 package org.apache.lucene.analysis.hi;
 
 
-import java.io.IOException;
-
 import org.apache.lucene.analysis.TokenFilter;
 import org.apache.lucene.analysis.TokenStream;
-import org.apache.lucene.analysis.tokenattributes.KeywordAttribute;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
+import org.apache.lucene.analysis.tokenattributes.KeywordAttribute;
+
+import java.io.IOException;
 
 /**
  * A {@link TokenFilter} that applies {@link HindiStemmer} to stem Hindi words.

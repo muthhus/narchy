@@ -12,8 +12,6 @@ import nars.table.QuestionTable;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termlike;
-import nars.term.Terms;
-import nars.term.container.TermContainer;
 import nars.term.subst.Unify;
 import nars.term.visit.SubtermVisitor;
 import nars.term.visit.SubtermVisitorX;

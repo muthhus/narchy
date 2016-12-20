@@ -17,13 +17,13 @@
 package org.apache.lucene.analysis.miscellaneous;
 
 
-import java.io.Reader;
-import java.io.StringReader;
-
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.util.BaseTokenStreamFactoryTestCase;
 import org.apache.lucene.analysis.util.StringMockResourceLoader;
 import org.apache.lucene.util.Version;
+
+import java.io.Reader;
+import java.io.StringReader;
 
 /**
  * Simple tests to ensure the stemmer override filter factory is working.

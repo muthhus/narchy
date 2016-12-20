@@ -17,13 +17,13 @@
 package org.apache.lucene.analysis.core;
 
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Map;
-
 import org.apache.lucene.analysis.Tokenizer;
 import org.apache.lucene.analysis.util.TokenizerFactory;
 import org.apache.lucene.util.AttributeFactory;
+
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Map;
 
 /**
  * Factory for {@link WhitespaceTokenizer}. 

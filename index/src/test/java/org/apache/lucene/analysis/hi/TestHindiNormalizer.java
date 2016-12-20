@@ -17,12 +17,13 @@
 package org.apache.lucene.analysis.hi;
 
 
-import java.io.IOException;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.BaseTokenStreamTestCase;
 import org.apache.lucene.analysis.TokenFilter;
 import org.apache.lucene.analysis.Tokenizer;
 import org.apache.lucene.analysis.core.KeywordTokenizer;
+
+import java.io.IOException;
 
 /**
  * Test HindiNormalizer

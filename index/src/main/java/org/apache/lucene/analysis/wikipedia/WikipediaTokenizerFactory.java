@@ -17,11 +17,11 @@
 package org.apache.lucene.analysis.wikipedia;
 
 
-import java.util.Collections;
-import java.util.Map;
-
 import org.apache.lucene.analysis.util.TokenizerFactory;
 import org.apache.lucene.util.AttributeFactory;
+
+import java.util.Collections;
+import java.util.Map;
 
 /** 
  * Factory for {@link WikipediaTokenizer}.

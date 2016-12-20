@@ -53,7 +53,7 @@ public class CompoundConcept<T extends Compound> implements Concept, Termlike {
     private @Nullable Map meta;
 
     @NotNull
-    private transient ConceptState policy;
+    private transient ConceptState state;
 
 
     /**
@@ -70,7 +70,7 @@ public class CompoundConcept<T extends Compound> implements Concept, Termlike {
         this.taskLinks = taskLinks;
 
 
-        this.policy = ConceptState.Deleted;
+        this.state = ConceptState.Deleted;
     }
 
 
@@ -155,12 +155,12 @@ public class CompoundConcept<T extends Compound> implements Concept, Termlike {
 
     @NotNull
     final QuestionTable questionsOrNew() {
-        return questions == null ? (questions = new ArrayQuestionTable(policy.questionCap(true))) : questions;
+        return questions == null ? (questions = new ArrayQuestionTable(state.questionCap(true))) : questions;
     }
 
     @NotNull
     final QuestionTable questsOrNew() {
-        return quests == null ? (quests = new ArrayQuestionTable(policy.questionCap(false))) : quests;
+        return quests == null ? (quests = new ArrayQuestionTable(state.questionCap(false))) : quests;
     }
 
     @NotNull
@@ -176,8 +176,8 @@ public class CompoundConcept<T extends Compound> implements Concept, Termlike {
 
     @NotNull
     protected BeliefTable newBeliefTable(NAR nar, boolean beliefOrGoal) {
-        int eCap = policy.beliefCap(this, beliefOrGoal, true);
-        int tCap = policy.beliefCap(this, beliefOrGoal, false);
+        int eCap = state.beliefCap(this, beliefOrGoal, true);
+        int tCap = state.beliefCap(this, beliefOrGoal, false);
         return newBeliefTable(nar, beliefOrGoal, eCap, tCap);
     }
 
@@ -269,14 +269,14 @@ public class CompoundConcept<T extends Compound> implements Concept, Termlike {
 
     @Override
     public final ConceptState state() {
-        return policy;
+        return state;
     }
 
     @Override
     public final void state(@NotNull ConceptState p, NAR nar) {
-        ConceptState current = this.policy;
+        ConceptState current = this.state;
         if (current != p) {
-            this.policy = p;
+            this.state = p;
             linkCapacity( p.linkCap(this, true), p.linkCap(this, false));
 
             beliefCapacity(p, nar);

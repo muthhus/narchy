@@ -17,13 +17,13 @@
 package org.apache.lucene.analysis.fa;
 
 
-import java.io.IOException;
-
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.BaseTokenStreamTestCase;
 import org.apache.lucene.analysis.MockTokenizer;
 import org.apache.lucene.analysis.Tokenizer;
 import org.apache.lucene.analysis.core.KeywordTokenizer;
+
+import java.io.IOException;
 
 /**
  * Test the Persian Normalization Filter

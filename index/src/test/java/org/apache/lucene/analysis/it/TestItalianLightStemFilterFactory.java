@@ -17,11 +17,11 @@
 package org.apache.lucene.analysis.it;
 
 
-import java.io.Reader;
-import java.io.StringReader;
-
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.util.BaseTokenStreamFactoryTestCase;
+
+import java.io.Reader;
+import java.io.StringReader;
 
 /**
  * Simple tests to ensure the Italian light stem factory is working.

@@ -16,24 +16,15 @@
  */
 package org.apache.lucene.analysis.synonym;
 
-import java.io.IOException;
-import java.util.Arrays;
-
 import org.apache.lucene.analysis.TokenFilter;
 import org.apache.lucene.analysis.TokenStream;
-import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
-import org.apache.lucene.analysis.tokenattributes.OffsetAttribute;
-import org.apache.lucene.analysis.tokenattributes.PositionIncrementAttribute;
-import org.apache.lucene.analysis.tokenattributes.PositionLengthAttribute;
-import org.apache.lucene.analysis.tokenattributes.TypeAttribute;
+import org.apache.lucene.analysis.tokenattributes.*;
 import org.apache.lucene.store.ByteArrayDataInput;
-import org.apache.lucene.util.ArrayUtil;
-import org.apache.lucene.util.AttributeSource;
-import org.apache.lucene.util.BytesRef;
-import org.apache.lucene.util.CharsRef;
-import org.apache.lucene.util.CharsRefBuilder;
-import org.apache.lucene.util.RamUsageEstimator;
+import org.apache.lucene.util.*;
 import org.apache.lucene.util.fst.FST;
+
+import java.io.IOException;
+import java.util.Arrays;
 
 /**
  * Matches single or multi word synonyms in a token stream.

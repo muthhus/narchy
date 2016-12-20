@@ -17,15 +17,15 @@
 package org.apache.lucene.analysis.util;
 
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.apache.lucene.analysis.charfilter.HTMLStripCharFilterFactory;
 import org.apache.lucene.analysis.core.LowerCaseFilterFactory;
 import org.apache.lucene.analysis.core.WhitespaceTokenizerFactory;
 import org.apache.lucene.analysis.miscellaneous.RemoveDuplicatesTokenFilterFactory;
 import org.apache.lucene.util.LuceneTestCase;
 import org.apache.lucene.util.Version;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class TestAnalysisSPILoader extends LuceneTestCase {
   

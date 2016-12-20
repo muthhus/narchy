@@ -15,10 +15,10 @@ package spacegraph.net.vnc.rfb.codec.handshaker;
 
 import io.netty.buffer.Unpooled;
 import io.netty.channel.*;
-import spacegraph.net.vnc.rfb.codec.ProtocolHandshakeHandler;
-import spacegraph.net.vnc.rfb.codec.ProtocolVersion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import spacegraph.net.vnc.rfb.codec.ProtocolHandshakeHandler;
+import spacegraph.net.vnc.rfb.codec.ProtocolVersion;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 

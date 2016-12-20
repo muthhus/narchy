@@ -52,7 +52,7 @@ package org.apache.lucene.analysis.no;
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-import static org.apache.lucene.analysis.util.StemmerUtil.*;
+import static org.apache.lucene.analysis.util.StemmerUtil.endsWith;
 
 /**
  * Light Stemmer for Norwegian.

@@ -17,12 +17,10 @@
 package org.apache.lucene.analysis.commongrams;
 
 
-import java.util.Map;
-
 import org.apache.lucene.analysis.TokenFilter;
 import org.apache.lucene.analysis.TokenStream;
-import org.apache.lucene.analysis.commongrams.CommonGramsFilter;
-import org.apache.lucene.analysis.commongrams.CommonGramsQueryFilter;
+
+import java.util.Map;
 
 /**
  * Construct {@link CommonGramsQueryFilter}.

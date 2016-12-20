@@ -11,16 +11,16 @@ import javafx.scene.image.ImageView;
 import javafx.scene.image.PixelFormat;
 import javafx.scene.image.PixelReader;
 import javafx.scene.image.WritableImage;
+import org.slf4j.LoggerFactory;
 import spacegraph.net.vnc.rfb.codec.decoder.ColourMapEvent;
 import spacegraph.net.vnc.rfb.codec.decoder.ServerDecoderEvent;
 import spacegraph.net.vnc.rfb.codec.encoder.InputEventListener;
 import spacegraph.net.vnc.rfb.codec.encoder.KeyButtonEvent;
 import spacegraph.net.vnc.rfb.render.ConnectInfoEvent;
+import spacegraph.net.vnc.rfb.render.rect.*;
 import spacegraph.net.vnc.ui.CutTextEventHandler;
 import spacegraph.net.vnc.ui.KeyButtonEventHandler;
-import spacegraph.net.vnc.rfb.render.rect.*;
 import spacegraph.net.vnc.ui.PointerEventHandler;
-import org.slf4j.LoggerFactory;
 
 import java.nio.ByteBuffer;
 import java.util.Objects;

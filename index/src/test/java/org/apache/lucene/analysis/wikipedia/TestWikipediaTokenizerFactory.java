@@ -17,12 +17,11 @@
 package org.apache.lucene.analysis.wikipedia;
 
 
-import java.io.Reader;
-import java.io.StringReader;
-
 import org.apache.lucene.analysis.Tokenizer;
 import org.apache.lucene.analysis.util.BaseTokenStreamFactoryTestCase;
-import org.apache.lucene.analysis.wikipedia.WikipediaTokenizer;
+
+import java.io.Reader;
+import java.io.StringReader;
 
 /**
  * Simple tests to ensure the wikipedia tokenizer is working.

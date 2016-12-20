@@ -16,11 +16,11 @@
  */
 package org.apache.lucene.analysis.commongrams;
 
-import java.io.IOException;
-
 import org.apache.lucene.analysis.TokenFilter;
 import org.apache.lucene.analysis.tokenattributes.PositionIncrementAttribute;
 import org.apache.lucene.analysis.tokenattributes.TypeAttribute;
+
+import java.io.IOException;
 
 import static org.apache.lucene.analysis.commongrams.CommonGramsFilter.GRAM_TYPE;
 

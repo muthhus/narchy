@@ -17,18 +17,13 @@
 package org.apache.lucene.analysis.hu;
 
 
-import java.io.IOException;
-
-import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.BaseTokenStreamTestCase;
-import org.apache.lucene.analysis.CharArraySet;
-import org.apache.lucene.analysis.MockTokenizer;
-import org.apache.lucene.analysis.TokenStream;
-import org.apache.lucene.analysis.Tokenizer;
+import org.apache.lucene.analysis.*;
 import org.apache.lucene.analysis.core.KeywordTokenizer;
 import org.apache.lucene.analysis.miscellaneous.SetKeywordMarkerFilter;
 
-import static org.apache.lucene.analysis.VocabularyAssert.*;
+import java.io.IOException;
+
+import static org.apache.lucene.analysis.VocabularyAssert.assertVocabulary;
 
 /**
  * Simple tests for {@link HungarianLightStemFilter}

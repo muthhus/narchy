@@ -19,7 +19,6 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Accordion;
 import javafx.scene.control.TitledPane;
 import spacegraph.net.vnc.app.persist.SessionContext;
-import spacegraph.net.vnc.app.about.AboutView;
 import spacegraph.net.vnc.app.presentation.connect.ConnectView;
 import spacegraph.net.vnc.app.presentation.info.InfoView;
 import spacegraph.net.vnc.ui.service.VncRenderService;

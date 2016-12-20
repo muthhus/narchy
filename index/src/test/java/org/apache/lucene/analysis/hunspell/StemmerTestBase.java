@@ -17,18 +17,18 @@
 package org.apache.lucene.analysis.hunspell;
 
 
+import org.apache.lucene.store.RAMDirectory;
+import org.apache.lucene.util.CharsRef;
+import org.apache.lucene.util.IOUtils;
+import org.apache.lucene.util.LuceneTestCase;
+import org.junit.AfterClass;
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.ParseException;
 import java.util.Arrays;
 import java.util.List;
-
-import org.apache.lucene.store.RAMDirectory;
-import org.apache.lucene.util.CharsRef;
-import org.apache.lucene.util.IOUtils;
-import org.apache.lucene.util.LuceneTestCase;
-import org.junit.AfterClass;
 
 /** base class for hunspell stemmer tests */
 public abstract class StemmerTestBase extends LuceneTestCase {

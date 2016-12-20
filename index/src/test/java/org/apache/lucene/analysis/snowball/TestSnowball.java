@@ -17,22 +17,12 @@
 package org.apache.lucene.analysis.snowball;
 
 
-import java.io.IOException;
-
-import org.apache.lucene.analysis.BaseTokenStreamTestCase;
-import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.MockTokenizer;
-import org.apache.lucene.analysis.Tokenizer;
-import org.apache.lucene.analysis.TokenStream;
+import org.apache.lucene.analysis.*;
 import org.apache.lucene.analysis.core.KeywordTokenizer;
-
-import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
-import org.apache.lucene.analysis.tokenattributes.FlagsAttribute;
-import org.apache.lucene.analysis.tokenattributes.OffsetAttribute;
-import org.apache.lucene.analysis.tokenattributes.PayloadAttribute;
-import org.apache.lucene.analysis.tokenattributes.PositionIncrementAttribute;
-import org.apache.lucene.analysis.tokenattributes.TypeAttribute;
+import org.apache.lucene.analysis.tokenattributes.*;
 import org.apache.lucene.util.BytesRef;
+
+import java.io.IOException;
 
 
 public class TestSnowball extends BaseTokenStreamTestCase {

@@ -11,10 +11,10 @@ import javafx.scene.ImageCursor;
 import javafx.scene.image.PixelFormat;
 import javafx.scene.image.PixelReader;
 import javafx.scene.image.WritableImage;
+import org.slf4j.LoggerFactory;
 import spacegraph.net.vnc.rfb.codec.decoder.ColourMapEvent;
 import spacegraph.net.vnc.rfb.codec.decoder.ServerDecoderEvent;
 import spacegraph.net.vnc.rfb.render.ConnectInfoEvent;
-import org.slf4j.LoggerFactory;
 import spacegraph.net.vnc.rfb.render.rect.*;
 
 import java.nio.ByteBuffer;

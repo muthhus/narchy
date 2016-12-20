@@ -17,12 +17,12 @@
 package org.apache.lucene.analysis.miscellaneous;
 
 
-import java.io.Reader;
-import java.io.StringReader;
-
 import org.apache.lucene.analysis.MockTokenizer;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.util.BaseTokenStreamFactoryTestCase;
+
+import java.io.Reader;
+import java.io.StringReader;
 
 public class TestLimitTokenOffsetFilterFactory extends BaseTokenStreamFactoryTestCase {
 

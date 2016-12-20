@@ -2,7 +2,6 @@ package nars.rdfowl;
 
 import jcog.data.random.XorShift128PlusRandom;
 import nars.NAR;
-import nars.Param;
 import nars.index.term.tree.TreeTermIndex;
 import nars.nar.Default;
 import nars.nar.exe.Executioner;

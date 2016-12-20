@@ -17,10 +17,10 @@
 package org.apache.lucene.collation.tokenattributes;
 
 
-import java.text.Collator;
-
 import org.apache.lucene.analysis.tokenattributes.CharTermAttributeImpl;
 import org.apache.lucene.util.BytesRef;
+
+import java.text.Collator;
 
 /**
  * Extension of {@link CharTermAttributeImpl} that encodes the term

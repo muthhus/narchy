@@ -17,12 +17,12 @@
 package org.apache.lucene.analysis.de;
 
 
-import java.io.IOException;
-
 import org.apache.lucene.analysis.TokenFilter;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.apache.lucene.analysis.util.StemmerUtil;
+
+import java.io.IOException;
 
 /**
  * Normalizes German characters according to the heuristics

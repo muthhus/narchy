@@ -17,10 +17,6 @@
 package org.apache.lucene.analysis.util;
 
 
-import java.io.IOException;
-import java.io.StringReader;
-import java.util.Locale;
-
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.BaseTokenStreamTestCase;
 import org.apache.lucene.analysis.TokenStream;
@@ -29,6 +25,10 @@ import org.apache.lucene.analysis.core.LetterTokenizer;
 import org.apache.lucene.analysis.core.LowerCaseTokenizer;
 import org.apache.lucene.analysis.tokenattributes.OffsetAttribute;
 import org.apache.lucene.util.TestUtil;
+
+import java.io.IOException;
+import java.io.StringReader;
+import java.util.Locale;
 
 
 /**

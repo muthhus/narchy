@@ -16,10 +16,10 @@ package spacegraph.net.vnc.rfb.codec.security.vncauth;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
-import spacegraph.net.vnc.rfb.codec.security.RfbSecurityEncoder;
-import spacegraph.net.vnc.rfb.exception.ProtocolException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import spacegraph.net.vnc.rfb.codec.security.RfbSecurityEncoder;
+import spacegraph.net.vnc.rfb.exception.ProtocolException;
 
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;

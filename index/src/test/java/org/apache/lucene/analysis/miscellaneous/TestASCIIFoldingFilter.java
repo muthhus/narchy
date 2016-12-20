@@ -17,18 +17,14 @@
 package org.apache.lucene.analysis.miscellaneous;
 
 
-import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.BaseTokenStreamTestCase;
-import org.apache.lucene.analysis.MockTokenizer;
-import org.apache.lucene.analysis.TokenStream;
-import org.apache.lucene.analysis.Tokenizer;
+import org.apache.lucene.analysis.*;
 import org.apache.lucene.analysis.core.KeywordTokenizer;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 public class TestASCIIFoldingFilter extends BaseTokenStreamTestCase {
   /**

@@ -4,7 +4,6 @@ import jcog.map.nbhm.HijacKache;
 import nars.Param;
 import nars.bag.Bag;
 import nars.budget.Budgeted;
-import nars.budget.control.Forget;
 import nars.budget.merge.BudgetMerge;
 import nars.link.ArrayBLink;
 import nars.link.BLink;

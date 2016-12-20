@@ -17,8 +17,6 @@
 package org.apache.lucene.analysis.ngram;
 
 
-import java.io.IOException;
-
 import org.apache.lucene.analysis.TokenFilter;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.miscellaneous.CodepointCountFilter;
@@ -26,6 +24,8 @@ import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.apache.lucene.analysis.tokenattributes.OffsetAttribute;
 import org.apache.lucene.analysis.tokenattributes.PositionIncrementAttribute;
 import org.apache.lucene.analysis.tokenattributes.PositionLengthAttribute;
+
+import java.io.IOException;
 
 /**
  * Tokenizes the input into n-grams of the given size(s).

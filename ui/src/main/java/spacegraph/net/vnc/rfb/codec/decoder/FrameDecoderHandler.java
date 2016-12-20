@@ -16,11 +16,11 @@ package spacegraph.net.vnc.rfb.codec.decoder;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import spacegraph.net.vnc.rfb.codec.Encoding;
 import spacegraph.net.vnc.rfb.codec.PixelFormat;
 import spacegraph.net.vnc.rfb.codec.ServerEvent;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.EnumMap;
 import java.util.List;

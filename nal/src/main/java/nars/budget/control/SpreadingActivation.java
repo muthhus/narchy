@@ -10,7 +10,6 @@ import nars.concept.Concept;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
-import nars.term.container.TermContainer;
 import org.eclipse.collections.api.tuple.primitive.ObjectFloatPair;
 import org.eclipse.collections.impl.map.mutable.primitive.ObjectFloatHashMap;
 import org.jetbrains.annotations.NotNull;

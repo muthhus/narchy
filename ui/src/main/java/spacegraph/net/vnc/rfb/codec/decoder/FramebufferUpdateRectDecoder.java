@@ -15,14 +15,14 @@ package spacegraph.net.vnc.rfb.codec.decoder;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import spacegraph.net.vnc.rfb.codec.Encoding;
 import spacegraph.net.vnc.rfb.codec.PixelFormat;
 import spacegraph.net.vnc.rfb.codec.ProtocolState;
 import spacegraph.net.vnc.rfb.codec.ServerEvent;
 import spacegraph.net.vnc.rfb.codec.decoder.rect.*;
 import spacegraph.net.vnc.rfb.exception.ProtocolException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.EnumMap;
 import java.util.List;

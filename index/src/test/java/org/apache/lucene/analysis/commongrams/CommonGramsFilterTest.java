@@ -16,13 +16,12 @@
  */
 package org.apache.lucene.analysis.commongrams;
 
-import java.io.StringReader;
-import java.util.Arrays;
-
 import org.apache.lucene.analysis.*;
-import org.apache.lucene.analysis.CharArraySet;
 import org.apache.lucene.analysis.core.WhitespaceTokenizer;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
+
+import java.io.StringReader;
+import java.util.Arrays;
 
 /**
  * Tests CommonGrams(Query)Filter

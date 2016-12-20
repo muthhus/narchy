@@ -13,7 +13,6 @@
  *******************************************************************************/
 package nars.video;
 
-import boofcv.struct.image.InterleavedU8;
 import com.airhacks.afterburner.injection.Injector;
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.util.texture.Texture;
@@ -22,9 +21,9 @@ import javafx.scene.image.WritableImage;
 import javafx.scene.image.WritablePixelFormat;
 import javafx.scene.layout.BorderPane;
 import nars.FX;
-import nars.nar.Default;
-import nars.remote.NAgents;
-import nars.time.RealTime;
+import org.slf4j.LoggerFactory;
+import spacegraph.SpaceGraph;
+import spacegraph.Surface;
 import spacegraph.net.vnc.rfb.codec.decoder.ServerDecoderEvent;
 import spacegraph.net.vnc.rfb.codec.encoder.KeyButtonEvent;
 import spacegraph.net.vnc.rfb.codec.security.SecurityType;
@@ -32,15 +31,9 @@ import spacegraph.net.vnc.rfb.render.rect.ImageRect;
 import spacegraph.net.vnc.ui.VncCanvas;
 import spacegraph.net.vnc.ui.control.VncImageView;
 import spacegraph.net.vnc.ui.service.VncRenderService;
-import org.slf4j.LoggerFactory;
-import spacegraph.SpaceGraph;
-import spacegraph.Surface;
 import spacegraph.render.Draw;
-import spacegraph.space.widget.MatrixView;
 
 import static nars.FX.scrolled;
-import static nars.$.t;
-import static nars.video.Bitmap2D.*;
 import static nars.video.VideoBag.EventTimeline.tgaTexture;
 
 /**

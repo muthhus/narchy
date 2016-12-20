@@ -1,173 +1,256 @@
-//package nars.index;
-//
-//import nars.IO;
-//import nars.Param;
-//import nars.concept.Concept;
-//import nars.term.Compound;
-//import nars.term.Term;
-//import nars.term.Termed;
-//import nars.term.atom.Atomic;
-//import nars.term.container.TermContainer;
-//import org.infinispan.AdvancedCache;
-//import org.infinispan.Cache;
-//import org.infinispan.cache.impl.DecoratedCache;
-//import org.infinispan.commons.io.ByteBuffer;
-//import org.infinispan.commons.io.ByteBufferImpl;
-//import org.infinispan.configuration.cache.ConfigurationBuilder;
-//import org.infinispan.context.Flag;
-//import org.infinispan.manager.DefaultCacheManager;
-//import org.jetbrains.annotations.NotNull;
-//import org.jetbrains.annotations.Nullable;
-//
-//import java.util.function.Consumer;
-//
-//
-//public class InfinispanIndex extends MaplikeIndex {
-//
-//    private final Cache<ByteBuffer, Termed> concepts;
-//    private final DecoratedCache<ByteBuffer,Termed> conceptsLocal;
-//    private final Cache<ByteBuffer, TermContainer> subterms;
-//    private final DecoratedCache<ByteBuffer,TermContainer> subtermsLocal;
-//
-//    private final IO.DefaultCodec codec;
-//    private final AdvancedCache<ByteBuffer,TermContainer> subtermsLocalNoResult;
-//    private final AdvancedCache<ByteBuffer,Termed> conceptsLocalNoResult;
-//
-//
-//
-//    public InfinispanIndex(Concept.ConceptBuilder conceptBuilder) {
-//        super(conceptBuilder);
-//
-//        this.codec = new IO.DefaultCodec(this);
-//
-//        ConfigurationBuilder cb = new ConfigurationBuilder();
-//        cb.unsafe().versioning().disable();
-//        cb.locking().concurrencyLevel(1);
-//        cb.jmxStatistics().disable();
-//        //cb.customInterceptors().addInterceptor();
-//
-//
-//
-//        DefaultCacheManager cm = new DefaultCacheManager(cb.build());
-//        //DefaultCacheManager cm = new DefaultCacheManager();
-//        //System.out.println(Joiner.on('\n').join(cm.getCacheManagerConfiguration().toString().split(", ")));
-//
-//        this.concepts = cm.getCache("concepts");
-//        this.conceptsLocal = new DecoratedCache<>(
-//                concepts.getAdvancedCache(),
-//                Flag.CACHE_MODE_LOCAL, /*Flag.SKIP_LOCKING,*/ Flag.SKIP_OWNERSHIP_CHECK,
-//                Flag.SKIP_REMOTE_LOOKUP);
-//        this.conceptsLocalNoResult = conceptsLocal.withFlags(Flag.IGNORE_RETURN_VALUES, Flag.SKIP_CACHE_LOAD, Flag.SKIP_REMOTE_LOOKUP);
-//        this.subterms = cm.getCache("subterms");
-//        this.subtermsLocal = new DecoratedCache<>(
-//                subterms.getAdvancedCache(),
-//                Flag.CACHE_MODE_LOCAL, /*Flag.SKIP_LOCKING,*/ Flag.SKIP_OWNERSHIP_CHECK,
-//                Flag.SKIP_REMOTE_LOOKUP);
-//        this.subtermsLocalNoResult = subtermsLocal.withFlags(Flag.IGNORE_RETURN_VALUES, Flag.SKIP_CACHE_LOAD, Flag.SKIP_REMOTE_LOOKUP);
-//
-//
-//    }
-//
-//    @Override
-//    public void remove(Termed x) {
-//        conceptsLocal.remove(key(x.term()));
-//    }
-//
-//    @Override
-//    public Termed get(@NotNull Termed x) {
-//        return conceptsLocal.get(key(x.term()));
-//    }
-//
-//
-//    @NotNull
-//    @Override
-//    protected Termed getNewAtom(@NotNull Atomic x) {
-//        return conceptsLocal.computeIfAbsent(key(x.term()), xx -> buildConcept(x));
-//    }
-//
-//    @Override
-//    public TermContainer internSubterms(@NotNull TermContainer t) {
-//        return subtermsLocal.get(key(t));
-//    }
-//
-//    @Override
-//    protected Termed getConceptCompound(@NotNull Compound x) {
-//
-//        if (!canBuildConcept(x)) {
-//            return buildCompound(x);
-//        } else {
-//            return conceptsLocal.computeIfAbsent(key((Term)(x.term())), xx -> buildConcept(buildCompound(x)));
-//        }
-//    }
-//
-//    @NotNull
-//    private Termed buildCompound(@NotNull Compound x) {
-//        return buildCompound(x.op(), x.dt(), x.subterms());
-//    }
-//
-//
-//    public ByteBuffer key(@NotNull Term x) {
-//        byte[] b = codec.asByteArray(x);
-//        return new ByteBufferImpl(b,0,b.length);
-//    }
-//
-//    public ByteBuffer key(@NotNull TermContainer x) {
-//        byte[] b = codec.asByteArray(x);
-//        return new ByteBufferImpl(b,0,b.length);
-//    }
-//
-//
-//    @Override
-//    @Deprecated public @Nullable void set(@NotNull Termed src, Termed target) {
-//        /*
-//        3.5.1. DecoratedCache
-//
-//Another approach would be to use the DecoratedCache wrapper. This allows you to reuse flags. For example:
-//
-//AdvancedCache cache = ...
-//DecoratedCache strictlyLocal = new DecoratedCache(cache, Flag.CACHE_MODE_LOCAL, Flag.SKIP_CACHE_STORE);
-//strictlyLocal.put("local_1", "only");
-//strictlyLocal.put("local_2", "only");
-//strictlyLocal.put("local_3", "only");
-//         */
-//        conceptsLocalNoResult
-//                .put(key(src.term()), target);
-//
-//    }
-//
-//    @Override
-//    public void clear() {
-//        conceptsLocal.clear();
-//        subtermsLocal.clear();
-//    }
-//
-//    @Override
-//    public void forEach(Consumer<? super Termed> c) {
-//        conceptsLocal.forEach( (k, v) -> c.accept(v) );
-//    }
-//
-//    @Override
-//    public int size() {
-//        return conceptsLocal.size();
-//    }
-//
-//    @Override
-//    public int subtermsCount() {
-//        return subtermsLocal.size();
-//    }
-//
-////    @Override
-////    protected TermContainer put(TermContainer x) {
-////        return subtermsLocal.putIfAbsent(key(x), x);
-////    }
-//
-//    @Override
-//    public @NotNull String summary() {
-//        if (Param.DEBUG) {
-//            return conceptsLocal.size() + " concepts, " + subtermsLocal.size() + " subterms (WARNING: slow to count)";
-//        }
-//        else {
-//            return "";
-//        }
-//    }
-//}
+package nars.index;
+
+import jcog.data.byt.RawByteSeq;
+import jcog.data.random.XorShift128PlusRandom;
+import nars.$;
+import nars.IO;
+import nars.NAR;
+import nars.Task;
+import nars.concept.*;
+import nars.concept.util.ConceptBuilder;
+import nars.index.term.TermIndex;
+import nars.index.term.map.MaplikeTermIndex;
+import nars.index.term.tree.TermKey;
+import nars.nar.Default;
+import nars.nar.util.DefaultConceptBuilder;
+import nars.task.MutableTask;
+import nars.term.Term;
+import nars.term.Termed;
+import nars.time.FrameTime;
+import org.infinispan.Cache;
+import org.infinispan.commons.marshall.AdvancedExternalizer;
+import org.infinispan.commons.util.concurrent.ConcurrentHashSet;
+import org.infinispan.configuration.cache.Configuration;
+import org.infinispan.configuration.cache.ConfigurationBuilder;
+import org.infinispan.configuration.global.GlobalConfiguration;
+import org.infinispan.configuration.global.GlobalConfigurationBuilder;
+import org.infinispan.manager.DefaultCacheManager;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
+import java.util.List;
+import java.util.Set;
+import java.util.function.Consumer;
+
+
+public class InfinispanIndex extends MaplikeTermIndex {
+
+    static final Logger logger = LoggerFactory.getLogger(InfinispanIndex.class);
+
+    private final Cache<RawByteSeq, Termed> concepts;
+
+    private final Set<Term> permanents = new ConcurrentHashSet(1024);
+
+
+    public InfinispanIndex(ConceptBuilder conceptBuilder) {
+        super(conceptBuilder);
+
+        GlobalConfiguration global = new GlobalConfigurationBuilder()
+                .serialization()
+                //.classResolver(new SimpleClassResolver(false,getClass().getClassLoader()))
+                .addAdvancedExternalizer(new TaskExternalizer())
+                //.addAdvancedExternalizer(new PermanentConceptExternalizer())
+                .addAdvancedExternalizer(new ConceptExternalizer())
+                .build();
+
+
+        Configuration infinispanConfiguration = new ConfigurationBuilder()
+                .unsafe()
+                .versioning().disable()
+                .storeAsBinary().storeKeysAsBinary(true).storeValuesAsBinary(true)
+                .persistence().passivation(true).addSingleFileStore().location("/tmp/concepts")
+                //cb.locking().concurrencyLevel(1);
+                //cb.customInterceptors().addInterceptor();
+                .jmxStatistics().disable()
+                .build();
+
+
+
+        DefaultCacheManager cm = new DefaultCacheManager(global, infinispanConfiguration);
+
+        concepts = cm.getCache();
+
+        Runtime.getRuntime().addShutdownHook(new Thread(()->{
+            stop();
+        }));
+    }
+
+    @Override
+    public @Nullable Termed get(@NotNull Term t, boolean createIfMissing) {
+        RawByteSeq key = key(t);
+        if (createIfMissing) {
+            return concepts.computeIfAbsent(key, (x) -> conceptBuilder().apply(t));
+        } else {
+            return concepts.get(key);
+        }
+    }
+
+    static RawByteSeq key(@NotNull Term t) {
+        return new RawByteSeq(TermKey.term(t));
+    }
+
+    @Override
+    public void set(@NotNull Term src, Termed target) {
+        RawByteSeq k = key(src);
+        if (src instanceof PermanentConcept) {
+            permanents.add(src);
+            concepts.put(k, target); //replace
+        } else
+            concepts.putIfAbsent(k, target);
+    }
+
+
+    public synchronized void stop() {
+        logger.info("stop: {}", concepts );
+
+        //remove permanents to avoid their persistence
+        for (Term p : permanents) {
+            if (concepts.remove(key(p))==null)
+                logger.warn("{} not in cache on removal", p) ;
+        }
+
+        concepts.shutdown();
+    }
+
+    @Override
+    public void clear() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void forEach(@NotNull Consumer<? super Termed> c) {
+        concepts.forEach((k, v) -> {
+            c.accept(v);
+        });
+    }
+
+    @Override
+    public int size() {
+        return concepts.size();
+    }
+
+    @Override
+    public @NotNull String summary() {
+        return "size=" + concepts.size();
+    }
+
+    @Override
+    public void remove(@NotNull Term entry) {
+        concepts.remove(key(entry));
+    }
+
+    public static void main(String[] args) {
+
+        InfinispanIndex index = new InfinispanIndex(new DefaultConceptBuilder());
+        NAR nar = new Default(1024, 1, 1, 3,
+                new XorShift128PlusRandom(1), index, new FrameTime());
+
+        nar.input("(x,y).", "a:b.");
+
+        nar.concepts.print(System.out);
+
+    }
+
+    public class TaskExternalizer implements AdvancedExternalizer<Task> {
+
+        @Override
+        public Set<Class<? extends Task>> getTypeClasses() {
+            return Set.of(Task.class);
+        }
+
+        @Override
+        public Integer getId() {
+            return 4443;
+        }
+
+        @Override
+        public void writeObject(ObjectOutput output, Task t) throws IOException {
+            IO.writeTask(output, t);
+        }
+
+        @Override
+        public Task readObject(ObjectInput input) throws IOException, ClassNotFoundException {
+            MutableTask t = IO.readTask(input, InfinispanIndex.this);
+            return t;
+        }
+    }
+
+    public class ConceptExternalizer implements AdvancedExternalizer<Concept> {
+
+        @Override
+        public void writeObject(ObjectOutput output, Concept c) throws IOException {
+            List<Task> ll = $.newArrayList(); //TODO do this streaming by using a 'null task' terminator
+            c.forEachTask(true, true, true, true, ll::add);
+
+            IO.writeTerm(output, c.term());
+
+            output.writeInt(ll.size());
+            for (Task x : ll) {
+                IO.writeTask(output, x);
+            }
+        }
+
+        @Override
+        public Concept readObject(ObjectInput input) throws IOException, ClassNotFoundException {
+
+            Term t = IO.readTerm(input, InfinispanIndex.this);
+            Concept c = (Concept) get(t, true);
+
+            int numTasks = input.readInt();
+            for (int i = 0; i < numTasks; i++) {
+                Task x = IO.readTask(input, InfinispanIndex.this);
+                if (c != null)
+                    nar.input(x);
+            }
+
+            return c;
+        }
+
+        @Override
+        public Set<Class<? extends Concept>> getTypeClasses() {
+            return Set.of(AtomConcept.class, CompoundConcept.class);
+        }
+
+        @Override
+        public Integer getId() {
+            return 4444;
+        }
+    }
+
+    public class PermanentConceptExternalizer implements AdvancedExternalizer<Concept> {
+
+        @Override
+        public void writeObject(ObjectOutput output, Concept c) throws IOException {
+            output.writeUTF(c.getClass().getName());
+        }
+
+        @Override
+        public Concept readObject(ObjectInput input) throws IOException, ClassNotFoundException {
+            //Term t = IO.readTerm(input, InfinispanIndex.this);
+            String className = input.readUTF();
+            try {
+                return (Concept) Class.forName(className).newInstance();
+            } catch (InstantiationException e) {
+                return null;
+            } catch (IllegalAccessException e) {
+                return null;
+            }
+            //return null; //(Concept) get(t, false);
+        }
+
+        @Override
+        public Set<Class<? extends Concept>> getTypeClasses() {
+            return Set.of(PermanentConcept.class, Functor.class, Functor.LambdaFunctor.class);
+        }
+
+        @Override
+        public Integer getId() {
+            return 4445;
+        }
+    }
+}

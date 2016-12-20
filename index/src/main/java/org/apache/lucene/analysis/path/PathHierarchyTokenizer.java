@@ -16,13 +16,13 @@
  */
 package org.apache.lucene.analysis.path;
 
-import java.io.IOException;
-
 import org.apache.lucene.analysis.Tokenizer;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.apache.lucene.analysis.tokenattributes.OffsetAttribute;
 import org.apache.lucene.analysis.tokenattributes.PositionIncrementAttribute;
 import org.apache.lucene.util.AttributeFactory;
+
+import java.io.IOException;
 
 /**
  * Tokenizer for path-like hierarchies.

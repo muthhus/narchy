@@ -16,12 +16,12 @@
  */
 package org.apache.lucene.analysis.payloads;
 
+import org.apache.lucene.util.BytesRef;
+
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-
-import org.apache.lucene.util.BytesRef;
 
 
 /**

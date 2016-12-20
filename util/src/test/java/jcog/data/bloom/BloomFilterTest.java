@@ -1,6 +1,5 @@
 package jcog.data.bloom;
 
-import jcog.data.bloom.BloomFilter;
 import org.junit.Test;
 
 import java.util.Random;

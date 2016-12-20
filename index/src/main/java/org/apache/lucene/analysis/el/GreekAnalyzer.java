@@ -16,18 +16,13 @@
  */
 package org.apache.lucene.analysis.el;
 
-import java.io.IOException;
-import java.io.Reader;
-
-import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.CharArraySet;
-import org.apache.lucene.analysis.StopFilter;
-import org.apache.lucene.analysis.StopwordAnalyzerBase;
-import org.apache.lucene.analysis.TokenStream;
-import org.apache.lucene.analysis.Tokenizer;
+import org.apache.lucene.analysis.*;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.analysis.standard.StandardFilter;
 import org.apache.lucene.analysis.standard.StandardTokenizer;
+
+import java.io.IOException;
+import java.io.Reader;
 
 /**
  * {@link Analyzer} for the Greek language. 

@@ -17,11 +17,11 @@
 package org.apache.lucene.analysis.fa;
 
 
-import java.io.Reader;
-
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.BaseTokenStreamTestCase;
 import org.apache.lucene.analysis.MockTokenizer;
+
+import java.io.Reader;
 
 public class TestPersianCharFilter extends BaseTokenStreamTestCase {
   private Analyzer analyzer;

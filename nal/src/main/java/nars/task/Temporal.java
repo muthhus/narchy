@@ -1,7 +1,5 @@
 package nars.task;
 
-import nars.time.Tense;
-
 /**
  * interface for the temporal information about the
  * task to which this refers to.  used to separate

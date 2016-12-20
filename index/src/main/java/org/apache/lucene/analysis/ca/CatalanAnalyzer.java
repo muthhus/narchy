@@ -17,23 +17,17 @@
 package org.apache.lucene.analysis.ca;
 
 
-import java.io.IOException;
-import java.io.Reader;
-import java.util.Arrays;
-
-import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.CharArraySet;
-import org.apache.lucene.analysis.LowerCaseFilter;
-import org.apache.lucene.analysis.StopFilter;
-import org.apache.lucene.analysis.TokenStream;
-import org.apache.lucene.analysis.Tokenizer;
+import org.apache.lucene.analysis.*;
 import org.apache.lucene.analysis.miscellaneous.SetKeywordMarkerFilter;
 import org.apache.lucene.analysis.snowball.SnowballFilter;
 import org.apache.lucene.analysis.standard.StandardFilter;
 import org.apache.lucene.analysis.standard.StandardTokenizer;
 import org.apache.lucene.analysis.util.ElisionFilter;
-import org.apache.lucene.analysis.StopwordAnalyzerBase;
 import org.tartarus.snowball.ext.CatalanStemmer;
+
+import java.io.IOException;
+import java.io.Reader;
+import java.util.Arrays;
 
 /**
  * {@link Analyzer} for Catalan.

@@ -17,18 +17,7 @@
 package org.apache.lucene.analysis.compound;
 
 
-import java.io.IOException;
-import java.io.Reader;
-import java.io.StringReader;
-import java.util.Arrays;
-
-import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.BaseTokenStreamTestCase;
-import org.apache.lucene.analysis.CharArraySet;
-import org.apache.lucene.analysis.MockTokenizer;
-import org.apache.lucene.analysis.TokenFilter;
-import org.apache.lucene.analysis.TokenStream;
-import org.apache.lucene.analysis.Tokenizer;
+import org.apache.lucene.analysis.*;
 import org.apache.lucene.analysis.charfilter.MappingCharFilter;
 import org.apache.lucene.analysis.charfilter.NormalizeCharMap;
 import org.apache.lucene.analysis.compound.hyphenation.HyphenationTree;
@@ -38,6 +27,11 @@ import org.apache.lucene.util.Attribute;
 import org.apache.lucene.util.AttributeImpl;
 import org.apache.lucene.util.AttributeReflector;
 import org.xml.sax.InputSource;
+
+import java.io.IOException;
+import java.io.Reader;
+import java.io.StringReader;
+import java.util.Arrays;
 
 public class TestCompoundWordTokenFilter extends BaseTokenStreamTestCase {
 

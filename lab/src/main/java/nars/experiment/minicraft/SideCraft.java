@@ -12,8 +12,6 @@ import nars.video.Sensor2D;
 
 import java.awt.image.BufferedImage;
 
-import static spacegraph.SpaceGraph.window;
-
 /**
  * Created by me on 9/19/16.
  */
@@ -24,7 +22,7 @@ public class SideCraft extends NAgents {
     private PixelAutoClassifier camAE;
 
     public static void main(String[] args) {
-        runRT(SideCraft::new, 30, 5);
+        runRT(SideCraft::new, 30, 5, -1);
     }
 
     public SideCraft(NAR nar) {

@@ -17,11 +17,6 @@
 package org.apache.lucene.analysis.hunspell;
 
 
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.util.IOUtils;
 import org.apache.lucene.util.LuceneTestCase;
@@ -29,6 +24,11 @@ import org.apache.lucene.util.LuceneTestCase.SuppressSysoutChecks;
 import org.apache.lucene.util.RamUsageTester;
 import org.apache.lucene.util.TestUtil;
 import org.junit.Ignore;
+
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 /**
  * These thunderbird dictionaries can be retrieved via:

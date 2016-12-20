@@ -2,7 +2,6 @@ package nars.term.var;
 
 import nars.$;
 import nars.Op;
-import nars.term.Termlike;
 import nars.term.atom.AtomicString;
 import org.jetbrains.annotations.NotNull;
 

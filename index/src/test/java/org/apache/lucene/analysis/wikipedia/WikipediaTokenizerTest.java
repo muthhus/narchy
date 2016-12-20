@@ -17,17 +17,17 @@
 
 package org.apache.lucene.analysis.wikipedia;
 
-import java.io.StringReader;
-import java.io.IOException;
-import java.util.Collections;
-import java.util.Random;
-import java.util.Set;
-import java.util.HashSet;
-
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.BaseTokenStreamTestCase;
 import org.apache.lucene.analysis.Tokenizer;
 import org.apache.lucene.analysis.tokenattributes.FlagsAttribute;
+
+import java.io.IOException;
+import java.io.StringReader;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Random;
+import java.util.Set;
 
 import static org.apache.lucene.analysis.wikipedia.WikipediaTokenizer.*;
 

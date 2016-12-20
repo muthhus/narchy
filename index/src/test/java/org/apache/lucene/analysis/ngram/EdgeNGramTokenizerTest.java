@@ -17,17 +17,15 @@
 package org.apache.lucene.analysis.ngram;
 
 
-
-import java.io.IOException;
-import java.io.StringReader;
-import java.util.Arrays;
-
+import com.carrotsearch.randomizedtesting.generators.RandomStrings;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.BaseTokenStreamTestCase;
 import org.apache.lucene.analysis.Tokenizer;
 import org.apache.lucene.util.TestUtil;
 
-import com.carrotsearch.randomizedtesting.generators.RandomStrings;
+import java.io.IOException;
+import java.io.StringReader;
+import java.util.Arrays;
 
 /**
  * Tests {@link EdgeNGramTokenizer} for correctness.

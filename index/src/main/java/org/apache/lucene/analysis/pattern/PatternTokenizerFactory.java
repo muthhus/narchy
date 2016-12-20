@@ -17,11 +17,11 @@
 package org.apache.lucene.analysis.pattern;
 
 
-import java.util.Map;
-import java.util.regex.Pattern;
-
 import org.apache.lucene.analysis.util.TokenizerFactory;
 import org.apache.lucene.util.AttributeFactory;
+
+import java.util.Map;
+import java.util.regex.Pattern;
 
 /**
  * Factory for {@link PatternTokenizer}.

@@ -17,9 +17,8 @@
 package org.apache.lucene.analysis.compound;
 
 
-
-import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.CharArraySet;
+import org.apache.lucene.analysis.TokenStream;
 
 /**
  * A {@link org.apache.lucene.analysis.TokenFilter} that decomposes compound words found in many Germanic languages.

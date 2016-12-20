@@ -40,6 +40,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -75,6 +76,8 @@ public interface Concept extends Termed {
         }
     }
 
+
+    default String termString() { return term().toString(); }
 
     /**
      * like Map.gett for getting data stored in meta map
@@ -285,7 +288,7 @@ public interface Concept extends Termed {
 //    }
 
 
-    default void forEachTask(@NotNull Consumer<Task> each, boolean includeConceptBeliefs, boolean includeConceptQuestions, boolean includeConceptGoals, boolean includeConceptQuests) {
+    default void forEachTask(boolean includeConceptBeliefs, boolean includeConceptQuestions, boolean includeConceptGoals, boolean includeConceptQuests, @NotNull Consumer<Task> each) {
         if (includeConceptBeliefs) beliefs().forEach(each);
         if (includeConceptQuestions) questions().forEach(each);
         if (includeConceptGoals) goals().forEach(each);

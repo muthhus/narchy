@@ -2,7 +2,6 @@ package nars.nal.nal6;
 
 import nars.NAR;
 import nars.Narsese;
-import nars.Task;
 import nars.nar.Default;
 import nars.term.Termed;
 import nars.time.Tense;

@@ -17,14 +17,14 @@
 package org.apache.lucene.analysis.core;
 
 
+import org.apache.lucene.analysis.BaseTokenStreamTestCase;
+import org.apache.lucene.analysis.Tokenizer;
+import org.apache.lucene.util.AttributeFactory;
+
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.HashMap;
 import java.util.Map;
-
-import org.apache.lucene.analysis.BaseTokenStreamTestCase;
-import org.apache.lucene.analysis.Tokenizer;
-import org.apache.lucene.util.AttributeFactory;
 
 public class TestUnicodeWhitespaceTokenizer extends BaseTokenStreamTestCase {
   

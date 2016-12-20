@@ -16,10 +16,6 @@
  */
 package org.apache.lucene.analysis.miscellaneous;
 
-import java.io.IOException;
-import java.util.Locale;
-import java.util.regex.Pattern;
-
 import org.apache.lucene.analysis.BaseTokenStreamTestCase;
 import org.apache.lucene.analysis.CharArraySet;
 import org.apache.lucene.analysis.TokenFilter;
@@ -27,6 +23,10 @@ import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.apache.lucene.analysis.tokenattributes.KeywordAttribute;
 import org.junit.Test;
+
+import java.io.IOException;
+import java.util.Locale;
+import java.util.regex.Pattern;
 
 
 /**

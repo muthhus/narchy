@@ -25,10 +25,10 @@ import javafx.beans.property.StringProperty;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
+import org.slf4j.LoggerFactory;
 import spacegraph.net.vnc.app.persist.SessionContext;
 import spacegraph.net.vnc.app.presentation.MainView;
 import spacegraph.net.vnc.ui.service.VncRenderService;
-import org.slf4j.LoggerFactory;
 
 /**
  * /usr/bin/qemu-system-x86_64 -boot c  -m 512 -hda '/home/me/img/Linux.qcow' -cdrom  '/home/me/Downloads/cm-x86-13.0-rc1.iso' -net nic,vlan=0 -net user,vlan=0 -localtime -vnc :1 -monitor stdio

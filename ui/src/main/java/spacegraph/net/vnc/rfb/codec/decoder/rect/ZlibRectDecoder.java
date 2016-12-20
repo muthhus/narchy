@@ -15,10 +15,10 @@ package spacegraph.net.vnc.rfb.codec.decoder.rect;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
-import spacegraph.net.vnc.rfb.codec.PixelFormat;
-import spacegraph.net.vnc.rfb.render.rect.ZlibImageRect;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import spacegraph.net.vnc.rfb.codec.PixelFormat;
+import spacegraph.net.vnc.rfb.render.rect.ZlibImageRect;
 
 import java.util.List;
 import java.util.zip.DataFormatException;

@@ -16,13 +16,9 @@
  */
 package org.apache.lucene.analysis.synonym;
 
-import java.io.StringReader;
+import org.apache.lucene.analysis.*;
 
-import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.BaseTokenStreamTestCase;
-import org.apache.lucene.analysis.MockAnalyzer;
-import org.apache.lucene.analysis.MockTokenizer;
-import org.apache.lucene.analysis.Tokenizer;
+import java.io.StringReader;
 
 public class TestWordnetSynonymParser extends BaseTokenStreamTestCase {
 

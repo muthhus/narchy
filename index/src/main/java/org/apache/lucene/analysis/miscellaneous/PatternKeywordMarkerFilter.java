@@ -16,12 +16,12 @@
  */
 package org.apache.lucene.analysis.miscellaneous;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.apache.lucene.analysis.tokenattributes.KeywordAttribute;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Marks terms as keywords via the {@link KeywordAttribute}. Each token

@@ -17,7 +17,7 @@
 package org.apache.lucene.analysis.ar;
 
 
-import static org.apache.lucene.analysis.util.StemmerUtil.*;
+import static org.apache.lucene.analysis.util.StemmerUtil.delete;
 
 /**
  *  Normalizer for Arabic.

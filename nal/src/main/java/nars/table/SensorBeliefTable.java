@@ -4,12 +4,10 @@ import nars.NAR;
 import nars.Task;
 import nars.concept.CompoundConcept;
 import nars.concept.SensorConcept;
-import nars.task.DerivedTask;
 import nars.truth.Truth;
 import nars.truth.TruthDelta;
 import nars.util.signal.ScalarSignal;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

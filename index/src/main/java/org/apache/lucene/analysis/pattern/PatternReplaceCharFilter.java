@@ -16,13 +16,13 @@
  */
 package org.apache.lucene.analysis.pattern;
 
+import org.apache.lucene.analysis.charfilter.BaseCharFilter;
+
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import org.apache.lucene.analysis.charfilter.BaseCharFilter;
 
 /**
  * CharFilter that uses a regular expression for the target of replace string.

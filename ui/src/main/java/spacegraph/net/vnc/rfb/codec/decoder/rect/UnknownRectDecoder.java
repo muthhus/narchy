@@ -13,11 +13,11 @@
  *******************************************************************************/
 package spacegraph.net.vnc.rfb.codec.decoder.rect;
 
-import java.util.List;
-import spacegraph.net.vnc.rfb.codec.PixelFormat;
-
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
+import spacegraph.net.vnc.rfb.codec.PixelFormat;
+
+import java.util.List;
 
 public class UnknownRectDecoder implements FrameRectDecoder {
 

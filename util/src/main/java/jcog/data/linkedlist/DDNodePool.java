@@ -1,7 +1,7 @@
 package jcog.data.linkedlist;
 
 
-import jcog.data.DequePool;
+import jcog.data.pool.DequePool;
 
 /**
 * Created by me on 1/20/15.

@@ -16,13 +16,13 @@
  */
 package org.apache.lucene.analysis.miscellaneous;
 
+import org.apache.lucene.analysis.BaseTokenStreamTestCase;
+import org.apache.lucene.analysis.TokenStream;
+
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
-
-import org.apache.lucene.analysis.BaseTokenStreamTestCase;
-import org.apache.lucene.analysis.TokenStream;
 
 public class DateRecognizerFilterTest extends BaseTokenStreamTestCase {
 

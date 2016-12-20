@@ -17,14 +17,10 @@
 package org.apache.lucene.demo.facet;
 
 import org.apache.lucene.analysis.core.WhitespaceAnalyzer;
-import org.apache.lucene.document.LongPoint;
 import org.apache.lucene.document.Document;
+import org.apache.lucene.document.LongPoint;
 import org.apache.lucene.document.NumericDocValuesField;
-import org.apache.lucene.facet.DrillDownQuery;
-import org.apache.lucene.facet.FacetResult;
-import org.apache.lucene.facet.Facets;
-import org.apache.lucene.facet.FacetsCollector;
-import org.apache.lucene.facet.FacetsConfig;
+import org.apache.lucene.facet.*;
 import org.apache.lucene.facet.range.LongRange;
 import org.apache.lucene.facet.range.LongRangeFacetCounts;
 import org.apache.lucene.index.DirectoryReader;

@@ -17,13 +17,13 @@
 package org.apache.lucene.analysis.miscellaneous;
 
 
-import java.io.IOException;
-import java.util.Collection;
-
 import org.apache.lucene.analysis.CharArraySet;
 import org.apache.lucene.analysis.TokenFilter;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
+
+import java.io.IOException;
+import java.util.Collection;
 
 /** 
  * A filter to apply normal capitalization rules to Tokens.  It will make the first letter

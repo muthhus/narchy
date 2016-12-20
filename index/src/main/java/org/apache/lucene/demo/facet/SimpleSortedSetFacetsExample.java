@@ -17,21 +17,13 @@
 package org.apache.lucene.demo.facet;
 
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.lucene.analysis.core.WhitespaceAnalyzer;
 import org.apache.lucene.codecs.DocValuesFormat;
 import org.apache.lucene.codecs.PostingsFormat;
 import org.apache.lucene.codecs.lucene50.Lucene50PostingsFormat;
 import org.apache.lucene.codecs.lucene70.Lucene70DocValuesFormat;
 import org.apache.lucene.document.Document;
-import org.apache.lucene.facet.DrillDownQuery;
-import org.apache.lucene.facet.FacetResult;
-import org.apache.lucene.facet.Facets;
-import org.apache.lucene.facet.FacetsCollector;
-import org.apache.lucene.facet.FacetsConfig;
+import org.apache.lucene.facet.*;
 import org.apache.lucene.facet.sortedset.DefaultSortedSetDocValuesReaderState;
 import org.apache.lucene.facet.sortedset.SortedSetDocValuesFacetCounts;
 import org.apache.lucene.facet.sortedset.SortedSetDocValuesFacetField;
@@ -44,6 +36,10 @@ import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.RAMDirectory;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 /** Shows simple usage of faceted indexing and search,
  *  using {@link SortedSetDocValuesFacetField} and {@link

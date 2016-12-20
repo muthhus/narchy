@@ -27,8 +27,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spacegraph.SpaceGraph;
 import spacegraph.Surface;
-import spacegraph.index.RTree;
-import spacegraph.index.Rect1D;
+import jcog.spatial.RTree;
+import jcog.spatial.Rect1D;
 import spacegraph.render.Draw;
 import spacegraph.video.WebCam;
 

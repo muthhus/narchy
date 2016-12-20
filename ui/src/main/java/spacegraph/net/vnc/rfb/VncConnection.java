@@ -10,11 +10,11 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.ReadOnlyBooleanWrapper;
+import org.slf4j.LoggerFactory;
 import spacegraph.net.vnc.rfb.codec.ProtocolInitializer;
 import spacegraph.net.vnc.rfb.render.DefaultProtocolConfiguration;
 import spacegraph.net.vnc.rfb.render.ProtocolConfiguration;
 import spacegraph.net.vnc.rfb.render.RenderProtocol;
-import org.slf4j.LoggerFactory;
 
 import java.util.Objects;
 import java.util.concurrent.*;

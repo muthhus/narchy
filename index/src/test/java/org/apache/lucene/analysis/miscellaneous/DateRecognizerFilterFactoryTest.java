@@ -16,10 +16,10 @@
  */
 package org.apache.lucene.analysis.miscellaneous;
 
+import org.apache.lucene.analysis.BaseTokenStreamTestCase;
+
 import java.util.HashMap;
 import java.util.Map;
-
-import org.apache.lucene.analysis.BaseTokenStreamTestCase;
 
 public class DateRecognizerFilterFactoryTest extends BaseTokenStreamTestCase {
 

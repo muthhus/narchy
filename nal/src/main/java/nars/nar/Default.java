@@ -1,8 +1,6 @@
 package nars.nar;
 
-import com.google.common.collect.Lists;
 import jcog.data.random.XorShift128PlusRandom;
-import nars.$;
 import nars.NAR;
 import nars.Param;
 import nars.concept.Concept;
@@ -30,7 +28,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Random;
 import java.util.function.Consumer;
 
@@ -66,14 +63,18 @@ public class Default extends NAR {
         this(activeConcepts, conceptsFirePerCycle, taskLinksPerConcept, termLinksPerConcept, random, index, time, new SynchronousExecutor());
     }
 
+
     public Default(int activeConcepts, int conceptsFirePerCycle, int taskLinksPerConcept, int termLinksPerConcept, @NotNull Random random, @NotNull TermIndex index, @NotNull Time time, Executioner exe) {
         super(time, index, random, Param.defaultSelf(), exe);
 
 
+        ConceptBagCycle c = new ConceptBagCycle(this, newDeriver(), activeConcepts);
 
+        c.termlinksFiredPerFiredConcept.set(1, termLinksPerConcept);
+        c.tasklinksFiredPerFiredConcept.set(taskLinksPerConcept);
+        c.conceptsFiredPerCycle.set(conceptsFirePerCycle);
 
-
-        this.core = newCore(activeConcepts, termLinksPerConcept, taskLinksPerConcept, conceptsFirePerCycle);
+        this.core = c;
 
 
         int level = level();
@@ -91,17 +92,6 @@ public class Default extends NAR {
         }
 
 
-    }
-
-    protected ConceptBagCycle newCore(int activeConcepts, int termLinksPerConcept, int taskLinksPerConcept, int conceptsFirePerCycle) {
-
-        ConceptBagCycle c = new ConceptBagCycle(this, newDeriver(), activeConcepts);
-
-        c.termlinksFiredPerFiredConcept.set(1, termLinksPerConcept);
-        c.tasklinksFiredPerFiredConcept.set(taskLinksPerConcept);
-        c.conceptsFiredPerCycle.set(conceptsFirePerCycle);
-
-        return c;
     }
 
     protected Deriver newDeriver() {

@@ -17,11 +17,11 @@
 package org.apache.lucene.analysis.tr;
 
 
-import java.io.IOException;
-
 import org.apache.lucene.analysis.TokenFilter;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
+
+import java.io.IOException;
 
 /**
  * Normalizes Turkish token text to lower case.

@@ -32,7 +32,7 @@ public class TaskStatistics {
     }
 
     public TaskStatistics add(Concept c) {
-        c.forEachTask(this::add, true,true,true,true);
+        c.forEachTask(true, true, true, true, this::add);
         return this;
     }
 

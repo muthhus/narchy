@@ -11,10 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.function.Consumer;
-
-import static java.util.stream.Collectors.toList;
 
 /**
  * Implements a strategy for managing submitted derivation processes

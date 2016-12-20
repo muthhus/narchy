@@ -1,9 +1,7 @@
 package nars.index.term;
 
-import jcog.Util;
 import jcog.map.nbhm.HijacKache;
 import nars.*;
-import nars.Op;
 import nars.concept.Concept;
 import nars.concept.util.ConceptBuilder;
 import nars.concept.util.InvalidConceptException;
@@ -16,7 +14,6 @@ import nars.term.Term;
 import nars.term.Termed;
 import nars.term.Terms;
 import nars.term.atom.Atom;
-import nars.term.atom.Atomic;
 import nars.term.compound.ProtoCompound;
 import nars.term.container.TermContainer;
 import nars.term.subst.MapSubst;
@@ -38,7 +35,8 @@ import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import static nars.Op.*;
+import static nars.Op.INH;
+import static nars.Op.PROD;
 import static nars.term.Term.False;
 import static nars.term.Termed.termOrNull;
 

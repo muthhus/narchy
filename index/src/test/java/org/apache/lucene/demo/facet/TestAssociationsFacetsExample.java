@@ -17,11 +17,11 @@
 package org.apache.lucene.demo.facet;
 
 
-import java.util.List;
-
 import org.apache.lucene.facet.FacetResult;
 import org.apache.lucene.util.LuceneTestCase;
 import org.junit.Test;
+
+import java.util.List;
 
 public class TestAssociationsFacetsExample extends LuceneTestCase {
   

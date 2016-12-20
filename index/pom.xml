@@ -8,7 +8,12 @@
     <version>0.0.1-SNAPSHOT</version>
     <inceptionYear>2016</inceptionYear>
     <packaging>jar</packaging>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
+        <maven.compiler.source>1.9</maven.compiler.source>
+        <maven.compiler.target>1.9</maven.compiler.target>
+    </properties>
     <licenses>
         <license>
             <name>GNU AFFERO GENERAL PUBLIC LICENSE (AGPL)</name>

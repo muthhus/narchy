@@ -16,13 +16,13 @@
  */
 package org.apache.lucene.analysis.cz;
 
-import java.io.IOException;
-
-import org.apache.lucene.analysis.miscellaneous.SetKeywordMarkerFilter; // for javadoc
 import org.apache.lucene.analysis.TokenFilter;
 import org.apache.lucene.analysis.TokenStream;
-import org.apache.lucene.analysis.tokenattributes.KeywordAttribute;
+import org.apache.lucene.analysis.miscellaneous.SetKeywordMarkerFilter;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
+import org.apache.lucene.analysis.tokenattributes.KeywordAttribute;
+
+import java.io.IOException;
 
 
 /**

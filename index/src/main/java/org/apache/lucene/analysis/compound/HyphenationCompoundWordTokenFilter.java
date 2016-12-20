@@ -16,13 +16,13 @@
  */
 package org.apache.lucene.analysis.compound;
 
-import java.io.IOException;
-
 import org.apache.lucene.analysis.CharArraySet;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.compound.hyphenation.Hyphenation;
 import org.apache.lucene.analysis.compound.hyphenation.HyphenationTree;
 import org.xml.sax.InputSource;
+
+import java.io.IOException;
 
 /**
  * A {@link org.apache.lucene.analysis.TokenFilter} that decomposes compound words found in many Germanic languages.

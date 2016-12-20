@@ -17,20 +17,14 @@
 package org.apache.lucene.analysis.shingle;
 
 
+import org.apache.lucene.analysis.*;
+import org.apache.lucene.analysis.core.KeywordTokenizer;
+import org.apache.lucene.analysis.core.WhitespaceTokenizer;
+import org.apache.lucene.analysis.tokenattributes.TypeAttribute;
+
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.Random;
-
-import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.BaseTokenStreamTestCase;
-import org.apache.lucene.analysis.CannedTokenStream;
-import org.apache.lucene.analysis.MockTokenizer;
-import org.apache.lucene.analysis.Token;
-import org.apache.lucene.analysis.TokenStream;
-import org.apache.lucene.analysis.Tokenizer;
-import org.apache.lucene.analysis.core.KeywordTokenizer;
-import org.apache.lucene.analysis.core.WhitespaceTokenizer;
-import org.apache.lucene.analysis.tokenattributes.*;
 
 public class ShingleFilterTest extends BaseTokenStreamTestCase {
 

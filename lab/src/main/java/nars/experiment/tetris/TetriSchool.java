@@ -13,11 +13,11 @@ import nars.time.RealTime;
 import spacegraph.Ortho;
 import spacegraph.SpaceGraph;
 import spacegraph.Surface;
+import spacegraph.render.Draw;
 import spacegraph.space.CrosshairSurface;
 import spacegraph.space.widget.*;
 import spacegraph.space.widget.console.ConsoleSurface;
 import spacegraph.space.widget.console.ConsoleTerminal;
-import spacegraph.render.Draw;
 
 import java.awt.*;
 import java.util.List;

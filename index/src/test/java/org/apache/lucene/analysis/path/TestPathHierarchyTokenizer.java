@@ -17,15 +17,15 @@
 package org.apache.lucene.analysis.path;
 
 
-import java.io.Reader;
-import java.io.StringReader;
-import java.util.Random;
-
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.BaseTokenStreamTestCase;
 import org.apache.lucene.analysis.Tokenizer;
 import org.apache.lucene.analysis.charfilter.MappingCharFilter;
 import org.apache.lucene.analysis.charfilter.NormalizeCharMap;
+
+import java.io.Reader;
+import java.io.StringReader;
+import java.util.Random;
 
 import static org.apache.lucene.analysis.path.PathHierarchyTokenizer.DEFAULT_DELIMITER;
 import static org.apache.lucene.analysis.path.PathHierarchyTokenizer.DEFAULT_SKIP;

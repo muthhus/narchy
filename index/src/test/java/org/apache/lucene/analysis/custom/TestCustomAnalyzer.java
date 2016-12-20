@@ -17,6 +17,21 @@
 package org.apache.lucene.analysis.custom;
 
 
+import org.apache.lucene.analysis.BaseTokenStreamTestCase;
+import org.apache.lucene.analysis.CharFilter;
+import org.apache.lucene.analysis.TokenStream;
+import org.apache.lucene.analysis.Tokenizer;
+import org.apache.lucene.analysis.charfilter.HTMLStripCharFilterFactory;
+import org.apache.lucene.analysis.core.*;
+import org.apache.lucene.analysis.miscellaneous.ASCIIFoldingFilterFactory;
+import org.apache.lucene.analysis.standard.ClassicTokenizerFactory;
+import org.apache.lucene.analysis.standard.StandardTokenizerFactory;
+import org.apache.lucene.analysis.util.*;
+import org.apache.lucene.util.AttributeFactory;
+import org.apache.lucene.util.BytesRef;
+import org.apache.lucene.util.SetOnce.AlreadySetException;
+import org.apache.lucene.util.Version;
+
 import java.io.IOException;
 import java.io.Reader;
 import java.nio.file.Paths;
@@ -24,29 +39,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.apache.lucene.analysis.BaseTokenStreamTestCase;
-import org.apache.lucene.analysis.CharFilter;
-import org.apache.lucene.analysis.TokenStream;
-import org.apache.lucene.analysis.Tokenizer;
-import org.apache.lucene.analysis.charfilter.HTMLStripCharFilterFactory;
-import org.apache.lucene.analysis.core.KeywordTokenizerFactory;
-import org.apache.lucene.analysis.core.LowerCaseFilterFactory;
-import org.apache.lucene.analysis.core.LowerCaseTokenizer;
-import org.apache.lucene.analysis.core.StopFilterFactory;
-import org.apache.lucene.analysis.core.WhitespaceTokenizerFactory;
-import org.apache.lucene.analysis.miscellaneous.ASCIIFoldingFilterFactory;
-import org.apache.lucene.analysis.standard.ClassicTokenizerFactory;
-import org.apache.lucene.analysis.standard.StandardTokenizerFactory;
-import org.apache.lucene.analysis.util.AbstractAnalysisFactory;
-import org.apache.lucene.analysis.util.CharFilterFactory;
-import org.apache.lucene.analysis.util.MultiTermAwareComponent;
-import org.apache.lucene.analysis.util.TokenFilterFactory;
-import org.apache.lucene.analysis.util.TokenizerFactory;
-import org.apache.lucene.util.AttributeFactory;
-import org.apache.lucene.util.BytesRef;
-import org.apache.lucene.util.SetOnce.AlreadySetException;
-import org.apache.lucene.util.Version;
 
 public class TestCustomAnalyzer extends BaseTokenStreamTestCase {
   

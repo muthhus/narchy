@@ -16,15 +16,15 @@
  */
 package org.apache.lucene.analysis.pattern;
 
-import java.io.IOException;
-import java.io.Reader;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import org.apache.lucene.analysis.Tokenizer;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.apache.lucene.analysis.tokenattributes.OffsetAttribute;
 import org.apache.lucene.util.AttributeFactory;
+
+import java.io.IOException;
+import java.io.Reader;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * This tokenizer uses regex pattern matching to construct distinct tokens

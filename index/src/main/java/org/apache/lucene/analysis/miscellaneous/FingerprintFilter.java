@@ -16,19 +16,14 @@
  */
 package org.apache.lucene.analysis.miscellaneous;
 
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.Comparator;
-
 import org.apache.lucene.analysis.CharArraySet;
 import org.apache.lucene.analysis.TokenFilter;
 import org.apache.lucene.analysis.TokenStream;
-import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
-import org.apache.lucene.analysis.tokenattributes.OffsetAttribute;
-import org.apache.lucene.analysis.tokenattributes.PositionIncrementAttribute;
-import org.apache.lucene.analysis.tokenattributes.PositionLengthAttribute;
-import org.apache.lucene.analysis.tokenattributes.TypeAttribute;
-import org.apache.lucene.util.AttributeSource;
+import org.apache.lucene.analysis.tokenattributes.*;
+
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.Comparator;
 
 /**
  * Filter outputs a single token which is a concatenation of the sorted and

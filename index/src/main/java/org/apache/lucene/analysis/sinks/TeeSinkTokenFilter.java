@@ -17,14 +17,14 @@
 package org.apache.lucene.analysis.sinks;
 
 
+import org.apache.lucene.analysis.TokenFilter;
+import org.apache.lucene.analysis.TokenStream;
+import org.apache.lucene.util.AttributeSource;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-
-import org.apache.lucene.analysis.TokenFilter;
-import org.apache.lucene.analysis.TokenStream;
-import org.apache.lucene.util.AttributeSource;
 
 /**
  * This TokenFilter provides the ability to set aside attribute states that have already been analyzed. This is useful

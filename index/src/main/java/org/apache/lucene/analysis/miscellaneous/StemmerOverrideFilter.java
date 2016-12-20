@@ -17,24 +17,18 @@
 package org.apache.lucene.analysis.miscellaneous;
 
 
-import java.io.IOException;
-import java.util.ArrayList;
-
 import org.apache.lucene.analysis.TokenFilter;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.apache.lucene.analysis.tokenattributes.KeywordAttribute;
-import org.apache.lucene.util.ArrayUtil;
-import org.apache.lucene.util.BytesRef;
-import org.apache.lucene.util.BytesRefBuilder;
-import org.apache.lucene.util.BytesRefHash;
-import org.apache.lucene.util.CharsRefBuilder;
-import org.apache.lucene.util.IntsRefBuilder;
-import org.apache.lucene.util.UnicodeUtil;
+import org.apache.lucene.util.*;
 import org.apache.lucene.util.fst.ByteSequenceOutputs;
 import org.apache.lucene.util.fst.FST;
 import org.apache.lucene.util.fst.FST.Arc;
 import org.apache.lucene.util.fst.FST.BytesReader;
+
+import java.io.IOException;
+import java.util.ArrayList;
 
 /**
  * Provides the ability to override any {@link KeywordAttribute} aware stemmer

@@ -4,7 +4,6 @@ import nars.NAR;
 import nars.bag.impl.Bagregate;
 import nars.concept.Concept;
 import nars.link.BLink;
-import nars.nar.Default;
 import nars.term.Term;
 
 import java.util.Collection;

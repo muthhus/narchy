@@ -17,10 +17,10 @@
 package org.apache.lucene.analysis.util;
 
 
+import org.apache.lucene.analysis.TokenStream;
+
 import java.util.Map;
 import java.util.Set;
-
-import org.apache.lucene.analysis.TokenStream;
 
 /**
  * Abstract parent class for analysis factories that create {@link org.apache.lucene.analysis.TokenFilter}

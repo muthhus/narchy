@@ -17,16 +17,16 @@
 package org.apache.lucene.analysis.core;
 
 
-import java.io.IOException;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
-
 import org.apache.lucene.analysis.BaseTokenStreamTestCase;
 import org.apache.lucene.analysis.CharArraySet;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.apache.lucene.analysis.tokenattributes.PositionIncrementAttribute;
+
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
 
 public class TestStopAnalyzer extends BaseTokenStreamTestCase {
   

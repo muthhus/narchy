@@ -17,24 +17,19 @@
 package org.apache.lucene.analysis.core;
 
 
-import java.io.Reader;
-import java.io.StringReader;
-import java.util.Random;
-
-import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.BaseTokenStreamTestCase;
-import org.apache.lucene.analysis.MockAnalyzer;
-import org.apache.lucene.analysis.MockReaderWrapper;
-import org.apache.lucene.analysis.TokenStream;
-import org.apache.lucene.analysis.Tokenizer;
+import org.apache.lucene.analysis.*;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.apache.lucene.analysis.tokenattributes.OffsetAttribute;
 import org.apache.lucene.analysis.tokenattributes.PositionIncrementAttribute;
 import org.apache.lucene.util.IOUtils;
 import org.apache.lucene.util.TestUtil;
-import org.apache.lucene.util.automaton.Operations;
-import org.apache.lucene.util.automaton.CharacterRunAutomaton;
 import org.apache.lucene.util.automaton.Automaton;
+import org.apache.lucene.util.automaton.CharacterRunAutomaton;
+import org.apache.lucene.util.automaton.Operations;
+
+import java.io.Reader;
+import java.io.StringReader;
+import java.util.Random;
 
 /**
  * Compares MockTokenizer (which is simple with no optimizations) with equivalent 

@@ -21,6 +21,7 @@ import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.apache.lucene.analysis.tokenattributes.PayloadAttribute;
 import org.apache.lucene.util.BytesRef;
+
 import java.nio.charset.StandardCharsets;
 
 public class DelimitedPayloadTokenFilterTest extends BaseTokenStreamTestCase {

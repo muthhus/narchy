@@ -1,6 +1,6 @@
 package jcog.version;
 
-import jcog.data.DequePool;
+import jcog.data.pool.DequePool;
 import jcog.list.FasterList;
 import org.jetbrains.annotations.NotNull;
 

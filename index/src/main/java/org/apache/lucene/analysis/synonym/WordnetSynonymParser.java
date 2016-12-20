@@ -17,15 +17,15 @@
 package org.apache.lucene.analysis.synonym;
 
 
+import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.util.CharsRef;
+import org.apache.lucene.util.CharsRefBuilder;
+
 import java.io.IOException;
 import java.io.LineNumberReader;
 import java.io.Reader;
 import java.text.ParseException;
 import java.util.Arrays;
-
-import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.util.CharsRef;
-import org.apache.lucene.util.CharsRefBuilder;
 
 /**
  * Parser for wordnet prolog format

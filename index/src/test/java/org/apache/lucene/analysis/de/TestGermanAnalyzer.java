@@ -17,14 +17,14 @@
 package org.apache.lucene.analysis.de;
 
 
-import java.io.IOException;
-import java.io.StringReader;
-
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.BaseTokenStreamTestCase;
 import org.apache.lucene.analysis.CharArraySet;
 import org.apache.lucene.analysis.core.LowerCaseTokenizer;
 import org.apache.lucene.analysis.miscellaneous.SetKeywordMarkerFilter;
+
+import java.io.IOException;
+import java.io.StringReader;
 
 public class TestGermanAnalyzer extends BaseTokenStreamTestCase {
   public void testReusableTokenStream() throws Exception {

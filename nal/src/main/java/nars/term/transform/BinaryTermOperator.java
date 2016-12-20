@@ -8,6 +8,8 @@ import nars.term.Compound;
 import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.Serializable;
+
 /**
  * Created by me on 12/12/15.
  */

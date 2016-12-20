@@ -17,11 +17,6 @@
 package org.apache.lucene.analysis.hunspell;
 
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 import org.apache.lucene.analysis.CharArraySet;
 import org.apache.lucene.store.ByteArrayDataInput;
 import org.apache.lucene.util.ArrayUtil;
@@ -31,6 +26,11 @@ import org.apache.lucene.util.IntsRef;
 import org.apache.lucene.util.automaton.CharacterRunAutomaton;
 import org.apache.lucene.util.fst.FST;
 import org.apache.lucene.util.fst.Outputs;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Stemmer uses the affix rules declared in the Dictionary to generate one or more stems for a word.  It

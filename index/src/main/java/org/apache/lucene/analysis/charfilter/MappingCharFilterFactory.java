@@ -17,6 +17,8 @@
 package org.apache.lucene.analysis.charfilter;
 
 
+import org.apache.lucene.analysis.util.*;
+
 import java.io.IOException;
 import java.io.Reader;
 import java.util.ArrayList;
@@ -24,12 +26,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import org.apache.lucene.analysis.util.AbstractAnalysisFactory;
-import org.apache.lucene.analysis.util.CharFilterFactory;
-import org.apache.lucene.analysis.util.MultiTermAwareComponent;
-import org.apache.lucene.analysis.util.ResourceLoader;
-import org.apache.lucene.analysis.util.ResourceLoaderAware;
 
 /**
  * Factory for {@link MappingCharFilter}. 

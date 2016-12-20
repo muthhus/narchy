@@ -17,14 +17,14 @@
 package org.apache.lucene.analysis.th;
 
 
-import java.text.BreakIterator;
-import java.util.Locale;
-
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.apache.lucene.analysis.tokenattributes.OffsetAttribute;
 import org.apache.lucene.analysis.util.CharArrayIterator;
 import org.apache.lucene.analysis.util.SegmentingTokenizerBase;
 import org.apache.lucene.util.AttributeFactory;
+
+import java.text.BreakIterator;
+import java.util.Locale;
 
 /**
  * Tokenizer that use {@link BreakIterator} to tokenize Thai text.

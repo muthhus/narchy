@@ -17,17 +17,17 @@
 package org.apache.lucene.analysis.miscellaneous;
 
 
-import java.io.IOException;
-
-import org.apache.lucene.analysis.tokenattributes.TermToBytesRefAttribute;
 import org.apache.lucene.analysis.BaseTokenStreamTestCase;
 import org.apache.lucene.analysis.TokenStream;
+import org.apache.lucene.analysis.tokenattributes.TermToBytesRefAttribute;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.StringField;
 import org.apache.lucene.document.TextField;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.store.Directory;
+
+import java.io.IOException;
 
 public class TestEmptyTokenStream extends BaseTokenStreamTestCase {
 

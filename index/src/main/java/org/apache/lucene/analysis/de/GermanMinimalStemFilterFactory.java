@@ -17,11 +17,10 @@
 package org.apache.lucene.analysis.de;
 
 
-import java.util.Map;
-
 import org.apache.lucene.analysis.TokenStream;
-import org.apache.lucene.analysis.de.GermanMinimalStemFilter;
 import org.apache.lucene.analysis.util.TokenFilterFactory;
+
+import java.util.Map;
 
 /**
  * Factory for {@link GermanMinimalStemFilter}.

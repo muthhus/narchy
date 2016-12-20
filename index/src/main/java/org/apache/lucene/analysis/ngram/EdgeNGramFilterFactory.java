@@ -17,11 +17,11 @@
 package org.apache.lucene.analysis.ngram;
 
 
-import java.util.Map;
-
 import org.apache.lucene.analysis.TokenFilter;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.util.TokenFilterFactory;
+
+import java.util.Map;
 
 /**
  * Creates new instances of {@link EdgeNGramTokenFilter}.

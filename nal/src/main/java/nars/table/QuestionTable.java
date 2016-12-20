@@ -2,11 +2,13 @@ package nars.table;
 
 import nars.NAR;
 import nars.Task;
-import nars.concept.Concept;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.Spliterator;
+import java.util.Spliterators;
 
 /** task table used for storing Questions and Quests.
  *  simpler than Belief/Goal tables

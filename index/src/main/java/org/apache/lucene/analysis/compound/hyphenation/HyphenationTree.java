@@ -16,12 +16,12 @@
  */
 package org.apache.lucene.analysis.compound.hyphenation;
 
+import org.xml.sax.InputSource;
+
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.HashMap;
-
-import org.xml.sax.InputSource;
 
 /**
  * This tree structure stores the hyphenation patterns in an efficient way for

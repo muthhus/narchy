@@ -18,14 +18,14 @@
 package org.apache.lucene.analysis.standard;
 
 
-import java.io.IOException;
-
 import org.apache.lucene.analysis.Tokenizer;
+import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.apache.lucene.analysis.tokenattributes.OffsetAttribute;
 import org.apache.lucene.analysis.tokenattributes.PositionIncrementAttribute;
-import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.apache.lucene.analysis.tokenattributes.TypeAttribute;
 import org.apache.lucene.util.AttributeFactory;
+
+import java.io.IOException;
 
 /**
  * This class implements Word Break rules from the Unicode Text Segmentation 

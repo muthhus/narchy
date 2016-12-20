@@ -17,12 +17,12 @@
 package org.apache.lucene.analysis.util;
 
 
+import org.apache.lucene.analysis.BaseTokenStreamTestCase;
+import org.apache.lucene.util.Version;
+
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
-
-import org.apache.lucene.analysis.BaseTokenStreamTestCase;
-import org.apache.lucene.util.Version;
 
 /** 
  * Base class for testing tokenstream factories. 

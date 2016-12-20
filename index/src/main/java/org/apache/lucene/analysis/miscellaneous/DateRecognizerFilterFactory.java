@@ -17,13 +17,13 @@
 package org.apache.lucene.analysis.miscellaneous;
 
 
+import org.apache.lucene.analysis.TokenStream;
+import org.apache.lucene.analysis.util.TokenFilterFactory;
+
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 import java.util.Map;
-
-import org.apache.lucene.analysis.TokenStream;
-import org.apache.lucene.analysis.util.TokenFilterFactory;
 
 /**
  * Factory for {@link DateRecognizerFilter}.

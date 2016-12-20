@@ -7,10 +7,9 @@ import org.jetbrains.annotations.Nullable;
 import spacegraph.SpaceGraph;
 import spacegraph.Surface;
 import spacegraph.input.Finger;
-import spacegraph.space.Cuboid;
+import spacegraph.render.Draw;
 import spacegraph.space.layout.Stacking;
 import spacegraph.space.widget.console.ConsoleTerminal;
-import spacegraph.render.Draw;
 
 import static spacegraph.space.layout.Grid.*;
 

@@ -16,10 +16,10 @@
  */
 package org.apache.lucene.analysis.util;
 
+import org.apache.lucene.util.ArrayUtil;
+
 import java.io.IOException;
 import java.io.Reader;
-
-import org.apache.lucene.util.ArrayUtil;
 
 /** Acts like a forever growing char[] as you read
  *  characters into it from the provided reader, but

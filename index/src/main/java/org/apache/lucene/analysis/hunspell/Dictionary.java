@@ -17,14 +17,19 @@
 package org.apache.lucene.analysis.hunspell;
 
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.LineNumberReader;
-import java.io.OutputStream;
+import org.apache.lucene.codecs.CodecUtil;
+import org.apache.lucene.store.ByteArrayDataOutput;
+import org.apache.lucene.store.Directory;
+import org.apache.lucene.store.IOContext;
+import org.apache.lucene.store.IndexOutput;
+import org.apache.lucene.util.*;
+import org.apache.lucene.util.OfflineSorter.ByteSequencesReader;
+import org.apache.lucene.util.OfflineSorter.ByteSequencesWriter;
+import org.apache.lucene.util.automaton.CharacterRunAutomaton;
+import org.apache.lucene.util.automaton.RegExp;
+import org.apache.lucene.util.fst.*;
+
+import java.io.*;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CodingErrorAction;
@@ -33,44 +38,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import org.apache.lucene.codecs.CodecUtil;
-import org.apache.lucene.store.ByteArrayDataOutput;
-import org.apache.lucene.store.Directory;
-import org.apache.lucene.store.IOContext;
-import org.apache.lucene.store.IndexOutput;
-import org.apache.lucene.util.ArrayUtil;
-import org.apache.lucene.util.BytesRef;
-import org.apache.lucene.util.BytesRefBuilder;
-import org.apache.lucene.util.BytesRefHash;
-import org.apache.lucene.util.CharsRef;
-import org.apache.lucene.util.IOUtils;
-import org.apache.lucene.util.IntsRef;
-import org.apache.lucene.util.IntsRefBuilder;
-import org.apache.lucene.util.OfflineSorter.ByteSequencesReader;
-import org.apache.lucene.util.OfflineSorter.ByteSequencesWriter;
-import org.apache.lucene.util.OfflineSorter;
-import org.apache.lucene.util.RamUsageEstimator;
-import org.apache.lucene.util.automaton.CharacterRunAutomaton;
-import org.apache.lucene.util.automaton.RegExp;
-import org.apache.lucene.util.fst.Builder;
-import org.apache.lucene.util.fst.CharSequenceOutputs;
-import org.apache.lucene.util.fst.FST;
-import org.apache.lucene.util.fst.IntSequenceOutputs;
-import org.apache.lucene.util.fst.Outputs;
-import org.apache.lucene.util.fst.Util;
 
 /**
  * In-memory structure for the dictionary (.dic) and affix (.aff)

@@ -17,20 +17,15 @@
 package org.apache.lucene.analysis.no;
 
 
+import org.apache.lucene.analysis.*;
+import org.apache.lucene.analysis.core.KeywordTokenizer;
+import org.apache.lucene.analysis.miscellaneous.SetKeywordMarkerFilter;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Random;
 
-import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.BaseTokenStreamTestCase;
-import org.apache.lucene.analysis.CharArraySet;
-import org.apache.lucene.analysis.MockTokenizer;
-import org.apache.lucene.analysis.TokenStream;
-import org.apache.lucene.analysis.Tokenizer;
-import org.apache.lucene.analysis.core.KeywordTokenizer;
-import org.apache.lucene.analysis.miscellaneous.SetKeywordMarkerFilter;
-
-import static org.apache.lucene.analysis.VocabularyAssert.*;
+import static org.apache.lucene.analysis.VocabularyAssert.assertVocabulary;
 import static org.apache.lucene.analysis.no.NorwegianLightStemmer.BOKMAAL;
 import static org.apache.lucene.analysis.no.NorwegianLightStemmer.NYNORSK;
 

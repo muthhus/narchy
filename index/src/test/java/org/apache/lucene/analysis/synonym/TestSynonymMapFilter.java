@@ -16,28 +16,18 @@
  */
 package org.apache.lucene.analysis.synonym;
 
-import java.io.IOException;
-import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.Set;
-
-import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.BaseTokenStreamTestCase;
-import org.apache.lucene.analysis.MockAnalyzer;
-import org.apache.lucene.analysis.MockTokenizer;
-import org.apache.lucene.analysis.Tokenizer;
-import org.apache.lucene.analysis.TokenStream;
-import org.apache.lucene.analysis.MockGraphTokenFilter;
+import org.apache.lucene.analysis.*;
 import org.apache.lucene.analysis.core.KeywordTokenizer;
-import org.apache.lucene.analysis.tokenattributes.*;
+import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
+import org.apache.lucene.analysis.tokenattributes.OffsetAttribute;
+import org.apache.lucene.analysis.tokenattributes.PositionIncrementAttribute;
+import org.apache.lucene.analysis.tokenattributes.PositionLengthAttribute;
 import org.apache.lucene.util.CharsRefBuilder;
 import org.apache.lucene.util.TestUtil;
+
+import java.io.IOException;
+import java.io.StringReader;
+import java.util.*;
 
 public class TestSynonymMapFilter extends BaseTokenStreamTestCase {
 

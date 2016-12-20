@@ -17,33 +17,19 @@
 package org.apache.lucene.analysis.custom;
 
 
-import static org.apache.lucene.analysis.util.AnalysisSPILoader.newFactoryClassInstance;
+import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.analysis.TokenStream;
+import org.apache.lucene.analysis.Tokenizer;
+import org.apache.lucene.analysis.util.*;
+import org.apache.lucene.util.SetOnce;
+import org.apache.lucene.util.Version;
 
 import java.io.IOException;
 import java.io.Reader;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
-import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.TokenStream;
-import org.apache.lucene.analysis.Tokenizer;
-import org.apache.lucene.analysis.util.AbstractAnalysisFactory;
-import org.apache.lucene.analysis.util.CharFilterFactory;
-import org.apache.lucene.analysis.util.ClasspathResourceLoader;
-import org.apache.lucene.analysis.util.FilesystemResourceLoader;
-import org.apache.lucene.analysis.util.MultiTermAwareComponent;
-import org.apache.lucene.analysis.util.ResourceLoader;
-import org.apache.lucene.analysis.util.ResourceLoaderAware;
-import org.apache.lucene.analysis.util.TokenFilterFactory;
-import org.apache.lucene.analysis.util.TokenizerFactory;
-import org.apache.lucene.util.SetOnce;
-import org.apache.lucene.util.Version;
+import static org.apache.lucene.analysis.util.AnalysisSPILoader.newFactoryClassInstance;
 
 /**
  * A general-purpose Analyzer that can be created with a builder-style API.

@@ -92,6 +92,7 @@ public class IO {
         return Truth.unhash(in.readInt(), Param.TRUTH_EPSILON);
     }
 
+
     /** with Term first */
     public static void writeTask(@NotNull DataOutput out, @NotNull Task t) throws IOException {
 

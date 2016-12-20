@@ -17,13 +17,8 @@
 package org.apache.lucene.analysis.util;
 
 
-import java.io.IOException;
-import java.util.Objects;
-import java.util.function.IntPredicate;
-import java.util.function.IntUnaryOperator;
-
-import org.apache.lucene.analysis.CharacterUtils.CharacterBuffer;
 import org.apache.lucene.analysis.CharacterUtils;
+import org.apache.lucene.analysis.CharacterUtils.CharacterBuffer;
 import org.apache.lucene.analysis.LowerCaseFilter;
 import org.apache.lucene.analysis.Tokenizer;
 import org.apache.lucene.analysis.core.LetterTokenizer;
@@ -32,6 +27,11 @@ import org.apache.lucene.analysis.core.WhitespaceTokenizer;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.apache.lucene.analysis.tokenattributes.OffsetAttribute;
 import org.apache.lucene.util.AttributeFactory;
+
+import java.io.IOException;
+import java.util.Objects;
+import java.util.function.IntPredicate;
+import java.util.function.IntUnaryOperator;
 
 /**
  * An abstract base class for simple, character-oriented tokenizers.

@@ -17,11 +17,11 @@
 package org.apache.lucene.analysis.charfilter;
 
 
-import java.io.Reader;
-import java.io.StringReader;
-
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.util.BaseTokenStreamFactoryTestCase;
+
+import java.io.Reader;
+import java.io.StringReader;
 
 /**
  * Simple tests to ensure this factory is working

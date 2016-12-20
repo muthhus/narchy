@@ -17,15 +17,15 @@
 package org.apache.lucene.analysis.snowball;
 
 
-import java.io.IOException;
-
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.Tokenizer;
 import org.apache.lucene.analysis.core.KeywordTokenizer;
 import org.apache.lucene.util.LuceneTestCase;
 import org.apache.lucene.util.LuceneTestCase.Slow;
 
-import static org.apache.lucene.analysis.VocabularyAssert.*;
+import java.io.IOException;
+
+import static org.apache.lucene.analysis.VocabularyAssert.assertVocabulary;
 
 /**
  * Test the snowball filters against the snowball data tests

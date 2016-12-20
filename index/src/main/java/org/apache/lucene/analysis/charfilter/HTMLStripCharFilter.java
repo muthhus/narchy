@@ -19,15 +19,15 @@
 
 package org.apache.lucene.analysis.charfilter;
 
+import org.apache.lucene.analysis.CharArrayMap;
+import org.apache.lucene.analysis.CharArraySet;
+import org.apache.lucene.analysis.util.OpenStringBuilder;
+
 import java.io.IOException;
 import java.io.Reader;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-
-import org.apache.lucene.analysis.CharArrayMap;
-import org.apache.lucene.analysis.CharArraySet;
-import org.apache.lucene.analysis.util.OpenStringBuilder;
 
 /**
  * A CharFilter that wraps another Reader and attempts to strip out HTML constructs.

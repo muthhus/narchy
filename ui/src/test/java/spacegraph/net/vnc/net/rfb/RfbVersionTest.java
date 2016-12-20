@@ -13,8 +13,8 @@
  *******************************************************************************/
 package spacegraph.net.vnc.net.rfb;
 
-import spacegraph.net.vnc.rfb.codec.ProtocolVersion;
 import org.junit.Test;
+import spacegraph.net.vnc.rfb.codec.ProtocolVersion;
 
 import static org.junit.Assert.*;
 

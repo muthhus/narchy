@@ -17,12 +17,12 @@
 package org.apache.lucene.analysis.pattern;
 
 
+import org.apache.lucene.analysis.CharFilter;
+import org.apache.lucene.analysis.util.CharFilterFactory;
+
 import java.io.Reader;
 import java.util.Map;
 import java.util.regex.Pattern;
-
-import org.apache.lucene.analysis.CharFilter;
-import org.apache.lucene.analysis.util.CharFilterFactory;
 
 /**
  * Factory for {@link PatternReplaceCharFilter}. 

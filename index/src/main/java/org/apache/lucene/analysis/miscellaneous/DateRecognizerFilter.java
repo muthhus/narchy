@@ -17,13 +17,13 @@
 package org.apache.lucene.analysis.miscellaneous;
 
 
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.util.Locale;
-
 import org.apache.lucene.analysis.FilteringTokenFilter;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
+
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.util.Locale;
 
 /** Filters all tokens that cannot be parsed to a date, using the provided {@link DateFormat}. */
 public class DateRecognizerFilter extends FilteringTokenFilter {

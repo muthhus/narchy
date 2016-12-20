@@ -2,10 +2,10 @@ package nars.video;
 
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.spi.ILoggingEvent;
-import nars.decide.DefaultConsoleAppender;
 import nars.$;
-import spacegraph.index.RTree;
-import spacegraph.index.Rect1D;
+import nars.decide.DefaultConsoleAppender;
+import jcog.spatial.RTree;
+import jcog.spatial.Rect1D;
 
 /**
  * Created by me on 12/2/16.

@@ -16,20 +16,16 @@
  */
 package org.apache.lucene.analysis.query;
 
-import java.io.IOException;
-import java.util.*;
-
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.AnalyzerWrapper;
 import org.apache.lucene.analysis.CharArraySet;
 import org.apache.lucene.analysis.StopFilter;
-import org.apache.lucene.index.IndexReader;
-import org.apache.lucene.index.MultiFields;
-import org.apache.lucene.index.Term;
-import org.apache.lucene.index.Terms;
-import org.apache.lucene.index.TermsEnum;
+import org.apache.lucene.index.*;
 import org.apache.lucene.util.BytesRef;
 import org.apache.lucene.util.CharsRefBuilder;
+
+import java.io.IOException;
+import java.util.*;
 
 /**
  * An {@link Analyzer} used primarily at query time to wrap another analyzer and provide a layer of protection

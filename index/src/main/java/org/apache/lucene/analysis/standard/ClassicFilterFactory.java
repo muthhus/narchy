@@ -17,12 +17,11 @@
 package org.apache.lucene.analysis.standard;
 
 
-import java.util.Map;
-
 import org.apache.lucene.analysis.TokenFilter;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.util.TokenFilterFactory;
-import org.apache.lucene.analysis.standard.ClassicFilter;
+
+import java.util.Map;
 
 /**
  * Factory for {@link ClassicFilter}.

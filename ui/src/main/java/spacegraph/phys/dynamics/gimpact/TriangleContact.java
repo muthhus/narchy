@@ -29,7 +29,6 @@ package spacegraph.phys.dynamics.gimpact;
 
 import spacegraph.math.Vector4f;
 import spacegraph.math.v3;
-import spacegraph.phys.BulletGlobals;
 import spacegraph.phys.util.OArrayList;
 
 import static spacegraph.phys.BulletGlobals.SIMD_EPSILON;

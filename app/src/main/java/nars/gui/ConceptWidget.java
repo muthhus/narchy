@@ -1,7 +1,6 @@
 package nars.gui;
 
 import com.jogamp.opengl.GL2;
-import jcog.Util;
 import nars.NAR;
 import nars.Task;
 import nars.bag.impl.ArrayBag;
@@ -13,14 +12,14 @@ import nars.term.Termed;
 import org.jetbrains.annotations.NotNull;
 import spacegraph.SpaceGraph;
 import spacegraph.Surface;
-import spacegraph.space.Cuboid;
-import spacegraph.space.EDraw;
-import spacegraph.space.widget.PushButton;
 import spacegraph.phys.Collidable;
 import spacegraph.phys.Dynamic;
 import spacegraph.phys.collision.ClosestRay;
 import spacegraph.render.Draw;
 import spacegraph.render.JoglPhysics;
+import spacegraph.space.Cuboid;
+import spacegraph.space.EDraw;
+import spacegraph.space.widget.PushButton;
 
 import java.util.HashMap;
 import java.util.function.Consumer;

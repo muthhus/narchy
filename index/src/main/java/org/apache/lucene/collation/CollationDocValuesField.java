@@ -17,11 +17,11 @@
 package org.apache.lucene.collation;
 
 
-import java.text.Collator;
-
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.SortedDocValuesField;
 import org.apache.lucene.util.BytesRef;
+
+import java.text.Collator;
 
 /**
  * Indexes collation keys as a single-valued {@link SortedDocValuesField}.

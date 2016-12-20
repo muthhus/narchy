@@ -18,13 +18,13 @@ import org.junit.Test;
 import java.util.Arrays;
 import java.util.DoubleSummaryStatistics;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiFunction;
 import java.util.function.IntFunction;
 
 import static nars.time.Tense.ETERNAL;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 
 /**
  * Created by me on 5/24/16.

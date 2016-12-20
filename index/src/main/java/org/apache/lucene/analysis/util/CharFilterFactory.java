@@ -17,11 +17,11 @@
 package org.apache.lucene.analysis.util;
 
 
+import org.apache.lucene.analysis.CharFilter;
+
 import java.io.Reader;
 import java.util.Map;
 import java.util.Set;
-
-import org.apache.lucene.analysis.CharFilter;
 
 /**
  * Abstract parent class for analysis factories that create {@link CharFilter}

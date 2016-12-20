@@ -17,10 +17,6 @@
 package org.apache.lucene.analysis.compound;
 
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Map;
-
 import org.apache.lucene.analysis.CharArraySet;
 import org.apache.lucene.analysis.TokenFilter;
 import org.apache.lucene.analysis.TokenStream;
@@ -30,6 +26,10 @@ import org.apache.lucene.analysis.util.ResourceLoaderAware;
 import org.apache.lucene.analysis.util.TokenFilterFactory;
 import org.apache.lucene.util.IOUtils;
 import org.xml.sax.InputSource;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Map;
 
 /**
  * Factory for {@link HyphenationCompoundWordTokenFilter}.

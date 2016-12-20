@@ -17,12 +17,12 @@
 package org.apache.lucene.analysis.util;
 
 
-import java.io.IOException;
-
 import org.apache.lucene.analysis.CharArraySet;
 import org.apache.lucene.analysis.TokenFilter;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
+
+import java.io.IOException;
 
 /**
  * Removes elisions from a {@link TokenStream}. For example, "l'avion" (the plane) will be

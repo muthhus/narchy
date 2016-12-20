@@ -70,7 +70,7 @@ public class PacmanAgent extends NAgents {
     }
 
     public static void main(String[] args) {
-        runRT(PacmanAgent::new, 15, 5);
+        runRT(PacmanAgent::new, 15, 5, -1);
         //runRT(PacmanAgent::new);
     }
 

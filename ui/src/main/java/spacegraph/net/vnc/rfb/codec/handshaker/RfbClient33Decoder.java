@@ -16,6 +16,8 @@ package spacegraph.net.vnc.rfb.codec.handshaker;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ReplayingDecoder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import spacegraph.net.vnc.rfb.codec.PixelFormat;
 import spacegraph.net.vnc.rfb.codec.handshaker.event.SecurityResultEvent;
 import spacegraph.net.vnc.rfb.codec.handshaker.event.SecurityTypesEvent;
@@ -24,8 +26,6 @@ import spacegraph.net.vnc.rfb.codec.security.SecurityType;
 import spacegraph.net.vnc.rfb.codec.security.vncauth.VncAuthSecurityMessage;
 import spacegraph.net.vnc.rfb.exception.ProtocolException;
 import spacegraph.net.vnc.rfb.exception.SecurityException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;

@@ -17,11 +17,11 @@
 package org.apache.lucene.analysis.no;
 
 
-import java.io.IOException;
-
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.BaseTokenStreamTestCase;
 import org.apache.lucene.analysis.CharArraySet;
+
+import java.io.IOException;
 
 public class TestNorwegianAnalyzer extends BaseTokenStreamTestCase {
   /** This test fails with NPE when the 

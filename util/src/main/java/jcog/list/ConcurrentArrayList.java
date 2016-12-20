@@ -31,11 +31,9 @@ package jcog.list;
 
 import org.apache.commons.lang3.ArrayUtils;
 
-import java.lang.reflect.Array;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.AbstractList;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.function.Consumer;
 

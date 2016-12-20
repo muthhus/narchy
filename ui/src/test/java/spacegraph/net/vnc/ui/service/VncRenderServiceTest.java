@@ -14,7 +14,6 @@
 package spacegraph.net.vnc.ui.service;
 
 import org.junit.Test;
-import spacegraph.net.vnc.ui.service.VncRenderService;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;

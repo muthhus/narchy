@@ -36,6 +36,11 @@
             <scope>compile</scope>
         </dependency>
 
+        <dependency>
+            <groupId>org.infinispan</groupId>
+            <artifactId>infinispan-embedded-query</artifactId>
+            <version>9.0.0.Alpha4</version>
+        </dependency>
 
     </dependencies>
 

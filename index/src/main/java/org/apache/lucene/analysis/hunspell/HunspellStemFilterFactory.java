@@ -17,6 +17,14 @@
 package org.apache.lucene.analysis.hunspell;
 
 
+import org.apache.lucene.analysis.TokenStream;
+import org.apache.lucene.analysis.util.ResourceLoader;
+import org.apache.lucene.analysis.util.ResourceLoaderAware;
+import org.apache.lucene.analysis.util.TokenFilterFactory;
+import org.apache.lucene.store.Directory;
+import org.apache.lucene.store.FSDirectory;
+import org.apache.lucene.util.IOUtils;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -25,14 +33,6 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
-import org.apache.lucene.analysis.TokenStream;
-import org.apache.lucene.analysis.util.ResourceLoader;
-import org.apache.lucene.analysis.util.ResourceLoaderAware;
-import org.apache.lucene.analysis.util.TokenFilterFactory;
-import org.apache.lucene.store.Directory;
-import org.apache.lucene.store.FSDirectory;
-import org.apache.lucene.util.IOUtils;
 
 /**
  * TokenFilterFactory that creates instances of {@link HunspellStemFilter}.

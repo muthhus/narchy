@@ -9,10 +9,8 @@ import nars.budget.policy.ConceptState;
 import nars.table.BeliefTable;
 import nars.table.QuestionTable;
 import nars.term.Term;
-import nars.term.Terms;
 import nars.term.atom.Atomic;
 import nars.term.atom.AtomicStringConstant;
-import nars.term.container.TermContainer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -23,8 +21,8 @@ public class AtomConcept extends AtomicStringConstant implements Concept {
 
     private final Bag<Term> termLinks;
     private final Bag<Task> taskLinks;
-    @Nullable
-    private ConceptState state;
+
+    @Nullable private transient ConceptState state;
 
     @NotNull
     private final Op op;

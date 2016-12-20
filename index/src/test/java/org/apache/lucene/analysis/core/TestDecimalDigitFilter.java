@@ -24,11 +24,10 @@ import org.apache.lucene.analysis.Tokenizer;
 import org.apache.lucene.search.DocIdSetIterator;
 import org.apache.lucene.util.SparseFixedBitSet;
 import org.apache.lucene.util.TestUtil;
-
-import java.util.Random;
-
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+
+import java.util.Random;
 
 /**
  * Tests for {@link DecimalDigitFilter}

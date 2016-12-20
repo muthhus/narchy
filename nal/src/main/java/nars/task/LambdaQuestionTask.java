@@ -11,7 +11,6 @@ import org.jetbrains.annotations.NotNull;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
-import java.util.function.Predicate;
 
 /**
  * Question task which accepts a callback to be invoked on answers

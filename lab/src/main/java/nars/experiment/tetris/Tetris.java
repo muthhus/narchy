@@ -20,7 +20,7 @@ import org.jetbrains.annotations.NotNull;
 import spacegraph.SimpleSpatial;
 import spacegraph.SpaceGraph;
 import spacegraph.Spatial;
-import spacegraph.index.Rect1D;
+import jcog.spatial.Rect1D;
 import spacegraph.layout.Flatten;
 import spacegraph.math.v2;
 import spacegraph.space.layout.Grid;

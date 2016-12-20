@@ -17,10 +17,10 @@
 package org.apache.lucene.analysis.ar;
 
 
-import java.io.IOException;
-
 import org.apache.lucene.analysis.BaseTokenStreamTestCase;
 import org.apache.lucene.analysis.CharArraySet;
+
+import java.io.IOException;
 
 /**
  * Test the Arabic Analyzer

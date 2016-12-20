@@ -1,7 +1,5 @@
 package spacegraph.video;
 
-import boofcv.io.image.ConvertBufferedImage;
-import boofcv.io.image.ConvertRaster;
 import boofcv.struct.image.InterleavedU8;
 import com.github.sarxos.webcam.Webcam;
 import com.github.sarxos.webcam.WebcamEvent;

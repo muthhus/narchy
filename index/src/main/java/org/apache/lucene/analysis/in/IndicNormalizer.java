@@ -19,8 +19,9 @@ package org.apache.lucene.analysis.in;
 
 import java.util.BitSet;
 import java.util.IdentityHashMap;
+
 import static java.lang.Character.UnicodeBlock.*;
-import static org.apache.lucene.analysis.util.StemmerUtil.*;
+import static org.apache.lucene.analysis.util.StemmerUtil.delete;
 
 /**
  * Normalizes the Unicode representation of text in Indian languages.

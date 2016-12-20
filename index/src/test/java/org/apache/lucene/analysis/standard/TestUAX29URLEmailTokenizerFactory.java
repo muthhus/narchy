@@ -17,11 +17,11 @@
 package org.apache.lucene.analysis.standard;
 
 
-import java.io.Reader;
-import java.io.StringReader;
-
 import org.apache.lucene.analysis.Tokenizer;
 import org.apache.lucene.analysis.util.BaseTokenStreamFactoryTestCase;
+
+import java.io.Reader;
+import java.io.StringReader;
 
 /**
  * A few tests based on org.apache.lucene.analysis.TestUAX29URLEmailTokenizer

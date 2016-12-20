@@ -17,26 +17,20 @@
 package org.apache.lucene.analysis.core;
 
 
+import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.analysis.BaseTokenStreamTestCase;
+import org.apache.lucene.analysis.MockTokenizer;
+import org.apache.lucene.analysis.Tokenizer;
+import org.apache.lucene.analysis.util.*;
+import org.apache.lucene.util.AttributeFactory;
+import org.apache.lucene.util.Version;
+
 import java.io.IOException;
 import java.io.Reader;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
-
-import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.BaseTokenStreamTestCase;
-import org.apache.lucene.analysis.MockTokenizer;
-import org.apache.lucene.analysis.Tokenizer;
-import org.apache.lucene.analysis.util.AbstractAnalysisFactory;
-import org.apache.lucene.analysis.util.CharFilterFactory;
-import org.apache.lucene.analysis.util.MultiTermAwareComponent;
-import org.apache.lucene.analysis.util.ResourceLoaderAware;
-import org.apache.lucene.analysis.util.StringMockResourceLoader;
-import org.apache.lucene.analysis.util.TokenFilterFactory;
-import org.apache.lucene.analysis.util.TokenizerFactory;
-import org.apache.lucene.util.AttributeFactory;
-import org.apache.lucene.util.Version;
 
 /**
  * Sanity check some things about all factories,

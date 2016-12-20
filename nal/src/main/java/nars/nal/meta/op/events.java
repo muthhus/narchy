@@ -4,7 +4,6 @@ import nars.Task;
 import nars.nal.meta.AtomicBoolCondition;
 import nars.nal.meta.BoolCondition;
 import nars.nal.meta.Derivation;
-import nars.term.Compound;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

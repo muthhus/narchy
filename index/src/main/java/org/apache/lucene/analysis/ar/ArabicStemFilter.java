@@ -17,13 +17,13 @@
 package org.apache.lucene.analysis.ar;
 
 
-import java.io.IOException;
-
-import org.apache.lucene.analysis.miscellaneous.SetKeywordMarkerFilter; // javadoc @link
 import org.apache.lucene.analysis.TokenFilter;
 import org.apache.lucene.analysis.TokenStream;
-import org.apache.lucene.analysis.tokenattributes.KeywordAttribute;
+import org.apache.lucene.analysis.miscellaneous.SetKeywordMarkerFilter;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
+import org.apache.lucene.analysis.tokenattributes.KeywordAttribute;
+
+import java.io.IOException;
 
 /**
  * A {@link TokenFilter} that applies {@link ArabicStemmer} to stem Arabic words..

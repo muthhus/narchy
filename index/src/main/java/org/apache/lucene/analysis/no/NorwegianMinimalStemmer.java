@@ -52,9 +52,9 @@ package org.apache.lucene.analysis.no;
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-import static org.apache.lucene.analysis.util.StemmerUtil.*;
 import static org.apache.lucene.analysis.no.NorwegianLightStemmer.BOKMAAL;
 import static org.apache.lucene.analysis.no.NorwegianLightStemmer.NYNORSK;
+import static org.apache.lucene.analysis.util.StemmerUtil.endsWith;
 
 /**
  * Minimal Stemmer for Norwegian Bokmål (no-nb) and Nynorsk (no-nn)

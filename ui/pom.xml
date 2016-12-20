@@ -270,12 +270,6 @@
             <version>0.3.6</version>
         </dependency>
 
-        <!-- https://mvnrepository.com/artifact/org.infinispan/infinispan-core -->
-        <dependency>
-            <groupId>org.infinispan</groupId>
-            <artifactId>infinispan-core</artifactId>
-            <version>9.0.0.Beta1</version>
-        </dependency>
 
     </dependencies>
 

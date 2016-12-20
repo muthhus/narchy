@@ -17,6 +17,12 @@
 package org.apache.lucene.analysis.util;
 
 
+import org.apache.lucene.analysis.CharArraySet;
+import org.apache.lucene.analysis.StopFilter;
+import org.apache.lucene.analysis.WordlistLoader;
+import org.apache.lucene.util.IOUtils;
+import org.apache.lucene.util.Version;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -25,23 +31,10 @@ import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CodingErrorAction;
 import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
-
-import org.apache.lucene.analysis.CharArraySet;
-import org.apache.lucene.analysis.StopFilter;
-import org.apache.lucene.analysis.WordlistLoader;
-import org.apache.lucene.util.IOUtils;
-import org.apache.lucene.util.Version;
 
 /**
  * Abstract parent class for analysis factories {@link TokenizerFactory},

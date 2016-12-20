@@ -17,9 +17,9 @@ import nars.video.PixelBag;
 import nars.video.Sensor2D;
 import spacegraph.SpaceGraph;
 import spacegraph.Surface;
+import spacegraph.render.Draw;
 import spacegraph.space.layout.Grid;
 import spacegraph.space.widget.Plot2D;
-import spacegraph.render.Draw;
 
 import java.awt.*;
 import java.awt.geom.Rectangle2D;

@@ -5,7 +5,6 @@ import nars.$;
 import nars.NAR;
 import nars.Narsese;
 import nars.Task;
-import nars.table.BeliefTable;
 import nars.table.SensorBeliefTable;
 import nars.term.Compound;
 import nars.term.Term;

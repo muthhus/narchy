@@ -17,12 +17,12 @@
 package org.apache.lucene.analysis.path;
 
 
-import java.io.StringReader;
-import java.util.Random;
-
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.BaseTokenStreamTestCase;
 import org.apache.lucene.analysis.Tokenizer;
+
+import java.io.StringReader;
+import java.util.Random;
 
 import static org.apache.lucene.analysis.path.ReversePathHierarchyTokenizer.DEFAULT_DELIMITER;
 import static org.apache.lucene.analysis.path.ReversePathHierarchyTokenizer.DEFAULT_SKIP;

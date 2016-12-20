@@ -11,10 +11,10 @@ import nars.truth.TruthWave;
 import spacegraph.Ortho;
 import spacegraph.SpaceGraph;
 import spacegraph.Surface;
+import spacegraph.render.Draw;
 import spacegraph.space.layout.Grid;
 import spacegraph.space.widget.Label;
 import spacegraph.space.widget.Widget;
-import spacegraph.render.Draw;
 
 import java.util.Collection;
 import java.util.List;

@@ -17,24 +17,16 @@
 package org.apache.lucene.analysis.hunspell;
 
 
+import org.apache.lucene.store.Directory;
+import org.apache.lucene.util.*;
+import org.apache.lucene.util.fst.*;
+
 import java.io.ByteArrayInputStream;
 import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
-
-import org.apache.lucene.store.Directory;
-import org.apache.lucene.util.BytesRef;
-import org.apache.lucene.util.CharsRef;
-import org.apache.lucene.util.IntsRef;
-import org.apache.lucene.util.IntsRefBuilder;
-import org.apache.lucene.util.LuceneTestCase;
-import org.apache.lucene.util.fst.Builder;
-import org.apache.lucene.util.fst.CharSequenceOutputs;
-import org.apache.lucene.util.fst.FST;
-import org.apache.lucene.util.fst.Outputs;
-import org.apache.lucene.util.fst.Util;
 
 public class TestDictionary extends LuceneTestCase {
 

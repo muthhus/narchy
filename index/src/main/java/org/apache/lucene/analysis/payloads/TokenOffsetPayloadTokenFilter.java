@@ -17,13 +17,13 @@
 package org.apache.lucene.analysis.payloads;
 
 
-import java.io.IOException;
-
 import org.apache.lucene.analysis.TokenFilter;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.tokenattributes.OffsetAttribute;
 import org.apache.lucene.analysis.tokenattributes.PayloadAttribute;
 import org.apache.lucene.util.BytesRef;
+
+import java.io.IOException;
 
 
 /**

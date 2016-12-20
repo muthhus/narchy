@@ -17,14 +17,14 @@
 package org.apache.lucene.analysis.synonym;
 
 
-import java.io.StringReader;
-import java.text.ParseException;
-
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.MockAnalyzer;
 import org.apache.lucene.analysis.MockTokenizer;
 import org.apache.lucene.analysis.Tokenizer;
 import org.apache.lucene.analysis.en.EnglishAnalyzer;
+
+import java.io.StringReader;
+import java.text.ParseException;
 
 /**
  * Tests parser for the Solr synonyms format

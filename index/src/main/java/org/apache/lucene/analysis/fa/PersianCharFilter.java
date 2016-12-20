@@ -17,10 +17,10 @@
 package org.apache.lucene.analysis.fa;
 
 
+import org.apache.lucene.analysis.CharFilter;
+
 import java.io.IOException;
 import java.io.Reader;
-
-import org.apache.lucene.analysis.CharFilter;
 
 /**
  * CharFilter that replaces instances of Zero-width non-joiner with an

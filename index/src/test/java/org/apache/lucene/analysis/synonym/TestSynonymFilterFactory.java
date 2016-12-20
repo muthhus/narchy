@@ -17,15 +17,16 @@
 package org.apache.lucene.analysis.synonym;
 
 
-import java.io.Reader;
-import java.io.StringReader;
 import org.apache.lucene.analysis.TokenStream;
+import org.apache.lucene.analysis.cjk.CJKAnalyzer;
 import org.apache.lucene.analysis.pattern.PatternTokenizerFactory;
-import org.apache.lucene.analysis.util.TokenFilterFactory;
 import org.apache.lucene.analysis.util.BaseTokenStreamFactoryTestCase;
 import org.apache.lucene.analysis.util.StringMockResourceLoader;
-import org.apache.lucene.analysis.cjk.CJKAnalyzer;
+import org.apache.lucene.analysis.util.TokenFilterFactory;
 import org.apache.lucene.util.Version;
+
+import java.io.Reader;
+import java.io.StringReader;
 
 public class TestSynonymFilterFactory extends BaseTokenStreamFactoryTestCase {
 

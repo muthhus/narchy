@@ -15,15 +15,6 @@
  * limitations under the License.
  */
 package org.apache.lucene.analysis.miscellaneous;
-import java.io.IOException;
-import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map.Entry;
-import java.util.Map;
-import java.util.Set;
 
 import org.apache.lucene.analysis.BaseTokenStreamTestCase;
 import org.apache.lucene.analysis.CharacterUtils;
@@ -34,6 +25,11 @@ import org.apache.lucene.analysis.core.WhitespaceTokenizer;
 import org.apache.lucene.analysis.en.PorterStemFilter;
 import org.apache.lucene.analysis.miscellaneous.StemmerOverrideFilter.StemmerOverrideMap;
 import org.apache.lucene.util.TestUtil;
+
+import java.io.IOException;
+import java.io.StringReader;
+import java.util.*;
+import java.util.Map.Entry;
 
 /**
  * 

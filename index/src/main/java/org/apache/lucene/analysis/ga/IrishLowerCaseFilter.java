@@ -17,11 +17,11 @@
 package org.apache.lucene.analysis.ga;
 
 
-import java.io.IOException;
-
 import org.apache.lucene.analysis.TokenFilter;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
+
+import java.io.IOException;
 
 /**
  * Normalises token text to lower case, handling t-prothesis

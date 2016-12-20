@@ -17,11 +17,10 @@
 package org.apache.lucene.analysis.es;
 
 
-import java.util.Map;
-
 import org.apache.lucene.analysis.TokenStream;
-import org.apache.lucene.analysis.es.SpanishLightStemFilter;
 import org.apache.lucene.analysis.util.TokenFilterFactory;
+
+import java.util.Map;
 
 /** 
  * Factory for {@link SpanishLightStemFilter}.

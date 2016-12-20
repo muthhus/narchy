@@ -1,8 +1,10 @@
 package nars.index.term.tree;
 
+import ch.qos.logback.core.encoder.ByteArrayUtil;
 import io.airlift.compress.lz4.Lz4Compressor;
 import io.airlift.compress.lz4.Lz4Decompressor;
 import io.airlift.compress.lz4.Lz4RawCompressor;
+import jcog.Util;
 import jcog.data.byt.DynByteSeq;
 import nars.IO;
 import nars.Op;
@@ -27,7 +29,8 @@ import static nars.IO.writeEvidence;
 public class TermKey extends DynByteSeq {
 
     private final static ThreadLocal<Lz4Compressor> compressor = ThreadLocal.withInitial(Lz4Compressor::new);
-    final static Lz4Decompressor decompressor = new Lz4Decompressor();
+    //final static Lz4Decompressor decompressor = new Lz4Decompressor();
+
     private final static float minCompressionRatio = 0.9f;
     private final static int MIN_COMPRESSION_INPUT = 16;
     private static final boolean COMPRESS = false;
@@ -129,7 +132,6 @@ public class TermKey extends DynByteSeq {
     public int hashCode() {
         throw new UnsupportedOperationException();
     }
-
 
     public static void writeTermSeq(@NotNull DataOutput out, @NotNull Term term, boolean includeTemporal) throws IOException {
 

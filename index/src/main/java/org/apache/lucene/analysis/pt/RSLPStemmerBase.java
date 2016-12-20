@@ -17,22 +17,18 @@
 package org.apache.lucene.analysis.pt;
 
 
+import org.apache.lucene.analysis.CharArraySet;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.LineNumberReader;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.lucene.analysis.CharArraySet;
-
-import static org.apache.lucene.analysis.util.StemmerUtil.*;
+import static org.apache.lucene.analysis.util.StemmerUtil.endsWith;
 
 /**
  * Base class for stemmers that use a set of RSLP-like stemming steps.

@@ -16,17 +16,17 @@
  */
 package org.apache.lucene.analysis.charfilter;
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.TreeMap;
-
 import org.apache.lucene.util.CharsRef;
 import org.apache.lucene.util.IntsRefBuilder;
 import org.apache.lucene.util.fst.CharSequenceOutputs;
 import org.apache.lucene.util.fst.FST;
 import org.apache.lucene.util.fst.Outputs;
 import org.apache.lucene.util.fst.Util;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.TreeMap;
 
 // TODO: save/load?
 
