@@ -24,6 +24,7 @@ package nars.nal.nal8;
 import nars.$;
 import nars.NAR;
 import nars.concept.OperationConcept;
+import nars.concept.PermanentConcept;
 import nars.term.atom.Atomic;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -45,6 +46,7 @@ public abstract class AbstractOperator implements Consumer<OperationConcept> {
     public String toString() {
         return atomicTerm.toString();
     }
+
 
 
     /**

@@ -7,23 +7,28 @@ import nars.IO;
 import nars.NAR;
 import nars.Task;
 import nars.concept.*;
+import nars.concept.dynamic.DynamicConcept;
 import nars.concept.util.ConceptBuilder;
-import nars.index.term.TermIndex;
 import nars.index.term.map.MaplikeTermIndex;
 import nars.index.term.tree.TermKey;
 import nars.nar.Default;
 import nars.nar.util.DefaultConceptBuilder;
+import nars.op.data.differ;
+import nars.op.data.intersect;
+import nars.op.data.union;
 import nars.task.MutableTask;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.time.FrameTime;
+import org.infinispan.AdvancedCache;
 import org.infinispan.Cache;
+import org.infinispan.cache.impl.DecoratedCache;
 import org.infinispan.commons.marshall.AdvancedExternalizer;
-import org.infinispan.commons.util.concurrent.ConcurrentHashSet;
 import org.infinispan.configuration.cache.Configuration;
 import org.infinispan.configuration.cache.ConfigurationBuilder;
 import org.infinispan.configuration.global.GlobalConfiguration;
 import org.infinispan.configuration.global.GlobalConfigurationBuilder;
+import org.infinispan.context.Flag;
 import org.infinispan.manager.DefaultCacheManager;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -33,6 +38,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -43,8 +49,10 @@ public class InfinispanIndex extends MaplikeTermIndex {
     static final Logger logger = LoggerFactory.getLogger(InfinispanIndex.class);
 
     private final Cache<RawByteSeq, Termed> concepts;
+    private final DecoratedCache conceptsLocal;
+    private final AdvancedCache conceptsLocalNoResult;
 
-    private final Set<Term> permanents = new ConcurrentHashSet(1024);
+    //private final Set<Term> permanents = new ConcurrentHashSet(1024);
 
 
     public InfinispanIndex(ConceptBuilder conceptBuilder) {
@@ -52,18 +60,20 @@ public class InfinispanIndex extends MaplikeTermIndex {
 
         GlobalConfiguration global = new GlobalConfigurationBuilder()
                 .serialization()
-                //.classResolver(new SimpleClassResolver(false,getClass().getClassLoader()))
                 .addAdvancedExternalizer(new TaskExternalizer())
-                //.addAdvancedExternalizer(new PermanentConceptExternalizer())
+                .addAdvancedExternalizer(new PermanentConceptExternalizer())
                 .addAdvancedExternalizer(new ConceptExternalizer())
                 .build();
+
 
 
         Configuration infinispanConfiguration = new ConfigurationBuilder()
                 .unsafe()
                 .versioning().disable()
                 .storeAsBinary().storeKeysAsBinary(true).storeValuesAsBinary(true)
-                .persistence().passivation(true).addSingleFileStore().location("/tmp/concepts")
+                .persistence()
+                    //.passivation(true)
+                    .addSingleFileStore().location("/tmp/concepts")
                 //cb.locking().concurrencyLevel(1);
                 //cb.customInterceptors().addInterceptor();
                 .jmxStatistics().disable()
@@ -75,9 +85,28 @@ public class InfinispanIndex extends MaplikeTermIndex {
 
         concepts = cm.getCache();
 
-        Runtime.getRuntime().addShutdownHook(new Thread(()->{
-            stop();
-        }));
+
+//        DefaultCacheManager cm = new DefaultCacheManager(cb.build());
+//        //DefaultCacheManager cm = new DefaultCacheManager();
+//        //System.out.println(Joiner.on('\n').join(cm.getCacheManagerConfiguration().toString().split(", ")));
+//
+//        this.concepts = cm.getCache("concepts");
+        this.conceptsLocal = new DecoratedCache<>(
+                concepts.getAdvancedCache(),
+                Flag.CACHE_MODE_LOCAL, /*Flag.SKIP_LOCKING,*/ Flag.SKIP_OWNERSHIP_CHECK,
+                Flag.SKIP_REMOTE_LOOKUP);
+        this.conceptsLocalNoResult = conceptsLocal.withFlags(Flag.IGNORE_RETURN_VALUES, Flag.SKIP_CACHE_LOAD, Flag.SKIP_REMOTE_LOOKUP);
+//        this.subterms = cm.getCache("subterms");
+//        this.subtermsLocal = new DecoratedCache<>(
+//                subterms.getAdvancedCache(),
+//                Flag.CACHE_MODE_LOCAL, /*Flag.SKIP_LOCKING,*/ Flag.SKIP_OWNERSHIP_CHECK,
+//                Flag.SKIP_REMOTE_LOOKUP);
+//        this.subtermsLocalNoResult = subtermsLocal.withFlags(Flag.IGNORE_RETURN_VALUES, Flag.SKIP_CACHE_LOAD, Flag.SKIP_REMOTE_LOOKUP);
+//
+
+//        Runtime.getRuntime().addShutdownHook(new Thread(()->{
+//            stop();
+//        }));
     }
 
     @Override
@@ -97,23 +126,19 @@ public class InfinispanIndex extends MaplikeTermIndex {
     @Override
     public void set(@NotNull Term src, Termed target) {
         RawByteSeq k = key(src);
-        if (src instanceof PermanentConcept) {
-            permanents.add(src);
-            concepts.put(k, target); //replace
-        } else
-            concepts.putIfAbsent(k, target);
+        conceptsLocalNoResult.put(k, target); //replace
     }
 
 
     public synchronized void stop() {
         logger.info("stop: {}", concepts );
-
-        //remove permanents to avoid their persistence
-        for (Term p : permanents) {
-            if (concepts.remove(key(p))==null)
-                logger.warn("{} not in cache on removal", p) ;
-        }
-
+//
+//        //remove permanents to avoid their persistence
+//        /*for (Term p : permanents) {
+//            if (concepts.remove(key(p))==null)
+//                logger.warn("{} not in cache on removal", p) ;
+//        }*/
+//
         concepts.shutdown();
     }
 
@@ -141,7 +166,7 @@ public class InfinispanIndex extends MaplikeTermIndex {
 
     @Override
     public void remove(@NotNull Term entry) {
-        concepts.remove(key(entry));
+        conceptsLocalNoResult.remove(key(entry));
     }
 
     public static void main(String[] args) {
@@ -150,9 +175,14 @@ public class InfinispanIndex extends MaplikeTermIndex {
         NAR nar = new Default(1024, 1, 1, 3,
                 new XorShift128PlusRandom(1), index, new FrameTime());
 
-        nar.input("(x,y).", "a:b.");
+        nar.log();
+        nar.input("(x,y).", "x:b.", "init(\"" + new Date() + "\").");
+        nar.next();
 
         nar.concepts.print(System.out);
+
+        index.stop();
+
 
     }
 
@@ -199,13 +229,18 @@ public class InfinispanIndex extends MaplikeTermIndex {
         public Concept readObject(ObjectInput input) throws IOException, ClassNotFoundException {
 
             Term t = IO.readTerm(input, InfinispanIndex.this);
-            Concept c = (Concept) get(t, true);
+
+            Concept c = (Concept) conceptBuilder().apply(t);
 
             int numTasks = input.readInt();
-            for (int i = 0; i < numTasks; i++) {
-                Task x = IO.readTask(input, InfinispanIndex.this);
-                if (c != null)
-                    nar.input(x);
+            if (numTasks > 0) {
+                List<Task> toInput = $.newArrayList(numTasks);
+                for (int i = 0; i < numTasks; i++) {
+                    Task x = IO.readTask(input, InfinispanIndex.this);
+                    //if (c != null)
+                    toInput.add(x);
+                }
+                c.put("init", toInput);
             }
 
             return c;
@@ -213,7 +248,7 @@ public class InfinispanIndex extends MaplikeTermIndex {
 
         @Override
         public Set<Class<? extends Concept>> getTypeClasses() {
-            return Set.of(AtomConcept.class, CompoundConcept.class);
+            return Set.of(AtomConcept.class, CompoundConcept.class, DynamicConcept.class );
         }
 
         @Override
@@ -226,26 +261,20 @@ public class InfinispanIndex extends MaplikeTermIndex {
 
         @Override
         public void writeObject(ObjectOutput output, Concept c) throws IOException {
-            output.writeUTF(c.getClass().getName());
+            //just write the term which will be used as a placeholder.
+            //an actual permanent concept instance, once inserted, will replace it in the cache
+            IO.writeTerm(output, c.term());
         }
 
         @Override
         public Concept readObject(ObjectInput input) throws IOException, ClassNotFoundException {
-            //Term t = IO.readTerm(input, InfinispanIndex.this);
-            String className = input.readUTF();
-            try {
-                return (Concept) Class.forName(className).newInstance();
-            } catch (InstantiationException e) {
-                return null;
-            } catch (IllegalAccessException e) {
-                return null;
-            }
-            //return null; //(Concept) get(t, false);
+            Term t = IO.readTerm(input, InfinispanIndex.this);
+            return (Concept) conceptBuilder().apply(t);
         }
 
         @Override
         public Set<Class<? extends Concept>> getTypeClasses() {
-            return Set.of(PermanentConcept.class, Functor.class, Functor.LambdaFunctor.class);
+            return Set.of(PermanentConcept.class, intersect.class, differ.class, union.class,Functor.LambdaFunctor.class);
         }
 
         @Override

@@ -183,7 +183,7 @@ public class IO {
     @Nullable
     public static Atomic readAtomic(@NotNull DataInput in, @NotNull Op o, @NotNull TermIndex t) throws IOException {
         String s = in.readUTF();
-        Term key;
+        Atomic key;
         switch (o) {
             case ATOM:
                 key = new Atom(s);
@@ -192,7 +192,8 @@ public class IO {
                 throw new UnsupportedOperationException();
         }
 
-        return (Atomic) t.get(key, true);
+        return key;
+        //return (Atomic) t.get(key, true); //<- can cause synchronization deadlocks
     }
 
 
@@ -218,11 +219,7 @@ public class IO {
     public
     @Nullable
     static Term readSpecialTerm(@NotNull DataInput in, @NotNull TermIndex t) throws IOException {
-        String toParse = in.readUTF();
-        Term x = t.parseRaw(toParse);
-        if (x == null)
-            throw new IOException("Undecoded term: " + toParse);
-        return x;
+        return t.parseRaw(in.readUTF());
     }
 
     public static void writeTerm(@NotNull DataOutput out, @NotNull Term term) throws IOException {
@@ -289,7 +286,7 @@ public class IO {
      * TODO make a version which reads directlyinto TermIndex
      */
     @Nullable
-    static Compound readCompound(@NotNull DataInput in, @NotNull Op o, @NotNull TermIndex t) throws IOException {
+    static Term readCompound(@NotNull DataInput in, @NotNull Op o, @NotNull TermIndex t) throws IOException {
 
         Term[] v = readTermContainer(in, t);
 
@@ -300,7 +297,7 @@ public class IO {
         else if (o.temporal)
             dt = in.readInt();
 
-        return (Compound) t.the(o, dt, v);
+        return t.the(o, dt, v);
 //        if (key == null)
 //            throw new UnsupportedOperationException();
 //        return (Compound) t.normalize(key, true);

@@ -793,12 +793,12 @@ public abstract class NAR extends Param implements Level, Consumer<Task>, NARIn,
     @NotNull
     @Deprecated
     public final On onExecution(@NotNull Atomic op, @NotNull Consumer<OperationConcept> each) {
-        On o = concept(op, true)
+        Concept c = (Concept)concepts.conceptBuilder().apply(op);
+        concepts.set(op, c);
+        On o = c
                 .<Topic<OperationConcept>>meta(Execution.class,
                         (k, v) -> v != null ? v : new ArrayTopic<>())
                 .on(each);
-        concepts.set(op);
-        //this.on.add(o);
         return o;
     }
 

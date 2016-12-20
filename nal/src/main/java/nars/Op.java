@@ -209,7 +209,7 @@ public enum Op {
         //negation does not contribute to structure vector
         this.bit = (1 << ordinal());
 
-        this.atomic = str.equals(".") /* atom */ || var || str.equals("^") || str.equals("`");
+        this.atomic = var || str.equals(".") /* atom */ || str.equals("`i") || str.equals("^") || str.equals("`");
 
     }
 
