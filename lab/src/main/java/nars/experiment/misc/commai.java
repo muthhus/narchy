@@ -132,7 +132,7 @@ public class commai extends NAgents {
 //        Default d = new Default();
 //        new commai(d).run(50000, 100);
 
-        NAgents.runRT(commai::new);
+        runRT(commai::new, 10);
 
     }
 

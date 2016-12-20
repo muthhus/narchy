@@ -48,10 +48,10 @@ public class DefaultConceptBuilder implements ConceptBuilder {
 
     public DefaultConceptBuilder() {
 
-        this.sleep = new DefaultConceptState("sleep", 6, 6, 1, 16, 8);
+        this.sleep = new DefaultConceptState("sleep", 12, 12, 2, 16, 12);
         this.init = sleep;
 
-        this.awake = new DefaultConceptState("awake", 12, 12, 3, 32, 24);
+        this.awake = new DefaultConceptState("awake", 16, 16, 3, 32, 24);
     }
 
 //    private static final int DEFAULT_ATOM_LINK_MAP_CAPACITY = 128;

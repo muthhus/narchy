@@ -16,7 +16,7 @@ public class Arkancide extends NAgents {
         //runRT(Arkancide::new);
         //nRT(Arkancide::new, 25, 5);
 
-        NAR nar = runRT(Arkancide::new, 40, 10);
+        NAR nar = runRT(Arkancide::new, 40, 20, -1);
 
         //nar.beliefConfidence(0.75f);
         //nar.goalConfidence(0.75f);
@@ -26,7 +26,7 @@ public class Arkancide extends NAgents {
     final int visW = 32;
     final int visH = 16;
 
-    final int afterlife = 60;
+    //final int afterlife = 60;
 
     float paddleSpeed = 40f;
 
@@ -42,7 +42,7 @@ public class Arkancide extends NAgents {
         noid = new Arkanoid() {
             @Override
             protected void die() {
-                nar.time.tick(afterlife);
+                //nar.time.tick(afterlife); //wont quite work in realtime mode
                 super.die();
             }
         };

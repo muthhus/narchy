@@ -221,7 +221,7 @@ public class Jake2Agent extends NAgents implements Runnable {
 
 
     public static void main(String[] args) {
-        NAgents.runRT(Jake2Agent::new);
+        runRT(Jake2Agent::new, 10);
     }
 }
 

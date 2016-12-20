@@ -155,17 +155,16 @@ abstract public class NAgent implements NSense, NAction {
 
         this.actionBoost = gamma;
 
-        float rewardConf = alpha;
 
-        rewardNormalized = new FloatPolarNormalized(() -> rewardValue).radius(1);
+        rewardNormalized = new FloatNormalized(() -> rewardValue);
 
 
         happy = new SensorConcept(
                 //"happy" + "(" + nar.self + ")", nar,
-                "happy(" + id + ")",
+                id.isEmpty() ? "(happy)" : "happy(" + id + ")",
                 nar,
                 rewardNormalized,
-                (x) -> t(x, rewardConf)
+                (x) -> t(x, alpha)
         ) {
             @Override
             protected int termlinkMultiplier() {

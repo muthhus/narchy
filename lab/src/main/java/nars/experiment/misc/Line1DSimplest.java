@@ -120,7 +120,7 @@ public class Line1DSimplest extends NAgent {
                         //.invocationListeners(new InvocationLogger())
         );*/
 
-        NAR nar = new Alann(new FrameTime(), 4, 2, 2 );
+        NAR nar = new Alann(new FrameTime(), 4, 256, 3, 2, 2 );
 
 
 

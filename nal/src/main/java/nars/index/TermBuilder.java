@@ -191,31 +191,27 @@ public abstract class TermBuilder {
 
     @NotNull
     public Term productNormalize(@NotNull Term u) {
-        boolean neg = u.op() == NEG;
-        Term t;
-        if (neg)
-            t = u.unneg();
-        else
-            t = u;
+        Term t = u.unneg();
+        boolean neg = (t!=u);
 
-        if (t instanceof Compound && (t.op() == INH) && (t.varPattern() == 0) && t.hasAny(Op.IMGbits)) {
-            Term s = (((Compound) t).term(0));
+        if (t instanceof Compound && t.hasAny(Op.IMGbits) && (t.op() == INH) && (t.varPattern() == 0)) {
+            Compound ct = (Compound) t;
+            Term s = (ct.term(0));
             Op so = s.op();
-            Term p = (((Compound) t).term(1));
+            Term p = (ct.term(1));
             Op po = p.op();
             if (so == Op.IMGi && !po.image) {
                 Compound ii = (Compound) s;
                 t = $.inh(ii.term(0), imageUnwrapToProd(p, ii));
-                if (t == null)
-                    return False;
             } else if (po == Op.IMGe && !so.image) {
                 Compound ii = (Compound) p;
                 t = $.inh(imageUnwrapToProd(s, ii), ii.term(0));
-                if (t == null)
-                    return False;
             } else {
                 return u; //original value
             }
+
+            if (t == null)
+                return False;
         }
 
         return !neg ? t : neg(t);
@@ -847,11 +843,15 @@ public abstract class TermBuilder {
                     return ((subject == ss) ^ (predicate == pp)) ? False : True;  //handle root-level negation comparison
                 }
 
-                //co-conjunction; with exceptions for pattern variable containing terms
-                if ((ss.varPattern() == 0 && ss.op() == CONJ && ss.containsTermRecursivelyAtemporally(pp)) ||
-                        (pp.varPattern() == 0 && pp.op() == CONJ && pp.containsTermRecursivelyAtemporally(ss))) {
+                if ((ss instanceof Compound && ss.varPattern() == 0 && ((Compound)ss).containsTermAtemporally(pp)) ||
+                        (pp instanceof Compound && pp.varPattern() == 0 && ((Compound)pp).containsTermAtemporally(ss))) {
                     return False; //self-reference
                 }
+//                //co-conjunction; with exceptions for pattern variable containing terms
+//                if ((ss.varPattern() == 0 && ss.op() == CONJ && ss.containsTermRecursivelyAtemporally(pp)) ||
+//                        (pp.varPattern() == 0 && pp.op() == CONJ && pp.containsTermRecursivelyAtemporally(ss))) {
+//                    return False; //self-reference
+//                }
 
 
 //                //compare unneg'd if it's not temporal or eternal/parallel

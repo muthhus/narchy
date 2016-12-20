@@ -197,7 +197,21 @@ public interface TermContainer extends Termlike, Iterable<Term> {
         return false;
     }
 
+    default boolean containsTermAtemporally(@NotNull Term b) {
+        b = b.unneg();
+        if (!impossibleSubTerm(b)) {
+            int s = size();
+            for (int i = 0; i < s; i++) {
+                if (Terms.equalAtemporally(term(i),b)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     default boolean containsTermRecursivelyAtemporally(@NotNull Term b) {
+        b = b.unneg();
         if (!impossibleSubTerm(b)) {
             int s = size();
             for (int i = 0; i < s; i++) {

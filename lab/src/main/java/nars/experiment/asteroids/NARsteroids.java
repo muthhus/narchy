@@ -18,7 +18,7 @@ public class NARsteroids extends NAgents {
     private final Sensor2D/*<SwingCamera>*/ pixels;
 
     public static void main(String[] args) {
-        runRT(NARsteroids::new);
+        runRT(NARsteroids::new, 10);
     }
 
     public NARsteroids(NAR nar) {

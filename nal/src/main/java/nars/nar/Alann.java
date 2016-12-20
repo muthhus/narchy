@@ -50,7 +50,7 @@ public class Alann extends NAR {
 
     private static final Logger logger = LoggerFactory.getLogger(Alann.class);
 
-    static private final BudgetMerge blend = BudgetMerge.plusBlend;
+
 
     public final List<GraphPremiseBuilder> cores;
 
@@ -63,20 +63,29 @@ public class Alann extends NAR {
 
         private BLink<Concept> current;
 
-        public final Bag<Concept> terms =
-                //new HijackBag<>(128, 3, blend, random);
-                new CurveBag<Concept>(32, new CurveBag.NormalizedSampler(power2BagCurve, random), blend, new ConcurrentHashMap(64)) {
+        public final Bag<Concept> active;
 
-                    @Override
-                    public void onAdded(BLink<Concept> value) {
-                        value.get().state(concepts.conceptBuilder().awake(), Alann.this);
-                    }
+        int fireTaskLinks = 1;
+        int fireTermLinksMin = 1;
+        int fireTermLinksMax = 4;
 
-                    @Override
-                    public void onRemoved(@NotNull BLink<Concept> value) {
-                        value.get().state(concepts.conceptBuilder().sleep(), Alann.this);
-                    }
-                };
+        public GraphPremiseBuilder(int capacity, int fireRate) {
+            //new HijackBag<>(128, 3, blend, random);
+
+            fireTermLinksMax = fireRate;
+            active = new CurveBag<Concept>(capacity, new CurveBag.NormalizedSampler(power2BagCurve, random), BudgetMerge.plusBlend, new ConcurrentHashMap<>(capacity)) {
+
+                @Override
+                public void onAdded(BLink<Concept> value) {
+                    value.get().state(concepts.conceptBuilder().awake(), Alann.this);
+                }
+
+                @Override
+                public void onRemoved(@NotNull BLink<Concept> value) {
+                    value.get().state(concepts.conceptBuilder().sleep(), Alann.this);
+                }
+            };
+        }
 
 //        /**
 //         * the tasklink bag is only modified and accessed by the core, locally, so it does not need to have a concurrent Map
@@ -84,10 +93,6 @@ public class Alann extends NAR {
 //        public final Bag<Task> tasklinks =
 //                //new HijackBag<>(128, 3, blend, random);
 //                new CurveBag(64, new CurveBag.NormalizedSampler(power2BagCurve, random), blend, new HashMap(64));
-
-        int fireTaskLinks = 1;
-        int fireTermLinksMin = 1;
-        int fireTermLinksMax = 4;
 
 
         public void loop() {
@@ -139,7 +144,7 @@ public class Alann extends NAR {
 
         @Nullable
         private BLink<Concept> go() {
-            BLink<Concept> next = terms.commit().sample();
+            BLink<Concept> next = active.commit().sample();
             if (next != null) {
 
                 //Concept d = next.get(); //concept(next.get());
@@ -156,8 +161,8 @@ public class Alann extends NAR {
         void print() {
             logger.info("at: {}", current);
             //out.println("\nlocal:"); local.print();
-            out.println("\nconcepts: " + terms.size() + "/" + terms.capacity());
-            terms.print();
+            out.println("\nconcepts: " + active.size() + "/" + active.capacity());
+            active.print();
 //            out.println("\ntasklinks:");
 //            tasklinks.print();
         }
@@ -166,11 +171,11 @@ public class Alann extends NAR {
     }
 
 
-    public Alann(@NotNull Time time, int cores) {
-        this(time, cores, Runtime.getRuntime().availableProcessors()-1, 1);
+    public Alann(@NotNull Time time, int cores, int coreSize, int coreFires) {
+        this(time, cores, coreSize, coreFires, Runtime.getRuntime().availableProcessors()-1, 1);
     }
 
-    public Alann(@NotNull Time time, int cores, int coreThreads, int auxThreads) {
+    public Alann(@NotNull Time time, int cores, int coreSize, int coreFires, int coreThreads, int auxThreads) {
         super(time,
                 new TreeTermIndex.L1TreeIndex(new DefaultConceptBuilder(), 512 * 1024,
                         1024 * 32, 3),
@@ -192,7 +197,7 @@ public class Alann extends NAR {
 
         }
 
-        this.cores = range(0, cores).mapToObj(i -> new GraphPremiseBuilder()).collect(toList());
+        this.cores = range(0, cores).mapToObj(i -> new GraphPremiseBuilder(coreSize, coreFires)).collect(toList());
 
         runLater(() -> {
             start(coreThreads);
@@ -239,7 +244,7 @@ public class Alann extends NAR {
 
 
         return () -> {
-            Iterator[] coreBags = cores.stream().map(x -> x.terms.iterator()).toArray(Iterator[]::new);
+            Iterator[] coreBags = cores.stream().map(x -> x.active.iterator()).toArray(Iterator[]::new);
             return IteratorUtils.zippingIterator(coreBags);
             //return new RoundRobinIterator<>(coreBags);
         };
@@ -272,7 +277,7 @@ public class Alann extends NAR {
     public final Concept concept(@NotNull Termed term, float priToAdd) {
         Concept c = concept(term);
         if (c != null) {
-            core(term).terms.add(term, priToAdd);
+            core(term).active.add(term, priToAdd);
         }
         return c;
     }
@@ -295,14 +300,14 @@ public class Alann extends NAR {
             float p = scale;
             float q = 1f / (1f + c.complexity());
 
-            core(c).terms.put(c, $.b(p, q), 1f, overflow);
+            core(c).active.put(c, $.b(p, q), 1f, overflow);
         });
     }
 
     @Override
     public final float priority(@NotNull Termed concept, float valueIfInactive) {
         //TODO impl
-        Bag<Concept> cc = core(concept).terms;
+        Bag<Concept> cc = core(concept).active;
         return cc.pri(concept, Float.NaN);
     }
 

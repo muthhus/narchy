@@ -50,7 +50,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
-import java.util.stream.Stream;
 
 import static nars.$.t;
 import static spacegraph.SpaceGraph.window;
@@ -88,6 +87,14 @@ abstract public class NAgents extends NAgent {
 
         a.run(frames);
 
+        print(nar, a);
+
+
+        //((TreeTaskIndex)nar.tasks).tasks.prettyPrint(System.out);
+
+    }
+
+    private static void print(NAR nar, NAgents a) {
         NAR.printActiveTasks(nar, true);
         NAR.printActiveTasks(nar, false);
 
@@ -102,21 +109,13 @@ abstract public class NAgents extends NAgent {
         a.predictors.forEach(p->{
             nar.concept(p).print();
         });
-
-
-        //((TreeTaskIndex)nar.tasks).tasks.prettyPrint(System.out);
-
-    }
-
-    public static void runRT(Function<NAR, NAgents> init) {
-        runRT(init, 10);
     }
 
     public static NAR runRT(Function<NAR, NAgents> init, float fps) {
-        return runRT(init, fps, 1);
+        return runRT(init, fps, 1, -1);
     }
 
-    public static NAR runRT(Function<NAR, NAgents> init, float fps, int durFrames) {
+    public static NAR runRT(Function<NAR, NAgents> init, float fps, int durFrames, int endTime) {
 
         //NAR nar = NAgents.newMultiThreadNAR(3, new RealTime.CS(true).dur(durFrames/fps), true);
         //NAR nar = newNAR();
@@ -126,7 +125,9 @@ abstract public class NAgents extends NAgent {
         a.trace = true;
         chart(a);
 
-        a.runRT(fps).join();
+        a.runRT(fps, endTime).join();
+
+        print(nar, a);
 
         return nar;
 
@@ -140,7 +141,7 @@ abstract public class NAgents extends NAgent {
     }
 
     public static Alann newAlann(float dur) {
-        Alann nar = new Alann(new RealTime.CS(true).dur( dur ), 6, 3, 2 );
+        Alann nar = new Alann(new RealTime.CS(true).dur( dur ), 6, 256, 3, 3, 2 );
 
         MySTMClustered stm = new MySTMClustered(nar, 128, '.', 3, true, 6);
         MySTMClustered stmGoal = new MySTMClustered(nar, 32, '!', 2, true, 4);
@@ -152,7 +153,7 @@ abstract public class NAgents extends NAgent {
         new Inperience(nar, 0.05f);
 
         SpaceGraph.window(grid(nar.cores.stream().map(c ->
-                Vis.items(c.terms, nar, 16)).toArray(Surface[]::new)), 900, 700);
+                Vis.items(c.active, nar, 16)).toArray(Surface[]::new)), 900, 700);
 
 
         return nar;
