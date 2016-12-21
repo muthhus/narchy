@@ -32,12 +32,12 @@ public class Point2D implements HyperPoint {
     }
 
     @Override
-    public int getNDim() {
+    public int dim() {
         return 2;
     }
 
     @Override
-    public Double getCoord(final int d) {
+    public Double coord(final int d) {
         if(d==0) {
             return x;
         } else if(d==1) {

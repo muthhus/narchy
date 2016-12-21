@@ -40,7 +40,7 @@ final class AxialSplitLeaf<T> extends Leaf<T> {
         final Branch<T> pNode = new Branch<>(builder, mMin, mMax, splitType);
         final Node<T> l1Node = create(builder, mMin, mMax, splitType);
         final Node<T> l2Node = create(builder, mMin, mMax, splitType);
-        final int nD = r[0].getNDim();
+        final int nD = r[0].dim();
 
         final HyperRect[] sortedMbr = new HyperRect[size];
         System.arraycopy(r, 0, sortedMbr, 0, size);
@@ -63,7 +63,7 @@ final class AxialSplitLeaf<T> extends Leaf<T> {
             final HyperPoint p1 = o1.getCentroid();
             final HyperPoint p2 = o2.getCentroid();
 
-            return p1.getCoord(splitDimension).compareTo(p2.getCoord(splitDimension));
+            return p1.coord(splitDimension).compareTo(p2.coord(splitDimension));
         });
 
         for(int i=0; i<size/2; i++) {

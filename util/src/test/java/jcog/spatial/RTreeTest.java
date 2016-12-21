@@ -294,7 +294,36 @@ public class RTreeTest {
 
         return rects;
     }
+    /**
+     * Generate 'count' random rectangles with fixed ranges.
+     *
+     * @param count - number of rectangles to generate
+     * @return array of generated rectangles
+     */
+    public static RectND[] generateRandomRects(int dimension, int count) {
+        final Random rand = new Random(13);
 
+        // changing these values changes the rectangle sizes and consequently the distribution density
+        final int minX = 500;
+        final int maxXRange = 25;
+
+
+
+        final RectND[] rects = new RectND[count];
+        for (int i = 0; i < count; i++) {
+
+            float[] min = new float[dimension];
+            float[] max = new float[dimension];
+            for (int d = 0; d < dimension; d++){
+                float x1 = min[d] = rand.nextInt(minX);
+                max[d] = x1 + rand.nextInt(maxXRange);
+            }
+
+            rects[i] = new RectND(min, max);
+        }
+
+        return rects;
+    }
     /**
      * Create a tree capable of holding rectangles with default minM (2) and maxM (8) values.
      *
@@ -315,5 +344,8 @@ public class RTreeTest {
      */
     public static RTree<Rect2D> createRect2DTree(int minM, int maxM, RTree.Split splitType) {
         return new RTree<>(new Rect2D.Builder(), minM, maxM, splitType);
+    }
+    public static RTree<RectND> createRectNDTree(int minM, int maxM, RTree.Split splitType) {
+        return new RTree<>(new RectND.Builder(), minM, maxM, splitType);
     }
 }

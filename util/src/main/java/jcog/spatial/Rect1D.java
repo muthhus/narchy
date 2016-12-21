@@ -49,7 +49,7 @@ public abstract class Rect1D<X extends Comparable<X>> implements HyperRect<X> {
     }
 
     @Override
-    public int getNDim() {
+    public int dim() {
         return 1;
     }
 
@@ -90,10 +90,7 @@ public abstract class Rect1D<X extends Comparable<X>> implements HyperRect<X> {
         return getRange(0);
     }
 
-    @Override
-    public double perimeter() {
-        return getRange(0);
-    }
+
 
 
 }

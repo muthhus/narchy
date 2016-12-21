@@ -59,26 +59,6 @@ public class Rect2D<X extends Comparable<X>> implements HyperRect<X> {
         max = new Point2D(maxX, maxY);
     }
 
-//    @Override
-//    public double distance(final HyperPoint a, final HyperPoint b) {
-//
-//
-//        final double dx = b.x-a.x;
-//        final double dy = b.y-a.y;
-//        return Math.sqrt(dx*dx + dy*dy);
-//    }
-//
-//    @Override
-//    public double distance(final HyperPoint p, final int d) {
-//        final Point2D p2 = (Point2D)p;
-//        if(d == 0) {
-//            return Math.abs(p2.x - x);
-//        } else if (d == 1) {
-//            return Math.abs(p2.y - y);
-//        } else {
-//            throw new IllegalArgumentException("Invalid dimension");
-//        }
-//    }
 
     @Override
     public HyperRect getMbr(final HyperRect r) {
@@ -93,7 +73,7 @@ public class Rect2D<X extends Comparable<X>> implements HyperRect<X> {
     }
 
     @Override
-    public int getNDim() {
+    public int dim() {
         return 2;
     }
 
@@ -140,10 +120,8 @@ public class Rect2D<X extends Comparable<X>> implements HyperRect<X> {
     public boolean intersects(final HyperRect r) {
         final Rect2D r2 = (Rect2D)r;
 
-        return !(min.x > r2.max.x ||
-                r2.min.x > max.x ||
-                min.y > r2.max.y ||
-                r2.min.y > max.y);
+        return !(min.x > r2.max.x || r2.min.x > max.x ||
+                min.y > r2.max.y || r2.min.y > max.y);
     }
 
     @Override
@@ -153,15 +131,7 @@ public class Rect2D<X extends Comparable<X>> implements HyperRect<X> {
         return Math.abs(dx)*Math.abs(dy);
     }
 
-    @Override
-    public double perimeter() {
-        double p = 0.0;
-        final int nD = this.getNDim();
-        for(int d = 0; d<nD; d++) {
-            p += 2.0 * this.getRange(d);
-        }
-        return p;
-    }
+
 
     @Override
     public boolean equals(Object o) {
@@ -207,9 +177,6 @@ public class Rect2D<X extends Comparable<X>> implements HyperRect<X> {
             return rect2D;
         }
 
-//        @Override
-//        public HyperRect getMbr(final HyperPoint p1, final HyperPoint p2) {
-//            return new Rect2D(p1.getCoord(0), p1.getCoord(1), p2.getCoord(0), p2.getCoord(1));
-//        }
     }
+
 }

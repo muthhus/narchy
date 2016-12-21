@@ -53,6 +53,7 @@ public class RTree<T> implements SpatialSearch<T> {
         root = Leaf.create(builder, mMin, mMax, splitType);
     }
 
+
     @Override
     @Deprecated public int search(final HyperRect rect, final T[] t) {
         return root.search(rect, t, 0);

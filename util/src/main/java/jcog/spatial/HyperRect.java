@@ -41,7 +41,7 @@ public interface HyperRect<X extends Comparable<X>>  {
      *
      * @return number of dimensions
      */
-    int getNDim();
+    int dim();
 
     /**
      * Get the minimum HyperPoint of this HyperRect
@@ -73,6 +73,8 @@ public interface HyperRect<X extends Comparable<X>>  {
      */
     double getRange(final int d);
 
+
+
     /**
      * Determines if this HyperRect fully contains parameter HyperRect
      *
@@ -103,6 +105,12 @@ public interface HyperRect<X extends Comparable<X>>  {
      *
      * @return - perimeter
      */
-    double perimeter();
-
+    default double perimeter() {
+        double p = 0.0;
+        final int nD = this.dim();
+        for(int d = 0; d<nD; d++) {
+            p += 2.0 * this.getRange(d);
+        }
+        return p;
+    }
 }

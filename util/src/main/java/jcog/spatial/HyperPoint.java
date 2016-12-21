@@ -32,7 +32,7 @@ public interface HyperPoint {
      *
      * @return dimension count
      */
-    int getNDim();
+    int dim();
 
     /**
      * Get the value of this point in the given dimension
@@ -44,7 +44,7 @@ public interface HyperPoint {
      * @return D - value of this point in the dimension
      * @throws IllegalArgumentException if a non-existent dimension is requested
      */
-    <D extends Comparable<D>> D getCoord(int d);
+    <D extends Comparable> D coord(int d);
 
     /**
      * Calculate the distance from this point to the given point across all dimensions

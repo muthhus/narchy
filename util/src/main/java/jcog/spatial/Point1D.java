@@ -11,12 +11,12 @@ package jcog.spatial;
     }
 
     @Override
-    public int getNDim() {
+    public int dim() {
         return 1;
     }
 
     @Override
-    public Double getCoord(int d) {
+    public Double coord(int d) {
         return x;
     }
 

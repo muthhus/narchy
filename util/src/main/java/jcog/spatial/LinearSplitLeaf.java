@@ -40,7 +40,7 @@ final class LinearSplitLeaf<T> extends Leaf<T> {
         final int MIN = 0;
         final int MAX = 1;
         final int NRANGE = 2;
-        final int nD = r[0].getNDim();
+        final int nD = r[0].dim();
         final int[][][] rIndex = new int[nD][NRANGE][NRANGE];
         // separation between min and max extremes
         final double   [] separation = new double[nD];
@@ -53,20 +53,25 @@ final class LinearSplitLeaf<T> extends Leaf<T> {
             rIndex[d][MAX][MAX] = 0;
 
             for(int j = 1; j < size; j++) {
-                if(r[rIndex[d][MIN][MIN]].getMin().getCoord(d).compareTo(r[j].getMin().getCoord(d)) > 0) {
-                    rIndex[d][MIN][MIN] = j;
+                int[][] rd = rIndex[d];
+
+                HyperRect rj = r[j];
+                Comparable rjMin = rj.getMin().coord(d);
+                if(r[rd[MIN][MIN]].getMin().coord(d).compareTo(rjMin) > 0) {
+                    rd[MIN][MIN] = j;
                 }
 
-                if(r[rIndex[d][MIN][MAX]].getMin().getCoord(d).compareTo(r[j].getMin().getCoord(d)) < 0) {
-                    rIndex[d][MIN][MAX] = j;
+                if(r[rd[MIN][MAX]].getMin().coord(d).compareTo(rjMin) < 0) {
+                    rd[MIN][MAX] = j;
                 }
 
-                if(r[rIndex[d][MAX][MIN]].getMax().getCoord(d).compareTo(r[j].getMax().getCoord(d)) > 0) {
-                    rIndex[d][MAX][MIN] = j;
+                Comparable rjMax = rj.getMax().coord(d);
+                if(r[rd[MAX][MIN]].getMax().coord(d).compareTo(rjMax) > 0) {
+                    rd[MAX][MIN] = j;
                 }
 
-                if(r[rIndex[d][MAX][MAX]].getMax().getCoord(d).compareTo(r[j].getMax().getCoord(d)) < 0) {
-                    rIndex[d][MAX][MAX] = j;
+                if(r[rd[MAX][MAX]].getMax().coord(d).compareTo(rjMax) < 0) {
+                    rd[MAX][MAX] = j;
                 }
             }
 

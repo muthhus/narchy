@@ -16,7 +16,7 @@ public class Rect1DTest {
         Rect1D rect = new Rect1D.DefaultRect1D(0, 4);
 
         HyperPoint centroid = rect.getCentroid();
-        double x = centroid.getCoord(0);
+        double x = centroid.coord(0);
         Assert.assertTrue("Bad X-coord of centroid - expected " + 2.0 + " but was " + x, x == 2.0d);
 
     }
