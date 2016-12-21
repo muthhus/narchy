@@ -1,5 +1,6 @@
 package nars.nar.util;
 
+import jcog.data.MutableIntRange;
 import jcog.list.FasterList;
 import nars.$;
 import nars.NAR;
@@ -29,14 +30,14 @@ public class PremiseMatrix {
 
     public static int run(@NotNull Concept c,
                           @NotNull NAR nar,
-                          int tasklinks, int termlinks,
+                          int tasklinks, MutableIntRange termlinks,
                           @NotNull Consumer<DerivedTask> target,
                           @NotNull Deriver deriver) {
 
         return run(c, nar, tasklinks, termlinks, target, deriver, c.tasklinks(), c.termlinks());
     }
 
-    public static int run(@NotNull Concept c, @NotNull NAR nar, int tasklinks, int termlinks, @NotNull Consumer<DerivedTask> target, @NotNull Deriver deriver, @NotNull Bag<Task> tasklinkBag, @NotNull Bag<? extends Term> termlinkBag) {
+    public static int run(@NotNull Concept c, @NotNull NAR nar, int tasklinks, MutableIntRange termlinks, @NotNull Consumer<DerivedTask> target, @NotNull Deriver deriver, @NotNull Bag<Task> tasklinkBag, @NotNull Bag<? extends Term> termlinkBag) {
         int count = 0;
 
 
@@ -50,7 +51,7 @@ public class PremiseMatrix {
         int tasksBufferSize = tasksBuffer.size();
         if (tasksBufferSize > 0) {
 
-            int termlinksSampled = (int) Math.ceil(termlinks);
+            int termlinksSampled = (int) Math.ceil(termlinks.hi());
 
             FasterList<BLink<? extends Term>> termsBuffer = (FasterList) $.newArrayList(termlinksSampled);
             termlinkBag.sample(termlinksSampled, termsBuffer::add);
@@ -77,7 +78,9 @@ public class PremiseMatrix {
 
                     int countPerTermlink = 0;
 
-                    for (int j = 0; j < termsBufferSize && countPerTermlink < termlinks; j++, jl++) {
+                    int termlinksPerForThisTask = termlinks.lerp(taskLink.pri());
+
+                    for (int j = 0; j < termsBufferSize && countPerTermlink < termlinksPerForThisTask; j++, jl++) {
 
                         Premise p = Premise.tryPremise(c, task, termsBuffer.get(jl % termsBufferSize).get(), now, nar);
                         if (p != null) {

@@ -2,6 +2,7 @@ package nars.nar;
 
 import com.google.common.collect.Lists;
 import jcog.Util;
+import jcog.data.MutableIntRange;
 import jcog.data.random.XorShift128PlusRandom;
 import nars.$;
 import nars.NAR;
@@ -66,13 +67,13 @@ public class Alann extends NAR {
         public final Bag<Concept> active;
 
         int fireTaskLinks = 1;
-        int fireTermLinksMin = 1;
-        int fireTermLinksMax = 4;
+        final MutableIntRange fireTermLinks = new MutableIntRange();
 
         public GraphPremiseBuilder(int capacity, int fireRate) {
             //new HijackBag<>(128, 3, blend, random);
 
-            fireTermLinksMax = fireRate;
+            fireTermLinks.set(1, fireRate);
+
             active = new CurveBag<Concept>(capacity, new CurveBag.NormalizedSampler(power2BagCurve, random), BudgetMerge.plusBlend, new ConcurrentHashMap<>(capacity)) {
 
                 @Override
@@ -127,7 +128,6 @@ public class Alann extends NAR {
 
                 Concept here = current.get();
 
-                int fireTermLinks = (int) Math.ceil(Util.lerp(fireTermLinksMax, fireTermLinksMin, current.pri()));
 
                 PremiseMatrix.run(here, Alann.this,
                         fireTaskLinks,

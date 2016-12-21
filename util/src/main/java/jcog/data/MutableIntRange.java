@@ -10,6 +10,10 @@ public class MutableIntRange {
     int lo, hi;
 
 
+    public MutableIntRange() {
+        this(0,0);
+    }
+
     public MutableIntRange(int lo, int hi) {
         set(lo, hi);
     }

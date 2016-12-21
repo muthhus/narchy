@@ -134,18 +134,11 @@ public class ConceptBagCycle implements Consumer<DerivedTask> {
                             int _tasklinks = tasklinksFiredPerFiredConcept.intValue();
 
                             for (int i = 0, toFireSize = toFire.size(); i < toFireSize; i++) {
-                                BLink<Concept> cl = toFire.get(i);
-                                int _termlinks = termlinksFiredPerFiredConcept.lerp(cl.pri());
-                                if (_termlinks > 0) {
-
-                                    Concept c = cl.get();
-
-                                    PremiseMatrix.run(c, this.nar,
-                                            _tasklinks, _termlinks,
-                                            this, //input them within the current thread here
-                                            deriver
-                                    );
-                                }
+                                PremiseMatrix.run(toFire.get(i).get(), this.nar,
+                                        _tasklinks, termlinksFiredPerFiredConcept,
+                                        this, //input them within the current thread here
+                                        deriver
+                                );
                             }
                         });
 
