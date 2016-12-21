@@ -70,6 +70,6 @@ public interface SpatialSearch<T> {
     void forEach(Consumer<T> consumer);
     void forEach(Consumer<T> consumer, HyperRect rect);
 
-    Stats collectStats();
+    Stats stats();
 
 }

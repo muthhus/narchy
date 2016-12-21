@@ -47,10 +47,10 @@ final class LinearSplitLeaf<T> extends Leaf<T> {
 
         for(int d = 0; d < nD; d++) {
 
-            rIndex[d][MIN][MIN] = 0;
-            rIndex[d][MIN][MAX] = 0;
-            rIndex[d][MAX][MIN] = 0;
-            rIndex[d][MAX][MAX] = 0;
+//            rIndex[d][MIN][MIN] = 0;
+//            rIndex[d][MIN][MAX] = 0;
+//            rIndex[d][MAX][MIN] = 0;
+//            rIndex[d][MAX][MAX] = 0;
 
             for(int j = 1; j < size; j++) {
                 int[][] rd = rIndex[d];

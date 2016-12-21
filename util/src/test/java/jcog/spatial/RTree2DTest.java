@@ -29,7 +29,7 @@ import java.util.Random;
 /**
  * Created by jcairns on 4/30/15.
  */
-public class RTreeTest {
+public class RTree2DTest {
 
     @Test
     public void pointSearchTest() {
@@ -141,7 +141,7 @@ public class RTreeTest {
                 rTree.add(rects[i]);
             }
 
-            Stats stats = rTree.collectStats();
+            Stats stats = rTree.stats();
             stats.print(System.out);
         }
     }
@@ -241,12 +241,12 @@ public class RTreeTest {
         for(int i = 0; i < rect.length; i++){
             rTree.add(rect[i]);
         }
-        Stats stat = rTree.collectStats();
+        Stats stat = rTree.stats();
         stat.print(System.out);
         for(int i = 0; i < 5; i++){
             rTree.remove(rect[64]);
         }
-        Stats stat2 = rTree.collectStats();
+        Stats stat2 = rTree.stats();
         stat2.print(System.out);
     }
 

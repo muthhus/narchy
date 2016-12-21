@@ -38,7 +38,7 @@ public class Rect1DTest {
 
             //t.forEach(x -> System.out.println(x));
 
-            Stats s = t.collectStats();
+            Stats s = t.stats();
             System.out.println(s);
 
             DoubleArrayList d = new DoubleArrayList();

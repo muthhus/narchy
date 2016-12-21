@@ -210,10 +210,10 @@ public class LockingRTree<T> implements SpatialSearch<T> {
     }
 
     @Override
-    public Stats collectStats() {
+    public Stats stats() {
         readLock.lock();
         try {
-            return rTree.collectStats();
+            return rTree.stats();
         } finally {
             readLock.unlock();
         }

@@ -29,7 +29,7 @@ import java.util.Arrays;
  *
  * Created by jcairns on 5/5/15.
  */
-final class AxialSplitLeaf<T> extends Leaf<T> {
+public final class AxialSplitLeaf<T> extends Leaf<T> {
 
     protected AxialSplitLeaf(final RectBuilder<T> builder, final int mMin, final int mMax) {
         super(builder, mMin, mMax, RTree.Split.AXIAL);

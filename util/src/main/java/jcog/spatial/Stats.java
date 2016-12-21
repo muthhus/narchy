@@ -36,9 +36,11 @@ public class Stats {
     private int branchCount;
     private int leafCount;
     private int entryCount;
-    private final int[] entriesAtDepth = new int[10000];
-    private final int[] branchesAtDepth = new int[10000];
-    private final int[] leavesAtDepth = new int[10000];
+
+    final static int MAX_DEPTH = 64;
+    private final int[] entriesAtDepth = new int[MAX_DEPTH];
+    private final int[] branchesAtDepth = new int[MAX_DEPTH];
+    private final int[] leavesAtDepth = new int[MAX_DEPTH];
 
     public void print(PrintStream out) {
         out.println("[" + type + "] m=" + minFill + " M=" + maxFill);

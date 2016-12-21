@@ -729,6 +729,15 @@ public enum Util { ;
         return Math.abs(a - b) < epsilon;
     }
 
+    public static boolean equals(float[] a, float[] b, float epsilon) {
+        if (a == b) return true;
+        for (int i = 0; i < a.length; i++) {
+            if (Math.abs(a[i] - b[i]) >= epsilon)
+                return false;
+        }
+        return true;
+    }
+
     /**
      * tests equivalence (according to epsilon precision)
      */

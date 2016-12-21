@@ -35,7 +35,8 @@ import java.util.function.Predicate;
  * Created by jcairns on 4/30/15.</p>
  */
 public class RTree<T> implements SpatialSearch<T> {
-    private static final double EPSILON = 1e-12;
+    public static final double EPSILON = 1e-12;
+    public static final float FPSILON = (float)EPSILON;
 
     private final int mMin;
     private final int mMax;
@@ -132,7 +133,7 @@ public class RTree<T> implements SpatialSearch<T> {
     }
 
     @Override
-    public Stats collectStats() {
+    public Stats stats() {
         Stats stats = new Stats();
         stats.setType(splitType);
         stats.setMaxFill(mMax);

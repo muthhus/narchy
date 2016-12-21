@@ -226,11 +226,8 @@ abstract class Leaf<T> implements Node<T> {
                     l1Node.add(t);
                 } else if(RTree.isEqual(l1MbrMargin, l2MbrMargin)) {
                     // break ties with least number
-                    if (l1Node.size() < l2Node.size()) {
-                        l1Node.add(t);
-                    } else {
-                        l2Node.add(t);
-                    }
+                    ((l1Node.size() < l2Node.size()) ? l1Node : l2Node).add(t);
+
                 } else {
                     l2Node.add(t);
                 }

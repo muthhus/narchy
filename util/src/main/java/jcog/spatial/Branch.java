@@ -20,6 +20,7 @@ package jcog.spatial;
  * #L%
  */
 
+
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
@@ -29,13 +30,15 @@ import java.util.function.Predicate;
  * Created by jcairns on 4/30/15.
  */
 final class Branch<T> implements Node<T> {
-    private HyperRect mbr;
+
     private final Node[] child;
-    private int size;
     private final RectBuilder<T> builder;
     private final int mMax;
     private final int mMin;
     private final RTree.Split splitType;
+
+    private HyperRect mbr;
+    private int size;
 
     Branch(final RectBuilder<T> builder, final int mMin, final int mMax, final RTree.Split splitType) {
         this.mMin = mMin;

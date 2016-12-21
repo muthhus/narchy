@@ -39,7 +39,7 @@ public class AxialSplitLeafTest {
     @Test
     public void basicSplitTest() {
 
-        RTree<Rect2D> rTree = RTreeTest.createRect2DTree(TYPE);
+        RTree<Rect2D> rTree = RTree2DTest.createRect2DTree(TYPE);
         rTree.add(new Rect2D(0, 0, 1, 1));
         rTree.add(new Rect2D(1, 1, 2, 2));
         rTree.add(new Rect2D(2, 2, 3, 3));
@@ -51,7 +51,7 @@ public class AxialSplitLeafTest {
         // 9 entries guarantees a split
         rTree.add(new Rect2D(8, 8, 9, 9));
 
-        Stats stats = rTree.collectStats();
+        Stats stats = rTree.stats();
         Assert.assertTrue("Unexpected max depth after basic split", stats.getMaxDepth() == 1);
         Assert.assertTrue("Unexpected number of branches after basic split", stats.getBranchCount() == 1);
         Assert.assertTrue("Unexpected number of leaves after basic split", stats.getLeafCount() == 2);
@@ -61,7 +61,7 @@ public class AxialSplitLeafTest {
     @Test
     public void splitCorrectnessTest() {
 
-        RTree<Rect2D> rTree = RTreeTest.createRect2DTree(2, 4, TYPE);
+        RTree<Rect2D> rTree = RTree2DTest.createRect2DTree(2, 4, TYPE);
         rTree.add(new Rect2D(0, 0, 3, 3));
         rTree.add(new Rect2D(1, 1, 2, 2));
         rTree.add(new Rect2D(2, 2, 4, 4));
@@ -99,7 +99,7 @@ public class AxialSplitLeafTest {
     @Test
     public void overlappingEntryTest() {
 
-        final RTree<Rect2D> rTree = RTreeTest.createRect2DTree(TYPE);
+        final RTree<Rect2D> rTree = RTree2DTest.createRect2DTree(TYPE);
         rTree.add(new Rect2D(0, 0, 1, 1));
         rTree.add(new Rect2D(0, 0, 2, 2));
         rTree.add(new Rect2D(0, 0, 2, 2));
@@ -124,7 +124,7 @@ public class AxialSplitLeafTest {
         // 17 entries guarantees *at least* 2 splits when max leaf size is 8
         final int expectedEntryCount = 17;
 
-        final Stats stats = rTree.collectStats();
+        final Stats stats = rTree.stats();
         Assert.assertEquals("Unexpected number of entries in " + TYPE + " split tree: " + stats.getEntryCount() + " entries - expected: " + expectedEntryCount + " actual: " + stats.getEntryCount(), expectedEntryCount, stats.getEntryCount());
     }
 
@@ -136,14 +136,14 @@ public class AxialSplitLeafTest {
     public void randomEntryTest() {
 
         final int entryCount = 50000;
-        final Rect2D[] rects = RTreeTest.generateRandomRects(entryCount);
+        final Rect2D[] rects = RTree2DTest.generateRandomRects(entryCount);
 
-        final RTree<Rect2D> rTree = RTreeTest.createRect2DTree(TYPE);
+        final RTree<Rect2D> rTree = RTree2DTest.createRect2DTree(TYPE);
         for (int i = 0; i < rects.length; i++) {
             rTree.add(rects[i]);
         }
 
-        final Stats stats = rTree.collectStats();
+        final Stats stats = rTree.stats();
         Assert.assertEquals("Unexpected number of entries in " + TYPE + " split tree: " + stats.getEntryCount() + " entries - expected: " + entryCount + " actual: " + stats.getEntryCount(), entryCount, stats.getEntryCount());
         stats.print(System.out);
     }
@@ -155,7 +155,7 @@ public class AxialSplitLeafTest {
      */
     @Test
     public void causeLinearSplitOverflow() {
-        final RTree<Rect2D> rTree = RTreeTest.createRect2DTree(TYPE);
+        final RTree<Rect2D> rTree = RTree2DTest.createRect2DTree(TYPE);
         final Random rand = new Random(13);
         for (int i = 0; i < 500; i++) {
             final int x1 = rand.nextInt(10);
@@ -165,7 +165,7 @@ public class AxialSplitLeafTest {
 
             rTree.add(new Rect2D(x1, y1, x2, y2));
         }
-        final Stats stats = rTree.collectStats();
+        final Stats stats = rTree.stats();
         stats.print(System.out);
     }
 

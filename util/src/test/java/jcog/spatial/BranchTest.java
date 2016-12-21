@@ -35,31 +35,31 @@ public class BranchTest {
     public void branchOptimizationTest() {
 
         for(RTree.Split type : RTree.Split.values()) {
-            RTree<Rect2D> rTree = RTreeTest.createRect2DTree(type);
-            Rect2D[] rects = RTreeTest.generateRandomRects(80);
+            RTree<Rect2D> rTree = RTree2DTest.createRect2DTree(type);
+            Rect2D[] rects = RTree2DTest.generateRandomRects(80);
 
             int i = 0;
             // cause no splits, fill up leaf
             while (i < 8) {
                 rTree.add(rects[i++]);
             }
-            Assert.assertEquals("[" + type + "] Expected 0 branches at this time", 0, rTree.collectStats().getBranchCount());
+            Assert.assertEquals("[" + type + "] Expected 0 branches at this time", 0, rTree.stats().getBranchCount());
 
             // leaf was full, first split
             rTree.add(rects[i++]);
-            Assert.assertEquals("[" + type + "] Expected 1 branch at this time", 1, rTree.collectStats().getBranchCount());
+            Assert.assertEquals("[" + type + "] Expected 1 branch at this time", 1, rTree.stats().getBranchCount());
 
             // cause another split, extra branches get optimized out
             while (i < 30) {
                 rTree.add(rects[i++]);
             }
-            Assert.assertEquals("[" + type + "] Expected 1 branch at this time", 1, rTree.collectStats().getBranchCount());
+            Assert.assertEquals("[" + type + "] Expected 1 branch at this time", 1, rTree.stats().getBranchCount());
 
             // cause enough additional splits to force new branch creation
             while (i < 80) {
                 rTree.add(rects[i++]);
             }
-            Assert.assertEquals("[" + type + "] Expected 6 branches at this time", 6, rTree.collectStats().getBranchCount());
+            Assert.assertEquals("[" + type + "] Expected 6 branches at this time", 6, rTree.stats().getBranchCount());
         }
     }
 }

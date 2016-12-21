@@ -4,6 +4,8 @@ import jcog.Util;
 
 import java.util.Arrays;
 
+import static jcog.spatial.RTree.FPSILON;
+
 /**
  * Created by me on 12/21/16.
  */
@@ -17,6 +19,12 @@ public class PointND implements HyperPoint {
 
     public PointND(float... coord) {
         this.coord = coord;
+    }
+
+    public static PointND fill(int dims, float value) {
+        float[] a = new float[dims];
+        Arrays.fill(a, value);
+        return new PointND(a);
     }
 
     @Override
@@ -50,11 +58,13 @@ public class PointND implements HyperPoint {
     public boolean equals(Object obj) {
         //TODO use float epsilon tolerance
         if (this == obj) return true;
-        return Arrays.equals(coord, ((PointND)obj).coord);
+        PointND p = (PointND) obj;
+        return Util.equals(coord, p.coord, FPSILON);
     }
 
     @Override
     public int hashCode() {
+        //TODO compute each component rounded to nearest epsilon?
         return Arrays.hashCode(coord);
     }
 
@@ -62,4 +72,7 @@ public class PointND implements HyperPoint {
     public String toString() {
         return "(" + Arrays.toString(coord) + ")";
     }
+
+
+
 }
