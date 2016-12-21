@@ -153,7 +153,7 @@ abstract public class NAgents extends NAgent {
         new Inperience(nar, 0.05f);
 
         SpaceGraph.window(grid(nar.cores.stream().map(c ->
-                Vis.items(c.active, nar, 16)).toArray(Surface[]::new)), 900, 700);
+                Vis.items(c.activeBag(), nar, 16)).toArray(Surface[]::new)), 900, 700);
 
 
         return nar;

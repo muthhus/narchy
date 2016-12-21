@@ -18,6 +18,7 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.List;
 import java.util.function.Consumer;
 
 /**
@@ -34,12 +35,10 @@ public class PremiseMatrix {
                           @NotNull Consumer<DerivedTask> target,
                           @NotNull Deriver deriver) {
 
-        return run(c, nar, tasklinks, termlinks, target, deriver, c.tasklinks(), c.termlinks());
+        return run(c, tasklinks, termlinks, c.tasklinks(), c.termlinks(), deriver, target, nar);
     }
 
-    public static int run(@NotNull Concept c, @NotNull NAR nar, int tasklinks, MutableIntRange termlinks, @NotNull Consumer<DerivedTask> target, @NotNull Deriver deriver, @NotNull Bag<Task> tasklinkBag, @NotNull Bag<? extends Term> termlinkBag) {
-        int count = 0;
-
+    public static int run(@NotNull Concept c, int tasklinks, MutableIntRange termlinks, @NotNull Bag<Task> tasklinkBag, @NotNull Bag<Term> termlinkBag, @NotNull Deriver deriver, @NotNull Consumer<DerivedTask> target, @NotNull NAR nar) {
 
         c.commit();
 
@@ -50,61 +49,70 @@ public class PremiseMatrix {
 
         int tasksBufferSize = tasksBuffer.size();
         if (tasksBufferSize > 0) {
-
-            int termlinksSampled = (int) Math.ceil(termlinks.hi());
-
-            FasterList<BLink<? extends Term>> termsBuffer = (FasterList) $.newArrayList(termlinksSampled);
-            termlinkBag.sample(termlinksSampled, termsBuffer::add);
-
-
-            int termsBufferSize = termsBuffer.size();
-            if (termsBufferSize > 0) {
-
-                //current termlink counter, as it cycles through what has been sampled, give it a random starting position
-                int jl = nar.random.nextInt(termsBufferSize);
-
-                //random starting position
-                int il = nar.random.nextInt(tasksBufferSize);
-
-                int countPerTasklink = 0;
-
-                long now = nar.time();
-
-                for (int i = 0; i < tasksBufferSize && countPerTasklink < tasklinks; i++, il++) {
-
-                    BLink<Task> taskLink = tasksBuffer.get(il % tasksBufferSize);
-
-                    Task task = taskLink.get(); /*match(taskLink.get(), nar); if (task==null) continue;*/
-
-                    int countPerTermlink = 0;
-
-                    int termlinksPerForThisTask = termlinks.lerp(taskLink.pri());
-
-                    for (int j = 0; j < termsBufferSize && countPerTermlink < termlinksPerForThisTask; j++, jl++) {
-
-                        Premise p = Premise.tryPremise(c, task, termsBuffer.get(jl % termsBufferSize).get(), now, nar);
-                        if (p != null) {
-                            deriver.accept(new Derivation(nar, p, target));
-                            countPerTermlink++;
-                        }
-
-                    }
-
-                    countPerTasklink += countPerTermlink > 0 ? 1 : 0;
-
-                }
-
-                count += countPerTasklink;
-
-            } else {
-                if (Param.DEBUG_EXTRA)
-                    logger.warn("{} has zero termlinks", c);
-            }
-
+            return run(c, termlinks, target, deriver, termlinkBag, tasksBuffer, nar);
         } else {
             if (Param.DEBUG_EXTRA)
                 logger.warn("{} has zero tasklinks", c);
+            return 0;
         }
+    }
+
+    public static int run(@NotNull Concept c, MutableIntRange termlinks, @NotNull Consumer<DerivedTask> target, @NotNull Deriver deriver, @NotNull Bag<Term> termlinkBag, List<BLink<Task>> taskLinks, @NotNull NAR nar) {
+
+        int count = 0;
+
+        int numTaskLinks = taskLinks.size();
+        int termlinksSampled = (int) Math.ceil(termlinks.hi());
+
+        FasterList<BLink<? extends Term>> termsBuffer = (FasterList) $.newArrayList(termlinksSampled);
+        termlinkBag.sample(termlinksSampled, termsBuffer::add);
+
+
+        int termsBufferSize = termsBuffer.size();
+        if (termsBufferSize > 0) {
+
+            //current termlink counter, as it cycles through what has been sampled, give it a random starting position
+            int jl = nar.random.nextInt(termsBufferSize);
+
+            //random starting position
+            int il = nar.random.nextInt(numTaskLinks);
+
+            int countPerTasklink = 0;
+
+            long now = nar.time();
+
+            for (int i = 0; i < numTaskLinks && countPerTasklink < numTaskLinks; i++, il++) {
+
+                BLink<Task> taskLink = taskLinks.get(il % numTaskLinks);
+
+                Task task = taskLink.get(); /*match(taskLink.get(), nar); if (task==null) continue;*/
+
+                int countPerTermlink = 0;
+
+                int termlinksPerForThisTask = termlinks.lerp(taskLink.pri());
+
+                for (int j = 0; j < termsBufferSize && countPerTermlink < termlinksPerForThisTask; j++, jl++) {
+
+                    Premise p = Premise.tryPremise(c, task, termsBuffer.get(jl % termsBufferSize).get(), now, nar);
+                    if (p != null) {
+                        deriver.accept(new Derivation(nar, p, target));
+                        countPerTermlink++;
+                    }
+
+                }
+
+                countPerTasklink += countPerTermlink > 0 ? 1 : 0;
+
+            }
+
+            count += countPerTasklink;
+
+        } else {
+            if (Param.DEBUG_EXTRA)
+                logger.warn("{} has zero termlinks", c);
+        }
+
+
 
 
         /*

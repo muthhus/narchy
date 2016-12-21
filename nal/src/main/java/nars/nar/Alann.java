@@ -1,14 +1,15 @@
 package nars.nar;
 
 import com.google.common.collect.Lists;
-import jcog.Util;
 import jcog.data.MutableIntRange;
 import jcog.data.random.XorShift128PlusRandom;
 import nars.$;
 import nars.NAR;
 import nars.Param;
+import nars.Task;
 import nars.bag.Bag;
 import nars.bag.impl.CurveBag;
+import nars.budget.Budget;
 import nars.budget.merge.BudgetMerge;
 import nars.concept.Concept;
 import nars.index.term.tree.TreeTermIndex;
@@ -25,12 +26,13 @@ import org.apache.commons.collections4.IteratorUtils;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.eclipse.collections.api.tuple.primitive.ObjectFloatPair;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -52,15 +54,48 @@ public class Alann extends NAR {
     private static final Logger logger = LoggerFactory.getLogger(Alann.class);
 
 
-
-    public final List<GraphPremiseBuilder> cores;
+    public final List<AlannAgent> cores;
 
     final static Deriver deriver = Default.newDefaultDeriver();
 
     final AtomicBoolean running = new AtomicBoolean(false);
     private ExecutorService coreExe = null;
 
-    public final class GraphPremiseBuilder {
+    public abstract class AlannAgent {
+
+        volatile boolean stopped = false;
+
+        public abstract void next();
+
+        abstract public Iterator<Concept> active();
+
+        abstract public Bag<Concept> activeBag();
+
+        public void stop() {
+            stopped = true;
+        }
+
+        public void loop() {
+            while (!stopped) {
+                try {
+                    next();
+                } catch (Throwable t) {
+                    logger.error("run: {}", t);
+                }
+            }
+        }
+
+
+        public abstract float pri(@NotNull Termed concept);
+
+        public abstract void activate(@NotNull Termed term, float priToAdd);
+
+        public abstract void activate(Concept c, Budget b, float v, MutableFloat overflow);
+
+    }
+
+
+    class ConceptFirer extends AlannAgent {
 
         private BLink<Concept> current;
 
@@ -69,7 +104,7 @@ public class Alann extends NAR {
         int fireTaskLinks = 1;
         final MutableIntRange fireTermLinks = new MutableIntRange();
 
-        public GraphPremiseBuilder(int capacity, int fireRate) {
+        public ConceptFirer(int capacity, int fireRate) {
             //new HijackBag<>(128, 3, blend, random);
 
             fireTermLinks.set(1, fireRate);
@@ -88,75 +123,58 @@ public class Alann extends NAR {
             };
         }
 
-//        /**
-//         * the tasklink bag is only modified and accessed by the core, locally, so it does not need to have a concurrent Map
-//         */
-//        public final Bag<Task> tasklinks =
-//                //new HijackBag<>(128, 3, blend, random);
-//                new CurveBag(64, new CurveBag.NormalizedSampler(power2BagCurve, random), blend, new HashMap(64));
-
-
-        public void loop() {
-            while (true) {
-                iterateSafe();
-            }
+        @Override
+        public float pri(@NotNull Termed concept) {
+            Bag<Concept> cc = active;
+            return cc.pri(concept, Float.NaN);
         }
 
-        public void iterateSafe() {
-            try {
-                iterate();
-            } catch (Throwable t) {
-                logger.error("run: {}", t);
-            }
+        @Override
+        public void activate(@NotNull Termed term, float priToAdd) {
+            active.add(term, priToAdd);
         }
 
+        @Override
+        public void activate(Concept c, Budget b, float v, MutableFloat overflow) {
+            active.put(c, b, v, overflow);
+        }
 
-        void iterate() {
+        @Override
+        public Iterator<Concept> active() {
+            return IteratorUtils.transformedIterator( active.iterator(), p -> p.get() );
+        }
+
+        @Override
+        public Bag<Concept> activeBag() {
+            return active;
+        }
+
+        @Override
+        public void next() {
 
 
-            BLink<? extends Termed> next = go();
+            BLink<Concept> next = active.commit().sample();
 
             if (next == null) {
                 //seed(seedRate);
-                go();
+                return;
             }
 
-            if (current != null) {
 
 //                float conceptVisitCost = 1f - (1f / terms.size());
 //                terms.mul(here, conceptVisitCost);
 
-                Concept here = current.get();
+            Concept here = next.get();
 
 
-                PremiseMatrix.run(here, Alann.this,
-                        fireTaskLinks,
-                        fireTermLinks,
-                        Alann.this::input, //input them within the current thread here
-                        deriver,
-                        here.tasklinks(), //this.tasklinks,
-                        here.termlinks()
-                );
-            }
+            PremiseMatrix.run(here, fireTaskLinks, fireTermLinks, here.tasklinks(), here.termlinks(), deriver, Alann.this::input, Alann.this
+                    //input them within the current thread here
+                    //this.tasklinks,
+            );
+
 
         }
 
-
-        @Nullable
-        private BLink<Concept> go() {
-            BLink<Concept> next = active.commit().sample();
-            if (next != null) {
-
-                //Concept d = next.get(); //concept(next.get());
-
-
-                //d.termlinks().commit().transfer(2, terms);
-                //d.tasklinks().commit().copy(tasklinks, TASKLINK_COLLECTION_RATE);
-
-                this.current = next;
-            }
-            return next;
-        }
 
         void print() {
             logger.info("at: {}", current);
@@ -170,9 +188,101 @@ public class Alann extends NAR {
 
     }
 
+    class TaskFirer extends AlannAgent {
+
+
+        public final Bag<Task> active;
+
+        final MutableIntRange fireTermLinks = new MutableIntRange();
+
+        public TaskFirer(int capacity, int fireRate) {
+            //new HijackBag<>(128, 3, blend, random);
+
+            fireTermLinks.set(1, fireRate);
+
+            active = new CurveBag<Task>(capacity, new CurveBag.NormalizedSampler(power2BagCurve, random), BudgetMerge.plusBlend, new ConcurrentHashMap<>(capacity)) {
+
+                @Override
+                public void onAdded(BLink<Task> value) {
+                    //value.get().state(concepts.conceptBuilder().awake(), Alann.this);
+                }
+
+                @Override
+                public void onRemoved(@NotNull BLink<Task> value) {
+                    //value.get().state(concepts.conceptBuilder().sleep(), Alann.this);
+                }
+            };
+        }
+
+        @Override
+        public float pri(@NotNull Termed concept) {
+            throw new UnsupportedOperationException("TODO");
+        }
+
+        @Override
+        public void activate(Concept c, Budget b, float v, MutableFloat overflow) {
+            BLink<Task> taskLink = c.tasklinks().sample();
+            if (taskLink!=null)
+                active.put(taskLink.get(), b, v, overflow);
+        }
+
+        @Override
+        public void activate(@NotNull Termed term, float priToAdd) {
+            BLink<Task> taskLink = concept(term).tasklinks().sample();
+            if (taskLink!=null)
+                active.put(taskLink.get(), taskLink, priToAdd, null); //HACK
+        }
+
+        @Override
+        public Iterator<Concept> active() {
+            Set<Concept> s = new LinkedHashSet();
+            active.forEachKey(t -> {
+                s.add(t.concept(Alann.this));
+            });
+            return s.iterator();
+        }
+
+        @Override
+        public Bag<Concept> activeBag() {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public void next() {
+
+
+
+            BLink<Task> taskLink = active.commit().sample();
+            if (taskLink == null) {
+                //seed(seedRate);
+                return;
+            }
+
+            Task task = taskLink.get();
+
+
+//                float conceptVisitCost = 1f - (1f / terms.size());
+//                terms.mul(here, conceptVisitCost);
+
+            Concept concept = task.concept(Alann.this);
+
+
+            PremiseMatrix.run(concept,
+                    fireTermLinks,
+                    Alann.this::input, //input them within the current thread here
+                    deriver,
+                    concept.termlinks(),
+                    Lists.newArrayList(taskLink),
+                    Alann.this
+            );
+
+        }
+
+
+    }
 
     public Alann(@NotNull Time time, int cores, int coreSize, int coreFires) {
-        this(time, cores, coreSize, coreFires, Runtime.getRuntime().availableProcessors()-1, 1);
+        this(time, cores, coreSize, coreFires, Runtime.getRuntime().availableProcessors() - 1, 1);
     }
 
     public Alann(@NotNull Time time, int cores, int coreSize, int coreFires, int coreThreads, int auxThreads) {
@@ -197,7 +307,10 @@ public class Alann extends NAR {
 
         }
 
-        this.cores = range(0, cores).mapToObj(i -> new GraphPremiseBuilder(coreSize, coreFires)).collect(toList());
+        this.cores = range(0, cores).mapToObj(i ->
+                new ConceptFirer(coreSize, coreFires)
+                //new TaskFirer(coreSize, coreFires)
+        ).collect(toList());
 
         runLater(() -> {
             start(coreThreads);
@@ -210,16 +323,16 @@ public class Alann extends NAR {
 
 
         if (running.compareAndSet(false, true)) {
-            List<List<GraphPremiseBuilder>> ll = Lists.partition(cores, (int) Math.ceil(((float) cores.size()) / threads));
+            List<List<AlannAgent>> ll = Lists.partition(cores, (int) Math.ceil(((float) cores.size()) / threads));
             coreExe =
                     //Executors.newCachedThreadPool();
                     Executors.newFixedThreadPool(threads);
-            for (List<GraphPremiseBuilder> l : ll) {
+            for (List<AlannAgent> l : ll) {
                 int s = l.size();
                 if (s == 1) {
                     coreExe.execute(l.get(0)::loop);
                 } else {
-                    coreExe.execute(loop(l.toArray(new GraphPremiseBuilder[s])));
+                    coreExe.execute(loop(l.toArray(new AlannAgent[s])));
                 }
 
             }
@@ -227,11 +340,15 @@ public class Alann extends NAR {
         }
     }
 
-    @NotNull Runnable loop(@NotNull GraphPremiseBuilder[] group) {
+    @NotNull Runnable loop(@NotNull AlannAgent[] group) {
         return () -> {
             while (true) {
-                for (GraphPremiseBuilder g : group) {
-                    g.iterateSafe();
+                for (AlannAgent g : group) {
+                    try {
+                        g.next();
+                    } catch (Throwable t) {
+                        logger.error("run: {}", t);
+                    }
                 }
             }
         };
@@ -244,17 +361,17 @@ public class Alann extends NAR {
 
 
         return () -> {
-            Iterator[] coreBags = cores.stream().map(x -> x.active.iterator()).toArray(Iterator[]::new);
+            Iterator[] coreBags = new Iterator[cores.size()];
+            for (int i = 0; i <coreBags.length; i++) {
+                coreBags[i] = cores.get(i).active();
+            }
             return IteratorUtils.zippingIterator(coreBags);
             //return new RoundRobinIterator<>(coreBags);
         };
     }
 
     public void print() {
-        for (GraphPremiseBuilder core : cores) {
-            core.print();
-        }
-        System.out.println();
+        System.out.println(cores);
     }
 
 
@@ -277,7 +394,7 @@ public class Alann extends NAR {
     public final Concept concept(@NotNull Termed term, float priToAdd) {
         Concept c = concept(term);
         if (c != null) {
-            core(term).active.add(term, priToAdd);
+            core(term).activate(term, priToAdd);
         }
         return c;
     }
@@ -285,7 +402,7 @@ public class Alann extends NAR {
     /**
      * which core is handling a term
      */
-    public GraphPremiseBuilder core(@NotNull Termed term) {
+    public AlannAgent core(@NotNull Termed term) {
         return cores.get(Math.abs(term.hashCode()) % cores.size());
     }
 
@@ -300,15 +417,16 @@ public class Alann extends NAR {
             float p = scale;
             float q = 1f / (1f + c.complexity());
 
-            core(c).active.put(c, $.b(p, q), 1f, overflow);
+            core(c).activate(c, $.b(p, q), 1f, overflow);
         });
     }
 
     @Override
     public final float priority(@NotNull Termed concept, float valueIfInactive) {
-        //TODO impl
-        Bag<Concept> cc = core(concept).active;
-        return cc.pri(concept, Float.NaN);
+        float p = core(concept).pri(concept);
+        if (p!=p)
+            return valueIfInactive;
+        return p;
     }
 
 

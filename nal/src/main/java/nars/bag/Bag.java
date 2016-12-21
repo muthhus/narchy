@@ -595,9 +595,10 @@ public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Iterable<BLink<
     }
 
 
+    /** if key is present, adds a priority amount (quality unaffected) */
     @Nullable V add(Object key, float x);
 
-    /** gets the link if present, applies a priority multiplier factor, and returns the link */
+    /** if key is present, applies a priority multiplier factor, and returns the link */
     @Nullable V mul(Object key, float factor);
 
     /** samples and removes the sampled item. returns null if bag empty, or for some other reason the sample did not succeed  */

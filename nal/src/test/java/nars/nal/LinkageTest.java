@@ -93,7 +93,7 @@ public class LinkageTest extends AbstractNALTest {
     //interlinked with an intermediate concept, this is needed in order to select one as task and the other as belief
     public void ProperlyLinkedIndirectlyTest(@NotNull String spremise1, char punc, @NotNull String spremise2) throws Exception {
 
-        int frames = 1;
+        int frames = 2;
 
         NAR nar = test().nar;
 
@@ -119,15 +119,22 @@ public class LinkageTest extends AbstractNALTest {
 
         @Nullable Concept p1 = nar.concept(premise1);
         assertNotNull(p1.state());
+
+        System.out.println("========================");
         p1.print();
+        System.out.println("------------------------");
+        nar.concept(premise2).print();
+        System.out.println("========================");
 
         boolean passed = linksIndirectly(nar, premise2, p1);
+        assertTrue(premise2 + " does not link indirectly to " + p1, passed);
 
         @Nullable Concept p2 = nar.concept(premise2);
         assertNotNull(p2.state());
         p2.print();
 
         boolean passed2 = linksIndirectly(nar, premise1, p2);
+        assertTrue(passed2);
 
 
         //System.err.println(premise1 + " not linked with " + premise2);
@@ -156,8 +163,6 @@ public class LinkageTest extends AbstractNALTest {
         }
         assertTrue(g.isConnected());
 
-        assertTrue(passed);
-        assertTrue(passed2);
 
     }
 
@@ -183,9 +188,9 @@ public class LinkageTest extends AbstractNALTest {
             }
 
             //test 2nd level link
-            Concept Wc = nar.concept(w);
-            if (Wc != null) {
-                for (BLink<Term> entry2 : Wc.termlinks()) {
+            Concept ww = nar.concept(w);
+            if (ww != null) {
+                for (BLink<Term> entry2 : ww.termlinks()) {
                     if (entry2.get().equals(p2Term)) {
                         return true;
                     }
