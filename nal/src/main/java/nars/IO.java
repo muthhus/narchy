@@ -658,11 +658,8 @@ public class IO {
     }
 
     public static Term fromJSON(String json) {
-
-
         JsonValue v = Json.parse(json);
         return fromJSON(v);
-
     }
 
     public static Term fromJSON(JsonValue v) {
@@ -672,8 +669,8 @@ public class IO {
             List<Term> members = $.newArrayList(s);
             o.forEach(m -> members.add( $.inh(fromJSON(m.getValue()), $.the(m.getName())) ));
             return $.
-                    parallel
-                    //sete
+                    //parallel
+                    sete
                     //secte
                         (members/*.toArray(new Term[s])*/);
 

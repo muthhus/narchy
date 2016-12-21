@@ -1,4 +1,4 @@
-package jcog;
+package nars.util;
 
 import jcog.signal.Autoencoder;
 import nars.NAR;

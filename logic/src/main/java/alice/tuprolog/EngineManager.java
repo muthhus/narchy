@@ -4,20 +4,21 @@ package alice.tuprolog;
 //import java.io.IOException;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class EngineManager implements java.io.Serializable {
+
     private static final long serialVersionUID = 1L;
-    private Prolog vm;
+
+    private final Prolog vm;
+
     private static final ThreadLocal<Integer> threads = new ThreadLocal<>();    //key: pid; obj: id
-    @Deprecated
-    private final static int rootID = 0;
-    private final EngineRunner er1 = new EngineRunner(rootID);
-    private int id;
+
+    private final EngineRunner er1 = new EngineRunner(0);
+    private final AtomicInteger id = new AtomicInteger();
 
     private final ConcurrentHashMap<Integer, EngineRunner> runners
             = new ConcurrentHashMap<>();    //key: id; obj: runner
@@ -26,15 +27,20 @@ public class EngineManager implements java.io.Serializable {
     private final ConcurrentHashMap<String, ReentrantLock> locks
             = new ConcurrentHashMap<>();
 
-    public void initialize(Prolog vm) {
-        er1.initialize(this.vm = vm);
+    public EngineManager(Prolog vm) {
+        this.vm = vm;
+    }
+
+    public void initialize() {
+        er1.initialize(vm);
     }
 
     public boolean threadCreate(Term threadID, Term goal) {
-        id = id + 1;
 
         if (goal == null)
             return false;
+
+        int id = this.id.incrementAndGet();
 
         if (goal instanceof Var)
             goal = goal.getTerm();
@@ -53,11 +59,11 @@ public class EngineManager implements java.io.Serializable {
 
         er.setGoal(goal);
 
-        synchronized (runners) {
+        //synchronized (runners) {
             //synchronized (runners) {
             runners.put(id, er);
             //}
-        }
+        //}
 
         Thread t = new Thread(er);
         //addThread(id); //called in EngineRunner.run method
@@ -65,6 +71,7 @@ public class EngineManager implements java.io.Serializable {
         t.start();
         return true;
     }
+
 
     public Solution join(int id) {
         EngineRunner er = runner(id);
@@ -235,7 +242,7 @@ public class EngineManager implements java.io.Serializable {
             //threads= new Hashtable<>();
             queues.clear();
             locks.clear();
-            id = 0;
+            id.set(0);;
         }
     }
 
@@ -269,9 +276,9 @@ public class EngineManager implements java.io.Serializable {
     private final EngineRunner runner(int id) {
         //if (!runners.containsKey(id)) return null;
         //synchronized (runners) {
-        synchronized (runners) {
+        //synchronized (runners) {
             return runners.get(id);
-        }
+        //}
         //}
     }
 
@@ -344,7 +351,6 @@ public class EngineManager implements java.io.Serializable {
             ReentrantLock mutex = locks.get(name);
             if (mutex == null) {
                 createLock(name);
-                continue;
             } else {
                 mutex.lock();
             /*toSPY
@@ -385,21 +391,16 @@ public class EngineManager implements java.io.Serializable {
 
     public void unlockAll() {
         //synchronized (locks) {
-            Set<String> mutexList = locks.keySet();
-            Iterator<String> it = mutexList.iterator();
-
-            while (it.hasNext()) {
-                ReentrantLock mutex = locks.get(it.next());
-                boolean unlocked = false;
-                while (!unlocked) {
-                    try {
-                        mutex.unlock();
-                    } catch (IllegalMonitorStateException e) {
-                        unlocked = true;
-                    }
+        locks.forEach((k,mutex)->{
+            boolean unlocked = false;
+            while (!unlocked) {
+                try {
+                    mutex.unlock();
+                } catch (IllegalMonitorStateException e) {
+                    unlocked = true;
                 }
             }
-        //}
+        });
     }
 
     Engine getEnv() {

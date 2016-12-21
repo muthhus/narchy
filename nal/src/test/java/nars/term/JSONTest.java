@@ -14,13 +14,18 @@ public class JSONTest {
     @Test
     public void testJSON1() {
         Term t = IO.fromJSON("{ \"a\": [1, 2], \"b\": \"x\", \"c\": { \"d\": 1 } }");
-        assertEquals("( &&+0, (\"x\"-->b),((1-->d)-->c),a(1,2))", t.toString());
+        assertEquals("{(\"x\"-->b),a(1,2),({(1-->d)}-->c)}", t.toString());
     }
     @Test
+    public void testJSON2() {
+        assertEquals("{a(1,2)}", IO.fromJSON("{ \"a\": [1, 2] }").toString());
+    }
+
+    @Test
     public void testJSONTermFunction() {
-        Term t = IO.fromJSON("{ \"a\": [1, 2] }");
+
         Term u = new Terminal().term("json(\"{ \"a\": [1, 2] }\")").term();
-        assertEquals(t, u);
+        assertEquals("{a(1,2)}", u.toString());
         //assertEquals("(&,(\"x\"-->b),((1-->d)-->c),a(1,2))", t.toString());
     }
 }

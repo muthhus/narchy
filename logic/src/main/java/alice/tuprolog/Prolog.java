@@ -163,13 +163,13 @@ public class Prolog implements /*Castagna 06/2011*/IProlog/**/ {
 		libraryManager   = new LibraryManager();
 		opManager        = new OperatorManager();
 		primitiveManager = new PrimitiveManager();
-		engineManager    = new EngineManager();
+		engineManager    = new EngineManager(this);
 		//config managers
 		theoryManager    = new TheoryManager(this, dynamics);
 		libraryManager.initialize(this);
 		flagManager.initialize(this);
 		primitiveManager.initialize(this);
-		engineManager.initialize(this);
+		engineManager.initialize();
 	}
 
 
