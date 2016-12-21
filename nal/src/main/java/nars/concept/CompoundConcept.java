@@ -273,7 +273,7 @@ public class CompoundConcept<T extends Compound> implements Concept, Termlike {
     }
 
     @Override
-    public final void state(@NotNull ConceptState p, NAR nar) {
+    public final ConceptState state(@NotNull ConceptState p, NAR nar) {
         ConceptState current = this.state;
         if (current != p) {
             this.state = p;
@@ -282,6 +282,7 @@ public class CompoundConcept<T extends Compound> implements Concept, Termlike {
             beliefCapacity(p, nar);
             questionCapacity(p, nar);
         }
+        return current;
     }
 
 

@@ -88,6 +88,13 @@ public interface Concept extends Termed {
         return null == m ? null : (C) m.get(key);
     }
 
+    default <C> C remove(@NotNull Object key) {
+        synchronized (this) {
+            Map m = meta();
+            return null == m ? null : (C) m.remove(key);
+        }
+    }
+
 
     @NotNull BeliefTable beliefs();
 
@@ -409,7 +416,8 @@ public interface Concept extends Termed {
 
     @NotNull ConceptState state();
 
-    void state(@NotNull ConceptState c, @NotNull NAR nar);
+    /** returns the previous state */
+    @Nullable ConceptState state(@NotNull ConceptState c, @NotNull NAR nar);
 
     default void commit() {
         tasklinks().commit();

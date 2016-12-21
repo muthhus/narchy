@@ -77,6 +77,11 @@ public abstract class TermIndex extends TermBuilder {
     abstract public void forEach(Consumer<? super Termed> c);
 
 
+    /** called when a concept has been modified, ie. to trigger persistence */
+    public void commit(Concept c) {
+        //by default does nothing
+    }
+
     public void start(NAR nar) {
         this.nar = nar;
         conceptBuilder().start(nar);

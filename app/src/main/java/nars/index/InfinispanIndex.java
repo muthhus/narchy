@@ -44,7 +44,10 @@ import java.util.Set;
 import java.util.function.Consumer;
 
 
+
 public class InfinispanIndex extends MaplikeTermIndex {
+
+    public static final String INIT = "init";
 
     static final Logger logger = LoggerFactory.getLogger(InfinispanIndex.class);
 
@@ -60,7 +63,7 @@ public class InfinispanIndex extends MaplikeTermIndex {
 
         GlobalConfiguration global = new GlobalConfigurationBuilder()
                 .serialization()
-                .addAdvancedExternalizer(new TaskExternalizer())
+                //.addAdvancedExternalizer(new TaskExternalizer())
                 .addAdvancedExternalizer(new PermanentConceptExternalizer())
                 .addAdvancedExternalizer(new ConceptExternalizer())
                 .build();
@@ -69,7 +72,7 @@ public class InfinispanIndex extends MaplikeTermIndex {
 
         Configuration infinispanConfiguration = new ConfigurationBuilder()
                 .unsafe()
-                .versioning().disable()
+                //.versioning().disable()
                 .storeAsBinary().storeKeysAsBinary(true).storeValuesAsBinary(true)
                 .persistence()
                     //.passivation(true)
@@ -86,23 +89,11 @@ public class InfinispanIndex extends MaplikeTermIndex {
         concepts = cm.getCache();
 
 
-//        DefaultCacheManager cm = new DefaultCacheManager(cb.build());
-//        //DefaultCacheManager cm = new DefaultCacheManager();
-//        //System.out.println(Joiner.on('\n').join(cm.getCacheManagerConfiguration().toString().split(", ")));
-//
-//        this.concepts = cm.getCache("concepts");
         this.conceptsLocal = new DecoratedCache<>(
                 concepts.getAdvancedCache(),
                 Flag.CACHE_MODE_LOCAL, /*Flag.SKIP_LOCKING,*/ Flag.SKIP_OWNERSHIP_CHECK,
                 Flag.SKIP_REMOTE_LOOKUP);
         this.conceptsLocalNoResult = conceptsLocal.withFlags(Flag.IGNORE_RETURN_VALUES, Flag.SKIP_CACHE_LOAD, Flag.SKIP_REMOTE_LOOKUP);
-//        this.subterms = cm.getCache("subterms");
-//        this.subtermsLocal = new DecoratedCache<>(
-//                subterms.getAdvancedCache(),
-//                Flag.CACHE_MODE_LOCAL, /*Flag.SKIP_LOCKING,*/ Flag.SKIP_OWNERSHIP_CHECK,
-//                Flag.SKIP_REMOTE_LOOKUP);
-//        this.subtermsLocalNoResult = subtermsLocal.withFlags(Flag.IGNORE_RETURN_VALUES, Flag.SKIP_CACHE_LOAD, Flag.SKIP_REMOTE_LOOKUP);
-//
 
 //        Runtime.getRuntime().addShutdownHook(new Thread(()->{
 //            stop();
@@ -129,18 +120,38 @@ public class InfinispanIndex extends MaplikeTermIndex {
         conceptsLocalNoResult.put(k, target); //replace
     }
 
+    @Override
+    public void onPolicyChanged(Concept c) {
 
-    public synchronized void stop() {
-        logger.info("stop: {}", concepts );
-//
-//        //remove permanents to avoid their persistence
-//        /*for (Term p : permanents) {
-//            if (concepts.remove(key(p))==null)
-//                logger.warn("{} not in cache on removal", p) ;
-//        }*/
-//
-        concepts.shutdown();
+        //handle attached pending tasks
+        List<? extends Task> pending = c.remove(INIT);
+        if (pending!=null) {
+            nar.inputLater(pending);
+        }
+
+        commit(c);
     }
+
+    @Override public void commit(Concept c) {
+        RawByteSeq key = key(c.term());
+        concepts.getAdvancedCache().replace(key, c);
+
+    }
+
+    //    public synchronized void stop() {
+//        logger.info("stop: {}", concepts );
+////
+////        //remove permanents to avoid their persistence
+////        /*for (Term p : permanents) {
+////            if (concepts.remove(key(p))==null)
+////                logger.warn("{} not in cache on removal", p) ;
+////        }*/
+////
+//
+//        //concepts.clear();
+//
+//        concepts.st
+//    }
 
     @Override
     public void clear() {
@@ -176,41 +187,42 @@ public class InfinispanIndex extends MaplikeTermIndex {
                 new XorShift128PlusRandom(1), index, new FrameTime());
 
         nar.log();
-        nar.input("(x,y).", "x:b.", "init(\"" + new Date() + "\").");
-        nar.next();
+        nar.input("(x,y).", "x:b.", "b(\"" + new Date() + "\").");
+        nar.run(10);
+        System.out.println(nar.concepts.summary());
 
-        nar.concepts.print(System.out);
+        //nar.concepts.print(System.out);
 
-        index.stop();
 
 
     }
 
-    public class TaskExternalizer implements AdvancedExternalizer<Task> {
-
-        @Override
-        public Set<Class<? extends Task>> getTypeClasses() {
-            return Set.of(Task.class);
-        }
-
-        @Override
-        public Integer getId() {
-            return 4443;
-        }
-
-        @Override
-        public void writeObject(ObjectOutput output, Task t) throws IOException {
-            IO.writeTask(output, t);
-        }
-
-        @Override
-        public Task readObject(ObjectInput input) throws IOException, ClassNotFoundException {
-            MutableTask t = IO.readTask(input, InfinispanIndex.this);
-            return t;
-        }
-    }
+//    public class TaskExternalizer implements AdvancedExternalizer<Task> {
+//
+//        @Override
+//        public Set<Class<? extends Task>> getTypeClasses() {
+//            return Set.of(Task.class);
+//        }
+//
+//        @Override
+//        public Integer getId() {
+//            return 4443;
+//        }
+//
+//        @Override
+//        public void writeObject(ObjectOutput output, Task t) throws IOException {
+//            IO.writeTask(output, t);
+//        }
+//
+//        @Override
+//        public Task readObject(ObjectInput input) throws IOException, ClassNotFoundException {
+//            MutableTask t = IO.readTask(input, InfinispanIndex.this);
+//            return t;
+//        }
+//    }
 
     public class ConceptExternalizer implements AdvancedExternalizer<Concept> {
+
 
         @Override
         public void writeObject(ObjectOutput output, Concept c) throws IOException {
@@ -219,9 +231,10 @@ public class InfinispanIndex extends MaplikeTermIndex {
 
             IO.writeTerm(output, c.term());
 
-            output.writeInt(ll.size());
-            for (Task x : ll) {
-                IO.writeTask(output, x);
+            int s = ll.size();
+            output.writeInt(s);
+            for (int i = 0, llSize = s; i < llSize; i++) {
+                IO.writeTask(output, ll.get(i));
             }
         }
 
@@ -240,7 +253,7 @@ public class InfinispanIndex extends MaplikeTermIndex {
                     //if (c != null)
                     toInput.add(x);
                 }
-                c.put("init", toInput);
+                c.put(INIT, toInput);
             }
 
             return c;

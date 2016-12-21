@@ -58,12 +58,13 @@ public class AtomConcept extends AtomicStringConstant implements Concept {
     }
 
     @Override
-    public void state(@NotNull ConceptState p, NAR nar) {
+    public ConceptState state(@NotNull ConceptState p, NAR nar) {
         ConceptState current = this.state;
         if (current!=p) {
             this.state = p;
             linkCapacity(p.linkCap(this, true),p.linkCap(this, false));
         }
+        return current;
     }
 
 

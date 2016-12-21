@@ -678,6 +678,8 @@ public abstract class NAR extends Param implements Level, Consumer<Task>, NARIn,
 
                     emotion.learn(input.priSafe(0));
 
+                    concepts.commit(c);
+
                     return c; //SUCCESSFULLY PROCESSED
 
                 } else {
@@ -1374,11 +1376,7 @@ public abstract class NAR extends Param implements Level, Consumer<Task>, NARIn,
 
     public final void policy(@NotNull Concept c, @NotNull ConceptState p) {
 
-        @Nullable ConceptState prev = c.state();
-        if (prev != p) {
-
-            c.state(p, this);
-
+        if (c.state(p, this)!=p) {
             concepts.onPolicyChanged(c);
         }
 

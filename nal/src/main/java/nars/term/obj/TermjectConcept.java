@@ -210,8 +210,10 @@ public class TermjectConcept<X> implements Concept, Termject<X> {
     }
 
     @Override
-    public void state(@NotNull ConceptState c, NAR nar) {
+    public ConceptState state(@NotNull ConceptState c, NAR nar) {
+        ConceptState current = this.policy;
         this.policy = c;
+        return current;
     }
 
     @NotNull
