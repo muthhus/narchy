@@ -50,25 +50,26 @@ public class CaffeineIndex extends MaplikeTermIndex implements RemovalListener {
         //return Math.round( 1f + 10 * (c*c) * (0.5f + 0.5f * beliefCost));
     };
 
-    public CaffeineIndex(@NotNull ConceptBuilder conceptBuilder, int capacity, int avgVolume, boolean soft, @NotNull Executor exe) {
-        this(conceptBuilder, capacity * avgVolume, soft, exe, capacity*4);
+    public CaffeineIndex(@NotNull ConceptBuilder conceptBuilder, int capacity, int avgVolume, boolean soft, @Nullable Executor exe) {
+        this(conceptBuilder, capacity * avgVolume, soft, exe, 0);
     }
 
     /** use the soft/weak option with CAUTION you may experience unexpected data loss and other weird symptoms */
-    public CaffeineIndex(@NotNull ConceptBuilder conceptBuilder, long maxWeight, boolean soft, @NotNull Executor exe) {
+    public CaffeineIndex(@NotNull ConceptBuilder conceptBuilder, long maxWeight, boolean soft, @Nullable Executor exe) {
         this(conceptBuilder, maxWeight, soft, exe, 0);
     }
 
     /** use the soft/weak option with CAUTION you may experience unexpected data loss and other weird symptoms */
-    public CaffeineIndex(@NotNull ConceptBuilder conceptBuilder, long maxWeight, boolean soft, @NotNull Executor exe, int maxSubterms) {
+    public CaffeineIndex(@NotNull ConceptBuilder conceptBuilder, long maxWeight, boolean soft, @Nullable Executor exe, int maxSubterms) {
         super(conceptBuilder);
 
 
         //long maxSubtermWeight = maxWeight * 3; //estimate considering re-use of subterms in compounds and also caching of non-compound subterms
 
         Caffeine<Term, Termed> builder = Caffeine.newBuilder()
-                .removalListener(this)
-                .executor(exe);
+                .removalListener(this);
+        if (exe!=null)
+                builder.executor(exe);
 
         if (soft) {
             builder.softValues();

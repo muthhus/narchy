@@ -12,7 +12,7 @@ import nars.bag.impl.CurveBag;
 import nars.budget.Budget;
 import nars.budget.merge.BudgetMerge;
 import nars.concept.Concept;
-import nars.index.term.tree.TreeTermIndex;
+import nars.index.term.map.CaffeineIndex;
 import nars.link.BLink;
 import nars.nal.Deriver;
 import nars.nar.exe.MultiThreadExecutioner;
@@ -141,7 +141,7 @@ public class Alann extends NAR {
 
         @Override
         public Iterator<Concept> active() {
-            return IteratorUtils.transformedIterator( active.iterator(), p -> p.get() );
+            return IteratorUtils.transformedIterator( active.iterator(), BLink::get );
         }
 
         @Override
@@ -287,8 +287,10 @@ public class Alann extends NAR {
 
     public Alann(@NotNull Time time, int cores, int coreSize, int coreFires, int coreThreads, int auxThreads) {
         super(time,
-                new TreeTermIndex.L1TreeIndex(new DefaultConceptBuilder(), 512 * 1024,
-                        1024 * 32, 3),
+
+                //new TreeTermIndex.L1TreeIndex(new DefaultConceptBuilder(), 512 * 1024, 1024 * 32, 3),
+                new CaffeineIndex(new DefaultConceptBuilder(), 512*1024, 16, false, null),
+
                 new XorShift128PlusRandom(1), Param.defaultSelf(),
                 auxThreads == 1 ? new SynchronousExecutor() :
                         new MultiThreadExecutioner(auxThreads, 1024 * auxThreads).sync(true)

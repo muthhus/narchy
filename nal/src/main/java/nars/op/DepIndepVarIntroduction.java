@@ -146,24 +146,30 @@ public class DepIndepVarIntroduction extends VarIntroduction {
         @Override
         public @NotNull Term apply(@NotNull Term[] args) {
 
-            Term[] only = new Term[] { False };
-            Compound x = (Compound) args[0];
+            Term[] only = { False };
+            Term x = args[0];
 
             //temporarily unwrap negation
+            Term xx;
             boolean negated;
             if (x.op() == NEG) {
-                x = (Compound) x.unneg();
+                xx = x.unneg();
                 negated = true;
             } else {
+                xx = x;
                 negated = false;
             }
 
-            introducer.accept(x, y -> only[0] = y);
+            if (!(x instanceof Compound))
+                return x;
+
+            x = xx;
+            introducer.accept((Compound)x, y -> only[0] = y);
 
             Term y = only[0];
             if (y == False)
                 return False;
-            return $.negIf((Compound) y, negated);
+            return $.negIf(y, negated);
         }
     }
 
