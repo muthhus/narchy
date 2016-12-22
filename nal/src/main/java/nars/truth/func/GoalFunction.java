@@ -46,7 +46,7 @@ public enum GoalFunction implements TruthOperator {
         }
     },
 
-    //@AllowOverlap
+    @AllowOverlap
     Deduction() {
         @Nullable
         @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, NAR m, float minConf) {

@@ -869,7 +869,7 @@ public class NAL7Test extends AbstractNALTest {
                 .inputAt(n3, "(x). :|:")
                 .inputAt(n3, $.task($("(y)"), '?', null).budgetSafe(1f, 0.9f).time(n3, n3 + eventDT))
 
-                .mustBelieve(n3+eventDT, "(y)", 1f, 0.5f, n3 + eventDT)
+                .mustBelieve(n3+eventDT, "(y)", 1f, 0.59f, n3 + eventDT)
         ;
     }
 

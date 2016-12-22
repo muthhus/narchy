@@ -929,7 +929,7 @@ public class UnificationTest {
 
     @Test
     public void varDep2() {
-        Unify f = test(Op.VAR_INDEP,
+        Unify f = test(Op.VAR_DEP,
                 "t:(#x | {#y})",
                 "t:(x | {y})",
                 true);
