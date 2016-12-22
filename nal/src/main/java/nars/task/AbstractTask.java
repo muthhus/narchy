@@ -235,7 +235,7 @@ public abstract class AbstractTask extends RawBudget implements Task, Temporal {
 
             if (isBeliefOrGoal()) {
                 setQuality(BudgetFunctions.truthToQuality(truth()));
-            } else {
+            } else if (!isCommand()) {
                 setQuality(nar.qualityDefault(punc));
             }
         }

@@ -33,7 +33,7 @@ public class Rect2DTest {
 
         Rect2D rect = new Rect2D(0, 0, 4, 3);
 
-        HyperPoint centroid = rect.getCentroid();
+        HyperPoint centroid = rect.center();
         double x = centroid.coord(0);
         double y = centroid.coord(1);
         Assert.assertTrue("Bad X-coord of centroid - expected " + 2.0 + " but was " + x, x == 2.0d);

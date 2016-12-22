@@ -3,7 +3,7 @@ package jcog.spatial;
 /**
  * Created by me on 12/2/16.
  */
-public abstract class Rect1D<X extends Comparable<X>> implements HyperRect<X> {
+public abstract class Rect1D implements HyperRect<Point1D> {
 
 
     abstract public double from();
@@ -37,7 +37,7 @@ public abstract class Rect1D<X extends Comparable<X>> implements HyperRect<X> {
     }
 
     @Override
-    public HyperPoint getCentroid() {
+    public HyperPoint center() {
         return new Point1D((from() + to()) / 2.0);
     }
 
@@ -63,7 +63,7 @@ public abstract class Rect1D<X extends Comparable<X>> implements HyperRect<X> {
         return getRange(0);
     }
 
-    public static class DefaultRect1D<X extends Comparable<X>> extends Rect1D<X> {
+    public static class DefaultRect1D extends Rect1D {
 
 
         private final double from, to;

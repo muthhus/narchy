@@ -26,7 +26,7 @@ package jcog.spatial;
 public class Point2D implements HyperPoint {
     final double x, y;
 
-    Point2D(final double x, final double y) {
+    public Point2D(final double x, final double y) {
         this.x = x;
         this.y = y;
     }
@@ -66,6 +66,11 @@ public class Point2D implements HyperPoint {
         } else {
             throw new ArrayIndexOutOfBoundsException();
         }
+    }
+
+    @Override
+    public String toString() {
+        return "<" + x + "," + y + '>';
     }
 
     public final static class Builder implements RectBuilder<Point2D> {

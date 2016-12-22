@@ -36,6 +36,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
@@ -289,7 +290,7 @@ public class Alann extends NAR {
         super(time,
 
                 //new TreeTermIndex.L1TreeIndex(new DefaultConceptBuilder(), 512 * 1024, 1024 * 32, 3),
-                new CaffeineIndex(new DefaultConceptBuilder(), 512*1024, 16, false, null),
+                new CaffeineIndex(new DefaultConceptBuilder(), 256*1024, 16, false, ForkJoinPool.commonPool()),
 
                 new XorShift128PlusRandom(1), Param.defaultSelf(),
                 auxThreads == 1 ? new SynchronousExecutor() :

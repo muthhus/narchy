@@ -20,12 +20,67 @@ package jcog.spatial;
  * #L%
  */
 
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Consumer;
 
 /**
  * Created by jcovert on 12/30/15.
  */
 public interface SpatialSearch<T> {
+
+    int DEFAULT_MIN_M = 2;
+    int DEFAULT_MAX_M = 8;
+    RTree.Split DEFAULT_SPLIT_TYPE = RTree.Split.AXIAL;
+
+    /**
+     * Create an R-Tree with default values for m, M, and split type
+     *
+     * @param builder - Builder implementation used to create HyperRects out of T's
+     * @param <T>     - The store type of the bound
+     * @return SpatialSearch - The spatial search and index structure
+     */
+    public static <T> SpatialSearch<T> rTree(final RectBuilder<T> builder) {
+        return new RTree<>(builder, DEFAULT_MIN_M, DEFAULT_MAX_M, DEFAULT_SPLIT_TYPE);
+    }
+
+    /**
+     * Create an R-Tree with specified values for m, M, and split type
+     *
+     * @param builder   - Builder implementation used to create HyperRects out of T's
+     * @param minM      - minimum number of entries per node of this tree
+     * @param maxM      - maximum number of entries per node of this tree (exceeding this causes node split)
+     * @param splitType - type of split to use when M+1 entries are added to a node
+     * @param <T>       - The store type of the bound
+     * @return SpatialSearch - The spatial search and index structure
+     */
+    static <T> SpatialSearch<T> rTree(final RectBuilder<T> builder, final int minM, final int maxM, final RTree.Split splitType) {
+        return new RTree<>(builder, minM, maxM, splitType);
+    }
+
+    /**
+     * Create a protected R-Tree with default values for m, M, and split type
+     *
+     * @param builder - Builder implementation used to create HyperRects out of T's
+     * @param <T>     - The store type of the bound
+     * @return SpatialSearch - The spatial search and index structure
+     */
+    static <T> SpatialSearch<T> lockingRTree(final RectBuilder<T> builder) {
+        return new LockingRTree<>(rTree(builder), new ReentrantReadWriteLock(true));
+    }
+
+    /**
+     * Create a protected R-Tree with specified values for m, M, and split type
+     *
+     * @param builder   - Builder implementation used to create HyperRects out of T's
+     * @param minM      - minimum number of entries per node of this tree
+     * @param maxM      - maximum number of entries per node of this tree (exceeding this causes node split)
+     * @param splitType - type of split to use when M+1 entries are added to a node
+     * @param <T>       - The store type of the bound
+     * @return SpatialSearch - The spatial search and index structure
+     */
+    static <T> SpatialSearch<T> lockingRTree(final RectBuilder<T> builder, final int minM, final int maxM, final RTree.Split splitType) {
+        return new LockingRTree<>(rTree(builder, minM, maxM, splitType), new ReentrantReadWriteLock(true));
+    }
 
     /**
      * Search for entries intersecting given bounding rect

@@ -23,13 +23,13 @@ package jcog.spatial;
 /**
  * Created by jcovert on 6/15/15.
  */
-public class RectND implements HyperRect {
+public class RectND implements HyperRect<PointND> {
 
     final PointND min, max;
 
     RectND(final PointND p) {
-        min = new PointND(p);
-        max = new PointND(p);
+        min = p;
+        max = p;
     }
 
     RectND(float[] a, float[] b) {
@@ -105,7 +105,7 @@ public class RectND implements HyperRect {
 
 
     @Override
-    public HyperPoint getCentroid() {
+    public HyperPoint center() {
         int dim = dim();
         float[] c = new float[dim];
         float[] minf = this.min.coord;

@@ -60,8 +60,8 @@ public final class AxialSplitLeaf<T> extends Leaf<T> {
         final int splitDimension = axis;
 
         Arrays.sort(sortedMbr, (o1, o2) -> {
-            final HyperPoint p1 = o1.getCentroid();
-            final HyperPoint p2 = o2.getCentroid();
+            final HyperPoint p1 = o1.center();
+            final HyperPoint p2 = o2.center();
 
             return p1.coord(splitDimension).compareTo(p2.coord(splitDimension));
         });

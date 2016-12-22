@@ -25,7 +25,7 @@ package jcog.spatial;
  * <p>
  * Created by jcairns on 4/30/15.
  */
-public interface HyperRect<X extends Comparable<X>> {
+public interface HyperRect<X> {
 
     /**
      * Calculate the resulting mbr when combining param HyperRect with this HyperRect
@@ -61,7 +61,7 @@ public interface HyperRect<X extends Comparable<X>> {
      *
      * @return middle HyperPoint
      */
-    HyperPoint getCentroid();
+    HyperPoint center();
 
     /**
      * Calculate the distance between the min and max HyperPoints in given dimension

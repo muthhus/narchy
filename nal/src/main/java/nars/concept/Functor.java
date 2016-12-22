@@ -1,5 +1,6 @@
 package nars.concept;
 
+import nars.$;
 import nars.Task;
 import nars.bag.Bag;
 import nars.term.Term;
@@ -42,6 +43,10 @@ abstract public class Functor extends AtomConcept implements TermTransform, Perm
     /** creates a new functor from a term name and a lambda */
     public static Concept f(@NotNull Atom termAtom, @NotNull Function<Term[], Term> f) {
         return new LambdaFunctor(termAtom, f);
+    }
+
+    public static Concept f(@NotNull String termAtom, int arityRequired, @NotNull Function<Term[], Term> ff) {
+        return f((Atom)$.the(termAtom), arityRequired, ff);
     }
 
     public static Concept f(@NotNull Atom termAtom, int arityRequired, @NotNull Function<Term[], Term> ff) {

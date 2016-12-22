@@ -771,8 +771,7 @@ public abstract class TermBuilder {
                         if (predicate instanceof TermTransform && transformImmediates() && sop == PROD) {
                             Term y = ((TermTransform) predicate).apply(((Compound) subject).terms());
                             if (y == null) {
-                                //throw new NullPointerException();
-                                //break; //null return value means just keep the original input term
+                                break; //null return value means just keep the original input term
                             }
                             return y;
                         }

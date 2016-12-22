@@ -34,6 +34,7 @@ import nars.task.util.InvalidTaskException;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
+import nars.term.Terms;
 import nars.term.atom.Atom;
 import nars.term.atom.Atomic;
 import nars.term.transform.TermTransform;
@@ -68,6 +69,7 @@ import static nars.Op.*;
 import static nars.Symbols.*;
 import static nars.concept.CompoundConcept.DuplicateMerge;
 import static nars.concept.Functor.f;
+import static nars.term.Term.False;
 import static nars.time.Tense.ETERNAL;
 import static org.fusesource.jansi.Ansi.ansi;
 
@@ -754,7 +756,11 @@ public abstract class NAR extends Param implements Level, Consumer<Task>, NARIn,
             y = the("unknown_command_pattern");
         }
 
-        Compound z = func(self, x, y); //form a compound by attaching SELF to it
+        Compound z;
+        if (y == null)
+            z = x;
+        else
+            z = func(self, x, y); //memoization of the command and its result
 
         //logger.info(" {}", z);
 

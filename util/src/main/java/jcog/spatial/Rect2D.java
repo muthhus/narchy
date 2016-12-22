@@ -23,20 +23,20 @@ package jcog.spatial;
 /**
  * Created by jcovert on 6/15/15.
  */
-public class Rect2D<X extends Comparable<X>> implements HyperRect<X> {
+public class Rect2D implements HyperRect<Rect2D> {
     final Point2D min, max;
 
-    Rect2D(final Point2D p) {
-        min = new Point2D(p.x, p.y);
-        max = new Point2D(p.x, p.y);
+    public Rect2D(final Point2D p) {
+        min = p;
+        max = p;
     }
 
-    Rect2D(final double x1, final double y1, final double x2, final double y2) {
+    public Rect2D(final double x1, final double y1, final double x2, final double y2) {
         min = new Point2D(x1, y1);
         max = new Point2D(x2, y2);
     }
 
-    Rect2D(final Point2D p1, final Point2D p2) {
+    public Rect2D(final Point2D p1, final Point2D p2) {
         final double minX, maxX;
 
         if (p1.x < p2.x) {
@@ -80,7 +80,7 @@ public class Rect2D<X extends Comparable<X>> implements HyperRect<X> {
     }
 
     @Override
-    public HyperPoint getCentroid() {
+    public HyperPoint center() {
         final double dx = min.x + (max.x - min.x) / 2.0;
         final double dy = min.y + (max.y - min.y) / 2.0;
 
