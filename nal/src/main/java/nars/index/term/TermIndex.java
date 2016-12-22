@@ -253,7 +253,7 @@ public abstract class TermIndex extends TermBuilder {
     }
 
     @NotNull
-    public final Term the(@NotNull Compound csrc, @NotNull Term... args) {
+    public final Term the(@NotNull Compound csrc, @NotNull Term[] args) {
         if (csrc.equalTerms(args))
             return csrc;
         return the(csrc.op(), csrc.dt(), args);
@@ -329,12 +329,17 @@ public abstract class TermIndex extends TermBuilder {
         return result;
     };
 
+    @NotNull
+    public final Term internCompound(Compound uninterned) {
+        return the(uninterned.op(), uninterned.dt(), uninterned.terms());
+    }
 
     @Nullable
     public final Compound normalize(@NotNull Compound src) {
 
+
         if (src.isNormalized()) {
-            return src; //c = t; //already normalized
+            return src;
         } else {
             //see if subterms need change
             Compound tgt = normalizations.computeIfAbsent(src, normalizer);
@@ -363,19 +368,15 @@ public abstract class TermIndex extends TermBuilder {
     @NotNull
     public Term transform(@NotNull Compound src, @NotNull CompoundTransform t) {
         if (!t.testSuperTerm(src))
-            return src;
+            return internCompound(src);
 
         TermContainer tc = transform(src, src, t);
 
-        if (tc == src) {
-            return src; //unmodified
-        } else {
-//            if (tc.equalTerms(superterm)) {
-//                throw new RuntimeException("actually unmodified");
-//            }
-
+        if (tc != src) {
             //construct new compound with same op and dt
             return the(src.op(), src.dt(), tc);
+        } else {
+            return src; //unmodified
         }
     }
 

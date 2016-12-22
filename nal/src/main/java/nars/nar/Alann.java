@@ -363,7 +363,7 @@ public class Alann extends NAR {
         return () -> {
             Iterator[] coreBags = new Iterator[cores.size()];
             for (int i = 0; i <coreBags.length; i++) {
-                coreBags[i] = cores.get(i).active();
+                coreBags[i] = cores.get(i).activeBag().iterator();
             }
             return IteratorUtils.zippingIterator(coreBags);
             //return new RoundRobinIterator<>(coreBags);

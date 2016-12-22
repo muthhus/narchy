@@ -1,5 +1,6 @@
 package nars;
 
+import com.eclipsesource.json.Json;
 import jcog.Texts;
 import jcog.list.FasterList;
 import nars.bag.Bag;
@@ -32,6 +33,8 @@ public class Builtin extends FasterList<Concept> {
             new union(),
             f0("date", () -> quote(new Date().toString())),
             f1("reflect", reflect::reflect),
+            f1("jsonParse", (jsonString)-> IO.fromJSON($.unquote(jsonString))),
+            f1("jsonStringify", (term)-> IO.toJSON(term) )
 
     };
 

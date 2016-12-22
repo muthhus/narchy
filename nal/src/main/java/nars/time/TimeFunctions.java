@@ -751,19 +751,20 @@ public interface TimeFunctions {
             if (!(newPresub instanceof Compound))
                 return null;
 
-            derived = (Compound) terms.the(derived,
-                    $.negIf(newPresub, neg),
-                    derived.term(1) );
+            derived = (Compound) ($.terms.the(derived,
+                    new Term[] { $.negIf(newPresub, neg),
+                    derived.term(1) }) );
         }
         if (post && derived.term(1) instanceof Compound) {
             //set subterm 1's DT
-            Term newSubterm1 = terms.the((Compound) derived.term(1),
+            Term newSubterm1 = $.terms.the((Compound) derived.term(1),
                     ((taskDT != DTERNAL) && (beliefDT != DTERNAL)) ? (taskDT - beliefDT) : DTERNAL);
 
             if (isTrueOrFalse(newSubterm1))
                 return null;
 
-            Term newDerived = terms.the(derived, derived.term(0), newSubterm1);
+
+            Term newDerived = $.terms.the(derived, new Term[] { derived.term(0), newSubterm1} );
             if (!(newDerived instanceof Compound))
                 return null;
 

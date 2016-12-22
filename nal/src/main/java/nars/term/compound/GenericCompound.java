@@ -8,13 +8,14 @@ import nars.concept.Concept;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
+import nars.term.atom.AtomicString;
 import nars.term.container.TermContainer;
 import nars.term.util.InvalidTermException;
 import nars.time.Tense;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import static nars.Op.CONJ;
+import static nars.Op.*;
 import static nars.time.Tense.DTERNAL;
 
 
@@ -65,7 +66,8 @@ public class GenericCompound implements Compound  {
 
         this.subterms = subterms;
 
-        this.normalized = subterms.constant();
+        this.normalized = !(op==INH&&subterms.term(1) instanceof AtomicString && subterms.term(0).op()==PROD)
+                && subterms.constant();  /* to force functor evaluation at normalization */;
 
         this.dt = dt;
 

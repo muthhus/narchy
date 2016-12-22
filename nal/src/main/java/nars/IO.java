@@ -325,6 +325,7 @@ public class IO {
 
 
 
+
     public enum TaskSerialization {
         TermFirst,
         TermLast
@@ -660,6 +661,31 @@ public class IO {
     public static Term fromJSON(String json) {
         JsonValue v = Json.parse(json);
         return fromJSON(v);
+    }
+
+    public static Term toJSON(Term term) {
+        return $.func("json", $.quote(toJSONValue(term)));
+    }
+
+    public static JsonValue toJSONValue(Term term) {
+        switch (term.op()) {
+
+            //TODO other types
+
+            /*case SETe: {
+                JsonObject o = Json.object();
+                for (Term x : term)
+                    o.add
+            }*/
+            case PROD: {
+                JsonArray a = (JsonArray) Json.array();
+                for (Term x : ((Compound)term))
+                    a.add(toJSONValue(x));
+                return a;
+            }
+            default:
+                return Json.value(term.toString() );
+        }
     }
 
     public static Term fromJSON(JsonValue v) {

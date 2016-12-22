@@ -346,6 +346,7 @@ public abstract class TermBuilder {
     }
 
 
+
     @NotNull
     public final Term the(@NotNull Op op, @NotNull Term... tt) {
         return the(op, DTERNAL, tt);
@@ -771,7 +772,7 @@ public abstract class TermBuilder {
                             Term y = ((TermTransform) predicate).apply(((Compound) subject).terms());
                             if (y == null) {
                                 //throw new NullPointerException();
-                                break; //null return value means just keep the original input term
+                                //break; //null return value means just keep the original input term
                             }
                             return y;
                         }

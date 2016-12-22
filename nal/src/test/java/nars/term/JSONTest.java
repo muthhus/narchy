@@ -22,10 +22,13 @@ public class JSONTest {
     }
 
     @Test
-    public void testJSONTermFunction() {
-
-        Term u = new Terminal().term("json(\"{ \"a\": [1, 2] }\")").term();
+    public void testParseJSONTermFunction() {
+        Term u = new Terminal().inputAndGet("jsonParse(\"{ \"a\": [1, 2] }\").").term();
         assertEquals("{a(1,2)}", u.toString());
-        //assertEquals("(&,(\"x\"-->b),((1-->d)-->c),a(1,2))", t.toString());
+    }
+    @Test
+    public void testToStringJSONTermFunction() {
+        Term u = new Terminal().inputAndGet("jsonStringify((x,y,z)).").term();
+        assertEquals("json(\"[\"x\",\"y\",\"z\"]\")", u.toString());
     }
 }
