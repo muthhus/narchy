@@ -25,14 +25,16 @@ public class bAblTests extends AbstractNALTest {
         return AbstractNALTest.nars(8);
     }
 
-    @Test @Ignore
+    @Test
     public void test1() {
 
         test()
-                .believe("<(*,{john},{playground}) --> isin>") //john is in the playground.
-                .believe("<(*,bob,office) --> isin>") //Bob is in the office.
-                .ask("<(*,{john},{?where}) --> isin>")
+                .believe("in({john},{playground})") //john is in the playground.
+                .believe("in(bob,office)") //Bob is in the office.
+                .ask("in({john},{?where})") //Where is john?
+                .mustBelieve(100, "in({john},{playground})", 1f, 0.73f) //note that the 0.90 conf result should have been provided as an answer to the question, not as a belief. the 0.73 conf version is a side effect so we'll test for that at least
                 ;
+
 
         ////(1) Basic Factoid QA with Single Supporting Fact
         ////john is in the playground.
@@ -64,22 +66,22 @@ public class bAblTests extends AbstractNALTest {
 
     }
 
-    @Ignore @Test public void test19() {
+    @Test public void test19() {
 
         //(19) Path Finding
         TestNAR t = test();
         t.nar.termVolumeMax.setValue(40); //larger than default
 
         //.log()
-               t.believe("<(&&, <( $1,$2) --> start>, <( $1,$B,$C) --> at>, <( $B,$2,$C2) --> at>) ==> (&&, <( id,$C,id,$C2) --> path>, <( $1,$2,$B) --> chunk>)>")
-                .believe("<(&&, <( $1,$2) --> start>, <( $1,$B,$C) --> at>, <( $2,$B,$C2) --> at>) ==> (&&, <( id,$C,neg,$C2) --> path>, <( $1,$2,$B) --> chunk>)>")
-                .believe("<(&&, <( $1,$2) --> start>, <( $B,$1,$C) --> at>, <( $B,$2,$C2) --> at>) ==> (&&, <( neg,$C,id,$C2) --> path>, <( $1,$2,$B) --> chunk>)>")
-                .believe("<(&&, <( $1,$2) --> start>, <( $B,$1,$C) --> at>, <( $2,$B,$C2) --> at>) ==> (&&, <( neg,$C,neg,$C2) --> path>, <( $1,$2,$B) --> chunk>)>")
-                .believe("<( kitchen,hallway,south) --> at>") //The kitchen is north of the hallway.
-                .believe("<( den,hallway,west) --> at>") //The den is east of the hallway.
-                .believe("<( den,kitchen) --> start>") //How do you go from den to kitchen?
-                //.ask("<?what --> path>")
-                .mustBelieve(2500, "<( id,west,neg,south) --> path>", 1f, 0.35f); //A:west,north
+               t.believe("((&&, start($1,$2), at( $1,$B,$C), at( $B,$2,$C2) ) ==> ( path( id,$C,id,$C2)   && chunk( $1,$2,$B) ))")
+                .believe("((&&, start($1,$2), at( $1,$B,$C), at( $2,$B,$C2) ) ==> ( path( id,$C,neg,$C2)  && chunk( $1,$2,$B) ))")
+                .believe("((&&, start($1,$2), at( $B,$1,$C), at( $B,$2,$C2) ) ==> ( path( neg,$C,id,$C2)  && chunk( $1,$2,$B) ))")
+                .believe("((&&, start($1,$2), at( $B,$1,$C), at( $2,$B,$C2) ) ==> ( path( neg,$C,neg,$C2) && chunk( $1,$2,$B) ))")
+                .believe("at(kitchen,hallway,south)") //The kitchen is north of the hallway.
+                .believe("at(den,hallway,west)") //The den is east of the hallway.
+                .believe("start(den,kitchen)") //How do you go from den to kitchen?
+                .ask("<?what --> path>")
+                .mustBelieve(2500, "path(id,west,neg,south)", 1f, 0.35f); //A:west,north
 
 
     }

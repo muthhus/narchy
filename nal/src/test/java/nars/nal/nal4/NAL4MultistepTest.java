@@ -27,7 +27,7 @@ public class NAL4MultistepTest extends AbstractNALTest {
     //this test only works because the confidence matches, but the related task has insufficient budget
     @Test
     public void nal4_everyday_reasoning() throws Narsese.NarseseException {
-        int time = 1050;
+        int time = 2050;
 
         //Global.DEBUG = true;
 
@@ -45,7 +45,7 @@ public class NAL4MultistepTest extends AbstractNALTest {
         tester.askAt(0, "<(cat,[blue]) --> likes>"); //cats like blue?
 
         tester.mustBelieve(time, "likes(cat,[blue])", 1.0f,
-                0.40f);
+                0.27f);
                 //0.42f);
 
     }

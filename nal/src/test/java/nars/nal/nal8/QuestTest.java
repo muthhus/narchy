@@ -1,7 +1,7 @@
 package nars.nal.nal8;
 
 import nars.NAR;
-import nars.Narsese;
+import nars.Param;
 import nars.nar.Default;
 import nars.time.Tense;
 import org.junit.Test;
@@ -27,13 +27,19 @@ public class QuestTest {
 
     @Test
     public void testQuestBeforeGoal()  {
-        testQuest(false, 0, 16);
-        testQuest(false, 1, 16);
-        testQuest(false, 4, 16);
+        testQuest(false, 1, 32);
+        testQuest(false, 4, 32);
+    }
+    @Test
+    public void testQuestBeforeGoal0() {
+        testQuest(false, 0, 64);
     }
 
-    public void testQuest(boolean goalFirst, int timeBetween, int timeAfter) throws Narsese.NarseseException {
+
+    public void testQuest(boolean goalFirst, int timeBetween, int timeAfter)  {
+        //Param.DEBUG = true;
         final NAR nar = new Default();
+        //nar.log();
 
         AtomicBoolean valid = new AtomicBoolean(false);
 

@@ -21,6 +21,7 @@ import org.jetbrains.annotations.Nullable;
 import java.io.IOException;
 import java.util.List;
 
+import static nars.Op.VAR_INDEP;
 import static nars.time.Tense.ETERNAL;
 import static nars.truth.TruthFunctions.w2c;
 
@@ -126,8 +127,18 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
             default:
                 if (!t.hasAny(Op.StatementBits))
                     return test(t, "Independent variables require statements super-terms", safe);
-                else if (op.statement && subjectOrPredicateIsIndependentVar(t))
-                    return test(t, "Statement Task's subject or predicate is VAR_INDEP", safe);
+                else if (op.statement && t.hasVarIndep()) {
+                    Term subj = t.term(0);
+                    if (subj.op()==VAR_INDEP)
+                        return test(t, "Statement Task's subject is VAR_INDEP", safe);
+                    if (subj.varIndep() == 0)
+                        return test(t, "Statement Task's subject has no VAR_INDEP", safe);
+                    Term pred = t.term(1);
+                    if (pred.op()==VAR_INDEP)
+                        return test(t, "Statement Task's predicate is VAR_INDEP", safe);
+                    if (pred.varIndep() == 0)
+                        return test(t, "Statement Task's predicate has no VAR_INDEP", safe);
+                }
 
                 //TODO more thorough test for invalid independent-variable containing compounds
                 // DepIndepVarIntroduction does this, adapt/share code from there
@@ -182,10 +193,6 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
 //            f += x.pri();
 //        return f;
 //    }
-
-    static boolean subjectOrPredicateIsIndependentVar(@NotNull Compound t) {
-        return t.hasVarIndep() && ((t.isTerm(0, Op.VAR_INDEP) || t.isTerm(1, Op.VAR_INDEP)));
-    }
 
 
     @Override

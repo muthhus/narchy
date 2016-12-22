@@ -139,8 +139,8 @@ public class UnificationTest {
 
     @Test
     public void unificationP1() {
-        test(Op.VAR_INDEP,
-                "<($1,$1) --> wu>",
+        test(Op.VAR_DEP,
+                "<(#1,#1) --> wu>",
                 "<(a,b) --> wu>",
                 false
         );
@@ -928,9 +928,9 @@ public class UnificationTest {
     }
 
     @Test
-    public void varIndep2() {
+    public void varDep2() {
         Unify f = test(Op.VAR_INDEP,
-                "t:($x | {$y})",
+                "t:(#x | {#y})",
                 "t:(x | {y})",
                 true);
     }

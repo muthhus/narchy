@@ -2,6 +2,7 @@ package nars.term;
 
 import nars.$;
 import nars.Op;
+import nars.nar.Terminal;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.junit.Ignore;
@@ -474,6 +475,11 @@ public class TermReductionsTest {
 
     @Test public void testConegatedConjunctionTerms01() {
         assertEquals(False, $.parallel($.varDep(1), $.neg($.varDep(1))));
+    }
+
+    @Test public void testInvalidStatementIndepVarTask() {
+        Terminal t = new Terminal();
+        assertTrue(/* failure */ t.inputAndGet("at($1,$2,$3)").isDeleted());
     }
 
     @Test public void testConegatedConjunctionTerms1() {

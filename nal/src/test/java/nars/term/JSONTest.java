@@ -4,6 +4,7 @@ import nars.IO;
 import nars.nar.Terminal;
 import org.junit.Test;
 
+import static nars.$.$;
 import static org.junit.Assert.assertEquals;
 
 /**
@@ -14,8 +15,9 @@ public class JSONTest {
     @Test
     public void testJSON1() {
         Term t = IO.fromJSON("{ \"a\": [1, 2], \"b\": \"x\", \"c\": { \"d\": 1 } }");
-        assertEquals("{(\"x\"-->b),a(1,2),({(1-->d)}-->c)}", t.toString());
+        assertEquals($("{(\"x\"-->b),a(1,2),({(1-->d)}-->c)}").toString(), t.toString());
     }
+
     @Test
     public void testJSON2() {
         assertEquals("{a(1,2)}", IO.fromJSON("{ \"a\": [1, 2] }").toString());
