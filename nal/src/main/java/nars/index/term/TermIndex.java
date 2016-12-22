@@ -121,33 +121,8 @@ public abstract class TermIndex extends TermBuilder {
 
     final Function<? super ProtoCompound, ? extends Term> termizer = pc -> {
 
-        return _the(pc.op(), pc.dt(), pc.terms() );
+        return theSafe(pc.op(), pc.dt(), pc.terms() );
     };
-
-    @NotNull
-    public final Term cached(@NotNull Op op, int dt, @NotNull Term[] u) throws InvalidTermException {
-
-//        int totalVolume = 0;
-//        for (Term x : u)
-//            totalVolume += x.volume();
-
-//        if (totalVolume > volumeMax(op))
-//            throw new InvalidTermException(op, dt, u, "Too voluminous");
-
-        boolean cacheable =
-                //(totalVolume > 2)
-                        //&&
-                ((op!=INH) || !(u[1] instanceof TermTransform && u[0].op() == PROD)) //prevents caching for potential transforming terms
-                ;
-
-        if (cacheable) {
-
-            return terms.computeIfAbsent(new ProtoCompound.RawProtoCompound(op, dt, u), termizer);
-
-        } else {
-            return _the(op, dt, u);
-        }
-    }
 
     private int volumeMax(Op op) {
         if (nar!=null) {
@@ -157,7 +132,7 @@ public abstract class TermIndex extends TermBuilder {
         }
     }
 
-    @NotNull private final Term _the(@NotNull Op o, int dt, @NotNull Term[] u) {
+    @NotNull private final Term theSafe(@NotNull Op o, int dt, @NotNull Term[] u) {
         try {
             return super.the(o, dt, u);
             //return t == null ? False : t;
@@ -273,21 +248,48 @@ public abstract class TermIndex extends TermBuilder {
         if (csrc.subterms().equals(newSubs)) {
             return csrc;
         } else {
-            return the(csrc, newSubs.terms());
+            return the(csrc.op(), csrc.dt(), newSubs.terms());
         }
     }
+
     @NotNull
     public final Term the(@NotNull Compound csrc, @NotNull Term... args) {
+        if (csrc.equalTerms(args))
+            return csrc;
         return the(csrc.op(), csrc.dt(), args);
     }
+
     @NotNull
     public final Term the(@NotNull Compound csrc, int newDT) {
+        if (csrc.dt()==newDT) //no change
+            return csrc;
+
         return the(csrc.op(), newDT, csrc.terms());
     }
 
     @Override
     public final @NotNull Term the(@NotNull Op op, int dt, @NotNull Term[] args) throws InvalidTermException {
-        return cached(op, dt, args);
+
+//        int totalVolume = 0;
+//        for (Term x : u)
+//            totalVolume += x.volume();
+
+//        if (totalVolume > volumeMax(op))
+//            throw new InvalidTermException(op, dt, u, "Too voluminous");
+
+        boolean cacheable =
+                //(totalVolume > 2)
+                        //&&
+                ((op !=INH) || !(args[1] instanceof TermTransform && args[0].op() == PROD)) //prevents caching for potential transforming terms
+                ;
+
+        if (cacheable) {
+
+            return terms.computeIfAbsent(new ProtoCompound.RawProtoCompound(op, dt, args), termizer);
+
+        } else {
+            return super.the(op, dt, args);
+        }
     }
 
 //    @Deprecated
@@ -573,7 +575,7 @@ public abstract class TermIndex extends TermBuilder {
 
     @Override
     protected @NotNull Term statement(@NotNull Op op, int dt, @NotNull Term subject, @NotNull Term predicate) {
-        if (predicate instanceof Atom && op == INH && transformImmediates() && !(predicate instanceof Concept)) {
+        if ( op == INH && predicate instanceof Atom && !(predicate instanceof Concept) && transformImmediates() ) {
             //resolve atomic statement predicates in inheritance, for inline term rewriting
             Termed existingPredicate = get(predicate);
             if (existingPredicate!=null)

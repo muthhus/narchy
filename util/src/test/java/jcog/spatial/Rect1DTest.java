@@ -42,7 +42,7 @@ public class Rect1DTest {
             System.out.println(s);
 
             DoubleArrayList d = new DoubleArrayList();
-            t.search(new Rect1D.DefaultRect1D(1, 101), d::add);
+            t.containing(new Rect1D.DefaultRect1D(1, 101), d::add);
 
             assertEquals(10, d.size());
 

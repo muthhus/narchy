@@ -6,6 +6,7 @@ import nars.nal.meta.match.Ellipsislike;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Terms;
+import nars.term.atom.AtomicSingleton;
 import nars.term.compound.GenericCompound;
 import nars.term.container.TermContainer;
 import nars.term.container.TermVector;
@@ -95,7 +96,7 @@ public abstract class TermBuilder {
      * main entry point for compound construction - creates an immutable result
      */
     @NotNull
-    public Term the(@NotNull Op op, int dt, @NotNull Term[] u) throws InvalidTermException {
+    public Term the(@NotNull Op op, int dt, @NotNull Term... u) throws InvalidTermException {
 
         if (transformImmediates())
             productNormalizeSubterms(u);
@@ -109,7 +110,7 @@ public abstract class TermBuilder {
 
             case NEG:
                 if (arity != 1)
-                    throw new InvalidTermException(op, dt, u, "negation requires 1 subterm");
+                    throw new InvalidTermException(op, dt, "negation requires 1 subterm", u);
 
                 return neg(u[0]);
 
@@ -118,20 +119,20 @@ public abstract class TermBuilder {
 //                break;
 
             case INSTANCE:
-                if (arity != 2 || dt != DTERNAL) throw new InvalidTermException(INSTANCE, dt, u, "needs 2 arg");
+                if (arity != 2 || dt != DTERNAL) throw new InvalidTermException(INSTANCE, dt, "needs 2 arg", u);
                 return inst(u[0], u[1]);
             case PROPERTY:
-                if (arity != 2 || dt != DTERNAL) throw new InvalidTermException(PROPERTY, dt, u, "needs 2 arg");
+                if (arity != 2 || dt != DTERNAL) throw new InvalidTermException(PROPERTY, dt, "needs 2 arg", u);
                 return prop(u[0], u[1]);
             case INSTANCE_PROPERTY:
                 if (arity != 2 || dt != DTERNAL)
-                    throw new InvalidTermException(INSTANCE_PROPERTY, dt, u, "needs 2 arg");
+                    throw new InvalidTermException(INSTANCE_PROPERTY, dt, "needs 2 arg", u);
                 return instprop(u[0], u[1]);
 
 
             case DISJ:
                 if (dt != DTERNAL)
-                    throw new InvalidTermException(op, dt, u, "Disjunction must be DTERNAL");
+                    throw new InvalidTermException(op, dt, "Disjunction must be DTERNAL", u);
                 return disjunction(u);
             case CONJ:
                 return conj(dt, u);
@@ -142,14 +143,14 @@ public abstract class TermBuilder {
                 //it must contain a _ placeholder
 
                 if ((arity < 1) || (dt > arity))
-                    throw new InvalidTermException(op, dt, u, "image requires size=2 excluding _ imdex");
+                    throw new InvalidTermException(op, dt, "image requires size=2 excluding _ imdex", u);
 
                 if (hasImdex(u)) {
                     return image(op, u);
                 }
 
                 if ((dt < 0) && !(u[0].varPattern() > 0 || u[1].varPattern() > 0))
-                    throw new InvalidTermException(op, dt, u, "Invalid Image");
+                    throw new InvalidTermException(op, dt, "Invalid Image", u);
 
 
                 break; //construct below
@@ -159,23 +160,30 @@ public abstract class TermBuilder {
             case DIFFi:
                 return newDiff(op, u);
             case SECTe:
-                return newIntersectEXT(u);
+                return newIntersection(u,
+                        SECTe,
+                        SETe,
+                        SETi);
             case SECTi:
-                return newIntersectINT(u);
+                return newIntersection(u,
+                        SECTi,
+                        SETi,
+                        SETe);
 
             case INH:
             case SIM:
             case EQUI:
             case IMPL:
                 if (arity != 2) {
-                    throw new InvalidTermException(op, dt, u, "Statement without exactly 2 arguments");
+                    throw new InvalidTermException(op, dt, "Statement without exactly 2 arguments", u);
                 }
                 return statement(op, dt, u[0], u[1]);
 
             case PROD:
                 if (arity == 0)
                     return Terms.ZeroProduct;
-                break;
+                else
+                    return finalize(op, dt, u);
 
         }
 
@@ -192,7 +200,7 @@ public abstract class TermBuilder {
     @NotNull
     public Term productNormalize(@NotNull Term u) {
         Term t = u.unneg();
-        boolean neg = (t!=u);
+        boolean neg = (t != u);
 
         if (t instanceof Compound && t.hasAny(Op.IMGbits) && (t.op() == INH) && (t.varPattern() == 0)) {
             Compound ct = (Compound) t;
@@ -237,7 +245,8 @@ public abstract class TermBuilder {
     /**
      * collection implementation of the conjunction true/false filter
      */
-    @NotNull private static Set<Term> conjTrueFalseFilter(@NotNull Set<Term> terms) {
+    @NotNull
+    private static Set<Term> conjTrueFalseFilter(@NotNull Set<Term> terms) {
         Iterator<Term> ii = terms.iterator();
         while (ii.hasNext()) {
             Term n = ii.next();
@@ -329,12 +338,11 @@ public abstract class TermBuilder {
 //            }
 //        }
 
-        return new GenericCompound(op, dt, intern(TermVector.the(subterms)));
+        return newCompound(op, dt, intern(TermVector.the(subterms)));
     }
 
-    @Deprecated
-    public final Compound newCompound(@NotNull Op op, int dt, TermContainer subterms) {
-        return newCompound(op, dt, subterms.terms());
+    public final GenericCompound newCompound(@NotNull Op op, int dt, TermContainer subterms) {
+        return new GenericCompound(op, dt, subterms);
     }
 
 
@@ -345,7 +353,7 @@ public abstract class TermBuilder {
 
 
     @NotNull
-    private Term newDiff(@NotNull Op op, @NotNull Term[] t) {
+    private Term newDiff(@NotNull Op op, @NotNull Term... t) {
 
         //corresponding set type for reduction:
         Op set = op == DIFFe ? SETe : SETi;
@@ -353,13 +361,15 @@ public abstract class TermBuilder {
         switch (t.length) {
             case 1:
                 Term t0 = t[0];
-                return t0 instanceof Ellipsislike ? finish(op, t0) : t0;
+                return t0 instanceof Ellipsislike ? finish(op, t0) : False;
             case 2:
                 Term et0 = t[0], et1 = t[1];
-                if ((et0.op() == set && et1.op() == set))
+                if (et0.equals(et1))
+                    return False;
+                else if ((et0.op() == set && et1.op() == set))
                     return difference(set, (Compound) et0, (Compound) et1);
                 else
-                    return et0.equals(et1) ? False : finish(op, t);
+                    return finish(op, t);
             default:
                 throw new InvalidTermException(op, t, "diff requires 2 terms");
         }
@@ -417,6 +427,10 @@ public abstract class TermBuilder {
         //if (Param.DEBUG ) {
         //check for any imdex terms that may have not been removed
         int s = args.length;
+        if (s == 0) {
+            throw new RuntimeException("should not have zero args here");
+        }
+
         for (int i = 0; i < s; i++) {
             Term x = args[i];
 //            if (x == null)
@@ -434,9 +448,7 @@ public abstract class TermBuilder {
 //        if (Param.ARITHMETIC_INDUCTION)
 //            args = ArithmeticInduction.compress(op, dt, args);
 
-        if (s == 0) {
-            throw new RuntimeException("should not have zero args here");
-        }
+
         if (s == 1 && op.minSize > 1) {
             //special case: allow for ellipsis to occupy one item even if minArity>1
             Term a0 = args[0];
@@ -489,8 +501,10 @@ public abstract class TermBuilder {
                         finalize(NEG, t);
             }
         } else {
-            if (isFalse(t)) return True;
-            if (isTrue(t)) return False;
+            if (t instanceof AtomicSingleton) {
+                if (isFalse(t)) return True;
+                if (isTrue(t)) return False;
+            }
             return t;
         }
     }
@@ -516,7 +530,7 @@ public abstract class TermBuilder {
         } else {
 
             if (index == DTERNAL)
-                throw new InvalidTermException(o, DTERNAL, res, "image missing '_' (Imdex)");
+                throw new InvalidTermException(o, DTERNAL, "image missing '_' (Imdex)", res);
 
             int serN = res.length - 1;
             ser = new Term[serN];
@@ -546,7 +560,7 @@ public abstract class TermBuilder {
 
         if (dt == XTERNAL) {
             if (n != 2)
-                throw new InvalidTermException(CONJ, XTERNAL, u, "XTERNAL only applies to 2 subterms, as dt placeholder");
+                throw new InvalidTermException(CONJ, XTERNAL, "XTERNAL only applies to 2 subterms, as dt placeholder", u);
 
             //preserve grouping (don't flatten) but use normal commutive ordering as dternal &&
             return finish(CONJ, XTERNAL, u);
@@ -574,7 +588,7 @@ public abstract class TermBuilder {
                     (u[0].compareTo(u[1]) > 0) ? -dt : dt, //it will be reversed in commutative sorting, so invert dt if sort order swapped
                     u);
         } else {
-            throw new InvalidTermException(CONJ, dt, u, "temporal conjunction requires exactly 2 arguments");
+            throw new InvalidTermException(CONJ, dt, "temporal conjunction requires exactly 2 arguments", u);
         }
 
     }
@@ -597,8 +611,8 @@ public abstract class TermBuilder {
 
 
         Set<Term> s =
-            new UnifiedSet<>(u.length);
-            //new TreeSet();
+                new UnifiedSet<>(u.length);
+        //new TreeSet();
         if (!flatten(op, u, dt, s))
             return False;
 
@@ -613,7 +627,7 @@ public abstract class TermBuilder {
                 Set<Term> cs = junctionGroupNonDTSubterms(s, dt);
                 if (!cs.isEmpty()) {
                     Set<Term> ts = conjTrueFalseFilter(cs);
-                    if (ts==cs || !ts.isEmpty())
+                    if (ts == cs || !ts.isEmpty())
                         return finalize(op, dt, ts);
                 }
                 return False;
@@ -697,7 +711,6 @@ public abstract class TermBuilder {
      * for commutive conjunction
      *
      * @param dt will be either 0 or DTERNAL (commutive relation)
-     *
      */
     private boolean flatten(@NotNull Op op, @NotNull Term[] u, int dt, @NotNull Set<Term> s) {
 
@@ -725,18 +738,36 @@ public abstract class TermBuilder {
 
     @NotNull
     protected Term statement(@NotNull Op op, int dt, @NotNull Term subject, @NotNull Term predicate) {
+
+
         statement:
         while (true) {
 
 
             while (true) {
 
-                //special statement filters
+
+                if (subject == predicate) //shortcut
+                    return True;
+
+                boolean subjTrue = isTrue(subject);
+                if (subjTrue && op == IMPL) {
+                    //special case for implications: reduce to the predicate if the subject is True
+                    return predicate;
+                }
+
+                //if either the subject or pred are True/False, then they collapse ot True if they are equal or False otherwise
+                if (subjTrue || isFalse(subject) || isTrueOrFalse(predicate)) {
+                    return subject == predicate ? True : False;
+                }
+
+                Op sop = subject.op();
+
                 switch (op) {
 
                     case INH:
 
-                        if (predicate instanceof TermTransform && transformImmediates() && subject.op() == PROD) {
+                        if (predicate instanceof TermTransform && transformImmediates() && sop == PROD) {
                             Term y = ((TermTransform) predicate).apply(((Compound) subject).terms());
                             if (y == null) {
                                 //throw new NullPointerException();
@@ -747,14 +778,9 @@ public abstract class TermBuilder {
                         break;
 
 
-                    case EQUI:
+                    case EQUI: {
 
-                        if (!validEquivalenceTerm(subject))
-                            throw new InvalidTermException(op, dt, new Term[]{subject, predicate}, "Invalid equivalence subject");
-                        if (!validEquivalenceTerm(predicate))
-                            throw new InvalidTermException(op, dt, new Term[]{subject, predicate}, "Invalid equivalence predicate");
-
-                        boolean subjNeg = subject.op() == NEG;
+                        boolean subjNeg = sop == NEG;
                         boolean predNeg = predicate.op() == NEG;
                         if (subjNeg && predNeg) {
                             subject = subject.unneg();
@@ -766,24 +792,29 @@ public abstract class TermBuilder {
                             return neg(statement(op, dt, subject.unneg(), predicate));
                         }
 
+                        if (!validEquivalenceTerm(subject))
+                            throw new InvalidTermException(op, dt, "Invalid equivalence subject", subject, predicate);
+                        if (!validEquivalenceTerm(predicate))
+                            throw new InvalidTermException(op, dt, "Invalid equivalence predicate", subject, predicate);
+
+
                         break;
+                    }
+
+                    case IMPL: {
 
 
-                    case IMPL:
-
-
-                        if (isTrue(subject)) {
-                            return predicate;
-                        } else if (isFalse(subject) || isTrueOrFalse(predicate)) {
-                            return False;
-                            //throw new InvalidTermException(op, dt, new Term[] { subject, predicate }, "Implication predicate is singular FALSE");
-                            //return negation(predicate); /??
+                        if (predicate.op() == NEG) {
+                            //negated predicate gets unwrapped to outside
+                            return neg(the(op, dt, subject, predicate.unneg()));
                         }
 
-
                         //filter (factor out) any common subterms iff commutive
-                        if ((subject.op() == CONJ) && (predicate.op() == CONJ)) {
-                            Compound csub = (Compound) subject;
+
+                        boolean subjNeg = sop == NEG;
+                        Term usub = subject.unneg();
+                        if ((usub.op() == CONJ) && (predicate.op() == CONJ)) {
+                            Compound csub = (Compound) usub;
                             Compound cpred = (Compound) predicate;
                             if (commutive(dt) || dt == XTERNAL /* if XTERNAL somehow happens here, just consider it as commutive */) {
 
@@ -791,8 +822,19 @@ public abstract class TermBuilder {
                                 TermContainer preds = cpred.subterms();
 
                                 MutableSet<Term> common = TermContainer.intersect(subjs, preds);
-                                if (!common.isEmpty()) {
-                                    subject = the(csub, TermContainer.exceptToSet(subjs, common));
+                                int commonSize = common.size();
+                                if (commonSize > 0) {
+
+                                    if (commonSize == preds.size())
+                                        return False; //shortcut: predicate was entirely removed
+
+                                    subject = commonSize!=subjs.size() ? the(csub, TermContainer.exceptToSet(subjs, common)) : False;
+                                    if (subjNeg)
+                                        subject = neg(subject); //reapply negation
+
+                                    if (isFalse(subject))
+                                        return False; //shortcut: subject is False, means this will reduce to False regardless
+
                                     predicate = the(cpred, TermContainer.exceptToSet(preds, common));
                                     continue;
                                 }
@@ -801,38 +843,26 @@ public abstract class TermBuilder {
 
                         // (C ==> (A ==> B))   <<==>>  ((&&,A,C) ==> B)
                         if (predicate.op() == IMPL) {
-                            Term oldCondition = subj(predicate);
-                            if ((oldCondition.op() == CONJ && oldCondition.containsTerm(subject))) {
-                                //throw new InvalidTermException(op, dt, new Term[]{subject, predicate}, "Implication circularity");
-                                return True; //infinite loop
-                            } else {
-                                if (commutive(dt)  /* if XTERNAL somehow happens here, just consider it as commutive */) {
-                                    subject = conj(dt, subject, oldCondition);
-                                    predicate = pred(predicate);
-                                }
+                            Term a = subj(predicate);
+
+                            if (commutive(dt)  /* if XTERNAL somehow happens here, just consider it as commutive? */) {
+                                int newDT = ((Compound)predicate).dt();
+                                subject = conj(dt, subject, a);
+                                predicate = pred(predicate);
+                                dt = newDT;
+                                continue;
                             }
+
                         }
 
 
                         if (subject.isAny(InvalidImplicationSubject))
-                            throw new InvalidTermException(op, dt, new Term[]{subject, predicate}, "Invalid implication subject");
+                            throw new InvalidTermException(op, dt, "Invalid implication subject", subject, predicate);
                         if (predicate.isAny(InvalidImplicationPredicate))
-                            throw new InvalidTermException(op, dt, new Term[]{subject, predicate}, "Invalid implication predicate");
+                            throw new InvalidTermException(op, dt, "Invalid implication predicate", subject, predicate);
 
-                        if (predicate.op() == NEG) {
-                            Term unNegatedPred = $.impl(subject, dt, predicate.unneg());
-                            return //negation
-                                    neg( //to be safe use the full negation but likely it can be the local negation pipeline
-                                            unNegatedPred
-                                    );
-                        }
                         break;
-
-                }
-
-                //if either the subject or pred are True/False by this point, fail
-                if (isTrueOrFalse(subject) || isTrueOrFalse(predicate)) {
-                    return subject == predicate ? True : False;
+                    }
                 }
 
 
@@ -843,8 +873,8 @@ public abstract class TermBuilder {
                     return ((subject == ss) ^ (predicate == pp)) ? False : True;  //handle root-level negation comparison
                 }
 
-                if ((ss instanceof Compound && ss.varPattern() == 0 && ((Compound)ss).containsTermAtemporally(pp)) ||
-                        (pp instanceof Compound && pp.varPattern() == 0 && ((Compound)pp).containsTermAtemporally(ss))) {
+                if ((ss instanceof Compound && ss.varPattern() == 0 && ((Compound) ss).containsTermAtemporally(pp)) ||
+                        (pp instanceof Compound && pp.varPattern() == 0 && ((Compound) pp).containsTermAtemporally(ss))) {
                     return False; //self-reference
                 }
 //                //co-conjunction; with exceptions for pattern variable containing terms
@@ -933,22 +963,6 @@ public abstract class TermBuilder {
 //    public Term subtractSet(@NotNull Op setType, @NotNull Compound A, @NotNull Compound B) {
 //        return difference(setType, A, B);
 //    }
-
-    @Nullable
-    private Term newIntersectINT(@NotNull Term[] t) {
-        return newIntersection(t,
-                SECTi,
-                SETi,
-                SETe);
-    }
-
-    @NotNull
-    private Term newIntersectEXT(@NotNull Term[] t) {
-        return newIntersection(t,
-                SECTe,
-                SETe,
-                SETi);
-    }
 
     @NotNull
     private Term newIntersection(@NotNull Term[] t, @NotNull Op intersection, @NotNull Op setUnion, @NotNull Op setIntersection) {

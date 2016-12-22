@@ -22,12 +22,12 @@ package jcog.spatial;
 
 /**
  * Guttmann's Linear split
- *
+ * <p>
  * Created by jcairns on 5/5/15.
  */
 final class LinearSplitLeaf<T> extends Leaf<T> {
 
-    protected LinearSplitLeaf(final RectBuilder<T> builder, final int mMin, final int mMax) {
+    LinearSplitLeaf(final RectBuilder<T> builder, final int mMin, final int mMax) {
         super(builder, mMin, mMax, RTree.Split.LINEAR);
     }
 
@@ -43,34 +43,34 @@ final class LinearSplitLeaf<T> extends Leaf<T> {
         final int nD = r[0].dim();
         final int[][][] rIndex = new int[nD][NRANGE][NRANGE];
         // separation between min and max extremes
-        final double   [] separation = new double[nD];
+        final double[] separation = new double[nD];
 
-        for(int d = 0; d < nD; d++) {
+        for (int d = 0; d < nD; d++) {
 
 //            rIndex[d][MIN][MIN] = 0;
 //            rIndex[d][MIN][MAX] = 0;
 //            rIndex[d][MAX][MIN] = 0;
 //            rIndex[d][MAX][MAX] = 0;
 
-            for(int j = 1; j < size; j++) {
+            for (int j = 1; j < size; j++) {
                 int[][] rd = rIndex[d];
 
                 HyperRect rj = r[j];
                 Comparable rjMin = rj.getMin().coord(d);
-                if(r[rd[MIN][MIN]].getMin().coord(d).compareTo(rjMin) > 0) {
+                if (r[rd[MIN][MIN]].getMin().coord(d).compareTo(rjMin) > 0) {
                     rd[MIN][MIN] = j;
                 }
 
-                if(r[rd[MIN][MAX]].getMin().coord(d).compareTo(rjMin) < 0) {
+                if (r[rd[MIN][MAX]].getMin().coord(d).compareTo(rjMin) < 0) {
                     rd[MIN][MAX] = j;
                 }
 
                 Comparable rjMax = rj.getMax().coord(d);
-                if(r[rd[MAX][MIN]].getMax().coord(d).compareTo(rjMax) > 0) {
+                if (r[rd[MAX][MIN]].getMax().coord(d).compareTo(rjMax) > 0) {
                     rd[MAX][MIN] = j;
                 }
 
-                if(r[rd[MAX][MAX]].getMax().coord(d).compareTo(rjMax) < 0) {
+                if (r[rd[MAX][MAX]].getMax().coord(d).compareTo(rjMax) < 0) {
                     rd[MAX][MAX] = j;
                 }
             }
@@ -84,26 +84,26 @@ final class LinearSplitLeaf<T> extends Leaf<T> {
 
         int r1Ext = rIndex[0][MAX][MIN], r2Ext = rIndex[0][MIN][MAX];
         double highSep = separation[0];
-        for(int d=1; d<nD; d++) {
-            if(highSep < separation[d]) {
+        for (int d = 1; d < nD; d++) {
+            if (highSep < separation[d]) {
                 highSep = separation[d];
                 r1Ext = rIndex[d][MAX][MIN];
                 r2Ext = rIndex[d][MIN][MAX];
             }
         }
 
-        if(r1Ext == r2Ext) {
+        if (r1Ext == r2Ext) {
             // they are not separated - arbitrarily choose the first and the last
             r1Ext = 0;
-            r2Ext = size-1;
+            r2Ext = size - 1;
         }
 
         // two seeds
         l1Node.add(entry[r1Ext]);
         l2Node.add(entry[r2Ext]);
 
-        for(int i = 0; i < size; i++) {
-            if((i != r1Ext) && (i != r2Ext)) {
+        for (int i = 0; i < size; i++) {
+            if ((i != r1Ext) && (i != r2Ext)) {
                 // classify with respect to nodes
                 classify(l1Node, l2Node, entry[i]);
             }

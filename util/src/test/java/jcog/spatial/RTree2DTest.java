@@ -43,7 +43,7 @@ public class RTree2DTest {
         final Rect2D rect = new Rect2D(new Point2D(2,2), new Point2D(8,8));
         final Point2D[] result = new Point2D[10];
 
-        final int n = pTree.search(rect, result);
+        final int n = pTree.containing(rect, result);
         Assert.assertEquals(7, n);
 
         for(int i=0; i<n; i++) {
@@ -72,7 +72,7 @@ public class RTree2DTest {
             final Rect2D searchRect = new Rect2D(5, 5, 10, 10);
             Rect2D[] results = new Rect2D[entryCount];
 
-            final int foundCount = rTree.search(searchRect, results);
+            final int foundCount = rTree.containing(searchRect, results);
             int resultCount = 0;
             for(int i = 0; i < results.length; i++) {
                 if(results[i] != null) {
@@ -110,7 +110,7 @@ public class RTree2DTest {
             final Rect2D searchRect = new Rect2D(0, 0, Integer.MAX_VALUE, Integer.MAX_VALUE);
             Rect2D[] results = new Rect2D[entryCount];
 
-            final int foundCount = rTree.search(searchRect, results);
+            final int foundCount = rTree.containing(searchRect, results);
             int resultCount = 0;
             for(int i = 0; i < results.length; i++) {
                 if(results[i] != null) {
@@ -171,7 +171,7 @@ public class RTree2DTest {
 
             final Rect2D searchRect = new Rect2D(100, 100, 120, 120);
             Rect2D[] results = new Rect2D[entryCount];
-            int foundCount = rTree.search(searchRect, results);
+            int foundCount = rTree.containing(searchRect, results);
 
             CounterNode<Rect2D> root = (CounterNode<Rect2D>) rTree.getRoot();
 
@@ -194,11 +194,11 @@ public class RTree2DTest {
         }
         Rect2D[] searchResults = new Rect2D[10];
         for(int i = 0; i < rects.length; i++) {
-            Assert.assertTrue("Found hyperRect that should have been removed on search " + i, rTree.search(rects[i], searchResults) == 0);
+            Assert.assertTrue("Found hyperRect that should have been removed on search " + i, rTree.containing(rects[i], searchResults) == 0);
         }
 
         rTree.add(new Rect2D(0,0,5,5));
-        Assert.assertTrue("Found hyperRect that should have been removed on search ", rTree.getEntryCount() != 0);
+        Assert.assertTrue("Found hyperRect that should have been removed on search ", rTree.size() != 0);
     }
 
     @Test
@@ -207,11 +207,11 @@ public class RTree2DTest {
 
         Rect2D rect = new Rect2D(0,0,2,2);
         rTree.add(rect);
-        Assert.assertTrue("Did not add HyperRect to Tree", rTree.getEntryCount() > 0);
+        Assert.assertTrue("Did not add HyperRect to Tree", rTree.size() > 0);
         rTree.remove(rect);
-        Assert.assertTrue("Did not remove HyperRect from Tree", rTree.getEntryCount() == 0);
+        Assert.assertTrue("Did not remove HyperRect from Tree", rTree.size() == 0);
         rTree.add(rect);
-        Assert.assertTrue("Tree nulled out and could not add HyperRect back in", rTree.getEntryCount() > 0);
+        Assert.assertTrue("Tree nulled out and could not add HyperRect back in", rTree.size() > 0);
     }
 
     @Ignore
@@ -260,7 +260,7 @@ public class RTree2DTest {
         Rect2D newRect = new Rect2D(1,2,3,4);
         rTree.update(oldRect, newRect);
         Rect2D[] results = new Rect2D[2];
-        int num = rTree.search(newRect, results);
+        int num = rTree.containing(newRect, results);
         Assert.assertTrue("Did not find the updated HyperRect", num == 1);
         String st = results[0].toString();
         System.out.print(st);

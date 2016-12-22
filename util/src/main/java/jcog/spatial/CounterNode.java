@@ -27,10 +27,9 @@ import java.util.function.Predicate;
  * Created by jcovert on 6/18/15.
  */
 final class CounterNode<T> implements Node<T> {
-    private final Node<T> node;
-
     static int searchCount;
     static int bboxEvalCount;
+    private final Node<T> node;
 
     CounterNode(final Node<T> node) {
         this.node = node;
@@ -42,8 +41,8 @@ final class CounterNode<T> implements Node<T> {
     }
 
     @Override
-    public HyperRect getRect() {
-        return this.node.getRect();
+    public HyperRect bounds() {
+        return this.node.bounds();
     }
 
     @Override
@@ -52,23 +51,27 @@ final class CounterNode<T> implements Node<T> {
     }
 
     @Override
-    public Node<T> remove(T t) { return this.node.remove(t); }
-
-    @Override
-    public Node<T> update(T told, T tnew) { return this.node.update(told, tnew); }
-
-    @Override
-    public int search(HyperRect rect, T[] t, int n) {
-        searchCount++;
-        bboxEvalCount += this.node.size();
-        return this.node.search(rect, t, n);
+    public Node<T> remove(T t) {
+        return this.node.remove(t);
     }
 
     @Override
-    public boolean search(HyperRect rect, Predicate<T> t) {
+    public Node<T> update(T told, T tnew) {
+        return this.node.update(told, tnew);
+    }
+
+    @Override
+    public int containing(HyperRect rect, T[] t, int n) {
         searchCount++;
         bboxEvalCount += this.node.size();
-        return this.node.search(rect, t);
+        return this.node.containing(rect, t, n);
+    }
+
+    @Override
+    public boolean containing(HyperRect rect, Predicate<T> t) {
+        searchCount++;
+        bboxEvalCount += this.node.size();
+        return this.node.containing(rect, t);
     }
 
     @Override
@@ -82,8 +85,8 @@ final class CounterNode<T> implements Node<T> {
     }
 
     @Override
-    public void forEach(Consumer<T> consumer, HyperRect rect) {
-        this.node.forEach(consumer, rect);
+    public void intersecting(Consumer<T> consumer, HyperRect rect) {
+        this.node.intersecting(consumer, rect);
     }
 
     @Override

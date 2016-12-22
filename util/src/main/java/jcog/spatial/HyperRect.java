@@ -22,16 +22,15 @@ package jcog.spatial;
 
 /**
  * An N dimensional rectangle or "hypercube" that is a representation of a data entry.
- *
+ * <p>
  * Created by jcairns on 4/30/15.
  */
-public interface HyperRect<X extends Comparable<X>>  {
+public interface HyperRect<X extends Comparable<X>> {
 
     /**
      * Calculate the resulting mbr when combining param HyperRect with this HyperRect
      *
      * @param r - mbr to add
-     *
      * @return new HyperRect representing mbr of both HyperRects combined
      */
     HyperRect<X> getMbr(HyperRect<X> r);
@@ -46,21 +45,21 @@ public interface HyperRect<X extends Comparable<X>>  {
     /**
      * Get the minimum HyperPoint of this HyperRect
      *
-     * @return  min HyperPoint
+     * @return min HyperPoint
      */
     HyperPoint getMin();
 
     /**
      * Get the minimum HyperPoint of this HyperRect
      *
-     * @return  min HyperPoint
+     * @return min HyperPoint
      */
     HyperPoint getMax();
 
     /**
      * Get the HyperPoint representing the center point in all dimensions of this HyperRect
      *
-     * @return  middle HyperPoint
+     * @return middle HyperPoint
      */
     HyperPoint getCentroid();
 
@@ -68,18 +67,15 @@ public interface HyperRect<X extends Comparable<X>>  {
      * Calculate the distance between the min and max HyperPoints in given dimension
      *
      * @param d - dimension to calculate
-     *
      * @return double - the numeric range of the dimention (min - max)
      */
     double getRange(final int d);
-
 
 
     /**
      * Determines if this HyperRect fully contains parameter HyperRect
      *
      * @param r - HyperRect to test
-     *
      * @return true if contains, false otherwise
      */
     boolean contains(HyperRect r);
@@ -88,7 +84,6 @@ public interface HyperRect<X extends Comparable<X>>  {
      * Determines if this HyperRect intersects parameter HyperRect
      *
      * @param r - HyperRect to test
-     *
      * @return true if intersects, false otherwise
      */
     boolean intersects(HyperRect r);
@@ -108,7 +103,7 @@ public interface HyperRect<X extends Comparable<X>>  {
     default double perimeter() {
         double p = 0.0;
         final int nD = this.dim();
-        for(int d = 0; d<nD; d++) {
+        for (int d = 0; d < nD; d++) {
             p += 2.0 * this.getRange(d);
         }
         return p;

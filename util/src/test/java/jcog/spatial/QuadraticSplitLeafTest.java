@@ -80,13 +80,13 @@ public class QuadraticSplitLeafTest {
         Assert.assertEquals("Expected different number of children after split", 2, childCount);
 
         Node<Rect2D> child1 = children[0];
-        Rect2D child1Mbr = (Rect2D) child1.getRect();
+        Rect2D child1Mbr = (Rect2D) child1.bounds();
         Rect2D expectedChild1Mbr = new Rect2D(0, 0, 4, 4);
         Assert.assertEquals("Child 1 size incorrect after split", 4, child1.size());
         Assert.assertEquals("Child 1 mbr incorrect after split", expectedChild1Mbr, child1Mbr);
 
         Node<Rect2D> child2 = children[1];
-        Rect2D child2Mbr = (Rect2D) child2.getRect();
+        Rect2D child2Mbr = (Rect2D) child2.bounds();
         Rect2D expectedChild2Mbr = new Rect2D(4, 0, 5, 1);
         Assert.assertEquals("Child 2 size incorrect after split", 1, child2.size());
         Assert.assertEquals("Child 2 mbr incorrect after split", expectedChild2Mbr, child2Mbr);

@@ -39,19 +39,19 @@ public class PointND implements HyperPoint {
 
     @Override
     public double distance(HyperPoint h) {
-        PointND p = (PointND)h;
+        PointND p = (PointND) h;
         float sumSq = 0;
         for (int i = 0; i < coord.length; i++) {
             float x = coord[i];
             float y = p.coord[i];
-            sumSq += Util.sqr(x-y);
+            sumSq += Util.sqr(x - y);
         }
         return Math.sqrt(sumSq);
     }
 
     @Override
     public double distance(HyperPoint p, int i) {
-        return Math.abs( coord[i] - ((PointND)p).coord[i] );
+        return Math.abs(coord[i] - ((PointND) p).coord[i]);
     }
 
     @Override
@@ -70,9 +70,8 @@ public class PointND implements HyperPoint {
 
     @Override
     public String toString() {
-        return "(" + Arrays.toString(coord) + ")";
+        return '(' + Arrays.toString(coord) + ')';
     }
-
 
 
 }

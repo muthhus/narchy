@@ -57,7 +57,7 @@ public class RectND implements HyperRect {
 
     @Override
     public boolean contains(final HyperRect r) {
-        final RectND x = (RectND)r;
+        final RectND x = (RectND) r;
 
         int dim = dim();
         for (int i = 0; i < dim; i++) {
@@ -69,7 +69,7 @@ public class RectND implements HyperRect {
 
     @Override
     public boolean intersects(final HyperRect r) {
-        final RectND x = (RectND)r;
+        final RectND x = (RectND) r;
 
         int dim = dim();
         for (int i = 0; i < dim; i++) {
@@ -91,7 +91,7 @@ public class RectND implements HyperRect {
 
     @Override
     public HyperRect getMbr(final HyperRect r) {
-        final RectND x = (RectND)r;
+        final RectND x = (RectND) r;
 
         int dim = dim();
         float[] newMin = new float[dim];
@@ -113,7 +113,7 @@ public class RectND implements HyperRect {
         for (int i = 0; i < dim; i++) {
             float min = minf[i];
             float max = maxf[i];
-            c[i] = min + (max - min)/2f;
+            c[i] = min + (max - min) / 2f;
         }
         return new PointND(c);
     }
@@ -136,7 +136,7 @@ public class RectND implements HyperRect {
 
     @Override
     public double getRange(final int i) {
-        return max.coord[i] -  min.coord[i];
+        return max.coord[i] - min.coord[i];
     }
 
     @Override

@@ -35,14 +35,14 @@ import java.util.function.Predicate;
  * Created by jcairns on 4/30/15.</p>
  */
 public class RTree<T> implements SpatialSearch<T> {
-    public static final double EPSILON = 1e-12;
-    public static final float FPSILON = (float)EPSILON;
+    private static final double EPSILON = 1e-12;
+    public static final float FPSILON = (float) EPSILON;
 
     private final int mMin;
     private final int mMax;
     private final RectBuilder<T> builder;
-    private Node<T> root;
     private final Split splitType;
+    private Node<T> root;
     private int entryCount;
 
     public RTree(final RectBuilder<T> builder, final int mMin, final int mMax, final Split splitType) {
@@ -54,15 +54,11 @@ public class RTree<T> implements SpatialSearch<T> {
         root = Leaf.create(builder, mMin, mMax, splitType);
     }
 
-
-    @Override
-    @Deprecated public int search(final HyperRect rect, final T[] t) {
-        return root.search(rect, t, 0);
+    static boolean isEqual(final double a, final double b) {
+        return Util.equals(a, b, EPSILON);
     }
 
-    public boolean search(final HyperRect rect, final Predicate<T> t) {
-        return root.search(rect, t);
-    }
+
 
     @Override
     public void add(final T t) {
@@ -90,7 +86,7 @@ public class RTree<T> implements SpatialSearch<T> {
      * @param t    Data entries to be evaluated
      * @return Whether or not all entries lie inside rect
      */
-    public boolean contains(final HyperRect rect, final T[] t) {
+    public boolean contains(final HyperRect rect, final T... t) {
         for (int i = 0; i < t.length; i++) {
             if (!rect.contains(builder.apply(t[i]))) {
                 return false;
@@ -103,18 +99,13 @@ public class RTree<T> implements SpatialSearch<T> {
      * @return number of data entries stored in the RTree
      */
     @Override
-    public int getEntryCount() {
+    public int size() {
         return entryCount;
-    }
-
-    static boolean isEqual(final double a, final double b) {
-        return Util.equals(a, b, EPSILON);
     }
 
 //    static boolean isEqual(final double a, final double b, final double eps) {
 //        return Math.abs(a - b) <= ((Math.abs(Math.abs(a) < Math.abs(b) ? b : a)) * eps);
 //    }
-
 
     @Override
     public void forEach(Consumer<T> consumer) {
@@ -122,8 +113,18 @@ public class RTree<T> implements SpatialSearch<T> {
     }
 
     @Override
-    public void forEach(Consumer<T> consumer, HyperRect rect) {
-        root.forEach(consumer, rect);
+    public void intersecting(HyperRect intersecting, Consumer<T> consumer) {
+        root.intersecting(consumer, intersecting);
+    }
+
+    @Override
+    @Deprecated
+    public int containing(HyperRect rect, final T[] t) {
+        return root.containing(rect, t, 0);
+    }
+
+    public boolean containing(HyperRect rect, final Predicate<T> t) {
+        return root.containing(rect, t);
     }
 
     void instrumentTree() {

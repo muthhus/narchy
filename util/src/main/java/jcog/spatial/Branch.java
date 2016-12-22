@@ -26,7 +26,7 @@ import java.util.function.Predicate;
 
 /**
  * RTree node that contains leaf nodes
- *
+ * <p>
  * Created by jcairns on 4/30/15.
  */
 final class Branch<T> implements Node<T> {
@@ -56,15 +56,14 @@ final class Branch<T> implements Node<T> {
      * @param n node to be added (can be leaf or branch)
      * @return position of the added node
      */
-    protected int addChild(final Node<T> n) {
-        if(size < mMax) {
+    int addChild(final Node<T> n) {
+        if (size < mMax) {
             child[size++] = n;
 
-            HyperRect nr = n.getRect();
+            HyperRect nr = n.bounds();
             mbr = mbr != null ? mbr.getMbr(nr) : nr;
             return size - 1;
-        }
-        else {
+        } else {
             throw new RuntimeException("Too many children");
         }
     }
@@ -75,7 +74,7 @@ final class Branch<T> implements Node<T> {
     }
 
     @Override
-    public HyperRect getRect() {
+    public HyperRect bounds() {
         return mbr;
     }
 
@@ -88,11 +87,11 @@ final class Branch<T> implements Node<T> {
     @Override
     public Node<T> add(final T t) {
         final HyperRect tRect = builder.apply(t);
-        if(size < mMin) {
-            for(int i=0; i<size; i++) {
-                if(child[i].getRect().contains(tRect)) {
+        if (size < mMin) {
+            for (int i = 0; i < size; i++) {
+                if (child[i].bounds().contains(tRect)) {
                     child[i] = child[i].add(t);
-                    mbr = mbr.getMbr(child[i].getRect());
+                    mbr = mbr.getMbr(child[i].bounds());
                     return child[i];
                 }
             }
@@ -100,7 +99,7 @@ final class Branch<T> implements Node<T> {
             final Node<T> nextLeaf = Leaf.create(builder, mMin, mMax, splitType);
             nextLeaf.add(t);
             final int nextChild = addChild(nextLeaf);
-            mbr = mbr.getMbr(child[nextChild].getRect());
+            mbr = mbr.getMbr(child[nextChild].bounds());
 
             return this;
 
@@ -109,14 +108,14 @@ final class Branch<T> implements Node<T> {
 
             child[bestLeaf] = child[bestLeaf].add(t);
 
-            mbr = mbr.getMbr(child[bestLeaf].getRect());
+            mbr = mbr.getMbr(child[bestLeaf].bounds());
 
             // optimize on split to remove the extra created branch when there
             // is space for the children here
-            if(child[bestLeaf].size() == 2 &&
+            if (child[bestLeaf].size() == 2 &&
                     size < mMax &&
                     child[bestLeaf] instanceof Branch) {
-                final Branch<T> branch = (Branch<T>)child[bestLeaf];
+                final Branch<T> branch = (Branch<T>) child[bestLeaf];
                 child[bestLeaf] = branch.child[0];
                 child[size++] = branch.child[1];
             }
@@ -130,12 +129,12 @@ final class Branch<T> implements Node<T> {
         final HyperRect tRect = builder.apply(t);
         Node<T> returned = null;
         for (int i = 0; i < size; i++) {
-            if (child[i].getRect().contains(tRect)) {
-                returned =  child[i].remove(t);
+            if (child[i].bounds().contains(tRect)) {
+                returned = child[i].remove(t);
 
                 // Replace a Branch Node with 1 child with it's child
                 // Will not work for a RTree with mMin > 2
-                if(returned != null) {
+                if (returned != null) {
                     if (returned.size() == 0) {
                         child[i] = null;
                         if (i < (size - 1)) {
@@ -161,11 +160,11 @@ final class Branch<T> implements Node<T> {
     @Override
     public Node<T> update(final T told, final T tnew) {
         final HyperRect tRect = builder.apply(told);
-        for(int i = 0; i < size; i++){
+        for (int i = 0; i < size; i++) {
             Node c = child[i];
-            if(c.getRect().contains(tRect)){
+            if (c.bounds().contains(tRect)) {
                 child[i] = c = c.update(told, tnew);
-                mbr = mbr.getMbr(c.getRect());
+                mbr = mbr.getMbr(c.bounds());
                 return c;
             }
         }
@@ -173,29 +172,31 @@ final class Branch<T> implements Node<T> {
     }
 
     @Override
-    public int search(final HyperRect rect, final T[] t, int n) {
+    public int containing(final HyperRect rect, final T[] t, int n) {
         final int tLen = t.length;
         final int n0 = n;
-        for(int i=0; i < size && n < tLen; i++) {
+        for (int i = 0; i < size && n < tLen; i++) {
             Node c = child[i];
-            if (rect.intersects(c.getRect())) {
-                n += c.search(rect, t, n);
+            if (rect.intersects(c.bounds())) {
+                n += c.containing(rect, t, n);
             }
         }
-        return n-n0;
+        return n - n0;
     }
-    @Override
-    public boolean search(final HyperRect rect, final Predicate<T> t) {
 
-        for(int i=0; i < size; i++) {
+    @Override
+    public boolean containing(final HyperRect rect, final Predicate<T> t) {
+
+        for (int i = 0; i < size; i++) {
             Node c = child[i];
-            if (rect.intersects(c.getRect())) {
-                if (!c.search(rect, t))
+            if (rect.intersects(c.bounds())) {
+                if (!c.containing(rect, t))
                     return false;
             }
         }
         return true;
     }
+
     /**
      * @return number of child nodes
      */
@@ -205,21 +206,20 @@ final class Branch<T> implements Node<T> {
     }
 
     private int chooseLeaf(final T t, final HyperRect tRect) {
-        if(size > 0) {
+        if (size > 0) {
             int bestNode = 0;
-            HyperRect childMbr = child[0].getRect().getMbr(tRect);
-            double leastEnlargement = childMbr.cost() - (child[0].getRect().cost() + tRect.cost());
-            double leastPerimeter   = childMbr.perimeter();
+            HyperRect childMbr = child[0].bounds().getMbr(tRect);
+            double leastEnlargement = childMbr.cost() - (child[0].bounds().cost() + tRect.cost());
+            double leastPerimeter = childMbr.perimeter();
 
-            for(int i = 1; i<size; i++) {
-                childMbr = child[i].getRect().getMbr(tRect);
-                final double nodeEnlargement = childMbr.cost() - (child[i].getRect().cost() + tRect.cost());
+            for (int i = 1; i < size; i++) {
+                childMbr = child[i].bounds().getMbr(tRect);
+                final double nodeEnlargement = childMbr.cost() - (child[i].bounds().cost() + tRect.cost());
                 if (nodeEnlargement < leastEnlargement) {
                     leastEnlargement = nodeEnlargement;
-                    leastPerimeter  = childMbr.perimeter();
+                    leastPerimeter = childMbr.perimeter();
                     bestNode = i;
-                }
-                else if(RTree.isEqual(nodeEnlargement, leastEnlargement)) {
+                } else if (RTree.isEqual(nodeEnlargement, leastEnlargement)) {
                     final double childPerimeter = childMbr.perimeter();
                     if (childPerimeter < leastPerimeter) {
                         leastEnlargement = nodeEnlargement;
@@ -230,15 +230,14 @@ final class Branch<T> implements Node<T> {
 
             }
             return bestNode;
-        }
-        else {
+        } else {
             final Node<T> n = Leaf.create(builder, mMin, mMax, splitType);
             n.add(t);
             child[size++] = n;
 
-            mbr = mbr == null ? n.getRect() : mbr.getMbr(n.getRect());
+            mbr = mbr == null ? n.bounds() : mbr.getMbr(n.bounds());
 
-            return size-1;
+            return size - 1;
         }
     }
 
@@ -253,23 +252,23 @@ final class Branch<T> implements Node<T> {
 
     @Override
     public void forEach(Consumer<T> consumer) {
-        for(int i = 0; i < size; i++) {
+        for (int i = 0; i < size; i++) {
             child[i].forEach(consumer);
         }
     }
 
     @Override
-    public void forEach(Consumer<T> consumer, HyperRect rect) {
-        for(int i = 0; i < size; i++) {
-            if(rect.intersects(child[i].getRect())) {
-                child[i].forEach(consumer, rect);
+    public void intersecting(Consumer<T> consumer, HyperRect rect) {
+        for (int i = 0; i < size; i++) {
+            if (rect.intersects(child[i].bounds())) {
+                child[i].intersecting(consumer, rect);
             }
         }
     }
 
     @Override
     public void collectStats(Stats stats, int depth) {
-        for(int i = 0; i < size; i++) {
+        for (int i = 0; i < size; i++) {
             child[i].collectStats(stats, depth + 1);
         }
         stats.countBranchAtDepth(depth);
@@ -277,7 +276,7 @@ final class Branch<T> implements Node<T> {
 
     @Override
     public Node<T> instrument() {
-        for(int i = 0; i < size; i++) {
+        for (int i = 0; i < size; i++) {
             child[i] = child[i].instrument();
         }
         return new CounterNode<>(this);

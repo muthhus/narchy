@@ -35,7 +35,7 @@ interface Node<T> {
     /**
      * @return Rect - the bounding rectangle for this node
      */
-    HyperRect getRect();
+    HyperRect bounds();
 
     /**
      * Add t to the index
@@ -63,13 +63,13 @@ interface Node<T> {
      * Search for rect within this node
      *
      * @param rect - HyperRect to search for
-     * @param t - array of found results
-     * @param n - total result count so far (from recursive call)
+     * @param t    - array of found results
+     * @param n    - total result count so far (from recursive call)
      * @return result count from search of this node
      */
-    int search(HyperRect rect, T[] t, int n);
+    int containing(HyperRect rect, T[] t, int n);
 
-    boolean search(HyperRect rect, Predicate<T> t);
+    boolean containing(HyperRect rect, Predicate<T> t);
 
     /**
      * The number of entries in the node
@@ -89,9 +89,9 @@ interface Node<T> {
      * Consumer "accepts" every node in the given rect
      *
      * @param consumer
-     * @param rect - limiting rect
+     * @param rect     - limiting rect
      */
-    void forEach(Consumer<T> consumer, HyperRect rect);
+    void intersecting(Consumer<T> consumer, HyperRect rect);
 
     /**
      * Recurses over index collecting stats

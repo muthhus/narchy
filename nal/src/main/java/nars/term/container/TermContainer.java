@@ -316,7 +316,16 @@ public interface TermContainer extends Termlike, Iterable<Term> {
         }
         return true;
     }
-
+    default boolean equalTerms(@NotNull Term... c) {
+        int s = size();
+        if (s !=c.length)
+            return false;
+        for (int i = 0; i < s; i++) {
+            if (!term(i).equals(c[i]))
+                return false;
+        }
+        return true;
+    }
 
     void copyInto(Collection<Term> target);
 
@@ -717,8 +726,14 @@ public interface TermContainer extends Termlike, Iterable<Term> {
 
     @NotNull
     static Set<Term> exceptToSet(@NotNull TermContainer c, @NotNull MutableSet<Term> toRemove) {
-        Set<Term> s = c.toSet();
-        s.removeAll(toRemove);
+
+        int cs = c.size();
+        Set<Term> s = new HashSet(cs);
+        for (int i = 0; i < cs; i++) {
+            Term x = c.term(i);
+            if (!toRemove.contains(x))
+                s.add(x);
+        }
         return s;
     }
 

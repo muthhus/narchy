@@ -25,13 +25,13 @@ import java.util.function.Function;
 /**
  * Created by jcairns on 4/30/15.
  */
-@FunctionalInterface public interface RectBuilder<T> extends Function<T,HyperRect> {
+@FunctionalInterface
+public interface RectBuilder<T> extends Function<T, HyperRect> {
 
     /**
      * Build a bounding rectangle for the given element
      *
      * @param t - element to bound
-     *
      * @return HyperRect impl for this entry
      */
     @Override

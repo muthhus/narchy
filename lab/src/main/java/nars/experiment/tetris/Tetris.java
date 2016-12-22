@@ -425,7 +425,7 @@ public class Tetris extends NAgents {
                     new NARSpace(n) {
                         @Override
                         protected void get(Collection displayNext) {
-                            li.search(new Rect1D.DefaultRect1D(start, end), x -> {
+                            li.containing(new Rect1D.DefaultRect1D(start, end), x -> {
                                 if (displayNext.size() > cap) {
                                     return false;
                                 }

@@ -437,8 +437,8 @@ public interface TimeFunctions {
     @Nullable
     static Compound noTemporalBasis(@NotNull Compound derived) {
         if (Param.DEBUG_EXTRA)
-            throw new InvalidTermException(derived.op(), derived.dt(), derived.terms(),
-                    "no basis for relating other occurrence to derived");
+            throw new InvalidTermException(derived.op(), derived.dt(), "no basis for relating other occurrence to derived", derived.terms()
+            );
         else
             return null;
     }

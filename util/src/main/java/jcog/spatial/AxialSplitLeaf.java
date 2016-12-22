@@ -24,14 +24,14 @@ import java.util.Arrays;
 
 /**
  * Fast RTree split suggested by Yufei Tao taoyf@cse.cuhk.edu.hk
- *
+ * <p>
  * Perform an axial split
- *
+ * <p>
  * Created by jcairns on 5/5/15.
  */
 public final class AxialSplitLeaf<T> extends Leaf<T> {
 
-    protected AxialSplitLeaf(final RectBuilder<T> builder, final int mMin, final int mMax) {
+    AxialSplitLeaf(final RectBuilder<T> builder, final int mMin, final int mMax) {
         super(builder, mMin, mMax, RTree.Split.AXIAL);
     }
 
@@ -48,10 +48,10 @@ public final class AxialSplitLeaf<T> extends Leaf<T> {
         // choose axis to split
         int axis = 0;
         double rangeD = mbr.getRange(0);
-        for(int d=1; d<nD; d++) {
+        for (int d = 1; d < nD; d++) {
             // split along the greatest range extent
             final double dr = mbr.getRange(d);
-            if(dr > rangeD) {
+            if (dr > rangeD) {
                 axis = d;
                 rangeD = dr;
             }
@@ -66,20 +66,20 @@ public final class AxialSplitLeaf<T> extends Leaf<T> {
             return p1.coord(splitDimension).compareTo(p2.coord(splitDimension));
         });
 
-        for(int i=0; i<size/2; i++) {
+        for (int i = 0; i < size / 2; i++) {
             outerLoop:
-            for(int j=0; j<size; j++) {
-                if(r[j] == sortedMbr[i]) {
+            for (int j = 0; j < size; j++) {
+                if (r[j] == sortedMbr[i]) {
                     l1Node.add(entry[j]);
                     break outerLoop;
                 }
             }
         }
 
-        for(int i=size/2; i<size; i++) {
+        for (int i = size / 2; i < size; i++) {
             outerLoop:
-            for(int j=0; j<size; j++) {
-                if(r[j] == sortedMbr[i]) {
+            for (int j = 0; j < size; j++) {
+                if (r[j] == sortedMbr[i]) {
                     l2Node.add(entry[j]);
                     break outerLoop;
                 }

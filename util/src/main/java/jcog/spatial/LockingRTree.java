@@ -33,7 +33,7 @@ public class LockingRTree<T> implements SpatialSearch<T> {
     private final Lock readLock;
     private final Lock writeLock;
 
-    protected LockingRTree(SpatialSearch<T> rTree, ReadWriteLock lock) {
+    LockingRTree(SpatialSearch<T> rTree, ReadWriteLock lock) {
         this.rTree = rTree;
         this.readLock = lock.readLock();
         this.writeLock = lock.writeLock();
@@ -43,17 +43,15 @@ public class LockingRTree<T> implements SpatialSearch<T> {
      * Blocking locked search
      *
      * @param rect - HyperRect to search
-     * @param t - array to hold results
-     *
+     * @param t    - array to hold results
      * @return number of entries found
      */
     @Override
-    public int search(HyperRect rect, T[] t) {
+    public int containing(HyperRect rect, T[] t) {
         readLock.lock();
         try {
-            return rTree.search(rect, t);
-        }
-        finally {
+            return rTree.containing(rect, t);
+        } finally {
             readLock.unlock();
         }
     }
@@ -68,8 +66,7 @@ public class LockingRTree<T> implements SpatialSearch<T> {
         writeLock.lock();
         try {
             rTree.add(t);
-        }
-        finally {
+        } finally {
             writeLock.unlock();
         }
     }
@@ -84,8 +81,7 @@ public class LockingRTree<T> implements SpatialSearch<T> {
         writeLock.lock();
         try {
             rTree.remove(t);
-        }
-        finally {
+        } finally {
             writeLock.unlock();
         }
     }
@@ -101,8 +97,7 @@ public class LockingRTree<T> implements SpatialSearch<T> {
         writeLock.lock();
         try {
             rTree.update(told, tnew);
-        }
-        finally {
+        } finally {
             writeLock.unlock();
         }
     }
@@ -111,14 +106,13 @@ public class LockingRTree<T> implements SpatialSearch<T> {
      * Non-blocking locked search
      *
      * @param rect - HyperRect to search
-     * @param t - array to hold results
-     *
+     * @param t    - array to hold results
      * @return number of entries found or -1 if lock was not acquired
      */
     public int trySearch(HyperRect rect, T[] t) {
-        if(readLock.tryLock()) {
+        if (readLock.tryLock()) {
             try {
-                return rTree.search(rect, t);
+                return rTree.containing(rect, t);
             } finally {
                 readLock.unlock();
             }
@@ -130,11 +124,10 @@ public class LockingRTree<T> implements SpatialSearch<T> {
      * Non-blocking locked add
      *
      * @param t - entry to add
-     *
      * @return true if lock was acquired, false otherwise
      */
     public boolean tryAdd(T t) {
-        if(writeLock.tryLock()) {
+        if (writeLock.tryLock()) {
             try {
                 rTree.add(t);
             } finally {
@@ -149,11 +142,10 @@ public class LockingRTree<T> implements SpatialSearch<T> {
      * Non-blocking locked remove
      *
      * @param t - entry to remove
-     *
      * @return true if lock was acquired, false otherwise
      */
     public boolean tryRemove(T t) {
-        if(writeLock.tryLock()) {
+        if (writeLock.tryLock()) {
             try {
                 rTree.remove(t);
             } finally {
@@ -169,11 +161,10 @@ public class LockingRTree<T> implements SpatialSearch<T> {
      *
      * @param told - entry to update
      * @param tnew - entry with new values
-     *
      * @return true if lock was acquired, false otherwise
      */
     public boolean tryUpdate(T told, T tnew) {
-        if(writeLock.tryLock()) {
+        if (writeLock.tryLock()) {
             try {
                 rTree.update(told, tnew);
             } finally {
@@ -185,8 +176,8 @@ public class LockingRTree<T> implements SpatialSearch<T> {
     }
 
     @Override
-    public int getEntryCount() {
-        return rTree.getEntryCount();
+    public int size() {
+        return rTree.size();
     }
 
     @Override
@@ -200,10 +191,10 @@ public class LockingRTree<T> implements SpatialSearch<T> {
     }
 
     @Override
-    public void forEach(Consumer<T> consumer, HyperRect rect) {
+    public void intersecting(HyperRect rect, Consumer<T> consumer) {
         readLock.lock();
         try {
-            rTree.forEach(consumer, rect);
+            rTree.intersecting(rect, consumer);
         } finally {
             readLock.unlock();
         }

@@ -28,9 +28,9 @@ import java.util.Random;
 import java.util.Set;
 
 import static nars.$.$;
-import static nars.Op.DISJ;
-import static nars.Op.VAR_PATTERN;
+import static nars.Op.*;
 import static nars.nal.meta.match.Ellipsis.firstEllipsis;
+import static nars.term.Term.False;
 import static org.junit.Assert.*;
 
 /**
@@ -496,8 +496,11 @@ public class EllipsisTest {
 
             if (o.statement) continue;
 
-            assertEquals(o + " with normal term",
-                    a, $.compound(o, a));
+            if (o!=DIFFe && o!=DIFFi) {
+                assertEquals(o + " with normal term", a, $.compound(o, a));
+            } else {
+                assertEquals(False, $.compound(o, a));
+            }
 
             assertEquals(o + " with ellipsis not reduced",
                     o.statement ? VAR_PATTERN : o,

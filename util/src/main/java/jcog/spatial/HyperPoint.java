@@ -22,7 +22,7 @@ package jcog.spatial;
 
 /**
  * N dimensional point used to signify the bounds of a HyperRect
- *
+ * <p>
  * Created by jcairns on 5/5/15.
  */
 public interface HyperPoint {
@@ -37,10 +37,8 @@ public interface HyperPoint {
     /**
      * Get the value of this point in the given dimension
      *
-     * @param d - dimension
-     *
-     * @param <D> - A comparable coordinate 
-     *
+     * @param d   - dimension
+     * @param <D> - A comparable coordinate
      * @return D - value of this point in the dimension
      * @throws IllegalArgumentException if a non-existent dimension is requested
      */
@@ -50,7 +48,6 @@ public interface HyperPoint {
      * Calculate the distance from this point to the given point across all dimensions
      *
      * @param p - point to calculate distance to
-     *
      * @return distance to the point
      * @throws IllegalArgumentException if a non-existent dimension is requested
      */
@@ -61,7 +58,6 @@ public interface HyperPoint {
      *
      * @param p - point to calculate distance to
      * @param d - dimension to use in calculation
-     *
      * @return distance to the point in the fiven dimension
      */
     double distance(HyperPoint p, int d);

@@ -32,7 +32,7 @@ public class RTreeNDTest {
             final RectND searchRect = new RectND(new PointND(5, 5), new PointND(10, 10));
             RectND[] results = new RectND[entryCount];
 
-            final int foundCount = rTree.search(searchRect, results);
+            final int foundCount = rTree.containing(searchRect, results);
             int resultCount = 0;
             for(int i = 0; i < results.length; i++) {
                 if(results[i] != null) {
@@ -81,7 +81,7 @@ public class RTreeNDTest {
 
                 RectND[] results = new RectND[entryCount];
 
-                final int foundCount = rTree.search(searchRect, results);
+                final int foundCount = rTree.containing(searchRect, results);
                 int resultCount = 0;
                 for (int i = 0; i < results.length; i++) {
                     if (results[i] != null) {

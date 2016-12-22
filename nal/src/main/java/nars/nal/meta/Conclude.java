@@ -180,13 +180,13 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
 //                    );
 //                }
 
-                throw new InvalidTermException(content.op(), content.dt(), content.terms(),
-                        "temporalization failure" + (Param.DEBUG ? rule : ""));
+                throw new InvalidTermException(content.op(), content.dt(), "temporalization failure" + (Param.DEBUG ? rule : ""), content.terms()
+                );
             }
 
             int tdt = temporalized.dt();
             if (tdt == XTERNAL || tdt == -XTERNAL) {
-                throw new InvalidTermException(content.op(), content.dt(), content.terms(), "XTERNAL/DTERNAL leak");
+                throw new InvalidTermException(content.op(), content.dt(), "XTERNAL/DTERNAL leak", content.terms());
             }
 
 //            if (Param.DEBUG && occReturn[0] != ETERNAL && Math.abs(occReturn[0] - DTERNAL) < 1000) {
@@ -223,9 +223,9 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
         //the derived compound indicated a potential dt, but the premise was actually atemporal;
         // this indicates a temporal placeholder (XTERNAL) in the rules which needs to be set to DTERNAL
         if (content.dt() == XTERNAL /*&& !o.isImage()*/) {
-            Term ete = m.index.the(o, DTERNAL, content.terms());
+            Term ete = m.index.the(content, DTERNAL);
             if (!(ete instanceof Compound)) {
-                throw new InvalidTermException(o, DTERNAL, content.terms(), "untemporalization failed");
+                throw new InvalidTermException(o, DTERNAL, "untemporalization failed", content.terms());
             }
             content = nar.normalize((Compound) ete);
             if (content == null)

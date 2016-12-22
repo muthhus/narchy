@@ -37,9 +37,9 @@ public class Rect2D<X extends Comparable<X>> implements HyperRect<X> {
     }
 
     Rect2D(final Point2D p1, final Point2D p2) {
-        final double minX, minY, maxX, maxY;
+        final double minX, maxX;
 
-        if(p1.x < p2.x) {
+        if (p1.x < p2.x) {
             minX = p1.x;
             maxX = p2.x;
         } else {
@@ -47,7 +47,9 @@ public class Rect2D<X extends Comparable<X>> implements HyperRect<X> {
             maxX = p2.x;
         }
 
-        if(p1.y < p2.y) {
+        final double minY;
+        final double maxY;
+        if (p1.y < p2.y) {
             minY = p1.y;
             maxY = p2.y;
         } else {
@@ -62,7 +64,7 @@ public class Rect2D<X extends Comparable<X>> implements HyperRect<X> {
 
     @Override
     public HyperRect getMbr(final HyperRect r) {
-        final Rect2D r2 = (Rect2D)r;
+        final Rect2D r2 = (Rect2D) r;
         final double minX = Math.min(min.x, r2.min.x);
         final double minY = Math.min(min.y, r2.min.y);
         final double maxX = Math.max(max.x, r2.max.x);
@@ -79,8 +81,8 @@ public class Rect2D<X extends Comparable<X>> implements HyperRect<X> {
 
     @Override
     public HyperPoint getCentroid() {
-        final double dx = min.x + (max.x - min.x)/2.0;
-        final double dy = min.y + (max.y - min.y)/2.0;
+        final double dx = min.x + (max.x - min.x) / 2.0;
+        final double dy = min.y + (max.y - min.y) / 2.0;
 
         return new Point2D(dx, dy);
     }
@@ -97,9 +99,9 @@ public class Rect2D<X extends Comparable<X>> implements HyperRect<X> {
 
     @Override
     public double getRange(final int d) {
-        if(d == 0) {
+        if (d == 0) {
             return max.x - min.x;
-        } else if(d == 1) {
+        } else if (d == 1) {
             return max.y - min.y;
         } else {
             throw new IllegalArgumentException("Invalid dimension");
@@ -108,7 +110,7 @@ public class Rect2D<X extends Comparable<X>> implements HyperRect<X> {
 
     @Override
     public boolean contains(final HyperRect r) {
-        final Rect2D r2 = (Rect2D)r;
+        final Rect2D r2 = (Rect2D) r;
 
         return min.x <= r2.min.x &&
                 max.x >= r2.max.x &&
@@ -118,7 +120,7 @@ public class Rect2D<X extends Comparable<X>> implements HyperRect<X> {
 
     @Override
     public boolean intersects(final HyperRect r) {
-        final Rect2D r2 = (Rect2D)r;
+        final Rect2D r2 = (Rect2D) r;
 
         return !(min.x > r2.max.x || r2.min.x > max.x ||
                 min.y > r2.max.y || r2.min.y > max.y);
@@ -128,9 +130,8 @@ public class Rect2D<X extends Comparable<X>> implements HyperRect<X> {
     public double cost() {
         final double dx = max.x - min.x;
         final double dy = max.y - min.y;
-        return Math.abs(dx)*Math.abs(dy);
+        return Math.abs(dx) * Math.abs(dy);
     }
-
 
 
     @Override
@@ -140,10 +141,10 @@ public class Rect2D<X extends Comparable<X>> implements HyperRect<X> {
 
         Rect2D rect2D = (Rect2D) o;
 
-        return min.x == rect2D.min.x &&
-               max.x == rect2D.max.x &&
-               min.y == rect2D.min.y &&
-               max.y == rect2D.max.y;
+        return RTree.isEqual(min.x , rect2D.min.x) &&
+                RTree.isEqual(max.x , rect2D.max.x) &&
+                RTree.isEqual(min.y , rect2D.min.y) &&
+                RTree.isEqual(max.y , rect2D.max.y);
     }
 
     @Override

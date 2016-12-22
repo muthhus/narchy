@@ -52,10 +52,10 @@ public class GenericCompound implements Compound  {
         if (Param.DEBUG && dt != DTERNAL) {
 
             if (op.image && ((dt < 0) || (dt > subterms.size()))) {
-                throw new InvalidTermException(op, dt, subterms.terms(), "Invalid dt value for image " + op);
+                throw new InvalidTermException(op, dt, "Invalid dt value for image " + op, subterms.terms());
             }
             if (op != CONJ && (op.temporal && subterms.size()!=2))
-                throw new InvalidTermException(op, dt, subterms.terms(), "Invalid dt value for operator " + op);
+                throw new InvalidTermException(op, dt, "Invalid dt value for operator " + op, subterms.terms());
         }
 
 //        if (dt!=XTERNAL && dt!=DTERNAL && Math.abs(dt) > 2000000)

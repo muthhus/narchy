@@ -28,19 +28,17 @@ import java.util.Arrays;
  */
 public class Stats {
 
+    private final static int MAX_DEPTH = 64;
+    private final int[] entriesAtDepth = new int[MAX_DEPTH];
+    private final int[] branchesAtDepth = new int[MAX_DEPTH];
+    private final int[] leavesAtDepth = new int[MAX_DEPTH];
     private RTree.Split type;
     private int maxFill;
     private int minFill;
-
     private int maxDepth;
     private int branchCount;
     private int leafCount;
     private int entryCount;
-
-    final static int MAX_DEPTH = 64;
-    private final int[] entriesAtDepth = new int[MAX_DEPTH];
-    private final int[] branchesAtDepth = new int[MAX_DEPTH];
-    private final int[] leavesAtDepth = new int[MAX_DEPTH];
 
     public void print(PrintStream out) {
         out.println("[" + type + "] m=" + minFill + " M=" + maxFill);
@@ -69,7 +67,7 @@ public class Stats {
         return ((entryCount * 1.0f) / leafCount);
     }
 
-    public float getLeafFillPercentage() {
+    private float getLeafFillPercentage() {
         return (getEntriesPerLeaf() * 100) / maxFill;
     }
 

@@ -3,6 +3,7 @@ package nars.nal.nal8;
 import nars.nar.Default;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 
@@ -11,6 +12,8 @@ public class TermFunctionTest {
     @Test
     public void testImmediateTransformOfInput() { //as opposed to deriver's use of it
         Default d = new Default();
+        assertEquals("[a,b]", d.term("union([a],[b])").toString());
+
         d.log();
         final boolean[] got = {false};
         d.onTask(t -> {
