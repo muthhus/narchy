@@ -96,6 +96,7 @@ public class PatternTermIndex extends MapTermIndex {
 
     }
 
+
     @NotNull
     private static PatternCompound makeEllipsis(@NotNull Compound seed, @NotNull TermContainer v, @NotNull Ellipsis e) {
 

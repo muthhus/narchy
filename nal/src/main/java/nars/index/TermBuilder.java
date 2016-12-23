@@ -6,6 +6,7 @@ import nars.nal.meta.match.Ellipsislike;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Terms;
+import nars.term.atom.Atomic;
 import nars.term.atom.AtomicSingleton;
 import nars.term.compound.GenericCompound;
 import nars.term.container.TermContainer;
@@ -98,7 +99,6 @@ public abstract class TermBuilder {
     @NotNull
     public Term the(@NotNull Op op, int dt, @NotNull Term... u) throws InvalidTermException {
 
-        productNormalizeSubterms(u);
 
         int arity = u.length;
         switch (op) {
@@ -189,19 +189,22 @@ public abstract class TermBuilder {
         return finish(op, dt, u);
     }
 
-    private void productNormalizeSubterms(@NotNull Term[] u) {
-        for (int i = 0, uLength = u.length; i < uLength; i++) {
-            u[i] = productNormalize(u[i]);
-        }
-    }
+//    private void productNormalizeSubterms(@NotNull Term[] u) {
+//        for (int i = 0, uLength = u.length; i < uLength; i++) {
+//            u[i] = productNormalize(u[i]);
+//        }
+//    }
 
 
     @NotNull
     public Term productNormalize(@NotNull Term u) {
+        if (!(u instanceof Compound))
+            return u;
+
         Term t = u.unneg();
         boolean neg = (t != u);
 
-        if (t instanceof Compound && t.hasAny(Op.IMGbits) && (t.op() == INH) && (t.varPattern() == 0)) {
+        if (t.hasAny(Op.IMGbits) && (t.op() == INH) && (t.varPattern() == 0)) {
             Compound ct = (Compound) t;
             Term s = (ct.term(0));
             Op so = s.op();
@@ -209,10 +212,10 @@ public abstract class TermBuilder {
             Op po = p.op();
             if (so == Op.IMGi && !po.image) {
                 Compound ii = (Compound) s;
-                t = $.inh(ii.term(0), imageUnwrapToProd(p, ii));
+                t = the(Op.INH, ii.term(0), imageUnwrapToProd(p, ii));
             } else if (po == Op.IMGe && !so.image) {
                 Compound ii = (Compound) p;
-                t = $.inh(imageUnwrapToProd(s, ii), ii.term(0));
+                t = the(Op.INH, imageUnwrapToProd(s, ii), ii.term(0));
             } else {
                 return u; //original value
             }
@@ -417,23 +420,16 @@ public abstract class TermBuilder {
 
         for (int i = 0; i < s; i++) {
             Term x = args[i];
-//            if (x == null)
-//                return False;
 
-            if (x instanceof Compound) {
-                Compound cx = (Compound)x;
-                args[i] = the(cx.op(), cx.dt(), cx.terms()); //force internining to evaluate functors
-            } else {
+            if (isTrueOrFalse(x)) {
+                if ((op == NEG) || (op == CONJ) || (op == IMPL) || (op == EQUI))
+                    throw new RuntimeException("appearance of True/False in " + op + " should have been filtered prior to this");
 
-                if (isTrueOrFalse(x)) {
-                    if ((op == NEG) || (op == CONJ) || (op == IMPL) || (op == EQUI))
-                        throw new RuntimeException("appearance of True/False in " + op + " should have been filtered prior to this");
-
-                    //any other term causes it to be invalid/meaningless
-                    return False;
-                }
-
+                //any other term causes it to be invalid/meaningless
+                return False;
             }
+
+            args[i] = intern(x);
         }
 
 //        if (Param.ARITHMETIC_INDUCTION)
@@ -450,20 +446,17 @@ public abstract class TermBuilder {
             }
         }
 
-        //        switch (subterms.length) {
-//            case 0:
-//                break; //continue
-//            case 1: {
-//                Term the = subterms[0];
-//                if (!(the.vars() > 0 || the.varPattern() > 0))
-//                    return new UnitCompound1(op, the);
-//                break; //use default below
-//            }
-//        }
-
         return newCompound(op, dt, intern(TermVector.the(args)));
     }
 
+
+    @NotNull protected Term intern(@NotNull Term x) {
+        if (x instanceof Compound) {
+            return productNormalize((Compound)x);
+        } else {
+            return x; //atomic
+        }
+    }
 
     @Nullable
     public Term inst(Term subj, Term pred) {

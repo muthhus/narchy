@@ -119,6 +119,8 @@ public enum Op {
     public static final Atomic Imdex = $.the("_");
     public static final int StatementBits = Op.or(Op.INH,Op.SIM,Op.IMPL,Op.EQUI);
     public static final int IMGbits = Op.or(Op.IMGe, Op.IMGi);
+    public static final int OpBits = Op.or(Op.ATOM, Op.INH, Op.PROD);
+    public static final int InhAndIMGbits = Op.or(Op.INH, Op.IMGe, Op.IMGi);
 
     /**
      * symbol representation of this getOperator

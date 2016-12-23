@@ -296,7 +296,7 @@ public abstract class TermIndex extends TermBuilder {
         out.println();
     }
 
-    final Function<Compound, Term> normalizer = src -> {
+    protected Term _normalize(Compound src) {
 
         Term result;
 
@@ -305,13 +305,15 @@ public abstract class TermIndex extends TermBuilder {
             int pVars = src.varPattern();
             int totalVars = vars + pVars;
 
-
             if (totalVars > 0) {
-                result = transform(src, (vars == 1 && pVars == 0) ?
-                                VariableNormalization.singleVariableNormalization :
-                                new VariableNormalization(totalVars /* estimate */));
+                result = transform(src,
+                        (vars == 1 && pVars == 0) ?
+                                VariableNormalization.singleVariableNormalization //special case for efficiency
+                                    :
+                                new VariableNormalization(totalVars /* estimate */)
+                );
             } else {
-                result = internCompound(src);
+                result = intern((Term)src);
             }
 
 
@@ -324,11 +326,23 @@ public abstract class TermIndex extends TermBuilder {
         }
 
         return result;
-    };
+    }
 
-    @NotNull
-    public final Term internCompound(Compound uninterned) {
-        return the(uninterned.op(), uninterned.dt(), uninterned.terms());
+    @Override
+    protected Term intern(Term x) {
+        Term y = super.intern(x);
+        if (y instanceof Atom /** or non-temporal, non-negation compound */) {
+            Termed yExist = get(y);
+            if (yExist!=null)
+                return (Term)yExist; //assumes the AtomConcept returned is the Term itself, as .term() would return
+                //return yExist.term();
+        } else if (y instanceof Compound) {
+            Compound ccy = (Compound)y;
+            //compute any subterm functors:
+            if (ccy.hasAll(Op.OpBits))
+                return the(ccy.op(), ccy.dt(), ccy.terms());
+        }
+        return y;
     }
 
     @Nullable
@@ -340,12 +354,7 @@ public abstract class TermIndex extends TermBuilder {
         } else {
             //see if subterms need change
 
-            Term tgt;
-            //if (!cacheNormalization(src)) {
-                tgt = normalizer.apply(src);
-//            } else {
-//                tgt = normalizations.computeIfAbsent(src, normalizer);
-//            }
+            Term tgt = _normalize(src);
 
             if (tgt instanceof Compound) {
 
@@ -354,6 +363,7 @@ public abstract class TermIndex extends TermBuilder {
                 ((Compound) tgt).setNormalized();
                 //}
             }
+
             return tgt;
         }
 
@@ -471,7 +481,7 @@ public abstract class TermIndex extends TermBuilder {
 
     @Nullable
     public <T extends Termed> T parse(@NotNull String termToParse) throws Narsese.NarseseException {
-        return (T) /*the*/(Narsese.the().term(termToParse, this, true));
+        return (T) (Narsese.the().term(termToParse, this, true));
     }
 
     /**

@@ -124,12 +124,10 @@ public class DynamicBeliefTableTest {
         System.out.println(t);
 
         CompoundConcept imgX = (CompoundConcept) n.concept($("(x --> (/,f,_,y))"), true);
-        assertTrue(imgX.beliefs().isEmpty());
         assertEquals(t, imgX.belief(n.time()));
 
 
         CompoundConcept imgY = (CompoundConcept) n.concept($("(y --> (/,f,x,_))"), true);
-        assertTrue(imgY.beliefs().isEmpty());
         assertEquals(t, imgY.belief(n.time()));
 
 
@@ -153,12 +151,10 @@ public class DynamicBeliefTableTest {
         System.out.println(t);
 
         CompoundConcept imgX = (CompoundConcept) n.concept($("((\\,f,_,y)-->x)"), true);
-        assertTrue(imgX.beliefs().isEmpty());
         assertEquals(t, imgX.belief(n.time()));
 
 
         CompoundConcept imgY = (CompoundConcept) n.concept($("((\\,f,x,_)-->y)"), true);
-        assertTrue(imgY.beliefs().isEmpty());
         assertEquals(t, imgY.belief(n.time()));
 
 
