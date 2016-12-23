@@ -122,7 +122,7 @@ abstract public class NAgent implements NSense, NAction {
     public final int frameRate;
 
     protected long now;
-    protected float dur;
+
 
 
 
@@ -266,7 +266,6 @@ abstract public class NAgent implements NSense, NAction {
     private void doFrame() {
         //System.out.println(nar.conceptPriority(reward) + " " + nar.conceptPriority(dRewardSensor));
         now = nar.time();
-        dur = nar.time.dur();
 
         float r = rewardValue = act();
         if (r == r) {
@@ -281,7 +280,6 @@ abstract public class NAgent implements NSense, NAction {
 
             happy.run();
             //joy.run();
-
 
             nar.runLater(sensors, SensorConcept::run, 4);
 
@@ -429,8 +427,8 @@ abstract public class NAgent implements NSense, NAction {
 
 
 
-                    new PredictionTask($.impl(action, dur, happiness), '?').time(nar, dur),
-                    new PredictionTask($.impl($.neg(action), dur, happiness), '?').time(nar, dur),
+//                    new PredictionTask($.impl(action, dur, happiness), '?').time(nar, dur),
+//                    new PredictionTask($.impl($.neg(action), dur, happiness), '?').time(nar, dur),
 
                     new PredictionTask($.seq(action, dur, happiness), '?').time(nar, dur),
                     new PredictionTask($.seq($.neg(action), dur, happiness), '?').time(nar, dur)

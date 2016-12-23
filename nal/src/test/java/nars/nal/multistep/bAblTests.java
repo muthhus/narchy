@@ -72,7 +72,8 @@ public class bAblTests extends AbstractNALTest {
         TestNAR t = test();
         t.nar.termVolumeMax.setValue(40); //larger than default
 
-        //.log()
+        //t.log();
+
                t.believe("((&&, start($1,$2), at( $1,$B,$C), at( $B,$2,$C2) ) ==> ( path( id,$C,id,$C2)   && chunk( $1,$2,$B) ))")
                 .believe("((&&, start($1,$2), at( $1,$B,$C), at( $2,$B,$C2) ) ==> ( path( id,$C,neg,$C2)  && chunk( $1,$2,$B) ))")
                 .believe("((&&, start($1,$2), at( $B,$1,$C), at( $B,$2,$C2) ) ==> ( path( neg,$C,id,$C2)  && chunk( $1,$2,$B) ))")

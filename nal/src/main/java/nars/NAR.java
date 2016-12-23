@@ -34,7 +34,6 @@ import nars.task.util.InvalidTaskException;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
-import nars.term.Terms;
 import nars.term.atom.Atom;
 import nars.term.atom.Atomic;
 import nars.term.transform.TermTransform;
@@ -69,7 +68,6 @@ import static nars.Op.*;
 import static nars.Symbols.*;
 import static nars.concept.CompoundConcept.DuplicateMerge;
 import static nars.concept.Functor.f;
-import static nars.term.Term.False;
 import static nars.time.Tense.ETERNAL;
 import static org.fusesource.jansi.Ansi.ansi;
 
@@ -1009,10 +1007,9 @@ public abstract class NAR extends Param implements Level, Consumer<Task>, NARIn,
     public final <X> void runLater(@NotNull List<X> items, @NotNull Consumer<X> each, int maxChunkSize) {
 
         int conc = exe.concurrency();
-        if (conc == 1 && !exe.concurrent()) {
+        if (conc == 1) {
             //special single-thread case: just execute all
             items.forEach(each);
-            return;
         } else {
             int s = items.size();
             int chunkSize = Math.max(1, Math.min(maxChunkSize, (int) Math.floor(s / conc)));
@@ -1342,19 +1339,6 @@ public abstract class NAR extends Param implements Level, Consumer<Task>, NARIn,
 
     }
 
-//    private final class InputTasks implements Runnable {
-//        public final Task[] t;
-//
-//        private InputTasks(Task[] t) {
-//            this.t = t;
-//        }
-//
-//        @Override
-//        public void run() {
-//            input(t);
-//        }
-//    }
-
     public final void inputLater(@NotNull Collection<Task> tt) {
         int s = tt.size();
         if (s > 0)
@@ -1380,10 +1364,10 @@ public abstract class NAR extends Param implements Level, Consumer<Task>, NARIn,
         level = newLevel;
     }
 
-    public final void policy(@NotNull Concept c, @NotNull ConceptState p) {
+    public final void setState(@NotNull Concept c, @NotNull ConceptState p) {
 
         if (c.state(p, this)!=p) {
-            concepts.onPolicyChanged(c);
+            concepts.onStateChanged(c);
         }
 
     }
@@ -1396,31 +1380,6 @@ public abstract class NAR extends Param implements Level, Consumer<Task>, NARIn,
     public abstract Iterable<? extends BLink<Concept>> conceptsActive(int maxNodes);
 
 
-//    @Nullable
-//    public Term eval(@NotNull String x) throws NarseseException {
-//        return rt.eval((Termed)term(x));
-//    }
-
-
-//    public final void with(Object... values) {
-//        with(values);
-//        //return (X)this;
-//    }
-
-    public static class RunStateException extends RuntimeException {
-        public RunStateException(boolean shouldRun) {
-            super(shouldRun ? "NAR already running" : "NAR already stopped");
-        }
-    }
-
-//    private abstract class StreamNARReaction extends NARReaction {
-//
-//        public StreamNARReaction(Class... signal) {
-//            super(NAR.this, signal);
-//        }
-//
-//    }
-//
 
     public @NotNull NAR input(@NotNull File input) throws IOException {
         return input(new FileInputStream(input));
@@ -1498,41 +1457,12 @@ public abstract class NAR extends Param implements Level, Consumer<Task>, NARIn,
         return this;
     }
 
-//    /**
-//     * activates a concept via a task. the task may already be present in the system,
-//     * but it will be reinforced via peer tasklinks activation.
-//     * (a normal duplicate task going through process() will not have this behavior.)
-//     */
-//    public final Activation activate(@NotNull Task t, float scale) /* throws InvalidConceptException.. */{
-//        @Nullable Concept concept = concept(t, true);
-//        if (concept == null)
-//            throw new TermIndex.InvalidConceptException(t.term(), "task did not resolve to a concept");
-//
-//
-//        Activation aa = new Activation(t, scale);
-//        aa.run(this);
-//        return aa;
-//    }
-
 
     /**
      * batched concept activation
      */
     abstract public void activate(Iterable<ObjectFloatPair<Concept>> concepts, @Nullable MutableFloat overflow);
 
-
-//    public final void activate(@NotNull Task t) {
-//        activate(t, 1f);
-//    }
-
-    public final Predicate<@NotNull Task> taskPast = (Task t) -> {
-        long o = t.occurrence();
-        return o != Tense.ETERNAL && o < time();
-    };
-    public final Predicate<@NotNull Task> taskFuture = (Task t) -> {
-        long o = t.occurrence();
-        return o != Tense.ETERNAL && o > time();
-    };
 
 
 }

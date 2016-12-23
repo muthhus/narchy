@@ -169,7 +169,7 @@ public class ConceptBagCycle implements Consumer<DerivedTask> {
     protected void sleep(@NotNull Concept c) {
         NAR n = this.nar;
 
-        n.policy(c, conceptBuilder.sleep());
+        n.setState(c, conceptBuilder.sleep());
 
         n.emotion.alert(1f / active.size());
     }
@@ -265,7 +265,7 @@ public class ConceptBagCycle implements Consumer<DerivedTask> {
 
             //float forgetPeriod = getForgetPeriod();
 
-            nar.policy(c, conceptBuilder.awake());
+            nar.setState(c, conceptBuilder.awake());
             /*BudgetSavings existing = c.get(this);
             if (existing!=null) {
                 if (existing.isDeleted())

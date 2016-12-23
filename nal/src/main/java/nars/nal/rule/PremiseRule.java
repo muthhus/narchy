@@ -904,7 +904,7 @@ public class PremiseRule extends GenericCompound {
 
 
         this.match = new MatchTaskBelief(
-                new TaskBeliefPair(getTask(), getBelief()), //HACK
+                getTask(), getBelief(), //HACK
                 index,
                 constraints);
 
@@ -975,7 +975,7 @@ public class PremiseRule extends GenericCompound {
     public static void opNotContained(Term task, Term belief, @NotNull Set<BoolCondition> pres, @NotNull ListMultimap<Term, MatchConstraint> constraints, @NotNull Term t, int structure) {
 
 
-        boolean prefiltered = true;
+        boolean prefiltered = false;
 
         if (t.equals(task)) {
             pres.add(new PatternOpNotContained(0, structure));
@@ -986,7 +986,7 @@ public class PremiseRule extends GenericCompound {
         }
 
         if (!prefiltered)
-            constraints.put(t, new OpNotContainedConstraint(structure));
+            constraints.put(t, new StructureExclusionConstraint(structure));
 
     }
 

@@ -60,11 +60,7 @@ abstract public class PatternCompound extends GenericCompound {
         abstract protected boolean matchEllipsis(@NotNull Compound y, @NotNull Unify subst);
 
         protected boolean canMatch(@NotNull Term y) {
-            if (op == y.op()) {
-                int yStructure = y.structure();
-                return ((yStructure | structureCached) == yStructure);
-            }
-            return false;
+            return op == y.op() && y.hasAll(structureCached);
         }
 
         @Override
@@ -118,8 +114,6 @@ abstract public class PatternCompound extends GenericCompound {
                             //SUFFIX
                             if (!ellipsis.validSize(available))
                                 return false;
-
-                            //TODO special handling to extract intermvals from Sequence terms here
 
                             return subst.putXY(ellipsis, EllipsisMatch.match(Y, j, j + available));
 
@@ -180,11 +174,11 @@ abstract public class PatternCompound extends GenericCompound {
 
     public static final class PatternCompoundWithEllipsisLinearImage extends PatternCompoundWithEllipsisLinearDT {
 
-        private final int ellipseIndex;
+        //private final int ellipseIndex;
 
         public PatternCompoundWithEllipsisLinearImage(@NotNull Compound seed, @NotNull Ellipsis ellipsis, @NotNull TermContainer subterms) {
             super(seed, ellipsis, subterms);
-            this.ellipseIndex = indexOf(ellipsis);
+            //this.ellipseIndex = indexOf(ellipsis);
         }
 
 //        @Override
@@ -361,9 +355,7 @@ abstract public class PatternCompound extends GenericCompound {
                 return Terms.equalAtemporally(alreadyInY, yFree);
             } else {
 
-                yFree.removeIf(yy -> {
-                    return alreadyInY.contains(Terms.atemporalize(yy));
-                });
+                yFree.removeIf(yy -> alreadyInY.contains(Terms.atemporalize(yy)));
 
                 int numRemainingForEllipsis = yFree.size() - xFree.size();
 

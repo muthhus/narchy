@@ -40,7 +40,7 @@ abstract public class Executioner implements Executor {
      * in subclasses, if this is true but concurrency()==1, it will use
      * concurrent data structures to bve safe.
      */
-    public boolean concurrent() {
+    public final boolean concurrent() {
         return concurrency() > 1;
     }
 

@@ -47,19 +47,19 @@ public class MatchTaskBelief extends AtomicBoolCondition {
 //    public final Term term;
 
 
-    public MatchTaskBelief(@NotNull TaskBeliefPair pattern, @NotNull PatternTermIndex index, @NotNull ListMultimap<Term, MatchConstraint> constraints) {
+    public MatchTaskBelief(@NotNull Term taskPattern, Term beliefPattern, @NotNull PatternTermIndex index, @NotNull ListMultimap<Term, MatchConstraint> constraints) {
 
         //this.pattern = pattern;
         //compiled = new TermPattern(pattern, constraints);
 
         //this.term = pattern;
-        this.id = getClass().getSimpleName() + '[' + pattern.toString() + ']';
+        this.id = getClass().getSimpleName() + '(' + taskPattern + ',' + beliefPattern + ')';
 
 
         List<BoolCondition> pre = $.newArrayList();
         List<BoolCondition> code = $.newArrayList();
 
-        compile(pattern, pre, code, index, constraints);
+        compile(taskPattern, beliefPattern, pre, code, index, constraints);
 
         this.pre = pre.toArray(new BoolCondition[pre.size()]);
         this.procedure = code.toArray(new BoolCondition[code.size()]);
@@ -101,14 +101,9 @@ public class MatchTaskBelief extends AtomicBoolCondition {
     }
 
 
-    private static void compile(@NotNull TaskBeliefPair pattern,
+    private static void compile(@NotNull Term task, @NotNull Term belief,
                                 @NotNull List<BoolCondition> pre, @NotNull List<BoolCondition> code,
                                 @NotNull PatternTermIndex index, @NotNull ListMultimap<Term, MatchConstraint> constraints) {
-
-
-
-        @NotNull Term task = pattern.term(0);
-        @NotNull Term belief = pattern.term(1);
 
         BoolCondition preGuard = null;
 

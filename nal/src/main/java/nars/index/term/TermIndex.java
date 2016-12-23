@@ -557,7 +557,7 @@ public abstract class TermIndex extends TermBuilder {
     /**
      * implementations can override this to update the index when a concept's state changes, ex: to re-evaluate it's features
      */
-    public void onPolicyChanged(Concept c) {
+    public void onStateChanged(Concept c) {
         /* nothing */
     }
 

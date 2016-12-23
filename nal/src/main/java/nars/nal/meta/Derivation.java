@@ -158,7 +158,7 @@ public class Derivation extends Unify {
         set(new substituteIfUnifiesAny(this));
         set(new substituteIfUnifiesForward(this));
         set(new substituteIfUnifiesDep(this));
-        set(new DepIndepVarIntroduction.VarIntro(nar));
+        set(new DepIndepVarIntroduction.VarIntro(nar.random));
 
         this.premise = p;
 
@@ -259,7 +259,7 @@ public class Derivation extends Unify {
 
         if (constraints != null) {
             if (this.constraints.set(constraints)==null)
-                return;
+                throw new RuntimeException("constraints not set");
         }
 
         unify(x, y, !finish, finish);

@@ -5,13 +5,13 @@
 //  corresponds to extensional union, and extensional intersection corresponds
 //  to intensional union.
 
-    (P --> M), (S --> M), notSet(S), notSet(P), neqCom(S,P) |- ((S | P) --> M), (Belief:Intersection)
-    (P --> M), (S --> M), notSet(S), notSet(P), neqCom(S,P) |- ((S & P) --> M), (Belief:Union)
-    (P --> M), (S --> M), notSet(S), notSet(P), neqCom(S,P) |- ((P ~ S) --> M), (Belief:Difference)
+    (P --> M), (S --> M), notSet(S), notSet(P), neqCom(S,P) |- ((S | P) --> M), (Belief:Intersection, Goal:Intersection)
+    (P --> M), (S --> M), notSet(S), notSet(P), neqCom(S,P) |- ((S & P) --> M), (Belief:Union, Goal:Union)
+    (P --> M), (S --> M), notSet(S), notSet(P), neqCom(S,P) |- ((P ~ S) --> M), (Belief:Difference, Goal:Difference)
 
-    (M --> P), (M --> S), notSet(S), notSet(P), neqCom(S,P) |- (M --> (P & S)), (Belief:Intersection)
-    (M --> P), (M --> S), notSet(S), notSet(P), neqCom(S,P) |- (M --> (P | S)), (Belief:Union)
-    (M --> P), (M --> S), notSet(S), notSet(P), neqCom(S,P) |- (M --> (P - S)), (Belief:Difference)
+    (M --> P), (M --> S), notSet(S), notSet(P), neqCom(S,P) |- (M --> (P & S)), (Belief:Intersection, Goal:Intersection)
+    (M --> P), (M --> S), notSet(S), notSet(P), neqCom(S,P) |- (M --> (P | S)), (Belief:Union, Goal:Union)
+    (M --> P), (M --> S), notSet(S), notSet(P), neqCom(S,P) |- (M --> (P - S)), (Belief:Difference, Goal:Difference)
 
 //raw product composition
 //    (A..+), (B..+) |- ((A..+) | (B..+)), (Belief:Intersection)
@@ -35,11 +35,11 @@
      (M --> S), (M --> (P - S)) |- (M --> P), (Belief:DecomposeNegativeNegativeNegative)
 
 
-//NAL3 single premise inference
+//NAL3 single premise decompose
 
     ((|,X,A..+) --> M), X |- ((|,A..+) --> M), (Belief:StructuralDeduction, Goal:StructuralDeduction)
     (M --> (&,X,A..+)), X |- (M --> (&,A..+)), (Belief:StructuralDeduction, Goal:StructuralDeduction)
 
     ((B ~ G) --> S), G |- (B --> S), (Belief:StructuralDeduction, Goal:StructuralDeduction)
-    (R --> (B - S)), S |- (R --> B), (Belief:StructuralDeduction, Goal:StructuralDeduction)
+    (S --> (B - G)), G |- (S --> B), (Belief:StructuralDeduction, Goal:StructuralDeduction)
 

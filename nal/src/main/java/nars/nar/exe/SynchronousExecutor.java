@@ -19,11 +19,6 @@ public class SynchronousExecutor extends Executioner {
     }
 
     @Override
-    public boolean concurrent() {
-        return false;
-    }
-
-    @Override
     public final void next(@NotNull NAR nar) {
 
         //only execute the current set of pending Runnable's here. more may be added but they will be handled in the next frame

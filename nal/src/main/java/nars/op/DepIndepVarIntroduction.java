@@ -138,9 +138,9 @@ public class DepIndepVarIntroduction extends VarIntroduction {
         @NotNull
         final DepIndepVarIntroduction introducer;
 
-        public VarIntro(@NotNull NAR nar) {
+        public VarIntro(@NotNull Random rng) {
             super("varIntro");
-            this.introducer = new DepIndepVarIntroduction(nar.random);
+            this.introducer = new DepIndepVarIntroduction(rng);
         }
 
         @Override

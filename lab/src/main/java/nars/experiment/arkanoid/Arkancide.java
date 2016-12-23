@@ -62,6 +62,7 @@ public class Arkancide extends NAgents {
 
         action(new ActionConcept( "dx(paddle)" , nar, (b, d) -> {
 
+
             float pct;
             if (d != null) {
                 pct = noid.paddle.moveTo(d.freq(), paddleSpeed); //* d.conf());

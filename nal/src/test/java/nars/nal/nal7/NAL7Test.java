@@ -859,7 +859,7 @@ public class NAL7Test extends AbstractNALTest {
         ((FrameTime)t.nar.time).dur(eventDT);
 
         t
-                .log()
+                //.log()
                 .inputAt(n1, "(x). :|:")
                 .inputAt(n1 + eventDT, "(y). :|:")
 //

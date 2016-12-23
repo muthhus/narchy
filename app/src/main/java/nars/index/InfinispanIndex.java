@@ -24,6 +24,7 @@ import org.infinispan.AdvancedCache;
 import org.infinispan.Cache;
 import org.infinispan.cache.impl.DecoratedCache;
 import org.infinispan.commons.marshall.AdvancedExternalizer;
+import org.infinispan.commons.util.concurrent.ConcurrentHashSet;
 import org.infinispan.configuration.cache.Configuration;
 import org.infinispan.configuration.cache.ConfigurationBuilder;
 import org.infinispan.configuration.global.GlobalConfiguration;
@@ -121,7 +122,7 @@ public class InfinispanIndex extends MaplikeTermIndex {
     }
 
     @Override
-    public void onPolicyChanged(Concept c) {
+    public void onStateChanged(Concept c) {
 
         //handle attached pending tasks
         List<? extends Task> pending = c.remove(INIT);

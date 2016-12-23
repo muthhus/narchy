@@ -71,7 +71,7 @@ public class Tetris extends NAgents {
                         return 0f;
                     }),
                     new MatrixView(tetris_width, tetris_height, (x, y, gl) -> {
-                        long then = (long) (now + dur * 8);
+                        long then = (long) (now + nar.time.dur() * 8);
                         Truth f = concept[x][y].belief(then);
                         float fr, co;
                         if (f == null) {

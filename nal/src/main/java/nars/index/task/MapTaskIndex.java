@@ -30,7 +30,7 @@ public final class MapTaskIndex extends TaskIndex {
                 concurrent ?
                     new ConcurrentHashMap<>(initialCapacity/* estimate TODO */):
                         //new ConcurrentHashMapUnsafe(128 * 1024 /* estimate TODO */);
-                    new HashMap(initialCapacity);
+                    new HashMap<>(initialCapacity);
 
         //Caffeine.newBuilder()
 
