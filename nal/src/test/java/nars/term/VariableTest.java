@@ -128,8 +128,8 @@ public class VariableTest {
         assertNotEquals(A, B);
 
         //but normalization should make them equal:
-        Compound NA = $.terms.normalize(A);
-        Compound NB = $.terms.normalize(B);
+        Term NA = $.terms.normalize(A);
+        Term NB = $.terms.normalize(B);
         System.out.println(A + "\t" + B);
         System.out.println(NA + "\t" + NB);
         assertEquals(NA, NB);

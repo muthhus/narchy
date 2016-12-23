@@ -17,6 +17,7 @@ import jcog.Texts;
 import nars.index.TermBuilder;
 import nars.index.term.TermIndex;
 import nars.nal.meta.match.Ellipsis;
+import nars.nal.nal8.Operator;
 import nars.task.MutableTask;
 import nars.term.Compound;
 import nars.term.Term;
@@ -108,7 +109,7 @@ public class Narsese extends BaseParser<Object> {
     }
 
     @NotNull
-    public static Task makeTask(NAR nar, @Nullable float[] b, Termed content, char p, @Nullable Truth t, Tense tense) {
+    public static Task makeTask(NAR nar, @Nullable float[] b, Compound content, char p, @Nullable Truth t, Tense tense) {
 
 //        if (p == null)
 //            throw new RuntimeException("character is null");
@@ -120,10 +121,6 @@ public class Narsese extends BaseParser<Object> {
 //        if ((blen > 0) && (Float.isFinite(b[0])))
 //            blen = 0;
 //
-
-        if (!(content instanceof Compound)) {
-            throw new RuntimeException("Task content is not compound");
-        }
 
         if (t == null) {
             t = nar.truthDefault(p);
@@ -1124,14 +1121,12 @@ public class Narsese extends BaseParser<Object> {
     /**
      * returns number of tasks created
      */
-    public static int tasks(String input, Collection<Task> c, Consumer<Object[]> unparsed, NAR m) {
+    public static int tasks(String input, Collection<Task> c, NAR m) {
         int[] i = new int[1];
         tasks(input, t -> {
             c.add(t);
             i[0]++;
-        }, unparsed, m);
-        if (i[0] == 0)
-            unparsed.accept(new Object[]{input});
+        }, m);
         return i[0];
     }
 
@@ -1140,12 +1135,11 @@ public class Narsese extends BaseParser<Object> {
      * which can be re-used because a Memory can generate them
      * ondemand
      */
-    public static void tasks(String input, Consumer<Task> c, @Nullable Consumer<Object[]> unparsed, NAR m) {
+    public static void tasks(String input, Consumer<Task> c, NAR m) {
         tasksRaw(input, o -> {
             Task t = decodeTask(m, o);
             if (t == null) {
-                if (unparsed != null)
-                    unparsed.accept(o);
+
             } else {
                 c.accept(t);
             }
@@ -1223,18 +1217,20 @@ public class Narsese extends BaseParser<Object> {
         Term contentRaw = (Term) x[1];
         if (!(contentRaw instanceof Compound))
             throw new NarseseException("Invalid task term");
-        Termed content = m.normalize((Compound) contentRaw);
-        if (content == null) {
-            throw new NarseseException("Task term unnormalizable: " + contentRaw);
+        Term content = m.normalize((Compound) contentRaw);
+        if (!(content instanceof Compound)) {
+            //throw new NarseseException("Task term unnormalizable: " + contentRaw);
+            return Operator.CommandOperator.task($.func("log", content));
+        } else {
+
+            char punct = (Character) x[2];
+
+            Truth t = (Truth) x[3];
+            if (t != null && !Float.isFinite(t.conf()))
+                t = t.withConf(m.confidenceDefault(punct));
+
+            return makeTask(m, (float[]) x[0], (Compound) content, punct, t, (Tense) x[4]);
         }
-
-        char punct = (Character) x[2];
-
-        Truth t = (Truth) x[3];
-        if (t != null && !Float.isFinite(t.conf()))
-            t = t.withConf(m.confidenceDefault(punct));
-
-        return makeTask(m, (float[]) x[0], content, punct, t, (Tense) x[4]);
     }
 
     /**
@@ -1275,10 +1271,7 @@ public class Narsese extends BaseParser<Object> {
         Term y = term(s);
         if (normalize) {
             if (y instanceof Compound) {
-                Compound x = index.normalize((Compound) y);
-                if (x == null)
-                    throw new NarseseException("Un-normalizable: " + y);
-                return x;
+                return index.normalize((Compound) y);
             }
 
         }

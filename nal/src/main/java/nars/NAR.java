@@ -32,7 +32,6 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.atom.Atom;
-import nars.term.atom.Atomic;
 import nars.term.transform.Functor;
 import nars.term.util.InvalidTermException;
 import nars.time.FrameTime;
@@ -193,7 +192,7 @@ public abstract class NAR extends Param implements Level, Consumer<Task>, NARIn,
 
 
     @Nullable
-    public final Compound normalize(@NotNull Compound t) {
+    public final Term normalize(@NotNull Compound t) {
         return concepts.normalize(t);
     }
 
@@ -245,7 +244,7 @@ public abstract class NAR extends Param implements Level, Consumer<Task>, NARIn,
         for (Concept t : Builtin.statik)
             on(t);
 
-        new Builtin(this).forEach(this::on);
+        Builtin.load(this);
 
     }
 
@@ -328,15 +327,8 @@ public abstract class NAR extends Param implements Level, Consumer<Task>, NARIn,
 
     @NotNull
     public List<Task> tasks(@NotNull String parse) {
-        return tasks(parse, (o) -> {
-            logger.error("unparsed: \"{}\": {}", parse, o);
-        });
-    }
-
-    @NotNull
-    public List<Task> tasks(@NotNull String parse, @NotNull Consumer<Object[]> unparsed) {
         List<Task> result = newArrayList(1);
-        Narsese.the().tasks(parse, result, unparsed, this);
+        Narsese.the().tasks(parse, result, this);
         return result;
     }
 
@@ -656,8 +648,10 @@ public abstract class NAR extends Param implements Level, Consumer<Task>, NARIn,
                     if (funcConcept!=null) {
                         Operator o = funcConcept.get(Operator.class);
                         if (o!=null) {
-                            Task result = o.process(input, this);
-                            if (result!=input) { //instance equality, not actual equality in case it wants to change this
+                            Task result = o.run(input, this);
+                            if (result == null) {
+                                return null; //finished
+                            } else if (result!=input) { //instance equality, not actual equality in case it wants to change this
                                 return input( result ); //recurse until its stable
                             } // else continue
                         }

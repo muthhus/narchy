@@ -33,9 +33,7 @@ public class NarseseTest {
         //TODO n.task(s) when the parser is replaced
         //return p.parseTask(s, true);
         List<Task> l = $.newArrayList(1);
-        List<Object[]> errors = $.newArrayList(1);
-        Narsese.tasks(s, l, errors::add, n);
-        assertEquals(0, errors.size());
+        Narsese.tasks(s, l, n);
         return l;
     }
 

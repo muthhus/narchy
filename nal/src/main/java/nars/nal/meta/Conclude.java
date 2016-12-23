@@ -119,10 +119,13 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
                         //note: the budget function used here should not depend on the truth's frequency. btw, it may be inverted below
                         Budget budget = m.budget(truth, r);
                         if (budget != null) {
-                            Compound rr = nar.normalize((Compound) r);
-                            if (rr != null) {
-                                derive(m, rr, truth, budget, ct); //continue to stage 2
+                            Term crr = nar.normalize((Compound) r);
+                            if (!(crr instanceof Compound)) {
+                                throw new InvalidTermException(r.op(), DTERNAL, "normalization failed", ((Compound)r).terms());
                             }
+
+                            derive(m, (Compound)crr, truth, budget, ct); //continue to stage 2
+
                         }
                     }
                 }
@@ -224,12 +227,14 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
         // this indicates a temporal placeholder (XTERNAL) in the rules which needs to be set to DTERNAL
         if (content.dt() == XTERNAL /*&& !o.isImage()*/) {
             Term ete = m.index.the(content, DTERNAL);
-            if (!(ete instanceof Compound)) {
+            if (!(ete instanceof Compound))
                 throw new InvalidTermException(o, DTERNAL, "untemporalization failed", content.terms());
-            }
-            content = nar.normalize((Compound) ete);
-            if (content == null)
-                return;
+
+            Term ete2 = nar.normalize((Compound) ete);
+            if (!(ete2 instanceof Compound))
+                throw new InvalidTermException(o, DTERNAL, "untemporalization failed", content.terms());
+
+            content = (Compound) ete2;
         }
 
 

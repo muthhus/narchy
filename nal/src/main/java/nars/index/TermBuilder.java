@@ -98,8 +98,7 @@ public abstract class TermBuilder {
     @NotNull
     public Term the(@NotNull Op op, int dt, @NotNull Term... u) throws InvalidTermException {
 
-        if (transformImmediates())
-            productNormalizeSubterms(u);
+        productNormalizeSubterms(u);
 
         int arity = u.length;
         switch (op) {
@@ -325,22 +324,6 @@ public abstract class TermBuilder {
         return s;
     }
 
-    @NotNull
-    public final Compound newCompound(@NotNull Op op, int dt, @NotNull Term[] subterms) {
-//        switch (subterms.length) {
-//            case 0:
-//                break; //continue
-//            case 1: {
-//                Term the = subterms[0];
-//                if (!(the.vars() > 0 || the.varPattern() > 0))
-//                    return new UnitCompound1(op, the);
-//                break; //use default below
-//            }
-//        }
-
-        return newCompound(op, dt, intern(TermVector.the(subterms)));
-    }
-
     public final GenericCompound newCompound(@NotNull Op op, int dt, TermContainer subterms) {
         return new GenericCompound(op, dt, subterms);
     }
@@ -437,12 +420,19 @@ public abstract class TermBuilder {
 //            if (x == null)
 //                return False;
 
-            if (isTrueOrFalse(x)) {
-                if ((op == NEG) || (op == CONJ) || (op == IMPL) || (op == EQUI))
-                    throw new RuntimeException("appearance of True/False in " + op + " should have been filtered prior to this");
+            if (x instanceof Compound) {
+                Compound cx = (Compound)x;
+                args[i] = the(cx.op(), cx.dt(), cx.terms()); //force internining to evaluate functors
+            } else {
 
-                //any other term causes it to be invalid/meaningless
-                return False;
+                if (isTrueOrFalse(x)) {
+                    if ((op == NEG) || (op == CONJ) || (op == IMPL) || (op == EQUI))
+                        throw new RuntimeException("appearance of True/False in " + op + " should have been filtered prior to this");
+
+                    //any other term causes it to be invalid/meaningless
+                    return False;
+                }
+
             }
         }
 
@@ -460,7 +450,18 @@ public abstract class TermBuilder {
             }
         }
 
-        return newCompound(op, dt, args);
+        //        switch (subterms.length) {
+//            case 0:
+//                break; //continue
+//            case 1: {
+//                Term the = subterms[0];
+//                if (!(the.vars() > 0 || the.varPattern() > 0))
+//                    return new UnitCompound1(op, the);
+//                break; //use default below
+//            }
+//        }
+
+        return newCompound(op, dt, intern(TermVector.the(args)));
     }
 
 

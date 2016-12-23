@@ -54,6 +54,7 @@ abstract public class Functor extends AtomConcept implements PermanentConcept, F
         return f(termAtom, (tt)->{
             if (tt.length!=arityRequired)
                 throw new RuntimeException(termAtom + " requires " + arityRequired + " arguments: " + tt);
+
             return ff.apply(tt);
         });
     }

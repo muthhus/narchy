@@ -50,6 +50,15 @@ public class TermFunctionTest {
         d.run(16);
     }
 
+    @Test
+    public void testFunctor1() {
+        Default d = new Default();
+        d.log();
+//        d.input("date(); :|:");
+//        d.run(16);
+        d.input("(now<->date()). :|:");
+        d.run(16);
+    }
 //    @Test
 //    public void testExecutionREsultIsCondition() {
 //        Default d = new Default();

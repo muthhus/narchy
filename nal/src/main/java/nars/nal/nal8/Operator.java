@@ -23,14 +23,18 @@ package nars.nal.nal8;
 
 import nars.NAR;
 import nars.Op;
+import nars.Symbols;
 import nars.Task;
-import nars.concept.Concept;
+import nars.task.MutableTask;
 import nars.term.Compound;
 import nars.term.Term;
+import nars.term.atom.Atomic;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import static nars.Op.*;
+import static nars.Op.ATOM;
+import static nars.Op.PROD;
+import static nars.Symbols.COMMAND;
 
 /**
  * interface which defines the behavior for processing functor tasks
@@ -46,10 +50,27 @@ import static nars.Op.*;
      * @param t task being processed
      * @return the task to continue processing, or null to cancel
      */
-    @Nullable Task process(@NotNull Task t, @NotNull NAR nar);
+    @Nullable Task run(@NotNull Task t, @NotNull NAR nar);
 
     final static int OPERATOR_BITS = ATOM.bit | PROD.bit | Op.INH.bit;
 
+    @FunctionalInterface  interface CommandOperator extends Operator {
+
+        @Override
+        default @Nullable Task run(@NotNull Task t, @NotNull NAR nar) {
+            if (t.punc()==COMMAND) {
+                Compound c = t.term();
+                run((Atomic)(c.term(1)), ((Compound)(t.term(0))).terms(), nar);
+            }
+            return null;
+        }
+
+        void run(@NotNull Atomic op, @NotNull Term[] args, @NotNull NAR nar);
+
+        public static Task task(Compound content) {
+            return new MutableTask(content, Symbols.COMMAND, null);
+        }
+    }
 
 
 //    @Override

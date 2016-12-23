@@ -160,10 +160,19 @@ public abstract class AbstractTask extends RawBudget implements Task, Temporal {
             throw new InvalidTaskException(this, "Unspecified punctuation");
 
 
-        //this conflicts with weakref's
-        /*if (!isCommand()) {
-            ensureValidParentTaskRef();
-        }*/
+        Term ntt = nar.normalize(t);
+        if (ntt == null || (!(term instanceof Compound)))
+            throw new InvalidTaskException(t, "Failed normalization");
+
+        Compound cntt = (Compound)ntt;
+
+        if (!Task.taskContentValid(cntt, punc, nar, !Param.DEBUG))
+            throw new InvalidTaskException(ntt, "Invalid content");
+
+        if (ntt!=t) {
+            this.term = cntt;
+            invalidate();
+        }
 
         //noinspection IfStatementWithTooManyBranches
         switch (punc()) {
@@ -195,17 +204,6 @@ public abstract class AbstractTask extends RawBudget implements Task, Temporal {
 
         }
 
-        Compound ntt = nar.normalize(t);
-        if (ntt == null)
-            throw new InvalidTaskException(t, "Failed normalization");
-
-        if (!Task.taskContentValid(ntt, punc, nar, !Param.DEBUG))
-            throw new InvalidTaskException(ntt, "Invalid content");
-
-        if (ntt!=t) {
-            this.term = ntt;
-            invalidate();
-        }
 
         // assign a unique stamp if none specified (input)
         if (evidence.length == 0)

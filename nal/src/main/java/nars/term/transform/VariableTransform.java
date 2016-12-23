@@ -17,7 +17,7 @@ public abstract class VariableTransform implements CompoundTransform<Compound, V
     }
 
     @Override
-    public boolean testSuperTerm(@NotNull Compound t) {
+    public final boolean testSuperTerm(@NotNull Compound t) {
         //prevent executing on any superterms that contain no variables, because this would have no effect
         return t.vars() > 0 || t.varPattern() > 0;
     }

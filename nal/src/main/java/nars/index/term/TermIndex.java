@@ -35,6 +35,7 @@ import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+import static nars.Op.ATOM;
 import static nars.Op.INH;
 import static nars.Op.PROD;
 import static nars.term.Term.False;
@@ -106,18 +107,10 @@ public abstract class TermIndex extends TermBuilder {
     public abstract void remove(@NotNull Term entry);
 
 
-    public final HijacKache<Compound, Compound> normalizations =
-            new HijacKache<>(Param.NORMALIZATION_CACHE_SIZE, 4);
-    public final HijacKache<ProtoCompound, Term> terms =
-            new HijacKache<>(Param.TERM_CACHE_SIZE, 4);
-
-//    final ThreadLocal<Map<Compound,Compound>> normalizations =
-//            ThreadLocal.withInitial( () ->
-//                new CapacityLinkedHashMap(Param.NORMALIZATION_CACHE_SIZE_PER_THREAD)
-//            );
-//            //Collections.synchronizedMap( new CapacityLinkedHashMap(16*1024) );
-    //final Cache<Compound,Compound> normalizations = Caffeine.newBuilder().maximumSize(Param.NORMALIZATION_CACHE_SIZE).build();
-
+//    public final HijacKache<Compound, Term> normalizations =
+//            new HijacKache<>(Param.NORMALIZATION_CACHE_SIZE, 4);
+//    public final HijacKache<ProtoCompound, Term> terms =
+//            new HijacKache<>(Param.TERM_CACHE_SIZE, 4);
 
     final Function<? super ProtoCompound, ? extends Term> termizer = pc -> {
 
@@ -267,30 +260,30 @@ public abstract class TermIndex extends TermBuilder {
         return the(csrc.op(), newDT, csrc.terms());
     }
 
-    @Override
-    public final @NotNull Term the(@NotNull Op op, int dt, @NotNull Term[] args) throws InvalidTermException {
-
-//        int totalVolume = 0;
-//        for (Term x : u)
-//            totalVolume += x.volume();
-
-//        if (totalVolume > volumeMax(op))
-//            throw new InvalidTermException(op, dt, u, "Too voluminous");
-
-        boolean cacheable =
-                //(totalVolume > 2)
-                        //&&
-                ((op !=INH) || !(args[1] instanceof Functor && args[0].op() == PROD)) //prevents caching for potential transforming terms
-                ;
-
-        if (cacheable) {
-
-            return terms.computeIfAbsent(new ProtoCompound.RawProtoCompound(op, dt, args), termizer);
-
-        } else {
-            return super.the(op, dt, args);
-        }
-    }
+//    @Override
+//    public final @NotNull Term the(@NotNull Op op, int dt, @NotNull Term[] args) throws InvalidTermException {
+//
+////        int totalVolume = 0;
+////        for (Term x : u)
+////            totalVolume += x.volume();
+//
+////        if (totalVolume > volumeMax(op))
+////            throw new InvalidTermException(op, dt, u, "Too voluminous");
+//
+//        boolean cacheable =
+//                //(totalVolume > 2)
+//                        //&&
+//                (op !=INH) || !(args[0].op() == PROD && args[1].op()==ATOM && get(args[1]) instanceof Functor) //prevents caching for potential transforming terms
+//                ;
+//
+//        if (cacheable) {
+//
+//            return terms.computeIfAbsent(new ProtoCompound.RawProtoCompound(op, dt, args), termizer);
+//
+//        } else {
+//            return super.the(op, dt, args);
+//        }
+//    }
 
 //    @Deprecated
 //    public final @NotNull Term the(@NotNull Op op, @NotNull Term... tt) {
@@ -303,20 +296,24 @@ public abstract class TermIndex extends TermBuilder {
         out.println();
     }
 
-    final Function<? super Compound, ? extends Compound> normalizer = src -> {
+    final Function<Compound, Term> normalizer = src -> {
 
-        Compound result;
+        Term result;
 
         try {
-            int numVars = src.vars();
+            int vars = src.vars();
+            int pVars = src.varPattern();
+            int totalVars = vars + pVars;
 
-            Term r = transform(src,
-                            (numVars == 1 && src.varPattern() == 0) ?
-                                    VariableNormalization.singleVariableNormalization :
-                                    new VariableNormalization(numVars /* estimate */)
-                    );
 
-            result = !(r instanceof Compound) ? InvalidCompound : (Compound) r;
+            if (totalVars > 0) {
+                result = transform(src, (vars == 1 && pVars == 0) ?
+                                VariableNormalization.singleVariableNormalization :
+                                new VariableNormalization(totalVars /* estimate */));
+            } else {
+                result = internCompound(src);
+            }
+
 
         } catch (InvalidTermException e) {
 
@@ -335,25 +332,36 @@ public abstract class TermIndex extends TermBuilder {
     }
 
     @Nullable
-    public final Compound normalize(@NotNull Compound src) {
+    public final Term normalize(@NotNull Compound src) {
 
 
         if (src.isNormalized()) {
             return src;
         } else {
             //see if subterms need change
-            Compound tgt = normalizations.computeIfAbsent(src, normalizer);
-            if (tgt == InvalidCompound)
-                return null;
 
-            //if (c!=null) {
-            //c = compoundOrNull($.unneg((Compound) c));
-            ((Compound) tgt).setNormalized();
-            //}
+            Term tgt;
+            //if (!cacheNormalization(src)) {
+                tgt = normalizer.apply(src);
+//            } else {
+//                tgt = normalizations.computeIfAbsent(src, normalizer);
+//            }
+
+            if (tgt instanceof Compound) {
+
+                //if (c!=null) {
+                //c = compoundOrNull($.unneg((Compound) c));
+                ((Compound) tgt).setNormalized();
+                //}
+            }
             return tgt;
         }
 
     }
+
+//    private boolean cacheNormalization(@NotNull Compound src) {
+//        return false;
+//    }
 
 
     @Nullable
@@ -368,7 +376,7 @@ public abstract class TermIndex extends TermBuilder {
     @NotNull
     public Term transform(@NotNull Compound src, @NotNull CompoundTransform t) {
         if (!t.testSuperTerm(src))
-            return internCompound(src);
+            return src;
 
         TermContainer tc = transform(src, src, t);
 
@@ -518,7 +526,7 @@ public abstract class TermIndex extends TermBuilder {
                     if (term instanceof Compound) {
 
                         if (!forTermlink && Param.FILTER_CONCEPTS_WITHOUT_ATOMS) {
-                            if (!term.hasAny(Op.ATOM.bit | Op.INT.bit))
+                            if (!term.hasAny(ATOM.bit | Op.INT.bit))
                                 return null;
                         } else {
                             //only filter 0-length compounds, example: ()
@@ -536,7 +544,7 @@ public abstract class TermIndex extends TermBuilder {
                     break;
 
             }
-        } while (termPre != term && term != null);
+        } while (term instanceof Compound && termPre != term && term != null);
 
         return term;
     }

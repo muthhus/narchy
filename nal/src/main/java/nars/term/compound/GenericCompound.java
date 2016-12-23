@@ -66,8 +66,9 @@ public class GenericCompound implements Compound  {
 
         this.subterms = subterms;
 
-        this.normalized = !(op==INH&&subterms.term(1) instanceof AtomicString && subterms.term(0).op()==PROD)
-                && subterms.constant();  /* to force functor evaluation at normalization */;
+        this.normalized = false; //force normalization to evaluate any contained functor subterms
+                //!(op==INH&&subterms.term(1) instanceof AtomicString && subterms.term(0).op()==PROD)
+                ///&& subterms.constant();  /* to force functor evaluation at normalization */;
 
         this.dt = dt;
 

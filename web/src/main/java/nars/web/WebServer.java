@@ -9,10 +9,12 @@ import io.undertow.websockets.extensions.PerMessageDeflateHandshake;
 import jcog.Texts;
 import jcog.Util;
 import jcog.data.MutableInteger;
+import nars.NAR;
 import nars.Wiki;
 import nars.bag.Bag;
 import nars.concept.Concept;
 import nars.nar.Default;
+import nars.remote.NAgents;
 import nars.term.Term;
 import nars.term.obj.IntTerm;
 import nars.test.DeductiveMeshTest;
@@ -36,8 +38,6 @@ import static io.undertow.UndertowOptions.ENABLE_HTTP2;
 import static io.undertow.UndertowOptions.ENABLE_SPDY;
 import static java.util.zip.Deflater.BEST_COMPRESSION;
 import static nars.$.*;
-import static nars.net.IRCAgent.hear;
-import static nars.net.IRCAgent.newRealtimeNAR;
 
 
 public class WebServer /*extends PathHandler*/ {
@@ -132,7 +132,7 @@ public class WebServer /*extends PathHandler*/ {
 
         //new IRCServer("localhost", 6667);
 
-        @NotNull Default nar = newRealtimeNAR(512, 3, 2);
+        @NotNull NAR nar = NAgents.newAlann(1f); //newRealtimeNAR(512, 3, 2);
         //Default nar = new Default();
 
 //        new IRCAgent(nar,
@@ -164,52 +164,52 @@ public class WebServer /*extends PathHandler*/ {
             return null;
         });
 
-        nar.on("read", (terms) -> {
-
-            String protocol = terms[0].toString();
-            String lookup = terms[1].toString();
-            switch (protocol) {
-                case "wiki": //wikipedia
-                    String base = "simple.wikipedia.org";
-                    //"en.wikipedia.org";
-                    Wiki enWiki = new Wiki(base);
-
-                    try {
-                        //remove quotes
-                        String page = enWiki.normalize(lookup.replace("\"", ""));
-                        //System.out.println(page);
-
-                        enWiki.setMaxLag(-1);
-
-                        String html = enWiki.getRenderedText(page);
-                        html = StringEscapeUtils.unescapeHtml4(html);
-                        String strippedText = html.replaceAll("(?s)<[^>]*>(\\s*<[^>]*>)*", " ").toLowerCase();
-
-                        //System.out.println(strippedText);
-
-                        hear(nar, strippedText, page, 200 /*ms per word */);
-
-                        return the("Reading " + base + ":" + page + ": " + strippedText.length() + " characters...");
-
-                    } catch (IOException e) {
-                        return the(e.toString());
-                    }
-
-                case "url":
-                    //TODO
-                    break;
-
-                case "json":
-                    //TODO
-                    break;
-
-                //...
-
-            }
-
-            return the("Unknown protocol");
-
-        });
+//        nar.on("read", (terms) -> {
+//
+//            String protocol = terms[0].toString();
+//            String lookup = terms[1].toString();
+//            switch (protocol) {
+//                case "wiki": //wikipedia
+//                    String base = "simple.wikipedia.org";
+//                    //"en.wikipedia.org";
+//                    Wiki enWiki = new Wiki(base);
+//
+//                    try {
+//                        //remove quotes
+//                        String page = enWiki.normalize(lookup.replace("\"", ""));
+//                        //System.out.println(page);
+//
+//                        enWiki.setMaxLag(-1);
+//
+//                        String html = enWiki.getRenderedText(page);
+//                        html = StringEscapeUtils.unescapeHtml4(html);
+//                        String strippedText = html.replaceAll("(?s)<[^>]*>(\\s*<[^>]*>)*", " ").toLowerCase();
+//
+//                        //System.out.println(strippedText);
+//
+//                        hear(nar, strippedText, page, 200 /*ms per word */);
+//
+//                        return the("Reading " + base + ":" + page + ": " + strippedText.length() + " characters...");
+//
+//                    } catch (IOException e) {
+//                        return the(e.toString());
+//                    }
+//
+//                case "url":
+//                    //TODO
+//                    break;
+//
+//                case "json":
+//                    //TODO
+//                    break;
+//
+//                //...
+//
+//            }
+//
+//            return the("Unknown protocol");
+//
+//        });
         nar.on("clear", (terms) -> {
             long dt = Util.time(() -> {
                 ((Default) nar).core.active.clear();
