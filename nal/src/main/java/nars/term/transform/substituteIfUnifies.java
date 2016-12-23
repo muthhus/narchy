@@ -60,7 +60,7 @@ import static nars.time.Tense.DTERNAL;
  <patham9_> and require at least one dep-var to be unified in dep-var unification.
  <patham9_> in principle the restriction to have at least one dep-var unified could be skipped, but the additional weaker result doesn't add any value to the system
  */
-abstract public class substituteIfUnifies extends TermTransformOperator  {
+abstract public class substituteIfUnifies extends Functor {
 
     //private final OneMatchFindSubst subMatcher;
     protected final Derivation parent; //parent matcher context

@@ -9,7 +9,6 @@ import nars.Task;
 import nars.task.Tasked;
 import nars.test.analyze.EventCount;
 import nars.test.condition.EternalTaskCondition;
-import nars.test.condition.ExecutionCondition;
 import nars.test.condition.NARCondition;
 import nars.test.condition.TemporalTaskCondition;
 import nars.time.Tense;
@@ -444,16 +443,16 @@ public class TestNAR  {
     }
 
 
-    @NotNull
-    public TestNAR mustExecute(long start, long end, @NotNull String term) {
-        return mustExecute(start, end, term, 0, 1.0f);
-    }
-
-    @NotNull
-    public TestNAR mustExecute(long start, long end, @NotNull String term, float minExpect, float maxExpect) {
-        requires.add(new ExecutionCondition(nar, start, end, term, minExpect, maxExpect));
-        return this;
-    }
+//    @NotNull
+//    public TestNAR mustExecute(long start, long end, @NotNull String term) {
+//        return mustExecute(start, end, term, 0, 1.0f);
+//    }
+//
+//    @NotNull
+//    public TestNAR mustExecute(long start, long end, @NotNull String term, float minExpect, float maxExpect) {
+//        requires.add(new ExecutionCondition(nar, start, end, term, minExpect, maxExpect));
+//        return this;
+//    }
 
     @NotNull
     public TestNAR ask(@NotNull String termString)  {

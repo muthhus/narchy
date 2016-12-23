@@ -19,7 +19,7 @@ import nars.term.container.TermContainer;
 import nars.term.subst.MapSubst;
 import nars.term.subst.Subst;
 import nars.term.transform.CompoundTransform;
-import nars.term.transform.TermTransform;
+import nars.term.transform.Functor;
 import nars.term.transform.VariableNormalization;
 import nars.term.util.InvalidTermException;
 import org.eclipse.collections.api.list.primitive.ByteList;
@@ -280,7 +280,7 @@ public abstract class TermIndex extends TermBuilder {
         boolean cacheable =
                 //(totalVolume > 2)
                         //&&
-                ((op !=INH) || !(args[1] instanceof TermTransform && args[0].op() == PROD)) //prevents caching for potential transforming terms
+                ((op !=INH) || !(args[1] instanceof Functor && args[0].op() == PROD)) //prevents caching for potential transforming terms
                 ;
 
         if (cacheable) {

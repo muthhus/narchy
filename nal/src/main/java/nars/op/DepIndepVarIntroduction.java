@@ -1,12 +1,11 @@
 package nars.op;
 
 import nars.$;
-import nars.NAR;
 import nars.Op;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Terms;
-import nars.term.transform.TermTransformOperator;
+import nars.term.transform.Functor;
 import org.eclipse.collections.impl.map.mutable.primitive.ObjectByteHashMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -133,7 +132,7 @@ public class DepIndepVarIntroduction extends VarIntroduction {
         return o == IMPL || o == EQUI;
     }
 
-    public static final class VarIntro extends TermTransformOperator {
+    public static final class VarIntro extends Functor {
 
         @NotNull
         final DepIndepVarIntroduction introducer;

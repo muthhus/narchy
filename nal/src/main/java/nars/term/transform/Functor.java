@@ -1,11 +1,14 @@
-package nars.concept;
+package nars.term.transform;
 
 import nars.$;
-import nars.Task;
+import nars.Op;
 import nars.bag.Bag;
+import nars.concept.AtomConcept;
+import nars.concept.Concept;
+import nars.concept.PermanentConcept;
+import nars.term.Compound;
 import nars.term.Term;
 import nars.term.atom.Atom;
-import nars.term.transform.TermTransform;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -15,25 +18,23 @@ import java.util.function.Supplier;
 
 import static nars.$.the;
 
-
-abstract public class Functor extends AtomConcept implements TermTransform, PermanentConcept {
+/** a functor is a term transform which immediately returns
+ *  a result Term from the Term[] arguments of
+ *  a function term, for example: f(x) or f(x, y).
+ */
+abstract public class Functor extends AtomConcept implements PermanentConcept, Function<Term[],Term> {
 
     public Functor(@NotNull String atom) {
-        this(fName(atom));
+        this((Atom)$.the(atom));
     }
 
     public Functor(@NotNull Atom atom) {
-        this(atom, Bag.EMPTY, Bag.EMPTY);
-    }
-
-    public Functor(@NotNull Atom atom, Bag<Term> termLinks, Bag<Task> taskLinks) {
-        super(atom, termLinks, taskLinks);
+        super(atom, Bag.EMPTY, Bag.EMPTY);
     }
 
     public static Atom fName(@NotNull String termAtom) {
         return (Atom)the(termAtom);
     }
-
 
     /** creates a new functor from a term name and a lambda */
     public static Concept f(@NotNull String termAtom, @NotNull Function<Term[], Term> f) {
@@ -65,13 +66,13 @@ abstract public class Functor extends AtomConcept implements TermTransform, Perm
     public static Concept f0(@NotNull String termAtom, @NotNull Supplier<Term> ff) {
         return f0(fName(termAtom), ff);
     }
+
     public static Concept f0(@NotNull String termAtom, @NotNull Runnable ff) {
         return f0(fName(termAtom), ()-> {
             ff.run();
             return null;
         });
     }
-
 
     /** one argument functor (convenience method) */
     public static Concept f1(@NotNull Atom termAtom, @NotNull Function<Term, Term> ff) {
@@ -86,9 +87,16 @@ abstract public class Functor extends AtomConcept implements TermTransform, Perm
     public static Concept f2(@NotNull Atom termAtom, @NotNull BiFunction<Term, Term, Term> ff) {
         return f(termAtom, 2, (tt)-> ff.apply(tt[0], tt[1]));
     }
+
     /** two argument functor (convenience method) */
     public static Concept f2(@NotNull String termAtom, @NotNull BiFunction<Term, Term, Term> ff) {
         return f2(fName(termAtom), ff);
+    }
+
+    @NotNull
+    @Override
+    public final Op op() {
+        return Op.ATOM;
     }
 
     public static final class LambdaFunctor extends Functor {
@@ -100,9 +108,51 @@ abstract public class Functor extends AtomConcept implements TermTransform, Perm
             this.f = f;
         }
 
-        @Nullable @Override public Term apply(@NotNull Term[] terms) {
+        @Nullable
+        @Override public Term apply(@NotNull Term[] terms) {
             return f.apply(terms);
         }
     }
 
+    /**
+     * Created by me on 12/12/15.
+     */
+    public abstract static class UnaryFunctor extends Functor {
+
+        protected UnaryFunctor(@NotNull String id) {
+            super(id);
+        }
+
+        @Nullable
+        @Override public final Term apply(@NotNull Term[] x) {
+            if (x.length!=1)
+                throw new UnsupportedOperationException("# args must equal 2");
+
+            return apply(x[0]);
+        }
+
+        @Nullable
+        public abstract Term apply(Term x);
+    }
+
+    /**
+     * Created by me on 12/12/15.
+     */
+    public abstract static class BinaryFunctor extends Functor {
+
+        protected BinaryFunctor(@NotNull String id) {
+            super(id);
+        }
+
+        @Nullable
+        @Override public final Term apply(@NotNull Term[] x) {
+            if (x.length!=2)
+                throw new UnsupportedOperationException("# args must equal 2");
+
+            return apply(x[0], x[1]);
+        }
+
+        @Nullable
+        public abstract Term apply(Term a, Term b);
+    }
 }

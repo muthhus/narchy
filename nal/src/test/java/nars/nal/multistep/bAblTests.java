@@ -66,7 +66,7 @@ public class bAblTests extends AbstractNALTest {
 
     }
 
-    @Test public void test19() {
+    @Ignore @Test public void test19() {
 
         //(19) Path Finding
         TestNAR t = test();

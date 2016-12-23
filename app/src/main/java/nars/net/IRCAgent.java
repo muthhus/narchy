@@ -6,7 +6,6 @@ import jcog.event.On;
 import nars.*;
 import nars.index.term.TermIndex;
 import nars.index.term.tree.TreeTermIndex;
-import nars.nal.nal8.operator.TermFunction;
 import nars.nar.Default;
 import nars.nar.exe.MultiThreadExecutioner;
 import nars.nar.util.DefaultConceptBuilder;

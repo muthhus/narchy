@@ -5,10 +5,9 @@
 package nars.op.data;
 
 import nars.$;
-import nars.index.term.TermIndex;
-import nars.nal.nal8.operator.TermFunction;
 import nars.term.Compound;
 import nars.term.Term;
+import nars.term.transform.Functor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -16,21 +15,15 @@ import org.jetbrains.annotations.Nullable;
  * Produces canonical "Reflective-Narsese" representation of a parameter term
  * @author me
  */
-public class reflect extends TermFunction {
+public class reflect extends Functor.UnaryFunctor {
 
+    public reflect() {
+        super("reflect");
+    }
 
-    /*
-     <(*,<(*,good,property) --> inheritance>,(&&,<(*,human,good) --> product>,<(*,(*,human,good),inheritance) --> inheritance>)) --> conjunction>.
-    */
-
-    
-    @Nullable
     @Override
-    public Object function(@NotNull Compound x, TermIndex i) {
-
-        Term content = x.term(0);
-
-        return reflect(content);
+    public Term apply(Term x) {
+        return reflect(x);
     }
 
 
@@ -110,5 +103,6 @@ public class reflect extends TermFunction {
         }
         
     }
+
 
 }

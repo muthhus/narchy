@@ -15,16 +15,13 @@ import nars.budget.control.Activation;
 import nars.budget.policy.ConceptState;
 import nars.concept.CompoundConcept;
 import nars.concept.Concept;
-import nars.concept.Functor;
-import nars.concept.OperationConcept;
 import nars.concept.util.InvalidConceptException;
 import nars.index.task.MapTaskIndex;
 import nars.index.task.TaskIndex;
 import nars.index.term.TermIndex;
 import nars.link.BLink;
 import nars.nal.Level;
-import nars.nal.nal8.AbstractOperator;
-import nars.nal.nal8.Execution;
+import nars.nal.nal8.Operator;
 import nars.nar.NARIn;
 import nars.nar.NAROut;
 import nars.nar.exe.Executioner;
@@ -36,7 +33,7 @@ import nars.term.Term;
 import nars.term.Termed;
 import nars.term.atom.Atom;
 import nars.term.atom.Atomic;
-import nars.term.transform.TermTransform;
+import nars.term.transform.Functor;
 import nars.term.util.InvalidTermException;
 import nars.time.FrameTime;
 import nars.time.Tense;
@@ -67,7 +64,7 @@ import static nars.$.*;
 import static nars.Op.*;
 import static nars.Symbols.*;
 import static nars.concept.CompoundConcept.DuplicateMerge;
-import static nars.concept.Functor.f;
+import static nars.term.transform.Functor.f;
 import static nars.time.Tense.ETERNAL;
 import static org.fusesource.jansi.Ansi.ansi;
 
@@ -167,7 +164,7 @@ public abstract class NAR extends Param implements Level, Consumer<Task>, NARIn,
             @Nullable ConceptState p = c.state();
             policy.addValue(p != null ? p.toString() : "null");
 
-            if (!(c instanceof TermTransform)) {
+            if (!(c instanceof Functor)) {
                 termlinksCap.accept(c.termlinks().capacity());
                 termlinksUsed.accept(c.termlinks().size());
                 tasklinksCap.accept(c.tasklinks().capacity());
@@ -244,8 +241,6 @@ public abstract class NAR extends Param implements Level, Consumer<Task>, NARIn,
 
 
         concepts.start(this);
-
-
 
         for (Concept t : Builtin.statik)
             on(t);
@@ -651,8 +646,29 @@ public abstract class NAR extends Param implements Level, Consumer<Task>, NARIn,
             return null;
         }
 
+        Compound inputTerm = input.term();
+        if (inputTerm.hasAll(Operator.OPERATOR_BITS) && inputTerm.op() == INH) {
+            Term func = inputTerm.term(1);
+            if (func.op() == ATOM) {
+                Term args = inputTerm.term(0);
+                if (args.op() == PROD) {
+                    Concept funcConcept = concept(func);
+                    if (funcConcept!=null) {
+                        Operator o = funcConcept.get(Operator.class);
+                        if (o!=null) {
+                            Task result = o.process(input, this);
+                            if (result!=input) { //instance equality, not actual equality in case it wants to change this
+                                return input( result ); //recurse until its stable
+                            } // else continue
+                        }
+                    }
+                }
+            }
+        }
+
+
         if (input.isCommand()) {
-            inputCommand(input.term());
+            //inputCommand(input.term());
             return null;
         }
 
@@ -729,45 +745,43 @@ public abstract class NAR extends Param implements Level, Consumer<Task>, NARIn,
         return null;
     }
 
-    /**
-     * meta-reasoner evaluator
-     */
-    @Nullable
-    public Term inputCommand(@NotNull Compound x) {
-
-        Term y;
-
-        if (x.op() == INH && x.isTerm(0, PROD) && x.isTerm(1, ATOM)) {
-            Term functor = x.term(1);
-            Term[] args = x.compound(0).terms();
-
-            Concept functorConcept = concept(functor);
-            if (functorConcept instanceof TermTransform) {
-                y = ((TermTransform) functorConcept).apply(args);
-            } else if (functorConcept instanceof Functor) {
-                y = ((Functor) functorConcept).apply(args);
-            } else {
-                y = the("unknown_command_functor");
-            }
-
-        } else {
-            y = the("unknown_command_pattern");
-        }
-
-        Compound z;
-        if (y == null)
-            z = x;
-        else
-            z = func(self, x, y); //memoization of the command and its result
-
-        //logger.info(" {}", z);
-
-        eventTaskProcess.emit(command(z));
-
-        return z;
-
-    }
-
+//    /**
+//     * meta-reasoner evaluator
+//     */
+//    @Nullable
+//    public void inputCommand(@NotNull Compound x) {
+//
+////        Term y;
+////
+////        if (x.op() == INH && x.isTerm(0, PROD) && x.isTerm(1, ATOM)) {
+////            Term functor = x.term(1);
+////            Term[] args = x.compound(0).terms();
+////
+////            Concept functorConcept = concept(functor);
+////            if (functorConcept instanceof Functor) {
+////                y = ((Functor) functorConcept).apply(args);
+////            } else {
+////                y = the("unknown_command_functor");
+////            }
+////
+////        } else {
+////            y = the("unknown_command_pattern");
+////        }
+////
+////        Compound z;
+////        if (y == null)
+////            z = x;
+////        else
+////            z = func(self, x, y); //memoization of the command and its result
+////
+////        //logger.info(" {}", z);
+//
+////        eventTaskProcess.emit(command(z));
+//
+//        //return z;
+//
+//    }
+//
 
     @Override
     public final void accept(@NotNull Task task) {
@@ -789,23 +803,22 @@ public abstract class NAR extends Param implements Level, Consumer<Task>, NARIn,
             input(x);
     }
 
-
-    public final On on(@NotNull AbstractOperator r) {
-        r.init(this);
-        return onExecution(r.operator(), r);
+    public final void on(@NotNull String atom, @NotNull Operator o) {
+        on((Atom)$.the(atom), o);
     }
 
+    public final void on(@NotNull Atom a, @NotNull Operator o) {
+        Concept c = concept(a, true);
+        if (c.putIfAbsent(Operator.class, o)!=null)
+            throw new RuntimeException(c + " already has an operator registered");
 
-    @NotNull
-    @Deprecated
-    public final On onExecution(@NotNull Atomic op, @NotNull Consumer<OperationConcept> each) {
-        Concept c = (Concept)concepts.conceptBuilder().apply(op);
-        concepts.set(op, c);
-        On o = c
-                .<Topic<OperationConcept>>meta(Execution.class,
-                        (k, v) -> v != null ? v : new ArrayTopic<>())
-                .on(each);
-        return o;
+//        Concept c = (Concept)concepts.conceptBuilder().apply(op);
+//        concepts.set(op, c);
+//        On o = c
+//                .<Topic<OperationConcept>>meta(Execution.class,
+//                        (k, v) -> v != null ? v : new ArrayTopic<>())
+//                .on(each);
+//        return o;
     }
 
 

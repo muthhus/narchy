@@ -1,6 +1,5 @@
 package nars;
 
-import com.eclipsesource.json.Json;
 import jcog.Texts;
 import jcog.list.FasterList;
 import nars.bag.Bag;
@@ -8,19 +7,19 @@ import nars.concept.Concept;
 import nars.concept.PermanentConcept;
 import nars.concept.SensorConcept;
 import nars.nar.Default;
-import nars.op.data.differ;
-import nars.op.data.intersect;
-import nars.op.data.reflect;
-import nars.op.data.union;
+import nars.op.data.*;
+
+import nars.term.Term;
 import nars.term.atom.Atom;
+import nars.term.transform.Functor;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
 import java.util.Date;
+import java.util.List;
 
 import static java.nio.file.Files.createTempFile;
 import static nars.$.quote;
-import static nars.concept.Functor.*;
 
 /**
  * Built-in functors, ie. the standard core function set
@@ -31,19 +30,23 @@ public class Builtin extends FasterList<Concept> {
             new intersect(),
             new differ(),
             new union(),
-            f0("date", () -> quote(new Date().toString())),
-            f1("reflect", reflect::reflect),
-            f1("jsonParse", (jsonString)-> IO.fromJSON($.unquote(jsonString))),
-            f1("jsonStringify", (term)-> IO.toJSON(term) )
-
+            Functor.f0("date", () -> quote(new Date().toString())),
+            Functor.f1("reflect", reflect::reflect),
+            Functor.f1("jsonParse", (jsonString)-> IO.fromJSON($.unquote(jsonString))),
+            Functor.f1("jsonStringify", (term)-> IO.toJSON(term) ),
+            new reflect(),
+            new flat.flatProduct(),
+            new similaritree(),
+            new complexity()
     };
 
     /**
      * generate all NAR-contextualized functors
      */
     public Builtin(NAR nar) {
+        //TODO these should be command-only operators, not functors
         addAll(
-                f0("help", () -> {
+                Functor.f0("help", () -> {
                     //TODO generalize with a predicate to filter the concepts, and a lambda for appending each one to an Appendable
                     StringBuilder sb = new StringBuilder(4096);
 
@@ -56,15 +59,15 @@ public class Builtin extends FasterList<Concept> {
                     });
                     return $.quote(sb);
                 }),
-                f0("clear", nar::clear),
-                f0("reset", nar::reset),
-                f0("whoami", () -> nar.self),
-                f0("memstat", () -> quote(nar.concepts.summary())),
+                Functor.f0("clear", nar::clear),
+                Functor.f0("reset", nar::reset),
+                Functor.f0("whoami", () -> nar.self),
+                Functor.f0("memstat", () -> quote(nar.concepts.summary())),
                 //TODO concept statistics
                 //TODO task statistics
                 //TODO emotion summary
-                f1("print", x -> quote(nar.concept(x).print(new StringBuilder(1024)))),
-                f("save", urlOrPath -> {
+                Functor.f1("print", x -> quote(nar.concept(x).print(new StringBuilder(1024)))),
+                Functor.f("save", urlOrPath -> {
                     try {
                         File tmp;
                         if (urlOrPath.length == 0) {
@@ -79,7 +82,7 @@ public class Builtin extends FasterList<Concept> {
                         return quote(e);//e.printStackTrace();
                     }
                 }),
-                f("top", (arguments) -> {
+                Functor.f("top", (arguments) -> {
                     int MAX_RESULT_LENGTH = 800;
 
 
@@ -140,5 +143,118 @@ public class Builtin extends FasterList<Concept> {
 //        });
 
     }
+
+
+//    public final AbstractOperator[] defaultOperators = {
+//
+//            //system control
+//
+//            //PauseInput.the,
+//            new reset(),
+//            //new eval(),
+//            //new Wait(),
+//
+////            new believe(),  // accept a statement with a default truth-value
+////            new want(),     // accept a statement with a default desire-value
+////            new wonder(),   // find the truth-value of a statement
+////            new evaluate(), // find the desire-value of a statement
+//            //concept operations for internal perceptions
+////            new remind(),   // create/activate a concept
+////            new consider(),  // do one inference step on a concept
+////            new name(),         // turn a compount term into an atomic term
+//            //new Abbreviate(),
+//            //new Register(),
+//
+//            //new echo(),
+//
+//
+//            new doubt(),        // decrease the confidence of a belief
+////            new hesitate(),      // decrease the confidence of a goal
+//
+//            //Meta
+//            new reflect(),
+//            //new jclass(),
+//
+//            // feeling operations
+//            //new feelHappy(),
+//            //new feelBusy(),
+//
+//
+//            // math operations
+//            //new length(),
+//            //new add(),
+//
+//            new intToBitSet(),
+//
+//            //new MathExpression(),
+//
+//            new complexity(),
+//
+//            //Term manipulation
+//            new flat.flatProduct(),
+//            new similaritree(),
+//
+//            //new NumericCertainty(),
+//
+//            //io operations
+//            new say(),
+//
+//            new schizo(),     //change Memory's SELF term (default: SELF)
+//
+//            //new js(), //javascript evalaution
+//
+//            /*new json.jsonfrom(),
+//            new json.jsonto()*/
+//         /*
+//+         *          I/O operations under consideration
+//+         * observe          // get the most active input (Channel ID: optional?)
+//+         * anticipate       // get the input matching a given statement with variables (Channel ID: optional?)
+//+         * tell             // output a judgment (Channel ID: optional?)
+//+         * ask              // output a question/quest (Channel ID: optional?)
+//+         * demand           // output a goal (Channel ID: optional?)
+//+         */
+//
+////        new Wait()              // wait for a certain number of clock cycle
+//
+//
+//        /*
+//         * -think            // carry out a working cycle
+//         * -do               // turn a statement into a goal
+//         *
+//         * possibility      // return the possibility of a term
+//         * doubt            // decrease the confidence of a belief
+//         * hesitate         // decrease the confidence of a goal
+//         *
+//         * feel             // the overall happyness, average solution quality, and predictions
+//         * busy             // the overall business
+//         *
+//
+//
+//         * do               // to turn a judgment into a goal (production rule) ??
+//
+//         *
+//         * count            // count the number of elements in a set
+//         * arithmatic       // + - * /
+//         * comparisons      // < = >
+//         * logic        // binary logic
+//         *
+//
+//
+//
+//         * -assume           // local assumption ???
+//         *
+//         * observe          // get the most active input (Channel ID: optional?)
+//         * anticipate       // get input of a certain pattern (Channel ID: optional?)
+//         * tell             // output a judgment (Channel ID: optional?)
+//         * ask              // output a question/quest (Channel ID: optional?)
+//         * demand           // output a goal (Channel ID: optional?)
+//
+//
+//        * name             // turn a compount term into an atomic term ???
+//         * -???              // rememberAction the history of the system? excutions of operatons?
+//         */
+//    };
+//
+//
 
 }

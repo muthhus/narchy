@@ -17,8 +17,6 @@ import jcog.Texts;
 import nars.index.TermBuilder;
 import nars.index.term.TermIndex;
 import nars.nal.meta.match.Ellipsis;
-import nars.nal.nal8.operator.ImmediateOperator;
-import nars.op.out.echo;
 import nars.task.MutableTask;
 import nars.term.Compound;
 import nars.term.Term;
@@ -252,36 +250,36 @@ public class Narsese extends BaseParser<Object> {
                 //"OUT:"
                 //),
                 //sNonNewLine(),
-                LineCommentEchoed(),
+                //LineCommentEchoed(),
                 firstOf("\n", eof() /* may not have newline at end of file */)
         );
     }
 
-    public Rule LineCommentEchoed() {
-        //return Atom.the(Utf8.toUtf8(name));
-
-        //return $.the('"' + t + '"');
-
-//        int olen = name.length();
-//        switch (olen) {
-//            case 0:
-//                throw new RuntimeException("empty atom name: " + name);
+//    public Rule LineCommentEchoed() {
+//        //return Atom.the(Utf8.toUtf8(name));
 //
-////            //re-use short term names
-////            case 1:
-////            case 2:
-////                return theCached(name);
+//        //return $.the('"' + t + '"');
 //
-//            default:
-//                if (olen > Short.MAX_VALUE/2)
-//                    throw new RuntimeException("atom name too long");
-
-        //  }
-        return sequence(
-                zeroOrMore(noneOf("\n")),
-                push(ImmediateOperator.command(echo.class, $.quote(match())))
-        );
-    }
+////        int olen = name.length();
+////        switch (olen) {
+////            case 0:
+////                throw new RuntimeException("empty atom name: " + name);
+////
+//////            //re-use short term names
+//////            case 1:
+//////            case 2:
+//////                return theCached(name);
+////
+////            default:
+////                if (olen > Short.MAX_VALUE/2)
+////                    throw new RuntimeException("atom name too long");
+//
+//        //  }
+//        return sequence(
+//                zeroOrMore(noneOf("\n")),
+//                push(ImmediateOperator.command(echo.class, $.quote(match())))
+//        );
+//    }
 
 //    public Rule PauseInput() {
 //        return sequence( s(), IntegerNonNegative(),

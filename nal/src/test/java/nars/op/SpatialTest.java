@@ -5,13 +5,17 @@ import jcog.spatial.Rect2D;
 import jcog.spatial.SpatialSearch;
 import nars.$;
 import nars.NAR;
-import nars.concept.Functor;
+import nars.nal.nal8.Operator;
 import nars.nar.Default;
 import nars.term.Term;
 import nars.term.atom.Atom;
 import nars.term.obj.IntTerm;
+import nars.term.transform.Functor;
 import org.junit.Test;
 
+import static nars.Symbols.COMMAND;
+import static nars.Symbols.GOAL;
+import static nars.nal.nal8.Operator.args;
 import static nars.term.Term.False;
 
 /**
@@ -49,29 +53,35 @@ public class SpatialTest {
 
         SpatialSearch<Rect2D> r = SpatialSearch.rTree(new Rect2D.Builder() );
         NAR n = new Default();
-        n.log();
 
-        n.on(Functor.LambdaFunctor.f("move", 3, (a) -> {
-            Term id = a[0];
-            if (id instanceof Atom) {
-                Term x = a[1];
-                Term y = a[1];
-                if (x instanceof IntTerm && y instanceof IntTerm) {
-                    int ix = ((IntTerm)x).val();
-                    int iy = ((IntTerm)y).val();
-                    r.add(new LRect<Atom>((Atom)id, ix, iy));
-                    return $.func("at", id, $.p(ix, iy));
+        n.on("at", (t, nar) -> {
+
+            if (t.punc() == COMMAND || (t.punc()==GOAL && t.expectation() > 0.75f)) {
+                Term[] a = args(t);
+                Term id = a[0];
+                if (id instanceof Atom) {
+                    Term x = a[1];
+                    Term y = a[1];
+                    if (x instanceof IntTerm && y instanceof IntTerm) {
+                        int ix = ((IntTerm)x).val();
+                        int iy = ((IntTerm)y).val();
+                        r.add(new LRect<Atom>((Atom)id, ix, iy));
+                        nar.believe( $.func("at", id, $.p(ix, iy), $.the("date()")) );
+                    }
                 }
             }
-            return False;
-        }));
-        n.on(Functor.LambdaFunctor.f("at", 2, (a) -> {
-            return null;
-        }));
 
-        n.input("move(a, 0, 0)!",
-                "move(b, 2, 2)?",
-                "move(c, 4, 4);");
+            return t;
+        });
+
+//        n.on(Functor.LambdaFunctor.f("at", 2, (a) -> {
+//            return null;
+//        }));
+
+        n.log();
+        n.input("at(a, 0, 0)!",
+                "at(b, 2, 2)!",
+                "at(c, 4, 4)!");
 
         r.forEach(x -> {
             System.out.println(x);

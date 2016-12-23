@@ -10,14 +10,8 @@ public abstract class AtomicStringConstant extends AtomicString {
     @NotNull public final String id;
 
     protected AtomicStringConstant(@NotNull String id) {
-        this(id, id.hashCode());
-    }
-
-    protected AtomicStringConstant(@NotNull String id, int hash) {
         this.id = id;
     }
-
-
 
     @NotNull
     @Override public final String toString() {

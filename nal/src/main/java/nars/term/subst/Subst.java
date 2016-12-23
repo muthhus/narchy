@@ -2,7 +2,7 @@ package nars.term.subst;
 
 import nars.term.Term;
 import nars.term.atom.Atomic;
-import nars.term.transform.TermTransform;
+import nars.term.transform.Functor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -40,7 +40,7 @@ public interface Subst  {
 //        return b[0];
 //    }
 
-    @Deprecated default @Nullable TermTransform getTransform(@NotNull Atomic t) {
+    @Deprecated default @Nullable Functor getTransform(@NotNull Atomic t) {
         return null;
     }
 

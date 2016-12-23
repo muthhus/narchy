@@ -3,10 +3,11 @@ package nars.op.data;
 import nars.$;
 import nars.Op;
 import nars.index.term.TermIndex;
-import nars.nal.nal8.operator.TermFunction;
 import nars.term.Compound;
 import nars.term.Term;
+import nars.term.transform.Functor;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
@@ -19,14 +20,21 @@ import java.util.List;
  *
  * TODO recursive version with order=breadth|depth option
  */
-public abstract class flat extends TermFunction {
+public abstract class flat extends Functor.UnaryFunctor {
 
-    @NotNull
+    protected flat() {
+        super("flat");
+    }
+
     @Override
-    public Object function(@NotNull Compound op, TermIndex i) {
-        List<Term> l = $.newArrayList();
-        collect(((Compound)op.term(0)).terms(), l);
-        return result(l);
+    public @Nullable Term apply(Term x) {
+        if (x instanceof Compound) {
+            List<Term> l = $.newArrayList(x.volume());
+            collect(((Compound)x).terms(), l);
+            return result(l);
+        } else {
+            return null;
+        }
     }
 
     @NotNull

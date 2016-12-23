@@ -10,7 +10,7 @@ import nars.term.atom.AtomicSingleton;
 import nars.term.compound.GenericCompound;
 import nars.term.container.TermContainer;
 import nars.term.container.TermVector;
-import nars.term.transform.TermTransform;
+import nars.term.transform.Functor;
 import nars.term.util.InvalidTermException;
 import nars.term.var.Variable;
 import org.apache.commons.lang3.ArrayUtils;
@@ -768,8 +768,8 @@ public abstract class TermBuilder {
 
                     case INH:
 
-                        if (predicate instanceof TermTransform && transformImmediates() && sop == PROD) {
-                            Term y = ((TermTransform) predicate).apply(((Compound) subject).terms());
+                        if (predicate instanceof Functor && transformImmediates() && sop == PROD) {
+                            Term y = ((Functor) predicate).apply(((Compound) subject).terms());
                             if (y == null) {
                                 break; //null return value means just keep the original input term
                             }

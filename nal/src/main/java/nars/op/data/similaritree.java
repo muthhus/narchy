@@ -1,31 +1,32 @@
 package nars.op.data;
 
 import jcog.Texts;
+import nars.$;
 import nars.index.term.TermIndex;
-import nars.nal.nal8.operator.TermFunction;
 import nars.term.Compound;
 import nars.term.Term;
+import nars.term.transform.Functor;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Uses the levenshtein distance of two term's string represents to
  * compute a similarity metric
  */
-public class similaritree extends TermFunction<Float> {
+public class similaritree extends Functor.BinaryFunctor {
 
-    //TODO integrate Ters Terms.termDistance()
+    public similaritree() {
+        super("similaritree");
+    }
 
     @Override
-    public Float function(@NotNull Compound o, TermIndex i) {
-
-        Term[] x = ((Compound)o.term(0)).terms();
-        if (x.length!=2) return Float.NaN;
-
-        String a = x[0].toString();
-        String b = x[1].toString();
-
-        float d = Texts.levenshteinDistance(a, b);
-        return 1.0f - (d / (Math.max(a.length(), b.length())));
+    public @Nullable Term apply(Term a, Term b) {
+        String as = a.toString();
+        String bs = b.toString();
+        int d = Texts.levenshteinDistance(as, bs);
+        return $.the(d);
     }
+
+
 
 }

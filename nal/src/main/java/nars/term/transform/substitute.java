@@ -10,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 
-public final class substitute extends TermTransformOperator  {
+public final class substitute extends Functor {
 
     @NotNull private final Derivation parent;
 
