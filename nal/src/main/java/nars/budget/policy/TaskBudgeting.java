@@ -35,7 +35,7 @@ public class TaskBudgeting {
 
         //Penalize by complexity: RELATIVE SIZE INCREASE METHOD
         /** occam factor */
-        float occam = occamComplexityGrowthRelative(derived, baseBudget);
+        float occam = occamComplexityGrowthRelative(derived, baseBudget, 1);
 
         final float quality =
                 Util.clamp(baseBudget.qua() * occam * derivationQuality, 0f, 1f- Param.BUDGET_EPSILON);
@@ -86,21 +86,20 @@ public class TaskBudgeting {
 
     /** occam's razor: penalize relative complexity growth
      * @return a value between 0 and 1 that priority will be scaled by */
-    public static float occamComplexityGrowthRelative(@NotNull Termed derived, @NotNull Premise pp) {
+    public static float occamComplexityGrowthRelative(@NotNull Termed derived, @NotNull Premise pp, int decayComplexity) {
         Task parentBelief = pp.belief;
         int parentComplexity;
         int taskCompl = pp.task.volume();
         if (parentBelief!=null) // && parentBelief.complexity() > parentComplexity)
             parentComplexity =
                 Math.min(taskCompl, parentBelief.volume());
-                //Math.max(taskCompl, parentBelief.volume());
         else
             parentComplexity = taskCompl;
 
         int derivedComplexity = derived.volume();
         //return parentComplexity / (1f + Math.max(parentComplexity, derivedComplexity));
         //return Math.max(1f, (parentComplexity/derivedComplexity));
-        return Math.max(1f, (parentComplexity/(derivedComplexity)));
+        return Util.unitize((float)parentComplexity/(decayComplexity +derivedComplexity));
     }
 
 

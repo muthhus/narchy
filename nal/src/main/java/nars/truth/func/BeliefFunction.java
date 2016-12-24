@@ -286,6 +286,24 @@ public enum BeliefFunction implements TruthOperator {
     },
 
     //@AllowOverlap
+    BeliefStructuralAbduction() {
+        @Nullable
+        @Override public Truth apply(final Truth T, @Nullable final Truth B, @NotNull NAR m, float minConf) {
+            if (B == null) return null;
+            return TruthFunctions.abduction(B, $.t(1f, defaultConfidence(m)), minConf);
+        }
+    },
+
+    //@AllowOverlap
+    BeliefStructuralAnalogy() {
+        @Nullable
+        @Override public Truth apply(final Truth T, @Nullable final Truth B, @NotNull NAR m, float minConf) {
+            if (B == null) return null;
+            return TruthFunctions.analogy(B, $.t(1f, defaultConfidence(m)), minConf);
+        }
+    },
+
+    //@AllowOverlap
     BeliefStructuralDifference() {
         @Nullable
         @Override public Truth apply(final Truth T, @Nullable final Truth B, @NotNull NAR m, float minConf) {

@@ -76,8 +76,7 @@
     (S --> P), (S <-> P),                       task("?") |- (S --> P),   (Belief:StructuralIntersection, Punctuation:Belief)
     (S ==> P), (S <=> P), time(dtBeliefExact),  task("?") |- (S ==>+- P), (Belief:StructuralIntersection, Punctuation:Belief)
 
-//implication answering
-    Z, (X==>Y), task("?") |- subIfUnifiesAny((X==>Y), Y, Z), (Belief:BeliefStructuralDeduction, Punctuation:Belief)
+
 
 //NAL2:
 

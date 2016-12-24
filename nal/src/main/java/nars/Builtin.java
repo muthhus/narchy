@@ -6,10 +6,13 @@ import nars.op.data.*;
 import nars.term.Term;
 import nars.term.atom.Atomic;
 import nars.term.transform.Functor;
+import nars.term.var.Variable;
 
 import java.util.Date;
 
 import static nars.$.quote;
+import static nars.term.Term.False;
+import static nars.term.Term.True;
 
 /**
  * Built-in functors, ie. the standard core function set
@@ -27,7 +30,12 @@ public class Builtin  {
             new reflect(),
             new flat.flatProduct(),
             new similaritree(),
-            new complexity()
+            new complexity(),
+            Functor.f2("equal", (x,y) -> {
+                if ((x instanceof Variable) ^ (y instanceof Variable))
+                    return null; //dont compare a variable to non-variable
+                return x.equals(y) ? True : False;
+            }),
     };
 
     /**
@@ -35,7 +43,6 @@ public class Builtin  {
      */
     public static void load(NAR nar) {
         //TODO these should be command-only operators, not functors
-
 
         nar.on("log", (Operator.CommandOperator)(Atomic a, Term[] t, NAR n) -> {
             n.logger.info("{}", t);

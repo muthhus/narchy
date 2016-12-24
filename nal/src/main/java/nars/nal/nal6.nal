@@ -92,6 +92,11 @@
             //     S, (S<=>P), task(negative), belief(positive) |- (--,%P), (Goal:StrongN)
             //     S, (S<=>P), task(negative), belief(negative) |- (--,%P), (Goal:Strong)
 
+    //answering
+    Z, (X==>Y), task("?"), time(dtBeliefExact) |- subIfUnifiesAny((X ==>+- Y), Y, Z), (Belief:BeliefStructuralDeduction, Punctuation:Belief)
+    Z, (X==>Y), task("?"), time(dtBeliefExact) |- subIfUnifiesAny((X ==>+- Y), X, Z), (Belief:BeliefStructuralAbduction, Punctuation:Belief)
+
+    Z, (X<=>Y), task("?"), time(dtBeliefExact) |- subIfUnifiesAny((X <=>+- Y), Y, Z), (Belief:BeliefStructuralAnalogy, Punctuation:Belief)
 
     //originally these were only valid if A occurrs during or after C. the opposite is not logical and would also produce redundant results
     B, (C && A), task(positive), time(decomposeBelief), neqCom(B,C), notImplEqui(C) |- subIfUnifiesAny(C,A,B), (Goal:Strong)

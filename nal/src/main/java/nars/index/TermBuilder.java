@@ -673,7 +673,7 @@ public abstract class TermBuilder {
                                         return Collections.emptySet();
                                     }
 
-                                    outer.add($.neg(cnt));
+                                    outer.add(neg(cnt));
                                 }
                                 ss.remove();
                             }
@@ -747,16 +747,12 @@ public abstract class TermBuilder {
                 if (subject == predicate) //shortcut
                     return True;
 
-                boolean subjTrue = isTrue(subject);
-                if (subjTrue && op == IMPL) {
-                    //special case for implications: reduce to the predicate if the subject is True
-                    return predicate;
-                }
 
-                //if either the subject or pred are True/False, then they collapse ot True if they are equal or False otherwise
-                if (subjTrue || isFalse(subject) || isTrueOrFalse(predicate)) {
-                    return subject == predicate ? True : False;
-                }
+
+//                //if either the subject or pred are True/False, then they collapse ot True if they are equal or False otherwise
+//                if (subjTrue || isFalse(subject) || isTrueOrFalse(predicate)) {
+//                    return subject == predicate ? True : False;
+//                }
 
                 Op sop = subject.op();
 
@@ -773,6 +769,11 @@ public abstract class TermBuilder {
 
 
                     case EQUI: {
+
+                        if (isTrue(subject))  return predicate;
+                        if (isFalse(subject)) return neg(predicate);
+                        if (isTrue(predicate))  return subject;
+                        if (isFalse(predicate)) return neg(subject);
 
                         boolean subjNeg = sop == NEG;
                         boolean predNeg = predicate.op() == NEG;
@@ -795,8 +796,15 @@ public abstract class TermBuilder {
                         break;
                     }
 
-                    case IMPL:
+                    case IMPL: {
 
+                        if (isTrue(subject)) {
+                            //special case for implications: reduce to the predicate if the subject is True
+                            return predicate;
+                        }
+                        if (isFalse(subject)) {
+                            return neg(predicate);
+                        }
 
                         if (predicate.op() == NEG) {
                             //negated predicate gets unwrapped to outside
@@ -822,7 +830,7 @@ public abstract class TermBuilder {
                                     if (commonSize == preds.size())
                                         return False; //shortcut: predicate was entirely removed
 
-                                    subject = commonSize!=subjs.size() ? the(csub, TermContainer.exceptToSet(subjs, common)) : False;
+                                    subject = commonSize != subjs.size() ? the(csub, TermContainer.exceptToSet(subjs, common)) : False;
                                     if (subjNeg)
                                         subject = neg(subject); //reapply negation
 
@@ -840,7 +848,7 @@ public abstract class TermBuilder {
                             Term a = subj(predicate);
 
                             if (commutive(dt)  /* if XTERNAL somehow happens here, just consider it as commutive? */) {
-                                int newDT = ((Compound)predicate).dt();
+                                int newDT = ((Compound) predicate).dt();
                                 subject = conj(dt, subject, a);
                                 predicate = pred(predicate);
                                 dt = newDT;
@@ -856,6 +864,7 @@ public abstract class TermBuilder {
                             throw new InvalidTermException(op, dt, "Invalid implication predicate", subject, predicate);
 
                         break;
+                    }
                 }
 
 
