@@ -67,8 +67,10 @@ public class CameraSensorView extends MatrixView implements MatrixView.ViewFunct
 
         //p /= maxConceptPriority;
 
-        bf *= 0.75f;
-        g.glColor4f(bf + dr * 0.25f, bf + dg * 0.25f, bf, 0.75f + 0.25f * p);
+        float dSum = dr + dg;
+        g.glColor4f(bf * 0.75f + dr * 0.25f,
+                  bf * 0.75f + dg * 0.25f,
+                bf - dSum * 0.5f, 0.5f + 0.5f * p);
 
         return ((b != null ? b.conf() : 0) + (d != null ? d.conf() : 0)) / 4f;
 

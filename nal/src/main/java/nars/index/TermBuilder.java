@@ -201,8 +201,8 @@ public abstract class TermBuilder {
     }
 
 
-    @NotNull
-    public Term productNormalize(@NotNull Term u) {
+    /** should only be applied to subterms, not the outer-most compound */
+    @NotNull public Term productNormalize(@NotNull Term u) {
         if (!(u instanceof Compound))
             return u;
 
@@ -434,7 +434,7 @@ public abstract class TermBuilder {
                 return False;
             }
 
-            args[i] = intern(x);
+            args[i] = intern(productNormalize(x));
         }
 
 //        if (Param.ARITHMETIC_INDUCTION)
@@ -456,7 +456,8 @@ public abstract class TermBuilder {
 
 
     @NotNull protected Term intern(@NotNull Term x) {
-        return productNormalize(x);
+        return x;
+        //return productNormalize(x);
     }
 
     @Nullable

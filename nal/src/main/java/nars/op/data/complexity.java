@@ -1,11 +1,9 @@
 package nars.op.data;
 
 import nars.$;
-import nars.index.term.TermIndex;
-import nars.term.Compound;
 import nars.term.Term;
 import nars.term.transform.Functor;
-import org.jetbrains.annotations.NotNull;
+import nars.term.var.Variable;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -19,6 +17,8 @@ public class complexity extends Functor.UnaryFunctor {
 
     @Override
     public @Nullable Term apply(Term x) {
-        return $.the(x.complexity());
+        if (!(x instanceof Variable))
+            return $.the(x.complexity());
+        return null;
     }
 }

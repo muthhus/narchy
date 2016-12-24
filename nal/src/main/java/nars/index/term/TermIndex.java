@@ -313,7 +313,10 @@ public abstract class TermIndex extends TermBuilder {
                                 new VariableNormalization(totalVars /* estimate */)
                 );
             } else {
-                result = intern((Term)src);
+                result =
+                        src.hasAll(Op.OpBits) ?
+                            transform(src, CompoundTransform.None) : //force subterm functor eval
+                            intern((Term)src);
             }
 
 
@@ -410,7 +413,7 @@ public abstract class TermIndex extends TermBuilder {
             //construct new compound with same op and dt
             return the(src.op(), src.dt(), tc);
         } else {
-            return src; //unmodified
+            return intern((Term)src); //unmodified
         }
     }
 
@@ -435,6 +438,10 @@ public abstract class TermIndex extends TermBuilder {
             } else {
                 y = null;
             }
+
+
+            if (y!=null)
+                y = intern(y);
 
             //if (x != y) { //must be refernce equality test for some variable normalization cases
             if (y!=null && !x.equals(y)) { //must be refernce equality test for some variable normalization cases

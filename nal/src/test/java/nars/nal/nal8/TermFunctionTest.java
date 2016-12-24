@@ -1,9 +1,11 @@
 package nars.nal.nal8;
 
 import nars.IO;
+import nars.Param;
 import nars.nar.Default;
 import nars.nar.Terminal;
 import nars.term.Term;
+import nars.test.TestNAR;
 import org.junit.Test;
 
 import static nars.$.$;
@@ -56,13 +58,16 @@ public class TermFunctionTest {
 
     @Test
     public void testFunctor1() {
-        Default d = new Default();
-        d.log();
-//        d.input("date(); :|:");
-//        d.run(16);
-        d.input("(now<->date()). :|:");
-        d.run(16);
+        Param.DEBUG = true;
+
+        TestNAR t = new TestNAR(new Default());
+        t.log();
+        t.believe("((complexity($1)<->3)==>c3($1))");
+        t.ask("c3(x:y)");
+        t.mustBelieve(16, "c3(x:y)", 1f, 0.9f);
+        t.run(true);
     }
+
 //    @Test
 //    public void testExecutionREsultIsCondition() {
 //        Default d = new Default();
@@ -95,4 +100,5 @@ public class TermFunctionTest {
         Term u = new Terminal().inputAndGet("jsonStringify((x,y,z)).").term();
         assertEquals("json(\"[\"x\",\"y\",\"z\"]\")", u.toString());
     }
+
 }

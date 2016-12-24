@@ -123,6 +123,7 @@ abstract public class NAgents extends NAgent {
 
         NAgents a = init.apply(nar);
         a.trace = true;
+
         chart(a);
 
         a.runRT(fps, endTime).join();
