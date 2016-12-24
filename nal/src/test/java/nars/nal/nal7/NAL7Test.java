@@ -905,8 +905,9 @@ public class NAL7Test extends AbstractNALTest {
                 .input("(x ==>+2 a). :|:")
                 .input("(y ==>+3 a). :|:")
                 .mustBelieve(cycles, "((y &&+1 x) ==>+2 a)", 1.00f, 0.81f, 0) //correct conj sub-term DT
-                .mustNotOutput(cycles, "((x && y) ==>+2 a)", '.', 0, ETERNAL)
-                .mustNotOutput(cycles, "((x && y) ==>+3 a)", '.', 0, ETERNAL);
+                .mustNotOutput(cycles, "((x &&+1 y) ==>+2 a)", '.')
+                .mustNotOutput(cycles, "((x && y) ==>+2 a)", '.')
+                .mustNotOutput(cycles, "((x && y) ==>+3 a)", '.');
     }
 
     @Test
@@ -916,6 +917,7 @@ public class NAL7Test extends AbstractNALTest {
                 .input("(a ==>+2 x). :|:")
                 .input("(a ==>+3 y). :|:")
                 .mustBelieve(cycles, "(a ==>+2 (x &&+1 y))", 1.00f, 0.81f, 0) //correct conj sub-term DT
+                .mustNotOutput(cycles, "(a ==>+2 (y &&+1 x))", '.', 0, ETERNAL)
                 .mustNotOutput(cycles, "(a ==>+2 (x && y))", '.', 0, ETERNAL)
                 .mustNotOutput(cycles, "(a ==>+3 (x && y))", '.', 0, ETERNAL);
     }

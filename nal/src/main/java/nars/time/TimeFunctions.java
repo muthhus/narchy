@@ -744,27 +744,50 @@ public interface TimeFunctions {
                 preSub = (Compound) preSub.unneg(); //unwrap
             }
 
-            Term newPresub = terms.the( preSub,
-                ((taskDT != DTERNAL) && (beliefDT != DTERNAL)) ? (taskDT - beliefDT) : DTERNAL
-            );
+            int preDT;
+            if ((taskDT != DTERNAL) && (taskDT!=XTERNAL) && (beliefDT != DTERNAL) && (beliefDT!=XTERNAL)) {
+                preDT = (taskDT - beliefDT);
+                if (!task.term(0).equals(preSub.term(0)))
+                    preDT = -preDT; //reverse the order
+            } else {
+                preDT = DTERNAL;
+            }
+
+            Term newPresub = p.index.the( preSub, preDT );
 
             if (!(newPresub instanceof Compound))
                 return null;
 
-            derived = (Compound) ($.terms.the(derived,
-                    new Term[] { $.negIf(newPresub, neg),
-                    derived.term(1) }) );
+            derived = (Compound) (p.index.the(derived,
+                    new Term[] { $.negIf(newPresub, neg), derived.term(1) })
+            );
         }
         if (post && derived.term(1) instanceof Compound) {
+
+            Compound postSub = (Compound) derived.term(1);
+            boolean neg = postSub.op()==NEG;
+            if (neg) {
+                postSub = (Compound) postSub.unneg(); //unwrap
+            }
+
+            int postDT;
+            if ((taskDT != DTERNAL) && (taskDT!=XTERNAL) && (beliefDT != DTERNAL) && (beliefDT!=XTERNAL)) {
+                postDT = (taskDT - beliefDT);
+                if (!task.term(1).equals(postSub.term(1)))
+                    postDT = -postDT; //reverse the order
+            } else {
+                postDT = DTERNAL;
+            }
+
+
             //set subterm 1's DT
-            Term newSubterm1 = $.terms.the((Compound) derived.term(1),
-                    ((taskDT != DTERNAL) && (beliefDT != DTERNAL)) ? (taskDT - beliefDT) : DTERNAL);
+            Term newSubterm1 = p.index.the((Compound) derived.term(1), postDT);
 
             if (isTrueOrFalse(newSubterm1))
                 return null;
 
 
-            Term newDerived = $.terms.the(derived, new Term[] { derived.term(0), newSubterm1} );
+            Term newDerived = p.index.the(derived, new Term[] { derived.term(0), $.negIf(newSubterm1,neg) } );
             if (!(newDerived instanceof Compound))
                 return null;
 

@@ -144,12 +144,14 @@ abstract public class NAgents extends NAgent {
     public static Alann newAlann(float dur) {
         Alann nar = new Alann(new RealTime.CS(true).dur( dur ), 3, 256, 3, 3, 2 );
 
-        MySTMClustered stm = new MySTMClustered(nar, 128, '.', 3, true, 6);
-        MySTMClustered stmGoal = new MySTMClustered(nar, 32, '!', 2, true, 4);
+        nar.termVolumeMax.set(48);
 
-        Abbreviation abbr = new Abbreviation(nar, "the",
-                4, 16,
-                0.05f, 32);
+        MySTMClustered stm = new MySTMClustered(nar, 128, '.', 3, false, 6);
+        MySTMClustered stmGoal = new MySTMClustered(nar, 32, '!', 2, false, 4);
+
+//        Abbreviation abbr = new Abbreviation(nar, "the",
+//                4, 16,
+//                0.05f, 32);
 
         new Inperience(nar, 0.05f);
 

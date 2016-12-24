@@ -819,7 +819,7 @@ public abstract class NAR extends Param implements Level, Consumer<Task>, NARIn,
     /**
      * Exits an iteration loop if running
      */
-    public final void stop() {
+    public void stop() {
         exe.stop();
     }
 

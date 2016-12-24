@@ -64,7 +64,7 @@ public class Alann extends NAR {
 
     public abstract class AlannAgent {
 
-        volatile boolean stopped = false;
+        public volatile boolean stopped = false;
 
         public abstract void next();
 
@@ -316,44 +316,51 @@ public class Alann extends NAR {
         ).collect(toList());
 
         runLater(() -> {
-            start(coreThreads);
+
+            if (running.compareAndSet(false, true)) {
+                List<List<AlannAgent>> ll = Lists.partition(Alann.this.cores, (int) Math.ceil(((float) cores) / coreThreads));
+                coreExe =
+                        //Executors.newCachedThreadPool();
+                        Executors.newFixedThreadPool(coreThreads);
+                for (List<AlannAgent> l : ll) {
+                    int s = l.size();
+                    if (s == 1) {
+                        coreExe.execute(l.get(0)::loop);
+                    } else {
+                        coreExe.execute(loop(l.toArray(new AlannAgent[s])));
+                    }
+
+                }
+
+            }
         });
 
     }
 
-
-    public synchronized void start(int threads) {
-
-
-        if (running.compareAndSet(false, true)) {
-            List<List<AlannAgent>> ll = Lists.partition(cores, (int) Math.ceil(((float) cores.size()) / threads));
-            coreExe =
-                    //Executors.newCachedThreadPool();
-                    Executors.newFixedThreadPool(threads);
-            for (List<AlannAgent> l : ll) {
-                int s = l.size();
-                if (s == 1) {
-                    coreExe.execute(l.get(0)::loop);
-                } else {
-                    coreExe.execute(loop(l.toArray(new AlannAgent[s])));
-                }
-
-            }
-
-        }
+    @Override
+    public void stop() {
+        for (AlannAgent a : cores)
+            a.stop();
+        coreExe.shutdownNow();
+        super.stop();
     }
 
     @NotNull Runnable loop(@NotNull AlannAgent[] group) {
         return () -> {
-            while (true) {
+            int n = group.length;
+            int stopped;
+            do {
+                stopped = 0;
                 for (AlannAgent g : group) {
                     try {
                         g.next();
                     } catch (Throwable t) {
                         logger.error("run: {}", t);
                     }
+                    if (g.stopped)
+                        stopped++;
                 }
-            }
+            } while (stopped < n);
         };
     }
 

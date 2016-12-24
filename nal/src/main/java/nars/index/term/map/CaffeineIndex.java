@@ -6,6 +6,7 @@ import com.github.benmanes.caffeine.cache.RemovalCause;
 import com.github.benmanes.caffeine.cache.RemovalListener;
 import nars.Param;
 import nars.concept.Concept;
+import nars.concept.PermanentConcept;
 import nars.concept.util.ConceptBuilder;
 import nars.term.Term;
 import nars.term.Termed;
@@ -17,7 +18,7 @@ import java.util.concurrent.Executor;
 import java.util.function.Consumer;
 
 
-public class CaffeineIndex extends MaplikeTermIndex implements RemovalListener {
+public class CaffeineIndex extends MaplikeTermIndex implements RemovalListener<Term,Termed> {
 
 
 //    @NotNull
@@ -168,9 +169,14 @@ public class CaffeineIndex extends MaplikeTermIndex implements RemovalListener {
     }
 
     /** this will be called from within a worker task */
-    @Override public final void onRemoval(Object key, Object value, @NotNull RemovalCause cause) {
+    @Override public final void onRemoval(Term key, Termed value, @NotNull RemovalCause cause) {
         if (value instanceof Concept) {
-            delete(((Concept) value), nar);
+            if (value instanceof PermanentConcept) {
+                //refuse deletion
+                set(key, value);
+            } else {
+                delete(((Concept) value), nar);
+            }
         }
     }
 

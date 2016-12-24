@@ -11,7 +11,7 @@ import nars.remote.NAgents;
 public class Arkancide extends NAgents {
 
     public static void main(String[] args) {
-        Param.DEBUG = true;
+        Param.DEBUG = false;
 
         //runRT(Arkancide::new);
         //nRT(Arkancide::new, 25, 5);

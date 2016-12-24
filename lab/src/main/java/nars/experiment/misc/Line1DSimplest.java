@@ -6,12 +6,14 @@ import nars.NAR;
 import nars.NAgent;
 import nars.Param;
 import nars.concept.ActionConcept;
+import nars.concept.Concept;
 import nars.nar.Alann;
 import nars.remote.NAgents;
 import nars.time.FrameTime;
 
 import static jcog.Texts.n2;
 import static jcog.Util.unitize;
+import static nars.Op.IMPL;
 
 
 /**
@@ -153,7 +155,7 @@ public class Line1DSimplest extends NAgent {
 
         //l.epsilonProbability.setValue( 0f );
 
-        NAgents.chart(l);
+        //NAgents.chart(l);
 
         //nar.log();
 
@@ -195,13 +197,20 @@ public class Line1DSimplest extends NAgent {
         //l.runRT(25, 15000).join();
 
 
-        l.runRT(5f);
+        l.runRT(25f, 100).join();
+        nar.stop();
 
-//
 //        NAR.printActiveTasks(nar, true);
 //        NAR.printActiveTasks(nar, false);
 
-        l.actions.forEach(a -> a.print());
+        //l.actions.forEach(a -> a.print());
+
+        nar.concepts.forEach(x -> {
+            if (x.op()==IMPL) {
+                Concept c = (Concept)x;
+                System.out.println(c.toString());
+            }
+        });
 //
 //        l.predictors.forEach(p->{
 //           nar.concept(p).print();

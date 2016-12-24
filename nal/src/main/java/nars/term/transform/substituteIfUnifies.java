@@ -86,7 +86,7 @@ abstract public class substituteIfUnifies extends Functor {
     @Nullable
     abstract protected Op unifying();
 
-    @Nullable
+    @NotNull
     @Override
     //public Term function(@NotNull Compound p, @NotNull PremiseEval r) {
     public Term apply(@NotNull Term[] a) {
@@ -99,7 +99,12 @@ abstract public class substituteIfUnifies extends Functor {
         Term x = a[1];
         Term y = a[2];
 
-        return unify(term, x, y);
+        Term z = unify(term, x, y);
+        if (z != null) {
+            return z;
+        } else {
+            return False;
+        }
     }
 
     public @Nullable Term unify(@NotNull Term term, @NotNull Term x, @NotNull Term y) {

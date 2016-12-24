@@ -655,6 +655,18 @@ public class TermReductionsTest {
         assertInvalid("((--,(x)) ==> ((--,(y)) && (--,(x))))");
     }
 
+    @Test public void testImplInImplDTernal() {
+        assertEquals(
+                "(((--,(in))&&(happy))==>(out))",
+                $("((--,(in)) ==> ((happy)  ==> (out)))").toString());
+    }
+    @Test public void testImplInImplDTemporal() {
+        assertEquals(
+                "(((--,(in)) &&+1 (happy)) ==>+2 (out))",
+                $("((--,(in)) ==>+1 ((happy) ==>+2 (out)))").toString());
+    }
+
+
     @Test
     public void testConjunctiveCoNegationAcrossImpl() {
         //((--,(&&,(--,(pad_top)),(pad_bottom),(pad_top))) ==>+133 (--,(pad_bottom)))! :4355: %.73;.24%

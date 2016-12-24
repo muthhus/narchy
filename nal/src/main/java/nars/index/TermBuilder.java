@@ -45,7 +45,7 @@ public abstract class TermBuilder {
     private static final int InvalidEquivalenceTerm = or(IMPL, EQUI);
 
     private static final int InvalidImplicationSubject = or(EQUI, IMPL);
-    private static final int InvalidImplicationPredicate = or(EQUI);
+    private static final int InvalidImplicationPredicate = or(EQUI, IMPL);
 
 
     @NotNull
@@ -812,7 +812,7 @@ public abstract class TermBuilder {
                             return predicate; //special case for implications: reduce to predicate if the subject is True
                         if (isFalse(subject))
                             return False; //return neg(predicate); ??
-                        if (isTrue(predicate)||isFalse(predicate))
+                        if (isTrueOrFalse(predicate))
                             return False;
 
                         if (predicate.op() == NEG) {
@@ -821,7 +821,6 @@ public abstract class TermBuilder {
                         }
 
                         //filter (factor out) any common subterms iff commutive
-
                         boolean subjNeg = sop == NEG;
                         Term usub = subject.unneg();
                         if ((usub.op() == CONJ) && (predicate.op() == CONJ)) {
@@ -852,17 +851,18 @@ public abstract class TermBuilder {
                             }
                         }
 
-                        // (C ==> (A ==> B))   <<==>>  ((&&,A,C) ==> B)
+                        // (C ==>+- (A ==>+- B))   <<==>>  ((C &&+- A) ==>+- B)
                         if (predicate.op() == IMPL) {
                             Term a = subj(predicate);
 
-                            if (commutive(dt)  /* if XTERNAL somehow happens here, just consider it as commutive? */) {
-                                int newDT = ((Compound) predicate).dt();
-                                subject = conj(dt, subject, a);
-                                predicate = pred(predicate);
-                                dt = newDT;
-                                continue;
-                            }
+                            int newDT = ((Compound) predicate).dt();
+                            if (dt == XTERNAL) //HACK XTERNAL handling, corrected later in Temporal calculations
+                                dt = DTERNAL;
+
+                            subject = conj(dt, subject, a);
+                            predicate = pred(predicate);
+                            dt = newDT;
+                            continue;
 
                         }
 
