@@ -86,7 +86,7 @@ abstract public class substituteIfUnifies extends Functor {
     @Nullable
     abstract protected Op unifying();
 
-    @NotNull
+    @Nullable
     @Override
     //public Term function(@NotNull Compound p, @NotNull PremiseEval r) {
     public Term apply(@NotNull Term[] a) {
@@ -102,21 +102,21 @@ abstract public class substituteIfUnifies extends Functor {
         return unify(term, x, y);
     }
 
-    public @NotNull Term unify(@NotNull Term term, @NotNull Term x, @NotNull Term y) {
+    public @Nullable Term unify(@NotNull Term term, @NotNull Term x, @NotNull Term y) {
 
         if (forwardOnly()) {
             if (!(term instanceof Compound))
-                return False;
+                return null;
             int dt = ((Compound)term).dt();
             if (!(dt == DTERNAL || dt == 0 || term.subtermTime( x ) == 0))
-                return False;
+                return null;
         }
 
         @Nullable Op op = unifying();
         boolean hasAnyOp = op == null || (x.hasAny(op) && term.hasAny(op));
 
         if (!hasAnyOp && mustSubstitute()) {
-            return False; //FAILED
+            return null; //FAILED
         }
 
         boolean equals = equal(x, y, false /* different dt */, true /* same polarity */);
@@ -150,9 +150,9 @@ abstract public class substituteIfUnifies extends Functor {
             SubUnify m = new SubUnify(parent, op);
 
             Term newTerm = m.tryMatch(parent, term, x, y);
-            return newTerm != null ? newTerm : False;
+            return newTerm != null ? newTerm : null;
         } else {
-            return equals ? term : False;
+            return equals ? term : null;
         }
     }
 

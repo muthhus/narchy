@@ -32,10 +32,10 @@ public class Builtin  {
             new similaritree(),
             new complexity(),
             Functor.f2("equal", (x,y) -> {
-                if ((x instanceof Variable) ^ (y instanceof Variable))
-                    return null; //dont compare a variable to non-variable
-                return x.equals(y) ? True : False;
-            }),
+                return x.equals(y) ? True :
+                        ((x instanceof Variable) || (y instanceof Variable)) ? null :
+                                False; //dont compare a variable to non-variable
+            })
     };
 
     /**

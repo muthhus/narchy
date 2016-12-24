@@ -49,7 +49,7 @@ public final class SubUnify extends Unify {
             }
         }
 
-        return (result == null || result == False) && --retries > 0;
+        return (result == null) && --retries > 0;
 
     }
 

@@ -75,9 +75,8 @@ public class TermFunctionTest {
         Param.DEBUG = true;
 
         TestNAR t = new TestNAR(new Default(1024,64,2,2));
-        //t.log();
+        t.log();
         t.believe("(equal(complexity($1),$2) <=> c($1,$2))");
-        //t.input("(1<->2). %0.0;0.9%");
         t.ask("c(x, 1)");
         t.ask("c(x, 2)");
         t.ask("c((y), 1)");

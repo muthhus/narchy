@@ -24,10 +24,10 @@ public class PrologCoreTest {
         n.input("(--, c:d).");
         n.next();
 
-        assertTrue(p.isTrue("'-->'(b,a)."));
-        assertFalse(p.isTrue("'-->'(a,b)."));
-        assertTrue(p.isTrue("'not'('-->'(d,c))."));
-        assertFalse(p.isTrue("'-->'(d,c)."));
+        assertTrue(p.isTrue("b('-->'(b,a), 1)."));
+        assertFalse(p.isTrue("b('-->'(a,b), 1)."));
+        assertTrue(p.isTrue("b('-->'(d,c), 0)."));
+        assertFalse(p.isTrue("b('-->'(d,c), 1)."));
 
     }
 
@@ -78,7 +78,7 @@ public class PrologCoreTest {
         n.input("(&&,a,b,c).");
         n.next();
 
-        assertTrue(p.isTrue("'&&'(a,b,c)."));
+        assertTrue(p.isTrue("b('&&'(a,b,c),1)."));
         //assertTrue(p.isTrue("','(a,','(b,c))."));
     }
     @Test

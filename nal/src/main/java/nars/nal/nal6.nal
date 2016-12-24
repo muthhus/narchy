@@ -97,6 +97,7 @@
     Z, (X==>Y), task("?"), time(dtBeliefExact) |- subIfUnifiesAny((X ==>+- Y), X, Z), (Belief:BeliefStructuralAbduction, Punctuation:Belief)
 
     Z, (X<=>Y), task("?"), time(dtBeliefExact) |- subIfUnifiesAny((X <=>+- Y), Y, Z), (Belief:BeliefStructuralAnalogy, Punctuation:Belief)
+    //Z, (X<=>Y), task("?"), time(dtBeliefExact) |- subIfUnifiesAny(X, Y, Z), ()
 
     //originally these were only valid if A occurrs during or after C. the opposite is not logical and would also produce redundant results
     B, (C && A), task(positive), time(decomposeBelief), neqCom(B,C), notImplEqui(C) |- subIfUnifiesAny(C,A,B), (Goal:Strong)
@@ -123,9 +124,10 @@
         //S, (||,(--,%S),A..+)                        |- (||,A..+), (Belief:DecomposePositivePositivePositive)
 
 
-//conditional abduction
-    ((&&,M,X,A..*) ==> C), (Y ==> C) |- subIfUnifiesAny(M,X,Y), (Belief:Abduction)
-    ((&&,M,A..+) ==> C), ((&&,A..+) ==> C) |- M, (Belief:Abduction)
+//conditional abduction TODO this needs to be 'dt' sensitive
+    ((&&,M,X,A..*) ==> C), (Y ==> C), time(decomposeTask) |- subIfUnifiesAny(M,X,Y), (Belief:Abduction)
+    ((&&,M,A..+) ==> C), ((&&,A..+) ==> C), time(decomposeTask) |- M, (Belief:Abduction)
+
         //TODO modify ellipsis to allow these two rules to be expressed as one:
         // ((&&,M,A..+) ==> C), (A..+ ==> C) |- M, (Belief:Abduction)
         //  which will match A..+ to a Conjunction

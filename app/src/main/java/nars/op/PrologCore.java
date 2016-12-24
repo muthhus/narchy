@@ -156,7 +156,7 @@ public class PrologCore extends Agent implements Consumer<Task> {
 
             }
 
-            Struct next = tterm(pterm(t.term()), _truth);
+            Struct next = tterm("b", pterm(t.term()), _truth);
 
             Solution s = solve( assertion(next) );
             if (s.isSuccess())
@@ -346,8 +346,8 @@ public class PrologCore extends Agent implements Consumer<Task> {
         return p;
     }
 
-    public static Struct tterm(final alice.tuprolog.Term nalTerm, boolean isTrue) {
-        return new Struct("t", nalTerm, isTrue ? ONE : ZERO );
+    public static Struct tterm(String punc, final alice.tuprolog.Term nalTerm, boolean isTrue) {
+        return new Struct(punc, nalTerm, isTrue ? ONE : ZERO );
     }
 
     //NARS term -> Prolog term

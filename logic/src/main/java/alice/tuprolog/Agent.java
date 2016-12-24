@@ -20,6 +20,8 @@ package alice.tuprolog;
 import alice.tuprolog.event.OutputListener;
 
 import java.io.InputStream;
+import java.util.Collections;
+import java.util.Iterator;
 
 /**
  * Provides a prolog virtual machine embedded in a separate thread.
@@ -49,11 +51,15 @@ public class Agent extends Prolog {
         theoryText=theory;
         addOutputListener(defaultOutputListener);
     }
-    
+
+    public Agent(String theory){
+        this(theory, (String)null);
+    }
+
     /**
      * Builds a prolog agent providing it a theory and a goal
      */
-    public Agent(String theory,String goal){
+    @Deprecated public Agent(String theory,String goal){
 
         theoryText=theory;
         goalText=goal;
@@ -101,7 +107,45 @@ public class Agent extends Prolog {
         this.goalText = goal;
         return run();
     }
-    
+    public Iterator<Term> iterate(String goal) {
+
+
+        try {
+
+            return new Iterator<Term>() {
+
+                Solution s = run(goal);
+
+                public Term next = s.getSolution();
+
+                @Override
+                public boolean hasNext() {
+
+                    return next!=null;
+                }
+
+                @Override
+                public Term next() {
+                    Term next = this.next;
+
+                    try {
+                        if (hasOpenAlternatives()) {
+                            this.next = solveNext().getSolution();
+                        } else {
+                            this.next = null;
+                        }
+                    } catch ( NoMoreSolutionException | NoSolutionException e) {
+                        this.next = null;
+                    }
+                    return next;
+                }
+            };
+        } catch (Exception e) {
+            return Collections.emptyIterator();
+        }
+    }
+
+
 //    /**
 //     * Adds a listener to ouput events
 //     *
