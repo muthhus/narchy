@@ -69,6 +69,7 @@ public class TermFunctionTest {
         t.mustBelieve(16, "c3(x:y)", 1f, 0.81f);
         t.run(true);
     }
+
     @Test
     public void testFunctor2() {
         Param.DEBUG = true;

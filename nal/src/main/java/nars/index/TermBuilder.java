@@ -9,6 +9,7 @@ import nars.term.Terms;
 import nars.term.atom.Atomic;
 import nars.term.atom.AtomicSingleton;
 import nars.term.compound.GenericCompound;
+import nars.term.compound.Statement;
 import nars.term.container.TermContainer;
 import nars.term.container.TermVector;
 import nars.term.transform.Functor;
@@ -798,13 +799,13 @@ public abstract class TermBuilder {
 
                     case IMPL: {
 
-                        if (isTrue(subject)) {
-                            //special case for implications: reduce to the predicate if the subject is True
-                            return predicate;
-                        }
-                        if (isFalse(subject)) {
-                            return neg(predicate);
-                        }
+                        //special case for implications: reduce to --predicate if the subject is False
+                        if (isTrue(subject))
+                            return predicate; //special case for implications: reduce to predicate if the subject is True
+                        if (isFalse(subject))
+                            return False; //return neg(predicate); ??
+                        if (isTrue(predicate)||isFalse(predicate))
+                            return False;
 
                         if (predicate.op() == NEG) {
                             //negated predicate gets unwrapped to outside
