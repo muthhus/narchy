@@ -138,10 +138,4 @@ public class PatternTermIndex extends MapTermIndex {
     }
 
 
-
-    @Override
-    protected final boolean transformImmediates() {
-        return false;
-    }
-
 }

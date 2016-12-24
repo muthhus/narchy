@@ -1095,10 +1095,6 @@ public enum $ {
             return null;
         }
 
-        @Override
-        protected boolean transformImmediates() {
-            return false;
-        }
     }
 
 

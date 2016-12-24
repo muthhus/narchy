@@ -196,6 +196,11 @@ public abstract class TermBuilder {
 //    }
 
 
+    protected Term eval(@NotNull Compound subject, @NotNull Functor predicate) {
+        return predicate.apply(subject.terms());
+    }
+
+
     @NotNull
     public Term productNormalize(@NotNull Term u) {
         if (!(u instanceof Compound))
@@ -451,11 +456,7 @@ public abstract class TermBuilder {
 
 
     @NotNull protected Term intern(@NotNull Term x) {
-        if (x instanceof Compound) {
-            return productNormalize((Compound)x);
-        } else {
-            return x; //atomic
-        }
+        return productNormalize(x);
     }
 
     @Nullable
@@ -761,13 +762,11 @@ public abstract class TermBuilder {
                 switch (op) {
 
                     case INH:
-
-                        if (predicate instanceof Functor && transformImmediates() && sop == PROD) {
-                            Term y = ((Functor) predicate).apply(((Compound) subject).terms());
-                            if (y == null) {
-                                break; //null return value means just keep the original input term
+                        if (predicate instanceof Functor && sop == PROD) {
+                            Term y = eval((Compound)subject, (Functor)predicate);
+                            if (y != null) {
+                                return y;
                             }
-                            return y;
                         }
                         break;
 
@@ -795,7 +794,7 @@ public abstract class TermBuilder {
                         break;
                     }
 
-                    case IMPL: {
+                    case IMPL:
 
 
                         if (predicate.op() == NEG) {
@@ -856,7 +855,6 @@ public abstract class TermBuilder {
                             throw new InvalidTermException(op, dt, "Invalid implication predicate", subject, predicate);
 
                         break;
-                    }
                 }
 
 
@@ -927,7 +925,7 @@ public abstract class TermBuilder {
                     boolean sn = subject.op() == NEG;
                     boolean pn = predicate.op() == NEG;
 
-                    if ((!(sn ^ pn)) && (subject.compareTo(predicate) > 0)) {
+                    if ((sn == pn) && (subject.compareTo(predicate) > 0)) {
                         Term x = predicate;
                         predicate = subject;
                         subject = x;
@@ -945,12 +943,12 @@ public abstract class TermBuilder {
         }
     }
 
-    /**
-     * whether to apply immediate transforms during compound building
-     */
-    protected boolean transformImmediates() {
-        return true;
-    }
+//    /**
+//     * whether to apply immediate transforms during compound building
+//     */
+//    protected boolean transformImmediates() {
+//        return true;
+//    }
 
 
 //    @Nullable

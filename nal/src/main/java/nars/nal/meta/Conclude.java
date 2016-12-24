@@ -107,7 +107,9 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
             try {
                 //TODO make a variation of transform which can terminate early if exceeds a minimum budget threshold
                 //  which is already determined bythe constructed term's growing complexity) in m.budget()
+
                 Term r = m.index.transform(this.conclusionPattern, m);
+
                 if (r instanceof Compound) {
 
                     Derivation.TruthPuncEvidence ct = m.punct.get();

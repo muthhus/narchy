@@ -329,7 +329,7 @@ public abstract class TermIndex extends TermBuilder {
     }
 
     @Override
-    protected Term intern(Term x) {
+    public Term intern(@NotNull Term x) {
         Term y = super.intern(x);
         if (y instanceof Atom /** or non-temporal, non-negation compound */) {
             Termed yExist = get(y);
@@ -339,11 +339,27 @@ public abstract class TermIndex extends TermBuilder {
         } else if (y instanceof Compound) {
             Compound ccy = (Compound)y;
             //compute any subterm functors:
-            if (ccy.hasAll(Op.OpBits))
-                return the(ccy.op(), ccy.dt(), ccy.terms());
+            if (ccy.op()==INH && ccy.isTerm(0, PROD) && ccy.isTerm(1, ATOM)) {
+                return eval(ccy);
+            }
         }
         return y;
     }
+
+    protected Term eval(Compound ccy) {
+        Term subject = ccy.term(0);
+        Termed predicate = get(ccy.term(1));
+        if (predicate instanceof Functor) {
+            Term dy = eval((Compound) subject, (Functor) predicate);
+            if (dy == null || dy == ccy) {
+                //null return value means just keep the original input term
+                return ccy;
+            }
+            return intern(dy);
+        }
+        return ccy;
+    }
+
 
     @Nullable
     public final Term normalize(@NotNull Compound src) {
@@ -592,15 +608,15 @@ public abstract class TermIndex extends TermBuilder {
             value.delete(nar);
     }
 
-    @Override
-    protected @NotNull Term statement(@NotNull Op op, int dt, @NotNull Term subject, @NotNull Term predicate) {
-        if ( op == INH && predicate instanceof Atom && !(predicate instanceof Concept) && transformImmediates() ) {
-            //resolve atomic statement predicates in inheritance, for inline term rewriting
-            Termed existingPredicate = get(predicate);
-            if (existingPredicate!=null)
-                predicate = existingPredicate.term();
-        }
-
-        return super.statement(op, dt, subject, predicate);
-    }
+//    @Override
+//    protected @NotNull Term statement(@NotNull Op op, int dt, @NotNull Term subject, @NotNull Term predicate) {
+//        if ( op == INH && predicate instanceof Atom && !(predicate instanceof Concept) && transformImmediates() ) {
+//            //resolve atomic statement predicates in inheritance, for inline term rewriting
+//            Termed existingPredicate = get(predicate);
+//            if (existingPredicate!=null)
+//                predicate = existingPredicate.term();
+//        }
+//
+//        return super.statement(op, dt, subject, predicate);
+//    }
 }

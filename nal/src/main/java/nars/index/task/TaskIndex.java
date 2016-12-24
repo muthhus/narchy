@@ -36,18 +36,20 @@ abstract public class TaskIndex {
         }
     }
 
-    abstract public void forEach(Consumer<Task> each);
+    abstract public void forEach(@NotNull Consumer<Task> each);
 
-    public void change(List<Task> toAdd, List<Task> toRemove) {
-        remove(toRemove);
-        addIfAbsent(toAdd);
+    public void change(@Nullable List<Task> toAdd, @Nullable List<Task> toRemove) {
+        if (toRemove!=null)
+            remove(toRemove);
+        if (toAdd!=null)
+            addIfAbsent(toAdd);
     }
 
-    public void addIfAbsent(List<Task> toAdd) {
+    public void addIfAbsent(@NotNull List<Task> toAdd) {
         for (int i = 0, toAddSize = toAdd.size(); i < toAddSize; i++) {
             addIfAbsent(toAdd.get(i));
         }
     }
 
-    abstract public boolean contains(Task t);
+    abstract public boolean contains(@NotNull Task t);
 }
