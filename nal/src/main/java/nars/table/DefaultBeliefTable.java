@@ -20,17 +20,8 @@ import static nars.time.Tense.ETERNAL;
  */
 public class DefaultBeliefTable implements BeliefTable {
 
-    @NotNull
-    public final EternalTable eternal;
-    @NotNull
-    public final TemporalBeliefTable temporal;
-
-    public DefaultBeliefTable(EternalTable eternal, TemporalBeliefTable temporal) {
-
-        /* Ranking by originality is a metric used to conserve original information in balance with confidence */
-        this.eternal = eternal;
-        this.temporal = temporal;
-    }
+    @Nullable public EternalTable eternal = EternalTable.EMPTY;
+    @Nullable public TemporalBeliefTable temporal = TemporalBeliefTable.EMPTY;
 
 
     /**
@@ -101,51 +92,6 @@ public class DefaultBeliefTable implements BeliefTable {
         eternal.capacity(eternals, nar);
     }
 
-//    @Override
-//    public void range(long[] t) {
-//        temporal.range(t);
-//    }
-
-    //    @Override
-//    public void remove(@NotNull Task belief, List<Task> displ) {
-//        ((belief.isEternal()) ? eternal : temporal).remove(belief, displ);
-//    }
-
-//    /**
-//     * calculates the max confidence of a belief within the given frequency range
-//     */
-//    public float confMax(float minFreq, float maxFreq) {
-//        float max = 0;
-//
-//        //HACK eternal top task may not hold the highest confidence (since rank involves originality) however we'll use that value here
-//        Task eternalMax = eternalTop();
-//        if (eternalMax != null) {
-//            float f = eternalMax.freq();
-//            if ((f >= minFreq) && (f <= maxFreq)) {
-//                max = eternalMax.conf();
-//            }
-//        }
-//
-//        List<Task> temporals = ((MicrosphereTemporalBeliefTable) temporal).list;
-//        for (int i = 0, temporalsSize = temporals.size(); i < temporalsSize; i++) {
-//            Task t = temporals.get(i);
-//            if (t != null) {
-//                float f = t.freq();
-//                if ((f >= minFreq) && (f <= maxFreq)) {
-//                    float c = t.conf();
-//                    if (c > max)
-//                        max = c;
-//                }
-//            }
-//        }
-//
-//
-//        return max;
-//    }
-
-
-
-
     /**
      * get the most relevant belief/goal with respect to a specific time.
      */
@@ -182,54 +128,32 @@ public class DefaultBeliefTable implements BeliefTable {
 
     @Override
     public TruthDelta add(@NotNull Task input, @NotNull QuestionTable questions, @NotNull CompoundConcept<?> concept, @NotNull NAR nar) {
-        return input.isEternal() ?  eternal.add(input, concept, nar) : temporal.add(input, eternal, concept, nar);
+        if (input.isEternal()) {
+
+            synchronized(concept) {
+                if (eternal == EternalTable.EMPTY) {
+                    int cap = concept.state().beliefCap(concept, input.isBelief(), true);
+                    if (cap > 0)
+                        eternal = concept.newEternalTable(cap); //allocate
+                    else
+                        return null;
+                }
+            }
+
+            return eternal.add(input, concept, nar);
+        } else {
+            synchronized (concept) {
+                if (temporal == TemporalBeliefTable.EMPTY) {
+                    int cap = concept.state().beliefCap(concept, input.isBelief(), false);
+                    if (cap > 0)
+                        temporal = concept.newTemporalTable(cap); //allocate
+                    else
+                        return null;
+                }
+            }
+            return temporal.add(input, eternal, concept, nar);
+        }
     }
-
-//    @NotNull
-//    private EternalTable nonEmptyEternal(@NotNull CompoundConcept<?> concept, @NotNull Task input) {
-//        if (eternal == EternalTable.EMPTY) {
-//            eternal = new EternalTable(concept.policy().beliefCap(concept, input.isBelief(), true));
-//        }
-//        return eternal;
-//    }
-
-
-//    private void eternalizeForgottenTemporals(@NotNull List<Task> displaced, @NotNull NAR nar, float factor) {
-//        float confMin = nar.confMin.floatValue();
-//
-//        @NotNull EternalTable eternal = this.eternal;
-//
-//        float minRank = eternal.isFull() ? eternal.rank(eternal.weakest()) : 0;
-//
-//        int displacedSize = displaced.size();
-//
-//        //should use indexed list access because adding eternal might add new eternal tasks at the end (which should not be processed here
-//        for (int i = 0; i < displacedSize; i++) {
-//            Task d = displaced.get(i);
-//
-//            assert (d.occurrence() != ETERNAL);
-//
-//            if (!d.isDeleted()) {
-//                float eConf = TruthFunctions.eternalize(d.conf()) * factor;
-//                if (eConf > confMin) {
-//                    if (eternal.rank(eConf, d.evidence().length) > minRank) {
-//
-//                        Task ee = new EternalizedTask(
-//                                d.term(), d.punc(),
-//                                $.t(d.freq(), eConf)
-//                        )
-//                                .time(nar.time(), ETERNAL)
-//                                .evidence(d)
-//                                .budget(Budget.Zero)
-//                                .log("Eternalized");
-//
-//                        nar.inputLater(ee);
-//                    }
-//
-//                }
-//            }
-//        }
-//    }
 
 
 }

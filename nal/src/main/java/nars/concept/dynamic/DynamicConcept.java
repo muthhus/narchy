@@ -17,11 +17,11 @@ public class DynamicConcept extends CompoundConcept {
         this.nar = nar;
         this.beliefs =
                 beliefModel!=null ?
-                        new DynamicBeliefTable(this, beliefModel, true, 1, 1, nar) :
+                        new DynamicBeliefTable(this, beliefModel, true) :
                         super.newBeliefTable(nar, true);
         this.goals =
                 goalModel != null ?
-                        new DynamicBeliefTable(this, goalModel, false, 1, 1, nar) :
+                        new DynamicBeliefTable(this, goalModel, false) :
                         super.newBeliefTable(nar, false);
     }
 

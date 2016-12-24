@@ -30,9 +30,8 @@ public class DynamicBeliefTable extends DefaultBeliefTable {
     static final boolean rejectDerivations = false;
 
 
-    public DynamicBeliefTable(DynamicConcept dynamicConcept, DynamicTruthModel model, boolean beliefOrGoal, int eCap, int tCap, NAR nar) {
-
-        super(dynamicConcept.newEternalTable(eCap), dynamicConcept.newTemporalTable(tCap));
+    public DynamicBeliefTable(DynamicConcept dynamicConcept, DynamicTruthModel model, boolean beliefOrGoal) {
+        super();
         this.dynamicConcept = dynamicConcept;
         this.model = model;
         this.beliefOrGoal = beliefOrGoal;

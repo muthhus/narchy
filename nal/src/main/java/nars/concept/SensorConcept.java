@@ -50,7 +50,7 @@ public class SensorConcept extends WiredConcept implements FloatFunction<Term>, 
         this.sensor = new ScalarSignal(n, this, this, truth, this);
 
         this.signal = signal;
-        this.beliefs = new SensorBeliefTable(this, newEternalTable(0),  newTemporalTable(1 /* N/A */));
+        this.beliefs = new SensorBeliefTable(this);
 
         pri(() -> n.priorityDefault(BELIEF));
     }

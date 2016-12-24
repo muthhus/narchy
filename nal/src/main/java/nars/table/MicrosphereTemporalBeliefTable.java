@@ -20,7 +20,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Iterator;
 import java.util.List;
-import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 /**
@@ -218,24 +217,6 @@ public class MicrosphereTemporalBeliefTable extends MultiRWFasterList<Task> impl
 
         if (copy!=null)
             copy.forEach(t -> nar.tasks.remove(t));
-    }
-
-    public boolean removeIf(Predicate<Task> o, @NotNull NAR nar) {
-        List<Task> trash = $.newArrayList(0);
-        boolean r = removeIf(((Predicate<Task>) t -> {
-            if (o.test(t)) {
-                trash.add(t);
-                return true;
-            }
-            return false;
-        }));
-
-        if (r) {
-            nar.tasks.remove(trash);
-            return true;
-        }
-
-        return false;
     }
 
 

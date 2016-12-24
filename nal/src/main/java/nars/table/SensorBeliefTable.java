@@ -20,8 +20,8 @@ public class SensorBeliefTable extends DefaultBeliefTable  {
     private static final Logger logger = LoggerFactory.getLogger(SensorBeliefTable.class);
     private final SensorConcept sensorConcept;
 
-    public SensorBeliefTable(SensorConcept sensorConcept, EternalTable eternal, TemporalBeliefTable temporal) {
-        super(eternal, temporal);
+    public SensorBeliefTable(SensorConcept sensorConcept) {
+        super();
         this.sensorConcept = sensorConcept;
     }
 
