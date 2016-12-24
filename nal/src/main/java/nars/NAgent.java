@@ -121,7 +121,7 @@ abstract public class NAgent implements NSense, NAction {
      */
     public final int frameRate;
 
-    protected long now;
+    protected long prev, now;
 
 
 
@@ -150,6 +150,8 @@ abstract public class NAgent implements NSense, NAction {
         sensorPriority = new FloatParam(alpha);
         actionPriority = new FloatParam(gamma);
         rewardPriority = new FloatParam(gamma);
+
+        this.prev = nar.time();
 
         this.actionBoost = gamma;
 
@@ -245,6 +247,9 @@ abstract public class NAgent implements NSense, NAction {
 
     protected void frame() {
 
+        prev = now;
+        now = nar.time();
+
         int phase = (actionFrame++) % (frameRate);
         if (phase == 0) {
             ticks(0); //freeze clock
@@ -265,7 +270,8 @@ abstract public class NAgent implements NSense, NAction {
 
     private void doFrame() {
         //System.out.println(nar.conceptPriority(reward) + " " + nar.conceptPriority(dRewardSensor));
-        now = nar.time();
+
+
 
         float r = rewardValue = act();
         if (r == r) {
@@ -499,6 +505,7 @@ abstract public class NAgent implements NSense, NAction {
             @Override
             public void next() {
 
+                prev = now;
                 now = nar.time();
 
                 if (stopTime > 0 && now > stopTime)
@@ -510,27 +517,6 @@ abstract public class NAgent implements NSense, NAction {
 
             }
         };
-
-//        new Thread(()->{
-//
-//            while (true) {
-//
-//                doFrame();
-//
-//                now = nar.time();
-//
-//                nar.run(1);
-//
-//                now = nar.time();
-//
-//                if (fps < 500) {
-//                    try {
-//                        Thread.sleep((long) (1000f / fps));
-//                    } catch (InterruptedException e) {
-//                    }
-//                }
-//            }
-//        }).start();
 
     }
 
@@ -615,6 +601,7 @@ abstract public class NAgent implements NSense, NAction {
         nar.runLater(actions, ActionConcept::run, 1);
     }
 
+
     protected void predict() {
 
         float pri =
@@ -624,8 +611,9 @@ abstract public class NAgent implements NSense, NAction {
 
 
         if (pri > 0) {
+            long frameTime = now-prev;
             for (int i = 0, predictorsSize = predictors.size(); i < predictorsSize; i++) {
-                predictors.set(i, boost(predictors.get(i), pri));
+                predictors.set(i, boost(predictors.get(i), pri, frameTime));
             }
         }
 
@@ -678,7 +666,7 @@ abstract public class NAgent implements NSense, NAction {
     }
 
 
-    private MutableTask boost(@NotNull MutableTask t, float p) {
+    private MutableTask boost(@NotNull MutableTask t, float p, long frameTime) {
 
         if (nar.random.nextFloat() > predictorProbability/ predictors.size())
             return t;
@@ -688,7 +676,7 @@ abstract public class NAgent implements NSense, NAction {
         if (t.occurrence() != ETERNAL) {
             s = (t instanceof PredictionTask) ? new PredictionTask(t.term(), pp) : new MutableTask(t.term(), pp, t.truth());
             s.budgetByTruth(p, nar)
-                .time(now, now + (t.occurrence() - t.creation()))
+                .time(now, now + frameTime)
                 .log("Agent Predictor");
 
             //s.evidence(t)

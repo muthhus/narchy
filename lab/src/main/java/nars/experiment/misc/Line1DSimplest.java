@@ -197,7 +197,7 @@ public class Line1DSimplest extends NAgent {
         //l.runRT(25, 15000).join();
 
 
-        l.runRT(25f, 100).join();
+        l.runRT(25f, 1000).join();
         nar.stop();
 
 //        NAR.printActiveTasks(nar, true);
@@ -205,12 +205,12 @@ public class Line1DSimplest extends NAgent {
 
         //l.actions.forEach(a -> a.print());
 
-        nar.concepts.forEach(x -> {
-            if (x.op()==IMPL) {
-                Concept c = (Concept)x;
-                System.out.println(c.toString());
-            }
-        });
+//        nar.concepts.forEach(x -> {
+//            if (x.op()==IMPL) {
+//                Concept c = (Concept)x;
+//                System.out.println(c.toString());
+//            }
+//        });
 //
 //        l.predictors.forEach(p->{
 //           nar.concept(p).print();
