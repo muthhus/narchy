@@ -142,7 +142,7 @@ abstract public class NAgents extends NAgent {
     }
 
     public static Alann newAlann(float dur) {
-        Alann nar = new Alann(new RealTime.CS(true).dur( dur ), 6, 256, 3, 3, 2 );
+        Alann nar = new Alann(new RealTime.CS(true).dur( dur ), 3, 256, 3, 3, 2 );
 
         MySTMClustered stm = new MySTMClustered(nar, 128, '.', 3, true, 6);
         MySTMClustered stmGoal = new MySTMClustered(nar, 32, '!', 2, true, 4);

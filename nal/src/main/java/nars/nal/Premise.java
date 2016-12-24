@@ -90,7 +90,7 @@ public final class Premise extends RawBudget implements Tasked {
      * patham9 especially try to understand the "temporal temporal" case
      * patham9 its using the result of higher confidence
      */
-    public static Premise tryPremise(@NotNull Concept c, @NotNull Task task, Term beliefTerm, long now, @NotNull NAR nar) {
+    public static Premise tryPremise(@NotNull Concept c, @NotNull final Task task, Term beliefTerm, long now, @NotNull NAR nar) {
 
         //if (Param.PREMISE_LOG)
         //logger.info("try: { concept:\"{}\",\ttask:\"{}\",\tbeliefTerm:\"{}\" }", c, task, beliefTerm);
@@ -98,7 +98,7 @@ public final class Premise extends RawBudget implements Tasked {
 //        if (Terms.equalSubTermsInRespectToImageAndProduct(task.term(), term))
 //            return null;
 
-        Budget taskBudget = task.budget().clone();
+        final Budget taskBudget = task.budget().clone();
         if (taskBudget == null)
             return null;
 
@@ -134,11 +134,9 @@ public final class Premise extends RawBudget implements Tasked {
                         boolean exists = nar.tasks.contains(answered);
                         if (!exists) {
                             //transfer budget from question to answer
-                            BudgetFunctions.transferPri(task.budget(), answered.budget(),
+                            BudgetFunctions.transferPri(taskBudget, answered.budget(),
                                 answered.conf() * (1f - taskBudget.qua()) //proportion of the taskBudget which the answer receives as a boost
                             );
-
-                            taskBudget = task.budget().clone();
 
                             boolean processed = nar.input(answered) != null;
                         }

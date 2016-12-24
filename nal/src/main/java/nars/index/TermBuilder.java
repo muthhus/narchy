@@ -395,11 +395,11 @@ public abstract class TermBuilder {
     }
 
 
-    private static boolean isTrue(@NotNull Term x) {
+    protected static boolean isTrue(@NotNull Term x) {
         return x == True;
     }
 
-    private static boolean isFalse(@NotNull Term x) {
+    protected static boolean isFalse(@NotNull Term x) {
         return x == False;
     }
 
@@ -426,11 +426,12 @@ public abstract class TermBuilder {
             Term x = args[i];
 
             if (isTrueOrFalse(x)) {
-                if ((op == NEG) || (op == CONJ) || (op == IMPL) || (op == EQUI))
-                    throw new RuntimeException("appearance of True/False in " + op + " should have been filtered prior to this");
+                /*if ((op == NEG) || (op == CONJ) || (op == IMPL) || (op == EQUI) || (op == INH) || (op == SIM))*/
+                //if (op!=PROD)
+                throw new RuntimeException("appearance of True/False in " + op + " should have been filtered prior to this");
 
                 //any other term causes it to be invalid/meaningless
-                return False;
+                //return False;
             }
 
             args[i] = intern(productNormalize(x));
@@ -557,6 +558,9 @@ public abstract class TermBuilder {
         if (dt == XTERNAL) {
             if (n != 2)
                 throw new InvalidTermException(CONJ, XTERNAL, "XTERNAL only applies to 2 subterms, as dt placeholder", u);
+
+            if (u[0].equals(u[1]))
+                return u[0];
 
             //preserve grouping (don't flatten) but use normal commutive ordering as dternal &&
             return finish(CONJ, XTERNAL, u);
@@ -757,7 +761,15 @@ public abstract class TermBuilder {
 
                 switch (op) {
 
+                    case SIM:
+                        if (isTrue(subject) || isFalse(subject) || isTrue(predicate) || isFalse(predicate))
+                            return False;
+                        break;
+
                     case INH:
+                        if (isTrue(subject) || isFalse(subject) || isTrue(predicate) || isFalse(predicate))
+                            return False;
+
                         if (predicate instanceof Functor && sop == PROD) {
                             Term y = eval((Compound)subject, (Functor)predicate);
                             if (y != null) {

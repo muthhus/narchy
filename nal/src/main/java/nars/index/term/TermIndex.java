@@ -1,7 +1,7 @@
 package nars.index.term;
 
-import jcog.map.nbhm.HijacKache;
 import nars.*;
+import nars.Op;
 import nars.concept.Concept;
 import nars.concept.util.ConceptBuilder;
 import nars.concept.util.InvalidConceptException;
@@ -13,7 +13,7 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.Terms;
-import nars.term.atom.Atom;
+import nars.term.atom.Atomic;
 import nars.term.compound.ProtoCompound;
 import nars.term.container.TermContainer;
 import nars.term.subst.MapSubst;
@@ -22,6 +22,7 @@ import nars.term.transform.CompoundTransform;
 import nars.term.transform.Functor;
 import nars.term.transform.VariableNormalization;
 import nars.term.util.InvalidTermException;
+import nars.term.var.Variable;
 import org.eclipse.collections.api.list.primitive.ByteList;
 import org.eclipse.collections.impl.factory.Maps;
 import org.jetbrains.annotations.NotNull;
@@ -35,9 +36,7 @@ import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import static nars.Op.ATOM;
-import static nars.Op.INH;
-import static nars.Op.PROD;
+import static nars.Op.*;
 import static nars.term.Term.False;
 import static nars.term.Termed.termOrNull;
 
@@ -180,7 +179,10 @@ public abstract class TermIndex extends TermBuilder {
 
         boolean changed = false;
         Compound crc = (Compound) src;
+        Op cop = crc.op();
 
+        //early prefilter for True/False subterms
+        boolean filterTrueFalse = !(cop.statement || cop==CONJ);
 
         //use COMPOUND_VOLUME_MAX instead of trying for the nar's to provide construction head-room that can allow terms
         //to reduce and potentially meet the requirement
@@ -195,6 +197,13 @@ public abstract class TermIndex extends TermBuilder {
 
                 ((EllipsisMatch) u).expand(op, sub);
                 subAt = sub.size();
+
+                for (; volAt < subAt; volAt++) {
+                    Term st = sub.get(volAt);
+                    if (filterTrueFalse && isTrueOrFalse(st)) return null;
+                    volSum += st.volume();  if (volSum >= volLimit) { return null; } //HARD VOLUME LIMIT REACHED
+                }
+
                 changed = true;
 
             } else {
@@ -203,21 +212,23 @@ public abstract class TermIndex extends TermBuilder {
 
                     if (strict) { return null; }
 
-                    sub.add(t); //keep value
+                    u = t; //keep value
 
                 } else {
-                    sub.add(u);
                     changed |= (u != t);
                 }
+
+                if (filterTrueFalse && isTrueOrFalse(u))
+                    return null;
+                volSum += u.volume();  if (volSum >= volLimit) { return null; } //HARD VOLUME LIMIT REACHED
+
+                sub.add(u);
 
                 subAt++;
 
             }
 
-            for (; volAt < subAt; volAt++) {
-                volSum+=sub.get(volAt).volume();
-                if (volSum > volLimit) { return null; } //HARD VOLUME LIMIT REACHED
-            }
+
         }
 
         Term transformed;
@@ -225,7 +236,7 @@ public abstract class TermIndex extends TermBuilder {
         if (!changed || (ss==len && crc.equalTerms(sub)))
             transformed = crc;
         else {
-            transformed = the(crc.op(), crc.dt(), sub.toArray(new Term[ss]));
+            transformed = the(cop, crc.dt(), sub.toArray(new Term[ss]));
         }
 
 //        //cache the result
@@ -333,34 +344,44 @@ public abstract class TermIndex extends TermBuilder {
 
     @Override
     public Term intern(@NotNull Term x) {
-        Term y = super.intern(x);
-        if (y instanceof Atom /** or non-temporal, non-negation compound */) {
-            Termed yExist = get(y);
+        if (x instanceof Variable) {
+            //nothing
+        } else if (x instanceof Atomic /** or non-temporal, non-negation compound */) {
+            if (isTrue(x) || isFalse(x))
+                return x;
+
+            Termed yExist = get(x);
             if (yExist!=null)
-                return (Term)yExist; //assumes the AtomConcept returned is the Term itself, as .term() would return
-                //return yExist.term();
-        } else if (y instanceof Compound) {
-            Compound ccy = (Compound)y;
+                x = (Term)yExist; //assumes the AtomConcept returned is the Term itself, as .term() would return
+        } else if (x instanceof Compound) {
+            Compound cx = (Compound)x;
             //compute any subterm functors:
-            if (ccy.op()==INH && ccy.isTerm(0, PROD) && ccy.isTerm(1, ATOM)) {
-                return eval(ccy);
+            Op op = cx.op();
+            if (op == INH) {
+                x = eval(cx);
+            } else if (op != NEG){
+                Termed y = get(x);
+                if (y != null)
+                    x = y.term();
             }
         }
-        return y;
+        return x;
     }
 
-    protected Term eval(Compound ccy) {
-        Term subject = ccy.term(0);
-        Termed predicate = get(ccy.term(1));
+    protected Term eval(Compound inhCompound) {
+        Termed predicate = get(inhCompound.term(1));
         if (predicate instanceof Functor) {
-            Term dy = eval((Compound) subject, (Functor) predicate);
-            if (dy == null || dy == ccy) {
-                //null return value means just keep the original input term
-                return ccy;
+            Term subject = inhCompound.term(0);
+            if (subject.op() == PROD) {
+                Term dy = eval((Compound) subject, (Functor) predicate);
+                if (dy == null || dy == inhCompound) {
+                    //null return value means just keep the original input term
+                    return inhCompound;
+                }
+                return intern(dy); //recurse
             }
-            return intern(dy);
         }
-        return ccy;
+        return inhCompound;
     }
 
 
