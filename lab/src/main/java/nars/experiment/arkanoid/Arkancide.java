@@ -11,12 +11,12 @@ import nars.remote.NAgents;
 public class Arkancide extends NAgents {
 
     public static void main(String[] args) {
-        Param.DEBUG = false;
+        Param.DEBUG = true;
 
         //runRT(Arkancide::new);
         //nRT(Arkancide::new, 25, 5);
 
-        NAR nar = runRT(Arkancide::new, 40, 20, -1);
+        NAR nar = runRT(Arkancide::new, 30, 10, -1);
 
         //nar.beliefConfidence(0.75f);
         //nar.goalConfidence(0.75f);

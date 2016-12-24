@@ -12,7 +12,6 @@ import nars.nar.core.ConceptBagCycle;
 import nars.nar.exe.Executioner;
 import nars.nar.exe.SynchronousExecutor;
 import nars.nar.util.DefaultConceptBuilder;
-
 import nars.op.time.STMTemporalLinkage;
 import nars.term.Termed;
 import nars.time.FrameTime;

@@ -2,11 +2,8 @@ package nars.op.data;
 
 import jcog.Texts;
 import nars.$;
-import nars.index.term.TermIndex;
-import nars.term.Compound;
 import nars.term.Term;
 import nars.term.transform.Functor;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**

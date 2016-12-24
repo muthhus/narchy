@@ -1,8 +1,11 @@
 package nars.index.term.map;
 
-import com.github.benmanes.caffeine.cache.*;
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.RemovalCause;
+import com.github.benmanes.caffeine.cache.RemovalListener;
+import nars.Param;
 import nars.concept.Concept;
-import nars.concept.PermanentConcept;
 import nars.concept.util.ConceptBuilder;
 import nars.term.Term;
 import nars.term.Termed;
@@ -24,7 +27,7 @@ public class CaffeineIndex extends MaplikeTermIndex implements RemovalListener {
 
 
     /** holds compounds and subterm vectors */
-    @NotNull public final Cache<Term, Termed> cache;
+    @NotNull public final Cache<Term, Termed> concepts;
 
     @Nullable
     private final Cache<TermContainer,TermContainer> subterms;
@@ -33,41 +36,37 @@ public class CaffeineIndex extends MaplikeTermIndex implements RemovalListener {
 //    private final Cache<TermContainer, TermContainer> subs;
 
 
-    private static final Weigher<Term, Termed> weigher = (k, v) -> {
+//    private static final Weigher<Term, Termed> weigher = (k, v) -> {
+//
+//        if (v instanceof PermanentConcept) {
+//            return 0; //special concept implementation: dont allow removal
+//        }
+//
+//        //        float beliefCost = (v instanceof CompoundConcept) ?
+////                    (1f - maxConfidence((CompoundConcept)v)) : //discount factor for belief/goal confidence
+////                    0;
+//
+//        //return v.complexity();
+//        return v.volume();
+//
+//        //return Math.round( 1f + 100 * c * beliefCost);
+//        //return Math.round( 1f + 10 * (c*c) * (0.5f + 0.5f * beliefCost));
+//    };
 
-        if (v instanceof PermanentConcept) {
-            return 0; //special concept implementation: dont allow removal
-        }
 
-        //        float beliefCost = (v instanceof CompoundConcept) ?
-//                    (1f - maxConfidence((CompoundConcept)v)) : //discount factor for belief/goal confidence
-//                    0;
-
-        //return v.complexity();
-        return v.volume();
-
-        //return Math.round( 1f + 100 * c * beliefCost);
-        //return Math.round( 1f + 10 * (c*c) * (0.5f + 0.5f * beliefCost));
-    };
-
-    public CaffeineIndex(@NotNull ConceptBuilder conceptBuilder, int capacity, int avgVolume, boolean soft, @Nullable Executor exe) {
-        this(conceptBuilder, capacity * avgVolume, soft, exe, 0);
+    /** use the soft/weak option with CAUTION you may experience unexpected data loss and other weird symptoms */
+    public CaffeineIndex(@NotNull ConceptBuilder conceptBuilder, long capacity, boolean soft, @Nullable Executor exe) {
+        this(conceptBuilder, capacity, soft, exe, 0);
     }
 
     /** use the soft/weak option with CAUTION you may experience unexpected data loss and other weird symptoms */
-    public CaffeineIndex(@NotNull ConceptBuilder conceptBuilder, long maxWeight, boolean soft, @Nullable Executor exe) {
-        this(conceptBuilder, maxWeight, soft, exe, 0);
-    }
-
-    /** use the soft/weak option with CAUTION you may experience unexpected data loss and other weird symptoms */
-    public CaffeineIndex(@NotNull ConceptBuilder conceptBuilder, long maxWeight, boolean soft, @Nullable Executor exe, int maxSubterms) {
+    public CaffeineIndex(@NotNull ConceptBuilder conceptBuilder, long capacity, boolean soft, @Nullable Executor exe, int maxSubterms) {
         super(conceptBuilder);
 
 
         //long maxSubtermWeight = maxWeight * 3; //estimate considering re-use of subterms in compounds and also caching of non-compound subterms
 
-        Caffeine<Term, Termed> builder = Caffeine.newBuilder()
-                .removalListener(this);
+        Caffeine<Term, Termed> builder = Caffeine.newBuilder().removalListener(this);
         if (exe!=null)
                 builder.executor(exe);
 
@@ -75,13 +74,17 @@ public class CaffeineIndex extends MaplikeTermIndex implements RemovalListener {
             builder.softValues();
 //                //.weakValues() //.softValues()
         } else {
-           builder.weigher(weigher)
-                .maximumWeight(maxWeight);
+           //builder.weigher(weigher)
+                //.maximumWeight(capacity);
         }
 
-        //.recordStats()
+        if (capacity > 0)
+            builder.maximumSize(capacity);
 
-        cache = builder.build();
+        if (Param.DEBUG)
+            builder.recordStats();
+
+        concepts = builder.build();
 
 
         if (maxSubterms > 0)
@@ -100,38 +103,38 @@ public class CaffeineIndex extends MaplikeTermIndex implements RemovalListener {
 
     @Override
     public void remove(@NotNull Term x) {
-        cache.invalidate(x);
+        concepts.invalidate(x);
     }
 
 
     @Override
     public void set(@NotNull Term src, @NotNull Termed target) {
-        cache.asMap().merge(src, target, setOrReplaceNonPermanent);
+        concepts.asMap().merge(src, target, setOrReplaceNonPermanent);
     }
 
 
     @Override
     public void clear() {
-        cache.invalidateAll();
+        concepts.invalidateAll();
     }
 
     @Override
     public void forEach(@NotNull Consumer<? super Termed> c) {
-        cache.asMap().values().forEach(c::accept);
+        concepts.asMap().values().forEach(c::accept);
     }
 
     @Override
     public int size() {
-        return (int)cache.estimatedSize();
+        return (int) concepts.estimatedSize();
     }
 
 
     @Override
     public Termed get(Term key, boolean createIfMissing) {
         if (createIfMissing) {
-            return cache.get(key, conceptBuilder);
+            return concepts.get(key, conceptBuilder);
         } else {
-            return cache.getIfPresent(key);
+            return concepts.getIfPresent(key);
         }
     }
 
@@ -153,7 +156,12 @@ public class CaffeineIndex extends MaplikeTermIndex implements RemovalListener {
     @Override
     public @NotNull String summary() {
         //CacheStats s = cache.stats();
-        return cache.estimatedSize() + " concepts, " + (subterms!=null ? (subterms.estimatedSize() + " subterms") : "");
+        String s = concepts.estimatedSize() + " concepts, " + (subterms!=null ? (subterms.estimatedSize() + " subterms") : "");
+
+        if (Param.DEBUG)
+            s += " " + concepts.stats().toString();
+
+        return s;
         //(" + n2(s.hitRate()) + " hitrate, " +
                 //s.requestCount() + " reqs)";
 

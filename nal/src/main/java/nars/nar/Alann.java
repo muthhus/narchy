@@ -290,7 +290,7 @@ public class Alann extends NAR {
         super(time,
 
                 //new TreeTermIndex.L1TreeIndex(new DefaultConceptBuilder(), 512 * 1024, 1024 * 32, 3),
-                new CaffeineIndex(new DefaultConceptBuilder(), 256*1024, 16, false, ForkJoinPool.commonPool()),
+                new CaffeineIndex(new DefaultConceptBuilder(), 128*1024, false, ForkJoinPool.commonPool()),
 
                 new XorShift128PlusRandom(1), Param.defaultSelf(),
                 auxThreads == 1 ? new SynchronousExecutor() :

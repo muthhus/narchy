@@ -5,18 +5,15 @@ import jcog.spatial.Rect2D;
 import jcog.spatial.SpatialSearch;
 import nars.$;
 import nars.NAR;
-import nars.nal.nal8.Operator;
 import nars.nar.Default;
 import nars.term.Term;
 import nars.term.atom.Atom;
 import nars.term.obj.IntTerm;
-import nars.term.transform.Functor;
 import org.junit.Test;
 
 import static nars.Symbols.COMMAND;
 import static nars.Symbols.GOAL;
 import static nars.nal.nal8.Operator.args;
-import static nars.term.Term.False;
 
 /**
  * Created by me on 12/21/16.

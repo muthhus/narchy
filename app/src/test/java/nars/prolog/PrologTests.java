@@ -1,7 +1,6 @@
 package nars.prolog;
 
 import alice.tuprolog.*;
-import org.apache.commons.collections4.IteratorUtils;
 import org.junit.Test;
 
 import java.util.List;

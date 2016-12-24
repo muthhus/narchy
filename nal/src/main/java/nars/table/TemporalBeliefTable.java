@@ -10,7 +10,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
 import java.util.Iterator;
-import java.util.function.Predicate;
 
 /**
  * Created by me on 5/7/16.

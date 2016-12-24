@@ -11,8 +11,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Random;
 
-import static nars.term.Term.False;
-
 /**
  * Less powerful one-match only unification
  */

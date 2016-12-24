@@ -17,6 +17,8 @@ import com.jogamp.opengl.GLProfile;
 import com.jogamp.opengl.util.texture.Texture;
 import com.jogamp.opengl.util.texture.TextureIO;
 import jcog.Util;
+import jcog.spatial.RTree;
+import jcog.spatial.Rect1D;
 import nars.$;
 import nars.bag.impl.ArrayBag;
 import nars.budget.merge.BudgetMerge;
@@ -27,8 +29,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spacegraph.SpaceGraph;
 import spacegraph.Surface;
-import jcog.spatial.RTree;
-import jcog.spatial.Rect1D;
 import spacegraph.render.Draw;
 import spacegraph.video.WebCam;
 

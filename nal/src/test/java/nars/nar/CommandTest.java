@@ -1,18 +1,7 @@
 package nars.nar;
 
-import nars.NAR;
-import nars.Symbols;
-import nars.Task;
-import nars.concept.Concept;
-import nars.concept.OperationConcept;
-import org.jetbrains.annotations.NotNull;
 import org.junit.Ignore;
 import org.junit.Test;
-
-import java.util.concurrent.atomic.AtomicBoolean;
-
-import static junit.framework.TestCase.assertEquals;
-import static org.junit.Assert.*;
 
 
 @Ignore

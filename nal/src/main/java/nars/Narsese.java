@@ -21,7 +21,6 @@ import nars.nal.nal8.Operator;
 import nars.task.MutableTask;
 import nars.term.Compound;
 import nars.term.Term;
-import nars.term.Termed;
 import nars.term.Terms;
 import nars.term.var.GenericVariable;
 import nars.term.var.Variable;

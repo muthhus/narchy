@@ -1,10 +1,7 @@
 package nars.index.term.tree;
 
-import ch.qos.logback.core.encoder.ByteArrayUtil;
 import io.airlift.compress.lz4.Lz4Compressor;
-import io.airlift.compress.lz4.Lz4Decompressor;
 import io.airlift.compress.lz4.Lz4RawCompressor;
-import jcog.Util;
 import jcog.data.byt.DynByteSeq;
 import nars.IO;
 import nars.Op;
