@@ -161,7 +161,7 @@ public class MultiRWFasterList<T> extends AbstractMultiReaderMutableCollection<T
         // For Externalizable use only
     }
 
-    private MultiRWFasterList(MutableList<T> newDelegate) {
+    protected MultiRWFasterList(MutableList<T> newDelegate) {
         this(newDelegate, new ReentrantReadWriteLock());
     }
 

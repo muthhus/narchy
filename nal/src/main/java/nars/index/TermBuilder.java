@@ -204,13 +204,13 @@ public abstract class TermBuilder {
 
     /** should only be applied to subterms, not the outer-most compound */
     @NotNull public Term productNormalize(@NotNull Term u) {
-        if (!(u instanceof Compound))
+        if (!(u instanceof Compound && u.hasAny(Op.IMGbits)))
             return u;
 
         Term t = u.unneg();
         boolean neg = (t != u);
 
-        if (t.hasAny(Op.IMGbits) && (t.op() == INH) && (t.varPattern() == 0)) {
+        if ((t.op() == INH) && (t.varPattern() == 0)) {
             Compound ct = (Compound) t;
             Term s = (ct.term(0));
             Op so = s.op();
@@ -226,8 +226,6 @@ public abstract class TermBuilder {
                 return u; //original value
             }
 
-            if (t == null)
-                return False;
         }
 
         return !neg ? t : neg(t);

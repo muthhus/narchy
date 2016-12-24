@@ -45,7 +45,7 @@ public class Tetris extends NAgents {
 
     public static final int tetris_width = 6;
     public static final int tetris_height = 12;
-    public static final int TIME_PER_FALL = 6;
+    public static final int TIME_PER_FALL = 8;
     public static final int PIXEL_RADIX = 2;
 
     private static SensorConcept[][] concept;
@@ -557,7 +557,7 @@ public class Tetris extends NAgents {
             t.trace = true;
 
 
-            t.runRT(30f, 10000).join();
+            t.runRT(20f, 10000).join();
 
 //        NARController meta = new NARController(nar, loop, t);
 //

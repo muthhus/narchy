@@ -10,6 +10,7 @@ import nars.concept.Concept;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
+import org.eclipse.collections.api.block.procedure.primitive.ObjectFloatProcedure;
 import org.eclipse.collections.api.tuple.primitive.ObjectFloatPair;
 import org.eclipse.collections.impl.map.mutable.primitive.ObjectFloatHashMap;
 import org.jetbrains.annotations.NotNull;
@@ -20,13 +21,14 @@ import java.util.List;
 /**
  * activation from a point source to its subterm components (termlink templates)
  */
-public class SpreadingActivation extends Activation {
+public class SpreadingActivation extends Activation implements ObjectFloatProcedure<Term> {
 
     private final int termlinkDepth;
 
     @NotNull public final Budgeted in;
 
     public final ObjectFloatHashMap<Term> spread;
+    final List<ObjectFloatPair<Concept>> conceptActivation;
 
     final static float parentRetention = 0.5f;
 
@@ -46,42 +48,39 @@ public class SpreadingActivation extends Activation {
         this.termlinkDepth = termlinkDepth;  //should be larger then TASKLINK_DEPTH_LIMIT because this resolves the Concept used for it in linkSubterms
 
         Term srcTerm = src.term();
+
         spread = new ObjectFloatHashMap<>(srcTerm.volume());
 
         link(srcTerm, scale, 0);
 
-        //PriorityAccumulator<Concept> conceptActivation = nar.accumulator();
+        conceptActivation = $.newArrayList(spread.size());
 
-        //System.out.println(in + ":");
-
-
-        List<ObjectFloatPair<Concept>> conceptActivation = $.newArrayList(spread.size());
-
-        spread.forEachKeyValue((k, v) -> {
-            //System.out.println("\t" + k + " " + v);
-
-            Termed kk = nar.concept(k, true);
-            if (kk != null) {
-                Concept ckk = (Concept) kk;
-
-                tasklink(ckk, v);
-
-                float conceptActivationRate = 1f;
-                conceptActivation.add(new LightObjectFloatPair<>(ckk, v * conceptActivationRate));
-
-            } else {
-                kk = k;
-            }
-
-            termBidi(kk, v, v);
-
-        });
-
-        nar.activate(conceptActivation, null);
+        spread.forEachKeyValue(this);
 
         nar.emotion.stress(linkOverflow);
+
+        nar.activate(conceptActivation, null);
     }
 
+    @Override
+    public void value(Term k, float v) {
+        //System.out.println("\t" + k + " " + v);
+
+        Termed kk = nar.concept(k, true);
+        if (kk != null) {
+            Concept ckk = (Concept) kk;
+
+            tasklink(ckk, v);
+
+            float conceptActivationRate = 1f;
+            conceptActivation.add(new LightObjectFloatPair(ckk, v * conceptActivationRate));
+
+        } else {
+            kk = k;
+        }
+
+        termBidi(kk, v, v);
+    }
 
     @Nullable
     void link(@NotNull Term targetTerm, float scale, int depth) {
@@ -118,9 +117,9 @@ public class SpreadingActivation extends Activation {
         if (tlForward > 0)
             termlink(origin, tgtTerm, tlForward);
 
-        if (tgt instanceof Concept) {
+        if (tlReverse > 0 && (tgt instanceof Concept)) {
             Term originTerm = origin.term();
-            if (tlReverse > 0 && !originTerm.equals(tgtTerm)) {
+            if (!originTerm.equals(tgtTerm)) {
                 termlink((Concept) tgt, originTerm, tlReverse);
             }
         }
@@ -135,6 +134,7 @@ public class SpreadingActivation extends Activation {
     void termlink(Concept from, Term to, float scale) {
         from.termlinks().put(to, in, scale, linkOverflow);
     }
+
 
 }
 

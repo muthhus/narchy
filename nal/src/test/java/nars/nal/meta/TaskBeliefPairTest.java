@@ -1,6 +1,8 @@
 package nars.nal.meta;
 
+import nars.$;
 import nars.Narsese;
+import nars.term.Compound;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -17,7 +19,7 @@ public class TaskBeliefPairTest {
 
         String a = "<x --> #1>";
         String b = "<y --> #1>";
-        TaskBeliefPair p = new TaskBeliefPair(
+        Compound p = $.p(
             parse.term(a),
             parse.term(b)
         );

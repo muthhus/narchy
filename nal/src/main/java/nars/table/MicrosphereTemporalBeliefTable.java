@@ -1,6 +1,7 @@
 package nars.table;
 
 import jcog.Util;
+import jcog.list.FasterList;
 import jcog.list.MultiRWFasterList;
 import nars.$;
 import nars.NAR;
@@ -25,15 +26,12 @@ import java.util.function.Predicate;
 /**
  * stores the items unsorted; revection manages their ranking and removal
  */
-public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
+public class MicrosphereTemporalBeliefTable extends MultiRWFasterList<Task> implements TemporalBeliefTable {
 
     private volatile int capacity;
-    final MultiRWFasterList<Task> list;
-
 
     public MicrosphereTemporalBeliefTable(int initialCapacity) {
-        super();
-        this.list = MultiRWFasterList.newList(initialCapacity);
+        super(new FasterList<Task>(initialCapacity));
         this.capacity = initialCapacity;
     }
 
@@ -44,10 +42,6 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
         //return list.iterator();
     }
 
-    @Override
-    public final void forEach(Consumer<? super Task> action) {
-        list.forEach(action);
-    }
 
     public void capacity(int newCapacity, NAR nar) {
 
@@ -56,7 +50,7 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
             this.capacity = newCapacity;
 
             //compress until under-capacity
-            List<Task>[] changes = list.ifNotEmptyWriteWith((l) -> {
+            List<Task>[] changes = ifNotEmptyWriteWith((l) -> {
 
                 int toRemove = l.size() - newCapacity;
                 if (toRemove <= 0) {
@@ -116,10 +110,6 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
     }
 
 
-    @Override
-    public final int size() {
-        return list.size();
-    }
 
     @Override
     public final boolean isEmpty() {
@@ -146,7 +136,7 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
         Task[] merged = new Task[1];
         List<Task> trash = $.newArrayList();
 
-        list.withWriteLockAndDelegate(l -> {
+        withWriteLockAndDelegate(l -> {
             final Truth before;
 
 
@@ -219,7 +209,7 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
     @Override
     public void clear(NAR nar) {
 
-        List<Task> copy = list.ifNotEmptyWriteWith(l->{
+        List<Task> copy = ifNotEmptyWriteWith(l->{
             List<Task> cc = $.newArrayList(l.size());
             cc.addAll(l);
             l.clear();
@@ -232,7 +222,7 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
 
     public boolean removeIf(Predicate<Task> o, @NotNull NAR nar) {
         List<Task> trash = $.newArrayList(0);
-        boolean r = list.removeIf(((Predicate<Task>) t -> {
+        boolean r = removeIf(((Predicate<Task>) t -> {
             if (o.test(t)) {
                 trash.add(t);
                 return true;
@@ -432,7 +422,7 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
     @Nullable
     @Override
     public final Task match(long when, @Deprecated long now, @Nullable Task against) {
-        return list.ifNotEmptyReadWith(l->{
+        return ifNotEmptyReadWith(l->{
             switch (l.size()) {
 //                case 0:
 //                    throw new RuntimeException("should not reach here");
@@ -453,7 +443,7 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
 
         Task topEternal = eternal!=null ? eternal.match() : null;
 
-        Truth r = list.ifNotEmptyReadWith(l->{
+        Truth r = ifNotEmptyReadWith(l->{
             return TruthPolation.truth(topEternal, when, l);
         });
 
