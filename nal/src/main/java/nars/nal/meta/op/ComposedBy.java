@@ -1,7 +1,7 @@
 package nars.nal.meta.op;
 
 import nars.nal.meta.AtomicBoolCondition;
-import nars.nal.meta.Derivation;
+import nars.nal.Derivation;
 import nars.term.Compound;
 import nars.term.Term;
 import org.jetbrains.annotations.NotNull;

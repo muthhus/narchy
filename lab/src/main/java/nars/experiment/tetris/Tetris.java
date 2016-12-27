@@ -14,7 +14,7 @@ import nars.term.Compound;
 import nars.term.atom.Atomic;
 import nars.time.FrameTime;
 import nars.truth.Truth;
-import nars.util.TaskStatistics;
+import nars.util.task.TaskStatistics;
 import nars.video.LogIndex;
 import org.jetbrains.annotations.NotNull;
 import spacegraph.SimpleSpatial;

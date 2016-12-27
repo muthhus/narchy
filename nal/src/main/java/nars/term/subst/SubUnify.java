@@ -4,7 +4,7 @@ import nars.$;
 import nars.Op;
 import nars.Param;
 import nars.index.term.TermIndex;
-import nars.nal.meta.Derivation;
+import nars.nal.Derivation;
 import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

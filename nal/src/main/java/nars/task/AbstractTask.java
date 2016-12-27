@@ -6,7 +6,7 @@ import nars.*;
 import nars.budget.RawBudget;
 import nars.budget.util.BudgetFunctions;
 import nars.concept.util.InvalidConceptException;
-import nars.task.util.InvalidTaskException;
+import nars.util.task.InvalidTaskException;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;

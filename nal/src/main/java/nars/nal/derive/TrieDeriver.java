@@ -5,6 +5,7 @@ import jcog.Util;
 import jcog.trie.TrieNode;
 import nars.$;
 import nars.Op;
+import nars.nal.Derivation;
 import nars.nal.Deriver;
 import nars.nal.meta.*;
 import nars.nal.meta.op.AbstractPatternOp.PatternOp;
@@ -12,6 +13,7 @@ import nars.nal.meta.op.MatchTermPrototype;
 import nars.nal.rule.PremiseRule;
 import nars.nal.rule.PremiseRuleSet;
 import nars.term.Term;
+import nars.util.TermTrie;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

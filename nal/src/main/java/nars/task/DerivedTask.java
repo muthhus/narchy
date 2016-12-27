@@ -6,7 +6,7 @@ import nars.Param;
 import nars.Task;
 import nars.concept.Concept;
 import nars.nal.Premise;
-import nars.nal.meta.Derivation;
+import nars.nal.Derivation;
 import nars.term.Compound;
 import nars.term.Termed;
 import nars.truth.Truth;

@@ -1,5 +1,6 @@
 package nars.nal.meta;
 
+import nars.nal.Derivation;
 import nars.term.Term;
 import nars.term.compound.GenericCompound;
 import nars.term.container.TermContainer;

@@ -1,5 +1,6 @@
 package nars.nal.meta;
 
+import nars.nal.Derivation;
 import nars.term.Term;
 
 /**

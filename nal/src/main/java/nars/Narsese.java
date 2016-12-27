@@ -17,7 +17,7 @@ import jcog.Texts;
 import nars.index.TermBuilder;
 import nars.index.term.TermIndex;
 import nars.nal.meta.match.Ellipsis;
-import nars.nal.nal8.Operator;
+import nars.nal.Operator;
 import nars.task.MutableTask;
 import nars.term.Compound;
 import nars.term.Term;

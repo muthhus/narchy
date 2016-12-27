@@ -2,7 +2,7 @@ package nars.nal.meta.op;
 
 import nars.Symbols;
 import nars.nal.meta.AtomicBoolCondition;
-import nars.nal.meta.Derivation;
+import nars.nal.Derivation;
 import org.jetbrains.annotations.NotNull;
 
 /**

@@ -10,15 +10,16 @@ import nars.Task;
 import nars.bag.Bag;
 import nars.bag.impl.CurveBag;
 import nars.budget.Budget;
+import nars.reason.DefaultPremiseBuilder;
 import nars.budget.merge.BudgetMerge;
 import nars.concept.Concept;
 import nars.index.term.map.CaffeineIndex;
 import nars.link.BLink;
 import nars.nal.Deriver;
-import nars.nar.exe.MultiThreadExecutioner;
-import nars.nar.exe.SynchronousExecutor;
-import nars.nar.util.DefaultConceptBuilder;
-import nars.nar.util.PremiseMatrix;
+import nars.util.exe.MultiThreadExecutioner;
+import nars.util.exe.SynchronousExecutor;
+import nars.reason.DefaultConceptBuilder;
+import nars.reason.PremiseBuilder;
 import nars.op.time.STMTemporalLinkage;
 import nars.term.Termed;
 import nars.time.Time;
@@ -58,6 +59,8 @@ public class Alann extends NAR {
     public final List<AlannAgent> cores;
 
     final static Deriver deriver = Default.newDefaultDeriver();
+
+    final static PremiseBuilder premiser = new DefaultPremiseBuilder();
 
     final AtomicBoolean running = new AtomicBoolean(false);
     private ExecutorService coreExe = null;
@@ -168,7 +171,7 @@ public class Alann extends NAR {
             Concept here = next.get();
 
 
-            PremiseMatrix.run(here, fireTaskLinks, fireTermLinks, here.tasklinks(), here.termlinks(), deriver, Alann.this::input, Alann.this
+            premiser.newPremiseMatrix(here, fireTaskLinks, fireTermLinks, here.tasklinks(), here.termlinks(), deriver, Alann.this::input, Alann.this
                     //input them within the current thread here
                     //this.tasklinks,
             );
@@ -268,7 +271,7 @@ public class Alann extends NAR {
             Concept concept = task.concept(Alann.this);
 
 
-            PremiseMatrix.run(concept,
+            premiser.newPremiseMatrix(concept,
                     fireTermLinks,
                     Alann.this::input, //input them within the current thread here
                     deriver,

@@ -118,9 +118,7 @@ public class PrologTests {
                 "verb(likes).\n" +
                 "verb(bites).";
 
-        List<Term> solutions = toList(
-            new Agent(theory).iterate("utterance([the, man, likes, X]).")
-        );
+        List<Term> solutions =  new Agent(theory).solutions("utterance([the, man, likes, X]).");
 
         assertEquals(
                 "[utterance([the,man,likes,man]), utterance([the,man,likes,dog])]",
@@ -128,6 +126,17 @@ public class PrologTests {
 
     }
 
+    @Test public void testHanoi1() {
+        String theory =
+            "hanoi(1,A,B,C,[to(A,B)|Zs],Zs).\n" +
+            "hanoi(N,A,B,C,Xs,Zs):- " +
+                "N>1," +
+                "N1 is N - 1," +
+                "hanoi(N1,A,C,B,Xs,[to(A,B)|Ys])," +
+                "hanoi(N1,C,B,A,Ys,Zs).";
+        new Agent(theory);
+        //TODO
+    }
 }
 
 

@@ -6,7 +6,7 @@ import nars.Op;
 import nars.Param;
 import nars.Task;
 import nars.nal.meta.Conclude;
-import nars.nal.meta.Derivation;
+import nars.nal.Derivation;
 import nars.nal.meta.OccurrenceSolver;
 import nars.nal.rule.PremiseRule;
 import nars.term.Compound;

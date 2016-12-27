@@ -15,7 +15,7 @@ import nars.concept.util.ConceptBuilder;
 import nars.index.term.map.MaplikeTermIndex;
 import nars.index.term.tree.TermKey;
 import nars.nar.Default;
-import nars.nar.util.DefaultConceptBuilder;
+import nars.reason.DefaultConceptBuilder;
 import nars.op.data.differ;
 import nars.op.data.intersect;
 import nars.op.data.union;

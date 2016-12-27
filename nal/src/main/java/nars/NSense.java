@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.function.*;
 
 /**
- * Created by me on 9/30/16.
+ * agent sensor builder
  */
 public interface NSense {
 

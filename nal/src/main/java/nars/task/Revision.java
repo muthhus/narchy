@@ -5,7 +5,7 @@ import jcog.data.random.XorShift128PlusRandom;
 import nars.$;
 import nars.Task;
 import nars.nal.Stamp;
-import nars.nal.meta.Derivation;
+import nars.nal.Derivation;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.truth.Truth;

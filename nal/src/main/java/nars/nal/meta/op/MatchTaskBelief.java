@@ -8,7 +8,7 @@ import nars.Op;
 import nars.index.term.PatternTermIndex;
 import nars.nal.meta.AtomicBoolCondition;
 import nars.nal.meta.BoolCondition;
-import nars.nal.meta.Derivation;
+import nars.nal.Derivation;
 import nars.nal.meta.constraint.AndConstraint;
 import nars.nal.meta.constraint.MatchConstraint;
 import nars.nal.meta.match.Ellipsis;

@@ -1,7 +1,7 @@
 package nars.term.util;
 
 import nars.Op;
-import nars.task.util.SoftException;
+import nars.util.SoftException;
 import nars.term.Term;
 import nars.term.container.TermContainer;
 import org.jetbrains.annotations.NotNull;

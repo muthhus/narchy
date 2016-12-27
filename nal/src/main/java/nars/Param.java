@@ -4,19 +4,20 @@ import jcog.Util;
 import jcog.data.FloatParam;
 import jcog.data.MutableInteger;
 import jcog.data.Range;
-import nars.nal.Level;
 import nars.term.atom.Atom;
 import nars.truth.DefaultTruth;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.function.Predicate;
+
 import static nars.Symbols.*;
 
 /**
  * NAR Parameters which can be changed during runtime.
  */
-public abstract class Param /*extends Container*/ implements Level {
+public abstract class Param /*extends Container*/  {
 
 
     /** absolute limit for constructing terms in any context in which a NAR is not known, which could provide a limit.
@@ -495,8 +496,17 @@ public abstract class Param /*extends Container*/ implements Level {
     }
 
 
+    abstract public int level();
 
+    @NotNull
+    Predicate levelMax(int level) {
+        return (r -> (level() <= level));
+    }
 
+    //TODO use IntStream.range?
+    Predicate[] maxLevel = new Predicate[] {
+            levelMax(0), levelMax(1), levelMax(2), levelMax(3), levelMax(4), levelMax(5), levelMax(6), levelMax(7)
+    };
 
 
 

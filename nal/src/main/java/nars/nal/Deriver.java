@@ -4,7 +4,6 @@ import com.github.benmanes.caffeine.cache.AsyncLoadingCache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.google.common.collect.Lists;
 import nars.nal.derive.TrieDeriver;
-import nars.nal.meta.Derivation;
 import nars.nal.rule.PremiseRuleSet;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;

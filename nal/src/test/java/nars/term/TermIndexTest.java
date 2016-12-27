@@ -8,7 +8,7 @@ import nars.index.term.TermIndex;
 import nars.index.term.map.MaplikeTermIndex;
 import nars.nar.Default;
 import nars.nar.Terminal;
-import nars.nar.util.DefaultConceptBuilder;
+import nars.reason.DefaultConceptBuilder;
 import nars.term.atom.Atomic;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Ignore;

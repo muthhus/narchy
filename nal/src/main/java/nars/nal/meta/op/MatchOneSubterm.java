@@ -1,7 +1,7 @@
 package nars.nal.meta.op;
 
 import nars.nal.meta.BoolCondition;
-import nars.nal.meta.Derivation;
+import nars.nal.Derivation;
 import nars.nal.meta.constraint.MatchConstraint;
 import nars.term.Term;
 import org.jetbrains.annotations.NotNull;

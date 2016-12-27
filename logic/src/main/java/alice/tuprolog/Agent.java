@@ -18,10 +18,12 @@
 package alice.tuprolog;
 
 import alice.tuprolog.event.OutputListener;
+import com.google.common.collect.Lists;
 
 import java.io.InputStream;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * Provides a prolog virtual machine embedded in a separate thread.
@@ -107,6 +109,11 @@ public class Agent extends Prolog {
         this.goalText = goal;
         return run();
     }
+
+    public List<Term> solutions(String goal) {
+        return Lists.newArrayList( iterate(goal) );
+    }
+
     public Iterator<Term> iterate(String goal) {
 
 

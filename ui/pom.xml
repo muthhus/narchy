@@ -91,6 +91,13 @@
 
         </dependency>
 
+        <!-- https://mvnrepository.com/artifact/org.joml/joml -->
+        <dependency>
+            <groupId>org.joml</groupId>
+            <artifactId>joml</artifactId>
+            <version>1.9.0</version>
+        </dependency>
+
 
         <!-- http://mvnrepository.com/artifact/com.eclipsesource.minimal-json/minimal-json -->
         <!--<dependency>-->

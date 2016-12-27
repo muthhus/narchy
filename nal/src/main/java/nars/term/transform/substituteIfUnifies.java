@@ -1,7 +1,7 @@
 package nars.term.transform;
 
 import nars.Op;
-import nars.nal.meta.Derivation;
+import nars.nal.Derivation;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.subst.SubUnify;

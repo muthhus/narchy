@@ -5,7 +5,7 @@ import nars.NAR;
 import nars.Param;
 import nars.concept.Concept;
 import nars.link.BLink;
-import nars.nar.exe.SynchronousExecutor;
+import nars.util.exe.SynchronousExecutor;
 import nars.term.Termed;
 import nars.time.FrameTime;
 import nars.time.Time;

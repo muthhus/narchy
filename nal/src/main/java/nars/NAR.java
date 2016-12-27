@@ -20,14 +20,11 @@ import nars.index.task.MapTaskIndex;
 import nars.index.task.TaskIndex;
 import nars.index.term.TermIndex;
 import nars.link.BLink;
-import nars.nal.Level;
-import nars.nal.nal8.Operator;
-import nars.nar.NARIn;
-import nars.nar.NAROut;
-import nars.nar.exe.Executioner;
+import nars.nal.Operator;
+import nars.util.exe.Executioner;
 import nars.table.BeliefTable;
 import nars.task.MutableTask;
-import nars.task.util.InvalidTaskException;
+import nars.util.task.InvalidTaskException;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
@@ -86,7 +83,7 @@ import static org.fusesource.jansi.Ansi.ansi;
  * <p>
  * Memory is serializable so it can be persisted and transported.
  */
-public abstract class NAR extends Param implements Level, Consumer<Task>, NARIn, NAROut, Iterative<NAR> {
+public abstract class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Iterative<NAR> {
 
     public static final Logger logger = LoggerFactory.getLogger(NAR.class);
     static final Set<String> logEvents = Sets.newHashSet("eventTaskProcess", "eventAnswer", "eventExecute");

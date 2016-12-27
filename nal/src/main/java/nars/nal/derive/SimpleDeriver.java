@@ -3,7 +3,7 @@ package nars.nal.derive;
 import nars.$;
 import nars.nal.Deriver;
 import nars.nal.meta.BoolCondition;
-import nars.nal.meta.Derivation;
+import nars.nal.Derivation;
 import nars.nal.meta.PostCondition;
 import nars.nal.rule.PremiseRule;
 import nars.nal.rule.PremiseRuleSet;

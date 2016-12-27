@@ -82,7 +82,7 @@ public class WebServer /*extends PathHandler*/ {
                 .addHttpListener(httpPort, "0.0.0.0")
                 .setServerOption(ENABLE_HTTP2, true)
                 .setServerOption(ENABLE_SPDY, true)
-                .setIoThreads(1)
+                //.setIoThreads(1)
                 .setHandler(path)
                 .build();
 

@@ -1,6 +1,7 @@
 package nars.nal.meta;
 
 import nars.Op;
+import nars.nal.Derivation;
 import nars.truth.Truth;
 import nars.truth.func.TruthOperator;
 import org.jetbrains.annotations.NotNull;

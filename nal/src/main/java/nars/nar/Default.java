@@ -8,10 +8,10 @@ import nars.index.term.TermIndex;
 import nars.index.term.map.MapTermIndex;
 import nars.link.BLink;
 import nars.nal.Deriver;
-import nars.nar.core.ConceptBagCycle;
-import nars.nar.exe.Executioner;
-import nars.nar.exe.SynchronousExecutor;
-import nars.nar.util.DefaultConceptBuilder;
+import nars.reason.ConceptBagReasoner;
+import nars.util.exe.Executioner;
+import nars.util.exe.SynchronousExecutor;
+import nars.reason.DefaultConceptBuilder;
 import nars.op.time.STMTemporalLinkage;
 import nars.term.Termed;
 import nars.time.FrameTime;
@@ -32,7 +32,7 @@ public class Default extends NAR {
 
     //private static final Logger logger = LoggerFactory.getLogger(Default.class);
 
-    public final @NotNull ConceptBagCycle core;
+    public final @NotNull ConceptBagReasoner core;
 
 
     @Deprecated
@@ -62,7 +62,7 @@ public class Default extends NAR {
         super(time, index, random, Param.defaultSelf(), exe);
 
 
-        ConceptBagCycle c = new ConceptBagCycle(this, newDeriver(), activeConcepts);
+        ConceptBagReasoner c = new ConceptBagReasoner(this, newDeriver(), activeConcepts);
 
         c.termlinksFiredPerFiredConcept.set(1, termLinksPerConcept);
         c.tasklinksFiredPerFiredConcept.set(taskLinksPerConcept);

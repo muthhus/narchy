@@ -5,7 +5,7 @@ import nars.concept.Concept;
 import nars.concept.util.InvalidConceptException;
 import nars.nal.Stamp;
 import nars.task.Tasked;
-import nars.task.util.InvalidTaskException;
+import nars.util.task.InvalidTaskException;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;

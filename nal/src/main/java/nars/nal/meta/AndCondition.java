@@ -2,6 +2,7 @@ package nars.nal.meta;
 
 import com.google.common.collect.Lists;
 import nars.Op;
+import nars.nal.Derivation;
 import nars.term.compound.GenericCompound;
 import nars.term.container.TermVector;
 import org.apache.commons.lang3.ArrayUtils;

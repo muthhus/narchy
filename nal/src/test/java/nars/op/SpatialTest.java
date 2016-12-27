@@ -13,7 +13,7 @@ import org.junit.Test;
 
 import static nars.Symbols.COMMAND;
 import static nars.Symbols.GOAL;
-import static nars.nal.nal8.Operator.args;
+import static nars.nal.Operator.args;
 
 /**
  * Created by me on 12/21/16.

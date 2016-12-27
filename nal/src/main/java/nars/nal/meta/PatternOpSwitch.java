@@ -1,5 +1,6 @@
 package nars.nal.meta;
 
+import nars.nal.Derivation;
 import nars.nal.meta.op.AbstractPatternOp.PatternOp;
 import nars.term.atom.Atom;
 import org.jetbrains.annotations.NotNull;

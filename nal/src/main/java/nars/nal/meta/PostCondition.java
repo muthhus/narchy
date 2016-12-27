@@ -2,7 +2,6 @@ package nars.nal.meta;
 
 import nars.Op;
 import nars.Symbols;
-import nars.nal.Level;
 import nars.nal.rule.PremiseRule;
 import nars.term.Compound;
 import nars.term.Term;
@@ -20,7 +19,7 @@ import static nars.$.the;
  * Describes a derivation postcondition
  * Immutable
  */
-public class PostCondition implements Serializable, Level //since there can be multiple tasks derived per rule
+public class PostCondition implements Serializable //since there can be multiple tasks derived per rule
 {
 
     public final Term beliefTruth;
@@ -192,12 +191,9 @@ public class PostCondition implements Serializable, Level //since there can be m
         return pc;
     }
 
-    @Override
-    public int level() {
+    public int levelRequired() {
         return minNAL;
     }
-
-
 
 
     public final boolean modifiesPunctuation() {

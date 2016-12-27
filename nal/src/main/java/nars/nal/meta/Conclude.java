@@ -7,10 +7,11 @@ import nars.Op;
 import nars.Param;
 import nars.Task;
 import nars.budget.Budget;
+import nars.nal.Derivation;
 import nars.nal.Premise;
 import nars.nal.rule.PremiseRule;
 import nars.task.DerivedTask;
-import nars.task.util.InvalidTaskException;
+import nars.util.task.InvalidTaskException;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
@@ -119,7 +120,7 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
                         Truth truth = ct.truth;
 
                         //note: the budget function used here should not depend on the truth's frequency. btw, it may be inverted below
-                        Budget budget = m.budget(truth, r);
+                        Budget budget = m.premise.budget(r, truth, m);
                         if (budget != null) {
                             Term crr = nar.normalize((Compound) r);
                             if (!(crr instanceof Compound)) {
