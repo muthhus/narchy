@@ -458,7 +458,7 @@ public class Tetris extends NAgents {
 
             NAR nar =
                     //NAgents.newMultiThreadNAR(4, new FrameTime().dur(TIME_PER_FALL));
-                    NARBuilder.newALANN(new FrameTime().dur(1), 3, 256, 5, 3, 2);
+                    NARBuilder.newALANN(new FrameTime().dur(1), 3, 256, 5, 3, 1);
 
             nar.termVolumeMax.setValue(24);
             //nar.linkFeedbackRate.setValue(0.05f);

@@ -5,7 +5,7 @@ import jcog.list.FasterList;
 import nars.*;
 import nars.bag.Bag;
 import nars.budget.Budget;
-import nars.budget.util.BudgetFunctions;
+import nars.budget.BudgetFunctions;
 import nars.concept.Concept;
 import nars.derive.Deriver;
 import nars.link.BLink;

@@ -2,7 +2,10 @@ package nars.video;
 
 import jcog.Util;
 import jcog.signal.Autoencoder;
-import nars.*;
+import nars.$;
+import nars.NAR;
+import nars.NAgent;
+import nars.Op;
 import nars.concept.SensorConcept;
 import nars.term.Compound;
 import nars.term.Term;

@@ -1,4 +1,4 @@
-package nars.op.time;
+package nars.op.stm;
 
 import jcog.data.MutableInteger;
 import jcog.event.On;
@@ -14,7 +14,7 @@ import java.util.Deque;
 import java.util.Iterator;
 import java.util.List;
 
-import static nars.budget.control.Crosslink.crossLink;
+import static nars.attention.Crosslink.crossLink;
 
 /**
  * Short-term Memory Belief Event Induction.

@@ -1,4 +1,4 @@
-package nars.budget.policy;
+package nars.conceptualize.state;
 
 import nars.Op;
 import nars.concept.CompoundConcept;

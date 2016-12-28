@@ -1,4 +1,4 @@
-package nars.bag.impl;
+package nars.bag;
 
 import jcog.data.sorted.SortedArray;
 import nars.table.ArrayListTable;

@@ -6,7 +6,7 @@ import nars.conceptualize.DefaultConceptBuilder;
 import nars.control.AlannControl;
 import nars.index.term.TermIndex;
 import nars.index.term.map.CaffeineIndex;
-import nars.op.time.STMTemporalLinkage;
+import nars.op.stm.STMTemporalLinkage;
 import nars.time.Time;
 import nars.util.exe.Executioner;
 import nars.util.exe.MultiThreadExecutioner;

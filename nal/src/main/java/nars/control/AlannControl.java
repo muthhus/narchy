@@ -6,9 +6,9 @@ import jcog.data.MutableIntRange;
 import nars.Control;
 import nars.NAR;
 import nars.bag.Bag;
-import nars.bag.impl.CurveBag;
+import nars.bag.CurveBag;
 import nars.budget.Budget;
-import nars.budget.merge.BudgetMerge;
+import nars.budget.BudgetMerge;
 import nars.concept.Concept;
 import nars.derive.DefaultDeriver;
 import nars.derive.Deriver;
@@ -31,7 +31,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import static java.lang.System.out;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.IntStream.range;
-import static nars.bag.impl.CurveBag.power2BagCurve;
+import static nars.bag.CurveBag.power2BagCurve;
 
 /**
  * Adaptive Logic and Neural Network

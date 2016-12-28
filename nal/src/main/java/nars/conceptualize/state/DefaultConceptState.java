@@ -1,4 +1,4 @@
-package nars.budget.policy;
+package nars.conceptualize.state;
 
 import jcog.Util;
 import jcog.data.MutableInteger;

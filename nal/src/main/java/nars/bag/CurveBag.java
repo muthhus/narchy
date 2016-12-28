@@ -1,11 +1,9 @@
-package nars.bag.impl;
+package nars.bag;
 
 import nars.Param;
-import nars.bag.Bag;
-import nars.budget.merge.BudgetMerge;
+import nars.budget.BudgetMerge;
 import nars.link.BLink;
 import org.eclipse.collections.api.block.function.primitive.FloatToFloatFunction;
-import org.eclipse.collections.impl.map.mutable.ConcurrentHashMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -35,14 +33,10 @@ public class CurveBag<V> extends ArrayBag<V> implements Bag<V> {
     final CurveSampler sampler;
 
 
-    public CurveBag(@NotNull BudgetMerge mergeFunction, Random rng) {
-        this(8, new CurveBag.DirectSampler(power2BagCurve, rng), mergeFunction, new ConcurrentHashMap<>());
-    }
-
-
 
     public CurveBag(int initialCapacity, @NotNull CurveSampler c, @NotNull BudgetMerge mergeFunction, @NotNull Map<V, BLink<V>> map) {
-        super(initialCapacity, mergeFunction, map);
+        super(mergeFunction, map);
+        capacity(initialCapacity);
         this.sampler = c;
     }
 

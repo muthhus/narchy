@@ -18,13 +18,10 @@
  * You should have received a copy of the GNU General Public License
  * along with Open-NARS.  If not, see <http://www.gnu.org/licenses/>.
  */
-package nars.budget.util;
+package nars.budget;
 
 import jcog.Util;
 import nars.Task;
-import nars.budget.Budget;
-import nars.budget.RawBudget;
-import nars.budget.merge.BudgetMerge;
 import nars.premise.Premise;
 import nars.term.Termed;
 import nars.truth.Truthed;

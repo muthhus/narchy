@@ -1,10 +1,10 @@
-package nars.bag.impl.experimental;
+package nars.bag.experimental;
 
 import jcog.map.nbhm.HijacKache;
 import nars.Param;
 import nars.bag.Bag;
+import nars.budget.BudgetMerge;
 import nars.budget.Budgeted;
-import nars.budget.merge.BudgetMerge;
 import nars.link.ArrayBLink;
 import nars.link.BLink;
 import org.apache.commons.lang3.mutable.MutableFloat;

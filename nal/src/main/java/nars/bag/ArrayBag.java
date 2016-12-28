@@ -1,12 +1,11 @@
-package nars.bag.impl;
+package nars.bag;
 
 import jcog.data.sorted.SortedArray;
 import nars.$;
-import nars.bag.Bag;
 import nars.budget.Budget;
+import nars.budget.BudgetMerge;
 import nars.budget.Budgeted;
 import nars.budget.RawBudget;
-import nars.budget.merge.BudgetMerge;
 import nars.link.BLink;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
@@ -37,6 +36,10 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
     public volatile float pressure = 0;
 
     private static final Logger logger = LoggerFactory.getLogger(ArrayBag.class);
+
+    public ArrayBag(BudgetMerge mergeFunction, @NotNull Map<V, BLink<V>> map) {
+        this(0, mergeFunction, map);
+    }
 
     public ArrayBag(@Deprecated int cap, BudgetMerge mergeFunction, @NotNull Map<V, BLink<V>> map) {
         super(BLink[]::new, map);

@@ -5,7 +5,6 @@ import jcog.Util;
 import nars.Op;
 import nars.Param;
 import nars.Task;
-import nars.budget.util.BudgetFunctions;
 import nars.util.SoftException;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.fusesource.jansi.Ansi;

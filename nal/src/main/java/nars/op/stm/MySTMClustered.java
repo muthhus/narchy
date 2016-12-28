@@ -1,4 +1,4 @@
-package nars.op.time;
+package nars.op.stm;
 
 import jcog.data.MutableInteger;
 import jcog.event.ArrayTopic;
@@ -6,7 +6,7 @@ import jcog.event.Topic;
 import nars.$;
 import nars.NAR;
 import nars.Task;
-import nars.budget.util.BudgetFunctions;
+import nars.budget.BudgetFunctions;
 import nars.task.GeneratedTask;
 import nars.term.Compound;
 import nars.term.Term;

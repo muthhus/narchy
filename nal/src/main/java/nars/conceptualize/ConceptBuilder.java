@@ -1,7 +1,7 @@
 package nars.conceptualize;
 
 import nars.NAR;
-import nars.budget.policy.ConceptState;
+import nars.conceptualize.state.ConceptState;
 import nars.term.Term;
 import nars.term.Termed;
 import org.jetbrains.annotations.NotNull;

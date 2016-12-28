@@ -1,9 +1,7 @@
-package nars.budget.merge;
+package nars.budget;
 
 import jcog.Util;
 import nars.Param;
-import nars.budget.Budget;
-import nars.budget.Budgeted;
 import nars.link.BLink;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -12,7 +10,7 @@ import java.util.function.BiFunction;
 
 import static jcog.Util.lerp;
 import static nars.Param.BUDGET_EPSILON;
-import static nars.budget.merge.BudgetMerge.PriMerge.*;
+import static nars.budget.BudgetMerge.PriMerge.*;
 import static nars.util.UtilityFunctions.or;
 
 /**

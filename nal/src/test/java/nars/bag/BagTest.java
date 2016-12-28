@@ -3,12 +3,10 @@ package nars.bag;
 import com.google.common.collect.Iterators;
 import jcog.data.random.XorShift128PlusRandom;
 import nars.Param;
-import nars.bag.impl.ArrayBag;
-import nars.bag.impl.CurveBag;
-import nars.bag.impl.experimental.HijackBag;
+import nars.bag.experimental.HijackBag;
 import nars.budget.Budget;
+import nars.budget.BudgetMerge;
 import nars.budget.RawBudget;
-import nars.budget.merge.BudgetMerge;
 import nars.link.BLink;
 import org.apache.commons.math3.random.EmpiricalDistribution;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
@@ -24,7 +22,7 @@ import java.util.Random;
 import java.util.function.DoubleSupplier;
 
 import static jcog.Texts.n4;
-import static nars.budget.merge.BudgetMerge.plusBlend;
+import static nars.budget.BudgetMerge.plusBlend;
 import static org.junit.Assert.*;
 
 /**

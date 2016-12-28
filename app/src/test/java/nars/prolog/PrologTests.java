@@ -5,7 +5,6 @@ import org.junit.Test;
 
 import java.util.List;
 
-import static org.apache.commons.collections4.IteratorUtils.toList;
 import static org.junit.Assert.assertEquals;
 
 /**

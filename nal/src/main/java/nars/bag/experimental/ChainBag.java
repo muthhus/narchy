@@ -1,4 +1,4 @@
-package nars.bag.impl.experimental;
+package nars.bag.experimental;
 
 import jcog.data.linkedlist.DD;
 import jcog.data.linkedlist.DDList;

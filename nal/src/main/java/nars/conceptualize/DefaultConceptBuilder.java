@@ -7,16 +7,16 @@ import nars.NAR;
 import nars.Op;
 import nars.Task;
 import nars.bag.Bag;
-import nars.bag.impl.CurveBag;
-import nars.bag.impl.experimental.HijackBag;
-import nars.budget.merge.BudgetMerge;
-import nars.budget.policy.ConceptState;
-import nars.budget.policy.DefaultConceptState;
+import nars.bag.CurveBag;
+import nars.bag.experimental.HijackBag;
+import nars.budget.BudgetMerge;
 import nars.concept.AtomConcept;
 import nars.concept.CompoundConcept;
 import nars.concept.Concept;
 import nars.concept.dynamic.DynamicConcept;
 import nars.concept.dynamic.DynamicTruthModel;
+import nars.conceptualize.state.ConceptState;
+import nars.conceptualize.state.DefaultConceptState;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
@@ -28,8 +28,6 @@ import nars.term.var.Variable;
 import org.eclipse.collections.impl.map.mutable.UnifiedMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -78,7 +76,7 @@ public class DefaultConceptBuilder implements ConceptBuilder {
 
     @NotNull
     public <X> Bag<X> newCurveBag(@NotNull Map m) {
-        return new CurveBag<>(8, defaultCurveSampler, BudgetMerge.plusBlend, m);
+        return new CurveBag<X>(8, defaultCurveSampler, BudgetMerge.plusBlend, m);
     }
 
 
@@ -254,12 +252,10 @@ public class DefaultConceptBuilder implements ConceptBuilder {
     /**
      * use average blend so that reactivations of adjusted task budgets can be applied repeatedly without inflating the link budgets they activate; see CompoundConcept.process
      */
-    private final BudgetMerge mergeDefault = BudgetMerge
-            .plusBlend;
+    private final BudgetMerge mergeDefault = BudgetMerge.plusBlend;
     //.avgBlend;
 
 
-    final static Logger logger = LoggerFactory.getLogger(DefaultConceptBuilder.class);
 
 
     @NotNull

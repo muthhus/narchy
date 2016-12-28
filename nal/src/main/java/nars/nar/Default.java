@@ -7,7 +7,7 @@ import nars.control.ConceptBagControl;
 import nars.derive.DefaultDeriver;
 import nars.index.term.TermIndex;
 import nars.index.term.map.MapTermIndex;
-import nars.op.time.STMTemporalLinkage;
+import nars.op.stm.STMTemporalLinkage;
 import nars.time.FrameTime;
 import nars.time.Time;
 import nars.util.exe.Executioner;

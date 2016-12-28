@@ -33,7 +33,7 @@ import nars.nar.Default;
 import nars.util.exe.Executioner;
 import nars.util.exe.MultiThreadExecutioner;
 import nars.conceptualize.DefaultConceptBuilder;
-import nars.op.time.MySTMClustered;
+import nars.op.stm.MySTMClustered;
 import nars.time.FrameTime;
 import nars.truth.Truth;
 import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunction;

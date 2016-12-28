@@ -5,10 +5,10 @@ import nars.$;
 import nars.NAR;
 import nars.Op;
 import nars.Task;
-import nars.bag.impl.CurveBag;
+import nars.attention.Activation;
+import nars.bag.ArrayBag;
 import nars.budget.Budget;
-import nars.budget.control.Activation;
-import nars.budget.merge.BudgetMerge;
+import nars.budget.BudgetMerge;
 import nars.concept.AtomConcept;
 import nars.concept.CompoundConcept;
 import nars.concept.Concept;
@@ -33,6 +33,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
@@ -79,11 +80,11 @@ public class Abbreviation/*<S extends Term>*/ extends Leak<CompoundConcept> {
 
 
     public Abbreviation(@NotNull NAR n, String termPrefix, int volMin, int volMax, float selectionRate, int capacity) {
-        super(new CurveBag<>(BudgetMerge.plusBlend, n.random), selectionRate, n);
+        super(new ArrayBag(BudgetMerge.max, new ConcurrentHashMap()), selectionRate, n);
 
         this.nar = n;
         this.termPrefix = termPrefix;
-        this.bag.setCapacity(capacity);
+        this.setCapacity(capacity);
         this.minAbbreviableVolume.set(volMin);
         this.abbreviationConfidence =
                 new MutableFloat(nar.confidenceDefault(Op.BELIEF));

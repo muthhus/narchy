@@ -1,4 +1,4 @@
-package nars.op.time;
+package nars.op.stm;
 
 import jcog.data.MutableInteger;
 import nars.NAR;

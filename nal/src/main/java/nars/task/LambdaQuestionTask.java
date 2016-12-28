@@ -2,8 +2,8 @@ package nars.task;
 
 import nars.NAR;
 import nars.Task;
-import nars.bag.impl.ArrayBag;
-import nars.budget.merge.BudgetMerge;
+import nars.bag.ArrayBag;
+import nars.budget.BudgetMerge;
 import nars.term.Compound;
 import nars.term.Termed;
 import org.jetbrains.annotations.NotNull;

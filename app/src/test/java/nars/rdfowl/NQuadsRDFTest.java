@@ -2,12 +2,12 @@ package nars.rdfowl;
 
 import jcog.data.random.XorShift128PlusRandom;
 import nars.NAR;
+import nars.conceptualize.DefaultConceptBuilder;
 import nars.index.term.tree.TreeTermIndex;
 import nars.nar.Default;
+import nars.time.FrameTime;
 import nars.util.exe.Executioner;
 import nars.util.exe.SynchronousExecutor;
-import nars.conceptualize.DefaultConceptBuilder;
-import nars.time.FrameTime;
 import org.junit.Ignore;
 import org.junit.Test;
 

@@ -1,13 +1,13 @@
-package nars.op.time;
+package nars.op.stm;
 
 import jcog.Util;
 import jcog.data.MutableInteger;
 import nars.NAR;
 import nars.Task;
+import nars.bag.ArrayBag;
 import nars.bag.Bag;
-import nars.bag.impl.ArrayBag;
+import nars.budget.BudgetMerge;
 import nars.budget.Budgeted;
-import nars.budget.merge.BudgetMerge;
 import nars.learn.gng.NeuralGasNet;
 import nars.learn.gng.Node;
 import nars.link.BLink;
@@ -306,7 +306,7 @@ public class STMClustered extends STM {
         clusters = (short) Math.max(2f, 1f + capacity.floatValue() / expectedTasksPerNode);
 
         this.punc = punc;
-        this.input = new ArrayBag<>(capacity.intValue(), BudgetMerge.avgBlend, new ConcurrentHashMap<>(capacity.intValue())) {
+        this.input = new ArrayBag<Task>(capacity.intValue(), BudgetMerge.avgBlend, new ConcurrentHashMap<>(capacity.intValue())) {
 
             @NotNull
             public Bag<Task> update(Consumer<BLink> each) {

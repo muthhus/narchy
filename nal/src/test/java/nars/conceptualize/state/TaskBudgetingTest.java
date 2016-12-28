@@ -1,4 +1,4 @@
-package nars.budget.policy;
+package nars.conceptualize.state;
 
 import nars.nar.Default;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;

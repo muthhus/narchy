@@ -1,7 +1,7 @@
 package nars.gui;
 
 import nars.NAR;
-import nars.bag.impl.Bagregate;
+import nars.bag.Bagregate;
 import nars.concept.Concept;
 import nars.link.BLink;
 import nars.term.Term;

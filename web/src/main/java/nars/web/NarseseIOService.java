@@ -7,8 +7,8 @@ import nars.IO;
 import nars.NAR;
 import nars.Task;
 import nars.bag.Bag;
-import nars.bag.impl.CurveBag;
-import nars.budget.merge.BudgetMerge;
+import nars.bag.CurveBag;
+import nars.budget.BudgetMerge;
 import nars.link.BLink;
 import nars.nlp.Twenglish;
 import org.slf4j.Logger;
@@ -18,6 +18,7 @@ import spacegraph.web.WebsocketService;
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -43,7 +44,7 @@ public class NarseseIOService extends WebsocketService {
     public NarseseIOService(NAR n) {
         super();
         this.nar = n;
-        output = new CurveBag<Task>(BudgetMerge.plusBlend, nar.random);
+        output = new CurveBag<Task>(OUTPUT_CAPACITY, new CurveBag.NormalizedSampler(CurveBag.power2BagCurve, n.random),  BudgetMerge.plusBlend, new HashMap());
         output.setCapacity(OUTPUT_CAPACITY);
 
     }

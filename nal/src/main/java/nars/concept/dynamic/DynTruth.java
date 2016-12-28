@@ -4,7 +4,7 @@ import nars.$;
 import nars.Op;
 import nars.Task;
 import nars.budget.Budget;
-import nars.budget.util.BudgetFunctions;
+import nars.budget.BudgetFunctions;
 import nars.term.Compound;
 import nars.truth.Stamp;
 import nars.truth.Truth;

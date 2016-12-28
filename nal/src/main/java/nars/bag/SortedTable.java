@@ -1,6 +1,5 @@
-package nars.bag.impl;
+package nars.bag;
 
-import nars.bag.Table;
 import org.jetbrains.annotations.Nullable;
 
 

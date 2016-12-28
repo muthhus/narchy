@@ -1,4 +1,4 @@
-package nars.budget.control;
+package nars.attention;
 
 import jcog.Util;
 import nars.Param;

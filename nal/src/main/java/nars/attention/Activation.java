@@ -1,4 +1,4 @@
-package nars.budget.control;
+package nars.attention;
 
 import nars.NAR;
 import nars.Param;

@@ -5,8 +5,8 @@ import nars.$;
 import nars.NAR;
 import nars.Op;
 import nars.Task;
-import nars.bag.impl.CurveBag;
-import nars.budget.merge.BudgetMerge;
+import nars.bag.ArrayBag;
+import nars.budget.BudgetMerge;
 import nars.link.BLink;
 import nars.link.DefaultBLink;
 import nars.op.Leak;
@@ -26,6 +26,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Random;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
 import static nars.$.the;
@@ -115,10 +116,13 @@ public class Inperience extends Leak<Task> {
 
 //
 
-    public Inperience(@NotNull NAR n, float rate) {
-        super(new CurveBag<>(BudgetMerge.max, n.random), rate, n);
+    public Inperience(@NotNull NAR n, float rate, int capacity) {
+        super(new ArrayBag<>(BudgetMerge.max, new ConcurrentHashMap()), rate, n);
 
         this.nar = n;
+
+        setCapacity(capacity);
+
 
 //        n.eventConceptProcess.on(p -> {
 //            Task belief = p.belief();

@@ -6,9 +6,10 @@ import nars.$;
 import nars.NAR;
 import nars.NAgent;
 import nars.Task;
-import nars.bag.impl.ArrayBag;
-import nars.bag.impl.Bagregate;
-import nars.budget.merge.BudgetMerge;
+import nars.bag.ArrayBag;
+import nars.bag.Bagregate;
+import nars.budget.BudgetMerge;
+import nars.conceptualize.DefaultConceptBuilder;
 import nars.gui.BagChart;
 import nars.gui.Vis;
 import nars.index.term.tree.TreeTermIndex;
@@ -16,17 +17,16 @@ import nars.link.BLink;
 import nars.link.DefaultBLink;
 import nars.nar.Default;
 import nars.nar.NARBuilder;
-import nars.util.exe.Executioner;
-import nars.util.exe.MultiThreadExecutioner;
-import nars.conceptualize.DefaultConceptBuilder;
 import nars.op.Leak;
 import nars.op.mental.Abbreviation;
 import nars.op.mental.Inperience;
-import nars.op.time.MySTMClustered;
+import nars.op.stm.MySTMClustered;
 import nars.time.FrameTime;
 import nars.time.RealTime;
 import nars.time.Time;
 import nars.truth.Truth;
+import nars.util.exe.Executioner;
+import nars.util.exe.MultiThreadExecutioner;
 import nars.util.task.TaskStatistics;
 import nars.video.*;
 import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunction;
@@ -153,7 +153,7 @@ abstract public class NAgents extends NAgent {
 //                4, 16,
 //                0.05f, 32);
 
-        new Inperience(nar, 0.05f);
+        new Inperience(nar, 0.05f, 16);
 
         /*SpaceGraph.window(grid(nar.cores.stream().map(c ->
                 Vis.items(c.activeBag(), nar, 16)).toArray(Surface[]::new)), 900, 700);*/
@@ -208,7 +208,7 @@ abstract public class NAgents extends NAgent {
                 4, 16,
                 0.01f, 32);
 
-        new Inperience(nar, 0.02f);
+        new Inperience(nar, 0.02f, 16);
 
 //        //causal accelerator
 //        nar.onTask(t -> {

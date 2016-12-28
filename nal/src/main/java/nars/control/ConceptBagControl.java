@@ -9,9 +9,9 @@ import nars.Control;
 import nars.NAR;
 import nars.Param;
 import nars.bag.Bag;
-import nars.bag.impl.CurveBag;
+import nars.bag.CurveBag;
+import nars.budget.BudgetMerge;
 import nars.budget.ROBudget;
-import nars.budget.merge.BudgetMerge;
 import nars.concept.Concept;
 import nars.conceptualize.ConceptBuilder;
 import nars.conceptualize.DefaultConceptBuilder;
@@ -211,7 +211,7 @@ public class ConceptBagControl implements Control, Consumer<DerivedTask> {
     public final class ConceptBag extends CurveBag<Concept> {
 
 
-        public ConceptBag( @NotNull CurveSampler sampler) {
+        public ConceptBag( @NotNull CurveBag.CurveSampler sampler) {
             super(0, sampler, BudgetMerge.plusBlend,
                     //new ConcurrentHashMap<>(capacity)
                     nar.exe.concurrent() ?  new java.util.concurrent.ConcurrentHashMap<>() : new HashMap()

@@ -2,9 +2,9 @@ package nars.net.gnutella.thread;
 
 import com.google.common.io.ByteStreams;
 import jcog.Util;
-import nars.bag.impl.ArrayBag;
+import nars.bag.ArrayBag;
 import nars.budget.Budget;
-import nars.budget.merge.BudgetMerge;
+import nars.budget.BudgetMerge;
 import nars.net.gnutella.GnutellaConstants;
 import nars.net.gnutella.Peer;
 import nars.net.gnutella.message.Message;
