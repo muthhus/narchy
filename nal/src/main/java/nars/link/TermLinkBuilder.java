@@ -1,7 +1,7 @@
 package nars.link;
 
 import nars.NAR;
-import nars.Param;
+import nars.attention.SpreadingActivation;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.atom.Atomic;
@@ -22,7 +22,7 @@ public enum TermLinkBuilder {
                 //new TreeSet<>();
                 new HashSet<>(host.complexity());
 
-        int hostLevels = levels(host);
+        int hostLevels = SpreadingActivation.levels(host);
         for (int i = 0, s = host.size(); i < s; i++) {
             components(host.term(i), hostLevels, components, nar);
         }
@@ -30,44 +30,6 @@ public enum TermLinkBuilder {
     }
 
 //    final static int levelBoost = Op.or(Op.EQUIV, Op.CONJ, Op.IMPL);
-
-    private static int levels(@NotNull Compound host) {
-        switch (host.op()) {
-            case PROD:
-            case SETe:
-            case SETi:
-            case DIFFe:
-            case DIFFi:
-            case SECTi:
-            case SECTe:
-            case IMGe:
-            case IMGi:
-                return 1;
-
-            case INH:
-                return 2;
-            case SIM:
-                return 2;
-
-            case IMPL:
-            case EQUI:
-                return (host.vars() > 0) ? 3 : 2;
-            case CONJ: {
-
-                int s = host.size();
-                int vars = host.vars();
-                if (s <= Param.MAX_CONJ_SIZE_FOR_LAYER2_TEMPLATES) {
-                    return (vars > 0) ? 3 : 2;
-                } else {
-                    return 2;
-                    //return (vars > 0) ? 2 : 1; //prevent long conjunctions from creating excessive templates
-                }
-            }
-
-            default:
-                throw new UnsupportedOperationException("unhandled operator type: " + host.op());
-        }
-    }
 
 
     /**

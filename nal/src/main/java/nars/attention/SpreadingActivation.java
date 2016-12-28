@@ -27,8 +27,7 @@ public class SpreadingActivation extends Activation implements ObjectFloatProced
 
     @NotNull public final Budgeted in;
 
-    public final ObjectFloatHashMap<Term> spread;
-    final List<ObjectFloatPair<Concept>> conceptActivation;
+    final ObjectFloatHashMap<Term> spread;
 
     final static float parentRetention = 0.5f;
 
@@ -36,7 +35,7 @@ public class SpreadingActivation extends Activation implements ObjectFloatProced
      * runs the task activation procedure
      */
     public SpreadingActivation(@NotNull Budgeted in, @NotNull Concept c, @NotNull NAR nar, float scale) {
-        this(in, scale, c, Param.ACTIVATION_TERMLINK_DEPTH, nar);
+        this(in, scale, c, in instanceof Task ? levels(((Task)in).term()) : Param.ACTIVATION_TERMLINK_DEPTH, nar);
     }
 
     /**
@@ -45,7 +44,7 @@ public class SpreadingActivation extends Activation implements ObjectFloatProced
     public SpreadingActivation(@NotNull Budgeted in, float scale, @NotNull Concept src, int termlinkDepth, @NotNull NAR nar) {
         super(in, scale, src, nar);
         this.in = in;
-        this.termlinkDepth = termlinkDepth;  //should be larger then TASKLINK_DEPTH_LIMIT because this resolves the Concept used for it in linkSubterms
+        this.termlinkDepth = termlinkDepth;
 
         Term srcTerm = src.term();
 
@@ -53,17 +52,48 @@ public class SpreadingActivation extends Activation implements ObjectFloatProced
 
         link(srcTerm, scale, 0);
 
-        conceptActivation = $.newArrayList(spread.size());
-
         spread.forEachKeyValue(this);
 
         nar.emotion.stress(linkOverflow);
 
-        for (int i = 0, conceptActivationSize = conceptActivation.size(); i < conceptActivationSize; i++) {
-            ObjectFloatPair<Concept> a = conceptActivation.get(i);
-            nar.activate(a.getOne(), a.getTwo());
-        }
+    }
 
+    public static int levels(@NotNull Compound host) {
+        switch (host.op()) {
+            case PROD:
+            case SETe:
+            case SETi:
+            case DIFFe:
+            case DIFFi:
+            case SECTi:
+            case SECTe:
+            case IMGe:
+            case IMGi:
+                return 1;
+
+            case INH:
+                return 2;
+            case SIM:
+                return 2;
+
+            case IMPL:
+            case EQUI:
+                return (host.vars() > 0) ? 3 : 2;
+            case CONJ: {
+
+                int s = host.size();
+                int vars = host.vars();
+                if (s <= Param.MAX_CONJ_SIZE_FOR_LAYER2_TEMPLATES) {
+                    return (vars > 0) ? 3 : 2;
+                } else {
+                    return 2;
+                    //return (vars > 0) ? 2 : 1; //prevent long conjunctions from creating excessive templates
+                }
+            }
+
+            default:
+                throw new UnsupportedOperationException("unhandled operator type: " + host.op());
+        }
     }
 
     @Override
@@ -76,8 +106,7 @@ public class SpreadingActivation extends Activation implements ObjectFloatProced
 
             tasklink(ckk, v);
 
-            float conceptActivationRate = 1f;
-            conceptActivation.add(new LightObjectFloatPair(ckk, v * conceptActivationRate));
+            nar.activate(ckk, v);
 
         } else {
             kk = k;
