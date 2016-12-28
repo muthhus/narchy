@@ -14,8 +14,8 @@ import nars.gui.Vis;
 import nars.index.term.tree.TreeTermIndex;
 import nars.link.BLink;
 import nars.link.DefaultBLink;
-import nars.nar.Alann;
 import nars.nar.Default;
+import nars.nar.NARBuilder;
 import nars.util.exe.Executioner;
 import nars.util.exe.MultiThreadExecutioner;
 import nars.conceptualize.DefaultConceptBuilder;
@@ -140,8 +140,9 @@ abstract public class NAgents extends NAgent {
         return d;
     }
 
-    public static Alann newAlann(float dur) {
-        Alann nar = new Alann(new RealTime.CS(true).dur( dur ), 3, 256, 3, 3, 2 );
+    public static NAR newAlann(float dur) {
+
+        NAR nar = NARBuilder.newALANN(new RealTime.CS(true).dur( dur ), 3, 256, 3, 3, 2 );
 
         nar.termVolumeMax.set(48);
 
@@ -156,7 +157,6 @@ abstract public class NAgents extends NAgent {
 
         /*SpaceGraph.window(grid(nar.cores.stream().map(c ->
                 Vis.items(c.activeBag(), nar, 16)).toArray(Surface[]::new)), 900, 700);*/
-
 
         return nar;
     }

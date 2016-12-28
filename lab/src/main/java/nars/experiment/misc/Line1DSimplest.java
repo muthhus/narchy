@@ -6,7 +6,7 @@ import nars.NAR;
 import nars.NAgent;
 import nars.Param;
 import nars.concept.ActionConcept;
-import nars.nar.Alann;
+import nars.nar.Default;
 import nars.time.FrameTime;
 
 import static jcog.Texts.n2;
@@ -119,7 +119,7 @@ public class Line1DSimplest extends NAgent {
                         //.invocationListeners(new InvocationLogger())
         );*/
 
-        NAR nar = new Alann(new FrameTime(), 4, 256, 3, 2, 2 );
+        NAR nar = new Default();
 
 
 

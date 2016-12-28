@@ -1,9 +1,17 @@
 package nars.nar;
 
+import jcog.data.random.XorShift128PlusRandom;
 import nars.NAR;
+import nars.conceptualize.DefaultConceptBuilder;
+import nars.control.AlannControl;
 import nars.index.term.TermIndex;
+import nars.index.term.map.CaffeineIndex;
+import nars.op.time.STMTemporalLinkage;
 import nars.time.Time;
 import nars.util.exe.Executioner;
+import nars.util.exe.MultiThreadExecutioner;
+import nars.util.exe.SynchronousExecutor;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Random;
 
@@ -11,6 +19,25 @@ import java.util.Random;
  * Created by me on 12/27/16.
  */
 public interface NARBuilder {
+
+    public static NAR newALANN(@NotNull Time time, int cores, int coreSize, int coreFires, int coreThreads, int auxThreads) {
+
+        Executioner exe = auxThreads == 1 ? new SynchronousExecutor() :
+                new MultiThreadExecutioner(auxThreads, 1024 * auxThreads).sync(true);
+
+        NAR n = new NAR(time,
+                    new CaffeineIndex(new DefaultConceptBuilder(), 128 * 1024, false, exe),
+                        //new TreeTermIndex.L1TreeIndex(new DefaultConceptBuilder(), 512 * 1024, 1024 * 32, 3),
+                    new XorShift128PlusRandom(1),
+                    exe
+        );
+
+        new STMTemporalLinkage(n, 2);
+
+        n.setControl(new AlannControl(n, cores, coreSize, coreFires, coreThreads));
+
+        return n;
+    }
 
     NAR get();
 

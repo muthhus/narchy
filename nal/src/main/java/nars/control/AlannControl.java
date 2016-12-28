@@ -34,7 +34,8 @@ import static java.util.stream.IntStream.range;
 import static nars.bag.impl.CurveBag.power2BagCurve;
 
 /**
- * Created by me on 12/28/16.
+ * Adaptive Logic and Neural Network
+ * Original design by Tony Lofthouse
  */
 public class AlannControl implements Control {
 

@@ -8,7 +8,7 @@ import nars.experiment.tetris.impl.TetrisState;
 import nars.experiment.tetris.impl.TetrisVisualizer;
 import nars.gui.ConceptWidget;
 import nars.gui.NARSpace;
-import nars.nar.Alann;
+import nars.nar.NARBuilder;
 import nars.remote.NAgents;
 import nars.term.Compound;
 import nars.term.atom.Atomic;
@@ -458,7 +458,7 @@ public class Tetris extends NAgents {
 
             NAR nar =
                     //NAgents.newMultiThreadNAR(4, new FrameTime().dur(TIME_PER_FALL));
-                    new Alann(new FrameTime().dur(1), 3, 256, 5, 3, 2);
+                    NARBuilder.newALANN(new FrameTime().dur(1), 3, 256, 5, 3, 2);
 
             nar.termVolumeMax.setValue(24);
             //nar.linkFeedbackRate.setValue(0.05f);
