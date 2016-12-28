@@ -22,77 +22,63 @@ public class DefaultPremiseBuilder extends PremiseBuilder {
 
     @Override
     protected @NotNull Premise newPremise(@NotNull Concept c, @NotNull Task task, Term beliefTerm, Task belief, float qua, float pri) {
-        return new DefaultPremise(c, task, beliefTerm, belief, pri, qua);
+
+        //return new DefaultPremise
+        return new PreferConfidencePremise
+                (c, task, beliefTerm, belief, pri, qua);
+
     }
 
     static class DefaultPremise extends Premise {
+
         public DefaultPremise(@NotNull Concept c, @NotNull Task task, Term beliefTerm, Task belief, float pri, float qua) {
             super(c, task, beliefTerm, belief, pri, qua);
         }
 
+
         @Override
         public @Nullable Budget budget(@NotNull Term conclusion, @Nullable Truth truth, @NotNull Derivation conclude) {
-            float derivationQuality;
-            if (truth == null) {
-                //question or quest:
-                derivationQuality = conclude.nar.qualityDefault(Op.QUESTION);
-            } else {
-                derivationQuality = truth.conf() / w2c(conclude.premiseEvidence);
-            }
 
+            float factor =
+                    qualityFactor(truth, conclude) *
+                    BudgetFunctions.occamComplexityGrowthRelative(conclusion, task, belief, 1);
 
-            Premise baseBudget = conclude.premise;
+            final float q = qua() * factor;
 
-            //Penalize by complexity: RELATIVE SIZE INCREASE METHOD
-            /** occam factor */
-            float occam = BudgetFunctions.occamComplexityGrowthRelative(conclusion, baseBudget, 1);
-
-            final float quality1 =
-                    Util.clamp(baseBudget.qua() * occam * derivationQuality, 0f, 1f- Param.BUDGET_EPSILON);
-
-            if (quality1 < conclude.quaMin)
+            if (q < conclude.quaMin)
                 return null;
 
-            float priority1 =
-                    //nal.taskLink.priIfFiniteElseZero() * volRatioScale;
-                    //or(nal.taskLink.priIfFiniteElseZero(), nal.termLink.priIfFiniteElseZero())
-                    //or(nal.taskLink.priIfFiniteElseZero(), nal.termLink.priIfFiniteElseZero())
-                    baseBudget.pri() * occam * derivationQuality
-                    //;
-                    ;
-
-            //and(baseQuality, factor);
-            //baseBudget.qua();
+            float p = pri() * factor;
 
 
-            //* occam //priority should be reduced as well as durability, because in the time between here and the next forgetting it should not have similar priority as parent in cases like Belief:Identity truth function derivations
-            //* qual
-            //if (priority * durability < Param.BUDGET_EPSILON)
-            //return null;
+            return $.b(p, Util.clamp(q, 0f, 1f - Param.BUDGET_EPSILON));
 
-            return $.b(priority1, quality1);
+        }
 
-
-        /* ORIGINAL: https://code.google.com/p/open-nars/source/browse/trunk/nars_core_java/nars/inference/BudgetFunctions.java
-            Item t = memory.currentTaskLink;
-            if (t == null) {
-                t = memory.currentTask;
-            }
-            float priority = t.getPriority();
-            float durability = t.getDurability() / complexity;
-            float quality = qual / complexity;
-            TermLink termLink = memory.currentBeliefLink;
-            if (termLink != null) {
-                priority = or(priority, termLink.getPriority());
-                durability = and(durability, termLink.getDurability());
-                float targetActivation = memory.getConceptActivation(termLink.getTarget());
-                termLink.incPriority(or(quality, targetActivation));
-                termLink.incDurability(quality);
-            }
-            return new BudgetValue(priority, durability, quality);
-         */
+        protected float qualityFactor(@Nullable Truth truth, @NotNull Derivation conclude) {
+            return 1f;
         }
     }
+
+    /** prioritizes derivations exhibiting confidence increase, relative to the premise's evidence */
+    static class PreferConfidencePremise extends DefaultPremise {
+
+        public PreferConfidencePremise(@NotNull Concept c, @NotNull Task task, Term beliefTerm, Task belief, float pri, float qua) {
+            super(c, task, beliefTerm, belief, pri, qua);
+        }
+
+        @Override protected float qualityFactor(@Nullable Truth truth, @NotNull Derivation conclude) {
+            if (truth == null) {
+                //question or quest:
+                return 1;
+                        //conclude.nar.qualityDefault(Op.QUESTION);
+            } else {
+                return truth.conf() / w2c(conclude.premiseEvidence);
+            }
+        }
+
+    }
+
 }
 
 

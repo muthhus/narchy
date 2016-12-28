@@ -324,8 +324,8 @@ public abstract class TermIndex extends TermBuilder {
                 );
             } else {
                 result =
-                        src.hasAll(Op.OpBits) ?
-                            transform(src, CompoundTransform.None) : //force subterm functor eval
+                        //src.hasAll(Op.OpBits) ?
+                            //transform(src, CompoundTransform.None) : //force subterm functor eval
                             intern((Term)src);
             }
 

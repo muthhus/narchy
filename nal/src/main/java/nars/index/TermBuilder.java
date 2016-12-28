@@ -426,10 +426,10 @@ public abstract class TermBuilder {
             if (isTrueOrFalse(x)) {
                 /*if ((op == NEG) || (op == CONJ) || (op == IMPL) || (op == EQUI) || (op == INH) || (op == SIM))*/
                 //if (op!=PROD)
-                throw new RuntimeException("appearance of True/False in " + op + " should have been filtered prior to this");
+                //throw new RuntimeException("appearance of True/False in " + op + " should have been filtered prior to this");
 
                 //any other term causes it to be invalid/meaningless
-                //return False;
+                return False;
             }
 
             args[i] = intern(productNormalize(x));
