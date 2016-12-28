@@ -1,5 +1,6 @@
 package nars.nal.nal7;
 
+import com.google.common.collect.Iterables;
 import nars.NAR;
 import nars.concept.Concept;
 import nars.nar.Default;
@@ -100,7 +101,7 @@ public class TemporalInductionTest {
 
     @Test public void testInductionStability() {
         //two entirely disjoint events, and all inductable beliefs from them, should produce a finite system that doesn't explode
-        Default d = new Default(1024,8,2,3);
+        NAR d = new Default(1024,8,2,3);
         d.input("a:b. :|:");
         d.run(5);
         d.input("c:d. :|:");
@@ -108,15 +109,15 @@ public class TemporalInductionTest {
         d.run(200);
 
         //everything should be inducted by now:
-        int numConcepts = d.core.active.size();
+        int numConcepts = Iterables.size(d.conceptsActive());
         int numBeliefs = getBeliefCount(d);
 
-        System.out.println(numConcepts + " " + numBeliefs);
+        //System.out.println(numConcepts + " " + numBeliefs);
 
         d.run(100);
 
         //# unique concepts unchanged:
-        assertEquals(numConcepts, d.core.active.size());
+        assertEquals(numConcepts, Iterables.size(d.conceptsActive()));
         assertEquals(numBeliefs, getBeliefCount(d));
 
     }

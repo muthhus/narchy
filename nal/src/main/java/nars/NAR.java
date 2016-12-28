@@ -109,7 +109,8 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
     @NotNull
     public final TaskIndex tasks;
 
-    @NotNull private final List<Control> control;
+    private Control control = Control.NullControl;
+
 
     @NotNull
     private Atom self = Param.randomSelf();
@@ -195,7 +196,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
 
     public NAR(@NotNull Time time, @NotNull TermIndex concepts, @NotNull Random rng, @NotNull Executioner exe) {
 
-        this.control = new ConcurrentArrayList<>(Control.class);
+
 
 
         random = rng;
@@ -244,16 +245,11 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
 
     }
 
-    public void addControl(Control control) {
-        if (this.control.contains(control))
-            throw new RuntimeException(control + " was already added");
-        this.control.add(control);
+    public void setControl(Control control) {
+        this.control = control;
     }
 
-    public void removeControl(Control control) {
-        if (!this.control.remove(control))
-            throw new RuntimeException(control + " was not added");
-    }
+
 
     public void setSelf(Atom self) {
         this.self = self;
@@ -1283,38 +1279,14 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
         return this == obj;
     }
 
-
     @Override public void activate(Termed term, float priToAdd) {
-        for (int i = 0, controlSize = control.size(); i < controlSize; i++) {
-            control.get(i).activate(term, priToAdd);
-        }
+        control.activate(term, priToAdd);
     }
-
-
-    /**
-     * gets a measure of the current priority of the concept
-     */
-    public float pri(@NotNull Termed termed) {
-        float p = 0;
-        for (int i = 0, controlSize = control.size(); i < controlSize; i++) {
-            Control c = control.get(i);
-            p += c.pri(termed);
-        }
-        return p;
+    @Override public float pri(@NotNull Termed termed) {
+        return control.pri(termed);
     }
-
-
-    @Override
     public Iterable<? extends BLink<Concept>> conceptsActive() {
-        int s = control.size();
-        switch (s) {
-            case 0: return Collections.emptyList();
-            case 1: return control.get(0).conceptsActive(); //avoids the concatenated iterator default case
-            default:
-                return ()->{
-                    return Iterators.concat( Iterators.transform( control.iterator(), c -> c.conceptsActive().iterator() ) );
-                };
-        }
+        return control.conceptsActive();
     }
 
 

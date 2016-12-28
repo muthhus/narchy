@@ -1,5 +1,6 @@
 package nars.nal.nal7;
 
+import com.google.common.collect.Iterables;
 import nars.*;
 import nars.bag.Bag;
 import nars.bag.impl.ArrayBag;
@@ -21,6 +22,7 @@ import org.junit.Test;
 
 import java.util.TreeSet;
 
+import static com.google.common.collect.Iterables.size;
 import static java.lang.System.out;
 import static junit.framework.TestCase.assertNotNull;
 import static nars.$.$;
@@ -32,18 +34,21 @@ public class TemporalTest {
     @NotNull NAR n = new Default();
 
 
-    @Test public void parsedCorrectOccurrenceTime() {
+    @Test
+    public void parsedCorrectOccurrenceTime() {
         Task t = n.inputAndGet("<a --> b>. :\\:");
         assertEquals(0, t.creation());
         assertEquals(-(1 /*n.duration()*/), t.occurrence());
     }
 
-    @Test public void testCoNegatedSubtermConcept() {
+    @Test
+    public void testCoNegatedSubtermConcept() {
         assertEquals("((--,(x))&&(x))", n.concept(
                 n.term("((x) &&+10 (--,(x)))"), true).toString());
     }
 
-    @Test public void testCoNegatedSubtermTask() {
+    @Test
+    public void testCoNegatedSubtermTask() {
 
         //allowed
         assertNotNull(n.task("((x) &&+1 (--,(x)))."));
@@ -62,12 +67,14 @@ public class TemporalTest {
         }
     }
 
-    @Test public void testAtemporalization() {
+    @Test
+    public void testAtemporalization() {
         assertEquals("((x)==>(y))", n.concept(
                 n.term("((x) ==>+10 (y))"), true).toString());
     }
 
-    @Test public void testAtemporalizationSharesNonTemporalSubterms() {
+    @Test
+    public void testAtemporalizationSharesNonTemporalSubterms() {
 
         Task a = n.inputAndGet("((x) ==>+10 (y)).");
         Task c = n.inputAndGet("((x) ==>+9 (y)).");
@@ -83,22 +90,24 @@ public class TemporalTest {
         @Nullable Concept nc = c.concept(n);
         assertNotNull(nc);
 
-        assertTrue( na == nc );
+        assertTrue(na == nc);
 
-        assertTrue( ((CompoundConcept) na).term(0) == ((CompoundConcept)nc).term(0));
+        assertTrue(((CompoundConcept) na).term(0) == ((CompoundConcept) nc).term(0));
 
-        System.out.println( ((CompoundConcept)b.concept(n)) );
-        System.out.println( ((CompoundConcept)c.concept(n)) );
+        System.out.println(((CompoundConcept) b.concept(n)));
+        System.out.println(((CompoundConcept) c.concept(n)));
 
-        assertTrue( ((CompoundConcept)b.concept(n)).term(0).equals( ((CompoundConcept)c.concept(n)).term(0)) );
+        assertTrue(((CompoundConcept) b.concept(n)).term(0).equals(((CompoundConcept) c.concept(n)).term(0)));
 
     }
 
-    @Test public void testHasTemporal() {
-        assertTrue( $("(?x &&+1 y)").hasTemporal() );
+    @Test
+    public void testHasTemporal() {
+        assertTrue($("(?x &&+1 y)").hasTemporal());
     }
 
-    @Test public void testParseOperationInFunctionalForm2() {
+    @Test
+    public void testParseOperationInFunctionalForm2() {
         assertEquals("(do(that) &&+0 ((a)&&(b)))", n.term("(do(that) &&+0 ((a)&&(b)))").toString());
 
         Termed<Term> nt = n.term("(((that)-->do) &&+0 ((a)&&(b)))");
@@ -111,7 +120,8 @@ public class TemporalTest {
 
     }
 
-    @Test public void testAnonymization2() {
+    @Test
+    public void testAnonymization2() {
         Termed<Term> nn = n.term("(do(that) &&+1 ((a) ==>+2 (b)))");
         assertEquals("(do(that) &&+1 ((a) ==>+2 (b)))", nn.toString());
 
@@ -122,31 +132,38 @@ public class TemporalTest {
 
     }
 
-    @Test public void testCommutiveTemporalityConjEquiv() {
+    @Test
+    public void testCommutiveTemporalityConjEquiv() {
         testParse("((#1-->$2) <=>-20 ({(row,3)}-->$2))", "(({(row,3)}-->$2) <=>+20 (#1-->$2))");
         testParse("(({(row,3)}-->$2) <=>+20 (#1-->$2))", "(({(row,3)}-->$2) <=>+20 (#1-->$2))");
 
         testParse("((#1-->$2) &&-20 ({(row,3)}-->$2))", "(({(row,3)}-->$2) &&+20 (#1-->$2))");
         testParse("(({(row,3)}-->$2) &&+20 (#1-->$2))", "(({(row,3)}-->$2) &&+20 (#1-->$2))");
     }
-    @Test public void testCommutiveTemporalityConj2() {
+
+    @Test
+    public void testCommutiveTemporalityConj2() {
         testParse("(goto(a) &&+5 ((SELF,b)-->at))", "(goto(a) &&+5 at(SELF,b))");
     }
 
 
-    @Test public void testCommutiveTemporality1() {
+    @Test
+    public void testCommutiveTemporality1() {
         testParse("(at(SELF,b) &&+5 goto(a))", "(at(SELF,b) &&+5 goto(a))");
         testParse("(goto(a) &&+0 ((SELF,b)-->at))", "(goto(a) &&+0 at(SELF,b))");
         testParse("(goto(a)&&((SELF,b)-->at))", "(goto(a)&&at(SELF,b))");
     }
-    @Test public void testCommutiveTemporality2() {
+
+    @Test
+    public void testCommutiveTemporality2() {
         testParse("(at(SELF,b) &&+5 goto(a))");
         testParse("(goto(a) &&+5 at(SELF,b))");
         testParse("(goto(a) &&+0 at(SELF,b))");
         testParse("(goto(a)&&at(SELF,b))");
     }
 
-    @Test public void testCommutiveTemporalityDepVar0() {
+    @Test
+    public void testCommutiveTemporalityDepVar0() {
         Term t0 = n.term("((SELF,#1)-->at)").term();
         Term t1 = n.term("goto(#1)").term();
         assertEquals(
@@ -155,22 +172,30 @@ public class TemporalTest {
         );
     }
 
-    @Test public void testCommutiveTemporalityDepVar1() {
+    @Test
+    public void testCommutiveTemporalityDepVar1() {
         testParse("(goto(#1) &&+5 at(SELF,#1))");
     }
-    @Test public void testCommutiveTemporalityDepVar2() {
+
+    @Test
+    public void testCommutiveTemporalityDepVar2() {
         testParse("(goto(#1) &&+5 at(SELF,#1))", "(goto(#1) &&+5 at(SELF,#1))");
         testParse("(goto(#1) &&-5 at(SELF,#1))", "(at(SELF,#1) &&+5 goto(#1))");
     }
 
-    @Test public void testCommutiveEquivAgain1() {
-        assertEquals( $("((--,(0,0)) <=>+48 (happy))"), $("((happy) <=>-48 (--,(0,0)))"));
+    @Test
+    public void testCommutiveEquivAgain1() {
+        assertEquals($("((--,(0,0)) <=>+48 (happy))"), $("((happy) <=>-48 (--,(0,0)))"));
     }
-    @Test public void testCommutiveEquivAgain2() {
-        assertEquals( $("((--,(0,0)) <=>+48 (happy))"), $("((--,(happy)) <=>-48 (0,0))"));
+
+    @Test
+    public void testCommutiveEquivAgain2() {
+        assertEquals($("((--,(0,0)) <=>+48 (happy))"), $("((--,(happy)) <=>-48 (0,0))"));
     }
-    @Test public void testCommutiveEquivAgain3() {
-        assertEquals( $("((--,(0,0)) <=>+48 (--,(happy)))"), $("((--,(happy)) <=>-48 (--,(0,0)))"));
+
+    @Test
+    public void testCommutiveEquivAgain3() {
+        assertEquals($("((--,(0,0)) <=>+48 (--,(happy)))"), $("((--,(happy)) <=>-48 (--,(0,0)))"));
     }
 
     void testParse(String s) {
@@ -184,7 +209,8 @@ public class TemporalTest {
         assertEquals(expected, t.toString());
     }
 
-    @Test public void testCommutiveTemporalityConcepts() {
+    @Test
+    public void testCommutiveTemporalityConcepts() {
         Default n = new Default();
 
         n.log();
@@ -232,38 +258,40 @@ public class TemporalTest {
         assertEquals("((before-->x) ==>+5 (after-->x))", $("(x:before ==>+5 x:after)").toString());
     }
 
-    @Test public void temporalEqualityAndCompare() {
-        assertNotEquals( $("(x ==>+5 y)"), $("(x ==>+0 y)") );
-        assertNotEquals( $("(x ==>+5 y)").hashCode(), $("(x ==>+0 y)").hashCode() );
-        assertNotEquals( $("(x ==> y)"), $("(x ==>+0 y)") );
-        assertNotEquals( $("(x ==> y)").hashCode(), $("(x ==>+0 y)").hashCode() );
+    @Test
+    public void temporalEqualityAndCompare() {
+        assertNotEquals($("(x ==>+5 y)"), $("(x ==>+0 y)"));
+        assertNotEquals($("(x ==>+5 y)").hashCode(), $("(x ==>+0 y)").hashCode());
+        assertNotEquals($("(x ==> y)"), $("(x ==>+0 y)"));
+        assertNotEquals($("(x ==> y)").hashCode(), $("(x ==>+0 y)").hashCode());
 
-        assertEquals( $("(x ==>+0 y)"), $("(x ==>-0 y)") );
-        assertNotEquals( $("(x ==>+5 y)"), $("(y ==>-5 x)") );
+        assertEquals($("(x ==>+0 y)"), $("(x ==>-0 y)"));
+        assertNotEquals($("(x ==>+5 y)"), $("(y ==>-5 x)"));
 
 
-
-        assertEquals(0,   $("(x ==>+0 y)").compareTo( $("(x ==>+0 y)") ) );
-        assertEquals(-1,  $("(x ==>+0 y)").compareTo( $("(x ==>+1 y)") ) );
-        assertEquals(+1,  $("(x ==>+1 y)").compareTo( $("(x ==>+0 y)") ) );
+        assertEquals(0, $("(x ==>+0 y)").compareTo($("(x ==>+0 y)")));
+        assertEquals(-1, $("(x ==>+0 y)").compareTo($("(x ==>+1 y)")));
+        assertEquals(+1, $("(x ==>+1 y)").compareTo($("(x ==>+0 y)")));
     }
 
 
-    @Test public void testReversibilityOfCommutive() {
-        for (String c : new String[] { "&&", "<=>" }) {
-            assertEquals("(a "+c+"+5 b)", $("(a "+c+"+5 b)").toString());
-            assertEquals("(b "+c+"+5 a)", $("(b "+c+"+5 a)").toString());
-            assertEquals("(a "+c+"+5 b)", $("(b "+c+"-5 a)").toString());
-            assertEquals("(b "+c+"+5 a)", $("(a "+c+"-5 b)").toString());
+    @Test
+    public void testReversibilityOfCommutive() {
+        for (String c : new String[]{"&&", "<=>"}) {
+            assertEquals("(a " + c + "+5 b)", $("(a " + c + "+5 b)").toString());
+            assertEquals("(b " + c + "+5 a)", $("(b " + c + "+5 a)").toString());
+            assertEquals("(a " + c + "+5 b)", $("(b " + c + "-5 a)").toString());
+            assertEquals("(b " + c + "+5 a)", $("(a " + c + "-5 b)").toString());
 
-            assertEquals($("(b "+c+"-5 a)"), $("(a "+c+"+5 b)"));
-            assertEquals($("(b "+c+"+5 a)"), $("(a "+c+"-5 b)"));
-            assertEquals($("(a "+c+"-5 b)"), $("(b "+c+"+5 a)"));
-            assertEquals($("(a "+c+"+5 b)"), $("(b "+c+"-5 a)"));
+            assertEquals($("(b " + c + "-5 a)"), $("(a " + c + "+5 b)"));
+            assertEquals($("(b " + c + "+5 a)"), $("(a " + c + "-5 b)"));
+            assertEquals($("(a " + c + "-5 b)"), $("(b " + c + "+5 a)"));
+            assertEquals($("(a " + c + "+5 b)"), $("(b " + c + "-5 a)"));
         }
     }
 
-    @Test public void testCommutiveWithCompoundSubterm() {
+    @Test
+    public void testCommutiveWithCompoundSubterm() {
         Term a = $("(((--,(b0)) &&+0 (pre_1)) &&+10 (else_0))");
         Term b = $("((else_0) &&-10 ((--,(b0)) &&+0 (pre_1)))");
         Term c = $.seq($("((--,(b0)) &&+0 (pre_1))"), 10, $("(else_0)"));
@@ -281,7 +309,8 @@ public class TemporalTest {
         assertEquals(a, d);
     }
 
-    @Test public void testConceptualization() {
+    @Test
+    public void testConceptualization() {
         Default d = new Default();
 
         d.input("(x ==>+0 y)."); //eternal
@@ -297,58 +326,60 @@ public class TemporalTest {
         d.concepts.print(System.out);
 
 
-        assertEquals(3 , d.concept("(x==>y)").beliefs().size() );
+        assertEquals(3, d.concept("(x==>y)").beliefs().size());
 
         d.input("(x ==>+1 y). :|:"); //present
         d.next();
 
         //d.concept("(x==>y)").print();
 
-        assertEquals(4, d.concept("(x==>y)").beliefs().size() );
+        assertEquals(4, d.concept("(x==>y)").beliefs().size());
 
         d.concepts.print(System.out);
-        assertEquals(indexSize, d.concepts.size() ); //remains same amount
+        assertEquals(indexSize, d.concepts.size()); //remains same amount
 
         d.concepts.print(out);
         d.concept("(x==>y)").print();
     }
 
-    @Test public void testConceptualization2() {
+    @Test
+    public void testConceptualization2() {
         //test that an image is not considered temporal:
         Default d = new Default();
         d.believe("(((#1-->[happy])&&(#1-->[sad])),(((0-->v),(0-->h))-->[pill]))");
         d.run(1);
-        d.core.active.print();
-        assertTrue(3 <= d.core.active.size());
+        //d.conceptsActive().print();
+        assertTrue(3 <= size(d.conceptsActive()));
     }
 
-    @Test public void testConceptualizationIntermpolationEternal() {
+    @Test
+    public void testConceptualizationIntermpolationEternal() {
 
         Default d = new Default();
         d.believe("((a ==>+2 b)-->[pill])");
         d.believe("((a ==>+6 b)-->[pill])"); //same concept
         d.run(1);
 
-        Bag<Concept> cb = d.core.active;
-        cb.print();
-        assertTrue(5 <= cb.size());
-        Concept cc = ((ArrayBag<Concept>) cb).get(0).get();
 
-        {
-            Term term = $("((a==>b)-->[pill])");
+        assertTrue(5 <= size(d.conceptsActive()));
+        //Concept cc = ((ArrayBag<Concept>) cb).get(0).get();
 
-            BLink<Concept> link = cb.get(term);
-            assertNotNull(link);
-            String q = "((a==>b)-->[pill])=$";
-            assertTrue(link.toString().startsWith(q));
-            //assertEquals(q, cc.toString());
-        }
+
+        Term term = $("((a==>b)-->[pill])");
+
+        Concept cc = d.concept(term);
+        assertNotNull(cc);
+        String q = "((a==>b)-->[pill])";
+        assertTrue(cc.toString().equals(q));
+        //assertEquals(q, cc.toString());
+
 
         //INTERMPOLATION APPLIED DURING REVISION:
         assertEquals("((a ==>+4 b)-->[pill])", cc.beliefs().matchEternal().term().toString());
     }
 
-    @Test public void testConceptualizationIntermpolationTemporal() {
+    @Test
+    public void testConceptualizationIntermpolationTemporal() {
 
         Default d = new Default();
         d.believe("((a ==>+2 b)-->[pill])", Tense.Present, 1f, 0.9f);
@@ -362,19 +393,19 @@ public class TemporalTest {
         Concept cc = ((ArrayBag<Concept>) cb).get(0).get();
         assertEquals("((a==>b)-->[pill])", cc.toString());
 
-        cc.beliefs().capacity(1,1, d); //set to capacity=1 to force compression
+        cc.beliefs().capacity(1, 1, d); //set to capacity=1 to force compression
 
         cc.print();
 
         d.tasks.forEach(System.out::println);
 
 
-
         //INTERMPOLATION APPLIED AFTER REVECTION:
-        assertEquals("((a ==>+4 b)-->[pill])", cc.beliefs().match(2,d.time(), null, true).term().toString());
+        assertEquals("((a ==>+4 b)-->[pill])", cc.beliefs().match(2, d.time(), null, true).term().toString());
     }
 
-    @Test public void testSubtermTimeRecursive() {
+    @Test
+    public void testSubtermTimeRecursive() {
         Compound c = $("(hold:t2 &&+1 (at:t1 &&+3 ([opened]:t1 &&+5 open(t1))))");
         assertEquals(0, c.subtermTime($("hold:t2")));
         assertEquals(1, c.subtermTime($("at:t1")));
@@ -383,7 +414,8 @@ public class TemporalTest {
     }
 
 
-    @Test public void testSubtermTimeRecursiveWithNegativeCommutive() {
+    @Test
+    public void testSubtermTimeRecursiveWithNegativeCommutive() {
         Compound b = $("(a &&+5 b)");
         assertEquals(0, b.subtermTime(A));
         assertEquals(5, b.subtermTime(B));
@@ -410,19 +442,23 @@ public class TemporalTest {
 
     }
 
-    @Test public void testSubtermTestOffset() {
+    @Test
+    public void testSubtermTestOffset() {
         String x = "(({t001}-->[opened]) &&-5 (open({t001}) &&-5 ((({t001})-->at) &&-5 (({t002})-->hold))))";
-        String y =                           "(open({t001}) &&-5 ((({t001})-->at) &&-5 (({t002})-->hold)))";
+        String y = "(open({t001}) &&-5 ((({t001})-->at) &&-5 (({t002})-->hold)))";
         assertEquals(0, $(x).subtermTime($(y)));
 
     }
-    @Test public void testSubtermNonCommutivePosNeg() {
+
+    @Test
+    public void testSubtermNonCommutivePosNeg() {
         Term ct = $("((d-->c) ==>-3 (a-->b))");
         assertEquals(0, ct.subtermTime($("(a-->b)")));
         assertEquals(3, ct.subtermTime($("(d-->c)")));
     }
 
-    @Test public void testNonCommutivityImplConcept() {
+    @Test
+    public void testNonCommutivityImplConcept() {
         Param.DEBUG = true;
         NAR n = new Default();
 
@@ -430,7 +466,7 @@ public class TemporalTest {
         n.input("((x) ==>+5 (y)).", "((y) ==>-5 (x)).");
         n.run(25);
 
-        TreeSet d = new TreeSet((x,y)-> x.toString().compareTo(y.toString()));
+        TreeSet d = new TreeSet((x, y) -> x.toString().compareTo(y.toString()));
         n.forEachActiveConcept(d::add);
 
         //2 unique impl concepts created
@@ -440,20 +476,22 @@ public class TemporalTest {
                 , d.toString());
     }
 
-    @Test public void testCommutivity() {
+    @Test
+    public void testCommutivity() {
 
-        assertTrue( $("(b && a)").isCommutative() );
-        assertTrue( $("(b &&+1 a)").isCommutative() );
+        assertTrue($("(b && a)").isCommutative());
+        assertTrue($("(b &&+1 a)").isCommutative());
 
 
         Term abc = $("((a &&+0 b) &&+0 c)");
-        assertEquals( "( &&+0 ,a,b,c)", abc.toString() );
-        assertTrue( abc.isCommutative() );
+        assertEquals("( &&+0 ,a,b,c)", abc.toString());
+        assertTrue(abc.isCommutative());
 
     }
 
-    @Test public void testInvalidConjunction() {
-        NarseseTest.assertInvalid( "( &&-59 ,(#1-->I),(#1-->{i141}),(#2-->{i141}))");
+    @Test
+    public void testInvalidConjunction() {
+        NarseseTest.assertInvalid("( &&-59 ,(#1-->I),(#1-->{i141}),(#2-->{i141}))");
 
         Compound x = $("(&&,(#1-->I),(#1-->{i141}),(#2-->{i141}))");
         Assert.assertNotNull(x);
@@ -469,7 +507,9 @@ public class TemporalTest {
 //            assertTrue(true);
 //        }
     }
-    @Test public void testEqualsAnonymous() {
+
+    @Test
+    public void testEqualsAnonymous() {
         //        if (as == bs) {
 //            return true;
 //        } else if (as instanceof Compound && bs instanceof Compound) {
@@ -512,7 +552,9 @@ public class TemporalTest {
 //        }
         assertFalse(Terms.equalAtemporally($("(x ==> y)"), $.<Term>$("(y ==>+1 x)")));
     }
-    @Test public void testEqualsAnonymous3() {
+
+    @Test
+    public void testEqualsAnonymous3() {
         //        if (as == bs) {
 //            return true;
 //        } else if (as instanceof Compound && bs instanceof Compound) {
@@ -538,7 +580,9 @@ public class TemporalTest {
 //        }
         assertFalse(Terms.equalAtemporally($("(x && (y ==> z))"), $.<Term>$("(x &&+1 (z ==>+1 w))")));
     }
-    @Test public void testEqualsAnonymous4() {
+
+    @Test
+    public void testEqualsAnonymous4() {
         //temporal terms within non-temporal terms
         //        if (as == bs) {
 //            return true;
@@ -574,7 +618,9 @@ public class TemporalTest {
 //        }
         assertTrue(Terms.equalAtemporally($("((a ==>+1 b),(b ==> c))"), $.<Term>$("((a ==> b),(b ==>+1 c))")));
     }
-    @Test public void testEqualsAnonymous5() {
+
+    @Test
+    public void testEqualsAnonymous5() {
         //special handling for images
         //        if (as == bs) {
 //            return true;

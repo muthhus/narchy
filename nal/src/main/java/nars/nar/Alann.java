@@ -208,7 +208,7 @@ public class Alann extends NAR {
 
         }
 
-        addControl(new AlannControl(this, cores, coreSize, coreFires, coreThreads));
+        setControl(new AlannControl(this, cores, coreSize, coreFires, coreThreads));
 
     }
 

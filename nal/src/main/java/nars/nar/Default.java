@@ -30,7 +30,9 @@ public class Default extends NAR {
 
     //private static final Logger logger = LoggerFactory.getLogger(Default.class);
 
-    public final @NotNull ConceptBagReasoner core;
+    public final ConceptBagReasoner core = new ConceptBagReasoner(this, new DefaultDeriver());
+
+    private final STMTemporalLinkage stmLinkage = new STMTemporalLinkage(this, 2);
 
 
     @Deprecated
@@ -59,65 +61,13 @@ public class Default extends NAR {
     public Default(int activeConcepts, int conceptsFirePerCycle, int taskLinksPerConcept, int termLinksPerConcept, @NotNull Random random, @NotNull TermIndex index, @NotNull Time time, Executioner exe) {
         super(time, index, random, exe);
 
+        core.active.capacity(activeConcepts);
+        core.termlinksFiredPerFiredConcept.set(1, termLinksPerConcept);
+        core.tasklinksFiredPerFiredConcept.set(taskLinksPerConcept);
+        core.conceptsFiredPerCycle.set(conceptsFirePerCycle);
 
-        ConceptBagReasoner c = new ConceptBagReasoner(this, new DefaultDeriver());
-
-        c.active.capacity(activeConcepts);
-        c.termlinksFiredPerFiredConcept.set(1, termLinksPerConcept);
-        c.tasklinksFiredPerFiredConcept.set(taskLinksPerConcept);
-        c.conceptsFiredPerCycle.set(conceptsFirePerCycle);
-
-        addControl(c);
-
-        this.core = c;
-
-
-        int level = level();
-
-        if (level >= 7) {
-
-            initNAL7();
-
-
-        }
-
-
+        setControl(this.core);
     }
-
-
-
-    @Nullable
-    private STMTemporalLinkage stmLinkage = null;
-
-    /** NAL7 plugins */
-    protected void initNAL7() {
-
-        stmLinkage = new STMTemporalLinkage(this, 2);
-
-    }
-
-
-//    @Override
-//    public final void activate(Termed term, float priToAdd) {
-//        return core.active.activate(term, priToAdd);
-//    }
-//
-//    @Override
-//    public final void activate(Iterable<ObjectFloatPair<Concept>> concepts, MutableFloat overflow) {
-//        core.activate(concepts, overflow);
-//    }
-//
-//    @Override
-//    public Iterable<? extends BLink<Concept>> conceptsActive() {
-//        return core.active;
-//    }
-//
-//    @Override
-//    public final float pri(@NotNull Termed concept, float valueIfInactive) {
-//        return core.pri(concept, valueIfInactive);
-//    }
-
-
 
 
     /**

@@ -7,6 +7,8 @@ import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Collections;
+
 /**
  * Created by me on 12/27/16.
  */
@@ -30,5 +32,24 @@ public interface Control {
     }
 
     Iterable<? extends BLink<Concept>> conceptsActive();
+
+
+
+    static Control NullControl = new Control() {
+        @Override
+        public void activate(Termed term, float priToAdd) {
+
+        }
+
+        @Override
+        public float pri(@NotNull Termed concept) {
+            return 0;
+        }
+
+        @Override
+        public Iterable<? extends BLink<Concept>> conceptsActive() {
+            return Collections.emptyList();
+        }
+    };
 
 }

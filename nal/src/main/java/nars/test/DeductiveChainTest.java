@@ -112,9 +112,9 @@ public class DeductiveChainTest  {
         //n.stdout();
         //n.frame(5000);
 
-        int nc = ((Default) n).core.active.size();
-        String ts = timestamp(start);
-        long time = n.time();
+        //int nc = ((Default) n).core.active.size();
+        //String ts = timestamp(start);
+        //long time = n.time();
 
         //n.stdout();
         //n.frame(55); //to print the ending
