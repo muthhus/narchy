@@ -650,7 +650,7 @@ abstract public class NAgent implements NSense, NAction {
 
         //HACK
         if (nar instanceof Default) {
-            ((Default) nar).core.active.add(c, amount);
+            ((Default) nar).core.active.activate(c, amount);
         }
 
 //        new Activation(boostBudget, c, nar, 1) {

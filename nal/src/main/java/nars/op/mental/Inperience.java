@@ -181,7 +181,7 @@ public class Inperience extends Leak<Task> {
         Task task = b.get();
 
         try {
-            Compound r = reify(task, nar.self, conceptCreationExpectation.floatValue());
+            Compound r = reify(task, nar.self(), conceptCreationExpectation.floatValue());
             if (r!=null) {
                 MutableTask e = new InperienceTask(task,
                         r,

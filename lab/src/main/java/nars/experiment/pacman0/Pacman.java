@@ -331,7 +331,7 @@ public class Pacman extends NAgent {
                             Vis.budgetHistogram(nar, 50),
                             Vis.conceptLinePlot(nar,
                                     Iterables.concat(p.actions, Lists.newArrayList(p.happy/*, p.joy*/)),
-                                    200, (org.eclipse.collections.api.block.function.primitive.FloatFunction<nars.term.Termed>) (termed) -> nar.priority(termed, Float.NaN))
+                                    200, (org.eclipse.collections.api.block.function.primitive.FloatFunction<nars.term.Termed>) (termed) -> nar.pri(termed, Float.NaN))
                     )
             ), 500, 500);
 

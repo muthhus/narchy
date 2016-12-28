@@ -5,6 +5,7 @@ import jcog.data.MutableInteger;
 import jcog.data.Range;
 import jcog.meter.event.HitMissMeter;
 import nars.$;
+import nars.Control;
 import nars.NAR;
 import nars.Param;
 import nars.bag.Bag;
@@ -36,7 +37,7 @@ import java.util.function.Consumer;
  *
  * multithreading granularity at the concept (outermost loop)
  */
-public class ConceptBagReasoner implements Consumer<DerivedTask> {
+public class ConceptBagReasoner implements Control, Consumer<DerivedTask> {
 
 
     private static final Logger logger = LoggerFactory.getLogger(ConceptBagReasoner.class);
@@ -91,7 +92,7 @@ public class ConceptBagReasoner implements Consumer<DerivedTask> {
     //private final CapacityLinkedHashMap<Premise,Premise> recent = new CapacityLinkedHashMap<>(256);
     //long novel=0, total=0;
 
-    public ConceptBagReasoner(@NotNull NAR nar, Deriver deriver, int initialCapacity) {
+    public ConceptBagReasoner(@NotNull NAR nar, @NotNull Deriver deriver) {
 
         this.nar = nar;
 
@@ -100,7 +101,7 @@ public class ConceptBagReasoner implements Consumer<DerivedTask> {
         this.conceptsFiredPerBatch = new MutableInteger(Param.CONCEPT_FIRE_BATCH_SIZE);
         this.conceptBuilder = nar.concepts.conceptBuilder();
 
-        this.active = new BagIndexAdapter(initialCapacity, ((DefaultConceptBuilder) conceptBuilder).defaultCurveSampler);
+        this.active = new ConceptBag( ((DefaultConceptBuilder) conceptBuilder).defaultCurveSampler);
 
 
         //nar.onFrame(this);
@@ -175,18 +176,24 @@ public class ConceptBagReasoner implements Consumer<DerivedTask> {
     }
 
 
-    public static final Budget baseConceptBudget = new ROBudget(1f, 0.5f);
+    public static final ROBudget baseBudget = new ROBudget(1f, 0.5f);
 
-    public void priorityAdd(Iterable<ObjectFloatPair<Concept>> activations, MutableFloat overflow) {
-        this.active.put(activations, baseConceptBudget, overflow);
+    @Override
+    public void activate(Termed term, float priToAdd) {
+        active.put((Concept)term, baseBudget, priToAdd, null);
     }
 
-    public float priority(@NotNull Termed concept, float valueIfInactive) {
-        BLink c = active.get(concept);
-        if (c == null) return valueIfInactive;
-        float p = c.priSafe(valueIfInactive);
 
-        return c != null ? c.pri() : Float.NaN;
+    @Override
+    public float pri(@NotNull Termed concept) {
+        BLink c = active.get(concept);
+        return (c != null) ? c.pri() : Float.NaN;
+    }
+
+
+    @Override
+    public Iterable<? extends BLink<Concept>> conceptsActive() {
+        return active;
     }
 
 //    static final class BudgetSavings extends RawBudget {
@@ -201,13 +208,13 @@ public class ConceptBagReasoner implements Consumer<DerivedTask> {
 
 
     /** extends CurveBag to invoke entrance/exit event handler lambda */
-    public final class BagIndexAdapter extends CurveBag<Concept> {
+    public final class ConceptBag extends CurveBag<Concept> {
 
 
-        public BagIndexAdapter(int capacity, @NotNull CurveSampler sampler) {
-            super(capacity, sampler, BudgetMerge.plusBlend,
+        public ConceptBag( @NotNull CurveSampler sampler) {
+            super(0, sampler, BudgetMerge.plusBlend,
                     //new ConcurrentHashMap<>(capacity)
-                    nar.exe.concurrent() ?  new java.util.concurrent.ConcurrentHashMap<>(capacity) : new HashMap(capacity)
+                    nar.exe.concurrent() ?  new java.util.concurrent.ConcurrentHashMap<>() : new HashMap()
                     //new NonBlockingHashMap<>(capacity)
             );
         }

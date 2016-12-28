@@ -115,6 +115,7 @@
 
     Y, (B ==> (&&,X,A..+)), time(dtBeliefExact), notImplEqui(A..+) |- subIfUnifiesAny((B ==>+- (&&,A..+)),X,Y), (Belief:Deduction)
     Y, (B ==> (&&,(--,%X),A..+)), time(dtBeliefExact), notImplEqui(A..+) |- subIfUnifiesAny((B ==>+- (&&,A..+)),(--,%X),(--,%Y)), (Belief:DeductionN)
+
 //// propositional decomposition ////////////////////////////////////////////////////////////////////////////////////
 //If S is the case, and (&&,S,A..+) is not the case, it can't be that (&&,A..+) is the case
 

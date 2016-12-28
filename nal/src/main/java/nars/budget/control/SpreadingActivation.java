@@ -59,7 +59,11 @@ public class SpreadingActivation extends Activation implements ObjectFloatProced
 
         nar.emotion.stress(linkOverflow);
 
-        nar.activate(conceptActivation, null);
+        for (int i = 0, conceptActivationSize = conceptActivation.size(); i < conceptActivationSize; i++) {
+            ObjectFloatPair<Concept> a = conceptActivation.get(i);
+            nar.activate(a.getOne(), a.getTwo());
+        }
+
     }
 
     @Override

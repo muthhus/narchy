@@ -16,9 +16,6 @@ import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import static nars.term.Terms.compoundOrNull;
-import static nars.util.UtilityFunctions.or;
-
 /**
  * Defines the conditions used in an instance of a derivation
  * Contains the information necessary for generating derivation Tasks via reasoning rules.

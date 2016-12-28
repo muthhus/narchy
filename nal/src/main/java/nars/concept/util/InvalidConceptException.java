@@ -1,7 +1,7 @@
 package nars.concept.util;
 
-import nars.util.SoftException;
 import nars.term.Termed;
+import nars.util.SoftException;
 import org.jetbrains.annotations.NotNull;
 
 /**

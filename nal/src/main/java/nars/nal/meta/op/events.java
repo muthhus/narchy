@@ -1,9 +1,9 @@
 package nars.nal.meta.op;
 
 import nars.Task;
+import nars.nal.Derivation;
 import nars.nal.meta.AtomicBoolCondition;
 import nars.nal.meta.BoolCondition;
-import nars.nal.Derivation;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

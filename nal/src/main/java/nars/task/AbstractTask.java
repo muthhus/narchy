@@ -6,13 +6,13 @@ import nars.*;
 import nars.budget.RawBudget;
 import nars.budget.util.BudgetFunctions;
 import nars.concept.util.InvalidConceptException;
-import nars.util.task.InvalidTaskException;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.time.Tense;
 import nars.truth.Truth;
 import nars.truth.TruthDelta;
+import nars.util.task.InvalidTaskException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

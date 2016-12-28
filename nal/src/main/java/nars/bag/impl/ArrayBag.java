@@ -223,12 +223,12 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
 
     @Nullable
     @Override
-    public V add(Object key, float x) {
+    public V activate(Object key, float toAdd) {
         BLink<V> c = map.get(key);
         if (c != null && !c.isDeleted()) {
             //float dur = c.dur();
             float pBefore = c.pri();
-            c.priAdd(x);
+            c.priAdd(toAdd);
             float delta = c.pri() - pBefore;
             pressure += delta;// * dur;
             return c.get();

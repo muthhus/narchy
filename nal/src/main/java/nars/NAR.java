@@ -1,6 +1,7 @@
 package nars;
 
 
+import com.google.common.collect.Iterators;
 import com.google.common.collect.Sets;
 import io.airlift.compress.snappy.SnappyFramedInputStream;
 import io.airlift.compress.snappy.SnappyFramedOutputStream;
@@ -8,6 +9,7 @@ import jcog.data.MutableInteger;
 import jcog.event.ArrayTopic;
 import jcog.event.On;
 import jcog.event.Topic;
+import jcog.list.ConcurrentArrayList;
 import nars.Narsese.NarseseException;
 import nars.budget.Budget;
 import nars.budget.Budgeted;
@@ -21,10 +23,8 @@ import nars.index.task.TaskIndex;
 import nars.index.term.TermIndex;
 import nars.link.BLink;
 import nars.nal.Operator;
-import nars.util.exe.Executioner;
 import nars.table.BeliefTable;
 import nars.task.MutableTask;
-import nars.util.task.InvalidTaskException;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
@@ -35,11 +35,12 @@ import nars.time.FrameTime;
 import nars.time.Tense;
 import nars.time.Time;
 import nars.truth.Truth;
-import nars.util.Iterative;
+import nars.util.Cycles;
+import nars.util.exe.Executioner;
+import nars.util.task.InvalidTaskException;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.apache.commons.math3.stat.Frequency;
 import org.eclipse.collections.api.tuple.Twin;
-import org.eclipse.collections.api.tuple.primitive.ObjectFloatPair;
 import org.fusesource.jansi.Ansi;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -83,7 +84,7 @@ import static org.fusesource.jansi.Ansi.ansi;
  * <p>
  * Memory is serializable so it can be persisted and transported.
  */
-public abstract class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Iterative<NAR> {
+public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control, Cycles<NAR> {
 
     public static final Logger logger = LoggerFactory.getLogger(NAR.class);
     static final Set<String> logEvents = Sets.newHashSet("eventTaskProcess", "eventAnswer", "eventExecute");
@@ -104,15 +105,14 @@ public abstract class NAR extends Param implements Consumer<Task>, NARIn, NAROut
      */
     @NotNull
     public final TermIndex concepts;
+
     @NotNull
     public final TaskIndex tasks;
 
-    /**
-     * The id/name of the reasoner
-     * TODO
-     */
+    @NotNull private final List<Control> control;
+
     @NotNull
-    public final Atom self;
+    private Atom self = Param.randomSelf();
 
 
     /**
@@ -193,7 +193,10 @@ public abstract class NAR extends Param implements Consumer<Task>, NARIn, NAROut
         return concepts.normalize(t);
     }
 
-    public NAR(@NotNull Time time, @NotNull TermIndex concepts, @NotNull Random rng, @NotNull Atom self, Executioner exe) {
+    public NAR(@NotNull Time time, @NotNull TermIndex concepts, @NotNull Random rng, @NotNull Executioner exe) {
+
+        this.control = new ConcurrentArrayList<>(Control.class);
+
 
         random = rng;
 
@@ -209,13 +212,9 @@ public abstract class NAR extends Param implements Consumer<Task>, NARIn, NAROut
                 //new TreeTaskIndex(); //Not working perfectly yet: confuses &&+ and ==>+ among other possible bugs
 
 
-        self = Param.defaultSelf(); //default value
-
-
         emotion = new Emotion();
 
 
-        this.self = self;
         (this.exe = exe).start(this);
 
 
@@ -245,6 +244,20 @@ public abstract class NAR extends Param implements Consumer<Task>, NARIn, NAROut
 
     }
 
+    public void addControl(Control control) {
+        if (this.control.contains(control))
+            throw new RuntimeException(control + " was already added");
+        this.control.add(control);
+    }
+
+    public void removeControl(Control control) {
+        if (!this.control.remove(control))
+            throw new RuntimeException(control + " was not added");
+    }
+
+    public void setSelf(Atom self) {
+        this.self = self;
+    }
 
     @Deprecated
     public static void printActiveTasks(@NotNull NAR n, boolean beliefsOrGoals) {
@@ -1061,7 +1074,7 @@ public abstract class NAR extends Param implements Consumer<Task>, NARIn, NAROut
     @NotNull
     @Override
     public String toString() {
-        return self + ":" + getClass().getSimpleName();
+        return self() + ":" + getClass().getSimpleName();
     }
 
 
@@ -1182,8 +1195,10 @@ public abstract class NAR extends Param implements Consumer<Task>, NARIn, NAROut
     }
 
     @Nullable
-    @Deprecated
-    public abstract NAR forEachActiveConcept(@NotNull Consumer<Concept> recip);
+    public NAR forEachActiveConcept(@NotNull Consumer<Concept> recip) {
+        conceptsActive().forEach(n->recip.accept(n.get()));
+        return this;
+    }
 
     @NotNull
     public NAR forEachConcept(@NotNull Consumer<Concept> recip) {
@@ -1268,10 +1283,39 @@ public abstract class NAR extends Param implements Consumer<Task>, NARIn, NAROut
         return this == obj;
     }
 
+
+    @Override public void activate(Termed term, float priToAdd) {
+        for (int i = 0, controlSize = control.size(); i < controlSize; i++) {
+            control.get(i).activate(term, priToAdd);
+        }
+    }
+
+
     /**
      * gets a measure of the current priority of the concept
      */
-    abstract public float priority(@NotNull Termed termed, float valueIfInactive);
+    public float pri(@NotNull Termed termed) {
+        float p = 0;
+        for (int i = 0, controlSize = control.size(); i < controlSize; i++) {
+            Control c = control.get(i);
+            p += c.pri(termed);
+        }
+        return p;
+    }
+
+
+    @Override
+    public Iterable<? extends BLink<Concept>> conceptsActive() {
+        int s = control.size();
+        switch (s) {
+            case 0: return Collections.emptyList();
+            case 1: return control.get(0).conceptsActive(); //avoids the concatenated iterator default case
+            default:
+                return ()->{
+                    return Iterators.concat( Iterators.transform( control.iterator(), c -> c.conceptsActive().iterator() ) );
+                };
+        }
+    }
 
 
     public Termed[] terms(String... terms) {
@@ -1350,11 +1394,6 @@ public abstract class NAR extends Param implements Consumer<Task>, NARIn, NAROut
     }
 
 
-    /**
-     * if the concept is active, returns the Concept while applying the boost factor to its budget
-     */
-    @Nullable
-    abstract public Concept concept(Termed termed, float priToAdd);
 
     @Override
     public final int level() {
@@ -1381,7 +1420,6 @@ public abstract class NAR extends Param implements Consumer<Task>, NARIn, NAROut
     }
 
 
-    public abstract Iterable<? extends BLink<Concept>> conceptsActive(int maxNodes);
 
 
 
@@ -1462,11 +1500,11 @@ public abstract class NAR extends Param implements Consumer<Task>, NARIn, NAROut
     }
 
 
+
     /**
-     * batched concept activation
+     * The id/name of the reasoner
      */
-    abstract public void activate(Iterable<ObjectFloatPair<Concept>> concepts, @Nullable MutableFloat overflow);
-
-
-
+    public final Atom self() {
+        return self;
+    }
 }

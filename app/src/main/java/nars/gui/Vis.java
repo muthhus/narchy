@@ -14,7 +14,7 @@ import nars.term.Term;
 import nars.term.Termed;
 import nars.term.atom.Atomic;
 import nars.truth.Truth;
-import nars.util.Iterative;
+import nars.util.Cycles;
 import org.eclipse.collections.api.block.function.primitive.FloatFunction;
 import org.eclipse.collections.impl.map.mutable.primitive.ObjectFloatHashMap;
 import org.jetbrains.annotations.Nullable;
@@ -168,7 +168,7 @@ public class Vis {
         return tc;
     }
 
-    public static <X extends Termed> BagChart<X> items(Bag<X> bag, final Iterative d, final int count) {
+    public static <X extends Termed> BagChart<X> items(Bag<X> bag, final Cycles d, final int count) {
         BagChart tc = new BagChart(bag, count) {
             @Override
             public void accept(BLink x, ItemVis y) {
@@ -260,7 +260,7 @@ public class Vis {
 
             };
             p.setTitle(t.toString());
-            p.add("P", () -> nar.priority(t, Float.NaN), 0f, 1f);
+            p.add("P", () -> nar.pri(t, Float.NaN), 0f, 1f);
             p.add("B", () -> nar.concept(t).beliefFreq(nar.time()), 0f, 1f);
             p.add("G", () -> nar.concept(t).goalFreq(nar.time()), 0f, 1f);
             grid.children.add(p);
@@ -380,7 +380,7 @@ public class Vis {
         NARSpace active = new NARSpace(nar) {
 
             final ObjectFloatHashMap<Term> priCache = new ObjectFloatHashMap<>();
-            final FloatFunction<Term> termFloatFunction = k -> nar.priority(k, Float.NaN);
+            final FloatFunction<Term> termFloatFunction = k -> nar.pri(k, Float.NaN);
 
             @Override
             protected void get(Collection displayNext) {

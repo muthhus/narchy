@@ -8,6 +8,6 @@ import java.util.function.Consumer;
 /**
  * Created by me on 10/20/16.
  */
-public interface Iterative<X> {
+public interface Cycles<X> {
     @NotNull On onCycle(Consumer<X> x);
 }

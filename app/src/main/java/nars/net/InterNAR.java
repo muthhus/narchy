@@ -44,7 +44,7 @@ public class InterNAR extends Peer implements PeerModel {
     public InterNAR(NAR n, short port) throws IOException {
         super(port);
 
-        logger = LoggerFactory.getLogger(n.self + "," + getClass().getSimpleName());
+        logger = LoggerFactory.getLogger(n.self() + "," + getClass().getSimpleName());
 
         this.nar = n;
 

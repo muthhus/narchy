@@ -155,8 +155,8 @@ abstract public class NAgents extends NAgent {
 
         new Inperience(nar, 0.05f);
 
-        SpaceGraph.window(grid(nar.cores.stream().map(c ->
-                Vis.items(c.activeBag(), nar, 16)).toArray(Surface[]::new)), 900, 700);
+        /*SpaceGraph.window(grid(nar.cores.stream().map(c ->
+                Vis.items(c.activeBag(), nar, 16)).toArray(Surface[]::new)), 900, 700);*/
 
 
         return nar;
@@ -328,7 +328,7 @@ abstract public class NAgents extends NAgent {
                                     .toArray(Surface[]::new)),
                             "inputEdit",()->Vis.newInputEditor(a.nar),
                             "concepts", ()->
-                                    Vis.treeChart( a.nar, new Bagregate(a.nar.conceptsActive(64), 64, 0.05f) , 64),
+                                    Vis.treeChart( a.nar, new Bagregate<>(a.nar.conceptsActive(), 64, 0.05f) , 64),
                             "conceptBudget", ()->
                                     Vis.budgetHistogram(nar, 24),
                             "tasks", ()-> taskChart,

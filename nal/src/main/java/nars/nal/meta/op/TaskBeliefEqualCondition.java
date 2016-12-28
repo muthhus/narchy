@@ -1,7 +1,7 @@
 package nars.nal.meta.op;
 
-import nars.nal.meta.AtomicBoolCondition;
 import nars.nal.Derivation;
+import nars.nal.meta.AtomicBoolCondition;
 import org.jetbrains.annotations.NotNull;
 
 /** matches the possibility that one half of the premise must be contained within the other.

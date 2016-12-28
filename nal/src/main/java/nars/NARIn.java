@@ -1,9 +1,5 @@
 package nars;
 
-import nars.NAR;
-import nars.Narsese;
-import nars.Symbols;
-import nars.Task;
 import nars.concept.Concept;
 import nars.task.LambdaQuestionTask;
 import nars.term.Compound;

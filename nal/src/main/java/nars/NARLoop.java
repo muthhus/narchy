@@ -39,7 +39,7 @@ public class NARLoop extends Loop {
      * @param initialPeriod
      */
     public NARLoop(@NotNull NAR n, int initialPeriod) {
-        super(n.self + ":loop");
+        super(n.self() + ":loop");
 
         nar = n;
 

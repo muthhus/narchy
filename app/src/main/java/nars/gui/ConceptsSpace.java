@@ -22,7 +22,7 @@ public class ConceptsSpace extends NARSpace<Term, ConceptWidget> {
         this.nar = nar;
         this.maxNodes = maxNodes;
         this.maxEdgesPerNode = maxEdgesPerNode;
-        bag = new Bagregate<Concept>(nar.conceptsActive(maxNodes), maxNodes, 0.5f) {
+        bag = new Bagregate<Concept>(nar.conceptsActive(), maxNodes, 0.5f) {
             @Override
             protected boolean include(BLink<Concept> x) {
                 return display(x.get().term());

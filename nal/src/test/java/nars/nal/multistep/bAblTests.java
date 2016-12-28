@@ -62,10 +62,11 @@ public class bAblTests extends AbstractNALTest {
             .inputAt(0,"pick({john},{football}). :|:") ////John picked up the football.
             .inputAt(0,"isIn({bob},{kitchen}). :|:") ////Bob went to the kitchen.
             .askAt  (0,"isIn({football},?where)") ////Where is the football?
-            .mustBelieve(2000, "isIn({football},{playground})", 1f, 0.59f, 0); ////A: playground
+            .mustBelieve(2000, "isIn({football},{playground})", 1f, 0.53f, 0); ////A: playground
 
     }
 
+    /** TODO find a better problem representation, this one isnt good */
     @Ignore @Test public void test19() {
 
         //(19) Path Finding

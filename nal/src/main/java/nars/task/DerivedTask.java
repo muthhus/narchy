@@ -5,8 +5,8 @@ import nars.NAR;
 import nars.Param;
 import nars.Task;
 import nars.concept.Concept;
-import nars.nal.Premise;
 import nars.nal.Derivation;
+import nars.nal.Premise;
 import nars.term.Compound;
 import nars.term.Termed;
 import nars.truth.Truth;
@@ -211,10 +211,11 @@ abstract public class DerivedTask extends MutableTask {
 
                     float b = boost;
 
-                    Concept c = nar.concept(premise1.concept, b);
+                    nar.activate(premise1.concept, b);
 
+                    Concept c = nar.concept(premise1.concept);
                     if (c != null) {
-                        c.termlinks().add(premise1.term, b);
+                        c.termlinks().activate(premise1.term, b);
                         //c.tasklinks().boost(premise.task, score);
                         //nar.concept(c.term(), b);
                     }

@@ -2,20 +2,19 @@ package nars.nar;
 
 import jcog.data.random.XorShift128PlusRandom;
 import nars.NAR;
-import nars.Param;
 import nars.concept.Concept;
 import nars.index.term.TermIndex;
 import nars.index.term.map.MapTermIndex;
 import nars.link.BLink;
-import nars.nal.Deriver;
-import nars.reason.ConceptBagReasoner;
-import nars.util.exe.Executioner;
-import nars.util.exe.SynchronousExecutor;
-import nars.reason.DefaultConceptBuilder;
 import nars.op.time.STMTemporalLinkage;
+import nars.reason.ConceptBagReasoner;
+import nars.reason.DefaultConceptBuilder;
+import nars.reason.DefaultDeriver;
 import nars.term.Termed;
 import nars.time.FrameTime;
 import nars.time.Time;
+import nars.util.exe.Executioner;
+import nars.util.exe.SynchronousExecutor;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.eclipse.collections.api.tuple.primitive.ObjectFloatPair;
 import org.jetbrains.annotations.NotNull;
@@ -23,7 +22,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Random;
-import java.util.function.Consumer;
 
 /**
  * Various extensions enabled
@@ -59,14 +57,17 @@ public class Default extends NAR {
 
 
     public Default(int activeConcepts, int conceptsFirePerCycle, int taskLinksPerConcept, int termLinksPerConcept, @NotNull Random random, @NotNull TermIndex index, @NotNull Time time, Executioner exe) {
-        super(time, index, random, Param.defaultSelf(), exe);
+        super(time, index, random, exe);
 
 
-        ConceptBagReasoner c = new ConceptBagReasoner(this, newDeriver(), activeConcepts);
+        ConceptBagReasoner c = new ConceptBagReasoner(this, new DefaultDeriver());
 
+        c.active.capacity(activeConcepts);
         c.termlinksFiredPerFiredConcept.set(1, termLinksPerConcept);
         c.tasklinksFiredPerFiredConcept.set(taskLinksPerConcept);
         c.conceptsFiredPerCycle.set(conceptsFirePerCycle);
+
+        addControl(c);
 
         this.core = c;
 
@@ -77,37 +78,13 @@ public class Default extends NAR {
 
             initNAL7();
 
-            if (level >= 8) {
-
-                initNAL8();
-
-            }
 
         }
 
 
     }
 
-    protected Deriver newDeriver() {
-        return newDefaultDeriver();
-    }
 
-    public static Deriver newDefaultDeriver() {
-        Deriver[] modules = Deriver.get(
-            "nal1.nal",
-            "nal2.nal",
-            "nal3.nal",
-            "nal4.nal",
-            "nal6.nal",
-            "induction.nal",
-            "nal.nal" //DEPRECATED
-        );
-
-        return (x) -> {
-            for (Deriver d : modules)
-                d.accept(x);
-        };
-    }
 
     @Nullable
     private STMTemporalLinkage stmLinkage = null;
@@ -119,42 +96,28 @@ public class Default extends NAR {
 
     }
 
-    /* NAL8 plugins */
-    protected void initNAL8() {
-        /*for (AbstractOperator o : defaultOperators)
-            on(o);*/
-    }
+
+//    @Override
+//    public final void activate(Termed term, float priToAdd) {
+//        return core.active.activate(term, priToAdd);
+//    }
+//
+//    @Override
+//    public final void activate(Iterable<ObjectFloatPair<Concept>> concepts, MutableFloat overflow) {
+//        core.activate(concepts, overflow);
+//    }
+//
+//    @Override
+//    public Iterable<? extends BLink<Concept>> conceptsActive() {
+//        return core.active;
+//    }
+//
+//    @Override
+//    public final float pri(@NotNull Termed concept, float valueIfInactive) {
+//        return core.pri(concept, valueIfInactive);
+//    }
 
 
-    @Nullable
-    @Override
-    public final Concept concept(Termed term, float priToAdd) {
-        return core.active.add(term, priToAdd);
-    }
-
-    @Override
-    public final void activate(Iterable<ObjectFloatPair<Concept>> concepts, MutableFloat overflow) {
-        core.priorityAdd(concepts, overflow);
-    }
-
-    @Override
-    public Iterable<? extends BLink<Concept>> conceptsActive(int maxNodes) {
-        return core.active;
-    }
-
-    @Override
-    public final float priority(@NotNull Termed concept, float valueIfInactive) {
-        return core.priority(concept, valueIfInactive);
-    }
-
-
-
-    @NotNull
-    @Override
-    public NAR forEachActiveConcept(@NotNull Consumer<Concept> recip) {
-        core.active.forEachKey(recip);
-        return this;
-    }
 
 
     /**

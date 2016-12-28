@@ -515,7 +515,7 @@ public class HijackBag<X> implements Bag<X> {
         return null;
     }
     @Override
-    public X add(@NotNull Object key, float x) {
+    public X activate(@NotNull Object key, float x) {
         BLink<X> b = get(key);
         if (b != null && !b.isDeleted()) {
             float before = b.pri();

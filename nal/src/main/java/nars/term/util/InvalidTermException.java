@@ -1,9 +1,9 @@
 package nars.term.util;
 
 import nars.Op;
-import nars.util.SoftException;
 import nars.term.Term;
 import nars.term.container.TermContainer;
+import nars.util.SoftException;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;

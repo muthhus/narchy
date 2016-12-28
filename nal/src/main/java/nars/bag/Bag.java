@@ -471,12 +471,9 @@ public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Iterable<BLink<
             return null;
         }
 
-        @Override
-        public void put(@NotNull Iterable values, @NotNull Budgeted in, MutableFloat overflow) {
 
-        }
 
-        @Override public Object add(Object c, float x) {
+        @Override public Object activate(Object c, float x) {
             return null;
         }
 
@@ -584,18 +581,9 @@ public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Iterable<BLink<
         forEach(b -> each.accept(b.get()));
     }
 
-    default void put(@NotNull Iterable<ObjectFloatPair<V>> values, @NotNull Budgeted in, MutableFloat overflow) {
-
-        Consumer<ObjectFloatPair<V>> p = (kv) -> {
-            put(kv.getOne(), in, kv.getTwo(), overflow);
-        };
-
-        values.forEach(p);
-    }
-
 
     /** if key is present, adds a priority amount (quality unaffected) */
-    @Nullable V add(Object key, float x);
+    @Nullable V activate(Object key, float toAdd);
 
     /** if key is present, applies a priority multiplier factor, and returns the link */
     @Nullable V mul(Object key, float factor);

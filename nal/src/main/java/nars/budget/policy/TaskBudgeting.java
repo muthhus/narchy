@@ -1,18 +1,19 @@
 package nars.budget.policy;
 
 import jcog.Util;
-import nars.*;
+import nars.$;
+import nars.Param;
+import nars.Symbols;
 import nars.budget.Budget;
 import nars.budget.util.BudgetFunctions;
-import nars.nal.Premise;
 import nars.nal.Derivation;
+import nars.nal.Premise;
 import nars.term.Termed;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import static nars.truth.TruthFunctions.w2c;
-import static nars.util.UtilityFunctions.and;
 
 /**
  * Created by me on 5/23/16.

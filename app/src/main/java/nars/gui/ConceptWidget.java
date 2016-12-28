@@ -326,7 +326,7 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<BLink<? exte
 
 
         public void apply(ConceptWidget conceptWidget, Term tt) {
-            float p = conceptWidget.space.nar.priority(tt, Float.NaN);
+            float p = conceptWidget.space.nar.pri(tt, Float.NaN);
             p = (p == p) ? p : 0;// = 1; //pri = key.priIfFiniteElseZero();
 
             //sqrt because the area will be the sqr of this dimension
@@ -345,7 +345,7 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<BLink<? exte
         public void apply(ConceptWidget conceptWidget, Term tt) {
             ConceptsSpace space = conceptWidget.space;
             NAR nar = space.nar;
-            float p = nar.priority(tt, Float.NaN);
+            float p = nar.pri(tt, Float.NaN);
             p = (p == p) ? p : 0;// = 1; //pri = key.priIfFiniteElseZero();
 
             //long now = space.now();

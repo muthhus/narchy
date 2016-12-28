@@ -58,7 +58,7 @@ public class Tetris extends NAgents {
 
     public final Grid view = new Grid(
                     new MatrixView(tetris_width, tetris_height, (x, y, gl) -> {
-                        float r = nar.priority(concept[x][y], Float.NaN);
+                        float r = nar.pri(concept[x][y], Float.NaN);
                         gl.glColor3f(r, 0, 0);
                         return 0f;
                     }),
@@ -615,7 +615,7 @@ public class Tetris extends NAgents {
                     }
                 }
 
-                float p = nar.priority(s, Float.NaN);
+                float p = nar.pri(s, Float.NaN);
                 g.glColor4f(dr, dg, bf, 0.5f + 0.5f * p);
 
                 return b != null ? b.conf() : 0;
