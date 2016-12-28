@@ -1,7 +1,7 @@
 package nars;
 
 import nars.concept.Concept;
-import nars.nal.Operator;
+import nars.op.Operator;
 import nars.op.data.*;
 import nars.term.Term;
 import nars.term.atom.Atomic;

@@ -2,12 +2,12 @@ package nars.nar;
 
 import jcog.data.random.XorShift128PlusRandom;
 import nars.NAR;
+import nars.conceptualize.DefaultConceptBuilder;
+import nars.control.ConceptBagControl;
+import nars.derive.DefaultDeriver;
 import nars.index.term.TermIndex;
 import nars.index.term.map.MapTermIndex;
 import nars.op.time.STMTemporalLinkage;
-import nars.reason.control.ConceptBagControl;
-import nars.reason.concept.DefaultConceptBuilder;
-import nars.reason.DefaultDeriver;
 import nars.time.FrameTime;
 import nars.time.Time;
 import nars.util.exe.Executioner;

@@ -44,7 +44,7 @@ public class NARTest {
     @Test @Ignore
     public void testMemoryTransplant() {
 
-        Default  nar = new Default(1000, 1, 5, 5);
+        Default nar = new Default(1000, 1, 5, 5);
         //DefaultAlann nar = new DefaultAlann(m, 32);
 
         //TextOutput.out(nar);

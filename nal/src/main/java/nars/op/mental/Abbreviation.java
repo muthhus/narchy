@@ -1,7 +1,10 @@
 package nars.op.mental;
 
 import jcog.data.MutableInteger;
-import nars.*;
+import nars.$;
+import nars.NAR;
+import nars.Op;
+import nars.Task;
 import nars.bag.impl.CurveBag;
 import nars.budget.Budget;
 import nars.budget.control.Activation;

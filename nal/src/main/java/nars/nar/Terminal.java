@@ -2,15 +2,11 @@ package nars.nar;
 
 import jcog.data.random.XORShiftRandom;
 import nars.NAR;
-import nars.concept.Concept;
-import nars.link.BLink;
-import nars.term.Termed;
 import nars.time.FrameTime;
 import nars.time.Time;
 import nars.util.exe.SynchronousExecutor;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Collections;
 import java.util.Random;
 
 /**

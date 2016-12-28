@@ -19,7 +19,7 @@ import nars.index.task.MapTaskIndex;
 import nars.index.task.TaskIndex;
 import nars.index.term.TermIndex;
 import nars.link.BLink;
-import nars.nal.Operator;
+import nars.op.Operator;
 import nars.table.BeliefTable;
 import nars.task.MutableTask;
 import nars.term.Compound;

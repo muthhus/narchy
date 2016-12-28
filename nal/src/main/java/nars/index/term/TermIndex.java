@@ -3,10 +3,10 @@ package nars.index.term;
 import nars.*;
 import nars.Op;
 import nars.concept.Concept;
-import nars.reason.ConceptBuilder;
+import nars.conceptualize.ConceptBuilder;
+import nars.derive.meta.match.EllipsisMatch;
 import nars.index.TermBuilder;
-import nars.nal.Derivation;
-import nars.nal.meta.match.EllipsisMatch;
+import nars.premise.Derivation;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
@@ -352,16 +352,13 @@ public abstract class TermIndex extends TermBuilder {
             Termed yExist = get(x);
             if (yExist!=null)
                 x = (Term)yExist; //assumes the AtomConcept returned is the Term itself, as .term() would return
+
         } else if (x instanceof Compound) {
             Compound cx = (Compound)x;
             //compute any subterm functors:
             Op op = cx.op();
             if (op == INH) {
                 x = eval(cx);
-            } else if (op != NEG){
-                Termed y = get(x);
-                if (y != null)
-                    x = y.term();
             }
         }
         return x;

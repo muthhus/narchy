@@ -1,11 +1,12 @@
 package nars.nal;
 
 import com.google.common.collect.Sets;
-import nars.reason.ConceptBuilder;
+import nars.conceptualize.ConceptBuilder;
+import nars.derive.Deriver;
+import nars.derive.TrieDeriver;
+import nars.derive.meta.BoolCondition;
+import nars.derive.rule.PremiseRule;
 import nars.index.term.PatternTermIndex;
-import nars.nal.derive.TrieDeriver;
-import nars.nal.meta.BoolCondition;
-import nars.nal.rule.PremiseRule;
 import org.apache.commons.math3.stat.Frequency;
 import org.junit.Test;
 

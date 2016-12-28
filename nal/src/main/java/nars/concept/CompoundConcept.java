@@ -8,7 +8,7 @@ import nars.budget.control.Activation;
 import nars.budget.control.SpreadingActivation;
 import nars.budget.merge.BudgetMerge;
 import nars.budget.policy.ConceptState;
-import nars.reason.concept.DefaultConceptBuilder;
+import nars.conceptualize.DefaultConceptBuilder;
 import nars.table.*;
 import nars.term.Compound;
 import nars.term.Term;

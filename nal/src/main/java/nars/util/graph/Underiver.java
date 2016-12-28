@@ -1,8 +1,8 @@
 package nars.util.graph;
 
 import nars.Task;
-import nars.nal.Deriver;
-import nars.nal.Premise;
+import nars.derive.Deriver;
+import nars.premise.Premise;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Consumer;

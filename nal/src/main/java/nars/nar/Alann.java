@@ -2,10 +2,10 @@ package nars.nar;
 
 import jcog.data.random.XorShift128PlusRandom;
 import nars.NAR;
+import nars.conceptualize.DefaultConceptBuilder;
+import nars.control.AlannControl;
 import nars.index.term.map.CaffeineIndex;
 import nars.op.time.STMTemporalLinkage;
-import nars.reason.concept.DefaultConceptBuilder;
-import nars.reason.control.AlannControl;
 import nars.time.Time;
 import nars.util.exe.MultiThreadExecutioner;
 import nars.util.exe.SynchronousExecutor;

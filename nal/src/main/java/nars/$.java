@@ -10,7 +10,7 @@ import jcog.list.FasterList;
 import jdk.nashorn.api.scripting.NashornScriptEngine;
 import nars.budget.Budget;
 import nars.budget.RawBudget;
-import nars.reason.ConceptBuilder;
+import nars.conceptualize.ConceptBuilder;
 import nars.index.term.TermIndex;
 import nars.task.MutableTask;
 import nars.term.Compound;

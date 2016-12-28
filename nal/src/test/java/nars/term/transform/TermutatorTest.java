@@ -4,7 +4,7 @@ import com.google.common.collect.Lists;
 import jcog.data.random.XorShift128PlusRandom;
 import nars.Op;
 import nars.Param;
-import nars.nal.meta.match.Ellipsis;
+import nars.derive.meta.match.Ellipsis;
 import nars.term.Term;
 import nars.term.mutate.Choose1;
 import nars.term.mutate.Choose2;

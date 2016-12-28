@@ -2,10 +2,10 @@ package nars.concept;
 
 import nars.$;
 import nars.NAR;
+import nars.concept.dynamic.DynTruth;
 import nars.concept.dynamic.DynamicBeliefTable;
 import nars.nar.Default;
 import nars.term.Compound;
-import nars.concept.dynamic.DynTruth;
 import nars.truth.Truth;
 import org.junit.Test;
 

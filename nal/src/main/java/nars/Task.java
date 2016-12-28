@@ -2,12 +2,12 @@ package nars;
 
 import nars.budget.Budgeted;
 import nars.concept.Concept;
-import nars.nal.Stamp;
 import nars.task.Tasked;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.time.Tense;
+import nars.truth.Stamp;
 import nars.truth.Truth;
 import nars.truth.TruthDelta;
 import nars.truth.Truthed;

@@ -1,12 +1,12 @@
 package nars.index.term;
 
 import nars.Op;
-import nars.reason.ConceptBuilder;
+import nars.conceptualize.ConceptBuilder;
+import nars.derive.meta.PatternCompound;
+import nars.derive.meta.match.Ellipsis;
+import nars.derive.meta.match.EllipsisTransform;
+import nars.derive.rule.PremiseRule;
 import nars.index.term.map.MapTermIndex;
-import nars.nal.meta.PatternCompound;
-import nars.nal.meta.match.Ellipsis;
-import nars.nal.meta.match.EllipsisTransform;
-import nars.nal.rule.PremiseRule;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;

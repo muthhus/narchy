@@ -1,13 +1,11 @@
 package nars.nal.nal7;
 
-import com.google.common.collect.Iterables;
 import nars.*;
 import nars.bag.Bag;
 import nars.bag.impl.ArrayBag;
 import nars.concept.CompoundConcept;
 import nars.concept.Concept;
 import nars.io.NarseseTest;
-import nars.link.BLink;
 import nars.nar.Default;
 import nars.term.Compound;
 import nars.term.Term;

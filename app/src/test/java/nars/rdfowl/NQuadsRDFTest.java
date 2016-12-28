@@ -6,7 +6,7 @@ import nars.index.term.tree.TreeTermIndex;
 import nars.nar.Default;
 import nars.util.exe.Executioner;
 import nars.util.exe.SynchronousExecutor;
-import nars.reason.concept.DefaultConceptBuilder;
+import nars.conceptualize.DefaultConceptBuilder;
 import nars.time.FrameTime;
 import org.junit.Ignore;
 import org.junit.Test;

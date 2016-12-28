@@ -4,13 +4,13 @@ import jcog.data.random.XorShift128PlusRandom;
 import nars.$;
 import nars.Op;
 import nars.Param;
+import nars.derive.meta.match.Ellipsis;
+import nars.derive.meta.match.EllipsisMatch;
+import nars.derive.meta.match.EllipsisOneOrMore;
+import nars.derive.meta.match.EllipsisZeroOrMore;
+import nars.derive.rule.PremiseRule;
 import nars.index.term.PatternTermIndex;
 import nars.index.term.TermIndex;
-import nars.nal.meta.match.Ellipsis;
-import nars.nal.meta.match.EllipsisMatch;
-import nars.nal.meta.match.EllipsisOneOrMore;
-import nars.nal.meta.match.EllipsisZeroOrMore;
-import nars.nal.rule.PremiseRule;
 import nars.nar.Default;
 import nars.term.Compound;
 import nars.term.Term;
@@ -29,7 +29,7 @@ import java.util.Set;
 
 import static nars.$.$;
 import static nars.Op.*;
-import static nars.nal.meta.match.Ellipsis.firstEllipsis;
+import static nars.derive.meta.match.Ellipsis.firstEllipsis;
 import static nars.term.Term.False;
 import static org.junit.Assert.*;
 

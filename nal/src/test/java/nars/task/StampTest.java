@@ -1,6 +1,6 @@
 package nars.task;
 
-import nars.nal.Stamp;
+import nars.truth.Stamp;
 import org.eclipse.collections.impl.list.mutable.primitive.LongArrayList;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
@@ -8,7 +8,7 @@ import org.junit.Test;
 import java.util.Arrays;
 
 import static junit.framework.TestCase.assertTrue;
-import static nars.nal.Stamp.*;
+import static nars.truth.Stamp.*;
 import static org.junit.Assert.*;
 
 /**

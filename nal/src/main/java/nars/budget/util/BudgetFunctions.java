@@ -25,7 +25,7 @@ import nars.Task;
 import nars.budget.Budget;
 import nars.budget.RawBudget;
 import nars.budget.merge.BudgetMerge;
-import nars.nal.Premise;
+import nars.premise.Premise;
 import nars.term.Termed;
 import nars.truth.Truthed;
 import nars.util.UtilityFunctions;

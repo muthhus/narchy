@@ -2,7 +2,10 @@ package nars.util.signal;
 
 import jcog.Util;
 import jcog.math.FloatSupplier;
-import nars.*;
+import nars.NAR;
+import nars.Op;
+import nars.Param;
+import nars.Task;
 import nars.task.MutableTask;
 import nars.term.Compound;
 import nars.term.Term;

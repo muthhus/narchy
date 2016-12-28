@@ -11,7 +11,6 @@ import nars.link.BLink;
 import nars.link.DefaultBLink;
 import nars.link.DependentBLink;
 import org.apache.commons.lang3.mutable.MutableFloat;
-import org.eclipse.collections.api.tuple.primitive.ObjectFloatPair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

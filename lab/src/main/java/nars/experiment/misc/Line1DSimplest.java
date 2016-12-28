@@ -6,14 +6,11 @@ import nars.NAR;
 import nars.NAgent;
 import nars.Param;
 import nars.concept.ActionConcept;
-import nars.concept.Concept;
 import nars.nar.Alann;
-import nars.remote.NAgents;
 import nars.time.FrameTime;
 
 import static jcog.Texts.n2;
 import static jcog.Util.unitize;
-import static nars.Op.IMPL;
 
 
 /**

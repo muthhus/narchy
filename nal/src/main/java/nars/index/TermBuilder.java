@@ -2,7 +2,7 @@ package nars.index;
 
 import nars.$;
 import nars.Op;
-import nars.nal.meta.match.Ellipsislike;
+import nars.derive.meta.match.Ellipsislike;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Terms;

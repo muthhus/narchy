@@ -2,7 +2,10 @@ package nars.task;
 
 import jcog.Util;
 import jcog.data.array.LongArrays;
-import nars.*;
+import nars.NAR;
+import nars.Op;
+import nars.Param;
+import nars.Task;
 import nars.budget.RawBudget;
 import nars.budget.util.BudgetFunctions;
 import nars.concept.Concept;

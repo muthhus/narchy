@@ -2,7 +2,7 @@ package nars.term.transform;
 
 import com.google.common.base.Objects;
 import nars.$;
-import nars.nal.Derivation;
+import nars.premise.Derivation;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.subst.MapSubst;

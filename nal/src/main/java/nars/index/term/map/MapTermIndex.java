@@ -1,6 +1,6 @@
 package nars.index.term.map;
 
-import nars.reason.ConceptBuilder;
+import nars.conceptualize.ConceptBuilder;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.container.TermContainer;

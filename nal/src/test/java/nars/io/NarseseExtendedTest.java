@@ -1,6 +1,9 @@
 package nars.io;
 
-import nars.*;
+import nars.$;
+import nars.Narsese;
+import nars.Op;
+import nars.Task;
 import nars.nar.Terminal;
 import nars.term.Compound;
 import nars.term.Term;

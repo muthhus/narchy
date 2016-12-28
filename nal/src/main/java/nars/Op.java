@@ -9,7 +9,6 @@ import nars.time.Tense;
 import org.eclipse.collections.api.map.ImmutableMap;
 import org.eclipse.collections.api.tuple.primitive.IntIntPair;
 import org.eclipse.collections.impl.factory.Maps;
-import org.eclipse.collections.impl.map.mutable.primitive.CharObjectHashMap;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;

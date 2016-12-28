@@ -13,7 +13,7 @@ import org.junit.Test;
 
 import static nars.Op.COMMAND;
 import static nars.Op.GOAL;
-import static nars.nal.Operator.args;
+import static nars.op.Operator.args;
 
 /**
  * Created by me on 12/21/16.

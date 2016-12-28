@@ -32,7 +32,7 @@ import nars.index.term.map.CaffeineIndex;
 import nars.nar.Default;
 import nars.util.exe.Executioner;
 import nars.util.exe.MultiThreadExecutioner;
-import nars.reason.concept.DefaultConceptBuilder;
+import nars.conceptualize.DefaultConceptBuilder;
 import nars.op.time.MySTMClustered;
 import nars.time.FrameTime;
 import nars.truth.Truth;
