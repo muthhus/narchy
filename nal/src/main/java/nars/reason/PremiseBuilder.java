@@ -194,7 +194,7 @@ abstract public class PremiseBuilder {
                         answered = task.onAnswered(answered, nar);
 
                         if (answered != null) {
-                            if (answered.punc() == Symbols.BELIEF)
+                            if (answered.punc() == Op.BELIEF)
                                 belief = answered;
                         }
                     }

@@ -12,7 +12,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Predicate;
 
-import static nars.Symbols.*;
+import static nars.Op.*;
 
 /**
  * NAR Parameters which can be changed during runtime.

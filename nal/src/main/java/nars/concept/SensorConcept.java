@@ -20,7 +20,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.function.Consumer;
 
-import static nars.Symbols.BELIEF;
+import static nars.Op.BELIEF;
 
 
 /**

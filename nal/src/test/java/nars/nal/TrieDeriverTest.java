@@ -1,7 +1,7 @@
 package nars.nal;
 
 import com.google.common.collect.Sets;
-import nars.concept.util.ConceptBuilder;
+import nars.reason.ConceptBuilder;
 import nars.index.term.PatternTermIndex;
 import nars.nal.derive.TrieDeriver;
 import nars.nal.meta.BoolCondition;

@@ -2,14 +2,13 @@ package nars.concept;
 
 import jcog.Util;
 import nars.NAR;
-import nars.Symbols;
 import nars.Task;
 import nars.bag.Bag;
 import nars.budget.control.Activation;
 import nars.budget.control.SpreadingActivation;
 import nars.budget.merge.BudgetMerge;
 import nars.budget.policy.ConceptState;
-import nars.reason.DefaultConceptBuilder;
+import nars.reason.concept.DefaultConceptBuilder;
 import nars.table.*;
 import nars.term.Compound;
 import nars.term.Term;
@@ -23,6 +22,7 @@ import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Predicate;
 
+import static nars.Op.*;
 import static nars.Param.TRUTH_EPSILON;
 
 
@@ -355,19 +355,19 @@ public class CompoundConcept<T extends Compound> implements Concept, Termlike {
         TruthDelta delta = null;
 
         switch (input.punc()) {
-            case Symbols.BELIEF:
+            case BELIEF:
                 delta = processBelief(input, nar);
                 break;
 
-            case Symbols.GOAL:
+            case GOAL:
                 delta = processGoal(input, nar);
                 break;
 
-            case Symbols.QUESTION:
+            case QUESTION:
                 accepted = processQuestion(input, nar);
                 break;
 
-            case Symbols.QUEST:
+            case QUEST:
                 accepted = processQuest(input, nar);
                 break;
 

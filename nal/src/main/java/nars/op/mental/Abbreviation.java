@@ -83,7 +83,7 @@ public class Abbreviation/*<S extends Term>*/ extends Leak<CompoundConcept> {
         this.bag.setCapacity(capacity);
         this.minAbbreviableVolume.set(volMin);
         this.abbreviationConfidence =
-                new MutableFloat(nar.confidenceDefault(Symbols.BELIEF));
+                new MutableFloat(nar.confidenceDefault(Op.BELIEF));
                 //new MutableFloat(1f - nar.truthResolution.floatValue());
         //new MutableFloat(nar.confidenceDefault(Symbols.BELIEF));
         this.maxVol = volMax;
@@ -397,7 +397,7 @@ public class Abbreviation/*<S extends Term>*/ extends Leak<CompoundConcept> {
         private final Term alias;
 
         public AbbreviationTask(@NotNull Compound abbreviation, @NotNull Compound abbreviated, @NotNull Termed alias, float conf) {
-            super(abbreviation, Symbols.BELIEF, $.t(1, conf));
+            super(abbreviation, Op.BELIEF, $.t(1, conf));
             this.abbreviated = abbreviated;
             this.alias = alias.term();
         }

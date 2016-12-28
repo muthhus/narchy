@@ -105,7 +105,7 @@ public class ActionConcept extends WiredConcept implements WiredConcept.Prioriti
         );
         feedback.resolution(n.truthResolution.floatValue());
         feedback.pri(
-                () -> n.priorityDefault(Symbols.BELIEF)
+                () -> n.priorityDefault(Op.BELIEF)
         );
     }
 

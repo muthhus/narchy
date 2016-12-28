@@ -11,8 +11,8 @@ import nars.term.atom.Atom;
 import nars.term.obj.IntTerm;
 import org.junit.Test;
 
-import static nars.Symbols.COMMAND;
-import static nars.Symbols.GOAL;
+import static nars.Op.COMMAND;
+import static nars.Op.GOAL;
 import static nars.nal.Operator.args;
 
 /**

@@ -1,7 +1,6 @@
 package nars.nal.meta;
 
 import nars.Op;
-import nars.Symbols;
 import nars.nal.rule.PremiseRule;
 import nars.term.Compound;
 import nars.term.Term;
@@ -108,16 +107,16 @@ public class PostCondition implements Serializable //since there can be multiple
                 case "Punctuation":
                     switch (which.toString()) {
                         case "Question":
-                            puncOverride = Symbols.QUESTION;
+                            puncOverride = Op.QUESTION;
                             break;
                         case "Goal":
-                            puncOverride = Symbols.GOAL;
+                            puncOverride = Op.GOAL;
                             break;
                         case "Belief":
-                            puncOverride = Symbols.BELIEF;
+                            puncOverride = Op.BELIEF;
                             break;
                         case "Quest":
-                            puncOverride = Symbols.QUEST;
+                            puncOverride = Op.QUEST;
                             break;
 
                         default:

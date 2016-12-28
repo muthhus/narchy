@@ -36,7 +36,6 @@ import java.util.List;
 import java.util.function.Consumer;
 
 import static nars.Op.*;
-import static nars.Symbols.*;
 
 /**
  * NARese, syntax and language for interacting with a NAR in NARS.
@@ -684,11 +683,11 @@ public class Narsese extends BaseParser<Object> {
         //TODO replace these with Symbols. constants
         switch (x) {
             case ' ':
-            case Symbols.ARGUMENT_SEPARATOR:
-            case Symbols.BELIEF:
-            case Symbols.GOAL:
-            case Symbols.QUESTION:
-            case Symbols.QUEST:
+            case ARGUMENT_SEPARATOR:
+            case BELIEF:
+            case GOAL:
+            case QUESTION:
+            case QUEST:
             case '\"':
 
             case '^':
@@ -819,10 +818,10 @@ public class Narsese extends BaseParser<Object> {
         */
         return sequence(
                 anyOf(new char[]{
-                        Symbols.VAR_INDEPENDENT,
-                        Symbols.VAR_DEPENDENT,
-                        Symbols.VAR_QUERY,
-                        Symbols.VAR_PATTERN
+                        Op.VAR_INDEP.ch,
+                        Op.VAR_DEP.ch,
+                        Op.VAR_QUERY.ch,
+                        Op.VAR_PATTERN.ch
                 }),
                 push(match()),
                 Atom(),

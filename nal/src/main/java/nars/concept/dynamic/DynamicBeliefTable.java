@@ -10,7 +10,6 @@ import nars.nal.Stamp;
 import nars.table.DefaultBeliefTable;
 import nars.table.QuestionTable;
 import nars.term.Compound;
-import nars.truth.DynTruth;
 import nars.truth.Truth;
 import nars.truth.TruthDelta;
 import org.jetbrains.annotations.NotNull;

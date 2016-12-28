@@ -7,7 +7,7 @@ import com.github.benmanes.caffeine.cache.RemovalListener;
 import nars.Param;
 import nars.concept.Concept;
 import nars.concept.PermanentConcept;
-import nars.concept.util.ConceptBuilder;
+import nars.reason.ConceptBuilder;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.container.TermContainer;

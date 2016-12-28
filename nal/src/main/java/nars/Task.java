@@ -2,7 +2,6 @@ package nars;
 
 import nars.budget.Budgeted;
 import nars.concept.Concept;
-import nars.concept.util.InvalidConceptException;
 import nars.nal.Stamp;
 import nars.task.Tasked;
 import nars.term.Compound;
@@ -147,7 +146,7 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
         }
 
 
-        if ((punc == Symbols.GOAL || punc == Symbols.QUEST) && (op == Op.IMPL || op == Op.EQUI))
+        if ((punc == Op.GOAL || punc == Op.QUEST) && (op == Op.IMPL || op == Op.EQUI))
             return test(t, "Goal/Quest task term may not be Implication or Equivalence", safe);
 
         return true;
@@ -281,7 +280,7 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
     boolean isGoal();
 
     default boolean isCommand() {
-        return (punc() == Symbols.COMMAND);
+        return (punc() == Op.COMMAND);
     }
 
     default boolean hasQueryVar() {
@@ -430,7 +429,7 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
     @Nullable
     @Deprecated
     default Appendable appendTo(Appendable buffer, /**@Nullable*/NAR memory, boolean showStamp) throws IOException {
-        boolean notCommand = punc() != Symbols.COMMAND;
+        boolean notCommand = punc() != Op.COMMAND;
         return appendTo(buffer, memory, true, showStamp && notCommand,
                 notCommand, //budget
                 showStamp //log
@@ -582,7 +581,7 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
      * if unnormalized, returns a normalized version of the task,
      * null if not normalizable
      */
-    void normalize(@NotNull NAR memory) throws InvalidTaskException, InvalidConceptException;
+    void normalize(@NotNull NAR memory) throws InvalidTaskException, Concept.InvalidConceptException;
 
 
 //    default void ensureValidParentTaskRef() {
@@ -642,11 +641,11 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
 
         switch (Tense.order(currentTime, ot, duration)) {
             case 1:
-                return Symbols.TENSE_FUTURE;
+                return Op.TENSE_FUTURE;
             case -1:
-                return Symbols.TENSE_PAST;
+                return Op.TENSE_PAST;
             default:
-                return Symbols.TENSE_PRESENT;
+                return Op.TENSE_PRESENT;
         }
     }
 

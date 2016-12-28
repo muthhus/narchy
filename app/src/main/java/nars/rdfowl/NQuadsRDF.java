@@ -1,9 +1,6 @@
 package nars.rdfowl;
 
-import nars.$;
-import nars.NAR;
-import nars.Symbols;
-import nars.Task;
+import nars.*;
 import nars.task.MutableTask;
 import nars.term.Compound;
 import nars.term.Term;
@@ -436,7 +433,7 @@ public abstract class NQuadsRDF {
         if (belief instanceof Compound) {
             //System.out.println(subject + " " + predicate + " " + object + " :: " + belief);
 
-            return new MutableTask(belief, Symbols.BELIEF, 1f, nar)
+            return new MutableTask(belief, Op.BELIEF, 1f, nar)
                     .time(nar.time(),
                     Tense.ETERNAL //TODO Tense parameter
                     );

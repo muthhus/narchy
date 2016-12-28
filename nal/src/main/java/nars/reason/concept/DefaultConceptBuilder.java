@@ -1,4 +1,4 @@
-package nars.reason;
+package nars.reason.concept;
 
 import jcog.map.SynchronizedHashMap;
 import jcog.map.SynchronizedUnifiedMap;
@@ -17,7 +17,7 @@ import nars.concept.CompoundConcept;
 import nars.concept.Concept;
 import nars.concept.dynamic.DynamicConcept;
 import nars.concept.dynamic.DynamicTruthModel;
-import nars.concept.util.ConceptBuilder;
+import nars.reason.ConceptBuilder;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;

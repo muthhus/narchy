@@ -3,8 +3,7 @@ package nars.index.term;
 import nars.*;
 import nars.Op;
 import nars.concept.Concept;
-import nars.concept.util.ConceptBuilder;
-import nars.concept.util.InvalidConceptException;
+import nars.reason.ConceptBuilder;
 import nars.index.TermBuilder;
 import nars.nal.Derivation;
 import nars.nal.meta.match.EllipsisMatch;
@@ -541,7 +540,7 @@ public abstract class TermIndex extends TermBuilder {
         @Nullable Termed c = get(term, createIfMissing);
         if (!(c instanceof Concept)) {
             if (createIfMissing) {
-                throw new InvalidConceptException(term, "Failed to build concept");
+                throw new Concept.InvalidConceptException(term, "Failed to build concept");
             }
             return null;
         }

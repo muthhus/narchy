@@ -11,7 +11,6 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Terms;
 import nars.term.obj.Termject;
-import nars.truth.DynTruth;
 import nars.truth.Truth;
 import org.eclipse.collections.api.list.primitive.ByteList;
 import org.jetbrains.annotations.NotNull;

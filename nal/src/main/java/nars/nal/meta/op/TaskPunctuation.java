@@ -1,6 +1,6 @@
 package nars.nal.meta.op;
 
-import nars.Symbols;
+import nars.Op;
 import nars.nal.Derivation;
 import nars.nal.meta.AtomicBoolCondition;
 import org.jetbrains.annotations.NotNull;
@@ -20,7 +20,7 @@ final public class TaskPunctuation extends AtomicBoolCondition {
     public static final AtomicBoolCondition QuestionOrQuest = new AtomicBoolCondition() {
         @Override public boolean run(@NotNull Derivation o, int now) {
             char c = o.taskPunct;
-            return c == Symbols.QUESTION || c == Symbols.QUEST;
+            return c == Op.QUESTION || c == Op.QUEST;
         }
         @Override public String toString() {
             return "task:\"?@\"";
@@ -28,7 +28,7 @@ final public class TaskPunctuation extends AtomicBoolCondition {
     };
     public static final AtomicBoolCondition Question = new AtomicBoolCondition() {
         @Override public boolean run(@NotNull Derivation o, int now) {
-            return o.taskPunct == Symbols.QUESTION;
+            return o.taskPunct == Op.QUESTION;
         }
         @Override public String toString() {
             return "task:\"?\"";
@@ -36,7 +36,7 @@ final public class TaskPunctuation extends AtomicBoolCondition {
     };
     public static final AtomicBoolCondition Quest = new AtomicBoolCondition() {
         @Override public boolean run(@NotNull Derivation o, int now) {
-            return o.taskPunct == Symbols.QUEST;
+            return o.taskPunct == Op.QUEST;
         }
         @Override public String toString() {
             return "task:\"@\"";
@@ -53,7 +53,7 @@ final public class TaskPunctuation extends AtomicBoolCondition {
     public static final AtomicBoolCondition NotQuestion = new AtomicBoolCondition()  {
         @Override public boolean run(@NotNull Derivation o, int now) {
             char p = o.taskPunct;
-            return (p != Symbols.QUESTION && p!= Symbols.QUEST);
+            return (p != Op.QUESTION && p!= Op.QUEST);
         }
         @Override public String toString() { return "task:\".!\""; }
     };

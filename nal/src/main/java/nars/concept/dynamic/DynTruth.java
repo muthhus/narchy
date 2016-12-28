@@ -1,13 +1,14 @@
-package nars.truth;
+package nars.concept.dynamic;
 
 import nars.$;
-import nars.Symbols;
+import nars.Op;
 import nars.Task;
 import nars.budget.Budget;
 import nars.budget.util.BudgetFunctions;
-import nars.concept.dynamic.DynamicBeliefTask;
 import nars.nal.Stamp;
 import nars.term.Compound;
+import nars.truth.Truth;
+import nars.truth.Truthed;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -68,7 +69,7 @@ public final class DynTruth implements Truthed {
 
     public DynamicBeliefTask task(Compound template, boolean beliefOrGoal, long cre, long occ, Budget b) {
 
-        DynamicBeliefTask t = new DynamicBeliefTask(template, beliefOrGoal ? Symbols.BELIEF : Symbols.GOAL,
+        DynamicBeliefTask t = new DynamicBeliefTask(template, beliefOrGoal ? Op.BELIEF : Op.GOAL,
                 truth(), cre, occ, evidence());
         t.setBudget(
                 b != null ? b : budget()

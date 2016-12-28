@@ -29,7 +29,6 @@ import java.util.function.Function;
 
 import static nars.IO.TaskSerialization.TermFirst;
 import static nars.Op.ATOM;
-import static nars.Symbols.*;
 import static nars.time.Tense.DTERNAL;
 import static nars.time.Tense.XTERNAL;
 
@@ -42,7 +41,7 @@ public class IO {
     public static final byte SPECIAL_OP = (byte) (Op.values().length + 1);
 
     static boolean hasTruth(char punc) {
-        return punc == Symbols.BELIEF || punc == Symbols.GOAL;
+        return punc == Op.BELIEF || punc == Op.GOAL;
     }
 
 
@@ -391,12 +390,12 @@ public class IO {
 
         static void compoundAppend(@NotNull Compound c, @NotNull Appendable p) throws IOException {
 
-            p.append(COMPOUND_TERM_OPENER);
+            p.append(Op.COMPOUND_TERM_OPENER);
 
             c.op().append(c, p);
 
             if (c.size() == 1)
-                p.append(ARGUMENT_SEPARATOR);
+                p.append(Op.ARGUMENT_SEPARATOR);
 
             appendArgs(c, p);
 
@@ -406,12 +405,12 @@ public class IO {
 
         static void compoundAppend(String o, @NotNull TermContainer c, @NotNull Function<Term, Term> filter, @NotNull Appendable p) throws IOException {
 
-            p.append(COMPOUND_TERM_OPENER);
+            p.append(Op.COMPOUND_TERM_OPENER);
 
             p.append(o);
 
             if (c.size() == 1)
-                p.append(ARGUMENT_SEPARATOR);
+                p.append(Op.ARGUMENT_SEPARATOR);
 
             appendArgs(c, filter, p);
 
@@ -426,7 +425,7 @@ public class IO {
             boolean bb = nterms > 1;
             for (int i = 0; i < nterms; i++) {
                 if ((i != 0) || bb) {
-                    p.append(Symbols.ARGUMENT_SEPARATOR);
+                    p.append(Op.ARGUMENT_SEPARATOR);
                 }
                 c.term(i).append(p);
             }
@@ -438,14 +437,14 @@ public class IO {
             boolean bb = nterms > 1;
             for (int i = 0; i < nterms; i++) {
                 if ((i != 0) || bb) {
-                    p.append(Symbols.ARGUMENT_SEPARATOR);
+                    p.append(Op.ARGUMENT_SEPARATOR);
                 }
                 filter.apply(c.term(i)).append(p);
             }
         }
 
         static void appendCloser(@NotNull Appendable p) throws IOException {
-            p.append(COMPOUND_TERM_CLOSER);
+            p.append(Op.COMPOUND_TERM_CLOSER);
         }
 
         static void append(@NotNull Compound c, @NotNull Appendable p) throws IOException {
@@ -531,35 +530,35 @@ public class IO {
                 reversedDT = false;
             }
 
-            p.append(COMPOUND_TERM_OPENER);
+            p.append(Op.COMPOUND_TERM_OPENER);
             a.append(p);
 
             op.append(c, p, reversedDT);
 
             b.append(p);
 
-            p.append(COMPOUND_TERM_CLOSER);
+            p.append(Op.COMPOUND_TERM_CLOSER);
         }
 
 
         static void productAppend(@NotNull Compound product, @NotNull Appendable p) throws IOException {
 
             int s = product.size();
-            p.append(COMPOUND_TERM_OPENER);
+            p.append(Op.COMPOUND_TERM_OPENER);
             for (int i = 0; i < s; i++) {
                 product.term(i).append(p);
                 if (i < s - 1) {
                     p.append(",");
                 }
             }
-            p.append(COMPOUND_TERM_CLOSER);
+            p.append(Op.COMPOUND_TERM_CLOSER);
         }
 
         static void imageAppend(@NotNull Compound image, @NotNull Appendable p) throws IOException {
 
             int len = image.size();
 
-            p.append(COMPOUND_TERM_OPENER);
+            p.append(Op.COMPOUND_TERM_OPENER);
             p.append(image.op().str);
 
             int relationIndex = image.dt();
@@ -567,24 +566,24 @@ public class IO {
             for (i = 0; i < len; i++) {
                 Term tt = image.term(i);
 
-                p.append(ARGUMENT_SEPARATOR);
+                p.append(Op.ARGUMENT_SEPARATOR);
                 //if (pretty) p.append(' ');
 
                 if (i == relationIndex) {
-                    p.append(Symbols.IMAGE_PLACE_HOLDER);
-                    p.append(ARGUMENT_SEPARATOR);
+                    p.append(Op.IMAGE_PLACE_HOLDER);
+                    p.append(Op.ARGUMENT_SEPARATOR);
                     //if (pretty) p.append(' ');
                 }
 
                 tt.append(p);
             }
             if (i == relationIndex) {
-                p.append(ARGUMENT_SEPARATOR);
+                p.append(Op.ARGUMENT_SEPARATOR);
                 //if (pretty) p.append(' ');
-                p.append(Symbols.IMAGE_PLACE_HOLDER);
+                p.append(Op.IMAGE_PLACE_HOLDER);
             }
 
-            p.append(COMPOUND_TERM_CLOSER);
+            p.append(Op.COMPOUND_TERM_CLOSER);
 
         }
 
@@ -596,16 +595,16 @@ public class IO {
             char opener, closer;
             if (set.op() == Op.SETe) {
                 opener = Op.SETe.ch;
-                closer = Symbols.SET_EXT_CLOSER;
+                closer = Op.SET_EXT_CLOSER;
             } else {
                 opener = Op.SETi.ch;
-                closer = Symbols.SET_INT_CLOSER;
+                closer = Op.SET_INT_CLOSER;
             }
 
             p.append(opener);
             for (int i = 0; i < len; i++) {
                 Term tt = set.term(i);
-                if (i != 0) p.append(Symbols.ARGUMENT_SEPARATOR);
+                if (i != 0) p.append(Op.ARGUMENT_SEPARATOR);
                 tt.append(p);
             }
             p.append(closer);
@@ -625,12 +624,12 @@ public class IO {
 
             p.append(operator.toString());
 
-            p.append(COMPOUND_TERM_OPENER);
+            p.append(Op.COMPOUND_TERM_OPENER);
 
             int n = 0;
             for (Term t : xt) {
                 if (n != 0) {
-                    p.append(ARGUMENT_SEPARATOR);
+                    p.append(Op.ARGUMENT_SEPARATOR);
                     /*if (pretty)
                         p.append(' ');*/
                 }
@@ -641,7 +640,7 @@ public class IO {
                 n++;
             }
 
-            p.append(COMPOUND_TERM_CLOSER);
+            p.append(Op.COMPOUND_TERM_CLOSER);
 
         }
 

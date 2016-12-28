@@ -28,18 +28,18 @@ public interface NARIn {
 
     @Nullable
     default Task ask(@NotNull Termed<Compound> term, long occ, @NotNull BiConsumer<LambdaQuestionTask,Task> eachAnswer) {
-        return ask(term, occ, Symbols.QUESTION, eachAnswer);
+        return ask(term, occ, Op.QUESTION, eachAnswer);
     }
 
     @Nullable
     default LambdaQuestionTask ask(@NotNull Termed<Compound> term, long occ, char punc /* question or quest */, @NotNull BiConsumer<LambdaQuestionTask, Task> eachAnswer) {
-        assert(punc == Symbols.QUESTION || punc == Symbols.QUEST);
+        assert(punc == Op.QUESTION || punc == Op.QUEST);
         return inputAndGet( new LambdaQuestionTask(term, punc, occ, 16, eachAnswer) );
     }
 
     @Nullable
     default LambdaQuestionTask ask(@NotNull Termed<Compound> term, long occ, char punc /* question or quest */, @NotNull Consumer<Task> eachAnswer) {
-        assert(punc == Symbols.QUESTION || punc == Symbols.QUEST);
+        assert(punc == Op.QUESTION || punc == Op.QUEST);
         return inputAndGet( new LambdaQuestionTask(term, punc, occ, 16, eachAnswer) );
     }
 

@@ -5,7 +5,7 @@ import jcog.data.array.LongArrays;
 import nars.*;
 import nars.budget.RawBudget;
 import nars.budget.util.BudgetFunctions;
-import nars.concept.util.InvalidConceptException;
+import nars.concept.Concept;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
@@ -21,6 +21,7 @@ import java.util.Arrays;
 import java.util.Objects;
 
 import static nars.$.t;
+import static nars.Op.*;
 import static nars.time.Tense.DTERNAL;
 import static nars.time.Tense.ETERNAL;
 
@@ -145,7 +146,7 @@ public abstract class AbstractTask extends RawBudget implements Task, Temporal {
 
 
     @Override
-    public void normalize(@NotNull NAR nar) throws InvalidConceptException, InvalidTaskException {
+    public void normalize(@NotNull NAR nar) throws Concept.InvalidConceptException, InvalidTaskException {
 
         if (isDeleted())
             throw new InvalidTaskException(this, "Deleted");
@@ -176,8 +177,8 @@ public abstract class AbstractTask extends RawBudget implements Task, Temporal {
 
         //noinspection IfStatementWithTooManyBranches
         switch (punc()) {
-            case Symbols.BELIEF:
-            case Symbols.GOAL:
+            case BELIEF:
+            case GOAL:
                 if (truth == null) {
                     //apply the default truth value for specified punctuation
                     setTruth(nar.truthDefault(punc));
@@ -191,12 +192,12 @@ public abstract class AbstractTask extends RawBudget implements Task, Temporal {
                 }
 
                 break;
-            case Symbols.QUEST:
-            case Symbols.QUESTION:
+            case QUEST:
+            case QUESTION:
                 if (truth!=null)
                     throw new RuntimeException("quests and questions must have null truth");
                 break;
-            case Symbols.COMMAND:
+            case COMMAND:
                 break;
 
             default:
@@ -333,7 +334,7 @@ public abstract class AbstractTask extends RawBudget implements Task, Temporal {
      * @return Whether the object is a Question
      */
     @Override public final boolean isQuestion() {
-        return (punc == Symbols.QUESTION);
+        return (punc == QUESTION);
     }
 
     /**
@@ -341,15 +342,15 @@ public abstract class AbstractTask extends RawBudget implements Task, Temporal {
      * @return Whether the object is a Judgment
      */
     @Override public final boolean isBelief() {
-        return (punc == Symbols.BELIEF);
+        return (punc == BELIEF);
     }
 
     @Override public final boolean isGoal() {
-        return (punc == Symbols.GOAL);
+        return (punc == GOAL);
     }
 
     @Override public final boolean isQuest() {
-        return (punc == Symbols.QUEST);
+        return (punc == QUEST);
     }
 
 

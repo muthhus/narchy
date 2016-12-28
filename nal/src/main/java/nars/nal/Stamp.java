@@ -21,8 +21,8 @@
 package nars.nal;
 
 import jcog.data.LongString;
+import nars.Op;
 import nars.Param;
-import nars.Symbols;
 import nars.Task;
 import nars.table.TemporalBeliefTable;
 import nars.time.Tense;
@@ -180,7 +180,7 @@ public interface Stamp {
         int estimatedInitialSize = 8 + (len * 3);
 
         StringBuilder buffer = new StringBuilder(estimatedInitialSize);
-        buffer.append(Symbols.STAMP_OPENER);
+        buffer.append(Op.STAMP_OPENER);
 
         /*if (creation() == TIMELESS) {
             buffer.append('?');
@@ -190,7 +190,7 @@ public interface Stamp {
         } else {
             buffer.append(creation());
         }
-        buffer.append(Symbols.STAMP_STARTER).append(' ');
+        buffer.append(Op.STAMP_STARTER).append(' ');
 
         for (int i = 0; i < len; i++) {
 
@@ -200,11 +200,11 @@ public interface Stamp {
                 LongString.append(buffer, ev[i]);
             }
             if (i < (len - 1)) {
-                buffer.append(Symbols.STAMP_SEPARATOR);
+                buffer.append(Op.STAMP_SEPARATOR);
             }
         }
 
-        buffer.append(Symbols.STAMP_CLOSER); //.append(' ');
+        buffer.append(Op.STAMP_CLOSER); //.append(' ');
 
         //this is for estimating an initial size of the stringbuffer
         //System.out.println(baseLength + " " + derivationChain.size() + " " + buffer.baseLength());

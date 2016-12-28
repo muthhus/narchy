@@ -65,7 +65,7 @@ public interface NSense {
      * learning rate
      */
     default float alpha() {
-        return nar().confidenceDefault(Symbols.BELIEF);
+        return nar().confidenceDefault(Op.BELIEF);
     }
 
     /**

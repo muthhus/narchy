@@ -34,7 +34,7 @@ public interface NAction {
         ActionConcept m = new ActionConcept(s, nar(), (b, d) -> {
             int now = state[0];
             boolean next = d!=null && d.freq() >= 0.5f;
-            float alpha = nar().confidenceDefault(Symbols.BELIEF);
+            float alpha = nar().confidenceDefault(Op.BELIEF);
             if (now>=0 && !next) {
                 state[0] = -1; off.run(); return $.t(0, alpha);
             } else if (now<=0 && next) {
@@ -83,7 +83,7 @@ public interface NAction {
                 default:
                     throw new RuntimeException();
             }
-            return $.t(f, nar().confidenceDefault(Symbols.BELIEF));
+            return $.t(f, nar().confidenceDefault(Op.BELIEF));
         });
 
         actions().add(m);
@@ -118,7 +118,7 @@ public interface NAction {
 
             boolean next = d!=null && d.freq() >= 0.5f;
 
-            float alpha = nar().confidenceDefault(Symbols.BELIEF);
+            float alpha = nar().confidenceDefault(Op.BELIEF);
             int v;
             int s;
             if (!next) {
@@ -187,7 +187,7 @@ public interface NAction {
             if (d!=null) {
                 float f = d.freq();
                 float y = (f - 0.5f) * 2f;
-                float alpha = nar().confidenceDefault(Symbols.BELIEF);
+                float alpha = nar().confidenceDefault(Op.BELIEF);
                 if (update.accept(y)) {
                     return $.t(f, alpha);
                 } else {

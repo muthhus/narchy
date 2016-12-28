@@ -1,7 +1,7 @@
 package nars.index.term;
 
 import nars.Op;
-import nars.concept.util.ConceptBuilder;
+import nars.reason.ConceptBuilder;
 import nars.index.term.map.MapTermIndex;
 import nars.nal.meta.PatternCompound;
 import nars.nal.meta.match.Ellipsis;

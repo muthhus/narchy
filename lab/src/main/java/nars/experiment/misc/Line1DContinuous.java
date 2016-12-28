@@ -11,7 +11,7 @@ import nars.index.term.map.CaffeineIndex;
 import nars.nar.Default;
 import nars.util.exe.Executioner;
 import nars.util.exe.SynchronousExecutor;
-import nars.reason.DefaultConceptBuilder;
+import nars.reason.concept.DefaultConceptBuilder;
 import nars.remote.NAgents;
 import nars.task.DerivedTask;
 import nars.time.FrameTime;

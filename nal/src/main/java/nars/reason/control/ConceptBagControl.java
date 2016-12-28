@@ -1,4 +1,4 @@
-package nars.reason;
+package nars.reason.control;
 
 import jcog.data.MutableIntRange;
 import jcog.data.MutableInteger;
@@ -10,17 +10,17 @@ import nars.NAR;
 import nars.Param;
 import nars.bag.Bag;
 import nars.bag.impl.CurveBag;
-import nars.budget.Budget;
 import nars.budget.ROBudget;
 import nars.budget.merge.BudgetMerge;
 import nars.concept.Concept;
-import nars.concept.util.ConceptBuilder;
+import nars.reason.ConceptBuilder;
 import nars.link.BLink;
 import nars.nal.Deriver;
+import nars.reason.PremiseBuilder;
+import nars.reason.concept.DefaultConceptBuilder;
+import nars.reason.premise.DefaultPremiseBuilder;
 import nars.task.DerivedTask;
 import nars.term.Termed;
-import org.apache.commons.lang3.mutable.MutableFloat;
-import org.eclipse.collections.api.tuple.primitive.ObjectFloatPair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -37,10 +37,10 @@ import java.util.function.Consumer;
  *
  * multithreading granularity at the concept (outermost loop)
  */
-public class ConceptBagReasoner implements Control, Consumer<DerivedTask> {
+public class ConceptBagControl implements Control, Consumer<DerivedTask> {
 
 
-    private static final Logger logger = LoggerFactory.getLogger(ConceptBagReasoner.class);
+    private static final Logger logger = LoggerFactory.getLogger(ConceptBagControl.class);
 
     final Deriver deriver;
 
@@ -79,7 +79,7 @@ public class ConceptBagReasoner implements Control, Consumer<DerivedTask> {
 
     final AtomicBoolean busy = new AtomicBoolean(false);
 
-    public final HitMissMeter meter = new HitMissMeter(ConceptBagReasoner.class.getSimpleName());
+    public final HitMissMeter meter = new HitMissMeter(ConceptBagControl.class.getSimpleName());
 
 //    private Comparator<? super BLink<Concept>> sortConceptLinks = (a, b) -> {
 //        Concept A = a.get();
@@ -92,7 +92,7 @@ public class ConceptBagReasoner implements Control, Consumer<DerivedTask> {
     //private final CapacityLinkedHashMap<Premise,Premise> recent = new CapacityLinkedHashMap<>(256);
     //long novel=0, total=0;
 
-    public ConceptBagReasoner(@NotNull NAR nar, @NotNull Deriver deriver) {
+    public ConceptBagControl(@NotNull NAR nar, @NotNull Deriver deriver) {
 
         this.nar = nar;
 

@@ -2,10 +2,7 @@ package nars.video;
 
 import jcog.Util;
 import jcog.signal.Autoencoder;
-import nars.$;
-import nars.NAR;
-import nars.NAgent;
-import nars.Symbols;
+import nars.*;
 import nars.concept.SensorConcept;
 import nars.term.Compound;
 import nars.term.Term;
@@ -110,7 +107,7 @@ public class PixelAutoClassifier extends Autoencoder implements Consumer<NAR> {
         //int q = 0;
 
         float minConf = nar.confMin.floatValue();
-        float baseConf = nar.confidenceDefault(Symbols.BELIEF);
+        float baseConf = nar.confidenceDefault(Op.BELIEF);
         //float basePri = nar.priorityDefault(Symbols.BELIEF);
         //float baseDur = nar.durabilityDefault(Symbols.BELIEF);
 

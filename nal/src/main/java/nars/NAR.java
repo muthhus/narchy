@@ -1,7 +1,6 @@
 package nars;
 
 
-import com.google.common.collect.Iterators;
 import com.google.common.collect.Sets;
 import io.airlift.compress.snappy.SnappyFramedInputStream;
 import io.airlift.compress.snappy.SnappyFramedOutputStream;
@@ -9,7 +8,6 @@ import jcog.data.MutableInteger;
 import jcog.event.ArrayTopic;
 import jcog.event.On;
 import jcog.event.Topic;
-import jcog.list.ConcurrentArrayList;
 import nars.Narsese.NarseseException;
 import nars.budget.Budget;
 import nars.budget.Budgeted;
@@ -17,7 +15,6 @@ import nars.budget.control.Activation;
 import nars.budget.policy.ConceptState;
 import nars.concept.CompoundConcept;
 import nars.concept.Concept;
-import nars.concept.util.InvalidConceptException;
 import nars.index.task.MapTaskIndex;
 import nars.index.task.TaskIndex;
 import nars.index.term.TermIndex;
@@ -38,7 +35,6 @@ import nars.truth.Truth;
 import nars.util.Cycles;
 import nars.util.exe.Executioner;
 import nars.util.task.InvalidTaskException;
-import org.apache.commons.lang3.mutable.MutableFloat;
 import org.apache.commons.math3.stat.Frequency;
 import org.eclipse.collections.api.tuple.Twin;
 import org.fusesource.jansi.Ansi;
@@ -59,7 +55,6 @@ import java.util.stream.Stream;
 import static nars.$.$;
 import static nars.$.*;
 import static nars.Op.*;
-import static nars.Symbols.*;
 import static nars.concept.CompoundConcept.DuplicateMerge;
 import static nars.term.transform.Functor.f;
 import static nars.time.Tense.ETERNAL;
@@ -705,7 +700,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
                 }
 
 
-            } catch (InvalidConceptException | InvalidTermException | InvalidTaskException | Budget.BudgetException e) {
+            } catch (Concept.InvalidConceptException | InvalidTermException | InvalidTaskException | Budget.BudgetException e) {
 
                 tasks.remove(input);
 

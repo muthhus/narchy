@@ -2,10 +2,7 @@ package nars.util.signal;
 
 import jcog.Util;
 import jcog.math.FloatSupplier;
-import nars.NAR;
-import nars.Param;
-import nars.Symbols;
-import nars.Task;
+import nars.*;
 import nars.task.MutableTask;
 import nars.term.Compound;
 import nars.term.Term;
@@ -59,7 +56,7 @@ public class ScalarSignal implements Consumer<NAR>, DoubleSupplier {
 
 
     public ScalarSignal(@NotNull NAR n, @NotNull Termed t, FloatFunction<Term> value, FloatToObjectFunction<Truth> truthFloatFunction, Consumer<Task> target) {
-        this(n, t, value, truthFloatFunction, n.priorityDefault(Symbols.BELIEF), target);
+        this(n, t, value, truthFloatFunction, n.priorityDefault(Op.BELIEF), target);
     }
 
     public ScalarSignal(@NotNull NAR n, @NotNull Termed t, FloatFunction<Term> value, @Nullable FloatToObjectFunction<Truth> truthFloatFunction, float pri, Consumer<Task> target) {

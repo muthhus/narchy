@@ -1,4 +1,4 @@
-package nars.reason;
+package nars.reason.control;
 
 import com.google.common.collect.Iterators;
 import jcog.list.ConcurrentArrayList;
@@ -13,9 +13,9 @@ import java.util.Collections;
 /**
  * adapter for a chain of controls
  */
-public class ControlChain extends ConcurrentArrayList<Control> implements Control {
+public class ChainedControl extends ConcurrentArrayList<Control> implements Control {
 
-    public ControlChain(Control... c) {
+    public ChainedControl(Control... c) {
         super(Control.class);
         for (Control x : c)
             add(x);

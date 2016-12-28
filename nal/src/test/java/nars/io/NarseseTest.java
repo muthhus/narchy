@@ -348,13 +348,13 @@ public class NarseseTest {
     @Test
     public void testVariables() throws Narsese.NarseseException {
         Variable v;
-        v = testVar(Symbols.VAR_DEPENDENT);
+        v = testVar(Op.VAR_DEP.ch);
         assertTrue(v.hasVarDep());
 
-        v = testVar(Symbols.VAR_INDEPENDENT);
+        v = testVar(Op.VAR_INDEP.ch);
         assertTrue(v.hasVarIndep());
 
-        v = testVar(Symbols.VAR_QUERY);
+        v = testVar(Op.VAR_QUERY.ch);
         assertTrue(v.hasVarQuery());
     }
 

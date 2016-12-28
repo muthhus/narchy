@@ -6,10 +6,15 @@ import nars.term.Term;
 import nars.term.Termed;
 import nars.term.atom.Atomic;
 import nars.time.Tense;
+import org.eclipse.collections.api.map.ImmutableMap;
 import org.eclipse.collections.api.tuple.primitive.IntIntPair;
+import org.eclipse.collections.impl.factory.Maps;
+import org.eclipse.collections.impl.map.mutable.primitive.CharObjectHashMap;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import static nars.time.Tense.XTERNAL;
 import static org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples.pair;
@@ -19,29 +24,12 @@ import static org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples.pair;
  */
 public enum Op {
 
-    /**
-     * an atomic term (includes interval and variables); this value is set if not a compound term
-     */
-    ATOM(".", Op.ANY, OpType.Other),
-    //        public final Atom get(String i) {
-//            return Atom.the(i);
-//        }}
-//
 
-    /*
-    <sseehh__> is it true thatdepvar only introduces across conjuncion subterms
-    <sseehh__> whlie indepvar only introduces across statement subterms
-    <sseehh__> or is there any other cases or exceptions to this
-    <patham9> yes, thats true for all introduction rules
-    <patham9> the reason is that independent variables are meant to capture the forall semantics by making use of the extension: if something is an A, it also is a B" (analogical with intension), so depends on this ==> copula
-    <patham9> but also on the --> on both sides
-    <patham9> while a dependent variable captures the some semantics, "something is A and B", which is a conjunction where both parts share this something
-    <sseehh__> ok that makes it simple
-    <sseehh__> we could call them 'conjunction variables' and 'statement variables'
-     */
-    VAR_INDEP(Symbols.VAR_INDEPENDENT,  6 /*NAL6 for Indep Vars */, OpType.Variable),
-    VAR_DEP(Symbols.VAR_DEPENDENT, Op.ANY, OpType.Variable),
-    VAR_QUERY(Symbols.VAR_QUERY, Op.ANY, OpType.Variable),
+    ATOM(".", Op.ANY_LEVEL, OpType.Other),
+
+    VAR_INDEP('$',  6 /*NAL6 for Indep Vars */, OpType.Variable),
+    VAR_DEP('#', Op.ANY_LEVEL, OpType.Variable),
+    VAR_QUERY('?', Op.ANY_LEVEL, OpType.Variable),
 
 
     NEG("--", 5, Args.One),
@@ -98,9 +86,9 @@ public enum Op {
 
 //    /** Termject */
 //    OBJECT("`", Op.ANY, OpType.Other),
-    INT("`i", Op.ANY, OpType.Other),
+    INT("`i", Op.ANY_LEVEL, OpType.Other),
 
-    VAR_PATTERN(Symbols.VAR_PATTERN, Op.ANY, OpType.Variable),
+    VAR_PATTERN('%', Op.ANY_LEVEL, OpType.Variable),
 
 
     //VIRTUAL TERMS
@@ -112,15 +100,48 @@ public enum Op {
     /** for ellipsis, when seen as a term */
     SUBTERMS("...", 1, OpType.Other );
 
-    //-----------------------------------------------------
 
 
     /** Image index ("imdex") symbol */
     public static final Atomic Imdex = $.the("_");
+
     public static final int StatementBits = Op.or(Op.INH,Op.SIM,Op.IMPL,Op.EQUI);
-    public static final int IMGbits = Op.or(Op.IMGe, Op.IMGi);
     public static final int OpBits = Op.or(Op.ATOM, Op.INH, Op.PROD);
     public static final int InhAndIMGbits = Op.or(Op.INH, Op.IMGe, Op.IMGi);
+
+    public static final char BELIEF = '.';
+    public static final char QUESTION = '?';
+    public static final char GOAL = '!';
+    public static final char QUEST = '@';
+    public static final char COMMAND = ';';
+
+    public static final String TENSE_PAST = ":\\:";
+    public static final String TENSE_PRESENT = ":|:";
+    public static final String TENSE_FUTURE = ":/:";
+
+    public static final String TENSE_ETERNAL = ":-:"; //ascii infinity symbol
+    public static final String TASK_RULE_FWD = "|-";
+
+    public static final char BUDGET_VALUE_MARK = '$';
+    public static final char TRUTH_VALUE_MARK = '%';
+    public static final char VALUE_SEPARATOR = ';';
+
+    public static final char ARGUMENT_SEPARATOR = ',';
+
+    public static final char IMAGE_PLACE_HOLDER = '_';
+    public static final char SET_INT_CLOSER = ']';
+    public static final char SET_EXT_CLOSER = '}';
+    public static final char COMPOUND_TERM_OPENER = '(';
+    public static final char COMPOUND_TERM_CLOSER = ')';
+
+    @Deprecated public static final char STATEMENT_OPENER = '<';
+    @Deprecated public static final char STATEMENT_CLOSER = '>';
+
+    public static final char STAMP_OPENER = '{';
+    public static final char STAMP_CLOSER = '}';
+    public static final char STAMP_SEPARATOR = ';';
+    public static final char STAMP_STARTER = ':';
+
 
     /**
      * symbol representation of this getOperator
@@ -156,11 +177,6 @@ public enum Op {
 
     /** whether this involves an additional numeric component: 'dt' (for temporals) or 'relation' (for images) */
     public final boolean hasNumeric;
-
-
-//    Op(char c, int minLevel) {
-//        this(c, minLevel, Args.NoArgs);
-//    }
 
     Op(char c, int minLevel, OpType type) {
         this(c, minLevel, type, Args.None);
@@ -234,6 +250,8 @@ public enum Op {
     }
 
 
+
+
     @NotNull
     @Override
     public String toString() {
@@ -247,8 +265,8 @@ public enum Op {
         int t = c.dt();
 
         return t == Tense.DTERNAL ?
-                    str :
-                    str + ((t >= 0) ? "+" : "") + (Integer.toString(t));
+                str :
+                str + ((t >= 0) ? "+" : "") + (Integer.toString(t));
     }
 
 
@@ -290,58 +308,21 @@ public enum Op {
         }
     }
 
-    public static int or(@NotNull int... i) {
-        int bits = 0;
-        for (int x : i) {
-            bits |= x;
-        }
-        return bits;
+    /** true if matches any of the on bits of the vector */
+    public final boolean in(int vector) {
+        return in(bit, vector);
     }
-    public static int or(@NotNull Op... o) {
-        int bits = 0;
-        for (Op n : o)
-            bits |= n.bit;
-        return bits;
+
+    @Deprecated public boolean isSet() {
+        return in(SetsBits);
     }
 
     public static int or(int bits, @NotNull Op o) {
         return bits | o.bit;
     }
 
-
-    /**
-     * specifier for any NAL level
-     */
-    public static final int ANY = 0;
-
-
-//    public static boolean isTemporal(@NotNull Term t, int newDT) {
-//        return isTemporal(t.op(), newDT, t.size());
-//    }
-//
-//    public static boolean isTemporal(@NotNull Op o, int dt, int arity) {
-//        return o.temporal && !(arity > 2 && dt != 0 && o == Op.CONJ && dt != DTERNAL && dt != XTERNAL);
-//    }
-//
-//    public boolean validSize(int length) {
-//        int min = this.minSize;
-//        if (min!=-1 && length < min) return false;
-//        int max = this.maxSize;
-//        return !(max != -1 && length > max);
-//    }
-
-
-    /** true if matches any of the on bits of the vector */
-    public final boolean in(int vector) {
-        return in(bit, vector);
-    }
-
     static boolean in(int needle, int haystack) {
         return (needle & haystack) == needle;
-    }
-
-    public boolean isSet() {
-        return in(SetsBits);
     }
 
     public static boolean hasAny(int structure, @NotNull Op o) {
@@ -352,6 +333,25 @@ public enum Op {
         return this == Op.SECTe || this == Op.SECTi;
     }
 
+    public static int or(@NotNull int... i) {
+        int bits = 0;
+        for (int x : i) {
+            bits |= x;
+        }
+        return bits;
+    }
+
+    public static int or(@NotNull Op... o) {
+        int bits = 0;
+        for (Op n : o)
+            bits |= n.bit;
+        return bits;
+    }
+
+    /**
+     * specifier for any NAL level
+     */
+    public static final int ANY_LEVEL = 0;
 
     /** top-level Op categories */
     public enum OpType {
@@ -359,53 +359,6 @@ public enum Op {
         Variable,
         Other
     }
-
-
-//    @Deprecated public static final int ImplicationsBits =
-//            Op.or(Op.IMPLICATION);
-//
-//    @Deprecated public static final int ConjunctivesBits =
-//            Op.or(Op.CONJUNCTION);
-
-//    @Deprecated public static final int EquivalencesBits =
-//            Op.or(Op.EQUIV);
-
-    public static final int SetsBits =
-            Op.or(Op.SETe, Op.SETi);
-
-
-
-
-
-//    public static int VarDepOrIndep = Op.or( Op.VAR_DEP, Op.VAR_INDEP );
-//    public static final int ProductOrImageBits = or(Op.PRODUCT, Op.IMAGE_EXT, Op.IMAGE_INT);
-    public static final int ImplicationOrEquivalenceBits = or(Op.EQUI, Op.IMPL);
-    public static final int TemporalBits = or(Op.CONJ, Op.EQUI, Op.IMPL);
-
-    public static final int ImageBits =
-        Op.or(Op.IMGe,Op.IMGi);
-
-    public static final int VariableBits =
-        Op.or(Op.VAR_PATTERN,Op.VAR_INDEP,Op.VAR_DEP,Op.VAR_QUERY);
-//    public static final int WildVariableBits =
-//            Op.or(Op.VAR_PATTERN,Op.VAR_QUERY);
-
-
-
-    //MACRO OPS as Strings only
-//    /** Macro: DISJ("||", true, 5, Args.GTETwo) */
-//    public static final String DISJ = "||";
-//
-//    /** Macro: INSTANCE("-{-", 2, OpType.Relation) */
-//    public static final String INSTANCE = "-{-";
-//
-//    /** Macro: PROPERTY("-]-", 2, OpType.Relation) */
-//    public static final String PROPERTY = "-]-";
-//
-//    /** Macro: INSTANCE_PROPERTY("{-]", 2, OpType.Relation) */
-//    public static final String INSTANCE_PROPERTY = "{-]";
-
-
 
 
     enum Args {
@@ -420,7 +373,29 @@ public enum Op {
 
     }
 
+
+    public static final int SetsBits = or(Op.SETe, Op.SETi);
+    public static final int ImplicationOrEquivalenceBits = or(Op.EQUI, Op.IMPL);
+    public static final int TemporalBits = or(Op.CONJ, Op.EQUI, Op.IMPL);
+    public static final int ImageBits = or(Op.IMGe,Op.IMGi);
+    public static final int VariableBits = or(Op.VAR_PATTERN,Op.VAR_INDEP,Op.VAR_DEP,Op.VAR_QUERY);
+
+
     public static final int[] NALLevelEqualAndAbove = new int[8+1]; //indexed from 0..7, meaning index 7 is NAL8, index 0 is NAL1
+
+
+
+    /** index of operators which are encoded by 1 byte: must be less than 31 because this is the range for control characters */
+    static final int numByteSymbols = 15;
+    static final Op[] byteSymbols = new Op[numByteSymbols];
+    static final ImmutableMap<String,Op> stringToOperator;
+    //static final CharObjectHashMap<Op> _charToOperator = new CharObjectHashMap(values().length * 2);
+
+
+    public static Op getOperator(String s) {
+        return stringToOperator.get(s);
+    }
+
     static {
         for (Op o : Op.values()) {
             int l = o.minLevel;
@@ -429,6 +404,34 @@ public enum Op {
                 NALLevelEqualAndAbove[i] |= o.bit;
             }
         }
+
+        final Map<String,Op> _stringToOperator = new HashMap<>(values().length * 2);
+
+        //Setup NativeOperator String index hashtable
+        for (Op r : Op.values()) {
+            _stringToOperator.put(r.toString(), r);
+            int ordinal = r.ordinal();
+            if (ordinal < 15)
+                Op.byteSymbols[ordinal] = r;
+        }
+        stringToOperator = Maps.immutable.ofMap(_stringToOperator);
+
+        //System.out.println(Arrays.toString(byteSymbols));
+
+        //VERIFICATION: Look for any empty holes in the byteSymbols table, indicating that the representation is not contigous
+        //index 0 is always 0 to maintain \0's semantics
+        //if # of operators are reduced in the future, then this will report that the table size should be reduced (avoiding unnecessary array lookups)
+        for (int i = 1; i < Op.byteSymbols.length; i++) {
+            if (null == Op.byteSymbols[i])
+                throw new RuntimeException("Invalid byteSymbols encoding: index " + i + " is null");
+        }
+
+//        //Setup NativeOperator Character index hashtable
+//        for (Op r : Op.values()) {
+//            char c = r.ch;
+//            if (c!=0)
+//                Op._charToOperator.put(c, r);
+//        }
     }
 
 
@@ -437,4 +440,5 @@ public enum Op {
             super("Invalid punctuation: " + c);
         }
     }
+
 }

@@ -26,6 +26,7 @@ import java.util.Random;
 import java.util.function.Consumer;
 
 import static nars.$.the;
+import static nars.Op.*;
 import static nars.time.Tense.ETERNAL;
 
 /**
@@ -186,7 +187,7 @@ public class Inperience extends Leak<Task> {
                 MutableTask e = new InperienceTask(task,
                         r,
                         nar.time(),
-                        nar.confidenceDefault(Symbols.BELIEF));
+                        nar.confidenceDefault(BELIEF));
 
                 logger.info(" {}", e);
                 nar.inputLater(e);
@@ -204,7 +205,7 @@ public class Inperience extends Leak<Task> {
     public static class InperienceTask extends GeneratedTask {
 
         public InperienceTask(Task task, Compound c, long now, float conf) {
-            super(c, Symbols.BELIEF, $.t(1, conf));
+            super(c, BELIEF, $.t(1, conf));
 
             time(now, task.occurrence() != ETERNAL ? task.occurrence() : now)
                     .budgetByTruth(task.priSafe(0))
@@ -222,16 +223,16 @@ public class Inperience extends Leak<Task> {
     public static Atomic reify(char punc) {
         Atomic opTerm;
         switch (punc) {
-            case Symbols.BELIEF:
+            case BELIEF:
                 opTerm = believe;
                 break;
-            case Symbols.GOAL:
+            case GOAL:
                 opTerm = want;
                 break;
-            case Symbols.QUESTION:
+            case QUESTION:
                 opTerm = wonder;
                 break;
-            case Symbols.QUEST:
+            case QUEST:
                 opTerm = evaluate;
                 break;
             default:
@@ -340,7 +341,7 @@ public class Inperience extends Leak<Task> {
 
         long now = nar.time();
 
-        nar.input(new MutableTask(new_term, Symbols.GOAL, 1f, nar)
+        nar.input(new MutableTask(new_term, GOAL, 1f, nar)
                         /*.budget(Global.DEFAULT_GOAL_PRIORITY * INTERNAL_EXPERIENCE_PRIORITY_MUL,
                                 Global.DEFAULT_GOAL_DURABILITY * INTERNAL_EXPERIENCE_DURABILITY_MUL)*/
                 //.parent(parent, belief)

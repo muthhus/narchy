@@ -2,10 +2,7 @@ package nars.test.condition;
 
 
 import jcog.Texts;
-import nars.$;
-import nars.NAR;
-import nars.Symbols;
-import nars.Task;
+import nars.*;
 import nars.task.Tasked;
 import nars.term.Compound;
 import nars.term.Term;
@@ -238,7 +235,7 @@ public class EternalTaskCondition implements NARCondition, Predicate<Task>, Cons
     }
 
     private boolean truthMatches(@NotNull Truthed task) {
-        if ((punc == Symbols.BELIEF) || (punc == Symbols.GOAL)) {
+        if ((punc == Op.BELIEF) || (punc == Op.GOAL)) {
             if (task.truth() == null) {
                 return false;
             }

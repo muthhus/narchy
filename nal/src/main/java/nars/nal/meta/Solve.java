@@ -6,7 +6,7 @@ import nars.truth.Truth;
 import nars.truth.func.TruthOperator;
 import org.jetbrains.annotations.NotNull;
 
-import static nars.Symbols.*;
+import static nars.Op.*;
 
 /**
  * Evaluates the truth of a premise

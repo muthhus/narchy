@@ -10,7 +10,7 @@ import jcog.list.FasterList;
 import jdk.nashorn.api.scripting.NashornScriptEngine;
 import nars.budget.Budget;
 import nars.budget.RawBudget;
-import nars.concept.util.ConceptBuilder;
+import nars.reason.ConceptBuilder;
 import nars.index.term.TermIndex;
 import nars.task.MutableTask;
 import nars.term.Compound;
@@ -297,12 +297,12 @@ public enum $ {
 
     @NotNull
     public static MutableTask belief(@NotNull Compound term, float freq, float conf) {
-        return task(term, Symbols.BELIEF, freq, conf);
+        return task(term, BELIEF, freq, conf);
     }
 
     @NotNull
     public static MutableTask goal(@NotNull Compound term, float freq, float conf) {
-        return task(term, Symbols.GOAL, freq, conf);
+        return task(term, GOAL, freq, conf);
     }
 
     @NotNull
@@ -1014,7 +1014,7 @@ public enum $ {
     @NotNull
     public static Task command(@NotNull Compound op) {
         //TODO use lightweight CommandTask impl without all the logic metadata
-        MutableTask t = new MutableTask(op, Symbols.COMMAND, null);
+        MutableTask t = new MutableTask(op, COMMAND, null);
         t.setBudget(1f, 1f);
         return t;
     }

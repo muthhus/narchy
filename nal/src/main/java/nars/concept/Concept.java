@@ -23,7 +23,6 @@ package nars.concept;
 import com.google.common.collect.Iterators;
 import nars.$;
 import nars.NAR;
-import nars.Symbols;
 import nars.Task;
 import nars.bag.Bag;
 import nars.budget.control.Activation;
@@ -35,6 +34,7 @@ import nars.table.TaskTable;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.truth.Truth;
+import nars.util.SoftException;
 import org.eclipse.collections.impl.map.mutable.UnifiedMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -46,6 +46,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
+
+import static nars.Op.*;
 
 public interface Concept extends Termed {
 
@@ -208,13 +210,13 @@ public interface Concept extends Termed {
     @Nullable
     default TaskTable tableFor(char punc) {
         switch (punc) {
-            case Symbols.BELIEF:
+            case BELIEF:
                 return beliefs();
-            case Symbols.GOAL:
+            case GOAL:
                 return goals();
-            case Symbols.QUESTION:
+            case QUESTION:
                 return questions();
-            case Symbols.QUEST:
+            case QUEST:
                 return quests();
             default:
                 throw new UnsupportedOperationException();
@@ -481,4 +483,26 @@ public interface Concept extends Termed {
 //        return filter(termToConcept, Concept.class); //should remove null's (unless they never get included anyway), TODO Check that)
 //    }
 
+    /**
+     * Created by me on 9/13/16.
+     */
+    final class InvalidConceptException extends SoftException {
+
+        @NotNull
+        public final Termed term;
+        @NotNull
+        public final String reason;
+
+        public InvalidConceptException(@NotNull Termed term, @NotNull String reason) {
+            this.term = term;
+            this.reason = reason;
+        }
+
+        @NotNull
+        @Override
+        public String getMessage() {
+            return "InvalidConceptTerm: " + term + " (" + term.getClass() + "): " + reason;
+        }
+
+    }
 }

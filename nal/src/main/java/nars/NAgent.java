@@ -34,8 +34,8 @@ import java.util.Random;
 import static jcog.Texts.n2;
 import static jcog.Texts.n4;
 import static nars.$.t;
-import static nars.Symbols.BELIEF;
-import static nars.Symbols.GOAL;
+import static nars.Op.BELIEF;
+import static nars.Op.GOAL;
 import static nars.time.Tense.ETERNAL;
 import static nars.truth.TruthFunctions.w2c;
 
@@ -725,7 +725,7 @@ abstract public class NAgent implements NSense, NAction {
 
         public PredictionTask(@NotNull Termed<Compound> term, char punct) {
             super(term, punct, null);
-            assert(punct == Symbols.QUESTION || punct == Symbols.QUEST);
+            assert(punct == Op.QUESTION || punct == Op.QUEST);
         }
 
         @Override

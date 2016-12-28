@@ -1,4 +1,4 @@
-package nars.concept.util;
+package nars.reason;
 
 import nars.NAR;
 import nars.budget.policy.ConceptState;

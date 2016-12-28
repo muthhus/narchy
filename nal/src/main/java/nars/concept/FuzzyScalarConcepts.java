@@ -5,7 +5,7 @@ import com.google.common.collect.Iterators;
 import jcog.math.FloatSupplier;
 import nars.$;
 import nars.NAR;
-import nars.Symbols;
+import nars.Op;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 
@@ -58,7 +58,7 @@ public class FuzzyScalarConcepts implements Iterable<SensorConcept> {
     public FuzzyScalarConcepts(FloatSupplier input, @NotNull NAR nar, @NotNull String... states) {
 
 
-        this.conf = nar.confidenceDefault(Symbols.BELIEF);
+        this.conf = nar.confidenceDefault(Op.BELIEF);
         this.input = input;
         this.nar = nar;
 

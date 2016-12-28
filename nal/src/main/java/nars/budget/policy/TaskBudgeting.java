@@ -2,8 +2,8 @@ package nars.budget.policy;
 
 import jcog.Util;
 import nars.$;
+import nars.Op;
 import nars.Param;
-import nars.Symbols;
 import nars.budget.Budget;
 import nars.budget.util.BudgetFunctions;
 import nars.nal.Derivation;
@@ -24,7 +24,7 @@ public class TaskBudgeting {
         float derivationQuality;
         if (truth == null) {
             //question or quest:
-            derivationQuality = p.nar.qualityDefault(Symbols.QUESTION);
+            derivationQuality = p.nar.qualityDefault(Op.QUESTION);
         } else {
             derivationQuality = truth.conf() / w2c(p.premiseEvidence);
         }

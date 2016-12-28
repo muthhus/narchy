@@ -2,7 +2,7 @@ package nars.truth.func;
 
 import nars.$;
 import nars.NAR;
-import nars.Symbols;
+import nars.Op;
 import nars.term.Term;
 import nars.truth.Truth;
 import nars.truth.TruthFunctions;
@@ -324,11 +324,11 @@ public enum BeliefFunction implements TruthOperator {
 
     @NotNull
     private static Truth defaultTruth(@NotNull NAR m) {
-        return m.truthDefault(Symbols.BELIEF);
+        return m.truthDefault(Op.BELIEF);
     }
 
     private static float defaultConfidence(@NotNull NAR m) {
-        return m.confidenceDefault(Symbols.BELIEF);
+        return m.confidenceDefault(Op.BELIEF);
     }
 
 

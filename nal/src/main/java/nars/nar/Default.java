@@ -2,23 +2,17 @@ package nars.nar;
 
 import jcog.data.random.XorShift128PlusRandom;
 import nars.NAR;
-import nars.concept.Concept;
 import nars.index.term.TermIndex;
 import nars.index.term.map.MapTermIndex;
-import nars.link.BLink;
 import nars.op.time.STMTemporalLinkage;
-import nars.reason.ConceptBagReasoner;
-import nars.reason.DefaultConceptBuilder;
+import nars.reason.control.ConceptBagControl;
+import nars.reason.concept.DefaultConceptBuilder;
 import nars.reason.DefaultDeriver;
-import nars.term.Termed;
 import nars.time.FrameTime;
 import nars.time.Time;
 import nars.util.exe.Executioner;
 import nars.util.exe.SynchronousExecutor;
-import org.apache.commons.lang3.mutable.MutableFloat;
-import org.eclipse.collections.api.tuple.primitive.ObjectFloatPair;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Random;
@@ -30,7 +24,7 @@ public class Default extends NAR {
 
     //private static final Logger logger = LoggerFactory.getLogger(Default.class);
 
-    public final ConceptBagReasoner core = new ConceptBagReasoner(this, new DefaultDeriver());
+    public final ConceptBagControl core = new ConceptBagControl(this, new DefaultDeriver());
 
     private final STMTemporalLinkage stmLinkage = new STMTemporalLinkage(this, 2);
 

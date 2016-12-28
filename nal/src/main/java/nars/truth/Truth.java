@@ -23,8 +23,8 @@ package nars.truth;
 import jcog.Texts;
 import jcog.Util;
 import nars.$;
+import nars.Op;
 import nars.Param;
-import nars.Symbols;
 import nars.term.Term;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.jetbrains.annotations.NotNull;
@@ -178,11 +178,11 @@ public interface Truth extends Truthed {
         
         //sb.ensureCapacity(3 + 2 * (2 + decimals) );
         return sb
-            .append(Symbols.TRUTH_VALUE_MARK)
+            .append(Op.TRUTH_VALUE_MARK)
             .append(Texts.n(freq(), decimals))
-            .append(Symbols.VALUE_SEPARATOR)
+            .append(Op.VALUE_SEPARATOR)
             .append(Texts.n(conf(), decimals))
-            .append(Symbols.TRUTH_VALUE_MARK);
+            .append(Op.TRUTH_VALUE_MARK);
     }
 
 

@@ -2,8 +2,8 @@ package nars.budget;
 
 import jcog.Texts;
 import jcog.Util;
+import nars.Op;
 import nars.Param;
-import nars.Symbols;
 import nars.Task;
 import nars.budget.util.BudgetFunctions;
 import nars.util.SoftException;
@@ -82,10 +82,10 @@ public interface Budget extends Budgeted {
                 ((StringBuilder)sb).ensureCapacity(c);
         }
 
-        sb.append(Symbols.BUDGET_VALUE_MARK)
-                .append(priorityString).append(Symbols.VALUE_SEPARATOR)
+        sb.append(Op.BUDGET_VALUE_MARK)
+                .append(priorityString).append(Op.VALUE_SEPARATOR)
                 .append(qualityString)
-                .append(Symbols.BUDGET_VALUE_MARK);
+                .append(Op.BUDGET_VALUE_MARK);
 
         return  sb;
     }

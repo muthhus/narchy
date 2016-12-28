@@ -65,25 +65,25 @@ public class MutableTask extends AbstractTask {
 
     @NotNull
     public MutableTask belief() {
-        punc(Symbols.BELIEF);
+        punc(Op.BELIEF);
         return this;
     }
 
     @NotNull
     public MutableTask question() {
-        punc(Symbols.QUESTION);
+        punc(Op.QUESTION);
         return this;
     }
 
     @NotNull
     public MutableTask quest() {
-        punc(Symbols.QUEST);
+        punc(Op.QUEST);
         return this;
     }
 
     @NotNull
     public MutableTask goal() {
-        punc(Symbols.GOAL);
+        punc(Op.GOAL);
         return this;
     }
 

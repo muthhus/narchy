@@ -1,4 +1,4 @@
-package nars.reason;
+package nars.reason.premise;
 
 import nars.Task;
 import nars.budget.Budget;
@@ -6,6 +6,7 @@ import nars.budget.policy.TaskBudgeting;
 import nars.concept.Concept;
 import nars.nal.Derivation;
 import nars.nal.Premise;
+import nars.reason.PremiseBuilder;
 import nars.term.Term;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;

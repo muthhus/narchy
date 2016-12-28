@@ -23,7 +23,6 @@ package nars.nal;
 
 import nars.NAR;
 import nars.Op;
-import nars.Symbols;
 import nars.Task;
 import nars.task.MutableTask;
 import nars.term.Compound;
@@ -34,7 +33,7 @@ import org.jetbrains.annotations.Nullable;
 
 import static nars.Op.ATOM;
 import static nars.Op.PROD;
-import static nars.Symbols.COMMAND;
+import static nars.Op.COMMAND;
 
 /**
  * interface which defines the behavior for processing functor tasks
@@ -68,7 +67,7 @@ import static nars.Symbols.COMMAND;
         void run(@NotNull Atomic op, @NotNull Term[] args, @NotNull NAR nar);
 
         public static Task task(Compound content) {
-            return new MutableTask(content, Symbols.COMMAND, null);
+            return new MutableTask(content, Op.COMMAND, null);
         }
     }
 

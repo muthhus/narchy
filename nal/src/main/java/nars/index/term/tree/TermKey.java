@@ -5,7 +5,6 @@ import io.airlift.compress.lz4.Lz4RawCompressor;
 import jcog.data.byt.DynByteSeq;
 import nars.IO;
 import nars.Op;
-import nars.Symbols;
 import nars.Task;
 import nars.term.Compound;
 import nars.term.Term;
@@ -74,7 +73,7 @@ public class TermKey extends DynByteSeq {
 
             writeLong(task.occurrence());
 
-            if ((punc == Symbols.BELIEF) || (punc == Symbols.GOAL)) {
+            if ((punc == Op.BELIEF) || (punc == Op.GOAL)) {
                 writeInt(task.truth().hashCode());
             }
 
