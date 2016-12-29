@@ -168,7 +168,7 @@ public class BasicLibrary extends Library {
                     th);
         Struct theory = (Struct) th;
         try {
-            new Agent(alice.util.Tools.removeApices(theory.toString()), new MutableClauseIndex()).spawn();
+            new PrologAgent(alice.util.Tools.removeApices(theory.toString()), new MutableClauseIndex()).spawn();
             return true;
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -197,7 +197,7 @@ public class BasicLibrary extends Library {
         Struct theory = (Struct) th;
         Struct goal = (Struct) g;
         try {
-            new Agent(alice.util.Tools.removeApices(theory.toString()), goal
+            new PrologAgent(alice.util.Tools.removeApices(theory.toString()), goal
                     .toString()
                     + '.').spawn();
             return true;

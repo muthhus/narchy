@@ -33,7 +33,7 @@ import java.util.List;
  * @see alice.tuprolog.Prolog
  *
  */
-public class Agent extends Prolog {
+public class PrologAgent extends Prolog {
     
     private String theoryText;
     private InputStream theoryInputStream;
@@ -48,20 +48,20 @@ public class Agent extends Prolog {
      *
      * @param theory the text representing the theory
      */
-    public Agent(String theory, ClauseIndex dynamics){
+    public PrologAgent(String theory, ClauseIndex dynamics){
         super(dynamics);
         theoryText=theory;
         addOutputListener(defaultOutputListener);
     }
 
-    public Agent(String theory){
+    public PrologAgent(String theory){
         this(theory, (String)null);
     }
 
     /**
      * Builds a prolog agent providing it a theory and a goal
      */
-    @Deprecated public Agent(String theory,String goal){
+    @Deprecated public PrologAgent(String theory, String goal){
 
         theoryText=theory;
         goalText=goal;
@@ -73,7 +73,7 @@ public class Agent extends Prolog {
      * Constructs the Agent with a theory provided
      * by an input stream
      */
-    public Agent(InputStream is, ClauseIndex dynamics){
+    public PrologAgent(InputStream is, ClauseIndex dynamics){
         super(dynamics);
         theoryInputStream=is;
         addOutputListener(defaultOutputListener);
@@ -83,7 +83,7 @@ public class Agent extends Prolog {
      * Constructs the Agent with a theory provided
      * by an input stream and a goal
      */
-    public Agent(InputStream is,String goal){
+    public PrologAgent(InputStream is, String goal){
         theoryInputStream=is;
         goalText=goal;
         addOutputListener(defaultOutputListener);
@@ -198,8 +198,8 @@ public class Agent extends Prolog {
     
     
     static final class AgentThread extends Thread {
-        Agent agent;
-        AgentThread(Agent agent){
+        PrologAgent agent;
+        AgentThread(PrologAgent agent){
             this.agent=agent;
         }
         @Override

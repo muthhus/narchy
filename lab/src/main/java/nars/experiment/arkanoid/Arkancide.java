@@ -7,6 +7,7 @@ import nars.NAR;
 import nars.Param;
 import nars.concept.ActionConcept;
 import nars.remote.NAgents;
+import nars.task.MutableTask;
 
 public class Arkancide extends NAgents {
 
@@ -72,6 +73,12 @@ public class Arkancide extends NAgents {
             return $.t(pct, nar.confidenceDefault('.'));
             //return null; //$.t(0.5f, alpha);
         }).feedbackResolution(resX));
+
+        //nar.log();
+//        predictors.add( (MutableTask)nar.input(
+//                //"(((noid) --> #y) && (add(#x,1) <-> #y))?"
+//                "((cam --> ($x,$y)) && (camdiff($x,$y) --> similaritree($x,$y))). %1.00;0.99%"
+//        ).get(0) );
 
     }
 

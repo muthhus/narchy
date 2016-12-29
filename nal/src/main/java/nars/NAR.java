@@ -4,6 +4,7 @@ package nars;
 import com.google.common.collect.Sets;
 import io.airlift.compress.snappy.SnappyFramedInputStream;
 import io.airlift.compress.snappy.SnappyFramedOutputStream;
+import jcog.Util;
 import jcog.data.MutableInteger;
 import jcog.event.ArrayTopic;
 import jcog.event.On;
@@ -631,7 +632,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
 
             input.delete();
 
-            if (Param.DEBUG_EXTRA)
+            if (input.isInput() || Param.DEBUG_EXTRA)
                 logger.warn("input: {}", e.toString());
 
             //e.printStackTrace();
@@ -716,21 +717,30 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
 
                 //different instance
 
+                float reactivation;
+                Budget e = existing.budget();
                 if (!existing.isDeleted()) {
-                    DuplicateMerge.merge(existing.budget(), input, 1f);
+                    float ep = e.priSafe(0);
+                    reactivation = Util.unitize((input.priSafe(0) - ep) / ep);
+                    if (reactivation > 0) {
+                        DuplicateMerge.merge(e, input, 1f);
+                    }
                     input.feedback(null, Float.NaN, Float.NaN, this);
                 } else {
                     //this may never get called due to the replacement above
                     //attempt to revive deleted task
-                    existing.budget().set(input.budget());
+                    e.set(input.budget());
+                    reactivation = 1f;
                 }
 
                 input.delete("Duplicate");
 
                 //re-activate only
-                Concept c = existing.concept(this);
-                if (c!=null) {
-                    ((CompoundConcept)c).activateTask(existing, this);
+                if (reactivation > 0) {
+                    Concept c = existing.concept(this);
+                    if (c != null) {
+                        ((CompoundConcept) c).activateTask(existing, this, reactivation);
+                    }
                 }
 
             }

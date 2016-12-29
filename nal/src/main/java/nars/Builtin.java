@@ -5,6 +5,7 @@ import nars.op.Operator;
 import nars.op.data.*;
 import nars.term.Term;
 import nars.term.atom.Atomic;
+import nars.term.obj.IntTerm;
 import nars.term.transform.Functor;
 import nars.term.var.Variable;
 
@@ -35,7 +36,17 @@ public class Builtin  {
                 return x.equals(y) ? True :
                         ((x instanceof Variable) || (y instanceof Variable)) ? null :
                                 False; //dont compare a variable to non-variable
-            })
+            }),
+            Functor.f2("add", (x,y) -> {
+                return ((x instanceof IntTerm) && (y instanceof IntTerm)) ?
+                            $.the(((IntTerm)x).val + ((IntTerm)y).val) :
+                            null;
+            }),
+            Functor.f2("sub", (x,y) -> {
+                return ((x instanceof IntTerm) && (y instanceof IntTerm)) ?
+                        $.the(((IntTerm)x).val - ((IntTerm)y).val) :
+                        null;
+            }),
     };
 
     /**

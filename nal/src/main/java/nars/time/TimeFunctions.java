@@ -384,6 +384,7 @@ public interface TimeFunctions {
 
                 if (occ == ETERNAL && occOther != ETERNAL) {
 
+
                     @Nullable Term rOtherTerm = resolve(p, decomposeTask ? p.beliefTerm.term() : p.taskTerm);
                     if (rOtherTerm!=null) {
 
@@ -408,6 +409,10 @@ public interface TimeFunctions {
 
                         }
                     }
+
+                    //default:
+                    if (occ == ETERNAL)
+                        occ = occOther;
 
                 }
 

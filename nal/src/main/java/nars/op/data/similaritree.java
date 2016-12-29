@@ -4,6 +4,7 @@ import jcog.Texts;
 import nars.$;
 import nars.term.Term;
 import nars.term.transform.Functor;
+import nars.term.var.Variable;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -18,10 +19,9 @@ public class similaritree extends Functor.BinaryFunctor {
 
     @Override
     public @Nullable Term apply(Term a, Term b) {
-        String as = a.toString();
-        String bs = b.toString();
-        int d = Texts.levenshteinDistance(as, bs);
-        return $.the(d);
+        if ((a instanceof Variable || b instanceof Variable))
+            return null;
+        return $.the( Texts.levenshteinDistance(a.toString(), b.toString()) );
     }
 
 

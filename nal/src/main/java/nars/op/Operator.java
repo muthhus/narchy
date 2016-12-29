@@ -31,14 +31,17 @@ import nars.term.atom.Atomic;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.function.BiConsumer;
+
 import static nars.Op.*;
+import static nars.time.Tense.ETERNAL;
 
 /**
  * interface which defines the behavior for processing functor tasks
  */
 @FunctionalInterface public interface Operator {
 
-    public static Term[] args(Task t) {
+    static Term[] args(Task t) {
         return ((Compound)(t.term(0)/*subject*/)).terms();
     }
 
@@ -49,7 +52,7 @@ import static nars.Op.*;
      */
     @Nullable Task run(@NotNull Task t, @NotNull NAR nar);
 
-    final static int OPERATOR_BITS = ATOM.bit | PROD.bit | Op.INH.bit;
+    int OPERATOR_BITS = ATOM.bit | PROD.bit | Op.INH.bit;
 
     @FunctionalInterface  interface CommandOperator extends Operator {
 
@@ -64,10 +67,27 @@ import static nars.Op.*;
 
         void run(@NotNull Atomic op, @NotNull Term[] args, @NotNull NAR nar);
 
-        public static Task task(Compound content) {
+        static Task task(Compound content) {
             return new MutableTask(content, Op.COMMAND, null);
         }
     }
+
+    /** if goal, automatically generates a corresponding feedback belief in the eternal, present, or future. */
+    public static Operator auto(BiConsumer<Task /* Goal */,Task /* Belief (feedback) */> onExec) {
+        return (g, nar) -> {
+            if (g.punc() == GOAL) {
+                Compound c = g.term();
+                if (c.vars() == 0 && c.varPattern() == 0) {
+                    long occurrence = g.occurrence();
+                    if (occurrence == ETERNAL || occurrence >= nar.time()) {
+                        Task b = nar.believe(g.priSafe(0), c, occurrence, g.freq(), nar.confidenceDefault(BELIEF));
+                        onExec.accept(g, b);
+                    }
+                }
+            }
+            return g;
+        };
+    };
 
 
 //    @Override

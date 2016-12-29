@@ -1,6 +1,10 @@
 package nars.prolog;
 
 import alice.tuprolog.*;
+import nars.NAR;
+import nars.Param;
+import nars.nar.Default;
+import nars.op.Operator;
 import org.junit.Test;
 
 import java.util.List;
@@ -14,15 +18,14 @@ public class PrologTests {
 
     @Test
     public void testHello() {
-        new Agent("go :- write('hello, world!'), nl.\n",
-                ":-solve(go).").run();
+        new PrologAgent("go :- write('hello, world!'), nl.\n").run(":-solve(go).");
     }
 
     @Test
     public void testAnd() {
         assertEquals(
                 "yes.",
-                new Agent("t(a).\nt(b).\nt(c).\n",
+                new PrologAgent("t(a).\nt(b).\nt(c).\n",
                         "t(a), t(b), t(c).").run().toString());
     }
 
@@ -30,7 +33,7 @@ public class PrologTests {
     public void testAnd2() {
         assertEquals(
                 "yes.",
-                new Agent("a.\nb.\nc.\n",
+                new PrologAgent("a.\nb.\nc.\n",
                         "a, b, c.").run().toString());
     }
 
@@ -38,15 +41,15 @@ public class PrologTests {
     public void testInequality() {
         assertEquals(
                 "no.",
-                new Agent("a.\nb.",
+                new PrologAgent("a.\nb.",
                         "a=b.").run().toString());
         assertEquals(
                 "yes.",
-                new Agent("a.\nb.",
+                new PrologAgent("a.\nb.",
                         "a=a.").run().toString());
         assertEquals(
                 "yes.",
-                new Agent("a.\nb.",
+                new PrologAgent("a.\nb.",
                         "not(a=b).").run().toString());
     }
 
@@ -67,13 +70,13 @@ public class PrologTests {
 
         assertEquals("yes.\n" +
                         "X / [a,b,e]",
-                new Agent(theory, "path(a,e,X).").run().toString());
+                new PrologAgent(theory, "path(a,e,X).").run().toString());
 
         assertEquals("yes.\n" +
                         "X / [a,b,e,f]",
-                new Agent(theory, "path(a,f,X).").run().toString());
+                new PrologAgent(theory, "path(a,f,X).").run().toString());
 
-        assertEquals("no.", new Agent(theory, "path(z,f,X).").run().toString());
+        assertEquals("no.", new PrologAgent(theory, "path(z,f,X).").run().toString());
 
 
     }
@@ -117,7 +120,7 @@ public class PrologTests {
                 "verb(likes).\n" +
                 "verb(bites).";
 
-        List<Term> solutions =  new Agent(theory).solutions("utterance([the, man, likes, X]).");
+        List<Term> solutions =  new PrologAgent(theory).solutions("utterance([the, man, likes, X]).");
 
         assertEquals(
                 "[utterance([the,man,likes,man]), utterance([the,man,likes,dog])]",
@@ -126,15 +129,37 @@ public class PrologTests {
     }
 
     @Test public void testHanoi1() {
-        String theory =
-            "hanoi(1,A,B,C,[to(A,B)|Zs],Zs).\n" +
-            "hanoi(N,A,B,C,Xs,Zs):- " +
-                "N>1," +
-                "N1 is N - 1," +
-                "hanoi(N1,A,C,B,Xs,[to(A,B)|Ys])," +
-                "hanoi(N1,C,B,A,Ys,Zs).";
-        new Agent(theory);
-        //TODO
+//        String theory =
+//            "hanoi(1,A,B,C,[to(A,B)|Zs],Zs).\n" +
+//            "hanoi(N,A,B,C,Xs,Zs):- " +
+//                "N>1," +
+//                "N1 is N - 1," +
+//                "hanoi(N1,A,C,B,Xs,[to(A,B)|Ys])," +
+//                "hanoi(N1,C,B,A,Ys,Zs).";
+
+        new PrologAgent("hanoi(N) :- move(N, left, centre, right).\n" +
+                "        move(0, _, _, _) :- !.\n" +
+                "        move(N, A, B, C) :- M is N-1, move(M, A, C, B), inform(A, B), move(M, C, B, A).\n" +
+                "        inform(X,Y) :-write([move, disk, from, X, to, Y]), nl.")
+                .run("hanoi(3).");
+
+
+
+        Param.DEBUG = true;
+
+        NAR n = new Default();
+        //n.logSummaryGT(System.out, 0.1f);
+        n.on("move", Operator.auto((g,b)->{
+            System.out.println(b);
+        }));
+        n.input(
+            "move(3, (l, c, r)). :|:",
+            "move(0, (#x, #y, #z))!",
+            "((move(sub($x,1), ($a, $c, $b)) &&+1 move(sub($x,1), ($c, $b, $a))) ==>+1 move($x, ($a, $b, $c)))."
+            //"(move($x, ($a, $b, $c)) ==>+1 (move(sub($x,1), ($a, $c, $b)) &&+1 move(sub($x,1), ($c, $b, $a))))."
+        );
+        n.run(5000);
+
     }
 }
 

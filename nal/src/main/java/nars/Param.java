@@ -22,7 +22,7 @@ public abstract class Param /*extends Container*/  {
 
     /** absolute limit for constructing terms in any context in which a NAR is not known, which could provide a limit.
      * typically a NAR instance's 'compoundVolumeMax' parameter will be lower than this */
-    public static final int COMPOUND_VOLUME_MAX = 64;
+    public static final int COMPOUND_VOLUME_MAX = 96;
 
     /**
      * hard upper-bound limit on Compound term complexity;

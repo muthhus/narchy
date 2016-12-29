@@ -8,13 +8,13 @@ import org.junit.Test;
 
 public class MathTest {
 
-    @Test
-    public void testAdd1() {
-        Terminal t = new Terminal();
-        t.log();
-        t.input("(add(1,2,?x)<->result).");
-        t.next();
-    }
+//    @Test
+//    public void testAdd1() {
+//        Terminal t = new Terminal();
+//        t.log();
+//        t.input("(add(1,2,?x)<->result).");
+//        t.next();
+//    }
     @Test
     public void testImplVarAdd1() {
         Param.DEBUG = true;
@@ -28,7 +28,7 @@ public class MathTest {
         t.input("((&&,({$x} --> i),({$y} --> i)) ==> ({($x,$y),($y,$x)} --> j)).");
         t.run(1000);
 
-        t.input("(({(#x,#y)} --> j) ==> ({add(#x,#y,?z)} --> i)).");
+        t.input("(({(#x,#y)} --> j) ==> ({add(#x,#y)} --> i)).");
         t.run(1000);
 
         //t.input("(({#x,#y} --> i) && (add(#x,#y)<->sum)).");

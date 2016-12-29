@@ -38,7 +38,8 @@ public class AtomicSingleton extends AtomicStringConstant {
 
     @Override
     public boolean unify(@NotNull Term y, @NotNull Unify subst) {
-        throw new UnsupportedOperationException("AtomicSingleton leak");
+        //throw new UnsupportedOperationException("AtomicSingleton leak");
+        return false;
     }
 
 }

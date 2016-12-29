@@ -527,7 +527,7 @@ public class Narsese extends BaseParser<Object> {
                                 firstOf(
 
                                         sequence(
-                                                COMPOUND_TERM_CLOSER, push(TermBuilder.empty(PROD))
+                                                COMPOUND_TERM_CLOSER, push(Terms.ZeroProduct)
                                         ),
 
 

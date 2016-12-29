@@ -38,7 +38,7 @@ public class TestEinsteinRiddle {
 
         String[] s = new String[1];
         //The answer is the German owns the fish.
-        Agent a = new Agent(ein, "einstein(_,X), write(X).");
+        PrologAgent a = new PrologAgent(ein, "einstein(_,X), write(X).");
         a.addOutputListener(o-> {
             if (s[0]==null)
                 s[0] = o.getMsg();

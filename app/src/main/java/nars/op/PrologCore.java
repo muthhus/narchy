@@ -34,7 +34,7 @@ import static nars.time.Tense.DTERNAL;
  * of a prolog solution (converted to NARS terms), which are input to NARS memory
  * with the hope that this is sooner than NARS can solve it by itself.
  */
-public class PrologCore extends Agent implements Consumer<Task> {
+public class PrologCore extends PrologAgent implements Consumer<Task> {
 
     final static Logger logger = LoggerFactory.getLogger(PrologCore.class);
 

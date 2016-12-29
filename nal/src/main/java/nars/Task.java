@@ -562,7 +562,7 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
      * or if its origin has been forgotten or never known
      */
     default boolean isInput() {
-        return evidence().length == 1;
+        return evidence().length <= 1;
         //return evidence().length <= 1;
         //return (getParentTask() == null);
         //return (evidence().length <= 1) && ;

@@ -580,9 +580,7 @@ public abstract class AbstractTask extends RawBudget implements Task, Temporal {
                 //dur *= evidence().length;
 
                 float dc = TruthPolation.evidenceDecay(cw, dur, delta);
-                if (eternalizable())
-                    return Math.max(dc, t.eternalizedConf());
-                return dc;
+                return eternalizable() ? Math.max(dc, t.eternalizedConf()) : dc;
 
             }
 
@@ -591,8 +589,8 @@ public abstract class AbstractTask extends RawBudget implements Task, Temporal {
     }
 
     public boolean eternalizable() {
-        //return term.vars() > 0;
-        return term.varIndep() > 0;
+        return term.vars() > 0;
+        //return term.varIndep() > 0;
         //return false;
 
 

@@ -48,16 +48,7 @@ public abstract class TermBuilder {
     private static final int InvalidImplicationPredicate = or(EQUI, IMPL);
 
 
-    @NotNull
-    public static Term empty(@NotNull Op op) {
-        switch (op) {
 
-            case PROD:
-                return Terms.ZeroProduct;
-            default:
-                return False;
-        }
-    }
 
     @NotNull
     public Term difference(@NotNull Op o, @NotNull Compound a, @NotNull TermContainer b) {
@@ -432,7 +423,11 @@ public abstract class TermBuilder {
                 return False;
             }
 
-            args[i] = intern(productNormalize(x));
+            x = intern(productNormalize(x));
+            if (isTrueOrFalse(x))
+                return False; //may have become False through eval()
+
+            args[i] = x;
         }
 
 //        if (Param.ARITHMETIC_INDUCTION)
@@ -1084,7 +1079,7 @@ public abstract class TermBuilder {
         MutableSet<Term> s = TermContainer.intersect(
                 /*(TermContainer)*/ a, /*(TermContainer)*/ b
         );
-        return s.isEmpty() ? empty(o) : (Compound) finalize(o, s);
+        return s.isEmpty() ? False : (Compound) finalize(o, s);
     }
 
 

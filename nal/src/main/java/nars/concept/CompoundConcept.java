@@ -408,8 +408,12 @@ public class CompoundConcept<T extends Compound> implements Concept, Termlike {
     }
 
     public Activation activateTask(@NotNull Task input, @NotNull NAR nar) {
+        return activateTask(input, nar, 1f);
+    }
+
+    public Activation activateTask(@NotNull Task input, @NotNull NAR nar, float scale) {
         //return new DepthFirstActivation(input, this, nar, nar.priorityFactor.floatValue());
-        return new SpreadingActivation(input, this, nar, nar.priorityFactor.floatValue());
+        return new SpreadingActivation(input, this, nar, nar.priorityFactor.floatValue() * scale);
     }
 
     /**

@@ -39,16 +39,16 @@ public class DefaultPremiseBuilder extends PremiseBuilder {
         @Override
         public @Nullable Budget budget(@NotNull Term conclusion, @Nullable Truth truth, @NotNull Derivation conclude) {
 
-            float factor =
-                    qualityFactor(truth, conclude) *
+            float truthFactor = qualityFactor(truth, conclude);
+            float complexityFactor =
                     BudgetFunctions.occamComplexityGrowthRelative(conclusion, task, belief, 1);
 
-            final float q = qua() * factor;
+            final float q = qua() * complexityFactor;
 
             if (q < conclude.quaMin)
                 return null;
 
-            float p = pri() * factor;
+            float p = pri() * truthFactor * complexityFactor;
 
 
             return $.b(p, Util.clamp(q, 0f, 1f - Param.BUDGET_EPSILON));
@@ -70,8 +70,8 @@ public class DefaultPremiseBuilder extends PremiseBuilder {
         @Override protected float qualityFactor(@Nullable Truth truth, @NotNull Derivation conclude) {
             if (truth == null) {
                 //question or quest:
-                return 1;
-                        //conclude.nar.qualityDefault(Op.QUESTION);
+                return //1;
+                       conclude.nar.qualityDefault(Op.QUESTION);
             } else {
                 return truth.conf() / w2c(conclude.premiseEvidence);
             }

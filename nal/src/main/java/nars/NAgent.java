@@ -436,8 +436,10 @@ abstract public class NAgent implements NSense, NAction {
 //                    new PredictionTask($.impl(action, dur, happiness), '?').time(nar, dur),
 //                    new PredictionTask($.impl($.neg(action), dur, happiness), '?').time(nar, dur),
 
-                    new PredictionTask($.seq(action, dur, happiness), '?').time(nar, dur),
-                    new PredictionTask($.seq($.neg(action), dur, happiness), '?').time(nar, dur)
+                    new PredictionTask($.seq(action, dur, happiness), '?')
+                            .time(nar, dur),
+                    new PredictionTask($.seq($.neg(action), dur, happiness), '?')
+                            .time(nar, dur)
 
 //                    new PredictionTask($.seq($.varQuery("x"), 0, $.seq(action, dur, happiness)), '?').eternal(),
 //                    new PredictionTask($.seq($.varQuery("x"), 0, $.seq($.neg(action), dur, happiness)), '?').eternal()
@@ -681,18 +683,19 @@ abstract public class NAgent implements NSense, NAction {
 
             //s.evidence(t)
 
-            nar.inputLater(s);
+            nar.input(s);
             return s;
         } else {
+            s = (t instanceof PredictionTask) ?
+                    new PredictionTask(t.term(), pp) :
+                    new MutableTask(t.term(), pp, t.truth());
 
+            s.budgetByTruth(p, nar).eternal().log("Agent Predictor");
 
-//            if (t.isDeleted()) {
-//                //TODO check if dur or qua changed?
-//            }
-            t.budgetByTruth(p, nar);
+            t.delete(); //allow the new one to replace it on re-activation
 
-            nar.inputLater(t);
-            return t;
+            nar.input(s);
+            return s;
         }
 
 

@@ -1,5 +1,6 @@
 package nars.experiment.tetris;
 
+import jcog.spatial.Rect1D;
 import nars.$;
 import nars.NAR;
 import nars.concept.ActionConcept;
@@ -10,6 +11,7 @@ import nars.gui.ConceptWidget;
 import nars.gui.NARSpace;
 import nars.nar.NARBuilder;
 import nars.remote.NAgents;
+import nars.task.MutableTask;
 import nars.term.Compound;
 import nars.term.atom.Atomic;
 import nars.time.FrameTime;
@@ -20,7 +22,6 @@ import org.jetbrains.annotations.NotNull;
 import spacegraph.SimpleSpatial;
 import spacegraph.SpaceGraph;
 import spacegraph.Spatial;
-import jcog.spatial.Rect1D;
 import spacegraph.layout.Flatten;
 import spacegraph.math.v2;
 import spacegraph.space.layout.Grid;
@@ -458,9 +459,9 @@ public class Tetris extends NAgents {
 
             NAR nar =
                     //NAgents.newMultiThreadNAR(4, new FrameTime().dur(TIME_PER_FALL));
-                    NARBuilder.newALANN(new FrameTime().dur(1), 3, 256, 5, 3, 1);
+                    NARBuilder.newALANN(new FrameTime().dur(1), 6, 64, 5, 3, 1);
 
-            nar.termVolumeMax.setValue(24);
+            nar.termVolumeMax.setValue(32);
             //nar.linkFeedbackRate.setValue(0.05f);
 
             //newTimeWindow(nar);
@@ -557,7 +558,9 @@ public class Tetris extends NAgents {
             t.trace = true;
 
 
-            t.runRT(20f, 10000).join();
+
+
+            t.runRT(15f, 10000).join();
 
 //        NARController meta = new NARController(nar, loop, t);
 //

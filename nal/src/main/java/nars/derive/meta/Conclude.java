@@ -179,7 +179,7 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
 
             //temporalization failure, could not determine temporal attributes. seems this can happen normally
             if ((temporalized == null) /*|| (Math.abs(occReturn[0]) > 2047483628)*/ /* long cast here due to integer wraparound */) {
-//                if (temporalized!=null) {
+//                 {
 //                    //FOR DEBUGGING, re-run it
 //                    Compound temporalized2 = this.time.compute(content,
 //                            m, this, occReturn, confScale
