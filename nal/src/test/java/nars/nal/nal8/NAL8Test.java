@@ -650,28 +650,10 @@ public class NAL8Test extends AbstractNALTest {
 
 
     @Test
-    public void goalInferredFromSimilarity()  {
+    public void goalInferredFromEquivAndImplEternalAndPresent()  {
         TestNAR tester = test();
 
-        tester.input("(a:b<->c:d).");
-        tester.input("c:d!");
-        tester.mustDesire(cycles, "a:b", 1.0f, 0.81f);
-    }
-    @Test
-    public void goalInferredFromSimilarityEternalAndPresent()  {
-        TestNAR tester = test();
-
-        tester.input("(a:b<->c:d)."); //ETERNAL
-        tester.input("c:d! :|:"); //PRESENT
-        tester.mustDesire(cycles, "a:b", 1.0f, 0.81f, 0);
-        tester.mustNotOutput(cycles*3, "a:b", '!', ETERNAL);
-
-    }
-    @Test
-    public void goalInferredFromSimilarityAndImplEternalAndPresent()  {
-        TestNAR tester = test();
-
-        tester.input("(a:b<->c:d)."); //ETERNAL
+        tester.input("(a:b<=>c:d)."); //ETERNAL
         tester.input("(c:d &&+0 e:f). :|:"); //PRESENT
         tester.input("e:f! :|:"); //PRESENT
         tester.mustDesire(cycles, "a:b", 1.0f, 0.73f, 0);
@@ -680,15 +662,15 @@ public class NAL8Test extends AbstractNALTest {
     }
 
     @Test
-    public void conjunctionSubstitutionViaSimilarity()  {
+    public void conjunctionSubstitutionViaEquiv()  {
         TestNAR tester = test();
 
-        tester.input("(a:b<->c:d)."); //ETERNAL
+        tester.input("(a:b<=>c:d)."); //ETERNAL
         tester.input("(c:d &&+0 e:f). :|:"); //PRESENT
         tester.mustBelieve(cycles, "(a:b &&+0 e:f)", 1.0f, 0.81f, 0);
         tester.mustNotOutput(cycles*3, "(a:b &&+0 e:f)", '.', ETERNAL);
-
     }
+
     @Test
     public void implSubstitutionViaSimilarity()  {
         test()
@@ -697,6 +679,7 @@ public class NAL8Test extends AbstractNALTest {
             .mustBelieve(cycles, "(a:b ==>+1 e:f)", 1.0f, 0.81f, 0)
             .mustNotOutput(cycles, "(a:b ==>+1 e:f)", '.', ETERNAL);
     }
+
     @Test
     public void implSubstitutionViaSimilarityReverse()  {
         test()
@@ -951,13 +934,16 @@ public class NAL8Test extends AbstractNALTest {
     }
 
 
+    //similarity should not spread desire
     @Test public void testGoalSimilaritySpreading() {
         test()
-                
                 .input("(R)!")
                 .input("((G) <-> (R)).")
-                .mustDesire(cycles, "(G)", 1.0f, 0.81f);
+                //.mustDesire(cycles, "(G)", 1.0f, 0.81f);
+                .mustNotOutput(cycles, "(G)", '!', ETERNAL); // because <-> isnt symmetric
     }
+
+    //similarity should not spread desire
     @Test public void testNegatedGoalSimilaritySpreading() {
         test()
                 .log()
@@ -968,26 +954,18 @@ public class NAL8Test extends AbstractNALTest {
 
     @Test public void testPosGoalEquivalenceSpreading() {
         test()
-                .log()
                 .input("(R)!")
                 .input("((G) <=> (R)).")
                 .mustDesire(cycles, "(G)", 1.0f, 0.81f);
     }
     @Test public void testNegatedGoalEquivalenceSpreading() {
         test()
-                .log()
                 .input("--(R)!")
                 .input("((G) <=> (R)).")
                 .mustDesire(cycles, "(G)", 0.0f, 0.81f);
     }
 
-    @Test public void testNegatedSubtermGoalSimilaritySpreading() {
-        test()
 
-                .input("--(R)!")
-                .input("((G) <-> --(R)).")
-                .mustDesire(cycles, "(G)", 1.0f, 0.81f);
-    }
 
 //    @Test public void testInheritanceCompositionTemporal() {
 //        /*

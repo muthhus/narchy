@@ -187,7 +187,7 @@ public interface NSense {
         return senseNumber(v,  "hi:" + id, "lo:" + id);
     }
     @NotNull
-    default FuzzyScalarConcepts senseNumberTrii(String id, FloatSupplier v) {
+    default FuzzyScalarConcepts senseNumberTri(String id, FloatSupplier v) {
         return senseNumber(v,  "hi:" + id, "mid:" + id, "lo:" + id);
     }
 

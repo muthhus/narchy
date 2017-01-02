@@ -17,7 +17,7 @@ public class Arkancide extends NAgents {
         //runRT(Arkancide::new);
         //nRT(Arkancide::new, 25, 5);
 
-        NAR nar = runRT(Arkancide::new, 30, 10, -1);
+        NAR nar = runRT((NAR n)-> new Arkancide(n, false), 30, 2, -1);
 
         //nar.beliefConfidence(0.75f);
         //nar.goalConfidence(0.75f);
@@ -37,10 +37,10 @@ public class Arkancide extends NAgents {
     private float prevScore;
 
 
-    public Arkancide(NAR nar) {
+    public Arkancide(NAR nar, boolean cam) {
         super("noid", nar);
 
-        noid = new Arkanoid() {
+        noid = new Arkanoid(!cam) {
             @Override
             protected void die() {
                 //nar.time.tick(afterlife); //wont quite work in realtime mode
@@ -51,17 +51,18 @@ public class Arkancide extends NAgents {
         float resX = Math.max(0.01f, 1f/visW); //dont need more resolution than 1/pixel_width
         float resY = Math.max(0.01f, 1f/visH); //dont need more resolution than 1/pixel_width
 
-        senseNumber( "x(paddle)", new FloatNormalized(()->noid.paddle.x)).resolution(resX);
-        senseNumber( "x(ball)", new FloatNormalized(()->noid.ball.x)).resolution(resX);
-        senseNumber( "y(ball)", new FloatNormalized(()->noid.ball.y)).resolution(resY);
-        senseNumber("vx(ball)", new FloatNormalized(()->noid.ball.velocityX));
-        senseNumber/*Bi*/("vy(ball)", new FloatNormalized(()->noid.ball.velocityY));
+        senseNumberBi( "x(paddle, noid)", new FloatNormalized(()->noid.paddle.x));//.resolution(resX);
+        senseNumberBi( "x(ball, noid)", new FloatNormalized(()->noid.ball.x));//.resolution(resX);
+        senseNumberBi( "y(ball, noid)", new FloatNormalized(()->noid.ball.y));//.resolution(resY);
+        senseNumberBi("vx(ball, noid)", new FloatNormalized(()->noid.ball.velocityX));
+        senseNumberBi("vy(ball, noid)", new FloatNormalized(()->noid.ball.velocityY));
 
-        addCamera("cam", noid, visW, visH);
+        if (cam)
+            addCamera("cam", noid, visW, visH);
         //addCameraRetina("zoom(cam(noid))", noid, visW/2, visH/2, (v) -> $.t(v, alpha));
 
 
-        action(new ActionConcept( "dx(paddle)" , nar, (b, d) -> {
+        action(new ActionConcept( "dx(paddle, noid)" , nar, (b, d) -> {
 
 
             float pct;

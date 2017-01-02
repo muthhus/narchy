@@ -46,10 +46,11 @@
 //substitutionViaSimilarity
      X, (B<->C), neqCom(X,C), neq(X,B) |- substitute(X,B,C,strict), (Belief:Intersection, Goal:Intersection)
 
+//INVALID:
 //desire spreading by similarity (was: Goal:Intersection)
-     S, (S<->P) |- P, (Goal:Strong)
-        S, ((--,%S)<->P), task(negative)  |- P, (Goal:StrongN)
-        S, ((--,%P)<->S), task(negative)  |- (--,%P), (Goal:StrongN)
+//     S, (S<->P) |- P, (Goal:Strong)
+//        S, ((--,%S)<->P), task(negative)  |- P, (Goal:StrongN)
+//        S, ((--,%P)<->S), task(negative)  |- (--,%P), (Goal:StrongN)
 
 
 

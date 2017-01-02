@@ -233,9 +233,9 @@ public class Abbreviation/*<S extends Term>*/ extends Leak<CompoundConcept> {
     @Nullable
     Compound newRelation(@NotNull Concept abbreviated, @NotNull String id) {
         return compoundOrNull(
-                        $.sim
+                        $.sim(abbreviated.term(), $.the(id))
                         //$.equi
-                                (abbreviated.term(), $.the(id))
+
                 );
         //(Compound) $.equi(abbreviated.term(), id);
         //(Compound) $.secte(abbreviated.term(), id);
