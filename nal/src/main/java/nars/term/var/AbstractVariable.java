@@ -56,7 +56,7 @@ public abstract class AbstractVariable implements Variable {
     //@Override abstract public boolean equals(Object other);
 
     @Override
-    public final boolean equals(@NotNull Object obj) {
+    public final boolean equals(Object obj) {
         return obj==this ||
                 (obj instanceof AbstractVariable && obj.hashCode() == hash); //hash first, it is more likely to differ
                 //((obj instanceof Variable) && ((Variable)obj).hash == hash);

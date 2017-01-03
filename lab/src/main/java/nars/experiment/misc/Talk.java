@@ -6,19 +6,15 @@
 //import nars.$;
 //import nars.NAR;
 //import nars.Task;
-//import nars.concept.OperationConcept;
 //import nars.index.TermIndex;
-//import nars.nal.nal8.AbstractOperator;
 //import nars.nal.nal8.operator.TermFunction;
 //import nars.nlp.Twenglish;
 //import nars.term.Compound;
 //import nars.term.Term;
 //import nars.term.atom.Atom;
-//
-//import nars.term.var.Variable;
 //import nars.util.Util;
 //import nars.util.data.MultiOutputStream;
-//import nars.util.data.map.CapacityLinkedHashMap;
+//import nars.util.map.CapacityLinkedHashMap;
 //import org.jetbrains.annotations.NotNull;
 //import org.jetbrains.annotations.Nullable;
 //import org.slf4j.Logger;
@@ -64,25 +60,25 @@
 ////        hearAppender.start();
 //
 //
-//        nar.onExec(new AbstractOperator("think") {
-//            @Override
-//            public void execute(OperationConcept x) {
-//                //@Nullable Operator say = operator();
-//                Term[] args = x.parameters().terms();
-//                if (args.length == 2) {
-//                    Term content = args[0];
-//                    Term context = args[1];
-//                    if (content instanceof Variable) {
-//                        return; //maybe randomly select a word
-//                    }
-//
-//                    think(x, content, context);
-//
-//                }
-//
-//            }
-//        });
-//        nar.onExec(new WordInfo());
+////        nar.onExec(new AbstractOperator("think") {
+////            @Override
+////            public void execute(OperationConcept x) {
+////                //@Nullable Operator say = operator();
+////                Term[] args = x.parameters().terms();
+////                if (args.length == 2) {
+////                    Term content = args[0];
+////                    Term context = args[1];
+////                    if (content instanceof Variable) {
+////                        return; //maybe randomly select a word
+////                    }
+////
+////                    think(x, content, context);
+////
+////                }
+////
+////            }
+////        });
+////        nar.onExec(new WordInfo());
 //
 //
 //
@@ -172,17 +168,17 @@
 //        return $.exec(hear, word, context );
 //    }
 //
-//    public void think(OperationConcept o, Term content, Term context) {
-//        long now = System.currentTimeMillis();
-//        float exp = o.goals().expectation(now);
-//        System.err.println("think: " + content + " (" + context + ")  " + exp);
-//
-//        if (!context.toString().equals("I"))
-//            hear(content, nar.self, now, exp);
-//
-//        //apply negative-feedback for that output
-//        //nar.goal(goal.pri(), belief.term(), belief.occurrence(), 1f-belief.freq(), belief.conf());
-//    }
+////    public void think(OperationConcept o, Term content, Term context) {
+////        long now = System.currentTimeMillis();
+////        float exp = o.goals().expectation(now);
+////        System.err.println("think: " + content + " (" + context + ")  " + exp);
+////
+////        if (!context.toString().equals("I"))
+////            hear(content, nar.self, now, exp);
+////
+////        //apply negative-feedback for that output
+////        //nar.goal(goal.pri(), belief.term(), belief.occurrence(), 1f-belief.freq(), belief.conf());
+////    }
 //
 //
 //    private static class WordInfo extends TermFunction<Term> {
