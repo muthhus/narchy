@@ -26,6 +26,7 @@
             <distribution>repo</distribution>
         </license>
     </licenses>
+
     <dependencies>
 
         <dependency>
@@ -97,6 +98,17 @@
             <artifactId>joml</artifactId>
             <version>1.9.1</version>
         </dependency>
+
+        <!--<dependency>-->
+            <!--<groupId>javax.usb</groupId>-->
+            <!--<artifactId>usb-api</artifactId>-->
+            <!--<version>1.0.2</version>-->
+        <!--</dependency>-->
+        <!--<dependency>-->
+            <!--<groupId>org.usb4java</groupId>-->
+            <!--<artifactId>usb4java-javax</artifactId>-->
+            <!--<version>1.2.0</version>-->
+        <!--</dependency>-->
 
 
         <!-- http://mvnrepository.com/artifact/com.eclipsesource.minimal-json/minimal-json -->
