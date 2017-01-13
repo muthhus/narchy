@@ -1,11 +1,11 @@
 package jcog.math;
 
 import com.google.common.base.Joiner;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import org.apache.commons.collections4.bag.HashBag;
 import org.eclipse.collections.api.block.procedure.primitive.FloatObjectProcedure;
 
-import java.util.List;
 import java.util.function.Predicate;
 
 /**
@@ -39,14 +39,18 @@ public class MultiStatistics<X> implements FloatObjectProcedure<X> {
         }
     }
 
-    public final List<Condition<X>> cond;
+    public final Iterable<Condition<X>> cond;
 
     public MultiStatistics(Condition<X>... cc) {
-        this.cond = Lists.newArrayList(cc);
+        this(Lists.newArrayList(cc));
     }
 
-    public MultiStatistics(List<Condition<X>> cond) {
-        this.cond = cond;
+    public MultiStatistics(Iterable<Condition<X>> cond) {
+        this.cond = Iterables.concat(
+                cond, Lists.newArrayList(
+                    new Condition<X>("*", x -> true)
+                )
+        );
     }
 
     @Override

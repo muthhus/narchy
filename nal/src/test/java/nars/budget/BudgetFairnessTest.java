@@ -16,6 +16,7 @@ import org.junit.Test;
  */
 public class BudgetFairnessTest {
 
+
     @Test
     public void test1() {
         //TODO partitioned subgraph memory generator
@@ -23,6 +24,8 @@ public class BudgetFairnessTest {
         int vocabularySize = 3;
 
 
+        final int cycles = 10;
+        final int conceptsFirePerCycle = 10;
 
         MultiStatistics<Term> m = new MultiStatistics<>(
                 new MultiStatistics.Condition<>("atom", (t) -> t.op() == Op.ATOM),
@@ -30,7 +33,7 @@ public class BudgetFairnessTest {
                 volumeIn(2,3),
                 volumeIn(4,5)
         );
-        Default d = new Default();
+        Default d = new Default(1024, conceptsFirePerCycle, 1, 3);
         Control c = d.getControl();
         d.setControl(new Control() {
             @Override
@@ -51,7 +54,7 @@ public class BudgetFairnessTest {
             }
         });
 
-        d.input("a:b.", "b:c.", "c:d.").run(5000);
+        d.input("a:b.", "b:c.", "c:d.").run(cycles);
         System.out.println(m);
 
     }
