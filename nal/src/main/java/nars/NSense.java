@@ -176,7 +176,7 @@ public interface NSense {
     @NotNull
     default FuzzyScalarConcepts senseNumber(FloatSupplier v, String... states) {
         FuzzyScalarConcepts fs = new FuzzyScalarConcepts(
-               v, nar(), states
+               v, nar(), FuzzyScalarConcepts.FuzzyBinary, states
         );//.resolution(0.05f);
         sensors().addAll(fs.sensors);
         return fs;

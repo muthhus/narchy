@@ -6,7 +6,9 @@ import jcog.math.FloatSupplier;
 import nars.$;
 import nars.NAR;
 import nars.Op;
+import nars.truth.Truth;
 import org.apache.commons.lang3.mutable.MutableFloat;
+import org.eclipse.collections.api.block.function.primitive.ObjectFloatIntToObjectFunction;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Iterator;
@@ -31,54 +33,70 @@ public class FuzzyScalarConcepts implements Iterable<SensorConcept> {
     float conf;
 
 
-    @NotNull final float[] centerPoints;
+    public final static FuzzyModel FuzzyTriangle = new FuzzyModel() {
 
-    public float value(int index) {
-        float v = input.asFloat();
+        @Override
+        public Truth truth(float v, int i, int indices, NAR n) {
 
-        int n = centerPoints.length;
-        //float nearness[] = new float[n];
-        float s = 0;
-        float dr = 1f / (n-1);
-        float numerator = Float.NaN;
-        for (int i = 0; i < n; i++) {
-            float dist = Math.abs(centerPoints[i] - v);
-            float nn = Math.max(0, dr-dist);
-            s += nn;
-            if (i == index)
-                numerator = nn;
+            float dr = 1f / (indices - 1);
+
+            return $.t( Math.max(0, (1f - Math.abs((i * dr) - v) / dr)), n.confidenceDefault(Op.BELIEF) ) ;
         }
-        return numerator /= s;
-    }
+    };
+    public final static FuzzyModel FuzzyBinary = new FuzzyModel() {
+
+        @Override
+        public Truth truth(float v, int i, int indices, NAR n) {
+
+            //float nearness[] = new float[n];
+
+            float b = v;
+            float dv = 1f;
+            for (int j =  0; j < i; j++) {
+                dv /= 2f;
+                b = Math.max(0, b - dv);
+            }
+
+            //System.out.println(v + " " + b + "/" + dv + " = " + (b/dv));
+
+            Truth tt = $.t( b/(dv), n.confidenceDefault(Op.BELIEF) ) ;
+            return tt;
+        }
+    };
+
 
     public FuzzyScalarConcepts(@NotNull MutableFloat input, @NotNull NAR nar, @NotNull String... states) {
-        this(input::floatValue, nar, states);
+        this(input, nar, FuzzyTriangle, states);
     }
 
-    public FuzzyScalarConcepts(FloatSupplier input, @NotNull NAR nar, @NotNull String... states) {
+    public FuzzyScalarConcepts(@NotNull MutableFloat input, @NotNull NAR nar, FuzzyModel truther,  @NotNull String... states) {
+        this(input::floatValue, nar, truther, states);
+    }
+
+    @FunctionalInterface  public interface FuzzyModel {
+        public Truth truth(float valueNormalized, int conceptIndex, int maxConcepts, NAR nar);
+    }
+
+    public FuzzyScalarConcepts(FloatSupplier input, @NotNull NAR nar, FuzzyModel truther, @NotNull String... states) {
 
 
         this.conf = nar.confidenceDefault(Op.BELIEF);
         this.input = input;
         this.nar = nar;
 
-        int numStates = states.length;
-        centerPoints = new float[numStates];
+        int num = states.length;
+        int numStates = num;
         this.sensors = $.newArrayList(numStates);
 
-        if (states.length > 1) {
-            float dr = 1f / (numStates-1);
-            float center = 0;
+        if (num > 1) {
             int i = 0;
             for (String s : states) {
 
-                centerPoints[i] = center;
                 int ii = i;
 
                 sensors.add( new SensorConcept(s, nar, this.input,
-                        (x) -> t(value(ii), conf)
+                        (x) -> truther.truth(x, ii, num, nar)
                 ));
-                center += dr;
                 i++;
             }
         } else {
@@ -151,7 +169,10 @@ public class FuzzyScalarConcepts implements Iterable<SensorConcept> {
     public String toString() {
         return Joiner.on("\t").join(Iterators.transform(
                 sensors.iterator(), s -> {
-                    return s.term() + " " + s.beliefs().truth(nar.time()).toString();
+                    if (s == null)
+                        return "?";
+                    else
+                        return s.term() + " " + s.beliefs().truth(nar.time());
                 }
         ));
     }

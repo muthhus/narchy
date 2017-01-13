@@ -33,7 +33,7 @@ public class FuzzyScalarConceptsTest {
         testSteadyFreqCondition(m,
             new FuzzyScalarConcepts(
                 new FloatNormalized(() -> m.floatValue()).updateRange(-1).updateRange(1),
-                d, "(x)"),
+                d, FuzzyScalarConcepts.FuzzyTriangle, "(x)"),
                 (f) -> Util.equals(f, 0.5f + 0.5f * m.floatValue(), tolerance)
         );
     }
@@ -45,7 +45,7 @@ public class FuzzyScalarConceptsTest {
 
         FloatPolarNormalized range = new FloatPolarNormalized(() -> m.floatValue());
         range.radius(1f);
-        FuzzyScalarConcepts f = new FuzzyScalarConcepts(range, d,
+        FuzzyScalarConcepts f = new FuzzyScalarConcepts(range, d, FuzzyScalarConcepts.FuzzyTriangle,
                 "(low)", "(mid)", "(hih)");
 
 
@@ -72,7 +72,10 @@ public class FuzzyScalarConceptsTest {
 //        }
 
 
-        testSteadyFreqCondition(m, f, (freqSum) -> Util.equals(freqSum, 1f, tolerance));
+        testSteadyFreqCondition(m, f, (freqSum) -> {
+            System.out.println(freqSum + " " + tolerance);
+            return Util.equals(freqSum, 1f, tolerance);
+        });
     }
 
     public void testSteadyFreqCondition(MutableFloat m, FuzzyScalarConcepts f, FloatPredicate withFreqSum) {
@@ -86,7 +89,7 @@ public class FuzzyScalarConceptsTest {
             double freqSum = StreamSupport.stream(f.spliterator(), false)
                     .peek(SensorConcept::run)
                     .map(x -> x.belief(d.time()))
-                    .mapToDouble(x -> x.freq()).sum();
+                    .mapToDouble(x -> x!=null ? x.freq() : 0f).sum();
 
             System.out.println(
                     Texts.n4(m.floatValue()) + "\t" +
@@ -100,5 +103,18 @@ public class FuzzyScalarConceptsTest {
 
 
         }
+    }
+
+    @Test
+    public void testRewardConceptsFuzzification2() {
+        NAR d = new Default();
+        MutableFloat m = new MutableFloat(0f);
+
+        testSteadyFreqCondition(m,
+                new FuzzyScalarConcepts(
+                        new FloatNormalized(() -> m.floatValue()).updateRange(-1).updateRange(1),
+                        d, FuzzyScalarConcepts.FuzzyBinary, "(x0)", "(x1)", "(x2)"),
+                (f) -> true /*Util.equals(f, 0.5f + 0.5f * m.floatValue(), tolerance)*/
+        );
     }
 }

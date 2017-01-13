@@ -17,7 +17,7 @@ public class Arkancide extends NAgents {
         //runRT(Arkancide::new);
         //nRT(Arkancide::new, 25, 5);
 
-        NAR nar = runRT((NAR n)-> new Arkancide(n, false), 30, 10, -1);
+        NAR nar = runRT((NAR n)-> new Arkancide(n, false), 30, 7, -1);
 
         //nar.beliefConfidence(0.75f);
         //nar.goalConfidence(0.75f);
@@ -63,9 +63,9 @@ public class Arkancide extends NAgents {
         else {
             nar.beliefConfidence(0.75f);
             nar.goalConfidence(0.75f);
-            nar.linkFeedbackRate.setValue(0.05f);
+            nar.linkFeedbackRate.setValue(0.1f);
             nar.logBudgetMin(System.out, 0.6f);
-            nar.termVolumeMax.setValue(22); //should need less complexity in non-camera mode
+            nar.termVolumeMax.setValue(18); //should need less complexity in non-camera mode
         }
 
         //addCameraRetina("zoom(cam(noid))", noid, visW/2, visH/2, (v) -> $.t(v, alpha));

@@ -29,31 +29,33 @@ Non-Axiomatic Reasoning System ([NARS](https://sites.google.com/site/narswang/ho
                         | "(--," <term> ")"                  // negation
                         | --<term>                           // negation shorthand, semi-functional TODO
 
-                        | "("<term> "-->" <term>")"          // inheritance
-                        | <term> ":" <term>                  // reverse-inheritance (shorthand)
 
-                        | "("<term> "<->" <term>")"          // similarity
+                        | "(" <term> {","<term>} ")"         // product (ie. un-ordered vector or list, length >= 0)
+                        | "{" <term> {","<term>} "}"         // extensional set (ordered, all unique, length >= 1)
+                        | "[" <term> {","<term>} "]"         // intensional set (ordered, all unique, length >= 1)
+
+                        | "("<term> "-->" <term>")"          // inheritance
+                        |    <term> ":" <term>               // reverse-inheritance (shorthand)
+
+                        | "("<term> "<->" <term>")"          // similarity (commutive)
 
                         | "("<term> "==>" <term>")"          // implication
                         | "("<term> "==>"<dt> <term>")"      // implication sequence
 
-                        | "("<term> "<=>" <term>")"          // equivalence
-                        | "("<term> "<=>"<dt> <term>")"      // equivalence sequence
+                        | "("<term> "<=>" <term>")"          // equivalence (commutive)
+                        | "("<term> "<=>"<dt> <term>")"      // equivalence sequence (commutive, but preserves relative time direction)
 
-                        | "(&&," <term> {","<term>} ")"      // conjunction eternal, also: (x && y)
-                        | "(&|," <term> {","<term>} ")"      // conjunction parallel (shorthand for &&+0), also: (x &| y) TODO
-                        | "(&/," <term> {","<term>} ")"      // conjunction sequence, internally converted to recursive 2-ary sequence conjunctions TODO
-                        | "("<term> "&&"<dt> <term>")"       // conjunction sequence (size=2 only)
+                        | "(&&," <term> {","<term>} ")"      // conjunction eternal (commutive)
+                        |   "("<term> "&&" <term>")"           // conjunction eternal (commutive, shorthand for size=2)
+                        |   "("<term> "&&"<dt> <term>")"       // conjunction sequence (size=2 only, preserving time direction)
+                        |   "(&/," <term> {","<term>} ")"      // conjunction sequence, internally converted to recursive 2-ary sequence conjunctions, with integer intervals embedded TODO
+                        |   "(&|," <term> {","<term>} ")"      // conjunction parallel (shorthand for &&+0), also: (x &| y) TODO
 
                         | "(||," <term> {","<term>} ")"      // disjunction, internally converts to negated conjunction of negations, also: (x || y)
 
                         | "("<term> "-{-" <term>")"          // instance, expanded on input to: {x} --> y
                         | "("<term> "-]-" <term>")"          // property, expanded on input to: x --> [y]
                         | "("<term> "{-]" <term>")"          // instance-property, expanded on input to: {x} --> [y]
-
-                        | "{" <term> {","<term>} "}"         // extensional set
-                        | "[" <term> {","<term>} "]"         // intensional set
-                        | "(" <term> {","<term>} ")"         // product (ie. vector or list)
 
                         | "(/," <term> {","<term>} ")"       // extensional image
                         | "(\," <term> {","<term>} ")"       // intensional image
@@ -63,7 +65,7 @@ Non-Axiomatic Reasoning System ([NARS](https://sites.google.com/site/narswang/ho
                         | "(-," <term> "," <term> ")"        // extensional difference, also: (x - y)
                         | "(~," <term> "," <term> ")"        // intensional difference, also: (x ~ y)
 
-                        | <term>"("<term> {","<term>} ")"    // an operation to be executed (function syntax); f(x,y) internally is: ((x,y)-->f)
+                        | <term>"("<term> {","<term>} ")"    // an operation, function syntax: f(x,y) internally is: ((x,y)-->f)
 
 
                  <dt> ::= [+|-]<number>                      //delta-time amount (frames); positive = future, negative = past, +0 = simultaneous
@@ -73,13 +75,21 @@ Non-Axiomatic Reasoning System ([NARS](https://sites.google.com/site/narswang/ho
 
 ```
 
+Note:
+ - Additional restrictions and reductions may be applied to input.  See TermBuilder.java.
+ - Built-in TermFunctions are executed inline during the term building process. See BuiltIn.java
+
+
 **Truth** = (frequency, confidence)
 ```
 <truth> ::= "%"<frequency>[";"<confidence>]"%" // two numbers in [0,1]x(0,1)
 ```
  - Frequency [0..1.0]
+    -  0 : "never"
+    - 0.5: "maybe"
+    -  1 : "always"
  - Confidence (0..1.0]*
-    - an input confidence=1.0 triggers a locked axiomatic belief state that disables additional beliefs in its table. otherwise conf=1.0 is not allowed
+    - confidence=1.0 triggers a locked axiomatic belief state that overrides any additional beliefs in its table
 
 **Occurrence** - (64 bit integer, can store resolutions up to Nanosecond precision)
  - specifies a relative (see <dt>) or absolute occurrence time. if unspecified, ETERNAL (TODO)
