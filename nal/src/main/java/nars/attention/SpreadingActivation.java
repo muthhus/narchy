@@ -21,13 +21,13 @@ import java.util.List;
 /**
  * activation from a point source to its subterm components (termlink templates)
  */
-public class SpreadingActivation extends Activation implements ObjectFloatProcedure<Term> {
+public class SpreadingActivation extends Activation implements ObjectFloatProcedure<Termed> {
 
     private final int termlinkDepth;
 
     @NotNull public final Budgeted in;
 
-    final ObjectFloatHashMap<Term> spread;
+    final ObjectFloatHashMap<Termed> spread;
 
     final static float parentRetention = 0.5f;
 
@@ -97,7 +97,7 @@ public class SpreadingActivation extends Activation implements ObjectFloatProced
     }
 
     @Override
-    public void value(Term k, float v) {
+    public void value(Termed k, float v) {
         //System.out.println("\t" + k + " " + v);
 
         Termed kk = nar.concept(k, true);
@@ -118,6 +118,7 @@ public class SpreadingActivation extends Activation implements ObjectFloatProced
     @Nullable
     void link(@NotNull Term targetTerm, float scale, int depth) {
 
+
         float thisScale = scale;
 
         int nextDepth = depth + 1;
@@ -137,7 +138,9 @@ public class SpreadingActivation extends Activation implements ObjectFloatProced
             }
         }
 
-        spread.addToValue(targetTerm, thisScale);
+        Concept termConcept = nar.concept(targetTerm, true);
+        if (termConcept!=null)
+            spread.addToValue(termConcept, thisScale);
 
     }
 

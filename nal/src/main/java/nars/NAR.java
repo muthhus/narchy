@@ -1180,7 +1180,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
     @Nullable
     public final Concept concept(@NotNull Termed tt, boolean createIfMissing) {
         if (tt instanceof Concept)
-            return ((Concept) tt);
+            return ((Concept) tt); //assumes the callee has the same instance as the instance this might return if given only a Term
         return concept(tt.term(), createIfMissing);
     }
 
@@ -1483,5 +1483,9 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
      */
     public final Atom self() {
         return self;
+    }
+
+    public Control getControl() {
+        return control;
     }
 }
