@@ -71,7 +71,7 @@ public class AnswerTask extends MutableTask {
 
         budgetSafe(
                 newPri,
-                !deleted ? Util.lerp(a.qua(), b.qua(), aMix) : 0
+                !deleted ? Util.lerp(aMix, a.qua(), b.qua()) : 0
         );
         return !deleted ? this : null;
     }

@@ -124,7 +124,7 @@ public class TuffySmokesTest {
         //n.conceptRemembering.setValue(12);
 
         //n.cyclesPerFrame.set(8);
-        n.logSummaryGT(System.out, 0f);
+        n.logBudgetMin(System.out, 0f);
 
         //new PrologCore(n);
 

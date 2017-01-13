@@ -50,7 +50,7 @@ public class AnimFloat extends MutableFloat implements Animated {
         float rate = speed.floatValue() * dt;
         //System.out.println(target + " " + floatValue() + " " + rate);
         super.setValue(
-                Util.lerp(target, floatValue(), rate)
+                Util.lerp(rate, target, floatValue())
         );
     }
 

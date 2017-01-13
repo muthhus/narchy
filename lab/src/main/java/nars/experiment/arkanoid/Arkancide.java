@@ -2,12 +2,12 @@ package nars.experiment.arkanoid;
 
 
 import jcog.math.FloatNormalized;
+import jcog.math.FloatPolarNormalized;
 import nars.$;
 import nars.NAR;
 import nars.Param;
 import nars.concept.ActionConcept;
 import nars.remote.NAgents;
-import nars.task.MutableTask;
 
 public class Arkancide extends NAgents {
 
@@ -17,7 +17,7 @@ public class Arkancide extends NAgents {
         //runRT(Arkancide::new);
         //nRT(Arkancide::new, 25, 5);
 
-        NAR nar = runRT((NAR n)-> new Arkancide(n, false), 30, 2, -1);
+        NAR nar = runRT((NAR n)-> new Arkancide(n, false), 30, 10, -1);
 
         //nar.beliefConfidence(0.75f);
         //nar.goalConfidence(0.75f);
@@ -48,21 +48,30 @@ public class Arkancide extends NAgents {
             }
         };
 
+
         float resX = Math.max(0.01f, 1f/visW); //dont need more resolution than 1/pixel_width
         float resY = Math.max(0.01f, 1f/visH); //dont need more resolution than 1/pixel_width
 
         senseNumberBi( "x(paddle, noid)", new FloatNormalized(()->noid.paddle.x));//.resolution(resX);
         senseNumberBi( "x(ball, noid)", new FloatNormalized(()->noid.ball.x));//.resolution(resX);
         senseNumberBi( "y(ball, noid)", new FloatNormalized(()->noid.ball.y));//.resolution(resY);
-        senseNumberBi("vx(ball, noid)", new FloatNormalized(()->noid.ball.velocityX));
-        senseNumberBi("vy(ball, noid)", new FloatNormalized(()->noid.ball.velocityY));
+        senseNumberBi("vx(ball, noid)", new FloatPolarNormalized(()->noid.ball.velocityX));
+        senseNumberBi("vy(ball, noid)", new FloatPolarNormalized(()->noid.ball.velocityY));
 
         if (cam)
             addCamera("cam", noid, visW, visH);
+        else {
+            nar.beliefConfidence(0.75f);
+            nar.goalConfidence(0.75f);
+            nar.linkFeedbackRate.setValue(0.05f);
+            nar.logBudgetMin(System.out, 0.6f);
+            nar.termVolumeMax.setValue(22); //should need less complexity in non-camera mode
+        }
+
         //addCameraRetina("zoom(cam(noid))", noid, visW/2, visH/2, (v) -> $.t(v, alpha));
 
 
-        action(new ActionConcept( "dx(paddle, noid)" , nar, (b, d) -> {
+        action(new ActionConcept( "x(paddleNext, noid)" , nar, (b, d) -> {
 
 
             float pct;
@@ -73,7 +82,7 @@ public class Arkancide extends NAgents {
             }
             return $.t(pct, nar.confidenceDefault('.'));
             //return null; //$.t(0.5f, alpha);
-        }).feedbackResolution(resX));
+        })/*.feedbackResolution(resX)*/);
 
         //nar.log();
 //        predictors.add( (MutableTask)nar.input(

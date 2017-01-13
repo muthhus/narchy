@@ -599,7 +599,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
      * logs tasks and other budgeted items with a summary exceeding a threshold
      */
     @NotNull
-    public NAR logSummaryGT(@NotNull Appendable out, float summaryThreshold) {
+    public NAR logBudgetMin(@NotNull Appendable out, float summaryThreshold) {
         return log(out, v -> {
             Budgeted b = null;
             if (v instanceof Budgeted) {

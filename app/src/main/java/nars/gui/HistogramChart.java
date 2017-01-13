@@ -80,7 +80,7 @@ public class HistogramChart extends Surface {
 
             float v = (float) (data[i] / max);
 
-            gl.glColor3f(Util.lerp(rb, ra, v), Util.lerp(gb, ga, v), Util.lerp(bb, ba, v));
+            gl.glColor3f(Util.lerp(v, rb, ra), Util.lerp(v, gb, ga), Util.lerp(v, bb, ba));
 
             Draw.rect(gl, x, 0, dx, v);
 

@@ -7,7 +7,6 @@ import nars.NAgent;
 import nars.Param;
 import nars.concept.ActionConcept;
 import nars.nar.Default;
-import nars.time.FrameTime;
 
 import static jcog.Texts.n2;
 import static jcog.Util.unitize;
@@ -47,7 +46,7 @@ public class Line1DSimplest extends NAgent {
         out = action("(out)", (b, d) -> {
             if (d != null) {
                 yEst = unitize(
-                        Util.lerp(d.freq(), yEst, 0.5f + 0.5f * d.conf())
+                        Util.lerp(0.5f + 0.5f * d.conf(), d.freq(), yEst)
                         //d.freq()
                 );
             }

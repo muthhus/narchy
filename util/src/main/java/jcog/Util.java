@@ -565,18 +565,21 @@ public enum Util { ;
 
     /**
      * linear interpolate between target & current, factor is between 0 and 1.0
+     * targetFactor=1:   full target
+     * targetfactor=0.5: average
+     * targetFactor=0:   full current
      */
-    public static float lerp(float target, float current, float factor) {
-        return current + (target-current) * unitize(factor);
+    public static float lerp(float targetFactor, float target, float current) {
+        return current + (target-current) * unitize(targetFactor);
     }
-    public static double lerp(double target, double current, double factor) {
-        return current + (target-current) * unitize(factor);
+    public static double lerp(double targetFactor, double target, double current) {
+        return current + (target-current) * unitize(targetFactor);
     }
 
-    public static long lerp(long target, long current, float factor) {
+    public static long lerp(float factor, long target, long current) {
         return current + Math.round((target-current) * ((double)unitize(factor)));
     }
-    public static int lerp(int target, int current, float factor) {
+    public static int lerp(float factor, int target, int current) {
         return current + Math.round((target-current) * unitize(factor));
     }
 

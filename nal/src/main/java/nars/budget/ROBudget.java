@@ -48,14 +48,24 @@ public final class ROBudget implements Budget {
     }
 
     @Override
-    public float pri() {
+    public final float pri() {
         return pri;
     }
 
     @Override
-    public float qua() {
+    public final float qua() {
         return qua;
     }
 
+    /**
+     * Fully display the BudgetValue
+     *
+     * @return String representation of the value
+     */
+    @NotNull
+    @Override
+    public final String toString() {
+        return getBudgetString();
+    }
 
 }

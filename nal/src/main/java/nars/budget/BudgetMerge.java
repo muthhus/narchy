@@ -1,7 +1,6 @@
 package nars.budget;
 
 import jcog.Util;
-import nars.Param;
 import nars.link.BLink;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -9,7 +8,6 @@ import org.jetbrains.annotations.Nullable;
 import java.util.function.BiFunction;
 
 import static jcog.Util.lerp;
-import static nars.Param.BUDGET_EPSILON;
 import static nars.budget.BudgetMerge.PriMerge.*;
 import static nars.util.UtilityFunctions.or;
 
@@ -48,21 +46,25 @@ public interface BudgetMerge extends BiFunction<Budget, Budget, Budget> {
     enum PriMerge {
         PLUS,
         AVERAGE,
-        AND,
-        OR
+        //AND, OR,
+        MAX
     }
 
     /** srcScale only affects the amount of priority adjusted; for the other components, the 'score'
      * calculations are used to interpolate
+     * @param exi existing budget
+     * @param inc incoming budget
+     *
      //TODO will this work for a possible negative pri value case?
      * */
-    static float blend(@NotNull Budget tgt, @NotNull Budgeted src, float sScale, @NotNull PriMerge priMerge) {
+    static float blend(@NotNull Budget exi, @NotNull Budgeted inc, float iScale, @NotNull PriMerge priMerge) {
 
-        float tPri = tgt.priSafe(0);
-        boolean hasTP = tPri > 0;
-        float sPri = src.priSafe(0);
-        boolean hasSP = sPri > 0 && sScale >= BUDGET_EPSILON;
+        float ePri = exi.priSafe(0);
+        //boolean hasTP = tPri > 0;
+        float iPri = inc.priSafe(0);
+        //boolean hasSP = sPri > 0 && sScale >= BUDGET_EPSILON;
 
+        /*
         if (!hasSP) {
             if (hasTP) {
                 return 0; //nothing to do; zero incoming doesnt budge the target budget
@@ -73,19 +75,35 @@ public interface BudgetMerge extends BiFunction<Budget, Budget, Budget> {
                 return 0;
             }
         }
+        */
+        float eQua = exi.qua();
+        float iQua = inc.qua();
+        float iInfluence = iScale * (iQua / (eQua + iQua));
 
-        float newPri;
+
+        float nextPri, nextQua;
         switch (priMerge) {
-            case PLUS:    newPri = tPri + sPri;       break;
-            case AND:     newPri = tPri * sPri;       break;
-            case OR:      newPri = or(tPri,sPri);     break;
-            case AVERAGE: newPri = (tPri + sPri)/2f;  break;
+            case PLUS:
+                nextPri = ePri + iPri;
+                nextQua = Math.max(eQua,iQua);
+                break;
+            case MAX:
+                nextPri = Math.max(ePri, iPri);
+                nextQua = Math.max(eQua,iQua);
+                break;
+            case AVERAGE:
+                nextPri = iPri;
+                nextQua = iQua;
+                break;
+            //TODO
+            //case AND:     .. = ePri * iPri;          break;
+            //case OR:      .. = or(ePri,iPri);        break;
             default:
                 throw new UnsupportedOperationException();
         }
 
-        newPri = lerp(newPri, tPri, sScale);
-
+        float newPri = lerp(iInfluence, nextPri, ePri);
+        float newQua = lerp(iInfluence, nextQua, eQua);
 
         float overflow;
         if (newPri > 1f) {
@@ -95,15 +113,7 @@ public interface BudgetMerge extends BiFunction<Budget, Budget, Budget> {
             overflow = 0;
         }
 
-        float tgtInfluence;
-        if (tPri + newPri < Param.BUDGET_EPSILON)
-            tgtInfluence = 0.5f;
-        else
-            tgtInfluence = (tPri / (tPri + newPri));
-
-        tgt.setBudget(
-                newPri,
-                (tgtInfluence * tgt.qua()) + ((1f-tgtInfluence)  * src.qua()));
+        exi.setBudget( newPri, newQua );
 
         return overflow;
     }
@@ -152,12 +162,12 @@ public interface BudgetMerge extends BiFunction<Budget, Budget, Budget> {
     /** avg priority, LERP other components in proportion to the priorities */
     BudgetMerge avgBlend = (tgt, src, srcScale) -> blend(tgt, src, srcScale, AVERAGE);
 
-    /** or priority, LERP other components in proportion to the priorities */
-    BudgetMerge orBlend = (tgt, src, srcScale) -> blend(tgt, src, srcScale, OR);
-
-
-    /** AND priority, LERP other components in proportion to the priorities */
-    BudgetMerge andBlend = (tgt, src, srcScale) -> blend(tgt, src, srcScale, AND);
+//    /** or priority, LERP other components in proportion to the priorities */
+//    BudgetMerge orBlend = (tgt, src, srcScale) -> blend(tgt, src, srcScale, OR);
+//
+//
+//    /** AND priority, LERP other components in proportion to the priorities */
+//    BudgetMerge andBlend = (tgt, src, srcScale) -> blend(tgt, src, srcScale, AND);
 
 
 //    @Deprecated BudgetMerge plusDQDominant = (tgt, src, srcScale) -> {

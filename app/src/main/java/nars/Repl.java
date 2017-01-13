@@ -64,7 +64,7 @@ public class Repl {
                 .appName("NARchy")
                 .build();
 
-        nar.logSummaryGT(new PrintStream(reader.getTerminal().output()), 0.1f);
+        nar.logBudgetMin(new PrintStream(reader.getTerminal().output()), 0.1f);
         nar.next();
         NARLoop loop = nar.loop(20f);
 

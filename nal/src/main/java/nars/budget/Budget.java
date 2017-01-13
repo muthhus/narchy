@@ -200,7 +200,7 @@ public interface Budget extends Budgeted {
 
     @NotNull
     default Budget priLerp(float target, float speed) {
-        setPriority(lerp(target, pri(), speed));
+        setPriority(lerp(speed, target, pri()));
         return this;
     }
 
@@ -213,7 +213,7 @@ public interface Budget extends Budgeted {
         float p = pri();
         float target = unitize(p * factor);
         float delta = target - p;
-        setPriority(lerp(target, p, speed));
+        setPriority(lerp(speed, target, p));
         return delta;
 
     }

@@ -199,7 +199,7 @@ public class TetriSchool extends NSchool implements Runnable {
 
             ConsoleSurface term = new ConsoleTerminal(120, 40);
 
-            school.nar.logSummaryGT(term, 0.25f);
+            school.nar.logBudgetMin(term, 0.25f);
 
             return col(
 

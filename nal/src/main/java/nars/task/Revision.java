@@ -77,7 +77,7 @@ public class Revision {
             float w2f = (1f-aFrequencyBalance) * w2;
             float p = w2f/(w1f+w2f);
 
-            float f = lerp(b.freq(), a.freq(), p);
+            float f = lerp(p, b.freq(), a.freq());
 
             return $.t( f, c );
 
@@ -131,7 +131,7 @@ public class Revision {
                 evidence
         ).budget(a, b, aProp);
 
-        return (t == null) ? null : t.dur(lerp(a.dur(), b.dur(), aw / (aw + bw))).log("Revection Merge");
+        return (t == null) ? null : t.dur(lerp(aw / (aw + bw), a.dur(), b.dur())).log("Revection Merge");
     }
 
 
@@ -197,7 +197,7 @@ public class Revision {
             dt = adt;
         else {
             dt = mergeOrChoose ?
-                    (lerp(adt, bdt, aProp)) :
+                    (lerp(aProp, adt, bdt)) :
                     ((choose(a, b, aProp, rng) == a) ? adt : bdt);
         }
 

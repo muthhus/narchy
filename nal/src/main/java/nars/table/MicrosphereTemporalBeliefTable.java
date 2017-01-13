@@ -392,7 +392,7 @@ public class MicrosphereTemporalBeliefTable extends MultiRWFasterList<Task> impl
         Truth t = Revision.revise(a, p, b, f, confMin);
 
         if (t != null) {
-            long mid = (long) Math.round(Util.lerp(a.occurrence(), b.occurrence(), (double) ac / (ac + bc)));
+            long mid = (long) Math.round(Util.lerp((double) ac / (ac + bc), a.occurrence(), b.occurrence()));
             return Revision.mergeInterpolate(a, b, mid, now, t, true);
         }
 

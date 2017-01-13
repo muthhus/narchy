@@ -155,7 +155,7 @@ public abstract class PixelBag implements Bitmap2D {
 
         for (int ly = 0; ly < py; ly++) {
             float l = ly / pyf;
-            int sy = Math.round(lerp(maxY, minY, !vflip ? l : 1f - l));
+            int sy = Math.round(lerp(!vflip ? l : 1f - l, maxY, minY));
 
             float dy = Math.abs(ly - cy);
             float yDistFromCenterSq = dy * dy;
@@ -175,12 +175,12 @@ public abstract class PixelBag implements Bitmap2D {
                 float dx = Math.abs(lx - cx);
                 float distFromCenterSq = dx * dx + yDistFromCenterSq; //manhattan distance from center
 
-                float clarity = lerp(minClarity, maxClarity, distFromCenterSq / maxCenterDistanceSq);
+                float clarity = lerp(distFromCenterSq / maxCenterDistanceSq, minClarity, maxClarity);
                 if (rng.nextFloat() > clarity)
                     continue;
 
                 //project to the viewed image plane
-                int sx = Math.round(lerp(maxX, minX, lx / pxf));
+                int sx = Math.round(lerp(lx / pxf, maxX, minX));
 
                 int samples = 0;
                 float R = 0, G = 0, B = 0;

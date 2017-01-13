@@ -103,7 +103,7 @@ public class DeductiveMeshTest {
 
         Default n = new Default(1024, 5, 2, 3);
         //n.nal(5);
-        n.logSummaryGT(System.out, 0.1f);
+        n.logBudgetMin(System.out, 0.1f);
 
 
         n.onCycle(x -> {
