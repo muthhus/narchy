@@ -146,13 +146,13 @@
 
   <build>
 
-    <!--<resources>-->
-      <!--<resource>-->
-        <!--<directory>src/main/resources</directory>-->
-        <!--<filtering>true</filtering>-->
-        <!--&lt;!&ndash;<excludes></excludes>&ndash;&gt;-->
-      <!--</resource>-->
-    <!--</resources>-->
+    <resources>
+      <resource>
+        <directory>src/main/resources</directory>
+        <filtering>true</filtering>
+        <excludes><exclude>**/node_modules</exclude></excludes>
+      </resource>
+    </resources>
 
     <plugins>
 

@@ -14,7 +14,7 @@ public class SynchronousExecutor extends Executioner {
     final ArrayDeque<Runnable> pending = new ArrayDeque<>(128 );
 
     @Override
-    public final int concurrency() {
+    public int concurrency() {
         return 1;
     }
 

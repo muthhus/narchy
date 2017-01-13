@@ -22,8 +22,11 @@ public interface NARBuilder {
 
     public static NAR newALANN(@NotNull Time time, int cores, int coreSize, int coreFires, int coreThreads, int auxThreads) {
 
-        Executioner exe = auxThreads == 1 ? new SynchronousExecutor() :
-                new MultiThreadExecutioner(auxThreads, 1024 * auxThreads).sync(true);
+        Executioner exe = auxThreads == 1 ? new SynchronousExecutor() {
+            @Override public int concurrency() {
+                return auxThreads + coreThreads;
+            }
+        } : new MultiThreadExecutioner(auxThreads, 1024 * auxThreads).sync(false);
 
         NAR n = new NAR(time,
                     new CaffeineIndex(new DefaultConceptBuilder(), 128 * 1024, false, exe),

@@ -27,8 +27,7 @@ Non-Axiomatic Reasoning System ([NARS](https://sites.google.com/site/narswang/ho
 
            <compound> ::=
                         | "(--," <term> ")"                  // negation
-                        | --<term>                           // negation shorthand, semi-functional TODO
-
+                        | --<term>                           // negation shorthand TODO
 
                         | "(" <term> {","<term>} ")"         // product (ie. un-ordered vector or list, length >= 0)
                         | "{" <term> {","<term>} "}"         // extensional set (ordered, all unique, length >= 1)

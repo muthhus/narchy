@@ -13,12 +13,23 @@ public final class SynchronizedUnifiedMap<K, V> extends UnifiedMap<K, V> {
     }
 
     @Override
-    public synchronized V remove(@NotNull Object key) {
-        return super.remove(key);
+    public V get(Object key) {
+        synchronized (this) {
+            return super.get(key);
+        }
     }
 
     @Override
-    public synchronized V compute(@NotNull K key, @NotNull BiFunction<? super K, ? super V, ? extends V> remappingFunction) {
-        return super.compute(key, remappingFunction);
+    public V remove(@NotNull Object key) {
+        synchronized (this) {
+            return super.remove(key);
+        }
+    }
+
+    @Override
+    public V compute(@NotNull K key, @NotNull BiFunction<? super K, ? super V, ? extends V> remappingFunction) {
+        synchronized (this) {
+            return super.compute(key, remappingFunction);
+        }
     }
 }

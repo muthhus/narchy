@@ -25,10 +25,10 @@ import nars.term.container.TermContainer;
 import nars.term.obj.Termject;
 import nars.term.obj.TermjectConcept;
 import nars.term.var.Variable;
-import org.eclipse.collections.impl.map.mutable.UnifiedMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
@@ -360,13 +360,14 @@ public class DefaultConceptBuilder implements ConceptBuilder {
 //            return new HashMap(defaultInitialCap, 1f);
             if (volume < 3) {
                 return new ConcurrentHashMap(8);
-            } else if (volume < 5){
+            } else if (volume < 7){
                 return new SynchronizedHashMap(2, loadFactor);
             } else {
-                return new SynchronizedUnifiedMap(0, loadFactor);
+                return new SynchronizedUnifiedMap(2, loadFactor);
             }
         } else {
-            return new UnifiedMap(0, loadFactor);
+            //return new UnifiedMap(0, loadFactor);
+            return new HashMap(2, loadFactor);
         }
 
     }
