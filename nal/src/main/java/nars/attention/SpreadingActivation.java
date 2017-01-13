@@ -100,7 +100,6 @@ public class SpreadingActivation extends Activation implements ObjectFloatProced
     public void value(Termed k, float v) {
         //System.out.println("\t" + k + " " + v);
 
-        float Q = in.qua();
 
         Termed kk = nar.concept(k, true);
         if (kk != null) {
@@ -108,7 +107,7 @@ public class SpreadingActivation extends Activation implements ObjectFloatProced
 
             tasklink(ckk, v);
 
-            float qv = v * Q; //activate concept by the priority times the quality
+            float qv = v * in.pri() * in.qua(); //activate concept by the priority times the quality
             if (qv >= Param.BUDGET_EPSILON)
                 nar.activate(ckk, qv);
 
