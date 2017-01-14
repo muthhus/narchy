@@ -33,35 +33,30 @@ public class FuzzyScalarConcepts implements Iterable<SensorConcept> {
     float conf;
 
 
-    public final static FuzzyModel FuzzyTriangle = new FuzzyModel() {
+    /** TODO need to analyze the interaction of the produced frequency values being reported by all concepts. */
+    public final static FuzzyModel FuzzyTriangle = (v, i, indices, n) -> {
 
-        @Override
-        public Truth truth(float v, int i, int indices, NAR n) {
+        float dr = 1f / (indices - 1);
 
-            float dr = 1f / (indices - 1);
-
-            return $.t( Math.max(0, (1f - Math.abs((i * dr) - v) / dr)), n.confidenceDefault(Op.BELIEF) ) ;
-        }
+        return $.t( Math.max(0, (1f - Math.abs((i * dr) - v) / dr)), n.confidenceDefault(Op.BELIEF) ) ;
     };
-    public final static FuzzyModel FuzzyBinary = new FuzzyModel() {
 
-        @Override
-        public Truth truth(float v, int i, int indices, NAR n) {
+    /** TODO not quite working yet. it is supposed to recursively subdivide like a binary number, and each concept represents the balance corresponding to each radix's progressively increasing sensitivity */
+    public final static FuzzyModel FuzzyBinary = (v, i, indices, n) -> {
 
-            //float nearness[] = new float[n];
+        //float nearness[] = new float[n];
 
-            float b = v;
-            float dv = 1f;
-            for (int j =  0; j < i; j++) {
-                dv /= 2f;
-                b = Math.max(0, b - dv);
-            }
-
-            //System.out.println(v + " " + b + "/" + dv + " = " + (b/dv));
-
-            Truth tt = $.t( b/(dv), n.confidenceDefault(Op.BELIEF) ) ;
-            return tt;
+        float b = v;
+        float dv = 1f;
+        for (int j =  0; j < i; j++) {
+            dv /= 2f;
+            b = Math.max(0, b - dv);
         }
+
+        //System.out.println(v + " " + b + "/" + dv + " = " + (b/dv));
+
+        Truth tt = $.t( b/(dv), n.confidenceDefault(Op.BELIEF) ) ;
+        return tt;
     };
 
 
