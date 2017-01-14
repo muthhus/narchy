@@ -169,31 +169,31 @@
             <scope>compile</scope>
         </dependency>
 
-        <dependency>
-            <groupId>de.dfki.mary</groupId>
-            <artifactId>voice-cmu-slt-hsmm</artifactId>
-            <version>5.2</version>
-            <exclusions>
+        <!--<dependency>-->
+            <!--<groupId>de.dfki.mary</groupId>-->
+            <!--<artifactId>voice-cmu-slt-hsmm</artifactId>-->
+            <!--<version>5.2</version>-->
+            <!--<exclusions>-->
 
 
-                <exclusion>
-                    <artifactId>commons-lang</artifactId>
-                    <groupId>commons-lang</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>log4j</artifactId>
-                    <groupId>log4j</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>slf4j-log4j12</artifactId>
-                    <groupId>org.slf4j</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>guava</artifactId>
-                    <groupId>com.google.guava</groupId>
-                </exclusion>
-            </exclusions>
-        </dependency>
+                <!--<exclusion>-->
+                    <!--<artifactId>commons-lang</artifactId>-->
+                    <!--<groupId>commons-lang</groupId>-->
+                <!--</exclusion>-->
+                <!--<exclusion>-->
+                    <!--<artifactId>log4j</artifactId>-->
+                    <!--<groupId>log4j</groupId>-->
+                <!--</exclusion>-->
+                <!--<exclusion>-->
+                    <!--<artifactId>slf4j-log4j12</artifactId>-->
+                    <!--<groupId>org.slf4j</groupId>-->
+                <!--</exclusion>-->
+                <!--<exclusion>-->
+                    <!--<artifactId>guava</artifactId>-->
+                    <!--<groupId>com.google.guava</groupId>-->
+                <!--</exclusion>-->
+            <!--</exclusions>-->
+        <!--</dependency>-->
 
         <dependency>
             <groupId>edu.cmu.sphinx</groupId>

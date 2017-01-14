@@ -29,7 +29,6 @@ import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.util.ImmModeSink;
 import com.jogamp.opengl.util.texture.Texture;
 import jcog.list.FasterList;
-import org.apache.commons.io.IOUtils;
 import org.eclipse.collections.impl.list.mutable.primitive.ByteArrayList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -45,8 +44,11 @@ import spacegraph.phys.util.BulletStack;
 import spacegraph.space.EDraw;
 
 import java.io.IOException;
-import java.nio.charset.Charset;
+import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import static com.jogamp.opengl.util.gl2.GLUT.STROKE_MONO_ROMAN;
@@ -1126,7 +1128,14 @@ public enum Draw {
             String font =
                     //"meteorology";
                     "rowmans";
-            lines = IOUtils.readLines(Draw.class.getClassLoader().getResourceAsStream("spacegraph/font/hershey/" + font + ".jhf"), Charset.defaultCharset());
+            try {
+                lines = Files.readAllLines(
+                    Paths.get(Draw.class.getClassLoader().getResource("spacegraph/font/hershey/" + font + ".jhf").toURI())
+                );
+            } catch (URISyntaxException e) {
+                e.printStackTrace();
+                lines = Collections.emptyList();
+            }
 
             String scratch = "";
             HGlyph nextGlyph;
