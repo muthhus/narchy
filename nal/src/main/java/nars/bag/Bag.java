@@ -1,6 +1,7 @@
 package nars.bag;
 
 import jcog.Util;
+import jcog.table.Table;
 import nars.$;
 import nars.Param;
 import nars.attention.Forget;

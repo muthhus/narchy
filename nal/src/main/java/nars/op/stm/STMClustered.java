@@ -335,7 +335,7 @@ public class STMClustered extends STM {
 
         };
 
-        this.net = new NeuralGasNet<>(DIMENSIONS, clusters) {
+        this.net = new NeuralGasNet<TasksNode>(DIMENSIONS, clusters) {
             @NotNull
             @Override
             public STMClustered.TasksNode newNode(int i, int dims) {

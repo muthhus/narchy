@@ -1,6 +1,7 @@
 package nars.bag;
 
 import jcog.data.sorted.SortedArray;
+import jcog.table.SortedListTable;
 import nars.$;
 import nars.budget.Budget;
 import nars.budget.BudgetMerge;

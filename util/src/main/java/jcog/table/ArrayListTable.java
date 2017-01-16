@@ -1,7 +1,7 @@
-package nars.table;
+package jcog.table;
 
 import jcog.map.CollectorMap;
-import nars.bag.Table;
+import jcog.table.Table;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

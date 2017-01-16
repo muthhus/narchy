@@ -1,4 +1,4 @@
-package nars.bag;
+package jcog.table;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

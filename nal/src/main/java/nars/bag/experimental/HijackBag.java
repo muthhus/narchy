@@ -50,7 +50,7 @@ public class HijackBag<X> implements Bag<X> {
 
     public HijackBag(int capacity, int reprobes, BudgetMerge merge, Random random) {
         this.merge = merge;
-        map = new HijacKache<>(capacity, reprobes, random) {
+        map = new HijacKache<X, float[]>(capacity, reprobes, random) {
             @Override
             protected void reincarnateInto(Object[] k) {
                 HijackBag.this.forEach((x,v)->{

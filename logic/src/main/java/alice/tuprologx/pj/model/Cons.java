@@ -8,7 +8,7 @@ import java.util.Vector;
  *
  * @author Maurizio
  */
-public class Cons<H extends Term<?>, R extends Compound<?>> extends Compound<Cons<H,R>> implements Iterable<Term<?>> {
+public class Cons<H extends Term<?>, R extends Compound<?>> extends Compound<Cons<H,R>> implements Iterable<Term> {
         
     
     String _theName;
@@ -69,12 +69,12 @@ public class Cons<H extends Term<?>, R extends Compound<?>> extends Compound<Con
     }
     */
     @Override
-    public Iterator<Term<?>> iterator() {
-        return new Iterator<>() {
+    public Iterator<Term> iterator() {
+        return new Iterator<Term>() {
             Cons<?, ?> theTuple = (Cons<?, ?>) Cons.this;
 
             @Override
-            public Term<?> next() {
+            public Term next() {
                 if (theTuple == null) {
                     throw new java.util.NoSuchElementException();
                 }

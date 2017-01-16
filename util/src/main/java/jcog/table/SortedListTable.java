@@ -1,7 +1,6 @@
-package nars.bag;
+package jcog.table;
 
 import jcog.data.sorted.SortedArray;
-import nars.table.ArrayListTable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

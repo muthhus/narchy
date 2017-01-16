@@ -34,7 +34,7 @@ public class BulletStack {
 
 	public BulletStack() {}
 	
-	private static final ThreadLocal<BulletStack> threadLocal = new ThreadLocal<>() {
+	private static final ThreadLocal<BulletStack> threadLocal = new ThreadLocal<BulletStack>() {
         @Override
         protected BulletStack initialValue() {
             return new BulletStack();

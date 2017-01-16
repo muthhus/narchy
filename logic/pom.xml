@@ -13,6 +13,7 @@
         <artifactId>narchy</artifactId>
         <version>1.8-SNAPSHOT</version>
     </parent>
+
     <licenses>
         <license>
             <name>GNU AFFERO GENERAL PUBLIC LICENSE (AGPL)</name>

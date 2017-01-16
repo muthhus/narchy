@@ -1,6 +1,7 @@
 package nars.table;
 
 import jcog.list.FasterList;
+import jcog.table.ArrayListTable;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Iterator;
