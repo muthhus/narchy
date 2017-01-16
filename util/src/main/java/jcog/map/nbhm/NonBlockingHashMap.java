@@ -1167,7 +1167,7 @@ public class NonBlockingHashMap<TypeK, TypeV>
      *  to construction. */
     @Override
     public Collection<TypeV> values() {
-        return new AbstractCollection<>() {
+        return new AbstractCollection<TypeV>() {
             @Override
             public void clear() {
                 NonBlockingHashMap.this.clear();
@@ -1226,7 +1226,7 @@ public class NonBlockingHashMap<TypeK, TypeV>
      *  to construction.  */
     @Override
     public Set<TypeK> keySet() {
-        return new AbstractSet<>() {
+        return new AbstractSet<TypeK>() {
             @Override
             public void clear() {
                 NonBlockingHashMap.this.clear();
@@ -1301,7 +1301,7 @@ public class NonBlockingHashMap<TypeK, TypeV>
      */
     @Override
     public Set<Map.Entry<TypeK,TypeV>> entrySet() {
-        return new AbstractSet<>() {
+        return new AbstractSet<Map.Entry<TypeK,TypeV>>() {
             @Override
             public void clear() {
                 NonBlockingHashMap.this.clear();
