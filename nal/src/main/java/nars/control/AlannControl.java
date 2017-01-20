@@ -142,7 +142,7 @@ public class AlannControl implements Control {
 
 
     @Override
-    public Iterable<? extends BLink<Concept>> conceptsActive() {
+    public Iterable<BLink<Concept>> conceptsActive() {
         //int s = cores.size();
         //int perCore = (int)Math.ceil((float)maxNodes / s);
 

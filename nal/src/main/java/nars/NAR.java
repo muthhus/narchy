@@ -1287,10 +1287,12 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
     @Override public void activate(Termed term, float priToAdd) {
         control.activate(term, priToAdd);
     }
+
     @Override public float pri(@NotNull Termed termed) {
         return control.pri(termed);
     }
-    public Iterable<? extends BLink<Concept>> conceptsActive() {
+
+    public Iterable<BLink<Concept>> conceptsActive() {
         return control.conceptsActive();
     }
 

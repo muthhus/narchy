@@ -84,3 +84,6 @@ body {
     position: fixed;
 }
 
+.CodeMirror-sizer, .CodeMirror-lines {
+    height: 100% !important;
+}

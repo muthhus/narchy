@@ -63,7 +63,7 @@ function spacegraph(opt) {
 //        });
 
     const maxNodes = 96;
-    const updatePeriodMS = 50;
+    const updatePeriodMS = 250;
 
 
     const localPriDecay = 0.999;
@@ -134,8 +134,9 @@ function spacegraph(opt) {
 
             const nn = new Array();
 
-
-            nodes.each((n, i) => {
+            c.nodes().forEach((n) => {
+                console.log(n);
+                return;
                 const x = n._private.data; //HACK
                 if (x) {
                     nn.push(x);

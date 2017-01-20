@@ -78,8 +78,7 @@ public class WebServer /*extends PathHandler*/ {
         server = Undertow.builder()
                 .addHttpListener(httpPort, "0.0.0.0")
                 .setServerOption(ENABLE_HTTP2, true)
-                .setServerOption(ENABLE_SPDY, true)
-                //.setIoThreads(1)
+                //.setServerOption(ENABLE_SPDY, true)
                 .setHandler(path)
                 .build();
 
@@ -249,10 +248,6 @@ public class WebServer /*extends PathHandler*/ {
         new nars.web.NARServices(nar, w.path);
 
         //new IRCAgent(nar, "localhost", "NARchy", "#x");
-
-
-
-
 
     }
 

@@ -39,7 +39,7 @@ public class ChainedControl extends ConcurrentArrayList<Control> implements Cont
     }
 
     @Override
-    public Iterable<? extends BLink<Concept>> conceptsActive() {
+    public Iterable<BLink<Concept>> conceptsActive() {
         int s = size();
         switch (s) {
             case 0:

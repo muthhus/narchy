@@ -8,7 +8,6 @@ import nars.NAR;
 import nars.Op;
 import nars.truth.Truth;
 import org.apache.commons.lang3.mutable.MutableFloat;
-import org.eclipse.collections.api.block.function.primitive.ObjectFloatIntToObjectFunction;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Iterator;

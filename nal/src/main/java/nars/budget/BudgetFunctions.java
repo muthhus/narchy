@@ -22,7 +22,6 @@ package nars.budget;
 
 import jcog.Util;
 import nars.Task;
-import nars.premise.Premise;
 import nars.term.Termed;
 import nars.truth.Truthed;
 import nars.util.UtilityFunctions;

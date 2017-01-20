@@ -1,7 +1,5 @@
 package nars.attention;
 
-import jcog.data.LightObjectFloatPair;
-import nars.$;
 import nars.NAR;
 import nars.Param;
 import nars.Task;
@@ -11,12 +9,9 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
 import org.eclipse.collections.api.block.procedure.primitive.ObjectFloatProcedure;
-import org.eclipse.collections.api.tuple.primitive.ObjectFloatPair;
 import org.eclipse.collections.impl.map.mutable.primitive.ObjectFloatHashMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.List;
 
 /**
  * activation from a point source to its subterm components (termlink templates)

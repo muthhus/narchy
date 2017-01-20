@@ -10,7 +10,6 @@ import nars.term.var.Variable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jgrapht.alg.ConnectivityInspector;
-import org.jgrapht.alg.StrongConnectivityInspector;
 import org.jgrapht.graph.DirectedPseudograph;
 
 import java.io.PrintStream;
@@ -147,10 +146,6 @@ public class TermLinkGraph extends DirectedPseudograph<Termed, Termed> {
         return ci.isGraphConnected();
     }
 
-    public boolean isStronglyConnected() {
-        StrongConnectivityInspector<Termed,Termed> ci = new StrongConnectivityInspector(this);
-        return ci.isStronglyConnected();
-    }
 
 //    public void add(Memory memory) {
 //        add(memory.getCycleProcess(), true);

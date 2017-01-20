@@ -54,13 +54,13 @@ public class ActiveConceptService extends PeriodicWebsocketService {
 
                 //SummaryStatistics s = new SummaryStatistics();
 
-                Bag<Concept> a = ((Default) nar).core.active;
-                if (!a.isEmpty()) {
+
+                {
 
                     ByteArrayOutputStream bs = new ByteArrayOutputStream(4096);
                     DataOutput dos = new DataOutputStream(bs);
 
-                    a.forEach(n, c -> {
+                    nar.conceptsActive().forEach(c -> {
 
                         try {
                             writeConceptSummary(dos, c);
@@ -121,7 +121,7 @@ public class ActiveConceptService extends PeriodicWebsocketService {
         }
     }
 
-    private static void writeConceptSummary(DataOutput out, BLink<? extends Concept> bc) throws IOException {
+    private static void writeConceptSummary(DataOutput out, BLink<Concept> bc) throws IOException {
         Concept c = bc.get();
 
         //punctuation: ConceptSummary

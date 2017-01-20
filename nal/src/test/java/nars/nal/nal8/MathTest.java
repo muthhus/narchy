@@ -3,7 +3,6 @@ package nars.nal.nal8;
 
 import nars.Param;
 import nars.nar.Default;
-import nars.nar.Terminal;
 import org.junit.Test;
 
 public class MathTest {

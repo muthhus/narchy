@@ -29,7 +29,7 @@ public interface Control {
         return (p == p) ? p : valueIfInactive;
     }
 
-    Iterable<? extends BLink<Concept>> conceptsActive();
+    Iterable<BLink<Concept>> conceptsActive();
 
 
 
@@ -45,7 +45,7 @@ public interface Control {
         }
 
         @Override
-        public Iterable<? extends BLink<Concept>> conceptsActive() {
+        public Iterable<BLink<Concept>> conceptsActive() {
             return Collections.emptyList();
         }
     };

@@ -8,8 +8,8 @@ import org.jetbrains.annotations.Nullable;
 import java.util.function.BiFunction;
 
 import static jcog.Util.lerp;
-import static nars.budget.BudgetMerge.PriMerge.*;
-import static nars.util.UtilityFunctions.or;
+import static nars.budget.BudgetMerge.PriMerge.AVERAGE;
+import static nars.budget.BudgetMerge.PriMerge.PLUS;
 
 /**
  * Budget merge function, with input scale factor

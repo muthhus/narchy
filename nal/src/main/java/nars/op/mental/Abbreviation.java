@@ -6,7 +6,6 @@ import nars.NAR;
 import nars.Op;
 import nars.Task;
 import nars.attention.Activation;
-import nars.bag.ArrayBag;
 import nars.bag.CurveBag;
 import nars.budget.Budget;
 import nars.budget.BudgetMerge;

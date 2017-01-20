@@ -49,7 +49,7 @@ public class BudgetFairnessTest {
             }
 
             @Override
-            public Iterable<? extends BLink<Concept>> conceptsActive() {
+            public Iterable<BLink<Concept>> conceptsActive() {
                 return c.conceptsActive();
             }
         });

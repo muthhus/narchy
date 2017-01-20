@@ -192,7 +192,7 @@ public class ConceptBagControl implements Control, Consumer<DerivedTask> {
 
 
     @Override
-    public Iterable<? extends BLink<Concept>> conceptsActive() {
+    public Iterable<BLink<Concept>> conceptsActive() {
         return active;
     }
 

@@ -8,12 +8,13 @@ function dock(socket, target) {
             {
                 type: 'column',
                 content: [
-                    { componentName: 'graph', type: 'component', componentState: {} },
+                    //{ componentName: 'graph', type: 'component', componentState: {} },
+                    { componentName: 'terminal', type: 'component', componentState: {} },
 
                     {
                         type: 'column',
                         content: [
-                            { componentName: 'terminal', type: 'component' },
+                            //{ componentName: 'terminal', type: 'component' },
                             //{ componentName: 'options', type: 'component' },
                             //{ componentName: 'edit', type: 'component' },
                             { componentName: 'input', type: 'component' }
