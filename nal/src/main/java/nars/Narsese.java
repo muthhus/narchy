@@ -16,7 +16,7 @@ import com.github.fge.grappa.support.Var;
 import jcog.Texts;
 import nars.derive.meta.match.Ellipsis;
 import nars.index.term.TermIndex;
-import nars.op.Operator;
+import nars.op.Command;
 import nars.task.MutableTask;
 import nars.term.Compound;
 import nars.term.Term;
@@ -1217,7 +1217,7 @@ public class Narsese extends BaseParser<Object> {
         Term content = m.normalize((Compound) contentRaw);
         if (!(content instanceof Compound)) {
             //throw new NarseseException("Task term unnormalizable: " + contentRaw);
-            return Operator.CommandOperator.task($.func("log", content));
+            return Command.task($.func("log", content));
         } else {
 
             char punct = (Character) x[2];

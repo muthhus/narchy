@@ -11,7 +11,7 @@ import java.util.ArrayDeque;
  */
 public class SynchronousExecutor extends Executioner {
 
-    final ArrayDeque<Runnable> pending = new ArrayDeque<>(128 );
+    //final ArrayDeque<Runnable> pending = new ArrayDeque<>(128 );
 
     @Override
     public int concurrency() {
@@ -22,10 +22,10 @@ public class SynchronousExecutor extends Executioner {
     public final void next(@NotNull NAR nar) {
 
         //only execute the current set of pending Runnable's here. more may be added but they will be handled in the next frame
-        int p = pending.size();
-        for (int i = 0; i < p; i++) {
-            pending.removeFirst().run();
-        }
+//        int p = pending.size();
+//        for (int i = 0; i < p; i++) {
+//            pending.removeFirst().run();
+//        }
 
         nar.eventCycleStart.emit(nar);
 

@@ -1,7 +1,7 @@
 package nars;
 
 import nars.concept.Concept;
-import nars.op.Operator;
+import nars.op.Command;
 import nars.op.data.*;
 import nars.term.Term;
 import nars.term.atom.Atomic;
@@ -55,7 +55,7 @@ public class Builtin  {
     public static void load(NAR nar) {
         //TODO these should be command-only operators, not functors
 
-        nar.on("log", (Operator.CommandOperator)(Atomic a, Term[] t, NAR n) -> {
+        nar.on("log", (Command)(Atomic a, Term[] t, NAR n) -> {
             n.logger.info("{}", t);
         });
 

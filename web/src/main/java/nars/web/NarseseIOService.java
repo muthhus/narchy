@@ -46,14 +46,13 @@ public class NarseseIOService extends WebsocketService {
         this.nar = n;
         output = new CurveBag<Task>(OUTPUT_CAPACITY, new CurveBag.NormalizedSampler(CurveBag.power2BagCurve, n.random),  BudgetMerge.plusBlend, new HashMap());
         output.setCapacity(OUTPUT_CAPACITY);
-
     }
 
     @Override
     public void onStart() {
 
         ons = new Ons(
-                nar.eventTaskProcess.on(this::output)
+            nar.eventTaskProcess.on(this::output)
 //                nar.eventAnswer.on(t -> send(
 //                        "ANS: " + t)),
                 //nar.eventError.on(this::queue),

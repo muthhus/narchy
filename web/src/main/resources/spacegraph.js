@@ -135,8 +135,6 @@ function spacegraph(opt) {
             const nn = new Array();
 
             c.nodes().forEach((n) => {
-                console.log(n);
-                return;
                 const x = n._private.data; //HACK
                 if (x) {
                     nn.push(x);

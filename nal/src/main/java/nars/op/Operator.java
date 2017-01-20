@@ -54,24 +54,6 @@ import static nars.time.Tense.ETERNAL;
 
     int OPERATOR_BITS = ATOM.bit | PROD.bit | Op.INH.bit;
 
-    @FunctionalInterface  interface CommandOperator extends Operator {
-
-        @Override
-        default @Nullable Task run(@NotNull Task t, @NotNull NAR nar) {
-            if (t.punc()==COMMAND) {
-                Compound c = t.term();
-                run((Atomic)(c.term(1)), ((Compound)(t.term(0))).terms(), nar);
-            }
-            return null;
-        }
-
-        void run(@NotNull Atomic op, @NotNull Term[] args, @NotNull NAR nar);
-
-        static Task task(Compound content) {
-            return new MutableTask(content, Op.COMMAND, null);
-        }
-    }
-
     /** if goal, automatically generates a corresponding feedback belief in the eternal, present, or future. */
     public static Operator auto(BiConsumer<Task /* Goal */,Task /* Belief (feedback) */> onExec) {
         return (g, nar) -> {

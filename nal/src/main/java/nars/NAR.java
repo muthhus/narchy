@@ -191,16 +191,12 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
     }
 
     public NAR(@NotNull Time time, @NotNull TermIndex concepts, @NotNull Random rng, @NotNull Executioner exe) {
+        this.random = rng;
+        this.exe = exe;
 
-
-
-
-        random = rng;
-
-        level = 8;
+        this.level = 8;
 
         this.time = time;
-        time.clear();
 
         this.concepts = concepts;
 
@@ -211,8 +207,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
 
         emotion = new Emotion();
 
-
-        (this.exe = exe).start(this);
+        concepts.start(this);
 
 
 //        eventError.on(e -> {
@@ -232,14 +227,58 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
 //        });
 
 
-        concepts.start(this);
+
+        restart();
+    }
+
+    /** soft-reset: clears plugins (but not essentialc omponents such as indices, clock, etc)
+     * typically this will temporarily clear active memory processes
+     * it is like asking NAR to empty its (conscious) mind to be ready for a new focus
+     * also can be considered a "soft" reset, vs the reset() which is "hard"
+     */
+    public final void clear() {
+        eventReset.emit(this);
+    }
+
+    /**
+     * Reset the system with an empty memory and reset clock.  Event handlers
+     * will remain attached but enabled plugins will have been deactivated and
+     * reactivated, a signal for them to empty their state (if necessary).
+     */
+    @NotNull
+    public void reset() {
+
+        synchronized (exe) {
+
+            clear();
+
+            exe.stop();
+
+            concepts.clear();
+
+            tasks.clear();
+
+            restart();
+
+        }
+
+    }
+
+    /** initialization and post-reset procedure */
+    protected void restart() {
 
         for (Concept t : Builtin.statik)
             on(t);
 
         Builtin.load(this);
 
+        time.clear();
+
+        exe.start(this);
+
     }
+
+
 
     public void setControl(Control control) {
         this.control = control;
@@ -281,39 +320,6 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
             }
         });
         bt.forEach(e);
-    }
-
-    /** soft-reset: clears plugins (but not essentialc omponents such as indices, clock, etc)
-     * typically this will temporarily clear active memory processes
-     * it is like asking NAR to empty its (conscious) mind to be ready for a new focus
-     * also can be considered a "soft" reset, vs the reset() which is "hard"
-     */
-    public final void clear() {
-        eventReset.emit(this);
-    }
-
-    /**
-     * Reset the system with an empty memory and reset clock.  Event handlers
-     * will remain attached but enabled plugins will have been deactivated and
-     * reactivated, a signal for them to empty their state (if necessary).
-     */
-    @NotNull
-    public void reset() {
-
-        synchronized (exe) {
-
-            exe.stop();
-            exe.start(this);
-
-            clear();
-
-            time.clear();
-
-            concepts.clear();
-
-            tasks.clear();
-        }
-
     }
 
 
@@ -624,7 +630,6 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
     @Nullable
     public final Concept input(@NotNull Task input) {
 
-        //TODO create: protected Concept NAR.process(input, c)  so it can just return or exception here
         try {
             input.normalize(this); //accept into input buffer for eventual processing
         } catch (@NotNull InvalidTaskException | InvalidTermException | Budget.BudgetException e) {
@@ -641,6 +646,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
         }
 
         Compound inputTerm = input.term();
+        boolean isCommand = input.isCommand();
         if (inputTerm.hasAll(Operator.OPERATOR_BITS) && inputTerm.op() == INH) {
             Term func = inputTerm.term(1);
             if (func.op() == ATOM) {
@@ -650,21 +656,35 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
                     if (funcConcept!=null) {
                         Operator o = funcConcept.get(Operator.class);
                         if (o!=null) {
+
+                            if (isCommand) {
+                                eventTaskProcess.emit(input);
+                            }
+
                             Task result = o.run(input, this);
-                            if (result == null) {
-                                return null; //finished
-                            } else if (result!=input) { //instance equality, not actual equality in case it wants to change this
-                                return input( result ); //recurse until its stable
-                            } // else continue
+
+                            if (isCommand) {
+                                if (result != null && result != input)
+                                    input(result); //recurse
+                                return null;
+                            } else {
+                                if (result != input) { //instance equality, not actual equality in case it wants to change this
+                                    if (result == null) {
+                                        return null; //finished
+                                    } else {
+                                        return input(result); //recurse until its stable
+                                    }
+                                }
+                            }
+
                         }
                     }
                 }
             }
         }
 
-
-        if (input.isCommand()) {
-            //inputCommand(input.term());
+        if (isCommand) {
+            logger.warn("non-executable command: {}", input);
             return null;
         }
 

@@ -72,9 +72,9 @@ const NARSocket = function(path, onMessage, options) {
 
         const d = m.data;
 
-        setTimeout(() => {
+        //setTimeout(() => {
             onMessage(e, d);
-        } ,0);
+        //} ,0);
 // //        try {
 //
 //         if (typeof d === "string")
@@ -142,7 +142,7 @@ function decodeTasks(e, m) {
                 const termStrLen = d.getInt16(j); j += 2;
                 const term = decoder.decode(m.slice(j, j + termStrLen)); j += termStrLen;
 
-                console.log(term, punct, pri, when, freq, conf);
+                //console.log(term, punct, pri, when, freq, conf);
 
                 e.emit('task', {
                     term: term,
