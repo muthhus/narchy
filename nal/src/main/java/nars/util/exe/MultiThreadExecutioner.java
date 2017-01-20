@@ -117,9 +117,10 @@ public class MultiThreadExecutioner extends Executioner {
 
     @Override
     public void stop() {
-        super.stop();
 
         synchronized (disruptor) {
+            super.stop();
+
             disruptor.shutdown();
             disruptor.halt();
         }

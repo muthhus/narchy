@@ -240,11 +240,7 @@ public class WebServer /*extends PathHandler*/ {
 //                }
 //
 //        );
-        nar.on("memstat", (Command) (op, args12, nar12) -> nar12.runLater((n) -> {
-            Command.log(nar, quote(nar.concepts.summary()));
-        }));
 
-        nar.on("reset", (Command) (op, args1, nar1) -> nar1.runLater(NAR::reset));
 
         new nars.web.NARServices(nar, w.path);
 

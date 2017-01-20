@@ -55,9 +55,22 @@ public class Builtin  {
     public static void load(NAR nar) {
         //TODO these should be command-only operators, not functors
 
-        nar.on("log", (Command)(Atomic a, Term[] t, NAR n) -> {
-            n.logger.info("{}", t);
-        });
+        nar.on("log", (Command) (a, t, n) ->
+            n.logger.info("{}", t)
+        );
+
+        nar.on("memstat", (Command) (op, a, nn) ->
+            Command.log(nar, quote(nar.concepts.summary()))
+        );
+
+        nar.on("reset", (Command) (op, args1, nar1) ->
+            nar1.runLater(NAR::reset)
+        );
+
+        nar.on("concept", (Command) (op, a, nar1) ->
+            Command.log(nar,
+                quote(nar.concept(a[0]).print(new StringBuilder(1024))))
+        );
 
 //                Functor.f0("help", () -> {
 //                    //TODO generalize with a predicate to filter the concepts, and a lambda for appending each one to an Appendable

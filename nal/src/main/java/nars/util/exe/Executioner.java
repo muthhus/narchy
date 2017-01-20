@@ -15,13 +15,18 @@ abstract public class Executioner implements Executor {
     @Nullable
     protected NAR nar;
 
-    public void start(NAR nar) {
+    public boolean isRunning() {
+        return nar!=null;
+    }
+
+    public synchronized void start(NAR nar) {
         if (this.nar == null) {
             this.nar = nar;
         } else {
             throw new RuntimeException("already started");
         }
     }
+
     public synchronized void stop() {
         if (this.nar != null) {
             this.nar = null;

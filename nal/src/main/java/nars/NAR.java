@@ -46,6 +46,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
@@ -92,10 +93,9 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
     public final transient Topic<NAR> eventReset = new ArrayTopic<>();
     public final transient ArrayTopic<NAR> eventCycleStart = new ArrayTopic<>();
     public final transient Topic<Task> eventTaskProcess = new ArrayTopic<>();
-    @NotNull
-    public final transient Emotion emotion;
-    @NotNull
-    public final Time time;
+    final Map<Atom,Operator> operators = new ConcurrentHashMap();
+    @NotNull public final transient Emotion emotion;
+    @NotNull public final Time time;
     /**
      * holds known Term's and Concept's
      */
@@ -209,7 +209,6 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
 
         concepts.start(this);
 
-
 //        eventError.on(e -> {
 //            if (e instanceof Throwable) {
 //                Throwable ex = (Throwable) e;
@@ -226,18 +225,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
 //            }
 //        });
 
-
-
         restart();
-    }
-
-    /** soft-reset: clears plugins (but not essentialc omponents such as indices, clock, etc)
-     * typically this will temporarily clear active memory processes
-     * it is like asking NAR to empty its (conscious) mind to be ready for a new focus
-     * also can be considered a "soft" reset, vs the reset() which is "hard"
-     */
-    public final void clear() {
-        eventReset.emit(this);
     }
 
     /**
@@ -250,9 +238,14 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
 
         synchronized (exe) {
 
-            clear();
+            if (!exe.isRunning()) {
+                logger.warn("can not reset already stopped NAR");
+                return;
+            }
 
-            exe.stop();
+            stop();
+
+            eventReset.emit(this);
 
             concepts.clear();
 
@@ -833,17 +826,14 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
     }
 
     public final void on(@NotNull Atom a, @NotNull Operator o) {
+        operators.put(a, o);
+        enableOperator(a, o);
+    }
+
+    private void enableOperator(@NotNull Atom a, @NotNull Operator o) {
         Concept c = concept(a, true);
         if (c.putIfAbsent(Operator.class, o)!=null)
             throw new RuntimeException(c + " already has an operator registered");
-
-//        Concept c = (Concept)concepts.conceptBuilder().apply(op);
-//        concepts.set(op, c);
-//        On o = c
-//                .<Topic<OperationConcept>>meta(Execution.class,
-//                        (k, v) -> v != null ? v : new ArrayTopic<>())
-//                .on(each);
-//        return o;
     }
 
 
