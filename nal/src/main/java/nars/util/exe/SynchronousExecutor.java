@@ -4,8 +4,6 @@ import nars.NAR;
 import nars.Task;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayDeque;
-
 /**
  * Created by me on 8/16/16.
  */
@@ -38,7 +36,7 @@ public class SynchronousExecutor extends Executioner {
         try {
             r.run();
         } catch (Throwable t) {
-            nar.logger.error("{} {}", r, t);
+            NAR.logger.error("{} {}", r, t);
         }
     }
 

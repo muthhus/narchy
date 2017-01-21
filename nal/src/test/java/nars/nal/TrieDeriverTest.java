@@ -21,7 +21,7 @@ import static org.junit.Assert.assertTrue;
  */
 public class TrieDeriverTest {
 
-    final static TrieDeriver d = (TrieDeriver) Deriver.get("nal.nal");
+    final static TrieDeriver d = (TrieDeriver) Deriver.get("nal1.nal");
 
     @Test public void printCompiledRuleTree() {
 

@@ -197,7 +197,7 @@ public class Inperience extends Leak<Task> {
                 logger.info(" {}", e);
                 nar.inputLater(e);
             }
-        } catch (ClassCastException e) {
+        } catch (ClassCastException ignored) {
             //happens rarely, due to circularity while trying to create something like: want((x<->want),...
 
             //System.err.println(task);

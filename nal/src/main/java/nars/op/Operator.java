@@ -24,10 +24,8 @@ package nars.op;
 import nars.NAR;
 import nars.Op;
 import nars.Task;
-import nars.task.MutableTask;
 import nars.term.Compound;
 import nars.term.Term;
-import nars.term.atom.Atomic;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

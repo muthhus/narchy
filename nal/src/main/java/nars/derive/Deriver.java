@@ -31,7 +31,7 @@ public interface Deriver extends Consumer<Derivation> {
     AsyncLoadingCache<String, Deriver> derivers = Caffeine.newBuilder().buildAsync((s) -> {
         try {
             return new TrieDeriver(PremiseRuleSet.rules(s));
-        } catch (IOException e) {
+        } catch (IOException ignored) {
             return (Deriver) null;
         }
     });

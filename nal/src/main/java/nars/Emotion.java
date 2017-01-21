@@ -84,7 +84,7 @@ public final class Emotion implements Serializable {
 
     /** percentage of business which was not frustration */
     public float learning() {
-        return (float) (learn.getSum()/ busyMass.getSum());
+        return learn.getSum()/ busyMass.getSum();
     }
 
     /** joy = first derivative of happiness, delta happiness / delta business */
@@ -96,10 +96,10 @@ public final class Emotion implements Serializable {
     }
 
     public float happy() {
-        return (float) happy.getSum();
+        return happy.getSum();
     }
     public float sad() {
-        return (float) sad.getSum();
+        return sad.getSum();
     }
 
 //    public void print(@NotNull OutputStream output) {

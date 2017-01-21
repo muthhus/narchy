@@ -45,10 +45,10 @@ public class EternalTaskCondition implements NARCondition, Predicate<Task>, Cons
     //@Expose
     //public  char punc;
 
-    public float freqMin;
-    public float freqMax;
-    public float confMin;
-    public float confMax;
+    public final float freqMin;
+    public final float freqMax;
+    public final float confMin;
+    public final float confMax;
     public long creationStart, creationEnd; //-1 for not compared
 
     /*float tenseCost = 0.35f;

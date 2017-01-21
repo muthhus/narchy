@@ -261,7 +261,7 @@ public class TestNAR  {
 //    }
 
     @NotNull
-    public TestNAR mustEmit(@NotNull Topic<Tasked>[] c, long cycleStart, long cycleEnd, @NotNull String sentenceTerm, char punc, float freqMin, float freqMax, float confMin, float confMax) throws Narsese.NarseseException {
+    public TestNAR mustEmit(@NotNull Topic<Tasked>[] c, long cycleStart, long cycleEnd, @NotNull String sentenceTerm, char punc, float freqMin, float freqMax, float confMin, float confMax) {
         return mustEmit(c, cycleStart, cycleEnd, sentenceTerm, punc, freqMin, freqMax, confMin, confMax, Tense.ETERNAL );
     }
 

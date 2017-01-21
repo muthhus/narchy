@@ -12,6 +12,7 @@ import nars.util.Loop;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.IOException;
 import java.util.List;
 
 
@@ -77,27 +78,31 @@ public class Hear extends Loop {
     static public void wiki(NAR nar) {
         nar.on("readWiki", (Command) (op, args, n) -> {
 
-            String base = "simple.wikipedia.org";
-            //"en.wikipedia.org";
-            Wiki enWiki = new Wiki(base);
+            try {
+                String base = "simple.wikipedia.org";
+                //"en.wikipedia.org";
+                Wiki enWiki = new Wiki(base);
 
-            String lookup = args[0].toString();
-            //remove quotes
-            String page = enWiki.normalize(lookup.replace("\"", ""));
-            //System.out.println(page);
+                String lookup = args[0].toString();
+                //remove quotes
+                String page = enWiki.normalize(lookup.replace("\"", ""));
+                //System.out.println(page);
 
-            enWiki.setMaxLag(-1);
+                enWiki.setMaxLag(-1);
 
-            String html = enWiki.getRenderedText(page);
-            html = StringEscapeUtils.unescapeHtml4(html);
-            String strippedText = html.replaceAll("(?s)<[^>]*>(\\s*<[^>]*>)*", " ").toLowerCase();
+                String html = enWiki.getRenderedText(page);
+                html = StringEscapeUtils.unescapeHtml4(html);
+                String strippedText = html.replaceAll("(?s)<[^>]*>(\\s*<[^>]*>)*", " ").toLowerCase();
 
-            //System.out.println(strippedText);
+                //System.out.println(strippedText);
 
-            Hear.hear(nar, strippedText,  page, 25);
+                Hear.hear(nar, strippedText, page, 25);
 
-            Command.log(n, "Reading " + base + ":" + page + ": " + strippedText.length() + " characters");
+                Command.log(n, "Reading " + base + ":" + page + ": " + strippedText.length() + " characters");
 
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         });
     }
 }

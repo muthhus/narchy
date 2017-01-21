@@ -7,7 +7,6 @@ package nars.op.data;
 import nars.$;
 import nars.term.Compound;
 import nars.term.Term;
-import nars.term.transform.Functor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

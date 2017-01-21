@@ -123,7 +123,7 @@ public class RevisionTask extends AnswerTask  {
                     resultPri,
                     newBeliefContribution);
 
-        } catch (BudgetException e) {
+        } catch (BudgetException ignored) {
             //HACK
         }
 

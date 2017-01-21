@@ -22,7 +22,7 @@ public interface Command extends Operator {
 
     String LOG_FUNCTOR = String.valueOf(Character.valueOf((char) 8594)); //RIGHT ARROW
 
-    void run(@NotNull Atomic op, @NotNull Term[] args, @NotNull NAR nar) throws Exception;
+    void run(@NotNull Atomic op, @NotNull Term[] args, @NotNull NAR nar);
 
     @Override
     default @Nullable Task run(@NotNull Task t, @NotNull NAR nar) {

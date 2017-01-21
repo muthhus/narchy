@@ -20,8 +20,7 @@ public class SpreadingActivation extends Activation implements ObjectFloatProced
 
     private final int termlinkDepth;
 
-    @NotNull public final Budgeted in;
-    float inPri; //cached priority value of input at input
+    final float inPri; //cached priority value of input at input
 
     final ObjectFloatHashMap<Termed> spread;
 
@@ -40,7 +39,6 @@ public class SpreadingActivation extends Activation implements ObjectFloatProced
     public SpreadingActivation(@NotNull Budgeted in, float scale, @NotNull Concept src, int termlinkDepth, @NotNull NAR nar) {
         super(in, scale, src, nar);
 
-        this.in = in;
         this.inPri = in.priSafe(0); // * in.qua(); //activate concept by the priority times the quality
 
         this.termlinkDepth = termlinkDepth;

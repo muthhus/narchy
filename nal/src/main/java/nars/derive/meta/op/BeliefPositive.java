@@ -9,7 +9,7 @@ import org.jetbrains.annotations.NotNull;
 /** belief truth is postiive */
 public class BeliefPositive extends AtomicBoolCondition {
 
-    public static final BeliefPositive the = new BeliefPositive();
+    public static final BeliefPositive thePos = new BeliefPositive();
 
     @Override
     public boolean run(@NotNull Derivation m, int now) {
@@ -29,7 +29,7 @@ public class BeliefPositive extends AtomicBoolCondition {
 
     public static final class BeliefNegative extends BeliefPositive {
 
-        public static final BeliefNegative the = new BeliefNegative();
+        public static final BeliefNegative theNeg = new BeliefNegative();
 
         @Override
         public boolean run(@NotNull Derivation m, int now) {

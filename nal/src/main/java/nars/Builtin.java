@@ -65,11 +65,11 @@ public class Builtin  {
                         quote(nar.concept(a[0]).print(new StringBuilder(1024))))
         );
 
-        Command log = (a, t, n) -> n.logger.info("{}", t);
+        Command log = (a, t, n) -> NAR.logger.info("{}", t);
         nar.on("log", log);
         nar.on(Command.LOG_FUNCTOR, log);
 
-        nar.on("error", (Command) (a, t, n) -> n.logger.error("{}", t) );
+        nar.on("error", (Command) (a, t, n) -> NAR.logger.error("{}", t) );
 
 
         nar.on("memstat", (Command) (op, a, nn) ->

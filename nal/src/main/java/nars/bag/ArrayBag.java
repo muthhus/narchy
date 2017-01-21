@@ -859,7 +859,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
     /**
      * Created by me on 8/15/16.
      */
-    final class Insertion<V> implements BiFunction<V, BLink, BLink> {
+    final class Insertion implements BiFunction<V, BLink<V>, BLink<V>> {
 
 
         private final float pri;

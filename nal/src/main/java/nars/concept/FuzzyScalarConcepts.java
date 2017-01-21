@@ -7,7 +7,6 @@ import nars.$;
 import nars.NAR;
 import nars.Op;
 import nars.term.Compound;
-import nars.term.Term;
 import nars.truth.Truth;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;

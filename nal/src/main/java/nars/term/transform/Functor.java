@@ -13,6 +13,7 @@ import nars.term.var.Variable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Arrays;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -54,7 +55,7 @@ abstract public class Functor extends AtomConcept implements PermanentConcept, F
     public static Concept f(@NotNull Atom termAtom, int arityRequired, @NotNull Function<Term[], Term> ff) {
         return f(termAtom, (tt)->{
             if (tt.length!=arityRequired)
-                throw new RuntimeException(termAtom + " requires " + arityRequired + " arguments: " + tt);
+                throw new RuntimeException(termAtom + " requires " + arityRequired + " arguments: " + Arrays.toString(tt));
 
             return ff.apply(tt);
         });

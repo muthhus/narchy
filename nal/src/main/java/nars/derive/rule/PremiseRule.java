@@ -855,10 +855,10 @@ public class PremiseRule extends GenericCompound {
                 case "belief":
                     switch (XString) {
                         case "negative":
-                            pres.add( BeliefPositive.BeliefNegative.the);
+                            pres.add( BeliefPositive.BeliefNegative.theNeg);
                             break;
                         case "positive":
-                            pres.add( BeliefPositive.the);
+                            pres.add( BeliefPositive.thePos);
                             break;
                     }
                     break;
