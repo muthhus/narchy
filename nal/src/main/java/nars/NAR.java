@@ -2,8 +2,6 @@ package nars;
 
 
 import com.google.common.collect.Sets;
-import io.airlift.compress.snappy.SnappyFramedInputStream;
-import io.airlift.compress.snappy.SnappyFramedOutputStream;
 import jcog.Util;
 import jcog.data.MutableInteger;
 import jcog.event.ArrayTopic;
@@ -11,10 +9,14 @@ import jcog.event.On;
 import jcog.event.Topic;
 import nars.Narsese.NarseseException;
 import nars.attention.Activation;
+import nars.bag.Bag;
 import nars.budget.Budget;
 import nars.budget.Budgeted;
+import nars.concept.AtomConcept;
 import nars.concept.CompoundConcept;
 import nars.concept.Concept;
+import nars.concept.PermanentConcept;
+import nars.conceptualize.DefaultConceptBuilder;
 import nars.conceptualize.state.ConceptState;
 import nars.index.task.MapTaskIndex;
 import nars.index.task.TaskIndex;
@@ -27,6 +29,7 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.atom.Atom;
+import nars.term.atom.Atomic;
 import nars.term.transform.Functor;
 import nars.term.util.InvalidTermException;
 import nars.time.FrameTime;
@@ -93,7 +96,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
     public final transient Topic<NAR> eventReset = new ArrayTopic<>();
     public final transient ArrayTopic<NAR> eventCycleStart = new ArrayTopic<>();
     public final transient Topic<Task> eventTaskProcess = new ArrayTopic<>();
-    final Map<Atom,Operator> operators = new ConcurrentHashMap();
+    final Map<PermanentAtomConcept,Operator> operators = new ConcurrentHashMap();
     @NotNull public final transient Emotion emotion;
     @NotNull public final Time time;
     /**
@@ -245,7 +248,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
 
             stop();
 
-            eventReset.emit(this);
+            clear();
 
             concepts.clear();
 
@@ -255,6 +258,10 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
 
         }
 
+    }
+
+    public void clear() {
+        runLater( () -> eventReset.emit(this));
     }
 
     /** initialization and post-reset procedure */
@@ -834,14 +841,23 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
     }
 
     public final void on(@NotNull Atom a, @NotNull Operator o) {
-        operators.put(a, o);
         enableOperator(a, o);
     }
 
+    static class PermanentAtomConcept extends AtomConcept implements PermanentConcept {
+        public PermanentAtomConcept(@NotNull Atomic atom, Bag<Term> termLinks, Bag<Task> taskLinks) {
+            super(atom, termLinks, taskLinks);
+        }
+    }
+
+    /** resets any existing atom or operator */
     private void enableOperator(@NotNull Atom a, @NotNull Operator o) {
-        Concept c = concept(a, true);
-        /*Object existing = */c.put(Operator.class, o);
-        //    throw new RuntimeException(c + " already has an operator registered");
+        DefaultConceptBuilder builder = (DefaultConceptBuilder) concepts.conceptBuilder();
+        Map map = builder.newBagMap(1);
+        PermanentAtomConcept c = new PermanentAtomConcept(a, builder.newBag(map), builder.newBag(map));
+        c.put(Operator.class, o);
+        concepts.set(c);
+        operators.put(c, o);
     }
 
 
@@ -1506,4 +1522,10 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
     public Control getControl() {
         return control;
     }
+
+    public On onReset(Consumer<NAR> o) {
+        return eventReset.on(o);
+    }
+
+
 }

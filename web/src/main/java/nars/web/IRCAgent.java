@@ -6,7 +6,6 @@ import jcog.event.On;
 import nars.*;
 import nars.bag.ArrayBag;
 import nars.budget.BudgetMerge;
-import nars.budget.RawBudget;
 import nars.conceptualize.DefaultConceptBuilder;
 import nars.control.ConceptBagControl;
 import nars.index.term.map.CaffeineIndex;
@@ -17,6 +16,7 @@ import nars.op.Command;
 import nars.op.Leak;
 import nars.op.mental.Inperience;
 import nars.term.Term;
+import nars.term.Terms;
 import nars.term.atom.Atom;
 import nars.time.RealTime;
 import nars.time.Tense;
@@ -77,11 +77,14 @@ public class IRCAgent extends IRC {
 
             @Override
             protected float onOut(@NotNull BLink<Task> t) {
-                Task task = t.get();
-                if (!task.isDeleted()) {
-                    boolean cmd = task.isCommand();
-                    String length = (!cmd) ? task.toString() : task.term().toString();
-                    send(channels, length);
+                return send(t.get());
+            }
+
+            private float send(Task task) {
+                boolean cmd = task.isCommand();
+                if (cmd || !task.isDeleted()) {
+                    String s = (!cmd) ? task.toString() : task.term().toString();
+                    IRCAgent.this.send(channels, s);
                     return cmd ? 0 : 1; //no cost for command outputs
                 }
                 return 0;
@@ -89,12 +92,13 @@ public class IRCAgent extends IRC {
 
             @Override
             protected void in(@NotNull Task t, Consumer<BLink<Task>> each) {
-                float p = t.pri();
-                //if (t.op()==INH && t.term(1).equals(nar.self())) {
-                boolean cmd = t.isCommand();
-
-                if (cmd || (!cmd && p == p)) { // || (t.term().containsTermRecursively(nar.self()) && (p > 0.5f))) {
-                    each.accept(new DefaultBLink<>(t, !cmd ? t : new RawBudget(1f,1f)));
+                if (t.isCommand()) {
+                    send(t); //immediate
+                } else {
+                    float p = t.pri();
+                    if (p == p) { // || (t.term().containsTermRecursively(nar.self()) && (p > 0.5f))) {
+                        each.accept(new DefaultBLink<>(t, t));
+                    }
                 }
             }
         };
@@ -162,16 +166,12 @@ public class IRCAgent extends IRC {
 
         });
 
-        nar.on("stfu", (Command) (op, args, n) -> {
-            out.bag.clear();
-            clearHearing();
-        });
 
         nar.on("clear", (Command) (op, args, n) -> {
-            ((Default) n).core.active.clear();
-            out.bag.clear();
-            clearHearing();
-            Command.log(n, "Ready. (" + n.concepts.size() + " subconcepts)");
+            n.clear();
+            n.runLater(()->{
+                Command.log(n, "Ready. (" + n.concepts.size() + " subconcepts)");
+            });
         });
 
         //                case "save":
@@ -228,9 +228,7 @@ public class IRCAgent extends IRC {
 
     }
 
-    private void clearHearing() {
-        hearing.forEach(Loop::stop);
-    }
+
 
     //    abstract class IRCBotOperator extends TermProcedure {
 //
@@ -375,13 +373,17 @@ public class IRCAgent extends IRC {
 
             Atom chan_nick = $.quote(src);
 
+            Term[] aa = new Term[] { $.the("hear"), chan_nick, Op.Imdex };
+
             return new Loop(msg, wordDelayMS) {
 
                 public On onReset;
                 int token = 0;
 
                 @Override
-                public void stop() {
+                public synchronized void stop() {
+                    onReset.off();
+                    onReset = null;
                     super.stop();
                     hearing.remove(this);
                 }
@@ -395,14 +397,14 @@ public class IRCAgent extends IRC {
 
                     onReset = nar.eventReset.on((n) -> {
                         if (onReset != null) {
-                            onReset.off();
-                            onReset = null;
                             stop();
                         }
                     });
 
+                    Term next = tokens.get(token++);
                     nar.believe(0.25f,
-                            $.func("hear", chan_nick, tokens.get(token++)),
+                            //$.func("hear", chan_nick, tokens.get(token++))
+                            $.inh(next, $.imge( aa)),
                             Tense.Present, 1f, 0.9f);
                 }
             };
@@ -451,13 +453,13 @@ public class IRCAgent extends IRC {
         nar.beliefConfidence(0.9f);
         nar.goalConfidence(0.9f);
 
-//        float p = 0.05f;
-//        nar.DEFAULT_BELIEF_PRIORITY = 0.75f * p;
-//        nar.DEFAULT_GOAL_PRIORITY = 1f * p;
-//        nar.DEFAULT_QUESTION_PRIORITY = 0.25f * p;
-//        nar.DEFAULT_QUEST_PRIORITY = 0.5f * p;
+        float p = 0.25f;
+        nar.DEFAULT_BELIEF_PRIORITY = 1f * p;
+        nar.DEFAULT_GOAL_PRIORITY = 1f * p;
+        nar.DEFAULT_QUESTION_PRIORITY = 1f * p;
+        nar.DEFAULT_QUEST_PRIORITY = 1f * p;
 
-        nar.confMin.setValue(0.05f);
+        nar.confMin.setValue(0.01f);
         nar.termVolumeMax.setValue(volMax);
 
 
@@ -484,14 +486,14 @@ public class IRCAgent extends IRC {
 
     public static void main(String[] args) throws Exception {
 
-        @NotNull Default n = newRealtimeNAR(2048, 50, 50);
+        @NotNull Default n = newRealtimeNAR(1024, 50, 200);
 
 
         IRCAgent bot = new IRCAgent(n,
                 "experiment1", "irc.freenode.net",
-                //"#123xyz"
+                "#123xyz"
                 //"#netention"
-                "#nars"
+                //"#nars"
         );
 
 

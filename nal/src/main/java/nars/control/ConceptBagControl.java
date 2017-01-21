@@ -151,7 +151,7 @@ public class ConceptBagControl implements Control, Consumer<DerivedTask> {
             }
 
         });
-        nar.eventReset.on((n)->active.clear());
+        nar.onReset((n)->active.clear());
 
     }
 

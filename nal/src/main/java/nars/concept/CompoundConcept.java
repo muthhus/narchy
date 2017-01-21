@@ -122,7 +122,7 @@ public class CompoundConcept<T extends Compound> implements Concept, Termlike {
      * default construction by a NAR on conceptualization
      */
     CompoundConcept(@NotNull T term, @NotNull DefaultConceptBuilder b, @NotNull NAR nar, @NotNull Map sharedMap) {
-        this(term, b.newCurveBag(sharedMap), b.newCurveBag(sharedMap), nar);
+        this(term, b.newBag(sharedMap), b.newBag(sharedMap), nar);
     }
 
 

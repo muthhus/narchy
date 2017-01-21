@@ -8,7 +8,6 @@ import nars.Op;
 import nars.Task;
 import nars.bag.Bag;
 import nars.bag.CurveBag;
-import nars.bag.experimental.HijackBag;
 import nars.budget.BudgetMerge;
 import nars.concept.AtomConcept;
 import nars.concept.CompoundConcept;
@@ -64,18 +63,18 @@ public class DefaultConceptBuilder implements ConceptBuilder {
                 switch (a.op()) {
                     default:
                         Map sharedMap = newBagMap(1);
-                        return new AtomConcept(a, newCurveBag(sharedMap), newCurveBag(sharedMap));
+                        return new AtomConcept(a, newBag(sharedMap), newBag(sharedMap));
                 }
 
             };
 
-    @NotNull
-    public <X> Bag<X> newHijackBag(int reprobes) {
-        return new HijackBag<>(1, reprobes, mergeDefault, nar.random);
-    }
+//    @NotNull
+//    public <X> Bag<X> newHijackBag(int reprobes) {
+//        return new HijackBag<>(1, reprobes, mergeDefault, nar.random);
+//    }
 
     @NotNull
-    public <X> Bag<X> newCurveBag(@NotNull Map m) {
+    public <X> Bag<X> newBag(@NotNull Map m) {
         return new CurveBag<X>(8, defaultCurveSampler, BudgetMerge.plusBlend, m);
     }
 
@@ -103,8 +102,8 @@ public class DefaultConceptBuilder implements ConceptBuilder {
 //                //newBagMap(DEFAULT_CONCEPT_LINK_MAP_CAPACITY);
 
         Map sharedMap = newBagMap(t.volume());
-        @NotNull Bag<Term> termbag = newCurveBag(sharedMap);
-        @NotNull Bag<Task> taskbag = newCurveBag(sharedMap);
+        @NotNull Bag<Term> termbag = newBag(sharedMap);
+        @NotNull Bag<Task> taskbag = newBag(sharedMap);
 
         DynamicTruthModel dmt = null;
 
@@ -302,7 +301,7 @@ public class DefaultConceptBuilder implements ConceptBuilder {
                 //Map m = newBagMap(DEFAULT_ATOM_LINK_MAP_CAPACITY);
 
                 Map sharedMap = newBagMap(term.volume());
-                result = new TermjectConcept((Termject) term, newCurveBag(sharedMap), newCurveBag(sharedMap));
+                result = new TermjectConcept((Termject) term, newBag(sharedMap), newBag(sharedMap));
             }
 
             if (term instanceof Variable) {

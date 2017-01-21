@@ -32,6 +32,7 @@ public abstract class Leak</* TODO: A, */B>  {
         n.onTask(task -> {
             in(task, bag::putLink);
         });
+        n.onReset((nn)->bag.clear());
         n.onCycle(this::next);
     }
 
