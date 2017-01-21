@@ -650,8 +650,12 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
             return null;
         }
 
-        Compound inputTerm = input.term();
         boolean isCommand = input.isCommand();
+        if (isCommand) {
+            eventTaskProcess.emit(input);
+        }
+
+        Compound inputTerm = input.term();
         if (inputTerm.hasAll(Operator.OPERATOR_BITS) && inputTerm.op() == INH) {
             Term func = inputTerm.term(1);
             if (func.op() == ATOM) {
@@ -661,17 +665,11 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
                     if (funcConcept!=null) {
                         Operator o = funcConcept.get(Operator.class);
                         if (o!=null) {
-
-                            if (isCommand) {
-                                eventTaskProcess.emit(input);
-                            }
-
                             Task result = o.run(input, this);
 
                             if (isCommand) {
                                 if (result != null && result != input)
-                                    input(result); //recurse
-                                return null;
+                                    return input(result); //recurse
                             } else {
                                 if (result != input) { //instance equality, not actual equality in case it wants to change this
                                     if (result == null) {
@@ -689,7 +687,6 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
         }
 
         if (isCommand) {
-            logger.warn("non-executable command: {}", input);
             return null;
         }
 

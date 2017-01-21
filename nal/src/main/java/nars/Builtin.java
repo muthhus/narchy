@@ -26,8 +26,8 @@ public class Builtin  {
             new union(),
             Functor.f0("date", () -> quote(new Date().toString())),
             Functor.f1("reflect", reflect::reflect),
-            Functor.f1("jsonParse", (jsonString)-> IO.fromJSON($.unquote(jsonString))),
-            Functor.f1("jsonStringify", (term)-> IO.toJSON(term) ),
+            Functor.f1("fromJSON", (jsonString)-> IO.fromJSON($.unquote(jsonString))),
+            Functor.f1("toJSON", IO::toJSON),
             new reflect(),
             new flat.flatProduct(),
             new similaritree(),
@@ -55,9 +55,8 @@ public class Builtin  {
     public static void load(NAR nar) {
         //TODO these should be command-only operators, not functors
 
-        nar.on("log", (Command) (a, t, n) ->
-            n.logger.info("{}", t)
-        );
+        nar.on("log", (Command) (a, t, n) -> n.logger.info("{}", t) );
+        nar.on("error", (Command) (a, t, n) -> n.logger.error("{}", t) );
 
         nar.on("memstat", (Command) (op, a, nn) ->
             Command.log(nar, quote(nar.concepts.summary()))

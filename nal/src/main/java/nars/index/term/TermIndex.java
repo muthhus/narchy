@@ -324,8 +324,8 @@ public abstract class TermIndex extends TermBuilder {
                 );
             } else {
                 result =
-                        //src.hasAll(Op.OpBits) ?
-                            //transform(src, CompoundTransform.None) : //force subterm functor eval
+                        src.hasAll(Op.OpBits) ?
+                            transform(src, CompoundTransform.None) : //force subterm functor eval
                             intern((Term)src);
             }
 
@@ -355,9 +355,8 @@ public abstract class TermIndex extends TermBuilder {
 
         } else if (x instanceof Compound) {
             Compound cx = (Compound)x;
-            //compute any subterm functors:
-            Op op = cx.op();
-            if (op == INH) {
+            //compute any contained subterm functors
+            if (cx.hasAll(Op.OpBits) &&  cx.size()==2) {
                 x = eval(cx);
             }
         }

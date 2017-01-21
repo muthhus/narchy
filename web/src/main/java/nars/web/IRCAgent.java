@@ -1,22 +1,21 @@
 package nars.web;
 
-import com.github.fge.grappa.exceptions.GrappaException;
 import jcog.data.random.XorShift128PlusRandom;
 import jcog.event.On;
 import nars.$;
 import nars.NAR;
-import nars.Narsese;
 import nars.Task;
+import nars.bag.CurveBag;
+import nars.budget.BudgetMerge;
 import nars.conceptualize.DefaultConceptBuilder;
 import nars.index.term.map.CaffeineIndex;
+import nars.link.BLink;
+import nars.link.DefaultBLink;
 import nars.nar.Default;
+import nars.op.Leak;
 import nars.op.mental.Inperience;
-import nars.op.stm.MySTMClustered;
-import nars.term.Compound;
 import nars.term.Term;
 import nars.term.atom.Atom;
-import nars.term.atom.Atomic;
-import nars.term.var.Variable;
 import nars.time.RealTime;
 import nars.time.Tense;
 import nars.util.Loop;
@@ -28,12 +27,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spacegraph.net.IRC;
 
-import java.io.FileNotFoundException;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Consumer;
 
-import static nars.Op.INH;
-import static nars.Op.PROD;
 import static nars.nlp.Twenglish.tokenize;
 
 /**
@@ -56,6 +54,7 @@ public class IRCAgent extends IRC {
     //private float ircMessagePri = 0.9f;
 
     final int wordDelayMS = 25; //for serializing tokens to events: the time in millisecond between each perceived (subvocalized) word, when the input is received simultaneously
+    private final Leak<Task> out;
     private boolean hearTwenglish = true;
 
     public IRCAgent(NAR nar, String nick, String server, String... channels) throws Exception {
@@ -68,14 +67,29 @@ public class IRCAgent extends IRC {
         //nar.log();
 
 
-        //SPEAK
-        nar.onTask(t -> {
-            float p = t.pri();
-            //if (t.op()==INH && t.term(1).equals(nar.self())) {
-            if (t.isCommand() || (p >= 0.1f)) { // || (t.term().containsTermRecursively(nar.self()) && (p > 0.5f))) {
-                send(channels, t.toString());
+        out = new Leak<Task>(new CurveBag<Task>(16, new CurveBag.NormalizedSampler(CurveBag.power6BagCurve, nar.random), BudgetMerge.plusBlend, new ConcurrentHashMap<>()), 0.1f, nar) {
+
+
+            @Override
+            protected float onOut(@NotNull BLink<Task> t) {
+                send(channels, t.get().toString());
+                return 0;
             }
-        });
+
+            @Override
+            protected void in(@NotNull Task t, Consumer<BLink<Task>> each) {
+                float p = t.pri();
+                //if (t.op()==INH && t.term(1).equals(nar.self())) {
+                if (t.isCommand() || (p==p && p >= 0.1f)) { // || (t.term().containsTermRecursively(nar.self()) && (p > 0.5f))) {
+                    each.accept(new DefaultBLink<>(t, t));
+                }
+            }
+        };
+
+//        //SPEAK
+//        nar.onTask(t -> {
+//
+//        });
 
 //        nar.on(new IRCBotOperator("readWiki") {
 //
@@ -448,7 +462,7 @@ public class IRCAgent extends IRC {
 
     public static void main(String[] args) throws Exception {
 
-        @NotNull Default n = newRealtimeNAR(2048, 5, 20);
+        @NotNull Default n = newRealtimeNAR(2048, 5, 50);
 
 
         IRCAgent bot = new IRCAgent(n,

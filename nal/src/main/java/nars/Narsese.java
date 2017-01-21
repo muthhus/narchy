@@ -1217,11 +1217,11 @@ public class Narsese extends BaseParser<Object> {
         Term contentRaw = (Term) x[1];
         if (!(contentRaw instanceof Compound))
             throw new NarseseException("Invalid task term");
-        Term content = m.normalize((Compound) contentRaw);
-        if (!(content instanceof Compound)) {
+        Term content = /*m.normalize*/((Compound) contentRaw);
+        /*if (!(content instanceof Compound)) {
             throw new NarseseException("Task term unnormalizable: " + contentRaw);
             //return Command.task($.func("log", content));
-        } else {
+        } else */{
 
             char punct = (Character) x[2];
 
@@ -1269,13 +1269,11 @@ public class Narsese extends BaseParser<Object> {
     @NotNull
     public Term term(String s, @Nullable TermIndex index, boolean normalize) throws NarseseException {
         Term y = term(s);
-        if (normalize) {
-            if (y instanceof Compound) {
-                return index.normalize((Compound) y);
-            }
-
+        if (normalize && y instanceof Compound) {
+            return index.normalize((Compound) y);
+        } else {
+            return index.get(y, true).term(); //y;
         }
-        return index.get(y, true).term(); //y;
     }
 
 //    public TaskRule taskRule(String input) {
