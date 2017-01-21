@@ -186,7 +186,7 @@ public abstract class TermBuilder {
 //    }
 
 
-    protected Term eval(@NotNull Compound subject, @NotNull Functor predicate) {
+    @Nullable protected Term eval(@NotNull Compound subject, @NotNull Functor predicate) {
         return predicate.apply(subject.terms());
     }
 
@@ -414,7 +414,7 @@ public abstract class TermBuilder {
         for (int i = 0; i < s; i++) {
             Term x = args[i];
 
-            if (isTrueOrFalse(x)) {
+            if (x == null || isTrueOrFalse(x)) {
                 /*if ((op == NEG) || (op == CONJ) || (op == IMPL) || (op == EQUI) || (op == INH) || (op == SIM))*/
                 //if (op!=PROD)
                 //throw new RuntimeException("appearance of True/False in " + op + " should have been filtered prior to this");
@@ -424,6 +424,7 @@ public abstract class TermBuilder {
             }
 
             x = intern(productNormalize(x));
+
             if (isTrueOrFalse(x))
                 return False; //may have become False through eval()
 

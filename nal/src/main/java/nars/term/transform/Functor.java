@@ -85,17 +85,17 @@ abstract public class Functor extends AtomConcept implements PermanentConcept, F
         return f1(fName(termAtom), ff);
     }
     public static Concept f1Const(@NotNull String termAtom, @NotNull Function<Term, Term> ff) {
-        return f1(fName(termAtom), x -> x instanceof Variable ? x : ff.apply(x));
+        return f1(fName(termAtom), x -> x instanceof Variable ? null : ff.apply(x));
     }
 
     /** a functor involving a concept resolved by the 1st argument term */
-    public static Concept f1c(@NotNull String termAtom, NAR nar, @NotNull BiFunction<Concept, NAR, Term> ff) {
+    public static Concept f1Concept(@NotNull String termAtom, NAR nar, @NotNull BiFunction<Concept, NAR, Term> ff) {
         return f1(fName(termAtom), t -> {
             Concept c = nar.concept(t);
             if (c!=null) {
                 return ff.apply(c, nar);
             } else {
-                return t;
+                return null;
             }
         });
     }

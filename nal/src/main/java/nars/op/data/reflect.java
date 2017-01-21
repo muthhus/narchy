@@ -56,8 +56,10 @@ public class reflect  {
     @Nullable
     public static Term sop(String operatorName, @NotNull Compound c) {
         Term[] m = new Term[c.size()];
-        for (int i = 0; i < c.size(); i++)
-            m[i] = reflect(c.term(i));
+        for (int i = 0; i < c.size(); i++) {
+            if ((m[i] = reflect(c.term(i))) == null)
+                return null;
+        }
 
         //return Atom.the(Utf8.toUtf8(name));
 

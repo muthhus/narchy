@@ -341,7 +341,7 @@ public abstract class TermIndex extends TermBuilder {
         return result;
     }
 
-    @Override
+    @NotNull
     public Term intern(@NotNull Term x) {
         if (x instanceof Variable) {
             //nothing
@@ -363,7 +363,7 @@ public abstract class TermIndex extends TermBuilder {
         return x;
     }
 
-    protected Term eval(Compound inhCompound) {
+    @NotNull protected Term eval(@NotNull Compound inhCompound) {
         Termed predicate = get(inhCompound.term(1));
         if (predicate instanceof Functor) {
             Term subject = inhCompound.term(0);

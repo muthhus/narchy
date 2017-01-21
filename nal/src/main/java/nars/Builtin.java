@@ -2,14 +2,10 @@ package nars;
 
 import jcog.Texts;
 import nars.concept.Concept;
-import nars.control.ConceptBagControl;
 import nars.link.BLink;
-import nars.nar.Default;
 import nars.op.Command;
 import nars.op.data.*;
-import nars.term.Term;
 import nars.term.atom.Atom;
-import nars.term.atom.Atomic;
 import nars.term.obj.IntTerm;
 import nars.term.transform.Functor;
 import nars.term.var.Variable;
@@ -61,8 +57,8 @@ public class Builtin  {
 
         nar.on(Functor.f0("self", nar::self));
 
-        nar.on(Functor.f1c("belief", nar, (c,n) -> $.quote(c.belief(n.time()))));
-        nar.on(Functor.f1c("goal", nar, (c,n) -> $.quote(c.goal(n.time()))));
+        nar.on(Functor.f1Concept("belief", nar, (c, n) -> $.quote(c.belief(n.time()))));
+        nar.on(Functor.f1Concept("goal", nar, (c, n) -> $.quote(c.goal(n.time()))));
 
         nar.on("concept", (Command) (op, a, nar1) ->
                 Command.log(nar,

@@ -165,7 +165,7 @@ public abstract class AbstractTask extends RawBudget implements Task, Temporal {
 
 
         Term ntt = nar.normalize(t);
-        if (ntt == null || (!(term instanceof Compound)))
+        if (ntt == null || (!(ntt instanceof Compound)))
             throw new InvalidTaskException(t, "Failed normalization");
 
         Compound cntt = (Compound)ntt;

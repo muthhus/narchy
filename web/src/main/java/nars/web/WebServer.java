@@ -113,7 +113,6 @@ public class WebServer extends PathHandler /*extends PathHandler*/ {
 
         new NARWeb(nar ,httpPort);
 
-        NARLoop loop = nar.loop(20);
 
     }
 
