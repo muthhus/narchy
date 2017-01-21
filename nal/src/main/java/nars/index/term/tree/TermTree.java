@@ -15,12 +15,6 @@ import java.util.function.Function;
  */
 public class TermTree extends MyConcurrentRadixTree<Termed> {
 
-
-    public final Termed get(@NotNull String id) {
-        return getValueForExactKey(key($.$(id)));
-    }
-
-
     public final Termed computeIfAbsent(@NotNull ByteSeq s, @NotNull Function<Term, ? extends Termed> conceptBuilder) {
         return putIfAbsent(s, () -> conceptBuilder.apply($.the(s.toString())));
     }

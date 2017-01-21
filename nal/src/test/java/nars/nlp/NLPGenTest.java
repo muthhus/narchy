@@ -1,6 +1,7 @@
 package nars.nlp;
 
 import nars.NAR;
+import nars.Narsese;
 import nars.nar.Default;
 import nars.util.NLPGen;
 import org.junit.Test;
@@ -17,7 +18,7 @@ public class NLPGenTest {
     NAR n = new Default();
 
     @Test
-    public void testSimple1() {
+    public void testSimple1() throws Narsese.NarseseException {
         assertEquals("a a b", g.toString(n.task("(a --> b).")));
         //assertEquals("a notA b", g.toString(n.task("(--,(a --> b)).")));
         assertEquals("(a) and (bbb)", g.toString(n.task("(&&, (a), (bbb)).")));
@@ -25,7 +26,7 @@ public class NLPGenTest {
     }
 
     @Test
-    public void testSimple2() {
+    public void testSimple2() throws Narsese.NarseseException {
         assertEquals("a same b", g.toString(n.task("(a <-> b).")));
     }
 

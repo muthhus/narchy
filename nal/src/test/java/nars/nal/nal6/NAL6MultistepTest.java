@@ -1,5 +1,6 @@
 package nars.nal.nal6;
 
+import nars.Narsese;
 import nars.Param;
 import nars.concept.Concept;
 import nars.nar.Default;
@@ -18,7 +19,7 @@ public class NAL6MultistepTest {
     }
 
     /** https://dtai.cs.kuleuven.be/problog/tutorial/basic/02_bayes.html */
-    @Test public void testBurglarEarthquake1() {
+    @Test public void testBurglarEarthquake1() throws Narsese.NarseseException {
 //        0.7::burglary.
 //        0.2::earthquake.
 //        0.9::p_alarm1.
@@ -67,7 +68,7 @@ public class NAL6MultistepTest {
 
 
     /** https://dtai.cs.kuleuven.be/problog/tutorial/basic/02_bayes.html */
-    @Test public void testBurglarEarthquake2() {
+    @Test public void testBurglarEarthquake2() throws Narsese.NarseseException {
 //        0.7::burglary.
 //        0.2::earthquake.
 //

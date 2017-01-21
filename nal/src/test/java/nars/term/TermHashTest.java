@@ -1,5 +1,6 @@
 package nars.term;
 
+import nars.Narsese;
 import nars.Op;
 import org.jetbrains.annotations.Nullable;
 import org.junit.Test;
@@ -15,7 +16,7 @@ import static org.junit.Assert.assertTrue;
 public class TermHashTest {
 
     @Test
-    public void testStructureIsVsHas() {
+    public void testStructureIsVsHas() throws Narsese.NarseseException {
 
         assertTrue(inh("a", "b").hasAny(Op.ATOM));
         assertTrue(inh(p("a"), $("b"))
@@ -32,7 +33,7 @@ public class TermHashTest {
         assertFalse(inh("a", "b").hasAny(SIM));
     }
 
-    @Test public void testHasAnyVSAll() {
+    @Test public void testHasAnyVSAll() throws Narsese.NarseseException {
         @Nullable Term iii = impl(inh("a", "b"), $("c"));
         assertTrue(iii.hasAll(or(IMPL, INH)));
         assertFalse(iii.hasAll(or(IMPL, SIM)));

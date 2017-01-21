@@ -1,8 +1,11 @@
 package nars.util.signal;
 
+import nars.Narsese;
 import nars.Task;
 import nars.test.TestNAR;
 import org.jetbrains.annotations.NotNull;
+
+import static org.junit.Assert.assertTrue;
 
 /**
  * test an invididual premise
@@ -46,8 +49,13 @@ public interface RuleTest {
 
 	static void test(@NotNull TestNAR test, @NotNull String task, @NotNull String belief, @NotNull String result,
 					 float minFreq, float maxFreq, float minConf, float maxConf) {
-		test(test, test.nar.task(task), test.nar.task(belief), result, minFreq, maxFreq,
-				minConf, maxConf);
+		try {
+			test(test, test.nar.task(task), test.nar.task(belief), result, minFreq, maxFreq,
+                    minConf, maxConf);
+		} catch (Narsese.NarseseException e) {
+			e.printStackTrace();
+			assertTrue(false);
+		}
 
 	}
 	static void test(@NotNull TestNAR test, @NotNull Task task, @NotNull Task belief, @NotNull String result,

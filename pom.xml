@@ -50,6 +50,7 @@
 
                     <showWarnings>false</showWarnings>
                     <useIncrementalCompilation>true</useIncrementalCompilation>
+                    <failOnError>false</failOnError>
 
                 </configuration>
             </plugin>

@@ -34,7 +34,7 @@ public class PremiseRuleTest {
 
 
     @Test
-    public void testParser() {
+    public void testParser() throws Narsese.NarseseException {
 
 
         //NAR p = new NAR(new Default());
@@ -99,7 +99,7 @@ public class PremiseRuleTest {
         return new PremiseRuleSet(true, onlyRule).rules.get(0);
     }
 
-    @NotNull static PremiseRule rule(@NotNull String onlyRule) {
+    @NotNull static PremiseRule rule(@NotNull String onlyRule) throws Narsese.NarseseException {
         return parse(onlyRule, new PatternTermIndex());
 //        PremiseRule r = (PremiseRule) p.term(onlyRule);
 //        return rule(
@@ -108,7 +108,7 @@ public class PremiseRuleTest {
     }
 
     @Test
-    public void testNotSingleVariableRule1() {
+    public void testNotSingleVariableRule1() throws Narsese.NarseseException {
         //tests an exceptional case that should now be fixed
 
         PatternTermIndex i = new PatternTermIndex();
@@ -121,7 +121,7 @@ public class PremiseRuleTest {
     }
 
     @Test
-    public void testPatternVarNormalization() {
+    public void testPatternVarNormalization() throws Narsese.NarseseException {
 
         //Narsese p = Narsese.the();
 
@@ -148,7 +148,7 @@ public class PremiseRuleTest {
 
 
     @Test
-    public void printTermRecursive() {
+    public void printTermRecursive() throws Narsese.NarseseException {
         Compound y = rule("(S --> P), --%S |- (P --> S), (Belief:Conversion, Info:SeldomUseful)");
         printRecursive(y);
     }
@@ -174,7 +174,7 @@ public class PremiseRuleTest {
 //    }
 
     @Test
-    public void testBackwardPermutations() {
+    public void testBackwardPermutations() throws Narsese.NarseseException {
         if (Param.BACKWARD_QUESTION_RULES) {
             Set<PremiseRule> s = PremiseRuleSet.permute(
                     rule("(A --> B), (B --> C), neq(A,C) |- (A --> C), (Belief:Deduction, Goal:Strong, Permute:Backward, Permute:Swap)")
@@ -199,7 +199,7 @@ public class PremiseRuleTest {
         }
     }
 
-    @Test public void testSubstIfUnifies() {
+    @Test public void testSubstIfUnifies() throws Narsese.NarseseException {
         PremiseRule r = rule("(Y --> L), ((Y --> S) ==> R), neq(L,S) |- substitute(((&&,(#X --> L),(#X --> S)) ==> R),Y,#X), (Belief:Induction, Goal:Induction)");
         System.out.println(r);
         System.out.println(r.source);

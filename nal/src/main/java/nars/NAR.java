@@ -335,7 +335,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
 
 
     @NotNull
-    public List<Task> input(@NotNull String text) throws NarseseException {
+    public List<Task> input(@NotNull String text) {
         List<Task> lt = tasks(text);
         lt.forEach(this::input);
         return lt;
@@ -458,7 +458,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
 
 
     @NotNull
-    public NAR believe(@NotNull Termed term, float freq, float conf) throws NarseseException {
+    public NAR believe(@NotNull Termed term, float freq, float conf)  {
         return believe(term, Tense.Eternal, freq, conf);
     }
 
@@ -468,8 +468,12 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
     }
 
     @NotNull
-    public NAR believe(@NotNull String term, @NotNull Tense tense, float freq, float conf) throws NarseseException {
-        believe(priorityDefault(BELIEF), term(term), time(tense), freq, conf);
+    public NAR believe(@NotNull String term, @NotNull Tense tense, float freq, float conf)  {
+        try {
+            believe(priorityDefault(BELIEF), term(term), time(tense), freq, conf);
+        } catch (NarseseException e) {
+            throw new RuntimeException(e);
+        }
         return this;
     }
 
@@ -483,8 +487,12 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
     }
 
     @NotNull
-    public Task goal(@NotNull String termString) throws NarseseException {
-        return goal((Termed) term(termString), true);
+    public Task goal(@NotNull String termString)  {
+        try {
+            return goal((Termed) term(termString), true);
+        } catch (NarseseException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @NotNull
@@ -493,8 +501,12 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
     }
 
     @NotNull
-    public NAR believe(@NotNull String termString, boolean isTrue) throws NarseseException {
-        return believe(term(termString), isTrue);
+    public NAR believe(@NotNull String termString, boolean isTrue)  {
+        try {
+            return believe(term(termString), isTrue);
+        } catch (NarseseException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @NotNull
@@ -503,12 +515,12 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
     }
 
     @NotNull
-    public NAR believe(@NotNull Termed<Compound> term) throws NarseseException {
+    public NAR believe(@NotNull Termed<Compound> term)  {
         return believe(term, true);
     }
 
     @NotNull
-    public NAR believe(@NotNull Termed<Compound> term, boolean trueOrFalse) throws NarseseException {
+    public NAR believe(@NotNull Termed<Compound> term, boolean trueOrFalse)  {
         return believe(term, trueOrFalse, confidenceDefault(BELIEF));
     }
 
@@ -523,7 +535,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
     }
 
     @NotNull
-    public NAR believe(@NotNull Termed<Compound> term, boolean trueOrFalse, float conf) throws NarseseException {
+    public NAR believe(@NotNull Termed<Compound> term, boolean trueOrFalse, float conf)  {
         return believe(term, trueOrFalse ? 1.0f : 0f, conf);
     }
 
@@ -533,7 +545,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
     }
 
     @Nullable
-    public Task believe(float pri, @NotNull Termed<Compound> term, long occurrenceTime, float freq, float conf) throws NarseseException {
+    public Task believe(float pri, @NotNull Termed<Compound> term, long occurrenceTime, float freq, float conf) {
         return input(pri, term, BELIEF, occurrenceTime, freq, conf);
     }
 
@@ -1109,7 +1121,8 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
 
     @NotNull
     public NAR input(@NotNull String... ss) {
-        for (String s : ss) input(s);
+        for (String s : ss)
+            input(s);
         return this;
     }
 
@@ -1307,9 +1320,6 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
     }
 
 
-    public Termed[] terms(String... terms) {
-        return Stream.of(terms).map(this::term).toArray(Termed[]::new);
-    }
 
     /**
      * text output
@@ -1430,10 +1440,10 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
     @NotNull
     public NAR output(@NotNull OutputStream o, @NotNull Predicate<Task> each) throws IOException {
 
-        SnappyFramedOutputStream os = new SnappyFramedOutputStream(o);
+        //SnappyFramedOutputStream os = new SnappyFramedOutputStream(o);
 
 
-        DataOutputStream oo = new DataOutputStream(os);
+        DataOutputStream oo = new DataOutputStream(o);
 
         MutableInteger total = new MutableInteger(0), filtered = new MutableInteger(0);
 
@@ -1468,20 +1478,20 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
      * byte codec input stream of tasks, to be input after decode
      */
     @NotNull
-    public NAR input(@NotNull InputStream tasks) throws IOException {
+    public NAR input(@NotNull InputStream i) throws IOException {
 
-        SnappyFramedInputStream i = new SnappyFramedInputStream(tasks, true);
+        //SnappyFramedInputStream i = new SnappyFramedInputStream(tasks, true);
         DataInputStream ii = new DataInputStream(i);
 
         int count = 0;
 
-        while ((tasks.available() > 0) || (i.available() > 0) || (ii.available() > 0)) {
+        while ((i.available() > 0) || (i.available() > 0) || (ii.available() > 0)) {
             Task t = IO.readTask(ii, concepts);
             input(t);
             count++;
         }
 
-        logger.info("Loaded {} tasks from {}", count, tasks);
+        logger.info("Loaded {} tasks from {}", count, i);
 
         ii.close();
 

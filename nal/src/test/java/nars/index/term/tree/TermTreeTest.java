@@ -1,6 +1,7 @@
 package nars.index.term.tree;
 
 import com.google.common.collect.Sets;
+import nars.Narsese;
 import nars.concept.AtomConcept;
 import nars.concept.Concept;
 import nars.nar.Terminal;
@@ -25,7 +26,7 @@ import static org.junit.Assert.*;
 public class TermTreeTest {
 
     @Test
-    public void testAtomInsertion() {
+    public void testAtomInsertion() throws Narsese.NarseseException {
 
         TermTree tree = new TermTree();
 
@@ -57,7 +58,7 @@ public class TermTreeTest {
 
 
     @Test
-    public void testCompoundInsertion() {
+    public void testCompoundInsertion() throws Narsese.NarseseException {
 
         Terminal nar = new Terminal();
         TreeTermIndex index = new TreeTermIndex(nar.concepts.conceptBuilder(), 1000);

@@ -1,6 +1,7 @@
 package nars.test.analyze;
 
 import nars.NAR;
+import nars.Narsese;
 import nars.Task;
 import nars.bag.Bag;
 import nars.concept.Concept;
@@ -21,7 +22,7 @@ public class BeliefAnalysis extends EnergyAnalysis {
 		this.term = term;
 	}
 
-	public BeliefAnalysis(@NotNull NAR n, @NotNull String term) {
+	public BeliefAnalysis(@NotNull NAR n, @NotNull String term) throws Narsese.NarseseException {
 		this(n, (Compound) n.term(term));
 	}
 

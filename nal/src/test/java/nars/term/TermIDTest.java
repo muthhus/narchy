@@ -1,6 +1,7 @@
 package nars.term;
 
 import nars.NAR;
+import nars.Narsese;
 import nars.nar.Terminal;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -9,6 +10,7 @@ import org.junit.Test;
 import java.util.Arrays;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Created by me on 6/3/15.
@@ -45,7 +47,6 @@ public class TermIDTest {
     }
 
 
-
     /**
      * tests whether NALOperators has been reduced to the
      * compact control character (8bits UTF) that represents it
@@ -77,12 +78,13 @@ public class TermIDTest {
         testBytesRepresentation("(a-->b)", 5);
     }
 
-    @Test public void testInternalRepresentationImage1() {
-        for (char t : new char[] { '/', '\\'}) {
-            testBytesRepresentation("("+t+",_,a)", 3 + 1);
-            testBytesRepresentation("("+t+",_,a,b)", 5 + 1);
-            testBytesRepresentation("("+t+",a,_,b)", 5 + 1);
-            testBytesRepresentation("("+t+",a,b,_)", 5 + 1);
+    @Test
+    public void testInternalRepresentationImage1() {
+        for (char t : new char[]{'/', '\\'}) {
+            testBytesRepresentation("(" + t + ",_,a)", 3 + 1);
+            testBytesRepresentation("(" + t + ",_,a,b)", 5 + 1);
+            testBytesRepresentation("(" + t + ",a,_,b)", 5 + 1);
+            testBytesRepresentation("(" + t + ",a,b,_)", 5 + 1);
         }
     }
 
@@ -92,14 +94,19 @@ public class TermIDTest {
 
     @NotNull
     public Term testBytesRepresentation(@NotNull String expectedCompactOutput, int expectedLength) {
-        return testBytesRepresentation(
-            null,
-            expectedCompactOutput,
-            expectedLength);
+        try {
+            return testBytesRepresentation(
+                    null,
+                    expectedCompactOutput,
+                    expectedLength);
+        } catch (Narsese.NarseseException e) {
+            assertTrue(false);
+            return null;
+        }
     }
 
     @NotNull
-    public Term testBytesRepresentation(@Nullable String expectedCompactOutput, @NotNull String expectedPrettyOutput, int expectedLength) {
+    public Term testBytesRepresentation(@Nullable String expectedCompactOutput, @NotNull String expectedPrettyOutput, int expectedLength) throws Narsese.NarseseException {
         //UTF8Identifier b = new UTF8Identifier(expectedPrettyOutput);
         Termed i = nar.term(expectedPrettyOutput);
         //byte[] b = i.bytes();

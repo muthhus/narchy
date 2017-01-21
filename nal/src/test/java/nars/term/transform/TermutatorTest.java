@@ -2,6 +2,7 @@ package nars.term.transform;
 
 import com.google.common.collect.Lists;
 import jcog.data.random.XorShift128PlusRandom;
+import nars.Narsese;
 import nars.Op;
 import nars.Param;
 import nars.derive.meta.match.Ellipsis;
@@ -44,6 +45,7 @@ public class TermutatorTest {
                         p("a", "b").toSet()), 2);
 
     }
+
     @Test
     public void testChoose1_3() {
 
@@ -51,6 +53,7 @@ public class TermutatorTest {
                 new Choose1(e1, p2,
                         p("a", "b", "c").toSet()), 3);
     }
+
     @Test
     public void testChoose1_4() {
 
@@ -60,7 +63,22 @@ public class TermutatorTest {
     }
 
 
-    static final @NotNull Ellipsis e1 = ((Ellipsis.EllipsisPrototype) $("%A..+")).make(1,1);
+    static final Term e0;
+    static {
+        //HACK
+        Term ee0;
+        try {
+            ee0 = $("%A..+");
+        } catch (Narsese.NarseseException e) {
+            ee0 = null;
+            e.printStackTrace();
+            System.exit(1);
+        }
+        e0 = ee0;
+    }
+    static final @NotNull Ellipsis e1 = ((Ellipsis.EllipsisPrototype) e0).make(1,1);
+
+
     static final Variable p2= v(Op.VAR_PATTERN, 2);
     static final Collection<Term> p2p3 = Lists.newArrayList( p2, v(Op.VAR_PATTERN, 3) );
 
@@ -97,17 +115,17 @@ public class TermutatorTest {
 
 
 
-    @Test public void testComm2() {
+    @Test public void testComm2() throws Narsese.NarseseException {
         assertTermutatorProducesUniqueResults(
                 new CommutivePermutations(f, $("{%A,%B}"),
                         $("{x,y}")), 2);
     }
-    @Test public void testComm3() {
+    @Test public void testComm3() throws Narsese.NarseseException {
         assertTermutatorProducesUniqueResults(
                 new CommutivePermutations(f, $("{%A,%B,%C}"),
                         $("{x,y,z}")), 6);
     }
-    @Test public void testComm4() {
+    @Test public void testComm4() throws Narsese.NarseseException {
         assertTermutatorProducesUniqueResults(
                 new CommutivePermutations(f, $("{%A,%B,%C,%D}"),
                         $("{w,x,y,z}")), 24);

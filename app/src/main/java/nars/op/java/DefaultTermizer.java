@@ -414,14 +414,14 @@ public class DefaultTermizer implements Termizer {
     }
 
     @NotNull
-    public static <T extends Term> Map<Atom,T> mapStaticClassFields(@NotNull Class c, @NotNull Function<Field, T> each) {
+    public static <T extends Term> Map<Atomic,T> mapStaticClassFields(@NotNull Class c, @NotNull Function<Field, T> each) {
         Field[] ff = c.getFields();
-        Map<Atom,T> t = $.newHashMap(ff.length);
+        Map<Atomic,T> t = $.newHashMap(ff.length);
         for (Field f : ff) {
             if (Modifier.isStatic(f.getModifiers())) {
                 T xx = each.apply(f);
                 if (xx!=null) {
-                    t.put($.$(f.getName()), xx);
+                    t.put($.the(f.getName()), xx);
                 }
             }
         }

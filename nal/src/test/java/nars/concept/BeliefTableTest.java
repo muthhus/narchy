@@ -10,6 +10,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.junit.Test;
 
+import static nars.task.RevisionTest.AB;
 import static nars.task.RevisionTest.newNAR;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -63,7 +64,7 @@ public class BeliefTableTest  {
         NAR n = newNAR(12);
 
 
-        BeliefAnalysis b = new BeliefAnalysis(n, "a:b");
+        BeliefAnalysis b = new BeliefAnalysis(n, AB);
 
         n.input("a:b. %0.9|0.9%"); //highest positive
         n.input("a:b. %0.8|0.8%");
@@ -93,7 +94,7 @@ public class BeliefTableTest  {
         int maxBeliefs = 10;
         NAR n = newNAR(maxBeliefs);
 
-        BeliefAnalysis b = new BeliefAnalysis(n, "<a-->b>");
+        BeliefAnalysis b = new BeliefAnalysis(n, AB);
 
         b.believe(1.0f, 0.5f); n.next();
         b.print();
@@ -156,7 +157,7 @@ public class BeliefTableTest  {
         NAR n = newNAR(maxBeliefs*2);
 
 
-        BeliefAnalysis b = new BeliefAnalysis(n, "<a-->b>");
+        BeliefAnalysis b = new BeliefAnalysis(n, AB);
 
         //assertEquals(0.0, (Double) b.energy().get(MemoryBudget.Budgeted.ActiveConceptPrioritySum), 0.001);
 

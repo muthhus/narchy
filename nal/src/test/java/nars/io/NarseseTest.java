@@ -14,6 +14,7 @@ import org.junit.Test;
 
 import java.util.List;
 
+import static nars.$.$;
 import static org.junit.Assert.*;
 
 
@@ -75,7 +76,7 @@ public class NarseseTest {
         assertEquals(0.95f, t.conf(), 0.001);
     }
 
-    @Test public void testTruth() {
+    @Test public void testTruth() throws Narsese.NarseseException {
         testTruth("%1;0.9%", 1f, 0.9f);
         testTruth("%1.0;0.90%", 1f, 0.9f);
         testTruth("%1.00;0.90%", 1f, 0.9f);
@@ -88,7 +89,7 @@ public class NarseseTest {
 //        testTruth("%1.0%", 1f, 0.9f);
 //    }
 
-    public static void testTruth(String t, float freq, float conf) {
+    public static void testTruth(String t, float freq, float conf) throws Narsese.NarseseException {
         String s = "a:b. " + t;
 
         Truth truth = task(s).truth();
@@ -112,7 +113,7 @@ public class NarseseTest {
     }
 
     @Test
-    public void testPropertyInstance() {
+    public void testPropertyInstance() throws Narsese.NarseseException {
 
         taskParses("<a -{- b>.");
         taskParses("<a -]- b>.");
@@ -232,7 +233,7 @@ public class NarseseTest {
 
 
     @Test
-    public void testShortFloat() {
+    public void testShortFloat() throws Narsese.NarseseException {
 
         taskParses("<{a} --> [b]>. %0;0.9%");
         taskParses("<a --> b>. %0.95;0.9%");
@@ -263,7 +264,7 @@ public class NarseseTest {
     }
 
     @Test
-    public void testOperationNoArgs() {
+    public void testOperationNoArgs() throws Narsese.NarseseException {
         Term t = term("op()");
         assertNotNull(t);
         assertEquals(t.toString(), Op.INH, t.op());
@@ -306,14 +307,14 @@ public class NarseseTest {
     }
 
     @Test
-    public void testOperationTask() {
+    public void testOperationTask() throws Narsese.NarseseException {
         taskParses("break({t001},SELF)! %1.00;0.95%");
     }
 
 
 
     @Test
-    public void testCompoundTermOpenerCloserStatements() {
+    public void testCompoundTermOpenerCloserStatements() throws Narsese.NarseseException {
         Term a = term("<a --> b>");
         Term x = term("(a --> b)");
         Term y = term("(a-->b)");
@@ -336,7 +337,7 @@ public class NarseseTest {
     }
 
     @NotNull
-    protected Variable testVar(char prefix) {
+    protected Variable testVar(char prefix) throws Narsese.NarseseException {
         Term x = term(prefix + "x");
         assertNotNull(x);
         assertTrue(x instanceof Variable);
@@ -359,7 +360,7 @@ public class NarseseTest {
     }
 
     @Test
-    public void testSet() {
+    public void testSet() throws Narsese.NarseseException {
         Compound xInt = term("[x]");
         assertEquals(Op.SETi, xInt.op());
         assertEquals(1, xInt.size());
@@ -426,29 +427,29 @@ public class NarseseTest {
     }
 
     @Test
-    public void testSimpleTask() {
+    public void testSimpleTask() throws Narsese.NarseseException {
         taskParses("(-,mammal,swimmer). %0.00;0.90%");
 
     }
 
     @Test
-    public void testCompleteTask() {
+    public void testCompleteTask() throws Narsese.NarseseException {
         taskParses("$0.80;0.50;0.95$ <<lock1 --> (/,open,$1,_)> ==> <$1 --> key>>. %1.00;0.90%");
     }
 
-    @Test public void testNonNegativeIntegerAtoms() {
+    @Test public void testNonNegativeIntegerAtoms() throws Narsese.NarseseException {
         //TODO test parsing to numeric atom types
         Term a = term("1");
         assertEquals("1", a.toString());
     }
 
-    @Test public void testNegativeIntegerAtoms() {
+    @Test public void testNegativeIntegerAtoms() throws Narsese.NarseseException {
         //TODO test parsing to numeric atom types
         Term a = term("-1");
         assertNotNull(a);
         assertEquals("-1", a.toString());
     }
-    @Test public void testFloatAtom() {
+    @Test public void testFloatAtom() throws Narsese.NarseseException {
         //TODO test parsing to numeric atom types
         float f = 1.24f;
         String ff = Float.toString(f);
@@ -458,7 +459,7 @@ public class NarseseTest {
     }
 
     @Test
-    public void testImageIndex() {
+    public void testImageIndex() throws Narsese.NarseseException {
         for (char c : new char[] { '/', '\\'}) {
             {
                 Compound t = term("(" + c + ",open,$1,_)");
@@ -473,33 +474,33 @@ public class NarseseTest {
     }
 
     @Test
-    public void testImageExtRel0() { testImageExtRel("(a-->(/,_,y,z))", 0); }
+    public void testImageExtRel0() throws Narsese.NarseseException { testImageExtRel("(a-->(/,_,y,z))", 0); }
     @Test
-    public void testImageIntRel0() { testImageIntRel("((\\,_,y,z)-->a)", 0); }
+    public void testImageIntRel0() throws Narsese.NarseseException { testImageIntRel("((\\,_,y,z)-->a)", 0); }
 
     @Test
-    public void testImageExtRel1() { testImageExtRel("(a-->(/,x,_,z))", 1); }
+    public void testImageExtRel1() throws Narsese.NarseseException { testImageExtRel("(a-->(/,x,_,z))", 1); }
     @Test
-    public void testImageIntRel1() { testImageIntRel("((\\,x,_,z)-->a)", 1); }
+    public void testImageIntRel1() throws Narsese.NarseseException { testImageIntRel("((\\,x,_,z)-->a)", 1); }
 
     @Test
-    public void testImageExtRel2() { testImageExtRel("(a-->(/,x,y,_))", 2); }
+    public void testImageExtRel2() throws Narsese.NarseseException { testImageExtRel("(a-->(/,x,y,_))", 2); }
     @Test
-    public void testImageIntRel2() { testImageIntRel("((\\,x,y,_)-->a)", 2); }
+    public void testImageIntRel2() throws Narsese.NarseseException { testImageIntRel("((\\,x,y,_)-->a)", 2); }
 
-    private void testImageIntRel(@NotNull String imageTerm, int relationIndexExpected) {
+    private void testImageIntRel(@NotNull String imageTerm, int relationIndexExpected) throws Narsese.NarseseException {
         Compound ti = term(imageTerm);
         assertEquals(relationIndexExpected, ((Compound)ti.term(0)).dt()  );
         assertEquals(imageTerm, ti.toString());
     }
 
-    private void testImageExtRel(@NotNull String imageTerm, int relationIndexExpected) {
+    private void testImageExtRel(@NotNull String imageTerm, int relationIndexExpected) throws Narsese.NarseseException {
         Compound ti = term(imageTerm);
         assertEquals(relationIndexExpected, ((Compound)ti.term(1)).dt() );
         assertEquals(imageTerm, ti.toString());
     }
 
-    private void taskParses(@NotNull String s) {
+    private void taskParses(@NotNull String s) throws Narsese.NarseseException {
         Task t = task(s);
         assertNotNull(t);
 //        Task u = oldParser.parseTaskOld(s, true);
@@ -545,11 +546,11 @@ public class NarseseTest {
     }
 
     @Test
-    public void testMultilineQuotes() {
+    public void testMultilineQuotes() throws Narsese.NarseseException {
 
         String a = "js(\"\"\"\n" + "1\n" + "\"\"\")";
-        System.out.println(a +  " " + $.$(a));
-        assertEquals(a, $.$(a).toString());
+        System.out.println(a +  " " + $(a));
+        assertEquals(a, $(a).toString());
         List<Task> l = tasks(a + "!");
         assertEquals(1, l.size());
     }
@@ -608,7 +609,7 @@ public class NarseseTest {
     }
 
 
-    @Test public void testEmptyProduct() {
+    @Test public void testEmptyProduct() throws Narsese.NarseseException {
         Compound e = term("()");
         assertNotNull(e);
         assertEquals(0, e.size());

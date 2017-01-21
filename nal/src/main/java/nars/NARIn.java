@@ -44,7 +44,7 @@ public interface NARIn {
     }
 
     @NotNull
-    default Task inputAndGet(@NotNull String taskText) {
+    default Task inputAndGet(@NotNull String taskText) throws Narsese.NarseseException {
         return inputAndGet(Narsese.the().task(taskText, nar()));
     }
 

@@ -1,6 +1,7 @@
 package nars.term;
 
 import nars.NAR;
+import nars.Narsese;
 import nars.Task;
 import nars.nar.Terminal;
 import org.junit.Test;
@@ -21,7 +22,7 @@ public class VariableTransformationTest {
 //    }
 
     @Test
-    public void testDestructiveNormalization() {
+    public void testDestructiveNormalization() throws Narsese.NarseseException {
         String t = "<$x --> y>";
         String n = "($1-->y)";
         NAR nar = new Terminal(32);
@@ -47,7 +48,7 @@ public class VariableTransformationTest {
 //        assertEquals(e, c);
 //    }
 
-    @Test public void varNormTestIndVar() {
+    @Test public void varNormTestIndVar() throws Narsese.NarseseException {
         //<<($1, $2) --> bigger> ==> <($2, $1) --> smaller>>. gets changed to this: <<($1, $4) --> bigger> ==> <($2, $1) --> smaller>>. after input
 
         NAR n = new Terminal(16);

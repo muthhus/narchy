@@ -1,9 +1,6 @@
 package nars.op;
 
-import nars.$;
-import nars.NAR;
-import nars.Op;
-import nars.Task;
+import nars.*;
 import nars.task.MutableTask;
 import nars.term.Compound;
 import nars.term.Term;
@@ -31,12 +28,16 @@ public interface Command extends Operator {
                 run((Atomic) (c.term(1)), ((Compound) (t.term(0))).terms(), nar);
                 return t;
             } catch (Throwable error) {
-                StringWriter ss = new StringWriter();
-                ExceptionUtils.printRootCauseStackTrace(error, new PrintWriter(ss));
-                return logTask(ss.toString());
+                return error(error);
             }
         }
         return null;
+    }
+
+    static Task error(Throwable error) {
+        StringWriter ss = new StringWriter();
+        ExceptionUtils.printRootCauseStackTrace(error, new PrintWriter(ss));
+        return Command.task("error", $.quote(ss.toString()));
     }
 
     void run(@NotNull Atomic op, @NotNull Term[] args, @NotNull NAR nar);
@@ -46,7 +47,11 @@ public interface Command extends Operator {
     }
 
     static Task logTask(@NotNull Term content) {
-        return Command.task($.func("log", content));
+        return Command.task("log", content);
+    }
+
+    static Task task(String func, @NotNull Term... args) {
+        return Command.task($.func(func, args));
     }
 
     static Task logTask(@NotNull String msg) {
@@ -60,5 +65,6 @@ public interface Command extends Operator {
     static void log(NAR nar, @NotNull String msg) {
         nar.inputLater( Command.logTask(msg) );
     }
+
 
 }

@@ -1,10 +1,7 @@
 package nars.task;
 
 import com.google.common.collect.Sets;
-import nars.$;
-import nars.IO;
-import nars.NAR;
-import nars.Task;
+import nars.*;
 import nars.nar.Default;
 import nars.nar.Terminal;
 import nars.term.Compound;
@@ -81,7 +78,7 @@ public class TermIOTest {
 
     //    /* https://github.com/RuedigerMoeller/fast-serialization/wiki/Serialization*/
     @Test
-    public void testTermSerialization() {
+    public void testTermSerialization() throws Narsese.NarseseException {
 
         assertEqualSerialize(nar.term("<a-->b>").term() /* term, not the concept */);
         assertEqualSerialize(nar.term("<aa-->b>").term() /* term, not the concept */);
@@ -91,15 +88,15 @@ public class TermIOTest {
         assertEqualSerialize(nar.term("exe(a,b)").term() /* term, not the concept */);
     }
     @Test
-    public void testTermSerialization2() {
+    public void testTermSerialization2() throws Narsese.NarseseException {
         assertTermEqualSerialize("<a-->(be)>");
     }
     @Test
-    public void testTermSerialization3() {
+    public void testTermSerialization3() throws Narsese.NarseseException {
         assertTermEqualSerialize("(#a --> b)");
     }
     @Test
-    public void testTermSerialization3_2() {
+    public void testTermSerialization3_2() throws Narsese.NarseseException {
         //multiple variables
 
         Variable q = $.varQuery(1);
@@ -118,7 +115,7 @@ public class TermIOTest {
 
     }
 
-    void assertTermEqualSerialize(@NotNull String s) {
+    void assertTermEqualSerialize(@NotNull String s) throws Narsese.NarseseException {
         Termed t = nar.term(s);
         assertTrue(t.isNormalized());
         assertTrue(t.term().isNormalized());
@@ -126,14 +123,14 @@ public class TermIOTest {
     }
 
     @Test
-    public void testTaskSerialization() {
+    public void testTaskSerialization() throws Narsese.NarseseException {
         assertEqualSerialize(nar.inputAndGet("<a-->b>."));
         assertEqualSerialize(nar.inputAndGet("<a-->(b==>c)>!"));
         assertEqualSerialize(nar.inputAndGet("<a-->(b==>c)>?"));
         assertEqualSerialize(nar.inputAndGet("$0.1;0.2;0.4$ (b-->c)! %1.0;0.8%"));
     }
 
-    @Test public void testTaskSerialization2() {
+    @Test public void testTaskSerialization2() throws Narsese.NarseseException {
         assertEqualSerialize(nar.inputAndGet("$0.3;0.2;0.1$ (a-->(bd))! %1.0;0.8%"));
     }
 

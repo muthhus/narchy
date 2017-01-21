@@ -1,6 +1,7 @@
 package nars.derive.meta;
 
 import nars.$;
+import nars.Narsese;
 import nars.Op;
 import nars.derive.meta.match.Ellipsis;
 import nars.derive.meta.match.EllipsisTransform;
@@ -36,7 +37,7 @@ public class EllipsisTransformTest {
         assertEquals(0, a.compareTo(a));
     }
 
-    @Test public void testEllipsisTransform() {
+    @Test public void testEllipsisTransform() throws Narsese.NarseseException {
         String s = "%A..%B=_..+";
         Ellipsis.EllipsisTransformPrototype t = $.$(s);
 

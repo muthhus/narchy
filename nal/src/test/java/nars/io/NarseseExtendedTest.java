@@ -22,12 +22,12 @@ import static org.junit.Assert.*;
 public class NarseseExtendedTest {
 
 
-    @Test public void testRuleComonent0() {
+    @Test public void testRuleComonent0() throws Narsese.NarseseException {
         assertNotNull($.$("((P ==> S), (S ==> P))"));
         assertNotNull($.$("((P ==> S), (S ==> P), neqCom(S,P), time(dtCombine))"));
     }
 
-    @Test public void testRuleComonent1() {
+    @Test public void testRuleComonent1() throws Narsese.NarseseException {
         String s = "((P ==> S), (S ==> P), neqCom(S,P), time(dtCombine), notImplEqui(P), notEqui(S), task(\"?\"))";
         assertNotNull($.$(s));
     }
@@ -51,7 +51,7 @@ public class NarseseExtendedTest {
         }
     }
 
-    @Test public void testOriginalTruth() {
+    @Test public void testOriginalTruth() throws Narsese.NarseseException {
         //singular form, normal, to test that it still works
         eternal(task("(a & b). %1.0;0.9%"));
 
@@ -62,7 +62,7 @@ public class NarseseExtendedTest {
 
 
     /** compact representation combining truth and tense */
-    @Test public void testTruthTense() {
+    @Test public void testTruthTense() throws Narsese.NarseseException {
 
 
         tensed(task("(a & b). %1.0|0.7%"), Present);
@@ -84,7 +84,7 @@ public class NarseseExtendedTest {
     }
 
     @Test
-    public void testColonReverseInheritance() {
+    public void testColonReverseInheritance() throws Narsese.NarseseException {
         Compound t = term("namespace:named");
         assertEquals(t.op(), Op.INH);
         assertEquals("named", t.term(0).toString());
@@ -112,16 +112,21 @@ public class NarseseExtendedTest {
     static void eqTerm(@NotNull String shorter, String expected) {
         Narsese p = Narsese.the();
 
-        Term a = p.term(shorter);
-        assertNotNull(a);
-        assertEquals(expected, a.toString());
 
-        eqTask(shorter, expected);
+        try {
+            Term a = p.term(shorter);
+            assertNotNull(a);
+            assertEquals(expected, a.toString());
+
+            eqTask(shorter, expected);
+        } catch (Narsese.NarseseException e) {
+            assertTrue(false);
+        }
     }
 
     static final Terminal t = new Terminal(8);
 
-    static void eqTask(String x, String b) {
+    static void eqTask(String x, String b) throws Narsese.NarseseException {
         Task a = t.task(x + '.');
         assertNotNull(a);
         assertEquals(b, a.term().toString());
@@ -153,7 +158,7 @@ public class NarseseExtendedTest {
     }
 
     @Test
-    public void testNamespaceLikeJSON() {
+    public void testNamespaceLikeJSON() throws Narsese.NarseseException {
         Narsese p = Narsese.the();
         Term a = p.term("{ a:x, b:{x,y} }");
         assertNotNull(a);
@@ -182,7 +187,7 @@ public class NarseseExtendedTest {
     }
 
     @Test
-    public void testNegation3() {
+    public void testNegation3() throws Narsese.NarseseException {
         //without comma
         assertEquals( "(--,(x))", term("--(x)").toString() );
         assertEquals( "(--,(x))", term("-- (x)").toString() );
@@ -219,7 +224,7 @@ public class NarseseExtendedTest {
 //    }
 
 
-    @Test public void testTripleQuote() {
+    @Test public void testTripleQuote() throws Narsese.NarseseException {
         assertEquals( "(\"\"\"triplequoted\"\"\")", term("(\"\"\"triplequoted\"\"\")").toString() );
         assertEquals( "(\"\"\"triple\"quoted\"\"\")", term("(\"\"\"triple\"quoted\"\"\")").toString() );
     }

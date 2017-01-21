@@ -44,7 +44,7 @@ public class QuestionTest {
     }
 
     /** question to answer matching */
-    public void testQuestionAnswer(int cycles, @NotNull String belief, @NotNull String question, @NotNull String expectedSolution) {
+    public void testQuestionAnswer(int cycles, @NotNull String belief, @NotNull String question, @NotNull String expectedSolution) throws Narsese.NarseseException {
         AtomicInteger ok = new AtomicInteger(0);
 
 
@@ -82,7 +82,7 @@ public class QuestionTest {
     }
 
 
-    @Test public void testQuestionHandler() {
+    @Test public void testQuestionHandler() throws Narsese.NarseseException {
         NAR nar = new Terminal();
 
         final int[] s = {0};
@@ -100,7 +100,7 @@ public class QuestionTest {
 
     }
 
-    @Test public void testOperationHandler() {
+    @Test public void testOperationHandler() throws Narsese.NarseseException {
         NAR nar = new Terminal();
 
         final int[] s = {0};

@@ -5,8 +5,7 @@ import nars.Narsese;
 import org.junit.Test;
 
 import static nars.$.$;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.*;
 
 /**
  * Created by me on 8/28/15.
@@ -17,7 +16,7 @@ public class VariableTest {
     static final Narsese p = Narsese.the();
 
     @Test
-    public void testPatternVarVolume() {
+    public void testPatternVarVolume() throws Narsese.NarseseException {
 
         assertEquals(0, p.term("$x").complexity());
         assertEquals(1, p.term("$x").volume());
@@ -30,7 +29,7 @@ public class VariableTest {
 
     }
 
-    @Test public void testNumVars() {
+    @Test public void testNumVars() throws Narsese.NarseseException {
         assertEquals(1, p.term("$x").vars());
         assertEquals(1, p.term("#x").vars());
         assertEquals(1, p.term("?x").vars());
@@ -72,7 +71,7 @@ public class VariableTest {
 //        );
 //    }
 
-    @Test public void testBooleanReductionViaHasPatternVar() {
+    @Test public void testBooleanReductionViaHasPatternVar() throws Narsese.NarseseException {
         Compound d = $("<a <-> <$1 --> b>>");
         assertEquals(0,  d.varPattern() );
 
@@ -136,8 +135,13 @@ public class VariableTest {
     }
 
     private static Compound raw(String a) {
-        return (Compound) $.terms.parseRaw(a);
-    }
+        try {
+            return (Compound) $.terms.parseRaw(a);
+        } catch (Narsese.NarseseException e) {
+            assertTrue(false);
+            return null;
+        }
+   }
 
     /** tests term sort order consistency */
     @Test public void testVariableSubtermSortAffect1() {

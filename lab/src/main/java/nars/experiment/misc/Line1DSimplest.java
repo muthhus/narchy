@@ -1,10 +1,7 @@
 package nars.experiment.misc;
 
 import jcog.Util;
-import nars.$;
-import nars.NAR;
-import nars.NAgent;
-import nars.Param;
+import nars.*;
 import nars.concept.ActionConcept;
 import nars.nar.Default;
 
@@ -32,7 +29,7 @@ public class Line1DSimplest extends NAgent {
     boolean print;
 
 
-    public Line1DSimplest(NAR n, IntToFloatFunction target) {
+    public Line1DSimplest(NAR n, IntToFloatFunction target) throws Narsese.NarseseException {
         super("", n, 1);
 
         this.targetFunc = target;
@@ -105,7 +102,7 @@ public class Line1DSimplest extends NAgent {
 
 
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Narsese.NarseseException {
 
         //XorShift128PlusRandom rng = new XorShift128PlusRandom((int) (Math.random() * 1000));
 

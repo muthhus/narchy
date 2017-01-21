@@ -29,13 +29,13 @@ public class ActionConcept extends WiredConcept implements WiredConcept.Prioriti
     static final int decisionDT = 0;
 
     public final ScalarSignal feedback;
-    private float feedbackConf = 0;
+    private float feedbackConf;
 
     private float currentFeedback;
 
     public FloatSupplier pri;
 
-    private boolean updateOnBeliefChange = false;
+    private final boolean updateOnBeliefChange = false;
 
     @Override
     public void pri(FloatSupplier v) {
@@ -89,7 +89,7 @@ public class ActionConcept extends WiredConcept implements WiredConcept.Prioriti
         this($(compoundTermString), n, motor);
     }
 
-    public ActionConcept(@NotNull Compound term, @NotNull NAR n, @NotNull MotorFunction motor) throws Narsese.NarseseException {
+    public ActionConcept(@NotNull Compound term, @NotNull NAR n, @NotNull MotorFunction motor) {
         super(term, n);
 
         //assert (Op.isOperation(this));

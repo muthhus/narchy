@@ -1,6 +1,7 @@
 package nars.task;
 
 import nars.NAR;
+import nars.Narsese;
 import nars.nar.Default;
 import nars.time.Tense;
 import org.junit.Test;
@@ -12,7 +13,7 @@ import static org.junit.Assert.assertTrue;
  */
 public class MutableTaskTest {
 
-    @Test public void testTenseEternality() {
+    @Test public void testTenseEternality() throws Narsese.NarseseException {
         NAR n = new Default();
 
         String s = "<a --> b>.";
@@ -27,7 +28,7 @@ public class MutableTaskTest {
 
     }
 
-    @Test public void testTenseOccurrenceOverrides() {
+    @Test public void testTenseOccurrenceOverrides() throws Narsese.NarseseException {
 
         NAR n = new Default();
 
@@ -40,7 +41,7 @@ public class MutableTaskTest {
     }
 
 
-//    @Test public void testStampTenseOccurenceOverrides() {
+//    @Test public void testStampTenseOccurenceOverrides() throws Narsese.NarseseException {
 //
 //        NAR n = new NAR(new Default());
 //

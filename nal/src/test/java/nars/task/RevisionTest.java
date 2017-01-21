@@ -1,10 +1,7 @@
 package nars.task;
 
 import jcog.data.random.XorShift128PlusRandom;
-import nars.$;
-import nars.NAR;
-import nars.Param;
-import nars.Task;
+import nars.*;
 import nars.bag.Bag;
 import nars.conceptualize.state.DefaultConceptState;
 import nars.nar.Default;
@@ -65,6 +62,8 @@ public class RevisionTest {
     }
 
 
+    public final static Compound AB = $.inh($.the("a"), $.the("b"));
+
     void testRevision(int delay1, boolean beliefOrGoal) {
         Param.DEBUG = true;
 
@@ -74,7 +73,7 @@ public class RevisionTest {
 
         //arbitrary time delays in which to observe that certain behavior does not happen
 
-        BeliefAnalysis b = new BeliefAnalysis(n, "<a-->b>")
+        BeliefAnalysis b = new BeliefAnalysis(n, AB)
             .input(beliefOrGoal, 1f, 0.9f).run(1);
 
         assertEquals(1, b.size(beliefOrGoal));
@@ -103,7 +102,7 @@ public class RevisionTest {
 
         int offCycles = 2;
 
-        BeliefAnalysis b = new BeliefAnalysis(n, "<a-->b>");
+        BeliefAnalysis b = new BeliefAnalysis(n, AB);
 
         //assertEquals(0.0, (Double) b.energy().get(MemoryBudget.Budgeted.ActiveConceptPrioritySum), 0.001);
 
@@ -148,7 +147,7 @@ public class RevisionTest {
 
 
 
-        BeliefAnalysis b = new BeliefAnalysis(n, "<a-->b>");
+        BeliefAnalysis b = new BeliefAnalysis(n, AB);
 
         //assertEquals(0.0, (Double) b.energy().get(MemoryBudget.Budgeted.ActiveConceptPrioritySum), 0.001);
 
@@ -211,7 +210,7 @@ public class RevisionTest {
     @Test public void testRevisionBudgetConserved() {
         Default  n = newNAR(6);
 
-        BeliefAnalysis b = new BeliefAnalysis(n, "<a-->b>");
+        BeliefAnalysis b = new BeliefAnalysis(n, AB);
 
         assertEquals(0, b.priSum(), 0.01f);
 
@@ -269,7 +268,7 @@ public class RevisionTest {
         b.tasklinks().print();
     }
 
-    @Test public void testIntermpolation1() {
+    @Test public void testIntermpolation1() throws Narsese.NarseseException {
         Compound a = $.$("(a &&+3 (b &&+3 c))");
         Compound b = $.$("(a &&+0 (b &&+3 c))");
         Compound c = $.$("(a &&+3 (b &&+0 c))");
@@ -290,7 +289,7 @@ public class RevisionTest {
         assertEquals("[(a &&+3 (b &&+0 c)), (a &&+3 (b &&+3 c))]", permutations(a, c).toString());
     }
 
-    @Test public void testIntermpolation2() {
+    @Test public void testIntermpolation2() throws Narsese.NarseseException {
         Compound f = $.$("(a &&+1 (b &&+1 c))");
         Compound g = $.$("(a &&+10 (b &&-10 c))");
 

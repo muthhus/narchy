@@ -161,7 +161,7 @@ abstract public class NAgent implements NSense, NAction {
 
         happy = new SensorConcept(
                 //"happy" + "(" + nar.self + ")", nar,
-                id.isEmpty() ? "(happy)" : "happy(" + id + ")",
+                id.isEmpty() ? $.p("happy") : $.func("happy", id),
                 nar,
                 rewardNormalized,
                 (x) -> t(x, alpha)

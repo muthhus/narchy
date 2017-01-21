@@ -2,10 +2,7 @@ package nars.gui;
 
 import com.google.common.collect.Lists;
 import com.jogamp.opengl.GL2;
-import nars.$;
-import nars.NAR;
-import nars.Param;
-import nars.Task;
+import nars.*;
 import nars.concept.Concept;
 import nars.nar.Default;
 import nars.table.BeliefTable;
@@ -210,7 +207,7 @@ public class TruthLab extends Grid {
     }
 
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Narsese.NarseseException {
         NAR n = new Default(1000, 64, 1, 3);
 
         SpaceGraph.window(

@@ -1,5 +1,6 @@
 package nars.term;
 
+import nars.Narsese;
 import org.junit.Test;
 
 import static nars.$.$;
@@ -11,7 +12,7 @@ import static org.junit.Assert.*;
 public class TermNormalizationTest {
 
     @Test
-    public void reuseVariableTermsDuringNormalization2() {
+    public void reuseVariableTermsDuringNormalization2() throws Narsese.NarseseException {
         for (String v : new String[] { "?a", "?b", "#a", "#c" }) {
             Compound eq = $("<<" + v +" --> b> <=> <" + v + " --> c>>");
             Term a = eq.subterm(0, 0);

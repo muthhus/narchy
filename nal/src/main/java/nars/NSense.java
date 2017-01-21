@@ -5,6 +5,8 @@ import jcog.math.FloatSupplier;
 import nars.concept.FuzzyScalarConcepts;
 import nars.concept.SensorConcept;
 import nars.term.Compound;
+import nars.term.Term;
+import nars.term.atom.Atomic;
 import nars.truth.Truth;
 import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunction;
 import org.jetbrains.annotations.NotNull;
@@ -14,6 +16,8 @@ import java.lang.reflect.Modifier;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.*;
+
+import static nars.$.*;
 
 /**
  * agent sensor builder
@@ -26,31 +30,20 @@ public interface NSense {
 
 
     @NotNull
-    default SensorConcept sense(@NotNull String term, @NotNull BooleanSupplier value) {
+    default SensorConcept sense(@NotNull Compound term, @NotNull BooleanSupplier value)  {
         return sense(term, () -> value.getAsBoolean() ? 1f : 0f);
     }
 
     @NotNull
-    default SensorConcept sense(@NotNull String term, FloatSupplier value) {
-        return sense($.$(term), value);
-    }
-    @NotNull
-    default SensorConcept sense(@NotNull Compound term, FloatSupplier value) {
-        return sense(term, value, (v)->$.t(v, alpha()));
+    default SensorConcept sense(@NotNull Compound term, FloatSupplier value)  {
+        return sense(term, value);
     }
 
-    @NotNull
-    default SensorConcept sense(@NotNull String term, FloatSupplier value, FloatToObjectFunction<Truth> truthFunc) {
-        return sense($.$(term), value, truthFunc);
-    }
     @NotNull
     default SensorConcept sense(@NotNull Compound term, FloatSupplier value, FloatToObjectFunction<Truth> truthFunc) {
         return sense(term, value, nar().truthResolution.floatValue(), truthFunc);
     }
-    @NotNull
-    default SensorConcept sense(@NotNull String term, FloatSupplier value, float resolution, FloatToObjectFunction<Truth> truthFunc) {
-        return sense($.$(term), value, resolution, truthFunc);
-    }
+
 
     @NotNull
     default SensorConcept sense(@NotNull Compound term, FloatSupplier value, float resolution, FloatToObjectFunction<Truth> truthFunc) {
@@ -74,27 +67,32 @@ public interface NSense {
     default <E extends Enum> void senseSwitch(String term, @NotNull Supplier<E> value) {
         E[] values = ((Class<? extends E>) value.get().getClass()).getEnumConstants();
         for (E e : values) {
-            String t = switchTerm(term, e.toString());
+            Compound t = switchTerm(term, e.toString());
             sense(t, () -> value.get() == e);
         }
     }
 
     @NotNull
-    static String switchTerm(String term, String e) {
-        //return "(" + e + " --> " + term + ")";
-        return "(" + term + " , " + e + ")";
+    static Compound switchTerm(String a, String b) {
+        return switchTerm(the(a), the(b));
     }
 
-    default void senseSwitch(String term, @NotNull IntSupplier value, int min, int max) {
+    @NotNull
+    static Compound switchTerm(Term a, Term b) {
+        //return "(" + e + " --> " + term + ")";
+        return p(a, b);//"(" + term + " , " + e + ")";
+    }
+
+    default void senseSwitch(Compound term, @NotNull IntSupplier value, int min, int max) {
         senseSwitch(term, value, Util.intSequence(min, max));
     }
 
     /**
      * interpret an int as a selector between (enumerated) integer values
      */
-    default void senseSwitch(String term, @NotNull IntSupplier value, @NotNull int[] values) {
+    default void senseSwitch(Term term, @NotNull IntSupplier value, @NotNull int[] values) {
         for (int e : values) {
-            String t = switchTerm(term, String.valueOf(e));
+            Compound t = switchTerm(term, the(e));
             sense(t, () -> value.getAsInt() == e);
         }
     }
@@ -104,7 +102,7 @@ public interface NSense {
      */
     default <O> void senseSwitch(String term, @NotNull Supplier<O> value, @NotNull O... values) {
         for (O e : values) {
-            String t = switchTerm(term, "\"" + e.toString() + "\"");
+            Compound t = switchTerm(term, "\"" + e.toString() + "\"");
             sense(t, () -> value.get().equals(e));
         }
     }
@@ -159,7 +157,7 @@ public interface NSense {
 
     @NotNull
     default List<SensorConcept> senseNumber(int from, int to, IntFunction<String> id, IntFunction<FloatSupplier> v) {
-        List<SensorConcept> l = $.newArrayList(to-from);
+        List<SensorConcept> l = newArrayList(to-from);
         for (int i = from; i < to; i++) {
             l.addAll( senseNumber(id.apply(i), v.apply(i)).sensors );
         }
@@ -168,13 +166,12 @@ public interface NSense {
 
 
     @NotNull
-    default FuzzyScalarConcepts senseNumber(String id, FloatSupplier v) {
-        String[] states = {id};
-        return senseNumber(v, states);
+    default FuzzyScalarConcepts senseNumber(Compound id, FloatSupplier v) {
+        return senseNumber(v, id);
     }
 
     @NotNull
-    default FuzzyScalarConcepts senseNumber(FloatSupplier v, String... states) {
+    default FuzzyScalarConcepts senseNumber(FloatSupplier v, Compound... states) {
         FuzzyScalarConcepts fs = new FuzzyScalarConcepts(
                v, nar(), FuzzyScalarConcepts.FuzzyTriangle, states
         );//.resolution(0.05f);
@@ -184,11 +181,13 @@ public interface NSense {
 
     @NotNull
     default FuzzyScalarConcepts senseNumberBi(String id, FloatSupplier v) {
-        return senseNumber(v,  "hi:" + id, "lo:" + id);
+        Atomic ID = the(id);
+        return senseNumber(v,  inh(ID, the("hi")), inh(ID, the("lo")));
     }
     @NotNull
     default FuzzyScalarConcepts senseNumberTri(String id, FloatSupplier v) {
-        return senseNumber(v,  "hi:" + id, "mid:" + id, "lo:" + id);
+        Atomic ID = the(id);
+        return senseNumber(v,  inh(ID, the("hi")), inh(ID, the("mid")), inh(ID, the("lo")));
     }
 
     @NotNull

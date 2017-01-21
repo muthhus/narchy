@@ -2,6 +2,7 @@ package nars.concept;
 
 import nars.$;
 import nars.NAR;
+import nars.Narsese;
 import nars.concept.dynamic.DynTruth;
 import nars.concept.dynamic.DynamicBeliefTable;
 import nars.nar.Default;
@@ -18,7 +19,7 @@ import static org.junit.Assert.*;
 public class DynamicBeliefTableTest {
 
     @Test
-    public void testDynamicConjunction2() {
+    public void testDynamicConjunction2() throws Narsese.NarseseException {
         NAR n = new Default();
         n.believe("a:x", 1f, 0.9f);
         n.believe("a:y", 1f, 0.9f);
@@ -30,7 +31,7 @@ public class DynamicBeliefTableTest {
     }
 
     @Test
-    public void testDynamicConjunction3() {
+    public void testDynamicConjunction3() throws Narsese.NarseseException {
         NAR n = new Default();
         n.believe("a:x", 1f, 0.9f);
         n.believe("a:y", 1f, 0.9f);
@@ -71,7 +72,7 @@ public class DynamicBeliefTableTest {
     }
 
     @Test
-    public void testDynamicConjunction2Temporal() {
+    public void testDynamicConjunction2Temporal() throws Narsese.NarseseException {
         NAR n = new Default();
         n.believe($("(x)"), (long)0, 1f, 0.9f);
         n.believe($("(y)"), (long)4, 1f, 0.9f);
@@ -114,7 +115,7 @@ public class DynamicBeliefTableTest {
 
     }
 
-    @Test public void testDynamicProductImageExtensional() {
+    @Test public void testDynamicProductImageExtensional() throws Narsese.NarseseException {
         NAR n = new Default();
 
         n.believe($("f(x,y)"), (long)0, 1f, 0.9f);
@@ -141,7 +142,7 @@ public class DynamicBeliefTableTest {
 
     }
 
-    @Test public void testDynamicProductImageIntensional() {
+    @Test public void testDynamicProductImageIntensional() throws Narsese.NarseseException {
         NAR n = new Default();
 
         n.believe($("(f-->(x,y))"), (long)0, 1f, 0.9f);

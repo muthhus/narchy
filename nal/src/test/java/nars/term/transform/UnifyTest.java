@@ -2,6 +2,7 @@ package nars.term.transform;
 
 import jcog.data.random.XorShift128PlusRandom;
 import nars.$;
+import nars.Narsese;
 import nars.Op;
 import nars.Param;
 import nars.term.Term;
@@ -20,7 +21,7 @@ import static org.junit.Assert.assertTrue;
 public class UnifyTest {
 
     @Test
-    public void testFindSubst1() {
+    public void testFindSubst1() throws Narsese.NarseseException {
         testFindSubst($.$("<a-->b>"), $.$("<?C-->b>"), true);
         testFindSubst($.$("(--,(a))"), $.$("<?C-->(b)>"), false);
     }

@@ -1,9 +1,6 @@
 package nars.term.transform;
 
-import nars.$;
-import nars.NAR;
-import nars.Op;
-import nars.Param;
+import nars.*;
 import nars.concept.Concept;
 import nars.index.term.PatternTermIndex;
 import nars.nar.Default;
@@ -54,36 +51,37 @@ public class UnificationTest {
 
         Term t1;
 
-        if (type == Op.VAR_PATTERN) {
+        try {
 
-            //special handling
-            final PatternTermIndex pi = new PatternTermIndex();
-            t1 = pi.get(pi.parse(s1), true).term();
+            if (type == Op.VAR_PATTERN) {
 
-        } else {
-            nar.believe(s1);
-            t1 = nar.concept(s1).term();
-        }
-        nar.believe(s2);
-        nar.run(2);
+                //special handling
+                final PatternTermIndex pi = new PatternTermIndex();
+                t1 = pi.get(pi.parse(s1), true).term();
+
+            } else {
+                nar.believe(s1);
+                t1 = nar.concept(s1).term();
+            }
+            nar.believe(s2);
+            nar.run(2);
 
 
-        Term t2 = nar.concept(s2).term();
+            Term t2 = nar.concept(s2).term();
+            Set<Term> t1u = ((Compound) t1).recurseTermsToSet(type);
+            Set<Term> t2u = ((Compound) t2).recurseTermsToSet(type);
 
-        Set<Term> t1u = ((Compound) t1).recurseTermsToSet(type);
-        Set<Term> t2u = ((Compound) t2).recurseTermsToSet(type);
+            int n1 = Sets.difference(t1u, t2u).size();
+            int n2 = Sets.difference(t2u, t1u).size();
 
-        int n1 = Sets.difference(t1u, t2u).size();
-        int n2 = Sets.difference(t2u, t1u).size();
+            //a somewhat strict lower bound
+            //int power = 4 * (1 + t1.volume() * t2.volume());
+            //power*=power;
 
-        //a somewhat strict lower bound
-        //int power = 4 * (1 + t1.volume() * t2.volume());
-        //power*=power;
+            AtomicBoolean subbed = new AtomicBoolean(false);
 
-        AtomicBoolean subbed = new AtomicBoolean(false);
-
-        final Term finalT = t1;
-        Unify sub = new Unify($.terms /* new Indexes.DefaultTermIndex(256, new XorShift128PlusRandom(1)) */, type, nar.random, Param.UnificationStackMax, Param.UnificationTermutesMax) {
+            final Term finalT = t1;
+            Unify sub = new Unify($.terms /* new Indexes.DefaultTermIndex(256, new XorShift128PlusRandom(1)) */, type, nar.random, Param.UnificationStackMax, Param.UnificationTermutesMax) {
 
 //            @Override
 //            public void onPartial() {
@@ -91,40 +89,47 @@ public class UnificationTest {
 //                System.out.println(xy);
 //            }
 
-            @Override
-            public boolean onMatch() {
+                @Override
+                public boolean onMatch() {
 
-                if (shouldSub) {
-                    if ((t2 instanceof Compound) && (finalT instanceof Compound)) {
-                        assertTrue((n2) <= (yx.size()));
-                        assertTrue((n1) <= (xy.size()));
+                    if (shouldSub) {
+                        if ((t2 instanceof Compound) && (finalT instanceof Compound)) {
+                            assertTrue((n2) <= (yx.size()));
+                            assertTrue((n1) <= (xy.size()));
+                        }
+
+                        assertFalse("incomplete: " + toString(), this.isEmpty());
+
+                        this.xy.forEachVersioned((k, v) -> {
+                            if (matchType(k))
+                                assertNotNull(v);
+                        });
+
+                        subbed.set(true);
+
+                    } else {
+                        //HACK there should be incomplete assignments even though this says it matched
+                        assertTrue("why matched?: " + xy.toString(), (n1) > (xy.size())); //|| (n2) <= (yx.size()));
+                        //assertFalse("match found but should not have", true);
                     }
 
-                    assertFalse("incomplete: " + toString(), this.isEmpty());
 
-                    this.xy.forEachVersioned((k, v) -> {
-                        if (matchType(k))
-                            assertNotNull(v);
-                    });
-
-                    subbed.set(true);
-
-                } else {
-                    //HACK there should be incomplete assignments even though this says it matched
-                    assertTrue("why matched?: " + xy.toString(), (n1) > (xy.size())); //|| (n2) <= (yx.size()));
-                    //assertFalse("match found but should not have", true);
+                    return true;
                 }
+            };
+            sub.unifyAll(t1, t2);
 
 
-                return true;
-            }
-        };
-        sub.unifyAll(t1, t2);
+            assertEquals(shouldSub, subbed.get());
+
+            return sub;
 
 
-        assertEquals(shouldSub, subbed.get());
+        } catch (Narsese.NarseseException e) {
+            assertTrue(false);
+            return null;
+        }
 
-        return sub;
     }
 
 

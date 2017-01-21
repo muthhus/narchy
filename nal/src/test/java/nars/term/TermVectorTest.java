@@ -1,11 +1,13 @@
 package nars.term;
 
 import nars.$;
+import nars.Narsese;
 import nars.term.container.TermContainer;
 import nars.term.container.TermSet;
 import nars.term.container.TermVector;
 import org.junit.Test;
 
+import static nars.task.RevisionTest.AB;
 import static org.junit.Assert.*;
 
 /**
@@ -16,7 +18,7 @@ public class TermVectorTest {
     @Test
     public void testSubtermsEquality() {
 
-        Compound a = $.inh("a", "b");
+        Compound a = AB;
         //return Atom.the(Utf8.toUtf8(name));
 
         //        int olen = name.length();
@@ -71,7 +73,7 @@ public class TermVectorTest {
 
     }
 
-    @Test public void testSortedTermContainer() {
+    @Test public void testSortedTermContainer() throws Narsese.NarseseException {
         TermContainer a = TermVector.the($.$("a"), $.$("b"));
         assertTrue(a.isSorted());
         TermContainer b = TermVector.the($.$("b"), $.$("a"));

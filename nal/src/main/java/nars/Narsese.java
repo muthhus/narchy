@@ -1036,12 +1036,12 @@ public class Narsese extends BaseParser<Object> {
                 vectorterms.add(p);
             } else if (p instanceof Op) {
 
-                if (op != null) {
-                    //if ((!allowInternalOp) && (!p.equals(op)))
-                    //throw new RuntimeException("Internal operator " + p + " not allowed here; default op=" + op);
-
-                    throw new NarseseException("Too many operators involved: " + op + ',' + p + " in " + stack + ':' + vectorterms);
-                }
+//                if (op != null) {
+//                    //if ((!allowInternalOp) && (!p.equals(op)))
+//                    //throw new RuntimeException("Internal operator " + p + " not allowed here; default op=" + op);
+//
+//                    throw new NarseseException("Too many operators involved: " + op + ',' + p + " in " + stack + ':' + vectorterms);
+//                }
 
                 op = (Op) p;
             }
@@ -1134,10 +1134,13 @@ public class Narsese extends BaseParser<Object> {
      */
     public static void tasks(String input, Consumer<Task> c, NAR m) {
         tasksRaw(input, o -> {
-            Task t = decodeTask(m, o);
-            if (t == null) {
-
-            } else {
+            Task t = null;
+            try {
+                t = decodeTask(m, o);
+            } catch (NarseseException e) {
+                t = Command.error(e);
+            }
+            if (t != null) {
                 c.accept(t);
             }
         });
@@ -1147,7 +1150,7 @@ public class Narsese extends BaseParser<Object> {
     /**
      * supplies the source array of objects that can construct a Task
      */
-    public static void tasksRaw(CharSequence input, Consumer<Object[]> c) {
+    public static void tasksRaw(CharSequence input, Consumer<Object[]> c)  {
 
         ParsingResult r = the().inputParser.run(input);
 
@@ -1157,12 +1160,12 @@ public class Narsese extends BaseParser<Object> {
             Object o = r.getValueStack().peek(i);
 
             if (o instanceof Task) {
-                //wrap the task in an array
                 c.accept(new Object[]{o});
             } else if (o instanceof Object[]) {
                 c.accept((Object[]) o);
             } else {
-                throw new RuntimeException("Unrecognized input result: " + o);
+                c.accept(new Object[]{Command.error(new NarseseException("Parse error: " + input))});
+                break;
             }
         }
     }
@@ -1216,8 +1219,8 @@ public class Narsese extends BaseParser<Object> {
             throw new NarseseException("Invalid task term");
         Term content = m.normalize((Compound) contentRaw);
         if (!(content instanceof Compound)) {
-            //throw new NarseseException("Task term unnormalizable: " + contentRaw);
-            return Command.task($.func("log", content));
+            throw new NarseseException("Task term unnormalizable: " + contentRaw);
+            //return Command.task($.func("log", content));
         } else {
 
             char punct = (Character) x[2];
@@ -1374,7 +1377,7 @@ public class Narsese extends BaseParser<Object> {
     /**
      * Describes an error that occurred while parsing Narsese
      */
-    public static class NarseseException extends RuntimeException {
+    public static class NarseseException extends Exception {
 
         @Nullable
         public final ParsingResult result;

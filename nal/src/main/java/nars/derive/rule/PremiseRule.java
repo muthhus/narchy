@@ -51,6 +51,12 @@ import static nars.term.Terms.*;
  */
 public class PremiseRule extends GenericCompound {
 
+    static final Term TaskAny = $.func("task", "any");
+    static final Term QUESTION_PUNCTUATION = $.inh($.the("Question"), $.the("Punctuation"));
+    static final Atomic BELIEF = $.the("Belief");
+    static final Atomic GOAL = $.the("Goal");
+
+
     public boolean allowBackward;
     public boolean allowForward = false;
 
@@ -1080,7 +1086,6 @@ public class PremiseRule extends GenericCompound {
         }
     }
 
-    static final Term TaskAny = $.$("task(any)");
 
 //    static final Term BELIEF = $.the("Belief");
 //    static final Term DESIRE = $.the("Desire");
@@ -1152,6 +1157,7 @@ public class PremiseRule extends GenericCompound {
         }
     }
 
+
     @NotNull
     private PremiseRule clonePermutation(Term newT, Term newB, Term newR, boolean question, @NotNull PatternTermIndex index) {
 
@@ -1185,9 +1191,9 @@ public class PremiseRule extends GenericCompound {
 
                     newConclusion.term(0), $.p(ss.filter((x) -> {
                         return !(((Compound) x).op() == Op.INH && (
-                                ((Compound) x).term(1).equals($.the("Belief"))
-                                        || ((Compound) x).term(1).equals($.the("Goal"))));
-                    }).append($("Punctuation:Question")))
+                                ((Compound) x).term(1).equals(BELIEF)
+                                        || ((Compound) x).term(1).equals(GOAL)));
+                    }).append(QUESTION_PUNCTUATION))
             );
 
         } else {

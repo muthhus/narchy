@@ -2,6 +2,7 @@ package nars.nal.nal7;
 
 import com.google.common.collect.Iterables;
 import nars.NAR;
+import nars.Narsese;
 import nars.concept.Concept;
 import nars.nar.Default;
 import nars.nar.Terminal;
@@ -35,7 +36,7 @@ public class TemporalInductionTest {
 
     }
 
-    @Test public void testTemporalRevision() {
+    @Test public void testTemporalRevision() throws Narsese.NarseseException {
 
         NAR n = new Terminal();
 

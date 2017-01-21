@@ -23,14 +23,14 @@ public class MutableTask extends AbstractTask {
     @Nullable
     private List log;
 
-    public MutableTask(@NotNull Termed<Compound> t, char punct, float freq, @NotNull NAR nar) throws Narsese.NarseseException {
+    public MutableTask(@NotNull Termed<Compound> t, char punct, float freq, @NotNull NAR nar) {
         this(t, punct, new DefaultTruth(freq, nar.confidenceDefault(punct)));
     }
 
     public MutableTask(@NotNull String compoundTermString, char punct, float freq, float conf) throws Narsese.NarseseException {
         this($.$(compoundTermString), punct, t(freq, conf));
     }
-    public MutableTask(@NotNull Termed<Compound> t, char punct, float freq, float conf) throws Narsese.NarseseException {
+    public MutableTask(@NotNull Termed<Compound> t, char punct, float freq, float conf) {
         this(t, punct, t(freq, conf));
     }
 

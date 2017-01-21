@@ -1,5 +1,6 @@
 package nars.term.compound;
 
+import nars.Narsese;
 import nars.Op;
 import nars.term.Compound;
 import nars.term.Term;
@@ -12,6 +13,7 @@ import static nars.$.$;
 
 /**
  * Annotates a GenericCompound with cached data to accelerate pattern matching
+ * TODO not finished yet
  */
 public class FastCompound extends GenericCompound {
 
@@ -53,7 +55,7 @@ public class FastCompound extends GenericCompound {
         System.out.println(toString() + "\n\tuniqueSubs=" + uniqueSubs);
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Narsese.NarseseException {
         FastCompound f = new FastCompound(
                 $("(&&,(MedicalCode-->MedicalIntangible),(MedicalIntangible-->#1),(SuperficialAnatomy-->#1),label(MedicalCode,MedicalCode),label(MedicalIntangible,MedicalIntangible),label(SuperficialAnatomy,SuperficialAnatomy))")
         );

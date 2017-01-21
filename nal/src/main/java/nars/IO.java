@@ -218,7 +218,11 @@ public class IO {
     public
     @Nullable
     static Term readSpecialTerm(@NotNull DataInput in, @NotNull TermIndex t) throws IOException {
-        return t.parseRaw(in.readUTF());
+        try {
+            return t.parseRaw(in.readUTF());
+        } catch (Narsese.NarseseException e) {
+            throw new IOException(e);
+        }
     }
 
     public static void writeTerm(@NotNull DataOutput out, @NotNull Term term) throws IOException {

@@ -2,6 +2,7 @@ package nars.nal.nal7;
 
 import nars.$;
 import nars.NAR;
+import nars.Narsese;
 import nars.nal.AbstractNALTest;
 import nars.test.TestNAR;
 import nars.time.FrameTime;
@@ -818,7 +819,7 @@ public class NAL7Test extends AbstractNALTest {
      * conj subset decomposition
      */
     @Test
-    public void testConjSubsetDecomposition() {
+    public void testConjSubsetDecomposition() throws Narsese.NarseseException {
         test()
                 //.nar.input( $.task( (Compound)$.parallel( $("(x)"), $("(y)"), $("(z)")), '.', 1f, 0.9f) )
                 //
@@ -845,7 +846,7 @@ public class NAL7Test extends AbstractNALTest {
     }
 
     @Test
-    public void testPrediction1() {
+    public void testPrediction1() throws Narsese.NarseseException {
 
         int n1 = 0; //time of 3rd repeat
 

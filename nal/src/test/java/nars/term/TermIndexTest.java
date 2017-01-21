@@ -3,6 +3,7 @@ package nars.term;
 import jcog.data.random.XorShift128PlusRandom;
 import nars.$;
 import nars.NAR;
+import nars.Narsese;
 import nars.Task;
 import nars.conceptualize.DefaultConceptBuilder;
 import nars.index.term.TermIndex;
@@ -27,7 +28,7 @@ public class TermIndexTest {
     );
 
     @Test
-    public void testTaskTermSharing1() {
+    public void testTaskTermSharing1() throws Narsese.NarseseException {
 
         NAR t = new Default();
 
@@ -41,7 +42,7 @@ public class TermIndexTest {
 
     }
 
-    void testIndex(@NotNull TermIndex i) {
+    void testIndex(@NotNull TermIndex i) throws Narsese.NarseseException {
         Terminal t = new Terminal();
         i.start(t);
         i.conceptBuilder().start(t);
@@ -76,7 +77,7 @@ public class TermIndexTest {
 //        );
 //        //testIndex(new MapIndex2(newHashMap(), conceptBuilder));
 //    }
-    @Test public void testTermSharing5c() {
+    @Test public void testTermSharing5c() throws Narsese.NarseseException {
         testIndex(
                 new Default.DefaultTermTermIndex(1024)
         );
@@ -95,7 +96,7 @@ public class TermIndexTest {
 //    }
 
 
-    void testTermSharing(@NotNull TermIndex tt) {
+    void testTermSharing(@NotNull TermIndex tt) throws Narsese.NarseseException {
 
         tt.start(new Terminal());
         testShared(tt, "<<x-->w> --> <y-->z>>");
@@ -123,14 +124,14 @@ public class TermIndexTest {
 //
 //    }
 
-    private void testNotShared(@NotNull NAR n, @NotNull String s) {
+    private void testNotShared(@NotNull NAR n, @NotNull String s) throws Narsese.NarseseException {
         Termed t1 = n.term(s); //create by parsing
         Termed t2 = n.term(s); //create by parsing again
         assertEquals(t1, t2);
         assertTrue(t1 != t2);
     }
 
-    private void testShared(@NotNull TermIndex i, @NotNull String s) {
+    private void testShared(@NotNull TermIndex i, @NotNull String s) throws Narsese.NarseseException {
 
         int t0 = i.size();
         //int s0 = i.subtermsCount();

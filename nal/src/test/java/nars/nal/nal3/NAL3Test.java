@@ -3,6 +3,7 @@ package nars.nal.nal3;
 
 import nars.$;
 import nars.NAR;
+import nars.Narsese;
 import nars.nal.AbstractNALTest;
 import nars.test.TestNAR;
 import org.junit.Test;
@@ -110,7 +111,7 @@ public class NAL3Test extends AbstractNALTest {
     }
 
     @Test
-    public void set_operations2_difference()  {
+    public void set_operations2_difference() throws Narsese.NarseseException {
         assertEquals("{Mars,Venus}", $.diffe($.$("{Mars,Pluto,Venus}"),$.$("{Pluto,Saturn}")).toString());
 
         TestNAR tester = test();

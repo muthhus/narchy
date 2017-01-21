@@ -1,6 +1,7 @@
 package nars.nal.nal8;
 
 import nars.IO;
+import nars.Narsese;
 import nars.Param;
 import nars.nar.Default;
 import nars.nar.Terminal;
@@ -100,7 +101,7 @@ public class TermFunctionTest {
 //    }
 
     @Test
-    public void testJSON1() {
+    public void testJSON1() throws Narsese.NarseseException {
         Term t = IO.fromJSON("{ \"a\": [1, 2], \"b\": \"x\", \"c\": { \"d\": 1 } }");
         assertEquals($("{(\"x\"-->b),a(1,2),({(1-->d)}-->c)}").toString(), t.toString());
     }
@@ -111,12 +112,12 @@ public class TermFunctionTest {
     }
 
     @Test
-    public void testParseJSONTermFunction() {
+    public void testParseJSONTermFunction() throws Narsese.NarseseException {
         Term u = new Terminal().inputAndGet("jsonParse(\"{ \"a\": [1, 2] }\").").term();
         assertEquals("{a(1,2)}", u.toString());
     }
     @Test
-    public void testToStringJSONTermFunction() {
+    public void testToStringJSONTermFunction() throws Narsese.NarseseException {
         Term u = new Terminal().inputAndGet("jsonStringify((x,y,z)).").term();
         assertEquals("json(\"[\"x\",\"y\",\"z\"]\")", u.toString());
     }

@@ -86,8 +86,8 @@ public class TopCraft extends NAgents {
 
 
         senseSwitch("dir(cra)", ()->craft.player.dir, 0, 4);
-        sense("stamina(cra)", ()->(craft.player.stamina)/((float)craft.player.maxStamina));
-        sense("health(cra)", ()->(craft.player.health)/((float)craft.player.maxHealth));
+        sense($.func("stamina", "cra"), ()->(craft.player.stamina)/((float)craft.player.maxStamina));
+        sense($.func("health", "cra"), ()->(craft.player.health)/((float)craft.player.maxHealth));
 
         int tileMax = 13;
         senseSwitch("tile(cra,here)", ()->craft.player.tile().id, 0, tileMax);
@@ -97,8 +97,8 @@ public class TopCraft extends NAgents {
         senseSwitch("tile(cra,left)", ()->craft.player.tile(-1,0).id, 0, tileMax);
 
         InputHandler input = craft.input;
-        actionToggleRapid("fire(cra)", (b) -> input.attack.toggle(b), 16 );
-        actionTriState("move(cra,X)", (i)->{
+        actionToggleRapid($.func("fire", "cra"), (b) -> input.attack.toggle(b), 16 );
+        actionTriState($.func("move","cra", "X"), (i)->{
            boolean l = false, r = false;
            switch (i) {
                case -1: l = true;  break;
@@ -107,7 +107,7 @@ public class TopCraft extends NAgents {
            input.left.toggle(l);
            input.right.toggle(r);
         });
-        actionTriState("move(cra,Y)", (i)->{
+        actionTriState($.func("move","cra", "Y"), (i)->{
             boolean u = false, d = false;
             switch (i) {
                 case -1:  u = true;  break;
@@ -116,7 +116,7 @@ public class TopCraft extends NAgents {
             input.up.toggle(u);
             input.down.toggle(d);
         });
-        actionToggle("menu(cra)", (b) -> input.menu.toggle(b) );
+        actionToggle($.func("menu", "cra"), (b) -> input.menu.toggle(b) );
 
 //        Param.DEBUG = true;
 //        nar.onTask(t ->{

@@ -6,6 +6,8 @@ import jcog.math.FloatSupplier;
 import nars.$;
 import nars.NAR;
 import nars.Op;
+import nars.term.Compound;
+import nars.term.Term;
 import nars.truth.Truth;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
@@ -59,11 +61,11 @@ public class FuzzyScalarConcepts implements Iterable<SensorConcept> {
     };
 
 
-    public FuzzyScalarConcepts(@NotNull MutableFloat input, @NotNull NAR nar, @NotNull String... states) {
+    public FuzzyScalarConcepts(@NotNull MutableFloat input, @NotNull NAR nar, @NotNull Compound... states) {
         this(input, nar, FuzzyTriangle, states);
     }
 
-    public FuzzyScalarConcepts(@NotNull MutableFloat input, @NotNull NAR nar, FuzzyModel truther,  @NotNull String... states) {
+    public FuzzyScalarConcepts(@NotNull MutableFloat input, @NotNull NAR nar, FuzzyModel truther,  @NotNull Compound... states) {
         this(input::floatValue, nar, truther, states);
     }
 
@@ -71,7 +73,7 @@ public class FuzzyScalarConcepts implements Iterable<SensorConcept> {
         public Truth truth(float valueNormalized, int conceptIndex, int maxConcepts, NAR nar);
     }
 
-    public FuzzyScalarConcepts(FloatSupplier input, @NotNull NAR nar, FuzzyModel truther, @NotNull String... states) {
+    public FuzzyScalarConcepts(FloatSupplier input, @NotNull NAR nar, FuzzyModel truther, @NotNull Compound... states) {
 
 
         this.conf = nar.confidenceDefault(Op.BELIEF);
@@ -84,7 +86,7 @@ public class FuzzyScalarConcepts implements Iterable<SensorConcept> {
 
         if (num > 1) {
             int i = 0;
-            for (String s : states) {
+            for (Compound s : states) {
 
                 int ii = i;
 

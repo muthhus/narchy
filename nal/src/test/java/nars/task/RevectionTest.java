@@ -1,9 +1,6 @@
 package nars.task;
 
-import nars.$;
-import nars.NAR;
-import nars.Param;
-import nars.Task;
+import nars.*;
 import nars.test.analyze.BeliefAnalysis;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
@@ -26,7 +23,7 @@ import static org.junit.Assert.assertTrue;
 public class RevectionTest {
 
     @Test
-    public void testRevisionEquivalence()  {
+    public void testRevisionEquivalence() throws Narsese.NarseseException {
         MutableTask a = t(1f, 0.5f, 0); //c~=0.67
         a.evidence(new long[] { 0 } );
         MutableTask b = t(1f, 0.5f, 0);
@@ -40,7 +37,7 @@ public class RevectionTest {
     }
 
     @Test
-    public void testRevisionInequivalenceDueToTemporalSeparation() {
+    public void testRevisionInequivalenceDueToTemporalSeparation() throws Narsese.NarseseException {
         MutableTask a = t(1f, 0.5f, -4).evidence(1).dur(1);
         MutableTask b = t(0f, 0.5f, 4).evidence(2).dur(1);
 
@@ -54,14 +51,14 @@ public class RevectionTest {
 
 
     @Test
-    public void testRevisionEquivalence2Instant() {
+    public void testRevisionEquivalence2Instant() throws Narsese.NarseseException {
         Task a = t(1f, 0.5f, 0);
         Task b = t(0f, 0.5f, 0);
         assertEquals( Revision.revise(a, b), TruthPolation.truth(0, a, b) );
     }
 
     @Test
-    public void testPolation1() {
+    public void testPolation1() throws Narsese.NarseseException {
         Task a = t(1f, 0.5f, 3).evidence(1).dur(1);
         Task b = t(0f, 0.5f, 6).evidence(2).dur(1);
         for (int i = 0; i < 10; i++) {
@@ -83,7 +80,7 @@ public class RevectionTest {
     }
 
     @Test
-    public void testRevisionEquivalence4() {
+    public void testRevisionEquivalence4() throws Narsese.NarseseException {
         Task a = t(0f, 0.1f, 3).evidence(1).dur(1);
         Task b = t(0f, 0.1f, 4).evidence(2).dur(1);
         Task c = t(1f, 0.1f, 5).evidence(3).dur(1);
@@ -96,7 +93,7 @@ public class RevectionTest {
 
     }
 
-    public static MutableTask t(float freq, float conf, long occ) {
+    public static MutableTask t(float freq, float conf, long occ) throws Narsese.NarseseException {
         return new MutableTask("a:b", '.', $.t(freq, conf)).time(0, occ);
     }
 
@@ -134,7 +131,7 @@ public class RevectionTest {
 
 
     @Test
-    public void testTemporalProjectionInterpolation() {
+    public void testTemporalProjectionInterpolation() throws Narsese.NarseseException {
 
         Param.DEBUG = true;
 
@@ -225,7 +222,12 @@ public class RevectionTest {
 
         float outConf = w2c( c2w(inConf)*repeats );
 
-        BeliefAnalysis b = new BeliefAnalysis(n, "<a-->b>");
+        BeliefAnalysis b = null;
+        try {
+            b = new BeliefAnalysis(n, "<a-->b>");
+        } catch (Narsese.NarseseException e) {
+            assertTrue(false);
+        }
         for (int i = 0; i < repeats; i++) {
             b.believe(0.5f, freq, inConf, at);
         }
@@ -241,7 +243,7 @@ public class RevectionTest {
 
 
     @Test
-    public void testTemporalRevection() {
+    public void testTemporalRevection() throws Narsese.NarseseException {
 
         Param.DEBUG = true;
 

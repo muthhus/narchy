@@ -133,7 +133,7 @@ public enum $ {
 
 
     @Nullable
-    public static Compound inh(@NotNull String subj, @NotNull String pred) {
+    public static Compound inh(@NotNull String subj, @NotNull String pred) throws Narsese.NarseseException {
         return inh((Term)$(subj), (Term)$(pred));
     }
 
@@ -146,6 +146,9 @@ public enum $ {
 
     public static Compound func(@NotNull String opTerm, @Nullable Term... arg) {
         return func($.the(opTerm), arg);
+    }
+    public static Compound func(@NotNull String opTerm, @Nullable String... arg) {
+        return func($.the(opTerm), $.array(arg));
     }
 
     /** function ((a,b)==>c) aka: c(a,b) */
@@ -363,6 +366,14 @@ public enum $ {
 
    private static Term[] array(@NotNull Collection<? extends Term> t) {
         return t.toArray(new Term[t.size()]);
+    }
+    private static Term[] array(String... s) {
+        int l = s.length;
+        Term[] tt = new Term[l];
+        for (int i = 0; i < l; i++)
+            tt[i] = $.the(s[i]);
+
+        return tt;
     }
 
     @NotNull

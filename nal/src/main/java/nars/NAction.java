@@ -27,7 +27,7 @@ public interface NAction {
      * its initial state will remain indetermined until the first feedback is generated.
      * */
     @Nullable
-    default ActionConcept actionToggle(@NotNull String s, @NotNull Runnable on, @NotNull Runnable off) {
+    default ActionConcept actionToggle(@NotNull Compound s, @NotNull Runnable on, @NotNull Runnable off) {
 
         final int[] state = { 0 }; // 0: unknown, -1: false, +1: true
 
@@ -52,7 +52,7 @@ public interface NAction {
      * its initial state will remain indetermined until the first feedback is generated.
      * */
     @Nullable
-    default ActionConcept actionTriState(@NotNull String s, @NotNull IntConsumer i) {
+    default ActionConcept actionTriState(@NotNull Compound s, @NotNull IntConsumer i) {
 
 
         ActionConcept m = new ActionConcept(s, nar(), (b, d) -> {
@@ -91,11 +91,11 @@ public interface NAction {
     }
 
     @Nullable
-    default ActionConcept actionToggle(@NotNull String s, @NotNull BooleanProcedure onChange) {
+    default ActionConcept actionToggle(@NotNull Compound s, @NotNull BooleanProcedure onChange) {
         return actionToggle(s, () -> onChange.value(true), () -> onChange.value(false) );
     }
     @Nullable
-    default ActionConcept actionToggleRapid(@NotNull String s, @NotNull BooleanProcedure onChange, int minPeriod) {
+    default ActionConcept actionToggleRapid(@NotNull Compound s, @NotNull BooleanProcedure onChange, int minPeriod) {
         return actionToggleRapid(s, () -> onChange.value(true), () -> onChange.value(false), minPeriod );
     }
 
@@ -106,7 +106,7 @@ public interface NAction {
      * TODO generalize to actionPWM (pulse width modulation) with controllable reset period (ex: by frequency, or conf etc)
      * */
     @Nullable
-    default ActionConcept actionToggleRapid(@NotNull String term, @NotNull Runnable on, @NotNull Runnable off, int minPeriod) {
+    default ActionConcept actionToggleRapid(@NotNull Compound term, @NotNull Runnable on, @NotNull Runnable off, int minPeriod) {
 
         if (minPeriod < 1)
             throw new UnsupportedOperationException();
@@ -164,7 +164,7 @@ public interface NAction {
      * TODO make a FloatToFloatFunction variation in which a returned value in 0..+1.0 proportionally decreasese the confidence of any feedback
      */
     @NotNull
-    default ActionConcept action(@NotNull String s, @NotNull ActionConcept.MotorFunction update) {
+    default ActionConcept action(@NotNull String s, @NotNull ActionConcept.MotorFunction update) throws Narsese.NarseseException {
         return action($.$(s), update);
     }
 
@@ -182,7 +182,7 @@ public interface NAction {
      * TODO make a FloatToFloatFunction variation in which a returned value in 0..+1.0 proportionally decreasese the confidence of any feedback
      */
     @NotNull
-    default ActionConcept actionBipolar(@NotNull String s, @NotNull FloatPredicate update) {
+    default ActionConcept actionBipolar(@NotNull Compound s, @NotNull FloatPredicate update) {
         return action(s, (b, d) -> {
             if (d!=null) {
                 float f = d.freq();

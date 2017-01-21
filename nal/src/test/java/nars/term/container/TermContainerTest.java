@@ -1,6 +1,7 @@
 package nars.term.container;
 
 import nars.$;
+import nars.Narsese;
 import nars.term.Compound;
 import nars.term.Term;
 import org.junit.Test;
@@ -14,7 +15,7 @@ import static org.junit.Assert.*;
 public class TermContainerTest {
 
     @Test
-    public void testCommonSubterms() {
+    public void testCommonSubterms() throws Narsese.NarseseException {
         assertTrue(TermContainer.commonSubtermOrContainment($("x"), $("x")));
         assertFalse(TermContainer.commonSubtermOrContainment($("x"), $("y")));
         assertTrue(TermContainer.commonSubtermOrContainment($("(x,y,z)"), $("y")));
@@ -24,7 +25,7 @@ public class TermContainerTest {
     }
 
     @Test
-    public void testCommonSubtermsRecursion() {
+    public void testCommonSubtermsRecursion() throws Narsese.NarseseException {
         assertTrue(TermContainer.commonSubterms($("(x,y)"), $("{a,x}")));
         assertFalse(TermContainer.commonSubterms($("(x,y)"), $("{a,b}")));
 
@@ -33,7 +34,7 @@ public class TermContainerTest {
     }
 
     @Test
-    public void testUnionReusesInstance() {
+    public void testUnionReusesInstance() throws Narsese.NarseseException {
         Compound container = $("{a,b}");
         Compound contained = $("{a}");
         assertTrue(
@@ -48,7 +49,7 @@ public class TermContainerTest {
     }
 
     @Test
-    public void testDifferReusesInstance() {
+    public void testDifferReusesInstance() throws Narsese.NarseseException {
         Compound x = $("{x}");
         Compound y = $("{y}");
         assertTrue(
@@ -56,7 +57,7 @@ public class TermContainerTest {
         );
     }
     @Test
-    public void testIntersectReusesInstance() {
+    public void testIntersectReusesInstance() throws Narsese.NarseseException {
         Compound x = $("{x,y}");
         Compound y = $("{x,y}");
         assertTrue(
@@ -65,7 +66,7 @@ public class TermContainerTest {
     }
 
     @Test
-    public void testSomething() {
+    public void testSomething() throws Narsese.NarseseException {
         Compound x = $("{e,f}");
         Compound y = $("{e,d}");
 

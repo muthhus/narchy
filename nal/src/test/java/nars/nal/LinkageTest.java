@@ -3,6 +3,7 @@ package nars.nal;
 import com.google.common.collect.Lists;
 import nars.$;
 import nars.NAR;
+import nars.Narsese;
 import nars.concept.Concept;
 import nars.link.BLink;
 import nars.nar.Default;
@@ -220,10 +221,10 @@ public class LinkageTest extends AbstractNALTest {
         tester.mustBelieve(1,"<a --> b>",0.9f);
     }
 
-    public boolean links(@NotNull String premise1, String premise2, @NotNull TestNAR tester) {
+    public boolean links(@NotNull String premise1, String premise2, @NotNull TestNAR tester) throws Narsese.NarseseException {
         Concept ret = tester.nar.concept(premise1);
         boolean passed = false;
-        if(ret!=null && ret.termlinks()!=null) {
+        if(ret != null) {
             for (BLink<Term> entry : ret.termlinks()) {
                 Term et1 = entry.get().term();
                 if(et1.toString().equals(premise2)) {

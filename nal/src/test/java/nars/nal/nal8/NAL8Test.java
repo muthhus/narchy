@@ -2,6 +2,7 @@ package nars.nal.nal8;
 
 import nars.$;
 import nars.NAR;
+import nars.Narsese;
 import nars.nal.AbstractNALTest;
 import nars.term.Term;
 import nars.test.TestNAR;
@@ -460,7 +461,7 @@ public class NAL8Test extends AbstractNALTest {
     }
 
     @Test
-    public void subbelief_2()  {
+    public void subbelief_2() throws Narsese.NarseseException {
         Term t = $.$("(hold:(SELF,{t002}) &&+5 (at(SELF,{t001}) &&+5 open({t001})))");
         assertEquals(2, t.size());
 

@@ -6,6 +6,7 @@ package nars.nar;
 
 
 import com.google.common.collect.Iterables;
+import nars.Narsese;
 import nars.concept.Concept;
 import org.junit.Test;
 
@@ -20,7 +21,7 @@ import static org.junit.Assert.assertTrue;
  */
 public class AttentionTest {
     
-    @Test public void testSampleNextConcept() {
+    @Test public void testSampleNextConcept() throws Narsese.NarseseException {
         
         int numConcepts = 32;
         Default n = new Default();

@@ -2,10 +2,7 @@ package nars.test;
 
 import jcog.event.Topic;
 import jcog.meter.event.HitMeter;
-import nars.$;
-import nars.NAR;
-import nars.Param;
-import nars.Task;
+import nars.*;
 import nars.task.Tasked;
 import nars.test.analyze.EventCount;
 import nars.test.condition.EternalTaskCondition;
@@ -153,7 +150,11 @@ public class TestNAR  {
     @NotNull
     public TestNAR goal(@NotNull String t, @NotNull Tense tense, float f, float c) {
         finished = false;
-        nar.goal(nar.term(t), tense, f, c);
+        try {
+            nar.goal(nar.term(t), tense, f, c);
+        } catch (Narsese.NarseseException e) {
+            throw new RuntimeException(e);
+        }
         return this;
     }
 
@@ -232,7 +233,11 @@ public class TestNAR  {
 
     @NotNull
     public TestNAR mustOutput(long withinCycles, @NotNull String task)  {
-        return mustEmit(outputEvents, withinCycles, task);
+        try {
+            return mustEmit(outputEvents, withinCycles, task);
+        } catch (Narsese.NarseseException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 //    public TestNAR onAnswer(String solution, AtomicBoolean solved /* for detecting outside of this */) throws InvalidInputException {
@@ -256,7 +261,7 @@ public class TestNAR  {
 //    }
 
     @NotNull
-    public TestNAR mustEmit(@NotNull Topic<Tasked>[] c, long cycleStart, long cycleEnd, @NotNull String sentenceTerm, char punc, float freqMin, float freqMax, float confMin, float confMax)  {
+    public TestNAR mustEmit(@NotNull Topic<Tasked>[] c, long cycleStart, long cycleEnd, @NotNull String sentenceTerm, char punc, float freqMin, float freqMax, float confMin, float confMax) throws Narsese.NarseseException {
         return mustEmit(c, cycleStart, cycleEnd, sentenceTerm, punc, freqMin, freqMax, confMin, confMax, Tense.ETERNAL );
     }
 
@@ -267,11 +272,15 @@ public class TestNAR  {
 
     @NotNull
     TestNAR mustEmit(@NotNull Topic<Tasked>[] c, long cycleStart, long cycleEnd, @NotNull String sentenceTerm, char punc, float freqMin, float freqMax, float confMin, float confMax, long occTimeAbsolute)  {
-        return mustEmit(c, cycleStart, cycleEnd, sentenceTerm, punc, freqMin, freqMax, confMin, confMax, occTimeAbsolute, true);
+        try {
+            return mustEmit(c, cycleStart, cycleEnd, sentenceTerm, punc, freqMin, freqMax, confMin, confMax, occTimeAbsolute, true);
+        } catch (Narsese.NarseseException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @NotNull
-    TestNAR mustEmit(@NotNull Topic<Tasked>[] c, long cycleStart, long cycleEnd, @NotNull String sentenceTerm, char punc, float freqMin, float freqMax, float confMin, float confMax, long occTimeAbsolute, boolean must)  {
+    TestNAR mustEmit(@NotNull Topic<Tasked>[] c, long cycleStart, long cycleEnd, @NotNull String sentenceTerm, char punc, float freqMin, float freqMax, float confMin, float confMax, long occTimeAbsolute, boolean must) throws Narsese.NarseseException {
 
 
         float h = (freqMin!=-1) ? truthTolerance / 2.0f : 0;
@@ -340,7 +349,7 @@ public class TestNAR  {
     public final long time() { return nar.time(); }
 
     @NotNull
-    public TestNAR mustEmit(@NotNull Topic<Tasked>[] c, long withinCycles, @NotNull String task)  {
+    public TestNAR mustEmit(@NotNull Topic<Tasked>[] c, long withinCycles, @NotNull String task) throws Narsese.NarseseException {
         Task t = nar.task(task);
         //TODO avoid reparsing term from string
 
@@ -398,10 +407,14 @@ public class TestNAR  {
         if (freqMin < 0 || freqMin > 1f || freqMax < 0 || freqMax > 1f || confMin < 0 || confMin > 1f || confMax < 0 || confMax > 1f || freqMin!=freqMin || freqMax!=freqMax)
             throw new UnsupportedOperationException();
 
-        return mustEmit(outputEvents,
-                nar.time(), nar.time() + withinCycles,
-                sentenceTerm, punc, freqMin, freqMax, confMin,
-                confMax, occ, false);
+        try {
+            return mustEmit(outputEvents,
+                    nar.time(), nar.time() + withinCycles,
+                    sentenceTerm, punc, freqMin, freqMax, confMin,
+                    confMax, occ, false);
+        } catch (Narsese.NarseseException e) {
+            throw new RuntimeException(e);
+        }
 
     }
 
@@ -458,7 +471,11 @@ public class TestNAR  {
     public TestNAR ask(@NotNull String termString)  {
         //Override believe to input beliefs that have occurrenceTime set on input
         // "lazy timing" appropriate for test cases that can have delays
-        Task t = nar.ask(termString);
+        try {
+            Task t = nar.ask(termString);
+        } catch (Narsese.NarseseException e) {
+            throw new RuntimeException(e);
+        }
 
         //explainable(t);
         return this;
@@ -472,14 +489,23 @@ public class TestNAR  {
 
     @NotNull
     public TestNAR believe(@NotNull String... termString)  {
-        for (String s : termString)
-            nar.believe(s);
+        for (String s : termString) {
+            try {
+                nar.believe(s);
+            } catch (Narsese.NarseseException e) {
+                throw new RuntimeException(e);
+            }
+        }
         return this;
     }
 
     @NotNull
     public TestNAR believe(@NotNull String termString, float freq, float conf)  {
-        nar.believe(termString, freq, conf);
+        try {
+            nar.believe(termString, freq, conf);
+        } catch (Narsese.NarseseException e) {
+            throw new RuntimeException(e);
+        }
         return this;
     }
 

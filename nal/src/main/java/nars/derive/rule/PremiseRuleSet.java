@@ -2,10 +2,7 @@ package nars.derive.rule;
 
 import com.google.common.collect.Lists;
 import jcog.Util;
-import nars.$;
-import nars.IO;
-import nars.NAR;
-import nars.Param;
+import nars.*;
 import nars.derive.Deriver;
 import nars.index.term.PatternTermIndex;
 import nars.term.Compound;
@@ -236,32 +233,42 @@ public class PremiseRuleSet {
 
     @NotNull
     static Stream<Pair<Compound, String>> parse(@NotNull Collection<String> rawRules, @NotNull PatternTermIndex index) {
-        return rawRules.parallelStream()
+        return rawRules.stream()
                 //.distinct()
                 //.parallel()
                 //.sequential()
-                .map(src -> Tuples.pair(parse(src, index), src));
+                .map(src -> {
+                    try {
+                        return Tuples.pair(parse(src, index), src);
+                    } catch (Narsese.NarseseException e) {
+                        logger.error(" {}", e);
+                        return null;
+                    }
+                });
     }
 
     @NotNull
-    public static PremiseRule parse(@NotNull String src, @NotNull PatternTermIndex index) {
-
+    public static PremiseRule parse(@NotNull String src, @NotNull PatternTermIndex index) throws Narsese.NarseseException {
 
         //(Compound) index.parseRaw(src)
         String[] ab = src.split("\\|\\-");
         if (ab.length!=2) {
-            throw new RuntimeException("parse error");
+            throw new Narsese.NarseseException("Rule component must have arity=2, separated by \"|-\": " + src);
         }
 
         String A = '(' + ab[0].trim() + ')';
-        Compound ap = (Compound) index.parseRaw(A);
+        Term a = index.parseRaw(A);
+        if (!(a instanceof Compound)) {
+            throw new Narsese.NarseseException("Left rule component must be compound: " + src);
+        }
+
         String B = '(' + ab[1].trim() + ')';
         Term b = index.parseRaw(B);
         if (!(b instanceof Compound)) {
-            throw new RuntimeException("parse error not compound");
+            throw new Narsese.NarseseException("Right rule component must be compound: " + src);
         }
-        Compound bp = (Compound) b;
-        return new PremiseRule(ap, bp);
+
+        return new PremiseRule((Compound)a, (Compound)b);
     }
 
     @NotNull

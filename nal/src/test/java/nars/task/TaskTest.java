@@ -1,10 +1,7 @@
 package nars.task;
 
 import com.google.common.collect.Lists;
-import nars.$;
-import nars.NAR;
-import nars.Param;
-import nars.Task;
+import nars.*;
 import nars.nar.Default;
 import nars.nar.Terminal;
 import org.jetbrains.annotations.NotNull;
@@ -36,7 +33,7 @@ public class TaskTest {
      * which is determined by directly comparing their int hashcode
      * representation (which is perfect and lossless hash if truth epsilon
      * is sufficiently large) */
-    @Test public void testTaskOrderByTruthViaHash() {
+    @Test public void testTaskOrderByTruthViaHash() throws Narsese.NarseseException {
         Terminal n = new Terminal();
         TreeSet<Task> t = new TreeSet<>();
         int count = 0;
@@ -72,7 +69,7 @@ public class TaskTest {
 
 
     @Test
-    public void inputTwoUniqueTasksDef() {
+    public void inputTwoUniqueTasksDef() throws Narsese.NarseseException {
         inputTwoUniqueTasks(new Default());
     }
     /*@Test public void inputTwoUniqueTasksSolid() {
@@ -85,7 +82,7 @@ public class TaskTest {
         inputTwoUniqueTasks(new Default());
     }*/
 
-    public void inputTwoUniqueTasks(@NotNull NAR n) {
+    public void inputTwoUniqueTasks(@NotNull NAR n) throws Narsese.NarseseException {
 
         Param.DEBUG = true;
 

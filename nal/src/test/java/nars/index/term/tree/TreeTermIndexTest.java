@@ -1,6 +1,7 @@
 package nars.index.term.tree;
 
 import jcog.radixtree.MyConcurrentRadixTree;
+import nars.Narsese;
 import nars.conceptualize.DefaultConceptBuilder;
 import org.junit.Test;
 
@@ -16,7 +17,7 @@ import static org.junit.Assert.assertTrue;
 public class TreeTermIndexTest {
 
     @Test
-    public void testVolumeSubTrees() {
+    public void testVolumeSubTrees() throws Narsese.NarseseException {
         TreeTermIndex t = new TreeTermIndex(new DefaultConceptBuilder(), 128);
         t.set($("a"));
         t.set($("(a)"));

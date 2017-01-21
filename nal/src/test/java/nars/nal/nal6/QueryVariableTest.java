@@ -16,19 +16,19 @@ import static org.junit.Assert.assertTrue;
 
 public class QueryVariableTest {
 
-    @Test public void testNoVariableAnswer() {
+    @Test public void testNoVariableAnswer() throws Narsese.NarseseException {
         testQuestionAnswer("<a --> b>", "<a --> b>");
     }
-    @Test public void testQueryVariableAnswerUnified() {
+    @Test public void testQueryVariableAnswerUnified() throws Narsese.NarseseException {
 
         testQuestionAnswer("<a --> b>", "<?x --> b>");
     }
-    @Test public void testQueryVariableAnswerUnified2() {
+    @Test public void testQueryVariableAnswerUnified2() throws Narsese.NarseseException {
 
         testQuestionAnswer("<c --> (a&b)>", "<?x --> (a&b)>");
     }
 
-    void testQuestionAnswer(@NotNull String beliefString, @NotNull String question) {
+    void testQuestionAnswer(@NotNull String beliefString, @NotNull String question) throws Narsese.NarseseException {
 
         int time = 64;
 
@@ -56,7 +56,7 @@ public class QueryVariableTest {
     }
 
     @Test
-    public void testQuery1()  {
+    public void testQuery1() throws Narsese.NarseseException {
         testQueryAnswered(1, 32);
     }
 

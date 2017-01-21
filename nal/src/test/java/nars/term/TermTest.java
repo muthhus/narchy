@@ -32,8 +32,8 @@ import static java.lang.Long.toBinaryString;
 import static junit.framework.TestCase.assertFalse;
 import static junit.framework.TestCase.assertNotNull;
 import static nars.$.$;
-import static nars.$.inh;
 import static nars.Op.*;
+import static nars.task.RevisionTest.AB;
 import static nars.term.Term.False;
 import static org.junit.Assert.*;
 
@@ -334,12 +334,12 @@ public class TermTest {
 //        nullCachedName("{x}");
 //    }
 
-    @Test public void testPatternVar() {
+    @Test public void testPatternVar() throws Narsese.NarseseException {
         assertTrue($("%x").op() == Op.VAR_PATTERN);
     }
 
     @Test
-    public void termEqualityWithQueryVariables() {
+    public void termEqualityWithQueryVariables() throws Narsese.NarseseException {
         NAR n = new Terminal(8);
         String a = "<?1-->bird>";
         assertEquals(n.term(a), n.term(a));
@@ -348,12 +348,21 @@ public class TermTest {
     }
 
     protected void testTermEqualityNonNormalizing(@NotNull String s) {
-        testTermEquality(s, false);
+        try {
+            testTermEquality(s, false);
+        } catch (Narsese.NarseseException e) {
+            assertTrue(false);
+        }
     }
-    protected void testTermEquality(@NotNull String s) {
-        testTermEquality(s, true);
+    protected void testTermEquality(@NotNull String s)  {
+        try {
+            testTermEquality(s, true);
+        } catch (Narsese.NarseseException e) {
+            assertTrue(false);
+        }
     }
-    protected void testTermEquality(@NotNull String s, boolean normalize) {
+
+    protected void testTermEquality(@NotNull String s, boolean normalize) throws Narsese.NarseseException {
 
         NAR n = new Terminal(16);
 
@@ -429,7 +438,7 @@ public class TermTest {
     }
 
     @Test
-    public void termEqualityWithMixedVariables() {
+    public void termEqualityWithMixedVariables() throws Narsese.NarseseException {
 
         NAR n = new Terminal(16);
 
@@ -452,7 +461,7 @@ public class TermTest {
 
 
     @Test
-    public void statementHash() {
+    public void statementHash() throws Narsese.NarseseException {
         //this is a case where a faulty hash function produced a collision
         statementHash("i4", "i2");
         statementHash("{i4}", "{i2}");
@@ -466,12 +475,12 @@ public class TermTest {
     }
 
     @Test
-    public void statementHash2() {
+    public void statementHash2() throws Narsese.NarseseException {
         statementHash("<<{i4} --> r> ==> A(7)>", "<<{i2} --> r> ==> A(9)>");
     }
 
     @Test
-    public void statementHash3() {
+    public void statementHash3() throws Narsese.NarseseException {
 
         //this is a case where a faulty hash function produced a collision
         statementHash("<<{i0} --> r> ==> A(8)>", "<<{i1} --> r> ==> A(7)>");
@@ -480,7 +489,7 @@ public class TermTest {
         statementHash("<<{i10} --> r> ==> A(1)>", "<<{i11} --> r> ==> A(0)>");
     }
 
-    public void statementHash(@NotNull String a, @NotNull String b) {
+    public void statementHash(@NotNull String a, @NotNull String b) throws Narsese.NarseseException {
 
 
         Term ta = $(a);
@@ -494,7 +503,7 @@ public class TermTest {
     }
 
     @Test
-    public void testTermComplexityMass() {
+    public void testTermComplexityMass() throws Narsese.NarseseException {
         NAR n = new Terminal(8);
 
         testTermComplexityMass(n, "x", 1, 1);
@@ -510,11 +519,11 @@ public class TermTest {
         testTermComplexityMass(n, "<$a --> (c & #d)>", 3, 5, 1, 1, 0);
     }
 
-    private void testTermComplexityMass(@NotNull NAR n, @NotNull String x, int complexity, int mass) {
+    private void testTermComplexityMass(@NotNull NAR n, @NotNull String x, int complexity, int mass) throws Narsese.NarseseException {
         testTermComplexityMass(n, x, complexity, mass, 0, 0, 0);
     }
 
-    private void testTermComplexityMass(@NotNull NAR n, @NotNull String x, int complexity, int mass, int varIndep, int varDep, int varQuery) {
+    private void testTermComplexityMass(@NotNull NAR n, @NotNull String x, int complexity, int mass, int varIndep, int varDep, int varQuery) throws Narsese.NarseseException {
         Term t = n.term(x).term();
 
         assertNotNull(t);
@@ -535,7 +544,7 @@ public class TermTest {
     }
 
     @NotNull
-    public <C extends Compound> C testStructure(@NotNull String term, String bits) {
+    public <C extends Compound> C testStructure(@NotNull String term, String bits) throws Narsese.NarseseException {
         NAR n = new Terminal(16);
         C a = (C) n.term(term).term();
         assertEquals(bits, toBinaryString(a.structure()));
@@ -574,7 +583,7 @@ public class TermTest {
 //    }
 
     @Test
-    public void testImageConstruction() {
+    public void testImageConstruction() throws Narsese.NarseseException {
         Term e1 = imageExt($("X"), $("Y"), $("_"));
         Term e2 = imageExt($("X"), $("Y"), Op.Imdex);
         assertEquals(e1, e2);
@@ -588,12 +597,12 @@ public class TermTest {
     }
 
     @Test
-    public void testImageConstruction2() {
+    public void testImageConstruction2() throws Narsese.NarseseException {
         assertTrue($("(/,_,X,Y)").op().image);
         assertFalse($("(X,Y)").op().image);
 
-        assertValidTermValidConceptInvalidTaskContent(()->imageExt($("X"), $("Y")));
-        assertValidTermValidConceptInvalidTaskContent(()->imageInt($("X"), $("Y")));
+        assertValidTermValidConceptInvalidTaskContent(()->imageExt($.the("X"), $.the("Y")));
+        assertValidTermValidConceptInvalidTaskContent(()->imageInt($.the("X"), $.the("Y")));
 
         assertEquals("(/,X,_)", $("(/,X,_)").toString());
         assertEquals("(/,X,_)", imageExt($("X"), $("_")).toString());
@@ -627,6 +636,20 @@ public class TermTest {
             //correct if happens here
         }
     }
+    public static void assertValidTermValidConceptInvalidTaskContent(String o) {
+        try {
+
+
+            Terminal t = new Terminal(8);
+            t.believe(o);
+
+            assertTrue(o + " should not have been allowed as a task content", false);
+
+
+        } catch (Exception e) {
+            //correct if happens here
+        }
+    }
 
     @Test
     public void testImageInhConstruction() {
@@ -644,15 +667,13 @@ public class TermTest {
     }
 
     @Test public void testStatemntString() {
-        assertTrue(inh("a", "b").op().statement);
-        Term aInhB = $("<a-->b>");
-        assertTrue(aInhB instanceof Compound);
-        assertEquals("(a-->b)",
-                     aInhB.toString());
+        assertTrue(AB.op().statement);
+        assertTrue(AB instanceof Compound);
+        assertEquals("(a-->b)", AB.toString());
     }
 
     @Test
-    public void testImageConstructionExt() {
+    public void testImageConstructionExt() throws Narsese.NarseseException {
 
 
 
@@ -678,7 +699,7 @@ public class TermTest {
         );
     }
     @Test
-    public void testImageConstructionInt() {
+    public void testImageConstructionInt() throws Narsese.NarseseException {
         assertEquals(
                 imageInt($("X"), $("_"), $("Y")), $("(\\, X, _, Y)")
         );
@@ -691,16 +712,16 @@ public class TermTest {
     }
 
     @Test
-    public void testImageOrdering1() {
+    public void testImageOrdering1() throws Narsese.NarseseException {
         testImageOrdering('/');
     }
 
     @Test
-    public void testImageOrdering2() {
+    public void testImageOrdering2() throws Narsese.NarseseException {
         testImageOrdering('\\');
     }
 
-    void testImageOrdering(char v) {
+    void testImageOrdering(char v) throws Narsese.NarseseException {
         NAR n = new Terminal(16);
 
         Termed<Compound> aa = n.term("(" + v + ",x, y, _)");
@@ -733,7 +754,7 @@ public class TermTest {
     }
 
     @Test
-    public void testImageStructuralVector() {
+    public void testImageStructuralVector() throws Narsese.NarseseException {
 
         String i1 = "(/,x,y,_)";
         String i2 = "(/,x,_,y)";
@@ -760,22 +781,14 @@ public class TermTest {
 
 
     @Test
-    public void testSubTermStructure() {
+    public void testSubTermStructure() throws Narsese.NarseseException {
         NAR n = new Terminal(16);
-
-        assertTrue(
-                n.term("<a --> b>").term().impossibleSubTerm(
-                        n.term("<a-->b>").term()
-                )
-        );
-        assertTrue(
-                !Op.hasAll(n.term("<a --> b>").term().structure(), n.term("<a-->#b>").term().structure())
-        );
-
+        assertTrue( AB.term().impossibleSubTerm( AB.term() ) );
+        assertTrue( !Op.hasAll(AB.term().structure(), n.term("<a-->#b>").term().structure()) );
     }
 
     @Test
-    public void testCommutativeWithVariableEquality() {
+    public void testCommutativeWithVariableEquality() throws Narsese.NarseseException {
         NAR n = new Terminal(16);
 
         Termed a = n.term("<(&&, <#1 --> M>, <#2 --> M>) ==> <#2 --> nonsense>>");
@@ -796,7 +809,7 @@ public class TermTest {
     }
 
     @Test
-    public void testHash1() {
+    public void testHash1() throws Narsese.NarseseException {
         testUniqueHash("<A --> B>", "<A <-> B>");
         testUniqueHash("<A --> B>", "<A ==> B>");
         testUniqueHash("A", "B");
@@ -806,7 +819,7 @@ public class TermTest {
         testUniqueHash("$1", "#1");
     }
 
-    public void testUniqueHash(@NotNull String a, @NotNull String b) {
+    public void testUniqueHash(@NotNull String a, @NotNull String b) throws Narsese.NarseseException {
         NAR n = new Terminal(16);
 
         int h1 = n.term(a).hashCode();
@@ -814,14 +827,14 @@ public class TermTest {
         assertNotEquals(h1, h2);
     }
 
-    @Test public void testSetOpFlags() {
+    @Test public void testSetOpFlags() throws Narsese.NarseseException {
         assertTrue( $("{x}").op().isSet() );
         assertTrue( $("[y]}").op().isSet() );
         assertFalse( $("x").op().isSet() );
         assertFalse( $("a:b").op().isSet() );
     }
 
-    @Test public void testEmptyProductEquality()  {
+    @Test public void testEmptyProductEquality() throws Narsese.NarseseException {
         assertEquals( $("()"),$("()") );
         assertEquals( $("()"),Terms.ZeroProduct);
     }
@@ -833,8 +846,6 @@ public class TermTest {
             if (recv!=False) //False also signals invalid reduction
                 assertTrue(recv.toString() + " was not null", false);
         } catch (InvalidTermException e) {
-            //correct if happens here
-        } catch (Narsese.NarseseException e) {
             //correct if happens here
         }
     }

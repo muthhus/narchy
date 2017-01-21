@@ -1,5 +1,6 @@
 package nars.conceptualize.state;
 
+import nars.Narsese;
 import nars.nar.Default;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.junit.Test;
@@ -12,7 +13,7 @@ public class TaskBudgetingTest {
     /** taskbudgeting - structural deduction test
     decompose large conj, analyze the durability, quality decay */
     @Test
-    public void structuralDeduction1() {
+    public void structuralDeduction1() throws Narsese.NarseseException {
 
         DescriptiveStatistics qua = new DescriptiveStatistics();
 

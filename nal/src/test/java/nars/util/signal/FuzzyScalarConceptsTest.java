@@ -4,6 +4,7 @@ import jcog.Texts;
 import jcog.Util;
 import jcog.math.FloatNormalized;
 import jcog.math.FloatPolarNormalized;
+import nars.$;
 import nars.NAR;
 import nars.concept.FuzzyScalarConcepts;
 import nars.concept.SensorConcept;
@@ -33,7 +34,7 @@ public class FuzzyScalarConceptsTest {
         testSteadyFreqCondition(m,
             new FuzzyScalarConcepts(
                 new FloatNormalized(() -> m.floatValue()).updateRange(-1).updateRange(1),
-                d, FuzzyScalarConcepts.FuzzyTriangle, "(x)"),
+                d, FuzzyScalarConcepts.FuzzyTriangle, $.p("x")),
                 (f) -> Util.equals(f, 0.5f + 0.5f * m.floatValue(), tolerance)
         );
     }
@@ -46,7 +47,7 @@ public class FuzzyScalarConceptsTest {
         FloatPolarNormalized range = new FloatPolarNormalized(() -> m.floatValue());
         range.radius(1f);
         FuzzyScalarConcepts f = new FuzzyScalarConcepts(range, d, FuzzyScalarConcepts.FuzzyTriangle,
-                "(low)", "(mid)", "(hih)");
+                $.p("low"), $.p("mid"), $.p("hih"));
 
 
 
@@ -113,7 +114,7 @@ public class FuzzyScalarConceptsTest {
         testSteadyFreqCondition(m,
                 new FuzzyScalarConcepts(
                         new FloatNormalized(() -> m.floatValue()).updateRange(-1).updateRange(1),
-                        d, FuzzyScalarConcepts.FuzzyBinary, "(x0)", "(x1)", "(x2)"),
+                        d, FuzzyScalarConcepts.FuzzyBinary, $.p("x0"), $.p("x1"), $.p("x2")),
                 (f) -> true /*Util.equals(f, 0.5f + 0.5f * m.floatValue(), tolerance)*/
         );
     }

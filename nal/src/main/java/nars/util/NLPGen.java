@@ -59,8 +59,15 @@ public class NLPGen {
             narsese = narsese.replaceAll(v, "%" + v);
         }
 
-        Task t = Narsese.the().task(narsese, terminal);
+        try {
+            train(natural, Narsese.the().task(narsese, terminal));
+        } catch (Narsese.NarseseException e) {
+            e.printStackTrace();
+        }
 
+    }
+
+    private void train(String natural, Task t) {
         Term pattern = index.get(t.term(), true).term();
 
         rules.add((tt, freq, conf, tense) -> {
@@ -100,7 +107,6 @@ public class NLPGen {
             }
             return null;
         });
-
     }
 
     private boolean timeMatch(@NotNull Task t, Tense tense) {
