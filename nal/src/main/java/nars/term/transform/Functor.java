@@ -9,6 +9,7 @@ import nars.concept.Concept;
 import nars.concept.PermanentConcept;
 import nars.term.Term;
 import nars.term.atom.Atom;
+import nars.term.var.Variable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -82,6 +83,9 @@ abstract public class Functor extends AtomConcept implements PermanentConcept, F
 
     public static Concept f1(@NotNull String termAtom, @NotNull Function<Term, Term> ff) {
         return f1(fName(termAtom), ff);
+    }
+    public static Concept f1Const(@NotNull String termAtom, @NotNull Function<Term, Term> ff) {
+        return f1(fName(termAtom), x -> x instanceof Variable ? x : ff.apply(x));
     }
 
     /** a functor involving a concept resolved by the 1st argument term */

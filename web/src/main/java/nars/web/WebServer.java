@@ -21,6 +21,7 @@ import static io.undertow.UndertowOptions.ENABLE_HTTP2;
 import static java.util.zip.Deflater.BEST_COMPRESSION;
 import static nars.$.newHashSet;
 import static nars.$.quote;
+import static nars.web.IRCAgent.newRealtimeNAR;
 
 
 public class WebServer extends PathHandler /*extends PathHandler*/ {
@@ -106,8 +107,9 @@ public class WebServer extends PathHandler /*extends PathHandler*/ {
         int httpPort = args.length < 1 ? 8080 : Integer.parseInt(args[0]);
 
         NAR nar =
-                //NAgents.newAlann(1f); //newRealtimeNAR(512, 3, 2);
-                new Default();
+                newRealtimeNAR(512, 3, 2);
+
+        Hear.wiki(nar);
 
         new NARWeb(nar ,httpPort);
 

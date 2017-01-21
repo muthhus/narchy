@@ -29,12 +29,26 @@ abstract public class Loop implements Runnable {
 
     public Loop(@NotNull String threadName, int periodMS) {
         this(threadName);
-
         start(periodMS);
     }
 
     public Loop(@NotNull String threadName, float fps) {
-        this(threadName, (int)(1000f/fps));
+        this(threadName);
+        start(fps);
+    }
+
+    public Loop() {
+        thread = new Thread(this);
+    }
+
+    public Loop(float fps) {
+        this();
+        start(fps);
+    }
+
+    public Loop(int periodMS) {
+        this();
+        start(periodMS);
     }
 
     public Loop(@NotNull String threadName) {

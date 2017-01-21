@@ -71,32 +71,6 @@ public class IRCAgent extends IRC {
 //
 //        });
 
-        nar.on("readWiki", (Command) (op, args, n) -> {
-
-            String base = "simple.wikipedia.org";
-            //"en.wikipedia.org";
-            Wiki enWiki = new Wiki(base);
-
-            String lookup = args[0].toString();
-            //remove quotes
-            String page = enWiki.normalize(lookup.replace("\"", ""));
-            //System.out.println(page);
-
-            enWiki.setMaxLag(-1);
-
-            String html = enWiki.getRenderedText(page);
-            html = StringEscapeUtils.unescapeHtml4(html);
-            String strippedText = html.replaceAll("(?s)<[^>]*>(\\s*<[^>]*>)*", " ").toLowerCase();
-
-            //System.out.println(strippedText);
-
-            hear(strippedText, page);
-
-            Command.log(n, "Reading " + base + ":" + page + ": " + strippedText.length() + " characters");
-
-        });
-
-
 
 
 //        nar.onExec(new IRCBotOperator("top") {
@@ -145,6 +119,7 @@ public class IRCAgent extends IRC {
 //        });
 
     }
+
 
 
 
@@ -283,6 +258,7 @@ public class IRCAgent extends IRC {
         nar.termVolumeMax.setValue(volMax);
 
 
+
 //        nar.inputLater(
 //                NQuadsRDF.stream(nar, new File(
 //                        "/home/me/Downloads/nquad"
@@ -308,6 +284,7 @@ public class IRCAgent extends IRC {
 
         @NotNull Default n = newRealtimeNAR(1024, 50, 200);
 
+        Hear.wiki(n);
 
         IRCAgent bot = new IRCAgent(n,
                 "experiment1", "irc.freenode.net",
@@ -319,6 +296,8 @@ public class IRCAgent extends IRC {
         //new NARWeb(n, 8080);
 
         bot.start();
+
+
 
 
     }

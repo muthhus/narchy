@@ -5,9 +5,11 @@ import jcog.event.On;
 import jcog.io.Twokenize;
 import nars.*;
 import nars.nlp.Twenglish;
+import nars.op.Command;
 import nars.term.Term;
 import nars.time.Tense;
 import nars.util.Loop;
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -29,19 +31,23 @@ public class Hear extends Loop {
         if (!parsed.isEmpty() && errors.isEmpty()) {
             parsed.forEach(nar::input);
         } else {
-            if (wordDelayMS > 0)
-                return new Hear(nar, msg, src, wordDelayMS);
+            if (wordDelayMS > 0) {
+                List<Term> tokens = tokenize(msg);
+                if (tokens!=null && !tokens.isEmpty())
+                    return new Hear(nar, tokens, src, wordDelayMS);
+            }
         }
         return null;
     }
 
-    public Hear(NAR nar, @NotNull String msg, @NotNull String who, int wordDelayMS) {
-        super(msg, wordDelayMS);
+    public Hear(NAR nar, @NotNull List<Term> msg, @NotNull String who, int wordDelayMS) {
+        super( );
         this.nar = nar;
 
         onReset = nar.eventReset.on(this::onReset);
-        tokens = tokenize(msg);
+        tokens = msg;
         context = new Term[]{$.the("hear"), $.quote(who), Op.Imdex};
+        start(wordDelayMS);
     }
 
     protected void onReset(NAR n) {
@@ -66,5 +72,32 @@ public class Hear extends Loop {
                 //$.func("hear", chan_nick, tokens.get(token++))
                 $.inh(next, $.imge(context)),
                 Tense.Present, 1f, 0.9f);
+    }
+
+    static public void wiki(NAR nar) {
+        nar.on("readWiki", (Command) (op, args, n) -> {
+
+            String base = "simple.wikipedia.org";
+            //"en.wikipedia.org";
+            Wiki enWiki = new Wiki(base);
+
+            String lookup = args[0].toString();
+            //remove quotes
+            String page = enWiki.normalize(lookup.replace("\"", ""));
+            //System.out.println(page);
+
+            enWiki.setMaxLag(-1);
+
+            String html = enWiki.getRenderedText(page);
+            html = StringEscapeUtils.unescapeHtml4(html);
+            String strippedText = html.replaceAll("(?s)<[^>]*>(\\s*<[^>]*>)*", " ").toLowerCase();
+
+            //System.out.println(strippedText);
+
+            Hear.hear(nar, strippedText,  page, 25);
+
+            Command.log(n, "Reading " + base + ":" + page + ": " + strippedText.length() + " characters");
+
+        });
     }
 }

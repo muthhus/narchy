@@ -15,16 +15,7 @@ import org.jetbrains.annotations.Nullable;
  * Produces canonical "Reflective-Narsese" representation of a parameter term
  * @author me
  */
-public class reflect extends Functor.UnaryFunctor {
-
-    public reflect() {
-        super("reflect");
-    }
-
-    @Override
-    public Term apply(Term x) {
-        return reflect(x);
-    }
+public class reflect  {
 
 
     /**

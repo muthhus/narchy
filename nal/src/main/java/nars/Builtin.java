@@ -32,15 +32,16 @@ public class Builtin  {
             new union(),
 
             Functor.f0("date", () -> quote(new Date().toString())),
-            Functor.f1("reflect", reflect::reflect),
-            Functor.f1("fromJSON", (jsonString)-> IO.fromJSON($.unquote(jsonString))),
-            Functor.f1("toJSON", IO::toJSON),
-            Functor.f1("toString", t -> $.quote(t.toString())),
 
-            new reflect(),
+            Functor.f1Const("reflect", reflect::reflect),
+            Functor.f1Const("fromJSON", (jsonString)-> IO.fromJSON($.unquote(jsonString))),
+            Functor.f1Const("toJSON", IO::toJSON),
+            Functor.f1Const("toString", x -> $.quote(x.toString())),
+            Functor.f1Const("toChars", x -> $.p(x.toString().toCharArray(), $::the)),
+            Functor.f1Const("complexity", x -> $.the(x.complexity())),
+
             new flat.flatProduct(),
             new similaritree(),
-            new complexity(),
 
             Functor.f2("equal", (x,y) ->
                 x.equals(y) ? True : (!((x instanceof Variable) || (y instanceof Variable)) ? False : null)),
@@ -73,6 +74,7 @@ public class Builtin  {
         nar.on(Command.LOG_FUNCTOR, log);
 
         nar.on("error", (Command) (a, t, n) -> n.logger.error("{}", t) );
+
 
         nar.on("memstat", (Command) (op, a, nn) ->
             Command.log(nar, quote(nar.concepts.summary()))
