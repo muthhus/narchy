@@ -3,6 +3,7 @@ package nars.experiment.math;
 import com.google.common.base.Joiner;
 import nars.$;
 import nars.NAR;
+import nars.Narsese;
 import nars.Task;
 import nars.nar.Default;
 import nars.op.PrologCore;
@@ -47,7 +48,7 @@ public class BooleanSATTest {
 
                 //(ii) -> (Compound)$.inh($.$(ii), TRUE) //INHERITANCE
 
-                (ii) -> $.p($.$(ii), TRUE) //PRODUCT pair
+                (ii) -> $.p($.the(ii), TRUE) //PRODUCT pair
 
             );
         }
@@ -105,12 +106,12 @@ public class BooleanSATTest {
         return this;
     }
 
-    public BooleanSATTest estimate(String s) {
+    public BooleanSATTest estimate(String s) throws Narsese.NarseseException {
         query(s);
         return this;
     }
 
-    public Task query(String s) {
+    public Task query(String s) throws Narsese.NarseseException {
 
         final String[] ss = {s};
         variables.forEach((k,v)->{
@@ -131,7 +132,7 @@ public class BooleanSATTest {
         return t;
     }
 
-    public BooleanSATTest expect(String s, boolean actual) {
+    public BooleanSATTest expect(String s, boolean actual) throws Narsese.NarseseException {
 
         Task t = query(s);
 
@@ -155,7 +156,7 @@ public class BooleanSATTest {
     }
 
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Narsese.NarseseException {
 
 
         Default n = new Default();
@@ -167,7 +168,7 @@ public class BooleanSATTest {
 
     }
 
-    public static void pairANDvsOR(NAR n) {
+    public static void pairANDvsOR(NAR n) throws Narsese.NarseseException {
         new BooleanSATTest(n)
                 .variable("a", true)
                 .variable("b", false)
@@ -176,7 +177,7 @@ public class BooleanSATTest {
                 .run(100);
     }
 
-    public static void tripleBinaryVsTrinary(NAR n) {
+    public static void tripleBinaryVsTrinary(NAR n) throws Narsese.NarseseException {
 
         n.log();
         new BooleanSATTest(n)

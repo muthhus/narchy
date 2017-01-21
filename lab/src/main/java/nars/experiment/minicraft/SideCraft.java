@@ -3,6 +3,7 @@ package nars.experiment.minicraft;
 import jcog.Util;
 import nars.$;
 import nars.NAR;
+import nars.Narsese;
 import nars.experiment.minicraft.side.SideScrollMinicraft;
 import nars.experiment.minicraft.side.awtgraphics.AwtGraphicsHandler;
 import nars.remote.NAgents;
@@ -11,6 +12,8 @@ import nars.video.PixelBag;
 import nars.video.Sensor2D;
 
 import java.awt.image.BufferedImage;
+
+import static nars.$.$;
 
 /**
  * Created by me on 9/19/16.
@@ -22,10 +25,17 @@ public class SideCraft extends NAgents {
     private PixelAutoClassifier camAE;
 
     public static void main(String[] args) {
-        runRT(SideCraft::new, 30, 5, -1);
+        runRT(nar1 -> {
+            try {
+                return new SideCraft(nar1);
+            } catch (Narsese.NarseseException e) {
+                e.printStackTrace();
+                return null;
+            }
+        }, 30, 5, -1);
     }
 
-    public SideCraft(NAR nar) {
+    public SideCraft(NAR nar) throws Narsese.NarseseException {
         super("cra", nar, 1);
 
         this.craft = new SideScrollMinicraft();
@@ -60,22 +70,22 @@ public class SideCraft extends NAgents {
 //                ).into(this);
 
 //        InputHandler input = craft.input;
-        actionToggle("cra(key,left)", (b) -> {
+        actionToggle($("cra(key,left)"), (b) -> {
             if (b) craft.player.startLeft(false /* slow */);
             else craft.player.stopLeft();
         });
-        actionToggle("cra(key,right)", (b) -> {
+        actionToggle($("cra(key,right)"), (b) -> {
             if (b) craft.player.startRight(false /* slow */);
             else craft.player.stopRight();
         });
-        actionToggle("cra(key,up)", (b) -> {
+        actionToggle($("cra(key,up)"), (b) -> {
             if (b) craft.player.startClimb();
             else craft.player.stopClimb();
         });
-        actionToggle("cra(key,mouseL)", (b) -> craft.leftClick = b);
-        actionToggle("cra(key,mouseR)", (b) -> craft.rightClick = b);
+        actionToggle($("cra(key,mouseL)"), (b) -> craft.leftClick = b);
+        actionToggle($("cra(key,mouseR)"), (b) -> craft.rightClick = b);
         float mSpeed = 45f;
-        actionBipolar("cra(mouse,X)", (v) -> {
+        actionBipolar($("cra(mouse,X)"), (v) -> {
             int x = craft.screenMousePos.x;
             int xx = Util.clamp(x + v * mSpeed, 0, camBuffer.getWidth() - 1);
             if (xx != x) {
@@ -84,7 +94,7 @@ public class SideCraft extends NAgents {
             }
             return false;
         });
-        actionBipolar("cra(mouse,Y)", (v) -> {
+        actionBipolar($("cra(mouse,Y)"), (v) -> {
             int y = craft.screenMousePos.y;
             int yy = Util.clamp(y + v * mSpeed, 0, camBuffer.getHeight() - 1);
             if (yy != y) {

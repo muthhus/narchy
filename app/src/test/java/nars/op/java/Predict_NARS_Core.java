@@ -1,10 +1,7 @@
 package nars.op.java;
 
 import jcog.time.IntervalTree;
-import nars.NAR;
-import nars.Op;
-import nars.Param;
-import nars.Task;
+import nars.*;
 import nars.nar.Default;
 import nars.op.in.ChangedTextInput;
 import org.eclipse.collections.impl.set.mutable.primitive.IntHashSet;
@@ -27,7 +24,7 @@ public class Predict_NARS_Core {
     static double maxval;
     private static int last = -1;
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Narsese.NarseseException {
 
         Param.DEBUG = false;
         int duration = 8;

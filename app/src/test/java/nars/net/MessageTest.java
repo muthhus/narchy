@@ -1,6 +1,7 @@
 package nars.net;
 
 import nars.IO;
+import nars.Narsese;
 import nars.Task;
 import nars.nar.Terminal;
 import nars.net.gnutella.message.QueryMessage;
@@ -37,11 +38,13 @@ public class MessageTest {
             testTaskRoundtrip("(a --> (b,c)).");
         } catch (IOException e) {
             assertTrue(false);
+        } catch (Narsese.NarseseException e) {
+            e.printStackTrace();
         }
 
     }
 
-    public void testTaskRoundtrip(String x) throws IOException {
+    public void testTaskRoundtrip(String x) throws IOException, Narsese.NarseseException {
         testTaskRoundtrip(t.task(x));
     }
     public void testTaskRoundtrip(Task x) throws IOException {

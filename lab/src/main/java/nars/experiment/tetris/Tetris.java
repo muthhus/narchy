@@ -3,6 +3,7 @@ package nars.experiment.tetris;
 import jcog.spatial.Rect1D;
 import nars.$;
 import nars.NAR;
+import nars.Narsese;
 import nars.concept.ActionConcept;
 import nars.concept.SensorConcept;
 import nars.experiment.tetris.impl.TetrisState;
@@ -30,6 +31,7 @@ import spacegraph.space.widget.MatrixView;
 import java.util.Collection;
 import java.util.List;
 
+import static nars.$.$;
 import static nars.experiment.tetris.impl.TetrisState.*;
 import static spacegraph.SpaceGraph.window;
 
@@ -118,7 +120,7 @@ public class Tetris extends NAgents {
          * @param height
          * @param timePerFall larger is slower gravity
          */
-        public Tetris(NAR nar, int width, int height, int timePerFall) {
+        public Tetris(NAR nar, int width, int height, int timePerFall) throws Narsese.NarseseException {
             super("tetris", nar);
 
             state = new TetrisState(width, height, timePerFall) {
@@ -177,7 +179,7 @@ public class Tetris extends NAgents {
         }
 
 
-        public static void actions(NAR nar, TetrisState state, List<ActionConcept> actions) {
+        public static void actions(NAR nar, TetrisState state, List<ActionConcept> actions) throws Narsese.NarseseException {
             float alpha = nar.confidenceDefault('.');
 
             float actionMargin =
@@ -190,7 +192,7 @@ public class Tetris extends NAgents {
 //        float actionThresholdLower = actionMargin / 1.5f;
 
 
-            actions.add(new ActionConcept("moveX(tetris)", nar, (b, d) -> {
+            actions.add(new ActionConcept($("moveX(tetris)"), nar, (b, d) -> {
                 if (d != null) {
                     float x = d.freq();
                     //System.out.println(d + " " + x);
@@ -213,7 +215,7 @@ public class Tetris extends NAgents {
             }));
 
             //if (rotate) {
-            actions.add(new ActionConcept("rotate(tetris)", nar, (b, d) -> {
+            actions.add(new ActionConcept($("rotate(tetris)"), nar, (b, d) -> {
                 if (d != null) {
                     float r = d.freq();
                     if (r > actionThresholdHigh) {
@@ -454,7 +456,7 @@ public class Tetris extends NAgents {
             s.show(1300, 900);
         }
 
-        public static void main(String[] args) {
+        public static void main(String[] args) throws Narsese.NarseseException {
             //Param.DEBUG = true;
 
             NAR nar =
@@ -627,7 +629,7 @@ public class Tetris extends NAgents {
 
     public static class MyTetris extends Tetris {
 
-        public MyTetris(NAR nar) {
+        public MyTetris(NAR nar) throws Narsese.NarseseException {
             super(nar, Tetris.tetris_width, Tetris.tetris_height, Tetris.TIME_PER_FALL);
         }
 

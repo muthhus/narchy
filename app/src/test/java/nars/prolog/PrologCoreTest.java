@@ -2,6 +2,7 @@ package nars.prolog;
 
 import alice.tuprolog.MalformedGoalException;
 import nars.NAR;
+import nars.Narsese;
 import nars.nar.Default;
 import nars.op.PrologCore;
 import org.junit.Test;
@@ -82,7 +83,7 @@ public class PrologCoreTest {
         //assertTrue(p.isTrue("','(a,','(b,c))."));
     }
     @Test
-    public void testConjunction3b() throws MalformedGoalException, IOException {
+    public void testConjunction3b() throws MalformedGoalException, IOException, Narsese.NarseseException {
         NAR n = new Default();
         PrologCore p = new PrologCore(n);
         n.believe("x:a");

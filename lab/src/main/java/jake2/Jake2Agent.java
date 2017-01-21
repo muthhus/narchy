@@ -7,7 +7,9 @@ import jake2.game.edict_t;
 import jake2.render.Base;
 import jake2.render.JoglGL2Renderer;
 import jake2.sys.IN;
+import nars.$;
 import nars.NAR;
+import nars.Narsese;
 import nars.remote.NAgents;
 import nars.video.PixelAutoClassifier;
 import nars.video.PixelBag;
@@ -22,6 +24,7 @@ import java.util.function.Supplier;
 
 import static jake2.Globals.*;
 import static jake2.render.Base.vid;
+import static nars.$.*;
 import static nars.$.t;
 
 /**
@@ -82,7 +85,7 @@ public class Jake2Agent extends NAgents implements Runnable {
     }
     final PlayerData player = new PlayerData();
 
-    public Jake2Agent(NAR nar) {
+    public Jake2Agent(NAR nar) throws Narsese.NarseseException {
         super("q", nar, 1);
 
 
@@ -94,28 +97,28 @@ public class Jake2Agent extends NAgents implements Runnable {
 
         senseFields("q", player);
 
-        actionToggle("q(fore)", (x) -> CL_input.in_forward.state = x ? 1 : 0);
-        actionToggle("q(back)", (x) -> CL_input.in_back.state = x ? 1 : 0);
+        actionToggle($("q(fore)"), (x) -> CL_input.in_forward.state = x ? 1 : 0);
+        actionToggle($("q(back)"), (x) -> CL_input.in_back.state = x ? 1 : 0);
 
-        //actionToggle("(left)", (x) -> CL_input.in_left.state = x ? 1 : 0);
-        //actionToggle("(right)", (x) -> CL_input.in_right.state = x ? 1 : 0);
-        actionToggle("q(moveleft)", (x) -> CL_input.in_moveleft.state = x ? 1 : 0);
-        actionToggle("q(moveright)", (x) -> CL_input.in_moveright.state = x ? 1 : 0);
-        actionToggle("q(jump)", (x) -> CL_input.in_up.state = x ? 1 : 0);
-        actionBipolar("q(lookyaw)", (x) -> {
+        //actionToggle($.$("(left)"), (x) -> CL_input.in_left.state = x ? 1 : 0);
+        //actionToggle($.$("(right)"), (x) -> CL_input.in_right.state = x ? 1 : 0);
+        actionToggle($("q(moveleft)"), (x) -> CL_input.in_moveleft.state = x ? 1 : 0);
+        actionToggle($("q(moveright)"), (x) -> CL_input.in_moveright.state = x ? 1 : 0);
+        actionToggle($("q(jump)"), (x) -> CL_input.in_up.state = x ? 1 : 0);
+        actionBipolar($("q(lookyaw)"), (x) -> {
             float yawSpeed = 10;
             cl.viewangles[Defines.YAW] += yawSpeed * x;
             //return CL_input.in_lookup.state = x ? 1 : 0;
             return true;
         });
-        actionBipolar("q(lookpitch)", (x) -> {
+        actionBipolar($("q(lookpitch)"), (x) -> {
             float pitchSpeed = 20; //absolute
             cl.viewangles[Defines.PITCH] = pitchSpeed * x;
             //return CL_input.in_lookup.state = x ? 1 : 0;
             return true;
         });
-        //actionToggle("(lookdown)", (x) -> CL_input.in_lookdown.state = x ? 1 : 0);
-        actionToggle("q(attak)", (x) -> CL_input.in_attack.state = x ? 1 : 0);
+        //actionToggle($.$("(lookdown)"), (x) -> CL_input.in_lookdown.state = x ? 1 : 0);
+        actionToggle($("q(attak)"), (x) -> CL_input.in_attack.state = x ? 1 : 0);
 
         new Thread(this).start();
     }
@@ -221,7 +224,14 @@ public class Jake2Agent extends NAgents implements Runnable {
 
 
     public static void main(String[] args) {
-        runRT(Jake2Agent::new, 10);
+        runRT(nar1 -> {
+            try {
+                return new Jake2Agent(nar1);
+            } catch (Narsese.NarseseException e) {
+                e.printStackTrace();
+                return null;
+            }
+        }, 10);
     }
 }
 

@@ -37,18 +37,16 @@ import static nars.Op.PROD;
 import static nars.nlp.Twenglish.tokenize;
 
 /**
-
- $0.9;0.9;0.99$
-
- $0.9;0.9;0.99$ (hear(?someone, $something) ==>+1 hear(I,$something)).
- $0.9;0.9;0.99$ (((hear(#someone,#someThing) &&+1 hear(#someone,$nextThing)) && hear(I, #someThing)) ==>+1 hear(I, $nextThing)).
- $0.9;0.9;0.99$ (((hear($someone,$someThing) &&+1 hear($someone,$nextThing)) <=> hear($someone, ($someThing,$nextThing)))).
- $0.9;0.9;0.99$ (((I<->#someone) && hear(#someone, $something)) ==>+1 hear(I, $something)).
- $0.9;0.9;0.99$ hear(I, #something)!
- hear(I,?x)?
-
- $0.9$ (($x,"the") <-> ($x,"a")).
-
+ * $0.9;0.9;0.99$
+ * <p>
+ * $0.9;0.9;0.99$ (hear(?someone, $something) ==>+1 hear(I,$something)).
+ * $0.9;0.9;0.99$ (((hear(#someone,#someThing) &&+1 hear(#someone,$nextThing)) && hear(I, #someThing)) ==>+1 hear(I, $nextThing)).
+ * $0.9;0.9;0.99$ (((hear($someone,$someThing) &&+1 hear($someone,$nextThing)) <=> hear($someone, ($someThing,$nextThing)))).
+ * $0.9;0.9;0.99$ (((I<->#someone) && hear(#someone, $something)) ==>+1 hear(I, $something)).
+ * $0.9;0.9;0.99$ hear(I, #something)!
+ * hear(I,?x)?
+ * <p>
+ * $0.9$ (($x,"the") <-> ($x,"a")).
  */
 public class IRCAgent extends IRC {
     private static final Logger logger = LoggerFactory.getLogger(IRCAgent.class);
@@ -58,6 +56,7 @@ public class IRCAgent extends IRC {
     //private float ircMessagePri = 0.9f;
 
     final int wordDelayMS = 25; //for serializing tokens to events: the time in millisecond between each perceived (subvocalized) word, when the input is received simultaneously
+    private boolean hearTwenglish = true;
 
     public IRCAgent(NAR nar, String nick, String server, String... channels) throws Exception {
         super(nick, server, channels);
@@ -291,8 +290,8 @@ public class IRCAgent extends IRC {
             //        else {
 
             try {
-                try {
-                    @NotNull List<Task> parsed = nar.input(msg.replace("http://", ""));
+
+                @NotNull List<Task> parsed = nar.tasks(msg.replace("http://", ""));
 
 
 //                            msg.replace("http://", "") /* HACK */, o -> {
@@ -300,20 +299,22 @@ public class IRCAgent extends IRC {
 //                    });
 
 
-//                    int narsese = parsed.size();
-//                    if (narsese > 0) {
+                int narsese = parsed.size();
+                if (narsese > 0) {
 //                        for (Task t : parsed) {
 //                            logger.info("narsese({},{}): {}", channel, nick, t);
 //                        }
-//                        parsed.forEach(nar::input);
+                    parsed.forEach(nar::input);
 //                        return;
-//                    }
-                } catch (GrappaException | Narsese.NarseseException f) {
-                    hear(msg, nick);
+                } else {
+                    if (hearTwenglish)
+                        hear(msg, nick);
                 }
+
             } catch (Exception e) {
                 pevent.respond(e.toString());
             }
+
 
             //logger.info("hear({},{}): {}", channel, nick, msg);
             //talk.hear(msg, context(channel, nick), ircMessagePri);
@@ -323,11 +324,11 @@ public class IRCAgent extends IRC {
     }
 
 
-    void hear(@NotNull String msg, @NotNull  String who) {
+    void hear(@NotNull String msg, @NotNull String who) {
         hear(nar, msg, who, wordDelayMS);
     }
 
-    static public Loop hear(NAR nar, @NotNull String msg, @NotNull  String src, int wordDelayMS) {
+    static public Loop hear(NAR nar, @NotNull String msg, @NotNull String src, int wordDelayMS) {
 //        nar.believe(
 //                $.inst($.p(tokenize(msg)), $.p($.quote(channel), $.quote(nick))),
 //                Tense.Present
@@ -336,7 +337,7 @@ public class IRCAgent extends IRC {
         final List<Term> tokens = tokenize(msg);
         if (!tokens.isEmpty()) {
 
-            Atom chan_nick = $.quote( src );
+            Atom chan_nick = $.quote(src);
 
             return new Loop(msg, wordDelayMS) {
 
@@ -350,14 +351,13 @@ public class IRCAgent extends IRC {
                         return;
                     }
 
-                    onReset = nar.eventReset.on((n)->{
-                        if (onReset!=null) {
+                    onReset = nar.eventReset.on((n) -> {
+                        if (onReset != null) {
                             onReset.off();
                             onReset = null;
                             stop();
                         }
                     });
-
 
 
                     //hear(who,what)
@@ -388,12 +388,12 @@ public class IRCAgent extends IRC {
 
         Random random = new XorShift128PlusRandom(System.currentTimeMillis());
 
-        MultiThreadExecutioner exe = new MultiThreadExecutioner(1, 1024*4);
+        MultiThreadExecutioner exe = new MultiThreadExecutioner(1, 1024 * 4);
         exe.sync(true);
 
         Default nar = new Default(activeConcepts, conceptsPerFrame, 1, 3, random,
 
-                new CaffeineIndex(new DefaultConceptBuilder(), 128*1024, false, exe),
+                new CaffeineIndex(new DefaultConceptBuilder(), 128 * 1024, false, exe),
                 //new TreeTermIndex.L1TreeIndex(new DefaultConceptBuilder(), 400000, 64 * 1024, 3),
 
                 new RealTime.DS(true),
@@ -463,6 +463,7 @@ public class IRCAgent extends IRC {
 
 
     }
+
     final StringBuilder b = new StringBuilder();
 
     public void say(String[] channels, Term w) {
@@ -489,8 +490,6 @@ public class IRCAgent extends IRC {
 //            }
 //        //}
 //    }
-
-
 
 
 }

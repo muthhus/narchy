@@ -71,7 +71,7 @@ public class Arkancide extends NAgents {
         //addCameraRetina("zoom(cam(noid))", noid, visW/2, visH/2, (v) -> $.t(v, alpha));
 
 
-        action(new ActionConcept( "x(paddleNext, noid)" , nar, (b, d) -> {
+        action(new ActionConcept( $.func("x", "paddleNext", "noid"), nar, (b, d) -> {
 
 
             float pct;

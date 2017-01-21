@@ -1,6 +1,7 @@
 package nars.nal;
 
 import nars.NAR;
+import nars.Narsese;
 import nars.concept.Concept;
 import nars.nar.Default;
 import nars.task.LambdaQuestionTask;
@@ -15,7 +16,7 @@ public class TuffySmokesTest {
 
     static NAR n;
 
-    static void print() {
+    static void print() throws Narsese.NarseseException {
         for (String name : new String[]{"Edward", "Anna", "Bob", "Frank", "Gary", "Helen"}) {
             String t = "<" + name + " --> Cancer>";
             //n.input(t + "?");
@@ -115,7 +116,7 @@ public class TuffySmokesTest {
 
     // @Test
     // public void testReasonableAnswers() {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Narsese.NarseseException {
 
         //Global.DEBUG = true;
 

@@ -31,6 +31,7 @@
 
 package nars.perf.nars.nar.perf;
 
+import nars.Narsese;
 import nars.nar.Default;
 import nars.term.Compound;
 import nars.test.DeductiveMeshTest;
@@ -70,7 +71,7 @@ public class NARBenchmark {
 
     @Benchmark
     @BenchmarkMode(value = Mode.AverageTime)
-    public void nal1Deduction() {
+    public void nal1Deduction() throws Narsese.NarseseException {
         n.nal(1);
         Compound a = $("<a-->b>");
         Compound b = $("<b-->c>");
@@ -82,7 +83,7 @@ public class NARBenchmark {
 
     @Benchmark
     @BenchmarkMode(value = Mode.AverageTime)
-    public void nal1DeductionInNAL8() {
+    public void nal1DeductionInNAL8() throws Narsese.NarseseException {
         n.nal(8);
         Compound a = $("<a-->b>");
         Compound b = $("<b-->c>");
