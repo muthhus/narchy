@@ -55,15 +55,20 @@ public abstract class WebsocketService extends AbstractWebsocketService {
      * broadcast to all
      */
     public void send(Object object) {
-
         for (WebSocketChannel x : connections) {
             send(x, object);
         }
-//        synchronized (connections) {
-//            connections.forEach(x -> send(x, object));
-//        }
     }
 
+    public void send(byte[] data) {
+        send(ByteBuffer.wrap(data));
+    }
+
+    public void send(ByteBuffer data) {
+        for (WebSocketChannel x : connections) {
+            WebSockets.sendBinary(data, x, null);
+        }
+    }
 
     @Override
     protected void onFullBinaryMessage(WebSocketChannel channel, BufferedBinaryMessage message) throws IOException {
@@ -131,11 +136,11 @@ public abstract class WebsocketService extends AbstractWebsocketService {
     /**
      * called if one or more connected
      */
-    abstract public void onStart();
+    public void onStart() {}
 
     /**
      * called when # connections becomes zero
      */
-    abstract public void onStop();
+    public void onStop() { }
 
 }

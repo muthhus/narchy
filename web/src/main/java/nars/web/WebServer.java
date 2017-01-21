@@ -6,23 +6,15 @@ import io.undertow.server.handlers.PathHandler;
 import io.undertow.server.handlers.resource.FileResourceManager;
 import io.undertow.websockets.WebSocketConnectionCallback;
 import io.undertow.websockets.extensions.PerMessageDeflateHandshake;
-import jcog.data.MutableInteger;
-import nars.$;
 import nars.NAR;
 import nars.NARLoop;
 import nars.nar.Default;
-import nars.op.Command;
-import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.lang.reflect.Field;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Set;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicLong;
 
 import static io.undertow.Handlers.*;
 import static io.undertow.UndertowOptions.ENABLE_HTTP2;
@@ -31,12 +23,9 @@ import static nars.$.newHashSet;
 import static nars.$.quote;
 
 
-public class WebServer /*extends PathHandler*/ {
-
+public class WebServer extends PathHandler /*extends PathHandler*/ {
 
     public final Undertow server;
-    private final PathHandler path;
-
 
     final static Logger logger = LoggerFactory.getLogger(WebServer.class);
 
@@ -50,10 +39,9 @@ public class WebServer /*extends PathHandler*/ {
     public WebServer(int httpPort) {
 
 
-        this.path = path()
-                .addPrefixPath("/", resource(
+        addPrefixPath("/", resource(
 
-                        new FileResourceManager(getResourcePath().toFile(), 0))
+                new FileResourceManager(getResourcePath().toFile(), 0))
 
 //                        new CachingResourceManager(
 //                                16384,
@@ -62,10 +50,10 @@ public class WebServer /*extends PathHandler*/ {
 //                                new PathResourceManager(getResourcePath(), 0, true, true),
 //                                0 //7 * 24 * 60 * 60 * 1000
 //                        ))
-                                .setCachable((x) -> false)
-                                .setDirectoryListingEnabled(true)
-                                .addWelcomeFiles("index.html")
-                );
+                        .setCachable((x) -> false)
+                        .setDirectoryListingEnabled(true)
+                        .addWelcomeFiles("index.html")
+        );
 
         //https://github.com/undertow-io/undertow/blob/master/examples/src/main/java/io/undertow/examples/sessionhandling/SessionServer.java
 
@@ -73,7 +61,7 @@ public class WebServer /*extends PathHandler*/ {
                 .addHttpListener(httpPort, "0.0.0.0")
                 .setServerOption(ENABLE_HTTP2, true)
                 //.setServerOption(ENABLE_SPDY, true)
-                .setHandler(path)
+                .setHandler(this)
                 .build();
 
 
@@ -115,139 +103,15 @@ public class WebServer /*extends PathHandler*/ {
 
     public static void main(String[] args) throws Exception {
 
-
         int httpPort = args.length < 1 ? 8080 : Integer.parseInt(args[0]);
 
-        WebServer w = new WebServer(httpPort);
-
-        //new IRCServer("localhost", 6667);
-
-        @NotNull NAR nar =
+        NAR nar =
                 //NAgents.newAlann(1f); //newRealtimeNAR(512, 3, 2);
                 new Default();
 
-
-//        new IRCAgent(nar,
-//                "experiment1", "irc.freenode.net",
-//                //"#123xyz"
-//                "#netention"
-//                //"#nars"
-//        ).start();
-
-
-        {
-            //access to the NAR
-
-            final Set<Class> classWhitelist = newHashSet(4);
-            classWhitelist.add(org.apache.commons.lang3.mutable.MutableFloat.class);
-            classWhitelist.add(MutableInteger.class);
-            classWhitelist.add(AtomicBoolean.class);
-            classWhitelist.add(AtomicLong.class);
-
-            Field[] ff = nar.getClass().getFields();
-
-        }
-
-
-//        nar.on("grid", (terms) -> {
-//            IntTerm x = (IntTerm) terms[0];
-//            IntTerm y = (IntTerm) terms[1];
-//            new DeductiveMeshTest(nar, new int[] { x.val(), y.val() });
-//            return null;
-//        });
-//
-////        nar.on("read", (terms) -> {
-////
-////            String protocol = terms[0].toString();
-////            String lookup = terms[1].toString();
-////            switch (protocol) {
-////                case "wiki": //wikipedia
-////                    String base = "simple.wikipedia.org";
-////                    //"en.wikipedia.org";
-////                    Wiki enWiki = new Wiki(base);
-////
-////                    try {
-////                        //remove quotes
-////                        String page = enWiki.normalize(lookup.replace("\"", ""));
-////                        //System.out.println(page);
-////
-////                        enWiki.setMaxLag(-1);
-////
-////                        String html = enWiki.getRenderedText(page);
-////                        html = StringEscapeUtils.unescapeHtml4(html);
-////                        String strippedText = html.replaceAll("(?s)<[^>]*>(\\s*<[^>]*>)*", " ").toLowerCase();
-////
-////                        //System.out.println(strippedText);
-////
-////                        hear(nar, strippedText, page, 200 /*ms per word */);
-////
-////                        return the("Reading " + base + ":" + page + ": " + strippedText.length() + " characters...");
-////
-////                    } catch (IOException e) {
-////                        return the(e.toString());
-////                    }
-////
-////                case "url":
-////                    //TODO
-////                    break;
-////
-////                case "json":
-////                    //TODO
-////                    break;
-////
-////                //...
-////
-////            }
-////
-////            return the("Unknown protocol");
-////
-////        });
-//        nar.on("clear", (terms) -> {
-//            long dt = Util.time(() -> {
-//                ((Default) nar).core.active.clear();
-//            });
-//            return the("Ready (" + dt + " ms)");
-//        });
-//        nar.on("memstat", (terms) ->
-//            quote(nar.concepts.summary())
-//        );
-//        nar.on("top", (terms) -> {
-//
-//                    int length = 16;
-//                    List<Term> b = newArrayList(length);
-//                    @NotNull Bag<Concept> cbag = ((Default) nar).core.active;
-//
-//                    String query;
-////            if (arguments.size() > 0 && arguments.term(0) instanceof Atom) {
-////                query = arguments.term(0).toString().toLowerCase();
-////            } else {
-//                    query = null;
-////            }
-//
-//                    cbag.forEachWhile(c -> {
-//                        String bs = c.get().toString();
-//                        if (query == null || bs.toLowerCase().contains(query)) {
-//                            b.add(p(c.get().term(),
-//                                    quote(
-//                                            //TODO better summary, or use a table representation
-//                                            Texts.n2(c.pri())
-//                                    )));
-//                        }
-//                        return b.size() <= length;
-//                    });
-//
-//                    return p(b);
-//                }
-//
-//        );
-
-
-        new nars.web.NARServices(nar, w.path);
-
-        //new IRCAgent(nar, "localhost", "NARchy", "#x");
+        new NARWeb(nar ,httpPort);
 
         NARLoop loop = nar.loop(20);
-
 
     }
 

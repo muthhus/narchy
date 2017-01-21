@@ -5,6 +5,7 @@ import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
 import jcog.Hack;
+import jcog.data.byt.DynByteSeq;
 import nars.budget.Budgeted;
 import nars.index.term.TermIndex;
 import nars.task.MutableTask;
@@ -340,8 +341,7 @@ public class IO {
     }
     public static byte[] taskToBytes(@NotNull Task x, @NotNull TaskSerialization mode) {
         try {
-            ByteArrayOutputStream bs = new ByteArrayOutputStream(x.volume() * 16 /* estimate */);
-            DataOutputStream dos = new DataOutputStream(bs);
+            DynByteSeq dos = new DynByteSeq(x.volume()*16);
             switch (mode) {
                 case TermFirst:
                     IO.writeTask(dos, x);
@@ -350,7 +350,7 @@ public class IO {
                     IO.writeTask2(dos, x);
                     break;
             }
-            return bs.toByteArray();
+            return dos.array();
         } catch (IOException e) {
             e.printStackTrace();
             return null;

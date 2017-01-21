@@ -2,6 +2,8 @@ package nars.web;
 
 import io.undertow.websockets.core.BufferedTextMessage;
 import io.undertow.websockets.core.WebSocketChannel;
+import io.undertow.websockets.core.WebSockets;
+import jcog.data.byt.DynByteSeq;
 import jcog.event.Ons;
 import nars.IO;
 import nars.NAR;
@@ -18,6 +20,7 @@ import spacegraph.web.WebsocketService;
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -27,140 +30,39 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public class NarseseIOService extends WebsocketService {
 
-
     static final Logger logger = LoggerFactory.getLogger(NarseseIOService.class);
 
-    public static final int OUTPUT_CAPACITY = 128;
-    public static final int OUTPUT_RATE = 4;
-
     private final NAR nar;
-    private Ons ons;
 
-    final Bag<Task> output;
-    final AtomicBoolean queued = new AtomicBoolean(false);
-
-    //FastConcurrentDirectDeque<byte[]> outgoing = new FastConcurrentDirectDeque();
+    final LeakOut output;
 
     public NarseseIOService(NAR n) {
         super();
         this.nar = n;
-        output = new CurveBag<Task>(OUTPUT_CAPACITY, new CurveBag.NormalizedSampler(CurveBag.power2BagCurve, n.random),  BudgetMerge.plusBlend, new HashMap());
-        output.setCapacity(OUTPUT_CAPACITY);
-    }
+        output = new LeakOut(n, 16, 1f) {
+            @Override protected float send(Task task) {
 
-    @Override
-    public void onStart() {
+                DynByteSeq dos = new DynByteSeq(8 + task.volume()*6 /* estimate */);
 
-        ons = new Ons(
-            nar.eventTaskProcess.on(this::output)
-//                nar.eventAnswer.on(t -> send(
-//                        "ANS: " + t)),
-                //nar.eventError.on(this::queue),
-//                nar.eventFrameStart.on(this::flush)
-        );
+                try {
+                    IO.writeTask2(dos, task);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    return 0f;
+                }
 
-    }
-
-    protected void flush() {
-        BLink<Task> tl;
-
-        output.commit();
-
-        try {
-            ByteArrayOutputStream bs = new ByteArrayOutputStream(4096);
-            DataOutputStream dos = new DataOutputStream(bs);
-
-            int remaining = OUTPUT_RATE;
-            while (remaining-- > 0 && (tl = output.pop()) != null) {
-                IO.writeTask2(dos, tl.get());
+                NarseseIOService.this.send(dos.array());
+                return 1f;
             }
-
-            send(bs.toByteArray());
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        queued.set(false);
-
-////        FastConcurrentDirectDeque b = outgoing;
-////        outgoing = new FastConcurrentDirectDeque();
-//        //CharSequence x = Json.collectionToJson(b, new StringBuilder(2048));
-//        //nar.runLater(()-> send(x));
+        };
     }
 
-    protected void output(Task t) {
-
-        output.put(t);
-
-        if (queued.compareAndSet(false, true))
-            nar.runLater(this::flush);
-
-    }
-
-
-//    protected void queue(Object o) {
-//        buffer.add(new Object[] { o.toString() } );
-//    }
-
-    @Override
-    public void onStop() {
-        ons.off();
-    }
 
     @Override
     protected void onFullTextMessage(WebSocketChannel socket, BufferedTextMessage message) throws IOException {
-
-        String msg = message.getData();
-
-        boolean narsese = tryNarsese(msg);
-        if (narsese)
-            return;
-
-        boolean twenglish = tryTwenglish(msg);
-        if (twenglish)
-            return;
-
-        logger.error("Unrecognizable input: {}", msg);
-
-//            if (attemptJSONParseOfText) {
-//                try {
-//                    System.out.println(socket + " recv txt: " + message.getData());
-//                    //JsonNode j = Core.json.readValue(message.getData(), JsonNode.class);
-//                    //onJSONMessage(socket, j);
-//                } catch (Exception e) {
-//                    e.printStackTrace();
-//                }
-//            }
+        Hear.hear(nar, message.getData(), "ui", 1);
     }
 
-    private boolean tryTwenglish(String msg) {
-
-        try {
-            new Twenglish().parse("ui", nar, msg).forEach(t -> {
-                //t.setPriority(INPUT_SENTENCE_PRIORITY);
-                if (t != null)
-                    nar.input(t);
-            });
-            return true;
-        } catch (Exception f) {
-            logger.error("{}", f);
-            return false;
-        }
-    }
-
-    private boolean tryNarsese(String msg) {
-        try {
-            List<Task> t = nar.tasks(msg);
-            if (t.isEmpty())
-                return false;
-
-            nar.input(t);
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
-    }
 
 
 }

@@ -299,9 +299,5 @@ public class Twenglish {
         return results;
     }
 
-    public static List<Term> tokenize(String msg) {
-        return Lists.transform(Twokenize.tokenize(msg),
-                Twenglish::spanToTerm);
-    }
 
 }

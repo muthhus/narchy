@@ -1,6 +1,7 @@
 package nars.term.transform;
 
 import nars.$;
+import nars.NAR;
 import nars.Op;
 import nars.bag.Bag;
 import nars.concept.AtomConcept;
@@ -82,6 +83,19 @@ abstract public class Functor extends AtomConcept implements PermanentConcept, F
     public static Concept f1(@NotNull String termAtom, @NotNull Function<Term, Term> ff) {
         return f1(fName(termAtom), ff);
     }
+
+    /** a functor involving a concept resolved by the 1st argument term */
+    public static Concept f1c(@NotNull String termAtom, NAR nar, @NotNull BiFunction<Concept, NAR, Term> ff) {
+        return f1(fName(termAtom), t -> {
+            Concept c = nar.concept(t);
+            if (c!=null) {
+                return ff.apply(c, nar);
+            } else {
+                return t;
+            }
+        });
+    }
+
 
     /** two argument functor (convenience method) */
     public static Concept f2(@NotNull Atom termAtom, @NotNull BiFunction<Term, Term, Term> ff) {

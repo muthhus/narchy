@@ -19,33 +19,10 @@ import static nars.web.WebServer.socket;
  */
 @Deprecated public class NARServices {
 
-    private static final Logger logger = LoggerFactory.getLogger(NARServices.class);
 
     public NARServices(NAR nar, PathHandler path) {
 
-        path
-                .addPrefixPath("/terminal", socket(new NarseseIOService(nar)))
-                //.addPrefixPath("/emotion", socket(new EvalService(nar, "emotion", 200)))
-                .addPrefixPath("/active", socket(new ActiveConceptService(nar, 200, 48)))
-                .addPrefixPath("/json/in", socket(new WebsocketService() {
 
-                    @Override
-                    protected void onFullTextMessage(WebSocketChannel channel, BufferedTextMessage message) {
-                        String s = message.getData();
-                        logger.info("in: {}", s);
-                        nar.believe(IO.fromJSON(s), Tense.Present, 1f);
-                    }
-
-                    @Override
-                    public void onStart() {
-
-                    }
-
-                    @Override
-                    public void onStop() {
-
-                    }
-                }));
 
 
     }

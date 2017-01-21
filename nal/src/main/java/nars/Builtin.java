@@ -1,9 +1,14 @@
 package nars;
 
+import jcog.Texts;
 import nars.concept.Concept;
+import nars.control.ConceptBagControl;
+import nars.link.BLink;
+import nars.nar.Default;
 import nars.op.Command;
 import nars.op.data.*;
 import nars.term.Term;
+import nars.term.atom.Atom;
 import nars.term.atom.Atomic;
 import nars.term.obj.IntTerm;
 import nars.term.transform.Functor;
@@ -21,32 +26,30 @@ import static nars.term.Term.True;
 public class Builtin  {
 
     static Concept[] statik = {
+
             new intersect(),
             new differ(),
             new union(),
+
             Functor.f0("date", () -> quote(new Date().toString())),
             Functor.f1("reflect", reflect::reflect),
             Functor.f1("fromJSON", (jsonString)-> IO.fromJSON($.unquote(jsonString))),
             Functor.f1("toJSON", IO::toJSON),
+            Functor.f1("toString", t -> $.quote(t.toString())),
+
             new reflect(),
             new flat.flatProduct(),
             new similaritree(),
             new complexity(),
-            Functor.f2("equal", (x,y) -> {
-                return x.equals(y) ? True :
-                        ((x instanceof Variable) || (y instanceof Variable)) ? null :
-                                False; //dont compare a variable to non-variable
-            }),
-            Functor.f2("add", (x,y) -> {
-                return ((x instanceof IntTerm) && (y instanceof IntTerm)) ?
-                            $.the(((IntTerm)x).val + ((IntTerm)y).val) :
-                            null;
-            }),
-            Functor.f2("sub", (x,y) -> {
-                return ((x instanceof IntTerm) && (y instanceof IntTerm)) ?
-                        $.the(((IntTerm)x).val - ((IntTerm)y).val) :
-                        null;
-            }),
+
+            Functor.f2("equal", (x,y) ->
+                x.equals(y) ? True : (!((x instanceof Variable) || (y instanceof Variable)) ? False : null)),
+            Functor.f2("add", (x,y) ->
+                ((x instanceof IntTerm) && (y instanceof IntTerm)) ?
+                    $.the(((IntTerm)x).val + ((IntTerm)y).val) : null),
+            Functor.f2("sub", (x,y) ->
+                ((x instanceof IntTerm) && (y instanceof IntTerm)) ?
+                    $.the(((IntTerm)x).val - ((IntTerm)y).val) : null),
     };
 
     /**
@@ -54,6 +57,16 @@ public class Builtin  {
      */
     public static void load(NAR nar) {
         //TODO these should be command-only operators, not functors
+
+        nar.on(Functor.f0("self", nar::self));
+
+        nar.on(Functor.f1c("belief", nar, (c,n) -> $.quote(c.belief(n.time()))));
+        nar.on(Functor.f1c("goal", nar, (c,n) -> $.quote(c.goal(n.time()))));
+
+        nar.on("concept", (Command) (op, a, nar1) ->
+                Command.log(nar,
+                        quote(nar.concept(a[0]).print(new StringBuilder(1024))))
+        );
 
         Command log = (a, t, n) -> n.logger.info("{}", t);
         nar.on("log", log);
@@ -69,10 +82,46 @@ public class Builtin  {
             nar1.runLater(NAR::reset)
         );
 
-        nar.on("concept", (Command) (op, a, nar1) ->
-            Command.log(nar,
-                quote(nar.concept(a[0]).print(new StringBuilder(1024))))
-        );
+        nar.on("clear", (Command) (op, args, n) -> {
+            n.clear();
+            n.runLater(()->{
+                Command.log(n, "Ready. (" + n.concepts.size() + " subconcepts)");
+            });
+        });
+
+
+
+        nar.on("top", (Command) (op, args, n) -> {
+            Iterable<BLink<Concept>> ii = n.conceptsActive();
+
+            int MAX_RESULT_LENGTH = 200;
+            StringBuilder b = new StringBuilder();
+
+            if (args.length > 0 && args[0] instanceof Atom) {
+                String query = args[0].toString().toLowerCase();
+                for (BLink<Concept> bc : ii) {
+                    String bs = bc.get().toString();
+                    String cs = bs.toLowerCase();
+                    if (cs.contains(query)) {
+                        b.append(bs).append("  ");
+                        if (b.length() > MAX_RESULT_LENGTH)
+                            break;
+                    }
+
+                }
+            } else {
+                for (BLink<Concept> bc : ii) {
+                    b.append(bc.get()).append('=').append(Texts.n2(bc.pri())).append("  ");
+                    if (b.length() > MAX_RESULT_LENGTH)
+                        break;
+                }
+            }
+
+            Command.log(n, b.toString());
+            //"core pri: " + cbag.active.priMin() + "<" + Texts.n4(cbag.active.priHistogram(new double[5])) + ">" + cbag.active.priMax());
+
+        });
+
 
 //                Functor.f0("help", () -> {
 //                    //TODO generalize with a predicate to filter the concepts, and a lambda for appending each one to an Appendable
@@ -87,14 +136,10 @@ public class Builtin  {
 //                    });
 //                    return $.quote(sb);
 //                }),
-//                Functor.f0("clear", nar::clear),
-//                Functor.f0("reset", nar::reset),
-//                Functor.f0("whoami", () -> nar.self),
-//                Functor.f0("memstat", () -> quote(nar.concepts.summary())),
+
 //                //TODO concept statistics
 //                //TODO task statistics
 //                //TODO emotion summary
-//                Functor.f1("print", x -> quote(nar.concept(x).print(new StringBuilder(1024)))),
 //                Functor.f("save", urlOrPath -> {
 //                    try {
 //                        File tmp;
@@ -110,35 +155,7 @@ public class Builtin  {
 //                        return quote(e);//e.printStackTrace();
 //                    }
 //                }),
-//                Functor.f("top", (arguments) -> {
-//                    int MAX_RESULT_LENGTH = 800;
-//
-//
-//                    StringBuilder b = new StringBuilder();
-//                    @NotNull Bag<Concept> cbag = ((Default) nar).core.active;
-//
-//                    String query;
-//                    if (arguments.length > 0 && arguments[0] instanceof Atom) {
-//                        query = arguments[0].toString().toLowerCase();
-//                    } else {
-//                        query = null;
-//                    }
-//
-//                    cbag.forEachWhile(c -> {
-//                        String bs = c.get().toString();
-//                        if (query == null || bs.toLowerCase().contains(query)) {
-//                            b.append(c.get()).append('=').append(Texts.n2(c.pri())).append("  ");
-//                        }
-//                        return b.length() <= MAX_RESULT_LENGTH;
-//                    });
-//
-//                    if (b.length() == 0)
-//                        return quote("(empty)");
-//
-//                    return quote(b.toString());
-//
-//                })
-//
+
 
 //        nar.on("nar", (terms) -> {
 //            //WARNING this could be dangerous to allow open access
