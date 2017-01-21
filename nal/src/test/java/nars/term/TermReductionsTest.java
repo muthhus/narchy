@@ -537,6 +537,8 @@ public class TermReductionsTest {
 
         assertEquals(True,
                 $("(||,x,y,a:b,(--,a:b))"));
+
+        assertEquals(False, $.parallel($.varDep(0), $.neg($.varDep(0)), $.the("x")));
     }
 
     @Test

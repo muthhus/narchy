@@ -38,7 +38,7 @@ public abstract class Leak</* TODO: A, */B>  {
     /** transduce an input to a series of created BLink's to be inserted */
     abstract protected void in(@NotNull Task task, Consumer<BLink<B>> each);
 
-    /** returns a value, in relation to the 'rate' parameter, which is subtracted
+    /** returns a cost value, in relation to the 'rate' parameter, which is subtracted
      * from the rate each iteration. this can allow proportional consumption of
      * a finitely allocated resource.
      */
@@ -58,9 +58,9 @@ public abstract class Leak</* TODO: A, */B>  {
              ) {
             @Nullable BLink<B> t = bag.pop();
             if (t!=null) {
-                onOut(t);
+                float cost = onOut(t);
+                r -= cost;
             }
-            r-=1f;
         }
 
     }

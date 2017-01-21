@@ -296,7 +296,7 @@ abstract public class NAgents extends NAgent {
 
             @Override
             protected float onOut(@NotNull BLink<Task> b) {
-                return 0;
+                return 1;
             }
 
             @Override

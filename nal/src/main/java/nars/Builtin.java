@@ -55,7 +55,10 @@ public class Builtin  {
     public static void load(NAR nar) {
         //TODO these should be command-only operators, not functors
 
-        nar.on("log", (Command) (a, t, n) -> n.logger.info("{}", t) );
+        Command log = (a, t, n) -> n.logger.info("{}", t);
+        nar.on("log", log);
+        nar.on(Command.LOG_FUNCTOR, log);
+
         nar.on("error", (Command) (a, t, n) -> n.logger.error("{}", t) );
 
         nar.on("memstat", (Command) (op, a, nn) ->

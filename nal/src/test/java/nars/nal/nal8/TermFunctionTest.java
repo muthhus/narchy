@@ -75,17 +75,18 @@ public class TermFunctionTest {
     public void testFunctor2() {
         Param.DEBUG = true;
 
-        TestNAR t = new TestNAR(new Default(1024,64,2,2));
+        int TIME = 64;
+        TestNAR t = new TestNAR(new Default(1024, 8,2,2));
         t.log();
         t.believe("(equal(complexity($1),$2) <=> c($1,$2))");
         t.ask("c(x, 1)");
         t.ask("c(x, 2)");
         t.ask("c((y), 1)");
         t.ask("c((y), 2)");
-        t.mustBelieve(64, "c(x,1)", 1f, 0.81f);
-        t.mustBelieve(64, "c(x,2)", 0f, 0.81f);
-        t.mustBelieve(64, "c((y),1)", 0f, 0.81f);
-        t.mustBelieve(64, "c((y),2)", 1f, 0.81f);
+        t.mustBelieve(TIME, "c(x,1)", 1f, 0.81f);
+        t.mustBelieve(TIME, "c(x,2)", 0f, 0.81f);
+        t.mustBelieve(TIME, "c((y),1)", 0f, 0.81f);
+        t.mustBelieve(TIME, "c((y),2)", 1f, 0.81f);
         t.run(true);
     }
 

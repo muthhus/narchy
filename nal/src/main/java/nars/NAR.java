@@ -326,8 +326,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
         return task;
     }
 
-    @NotNull
-    public List<Task> tasks(@NotNull String parse) {
+    @NotNull public List<Task> tasks(@NotNull String parse) {
         List<Task> result = newArrayList(1);
         Narsese.the().tasks(parse, result, this);
         return result;
@@ -452,7 +451,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
 
 
     @Nullable
-    public Task believe(float priority, @NotNull Termed term, @NotNull Tense tense, float freq, float conf) throws NarseseException {
+    public Task believe(float priority, @NotNull Termed term, @NotNull Tense tense, float freq, float conf)  {
         return believe(priority, term, time(tense), freq, conf);
     }
 
@@ -841,8 +840,8 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
 
     private void enableOperator(@NotNull Atom a, @NotNull Operator o) {
         Concept c = concept(a, true);
-        if (c.putIfAbsent(Operator.class, o)!=null)
-            throw new RuntimeException(c + " already has an operator registered");
+        /*Object existing = */c.put(Operator.class, o);
+        //    throw new RuntimeException(c + " already has an operator registered");
     }
 
 

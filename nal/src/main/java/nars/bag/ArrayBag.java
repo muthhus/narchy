@@ -328,9 +328,10 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
     @NotNull
     @Override
     public Bag<V> sample(int n, @NotNull Predicate<? super BLink<V>> target) {
-        throw new RuntimeException("unimpl");
+        if (!isEmpty())
+            forEachWhile(target, n);
+        return this;
     }
-
 
     @Override
     public final BLink<V> put(@NotNull V key, @NotNull Budgeted b, float scale, @Nullable MutableFloat overflow) {

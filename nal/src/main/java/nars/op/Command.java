@@ -20,6 +20,10 @@ import static nars.Op.COMMAND;
 @FunctionalInterface
 public interface Command extends Operator {
 
+    String LOG_FUNCTOR = String.valueOf(Character.valueOf((char) 8594)); //RIGHT ARROW
+
+    void run(@NotNull Atomic op, @NotNull Term[] args, @NotNull NAR nar) throws Exception;
+
     @Override
     default @Nullable Task run(@NotNull Task t, @NotNull NAR nar) {
         if (t.punc() == COMMAND) {
@@ -40,14 +44,13 @@ public interface Command extends Operator {
         return Command.task("error", $.quote(ss.toString()));
     }
 
-    void run(@NotNull Atomic op, @NotNull Term[] args, @NotNull NAR nar);
 
     static Task task(Compound content) {
         return new MutableTask(content, Op.COMMAND, null);
     }
 
     static Task logTask(@NotNull Term content) {
-        return Command.task("log", content);
+        return Command.task(LOG_FUNCTOR, content);
     }
 
     static Task task(String func, @NotNull Term... args) {

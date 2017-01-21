@@ -1127,18 +1127,26 @@ public class Narsese extends BaseParser<Object> {
         return i[0];
     }
 
+    public static void tasks(String input, Collection<Task> c, Collection<NarseseException> e, NAR m)  {
+        tasks(input, c::add, e::add, m);
+    }
+
+    public static void tasks(String input, Consumer<Task> c, NAR m) {
+        tasks(input, c, (e) -> c.accept( Command.error(e) ), m );
+    }
+
     /**
      * gets a stream of raw immutable task-generating objects
      * which can be re-used because a Memory can generate them
      * ondemand
      */
-    public static void tasks(String input, Consumer<Task> c, NAR m) {
+    public static void tasks(String input, Consumer<Task> c, Consumer<NarseseException> onError, NAR m) {
         tasksRaw(input, o -> {
             Task t = null;
             try {
                 t = decodeTask(m, o);
             } catch (NarseseException e) {
-                t = Command.error(e);
+                onError.accept(e);
             }
             if (t != null) {
                 c.accept(t);

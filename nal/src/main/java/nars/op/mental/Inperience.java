@@ -187,7 +187,7 @@ public class Inperience extends Leak<Task> {
         Task task = b.get();
 
         try {
-            Compound r = reify(task, nar.self(), conceptCreationExpectation.floatValue());
+            Compound r = reify(task, nar.self());
             if (r!=null) {
                 MutableTask e = new InperienceTask(task,
                         r,
@@ -203,7 +203,7 @@ public class Inperience extends Leak<Task> {
             //System.err.println(task);
         }
 
-        return 0;
+        return 1;
     }
 
 
@@ -247,10 +247,10 @@ public class Inperience extends Leak<Task> {
     }
 
     @Nullable
-    public static Compound reify(@NotNull Task s, Term self, float conceptCreationExpectation) {
+    public static Compound reify(@NotNull Task s, Term self) {
 
         Truth tr = s.truth();
-        Term[] arg = new Term[1 + (tr == null ? 1 : 2)];
+        Term[] arg = new Term[1 + (tr == null ? 1 : 1)];
 
         int k = 0;
 
@@ -262,7 +262,7 @@ public class Inperience extends Leak<Task> {
 
         if (tr != null) {
             neg = tr.isNegative();
-            arg[k] = tr.expTerm(tr.negIf(neg).expectation(), conceptCreationExpectation);
+            //arg[k] = tr.expTerm(tr.negIf(neg).expectation(), conceptCreationExpectation);
             //arg[k++] = tr.freqTerm(tr.freq(), 0.66f);
             //arg[k++] = tr.confTerm(tr.conf(), 0.5f);
         } else {

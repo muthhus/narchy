@@ -7,6 +7,7 @@ import nars.concept.CompoundConcept;
 import nars.concept.Concept;
 import nars.io.NarseseTest;
 import nars.nar.Default;
+import nars.nar.Terminal;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
@@ -58,7 +59,7 @@ public class TemporalTest {
 
     public void assertInvalidTask(@NotNull String ss) {
         try {
-            n.input(ss);
+            Narsese.the().task(ss, new Terminal());
             assertTrue(false);
         } catch (Exception e) {
             assertTrue(true);
