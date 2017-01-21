@@ -1,5 +1,6 @@
 package nars.premise;
 
+import jcog.Util;
 import jcog.data.MutableIntRange;
 import jcog.list.FasterList;
 import nars.*;
@@ -180,21 +181,28 @@ abstract public class PremiseBuilder {
 
                         boolean exists = nar.tasks.contains(answered);
                         if (!exists) {
-                            //transfer budget from question to answer
-                            BudgetFunctions.transferPri(taskBudget, answered.budget(),
-                                    answered.conf() * (1f - taskBudget.qua()) //proportion of the taskBudget which the answer receives as a boost
-                            );
-
                             boolean processed = nar.input(answered) != null;
                         }
 
-                        //need to call this to handle pre-existing tasks matched to a newer question
                         answered = task.onAnswered(answered, nar);
-
                         if (answered != null) {
+
+                            //transfer budget from question to answer
+                            float qBefore = taskBudget.pri();
+                            float aBefore = answered.pri();
+                            BudgetFunctions.transferPri(taskBudget, answered.budget(),
+                                answered.conf() * (1f - Util.unitize(taskBudget.qua()/answered.qua())) //proportion of the taskBudget which the answer receives as a boost
+                            );
+                            float qFactor = taskBudget.pri() / qBefore;
+                            float aFactor = answered.pri() / aBefore;
+                            task.budget().set(taskBudget); //update the task budget
+                            c.tasklinks().mul(task, qFactor); //adjust the tasklink's budget in the same proportion as the task was adjusted
+                            c.termlinks().mul(beliefTerm, aFactor);
+
                             if (answered.punc() == Op.BELIEF)
                                 belief = answered;
                         }
+
                     }
                 }
             }
