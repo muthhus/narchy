@@ -73,7 +73,7 @@ public class IRCAgent extends IRC {
         nar.onTask(t -> {
             float p = t.pri();
             //if (t.op()==INH && t.term(1).equals(nar.self())) {
-            if (p >= 0.1f) { // || (t.term().containsTermRecursively(nar.self()) && (p > 0.5f))) {
+            if (t.isCommand() || (p >= 0.1f)) { // || (t.term().containsTermRecursively(nar.self()) && (p > 0.5f))) {
                 send(channels, t.toString());
             }
         });
@@ -300,14 +300,14 @@ public class IRCAgent extends IRC {
 //                    });
 
 
-                    int narsese = parsed.size();
-                    if (narsese > 0) {
-                        for (Task t : parsed) {
-                            logger.info("narsese({},{}): {}", channel, nick, t);
-                        }
-                        parsed.forEach(nar::input);
-                        return;
-                    }
+//                    int narsese = parsed.size();
+//                    if (narsese > 0) {
+//                        for (Task t : parsed) {
+//                            logger.info("narsese({},{}): {}", channel, nick, t);
+//                        }
+//                        parsed.forEach(nar::input);
+//                        return;
+//                    }
                 } catch (GrappaException | Narsese.NarseseException f) {
                     hear(msg, nick);
                 }

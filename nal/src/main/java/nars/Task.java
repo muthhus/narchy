@@ -2,6 +2,7 @@ package nars;
 
 import nars.budget.Budgeted;
 import nars.concept.Concept;
+import nars.op.Command;
 import nars.task.Tasked;
 import nars.term.Compound;
 import nars.term.Term;
@@ -340,6 +341,8 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
      * to cancel any matched premise belief.
      */
     default Task onAnswered(Task answer, NAR nar) {
+        if (isInput())
+            Command.log(nar, this.toString() + "  " + answer.toString());
         return answer;
     }
 
