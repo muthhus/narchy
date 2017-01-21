@@ -37,9 +37,10 @@ public enum ImageMatch {
         Term[] t2;
 
         int dt = y.indexOf(relationTerm);
+        int ydt = y.dt();
         if (dt == -1) {
             //insert the relation term
-            int yOff = y.dt() - yOffset; //where to expect _ in t
+            int yOff = ydt - yOffset; //where to expect _ in t
             t2 = new Term[l + 1];
             for (Term x : t) {
                 if (j == yOff)
@@ -56,9 +57,9 @@ public enum ImageMatch {
             int m = l ;
             t2 = new Term[m];
             int numPreMatched = y.size() - t.length;
-            for (int i = 0, tLength = t.length; i < tLength; ) {
+            for (int i = 0, tLength = t.length; i < tLength && j < m; ) {
                 t2[j++] = t[i++];
-                if ((i >= (y.dt() - numPreMatched)) && (i == (dt - 1)))
+                if ((i >= (ydt - numPreMatched)) && (i == (dt - 1)))
                     t2[j++] = Imdex;
             }
 

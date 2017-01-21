@@ -66,8 +66,8 @@ public class BeliefTableTest  {
 
         BeliefAnalysis b = new BeliefAnalysis(n, AB);
 
-        n.input("a:b. %0.9|0.9%"); //highest positive
-        n.input("a:b. %0.8|0.8%");
+        n.input("b:a. %0.9|0.9%"); //highest positive
+        n.input("b:a. %0.8|0.8%");
 
 
         n.next();
@@ -75,8 +75,8 @@ public class BeliefTableTest  {
 
         assertEquals(0.86f, b.beliefs().match(n.time()).expectation(), 0.1f);
 
-        n.input("a:b. %0.2|0.7%");
-        n.input("a:b. %0.1|0.8%"); //highest negative
+        n.input("b:a. %0.2|0.7%");
+        n.input("b:a. %0.1|0.8%"); //highest negative
 
         n.next();
         b.print();

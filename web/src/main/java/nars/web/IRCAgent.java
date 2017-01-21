@@ -73,16 +73,18 @@ public class IRCAgent extends IRC {
 
         out = new Leak<Task>(new ArrayBag<Task>(16, BudgetMerge.plusBlend, new ConcurrentHashMap<>()), 0.01f, nar) {
 
-            boolean echoCommandInput = false;
+            //boolean echoCommandInput = false;
 
             @Override
             protected float onOut(@NotNull BLink<Task> t) {
                 Task task = t.get();
                 if (!task.isDeleted()) {
-                    String length = (!task.isCommand()) ? task.toString() : task.term().toString();
+                    boolean cmd = task.isCommand();
+                    String length = (!cmd) ? task.toString() : task.term().toString();
                     send(channels, length);
+                    return cmd ? 0 : 1; //no cost for command outputs
                 }
-                return 1;
+                return 0;
             }
 
             @Override
@@ -91,7 +93,7 @@ public class IRCAgent extends IRC {
                 //if (t.op()==INH && t.term(1).equals(nar.self())) {
                 boolean cmd = t.isCommand();
 
-                if ((cmd && (echoCommandInput || !t.isInput())) || (!cmd && p == p)) { // || (t.term().containsTermRecursively(nar.self()) && (p > 0.5f))) {
+                if (cmd || (!cmd && p == p)) { // || (t.term().containsTermRecursively(nar.self()) && (p > 0.5f))) {
                     each.accept(new DefaultBLink<>(t, !cmd ? t : new RawBudget(1f,1f)));
                 }
             }
