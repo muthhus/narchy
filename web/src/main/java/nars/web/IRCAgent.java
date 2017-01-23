@@ -6,9 +6,11 @@ import nars.Task;
 import nars.Wiki;
 import nars.conceptualize.DefaultConceptBuilder;
 import nars.index.term.map.CaffeineIndex;
+import nars.link.BLink;
 import nars.nar.Default;
 import nars.op.Command;
 import nars.op.Leak;
+import nars.op.mental.Abbreviation;
 import nars.op.mental.Inperience;
 import nars.term.Term;
 import nars.time.RealTime;
@@ -22,6 +24,7 @@ import org.slf4j.LoggerFactory;
 import spacegraph.net.IRC;
 
 import java.util.Random;
+import java.util.function.Consumer;
 
 /**
  * $0.9;0.9;0.99$
@@ -46,6 +49,7 @@ public class IRCAgent extends IRC {
     private final Leak<Task> out;
     private boolean hearTwenglish = true;
 
+    boolean trace = false;
 
     public IRCAgent(NAR nar, String nick, String server, String... channels) throws Exception {
         super(nick, server, channels);
@@ -53,16 +57,22 @@ public class IRCAgent extends IRC {
         this.nar = nar;
 
 
-        out = new LeakOut(nar, 16, 0.01f) {
+        out = new LeakOut(nar, 8, 0.02f) {
             @Override
             protected float send(Task task) {
                 boolean cmd = task.isCommand();
-                if (cmd || !task.isDeleted()) {
+                if (cmd || (trace && !task.isDeleted())) {
                     String s = (!cmd) ? task.toString() : task.term().toString();
                     IRCAgent.this.send(channels, s);
                     return cmd ? 0 : 1; //no cost for command outputs
                 }
                 return 0;
+            }
+
+            @Override
+            protected void in(@NotNull Task t, Consumer<BLink<Task>> each) {
+                if (trace || t.isCommand())
+                    super.in(t, each);
             }
         };
 
@@ -120,8 +130,9 @@ public class IRCAgent extends IRC {
 
     }
 
-
-
+    public void setTrace(boolean trace) {
+        this.trace = trace;
+    }
 
     //    abstract class IRCBotOperator extends TermProcedure {
 //
@@ -221,20 +232,20 @@ public class IRCAgent extends IRC {
 
         Random random = new XorShift128PlusRandom(System.currentTimeMillis());
 
-        MultiThreadExecutioner exe = new MultiThreadExecutioner(2, 1024 * 4);
+        MultiThreadExecutioner exe = new MultiThreadExecutioner(3, 1024 * 8);
         exe.sync(true);
 
         Default nar = new Default(activeConcepts, conceptsPerFrame, 1, 3, random,
 
-                new CaffeineIndex(new DefaultConceptBuilder(), 128 * 1024, false, exe),
+                new CaffeineIndex(new DefaultConceptBuilder(), 512 * 1024, false, exe),
                 //new TreeTermIndex.L1TreeIndex(new DefaultConceptBuilder(), 400000, 64 * 1024, 3),
 
-                new RealTime.CS(true),
+                new RealTime.CS(true).dur(0.1f),
                 exe
         );
 
 
-        int volMax = 48;
+        int volMax = 32;
 
 //        //Multi nar = new Multi(3,512,
 //        Default nar = new Default(2048,
@@ -245,17 +256,18 @@ public class IRCAgent extends IRC {
 //                , new FrameClock(), exe);
 
 
-        nar.beliefConfidence(0.9f);
-        nar.goalConfidence(0.9f);
+        nar.beliefConfidence(0.5f);
+        nar.goalConfidence(0.5f);
 
         float p = 0.25f;
-        nar.DEFAULT_BELIEF_PRIORITY = 1f * p;
+        nar.DEFAULT_BELIEF_PRIORITY = 0.5f * p;
         nar.DEFAULT_GOAL_PRIORITY = 1f * p;
         nar.DEFAULT_QUESTION_PRIORITY = 1f * p;
         nar.DEFAULT_QUEST_PRIORITY = 1f * p;
 
-        nar.confMin.setValue(0.01f);
+        nar.confMin.setValue(0.02f);
         nar.termVolumeMax.setValue(volMax);
+        nar.linkFeedbackRate.setValue(0.02f);
 
 
 
@@ -273,7 +285,8 @@ public class IRCAgent extends IRC {
 
         //MySTMClustered stm = new MySTMClustered(nar, 64, '.', 2, true, 1);
 
-        new Inperience(nar, 0.005f, 8);
+        new Abbreviation(nar, "_", 4, 12, 0.001f, 8);
+        new Inperience(nar, 0.003f, 8);
 
         nar.loop(framesPerSecond);
 
@@ -286,19 +299,27 @@ public class IRCAgent extends IRC {
 
         Hear.wiki(n);
 
+
         IRCAgent bot = new IRCAgent(n,
                 "experiment1", "irc.freenode.net",
-                "#123xyz"
+                //"#123xyz"
                 //"#netention"
-                //"#nars"
+                "#nars"
         );
+
+        n.on("trace", (Command) (a, t, nn) -> {
+            if (t.length > 0) {
+                switch (t[0].toString()) {
+                    case "on": bot.setTrace(true); break;
+                    case "off": bot.setTrace(false); break;
+                }
+            }
+        });
+
 
         //new NARWeb(n, 8080);
 
         bot.start();
-
-
-
 
     }
 

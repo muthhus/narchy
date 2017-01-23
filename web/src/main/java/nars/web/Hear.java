@@ -15,6 +15,8 @@ import org.jetbrains.annotations.NotNull;
 import java.io.IOException;
 import java.util.List;
 
+import static nars.Op.BELIEF;
+
 
 public class Hear extends Loop {
     private final NAR nar;
@@ -22,6 +24,9 @@ public class Hear extends Loop {
     private final List<Term> tokens;
     public final On onReset;
     int token = 0;
+
+    float priorityFactor = 1f;
+    float confFactor = 1f;
 
     /** set wordDelayMS to -1 to disable twenglish function */
     public static Loop hear(NAR nar, String msg, String src, int wordDelayMS) {
@@ -69,10 +74,10 @@ public class Hear extends Loop {
         }
 
         Term next = tokens.get(token++);
-        nar.believe(0.25f,
+        nar.believe(nar.priorityDefault(BELIEF) * priorityFactor,
                 //$.func("hear", chan_nick, tokens.get(token++))
                 $.inh(next, $.imge(context)),
-                Tense.Present, 1f, 0.9f);
+                Tense.Present, 1f, nar.confidenceDefault(BELIEF) * confFactor);
     }
 
     static public void wiki(NAR nar) {
@@ -96,7 +101,7 @@ public class Hear extends Loop {
 
                 //System.out.println(strippedText);
 
-                Hear.hear(nar, strippedText, page, 25);
+                Hear.hear(nar, strippedText, page, 13);
 
                 Command.log(n, "Reading " + base + ":" + page + ": " + strippedText.length() + " characters");
 

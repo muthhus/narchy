@@ -502,12 +502,13 @@ public class Tetris extends NAgents {
 ////            }
 ////        });
 //
-        float p = 0.75f;
+        float p = 0.05f;
         nar.DEFAULT_BELIEF_PRIORITY = 0.25f * p;
         nar.DEFAULT_GOAL_PRIORITY = 1f * p;
         nar.DEFAULT_QUESTION_PRIORITY = 1f * p;
         nar.DEFAULT_QUEST_PRIORITY = 1f * p;
 
+        /*
         nar.onCycle((n)->{
             FloatSummaryReusableStatistics inputPri = new FloatSummaryReusableStatistics();
             FloatSummaryReusableStatistics derivPri = new FloatSummaryReusableStatistics();
@@ -530,6 +531,8 @@ public class Tetris extends NAgents {
             System.out.println("other=" + otherPri);
             System.out.println();
         });
+        */
+
 //
 //
 //        nar.confMin.setValue(0.02f);

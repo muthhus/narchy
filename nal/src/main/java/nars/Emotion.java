@@ -18,7 +18,7 @@ public final class Emotion implements Serializable {
     @NotNull
     public final FloatGuage busyMass;
 
-    public final DescriptiveStatistics busyMassAvg = new DescriptiveStatistics(16);
+    public final DescriptiveStatistics busyMassAvg = new DescriptiveStatistics(Param.BUSY_WINDOW);
 
     /** priority rate of Task processing which affected concepts */
     @NotNull
