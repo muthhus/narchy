@@ -152,10 +152,8 @@ abstract public class substituteIfUnifies extends Functor {
 //        }
 
         if (!equals && hasAnyOp) {
-            SubUnify m = new SubUnify(parent, op);
-
-            Term newTerm = m.tryMatch(parent, term, x, y);
-            return newTerm != null ? newTerm : null;
+            Term newTerm = new SubUnify(parent, op).tryMatch(parent, term, x, y);
+            return newTerm;
         } else {
             return equals ? term : null;
         }

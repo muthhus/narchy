@@ -28,6 +28,7 @@ import nars.Op;
 import nars.term.atom.Atomic;
 import nars.term.atom.AtomicSingleton;
 import nars.term.container.TermContainer;
+import nars.term.obj.IntTerm;
 import nars.term.subst.Unify;
 import nars.term.var.AbstractVariable;
 import nars.term.var.GenericVariable;
@@ -45,6 +46,7 @@ import java.util.List;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
 
+import static nars.Op.INT;
 import static nars.time.Tense.DTERNAL;
 
 
@@ -424,5 +426,15 @@ public interface Term extends Termed, Termlike, Comparable<Termlike> {
         return this;
     }
 
+    static int intValue(Term intTerm) {
+        if (intTerm instanceof IntTerm) {
+            return ((IntTerm)intTerm).val;
+        } else /*else /*if (x.op() == INT )*/ {
+            String xs = intTerm.toString();
+            return Integer.valueOf(xs);
+        }/* else {
+            throw new NumberFormatException(x + " is not an IntTerm");
+        }*/
+    }
 }
 

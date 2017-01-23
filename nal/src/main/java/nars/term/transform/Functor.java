@@ -9,6 +9,7 @@ import nars.concept.Concept;
 import nars.concept.PermanentConcept;
 import nars.term.Term;
 import nars.term.atom.Atom;
+import nars.term.obj.IntTerm;
 import nars.term.var.Variable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -19,6 +20,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 import static nars.$.the;
+import static nars.Op.INT;
 
 /** a functor is a term transform which immediately returns
  *  a result Term from the Term[] arguments of
@@ -110,6 +112,20 @@ abstract public class Functor extends AtomConcept implements PermanentConcept, F
     /** two argument functor (convenience method) */
     public static Concept f2(@NotNull String termAtom, @NotNull BiFunction<Term, Term, Term> ff) {
         return f2(fName(termAtom), ff);
+    }
+
+    /** two argument non-variable integer functor (convenience method) */
+    @FunctionalInterface public interface IntIntFunc {
+        int apply(int x, int y);
+    }
+
+    public static Concept f2Int(@NotNull String termAtom, @NotNull IntIntFunc ff) {
+        return f2(fName(termAtom), (xt, yt) -> {
+            if ((!(xt.op()==INT)) || (!(yt.op()==INT)))
+                return null;
+            else
+                return $.the(ff.apply(Term.intValue(xt), Term.intValue(yt)));
+        });
     }
 
     @NotNull

@@ -41,12 +41,9 @@ public class Builtin  {
 
             Functor.f2("equal", (x,y) ->
                 x.equals(y) ? True : (!((x instanceof Variable) || (y instanceof Variable)) ? False : null)),
-            Functor.f2("add", (x,y) ->
-                ((x instanceof IntTerm) && (y instanceof IntTerm)) ?
-                    $.the(((IntTerm)x).val + ((IntTerm)y).val) : null),
-            Functor.f2("sub", (x,y) ->
-                ((x instanceof IntTerm) && (y instanceof IntTerm)) ?
-                    $.the(((IntTerm)x).val - ((IntTerm)y).val) : null),
+
+            Functor.f2Int("add", (x, y) -> x + y),
+            Functor.f2Int("sub", (x, y) -> x - y)
     };
 
     /**

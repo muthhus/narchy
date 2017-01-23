@@ -39,12 +39,14 @@ public final class SubUnify extends Unify {
     public boolean onMatch() {
         //apply the match before the xy/yx mapping gets reverted after leaving the termutator
         if (xterm != null) {
+            Subst s;
             if (target != null) {
                 target.replaceAllXY(this);
-                result = $.terms.transform(xterm, target);
+                s = target;
             } else {
-                result = transform(xterm, this);
+                s = this;
             }
+            result = transform(xterm, s);
         }
 
         return (result == null) && --retries > 0;

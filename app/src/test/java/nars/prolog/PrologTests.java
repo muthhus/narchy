@@ -139,8 +139,8 @@ public class PrologTests {
 
         new PrologAgent("hanoi(N) :- move(N, left, centre, right).\n" +
                 "        move(0, _, _, _) :- !.\n" +
-                "        move(N, A, B, C) :- M is N-1, move(M, A, C, B), inform(A, B), move(M, C, B, A).\n" +
-                "        inform(X,Y) :-write([move, disk, from, X, to, Y]), nl.")
+                "        move(N, A, B, C) :- M is N-1, move(M, A, C, B), inform(M, A, B), move(M, C, B, A).\n" +
+                "        inform(L, X,Y) :-write([L, ': ', move, disk, from, X, to, Y]), nl.")
                 .run("hanoi(3).");
 
 
@@ -148,13 +148,13 @@ public class PrologTests {
         Param.DEBUG = true;
 
         NAR n = new Default();
-        //n.logSummaryGT(System.out, 0.1f);
+        n.logBudgetMin(System.out, 0.1f);
         n.on("move", Operator.auto((g,b)->{
-            System.out.println(b);
+            System.err.println(g + "\t" + b);
         }));
         n.input(
             "move(3, (l, c, r)). :|:",
-            "move(0, (#x, #y, #z))!",
+            "move(0, #x)!",
             "((move(sub($x,1), ($a, $c, $b)) &&+1 move(sub($x,1), ($c, $b, $a))) ==>+1 move($x, ($a, $b, $c)))."
             //"(move($x, ($a, $b, $c)) ==>+1 (move(sub($x,1), ($a, $c, $b)) &&+1 move(sub($x,1), ($c, $b, $a))))."
         );
