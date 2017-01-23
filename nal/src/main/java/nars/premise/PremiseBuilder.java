@@ -274,6 +274,9 @@ abstract public class PremiseBuilder {
         //aveAri(taskLinkBudget.pri(), termLinkBudget.pri());
         //nar.conceptPriority(c);
 
+        float busy = (float) nar.emotion.busyMassAvg.getMean();
+        if (busy == busy && busy > 1f)
+            pri /= busy;
 
         return newPremise(c, task, beliefTerm, belief, qua, pri);
     }

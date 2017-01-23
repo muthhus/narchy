@@ -1,5 +1,6 @@
 package nars.experiment.tetris;
 
+import jcog.math.FloatSummaryReusableStatistics;
 import jcog.spatial.Rect1D;
 import nars.$;
 import nars.NAR;
@@ -12,13 +13,14 @@ import nars.gui.ConceptWidget;
 import nars.gui.NARSpace;
 import nars.nar.NARBuilder;
 import nars.remote.NAgents;
-import nars.task.MutableTask;
+import nars.task.DerivedTask;
 import nars.term.Compound;
 import nars.term.atom.Atomic;
 import nars.time.FrameTime;
 import nars.truth.Truth;
 import nars.util.task.TaskStatistics;
 import nars.video.LogIndex;
+import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.jetbrains.annotations.NotNull;
 import spacegraph.SimpleSpatial;
 import spacegraph.SpaceGraph;
@@ -500,11 +502,34 @@ public class Tetris extends NAgents {
 ////            }
 ////        });
 //
-//        float p = 1f;
-//        nar.DEFAULT_BELIEF_PRIORITY = 0.75f * p;
-//        nar.DEFAULT_GOAL_PRIORITY = 1f * p;
-//        nar.DEFAULT_QUESTION_PRIORITY = 0.5f * p;
-//        nar.DEFAULT_QUEST_PRIORITY = 0.5f * p;
+        float p = 0.75f;
+        nar.DEFAULT_BELIEF_PRIORITY = 0.25f * p;
+        nar.DEFAULT_GOAL_PRIORITY = 1f * p;
+        nar.DEFAULT_QUESTION_PRIORITY = 1f * p;
+        nar.DEFAULT_QUEST_PRIORITY = 1f * p;
+
+        nar.onCycle((n)->{
+            FloatSummaryReusableStatistics inputPri = new FloatSummaryReusableStatistics();
+            FloatSummaryReusableStatistics derivPri = new FloatSummaryReusableStatistics();
+            FloatSummaryReusableStatistics otherPri = new FloatSummaryReusableStatistics();
+            n.tasks.forEach(t -> {
+                float tp = t.pri();
+                if (tp != tp)
+                    return;
+                if (t.isInput()) {
+                    inputPri.accept(tp);
+                } else if (t instanceof DerivedTask) {
+                    derivPri.accept(tp);
+                } else {
+                    otherPri.accept(tp);
+                }
+            });
+
+            System.out.println("input=" + inputPri);
+            System.out.println("deriv=" + derivPri);
+            System.out.println("other=" + otherPri);
+            System.out.println();
+        });
 //
 //
 //        nar.confMin.setValue(0.02f);

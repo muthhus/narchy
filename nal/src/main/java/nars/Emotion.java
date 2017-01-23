@@ -4,6 +4,7 @@ import jcog.meter.event.FloatGuage;
 import nars.term.Compound;
 import nars.term.Term;
 import org.apache.commons.lang3.mutable.MutableFloat;
+import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.Serializable;
@@ -16,6 +17,8 @@ public final class Emotion implements Serializable {
     /** priority rate of Task processing attempted */
     @NotNull
     public final FloatGuage busyMass;
+
+    public final DescriptiveStatistics busyMassAvg = new DescriptiveStatistics(16);
 
     /** priority rate of Task processing which affected concepts */
     @NotNull
@@ -74,7 +77,10 @@ public final class Emotion implements Serializable {
     public void frame() {
         happy.clear();
         sad.clear();
+
+        busyMassAvg.addValue(busyMass.getSum());
         busyMass.clear();
+
         stress.clear();
         learn.clear();
         alert.clear();

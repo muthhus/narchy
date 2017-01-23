@@ -106,7 +106,7 @@ public class Narsese extends BaseParser<Object> {
     }
 
     @NotNull
-    public static Task makeTask(NAR nar, @Nullable float[] b, Compound content, char p, @Nullable Truth t, Tense tense) {
+    public static Task makeTask(NAR nar, @Nullable float[] b, Compound content, char p, @Nullable Truth t, Tense tense) throws NarseseException {
 
 //        if (p == null)
 //            throw new RuntimeException("character is null");
@@ -140,11 +140,10 @@ public class Narsese extends BaseParser<Object> {
                 ttt.budgetSafe(b[0], Float.NaN);
                 break;
             case 2:
-                ttt.budgetByTruth(b[1]);
+                ttt.budgetSafe(b[1], b[0]);
                 break;
             default:
-                ttt.setBudget(b[2], b[0]);
-                break;
+                throw new NarseseException("budget parse error");
         }
 
         return ttt.log(NARSESE_TASK_TAG);

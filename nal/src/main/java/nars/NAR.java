@@ -335,7 +335,12 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
 
     @NotNull public List<Task> tasks(@NotNull String parse) {
         List<Task> result = newArrayList(1);
-        Narsese.the().tasks(parse, result, this);
+        List<NarseseException> exc = newArrayList(0);
+        Narsese.the().tasks(parse, result, exc, this);
+
+        if (!exc.isEmpty())
+            exc.forEach(e -> logger.error("parse error: {}", e));
+
         return result;
     }
 

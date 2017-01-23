@@ -57,13 +57,14 @@ import static nars.time.Tense.ETERNAL;
         return (g, nar) -> {
             if (g.punc() == GOAL) {
                 Compound c = g.term();
+                Task b = null;
                 if (c.vars() == 0 && c.varPattern() == 0) {
                     long occurrence = g.occurrence();
                     if (occurrence == ETERNAL || occurrence >= nar.time()) {
-                        Task b = nar.believe(g.priSafe(0), c, occurrence, g.freq(), nar.confidenceDefault(BELIEF));
-                        onExec.accept(g, b);
+                        b = nar.believe(g.priSafe(0), c, occurrence, g.freq(), nar.confidenceDefault(BELIEF));
                     }
                 }
+                onExec.accept(g, b);
             }
             return g;
         };

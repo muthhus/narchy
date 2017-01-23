@@ -148,17 +148,20 @@ public class PrologTests {
         Param.DEBUG = true;
 
         NAR n = new Default();
-        n.logBudgetMin(System.out, 0.1f);
+        n.DEFAULT_BELIEF_PRIORITY = 0.1f;
+        n.DEFAULT_GOAL_PRIORITY = 0.9f;
+        n.DEFAULT_QUESTION_PRIORITY = 0.9f;
+        //n.logBudgetMin(System.out, 0f);
         n.on("move", Operator.auto((g,b)->{
             System.err.println(g + "\t" + b);
         }));
         n.input(
-            "move(3, (l, c, r)). :|:",
-            "move(0, #x)!",
-            "((move(sub($x,1), ($a, $c, $b)) &&+1 move(sub($x,1), ($c, $b, $a))) ==>+1 move($x, ($a, $b, $c)))."
-            //"(move($x, ($a, $b, $c)) ==>+1 (move(sub($x,1), ($a, $c, $b)) &&+1 move(sub($x,1), ($c, $b, $a))))."
+            "move(3, (l, c, r)). %1.0;0.99%",
+            "move(0, #x)! %1.0;0.99%",
+            //"(?x ==> move(0, ?y))?",
+            "((move(sub($x,1), ($a, $c, $b)) && move(sub($x,1), ($c, $b, $a))) ==> move($x, ($a, $b, $c))). %1.00;0.99%"
         );
-        n.run(5000);
+        n.run(500);
 
     }
 }
