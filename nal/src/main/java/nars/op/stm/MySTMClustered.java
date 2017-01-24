@@ -7,6 +7,7 @@ import nars.$;
 import nars.NAR;
 import nars.Task;
 import nars.budget.BudgetFunctions;
+import nars.budget.Budgeted;
 import nars.task.GeneratedTask;
 import nars.term.Compound;
 import nars.term.Term;
@@ -47,11 +48,11 @@ public class MySTMClustered extends STMClustered {
         this(nar, size, punc, maxGroupSize, false, 1);
     }
 
-    public MySTMClustered(@NotNull NAR nar, int size, char punc, int maxGroupSize, boolean allowNonInput, int intinputsPerFrame) {
+    public MySTMClustered(@NotNull NAR nar, int size, char punc, int maxGroupSize, boolean allowNonInput, int intinputsPerCycle) {
         this(nar, size, punc, maxGroupSize, maxGroupSize,
                 Math.round(((float) nar.termVolumeMax.intValue()) / (2)) /* estimate */
                 , allowNonInput,
-                intinputsPerFrame);
+                intinputsPerCycle);
     }
 
     public MySTMClustered(@NotNull NAR nar, int size, char punc, int minGroupSize, int maxGroupSize, int maxInputVolume, boolean allowNonInput, int inputsPerFrame) {
@@ -192,7 +193,7 @@ public class MySTMClustered extends STMClustered {
                         long t = Math.round(nc[0]);
 
                         //priority calculation: conservatively choose the max value and not the sum
-                        float pri = (float) uu.stream().mapToDouble(x -> x.pri()).max().getAsDouble();
+                        float pri = (float) uu.stream().mapToDouble(Budgeted::pri).max().getAsDouble();
 
                         Task m = new GeneratedTask(conj, punc,
                                 $.t(finalFreq, conf)) //TODO use a truth calculated specific to this fixed-size batch, not all the tasks combined

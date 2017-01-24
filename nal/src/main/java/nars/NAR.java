@@ -32,6 +32,7 @@ import nars.term.atom.Atom;
 import nars.term.atom.Atomic;
 import nars.term.transform.Functor;
 import nars.term.util.InvalidTermException;
+import nars.term.var.Variable;
 import nars.time.FrameTime;
 import nars.time.Tense;
 import nars.time.Time;
@@ -1221,10 +1222,15 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
     public final Concept concept(@NotNull Termed tt, boolean createIfMissing) {
         if (tt instanceof Concept)
             return ((Concept) tt); //assumes the callee has the same instance as the instance this might return if given only a Term
+        if (tt instanceof Variable)
+            return null; //fast eliminate
         return concept(tt.term(), createIfMissing);
     }
 
     public final @Nullable Concept concept(@NotNull Term t, boolean createIfMissing) {
+        if (t instanceof Variable)
+            return null; //fast eliminate
+
         Concept c = concepts.concept(t, createIfMissing);
         if (c != null && createIfMissing && c.isDeleted()) {
             //try again

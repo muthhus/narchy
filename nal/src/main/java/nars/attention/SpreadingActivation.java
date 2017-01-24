@@ -8,6 +8,7 @@ import nars.concept.Concept;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
+import nars.term.var.Variable;
 import org.eclipse.collections.api.block.procedure.primitive.ObjectFloatProcedure;
 import org.eclipse.collections.impl.map.mutable.primitive.ObjectFloatHashMap;
 import org.jetbrains.annotations.NotNull;
@@ -122,7 +123,7 @@ public class SpreadingActivation extends Activation implements ObjectFloatProced
         float thisScale = scale;
 
         int nextDepth = depth + 1;
-        if (targetTerm instanceof Compound && (nextDepth <= termlinkDepth)) {
+        if ((nextDepth <= termlinkDepth) && (targetTerm instanceof Compound)) {
 
             int n = targetTerm.size();
             if (n > 0) {
@@ -138,9 +139,18 @@ public class SpreadingActivation extends Activation implements ObjectFloatProced
             }
         }
 
-        Concept termConcept = nar.concept(targetTerm, true);
-        if (termConcept!=null)
-            spread.addToValue(termConcept, thisScale);
+        Termed linkedTerm;
+        if (!(targetTerm instanceof Variable)) {
+            Concept termConcept = nar.concept(targetTerm, true);
+            if (termConcept != null)
+                linkedTerm = termConcept;
+            else
+                return;
+        } else {
+            linkedTerm = targetTerm;
+        }
+
+        spread.addToValue(linkedTerm, thisScale);
 
     }
 
@@ -153,7 +163,7 @@ public class SpreadingActivation extends Activation implements ObjectFloatProced
         if (tlForward > 0)
             termlink(origin, tgtTerm, tlForward);
 
-        if (tlReverse > 0 && (tgt instanceof Concept)) {
+        if (tgt!=origin /*(fast test to eliminate reverse self link)*/ && tlReverse > 0 && (tgt instanceof Concept)) {
             Term originTerm = origin.term();
             if (!originTerm.equals(tgtTerm)) {
                 termlink((Concept) tgt, originTerm, tlReverse);

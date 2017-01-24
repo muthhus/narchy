@@ -73,11 +73,19 @@ public class Hear extends Loop {
             return;
         }
 
-        Term next = tokens.get(token++);
+//        if (token > 0) {
+//            hear(tokens.get(token-1), 0.5f); //word OFF
+//        }
+
+        hear(tokens.get(token++), 1f); //word ON
+    }
+
+    private void hear(Term next, float freq) {
         nar.believe(nar.priorityDefault(BELIEF) * priorityFactor,
                 //$.func("hear", chan_nick, tokens.get(token++))
                 $.inh(next, $.imge(context)),
-                Tense.Present, 1f, nar.confidenceDefault(BELIEF) * confFactor);
+                //$.prop(next, (context[1])),
+                Tense.Present, freq, nar.confidenceDefault(BELIEF) * confFactor);
     }
 
     static public void wiki(NAR nar) {
@@ -101,7 +109,7 @@ public class Hear extends Loop {
 
                 //System.out.println(strippedText);
 
-                Hear.hear(nar, strippedText, page, 13);
+                Hear.hear(nar, strippedText, page, 25);
 
                 Command.log(n, "Reading " + base + ":" + page + ": " + strippedText.length() + " characters");
 

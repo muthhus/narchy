@@ -116,9 +116,6 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
         /* A statement sentence is not allowed to have a independent variable as subj or pred"); */
         Op op = t.op();
 
-        if (Param.FILTER_CONCEPTS_WITHOUT_ATOMS && !t.hasAny(Op.ATOM.bit | Op.INT.bit))
-            return false;
-
         switch (t.varIndep()) {
             case 0:
                 break;  //OK

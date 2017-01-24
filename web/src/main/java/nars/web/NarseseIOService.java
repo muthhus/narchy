@@ -60,7 +60,7 @@ public class NarseseIOService extends WebsocketService {
 
     @Override
     protected void onFullTextMessage(WebSocketChannel socket, BufferedTextMessage message) throws IOException {
-        Hear.hear(nar, message.getData(), "ui", 1);
+        Hear.hear(nar, message.getData(), "ui", 25);
     }
 
 

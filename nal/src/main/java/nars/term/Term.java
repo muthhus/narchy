@@ -59,13 +59,15 @@ public interface Term extends Termed, Termlike, Comparable<Termlike> {
     AtomicSingleton True = new AtomicSingleton("†");
 
     AtomicSingleton False = new AtomicSingleton("Ø");/* {
+
+
         @NotNull
         @Override
         public Term unneg() {
             return True;
         }
     };*/
-
+    AtomicSingleton Null = new AtomicSingleton("");
 
     @NotNull
     @Override

@@ -1,5 +1,7 @@
 package nars;
 
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.fge.grappa.Grappa;
 import com.github.fge.grappa.annotations.Cached;
 import com.github.fge.grappa.matchers.MatcherType;
@@ -26,6 +28,8 @@ import nars.term.var.Variable;
 import nars.time.Tense;
 import nars.truth.DefaultTruth;
 import nars.truth.Truth;
+import org.eclipse.collections.api.tuple.Pair;
+import org.eclipse.collections.impl.tuple.Tuples;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -33,6 +37,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 import static nars.Op.*;
 
@@ -1051,9 +1056,11 @@ public class Narsese extends BaseParser<Object> {
         if (op == null)
             op = PROD;
 
-        Term c = $.compound(op, vectorterms);
-        //System.out.println(c);
-        return c;
+        //return $.compound(op, vectorterms);
+        Term x = termCache.get(Tuples.pair(op, vectorterms), termBuilder);
+        if (x == Term.Null)
+            return null;
+        return x;
 
 //        if (vectorterms.isEmpty())
 //            return null;
@@ -1062,6 +1069,14 @@ public class Narsese extends BaseParser<Object> {
         //return vectorTerms.get().computeIfAbsent(Tuples.pair(op, (List) vectorterms), popTermFunction);
     }
 
+    final static Cache<Pair<Op,List>, Term> termCache = Caffeine.newBuilder().maximumSize(1024 * 32).build();
+
+    static final Function<Pair<Op,List>, Term> termBuilder = (k) ->{
+       Term x = $.compound(k.getOne(), k.getTwo());
+       if (x == null) //cant store null values so use placeholder
+           return Term.Null;
+       return x;
+    };
 
 //    @Nullable
 //    public static final Function<Pair<Op, List>, Term> popTermFunction = (x) -> {

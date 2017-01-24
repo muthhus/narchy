@@ -107,7 +107,7 @@ public class WebServer extends PathHandler /*extends PathHandler*/ {
         int httpPort = args.length < 1 ? 8080 : Integer.parseInt(args[0]);
 
         NAR nar =
-                newRealtimeNAR(512, 3, 2);
+                newRealtimeNAR(512, 25, 2);
 
         Hear.wiki(nar);
 

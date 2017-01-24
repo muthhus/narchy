@@ -574,14 +574,14 @@ public abstract class TermIndex extends TermBuilder {
 
                     if (term instanceof Compound) {
 
-                        if (Param.FILTER_CONCEPTS_WITHOUT_ATOMS) {
-                            if (!term.hasAny(ATOM.bit | Op.INT.bit))
-                                return null;
-                        } /*else {
-                            //only filter 0-length compounds, example: ()
-                            if (term.size() == 0)
-                                return null;
-                        }*/
+//                        if (Param.FILTER_CONCEPTS_WITHOUT_ATOMS) {
+//                            if (!term.hasAny(ATOM.bit | Op.INT.bit))
+//                                return null;
+//                        } /*else {
+//                            //only filter 0-length compounds, example: ()
+//                            if (term.size() == 0)
+//                                return null;
+//                        }*/
 
                         term = normalize((Compound) term);
                     }

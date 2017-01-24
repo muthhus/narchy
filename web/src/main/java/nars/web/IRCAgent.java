@@ -3,7 +3,6 @@ package nars.web;
 import jcog.data.random.XorShift128PlusRandom;
 import nars.NAR;
 import nars.Task;
-import nars.Wiki;
 import nars.conceptualize.DefaultConceptBuilder;
 import nars.index.term.map.CaffeineIndex;
 import nars.link.BLink;
@@ -12,10 +11,10 @@ import nars.op.Command;
 import nars.op.Leak;
 import nars.op.mental.Abbreviation;
 import nars.op.mental.Inperience;
+import nars.op.stm.MySTMClustered;
 import nars.term.Term;
 import nars.time.RealTime;
 import nars.util.exe.MultiThreadExecutioner;
-import org.apache.commons.lang3.StringEscapeUtils;
 import org.jetbrains.annotations.NotNull;
 import org.pircbotx.hooks.events.MessageEvent;
 import org.pircbotx.hooks.types.GenericMessageEvent;
@@ -28,15 +27,16 @@ import java.util.function.Consumer;
 
 /**
  * $0.9;0.9;0.99$
- * <p>
+ *
  * $0.9;0.9;0.99$ (hear(?someone, $something) ==>+1 hear(I,$something)).
  * $0.9;0.9;0.99$ (((hear(#someone,#someThing) &&+1 hear(#someone,$nextThing)) && hear(I, #someThing)) ==>+1 hear(I, $nextThing)).
  * $0.9;0.9;0.99$ (((hear($someone,$someThing) &&+1 hear($someone,$nextThing)) <=> hear($someone, ($someThing,$nextThing)))).
  * $0.9;0.9;0.99$ (((I<->#someone) && hear(#someone, $something)) ==>+1 hear(I, $something)).
  * $0.9;0.9;0.99$ hear(I, #something)!
  * hear(I,?x)?
- * <p>
+ *
  * $0.9$ (($x,"the") <-> ($x,"a")).
+ * ((($x --> (/,hear,#c,_)) &&+1 ($y --> (/,hear,#c,_))) ==> bigram($x,$y)).
  */
 public class IRCAgent extends IRC {
     private static final Logger logger = LoggerFactory.getLogger(IRCAgent.class);
@@ -57,7 +57,7 @@ public class IRCAgent extends IRC {
         this.nar = nar;
 
 
-        out = new LeakOut(nar, 8, 0.02f) {
+        out = new LeakOut(nar, 32, 0.02f) {
             @Override
             protected float send(Task task) {
                 boolean cmd = task.isCommand();
@@ -233,7 +233,7 @@ public class IRCAgent extends IRC {
         Random random = new XorShift128PlusRandom(System.currentTimeMillis());
 
         MultiThreadExecutioner exe = new MultiThreadExecutioner(3, 1024 * 8);
-        exe.sync(true);
+        exe.sync(false);
 
         Default nar = new Default(activeConcepts, conceptsPerFrame, 1, 3, random,
 
@@ -245,7 +245,7 @@ public class IRCAgent extends IRC {
         );
 
 
-        int volMax = 32;
+        int volMax = 28;
 
 //        //Multi nar = new Multi(3,512,
 //        Default nar = new Default(2048,
@@ -256,18 +256,18 @@ public class IRCAgent extends IRC {
 //                , new FrameClock(), exe);
 
 
-        nar.beliefConfidence(0.5f);
-        nar.goalConfidence(0.5f);
+        nar.beliefConfidence(0.8f);
+        nar.goalConfidence(0.8f);
 
-        float p = 0.25f;
-        nar.DEFAULT_BELIEF_PRIORITY = 0.5f * p;
+        float p = 0.02f;
+        nar.DEFAULT_BELIEF_PRIORITY = 1f * p;
         nar.DEFAULT_GOAL_PRIORITY = 1f * p;
         nar.DEFAULT_QUESTION_PRIORITY = 1f * p;
         nar.DEFAULT_QUEST_PRIORITY = 1f * p;
 
         nar.confMin.setValue(0.02f);
         nar.termVolumeMax.setValue(volMax);
-        nar.linkFeedbackRate.setValue(0.02f);
+        //nar.linkFeedbackRate.setValue(0.005f);
 
 
 
@@ -283,9 +283,9 @@ public class IRCAgent extends IRC {
 //        );
 //        nar.run(1);
 
-        //MySTMClustered stm = new MySTMClustered(nar, 64, '.', 2, true, 1);
+        MySTMClustered stm = new MySTMClustered(nar, 16, '.', 3, false, 2);
 
-        new Abbreviation(nar, "_", 4, 12, 0.001f, 8);
+        new Abbreviation(nar, "_", 3, 12, 0.01f, 8);
         new Inperience(nar, 0.003f, 8);
 
         nar.loop(framesPerSecond);

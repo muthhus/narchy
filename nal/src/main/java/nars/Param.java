@@ -108,7 +108,7 @@ public abstract class Param /*extends Container*/  {
     public static final float UnificationMatchesMax = 4, UnificationMatchesMin = 2;
 
 
-    public static final boolean FILTER_CONCEPTS_WITHOUT_ATOMS = true;
+//    public static final boolean FILTER_CONCEPTS_WITHOUT_ATOMS = false;
 
     /**
      * max # of chained termutes which can be active
