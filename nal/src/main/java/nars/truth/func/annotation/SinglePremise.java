@@ -7,7 +7,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 /**
  * marker annotation for single-premise truthfunctions
  */
-@Retention(value=RUNTIME)
+@Retention(RUNTIME)
 public @interface SinglePremise {
 
 }

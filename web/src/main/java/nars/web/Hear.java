@@ -7,6 +7,7 @@ import nars.*;
 import nars.nlp.Twenglish;
 import nars.op.Command;
 import nars.term.Term;
+import nars.term.atom.Atom;
 import nars.time.Tense;
 import nars.util.Loop;
 import org.apache.commons.lang3.StringEscapeUtils;
@@ -19,6 +20,9 @@ import static nars.Op.BELIEF;
 
 
 public class Hear extends Loop {
+
+    final static Atom START = $.the("start");
+
     private final NAR nar;
     private final Term[] context;
     private final List<Term> tokens;
@@ -28,13 +32,15 @@ public class Hear extends Loop {
     float priorityFactor = 1f;
     float confFactor = 1f;
 
-    /** set wordDelayMS to -1 to disable twenglish function */
+    /** set wordDelayMS to 0 to disable twenglish function */
     public static Loop hear(NAR nar, String msg, String src, int wordDelayMS) {
         @NotNull List<Task> parsed = $.newArrayList();
         @NotNull List<Narsese.NarseseException> errors = $.newArrayList();
-        Narsese.the().tasks(msg.replace("http://", ""), parsed, errors, nar);
+
+        Narsese.the().tasks(msg, parsed, errors, nar);
 
         if (!parsed.isEmpty() && errors.isEmpty()) {
+            logger.info("narsese: {}", parsed);
             parsed.forEach(nar::input);
         } else {
             if (wordDelayMS > 0) {
@@ -77,13 +83,13 @@ public class Hear extends Loop {
 //            hear(tokens.get(token-1), 0.5f); //word OFF
 //        }
 
-        hear(tokens.get(token++), 1f); //word ON
+        hear(token > 0 ? tokens.get(token-1) : START, tokens.get(token++), 1f); //word ON
     }
 
-    private void hear(Term next, float freq) {
+    private void hear(Term prev, Term next, float freq) {
         nar.believe(nar.priorityDefault(BELIEF) * priorityFactor,
                 //$.func("hear", chan_nick, tokens.get(token++))
-                $.inh(next, $.imge(context)),
+                $.inh($.p(prev,next), $.imge(context)),
                 //$.prop(next, (context[1])),
                 Tense.Present, freq, nar.confidenceDefault(BELIEF) * confFactor);
     }

@@ -38,13 +38,11 @@ public class DynamicBeliefTableTest {
         n.believe("a:z", 1f, 0.9f);
         n.run(1);
 
-        {
-            Concept cc = n.concept($("(&&, a:x, a:y, a:z)"), true);
-            Truth now = cc.belief(n.time());
-            assertEquals($.t(1f, 0.73f), now);
-            //the truth values were provided despite the belief tables being empty:
-            assertTrue(cc.beliefs().isEmpty());
-        }
+        Concept cc = n.concept($("(&&, a:x, a:y, a:z)"), true);
+        Truth now = cc.belief(n.time());
+        assertEquals($.t(1f, 0.73f), now);
+        //the truth values were provided despite the belief tables being empty:
+        assertTrue(cc.beliefs().isEmpty());
 
         //test unknown:
         {
@@ -61,13 +59,11 @@ public class DynamicBeliefTableTest {
         }
 
         //test change after a component's revision:
-        {
-            n.believe("a:y", 0, 0.95f);
-            n.run(1);
-            Concept ccn = n.concept("(&&, a:x, a:y, a:z)");
-            Truth now2 = ccn.belief(n.time());
-            assertTrue(now2.freq() < 0.4f);
-        }
+        n.believe("a:y", 0, 0.95f);
+        n.run(1);
+        Concept ccn = n.concept("(&&, a:x, a:y, a:z)");
+        Truth now2 = ccn.belief(n.time());
+        assertTrue(now2.freq() < 0.4f);
 
     }
 
@@ -100,17 +96,15 @@ public class DynamicBeliefTableTest {
             }
         }
 
-        {
-            long when = 0;
-            for (int i = 0; i <= 8; i++) {
-                Compound template = $("((x) &&+"+ i + " (y))");
-                System.out.println( xtable.truth(when, template.dt(), true) + " " + xtable.generate(template, when));
-            }
-
-            assertEquals(0.81f, xtable.generate($("((x) &&+4 (y))"), 0).conf(), 0.01f); //best match to the input
-            assertEquals(0.45f, xtable.generate($("((x) &&+2 (y))"), 0).conf(), 0.01f);
-            assertEquals(0.23f, xtable.generate($("((x) &&+0 (y))"), 0).conf(), 0.01f);
+        long when = 0;
+        for (int i = 0; i <= 8; i++) {
+            Compound template = $("((x) &&+"+ i + " (y))");
+            System.out.println( xtable.truth(when, template.dt(), true) + " " + xtable.generate(template, when));
         }
+
+        assertEquals(0.81f, xtable.generate($("((x) &&+4 (y))"), 0).conf(), 0.01f); //best match to the input
+        assertEquals(0.45f, xtable.generate($("((x) &&+2 (y))"), 0).conf(), 0.01f);
+        assertEquals(0.23f, xtable.generate($("((x) &&+0 (y))"), 0).conf(), 0.01f);
 
 
     }

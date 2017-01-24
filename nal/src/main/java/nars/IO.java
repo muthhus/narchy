@@ -680,12 +680,11 @@ public class IO {
                 for (Term x : term)
                     o.add
             }*/
-            case PROD: {
+            case PROD:
                 JsonArray a = (JsonArray) Json.array();
                 for (Term x : ((Compound)term))
                     a.add(toJSONValue(x));
                 return a;
-            }
             default:
                 return Json.value(term.toString() );
         }

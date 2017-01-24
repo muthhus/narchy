@@ -157,19 +157,15 @@ public class QuestionTest {
         for (int i = 0; i < 10; i++) {
             int seed = i + 1;
 
-            {
-                TestNAR withQuestion = testProvider.apply(seed, 0);
-                withQuestion.run(true);
-                withTime.accept(withQuestion.time());
-                withTasks.add(withQuestion.nar);
-            }
+            TestNAR withQuestion = testProvider.apply(seed, 0);
+            withQuestion.run(true);
+            withTime.accept(withQuestion.time());
+            withTasks.add(withQuestion.nar);
 
-            {
-                TestNAR withoutQuestion = testProvider.apply(seed, 1);
-                withoutQuestion.run(true);
-                withOutTime.accept(withoutQuestion.time());
-                withoutTasks.add(withoutQuestion.nar);
-            }
+            TestNAR withoutQuestion = testProvider.apply(seed, 1);
+            withoutQuestion.run(true);
+            withOutTime.accept(withoutQuestion.time());
+            withoutTasks.add(withoutQuestion.nar);
         }
 
         withTasks.print();

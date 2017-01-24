@@ -211,7 +211,7 @@ public class MatchTaskBelief extends AtomicBoolCondition {
 
 
 
-        Ellipsis taskEllipsis = EllipsisTransform.firstEllipsisRecursive(task);
+        Ellipsis taskEllipsis = Ellipsis.firstEllipsisRecursive(task);
         if (taskEllipsis instanceof EllipsisTransform) {
             //belief must be matched first especially for EllipsisTransform
             return false;
@@ -225,7 +225,7 @@ public class MatchTaskBelief extends AtomicBoolCondition {
         }
         
         //prefer non-ellipsis matches first
-        Ellipsis beliefEllipsis = EllipsisTransform.firstEllipsisRecursive(belief);
+        Ellipsis beliefEllipsis = Ellipsis.firstEllipsisRecursive(belief);
         if (beliefEllipsis!=null) {
             return true;
         }

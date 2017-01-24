@@ -25,9 +25,9 @@ public class RevectionTest {
     @Test
     public void testRevisionEquivalence() throws Narsese.NarseseException {
         MutableTask a = t(1f, 0.5f, 0); //c~=0.67
-        a.evidence(new long[] { 0 } );
+        a.evidence(0);
         MutableTask b = t(1f, 0.5f, 0);
-        b.evidence(new long[] { 1 } ); //cause different hash
+        b.evidence(1); //cause different hash
 
         //assertEquals(a.truth(), TruthPolation.truth(0, a, a)); //same item
 
@@ -124,7 +124,7 @@ public class RevectionTest {
 
         System.out.println("TRUTHPOLATION");
         for (long d = start; d < end; d++) {
-            Truth a1 = p.truth(d, l);
+            Truth a1 = TruthPolation.truth(d, l);
             System.out.println(d + ": " + a1);
         }
     }

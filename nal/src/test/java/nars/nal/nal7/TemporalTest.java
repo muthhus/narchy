@@ -93,8 +93,8 @@ public class TemporalTest {
 
         assertTrue(((CompoundConcept) na).term(0) == ((CompoundConcept) nc).term(0));
 
-        System.out.println(((CompoundConcept) b.concept(n)));
-        System.out.println(((CompoundConcept) c.concept(n)));
+        System.out.println(b.concept(n));
+        System.out.println(c.concept(n));
 
         assertTrue(((CompoundConcept) b.concept(n)).term(0).equals(((CompoundConcept) c.concept(n)).term(0)));
 

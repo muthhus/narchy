@@ -259,7 +259,7 @@ public class IRCAgent extends IRC {
         nar.beliefConfidence(0.8f);
         nar.goalConfidence(0.8f);
 
-        float p = 0.02f;
+        float p = 0.5f;
         nar.DEFAULT_BELIEF_PRIORITY = 1f * p;
         nar.DEFAULT_GOAL_PRIORITY = 1f * p;
         nar.DEFAULT_QUESTION_PRIORITY = 1f * p;
@@ -311,7 +311,7 @@ public class IRCAgent extends IRC {
             if (t.length > 0) {
                 switch (t[0].toString()) {
                     case "on": bot.setTrace(true); break;
-                    case "off": bot.setTrace(false); break;
+                    case "off": bot.out.clear(); bot.setTrace(false); break;
                 }
             }
         });
@@ -325,7 +325,7 @@ public class IRCAgent extends IRC {
 
     final StringBuilder b = new StringBuilder();
 
-    public void say(String[] channels, Term w) {
+    public synchronized void say(String[] channels, Term w) {
         logger.info("say {}", w);
         b.append(w.toString()).append(' ');
         if (b.length() > 40) {

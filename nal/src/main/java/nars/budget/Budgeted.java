@@ -21,7 +21,7 @@ public interface Budgeted  {
         return totalPriority;
     }
 
-    public static void normalizePriSum(@NotNull Iterable<? extends Budgeted> l, float total) {
+    static void normalizePriSum(@NotNull Iterable<? extends Budgeted> l, float total) {
 
         float priSum = Budgeted.priSum(l);
         float mult = total / priSum;

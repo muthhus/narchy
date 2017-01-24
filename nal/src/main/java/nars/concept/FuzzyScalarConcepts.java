@@ -69,7 +69,7 @@ public class FuzzyScalarConcepts implements Iterable<SensorConcept> {
     }
 
     @FunctionalInterface  public interface FuzzyModel {
-        public Truth truth(float valueNormalized, int conceptIndex, int maxConcepts, NAR nar);
+        Truth truth(float valueNormalized, int conceptIndex, int maxConcepts, NAR nar);
     }
 
     public FuzzyScalarConcepts(FloatSupplier input, @NotNull NAR nar, FuzzyModel truther, @NotNull Compound... states) {

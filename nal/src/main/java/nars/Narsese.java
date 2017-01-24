@@ -170,13 +170,14 @@ public class Narsese extends BaseParser<Object> {
         return sequence(
                 zeroOrMore( //1 or more?
                         //sequence(
-                        firstOf(
-                                LineComment(),
-                                Task()
-                        ),
-                        s()
+                        //firstOf(
+                                //LineComment(),
+                        s(),
+                        Task()
                         //)
-                ), eof());
+
+                        //)
+                ), s(), eof());
     }
 
 //    /**
@@ -296,7 +297,7 @@ public class Narsese extends BaseParser<Object> {
     public Rule Task() {
 
         Var<float[]> budget = new Var();
-        Var<Character> punc = new Var();
+        Var<Character> punc = new Var(Op.COMMAND);
         Var<Term> term = new Var();
         Var<Truth> truth = new Var();
         Var<Tense> tense = new Var(Tense.Eternal);
@@ -310,15 +311,16 @@ public class Narsese extends BaseParser<Object> {
                 Term(true, false),
                 term.set(the(pop())),
 
-                SentencePunctuation(punc),
-
                 optional(
-                        s(), Tense(tense)
+                    s(), SentencePunctuation(punc)
                 ),
 
                 optional(
-                        s(), Truth(truth, tense)
+                    s(), Tense(tense)
+                ),
 
+                optional(
+                    s(), Truth(truth, tense)
                 ),
 
                 push(new Object[]{budget.get(), term.get(), punc.get(), truth.get(), tense.get()})
@@ -441,13 +443,7 @@ public class Narsese extends BaseParser<Object> {
 //    }
 
     Rule SentencePunctuation(Var<Character> punc) {
-        return firstOf(
-
-                sequence(anyOf(".?!@;"), punc.set(matchedChar())),
-
-                //default to command if punctuation missing
-                sequence(eof(), punc.set(';'))
-        );
+        return sequence(anyOf(".?!@;"), punc.set(matchedChar()));
     }
 
 
@@ -739,36 +735,19 @@ public class Narsese extends BaseParser<Object> {
         );
     }
 
-//    /**
-//     * MACRO: y`x    becomes    <{x} --> y>
-//     */
-//    Rule BacktickReverseInstance() {
-//        return sequence(
-//                Atom(), s(), '`', s(), Term(false),
-//                push(Instance.make((Term)(pop()), Atom.the(pop())))
-//        );
-//    }
-//
-
-//    /** creates a parser that is not associated with a memory; it will not parse any operator terms (which are registered with a Memory instance) */
-//    public static NarseseParser newParser() {
-//        return newParser((Memory)null);
-//    }
-//
-//    public static NarseseParser newMetaParser() {
-//        return newParser((Memory)null);
-//    }
-
 
     Rule QuotedAtom() {
         return sequence(
-                dquote(),
+                dquote(), //leading quote
                 firstOf(
                     //multi-line TRIPLE quotes
                     seq( regex("\"\"[\\s\\S]+\"\"\""), push( $.the( '\"' + match() ) ) ),
 
-                        //one quote
-                    seq( regex(".*\""), push( $.the( '\"' + match() ) ) )
+                    //one quote
+                    seq(
+                            //regex("[\\s\\S]+\""),
+                            regex("(?:[^\"\\\\]|\\\\.)*\""),
+                            push( $.the( '\"' + match() ) ) )
                 )
         );
     }

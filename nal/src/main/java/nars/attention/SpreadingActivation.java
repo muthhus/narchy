@@ -77,7 +77,7 @@ public class SpreadingActivation extends Activation implements ObjectFloatProced
             case IMPL:
             case EQUI:
                 return (host.vars() > 0) ? 3 : 2;
-            case CONJ: {
+            case CONJ:
 
                 int s = host.size();
                 int vars = host.vars();
@@ -87,7 +87,6 @@ public class SpreadingActivation extends Activation implements ObjectFloatProced
                     return 2;
                     //return (vars > 0) ? 2 : 1; //prevent long conjunctions from creating excessive templates
                 }
-            }
 
             default:
                 throw new UnsupportedOperationException("unhandled operator type: " + host.op());

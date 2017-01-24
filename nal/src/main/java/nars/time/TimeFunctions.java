@@ -394,7 +394,7 @@ public interface TimeFunctions {
                             int otherInDecomposed = rDecomposed.subtermTime(rOtherTerm);
                             if (decomposedTerm.dt() == 0 && otherInDecomposed == 0) {
                                 //special case for &&+0 having undergone some unrecognizable change
-                                occ = occOther - otherInDecomposed; //+0 should ensure it has the same time as this siblign event
+                                occ = occOther - 0; //+0 should ensure it has the same time as this siblign event
 
                             } else if (rDerived != null) { //{ && otherInDecomposed != DTERNAL) {
                                 int derivedInDecomposed = rDecomposed.subtermTime(rDerived);

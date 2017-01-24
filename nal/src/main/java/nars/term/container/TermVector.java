@@ -129,6 +129,7 @@ public abstract class TermVector implements TermContainer {
         return structure;
     }
 
+    @Override
     @NotNull abstract public Term term(int i);
 
     @Override

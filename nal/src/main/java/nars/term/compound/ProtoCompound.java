@@ -21,7 +21,7 @@ public interface ProtoCompound {
 
 
 
-    public class RawProtoCompound implements ProtoCompound {
+    class RawProtoCompound implements ProtoCompound {
 
 
         @NotNull private final Op op;

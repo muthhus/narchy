@@ -33,7 +33,7 @@ public interface Control {
 
 
 
-    static Control NullControl = new Control() {
+    Control NullControl = new Control() {
         @Override
         public void activate(Termed term, float priToAdd) {
 

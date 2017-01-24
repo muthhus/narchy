@@ -160,7 +160,7 @@ public class AlannControl implements Control {
 
     public static abstract class AlannAgent {
 
-        public volatile boolean stopped = false;
+        public volatile boolean stopped;
 
         public abstract void next();
 

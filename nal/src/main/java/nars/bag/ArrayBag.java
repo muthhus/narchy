@@ -34,7 +34,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
     /**
      * inbound pressure sum since last commit
      */
-    public volatile float pressure = 0;
+    public volatile float pressure;
 
     private static final Logger logger = LoggerFactory.getLogger(ArrayBag.class);
 
@@ -507,6 +507,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
 
 
 
+    @Override
     @NotNull public final Bag<V> commit(@Nullable Function<Bag, Consumer<BLink>> update) {
 
         synchronized (items) {
@@ -727,22 +728,20 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
                     swap(c, i, left);
                 }
 
-                {
-                    BLink temp = c[i];
-                    float tempV = pCmp(temp);
+                BLink temp = c[i];
+                float tempV = pCmp(temp);
 
-                    while (true) {
-                        while (i < cLenMin1 && cmpLT(c[++i], tempV)) ;
-                        while (cmpGT(c[--j], tempV)) ;
-                        if (j < i) {
-                            break;
-                        }
-                        swap(c, j, i);
+                while (true) {
+                    while (i < cLenMin1 && cmpLT(c[++i], tempV)) ;
+                    while (cmpGT(c[--j], tempV)) ;
+                    if (j < i) {
+                        break;
                     }
-
-                    c[left + 1] = c[j];
-                    c[j] = temp;
+                    swap(c, j, i);
                 }
+
+                c[left + 1] = c[j];
+                c[j] = temp;
 
                 short a, b;
                 if ((right - i + 1) >= (j - left)) {
@@ -868,7 +867,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
          * TODO this field can be re-used for 'activated' return value
          * -1 = deactivated, +1 = activated, 0 = no change
          */
-        int result = 0;
+        int result;
 
         public Insertion(float pri) {
             this.pri = pri;

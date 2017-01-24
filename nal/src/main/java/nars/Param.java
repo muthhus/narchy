@@ -38,8 +38,8 @@ public abstract class Param /*extends Container*/  {
 
 
     /** whether derivation's concepts are cross-termlink'ed with the premise concept */
-    public static boolean DERIVATION_TERMLINKED = false;
-    public static boolean DERIVATION_TASKLINKED = false;
+    public static boolean DERIVATION_TERMLINKED;
+    public static boolean DERIVATION_TASKLINKED;
 
 
     //    //TODO use 'I' for SELf, it is 3 characters shorter
@@ -507,7 +507,7 @@ public abstract class Param /*extends Container*/  {
     }
 
     //TODO use IntStream.range?
-    Predicate[] maxLevel = new Predicate[] {
+    Predicate[] maxLevel = {
             levelMax(0), levelMax(1), levelMax(2), levelMax(3), levelMax(4), levelMax(5), levelMax(6), levelMax(7)
     };
 

@@ -20,7 +20,7 @@ import java.util.Random;
  */
 public interface NARBuilder {
 
-    public static NAR newALANN(@NotNull Time time, int cores, int coreSize, int coreFires, int coreThreads, int auxThreads) {
+    static NAR newALANN(@NotNull Time time, int cores, int coreSize, int coreFires, int coreThreads, int auxThreads) {
 
         Executioner exe = auxThreads == 1 ? new SynchronousExecutor() {
             @Override public int concurrency() {
@@ -60,10 +60,10 @@ public interface NARBuilder {
     class MutableNARBuilder implements NARBuilder {
 
 
-        private Executioner exec = null;
-        private Time time = null;
-        private TermIndex index = null;
-        private Random rng = null;
+        private Executioner exec;
+        private Time time;
+        private TermIndex index;
+        private Random rng;
 
         @Override
         public NAR get() {

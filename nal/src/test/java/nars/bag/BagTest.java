@@ -301,7 +301,7 @@ public class BagTest {
 
         int n = a.capacity();
         int rrr = 100;
-        EmpiricalDistribution d = getSamplingIndexDistribution((CurveBag) a, n * rrr, n - 1);
+        EmpiricalDistribution d = getSamplingIndexDistribution(a, n * rrr, n - 1);
         //printDist(d);
         for (int i = 0; i < n - 1; i++) {
             long bi = d.getBinStats().get(i).getN();

@@ -39,7 +39,7 @@ public class ArithmeticInduction {
 
     private static final MultimapBuilder.SetMultimapBuilder setSetMapBuilder = MultimapBuilder.hashKeys().hashSetValues();
     private static final int resultLimit = 1;
-    private static boolean recurseAllSubstructures = false;
+    private static final boolean recurseAllSubstructures = false;
 
     @NotNull
     public static TermContainer compress(Op op, int dt, @NotNull TermContainer args) {

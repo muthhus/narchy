@@ -308,6 +308,7 @@ public interface Term extends Termed, Termlike, Comparable<Termlike> {
      * <p>
      * subclasses can override this for more efficient aggregation if certain features are sure to be absent
      */
+    @Override
     default int init(@NotNull int[] meta) {
 
         if (vars() > 0) {

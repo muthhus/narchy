@@ -801,7 +801,7 @@ public abstract class TermBuilder {
                         break;
                     }
 
-                    case IMPL: {
+                    case IMPL:
 
                         //special case for implications: reduce to --predicate if the subject is False
                         if (isTrue(subject))
@@ -869,7 +869,6 @@ public abstract class TermBuilder {
                             throw new InvalidTermException(op, dt, "Invalid implication predicate", subject, predicate);
 
                         break;
-                    }
                 }
 
 

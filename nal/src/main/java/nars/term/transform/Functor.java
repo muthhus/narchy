@@ -29,7 +29,7 @@ import static nars.Op.INT;
 abstract public class Functor extends AtomConcept implements PermanentConcept, Function<Term[],Term> {
 
     public Functor(@NotNull String atom) {
-        this((Atom)$.the(atom));
+        this($.the(atom));
     }
 
     public Functor(@NotNull Atom atom) {
@@ -37,7 +37,7 @@ abstract public class Functor extends AtomConcept implements PermanentConcept, F
     }
 
     public static Atom fName(@NotNull String termAtom) {
-        return (Atom)the(termAtom);
+        return the(termAtom);
     }
 
     /** creates a new functor from a term name and a lambda */
@@ -51,7 +51,7 @@ abstract public class Functor extends AtomConcept implements PermanentConcept, F
     }
 
     public static Concept f(@NotNull String termAtom, int arityRequired, @NotNull Function<Term[], Term> ff) {
-        return f((Atom)$.the(termAtom), arityRequired, ff);
+        return f($.the(termAtom), arityRequired, ff);
     }
 
     public static Concept f(@NotNull Atom termAtom, int arityRequired, @NotNull Function<Term[], Term> ff) {

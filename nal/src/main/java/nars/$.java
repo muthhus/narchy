@@ -82,7 +82,7 @@ public enum $ {
 //    }
 
     @NotNull
-    public static Atomic the(@NotNull String id) {
+    public static Atom the(@NotNull String id) {
         return new Atom(id);
     }
 

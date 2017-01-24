@@ -70,4 +70,8 @@ public abstract class Leak</* TODO: A, */B>  {
     public void setCapacity(int capacity) {
         bag.setCapacity(capacity);
     }
+
+    public void clear() {
+        bag.clear();
+    }
 }

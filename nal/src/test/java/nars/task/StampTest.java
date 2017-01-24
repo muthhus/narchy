@@ -86,7 +86,7 @@ public class StampTest {
 
     @Test public void directionInvariance() {
         //this one should behave the same regardless of the direction (since there is enough space)
-        final boolean[] both = new boolean[] { false, true };
+        final boolean[] both = { false, true };
         for (boolean dir : both) {
             assertArrayEquals(
                     new long[]{1, 2, 3, 4},
@@ -138,8 +138,8 @@ public class StampTest {
         );
 
 
-        long[] a = new long[] { 1, 2, 10, 11 };
-        long[] b = new long[] { 3, 5, 7, 22 };
+        long[] a = { 1, 2, 10, 11 };
+        long[] b = { 3, 5, 7, 22 };
         assertEquals(
                 new LongArrayList(new long[] { 1, 2, 3, 5}),
                 new LongArrayList(zipReverse(a, b, 4)));

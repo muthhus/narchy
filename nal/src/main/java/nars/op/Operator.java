@@ -53,7 +53,7 @@ import static nars.time.Tense.ETERNAL;
     int OPERATOR_BITS = ATOM.bit | PROD.bit | Op.INH.bit;
 
     /** if goal, automatically generates a corresponding feedback belief in the eternal, present, or future. */
-    public static Operator auto(BiConsumer<Task /* Goal */,Task /* Belief (feedback) */> onExec) {
+    static Operator auto(BiConsumer<Task /* Goal */, Task /* Belief (feedback) */> onExec) {
         return (g, nar) -> {
             if (g.punc() == GOAL) {
                 Compound c = g.term();
@@ -68,7 +68,7 @@ import static nars.time.Tense.ETERNAL;
             }
             return g;
         };
-    };
+    }
 
 
 //    @Override

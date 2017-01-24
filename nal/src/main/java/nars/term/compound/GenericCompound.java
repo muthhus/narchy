@@ -107,6 +107,7 @@ public class GenericCompound implements Compound  {
     /**
      * do not call this manually, it will be set by VariableNormalization only
      */
+    @Override
     public final void setNormalized() {
         this.normalized = true;
     }

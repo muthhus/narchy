@@ -250,7 +250,7 @@ public class Inperience extends Leak<Task> {
     public static Compound reify(@NotNull Task s, Term self) {
 
         Truth tr = s.truth();
-        Term[] arg = new Term[1 + (tr == null ? 1 : 1)];
+        Term[] arg = new Term[1 + (1)];
 
         int k = 0;
 

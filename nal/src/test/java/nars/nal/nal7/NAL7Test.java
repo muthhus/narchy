@@ -831,7 +831,6 @@ public class NAL7Test extends AbstractNALTest {
                 .mustBelieve(cycles, "((x) &&+0 (z))", 1f, 0.81f, 3)
                 .mustNotOutput(cycles, "((x) && (z))", '.', 0, 3, ETERNAL) //the dternal (non-parallel) version of the term
                 .mustNotOutput(cycles, "((x) &&+0 (z))", '.', 0, ETERNAL); //the correct form but at the wrong occurrence time
-        ;
 
     }
 
