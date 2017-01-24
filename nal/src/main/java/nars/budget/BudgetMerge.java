@@ -103,7 +103,6 @@ public interface BudgetMerge extends BiFunction<Budget, Budget, Budget> {
         }
 
         float newPri = lerp(iInfluence, nextPri, ePri);
-        float newQua = lerp(iInfluence, nextQua, eQua);
 
         float overflow;
         if (newPri > 1f) {
@@ -112,6 +111,8 @@ public interface BudgetMerge extends BiFunction<Budget, Budget, Budget> {
         } else {
             overflow = 0;
         }
+
+        float newQua = lerp(iInfluence, nextQua, eQua);
 
         exi.setBudget( newPri, newQua );
 

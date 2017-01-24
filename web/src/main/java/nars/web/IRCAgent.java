@@ -2,6 +2,7 @@ package nars.web;
 
 import jcog.data.random.XorShift128PlusRandom;
 import nars.NAR;
+import nars.Param;
 import nars.Task;
 import nars.conceptualize.DefaultConceptBuilder;
 import nars.index.term.map.CaffeineIndex;
@@ -11,8 +12,6 @@ import nars.op.Command;
 import nars.op.Leak;
 import nars.op.mental.Abbreviation;
 import nars.op.mental.Inperience;
-import nars.op.stm.MySTMClustered;
-import nars.term.Term;
 import nars.time.RealTime;
 import nars.util.exe.MultiThreadExecutioner;
 import org.jetbrains.annotations.NotNull;
@@ -66,6 +65,8 @@ public class IRCAgent extends IRC {
                     Runnable r = IRCAgent.this.send(channels, s);
                     if (r!=null) {
                         nar.runLater(r);
+                        if (Param.DEBUG && !task.isCommand())
+                            logger.info("{}\n{}", task, task.proof());
                     } else {
                         //..?
                     }
@@ -299,6 +300,8 @@ public class IRCAgent extends IRC {
     }
 
     public static void main(String[] args) throws Exception {
+
+        //Param.DEBUG = true;
 
         @NotNull Default n = newRealtimeNAR(1024, 50, 200);
 

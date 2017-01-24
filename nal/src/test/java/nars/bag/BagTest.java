@@ -128,8 +128,7 @@ public class BagTest {
         a.commit();        a.print();
         assertEquals(2, a.size());
 
-        assertEquals( 0.1f , a.minPri, 0.2f /* to allow for any forgetting that was applied */);
-        System.out.println("..");
+        assertEquals( 0.1f , a.priMin(), 0.2f /* to allow for any forgetting that was applied */);
 
         a.put("z", new RawBudget(0.05f, 0.5f));
         a.commit();        a.print();
@@ -176,7 +175,7 @@ public class BagTest {
         assertNotNull(a.get("x"));
         a.commit();
 
-        assertEquals(0.15, a.get("x").pri(), 0.001f);
+        assertEquals(0.125, a.get("x").pri(), 0.001f);
     }
 
     void testScalePut2(Bag<String> a) {

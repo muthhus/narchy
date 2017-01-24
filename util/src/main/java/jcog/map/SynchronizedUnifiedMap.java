@@ -12,12 +12,12 @@ public final class SynchronizedUnifiedMap<K, V> extends UnifiedMap<K, V> {
         super(cap, loadFactor);
     }
 
-    @Override
-    public V get(Object key) {
-        synchronized (this) {
-            return super.get(key);
-        }
-    }
+//    @Override
+//    public V get(Object key) {
+//        synchronized (this) {
+//            return super.get(key);
+//        }
+//    }
 
     @Override
     public V remove(@NotNull Object key) {

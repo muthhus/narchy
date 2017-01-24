@@ -22,6 +22,7 @@ package nars.term;
 
 
 import jcog.Hack;
+import jcog.Texts;
 import jcog.data.array.IntArrays;
 import nars.$;
 import nars.Op;
@@ -46,7 +47,6 @@ import java.util.List;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
 
-import static nars.Op.INT;
 import static nars.time.Tense.DTERNAL;
 
 
@@ -429,7 +429,7 @@ public interface Term extends Termed, Termlike, Comparable<Termlike> {
         return this;
     }
 
-    static int intValue(Term intTerm) {
+    @Deprecated static int intValue(Term intTerm) {
         if (intTerm instanceof IntTerm) {
             return ((IntTerm)intTerm).val;
         } else /*else /*if (x.op() == INT )*/ {
@@ -438,6 +438,14 @@ public interface Term extends Termed, Termlike, Comparable<Termlike> {
         }/* else {
             throw new NumberFormatException(x + " is not an IntTerm");
         }*/
+    }
+
+    static int intValue(Term intTerm, int ifNotInt) {
+        if (intTerm instanceof IntTerm) {
+            return ((IntTerm)intTerm).val;
+        } else /*else /*if (x.op() == INT )*/ {
+            return Texts.i(intTerm.toString(), ifNotInt);
+        }
     }
 }
 

@@ -277,7 +277,7 @@ public class MutableTask extends AbstractTask {
         return this;
     }
 
-    @Nullable public static Task clone(@NotNull Task xt, @NotNull Compound y, @NotNull NAR nar) {
+    @Nullable public static MutableTask clone(@NotNull Task xt, @NotNull Compound y, @NotNull NAR nar) {
 //        if (!y.isNormalized()) {
 //            y = (Compound) nar.normalize(y);
 //            if (y == null)
