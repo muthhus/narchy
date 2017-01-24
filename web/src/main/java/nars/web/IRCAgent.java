@@ -63,7 +63,12 @@ public class IRCAgent extends IRC {
                 boolean cmd = task.isCommand();
                 if (cmd || (trace && !task.isDeleted())) {
                     String s = (!cmd) ? task.toString() : task.term().toString();
-                    IRCAgent.this.send(channels, s);
+                    Runnable r = IRCAgent.this.send(channels, s);
+                    if (r!=null) {
+                        nar.runLater(r);
+                    } else {
+                        //..?
+                    }
                     return cmd ? 0 : 1; //no cost for command outputs
                 }
                 return 0;
@@ -233,14 +238,14 @@ public class IRCAgent extends IRC {
         Random random = new XorShift128PlusRandom(System.currentTimeMillis());
 
         MultiThreadExecutioner exe = new MultiThreadExecutioner(3, 1024 * 8);
-        exe.sync(false);
+        exe.sync(true);
 
         Default nar = new Default(activeConcepts, conceptsPerFrame, 1, 3, random,
 
                 new CaffeineIndex(new DefaultConceptBuilder(), 512 * 1024, false, exe),
                 //new TreeTermIndex.L1TreeIndex(new DefaultConceptBuilder(), 400000, 64 * 1024, 3),
 
-                new RealTime.CS(true).dur(0.1f),
+                new RealTime.CS(true).dur(0.25f),
                 exe
         );
 
@@ -283,9 +288,9 @@ public class IRCAgent extends IRC {
 //        );
 //        nar.run(1);
 
-        MySTMClustered stm = new MySTMClustered(nar, 16, '.', 3, false, 2);
+        //MySTMClustered stm = new MySTMClustered(nar, 16, '.', 3, false, 2);
 
-        new Abbreviation(nar, "_", 3, 12, 0.01f, 8);
+        new Abbreviation(nar, "_", 3, 12, 0.001f, 8);
         new Inperience(nar, 0.003f, 8);
 
         nar.loop(framesPerSecond);
@@ -311,7 +316,7 @@ public class IRCAgent extends IRC {
             if (t.length > 0) {
                 switch (t[0].toString()) {
                     case "on": bot.setTrace(true); break;
-                    case "off": bot.out.clear(); bot.setTrace(false); break;
+                    case "off": bot.setTrace(false);  bot.out.clear(); break;
                 }
             }
         });
@@ -323,17 +328,17 @@ public class IRCAgent extends IRC {
 
     }
 
-    final StringBuilder b = new StringBuilder();
-
-    public synchronized void say(String[] channels, Term w) {
-        logger.info("say {}", w);
-        b.append(w.toString()).append(' ');
-        if (b.length() > 40) {
-            send(channels, b.toString());
-            b.setLength(0);
-        }
-
-    }
+//    final StringBuilder b = new StringBuilder();
+//
+//    public synchronized void say(String[] channels, Term w) {
+//        logger.info("say {}", w);
+//        b.append(w.toString()).append(' ');
+//        if (b.length() > 40) {
+//            send(channels, b.toString());
+//            b.setLength(0);
+//        }
+//
+//    }
 
 
 //    public static void main(String[] args) throws Exception {

@@ -73,14 +73,15 @@ public class IRC extends ListenerAdapter {
         }
     }
 
-    public void send(String[] channels, String message) {
+    public Runnable send(String[] channels, String message) {
         if (irc.isConnected()) {
             OutputIRC out = irc.send();
-            for (String c : channels) {
-                out.message(c, message);
-            }
+            return ()-> {
+                for (String c : channels)
+                    out.message(c, message);
+            };
         } else {
-            //.?
+            return null;
         }
     }
 

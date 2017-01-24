@@ -57,10 +57,13 @@ public class Builtin  {
         nar.on(Functor.f1Concept("belief", nar, (c, n) -> $.quote(c.belief(n.time()))));
         nar.on(Functor.f1Concept("goal", nar, (c, n) -> $.quote(c.goal(n.time()))));
 
-        nar.on("concept", (Command) (op, a, nar1) ->
-                Command.log(nar,
-                        quote(nar.concept(a[0]).print(new StringBuilder(1024))))
-        );
+        nar.on("concept", (Command) (op, a, nar1) -> {
+            Concept c = nar.concept(a[0]);
+            Command.log(nar,
+                (c!=null) ?
+                    quote(c.print(new StringBuilder(1024))) : $.func("unknown", a[0])
+            );
+        });
 
         Command log = (a, t, n) -> NAR.logger.info("{}", t);
         nar.on("log", log);

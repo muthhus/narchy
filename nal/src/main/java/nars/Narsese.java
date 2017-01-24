@@ -307,21 +307,16 @@ public class Narsese extends BaseParser<Object> {
 
                 optional(Budget(budget)),
 
-
                 Term(true, false),
                 term.set(the(pop())),
 
-                optional(
-                    s(), SentencePunctuation(punc)
-                ),
+                s(),
 
-                optional(
-                    s(), Tense(tense)
-                ),
+                optional( SentencePunctuation(punc), s() ),
 
-                optional(
-                    s(), Truth(truth, tense)
-                ),
+                optional( Tense(tense), s() ),
+
+                optional( Truth(truth, tense), s() ),
 
                 push(new Object[]{budget.get(), term.get(), punc.get(), truth.get(), tense.get()})
                 //push(getTask(budget, term, punc, truth, tense))

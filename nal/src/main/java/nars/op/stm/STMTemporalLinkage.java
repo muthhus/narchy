@@ -43,7 +43,9 @@ public final class STMTemporalLinkage extends STM {
 
     @Override
     public void clear() {
-        stm.clear();
+        synchronized (stm) {
+            stm.clear();
+        }
     }
 
     @Override
@@ -72,32 +74,36 @@ public final class STMTemporalLinkage extends STM {
         Term tt = t.unneg();
 
 
-        List<Task> queued = $.newArrayList(stm.size());
-
+        List<Task> queued;
         synchronized (stm) {
-            int numExtra = Math.max(0, (stm.size()+1) - stmCapacity);
+            int s = stm.size();
+            if (s > 0) {
+                queued = $.newArrayList(s);
+                int numExtra = Math.max(0, (s + 1) - stmCapacity);
 
-            Iterator<Task> ss = stm.iterator();
-            while (ss.hasNext()) {
+                Iterator<Task> ss = stm.iterator();
+                while (ss.hasNext()) {
 
-                Task previousTask = ss.next();
+                    Task previousTask = ss.next();
 
-                if ((numExtra > 0) || (previousTask.isDeleted())) {
-                    numExtra--;
-                    ss.remove();
-                } else {
+                    if ((numExtra > 0) || (previousTask.isDeleted())) {
+                        numExtra--;
+                        ss.remove();
+                    } else {
+                        if (!tt.equals(previousTask.unneg()))
+                            queued.add(previousTask);
+                    }
 
-                    if (!tt.equals(previousTask.unneg()))
-                        queued.add(previousTask);
+
                 }
-
-
+            } else {
+                queued = null;
             }
 
             stm.add(t);
         }
 
-        if (!queued.isEmpty()) {
+        if (queued!=null) {
             nar.runLater(()-> {
                 for (int i = 0, queuedSize = queued.size(); i < queuedSize; i++) {
                     crossLink(concept, t, queued.get(i), strength, nar);
