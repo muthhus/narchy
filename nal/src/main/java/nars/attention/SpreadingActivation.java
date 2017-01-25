@@ -46,7 +46,7 @@ public class SpreadingActivation extends Activation implements ObjectFloatProced
 
         Term srcTerm = src.term();
 
-        spread = new ObjectFloatHashMap<>(srcTerm.volume());
+        spread = new ObjectFloatHashMap<>(srcTerm.volume() /* estimate */);
 
         link(srcTerm, scale, 0);
 
@@ -58,7 +58,6 @@ public class SpreadingActivation extends Activation implements ObjectFloatProced
 
     public static int levels(@NotNull Compound host) {
         switch (host.op()) {
-            case PROD:
             case SETe:
             case SETi:
             case DIFFe:
@@ -67,10 +66,10 @@ public class SpreadingActivation extends Activation implements ObjectFloatProced
             case SECTe:
             case IMGe:
             case IMGi:
+            case PROD:
                 return 1;
 
             case INH:
-                return 2;
             case SIM:
                 return 2;
 
