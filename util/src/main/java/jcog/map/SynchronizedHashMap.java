@@ -4,6 +4,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 import java.util.function.BiFunction;
+import java.util.function.Function;
 
 /** synchronized in a few methods for NARS bag purposes.
  *
@@ -20,6 +21,13 @@ public final class SynchronizedHashMap<K, V> extends HashMap<K, V> {
     public V remove(@NotNull Object key) {
         synchronized (this) {
             return super.remove(key);
+        }
+    }
+
+    @Override
+    public V computeIfAbsent(K key, Function<? super K, ? extends V> mappingFunction) {
+        synchronized (this) {
+            return super.computeIfAbsent(key, mappingFunction);
         }
     }
 

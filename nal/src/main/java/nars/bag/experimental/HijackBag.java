@@ -503,26 +503,26 @@ public class HijackBag<X> implements Bag<X> {
 
 
     @Override
-    public X mul(@NotNull Object key, float factor) {
+    public BLink<X> mul(@NotNull Object key, float factor) {
         BLink<X> b = get(key);
         if (b != null && !b.isDeleted()) {
             float before = b.pri();
             b.priMult(factor);
             float after = range(b.pri());
             pressure += (after - before);
-            return b.get();
+            return b;
         }
         return null;
     }
     @Override
-    public X activate(@NotNull Object key, float x) {
+    public BLink<X> add(@NotNull Object key, float x) {
         BLink<X> b = get(key);
         if (b != null && !b.isDeleted()) {
             float before = b.pri();
             b.priAdd(x);
             float after = range(b.pri());
             pressure += (after - before);
-            return b.get();
+            return b;
         }
         return null;
     }

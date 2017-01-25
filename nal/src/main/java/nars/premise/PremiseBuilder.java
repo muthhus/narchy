@@ -74,6 +74,14 @@ abstract public class PremiseBuilder {
         FasterList<BLink<? extends Term>> termsBuffer = (FasterList) $.newArrayList(termlinksSampled);
         termlinkBag.sample(termlinksSampled, termsBuffer::add);
 
+        float priFactor;
+        float busy = (float) nar.emotion.busyMassAvg.getMean() * nar.emotion.learning();
+        if (busy == busy && busy > 1f)
+            priFactor = 1f/busy;
+        else
+            priFactor = 1f;
+
+
 
         int termsBufferSize = termsBuffer.size();
         if (termsBufferSize > 0) {
@@ -100,7 +108,7 @@ abstract public class PremiseBuilder {
 
                 for (int j = 0; j < termsBufferSize && countPerTermlink < termlinksPerForThisTask; j++, jl++) {
 
-                    Premise p = premise(c, task, termsBuffer.get(jl % termsBufferSize).get(), now, nar);
+                    Premise p = premise(c, task, termsBuffer.get(jl % termsBufferSize).get(), now, nar, priFactor);
                     if (p != null) {
                         deriver.accept(new Derivation(nar, p, target));
                         countPerTermlink++;
@@ -137,7 +145,7 @@ abstract public class PremiseBuilder {
      * patham9 its using the result of higher confidence
      */
     @Nullable
-    Premise premise(@NotNull Concept c, @NotNull final Task task, Term beliefTerm, long now, NAR nar) {
+    Premise premise(@NotNull Concept c, @NotNull final Task task, Term beliefTerm, long now, NAR nar, float priFactor) {
 
         //if (Param.PREMISE_LOG)
         //logger.info("try: { concept:\"{}\",\ttask:\"{}\",\tbeliefTerm:\"{}\" }", c, task, beliefTerm);
@@ -274,11 +282,7 @@ abstract public class PremiseBuilder {
         //aveAri(taskLinkBudget.pri(), termLinkBudget.pri());
         //nar.conceptPriority(c);
 
-        float busy = (float) nar.emotion.busyMassAvg.getMean();
-        if (busy == busy && busy > 1f)
-            pri /= busy;
-
-        return newPremise(c, task, beliefTerm, belief, qua, pri);
+        return newPremise(c, task, beliefTerm, belief, qua, pri * priFactor);
     }
 
     abstract protected Premise newPremise(@NotNull Concept c, @NotNull Task task, Term beliefTerm, Task belief, float qua, float pri);

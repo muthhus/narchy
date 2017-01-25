@@ -472,13 +472,13 @@ public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Iterable<BLink<
 
 
 
-        @Override public Object activate(Object c, float x) {
+        @Override public BLink add(Object c, float x) {
             return null;
         }
 
 
         @Override
-        public Object mul(Object key, float boost) {
+        public BLink mul(Object key, float boost) {
             return null;
         }
 
@@ -582,10 +582,10 @@ public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Iterable<BLink<
 
 
     /** if key is present, adds a priority amount (quality unaffected) */
-    @Nullable V activate(Object key, float toAdd);
+    @Nullable BLink<V> add(Object key, float toAdd);
 
     /** if key is present, applies a priority multiplier factor, and returns the link */
-    @Nullable V mul(Object key, float factor);
+    @Nullable BLink<V> mul(Object key, float factor);
 
     /** samples and removes the sampled item. returns null if bag empty, or for some other reason the sample did not succeed  */
     @Nullable default BLink<V> pop() {

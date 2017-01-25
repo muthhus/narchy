@@ -3,6 +3,7 @@ package nars.bag;
 import jcog.data.sorted.SortedArray;
 import jcog.table.SortedListTable;
 import nars.$;
+import nars.Param;
 import nars.budget.Budget;
 import nars.budget.BudgetMerge;
 import nars.budget.Budgeted;
@@ -55,10 +56,10 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
     @Override
     public final boolean setCapacity(int newCapacity) {
         if (newCapacity != this.capacity) {
-            synchronized (_items()) {
-                this.capacity = newCapacity;
+            this.capacity = newCapacity;
+            synchronized (items) {
                 if (this.size() > newCapacity)
-                    commit(null);
+                    commit(null, true);
             }
             return true;
         }
@@ -72,7 +73,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
 
 
     /**
-     * returns true unless failed to add during 'add' operation
+     * returns true unless failed to add during 'add' operation or is empty
      */
     @Override
     protected boolean updateItems(@Nullable BLink<V> toAdd) {
@@ -228,31 +229,39 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
 
     @Nullable
     @Override
-    public V activate(Object key, float toAdd) {
+    public BLink<V> add(Object key, float toAdd) {
         BLink<V> c = map.get(key);
         if (c != null && !c.isDeleted()) {
             //float dur = c.dur();
-            float pBefore = c.pri();
-            c.priAdd(toAdd);
+            float pBefore = c.priSafe(0);
+            c.setPriority(pBefore + toAdd);
             float delta = c.pri() - pBefore;
             pressure += delta;// * dur;
-            return c.get();
+
+            update(null, false);
+
+            return c;
         }
         return null;
     }
 
     @Override
-    public V mul(Object key, float factor) {
+    public BLink<V> mul(Object key, float factor) {
         BLink<V> c = map.get(key);
         if (c != null) {
             float pBefore = c.pri();
             if (pBefore != pBefore)
                 return null; //already deleted
 
-            c.priMult(factor);
+            if (c.priMult(factor)==null) {
+                return null;
+            }
             float delta = c.pri() - pBefore;
             pressure += delta;// * dur;
-            return c.get();
+
+            update(null, false);
+
+            return c;
         }
         return null;
 
@@ -359,34 +368,48 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
 
             //merge with existing
 
+            float pBefore = v.priSafe(0);
             float o = mergeFunction.merge(v, b, scale);
             if (o > 0) {
                 if (overflow != null)
                     overflow.add(o);
-                pressure -= o;
+                //pressure -= o;
+            }
+
+            if (Math.abs(v.pri()-pBefore) > Param.BUDGET_EPSILON) {
+                synchronized (items) {
+                    sort();
+                }
             }
 
             return v;
 
         } else {
 
-            //attempt new insert
             v.setBudget(bp, b.qua());
 
+            boolean added;
             synchronized (items) {
-                if (updateItems(v)) {
-                    //updateRange();
-                    onAdded(v);
-                    return v;
-                } else {
+                //attempt new insert
+                if (!updateItems(v)) {
                     v.delete();
+                    added = false;
+                } else {
+                    sort();
+                    added = true;
                 }
             }
 
-            map.remove(key);
+            if (added) {
+                onAdded(v);
+                return v;
+            } else {
+                map.remove(key);
+                return null;
+            }
+
         }
 
-        return null;
     }
 
 
@@ -400,14 +423,14 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
     @Override
     @NotNull
     public final Bag<V> commit(@Nullable Function<Bag, Consumer<BLink>> update) {
-
-        synchronized (items) {
-
-            update(update != null ? update.apply(this) : null);
-
-        }
-
+        commit(update, false);
         return this;
+    }
+
+    private void commit(@Nullable Function<Bag, Consumer<BLink>> update, boolean checkCapacity) {
+        Consumer<BLink> u = update != null ? update.apply(this) : null;
+        if (u != null || checkCapacity)
+            update(u, checkCapacity);
     }
 
     public float mass() {
@@ -428,26 +451,34 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
      * applies the 'each' consumer and commit simultaneously, noting the range of items that will need sorted
      */
     @NotNull
-    protected Bag<V> update(@Nullable Consumer<BLink> each) {
+    protected Bag<V> update(@Nullable Consumer<BLink> each, boolean checkCapacity) {
 
-        if (each != null)
-            this.pressure = 0; //reset pressure accumulator
 
         synchronized (items) {
 
+            if (each != null)
+                this.pressure = 0; //reset pressure accumulator
+
             if (size() > 0) {
-                if (updateItems(null)) {
+                if (checkCapacity)
+                    if (!updateItems(null))
+                        return this;
 
-                    int lowestUnsorted = updateBudget(each);
-
-                    if (lowestUnsorted != -1) {
-                        sort(); //if not perfectly sorted already
-                    }
+                boolean needsSort;
+                if (each!=null) {
+                    needsSort = !updateBudget(each);
+                } else {
+                    needsSort = true;
                 }
+
+
+                if (needsSort) {
+                    sort();
+                }
+
             }
 
         }
-
 
         return this;
     }
@@ -460,40 +491,37 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
     }
 
     /**
-     * returns the index of the lowest unsorted item
+     * returns whether the items list was detected to be sorted
      */
-    private int updateBudget(@Nullable Consumer<BLink> each) {
+    private boolean updateBudget(@NotNull Consumer<BLink> each) {
 //        int dirtyStart = -1;
-        int lowestUnsorted = -1;
+        boolean sorted = true;
 
 
         int s = size();
         BLink[] l = items.array();
         int i = s - 1;
         //@NotNull BLink<V> beneath = l[i]; //compares with self below to avoid a null check in subsequent iterations
-        float beneath = Float.POSITIVE_INFINITY;
+        float pBelow = -2;
         for (; i >= 0; ) {
             BLink b = l[i];
 
-            float bCmp;
-            bCmp = b != null ? b.priSafe(-1) : -2; //sort nulls to the end of the end
+            float p = (b != null) ? b.priSafe(-1) : -2; //sort nulls to the end of the end
 
-            if (bCmp > 0) {
-                if (each != null)
-                    each.accept(b);
+            if (p > 0) {
+                each.accept(b);
             }
 
-
-            if (lowestUnsorted == -1 && bCmp < beneath) {
-                lowestUnsorted = i + 1;
+            if (pBelow - p >= Param.BUDGET_EPSILON) {
+                sorted = false;
             }
 
-            beneath = bCmp;
+            pBelow = p;
             i--;
         }
 
 
-        return lowestUnsorted;
+        return sorted;
     }
 
 
@@ -684,13 +712,13 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
     @Override
     public float priMax() {
         BLink x = items.first();
-        return x != null ? x.pri() : 0f;
+        return x != null ? x.priSafe(-1) : 0f;
     }
 
     @Override
     public float priMin() {
         BLink x = items.last();
-        return x != null ? x.pri() : 0f;
+        return x != null ? x.priSafe(-1) : 0f;
     }
 
 

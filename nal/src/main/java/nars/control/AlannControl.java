@@ -230,7 +230,7 @@ public class AlannControl implements Control {
 
         @Override
         public void activate(@NotNull Termed term, float priToAdd) {
-            active.activate(term, priToAdd);
+            active.add(term, priToAdd);
         }
 
         @Override
