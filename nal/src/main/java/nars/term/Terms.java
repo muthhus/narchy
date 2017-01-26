@@ -776,20 +776,26 @@ public class Terms   {
      *
      */
     public static boolean equal(@NotNull Term a, @NotNull Term b, boolean sameTemporality, boolean samePolarity) {
+
         if (a == b)
             return true;
+
         if (!samePolarity) {
             a = a.unneg();
             b = b.unneg();
         }
+
+        if (a.equals(b))
+            return true;
+
         if (!sameTemporality) {
             return ((a.structure() == b.structure()) &&
                     (a.volume() == b.volume()) &&
                     (a.op() == b.op()) &&
                     atemporalize(b).equals(atemporalize(a)));
-        } else {
-            return a.equals(b);
         }
+
+        return false;
     }
 
     /** a Set is already duplicate free, so just sort it */

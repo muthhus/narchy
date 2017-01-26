@@ -363,7 +363,11 @@ public abstract class TermBuilder {
 
     @NotNull
     private Term finish(@NotNull Op op, int dt, @NotNull Term... args) {
-        if (TermContainer.requiresSorting(op, dt, args.length)) {
+        return finish(TermContainer.requiresSorting(op, dt, args.length), op, dt, args);
+    }
+    @NotNull
+    private Term finish(boolean sort, @NotNull Op op, int dt, @NotNull Term... args) {
+        if (sort) {
             args = Terms.sorted(args);
         }
         return finalize(op, dt, args);
@@ -579,8 +583,8 @@ public abstract class TermBuilder {
 //                return False;
 //            }
 
-            return finish(CONJ,
-                    dt, //(u[0].compareTo(u[1]) > 0) ? -dt : dt, //it will be reversed in commutative sorting, so invert dt if sort order swapped
+            return finish(true /* store sorted anyway */, CONJ,
+                    (u[0].compareTo(u[1]) > 0) ? -dt : dt, //it will be reversed in commutative sorting, so invert dt if sort order swapped
                     u);
         } else {
             throw new InvalidTermException(CONJ, dt, "temporal conjunction requires exactly 2 arguments", u);

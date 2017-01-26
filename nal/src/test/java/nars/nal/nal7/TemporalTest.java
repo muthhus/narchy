@@ -141,7 +141,7 @@ public class TemporalTest {
     }
     @Test
     public void testCommutiveTemporalityConjEquiv2() {
-        testParse("(({(row,3)}-->$2) &&+20 (#1-->$2))", "(({(row,3)}-->$1) &&+20 (#2-->$1))");
+        testParse("(({(row,3)}-->$2) &&+20 (#1-->$2))", "(({(row,3)}-->$2) &&+20 (#1-->$2))");
     }
 
     @Test
@@ -302,6 +302,8 @@ public class TemporalTest {
     public void testCommutiveWithCompoundSubterm() throws Narsese.NarseseException {
         Term a = $("(((--,(b0)) &&+0 (pre_1)) &&+10 (else_0))");
         Term b = $("((else_0) &&-10 ((--,(b0)) &&+0 (pre_1)))");
+        assertEquals(a, b);
+
         Term c = $.seq($("((--,(b0)) &&+0 (pre_1))"), 10, $("(else_0)"));
         Term d = $.seq($("(else_0)"), -10, $("((--,(b0)) &&+0 (pre_1))"));
 
@@ -310,7 +312,6 @@ public class TemporalTest {
 //        System.out.println(c);
 //        System.out.println(d);
 
-        assertEquals(a, b);
         assertEquals(b, c);
         assertEquals(c, d);
         assertEquals(a, c);
