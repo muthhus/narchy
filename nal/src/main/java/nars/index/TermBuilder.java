@@ -573,8 +573,10 @@ public abstract class TermBuilder {
 
             Term a = u[0];
             Term b = u[1];
-            if (commutes && a.equals(b))
+            boolean equal = a.equals(b);
+            if (commutes && equal)
                 return a;
+
 
 //            //if dternal or parallel, dont allow the subterms to be conegative:
 //            if (commutive(dt) &&
@@ -583,7 +585,8 @@ public abstract class TermBuilder {
 //                return False;
 //            }
 
-            return finish(true /* store sorted anyway */, CONJ,
+            return finish(!equal /* store sorted/deduplicated anyway, if they are not equal */,
+                    CONJ,
                     (u[0].compareTo(u[1]) > 0) ? -dt : dt, //it will be reversed in commutative sorting, so invert dt if sort order swapped
                     u);
         } else {

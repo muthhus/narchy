@@ -12,6 +12,7 @@ import nars.op.Command;
 import nars.op.Leak;
 import nars.op.mental.Abbreviation;
 import nars.op.mental.Inperience;
+import nars.op.stm.MySTMClustered;
 import nars.time.RealTime;
 import nars.util.exe.MultiThreadExecutioner;
 import org.jetbrains.annotations.NotNull;
@@ -289,7 +290,8 @@ public class IRCAgent extends IRC {
 //        );
 //        nar.run(1);
 
-        //MySTMClustered stm = new MySTMClustered(nar, 16, '.', 3, false, 2);
+        MySTMClustered stm = new MySTMClustered(nar, 16, '.', 3, false, 3);
+        MySTMClustered stm2 = new MySTMClustered(nar, 32, '.', 2, true, 2);
 
         new Abbreviation(nar, "_", 3, 12, 0.001f, 8);
         new Inperience(nar, 0.003f, 8);
@@ -310,9 +312,9 @@ public class IRCAgent extends IRC {
 
         IRCAgent bot = new IRCAgent(n,
                 "experiment1", "irc.freenode.net",
-                //"#123xyz"
+                "#123xyz"
                 //"#netention"
-                "#nars"
+                //"#nars"
         );
 
         n.on("trace", (Command) (a, t, nn) -> {
