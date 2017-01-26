@@ -330,7 +330,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
     @Nullable
     public Task task(@NotNull String taskText) throws NarseseException {
         Task task = Narsese.the().task(taskText, this);
-        task.normalize(this);
+        //task.normalize(this);
         return task;
     }
 
@@ -650,6 +650,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
         try {
             input.normalize(this); //accept into input buffer for eventual processing
         } catch (@NotNull InvalidTaskException | InvalidTermException | Budget.BudgetException e) {
+
             emotion.eror();
 
             input.delete();

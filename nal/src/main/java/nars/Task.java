@@ -87,16 +87,6 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
 //    }
 
 
-    /**
-     * performs some (but not exhaustive) tests on a term to determine some cases where it is invalid as a sentence content
-     * returns the compound valid for a Task if so,
-     * otherwise returns null
-     */
-    @Nullable
-    static boolean taskContentValid(@NotNull Compound t, char punc, @NotNull NAR nar, boolean safe) {
-        return taskContentValid(t, punc, nar.level(), nar.termVolumeMax.intValue(), safe);
-    }
-
     @Nullable
     static boolean taskContentValid(@NotNull Compound t, char punc, int nalLevel, int maxVol, boolean safe) {
         if (!t.isNormalized())
@@ -105,6 +95,11 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
             return test(t, "Term exceeds maximum volume", safe);
         if (!t.levelValid(nalLevel))
             return test(t, "Term exceeds maximum NAL level", safe);
+
+        if (Param.DEBUG) {
+            if (t.containsTerm(Term.True) || t.containsTerm(Term.False))
+                throw new InvalidTaskException(t, "term contains True or False");
+        }
 
         return taskStatementValid(t, punc, safe);
     }

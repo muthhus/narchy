@@ -24,6 +24,8 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
+import static nars.index.TermBuilder.commutive;
+import static nars.time.Tense.DTERNAL;
 import static org.eclipse.collections.impl.factory.Sets.immutable;
 import static org.eclipse.collections.impl.factory.Sets.mutable;
 
@@ -594,26 +596,21 @@ public interface TermContainer extends Termlike, Iterable<Term> {
     }
 
 
-    @NotNull
-    static TermContainer the(@NotNull Op op, @NotNull Collection<Term> tt) {
-        //if (tt.isEmpty()) ...
-        Term[] ttt = tt.toArray(new Term[tt.size()]);
-        return TermContainer.the(op, ttt);
-    }
 
 
     @NotNull
-    static TermContainer the(@NotNull Op op, @NotNull Term... tt) {
-        return requiresSorting(op, tt.length) ?
+    static TermContainer the(@NotNull Op op, int dt, @NotNull Term... tt) {
+        return requiresSorting(op, dt, tt.length) ?
                 TermSet.the(tt) :
                 TermVector.the(tt);
     }
 
 
-    public static boolean requiresSorting(@NotNull Op op, int num) {
-        return
-            /*(dt==0 || dt==ITERNAL) &&*/ //non-zero or non-iternal dt disqualifies any reason for needing a TermSet
-                ((num > 1) && op.commutative);
+    public static boolean requiresSorting(@NotNull Op op, int dt, int num) {
+        return op.commutative &&
+                num > 1 && //non-zero or non-iternal dt disqualifies any reason for needing a TermSet
+                commutive(dt)
+                ;
     }
 
     default boolean isSorted() {

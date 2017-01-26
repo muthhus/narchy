@@ -38,6 +38,7 @@ import java.util.function.Function;
 import static nars.Op.*;
 import static nars.term.Term.False;
 import static nars.term.Termed.termOrNull;
+import static nars.time.Tense.DTERNAL;
 
 /**
  *
@@ -423,18 +424,19 @@ public abstract class TermIndex extends TermBuilder {
         if (!t.testSuperTerm(src))
             return src;
 
-        TermContainer tc = transform(src, src, t);
+        int dt = src.dt();
+        TermContainer tc = transform(src, src, src.dt(), t);
 
         if (tc != src) {
             //construct new compound with same op and dt
-            return the(src.op(), src.dt(), tc);
+            return the(src.op(), dt, tc);
         } else {
             return intern((Term)src); //unmodified
         }
     }
 
     @NotNull
-    public TermContainer transform(@NotNull TermContainer src, Compound superterm, @NotNull CompoundTransform t) {
+    public TermContainer transform(@NotNull TermContainer src, Compound superterm, int dt, @NotNull CompoundTransform t) {
 
         int modifications = 0;
 
@@ -469,7 +471,7 @@ public abstract class TermIndex extends TermBuilder {
             target[i] = y;
         }
 
-        return modifications == 0 ? src : TermContainer.the(superterm.op(), target);
+        return modifications == 0 ? src : TermContainer.the(superterm.op(), dt, target);
     }
 
 

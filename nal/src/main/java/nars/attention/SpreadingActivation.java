@@ -79,8 +79,8 @@ public class SpreadingActivation extends Activation implements ObjectFloatProced
             case CONJ:
 
                 int s = host.size();
-                int vars = host.vars();
                 if (s <= Param.MAX_CONJ_SIZE_FOR_LAYER2_TEMPLATES) {
+                    int vars = host.vars();
                     return (vars > 0) ? 3 : 2;
                 } else {
                     return 2;

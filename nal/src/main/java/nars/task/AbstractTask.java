@@ -129,10 +129,11 @@ public abstract class AbstractTask extends RawBudget implements Task, Temporal {
         this.punc = punctuation;
 
         //unwrap top-level negation
-        if (term.op() == Op.NEG) {
-            Term nt = term.term().term(0);
+        Compound tt = term.term();
+        if (tt.op() == Op.NEG) {
+            Term nt = tt.term(0);
             if (nt instanceof Compound) {
-                term = nt;
+                tt = (Compound) nt;
 
                 if (isBeliefOrGoal())
                     truth = truth.negated();
@@ -142,7 +143,7 @@ public abstract class AbstractTask extends RawBudget implements Task, Temporal {
         }
 
         this.truth = truth;
-        this.term = term.term();
+        this.term = tt;
     }
 
 
@@ -170,7 +171,7 @@ public abstract class AbstractTask extends RawBudget implements Task, Temporal {
 
         Compound cntt = (Compound)ntt;
 
-        if (!Task.taskContentValid(cntt, punc, nar, !Param.DEBUG))
+        if (!Task.taskContentValid(cntt, punc, nar.level(), nar.termVolumeMax.intValue(), !Param.DEBUG))
             throw new InvalidTaskException(ntt, "Invalid content");
 
         if (ntt!=t) {

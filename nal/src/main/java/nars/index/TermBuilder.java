@@ -363,7 +363,7 @@ public abstract class TermBuilder {
 
     @NotNull
     private Term finish(@NotNull Op op, int dt, @NotNull Term... args) {
-        if (TermContainer.requiresSorting(op, args.length)) {
+        if (TermContainer.requiresSorting(op, dt, args.length)) {
             args = Terms.sorted(args);
         }
         return finalize(op, dt, args);
@@ -560,7 +560,8 @@ public abstract class TermBuilder {
             return finish(CONJ, XTERNAL, u);
         }
 
-        if (commutive(dt)) {
+        boolean commutes = commutive(dt);
+        if (commutes) {
             return junctionFlat(CONJ, dt, u);
         }
 
@@ -568,7 +569,7 @@ public abstract class TermBuilder {
 
             Term a = u[0];
             Term b = u[1];
-            if (a.equals(b))
+            if (commutes && a.equals(b))
                 return a;
 
 //            //if dternal or parallel, dont allow the subterms to be conegative:
@@ -579,7 +580,7 @@ public abstract class TermBuilder {
 //            }
 
             return finish(CONJ,
-                    (u[0].compareTo(u[1]) > 0) ? -dt : dt, //it will be reversed in commutative sorting, so invert dt if sort order swapped
+                    dt, //(u[0].compareTo(u[1]) > 0) ? -dt : dt, //it will be reversed in commutative sorting, so invert dt if sort order swapped
                     u);
         } else {
             throw new InvalidTermException(CONJ, dt, "temporal conjunction requires exactly 2 arguments", u);
@@ -587,8 +588,8 @@ public abstract class TermBuilder {
 
     }
 
-    private static boolean commutive(int dt) {
-        return (dt == DTERNAL) || (dt == 0);
+    public static boolean commutive(int dt) {
+        return (dt == DTERNAL) || (dt == 0) || (dt == XTERNAL);
     }
 
 
@@ -741,26 +742,29 @@ public abstract class TermBuilder {
             while (true) {
 
 
-                if (subject == predicate) //shortcut
-                    return True;
-
-
-
 //                //if either the subject or pred are True/False, then they collapse ot True if they are equal or False otherwise
 //                if (subjTrue || isFalse(subject) || isTrueOrFalse(predicate)) {
 //                    return subject == predicate ? True : False;
 //                }
+
+                boolean mustNotEqual = true, mustNotContain = true;
 
                 Op sop = subject.op();
 
                 switch (op) {
 
                     case SIM:
+
+                        if (subject == predicate)
+                            return True;
                         if (isTrue(subject) || isFalse(subject) || isTrue(predicate) || isFalse(predicate))
                             return False;
                         break;
 
                     case INH:
+
+                        if (subject == predicate)
+                            return True;
                         if (isTrue(subject) || isFalse(subject) || isTrue(predicate) || isFalse(predicate))
                             return False;
 
@@ -774,6 +778,9 @@ public abstract class TermBuilder {
 
 
                     case EQUI: {
+
+                        if (subject == predicate)
+                            return True;
 
                         if (isTrue(subject))  return predicate;
                         if (isFalse(subject)) return neg(predicate);
@@ -802,6 +809,7 @@ public abstract class TermBuilder {
                     }
 
                     case IMPL:
+
 
                         //special case for implications: reduce to --predicate if the subject is False
                         if (isTrue(subject))
@@ -868,6 +876,10 @@ public abstract class TermBuilder {
                         if (predicate.isAny(InvalidImplicationPredicate))
                             throw new InvalidTermException(op, dt, "Invalid implication predicate", subject, predicate);
 
+                        if ((dt!=0 && dt!=DTERNAL)) {
+                            mustNotEqual = false; //allow repeat
+                        }
+
                         break;
                 }
 
@@ -875,63 +887,21 @@ public abstract class TermBuilder {
                 Term ss = subject.unneg();
                 Term pp = predicate.unneg();
 
-                if (Terms.equalAtemporally(ss, pp)) {
+                if (mustNotEqual && Terms.equalAtemporally(ss, pp)) {
                     return ((subject == ss) ^ (predicate == pp)) ? False : True;  //handle root-level negation comparison
                 }
 
-                if ((ss instanceof Compound && ss.varPattern() == 0 && ((Compound) ss).containsTermAtemporally(pp)) ||
-                        (pp instanceof Compound && pp.varPattern() == 0 && ((Compound) pp).containsTermAtemporally(ss))) {
-                    return False; //self-reference
+                if (mustNotContain) {
+                    if ((ss instanceof Compound && ss.varPattern() == 0 && ((Compound) ss).containsTermAtemporally(pp)) ||
+                            (pp instanceof Compound && pp.varPattern() == 0 && ((Compound) pp).containsTermAtemporally(ss))) {
+                        return False; //self-reference
+                    }
                 }
-//                //co-conjunction; with exceptions for pattern variable containing terms
-//                if ((ss.varPattern() == 0 && ss.op() == CONJ && ss.containsTermRecursivelyAtemporally(pp)) ||
-//                        (pp.varPattern() == 0 && pp.op() == CONJ && pp.containsTermRecursivelyAtemporally(ss))) {
-//                    return False; //self-reference
-//                }
-
-
-//                //compare unneg'd if it's not temporal or eternal/parallel
-//                boolean preventInverse = !op.temporal || (commutive(dt) || dt == XTERNAL);
-//                Term sRoot = (subject instanceof Compound && preventInverse) ? $.unneg(subject) : subject;
-//                Term pRoot = (predicate instanceof Compound && preventInverse) ? $.unneg(predicate) : predicate;
-//                //        if (as == bs) {
-////            return true;
-////        } else if (as instanceof Compound && bs instanceof Compound) {
-////            return equalsAnonymous((Compound) as, (Compound) bs);
-////        } else {
-////            return as.equals(bs);
-////        }
-//                if (Terms.equalAtemporally(sRoot, pRoot))
-//                    return subject.op() == predicate.op() ? True : False; //True if same, False if negated
-//
-//
-//                //TODO its possible to disqualify invalid statement if there is no structural overlap here??
-////
-//                @NotNull Op sop = sRoot.op();
-//                if (sop == CONJ && (sRoot.containsTerm(pRoot) || (pRoot instanceof Compound && (preventInverse && sRoot.containsTerm($.neg(pRoot)))))) { //non-recursive
-//                    //throw new InvalidTermException(op, new Term[]{subject, predicate}, "subject conjunction contains predicate");
-//                    return True;
-//                }
-//
-//                @NotNull Op pop = pRoot.op();
-//                if (pop == CONJ && pRoot.containsTerm(sRoot) || (sRoot instanceof Compound && (preventInverse && pRoot.containsTerm($.neg(sRoot))))) {
-//                    //throw new InvalidTermException(op, new Term[]{subject, predicate}, "predicate conjunction contains subject");
-//                    return True;
-//                }
-
-//            if (sop.statement && pop.statement) {
-//                Compound csroot = (Compound) sRoot;
-//                Compound cproot = (Compound) pRoot;
-//                if ((csroot.term(0).equals(cproot.term(1))) ||
-//                        (csroot.term(1).equals(cproot.term(0))))
-//                    throw new InvalidTermException(op, new Term[]{subject, predicate}, "inner subject cross-linked with predicate");
-//
-//            }
 
 
                 if (op.commutative) {
 
-                    boolean crossesTime = (dt != DTERNAL) && (dt != XTERNAL) && (dt != 0);
+                    boolean crossesTime = !commutive(dt); //(dt != DTERNAL) && (dt != XTERNAL) && (dt != 0);
 
                     //System.out.println("\t" + subject + " " + predicate + " " + subject.compareTo(predicate) + " " + predicate.compareTo(subject));
 

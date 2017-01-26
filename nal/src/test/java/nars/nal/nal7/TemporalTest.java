@@ -25,6 +25,7 @@ import static com.google.common.collect.Iterables.size;
 import static java.lang.System.out;
 import static junit.framework.TestCase.assertNotNull;
 import static nars.$.$;
+import static nars.time.Tense.DTERNAL;
 import static org.junit.Assert.*;
 
 
@@ -137,7 +138,10 @@ public class TemporalTest {
         testParse("(({(row,3)}-->$2) <=>+20 (#1-->$2))", "(({(row,3)}-->$2) <=>+20 (#1-->$2))");
 
         testParse("((#1-->$2) &&-20 ({(row,3)}-->$2))", "(({(row,3)}-->$2) &&+20 (#1-->$2))");
-        testParse("(({(row,3)}-->$2) &&+20 (#1-->$2))", "(({(row,3)}-->$2) &&+20 (#1-->$2))");
+    }
+    @Test
+    public void testCommutiveTemporalityConjEquiv2() {
+        testParse("(({(row,3)}-->$2) &&+20 (#1-->$2))", "(({(row,3)}-->$1) &&+20 (#2-->$1))");
     }
 
     @Test
@@ -166,8 +170,8 @@ public class TemporalTest {
         Term t0 = n.term("((SELF,#1)-->at)").term();
         Term t1 = n.term("goto(#1)").term();
         assertEquals(
-                TermContainer.the(Op.CONJ, t0, t1),
-                TermContainer.the(Op.CONJ, t1, t0)
+            TermContainer.the(Op.CONJ, DTERNAL, t0, t1),
+            TermContainer.the(Op.CONJ, DTERNAL, t1, t0)
         );
     }
 
@@ -495,7 +499,7 @@ public class TemporalTest {
 
     @Test
     public void testInvalidConjunction() throws Narsese.NarseseException {
-        NarseseTest.assertInvalid("( &&-59 ,(#1-->I),(#1-->{i141}),(#2-->{i141}))");
+        NarseseTest.assertInvalidTerms("( &&-59 ,(#1-->I),(#1-->{i141}),(#2-->{i141}))");
 
         Compound x = $("(&&,(#1-->I),(#1-->{i141}),(#2-->{i141}))");
         Assert.assertNotNull(x);

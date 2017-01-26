@@ -17,6 +17,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static nars.Op.NEG;
+import static nars.time.Tense.DTERNAL;
 
 /**
  * Index which specifically holds the term components of a deriver ruleset.
@@ -78,7 +79,7 @@ public class PatternTermIndex extends MapTermIndex {
             bb[i] = b;
         }
 
-        TermContainer v = (changed ? TermContainer.the(x.op(), bb) : s);
+        TermContainer v = (changed ? TermContainer.the(x.op(), x.dt(), bb) : s);
 
 
         Ellipsis e = Ellipsis.firstEllipsis(v);

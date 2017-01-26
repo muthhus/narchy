@@ -3,6 +3,7 @@ package nars.term;
 import nars.$;
 import nars.Narsese;
 import nars.Op;
+import nars.Task;
 import nars.nar.Terminal;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -12,7 +13,7 @@ import org.junit.Test;
 import static nars.$.*;
 import static nars.Op.CONJ;
 import static nars.index.TermBuilder.imageUnwrap;
-import static nars.io.NarseseTest.assertInvalid;
+import static nars.io.NarseseTest.assertInvalidTerms;
 import static nars.term.Term.False;
 import static nars.term.Term.True;
 import static nars.term.TermTest.assertValid;
@@ -96,7 +97,7 @@ public class TermReductionsTest {
 
     @Test
     public void testIntersectIntReductionToZero() throws Narsese.NarseseException {
-        assertInvalid("(|,{P,Q},{R,S})");
+        assertInvalidTerms("(|,{P,Q},{R,S})");
     }
 
     @Test
@@ -112,7 +113,7 @@ public class TermReductionsTest {
 
         TermTest.assertInvalid(() -> equi(impl(p, q), r));
         TermTest.assertInvalid(() -> equi(equi(p, q), r));
-        assertInvalid("<<a <=> b> <=> c>");
+        assertInvalidTerms("<<a <=> b> <=> c>");
     }
 
 
@@ -147,17 +148,17 @@ public class TermReductionsTest {
 
     @Test
     public void testReducedAndInvalidImplications1() throws Narsese.NarseseException {
-        assertInvalid("<<P<=>Q> ==> R>");
+        assertInvalidTerms("<<P<=>Q> ==> R>");
     }
 
     @Test
     public void testReducedAndInvalidImplications5() throws Narsese.NarseseException {
-        assertInvalid("<<P==>Q> ==> R>");
+        assertInvalidTerms("<<P==>Q> ==> R>");
     }
 
     @Test
     public void testReducedAndInvalidImplications6() throws Narsese.NarseseException {
-        assertInvalid("<R ==> <P<=>Q>>");
+        assertInvalidTerms("<R ==> <P<=>Q>>");
     }
 
     @Test
@@ -167,7 +168,7 @@ public class TermReductionsTest {
 
     @Test
     public void testReducedAndInvalidImplications3() throws Narsese.NarseseException {
-        assertInvalid("<R==><P==>R>>");
+        assertInvalidTerms("<R==><P==>R>>");
     }
 
     @Test
@@ -458,10 +459,10 @@ public class TermReductionsTest {
                 $("((&&, a, b, c) ==> (&&, a, d))").toString());
         assertEquals("(d==>(b&&c))",
                 $("((&&, a, d) ==> (&&, a, b, c))").toString());
-        assertInvalid("((&&, a, b, c) ==> (&&, a, b))");
-        assertInvalid("((&&, a, b) ==> (&&, a, b, c))");
-        assertInvalid("((&&, a, b, c) ==> a)");
-        assertInvalid("(a ==> (&&, a, b, c))");
+        assertInvalidTerms("((&&, a, b, c) ==> (&&, a, b))");
+        assertInvalidTerms("((&&, a, b) ==> (&&, a, b, c))");
+        assertInvalidTerms("((&&, a, b, c) ==> a)");
+        assertInvalidTerms("(a ==> (&&, a, b, c))");
     }
 
     @Test public void testConegatedConjunctionTerms0() throws Narsese.NarseseException {
@@ -494,7 +495,7 @@ public class TermReductionsTest {
     }
 
     @Test public void testConegatedConjunctionTerms2() throws Narsese.NarseseException {
-        assertInvalid("(#1 && --(#1&&(robin-->swimmer)))");
+        assertInvalidTerms("(#1 && --(#1&&(robin-->swimmer)))");
     }
 
     @Test
@@ -519,10 +520,10 @@ public class TermReductionsTest {
     @Test
     public void testCoNegatedJunction() throws Narsese.NarseseException {
         //the conegation cancels itself out
-        assertInvalid(
+        assertInvalidTerms(
                 "(&&,x,a:b,(--,a:b))");
 
-        assertInvalid(
+        assertInvalidTerms(
                 "(&&,x,y,a:b,(--,a:b))");
     }
 
@@ -550,7 +551,7 @@ public class TermReductionsTest {
         assertValidTermValidConceptInvalidTaskContent("((--,(a1)) &&+0 (a1))");
         assertValid($("((--,(a1)) &&+1 (a1))"));
 
-        assertInvalid("((--,(a1)) || (a1))");
+        assertInvalidTerms("((--,(a1)) || (a1))");
     }
 
     @Test
@@ -566,6 +567,21 @@ public class TermReductionsTest {
         assertValidTermValidConceptInvalidTaskContent(("((--,(a)) ==> (a))"));
         assertValidTermValidConceptInvalidTaskContent(("((--,(a)) ==>+0 (a))"));
         assertValid($("((--,(a)) ==>+1 (a))"));
+    }
+
+    @Test public void testRepeatEvent() throws Narsese.NarseseException {
+        for (String x : new String[] { "((a) ==>+1 (a))", "((a) &&+1 (a))" }) {
+            Term t = $(x);
+            assertValid(t);
+
+            Task y = task((Compound)t, Op.BELIEF, $.t(1f,0.9f));
+
+            assertEquals(x, y.term().toString());
+
+            y.normalize(new Terminal()); //that normalization doesnt throw
+        }
+
+
 
     }
 
@@ -606,7 +622,7 @@ public class TermReductionsTest {
     @Test
     public void testSingularStatementsInDisjunction() throws Narsese.NarseseException {
 
-        assertInvalid("(||,(a<->a),c:d,e:f)"); //null, singular true
+        assertInvalidTerms("(||,(a<->a),c:d,e:f)"); //null, singular true
     }
 
     @Test
@@ -631,11 +647,11 @@ public class TermReductionsTest {
 
     @Test
     public void testCoNegatedIntersectionAndDiffs() throws Narsese.NarseseException {
-        assertInvalid("(|,(x),(--,(x))");
-        assertInvalid("(&,(x),(--,(x))");
-        assertInvalid("(-,(x),(--,(x))");
-        assertInvalid("(~,(x),(--,(x))");
-        assertInvalid("(-,(x),(x))");
+        assertInvalidTerms("(|,(x),(--,(x))");
+        assertInvalidTerms("(&,(x),(--,(x))");
+        assertInvalidTerms("(-,(x),(--,(x))");
+        assertInvalidTerms("(~,(x),(--,(x))");
+        assertInvalidTerms("(-,(x),(x))");
     }
 
     @Test
@@ -654,8 +670,8 @@ public class TermReductionsTest {
 
     @Test
     public void testReducibleImpl() throws Narsese.NarseseException {
-        assertInvalid("((--,(x)) ==>+0 ((--,(y)) &&+0 (--,(x))))");
-        assertInvalid("((--,(x)) ==> ((--,(y)) && (--,(x))))");
+        assertInvalidTerms("((--,(x)) ==>+0 ((--,(y)) &&+0 (--,(x))))");
+        assertInvalidTerms("((--,(x)) ==> ((--,(y)) && (--,(x))))");
     }
 
     @Test public void testImplInImplDTernal() throws Narsese.NarseseException {

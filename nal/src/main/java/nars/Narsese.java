@@ -1189,14 +1189,9 @@ public class Narsese extends BaseParser<Object> {
             if (r == null)
                 throw new NarseseException(input);
 
-            try {
-                return decodeTask(memory, (Object[]) r.getValueStack().peek());
-            } catch (Exception e) {
-                throw new NarseseException(input, r, e);
-            }
+            return decodeTask(memory, (Object[]) r.getValueStack().peek());
 
         } catch (Throwable ge) {
-            //ge.printStackTrace();
             throw new NarseseException(input, ge.getCause());
         }
 

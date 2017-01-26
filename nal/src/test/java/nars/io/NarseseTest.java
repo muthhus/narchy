@@ -9,10 +9,12 @@ import nars.term.atom.Atomic;
 import nars.term.util.InvalidTermException;
 import nars.term.var.Variable;
 import nars.truth.Truth;
+import nars.util.task.InvalidTaskException;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
 import java.util.List;
+import java.util.function.Supplier;
 
 import static nars.$.$;
 import static org.junit.Assert.*;
@@ -165,7 +167,7 @@ public class NarseseTest {
 
     @Test
     public void testFailureOfMultipleDistinctInfixOperators() {
-        assertInvalid("(a * b & c)");
+        assertInvalidTerms("(a * b & c)");
     }
 
     @Test
@@ -605,10 +607,10 @@ public class NarseseTest {
 //    }
 
     @Test public void testEmptySets() {
-        assertInvalid("{}", "[]");
+        assertInvalidTerms("{}", "[]");
     }
 
-    public static void assertInvalid(@NotNull String... inputs) {
+    public static void assertInvalidTerms(@NotNull String... inputs) {
         for (String s : inputs ) {
             try {
                 Term e = term(s);
@@ -625,6 +627,40 @@ public class NarseseTest {
         }
     }
 
+    public static void assertInvalidTasks(@NotNull String... inputs) {
+        for (String s : inputs ) {
+            try {
+                Task e = task(s);
+                assertTrue(false);
+            } catch (Exception e) {
+                assertTrue(true);
+            }
+        }
+    }
+    public static void assertInvalidTasks(Supplier<Task> s) {
+
+            try {
+                s.get().normalize(new Terminal());
+                assertTrue(false);
+            } catch (InvalidTaskException good) {
+                assertTrue(true); //what should happen
+            } catch (Exception e) {
+                assertTrue(e.toString(), false); //something else happend
+            }
+
+    }
+
+
+    @Test public void testInvalidTrueFalseTask() {
+        for (Term t : new Term[] { Term.True, Term.False }) {
+            Compound bad = $.p("x", "y", "z");
+            bad.subterms().terms()[0] = t; //directly replace it because constructing such a term wont be allowed
+
+            assertInvalidTasks(()->$.task(bad, Op.BELIEF, $.t(1f, 0.9f)));
+            assertInvalidTasks(()->$.task(bad, Op.QUESTION, $.t(1f, 0.9f)));
+        }
+
+    }
 
     @Test public void testEmptyProduct() throws Narsese.NarseseException {
         Compound e = term("()");

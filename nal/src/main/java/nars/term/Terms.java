@@ -585,7 +585,7 @@ public class Terms   {
                     subsChanged = true;
 
             }
-            newSubs = subsChanged ? /*theSubterms(*/TermContainer.the(o, ss)/*)*/ : null;
+            newSubs = subsChanged ? /*theSubterms(*/TermContainer.the(o, DTERNAL, ss)/*)*/ : null;
         } else {
             newSubs = null;
         }

@@ -10,6 +10,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 
 import static nars.Op.CONJ;
+import static nars.time.Tense.DTERNAL;
 
 
 /** parallel branching */
@@ -19,7 +20,7 @@ public final class Fork extends GenericCompound implements BoolCondition {
     public final BoolCondition[] termCache;
 
     protected Fork(@NotNull BoolCondition[] actions) {
-        super(CONJ, TermContainer.the(CONJ, (Term[]) actions));
+        super(CONJ, TermContainer.the(CONJ, DTERNAL, (Term[]) actions));
         if (actions.length == 1)
             throw new RuntimeException("unnecessary use of fork");
         this.termCache = actions;
