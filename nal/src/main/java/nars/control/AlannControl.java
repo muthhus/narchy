@@ -131,7 +131,7 @@ public class AlannControl implements Control {
 
     @Override
     public void activate(Termed term, float priToAdd) {
-        core(term).activate((Concept) term, ConceptBagControl.baseBudget, priToAdd, null);
+        core(term).activate((Concept) term, ConceptBagControl.insertionBudget, priToAdd, null);
     }
 
     @Override

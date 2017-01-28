@@ -64,21 +64,24 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, Sorted
 
             this.capacity = c;
 
-            int s = size();
+            synchronized (this) {
 
-            //TODO can be accelerated by batch remove operation
-            while (c < s--) {
-                nar.tasks.remove(removeWeakest());
+                int s = size();
+
+                //TODO can be accelerated by batch remove operation
+                while (c < s--) {
+                    nar.tasks.remove(removeWeakest());
+                }
             }
         }
     }
 
-    @Override
-    public void forEach(Consumer<? super Task> action) {
-        synchronized (this) {
-            super.forEach(action);
-        }
-    }
+//    @Override
+//    public void forEach(Consumer<? super Task> action) {
+//        //synchronized (this) {
+//            super.forEach(action);
+//        //}
+//    }
 
     //    protected final Task removeWeakest(Object reason) {
 //        if (!isEmpty()) {

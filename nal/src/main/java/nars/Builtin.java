@@ -57,9 +57,9 @@ public class Builtin  {
         nar.on(Functor.f1Concept("belief", nar, (c, n) -> $.quote(c.belief(n.time()))));
         nar.on(Functor.f1Concept("goal", nar, (c, n) -> $.quote(c.goal(n.time()))));
 
-        nar.on("concept", (Command) (op, a, nar1) -> {
-            Concept c = nar.concept(a[0]);
-            Command.log(nar,
+        nar.on("concept", (Command) (op, a, nn) -> {
+            Concept c = nn.concept(a[0]);
+            Command.log(nn,
                 (c!=null) ?
                     quote(c.print(new StringBuilder(1024))) : $.func("unknown", a[0])
             );
@@ -73,7 +73,7 @@ public class Builtin  {
 
 
         nar.on("memstat", (Command) (op, a, nn) ->
-            Command.log(nar, quote(nar.concepts.summary()))
+            Command.log(nn, quote(nn.concepts.summary()))
         );
 
         nar.on("reset", (Command) (op, args1, nar1) ->

@@ -9,7 +9,9 @@ import java.util.function.BiFunction;
 
 import static jcog.Util.lerp;
 import static nars.budget.BudgetMerge.PriMerge.AVERAGE;
+import static nars.budget.BudgetMerge.PriMerge.OR;
 import static nars.budget.BudgetMerge.PriMerge.PLUS;
+import static nars.util.UtilityFunctions.or;
 
 /**
  * Budget merge function, with input scale factor
@@ -46,6 +48,7 @@ public interface BudgetMerge extends BiFunction<Budget, Budget, Budget> {
     enum PriMerge {
         PLUS,
         AVERAGE,
+        OR,
         //AND, OR,
         MAX
     }
@@ -85,6 +88,10 @@ public interface BudgetMerge extends BiFunction<Budget, Budget, Budget> {
         switch (priMerge) {
             case PLUS:
                 nextPri = ePri + iPri;
+                nextQua = Math.max(eQua,iQua);
+                break;
+            case OR:
+                nextPri = or(ePri,iPri);
                 nextQua = Math.max(eQua,iQua);
                 break;
             case MAX:
@@ -164,7 +171,7 @@ public interface BudgetMerge extends BiFunction<Budget, Budget, Budget> {
     BudgetMerge avgBlend = (tgt, src, srcScale) -> blend(tgt, src, srcScale, AVERAGE);
 
 //    /** or priority, LERP other components in proportion to the priorities */
-//    BudgetMerge orBlend = (tgt, src, srcScale) -> blend(tgt, src, srcScale, OR);
+    BudgetMerge orBlend = (tgt, src, srcScale) -> blend(tgt, src, srcScale, OR);
 //
 //
 //    /** AND priority, LERP other components in proportion to the priorities */

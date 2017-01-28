@@ -42,9 +42,15 @@ public class ConceptBagControl implements Control, Consumer<DerivedTask> {
 
     private static final Logger logger = LoggerFactory.getLogger(ConceptBagControl.class);
 
+    public static final BudgetMerge CONCEPT_BAG_BLEND = BudgetMerge.plusBlend;
+
     final Deriver deriver;
 
     final PremiseBuilder premiser = new DefaultPremiseBuilder();
+
+    /** this will be scaled by the input priority factor for each concept */
+    public static final ROBudget insertionBudget = new ROBudget(1f, 0.5f);
+
 
     /**
      * concepts active in this cycle
@@ -162,6 +168,8 @@ public class ConceptBagControl implements Control, Consumer<DerivedTask> {
                 meter.hit();
                 return;
             }
+        } else {
+            d.delete();
         }
         meter.miss();
     }
@@ -176,11 +184,10 @@ public class ConceptBagControl implements Control, Consumer<DerivedTask> {
     }
 
 
-    public static final ROBudget baseBudget = new ROBudget(1f, 0.5f);
 
     @Override
     public void activate(Termed term, float priToAdd) {
-        active.put((Concept)term, baseBudget, priToAdd, null);
+        active.put((Concept)term, insertionBudget, priToAdd, null);
     }
 
 
@@ -212,7 +219,7 @@ public class ConceptBagControl implements Control, Consumer<DerivedTask> {
 
 
         public ConceptBag( @NotNull CurveBag.CurveSampler sampler) {
-            super(0, sampler, BudgetMerge.plusBlend,
+            super(0, sampler, CONCEPT_BAG_BLEND,
                     //new ConcurrentHashMap<>(capacity)
                     nar.exe.concurrent() ?  new java.util.concurrent.ConcurrentHashMap<>() : new HashMap()
                     //new NonBlockingHashMap<>(capacity)

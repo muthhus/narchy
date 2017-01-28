@@ -13,6 +13,10 @@ import java.util.function.Function;
  */
 public final class SynchronizedHashMap<K, V> extends HashMap<K, V> {
 
+    public SynchronizedHashMap() {
+        super();
+    }
+
     public SynchronizedHashMap(int cap, float loadFactor) {
         super(cap, loadFactor);
     }

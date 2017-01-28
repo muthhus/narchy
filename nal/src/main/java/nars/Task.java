@@ -1,5 +1,6 @@
 package nars;
 
+import jcog.map.SynchronizedHashMap;
 import nars.bag.ArrayBag;
 import nars.budget.BudgetMerge;
 import nars.budget.Budgeted;
@@ -22,7 +23,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
 
 import static nars.Op.VAR_INDEP;
@@ -336,10 +336,10 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
      * return the input task, or a modification of it to use a customized matched premise belief. or null to
      * to cancel any matched premise belief.
      */
-    default Task onAnswered(Task answer, NAR nar) {
+    @Nullable default Task onAnswered(@NotNull Task answer, @NotNull NAR nar) {
         if (isInput()) {
             ArrayBag<Task> answers = concept(nar).computeIfAbsent(Op.QUESTION, () ->
-                new ArrayBag<>(BudgetMerge.max, new HashMap<>()).capacity(Param.MAX_INPUT_ANSWERS)
+                new ArrayBag<>(BudgetMerge.max, new SynchronizedHashMap<>()).capacity(Param.MAX_INPUT_ANSWERS)
             );
             float confEffective = answer.conf(occurrence());
             if (answers.putIfAbsent(answer, new RawBudget(1f, confEffective))) {
@@ -349,6 +349,7 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
                 return null;
             }
         }
+
         return answer;
     }
 
