@@ -3,8 +3,10 @@ package nars.attention;
 import nars.NAR;
 import nars.Param;
 import nars.Task;
+import nars.bag.Bag;
 import nars.budget.Budgeted;
 import nars.concept.Concept;
+import nars.link.BLink;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
@@ -120,25 +122,11 @@ public class SpreadingActivation extends Activation implements ObjectFloatProced
 
         float thisScale = scale;
 
-        int nextDepth = depth + 1;
-        if ((nextDepth <= termlinkDepth) && (targetTerm instanceof Compound)) {
+        boolean isntVariable = !(targetTerm instanceof Variable);
 
-            int n = targetTerm.size();
-            if (n > 0) {
-                float childScale = ((1f - parentRetention) * scale) / (n);
-                if (childScale >= minScale) {
-                    Compound targetCompound = (Compound) targetTerm;
-                    Term[] children = targetCompound.terms();
-                    for (Term t : children)
-                        link(t.unneg(), childScale, nextDepth); //link and recurse to the concept
-
-                    thisScale = scale * parentRetention;
-                }
-            }
-        }
 
         Termed linkedTerm;
-        if (!(targetTerm instanceof Variable)) {
+        if (isntVariable) {
             Concept termConcept = nar.concept(targetTerm, true);
             if (termConcept != null)
                 linkedTerm = termConcept;
@@ -146,6 +134,41 @@ public class SpreadingActivation extends Activation implements ObjectFloatProced
                 return;
         } else {
             linkedTerm = targetTerm;
+        }
+
+
+        int nextDepth = depth + 1;
+        if (nextDepth <= termlinkDepth) {
+
+            if (targetTerm instanceof Compound) {
+                int n = targetTerm.size();
+                if (n > 0) {
+                    float childScale = ((1f - parentRetention) * scale) / (n);
+                    if (childScale >= minScale) {
+                        Compound targetCompound = (Compound) targetTerm;
+                        Term[] children = targetCompound.terms();
+                        for (Term t : children)
+                            link(t.unneg(), childScale, nextDepth); //link and recurse to the concept
+
+                        thisScale = scale * parentRetention;
+                    }
+                }
+            } else if (linkedTerm instanceof Concept) {
+                //activate (but not link to) Atom's termlinks
+                Bag<Term> tlinks = ((Concept) linkedTerm).termlinks();
+                int n = tlinks.size();
+                if (n > 0) {
+                    float childScale = ((1f - parentRetention) * scale) / (n);
+                    if (childScale >= minScale) {
+                        for (BLink<Term> b : tlinks) {
+                            if (b!=null) {
+                                Term key = b.get();
+                                spread.addToValue(key, childScale);
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         spread.addToValue(linkedTerm, thisScale);

@@ -9,9 +9,7 @@ import org.jetbrains.annotations.NotNull;
 public interface BLink<X> extends Budget, Link<X> {
 
 
-    @NotNull
-    @Override
-    X get();
+    @NotNull @Override X get();
 
     @Override
     default boolean isDeleted() {
