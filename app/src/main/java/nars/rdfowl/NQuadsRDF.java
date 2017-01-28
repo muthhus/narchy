@@ -21,6 +21,7 @@ import javax.xml.namespace.QName;
 import java.io.*;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -95,11 +96,11 @@ public abstract class NQuadsRDF {
     }
 
 
-    public static Stream<MutableTask> stream(@NotNull NAR n, File f) throws FileNotFoundException {
+    public static Stream<Task> stream(@NotNull NAR n, File f) throws FileNotFoundException {
         return NQuadsRDF.stream(n, NQuadsRDF.stream(f));
     }
 
-    public static Stream<MutableTask> stream(@NotNull NAR nar, @NotNull Stream<Node[]> nxp) {
+    public static Stream<Task> stream(@NotNull NAR nar, @NotNull Stream<Node[]> nxp) {
 
         return nxp.map( (Node[] nx) -> {
             if (nx.length >= 3) {
@@ -114,7 +115,7 @@ public abstract class NQuadsRDF {
 
             }
             return null;
-        } ).filter(x -> x!=null);
+        } ).filter(Objects::nonNull);
     }
 
 //    public static void input(NAR nar, File input) throws Exception {
@@ -337,7 +338,7 @@ public abstract class NQuadsRDF {
          * relation is to be saved. Takes care of updating relation_types as well.
          *
          */
-    public static MutableTask inputNALlike(@NotNull NAR nar,
+    public static Task inputNALlike(@NotNull NAR nar,
                               @Nullable Atomic subject,
                               @Nullable Atomic predicate, @Nullable Term object) {
 
@@ -437,9 +438,7 @@ public abstract class NQuadsRDF {
             //System.out.println(subject + " " + predicate + " " + object + " :: " + belief);
 
             return new MutableTask(belief, Op.BELIEF, 1f, nar)
-                    .time(nar.time(),
-                    Tense.ETERNAL //TODO Tense parameter
-                    );
+                    .eternal();
         }
 
         return null;

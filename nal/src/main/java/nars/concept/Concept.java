@@ -46,6 +46,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 import static nars.Op.*;
 
@@ -163,6 +164,13 @@ public interface Concept extends Termed {
             return metaOrCreate().putIfAbsent(key, value);
         }
     }
+
+    default <X> X computeIfAbsent(@NotNull Object key, Supplier value) {
+        synchronized (term()) {
+            return (X) metaOrCreate().computeIfAbsent(key, (k) -> value.get());
+        }
+    }
+
 
     default boolean isDeleted()  {
         return state() == ConceptState.Deleted;

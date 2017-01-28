@@ -1319,7 +1319,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
         runLater(tasks, this::input, maxChunkSize);
     }
 
-    public void inputLater(@NotNull Stream<? extends Task> taskStream) {
+    public void inputLater(@NotNull Stream<Task> taskStream) {
         taskStream.forEach(this::inputLater);
         //input(new TaskStream(taskStream));
     }

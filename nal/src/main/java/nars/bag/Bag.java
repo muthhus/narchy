@@ -4,6 +4,7 @@ import jcog.Util;
 import jcog.table.Table;
 import nars.$;
 import nars.Param;
+import nars.Task;
 import nars.attention.Forget;
 import nars.budget.Budget;
 import nars.budget.Budgeted;
@@ -64,8 +65,8 @@ public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Iterable<BLink<
     /**
      * insert/merge with an initial / default budget
      */
-    default void put(@NotNull V x) {
-        put(x, initialBudget(x), null);
+    default BLink<V> put(@NotNull V x) {
+        return put(x, initialBudget(x), null);
     }
     default void putLink(@NotNull BLink<V> x) {
         put(x.get(), x);
@@ -636,6 +637,16 @@ public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Iterable<BLink<
         setCapacity(i);
         return this;
     }
+
+    default boolean putIfAbsent(V x) {
+        if (contains(x))
+            return false;
+        if (put(x)==null)
+            return false;
+        return true;
+    }
+
+
 
     //TODO default @NotNull Bag<V> move(int limit, @NotNull Bag target) {
 

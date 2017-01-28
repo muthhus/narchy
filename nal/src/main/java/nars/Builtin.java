@@ -27,7 +27,7 @@ public class Builtin  {
             new differ(),
             new union(),
 
-            Functor.f0("date", () -> quote(new Date().toString())),
+            //Functor.f0("date", () -> quote(new Date().toString())),
 
             Functor.f1Const("reflect", reflect::reflect),
             Functor.f1Const("fromJSON", (jsonString)-> IO.fromJSON($.unquote(jsonString))),

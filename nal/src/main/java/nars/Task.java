@@ -1,5 +1,7 @@
 package nars;
 
+import nars.bag.ArrayBag;
+import nars.budget.BudgetMerge;
 import nars.budget.Budgeted;
 import nars.concept.Concept;
 import nars.op.Command;
@@ -19,6 +21,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 
 import static nars.Op.VAR_INDEP;
@@ -333,8 +336,15 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
      * to cancel any matched premise belief.
      */
     default Task onAnswered(Task answer, NAR nar) {
-        if (isInput())
-            Command.log(nar, this.toString() + "  " + answer.toString());
+        if (isInput()) {
+            ArrayBag<Task> answers = concept(nar).computeIfAbsent(Op.QUESTION, () ->
+                new ArrayBag<>(BudgetMerge.max, new HashMap()).capacity(Param.MAX_INPUT_ANSWERS)
+            );
+            if (answers.putIfAbsent(answer)) {
+                answers.commit();
+                Command.log(nar, this.toString() + "  " + answer.toString());
+            }
+        }
         return answer;
     }
 

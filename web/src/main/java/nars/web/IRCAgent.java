@@ -13,6 +13,7 @@ import nars.op.Leak;
 import nars.op.mental.Abbreviation;
 import nars.op.mental.Inperience;
 import nars.op.stm.MySTMClustered;
+import nars.rdfowl.NQuadsRDF;
 import nars.time.RealTime;
 import nars.util.exe.MultiThreadExecutioner;
 import org.jetbrains.annotations.NotNull;
@@ -22,8 +23,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spacegraph.net.IRC;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.Random;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 /**
  * $0.9;0.9;0.99$
@@ -57,7 +61,7 @@ public class IRCAgent extends IRC {
         this.nar = nar;
 
 
-        out = new LeakOut(nar, 32, 0.02f) {
+        out = new LeakOut(nar, 8, 0.02f) {
             @Override
             protected float send(Task task) {
                 boolean cmd = task.isCommand();
@@ -235,11 +239,11 @@ public class IRCAgent extends IRC {
 
 
     @NotNull
-    public static Default newRealtimeNAR(int activeConcepts, int framesPerSecond, int conceptsPerFrame) {
+    public static Default newRealtimeNAR(int activeConcepts, int framesPerSecond, int conceptsPerFrame) throws FileNotFoundException {
 
         Random random = new XorShift128PlusRandom(System.currentTimeMillis());
 
-        MultiThreadExecutioner exe = new MultiThreadExecutioner(3, 1024 * 8);
+        MultiThreadExecutioner exe = new MultiThreadExecutioner(3, 1024 * 32);
         exe.sync(true);
 
         Default nar = new Default(activeConcepts, conceptsPerFrame, 1, 3, random,
@@ -247,12 +251,12 @@ public class IRCAgent extends IRC {
                 new CaffeineIndex(new DefaultConceptBuilder(), 512 * 1024, false, exe),
                 //new TreeTermIndex.L1TreeIndex(new DefaultConceptBuilder(), 400000, 64 * 1024, 3),
 
-                new RealTime.CS(true).dur(0.25f),
+                new RealTime.CS(true).dur(0.2f),
                 exe
         );
 
 
-        int volMax = 28;
+        int volMax = 24;
 
 //        //Multi nar = new Multi(3,512,
 //        Default nar = new Default(2048,
@@ -263,14 +267,14 @@ public class IRCAgent extends IRC {
 //                , new FrameClock(), exe);
 
 
-        nar.beliefConfidence(0.8f);
-        nar.goalConfidence(0.8f);
+        nar.beliefConfidence(0.9f);
+        nar.goalConfidence(0.9f);
 
-        float p = 0.5f;
-        nar.DEFAULT_BELIEF_PRIORITY = 1f * p;
-        nar.DEFAULT_GOAL_PRIORITY = 1f * p;
-        nar.DEFAULT_QUESTION_PRIORITY = 1f * p;
-        nar.DEFAULT_QUEST_PRIORITY = 1f * p;
+        float p = 1f;
+        nar.DEFAULT_BELIEF_PRIORITY = 0.4f * p;
+        nar.DEFAULT_GOAL_PRIORITY = 0.4f * p;
+        nar.DEFAULT_QUESTION_PRIORITY = 0.5f * p;
+        nar.DEFAULT_QUEST_PRIORITY = 0.5f * p;
 
         nar.confMin.setValue(0.02f);
         nar.termVolumeMax.setValue(volMax);
@@ -278,23 +282,13 @@ public class IRCAgent extends IRC {
 
 
 
-//        nar.inputLater(
-//                NQuadsRDF.stream(nar, new File(
-//                        "/home/me/Downloads/nquad"
-//                )).
-//                        peek(t -> {
-//                            t.setBudget(0.01f, 0.5f, 0.9f);
-//                        }).
-//                        collect(Collectors.toList())
-//                , 32
-//        );
-//        nar.run(1);
 
-        MySTMClustered stm = new MySTMClustered(nar, 16, '.', 3, false, 3);
+        MySTMClustered stm = new MySTMClustered(nar, 16, '.', 4, false, 3);
         MySTMClustered stm2 = new MySTMClustered(nar, 32, '.', 2, true, 2);
 
         new Abbreviation(nar, "_", 3, 12, 0.001f, 8);
         new Inperience(nar, 0.003f, 8);
+
 
         nar.loop(framesPerSecond);
 
@@ -312,9 +306,9 @@ public class IRCAgent extends IRC {
 
         IRCAgent bot = new IRCAgent(n,
                 "experiment1", "irc.freenode.net",
-                "#123xyz"
+                //"#123xyz"
                 //"#netention"
-                //"#nars"
+                "#nars"
         );
 
         n.on("trace", (Command) (a, t, nn) -> {
@@ -326,10 +320,23 @@ public class IRCAgent extends IRC {
             }
         });
 
+        n.inputLater(
+                NQuadsRDF.stream(n, new File(
+                        "/home/me/Downloads/nquad"
+                ))//.
+//                        peek(t -> {
+//                            t.setBudget(0.01f, 0.9f);
+//                        }).
+                //    collect(Collectors.toList())
+//                , 32
+        );
 
         //new NARWeb(n, 8080);
 
         bot.start();
+
+
+//        nar.run(1);
 
     }
 
