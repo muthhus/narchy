@@ -73,12 +73,12 @@ public abstract class Param /*extends Container*/  {
 
 
     /** average priority target for bag forgetting */
-    public static final float BAG_THRESHOLD = (0.33f);
+    public static final float BAG_THRESHOLD = (0.5f);
 
     /** conjunctions over this length will be ineligible for 2nd-layer termlink templates. it can be decomposed however, and decompositions of this size or less will be eligible. */
     public static final int MAX_CONJ_SIZE_FOR_LAYER2_TEMPLATES = 3;
 
-    /** adjuts this between 0 and 1. 0=fully backward, 0.5=balanced, 1=fully forward */
+    ///* adjuts this between 0 and 1. 0=fully backward, 0.5=balanced, 1=fully forward */
     //public static final float ACTIVATION_TERMLINK_BALANCE = 0.5f;
 
     /** note: depth=0 means the concept itself, and increasing numbers are recursion iterations in the activation traversal pattern */

@@ -638,10 +638,10 @@ public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Iterable<BLink<
         return this;
     }
 
-    default boolean putIfAbsent(V x) {
+    default boolean putIfAbsent(V x, Budgeted b) {
         if (contains(x))
             return false;
-        if (put(x)==null)
+        if (put(x, b, null)==null)
             return false;
         return true;
     }

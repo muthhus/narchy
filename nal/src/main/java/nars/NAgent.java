@@ -724,21 +724,21 @@ abstract public class NAgent implements NSense, NAction {
         return Float.NaN;
     }
 
-    public static class PredictionTask extends GeneratedTask {
+    public static class PredictionTask extends MutableTask {
 
         public PredictionTask(@NotNull Termed<Compound> term, char punct) {
             super(term, punct, null);
             assert(punct == Op.QUESTION || punct == Op.QUEST);
         }
 
-        @Override
-        public Task onAnswered(Task answer, NAR nar) {
-            if (!answer.isDeleted()) {
-                long lag = answer.creation() - creation();
-                nar.logger.info("Prediction:\t{}\n\t{}\tlag={}", this, answer, lag);
-            }
-            return answer;
-        }
+//        @Override
+//        public Task onAnswered(Task answer, NAR nar) {
+//            if (!answer.isDeleted()) {
+//                long lag = answer.creation() - creation();
+//                nar.logger.info("Prediction:\t{}\n\t{}\tlag={}", this, answer, lag);
+//            }
+//            return answer;
+//        }
     }
 
 }

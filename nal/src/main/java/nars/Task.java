@@ -3,6 +3,7 @@ package nars;
 import nars.bag.ArrayBag;
 import nars.budget.BudgetMerge;
 import nars.budget.Budgeted;
+import nars.budget.RawBudget;
 import nars.concept.Concept;
 import nars.op.Command;
 import nars.task.Tasked;
@@ -338,11 +339,14 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
     default Task onAnswered(Task answer, NAR nar) {
         if (isInput()) {
             ArrayBag<Task> answers = concept(nar).computeIfAbsent(Op.QUESTION, () ->
-                new ArrayBag<>(BudgetMerge.max, new HashMap()).capacity(Param.MAX_INPUT_ANSWERS)
+                new ArrayBag<>(BudgetMerge.max, new HashMap<>()).capacity(Param.MAX_INPUT_ANSWERS)
             );
-            if (answers.putIfAbsent(answer)) {
+            float confEffective = answer.conf(occurrence());
+            if (answers.putIfAbsent(answer, new RawBudget(1f, confEffective))) {
                 answers.commit();
                 Command.log(nar, this.toString() + "  " + answer.toString());
+            } else {
+                return null;
             }
         }
         return answer;
