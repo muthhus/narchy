@@ -1,5 +1,6 @@
 package nars.web;
 
+import jcog.RateIterator;
 import jcog.data.random.XorShift128PlusRandom;
 import nars.NAR;
 import nars.Param;
@@ -27,7 +28,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Random;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 /**
  * $0.9;0.9;0.99$
@@ -320,16 +320,27 @@ public class IRCAgent extends IRC {
             }
         });
 
-        n.inputLater(
-                NQuadsRDF.stream(n, new File(
-                        "/home/me/Downloads/nquad"
-                ))//.
-//                        peek(t -> {
-//                            t.setBudget(0.01f, 0.9f);
-//                        }).
-                //    collect(Collectors.toList())
-//                , 32
-        );
+
+        try {
+            new RateIterator<Task>(
+                NQuadsRDF.stream(n,
+                    new File("/home/me/Downloads/nquad")), 10)
+                        .threadEachRemaining(n::inputLater).start();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+
+
+//        n.inputLater(
+//                NQuadsRDF.stream(n, new File(
+//                        "/home/me/Downloads/nquad"
+//                ))//.
+////                        peek(t -> {
+////                            t.setBudget(0.01f, 0.9f);
+////                        }).
+//                //    collect(Collectors.toList())
+////                , 32
+//        );
 
         //new NARWeb(n, 8080);
 
