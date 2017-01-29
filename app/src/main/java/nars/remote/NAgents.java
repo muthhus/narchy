@@ -181,13 +181,7 @@ abstract public class NAgents extends NAgent {
                 ,
                 //new FrameClock()
                 time,
-                exe) {
-
-//            @Override
-//            protected void initNAL7() {
-//                //no STM linkage
-//            }
-        };
+                exe);
 
         nar.beliefConfidence(0.75f);
         nar.goalConfidence(0.75f);

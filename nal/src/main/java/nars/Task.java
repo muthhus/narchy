@@ -339,7 +339,7 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
     @Nullable default Task onAnswered(@NotNull Task answer, @NotNull NAR nar) {
         if (isInput()) {
             ArrayBag<Task> answers = concept(nar).computeIfAbsent(Op.QUESTION, () ->
-                new ArrayBag<>(BudgetMerge.max, new SynchronizedHashMap<>()).capacity(Param.MAX_INPUT_ANSWERS)
+                new ArrayBag<>(BudgetMerge.maxHard, new SynchronizedHashMap<>()).capacity(Param.MAX_INPUT_ANSWERS)
             );
             float confEffective = answer.conf(occurrence());
             if (answers.putIfAbsent(answer, new RawBudget(1f, confEffective))) {

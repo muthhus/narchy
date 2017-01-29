@@ -159,7 +159,7 @@ public class DepIndepVarIntroduction extends VarIntroduction {
                 negated = false;
             }
 
-            if (!(x instanceof Compound))
+            if (!(xx instanceof Compound))
                 return x;
 
             x = xx;

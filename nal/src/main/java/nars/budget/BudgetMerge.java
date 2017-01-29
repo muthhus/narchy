@@ -8,9 +8,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.function.BiFunction;
 
 import static jcog.Util.lerp;
-import static nars.budget.BudgetMerge.PriMerge.AVERAGE;
-import static nars.budget.BudgetMerge.PriMerge.OR;
-import static nars.budget.BudgetMerge.PriMerge.PLUS;
+import static nars.budget.BudgetMerge.PriMerge.*;
 import static nars.util.UtilityFunctions.or;
 
 /**
@@ -172,6 +170,9 @@ public interface BudgetMerge extends BiFunction<Budget, Budget, Budget> {
 
 //    /** or priority, LERP other components in proportion to the priorities */
     BudgetMerge orBlend = (tgt, src, srcScale) -> blend(tgt, src, srcScale, OR);
+
+    //    /** or priority, LERP other components in proportion to the priorities */
+    BudgetMerge maxBlend = (tgt, src, srcScale) -> blend(tgt, src, srcScale, MAX);
 //
 //
 //    /** AND priority, LERP other components in proportion to the priorities */
@@ -235,7 +236,7 @@ public interface BudgetMerge extends BiFunction<Budget, Budget, Budget> {
     /** add priority, interpolate durability and quality according to the relative change in priority
      *  WARNING untested
      * */
-    BudgetMerge max = (tgt, src, srcScaleIgnored) -> {
+    BudgetMerge maxHard = (tgt, src, srcScaleIgnored) -> {
         tgt.setBudget(
             Util.max(src.priSafe(0), tgt.priSafe(0)),
                 Util.max(src.qua(), tgt.qua()));

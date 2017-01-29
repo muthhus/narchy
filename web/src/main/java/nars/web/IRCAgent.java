@@ -2,10 +2,12 @@ package nars.web;
 
 import jcog.RateIterator;
 import jcog.data.random.XorShift128PlusRandom;
+import nars.Control;
 import nars.NAR;
 import nars.Param;
 import nars.Task;
 import nars.conceptualize.DefaultConceptBuilder;
+import nars.control.ChainedControl;
 import nars.index.term.map.CaffeineIndex;
 import nars.link.BLink;
 import nars.nar.Default;
@@ -15,6 +17,7 @@ import nars.op.mental.Abbreviation;
 import nars.op.mental.Inperience;
 import nars.op.stm.MySTMClustered;
 import nars.rdfowl.NQuadsRDF;
+import nars.term.Termed;
 import nars.time.RealTime;
 import nars.util.exe.MultiThreadExecutioner;
 import org.jetbrains.annotations.NotNull;
@@ -300,6 +303,22 @@ public class IRCAgent extends IRC {
         //Param.DEBUG = true;
 
         @NotNull Default n = newRealtimeNAR(1024, 50, 200);
+
+
+        Control c = n.getControl();
+        n.setControl(new ChainedControl(c) {
+//            @Override
+//            public void activate(Termed term, float priToAdd) {
+//
+//                synchronized(this) {
+//                    System.out.print(term + " " + priToAdd + "\t===");
+//                    super.activate(term, priToAdd);
+//                    System.out.println(pri(term));
+//                }
+//            }
+        });
+
+
 
         Hear.wiki(n);
 

@@ -81,7 +81,7 @@ public class Abbreviation/*<S extends Term>*/ extends Leak<CompoundConcept> {
 
 
     public Abbreviation(@NotNull NAR n, String termPrefix, int volMin, int volMax, float selectionRate, int capacity) {
-        super(new CurveBag(capacity, new CurveBag.NormalizedSampler(power2BagCurve, n.random), BudgetMerge.max, new ConcurrentHashMap()), selectionRate, n);
+        super(new CurveBag(capacity, new CurveBag.NormalizedSampler(power2BagCurve, n.random), BudgetMerge.maxHard, new ConcurrentHashMap()), selectionRate, n);
 
         this.nar = n;
         this.termPrefix = termPrefix;

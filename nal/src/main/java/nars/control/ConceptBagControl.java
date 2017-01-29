@@ -12,6 +12,7 @@ import nars.bag.Bag;
 import nars.bag.CurveBag;
 import nars.budget.BudgetMerge;
 import nars.budget.ROBudget;
+import nars.budget.RawBudget;
 import nars.concept.Concept;
 import nars.conceptualize.ConceptBuilder;
 import nars.conceptualize.DefaultConceptBuilder;
@@ -42,14 +43,14 @@ public class ConceptBagControl implements Control, Consumer<DerivedTask> {
 
     private static final Logger logger = LoggerFactory.getLogger(ConceptBagControl.class);
 
-    public static final BudgetMerge CONCEPT_BAG_BLEND = BudgetMerge.plusBlend;
+    public static final BudgetMerge CONCEPT_BAG_BLEND = BudgetMerge.maxBlend;
 
     final Deriver deriver;
 
     final PremiseBuilder premiser = new DefaultPremiseBuilder();
 
-    /** this will be scaled by the input priority factor for each concept */
-    public static final ROBudget insertionBudget = new ROBudget(1f, 0.5f);
+//    /** this will be scaled by the input priority factor for each concept */
+//    public static final ROBudget insertionBudget = new ROBudget(1f, 0.5f);
 
 
     /**
@@ -187,7 +188,7 @@ public class ConceptBagControl implements Control, Consumer<DerivedTask> {
 
     @Override
     public void activate(Termed term, float priToAdd) {
-        active.put((Concept)term, insertionBudget, priToAdd, null);
+        active.put((Concept)term, new RawBudget(priToAdd, 0.5f), 1f, null);
     }
 
 

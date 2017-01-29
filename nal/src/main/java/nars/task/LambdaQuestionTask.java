@@ -29,7 +29,7 @@ public class LambdaQuestionTask extends MutableTask {
 
     public LambdaQuestionTask(@NotNull Termed<Compound> term, char punc, long occ, int history, @NotNull BiConsumer<LambdaQuestionTask, Task> eachAnswer) {
         super(term, punc, null);
-        this.answers = new ArrayBag<>(history, BudgetMerge.max, new ConcurrentHashMap<>(history));
+        this.answers = new ArrayBag<>(history, BudgetMerge.maxHard, new ConcurrentHashMap<>(history));
         this.eachAnswer = eachAnswer;
         occurr(occ);
     }

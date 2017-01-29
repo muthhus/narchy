@@ -9,6 +9,7 @@ import nars.bag.Bag;
 import nars.bag.CurveBag;
 import nars.budget.Budget;
 import nars.budget.BudgetMerge;
+import nars.budget.RawBudget;
 import nars.concept.Concept;
 import nars.derive.DefaultDeriver;
 import nars.derive.Deriver;
@@ -131,7 +132,7 @@ public class AlannControl implements Control {
 
     @Override
     public void activate(Termed term, float priToAdd) {
-        core(term).activate((Concept) term, ConceptBagControl.insertionBudget, priToAdd, null);
+        core(term).activate((Concept) term, new RawBudget(priToAdd, 0.5f), 1f, null);
     }
 
     @Override

@@ -75,10 +75,10 @@ abstract public class PremiseBuilder {
         termlinkBag.sample(termlinksSampled, termsBuffer::add);
 
         float priFactor;
-        float busy = (float) nar.emotion.busyMassAvg.getMean() * nar.emotion.learning();
-        if (busy == busy && busy > 1f)
-            priFactor = 1f/busy;
-        else
+//        float busy = (float) nar.emotion.busyMassAvg.getMean() * nar.emotion.learning();
+//        if (busy == busy && busy > 1f)
+//            priFactor = 1f/busy;
+//        else
             priFactor = 1f;
 
 

@@ -30,7 +30,7 @@ public class ServerThread extends PeerThread {
     float maxRecvFrequency = 48;
     final int messageBagSize = 128;
 
-    final ArrayBag<Message> outgoing = new ArrayBag(messageBagSize, BudgetMerge.max, new HashMap<>(messageBagSize));
+    final ArrayBag<Message> outgoing = new ArrayBag(messageBagSize, BudgetMerge.maxHard, new HashMap<>(messageBagSize));
 
 
 

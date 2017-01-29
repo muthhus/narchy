@@ -334,7 +334,7 @@ public class CompoundConcept<T extends Compound> implements Concept, Termlike {
 
 
 
-    public static final BudgetMerge DuplicateMerge = BudgetMerge.max; //this should probably always be max otherwise incoming duplicates may decrease the existing priority
+    public static final BudgetMerge DuplicateMerge = BudgetMerge.maxHard; //this should probably always be max otherwise incoming duplicates may decrease the existing priority
 
     /**
      * Directly process a new task. Called exactly once on each task. Using

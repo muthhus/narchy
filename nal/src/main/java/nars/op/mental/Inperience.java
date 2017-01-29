@@ -118,7 +118,7 @@ public class Inperience extends Leak<Task> {
 //
 
     public Inperience(@NotNull NAR n, float rate, int capacity) {
-        super(new CurveBag(capacity, new CurveBag.NormalizedSampler(power2BagCurve, n.random), BudgetMerge.max, new ConcurrentHashMap()), rate, n);
+        super(new CurveBag(capacity, new CurveBag.NormalizedSampler(power2BagCurve, n.random), BudgetMerge.maxHard, new ConcurrentHashMap()), rate, n);
 
         this.nar = n;
 

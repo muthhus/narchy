@@ -35,9 +35,7 @@ public class LinkageTest extends AbstractNALTest {
     @Parameterized.Parameters(name= "{0}")
     public static Iterable<Supplier> configurations() {
         return Lists.newArrayList(() -> {
-            Default d = new Default(1000, 1, 1, 1) {
-
-            };
+            Default d = new Default(1000, 1, 1, 1);
             d.nal(6);
             return d;
         });
