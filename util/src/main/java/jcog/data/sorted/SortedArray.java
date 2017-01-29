@@ -287,12 +287,12 @@ public class SortedArray<E> implements Iterable<E> {
             this.array = array;
             next = index;
             lastReturned = -1;
-            this.size = size;
+            this.size = Math.min(array.length, size);
         }
 
         @Override
         public boolean hasNext() {
-            return next != size;
+            return next < size;
         }
 
         @Override

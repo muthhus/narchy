@@ -322,14 +322,14 @@ public class NAL8Test extends AbstractNALTest {
     @Test public void desiredFeedbackReversedIntoGoalEternal()  {
         TestNAR tester = test();
         tester.input("<y --> (/,exe,x,_)>!");
-        tester.mustDesire(5, "exe(x, y)", 1.0f, 0.9f);
+        tester.mustDesire(55, "exe(x, y)", 1.0f, 0.9f);
     }
 
 
     @Test public void desiredFeedbackReversedIntoGoalNow()  {
         TestNAR tester = test();
         tester.input("<y --> (/,exe,x,_)>! :|:");
-        tester.mustDesire(5, "exe(x, y)", 1.0f, 0.9f, 0);
+        tester.mustDesire(55, "exe(x, y)", 1.0f, 0.9f, 0);
     }
 
 

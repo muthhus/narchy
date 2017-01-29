@@ -307,7 +307,7 @@ public class MicrosphereTemporalBeliefTable extends MultiRWFasterList<Task> impl
         float yf = y.freq();
 
         return x -> {
-            if (x == y)
+            if ((x == y) || (x == null))
                 return Float.NEGATIVE_INFINITY;
 
             long xo = x.mid();

@@ -502,11 +502,11 @@ public class Tetris extends NAgents {
 ////            }
 ////        });
 //
-        float p = 0.05f;
-        nar.DEFAULT_BELIEF_PRIORITY = 0.25f * p;
+        float p = 0.25f;
+        nar.DEFAULT_BELIEF_PRIORITY = 0.5f * p;
         nar.DEFAULT_GOAL_PRIORITY = 1f * p;
-        nar.DEFAULT_QUESTION_PRIORITY = 1f * p;
-        nar.DEFAULT_QUEST_PRIORITY = 1f * p;
+        nar.DEFAULT_QUESTION_PRIORITY = 0.75f * p;
+        nar.DEFAULT_QUEST_PRIORITY = 0.75f * p;
 
         /*
         nar.onCycle((n)->{

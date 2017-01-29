@@ -196,13 +196,16 @@ abstract public class PremiseBuilder {
                         if (answered != null) {
 
                             //transfer budget from question to answer
-                            float qBefore = taskBudget.priSafe(0);
-                            float aBefore = answered.priSafe(0);
+                            //float qBefore = taskBudget.priSafe(0);
+                            //float aBefore = answered.priSafe(0);
                             BudgetFunctions.transferPri(taskBudget, answered.budget(),
-                                answered.conf() * (1f - Util.unitize(taskBudget.qua()/answered.qua())) //proportion of the taskBudget which the answer receives as a boost
+                                (float)Math.sqrt(answered.conf())
+                                        //(1f - taskBudget.qua())
+                                        //(1f - Util.unitize(taskBudget.qua()/answered.qua())) //proportion of the taskBudget which the answer receives as a boost
                             );
 
                             task.budget().set(taskBudget); //update the task budget
+
 
                             /*
                             if (qBefore > 0) {
@@ -210,11 +213,13 @@ abstract public class PremiseBuilder {
                                 c.tasklinks().mul(task, qFactor); //adjust the tasklink's budget in the same proportion as the task was adjusted
                             }
 
+
                             if (aBefore > 0) {
                                 float aFactor = answered.priSafe(0) / aBefore;
                                 c.termlinks().mul(beliefTerm, aFactor);
                             }
                             */
+
 
                             if (answered.punc() == Op.BELIEF)
                                 belief = answered;

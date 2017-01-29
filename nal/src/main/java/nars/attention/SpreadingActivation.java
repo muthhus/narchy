@@ -48,7 +48,7 @@ public class SpreadingActivation extends Activation implements ObjectFloatProced
 
         Term srcTerm = src.term();
 
-        spread = new ObjectFloatHashMap<>(srcTerm.volume() /* estimate */);
+        spread = new ObjectFloatHashMap<>(srcTerm.volume()*4 /* estimate */);
 
         link(srcTerm, scale, 0);
 
@@ -158,12 +158,14 @@ public class SpreadingActivation extends Activation implements ObjectFloatProced
                 Bag<Term> tlinks = ((Concept) linkedTerm).termlinks();
                 int n = tlinks.size();
                 if (n > 0) {
-                    float childScale = ((1f - parentRetention) * scale) / (n);
-                    if (childScale >= minScale) {
+                    float maxSubScale = ((1f - parentRetention) * scale) / (n);
+                    if (maxSubScale >= minScale) {
                         for (BLink<Term> b : tlinks) {
                             if (b!=null) {
                                 Term key = b.get();
-                                spread.addToValue(key, childScale);
+                                float p = b.priSafe(0) * maxSubScale;
+                                if (p >= minScale)
+                                    spread.addToValue(key, p);
                             }
                         }
                     }

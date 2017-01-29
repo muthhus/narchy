@@ -34,10 +34,10 @@ public final class SynchronizedUnifiedMap<K, V> extends UnifiedMap<K, V> {
         }
     }
 
-//    @Override
-//    public V get(Object key) {
-//        synchronized (this) {
-//            return super.get(key);
-//        }
-//    }
+    @Override
+    public V get(Object key) {
+        synchronized (this) {
+            return super.get(key);
+        }
+    }
 }
