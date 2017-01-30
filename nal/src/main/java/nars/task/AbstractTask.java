@@ -500,9 +500,6 @@ public abstract class AbstractTask extends RawBudget implements Task, Temporal {
         if (stamp && (!Arrays.equals(this.evidence, that.evidence())))
             return false;
 
-        if (term && !this.term.equals(that.term()))
-            return false;
-
         if (evidence.length > 1) {
             if (occurrenceTime && (this.occurrence != that.occurrence()))
                 return false;
@@ -510,6 +507,9 @@ public abstract class AbstractTask extends RawBudget implements Task, Temporal {
             if (truth && !Objects.equals(this.truth, that.truth()))
                 return false;
         }
+
+        if (term && !this.term.equals(that.term()))
+            return false;
 
         if (punctuation && (this.punc != that.punc()))
             return false;

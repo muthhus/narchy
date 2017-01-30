@@ -141,7 +141,7 @@ public class GenericCompound implements Compound  {
             cthat = (Compound)that;
 
         } else if (that instanceof Concept /* Termed but not Task*/)  {
-            Term tthat = ((Termed) that).term();
+            Term tthat = ((Concept) that).term();
             if (tthat instanceof Compound) {
 
                 if (this == tthat)
