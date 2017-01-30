@@ -1,0 +1,20 @@
+from: https://gist.github.com/patham9/73ce2d3df1269097fc6633259364b5a6
+
+0- === false in boolean logic, negative evidence in NAL
+1- === true  in boolean logic, negative evidence in NAL
+0+ === false in boolean logic, positive evidence in NAL
+1+ === true  in boolean logic, positive evidence in NAL
+1  === true  in boolean logic, neither neg. nor pos. evidence in NAL
+0  === false in boolean logic, neither neg. nor pos. evidence in NAL
+
+Truth table:
+
+a  b    --b  | (a <=> --b) (--,(a <=> b))    | (a ==> --b)   (--,(a ==> b))
+0- 0-     1+ |          0-            0-     |          1               0
+0- 1+     0- |          1+            1+     |          1               0
+1+ 0-     1+ |          1+            1+     |          1+              1+
+1+ 1+     0- |          0-            0-     |          0-              0-
+                            ^full agreement for equivalence in boolean logic and NAL
+                                                           ^NAL ignores the cases where the antedecent
+                                                            is not fullfilled, making these statements equal in NAL,
+                                                            but not equal in boolean algebra.
