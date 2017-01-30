@@ -1,6 +1,5 @@
 package nars.premise;
 
-import jcog.Util;
 import jcog.data.MutableIntRange;
 import jcog.list.FasterList;
 import nars.*;

@@ -194,9 +194,8 @@ public abstract class TermVector implements TermContainer {
         return
             (this == obj)
             ||
-            ((obj instanceof TermContainer) && equalTo((TermContainer)obj));
+            ((hash == obj.hashCode()) && (obj instanceof TermContainer) && equalTerms((TermContainer)obj));
     }
-
 
 
     @Override

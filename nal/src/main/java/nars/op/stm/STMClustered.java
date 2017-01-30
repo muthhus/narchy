@@ -327,8 +327,12 @@ public class STMClustered extends STM {
 
             @NotNull
             @Override
-            public BLink newLink(Object i) {
-                return new TLink((Task) i);
+            public BLink<Task> newLink(@NotNull Task i, BLink<Task> exists) {
+                if (exists != null) {
+                    return exists;
+                } else {
+                    return new TLink(i);
+                }
             }
 
 

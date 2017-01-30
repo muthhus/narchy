@@ -25,7 +25,6 @@ import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import static nars.index.TermBuilder.commutive;
-import static nars.time.Tense.DTERNAL;
 import static org.eclipse.collections.impl.factory.Sets.immutable;
 import static org.eclipse.collections.impl.factory.Sets.mutable;
 

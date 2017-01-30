@@ -692,7 +692,9 @@ public class SortedArray<E> implements Iterable<E> {
     @Nullable
     public final E last() {
         int size = this.size;
-        return size == 0 ? null : this.list[size - 1];
+        if (size == 0) return null;
+        E[] ll = list;
+        return ll[Math.min(ll.length-1, size - 1)];
     }
 
 //	@Override

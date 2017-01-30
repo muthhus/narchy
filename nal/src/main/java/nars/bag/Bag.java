@@ -4,7 +4,6 @@ import jcog.Util;
 import jcog.table.Table;
 import nars.$;
 import nars.Param;
-import nars.Task;
 import nars.attention.Forget;
 import nars.budget.Budget;
 import nars.budget.Budgeted;
@@ -559,22 +558,29 @@ public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Iterable<BLink<
     };
 
     @NotNull
-    default <Y> BLink<Y> newLink(@NotNull Y i, @NotNull Budgeted b) {
+    default BLink<V> newLink(@NotNull V i, @Nullable BLink<V> exists) {
 
-        if (i instanceof Budgeted)
-            return new DependentBLink((Budgeted) i, b);
-        else
-            return new DefaultBLink(i, b);
+        if (exists == null || exists.isDeleted()) {
+            if (i instanceof Budgeted) {
+                return new DependentBLink((Budgeted) i);
+                //return new WeakBLink(i);
+            } else {
+                return new DefaultBLink(i);
+            }
+        } else {
+            return exists;
+        }
+
     }
 
-    @NotNull
-    default <Y> BLink<Y> newLink(@NotNull Y i) {
-
-        if (i instanceof Budgeted)
-            return new DependentBLink((Budgeted) i);
-        else
-            return new DefaultBLink(i);
-    }
+//    @NotNull
+//    default <Y> BLink<Y> newLink(@NotNull Y i) {
+//
+//        if (i instanceof Budgeted)
+//            return new DependentBLink((Budgeted) i);
+//        else
+//            return new DefaultBLink(i);
+//    }
 
     @Override
     default void forEachKey(Consumer<V> each) {

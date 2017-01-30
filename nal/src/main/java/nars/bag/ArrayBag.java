@@ -4,10 +4,8 @@ import jcog.data.sorted.SortedArray;
 import jcog.table.SortedListTable;
 import nars.$;
 import nars.Param;
-import nars.budget.Budget;
 import nars.budget.BudgetMerge;
 import nars.budget.Budgeted;
-import nars.budget.RawBudget;
 import nars.link.BLink;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
@@ -17,7 +15,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Map;
-import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -362,31 +359,35 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
         }
 
 
-        BLink<V> v = map.computeIfAbsent(key, this::newLink);
-
-        if (!v.isDeleted()) {
-
-            //merge with existing
-
-            float pBefore = v.priSafe(0);
-            float o = mergeFunction.merge(v, b, scale);
-            if (o > 0) {
-                if (overflow != null)
-                    overflow.add(o);
-                //pressure -= o;
-            }
-
-            if (Math.abs(v.pri()-pBefore) > Param.BUDGET_EPSILON) {
-                synchronized (items) {
-                    sort();
-                }
-            }
-
-            return v;
-
+        BLink<V> v = map.compute(key, this::newLink);
+        boolean isNew = v.isDeleted();
+        float pBefore;
+        if (isNew) {
+            v.setBudget(0, 0);
+            pBefore = 0;
         } else {
+            pBefore = v.priSafe(0);
+        }
 
-            v.setBudget(bp, b.qua());
+
+        float o = mergeFunction.merge(v, b, scale);
+        if ((o > 0) && overflow != null) {
+            overflow.add(o);
+        }
+
+        float pAfter = v.priSafe(0);
+        if (!isNew) {
+            if ((pAfter - pBefore) <= Param.BUDGET_EPSILON)
+                return v;//no change
+        }
+
+        pressure += pAfter - pBefore;
+
+        if (isNew) {
+            if (size() >= capacity && v.pri() < priMin()) {
+                return null; //reject
+            }
+
 
             boolean added;
             synchronized (items) {
@@ -402,13 +403,17 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
 
             if (added) {
                 onAdded(v);
-                return v;
             } else {
                 map.remove(key);
                 return null;
             }
-
+        } else {
+            synchronized (items) {
+                sort(); //TODO see if this works better here, being an adaptive sort: https://en.wikipedia.org/wiki/Smoothsort
+            }
         }
+
+        return v;
 
     }
 

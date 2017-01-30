@@ -32,7 +32,7 @@ public class IRC extends ListenerAdapter {
 //            event.respond("Hello world!");
 //    }
 
-    public IRC(String nick, String server, String... channels) throws IOException, IrcException {
+    public IRC(String nick, String server, String... channels) {
         this(new Configuration.Builder()
                 .setName(nick)
                 .setRealName(nick)

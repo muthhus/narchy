@@ -295,38 +295,38 @@ public class Abbreviation/*<S extends Term>*/ extends Leak<CompoundConcept> {
             //rewriteLinks(nar);
         }
 
-
-        /**
-         * rewrite termlinks and tasklinks which contain the abbreviated term...
-         * (but are not equal to since tasks can not have atom content)
-         * ...replacing it with this alias
-         */
-        private void rewriteLinks(@NotNull NAR nar) {
-            Term that = abbr.term();
-            termlinks().compute(existingLink -> {
-                Term x = existingLink.get();
-                Term y = nar.concepts.replace(x, that, this);
-                return (y != null && y != x && y != Term.False) ?
-                        termlinks().newLink(y, existingLink) :
-                        existingLink;
-            });
-            tasklinks().compute(existingLink -> {
-                Task xt = existingLink.get();
-                Term x = xt.term();
-
-                if (!x.equals(that) && !x.hasTemporal()) {
-                    Term y = $.terms.replace(x, that, this);
-                    if (y != x && y instanceof Compound) {
-                        Task yt = MutableTask.clone(xt, (Compound) y, nar);
-                        if (yt != null)
-                            return termlinks().newLink(yt, existingLink);
-                    }
-                }
-
-                return existingLink;
-
-            });
-        }
+//
+//        /**
+//         * rewrite termlinks and tasklinks which contain the abbreviated term...
+//         * (but are not equal to since tasks can not have atom content)
+//         * ...replacing it with this alias
+//         */
+//        private void rewriteLinks(@NotNull NAR nar) {
+//            Term that = abbr.term();
+//            termlinks().compute(existingLink -> {
+//                Term x = existingLink.get();
+//                Term y = nar.concepts.replace(x, that, this);
+//                return (y != null && y != x && y != Term.False) ?
+//                        termlinks().newLink(y, existingLink) :
+//                        existingLink;
+//            });
+//            tasklinks().compute(existingLink -> {
+//                Task xt = existingLink.get();
+//                Term x = xt.term();
+//
+//                if (!x.equals(that) && !x.hasTemporal()) {
+//                    Term y = $.terms.replace(x, that, this);
+//                    if (y != x && y instanceof Compound) {
+//                        Task yt = MutableTask.clone(xt, (Compound) y, nar);
+//                        if (yt != null)
+//                            return termlinks().newLink(yt, existingLink);
+//                    }
+//                }
+//
+//                return existingLink;
+//
+//            });
+//        }
 
 
         @Override

@@ -34,9 +34,7 @@ import static junit.framework.TestCase.assertNotNull;
 import static nars.$.$;
 import static nars.Op.*;
 import static nars.task.RevisionTest.AB;
-import static nars.term.Term.False;
-import static nars.term.Term.Null;
-import static nars.term.Term.True;
+import static nars.term.Term.*;
 import static org.junit.Assert.*;
 
 /**

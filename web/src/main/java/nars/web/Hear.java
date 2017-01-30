@@ -89,7 +89,8 @@ public class Hear extends Loop {
     private void hear(Term prev, Term next, float freq) {
         nar.believe(nar.priorityDefault(BELIEF) * priorityFactor,
                 //$.func("hear", chan_nick, tokens.get(token++))
-                $.inh($.p(prev,next), $.imge(context)),
+                $.inh(next, $.imge(context)), //1 word
+                //$.inh($.p(prev,next), $.imge(context)), //bigram
                 //$.prop(next, (context[1])),
                 Tense.Present, freq, nar.confidenceDefault(BELIEF) * confFactor);
     }

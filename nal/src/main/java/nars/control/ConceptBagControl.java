@@ -11,7 +11,6 @@ import nars.Param;
 import nars.bag.Bag;
 import nars.bag.CurveBag;
 import nars.budget.BudgetMerge;
-import nars.budget.ROBudget;
 import nars.budget.RawBudget;
 import nars.concept.Concept;
 import nars.conceptualize.ConceptBuilder;

@@ -170,9 +170,7 @@ public class TermVector1 implements TermContainer, Set<Term> {
     }
 
     @Override public boolean equalTo(@NotNull TermContainer b) {
-        return (hashCode() == b.hashCode()) &&
-                //(structure() == b.structure()) &&
-                //(volume() == b.volume()) &&
+        return //(hashCode() == b.hashCode()) &&
                 (b.size()==1) &&
                 the.equals(b.term(0));
     }

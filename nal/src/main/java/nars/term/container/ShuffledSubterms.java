@@ -13,6 +13,7 @@ import java.util.function.Consumer;
 
 /**
  * proxy to a TermContainer providing access to its subterms via a shuffling order
+ * warning: don't use as subterms of a Compound
  */
 public final class ShuffledSubterms extends ShuffledPermutations implements TermContainer {
 

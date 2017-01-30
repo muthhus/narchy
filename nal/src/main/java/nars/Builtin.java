@@ -6,11 +6,8 @@ import nars.link.BLink;
 import nars.op.Command;
 import nars.op.data.*;
 import nars.term.atom.Atom;
-import nars.term.obj.IntTerm;
 import nars.term.transform.Functor;
 import nars.term.var.Variable;
-
-import java.util.Date;
 
 import static nars.$.quote;
 import static nars.term.Term.False;

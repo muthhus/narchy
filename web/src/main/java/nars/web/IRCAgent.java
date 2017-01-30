@@ -2,10 +2,7 @@ package nars.web;
 
 import jcog.RateIterator;
 import jcog.data.random.XorShift128PlusRandom;
-import nars.Control;
-import nars.NAR;
-import nars.Param;
-import nars.Task;
+import nars.*;
 import nars.conceptualize.DefaultConceptBuilder;
 import nars.control.ChainedControl;
 import nars.index.term.map.CaffeineIndex;
@@ -13,22 +10,24 @@ import nars.link.BLink;
 import nars.nar.Default;
 import nars.op.Command;
 import nars.op.Leak;
-import nars.op.mental.Abbreviation;
-import nars.op.mental.Inperience;
 import nars.op.stm.MySTMClustered;
-import nars.rdfowl.NQuadsRDF;
-import nars.term.Termed;
+import nars.term.Compound;
+import nars.term.Term;
 import nars.time.RealTime;
 import nars.util.exe.MultiThreadExecutioner;
 import org.jetbrains.annotations.NotNull;
+import org.mockito.internal.util.io.IOUtil;
 import org.pircbotx.hooks.events.MessageEvent;
+import org.pircbotx.hooks.events.PrivateMessageEvent;
 import org.pircbotx.hooks.types.GenericMessageEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spacegraph.net.IRC;
 
-import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.net.URL;
+import java.util.Collection;
 import java.util.Random;
 import java.util.function.Consumer;
 
@@ -52,9 +51,10 @@ public class IRCAgent extends IRC {
     private final NAR nar;
     //private float ircMessagePri = 0.9f;
 
+    private boolean hearTwenglish = false;
+
     final int wordDelayMS = 25; //for serializing tokens to events: the time in millisecond between each perceived (subvocalized) word, when the input is received simultaneously
     private final Leak<Task> out;
-    private boolean hearTwenglish = true;
 
     boolean trace = false;
 
@@ -202,6 +202,11 @@ public class IRCAgent extends IRC {
     }
 
     @Override
+    public void onPrivateMessage(PrivateMessageEvent event) throws Exception {
+        //hear(event.getMessage(), event.getUser().toString());
+    }
+
+    @Override
     public void onGenericMessage(GenericMessageEvent event) throws Exception {
 
         if (event instanceof MessageEvent) {
@@ -246,12 +251,12 @@ public class IRCAgent extends IRC {
 
         Random random = new XorShift128PlusRandom(System.currentTimeMillis());
 
-        MultiThreadExecutioner exe = new MultiThreadExecutioner(3, 1024 * 32);
+        MultiThreadExecutioner exe = new MultiThreadExecutioner(2, 1024 * 32);
         exe.sync(true);
 
         Default nar = new Default(activeConcepts, conceptsPerFrame, 1, 3, random,
 
-                new CaffeineIndex(new DefaultConceptBuilder(), 512 * 1024, false, exe),
+                new CaffeineIndex(new DefaultConceptBuilder(), 128 * 1024, false, exe),
                 //new TreeTermIndex.L1TreeIndex(new DefaultConceptBuilder(), 400000, 64 * 1024, 3),
 
                 new RealTime.CS(true).dur(0.2f),
@@ -259,7 +264,7 @@ public class IRCAgent extends IRC {
         );
 
 
-        int volMax = 32;
+        int volMax = 24;
 
 //        //Multi nar = new Multi(3,512,
 //        Default nar = new Default(2048,
@@ -274,12 +279,13 @@ public class IRCAgent extends IRC {
         nar.goalConfidence(0.9f);
 
         float p = 1f;
-        nar.DEFAULT_BELIEF_PRIORITY = 0.4f * p;
+        nar.DEFAULT_BELIEF_PRIORITY = 0.8f * p;
+        nar.DEFAULT_QUESTION_PRIORITY = 0.9f * p;
+        nar.DEFAULT_QUESTION_QUALITY = 0.9f * p;
         nar.DEFAULT_GOAL_PRIORITY = 0.4f * p;
-        nar.DEFAULT_QUESTION_PRIORITY = 0.5f * p;
         nar.DEFAULT_QUEST_PRIORITY = 0.5f * p;
 
-        nar.confMin.setValue(0.02f);
+        nar.confMin.setValue(0.01f);
         nar.termVolumeMax.setValue(volMax);
         //nar.linkFeedbackRate.setValue(0.005f);
 
@@ -287,10 +293,10 @@ public class IRCAgent extends IRC {
 
 
         MySTMClustered stm = new MySTMClustered(nar, 16, '.', 4, false, 3);
-        MySTMClustered stm2 = new MySTMClustered(nar, 32, '.', 2, true, 2);
+        //MySTMClustered stm2 = new MySTMClustered(nar, 32, '.', 2, true, 2);
 
-        new Abbreviation(nar, "_", 3, 12, 0.001f, 8);
-        new Inperience(nar, 0.003f, 8);
+        //new Abbreviation(nar, "_", 3, 12, 0.001f, 8);
+        //new Inperience(nar, 0.003f, 8);
 
 
         nar.loop(framesPerSecond);
@@ -302,7 +308,7 @@ public class IRCAgent extends IRC {
 
         //Param.DEBUG = true;
 
-        @NotNull Default n = newRealtimeNAR(1024, 50, 200);
+        @NotNull Default n = newRealtimeNAR(1024, 30, 25);
 
 
         Control c = n.getControl();
@@ -325,9 +331,9 @@ public class IRCAgent extends IRC {
 
         IRCAgent bot = new IRCAgent(n,
                 "experiment1", "irc.freenode.net",
-                "#123xyz"
+                //"#123xyz"
                 //"#netention"
-                //"#nars"
+                "#nars"
         );
 
         n.on("trace", (Command) (a, t, nn) -> {
@@ -340,14 +346,52 @@ public class IRCAgent extends IRC {
         });
 
 
+        n.on("readToUs", (Command) (a, t, nn) -> {
+            if (t.length > 0) {
+                String url = $.unquote(t[0]);
+                if (canReadURL(url)) {
+                    try {
+
+                        Term[] targets;
+                        if (t.length > 1 && t[1] instanceof Compound) {
+                            targets = ((Compound)t[1]).terms();
+                        } else {
+                            targets = null;
+                        }
+
+                        Collection<String> lines = IOUtil.readLines(new URL(url).openStream());
+
+                        new RateIterator<String>(lines.iterator(), 2)
+                                .threadEachRemaining(l -> {
+
+                                    bot.hear(l, nn.self().toString());
+
+                                    if (targets == null) {
+                                        bot.broadcast(l);
+                                    } else {
+                                        for (Term u : targets)
+                                            bot.send($.unquote(u), l);
+                                    }
+
+                                }).start();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        });
+
+
+        /*
         try {
             new RateIterator<Task>(
                 NQuadsRDF.stream(n,
-                    new File("/home/me/Downloads/nquad")), 10)
+                    new File("/home/me/Downloads/nquad")), 500)
                         .threadEachRemaining(n::inputLater).start();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
+        */
 
 
 //        n.inputLater(
@@ -368,6 +412,14 @@ public class IRCAgent extends IRC {
 
 //        nar.run(1);
 
+    }
+
+    public void send(@NotNull String target, String l) {
+        irc.send().message(target, l);
+    }
+
+    static boolean canReadURL(String url) {
+        return url.startsWith("https://gist.githubusercontent");
     }
 
 //    final StringBuilder b = new StringBuilder();

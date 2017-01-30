@@ -1,7 +1,6 @@
 package nars.index.term;
 
 import nars.*;
-import nars.Op;
 import nars.concept.Concept;
 import nars.conceptualize.ConceptBuilder;
 import nars.derive.meta.match.EllipsisMatch;
@@ -35,10 +34,10 @@ import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import static nars.Op.*;
+import static nars.Op.CONJ;
+import static nars.Op.PROD;
 import static nars.term.Term.False;
 import static nars.term.Termed.termOrNull;
-import static nars.time.Tense.DTERNAL;
 
 /**
  *
