@@ -347,17 +347,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
         float bp = b.priSafe(-1) * scale;
         if (bp < 0) { //already deleted
             return null;
-        } else if (size() >= capacity() && bp < priMin()) {
-            //insufficient priority
-
-            if (overflow != null)
-                overflow.add(bp);
-
-            pressure += bp;
-
-            return null;
         }
-
 
         BLink<V> v = map.compute(key, this::newLink);
         boolean isNew = v.isDeleted();

@@ -3,6 +3,7 @@ package nars.premise;
 import jcog.data.MutableIntRange;
 import jcog.list.FasterList;
 import nars.*;
+import nars.attention.Crosslink;
 import nars.bag.Bag;
 import nars.budget.Budget;
 import nars.budget.BudgetFunctions;
@@ -182,7 +183,6 @@ abstract public class PremiseBuilder {
 
                     BeliefTable table = task.isQuest() ? answerConcept.goals() : answerConcept.beliefs();
 
-
                     Task answered = table.answer(when, now, task, answerTerm, nar.confMin.floatValue());
                     if (answered != null) {
 
@@ -205,6 +205,7 @@ abstract public class PremiseBuilder {
 
                             task.budget().set(taskBudget); //update the task budget
 
+                            Crosslink.crossLink(task, answered, answered.conf(), nar);
 
                             /*
                             if (qBefore > 0) {

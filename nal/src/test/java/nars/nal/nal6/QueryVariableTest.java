@@ -52,7 +52,7 @@ public class QueryVariableTest {
 
     @Test
     public void testQuery2() throws Narsese.NarseseException {
-        testQueryAnswered(64, 1);
+        testQueryAnswered(64, 4);
     }
 
     @Test

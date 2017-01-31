@@ -43,7 +43,8 @@ public interface BeliefTable extends TaskTable {
         }
 
         @Override
-        public void capacity(int eternals, int temporals, NAR nar) {        }
+        public void capacity(int eternals, int temporals, NAR nar) {
+        }
 
         @Override
         public @Nullable Task match(long now) {
@@ -114,7 +115,6 @@ public interface BeliefTable extends TaskTable {
         }
 
 
-
         @Nullable
         @Override
         public Truth truth(long when, long now) {
@@ -163,18 +163,20 @@ public interface BeliefTable extends TaskTable {
 
     @Nullable Task match(long when, long now, @Nullable Task against, boolean noOverlap);
 
-    @Nullable default Task match(long now) {
+    @Nullable
+    default Task match(long now) {
         return match(now, now);
     }
 
-    @Nullable default Task match(long when, long now) {
+    @Nullable
+    default Task match(long when, long now) {
         return match(when, now, null, true);
     }
 
-    @Nullable default Task matchEternal() {  return match(ETERNAL, ETERNAL, null, false);    }
-
-
-
+    @Nullable
+    default Task matchEternal() {
+        return match(ETERNAL, ETERNAL, null, false);
+    }
 
 
     default void print(@NotNull PrintStream out) {
@@ -185,8 +187,10 @@ public interface BeliefTable extends TaskTable {
         print(System.out);
     }
 
-    /** simple metric that guages the level of inconsistency (ex: variance) aggregated by contained belief states.
-     *  returns 0 if no tasks exist */
+    /**
+     * simple metric that guages the level of inconsistency (ex: variance) aggregated by contained belief states.
+     * returns 0 if no tasks exist
+     */
     default float coherence() {
         throw new UnsupportedOperationException("TODO");
     }
@@ -203,7 +207,10 @@ public interface BeliefTable extends TaskTable {
     @Nullable Truth truth(long when, long now);
 
 
-    @Nullable default Truth truth(long when) {   return truth(when, when);    }
+    @Nullable
+    default Truth truth(long when) {
+        return truth(when, when);
+    }
 
 
     default float expectation(long when) {
@@ -221,7 +228,9 @@ public interface BeliefTable extends TaskTable {
         return t != null ? t.freq() : Float.NaN;
     }
 
-    /** empties the table, an unindexes them in the NAR */
+    /**
+     * empties the table, an unindexes them in the NAR
+     */
     void clear(NAR nar);
 
     default float eviSum(long now) {
@@ -229,7 +238,7 @@ public interface BeliefTable extends TaskTable {
         final float[] eSum = {0};
         forEach(t -> {
             Truth tt = t.truth(now);
-            if (tt!=null) {
+            if (tt != null) {
                 eSum[0] += tt.evi();
             }
         });
@@ -245,42 +254,44 @@ public interface BeliefTable extends TaskTable {
         Budget answerBudget;
         if (this instanceof DynamicBeliefTable) {
             answer = ((DynamicBeliefTable) this).generate(template, when);
-            if (answer == null)
-                return null;
+            if (answer != null) {
 
-            answerBudget = answer.budget().clone();
-            if (answerBudget == null)
-                return null;
+//                answerBudget = answer.budget().clone();
+//                if (answerBudget != null)
+//                    return null;
 
-        } else {
-            answer = match(when, now, question, false);
-            if (answer == null)
-                return null;
+                return answer;
+            }
 
-            answerBudget = answer.budget().clone();
-            if (answerBudget.isDeleted())
-                return null;
+        }
+
+        answer = match(when, now, question, false);
+        if (answer == null)
+            return null;
+
+        answerBudget = answer.budget().clone();
+        if (answerBudget.isDeleted())
+            return null;
 
 //            //require EXACT term (except for variables) but otherwise requiring exact same dt structure
 //            if (!answer.term().equalsIgnoringVariables(question.term()))
 //                return null;
 
-            //project if different occurrence
-            if (answer.occurrence() != when) {
-                Truth aProj = answer.truth(when, minConf);
-                if (aProj == null)
-                    return null;
+        //project if different occurrence
+        if (answer.occurrence() != when) {
+            Truth aProj = answer.truth(when, minConf);
+            if (aProj == null)
+                return null;
 
-                answer = new AnswerTask(
-                        answer,
-                        answer,
-                        question,
-                        aProj, now, when, 0.5f)
-                            .log("Answer Projected")
-                            .budget(answerBudget);
-            }
-
+            answer = new AnswerTask(
+                    answer,
+                    answer,
+                    question,
+                    aProj, now, when, 0.5f)
+                    .log("Answer Projected")
+                    .budget(answerBudget);
         }
+
 
         return answer;
     }

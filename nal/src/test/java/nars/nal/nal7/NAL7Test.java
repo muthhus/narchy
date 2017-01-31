@@ -22,7 +22,7 @@ import static nars.time.Tense.ETERNAL;
 @RunWith(Parameterized.class)
 public class NAL7Test extends AbstractNALTest {
 
-    final int cycles = 200;
+    final int cycles = 400;
 
     public NAL7Test(Supplier<NAR> b) {
         super(b);
@@ -880,7 +880,7 @@ public class NAL7Test extends AbstractNALTest {
 
         test()
                 .input("hold(key). :|:")
-                .input("((hold(?x) && open(door)) ==> enter(room)). :|:")
+                .input("((hold(#x) && open(door)) ==> enter(room)). :|:")
                 .mustBelieve(cycles, "(open(door) ==> enter(room))",
                         1.00f, 0.81f,
                         0)
@@ -893,7 +893,7 @@ public class NAL7Test extends AbstractNALTest {
 
         test()
                 .input("hold(key). :|:")
-                .input("(goto(door) ==> (hold(?x) && open(door))). :|:")
+                .input("(goto(door) ==> (hold(#x) && open(door))). :|:")
                 .mustBelieve(cycles, "(goto(door) ==> open(door))",
                         1.00f, 0.81f,
                         0);

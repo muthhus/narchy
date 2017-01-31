@@ -43,6 +43,14 @@ public class QuestionTest {
         testQuestionAnswer(withinCycles, "<bird --> swimmer>", "<bird --> swimmer>", "<bird --> swimmer>");
     }
 
+    @Test
+    public void testTemporal() throws Narsese.NarseseException {
+        testQuestionAnswer(withinCycles,
+                "((a &&+1 b) &&+1 c)",
+                "((a &&+1 b) &&+1 c)",
+                "((a &&+1 b) &&+1 c)");
+    }
+
     /** question to answer matching */
     public void testQuestionAnswer(int cycles, @NotNull String belief, @NotNull String question, @NotNull String expectedSolution) throws Narsese.NarseseException {
         AtomicInteger ok = new AtomicInteger(0);
@@ -51,7 +59,7 @@ public class QuestionTest {
         Term expectedSolutionTerm = $.$(expectedSolution);
 
         NAR nar = new Default();
-        nar.nal(1);
+        //nar.nal(1);
         nar.log();
 
         nar

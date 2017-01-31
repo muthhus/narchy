@@ -9,6 +9,11 @@ import org.jetbrains.annotations.NotNull;
  * Created by me on 12/18/16.
  */
 public class Crosslink {
+
+    public static void crossLink(@NotNull Task srcTask, @NotNull Task tgtTask, float scale, @NotNull NAR nar) {
+        crossLink(srcTask.concept(nar), srcTask, tgtTask, scale, nar);
+    }
+
     /**
      * @param src task with a term equal to this concept's
      * @param tgt task with a term equal to another concept's
@@ -19,8 +24,8 @@ public class Crosslink {
         if (tgtConcept == null || tgtConcept.term().equals(srcConcept.term()))
             return; //null or same concept
 
-        //termlink=0, tasklink=-1
-        new SpreadingActivation(srcTask, scale * srcTask.conf(), tgtConcept, 1, nar);
-        new SpreadingActivation(tgtTask, scale * tgtTask.conf(), srcConcept, 1, nar);
+
+        new SpreadingActivation(srcTask, scale, tgtConcept, 0, nar);
+        new SpreadingActivation(tgtTask, scale, srcConcept, 0, nar);
     }
 }
