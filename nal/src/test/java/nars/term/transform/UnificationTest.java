@@ -60,10 +60,10 @@ public class UnificationTest {
                 t1 = pi.get(pi.parse(s1), true).term();
 
             } else {
-                nar.believe(s1);
+                nar.ask(s1);
                 t1 = nar.concept(s1).term();
             }
-            nar.believe(s2);
+            nar.ask(s2);
             nar.run(2);
 
 

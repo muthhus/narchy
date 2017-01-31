@@ -96,7 +96,7 @@ public class Hear extends Loop {
         //$.func("hear", chan_nick, tokens.get(token++))
 
         float onConf = nar.confidenceDefault(BELIEF) * confFactor;
-        float offConf = nar.confidenceDefault(BELIEF) * confFactor/2f;
+        float offConf = 0.1f; //nar.confidenceDefault(BELIEF) * confFactor/2f;
 
         Concept concept = nar.concept(term);
 

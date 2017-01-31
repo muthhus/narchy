@@ -89,11 +89,11 @@ public class Builtin  {
         nar.on("top", (Command) (op, args, n) -> {
             Iterable<BLink<Concept>> ii = n.conceptsActive();
 
-            int MAX_RESULT_LENGTH = 200;
-            StringBuilder b = new StringBuilder();
+            int MAX_RESULT_LENGTH = 250;
+            StringBuilder b = new StringBuilder(MAX_RESULT_LENGTH+8);
 
             if (args.length > 0 && args[0] instanceof Atom) {
-                String query = args[0].toString().toLowerCase();
+                String query = $.unquote(args[0]).toLowerCase();
                 for (BLink<Concept> bc : ii) {
                     String bs = bc.get().toString();
                     String cs = bs.toLowerCase();

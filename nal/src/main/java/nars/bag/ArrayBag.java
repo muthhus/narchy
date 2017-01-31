@@ -490,9 +490,8 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
 
     public void sort() {
         int s = size();
-
-        qsort(new short[16 /* estimate */], items.array(), (short) 0 /*dirtyStart - 1*/, (short) (s - 1));
-
+        if (s > 0)
+            qsort(new short[16 /* estimate */], items.array(), (short) 0 /*dirtyStart - 1*/, (short) (s - 1));
     }
 
     /**

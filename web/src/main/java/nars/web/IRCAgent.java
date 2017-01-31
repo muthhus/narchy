@@ -260,7 +260,7 @@ public class IRCAgent extends IRC {
                 new CaffeineIndex(new DefaultConceptBuilder(), 600 * 1024, false, exe),
                 //new TreeTermIndex.L1TreeIndex(new DefaultConceptBuilder(), 400000, 64 * 1024, 3),
 
-                new RealTime.DS(true).dur(0.25f),
+                new RealTime.CS(true).dur(0.25f),
                 exe
         );
 
@@ -281,9 +281,9 @@ public class IRCAgent extends IRC {
 
         float p = 1f;
         nar.DEFAULT_BELIEF_PRIORITY = 0.8f * p;
-        nar.DEFAULT_QUESTION_PRIORITY = 0.9f * p;
+        nar.DEFAULT_QUESTION_PRIORITY = 0.5f * p;
         nar.DEFAULT_QUESTION_QUALITY = 0.9f * p;
-        nar.DEFAULT_GOAL_PRIORITY = 0.4f * p;
+        nar.DEFAULT_GOAL_PRIORITY = 0.8f * p;
         nar.DEFAULT_QUEST_PRIORITY = 0.5f * p;
 
         nar.confMin.setValue(0.01f);
@@ -291,9 +291,7 @@ public class IRCAgent extends IRC {
         //nar.linkFeedbackRate.setValue(0.005f);
 
 
-
-
-        MySTMClustered stm = new MySTMClustered(nar, 64, '.', 8, false, 3);
+        MySTMClustered stm = new MySTMClustered(nar, 64, '.', 8, true, 3);
         //MySTMClustered stm2 = new MySTMClustered(nar, 32, '.', 2, true, 2);
 
         //new Abbreviation(nar, "_", 3, 12, 0.001f, 8);
