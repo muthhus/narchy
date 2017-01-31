@@ -2,7 +2,10 @@ package nars.web;
 
 import jcog.RateIterator;
 import jcog.data.random.XorShift128PlusRandom;
-import nars.*;
+import nars.Control;
+import nars.NAR;
+import nars.Param;
+import nars.Task;
 import nars.conceptualize.DefaultConceptBuilder;
 import nars.control.ChainedControl;
 import nars.index.term.map.CaffeineIndex;
@@ -10,13 +13,13 @@ import nars.link.BLink;
 import nars.nar.Default;
 import nars.op.Command;
 import nars.op.Leak;
+import nars.op.mental.Abbreviation;
+import nars.op.mental.Inperience;
 import nars.op.stm.MySTMClustered;
-import nars.term.Compound;
-import nars.term.Term;
+import nars.rdfowl.NQuadsRDF;
 import nars.time.RealTime;
 import nars.util.exe.MultiThreadExecutioner;
 import org.jetbrains.annotations.NotNull;
-import org.mockito.internal.util.io.IOUtil;
 import org.pircbotx.hooks.events.MessageEvent;
 import org.pircbotx.hooks.events.PrivateMessageEvent;
 import org.pircbotx.hooks.types.GenericMessageEvent;
@@ -24,10 +27,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spacegraph.net.IRC;
 
+import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.net.URL;
-import java.util.Collection;
 import java.util.Random;
 import java.util.function.Consumer;
 
@@ -51,7 +52,7 @@ public class IRCAgent extends IRC {
     private final NAR nar;
     //private float ircMessagePri = 0.9f;
 
-    private boolean hearTwenglish = false;
+    private boolean hearTwenglish = true;
 
     final int wordDelayMS = 25; //for serializing tokens to events: the time in millisecond between each perceived (subvocalized) word, when the input is received simultaneously
     private final Leak<Task> out;
@@ -256,15 +257,15 @@ public class IRCAgent extends IRC {
 
         Default nar = new Default(activeConcepts, conceptsPerFrame, 1, 3, random,
 
-                new CaffeineIndex(new DefaultConceptBuilder(), 128 * 1024, false, exe),
+                new CaffeineIndex(new DefaultConceptBuilder(), 600 * 1024, false, exe),
                 //new TreeTermIndex.L1TreeIndex(new DefaultConceptBuilder(), 400000, 64 * 1024, 3),
 
-                new RealTime.CS(true).dur(0.2f),
+                new RealTime.DS(true).dur(0.25f),
                 exe
         );
 
 
-        int volMax = 24;
+        int volMax = 32;
 
 //        //Multi nar = new Multi(3,512,
 //        Default nar = new Default(2048,
@@ -292,7 +293,7 @@ public class IRCAgent extends IRC {
 
 
 
-        MySTMClustered stm = new MySTMClustered(nar, 16, '.', 4, false, 3);
+        MySTMClustered stm = new MySTMClustered(nar, 64, '.', 8, false, 3);
         //MySTMClustered stm2 = new MySTMClustered(nar, 32, '.', 2, true, 2);
 
         //new Abbreviation(nar, "_", 3, 12, 0.001f, 8);
@@ -308,7 +309,7 @@ public class IRCAgent extends IRC {
 
         //Param.DEBUG = true;
 
-        @NotNull Default n = newRealtimeNAR(1024, 30, 25);
+        @NotNull Default n = newRealtimeNAR(1024, 35, 200);
 
 
         Control c = n.getControl();
@@ -331,9 +332,9 @@ public class IRCAgent extends IRC {
 
         IRCAgent bot = new IRCAgent(n,
                 "experiment1", "irc.freenode.net",
-                //"#123xyz"
+                "#123xyz"
                 //"#netention"
-                "#nars"
+                //"#nars"
         );
 
         n.on("trace", (Command) (a, t, nn) -> {
@@ -346,6 +347,7 @@ public class IRCAgent extends IRC {
         });
 
 
+        /*
         n.on("readToUs", (Command) (a, t, nn) -> {
             if (t.length > 0) {
                 String url = $.unquote(t[0]);
@@ -380,9 +382,11 @@ public class IRCAgent extends IRC {
                 }
             }
         });
+        */
 
 
         /*
+
         try {
             new RateIterator<Task>(
                 NQuadsRDF.stream(n,
@@ -394,16 +398,6 @@ public class IRCAgent extends IRC {
         */
 
 
-//        n.inputLater(
-//                NQuadsRDF.stream(n, new File(
-//                        "/home/me/Downloads/nquad"
-//                ))//.
-////                        peek(t -> {
-////                            t.setBudget(0.01f, 0.9f);
-////                        }).
-//                //    collect(Collectors.toList())
-////                , 32
-//        );
 
         //new NARWeb(n, 8080);
 

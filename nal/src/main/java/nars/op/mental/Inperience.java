@@ -17,6 +17,8 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Terms;
 import nars.term.atom.Atomic;
+import nars.term.transform.CompoundTransform;
+import nars.term.var.Variable;
 import nars.truth.Truth;
 import org.eclipse.collections.api.set.ImmutableSet;
 import org.eclipse.collections.impl.factory.Sets;
@@ -256,7 +258,8 @@ public class Inperience extends Leak<Task> {
 
         arg[k++] = self;
 
-        arg[k++] = s.term(); //unwrapping negation here isnt necessary sice the term of a task will be non-negated
+        arg[k++] = reify(s.term()); //unwrapping negation here isnt necessary sice the term of a task will be non-negated
+
 
         boolean neg;
 
@@ -269,8 +272,28 @@ public class Inperience extends Leak<Task> {
             neg = false;
         }
 
+
         return Terms.compoundOrNull($.negIf($.func(reify(s.punc()), arg), neg));
     }
+
+    static Term reify(@NotNull Compound term) {
+        return $.terms.transform(term, queryToDepVar);
+    }
+
+    /** change all query variables to dep vars */
+    final static CompoundTransform<Compound,Term> queryToDepVar = new CompoundTransform<Compound,Term>() {
+
+        @Override public boolean test(Term o) {
+            return o.hasVarQuery();
+        }
+
+        @Nullable @Override public Term apply(@Nullable Compound parent, @NotNull Term subterm) {
+            if (subterm.op()==VAR_QUERY) {
+                return $.varDep((((Variable)subterm).id()));
+            }
+            return subterm;
+        }
+    };
 
 
     public static Atomic randomNonInnate(@NotNull Random r) {

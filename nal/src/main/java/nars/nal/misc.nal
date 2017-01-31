@@ -40,8 +40,6 @@
 //    S, (||,(--,S),A_1..n) |- (||,A_1..n), (Truth:DecomposePositivePositivePositive)
 
 
-//disjunction
-    (&&,(--,%B),(--,%A)), B, task("?") |- (||,%B,%A), (Belief:BeliefStructuralDeduction, Punctuation:Belief)
 
 //substitutionViaSimilarity
      X, (B<->C), neqCom(X,C), neq(X,B) |- substitute(X,B,C,strict), (Belief:Intersection, Goal:Intersection)
@@ -96,6 +94,8 @@
 
 //NAL3:
 
+//TODO these may produce invalid beliefs if the input contains a query variable, this can be filtered before the rule is processed:
+
 ////composition on both sides of a statement:
 
     ((&,B,A..+) --> (&,X,A..+)), (B --> X), task("?") |- ((&,B,A..+) --> (&,X,A..+)), (Belief:BeliefStructuralDeduction, Punctuation:Belief)
@@ -113,6 +113,8 @@
     ((~,S,B) --> W), (B --> W), neqCom(W,S), task("?") |- ((~,S,B) --> W), (Belief:BeliefStructuralDifference, Punctuation:Belief)
 
 
+//disjunction
+    (&&,(--,%B),(--,%A)), B, task("?") |- (||,%B,%A), (Belief:BeliefStructuralDeduction, Punctuation:Belief)
 
 
 

@@ -105,6 +105,10 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
                 throw new InvalidTaskException(t, "term contains True or False");
         }
 
+        if ((punc == Op.BELIEF || punc == Op.GOAL) && (t.hasVarQuery())) {
+            return test(t, "Belief or goal with query variable", safe);
+        }
+
         return taskStatementValid(t, punc, safe);
     }
 

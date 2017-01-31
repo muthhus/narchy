@@ -143,23 +143,23 @@ abstract public class NAgent implements NSense, NAction {
 
         this.id = id;
         this.nar = nar;
-        alpha = this.nar.confidenceDefault(BELIEF);
-        gamma = this.nar.confidenceDefault(GOAL);
+        this.alpha = this.nar.confidenceDefault(BELIEF);
+        this.gamma = this.nar.confidenceDefault(GOAL);
         this.frameRate = frameRate;
 
-        sensorPriority = new FloatParam(alpha);
-        actionPriority = new FloatParam(gamma);
-        rewardPriority = new FloatParam(gamma);
+        this.sensorPriority = new FloatParam(alpha);
+        this.actionPriority = new FloatParam(gamma);
+        this.rewardPriority = new FloatParam(gamma);
 
         this.prev = nar.time();
 
         this.actionBoost = gamma;
 
 
-        rewardNormalized = new FloatNormalized(() -> rewardValue);
+        this.rewardNormalized = new FloatNormalized(() -> rewardValue);
 
 
-        happy = new SensorConcept(
+        this.happy = new SensorConcept(
                 //"happy" + "(" + nar.self + ")", nar,
                 id.isEmpty() ? $.p("happy") : $.func("happy", id),
                 nar,

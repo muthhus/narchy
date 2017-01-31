@@ -4,8 +4,11 @@ import com.google.common.collect.Lists;
 import jcog.event.On;
 import jcog.io.Twokenize;
 import nars.*;
+import nars.concept.Concept;
 import nars.nlp.Twenglish;
 import nars.op.Command;
+import nars.table.DefaultBeliefTable;
+import nars.term.Compound;
 import nars.term.Term;
 import nars.term.atom.Atom;
 import nars.time.Tense;
@@ -83,16 +86,32 @@ public class Hear extends Loop {
 //            hear(tokens.get(token-1), 0.5f); //word OFF
 //        }
 
-        hear(token > 0 ? tokens.get(token-1) : START, tokens.get(token++), 1f); //word ON
+        hear(token > 0 ? tokens.get(token-1) : START, tokens.get(token++)); //word ON
     }
 
-    private void hear(Term prev, Term next, float freq) {
+    private void hear(Term prev, Term next) {
+        Compound term = $.inh(next, $.imge(context));
+        //$.inh($.p(prev,next), $.imge(context)), //bigram
+        //$.prop(next, (context[1])),
+        //$.func("hear", chan_nick, tokens.get(token++))
+
+        float onConf = nar.confidenceDefault(BELIEF) * confFactor;
+        float offConf = nar.confidenceDefault(BELIEF) * confFactor/2f;
+
+        Concept concept = nar.concept(term);
+
+        //if (((DefaultBeliefTable) concept.beliefs()).eternal.isEmpty()) {
+        if (concept == null) {
+            //input a constant negative bias - we dont hear the word when it is not spoken
+            //only input when first conceptualized
+            nar.believe(term, Tense.Eternal, 0f, offConf);
+        }
+
         nar.believe(nar.priorityDefault(BELIEF) * priorityFactor,
-                //$.func("hear", chan_nick, tokens.get(token++))
-                $.inh(next, $.imge(context)), //1 word
-                //$.inh($.p(prev,next), $.imge(context)), //bigram
-                //$.prop(next, (context[1])),
-                Tense.Present, freq, nar.confidenceDefault(BELIEF) * confFactor);
+                term, //1 word
+                Tense.Present, 1f, onConf);
+
+
     }
 
     static public void wiki(NAR nar) {

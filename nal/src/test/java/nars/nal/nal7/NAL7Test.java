@@ -847,19 +847,20 @@ public class NAL7Test extends AbstractNALTest {
     @Test
     public void testPrediction1() throws Narsese.NarseseException {
 
-        int n1 = 0; //time of 3rd repeat
-
-        int n2 = 100; //time of 3rd repeat
-
-        int n3 = 200; //time of 3rd repeat
-
         int eventDT = 50;
+
+        int n1 = 0;
+
+        int n2 = n1 + eventDT*2;
+
+        int n3 = n2 + eventDT*2;
+
 
         TestNAR t = test();
         ((FrameTime)t.nar.time).dur(eventDT);
 
         t
-                //.log()
+                .log()
                 .inputAt(n1, "(x). :|:")
                 .inputAt(n1 + eventDT, "(y). :|:")
 //

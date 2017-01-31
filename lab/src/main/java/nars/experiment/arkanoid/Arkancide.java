@@ -5,9 +5,11 @@ import jcog.math.FloatNormalized;
 import jcog.math.FloatPolarNormalized;
 import nars.$;
 import nars.NAR;
+import nars.Op;
 import nars.Param;
 import nars.concept.ActionConcept;
 import nars.remote.NAgents;
+import nars.task.MutableTask;
 
 public class Arkancide extends NAgents {
 
@@ -17,7 +19,7 @@ public class Arkancide extends NAgents {
         //runRT(Arkancide::new);
         //nRT(Arkancide::new, 25, 5);
 
-        NAR nar = runRT((NAR n)-> new Arkancide(n, false), 30, 7, -1);
+        NAR nar = runRT((NAR n)-> new Arkancide(n, false), 30, 2, -1);
 
         //nar.beliefConfidence(0.75f);
         //nar.goalConfidence(0.75f);
@@ -48,6 +50,7 @@ public class Arkancide extends NAgents {
             }
         };
 
+        nar.input(new MutableTask(happy, Op.BELIEF, $.t(0.5f, 0.1f)).eternal());
 
         float resX = Math.max(0.01f, 1f/visW); //dont need more resolution than 1/pixel_width
         float resY = Math.max(0.01f, 1f/visH); //dont need more resolution than 1/pixel_width

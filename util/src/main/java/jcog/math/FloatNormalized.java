@@ -55,13 +55,13 @@ public class FloatNormalized implements FloatSupplier {
     @Override
     public float asFloat() {
         float raw = in.asFloat();
-        return normalize(raw);
+        return raw != raw ? Float.NaN : normalize(raw);
     }
 
     public float normalize(float raw) {
-        if (!Float.isFinite(raw))
-            //throw new ArithmeticException();
-            return 0.5f;
+//        if (!Float.isFinite(raw))
+//            //throw new ArithmeticException();
+//            return 0.5f;
 
         updateRange(raw);
 
