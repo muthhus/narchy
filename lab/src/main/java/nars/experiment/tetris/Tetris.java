@@ -14,7 +14,7 @@ import nars.nar.NARBuilder;
 import nars.remote.NAgents;
 import nars.term.Compound;
 import nars.term.atom.Atomic;
-import nars.time.RealTime;
+import nars.time.FrameTime;
 import nars.truth.Truth;
 import nars.util.task.TaskStatistics;
 import nars.video.LogIndex;
@@ -460,7 +460,7 @@ public class Tetris extends NAgents {
 
             NAR nar =
                     //NAgents.newMultiThreadNAR(4, new FrameTime().dur(TIME_PER_FALL));
-                    NARBuilder.newALANN(new RealTime.DS().dur(0.1f), 4, 64, 5, 4, 1);
+                    NARBuilder.newALANN(new FrameTime().dur(1), 4, 64, 5, 4, 1);
 
             nar.termVolumeMax.setValue(24);
             //nar.linkFeedbackRate.setValue(0.05f);
@@ -587,7 +587,7 @@ public class Tetris extends NAgents {
 
 
 
-            t.runRT(15f, 10000).join();
+            t.runRT(15f).join();
 
 //        NARController meta = new NARController(nar, loop, t);
 //

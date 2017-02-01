@@ -27,6 +27,7 @@ import java.util.function.*;
 
 import static nars.Op.*;
 import static nars.time.Tense.DTERNAL;
+import static nars.time.Tense.XTERNAL;
 
 /**
  * Static utility class for static methods related to Terms
@@ -585,7 +586,11 @@ public class Terms   {
                     subsChanged = true;
 
             }
-            newSubs = subsChanged ? /*theSubterms(*/TermContainer.the(o, DTERNAL, ss)/*)*/ : null;
+            int dt = c.dt();
+            newSubs = subsChanged ? /*theSubterms(*/TermContainer.the(o,
+                    (dt == DTERNAL||dt==0) ? DTERNAL : XTERNAL /* preserve order */,
+                    ss)/*)*/ : null;
+
         } else {
             newSubs = null;
         }

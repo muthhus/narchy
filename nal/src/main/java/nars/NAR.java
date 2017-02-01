@@ -1229,8 +1229,6 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
     }
 
     public final @Nullable Concept concept(@NotNull Term t, boolean createIfMissing) {
-        if (t instanceof Variable)
-            return null; //fast eliminate
 
         Concept c = concepts.concept(t, createIfMissing);
         if (c != null && createIfMissing && c.isDeleted()) {

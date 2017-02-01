@@ -528,9 +528,9 @@ public abstract class TermIndex extends TermBuilder {
      * applies normalization and anonymization to resolve the term of the concept the input term maps t
      */
     @Nullable
-    public final Concept concept(@NotNull Term term, boolean createIfMissing) {
+    public final Concept concept(@NotNull Term possiblyConceptualizable, boolean createIfMissing) {
 
-        term = conceptualizable(term, false);
+        Term term = conceptualizable(possiblyConceptualizable, false);
         if (term == null)
             return null;
 
@@ -595,6 +595,9 @@ public abstract class TermIndex extends TermBuilder {
 
             }
         } while (term instanceof Compound && termPre != term && term != null);
+
+        if (term instanceof Variable)
+            return null;
 
         return term;
     }

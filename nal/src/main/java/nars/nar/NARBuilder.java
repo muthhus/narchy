@@ -29,7 +29,7 @@ public interface NARBuilder {
         } : new MultiThreadExecutioner(auxThreads, 1024 * auxThreads).sync(false);
 
         NAR n = new NAR(time,
-                    new CaffeineIndex(new DefaultConceptBuilder(), 64 * 1024, false, exe),
+                    new CaffeineIndex(new DefaultConceptBuilder(), 128 * 1024, false, exe),
                         //new TreeTermIndex.L1TreeIndex(new DefaultConceptBuilder(), 512 * 1024, 1024 * 32, 3),
                     new XorShift128PlusRandom(1),
                     exe
