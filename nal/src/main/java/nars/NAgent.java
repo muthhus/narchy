@@ -7,6 +7,7 @@ import jcog.Util;
 import jcog.data.FloatParam;
 import jcog.list.FasterList;
 import jcog.math.FloatNormalized;
+import jcog.math.FloatPolarNormalized;
 import nars.concept.ActionConcept;
 import nars.concept.Concept;
 import nars.concept.SensorConcept;
@@ -156,7 +157,7 @@ abstract public class NAgent implements NSense, NAction {
         this.actionBoost = gamma;
 
 
-        this.rewardNormalized = new FloatNormalized(() -> rewardValue);
+        this.rewardNormalized = new FloatPolarNormalized(() -> rewardValue);
 
 
         this.happy = new SensorConcept(

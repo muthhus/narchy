@@ -19,7 +19,7 @@ public class Arkancide extends NAgents {
         //runRT(Arkancide::new);
         //nRT(Arkancide::new, 25, 5);
 
-        NAR nar = runRT((NAR n)-> new Arkancide(n, false), 30, 2, -1);
+        NAR nar = runRT((NAR n)-> new Arkancide(n, false), 20, 3, -1);
 
         //nar.beliefConfidence(0.75f);
         //nar.goalConfidence(0.75f);
@@ -52,23 +52,23 @@ public class Arkancide extends NAgents {
 
         nar.input(new MutableTask(happy, Op.BELIEF, $.t(0.5f, 0.1f)).eternal());
 
-        float resX = Math.max(0.01f, 1f/visW); //dont need more resolution than 1/pixel_width
-        float resY = Math.max(0.01f, 1f/visH); //dont need more resolution than 1/pixel_width
+        //float resX = Math.max(0.01f, 1f/visW); //dont need more resolution than 1/pixel_width
+        //float resY = Math.max(0.01f, 1f/visH); //dont need more resolution than 1/pixel_width
 
-        senseNumberBi( "x(paddle, noid)", new FloatNormalized(()->noid.paddle.x));//.resolution(resX);
-        senseNumberBi( "x(ball, noid)", new FloatNormalized(()->noid.ball.x));//.resolution(resX);
-        senseNumberBi( "y(ball, noid)", new FloatNormalized(()->noid.ball.y));//.resolution(resY);
-        senseNumberBi("vx(ball, noid)", new FloatPolarNormalized(()->noid.ball.velocityX));
-        senseNumberBi("vy(ball, noid)", new FloatPolarNormalized(()->noid.ball.velocityY));
+        senseNumber( "x(paddle, noid)", new FloatPolarNormalized(()->noid.paddle.x, noid.getWidth()/2));//.resolution(resX);
+        senseNumber( "x(ball, noid)", new FloatPolarNormalized(()->noid.ball.x, noid.getWidth()/2));//.resolution(resX);
+        senseNumber( "y(ball, noid)", new FloatPolarNormalized(()->noid.ball.y, noid.getHeight()/2));//.resolution(resY);
+        senseNumber("vx(ball, noid)", new FloatPolarNormalized(()->noid.ball.velocityX, noid.getWidth()/2));
+        senseNumber("vy(ball, noid)", new FloatPolarNormalized(()->noid.ball.velocityY, noid.getHeight()/2));
 
         if (cam)
             addCamera("cam", noid, visW, visH);
         else {
-            nar.beliefConfidence(0.75f);
-            nar.goalConfidence(0.75f);
-            nar.linkFeedbackRate.setValue(0.1f);
-            nar.logBudgetMin(System.out, 0.6f);
-            nar.termVolumeMax.setValue(18); //should need less complexity in non-camera mode
+            nar.beliefConfidence(0.9f);
+            nar.goalConfidence(0.9f);
+            nar.linkFeedbackRate.setValue(0.02f);
+            //nar.logBudgetMin(System.out, 0.6f);
+            nar.termVolumeMax.setValue(24); //should need less complexity in non-camera mode
         }
 
         //addCameraRetina("zoom(cam(noid))", noid, visW/2, visH/2, (v) -> $.t(v, alpha));

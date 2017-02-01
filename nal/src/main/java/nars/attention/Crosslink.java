@@ -25,7 +25,7 @@ public class Crosslink {
             return; //null or same concept
 
 
-        new SpreadingActivation(srcTask, scale, tgtConcept, 0, nar);
-        new SpreadingActivation(tgtTask, scale, srcConcept, 0, nar);
+        new SpreadingActivation(srcTask, scale, tgtConcept, 1, nar);
+        new SpreadingActivation(tgtTask, scale, srcConcept, 1, nar);
     }
 }

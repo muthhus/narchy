@@ -192,8 +192,7 @@ public interface NSense {
 
     @NotNull
     default FuzzyScalarConcepts senseNumber(String id, DoubleSupplier v) {
-
-        return senseNumber(id, ()->(float)v.getAsDouble());
+        return senseNumber(()->(float)v.getAsDouble(), $.p(the(id)));
     }
 
     /**

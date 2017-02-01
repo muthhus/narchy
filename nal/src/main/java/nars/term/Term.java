@@ -48,6 +48,7 @@ import java.util.function.BiPredicate;
 import java.util.function.Function;
 
 import static nars.time.Tense.DTERNAL;
+import static nars.time.Tense.XTERNAL;
 
 
 public interface Term extends Termed, Termlike, Comparable<Termlike> {
@@ -214,9 +215,11 @@ public interface Term extends Termed, Termlike, Comparable<Termlike> {
         return true;
     }
 
+    /** note: only gets the first found subterm time of x occurring in this term. */
     default int subtermTime(@NotNull Term x) {
         return subtermTime(x, this instanceof Compound ? ((Compound) this).dt() : DTERNAL);
     }
+
 //    default long subtermTimeOrZero(Term x, long offset) {
 //        int e = subtermTime(x, this instanceof Compound ? ((Compound)this).dt() : DTERNAL);
 //        return e == DTERNAL ? DTERNAL : e + offset;
@@ -259,11 +262,13 @@ public interface Term extends Termed, Termlike, Comparable<Termlike> {
                 //use the normalized order of the terms so that the first is always @ 0
 
                 if (dt < 0) {
-                    dt = -dt;
+                    //offset by width of the other subterm
+                    dt = -dt + c.term(1).dtRange();
 
                     firstIndex = 1;
                     lastIndex = 0;
                 } else {
+                    //already left-aligned
 
                     firstIndex = 0;
                     lastIndex = 1;
@@ -296,6 +301,35 @@ public interface Term extends Termed, Termlike, Comparable<Termlike> {
 
         return DTERNAL;
     }
+
+    /** total span of time consumed within a temporal compound */
+    default int dtRange() {
+        if (op().temporal) {
+            Compound c = (Compound) this;
+            int dt = c.dt();
+            if (size()==2) {
+
+                switch (dt) {
+                    case DTERNAL:
+                    case XTERNAL:
+                    case 0:
+                        dt = 0;
+                }
+
+
+                //if (dt > 0) {
+                    return c.term(0).dtRange() + Math.abs(dt) + c.term(1).dtRange();
+                //} else {
+                    //return c.term(0).dtRange() + dt + c.term(0).dtRange();
+                //}
+                //return Math.abs(dt);
+
+            }
+        }
+        return 0;
+    }
+
+
 
     /**
      * meta is int[] that collects term metadata:

@@ -451,6 +451,35 @@ public class TemporalTest {
 
     }
 
+    @Test public void testSubtermConjInConj() throws Narsese.NarseseException {
+        Compound g = $("(((x) &&+1 (y)) &&+1 (z))");
+        assertEquals(0, g.subtermTime($("(x)")));
+        assertEquals(1, g.subtermTime($("(y)")));
+        assertEquals(2, g.subtermTime($("(z)")));
+
+        Compound h = $("((z) &&+1 ((x) &&+1 (y)))");
+        assertEquals(0, h.subtermTime($("(z)")));
+        assertEquals(1, h.subtermTime($("(x)")));
+        assertEquals(2, h.subtermTime($("(y)")));
+
+        Compound i = $("((y) &&+1 ((z) &&+1 (x)))");
+        assertEquals(0, i.subtermTime($("(y)")));
+        assertEquals(1, i.subtermTime($("(z)")));
+        assertEquals(2, i.subtermTime($("(x)")));
+
+        Compound j = $("((x) &&+1 ((z) &&+1 (y)))");
+        assertEquals(0, j.subtermTime($("(x)")));
+        assertEquals(1, j.subtermTime($("(z)")));
+        assertEquals(2, j.subtermTime($("(y)")));
+    }
+
+    @Test public void testDTRange() throws Narsese.NarseseException {
+        assertEquals(1, $("((z) &&+1 (y))").dtRange());
+        assertEquals(2, $("((x) &&+1 ((z) &&+1 (y)))").dtRange());
+        assertEquals(4, $("((x) &&+1 ((z) &&+1 ((y) &&+2 (w))))").dtRange());
+        assertEquals(4, $("(((z) &&+1 ((y) &&+2 (w))) &&+1 (x))").dtRange());
+    }
+
     @Test
     public void testSubtermTestOffset() throws Narsese.NarseseException {
         String x = "(({t001}-->[opened]) &&-5 (open({t001}) &&-5 ((({t001})-->at) &&-5 (({t002})-->hold))))";

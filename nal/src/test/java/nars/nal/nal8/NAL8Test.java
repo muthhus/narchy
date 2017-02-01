@@ -34,7 +34,6 @@ public class NAL8Test extends AbstractNALTest {
     public void subsent_1()  {
         TestNAR tester = test();
 
-        tester.log();
 
         //TODO decide correct parentheses ordering
 
@@ -46,7 +45,7 @@ public class NAL8Test extends AbstractNALTest {
         // hold .. at .. open
         tester.mustBelieve(cycles, "((hold:({t002}) &&+5 at({t001})) &&+5 open({t001}))",
                 1.0f, 0.81f,
-                -5);
+                -15);
 
 
 //        //the structurually inverted sequence
@@ -130,11 +129,11 @@ public class NAL8Test extends AbstractNALTest {
     }
 
     @Test
-    public void ded_with_query_var_temporal()  {
+    public void ded_with_var_temporal()  {
         test()
             
             .input("goto({t003}). :|:")
-            .inputAt(10, "(goto(?1) ==>+5 at(SELF,?1)).")
+            .inputAt(10, "(goto(#1) ==>+5 at(SELF,#1)).")
             .mustBelieve(cycles, "at(SELF,{t003})", 1.0f, 0.81f, 5);
     }
 

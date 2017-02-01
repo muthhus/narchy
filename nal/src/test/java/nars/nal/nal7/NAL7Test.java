@@ -211,7 +211,7 @@ public class NAL7Test extends AbstractNALTest {
 
                 //.input("X:x.") //shouldnt be necessary
                 .inputAt(1, "(X:x &&+1 (Y:y &&+2 Z:z)). :|:")
-                .mustBelieve(time, "X:x.", 1.00f, 0.81f, 1)
+                .mustBelieve(time, "X:x.", 1.00f, 0.73f, 1)
                 .mustBelieve(time, "(Y:y &&+2 Z:z).", 1.00f, 0.81f, 2)
                 .mustNotOutput(time, "(Y:y &&+2 Z:z)", '.', 1.00f, 1f, 0.43f, 0.43f, 2) //avoid the substitutionIfUnifies result
                 .mustBelieve(time, "Y:y.", 1.00f, 0.73f, 2)
@@ -732,12 +732,30 @@ public class NAL7Test extends AbstractNALTest {
     }
 
     @Test
-    public void testDecomposeConjunction0() {
+    public void testDecomposeConjunctionTemporal() {
         test()
                 .input("((x) &&+0 (y)). :|:")
                 .mustBelieve(cycles, "(x)", 1f, 0.81f, 0)
                 .mustBelieve(cycles, "(y)", 1f, 0.81f, 0);
     }
+
+    @Test
+    public void testDecomposeConjunctionEmbedded() {
+        test()
+                .input("(((x) &&+1 (y)) &&+1 (z)). :|:")
+                .mustBelieve(cycles, "((x) &&+1 (y))", 1f, 0.81f, 0)
+                .mustBelieve(cycles, "((y) &&+1 (z))", 1f, 0.81f, 1)
+                .mustBelieve(cycles, "((x) &&+2 (z))", 1f, 0.81f, 0);
+    }
+    @Test
+    public void testDecomposeConjunctionEmbeddedInnerCommute() {
+        test()
+                .input("((&&,a,b,c) &&+1 (z)). :|:")
+                .mustBelieve(cycles, "(a &&+1 (z))", 1f, 0.81f, 0)
+                .mustBelieve(cycles, "(b &&+1 (z))", 1f, 0.81f, 0)
+                .mustBelieve(cycles, "(c &&+1 (z))", 1f, 0.81f, 0);
+    }
+
 
     @Test
     public void testWTFDontDecomposeConjunctionDTERNAL() {

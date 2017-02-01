@@ -142,12 +142,12 @@ abstract public class NAgents extends NAgent {
 
     public static NAR newAlann(float dur) {
 
-        NAR nar = NARBuilder.newALANN(new RealTime.CS(true).dur( dur ), 3, 256, 3, 3, 2 );
+        NAR nar = NARBuilder.newALANN(new RealTime.CS(true).dur( dur ), 3, 512, 3, 3, 2 );
 
-        nar.termVolumeMax.set(48);
+        nar.termVolumeMax.set(32);
 
-        MySTMClustered stm = new MySTMClustered(nar, 128, '.', 3, false, 6);
-        MySTMClustered stmGoal = new MySTMClustered(nar, 32, '!', 2, false, 4);
+        MySTMClustered stm = new MySTMClustered(nar, 64, '.', 8, false, 3);
+        MySTMClustered stmGoal = new MySTMClustered(nar, 32, '!', 8, false, 3);
 
 //        Abbreviation abbr = new Abbreviation(nar, "the",
 //                4, 16,
@@ -295,7 +295,7 @@ abstract public class NAgents extends NAgent {
 
             @Override
             protected void in(@NotNull Task task, Consumer<BLink<Task>> each) {
-                if (!task.isDeleted())
+                if (!task.isCommand() && !task.isDeleted())
                     each.accept(new DefaultBLink<>(task, task, 0.1f));
             }
 

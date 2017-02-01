@@ -5,6 +5,10 @@ package jcog.math;
  * */
 public class FloatPolarNormalized extends FloatNormalized {
 
+    public FloatPolarNormalized(FloatSupplier in, float midPoint) {
+        this(() -> in.asFloat() - midPoint );
+    }
+
     public FloatPolarNormalized(FloatSupplier in) {
         super(in);
         min = 0; //origin

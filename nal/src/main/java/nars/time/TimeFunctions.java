@@ -282,6 +282,26 @@ public interface TimeFunctions {
     @Nullable TimeFunctions decomposeBelief = (@NotNull Compound derived, @NotNull Derivation p, @NotNull Conclude d, @NotNull long[] occReturn, float[] confScale) ->
             decompose(derived, p, occReturn, false);
 
+    /** the 2-ary result will have its 'dt' assigned by the occurrence of its subterms in the task's compound */
+    @Nullable TimeFunctions decomposeTaskComponents = (@NotNull Compound derived, @NotNull Derivation p, @NotNull Conclude d, @NotNull long[] occReturn, float[] confScale) -> {
+
+        Compound from = p.task.term();
+        if (derived.size()!=2)
+            return null;
+        Term toA = derived.term(0);
+        Term toB = derived.term(1);
+        int occA = from.subtermTime(toA);
+        int occB = from.subtermTime(toB);
+
+
+        if (occA!=DTERNAL && occB!=DTERNAL) {
+            int dt = occB - occA;
+            occReturn[0] = p.task.occurrence() + Math.min(occA, occB);
+            return deriveDT(derived, +1, p, dt, occReturn);
+        } else {
+            return null;
+        }
+    };
 
     /*** special case for decomposing conjunctions in the task slot */
     @Nullable TimeFunctions decomposeTaskSubset = (@NotNull Compound derived, @NotNull Derivation p, @NotNull Conclude d, @NotNull long[] occReturn, float[] confScale) -> {
@@ -394,14 +414,14 @@ public interface TimeFunctions {
                             int otherInDecomposed = rDecomposed.subtermTime(rOtherTerm);
                             if (decomposedTerm.dt() == 0 && otherInDecomposed == 0) {
                                 //special case for &&+0 having undergone some unrecognizable change
-                                occ = occOther - 0; //+0 should ensure it has the same time as this siblign event
+                                occ = occOther - 0; //+0 should ensure it has the same time as this sibling event
 
                             } else if (rDerived != null) { //{ && otherInDecomposed != DTERNAL) {
                                 int derivedInDecomposed = rDecomposed.subtermTime(rDerived);
                                 if (derivedInDecomposed != DTERNAL) {
                                     occ = occOther + derivedInDecomposed;
                                     if (otherInDecomposed!=DTERNAL) //???
-                                        occ -= otherInDecomposed;
+                                        occ -= otherInDecomposed;// - rDerived.dtRange();
 
 
                                 }

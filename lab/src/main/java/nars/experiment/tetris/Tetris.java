@@ -1,6 +1,5 @@
 package nars.experiment.tetris;
 
-import jcog.math.FloatSummaryReusableStatistics;
 import jcog.spatial.Rect1D;
 import nars.$;
 import nars.NAR;
@@ -13,14 +12,12 @@ import nars.gui.ConceptWidget;
 import nars.gui.NARSpace;
 import nars.nar.NARBuilder;
 import nars.remote.NAgents;
-import nars.task.DerivedTask;
 import nars.term.Compound;
 import nars.term.atom.Atomic;
-import nars.time.FrameTime;
+import nars.time.RealTime;
 import nars.truth.Truth;
 import nars.util.task.TaskStatistics;
 import nars.video.LogIndex;
-import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.jetbrains.annotations.NotNull;
 import spacegraph.SimpleSpatial;
 import spacegraph.SpaceGraph;
@@ -463,9 +460,9 @@ public class Tetris extends NAgents {
 
             NAR nar =
                     //NAgents.newMultiThreadNAR(4, new FrameTime().dur(TIME_PER_FALL));
-                    NARBuilder.newALANN(new FrameTime().dur(1), 6, 64, 5, 3, 1);
+                    NARBuilder.newALANN(new RealTime.DS().dur(0.1f), 4, 64, 5, 4, 1);
 
-            nar.termVolumeMax.setValue(32);
+            nar.termVolumeMax.setValue(24);
             //nar.linkFeedbackRate.setValue(0.05f);
 
             //newTimeWindow(nar);
@@ -503,10 +500,10 @@ public class Tetris extends NAgents {
 ////        });
 //
         float p = 0.25f;
-        nar.DEFAULT_BELIEF_PRIORITY = 0.5f * p;
+        nar.DEFAULT_BELIEF_PRIORITY = 1f * p;
         nar.DEFAULT_GOAL_PRIORITY = 1f * p;
-        nar.DEFAULT_QUESTION_PRIORITY = 0.75f * p;
-        nar.DEFAULT_QUEST_PRIORITY = 0.75f * p;
+        nar.DEFAULT_QUESTION_PRIORITY = 1f * p;
+        nar.DEFAULT_QUEST_PRIORITY = 1f * p;
 
         /*
         nar.onCycle((n)->{
