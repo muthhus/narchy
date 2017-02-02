@@ -37,6 +37,12 @@ public class MySTMClustered extends STMClustered {
     private final int minGroupSize;
     private final int inputsPerFrame;
 
+
+    final static int TIME = 0;
+    final static int FREQ = 1;
+    final static int CONF = 2; //group by confidence to preserve the maximum collective confidence of any group
+
+
     float timeCoherenceThresh = 0.99f; //only used when not in group=2 sequence pairs phase
     float freqCoherenceThresh = 0.9f;
     float confCoherenceThresh = 0.5f;
@@ -56,7 +62,7 @@ public class MySTMClustered extends STMClustered {
     }
 
     public MySTMClustered(@NotNull NAR nar, int size, char punc, int minGroupSize, int maxGroupSize, int maxInputVolume, boolean allowNonInput, int inputsPerFrame) {
-        super(nar, new MutableInteger(size), punc, maxGroupSize);
+        super(3, nar, new MutableInteger(size), punc, maxGroupSize);
 
         this.minGroupSize = minGroupSize;
         this.maxGroupSize = maxGroupSize;
@@ -72,6 +78,24 @@ public class MySTMClustered extends STMClustered {
         net.setWinnerUpdateRate(0.03f, 0.01f);
     }
 
+    @NotNull
+    public double[] getCoord(@NotNull Task t) {
+        double[] c = new double[dims];
+        c[0] = t.occurrence(); //time
+        c[1] = t.freq(); //0..+1
+        c[2] = t.conf(); //0..+1
+        return c;
+    }
+
+
+    @Override
+    protected TasksNode newCentroid(int id) {
+        TasksNode t = new TasksNode(id);
+        t.randomizeUniform(0, now - 1, now + 1);
+        t.randomizeUniform(1, 0f, 1f);
+        t.randomizeUniform(2, 0f, 1f);
+        return t;
+    }
 
     @Override
     public void accept(@NotNull Task t) {

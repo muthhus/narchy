@@ -34,11 +34,9 @@ public class MicrosphereTemporalBeliefTable extends MultiRWFasterList<Task> impl
         this.capacity = initialCapacity;
     }
 
-    @NotNull
-    @Override
-    public Iterator<Task> iterator() {
-        throw new UnsupportedOperationException();
-        //return list.iterator();
+    /** warning: not efficient as forEach visiting */
+    @NotNull @Override public Iterator<Task> iterator() {
+        return toImmutable().iterator();
     }
 
 

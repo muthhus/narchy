@@ -16,6 +16,7 @@ import java.util.List;
 
 import static nars.attention.Crosslink.crossLink;
 import static nars.util.UtilityFunctions.and;
+import static nars.util.UtilityFunctions.or;
 
 /**
  * Short-term Memory Belief Event Induction.
@@ -106,10 +107,12 @@ public final class STMTemporalLinkage extends STM {
 
         if (queued!=null) {
             nar.runLater(()-> {
-                float tConf = t.conf();
-                for (int i = 0, queuedSize = queued.size(); i < queuedSize; i++) {
-                    Task u = queued.get(i);
-                    crossLink(concept, t, u, strength * and(tConf, u.conf()), nar);
+                float tPri = t.priSafe(0);
+                if (tPri > 0) {
+                    for (int i = 0, queuedSize = queued.size(); i < queuedSize; i++) {
+                        Task u = queued.get(i);
+                        crossLink(concept, t, u, strength * or(tPri, u.priSafe(0)), nar);
+                    }
                 }
             });
         }

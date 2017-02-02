@@ -14,6 +14,8 @@ import nars.truth.TruthDelta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import static nars.time.Tense.ETERNAL;
+
 
 /**
  * TODO extend an ImmutableTask class
@@ -24,16 +26,21 @@ abstract public class DerivedTask extends MutableTask {
     @Nullable
     public volatile transient Premise premise;
 
+    private final long end;
+
     //@Nullable long[] startEnd;
 
     //TODO should this also affect the Belief task?
 
-    public DerivedTask(@NotNull Termed<Compound> tc, char punct, @Nullable Truth truth, @NotNull Derivation p, long[] evidence, long now, long occ) {
+    public DerivedTask(@NotNull Termed<Compound> tc, char punct, @Nullable Truth truth, @NotNull Derivation p, long[] evidence, long now, long[] occ) {
         super(tc, punct, truth);
 
         this.premise = p.premise;
 
-        time(now, occ);
+        time(now, occ != null ? occ[0] : ETERNAL);
+
+        end = occ != null ? occ[1] : ETERNAL;
+
         evidence(evidence);
 
 
@@ -93,6 +100,12 @@ abstract public class DerivedTask extends MutableTask {
         return p != null ? p.belief : null;
     }
 
+    @Override
+    public long end() {
+        if (end!=ETERNAL)
+            return end;
+        return super.end();
+    }
 
     //    /** next = the child which resulted from this and another task being revised */
 //    @Override public boolean onRevision(@NotNull Task next) {
@@ -122,7 +135,7 @@ abstract public class DerivedTask extends MutableTask {
 
     public static class DefaultDerivedTask extends DerivedTask {
 
-        public DefaultDerivedTask(@NotNull Termed<Compound> tc, @Nullable Truth truth, char punct, long[] evidence, @NotNull Derivation premise, long now, long occ) {
+        public DefaultDerivedTask(@NotNull Termed<Compound> tc, @Nullable Truth truth, char punct, long[] evidence, @NotNull Derivation premise, long now, long[] occ) {
             super(tc, punct, truth, premise, evidence, now, occ);
         }
 

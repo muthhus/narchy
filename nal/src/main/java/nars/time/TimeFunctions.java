@@ -1,6 +1,7 @@
 package nars.time;
 
 import jcog.Util;
+import jcog.math.Interval;
 import nars.$;
 import nars.Op;
 import nars.Param;
@@ -875,6 +876,7 @@ public interface TimeFunctions {
 
         long occ = occInterpolate(task, belief, p); //reset
 
+
         Compound tt = (Compound) p.taskTerm.unneg();
         Term bb = p.beliefTerm; // belief() != null ? belief().term() : null;
 
@@ -1137,10 +1139,29 @@ public interface TimeFunctions {
 //            }
         }
 
+        if (belief!=null) {
+            long taskOcc = task.occurrence();
+            if (taskOcc!=ETERNAL) {
+                long belOcc = belief.occurrence();
+                if (belOcc!=ETERNAL) {
+                    Interval ii = Interval.intersect(task.start(), task.end(), belief.start(), belief.end() );
+                    if (ii.length() > 0) {
+                        occReturn[0] = ii.a;
+                        occReturn[1] = ii.b;
+                        return derived;
+                    } else {
+                        //no intersection: point-like below
+                    }
+                }
+            }
+        } else {
+            //inherit task's occurrence exactly
+            occReturn[0] = task.start();
+            occReturn[1] = task.end();
+            return derived;
+        }
 
         occReturn[0] = occ;
-
-
         return derived;
 
     };

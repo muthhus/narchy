@@ -1,6 +1,7 @@
 package nars.attention;
 
 import nars.NAR;
+import nars.Param;
 import nars.Task;
 import nars.concept.Concept;
 import org.jetbrains.annotations.NotNull;

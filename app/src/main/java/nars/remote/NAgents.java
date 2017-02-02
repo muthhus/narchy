@@ -146,8 +146,8 @@ abstract public class NAgents extends NAgent {
 
         nar.termVolumeMax.set(32);
 
-        MySTMClustered stm = new MySTMClustered(nar, 64, '.', 8, false, 3);
-        MySTMClustered stmGoal = new MySTMClustered(nar, 32, '!', 8, false, 3);
+        MySTMClustered stm = new MySTMClustered(nar, 64, '.', 8, true, 3);
+        MySTMClustered stmGoal = new MySTMClustered(nar, 32, '!', 8, true, 3);
 
 //        Abbreviation abbr = new Abbreviation(nar, "the",
 //                4, 16,

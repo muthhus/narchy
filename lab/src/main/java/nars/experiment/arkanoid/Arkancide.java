@@ -19,7 +19,7 @@ public class Arkancide extends NAgents {
         //runRT(Arkancide::new);
         //nRT(Arkancide::new, 25, 5);
 
-        NAR nar = runRT((NAR n)-> new Arkancide(n, false), 30, 1, -1);
+        NAR nar = runRT((NAR n)-> new Arkancide(n, false), 15, 3, -1);
 
         //nar.beliefConfidence(0.75f);
         //nar.goalConfidence(0.75f);
@@ -55,11 +55,11 @@ public class Arkancide extends NAgents {
         //float resX = Math.max(0.01f, 1f/visW); //dont need more resolution than 1/pixel_width
         //float resY = Math.max(0.01f, 1f/visH); //dont need more resolution than 1/pixel_width
 
-        senseNumber( "x(paddle, noid)", new FloatPolarNormalized(()->noid.paddle.x, noid.getWidth()/2));//.resolution(resX);
-        senseNumber( "x(ball, noid)", new FloatPolarNormalized(()->noid.ball.x, noid.getWidth()/2));//.resolution(resX);
-        senseNumber( "y(ball, noid)", new FloatPolarNormalized(()->noid.ball.y, noid.getHeight()/2));//.resolution(resY);
-        senseNumber("vx(ball, noid)", new FloatPolarNormalized(()->noid.ball.velocityX));
-        senseNumber("vy(ball, noid)", new FloatPolarNormalized(()->noid.ball.velocityY));
+        senseNumberBi( "x(paddle, noid)", new FloatPolarNormalized(()->noid.paddle.x, noid.getWidth()/2));//.resolution(resX);
+        senseNumberBi( "x(ball, noid)", new FloatPolarNormalized(()->noid.ball.x, noid.getWidth()/2));//.resolution(resX);
+        senseNumberBi( "y(ball, noid)", new FloatPolarNormalized(()->noid.ball.y, noid.getHeight()/2));//.resolution(resY);
+        senseNumberBi("vx(ball, noid)", new FloatPolarNormalized(()->noid.ball.velocityX));
+        senseNumberBi("vy(ball, noid)", new FloatPolarNormalized(()->noid.ball.velocityY));
 
         if (cam)
             addCamera("cam", noid, visW, visH);

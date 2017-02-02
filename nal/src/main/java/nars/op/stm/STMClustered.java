@@ -30,15 +30,12 @@ import java.util.stream.StreamSupport;
 /**
  * clusterjunctioning
  */
-public class STMClustered extends STM {
+public abstract class STMClustered extends STM {
 
-    static final int DIMENSIONS = 3;
-    final static int TIME = 0;
-    final static int FREQ = 1;
-    final static int CONF = 2; //group by confidence to preserve the maximum collective confidence of any group
 
 
     final short clusters;
+    public final int dims;
 
     long now;
 
@@ -60,15 +57,12 @@ public class STMClustered extends STM {
         /**
          * current members
          */
-        public final Set<TLink> tasks = nar.exe.concurrent() ? new CopyOnWriteArraySet<>() : new LinkedHashSet<>();
+        public final Set<TLink> tasks = nar.exe.concurrent() ?
+                Collections.newSetFromMap(new ConcurrentHashMap<>()) : new LinkedHashSet<>();
 
 
-        public TasksNode(int id, int dimensions) {
-            super(id, dimensions);
-            randomizeUniform(0, now - 1, now + 1);
-            randomizeUniform(1, 0f, 1f);
-            randomizeUniform(2, 0f, 1f);
-            filter();
+        public TasksNode(int id) {
+            super(id, dims);
         }
 
         @Override
@@ -287,20 +281,15 @@ public class STMClustered extends STM {
 //        return baseForgetRate + forgetRate * (1f - id.conf() * id.originality());
 //    }
 
-    @NotNull
-    public static double[] getCoord(@NotNull Task t) {
-        double[] c = new double[DIMENSIONS];
-        c[0] = t.occurrence(); //time
-        c[1] = t.freq(); //0..+1
-        c[2] = t.conf(); //0..+1
-        return c;
-    }
+    abstract double[] getCoord(@NotNull Task t);
 
     @Nullable
     public final Bag<Task> input;
 
-    public STMClustered(@NotNull NAR nar, @NotNull MutableInteger capacity, char punc, int expectedTasksPerNode) {
+    public STMClustered(int dims, @NotNull NAR nar, @NotNull MutableInteger capacity, char punc, int expectedTasksPerNode) {
         super(nar, capacity);
+
+        this.dims = dims;
 
         //TODO make this adaptive
         clusters = (short) Math.max(2f, 1f + capacity.floatValue() / expectedTasksPerNode);
@@ -344,11 +333,13 @@ public class STMClustered extends STM {
 
         };
 
-        this.net = new NeuralGasNet<TasksNode>(DIMENSIONS, clusters) {
+        this.net = new NeuralGasNet<TasksNode>(dims, clusters) {
             @NotNull
             @Override
             public STMClustered.TasksNode newNode(int i, int dims) {
-                return new TasksNode(i, dims);
+                TasksNode c = newCentroid(i);
+                c.filter();
+                return c;
             }
 
             @Override
@@ -365,6 +356,7 @@ public class STMClustered extends STM {
         });
     }
 
+    abstract protected TasksNode newCentroid(int id);
 
     final AtomicBoolean busy = new AtomicBoolean(false);
 

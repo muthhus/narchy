@@ -164,13 +164,13 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
 //        if (!Task.taskContentValid(content, ct.punc, nar, false/* !Param.DEBUG*/))
 //            return; //INVALID TERM FOR TASK
 
-        long occ;
+        long[] occ;
 
         if (m.temporal) {
 //            if (nar.level() < 7)
 //                throw new NAR.InvalidTaskException(content, "invalid NAL level");
 
-            long[] occReturn = {ETERNAL};
+            long[] occReturn = {ETERNAL, ETERNAL};
             float[] confScale = {1f};
 
             Compound temporalized = this.time.compute(content,
@@ -218,11 +218,11 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
                 }
             }
 
-            occ = occReturn[0];
+            occ = occReturn;
 
         } else {
 
-            occ = ETERNAL;
+            occ = null;
         }
 
 
@@ -260,15 +260,17 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
      * part 2
      */
     @Nullable
-    public final DerivedTask derive(@NotNull Termed<Compound> c, @NotNull Budget budget, long now, long occ, @NotNull Derivation p, Truth truth, Derivation.TruthPuncEvidence ct) {
+    public final DerivedTask derive(@NotNull Termed<Compound> c, @NotNull Budget budget, long now, long[] occ, @NotNull Derivation p, Truth truth, Derivation.TruthPuncEvidence ct) {
         char punc = ct.punc;
         long[] evidence = ct.evidence;
 
 
-        DerivedTask dt =
+        DerivedTask d =
                 new DerivedTask.DefaultDerivedTask(c, truth, punc, evidence, p, now, occ);
+
+
         //new RuleFeedbackDerivedTask(c, truth, punc, evidence, p, rule);
-        dt.budget(budget) // copied in, not shared
+        d.budget(budget) // copied in, not shared
                 //.anticipate(derivedTemporal && d.anticipate)
                 .log(Param.DEBUG ? rule : null);
 
@@ -281,7 +283,7 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
 //            }
 //            //</TEMPORARY MEASUREMENT
 
-        return dt;
+        return d;
 
 
         //ETERNALIZE: (CURRENTLY DISABLED)
@@ -312,7 +314,7 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
 
         private final @NotNull PremiseRule rule;
 
-        public RuleFeedbackDerivedTask(@NotNull Termed<Compound> tc, @Nullable Truth truth, char punct, long[] evidence, @NotNull Derivation premise, @NotNull PremiseRule rule, long now, long occ) {
+        public RuleFeedbackDerivedTask(@NotNull Termed<Compound> tc, @Nullable Truth truth, char punct, long[] evidence, @NotNull Derivation premise, @NotNull PremiseRule rule, long now, long[] occ) {
             super(tc, truth, punct, evidence, premise, now, occ);
             this.rule = rule;
         }
