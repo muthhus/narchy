@@ -7,7 +7,6 @@ import nars.Param;
 import nars.concept.Concept;
 import nars.term.Compound;
 import nars.term.Term;
-import nars.term.Termed;
 import nars.term.container.TermContainer;
 import nars.term.util.InvalidTermException;
 import nars.time.Tense;

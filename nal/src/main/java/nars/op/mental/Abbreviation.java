@@ -19,7 +19,6 @@ import nars.op.Leak;
 import nars.table.BeliefTable;
 import nars.table.QuestionTable;
 import nars.task.GeneratedTask;
-import nars.task.MutableTask;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;

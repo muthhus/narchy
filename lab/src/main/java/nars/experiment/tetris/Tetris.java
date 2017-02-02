@@ -1,6 +1,5 @@
 package nars.experiment.tetris;
 
-import jcog.spatial.Rect1D;
 import nars.$;
 import nars.NAR;
 import nars.Narsese;
@@ -17,7 +16,6 @@ import nars.term.atom.Atomic;
 import nars.time.FrameTime;
 import nars.truth.Truth;
 import nars.util.task.TaskStatistics;
-import nars.video.LogIndex;
 import org.jetbrains.annotations.NotNull;
 import spacegraph.SimpleSpatial;
 import spacegraph.SpaceGraph;
@@ -417,43 +415,43 @@ public class Tetris extends NAgents {
         }
 
 
-        public static void newTimeWindow(NAR n) {
-            LogIndex li = new LogIndex();
-
-            final int cap = 90;
-            long start = System.currentTimeMillis();
-            long end = start + 5000;
-            float width = 2f;
-            SpaceGraph s = new SpaceGraph(
-                    new NARSpace(n) {
-                        @Override
-                        protected void get(Collection displayNext) {
-                            li.containing(new Rect1D.DefaultRect1D(start, end), x -> {
-                                if (displayNext.size() > cap) {
-                                    return false;
-                                }
-                                Spatial w = space.getOrAdd(x, t -> new ConceptWidget(n, $.the(t.toString()), 1));
-
-                                ((SimpleSpatial) w).moveX((-0.5f + (float) (x.from() - start) / (end - start)) * width, 0.8f);
-                                //((SimpleSpatial)w).moveY(0, 0.4f);
-                                //((SimpleSpatial)w).moveZ(0, 0.4f);
-                                displayNext.add(w);
-                                return true;
-                            });
-                        }
-                    }.with(
-                            new Flatten()
-                            //new Spiral()
-                            //new FastOrganicLayout()
-                    )
-            );
-//        ForceDirected forceDirect = new ForceDirected();
-//        //forceDirect.repelSpeed = 0.5f;
-//        s.dyn.addBroadConstraint(forceDirect);
-
-
-            s.show(1300, 900);
-        }
+//        public static void newTimeWindow(NAR n) {
+//            LogIndex li = new LogIndex();
+//
+//            final int cap = 90;
+//            long start = System.currentTimeMillis();
+//            long end = start + 5000;
+//            float width = 2f;
+//            SpaceGraph s = new SpaceGraph(
+//                    new NARSpace(n) {
+//                        @Override
+//                        protected void get(Collection displayNext) {
+//                            li.containing(new Rect1D.DefaultRect1D(start, end), x -> {
+//                                if (displayNext.size() > cap) {
+//                                    return false;
+//                                }
+//                                Spatial w = space.getOrAdd(x, t -> new ConceptWidget(n, $.the(t.toString()), 1));
+//
+//                                ((SimpleSpatial) w).moveX((-0.5f + (float) (x.from() - start) / (end - start)) * width, 0.8f);
+//                                //((SimpleSpatial)w).moveY(0, 0.4f);
+//                                //((SimpleSpatial)w).moveZ(0, 0.4f);
+//                                displayNext.add(w);
+//                                return true;
+//                            });
+//                        }
+//                    }.with(
+//                            new Flatten()
+//                            //new Spiral()
+//                            //new FastOrganicLayout()
+//                    )
+//            );
+////        ForceDirected forceDirect = new ForceDirected();
+////        //forceDirect.repelSpeed = 0.5f;
+////        s.dyn.addBroadConstraint(forceDirect);
+//
+//
+//            s.show(1300, 900);
+//        }
 
         public static void main(String[] args) throws Narsese.NarseseException {
             //Param.DEBUG = true;

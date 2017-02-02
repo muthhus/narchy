@@ -4,7 +4,6 @@ import nars.term.Term;
 import org.apache.commons.collections4.iterators.ArrayIterator;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.function.Consumer;
 
