@@ -114,8 +114,7 @@ public abstract class TermBuilder {
                 if (arity != 2 || dt != DTERNAL) throw new InvalidTermException(PROPERTY, dt, "needs 2 arg", u);
                 return prop(u[0], u[1]);
             case INSTANCE_PROPERTY:
-                if (arity != 2 || dt != DTERNAL)
-                    throw new InvalidTermException(INSTANCE_PROPERTY, dt, "needs 2 arg", u);
+                if (arity != 2 || dt != DTERNAL) throw new InvalidTermException(INSTANCE_PROPERTY, dt, "needs 2 arg", u);
                 return instprop(u[0], u[1]);
 
 
@@ -163,16 +162,11 @@ public abstract class TermBuilder {
             case SIM:
             case EQUI:
             case IMPL:
-                if (arity != 2) {
-                    throw new InvalidTermException(op, dt, "Statement without exactly 2 arguments", u);
-                }
+                if (arity != 2) throw new InvalidTermException(op, dt, "Statement without exactly 2 arguments", u);
                 return statement(op, dt, u[0], u[1]);
 
             case PROD:
-                if (arity == 0)
-                    return Terms.ZeroProduct;
-                else
-                    return finalize(op, dt, u);
+                return (arity != 0) ? finalize(op, dt, u) : Terms.ZeroProduct;
 
         }
 
@@ -458,22 +452,22 @@ public abstract class TermBuilder {
         //return productNormalize(x);
     }
 
-    @Nullable
+    @NotNull
     public Term inst(Term subj, Term pred) {
         return the(INH, the(SETe, subj), pred);
     }
 
-    @Nullable
+    @NotNull
     public Term prop(Term subj, Term pred) {
         return the(INH, subj, the(SETi, pred));
     }
 
-    @Nullable
+    @NotNull
     public Term instprop(@NotNull Term subj, @NotNull Term pred) {
         return the(INH, the(SETe, subj), the(SETi, pred));
     }
 
-    @Nullable
+    @NotNull
     private Term[] neg(@NotNull Term[] modified) {
         int l = modified.length;
         Term[] u = new Term[l];
@@ -786,8 +780,11 @@ public abstract class TermBuilder {
 
                     case EQUI: {
 
-                        if (subject == predicate)
+                        if ((dt!=0 && dt!=DTERNAL)) {
+                            mustNotEqual = false; //allow repeat
+                        } else if (subject == predicate) {
                             return True;
+                        }
 
                         if (isTrue(subject))  return predicate;
                         if (isFalse(subject)) return neg(predicate);
@@ -817,6 +814,12 @@ public abstract class TermBuilder {
 
                     case IMPL:
 
+
+                        if ((dt!=0 && dt!=DTERNAL)) {
+                            mustNotEqual = false; //allow repeat
+                        } else if (subject==predicate) {
+                            return True;
+                        }
 
                         //special case for implications: reduce to --predicate if the subject is False
                         if (isTrue(subject))
@@ -882,10 +885,6 @@ public abstract class TermBuilder {
                             throw new InvalidTermException(op, dt, "Invalid implication subject", subject, predicate);
                         if (predicate.isAny(InvalidImplicationPredicate))
                             throw new InvalidTermException(op, dt, "Invalid implication predicate", subject, predicate);
-
-                        if ((dt!=0 && dt!=DTERNAL)) {
-                            mustNotEqual = false; //allow repeat
-                        }
 
                         break;
                 }

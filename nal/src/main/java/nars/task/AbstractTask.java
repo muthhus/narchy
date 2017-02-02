@@ -150,14 +150,14 @@ public abstract class AbstractTask extends RawBudget implements Task, Temporal {
 
 
     @Override
-    public void normalize(@NotNull NAR nar) throws Concept.InvalidConceptException, InvalidTaskException {
+    public void normalize(@NotNull NAR n) throws Concept.InvalidConceptException, InvalidTaskException {
 
         if (isDeleted())
             throw new InvalidTaskException(this, "Deleted");
 
         Compound t = term;
 
-        if (!t.levelValid( nar.level() ))
+        if (!t.levelValid( n.level() ))
             throw new InvalidTaskException(this, "Unsupported NAL level");
 
         char punc = punc();
@@ -165,13 +165,13 @@ public abstract class AbstractTask extends RawBudget implements Task, Temporal {
             throw new InvalidTaskException(this, "Unspecified punctuation");
 
 
-        Term ntt = nar.normalize(t);
+        Term ntt = n.normalize(t);
         if (ntt == null || (!(ntt instanceof Compound)))
             throw new InvalidTaskException(t, "Failed normalization");
 
         Compound cntt = (Compound)ntt;
 
-        if (!Task.taskContentValid(cntt, punc, nar.level(), nar.termVolumeMax.intValue(), !Param.DEBUG))
+        if (!Task.taskContentValid(cntt, punc, n.level(), n.termVolumeMax.intValue(), !Param.DEBUG))
             throw new InvalidTaskException(ntt, "Invalid content");
 
         if (ntt!=t) {
@@ -185,7 +185,7 @@ public abstract class AbstractTask extends RawBudget implements Task, Temporal {
             case GOAL:
                 if (truth == null) {
                     //apply the default truth value for specified punctuation
-                    setTruth(nar.truthDefault(punc));
+                    setTruth(n.truthDefault(punc));
                 } else {
 
                     float confLimit = 1f - Param.TRUTH_EPSILON;
@@ -212,7 +212,7 @@ public abstract class AbstractTask extends RawBudget implements Task, Temporal {
 
         // assign a unique stamp if none specified (input)
         if (evidence.length == 0)
-            setEvidence(nar.time.nextStamp());
+            setEvidence(n.time.nextStamp());
 
 
         // if a task has an unperceived creationTime,
@@ -220,7 +220,7 @@ public abstract class AbstractTask extends RawBudget implements Task, Temporal {
         // and adjust occurenceTime if it's not eternal
 
         if (creation() <= Tense.TIMELESS) {
-            long now = nar.time();
+            long now = n.time();
             long oc = occurrence();
             if (oc != ETERNAL)
                 oc += now;
@@ -234,19 +234,19 @@ public abstract class AbstractTask extends RawBudget implements Task, Temporal {
         float q = qua();
         if (q!=q) {
 
-            setPriority(nar.priorityDefault(punc));
+            setPriority(n.priorityDefault(punc));
 
             if (isBeliefOrGoal()) {
                 setQuality(BudgetFunctions.truthToQuality(truth()));
             } else if (!isCommand()) {
-                setQuality(nar.qualityDefault(punc));
+                setQuality(n.qualityDefault(punc));
             }
         }
 
 
         if (dur!=dur) {
             //assign default duration from NAR
-            dur = nar.time.dur();
+            dur = n.time.dur();
         }
 
             //shift the occurrence time if input and dt < 0 and non-eternal HACK dont use log it may be removed without warning

@@ -570,7 +570,9 @@ public class TermReductionsTest {
     }
 
     @Test public void testRepeatEvent() throws Narsese.NarseseException {
-        for (String x : new String[] { "((a) ==>+1 (a))", "((a) &&+1 (a))" }) {
+        Terminal n = new Terminal();
+
+        for (String x : new String[] { "((a) ==>+1 (a))", "((a) &&+1 (a))", "((a) <=>+1 (a))" }) {
             Term t = $(x);
             assertValid(t);
 
@@ -578,7 +580,7 @@ public class TermReductionsTest {
 
             assertEquals(x, y.term().toString());
 
-            y.normalize(new Terminal()); //that normalization doesnt throw
+            y.normalize(n); //that normalization doesnt throw
         }
 
 

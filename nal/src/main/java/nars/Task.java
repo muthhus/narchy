@@ -595,7 +595,7 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
      * if unnormalized, returns a normalized version of the task,
      * null if not normalizable
      */
-    void normalize(@NotNull NAR memory) throws InvalidTaskException, Concept.InvalidConceptException;
+    void normalize(@NotNull NAR n) throws InvalidTaskException, Concept.InvalidConceptException;
 
 
 //    default void ensureValidParentTaskRef() {
