@@ -13,6 +13,6 @@ public class DynamicBeliefTask extends RevisionTask {
 
 
     public DynamicBeliefTask(@NotNull Termed<Compound> term, char punc, Truth conclusion, long creationTime, long occTime, long[] evidence) {
-        super(term, punc, conclusion, creationTime, occTime, evidence);
+        super(term, punc, conclusion, creationTime, occTime, occTime, evidence);
     }
 }

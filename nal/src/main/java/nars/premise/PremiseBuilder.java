@@ -186,10 +186,10 @@ abstract public class PremiseBuilder {
                     Task answered = table.answer(when, now, task, answerTerm, nar.confMin.floatValue());
                     if (answered != null) {
 
-                        boolean exists = nar.tasks.contains(answered);
-                        if (!exists) {
-                            boolean processed = nar.input(answered) != null;
-                        }
+//                        boolean exists = nar.tasks.contains(answered);
+//                        if (!exists) {
+//                            boolean processed = nar.input(answered) != null;
+//                        }
 
                         answered = task.onAnswered(answered, nar);
                         if (answered != null) {

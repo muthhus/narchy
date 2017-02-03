@@ -85,7 +85,7 @@ public class BagTest {
 
 
         BLink<String> agx = a.get("x");
-        RawBudget expect = new RawBudget(0.15f, 0.5f);
+        RawBudget expect = new RawBudget(0.2f, 0.5f);
         assertTrue(agx + "==?==" + expect, expect.equalsBudget(
                 agx, 0.01f));
 
@@ -176,7 +176,7 @@ public class BagTest {
         assertNotNull(a.get("x"));
         a.commit();
 
-        assertEquals(0.125, a.get("x").pri(), 0.001f);
+        assertEquals(0.15, a.get("x").pri(), 0.001f);
     }
 
     void testScalePut2(Bag<String> a) {

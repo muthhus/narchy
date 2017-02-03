@@ -204,7 +204,7 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, Sorted
                 newBelief, oldBelief,
                 conclusion,
                 nar.time(),
-                ETERNAL,
+                ETERNAL, ETERNAL,
                 (CompoundConcept) concept
         ).budget(oldBelief, newBelief);
 

@@ -56,10 +56,10 @@ public class TemporalInductionTest {
         //assertEquals("(b-->a). 5+0 %0.0;.90%", c.beliefs().top(n.time()).toStringWithoutBudget());
 
         //least relevant
-        assertEquals("(b-->a). 0+0 %1.0;.90%", c.beliefs().match(0).toStringWithoutBudget());
+        assertEquals("(b-->a). 0 %1.0;.90%", c.beliefs().match(0).toStringWithoutBudget());
 
         //most current relevant overall:
-        assertEquals("(b-->a). 5+0 %0.0;.90%", c.beliefs().match(n.time()).toStringWithoutBudget());
+        assertEquals("(b-->a). 5 %0.0;.90%", c.beliefs().match(n.time()).toStringWithoutBudget());
     }
 
     @Test public void testTemporalRevisionOfTemporalRelation() {

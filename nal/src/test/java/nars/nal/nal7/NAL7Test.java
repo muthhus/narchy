@@ -743,17 +743,17 @@ public class NAL7Test extends AbstractNALTest {
     public void testDecomposeConjunctionEmbedded() {
         test()
                 .input("(((x) &&+1 (y)) &&+1 (z)). :|:")
-                .mustBelieve(cycles, "((x) &&+1 (y))", 1f, 0.81f, 0)
-                .mustBelieve(cycles, "((y) &&+1 (z))", 1f, 0.81f, 1)
-                .mustBelieve(cycles, "((x) &&+2 (z))", 1f, 0.81f, 0);
+                .mustBelieve(cycles, "((x) &&+1 (y))", 1f, 0.81f, 0, 1)
+                .mustBelieve(cycles, "((y) &&+1 (z))", 1f, 0.81f, 1, 2)
+                .mustBelieve(cycles, "((x) &&+2 (z))", 1f, 0.81f, 0, 2);
     }
     @Test
     public void testDecomposeConjunctionEmbeddedInnerCommute() {
         test()
                 .input("((&&,a,b,c) &&+1 (z)). :|:")
-                .mustBelieve(cycles, "(a &&+1 (z))", 1f, 0.81f, 0)
-                .mustBelieve(cycles, "(b &&+1 (z))", 1f, 0.81f, 0)
-                .mustBelieve(cycles, "(c &&+1 (z))", 1f, 0.81f, 0);
+                .mustBelieve(cycles, "(a &&+1 (z))", 1f, 0.81f, 0, 1)
+                .mustBelieve(cycles, "(b &&+1 (z))", 1f, 0.81f, 0, 1)
+                .mustBelieve(cycles, "(c &&+1 (z))", 1f, 0.81f, 0, 1);
     }
 
 
@@ -858,7 +858,7 @@ public class NAL7Test extends AbstractNALTest {
                 //
                 .inputAt(0, "(x --> a). :|:")
                 .inputAt(16, "(y --> a). :|:")
-                .mustBelieve(cycles, "((x&y)-->a)", 1f, 0.81f, 8)
+                .mustBelieve(cycles, "((x&y)-->a)", 1f, 0.81f, 0,16)
         ;
     }
 

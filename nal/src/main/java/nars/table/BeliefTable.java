@@ -287,7 +287,7 @@ public interface BeliefTable extends TaskTable {
                     answer,
                     answer,
                     question,
-                    aProj, now, when, 0.5f)
+                    aProj, now, when, when, 0.5f)
                     .log("Answer Projected")
                     .budget(answerBudget);
         }

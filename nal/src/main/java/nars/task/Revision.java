@@ -95,7 +95,7 @@ public class Revision {
 
 
 
-    @Nullable public static Task mergeInterpolate(@NotNull Task a, @NotNull Task b, long when, long now, @NotNull Truth newTruth, boolean mergeOrChoose) {
+    @Nullable public static Task mergeInterpolate(@NotNull Task a, @NotNull Task b, long start, long end, long now, @NotNull Truth newTruth, boolean mergeOrChoose) {
         assert (a.punc() == b.punc());
 
         float aw = a.isQuestOrQuestion() ? 0 : a.evi(); //question
@@ -104,7 +104,7 @@ public class Revision {
         float aProp = aw / (aw + bw);
 
         //HACK create a temorary RNG because pulling one up through the method calls would be a mess
-        Random rng = new XorShift128PlusRandom(Util.hashCombine(a.hashCode(), b.hashCode()) << 32 + Util.hashCombine((int) when, (int) now) * 31 + newTruth.hashCode());
+        Random rng = new XorShift128PlusRandom(Util.hashCombine(a.hashCode(), b.hashCode()) << 32 + Util.hashCombine((int) start, (int) now) * 31 + newTruth.hashCode());
 
         MutableFloat accumulatedDifference = new MutableFloat(0);
         Compound cc = compoundOrNull( intermpolate(a.term(), b.term(), aProp, accumulatedDifference, 1f, rng, mergeOrChoose) );
@@ -127,7 +127,7 @@ public class Revision {
 
         MutableTask t = new RevisionTask(cc, a.punc(),
                 newTruth,
-                now, when,
+                now, start, end,
                 evidence
         ).budget(a, b, aProp);
 

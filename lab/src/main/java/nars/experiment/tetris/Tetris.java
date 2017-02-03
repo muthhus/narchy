@@ -456,11 +456,12 @@ public class Tetris extends NAgents {
         public static void main(String[] args) throws Narsese.NarseseException {
             //Param.DEBUG = true;
 
+            FrameTime clock = new FrameTime().dur(3);
             NAR nar =
-                    //NAgents.newMultiThreadNAR(4, new FrameTime().dur(TIME_PER_FALL));
-                    NARBuilder.newALANN(new FrameTime().dur(1), 4, 64, 5, 4, 1);
+                    NAgents.newMultiThreadNAR(4, clock);
+                    //NARBuilder.newALANN(clock, 4, 64, 5, 4, 1);
 
-            nar.termVolumeMax.setValue(24);
+            nar.termVolumeMax.setValue(18);
             //nar.linkFeedbackRate.setValue(0.05f);
 
             //newTimeWindow(nar);
@@ -497,11 +498,11 @@ public class Tetris extends NAgents {
 ////            }
 ////        });
 //
-        float p = 0.25f;
-        nar.DEFAULT_BELIEF_PRIORITY = 1f * p;
+        float p = 0.5f;
+        nar.DEFAULT_BELIEF_PRIORITY = 0.8f * p;
         nar.DEFAULT_GOAL_PRIORITY = 1f * p;
-        nar.DEFAULT_QUESTION_PRIORITY = 1f * p;
-        nar.DEFAULT_QUEST_PRIORITY = 1f * p;
+        nar.DEFAULT_QUESTION_PRIORITY = 0.8f * p;
+        nar.DEFAULT_QUEST_PRIORITY = 0.8f * p;
 
         /*
         nar.onCycle((n)->{

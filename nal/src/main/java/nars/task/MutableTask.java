@@ -161,6 +161,7 @@ public class MutableTask extends AbstractTask {
     @NotNull
     public final MutableTask occurr(long occurrenceTime) {
         setStart(occurrenceTime);
+        setEnd(occurrenceTime);
         return this;
     }
 
@@ -168,6 +169,7 @@ public class MutableTask extends AbstractTask {
     @NotNull
     public MutableTask eternal() {
         setStart(Tense.ETERNAL);
+        setEnd(Tense.ETERNAL);
         return this;
     }
 

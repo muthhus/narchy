@@ -448,6 +448,11 @@ public interface TimeFunctions {
 
             occReturn[0] = occ;
 
+            //TODO decide if this is right
+            int dt = derived.dt();
+            if (derived.op()==CONJ && dt !=DTERNAL)
+                occReturn[1] = occ + derived.dtRange();
+
             return derived;
 
         }
@@ -1146,8 +1151,14 @@ public interface TimeFunctions {
                 if (belOcc!=ETERNAL) {
                     Interval ii = Interval.union(task.start(), task.end(), belief.start(), belief.end() );
                     if (ii != null) {
+
+                        if (ii.b < ii.a) {
+                            throw new RuntimeException();
+                        }
+
                         occReturn[0] = ii.a;
                         occReturn[1] = ii.b;
+
                         return derived;
                     } else {
                         //no intersection: point-like below
@@ -1198,16 +1209,21 @@ public interface TimeFunctions {
         if (!o.temporal) {
             dt = DTERNAL;
         }
-        if (!o.temporal && dt != DTERNAL && dt != 0 && occReturn[0] != ETERNAL) {
-            //something got reduced to a non-temporal, so shift it to the midpoint of what the actual term would have been:
-            occReturn[0] += dt / 2;
-            dt = DTERNAL;
-        }
+//        if (!o.temporal && dt != DTERNAL && dt != 0 && occReturn[0] != ETERNAL) {
+//            //something got reduced to a non-temporal, so shift it to the midpoint of what the actual term would have been:
+//            occReturn[0] += dt / 2;
+//            dt = DTERNAL;
+//        }
         if (derived.dt() != dt) {
             TermContainer ds = derived.subterms();
             @NotNull Term n = terms.the(o, dt, ds);
             if (!(n instanceof Compound))
                 throw new InvalidTermException(o, dt, ds, "Untemporalizable to new DT");
+
+            //TODO decide if this is correct
+            if (derived.op()==CONJ && occReturn[0]!=ETERNAL && occReturn[1] == ETERNAL)
+                occReturn[1] = occReturn[0] + n.dtRange();
+
             return (Compound) n;
         } else {
             return derived;

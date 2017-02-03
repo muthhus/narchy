@@ -20,14 +20,14 @@ public class AnswerTask extends MutableTask {
     @Nullable
     protected Task aBelief, bBelief;
 
-    public AnswerTask(@NotNull Termed<Compound> term, char punc, Truth conclusion, long creationTime, long occTime, long[] evidence) {
+    public AnswerTask(@NotNull Termed<Compound> term, char punc, Truth conclusion, long creationTime, long start, long end, long[] evidence) {
         super(term, punc, conclusion);
         evidence(evidence);
-        time(creationTime, occTime);
+        time(creationTime, start, end);
     }
 
-    public AnswerTask(@NotNull Termed<Compound> term, @NotNull Task aBelief, @NotNull Task bBelief, Truth conclusion, long creationTime, long occTime, float evidenceBalance) {
-        this(term, aBelief.punc(), conclusion, creationTime, occTime, Stamp.zip(aBelief.evidence(), bBelief.evidence(), evidenceBalance));
+    public AnswerTask(@NotNull Termed<Compound> term, @NotNull Task aBelief, @NotNull Task bBelief, Truth conclusion, long creationTime, long start, long end, float evidenceBalance) {
+        this(term, aBelief.punc(), conclusion, creationTime, start, end, Stamp.zip(aBelief.evidence(), bBelief.evidence(), evidenceBalance));
 
         this.aBelief = aBelief;
         this.bBelief = bBelief;

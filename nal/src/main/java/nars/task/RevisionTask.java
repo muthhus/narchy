@@ -27,14 +27,14 @@ public class RevisionTask extends AnswerTask  {
     @Nullable
     private Concept concept;
 
-    public RevisionTask(@NotNull Termed<Compound> term, @NotNull Task newBelief, @NotNull Task oldBelief, Truth conclusion, long creationTime, long occTime, Concept target) {
-        super(term, newBelief, oldBelief, conclusion, creationTime, occTime, 0.5f);
+    public RevisionTask(@NotNull Termed<Compound> term, @NotNull Task newBelief, @NotNull Task oldBelief, Truth conclusion, long creationTime, long start, long end, Concept target) {
+        super(term, newBelief, oldBelief, conclusion, creationTime, start, end, 0.5f);
         this.concept = target;
     }
 
 
-    public RevisionTask(@NotNull Termed<Compound> term, char punc, Truth conclusion, long creationTime, long occTime, long[] evidence) {
-        super(term, punc, conclusion, creationTime, occTime, evidence);
+    public RevisionTask(@NotNull Termed<Compound> term, char punc, Truth conclusion, long creationTime, long start, long end, long[] evidence) {
+        super(term, punc, conclusion, creationTime, start, end, evidence);
     }
 
 //    public RevisionTask(@NotNull Compound c, @NotNull Task a, @NotNull Task b, long now, long newOcc, float aMix, Truth newTruth, Concept target) {

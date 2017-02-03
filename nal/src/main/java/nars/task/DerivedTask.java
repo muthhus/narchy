@@ -36,8 +36,14 @@ abstract public class DerivedTask extends MutableTask {
 
         this.premise = p.premise;
 
-        if (occ!=null)
-            time(now, occ[0], occ[1]);
+
+        if (occ!=null) {
+            long start = occ[0];
+            long end = occ[1];
+            if (end == ETERNAL)
+                end = start;
+            time(now, start, end);
+        }
         else
             time(now, ETERNAL);
 

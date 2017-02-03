@@ -162,7 +162,7 @@ public interface Stamp {
 
             long end = end();
             if (end!=oc) {
-                sb.append('|').append(end);
+                sb.append((char)0x22c8 /* bowtie, horizontal hourglass */).append(end);
             }
 
 

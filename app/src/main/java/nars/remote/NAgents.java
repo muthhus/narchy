@@ -173,9 +173,9 @@ abstract public class NAgents extends NAgent {
 
 
         //Multi nar = new Multi(3,512,
-        Default nar = new Default(2048,
-                conceptsPerCycle, 2, 3, rng,
-                new CaffeineIndex(new DefaultConceptBuilder(), 1024*1024, false, exe)
+        Default nar = new Default(1024,
+                conceptsPerCycle, 1, 3, rng,
+                new CaffeineIndex(new DefaultConceptBuilder(), 128*1024, false, exe)
                 //new TreeTermIndex.L1TreeIndex(new DefaultConceptBuilder(), 300000, 32 * 1024, 3)
 
                 ,

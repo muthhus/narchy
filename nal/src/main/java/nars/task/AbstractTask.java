@@ -226,6 +226,7 @@ public abstract class AbstractTask extends RawBudget implements Task {
 
             this.creation = now;
             setStart(oc);
+            setEnd(oc);
         }
 
 
@@ -418,7 +419,9 @@ public abstract class AbstractTask extends RawBudget implements Task {
     public final Task setCreationTime(long creationTime) {
         if ((this.creation <= Tense.TIMELESS) && (start > Tense.TIMELESS)) {
             //use the occurrence time as the delta, now that this has a "finite" creationTime
-            setStart(start + creationTime);
+            long when = start + creationTime;
+            setStart(when);
+            setEnd(when);
         }
         //if (this.creationTime != creationTime) {
         this.creation = creationTime;
@@ -437,6 +440,7 @@ public abstract class AbstractTask extends RawBudget implements Task {
 //            System.err.println("Likely an invalid occurrence time being set");
 //        }
         if (o != start) {
+
             this.start = o;
             invalidate();
         }
@@ -448,6 +452,11 @@ public abstract class AbstractTask extends RawBudget implements Task {
 //            System.err.println("Likely an invalid occurrence time being set");
 //        }
         if (o != end) {
+            if (start == ETERNAL && o!=ETERNAL)
+                throw new RuntimeException("can not set end time for eternal task");
+            if (o < start)
+                throw new RuntimeException("end must be equal to or greater than start");
+
             this.end = o;
             invalidate();
         }

@@ -344,7 +344,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
     public final BLink<V> put(@NotNull V key, @NotNull Budgeted b, float scale, @Nullable MutableFloat overflow) {
 
 
-        float bp = b.priSafe(-1) * scale;
+        float bp = b.priSafe(-1);
         if (bp < 0) { //already deleted
             return null;
         }
@@ -375,36 +375,36 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
         pressure += pAfter - pBefore;
 
         if (isNew) {
-            if (size() >= capacity && v.pri() < priMin()) {
-                return null; //reject
-            }
+            if (size() < capacity || v.pri() >= priMin()) {
 
+                boolean added;
+                synchronized (items) {
+                    //attempt new insert
+                    if (!updateItems(v)) {
+                        v.delete();
+                        added = false;
+                    } else {
+                        sort();
+                        added = true;
+                    }
+                }
 
-            boolean added;
-            synchronized (items) {
-                //attempt new insert
-                if (!updateItems(v)) {
-                    v.delete();
-                    added = false;
-                } else {
-                    sort();
-                    added = true;
+                if (added) {
+                    onAdded(v);
+                    return v;
                 }
             }
 
-            if (added) {
-                onAdded(v);
-            } else {
-                map.remove(key);
-                return null;
-            }
+            map.remove(key);
+            return null; //reject
+
         } else {
             synchronized (items) {
                 sort(); //TODO see if this works better here, being an adaptive sort: https://en.wikipedia.org/wiki/Smoothsort
             }
+            return v;
         }
 
-        return v;
 
     }
 
