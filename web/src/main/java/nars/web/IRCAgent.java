@@ -65,7 +65,7 @@ public class IRCAgent extends IRC {
         this.nar = nar;
 
 
-        out = new LeakOut(nar, 8, 0.02f) {
+        out = new LeakOut(nar, 8, 0.03f) {
             @Override
             protected float send(Task task) {
                 boolean cmd = task.isCommand();
@@ -252,12 +252,12 @@ public class IRCAgent extends IRC {
 
         Random random = new XorShift128PlusRandom(System.currentTimeMillis());
 
-        MultiThreadExecutioner exe = new MultiThreadExecutioner(2, 1024 * 32);
+        MultiThreadExecutioner exe = new MultiThreadExecutioner(2, 1024 * 16);
         exe.sync(true);
 
         Default nar = new Default(activeConcepts, conceptsPerFrame, 1, 3, random,
 
-                new CaffeineIndex(new DefaultConceptBuilder(), 600 * 1024, false, exe),
+                new CaffeineIndex(new DefaultConceptBuilder(), 256 * 1024, false, exe),
                 //new TreeTermIndex.L1TreeIndex(new DefaultConceptBuilder(), 400000, 64 * 1024, 3),
 
                 new RealTime.CS(true).dur(0.25f),
@@ -265,7 +265,7 @@ public class IRCAgent extends IRC {
         );
 
 
-        int volMax = 32;
+        int volMax = 24;
 
 //        //Multi nar = new Multi(3,512,
 //        Default nar = new Default(2048,
@@ -294,12 +294,11 @@ public class IRCAgent extends IRC {
         //nar.linkFeedbackRate.setValue(0.005f);
 
 
-        MySTMClustered stm = new MySTMClustered(nar, 64, '.', 8, true, 3);
+        MySTMClustered stm = new MySTMClustered(nar, 32, '.', 8, true, 3);
         //MySTMClustered stm2 = new MySTMClustered(nar, 32, '.', 2, true, 2);
 
         new Abbreviation(nar, "_", 3, 12, 0.001f, 8);
         new Inperience(nar, 0.003f, 8);
-
 
         nar.loop(framesPerSecond);
 
@@ -310,26 +309,24 @@ public class IRCAgent extends IRC {
 
         //Param.DEBUG = true;
 
-        @NotNull Default n = newRealtimeNAR(1024, 35, 200);
+        @NotNull Default n = newRealtimeNAR(1024, 25, 200);
 
 
-        Control c = n.getControl();
-        n.setControl(new ChainedControl(c) {
-//            @Override
-//            public void activate(Termed term, float priToAdd) {
-//
-//                synchronized(this) {
-//                    System.out.print(term + " " + priToAdd + "\t===");
-//                    super.activate(term, priToAdd);
-//                    System.out.println(pri(term));
-//                }
-//            }
-        });
-
+//        Control c = n.getControl();
+//        n.setControl(new ChainedControl(c) {
+////            @Override
+////            public void activate(Termed term, float priToAdd) {
+////
+////                synchronized(this) {
+////                    System.out.print(term + " " + priToAdd + "\t===");
+////                    super.activate(term, priToAdd);
+////                    System.out.println(pri(term));
+////                }
+////            }
+//        });
 
 
         Hear.wiki(n);
-
 
         IRCAgent bot = new IRCAgent(n,
                 "experiment1", "irc.freenode.net",

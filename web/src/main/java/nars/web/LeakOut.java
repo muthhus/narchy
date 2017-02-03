@@ -18,7 +18,7 @@ import java.util.function.Consumer;
 abstract public class LeakOut extends Leak<Task> {
 
     public LeakOut(NAR nar, int capacity, float rate) {
-        super(new ArrayBag<Task>(capacity, BudgetMerge.plusBlend, new ConcurrentHashMap<>()), rate, nar);
+        super(new ArrayBag<Task>(capacity, BudgetMerge.maxBlend, new ConcurrentHashMap<>()), rate, nar);
     }
 
     //boolean echoCommandInput = false;

@@ -145,17 +145,17 @@ public interface Stamp {
 
         //however, timeless creation time means it has not been perceived yet
 
-        if (oc == ETERNAL) {
-            if (ct == TIMELESS) {
-                sb.append(":-:");
-            } else {
-                sb.append(':').append(ct).append(':');
-            }
+//        if (oc == ETERNAL) {
+//            if (ct == TIMELESS) {
+//                sb.append(":-:");
+//            } else {
+//                sb.append(':').append(ct).append(':');
+//            }
+//
+//        } else if (oc == TIMELESS) {
+//            sb.append("N/A");
 
-        } else if (oc == TIMELESS) {
-            sb.append("N/A");
-
-        } else {
+        if (oc != ETERNAL) {
             int estTimeLength = 8; /* # digits */
             sb.ensureCapacity(estTimeLength);
             sb.append(oc);

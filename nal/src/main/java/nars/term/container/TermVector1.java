@@ -45,7 +45,7 @@ public class TermVector1 implements TermContainer, Set<Term> {
     }
 
     @Override
-    public @NotNull Term term(int i) {
+    public final @NotNull Term term(int i) {
         if (i!=0)
             throw new ArrayIndexOutOfBoundsException();
         return the;

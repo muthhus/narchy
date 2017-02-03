@@ -28,12 +28,14 @@ public class Hear extends Loop {
 
     private final NAR nar;
     private final Term[] context;
+    private final Term[] contextAnonymous;
     private final List<Term> tokens;
     public final On onReset;
     int token = 0;
 
     float priorityFactor = 1f;
     float confFactor = 1f;
+    float offConf = 0.1f; //nar.confidenceDefault(BELIEF) * confFactor/2f;
 
     /** set wordDelayMS to 0 to disable twenglish function */
     public static Loop hear(NAR nar, String msg, String src, int wordDelayMS) {
@@ -62,6 +64,7 @@ public class Hear extends Loop {
         onReset = nar.eventReset.on(this::onReset);
         tokens = msg;
         context = new Term[]{$.the("hear"), $.quote(who), Op.Imdex};
+        contextAnonymous = new Term[]{$.the("hear"), $.varDep(1), Op.Imdex};
         start(wordDelayMS);
     }
 
@@ -91,20 +94,22 @@ public class Hear extends Loop {
 
     private void hear(Term prev, Term next) {
         Compound term = $.inh(next, $.imge(context));
+        Compound termAnonymous = $.inh(next, $.imge(contextAnonymous));
         //$.inh($.p(prev,next), $.imge(context)), //bigram
         //$.prop(next, (context[1])),
         //$.func("hear", chan_nick, tokens.get(token++))
 
         float onConf = nar.confidenceDefault(BELIEF) * confFactor;
-        float offConf = 0.1f; //nar.confidenceDefault(BELIEF) * confFactor/2f;
 
-        Concept concept = nar.concept(term);
+        {
+            Concept concept = nar.concept(termAnonymous);
 
-        //if (((DefaultBeliefTable) concept.beliefs()).eternal.isEmpty()) {
-        if (concept == null) {
-            //input a constant negative bias - we dont hear the word when it is not spoken
-            //only input when first conceptualized
-            nar.believe(term, Tense.Eternal, 0f, offConf);
+            //if (((DefaultBeliefTable) concept.beliefs()).eternal.isEmpty()) {
+            if (concept == null) {
+                //input a constant negative bias - we dont hear the word when it is not spoken
+                //only input when first conceptualized
+                nar.believe(termAnonymous, Tense.Eternal, 0f, offConf);
+            }
         }
 
         nar.believe(nar.priorityDefault(BELIEF) * priorityFactor,
