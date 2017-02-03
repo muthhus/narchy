@@ -1144,8 +1144,8 @@ public interface TimeFunctions {
             if (taskOcc!=ETERNAL) {
                 long belOcc = belief.occurrence();
                 if (belOcc!=ETERNAL) {
-                    Interval ii = Interval.intersect(task.start(), task.end(), belief.start(), belief.end() );
-                    if (ii.length() > 0) {
+                    Interval ii = Interval.union(task.start(), task.end(), belief.start(), belief.end() );
+                    if (ii != null) {
                         occReturn[0] = ii.a;
                         occReturn[1] = ii.b;
                         return derived;

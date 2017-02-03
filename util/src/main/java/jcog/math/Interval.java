@@ -106,7 +106,11 @@ public class Interval {
 
 	/** Return the longerval in common between this and o */
 	public Interval intersection(Interval other) {
-		return new Interval(max(a, other.a), min(b, other.b));
+		long a = max(this.a, other.a);
+		long b = min(this.b, other.b);
+		if (a > b)
+			return null;
+		return new Interval(a, b);
 	}
 
 	/** Return the longerval with elements from this not in other;

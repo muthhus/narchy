@@ -19,7 +19,7 @@ public class Arkancide extends NAgents {
         //runRT(Arkancide::new);
         //nRT(Arkancide::new, 25, 5);
 
-        NAR nar = runRT((NAR n)-> new Arkancide(n, false), 15, 3, -1);
+        NAR nar = runRT((NAR n)-> new Arkancide(n, false), 15, 4, -1);
 
         //nar.beliefConfidence(0.75f);
         //nar.goalConfidence(0.75f);

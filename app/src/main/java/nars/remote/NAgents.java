@@ -12,7 +12,7 @@ import nars.budget.BudgetMerge;
 import nars.conceptualize.DefaultConceptBuilder;
 import nars.gui.BagChart;
 import nars.gui.Vis;
-import nars.index.term.tree.TreeTermIndex;
+import nars.index.term.map.CaffeineIndex;
 import nars.link.BLink;
 import nars.link.DefaultBLink;
 import nars.nar.Default;
@@ -116,9 +116,9 @@ abstract public class NAgents extends NAgent {
 
     public static NAR runRT(Function<NAR, NAgents> init, float fps, int durFrames, int endTime) {
 
-        //NAR nar = NAgents.newMultiThreadNAR(3, new RealTime.CS(true).dur(durFrames/fps), true);
+        NAR nar = NAgents.newMultiThreadNAR(3, new RealTime.CS(true).dur(durFrames/fps), true);
         //NAR nar = newNAR();
-        NAR nar = newAlann(durFrames/fps);
+        //NAR nar = newAlann(durFrames/fps);
 
         NAgents a = init.apply(nar);
         a.trace = true;
@@ -175,22 +175,21 @@ abstract public class NAgents extends NAgent {
         //Multi nar = new Multi(3,512,
         Default nar = new Default(2048,
                 conceptsPerCycle, 2, 3, rng,
-                //new CaffeineIndex(new DefaultConceptBuilder(rng), 1024*1024, volMax/2, false, exe)
-                new TreeTermIndex.L1TreeIndex(new DefaultConceptBuilder(), 300000, 32 * 1024, 3)
+                new CaffeineIndex(new DefaultConceptBuilder(), 1024*1024, false, exe)
+                //new TreeTermIndex.L1TreeIndex(new DefaultConceptBuilder(), 300000, 32 * 1024, 3)
 
                 ,
-                //new FrameClock()
                 time,
                 exe);
 
-        nar.beliefConfidence(0.75f);
-        nar.goalConfidence(0.75f);
+        nar.beliefConfidence(0.9f);
+        nar.goalConfidence(0.9f);
 
         float p = 0.5f;
-        nar.DEFAULT_BELIEF_PRIORITY = 0.75f * p;
+        nar.DEFAULT_BELIEF_PRIORITY = 1f * p;
         nar.DEFAULT_GOAL_PRIORITY = 1f * p;
-        nar.DEFAULT_QUESTION_PRIORITY = 0.5f * p;
-        nar.DEFAULT_QUEST_PRIORITY = 0.5f * p;
+        nar.DEFAULT_QUESTION_PRIORITY = 1f * p;
+        nar.DEFAULT_QUEST_PRIORITY = 1f * p;
 
         nar.confMin.setValue(0.01f);
         nar.termVolumeMax.setValue(volMax);
@@ -202,7 +201,7 @@ abstract public class NAgents extends NAgent {
                 4, 16,
                 0.01f, 32);
 
-        new Inperience(nar, 0.02f, 16);
+        new Inperience(nar, 0.01f, 16);
 
 //        //causal accelerator
 //        nar.onTask(t -> {

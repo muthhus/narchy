@@ -79,7 +79,7 @@ public interface BudgetMerge extends BiFunction<Budget, Budget, Budget> {
         */
         float eQua = exi.qua();
         float iQua = inc.qua();
-        float iInfluence = iScale * (iQua / (eQua + iQua));
+        float iInfluence = iScale;// * (iQua / (eQua + iQua));
 
 
         float nextPri, nextQua;

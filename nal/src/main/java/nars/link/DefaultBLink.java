@@ -19,7 +19,7 @@ public class DefaultBLink<X> extends RawBudget implements BLink<X> {
 
     public DefaultBLink(@NotNull X id) {
         this.id = id;
-        this.priority = Float.NaN; //begin deleted
+        this.quality = Float.NaN; //begin 'new'
     }
 
     public DefaultBLink(@NotNull X id, float p, float q) {

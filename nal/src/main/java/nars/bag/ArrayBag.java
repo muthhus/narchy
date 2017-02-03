@@ -350,11 +350,12 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
         }
 
         BLink<V> v = map.compute(key, this::newLink);
-        boolean isNew = v.isDeleted();
+        float vq = v.qua();
+        boolean isNew = (vq!=vq) /* NaN */;
         float pBefore;
         if (isNew) {
-            v.setBudget(0, 0);
             pBefore = 0;
+            v.setBudget(0, b.qua()); //use the incoming quality.  budget will be merged
         } else {
             pBefore = v.priSafe(0);
         }
