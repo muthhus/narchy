@@ -81,7 +81,7 @@ public class MySTMClustered extends STMClustered {
     @NotNull
     public double[] getCoord(@NotNull Task t) {
         double[] c = new double[dims];
-        c[0] = t.occurrence(); //time
+        c[0] = t.start(); //time
         c[1] = t.freq(); //0..+1
         c[2] = t.conf(); //0..+1
         return c;
@@ -254,14 +254,14 @@ public class MySTMClustered extends STMClustered {
 
             Task u0 = uu[0];
             Task u1 = uu[1];
-            if (u0.occurrence() <= u1.occurrence()) {
+            if (u0.start() <= u1.start()) {
                 early = u0;
                 late = u1;
             } else {
                 early = u1;
                 late = u0;
             }
-            int dt = (int) (late.occurrence() - early.occurrence());
+            int dt = (int) (late.start() - early.start());
 
 
             return $.seq(

@@ -71,7 +71,7 @@ public class TermKey extends DynByteSeq {
             this.writeByte(punc);
 
 
-            writeLong(task.occurrence());
+            writeLong(task.start());
 
             if ((punc == Op.BELIEF) || (punc == Op.GOAL)) {
                 writeInt(task.truth().hashCode());

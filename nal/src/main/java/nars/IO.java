@@ -61,7 +61,8 @@ public class IO {
             truth = null;
         }
 
-        long occ = in.readLong();
+        long start = in.readLong();
+        long end = in.readLong();
 
         long[] evi = readEvidence(in);
 
@@ -71,7 +72,7 @@ public class IO {
         long cre = in.readLong();
 
 
-        MutableTask mm = new MutableTask(term, punc, truth).time(cre, occ);
+        MutableTask mm = new MutableTask(term, punc, truth).time(cre, start, end);
         mm.evidence(evi);
         mm.setBudget(pri, qua);
         return mm;
@@ -104,7 +105,8 @@ public class IO {
         if (hasTruth(p))
             writeTruth(out, t);
 
-        out.writeLong(t.occurrence());
+        out.writeLong(t.start());
+        out.writeLong(t.end());
 
         writeEvidence(out, t.evidence());
 
@@ -122,7 +124,8 @@ public class IO {
 
         writeBudget(out, t);
 
-        out.writeLong(t.occurrence());
+        out.writeLong(t.start());
+        out.writeLong(t.end());
 
         if (hasTruth(p)) {
             out.writeFloat(t.freq());

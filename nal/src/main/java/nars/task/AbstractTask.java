@@ -42,9 +42,8 @@ import static nars.time.Tense.ETERNAL;
 
      once input, input tasks will have unique serial numbers anyway
  */
-public abstract class AbstractTask extends RawBudget implements Task, Temporal {
+public abstract class AbstractTask extends RawBudget implements Task {
 
-    /** content term of this task */
     @NotNull
     private Compound term;
 
@@ -57,7 +56,7 @@ public abstract class AbstractTask extends RawBudget implements Task, Temporal {
     private long[] evidence = LongArrays.EMPTY_ARRAY;
 
     private long creation = Tense.TIMELESS;
-    private long occurrence = ETERNAL;
+    private long start = ETERNAL, end = ETERNAL;
 
     protected float dur = Float.NaN;
 
@@ -221,12 +220,12 @@ public abstract class AbstractTask extends RawBudget implements Task, Temporal {
 
         if (creation() <= Tense.TIMELESS) {
             long now = n.time();
-            long oc = occurrence();
+            long oc = start();
             if (oc != ETERNAL)
                 oc += now;
 
             this.creation = now;
-            setOccurrence(oc);
+            setStart(oc);
         }
 
 
@@ -293,10 +292,12 @@ public abstract class AbstractTask extends RawBudget implements Task, Temporal {
 
             h = Util.hashCombine(
                     h,
-                    Long.hashCode(occurrence),
-                    t!=null ? t.hashCode() : 1
+                    Long.hashCode(start),
+                    Long.hashCode(end)
             );
 
+            if (t!=null)
+                h = Util.hashCombine(h, t.hashCode());
         }
 
 
@@ -321,8 +322,7 @@ public abstract class AbstractTask extends RawBudget implements Task, Temporal {
         return truth;
     }
 
-    @Override
-    public final void setTruth(@Nullable Truth t) {
+    protected final void setTruth(@Nullable Truth t) {
 
         if (t == null && isBeliefOrGoal())
             throw new InvalidTaskException(this, "null truth for belief or goal");
@@ -333,29 +333,7 @@ public abstract class AbstractTask extends RawBudget implements Task, Temporal {
         }
     }
 
-    /**
-     * Recognize a Question
-     * @return Whether the object is a Question
-     */
-    @Override public final boolean isQuestion() {
-        return (punc == QUESTION);
-    }
 
-    /**
-     * Recognize a Belief (aka Judgment)
-     * @return Whether the object is a Judgment
-     */
-    @Override public final boolean isBelief() {
-        return (punc == BELIEF);
-    }
-
-    @Override public final boolean isGoal() {
-        return (punc == GOAL);
-    }
-
-    @Override public final boolean isQuest() {
-        return (punc == QUEST);
-    }
 
 
 //    @Override
@@ -393,8 +371,8 @@ public abstract class AbstractTask extends RawBudget implements Task, Temporal {
     }
 
     @Override
-    public final long occurrence() {
-        return occurrence;
+    public final long start() {
+        return start;
     }
 
 
@@ -422,7 +400,7 @@ public abstract class AbstractTask extends RawBudget implements Task, Temporal {
             }
 
 
-            int to = Long.compare(occurrence, o.occurrence());
+            int to = Long.compare(start, o.start());
             if (to != 0) return to;
         }
 
@@ -438,9 +416,9 @@ public abstract class AbstractTask extends RawBudget implements Task, Temporal {
     @NotNull
     @Override
     public final Task setCreationTime(long creationTime) {
-        if ((this.creation <= Tense.TIMELESS) && (occurrence > Tense.TIMELESS)) {
+        if ((this.creation <= Tense.TIMELESS) && (start > Tense.TIMELESS)) {
             //use the occurrence time as the delta, now that this has a "finite" creationTime
-            setOccurrence(occurrence + creationTime);
+            setStart(start + creationTime);
         }
         //if (this.creationTime != creationTime) {
         this.creation = creationTime;
@@ -449,20 +427,28 @@ public abstract class AbstractTask extends RawBudget implements Task, Temporal {
         return this;
     }
 
-
-
-
     protected final void invalidate() {
         hash = 0;
     }
 
     /** TODO for external use in MutableTask instances only */
-    public final void setOccurrence(long o) {
-        if ((o == Integer.MIN_VALUE || o == Integer.MAX_VALUE) && Param.DEBUG) {
-            System.err.println("Likely an invalid occurrence time being set");
+    public final void setStart(long o) {
+//        if ((o == Integer.MIN_VALUE || o == Integer.MAX_VALUE) && Param.DEBUG) {
+//            System.err.println("Likely an invalid occurrence time being set");
+//        }
+        if (o != start) {
+            this.start = o;
+            invalidate();
         }
-        if (o != occurrence) {
-            this.occurrence = o;
+    }
+
+    /** TODO for external use in MutableTask instances only */
+    public final void setEnd(long o) {
+//        if ((o == Integer.MIN_VALUE || o == Integer.MAX_VALUE) && Param.DEBUG) {
+//            System.err.println("Likely an invalid occurrence time being set");
+//        }
+        if (o != end) {
+            this.end = o;
             invalidate();
         }
     }
@@ -488,8 +474,8 @@ public abstract class AbstractTask extends RawBudget implements Task, Temporal {
 
         return this == that ||
                 (that!=null  &&
-                    hashCode() == that.hashCode() &&
                     that instanceof Task &&
+                    hashCode() == that.hashCode() &&
                     equivalentTo((Task) that, true, true, true, true, true));
 
     }
@@ -501,7 +487,7 @@ public abstract class AbstractTask extends RawBudget implements Task, Temporal {
             return false;
 
         if (evidence.length > 1) {
-            if (occurrenceTime && (this.occurrence != that.occurrence()))
+            if (occurrenceTime && (this.start != that.start()) || (this.end != that.end()))
                 return false;
 
             if (truth && !Objects.equals(this.truth, that.truth()))
@@ -600,26 +586,25 @@ public abstract class AbstractTask extends RawBudget implements Task, Temporal {
         //return op.statement || term.vars() > 0;
     }
 
-    @Override
-    public long start() {
-        return occurrence();
-    }
+
 
     /** end occurrence */
-    @Override public long end() {
+    @Override public final long end() {
 
-        //return occurrence();
-        long p = occurrence();
-        if (p == ETERNAL)
-            return ETERNAL;
+        return end;
 
-        long dt = 0;
-        if (op().temporal) {
-            dt=dt();
-            if (dt==DTERNAL)
-                dt = 0;
-        }
-        return p + dt;
+//        //return occurrence();
+//        long p = start();
+//        if (p == ETERNAL)
+//            return ETERNAL;
+//
+//        long dt = 0;
+//        if (op().temporal) {
+//            dt=dt();
+//            if (dt==DTERNAL)
+//                dt = 0;
+//        }
+//        return p + dt;
     }
 
     @Override

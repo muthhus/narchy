@@ -39,9 +39,9 @@ public class Predict_NARS_Core {
         //n.param.conceptForgetDurations.set(16);
 
         n.eventTaskProcess.on(t -> {
-            if (!t.isDeleted() && t.isBelief() && t.op()== Op.PROD && t.term().volume()==2 &&  !t.isEternal() && t.occurrence() > n.time() && t.expectation()>0.5) {
+            if (!t.isDeleted() && t.isBelief() && t.op()== Op.PROD && t.term().volume()==2 &&  !t.isEternal() && t.start() > n.time() && t.expectation()>0.5) {
 
-                long time = (int) t.occurrence();
+                long time = (int) t.start();
                 String ts = t.term().toString();
                 if (ts.startsWith("(y")) {
                     predict(time, t);

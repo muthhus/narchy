@@ -31,7 +31,7 @@ abstract public class TemporalStabilityTest {
 
             for (Task tt : m.values()) {
 
-                long o = tt.occurrence();
+                long o = tt.start();
                 if (!validOccurrence(o)) {
                     if (irregular.add(tt)) { //already detected?
                         System.err.println("  instability: " + tt + "\n" + tt.proof() + "\n");

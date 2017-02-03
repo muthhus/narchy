@@ -185,23 +185,12 @@ public class ScalarSignal implements Consumer<NAR>, DoubleSupplier {
 
     public static class SignalTask extends MutableTask {
 
-        long end;
 
         public SignalTask(@NotNull Termed<Compound> t, char punct, @Nullable Truth truth, long start)  {
             super(t, punct, truth);
             time(start, start);
-
-            end = start;
         }
 
-        public void setEnd(long end) {
-            this.end = end;
-        }
-
-        @Override
-        public long end() {
-            return end;
-        }
     }
 
     @Nullable

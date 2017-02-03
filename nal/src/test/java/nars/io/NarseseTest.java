@@ -403,8 +403,8 @@ public class NarseseTest {
         Task now = task("<a --> b>. :|:");
         Task f = task("<a --> b>. :/:");
         Task p = task("<a --> b>. :\\:");
-        assertTrue(now.occurrence() > p.occurrence());
-        assertTrue(now.occurrence() < f.occurrence());
+        assertTrue(now.start() > p.start());
+        assertTrue(now.start() < f.start());
     }
 
     @Test

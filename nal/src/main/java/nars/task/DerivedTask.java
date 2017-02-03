@@ -26,7 +26,6 @@ abstract public class DerivedTask extends MutableTask {
     @Nullable
     public volatile transient Premise premise;
 
-    private final long end;
 
     //@Nullable long[] startEnd;
 
@@ -37,9 +36,10 @@ abstract public class DerivedTask extends MutableTask {
 
         this.premise = p.premise;
 
-        time(now, occ != null ? occ[0] : ETERNAL);
-
-        end = occ != null ? occ[1] : ETERNAL;
+        if (occ!=null)
+            time(now, occ[0], occ[1]);
+        else
+            time(now, ETERNAL);
 
         evidence(evidence);
 
@@ -100,12 +100,6 @@ abstract public class DerivedTask extends MutableTask {
         return p != null ? p.belief : null;
     }
 
-    @Override
-    public long end() {
-        if (end!=ETERNAL)
-            return end;
-        return super.end();
-    }
 
     //    /** next = the child which resulted from this and another task being revised */
 //    @Override public boolean onRevision(@NotNull Task next) {

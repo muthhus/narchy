@@ -135,9 +135,18 @@ public class MutableTask extends AbstractTask {
     }
 
     @NotNull
+    public MutableTask time(long creationTime, long start, long end) {
+        setCreationTime(creationTime);
+        setStart(start);
+        setEnd(end);
+        return this;
+    }
+
+    @NotNull
     public MutableTask time(long creationTime, long occurrenceTime) {
         setCreationTime(creationTime);
-        setOccurrence(occurrenceTime);
+        setStart(occurrenceTime);
+        setEnd(occurrenceTime);
         return this;
     }
 
@@ -151,14 +160,14 @@ public class MutableTask extends AbstractTask {
 
     @NotNull
     public final MutableTask occurr(long occurrenceTime) {
-        setOccurrence(occurrenceTime);
+        setStart(occurrenceTime);
         return this;
     }
 
 
     @NotNull
     public MutableTask eternal() {
-        setOccurrence(Tense.ETERNAL);
+        setStart(Tense.ETERNAL);
         return this;
     }
 
@@ -287,7 +296,7 @@ public class MutableTask extends AbstractTask {
         MutableTask yt = new MutableTask(y, xt.punc(), xt.truth());
         yt.setBudget(xt);
         yt.setEvidence(xt.evidence());
-        yt.time(xt.creation(), xt.occurrence());
+        yt.time(xt.creation(), xt.start());
         return yt;
     }
 

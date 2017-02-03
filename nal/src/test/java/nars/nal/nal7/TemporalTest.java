@@ -38,7 +38,7 @@ public class TemporalTest {
     public void parsedCorrectOccurrenceTime() throws Narsese.NarseseException {
         Task t = n.inputAndGet("<a --> b>. :\\:");
         assertEquals(0, t.creation());
-        assertEquals(-(1 /*n.duration()*/), t.occurrence());
+        assertEquals(-(1 /*n.duration()*/), t.start());
     }
 
     @Test

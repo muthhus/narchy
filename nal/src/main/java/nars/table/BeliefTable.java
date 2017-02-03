@@ -278,7 +278,7 @@ public interface BeliefTable extends TaskTable {
 //                return null;
 
         //project if different occurrence
-        if (answer.occurrence() != when) {
+        if (answer.start() != when) {
             Truth aProj = answer.truth(when, minConf);
             if (aProj == null)
                 return null;

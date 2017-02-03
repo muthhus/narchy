@@ -123,11 +123,11 @@ abstract public class events extends AtomicBoolCondition {
         if (b == null)
             return DTERNAL;
 
-        long tOcc = a.occurrence();
+        long tOcc = a.start();
         if (tOcc == ETERNAL)
             return DTERNAL;
 
-        long bOcc = b.occurrence();
+        long bOcc = b.start();
         if (bOcc == ETERNAL)
             return DTERNAL;
 
@@ -147,7 +147,7 @@ abstract public class events extends AtomicBoolCondition {
         public boolean run(@NotNull Derivation m, int now) {
             Task b = m.belief;
             if (b == null) return false;
-            return m.task.occurrence() == ETERNAL && b.occurrence() == ETERNAL;
+            return m.task.start() == ETERNAL && b.start() == ETERNAL;
         }
     };
 
@@ -168,10 +168,10 @@ abstract public class events extends AtomicBoolCondition {
             Task b = m.belief;
             if (b == null) return false;
 
-            long bOcc = b.occurrence();
+            long bOcc = b.start();
             boolean bEternal = (bOcc == ETERNAL);
 
-            long tOcc = m.task.occurrence();
+            long tOcc = m.task.start();
             boolean tEternal = (tOcc == ETERNAL);
             return tEternal ? bEternal : (!bEternal && (bOcc <= tOcc));
         }

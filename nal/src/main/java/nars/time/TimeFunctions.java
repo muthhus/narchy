@@ -297,7 +297,7 @@ public interface TimeFunctions {
 
         if (occA!=DTERNAL && occB!=DTERNAL) {
             int dt = occB - occA;
-            occReturn[0] = p.task.occurrence() + Math.min(occA, occB);
+            occReturn[0] = p.task.start() + Math.min(occA, occB);
             return deriveDT(derived, +1, p, dt, occReturn);
         } else {
             return null;
@@ -324,7 +324,7 @@ public interface TimeFunctions {
             return decompose(derived, p, occReturn, true);
             //}
         } else {
-            occReturn[0] = task.occurrence();
+            occReturn[0] = task.start();
 
             //3 or more
             if (derived.op() == CONJ) {
@@ -353,12 +353,12 @@ public interface TimeFunctions {
         Compound decomposedTerm = (Compound) (decomposeTask ? p.taskTerm : p.beliefTerm);
         //int dtDecomposed = decomposedTerm.dt();
 
-        long occDecomposed = decomposeTask ? task.occurrence() : (belief != null ? belief.occurrence() : task.occurrence());
+        long occDecomposed = decomposeTask ? task.start() : (belief != null ? belief.start() : task.start());
 
         //the non-decomposed counterpart of the premise
 
 
-        long occOther = (otherTask != null) ? otherTask.occurrence() : ETERNAL;
+        long occOther = (otherTask != null) ? otherTask.start() : ETERNAL;
 
 
         if ((occDecomposed == ETERNAL) && (occOther == ETERNAL)) {
@@ -560,10 +560,10 @@ public interface TimeFunctions {
         Task t = p.task;
         Task b = p.belief;
 
-        long tOcc = t.occurrence();
+        long tOcc = t.start();
         if (b!=null) {
             if (t.isQuestOrQuestion() || tOcc==ETERNAL)
-                tOcc = b.occurrence(); //use belief time when task is a question, or task is eternal
+                tOcc = b.start(); //use belief time when task is a question, or task is eternal
         }
 
         if (!taskOrBelief && b != null) {
@@ -938,8 +938,8 @@ public interface TimeFunctions {
 
                 }
 
-                long to = task.occurrence();
-                long bo = belief != null ? belief.occurrence() : to;
+                long to = task.start();
+                long bo = belief != null ? belief.start() : to;
 
                 int occDiff = (to != ETERNAL && bo != ETERNAL) ? (int) (bo - to) : 0;
 
@@ -1096,7 +1096,7 @@ public interface TimeFunctions {
                             occ += ot; //occ + ot;
                         } else if (ob != DTERNAL) {
 
-                            if (belief.occurrence() != task.occurrence()) { //why?
+                            if (belief.start() != task.start()) { //why?
                                 if (bp instanceof Compound) {
                                     Compound cbp = (Compound) bp;
                                     if (!derivationMatch(cbp.term(1), cp)) {
@@ -1140,9 +1140,9 @@ public interface TimeFunctions {
         }
 
         if (belief!=null) {
-            long taskOcc = task.occurrence();
+            long taskOcc = task.start();
             if (taskOcc!=ETERNAL) {
-                long belOcc = belief.occurrence();
+                long belOcc = belief.start();
                 if (belOcc!=ETERNAL) {
                     Interval ii = Interval.union(task.start(), task.end(), belief.start(), belief.end() );
                     if (ii != null) {
@@ -1168,12 +1168,12 @@ public interface TimeFunctions {
 
     static long occInterpolate(@NotNull Task t, @Nullable Task b, Derivation p) {
 
-        long to = t.occurrence();
+        long to = t.start();
         if (b == null) {
             return to;
         }
 
-        long bo = b.occurrence();
+        long bo = b.start();
         if (t.isQuestOrQuestion() || to==ETERNAL)
             return bo; //use belief time when task is a question, or task is eternal
 

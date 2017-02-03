@@ -129,7 +129,7 @@ public class PrologCore extends PrologAgent implements Consumer<Task> {
                 /* else: UNSURE */
             }
         } else if (task.isQuestion()) {
-            if (task.isEternal() || task.occurrence() == nar.time()) {
+            if (task.isEternal() || task.start() == nar.time()) {
                 question(task);
             }
         }

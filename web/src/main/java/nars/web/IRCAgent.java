@@ -281,10 +281,13 @@ public class IRCAgent extends IRC {
 
         float p = 1f;
         nar.DEFAULT_BELIEF_PRIORITY = 0.8f * p;
-        nar.DEFAULT_QUESTION_PRIORITY = 0.5f * p;
-        nar.DEFAULT_QUESTION_QUALITY = 0.9f * p;
         nar.DEFAULT_GOAL_PRIORITY = 0.8f * p;
+
+        nar.DEFAULT_QUESTION_PRIORITY = 0.5f * p;
         nar.DEFAULT_QUEST_PRIORITY = 0.5f * p;
+
+        nar.DEFAULT_QUESTION_QUALITY = 0.5f;
+        nar.DEFAULT_QUEST_QUALITY = 0.5f;
 
         nar.confMin.setValue(0.01f);
         nar.termVolumeMax.setValue(volMax);
@@ -294,8 +297,8 @@ public class IRCAgent extends IRC {
         MySTMClustered stm = new MySTMClustered(nar, 64, '.', 8, true, 3);
         //MySTMClustered stm2 = new MySTMClustered(nar, 32, '.', 2, true, 2);
 
-        //new Abbreviation(nar, "_", 3, 12, 0.001f, 8);
-        //new Inperience(nar, 0.003f, 8);
+        new Abbreviation(nar, "_", 3, 12, 0.001f, 8);
+        new Inperience(nar, 0.003f, 8);
 
 
         nar.loop(framesPerSecond);

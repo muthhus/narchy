@@ -59,7 +59,7 @@ import static nars.time.Tense.ETERNAL;
                 Compound c = g.term();
                 Task b = null;
                 if (c.vars() == 0 && c.varPattern() == 0) {
-                    long occurrence = g.occurrence();
+                    long occurrence = g.start();
                     if (occurrence == ETERNAL || occurrence >= nar.time()) {
                         b = nar.believe(g.priSafe(0), c, occurrence, g.freq(), nar.confidenceDefault(BELIEF));
                     }

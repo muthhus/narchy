@@ -152,7 +152,7 @@ public class BeliefTableChart extends Widget {
                 if (tl != null) {
                     Task x = tl.get();
                     if ((x != null) && (x.isBeliefOrGoal())) {
-                        long o = x.occurrence();
+                        long o = x.start();
                         float tlx = o == ETERNAL ? nowX : xTime(minT, maxT, o);
                         if (tlx > 0 && tlx < 1) {
                             float tly = x.freq();

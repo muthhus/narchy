@@ -358,7 +358,7 @@ public class TestNAR  {
         if (t.truth()!=null) {
             float freq = t.freq();
             float conf = t.conf();
-            long occurrence = t.occurrence();
+            long occurrence = t.start();
             return mustEmit(c, now, now + withinCycles, termString, t.punc(), freq, freq, conf, conf, occurrence);
         }
         else {

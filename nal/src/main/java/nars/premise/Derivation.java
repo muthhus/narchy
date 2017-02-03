@@ -302,12 +302,12 @@ public class Derivation extends Unify {
 
 
     public final long occurrenceTarget(@NotNull OccurrenceSolver s) {
-        long tOcc = task.occurrence();
+        long tOcc = task.start();
         Task b = belief;
         if (b == null) {
             return tOcc;
         } else {
-            long bOcc = b.occurrence();
+            long bOcc = b.start();
             return s.compute(tOcc, bOcc);
 
 //            //if (bOcc == ETERNAL) {

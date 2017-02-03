@@ -25,7 +25,8 @@ import org.jetbrains.annotations.Nullable;
 import java.io.IOException;
 import java.util.List;
 
-import static nars.Op.VAR_INDEP;
+import static nars.Op.*;
+import static nars.Op.QUEST;
 import static nars.time.Tense.ETERNAL;
 import static nars.truth.TruthFunctions.w2c;
 
@@ -39,9 +40,29 @@ import static nars.truth.TruthFunctions.w2c;
  */
 public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed<Compound>, Tasked {
 
+    char punc();
+
+
+    @Override
+    long creation();
+
+    @NotNull
+    @Override
+    Compound term();
+
+
+    long start();
+    long end();
+
+
+    /**
+     * duration time constant in which evidence diminishes at a time before start() and after end()
+     */
+    float dur();
+
+
     static void proof(@NotNull Task task, int indent, @NotNull Appendable sb) {
         //TODO StringBuilder
-
 
         try {
             for (int i = 0; i < indent; i++)
@@ -52,17 +73,6 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-
-//        List l = task.getLog();
-//        if (l!=null)
-//            sb.append(" log=").append(l);
-
-//        if (task.getBestSolution() != null) {
-//            if (!task.term().equals(task.getBestSolution().term())) {
-//                sb.append(" solution=");
-//                task.getBestSolution().appendTo(sb);
-//            }
-//        }
 
 
         Task pt = task.getParentTask();
@@ -78,17 +88,7 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
         }
     }
 
-//    static Set<Truthed> getSentences(Iterable<Task> tasks) {
-//
-//        int size;
-//
-//        size = tasks instanceof Collection ? ((Collection) tasks).size() : 2;
-//
-//        Set<Truthed> s = Global.newHashSet(size);
-//        for (Task t : tasks)
-//            s.add(t);
-//        return s;
-//    }
+
 
 
     @Nullable
@@ -161,39 +161,6 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
             throw new InvalidTaskException(t, reason);
     }
 
-//    static boolean hasCoNegatedAtemporalConjunction(Term term) {
-//        if (term instanceof Compound) {
-//
-//            Compound cterm = ((Compound) term);
-//
-//            int dt = cterm.dt();
-//            if (term.op() == CONJ && (dt ==DTERNAL || dt == 0) && cterm.subterms().hasAny(NEG)) {
-//                int s = cterm.size();
-//                for (int i = 0; i < s; i++) {
-//                    Term x = cterm.term(i);
-//                    if (x.op() == NEG) {
-//                        if (cterm.containsTerm(((Compound) x).term(0))) {
-//                            return true;
-//                        }
-//                    }
-//                }
-//            }
-//
-//            if (term.hasAll(CONJUNCTION_WITH_NEGATION)) {
-//                return term.or(Task::hasCoNegatedAtemporalConjunction);
-//            }
-//        }
-//        return false;
-//
-//    }
-
-//    static float prioritySum(@NotNull Iterable<? extends Budgeted > dd) {
-//        float f = 0;
-//        for (Budgeted  x : dd)
-//            f += x.pri();
-//        return f;
-//    }
-
 
     @Override
     @NotNull
@@ -211,83 +178,22 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
     boolean equivalentTo(@NotNull Task that, boolean punctuation, boolean term, boolean truth, boolean stamp, boolean creationTime);
 
 
-//
-//    /** projects a belief task to match a question */
-//    @Nullable default Task projectMatched(@NotNull Task question, @NotNull Memory memory, float minConf) {
-//
-//        assert(!question.isEternal());
-//        if (question.occurrence() == occurrence())
-//            return this; //exact time already
-//
-//        long now = memory.time();
-//
-//
-//        @NotNull Compound theTerm = term();
-//
-//
-//        //TODO avoid creating new Truth instances
-//        Truth solTruth = projectTruth(question.occurrence(), now, false);
-//        /*if (solTruth == null)
-//            return null;*/
-//
-//        if (solTruth.conf() < minConf)
-//            return null;
-//
-//        //if truth instanceof ProjectedTruth, use its attached occ time (possibly eternal or temporal), otherwise assume it is this task's occurence time
-//        long solutionOcc = solTruth instanceof ProjectedTruth ?
-//                ((ProjectedTruth)solTruth).when : occurrence();
-//
-//
-//
-//        Budget solutionBudget = solutionBudget(question, this, solTruth, memory);
-//        /*if (solutionBudget == null)
-//            return null;*/
-//
-//        Task solution;
-//        //if ((!truth().equals(solTruth)) || (!newTerm.equals(term())) || (solutionOcc!= occCurrent)) {
-//        solution = new MutableTask(theTerm, punc(), solTruth)
-//                .time(now, solutionOcc)
-//                .parent(this)
-//                .budget(solutionBudget)
-//                //.state(state())
-//                //.setEvidence(evidence())
-//                .log("Projected Belief")
-//                //.log("Projected from " + this)
-//        ;
-//
-//        return solution;
-//    }
 
 
-    char punc();
-
-//    @Nullable
-//    @Override
-//    long[] evidence();
-
-    @Override
-    long creation();
-
-    @NotNull
-    @Override
-    Task setCreationTime(long c);
-
-    boolean isQuestion();
-
-    boolean isQuest();
-
-    boolean isBelief();
-
-    boolean isGoal();
+    default boolean isQuestion() { return (punc() == QUESTION);     }
+    default boolean isBelief() {
+        return (punc() == BELIEF);
+    }
+    default boolean isGoal() {
+        return (punc() == GOAL);
+    }
+    default boolean isQuest() {
+        return (punc() == QUEST);
+    }
 
     default boolean isCommand() {
-        return (punc() == Op.COMMAND);
+        return (punc() == COMMAND);
     }
-
-    default boolean hasQueryVar() {
-        return term().hasVarQuery();
-    }
-
 
     @Nullable
     default Appendable appendTo(Appendable sb) throws IOException {
@@ -298,11 +204,6 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
     default Appendable toString(NAR memory, boolean showStamp) throws IOException {
         return appendTo(new StringBuilder(), memory, showStamp);
     }
-
-
-    @Override
-    boolean delete();
-
 
     @Nullable
     default Concept concept(@NotNull NAR n) {
@@ -315,9 +216,6 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
      */
     void feedback(TruthDelta delta, float deltaConfidence, float deltaSatisfaction, NAR nar);
 
-    @NotNull
-    @Override
-    Compound term();
 
 
     default boolean isQuestOrQuestion() {
@@ -345,7 +243,7 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
             ArrayBag<Task> answers = concept(nar).computeIfAbsent(Op.QUESTION, () ->
                 new ArrayBag<>(BudgetMerge.maxHard, new SynchronizedHashMap<>()).capacity(Param.MAX_INPUT_ANSWERS)
             );
-            float confEffective = answer.conf(occurrence());
+            float confEffective = answer.conf(start());
             if (answers.putIfAbsent(answer, new RawBudget(1f, confEffective))) {
                 answers.commit();
                 Command.log(nar, this.toString() + "  " + answer.toString());
@@ -604,7 +502,6 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
 //    }
 
 
-    void setTruth(@NotNull Truth t);
 
 
 //
@@ -641,13 +538,13 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
 //    }
 
     default boolean isEternal() {
-        return occurrence() == ETERNAL;
+        return start() == ETERNAL;
     }
 
 
     default String getTense(long currentTime, int duration) {
 
-        long ot = occurrence();
+        long ot = start();
 
         if (Tense.isEternal(ot)) {
             return "";
@@ -662,13 +559,6 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
                 return Op.TENSE_PRESENT;
         }
     }
-
-
-    @Override
-    default long occurrence() {
-        return ETERNAL;
-    }
-
 
 //    default Truth projection(long targetTime, long now) {
 //        return projection(targetTime, now, true);
@@ -731,7 +621,7 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
 
 
     default boolean temporal() {
-        return occurrence() != ETERNAL;
+        return start() != ETERNAL;
     }
 
 
@@ -775,14 +665,8 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
      */
     float confWeight(long when);
 
-    long start();
 
-    long end();
 
-    /**
-     * duration time constant in which evidence diminishes at a time before start() and after end()
-     */
-    float dur();
 
     default long mid() {
         return Math.round((start() + end()) / 2L);

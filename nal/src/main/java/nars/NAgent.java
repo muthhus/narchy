@@ -676,7 +676,7 @@ abstract public class NAgent implements NSense, NAction {
 
         MutableTask s;
         char pp = t.punc();
-        if (t.occurrence() != ETERNAL) {
+        if (t.start() != ETERNAL) {
             s = (t instanceof PredictionTask) ? new PredictionTask(t.term(), pp) : new MutableTask(t.term(), pp, t.truth());
             s.budgetByTruth(p, nar)
                 .time(now, now + frameTime)

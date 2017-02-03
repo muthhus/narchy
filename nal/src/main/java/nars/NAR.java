@@ -1159,7 +1159,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
         for (Task y : x) {
             MutableTask my = (MutableTask) y;
             my.setCreationTime(time);
-            if (my.occurrence() != ETERNAL)
+            if (my.start() != ETERNAL)
                 my.occurr(time);
         }
 

@@ -135,7 +135,7 @@ public interface Stamp {
 
     @NotNull
     default StringBuilder appendOccurrenceTime(@NotNull StringBuilder sb) {
-        long oc = occurrence();
+        long oc = start();
         long ct = creation();
 
         /*if (oc == Stamp.TIMELESS)
@@ -158,12 +158,20 @@ public interface Stamp {
         } else {
             int estTimeLength = 8; /* # digits */
             sb.ensureCapacity(estTimeLength);
-            sb.append(ct);
+            sb.append(oc);
 
-            long OCrelativeToCT = (oc - ct);
-            if (OCrelativeToCT >= 0)
-                sb.append('+'); //+ sign if positive or zero, negative sign will be added automatically in converting the int to string:
-            sb.append(OCrelativeToCT);
+            long end = end();
+            if (end!=oc) {
+                sb.append('|').append(end);
+            }
+
+
+            //sb.append(ct);
+
+//            long OCrelativeToCT = (oc - ct);
+//            if (OCrelativeToCT >= 0)
+//                sb.append('+'); //+ sign if positive or zero, negative sign will be added automatically in converting the int to string:
+//            sb.append(OCrelativeToCT);
 
         }
 
@@ -184,7 +192,7 @@ public interface Stamp {
         /*if (creation() == TIMELESS) {
             buffer.append('?');
         } else */
-        if (!Tense.isEternal(occurrence())) {
+        if (!Tense.isEternal(start())) {
             appendOccurrenceTime(buffer);
         } else {
             buffer.append(creation());
@@ -332,7 +340,8 @@ public interface Stamp {
     }
 
     long creation();
-    long occurrence();
+    long start();
+    long end();
 
     @NotNull
     Stamp setCreationTime(long t);

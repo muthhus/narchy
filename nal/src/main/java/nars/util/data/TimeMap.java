@@ -23,7 +23,7 @@ public class TimeMap extends IntervalTree<Long, Task> implements Consumer<Task> 
     @Override
     public void accept(@NotNull Task task) {
         if (!task.isEternal()) {
-            put(task.occurrence(), task);
+            put(task.start(), task);
         }
     }
 

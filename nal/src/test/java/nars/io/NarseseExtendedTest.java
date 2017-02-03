@@ -40,13 +40,13 @@ public class NarseseExtendedTest {
         tensed(t, false, w);
     }
     void tensed(@NotNull Task t, boolean eternal, @NotNull Tense w) {
-        assertEquals(eternal, isEternal(t.occurrence()));
+        assertEquals(eternal, isEternal(t.start()));
         if (!eternal) {
             switch (w) {
-                case Past: assertTrue(t.occurrence() < 0); break;
-                case Future: assertTrue(t.occurrence() > 0); break;
-                case Present: assertEquals(0, t.occurrence()); break;
-                case Eternal: assertEquals(ETERNAL, t.occurrence()); break;
+                case Past: assertTrue(t.start() < 0); break;
+                case Future: assertTrue(t.start() > 0); break;
+                case Present: assertEquals(0, t.start()); break;
+                case Eternal: assertEquals(ETERNAL, t.start()); break;
             }
         }
     }

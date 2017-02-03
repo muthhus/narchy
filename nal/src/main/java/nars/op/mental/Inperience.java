@@ -214,7 +214,7 @@ public class Inperience extends Leak<Task> {
         public InperienceTask(Task task, Compound c, long now, float conf) {
             super(c, BELIEF, $.t(1, conf));
 
-            time(now, task.occurrence() != ETERNAL ? task.occurrence() : now)
+            time(now, task.start() != ETERNAL ? task.start() : now)
                     .budgetByTruth(task.priSafe(0))
                     .evidence(task)
                     .because("Inperience");

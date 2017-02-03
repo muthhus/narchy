@@ -49,9 +49,9 @@ public class IfTermLinkBefore extends events {
         int ttdt = tt.dt();
 
 
-        if ((belief != null) && (belief.occurrence() != ETERNAL) && (task.occurrence() != ETERNAL)) {
+        if ((belief != null) && (belief.start() != ETERNAL) && (task.start() != ETERNAL)) {
             //only allow a belief if it occurred before or during the task's specified occurrence
-            if (belief.occurrence() > task.occurrence())
+            if (belief.start() > task.start())
                 return false;
         }
 

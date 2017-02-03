@@ -457,38 +457,6 @@ public enum $ {
         return terms.disjunction(a);
     }
 
-    //static {
-//        // assume SLF4J is bound to logback in the current environment
-//        LoggerContext context = (LoggerContext) LoggerFactory.getILoggerFactory();
-//
-//        try {
-//            JoranConfigurator configurator = new JoranConfigurator();
-//            configurator.setContext(context);
-//            // Call context.reset() to clear any previous configuration, e.g. default
-//            // configuration. For multi-step configuration, omit calling context.reset().
-//            context.reset();
-//            //configurator.doConfigure(args[0]);
-//        } catch (Exception je) {
-//            // StatusPrinter will handle this
-//        }
-//        StatusPrinter.printInCaseOfErrorsOrWarnings(context);
-//
-//        Logger logger = LoggerFactory.getLogger($.class);
-//        logger.info("Entering application.");
-//
-//
-//
-//        logger.info("Exiting application.");
-//
-//        LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
-//        // print logback's internal status
-//        StatusPrinter.print(lc);
-//
-//        // assume SLF4J is bound to logback-classic in the current environment
-//        LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
-//        loggerContext.start();
-//        //loggerContext.stop();
-    //}
 
     @NotNull
     public static final Logger LOG;

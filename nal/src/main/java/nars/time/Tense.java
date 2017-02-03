@@ -61,7 +61,7 @@ public enum Tense  {
 //    }
 
     public static float solutionQuality(@NotNull Task problem, @NotNull Task solution, @NotNull Truth projectedTruth, long now) {
-        return !problem.hasQueryVar() ?
+        return !problem.term().hasVarQuery() ?
                     BeliefTable.rankEternalByConfAndOriginality(solution) :
                     or(solution.originality(), projectedTruth.expectation() / solution.term().complexity());
     }

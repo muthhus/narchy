@@ -36,7 +36,7 @@ public class TemporalTaskCondition extends EternalTaskCondition {
         if (task.isEternal()) return false;
 
         //final long cc = task.getCreationTime();
-        long oc = task.occurrence();
+        long oc = task.start();
 
         return (oc >= occStart) && (oc <= occEnd);
 //

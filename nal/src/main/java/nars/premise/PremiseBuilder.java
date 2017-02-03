@@ -167,7 +167,7 @@ abstract public class PremiseBuilder {
 
 
         long when =
-                task.occurrence();
+                task.start();
         //nar.random.nextBoolean() ?
         // : now;
         //now;
