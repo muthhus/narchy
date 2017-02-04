@@ -50,8 +50,8 @@ public class TaskTest {
         //l.forEach(System.out::println);
         int last = l.size() - 1;
 
-        assertTrue(l.get(0).toString(), l.get(0).toString().contains("(b-->a). :0: %0.0;.01%"));
-        assertTrue(l.get(last).toString(), l.get(last).toString().contains("(b-->a). :0: %.90;.91%"));
+        assertTrue(l.get(0).toString(), l.get(0).toString().contains("(b-->a). %0.0;.01%"));
+        assertTrue(l.get(last).toString(), l.get(last).toString().contains("(b-->a). %.90;.91%"));
 
         //test monotonically increasing
         Task y = null;

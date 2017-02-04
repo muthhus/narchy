@@ -308,7 +308,7 @@ public interface Term extends Termed, Termlike, Comparable<Termlike> {
         if (o.temporal) {
             Compound c = (Compound) this;
             int dt = c.dt();
-            if (o.statement) {
+            if (c.size() == 2) {
 
                 switch (dt) {
                     case DTERNAL:

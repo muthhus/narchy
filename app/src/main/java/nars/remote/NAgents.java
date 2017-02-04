@@ -116,7 +116,7 @@ abstract public class NAgents extends NAgent {
 
     public static NAR runRT(Function<NAR, NAgents> init, float fps, int durFrames, int endTime) {
 
-        NAR nar = NAgents.newMultiThreadNAR(3, new RealTime.CS(true).dur(durFrames/fps), true);
+        NAR nar = NAgents.newMultiThreadNAR(3, new RealTime.CS(true).dur(durFrames/fps), false);
         //NAR nar = newNAR();
         //NAR nar = newAlann(durFrames/fps);
 

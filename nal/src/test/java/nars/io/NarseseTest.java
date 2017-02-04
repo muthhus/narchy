@@ -364,14 +364,14 @@ public class NarseseTest {
     @Test public void testQueryVariableTask() throws Narsese.NarseseException {
         String term = "hear(Time,(the,?x))";
         assertEquals("hear(Time,(the,?x))", term( term ).toString());
-        assertEquals("$.50;NaN$ hear(Time,(the,?x)). :0: %1.0;.90%", task(term + ".").toString());
-        assertEquals("$.50;NaN$ hear(Time,(the,?x))? :0:", task(term + "?").toString());
+        assertEquals("$.50;NaN$ hear(Time,(the,?x)). %1.0;.90%", task(term + ".").toString());
+        assertEquals("$.50;NaN$ hear(Time,(the,?x))?", task(term + "?").toString());
     }
     @Test public void testQueryVariableTaskQuotes() throws Narsese.NarseseException {
         String term = "hear(\"Time\",(\"the\",?x))";
         assertEquals("hear(\"Time\",(\"the\",?x))", term( term ).toString());
-        assertEquals("$.50;NaN$ hear(\"Time\",(\"the\",?x)). :0: %1.0;.90%", task(term + ".").toString());
-        assertEquals("$.50;NaN$ hear(\"Time\",(\"the\",?x))? :0:", task(term + "?").toString());
+        assertEquals("$.50;NaN$ hear(\"Time\",(\"the\",?x)). %1.0;.90%", task(term + ".").toString());
+        assertEquals("$.50;NaN$ hear(\"Time\",(\"the\",?x))?", task(term + "?").toString());
     }
 
     @Test

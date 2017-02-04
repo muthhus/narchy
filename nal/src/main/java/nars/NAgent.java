@@ -437,9 +437,9 @@ abstract public class NAgent implements NSense, NAction {
 //                    new PredictionTask($.impl(action, dur, happiness), '?').time(nar, dur),
 //                    new PredictionTask($.impl($.neg(action), dur, happiness), '?').time(nar, dur),
 
-                    new PredictionTask($.seq(action, dur, happiness), '?')
+                    new PredictionTask($.impl(action, dur, happiness), '?')
                             .time(nar, dur),
-                    new PredictionTask($.seq($.neg(action), dur, happiness), '?')
+                    new PredictionTask($.impl($.neg(action), dur, happiness), '?')
                             .time(nar, dur)
 
 //                    new PredictionTask($.seq($.varQuery("x"), 0, $.seq(action, dur, happiness)), '?').eternal(),

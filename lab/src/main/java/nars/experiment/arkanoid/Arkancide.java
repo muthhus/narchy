@@ -23,7 +23,7 @@ public class Arkancide extends NAgents {
 
         NAR nar = runRT((NAR n) -> {
             return new Arkancide(n, cam);
-        }, 35, 35, -1);
+        }, 55, 15, -1);
 
         //nar.beliefConfidence(0.75f);
         //nar.goalConfidence(0.75f);
@@ -35,7 +35,7 @@ public class Arkancide extends NAgents {
 
     //final int afterlife = 60;
 
-    float paddleSpeed = 40f;
+    float paddleSpeed;
 
 
     final Arkanoid noid;
@@ -46,6 +46,7 @@ public class Arkancide extends NAgents {
     public Arkancide(NAR nar, boolean cam) {
         super("noid", nar);
 
+
         noid = new Arkanoid(!cam) {
             @Override
             protected void die() {
@@ -53,6 +54,8 @@ public class Arkancide extends NAgents {
                 super.die();
             }
         };
+
+        paddleSpeed = 40 * noid.BALL_VELOCITY;
 
         nar.input(new MutableTask(happy, Op.BELIEF, $.t(0.5f, 0.15f)).eternal());
 
@@ -65,17 +68,17 @@ public class Arkancide extends NAgents {
         senseNumber("vx(ball, noid)", new FloatPolarNormalized(()->noid.ball.velocityX));
         senseNumber("vy(ball, noid)", new FloatPolarNormalized(()->noid.ball.velocityY));
 
-        if (cam)
+        if (cam) {
             addCamera("cam", noid, visW, visH);
-        else {
-            nar.beliefConfidence(0.9f);
-            nar.goalConfidence(0.8f);
-            nar.linkFeedbackRate.setValue(0.01f);
-            //nar.logBudgetMin(System.out, 0.6f);
-            nar.termVolumeMax.setValue(20); //should need less complexity in non-camera mode
+            //addCameraRetina("zoom(cam(noid))", noid, visW/2, visH/2, (v) -> $.t(v, alpha));
         }
 
-        //addCameraRetina("zoom(cam(noid))", noid, visW/2, visH/2, (v) -> $.t(v, alpha));
+        nar.beliefConfidence(0.8f);
+        nar.goalConfidence(0.7f);
+        nar.linkFeedbackRate.setValue(0.02f);
+        nar.termVolumeMax.setValue(28);
+
+
 
 
         action(new ActionConcept( $.func("x", "paddleNext", "noid"), nar, (b, d) -> {

@@ -181,6 +181,8 @@ public class MicrosphereTemporalBeliefTable extends MultiRWFasterList<Task> impl
         float c = inserted.conf();
         long is = inserted.start();
         long ie = inserted.end();
+        Interval ii = new Interval(is, ie);
+
         for (int i = 0, lSize = l.size(); i < lSize; i++) {
             Task x = l.get(i);
             if (x == inserted) continue;
@@ -189,16 +191,17 @@ public class MicrosphereTemporalBeliefTable extends MultiRWFasterList<Task> impl
             if (dq > Param.BUDGET_EPSILON) {
 
                 float df = Math.abs(f - x.freq());
-                if (df > Param.TRUTH_EPSILON) {
+                float dqf = dq * df;
+
+                if (dqf > Param.BUDGET_EPSILON) {
+
                     long xs = x.start();
                     long xe = x.end();
-                    Interval overlap = Interval.intersect(is, ie, xs, xe);
-
+                    Interval overlap = ii.intersection(new Interval(xs, xe));
                     if (overlap!=null) {
 
-                        float penalty =  dq * df * ((1f + overlap.length()) / (1f + (xe-xs)));
+                        float penalty =  dqf * ((1f + overlap.length()) / (1f + (xe-xs)));
                         if (penalty > Param.BUDGET_EPSILON) {
-                            System.out.println("penalty: " + penalty);
                             x.budget().mul(1f - penalty, 1f - penalty);
                         }
 

@@ -21,7 +21,7 @@ public class Arkanoid extends JFrame implements KeyListener {
 	public static final int BLOCK_TOP_MARGIN = 15;
 
 	public static final float BALL_RADIUS = 10.0f;
-	public static final float BALL_VELOCITY = 1.5f;
+	public static final float BALL_VELOCITY = 1f;
 
 	public static final float PADDLE_WIDTH = 60.0f;
 	public static final float PADDLE_HEIGHT = 20.0f;
