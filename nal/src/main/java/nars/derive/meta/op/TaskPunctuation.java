@@ -18,7 +18,7 @@ final public class TaskPunctuation extends AtomicBoolCondition {
     public static final TaskPunctuation Goal = new TaskPunctuation('!');
 
     public static final AtomicBoolCondition QuestionOrQuest = new AtomicBoolCondition() {
-        @Override public boolean run(@NotNull Derivation o, int now) {
+        @Override public boolean run(@NotNull Derivation o) {
             char c = o.taskPunct;
             return c == Op.QUESTION || c == Op.QUEST;
         }
@@ -27,7 +27,7 @@ final public class TaskPunctuation extends AtomicBoolCondition {
         }
     };
     public static final AtomicBoolCondition Question = new AtomicBoolCondition() {
-        @Override public boolean run(@NotNull Derivation o, int now) {
+        @Override public boolean run(@NotNull Derivation o) {
             return o.taskPunct == Op.QUESTION;
         }
         @Override public String toString() {
@@ -35,7 +35,7 @@ final public class TaskPunctuation extends AtomicBoolCondition {
         }
     };
     public static final AtomicBoolCondition Quest = new AtomicBoolCondition() {
-        @Override public boolean run(@NotNull Derivation o, int now) {
+        @Override public boolean run(@NotNull Derivation o) {
             return o.taskPunct == Op.QUEST;
         }
         @Override public String toString() {
@@ -51,7 +51,7 @@ final public class TaskPunctuation extends AtomicBoolCondition {
 //        @Override public String toString() { return "task:\".\""; }
 //    };
     public static final AtomicBoolCondition NotQuestion = new AtomicBoolCondition()  {
-        @Override public boolean run(@NotNull Derivation o, int now) {
+        @Override public boolean run(@NotNull Derivation o) {
             char p = o.taskPunct;
             return (p != Op.QUESTION && p!= Op.QUEST);
         }
@@ -82,7 +82,7 @@ final public class TaskPunctuation extends AtomicBoolCondition {
     }
 
     @Override
-    public final boolean run(@NotNull Derivation m, int now) {
+    public final boolean run(@NotNull Derivation m) {
         return m.taskPunct == punc;
     }
 

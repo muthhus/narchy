@@ -77,7 +77,7 @@ public abstract class SubtermPathCondition extends AtomicBoolCondition {
     }
 
     @Override
-    public boolean run(@NotNull Derivation ff, int now) {
+    public boolean run(@NotNull Derivation ff) {
 
         Term ta;
         if ((ta = resolve(ff, a, aPath)) == null)

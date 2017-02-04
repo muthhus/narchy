@@ -43,7 +43,7 @@ public class SimpleDeriver implements Deriver {
                 if (p instanceof BoolCondition) {
 
                     try {
-                        if (!((BoolCondition) p).run(m, m.now()))
+                        if (!((BoolCondition) p).run(m))
                             break;
 
                     } catch (Exception e) {

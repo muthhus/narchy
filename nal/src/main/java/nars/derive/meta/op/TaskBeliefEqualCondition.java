@@ -11,7 +11,7 @@ import org.jetbrains.annotations.NotNull;
 final class TaskBeliefEqualCondition extends AtomicBoolCondition {
 
     @Override
-    public boolean run(@NotNull Derivation m, int now) {
+    public boolean run(@NotNull Derivation m) {
         return m.taskTerm.equals(m.beliefTerm);
     }
 

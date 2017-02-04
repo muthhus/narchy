@@ -39,7 +39,7 @@ public final class SubTermStructure extends AtomicBoolCondition {
     }
 
     @Override
-    public boolean run(@NotNull Derivation ff, int now) {
+    public boolean run(@NotNull Derivation ff) {
 
         return ff.subTermMatch(subterm, bits);
     }

@@ -38,7 +38,7 @@ public enum AbstractPatternOp  {
         }
 
         @Override
-        public boolean run(@NotNull Derivation ff, int now) {
+        public boolean run(@NotNull Derivation ff) {
             return (subterm == 0 ? ff.termSub0op : ff.termSub1op) == opOrdinal;
         }
 
@@ -65,7 +65,7 @@ public enum AbstractPatternOp  {
         }
 
         @Override
-        public boolean run(@NotNull Derivation ff, int now) {
+        public boolean run(@NotNull Derivation ff) {
             //the bit must not be set in the structure
             return (opBits & (subterm == 0 ? ff.termSub0opBit : ff.termSub1opBit)) == 0;
         }
@@ -92,7 +92,7 @@ public enum AbstractPatternOp  {
         }
 
         @Override
-        public boolean run(@NotNull Derivation ff, int now) {
+        public boolean run(@NotNull Derivation ff) {
             //the bit must not be set in the structure
             return (opBits & (subterm == 0 ? ff.termSub0Struct : ff.termSub1Struct)) == 0;
         }

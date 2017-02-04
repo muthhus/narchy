@@ -284,7 +284,7 @@ public class Derivation extends Unify {
 //        }
 
         //return forEachMatch.run(this, now()) && (--matchesRemain > 0);
-        return  (--matchesRemain > 0) && forEachMatch.run(this, now());
+        return  (--matchesRemain > 0) && forEachMatch.run(this);
     }
 
 

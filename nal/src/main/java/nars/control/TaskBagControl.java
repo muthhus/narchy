@@ -23,10 +23,16 @@ import static nars.bag.CurveBag.power2BagCurve;
 public class TaskBagControl {
 
     public final CurveBag<Task> tasks;
-    final NAR nar = new Terminal();
+    final NAR nar;
     final Deriver deriver = new DefaultDeriver();
 
     public TaskBagControl(int capacity) {
+
+        nar = new Terminal() {
+
+
+        };
+
         tasks = new CurveBag<Task>(capacity, new CurveBag.NormalizedSampler(power2BagCurve, nar.random), BudgetMerge.maxBlend, new ConcurrentHashMap<>(capacity)) {
 
             @Override
@@ -40,7 +46,9 @@ public class TaskBagControl {
             }
         };
 
+
     }
+
 
     public Task input(String task) throws Narsese.NarseseException {
         return input( nar.task(task) );
@@ -53,6 +61,7 @@ public class TaskBagControl {
             if (r == null)
                 return null;
             else {
+                nar.eventTaskProcess.emit(t);
                 tasks.commit();
                 return r.get();
             }

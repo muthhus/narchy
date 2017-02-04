@@ -38,16 +38,15 @@ public final class AndCondition extends GenericCompound implements BoolCondition
 //    }
 
     @Override
-    public final boolean run(@NotNull Derivation m, int now) {
+    public final boolean run(@NotNull Derivation m) {
         boolean result = true;
-        int start = now;
+        int start = m.now();
         for (BoolCondition x : termCache) {
-            boolean b = x.run(m, now);
+            boolean b = x.run(m);
             if (!b) {
                 result = false;
                 break;
             }
-            now = m.now();
         }
 
         m.revert(start);

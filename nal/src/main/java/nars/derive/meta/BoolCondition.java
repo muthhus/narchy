@@ -10,7 +10,7 @@ public interface BoolCondition extends /*, BooleanFunction<PremiseEval>*/ Term {
 
     //void accept(PremiseEval c, int now);
 
-    boolean run(Derivation p, int now);
+    boolean run(Derivation p);
 
 
 

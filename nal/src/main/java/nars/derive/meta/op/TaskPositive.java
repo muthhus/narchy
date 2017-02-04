@@ -11,7 +11,7 @@ public class TaskPositive extends AtomicBoolCondition {
     public static final TaskPositive the = new TaskPositive();
 
     @Override
-    public boolean run(@NotNull Derivation m, int now) {
+    public boolean run(@NotNull Derivation m) {
         Truth t = m.premise.task.truth();
         return (t!=null && t.freq() >= 0.5f);
     }

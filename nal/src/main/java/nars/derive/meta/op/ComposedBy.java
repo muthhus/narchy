@@ -25,7 +25,7 @@ public final class ComposedBy extends AtomicBoolCondition {
 
 
     @Override
-    public boolean run(@NotNull Derivation p, int now) {
+    public boolean run(@NotNull Derivation p) {
         Term container = this.container==0 ? p.taskTerm : p.beliefTerm;
         Term contained = this.contained==0 ? p.taskTerm : p.beliefTerm;
         if (container instanceof Compound) {

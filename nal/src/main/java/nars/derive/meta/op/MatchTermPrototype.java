@@ -125,7 +125,7 @@ abstract public class MatchTermPrototype extends AtomicBoolCondition {
     abstract protected BoolCondition build(BoolCondition eachMatch);
 
     @Override
-    public boolean run(Derivation derivation, int now) {
+    public boolean run(Derivation derivation) {
         throw new UnsupportedOperationException("Use the instance that this builds, not this. it should not result in the deriver");
     }
 

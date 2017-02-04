@@ -89,7 +89,7 @@ public class MatchTaskBelief extends AtomicBoolCondition {
 
 
     @Override
-    public boolean run(Derivation m, int now) {
+    public boolean run(Derivation m) {
         throw new RuntimeException("this should not be called");
     }
 
@@ -306,7 +306,7 @@ public class MatchTaskBelief extends AtomicBoolCondition {
         }
 
         @Override
-        public boolean run(@NotNull Derivation m, int now) {
+        public boolean run(@NotNull Derivation m) {
 
 
             Term maybeContainer = this.container==0 ? m.taskTerm : m.beliefTerm;

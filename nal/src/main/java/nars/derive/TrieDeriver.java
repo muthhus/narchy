@@ -103,7 +103,7 @@ public class TrieDeriver implements Deriver {
     public final void accept(@NotNull Derivation d) {
         int now = d.now();
         for (BoolCondition r : roots) {
-            r.run(d, now);
+            r.run(d);
             d.revert(now);
         }
     }

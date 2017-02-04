@@ -99,7 +99,7 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
      * false to stop it
      */
     @Override
-    public final boolean run(@NotNull Derivation m, int now) {
+    public final boolean run(@NotNull Derivation m) {
 
         NAR nar = m.nar;
 

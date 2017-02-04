@@ -12,7 +12,7 @@ public class BeliefPositive extends AtomicBoolCondition {
     public static final BeliefPositive thePos = new BeliefPositive();
 
     @Override
-    public boolean run(@NotNull Derivation m, int now) {
+    public boolean run(@NotNull Derivation m) {
         Task B = m.premise.belief;
         if (B !=null) {
             Truth t = B.truth();
@@ -32,8 +32,8 @@ public class BeliefPositive extends AtomicBoolCondition {
         public static final BeliefNegative theNeg = new BeliefNegative();
 
         @Override
-        public boolean run(@NotNull Derivation m, int now) {
-            return !super.run(m, now);
+        public boolean run(@NotNull Derivation m) {
+            return !super.run(m);
         }
     }
 

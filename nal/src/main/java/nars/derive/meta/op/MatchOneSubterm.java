@@ -19,7 +19,7 @@ public final class MatchOneSubterm extends MatchTerm {
     }
 
     @Override
-    public final boolean run(@NotNull Derivation p, int now) {
+    public final boolean run(@NotNull Derivation p) {
         p.matchAll(pattern, subterm == 0 ? p.taskTerm : p.beliefTerm /* current term */, eachMatch, constraints, 1);
         return true;
     }

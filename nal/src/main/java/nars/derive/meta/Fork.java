@@ -27,10 +27,11 @@ public final class Fork extends GenericCompound implements BoolCondition {
     }
 
     @Override
-    public boolean run(@NotNull Derivation m, int now) {
+    public boolean run(@NotNull Derivation m) {
 
+        int now = m.now();
         for (BoolCondition s : termCache) {
-            s.run(m, now);
+            s.run(m);
             m.revert(now);
         }
 

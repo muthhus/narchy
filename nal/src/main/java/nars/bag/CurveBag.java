@@ -396,7 +396,7 @@ public class CurveBag<V> extends ArrayBag<V> implements Bag<V> {
      * maps y in 0..1.0 to an index in [0..size). as if window=1
      */
     static int index(float y, int size) {
-        return clamp(Math.round(y * (size - 1) - 0.5f), 0, size);
+        return clamp(Math.round(y * (size) - 0.5f), 0, size);
     }
 
 
