@@ -36,22 +36,22 @@ public class GraphAlgorithms {
     /**
      * output of some algorithms is passed here
      */
-    public int[] root = null;
+    public int[] root;
     /**
      * output of some algorithms is passed here
      */
-    public int[] color = null;
+    public int[] color;
     /**
      * output of some algorithms is passed here
      */
-    public Set<Integer> cluster = null;
+    public Set<Integer> cluster;
     /**
      * output of some algorithms is passed here
      */
-    public int[] d = null;
-    private Stack<Integer> stack = new Stack<Integer>();
-    private int counter = 0;
-    private Graph g = null;
+    public int[] d;
+    private final Stack<Integer> stack = new Stack<Integer>();
+    private int counter;
+    private Graph g;
 
 // =================== private methods ================================
 // ====================================================================

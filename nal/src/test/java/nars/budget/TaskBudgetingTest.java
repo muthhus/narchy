@@ -1,4 +1,4 @@
-package nars.conceptualize.state;
+package nars.budget;
 
 import nars.Narsese;
 import nars.nar.Default;

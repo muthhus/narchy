@@ -588,7 +588,8 @@ public class Terms   {
             }
             int dt = c.dt();
             newSubs = subsChanged ? /*theSubterms(*/TermContainer.the(o,
-                    (dt == DTERNAL||dt==0) ? DTERNAL : XTERNAL /* preserve order */,
+                    DTERNAL,
+                    //(dt == DTERNAL||dt==0) ? DTERNAL : XTERNAL /* preserve order */,
                     ss)/*)*/ : null;
 
         } else {

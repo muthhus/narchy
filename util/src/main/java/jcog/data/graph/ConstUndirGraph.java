@@ -90,6 +90,7 @@ public class ConstUndirGraph implements Graph {
 // ==============================================================
 
 
+    @Override
     public boolean isEdge(int i, int j) {
 
         return g.isEdge(i, j) || g.isEdge(j, i);
@@ -101,6 +102,7 @@ public class ConstUndirGraph implements Graph {
      * Uses sets as collection so does not support multiple edges now, even if
      * the underlying directed graph does.
      */
+    @Override
     public Collection<Integer> getNeighbours(int i) {
 
         List<Integer> result = new ArrayList<Integer>();
@@ -114,6 +116,7 @@ public class ConstUndirGraph implements Graph {
     /**
      * Returns the node from the underlying graph
      */
+    @Override
     public Object getNode(int i) {
         return g.getNode(i);
     }
@@ -124,6 +127,7 @@ public class ConstUndirGraph implements Graph {
      * If there is an (i,j) edge, returns that, otherwise if there is a (j,i)
      * edge, returns that, otherwise returns null.
      */
+    @Override
     public Object getEdge(int i, int j) {
 
         if (g.isEdge(i, j)) return g.getEdge(i, j);
@@ -133,12 +137,14 @@ public class ConstUndirGraph implements Graph {
 
 // ---------------------------------------------------------------
 
+    @Override
     public int size() {
         return g.size();
     }
 
 // --------------------------------------------------------------------
 
+    @Override
     public boolean directed() {
         return false;
     }
@@ -148,6 +154,7 @@ public class ConstUndirGraph implements Graph {
     /**
      * not supported
      */
+    @Override
     public boolean setEdge(int i, int j) {
 
         throw new UnsupportedOperationException();
@@ -158,6 +165,7 @@ public class ConstUndirGraph implements Graph {
     /**
      * not supported
      */
+    @Override
     public boolean clearEdge(int i, int j) {
 
         throw new UnsupportedOperationException();
@@ -165,6 +173,7 @@ public class ConstUndirGraph implements Graph {
 
 // ---------------------------------------------------------------
 
+    @Override
     public int degree(int i) {
         return g.degree(i) + (in == null ? 0 : in[i].size());
     }

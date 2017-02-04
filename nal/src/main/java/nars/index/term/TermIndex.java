@@ -552,8 +552,8 @@ public abstract class TermIndex extends TermBuilder {
 
     @Nullable
     public Term conceptualizable(@NotNull Term term, boolean forTermlink) {
-        Term termPre;
-        do {
+        Term termPre = null;
+        while (term instanceof Compound && termPre != term && term != null) {
 //            //shouldnt need to check for this here
 //            if (isTrueOrFalse(term))
 //                throw new UnsupportedOperationException();
@@ -594,7 +594,7 @@ public abstract class TermIndex extends TermBuilder {
                     break;
 
             }
-        } while (term instanceof Compound && termPre != term && term != null);
+        }
 
         if (term instanceof Variable)
             return null;

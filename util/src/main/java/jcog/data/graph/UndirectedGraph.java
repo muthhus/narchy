@@ -57,6 +57,7 @@ public class UndirectedGraph implements Graph {
 // ==============================================================
 
 
+    @Override
     public boolean isEdge(int i, int j) {
 
         return g.isEdge(i, j) || g.isEdge(j, i);
@@ -68,6 +69,7 @@ public class UndirectedGraph implements Graph {
      * Uses sets as collection so does not support multiple edges now, even if
      * the underlying directed graph does.
      */
+    @Override
     public Collection<Integer> getNeighbours(int i) {
 
         Set<Integer> result = new HashSet<Integer>();
@@ -82,6 +84,7 @@ public class UndirectedGraph implements Graph {
 
 // ---------------------------------------------------------------
 
+    @Override
     public Object getNode(int i) {
         return g.getNode(i);
     }
@@ -92,6 +95,7 @@ public class UndirectedGraph implements Graph {
      * If there is an (i,j) edge, returns that, otherwise if there is a (j,i)
      * edge, returns that, otherwise returns null.
      */
+    @Override
     public Object getEdge(int i, int j) {
 
         if (g.isEdge(i, j)) return g.getEdge(i, j);
@@ -101,12 +105,14 @@ public class UndirectedGraph implements Graph {
 
 // ---------------------------------------------------------------
 
+    @Override
     public int size() {
         return g.size();
     }
 
 // --------------------------------------------------------------------
 
+    @Override
     public boolean directed() {
         return false;
     }
@@ -116,6 +122,7 @@ public class UndirectedGraph implements Graph {
     /**
      * not supported
      */
+    @Override
     public boolean setEdge(int i, int j) {
 
         throw new UnsupportedOperationException();
@@ -126,6 +133,7 @@ public class UndirectedGraph implements Graph {
     /**
      * not supported
      */
+    @Override
     public boolean clearEdge(int i, int j) {
 
         throw new UnsupportedOperationException();
@@ -133,6 +141,7 @@ public class UndirectedGraph implements Graph {
 
 // --------------------------------------------------------------------
 
+    @Override
     public int degree(int i) {
 
         return getNeighbours(i).size();

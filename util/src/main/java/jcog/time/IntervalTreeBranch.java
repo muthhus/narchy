@@ -215,7 +215,7 @@ public class IntervalTreeBranch<K extends Comparable<? super K>, V> implements
 
     private IntervalTreeNode<K, V> removeCleanup() {
         if (left == null) {
-            return right == null ? null : right;
+            return right;
         }
         if (right == null) {
             return left;

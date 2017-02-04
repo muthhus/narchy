@@ -37,10 +37,12 @@ public class StableBloomFilter<E> implements CountingBloomFilter<E> {
         return c;
     }
 
+    @Override
     public void add(E element) {
         add(hash(element));
     }
 
+    @Override
     public boolean contains(E element) {
         return contains(hash(element));
     }
@@ -63,6 +65,7 @@ public class StableBloomFilter<E> implements CountingBloomFilter<E> {
     }
 
 
+    @Override
     public void remove(E element) {
         int[] indices = hash(element);
 

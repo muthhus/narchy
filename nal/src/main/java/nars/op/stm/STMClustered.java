@@ -33,6 +33,8 @@ import java.util.stream.StreamSupport;
 public abstract class STMClustered extends STM {
 
 
+    @Nullable
+    public final Bag<Task> input;
 
     final short clusters;
     public final int dims;
@@ -262,10 +264,10 @@ public abstract class STMClustered extends STM {
             @Nullable Task oid = o.id;
             if (id == oid)
                 return 0;
-            if (id == null)
-                return 1;
-            if (oid == null)
-                return -1;
+//            if (id == null)
+//                return 1;
+//            if (oid == null)
+//                return -1;
             return id.compareTo(oid);
         }
     }
@@ -283,8 +285,6 @@ public abstract class STMClustered extends STM {
 
     abstract double[] getCoord(@NotNull Task t);
 
-    @Nullable
-    public final Bag<Task> input;
 
     public STMClustered(int dims, @NotNull NAR nar, @NotNull MutableInteger capacity, char punc, int expectedTasksPerNode) {
         super(nar, capacity);
@@ -295,24 +295,7 @@ public abstract class STMClustered extends STM {
         clusters = (short) Math.max(2f, 1f + capacity.floatValue() / expectedTasksPerNode);
 
         this.punc = punc;
-        this.input = new ArrayBag<Task>(capacity.intValue(), BudgetMerge.avgBlend, new ConcurrentHashMap<>(capacity.intValue())) {
-
-            @NotNull
-            @Override
-            protected Bag<Task> update(@Nullable Consumer<BLink> each, boolean checkCapacity) {
-                super.update(each, checkCapacity);
-
-                if (checkCapacity) { //true on commit
-                    forEach(t -> {
-                        if (t != null) {
-                            TLink tt = (TLink) t;
-                            tt.nearest().transfer(tt);
-                        }
-                    });
-                }
-
-                return this;
-            }
+        this.input = new ArrayBag<Task>(capacity.intValue(), BudgetMerge.maxBlend, new ConcurrentHashMap<>(capacity.intValue())) {
 
             @NotNull
             @Override
@@ -364,14 +347,11 @@ public abstract class STMClustered extends STM {
 
         if (busy.compareAndSet(false, true)) {
 
-
-            if (!removed.isEmpty()) {
-                int rr = removed.size();
-                for (int i = 0; i < rr; i++) {
-                    TasksNode t = removed.pollFirst();
-                    t.tasks.forEach(TLink::migrate);
-                    t.delete();
-                }
+            int rr = removed.size();
+            for (int i = 0; i < rr; i++) {
+                TasksNode t = removed.pollFirst();
+                t.tasks.forEach(TLink::migrate);
+                t.delete();
             }
 
             input.setCapacity(capacity.intValue());
@@ -381,6 +361,12 @@ public abstract class STMClustered extends STM {
 
             now = nar.time();
 
+            input.forEach(t -> {
+                if (t != null) {
+                    TLink tt = (TLink) t;
+                    tt.nearest().transfer(tt);
+                }
+            });
 
             busy.set(false);
             return true;

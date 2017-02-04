@@ -70,7 +70,7 @@ public class Blobs {
     private final Logger logger = LoggerFactory.getLogger(Blobs.class);
 
     private File baseDirectory;
-    private boolean validating = false;
+    private boolean validating;
     private boolean caseSensitive = true;
     private static final String ALGORITHM = "SHA1";
     private static final int HASH_DIRECTORY_NAME_LENGTH = 2;
@@ -506,12 +506,13 @@ public class Blobs {
 
     private static class StartsWithFileFilter
             implements FileFilter {
-        private String filenamePart;
+        private final String filenamePart;
 
         public StartsWithFileFilter(String filenamePart) {
             this.filenamePart = filenamePart;
         }
 
+        @Override
         public boolean accept(File file) {
             return file.isFile() && file.getName().startsWith(filenamePart);
         }
@@ -519,6 +520,7 @@ public class Blobs {
 
     private static class MatchingDirectoriesFileFilter
             implements FileFilter {
+        @Override
         public boolean accept(File file) {
             return file.isDirectory() && file.getName().length() == HASH_DIRECTORY_NAME_LENGTH;
         }
@@ -526,6 +528,7 @@ public class Blobs {
 
     private static class MatchingFilesFileFilter
             implements FileFilter {
+        @Override
         public boolean accept(File file) {
             return file.isFile() && file.getName().length() == HASH_REMAINDER_NAME_LENGTH;
         }

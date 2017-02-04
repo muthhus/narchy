@@ -1,13 +1,10 @@
 package nars.op.stm;
 
 import jcog.data.MutableInteger;
-import jcog.event.ArrayTopic;
-import jcog.event.Topic;
 import nars.$;
 import nars.NAR;
 import nars.Task;
 import nars.budget.BudgetFunctions;
-import nars.budget.Budgeted;
 import nars.task.GeneratedTask;
 import nars.term.Compound;
 import nars.term.Term;
@@ -21,26 +18,27 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
- * TODO use Leak class
+ * Task Dimension Mapping:
+ *  0: Start time
+ *  1: End time
+ *  2: Freq
+ *  3: Conf (grouping by confidence preserves the maximum collective confidence of any group, which is multiplied in conjunction truth)
  */
 public class MySTMClustered extends STMClustered {
 
     private static final Logger logger = LoggerFactory.getLogger(MySTMClustered.class);
 
-    public final Topic<Task> generate = new ArrayTopic<>();
+    //public final Topic<Task> generate = new ArrayTopic<>();
 
     private final int maxGroupSize;
     private final int maxInputVolume;
     private final int minGroupSize;
     private final int inputsPerFrame;
 
-
-    final static int TIME = 0;
-    final static int FREQ = 1;
-    final static int CONF = 2; //group by confidence to preserve the maximum collective confidence of any group
 
 
     float timeCoherenceThresh = 0.99f; //only used when not in group=2 sequence pairs phase
@@ -62,7 +60,7 @@ public class MySTMClustered extends STMClustered {
     }
 
     public MySTMClustered(@NotNull NAR nar, int size, char punc, int minGroupSize, int maxGroupSize, int maxInputVolume, boolean allowNonInput, int inputsPerFrame) {
-        super(3, nar, new MutableInteger(size), punc, maxGroupSize);
+        super(4, nar, new MutableInteger(size), punc, maxGroupSize);
 
         this.minGroupSize = minGroupSize;
         this.maxGroupSize = maxGroupSize;
@@ -81,9 +79,10 @@ public class MySTMClustered extends STMClustered {
     @NotNull
     public double[] getCoord(@NotNull Task t) {
         double[] c = new double[dims];
-        c[0] = t.start(); //time
-        c[1] = t.freq(); //0..+1
-        c[2] = t.conf(); //0..+1
+        c[0] = t.start();
+        c[1] = t.end();
+        c[2] = t.freq(); //0..+1
+        c[3] = t.conf(); //0..+1
         return c;
     }
 
@@ -92,8 +91,9 @@ public class MySTMClustered extends STMClustered {
     protected TasksNode newCentroid(int id) {
         TasksNode t = new TasksNode(id);
         t.randomizeUniform(0, now - 1, now + 1);
-        t.randomizeUniform(1, 0f, 1f);
+        t.randomizeUniform(1, now - 1, now + 1);
         t.randomizeUniform(2, 0f, 1f);
+        t.randomizeUniform(3, 0f, 1f);
         return t;
     }
 
@@ -119,7 +119,7 @@ public class MySTMClustered extends STMClustered {
             //clusters where all terms occurr simultaneously at precisely the same time
             //cluster(maxConjunctionSize, 1.0f, freqCoherenceThresh);
 
-            cluster(((int)(inputsPerFrame * nar.exe.load())), minGroupSize, maxGroupSize);
+            cluster(((int)(inputsPerFrame * (1f-nar.exe.load()))), minGroupSize, maxGroupSize);
 
             //clusters where dt is allowed, but these must be of length 2. process any of these pairs which remain
             //if (maxGroupSize != 2)
@@ -135,6 +135,7 @@ public class MySTMClustered extends STMClustered {
         if (limit == 0)
             return;
 
+        List<Task> toInput = $.newArrayList(0);
         net.nodeStream()
                 //.parallel()
                 //.sorted((a, b) -> Float.compare(a.priSum(), b.priSum()))
@@ -147,9 +148,9 @@ public class MySTMClustered extends STMClustered {
                     double[] tc = n.coherence(0);
 
                     if (tc != null && (maxGroupSize == 2 || tc[1] >= timeCoherenceThresh)) {
-                        double[] fc = n.coherence(1);
+                        double[] fc = n.coherence(2);
                         if (fc != null && fc[1] >= freqCoherenceThresh) {
-                            double[] cc = n.coherence(2);
+                            double[] cc = n.coherence(3);
                             if (cc != null && cc[1] >= confCoherenceThresh) {
                                 return true;
                             }
@@ -194,6 +195,8 @@ public class MySTMClustered extends STMClustered {
                         });
 
                         Collection<Task> uu = vv.values();
+                        if (uu.size() < 2)
+                            return;
 
                         //float confMin = (float) Stream.of(uu).mapToDouble(Task::conf).min().getAsDouble();
                         float conf = TruthFunctions.confAnd(uu); //used for emulation of 'intersection' truth function
@@ -217,7 +220,7 @@ public class MySTMClustered extends STMClustered {
                         long t = Math.round(nc[0]);
 
                         //priority calculation: conservatively choose the max value and not the sum
-                        float pri = (float) uu.stream().mapToDouble(Budgeted::pri).max().getAsDouble();
+                        float pri = (float) uu.stream().mapToDouble(x -> x.priSafe(0)).max().getAsDouble();
 
                         Task m = new GeneratedTask(conj, punc,
                                 $.t(finalFreq, conf)) //TODO use a truth calculated specific to this fixed-size batch, not all the tasks combined
@@ -226,12 +229,12 @@ public class MySTMClustered extends STMClustered {
                                 .budget(BudgetFunctions.fund(uu, pri / uu.size()))
                                 .log("STMCluster CoOccurr");
 
+                        toInput.add(m);
 
                         //logger.debug("{}", m);
-                        generate.emit(m);
+                        //generate.emit(m);
 
                         //System.err.println(m + " " + Arrays.toString(m.evidence()));
-                        nar.inputLater(m);
 
                         //node.tasks.removeAll(tt);
 
@@ -240,6 +243,10 @@ public class MySTMClustered extends STMClustered {
 
 
                 });
+
+        if (!toInput.isEmpty())
+            nar.inputLater(toInput);
+
     }
 
     @Nullable

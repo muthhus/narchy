@@ -66,6 +66,7 @@ public class PrefixSubGraph implements Graph {
 // ==============================================================
 
 
+    @Override
     public boolean isEdge(int i, int j) {
 
         if (i < 0 || i >= prefSize) throw new IndexOutOfBoundsException();
@@ -75,6 +76,7 @@ public class PrefixSubGraph implements Graph {
 
 // ---------------------------------------------------------------
 
+    @Override
     public Collection<Integer> getNeighbours(int i) {
 
         if (i < 0 || i >= prefSize) throw new IndexOutOfBoundsException();
@@ -89,6 +91,7 @@ public class PrefixSubGraph implements Graph {
 
 // ---------------------------------------------------------------
 
+    @Override
     public Object getNode(int i) {
 
         if (i < 0 || i >= prefSize) throw new IndexOutOfBoundsException();
@@ -101,6 +104,7 @@ public class PrefixSubGraph implements Graph {
      * Returns the edge in the original graph if both i and j are smaller than
      * size().
      */
+    @Override
     public Object getEdge(int i, int j) {
 
         if (isEdge(i, j)) return g.getEdge(i, j);
@@ -109,12 +113,14 @@ public class PrefixSubGraph implements Graph {
 
 // --------------------------------------------------------------------
 
+    @Override
     public int size() {
         return prefSize;
     }
 
 // --------------------------------------------------------------------
 
+    @Override
     public boolean directed() {
         return g.directed();
     }
@@ -124,6 +130,7 @@ public class PrefixSubGraph implements Graph {
     /**
      * not supported
      */
+    @Override
     public boolean setEdge(int i, int j) {
 
         throw new UnsupportedOperationException();
@@ -134,6 +141,7 @@ public class PrefixSubGraph implements Graph {
     /**
      * not supported
      */
+    @Override
     public boolean clearEdge(int i, int j) {
 
         throw new UnsupportedOperationException();
@@ -141,6 +149,7 @@ public class PrefixSubGraph implements Graph {
 
 // ---------------------------------------------------------------
 
+    @Override
     public int degree(int i) {
 
         if (i < 0 || i >= prefSize) throw new IndexOutOfBoundsException();

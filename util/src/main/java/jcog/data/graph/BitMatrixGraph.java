@@ -70,6 +70,7 @@ public class BitMatrixGraph implements Graph {
 // ==============================================================
 
 
+    @Override
     public boolean isEdge(int i, int j) {
 
         return sets.get(i).get(j);
@@ -77,6 +78,7 @@ public class BitMatrixGraph implements Graph {
 
 // ---------------------------------------------------------------
 
+    @Override
     public Collection<Integer> getNeighbours(int i) {
 
         Set<Integer> result = new HashSet<Integer>();
@@ -94,6 +96,7 @@ public class BitMatrixGraph implements Graph {
     /**
      * Returns null always
      */
+    @Override
     public Object getNode(int i) {
         return null;
     }
@@ -103,24 +106,28 @@ public class BitMatrixGraph implements Graph {
     /**
      * Returns null always.
      */
+    @Override
     public Object getEdge(int i, int j) {
         return null;
     }
 
 // ---------------------------------------------------------------
 
+    @Override
     public int size() {
         return sets.size();
     }
 
 // --------------------------------------------------------------------
 
+    @Override
     public boolean directed() {
         return directed;
     }
 
 // --------------------------------------------------------------------
 
+    @Override
     public boolean setEdge(int i, int j) {
 
         if (i > size() || j > size() || i < 0 || j < 0) throw new
@@ -140,6 +147,7 @@ public class BitMatrixGraph implements Graph {
 
 // --------------------------------------------------------------------
 
+    @Override
     public boolean clearEdge(int i, int j) {
 
         if (i > size() || j > size() || i < 0 || j < 0) throw new
@@ -159,6 +167,7 @@ public class BitMatrixGraph implements Graph {
 
 // --------------------------------------------------------------------
 
+    @Override
     public int degree(int i) {
 
         BitSet neighb = sets.get(i);

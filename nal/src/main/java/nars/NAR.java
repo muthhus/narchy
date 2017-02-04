@@ -1309,11 +1309,11 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
         return this;
     }
 
-    public void inputLater(@NotNull List<? extends Task> tasks) {
+    public void inputLater(@NotNull List<Task> tasks) {
         inputLater(tasks, 1);
     }
 
-    public void inputLater(@NotNull List<? extends Task> tasks, int maxChunkSize) {
+    public void inputLater(@NotNull List<Task> tasks, int maxChunkSize) {
         runLater(tasks, this::input, maxChunkSize);
     }
 

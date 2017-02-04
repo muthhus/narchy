@@ -302,14 +302,14 @@ public final class BudgetFunctions extends UtilityFunctions {
     public static float occamComplexityGrowthRelative(@NotNull Termed derived, Task parentTask, Task parentBelief, int decayComplexity) {
 
         int parentComplexity;
-        int taskCompl = parentTask.volume();
+        int taskCompl = parentTask.complexity();
         if (parentBelief!=null) // && parentBelief.complexity() > parentComplexity)
             parentComplexity =
-                Math.min(taskCompl, parentBelief.volume());
+                Math.min(taskCompl, parentBelief.complexity());
         else
             parentComplexity = taskCompl;
 
-        int derivedComplexity = derived.volume();
+        int derivedComplexity = derived.complexity();
         //return parentComplexity / (1f + Math.max(parentComplexity, derivedComplexity));
         //return Math.max(1f, (parentComplexity/derivedComplexity));
         return Util.unitize((float)parentComplexity/(decayComplexity +derivedComplexity));

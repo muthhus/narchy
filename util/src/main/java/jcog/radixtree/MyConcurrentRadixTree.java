@@ -693,7 +693,7 @@ public class MyConcurrentRadixTree<X> implements /*RadixTree<X>,*/Serializable, 
                             // to leave a similar node in place to act as the split between the child edges.
                             // Just delete the value associated with this node.
                             // -> Clone this node without its value, preserving its child nodes...
-                            @SuppressWarnings({"NullableProblems"})
+                            @SuppressWarnings("NullableProblems")
                             Node cloned = createNode(found.getIncomingEdge(), null, found.getOutgoingEdges(), false);
                             // Re-add the replacement node to the parent...
                             parent.updateOutgoingEdge(cloned);
@@ -1238,7 +1238,7 @@ public class MyConcurrentRadixTree<X> implements /*RadixTree<X>,*/Serializable, 
                         ByteSeq suffixFromExistingEdge = subtractPrefix(found.getIncomingEdge(), commonPrefix);
 
                         Node n2 = createNode(suffixFromExistingEdge, foundValue, oedges, false);
-                        @SuppressWarnings({"NullableProblems"})
+                        @SuppressWarnings("NullableProblems")
                         Node n3 = createNode(commonPrefix, null, new FasterList(2, new Node[] { n1, n2} ), false);
 
                         result.parentNode.updateOutgoingEdge(n3);
@@ -1281,7 +1281,7 @@ public class MyConcurrentRadixTree<X> implements /*RadixTree<X>,*/Serializable, 
      * Note that this method internally converts {@link CharSequence}s to {@link String}s, to avoid set equality issues,
      * because equals() and hashCode() are not specified by the CharSequence API contract.
      */
-    @SuppressWarnings({"JavaDoc"})
+    @SuppressWarnings("JavaDoc")
     Iterable<ByteSeq> getDescendantKeys(final ByteSeq startKey, final Node startNode) {
         return new DescendantKeys(startKey, startNode);
     }
@@ -1290,7 +1290,7 @@ public class MyConcurrentRadixTree<X> implements /*RadixTree<X>,*/Serializable, 
      * Returns a lazy iterable which will return values which are associated with keys in the tree for which
      * the given key is a prefix.
      */
-    @SuppressWarnings({"JavaDoc"})
+    @SuppressWarnings("JavaDoc")
     <O> Iterable<O> getDescendantValues(final ByteSeq startKey, final Node startNode) {
         return new Iterable<O>() {
             @Override
@@ -1332,7 +1332,7 @@ public class MyConcurrentRadixTree<X> implements /*RadixTree<X>,*/Serializable, 
      * Note that this method internally converts {@link CharSequence}s to {@link String}s, to avoid set equality issues,
      * because equals() and hashCode() are not specified by the CharSequence API contract.
      */
-    @SuppressWarnings({"JavaDoc"})
+    @SuppressWarnings("JavaDoc")
     <O> Iterable<Pair<ByteSeq, O>> getDescendantKeyValuePairs(final ByteSeq startKey, final Node startNode) {
         return new Iterable<Pair<ByteSeq, O>>() {
             @Override

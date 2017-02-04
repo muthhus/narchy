@@ -61,6 +61,7 @@ public class SubGraphEdges implements Graph {
 // ==============================================================
 
 
+    @Override
     public boolean isEdge(int i, int j) {
 
         return nodes.get(i) && nodes.get(j) && g.isEdge(i, j);
@@ -68,6 +69,7 @@ public class SubGraphEdges implements Graph {
 
 // ---------------------------------------------------------------
 
+    @Override
     public Collection<Integer> getNeighbours(int i) {
 
         List<Integer> result = new LinkedList<Integer>();
@@ -82,6 +84,7 @@ public class SubGraphEdges implements Graph {
 
 // ---------------------------------------------------------------
 
+    @Override
     public Object getNode(int i) {
         return g.getNode(i);
     }
@@ -92,6 +95,7 @@ public class SubGraphEdges implements Graph {
      * If both i and j are within the node set of the subgraph and the original
      * graph has an (i,j) edge, returns that edge.
      */
+    @Override
     public Object getEdge(int i, int j) {
 
         if (isEdge(i, j)) return g.getEdge(i, j);
@@ -100,12 +104,14 @@ public class SubGraphEdges implements Graph {
 
 // --------------------------------------------------------------------
 
+    @Override
     public int size() {
         return g.size();
     }
 
 // --------------------------------------------------------------------
 
+    @Override
     public boolean directed() {
         return g.directed();
     }
@@ -115,6 +121,7 @@ public class SubGraphEdges implements Graph {
     /**
      * not supported
      */
+    @Override
     public boolean setEdge(int i, int j) {
 
         throw new UnsupportedOperationException();
@@ -125,6 +132,7 @@ public class SubGraphEdges implements Graph {
     /**
      * not supported
      */
+    @Override
     public boolean clearEdge(int i, int j) {
 
         throw new UnsupportedOperationException();
@@ -132,6 +140,7 @@ public class SubGraphEdges implements Graph {
 
 // ---------------------------------------------------------------
 
+    @Override
     public int degree(int i) {
 
         int degree = 0;

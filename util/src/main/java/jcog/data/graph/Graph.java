@@ -73,17 +73,17 @@ public interface Graph {
      * If the graph is
      * undirected, sets the edge (j,i) as well. Optional operation.
      */
-    public boolean setEdge(int i, int j);
+    boolean setEdge(int i, int j);
 
     /**
      * Removes given edge, returns true if it existed before. If the graph is
      * undirected, removes the edge (j,i) as well. Optional operation.
      */
-    public boolean clearEdge(int i, int j);
+    boolean clearEdge(int i, int j);
 
     /**
      * Returns the degree of the given node. If the graph is directed,
      * returns out degree.
      */
-    public int degree(int i);
+    int degree(int i);
 }

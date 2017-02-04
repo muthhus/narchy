@@ -120,6 +120,7 @@ public class NeighbourListGraph implements Graph, java.io.Serializable {
 // ================================================================
 
 
+    @Override
     public boolean setEdge(int i, int j) {
 
         boolean ret = neighbors.get(i).add(j);
@@ -129,6 +130,7 @@ public class NeighbourListGraph implements Graph, java.io.Serializable {
 
 // ---------------------------------------------------------------
 
+    @Override
     public boolean clearEdge(int i, int j) {
 
         boolean ret = neighbors.get(i).remove(j);
@@ -138,6 +140,7 @@ public class NeighbourListGraph implements Graph, java.io.Serializable {
 
 // ---------------------------------------------------------------
 
+    @Override
     public boolean isEdge(int i, int j) {
 
         return neighbors.get(i).contains(j);
@@ -145,6 +148,7 @@ public class NeighbourListGraph implements Graph, java.io.Serializable {
 
 // ---------------------------------------------------------------
 
+    @Override
     public Collection<Integer> getNeighbours(int i) {
 
         return Collections.unmodifiableCollection(neighbors.get(i));
@@ -156,6 +160,7 @@ public class NeighbourListGraph implements Graph, java.io.Serializable {
      * If the graph was gradually grown using {@link #addNode}, returns the
      * object associated with the node, otherwise null
      */
+    @Override
     public Object getNode(int i) {
         return (nodes == null ? null : nodes.get(i));
     }
@@ -165,24 +170,28 @@ public class NeighbourListGraph implements Graph, java.io.Serializable {
     /**
      * Returns null always.
      */
+    @Override
     public Object getEdge(int i, int j) {
         return null;
     }
 
 // ---------------------------------------------------------------
 
+    @Override
     public int size() {
         return neighbors.size();
     }
 
 // --------------------------------------------------------------------
 
+    @Override
     public boolean directed() {
         return directed;
     }
 
 // --------------------------------------------------------------------
 
+    @Override
     public int degree(int i) {
         return neighbors.get(i).size();
     }

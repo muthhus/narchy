@@ -63,6 +63,7 @@ public class ConcurrentArrayList<E> extends AbstractList<E>
     return _array.length;
   }
   
+  @Override
   public E get(int index)
   {
     return _array[index];
@@ -144,6 +145,7 @@ public class ConcurrentArrayList<E> extends AbstractList<E>
     }
   }
   
+  @Override
   public E set(int index, E value)
   {
     synchronized (_list) {
@@ -171,6 +173,7 @@ public class ConcurrentArrayList<E> extends AbstractList<E>
     }
   }
   
+  @Override
   public E remove(int index)
   {
     synchronized (_list) {
@@ -255,7 +258,7 @@ public class ConcurrentArrayList<E> extends AbstractList<E>
   }
 
   public interface Match<E,K> {
-    public boolean isMatch(E element, K key);
+    boolean isMatch(E element, K key);
   }
   
   public static class ArrayIterator<E> implements Iterator<E> {

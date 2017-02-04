@@ -49,6 +49,7 @@ public class FastUndirGraph extends ConstUndirGraph {
 
 // -----------------------------------------------------------------
 
+    @Override
     protected void initGraph() {
         final int max = g.size();
         triangle = new BitSet[max];
@@ -76,6 +77,7 @@ public class FastUndirGraph extends ConstUndirGraph {
 // =================================================================
 
 
+    @Override
     public boolean isEdge(int i, int j) {
         // make sure i>j
         if (i < j) {

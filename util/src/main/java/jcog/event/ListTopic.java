@@ -11,6 +11,7 @@ public class ListTopic<V> extends ArrayList<Consumer<V>> implements Topic<V> {
         super();
     }
 
+    @Override
     public final void emit(V arg) {
         for (int i = 0, thisSize = this.size(); i < thisSize; i++) {
             this.get(i).accept(arg);
@@ -18,12 +19,14 @@ public class ListTopic<V> extends ArrayList<Consumer<V>> implements Topic<V> {
 
     }
 
+    @Override
     public final On on(Consumer<V> o) {
         On d = new On(this, o);
         this.add(o);
         return d;
     }
 
+    @Override
     public final void off(On<V> o) {
         if(!this.remove(o.reaction)) {
             throw new RuntimeException(this + " has not " + o.reaction);
@@ -35,6 +38,7 @@ public class ListTopic<V> extends ArrayList<Consumer<V>> implements Topic<V> {
         throw new UnsupportedOperationException();
     }
 
+    @Override
     public void delete() {
         clear();
     }

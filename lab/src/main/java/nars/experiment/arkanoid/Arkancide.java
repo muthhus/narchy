@@ -13,13 +13,17 @@ import nars.task.MutableTask;
 
 public class Arkancide extends NAgents {
 
+    static boolean cam = true;
+
     public static void main(String[] args) {
         Param.DEBUG = false;
 
         //runRT(Arkancide::new);
         //nRT(Arkancide::new, 25, 5);
 
-        NAR nar = runRT((NAR n)-> new Arkancide(n, false), 25, 5, -1);
+        NAR nar = runRT((NAR n) -> {
+            return new Arkancide(n, cam);
+        }, 35, 35, -1);
 
         //nar.beliefConfidence(0.75f);
         //nar.goalConfidence(0.75f);
@@ -50,7 +54,7 @@ public class Arkancide extends NAgents {
             }
         };
 
-        nar.input(new MutableTask(happy, Op.BELIEF, $.t(0.5f, 0.08f)).eternal());
+        nar.input(new MutableTask(happy, Op.BELIEF, $.t(0.5f, 0.15f)).eternal());
 
         //float resX = Math.max(0.01f, 1f/visW); //dont need more resolution than 1/pixel_width
         //float resY = Math.max(0.01f, 1f/visH); //dont need more resolution than 1/pixel_width
@@ -66,9 +70,9 @@ public class Arkancide extends NAgents {
         else {
             nar.beliefConfidence(0.9f);
             nar.goalConfidence(0.8f);
-            nar.linkFeedbackRate.setValue(0.05f);
+            nar.linkFeedbackRate.setValue(0.01f);
             //nar.logBudgetMin(System.out, 0.6f);
-            nar.termVolumeMax.setValue(28); //should need less complexity in non-camera mode
+            nar.termVolumeMax.setValue(20); //should need less complexity in non-camera mode
         }
 
         //addCameraRetina("zoom(cam(noid))", noid, visW/2, visH/2, (v) -> $.t(v, alpha));
@@ -98,7 +102,7 @@ public class Arkancide extends NAgents {
     @Override
     protected float act() {
         float nextScore = noid.next();
-        float reward = nextScore - prevScore;
+        float reward = Math.max(-1f, Math.min(1f,nextScore - prevScore));
         this.prevScore = nextScore;
         if (reward == 0)
             return Float.NaN;
