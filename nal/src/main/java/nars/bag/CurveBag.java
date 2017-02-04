@@ -88,8 +88,9 @@ public class CurveBag<V> extends ArrayBag<V> implements Bag<V> {
                 int i = sampleIndex(s);
                 BLink<V> b = get(i);
                 if (b.isDeleted()) {
-                    if (removeItem(b)!=null)
-                        s--;
+                    items.removeFast(i);
+                    map.remove(b.get());
+                    s--;
                     //then try again
                 } else {
                     return b;

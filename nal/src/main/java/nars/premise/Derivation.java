@@ -217,6 +217,8 @@ public class Derivation extends Unify {
         float premiseEvidence = task.isBeliefOrGoal() ? task.evi() : 0;
         if (belief!=null)
             premiseEvidence = Math.max(premiseEvidence, belief.evi());
+        if (premiseEvidence!=premiseEvidence)
+            premiseEvidence = 0; //???
         this.premiseEvidence = premiseEvidence;
 
     }

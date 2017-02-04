@@ -40,7 +40,7 @@ public class DefaultPremiseBuilder extends PremiseBuilder {
         @Override
         public @Nullable Budget budget(@NotNull Term conclusion, @Nullable Truth truth, @NotNull Derivation conclude) {
 
-            float truthFactor = qualityFactor(truth, conclude);
+            float truthFactor = Util.unitize(qualityFactor(truth, conclude));
             float complexityFactor =
                     BudgetFunctions.occamComplexityGrowthRelative(conclusion, task, belief, 1);
 
@@ -74,7 +74,10 @@ public class DefaultPremiseBuilder extends PremiseBuilder {
                 return //1;
                        conclude.nar.qualityDefault(Op.QUESTION);
             } else {
-                return truth.conf() / w2c(conclude.premiseEvidence);
+                float pe = conclude.premiseEvidence;
+                if (pe == 0)
+                    return 0; //??
+                return truth.conf() / w2c(pe);
             }
         }
 

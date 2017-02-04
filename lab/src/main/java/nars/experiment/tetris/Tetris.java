@@ -3,13 +3,12 @@ package nars.experiment.tetris;
 import nars.$;
 import nars.NAR;
 import nars.Narsese;
+import nars.Task;
 import nars.concept.ActionConcept;
 import nars.concept.SensorConcept;
+import nars.control.TaskBagControl;
 import nars.experiment.tetris.impl.TetrisState;
 import nars.experiment.tetris.impl.TetrisVisualizer;
-import nars.gui.ConceptWidget;
-import nars.gui.NARSpace;
-import nars.nar.NARBuilder;
 import nars.remote.NAgents;
 import nars.term.Compound;
 import nars.term.atom.Atomic;
@@ -17,15 +16,10 @@ import nars.time.FrameTime;
 import nars.truth.Truth;
 import nars.util.task.TaskStatistics;
 import org.jetbrains.annotations.NotNull;
-import spacegraph.SimpleSpatial;
-import spacegraph.SpaceGraph;
-import spacegraph.Spatial;
-import spacegraph.layout.Flatten;
 import spacegraph.math.v2;
 import spacegraph.space.layout.Grid;
 import spacegraph.space.widget.MatrixView;
 
-import java.util.Collection;
 import java.util.List;
 
 import static nars.$.$;
@@ -461,7 +455,18 @@ public class Tetris extends NAgents {
                     NAgents.newMultiThreadNAR(4, clock);
                     //NARBuilder.newALANN(clock, 4, 64, 5, 4, 1);
 
-            nar.termVolumeMax.setValue(18);
+
+            TaskBagControl tc = new TaskBagControl(nar, 1024) {
+                @Override protected void output(Task t) {
+                    //logger.info("aux: {}", t);
+                    nar.input(t);
+                }
+            };
+            nar.onTask(tc::input);
+            nar.onCycle(()->tc.run(32));
+
+
+            nar.termVolumeMax.setValue(24);
             //nar.linkFeedbackRate.setValue(0.05f);
 
             //newTimeWindow(nar);
