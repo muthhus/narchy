@@ -3,8 +3,10 @@ package nars.table;
 import jcog.Util;
 import jcog.list.FasterList;
 import jcog.list.MultiRWFasterList;
+import jcog.math.Interval;
 import nars.$;
 import nars.NAR;
+import nars.Param;
 import nars.Task;
 import nars.concept.Concept;
 import nars.task.Revision;
@@ -157,6 +159,8 @@ public class MicrosphereTemporalBeliefTable extends MultiRWFasterList<Task> impl
 
                 final Truth after = truth(now, eternal);
                 delta[0] = new TruthDelta(before, after);
+
+                feedback(l, input);
             }
         });
 
@@ -170,6 +174,39 @@ public class MicrosphereTemporalBeliefTable extends MultiRWFasterList<Task> impl
         return delta[0];
     }
 
+    /** apply feedback for a newly inserted task */
+    protected void feedback(MutableList<Task> l, @NotNull Task inserted) {
+        float f = inserted.freq();
+        float q = inserted.qua();
+        float c = inserted.conf();
+        long is = inserted.start();
+        long ie = inserted.end();
+        for (int i = 0, lSize = l.size(); i < lSize; i++) {
+            Task x = l.get(i);
+            if (x == inserted) continue;
+
+            float dq = q - x.qua();
+            if (dq > Param.BUDGET_EPSILON) {
+
+                float df = Math.abs(f - x.freq());
+                if (df > Param.TRUTH_EPSILON) {
+                    long xs = x.start();
+                    long xe = x.end();
+                    Interval overlap = Interval.intersect(is, ie, xs, xe);
+
+                    if (overlap!=null) {
+
+                        float penalty =  dq * df * ((1f + overlap.length()) / (1f + (xe-xs)));
+                        if (penalty > Param.BUDGET_EPSILON) {
+                            System.out.println("penalty: " + penalty);
+                            x.budget().mul(1f - penalty, 1f - penalty);
+                        }
+
+                    }
+                }
+            }
+        }
+    }
 
 
 //    /** HACK use of volatiles here is a hack. it may rarely cause the bag to experience flashbacks. proper locking can solve this */
