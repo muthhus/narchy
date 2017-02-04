@@ -304,10 +304,11 @@ public interface Term extends Termed, Termlike, Comparable<Termlike> {
 
     /** total span of time consumed within a temporal compound */
     default int dtRange() {
-        if (op().temporal) {
+        Op o = op();
+        if (o.temporal) {
             Compound c = (Compound) this;
             int dt = c.dt();
-            if (size()==2) {
+            if (o.statement) {
 
                 switch (dt) {
                     case DTERNAL:
@@ -324,6 +325,13 @@ public interface Term extends Termed, Termlike, Comparable<Termlike> {
                 //}
                 //return Math.abs(dt);
 
+            } else  {
+                int s = 0;
+                for (Term x : c.terms()) {
+                    s = Math.max(s, x.dtRange());
+                }
+
+                return s;
             }
         }
         return 0;
