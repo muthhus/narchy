@@ -209,7 +209,7 @@ public class AlannControl implements Control {
 
             fireTermLinks.set(1, fireRate);
 
-            active = new CurveBag<Concept>(capacity, new CurveBag.NormalizedSampler(power2BagCurve, nar.random), BudgetMerge.plusBlend, new ConcurrentHashMap<>(capacity)) {
+            active = new CurveBag<Concept>(capacity, new CurveBag.NormalizedSampler(power2BagCurve, nar.random), BudgetMerge.maxBlend, new ConcurrentHashMap<>(capacity)) {
 
                 @Override
                 public void onAdded(BLink<Concept> value) {

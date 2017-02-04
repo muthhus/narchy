@@ -9,6 +9,7 @@ import nars.budget.Budget;
 import nars.budget.BudgetFunctions;
 import nars.concept.Concept;
 import nars.term.Term;
+import nars.term.Termed;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -31,7 +32,7 @@ public class DefaultPremiseBuilder extends PremiseBuilder {
 
     static class DefaultPremise extends Premise {
 
-        public DefaultPremise(@NotNull Concept c, @NotNull Task task, Term beliefTerm, Task belief, float pri, float qua) {
+        public DefaultPremise(@NotNull Termed c, @NotNull Task task, Term beliefTerm, Task belief, float pri, float qua) {
             super(c, task, beliefTerm, belief, pri, qua);
         }
 
@@ -61,9 +62,9 @@ public class DefaultPremiseBuilder extends PremiseBuilder {
     }
 
     /** prioritizes derivations exhibiting confidence increase, relative to the premise's evidence */
-    static class PreferConfidencePremise extends DefaultPremise {
+    public static class PreferConfidencePremise extends DefaultPremise {
 
-        public PreferConfidencePremise(@NotNull Concept c, @NotNull Task task, Term beliefTerm, Task belief, float pri, float qua) {
+        public PreferConfidencePremise(Termed c, @NotNull Task task, Term beliefTerm, Task belief, float pri, float qua) {
             super(c, task, beliefTerm, belief, pri, qua);
         }
 

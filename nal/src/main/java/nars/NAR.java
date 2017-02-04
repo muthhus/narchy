@@ -327,7 +327,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
     /**
      * parses and forms a Task from a string but doesnt input it
      */
-    @Nullable
+    @NotNull
     public Task task(@NotNull String taskText) throws NarseseException {
         Task task = Narsese.the().task(taskText, this);
         //task.normalize(this);
