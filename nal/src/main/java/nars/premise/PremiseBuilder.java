@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.function.Consumer;
 
 import static nars.term.Terms.compoundOrNull;
+import static nars.time.Tense.ETERNAL;
 import static nars.util.UtilityFunctions.or;
 
 
@@ -166,8 +167,11 @@ abstract public class PremiseBuilder {
 
 
 
-        long when =
-                task.start();
+        //temporal focus:
+        long when = task.mid();
+        if (when == ETERNAL || nar.random.nextBoolean())
+            when = now;
+
         //nar.random.nextBoolean() ?
         // : now;
         //now;

@@ -76,7 +76,7 @@ public class Arkancide extends NAgents {
         nar.beliefConfidence(0.5f);
         nar.goalConfidence(0.5f);
         //nar.linkFeedbackRate.setValue(0.02f);
-        nar.termVolumeMax.setValue(32);
+        nar.termVolumeMax.setValue(28);
 
 
 

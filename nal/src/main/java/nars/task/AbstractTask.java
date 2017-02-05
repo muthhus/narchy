@@ -559,24 +559,32 @@ public abstract class AbstractTask extends RawBudget implements Task {
             return t.eternalizedConf();
         else {
             long z = end();
+            float dur = dur();
+            float factor =
+                    (this instanceof DerivedTask) ?
+                        (z==a) ? 1f : Math.min(1f, dur / (z - a)) //divide the evidence across the timespan, in proportion to the number of durations involved
+                            :
+                        1f;
 
-            if (z < a) { long x = a; a = z; z = x; } //order a..z
+            float ccw = factor * cw;
+
             if ((when >= a) && (when <= z)) {
-                return cw;
+                return ccw;
             } else {
                 long nearest; //nearest endpoint of the interval
                 if (when <= a) nearest = a;
                 else /*if (when > z)*/ nearest = z;
                 long delta = Math.abs(nearest - when);
 
-                float dur = dur();
+
                 /*if (dur!=dur)
                     throw new RuntimeException("NaN duration");*/
 
                 //dur *= evidence().length;
 
-                float dc = TruthPolation.evidenceDecay(cw, dur, delta);
-                return eternalizable() ? Math.max(dc, t.eternalizedConf()) : dc;
+                float dc = TruthPolation.evidenceDecay(ccw, dur, delta);
+                return dc;
+                //return eternalizable() ? Math.max(dc, t.eternalizedConf()) : dc;
 
             }
 
@@ -584,16 +592,16 @@ public abstract class AbstractTask extends RawBudget implements Task {
 
     }
 
-    public boolean eternalizable() {
-        return term.vars() > 0;
-        //return term.varIndep() > 0;
-        //return false;
-
-
-        //Op op = term.op();
-        //return op ==IMPL || op ==EQUI || term.vars() > 0;
-        //return op.statement || term.vars() > 0;
-    }
+//    public boolean eternalizable() {
+//        return term.vars() > 0;
+//        //return term.varIndep() > 0;
+//        //return false;
+//
+//
+//        //Op op = term.op();
+//        //return op ==IMPL || op ==EQUI || term.vars() > 0;
+//        //return op.statement || term.vars() > 0;
+//    }
 
 
 

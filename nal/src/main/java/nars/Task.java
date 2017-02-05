@@ -669,7 +669,8 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
 
 
     default long mid() {
-        return Math.round((start() + end()) / 2L);
+        long s = start();
+        return (s != ETERNAL) ? Math.round((s + end()) / 2L) : ETERNAL;
     }
 
     default long range() {
