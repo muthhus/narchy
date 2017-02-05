@@ -43,11 +43,18 @@ import static nars.Op.PROD;
 public class DefaultConceptBuilder implements ConceptBuilder {
 
     public DefaultConceptBuilder() {
+        this(
+            new DefaultConceptState("sleep", 12, 12, 2, 12, 10),
+            new DefaultConceptState("awake", 16, 16, 3, 24, 16)
+        );
+    }
 
-        this.sleep = new DefaultConceptState("sleep", 12, 12, 2, 12, 10);
+    public DefaultConceptBuilder(ConceptState sleep, ConceptState awake) {
+
+        this.sleep = sleep;
         this.init = sleep;
 
-        this.awake = new DefaultConceptState("awake", 16, 16, 3, 24, 16);
+        this.awake = awake;
     }
 
 //    private static final int DEFAULT_ATOM_LINK_MAP_CAPACITY = 128;
@@ -246,14 +253,6 @@ public class DefaultConceptBuilder implements ConceptBuilder {
     private boolean validUnwrappableSubterms(@NotNull TermContainer subterms) {
         return !subterms.or(x -> x instanceof Variable);
     }
-
-
-    /**
-     * use average blend so that reactivations of adjusted task budgets can be applied repeatedly without inflating the link budgets they activate; see CompoundConcept.process
-     */
-    private final BudgetMerge mergeDefault = BudgetMerge.plusBlend;
-    //.avgBlend;
-
 
 
 

@@ -11,9 +11,12 @@ import nars.budget.BudgetMerge;
 import nars.concept.CompoundConcept;
 import nars.concept.Concept;
 import nars.conceptualize.DefaultConceptBuilder;
+import nars.conceptualize.state.ConceptState;
+import nars.conceptualize.state.DefaultConceptState;
 import nars.derive.DefaultDeriver;
 import nars.derive.Deriver;
 import nars.index.task.MapTaskIndex;
+import nars.index.task.TaskIndex;
 import nars.index.term.map.CaffeineIndex;
 import nars.link.BLink;
 import nars.premise.DefaultPremiseBuilder;
@@ -22,12 +25,14 @@ import nars.time.FrameTime;
 import nars.truth.TruthDelta;
 import nars.util.exe.SynchronousExecutor;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ForkJoinPool;
+import java.util.function.Consumer;
 
 import static nars.Op.*;
 import static nars.bag.CurveBag.power2BagCurve;
@@ -46,6 +51,17 @@ public class TaskNAR extends NAR {
 
     static class SimpleConceptBuilder extends DefaultConceptBuilder {
 
+        public SimpleConceptBuilder() {
+            this(new DefaultConceptState("x",
+                    16, 16,
+                    3,
+                    0, 0));
+        }
+
+        public SimpleConceptBuilder(ConceptState s) {
+            super( s,s );
+        }
+
         @NotNull
         @Override
         public <X> Bag<X> newBag(@NotNull Map m) {
@@ -54,9 +70,14 @@ public class TaskNAR extends NAR {
 
     }
 
+    @Override
+    protected TaskIndex newTaskIndex() {
+        return new TaskBagIndex();
+    }
+
+
     public TaskNAR(int capacity) {
         super(new FrameTime(), new CaffeineIndex(new SimpleConceptBuilder(), -1, false, ForkJoinPool.commonPool()),
-                new MapTaskIndex(true) /* deprecated */,
                 new XorShift128PlusRandom(1), new SynchronousExecutor());
 
 
@@ -129,18 +150,6 @@ public class TaskNAR extends NAR {
             return null;
     }
 
-    @Override
-    protected Task addIfAbsent(@NotNull Task t) {
-        BLink<Task> r = tasks.put(t);
-        if (r == null)
-            return t; //rejected
-
-        Task t2 = r.get();
-        if (t2 != t)
-            return t2; //duplicate
-
-        return null; //accepted
-    }
 
     public void cycle() {
         tasks.commit();
@@ -198,4 +207,39 @@ public class TaskNAR extends NAR {
         }
     }
 
+    private final class TaskBagIndex implements TaskIndex {
+
+        @Override
+        public @Nullable Task addIfAbsent(@NotNull Task t) {
+            BLink<Task> r = tasks.put(t);
+            if (r == null)
+                return t; //rejected
+
+            Task t2 = r.get();
+            if (t2 != t)
+                return t2; //duplicate
+
+            return null; //accepted
+        }
+
+        @Override
+        public void removeInternal(@NotNull Task tt) {
+            tasks.remove(tt);
+        }
+
+        @Override
+        public void clear() {
+            tasks.clear();
+        }
+
+        @Override
+        public void forEach(@NotNull Consumer<Task> each) {
+            tasks.forEachKey(each);
+        }
+
+        @Override
+        public boolean contains(@NotNull Task t) {
+            return tasks.contains(t);
+        }
+    }
 }

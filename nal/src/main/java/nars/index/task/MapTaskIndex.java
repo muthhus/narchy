@@ -14,7 +14,7 @@ import java.util.function.Consumer;
 /**
  * Created by me on 8/14/16.
  */
-public final class MapTaskIndex extends TaskIndex {
+public final class MapTaskIndex implements TaskIndex {
 
     final static Logger logger = LoggerFactory.getLogger(MapTaskIndex.class);
 
@@ -69,7 +69,7 @@ public final class MapTaskIndex extends TaskIndex {
 
 
     @Override
-    protected final void removeInternal(@NotNull Task tt) {
+    public final void removeInternal(@NotNull Task tt) {
         tasks.remove(tt);
     }
 

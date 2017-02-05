@@ -12,7 +12,7 @@ import java.util.function.Consumer;
 /**
  * Created by me on 10/14/16.
  */
-public class TreeTaskIndex extends TaskIndex {
+public class TreeTaskIndex implements TaskIndex {
 
 
     public final MyConcurrentRadixTree<Task> tasks = new MyConcurrentRadixTree<>();
@@ -40,7 +40,7 @@ public class TreeTaskIndex extends TaskIndex {
     }
 
     @Override
-    protected final void removeInternal(@NotNull Task tt) {
+    public final void removeInternal(@NotNull Task tt) {
         tasks.remove(key(tt));
     }
 
