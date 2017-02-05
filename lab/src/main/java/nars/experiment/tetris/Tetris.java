@@ -6,7 +6,7 @@ import nars.Narsese;
 import nars.Task;
 import nars.concept.ActionConcept;
 import nars.concept.SensorConcept;
-import nars.control.TaskBagControl;
+import nars.control.TaskNAR;
 import nars.experiment.tetris.impl.TetrisState;
 import nars.experiment.tetris.impl.TetrisVisualizer;
 import nars.remote.NAgents;
@@ -456,14 +456,7 @@ public class Tetris extends NAgents {
                     //NARBuilder.newALANN(clock, 4, 64, 5, 4, 1);
 
 
-            TaskBagControl tc = new TaskBagControl(nar, 1024) {
-                @Override protected void output(Task t) {
-                    //logger.info("aux: {}", t);
-                    nar.input(t);
-                }
-            };
-            nar.onTask(tc::input);
-            nar.onCycle(()->tc.run(32));
+
 
 
             nar.termVolumeMax.setValue(24);

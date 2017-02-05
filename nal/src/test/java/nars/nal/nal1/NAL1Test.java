@@ -14,7 +14,7 @@ import static nars.time.Tense.ETERNAL;
 @RunWith(Parameterized.class)
 public class NAL1Test extends AbstractNALTest {
 
-    final int CYCLES = 50;
+    final int CYCLES = 150;
 
     public NAL1Test(Supplier<NAR> b) {
         super(b);

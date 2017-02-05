@@ -195,7 +195,14 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
     }
 
     public NAR(@NotNull Time time, @NotNull TermIndex concepts, @NotNull Random rng, @NotNull Executioner exe) {
+        this(time, concepts, new MapTaskIndex(exe.concurrent()), rng, exe);
+            //new TreeTaskIndex(); //Not working perfectly yet: confuses &&+ and ==>+ among other possible bugs
+    }
+
+    public NAR(@NotNull Time time, @NotNull TermIndex concepts, TaskIndex tasks, @NotNull Random rng, @NotNull Executioner exe) {
+
         this.random = rng;
+
         this.exe = exe;
 
         this.level = 8;
@@ -204,12 +211,9 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
 
         this.concepts = concepts;
 
-        this.tasks =
-                new MapTaskIndex(exe.concurrent());
-                //new TreeTaskIndex(); //Not working perfectly yet: confuses &&+ and ==>+ among other possible bugs
+        this.tasks = tasks;
 
-
-        emotion = new Emotion();
+        this.emotion = new Emotion();
 
         concepts.start(this);
 
@@ -705,7 +709,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
 
         emotion.busy(input.priSafe(0));
 
-        Task existing = tasks.addIfAbsent(input);
+        Task existing = addIfAbsent(input);
 
         if (existing == null) {
 
@@ -783,6 +787,10 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
         }
 
         return null;
+    }
+
+    protected Task addIfAbsent(@NotNull Task input) {
+        return tasks.addIfAbsent(input);
     }
 
 //    /**

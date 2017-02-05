@@ -25,6 +25,7 @@ import java.util.function.IntFunction;
 import static nars.time.Tense.ETERNAL;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Created by me on 5/24/16.
@@ -72,7 +73,7 @@ public class QuestionTest {
 
         nar.run(cycles);
 
-        assertEquals(1, ok.get());
+        assertTrue( ok.get() > 0);
 
 //           .onAnswer(question, a -> { //.en("What is a type of swimmer?")
 //
