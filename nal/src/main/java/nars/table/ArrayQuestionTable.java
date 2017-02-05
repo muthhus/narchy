@@ -1,9 +1,10 @@
 package nars.table;
 
 
+import jcog.list.FasterList;
+import jcog.list.MultiRWFasterList;
 import nars.NAR;
 import nars.Task;
-import org.eclipse.collections.impl.list.mutable.MultiReaderFastList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -14,27 +15,23 @@ import java.util.Iterator;
 import java.util.function.Consumer;
 
 /**
- * implements a Task table suitable for Questions and Quests using an ArrayList.
+ * implements a Task table suitable for Questions and Quests using an Array
  * uses a List and assumes that it is an ArrayList that can be
  * accessed by index.
  * <p>
  * TODO use a ring-buffer deque slightly faster than basic ArrayList modification
  */
-public class ArrayQuestionTable  implements QuestionTable, Comparator<Task> {
+public class ArrayQuestionTable extends MultiRWFasterList<Task> implements QuestionTable, Comparator<Task> {
 
     protected int capacity;
     static final Logger logger = LoggerFactory.getLogger(ArrayQuestionTable.class);
 
-    @NotNull
-    private final MultiReaderFastList<Task> list;
+
 
     public ArrayQuestionTable(int capacity) {
-        super();
-
-        this.list = MultiReaderFastList.newList(capacity);
+        super(new FasterList<Task>(capacity));
 
         this.capacity = capacity;
-        //setCapacity(capacity);
     }
 
     @Override
@@ -48,7 +45,7 @@ public class ArrayQuestionTable  implements QuestionTable, Comparator<Task> {
         if (this.capacity != newCapacity) {
 
 
-            list.withWriteLockAndDelegate(ll -> {
+            withWriteLockAndDelegate(ll -> {
                 this.capacity = newCapacity;
 
                 int s = ll.size();
@@ -63,17 +60,15 @@ public class ArrayQuestionTable  implements QuestionTable, Comparator<Task> {
         }
     }
 
-
     @Override
-    public final int size() {
-        return list.size();
+    public boolean remove(Task x) {
+        final boolean[] removed = new boolean[1];
+        withWriteLockAndDelegate(l -> {
+            removed[0] = l.remove(x);
+        });
+        return removed[0];
     }
 
-
-    @Override
-    public final boolean isEmpty() {
-        return list.isEmpty();
-    }
 
 
     @Nullable
@@ -87,7 +82,7 @@ public class ArrayQuestionTable  implements QuestionTable, Comparator<Task> {
         final Task[] trash = new Task[1];
         final Task[] result = new Task[1];
 
-        list.withWriteLockAndDelegate(l -> {
+        withWriteLockAndDelegate(l -> {
 
             int sizeStart = l.size();
             if (sizeStart > 0) {
@@ -128,15 +123,10 @@ public class ArrayQuestionTable  implements QuestionTable, Comparator<Task> {
     }
 
 
-    @NotNull
-    @Override
-    public Iterator<Task> iterator() {
-        return list.iterator();
-    }
 
     @Override
     public final void forEach(@NotNull Consumer<? super Task> action) {
-        list.forEach(t -> {
+        super.forEach(t -> {
             if (/*t != null && */!t.isDeleted())
                 action.accept(t);
         });
@@ -190,7 +180,7 @@ public class ArrayQuestionTable  implements QuestionTable, Comparator<Task> {
 //    @Override
 //    public void answer(@NotNull Task a, Concept answerConcept, @NotNull NAR nar, List<Task> displ) {
 //
-//        list.withWriteLockAndDelegate(l -> {
+//        withWriteLockAndDelegate(l -> {
 //            int size = l.size();
 //
 //            //each question is only responsible for 1/N of the effect on the answer

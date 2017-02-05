@@ -91,7 +91,7 @@ public class AtomConcept extends AtomicStringConstant implements Concept {
 
     @Override
     public Activation process(@NotNull Task input, NAR nar) {
-        throw new UnsupportedOperationException("Atom " + this + " can not process Tasks; " + input);
+        throw new UnsupportedOperationException();
     }
 
     @NotNull

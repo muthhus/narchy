@@ -55,6 +55,11 @@ public interface QuestionTable extends TaskTable {
             return 0;
         }
 
+        @Override
+        public boolean remove(Task x) {
+            return false;
+        }
+
         @Nullable
         @Override
         public Task add(Task t, BeliefTable answers, NAR n) {

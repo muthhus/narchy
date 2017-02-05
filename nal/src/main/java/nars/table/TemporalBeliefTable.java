@@ -48,6 +48,11 @@ public interface TemporalBeliefTable extends TaskTable {
         }
 
         @Override
+        public boolean remove(Task x) {
+            return false;
+        }
+
+        @Override
         public int size() {
             return 0;
         }

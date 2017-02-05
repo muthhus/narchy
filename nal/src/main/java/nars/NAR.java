@@ -722,7 +722,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
 
                 Concept c = input.concept(this);
 
-                Activation a = c.process(input, this);
+                Activation a = process(input, c);
                 if (a != null) {
 
                     eventTaskProcess.emit(input); //signal any additional processes
@@ -787,6 +787,10 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
         }
 
         return null;
+    }
+
+    protected Activation process(@NotNull Task t, Concept c) {
+        return c.process(t, this);
     }
 
     protected Task addIfAbsent(@NotNull Task input) {

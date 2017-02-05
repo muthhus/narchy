@@ -656,6 +656,20 @@ public class CompoundConcept<T extends Compound> implements Concept, Termlike {
         return term.volume();
     }
 
+    public int taskCount() {
+        int s = 0;
+        if (beliefs!=null)
+            s += beliefs.size();
+        if (goals!=null)
+            s += goals.size();
+        if (questions!=null)
+            s += questions.size();
+        if (quests!=null)
+            s += quests.size();
+
+        return s;
+    }
+
 //    static final class MyMicrosphereTemporalBeliefTable extends MicrosphereTemporalBeliefTable {
 //
 //        private final Time time;

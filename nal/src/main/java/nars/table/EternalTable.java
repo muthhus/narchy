@@ -34,6 +34,11 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, Sorted
         }
 
         @Override
+        public boolean remove(Task x) {
+            return false;
+        }
+
+        @Override
         public final int capacity() {
             //throw new UnsupportedOperationException();
             return Integer.MAX_VALUE;
@@ -251,6 +256,14 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, Sorted
 //        }
 //        TaskTable.removeTask(belief, null, displ);
 //    }
+
+
+    @Override
+    public boolean remove(Task x) {
+        synchronized (this) {
+            return remove(indexOf(x, this))!=null;
+        }
+    }
 
     @Nullable
     public TruthDelta add(@NotNull Task input, CompoundConcept<?> concept, @NotNull NAR nar) {

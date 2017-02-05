@@ -38,6 +38,11 @@ public class DefaultBeliefTable implements BeliefTable {
     }
 
     @Override
+    public boolean remove(Task x) {
+        return (x.isEternal()) ?  eternal.remove(x) : temporal.remove(x);
+    }
+
+    @Override
     public void clear(@NotNull NAR nar) {
         if (!eternal.isEmpty())
             throw new UnsupportedOperationException("eternal clear impl soon");

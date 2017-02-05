@@ -59,6 +59,9 @@ public interface TaskTable extends Iterable<Task> {
         });
     }
 
+    /** returns true if the task was removed */
+    boolean remove(Task x);
+
 
     //boolean contains(Task t);
 

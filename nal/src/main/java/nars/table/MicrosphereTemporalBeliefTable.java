@@ -109,6 +109,14 @@ public class MicrosphereTemporalBeliefTable extends MultiRWFasterList<Task> impl
     }
 
 
+    @Override
+    public boolean remove(Task x) {
+        final boolean[] removed = new boolean[1];
+        withWriteLockAndDelegate(l -> {
+           removed[0] = l.remove(x);
+        });
+        return removed[0];
+    }
 
     @Override
     public final boolean isEmpty() {

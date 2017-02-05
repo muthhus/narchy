@@ -4,9 +4,12 @@ import jcog.data.MutableInteger;
 import jcog.data.random.XorShift128PlusRandom;
 import nars.NAR;
 import nars.Task;
+import nars.attention.Activation;
 import nars.bag.Bag;
 import nars.bag.CurveBag;
 import nars.budget.BudgetMerge;
+import nars.concept.CompoundConcept;
+import nars.concept.Concept;
 import nars.conceptualize.DefaultConceptBuilder;
 import nars.derive.DefaultDeriver;
 import nars.derive.Deriver;
@@ -16,6 +19,7 @@ import nars.link.BLink;
 import nars.premise.DefaultPremiseBuilder;
 import nars.premise.Derivation;
 import nars.time.FrameTime;
+import nars.truth.TruthDelta;
 import nars.util.exe.SynchronousExecutor;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -25,6 +29,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ForkJoinPool;
 
+import static nars.Op.*;
 import static nars.bag.CurveBag.power2BagCurve;
 
 /**
@@ -60,10 +65,23 @@ public class TaskNAR extends NAR {
             @Override
             public void onAdded(BLink<Task> value) {
                 //value.get().state(nar.concepts.conceptBuilder().awake(), nar);
+
             }
 
             @Override
             public void onRemoved(@NotNull BLink<Task> value) {
+                Task x = value.get();
+                CompoundConcept c = (CompoundConcept) x.concept(TaskNAR.this);
+                if (c != null) {
+                    synchronized (c) {
+                        c.tableFor(x.punc()).remove(x);
+
+                        if (c.taskCount() == 0) {
+                            concepts.remove(c.term());
+                        }
+                    }
+                }
+
                 //value.get().state(nar.concepts.conceptBuilder().sleep(), nar);
             }
         };
@@ -74,13 +92,51 @@ public class TaskNAR extends NAR {
     }
 
     @Override
+    protected Activation process(@NotNull Task x, Concept cc) {
+
+        //TODO this duplicates CompoundConcept.process code
+
+        boolean accepted = false;
+        TruthDelta delta = null;
+        CompoundConcept c = (CompoundConcept) cc;
+
+
+        switch (x.punc()) {
+            case BELIEF:
+                delta = c.processBelief(x, this);
+                break;
+
+            case GOAL:
+                delta = c.processGoal(x, this);
+                break;
+
+            case QUESTION:
+                accepted = c.processQuestion(x, this);
+                break;
+
+            case QUEST:
+                accepted = c.processQuest(x, this);
+                break;
+
+            default:
+                throw new RuntimeException("Invalid sentence type: " + x);
+        }
+
+
+        if (accepted || delta != null)
+            return new MyActivation(x, c);
+        else
+            return null;
+    }
+
+    @Override
     protected Task addIfAbsent(@NotNull Task t) {
         BLink<Task> r = tasks.put(t);
         if (r == null)
             return t; //rejected
 
         Task t2 = r.get();
-        if (t2!=t)
+        if (t2 != t)
             return t2; //duplicate
 
         return null; //accepted
@@ -107,9 +163,9 @@ public class TaskNAR extends NAR {
         Task b = bb.get();
 
         DefaultPremiseBuilder.PreferConfidencePremise p = new DefaultPremiseBuilder.PreferConfidencePremise(
-            a /* not necessary */,
-            a, b.term(), (b!=a && b.isBelief()) ? b : null,
-            1f, 1f
+                a /* not necessary */,
+                a, b.term(), (b != a && b.isBelief()) ? b : null,
+                1f, 1f
         );
 
         deriver.accept(new Derivation(this, p, this::input));
@@ -134,6 +190,12 @@ public class TaskNAR extends NAR {
 
         n.tasks.print();
 
+    }
+
+    private class MyActivation extends Activation {
+        public MyActivation(@NotNull Task t, Concept c) {
+            super(t, 1f, c, TaskNAR.this);
+        }
     }
 
 }
