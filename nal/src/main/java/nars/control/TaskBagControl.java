@@ -61,6 +61,9 @@ public class TaskBagControl {
     }
 
     public Task input(Task t) {
+        if (t.isCommand())
+            return t;
+
         try {
             t.normalize(nar);
             BLink<Task> r = tasks.put(t);
@@ -99,7 +102,7 @@ public class TaskBagControl {
 
         DefaultPremiseBuilder.PreferConfidencePremise p = new DefaultPremiseBuilder.PreferConfidencePremise(
             a /* not necessary */,
-            a, b.term(), b!=a ? b : null,
+            a, b.term(), (b!=a && b.isBelief()) ? b : null,
             1f, 1f
         );
 

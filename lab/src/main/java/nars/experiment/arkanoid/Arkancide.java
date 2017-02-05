@@ -23,7 +23,7 @@ public class Arkancide extends NAgents {
 
         NAR nar = runRT((NAR n) -> {
             return new Arkancide(n, cam);
-        }, 55, 15, -1);
+        }, 55, 10, -1);
 
         //nar.beliefConfidence(0.75f);
         //nar.goalConfidence(0.75f);
@@ -73,10 +73,10 @@ public class Arkancide extends NAgents {
             //addCameraRetina("zoom(cam(noid))", noid, visW/2, visH/2, (v) -> $.t(v, alpha));
         }
 
-        nar.beliefConfidence(0.8f);
-        nar.goalConfidence(0.7f);
-        nar.linkFeedbackRate.setValue(0.02f);
-        nar.termVolumeMax.setValue(28);
+        nar.beliefConfidence(0.5f);
+        nar.goalConfidence(0.5f);
+        //nar.linkFeedbackRate.setValue(0.02f);
+        nar.termVolumeMax.setValue(32);
 
 
 

@@ -28,7 +28,7 @@ public class Hear extends Loop {
 
     private final NAR nar;
     private final Term[] context;
-    private final Term[] contextAnonymous;
+    //private final Term[] contextAnonymous;
     private final List<Term> tokens;
     public final On onReset;
     int token = 0;
@@ -64,7 +64,7 @@ public class Hear extends Loop {
         onReset = nar.eventReset.on(this::onReset);
         tokens = msg;
         context = new Term[]{$.the("hear"), $.quote(who), Op.Imdex};
-        contextAnonymous = new Term[]{$.the("hear"), $.varDep(1), Op.Imdex};
+        //contextAnonymous = new Term[]{$.the("hear"), $.varDep(1), Op.Imdex};
         start(wordDelayMS);
     }
 
@@ -94,7 +94,7 @@ public class Hear extends Loop {
 
     private void hear(Term prev, Term next) {
         Compound term = $.inh(next, $.imge(context));
-        Compound termAnonymous = $.inh(next, $.imge(contextAnonymous));
+        //Compound termAnonymous = $.inh(next, $.imge(contextAnonymous));
         //$.inh($.p(prev,next), $.imge(context)), //bigram
         //$.prop(next, (context[1])),
         //$.func("hear", chan_nick, tokens.get(token++))
@@ -102,13 +102,13 @@ public class Hear extends Loop {
         float onConf = nar.confidenceDefault(BELIEF) * confFactor;
 
         {
-            Concept concept = nar.concept(termAnonymous);
+            Concept concept = nar.concept(term);
 
             //if (((DefaultBeliefTable) concept.beliefs()).eternal.isEmpty()) {
             if (concept == null) {
                 //input a constant negative bias - we dont hear the word when it is not spoken
                 //only input when first conceptualized
-                nar.believe(termAnonymous, Tense.Eternal, 0f, offConf);
+                nar.believe(term, Tense.Eternal, 0f, offConf);
             }
         }
 
