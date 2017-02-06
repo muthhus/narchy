@@ -22,6 +22,7 @@ import nars.index.term.map.CaffeineIndex;
 import nars.link.BLink;
 import nars.premise.DefaultPremiseBuilder;
 import nars.premise.Derivation;
+import nars.term.Term;
 import nars.time.FrameTime;
 import nars.time.Time;
 import nars.truth.TruthDelta;
@@ -40,7 +41,6 @@ import java.util.function.Consumer;
 
 import static nars.Op.*;
 import static nars.bag.CurveBag.power2BagCurve;
-import static nars.bag.CurveBag.power4BagCurve;
 
 /**
  * heuristic task-driven NAR model without concept link network
@@ -52,7 +52,7 @@ public class TaskNAR extends NAR {
     public final CurveBag<Task> tasks;
     final Deriver deriver = new DefaultDeriver();
 
-    final MutableInteger derivationsPerCycle = new MutableInteger(1024);
+    final MutableInteger derivationsPerCycle = new MutableInteger(256);
 
     static class SimpleConceptBuilder extends DefaultConceptBuilder {
 
@@ -90,12 +90,21 @@ public class TaskNAR extends NAR {
                 new XorShift128PlusRandom(1), exe);
 
 
-        tasks = new CurveBag<Task>(capacity, new CurveBag.NormalizedSampler(power4BagCurve, random), BudgetMerge.maxBlend, new ConcurrentHashMap<>(capacity)) {
+        tasks = new CurveBag<Task>(capacity, new CurveBag.NormalizedSampler(power2BagCurve, random), BudgetMerge.maxBlend, new ConcurrentHashMap<>(capacity)) {
+
+            float sortPercentage = 0.025f;
 
             @Override
             protected void sortAfterUpdate() {
                 //do nothing here = only sort on commit
                 //super.sortAfterUpdate();
+
+                int s = size();
+                int sortRange = (int)Math.ceil(s * sortPercentage);
+                int start = sampleIndex();
+                int end = Math.min(start + sortRange, s-1);
+
+                qsort(new int[sortSize(sortRange) /* estimate */], items.array(), start /*dirtyStart - 1*/, end);
             }
 
             @Override
@@ -210,18 +219,32 @@ public class TaskNAR extends NAR {
 
         Task a = ba.get();
         Task b = bb.get();
+        Term t = b.term();
 
-        float p = UtilityFunctions.and(a.priSafe(0),b.priSafe(0));
+        float p;
+        if (b==a || !b.isBelief()) {
+            b = null;
+            p = a.priSafe(0);
+        } else {
+            p = UtilityFunctions.aveAri(a.priSafe(0),b.priSafe(0));
+        }
+
         if (p < tasks.priMin()) {
             tasks.pressure += p;
             return; //useless
         }
 
-        float q = UtilityFunctions.aveAri(a.qua(),b.qua());
+        float q;
+        if (b==null) {
+            q = a.qua();
+        } else {
+            q = UtilityFunctions.aveAri(a.qua(),b.qua());
+        }
+
 
         DefaultPremiseBuilder.PreferConfidencePremise c = new DefaultPremiseBuilder.PreferConfidencePremise(
                 a /* not necessary */,
-                a, b.term(), (b != a && b.isBelief()) ? b : null,
+                a, t, b,
                 p, q
         );
 

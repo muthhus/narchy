@@ -9,26 +9,21 @@ import static nars.truth.TruthFunctions.c2w;
 /** indicates an implementation has, or is associated with a specific TruthValue */
 public interface Truthed  {
 
-
-
-
     @Nullable
     Truth truth();
 
 
     default float expectation() { return truth().expectation(); }
 
-    /** balanced form of expectation, where -1 = no, +1 = yes, and 0 = maybe */
-    default float motivationUnweighted() {
-        return (freq() - 0.5f) * conf() * 2f;
-    }
+//    /** balanced form of expectation, where -1 = no, +1 = yes, and 0 = maybe */
+//    default float motivationUnweighted() {
+//        return (freq() - 0.5f) * conf() * 2f;
+//    }
 
     /** balanced form of expectation, where -infinity = no, +infinity = yes, and 0 = maybe */
     default float motivation() {
-        return (freq() - 0.5f) * c2w(conf()) * 2f;
+        return (freq() - 0.5f) * evi() * 2f;
     }
-
-
 
     default float conf() {
         Truth t = truth();

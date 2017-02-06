@@ -588,7 +588,7 @@ public abstract class AbstractTask extends RawBudget implements Task {
             }
 
             if (eternalizable()) {
-                float et = t.eternalizedConf();
+                float et = t.eternalizedConf() * factor;
                 ccw = Math.max(ccw, et);
             }
 

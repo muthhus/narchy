@@ -23,7 +23,7 @@ public class Arkancide extends NAgents {
 
         NAR nar = runRT((NAR n) -> {
             return new Arkancide(n, cam);
-        }, 55, 10, -1);
+        }, 35, 10, -1);
 
         //nar.beliefConfidence(0.75f);
         //nar.goalConfidence(0.75f);

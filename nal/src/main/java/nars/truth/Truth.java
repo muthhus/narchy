@@ -294,10 +294,10 @@ public interface Truth extends Truthed {
     default float eternalizedConf() {
         return TruthFunctions.eternalize(conf());
     }
-    default float eternalizedConfWeight() {
-        //TODO does this simplify?
-        return c2w(TruthFunctions.eternalize(conf()));
-    }
+//    default float eternalizedConfWeight() {
+//        //TODO does this simplify?
+//        return c2w(TruthFunctions.eternalize(conf()));
+//    }
 
     @Nullable
     static Truth maxConf(@Nullable Truth a, @Nullable Truth b) {

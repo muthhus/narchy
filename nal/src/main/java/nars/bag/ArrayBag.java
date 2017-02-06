@@ -489,7 +489,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
             qsort(new int[sortSize(s) /* estimate */], items.array(), 0 /*dirtyStart - 1*/, (s - 1));
     }
 
-    private static int sortSize(int s) {
+    protected static int sortSize(int s) {
         //estimate, probably log2(size)
         if (s < 128) {
             return 8;

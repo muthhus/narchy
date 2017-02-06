@@ -254,8 +254,6 @@ public final class TruthFunctions extends UtilityFunctions {
         return c < minConf ? null : desire(aFreq, bFreq, c);
     }
 
-
-
     /**
      * A function specially designed for desire value [To be refined]
      */

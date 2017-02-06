@@ -3,17 +3,18 @@ package nars.experiment.tetris;
 import nars.$;
 import nars.NAR;
 import nars.Narsese;
-import nars.Task;
 import nars.concept.ActionConcept;
 import nars.concept.SensorConcept;
 import nars.control.TaskNAR;
 import nars.experiment.tetris.impl.TetrisState;
 import nars.experiment.tetris.impl.TetrisVisualizer;
+import nars.op.stm.MySTMClustered;
 import nars.remote.NAgents;
 import nars.term.Compound;
 import nars.term.atom.Atomic;
 import nars.time.FrameTime;
 import nars.truth.Truth;
+import nars.util.exe.MultiThreadExecutioner;
 import nars.util.task.TaskStatistics;
 import org.jetbrains.annotations.NotNull;
 import spacegraph.math.v2;
@@ -39,7 +40,7 @@ public class Tetris extends NAgents {
 
     public static final int tetris_width = 6;
     public static final int tetris_height = 12;
-    public static final int TIME_PER_FALL = 8;
+    public static final int TIME_PER_FALL = 4;
     public static final int PIXEL_RADIX = 2;
 
     private static SensorConcept[][] concept;
@@ -450,17 +451,19 @@ public class Tetris extends NAgents {
         public static void main(String[] args) throws Narsese.NarseseException {
             //Param.DEBUG = true;
 
-            FrameTime clock = new FrameTime().dur(3);
+            FrameTime clock = new FrameTime().dur(1);
             //NAR nar =
                     //NAgents.newMultiThreadNAR(4, clock);
                     //NARBuilder.newALANN(clock, 4, 64, 5, 4, 1);
 
-            NAR nar = new TaskNAR(32 * 1024);
+            NAR nar = new TaskNAR(32 * 1024, new MultiThreadExecutioner(2, 4096), clock);
 
+            nar.termVolumeMax.setValue(32);
+            nar.truthResolution.setValue(0.03f);
 
+            MySTMClustered stm = new MySTMClustered(nar, 64, '.', 4, true, 8);
+            MySTMClustered stmGoal = new MySTMClustered(nar, 16, '!', 2, true, 4);
 
-
-            nar.termVolumeMax.setValue(22);
             //nar.linkFeedbackRate.setValue(0.05f);
 
             //newTimeWindow(nar);
@@ -531,7 +534,7 @@ public class Tetris extends NAgents {
 //        nar.compoundVolumeMax.setValue(maxVol);
 //        nar.linkFeedbackRate.setValue(0.15f);
 //
-//        //nar.truthResolution.setValue(0.02f);
+
 //
 ////        nar.on(new TransformConcept("seq", (c) -> {
 ////            if (c.size() != 3)
@@ -567,8 +570,6 @@ public class Tetris extends NAgents {
 //
 //        new Inperience(nar);
 //
-//        MySTMClustered stm = new MySTMClustered(nar, 64, '.', 4, true, 8);
-//        MySTMClustered stmGoal = new MySTMClustered(nar, 16, '!', 2, true, 4);
 
             //new VariableCompressor(nar);
 
@@ -580,7 +581,7 @@ public class Tetris extends NAgents {
 
 
 
-            t.runRT(25f).join();
+            t.runRT(25f ).join();
 
 //        NARController meta = new NARController(nar, loop, t);
 //
