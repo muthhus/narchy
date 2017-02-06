@@ -65,15 +65,14 @@ public class AnswerTask extends MutableTask {
 
     @Nullable
     public final AnswerTask budget(@NotNull Task a, @NotNull Task b, float aMix) {
-        float priSum = a.pri() + b.pri();
-        boolean deleted = priSum != priSum;
-        float newPri = !deleted ? Util.unitize(priSum) : Float.NaN;
+        float priSum = a.priSafe(0) + b.priSafe(0);
+        float newPri = Util.unitize(priSum);
 
         budgetSafe(
                 newPri,
-                !deleted ? Util.lerp(aMix, a.qua(), b.qua()) : 0
+                Util.lerp(aMix, a.qua(), b.qua())
         );
-        return !deleted ? this : null;
+        return this;
     }
 
     @Override

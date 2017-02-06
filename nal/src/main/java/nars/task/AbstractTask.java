@@ -569,7 +569,7 @@ public abstract class AbstractTask extends RawBudget implements Task {
             float ccw = factor * cw;
 
             if ((when >= a) && (when <= z)) {
-                return ccw;
+
             } else {
                 long nearest; //nearest endpoint of the interval
                 if (when <= a) nearest = a;
@@ -582,26 +582,32 @@ public abstract class AbstractTask extends RawBudget implements Task {
 
                 //dur *= evidence().length;
 
-                float dc = TruthPolation.evidenceDecay(ccw, dur, delta);
-                return dc;
+                ccw = TruthPolation.evidenceDecay(ccw, dur, delta);
                 //return eternalizable() ? Math.max(dc, t.eternalizedConf()) : dc;
 
             }
+
+            if (eternalizable()) {
+                float et = t.eternalizedConf();
+                ccw = Math.max(ccw, et);
+            }
+
+            return ccw;
 
         }
 
     }
 
-//    public boolean eternalizable() {
-//        return term.vars() > 0;
-//        //return term.varIndep() > 0;
-//        //return false;
-//
-//
-//        //Op op = term.op();
-//        //return op ==IMPL || op ==EQUI || term.vars() > 0;
-//        //return op.statement || term.vars() > 0;
-//    }
+    public boolean eternalizable() {
+        return term.vars() > 0;
+        //return term.varIndep() > 0;
+        //return false;
+
+
+        //Op op = term.op();
+        //return op ==IMPL || op ==EQUI || term.vars() > 0;
+        //return op.statement || term.vars() > 0;
+    }
 
 
 

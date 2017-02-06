@@ -5,6 +5,8 @@ import nars.$;
 import nars.NAR;
 import nars.Narsese;
 import nars.Task;
+import nars.table.BeliefTable;
+import nars.table.MicrosphereTemporalBeliefTable;
 import nars.table.SensorBeliefTable;
 import nars.term.Compound;
 import nars.term.Term;
@@ -12,6 +14,7 @@ import nars.truth.Truth;
 import nars.util.signal.ScalarSignal;
 import org.eclipse.collections.api.block.function.primitive.FloatFunction;
 import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunction;
+import org.eclipse.collections.api.list.MutableList;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,11 +56,12 @@ public class SensorConcept extends WiredConcept implements FloatFunction<Term>, 
         pri(() -> n.priorityDefault(BELIEF));
     }
 
+    @Override
+    public MicrosphereTemporalBeliefTable newTemporalTable(int tCap) {
+        return new MyMicrosphereTemporalBeliefTable(tCap);
+    }
 
-
-
-
-//    /** originating from this sensor, or a future prediction */
+    //    /** originating from this sensor, or a future prediction */
 //    @Override
 //    public boolean validBelief(@NotNull Task t, @NotNull NAR nar) {
 //        //return onlyDerivationsIfFuture(t, nar);
@@ -196,6 +200,17 @@ public class SensorConcept extends WiredConcept implements FloatFunction<Term>, 
     @Override
     public void accept(Task generated) {
         nar.input(generated);
+    }
+
+    private static class MyMicrosphereTemporalBeliefTable extends MicrosphereTemporalBeliefTable {
+        public MyMicrosphereTemporalBeliefTable(int tCap) {
+            super(tCap);
+        }
+
+        @Override
+        protected void feedback(MutableList<Task> l,  @NotNull Task inserted) {
+            //ignore feedback here
+        }
     }
 
 

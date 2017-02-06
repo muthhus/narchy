@@ -9,6 +9,7 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.test.analyze.BeliefAnalysis;
 import nars.time.Tense;
+import org.jetbrains.annotations.Nullable;
 import org.junit.Test;
 
 import java.util.Random;
@@ -202,6 +203,20 @@ public class RevisionTest {
         n.frame(1);
     }*/
 
+
+    }
+
+    @Test public void testRevision3Eternals() throws Narsese.NarseseException {
+        Default  n = newNAR(6);
+        //n.log();
+        n.input("(a). %1.0;0.5%",
+                "(a). %0.0;0.5%",
+                "(a). %0.1;0.5%"
+                );
+        n.run(1);
+        Task t = n.concept("(a)").beliefs().matchEternal();
+        assertEquals(0.37f, t.freq(), 0.01f);
+        assertEquals(0.75f, t.conf(), 0.01f);
 
     }
 

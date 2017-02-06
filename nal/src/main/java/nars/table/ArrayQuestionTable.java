@@ -122,13 +122,12 @@ public class ArrayQuestionTable extends MultiRWFasterList<Task> implements Quest
         return result[0];
     }
 
-
-
-    @Override
-    public final void forEach(@NotNull Consumer<? super Task> action) {
-        super.forEach(t -> {
-            if (/*t != null && */!t.isDeleted())
-                action.accept(t);
+    @Override public final void forEach(@NotNull Consumer<? super Task> action) {
+        withWriteLockAndDelegate(l->{
+            l.forEach(t -> {
+                if (/*t != null && */!t.isDeleted())
+                    action.accept(t);
+            });
         });
     }
 

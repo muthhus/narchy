@@ -8,6 +8,7 @@ import nars.$;
 import nars.NAR;
 import nars.Param;
 import nars.Task;
+import nars.budget.Budget;
 import nars.concept.Concept;
 import nars.task.Revision;
 import nars.task.TruthPolation;
@@ -191,6 +192,8 @@ public class MicrosphereTemporalBeliefTable extends MultiRWFasterList<Task> impl
         long ie = inserted.end();
         Interval ii = new Interval(is, ie);
 
+        float penaltySum = 0;
+
         for (int i = 0, lSize = l.size(); i < lSize; i++) {
             Task x = l.get(i);
             if (x == inserted) continue;
@@ -210,13 +213,22 @@ public class MicrosphereTemporalBeliefTable extends MultiRWFasterList<Task> impl
 
                         float penalty =  dqf * ((1f + overlap.length()) / (1f + (xe-xs)));
                         if (penalty > Param.BUDGET_EPSILON) {
-                            x.budget().mul(1f - penalty, 1f - penalty);
+                            Budget b = x.budget();
+                            float pBefore = b.priSafe(0), pAfter;
+                            if (pBefore > 0) {
+                                b.mul(1f - penalty, 1f - penalty);
+                                pAfter = b.pri();
+                                penaltySum += pAfter - pBefore;
+                            }
                         }
 
                     }
                 }
             }
         }
+
+        if (penaltySum > 0)
+            inserted.budget().priAdd(penaltySum); //absorb removed priority from sibling tasks
     }
 
 
@@ -439,9 +451,13 @@ public class MicrosphereTemporalBeliefTable extends MultiRWFasterList<Task> impl
 
         if (t != null) {
             double factor = (double) ac / (ac + bc);
-            long midStart = (long) Math.round(Util.lerp(factor, a.start(), b.start()));
-            long midEnd = (long) Math.round(Util.lerp(factor, a.end(), b.end()));
-            return Revision.mergeInterpolate(a, b, midStart, midEnd, now, t, true);
+
+            long mergedStart = //Math.min(a.start(), b.start());
+                         (long) Math.round(Util.lerp(factor, a.start(), b.start()));
+            long mergedEnd = //Math.max(a.end(), b.end());
+                         (long) Math.round(Util.lerp(factor, a.end(), b.end()));
+
+            return Revision.mergeInterpolate(a, b, mergedStart, mergedEnd, now, t, true);
         }
 
         return null;

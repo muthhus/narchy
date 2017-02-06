@@ -40,6 +40,7 @@ import java.util.function.Consumer;
 
 import static nars.Op.*;
 import static nars.bag.CurveBag.power2BagCurve;
+import static nars.bag.CurveBag.power4BagCurve;
 
 /**
  * heuristic task-driven NAR model without concept link network
@@ -89,7 +90,7 @@ public class TaskNAR extends NAR {
                 new XorShift128PlusRandom(1), exe);
 
 
-        tasks = new CurveBag<Task>(capacity, new CurveBag.NormalizedSampler(power2BagCurve, random), BudgetMerge.maxBlend, new ConcurrentHashMap<>(capacity)) {
+        tasks = new CurveBag<Task>(capacity, new CurveBag.NormalizedSampler(power4BagCurve, random), BudgetMerge.maxBlend, new ConcurrentHashMap<>(capacity)) {
 
             @Override
             protected void sortAfterUpdate() {
@@ -216,7 +217,7 @@ public class TaskNAR extends NAR {
             return; //useless
         }
 
-        float q = UtilityFunctions.or(a.qua(),b.qua());
+        float q = UtilityFunctions.aveAri(a.qua(),b.qua());
 
         DefaultPremiseBuilder.PreferConfidencePremise c = new DefaultPremiseBuilder.PreferConfidencePremise(
                 a /* not necessary */,

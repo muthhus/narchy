@@ -330,9 +330,9 @@ public class IRCAgent extends IRC {
 
         IRCAgent bot = new IRCAgent(n,
                 "experiment1", "irc.freenode.net",
-                "#123xyz"
+                //"#123xyz"
                 //"#netention"
-                //"#nars"
+                "#nars"
         );
 
         n.on("trace", (Command) (a, t, nn) -> {

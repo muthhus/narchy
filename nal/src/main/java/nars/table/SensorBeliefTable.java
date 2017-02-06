@@ -25,6 +25,8 @@ public class SensorBeliefTable extends DefaultBeliefTable  {
         this.sensorConcept = sensorConcept;
     }
 
+
+
     @Override
     public TruthDelta add(@NotNull Task input, @NotNull QuestionTable questions, @NotNull CompoundConcept<?> concept, @NotNull NAR nar) {
 

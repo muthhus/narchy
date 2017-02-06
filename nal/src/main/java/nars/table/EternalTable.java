@@ -296,7 +296,8 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, Sorted
             }
 
             //Try forming a revision and if successful, inputs to NAR for subsequent cycle
-            if (!(input instanceof AnswerTask)) {
+            /*if (!(input instanceof AnswerTask))*/
+            {
                 revised = tryRevision(input, concept, nar);
                 if (revised != null) {
                     if (revised.isDeleted()) {
@@ -309,9 +310,9 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, Sorted
                             throw new RuntimeException("useless revision");
                     }
                 }
-            } else {
+            }/* else {
                 revised = null;
-            }
+            }*/
 
 
             //Finally try inserting this task.  If successful, it will be returned for link activation etc
