@@ -285,6 +285,9 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, Sorted
             return null;
         }
 
+        Task revised = null;
+        TruthDelta delta = null;
+
         synchronized (this) {
             if ((input.conf() >= 1f) && (cap != 1) && (isEmpty() || (first().conf() < 1f))) {
                 //AXIOMATIC/CONSTANT BELIEF/GOAL
@@ -293,7 +296,6 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, Sorted
             }
 
             //Try forming a revision and if successful, inputs to NAR for subsequent cycle
-            Task revised;
             if (!(input instanceof AnswerTask)) {
                 revised = tryRevision(input, concept, nar);
                 if (revised != null) {
@@ -313,33 +315,34 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, Sorted
 
 
             //Finally try inserting this task.  If successful, it will be returned for link activation etc
-            TruthDelta delta = insert(input, nar);
-            if (revised != null) {
+            delta = insert(input, nar);
 
-                //            revised = insert(revised, displaced) ? revised : null;
-                //
-                //            if (revised!=null) {
-                //                if (result == null) {
-                //                    result = revised;
-                //                } else {
-                //                    //HACK
-                //                    //insert a tasklink since it will not be created normally
-                //                    nar.activate(revised, nar.conceptActivation.floatValue() /* correct? */);
-                //                    revised.onConcept(revised.concept(nar), 0f);
-                //
-                //                }
-                //            }
-                //result = insert(revised, et) ? revised : result;
-                nar.inputLater(revised);
-                //            nar.runLater(() -> {
-                //                if (!revised.isDeleted())
-                //                    nar.input(revised);
-                //            });
-            }
-
-            return delta;
         }
 
+        if (revised != null) {
+
+            //            revised = insert(revised, displaced) ? revised : null;
+            //
+            //            if (revised!=null) {
+            //                if (result == null) {
+            //                    result = revised;
+            //                } else {
+            //                    //HACK
+            //                    //insert a tasklink since it will not be created normally
+            //                    nar.activate(revised, nar.conceptActivation.floatValue() /* correct? */);
+            //                    revised.onConcept(revised.concept(nar), 0f);
+            //
+            //                }
+            //            }
+            //result = insert(revised, et) ? revised : result;
+            nar.inputLater(revised);
+            //            nar.runLater(() -> {
+            //                if (!revised.isDeleted())
+            //                    nar.input(revised);
+            //            });
+        }
+
+        return delta;
     }
 
 

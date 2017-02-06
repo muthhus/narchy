@@ -384,7 +384,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
                         v.delete();
                         added = false;
                     } else {
-                        sort();
+                        sortAfterUpdate();
                         added = true;
                     }
                 }
@@ -400,7 +400,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
 
         } else {
             synchronized (items) {
-                sort(); //TODO see if this works better here, being an adaptive sort: https://en.wikipedia.org/wiki/Smoothsort
+                sortAfterUpdate(); //TODO see if this works better here, being an adaptive sort: https://en.wikipedia.org/wiki/Smoothsort
             }
             return v;
         }
@@ -479,6 +479,10 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
         return this;
     }
 
+    protected void sortAfterUpdate() {
+        sort();
+    }
+
     public void sort() {
         int s = size();
         if (s > 0)
@@ -492,7 +496,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
         } else  if (s < 2048) {
             return 16;
         } else {
-            return 24;
+            return 32;
         }
     }
 

@@ -51,7 +51,7 @@ public class TaskNAR extends NAR {
     public final CurveBag<Task> tasks;
     final Deriver deriver = new DefaultDeriver();
 
-    final MutableInteger derivationsPerCycle = new MutableInteger(32);
+    final MutableInteger derivationsPerCycle = new MutableInteger(64);
 
     static class SimpleConceptBuilder extends DefaultConceptBuilder {
 
@@ -92,6 +92,12 @@ public class TaskNAR extends NAR {
         tasks = new CurveBag<Task>(capacity, new CurveBag.NormalizedSampler(power2BagCurve, random), BudgetMerge.maxBlend, new ConcurrentHashMap<>(capacity)) {
 
             @Override
+            protected void sortAfterUpdate() {
+                //do nothing here = only sort on commit
+                //super.sortAfterUpdate();
+            }
+
+            @Override
             public void onAdded(BLink<Task> value) {
                 //value.get().state(nar.concepts.conceptBuilder().awake(), nar);
 
@@ -100,19 +106,21 @@ public class TaskNAR extends NAR {
             @Override
             public void onRemoved(@NotNull BLink<Task> value) {
                 Task x = value.get();
-                CompoundConcept c = (CompoundConcept) x.concept(TaskNAR.this);
-                if (c != null) {
-                    c.tableFor(x.punc()).remove(x);
+                runLater(()-> {
+                    CompoundConcept c = (CompoundConcept) x.concept(TaskNAR.this);
+                    if (c != null) {
+                        c.tableFor(x.punc()).remove(x);
 
-                    if (!(c instanceof PermanentConcept)) {
-                        //synchronized (c) {
+                        if (!(c instanceof PermanentConcept)) {
+                            //synchronized (c) {
                             if (c.taskCount() == 0) {
                                 concepts.remove(c.term());
                                 c.delete(TaskNAR.this);
                             }
-                        //}
+                            //}
+                        }
                     }
-                }
+                });
 
                 //value.get().state(nar.concepts.conceptBuilder().sleep(), nar);
             }

@@ -134,10 +134,9 @@ public abstract class CollectorMap<K, V> {
                 //                //return null;
                 //            }
 
-                if (/*removed!=null && */removed != e) {
+                /*if (removed != e) {
                     throw new RuntimeException(x + " removed " + e + " but item removed was something else: " + removed);
-                            //+ removed);
-                }
+                }*/
                 return removed;
             }
         }
