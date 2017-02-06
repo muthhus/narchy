@@ -1,6 +1,7 @@
 package nars.table;
 
 import jcog.data.sorted.SortedArray;
+import nars.$;
 import nars.NAR;
 import nars.Param;
 import nars.Task;
@@ -16,6 +17,7 @@ import nars.truth.TruthDelta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.List;
 import java.util.function.Consumer;
 
 import static nars.time.Tense.ETERNAL;
@@ -69,15 +71,18 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, Sorted
 
             this.capacity = c;
 
+            List<Task> removed = $.newArrayList(1);
             synchronized (this) {
 
                 int s = size();
 
                 //TODO can be accelerated by batch remove operation
                 while (c < s--) {
-                    nar.tasks.remove(removeWeakest());
+                    removed.add(removeWeakest());
                 }
             }
+
+            nar.tasks.remove(removed);
         }
     }
 
@@ -260,8 +265,13 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, Sorted
 
     @Override
     public boolean remove(Task x) {
+
         synchronized (this) {
-            return remove(indexOf(x, this))!=null;
+            int index = indexOf(x, this);
+            if (index == -1)
+                return false;
+
+            return remove(index)!=null;
         }
     }
 

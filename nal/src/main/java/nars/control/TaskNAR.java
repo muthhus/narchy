@@ -2,6 +2,7 @@ package nars.control;
 
 import jcog.data.MutableInteger;
 import jcog.data.random.XorShift128PlusRandom;
+import nars.$;
 import nars.NAR;
 import nars.Task;
 import nars.attention.Activation;
@@ -10,28 +11,31 @@ import nars.bag.CurveBag;
 import nars.budget.BudgetMerge;
 import nars.concept.CompoundConcept;
 import nars.concept.Concept;
+import nars.concept.PermanentConcept;
 import nars.conceptualize.DefaultConceptBuilder;
 import nars.conceptualize.state.ConceptState;
 import nars.conceptualize.state.DefaultConceptState;
 import nars.derive.DefaultDeriver;
 import nars.derive.Deriver;
-import nars.index.task.MapTaskIndex;
 import nars.index.task.TaskIndex;
 import nars.index.term.map.CaffeineIndex;
 import nars.link.BLink;
 import nars.premise.DefaultPremiseBuilder;
 import nars.premise.Derivation;
 import nars.time.FrameTime;
+import nars.time.Time;
 import nars.truth.TruthDelta;
-import nars.util.exe.SynchronousExecutor;
+import nars.util.UtilityFunctions;
+import nars.util.exe.Executioner;
+import nars.util.exe.MultiThreadExecutioner;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ForkJoinPool;
 import java.util.function.Consumer;
 
 import static nars.Op.*;
@@ -47,7 +51,7 @@ public class TaskNAR extends NAR {
     public final CurveBag<Task> tasks;
     final Deriver deriver = new DefaultDeriver();
 
-    final MutableInteger derivationsPerCycle = new MutableInteger(16);
+    final MutableInteger derivationsPerCycle = new MutableInteger(32);
 
     static class SimpleConceptBuilder extends DefaultConceptBuilder {
 
@@ -77,8 +81,12 @@ public class TaskNAR extends NAR {
 
 
     public TaskNAR(int capacity) {
-        super(new FrameTime(), new CaffeineIndex(new SimpleConceptBuilder(), -1, false, ForkJoinPool.commonPool()),
-                new XorShift128PlusRandom(1), new SynchronousExecutor());
+        this(capacity, new MultiThreadExecutioner(2, 4096), new FrameTime());
+    }
+
+    public TaskNAR(int capacity, Executioner exe, Time time) {
+        super(time, new CaffeineIndex(new SimpleConceptBuilder(), -1, false, exe),
+                new XorShift128PlusRandom(1), exe);
 
 
         tasks = new CurveBag<Task>(capacity, new CurveBag.NormalizedSampler(power2BagCurve, random), BudgetMerge.maxBlend, new ConcurrentHashMap<>(capacity)) {
@@ -94,12 +102,15 @@ public class TaskNAR extends NAR {
                 Task x = value.get();
                 CompoundConcept c = (CompoundConcept) x.concept(TaskNAR.this);
                 if (c != null) {
-                    synchronized (c) {
-                        c.tableFor(x.punc()).remove(x);
+                    c.tableFor(x.punc()).remove(x);
 
-                        if (c.taskCount() == 0) {
-                            concepts.remove(c.term());
-                        }
+                    if (!(c instanceof PermanentConcept)) {
+                        //synchronized (c) {
+                            if (c.taskCount() == 0) {
+                                concepts.remove(c.term());
+                                c.delete(TaskNAR.this);
+                            }
+                        //}
                     }
                 }
 
@@ -154,30 +165,65 @@ public class TaskNAR extends NAR {
     public void cycle() {
         tasks.commit();
 
-        for (int i = 0; i < derivationsPerCycle.intValue(); i++)
-            derive();
+        float load = exe.load();
+
+        int cpf = Math.round(derivationsPerCycle.floatValue() * (1f - load));
+        if (cpf > 0) {
+
+            int cbs = 4; //conceptsFiredPerBatch.intValue();
+
+            //logger.info("firing {} concepts (exe load={})", cpf, load);
+
+            while (cpf > 0) {
+
+                int batchSize = Math.min(cpf, cbs);
+                cpf -= cbs;
+
+                runLater(() -> {
+                    List<BLink<Task>> sampled = $.newArrayList(batchSize*2);
+                    tasks.sample(batchSize*2, sampled::add);
+                    int n = sampled.size();
+                    for (int i = 0; i < n; )
+                        derive(sampled.get(i++), i < n ? sampled.get(i++) : null);
+                });
+            }
+        }
     }
 
-    public void derive() {
+    protected void processDuplicate(@NotNull Task input, Task existing) {
+        /* n/a */
+    }
 
-        BLink<Task> ba = tasks.sample();
-        if (ba == null)
-            return;
+    public void derive(BLink<Task> ba, BLink<Task> bb) {
 
-        BLink<Task> bb = tasks.sample(); //TODO add learning/filtering heuristics which depend on 'a'
-        if (bb == null)
+        if (ba == null || bb == null)
             return;
 
         Task a = ba.get();
         Task b = bb.get();
 
-        DefaultPremiseBuilder.PreferConfidencePremise p = new DefaultPremiseBuilder.PreferConfidencePremise(
+        float p = UtilityFunctions.and(a.priSafe(0),b.priSafe(0));
+        if (p < tasks.priMin()) {
+            tasks.pressure += p;
+            return; //useless
+        }
+
+        float q = UtilityFunctions.or(a.qua(),b.qua());
+
+        DefaultPremiseBuilder.PreferConfidencePremise c = new DefaultPremiseBuilder.PreferConfidencePremise(
                 a /* not necessary */,
                 a, b.term(), (b != a && b.isBelief()) ? b : null,
-                1f, 1f
+                p, q
         );
 
-        deriver.accept(new Derivation(this, p, this::input));
+        deriver.accept(new Derivation(this, c,
+//                t -> {
+//                    //if (t.pri() > a.pri() || t.pri() > b.pri())
+//                        logger.info("{} {}\n\t{}", a, b, t);
+//                    input(t);
+//                }
+                this::input
+        ));
 
     }
 

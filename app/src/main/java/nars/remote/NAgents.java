@@ -10,6 +10,7 @@ import nars.bag.ArrayBag;
 import nars.bag.Bagregate;
 import nars.budget.BudgetMerge;
 import nars.conceptualize.DefaultConceptBuilder;
+import nars.control.TaskNAR;
 import nars.gui.BagChart;
 import nars.gui.Vis;
 import nars.index.term.map.CaffeineIndex;
@@ -116,7 +117,10 @@ abstract public class NAgents extends NAgent {
 
     public static NAR runRT(Function<NAR, NAgents> init, float fps, int durFrames, int endTime) {
 
-        NAR nar = NAgents.newMultiThreadNAR(3, new RealTime.CS(true).dur(durFrames/fps), false);
+        Time clock = new RealTime.CS(true).dur(durFrames / fps);
+        NAR nar =
+                new TaskNAR(8 * 1024, new MultiThreadExecutioner(3, 4 * 1024), clock);
+                //NAgents.newMultiThreadNAR(3, clock, false);
         //NAR nar = newNAR();
         //NAR nar = newAlann(durFrames/fps);
 

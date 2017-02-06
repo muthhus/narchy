@@ -752,41 +752,45 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
             }
         } else {
 
-            if (existing != input) {
-
-                //different instance
-
-                float reactivation;
-                Budget e = existing.budget();
-                if (!existing.isDeleted()) {
-                    float ep = e.priSafe(0);
-                    reactivation = Util.unitize((input.priSafe(0) - ep) / ep);
-                    if (reactivation > 0) {
-                        DuplicateMerge.merge(e, input, 1f);
-                    }
-                    input.feedback(null, Float.NaN, Float.NaN, this);
-                } else {
-                    //this may never get called due to the replacement above
-                    //attempt to revive deleted task
-                    e.set(input.budget());
-                    reactivation = 1f;
-                }
-
-                input.delete("Duplicate");
-
-                //re-activate only
-                if (reactivation > 0) {
-                    Concept c = existing.concept(this);
-                    if (c != null) {
-                        ((CompoundConcept) c).activateTask(existing, this, reactivation);
-                    }
-                }
-
-            }
+            processDuplicate(input, existing);
 
         }
 
         return null;
+    }
+
+    protected void processDuplicate(@NotNull Task input, Task existing) {
+        if (existing != input) {
+
+            //different instance
+
+            float reactivation;
+            Budget e = existing.budget();
+            if (!existing.isDeleted()) {
+                float ep = e.priSafe(0);
+                reactivation = Util.unitize((input.priSafe(0) - ep) / ep);
+                if (reactivation > 0) {
+                    DuplicateMerge.merge(e, input, 1f);
+                }
+                input.feedback(null, Float.NaN, Float.NaN, this);
+            } else {
+                //this may never get called due to the replacement above
+                //attempt to revive deleted task
+                e.set(input.budget());
+                reactivation = 1f;
+            }
+
+            input.delete("Duplicate");
+
+            //re-activate only
+            if (reactivation > 0) {
+                Concept c = existing.concept(this);
+                if (c != null) {
+                    ((CompoundConcept) c).activateTask(existing, this, reactivation);
+                }
+            }
+
+        }
     }
 
     protected Activation process(@NotNull Task t, Concept c) {

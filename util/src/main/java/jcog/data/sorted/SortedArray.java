@@ -499,6 +499,9 @@ public class SortedArray<E> implements Iterable<E> {
 			return -1;*/
 
 		int size = size();
+		if (size == 0)
+		    return -1;
+
 		if (size >= binarySearchThreshold) {
 
             final int[] rightBorder = {0};
