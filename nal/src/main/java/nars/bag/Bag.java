@@ -5,6 +5,7 @@ import jcog.table.Table;
 import nars.$;
 import nars.Param;
 import nars.attention.Forget;
+import nars.bag.experimental.HijackBag;
 import nars.budget.Budget;
 import nars.budget.Budgeted;
 import nars.link.BLink;
@@ -435,7 +436,9 @@ public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Iterable<BLink<
 
     @Deprecated default Bag<V> commit() {
         return commit((b)->{
-            return Forget.forget(((ArrayBag)b).pressure, ((ArrayBag)b).mass(), b.size(), Param.BAG_THRESHOLD);
+            float p = b instanceof ArrayBag ? ((ArrayBag) b).pressure : ((HijackBag)b).pressure; //HACK
+            float m = b instanceof ArrayBag ? ((ArrayBag) b).mass(): ((HijackBag)b).mass; //HACK
+            return Forget.forget(p, m, b.size(), Param.BAG_THRESHOLD);
         });
     }
 

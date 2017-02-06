@@ -86,7 +86,7 @@ import static nars.budget.Budget.validPriority;
 
     @Override
     public @NotNull String toString() {
-        return id + "=" + super.toString();
+        return id + "=" + toBudgetString();
     }
 
     public static class ArrayBLinkToBudgeted<X extends Budgeted> extends ArrayBLink<X> {

@@ -6,6 +6,7 @@ import nars.$;
 import nars.NAR;
 import nars.Task;
 import nars.attention.Activation;
+import nars.bag.ArrayBag;
 import nars.bag.Bag;
 import nars.bag.CurveBag;
 import nars.budget.BudgetMerge;
@@ -37,6 +38,7 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
 import static nars.Op.*;
@@ -49,10 +51,10 @@ public class TaskNAR extends NAR {
 
     final static Logger logger = LoggerFactory.getLogger(TaskNAR.class);
 
-    public final CurveBag<Task> tasks;
+    public final Bag<Task> tasks;
     final Deriver deriver = new DefaultDeriver();
 
-    final MutableInteger derivationsPerCycle = new MutableInteger(256);
+    final MutableInteger derivationsPerCycle = new MutableInteger(16);
 
     static class SimpleConceptBuilder extends DefaultConceptBuilder {
 
@@ -90,9 +92,13 @@ public class TaskNAR extends NAR {
                 new XorShift128PlusRandom(1), exe);
 
 
+        //tasks = new HijackBag<Task>(capacity, 2, BudgetMerge.maxBlend, random) {
         tasks = new CurveBag<Task>(capacity, new CurveBag.NormalizedSampler(power2BagCurve, random), BudgetMerge.maxBlend, new ConcurrentHashMap<>(capacity)) {
 
+
+            //TODO move to ArrayBag as a 'sortPartial(float samplePercentage)' method
             float sortPercentage = 0.025f;
+
 
             @Override
             protected void sortAfterUpdate() {
@@ -104,19 +110,30 @@ public class TaskNAR extends NAR {
                 int start = sampleIndex();
                 int end = Math.min(start + sortRange, s-1);
 
-                qsort(new int[sortSize(sortRange) /* estimate */], items.array(), start /*dirtyStart - 1*/, end);
+                qsort(new int[sortSize(sortRange)], items.array(), start, end);
             }
+
+
+            final AtomicInteger size = new AtomicInteger();
 
             @Override
             public void onAdded(BLink<Task> value) {
                 //value.get().state(nar.concepts.conceptBuilder().awake(), nar);
-
+                //System.out.println("added: " + size());
+                if (size.incrementAndGet() > capacity) {
+                    //System.err.println("Wtf");
+                }
             }
 
             @Override
             public void onRemoved(@NotNull BLink<Task> value) {
+                //size.decrementAndGet();
+
+                if (!value.isDeleted())
+                    value.delete();
+
                 Task x = value.get();
-                runLater(()-> {
+                //runLater(()-> {
                     CompoundConcept c = (CompoundConcept) x.concept(TaskNAR.this);
                     if (c != null) {
                         c.tableFor(x.punc()).remove(x);
@@ -129,8 +146,10 @@ public class TaskNAR extends NAR {
                             }
                             //}
                         }
+                    } else {
+                        System.err.println("concept not found: " + x);
                     }
-                });
+                //});
 
                 //value.get().state(nar.concepts.conceptBuilder().sleep(), nar);
             }
@@ -218,7 +237,13 @@ public class TaskNAR extends NAR {
             return;
 
         Task a = ba.get();
+        if (a == null)
+            return;
+
         Task b = bb.get();
+        if (b == null)
+            return;
+
         Term t = b.term();
 
         float p;
@@ -230,7 +255,7 @@ public class TaskNAR extends NAR {
         }
 
         if (p < tasks.priMin()) {
-            tasks.pressure += p;
+            ((ArrayBag)tasks).pressure += p;
             return; //useless
         }
 
@@ -290,12 +315,16 @@ public class TaskNAR extends NAR {
         @Override
         public @Nullable Task addIfAbsent(@NotNull Task t) {
             BLink<Task> r = tasks.put(t);
-            if (r == null)
+            if (r == null) {
+                t.delete();
                 return t; //rejected
+            }
 
             Task t2 = r.get();
-            if (t2 != t)
+            if (t2 != t) {
+                t.delete();
                 return t2; //duplicate
+            }
 
             return null; //accepted
         }

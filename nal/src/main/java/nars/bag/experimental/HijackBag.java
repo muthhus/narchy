@@ -1,5 +1,6 @@
 package nars.bag.experimental;
 
+import com.google.common.collect.Iterators;
 import jcog.map.nbhm.HijacKache;
 import nars.Param;
 import nars.bag.Bag;
@@ -7,6 +8,7 @@ import nars.budget.BudgetMerge;
 import nars.budget.Budgeted;
 import nars.link.ArrayBLink;
 import nars.link.BLink;
+import nars.link.DefaultBLink;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -36,33 +38,41 @@ public class HijackBag<X> implements Bag<X> {
     private static final float SCAN_ITERATIONS = 1.1f;
     private final BudgetMerge merge;
 
-    /** pressure from outside trying to enter */
-    private float pressure;
+    /**
+     * pressure from outside trying to enter
+     */
+    public float pressure;
+
+    public float mass;
+
 
     float priMin, priMax;
     int count;
 
-
-
-    public HijackBag(int capacity, int reprobes, Random random) {
-        this(capacity, reprobes, BudgetMerge.plusBlend, random);
-    }
 
     public HijackBag(int capacity, int reprobes, BudgetMerge merge, Random random) {
         this.merge = merge;
         map = new HijacKache<X, float[]>(capacity, reprobes, random) {
             @Override
             protected void reincarnateInto(Object[] k) {
-                HijackBag.this.forEach((x,v)->{
+                HijackBag.this.forEach((x, v) -> {
                     int idx = putIdx(k, x, v[0]);
-                    if (idx>=0) {
-                        CAS_val(k, idx, null, v);
+                    if (idx != Integer.MIN_VALUE) {
+                        CAS_val(k, rectify(idx), null, v);
                     } else {
                         //lost
                     }
                 });
             }
         };
+    }
+
+    private static int rectify(int idx) {
+        if (idx < 0) {
+            return -(idx + 1);
+        } else {
+            return idx;
+        }
     }
 
 
@@ -74,8 +84,8 @@ public class HijackBag<X> implements Bag<X> {
     @Nullable
     @Override
     public BLink<X> remove(X x) {
-        throw new UnsupportedOperationException("yet");
-        //return map.remove(x); //<- probably works
+        float[] v = map.remove(x); //<- probably works
+        return (v != null) ? linkSnapshot(x, v) : null;
     }
 
     /**
@@ -88,77 +98,86 @@ public class HijackBag<X> implements Bag<X> {
 
         int idx = putIdx(kvs, key, newPri);
 
-        if (idx == -1)
+        if (idx == Integer.MIN_VALUE)
             return null;
 
+        boolean gotExisting = (idx < 0);
+        idx = rectify(idx);
+
         Object V = val(kvs, idx);         // Get old value (before volatile read below!)
-        if (V == null) {
-            float[] ff = { Float.NaN, 0, 0 };
-            if (CAS_val(kvs, idx, null, ff)) {
+        if (gotExisting) {
+            if (V instanceof float[]) {
+                return (float[]) V;
+            } else {
+                return new float[]{0, 0}; //reset?
+            }
+        } else {
+            float[] ff = {Float.NaN, 0};
+            if (CAS_val(kvs, idx, V, ff)) {
                 return ff;
             } else {
+                //onRemoved(linkSnapshot((X) key(kvs,idx), new float[] {0,0} /* N/A */ ));
                 //return (float[]) val(kvs, idx);
                 return null; //hijack got hijacked
             }
-        } else {
-            return (float[]) V;
         }
     }
 
-    private int putIdx(Object[] kvs, @NotNull Object key, float newPri) {
+    /**
+     * @return Integer.MIN_VALUE - unable to insert
+     * < 0 : existing key found, so negate this value and add 1 to get its index
+     * >= 0 : new insertion index
+     */
+    private int putIdx(Object[] kvs, @NotNull Object newKey, float newPri) {
         int maxReprobes = map.reprobes;
 
         int reprobe = 0;
-        final int fullhash = HijacKache.hash(key); // throws NullPointerException if key null
+        final int newKeyHash = HijacKache.hash(newKey); // throws NullPointerException if key null
         final int len = HijacKache.len(kvs); // Count of key/value pairs, reads kvs.length
         final int[] hashes = HijacKache.hashes(kvs); // Reads kvs[1], read before kvs[0]
-        int idx = fullhash & (len - 1);
+        int idx = newKeyHash & (len - 1);
 
-        int weakestIdx = -1;
-        float weakestPri = Float.MAX_VALUE;
+        int weakestIdx = Integer.MIN_VALUE;
+        float weakestPri = Float.POSITIVE_INFINITY;
 
         while (true) {             // Spin till we get a Key slot
 
+            // Found an empty Key slot - which means this Key has never been in
+            // this table.  No need to put a Tombstone - the Key is not here!
 
-
-                // Found an empty Key slot - which means this Key has never been in
-                // this table.  No need to put a Tombstone - the Key is not here!
-
-            if (CAS_key(kvs, idx, null, key)) {
+            if (CAS_key(kvs, idx, null, newKey)) {
                 // Claim the null key-slot
                 //if (CAS_key(kvs, idx, null, key)) { // Claim slot for Key
-                    //chm._slots.add(1);      // Raise key-slots-used count
-                hashes[idx] = fullhash; // Memoize fullhash
+                //chm._slots.add(1);      // Raise key-slots-used count
+                hashes[idx] = newKeyHash; // Memoize fullhash
                 break;                  // Got a null entry
                 //} /*else {
-                    //K = key(kvs, idx); //recalculte
+                //K = key(kvs, idx); //recalculte
                 //}*/
             }
 
-            Object K = key(kvs, idx);         // Get current key
+            Object oldKey = key(kvs, idx);         // Get current key
 
-            if (K!=null && keyeq(K, key, hashes, idx, fullhash)) {
-                break;                  // Got its existing entry
+            if (oldKey != null && keyeq(oldKey, newKey, hashes, idx, newKeyHash)) {
+                return -(idx) - 1; //use negative value minus one to signal the existing entry was found
             }
 
-            {
+            if (weakestPri != Float.NEGATIVE_INFINITY) { //if havent found an ultimate weakest index in this loop, test this one
                 Object V = val(kvs, idx);
-                if (V != null) {
+                float p = Float.NEGATIVE_INFINITY;
+                if (V instanceof float[]) {
                     float[] v = (float[]) V;
-                    float p = v[0];
-                    if (p!=p) /* deleted, take it */ {
-                        if (CAS_key(kvs, idx, K, key)) {
-                            hashes[idx] = fullhash;
-                            //onRemoved(null);
-                            break;
-                        }
-                    } else {
-                        if (p < weakestPri) {
-                            weakestIdx = idx;
-                            weakestPri = p;
-                        }
+                    float pv = v[0];
+                    if (pv == pv) /* deleted */ {
+                        p = pv;
                     }
                 }
+
+                if (p < weakestPri) {
+                    weakestIdx = idx;
+                    weakestPri = p;
+                }
+
             }
 
 
@@ -169,7 +188,7 @@ public class HijackBag<X> implements Bag<X> {
                 // erasing the old value of another key
 
                 idx = weakestIdx; //(startIdx + rng.nextInt(maxReprobes)) & (len - 1);
-                if (weakestIdx < 0)
+                if (weakestIdx == Integer.MIN_VALUE)
                     throw new RuntimeException("no weakest found to take after probing");
 
 
@@ -178,19 +197,19 @@ public class HijackBag<X> implements Bag<X> {
                         hijackSoftmax(newPri, weakestPri);
 
                 if (hijack) {
-                    if (CAS_key(kvs, idx, K, key)) { // Got it!
-                        hashes[idx] = fullhash; // Memoize fullhash
+                    if (CAS_key(kvs, idx, oldKey, newKey)) { // Got it!
+                        hashes[idx] = newKeyHash; // Memoize fullhash
 
                         Object V = val(kvs, idx);
-                        if (V!=null) {
+                        if (V instanceof float[]) {
                             float[] f = (float[]) V;
-                            //onRemoved(new DefaultBLink((X)K, f[0], f[1], f[2]));
+                            onRemoved(linkSnapshot((X) oldKey, new float[]{0, 0}));
                             f[0] = Float.NaN;
                         }
 
                     }
                 } else {
-                    idx = -1;
+                    return Integer.MIN_VALUE; //failed insert
                 }
                 break;
             }
@@ -202,13 +221,16 @@ public class HijackBag<X> implements Bag<X> {
     }
 
     private boolean hijackSoftmax(float newPri, float oldPri) {
-        if (newPri >= oldPri) return true;
-        else {
-            boolean newPriThresh = newPri > Param.BUDGET_EPSILON;
-            boolean oldPriThresh = oldPri > Param.BUDGET_EPSILON;
-            if (newPriThresh && oldPriThresh) {
-                return (map.rng.nextFloat() > (oldPri / (newPri + oldPri)));
-            } else return newPriThresh;
+
+        boolean newPriThresh = newPri > Param.BUDGET_EPSILON;
+        boolean oldPriThresh = oldPri > Param.BUDGET_EPSILON;
+        if (!oldPriThresh) {
+            if (newPriThresh)
+                return true;
+            else
+                return map.rng.nextBoolean(); //50/50 chance
+        } else {
+            return (map.rng.nextFloat() > (oldPri / (newPri + oldPri)));
         }
     }
 
@@ -223,8 +245,10 @@ public class HijackBag<X> implements Bag<X> {
         float[] f = putBag(x, nP);
         if (f == null) {
             //rejected insert
-            pressure += range(nP);
+            pressure += /*range*/(nP);
             //onRemoved(null);
+            return null;
+
         } else {
 
             float pBefore = f[0];
@@ -236,17 +260,21 @@ public class HijackBag<X> implements Bag<X> {
                     overflowing.add(overflow);
 
                 pressure += range(f[0]) - pBefore;
+                return y;
             } else {
                 //overwite an empty or deleted entry
-                f[0] = range(nP);
-                f[1] = b.qua();
-                pressure += range(nP);
+                float p, q;
+                f[0] = p = range(nP);
+                f[1] = q = b.qua();
+                pressure += p;
+
+                BLink<X> l = linkSnapshot(x, p, q);
+                onAdded(l);
+                return l;
             }
 
-            //onAdded(y);
         }
 
-        return null;
     }
 
     /**
@@ -278,13 +306,23 @@ public class HijackBag<X> implements Bag<X> {
     @Override
     public @Nullable BLink<X> get(Object key) {
         float[] f = map.get(key);
-        return f == null ? null : link((X) key, f);
+        return f == null ? null : linkShared((X) key, f);
     }
 
     @NotNull
-    private BLink<X> link(X key, float[] f) {
+    private BLink<X> linkSnapshot(X key, float[] f) {
+        return linkSnapshot(key, f[0], f[1]);
+    }
+
+    @NotNull
+    private BLink<X> linkSnapshot(X key, float p, float q) {
+        return new DefaultBLink<>(key, p, q);
+    }
+
+    @NotNull
+    private BLink<X> linkShared(X key, float[] f) {
         if (key instanceof Budgeted) {
-            return new ArrayBLink.ArrayBLinkToBudgeted((Budgeted)key, f);
+            return new ArrayBLink.ArrayBLinkToBudgeted((Budgeted) key, f);
         } else {
             return new ArrayBLink<>(key, f);
         }
@@ -319,7 +357,7 @@ public class HijackBag<X> implements Bag<X> {
         //randomly choose traversal direction
         int di = map.rng.nextBoolean() ? +1 : -1;
 
-        ArrayBLink<X> a = new ArrayBLink<>();
+        //ArrayBLink<X> a = new ArrayBLink<>();
 
         while ((n > 0) && (j < jLimit) /* prevent infinite looping */) {
             int m = ((i += di) & (c - 1)) * 2 + 2;
@@ -328,7 +366,7 @@ public class HijackBag<X> implements Bag<X> {
             Object k = data[m];
             Object v = data[m + 1];
 
-            if (k != null && v != null) {
+            if (k != null && v instanceof float[]) {
 
                 float[] f = (float[]) v;
 
@@ -339,10 +377,9 @@ public class HijackBag<X> implements Bag<X> {
 
                         if ((r < p) || (r < p + tolerance(j, jLimit, n, batchSize, c))) {
                             if (target.test(
-                                    newLink((X) k,
-                                        a.set(null, f) //wraps the re-usable arraybag
-                                    )) //creates a fresh copy from it
-                                ) {
+                                    linkSnapshot((X) k, f)))
+                                        /*a.set(null, f) //wraps the re-usable arrayblink
+                                    )) //creates a fresh copy from it*/ {
                                 n--;
                                 r = curve();
                             }
@@ -359,33 +396,17 @@ public class HijackBag<X> implements Bag<X> {
     }
 
 
-    @Override public int size() {
+    @Override
+    public int size() {
         return count;
     }
 
     @Override
     public void forEach(Consumer<? super BLink<X>> action) {
-        Object[] data = map.data;
-        int c = (data.length - 2) / 2;
-
-        int j = 0;
         ArrayBLink<X> a = new ArrayBLink();
-
-        while (j < c) {
-            int m = ((j++) & (c - 1)) * 2 + 2;
-
-            //slight chance these values may be inconsistently paired. TODO use CAS double-checked access
-            //maybe use unsafe 64 bit atomic access?
-            Object k = data[m];
-            Object v = data[m + 1];
-            if ((k!=null) && (v != null)) {
-                float[] b = (float[]) v;
-                float p = b[0];
-                if (p == p) /* NaN */ {
-                    action.accept(a.set((X) k, b));
-                }
-            }
-        }
+        forEach((k, b) -> {
+            action.accept(a.set(k, b));
+        });
     }
 
     public void forEach(@NotNull BiConsumer<X, float[]> e) {
@@ -401,7 +422,7 @@ public class HijackBag<X> implements Bag<X> {
             Object k = data[m];
             Object v = data[m + 1];
 
-            if (k != null && v != null) {
+            if (k != null && v instanceof float[]) {
                 float[] f = (float[]) v;
                 float p = f[0];
                 if (p == p) /* NaN? */ {
@@ -431,7 +452,7 @@ public class HijackBag<X> implements Bag<X> {
      */
     private static float tolerance(int j, int jLimit, int b, int batchSize, int cap) {
 
-        float searchProgress = ((float)j)/jLimit;
+        float searchProgress = ((float) j) / jLimit;
         //float selectionRate =  ((float)batchSize)/cap;
 
         /* raised polynomially to sharpen the selection curve, growing more slowly at the beginning */
@@ -439,10 +460,14 @@ public class HijackBag<X> implements Bag<X> {
         return (float) Math.pow(searchProgress, exp);// + selectionRate;
     }
 
+    /**
+     * WARNING may not work correctly
+     */
     @NotNull
     @Override
     public Iterator<BLink<X>> iterator() {
-        return map.entrySet().stream().map(x -> (BLink<X>) new ArrayBLink<>(x.getKey(), x.getValue())).iterator();
+        //return Iterators.transform(map.entryIterator(), x -> (BLink<X>) new ArrayBLink<>(x.getKey(), x.getValue()));
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -452,7 +477,7 @@ public class HijackBag<X> implements Bag<X> {
 
     @Override
     public boolean isEmpty() {
-        return map.isEmpty();
+        return size() == 0;
     }
 
 
@@ -462,15 +487,18 @@ public class HijackBag<X> implements Bag<X> {
         final float[] mass = {0};
 
         final int[] count = {0};
-        final float[] min = {Float.MAX_VALUE};
-        final float[] max = {Float.MIN_VALUE};
+        final float[] min = {Float.POSITIVE_INFINITY};
+        final float[] max = {Float.NEGATIVE_INFINITY};
 
         forEach((X x, float[] f) -> {
             float p = f[0];
+
             if (p > max[0]) max[0] = p;
             if (p < min[0]) min[0] = p;
             mass[0] += p;
+
             count[0]++;
+
         });
 
 
@@ -478,7 +506,7 @@ public class HijackBag<X> implements Bag<X> {
         this.priMax = max[0];
         this.count = count[0];
 
-        float existingMass = mass[0];
+        this.mass = mass[0];
 
 //        Forget f;
 //        if (existingMass > 0 && pressure > 0) {
@@ -488,9 +516,12 @@ public class HijackBag<X> implements Bag<X> {
 //            f = null;
 //        }
 
-        this.pressure = 0;
 
-        return update(update!=null ? update.apply(this) : null);
+        update(update != null ? update.apply(this) : null);
+
+        this.pressure = 0; //HACK clear this when it is read, not after the update
+
+        return this;
     }
 
     @NotNull
@@ -514,6 +545,7 @@ public class HijackBag<X> implements Bag<X> {
         }
         return null;
     }
+
     @Override
     public BLink<X> add(@NotNull Object key, float x) {
         BLink<X> b = get(key);
@@ -526,5 +558,6 @@ public class HijackBag<X> implements Bag<X> {
         }
         return null;
     }
+
 
 }

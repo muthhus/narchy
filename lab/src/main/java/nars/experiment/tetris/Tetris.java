@@ -456,7 +456,7 @@ public class Tetris extends NAgents {
                     //NAgents.newMultiThreadNAR(4, clock);
                     //NARBuilder.newALANN(clock, 4, 64, 5, 4, 1);
 
-            NAR nar = new TaskNAR(32 * 1024, new MultiThreadExecutioner(2, 4096), clock);
+            NAR nar = new TaskNAR(16 * 1024, new MultiThreadExecutioner(4, 4096), clock);
 
             nar.termVolumeMax.setValue(32);
             nar.truthResolution.setValue(0.03f);

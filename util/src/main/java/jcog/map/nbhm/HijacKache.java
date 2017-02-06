@@ -1659,6 +1659,11 @@ public class HijacKache<TypeK, TypeV>
     }
 
 
+    /** WARNING may not work correctly */
+    public Iterator<Map.Entry<TypeK, TypeV>> entryIterator() {
+        return new SnapshotE();
+    }
+
     private final class SnapshotE implements Iterator<Map.Entry<TypeK, TypeV>> {
         final SnapshotV _ss;
 

@@ -1,5 +1,6 @@
 package nars.bag;
 
+import com.google.common.base.Joiner;
 import com.google.common.collect.Iterators;
 import jcog.data.random.XorShift128PlusRandom;
 import nars.Param;
@@ -8,6 +9,7 @@ import nars.budget.Budget;
 import nars.budget.BudgetMerge;
 import nars.budget.RawBudget;
 import nars.link.BLink;
+import org.apache.commons.collections4.IteratorUtils;
 import org.apache.commons.math3.random.EmpiricalDistribution;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.eclipse.collections.impl.list.mutable.primitive.DoubleArrayList;
@@ -15,13 +17,11 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.junit.Test;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 import java.util.function.DoubleSupplier;
 
 import static jcog.Texts.n4;
+import static nars.budget.BudgetMerge.maxBlend;
 import static nars.budget.BudgetMerge.plusBlend;
 import static org.junit.Assert.*;
 
@@ -30,7 +30,7 @@ import static org.junit.Assert.*;
  */
 public class BagTest {
 
-    static final Random rng = new XorShift128PlusRandom(1);
+    static final Random rng = rng();
 
     static {
         Param.DEBUG = true;
@@ -48,7 +48,7 @@ public class BagTest {
 
     @Test
     public void testBasicInsertionRemovalHijack() {
-        testBasicInsertionRemoval(new HijackBag(1, 1, new XorShift128PlusRandom(1)));
+        testBasicInsertionRemoval(new HijackBag(1, 1, maxBlend, rng()));
     }
 
     public void testBasicInsertionRemoval(Bag<String> c) {
@@ -141,42 +141,53 @@ public class BagTest {
 
     @Test
     public void testRemoveByKey() {
-        ArrayBag<String> a = new ArrayBag(2, plusBlend, new HashMap<>(2));
+        testRemoveByKey(new ArrayBag(2, plusBlend, new HashMap<>(2)));
+        testRemoveByKey(new HijackBag(2, 3, plusBlend, rng()));
+    }
+
+    public void testRemoveByKey(Bag<String> a) {
 
         a.put("x", new RawBudget(0.1f, 0.5f));
         a.commit();
         assertEquals(1, a.size());
 
         a.remove("x");
+        a.commit();
         assertEquals(0, a.size());
         assertTrue(a.isEmpty());
-        assertTrue(a.listCopy().isEmpty());
-        assertTrue(a.keySet().isEmpty());
+        if (a instanceof ArrayBag) {
+            assertTrue(((ArrayBag)a).listCopy().isEmpty());
+            assertTrue(((ArrayBag)a).keySet().isEmpty());
+        }
 
     }
 
     @Test
     public void testScalePutArray() {
-        testScalePut(new ArrayBag<>(2, plusBlend, new HashMap<>(2)));
+        testScalePut(new ArrayBag<>(2, maxBlend, new HashMap<>(2)));
         testScalePut2(new ArrayBag(2, plusBlend, new HashMap<>(2)));
 
     }
 
     @Test
     public void testScalePutHija() {
-        testScalePut(new HijackBag<>(2, 1, new XorShift128PlusRandom(1)));
-            testScalePut(new HijackBag<>(2, 2, new XorShift128PlusRandom(1)));
-        testScalePut2(new HijackBag<>(2, 1, new XorShift128PlusRandom(1)));
-            testScalePut2(new HijackBag<>(2, 2, new XorShift128PlusRandom(1)));
+        testScalePut(new HijackBag<>(2, 1, maxBlend, rng()));
+            testScalePut(new HijackBag<>(2, 2, maxBlend, rng()));
+        testScalePut2(new HijackBag<>(2, 1, plusBlend, rng()));
+            testScalePut2(new HijackBag<>(2, 2, plusBlend, rng()));
+    }
+
+    private static XorShift128PlusRandom rng() {
+        return new XorShift128PlusRandom(1);
     }
 
     void testScalePut(Bag<String> a) {
         a.put("x", new RawBudget(0.1f, 0.5f));
-        a.put("x", new RawBudget(0.1f, 0.5f), 0.5f, null);
+        a.put("x", new RawBudget(0.15f, 0.5f), 0.5f, null);
         assertNotNull(a.get("x"));
         a.commit();
 
-        assertEquals(0.15, a.get("x").pri(), 0.001f);
+        assertEquals(0.125, a.get("x").pri(), 0.001f);
     }
 
     void testScalePut2(Bag<String> a) {
@@ -186,7 +197,7 @@ public class BagTest {
         a.put("y", new RawBudget(0.1f, 0.5f), 0.25f, null);
         a.commit();
 
-        assertEquals(0.138, a.get("y").pri(), 0.001f);
+        assertEquals(0.175, a.get("y").pri(), 0.001f);
 
     }
 
@@ -216,11 +227,6 @@ public class BagTest {
         return e;
     }
 
-
-    @NotNull
-    private EmpiricalDistribution getSamplingPriorityDistribution(@NotNull Bag b, int n) {
-        return getSamplingPriorityDistribution(b, n, 10);
-    }
 
     @NotNull
     private EmpiricalDistribution getSamplingPriorityDistribution(@NotNull Bag b, int n, int bins) {
@@ -313,27 +319,42 @@ public class BagTest {
     @Test
     public void testFlatBagRemainsRandomInNormalizedSamplerHija() {
 
-        int n = 32;
+        int n = 64;
 
-        testSamplingFlat(new HijackBag<>(n, 4, new XorShift128PlusRandom(1)), 0.076f);
+        testSamplingFlat(new HijackBag<>(n, 4, maxBlend, rng()), 0.076f);
 
-        HijackBag<String> a = new HijackBag<>((int)(n*2f), 2, new XorShift128PlusRandom(2));
+        HijackBag<String> a = new HijackBag<>((int)(n), 2, maxBlend, rng());
         for (int i = 0; i < n; i++) {
-            a.put("x" + Integer.toString(Float.floatToIntBits(1f/i),5), new RawBudget(((float)(i+1))/(n), 0.5f));
+            a.put("x" + Integer.toString(Float.floatToIntBits(1f/i),5), new RawBudget(((float)(i))/(n), 0.5f));
         }
-        int expectedSize = n - 1; /* not all fit */
 
-        assertEquals(expectedSize, a.map.values().size());
-        assertEquals(expectedSize, Iterators.toArray(a.iterator(), Object.class).length);
+
+        a.commit();
+        int size = a.size();
+        //assertTrue(size >= 20 && size <= 30);
+
+//        TreeSet<String> keys = new TreeSet();
+//        Iterators.transform(a.iterator(), x -> x.get()).forEachRemaining(keys::add);
+//        System.out.println( keys.size() + " " + Joiner.on(' ').join(keys) );
+
+        TreeSet<String> keys2 = new TreeSet();
+        a.forEach((k,b)->{
+           if (!keys2.add(k))
+               throw new RuntimeException("duplicate detected");
+        });
+        System.out.println( keys2.size() + " " + Joiner.on(' ').join(keys2) );
+
+        assertEquals(size, keys2.size());
 
         int b = 20;
-        EmpiricalDistribution e = getSamplingPriorityDistribution(a, n * 5000, b);
+        EmpiricalDistribution e = getSamplingPriorityDistribution(a, n * 500, b);
 
         printDist(e);
 
         //monotonically increasing:
-        assertTrue(e.getBinStats().get(0).getMean() < e.getBinStats().get(b/2).getMean());
-        assertTrue(e.getBinStats().get(b/2).getMean() < e.getBinStats().get(b-2).getMean());
+        assertTrue(e.getBinStats().get(0).getMean() < e.getBinStats().get(b-1).getMean());
+        //assertTrue(e.getBinStats().get(0).getMean() < e.getBinStats().get(b/2).getMean());
+        //assertTrue(e.getBinStats().get(b/2).getMean() < e.getBinStats().get(b-2).getMean());
 
         //a.print();
     }
