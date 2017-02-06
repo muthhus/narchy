@@ -52,7 +52,7 @@ public class TaskNAR extends NAR {
     public final CurveBag<Task> tasks;
     final Deriver deriver = new DefaultDeriver();
 
-    final MutableInteger derivationsPerCycle = new MutableInteger(64);
+    final MutableInteger derivationsPerCycle = new MutableInteger(1024);
 
     static class SimpleConceptBuilder extends DefaultConceptBuilder {
 
@@ -179,7 +179,7 @@ public class TaskNAR extends NAR {
         int cpf = Math.round(derivationsPerCycle.floatValue() * (1f - load));
         if (cpf > 0) {
 
-            int cbs = 4; //conceptsFiredPerBatch.intValue();
+            int cbs = 8; //conceptsFiredPerBatch.intValue();
 
             //logger.info("firing {} concepts (exe load={})", cpf, load);
 

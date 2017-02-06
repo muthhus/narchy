@@ -455,12 +455,12 @@ public class Tetris extends NAgents {
                     //NAgents.newMultiThreadNAR(4, clock);
                     //NARBuilder.newALANN(clock, 4, 64, 5, 4, 1);
 
-            NAR nar = new TaskNAR(16 * 1024);
+            NAR nar = new TaskNAR(32 * 1024);
 
 
 
 
-            nar.termVolumeMax.setValue(24);
+            nar.termVolumeMax.setValue(22);
             //nar.linkFeedbackRate.setValue(0.05f);
 
             //newTimeWindow(nar);

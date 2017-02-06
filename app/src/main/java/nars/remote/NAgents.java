@@ -117,7 +117,7 @@ abstract public class NAgents extends NAgent {
 
     public static NAR runRT(Function<NAR, NAgents> init, float fps, int durFrames, int endTime) {
 
-        Time clock = new RealTime.DS(true).dur(durFrames / fps);
+        Time clock = new RealTime.CS(true).dur(durFrames / fps);
         NAR nar =
                 new TaskNAR(32 * 1024, new MultiThreadExecutioner(3, 4 * 1024), clock);
                 //NAgents.newMultiThreadNAR(3, clock, false);
