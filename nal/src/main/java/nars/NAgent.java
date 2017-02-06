@@ -166,12 +166,7 @@ abstract public class NAgent implements NSense, NAction {
                 nar,
                 rewardNormalized,
                 (x) -> t(x, alpha)
-        ) {
-            @Override
-            protected int termlinkMultiplier() {
-                return HAPPINESS_TERMLINK_CAPACITY_MULTIPLIER * super.termlinkMultiplier();
-            }
-        };
+        );
 
         int curiosityMonitorDuration = Math.round(nar.time.dur() * 2f); //TODO handle changing duration value
         avgActionDesire = new DescriptiveStatistics(curiosityMonitorDuration);
@@ -438,9 +433,11 @@ abstract public class NAgent implements NSense, NAction {
 //                    new PredictionTask($.impl($.neg(action), dur, happiness), '?').time(nar, dur),
 
                     new PredictionTask($.impl(action, dur, happiness), '?')
-                            .time(nar, dur),
+                            .eternal(),
+                            //.time(nar, dur),
                     new PredictionTask($.impl($.neg(action), dur, happiness), '?')
-                            .time(nar, dur)
+                            .eternal()
+                            //.time(nar, dur)
 
 //                    new PredictionTask($.seq($.varQuery("x"), 0, $.seq(action, dur, happiness)), '?').eternal(),
 //                    new PredictionTask($.seq($.varQuery("x"), 0, $.seq($.neg(action), dur, happiness)), '?').eternal()
@@ -686,7 +683,7 @@ abstract public class NAgent implements NSense, NAction {
 
             nar.input(s);
             return s;
-        } else {
+        } else if (t.isDeleted()) {
             s = (t instanceof PredictionTask) ?
                     new PredictionTask(t.term(), pp) :
                     new MutableTask(t.term(), pp, t.truth());
@@ -697,6 +694,9 @@ abstract public class NAgent implements NSense, NAction {
 
             nar.input(s);
             return s;
+        } else {
+            nar.input(t);
+            return t;
         }
 
 

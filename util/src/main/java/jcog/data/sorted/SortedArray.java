@@ -61,6 +61,7 @@ public class SortedArray<E> implements Iterable<E> {
         return size;
     }
 
+
     public E remove(int index) {
 //        if (size < index)
 //            throw new ArrayIndexOutOfBoundsException(index);

@@ -102,8 +102,11 @@ public class MicrosphereTemporalBeliefTable extends MultiRWFasterList<Task> impl
                 return new List[] { merged, trash };
             });
 
-            if (changes!=null)
-                nar.tasks.change( changes[0], changes[1] );
+            if (changes!=null) {
+                nar.tasks.remove(changes[1]);
+                nar.inputLater(changes[1]);
+                //nar.tasks.change(changes[0], changes[1]);
+            }
 
         }
 

@@ -1,12 +1,14 @@
 package nars.control;
 
+import jcog.Util;
 import jcog.data.MutableInteger;
 import jcog.data.random.XorShift128PlusRandom;
 import nars.$;
 import nars.NAR;
+import nars.Param;
 import nars.Task;
 import nars.attention.Activation;
-import nars.bag.ArrayBag;
+import nars.attention.Forget;
 import nars.bag.Bag;
 import nars.bag.CurveBag;
 import nars.budget.BudgetMerge;
@@ -21,13 +23,15 @@ import nars.derive.Deriver;
 import nars.index.task.TaskIndex;
 import nars.index.term.map.CaffeineIndex;
 import nars.link.BLink;
-import nars.premise.DefaultPremiseBuilder;
 import nars.premise.Derivation;
+import nars.premise.PreferSimpleAndConfidentPremise;
+import nars.premise.Premise;
+import nars.premise.PremiseBuilder;
 import nars.term.Term;
+import nars.term.Termed;
 import nars.time.FrameTime;
 import nars.time.Time;
 import nars.truth.TruthDelta;
-import nars.util.UtilityFunctions;
 import nars.util.exe.Executioner;
 import nars.util.exe.MultiThreadExecutioner;
 import org.jetbrains.annotations.NotNull;
@@ -38,7 +42,6 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
 import static nars.Op.*;
@@ -56,6 +59,14 @@ public class TaskNAR extends NAR {
 
     final MutableInteger derivationsPerCycle = new MutableInteger(16);
 
+    final PremiseBuilder premiseBuilder = new PremiseBuilder() {
+
+        @Override
+        protected Premise newPremise(@NotNull Termed c, @NotNull Task task, Term beliefTerm, Task belief, float pri, float qua) {
+            return new PreferSimpleAndConfidentPremise(c, task, beliefTerm, belief, pri, qua);
+        }
+    };
+
     static class SimpleConceptBuilder extends DefaultConceptBuilder {
 
         public SimpleConceptBuilder() {
@@ -66,7 +77,7 @@ public class TaskNAR extends NAR {
         }
 
         public SimpleConceptBuilder(ConceptState s) {
-            super( s,s );
+            super(s, s);
         }
 
         @NotNull
@@ -95,47 +106,52 @@ public class TaskNAR extends NAR {
         //tasks = new HijackBag<Task>(capacity, 2, BudgetMerge.maxBlend, random) {
         tasks = new CurveBag<Task>(capacity, new CurveBag.NormalizedSampler(power2BagCurve, random), BudgetMerge.maxBlend, new ConcurrentHashMap<>(capacity)) {
 
+            @Override
+            public Forget<Task> forget(float rate) {
+                return new MyTaskForget(rate);
+            }
 
             //TODO move to ArrayBag as a 'sortPartial(float samplePercentage)' method
-            float sortPercentage = 0.025f;
+
 
 
             @Override
             protected void sortAfterUpdate() {
                 //do nothing here = only sort on commit
-                //super.sortAfterUpdate();
 
-                int s = size();
-                int sortRange = (int)Math.ceil(s * sortPercentage);
-                int start = sampleIndex();
-                int end = Math.min(start + sortRange, s-1);
-
-                qsort(new int[sortSize(sortRange)], items.array(), start, end);
+                //float sortPercentage = 0.025f;
+                //sortPartial(sortPercentage);
             }
 
 
-            final AtomicInteger size = new AtomicInteger();
+
+
+            //final AtomicInteger size = new AtomicInteger();
 
             @Override
             public void onAdded(BLink<Task> value) {
                 //value.get().state(nar.concepts.conceptBuilder().awake(), nar);
                 //System.out.println("added: " + size());
-                if (size.incrementAndGet() > capacity) {
-                    //System.err.println("Wtf");
-                }
+//                if (size.incrementAndGet() > capacity) {
+//                    //System.err.println("Wtf");
+//                }
             }
 
             @Override
             public void onRemoved(@NotNull BLink<Task> value) {
                 //size.decrementAndGet();
 
+                Task x = value.get();
+                if (!x.isDeleted())
+                    x.delete();
+
                 if (!value.isDeleted())
                     value.delete();
 
-                Task x = value.get();
-                //runLater(()-> {
-                    CompoundConcept c = (CompoundConcept) x.concept(TaskNAR.this);
-                    if (c != null) {
+                CompoundConcept c = (CompoundConcept) x.concept(TaskNAR.this);
+                if (c != null) {
+                    //runLater(() -> {
+
                         c.tableFor(x.punc()).remove(x);
 
                         if (!(c instanceof PermanentConcept)) {
@@ -146,10 +162,11 @@ public class TaskNAR extends NAR {
                             }
                             //}
                         }
-                    } else {
-                        System.err.println("concept not found: " + x);
-                    }
-                //});
+                    //});
+                } else {
+                    System.err.println("concept not found: " + x);
+                }
+
 
                 //value.get().state(nar.concepts.conceptBuilder().sleep(), nar);
             }
@@ -202,6 +219,8 @@ public class TaskNAR extends NAR {
     public void cycle() {
         tasks.commit();
 
+        float minPri = tasks.priMin();
+
         float load = exe.load();
 
         int cpf = Math.round(derivationsPerCycle.floatValue() * (1f - load));
@@ -217,11 +236,11 @@ public class TaskNAR extends NAR {
                 cpf -= cbs;
 
                 runLater(() -> {
-                    List<BLink<Task>> sampled = $.newArrayList(batchSize*2);
-                    tasks.sample(batchSize*2, sampled::add);
+                    List<BLink<Task>> sampled = $.newArrayList(batchSize * 2);
+                    tasks.sample(batchSize * 2, sampled::add);
                     int n = sampled.size();
                     for (int i = 0; i < n; )
-                        derive(sampled.get(i++), i < n ? sampled.get(i++) : null);
+                        derive(sampled.get(i++), i < n ? sampled.get(i++) : null, minPri);
                 });
             }
         }
@@ -231,7 +250,7 @@ public class TaskNAR extends NAR {
         /* n/a */
     }
 
-    public void derive(BLink<Task> ba, BLink<Task> bb) {
+    public void derive(BLink<Task> ba, BLink<Task> bb, float minPri) {
 
         if (ba == null || bb == null)
             return;
@@ -246,41 +265,22 @@ public class TaskNAR extends NAR {
 
         Term t = b.term();
 
-        float p;
-        if (b==a || !b.isBelief()) {
-            b = null;
-            p = a.priSafe(0);
-        } else {
-            p = UtilityFunctions.aveAri(a.priSafe(0),b.priSafe(0));
-        }
-
-        if (p < tasks.priMin()) {
-            ((ArrayBag)tasks).pressure += p;
-            return; //useless
-        }
-
-        float q;
-        if (b==null) {
-            q = a.qua();
-        } else {
-            q = UtilityFunctions.aveAri(a.qua(),b.qua());
-        }
-
-
-        DefaultPremiseBuilder.PreferConfidencePremise c = new DefaultPremiseBuilder.PreferConfidencePremise(
-                a /* not necessary */,
-                a, t, b,
-                p, q
+        Premise c = premiseBuilder.premise(a /* not necessary */,
+                a, t, time(),
+                this, 1f, minPri
         );
 
-        deriver.accept(new Derivation(this, c,
-//                t -> {
-//                    //if (t.pri() > a.pri() || t.pri() > b.pri())
-//                        logger.info("{} {}\n\t{}", a, b, t);
-//                    input(t);
-//                }
-                this::input
-        ));
+        if (c != null) {
+
+            deriver.accept(new Derivation(this, c,
+                    //                t -> {
+                    //                    //if (t.pri() > a.pri() || t.pri() > b.pri())
+                    //                        logger.info("{} {}\n\t{}", a, b, t);
+                    //                    input(t);
+                    //                }
+                    this::input
+            ));
+        }
 
     }
 
@@ -302,6 +302,37 @@ public class TaskNAR extends NAR {
 
         n.tasks.print();
 
+    }
+
+    private static class MyTaskForget extends Forget<Task> {
+        public MyTaskForget(float rate) {
+            super(rate);
+        }
+
+        @Override
+        public void accept(@NotNull BLink<Task> bLink) {
+            Task t = bLink.get();
+
+            float tp = t.priSafe(-1);
+            if (tp < 0) {
+                bLink.delete();
+                return;
+            }
+
+            if (t.isInput() && t.isEternal()) {
+                //dont forget eternal input tasks and act as a copy of the task's budget
+                bLink.set(t);
+                return;
+            } else {
+                //make the link always less than the task. if the task decreases more than the link, then bring the link down too
+                if (tp < bLink.pri()) {
+                    bLink.set(t);
+                }
+            }
+
+
+            super.accept(bLink);
+        }
     }
 
     private class MyActivation extends Activation {

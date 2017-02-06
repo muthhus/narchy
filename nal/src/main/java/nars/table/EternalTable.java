@@ -266,17 +266,22 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, Sorted
     @Override
     public boolean remove(Task x) {
 
-        synchronized (this) {
-            int index = indexOf(x, this);
-            if (index == -1)
-                return false;
+        int index = indexOf(x, this);
+        if (index == -1)
+            return false; //HACK avoid synchronizing if the item isnt present
 
-            return remove(index)!=null;
+        synchronized (this) {
+            int findAgainToBeSure = indexOf(x, this);
+            return (findAgainToBeSure!=-1) ?
+                remove(findAgainToBeSure) != null :
+                    false;
         }
+
+
     }
 
     @Nullable
-    public TruthDelta add(@NotNull Task input, CompoundConcept<?> concept, @NotNull NAR nar) {
+    public TruthDelta add(@NotNull Task input, CompoundConcept concept, @NotNull NAR nar) {
 
         int cap = capacity();
         if (cap == 0) {

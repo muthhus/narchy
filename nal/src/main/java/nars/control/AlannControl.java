@@ -14,8 +14,7 @@ import nars.concept.Concept;
 import nars.derive.DefaultDeriver;
 import nars.derive.Deriver;
 import nars.link.BLink;
-import nars.premise.DefaultPremiseBuilder;
-import nars.premise.PremiseBuilder;
+import nars.premise.MatrixPremiseBuilder;
 import nars.term.Termed;
 import org.apache.commons.collections4.IteratorUtils;
 import org.apache.commons.lang3.mutable.MutableFloat;
@@ -197,7 +196,7 @@ public class AlannControl implements Control {
 
         final Deriver deriver = new DefaultDeriver();
 
-        final PremiseBuilder premiser = new DefaultPremiseBuilder();
+        final MatrixPremiseBuilder premiser = new MatrixPremiseBuilder();
 
         public final Bag<Concept> active;
 

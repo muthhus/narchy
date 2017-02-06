@@ -11,7 +11,7 @@ import java.util.function.Consumer;
 /**
  * Created by me on 9/4/16.
  */
-public final class Forget implements Consumer<BLink> {
+public class Forget<X> implements Consumer<BLink<X>> {
 
     public final float r;
 
@@ -21,28 +21,8 @@ public final class Forget implements Consumer<BLink> {
         this.r = r;
     }
 
-    /**
-     existingMass - (existingMass * forgetRate) + pressure <= (capacity * avgMass)
-        avgMass = 0.5 (estimate)
-
-     forgetRate ~= -((capacity * avgMass) - pressure - existingMass) / existingMass
-     */
-    @Nullable
-    public static Forget forget(float pressure, float existingMass, int num, float expectedAvgMass) {
-
-        float r = pressure > 0 ?
-                -((num * expectedAvgMass) - pressure - existingMass) / existingMass :
-                0;
-
-        //float pressurePlusOversize = pressure + Math.max(0, expectedAvgMass * size - existingMass);
-        //float r = (pressurePlusOversize) / (pressurePlusOversize + existingMass*4f /* momentum*/);
-
-        //System.out.println(pressure + " " + existingMass + "\t" + r);
-        return r >= Param.BUDGET_EPSILON ? new Forget(Util.unitize(r)) : null;
-    }
-
     @Override
-    public void accept(@NotNull BLink bLink) {
+    public void accept(@NotNull BLink<X> bLink) {
         float p = bLink.priSafe(-1);
         if (p > 0) {
             float q = bLink.qua();

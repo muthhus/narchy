@@ -100,6 +100,16 @@ public class CurveBag<V> extends ArrayBag<V> implements Bag<V> {
         return null;
     }
 
+    public void sortPartial(float sortPercentage) {
+        int s = size();
+        int sortRange = (int) Math.ceil(s * sortPercentage);
+        int start = sampleIndex();
+        int end = Math.min(start + sortRange, s - 1);
+
+        qsort(new int[sortSize(sortRange)], items.array(), start, end);
+    }
+
+
     /**
      * optimized batch fill, using consecutive array elements, also ensuring uniqueness
      * returns the instance for fluentcy

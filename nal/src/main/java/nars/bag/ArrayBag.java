@@ -479,6 +479,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
         return this;
     }
 
+
     protected void sortAfterUpdate() {
         sort();
     }

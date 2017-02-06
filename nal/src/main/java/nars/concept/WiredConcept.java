@@ -43,21 +43,10 @@ public abstract class WiredConcept extends CompoundConcept<Compound> implements 
 
     @Override
     public void linkCapacity(int termlinks, int tasklinks) {
-        super.linkCapacity(termlinks * termlinkMultiplier(), tasklinks * tasklinkMultiplier());
+        super.linkCapacity(termlinks, tasklinks);
     }
 
-//    @Override
-//    protected void beliefCapacity(@NotNull ConceptPolicy p, NAR nar) {
-//        beliefCapacity(1, beliefCapacity, 1, goalCapacity, nar);
-//    }
 
-    protected int termlinkMultiplier() {
-        return 1;
-    }
-
-    protected int tasklinkMultiplier() {
-        return 1;
-    }
 
     //    @Override
 //    protected TermContainer buildTemplates(Compound term, NAR nar) {

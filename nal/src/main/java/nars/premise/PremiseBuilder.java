@@ -1,19 +1,17 @@
 package nars.premise;
 
-import jcog.data.MutableIntRange;
-import jcog.list.FasterList;
-import nars.*;
+import nars.$;
+import nars.NAR;
+import nars.Op;
+import nars.Task;
 import nars.attention.Crosslink;
-import nars.bag.Bag;
 import nars.budget.Budget;
 import nars.budget.BudgetFunctions;
 import nars.concept.Concept;
-import nars.derive.Deriver;
-import nars.link.BLink;
 import nars.table.BeliefTable;
-import nars.task.DerivedTask;
 import nars.term.Compound;
 import nars.term.Term;
+import nars.term.Termed;
 import nars.term.Terms;
 import nars.term.subst.UnifySubst;
 import org.jetbrains.annotations.NotNull;
@@ -22,7 +20,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
-import java.util.function.Consumer;
 
 import static nars.term.Terms.compoundOrNull;
 import static nars.time.Tense.ETERNAL;
@@ -34,103 +31,6 @@ abstract public class PremiseBuilder {
     private static final Logger logger = LoggerFactory.getLogger(PremiseBuilder.class);
 
 
-    public int newPremiseMatrix(@NotNull Concept c,
-                               @NotNull NAR nar,
-                               int tasklinks, MutableIntRange termlinks,
-                               @NotNull Consumer<DerivedTask> target,
-                               @NotNull Deriver deriver) {
-
-        return newPremiseMatrix(c, tasklinks, termlinks, c.tasklinks(), c.termlinks(), deriver, target, nar);
-    }
-
-    public int newPremiseMatrix(@NotNull Concept c, int tasklinks, MutableIntRange termlinks, @NotNull Bag<Task> tasklinkBag, @NotNull Bag<Term> termlinkBag, @NotNull Deriver deriver, @NotNull Consumer<DerivedTask> target, @NotNull NAR nar) {
-
-        c.commit();
-
-        int tasklinksSampled = (int) Math.ceil(tasklinks);
-
-        FasterList<BLink<Task>> tasksBuffer = (FasterList) $.newArrayList(tasklinksSampled);
-        tasklinkBag.sample(tasklinksSampled, tasksBuffer::add);
-
-        int tasksBufferSize = tasksBuffer.size();
-        if (tasksBufferSize > 0) {
-            return newPremiseMatrix(c, termlinks, target, deriver, termlinkBag, tasksBuffer, nar);
-        } else {
-            if (Param.DEBUG_EXTRA)
-                logger.warn("{} has zero tasklinks", c);
-            return 0;
-        }
-    }
-
-    /**
-     * derives matrix of: concept => (tasklink x termlink) => premises
-     */
-    public int newPremiseMatrix(@NotNull Concept c, MutableIntRange termlinks, @NotNull Consumer<DerivedTask> target, @NotNull Deriver deriver, @NotNull Bag<Term> termlinkBag, List<BLink<Task>> taskLinks, @NotNull NAR nar) {
-
-        int count = 0;
-
-        int numTaskLinks = taskLinks.size();
-        int termlinksSampled = (int) Math.ceil(termlinks.hi());
-
-        FasterList<BLink<? extends Term>> termsBuffer = (FasterList) $.newArrayList(termlinksSampled);
-        termlinkBag.sample(termlinksSampled, termsBuffer::add);
-
-        float priFactor;
-//        float busy = (float) nar.emotion.busyMassAvg.getMean() * nar.emotion.learning();
-//        if (busy == busy && busy > 1f)
-//            priFactor = 1f/busy;
-//        else
-            priFactor = 1f;
-
-
-
-        int termsBufferSize = termsBuffer.size();
-        if (termsBufferSize > 0) {
-
-            //current termlink counter, as it cycles through what has been sampled, give it a random starting position
-            int jl = nar.random.nextInt(termsBufferSize);
-
-            //random starting position
-            int il = nar.random.nextInt(numTaskLinks);
-
-            int countPerTasklink = 0;
-
-            long now = nar.time();
-
-            for (int i = 0; i < numTaskLinks && countPerTasklink < numTaskLinks; i++, il++) {
-
-                BLink<Task> taskLink = taskLinks.get(il % numTaskLinks);
-
-                Task task = taskLink.get(); /*match(taskLink.get(), nar); if (task==null) continue;*/
-
-                int countPerTermlink = 0;
-
-                int termlinksPerForThisTask = termlinks.lerp(taskLink.pri());
-
-                for (int j = 0; j < termsBufferSize && countPerTermlink < termlinksPerForThisTask; j++, jl++) {
-
-                    Premise p = premise(c, task, termsBuffer.get(jl % termsBufferSize).get(), now, nar, priFactor);
-                    if (p != null) {
-                        deriver.accept(new Derivation(nar, p, target));
-                        countPerTermlink++;
-                    }
-
-                }
-
-                countPerTasklink += countPerTermlink > 0 ? 1 : 0;
-
-            }
-
-            count += countPerTasklink;
-
-        } else {
-            if (Param.DEBUG_EXTRA)
-                logger.warn("{} has zero termlinks", c);
-        }
-
-
-        return count;
-    }
 
     /**
      * resolves the most relevant belief of a given term/concept
@@ -146,7 +46,7 @@ abstract public class PremiseBuilder {
      * patham9 its using the result of higher confidence
      */
     @Nullable
-    Premise premise(@NotNull Concept c, @NotNull final Task task, Term beliefTerm, long now, NAR nar, float priFactor) {
+    public Premise premise(@NotNull Termed c, @NotNull final Task task, Term beliefTerm, long now, NAR nar, float priFactor, float priMin) {
 
         //if (Param.PREMISE_LOG)
         //logger.info("try: { concept:\"{}\",\ttask:\"{}\",\tbeliefTerm:\"{}\" }", c, task, beliefTerm);
@@ -290,13 +190,16 @@ abstract public class PremiseBuilder {
 
         float pri =
                 belief == null ? taskBudget.pri() : or(taskBudget.pri(), beliefBudget.pri());
+        if (pri < priMin)
+            return null;
+
         //aveAri(taskLinkBudget.pri(), termLinkBudget.pri());
         //nar.conceptPriority(c);
 
-        return newPremise(c, task, beliefTerm, belief, qua, pri * priFactor);
+        return newPremise(c, task, beliefTerm, belief, pri * priFactor, qua);
     }
 
-    abstract protected Premise newPremise(@NotNull Concept c, @NotNull Task task, Term beliefTerm, Task belief, float qua, float pri);
+    abstract protected Premise newPremise(@NotNull Termed c, @NotNull Task task, Term beliefTerm, Task belief, float pri, float qua);
 //    {
 //        return new Premise(c, task, beliefTerm, belief, pri, qua);
 //    }

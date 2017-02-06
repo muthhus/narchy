@@ -17,8 +17,7 @@ import nars.conceptualize.ConceptBuilder;
 import nars.conceptualize.DefaultConceptBuilder;
 import nars.derive.Deriver;
 import nars.link.BLink;
-import nars.premise.DefaultPremiseBuilder;
-import nars.premise.PremiseBuilder;
+import nars.premise.MatrixPremiseBuilder;
 import nars.task.DerivedTask;
 import nars.term.Termed;
 import org.jetbrains.annotations.NotNull;
@@ -46,7 +45,7 @@ public class ConceptBagControl implements Control, Consumer<DerivedTask> {
 
     final Deriver deriver;
 
-    final PremiseBuilder premiser = new DefaultPremiseBuilder();
+    final MatrixPremiseBuilder premiser = new MatrixPremiseBuilder();
 
 //    /** this will be scaled by the input priority factor for each concept */
 //    public static final ROBudget insertionBudget = new ROBudget(1f, 0.5f);

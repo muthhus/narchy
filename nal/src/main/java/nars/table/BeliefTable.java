@@ -275,7 +275,7 @@ public interface BeliefTable extends TaskTable {
             return null;
 
         answerBudget = answer.budget().clone();
-        if (answerBudget.isDeleted())
+        if (answerBudget == null || answerBudget.isDeleted())
             return null;
 
 //            //require EXACT term (except for variables) but otherwise requiring exact same dt structure

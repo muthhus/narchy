@@ -3,6 +3,7 @@ package nars.op;
 import nars.NAR;
 import nars.Task;
 import nars.bag.Bag;
+import nars.budget.Budget;
 import nars.link.BLink;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
@@ -30,7 +31,11 @@ public abstract class Leak</* TODO: A, */B>  {
         this.bag = bag;
         this.rate = rate;
         n.onTask(task -> {
-            in(task, bag::putLink);
+            try {
+                in(task, bag::putLink);
+            } catch (Budget.BudgetException e) {
+                //was deleted before the link could be made
+            }
         });
         n.onReset((nn)->bag.clear());
         n.onCycle(this::next);

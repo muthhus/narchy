@@ -438,8 +438,26 @@ public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Iterable<BLink<
         return commit((b)->{
             float p = b instanceof ArrayBag ? ((ArrayBag) b).pressure : ((HijackBag)b).pressure; //HACK
             float m = b instanceof ArrayBag ? ((ArrayBag) b).mass(): ((HijackBag)b).mass; //HACK
-            return Forget.forget(p, m, b.size(), Param.BAG_THRESHOLD);
+            return forget(b.size(), p, m);
         });
+    }
+
+    @Nullable
+    default Forget forget(int s, float p, float m) {
+
+        float r = p > 0 ?
+                -((s * Param.BAG_THRESHOLD) - p - m) / m :
+                0;
+
+        //float pressurePlusOversize = pressure + Math.max(0, expectedAvgMass * size - existingMass);
+        //float r = (pressurePlusOversize) / (pressurePlusOversize + existingMass*4f /* momentum*/);
+
+        //System.out.println(pressure + " " + existingMass + "\t" + r);
+        return r >= Param.BUDGET_EPSILON ? forget(Util.unitize(r)) : null;
+    }
+
+    default Forget forget(float rate) {
+        return new Forget(rate);
     }
 
     /**
