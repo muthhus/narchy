@@ -1,7 +1,6 @@
 package nars.experiment.arkanoid;
 
 
-import jcog.Util;
 import jcog.math.FloatPolarNormalized;
 import nars.$;
 import nars.NAR;
@@ -9,21 +8,32 @@ import nars.Param;
 import nars.concept.ActionConcept;
 import nars.remote.NAgents;
 
+import java.io.IOException;
+
 public class Arkancide extends NAgents {
 
-    static boolean cam = false;
+    static boolean cam = true;
 
     private float paddleSpeed = 1f;
 
-    public static void main(String[] args) {
+
+    public static void main(String[] args) throws IOException {
         Param.DEBUG = false;
 
         //runRT(Arkancide::new);
         //nRT(Arkancide::new, 25, 5);
 
         NAR nar = runRT((NAR n) -> {
-            return new Arkancide(n, cam);
-        }, 55, 5, -1);
+
+            Arkancide agent = new Arkancide(n, cam);
+
+            return agent;
+
+        }, 25, 5, -1);
+
+        //System.out.println(ts.db.getInfo());
+
+        //ts.db.close();
 
         //nar.beliefConfidence(0.75f);
         //nar.goalConfidence(0.75f);
@@ -43,6 +53,7 @@ public class Arkancide extends NAgents {
     private float prevScore;
 
 
+
     public Arkancide(NAR nar, boolean cam) {
         super("noid", nar);
 
@@ -55,7 +66,8 @@ public class Arkancide extends NAgents {
             }
         };
 
-        maxPaddleSpeed = 66 * noid.BALL_VELOCITY;
+
+        maxPaddleSpeed = 46 * noid.BALL_VELOCITY;
 
         nar.truthResolution.setValue(0.02f);
 
@@ -79,7 +91,7 @@ public class Arkancide extends NAgents {
         nar.beliefConfidence(0.9f);
         nar.goalConfidence(0.9f);
         //nar.linkFeedbackRate.setValue(0.02f);
-        nar.termVolumeMax.setValue(32);
+        nar.termVolumeMax.setValue(40);
 
 
 

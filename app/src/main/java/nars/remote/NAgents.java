@@ -9,6 +9,7 @@ import nars.Task;
 import nars.bag.ArrayBag;
 import nars.bag.Bagregate;
 import nars.budget.BudgetMerge;
+import nars.concept.Concept;
 import nars.conceptualize.DefaultConceptBuilder;
 import nars.control.TaskNAR;
 import nars.gui.BagChart;
@@ -107,7 +108,9 @@ abstract public class NAgents extends NAgent {
         new TaskStatistics().add(nar).print(System.out);
 
         a.predictors.forEach(p->{
-            nar.concept(p).print();
+            Concept pp = nar.concept(p);
+            if (pp!=null)
+                pp.print();
         });
     }
 
