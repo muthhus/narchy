@@ -179,9 +179,8 @@ abstract public class NAgents extends NAgent {
         //Multi nar = new Multi(3,512,
         Default nar = new Default(1024,
                 conceptsPerCycle, 1, 3, rng,
-                new CaffeineIndex(new DefaultConceptBuilder(), 256*1024, false, exe)
+                new CaffeineIndex(new DefaultConceptBuilder(), 64*1024, false, exe)
                 //new TreeTermIndex.L1TreeIndex(new DefaultConceptBuilder(), 300000, 32 * 1024, 3)
-
                 ,
                 time,
                 exe);
@@ -190,10 +189,10 @@ abstract public class NAgents extends NAgent {
         nar.goalConfidence(0.9f);
 
         float p = 0.5f;
-        nar.DEFAULT_BELIEF_PRIORITY = 1f * p;
+        nar.DEFAULT_BELIEF_PRIORITY = 0.9f * p;
         nar.DEFAULT_GOAL_PRIORITY = 1f * p;
-        nar.DEFAULT_QUESTION_PRIORITY = 1f * p;
-        nar.DEFAULT_QUEST_PRIORITY = 1f * p;
+        nar.DEFAULT_QUESTION_PRIORITY = 0.75f * p;
+        nar.DEFAULT_QUEST_PRIORITY = 0.75f * p;
 
         nar.confMin.setValue(0.01f);
         nar.termVolumeMax.setValue(volMax);

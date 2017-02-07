@@ -58,8 +58,6 @@ public abstract class AbstractTask extends RawBudget implements Task {
     private long creation = Tense.TIMELESS;
     private long start = ETERNAL, end = ETERNAL;
 
-    protected float dur = Float.NaN;
-
 //    /** Array of tasks from which the Task is derived, or null if input
 //     *
 //     * These are not guaranteed to remain because it is
@@ -244,10 +242,10 @@ public abstract class AbstractTask extends RawBudget implements Task {
         }
 
 
-        if (dur!=dur) {
-            //assign default duration from NAR
-            dur = n.time.dur();
-        }
+//        if (dur!=dur) {
+//            //assign default duration from NAR
+//            dur = n.time.dur();
+//        }
 
             //shift the occurrence time if input and dt < 0 and non-eternal HACK dont use log it may be removed without warning
 //        if (isInput()) {
@@ -559,11 +557,15 @@ public abstract class AbstractTask extends RawBudget implements Task {
             return t.eternalizedConf();
         else {
             long z = end();
-            float dur = dur();
+            //float dur = dur();
+
+//            if (z - start < dur)
+//                z = Math.round(start + dur); //HACK
+
             float factor =
-                    (this instanceof DerivedTask) ?
+                    /*(this instanceof DerivedTask) ?
                         (z==a) ? 1f : Math.min(1f, dur / (z - a)) //divide the evidence across the timespan, in proportion to the number of durations involved
-                            :
+                            :*/
                         1f;
 
             float ccw = factor * cw;
@@ -571,20 +573,10 @@ public abstract class AbstractTask extends RawBudget implements Task {
             if ((when >= a) && (when <= z)) {
 
             } else {
-                long nearest; //nearest endpoint of the interval
-                if (when <= a) nearest = a;
-                else /*if (when > z)*/ nearest = z;
-                long delta = Math.abs(nearest - when);
+                //nearest endpoint of the interval
+                //ccw = TruthPolation.evidenceDecay(ccw, dur, Math.abs((when <= a ? a : z) - when));
 
-
-                /*if (dur!=dur)
-                    throw new RuntimeException("NaN duration");*/
-
-                //dur *= evidence().length;
-
-                ccw = TruthPolation.evidenceDecay(ccw, dur, delta);
-                //return eternalizable() ? Math.max(dc, t.eternalizedConf()) : dc;
-
+                ccw = 0;
             }
 
             if (eternalizable()) {
@@ -630,10 +622,7 @@ public abstract class AbstractTask extends RawBudget implements Task {
 //        return p + dt;
     }
 
-    @Override
-    public float dur() {
-        return dur;
-    }
+
 
 
 }

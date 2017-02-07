@@ -8,6 +8,7 @@ import nars.link.BLink;
 import nars.term.Termed;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Arrays;
 import java.util.Collections;
 
 /**
@@ -17,8 +18,7 @@ public class ChainedControl extends ConcurrentArrayList<Control> implements Cont
 
     public ChainedControl(Control... c) {
         super(Control.class);
-        for (Control x : c)
-            add(x);
+        this.addAll(Arrays.asList(c));
     }
 
     @Override

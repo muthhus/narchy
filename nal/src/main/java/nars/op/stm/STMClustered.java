@@ -319,7 +319,7 @@ public abstract class STMClustered extends STM {
         this.net = new NeuralGasNet<TasksNode>(dims, clusters) {
             @NotNull
             @Override
-            public STMClustered.TasksNode newNode(int i, int dims) {
+            public STMClustered.TasksNode newNode(int i, int _dims) {
                 TasksNode c = newCentroid(i);
                 c.filter();
                 return c;

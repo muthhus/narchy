@@ -21,7 +21,7 @@ abstract public class Activation {
     final float minScale; //cut-off limit for recursive spread
     protected final Budgeted in;
 
-    public Activation(@NotNull Budgeted in, float scale, @NotNull Concept origin, @NotNull NAR nar) {
+    public Activation(@NotNull Budgeted in, float scale, @NotNull Concept origin, NAR nar) {
         this.nar = nar;
         this.in = in;
         this.minScale = Param.BUDGET_EPSILON / (scale * in.pri());

@@ -463,6 +463,11 @@ public class TestNAR  {
         long t = nar.time();
         return mustOutput(t, t + withinCycles, goalTerm, '!', freq, freq, conf, conf, occ);
     }
+    @NotNull
+    public TestNAR mustDesire(long withinCycles, @NotNull String goalTerm, float freq, float conf, long start, long end) {
+        long t = nar.time();
+        return mustOutput(t, t + withinCycles, goalTerm, '!', freq, freq, conf, conf, start, end);
+    }
 
 
 //    @NotNull

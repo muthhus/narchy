@@ -378,7 +378,7 @@ public class MicrosphereTemporalBeliefTable extends MultiRWFasterList<Task> impl
             return (1f + (1f - Math.abs(x.freq() - yf)))
                     //* (1f + (1f - xtc))
                     * (1f + 1f / (1f + x.range()))
-                    * (1f + 1f / (1f + x.dur()))
+                    //* (1f + 1f / (1f + x.dur()))
                     * (1f + TruthPolation.evidenceDecay(1, dur, Math.abs(xo - now) + Math.abs(xo - yo)));
         };
 

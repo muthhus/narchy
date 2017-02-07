@@ -422,7 +422,7 @@ public interface TimeFunctions {
                                 if (derivedInDecomposed != DTERNAL) {
                                     occ = occOther + derivedInDecomposed;
                                     if (otherInDecomposed!=DTERNAL) //???
-                                        occ -= otherInDecomposed;// - rDerived.dtRange();
+                                        occ -= otherInDecomposed + rDerived.dtRange();
 
 
                                 }

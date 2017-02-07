@@ -116,7 +116,7 @@ public class MultiThreadExecutioner extends Executioner {
     }
 
     @Override
-    public void stop() {
+    public synchronized void stop() {
 
         synchronized (disruptor) {
             super.stop();
@@ -176,7 +176,7 @@ public class MultiThreadExecutioner extends Executioner {
     }
 
     @Override
-    public void start(@NotNull NAR nar) {
+    public synchronized void start(@NotNull NAR nar) {
         super.start(nar);
 
         WorkHandler[] taskWorker = new WorkHandler[threads];

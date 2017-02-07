@@ -50,16 +50,11 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
     @Override
     Compound term();
 
-
+    /** occurrence starting time */
     long start();
+
+    /** occurrence ending time */
     long end();
-
-
-    /**
-     * duration time constant in which evidence diminishes at a time before start() and after end()
-     */
-    float dur();
-
 
     static void proof(@NotNull Task task, int indent, @NotNull Appendable sb) {
         //TODO StringBuilder

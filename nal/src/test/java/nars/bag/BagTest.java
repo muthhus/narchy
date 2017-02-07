@@ -323,7 +323,7 @@ public class BagTest {
 
         testSamplingFlat(new HijackBag<>(n, 4, maxBlend, rng()), 0.076f);
 
-        HijackBag<String> a = new HijackBag<>((int)(n), 2, maxBlend, rng());
+        HijackBag<String> a = new HijackBag<>(n, 2, maxBlend, rng());
         for (int i = 0; i < n; i++) {
             a.put("x" + Integer.toString(Float.floatToIntBits(1f/i),5), new RawBudget(((float)(i))/(n), 0.5f));
         }

@@ -1,11 +1,9 @@
 package nars.control;
 
-import jcog.Util;
 import jcog.data.MutableInteger;
 import jcog.data.random.XorShift128PlusRandom;
 import nars.$;
 import nars.NAR;
-import nars.Param;
 import nars.Task;
 import nars.attention.Activation;
 import nars.attention.Forget;
@@ -55,7 +53,7 @@ public class TaskNAR extends NAR {
 
     final static Logger logger = LoggerFactory.getLogger(TaskNAR.class);
 
-    public final Bag<Task> tasks;
+    public final Bag<Task> tasksBag;
     final Deriver deriver = new DefaultDeriver();
 
     final MutableInteger derivationsPerCycle = new MutableInteger(128);
@@ -105,7 +103,7 @@ public class TaskNAR extends NAR {
 
 
         //tasks = new HijackBag<Task>(capacity, 2, BudgetMerge.maxBlend, random) {
-        tasks = new CurveBag<Task>(capacity, new CurveBag.NormalizedSampler(power2BagCurve, random), BudgetMerge.maxBlend, new ConcurrentHashMap<>(capacity)) {
+        tasksBag = new CurveBag<Task>(capacity, new CurveBag.NormalizedSampler(power2BagCurve, random), BudgetMerge.maxBlend, new ConcurrentHashMap<>(capacity)) {
 
             @Override
             public Forget<Task> forget(float rate) {
@@ -223,9 +221,9 @@ public class TaskNAR extends NAR {
 
 
     public void cycle() {
-        tasks.commit();
+        tasksBag.commit();
 
-        float minPri = tasks.priMin();
+        float minPri = tasksBag.priMin();
 
         float load = exe.load();
 
@@ -243,7 +241,7 @@ public class TaskNAR extends NAR {
 
                 runLater(() -> {
                     List<BLink<Task>> sampled = $.newArrayList(batchSize * 2);
-                    tasks.sample(batchSize * 2, sampled::add);
+                    tasksBag.sample(batchSize * 2, sampled::add);
                     int n = sampled.size();
                     for (int i = 0; i < n; )
                         derive(sampled.get(i++), i < n ? sampled.get(i++) : null, minPri);
@@ -313,7 +311,7 @@ public class TaskNAR extends NAR {
 
         System.out.println();
 
-        n.tasks.print();
+        n.tasksBag.print();
 
     }
 
@@ -348,9 +346,9 @@ public class TaskNAR extends NAR {
         }
     }
 
-    private class MyActivation extends Activation {
+    private static class MyActivation extends Activation {
         public MyActivation(@NotNull Task t, Concept c) {
-            super(t, 1f, c, TaskNAR.this);
+            super(t, 1f, c, null);
         }
     }
 
@@ -358,7 +356,7 @@ public class TaskNAR extends NAR {
 
         @Override
         public @Nullable Task addIfAbsent(@NotNull Task t) {
-            BLink<Task> r = tasks.put(t);
+            BLink<Task> r = tasksBag.put(t);
             if (r == null) {
                 t.delete();
                 return t; //rejected
@@ -374,22 +372,22 @@ public class TaskNAR extends NAR {
 
         @Override
         public void removeInternal(@NotNull Task tt) {
-            tasks.remove(tt);
+            tasksBag.remove(tt);
         }
 
         @Override
         public void clear() {
-            tasks.clear();
+            tasksBag.clear();
         }
 
         @Override
         public void forEach(@NotNull Consumer<Task> each) {
-            tasks.forEachKey(each);
+            tasksBag.forEachKey(each);
         }
 
         @Override
         public boolean contains(@NotNull Task t) {
-            return tasks.contains(t);
+            return tasksBag.contains(t);
         }
     }
 }

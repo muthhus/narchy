@@ -79,7 +79,9 @@ public interface Concept extends Termed {
     }
 
 
-    default String termString() { return term().toString(); }
+    default String termString() {
+        return term().toString();
+    }
 
     /**
      * like Map.gett for getting data stored in meta map
@@ -91,10 +93,14 @@ public interface Concept extends Termed {
     }
 
     default <C> C remove(@NotNull Object key) {
-        synchronized (this) {
-            Map m = meta();
-            return null == m ? null : (C) m.remove(key);
+
+        Map m = meta();
+        if (m == null)
+            return null;
+        synchronized (m) {
+            return (C) m.remove(key);
         }
+
     }
 
 
@@ -125,17 +131,11 @@ public interface Concept extends Termed {
      */
     @Nullable
     default Object put(@NotNull Object key, @Nullable Object value) {
-
-        synchronized (term()) {
-
-            if (value != null) {
-                return metaOrCreate().put(key, value);
-            } else {
-                Map currMeta = meta();
-                return currMeta != null ? currMeta.remove(key) : null;
-            }
+        if (value != null) {
+            return metaOrCreate().put(key, value);
+        } else {
+            return remove(key);
         }
-
     }
 
     default void linkCapacity(int termlinks, int tasklinks) {
@@ -172,10 +172,9 @@ public interface Concept extends Termed {
     }
 
 
-    default boolean isDeleted()  {
+    default boolean isDeleted() {
         return state() == ConceptState.Deleted;
     }
-
 
 
     /**
@@ -344,7 +343,7 @@ public interface Concept extends Termed {
     default void print(@NotNull Appendable out, boolean showbeliefs, boolean showgoals, boolean showtermlinks, boolean showtasklinks) {
 
         try {
-            out.append("concept: " + toString()).append('\n');
+            out.append("concept: ").append(toString()).append('\n');
             String indent = "  \t";
 
             Consumer<Task> printTask = s -> {
@@ -353,7 +352,7 @@ public interface Concept extends Termed {
                     out.append(s.toString());
                     out.append(" ");
                     Object ll = s.lastLogged();
-                    if (ll!=null)
+                    if (ll != null)
                         out.append(ll.toString());
                     out.append('\n');
                 } catch (IOException e) {
@@ -364,7 +363,7 @@ public interface Concept extends Termed {
             Consumer<BLink> printBagItem = b -> {
                 try {
                     out.append(indent);
-                    out.append(b.get() + " " + b.toBudgetString());
+                    out.append(String.valueOf(b.get())).append(" ").append(b.toBudgetString());
                     out.append(" ");
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -405,13 +404,13 @@ public interface Concept extends Termed {
                 //out.append("TermLinkTemplates: ");
                 //out.appendln(termlinkTemplates());
 
-                out.append("\n TermLinks: " + termlinks().size() + '/' + termlinks().capacity() ).append('\n');
+                out.append("\n TermLinks: ").append(String.valueOf(termlinks().size())).append(String.valueOf('/')).append(String.valueOf(termlinks().capacity())).append('\n');
 
                 termlinks().forEach(printBagItem);
             }
 
             if (showtasklinks) {
-                out.append("\n TaskLinks: " + tasklinks().size() + '/' + tasklinks().capacity()).append('\n');
+                out.append("\n TaskLinks: ").append(String.valueOf(tasklinks().size())).append(String.valueOf('/')).append(String.valueOf(tasklinks().capacity())).append('\n');
 
                 tasklinks().forEach(printBagItem);
             }
@@ -425,7 +424,9 @@ public interface Concept extends Termed {
 
     @NotNull ConceptState state();
 
-    /** returns the previous state */
+    /**
+     * returns the previous state
+     */
     @Nullable ConceptState state(@NotNull ConceptState c, @NotNull NAR nar);
 
     default void commit() {

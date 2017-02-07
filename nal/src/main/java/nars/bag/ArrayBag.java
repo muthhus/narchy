@@ -32,7 +32,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
     /**
      * inbound pressure sum since last commit
      */
-    public volatile float pressure;
+    public float pressure;
 
     private static final Logger logger = LoggerFactory.getLogger(ArrayBag.class);
 
@@ -76,12 +76,12 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
     protected boolean updateItems(@Nullable BLink<V> toAdd) {
 
 
-        SortedArray<BLink<V>> items = this.items;
+        SortedArray<BLink<V>> items;
 
         //List<BLink<V>> pendingRemoval;
         List<BLink<V>> pendingRemoval;
         boolean result;
-        synchronized (items) {
+        synchronized (items = this.items) {
             int additional = (toAdd != null) ? 1 : 0;
             int c = capacity();
 
@@ -450,10 +450,10 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
     protected Bag<V> update(@Nullable Consumer<BLink> each, boolean checkCapacity) {
 
 
-        synchronized (items) {
+        if (each != null)
+            this.pressure = 0; //reset pressure accumulator
 
-            if (each != null)
-                this.pressure = 0; //reset pressure accumulator
+        synchronized (items) {
 
             if (size() > 0) {
                 if (checkCapacity)

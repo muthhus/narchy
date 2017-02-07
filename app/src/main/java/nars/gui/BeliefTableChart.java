@@ -342,21 +342,18 @@ public class BeliefTableChart extends Widget {
     }
 
     private void renderWave(float nowX, long minT, long maxT, GL2 gl, TruthWave wave, boolean beliefOrGoal) {
-        wave.forEach((freq, conf, s, e, qua, dur) -> {
+        wave.forEach((freq, conf, s, e, qua) -> {
 
             boolean eternal = (s != s);
             float pw = baseTaskSize / 4f;// + gew / (1f / conf) / 4f;//10 + 10 * conf;
             float ph = baseTaskSize + conf * baseTaskSize;// + geh / (1f / conf) / 4f;//10 + 10 * conf;
 
-            float start, end, startD, endD;
+            float start, end;
             if (showEternal && eternal) {
                 start = end = nowX;
-                startD = endD = Float.NaN;
             } else if (((e <= maxT) && (e >= minT)) || ((s >= minT) && (s <= maxT))) {
                 start = xTime(minT, maxT, s);
-                startD = xTime(minT, maxT, s-dur);
                 end = xTime(minT, maxT, e);
-                endD = xTime(minT, maxT, e+dur);
             } else {
                 return;
             }
@@ -379,21 +376,6 @@ public class BeliefTableChart extends Widget {
             }
 
 
-
-
-            //draw shadow to indicate duration
-            if (!eternal) {
-                float mid = (endD + startD) / 2f;
-                float W = Math.max((endD - startD), pw);
-                float x = mid - W / 2;
-                float phh = ph / 2f;
-                float y = freq - phh / 2;
-                gl.glColor4f(r, g, b, alpha/2f); //, 0.7f + 0.2f * q);
-                Draw.rect(gl,
-                        x, y,
-                        W, phh);
-            }
-
             {
                 float mid = (end + start) / 2f;
                 float W = Math.max((end - start), pw);
@@ -414,7 +396,7 @@ public class BeliefTableChart extends Widget {
         gl.glLineWidth(2.0f);
         gl.glBegin(GL2.GL_LINE_STRIP);
 
-        wave.forEach((freq, conf, start, end, qua, dur) -> {
+        wave.forEach((freq, conf, start, end, qua) -> {
 
             boolean eternal = (start != start);
             float x;

@@ -52,11 +52,6 @@ public class MutableTask extends AbstractTask {
     }
 
 
-    public MutableTask dur(float newDur) {
-        this.dur = newDur;
-        return this;
-    }
-
     @NotNull
     public final MutableTask truth(float freq, float conf) {
         return truth($.t(freq,conf));

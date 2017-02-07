@@ -131,7 +131,7 @@ public class Revision {
                 evidence
         ).budget(a, b, aProp);
 
-        return (t == null) ? null : t.dur(lerp(aw / (aw + bw), a.dur(), b.dur())).log("Revection Merge");
+        return t;//.dur(lerp(aw / (aw + bw), a.dur(), b.dur())).log("Revection Merge");
     }
 
 

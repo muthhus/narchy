@@ -41,12 +41,12 @@ public class TrieDeriverTest {
 
 
 
-    final String r0 = "(S --> P), (S <-> P), task(\"?\") |- (S --> P), (Belief:StructuralIntersection, Punctuation:Belief)";
+    static final String r0 = "(S --> P), (S <-> P), task(\"?\") |- (S --> P), (Belief:StructuralIntersection, Punctuation:Belief)";
 
-    final String r1 = "((|,X,A..+) --> M), M, task(\".\") |- (X --> M), (Belief:StructuralDeduction)";
-    final String r1Case = "<(|, puppy, kitten) --> animal>.";
+    static final String r1 = "((|,X,A..+) --> M), M, task(\".\") |- (X --> M), (Belief:StructuralDeduction)";
+    static final String r1Case = "<(|, puppy, kitten) --> animal>.";
 
-    final String rN = "(C --> {A..+}), (C --> {B..+}) |- (C --> {A..+,B..+}), (Belief:Union), (C --> intersect({A..+},{B..+})), (Belief:Intersection)";
+    static final String rN = "(C --> {A..+}), (C --> {B..+}) |- (C --> {A..+,B..+}), (Belief:Union), (C --> intersect({A..+},{B..+})), (Belief:Intersection)";
 
 
 //    @Test

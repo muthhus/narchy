@@ -82,6 +82,8 @@ abstract public class PremiseBuilder {
             Compound answerTerm = unify(task.term(), (Compound) beliefTerm, nar);
             if (answerTerm != null) {
 
+                beliefTerm = answerTerm;
+
                 Concept answerConcept = nar.concept(answerTerm);
                 if (answerConcept != null) {
 
@@ -211,20 +213,23 @@ abstract public class PremiseBuilder {
         if (q.op() != a.op())
             return null; //no chance
 
+
+        if ((q.vars() > 0)/* || (q.varPattern() != 0)*/) {
+
+            List<Term> result = $.newArrayList(1);
+            new UnifySubst(null /* all variables */, nar, result, 1 /*Param.QUERY_ANSWERS_PER_MATCH*/)
+                    .unifyAll(q, a);
+            if (!result.isEmpty()) {
+                Compound unified = compoundOrNull(result.get(0));
+                if (unified != null)
+                    return unified;
+            }
+        }
+
         if (Terms.equal(q, a, false, true /* no need to unneg, task content is already non-negated */))
             return q;
-
-        if ((q.vars() == 0) && (q.varPattern() == 0))
-            return null; //since they are inequal, if the question has no variables then nothing would unify anyway
-
-        List<Term> result = $.newArrayList(0);
-        new UnifySubst(null /* all variables */, nar, result, 1 /*Param.QUERY_ANSWERS_PER_MATCH*/)
-                .unifyAll(q, a);
-
-        if (result.isEmpty())
+        else
             return null;
-
-        return compoundOrNull(result.get(0));
     }
 
 

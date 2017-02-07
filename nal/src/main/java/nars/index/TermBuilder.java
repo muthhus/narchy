@@ -180,7 +180,7 @@ public abstract class TermBuilder {
 //    }
 
 
-    @Nullable protected Term eval(@NotNull Compound subject, @NotNull Functor predicate) {
+    @Nullable protected static Term eval(@NotNull Compound subject, @NotNull Functor predicate) {
         return predicate.apply(subject.terms());
     }
 

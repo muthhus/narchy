@@ -13,7 +13,7 @@ public class Arkancide extends NAgents {
 
     static boolean cam = true;
 
-    private float paddleSpeed = 0.5f;
+    private float paddleSpeed = 1f;
 
     public static void main(String[] args) {
         Param.DEBUG = false;
@@ -23,7 +23,7 @@ public class Arkancide extends NAgents {
 
         NAR nar = runRT((NAR n) -> {
             return new Arkancide(n, cam);
-        }, 35, 5, -1);
+        }, 35, 15, -1);
 
         //nar.beliefConfidence(0.75f);
         //nar.goalConfidence(0.75f);
@@ -55,9 +55,9 @@ public class Arkancide extends NAgents {
             }
         };
 
-        maxPaddleSpeed = 15 * noid.BALL_VELOCITY;
+        maxPaddleSpeed = 35 * noid.BALL_VELOCITY;
 
-        nar.truthResolution.setValue(0.05f);
+        nar.truthResolution.setValue(0.02f);
 
         //nar.input(new MutableTask(happy, Op.BELIEF, $.t(0.5f, 0.15f)).eternal());
 
@@ -84,12 +84,12 @@ public class Arkancide extends NAgents {
 
 
 
-        action(new ActionConcept( $.func("dx", "paddleNext", "noid"), nar, (b, d) -> {
+        /*action(new ActionConcept( $.func("dx", "paddleNext", "noid"), nar, (b, d) -> {
             if (d!=null) {
                 paddleSpeed = Util.round(d.freq(), 0.2f);
             }
             return $.t(paddleSpeed, nar.confidenceDefault('.'));
-        }));
+        }));*/
         action(new ActionConcept( $.func("x", "paddleNext", "noid"), nar, (b, d) -> {
 
 
