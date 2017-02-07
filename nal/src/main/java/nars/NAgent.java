@@ -99,7 +99,7 @@ abstract public class NAgent implements NSense, NAction {
 
     public final FloatParam epsilonProbability = new FloatParam(0.1f);
 
-    public final FloatParam gammaEpsilonFactor = new FloatParam(0.25f);
+    public final FloatParam gammaEpsilonFactor = new FloatParam(0.1f);
 
     //final int curiosityMonitorDuration; //frames
     final DescriptiveStatistics avgActionDesire;
@@ -545,7 +545,7 @@ abstract public class NAgent implements NSense, NAction {
                 if (t!=null) {
                     nar.input(
                             new GeneratedTask(action, GOAL, t)
-                                    .time(now, now, Math.round(now + nar.time.dur()))
+                                    .time(now, now, now + Math.round(nar.time.dur()))
                                     .budgetByTruth(action.pri.asFloat())
                                     .log("Curiosity")
                     );

@@ -119,6 +119,8 @@ public class ActionConcept extends WiredConcept implements WiredConcept.Prioriti
         List<Truth> belief = $.newArrayList(0);
         List<Truth> goal = $.newArrayList(0);
 
+        float dur = nar.time.dur();
+
         termlinks().forEach(tll->{
             Term t = tll.get();
             if (t.op() == IMPL) {
@@ -131,7 +133,7 @@ public class ActionConcept extends WiredConcept implements WiredConcept.Prioriti
                     Concept implConcept = nar.concept(t);
                     if (implConcept!=null) {
 
-                        Truth it = implConcept.belief(when, now); //belief truth of the implication
+                        Truth it = implConcept.belief(when, now, dur); //belief truth of the implication
                         if (it!=null) {
 
                             Term preCondition = ct.term(0);
@@ -142,7 +144,7 @@ public class ActionConcept extends WiredConcept implements WiredConcept.Prioriti
                             if (preconditionConcept != null) {
 
                                 //belief = deduction(pbt, it)
-                                Truth pbt = preconditionConcept.belief(when, now);
+                                Truth pbt = preconditionConcept.belief(when, now, dur);
                                 if (pbt!=null) {
                                     Truth y = TruthFunctions.deduction(pbt.negIf(preCondNegated), it, minConf);
                                     if (y!=null)
@@ -150,7 +152,7 @@ public class ActionConcept extends WiredConcept implements WiredConcept.Prioriti
                                 }
 
                                 //goal = induction(pgt, it)
-                                Truth pgt = preconditionConcept.goal(when, now);
+                                Truth pgt = preconditionConcept.goal(when, now, dur);
                                 if (pgt!=null) {
                                     Truth y = TruthFunctions.induction(pgt.negIf(preCondNegated), it, minConf);
                                     if (y!=null)
@@ -246,12 +248,12 @@ public class ActionConcept extends WiredConcept implements WiredConcept.Prioriti
         Truth[] td = truthLinked(then, now, nar.confMin.floatValue());
         Truth tdb = td[0];
 
-        @Nullable Truth b = this.belief(then, now);
+        @Nullable Truth b = this.belief(then, now, nar.time.dur());
         if (tdb != null) {
             b = (b != null) ? Revision.revise(b, tdb) : tdb;
         }
 
-        @Nullable Truth d = this.goal(then, now);
+        @Nullable Truth d = this.goal(then, now, nar.time.dur());
         Truth tdg = td[1];
         if (tdg!=null) {
             d = (d != null) ? Revision.revise(d, tdg) : tdg;
