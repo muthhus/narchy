@@ -1,5 +1,6 @@
 package nars.premise;
 
+import jcog.Util;
 import nars.$;
 import nars.NAR;
 import nars.Op;
@@ -23,7 +24,7 @@ import java.util.List;
 
 import static nars.term.Terms.compoundOrNull;
 import static nars.time.Tense.ETERNAL;
-import static nars.util.UtilityFunctions.or;
+import static nars.util.UtilityFunctions.aveAri;
 
 
 abstract public class PremiseBuilder {
@@ -84,7 +85,7 @@ abstract public class PremiseBuilder {
             Compound answerTerm = unify(task.term(), (Compound) beliefTerm, nar);
             if (answerTerm != null) {
 
-                beliefTerm = answerTerm;
+                beliefTerm = (answerTerm = (Compound) answerTerm.unneg());
 
                 Concept answerConcept = nar.concept(answerTerm);
                 if (answerConcept != null) {
@@ -188,12 +189,14 @@ abstract public class PremiseBuilder {
         //TODO lerp by the two budget's qualities instead of aveAri,or etc ?
 
 
-        float qua = belief == null ? taskBudget.qua() : or(taskBudget.qua(), beliefBudget.qua());
+        float tq = taskBudget.qua();
+        float bq = (beliefBudget!=null) ? beliefBudget.qua() : Float.NaN;
+        float qua = belief == null ? tq : aveAri(tq, bq);
         if (qua < nar.quaMin.floatValue())
             return null;
 
         float pri =
-                belief == null ? taskBudget.pri() : or(taskBudget.pri(), beliefBudget.pri());
+                belief == null ? taskBudget.pri() : Util.lerp(tq / (tq + bq), taskBudget.pri(), beliefBudget.pri());
         if (pri < priMin)
             return null;
 

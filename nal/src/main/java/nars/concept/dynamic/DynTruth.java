@@ -49,7 +49,7 @@ public final class DynTruth implements Truthed {
             //            return b;
             return BudgetFunctions.fund(e, f);
         } else {
-            return e.get(0).budget();
+            return e.get(0).budget().clone();
         }
     }
 
@@ -72,13 +72,14 @@ public final class DynTruth implements Truthed {
         return truth().toString();
     }
 
-    public DynamicBeliefTask task(Compound template, boolean beliefOrGoal, long cre, long occ, @Nullable Budget b) {
+    @Nullable public DynamicBeliefTask task(@NotNull Compound template, boolean beliefOrGoal, long cre, long occ, @Nullable Budget b) {
 
+        Budget budget = b != null ? b : budget();
+        if (budget.isDeleted())
+            return null;
         DynamicBeliefTask t = new DynamicBeliefTask(template, beliefOrGoal ? Op.BELIEF : Op.GOAL,
                 truth(), cre, occ, evidence());
-        t.setBudget(
-                b != null ? b : budget()
-        );
+        t.setBudget( budget );
         t.log("Dynamic");
         return t;
 

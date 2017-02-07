@@ -38,9 +38,9 @@ public class Tetris extends NAgents {
 //            new MultiThreadExecutioner(3, 1024*8);
 
 
-    public static final int tetris_width = 6;
-    public static final int tetris_height = 12;
-    public static final int TIME_PER_FALL = 6;
+    public static final int tetris_width = 8;
+    public static final int tetris_height = 16;
+    public static final int TIME_PER_FALL = 8;
     public static final int PIXEL_RADIX = 2;
 
     private static SensorConcept[][] concept;
@@ -253,10 +253,13 @@ public class Tetris extends NAgents {
 
                             $.inh(
                                     //$.func(
-                                    $.p(tetris),
+                                    (tetris),
                                     $.p(
-                                        $.pRecurse($.radixArray(x, PIXEL_RADIX, state.width)), $.pRecurse($.radixArray(y, PIXEL_RADIX, state.height)),
-                                            $.p($.radixArray(x, PIXEL_RADIX, state.width)), $.p($.radixArray(y, PIXEL_RADIX, state.height))
+                                            $.pRadix(x, PIXEL_RADIX, state.width),
+                                            $.pRadix(y, PIXEL_RADIX, state.height)
+
+                                    /*$.pRecurse($.radixArray(x, PIXEL_RADIX, state.width)), $.pRecurse($.radixArray(y, PIXEL_RADIX, state.height)),
+                                            $.p($.radixArray(x, PIXEL_RADIX, state.width)), $.p($.radixArray(y, PIXEL_RADIX, state.height))*/
 
                                     //        x, y
                                     )
@@ -452,17 +455,17 @@ public class Tetris extends NAgents {
         public static void main(String[] args) throws Narsese.NarseseException {
             //Param.DEBUG = true;
 
-            FrameTime clock = new FrameTime().dur(1);
+            FrameTime clock = new FrameTime().dur(2);
             NAR nar =
-                    NAgents.newMultiThreadNAR(3, clock);
+                    NAgents.newMultiThreadNAR(4, clock);
                     //NARBuilder.newALANN(clock, 4, 64, 5, 4, 1);
 
             //NAR nar = new TaskNAR(32 * 1024, new MultiThreadExecutioner(4, 4096), clock);
 //            MySTMClustered stm = new MySTMClustered(nar, 64, '.', 4, false, 2);
 //            MySTMClustered stmGoal = new MySTMClustered(nar, 16, '!', 2, false, 1);
 
-            nar.termVolumeMax.setValue(55);
-            nar.truthResolution.setValue(0.05f);
+            nar.termVolumeMax.setValue(50);
+            nar.truthResolution.setValue(0.08f);
 
 
             //nar.linkFeedbackRate.setValue(0.05f);
