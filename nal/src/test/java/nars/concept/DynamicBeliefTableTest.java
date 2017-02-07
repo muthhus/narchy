@@ -24,7 +24,7 @@ public class DynamicBeliefTableTest {
         n.believe("a:x", 1f, 0.9f);
         n.believe("a:y", 1f, 0.9f);
         n.run(1);
-        Truth now = n.concept($("(a:x && a:y)"), true).belief(n.time());
+        Truth now = n.concept($("(a:x && a:y)"), true).belief(n.time(), n.time.dur());
         assertEquals($.t(1f,0.81f),now);
 
         //n.ask("(a:x && a:y)")
@@ -39,7 +39,7 @@ public class DynamicBeliefTableTest {
         n.run(1);
 
         Concept cc = n.concept($("(&&, a:x, a:y, a:z)"), true);
-        Truth now = cc.belief(n.time());
+        Truth now = cc.belief(n.time(), n.time.dur());
         assertEquals($.t(1f, 0.73f), now);
         //the truth values were provided despite the belief tables being empty:
         assertTrue(cc.beliefs().isEmpty());
@@ -47,14 +47,14 @@ public class DynamicBeliefTableTest {
         //test unknown:
         {
             Concept ccn = n.concept($("(&&, a:x, a:w)"), true);
-            Truth nown = ccn.belief(n.time());
+            Truth nown = ccn.belief(n.time(), n.time.dur());
             assertNull(nown);
         }
 
         //test negation:
         {
             Concept ccn = n.concept($("(&&, a:x, (--, a:y), a:z)"), true);
-            Truth nown = ccn.belief(n.time());
+            Truth nown = ccn.belief(n.time(), n.time.dur());
             assertEquals(ccn.toString(), $.t(0f, 0.73f), nown);
         }
 
@@ -62,7 +62,7 @@ public class DynamicBeliefTableTest {
         n.believe("a:y", 0, 0.95f);
         n.run(1);
         Concept ccn = n.concept("(&&, a:x, a:y, a:z)");
-        Truth now2 = ccn.belief(n.time());
+        Truth now2 = ccn.belief(n.time(), n.time.dur());
         assertTrue(now2.freq() < 0.4f);
 
     }
@@ -115,24 +115,24 @@ public class DynamicBeliefTableTest {
         n.believe($("f(x,y)"), (long)0, 1f, 0.9f);
 
         CompoundConcept prod = (CompoundConcept) n.concept($("f(x, y)"), false);
-        Truth t = prod.belief(n.time());
+        Truth t = prod.belief(n.time(), n.time.dur());
         System.out.println(t);
 
         CompoundConcept imgX = (CompoundConcept) n.concept($("(x --> (/,f,_,y))"), true);
-        assertEquals(t, imgX.belief(n.time()));
+        assertEquals(t, imgX.belief(n.time(), n.time.dur()));
 
 
         CompoundConcept imgY = (CompoundConcept) n.concept($("(y --> (/,f,x,_))"), true);
-        assertEquals(t, imgY.belief(n.time()));
+        assertEquals(t, imgY.belief(n.time(), n.time.dur()));
 
 
 
         n.run(16); //by now, structural decomposition should have also had the opportunity to derive the image
 
-        Truth t2 = prod.belief(n.time());
+        Truth t2 = prod.belief(n.time(), n.time.dur());
 
-        assertEquals(t2, imgX.belief(n.time()));
-        assertEquals(t2, imgY.belief(n.time()));
+        assertEquals(t2, imgX.belief(n.time(), n.time.dur()));
+        assertEquals(t2, imgY.belief(n.time(), n.time.dur()));
 
     }
 
@@ -142,24 +142,24 @@ public class DynamicBeliefTableTest {
         n.believe($("(f-->(x,y))"), (long)0, 1f, 0.9f);
 
         CompoundConcept prod = (CompoundConcept) n.concept($("(f-->(x, y))"), false);
-        Truth t = prod.belief(n.time());
+        Truth t = prod.belief(n.time(), n.time.dur());
         System.out.println(t);
 
         CompoundConcept imgX = (CompoundConcept) n.concept($("((\\,f,_,y)-->x)"), true);
-        assertEquals(t, imgX.belief(n.time()));
+        assertEquals(t, imgX.belief(n.time(), n.time.dur()));
 
 
         CompoundConcept imgY = (CompoundConcept) n.concept($("((\\,f,x,_)-->y)"), true);
-        assertEquals(t, imgY.belief(n.time()));
+        assertEquals(t, imgY.belief(n.time(), n.time.dur()));
 
 
 
         n.run(16); //by now, structural decomposition should have also had the opportunity to derive the image
 
-        Truth t2 = prod.belief(n.time());
+        Truth t2 = prod.belief(n.time(), n.time.dur());
 
-        assertEquals(t2, imgX.belief(n.time()));
-        assertEquals(t2, imgY.belief(n.time()));
+        assertEquals(t2, imgX.belief(n.time(), n.time.dur()));
+        assertEquals(t2, imgY.belief(n.time(), n.time.dur()));
 
     }
 

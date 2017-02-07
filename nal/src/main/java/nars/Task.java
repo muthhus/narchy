@@ -83,9 +83,6 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
         }
     }
 
-
-
-
     @Nullable
     static boolean taskContentValid(@NotNull Compound t, char punc, int nalLevel, int maxVol, boolean safe) {
         if (!t.isNormalized())
@@ -238,7 +235,7 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
             ArrayBag<Task> answers = concept(nar).computeIfAbsent(Op.QUESTION, () ->
                 new ArrayBag<>(BudgetMerge.maxHard, new SynchronizedHashMap<>()).capacity(Param.MAX_INPUT_ANSWERS)
             );
-            float confEffective = answer.conf(start());
+            float confEffective = answer.conf(start(), nar.time.dur());
             if (answers.putIfAbsent(answer, new RawBudget(1f, confEffective))) {
                 answers.commit();
                 Command.log(nar, this.toString() + "  " + answer.toString());
@@ -360,7 +357,7 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
 
         CharSequence tenseString;
         if (memory != null) {
-            tenseString = getTense(memory.time(), 1);
+            tenseString = getTense(memory.time());
         } else {
             //TODO dont bother craeting new StringBuilder and calculating the entire length etc.. just append it to a reusable StringReader?
             appendOccurrenceTime(
@@ -537,7 +534,7 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
     }
 
 
-    default String getTense(long currentTime, int duration) {
+    default String getTense(long currentTime) {
 
         long ot = start();
 
@@ -545,7 +542,7 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
             return "";
         }
 
-        switch (Tense.order(currentTime, ot, duration)) {
+        switch (Tense.order(currentTime, ot, 1)) {
             case 1:
                 return Op.TENSE_FUTURE;
             case -1:
@@ -630,15 +627,15 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
     }
 
 
-    default float conf(long when) {
-        float cw = confWeight(when);
+    default float conf(long when, float dur) {
+        float cw = confWeight(when, dur);
         return cw == cw ? w2c(cw) : Float.NaN;
     }
 
 
     @Nullable
-    default Truth truth(long when, float minConf) {
-        float cw = confWeight(when);
+    default Truth truth(long when, float dur, float minConf) {
+        float cw = confWeight(when, dur);
         if (cw == cw && cw > 0) {
 
             float conf = w2c(cw);
@@ -650,15 +647,16 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
     }
 
     @Nullable
-    default Truth truth(long when) {
-        return truth(when, Param.TRUTH_EPSILON);
+    default Truth truth(long when, float dur) {
+        return truth(when, dur, Param.TRUTH_EPSILON);
     }
 
     /**
      * @param when time
+     * @param dur duration period across which evidence can decay before and after its defined start/stop time
      * @return value >= 0 indicating the evidence
      */
-    float confWeight(long when);
+    float confWeight(long when, float dur);
 
 
 

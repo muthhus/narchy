@@ -139,7 +139,10 @@ public class ScalarSignal implements Consumer<NAR>, DoubleSupplier {
 
         if ((inputIfSame || different || lateEnough) && (!tooSoon)) {
 
-            SignalTask t = task(f, currentValue, now, this.current);
+            SignalTask t = task(f, currentValue,
+                    Math.round(now - nar.time.dur()),  //start: it was 'sensed' so it has already happened in the past (one duration ago)
+                    now,
+                    this.current);
             if (t!=null) {
                 //Task prevStart = this.current;
 
@@ -186,21 +189,21 @@ public class ScalarSignal implements Consumer<NAR>, DoubleSupplier {
     public static class SignalTask extends MutableTask {
 
 
-        public SignalTask(@NotNull Termed<Compound> t, char punct, @Nullable Truth truth, long start)  {
+        public SignalTask(@NotNull Termed<Compound> t, char punct, @Nullable Truth truth, long start, long end)  {
             super(t, punct, truth);
-            time(start, start);
+            time(start, start, end);
         }
 
     }
 
     @Nullable
-    protected SignalTask task(float v, float prevV, long now, Task previous) {
+    protected SignalTask task(float v, float prevV, long start, long end, Task previous) {
 
         Truth t = truthFloatFunction.valueOf(v);
         if (t == null)
             return null;
 
-        SignalTask s = new SignalTask(term(), punc, t, now);
+        SignalTask s = new SignalTask(term(), punc, t, start, end);
         s.budgetByTruth( pri.asFloat()  /*(v, now, prevF, lastInput)*/);
 
         //float changeFactor = prevV==prevV ? Math.abs(v - prevV) : 1f /* if prevV == NaN */;

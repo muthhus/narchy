@@ -33,7 +33,7 @@ public class RevectionTest {
         //assertEquals(a.truth(), TruthPolation.truth(0, a, a)); //same item
 
         //System.out.println( TruthPolation.truth(0, a, b) );
-        assertEquals(Revision.revise(a, b), TruthPolation.truth(0, a, b));
+        assertEquals(Revision.revise(a, b), TruthPolation.truth(0, 1, a, b));
 
     }
 
@@ -42,7 +42,7 @@ public class RevectionTest {
         MutableTask a = t(1f, 0.5f, -4).evidence(1);
         MutableTask b = t(0f, 0.5f, 4).evidence(2);
 
-        Truth pt = TruthPolation.truth(0, a, b);
+        Truth pt = TruthPolation.truth(0, 1, a, b);
         @Nullable Truth rt = Revision.revise(a, b);
 
         assertEquals(pt.freq(), rt.freq(), 0.01f);
@@ -55,27 +55,30 @@ public class RevectionTest {
     public void testRevisionEquivalence2Instant() throws Narsese.NarseseException {
         Task a = t(1f, 0.5f, 0);
         Task b = t(0f, 0.5f, 0);
-        assertEquals( Revision.revise(a, b), TruthPolation.truth(0, a, b) );
+        assertEquals( Revision.revise(a, b), TruthPolation.truth(0, 1, a, b) );
     }
 
     @Test
     public void testPolation1() throws Narsese.NarseseException {
+
+        float dur = 1;
+
         Task a = t(1f, 0.5f, 3).evidence(1);
         Task b = t(0f, 0.5f, 6).evidence(2);
         for (int i = 0; i < 10; i++) {
-            System.out.println(i + " " + TruthPolation.truth(i, a, b));
+            System.out.println(i + " " + TruthPolation.truth(i, dur, a, b));
         }
 
         System.out.println();
 
-        Truth ab2 = TruthPolation.truth(3, a, b);
+        Truth ab2 = TruthPolation.truth(3, dur, a, b);
         assertTrue( ab2.conf() >= 0.5f );
 
-        Truth abneg1 = TruthPolation.truth(3, a, b);
+        Truth abneg1 = TruthPolation.truth(3, dur, a, b);
         assertTrue( abneg1.freq() > 0.6f );
         assertTrue( abneg1.conf() >= 0.5f );
 
-        Truth ab5 = TruthPolation.truth(6, a, b);
+        Truth ab5 = TruthPolation.truth(6, dur, a, b);
         assertTrue( ab5.freq() < 0.35f );
         assertTrue( ab5.conf() >= 0.5f );
     }
@@ -89,7 +92,7 @@ public class RevectionTest {
         Task e = t(0f, 0.1f, 7).evidence(5);
 
         for (int i = 0; i < 15; i++) {
-            System.out.println(i + " " + TruthPolation.truth(i, a, b, c, d, e));
+            System.out.println(i + " " + TruthPolation.truth(i, 1, a, b, c, d, e));
         }
 
     }
@@ -128,7 +131,7 @@ public class RevectionTest {
 
         System.out.println("TRUTHPOLATION");
         for (long d = start; d < end; d++) {
-            Truth a1 = TruthPolation.truth(d, l);
+            Truth a1 = TruthPolation.truth(d, 1, l);
             System.out.println(d + ": " + a1);
         }
     }
@@ -220,6 +223,8 @@ public class RevectionTest {
         int maxBeliefs = repeats*4;
         NAR n = newNAR(maxBeliefs);
 
+
+
         n.log();
 
         long at = 5;
@@ -240,7 +245,7 @@ public class RevectionTest {
         b.print();
         assertEquals(repeats, b.size());
 
-        @Nullable Truth result = b.beliefs().truth(at);
+        @Nullable Truth result = b.beliefs().truth(at, n.time.dur());
         assertEquals(freq, result.freq(), Param.TRUTH_EPSILON);
         assertEquals(outConf, result.conf(), Param.TRUTH_EPSILON);
     }

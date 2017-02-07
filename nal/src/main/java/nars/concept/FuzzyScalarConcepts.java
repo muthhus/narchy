@@ -167,7 +167,7 @@ public class FuzzyScalarConcepts implements Iterable<SensorConcept> {
                     if (s == null)
                         return "?";
                     else
-                        return s.term() + " " + s.beliefs().truth(nar.time());
+                        return s.term() + " " + s.beliefs().truth(nar.time(), 0);
                 }
         ));
     }

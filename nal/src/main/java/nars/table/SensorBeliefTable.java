@@ -60,7 +60,7 @@ public class SensorBeliefTable extends DefaultBeliefTable  {
                 refresh = true;
             } else {
                 //touches past
-                Truth computedTruth = truth(input.end());
+                Truth computedTruth = truth(input.end(), nar.time.dur());
                 if (computedTruth!=null && computedTruth.conf() >= input.conf()) {
                     //logger.info("reject derived signal:\n{}", input);//.proof());
                     return null;

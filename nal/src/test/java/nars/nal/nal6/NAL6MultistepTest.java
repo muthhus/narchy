@@ -58,12 +58,12 @@ public class NAL6MultistepTest {
             // burglary.print();  earthquake.print();
             //long now = d.time();
             d.run(100);
-            System.out.println("burglary=" + burglary.belief(Tense.ETERNAL) + "\tearthquake=" + earthquake.belief(Tense.ETERNAL));
+            System.out.println("burglary=" + burglary.belief(Tense.ETERNAL,0) + "\tearthquake=" + earthquake.belief(Tense.ETERNAL,0));
         }
 
         //result from Probcog:  earthquake=23%, burglary=99%
-        assertEquals(0.99f, burglary.belief(Tense.ETERNAL).freq(), 0.4f /* approximate */);
-        assertEquals(0.23f, earthquake.belief(Tense.ETERNAL).freq(), 0.1f /* approximate */);
+        assertEquals(0.99f, burglary.belief(Tense.ETERNAL,0).freq(), 0.4f /* approximate */);
+        assertEquals(0.23f, earthquake.belief(Tense.ETERNAL,0).freq(), 0.1f /* approximate */);
     }
 
 
@@ -99,13 +99,13 @@ public class NAL6MultistepTest {
         for (int i = 0; i < 5; i++) {
             // burglary.print();  earthquake.print();
             //long now = d.time();
-            System.out.println("burglary=" + burglary.belief(Tense.ETERNAL) + "\tearthquake=" + earthquake.belief(Tense.ETERNAL));
+            System.out.println("burglary=" + burglary.belief(Tense.ETERNAL,0,0) + "\tearthquake=" + earthquake.belief(Tense.ETERNAL,0,0));
             d.run(400);
         }
 
         //result from Probcog:  earthquake=23%, burglary=99%
-        assertEquals(0.99f, burglary.belief(Tense.ETERNAL).freq(), 0.3f /* approximate */);
-        assertEquals(0.23f, earthquake.belief(Tense.ETERNAL).freq(), 0.1f /* approximate */);
+        assertEquals(0.99f, burglary.belief(Tense.ETERNAL,0,0).freq(), 0.3f /* approximate */);
+        assertEquals(0.23f, earthquake.belief(Tense.ETERNAL,0,0).freq(), 0.1f /* approximate */);
 
 
 
@@ -158,13 +158,13 @@ public class NAL6MultistepTest {
 //            path15.print();
 //            path16.print();
 //            //long now = d.time();
-//            System.out.println(path15 + "=" + path15.belief(Tense.ETERNAL) + "\t" + path16 + "=" + path16.belief(Tense.ETERNAL));
+//            System.out.println(path15 + "=" + path15.belief(Tense.ETERNAL,0) + "\t" + path16 + "=" + path16.belief(Tense.ETERNAL,0));
 //            d.run(100);
 //        }
 //
 //
-//        assertEquals(0.25, path15.belief(Tense.ETERNAL).freq(), 0.1f /* approximate */);
-//        assertEquals(0.21f, path16.belief(Tense.ETERNAL).freq(), 0.1f /* approximate */);
+//        assertEquals(0.25, path15.belief(Tense.ETERNAL,0).freq(), 0.1f /* approximate */);
+//        assertEquals(0.21f, path16.belief(Tense.ETERNAL,0).freq(), 0.1f /* approximate */);
 //
 //
 //

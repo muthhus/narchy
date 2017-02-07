@@ -77,6 +77,8 @@ abstract public class PremiseBuilder {
         //now;
         //(long)(now + dur);
 
+        float dur = nar.time.dur();
+
         if (beliefTerm instanceof Compound && task.isQuestOrQuestion()) {
 
             Compound answerTerm = unify(task.term(), (Compound) beliefTerm, nar);
@@ -89,7 +91,7 @@ abstract public class PremiseBuilder {
 
                     BeliefTable table = task.isQuest() ? answerConcept.goals() : answerConcept.beliefs();
 
-                    Task answered = table.answer(when, now, task, answerTerm, nar.confMin.floatValue());
+                    Task answered = table.answer(when, now, dur, task, answerTerm, nar.confMin.floatValue());
                     if (answered != null) {
 
 //                        boolean exists = nar.tasks.contains(answered);
@@ -141,7 +143,7 @@ abstract public class PremiseBuilder {
             Concept beliefConcept = nar.concept(beliefTerm);
             if (beliefConcept != null) {
 
-                belief = beliefConcept.beliefs().match(when, now, task, true); //in case of quest, proceed with matching belief
+                belief = beliefConcept.beliefs().match(when, now, dur, task, true); //in case of quest, proceed with matching belief
             }
         }
 

@@ -25,6 +25,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.function.Predicate;
 
+import static java.lang.Math.abs;
+
 /**
  * stores the items unsorted; revection manages their ranking and removal
  */
@@ -72,7 +74,7 @@ public class MicrosphereTemporalBeliefTable extends MultiRWFasterList<Task> impl
 
                     float confMin = nar.confMin.floatValue();
 
-                    Function<Task, Float> rank = temporalConfidence(now);
+                    Function<Task, Float> rank = temporalConfidence(now, dur);
                     merged = $.newArrayList(1);
 
                     while (l.size() > capacity) {
@@ -153,12 +155,12 @@ public class MicrosphereTemporalBeliefTable extends MultiRWFasterList<Task> impl
 
             Time time = nar.time;
             long now = time.time();
+            float dur = time.dur();
 
-            before = truth(now, eternal);
+            before = truth(now, dur, eternal);
 
             Task next;
 
-            float dur = time.dur();
             float confMin = nar.confMin.floatValue();
             if ((next = compress(input, now, l, trash, dur, confMin)) != null) {
 
@@ -169,7 +171,7 @@ public class MicrosphereTemporalBeliefTable extends MultiRWFasterList<Task> impl
                     l.add(merged[0] = next);
                 }
 
-                final Truth after = truth(now, eternal);
+                final Truth after = truth(now, dur, eternal);
                 delta[0] = new TruthDelta(before, after);
 
                 feedback(l, input);
@@ -204,7 +206,7 @@ public class MicrosphereTemporalBeliefTable extends MultiRWFasterList<Task> impl
             float dq = q - x.qua();
             if (dq > Param.BUDGET_EPSILON) {
 
-                float df = Math.abs(f - x.freq());
+                float df = abs(f - x.freq());
                 float dqf = dq * df;
 
                 if (dqf > Param.BUDGET_EPSILON) {
@@ -340,12 +342,17 @@ public class MicrosphereTemporalBeliefTable extends MultiRWFasterList<Task> impl
     }
 
 
-    private Function<Task, Float> temporalConfidence(long when) {
-        return x -> rankTemporalByConfidence(x, when);
+    private Function<Task, Float> temporalConfidence(long when, float dur) {
+        return x -> rankTemporalByConfidenceAndQuality(x, when, dur);
     }
 
-    final float rankTemporalByConfidence(@Nullable Task t, long when) {
-        return t == null ? -1 : t.conf(when);
+    final float rankTemporalByConfidenceAndQuality(@Nullable Task t, long when, float dur) {
+        return t!=null ? t.confWeight(when, dur) : Float.NEGATIVE_INFINITY;// * (1+t.range()) * t.qua();
+
+//        long range = Math.max(1, t.range());
+//        long worstDistance = range == 1 ? Math.abs(when - t.mid()) : Math.max(abs(when - t.start()), abs(when - t.end()));
+//        return t == null ? -1 :
+//                (t.conf() * range / (range + (worstDistance * worstDistance)));
     }
 
     Task matchMerge(MutableList<Task> l, long now, @NotNull Task toMergeWith, float dur) {
@@ -364,22 +371,28 @@ public class MicrosphereTemporalBeliefTable extends MultiRWFasterList<Task> impl
         //  more time from now
         //  less range
 
-        long yo = y.mid();
+        long ys = y.start();
+        long ye = y.end();
         float yf = y.freq();
 
         return x -> {
             if ((x == y) || (x == null))
                 return Float.NEGATIVE_INFINITY;
 
-            long xo = x.mid();
+            long xs = x.start();
+            long xe = x.end();
 //            float xtc = x.conf(yo);
 //            if (xtc!=xtc) xtc = 0;
 
-            return (1f + (1f - Math.abs(x.freq() - yf)))
+            return (1f + (1f - abs(x.freq() - yf)))
                     //* (1f + (1f - xtc))
-                    * (1f + 1f / (1f + x.range()))
+                    //* (1f + 1f / (1f + x.range()))
                     //* (1f + 1f / (1f + x.dur()))
-                    * (1f + TruthPolation.evidenceDecay(1, dur, Math.abs(xo - now) + Math.abs(xo - yo)));
+                    * (1f
+                        + TruthPolation.evidenceDecay(1, dur,
+                        abs(xs - ys) + abs(xe - ye) + abs((xe+xs)/2f - now))
+                    )
+                    ;
         };
 
     }
@@ -408,11 +421,11 @@ public class MicrosphereTemporalBeliefTable extends MultiRWFasterList<Task> impl
         }
 
         //return rankTemporalByConfidenceAndOriginality(t, when, now, -1);
-        float inputRank = input != null ? rankTemporalByConfidence(input, now) : Float.POSITIVE_INFINITY;
+        float inputRank = input != null ? rankTemporalByConfidenceAndQuality(input, now, dur) : Float.POSITIVE_INFINITY;
 
-        Task a = l.minBy(temporalConfidence(now));
+        Task a = l.minBy(temporalConfidence(now, dur));
         //return rankTemporalByConfidenceAndOriginality(t, when, now, -1);
-        if (a == null || inputRank < rankTemporalByConfidence(a, now)) {
+        if (a == null || inputRank < rankTemporalByConfidenceAndQuality(a, now, dur)) {
             //dont continue if the input was too weak
             return null;
         }
@@ -453,14 +466,32 @@ public class MicrosphereTemporalBeliefTable extends MultiRWFasterList<Task> impl
         Truth t = Revision.revise(a, p, b, f, confMin);
 
         if (t != null) {
+
             double factor = (double) ac / (ac + bc);
 
-            long mergedStart = //Math.min(a.start(), b.start());
-                         (long) Math.round(Util.lerp(factor, a.start(), b.start()));
-            long mergedEnd = //Math.max(a.end(), b.end());
-                         (long) Math.round(Util.lerp(factor, a.end(), b.end()));
+            Interval ai = new Interval(a.start(), a.end());
+            Interval bi = new Interval(b.start(), b.end());
+            Interval overlap = ai.intersection(bi);
+            long mergedStart, mergedEnd;
+            if (overlap!=null) {
+                Interval union = ai.union(bi);
+                mergedStart = union.a;
+                    //(long) Math.round(Util.lerp(factor, a.start(), b.start()));
+                mergedEnd = union.b;
+                    //(long) Math.round(Util.lerp(factor, a.end(), b.end()));
 
-            return Revision.mergeInterpolate(a, b, mergedStart, mergedEnd, now, t, true);
+                float timeRatio = Math.min(1f,
+                        (float) Math.max(1, overlap.length()) /
+                                Math.max(1, union.length())
+                );
+                t = t.confWeightMult(timeRatio);
+            } else {
+                //create point sample
+                mergedStart = mergedEnd = Math.round(Util.lerp(factor, a.mid(), b.mid()));
+            }
+
+            if (t!=null)
+                return Revision.mergeInterpolate(a, b, mergedStart, mergedEnd, now, t, true);
         }
 
         return null;
@@ -469,7 +500,7 @@ public class MicrosphereTemporalBeliefTable extends MultiRWFasterList<Task> impl
 
     @Nullable
     @Override
-    public final Task match(long when, @Deprecated long now, @Nullable Task against) {
+    public final Task match(long when, @Deprecated long now, float dur, @Nullable Task against) {
         return ifNotEmptyReadWith(l->{
             switch (l.size()) {
 //                case 0:
@@ -477,22 +508,22 @@ public class MicrosphereTemporalBeliefTable extends MultiRWFasterList<Task> impl
                 case 1:
                     return l.get(0); //special case avoid creating the lambda
                 default:
-                    return l.maxBy(temporalConfidence(when));
+                    return l.maxBy(temporalConfidence(when, dur));
             }
         });
     }
 
     @Nullable
-    public final Truth truth(long when, @Deprecated @Nullable EternalTable eternal) {
-        return truth(when, when, eternal);
+    public final Truth truth(long when, float dur, @Deprecated @Nullable EternalTable eternal) {
+        return truth(when, when, dur, eternal);
     }
 
-    @Nullable @Override public final Truth truth(long when, long now, @Nullable EternalTable eternal) {
+    @Nullable @Override public final Truth truth(long when, long now, float dur, @Nullable EternalTable eternal) {
 
         Task topEternal = eternal!=null ? eternal.match() : null;
 
         Truth r = ifNotEmptyReadWith(l->{
-            return TruthPolation.truth(topEternal, when, l);
+            return TruthPolation.truth(topEternal, when, dur, l);
         });
 
         return (r == null && topEternal!=null) ? topEternal.truth() : r;

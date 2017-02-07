@@ -17,6 +17,7 @@ public class CameraSensorView extends MatrixView implements MatrixView.ViewFunct
     private final NAR nar;
     private float maxConceptPriority;
     private long now;
+    float dur;
 
     public CameraSensorView(Sensor2D cam, NAR nar) {
         super(cam.width, cam.height);
@@ -24,6 +25,7 @@ public class CameraSensorView extends MatrixView implements MatrixView.ViewFunct
         this.nar = nar;
         nar.onCycle(nn -> {
             now = nn.time();
+            dur = nn.time.dur();
             maxConceptPriority = nar instanceof Default ? ((Default) nar).core.active.priMax() : 1; //HACK TODO cache this
         });
     }
@@ -32,9 +34,9 @@ public class CameraSensorView extends MatrixView implements MatrixView.ViewFunct
     public float update(int x, int y, GL2 g) {
 
         Concept s = cam.matrix[x][y];
-        Truth b = s.beliefs().truth(now);
+        Truth b = s.beliefs().truth(now, dur);
         float bf = b != null ? b.freq() : 0.5f;
-        Truth d = s.goals().truth(now);
+        Truth d = s.goals().truth(now, dur);
 //        if (d == null) {
 //            dr = dg = 0;
 //        } else {

@@ -1,5 +1,7 @@
 package jcog.math;
 
+import org.jetbrains.annotations.Nullable;
+
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 
@@ -105,12 +107,11 @@ public class Interval {
 	}
 
 	/** Return the longerval in common between this and o */
+	@Nullable
 	public Interval intersection(Interval other) {
 		long a = max(this.a, other.a);
 		long b = min(this.b, other.b);
-		if (a > b)
-			return null;
-		return new Interval(a, b);
+		return a > b ? null : new Interval(a, b);
 	}
 
 	/** Return the longerval with elements from this not in other;

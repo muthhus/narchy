@@ -410,7 +410,7 @@ public class TemporalTest {
 
 
         //INTERMPOLATION APPLIED AFTER REVECTION:
-        assertEquals("((a ==>+4 b)-->[pill])", cc.beliefs().match(2, d.time(), null, true).term().toString());
+        assertEquals("((a ==>+4 b)-->[pill])", cc.beliefs().match(2, d.time(), n.time.dur(), null, true).term().toString());
     }
 
     @Test

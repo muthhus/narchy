@@ -11,7 +11,7 @@ import nars.remote.NAgents;
 
 public class Arkancide extends NAgents {
 
-    static boolean cam = true;
+    static boolean cam = false;
 
     private float paddleSpeed = 1f;
 
@@ -23,7 +23,7 @@ public class Arkancide extends NAgents {
 
         NAR nar = runRT((NAR n) -> {
             return new Arkancide(n, cam);
-        }, 35, 15, -1);
+        }, 55, 5, -1);
 
         //nar.beliefConfidence(0.75f);
         //nar.goalConfidence(0.75f);
@@ -55,7 +55,7 @@ public class Arkancide extends NAgents {
             }
         };
 
-        maxPaddleSpeed = 35 * noid.BALL_VELOCITY;
+        maxPaddleSpeed = 66 * noid.BALL_VELOCITY;
 
         nar.truthResolution.setValue(0.02f);
 

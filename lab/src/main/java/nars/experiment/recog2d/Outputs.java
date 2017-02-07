@@ -142,10 +142,11 @@ public class Outputs {
 
         a.nar.onCycle(nn -> {
             long now = nar.time();
+            float dur = nar.time.dur();
             out.forEach((cc, nnn) -> {
 
                 Truth t =
-                        cc.belief(now);
+                        cc.belief(now, dur);
                         //cc.goal(now);
                 float f, c;
                 if (t == null) {

@@ -13,6 +13,7 @@ import nars.table.*;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termlike;
+import nars.time.Time;
 import nars.truth.Truth;
 import nars.truth.TruthDelta;
 import org.jetbrains.annotations.NotNull;
@@ -436,15 +437,17 @@ public class CompoundConcept<T extends Compound> implements Concept, Termlike {
             Truth other;
             float polarity = 0;
 
-            long now = nar.time();
+            Time time = nar.time;
+            float dur = time.dur();
+            long now = time.time();
             if (input.isBelief()) {
                 //compare against the current goal state
-                other = concept.goals().truth(now);
+                other = concept.goals().truth(now, dur);
                 if (other != null)
                     polarity = +1f;
             } else if (input.isGoal()) {
                 //compare against the current belief state
-                other = concept.beliefs().truth(now);
+                other = concept.beliefs().truth(now, dur);
                 if (other != null)
                     polarity = -1f;
             } else {

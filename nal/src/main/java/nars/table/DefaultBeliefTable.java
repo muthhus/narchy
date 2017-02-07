@@ -29,9 +29,9 @@ public class DefaultBeliefTable implements BeliefTable {
      */
     @Nullable
     @Override
-    public Truth truth(long when, long now) {
+    public Truth truth(long when, long now, float dur) {
 
-        Truth tt = temporal.truth(when, now, eternal);
+        Truth tt = temporal.truth(when, now, dur, eternal);
 
         return (tt != null) ? tt : eternal.truth();
 
@@ -101,7 +101,7 @@ public class DefaultBeliefTable implements BeliefTable {
      * get the most relevant belief/goal with respect to a specific time.
      */
     @Nullable
-    public Task match(long when, long now, @Nullable Task against, boolean noOverlap) {
+    @Override public Task match(long when, long now, float dur, @Nullable Task against, boolean noOverlap) {
 
         final Task ete = eternal.match();
         if (when == ETERNAL) {
@@ -112,7 +112,7 @@ public class DefaultBeliefTable implements BeliefTable {
 
         if (now!=ETERNAL) {
 
-            Task tmp = temporal.match(when, now, against);
+            Task tmp = temporal.match(when, now, dur, against);
 
             if (tmp == null) {
                 return ete;
@@ -120,7 +120,7 @@ public class DefaultBeliefTable implements BeliefTable {
                 if (ete == null) {
                     return tmp;
                 } else {
-                    return (ete.confWeight(when) > tmp.confWeight(when)) ?
+                    return (ete.confWeight(when, dur) > tmp.confWeight(when, dur)) ?
                             ete : tmp;
                 }
             }

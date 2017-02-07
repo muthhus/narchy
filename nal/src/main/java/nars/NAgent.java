@@ -99,7 +99,7 @@ abstract public class NAgent implements NSense, NAction {
 
     public final FloatParam epsilonProbability = new FloatParam(0.1f);
 
-    public final FloatParam gammaEpsilonFactor = new FloatParam(0.1f);
+    public final FloatParam gammaEpsilonFactor = new FloatParam(0.25f);
 
     //final int curiosityMonitorDuration; //frames
     final DescriptiveStatistics avgActionDesire;
@@ -168,7 +168,7 @@ abstract public class NAgent implements NSense, NAction {
                 (x) -> t(x, alpha)
         );
 
-        int curiosityMonitorDuration = Math.round(nar.time.dur() * 2f); //TODO handle changing duration value
+        int curiosityMonitorDuration = Math.round((1 + nar.time.dur())); //TODO handle changing duration value
         avgActionDesire = new DescriptiveStatistics(curiosityMonitorDuration);
         rewardWindow = new DescriptiveStatistics(curiosityMonitorDuration);
 
@@ -529,7 +529,7 @@ abstract public class NAgent implements NSense, NAction {
         for (int i = 0, actionsSize = actions.size(); i < actionsSize; i++) {
             ActionConcept action = actions.get(i);
 
-            float motorEpsilonProbability = epsilonProbability.floatValue() * (1f - Math.min(1f, action.goalConf(now, 0) / gamma));
+            float motorEpsilonProbability = epsilonProbability.floatValue() * (1f - Math.min(1f, action.goalConf(now, nar.time.dur(), 0) / gamma));
 
 
             if (nar.random.nextFloat() < motorEpsilonProbability) {
@@ -543,9 +543,9 @@ abstract public class NAgent implements NSense, NAction {
                 //action.biasDesire(t);
 
                 if (t!=null) {
-                    nar.inputLater(
+                    nar.input(
                             new GeneratedTask(action, GOAL, t)
-                                    .time(now, now)
+                                    .time(now, now, Math.round(now + nar.time.dur()))
                                     .budgetByTruth(action.pri.asFloat())
                                     .log("Curiosity")
                     );
@@ -591,7 +591,7 @@ abstract public class NAgent implements NSense, NAction {
 //                }
 //            }
 
-            Truth d = a.goals().truth(now);
+            Truth d = a.goals().truth(now, nar.time.dur());
             if (d != null)
                 m += d.evi();
         }

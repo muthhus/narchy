@@ -34,23 +34,23 @@ public enum TruthPolation  {
     final static float MIN_ILLUMINATION = c2w(TRUTH_EPSILON);
 
     @Nullable
-    public static Truth truth(long when, @NotNull List<Task> tasks) {
-        return truth(null, when, tasks);
+    public static Truth truth(long when, float dur, @NotNull List<Task> tasks) {
+        return truth(null, when, dur, tasks);
     }
     @Nullable
-    public static Truth truth(long when, @NotNull Task... tasks) {
-        return truth(null, when, Lists.newArrayList(tasks));
+    public static Truth truth(long when, float dur, @NotNull Task... tasks) {
+        return truth(null, when, dur, Lists.newArrayList(tasks));
     }
 
     @Nullable
-    public static Truth truth(@Nullable Task topEternal, long when, @NotNull List<Task> tasks) {
+    public static Truth truth(@Nullable Task topEternal, long when, float dur, @NotNull List<Task> tasks) {
 
 
         int tasksSize = tasks.size();
         if (tasksSize == 0)
             return null;
         if (tasksSize == 1)
-            return tasks.get(0).truth(when);
+            return tasks.get(0).truth(when, dur);
 
         float weightedValue = 0, illumination = 0;
 
@@ -61,7 +61,7 @@ public enum TruthPolation  {
             if (t instanceof DynamicBeliefTask)
                 continue; //ignore dynamic belief tasks
 
-            float tw = t.confWeight(when);
+            float tw = t.confWeight(when, dur);
             if (tw > 0) {
                 illumination += tw;
                 weightedValue += tw * t.freq();

@@ -316,11 +316,13 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
             return i;
         }
         );
+
+        float dur = n.time.dur();
         n.forEachActiveConcept(c -> {
             BeliefTable table = beliefsOrGoals ? c.beliefs() : c.goals();
 
             if (!table.isEmpty()) {
-                bt.add(table.match(n.time()));
+                bt.add(table.match(n.time(), dur));
                 //System.out.println("\t" + c.beliefs().top(n.time()));
             }
         });

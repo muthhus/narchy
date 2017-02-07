@@ -47,11 +47,11 @@ public class TruthWave {
 
     public TruthWave(@NotNull BeliefTable b, @NotNull NAR n) {
         this(b.size());
-        set(b, n.time());
+        set(b, n.time(), n.time.dur());
     }
 
     /** clears and fills this wave with the data from a table */
-    public void set(@NotNull BeliefTable b, long now) {
+    public void set(@NotNull BeliefTable b, long now, float dur) {
         int s = b.size();
         if (s == 0) {
             this.current = null;
@@ -89,7 +89,7 @@ public class TruthWave {
         this.start = (long) start;
         this.end = (long) end;
 
-        this.current = b.truth(now);
+        this.current = b.truth(now, dur);
     }
 
     public static void load(float[] array, int index, long start, long end, @Nullable Truthed truth, float qua) {
@@ -116,7 +116,7 @@ public class TruthWave {
 
 
     /** fills the wave with evenly sampled points in a time range */
-    public void project(@NotNull BeliefTable table, float minT, float maxT, int points) {
+    public void project(@NotNull BeliefTable table, float minT, float maxT, float dur, int points) {
         clear();
 
         if (minT == maxT) {
@@ -130,7 +130,7 @@ public class TruthWave {
         int j = 0;
         for (int i = 0; i < points; i++) {
             int lt = Math.round(t);
-            Truth x = table.truth(lt);
+            Truth x = table.truth(lt, dur);
             if (x!=null) {
                 load(data, (j++) * ENTRY_SIZE, lt, lt, x, 0.5f);
             }

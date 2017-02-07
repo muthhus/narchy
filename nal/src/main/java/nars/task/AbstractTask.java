@@ -543,7 +543,7 @@ public abstract class AbstractTask extends RawBudget implements Task {
 
 
     @Override
-    public float confWeight(long when) {
+    public float confWeight(long when, float dur) {
         if (!isBeliefOrGoal())
             throw new UnsupportedOperationException();
 
@@ -574,9 +574,12 @@ public abstract class AbstractTask extends RawBudget implements Task {
 
             } else {
                 //nearest endpoint of the interval
-                //ccw = TruthPolation.evidenceDecay(ccw, dur, Math.abs((when <= a ? a : z) - when));
+                if (dur > 0)
+                    ccw = TruthPolation.evidenceDecay(ccw, dur, Math.abs((when <= a ? a : z) - when));
+                else
+                    ccw = 0;
 
-                ccw = 0;
+                //ccw = 0;
             }
 
             if (eternalizable()) {

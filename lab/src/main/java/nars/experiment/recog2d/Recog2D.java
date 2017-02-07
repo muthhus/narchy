@@ -138,7 +138,9 @@ public class Recog2D extends NAgents {
                         float freq, conf;
 
                         long now = nar.time();
-                        Truth t = c.belief(now);
+                        float dur = nar.time.dur();
+
+                        Truth t = c.belief(now, dur);
                         if (t != null) {
                             conf = t.conf();
                             freq = t.freq();

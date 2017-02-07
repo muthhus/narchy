@@ -218,7 +218,7 @@ public class PrologCore extends PrologAgent implements Consumer<Task> {
 
             if (nterm instanceof Compound) {
                 Concept c = nar.concept(nterm);
-                Truth currentBelief = c!=null ? c.beliefs().truth(nar.time()) : null;
+                Truth currentBelief = c!=null ? c.beliefs().truth(nar.time(), nar.time.dur()) : null;
 
                 //only input if NARS doesnt have any belief or only has a weak belief for this fact
                 if (currentBelief == null || currentBelief.conf() < confThreshold.floatValue()*existingAnswerThreshold) {

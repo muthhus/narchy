@@ -249,7 +249,8 @@ public interface Truth extends Truthed {
     @Nullable Truth confMult(float f);
 
     default Truth confWeightMult(float f) {
-        return withConf(w2c(evi() * f));
+        if (f == 1f) return this;
+        else return withConf(w2c(evi() * f));
     }
 
     @Nullable Truth withConf(float f);

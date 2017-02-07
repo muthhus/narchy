@@ -43,6 +43,7 @@ public class BeliefTableChart extends Widget {
     private final NAR nar;
     private String termString;
     private long now;
+    private float dur;
 
     float angleSpeed = 0.5f;
 
@@ -114,15 +115,17 @@ public class BeliefTableChart extends Widget {
 
     public void update() {
 
-        this.now = nar.time();
+        long now = this.now = nar.time();
+        float dur = this.dur = nar.time.dur();
+
         Concept c = nar.concept(term/* lookup by term, not the termed which could be a dead instance */);
 
         if (c != null) {
-            beliefs.set(c.beliefs(), now);
-            goals.set(c.goals(), now);
+            beliefs.set(c.beliefs(), now, dur);
+            goals.set(c.goals(), now, dur);
         } else {
-            beliefs.set(BeliefTable.EMPTY, now);
-            goals.set(BeliefTable.EMPTY, now);
+            beliefs.set(BeliefTable.EMPTY, now, dur);
+            goals.set(BeliefTable.EMPTY, now, dur);
         }
 
         ready();
@@ -318,7 +321,7 @@ public class BeliefTableChart extends Widget {
             BeliefTable table = beliefOrGoal ? c.beliefs() : c.goals();
 
             TruthWave pwave = beliefProj;
-            pwave.project(table, minT, maxT, projections);
+            pwave.project(table, minT, maxT, nar.time.dur(), projections);
             renderWaveLine(nowX, minT, maxT, gl, pwave, beliefOrGoal);
         }
 

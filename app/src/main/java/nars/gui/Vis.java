@@ -107,8 +107,8 @@ public class Vis {
         return treeChart(d, d.core.active, count);
     }
 
-    public static BagChart<Concept> treeChart(NAR n, Bag<Concept> b, final int count) {
-        long[] now = new long[]{n.time()};
+    public static BagChart<Concept> treeChart(NAR nar, Bag<Concept> b, final int count) {
+        long[] now = new long[]{nar.time()};
         BagChart<Concept> tc = new BagChart<Concept>(b, count) {
 
             @Override
@@ -126,13 +126,14 @@ public class Vis {
 
                     long n = now[0];
 
-                    @Nullable Truth bt = c.beliefs().truth(n);
+                    float dur = nar.time.dur();
+                    @Nullable Truth bt = c.beliefs().truth(n, dur);
                     if (bt != null)
                         belief = bt.conf();
 
 
                     float goal = 0;
-                    @Nullable Truth gt = c.goals().truth(n);
+                    @Nullable Truth gt = c.goals().truth(n, dur);
                     if (gt != null)
                         goal = gt.conf();
 
@@ -157,7 +158,7 @@ public class Vis {
             }
         };
 
-        n.onCycle(xx -> {
+        nar.onCycle(xx -> {
 
             //if (s.window.isVisible()) {
             now[0] = xx.time();
@@ -261,8 +262,8 @@ public class Vis {
             };
             p.setTitle(t.toString());
             p.add("P", () -> nar.pri(t, Float.NaN), 0f, 1f);
-            p.add("B", () -> nar.concept(t).beliefFreq(nar.time()), 0f, 1f);
-            p.add("G", () -> nar.concept(t).goalFreq(nar.time()), 0f, 1f);
+            p.add("B", () -> nar.concept(t).beliefFreq(nar.time(), nar.time.dur()), 0f, 1f);
+            p.add("G", () -> nar.concept(t).goalFreq(nar.time(), nar.time.dur()), 0f, 1f);
             grid.children.add(p);
             plots.add(p);
         }

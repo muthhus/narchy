@@ -52,12 +52,12 @@ public interface BeliefTable extends TaskTable {
         }
 
         @Override
-        public @Nullable Task match(long now) {
+        public @Nullable Task match(long now, float dur) {
             return null;
         }
 
         @Override
-        public @Nullable Task match(long when, long now) {
+        public @Nullable Task match(long when, long now, float dur) {
             return null;
         }
 
@@ -67,12 +67,12 @@ public interface BeliefTable extends TaskTable {
         }
 
         @Override
-        public float eviSum(long now) {
+        public float eviSum(long now, float dur) {
             return 0;
         }
 
         @Override
-        public Task answer(long when, long now, @NotNull Task question, Compound template, float minConf) {
+        public Task answer(long when, long now, float dur, @NotNull Task question, Compound template, float minConf) {
             return null;
         }
 
@@ -110,19 +110,19 @@ public interface BeliefTable extends TaskTable {
         }
 
         @Override
-        public Task match(long when, long now, @Nullable Task against, boolean noOverlap) {
+        public Task match(long when, long now, float dur, @Nullable Task against, boolean noOverlap) {
             return null;
         }
 
         @Override
-        public float freq(long when) {
+        public float freq(long when, float dur) {
             return Float.NaN;
         }
 
 
         @Nullable
         @Override
-        public Truth truth(long when, long now) {
+        public Truth truth(long when, long now, float dur) {
             return null;
         }
 
@@ -166,21 +166,18 @@ public interface BeliefTable extends TaskTable {
     @Nullable TruthDelta add(@NotNull Task input, @NotNull QuestionTable questions, CompoundConcept<?> concept, @NotNull NAR nar);
 
 
-    @Nullable Task match(long when, long now, @Nullable Task against, boolean noOverlap);
+    @Nullable Task match(long when, long now, float dur, @Nullable Task against, boolean noOverlap);
 
-    @Nullable
-    default Task match(long now) {
-        return match(now, now);
+    @Nullable default Task match(long now, float dur) {
+        return match(now, now, dur);
     }
 
-    @Nullable
-    default Task match(long when, long now) {
-        return match(when, now, null, true);
+    @Nullable default Task match(long when, long now, float dur) {
+        return match(when, now, dur, null, true);
     }
 
-    @Nullable
-    default Task matchEternal() {
-        return match(ETERNAL, ETERNAL, null, false);
+    @Nullable default Task matchEternal() {
+        return match(ETERNAL, ETERNAL, 0, null, false);
     }
 
 
@@ -209,27 +206,27 @@ public interface BeliefTable extends TaskTable {
      * estimates the current truth value from the top task, projected to the specified 'when' time;
      * returns null if no evidence is available
      */
-    @Nullable Truth truth(long when, long now);
+    @Nullable Truth truth(long when, long now, float dur);
 
 
     @Nullable
-    default Truth truth(long when) {
-        return truth(when, when);
+    default Truth truth(long when, float dur) {
+        return truth(when, when, dur);
     }
 
 
-    default float expectation(long when) {
-        Truth t = truth(when);
+    default float expectation(long when, float dur) {
+        Truth t = truth(when, dur);
         return t != null ? t.expectation() : 0.5f;
     }
 
-    default float motivation(long when) {
-        Truth t = truth(when);
+    default float motivation(long when, float dur) {
+        Truth t = truth(when, dur);
         return t != null ? t.motivation() : 0;
     }
 
-    default float freq(long when) {
-        Truth t = truth(when);
+    default float freq(long when, float dur) {
+        Truth t = truth(when, dur);
         return t != null ? t.freq() : Float.NaN;
     }
 
@@ -238,11 +235,11 @@ public interface BeliefTable extends TaskTable {
      */
     void clear(NAR nar);
 
-    default float eviSum(long now) {
+    default float eviSum(long now, float dur) {
 
         final float[] eSum = {0};
         forEach(t -> {
-            Truth tt = t.truth(now);
+            Truth tt = t.truth(now, dur);
             if (tt != null) {
                 eSum[0] += tt.evi();
             }
@@ -251,7 +248,7 @@ public interface BeliefTable extends TaskTable {
         return eSum[0];
     }
 
-    default Task answer(long when, long now, @NotNull Task question, Compound template, float minConf) {
+    default Task answer(long when, long now, float dur, @NotNull Task question, Compound template, float minConf) {
 
         Budget qBudget = question.budget();
 
@@ -270,7 +267,7 @@ public interface BeliefTable extends TaskTable {
 
         }
 
-        answer = match(when, now, question, false);
+        answer = match(when, now, dur, question, false);
         if (answer == null)
             return null;
 

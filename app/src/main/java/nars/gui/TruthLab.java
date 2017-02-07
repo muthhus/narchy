@@ -145,22 +145,26 @@ public class TruthLab extends Grid {
 
     }
 
-    static class TaskTimeline extends TruthTimeline {
+    class TaskTimeline extends TruthTimeline {
 
         public TaskTimeline(Task task, long start, long end, int samplePeriod) {
-            super(start, end, samplePeriod, (w) -> task.truth(w));
+            super(start, end, samplePeriod, (w) -> task.truth(w, dur));
 
             this.label = task.toString();
             Draw.colorHash(Terms.atemporalize( task.term() ), labelColor);
         }
     }
-    static class BeliefTableTimeline extends TruthTimeline {
+
+    private final float dur = 1;
+
+    class BeliefTableTimeline extends TruthTimeline {
+
 
         public BeliefTableTimeline(Compound t, BeliefTable b, long start, long end, int samplePeriod) {
             super(start, end, samplePeriod, (w) -> {
-                Task x = b.match(w, w, $.task(t, '?', null).evidence(0), true);
+                Task x = b.match(w, w, dur, $.task(t, '?', null).evidence(0), true);
                 if (x!=null)
-                    return x.truth(w);
+                    return x.truth(w, dur);
                 return null;
             });
 
@@ -169,7 +173,7 @@ public class TruthLab extends Grid {
         }
     }
 
-    public static class ConceptTimeline extends Grid {
+    public class ConceptTimeline extends Grid {
         private final Compound term;
         private boolean showBeliefs;
 

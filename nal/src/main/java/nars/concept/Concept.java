@@ -188,28 +188,28 @@ public interface Concept extends Termed {
 
 
     @Nullable
-    default Truth belief(long when, long now) {
-        return beliefs().truth(when, now);
+    default Truth belief(long when, long now, float dur) {
+        return beliefs().truth(when, now, dur);
     }
 
     @Nullable
-    default Truth goal(long when, long now) {
-        return goals().truth(when, now);
+    default Truth goal(long when, long now, float dur) {
+        return goals().truth(when, now, dur);
     }
 
     @Nullable
-    default Truth belief(long now) {
-        return beliefs().truth(now);
+    default Truth belief(long now, float dur) {
+        return beliefs().truth(now, dur);
     }
 
     @Nullable
-    default Truth goal(long now) {
-        return goals().truth(now);
+    default Truth goal(long now, float dur) {
+        return goals().truth(now, dur);
     }
 
     @Nullable
-    default float goalConf(long now, float ifMissing) {
-        Truth t = goals().truth(now);
+    default float goalConf(long now, float dur, float ifMissing) {
+        Truth t = goals().truth(now, dur);
         return (t != null) ? t.conf() : ifMissing;
     }
 
@@ -434,28 +434,28 @@ public interface Concept extends Termed {
         termlinks().commit();
     }
 
-    default float beliefFreq(long time) {
-        return beliefFreq(time, Float.NaN);
+    default float beliefFreq(long time, float dur) {
+        return beliefFreq(time, dur, Float.NaN);
     }
 
-    default float beliefFreq(long time, float valueIfNonExistent) {
-        return freq(time, beliefs(), valueIfNonExistent);
+    default float beliefFreq(long time, float dur, float valueIfNonExistent) {
+        return freq(time, dur, beliefs(), valueIfNonExistent);
     }
 
-    default float goalFreq(long time) {
-        return goalFreq(time, Float.NaN);
+    default float goalFreq(long time, float dur) {
+        return goalFreq(time, dur, Float.NaN);
     }
 
-    default float goalFreq(long time, float valueIfNonExistent) {
-        return freq(time, goals(), valueIfNonExistent);
+    default float goalFreq(long time, float dur, float valueIfNonExistent) {
+        return freq(time, dur, goals(), valueIfNonExistent);
     }
 
-    static float freq(long time, @NotNull BeliefTable table) {
-        return freq(time, table, Float.NaN);
+    static float freq(long time, float dur, @NotNull BeliefTable table) {
+        return freq(time, dur, table, Float.NaN);
     }
 
-    static float freq(long time, @NotNull BeliefTable table, float valueIfNonExistent) {
-        Truth t = table.truth(time);
+    static float freq(long time, float dur, @NotNull BeliefTable table, float valueIfNonExistent) {
+        Truth t = table.truth(time, dur);
         return t != null ? t.freq() : valueIfNonExistent;
     }
 

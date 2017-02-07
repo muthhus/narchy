@@ -66,8 +66,9 @@ public class Tetris extends NAgents {
                         return 0f;
                     }),
                     new MatrixView(tetris_width, tetris_height, (x, y, gl) -> {
-                        long then = (long) (now + nar.time.dur() * 8);
-                        Truth f = concept[x][y].belief(then);
+                        float dur = nar.time.dur();
+                        long then = (long) (now + dur * 8);
+                        Truth f = concept[x][y].belief(then, dur);
                         float fr, co;
                         if (f == null) {
                             fr = 0.5f;
@@ -451,7 +452,7 @@ public class Tetris extends NAgents {
         public static void main(String[] args) throws Narsese.NarseseException {
             //Param.DEBUG = true;
 
-            FrameTime clock = new FrameTime().dur(TIME_PER_FALL);
+            FrameTime clock = new FrameTime().dur(1);
             NAR nar =
                     NAgents.newMultiThreadNAR(3, clock);
                     //NARBuilder.newALANN(clock, 4, 64, 5, 4, 1);
@@ -461,7 +462,7 @@ public class Tetris extends NAgents {
 //            MySTMClustered stmGoal = new MySTMClustered(nar, 16, '!', 2, false, 1);
 
             nar.termVolumeMax.setValue(42);
-            nar.truthResolution.setValue(0.1f);
+            nar.truthResolution.setValue(0.05f);
 
 
             //nar.linkFeedbackRate.setValue(0.05f);
@@ -621,9 +622,9 @@ public class Tetris extends NAgents {
 
                 SensorConcept s = sensors.get(y * tetris_width + x);
 
-                Truth b = s.beliefs().truth(now + whenRelative);
+                Truth b = s.beliefs().truth(now + whenRelative, whenRelative);
                 float bf = b != null ? b.freq() : 0.5f;
-                Truth dt = s.goals().truth(now + whenRelative);
+                Truth dt = s.goals().truth(now + whenRelative, whenRelative);
                 float dr, dg;
                 if (dt == null) {
                     dr = dg = 0;
