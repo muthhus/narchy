@@ -421,8 +421,13 @@ public interface TimeFunctions {
                                 int derivedInDecomposed = rDecomposed.subtermTime(rDerived);
                                 if (derivedInDecomposed != DTERNAL) {
                                     occ = occOther + derivedInDecomposed;
-                                    if (otherInDecomposed!=DTERNAL) //???
-                                        occ -= otherInDecomposed + rDerived.dtRange();
+                                    if (otherInDecomposed!=DTERNAL) { //???
+                                        if (derivedInDecomposed==0) {
+                                            occ -= otherInDecomposed + rDerived.dtRange();
+                                        } else {
+                                            occ -= otherInDecomposed; //<---- TODO subsent_1
+                                        }
+                                    }
 
 
                                 }

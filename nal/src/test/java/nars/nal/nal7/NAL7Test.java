@@ -48,7 +48,7 @@ public class NAL7Test extends AbstractNALTest {
                 .mustBelieve(cycles, "(x:before ==>+10 x:after)", 1.00f, 0.45f /*abductionConf*/, 0)
                 .mustBelieve(cycles, "(x:after ==>-10 x:before)", 1.00f, 0.45f /*inductionConf*/, 0)
                 .mustBelieve(cycles, "(x:after <=>-10 x:before)", 1.00f, 0.45f /*comparisonConf*/, 0)
-                .mustBelieve(cycles, "(x:after &&-10 x:before)", 1.00f, 0.81f /*intersectionConf*/, 0)
+                .mustBelieve(cycles, "(x:after &&-10 x:before)", 1.00f, 0.81f /*intersectionConf*/, 0, 10)
         ;
     }
 
@@ -60,7 +60,7 @@ public class NAL7Test extends AbstractNALTest {
                 .mustBelieve(cycles, "(--x:before ==>+10 x:after)", 1.00f, 0.45f /*abductionConf*/, 0)
                 .mustBelieve(cycles, "(x:after ==>-10 x:before)", 0.00f, 0.45f /*inductionConf*/, 0)
                 .mustBelieve(cycles, "(x:after <=>-10 x:before)", 0.00f, 0.45f /*comparisonConf*/, 0)
-                .mustBelieve(cycles, "(--x:before &&+10 x:after)", 1.00f, 0.81f /*intersectionConf*/, 0)
+                .mustBelieve(cycles, "(--x:before &&+10 x:after)", 1.00f, 0.81f /*intersectionConf*/, 0, 10)
         ;
     }
     @Test
@@ -71,7 +71,7 @@ public class NAL7Test extends AbstractNALTest {
                 .mustBelieve(cycles, "(x:before ==>+10 x:after)", 0.00f, 0.45f /*abductionConf*/, 0)
                 .mustBelieve(cycles, "(--x:after ==>-10 x:before)", 1.00f, 0.45f /*inductionConf*/, 0)
                 .mustBelieve(cycles, "(x:after <=>-10 x:before)", 0.00f, 0.45f /*comparisonConf*/, 0)
-                .mustBelieve(cycles, "(x:before &&+10 --x:after)", 1.00f, 0.81f /*intersectionConf*/, 0)
+                .mustBelieve(cycles, "(x:before &&+10 --x:after)", 1.00f, 0.81f /*intersectionConf*/, 0, 10)
                 .mustNotOutput(cycles, "(x:before &&-10 --x:after)", '.')
         ;
     }
@@ -212,7 +212,7 @@ public class NAL7Test extends AbstractNALTest {
                 //.input("X:x.") //shouldnt be necessary
                 .inputAt(1, "(X:x &&+1 (Y:y &&+2 Z:z)). :|:")
                 .mustBelieve(time, "X:x.", 1.00f, 0.73f, 1)
-                .mustBelieve(time, "(Y:y &&+2 Z:z).", 1.00f, 0.81f, 2)
+                .mustBelieve(time, "(Y:y &&+2 Z:z).", 1.00f, 0.81f, 2, 4)
                 .mustNotOutput(time, "(Y:y &&+2 Z:z)", '.', 1.00f, 1f, 0.43f, 0.43f, 2) //avoid the substitutionIfUnifies result
                 .mustBelieve(time, "Y:y.", 1.00f, 0.73f, 2)
                 .mustBelieve(time, "Z:z.", 1.00f, 0.73f, 4)
@@ -316,7 +316,7 @@ public class NAL7Test extends AbstractNALTest {
                 .mustBelieve(cycles, "( (--,open(John, door)) ==>+4 enter(John, room) )",
                         1.00f, 0.45f, 0)
                 .mustBelieve(cycles, "( (--,open(John, door)) &&+4 enter(John, room) )",
-                        1f, 0.81f, 0)
+                        1f, 0.81f, 0, 4)
         ;
     }
 
@@ -526,11 +526,11 @@ public class NAL7Test extends AbstractNALTest {
                 //"(<#1 --> (/,at,SELF,_)> &&+10 <#1 --> (/,on,{t002},_)>)",
                 "(at(SELF,{t003}) &&+10 on({t002},{t003}))",
                 1.0f, 0.81f,
-                0);
+                0, 10);
         tester.mustBelieve(cycles,
                 "(at(SELF,#1) &&+10 on({t002},#1))",
                 1.0f, 0.81f,
-                0);
+                0, 10);
         tester.mustNotOutput(cycles, "(at(SELF,#1) &&-10 on({t002},#1))", '.', ETERNAL);
 
     }
@@ -654,7 +654,7 @@ public class NAL7Test extends AbstractNALTest {
         test()
                 .inputAt(2, "a:x. :|: %1.0;0.45%")
                 .inputAt(5, "b:x. :|: %1.0;0.90%")
-                .mustBelieve(cycles, "(a:#1 &&+3 b:#1)", 1f, 0.40f, 2)
+                .mustBelieve(cycles, "(a:#1 &&+3 b:#1)", 1f, 0.40f, 2, 5)
                 .mustNotOutput(cycles, "(a:#1 &&-3 b:#1)", '.', 0f, 1, 0f, 1, 2);
 
     }
@@ -867,28 +867,27 @@ public class NAL7Test extends AbstractNALTest {
 
         int eventDT = 50;
 
-        int n1 = 0;
-
-        int n2 = n1 + eventDT*2;
-
-        int n3 = n2 + eventDT*2;
+        int x1 = 0;
+        int x2 =       x1 + eventDT*2;
+        int x3 =       x2 + eventDT*2;
+        int deadline = x3 + (int) (eventDT * 1.5f);
+        int x4 =       x3 + eventDT*2;
 
 
         TestNAR t = test();
-        ((FrameTime)t.nar.time).dur(eventDT);
+        //((FrameTime)t.nar.time).dur(eventDT);
 
         t
-                .log()
-                .inputAt(n1, "(x). :|:")
-                .inputAt(n1 + eventDT, "(y). :|:")
-//
-                .inputAt(n2, "(x). :|:")
-                .inputAt(n2 + eventDT, "(y). :|:")
+                .inputAt(x1, "(x). :|:")
+                .inputAt(x1 + eventDT, "(y). :|:")
+                .inputAt(x2, "(x). :|:")
+                .inputAt(x2 + eventDT, "(y). :|:")
 
-                .inputAt(n3, "(x). :|:")
-                .inputAt(n3, $.task($("(y)"), '?', null).budgetSafe(1f, 0.9f).time(n3, n3 + eventDT))
+                .inputAt(x3, "(x). :|:")
+                .inputAt(x3 + eventDT, $.task($("(y)"), '?', null).budgetSafe(1f, 0.9f).time(x3, x3 + eventDT))
 
-                .mustBelieve(n3+eventDT, "(y)", 1f, 0.59f, n3 + eventDT)
+                .mustBelieve(deadline, "(x)", 1f, 0.59f, x4)
+                .mustBelieve(deadline, "(y)", 1f, 0.59f, x4+eventDT)
         ;
     }
 

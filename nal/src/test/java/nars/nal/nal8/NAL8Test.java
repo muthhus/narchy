@@ -39,8 +39,7 @@ public class NAL8Test extends AbstractNALTest {
 
         //tester.nar;
         tester.input("[opened]:{t001}. :|:");
-        tester.inputAt(10,
-                "(((hold({t002}) &&+5 at({t001})) &&+5 open({t001})) &&+5 [opened]:{t001}).");
+        tester.input("(((hold({t002}) &&+5 at({t001})) &&+5 open({t001})) &&+5 [opened]:{t001}).");
 
         // hold .. at .. open
         tester.mustBelieve(cycles, "((hold({t002}) &&+5 at({t001})) &&+5 open({t001}))",
@@ -565,9 +564,9 @@ public class NAL8Test extends AbstractNALTest {
         test()
                 
                 .input("(hold). :|:")
-                .inputAt(2, "( (hold) &&+5 ((at) &&+5 (open)) )!")
-                .mustDesire(cycles, "((at) &&+5 (open))", 1.0f, 0.81f, 5)
-                .mustNotOutput(cycles, "((at) &&+5 (open))", '!', ETERNAL, 7)
+                .input("( (hold) &&+5 ((at) &&+5 (open)) )!")
+                .mustDesire(cycles, "((at) &&+5 (open))", 1.0f, 0.81f, 5, 10)
+                .mustNotOutput(cycles, "((at) &&+5 (open))", '!', ETERNAL)
         ;
     }
 
