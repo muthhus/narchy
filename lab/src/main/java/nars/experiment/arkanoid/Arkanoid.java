@@ -5,8 +5,9 @@ import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
-import java.util.concurrent.ConcurrentSkipListSet;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /** https://gist.github.com/Miretz/f10b18df01f9f9ebfad5 */
@@ -21,9 +22,9 @@ public class Arkanoid extends JFrame implements KeyListener {
 	public static final int BLOCK_TOP_MARGIN = 15;
 
 	public static final float BALL_RADIUS = 10.0f;
-	public static final float BALL_VELOCITY = 1f;
+	public static final float BALL_VELOCITY = 2f;
 
-	public static final float PADDLE_WIDTH = 60.0f;
+	public static final float PADDLE_WIDTH = 30.0f;
 	public static final float PADDLE_HEIGHT = 20.0f;
 	public static final float PADDLE_VELOCITY = 0.6f;
 
@@ -43,7 +44,7 @@ public class Arkanoid extends JFrame implements KeyListener {
 
 	public final Paddle paddle = new Paddle(SCREEN_WIDTH / 2, SCREEN_HEIGHT - PADDLE_HEIGHT);
 	public final Ball ball = new Ball(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2);
-	public final Collection<Brick> bricks = new ConcurrentSkipListSet<Brick>();
+	public final Collection<Brick> bricks = Collections.newSetFromMap(new ConcurrentHashMap());
 
 	//private float lastFt;
 	//private float currentSlice;
@@ -216,7 +217,7 @@ public class Arkanoid extends JFrame implements KeyListener {
 		}
 
 		public void setVelocityRandom() {
-			this.setVelocity(BALL_VELOCITY, (float)(Math.random() * Math.PI/3 + Math.PI/2)); //angled downward
+			this.setVelocity(BALL_VELOCITY, (float)(Math.random() * -Math.PI*(2/3f) + -Math.PI - Math.PI/6)); //angled downward
 		}
 
 		public void setVelocity(float speed, float angle) {

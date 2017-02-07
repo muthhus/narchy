@@ -11,6 +11,7 @@ import nars.attention.Activation;
 import nars.attention.Forget;
 import nars.bag.Bag;
 import nars.bag.CurveBag;
+import nars.budget.Budget;
 import nars.budget.BudgetMerge;
 import nars.concept.CompoundConcept;
 import nars.concept.Concept;
@@ -57,7 +58,7 @@ public class TaskNAR extends NAR {
     public final Bag<Task> tasks;
     final Deriver deriver = new DefaultDeriver();
 
-    final MutableInteger derivationsPerCycle = new MutableInteger(16);
+    final MutableInteger derivationsPerCycle = new MutableInteger(128);
 
     final PremiseBuilder premiseBuilder = new PremiseBuilder() {
 
@@ -209,9 +210,14 @@ public class TaskNAR extends NAR {
         }
 
 
-        if (accepted || delta != null)
+        if (accepted || delta != null) {
+
+            /*if (delta!=null) {
+                System.out.println(c + " : " + x + " : " + delta);
+            }*/
+
             return new MyActivation(x, c);
-        else
+        } else
             return null;
     }
 
@@ -248,6 +254,13 @@ public class TaskNAR extends NAR {
 
     protected void processDuplicate(@NotNull Task input, Task existing) {
         /* n/a */
+        if (existing!=input) {
+            //set the task budget, the link budget will already have been merged prior to this
+            Budget eb = existing.budget();
+            if (!eb.equalsBudget(input.budget()))
+                BudgetMerge.maxBlend.merge(eb, input, 1f);
+        }
+
     }
 
     public void derive(BLink<Task> ba, BLink<Task> bb, float minPri) {
@@ -353,7 +366,6 @@ public class TaskNAR extends NAR {
 
             Task t2 = r.get();
             if (t2 != t) {
-                t.delete();
                 return t2; //duplicate
             }
 

@@ -432,10 +432,10 @@ abstract public class NAgent implements NSense, NAction {
 //                    new PredictionTask($.impl(action, dur, happiness), '?').time(nar, dur),
 //                    new PredictionTask($.impl($.neg(action), dur, happiness), '?').time(nar, dur),
 
-                    new PredictionTask($.impl(action, dur, happiness), '?')
+                    new PredictionTask($.impl($.parallel(action, $.varDep(1)), happiness), '?')
                             .eternal(),
                             //.time(nar, dur),
-                    new PredictionTask($.impl($.neg(action), dur, happiness), '?')
+                    new PredictionTask($.impl($.parallel($.neg(action), $.varDep(1)), happiness), '?')
                             .eternal()
                             //.time(nar, dur)
 
@@ -695,6 +695,7 @@ abstract public class NAgent implements NSense, NAction {
             nar.input(s);
             return s;
         } else {
+            t.budgetByTruth(p, nar).eternal().log("Agent Predictor");
             nar.input(t);
             return t;
         }

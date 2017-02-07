@@ -1,19 +1,19 @@
 package nars.experiment.arkanoid;
 
 
-import jcog.math.FloatNormalized;
+import jcog.Util;
 import jcog.math.FloatPolarNormalized;
 import nars.$;
 import nars.NAR;
-import nars.Op;
 import nars.Param;
 import nars.concept.ActionConcept;
 import nars.remote.NAgents;
-import nars.task.MutableTask;
 
 public class Arkancide extends NAgents {
 
     static boolean cam = true;
+
+    private float paddleSpeed = 0.5f;
 
     public static void main(String[] args) {
         Param.DEBUG = false;
@@ -23,7 +23,7 @@ public class Arkancide extends NAgents {
 
         NAR nar = runRT((NAR n) -> {
             return new Arkancide(n, cam);
-        }, 35, 10, -1);
+        }, 35, 5, -1);
 
         //nar.beliefConfidence(0.75f);
         //nar.goalConfidence(0.75f);
@@ -35,7 +35,7 @@ public class Arkancide extends NAgents {
 
     //final int afterlife = 60;
 
-    float paddleSpeed;
+    float maxPaddleSpeed;
 
 
     final Arkanoid noid;
@@ -55,38 +55,47 @@ public class Arkancide extends NAgents {
             }
         };
 
-        paddleSpeed = 40 * noid.BALL_VELOCITY;
+        maxPaddleSpeed = 15 * noid.BALL_VELOCITY;
 
-        nar.input(new MutableTask(happy, Op.BELIEF, $.t(0.5f, 0.15f)).eternal());
+        nar.truthResolution.setValue(0.05f);
+
+        //nar.input(new MutableTask(happy, Op.BELIEF, $.t(0.5f, 0.15f)).eternal());
 
         //float resX = Math.max(0.01f, 1f/visW); //dont need more resolution than 1/pixel_width
         //float resY = Math.max(0.01f, 1f/visH); //dont need more resolution than 1/pixel_width
 
-        senseNumber( "x(paddle, noid)", new FloatPolarNormalized(()->noid.paddle.x, noid.getWidth()/2));//.resolution(resX);
-        senseNumber( "x(ball, noid)", new FloatPolarNormalized(()->noid.ball.x, noid.getWidth()/2));//.resolution(resX);
-        senseNumber( "y(ball, noid)", new FloatPolarNormalized(()->noid.ball.y, noid.getHeight()/2));//.resolution(resY);
-        senseNumber("vx(ball, noid)", new FloatPolarNormalized(()->noid.ball.velocityX));
-        senseNumber("vy(ball, noid)", new FloatPolarNormalized(()->noid.ball.velocityY));
 
         if (cam) {
-            addCamera("cam", noid, visW, visH);
-            //addCameraRetina("zoom(cam(noid))", noid, visW/2, visH/2, (v) -> $.t(v, alpha));
+            addCamera("cam1", noid, visW, visH);
+            //addCameraRetina("cam2", noid, visW/2, visH/2, (v) -> $.t(v, alpha));
+        } else {
+            senseNumber( "x(paddle, noid)", new FloatPolarNormalized(()->noid.paddle.x, noid.getWidth()/2));//.resolution(resX);
+            senseNumber( "x(ball, noid)", new FloatPolarNormalized(()->noid.ball.x, noid.getWidth()/2));//.resolution(resX);
+            senseNumber( "y(ball, noid)", new FloatPolarNormalized(()->noid.ball.y, noid.getHeight()/2));//.resolution(resY);
+            senseNumber("vx(ball, noid)", new FloatPolarNormalized(()->noid.ball.velocityX));
+            senseNumber("vy(ball, noid)", new FloatPolarNormalized(()->noid.ball.velocityY));
         }
 
-        nar.beliefConfidence(0.5f);
-        nar.goalConfidence(0.5f);
+        nar.beliefConfidence(0.9f);
+        nar.goalConfidence(0.9f);
         //nar.linkFeedbackRate.setValue(0.02f);
-        nar.termVolumeMax.setValue(28);
+        nar.termVolumeMax.setValue(32);
 
 
 
 
+        action(new ActionConcept( $.func("dx", "paddleNext", "noid"), nar, (b, d) -> {
+            if (d!=null) {
+                paddleSpeed = Util.round(d.freq(), 0.2f);
+            }
+            return $.t(paddleSpeed, nar.confidenceDefault('.'));
+        }));
         action(new ActionConcept( $.func("x", "paddleNext", "noid"), nar, (b, d) -> {
 
 
             float pct;
             if (d != null) {
-                pct = noid.paddle.moveTo(d.freq(), paddleSpeed); //* d.conf());
+                pct = noid.paddle.moveTo(d.freq(), paddleSpeed * maxPaddleSpeed); //* d.conf());
             } else {
                 pct = noid.paddle.x / noid.SCREEN_WIDTH; //unchanged
             }

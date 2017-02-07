@@ -38,9 +38,9 @@ public class Tetris extends NAgents {
 //            new MultiThreadExecutioner(3, 1024*8);
 
 
-    public static final int tetris_width = 6;
-    public static final int tetris_height = 12;
-    public static final int TIME_PER_FALL = 4;
+    public static final int tetris_width = 8;
+    public static final int tetris_height = 16;
+    public static final int TIME_PER_FALL = 2;
     public static final int PIXEL_RADIX = 2;
 
     private static SensorConcept[][] concept;
@@ -184,7 +184,7 @@ public class Tetris extends NAgents {
 //        float actionThresholdLower = actionMargin / 1.5f;
 
 
-            actions.add(new ActionConcept($("moveX(tetris)"), nar, (b, d) -> {
+            actions.add(new ActionConcept($("tetris(x)"), nar, (b, d) -> {
                 if (d != null) {
                     float x = d.freq();
                     //System.out.println(d + " " + x);
@@ -207,7 +207,7 @@ public class Tetris extends NAgents {
             }));
 
             //if (rotate) {
-            actions.add(new ActionConcept($("rotate(tetris)"), nar, (b, d) -> {
+            actions.add(new ActionConcept($("tetris(rotate)"), nar, (b, d) -> {
                 if (d != null) {
                     float r = d.freq();
                     if (r > actionThresholdHigh) {
@@ -252,13 +252,14 @@ public class Tetris extends NAgents {
 
                             $.inh(
                                     //$.func(
-                                    $.p(tetris),
                                     $.p(
-//                                  $.pRecurse($.radixArray(x, PIXEL_RADIX, state.width)), $.pRecurse($.radixArray(y, PIXEL_RADIX, state.height))
-                                            //$.p($.radixArray(x, PIXEL_RADIX, state.width)), $.p($.radixArray(y, PIXEL_RADIX, state.height))
-                                            x, y
-                                    )
+                                        $.pRecurse($.radixArray(x, PIXEL_RADIX, state.width)), $.pRecurse($.radixArray(y, PIXEL_RADIX, state.height)),
+                                            $.p($.radixArray(x, PIXEL_RADIX, state.width)), $.p($.radixArray(y, PIXEL_RADIX, state.height))
 
+                                    //        x, y
+                                    ),
+                                    tetris
+                                    //$.p(tetris)
                             )
                             //$.p(
                             //$.the("tetris"))
@@ -456,13 +457,13 @@ public class Tetris extends NAgents {
                     //NAgents.newMultiThreadNAR(4, clock);
                     //NARBuilder.newALANN(clock, 4, 64, 5, 4, 1);
 
-            NAR nar = new TaskNAR(16 * 1024, new MultiThreadExecutioner(4, 4096), clock);
+            NAR nar = new TaskNAR(32 * 1024, new MultiThreadExecutioner(4, 4096), clock);
 
-            nar.termVolumeMax.setValue(24);
-            nar.truthResolution.setValue(0.1f);
+            nar.termVolumeMax.setValue(42);
+            nar.truthResolution.setValue(0.15f);
 
-            MySTMClustered stm = new MySTMClustered(nar, 64, '.', 4, true, 2);
-            MySTMClustered stmGoal = new MySTMClustered(nar, 16, '!', 2, true, 1);
+            //MySTMClustered stm = new MySTMClustered(nar, 64, '.', 4, false, 2);
+            //MySTMClustered stmGoal = new MySTMClustered(nar, 16, '!', 2, false, 1);
 
             //nar.linkFeedbackRate.setValue(0.05f);
 

@@ -5,7 +5,7 @@ package nars.truth;
  * Used for accurate feedback measurements.
  * Recorded during a synchronized block to ensure that it assigns the credit to the inserted task accurately.
  */
-public final class TruthDelta {
+public class TruthDelta {
 
     public final Truth before, after;
 
@@ -14,5 +14,8 @@ public final class TruthDelta {
         this.after = beliefAfter;
     }
 
-
+    @Override
+    public String toString() {
+        return before + " -> " + after;
+    }
 }
