@@ -124,7 +124,7 @@ public class TaskNAR extends NAR {
             @Override
             public void onAdded(BLink<Task> value) {
                 //value.get().state(nar.concepts.conceptBuilder().awake(), nar);
-                System.out.println("added: " + size());
+                //System.out.println("added: " + size());
 //                if (size.incrementAndGet() > capacity) {
 //                    //System.err.println("Wtf");
 //                }
@@ -132,7 +132,7 @@ public class TaskNAR extends NAR {
 
             @Override
             public void onRemoved(@NotNull BLink<Task> value) {
-                System.out.println("removed: " + size());
+                //System.out.println("removed: " + size());
 
                 Task x = value.get();
                 if (!x.isDeleted())

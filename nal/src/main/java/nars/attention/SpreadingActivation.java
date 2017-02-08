@@ -160,14 +160,12 @@ public class SpreadingActivation extends Activation implements ObjectFloatProced
                 if (n > 0) {
                     float maxSubScale = ((1f - parentRetention) * scale) / (n);
                     if (maxSubScale >= minScale) {
-                        for (BLink<Term> b : tlinks) {
-                            if (b!=null) {
-                                Term key = b.get();
-                                float p = b.priSafe(0) * maxSubScale;
-                                if (p >= minScale)
-                                    spread.addToValue(key, p);
-                            }
-                        }
+                        tlinks.forEach(b -> {
+                            Term key = b.get();
+                            float p = b.priSafe(0) * maxSubScale;
+                            if (p >= minScale)
+                                spread.addToValue(key, p);
+                        });
                     }
                 }
             }

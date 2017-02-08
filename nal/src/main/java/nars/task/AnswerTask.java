@@ -11,6 +11,8 @@ import nars.truth.TruthDelta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import static nars.util.UtilityFunctions.or;
+
 /**
  * Created by me on 7/3/16.
  */
@@ -65,7 +67,7 @@ public class AnswerTask extends MutableTask {
 
     @Nullable
     public final AnswerTask budget(@NotNull Task a, @NotNull Task b, float aMix) {
-        float priSum = a.priSafe(0) + b.priSafe(0);
+        float priSum = or(a.priSafe(0), b.priSafe(0));
         float newPri = Util.unitize(priSum);
 
         budgetSafe(

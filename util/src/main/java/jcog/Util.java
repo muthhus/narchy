@@ -21,6 +21,7 @@ import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Longs;
 import jcog.data.LongString;
 import jcog.list.FasterList;
+import jcog.map.nbhm.NonBlockingHashMap;
 import jcog.signal.OneDHaar;
 import org.apache.commons.lang3.ArrayUtils;
 import org.eclipse.collections.api.block.function.primitive.IntToFloatFunction;
@@ -30,6 +31,7 @@ import org.eclipse.collections.impl.list.mutable.primitive.IntArrayList;
 import org.eclipse.collections.impl.tuple.Tuples;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
+import sun.misc.Unsafe;
 
 import java.io.*;
 import java.lang.invoke.MethodHandle;
@@ -58,6 +60,9 @@ public enum Util { ;
     public static final int PRIME2 = 92821;
     public static final int PRIME1 = 31;
     public static final float[] EmptyFloatArray = new float[0];
+    // --- Bits to allow Unsafe access to arrays
+
+    public static final Unsafe UNSAFE = com.lmax.disruptor.util.Util.getUnsafe();
 
     /**
      * It is basically the same as a lookup table with 2048 entries and linear interpolation between the entries, but all this with IEEE floating point tricks.
@@ -1418,4 +1423,6 @@ public enum Util { ;
             return Math.abs(p_of_2 - Math.round((int) p_of_2)) == 0;
         }
     }
+
+
 }

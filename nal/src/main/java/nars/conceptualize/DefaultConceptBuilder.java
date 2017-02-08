@@ -8,6 +8,7 @@ import nars.Op;
 import nars.Task;
 import nars.bag.Bag;
 import nars.bag.CurveBag;
+import nars.bag.experimental.HijackBag;
 import nars.budget.BudgetMerge;
 import nars.concept.AtomConcept;
 import nars.concept.CompoundConcept;
@@ -30,7 +31,6 @@ import org.jetbrains.annotations.Nullable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Function;
 
 import static nars.Op.DIFFe;
 import static nars.Op.PROD;
@@ -57,23 +57,6 @@ public class DefaultConceptBuilder implements ConceptBuilder {
         this.awake = awake;
     }
 
-//    private static final int DEFAULT_ATOM_LINK_MAP_CAPACITY = 128;
-//    private static final int DEFAULT_CONCEPT_LINK_MAP_CAPACITY = 32;
-
-    final Function<Atomic, AtomConcept> atomBuilder =
-            (Atomic a) -> {
-//                Map map1 = newBagMap(DEFAULT_ATOM_LINK_MAP_CAPACITY);
-//                Map map2 =
-//                        map1; //shared
-//                        //newBagMap(DEFAULT_ATOM_LINK_MAP_CAPACITY);
-
-                switch (a.op()) {
-                    default:
-                        Map sharedMap = newBagMap(1);
-                        return new AtomConcept(a, newBag(sharedMap), newBag(sharedMap));
-                }
-
-            };
 
 //    @NotNull
 //    public <X> Bag<X> newHijackBag(int reprobes) {
@@ -309,7 +292,15 @@ public class DefaultConceptBuilder implements ConceptBuilder {
                 //result = varBuilder.apply((Variable) term);
                 return term;
             } else if (term instanceof Atomic) {
-                result = atomBuilder.apply((Atomic) term);
+                Map sharedMap = newBagMap(1);
+                result = new AtomConcept((Atomic)term, newBag(sharedMap), newBag(sharedMap));
+
+
+//                result = new AtomConcept((Atomic)term,
+//                        new HijackBag<>(32, 2, BudgetMerge.maxBlend, nar.random),
+//                        new HijackBag<>(32, 2, BudgetMerge.maxBlend, nar.random)
+//                );
+
             }
 
         }

@@ -5,9 +5,7 @@
 
 package jcog.map.nbhm;
 
-import com.lmax.disruptor.util.Util;
 import org.jetbrains.annotations.NotNull;
-import sun.misc.Unsafe;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -84,10 +82,8 @@ public class NonBlockingHashMap<TypeK, TypeV>
 
     private static final int REPROBE_LIMIT=10; // Too many reprobes then force a table-resize
 
-    // --- Bits to allow Unsafe access to arrays
-    private static final Unsafe _unsafe = Util.getUnsafe();
-    private static final int _Obase  = _unsafe.arrayBaseOffset(Object[].class);
-    private static final int _Oscale = _unsafe.arrayIndexScale(Object[].class);
+    private static final int _Obase  = jcog.Util.UNSAFE.arrayBaseOffset(Object[].class);
+    private static final int _Oscale = jcog.Util.UNSAFE.arrayIndexScale(Object[].class);
     private static long rawIndex(final Object[] ary, final int idx) {
         assert idx >= 0 && idx < ary.length;
         return _Obase + idx * _Oscale;
@@ -99,10 +95,10 @@ public class NonBlockingHashMap<TypeK, TypeV>
         Field f = null;
         try { f = NonBlockingHashMap.class.getDeclaredField("_kvs"); }
         catch( java.lang.NoSuchFieldException e ) { throw new RuntimeException(e); }
-        _kvs_offset = _unsafe.objectFieldOffset(f);
+        _kvs_offset = jcog.Util.UNSAFE.objectFieldOffset(f);
     }
     private final boolean CAS_kvs( final Object[] oldkvs, final Object[] newkvs ) {
-        return _unsafe.compareAndSwapObject(this, _kvs_offset, oldkvs, newkvs );
+        return jcog.Util.UNSAFE.compareAndSwapObject(this, _kvs_offset, oldkvs, newkvs );
     }
 
     // --- Adding a 'prime' bit onto Values via wrapping with a junk wrapper class
@@ -178,10 +174,10 @@ public class NonBlockingHashMap<TypeK, TypeV>
     private static final Object key(Object[] kvs,int idx) { return kvs[(idx<<1)+2]; }
     private static final Object val(Object[] kvs,int idx) { return kvs[(idx<<1)+3]; }
     private static final boolean CAS_key( Object[] kvs, int idx, Object old, Object key ) {
-        return _unsafe.compareAndSwapObject( kvs, rawIndex(kvs,(idx<<1)+2), old, key );
+        return jcog.Util.UNSAFE.compareAndSwapObject( kvs, rawIndex(kvs,(idx<<1)+2), old, key );
     }
     private static final boolean CAS_val( Object[] kvs, int idx, Object old, Object val ) {
-        return _unsafe.compareAndSwapObject( kvs, rawIndex(kvs,(idx<<1)+3), old, val );
+        return jcog.Util.UNSAFE.compareAndSwapObject( kvs, rawIndex(kvs,(idx<<1)+3), old, val );
     }
 
 
