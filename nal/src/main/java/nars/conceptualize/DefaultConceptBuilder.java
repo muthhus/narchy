@@ -356,9 +356,9 @@ public class DefaultConceptBuilder implements ConceptBuilder {
 //            //ConcurrentHashMapUnsafe(cap);
 //        } else {
 //            return new HashMap(defaultInitialCap, 1f);
-            if (volume < 3) {
+            if (volume < 6) {
                 return new ConcurrentHashMap(8);
-            } else if (volume < 7){
+            } else if (volume < 13){
                 return new SynchronizedHashMap(2, loadFactor);
             } else {
                 return new SynchronizedUnifiedMap(2, loadFactor);
