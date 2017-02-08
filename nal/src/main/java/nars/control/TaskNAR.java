@@ -8,7 +8,7 @@ import nars.Task;
 import nars.attention.Activation;
 import nars.attention.Forget;
 import nars.bag.Bag;
-import nars.bag.CurveBag;
+import nars.bag.experimental.HijackBag;
 import nars.budget.Budget;
 import nars.budget.BudgetMerge;
 import nars.concept.CompoundConcept;
@@ -40,11 +40,9 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
 import static nars.Op.*;
-import static nars.bag.CurveBag.power2BagCurve;
 
 /**
  * heuristic task-driven NAR model without concept link network
@@ -102,25 +100,21 @@ public class TaskNAR extends NAR {
                 new XorShift128PlusRandom(1), exe);
 
 
-        //tasks = new HijackBag<Task>(capacity, 2, BudgetMerge.maxBlend, random) {
-        tasksBag = new CurveBag<Task>(capacity, new CurveBag.NormalizedSampler(power2BagCurve, random), BudgetMerge.maxBlend, new ConcurrentHashMap<>(capacity)) {
+        tasksBag = new HijackBag<Task>(capacity, 2, BudgetMerge.maxBlend, random) {
+        //tasksBag = new CurveBag<Task>(capacity, new CurveBag.NormalizedSampler(power2BagCurve, random), BudgetMerge.maxBlend, new ConcurrentHashMap<>(capacity)) {
 
             @Override
             public Forget<Task> forget(float rate) {
                 return new MyTaskForget(rate);
             }
 
-            //TODO move to ArrayBag as a 'sortPartial(float samplePercentage)' method
-
-
-
-            @Override
-            protected void sortAfterUpdate() {
-                //do nothing here = only sort on commit
-
-                //float sortPercentage = 0.025f;
-                //sortPartial(sortPercentage);
-            }
+//            @Override
+//            protected void sortAfterUpdate() {
+//                //do nothing here = only sort on commit
+//
+//                //float sortPercentage = 0.025f;
+//                //sortPartial(sortPercentage);
+//            }
 
 
 
@@ -130,7 +124,7 @@ public class TaskNAR extends NAR {
             @Override
             public void onAdded(BLink<Task> value) {
                 //value.get().state(nar.concepts.conceptBuilder().awake(), nar);
-                //System.out.println("added: " + size());
+                System.out.println("added: " + size());
 //                if (size.incrementAndGet() > capacity) {
 //                    //System.err.println("Wtf");
 //                }
@@ -138,7 +132,7 @@ public class TaskNAR extends NAR {
 
             @Override
             public void onRemoved(@NotNull BLink<Task> value) {
-                //size.decrementAndGet();
+                System.out.println("removed: " + size());
 
                 Task x = value.get();
                 if (!x.isDeleted())

@@ -185,6 +185,8 @@ public class BagTest {
         assertNotNull(a.get("x"));
         a.commit();
 
+        a.print();
+
         assertEquals(0.125, a.get("x").pri(), 0.001f);
     }
 
@@ -336,8 +338,8 @@ public class BagTest {
 //        System.out.println( keys.size() + " " + Joiner.on(' ').join(keys) );
 
         TreeSet<String> keys2 = new TreeSet();
-        a.forEach((k,b)->{
-           if (!keys2.add(k))
+        a.forEach((b)->{
+           if (!keys2.add(b.get()))
                throw new RuntimeException("duplicate detected");
         });
         System.out.println( keys2.size() + " " + Joiner.on(' ').join(keys2) );

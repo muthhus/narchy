@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 import java.util.function.IntFunction;
 
 
@@ -117,7 +118,7 @@ abstract public class SortedListTable<V, L> extends ArrayListTable<V,L> implemen
     @NotNull
     @Deprecated public List<L> listCopy() {
         List<L> l = new ArrayList(size());
-        forEach(x -> l.add(x));
+        forEach((Consumer<L>) l::add);
         return l;
     }
 

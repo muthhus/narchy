@@ -13,6 +13,7 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -285,18 +286,18 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
     /**
      * true iff o1 > o2
      */
-    static final boolean cmpGT(@Nullable BLink o1, @Nullable BLink o2) {
+    static boolean cmpGT(@Nullable BLink o1, @Nullable BLink o2) {
         return cmpGT(o1, pCmp(o2));
     }
 
-    static final boolean cmpGT(@Nullable BLink o1, float o2) {
+    static boolean cmpGT(@Nullable BLink o1, float o2) {
         return (pCmp(o1) < o2);
     }
 
     /**
      * true iff o1 > o2
      */
-    static final boolean cmpGT(float o1, @Nullable BLink o2) {
+    static boolean cmpGT(float o1, @Nullable BLink o2) {
         return (o1 < pCmp(o2));
     }
 
@@ -304,11 +305,11 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
     /**
      * true iff o1 < o2
      */
-    static final boolean cmpLT(@Nullable BLink o1, @Nullable BLink o2) {
+    static boolean cmpLT(@Nullable BLink o1, @Nullable BLink o2) {
         return cmpLT(o1, pCmp(o2));
     }
 
-    static final boolean cmpLT(@Nullable BLink o1, float o2) {
+    static boolean cmpLT(@Nullable BLink o1, float o2) {
         return (pCmp(o1) > o2);
     }
 
@@ -411,7 +412,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
 
     @Nullable
     @Override
-    protected BLink<V> addItem(BLink<V> i) {
+    protected BLink<V> addItem(@NotNull BLink<V> i) {
         throw new UnsupportedOperationException();
     }
 
@@ -511,10 +512,9 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
 
         int s = size();
         BLink[] l = items.array();
-        int i = s - 1;
         //@NotNull BLink<V> beneath = l[i]; //compares with self below to avoid a null check in subsequent iterations
         float pBelow = -2;
-        for (; i >= 0; ) {
+        for (int i = s - 1; i >= 0; ) {
             BLink b = l[i];
 
             float p = (b != null) ? b.priSafe(-1) : -2; //sort nulls to the end of the end
@@ -536,7 +536,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
     }
 
 
-    private int removeDeleted(@NotNull List<BLink<V>> removed, int minRemoved) {
+    private int removeDeleted(@NotNull Collection<BLink<V>> removed, int minRemoved) {
 
         SortedArray<BLink<V>> items = this.items;
         final Object[] l = items.array();
@@ -602,10 +602,9 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
         while (true) {
             int i, j;
             if (right - left <= 7) {
-                BLink swap;
                 //bubble sort on a region of right less than 8?
                 for (j = left + 1; j <= right; j++) {
-                    swap = c[j];
+                    BLink swap = c[j];
                     i = j - 1;
                     float swapV = pCmp(swap);
                     while (i >= left && cmpGT(c[i], swapV)) {
@@ -672,8 +671,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
     }
 
     public static void swap(BLink[] c, int x, int y) {
-        BLink swap;
-        swap = c[y];
+        BLink swap = c[y];
         c[y] = c[x];
         c[x] = swap;
     }
