@@ -1045,7 +1045,9 @@ public enum Util { ;
 
     public static double[] variance(DoubleStream s) {
         DoubleArrayList dd = new DoubleArrayList();
-        double average = s.peek(x -> dd.add(x)).average().getAsDouble();
+        double average = s.peek(dd::add).average().orElse(Float.NaN);
+        if (average!=average)
+            return null;
 
         double variance = 0.0;
         int n = dd.size();

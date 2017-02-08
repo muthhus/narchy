@@ -38,9 +38,9 @@ public class Tetris extends NAgents {
 //            new MultiThreadExecutioner(3, 1024*8);
 
 
-    public static final int tetris_width = 8;
+    public static final int tetris_width = 6;
     public static final int tetris_height = 16;
-    public static final int TIME_PER_FALL = 8;
+    public static final int TIME_PER_FALL = 6;
     public static final int PIXEL_RADIX = 2;
 
     private static SensorConcept[][] concept;

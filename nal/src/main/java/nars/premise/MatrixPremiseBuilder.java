@@ -2,7 +2,10 @@ package nars.premise;
 
 import jcog.data.MutableIntRange;
 import jcog.list.FasterList;
-import nars.*;
+import nars.$;
+import nars.NAR;
+import nars.Param;
+import nars.Task;
 import nars.bag.Bag;
 import nars.concept.Concept;
 import nars.derive.Deriver;

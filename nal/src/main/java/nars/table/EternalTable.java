@@ -7,7 +7,6 @@ import nars.Param;
 import nars.Task;
 import nars.concept.CompoundConcept;
 import nars.concept.Concept;
-import nars.task.AnswerTask;
 import nars.task.MutableTask;
 import nars.task.Revision;
 import nars.task.RevisionTask;

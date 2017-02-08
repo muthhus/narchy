@@ -15,7 +15,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import static nars.attention.Crosslink.crossLink;
-import static nars.util.UtilityFunctions.and;
 import static nars.util.UtilityFunctions.or;
 
 /**

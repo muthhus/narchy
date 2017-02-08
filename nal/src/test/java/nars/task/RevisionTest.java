@@ -9,7 +9,6 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.test.analyze.BeliefAnalysis;
 import nars.time.Tense;
-import org.jetbrains.annotations.Nullable;
 import org.junit.Test;
 
 import java.util.Random;

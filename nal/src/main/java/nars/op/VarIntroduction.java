@@ -27,7 +27,7 @@ public abstract class VarIntroduction {
         this.rng = rng;
     }
 
-    @NotNull public void accept(@NotNull Compound c, @NotNull Consumer<Compound> each) {
+    public void accept(@NotNull Compound c, @NotNull Consumer<Compound> each) {
 
         if (!c.hasAny(ConjOrStatementBits) || c.volume() < 2)
             return; //earliest failure test

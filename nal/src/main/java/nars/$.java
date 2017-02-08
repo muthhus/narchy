@@ -185,7 +185,7 @@ public enum $ {
         return terms.neg(x);
     }
 
-    @Nullable public static Term negIf(@NotNull Term x, boolean negate) {
+    @NotNull public static Term negIf(@NotNull Term x, boolean negate) {
         return negate ? neg(x) : x;
     }
 

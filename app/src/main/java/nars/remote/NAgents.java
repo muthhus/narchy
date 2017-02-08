@@ -173,7 +173,9 @@ abstract public class NAgents extends NAgent {
         Random rng = new XorShift128PlusRandom(1);
         final Executioner exe =
                 //new SingleThreadExecutioner();
-                new MultiThreadExecutioner(threads, 16384 /* TODO chose a power of 2 number to scale proportionally to # of threads */);
+                new MultiThreadExecutioner(threads, 4096 /* TODO chose a power of 2 number to scale proportionally to # of threads */)
+                    //.sync(false)
+                ;
 
         int volMax = 32;
         int conceptsPerCycle = 48*threads;
@@ -192,10 +194,10 @@ abstract public class NAgents extends NAgent {
         nar.goalConfidence(0.9f);
 
         float p = 0.5f;
-        nar.DEFAULT_BELIEF_PRIORITY = 0.9f * p;
+        nar.DEFAULT_BELIEF_PRIORITY = 0.75f * p;
         nar.DEFAULT_GOAL_PRIORITY = 1f * p;
-        nar.DEFAULT_QUESTION_PRIORITY = 0.75f * p;
-        nar.DEFAULT_QUEST_PRIORITY = 0.75f * p;
+        nar.DEFAULT_QUESTION_PRIORITY = 0.5f * p;
+        nar.DEFAULT_QUEST_PRIORITY = 0.5f * p;
 
         nar.confMin.setValue(0.01f);
         nar.termVolumeMax.setValue(volMax);

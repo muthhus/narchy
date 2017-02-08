@@ -26,7 +26,6 @@ import java.io.IOException;
 import java.util.List;
 
 import static nars.Op.*;
-import static nars.Op.QUEST;
 import static nars.time.Tense.ETERNAL;
 import static nars.truth.TruthFunctions.w2c;
 

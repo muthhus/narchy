@@ -20,9 +20,7 @@ import org.jetbrains.annotations.Nullable;
 import java.io.PrintStream;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -142,8 +140,12 @@ public abstract class STMClustered extends STM {
          */
         @Nullable
         public double[] coherence(int dim) {
-            if (size() == 0) return null;
+
             double[] v = Util.variance(tasks.stream().mapToDouble(t -> t.coord[dim])); //HACK slow
+
+            if (v==null)
+                return null;
+
             v[1] = 1f - v[1]; //convert variance to coherence
             return v;
         }
@@ -300,11 +302,7 @@ public abstract class STMClustered extends STM {
             @NotNull
             @Override
             public BLink<Task> newLink(@NotNull Task i, BLink<Task> exists) {
-                if (exists != null) {
-                    return exists;
-                } else {
-                    return new TLink(i);
-                }
+                return (exists != null) ? exists : new TLink(i);
             }
 
 
@@ -334,9 +332,7 @@ public abstract class STMClustered extends STM {
 
         now = nar.time();
 
-        nar.onCycle((nn) -> {
-            iterate();
-        });
+        nar.onCycle((nn) -> iterate());
     }
 
     abstract protected TasksNode newCentroid(int id);

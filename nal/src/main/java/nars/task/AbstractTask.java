@@ -25,7 +25,6 @@ import java.util.Objects;
 
 import static nars.$.t;
 import static nars.Op.*;
-import static nars.time.Tense.DTERNAL;
 import static nars.time.Tense.ETERNAL;
 
 /**

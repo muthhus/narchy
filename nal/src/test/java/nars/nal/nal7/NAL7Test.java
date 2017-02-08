@@ -5,7 +5,6 @@ import nars.NAR;
 import nars.Narsese;
 import nars.nal.AbstractNALTest;
 import nars.test.TestNAR;
-import nars.time.FrameTime;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 import org.junit.runner.RunWith;

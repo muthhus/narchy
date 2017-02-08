@@ -1,7 +1,6 @@
 package nars.bag;
 
 import com.google.common.base.Joiner;
-import com.google.common.collect.Iterators;
 import jcog.data.random.XorShift128PlusRandom;
 import nars.Param;
 import nars.bag.experimental.HijackBag;
@@ -9,7 +8,6 @@ import nars.budget.Budget;
 import nars.budget.BudgetMerge;
 import nars.budget.RawBudget;
 import nars.link.BLink;
-import org.apache.commons.collections4.IteratorUtils;
 import org.apache.commons.math3.random.EmpiricalDistribution;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.eclipse.collections.impl.list.mutable.primitive.DoubleArrayList;

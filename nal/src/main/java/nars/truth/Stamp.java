@@ -38,7 +38,6 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import static nars.time.Tense.ETERNAL;
-import static nars.time.Tense.TIMELESS;
 
 public interface Stamp {
 

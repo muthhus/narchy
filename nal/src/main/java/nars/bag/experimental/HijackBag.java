@@ -1,6 +1,5 @@
 package nars.bag.experimental;
 
-import com.google.common.collect.Iterators;
 import jcog.map.nbhm.HijacKache;
 import nars.Param;
 import nars.bag.Bag;

@@ -382,9 +382,7 @@ public interface Term extends Termed, Termlike, Comparable<Termlike> {
      * @return null if not a subterm, an empty int[] array if equal to this term, or a non-empty int[] array specifying subterm paths to reach it
      */
     @Nullable default byte[] pathTo(@NotNull Term subterm) {
-        if (subterm.equals(this))
-            return IntArrays.EMPTY_BYTES;
-        return null;
+        return subterm.equals(this) ? IntArrays.EMPTY_BYTES : null;
     }
 
     @NotNull

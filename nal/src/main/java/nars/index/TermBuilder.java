@@ -38,7 +38,7 @@ public abstract class TermBuilder {
 
     private static final Term[] TrueArray = {True};
     private static final Term[] FalseArray = {False};
-    public static final TermContainer InvalidSubterms = TermVector.the(False);
+    private static final TermContainer InvalidSubterms = TermVector.the(False);
     public static final Compound InvalidCompound = new GenericCompound(Op.PROD, InvalidSubterms);
 
 
@@ -252,7 +252,7 @@ public abstract class TermBuilder {
      * array implementation of the conjunction true/false filter
      */
     @NotNull
-    private static Term[] conjTrueFalseFilter(@NotNull Term[] u) {
+    private static Term[] conjTrueFalseFilter(@NotNull Term... u) {
         int trues = 0; //# of True subterms that can be eliminated
         for (Term x : u) {
             if (isTrue(x)) {
@@ -295,7 +295,7 @@ public abstract class TermBuilder {
 //        }
     }
 
-    private static boolean hasImdex(@NotNull Term[] r) {
+    private static boolean hasImdex(@NotNull Term... r) {
         for (Term x : r) {
             //        if (t instanceof Compound) return false;
 //        byte[] n = t.bytes();
@@ -350,8 +350,8 @@ public abstract class TermBuilder {
     }
 
 
-    @Nullable
-    private final Term finish(@NotNull Op op, @NotNull Term... args) {
+    @NotNull
+    private Term finish(@NotNull Op op, @NotNull Term... args) {
         return finish(op, DTERNAL, args);
     }
 
@@ -468,7 +468,7 @@ public abstract class TermBuilder {
     }
 
     @NotNull
-    private Term[] neg(@NotNull Term[] modified) {
+    private Term[] neg(@NotNull Term... modified) {
         int l = modified.length;
         Term[] u = new Term[l];
         for (int i = 0; i < l; i++) {
@@ -482,13 +482,8 @@ public abstract class TermBuilder {
         //HACK testing for equality like this is not a complete solution. for that we need a new special term type
 
         if ((t instanceof Compound) || (t instanceof Variable)) {
-            if (t.op() == NEG) {
-                // (--,(--,P)) = P
-                return t.unneg();
-            } else {
-                return //newCompound(NEG, DTERNAL, TermVector.the(t)); //newCompound bypasses some checks that finish involves
-                        finalize(NEG, t);
-            }
+            // (--,(--,P)) = P
+            return (t.op() == NEG) ? t.unneg() : finalize(NEG, t);
         } else {
             if (t instanceof AtomicSingleton) {
                 if (isFalse(t)) return True;
@@ -499,8 +494,8 @@ public abstract class TermBuilder {
     }
 
 
-    @Nullable
-    private Term image(@NotNull Op o, @NotNull Term[] res) {
+    @NotNull
+    private Term image(@NotNull Op o, @NotNull Term... res) {
 
         int index = DTERNAL, j = 0;
         boolean hasPatternVar = false;
@@ -598,7 +593,7 @@ public abstract class TermBuilder {
      * flattening junction builder, for (commutive) multi-arg conjunction and disjunction (dt == 0 ar DTERNAL)
      */
     @NotNull
-    private Term junctionFlat(@NotNull Op op, int dt, @NotNull Term[] u) {
+    private Term junctionFlat(@NotNull Op op, int dt, @NotNull Term... u) {
 
         if (u.length == 0)
             return False;
@@ -692,10 +687,7 @@ public abstract class TermBuilder {
             Term[] sa = Terms.toArray(s);
 
             Term next;
-            if (sa.length == 1)
-                next = sa[0];
-            else
-                next = the(CONJ, innerDT, sa);
+            next = (sa.length == 1) ? sa[0] : the(CONJ, innerDT, sa);
 
             outer.add(next);
             return outer;
@@ -733,7 +725,7 @@ public abstract class TermBuilder {
 
 
     @NotNull
-    protected Term statement(@NotNull Op op, int dt, @NotNull Term subject, @NotNull Term predicate) {
+    private Term statement(@NotNull Op op, int dt, @NotNull Term subject, @NotNull Term predicate) {
 
 
         statement:
@@ -963,17 +955,17 @@ public abstract class TermBuilder {
                 return True; //all were true
             } else if (t.length - trues == 1) {
                 //find the element which is not true and return it
-                for (Term y : t) {
-                    if (!isTrue(y))
-                        return y;
+                for (Term x : t) {
+                    if (!isTrue(x))
+                        return x;
                 }
             } else {
                 //filter the True statements from t
                 Term[] t2 = new Term[t.length - trues];
                 int yy = 0;
-                for (Term y : t) {
-                    if (!isTrue(y))
-                        t2[yy++] = y;
+                for (Term x : t) {
+                    if (!isTrue(x))
+                        t2[yy++] = x;
                 }
                 t = t2;
             }
@@ -1065,12 +1057,12 @@ public abstract class TermBuilder {
         if (a.equals(b))
             return a;
 
-        int as = a.size();
-        int bs = b.size();
-        int maxSize = Math.max(as, bs);
         TreeSet<Term> t = new TreeSet<>();
         a.copyInto(t);
         b.copyInto(t);
+        int as = a.size();
+        int bs = b.size();
+        int maxSize = Math.max(as, bs);
         if (t.size() == maxSize) {
             //the smaller is contained by the larger other
             return as > bs ? a : b;
@@ -1079,7 +1071,7 @@ public abstract class TermBuilder {
     }
 
     @NotNull
-    public Term the(@NotNull Compound csrc, @NotNull Term[] newSubs) {
+    public Term the(@NotNull Compound csrc, @NotNull Term... newSubs) {
         return the(csrc.op(), csrc.dt(), newSubs);
     }
 
@@ -1089,11 +1081,11 @@ public abstract class TermBuilder {
     }
 
     @NotNull
-    public Term the(@NotNull Compound csrc, @NotNull Collection<Term> newSubs) {
+    private Term the(@NotNull Compound csrc, @NotNull Collection<Term> newSubs) {
         return the(csrc.op(), csrc.dt(), newSubs.toArray(new Term[newSubs.size()]));
     }
 
-    public final Term disjunction(@NotNull Term[] u) {
+    public final Term disjunction(@NotNull Term... u) {
         return neg(conj(DTERNAL, neg(u)));
     }
 

@@ -25,7 +25,7 @@ public class DepIndepVarIntroduction extends VarIntroduction {
 
 
 
-    public DepIndepVarIntroduction(Random rng) {
+    private DepIndepVarIntroduction(Random rng) {
         super(1, rng);
     }
 
@@ -41,8 +41,8 @@ public class DepIndepVarIntroduction extends VarIntroduction {
 
 
     final static int ConjOrStatementBits = Op.IMPL.bit | Op.EQUI.bit | Op.CONJ.bit;
-    final static int DepOrIndepBits = Op.VAR_INDEP.bit | Op.VAR_DEP.bit | Op.VAR_PATTERN.bit;
-    static final Predicate<Term> condition = subterm -> !subterm.isAny(DepOrIndepBits);
+    private final static int DepOrIndepBits = Op.VAR_INDEP.bit | Op.VAR_DEP.bit | Op.VAR_PATTERN.bit;
+    private static final Predicate<Term> condition = subterm -> !subterm.isAny(DepOrIndepBits);
 
     @Nullable
     @Override
@@ -62,20 +62,26 @@ public class DepIndepVarIntroduction extends VarIntroduction {
             return null;
 
         //detect an invalid top-level indep var substitution
-        if (input.op().statement) {
-            for (byte[] path : p)
-                if (path.length < 2)
-                    return null; //substitution would replace something at the top level of a statement
+        Op inOp = input.op();
+        if (inOp.statement) {
+            for (int i = 0, pSize = p.size(); i < pSize; i++) {
+                if (p.get(i).length < 2)
+                    return null; //substitution would replace something at the top level of a statement}
+            }
         }
 
         //decide what kind of variable can be introduced according to the input operator
         boolean dep, indep;
-        if (input.op() == CONJ) {
-            dep = true; indep = false;
-        } else if (input.isAny(ImplicationOrEquivalenceBits)) {
-            dep = false; indep = true;
-        } else {
-            throw new UnsupportedOperationException();
+        switch (inOp) {
+            case CONJ:
+                dep = true; indep = false;
+                break;
+            case IMPL:
+            case EQUI:
+                dep = false; indep = true;
+                break;
+            default:
+                throw new UnsupportedOperationException();
         }
 
 
@@ -87,10 +93,7 @@ public class DepIndepVarIntroduction extends VarIntroduction {
             Term t = null; //root
             int pathLength = path.length;
             for (int i = -1; i < pathLength-1 /* dont include the selected term itself */; i++) {
-                if (i == -1)
-                    t = input;
-                else
-                    t = ((Compound) t).term(path[i]);
+                t = (i == -1) ? input : ((Compound) t).term(path[i]);
                 Op o = t.op();
 
                 if (indep && validIndepVarSuperterm(o)) {
@@ -128,7 +131,7 @@ public class DepIndepVarIntroduction extends VarIntroduction {
         return /*o.statement ||*/ o == CONJ;
     }
 
-    static boolean validIndepVarSuperterm(Op o) {
+    private static boolean validIndepVarSuperterm(Op o) {
         return o == IMPL || o == EQUI;
     }
 
@@ -149,15 +152,8 @@ public class DepIndepVarIntroduction extends VarIntroduction {
             Term x = args[0];
 
             //temporarily unwrap negation
-            Term xx;
-            boolean negated;
-            if (x.op() == NEG) {
-                xx = x.unneg();
-                negated = true;
-            } else {
-                xx = x;
-                negated = false;
-            }
+            boolean negated = x.op() == NEG;
+            Term xx = negated ? x.unneg() : x;
 
             if (!(xx instanceof Compound))
                 return x;
@@ -165,10 +161,8 @@ public class DepIndepVarIntroduction extends VarIntroduction {
             x = xx;
             introducer.accept((Compound)x, y -> only[0] = y);
 
-            Term y = only[0];
-            if (y == False)
-                return False;
-            return $.negIf(y, negated);
+            Term o = only[0];
+            return (o == False) ? False : $.negIf(o, negated);
         }
     }
 

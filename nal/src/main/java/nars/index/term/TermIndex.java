@@ -11,7 +11,6 @@ import nars.term.Term;
 import nars.term.Termed;
 import nars.term.Terms;
 import nars.term.atom.Atomic;
-import nars.term.compound.ProtoCompound;
 import nars.term.container.TermContainer;
 import nars.term.subst.MapSubst;
 import nars.term.subst.Subst;
@@ -32,7 +31,6 @@ import java.io.PrintStream;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 import static nars.Op.CONJ;
 import static nars.Op.PROD;
@@ -45,7 +43,7 @@ import static nars.term.Termed.termOrNull;
 public abstract class TermIndex extends TermBuilder {
 
 
-    public static final Logger logger = LoggerFactory.getLogger(TermIndex.class);
+    private static final Logger logger = LoggerFactory.getLogger(TermIndex.class);
     protected NAR nar;
 
 
@@ -53,7 +51,7 @@ public abstract class TermIndex extends TermBuilder {
      * get if not absent
      */
     @Nullable
-    public final Termed get(@NotNull Term t) {
+    private Termed get(@NotNull Term t) {
         return get(t, false);
     }
 
@@ -110,18 +108,18 @@ public abstract class TermIndex extends TermBuilder {
 //    public final HijacKache<ProtoCompound, Term> terms =
 //            new HijacKache<>(Param.TERM_CACHE_SIZE, 4);
 
-    final Function<? super ProtoCompound, ? extends Term> termizer = pc -> {
-
-        return theSafe(pc.op(), pc.dt(), pc.terms() );
-    };
-
-    private int volumeMax(Op op) {
-        if (nar!=null) {
-            return nar.termVolumeMax.intValue();
-        } else {
-            return Param.COMPOUND_VOLUME_MAX;
-        }
-    }
+//    final Function<? super ProtoCompound, ? extends Term> termizer = pc -> {
+//
+//        return theSafe(pc.op(), pc.dt(), pc.terms() );
+//    };
+//
+//    private int volumeMax(Op op) {
+//        if (nar!=null) {
+//            return nar.termVolumeMax.intValue();
+//        } else {
+//            return Param.COMPOUND_VOLUME_MAX;
+//        }
+//    }
 
     @NotNull private final Term theSafe(@NotNull Op o, int dt, @NotNull Term[] u) {
         try {
@@ -246,14 +244,14 @@ public abstract class TermIndex extends TermBuilder {
     }
 
 
-    @NotNull
-    public final Term the(@NotNull Compound csrc, @NotNull TermContainer newSubs) {
-        if (csrc.subterms().equals(newSubs)) {
-            return csrc;
-        } else {
-            return the(csrc.op(), csrc.dt(), newSubs.terms());
-        }
-    }
+//    @NotNull
+//    public final Term the(@NotNull Compound csrc, @NotNull TermContainer newSubs) {
+//        if (csrc.subterms().equals(newSubs)) {
+//            return csrc;
+//        } else {
+//            return the(csrc.op(), csrc.dt(), newSubs.terms());
+//        }
+//    }
 
     @NotNull
     public final Term the(@NotNull Compound csrc, @NotNull Term[] args) {
@@ -306,7 +304,7 @@ public abstract class TermIndex extends TermBuilder {
         out.println();
     }
 
-    protected Term _normalize(Compound src) {
+    private Term _normalize(Compound src) {
 
         Term result;
 
@@ -363,7 +361,8 @@ public abstract class TermIndex extends TermBuilder {
         return x;
     }
 
-    @NotNull protected Term eval(@NotNull Compound inhCompound) {
+    @NotNull
+    private Term eval(@NotNull Compound inhCompound) {
         Termed predicate = get(inhCompound.term(1));
         if (predicate instanceof Functor) {
             Term subject = inhCompound.term(0);
@@ -409,13 +408,13 @@ public abstract class TermIndex extends TermBuilder {
 //    }
 
 
-    @Nullable
-    public Term the(@NotNull Compound src, @NotNull List<Term> newSubs) {
-        if (src.size() == newSubs.size() && src.equalTerms(newSubs) )
-            return src;
-        else
-            return the(src.op(), src.dt(), newSubs.toArray(new Term[newSubs.size()]));
-    }
+//    @Nullable
+//    public Term the(@NotNull Compound src, @NotNull List<Term> newSubs) {
+//        if (src.size() == newSubs.size() && src.equalTerms(newSubs) )
+//            return src;
+//        else
+//            return the(src.op(), src.dt(), newSubs.toArray(new Term[newSubs.size()]));
+//    }
 
 
     @NotNull
@@ -435,7 +434,7 @@ public abstract class TermIndex extends TermBuilder {
     }
 
     @NotNull
-    public TermContainer transform(@NotNull TermContainer src, Compound superterm, int dt, @NotNull CompoundTransform t) {
+    private TermContainer transform(@NotNull TermContainer src, Compound superterm, int dt, @NotNull CompoundTransform t) {
 
         int modifications = 0;
 
@@ -480,7 +479,7 @@ public abstract class TermIndex extends TermBuilder {
     }
 
     @Nullable
-    public Term transform(@NotNull Term src, @NotNull ByteList path, int depth, @NotNull Term replacement) {
+    private Term transform(@NotNull Term src, @NotNull ByteList path, int depth, @NotNull Term replacement) {
         int ps = path.size();
         if (ps == depth)
             return replacement;
@@ -530,7 +529,7 @@ public abstract class TermIndex extends TermBuilder {
     @Nullable
     public final Concept concept(@NotNull Term possiblyConceptualizable, boolean createIfMissing) {
 
-        Term term = conceptualizable(possiblyConceptualizable, false);
+        Term term = conceptualizable(possiblyConceptualizable);
         if (term == null)
             return null;
 
@@ -551,7 +550,7 @@ public abstract class TermIndex extends TermBuilder {
     }
 
     @Nullable
-    public Term conceptualizable(@NotNull Term term, boolean forTermlink) {
+    private Term conceptualizable(@NotNull Term term) {
         Term termPre = null;
         while (term instanceof Compound && termPre != term && term != null) {
 //            //shouldnt need to check for this here
@@ -623,7 +622,7 @@ public abstract class TermIndex extends TermBuilder {
     }
 
 
-    static boolean isDeletable(@NotNull Concept c) {
+    private static boolean isDeletable(@NotNull Concept c) {
         return c.get(Concept.Savior.class) == null;
     }
 

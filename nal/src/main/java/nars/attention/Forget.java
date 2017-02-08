@@ -1,10 +1,7 @@
 package nars.attention;
 
-import jcog.Util;
-import nars.Param;
 import nars.link.BLink;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Consumer;
 
