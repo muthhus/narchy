@@ -111,7 +111,7 @@ public class ConceptBagControl implements Control, Consumer<DerivedTask> {
             new CurveBag<>(0, ((DefaultConceptBuilder) conceptBuilder).defaultCurveSampler, CONCEPT_BAG_BLEND,
                         nar.exe.concurrent() ?  new java.util.concurrent.ConcurrentHashMap<>() : new HashMap()
             )
-            //new HijackBag<>(4096, 4, BudgetMerge.maxBlend, nar.random )
+            //new HijackBag<>(8192, 8, BudgetMerge.maxBlend, nar.random )
 
         );
 

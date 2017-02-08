@@ -21,7 +21,7 @@ import java.util.function.Predicate;
 import java.util.stream.IntStream;
 
 /**
- * TODO add busy-wait non-locking exclusion to prevent duplicate insert at different probe indices for the same item
+ * unsorted priority queue with stochastic replacement policy
  */
 public class HijackBag<X> implements Bag<X> {
 
