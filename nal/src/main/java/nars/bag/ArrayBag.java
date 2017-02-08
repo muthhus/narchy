@@ -64,10 +64,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
         return false;
     }
 
-    @Override
-    public final boolean isEmpty() {
-        return size() == 0;
-    }
+
 
 
     /**

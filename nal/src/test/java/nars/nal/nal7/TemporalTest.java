@@ -399,7 +399,7 @@ public class TemporalTest {
         Bag<Concept> cb = d.core.active;
         cb.print();
         assertTrue(5 <= cb.size());
-        Concept cc = ((ArrayBag<Concept>) cb).get(0).get();
+        Concept cc = cb.iterator().next().get();//((ArrayBag<Concept>) cb).get(0).get();
         assertEquals("((a==>b)-->[pill])", cc.toString());
 
         cc.beliefs().capacity(1, 1, d); //set to capacity=1 to force compression

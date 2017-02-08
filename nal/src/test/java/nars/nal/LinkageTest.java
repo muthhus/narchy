@@ -20,6 +20,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
+import java.util.List;
 import java.util.function.Supplier;
 
 import static org.junit.Assert.*;
@@ -92,7 +93,7 @@ public class LinkageTest extends AbstractNALTest {
     //interlinked with an intermediate concept, this is needed in order to select one as task and the other as belief
     public void ProperlyLinkedIndirectlyTest(@NotNull String spremise1, char punc, @NotNull String spremise2) throws Exception {
 
-        int frames = 1;
+        int frames = 5;
 
         NAR nar = test().nar;
 
@@ -344,7 +345,7 @@ public class LinkageTest extends AbstractNALTest {
     }
     @Test
     public void Indirect_Linkage_NAL6_second_level_variable_unification_alt() throws Exception {
-        ProperlyLinkedIndirectlyTest("(&&, <#1 --> lock>, <<$2 --> key> ==> open:($2, #1)>)", "<{key1} --> key>");
+        ProperlyLinkedIndirectlyTest("(&&, <#1 --> lock>, <<$2 --> key> ==> open($2, #1)>)", "<{key1} --> key>");
     }
 
     @Test

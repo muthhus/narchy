@@ -1,13 +1,11 @@
 package nars.bag.experimental;
 
-import com.google.common.collect.Iterators;
-import jcog.Util;
 import nars.Param;
 import nars.bag.Bag;
 import nars.budget.BudgetMerge;
 import nars.budget.Budgeted;
 import nars.link.BLink;
-import org.apache.commons.collections4.iterators.ArrayIterator;
+import nars.link.DefaultBLink;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -20,6 +18,7 @@ import java.util.concurrent.atomic.AtomicReferenceArray;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.IntStream;
 
 /**
  * TODO add busy-wait non-locking exclusion to prevent duplicate insert at different probe indices for the same item
@@ -89,6 +88,7 @@ public class HijackBag<X> implements Bag<X> {
         BLink<X> target = null;
         BLink<X> found = null; //get or remove
 
+        boolean merged = false;
         final int ticket = add ? busy((X)x) : Integer.MIN_VALUE /* N/A for get or remove */;
 
         int c = capacity();
@@ -123,7 +123,9 @@ public class HijackBag<X> implements Bag<X> {
                             float pBefore = ii.priSafe(0);
                             merge.apply(ii, adding, scale); //TODO overflow
                             pressure += ii.priSafe(0) - pBefore;
-                            found = ii;
+                            added = ii;
+                            targetIndex = -1;
+                            merged = true;
                         }
 
                         break; //continue below
@@ -144,10 +146,15 @@ public class HijackBag<X> implements Bag<X> {
             //add at target index
             if (targetIndex != -1) {
                 if (targetPri == Float.NEGATIVE_INFINITY) {
+
+                    DefaultBLink adding2 = new DefaultBLink(x);
+                    adding2.setBudget(0, adding.qua()); //use the incoming quality.  budget will be merged
+                    merge.apply(adding2, adding, scale);
+
                     //insert to empty
-                    if (map.compareAndSet(targetIndex, null, adding)) {
-                        added = adding;
-                        pressure += addingPri;
+                    if (map.compareAndSet(targetIndex, null, adding2)) {
+                        added = adding2;
+                        pressure += adding2.priSafe(0);
                     }
 
                 } else {
@@ -170,17 +177,19 @@ public class HijackBag<X> implements Bag<X> {
             unbusy(x, ticket);
         }
 
-        if ((add || remove) && found!=null) {
-            count.decrementAndGet();
-            onRemoved(found);
+        if (!merged) {
+            if ((add || remove) && found != null) {
+                count.decrementAndGet();
+                onRemoved(found);
+            }
+
+            if (added != null) {
+                count.incrementAndGet();
+                onAdded(added);
+            }
         }
 
-        if ((added!=null)) {
-            count.incrementAndGet();
-            onAdded(added);
-        }
-
-        if (Param.DEBUG) {
+        /*if (Param.DEBUG)*/ {
             int cnt = count.get();
             if (cnt > capacity()) {
                 throw new RuntimeException("overflow");
@@ -271,6 +280,8 @@ public class HijackBag<X> implements Bag<X> {
      * only improves accuracy between commits.
      */
     private float range(float p) {
+        if (p!=p)
+            return p;
         if (p > priMax) priMax = p;
         if (p < priMin) priMin = p;
         return p;
@@ -310,6 +321,9 @@ public class HijackBag<X> implements Bag<X> {
     @NotNull
     @Override
     public Bag<X> sample(int n, @NotNull Predicate<? super BLink<X>> target) {
+        if (isEmpty())
+            return null;
+
         int c = capacity();
         int jLimit = (int) Math.ceil(c * SCAN_ITERATIONS);
 
@@ -363,6 +377,9 @@ public class HijackBag<X> implements Bag<X> {
 
     @Override
     public void forEach(@NotNull Consumer<? super BLink<X>> e) {
+        if (isEmpty())
+            return;
+
         int c = capacity();
 
         int j = 0;
@@ -418,7 +435,7 @@ public class HijackBag<X> implements Bag<X> {
     public Iterator<BLink<X>> iterator() {
         //return Iterators.transform(map.entryIterator(), x -> (BLink<X>) new ArrayBLink<>(x.getKey(), x.getValue()));
         //throw new UnsupportedOperationException();
-        return Iterators.filter(new ArrayIterator<BLink<X>>(map), b -> b != null && !b.isDeleted());
+        return IntStream.range(0, capacity()).mapToObj(i -> map.get(i)).filter(n -> n!=null).iterator();
     }
 
     @Override
@@ -426,18 +443,11 @@ public class HijackBag<X> implements Bag<X> {
         return get(it) != null;
     }
 
-    @Override
-    public boolean isEmpty() {
-        return size() == 0;
-    }
-
-
     @NotNull
     @Override
     public Bag<X> commit(Function<Bag, Consumer<BLink>> update) {
         final float[] mass = {0};
 
-        final int[] count = {0};
         final float[] min = {Float.POSITIVE_INFINITY};
         final float[] max = {Float.NEGATIVE_INFINITY};
 
@@ -447,9 +457,6 @@ public class HijackBag<X> implements Bag<X> {
             if (p > max[0]) max[0] = p;
             if (p < min[0]) min[0] = p;
             mass[0] += p;
-
-            count[0]++;
-
         });
 
 
@@ -476,7 +483,7 @@ public class HijackBag<X> implements Bag<X> {
 
     @NotNull
     public Bag<X> update(@Nullable Consumer<BLink> each) {
-        if (each != null && !isEmpty())
+        if (each != null)
             forEach(each);
 
         return this;
@@ -487,7 +494,7 @@ public class HijackBag<X> implements Bag<X> {
     public BLink<X> mul(@NotNull Object key, float factor) {
         BLink<X> b = get(key);
         if (b != null && !b.isDeleted()) {
-            float before = b.pri();
+            float before = b.priSafe(0);
             b.priMult(factor);
             float after = range(b.pri());
             pressure += (after - before);
@@ -500,7 +507,7 @@ public class HijackBag<X> implements Bag<X> {
     public BLink<X> add(@NotNull Object key, float x) {
         BLink<X> b = get(key);
         if (b != null && !b.isDeleted()) {
-            float before = b.pri();
+            float before = b.priSafe(0);
             b.priAdd(x);
             float after = range(b.pri());
             pressure += (after - before);

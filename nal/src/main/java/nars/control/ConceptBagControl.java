@@ -9,6 +9,7 @@ import nars.Control;
 import nars.NAR;
 import nars.Param;
 import nars.bag.Bag;
+import nars.bag.BagAdapter;
 import nars.bag.CurveBag;
 import nars.budget.BudgetMerge;
 import nars.budget.RawBudget;
@@ -106,7 +107,13 @@ public class ConceptBagControl implements Control, Consumer<DerivedTask> {
         this.conceptsFiredPerBatch = new MutableInteger(Param.CONCEPT_FIRE_BATCH_SIZE);
         this.conceptBuilder = nar.concepts.conceptBuilder();
 
-        this.active = new ConceptBag( ((DefaultConceptBuilder) conceptBuilder).defaultCurveSampler);
+        this.active = new ConceptBag(
+            new CurveBag<>(0, ((DefaultConceptBuilder) conceptBuilder).defaultCurveSampler, CONCEPT_BAG_BLEND,
+                        nar.exe.concurrent() ?  new java.util.concurrent.ConcurrentHashMap<>() : new HashMap()
+            )
+            //new HijackBag<>(4096, 4, BudgetMerge.maxBlend, nar.random )
+
+        );
 
 
         //nar.onFrame(this);
@@ -214,15 +221,11 @@ public class ConceptBagControl implements Control, Consumer<DerivedTask> {
 
 
     /** extends CurveBag to invoke entrance/exit event handler lambda */
-    public final class ConceptBag extends CurveBag<Concept> {
+    public final class ConceptBag extends BagAdapter<Concept> {
 
 
-        public ConceptBag( @NotNull CurveBag.CurveSampler sampler) {
-            super(0, sampler, CONCEPT_BAG_BLEND,
-                    //new ConcurrentHashMap<>(capacity)
-                    nar.exe.concurrent() ?  new java.util.concurrent.ConcurrentHashMap<>() : new HashMap()
-                    //new NonBlockingHashMap<>(capacity)
-            );
+        public ConceptBag( @NotNull Bag<Concept> bag) {
+            super(bag);
         }
 
 //        final AtomicBoolean busyPut = new AtomicBoolean(false);
@@ -300,8 +303,8 @@ public class ConceptBagControl implements Control, Consumer<DerivedTask> {
 
 
         @Override
-        public final void onRemoved(@NotNull BLink<Concept> value) {
-                Concept c  = value.get();
+        public final void onRemoved(@NotNull BLink<Concept> v) {
+                Concept c  = v.get();
                 sleep(c);
 
                 /*if (value.priIfFiniteElseNeg1() > Param.BUDGET_EPSILON) {

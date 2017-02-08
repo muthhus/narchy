@@ -201,6 +201,7 @@ public class TaskNAR extends NAR {
                 throw new RuntimeException("Invalid sentence type: " + x);
         }
 
+        x.feedback(null, Float.NaN, Float.NaN, this); //clear any stored premise
 
         if (accepted || delta != null) {
 
