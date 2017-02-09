@@ -1,6 +1,7 @@
 package nars.bag;
 
 import com.google.common.base.Joiner;
+import jcog.Util;
 import jcog.data.random.XorShift128PlusRandom;
 import nars.Param;
 import nars.bag.experimental.HijackBag;
@@ -46,7 +47,7 @@ public class BagTest {
 
     @Test
     public void testBasicInsertionRemovalHijack() {
-        testBasicInsertionRemoval(new HijackBag(1, 1, maxBlend, rng()));
+        testBasicInsertionRemoval(new HijackBag(2, 1, maxBlend, rng()));
     }
 
     public void testBasicInsertionRemoval(Bag<String> c) {
@@ -175,7 +176,7 @@ public class BagTest {
             testScalePut2(new HijackBag<>(2, 2, plusBlend, rng()));
     }
 
-    private static XorShift128PlusRandom rng() {
+    public static Random rng() {
         return new XorShift128PlusRandom(1);
     }
 
@@ -360,7 +361,7 @@ public class BagTest {
     }
 
     void testSamplingFlat(Bag<String> a, float level) {
-        int n = a.capacity();
+        int n = a.capacity()*2;
 
 
         for (int i = 0; i < n; i++) {
@@ -379,6 +380,23 @@ public class BagTest {
     @NotNull
     public CurveBag<String> curveBag(int n, BudgetMerge mergeFunction) {
         return new CurveBag(n, defaultSampler, mergeFunction, new HashMap());
+    }
+
+    public static void populate(Bag<String> b, Random rng, int count, int dimensionality, float minPri, float maxPri, float qua) {
+        populate(b, rng, count, dimensionality, minPri, maxPri, qua, qua);
+    }
+
+    public static void populate(Bag<String> b, Random rng, int count, int dimensionality, float minPri, float maxPri, float minQua, float maxQua) {
+        float dPri = maxPri - minPri;
+        float dQua = maxQua - minQua;
+        for (int i = 0; i < count; i++) {
+            b.put("x" + rng.nextInt(dimensionality), new RawBudget(
+                    rng.nextFloat() * dPri + minPri,
+                    rng.nextFloat() * dQua + minQua)
+            );
+        }
+        b.commit();
+
     }
 
     //AutoBag does not apply to this test

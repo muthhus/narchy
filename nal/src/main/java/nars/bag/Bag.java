@@ -68,8 +68,8 @@ public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Iterable<BLink<
     default BLink<V> put(@NotNull V x) {
         return put(x, initialBudget(x), null);
     }
-    default void putLink(@NotNull BLink<V> x) {
-        put(x.get(), x);
+    default @Nullable BLink<V> putLink(@NotNull BLink<V> x) {
+        return put(x.get(), x);
     }
 
 //        @Nullable
