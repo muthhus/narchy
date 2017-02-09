@@ -7,12 +7,12 @@ import nars.budget.Budgeted;
 import nars.link.BLink;
 import nars.link.DefaultBLink;
 import org.apache.commons.lang3.mutable.MutableFloat;
+import org.eclipse.collections.impl.map.mutable.ConcurrentHashMapUnsafe;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Iterator;
 import java.util.Random;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReferenceArray;
 import java.util.function.Consumer;
@@ -22,6 +22,8 @@ import java.util.stream.IntStream;
 
 /**
  * unsorted priority queue with stochastic replacement policy
+ *
+ * it uses a AtomicReferenceArray<> to hold the data but Unsafe CAS operations might perform better (i couldnt get them to work like NBHM does).  this is necessary when an index is chosen for replacement that it makes certain it was replacing the element it thought it was (that it hadnt been inter-hijacked by another thread etc).  on an insert i issue a ticket to the thread and store this in a small ConcurrentHashMap<X,Integer>.  this spins in a busy putIfAbsent loop until it can claim the ticket for the object being inserted. this is to prevent the case where two threads try to insert the same object and end-up puttnig two copies in adjacent hash indices.  this should be rare so the putIfAbsent should usually work on the first try.  when it exits the update critical section it removes the key,value ticket freeing it for another thread.  any onAdded and onRemoved subclass event handling happen outside of this critical section, and all cases seem to be covered.
  */
 public class HijackBag<X> implements Bag<X> {
 
@@ -51,6 +53,10 @@ public class HijackBag<X> implements Bag<X> {
 
     final AtomicInteger count = new AtomicInteger(0);
 
+    /** hash -> ticket */
+    final ConcurrentHashMapUnsafe<Integer, Integer> busy = new ConcurrentHashMapUnsafe<>();
+
+    final AtomicInteger ticket = new AtomicInteger(0);
 
     public HijackBag(int capacity, int reprobes, BudgetMerge merge, Random random) {
         this.merge = merge;
@@ -72,7 +78,8 @@ public class HijackBag<X> implements Bag<X> {
         }
     }
 
-    @Nullable protected BLink<X> update(Object x, @Nullable BLink<X> adding /* null to remove */, float scale /* -1 to remove, 0 to get only*/) {
+    @Nullable
+    protected BLink<X> update(Object x, @Nullable BLink<X> adding /* null to remove */, float scale /* -1 to remove, 0 to get only*/) {
         int hash = x.hashCode();
 
 
@@ -83,13 +90,13 @@ public class HijackBag<X> implements Bag<X> {
         float targetPri = Float.POSITIVE_INFINITY;
 
         BLink<X> added = null;
-        float addingPri = adding!=null ? adding.priSafe(0) : Float.NaN;
+        float addingPri = adding != null ? adding.priSafe(0) : Float.NaN;
 
         BLink<X> target = null;
         BLink<X> found = null; //get or remove
 
         boolean merged = false;
-        final int ticket = add ? busy((X)x) : Integer.MIN_VALUE /* N/A for get or remove */;
+        final int ticket = add ? busy(hash) : Integer.MIN_VALUE /* N/A for get or remove */;
 
         int c = capacity();
 
@@ -158,7 +165,7 @@ public class HijackBag<X> implements Bag<X> {
                     }
 
                 } else {
-                    if (hijackSoftmax(addingPri, targetPri)) {
+                    if (replace(addingPri, targetPri)) {
                         if (map.compareAndSet(targetIndex, target, adding)) {
                             //inserted
                             pressure += Math.max(0, addingPri - targetPri);
@@ -174,7 +181,7 @@ public class HijackBag<X> implements Bag<X> {
         }
 
         if (add) {
-            unbusy(x, ticket);
+            unbusy(hash, ticket);
         }
 
         if (!merged) {
@@ -189,7 +196,8 @@ public class HijackBag<X> implements Bag<X> {
             }
         }
 
-        /*if (Param.DEBUG)*/ {
+        /*if (Param.DEBUG)*/
+        {
             int cnt = count.get();
             if (cnt > capacity()) {
                 throw new RuntimeException("overflow");
@@ -199,14 +207,16 @@ public class HijackBag<X> implements Bag<X> {
         }
 
 
-        if (!add) {
-            return found;
-        } else {
-            return added;
-        }
+        return !add ? found : added;
 
     }
 
+    /** can override in subclasses for custom replacement policy */
+    protected boolean replace(float incomingPri, float existingPri) {
+        return hijackSoftmax(incomingPri, existingPri);
+    }
+
+    /** can override in subclasses for custom equality test */
     protected boolean equals(Object x, X y) {
         return x == y || x.equals(y);
     }
@@ -236,8 +246,6 @@ public class HijackBag<X> implements Bag<X> {
         return weakestPri <= newPri;
     }
 
-    final ConcurrentHashMap<X,Integer> busy = new ConcurrentHashMap<>();
-    final AtomicInteger ticket = new AtomicInteger(0);
 
     @Override
     public BLink<X> put(@NotNull X x, @NotNull Budgeted b, float scale, @Nullable MutableFloat overflowing) {
@@ -258,17 +266,17 @@ public class HijackBag<X> implements Bag<X> {
         return y;
     }
 
-    public int busy(@NotNull X x) {
+    public int busy(int hash) {
         int ticket = this.ticket.incrementAndGet();
 
-        while (busy.putIfAbsent(x, ticket)!=null) {
+        while (busy.putIfAbsent(hash, ticket) != null) {
             //System.out.println("wait");
         }
 
         return ticket;
     }
 
-    public void unbusy(@NotNull Object x, int ticket) {
+    public void unbusy(int x, int ticket) {
         boolean freed = busy.remove(x, ticket);
         if (!freed)
             throw new RuntimeException("insertion fault");
@@ -280,7 +288,7 @@ public class HijackBag<X> implements Bag<X> {
      * only improves accuracy between commits.
      */
     private float range(float p) {
-        if (p!=p)
+        if (p != p)
             return p;
         if (p > priMax) priMax = p;
         if (p < priMin) priMin = p;
@@ -318,7 +326,7 @@ public class HijackBag<X> implements Bag<X> {
         throw new UnsupportedOperationException("yet");
     }
 
-    @NotNull
+    @Nullable
     @Override
     public Bag<X> sample(int n, @NotNull Predicate<? super BLink<X>> target) {
         if (isEmpty())
@@ -350,7 +358,7 @@ public class HijackBag<X> implements Bag<X> {
 
                 float p = v.pri();
                 if (p == p) {
-                    if (p >= 0) {
+                    //if (p >= 0) {
 
                         if ((r < p) || (r < p + tolerance(j, jLimit, n, batchSize, c))) {
                             if (target.test(v)) {
@@ -358,7 +366,7 @@ public class HijackBag<X> implements Bag<X> {
                                 r = curve();
                             }
                         }
-                    }
+                    //}
                 } else {
                     //early deletion nullify
                     map.compareAndSet(m, v, null);
@@ -435,7 +443,7 @@ public class HijackBag<X> implements Bag<X> {
     public Iterator<BLink<X>> iterator() {
         //return Iterators.transform(map.entryIterator(), x -> (BLink<X>) new ArrayBLink<>(x.getKey(), x.getValue()));
         //throw new UnsupportedOperationException();
-        return IntStream.range(0, capacity()).mapToObj(i -> map.get(i)).filter(n -> n!=null).iterator();
+        return IntStream.range(0, capacity()).mapToObj(i -> map.get(i)).filter(n -> n != null).iterator();
     }
 
     @Override
