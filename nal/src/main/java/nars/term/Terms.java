@@ -362,15 +362,6 @@ public class Terms   {
     }
 
 
-    /**
-     * build a component list from terms
-     *
-     * @return the component list
-     */
-    public static Term[] toArray(Term... t) {
-        return t;
-    }
-
     public static List<Term> toList(Term[] t) {
         return Arrays.asList(t);
     }
@@ -445,8 +436,7 @@ public class Terms   {
             if (filter.accept(i, t))
                 l.add(t);
         }
-        if (l.isEmpty()) return Terms.empty;
-        return l.toArray(new Term[l.size()]);
+        return !l.isEmpty() ? l.toArray(new Term[l.size()]) : Terms.empty;
     }
 
     @NotNull
@@ -462,13 +452,11 @@ public class Terms   {
     @NotNull
     public static Term[] toArray(@NotNull Collection<Term> l) {
         int s = l.size();
-        if (s == 0)
-            return Terms.empty;
-        return l.toArray(new Term[s]);
+        return s == 0 ? Terms.empty : l.toArray(new Term[s]);
     }
 
     @NotNull
-    public static Term[] cloneTermsReplacing(@NotNull Term[] term, Term from, @NotNull Term to) {
+    public static Term[] cloneTermsReplacing(@NotNull Term[] term, @NotNull Term from, @NotNull Term to) {
         Term[] y = new Term[term.length];
         int i = 0;
         for (Term x : term) {
@@ -528,15 +516,12 @@ public class Terms   {
 
     /** dangerous because some operations involving concepts can naturally reduce to atoms, and using this interprets them as non-existent */
     @Deprecated @Nullable public static Compound compoundOrNull(@Nullable Term t) {
-        if (t instanceof Compound)
-            return ((Compound) t);
-        else
-            return null;
+        return (t instanceof Compound) ? (Compound) t : null;
     }
 
     /** dangerous because some operations involving concepts can naturally reduce to atoms, and using this interprets them as non-existent */
     @Deprecated @Nullable public static Compound compoundOrNull(@Nullable Termed t) {
-        return t instanceof Compound ? ((Compound)t) : compoundOrNull(t.term());
+        return (t instanceof Compound) ? ((Compound) t) : compoundOrNull(t.term());
     }
 
     /** detects a negated conjunction of negated subterms:

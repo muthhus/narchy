@@ -2,6 +2,9 @@ package nars.nar;
 
 import jcog.data.random.XorShift128PlusRandom;
 import nars.NAR;
+import nars.bag.Bag;
+import nars.bag.CurveBag;
+import nars.concept.Concept;
 import nars.conceptualize.DefaultConceptBuilder;
 import nars.control.ConceptBagControl;
 import nars.derive.DefaultDeriver;
@@ -24,7 +27,7 @@ public class Default extends NAR {
 
     //private static final Logger logger = LoggerFactory.getLogger(Default.class);
 
-    public final ConceptBagControl core = new ConceptBagControl(this, new DefaultDeriver());
+    public final ConceptBagControl core;
 
     private final STMTemporalLinkage stmLinkage = new STMTemporalLinkage(this, 2);
 
@@ -52,8 +55,10 @@ public class Default extends NAR {
     }
 
 
-    public Default(int activeConcepts, int conceptsFirePerCycle, int taskLinksPerConcept, int termLinksPerConcept, @NotNull Random random, @NotNull TermIndex index, @NotNull Time time, Executioner exe) {
-        super(time, index, random, exe);
+    public Default(int activeConcepts, int conceptsFirePerCycle, int taskLinksPerConcept, int termLinksPerConcept, @NotNull Random random, @NotNull TermIndex concepts, @NotNull Time time, Executioner exe) {
+        super(time, concepts, random, exe);
+
+        core = new ConceptBagControl(this, new DefaultDeriver(), newConceptBag(activeConcepts));
 
         core.active.capacity(activeConcepts);
         core.termlinksFiredPerFiredConcept.set(1, termLinksPerConcept);
@@ -61,6 +66,17 @@ public class Default extends NAR {
         core.conceptsFiredPerCycle.set(conceptsFirePerCycle);
 
         setControl(this.core);
+    }
+
+    protected Bag<Concept> newConceptBag(int activeConcepts) {
+
+
+        return
+                new CurveBag<Concept>(activeConcepts, ((DefaultConceptBuilder) concepts.conceptBuilder()).defaultCurveSampler, ConceptBagControl.CONCEPT_BAG_BLEND,
+                this.exe.concurrent() ? new java.util.concurrent.ConcurrentHashMap<>() : new HashMap());
+
+                //new HijackBag<>(8192, 8, BudgetMerge.maxBlend, nar.random )
+
     }
 
 

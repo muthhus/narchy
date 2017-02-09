@@ -15,7 +15,6 @@ import nars.budget.BudgetMerge;
 import nars.budget.RawBudget;
 import nars.concept.Concept;
 import nars.conceptualize.ConceptBuilder;
-import nars.conceptualize.DefaultConceptBuilder;
 import nars.derive.Deriver;
 import nars.link.BLink;
 import nars.premise.MatrixPremiseBuilder;
@@ -26,7 +25,6 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
@@ -98,7 +96,7 @@ public class ConceptBagControl implements Control, Consumer<DerivedTask> {
     //private final CapacityLinkedHashMap<Premise,Premise> recent = new CapacityLinkedHashMap<>(256);
     //long novel=0, total=0;
 
-    public ConceptBagControl(@NotNull NAR nar, @NotNull Deriver deriver) {
+    public ConceptBagControl(@NotNull NAR nar, @NotNull Deriver deriver, @NotNull Bag<Concept> conceptBag) {
 
         this.nar = nar;
 
@@ -108,10 +106,7 @@ public class ConceptBagControl implements Control, Consumer<DerivedTask> {
         this.conceptBuilder = nar.concepts.conceptBuilder();
 
         this.active = new ConceptBag(
-            new CurveBag<>(0, ((DefaultConceptBuilder) conceptBuilder).defaultCurveSampler, CONCEPT_BAG_BLEND,
-                        nar.exe.concurrent() ?  new java.util.concurrent.ConcurrentHashMap<>() : new HashMap()
-            )
-            //new HijackBag<>(8192, 8, BudgetMerge.maxBlend, nar.random )
+                conceptBag
 
         );
 

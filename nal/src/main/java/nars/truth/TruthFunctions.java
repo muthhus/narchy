@@ -240,8 +240,8 @@ public final class TruthFunctions extends UtilityFunctions {
     /** measures the similarity or coherence of two freqency values */
     public static float freqSimilarity(float aFreq, float bFreq) {
 
-        //return 1f - Math.abs(aFreq - bFreq);
-        return Math.max( (aFreq * bFreq), (1f-aFreq) * (1f-bFreq) );
+        return 1f - Math.abs(aFreq - bFreq);
+        //return Math.max( (aFreq * bFreq), (1f-aFreq) * (1f-bFreq) );
     }
 
     /**

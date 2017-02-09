@@ -4,13 +4,14 @@ import jcog.Util;
 import jcog.data.MutableInteger;
 import nars.NAR;
 import nars.Task;
-import nars.bag.ArrayBag;
 import nars.bag.Bag;
+import nars.bag.experimental.HijackBag;
 import nars.budget.BudgetMerge;
 import nars.budget.Budgeted;
 import nars.learn.gng.NeuralGasNet;
 import nars.learn.gng.Node;
 import nars.link.BLink;
+import nars.link.DefaultBLink;
 import nars.link.DependentBLink;
 import nars.truth.Truth;
 import nars.truth.Truthed;
@@ -297,18 +298,22 @@ public abstract class STMClustered extends STM {
         clusters = (short) Math.max(2f, 1f + capacity.floatValue() / expectedTasksPerNode);
 
         this.punc = punc;
-        this.input = new ArrayBag<Task>(capacity.intValue(), BudgetMerge.maxBlend, new ConcurrentHashMap<>(capacity.intValue())) {
+
+        //this.input = new ArrayBag<Task>(capacity.intValue(), BudgetMerge.maxBlend, new ConcurrentHashMap<>(capacity.intValue())) {
+        this.input = new HijackBag<Task>(capacity.intValue(), 4, BudgetMerge.maxBlend, nar.random) {
 
             @NotNull
             @Override
             public BLink<Task> newLink(@NotNull Task i, BLink<Task> exists) {
-                return (exists != null) ? exists : new TLink(i);
+                if (!(exists instanceof TLink) || exists.isDeleted())
+                    return new TLink(i);
+                return exists;
             }
 
 
             @Override
             public void onRemoved(@Nullable BLink<Task> value) {
-                if (value != null)
+                if (value instanceof TLink)
                     drop((TLink) value);
             }
 

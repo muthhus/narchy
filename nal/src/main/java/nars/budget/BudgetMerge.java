@@ -9,6 +9,7 @@ import java.util.function.BiFunction;
 
 import static jcog.Util.lerp;
 import static nars.budget.BudgetMerge.PriMerge.*;
+import static nars.util.UtilityFunctions.aveAri;
 import static nars.util.UtilityFunctions.or;
 
 /**
@@ -94,7 +95,12 @@ public interface BudgetMerge extends BiFunction<Budget, Budget, Budget> {
                 break;
             case MAX:
                 nextPri = Math.max(ePri, iPri);
-                nextQua = Math.max(eQua,iQua);
+                //nextQua = Math.max(eQua, iQua);
+                float pInfluence = iPri / (ePri + iPri);
+                if (eQua!=iQua)
+                    nextQua = Util.lerp(pInfluence, iQua, eQua);
+                else
+                    nextQua = eQua;
                 break;
             case AVERAGE:
                 nextPri = iPri;

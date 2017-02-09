@@ -6,8 +6,11 @@ import nars.$;
 import nars.NAR;
 import nars.NAgent;
 import nars.Task;
+import nars.attention.Forget;
 import nars.bag.ArrayBag;
+import nars.bag.Bag;
 import nars.bag.Bagregate;
+import nars.bag.experimental.HijackBag;
 import nars.budget.BudgetMerge;
 import nars.concept.Concept;
 import nars.conceptualize.DefaultConceptBuilder;
@@ -42,10 +45,8 @@ import spacegraph.space.widget.FloatSlider;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.lang.reflect.Field;
-import java.util.LinkedHashMap;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
-import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
@@ -177,39 +178,50 @@ abstract public class NAgents extends NAgent {
                     //.sync(false)
                 ;
 
-        int volMax = 32;
-        int conceptsPerCycle = 48*threads;
+        int conceptsPerCycle = 128*threads;
 
 
         //Multi nar = new Multi(3,512,
-        Default nar = new Default(1024,
-                conceptsPerCycle, 1, 3, rng,
-                new CaffeineIndex(new DefaultConceptBuilder(), 64*1024, false, exe)
+        Default nar = new Default(32768,
+                conceptsPerCycle, 1, 4, rng,
+                new CaffeineIndex(new DefaultConceptBuilder(), 128*1024, false, exe)
                 //new TreeTermIndex.L1TreeIndex(new DefaultConceptBuilder(), 300000, 32 * 1024, 3)
                 ,
                 time,
-                exe);
+                exe) {
+
+            @Override
+            protected Bag<Concept> newConceptBag(int activeConcepts) {
+                return new HijackBag<>(activeConcepts, 5, BudgetMerge.maxBlend, random ) {
+                    @Override
+                    public Forget forget(float rate) {
+                        float memoryForget = 1f;
+                        return new Forget(rate, memoryForget, 0.25f);
+                    }
+                };
+            }
+        };
 
         nar.beliefConfidence(0.9f);
         nar.goalConfidence(0.9f);
 
         float p = 0.5f;
-        nar.DEFAULT_BELIEF_PRIORITY = 0.75f * p;
-        nar.DEFAULT_GOAL_PRIORITY = 1f * p;
+        nar.DEFAULT_BELIEF_PRIORITY = 0.85f * p;
+        nar.DEFAULT_GOAL_PRIORITY = 0.95f * p;
         nar.DEFAULT_QUESTION_PRIORITY = 0.5f * p;
         nar.DEFAULT_QUEST_PRIORITY = 0.5f * p;
 
-        nar.confMin.setValue(0.01f);
-        nar.termVolumeMax.setValue(volMax);
+        nar.confMin.setValue(0.02f);
+        nar.termVolumeMax.setValue(32);
 
         MySTMClustered stm = new MySTMClustered(nar, 64, '.', 3, true, 6);
         MySTMClustered stmGoal = new MySTMClustered(nar, 32, '!', 2, true, 4);
 
         Abbreviation abbr = new Abbreviation(nar, "the",
                 4, 16,
-                0.01f, 32);
+                0.02f, 32);
 
-        new Inperience(nar, 0.01f, 16);
+        new Inperience(nar, 0.02f, 16);
 
 //        //causal accelerator
 //        nar.onTask(t -> {
@@ -320,7 +332,7 @@ abstract public class NAgents extends NAgent {
 //                "dsf", () -> grid(new Label("y"), new Label("xy"), new Label("xyzxcv"))
 //            ))), 800, 600);
             window(
-                    new TabPane(Map.of(
+                    new TabPane(new TreeMap<String,Supplier<Surface>>(Map.of(
                             "agent", ()-> new ReflectionSurface(a),
                             //"control", () -> new ReflectionSurface(a.nar),
                             "input", () -> grid(a.cam.values().stream().map(cs ->
@@ -330,13 +342,13 @@ abstract public class NAgents extends NAgent {
                             "concepts", ()->
                                     Vis.treeChart( a.nar, new Bagregate<>(a.nar.conceptsActive(), 64, 0.05f) , 64),
                             "conceptBudget", ()->
-                                    Vis.budgetHistogram(nar, 24),
+                                    Vis.budgetHistogram(nar, 64),
                             "tasks", ()-> taskChart,
                             "agentCharts", ()-> Vis.emotionPlots(a.nar, 256),
                             "agentActions", ()-> Vis.agentActions(a, 400),
                             "agentPredict", ()-> Vis.beliefCharts(400, a.predictors, a.nar)
 
-                    )
+                    ))
 
                             //nar instanceof Default ? Vis.concepts((Default) nar, 128) : grid(/*blank*/),
 

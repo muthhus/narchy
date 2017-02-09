@@ -35,7 +35,7 @@ public class TermVector1 implements TermContainer, Set<Term> {
         return
                 (this == obj)
                         ||
-                        ((obj instanceof TermContainer) && equalTo((TermContainer)obj));
+                ((obj instanceof TermContainer) && equalTo((TermContainer)obj));
     }
 
     @NotNull

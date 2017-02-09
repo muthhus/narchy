@@ -39,8 +39,6 @@ public class MySTMClustered extends STMClustered {
     private final int minGroupSize;
     private final int inputsPerFrame;
 
-
-
     float timeCoherenceThresh = 0.99f; //only used when not in group=2 sequence pairs phase
     float freqCoherenceThresh = 0.9f;
     float confCoherenceThresh = 0.5f;

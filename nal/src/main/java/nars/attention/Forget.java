@@ -12,10 +12,18 @@ public class Forget<X> implements Consumer<BLink<X>> {
 
     public final float r;
 
-    static final float maxEffectiveQuality = 1f;
+    public final float maxEffectiveQuality;
+
+    public final float gain;
 
     public Forget(float r) {
+        this(r, 1f ,1f);
+    }
+
+    public Forget(float r, float maxEffectiveQuality, float gain) {
         this.r = r;
+        this.maxEffectiveQuality = maxEffectiveQuality;
+        this.gain = gain;
     }
 
     @Override
@@ -23,10 +31,10 @@ public class Forget<X> implements Consumer<BLink<X>> {
         float p = bLink.priSafe(-1);
         if (p > 0) {
             float q = bLink.qua();
-            if (q==q) //???
-                bLink.setPriority(p * (1f - (r * (1f - q * maxEffectiveQuality))));
-            else
-                bLink.delete();
+            //if (q==q) //???
+                bLink.setPriority(gain * p * (1f - (r * (1f - q * maxEffectiveQuality))));
+            //else
+                //bLink.delete();
             //bLink.setPriority(p - (r * (1f - q * maxEffectiveQuality)));
 
         }

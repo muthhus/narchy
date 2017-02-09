@@ -154,7 +154,7 @@ public class HijackBag<X> implements Bag<X> {
             if (targetIndex != -1) {
                 if (targetPri == Float.NEGATIVE_INFINITY) {
 
-                    DefaultBLink adding2 = new DefaultBLink(x);
+                    BLink<X> adding2 = newLink((X) x, null);
                     adding2.setBudget(0, adding.qua()); //use the incoming quality.  budget will be merged
                     merge.apply(adding2, adding, scale);
 
