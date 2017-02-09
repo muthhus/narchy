@@ -178,7 +178,7 @@ abstract public class NAgents extends NAgent {
                     //.sync(false)
                 ;
 
-        int conceptsPerCycle = 128*threads;
+        int conceptsPerCycle = 64*threads;
 
 
         //Multi nar = new Multi(3,512,
@@ -195,8 +195,8 @@ abstract public class NAgents extends NAgent {
                 return new HijackBag<>(activeConcepts, 5, BudgetMerge.maxBlend, random ) {
                     @Override
                     public Forget forget(float rate) {
-                        float memoryForget = 1f;
-                        return new Forget(rate, memoryForget, 0.25f);
+                        float memoryForget = 0.75f;
+                        return new Forget(rate, memoryForget, 0.9f);
                     }
                 };
             }

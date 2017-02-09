@@ -1,7 +1,6 @@
 package nars.nal.nal7;
 
 import nars.*;
-import nars.bag.ArrayBag;
 import nars.bag.Bag;
 import nars.concept.CompoundConcept;
 import nars.concept.Concept;

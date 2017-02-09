@@ -8,7 +8,6 @@ import nars.Op;
 import nars.Task;
 import nars.bag.Bag;
 import nars.bag.CurveBag;
-import nars.bag.experimental.HijackBag;
 import nars.budget.BudgetMerge;
 import nars.concept.AtomConcept;
 import nars.concept.CompoundConcept;

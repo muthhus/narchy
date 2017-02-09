@@ -21,7 +21,6 @@ import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Longs;
 import jcog.data.LongString;
 import jcog.list.FasterList;
-import jcog.map.nbhm.NonBlockingHashMap;
 import jcog.signal.OneDHaar;
 import org.apache.commons.lang3.ArrayUtils;
 import org.eclipse.collections.api.block.function.primitive.IntToFloatFunction;

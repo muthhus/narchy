@@ -6,7 +6,6 @@ import nars.Task;
 import nars.bag.Bag;
 import nars.budget.Budgeted;
 import nars.concept.Concept;
-import nars.link.BLink;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;

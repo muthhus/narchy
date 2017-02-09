@@ -9,7 +9,6 @@ import java.util.function.BiFunction;
 
 import static jcog.Util.lerp;
 import static nars.budget.BudgetMerge.PriMerge.*;
-import static nars.util.UtilityFunctions.aveAri;
 import static nars.util.UtilityFunctions.or;
 
 /**

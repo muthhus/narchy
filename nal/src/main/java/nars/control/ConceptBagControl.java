@@ -10,7 +10,6 @@ import nars.NAR;
 import nars.Param;
 import nars.bag.Bag;
 import nars.bag.BagAdapter;
-import nars.bag.CurveBag;
 import nars.budget.BudgetMerge;
 import nars.budget.RawBudget;
 import nars.concept.Concept;

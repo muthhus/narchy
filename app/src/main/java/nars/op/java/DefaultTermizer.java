@@ -4,7 +4,6 @@ import com.google.common.collect.ImmutableSet;
 import nars.$;
 import nars.term.Compound;
 import nars.term.Term;
-import nars.term.atom.Atom;
 import nars.term.atom.Atomic;
 import nars.term.var.Variable;
 import org.eclipse.collections.api.bimap.MutableBiMap;

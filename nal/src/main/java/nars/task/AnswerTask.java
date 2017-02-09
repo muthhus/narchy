@@ -12,7 +12,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import static jcog.Util.lerp;
-import static nars.util.UtilityFunctions.or;
 
 /**
  * Created by me on 7/3/16.

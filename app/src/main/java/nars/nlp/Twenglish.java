@@ -16,7 +16,6 @@
  */
 package nars.nlp;
 
-import com.google.common.collect.Lists;
 import jcog.io.Twokenize;
 import jcog.io.Twokenize.Span;
 import nars.$;

@@ -1,11 +1,11 @@
 package nars.bag.experimental;
 
+import jcog.Util;
 import nars.Param;
 import nars.bag.Bag;
 import nars.budget.BudgetMerge;
 import nars.budget.Budgeted;
 import nars.link.BLink;
-import nars.link.DefaultBLink;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.eclipse.collections.impl.map.mutable.ConcurrentHashMapUnsafe;
 import org.jetbrains.annotations.NotNull;
@@ -431,8 +431,11 @@ public class HijackBag<X> implements Bag<X> {
         //float selectionRate =  ((float)batchSize)/cap;
 
         /* raised polynomially to sharpen the selection curve, growing more slowly at the beginning */
+        return Util.sqr(Util.sqr(searchProgress*searchProgress)*searchProgress);
+
+        /*
         float exp = 6;
-        return (float) Math.pow(searchProgress, exp);// + selectionRate;
+        return float) Math.pow(searchProgress, exp);// + selectionRate;*/
     }
 
     /**
@@ -484,13 +487,13 @@ public class HijackBag<X> implements Bag<X> {
 
         update(update != null ? update.apply(this) : null);
 
-        this.pressure = 0; //HACK clear this when it is read, not after the update
-
         return this;
     }
 
     @NotNull
     public Bag<X> update(@Nullable Consumer<BLink> each) {
+        this.pressure = 0;
+
         if (each != null)
             forEach(each);
 

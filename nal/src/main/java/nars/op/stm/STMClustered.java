@@ -11,7 +11,6 @@ import nars.budget.Budgeted;
 import nars.learn.gng.NeuralGasNet;
 import nars.learn.gng.Node;
 import nars.link.BLink;
-import nars.link.DefaultBLink;
 import nars.link.DependentBLink;
 import nars.truth.Truth;
 import nars.truth.Truthed;
