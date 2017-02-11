@@ -115,24 +115,26 @@ public class DynamicBeliefTableTest {
         n.believe($("f(x,y)"), (long)0, 1f, 0.9f);
 
         CompoundConcept prod = (CompoundConcept) n.concept($("f(x, y)"), false);
-        Truth t = prod.belief(n.time(), n.time.dur());
+        float dur = n.time.dur();
+
+        Truth t = prod.belief(n.time(), dur);
         System.out.println(t);
 
         CompoundConcept imgX = (CompoundConcept) n.concept($("(x --> (/,f,_,y))"), true);
-        assertEquals(t, imgX.belief(n.time(), n.time.dur()));
+        assertEquals(t, imgX.belief(n.time(), dur));
 
 
         CompoundConcept imgY = (CompoundConcept) n.concept($("(y --> (/,f,x,_))"), true);
-        assertEquals(t, imgY.belief(n.time(), n.time.dur()));
+        assertEquals(t, imgY.belief(n.time(), dur));
 
 
 
         n.run(16); //by now, structural decomposition should have also had the opportunity to derive the image
 
-        Truth t2 = prod.belief(n.time(), n.time.dur());
+        Truth t2 = prod.belief(n.time(), dur);
 
-        assertEquals(t2, imgX.belief(n.time(), n.time.dur()));
-        assertEquals(t2, imgY.belief(n.time(), n.time.dur()));
+        assertEquals(t2, imgX.belief(n.time(), dur));
+        assertEquals(t2, imgY.belief(n.time(), dur));
 
     }
 

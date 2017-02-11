@@ -47,7 +47,7 @@ public class BagTest {
 
     @Test
     public void testBasicInsertionRemovalHijack() {
-        testBasicInsertionRemoval(new HijackBag(2, 1, maxBlend, rng()));
+        testBasicInsertionRemoval(new HijackBag(1, 1, maxBlend, rng()));
     }
 
     public void testBasicInsertionRemoval(Bag<String> c) {

@@ -174,14 +174,14 @@ public class ConceptBagControl implements Control, Consumer<DerivedTask> {
         meter.miss();
     }
 
-    /** called when a concept is displaced from the concept bag */
-    protected void sleep(@NotNull Concept c) {
-        NAR n = this.nar;
-
-        n.setState(c, conceptBuilder.sleep());
-
-        n.emotion.alert(1f / active.size());
-    }
+//    /** called when a concept is displaced from the concept bag */
+//    protected void sleep(@NotNull Concept c) {
+//        NAR n = this.nar;
+//
+//        n.setState(c, conceptBuilder.sleep());
+//
+//        n.emotion.alert(1f / active.size());
+//    }
 
 
 
@@ -252,18 +252,6 @@ public class ConceptBagControl implements Control, Consumer<DerivedTask> {
 //            }
 //        }
 
-        @Override
-        public void clear() {
-            forEach((BLink<Concept> v) -> {
-
-                Concept c = v.get();
-                sleep(c);
-                //c.put(this, null);
-
-                //TODO clear BudgetSavings in the meta maps
-            }); //HACK allow opportunity to process removals
-            super.clear();
-        }
 
 
 
@@ -296,28 +284,30 @@ public class ConceptBagControl implements Control, Consumer<DerivedTask> {
         }*/
 
 
-        @Override
-        public final void onRemoved(@NotNull BLink<Concept> v) {
-                Concept c  = v.get();
-                sleep(c);
-
-                /*if (value.priIfFiniteElseNeg1() > Param.BUDGET_EPSILON) {
-                    BudgetSavings s = new BudgetSavings(value, now);
-                    if (!s.isDeleted()) {
-                        c.put(this, s);
-                    }
-                }*/
-        }
-
-        @Override
-        public @Nullable BLink<Concept> remove(@NotNull Concept x) {
-            BLink<Concept> r = super.remove(x);
-            if (r!=null) {
-                sleep(x);
-            }
-            return r;
-        }
-
+//        @Override
+//        public final void onRemoved(@NotNull BLink<Concept> v) {
+//            super.onRemoved(v);
+//
+//            Concept c  = v.get();
+//            sleep(c);
+//
+//                /*if (value.priIfFiniteElseNeg1() > Param.BUDGET_EPSILON) {
+//                    BudgetSavings s = new BudgetSavings(value, now);
+//                    if (!s.isDeleted()) {
+//                        c.put(this, s);
+//                    }
+//                }*/
+//        }
+//
+//        @Override
+//        public @Nullable BLink<Concept> remove(@NotNull Concept x) {
+//            BLink<Concept> r = super.remove(x);
+//            if (r!=null) {
+//                sleep(x);
+//            }
+//            return r;
+//        }
+//
 
     }
 

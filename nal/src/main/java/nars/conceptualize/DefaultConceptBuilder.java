@@ -8,6 +8,7 @@ import nars.Op;
 import nars.Task;
 import nars.bag.Bag;
 import nars.bag.CurveBag;
+import nars.bag.experimental.HijackBag;
 import nars.budget.BudgetMerge;
 import nars.concept.AtomConcept;
 import nars.concept.CompoundConcept;
@@ -85,10 +86,8 @@ public class DefaultConceptBuilder implements ConceptBuilder {
     @Nullable
     final Concept newConcept(@NotNull Compound t) {
 
-//        Map map1 = newBagMap(DEFAULT_CONCEPT_LINK_MAP_CAPACITY);
-//        Map map2 =
-//                map1; //shared
-//                //newBagMap(DEFAULT_CONCEPT_LINK_MAP_CAPACITY);
+//        @NotNull Bag<Term> termbag = new HijackBag<>(3, BudgetMerge.maxBlend, nar.random);
+//        @NotNull Bag<Task> taskbag = new HijackBag<>(3, BudgetMerge.maxBlend, nar.random);
 
         Map sharedMap = newBagMap(t.volume());
         @NotNull Bag<Term> termbag = newBag(sharedMap);

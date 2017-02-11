@@ -557,7 +557,10 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
     public void clear() {
         synchronized (items) {
             //map is possibly shared with another bag. only remove the items from it which are present in items
-            items.forEach(x -> map.remove(x.get()));
+            items.forEach(x -> {
+                map.remove(x.get());
+                onRemoved(x);
+            });
             items.clear();
         }
     }

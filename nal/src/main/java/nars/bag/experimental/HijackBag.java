@@ -12,10 +12,7 @@ import org.eclipse.collections.impl.map.mutable.ConcurrentHashMapUnsafe;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Iterator;
-import java.util.List;
-import java.util.Objects;
-import java.util.Random;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.atomic.AtomicReferenceArray;
@@ -81,17 +78,24 @@ public class HijackBag<X> implements Bag<X> {
 
     public boolean setCapacity(int newCapacity) {
 
-        AtomicReferenceArray<BLink<X>> prev = map.get();
 
         if (!capacity.compareAndSet(newCapacity, newCapacity)) {
 
             List<BLink> removed = $.newArrayList();
 
+            final AtomicReferenceArray<BLink<X>>[] prev = new AtomicReferenceArray[1];
+
             AtomicReferenceArray<BLink<X>> next = newCapacity != 0 ? new AtomicReferenceArray<BLink<X>>(newCapacity) : EMPTY_ARRAY;
-            if (prev == this.map.getAndUpdate((x) -> (x.length() != newCapacity) ? next : x)) {
+            if (next == this.map.updateAndGet((x) -> {
+                if (x.length() != newCapacity) {
+                    prev[0] = x;
+                    return next;
+                }
+                else return x;
+            })) {
                 //copy items from the previous map into the new map. they will be briefly invisibile while they get transferred.  TODO verify
-                forEach(prev, true, (b) -> {
-                    size.decrementAndGet();
+                forEach(prev[0], false, (b) -> {
+                    size.decrementAndGet(); //decrement size in any case. it will be re-incremented if the value was accepted during the following put
                     if (putLink(b) == null) {
                         removed.add(b);
                     }
@@ -232,6 +236,7 @@ public class HijackBag<X> implements Bag<X> {
         if (!merged) {
             if ((add || remove) && found != null) {
                 size.decrementAndGet();
+                found.delete(); //ensure deleted
                 onRemoved(found);
             }
 
@@ -305,14 +310,18 @@ public class HijackBag<X> implements Bag<X> {
 
 
     @Override
-    public BLink<X> put(@NotNull X x, @NotNull Budgeted b, float scale, @Nullable MutableFloat overflowing) {
+    public BLink<X> put(@NotNull X x, @NotNull Budgeted b, float scale, /* TODO */ @Nullable MutableFloat overflowing) {
 
         BLink<X> bb;
         if (b instanceof BLink) {
             bb = (BLink) b;
         } else {
             bb = newLink(x, null);
-            bb.setBudget(b);
+            float p = b.pri();
+            if (p!=p)
+                return null; //deleted
+            float q = b.qua();
+            bb.setBudget(p, q);
         }
 
         BLink<X> y = update(x, bb, scale);
@@ -398,21 +407,22 @@ public class HijackBag<X> implements Bag<X> {
         //TODO detect when the array is completely empty after 1 iteration through it in case the scan limit > 1.0
 
         //randomly choose traversal direction
-        int di = random.nextBoolean() ? +1 : -1;
-
+        boolean di = random.nextBoolean();
 
         while ((n > 0) && (j < jLimit) /* prevent infinite looping */) {
-            //int m = ((i += di) & (c - 1));
-            int m = i(c, i += di, j);
 
-            //slight chance these values may be inconsistently paired. TODO use CAS double-checked access
-            BLink<X> v = map.get(m);
+            BLink<X> v = map.get(i);
+            if (di) {
+                if (++i == c) i = 0;
+            } else {
+                if (--i == -1) i = c-1;
+            }
+
 
             if (v != null) {
 
                 float p = v.pri();
                 if (p == p) {
-
 
                     if ((r < p) || (r < p + tolerance(j, jLimit, n, batchSize, c))) {
                         if (target.test(v)) {
@@ -423,8 +433,10 @@ public class HijackBag<X> implements Bag<X> {
 
                 } else {
                     //early deletion nullify
-                    if (map.compareAndSet(m, v, null))
-                        size.decrementAndGet();
+//                    if (map.compareAndSet(m, v, null)) {
+//                        size.decrementAndGet();
+//                        onRemoved(v);
+//                    }
                 }
             }
             j++;
@@ -451,16 +463,13 @@ public class HijackBag<X> implements Bag<X> {
         if (c == 0)
             return;
 
-        int j = 0;
-
-        while (j < c) {
-            int m = i(c, j++);
-
-            BLink<X> v = map.get(m);
+        int j = -1;
+        while (++j < c) {
+            BLink<X> v = map.get(j);
 
             if (v != null) {
                 float p = v.pri();
-                if (acceptDeleted || (p == p)) /* NaN? */ {
+                if (acceptDeleted || (p == p) /* NaN? */) {
                     e.accept(v);
                 } else {
                     /*if (map.compareAndSet(m, v, null))
@@ -500,6 +509,11 @@ public class HijackBag<X> implements Bag<X> {
     }
 
 
+    @Override
+    public Spliterator<BLink<X>> spliterator() {
+        return stream().spliterator();
+    }
+
     @NotNull
     @Override
     public Iterator<BLink<X>> iterator() {
@@ -525,10 +539,11 @@ public class HijackBag<X> implements Bag<X> {
 
         final float[] min = {Float.POSITIVE_INFINITY};
         final float[] max = {Float.NEGATIVE_INFINITY};
+        final int[] count = {0};
 
         forEach((BLink<X> f) -> {
             float p = f.priSafe(0);
-
+            count[0]++;
             if (p > max[0]) max[0] = p;
             if (p < min[0]) min[0] = p;
             mass[0] += p;
@@ -545,6 +560,7 @@ public class HijackBag<X> implements Bag<X> {
         }
 
         this.mass = mass[0];
+        this.size.set(count[0]);
 
 //        Forget f;
 //        if (existingMass > 0 && pressure > 0) {
