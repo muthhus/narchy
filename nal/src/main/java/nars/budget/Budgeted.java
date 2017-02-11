@@ -1,7 +1,6 @@
 package nars.budget;
 
 import jcog.Util;
-import nars.NAR;
 import nars.Param;
 import org.jetbrains.annotations.NotNull;
 

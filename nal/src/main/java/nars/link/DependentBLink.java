@@ -2,7 +2,6 @@ package nars.link;
 
 import nars.budget.BudgetMerge;
 import nars.budget.Budgeted;
-import nars.budget.Prioritized;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -35,8 +34,8 @@ public class DependentBLink<X extends Budgeted> extends RawBLink<X> {
     }
 
     @Override
-    public DependentBLink<X> cloneZero() {
-        return new DependentBLink<>(id, 0, Float.NaN);
+    public DependentBLink<X> cloneZero(float q) {
+        return new DependentBLink<>(id, 0, q);
     }
 
     @Override

@@ -49,8 +49,8 @@ public class RawBLink<X> extends RawBudget implements BLink<X> {
     }
 
     @Override
-    public RawBLink<X> cloneZero() {
-        return new RawBLink<>(id, 0, Float.NaN);
+    public RawBLink<X> cloneZero(float q) {
+        return new RawBLink<>(id, 0, q);
     }
 
     @Override

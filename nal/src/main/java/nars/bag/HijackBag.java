@@ -6,7 +6,6 @@ import nars.Param;
 import nars.budget.Budget;
 import nars.budget.BudgetMerge;
 import nars.link.BLink;
-import nars.link.RawBLink;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.eclipse.collections.impl.map.mutable.ConcurrentHashMapUnsafe;
 import org.jetbrains.annotations.NotNull;

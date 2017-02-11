@@ -11,7 +11,6 @@ import nars.Narsese.NarseseException;
 import nars.attention.Activation;
 import nars.bag.Bag;
 import nars.budget.Budget;
-import nars.budget.Budgeted;
 import nars.budget.Prioritized;
 import nars.concept.AtomConcept;
 import nars.concept.CompoundConcept;

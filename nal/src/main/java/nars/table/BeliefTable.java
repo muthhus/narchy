@@ -3,7 +3,6 @@ package nars.table;
 import nars.NAR;
 import nars.Task;
 import nars.budget.Budget;
-import nars.budget.Budgeted;
 import nars.budget.Prioritized;
 import nars.concept.CompoundConcept;
 import nars.concept.dynamic.DynamicBeliefTable;

@@ -4,7 +4,6 @@ import jcog.Util;
 import jcog.data.MutableInteger;
 import nars.NAR;
 import nars.Task;
-import nars.bag.ArrayBag;
 import nars.bag.Bag;
 import nars.bag.HijackBag;
 import nars.budget.BudgetMerge;
@@ -234,8 +233,8 @@ public abstract class STMClustered extends STM {
         }
 
         @Override
-        public TLink cloneZero() {
-            return new TLink(id, 0, Float.NaN);
+        public TLink cloneZero(float q) {
+            return new TLink(id, 0, q);
         }
 
         @Override

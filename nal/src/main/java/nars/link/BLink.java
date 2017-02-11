@@ -10,7 +10,8 @@ public interface BLink<X> extends PLink<X>, Budget {
 
     BLink<X> cloneScaled(BudgetMerge merge, float scale);
 
-    BLink<X> cloneZero();
+    /** set priority 0, quality=this.quality */
+    BLink<X> cloneZero(float q);
 
 
 

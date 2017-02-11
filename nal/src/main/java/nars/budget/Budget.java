@@ -219,7 +219,7 @@ public interface Budget extends Budgeted {
     }
 
     default void quaMult(float factor) {
-        setQuality(qua() * factor);
+        setQua(qua() * factor);
     }
 
     default boolean equals(Budgeted b, float epsilon) {
@@ -238,7 +238,7 @@ public interface Budget extends Budgeted {
 
 
 
-    void setQuality(float q);
+    void setQua(float q);
 
 
     default void orPriority(float v) {
@@ -249,7 +249,7 @@ public interface Budget extends Budgeted {
     }
 
     default void orQuality(float v) {
-        setQuality(BudgetFunctions.or(qua(), v));
+        setQua(BudgetFunctions.or(qua(), v));
     }
 
 
@@ -386,7 +386,7 @@ public interface Budget extends Budgeted {
 
     default void mul(float pf, float qf) {
         setPriority(pri()*pf);
-        setQuality(qua()*qf);
+        setQua(qua()*qf);
     }
     default Budget multiplied(float pf, float qf) {
         mul(pf, qf);

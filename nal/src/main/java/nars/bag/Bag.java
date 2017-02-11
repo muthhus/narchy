@@ -11,7 +11,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintStream;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.function.Consumer;

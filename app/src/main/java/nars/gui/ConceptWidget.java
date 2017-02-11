@@ -2,7 +2,6 @@ package nars.gui;
 
 import com.jogamp.opengl.GL2;
 import nars.NAR;
-import nars.Task;
 import nars.bag.ArrayBag;
 import nars.budget.BudgetMerge;
 import nars.concept.Concept;

@@ -7,8 +7,6 @@ import nars.Param;
 import nars.budget.BudgetMerge;
 import nars.budget.Prioritized;
 import nars.link.BLink;
-import nars.link.RawBLink;
-import nars.link.DependentBLink;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -367,21 +365,18 @@ public class ArrayBag<X> extends SortedListTable<X, BLink<X>> implements Bag<X,B
         }
 
         BLink<X> v = map.compute(key, (k, existing) ->{
-
-            if (existing!=null) {
-                if (!existing.isDeleted())
-                    return existing;
-            }
-
-            return b.cloneZero();
+            if (existing!=null && !existing.isDeleted())
+                return existing;
+            else
+                return b.cloneZero(Float.NaN);
         });
 
-        float vq = v.qua();
-        boolean isNew = (vq!=vq) /* NaN */;
         float pBefore;
+        float vq = v.qua();
+        boolean isNew = (vq!=vq);
         if (isNew) {
+            v.setQua(b.qua());
             pBefore = 0;
-            v.setBudget(0, b.qua()); //use the incoming quality.  budget will be merged
         } else {
             pBefore = v.priSafe(0);
         }

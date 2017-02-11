@@ -8,7 +8,6 @@ import nars.NAgent;
 import nars.Task;
 import nars.attention.Forget;
 import nars.bag.ArrayBag;
-import nars.bag.Bag;
 import nars.bag.Bagregate;
 import nars.bag.HijackBag;
 import nars.budget.BudgetMerge;

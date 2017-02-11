@@ -234,9 +234,9 @@ public abstract class AbstractTask extends RawBudget implements Task {
             setPriority(n.priorityDefault(punc));
 
             if (isBeliefOrGoal()) {
-                setQuality(BudgetFunctions.truthToQuality(truth()));
+                setQua(BudgetFunctions.truthToQuality(truth()));
             } else if (!isCommand()) {
-                setQuality(n.qualityDefault(punc));
+                setQua(n.qualityDefault(punc));
             }
         }
 

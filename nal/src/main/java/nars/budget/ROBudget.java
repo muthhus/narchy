@@ -31,7 +31,7 @@ public final class ROBudget implements Budget {
 
 
     @Override
-    public void setQuality(float q) {
+    public void setQua(float q) {
         throw new UnsupportedOperationException();
     }
 

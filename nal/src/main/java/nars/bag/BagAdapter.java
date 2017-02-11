@@ -1,6 +1,5 @@
 package nars.bag;
 
-import nars.budget.Budgeted;
 import nars.link.BLink;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
