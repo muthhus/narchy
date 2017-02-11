@@ -195,8 +195,8 @@ abstract public class NAgents extends NAgent {
                 return new HijackBag<>(activeConcepts, 5, BudgetMerge.maxBlend, random ) {
                     @Override
                     public Forget forget(float rate) {
-                        float memoryForget = 0.9f;
-                        return new Forget(rate, memoryForget, 0.9f);
+                        float memoryForget = 0.7f;
+                        return new Forget(rate, memoryForget, memoryForget);
                     }
                 };
             }

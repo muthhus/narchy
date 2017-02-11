@@ -79,7 +79,7 @@ public class HijackBag<X> implements Bag<X> {
     public boolean setCapacity(int newCapacity) {
 
 
-        if (!capacity.compareAndSet(newCapacity, newCapacity)) {
+        if (capacity.getAndSet(newCapacity)!=newCapacity) {
 
             List<BLink> removed = $.newArrayList();
 
@@ -148,9 +148,12 @@ public class HijackBag<X> implements Bag<X> {
         final int ticket = add ? busy(hash) : Integer.MIN_VALUE /* N/A for get or remove */;
 
 
+        int i = i(c, hash);
+
         try {
             for (int r = 0; r < reprobes; r++) {
-                int i = i(c, hash, r);
+                i++;
+                if (i == c) i = 0; //wrap-around
 
                 BLink<X> ii = map.get(i);
 
@@ -162,7 +165,9 @@ public class HijackBag<X> implements Bag<X> {
                         targetPri = Float.NEGATIVE_INFINITY;
                     }
                 } else {
-                    if (equals(x, ii.get())) { //existing
+                    X iiv = ii.get();
+                    boolean sameInstance;
+                    if ((sameInstance = (iiv == x)) || equals(x, iiv)) { //existing
 
                         if (!add) {
 
@@ -178,8 +183,9 @@ public class HijackBag<X> implements Bag<X> {
                             float pBefore = ii.priSafe(0);
                             merge.apply(ii, adding, scale); //TODO overflow
                             pressure += ii.priSafe(0) - pBefore;
-                            added = ii;
+
                             targetIndex = -1;
+                            added = ii;
                             merged = true;
                         }
 
@@ -280,7 +286,7 @@ public class HijackBag<X> implements Bag<X> {
      * can override in subclasses for custom equality test
      */
     protected boolean equals(Object x, X y) {
-        return x == y || x.equals(y);
+        return x.equals(y);
     }
 
     @Nullable
@@ -441,6 +447,7 @@ public class HijackBag<X> implements Bag<X> {
             }
             j++;
         }
+
         return this;
     }
 
@@ -501,7 +508,7 @@ public class HijackBag<X> implements Bag<X> {
         //float selectionRate =  ((float)batchSize)/cap;
 
         /* raised polynomially to sharpen the selection curve, growing more slowly at the beginning */
-        return Util.sqr(Util.sqr(searchProgress * searchProgress) * searchProgress);
+        return /*Util.sqr*/(Util.sqr(searchProgress * searchProgress));// * searchProgress);
 
         /*
         float exp = 6;

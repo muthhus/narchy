@@ -455,17 +455,17 @@ public class Tetris extends NAgents {
         public static void main(String[] args) throws Narsese.NarseseException {
             //Param.DEBUG = true;
 
-            FrameTime clock = new FrameTime().dur(2);
+            FrameTime clock = new FrameTime().dur(3);
             NAR nar =
-                    NAgents.newMultiThreadNAR(4, clock);
+                    NAgents.newMultiThreadNAR(5, clock);
                     //NARBuilder.newALANN(clock, 4, 64, 5, 4, 1);
 
             //NAR nar = new TaskNAR(32 * 1024, new MultiThreadExecutioner(4, 4096), clock);
 //            MySTMClustered stm = new MySTMClustered(nar, 64, '.', 4, false, 2);
 //            MySTMClustered stmGoal = new MySTMClustered(nar, 16, '!', 2, false, 1);
 
-            nar.termVolumeMax.setValue(50);
-            nar.truthResolution.setValue(0.08f);
+            nar.termVolumeMax.setValue(64);
+            nar.truthResolution.setValue(0.04f);
 
 
             //nar.linkFeedbackRate.setValue(0.05f);
