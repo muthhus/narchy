@@ -15,7 +15,7 @@ import java.util.function.Consumer;
 /**
  * Created by me on 1/21/17.
  */
-abstract public class LeakOut extends Leak<Task> {
+abstract public class LeakOut extends Leak<Task,BLink<Task>> {
 
     public LeakOut(NAR nar, int capacity, float rate) {
         super(new ArrayBag<Task>(capacity, BudgetMerge.maxBlend, new ConcurrentHashMap<>()), rate, nar);

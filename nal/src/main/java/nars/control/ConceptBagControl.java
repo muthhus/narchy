@@ -38,7 +38,7 @@ public class ConceptBagControl implements Control, Consumer<DerivedTask> {
 
     private static final Logger logger = LoggerFactory.getLogger(ConceptBagControl.class);
 
-    public static final BudgetMerge CONCEPT_BAG_BLEND = BudgetMerge.maxBlend;
+    public static final BudgetMerge CONCEPT_BAG_BLEND = BudgetMerge.orBlend;
 
     final Deriver deriver;
 

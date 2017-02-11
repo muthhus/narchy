@@ -29,7 +29,7 @@ public class RawBLink<X> extends RawBudget implements BLink<X> {
     }
 
     public RawBLink(@NotNull X id, @NotNull Budgeted b) {
-        this(id, b.pri(), b.qua());
+        this(id, b.priSafe(0), b.qua());
     }
 
     public RawBLink(@NotNull X id, @NotNull Budgeted b, float scale) {
@@ -38,10 +38,14 @@ public class RawBLink<X> extends RawBudget implements BLink<X> {
 
     @Override
     public RawBLink<X> cloneScaled(BudgetMerge merge, float scale) {
-        RawBLink<X> adding2 = new RawBLink<X>(id);
-        adding2.setBudget(0, qua()); //use the incoming quality.  budget will be merged
-        merge.apply(adding2, this, scale);
-        return adding2;
+        if (scale!=1f) {
+            RawBLink<X> adding2 = new RawBLink<X>(id, 0, qua()); //use the incoming quality.  budget will be merged
+            merge.apply(adding2, this, scale);
+            return adding2;
+        } else {
+            //return new RawBLink(id, priSafe(0), qua());
+            return this;
+        }
     }
 
     @Override

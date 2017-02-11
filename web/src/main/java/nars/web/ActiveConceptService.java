@@ -130,7 +130,7 @@ public class ActiveConceptService extends PeriodicWebsocketService {
 
         IO.writeStringUTF(out, c.toString());
 
-        Bag<Term> b = c.termlinks();
+        Bag<Term,BLink<Term>> b = c.termlinks();
         b.forEach(termlinks, t -> {
             try {
                 IO.writeBudget(out, t);

@@ -10,25 +10,28 @@ import org.jetbrains.annotations.NotNull;
  * Adds an additional condition that deletes the link if the referenced
  * Budgeted is deleted.
  */
-public class DependentBLink<X extends Prioritized> extends RawBLink<X> {
+public class DependentBLink<X extends Budgeted> extends RawBLink<X> {
 
     public DependentBLink(@NotNull X id) {
-        super(id);
-        setPriority(id.pri());
-        if (id instanceof Budgeted)
-            setQuality(((Budgeted)id).qua());
+        super(id, id.priSafe(0), id.qua());
     }
+
     public DependentBLink(@NotNull X id, float p, float q) {
-        super(id);
-        setBudget(p, q);
+        super(id, p, q);
     }
 
     @Override
     public DependentBLink<X> cloneScaled(BudgetMerge merge, float scale) {
-        DependentBLink<X> adding2 = new DependentBLink<X>(id);
-        adding2.setBudget(0, qua()); //use the incoming quality.  budget will be merged
-        merge.apply(adding2, this, scale);
-        return adding2;
+
+        if (scale!=1f) {
+            DependentBLink<X> adding2 = new DependentBLink<X>(id, 0, qua()); //use the incoming quality.  budget will be merged
+            merge.apply(adding2, this, scale);
+            return adding2;
+        } else {
+            //return new DependentBLink(id, priSafe(0), qua());
+            return this;
+        }
+
     }
 
     @Override

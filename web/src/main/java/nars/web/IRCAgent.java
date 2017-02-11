@@ -55,7 +55,7 @@ public class IRCAgent extends IRC {
     private boolean hearTwenglish = false;
 
     final int wordDelayMS = 25; //for serializing tokens to events: the time in millisecond between each perceived (subvocalized) word, when the input is received simultaneously
-    private final Leak<Task> out;
+    private final Leak<Task,BLink<Task>> out;
 
     boolean trace = false;
 

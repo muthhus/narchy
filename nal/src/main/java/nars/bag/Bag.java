@@ -58,7 +58,7 @@ public interface Bag<K,V extends PLink<K>> extends Table<K, V>, Iterable<V> {
 
 
     default V put(@NotNull V x) {
-        return put(x.get(), x);
+        return put(x, 1f, null);
     }
 
     //        @Nullable
@@ -81,14 +81,11 @@ public interface Bag<K,V extends PLink<K>> extends Table<K, V>, Iterable<V> {
 
 
 
-    @Override default @Nullable V put(@NotNull K i, @NotNull V b) {
+    @Deprecated @Override default @Nullable V put(@NotNull K i, @NotNull V b) {
+        assert(b.get().equals(i));
         return put(i, b, 1f, null);
     }
 
-
-    default V put(@NotNull K k, @NotNull V b, @Nullable MutableFloat overflowing) {
-        return put(b, 1f, overflowing);
-    }
 
     default V put(@NotNull V b, float scale, @Nullable MutableFloat overflowing) {
         return put(b.get(), b, scale, overflowing);
@@ -603,7 +600,7 @@ public interface Bag<K,V extends PLink<K>> extends Table<K, V>, Iterable<V> {
         K x = b.get();
         if (contains(x))
             return false;
-        if (put(x, b, null)==null)
+        if (put(b, 1f, null)==null)
             return false;
         return true;
     }
