@@ -29,7 +29,7 @@ import static spacegraph.math.v3.v;
 
 public class ConceptWidget extends Cuboid<Term> implements Consumer<BLink<? extends Termed>> {
 
-    public final ArrayBag<TermEdge> edges;
+    public final ArrayBag<? extends TermEdge> edges;
 
 
     //caches a reference to the current concept
@@ -211,19 +211,18 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<BLink<? exte
         }
     }
 
-    @Override
-    public void accept(BLink<? extends Termed> tgt) {
+    @Override public void accept(BLink<? extends Termed> tgt) {
         Termed ttt = tgt.get();
         Term tt = ttt.term();
         if (!tt.equals(key)) {
             ConceptWidget at = (ConceptWidget) space.space.getIfActive(tt);
             if (at!=null) {
-                TermEdge ate = new TermEdge(at);
+//                TermEdge ate = new TermEdge(at);
 
-                BLink<TermEdge> x = edges.put(ate, tgt, bagMomentum, null);
-                if (x!=null) {
-                    x.get().add(tgt, !(ttt instanceof Task));
-                }
+//                BLink x = edges.put(ate, tgt, bagMomentum, null);
+//                if (x!=null) {
+//                    x.get().add(tgt, !(ttt instanceof Task));
+//                }
             }
         }
     }
@@ -274,7 +273,7 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<BLink<? exte
             return hash;
         }
 
-        public void update(BLink<TermEdge> ff) {
+        public void update(BLink<? extends TermEdge> ff) {
 
             float priSum = (termlinkPri + tasklinkPri);
 

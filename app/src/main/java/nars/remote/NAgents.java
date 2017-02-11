@@ -10,7 +10,7 @@ import nars.attention.Forget;
 import nars.bag.ArrayBag;
 import nars.bag.Bag;
 import nars.bag.Bagregate;
-import nars.bag.experimental.HijackBag;
+import nars.bag.HijackBag;
 import nars.budget.BudgetMerge;
 import nars.concept.Concept;
 import nars.conceptualize.DefaultConceptBuilder;
@@ -19,7 +19,7 @@ import nars.gui.BagChart;
 import nars.gui.Vis;
 import nars.index.term.map.CaffeineIndex;
 import nars.link.BLink;
-import nars.link.DefaultBLink;
+import nars.link.RawBLink;
 import nars.nar.Default;
 import nars.nar.NARBuilder;
 import nars.op.Leak;
@@ -191,7 +191,7 @@ abstract public class NAgents extends NAgent {
                 exe) {
 
             @Override
-            protected Bag<Concept> newConceptBag(int activeConcepts) {
+            protected HijackBag<Concept> newConceptBag(int activeConcepts) {
                 return new HijackBag<>(activeConcepts, 5, BudgetMerge.maxBlend, random ) {
                     @Override
                     public Forget forget(float rate) {
@@ -304,7 +304,7 @@ abstract public class NAgents extends NAgent {
     public static void chart(NAgents a) {
         NAR nar = a.nar;
 
-        BagChart<Task> taskChart = new BagChart<Task>(new Leak<Task>(new ArrayBag<Task>(16, BudgetMerge.plusBlend, new ConcurrentHashMap<>()), 0f, a.nar) {
+        BagChart<Task> taskChart = new BagChart<Task>(new Leak<Task,BLink<Task>>(new ArrayBag<Task>(16, BudgetMerge.plusBlend, new ConcurrentHashMap<>()), 0f, a.nar) {
 
 
             @Override
@@ -315,7 +315,7 @@ abstract public class NAgents extends NAgent {
             @Override
             protected void in(@NotNull Task task, Consumer<BLink<Task>> each) {
                 if (!task.isCommand() && !task.isDeleted())
-                    each.accept(new DefaultBLink<>(task, task, 0.1f));
+                    each.accept(new RawBLink<>(task, task, 0.1f));
             }
 
         }.bag, 16);

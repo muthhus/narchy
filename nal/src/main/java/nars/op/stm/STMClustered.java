@@ -4,10 +4,11 @@ import jcog.Util;
 import jcog.data.MutableInteger;
 import nars.NAR;
 import nars.Task;
+import nars.bag.ArrayBag;
 import nars.bag.Bag;
-import nars.bag.experimental.HijackBag;
+import nars.bag.HijackBag;
 import nars.budget.BudgetMerge;
-import nars.budget.Budgeted;
+import nars.budget.Prioritized;
 import nars.learn.gng.NeuralGasNet;
 import nars.learn.gng.Node;
 import nars.link.BLink;
@@ -31,8 +32,7 @@ import java.util.stream.StreamSupport;
 public abstract class STMClustered extends STM {
 
 
-    @Nullable
-    public final Bag<Task> input;
+    public final ThreadLocal<@Nullable Bag<Task, BLink<Task>>> input;
 
     final short clusters;
     public final int dims;
@@ -163,7 +163,7 @@ public abstract class STMClustered extends STM {
             final int[] subterms = {0};
             final int[] currentVolume = {0};
             return tasks.stream().
-                    filter(x -> x.get() != null).
+                    //filter(x -> x.get() != null).
                     collect(Collectors.groupingBy(tx -> {
 
                         Task x = tx.get();
@@ -220,13 +220,27 @@ public abstract class STMClustered extends STM {
             this.coord = getCoord(t);
         }
 
+        public TLink(@NotNull Task t, float p, float q) {
+            super(t, p, q);
+            this.coord = getCoord(t);
+        }
+
+        @Override
+        public DependentBLink<Task> cloneScaled(BudgetMerge merge, float scale) {
+            TLink adding2 = new TLink(id);
+            adding2.setBudget(0, qua()); //use the incoming quality.  budget will be merged
+            merge.apply(adding2, this, scale);
+            return adding2;
+        }
+
+        @Override
+        public TLink cloneZero() {
+            return new TLink(id, 0, Float.NaN);
+        }
 
         @Override
         public @Nullable Truth truth() {
-            Task x = get();
-            if (x == null)
-                return null;
-            return x.truth();
+            return get().truth();
         }
 
 
@@ -299,24 +313,30 @@ public abstract class STMClustered extends STM {
         this.punc = punc;
 
         //this.input = new ArrayBag<Task>(capacity.intValue(), BudgetMerge.maxBlend, new ConcurrentHashMap<>(capacity.intValue())) {
-        this.input = new HijackBag<Task>(capacity.intValue(), 4, BudgetMerge.maxBlend, nar.random) {
+        this.input = ThreadLocal.withInitial(() -> new HijackBag<Task>(capacity.intValue(), 4, BudgetMerge.maxBlend, nar.random) {
 
-            @NotNull
+//            @NotNull
+//            @Override
+//            public BLink<Task> newLink(@NotNull Task i, BLink<Task> exists) {
+//                if (!(exists instanceof TLink) || exists.isDeleted())
+//                    return new TLink(i);
+//                return exists;
+//            }
+
+
+
             @Override
-            public BLink<Task> newLink(@NotNull Task i, BLink<Task> exists) {
-                if (!(exists instanceof TLink) || exists.isDeleted())
-                    return new TLink(i);
-                return exists;
+            public void onRemoved(@NotNull BLink<Task> value) {
+                drop((TLink) value);
             }
 
 
-            @Override
-            public void onRemoved(@Nullable BLink<Task> value) {
-                if (value instanceof TLink)
-                    drop((TLink) value);
-            }
+//            @Override
+//            public void onRemoved(@Nullable BLink<Task> value) {
+//                drop((TLink) value);
+//            }
 
-        };
+        });
 
         this.net = new NeuralGasNet<TasksNode>(dims, clusters) {
             @NotNull
@@ -354,14 +374,14 @@ public abstract class STMClustered extends STM {
                 t.delete();
             }
 
-            input.setCapacity(capacity.intValue());
-            input.commit();
+            input.get().setCapacity(capacity.intValue());
+            input.get().commit();
 
             net.compact();
 
             now = nar.time();
 
-            input.forEach(t -> {
+            input.get().forEach(t -> {
                 if (t != null) {
                     TLink tt = (TLink) t;
                     tt.nearest().transfer(tt);
@@ -378,15 +398,14 @@ public abstract class STMClustered extends STM {
 
     @Override
     public void clear() {
-        input.clear();
+        input.get().clear();
     }
 
     @Override
     public void accept(@NotNull Task t) {
 
         if (t.punc() == punc) {
-
-            input.put(t, t.budget());
+            input.get().put(new TLink(t));
         }
 
     }
@@ -398,7 +417,7 @@ public abstract class STMClustered extends STM {
     }
 
     public int size() {
-        return input.size();
+        return input.get().size();
     }
 
     public void print(@NotNull PrintStream out) {
@@ -425,7 +444,7 @@ public abstract class STMClustered extends STM {
     }
 
     public DoubleSummaryStatistics bagStatistics() {
-        return StreamSupport.stream(input.spliterator(), false).mapToDouble(Budgeted::pri).summaryStatistics();
+        return StreamSupport.stream(input.get().spliterator(), false).mapToDouble(Prioritized::pri).summaryStatistics();
     }
 
 

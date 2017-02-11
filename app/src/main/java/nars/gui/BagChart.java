@@ -20,7 +20,7 @@ public class BagChart<X> extends TreeChart<BLink<X>> implements BiConsumer<BLink
 
     //protected long now;
     final AtomicBoolean busy = new AtomicBoolean(false);
-    private final Bag<X> bag;
+    private final Bag<X,BLink<X>> bag;
 
     public static void main(String[] args) {
         Default d = new Default(1024,50,2,2);
@@ -52,7 +52,7 @@ public class BagChart<X> extends TreeChart<BLink<X>> implements BiConsumer<BLink
 //        this(b, -1);
 //    }
 
-    public BagChart(@NotNull Bag<X> b, int limit) {
+    public BagChart(@NotNull Bag<X,BLink<X>> b, int limit) {
         super();
         this.bag = b;
         this.limit = limit;

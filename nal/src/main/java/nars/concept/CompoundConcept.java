@@ -9,6 +9,7 @@ import nars.bag.Bag;
 import nars.budget.BudgetMerge;
 import nars.conceptualize.DefaultConceptBuilder;
 import nars.conceptualize.state.ConceptState;
+import nars.link.BLink;
 import nars.table.*;
 import nars.term.Compound;
 import nars.term.Term;
@@ -30,9 +31,9 @@ import static nars.Param.TRUTH_EPSILON;
 public class CompoundConcept<T extends Compound> implements Concept, Termlike {
 
     @NotNull
-    private final Bag<Task> taskLinks;
+    private final Bag<Task,BLink<Task>> taskLinks;
     @NotNull
-    private final Bag<Term> termLinks;
+    private final Bag<Term,BLink<Term>> termLinks;
 
     /**
      * how incoming budget is merged into its existing duplicate quest/question
@@ -64,7 +65,7 @@ public class CompoundConcept<T extends Compound> implements Concept, Termlike {
      * @param termLinks
      * @param taskLinks
      */
-    public CompoundConcept(@NotNull T term, @NotNull Bag<Term> termLinks, @NotNull Bag<Task> taskLinks, @NotNull NAR nar) {
+    public CompoundConcept(@NotNull T term, @NotNull Bag<Term,BLink<Term>> termLinks, @NotNull Bag<Task,BLink<Task>> taskLinks, @NotNull NAR nar) {
 
         this.term = term;
         this.termLinks = termLinks;
@@ -101,13 +102,13 @@ public class CompoundConcept<T extends Compound> implements Concept, Termlike {
     }
 
     @Override
-    public @NotNull Bag<Task> tasklinks() {
+    public @NotNull Bag<Task,BLink<Task>> tasklinks() {
         return taskLinks;
     }
 
     @NotNull
     @Override
-    public Bag<Term> termlinks() {
+    public Bag<Term,BLink<Term>> termlinks() {
         return termLinks;
     }
 

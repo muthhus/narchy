@@ -32,7 +32,7 @@ public interface Table<K,V> extends Iterable<V> {
     }
 
     /** iterates in sorted order */
-    void forEachKey(@NotNull Consumer<K> each);
+    void forEachKey(@NotNull Consumer<? super K> each);
 
     int capacity();
 

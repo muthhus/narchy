@@ -6,6 +6,8 @@ import nars.Task;
 import nars.bag.Bag;
 import nars.budget.Budgeted;
 import nars.concept.Concept;
+import nars.link.DependentBLink;
+import nars.link.RawBLink;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
@@ -154,7 +156,7 @@ public class SpreadingActivation extends Activation implements ObjectFloatProced
                 }
             } else if (linkedTerm instanceof Concept) {
                 //activate (but not link to) Atom's termlinks
-                Bag<Term> tlinks = ((Concept) linkedTerm).termlinks();
+                Bag<Term,?> tlinks = ((Concept) linkedTerm).termlinks();
                 int n = tlinks.size();
                 if (n > 0) {
                     float maxSubScale = ((1f - parentRetention) * scale) / (n);
@@ -194,11 +196,11 @@ public class SpreadingActivation extends Activation implements ObjectFloatProced
 
     void tasklink(Concept target, float scale) {
         Task src = (Task) in;
-        target.tasklinks().put(src, src, scale, null);
+        target.tasklinks().put(src, new DependentBLink(src), scale, null);
     }
 
     void termlink(Concept from, Term to, float scale) {
-        from.termlinks().put(to, in, scale, linkOverflow);
+        from.termlinks().put(to, new RawBLink(to, in), scale, linkOverflow);
     }
 
 

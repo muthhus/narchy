@@ -26,7 +26,7 @@ import static jcog.Util.clamp;
  * <p>
  * TODO make a CurveSampling interface with at least 2 implementations: Random and LinearScanning. it will use this instead of the 'boolean random' constructor argument
  */
-public class CurveBag<V> extends ArrayBag<V> implements Bag<V> {
+public class CurveBag<V> extends ArrayBag<V>  {
 
 
     @NotNull

@@ -14,15 +14,15 @@ import java.util.function.Predicate;
 /**
  * proxies to a delegate bag
  */
-public class BagAdapter<X> implements Bag<X> {
+public class BagAdapter<X> implements Bag<X,BLink<X>> {
 
-    @NotNull Bag<X> bag;
+    @NotNull Bag<X,BLink<X>> bag;
 
-    public BagAdapter(Bag<X> delegate) {
+    public BagAdapter(Bag<X,BLink<X>> delegate) {
         set(delegate);
     }
 
-    public void set(Bag<X> delegate) {
+    public void set(Bag<X,BLink<X>> delegate) {
         bag = delegate;
     }
 
@@ -47,7 +47,7 @@ public class BagAdapter<X> implements Bag<X> {
     }
 
     @Override
-    public void forEachKey(Consumer<X> each) {
+    public void forEachKey(Consumer<? super X> each) {
         bag.forEachKey(each);
     }
 
@@ -73,13 +73,13 @@ public class BagAdapter<X> implements Bag<X> {
     }
 
     @Override
-    public BLink<X> put(@NotNull X i, @NotNull Budgeted b, float scale, @Nullable MutableFloat overflowing) {
+    public BLink<X> put(@NotNull X i, @NotNull BLink<X> b, float scale, @Nullable MutableFloat overflowing) {
         return bag.put(i, b, scale, overflowing);
     }
 
     @NotNull
     @Override
-    public Bag<X> sample(int n, @NotNull Predicate<? super BLink<X>> target) {
+    public Bag<X,BLink<X>> sample(int n, @NotNull Predicate<? super BLink<X>> target) {
         bag.sample(n, target);
         return this;
     }
@@ -123,7 +123,7 @@ public class BagAdapter<X> implements Bag<X> {
 
     @NotNull
     @Override
-    public Bag<X> commit(Function<Bag, Consumer<BLink>> update) {
+    public Bag<X,BLink<X>> commit(Function<Bag, Consumer<BLink>> update) {
         bag.commit(update);
         return this;
     }
@@ -151,7 +151,7 @@ public class BagAdapter<X> implements Bag<X> {
     }
 
     @Override
-    public Bag<X> commit() {
+    public Bag<X,BLink<X>> commit() {
         bag.commit();
         return this;
     }

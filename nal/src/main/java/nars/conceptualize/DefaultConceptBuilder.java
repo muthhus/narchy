@@ -8,7 +8,6 @@ import nars.Op;
 import nars.Task;
 import nars.bag.Bag;
 import nars.bag.CurveBag;
-import nars.bag.experimental.HijackBag;
 import nars.budget.BudgetMerge;
 import nars.concept.AtomConcept;
 import nars.concept.CompoundConcept;
@@ -17,6 +16,7 @@ import nars.concept.dynamic.DynamicConcept;
 import nars.concept.dynamic.DynamicTruthModel;
 import nars.conceptualize.state.ConceptState;
 import nars.conceptualize.state.DefaultConceptState;
+import nars.link.BLink;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
@@ -64,7 +64,7 @@ public class DefaultConceptBuilder implements ConceptBuilder {
 //    }
 
     @NotNull
-    public <X> Bag<X> newBag(@NotNull Map m) {
+    public <X> Bag<X,BLink<X>> newBag(@NotNull Map m) {
         return new CurveBag<>(8, defaultCurveSampler, BudgetMerge.maxBlend, m);
     }
 
@@ -86,12 +86,12 @@ public class DefaultConceptBuilder implements ConceptBuilder {
     @Nullable
     final Concept newConcept(@NotNull Compound t) {
 
-//        @NotNull Bag<Term> termbag = new HijackBag<>(3, BudgetMerge.maxBlend, nar.random);
-//        @NotNull Bag<Task> taskbag = new HijackBag<>(3, BudgetMerge.maxBlend, nar.random);
+//        @NotNull Bag<Term,BLink<Term>> termbag = new HijackBag<>(3, BudgetMerge.maxBlend, nar.random);
+//        @NotNull Bag<Task,BLink<Task>> taskbag = new HijackBag<>(3, BudgetMerge.maxBlend, nar.random);
 
         Map sharedMap = newBagMap(t.volume());
-        @NotNull Bag<Term> termbag = newBag(sharedMap);
-        @NotNull Bag<Task> taskbag = newBag(sharedMap);
+        @NotNull Bag<Term,BLink<Term>> termbag = newBag(sharedMap);
+        @NotNull Bag<Task,BLink<Task>> taskbag = newBag(sharedMap);
 
         DynamicTruthModel dmt = null;
 

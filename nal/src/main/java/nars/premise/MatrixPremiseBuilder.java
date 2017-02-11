@@ -47,7 +47,7 @@ public class MatrixPremiseBuilder extends PremiseBuilder {
         return newPremiseMatrix(c, tasklinks, termlinks, c.tasklinks(), c.termlinks(), deriver, target, nar);
     }
 
-    public int newPremiseMatrix(@NotNull Concept c, int tasklinks, MutableIntRange termlinks, @NotNull Bag<Task> tasklinkBag, @NotNull Bag<Term> termlinkBag, @NotNull Deriver deriver, @NotNull Consumer<DerivedTask> target, @NotNull NAR nar) {
+    public int newPremiseMatrix(@NotNull Concept c, int tasklinks, MutableIntRange termlinks, @NotNull Bag<Task,BLink<Task>> tasklinkBag, @NotNull Bag<Term,BLink<Term>> termlinkBag, @NotNull Deriver deriver, @NotNull Consumer<DerivedTask> target, @NotNull NAR nar) {
 
         c.commit();
 
@@ -69,14 +69,14 @@ public class MatrixPremiseBuilder extends PremiseBuilder {
     /**
      * derives matrix of: concept => (tasklink x termlink) => premises
      */
-    public int newPremiseMatrix(@NotNull Concept c, MutableIntRange termlinks, @NotNull Consumer<DerivedTask> target, @NotNull Deriver deriver, @NotNull Bag<Term> termlinkBag, List<BLink<Task>> taskLinks, @NotNull NAR nar) {
+    public int newPremiseMatrix(@NotNull Concept c, MutableIntRange termlinks, @NotNull Consumer<DerivedTask> target, @NotNull Deriver deriver, @NotNull Bag<Term,BLink<Term>> termlinkBag, List<BLink<Task>> taskLinks, @NotNull NAR nar) {
 
         int count = 0;
 
         int numTaskLinks = taskLinks.size();
         int termlinksSampled = (int) Math.ceil(termlinks.hi());
 
-        FasterList<BLink<? extends Term>> termsBuffer = (FasterList) $.newArrayList(termlinksSampled);
+        FasterList<BLink<Term>> termsBuffer = (FasterList) $.newArrayList(termlinksSampled);
         termlinkBag.sample(termlinksSampled, termsBuffer::add);
 
         float priFactor;

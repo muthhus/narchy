@@ -7,6 +7,7 @@ import nars.attention.Activation;
 import nars.bag.Bag;
 import nars.concept.Concept;
 import nars.conceptualize.state.ConceptState;
+import nars.link.BLink;
 import nars.table.BeliefTable;
 import nars.table.QuestionTable;
 import nars.term.Compound;
@@ -29,11 +30,11 @@ public class TermjectConcept<X> implements Concept, Termject<X> {
 
     @NotNull
     private final Termject<X> termject;
-    private final Bag<Term> termLinks;
-    private final Bag<Task> taskLinks;
+    private final Bag<Term,BLink<Term>> termLinks;
+    private final Bag<Task,BLink<Task>> taskLinks;
     private ConceptState policy;
 
-    public TermjectConcept(@NotNull Termject<X> t, Bag<Term> termLinks, Bag<Task> taskLinks) {
+    public TermjectConcept(@NotNull Termject<X> t, Bag<Term,BLink<Term>> termLinks, Bag<Task,BLink<Task>> taskLinks) {
         this.termject = t;
         this.termLinks = termLinks;
         this.taskLinks = taskLinks;
@@ -168,12 +169,12 @@ public class TermjectConcept<X> implements Concept, Termject<X> {
 
 
     @Override
-    public @NotNull Bag<Task> tasklinks() {
+    public @NotNull Bag<Task,BLink<Task>> tasklinks() {
         return taskLinks;
     }
 
     @Override
-    public @NotNull Bag<Term> termlinks() {
+    public @NotNull Bag<Term,BLink<Term>> termlinks() {
         return termLinks;
     }
 

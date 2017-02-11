@@ -1,12 +1,12 @@
-package nars.bag.experimental;
+package nars.bag;
 
 import jcog.Util;
 import nars.$;
 import nars.Param;
-import nars.bag.Bag;
+import nars.budget.Budget;
 import nars.budget.BudgetMerge;
-import nars.budget.Budgeted;
 import nars.link.BLink;
+import nars.link.RawBLink;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.eclipse.collections.impl.map.mutable.ConcurrentHashMapUnsafe;
 import org.jetbrains.annotations.NotNull;
@@ -27,7 +27,7 @@ import java.util.stream.Stream;
  * <p>
  * it uses a AtomicReferenceArray<> to hold the data but Unsafe CAS operations might perform better (i couldnt get them to work like NBHM does).  this is necessary when an index is chosen for replacement that it makes certain it was replacing the element it thought it was (that it hadnt been inter-hijacked by another thread etc).  on an insert i issue a ticket to the thread and store this in a small ConcurrentHashMap<X,Integer>.  this spins in a busy putIfAbsent loop until it can claim the ticket for the object being inserted. this is to prevent the case where two threads try to insert the same object and end-up puttnig two copies in adjacent hash indices.  this should be rare so the putIfAbsent should usually work on the first try.  when it exits the update critical section it removes the key,value ticket freeing it for another thread.  any onAdded and onRemoved subclass event handling happen outside of this critical section, and all cases seem to be covered.
  */
-public class HijackBag<X> implements Bag<X> {
+public class HijackBag<X> implements Bag<X,BLink<X>> {
 
     public static final AtomicReferenceArray EMPTY_ARRAY = new AtomicReferenceArray(0);
     private final Random random;
@@ -85,6 +85,8 @@ public class HijackBag<X> implements Bag<X> {
 
             final AtomicReferenceArray<BLink<X>>[] prev = new AtomicReferenceArray[1];
 
+            //ensures sure only the thread successful in changing the map instance is the one responsible for repopulating it,
+            //in the case of 2 simultaneous threads deciding to allocate a replacement:
             AtomicReferenceArray<BLink<X>> next = newCapacity != 0 ? new AtomicReferenceArray<BLink<X>>(newCapacity) : EMPTY_ARRAY;
             if (next == this.map.updateAndGet((x) -> {
                 if (x.length() != newCapacity) {
@@ -96,7 +98,7 @@ public class HijackBag<X> implements Bag<X> {
                 //copy items from the previous map into the new map. they will be briefly invisibile while they get transferred.  TODO verify
                 forEach(prev[0], false, (b) -> {
                     size.decrementAndGet(); //decrement size in any case. it will be re-incremented if the value was accepted during the following put
-                    if (putLink(b) == null) {
+                    if (put(b) == null) {
                         removed.add(b);
                     }
                 });
@@ -209,9 +211,7 @@ public class HijackBag<X> implements Bag<X> {
             if (targetIndex != -1) {
                 if (targetPri == Float.NEGATIVE_INFINITY) {
 
-                    BLink<X> adding2 = newLink((X) x, null);
-                    adding2.setBudget(0, adding.qua()); //use the incoming quality.  budget will be merged
-                    merge.apply(adding2, adding, scale);
+                    BLink<X> adding2 = adding.cloneScaled(merge, scale);
 
                     //insert to empty
                     if (map.compareAndSet(targetIndex, null, adding2)) {
@@ -236,7 +236,7 @@ public class HijackBag<X> implements Bag<X> {
         }
 
         if (add) {
-            unbusy(hash, ticket);
+            unbusy(hash/*, ticket*/);
         }
 
         if (!merged) {
@@ -252,24 +252,25 @@ public class HijackBag<X> implements Bag<X> {
             }
         }
 
-        /*if (Param.DEBUG)*/
-        {
-            int cnt = size.get();
-            if (cnt > c) {
-                //throw new RuntimeException("overflow");
-            } else if (cnt < 0) {
-                //throw new RuntimeException("underflow");
-            }
-        }
+//        /*if (Param.DEBUG)*/
+//        {
+//            int cnt = size.get();
+//            if (cnt > c) {
+//                //throw new RuntimeException("overflow");
+//            } else if (cnt < 0) {
+//                //throw new RuntimeException("underflow");
+//            }
+//        }
 
 
         return !add ? found : added;
 
     }
 
-    private static int i(int c, int hash, int r) {
+
+    /*private static int i(int c, int hash, int r) {
         return (int) ((Integer.toUnsignedLong(hash) + r) % c);
-    }
+    }*/
 
     private static int i(int c, int hash) {
         return (int) (Integer.toUnsignedLong(hash) % c);
@@ -316,19 +317,19 @@ public class HijackBag<X> implements Bag<X> {
 
 
     @Override
-    public BLink<X> put(@NotNull X x, @NotNull Budgeted b, float scale, /* TODO */ @Nullable MutableFloat overflowing) {
+    public BLink<X> put(@NotNull X x, @NotNull BLink<X> bb, float scale, /* TODO */ @Nullable MutableFloat overflowing) {
 
-        BLink<X> bb;
-        if (b instanceof BLink) {
-            bb = (BLink) b;
-        } else {
-            bb = newLink(x, null);
-            float p = b.pri();
-            if (p!=p)
-                return null; //deleted
-            float q = b.qua();
-            bb.setBudget(p, q);
-        }
+//        BLink<X> bb;
+//        if (b instanceof BLink) {
+//            bb = (BLink) b;
+//        } else {
+//            float p = b.pri();
+//            if (p!=p)
+//                return null; //deleted
+//            float q = b.qua();
+//            bb = ArrayBag.newLink(x, null);
+//            bb.setBudget(p, q);
+//        }
 
         BLink<X> y = update(x, bb, scale);
 
@@ -348,10 +349,11 @@ public class HijackBag<X> implements Bag<X> {
         return ticket;
     }
 
-    public void unbusy(int x, int ticket) {
-        boolean freed = busy.remove(x, ticket);
-        if (!freed)
-            throw new RuntimeException("insertion fault");
+    public void unbusy(int x/*, int ticket*/) {
+        /*boolean freed = */
+        Integer freed = busy.remove(x/*, ticket*/);
+        /*if (freed==null || freed!=ticket)
+            throw new RuntimeException("insertion fault");*/
     }
 
     /**
@@ -361,7 +363,8 @@ public class HijackBag<X> implements Bag<X> {
      */
     private float range(float p) {
         if (p != p)
-            return p;
+            throw new Budget.BudgetException();
+            //return p;
         if (p > priMax) priMax = p;
         if (p < priMin) priMin = p;
         return p;
@@ -395,12 +398,14 @@ public class HijackBag<X> implements Bag<X> {
 
     @Nullable
     @Override
-    public Bag<X> sample(int n, @NotNull Predicate<? super BLink<X>> target) {
-        if (isEmpty())
-            return null;
-
+    public HijackBag<X> sample(int n, @NotNull Predicate<? super BLink<X>> target) {
         AtomicReferenceArray<BLink<X>> map = this.map.get();
         int c = map.length();
+        if (c == 0)
+            return null;
+
+        /*if (isEmpty())
+            return null;*/
 
         int jLimit = (int) Math.ceil(c * SCAN_ITERATIONS);
 
@@ -539,7 +544,7 @@ public class HijackBag<X> implements Bag<X> {
 
     @NotNull
     @Override
-    public Bag<X> commit(Function<Bag, Consumer<BLink>> update) {
+    public HijackBag<X> commit(Function<Bag, Consumer<BLink>> update) {
 
 
         final float[] mass = {0};
@@ -556,6 +561,8 @@ public class HijackBag<X> implements Bag<X> {
             mass[0] += p;
         });
 
+        this.size.set(count[0]);
+
 
         float MIN = min[0];
         if (MIN == Float.POSITIVE_INFINITY) {
@@ -567,7 +574,6 @@ public class HijackBag<X> implements Bag<X> {
         }
 
         this.mass = mass[0];
-        this.size.set(count[0]);
 
 //        Forget f;
 //        if (existingMass > 0 && pressure > 0) {
@@ -584,11 +590,12 @@ public class HijackBag<X> implements Bag<X> {
     }
 
     @NotNull
-    public Bag<X> update(@Nullable Consumer<BLink> each) {
-        this.pressure = 0;
+    public HijackBag<X> update(@Nullable Consumer<BLink> each) {
 
-        if (each != null)
+        if (each != null) {
+            this.pressure = 0;
             forEach(each);
+        }
 
         return this;
     }

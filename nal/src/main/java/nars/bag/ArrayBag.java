@@ -5,8 +5,10 @@ import jcog.table.SortedListTable;
 import nars.$;
 import nars.Param;
 import nars.budget.BudgetMerge;
-import nars.budget.Budgeted;
+import nars.budget.Prioritized;
 import nars.link.BLink;
+import nars.link.RawBLink;
+import nars.link.DependentBLink;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -24,8 +26,23 @@ import java.util.function.Predicate;
 /**
  * A bag implemented as a combination of a Map and a SortedArrayList
  */
-public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> {
+public class ArrayBag<X> extends SortedListTable<X, BLink<X>> implements Bag<X,BLink<X>> {
 
+//    @Deprecated @NotNull
+//    public static <K> BLink<K> newLink(@NotNull K i, @Nullable Budgeted exists) {
+//
+//        if (exists == null || exists.isDeleted()) {
+//            if (i instanceof Budgeted) {
+//                return new DependentBLink((Budgeted) i);
+//                //return new WeakBLink(i);
+//            } else {
+//                return new DefaultBLink(i);
+//            }
+//        } else {
+//            return new DefaultBLink(i, exists);
+//        }
+//
+//    }
 
     public final BudgetMerge mergeFunction;
 
@@ -37,11 +54,11 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
 
     private static final Logger logger = LoggerFactory.getLogger(ArrayBag.class);
 
-    public ArrayBag(BudgetMerge mergeFunction, @NotNull Map<V, BLink<V>> map) {
+    public ArrayBag(BudgetMerge mergeFunction, @NotNull Map<X, BLink<X>> map) {
         this(0, mergeFunction, map);
     }
 
-    public ArrayBag(@Deprecated int cap, BudgetMerge mergeFunction, @NotNull Map<V, BLink<V>> map) {
+    public ArrayBag(@Deprecated int cap, BudgetMerge mergeFunction, @NotNull Map<X, BLink<X>> map) {
         super(BLink[]::new, map);
 
         this.mergeFunction = mergeFunction;
@@ -71,13 +88,13 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
      * returns true unless failed to add during 'add' operation or is empty
      */
     @Override
-    protected boolean updateItems(@Nullable BLink<V> toAdd) {
+    protected boolean updateItems(@Nullable BLink<X> toAdd) {
 
 
-        SortedArray<BLink<V>> items;
+        SortedArray<BLink<X>> items;
 
         //List<BLink<V>> pendingRemoval;
-        List<BLink<V>> pendingRemoval;
+        List<BLink<X>> pendingRemoval;
         boolean result;
         synchronized (items = this.items) {
             int additional = (toAdd != null) ? 1 : 0;
@@ -154,7 +171,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
 
     }
 
-    private int clean(@Nullable BLink<V> toAdd, int s, int minRemoved, List<BLink<V>> trash) {
+    private int clean(@Nullable BLink<X> toAdd, int s, int minRemoved, List<BLink<X>> trash) {
 
         final int s0 = s;
 
@@ -180,14 +197,14 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
         return false;
     }
 
-    private void clean2(List<BLink<V>> trash) {
+    private void clean2(List<BLink<X>> trash) {
         int toRemoveSize = trash.size();
         if (toRemoveSize > 0) {
 
             for (int i = 0; i < toRemoveSize; i++) {
-                BLink<V> w = trash.get(i);
+                BLink<X> w = trash.get(i);
 
-                V k = w.get();
+                X k = w.get();
 
 
                 map.remove(k);
@@ -210,11 +227,11 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
 
     }
 
-    private int removeWeakestUntilUnderCapacity(int s, @NotNull List<BLink<V>> toRemove, boolean pendingAddition) {
-        SortedArray<BLink<V>> items = this.items;
+    private int removeWeakestUntilUnderCapacity(int s, @NotNull List<BLink<X>> toRemove, boolean pendingAddition) {
+        SortedArray<BLink<X>> items = this.items;
         final int c = capacity;
         while (!isEmpty() && ((s - c) + (pendingAddition ? 1 : 0)) > 0) {
-            BLink<V> w = items.remove(s - 1);
+            BLink<X> w = items.remove(s - 1);
             if (w != null) //skip over nulls
                 toRemove.add(w);
             s--;
@@ -224,8 +241,8 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
 
     @Nullable
     @Override
-    public BLink<V> add(Object key, float toAdd) {
-        BLink<V> c = map.get(key);
+    public BLink<X> add(Object key, float toAdd) {
+        BLink<X> c = map.get(key);
         if (c != null && !c.isDeleted()) {
             //float dur = c.dur();
             float pBefore = c.priSafe(0);
@@ -241,8 +258,8 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
     }
 
     @Override
-    public BLink<V> mul(Object key, float factor) {
-        BLink<V> c = map.get(key);
+    public BLink<X> mul(Object key, float factor) {
+        BLink<X> c = map.get(key);
         if (c != null) {
             float pBefore = c.pri();
             if (pBefore != pBefore)
@@ -314,7 +331,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
      * gets the scalar float value used in a comparison of BLink's
      * essentially the same as b.priIfFiniteElseNeg1 except it also includes a null test. otherwise they are interchangeable
      */
-    static float pCmp(@Nullable Budgeted b) {
+    static float pCmp(@Nullable Prioritized b) {
         return (b == null) ? -2f : b.priSafe(-1); //sort nulls beneath
 
 //        float p = b.pri();
@@ -325,21 +342,23 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
 
 
     @Override
-    public final V key(@NotNull BLink<V> l) {
+    public final X key(@NotNull BLink<X> l) {
         return l.get();
     }
 
 
     @NotNull
     @Override
-    public Bag<V> sample(int n, @NotNull Predicate<? super BLink<V>> target) {
+    public ArrayBag<X> sample(int n, @NotNull Predicate<? super BLink<X>> target) {
         if (!isEmpty())
             forEachWhile(target, n);
         return this;
     }
 
+
+
     @Override
-    public final BLink<V> put(@NotNull V key, @NotNull Budgeted b, float scale, @Nullable MutableFloat overflow) {
+    public final BLink<X> put(@NotNull X key, @NotNull BLink<X> b, float scale, @Nullable MutableFloat overflow) {
 
 
         float bp = b.priSafe(-1);
@@ -347,7 +366,16 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
             return null;
         }
 
-        BLink<V> v = map.compute(key, this::newLink);
+        BLink<X> v = map.compute(key, (k, existing) ->{
+
+            if (existing!=null) {
+                if (!existing.isDeleted())
+                    return existing;
+            }
+
+            return b.cloneZero();
+        });
+
         float vq = v.qua();
         boolean isNew = (vq!=vq) /* NaN */;
         float pBefore;
@@ -409,14 +437,14 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
 
     @Nullable
     @Override
-    protected BLink<V> addItem(@NotNull BLink<V> i) {
+    protected BLink<X> addItem(@NotNull BLink<X> i) {
         throw new UnsupportedOperationException();
     }
 
 
     @Override
     @NotNull
-    public final Bag<V> commit(@Nullable Function<Bag, Consumer<BLink>> update) {
+    public final ArrayBag<X> commit(@Nullable Function<Bag, Consumer<BLink>> update) {
         commit(update, false);
         return this;
     }
@@ -445,7 +473,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
      * applies the 'each' consumer and commit simultaneously, noting the range of items that will need sorted
      */
     @NotNull
-    protected Bag<V> update(@Nullable Consumer<BLink> each, boolean checkCapacity) {
+    protected ArrayBag<X> update(@Nullable Consumer<BLink> each, boolean checkCapacity) {
 
 
         if (each != null)
@@ -533,15 +561,15 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
     }
 
 
-    private int removeDeleted(@NotNull Collection<BLink<V>> removed, int minRemoved) {
+    private int removeDeleted(@NotNull Collection<BLink<X>> removed, int minRemoved) {
 
-        SortedArray<BLink<V>> items = this.items;
+        SortedArray<BLink<X>> items = this.items;
         final Object[] l = items.array();
         int removedFromMap = 0;
 
         //iterate in reverse since null entries should be more likely to gather at the end
         for (int s = size() - 1; removedFromMap < minRemoved && s >= 0; s--) {
-            BLink<V> x = (BLink<V>) l[s];
+            BLink<X> x = (BLink<X>) l[s];
             if (x == null || x.isDeleted()) {
                 items.removeFast(s);
                 if (x != null)
@@ -578,12 +606,12 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
 //    }
 
     @Override
-    public void forEach(Consumer<? super BLink<V>> action) {
+    public void forEach(Consumer<? super BLink<X>> action) {
         Object[] x = items.array();
         if (x.length > 0) {
             for (BLink a : ((BLink[]) x)) {
                 if (a != null) {
-                    BLink<V> b = a;
+                    BLink<X> b = a;
                     if (!b.isDeleted())
                         action.accept(b);
                 }

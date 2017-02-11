@@ -100,7 +100,7 @@ public class MySTMClustered extends STMClustered {
 
         if (t.punc() == punc && t.volume() <= maxInputVolume) {
 
-            input.put(t, t.budget());
+            input.get().put(new TLink(t));
         }
 
     }

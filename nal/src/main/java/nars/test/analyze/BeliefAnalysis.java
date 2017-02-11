@@ -5,6 +5,7 @@ import nars.Narsese;
 import nars.Task;
 import nars.bag.Bag;
 import nars.concept.Concept;
+import nars.link.BLink;
 import nars.table.BeliefTable;
 import nars.term.Compound;
 import nars.time.Tense;
@@ -120,7 +121,7 @@ public class BeliefAnalysis extends EnergyAnalysis {
 	}
 
 	@NotNull
-    public Bag<Task> tasklinks() {
+    public Bag<Task,BLink<Task>> tasklinks() {
 		return concept().tasklinks();
 	}
 

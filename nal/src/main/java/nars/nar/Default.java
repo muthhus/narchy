@@ -10,6 +10,7 @@ import nars.control.ConceptBagControl;
 import nars.derive.DefaultDeriver;
 import nars.index.term.TermIndex;
 import nars.index.term.map.MapTermIndex;
+import nars.link.BLink;
 import nars.op.stm.STMTemporalLinkage;
 import nars.time.FrameTime;
 import nars.time.Time;
@@ -68,7 +69,7 @@ public class Default extends NAR {
         setControl(this.core);
     }
 
-    protected Bag<Concept> newConceptBag(int activeConcepts) {
+    protected Bag<Concept,BLink<Concept>> newConceptBag(int activeConcepts) {
 
 
         return

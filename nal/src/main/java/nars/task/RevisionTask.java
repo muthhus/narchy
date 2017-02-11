@@ -5,6 +5,7 @@ import nars.Task;
 import nars.bag.Bag;
 import nars.budget.BudgetFunctions;
 import nars.concept.Concept;
+import nars.link.BLink;
 import nars.term.Compound;
 import nars.term.Termed;
 import nars.truth.Truth;
@@ -117,7 +118,7 @@ public class RevisionTask extends AnswerTask  {
                     newBeliefContribution);
 
             //Balance Tasklinks
-            Bag<Task> tasklinks = concept(nar).tasklinks();
+            Bag<Task,BLink<Task>> tasklinks = concept(nar).tasklinks();
             BudgetFunctions.balancePri(
                     tasklinks.get(parentNewBelief), tasklinks.get(parentOldBelief),
                     resultPri,
@@ -178,7 +179,7 @@ public class RevisionTask extends AnswerTask  {
 //                newBeliefContribution);
 //
 //        //Balance Tasklinks
-//        Bag<Task> tasklinks = c.tasklinks();
+//        Bag<Task,BLink<Task>> tasklinks = c.tasklinks();
 //        BudgetFunctions.balancePri(
 //                tasklinks.get(newBelief), tasklinks.get(oldBelief),
 //                resultPri,

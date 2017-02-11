@@ -4,6 +4,7 @@ import nars.NAR;
 import nars.Task;
 import nars.budget.Budget;
 import nars.budget.Budgeted;
+import nars.budget.Prioritized;
 import nars.concept.CompoundConcept;
 import nars.concept.dynamic.DynamicBeliefTable;
 import nars.task.AnswerTask;
@@ -199,7 +200,7 @@ public interface BeliefTable extends TaskTable {
 
     default float priSum() {
         return (float) stream(spliterator(), false)
-                .mapToDouble(Budgeted::pri).sum();
+                .mapToDouble(Prioritized::pri).sum();
     }
 
     /**

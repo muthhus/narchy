@@ -225,7 +225,7 @@ public interface Budget extends Budgeted {
     default boolean equals(Budgeted b, float epsilon) {
         return
                 Util.equals(priSafe(-1), b.priSafe(-1), epsilon) &&
-                Util.equals(qua(), qua(), epsilon);
+                Util.equals(qua(), b.qua(), epsilon);
 
     }
 

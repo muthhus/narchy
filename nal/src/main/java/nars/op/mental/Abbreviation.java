@@ -14,7 +14,7 @@ import nars.concept.CompoundConcept;
 import nars.concept.Concept;
 import nars.concept.PermanentConcept;
 import nars.link.BLink;
-import nars.link.DefaultBLink;
+import nars.link.RawBLink;
 import nars.op.Leak;
 import nars.table.BeliefTable;
 import nars.table.QuestionTable;
@@ -45,7 +45,7 @@ import static nars.time.Tense.ETERNAL;
  *
  * @param S serial term type
  */
-public class Abbreviation/*<S extends Term>*/ extends Leak<CompoundConcept> {
+public class Abbreviation/*<S extends Term>*/ extends Leak<CompoundConcept,BLink<CompoundConcept>> {
 
     /**
      * when a concept is important and exceeds a syntactic complexity above
@@ -116,7 +116,7 @@ public class Abbreviation/*<S extends Term>*/ extends Leak<CompoundConcept> {
                             abbreviable.get(Abbreviation.class) == null &&
                             abbreviable.get(Concept.Savior.class) == null) {
 
-                        each.accept(new DefaultBLink(abbreviable, b));
+                        each.accept(new RawBLink(abbreviable, b));
                     }
                 } else {
                     //recursiely try subterms of a temporal or exceedingly large concept

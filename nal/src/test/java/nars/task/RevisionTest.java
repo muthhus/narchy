@@ -230,7 +230,7 @@ public class RevisionTest {
 
         b.believe(1.0f, 0.5f).run(1);
 
-        Bag<Task> tasklinks = b.concept().tasklinks();
+        Bag<Task,?> tasklinks = b.concept().tasklinks();
 
         assertEquals(0.5f, b.beliefs().matchEternal().truth().conf(), 0.01f);
 

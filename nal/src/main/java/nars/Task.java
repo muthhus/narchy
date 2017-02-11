@@ -4,8 +4,8 @@ import jcog.map.SynchronizedHashMap;
 import nars.bag.ArrayBag;
 import nars.budget.BudgetMerge;
 import nars.budget.Budgeted;
-import nars.budget.RawBudget;
 import nars.concept.Concept;
+import nars.link.RawBLink;
 import nars.op.Command;
 import nars.task.Tasked;
 import nars.term.Compound;
@@ -235,7 +235,7 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
                 new ArrayBag<>(BudgetMerge.maxHard, new SynchronizedHashMap<>()).capacity(Param.MAX_INPUT_ANSWERS)
             );
             float confEffective = answer.conf(start(), nar.time.dur());
-            if (answers.putIfAbsent(answer, new RawBudget(1f, confEffective))) {
+            if (answers.putIfAbsent(new RawBLink(answer, 1f, confEffective))) {
                 answers.commit();
                 Command.log(nar, this.toString() + "  " + answer.toString());
             } else {

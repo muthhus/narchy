@@ -107,7 +107,7 @@ public class Vis {
         return treeChart(d, d.core.active, count);
     }
 
-    public static BagChart<Concept> treeChart(NAR nar, Bag<Concept> b, final int count) {
+    public static BagChart<Concept> treeChart(NAR nar, Bag<Concept,BLink<Concept>> b, final int count) {
         long[] now = new long[]{nar.time()};
         BagChart<Concept> tc = new BagChart<Concept>(b, count) {
 
@@ -169,7 +169,7 @@ public class Vis {
         return tc;
     }
 
-    public static <X extends Termed> BagChart<X> items(Bag<X> bag, final Cycles d, final int count) {
+    public static <X extends Termed> BagChart<X> items(Bag<X,?> bag, final Cycles d, final int count) {
         BagChart tc = new BagChart(bag, count) {
             @Override
             public void accept(BLink x, ItemVis y) {

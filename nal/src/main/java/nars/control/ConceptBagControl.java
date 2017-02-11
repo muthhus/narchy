@@ -11,16 +11,15 @@ import nars.Param;
 import nars.bag.Bag;
 import nars.bag.BagAdapter;
 import nars.budget.BudgetMerge;
-import nars.budget.RawBudget;
 import nars.concept.Concept;
 import nars.conceptualize.ConceptBuilder;
 import nars.derive.Deriver;
 import nars.link.BLink;
+import nars.link.RawBLink;
 import nars.premise.MatrixPremiseBuilder;
 import nars.task.DerivedTask;
 import nars.term.Termed;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,7 +52,7 @@ public class ConceptBagControl implements Control, Consumer<DerivedTask> {
      * concepts active in this cycle
      */
     @NotNull
-    public final Bag<Concept> active;
+    public final Bag<Concept,BLink<Concept>> active;
 
     @Deprecated
     public final transient @NotNull NAR nar;
@@ -95,7 +94,7 @@ public class ConceptBagControl implements Control, Consumer<DerivedTask> {
     //private final CapacityLinkedHashMap<Premise,Premise> recent = new CapacityLinkedHashMap<>(256);
     //long novel=0, total=0;
 
-    public ConceptBagControl(@NotNull NAR nar, @NotNull Deriver deriver, @NotNull Bag<Concept> conceptBag) {
+    public ConceptBagControl(@NotNull NAR nar, @NotNull Deriver deriver, @NotNull Bag<Concept,BLink<Concept>> conceptBag) {
 
         this.nar = nar;
 
@@ -104,10 +103,7 @@ public class ConceptBagControl implements Control, Consumer<DerivedTask> {
         this.conceptsFiredPerBatch = new MutableInteger(Param.CONCEPT_FIRE_BATCH_SIZE);
         this.conceptBuilder = nar.concepts.conceptBuilder();
 
-        this.active = new ConceptBag(
-                conceptBag
-
-        );
+        this.active = new ConceptBag( conceptBag );
 
 
         //nar.onFrame(this);
@@ -187,7 +183,7 @@ public class ConceptBagControl implements Control, Consumer<DerivedTask> {
 
     @Override
     public void activate(Termed term, float priToAdd) {
-        active.put((Concept)term, new RawBudget(priToAdd, 0.5f), 1f, null);
+        active.put((Concept)term, new RawBLink(term, priToAdd, 0.5f), 1f, null);
     }
 
 
@@ -218,7 +214,7 @@ public class ConceptBagControl implements Control, Consumer<DerivedTask> {
     public final class ConceptBag extends BagAdapter<Concept> {
 
 
-        public ConceptBag( @NotNull Bag<Concept> bag) {
+        public ConceptBag( @NotNull Bag<Concept,BLink<Concept>> bag) {
             super(bag);
         }
 

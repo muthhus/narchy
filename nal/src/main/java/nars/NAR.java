@@ -12,6 +12,7 @@ import nars.attention.Activation;
 import nars.bag.Bag;
 import nars.budget.Budget;
 import nars.budget.Budgeted;
+import nars.budget.Prioritized;
 import nars.concept.AtomConcept;
 import nars.concept.CompoundConcept;
 import nars.concept.Concept;
@@ -628,17 +629,17 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
      * logs tasks and other budgeted items with a summary exceeding a threshold
      */
     @NotNull
-    public NAR logBudgetMin(@NotNull Appendable out, float summaryThreshold) {
+    public NAR logBudgetMin(@NotNull Appendable out, float priThresh) {
         return log(out, v -> {
-            Budgeted b = null;
-            if (v instanceof Budgeted) {
-                b = ((Budgeted) v);
+            Prioritized b = null;
+            if (v instanceof Prioritized) {
+                b = ((Prioritized) v);
             } else if (v instanceof Twin) {
-                if (((Twin) v).getOne() instanceof Budgeted) {
-                    b = (Budgeted) ((Twin) v).getOne();
+                if (((Twin) v).getOne() instanceof Prioritized) {
+                    b = (Prioritized) ((Twin) v).getOne();
                 }
             }
-            return b != null && b.pri() > summaryThreshold;
+            return b != null && b.pri() > priThresh;
         });
     }
 
@@ -782,7 +783,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
                 reactivation = 1f;
             }
 
-            input.delete("Duplicate");
+            input.delete();
 
             //re-activate only
             if (reactivation > 0) {
@@ -867,7 +868,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
     }
 
     static class PermanentAtomConcept extends AtomConcept implements PermanentConcept {
-        public PermanentAtomConcept(@NotNull Atomic atom, Bag<Term> termLinks, Bag<Task> taskLinks) {
+        public PermanentAtomConcept(@NotNull Atomic atom, Bag<Term,BLink<Term>> termLinks, Bag<Task,BLink<Task>> taskLinks) {
             super(atom, termLinks, taskLinks);
         }
     }

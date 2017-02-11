@@ -1,5 +1,6 @@
 package nars.link;
 
+import nars.budget.BudgetMerge;
 import nars.budget.Budgeted;
 import nars.budget.RawBudget;
 import org.jetbrains.annotations.NotNull;
@@ -11,28 +12,41 @@ import org.jetbrains.annotations.NotNull;
  * Acts as a "budget vector" containing an accumulating delta
  * that can be commit()'d on the next udpate
  */
-public class DefaultBLink<X> extends RawBudget implements BLink<X> {
+public class RawBLink<X> extends RawBudget implements BLink<X> {
 
 
     ///** the referred item */
     @NotNull protected final X id;
 
-    public DefaultBLink(@NotNull X id) {
+    public RawBLink(@NotNull X id) {
         this.id = id;
         this.quality = Float.NaN; //begin 'new'
     }
 
-    public DefaultBLink(@NotNull X id, float p, float q) {
-        setBudget(p, q);
+    public RawBLink(@NotNull X id, float p, float q) {
         this.id = id;
+        setBudget(p, q);
     }
 
-    public DefaultBLink(@NotNull X id, @NotNull Budgeted b) {
-        this(id, b, 1f);
+    public RawBLink(@NotNull X id, @NotNull Budgeted b) {
+        this(id, b.pri(), b.qua());
     }
 
-    public DefaultBLink(@NotNull X id, @NotNull Budgeted b, float scale) {
+    public RawBLink(@NotNull X id, @NotNull Budgeted b, float scale) {
         this(id, b.pri() * scale, b.qua());
+    }
+
+    @Override
+    public RawBLink<X> cloneScaled(BudgetMerge merge, float scale) {
+        RawBLink<X> adding2 = new RawBLink<X>(id);
+        adding2.setBudget(0, qua()); //use the incoming quality.  budget will be merged
+        merge.apply(adding2, this, scale);
+        return adding2;
+    }
+
+    @Override
+    public RawBLink<X> cloneZero() {
+        return new RawBLink<>(id, 0, Float.NaN);
     }
 
     @Override

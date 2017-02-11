@@ -5,7 +5,7 @@ import nars.Task;
 import nars.bag.ArrayBag;
 import nars.budget.BudgetMerge;
 import nars.link.BLink;
-import nars.link.DefaultBLink;
+import nars.link.RawBLink;
 import nars.op.Leak;
 import org.jetbrains.annotations.NotNull;
 
@@ -37,7 +37,7 @@ abstract public class LeakOut extends Leak<Task> {
         } else {
             float p = t.pri();
             if (p == p) { // || (t.term().containsTermRecursively(nar.self()) && (p > 0.5f))) {
-                each.accept(new DefaultBLink<>(t, t));
+                each.accept(new RawBLink<>(t, t));
             }
         }
     }

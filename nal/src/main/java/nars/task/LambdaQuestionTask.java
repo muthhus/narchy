@@ -4,6 +4,7 @@ import nars.NAR;
 import nars.Task;
 import nars.bag.ArrayBag;
 import nars.budget.BudgetMerge;
+import nars.link.DependentBLink;
 import nars.term.Compound;
 import nars.term.Termed;
 import org.jetbrains.annotations.NotNull;
@@ -39,7 +40,7 @@ public class LambdaQuestionTask extends MutableTask {
         //answer = super.onAnswered(answer, nar);
 
         boolean novel = !answers.contains(answer);
-        answers.put(answer);
+        answers.put(new DependentBLink<Task>(answer));
         if (novel) {
             eachAnswer.accept(this, answer);
         }

@@ -8,7 +8,7 @@ import nars.Task;
 import nars.bag.CurveBag;
 import nars.budget.BudgetMerge;
 import nars.link.BLink;
-import nars.link.DefaultBLink;
+import nars.link.RawBLink;
 import nars.op.Leak;
 import nars.premise.Premise;
 import nars.task.GeneratedTask;
@@ -42,7 +42,7 @@ import static nars.time.Tense.ETERNAL;
  * <p>
  * https://www.youtube.com/watch?v=ia4wMU-vfrw
  */
-public class Inperience extends Leak<Task> {
+public class Inperience extends Leak<Task,BLink<Task>> {
 
     public static final Logger logger = LoggerFactory.getLogger(Inperience.class);
 
@@ -152,7 +152,7 @@ public class Inperience extends Leak<Task> {
             return;
 
         if (!task.isDeleted())
-            each.accept(new DefaultBLink<>(task, task, 1f / tt.volume()));
+            each.accept(new RawBLink<>(task, task, 1f / tt.volume()));
 
         // if(OLD_BELIEVE_WANT_EVALUATE_WONDER_STRATEGY ||
         //         (!OLD_BELIEVE_WANT_EVALUATE_WONDER_STRATEGY && (task.sentence.punctuation==Symbols.QUESTION || task.sentence.punctuation==Symbols.QUEST))) {

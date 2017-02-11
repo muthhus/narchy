@@ -4,7 +4,10 @@ import jcog.Util;
 import nars.NAR;
 import nars.Param;
 import nars.Task;
+import nars.budget.Budget;
 import nars.concept.Concept;
+import nars.link.DependentBLink;
+import nars.link.RawBLink;
 import nars.premise.Derivation;
 import nars.premise.Premise;
 import nars.term.Compound;
@@ -189,12 +192,13 @@ abstract public class DerivedTask extends MutableTask {
                     //TODO use CrossLink or other Activation's here?
 
                     if (tasklinked) {
-                        parentConcept.tasklinks().put(this);
+                        parentConcept.tasklinks().put(new DependentBLink(this));
                     }
 
                     if (termlinked && !thisConcept.equals(parentConcept)) {
-                        parentConcept.termlinks().put(thisConcept.term(), budget());
-                        thisConcept.termlinks().put(parentConcept.term(), budget());
+                        Budget b = budget();
+                        parentConcept.termlinks().put(new RawBLink(thisConcept.term(), b));
+                        thisConcept.termlinks().put(new RawBLink(parentConcept.term(), b));
                     }
 
                 }

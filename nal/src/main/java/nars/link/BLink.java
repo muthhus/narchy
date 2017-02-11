@@ -1,20 +1,16 @@
 package nars.link;
 
 import nars.budget.Budget;
+import nars.budget.BudgetMerge;
 
 /**
  * Created by me on 5/29/16.
  */
-public interface BLink<X> extends Budget, Link<X> {
+public interface BLink<X> extends PLink<X>, Budget {
 
+    BLink<X> cloneScaled(BudgetMerge merge, float scale);
 
-    @Override X get();
-
-    @Override
-    default boolean isDeleted() {
-        float p = pri(); //b[PRI];
-        return (p!=p); //fast NaN test
-    }
+    BLink<X> cloneZero();
 
 
 

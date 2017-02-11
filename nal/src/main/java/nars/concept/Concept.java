@@ -52,9 +52,9 @@ import static nars.Op.*;
 
 public interface Concept extends Termed {
 
-    @NotNull Bag<Task> tasklinks();
+    @NotNull Bag<Task,BLink<Task>> tasklinks();
 
-    @NotNull Bag<Term> termlinks();
+    @NotNull Bag<Term,BLink<Term>> termlinks();
 
     @Nullable Map<Object, Object> meta();
 

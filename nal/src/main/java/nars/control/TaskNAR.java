@@ -8,7 +8,7 @@ import nars.Task;
 import nars.attention.Activation;
 import nars.attention.Forget;
 import nars.bag.Bag;
-import nars.bag.experimental.HijackBag;
+import nars.bag.HijackBag;
 import nars.budget.Budget;
 import nars.budget.BudgetMerge;
 import nars.concept.CompoundConcept;
@@ -22,6 +22,7 @@ import nars.derive.Deriver;
 import nars.index.task.TaskIndex;
 import nars.index.term.map.CaffeineIndex;
 import nars.link.BLink;
+import nars.link.DependentBLink;
 import nars.premise.Derivation;
 import nars.premise.PreferSimpleAndConfidentPremise;
 import nars.premise.Premise;
@@ -51,7 +52,7 @@ public class TaskNAR extends NAR {
 
     final static Logger logger = LoggerFactory.getLogger(TaskNAR.class);
 
-    public final Bag<Task> tasksBag;
+    public final Bag<Task,BLink<Task>> tasksBag;
     final Deriver deriver = new DefaultDeriver();
 
     final MutableInteger derivationsPerCycle = new MutableInteger(128);
@@ -79,7 +80,7 @@ public class TaskNAR extends NAR {
 
         @NotNull
         @Override
-        public <X> Bag<X> newBag(@NotNull Map m) {
+        public <X> Bag<X,BLink<X>> newBag(@NotNull Map m) {
             return Bag.EMPTY;
         }
 
@@ -351,7 +352,7 @@ public class TaskNAR extends NAR {
 
         @Override
         public @Nullable Task addIfAbsent(@NotNull Task t) {
-            BLink<Task> r = tasksBag.put(t);
+            BLink<Task> r = tasksBag.put(new DependentBLink(t));
             if (r == null) {
                 t.delete();
                 return t; //rejected

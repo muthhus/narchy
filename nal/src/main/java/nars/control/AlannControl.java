@@ -14,6 +14,8 @@ import nars.concept.Concept;
 import nars.derive.DefaultDeriver;
 import nars.derive.Deriver;
 import nars.link.BLink;
+import nars.link.RawBLink;
+import nars.link.PLink;
 import nars.premise.MatrixPremiseBuilder;
 import nars.term.Termed;
 import org.apache.commons.collections4.IteratorUtils;
@@ -166,7 +168,7 @@ public class AlannControl implements Control {
 
         abstract public Iterator<Concept> active();
 
-        abstract public Bag<Concept> activeBag();
+        abstract public Bag<Concept,BLink<Concept>> activeBag();
 
         public void stop() {
             stopped = true;
@@ -198,7 +200,7 @@ public class AlannControl implements Control {
 
         final MatrixPremiseBuilder premiser = new MatrixPremiseBuilder();
 
-        public final Bag<Concept> active;
+        public final Bag<Concept,BLink<Concept>> active;
 
         int fireTaskLinks = 1;
         final MutableIntRange fireTermLinks = new MutableIntRange();
@@ -224,7 +226,7 @@ public class AlannControl implements Control {
 
         @Override
         public float pri(@NotNull Termed concept) {
-            Bag<Concept> cc = active;
+            Bag<Concept,BLink<Concept>> cc = active;
             return cc.pri(concept, Float.NaN);
         }
 
@@ -235,16 +237,16 @@ public class AlannControl implements Control {
 
         @Override
         public void activate(Concept c, Budget b, float v, MutableFloat overflow) {
-            active.put(c, b, v, overflow);
+            active.put(c, new RawBLink(c,b), v, overflow);
         }
 
         @Override
         public Iterator<Concept> active() {
-            return IteratorUtils.transformedIterator(active.iterator(), BLink::get);
+            return IteratorUtils.transformedIterator(active.iterator(), PLink::get);
         }
 
         @Override
-        public Bag<Concept> activeBag() {
+        public Bag<Concept,BLink<Concept>> activeBag() {
             return active;
         }
 
