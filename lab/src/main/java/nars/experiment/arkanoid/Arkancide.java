@@ -8,11 +8,9 @@ import nars.Param;
 import nars.concept.ActionConcept;
 import nars.remote.NAgents;
 
-import java.io.IOException;
-
 public class Arkancide extends NAgents {
 
-    static boolean cam = false;
+    static boolean cam = true;
 
     private final float paddleSpeed = 1f;
 
@@ -29,7 +27,7 @@ public class Arkancide extends NAgents {
 
             return agent;
 
-        }, 20, 6, 4000);
+        }, 30, 3, -1);
 
         //System.out.println(ts.db.getInfo());
 
@@ -81,8 +79,8 @@ public class Arkancide extends NAgents {
 
 
         if (cam) {
-            addCamera("cam1", noid, visW, visH);
-            //addCameraRetina("cam2", noid, visW/2, visH/2, (v) -> $.t(v, alpha));
+            senseCamera("cam1", noid, visW, visH);
+            senseCameraRetina("cam2", noid, visW/2, visH/2, (v) -> $.t(v, alpha));
         } else {
             senseNumber( "x(paddle, noid)", new FloatPolarNormalized(()->noid.paddle.x, noid.getWidth()/2));//.resolution(resX);
             senseNumber( "x(ball, noid)", new FloatPolarNormalized(()->noid.ball.x, noid.getWidth()/2));//.resolution(resX);

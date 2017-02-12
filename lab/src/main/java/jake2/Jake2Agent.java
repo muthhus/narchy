@@ -7,7 +7,6 @@ import jake2.game.edict_t;
 import jake2.render.Base;
 import jake2.render.JoglGL2Renderer;
 import jake2.sys.IN;
-import nars.$;
 import nars.NAR;
 import nars.Narsese;
 import nars.remote.NAgents;
@@ -89,7 +88,7 @@ public class Jake2Agent extends NAgents implements Runnable {
         super("q", nar, 1);
 
 
-        Sensor2D<PixelBag> qcam = addCameraRetina("q", screenshotter, 64, 64, (v) -> t(v, alpha));
+        Sensor2D<PixelBag> qcam = senseCameraRetina("q", screenshotter, 64, 64, (v) -> t(v, alpha));
         qcam.src.vflip = true;
 
 //        camAE = new PixelAutoClassifier("cra", qcam.src.pixels, 16, 16, 32, this);

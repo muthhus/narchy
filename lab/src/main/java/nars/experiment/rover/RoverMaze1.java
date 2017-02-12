@@ -77,7 +77,7 @@ public class RoverMaze1 {
                         Dynamic l = super.create(world);
 
                         //move(0,-1,0);
-                        body.clearForces();
+                        //body.clearForces();
 
                         l.clearForces();
                         HingeConstraint p = new HingeConstraint(neck.body, body, v(0, 0.6f, 0), v(0, -0.6f, 0), v(0, 1, 0), v(0, 1, 0));

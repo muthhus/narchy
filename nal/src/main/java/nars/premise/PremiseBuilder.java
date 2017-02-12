@@ -25,6 +25,7 @@ import java.util.List;
 import static nars.term.Terms.compoundOrNull;
 import static nars.time.Tense.ETERNAL;
 import static nars.util.UtilityFunctions.and;
+import static nars.util.UtilityFunctions.aveAri;
 import static nars.util.UtilityFunctions.or;
 
 
@@ -197,7 +198,7 @@ abstract public class PremiseBuilder {
 
         float tq = taskBudget.qua();
         float bq = (beliefBudget!=null) ? beliefBudget.qua() : Float.NaN;
-        float qua = belief == null ? tq : or(tq, bq);
+        float qua = belief == null ? tq : aveAri(tq, bq);
         if (qua < nar.quaMin.floatValue())
             return null;
 

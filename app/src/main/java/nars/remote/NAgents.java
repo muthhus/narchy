@@ -31,12 +31,10 @@ import nars.time.Time;
 import nars.truth.Truth;
 import nars.util.exe.Executioner;
 import nars.util.exe.MultiThreadExecutioner;
-import nars.util.signal.SignalTask;
 import nars.util.task.TaskStatistics;
 import nars.video.*;
 import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunction;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import spacegraph.Surface;
 import spacegraph.space.layout.Grid;
 import spacegraph.space.layout.TabPane;
@@ -197,7 +195,7 @@ abstract public class NAgents extends NAgent {
 
             @Override
             public Task pre(@NotNull Task t) {
-                if (!t.isInput() || (t instanceof SignalTask)) {
+                if (!t.isInput() ) {
                     return compressor.encode(t);
                 } else {
                     return t; //dont affect input
@@ -225,8 +223,8 @@ abstract public class NAgents extends NAgent {
                 return new HijackBag<>(activeConcepts, 4, BudgetMerge.maxBlend, random ) {
                     @Override
                     public Forget forget(float rate) {
-                        float memoryForget = 0.95f;
-                        return new Forget(rate, memoryForget, memoryForget);
+                        float memoryForget = 0.75f;
+                        return new Forget(rate, 1f, memoryForget);
                     }
                 };
             }
@@ -242,7 +240,7 @@ abstract public class NAgents extends NAgent {
         nar.DEFAULT_QUEST_PRIORITY = 0.25f * p;
 
         nar.confMin.setValue(0.01f);
-        nar.truthResolution.setValue(0.01f);
+        nar.truthResolution.setValue(0.03f);
         nar.termVolumeMax.setValue(48);
 
         MySTMClustered stm = new MySTMClustered(nar, 64, '.', 3, true, 6);
@@ -421,34 +419,34 @@ abstract public class NAgents extends NAgent {
     /**
      * pixelTruth defaults to linear monochrome brightness -> frequency
      */
-    protected Sensor2D addCamera(String id, Container w, int pw, int ph) {
-        return addCamera(id, w, pw, ph, (v) -> t(v, alpha));
+    protected Sensor2D senseCamera(String id, Container w, int pw, int ph) {
+        return senseCamera(id, w, pw, ph, (v) -> t(v, alpha));
     }
 
-    protected Sensor2D<Scale> addCamera(String id, Container w, int pw, int ph, FloatToObjectFunction<Truth> pixelTruth) {
-        return addCamera(id, new Scale(new SwingCamera(w), pw, ph), pixelTruth);
+    protected Sensor2D<Scale> senseCamera(String id, Container w, int pw, int ph, FloatToObjectFunction<Truth> pixelTruth) {
+        return senseCamera(id, new Scale(new SwingCamera(w), pw, ph), pixelTruth);
     }
 
-    protected Sensor2D<PixelBag> addCameraRetina(String id, Container w, int pw, int ph) {
-        return addCameraRetina(id, new SwingCamera(w), pw, ph, (v) -> t(v, alpha));
+    protected Sensor2D<PixelBag> senseCameraRetina(String id, Container w, int pw, int ph) {
+        return senseCameraRetina(id, new SwingCamera(w), pw, ph, (v) -> t(v, alpha));
     }
 
-    protected Sensor2D<PixelBag> addCameraRetina(String id, Container w, int pw, int ph, FloatToObjectFunction<Truth> pixelTruth) {
-        return addCameraRetina(id, new SwingCamera(w), pw, ph, pixelTruth);
+    protected Sensor2D<PixelBag> senseCameraRetina(String id, Container w, int pw, int ph, FloatToObjectFunction<Truth> pixelTruth) {
+        return senseCameraRetina(id, new SwingCamera(w), pw, ph, pixelTruth);
     }
 
-    protected Sensor2D<PixelBag> addCameraRetina(String id, Supplier<BufferedImage> w, int pw, int ph, FloatToObjectFunction<Truth> pixelTruth) {
+    protected Sensor2D<PixelBag> senseCameraRetina(String id, Supplier<BufferedImage> w, int pw, int ph, FloatToObjectFunction<Truth> pixelTruth) {
         PixelBag pb = PixelBag.of(w, pw, ph);
         pb.addActions(id, this);
-        return addCamera(id, pb, pixelTruth);
+        return senseCamera(id, pb, pixelTruth);
     }
 
     protected Sensor2D<WaveletBag> addFreqCamera(String id, Supplier<BufferedImage> w, int pw, int ph, FloatToObjectFunction<Truth> pixelTruth) {
         WaveletBag pb = new WaveletBag(w, pw, ph);
-        return addCamera(id, pb, pixelTruth);
+        return senseCamera(id, pb, pixelTruth);
     }
 
-    protected <C extends Bitmap2D> Sensor2D<C> addCamera(String id, C bc, FloatToObjectFunction<Truth> pixelTruth) {
+    protected <C extends Bitmap2D> Sensor2D<C> senseCamera(String id, C bc, FloatToObjectFunction<Truth> pixelTruth) {
         CameraSensor c = new CameraSensor<>($.the(id), bc, this, pixelTruth);
         cam.put(id, c);
         return c;

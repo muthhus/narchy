@@ -58,7 +58,7 @@ public class SideCraft extends NAgents {
         //window(camAE.newChart(), 500, 500);
 
 
-        pixels = addCamera("cra", cam, (v) -> $.t(v, alpha));
+        pixels = senseCamera("cra", cam, (v) -> $.t(v, alpha));
 
 
 //        new NObj("cra", craft, nar)

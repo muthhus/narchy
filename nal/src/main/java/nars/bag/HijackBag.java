@@ -410,9 +410,11 @@ public class HijackBag<X> implements Bag<X,BLink<X>> {
 
         int i = random.nextInt(c), j = 0;
 
-        int batchSize = n;
 
-        float r = curve(); //randomized threshold
+
+        float min = priMin;
+        float max = priMax;
+        float priRange = max - min;
 
         //TODO detect when the array is completely empty after 1 iteration through it in case the scan limit > 1.0
 
@@ -434,10 +436,11 @@ public class HijackBag<X> implements Bag<X,BLink<X>> {
                 float p = v.pri();
                 if (p == p) {
 
-                    if ((r < p) || (r < p + tolerance(j, jLimit, n, batchSize, c))) {
+                    float r = curve() * priRange + priMin; //randomized threshold
+
+                    if ((r < p) /*|| (r < p + tolerance(j, jLimit, n, batchSize, c))*/) {
                         if (target.test(v)) {
                             n--;
-                            r = curve();
                         }
                     }
 
@@ -496,28 +499,25 @@ public class HijackBag<X> implements Bag<X,BLink<X>> {
      */
     public float curve() {
         float c = random.nextFloat();
-        c *= c; //c^2 curve
-
-        //float min = this.priMin;
-        return (c); // * (priMax - min);
+        return 1f - (c * c);
     }
 
-    /**
-     * beam width (tolerance range)
-     * searchProgress in range 0..1.0
-     */
-    private static float tolerance(int j, int jLimit, int b, int batchSize, int cap) {
-
-        float searchProgress = ((float) j) / jLimit;
-        //float selectionRate =  ((float)batchSize)/cap;
-
-        /* raised polynomially to sharpen the selection curve, growing more slowly at the beginning */
-        return /*Util.sqr*/(Util.sqr(searchProgress * searchProgress));// * searchProgress);
-
-        /*
-        float exp = 6;
-        return float) Math.pow(searchProgress, exp);// + selectionRate;*/
-    }
+//    /**
+//     * beam width (tolerance range)
+//     * searchProgress in range 0..1.0
+//     */
+//    private static float tolerance(int j, int jLimit, int b, int batchSize, int cap) {
+//
+//        float searchProgress = ((float) j) / jLimit;
+//        //float selectionRate =  ((float)batchSize)/cap;
+//
+//        /* raised polynomially to sharpen the selection curve, growing more slowly at the beginning */
+//        return Util.sqr(Util.sqr(searchProgress * searchProgress));// * searchProgress);
+//
+//        /*
+//        float exp = 6;
+//        return float) Math.pow(searchProgress, exp);// + selectionRate;*/
+//    }
 
 
     @Override
