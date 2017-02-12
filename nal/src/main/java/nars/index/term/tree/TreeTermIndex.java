@@ -1,6 +1,5 @@
 package nars.index.term.tree;
 
-import jcog.map.nbhm.HijacKache;
 import jcog.radixtree.MyConcurrentRadixTree;
 import nars.NAR;
 import nars.concept.Concept;
@@ -269,52 +268,52 @@ public class TreeTermIndex extends TermIndex implements Consumer<NAR> {
     }
 
 
-    /**
-     * Tree-index with a front-end "L1" non-blocking hashmap cache
-     */
-    public static class L1TreeIndex extends TreeTermIndex {
-
-        @NotNull
-        private final HijacKache<Term, Termed> L1;
-
-        public L1TreeIndex(ConceptBuilder conceptBuilder, int sizeLimit, int cacheSize, int reprobes) {
-            super(conceptBuilder, sizeLimit);
-            this.L1 = new HijacKache<>(cacheSize, reprobes);
-        }
-
-        @Override
-        public @Nullable Termed get(@NotNull Term t, boolean createIfMissing) {
-
-            Object o = L1.computeIfAbsent2(t,
-                    createIfMissing ?
-                            ttt -> super.get(ttt, true) :
-                            ttt -> {
-                                Termed v = super.get(ttt, false);
-                                if (v == null)
-                                    return L1; //this will result in null at the top level, but the null will not be stored in L1 itself
-                                return v;
-                            }
-            );
-
-            if (o instanceof Termed)
-                return (Termed) o;
-            else if (createIfMissing) { //HACK try again: this should be handled by computeIfAbsent2, not here
-                L1.miss++;
-                return super.get(t, true);
-            } else {
-                return null;
-            }
-        }
-
-        @Override
-        public @NotNull String summary() {
-            return super.summary() + "\t, L1:" + L1.summary(true);
-        }
-
-        @Override
-        protected void onRemoval(Concept r) {
-            super.onRemoval(r);
-            L1.remove(r);
-        }
-    }
+//    /**
+//     * Tree-index with a front-end "L1" non-blocking hashmap cache
+//     */
+//    public static class L1TreeIndex extends TreeTermIndex {
+//
+//        @NotNull
+//        private final HijacKache<Term, Termed> L1;
+//
+//        public L1TreeIndex(ConceptBuilder conceptBuilder, int sizeLimit, int cacheSize, int reprobes) {
+//            super(conceptBuilder, sizeLimit);
+//            this.L1 = new HijacKache<>(cacheSize, reprobes);
+//        }
+//
+//        @Override
+//        public @Nullable Termed get(@NotNull Term t, boolean createIfMissing) {
+//
+//            Object o = L1.computeIfAbsent2(t,
+//                    createIfMissing ?
+//                            ttt -> super.get(ttt, true) :
+//                            ttt -> {
+//                                Termed v = super.get(ttt, false);
+//                                if (v == null)
+//                                    return L1; //this will result in null at the top level, but the null will not be stored in L1 itself
+//                                return v;
+//                            }
+//            );
+//
+//            if (o instanceof Termed)
+//                return (Termed) o;
+//            else if (createIfMissing) { //HACK try again: this should be handled by computeIfAbsent2, not here
+//                L1.miss++;
+//                return super.get(t, true);
+//            } else {
+//                return null;
+//            }
+//        }
+//
+//        @Override
+//        public @NotNull String summary() {
+//            return super.summary() + "\t, L1:" + L1.summary(true);
+//        }
+//
+//        @Override
+//        protected void onRemoval(Concept r) {
+//            super.onRemoval(r);
+//            L1.remove(r);
+//        }
+//    }
 }

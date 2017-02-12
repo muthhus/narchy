@@ -192,7 +192,12 @@ public class IO {
                 key = new Atom(s);
                 break;
             default:
-                throw new UnsupportedOperationException();
+                try {
+                    key = $.$(s);
+                } catch (Narsese.NarseseException e) {
+                    throw new UnsupportedEncodingException(e.getMessage());
+                }
+                //throw new UnsupportedOperationException();
         }
 
         return key;

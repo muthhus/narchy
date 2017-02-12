@@ -32,7 +32,7 @@ public abstract class Leak</* TODO: A, */X, V extends PLink<X>>  {
         this.rate = rate;
         n.onTask(task -> {
             try {
-                in(task, x -> bag.put(x));
+                in(task, bag::put);
             } catch (Budget.BudgetException e) {
                 //was deleted before the link could be made
             }
