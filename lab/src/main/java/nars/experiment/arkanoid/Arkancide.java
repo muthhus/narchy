@@ -29,7 +29,7 @@ public class Arkancide extends NAgents {
 
             return agent;
 
-        }, 25, 5, -1);
+        }, 20, 3, -1);
 
         //System.out.println(ts.db.getInfo());
 

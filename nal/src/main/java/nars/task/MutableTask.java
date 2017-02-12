@@ -290,11 +290,16 @@ public class MutableTask extends AbstractTask {
 //                return null;
 //        }
 
-        MutableTask yt = new MutableTask(y, xt.punc(), xt.truth());
-        yt.setBudget(xt);
-        yt.setEvidence(xt.evidence());
-        yt.time(xt.creation(), xt.start(), xt.end());
-        return yt;
+        Budget b = xt.budget().clone(); //snapshot its budget
+        if (b.isDeleted()) {
+            return null;
+        } else {
+            MutableTask yt = new MutableTask(y, xt.punc(), xt.truth());
+            yt.setBudget(b);
+            yt.setEvidence(xt.evidence());
+            yt.time(xt.creation(), xt.start(), xt.end());
+            return yt;
+        }
     }
 
 

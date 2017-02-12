@@ -464,8 +464,6 @@ public class Tetris extends NAgents {
 //            MySTMClustered stm = new MySTMClustered(nar, 64, '.', 4, false, 2);
 //            MySTMClustered stmGoal = new MySTMClustered(nar, 16, '!', 2, false, 1);
 
-            nar.termVolumeMax.setValue(64);
-            nar.truthResolution.setValue(0.04f);
 
 
             //nar.linkFeedbackRate.setValue(0.05f);

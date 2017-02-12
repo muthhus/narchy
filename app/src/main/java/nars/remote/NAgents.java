@@ -23,6 +23,7 @@ import nars.nar.Default;
 import nars.nar.NARBuilder;
 import nars.op.Leak;
 import nars.op.mental.Abbreviation;
+import nars.op.mental.Compressor;
 import nars.op.mental.Inperience;
 import nars.op.stm.MySTMClustered;
 import nars.time.FrameTime;
@@ -123,8 +124,8 @@ abstract public class NAgents extends NAgent {
 
         Time clock = new RealTime.CS(true).dur(durFrames / fps);
         NAR nar =
-                new TaskNAR(32 * 1024, new MultiThreadExecutioner(4, 4 * 1024), clock);
-                //NAgents.newMultiThreadNAR(3, clock, false);
+                //new TaskNAR(32 * 1024, new MultiThreadExecutioner(4, 4 * 1024), clock);
+                NAgents.newMultiThreadNAR(2, clock, false);
         //NAR nar = newNAR();
         //NAR nar = newAlann(durFrames/fps);
 
@@ -134,8 +135,8 @@ abstract public class NAgents extends NAgent {
         chart(a);
 
         a.runRT(fps, endTime).join();
-
-        print(nar, a);
+//
+//        print(nar, a);
 
         return nar;
 
@@ -174,28 +175,38 @@ abstract public class NAgents extends NAgent {
         Random rng = new XorShift128PlusRandom(1);
         final Executioner exe =
                 //new SingleThreadExecutioner();
-                new MultiThreadExecutioner(threads, 4096 /* TODO chose a power of 2 number to scale proportionally to # of threads */)
+                new MultiThreadExecutioner(threads, 16384 /* TODO chose a power of 2 number to scale proportionally to # of threads */)
                     //.sync(false)
                 ;
 
-        int conceptsPerCycle = 64*threads;
+        int conceptsPerCycle = 32*threads;
 
 
         //Multi nar = new Multi(3,512,
         Default nar = new Default(32768,
-                conceptsPerCycle, 1, 4, rng,
+                conceptsPerCycle, 1, 3, rng,
                 new CaffeineIndex(new DefaultConceptBuilder(), 128*1024, false, exe)
                 //new TreeTermIndex.L1TreeIndex(new DefaultConceptBuilder(), 300000, 32 * 1024, 3)
                 ,
                 time,
                 exe) {
 
+            final Compressor compressor = new Compressor(this, "_", 4, 8, 1f, 64, 256);
+
+            @Override
+            protected Task pre(@NotNull Task t) {
+                if (t.isInput())
+                    return t; //dont affect input
+                else
+                    return compressor.encode(t);
+            }
+
             @Override
             protected HijackBag<Concept> newConceptBag(int activeConcepts) {
                 return new HijackBag<>(activeConcepts, 5, BudgetMerge.maxBlend, random ) {
                     @Override
                     public Forget forget(float rate) {
-                        float memoryForget = 0.7f;
+                        float memoryForget = 0.9f;
                         return new Forget(rate, memoryForget, memoryForget);
                     }
                 };
@@ -206,20 +217,21 @@ abstract public class NAgents extends NAgent {
         nar.goalConfidence(0.9f);
 
         float p = 0.5f;
-        nar.DEFAULT_BELIEF_PRIORITY = 0.85f * p;
-        nar.DEFAULT_GOAL_PRIORITY = 0.95f * p;
-        nar.DEFAULT_QUESTION_PRIORITY = 0.5f * p;
-        nar.DEFAULT_QUEST_PRIORITY = 0.5f * p;
+        nar.DEFAULT_BELIEF_PRIORITY = 0.7f * p;
+        nar.DEFAULT_GOAL_PRIORITY = 0.9f * p;
+        nar.DEFAULT_QUESTION_PRIORITY = 0.25f * p;
+        nar.DEFAULT_QUEST_PRIORITY = 0.25f * p;
 
-        nar.confMin.setValue(0.02f);
-        nar.termVolumeMax.setValue(32);
+        nar.confMin.setValue(0.01f);
+        nar.truthResolution.setValue(0.01f);
+        nar.termVolumeMax.setValue(48);
 
         MySTMClustered stm = new MySTMClustered(nar, 64, '.', 3, true, 6);
         MySTMClustered stmGoal = new MySTMClustered(nar, 32, '!', 2, true, 4);
 
-        Abbreviation abbr = new Abbreviation(nar, "the",
-                4, 16,
-                0.02f, 32);
+//        Abbreviation abbr = new Abbreviation(nar, "the",
+//                4, 16,
+//                0.02f, 32);
 
         new Inperience(nar, 0.02f, 16);
 

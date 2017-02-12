@@ -651,9 +651,14 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
      * if the task was a command, it will return false even if executed
      */
     @Nullable
-    public final Concept input(@NotNull Task input) {
+    public final Concept input(@NotNull Task input0) {
+
+        Task input = pre(input0);
+        if (input == null)
+            return null;
 
         try {
+
             input.normalize(this); //accept into input buffer for eventual processing
         } catch (@NotNull InvalidTaskException | InvalidTermException | Budget.BudgetException e) {
 
@@ -727,7 +732,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
                 Activation a = process(input, c);
                 if (a != null) {
 
-                    eventTaskProcess.emit(input); //signal any additional processes
+                    eventTaskProcess.emit(input);
 
                     emotion.learn(input.priSafe(0));
 
@@ -759,6 +764,11 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
         }
 
         return null;
+    }
+
+    /** override to perform any preprocessing of a task (applied before the normalization step)*/
+    protected Task pre(@NotNull Task t) {
+        return t;
     }
 
     protected void processDuplicate(@NotNull Task input, Task existing) {

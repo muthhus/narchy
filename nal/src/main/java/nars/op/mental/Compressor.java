@@ -4,6 +4,7 @@ import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.RemovalCause;
 import com.github.benmanes.caffeine.cache.RemovalListener;
+import nars.$;
 import nars.IO;
 import nars.NAR;
 import nars.Task;
@@ -47,7 +48,7 @@ public class Compressor extends Abbreviation implements RemovalListener<Compound
     final Cache<Compound, Abbr> code;
 
     final Map<SequenceMatcher, Abbr> dc = new ConcurrentHashMap(); //HACK
-    final Map<SequenceMatcher, Abbr> ec= new ConcurrentHashMap(); //HACK
+    final Map<SequenceMatcher, Abbr> ec = new ConcurrentHashMap(); //HACK
 
 
     /* static */ class Abbr {
@@ -81,7 +82,7 @@ public class Compressor extends Abbreviation implements RemovalListener<Compound
     public Compressor(@NotNull NAR n, String termPrefix, int volMin, int volMax, float selectionRate, int pendingCapacity, int maxCodes) {
         super(n, termPrefix, volMin, volMax, selectionRate, pendingCapacity);
 
-         code = Caffeine.newBuilder().maximumSize(maxCodes).removalListener(this).executor(n.exe).build();
+        code = Caffeine.newBuilder().maximumSize(maxCodes).removalListener(this).executor(n.exe).build();
     }
 
     @Override
@@ -95,7 +96,7 @@ public class Compressor extends Abbreviation implements RemovalListener<Compound
     protected void abbreviate(@NotNull Compound abbreviated, @NotNull Budget b) {
         final boolean[] changed = {false};
 
-        code.get(abbreviated, (a) -> {
+        Abbr abb = code.get(abbreviated, (a) -> {
 
             String compr = newSerialTerm();
 
@@ -106,6 +107,7 @@ public class Compressor extends Abbreviation implements RemovalListener<Compound
         });
         if (changed[0]) {
             recompile();
+            nar.believe($.sim(abb.compressed, abb.decompressed));
         }
 
     }
@@ -115,19 +117,20 @@ public class Compressor extends Abbreviation implements RemovalListener<Compound
     private void recompile() {
 
         if (busy.compareAndSet(false, true)) {
-            nar.runLater(()-> {
-                decoder = matcher(x -> x.decode);
-                encoder = matcher(x -> x.encode);
-                busy.set(false);
+            nar.runLater(() -> {
+                if (busy.compareAndSet(true, false)) {
+                    decoder = matcher(x -> x.decode);
+                    encoder = matcher(x -> x.encode);
+                }
             });
         }
 
     }
 
 
-    private MultiSequenceMatcher matcher(Function<Abbr, SequenceMatcher> theDecode) {
+    private MultiSequenceMatcher matcher(Function<Abbr, SequenceMatcher> which) {
 
-        List<SequenceMatcher> mm = code.asMap().values().stream().map(theDecode).collect(Collectors.toList());
+        List<SequenceMatcher> mm = code.asMap().values().stream().map(which).collect(Collectors.toList());
         switch (mm.size()) {
             case 0:
                 return null;
@@ -141,11 +144,13 @@ public class Compressor extends Abbreviation implements RemovalListener<Compound
         }
     }
 
-    @NotNull public Task encode(Task tt) {
+    @NotNull
+    public Task encode(Task tt) {
         return transcode(tt, true);
     }
 
-    @NotNull public Task decode(Task tt) {
+    @NotNull
+    public Task decode(Task tt) {
         return transcode(tt, false);
     }
 
@@ -153,7 +158,7 @@ public class Compressor extends Abbreviation implements RemovalListener<Compound
 
         Term i = tt.term();
         Term o = transcode(i, en);
-        if (o!=i) {
+        if (o != i) {
 
             try {
                 //HACK wrap in product if atomic
@@ -173,7 +178,8 @@ public class Compressor extends Abbreviation implements RemovalListener<Compound
 
     }
 
-    @NotNull public Term transcode(Term t, boolean en) {
+    @NotNull
+    public Term transcode(Term t, boolean en) {
         if (!(t instanceof Compound))
             return t;
         else {
@@ -183,11 +189,13 @@ public class Compressor extends Abbreviation implements RemovalListener<Compound
         }
     }
 
-    @NotNull public Term encode(Term t) {
+    @NotNull
+    public Term encode(Term t) {
         return transcode(t, true);
     }
 
-    @NotNull public Term decode(Term t) {
+    @NotNull
+    public Term decode(Term t) {
         return transcode(t, false);
     }
 
@@ -207,7 +215,8 @@ public class Compressor extends Abbreviation implements RemovalListener<Compound
         do {
 
             if (wr == null) {
-                 wr = new ByteArrayReader(b);
+                i = 0; //restart at beginning after each substitution
+                wr = new ByteArrayReader(b);
             }
 
             try {
@@ -269,7 +278,6 @@ public class Compressor extends Abbreviation implements RemovalListener<Compound
     private Abbr abbr(SequenceMatcher m, boolean en) {
         return (en ? this.ec : this.dc).get(m);
     }
-
 
 
     public static void main(String[] args) {
