@@ -96,13 +96,14 @@ abstract public class NAgents extends NAgent {
     }
 
     private static void print(NAR nar, NAgents a) {
-        NAR.printActiveTasks(nar, true);
-        NAR.printActiveTasks(nar, false);
+        //NAR.printActiveTasks(nar, true);
+        //NAR.printActiveTasks(nar, false);
 
-//        nar.tasks.forEach(x -> {
-//            if (x.isQuestOrQuestion())
-//                System.out.println(x.proof());
-//        });
+        nar.tasks.forEach(x -> {
+            System.out.println(x);
+            //if (x.isQuestOrQuestion())
+                ///System.out.println(x.proof());
+        });
 
         nar.printConceptStatistics();
         new TaskStatistics().add(nar).print(System.out);

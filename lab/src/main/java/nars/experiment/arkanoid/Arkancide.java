@@ -14,10 +14,10 @@ public class Arkancide extends NAgents {
 
     static boolean cam = true;
 
-    private float paddleSpeed = 1f;
+    private final float paddleSpeed = 1f;
 
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) {
         Param.DEBUG = false;
 
         //runRT(Arkancide::new);
@@ -67,7 +67,7 @@ public class Arkancide extends NAgents {
         };
 
 
-        maxPaddleSpeed = 46 * noid.BALL_VELOCITY;
+        maxPaddleSpeed = 46 * Arkanoid.BALL_VELOCITY;
 
         nar.truthResolution.setValue(0.02f);
 
@@ -109,7 +109,7 @@ public class Arkancide extends NAgents {
             if (d != null) {
                 pct = noid.paddle.moveTo(d.freq(), paddleSpeed * maxPaddleSpeed); //* d.conf());
             } else {
-                pct = noid.paddle.x / noid.SCREEN_WIDTH; //unchanged
+                pct = noid.paddle.x / Arkanoid.SCREEN_WIDTH; //unchanged
             }
             return $.t(pct, nar.confidenceDefault('.'));
             //return null; //$.t(0.5f, alpha);

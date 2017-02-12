@@ -16,6 +16,9 @@ import java.util.zip.Inflater;
 
 
 /**
+ *
+ * UNTESTED
+ *
  * https://github.com/MPdaedalus/CompressHuffman
  * <p>
  * CompressHuffman is a library to compress isolated records of data in a DB using a shared huffman tree generated from all the records.

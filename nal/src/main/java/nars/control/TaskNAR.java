@@ -104,9 +104,9 @@ public class TaskNAR extends NAR {
                 new XorShift128PlusRandom(1), exe);
 
 
-        compressor = new Compressor(this, "_", 2, 6, 0.05f, 32);
+        compressor = new Compressor(this, "_", 4, 8, 6f, 32, 256);
 
-        tasksBag = new HijackBag<Task>(capacity, 2, BudgetMerge.maxBlend, random) {
+        tasksBag = new HijackBag<Task>(capacity, 6, BudgetMerge.maxBlend, random) {
         //tasksBag = new CurveBag<Task>(capacity, new CurveBag.NormalizedSampler(power2BagCurve, random), BudgetMerge.maxBlend, new ConcurrentHashMap<>(capacity)) {
 
             @Override

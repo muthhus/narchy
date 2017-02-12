@@ -1,17 +1,18 @@
 package nars.op.mental;
 
-import nars.$;
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.RemovalCause;
+import com.github.benmanes.caffeine.cache.RemovalListener;
 import nars.IO;
 import nars.NAR;
 import nars.Task;
 import nars.budget.Budget;
-import nars.concept.CompoundConcept;
 import nars.nar.Default;
 import nars.task.MutableTask;
 import nars.term.Compound;
 import nars.term.Term;
 import net.byteseek.automata.factory.MutableStateFactory;
-import net.byteseek.automata.trie.Trie;
 import net.byteseek.automata.trie.TrieFactory;
 import net.byteseek.io.reader.ByteArrayReader;
 import net.byteseek.matcher.automata.ByteMatcherTransitionFactory;
@@ -24,29 +25,30 @@ import net.byteseek.matcher.sequence.SequenceMatcher;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-
-import static nars.term.Terms.compoundOrNull;
 
 /**
  * Created by me on 2/11/17.
  */
-public class Compressor extends Abbreviation {
+public class Compressor extends Abbreviation implements RemovalListener<Compound, Compressor.Abbr> {
 
     final MutableStateFactory<SequenceMatcher> stateFactory = new MutableStateFactory<>();
     final ByteMatcherTransitionFactory<SequenceMatcher> transitionFactory = new ByteMatcherTransitionFactory<>();
+    final TrieFactory<SequenceMatcher> smFactory = sequences -> new SequenceMatcherTrie(sequences, stateFactory, transitionFactory);
 
     private MultiSequenceMatcher encoder;
     private MultiSequenceMatcher decoder;
 
-    final Map<Compound, Abbr> code = new ConcurrentHashMap<>();
+    final Cache<Compound, Abbr> code;
+
     final Map<SequenceMatcher, Abbr> dc = new ConcurrentHashMap(); //HACK
     final Map<SequenceMatcher, Abbr> ec= new ConcurrentHashMap(); //HACK
+
 
     /* static */ class Abbr {
         public final Term decompressed;
@@ -56,65 +58,76 @@ public class Compressor extends Abbreviation {
         private final byte[] encoded;
         private final byte[] decoded;
 
-        Abbr(Term decompressed, AliasConcept compressed) {
+        Abbr(Compound decompressed, String compressed, NAR nar) {
+
+            this.compressed = AliasConcept.get(compressed, decompressed, nar);
+
             this.decompressed = decompressed;
-            this.compressed = compressed;
-            this.encoded = IO.asBytes(compressed.term());
-            this.decode = new ByteSequenceMatcher(encoded);
+
+            this.encoded = IO.asBytes(this.compressed.term());
             this.decoded = IO.asBytes(decompressed);
+            this.decode = new ByteSequenceMatcher(encoded);
             this.encode = new ByteSequenceMatcher(decoded);
 
             //HACK
             ec.put(encode, this);
             dc.put(decode, this);
+
+            nar.on(this.compressed);
         }
     }
 
 
-    public Compressor(@NotNull NAR n, String termPrefix, int volMin, int volMax, float selectionRate, int capacity) {
-        super(n, termPrefix, volMin, volMax, selectionRate, capacity);
+    public Compressor(@NotNull NAR n, String termPrefix, int volMin, int volMax, float selectionRate, int pendingCapacity, int maxCodes) {
+        super(n, termPrefix, volMin, volMax, selectionRate, pendingCapacity);
+
+         code = Caffeine.newBuilder().maximumSize(maxCodes).removalListener(this).executor(n.exe).build();
     }
+
+    @Override
+    public void onRemoval(Compound key, Abbr value, RemovalCause cause) {
+        ec.remove(value.encode);
+        dc.remove(value.decode);
+    }
+
 
     @Override
     protected void abbreviate(@NotNull Compound abbreviated, @NotNull Budget b) {
         final boolean[] changed = {false};
-        synchronized (code) { //TODO not synch
-            code.computeIfAbsent(abbreviated, (a) -> {
 
-                String compr = newSerialTerm();
+        code.get(abbreviated, (a) -> {
 
-                System.out.println("compress CODE: " + a + " to " + compr);
+            String compr = newSerialTerm();
 
-                changed[0] = true;
-                AliasConcept ac = AliasConcept.get(compr, a, nar);
-                nar.on(ac);
-                return new Abbr(a.term(), ac);
-            });
-            if (changed[0]) {
-                recompile();
-            }
+            //System.out.println("compress CODE: " + a + " to " + compr);
+
+            changed[0] = true;
+            return new Abbr(a.term(), compr, nar);
+        });
+        if (changed[0]) {
+            recompile();
         }
+
     }
+
+    final AtomicBoolean busy = new AtomicBoolean();
 
     private void recompile() {
 
-        decoder = matcher(x -> x.decode);
-        encoder = matcher(x -> x.encode);
+        if (busy.compareAndSet(false, true)) {
+            nar.runLater(()-> {
+                decoder = matcher(x -> x.decode);
+                encoder = matcher(x -> x.encode);
+                busy.set(false);
+            });
+        }
 
     }
 
-    public final TrieFactory<SequenceMatcher> smFactory = new TrieFactory<SequenceMatcher>() {
-
-        @Override
-        public Trie create(Collection<? extends SequenceMatcher> sequences) {
-            return new SequenceMatcherTrie(sequences, stateFactory, transitionFactory);
-        }
-    };
 
     private MultiSequenceMatcher matcher(Function<Abbr, SequenceMatcher> theDecode) {
-        //SequenceMatcherTrieFactory factory = new SequenceMatcherTrieFactory();
 
-        List<SequenceMatcher> mm = code.values().stream().map(theDecode).collect(Collectors.toList());
+        List<SequenceMatcher> mm = code.asMap().values().stream().map(theDecode).collect(Collectors.toList());
         switch (mm.size()) {
             case 0:
                 return null;
@@ -131,6 +144,7 @@ public class Compressor extends Abbreviation {
     @NotNull public Task encode(Task tt) {
         return transcode(tt, true);
     }
+
     @NotNull public Task decode(Task tt) {
         return transcode(tt, false);
     }
@@ -205,6 +219,10 @@ public class Compressor extends Abbreviation {
                 }
 
                 Abbr c = abbr(m, en);
+                if (c == null) {
+                    i++;
+                    continue; //HACK maybe other matches apply, try them all?
+                }
 
                 final byte[] to = en ? c.encoded : c.decoded;
                 final byte[] from = en ? c.decoded : c.encoded;
@@ -256,7 +274,7 @@ public class Compressor extends Abbreviation {
 
     public static void main(String[] args) {
         Default n = new Default();
-        Compressor c = new Compressor(n, "_", 2, 8, 0.5f, 8);
+        Compressor c = new Compressor(n, "_", 2, 8, 0.5f, 8, 32);
 
         n.onTask(x -> {
             Task y = c.encode(x);
