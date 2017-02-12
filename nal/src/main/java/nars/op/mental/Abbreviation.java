@@ -131,7 +131,9 @@ public class Abbreviation/*<S extends Term>*/ extends Leak<Compound, BLink<Compo
             }
         } else {
             //recursiely try subterms of a temporal or exceedingly large concept
-            t.forEachCompound(x -> input(b, each, ((Compound) x)));
+            //budget with a proportion of this compound relative to their volume contribution
+            float tVolume = t.volume();
+            t.forEachCompound(x -> input(b.cloneMult(x.volume()/tVolume, 1f), each, ((Compound) x)));
         }
     }
 

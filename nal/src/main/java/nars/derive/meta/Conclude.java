@@ -250,7 +250,7 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
             }
         }
 
-        DerivedTask d = derive(nar.pre(content), budget, nar.time(), occ, m, truth, ct);
+        DerivedTask d = derive(nar.pre(content) /* pre-encode for efficiency purposes */, budget, nar.time(), occ, m, truth, ct);
         if (d != null)
             m.target.accept(d);
     }

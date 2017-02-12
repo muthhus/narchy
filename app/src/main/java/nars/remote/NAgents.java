@@ -192,7 +192,8 @@ abstract public class NAgents extends NAgent {
                 time,
                 exe) {
 
-            final Compressor compressor = new Compressor(this, "_", 4, 10, 3f, 64, 384);
+            final Compressor compressor = new Compressor(this, "_", 3, 10,
+                    3f, 64, 512);
 
             @Override
             public Task pre(@NotNull Task t) {
@@ -221,10 +222,10 @@ abstract public class NAgents extends NAgent {
 
             @Override
             protected HijackBag<Concept> newConceptBag(int activeConcepts) {
-                return new HijackBag<>(activeConcepts, 5, BudgetMerge.maxBlend, random ) {
+                return new HijackBag<>(activeConcepts, 4, BudgetMerge.maxBlend, random ) {
                     @Override
                     public Forget forget(float rate) {
-                        float memoryForget = 0.9f;
+                        float memoryForget = 0.95f;
                         return new Forget(rate, memoryForget, memoryForget);
                     }
                 };

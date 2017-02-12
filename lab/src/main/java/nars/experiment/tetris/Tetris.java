@@ -254,15 +254,16 @@ public class Tetris extends NAgents {
                             $.inh(
                                     //$.func(
                                     (tetris),
-                                    $.p(
+                                    /*$.p(
                                             $.pRadix(x, PIXEL_RADIX, state.width),
-                                            $.pRadix(y, PIXEL_RADIX, state.height)
-
-                                    /*$.pRecurse($.radixArray(x, PIXEL_RADIX, state.width)), $.pRecurse($.radixArray(y, PIXEL_RADIX, state.height)),
-                                            $.p($.radixArray(x, PIXEL_RADIX, state.width)), $.p($.radixArray(y, PIXEL_RADIX, state.height))*/
+                                            $.pRadix(y, PIXEL_RADIX, state.height)*/
+                                    $.p(
+                                        $.pRecurse($.radixArray(x, PIXEL_RADIX, state.width)),
+                                        $.pRecurse($.radixArray(y, PIXEL_RADIX, state.height))
+                                    )
 
                                     //        x, y
-                                    )
+
                             )
                             //$.p(
                             //$.the("tetris"))

@@ -111,7 +111,7 @@ public interface Budget extends Budgeted {
     default void priSub(float toSubtract) { setPriority(priSafe(0) - toSubtract); }
 
     @NotNull
-    default Budgeted cloneMult(float p, float d, float q) {
+    default Budget cloneMult(float p, float q) {
         Budget x = clone();
         x.mul(p, q);
         return x;
