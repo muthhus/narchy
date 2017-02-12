@@ -33,7 +33,7 @@ public class Granulator {
 
 	public float getSample(long[] grain, long now) {
 		long startIndex = grain[0];
-		long length = grain[1];
+		//long length = grain[1];
 		long showTime = grain[2];
 
 		float[] sb = sourceBuffer;
@@ -42,15 +42,8 @@ public class Granulator {
 		int sourceIndex = (int) ((startIndex + offset + sb.length) % sb.length);
 		while (sourceIndex < 0)
 			sourceIndex += sb.length;
-		float sample = sb[sourceIndex];
-		float ww = 0;
-		if (offset <= 0) {
-			ww = window.getFactor((int) offset);
-		}
-		if (offset > length) {
-			ww = window.getFactor((int) (offset - length));
-		}
-		return sample * ww;
+		return sb[sourceIndex] * window.getFactor( ((int)offset) );
+				//(offset <= 0) ? ((int) offset) : ((int) (offset - length)));
 	}
 
 	public static boolean isFading(long[] grain, long now) {
@@ -59,13 +52,13 @@ public class Granulator {
 		return now > showTime + length;
 	}
 
-	public long[] nextGrain(long[] grain, int startIndex, long fadeInTime) {
+	public long[] nextGrain(long[] grain, int startIndex, float fadeInTime) {
 		if (grain == null)
 			grain = new long[3];
 		int ws = window.getSize();
 		grain[0] = (startIndex + ws) % sourceBuffer.length;
 		grain[1] = grainSizeSamples;
-		grain[2] = fadeInTime + ws;
+		grain[2] = Math.round(fadeInTime + ws);
 		return grain;
 	}
 

@@ -1,16 +1,19 @@
 package spacegraph.audio;
 
 
+import com.google.common.primitives.Primitives;
+import jcog.list.ConcurrentArrayList;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 
-public class ListenerMixer implements StereoSoundProducer
-{
-    public final List<Sound> sounds =
-            Collections.synchronizedList( new ArrayList<>() );
+public class ListenerMixer implements StereoSoundProducer {
+    public final List<Sound> sounds = new ConcurrentArrayList<>(Sound.class);
+
 
     private float[] buf = new float[0];
 
@@ -18,24 +21,20 @@ public class ListenerMixer implements StereoSoundProducer
 
     private SoundListener soundListener;
 
-    public ListenerMixer(int maxChannels)
-    {
+    public ListenerMixer(int maxChannels) {
         this.maxChannels = maxChannels;
     }
 
-    public void setSoundListener(SoundListener soundListener)
-    {
+    public void setSoundListener(SoundListener soundListener) {
         this.soundListener = soundListener;
     }
 
-    public void addSoundProducer(SoundProducer producer, SoundSource soundSource, float volume, float priority)
-    {
+    public void addSoundProducer(SoundProducer producer, SoundSource soundSource, float volume, float priority) {
         sounds.add(new Sound(producer, soundSource, volume, priority));
     }
 
-    public void update(float alpha)
-    {
-        boolean updating = (soundListener!=null);
+    public void update(float alpha) {
+        boolean updating = (soundListener != null);
 
         for (int i = 0; ; ) {
             if ((i >= 0) && (i < sounds.size())) {
@@ -48,8 +47,7 @@ public class ListenerMixer implements StereoSoundProducer
                 } else {
                     i++;
                 }
-            }
-            else
+            } else
                 break;
         }
 
@@ -68,8 +66,7 @@ public class ListenerMixer implements StereoSoundProducer
 
     @Override
     @SuppressWarnings("unchecked")
-    public float read(float[] leftBuf, float[] rightBuf, int readRate)
-    {
+    public float read(float[] leftBuf, float[] rightBuf, int readRate) {
         if (buf.length != leftBuf.length)
             buf = new float[leftBuf.length];
 
@@ -81,7 +78,7 @@ public class ListenerMixer implements StereoSoundProducer
         Arrays.fill(rightBuf, 0);
         float maxAmplitude = 0;
 
-        for (int i = 0; i < sounds.size() && i >= 0; )  {
+        for (int i = 0; i < sounds.size() && i >= 0; ) {
             Sound sound = sounds.get(i);
 
             if (i < maxChannels) {
@@ -91,25 +88,25 @@ public class ListenerMixer implements StereoSoundProducer
 
                 float pan = sound.pan;
 
-                float rp = (pan <0?1:1- pan)*sound.amplitude;
-                float lp = (pan >0?1:1+ pan)*sound.amplitude;
+                float rp = (pan < 0 ? 1 : 1 - pan) * sound.amplitude;
+                float lp = (pan > 0 ? 1 : 1 + pan) * sound.amplitude;
 
                 int l = leftBuf.length;
 
                 for (int j = 0; j < l; j++) {
-                    float lb = leftBuf[j];
-                    float rb = rightBuf[j];
                     float bj = buf[j];
-                    lb += bj*lp;
-                    rb += bj*rp;
-                    if (lb>maxAmplitude) maxAmplitude = lb;
-                    if (rb>maxAmplitude) maxAmplitude = rb;
+
+                    float lb = leftBuf[j];
+                    lb += bj * lp;
+                    if (lb > maxAmplitude) maxAmplitude = lb;
                     leftBuf[j] = lb;
+
+                    float rb = rightBuf[j];
+                    rb += bj * rp;
+                    if (rb > maxAmplitude) maxAmplitude = rb;
                     rightBuf[j] = rb;
                 }
-            }
-            else
-            {
+            } else {
                 sound.skip(leftBuf.length, readRate);
             }
 
@@ -118,13 +115,12 @@ public class ListenerMixer implements StereoSoundProducer
             else
                 i++;
         }
-        
+
         return maxAmplitude;
     }
 
     @Override
-    public void skip(int samplesToSkip, int readRate)
-    {
+    public void skip(int samplesToSkip, int readRate) {
         for (Sound sound : sounds) {
             sound.skip(samplesToSkip, readRate);
         }

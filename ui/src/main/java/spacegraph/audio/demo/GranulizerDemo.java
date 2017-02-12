@@ -5,7 +5,6 @@ import spacegraph.audio.SoundListener;
 import spacegraph.audio.granular.Granulize;
 import spacegraph.audio.granular.TimeStretchGui;
 import spacegraph.audio.sample.SampleLoader;
-import spacegraph.audio.sample.SamplePlayer;
 import spacegraph.audio.sample.SonarSample;
 
 import javax.sound.sampled.LineUnavailableException;
@@ -57,14 +56,14 @@ public enum GranulizerDemo {
 
         TimeStretchGui gui = new TimeStretchGui(audio);
 
-        SonarSample smp = SampleLoader.load("/tmp/317683__jalastram__sfx-pickup-04.wav");
+        SonarSample smp = SampleLoader.load("/tmp/awake.wav");
 
-        Granulize ts = new Granulize(smp, 0.3f, 0.2f);
-        ts.setStretchFactor(0.5f);
+        Granulize ts = new Granulize(smp, 0.25f, 0.9f);
+        ts.setStretchFactor(0.25f);
 
-        //audio.play(ts, SoundListener.zero, 1, 1);
+        audio.play(ts, SoundListener.zero, 1, 1);
 
-        audio.play(new SamplePlayer(smp, 0.5f), SoundListener.zero, 1, 1);
+        //audio.play(new SamplePlayer(smp, 0.5f), SoundListener.zero, 1, 1);
 
 
         frame.setLayout(new GridLayout());

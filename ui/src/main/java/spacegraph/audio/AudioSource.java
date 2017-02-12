@@ -118,13 +118,13 @@ public class AudioSource implements WaveSource {
         // we need to convert our read byte[] to short[]
         // (see source from FFmpegFrameRecorder.recordSamples for AV_SAMPLE_FMT_S16)
         // Let's initialize our short[] array
-        int nSamplesRead = nBytesRead / 2;
 
 
         // Let's wrap our short[] into a ShortBuffer and
         // pass it to recordSamples
         ByteBuffer.wrap(audioBytes).order(ByteOrder.LITTLE_ENDIAN).asShortBuffer().get(samples);
 
+        int nSamplesRead = nBytesRead / 2;
         int start = Math.max(0, nSamplesRead - bufferSamples);
         int end = nSamplesRead;
         int j = 0;

@@ -11,7 +11,7 @@ import edu.cmu.sphinx.result.WordResult;
  */
 public class SpeechIn {
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) throws java.io.IOException {
 
         Configuration configuration = new Configuration();
         configuration

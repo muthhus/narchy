@@ -12,18 +12,16 @@ import java.nio.ByteOrder;
 import java.util.List;
 
 
-public class Audio implements Runnable
-{
+public class Audio implements Runnable {
     private final AudioFormat audioFormat;
     private final Line.Info info;
     private final int bufferBytes;
-    public final int maxChannels
-            ;
+    public final int maxChannels;
     private final SonarSample silentSample;
     private final SourceDataLine sdl;
     private final int rate = 44100;
     private final ListenerMixer listenerMixer;
-    private final int bufferSize = rate / 16;
+    private final int bufferSize = rate / 8;
     private final ByteBuffer soundBuffer = ByteBuffer.allocate(bufferSize * 4);
     private final float[] leftBuf, rightBuf;
     //private float amplitude = 1;
@@ -38,10 +36,10 @@ public class Audio implements Runnable
     public Audio(int maxChannels) throws LineUnavailableException {
 
         this.maxChannels = maxChannels;
-        silentSample = new SonarSample(new float[] {0}, 44100);
+        silentSample = new SonarSample(new float[]{0}, 44100);
         Mixer mixer = AudioSystem.getMixer(null);
 
-        bufferBytes = bufferSize * 2 * 2 * 2 * 2 * 2;
+        bufferBytes = bufferSize * 2 * 2;
 
         sdl = (SourceDataLine) mixer.getLine(info = new Line.Info(SourceDataLine.class));
         sdl.open(audioFormat = new AudioFormat(rate, 16, 2, true, false), bufferBytes);
@@ -49,12 +47,10 @@ public class Audio implements Runnable
         sdl.start();
 
 
-
         try {
             FloatControl volumeControl = (FloatControl) sdl.getControl(FloatControl.Type.MASTER_GAIN);
             volumeControl.setValue(volumeControl.getMaximum());
-        }
-        catch (IllegalArgumentException e)        {
+        } catch (IllegalArgumentException ignored) {
             System.out.println("Failed to set the sound volume");
         }
 
@@ -66,12 +62,12 @@ public class Audio implements Runnable
 
         Thread thread = new Thread(this);
         thread.setDaemon(true);
-        thread.setPriority(10);
+        //thread.setPriority(10);
         thread.start();
 
     }
 
-    public void record(String path) throws LineUnavailableException, IOException {
+    public void record(String path) throws LineUnavailableException, java.io.FileNotFoundException {
 
         //if (rec != null) //...
 
@@ -91,13 +87,11 @@ public class Audio implements Runnable
 
     }
 
-    public void setListener(SoundListener soundListener)
-    {
+    public void setListener(SoundListener soundListener) {
         listenerMixer.setSoundListener(soundListener);
     }
 
-    public void shutDown()
-    {
+    public void shutDown() {
         alive = false;
     }
 
@@ -131,32 +125,28 @@ public class Audio implements Runnable
         play(p, new DefaultSource(p), volume, priority);
     }
 
-    public void play(SoundProducer p, SoundSource soundSource, float volume, float priority)
-    {
+    public void play(SoundProducer p, SoundSource soundSource, float volume, float priority) {
 //        if (!alive)
 //            return;
-//
-        synchronized (listenerMixer) {
-            listenerMixer.addSoundProducer(p, soundSource, volume, priority);
-        }
+        listenerMixer.addSoundProducer(p, soundSource, volume, priority);
     }
 
-    public List<Sound> getSounds() { return listenerMixer.sounds; }
+    public List<Sound> getSounds() {
+        return listenerMixer.sounds;
+    }
 
-    public void clientTick(float alpha)
-    {
+    public void clientTick(float alpha) {
         synchronized (listenerMixer) {
             listenerMixer.update(alpha);
         }
     }
 
-    public void tick()
-    {
+    public void tick() {
         //soundBuffer.clear();
 
         //        targetAmplitude = (targetAmplitude - 1) * 0.9f + 1;
         //        targetAmplitude = (targetAmplitude - 1) * 0.9f + 1;
-        synchronized (listenerMixer)        {
+        synchronized (listenerMixer) {
             float maxAmplitude = listenerMixer.read(leftBuf, rightBuf, rate);
             ////            if (maxAmplitude > targetAmplitude) targetAmplitude = maxAmplitude;
         }
@@ -164,20 +154,20 @@ public class Audio implements Runnable
         soundBuffer.clear();
         int max16 = 32767;
         float gain = max16;
-        for (int i = 0; i < bufferSize; i++)
-        {
+        for (int i = 0; i < bufferSize; i++) {
             //            amplitude += (targetAmplitude - amplitude) / rate;
             //          amplitude = 1;
             //              float gain = 30000;
-            int l = (int) (leftBuf[i] * gain);
-            int r = (int) (rightBuf[i] * gain);
+
+            int l = Math.round(leftBuf[i] * gain);
             if (l > max16) l = max16;
             else if (l < -max16) l = -max16;
+            soundBuffer.putShort((short) l);
+
+            int r = Math.round(rightBuf[i] * gain);
             if (r > max16) r = max16;
             else if (r < -max16) r = -max16;
-
-            soundBuffer.putShort((short)l);
-            soundBuffer.putShort((short)r);
+            soundBuffer.putShort((short) r);
 
             //doesnt work right:
             //soundBuffer.putInt( ((short)r) | ( ((short)l) << 16));
@@ -187,25 +177,23 @@ public class Audio implements Runnable
 
         byte[] ba = soundBuffer.array();
         sdl.write(ba, 0, bufferSize * 2 * 2);
-        if (rec!=null)
+        if (rec != null) {
             try {
-              rec.write(ba, 0, bufferSize * 2 * 2);
-              rec.flush();
+                rec.write(ba, 0, bufferSize * 2 * 2);
+                rec.flush();
             } catch (Exception e) {
                 e.printStackTrace();
             }
+        }
     }
 
     @Override
-    public void run()
-    {
-        while (alive)
-        {
+    public void run() {
+        while (alive) {
             clientTick(alpha);
             tick();
         }
     }
-
 
 
     public void setAlpha(float alpha) {

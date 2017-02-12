@@ -1,7 +1,7 @@
 package spacegraph.audio.granular;
 
-import jcog.data.MutableDouble;
 import jcog.data.random.XorShift128PlusRandom;
+import org.apache.commons.lang3.mutable.MutableFloat;
 import spacegraph.audio.SoundProducer;
 import spacegraph.audio.sample.SonarSample;
 
@@ -11,14 +11,15 @@ public class Granulize implements SoundProducer, SoundProducer.Amplifiable {
 
 	private final float[] sourceBuffer;
 	private float now;
+	private float playTime;
 
     /** this actually represents the target amplitude which the current amplitude will continuously interpolate towards */
-    public final MutableDouble amplitude = new MutableDouble(1.0);
+    public final MutableFloat amplitude = new MutableFloat(1.0f);
+	public final MutableFloat stretchFactor = new MutableFloat(1.0f);
+	public final MutableFloat pitchFactor = new MutableFloat(1.0f);
 
     protected float currentAmplitude = amplitude.floatValue();
 
-	public final MutableDouble stretchFactor = new MutableDouble(1.0);
-    public final MutableDouble pitchFactor = new MutableDouble(1.0);
 
     /** grains are represented as a triple of long integers (see Granulator.createGrain() which constructs these) */
 	private long[] currentGrain;
@@ -26,14 +27,11 @@ public class Granulize implements SoundProducer, SoundProducer.Amplifiable {
 
 	private final Granulator granulator;
 	private boolean isPlaying;
-	private float playTime;
 	private int playOffset = -1;
 
+	final Random rng = new XorShift128PlusRandom(1);
 
 
-	public Granulize(SonarSample s, float grainSizeSecs) {
-		this(s, grainSizeSecs, 1.0f);
-	}
 
     public Granulize(SonarSample s, float grainSizeSecs, float windowSizeFactor) {
         this(s.buf, s.rate, grainSizeSecs, windowSizeFactor);
@@ -78,7 +76,7 @@ public class Granulize implements SoundProducer, SoundProducer.Amplifiable {
 
 		for (int i = 0; i < samples; i++ ) {
             float nextSample = 0;
-            long lnow = (long)n;
+            long lnow = Math.round(n);
 			if (cGrain != null) {
 				nextSample = g.getSample(cGrain, lnow);
 				if (Granulator.isFading(cGrain, lnow)) {
@@ -107,7 +105,7 @@ public class Granulize implements SoundProducer, SoundProducer.Amplifiable {
 
     @Override
 	public final void setAmplitude(float amplitude) {
-        this.amplitude.set(amplitude);
+        this.amplitude.setValue(amplitude);
     }
 
     @Override
@@ -115,7 +113,6 @@ public class Granulize implements SoundProducer, SoundProducer.Amplifiable {
         return amplitude.floatValue();
     }
 
-	final Random rng = new XorShift128PlusRandom(1);
 
     public void play() {
 		playOffset = rng.nextInt();
@@ -135,20 +132,20 @@ public class Granulize implements SoundProducer, SoundProducer.Amplifiable {
 
 	private long[] nextGrain(long[] targetGrain) {
 		//System.out.println("create grain: " + calculateCurrentBufferIndex() + " " + now);
-        targetGrain = granulator.nextGrain(targetGrain, calculateCurrentBufferIndex(), (long)now);
+        targetGrain = granulator.nextGrain(targetGrain, calculateCurrentBufferIndex(), now);
         return targetGrain;
 	}
 
 	private int calculateCurrentBufferIndex() {
         float sf = stretchFactor.floatValue();
 
-		return (playOffset + Math.round((now - playTime) / sf)) % sourceBuffer.length;
+		return Math.round(playOffset + (now - playTime) / sf) % sourceBuffer.length;
 	}
 
 	public Granulize setStretchFactor(float stretchFactor) {
 		playOffset = calculateCurrentBufferIndex();
 		playTime = now;
-		this.stretchFactor.set(stretchFactor);
+		this.stretchFactor.setValue(stretchFactor);
         return this;
 	}
 
