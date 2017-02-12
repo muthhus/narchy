@@ -62,6 +62,7 @@ import static nars.$.$;
 import static nars.$.*;
 import static nars.Op.*;
 import static nars.concept.CompoundConcept.DuplicateMerge;
+import static nars.term.Terms.compoundOrNull;
 import static nars.term.transform.Functor.f;
 import static nars.time.Tense.ETERNAL;
 import static org.fusesource.jansi.Ansi.ansi;
@@ -771,6 +772,20 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
         return t;
     }
 
+    @NotNull
+    public Term pre(@NotNull Term t) {
+        return t;
+    }
+
+    @NotNull
+    public Compound pre(@NotNull Compound c) {
+        Compound d = compoundOrNull(pre((Term)c));
+        if (d == null)
+            return c; //unchanged because post-processing resulted in invalid or non-compound
+        else
+            return d;
+    }
+
     /** override to apply any post-processing of a task before it is made available for external use (ex: decompression) */
     @NotNull public Task post(@NotNull Task t) {
         return t;
@@ -779,6 +794,14 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
     /** override to apply any post-processing of a term before it is made available for external use (ex: decompression) */
     @NotNull public Term post(@NotNull Term t) {
         return t;
+    }
+
+    @NotNull public Compound post(@NotNull Compound c) {
+        Compound d = compoundOrNull(post((Term)c));
+        if (d == null)
+            return c; //unchanged because post-processing resulted in invalid or non-compound
+        else
+            return d;
     }
 
     protected void processDuplicate(@NotNull Task input, Task existing) {

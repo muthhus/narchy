@@ -223,9 +223,7 @@ public class Compressor extends Abbreviation implements RemovalListener<Compound
             try {
 
                 /*Array*/List<SequenceMatcher> mm = (List<SequenceMatcher>) encoder.allMatches(wr, i);
-                if (mm.size() > 1) {
-                    System.out.println(mm);
-                }
+
                 if (!mm.isEmpty()) {
                     for (int i1 = 0, mmSize = mm.size(); i1 < mmSize; i1++) {
                         SequenceMatcher m = mm.get(i1);

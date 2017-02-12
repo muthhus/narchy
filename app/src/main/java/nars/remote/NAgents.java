@@ -36,6 +36,7 @@ import nars.util.task.TaskStatistics;
 import nars.video.*;
 import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunction;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import spacegraph.Surface;
 import spacegraph.space.layout.Grid;
 import spacegraph.space.layout.TabPane;
@@ -191,16 +192,21 @@ abstract public class NAgents extends NAgent {
                 time,
                 exe) {
 
-            final Compressor compressor = new Compressor(this, "_", 3, 10, 3f, 64, 384);
+            final Compressor compressor = new Compressor(this, "_", 4, 10, 3f, 64, 384);
 
             @Override
-            protected Task pre(@NotNull Task t) {
+            public Task pre(@NotNull Task t) {
                 if (!t.isInput() || (t instanceof SignalTask)) {
                     return compressor.encode(t);
                 } else {
                     return t; //dont affect input
                 }
+            }
 
+            @NotNull
+            @Override
+            public Term pre(@NotNull Term t) {
+                return compressor.encode(t);
             }
 
             @NotNull
