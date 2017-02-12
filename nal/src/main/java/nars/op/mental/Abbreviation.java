@@ -6,6 +6,7 @@ import nars.NAR;
 import nars.Op;
 import nars.Task;
 import nars.attention.Activation;
+import nars.bag.Bag;
 import nars.bag.CurveBag;
 import nars.budget.Budget;
 import nars.budget.BudgetMerge;
@@ -13,6 +14,7 @@ import nars.concept.AtomConcept;
 import nars.concept.CompoundConcept;
 import nars.concept.Concept;
 import nars.concept.PermanentConcept;
+import nars.conceptualize.DefaultConceptBuilder;
 import nars.link.BLink;
 import nars.link.RawBLink;
 import nars.op.Leak;
@@ -45,7 +47,7 @@ import static nars.time.Tense.ETERNAL;
  *
  * @param S serial term type
  */
-public class Abbreviation/*<S extends Term>*/ extends Leak<CompoundConcept,BLink<CompoundConcept>> {
+public class Abbreviation/*<S extends Term>*/ extends Leak<Compound, BLink<Compound>> {
 
     /**
      * when a concept is important and exceeds a syntactic complexity above
@@ -66,7 +68,9 @@ public class Abbreviation/*<S extends Term>*/ extends Leak<CompoundConcept,BLink
      */
     public final MutableFloat abbreviationProbability = new MutableFloat(2f);
 
-    /** whether to use a (strong, proxying) alias atom concept */
+    /**
+     * whether to use a (strong, proxying) alias atom concept
+     */
     boolean aliasConcept = false;
 
     static final Logger logger = LoggerFactory.getLogger(Abbreviation.class);
@@ -88,46 +92,49 @@ public class Abbreviation/*<S extends Term>*/ extends Leak<CompoundConcept,BLink
         this.minAbbreviableVolume.set(volMin);
         this.abbreviationConfidence =
                 new MutableFloat(nar.confidenceDefault(Op.BELIEF));
-                //new MutableFloat(1f - nar.truthResolution.floatValue());
+        //new MutableFloat(1f - nar.truthResolution.floatValue());
         //new MutableFloat(nar.confidenceDefault(Symbols.BELIEF));
         this.maxVol = volMax;
     }
 
     @Nullable
     @Override
-    protected void in(@NotNull Task task, @NotNull Consumer<BLink<CompoundConcept>> each) {
+    protected void in(@NotNull Task task, @NotNull Consumer<BLink<Compound>> each) {
 
         if (task instanceof AbbreviationTask)
             return;
 
         Budget b = task.budget().clone();
-        if (b!=null)
+        if (b != null)
             input(b, each, task.term());
     }
 
-    private void input(@NotNull Budget b, @NotNull Consumer<BLink<CompoundConcept>> each, @NotNull Compound t) {
-        if (t.vars() == 0) {
-            int vol = t.volume();
-            if (vol >= minAbbreviableVolume.intValue())
-                if (vol <= maxVol && !t.hasTemporal()) {
+    private void input(@NotNull Budget b, @NotNull Consumer<BLink<Compound>> each, @NotNull Compound t) {
+        int vol = t.volume();
+        if (vol <= maxVol) {
+            if (t.vars() == 0 && !t.hasTemporal()) {
+                if (vol >= minAbbreviableVolume.intValue()) {
+
                     CompoundConcept abbreviable = (CompoundConcept) nar.concept(t);
-                    if ((abbreviable != null) &&
+                    if ((abbreviable == null) ||
                             !(abbreviable instanceof PermanentConcept) &&
                             abbreviable.get(Abbreviation.class) == null &&
                             abbreviable.get(Concept.Savior.class) == null) {
 
-                        each.accept(new RawBLink(abbreviable, b));
+                        each.accept(new RawBLink<Compound>(t, b));
                     }
-                } else {
-                    //recursiely try subterms of a temporal or exceedingly large concept
-                    t.forEachCompound(x -> input(b, each, ((Compound) x)));
+
                 }
+            }
+        } else {
+            //recursiely try subterms of a temporal or exceedingly large concept
+            t.forEachCompound(x -> input(b, each, ((Compound) x)));
         }
     }
 
 
     @Override
-    protected float onOut(BLink<CompoundConcept> b) {
+    protected float onOut(BLink<Compound> b) {
 
         abbreviate(b.get(), b);
         return 1f;
@@ -179,7 +186,7 @@ public class Abbreviation/*<S extends Term>*/ extends Leak<CompoundConcept,BLink
     //private boolean createRelation = false;
 
 
-    protected void abbreviate(@NotNull CompoundConcept abbreviated, @NotNull Budget b) {
+    protected void abbreviate(@NotNull Compound abbreviated, @NotNull Budget b) {
 
         String id;
 //            id = newCanonicalTerm(abbreviated);
@@ -193,13 +200,13 @@ public class Abbreviation/*<S extends Term>*/ extends Leak<CompoundConcept,BLink
         if (abbreviation != null) {
 
             @Nullable Concept a = nar.concept(abbreviated);
-            if (a!=null) {
+            if (a != null) {
 
                 if (a.putIfAbsent(Abbreviation.class, id) == null) {
 
-                    Concept alias = aliasConcept ? nar.on(new AliasConcept(id, abbreviated, nar, abbreviation)) : null;
+                    Concept alias = aliasConcept ? nar.on(AliasConcept.get(id, abbreviated, nar, abbreviation)) : null;
 
-                    Termed aliasTerm = alias!=null ? alias : $.the(id);
+                    Termed aliasTerm = alias != null ? alias : $.the(id);
 
                     //if (abbreviation != null) {
 
@@ -229,12 +236,12 @@ public class Abbreviation/*<S extends Term>*/ extends Leak<CompoundConcept,BLink
 //        }
 
     @Nullable
-    Compound newRelation(@NotNull Concept abbreviated, @NotNull String id) {
+    Compound newRelation(@NotNull Compound abbreviated, @NotNull String id) {
         return compoundOrNull(
-                        $.sim(abbreviated.term(), $.the(id))
-                        //$.equi
+                $.sim(abbreviated, $.the(id))
+                //$.equi
 
-                );
+        );
         //(Compound) $.equi(abbreviated.term(), id);
         //(Compound) $.secte(abbreviated.term(), id);
 
@@ -276,15 +283,20 @@ public class Abbreviation/*<S extends Term>*/ extends Leak<CompoundConcept,BLink
     static final class AliasConcept extends AtomConcept {
 
         @NotNull
-        private final Concept abbr;
+        private final CompoundConcept abbr;
         private TermContainer templates;
 
-        public AliasConcept(@NotNull String term, @NotNull Concept abbreviated, @NotNull NAR nar, @NotNull Term... additionalTerms) {
-            super(term, Op.ATOM, abbreviated.termlinks(), abbreviated.tasklinks());
+        static public AliasConcept get(@NotNull String term, @NotNull Compound abbreviated, @NotNull NAR nar, @NotNull Term... additionalTerms) {
+            Concept c = nar.concept(abbreviated, true);
+            AliasConcept a = new AliasConcept(term, (CompoundConcept)c, nar, additionalTerms);
+            c.put(Concept.Savior.class, a);
+            return a;
+        }
 
-            abbreviated.put(Concept.Savior.class, this);
+        AliasConcept(@NotNull String abbreviation, CompoundConcept abbr, @NotNull NAR nar, @NotNull Term... additionalTerms) {
+            super(abbreviation, Op.ATOM, abbr.termlinks(), abbr.tasklinks());
 
-            this.abbr = abbreviated;
+            this.abbr = abbr;
 
 //            Term[] tl = ArrayUtils.add(abbreviated.templates().terms(), abbreviated.term());
 //            if (additionalTerms.length > 0)

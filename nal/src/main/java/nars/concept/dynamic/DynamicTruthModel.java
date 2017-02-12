@@ -70,7 +70,7 @@ abstract public class DynamicTruthModel {
                 boolean evi = d.e != null;
 
                 Truth nt;
-                if (tableDynamic) {
+                if (tableDynamic && subterm instanceof Compound) {
                     DynTruth ndt = ((DynamicBeliefTable) table).truth(when + dt, now, (Compound) subterm, evi);
                     if (ndt != null) {
                         Truth ntt = ndt.truth();

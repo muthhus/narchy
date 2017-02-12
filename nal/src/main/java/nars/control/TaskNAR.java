@@ -23,6 +23,7 @@ import nars.index.task.TaskIndex;
 import nars.index.term.map.CaffeineIndex;
 import nars.link.BLink;
 import nars.link.DependentBLink;
+import nars.op.mental.Compressor;
 import nars.premise.Derivation;
 import nars.premise.PreferSimpleAndConfidentPremise;
 import nars.premise.Premise;
@@ -56,6 +57,8 @@ public class TaskNAR extends NAR {
     final Deriver deriver = new DefaultDeriver();
 
     final MutableInteger derivationsPerCycle = new MutableInteger(128);
+
+    final Compressor compressor;
 
     final PremiseBuilder premiseBuilder = new PremiseBuilder() {
 
@@ -100,6 +103,8 @@ public class TaskNAR extends NAR {
         super(time, new CaffeineIndex(new SimpleConceptBuilder(), -1, false, exe),
                 new XorShift128PlusRandom(1), exe);
 
+
+        compressor = new Compressor(this, "_", 2, 6, 0.05f, 32);
 
         tasksBag = new HijackBag<Task>(capacity, 2, BudgetMerge.maxBlend, random) {
         //tasksBag = new CurveBag<Task>(capacity, new CurveBag.NormalizedSampler(power2BagCurve, random), BudgetMerge.maxBlend, new ConcurrentHashMap<>(capacity)) {
@@ -342,6 +347,11 @@ public class TaskNAR extends NAR {
         }
     }
 
+
+    protected Task compress(Task x) {
+        return !x.isInput() ? compressor.encode(x) : x;
+    }
+
     private static class MyActivation extends Activation {
         public MyActivation(@NotNull Task t, Concept c) {
             super(t, 1f, c, null);
@@ -352,7 +362,7 @@ public class TaskNAR extends NAR {
 
         @Override
         public @Nullable Task addIfAbsent(@NotNull Task t) {
-            BLink<Task> r = tasksBag.put(new DependentBLink(t));
+            BLink<Task> r = tasksBag.put(new DependentBLink(compress(t)));
             if (r == null) {
                 t.delete();
                 return t; //rejected

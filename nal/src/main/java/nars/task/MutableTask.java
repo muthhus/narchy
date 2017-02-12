@@ -283,7 +283,7 @@ public class MutableTask extends AbstractTask {
         return this;
     }
 
-    @Nullable public static MutableTask clone(@NotNull Task xt, @NotNull Compound y, @NotNull NAR nar) {
+    @Nullable public static MutableTask clone(@NotNull Task xt, @NotNull Compound y) {
 //        if (!y.isNormalized()) {
 //            y = (Compound) nar.normalize(y);
 //            if (y == null)
@@ -293,22 +293,11 @@ public class MutableTask extends AbstractTask {
         MutableTask yt = new MutableTask(y, xt.punc(), xt.truth());
         yt.setBudget(xt);
         yt.setEvidence(xt.evidence());
-        yt.time(xt.creation(), xt.start());
+        yt.time(xt.creation(), xt.start(), xt.end());
         return yt;
     }
 
-    @NotNull
-    public static Task clone(@NotNull Task t, long newOccurrence) {
-        return clone(t, t.truth(), newOccurrence);
-    }
-    @NotNull
-    public static Task clone(@NotNull Task t, Truth newTruth, long newOccurrence) {
-        MutableTask yt = new MutableTask(t.term(), t.punc(), newTruth);
-        yt.budgetSafe(t.budget());
-        yt.setEvidence(t.evidence());
-        yt.time(t.creation(), newOccurrence);
-        return yt;
-    }
+
 
 //    /**
 //     * append a log entry; returns this task
