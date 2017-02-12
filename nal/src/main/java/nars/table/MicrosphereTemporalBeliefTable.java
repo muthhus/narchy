@@ -32,7 +32,7 @@ import static java.lang.Math.abs;
  */
 public class MicrosphereTemporalBeliefTable extends MultiRWFasterList<Task> implements TemporalBeliefTable {
 
-    private volatile int capacity;
+    private int capacity;
 
     public MicrosphereTemporalBeliefTable(int initialCapacity) {
         super(new FasterList<Task>(initialCapacity));

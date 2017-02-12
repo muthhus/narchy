@@ -6,7 +6,7 @@ import nars.concept.CompoundConcept;
 import nars.concept.SensorConcept;
 import nars.truth.Truth;
 import nars.truth.TruthDelta;
-import nars.util.signal.ScalarSignal;
+import nars.util.signal.SignalTask;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,7 +34,7 @@ public class SensorBeliefTable extends DefaultBeliefTable  {
 
         long now = nar.time();
 
-        boolean local = input instanceof ScalarSignal.SignalTask;
+        boolean local = input instanceof SignalTask;
         if (local) {
 //            //invalidate existing derived beliefs which precede a sensor input
 //            temporal.removeIf((t)->{

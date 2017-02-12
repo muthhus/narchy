@@ -39,6 +39,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
 import static nars.bag.CurveBag.power2BagCurve;
+import static nars.bag.CurveBag.power4BagCurve;
 import static nars.term.Terms.compoundOrNull;
 import static nars.time.Tense.ETERNAL;
 
@@ -84,7 +85,9 @@ public class Abbreviation/*<S extends Term>*/ extends Leak<Compound, BLink<Compo
 
 
     public Abbreviation(@NotNull NAR n, String termPrefix, int volMin, int volMax, float selectionRate, int capacity) {
-        super(new CurveBag(capacity, new CurveBag.NormalizedSampler(power2BagCurve, n.random), BudgetMerge.maxHard, new ConcurrentHashMap()), selectionRate, n);
+        super(new CurveBag(capacity,
+                new CurveBag.NormalizedSampler(power4BagCurve, n.random),
+                BudgetMerge.plusBlend, new ConcurrentHashMap()), selectionRate, n);
 
         this.nar = n;
         this.termPrefix = termPrefix;
@@ -145,7 +148,7 @@ public class Abbreviation/*<S extends Term>*/ extends Leak<Compound, BLink<Compo
     @NotNull
     protected String newSerialTerm() {
 
-        return (termPrefix + "_" + Integer.toString(currentTermSerial.incrementAndGet(), 36));
+        return termPrefix + Integer.toString(currentTermSerial.incrementAndGet(), 36);
 
 //        int olen = name.length();
 //        switch (olen) {

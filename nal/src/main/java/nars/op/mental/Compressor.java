@@ -13,6 +13,7 @@ import nars.nar.Default;
 import nars.task.MutableTask;
 import nars.term.Compound;
 import nars.term.Term;
+import nars.time.Tense;
 import net.byteseek.automata.factory.MutableStateFactory;
 import net.byteseek.automata.trie.TrieFactory;
 import net.byteseek.io.reader.ByteArrayReader;
@@ -24,8 +25,10 @@ import net.byteseek.matcher.multisequence.TrieMultiSequenceMatcher;
 import net.byteseek.matcher.sequence.ByteSequenceMatcher;
 import net.byteseek.matcher.sequence.SequenceMatcher;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -106,8 +109,8 @@ public class Compressor extends Abbreviation implements RemovalListener<Compound
             return new Abbr(a.term(), compr, nar);
         });
         if (changed[0]) {
+            nar.believe($.sim(abb.compressed, abb.decompressed), Tense.Eternal, 1f, 0.99f);
             recompile();
-            nar.believe($.sim(abb.compressed, abb.decompressed));
         }
 
     }
@@ -167,8 +170,11 @@ public class Compressor extends Abbreviation implements RemovalListener<Compound
 
                 //System.out.println("  compress: " + i + " to " + o);
 
-                if (o instanceof Compound)
-                    return MutableTask.clone(tt, (Compound) o);
+                if (o instanceof Compound) {
+                    @Nullable MutableTask rr = MutableTask.clone(tt, (Compound) o);
+                    if (rr!=null)
+                        return rr;
+                }
             } catch (Throwable t) {
                 //HACK ignore
             }
@@ -210,69 +216,56 @@ public class Compressor extends Abbreviation implements RemovalListener<Compound
         int i = 0;
 
 
-        ByteArrayReader wr = null;
+        ByteArrayReader wr = new ByteArrayReader(b);
 
-        do {
-
-            if (wr == null) {
-                i = 0; //restart at beginning after each substitution
-                wr = new ByteArrayReader(b);
-            }
+        compare: do {
 
             try {
-                SequenceMatcher m = coder.firstMatch(wr, i);
-                //m = encoder.allMatches(b, i);
-                if (m == null) {
-                    i++;
-                    continue;
+
+                /*Array*/List<SequenceMatcher> mm = (List<SequenceMatcher>) encoder.allMatches(wr, i);
+                if (mm.size() > 1) {
+                    System.out.println(mm);
+                }
+                if (!mm.isEmpty()) {
+                    for (int i1 = 0, mmSize = mm.size(); i1 < mmSize; i1++) {
+                        SequenceMatcher m = mm.get(i1);
+                        Abbr c = abbr(m, en);
+                        if (c != null) {
+                            //substitute
+                            final byte[] to = en ? c.encoded : c.decoded;
+                            final byte[] from = en ? c.decoded : c.encoded;
+
+                            final byte[] prev = b;
+                            int change = to.length - from.length;
+                            final byte[] next = new byte[b.length + change];
+
+                            System.arraycopy(prev, 0, next, 0, i);
+                            System.arraycopy(to, 0, next, i, to.length);
+                            int l = b.length;
+                            if (i < l)
+                                System.arraycopy(prev, i + from.length, next, i + to.length, l - (i + from.length));
+
+                            b = next;
+                            i = 0; //start from beginning
+                            wr = new ByteArrayReader(b);
+                            break compare;
+                        }
+
+                    }
                 }
 
-                Abbr c = abbr(m, en);
-                if (c == null) {
-                    i++;
-                    continue; //HACK maybe other matches apply, try them all?
-                }
+                i++;
 
-                final byte[] to = en ? c.encoded : c.decoded;
-                final byte[] from = en ? c.decoded : c.encoded;
-
-                final byte[] prev = b;
-                int change = to.length - from.length;
-                final byte[] next = new byte[b.length + change];
-
-                System.arraycopy(prev, 0, next, 0, i);
-                System.arraycopy(to, 0, next, i, to.length);
-                int l = b.length;
-                if (i < l)
-                    System.arraycopy(prev, i + from.length, next, i + to.length, l - (i + from.length));
-
-                wr = null;
-                b = next;
-
-                //dont advance if changed
 
             } catch (IOException e) {
                 e.printStackTrace();
             }
 
         } while (i < b.length);
-//
-//        if (b!=bOriginal) {
-//            System.out.println("\t\t" + new String(b));
-//            System.out.println("\t\t\t" + IO.termFromBytes(b, nar.concepts));
-//        }
+
 
         return b;
 
-
-//        List<SearchResult<SequenceMatcher>> matches = encoder.searchForwards(b);
-//
-//        System.out.println(b.toString());
-//        for (SearchResult<SequenceMatcher> s : matches) {
-//            System.out.println("\t" + s.getMatchingObject().getClass() + ": " + s.getMatchingObject() + " @"  + s.getMatchPosition());
-//        }
-//
-//        return b;
     }
 
     private Abbr abbr(SequenceMatcher m, boolean en) {

@@ -6,7 +6,6 @@ import nars.NAR;
 import nars.Op;
 import nars.Param;
 import nars.Task;
-import nars.task.MutableTask;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
@@ -184,16 +183,6 @@ public class ScalarSignal implements Consumer<NAR>, DoubleSupplier {
 //    protected float freq(float v) {
 //        return v;
 //    }
-
-    public static class SignalTask extends MutableTask {
-
-
-        public SignalTask(@NotNull Termed<Compound> t, char punct, @Nullable Truth truth, long start, long end)  {
-            super(t, punct, truth);
-            time(start, start, end);
-        }
-
-    }
 
     @Nullable
     protected SignalTask task(float v, float prevV, long start, long end, Task previous) {

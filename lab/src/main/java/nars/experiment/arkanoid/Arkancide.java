@@ -12,7 +12,7 @@ import java.io.IOException;
 
 public class Arkancide extends NAgents {
 
-    static boolean cam = true;
+    static boolean cam = false;
 
     private final float paddleSpeed = 1f;
 
@@ -29,7 +29,7 @@ public class Arkancide extends NAgents {
 
             return agent;
 
-        }, 20, 3, -1);
+        }, 20, 6, 4000);
 
         //System.out.println(ts.db.getInfo());
 
@@ -66,10 +66,13 @@ public class Arkancide extends NAgents {
             }
         };
 
-
+        //nar.linkFeedbackRate.setValue(0.02f);
+        nar.termVolumeMax.setValue(30);
         maxPaddleSpeed = 46 * Arkanoid.BALL_VELOCITY;
 
-        nar.truthResolution.setValue(0.02f);
+        nar.truthResolution.setValue(0.1f);
+        nar.beliefConfidence(0.5f);
+        nar.goalConfidence(0.5f);
 
         //nar.input(new MutableTask(happy, Op.BELIEF, $.t(0.5f, 0.15f)).eternal());
 
@@ -88,10 +91,7 @@ public class Arkancide extends NAgents {
             senseNumber("vy(ball, noid)", new FloatPolarNormalized(()->noid.ball.velocityY));
         }
 
-        nar.beliefConfidence(0.9f);
-        nar.goalConfidence(0.9f);
-        //nar.linkFeedbackRate.setValue(0.02f);
-        nar.termVolumeMax.setValue(40);
+
 
 
 

@@ -108,18 +108,7 @@ public interface Budget extends Budgeted {
     default void priAdd(float toAdd) {
         setPriority(priSafe(0) + toAdd);
     }
-    default void priSub(float toSubtract) {
-        float p = pri();
-
-        if (p!=p)
-            throw new BudgetException();
-
-        p -= toSubtract;
-        if (p < -Param.BUDGET_EPSILON)
-            throw new BudgetException("Budget Underflow");
-
-        setPriority(p);
-    }
+    default void priSub(float toSubtract) { setPriority(priSafe(0) - toSubtract); }
 
     @NotNull
     default Budgeted cloneMult(float p, float d, float q) {

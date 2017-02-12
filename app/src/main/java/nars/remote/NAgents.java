@@ -13,7 +13,6 @@ import nars.bag.HijackBag;
 import nars.budget.BudgetMerge;
 import nars.concept.Concept;
 import nars.conceptualize.DefaultConceptBuilder;
-import nars.control.TaskNAR;
 import nars.gui.BagChart;
 import nars.gui.Vis;
 import nars.index.term.map.CaffeineIndex;
@@ -22,16 +21,17 @@ import nars.link.RawBLink;
 import nars.nar.Default;
 import nars.nar.NARBuilder;
 import nars.op.Leak;
-import nars.op.mental.Abbreviation;
 import nars.op.mental.Compressor;
 import nars.op.mental.Inperience;
 import nars.op.stm.MySTMClustered;
+import nars.term.Term;
 import nars.time.FrameTime;
 import nars.time.RealTime;
 import nars.time.Time;
 import nars.truth.Truth;
 import nars.util.exe.Executioner;
 import nars.util.exe.MultiThreadExecutioner;
+import nars.util.signal.SignalTask;
 import nars.util.task.TaskStatistics;
 import nars.video.*;
 import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunction;
@@ -135,8 +135,8 @@ abstract public class NAgents extends NAgent {
         chart(a);
 
         a.runRT(fps, endTime).join();
-//
-//        print(nar, a);
+
+        print(nar, a);
 
         return nar;
 
@@ -183,22 +183,34 @@ abstract public class NAgents extends NAgent {
 
 
         //Multi nar = new Multi(3,512,
-        Default nar = new Default(32768,
+        Default nar = new Default(16 * 1024,
                 conceptsPerCycle, 1, 3, rng,
-                new CaffeineIndex(new DefaultConceptBuilder(), 128*1024, false, exe)
+                new CaffeineIndex(new DefaultConceptBuilder(), 256*1024, false, exe)
                 //new TreeTermIndex.L1TreeIndex(new DefaultConceptBuilder(), 300000, 32 * 1024, 3)
                 ,
                 time,
                 exe) {
 
-            final Compressor compressor = new Compressor(this, "_", 4, 8, 1f, 64, 256);
+            final Compressor compressor = new Compressor(this, "_", 3, 10, 3f, 64, 384);
 
             @Override
             protected Task pre(@NotNull Task t) {
-                if (t.isInput())
-                    return t; //dont affect input
-                else
+                if (!t.isInput() || (t instanceof SignalTask)) {
                     return compressor.encode(t);
+                } else {
+                    return t; //dont affect input
+                }
+
+            }
+
+            @NotNull
+            @Override public Task post(@NotNull Task t) {
+                return compressor.decode(t);
+            }
+
+            @Override
+            @NotNull public Term post(@NotNull Term t) {
+                return compressor.decode(t);
             }
 
             @Override

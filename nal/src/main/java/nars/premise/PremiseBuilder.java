@@ -48,7 +48,7 @@ abstract public class PremiseBuilder {
      * patham9 its using the result of higher confidence
      */
     @Nullable
-    public Premise premise(@NotNull Termed c, @NotNull final Task task, Term beliefTerm, long now, NAR nar, float priFactor, float priMin) {
+    public Premise premise(@NotNull Termed c, @NotNull final Task _task, Term _beliefTerm, long now, NAR nar, float priFactor, float priMin) {
 
         //if (Param.PREMISE_LOG)
         //logger.info("try: { concept:\"{}\",\ttask:\"{}\",\tbeliefTerm:\"{}\" }", c, task, beliefTerm);
@@ -56,10 +56,13 @@ abstract public class PremiseBuilder {
 //        if (Terms.equalSubTermsInRespectToImageAndProduct(task.term(), term))
 //            return null;
 
-        final Budget taskBudget = task.budget().clone();
+
+        final Budget taskBudget = _task.budget().clone();
         if (taskBudget == null)
             return null;
 
+        final Task task = nar.post(_task);
+        Term beliefTerm = nar.post(_beliefTerm).unneg();
 //        Budget termLinkBudget = termLink.clone();
 //        if (termLinkBudget == null)
 //            return null;
@@ -148,6 +151,8 @@ abstract public class PremiseBuilder {
                 belief = beliefConcept.beliefs().match(when, now, dur, task, true); //in case of quest, proceed with matching belief
             }
         }
+
+
 
 //                if (belief != null) {
 //                    //try {

@@ -14,6 +14,8 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 
 import static nars.$.t;
+import static nars.Op.NEG;
+import static nars.term.Terms.compoundOrNull;
 
 /**
  * Mutable task with additional fluent api utility methods
@@ -294,7 +296,14 @@ public class MutableTask extends AbstractTask {
         if (b.isDeleted()) {
             return null;
         } else {
-            MutableTask yt = new MutableTask(y, xt.punc(), xt.truth());
+            boolean negated = (y.op()==NEG);
+            if (negated)
+                y = compoundOrNull(y.unneg());
+
+            if (y == null)
+                return null;
+
+            MutableTask yt = new MutableTask(y, xt.punc(), xt.truth().negIf(negated));
             yt.setBudget(b);
             yt.setEvidence(xt.evidence());
             yt.time(xt.creation(), xt.start(), xt.end());

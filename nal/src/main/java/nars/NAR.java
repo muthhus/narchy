@@ -732,7 +732,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
                 Activation a = process(input, c);
                 if (a != null) {
 
-                    eventTaskProcess.emit(input);
+                    eventTaskProcess.emit(post(input));
 
                     emotion.learn(input.priSafe(0));
 
@@ -766,8 +766,18 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
         return null;
     }
 
-    /** override to perform any preprocessing of a task (applied before the normalization step)*/
-    protected Task pre(@NotNull Task t) {
+    /** override to perform any preprocessing of a task (applied before the normalization step) */
+    @Nullable protected Task pre(@NotNull Task t) {
+        return t;
+    }
+
+    /** override to apply any post-processing of a task before it is made available for external use (ex: decompression) */
+    @NotNull public Task post(@NotNull Task t) {
+        return t;
+    }
+
+    /** override to apply any post-processing of a term before it is made available for external use (ex: decompression) */
+    @NotNull public Term post(@NotNull Term t) {
         return t;
     }
 

@@ -21,8 +21,8 @@ abstract public class Loop implements Runnable {
     protected final int windowLength = 16;
 
     protected long afterTime;
-    protected volatile boolean stopping;
-    protected volatile boolean stopped;
+    protected boolean stopping;
+    protected boolean stopped;
     public final DescriptiveStatistics frameTime = new DescriptiveStatistics(windowLength); //in millisecond
     private int periodMS;
 
