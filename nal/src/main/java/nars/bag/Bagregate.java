@@ -22,7 +22,7 @@ public class Bagregate<X> extends ArrayBag<X> {
     final AtomicBoolean busy = new AtomicBoolean();
 
     public Bagregate(@NotNull Iterable<? extends BLink<X>> src, int capacity, float scale) {
-        super(capacity, BudgetMerge.plusBlend, new ConcurrentHashMap<>(capacity));
+        super(capacity, BudgetMerge.avgBlend, new ConcurrentHashMap<>(capacity));
 
         this.src = src;
         this.scale = new FloatParam(scale);

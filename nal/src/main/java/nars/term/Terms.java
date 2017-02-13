@@ -27,6 +27,7 @@ import java.util.function.*;
 
 import static nars.Op.*;
 import static nars.time.Tense.DTERNAL;
+import static nars.time.Tense.XTERNAL;
 
 /**
  * Static utility class for static methods related to Terms
@@ -576,19 +577,34 @@ public class Terms   {
                     //(dt == DTERNAL||dt==0) ? DTERNAL : XTERNAL /* preserve order */,
                     ss)/*)*/ : null;
 
+
+
         } else {
             newSubs = null;
         }
 
 
         int pdt = c.dt();
+
+
+
+
         boolean dtChanged = (pdt != DTERNAL && o.temporal);
-        boolean subsChanged = newSubs != null;
+        boolean subsChanged = (newSubs!=null);
 
         if (subsChanged || dtChanged) {
 
+            if (subsChanged &&o.statement && newSubs.size()==1) {
+                //it was a repeat which collapsed, so use XTERNAL and repeat the subterm
+                pdt = XTERNAL;
+                Term s = newSubs.term(0);
+                newSubs = TermVector.the(s,s);
+            } else {
+                pdt = DTERNAL;
+            }
+
             Compound xx = $.terms.newCompound(o,
-                    dtChanged ? DTERNAL : pdt,
+                    pdt,
                     subsChanged ? newSubs : psubs);
 
             if (c.isNormalized())

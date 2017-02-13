@@ -333,8 +333,7 @@ abstract public class NAgents extends NAgent {
     public static void chart(NAgents a) {
         NAR nar = a.nar;
 
-        BagChart<Task> taskChart = new BagChart<Task>(new Leak<Task,BLink<Task>>(new ArrayBag<Task>(16, BudgetMerge.plusBlend, new ConcurrentHashMap<>()), 0f, a.nar) {
-
+        BagChart<Task> taskChart = new BagChart<Task>(new Leak<Task,BLink<Task>>(new ArrayBag<Task>(16, BudgetMerge.maxBlend, new ConcurrentHashMap<>()), 0f, a.nar) {
 
             @Override
             protected float onOut(@NotNull BLink<Task> b) {

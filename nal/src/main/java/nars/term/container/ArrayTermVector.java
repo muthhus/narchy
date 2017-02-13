@@ -35,15 +35,12 @@ public class ArrayTermVector extends TermVector {
             Term y = c.term(i);
             Term x = terms[i];
 
-            if (x == y)
-                continue;
-
             if (!x.equals(y)) {
                 return false;
-            } else {
+            } /*else {
                 //share the ref
                 terms[i] = y;
-            }
+            }*/
         }
         return true;
     }
