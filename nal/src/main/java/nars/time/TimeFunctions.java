@@ -32,8 +32,6 @@ import static nars.time.TimeFunctions.occInterpolate;
 @FunctionalInterface
 public interface TimeFunctions {
 
-
-
     /**
      * @param derived   raw resulting untemporalized derived term that may or may not need temporalized and/or occurrence shifted as part of a derived task
      * @param p         current match context
@@ -64,7 +62,6 @@ public interface TimeFunctions {
     //nars.Premise.OccurrenceSolver latestOccurrence = (t, b) -> earlyOrLate(t, b, false);
     OccurrenceSolver earliestOccurrence = (t, b) -> earlyOrLate(t, b, true);
     OccurrenceSolver latestOccurence = (t, b) -> earlyOrLate(t, b, false);
-
 
     /**
      * early-aligned, difference in dt
@@ -156,28 +153,6 @@ public interface TimeFunctions {
     TimeFunctions occReverse = (derived, p, d, occReturn, confScale) -> occBeliefMinTask(derived, p, occReturn, -1);
 
 
-//    /**
-//     * if the premise is an event (and it is allowed to not be) then the dt is the difference
-//     * in task and belief occurrence times, and the occurrence time is the belief's.
-//     */
-//    Temporalize dtIfEvent = (derived, p, d, occReturn) -> {
-//        if (!p.premise.isEvent()) {
-//            return derived;
-//        } else {
-//            return occBeliefMinTask(derived, p, occReturn, +1);
-//        }
-//    };
-
-//    /** shifts to task's predicate by the task's dt (if present) */
-//    Temporalize taskPredicate = (derived, p, d, occReturn) -> {
-//        long oc = p.premise.occurrenceTarget(latestOccurrence);
-//        int tdt = p.premise.task().term().dt();
-//        if (tdt!=ITERNAL)
-//            oc += tdt;
-//        occReturn[0] = oc;
-//        return derived;
-//    };
-
     @NotNull
     static Compound occBeliefMinTask(@NotNull Compound derived, @NotNull Derivation p, @NotNull long[] occReturn, int polarity) {
 
@@ -190,37 +165,6 @@ public interface TimeFunctions {
 
             dt = (int) (beliefStart - taskStart); //TODO check valid int/long conversion
             long start = p.occurrenceTarget(earliestOccurrence);
-
-//            long beliefEnd = p.belief.end();
-//            long taskEnd = p.task.end();
-//
-//            long start;
-//
-//            if (beliefEnd == beliefStart && taskEnd == taskStart) {
-//
-//                //HACK the original calculation, involving point events
-//
-//                dt = (int) (beliefStart - taskStart); //TODO check valid int/long conversion
-//                start = p.occurrenceTarget(earliestOccurrence);
-//
-//
-//            } else {
-//
-////                switch (derived.op()) {
-////                    case CONJ:
-//                        Interval i = Interval.union(taskStart, taskEnd, beliefStart, beliefEnd);
-//                        start = i.a;
-//                        dt = (int) i.length();
-////                        break;
-////                    default:
-////                        dt = (int) (beliefStart - taskStart); //TODO check valid int/long conversion
-////                        start = p.occurrenceTarget(earliestOccurrence);
-////                        break;
-//
-////                }
-//            }
-//
-//
 
             occReturn[0] = start;
 
@@ -258,16 +202,16 @@ public interface TimeFunctions {
         return /*productNormalize*/(a.unneg()).equalsIgnoringVariables(/*productNormalize*/b);
     }
 
-    static boolean derivationMatch(@NotNull Term a, @NotNull Term b, @NotNull Derivation p) {
-        Term pa = resolve(p, a);
-        if (pa!=null) {
-            Term pb = resolve(p, b);
-            if (pb!=null) {
-                return pa.unneg().equalsIgnoringVariables(pb);
-            }
-        }
-        return false;
-    }
+//    static boolean derivationMatch(@NotNull Term a, @NotNull Term b, @NotNull Derivation p) {
+//        Term pa = resolve(p, a);
+//        if (pa!=null) {
+//            Term pb = resolve(p, b);
+//            if (pb!=null) {
+//                return pa.unneg().equalsIgnoringVariables(pb);
+//            }
+//        }
+//        return false;
+//    }
 
 
     /**
@@ -290,24 +234,26 @@ public interface TimeFunctions {
     /** the 2-ary result will have its 'dt' assigned by the occurrence of its subterms in the task's compound */
     @Nullable TimeFunctions decomposeTaskComponents = (@NotNull Compound derived, @NotNull Derivation p, @NotNull Conclude d, @NotNull long[] occReturn, float[] confScale) -> {
 
-        Compound from = p.task.term();
-        if (derived.size()!=2)
-            return null;
-        Term toA = derived.term(0);
-        Term toB = derived.term(1);
-        int occA = from.subtermTime(toA);
-        int occB = from.subtermTime(toB);
+        if (derived.size()==2) {
 
+            Compound from = p.task.term();
+            int occA = from.subtermTime(derived.term(0));
 
-        if (occA!=DTERNAL && occB!=DTERNAL) {
-            int dt = occB - occA;
-            if (!p.task.isEternal()) {
-                occReturn[0] = p.task.start() + Math.min(occA, occB);
+            if (occA != DTERNAL) {
+
+                int occB = from.subtermTime(derived.term(1));
+
+                if (occB != DTERNAL) {
+                    int dt = occB - occA;
+                    if (!p.task.isEternal()) {
+                        occReturn[0] = p.task.start() + Math.min(occA, occB);
+                    }
+                    return deriveDT(derived, +1, p, dt, occReturn);
+                }
             }
-            return deriveDT(derived, +1, p, dt, occReturn);
-        } else {
-            return null;
         }
+
+        return null;
     };
 
     /*** special case for decomposing conjunctions in the task slot */
@@ -531,78 +477,6 @@ public interface TimeFunctions {
 
     }
 
-
-//    /**
-//     * dt is supplied by Task
-//     */
-//    TimeFunctions dtTask = (@NotNull Compound derived, @NotNull Derivation p, @NotNull Conclude d, long[] occReturn, float[] confScale) ->
-//            dtTaskOrBelief(derived, p, occReturn, earliestOccurrence, true, false);
-//
-//    TimeFunctions dtTaskEnd = (@NotNull Compound derived, @NotNull Derivation p, @NotNull Conclude d, long[] occReturn, float[] confScale) ->
-//            dtTaskOrBelief(derived, p, occReturn, earliestOccurrence, true, true);
-
-    /**
-     * dt is supplied by Belief
-     */
-//    TimeFunctions dtBelief = (@NotNull Compound derived, @NotNull Derivation p, @NotNull Conclude d, long[] occReturn, float[] confScale) ->
-//            dtTaskOrBelief(derived, p, occReturn, earliestOccurrence, false, false);
-//    TimeFunctions dtBeliefEnd = (@NotNull Compound derived, @NotNull Derivation p, @NotNull Conclude d, long[] occReturn, float[] confScale) ->
-//            dtTaskOrBelief(derived, p, occReturn, earliestOccurrence, false, true);
-
-//    @NotNull
-//    static Compound dtTaskOrBelief(@NotNull Compound derived, @NotNull Derivation p, long[] occReturn, @NotNull OccurrenceSolver s, boolean taskOrBelief/*, boolean shiftToPredicate*/, boolean end) {
-//
-//        long o = p.occurrenceTarget(s);
-////        if (o != ETERNAL) {
-////            long taskDT;
-////            if (taskOrBelief) {
-////                taskDT = premise.task().term().dt();
-////            } else {
-////                taskDT = premise.belief().term().dt();
-////            }
-////            if (taskDT != DTERNAL) {
-////                if (end && taskDT > 0) {
-////                    o += taskDT;
-////                } else if (!end && taskDT < 0) {
-////                    o -= taskDT;
-////                }
-////            }
-////        }
-//        if (o != ETERNAL) {
-//            if (taskOrBelief && end) {
-//                //long taskDT = (taskOrBelief ? premise.task() : premise.belief()).term().dt();
-//
-//                long ddt = ((Compound) p.taskTerm.unneg()).dt();
-//                if (ddt != DTERNAL)
-//                    o += ddt;
-//            } else if (taskOrBelief && !end) {
-//                //NOTHING NECESSARY
-//                /*long ddt = premise.task().term().dt();
-//                if (ddt != DTERNAL)
-//                    o -= ddt;*/
-//            } else {
-//
-//                //Task belief = premise.belief();
-//                Compound beliefTerm = (Compound) p.beliefTerm;
-//                //if (belief != null) {
-//                long ddt = beliefTerm.dt();
-//                if (ddt != DTERNAL) {
-//                    if (!taskOrBelief && !end) {
-//                        o -= ddt;
-//                    } else if (!taskOrBelief && end) {
-//                        o += ddt;
-//                    }
-//                }
-//                //}
-//            }
-//
-//        }
-//
-//        occReturn[0] = o;
-//
-//        return derived;
-//    }
-
     @NotNull
     static Compound deriveDT(@NotNull Compound derived, int polarity, @NotNull Derivation p, int eventDelta, @NotNull long[] occReturn) {
         int dt;
@@ -758,39 +632,6 @@ public interface TimeFunctions {
         return deriveDT(derived, 1, p, eventDelta, occReturn);
     }
 
-    TimeFunctions occMerge = (derived, p, d, occReturn, confScale) -> {
-//        long taskOcc = p.task.occurrence();
-//        long beliefOcc = p.belief.occurrence();
-//        if (taskOcc == Tense.ETERNAL) {
-//            occReturn[0] = beliefOcc;
-//        } else if (beliefOcc == Tense.ETERNAL) {
-//            occReturn[0] = taskOcc;
-//        } else {
-//            //merge in proportion to their conf
-//            //double tConf = p.task.confWeight();
-//            //double bConf = p.belief.confWeight();
-//            //double newOcc = Util.lerp(taskOcc, beliefOcc, tConf / (bConf + tConf));
-//
-//            ;
-//        }
-        occReturn[0] =
-                //chooseByConf(p.task, p.belief, p).occurrence();
-                occInterpolate(p.task, p.belief, p);
-
-        return derived;
-    };
-
-//    Temporalize AutoSimple = (derived, p, d, occReturn) -> {
-//
-//        ConceptProcess premise = p.premise;
-//
-//        long occ = premise.occurrenceTarget((t, b) -> t); //reset
-//
-//        occReturn[0] = occ;
-//
-//        return derived;
-//    };
-
 
     /**
      * "automatic" implementation of Temporalize, used by default. slow and wrong about 25..30% of the time sux needs rewritten or replaced
@@ -845,32 +686,33 @@ public interface TimeFunctions {
                 Term cb = ccc.term(1);
 
                 //chained relations
-                if (td != DTERNAL && bd != DTERNAL && (tp.size() == 2) && (bp.size() == 2)) {
-                    Compound tpp = (Compound) tp;
-                    Compound bpp = (Compound) bp;
-
-                    if (derivationMatch(tpp.term(1), bpp.term(0))) {
-                        t = td + bd;
-
-                        //chained inner
-                        if (!derivationMatch(cb, bpp.term(1))) {
-                            t = -t; //invert direction
-                        }
-                    } else if (derivationMatch(tpp.term(0), bpp.term(1))) {
-                        //chain outer
-                        t = td + bd; //?? CHECK
-                    } else if (derivationMatch(tpp.term(0), bpp.term(0))) {
-                        //common left
-                        t = td - bd;
-                    } else if (derivationMatch(tpp.term(1), bpp.term(1))) {
-                        //common right
-                        t = bd - td;
-                    } else {
-                        //throw new RuntimeException("unhandled case");
-                        t = (bd + td) / 2; //???
-                    }
-
-                }
+//                if (td != DTERNAL && bd != DTERNAL && (tp.size() == 2) && (bp.size() == 2)) {
+//
+//                    Compound tpp = (Compound) tp;
+//                    Compound bpp = (Compound) bp;
+//
+//                    if (derivationMatch(tpp.term(1), bpp.term(0))) {
+//                        t = td + bd;
+//
+//                        //chained inner
+//                        if (!derivationMatch(cb, bpp.term(1))) {
+//                            t = -t; //invert direction
+//                        }
+//                    } else if (derivationMatch(tpp.term(0), bpp.term(1))) {
+//                        //chain outer
+//                        t = td + bd; //?? CHECK
+//                    } else if (derivationMatch(tpp.term(0), bpp.term(0))) {
+//                        //common left
+//                        t = td - bd;
+//                    } else if (derivationMatch(tpp.term(1), bpp.term(1))) {
+//                        //common right
+//                        t = bd - td;
+//                    } else {
+//                        //throw new RuntimeException("unhandled case");
+//                        t = (bd + td) / 2; //???
+//                    }
+//
+//                }
 
                 long to = task.start();
                 long bo = belief != null ? belief.start() : to;
@@ -879,65 +721,65 @@ public interface TimeFunctions {
 
                 if (td == DTERNAL && bd == DTERNAL) {
 
-                    int aTask = tp.subtermTime(ca, DTERNAL);
-                    int aBelief = bp.subtermTime(ca, DTERNAL);
-                    int bTask = tp.subtermTime(cb, DTERNAL);
-                    int bBelief = bp.subtermTime(cb, DTERNAL);
+//                    int aTask = tp.subtermTime(ca, DTERNAL);
+//                    int aBelief = bp.subtermTime(ca, DTERNAL);
+//                    int bTask = tp.subtermTime(cb, DTERNAL);
+//                    int bBelief = bp.subtermTime(cb, DTERNAL);
+//
+//                    if (belief != null) {
+//
+//                        boolean reversed = false;
+//                    /* reverse subterms if commutive and the terms are opposite the corresponding pattern */
+//                        if (derived.op().commutative) {
+//                            if (!derivationMatch(
+//                                    p.resolve(((Compound) cp).term(0)),
+//                                    derived.term(0))) {
+//                                occDiff = -occDiff;
+//                                reversed = true;
+//                            }
+//                        }
+//
+//
+//                        if (aTask != DTERNAL && aBelief == DTERNAL &&
+//                                bBelief != DTERNAL && bTask == DTERNAL) {
+//                            //forward: task -> belief
+//                            //t = (int) (task.occurrence() - belief().occurrence());
+//                            t = occDiff;
+//                            if (reversed) occ -= t;
+//                            else occ += t;
+//
+//                        } else if (aTask == DTERNAL && aBelief != DTERNAL &&
+//                                bBelief == DTERNAL && bTask != DTERNAL) {
+//                            //reverse: belief -> task
+//                            t = -occDiff;
+//                            //t = (int) (belief().occurrence() - task.occurrence());
+//                            //t = (int) (task.occurrence() - belief().occurrence());
+//
+//                            if (!reversed) {
+//                                occ -= t;
+//                            } else {
+//                                occ += t;
+//                            }
+//
+//
+//                        } else {
+//
+//                            //both ITERNAL
+//
+//                            if ((to != ETERNAL) && (bo != ETERNAL)) {
+//                                t = occDiff;
+//                                if (reversed) occ -= t;
+//                                else occ += t;
+//                            }
+//
+//                        }
+//                    }
 
-                    if (belief != null) {
-
-                        boolean reversed = false;
-                    /* reverse subterms if commutive and the terms are opposite the corresponding pattern */
-                        if (derived.op().commutative) {
-                            if (!derivationMatch(
-                                    p.resolve(((Compound) cp).term(0)),
-                                    derived.term(0))) {
-                                occDiff = -occDiff;
-                                reversed = true;
-                            }
-                        }
-
-
-                        if (aTask != DTERNAL && aBelief == DTERNAL &&
-                                bBelief != DTERNAL && bTask == DTERNAL) {
-                            //forward: task -> belief
-                            //t = (int) (task.occurrence() - belief().occurrence());
-                            t = occDiff;
-                            if (reversed) occ -= t;
-                            else occ += t;
-
-                        } else if (aTask == DTERNAL && aBelief != DTERNAL &&
-                                bBelief == DTERNAL && bTask != DTERNAL) {
-                            //reverse: belief -> task
-                            t = -occDiff;
-                            //t = (int) (belief().occurrence() - task.occurrence());
-                            //t = (int) (task.occurrence() - belief().occurrence());
-
-                            if (!reversed) {
-                                occ -= t;
-                            } else {
-                                occ += t;
-                            }
-
-
-                        } else {
-
-                            //both ITERNAL
-
-                            if ((to != ETERNAL) && (bo != ETERNAL)) {
-                                t = occDiff;
-                                if (reversed) occ -= t;
-                                else occ += t;
-                            }
-
-                        }
-                    }
-
-                } else if (td == DTERNAL && bd != DTERNAL) {
+                } else if (td == DTERNAL) {
                     //belief has dt
                     t = bd;// + occDiff;
                     //TODO align
-                } else if (td != DTERNAL && bd == DTERNAL) {
+                } else if (bd == DTERNAL) {
                     //task has dt
                     t = td + occDiff;
                     //occ += t; //TODO check this alignment
@@ -949,18 +791,6 @@ public interface TimeFunctions {
                     //t = (td+bd)/2;
                 }
             }
-
-
-//            if (t!=ITERNAL) {
-//                long ot = taskPattern.subtermTime(cp, t);
-//                long ob = beliefPattern.subtermTime(cp, t);
-//
-//                System.out.println(ot + " " + ob);
-//
-//            }
-
-            //System.out.println(derived + " " + a + ":"+ aTask + "|" + aBelief + ", " + b + ":" + bTask + "|" + bBelief);
-
 
         }
 
@@ -1017,34 +847,34 @@ public interface TimeFunctions {
                             occ += timeOfDerivedInTask;
                     } else {
 
-                        int ot = tp.subtermTime(cp, td);
-                        int ob = bp.subtermTime(cp, bd);
-
-                        if (ot != DTERNAL) {
-                            if (tp instanceof Compound) {
-                                Compound ctp = (Compound) tp;
-                                if (derivationMatch(ctp.term(0), cp)) {
-                                    ot -= td;
-                                }
-                            }
-                            occ += ot; //occ + ot;
-                        } else if (ob != DTERNAL) {
-
-                            if (belief.start() != task.start()) { //why?
-                                if (bp instanceof Compound) {
-                                    Compound cbp = (Compound) bp;
-                                    if (!derivationMatch(cbp.term(1), cp)) {
-                                        ob -= bd;
-                                    }
-                                }
-                            }
-
-                            occ += ob;
-
-                        } else {
-                            //neither, remain eternal
-                            throw new RuntimeException("unhandled case");
-                        }
+//                        int ot = tp.subtermTime(cp, td);
+//                        int ob = bp.subtermTime(cp, bd);
+//
+//                        if (ot != DTERNAL) {
+//                            if (tp instanceof Compound) {
+//                                Compound ctp = (Compound) tp;
+//                                if (derivationMatch(ctp.term(0), cp)) {
+//                                    ot -= td;
+//                                }
+//                            }
+//                            occ += ot; //occ + ot;
+//                        } else if (ob != DTERNAL) {
+//
+//                            if (belief.start() != task.start()) { //why?
+//                                if (bp instanceof Compound) {
+//                                    Compound cbp = (Compound) bp;
+//                                    if (!derivationMatch(cbp.term(1), cp)) {
+//                                        ob -= bd;
+//                                    }
+//                                }
+//                            }
+//
+//                            occ += ob;
+//
+//                        } else {
+//                            //neither, remain eternal
+//                            throw new RuntimeException("unhandled case");
+//                        }
                     }
                 }
             }
