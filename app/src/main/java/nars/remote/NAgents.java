@@ -124,7 +124,7 @@ abstract public class NAgents extends NAgent {
         Time clock = new RealTime.CS(true).dur(durFrames / fps);
         NAR nar =
                 //new TaskNAR(32 * 1024, new MultiThreadExecutioner(4, 4 * 1024), clock);
-                NAgents.newMultiThreadNAR(2, clock, false);
+                NAgents.newMultiThreadNAR(3, clock, false);
         //NAR nar = newNAR();
         //NAR nar = newAlann(durFrames/fps);
 
@@ -178,7 +178,7 @@ abstract public class NAgents extends NAgent {
                     //.sync(false)
                 ;
 
-        int conceptsPerCycle = 32*threads;
+        int conceptsPerCycle = 64*threads;
 
 
         //Multi nar = new Multi(3,512,

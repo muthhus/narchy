@@ -27,7 +27,7 @@ public class Arkancide extends NAgents {
 
             return agent;
 
-        }, 30, 3, -1);
+        }, 20, 3, -1);
 
         //System.out.println(ts.db.getInfo());
 

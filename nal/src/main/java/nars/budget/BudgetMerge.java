@@ -45,7 +45,7 @@ public interface BudgetMerge extends BiFunction<Budget, Budget, Budget> {
 
     enum PriMerge {
         PLUS,
-        AVERAGE,
+        AVG,
         OR,
         //AND, OR,
         MAX
@@ -101,9 +101,9 @@ public interface BudgetMerge extends BiFunction<Budget, Budget, Budget> {
                 else
                     nextQua = eQua;
                 break;
-            case AVERAGE:
-                nextPri = iPri;
-                nextQua = iQua;
+            case AVG:
+                nextPri = (ePri+iPri)*0.5f;
+                nextQua = (eQua+iQua)*0.5f;
                 break;
             //TODO
             //case AND:     .. = ePri * iPri;          break;
@@ -171,7 +171,7 @@ public interface BudgetMerge extends BiFunction<Budget, Budget, Budget> {
     BudgetMerge plusBlend = (tgt, src, srcScale) -> blend(tgt, src, srcScale, PLUS);
 
     /** avg priority, LERP other components in proportion to the priorities */
-    BudgetMerge avgBlend = (tgt, src, srcScale) -> blend(tgt, src, srcScale, AVERAGE);
+    BudgetMerge avgBlend = (tgt, src, srcScale) -> blend(tgt, src, srcScale, AVG);
 
 //    /** or priority, LERP other components in proportion to the priorities */
     BudgetMerge orBlend = (tgt, src, srcScale) -> blend(tgt, src, srcScale, OR);

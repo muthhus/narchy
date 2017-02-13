@@ -680,6 +680,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
             eventTaskProcess.emit(input);
         }
 
+        //TODO evaluate from inside first, then outwards. like ordinary order of operations
         Compound inputTerm = input.term();
         if (inputTerm.hasAll(Operator.OPERATOR_BITS) && inputTerm.op() == INH) {
             Term func = inputTerm.term(1);

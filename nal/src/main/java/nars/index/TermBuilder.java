@@ -193,11 +193,11 @@ public abstract class TermBuilder {
         Term t = u.unneg();
         boolean neg = (t != u);
 
-        if ((t.op() == INH) && (t.varPattern() == 0)) {
+        if (t.op() == INH) {
             Compound ct = (Compound) t;
-            Term s = (ct.term(0));
+            Term s = ct.term(0);
             Op so = s.op();
-            Term p = (ct.term(1));
+            Term p = ct.term(1);
             Op po = p.op();
             if (so == Op.IMGi && !po.image) {
                 Compound ii = (Compound) s;

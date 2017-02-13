@@ -694,22 +694,22 @@ public class PremiseRule extends GenericCompound {
                             break;
 
 
-                        case "dtBelief":
-                            timeFunction = TimeFunctions.dtBelief;
-                            break;
-                        case "dtBeliefEnd":
-                            timeFunction = TimeFunctions.dtBeliefEnd;
-                            break;
+//                        case "dtBelief":
+//                            timeFunction = TimeFunctions.dtBelief;
+//                            break;
+//                        case "dtBeliefEnd":
+//                            timeFunction = TimeFunctions.dtBeliefEnd;
+//                            break;
                         case "dtBeliefExact":
                             timeFunction = TimeFunctions.dtBeliefExact;
                             break;
 
-                        case "dtTask":
-                            timeFunction = TimeFunctions.dtTask;
-                            break;
-                        case "dtTaskEnd":
-                            timeFunction = TimeFunctions.dtTaskEnd;
-                            break;
+//                        case "dtTask":
+//                            timeFunction = TimeFunctions.dtTask;
+//                            break;
+//                        case "dtTaskEnd":
+//                            timeFunction = TimeFunctions.dtTaskEnd;
+//                            break;
                         case "dtTaskExact":
                             timeFunction = TimeFunctions.dtTaskExact;
                             break;
