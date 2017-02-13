@@ -2,12 +2,17 @@ package spacegraph.audio.sample;
 
 
 import org.eclipse.collections.api.block.function.primitive.FloatToFloatFunction;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.UnsupportedAudioFileException;
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
@@ -15,43 +20,46 @@ public enum SampleLoader
 {
     ;
 
+    private static final Logger logger = LoggerFactory.getLogger(SampleLoader.class);
+
     /**
      * Loads a sample from an url
      */
-    public static SonarSample loadSample(InputStream isis) throws UnsupportedAudioFileException, IOException
+    public static SonarSample load(InputStream isis) throws UnsupportedAudioFileException, IOException
     {
         // Hack to prevent "mark/reset not supported" on some systems 
         byte[] d = rip(isis);
         AudioInputStream ais = AudioSystem.getAudioInputStream(new ByteArrayInputStream(d));
-        System.out.println(ais.getFormat());
+        //System.out.println(ais.getFormat());
         return buildSample(rip(ais), ais.getFormat());
     }
 
     public static SonarSample load(String path)  {
         try {
-            return loadSample(new FileInputStream(path));
+            return load(new FileInputStream(path));
         } catch (UnsupportedAudioFileException | IOException e) {
-            e.printStackTrace();
+            logger.warn(e.getMessage());
         }
         return null;
     }
 
+
     /**
      * Rips the entire contents of an inputstream into a byte array
      */
-    private static byte[] rip(InputStream in) throws IOException
-    {
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        byte[] b = new byte[4096];
-
-        int read = 0;
-        while ((read = in.read(b)) > 0)
-        {
-            bos.write(b, 0, read);
-        }
-
-        bos.close();
-        return bos.toByteArray();
+    private static byte[] rip(InputStream in) throws IOException {
+        return in.readAllBytes();
+//        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+//        byte[] b = new byte[BUFFER_SIZE];
+//
+//        int read = 0;
+//        while ((read = in.read(b)) > 0)
+//        {
+//            bos.write(b, 0, read);
+//        }
+//
+//        bos.close();
+//        return bos.toByteArray();
     }
 
     /**

@@ -7,7 +7,7 @@ import spacegraph.audio.sample.SonarSample;
 
 import java.util.Random;
 
-public class Granulize implements SoundProducer, SoundProducer.Amplifiable {
+public class Granulize extends Granulator implements SoundProducer, SoundProducer.Amplifiable {
 
 	private final float[] sourceBuffer;
 	private float now;
@@ -25,7 +25,6 @@ public class Granulize implements SoundProducer, SoundProducer.Amplifiable {
 	private long[] currentGrain;
 	private long[] fadingGrain;
 
-	private final Granulator granulator;
 	private boolean isPlaying;
 	private int playOffset = -1;
 
@@ -38,10 +37,9 @@ public class Granulize implements SoundProducer, SoundProducer.Amplifiable {
     }
 
 	public Granulize(float[] buffer, float sampleRate, float grainSizeSecs, float windowSizeFactor) {
+		super(buffer, sampleRate, grainSizeSecs, windowSizeFactor);
 
 		sourceBuffer = buffer;
-
-		granulator = new Granulator(buffer, sampleRate, grainSizeSecs, windowSizeFactor);
 
 		play();
 	}
@@ -55,14 +53,12 @@ public class Granulize implements SoundProducer, SoundProducer.Amplifiable {
 		if (currentGrain == null && isPlaying) {
 			currentGrain = nextGrain(null);
 		}
-        float dNow = ((granulator.sampleRate / readRate)) * pitchFactor.floatValue();
+        float dNow = ((sampleRate / readRate)) * pitchFactor.floatValue();
 
         float amp = currentAmplitude;
         float dAmp = (amplitude.floatValue() - amp) / output.length;
 
         float n = now;
-
-        Granulator g = granulator;
 
 
         boolean p = isPlaying;
@@ -78,15 +74,15 @@ public class Granulize implements SoundProducer, SoundProducer.Amplifiable {
             float nextSample = 0;
             long lnow = Math.round(n);
 			if (cGrain != null) {
-				nextSample = g.getSample(cGrain, lnow);
+				nextSample = getSample(cGrain, lnow);
 				if (Granulator.isFading(cGrain, lnow)) {
 					fGrain = cGrain;
 					cGrain = p ? nextGrain(cGrain) : null;
 				}
 			}
 			if (fGrain != null) {
-                nextSample += g.getSample(fGrain, lnow);
-				if (!g.hasMoreSamples(fGrain, lnow)) {
+                nextSample += getSample(fGrain, lnow);
+				if (!hasMoreSamples(fGrain, lnow)) {
 					fGrain = null;
 				}
 			}
@@ -132,7 +128,7 @@ public class Granulize implements SoundProducer, SoundProducer.Amplifiable {
 
 	private long[] nextGrain(long[] targetGrain) {
 		//System.out.println("create grain: " + calculateCurrentBufferIndex() + " " + now);
-        targetGrain = granulator.nextGrain(targetGrain, calculateCurrentBufferIndex(), now);
+        targetGrain = nextGrain(targetGrain, calculateCurrentBufferIndex(), now);
         return targetGrain;
 	}
 
@@ -143,8 +139,8 @@ public class Granulize implements SoundProducer, SoundProducer.Amplifiable {
 	}
 
 	public Granulize setStretchFactor(float stretchFactor) {
-		playOffset = calculateCurrentBufferIndex();
-		playTime = now;
+//		playOffset = calculateCurrentBufferIndex();
+//		playTime = now;
 		this.stretchFactor.setValue(stretchFactor);
         return this;
 	}

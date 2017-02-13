@@ -21,7 +21,7 @@ public class Audio implements Runnable {
     private final SourceDataLine sdl;
     private final int rate = 44100;
     private final ListenerMixer listenerMixer;
-    private final int bufferSize = rate / 8;
+    private final int bufferSize = rate / 4;
     private final ByteBuffer soundBuffer = ByteBuffer.allocate(bufferSize * 4);
     private final float[] leftBuf, rightBuf;
     //private float amplitude = 1;
@@ -31,6 +31,7 @@ public class Audio implements Runnable {
 
 
     private FileOutputStream rec;
+    public Thread thread;
 
 
     public Audio(int maxChannels) throws LineUnavailableException {
@@ -60,7 +61,7 @@ public class Audio implements Runnable {
         leftBuf = new float[bufferSize];
         rightBuf = new float[bufferSize];
 
-        Thread thread = new Thread(this);
+        thread = new Thread(this);
         thread.setDaemon(true);
         //thread.setPriority(10);
         thread.start();
@@ -192,6 +193,7 @@ public class Audio implements Runnable {
         while (alive) {
             clientTick(alpha);
             tick();
+            Thread.yield();
         }
     }
 
