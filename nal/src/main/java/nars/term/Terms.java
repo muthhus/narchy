@@ -600,7 +600,8 @@ public class Terms   {
                 Term s = newSubs.term(0);
                 newSubs = TermVector.the(s,s);
             } else {
-                pdt = DTERNAL;
+                if (o.temporal)
+                    pdt = DTERNAL; //dont destroy image relation
             }
 
             Compound xx = $.terms.newCompound(o,

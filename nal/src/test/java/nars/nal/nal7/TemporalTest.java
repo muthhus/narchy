@@ -618,6 +618,13 @@ public class TemporalTest {
         assertFalse(Terms.equalAtemporally($("(x && (y ==> z))"), $.<Term>$("(x &&+1 (z ==>+1 w))")));
     }
 
+    @Test public void testAtemporalization1() throws Narsese.NarseseException {
+        Term x = $("(((--,(tetris-->(_n,#2))) &&+1 $1) <=>+1 ($1 &&+0 (--,(tetris-->(_n,#2)))))");
+        Term y = Terms.atemporalize(x);
+        assertEquals("(($1&&(--,(tetris-->(_n,#2)))) <=>+- ($1&&(--,(tetris-->(_n,#2)))))", y.toString());
+    }
+
+
     @Test
     public void testEqualsAnonymous4() throws Narsese.NarseseException {
         //temporal terms within non-temporal terms
@@ -657,7 +664,7 @@ public class TemporalTest {
     }
 
     @Test
-    public void testEqualsAnonymous5() throws Narsese.NarseseException {
+    public void testEqualAtemporally5() throws Narsese.NarseseException {
         //special handling for images
         //        if (as == bs) {
 //            return true;
