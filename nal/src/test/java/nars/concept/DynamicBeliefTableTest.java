@@ -140,28 +140,29 @@ public class DynamicBeliefTableTest {
 
     @Test public void testDynamicProductImageIntensional() throws Narsese.NarseseException {
         NAR n = new Default();
+        float dur = n.time.dur();
 
         n.believe($("(f-->(x,y))"), (long)0, 1f, 0.9f);
 
         CompoundConcept prod = (CompoundConcept) n.concept($("(f-->(x, y))"), false);
-        Truth t = prod.belief(n.time(), n.time.dur());
-        System.out.println(t);
+        Truth t = prod.belief(0, dur);
 
         CompoundConcept imgX = (CompoundConcept) n.concept($("((\\,f,_,y)-->x)"), true);
-        assertEquals(t, imgX.belief(n.time(), n.time.dur()));
-
+        assertEquals(t, imgX.belief(0, dur));
 
         CompoundConcept imgY = (CompoundConcept) n.concept($("((\\,f,x,_)-->y)"), true);
-        assertEquals(t, imgY.belief(n.time(), n.time.dur()));
+        assertEquals(t, imgY.belief(0, dur));
 
 
 
         n.run(16); //by now, structural decomposition should have also had the opportunity to derive the image
 
-        Truth t2 = prod.belief(n.time(), n.time.dur());
+        Truth t2 = prod.belief(0, dur);
 
-        assertEquals(t2, imgX.belief(n.time(), n.time.dur()));
-        assertEquals(t2, imgY.belief(n.time(), n.time.dur()));
+        assertEquals(t2, imgX.belief(0, dur));
+        assertNotEquals(t2, imgX.belief(n.time(), dur));
+        assertEquals(t2, imgY.belief(0, dur));
+        assertNotEquals(t2, imgY.belief(n.time(), dur));
 
     }
 

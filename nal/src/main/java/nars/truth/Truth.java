@@ -301,10 +301,10 @@ public interface Truth extends Truthed {
 
     @Nullable
     static Truth maxConf(@Nullable Truth a, @Nullable Truth b) {
-        if (a == null)
-            return b;
         if (b == null)
             return a;
+        if (a == null)
+            return b;
         return a.conf() >= b.conf() ? a : b;
     }
 
