@@ -297,7 +297,9 @@ public interface TimeFunctions {
 
         if (occA!=DTERNAL && occB!=DTERNAL) {
             int dt = occB - occA;
-            occReturn[0] = p.task.start() + Math.min(occA, occB);
+            if (!p.task.isEternal()) {
+                occReturn[0] = p.task.start() + Math.min(occA, occB);
+            }
             return deriveDT(derived, +1, p, dt, occReturn);
         } else {
             return null;

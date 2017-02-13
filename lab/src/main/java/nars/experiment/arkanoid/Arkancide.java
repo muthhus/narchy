@@ -65,12 +65,12 @@ public class Arkancide extends NAgents {
         };
 
         //nar.linkFeedbackRate.setValue(0.02f);
-        nar.termVolumeMax.setValue(30);
-        maxPaddleSpeed = 46 * Arkanoid.BALL_VELOCITY;
+        nar.termVolumeMax.setValue(40);
+        maxPaddleSpeed = 35 * Arkanoid.BALL_VELOCITY;
 
-        nar.truthResolution.setValue(0.1f);
-        nar.beliefConfidence(0.5f);
-        nar.goalConfidence(0.5f);
+        nar.truthResolution.setValue(0.02f);
+        nar.beliefConfidence(0.75f);
+        nar.goalConfidence(0.75f);
 
         //nar.input(new MutableTask(happy, Op.BELIEF, $.t(0.5f, 0.15f)).eternal());
 

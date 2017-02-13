@@ -37,14 +37,13 @@ public class NAL8Test extends AbstractNALTest {
 
         //TODO decide correct parentheses ordering
 
-        //tester.nar;
         tester.input("[opened]:{t001}. :|:");
         tester.input("(((hold({t002}) &&+5 at({t001})) &&+5 open({t001})) &&+5 [opened]:{t001}).");
 
         // hold .. at .. open
         tester.mustBelieve(cycles, "((hold({t002}) &&+5 at({t001})) &&+5 open({t001}))",
                 1.0f, 0.81f,
-                -15);
+                -15, -5);
 
 
 //        //the structurually inverted sequence
