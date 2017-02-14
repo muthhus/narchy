@@ -99,9 +99,9 @@ public class Compressor extends Abbreviation implements RemovalListener<Compound
 //        Compound y = decode(x);
 //        int xxl = y.volume();
 //        if (xxl >= volume.lo() && xxl <= volume.hi()) {
-            //return super.onOut(b);
-            abbreviate(x, b);
-            return 1f;
+        //return super.onOut(b);
+        abbreviate(x, b);
+        return 1f;
 //        } else
 //            return 0; //rejected
     }
@@ -127,7 +127,7 @@ public class Compressor extends Abbreviation implements RemovalListener<Compound
             return new Abbr(decode(a.term())  /** store fully decompress */, compr, nar);
         });
         if (changed[0]) {
-            Compound s = compoundOrNull( $.sim(abb.compressed, abb.decompressed) );
+            Compound s = compoundOrNull($.sim(abb.compressed, abb.decompressed));
             if (s == null) {
                 logger.warn("unrelateable: {}", abb);
             } else {
@@ -196,7 +196,7 @@ public class Compressor extends Abbreviation implements RemovalListener<Compound
 
                 if (o instanceof Compound) {
                     @Nullable MutableTask rr = MutableTask.clone(tt, (Compound) o);
-                    if (rr!=null)
+                    if (rr != null)
                         return rr;
                 }
             } catch (Throwable t) {
@@ -234,15 +234,16 @@ public class Compressor extends Abbreviation implements RemovalListener<Compound
         return transcode(t, true);
     }
 
-    @NotNull public Term decode(Term t) {
+    @NotNull
+    public Term decode(Term t) {
         return transcode(t, false);
     }
-    @NotNull public Compound decode(Compound t) {
+
+    @NotNull
+    public Compound decode(Compound t) {
         Compound u = compoundOrNull(transcode(t, false));
-        return (u!=null) ? u : t;
+        return (u != null) ? u : t;
     }
-
-
 
 
     public byte[] transcode(byte[] b, boolean en) {
@@ -280,43 +281,39 @@ public class Compressor extends Abbreviation implements RemovalListener<Compound
             try {
 
                 /*Array*/
-                List<SequenceMatcher> mm = (List<SequenceMatcher>) coder.allMatches(wr, i);
+                SequenceMatcher m = coder.firstMatch(wr, i);
+                if (m!=null) {
+                    //if (!mm.isEmpty()) {
+                    //int mms = mm.size();
 
-                if (!mm.isEmpty()) {
-                    int mms = mm.size();
+                    //for (int i1 = 0, mmSize = mms; i1 < mmSize; i1++) {
+                    //SequenceMatcher m = mm.get(i1);
+                    Abbr c = abbr(m, en);
+                    if (c != null) {
+                        //substitute
+                        final byte[] to = en ? c.encoded : c.decoded;
+                        final byte[] from = en ? c.decoded : c.encoded;
 
-                    for (int i1 = 0, mmSize = mms; i1 < mmSize; i1++) {
-                        SequenceMatcher m = mm.get(i1);
-                        Abbr c = abbr(m, en);
-                        if (c != null) {
-                            //substitute
-                            final byte[] to = en ? c.encoded : c.decoded;
-                            final byte[] from = en ? c.decoded : c.encoded;
+                        final byte[] prev = b;
+                        int change = to.length - from.length;
+                        if (change < -b.length)
+                            throw new ArrayIndexOutOfBoundsException();
 
-                            final byte[] prev = b;
-                            int change = to.length - from.length;
-                            if (change < -b.length)
-                                throw new ArrayIndexOutOfBoundsException();
+                        final byte[] next = new byte[b.length + change];
 
-                            final byte[] next = new byte[b.length + change];
+                        System.arraycopy(prev, 0, next, 0, i);
+                        System.arraycopy(to, 0, next, i, to.length);
+                        int l = b.length;
+                        if (i < l)
+                            System.arraycopy(prev, i + from.length, next, i + to.length, l - (i + from.length));
 
-                            System.arraycopy(prev, 0, next, 0, i);
-                            System.arraycopy(to, 0, next, i, to.length);
-                            int l = b.length;
-                            if (i < l)
-                                System.arraycopy(prev, i + from.length, next, i + to.length, l - (i + from.length));
-
-                            termPos.clear();
-                            b = next;
-                            ii = 0;
-                            break;
-                        }
-
+                        termPos.clear();
+                        b = next;
+                        ii = 0;
+                        break;
                     }
+
                 }
-
-
-
 
             } catch (IOException e) {
                 logger.error("{}", e.getMessage());
