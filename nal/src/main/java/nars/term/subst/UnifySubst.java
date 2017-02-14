@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
 import java.util.Map;
+import java.util.function.Consumer;
 
 /** not thread safe, use 1 per thread (do not interrupt matchAll) */
 public class UnifySubst extends Unify {
@@ -22,13 +23,13 @@ public class UnifySubst extends Unify {
     public final NAR memory;
 
 
-    final Collection<Term> target;
+    final Consumer<Term> target;
     final int maxMatches;
     private Term a;
 
     int matches;
 
-    public UnifySubst(Op varType, @NotNull NAR memory, Collection<Term> target, int maxMatches) {
+    public UnifySubst(Op varType, @NotNull NAR memory, Consumer<Term> target, int maxMatches) {
         super(memory.concepts, varType, memory.random, Param.SubUnificationStackMax, Param.SubUnificationTermutesMax);
 
         this.memory = memory;
@@ -59,17 +60,19 @@ public class UnifySubst extends Unify {
 
         //TODO combine these two blocks to use the same sub-method
 
-        try {
+        //try {
             Term aa = resolve(a, xy);
 
-            target.add(aa);
-            //if (accept(a, aa))
             matches++;
 
-        }
+            target.accept(aa);
+            //if (accept(a, aa))
+
+
+        /*}
         catch (InvalidTermException e) {
             logger.warn("{}",e);
-        }
+        }*/
 
 //        if ((aa == null) ||
 //        //Op aaop = aa.op();

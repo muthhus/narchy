@@ -124,22 +124,22 @@ abstract public class PatternCompound extends GenericCompound {
                         }
                     } else {
                         //previous match exists, match against what it had
-                        if (i == xsize) {
-//                        //SUFFIX - match the remaining terms against what the ellipsis previously collected
-//                        //HACK this only works with EllipsisMatch type
-//                        Term[] sp = ((EllipsisMatch) eMatched).term;
-//                        if (sp.length!=available)
-//                            return false; //incorrect size
-//
-//                        //match every item
-//                        for (Term aSp : sp) {
-//                            if (!match(aSp, Y.term(j++)))
-//                                return false;
+//                        if (i == xsize) {
+////                        //SUFFIX - match the remaining terms against what the ellipsis previously collected
+////                        //HACK this only works with EllipsisMatch type
+////                        Term[] sp = ((EllipsisMatch) eMatched).term;
+////                        if (sp.length!=available)
+////                            return false; //incorrect size
+////
+////                        //match every item
+////                        for (Term aSp : sp) {
+////                            if (!match(aSp, Y.term(j++)))
+////                                return false;
+////                        }
+//                        } else {
+//                            //TODO other cases
+//                            return false;
 //                        }
-                        } else {
-                            //TODO other cases
-                            return false;
-                        }
 
                     }
                 } else {

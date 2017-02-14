@@ -10,9 +10,9 @@ public final class OpNotConstraint implements MatchConstraint {
 
     private final int op;
 
-    public OpNotConstraint(@NotNull Op o) {
-        this(o.bit);
-    }
+//    public OpNotConstraint(@NotNull Op o) {
+//        this(o.bit);
+//    }
 
     public OpNotConstraint(int opVector) {
         this.op = opVector;

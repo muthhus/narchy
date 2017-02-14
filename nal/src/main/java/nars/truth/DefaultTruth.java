@@ -59,11 +59,6 @@ public class DefaultTruth implements Truth  {
         this(truth.freq(), truth.conf());
     }
 
-    @Nullable
-    @Override
-    public Truth confMult(float factor) {
-        return withConf(conf() * factor);
-    }
 
     @Nullable
     @Override public final Truth withConf(float newConf) {

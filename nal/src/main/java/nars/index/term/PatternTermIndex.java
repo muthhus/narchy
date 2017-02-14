@@ -35,7 +35,7 @@ public class PatternTermIndex extends MapTermIndex {
     }
 
     @Override
-    public Termed get(Term x, boolean createIfMissing) {
+    public Termed get(@NotNull Term x, boolean createIfMissing) {
         if (x instanceof Compound) {
             return compute((Compound)x);
         }

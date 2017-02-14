@@ -6,7 +6,10 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Terms;
 import nars.term.atom.Atomic;
+import org.eclipse.collections.api.set.ImmutableSet;
+import org.eclipse.collections.impl.factory.Sets;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.Serializable;
 import java.util.LinkedHashSet;
@@ -21,12 +24,10 @@ import static nars.$.the;
 public class PostCondition implements Serializable //since there can be multiple tasks derived per rule
 {
 
-    public final Term beliefTruth;
-    public final Term goalTruth;
+    @NotNull public final Term pattern;
 
-    @NotNull
-    public final Term pattern;
-
+    @Nullable public final Term beliefTruth;
+    @Nullable public final Term goalTruth;
 
     /**
      * minimum NAL level necessary to involve this postcondition
@@ -42,19 +43,16 @@ public class PostCondition implements Serializable //since there can be multiple
     }
 
 
-    public static final Set<Atomic> reservedMetaInfoCategories = new LinkedHashSet() {{
-        add(the("Belief"));
-        add(the("Stamp"));
-        add(the("Goal"));
-        add(the("Order"));
-        add(the("Permute"));
-        add(the("Info"));
-        add(the("Event"));
-        add(the("Punctuation"));
-        /*@Deprecated*/
-        add(the("SequenceIntervals"));
-        add(the("Eternalize"));
-    }};
+    public static final ImmutableSet<Atomic> reservedMetaInfoCategories = Sets.immutable.of(
+        the("Belief"),
+        the("Stamp"),
+        the("Goal"),
+        the("Order"),
+        the("Permute"),
+        the("Info"),
+        the("Event"),
+        the("Punctuation")
+    );
 
 
     static final Atomic
@@ -63,11 +61,11 @@ public class PostCondition implements Serializable //since there can be multiple
             contraposition = the("Contraposition"),
             identity = the("Identity"),*/
             swap = the("Swap"),
-            backward = the("Backward"),
+            backward = the("Backward");
 //            fromTask = the("FromTask"),
 //            fromBelief = the("FromBelief"),
-            anticipate = the("Anticipate"),
-            immediate = the("Immediate");
+//            anticipate = the("Anticipate"),
+//            immediate = the("Immediate");
 
     /**
      * if puncOverride == 0 (unspecified), then the default punctuation rule determines the
@@ -142,31 +140,31 @@ public class PostCondition implements Serializable //since there can be multiple
                         rule.allowForward = true;
                     break;
 
-                case "Order":
-                    //ignore, because this only affects at TaskRule construction
-                    break;
-
-                case "Event":
-                    if (which.equals(PostCondition.anticipate)) {
-                        //IGNORED
-                        //rule.anticipate = true;
-                    }
-                    break;
-
-                case "Eternalize":
-                    if (which.equals(PostCondition.immediate)) {
-                        rule.eternalize = true;
-                    }
-                    break;
-
-                case "SequenceIntervals":
-                    //IGNORED
-//                    if (which.equals(PostCondition.fromBelief)) {
-//                        rule.sequenceIntervalsFromBelief = true;
-//                    } else if (which.equals(PostCondition.fromTask)) {
-//                        rule.sequenceIntervalsFromTask = true;
+//                case "Order":
+//                    //ignore, because this only affects at TaskRule construction
+//                    break;
+//
+//                case "Event":
+//                    if (which.equals(PostCondition.anticipate)) {
+//                        //IGNORED
+//                        //rule.anticipate = true;
 //                    }
-                    break;
+//                    break;
+//
+//                case "Eternalize":
+//                    if (which.equals(PostCondition.immediate)) {
+//                        rule.eternalize = true;
+//                    }
+//                    break;
+
+//                case "SequenceIntervals":
+//                    //IGNORED
+////                    if (which.equals(PostCondition.fromBelief)) {
+////                        rule.sequenceIntervalsFromBelief = true;
+////                    } else if (which.equals(PostCondition.fromTask)) {
+////                        rule.sequenceIntervalsFromTask = true;
+////                    }
+//                    break;
 
                 default:
                     throw new RuntimeException("Unhandled postcondition: " + type + ':' + which);
@@ -190,9 +188,6 @@ public class PostCondition implements Serializable //since there can be multiple
         return pc;
     }
 
-    public int levelRequired() {
-        return minNAL;
-    }
 
 
     public final boolean modifiesPunctuation() {

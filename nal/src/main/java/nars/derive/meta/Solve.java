@@ -53,21 +53,13 @@ abstract public class Solve extends AtomicBoolCondition {
                 if (!f.allowOverlap() && m.overlap(single))
                     return false;
 
-                //task truth is not involved in the outcome of this; set task truth to be null to prevent any negations below:
-                Truth taskTruth = m.taskTruth;
-
                 //truth function is single premise so set belief truth to be null to prevent any negations below:
-
-                Truth beliefTruth = (single) ? null : m.beliefTruth;
-
-                t = f.apply(
-                        taskTruth,
-                        beliefTruth,
+                if ((t = f.apply(
+                        m.taskTruth, //task truth is not involved in the outcome of this; set task truth to be null to prevent any negations below:
+                        (single) ? null : m.beliefTruth,
                         m.nar,
                         m.confMin
-                );
-
-                if (t == null)
+                ))==null)
                     return false;
 
                 t = t.dither(m.truthResolution);

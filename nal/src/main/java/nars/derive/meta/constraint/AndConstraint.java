@@ -7,7 +7,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
 
-public class AndConstraint implements MatchConstraint {
+public final class AndConstraint implements MatchConstraint {
 
     @NotNull
     final MatchConstraint[] subConst;

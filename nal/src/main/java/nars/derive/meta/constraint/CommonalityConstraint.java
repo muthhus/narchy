@@ -22,27 +22,26 @@ public abstract class CommonalityConstraint implements MatchConstraint {
         if (y instanceof Variable)
             return false;
 
-        Term B = f.xy(b);
+        Term bb = f.xy(b);
 
-        if (B == null || B instanceof Variable)
+        if (bb == null || bb instanceof Variable)
             return false;
 
-        boolean bCompound = B instanceof Compound;
-
-        if (B.equals(y))
+        if (bb.equals(y))
             return true;
 
+        boolean bCompound = bb instanceof Compound;
         if (!(y instanceof Compound)) {
 
-            return bCompound && B.containsTerm(y); //B.equals(y);
+            return bCompound && bb.containsTerm(y); //B.equals(y);
         } else {
 
             Compound C = (Compound) y;
 
             return bCompound ?
-                    invalid((Compound) B, C)
+                    invalid((Compound) bb, C)
                     :
-                    C.containsTerm(B);
+                    C.containsTerm(bb);
 
         }
 

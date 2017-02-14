@@ -497,30 +497,15 @@ public class PremiseRule extends GenericCompound {
 
     @NotNull
     public final PremiseRule normalizeRule(@NotNull PatternTermIndex index) {
-        //try {
 
         //HACK
         Compound ss = (Compound) index.transform(this, UppercaseAtomsToPatternVariables);
-        if (ss == null)
-            throw new RuntimeException("unnormalizable: " + this);
 
         Term tt = index.transform(ss, new PremiseRuleVariableNormalization());
 
-        if (tt == null)
-            throw new RuntimeException("unnormalizable: " + this);
-
         Compound premiseComponents = (Compound) index.get(tt, true);
 
-
         return new PremiseRule(premiseComponents);
-
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            logger.error("normalizeRule untransformed: {} {}", this, e.getCause());
-//            throw e;
-//        }
-
-
     }
 
 
@@ -607,28 +592,28 @@ public class PremiseRule extends GenericCompound {
                     constraints.put(Y, new NoCommonSubtermConstraint(X, false));
                     constraints.put(X, new NoCommonSubtermConstraint(Y, false));
                     break;
-                case "neqRCom":
-                    neqPrefilter(pres, taskTermPattern, beliefTermPattern, X, Y);
-                    constraints.put(Y, new NoCommonSubtermConstraint(X, true));
-                    constraints.put(X, new NoCommonSubtermConstraint(Y, true));
-                    break;
+//                case "neqRCom":
+//                    neqPrefilter(pres, taskTermPattern, beliefTermPattern, X, Y);
+//                    constraints.put(Y, new NoCommonSubtermConstraint(X, true));
+//                    constraints.put(X, new NoCommonSubtermConstraint(Y, true));
+//                    break;
 
 
-                case "neqRec":
-                    neqPrefilter(pres, taskTermPattern, beliefTermPattern, X, Y);
-
-                    constraints.put(X, new NoCommonRecursiveSubtermConstraint(Y));
-                    constraints.put(Y, new NoCommonRecursiveSubtermConstraint(X));
-                    //neqPrefilter(pres, taskTermPattern, beliefTermPattern, X, Y);
-                    break;
+//                case "neqRec":
+//                    neqPrefilter(pres, taskTermPattern, beliefTermPattern, X, Y);
+//
+//                    constraints.put(X, new NoCommonRecursiveSubtermConstraint(Y));
+//                    constraints.put(Y, new NoCommonRecursiveSubtermConstraint(X));
+//                    //neqPrefilter(pres, taskTermPattern, beliefTermPattern, X, Y);
+//                    break;
 
                 case "notSet":
                     opNot(taskTermPattern, beliefTermPattern, pres, constraints, X, Op.SetsBits);
                     break;
 
-                case "hasNoDepVar":
-                    opNot(taskTermPattern, beliefTermPattern, pres, constraints, X, Op.VAR_DEP.bit);
-                    break;
+//                case "hasNoDepVar":
+//                    opNot(taskTermPattern, beliefTermPattern, pres, constraints, X, Op.VAR_DEP.bit);
+//                    break;
 
                 case "setext":
                     //assumes arity=2 but arity=1 support can be written
@@ -657,41 +642,41 @@ public class PremiseRule extends GenericCompound {
                     opNotContained(taskTermPattern, beliefTermPattern, pres, constraints, X, Op.ImplicationOrEquivalenceBits);
                     break;
 
-                case "events":
-                    throw new RuntimeException("depr");
+//                case "events":
+//                    throw new RuntimeException("depr");
 
 //                case "contains":
 //                    pres.add(new ContainedBy(withinNonCommutive(taskTermPattern, beliefTermPattern, X, Y)));
 //                    break;
 
-                case "component":
-                    if (XString.equals("task") && Y.toString().equals("belief")) {
-                        pres.add(new ComposedBy(0,1));
-                    } else {
-                        throw new UnsupportedOperationException();
-                    }
-                    break;
+//                case "component":
+//                    if (XString.equals("task") && Y.toString().equals("belief")) {
+//                        pres.add(new ComposedBy(0,1));
+//                    } else {
+//                        throw new UnsupportedOperationException();
+//                    }
+//                    break;
 
                 case "time":
                     switch (XString) {
-                        case "after":
-                            pres.add(events.after);
-                            break;
-
-                        case "eternal":
-                            pres.add(events.eternal);
-                            timeFunction = TimeFunctions.dternal;
-                            break;
-
-                        case "afterOrEternal":
-                            pres.add(events.afterOrEternal);
-                            break;
+//                        case "after":
+//                            pres.add(events.after);
+//                            break;
+//
+//                        case "eternal":
+//                            pres.add(events.eternal);
+//                            timeFunction = TimeFunctions.dternal;
+//                            break;
+//
+//                        case "afterOrEternal":
+//                            pres.add(events.afterOrEternal);
+//                            break;
                         /*case "taskPredicate":
                             pres.add( events.taskPredicate;
                             break;*/
-                        case "dt":
-                            timeFunction = TimeFunctions.occForward;
-                            break;
+//                        case "dt":
+//                            timeFunction = TimeFunctions.occForward;
+//                            break;
 
 
 //                        case "dtBelief":
@@ -717,10 +702,10 @@ public class PremiseRule extends GenericCompound {
                         case "decomposeTask":
                             timeFunction = TimeFunctions.decomposeTask;
                             break;
-                        case "decomposeTaskIfTemporal":
-                            pres.add(events.taskNotDTernal);
-                            timeFunction = TimeFunctions.decomposeTask;
-                            break;
+//                        case "decomposeTaskIfTemporal":
+//                            pres.add(events.taskNotDTernal);
+//                            timeFunction = TimeFunctions.decomposeTask;
+//                            break;
 
                         case "decomposeTaskSubset":
                             timeFunction = TimeFunctions.decomposeTaskSubset;
@@ -729,15 +714,15 @@ public class PremiseRule extends GenericCompound {
                             timeFunction = TimeFunctions.decomposeTaskComponents;
                             break;
 
-                        case "decomposeTaskIfTermLinkBefore":
-                            timeFunction = TimeFunctions.decomposeTask;
-                            pres.add(IfTermLinkBefore.ifTermLinkBefore);
-                            break;
-
-                        case "decomposeTaskIfBeliefBefore":
-                            timeFunction = TimeFunctions.decomposeTask;
-                            pres.add(IfTermLinkBefore.ifBeliefBefore);
-                            break;
+//                        case "decomposeTaskIfTermLinkBefore":
+//                            timeFunction = TimeFunctions.decomposeTask;
+//                            pres.add(IfTermLinkBefore.ifTermLinkBefore);
+//                            break;
+//
+//                        case "decomposeTaskIfBeliefBefore":
+//                            timeFunction = TimeFunctions.decomposeTask;
+//                            pres.add(IfTermLinkBefore.ifBeliefBefore);
+//                            break;
 
                         case "decomposeBelief": timeFunction = TimeFunctions.decomposeBelief; break;
 
@@ -759,10 +744,10 @@ public class PremiseRule extends GenericCompound {
                             pres.add(events.after);
                             break;
 
-                        case "dtBefore":
-                            timeFunction = TimeFunctions.occReverse;
-                            pres.add(events.after);
-                            break;
+//                        case "dtBefore":
+//                            timeFunction = TimeFunctions.occReverse;
+//                            pres.add(events.after);
+//                            break;
 
 //                        case "dtIfEvent":
 //                            temporalize = Temporalize.dtIfEvent;
@@ -786,9 +771,9 @@ public class PremiseRule extends GenericCompound {
                         case "dtBminT":
                             timeFunction = TimeFunctions.dtBminT;
                             break;
-                        case "dtIntersect":
-                            timeFunction = TimeFunctions.dtIntersect;
-                            break;
+//                        case "dtIntersect":
+//                            timeFunction = TimeFunctions.dtIntersect;
+//                            break;
                         case "dtUnion":
                             timeFunction = TimeFunctions.dtUnion;
                             break;
@@ -1255,20 +1240,21 @@ public class PremiseRule extends GenericCompound {
                         , ep.minArity);
             } else if (v instanceof Ellipsis) {
 
-                int idOffset;
-                if (v instanceof EllipsisTransform) {
-                    idOffset = ELLIPSIS_TRANSFORM_ID_OFFSET;
-                } else if (v instanceof EllipsisZeroOrMore) {
-                    idOffset = ELLIPSIS_ZERO_OR_MORE_ID_OFFSET;
-                } else if (v instanceof EllipsisOneOrMore) {
-                    idOffset = ELLIPSIS_ONE_OR_MORE_ID_OFFSET;
-                } else {
-                    throw new RuntimeException("N/A");
-                }
-
-                Variable r = ((Ellipsis) v).clone(varPattern(actualSerial + idOffset), this);
-                offset = 0; //return to zero
-                return r;
+                throw new UnsupportedOperationException("?");
+//                int idOffset;
+//                if (v instanceof EllipsisTransform) {
+//                    idOffset = ELLIPSIS_TRANSFORM_ID_OFFSET;
+//                } else if (v instanceof EllipsisZeroOrMore) {
+//                    idOffset = ELLIPSIS_ZERO_OR_MORE_ID_OFFSET;
+//                } else if (v instanceof EllipsisOneOrMore) {
+//                    idOffset = ELLIPSIS_ONE_OR_MORE_ID_OFFSET;
+//                } else {
+//                    throw new RuntimeException("N/A");
+//                }
+//
+//                Variable r = ((Ellipsis) v).clone(varPattern(actualSerial + idOffset), this);
+//                offset = 0; //return to zero
+//                return r;
             } /*else if (v instanceof GenericVariable) {
                 return ((GenericVariable) v).normalize(actualSerial); //HACK
             } else {

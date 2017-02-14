@@ -227,7 +227,7 @@ abstract public class PremiseBuilder {
         if ((q.vars() > 0)/* || (q.varPattern() != 0)*/) {
 
             List<Term> result = $.newArrayList(1);
-            new UnifySubst(null /* all variables */, nar, result, 1 /*Param.QUERY_ANSWERS_PER_MATCH*/)
+            new UnifySubst(null /* all variables */, nar, result::add, 1 /*Param.QUERY_ANSWERS_PER_MATCH*/)
                     .unifyAll(q, a);
             if (!result.isEmpty()) {
                 Compound unified = compoundOrNull(result.get(0));

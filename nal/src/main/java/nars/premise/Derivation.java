@@ -161,12 +161,12 @@ public class Derivation extends Unify {
         this.premise = p;
 
         Task task;
-        this.task = task = p.task();
+        this.task = task = p.task;
         Compound tt = task.term();
         Term taskTerm = this.taskTerm = tt;
 
         Task belief;
-        this.belief = belief = p.belief();
+        this.belief = belief = p.belief;
         this.beliefTerm = p.beliefTerm();
         if (beliefTerm.op()==NEG) {
             throw new RuntimeException("negated belief term");

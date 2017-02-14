@@ -40,15 +40,13 @@ import static nars.truth.TruthFunctions.w2c;
 /** scalar (1D) truth value "frequency", stored as a floating point value */
 public interface Truth extends Truthed {
 
-
-
-    Term Truth_TRUE = $.the("TRUE");
-    Term Truth_FALSE = $.the("FALSE");
-    Term Truth_UNSURE = $.the("UNSURE"); //only really valid for describing expectation, not frequency by itself
-    Term Truth_MAYBE = $.the("MAYBE");
-    Term Truth_CERTAIN = $.the("CERTAIN");
-    Term Truth_UNCERTAIN = $.the("UNCERTAIN");
-    Comparator<Truthed> compareConfidence = (o1, o2) -> Float.compare(o2.truth().conf(), o1.truth().conf());
+//    Term Truth_TRUE = $.the("TRUE");
+//    Term Truth_FALSE = $.the("FALSE");
+//    Term Truth_UNSURE = $.the("UNSURE"); //only really valid for describing expectation, not frequency by itself
+//    Term Truth_MAYBE = $.the("MAYBE");
+//    Term Truth_CERTAIN = $.the("CERTAIN");
+//    Term Truth_UNCERTAIN = $.the("UNCERTAIN");
+//    Comparator<Truthed> compareConfidence = (o1, o2) -> Float.compare(o2.truth().conf(), o1.truth().conf());
 
 
     /**
@@ -121,9 +119,6 @@ public interface Truth extends Truthed {
      * as well as non-naturally ordered / non-lexicographic
      * but deterministic compareTo() ordering.
      */
-    static int hash(@NotNull Truth t, int hashDiscreteness) {
-        return hash(t.freq(), t.conf(), hashDiscreteness);
-    }
 
     static int hash(float freq, float conf) {
         return hash(freq, conf, Param.TRUTH_EPSILON);
@@ -167,64 +162,16 @@ public interface Truth extends Truthed {
      */
     @NotNull
     default Appendable appendString(@NotNull Appendable sb, int decimals) throws IOException {
-        /*String s1 = DELIMITER + frequency.toStringBrief() + SEPARATOR;
-        String s2 = confidence.toStringBrief();
-        if (s2.equals("1.00")) {
-            return s1 + "0.99" + DELIMITER;
-        } else {
-            return s1 + s2 + DELIMITER;
-        }*/
-        
-        //sb.ensureCapacity(3 + 2 * (2 + decimals) );
+
+        if (sb instanceof StringBuilder)
+            ((StringBuilder)sb).ensureCapacity(3 + 2 * (2 + decimals) );
+
         return sb
             .append(Op.TRUTH_VALUE_MARK)
             .append(Texts.n(freq(), decimals))
             .append(Op.VALUE_SEPARATOR)
             .append(Texts.n(conf(), decimals))
             .append(Op.TRUTH_VALUE_MARK);
-    }
-
-
-    //    /** displays the truth value as a short string indicating degree of true/false */
-//    @Nullable
-//    default String toTrueFalseString() {
-//        //TODO:
-//        //  F,f,~,t,T
-//        return null;
-//    }
-//
-//    /** displays the truth value as a short string indicating degree of yes/no */
-//    @Nullable
-//    default String toYesNoString() {
-//        //TODO
-//        // N,n,~,y,Y
-//        return null;
-//    }
-
-    
-    @NotNull default Term expTerm(float expectation, float trueExpectationThreshold) {
-        if (expectation > trueExpectationThreshold)
-            return Truth_TRUE;
-        else if (expectation < 1f - trueExpectationThreshold)
-            return Truth_FALSE;
-        else
-            return Truth_UNSURE;
-    }
-    @NotNull
-    default Term freqTerm(float f, float freqThreshold) {
-        if (f > freqThreshold)
-            return Truth_TRUE;
-        else if (f < 1f - freqThreshold)
-            return Truth_FALSE;
-        else
-            return Truth_MAYBE;
-    }
-    @NotNull
-    default Term confTerm(float c, float confThreshold) {
-        if (c > confThreshold)
-            return Truth_CERTAIN;
-        else
-            return Truth_UNCERTAIN;
     }
 
 
@@ -244,12 +191,9 @@ public interface Truth extends Truthed {
     }
 
 
-    /** clones a copy with confidence multiplied. null if conf < epsilon */
-    @Nullable Truth confMult(float f);
 
     default Truth confWeightMult(float f) {
-        if (f == 1f) return this;
-        else return withConf(w2c(evi() * f));
+        return (f == 1f) ? this : withConf(w2c(evi() * f));
     }
 
     @Nullable Truth withConf(float f);
@@ -284,11 +228,6 @@ public interface Truth extends Truthed {
 
     default int hash(float truthEpsilon) {
         return Truth.hash(freq(), conf(), truthEpsilon);
-    }
-
-    @Nullable
-    default Truth eternalize() {
-        return withConf(TruthFunctions.eternalize(conf()));
     }
 
     default float eternalizedConf() {

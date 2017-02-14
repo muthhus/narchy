@@ -99,7 +99,7 @@ abstract public class DerivedTask extends MutableTask {
     @Nullable
     public final Task getParentTask() {
         Premise p = this.premise;
-        return p != null ? p.task() : null;
+        return p != null ? p.task : null;
     }
 
     @Override

@@ -311,65 +311,65 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
 
     }
 
-    public static class RuleFeedbackDerivedTask extends DerivedTask.DefaultDerivedTask {
-
-        private final @NotNull PremiseRule rule;
-
-        public RuleFeedbackDerivedTask(@NotNull Termed<Compound> tc, @Nullable Truth truth, char punct, long[] evidence, @NotNull Derivation premise, @NotNull PremiseRule rule, long now, long[] occ) {
-            super(tc, truth, punct, evidence, premise, now, occ);
-            this.rule = rule;
-        }
-
-        @Override
-        public void feedback(TruthDelta delta, float deltaConfidence, float deltaSatisfaction, NAR nar) {
-            if (!isDeleted())
-                Conclude.feedback(premise, rule, this, delta, deltaConfidence, deltaSatisfaction, nar);
-            super.feedback(delta, deltaConfidence, deltaSatisfaction, nar);
-
-        }
-    }
-
-    static class RuleStats {
-        final SummaryStatistics pri = new SummaryStatistics();
-        final SummaryStatistics dSat = new SummaryStatistics();
-        final SummaryStatistics dConf = new SummaryStatistics();
-
-        public long count() {
-            return dSat.getN();
-        }
-
-    }
-
-    static final Map<NAR, Map<PremiseRule, RuleStats>> stats = new ConcurrentHashMap();
-
-    private static void feedback(Premise premise, @NotNull PremiseRule rule, @NotNull RuleFeedbackDerivedTask t, @Nullable TruthDelta delta, float deltaConfidence, float deltaSatisfaction, NAR nar) {
-        Map<PremiseRule, RuleStats> x = stats.computeIfAbsent(nar, n -> new ConcurrentHashMap<>());
-
-        RuleStats s = x.computeIfAbsent(rule, d -> new RuleStats());
-
-        s.pri.addValue(t.pri());
-
-        if (delta != null) {
-            s.dSat.addValue(Math.abs(deltaSatisfaction));
-            s.dConf.addValue(Math.abs(deltaConfidence));
-        }
-
-    }
-
-    static public void printStats(NAR nar) {
-        stats.get(nar).forEach((r, s) -> {
-            long n = s.count();
-
-            System.out.println(
-                    r + "\t" +
-                            Texts.n4(s.pri.getSum()) + '\t' +
-                            Texts.n4(s.dConf.getSum()) + '\t' +
-                            Texts.n4(s.dSat.getSum()) + '\t' +
-                            n
-                    //" \t " + mean +
-            );
-        });
-    }
+//    public static class RuleFeedbackDerivedTask extends DerivedTask.DefaultDerivedTask {
+//
+//        private final @NotNull PremiseRule rule;
+//
+//        public RuleFeedbackDerivedTask(@NotNull Termed<Compound> tc, @Nullable Truth truth, char punct, long[] evidence, @NotNull Derivation premise, @NotNull PremiseRule rule, long now, long[] occ) {
+//            super(tc, truth, punct, evidence, premise, now, occ);
+//            this.rule = rule;
+//        }
+//
+//        @Override
+//        public void feedback(TruthDelta delta, float deltaConfidence, float deltaSatisfaction, NAR nar) {
+//            if (!isDeleted())
+//                Conclude.feedback(premise, rule, this, delta, deltaConfidence, deltaSatisfaction, nar);
+//            super.feedback(delta, deltaConfidence, deltaSatisfaction, nar);
+//
+//        }
+//    }
+//
+//    static class RuleStats {
+//        final SummaryStatistics pri = new SummaryStatistics();
+//        final SummaryStatistics dSat = new SummaryStatistics();
+//        final SummaryStatistics dConf = new SummaryStatistics();
+//
+//        public long count() {
+//            return dSat.getN();
+//        }
+//
+//    }
+//
+//    static final Map<NAR, Map<PremiseRule, RuleStats>> stats = new ConcurrentHashMap();
+//
+//    private static void feedback(Premise premise, @NotNull PremiseRule rule, @NotNull RuleFeedbackDerivedTask t, @Nullable TruthDelta delta, float deltaConfidence, float deltaSatisfaction, NAR nar) {
+//        Map<PremiseRule, RuleStats> x = stats.computeIfAbsent(nar, n -> new ConcurrentHashMap<>());
+//
+//        RuleStats s = x.computeIfAbsent(rule, d -> new RuleStats());
+//
+//        s.pri.addValue(t.pri());
+//
+//        if (delta != null) {
+//            s.dSat.addValue(Math.abs(deltaSatisfaction));
+//            s.dConf.addValue(Math.abs(deltaConfidence));
+//        }
+//
+//    }
+//
+//    static public void printStats(NAR nar) {
+//        stats.get(nar).forEach((r, s) -> {
+//            long n = s.count();
+//
+//            System.out.println(
+//                    r + "\t" +
+//                            Texts.n4(s.pri.getSum()) + '\t' +
+//                            Texts.n4(s.dConf.getSum()) + '\t' +
+//                            Texts.n4(s.dSat.getSum()) + '\t' +
+//                            n
+//                    //" \t " + mean +
+//            );
+//        });
+//    }
 
 
 //    final static HashBag<PremiseRule> posGoal = new HashBag();

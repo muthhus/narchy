@@ -43,46 +43,61 @@ public class PremiseRuleSet {
     public final List<PremiseRule> rules;
 
 
-    static final BiConsumer<Pair<Compound, String>, DataOutput> encoder = (x, o) ->{
-        try {
-            IO.writeTerm(o, x.getOne());
-            o.writeUTF(x.getTwo());
-        } catch (IOException e) {
-            throw new RuntimeException(e); //e.printStackTrace();
-        }
-    };
-
-    @NotNull
-    public static PremiseRuleSet rulesCached(String name) throws IOException, URISyntaxException {
-
-        PatternTermIndex p = new PatternTermIndex(1024);
-
-        Function<DataInput,Pair<Compound,String>> decoder = (i) -> {
-            try {
-                return Tuples.pair(
-                        (Compound)readTerm(i, p),
-                        i.readUTF()
-                );
-            } catch (IOException e) {
-                throw new RuntimeException(e); //e.printStackTrace();
-                //return null;
-            }
-        };
-
-        //Path path = Paths.get(Deriver.class.getClassLoader().getResource(name).toURI());
-
-        URL path = Deriver.class.getClassLoader().getResource(name);
-
-        Stream<Pair<Compound, String>> parsed =
-                Util.fileCache(path, PremiseRuleSet.class.getSimpleName(),
-                        () -> load(p, path),
-                        encoder,
-                        decoder,
-                        logger
-                );
-
-        return new PremiseRuleSet(parsed, p);
-    }
+//    static final BiConsumer<Pair<Compound, String>, DataOutput> encoder = (x, o) ->{
+//        try {
+//            IO.writeTerm(o, x.getOne());
+//            o.writeUTF(x.getTwo());
+//        } catch (IOException e) {
+//            throw new RuntimeException(e); //e.printStackTrace();
+//        }
+//    };
+//
+//    @NotNull
+//    public static PremiseRuleSet rulesCached(String name) throws IOException, URISyntaxException {
+//
+//        PatternTermIndex p = new PatternTermIndex(1024);
+//
+//        Function<DataInput,Pair<Compound,String>> decoder = (i) -> {
+//            try {
+//                return Tuples.pair(
+//                        (Compound)readTerm(i, p),
+//                        i.readUTF()
+//                );
+//            } catch (IOException e) {
+//                throw new RuntimeException(e); //e.printStackTrace();
+//                //return null;
+//            }
+//        };
+//
+//        //Path path = Paths.get(Deriver.class.getClassLoader().getResource(name).toURI());
+//
+//        URL path = Deriver.class.getClassLoader().getResource(name);
+//
+//        Stream<Pair<Compound, String>> parsed =
+//                Util.fileCache(path, PremiseRuleSet.class.getSimpleName(),
+//                        () -> load(p, path),
+//                        encoder,
+//                        decoder,
+//                        logger
+//                );
+//
+//        return new PremiseRuleSet(parsed, p);
+//    }
+//static Stream<Pair<Compound, String>> load(@NotNull PatternTermIndex p, @NotNull URL path) {
+//    try {
+//
+//        return parse(load(readAllLines(Paths.get(path.toURI()))), p);
+//    } catch (Exception e) {
+//        throw new RuntimeException(e);
+//    }
+//}
+//public PremiseRuleSet(@NotNull List<String> ruleStrings) {
+//    this(ruleStrings, new PatternTermIndex());
+//}
+//
+//    public PremiseRuleSet(@NotNull List<String> ruleStrings, @NotNull PatternTermIndex patterns) {
+//        this(parse(load(ruleStrings), patterns), patterns);
+//    }
 
     @NotNull
     public static PremiseRuleSet rules(String name) throws IOException {
@@ -98,14 +113,7 @@ public class PremiseRuleSet {
         return rs;
     }
 
-    static Stream<Pair<Compound, String>> load(@NotNull PatternTermIndex p, @NotNull URL path) {
-        try {
 
-            return parse(load(readAllLines(Paths.get(path.toURI()))), p);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
 
 
     @NotNull
@@ -127,13 +135,6 @@ public class PremiseRuleSet {
     final int[] errors = {0};
 
 
-    public PremiseRuleSet(@NotNull List<String> ruleStrings) {
-        this(ruleStrings, new PatternTermIndex());
-    }
-
-    public PremiseRuleSet(@NotNull List<String> ruleStrings, @NotNull PatternTermIndex patterns) {
-        this(parse(load(ruleStrings), patterns), patterns);
-    }
 
     public PremiseRuleSet(@NotNull Stream<Pair<Compound, String>> parsed, @NotNull PatternTermIndex patterns) {
         this.rules = permute(parsed, patterns).distinct().collect(toList());

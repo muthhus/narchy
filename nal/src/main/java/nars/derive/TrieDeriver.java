@@ -70,9 +70,9 @@ public class TrieDeriver implements Deriver {
     }
 
 
-    public TrieDeriver(String... rule) {
-        this(new PremiseRuleSet(Lists.newArrayList(rule)));
-    }
+//    public TrieDeriver(String... rule) {
+//        this(new PremiseRuleSet(Lists.newArrayList(rule)));
+//    }
 
     public TrieDeriver(@NotNull PremiseRuleSet ruleset) {
         this.rules = ruleset;

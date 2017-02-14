@@ -64,13 +64,6 @@ public interface Truthed  {
         return c2w(conf());
     }
 
-    default float freqNegated() {
-        return 1f - freq();
-    }
-
-    default boolean equalsTruth(@NotNull Truthed x, float resolution) {
-        return Util.equals(freq(), x.freq(), resolution) && Util.equals(conf(), x.conf(), resolution);
-    }
 
 
     //void setValue(T v); //move to MutableMetaTruth interface

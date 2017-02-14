@@ -591,12 +591,11 @@ public abstract class Unify extends Termunator implements Subst {
                 return matchLinear2(X, Y, matchType(X.term(0)) ? 0 : 1);
                 //return matchLinear2(X, Y, 0); //<- fails for certain image transformation rules
             default:
-                return matchLinearN(X, Y);
+                return matchLinearN(X, Y, s);
         }
     }
 
-    public final boolean matchLinearN(@NotNull TermContainer X, @NotNull TermContainer Y) {
-        final int s = X.size();
+    final boolean matchLinearN(@NotNull TermContainer X, @NotNull TermContainer Y, int s) {
         for (int i = 0; i < s; i++) {
             if (!matchSub(X, Y, i)) return false;
         }
@@ -611,8 +610,7 @@ public abstract class Unify extends Termunator implements Subst {
      * special match for size=2 compounds, with order reversal ability
      */
     public final boolean matchLinear2(@NotNull TermContainer X, @NotNull TermContainer Y, int first) {
-        int other = 1 - first;
-        return unify(X.term(first), Y.term(first)) && unify(X.term(other), Y.term(other));
+        return matchSub(X, Y, first) && matchSub(X, Y, 1 - first);
     }
 
 
@@ -665,10 +663,10 @@ public abstract class Unify extends Termunator implements Subst {
 //        //TODO yx also?
 //    }
 
-
-    public final boolean isFull() {
-        return versioning.isFull();
-    }
+//
+//    public final boolean isFull() {
+//        return versioning.isFull();
+//    }
 
     @NotNull public final Term yxResolve(@NotNull Term y) {
         Term y1 = yx.get(y);

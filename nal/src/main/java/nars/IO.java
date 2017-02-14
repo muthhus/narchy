@@ -15,7 +15,6 @@ import nars.term.Termed;
 import nars.term.Terms;
 import nars.term.atom.Atom;
 import nars.term.atom.Atomic;
-import nars.term.compound.Statement;
 import nars.term.container.TermContainer;
 import nars.term.var.AbstractVariable;
 import nars.term.var.GenericVariable;
@@ -528,8 +527,8 @@ public class IO {
 //        }
 
         static void statementAppend(@NotNull Compound c, @NotNull Appendable p, @NotNull Op op) throws IOException {
-            Term a = Statement.subj(c);
-            Term b = Statement.pred(c);
+            Term a = Terms.subj(c);
+            Term b = Terms.pred(c);
 
             int dt = c.dt();
             boolean reversedDT;

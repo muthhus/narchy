@@ -7,7 +7,6 @@ import jcog.list.FasterList;
 import nars.$;
 import nars.Op;
 import nars.term.compound.GenericCompound;
-import nars.term.compound.Statement;
 import nars.term.container.ArrayTermVector;
 import nars.term.container.TermContainer;
 import nars.term.container.TermVector;
@@ -176,10 +175,10 @@ public class Terms   {
 //            return false; //the remaining comparisons are unnecessary
 //        }
 
-        Term subjA = Statement.subj(A);
-        Term predA = Statement.pred(A);
-        Term subjB = Statement.subj(B);
-        Term predB = Statement.pred(B);
+        Term subjA = subj(A);
+        Term predA = pred(A);
+        Term subjB = subj(B);
+        Term predB = pred(B);
 
         Term ta = null, tb = null; //the compound term to put itself in the comparison set
         Term sa = null, sb = null; //the compound term to put its components in the comparison set
@@ -822,6 +821,16 @@ public class Terms   {
             Arrays.sort(x);
 
         return x;
+    }
+
+    @Nullable
+    public static Term subj(@NotNull Termed statement) {
+        return ((TermContainer)statement.term()).term(0);
+    }
+
+    @Nullable
+    public static Term pred(@NotNull Termed statement) {
+        return ((TermContainer)statement.term()).term(1);
     }
 
     interface SubtermScorer {

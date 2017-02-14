@@ -117,14 +117,9 @@ public abstract class Premise extends RawBudget implements Tasked {
 
     @NotNull
     public final Term beliefTerm() {
-        Task x = belief();
-        return x == null ? term : x.term();
+        return belief == null ? term : belief.term();
     }
 
-    @Nullable
-    public final Task belief() {
-        return belief;
-    }
 
 
     @NotNull
@@ -149,19 +144,19 @@ public abstract class Premise extends RawBudget implements Tasked {
 //        return termlink(nar.concept(concept));
 //    }
 
-    @Nullable
-    public final BLink<? extends Termed> termlink(@NotNull Concept c) {
-        return c.termlinks().get(term);
-    }
-
-//    @Nullable public final BLink<? extends Task> tasklink(NAR nar) {
-//        return tasklink(nar.concept(concept));
+//    @Nullable
+//    public final BLink<? extends Termed> termlink(@NotNull Concept c) {
+//        return c.termlinks().get(term);
 //    }
-
-    @Nullable
-    public final BLink<? extends Task> tasklink(@NotNull Concept c) {
-        return c.tasklinks().get(task);
-    }
+//
+////    @Nullable public final BLink<? extends Task> tasklink(NAR nar) {
+////        return tasklink(nar.concept(concept));
+////    }
+//
+//    @Nullable
+//    public final BLink<? extends Task> tasklink(@NotNull Concept c) {
+//        return c.tasklinks().get(task);
+//    }
 
     @Override
     public boolean equals(Object o) {
