@@ -62,11 +62,6 @@ public class Abbreviation/*<S extends Term>*/ extends Leak<Compound, BLink<Compo
     public final MutableFloat abbreviationConfidence;
 
     /**
-     * abbreviations per processed task
-     */
-    public final MutableFloat abbreviationProbability = new MutableFloat(2f);
-
-    /**
      * whether to use a (strong, proxying) alias atom concept
      */
     boolean aliasConcept = false;
@@ -84,7 +79,7 @@ public class Abbreviation/*<S extends Term>*/ extends Leak<Compound, BLink<Compo
     public Abbreviation(@NotNull NAR n, String termPrefix, int volMin, int volMax, float selectionRate, int capacity) {
         super(new CurveBag(capacity,
                 new CurveBag.NormalizedSampler(power4BagCurve, n.random),
-                BudgetMerge.maxBlend, new ConcurrentHashMap()), selectionRate, n);
+                BudgetMerge.plusBlend, new ConcurrentHashMap()), selectionRate, n);
 
         this.nar = n;
         this.termPrefix = termPrefix;

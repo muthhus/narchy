@@ -5,6 +5,8 @@ import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
 import jcog.Hack;
+import jcog.Texts;
+import jcog.Util;
 import jcog.data.byt.DynByteSeq;
 import nars.budget.Budgeted;
 import nars.index.term.TermIndex;
@@ -185,21 +187,25 @@ public class IO {
     @Nullable
     public static Atomic readAtomic(@NotNull DataInput in, @NotNull Op o, @NotNull TermIndex t) throws IOException {
         String s = in.readUTF();
-        Atomic key;
         switch (o) {
+
             case ATOM:
-                key = new Atom(s);
-                break;
+                return new Atom(s);
+
             default:
+                int maybeI = Texts.i(s, Integer.MIN_VALUE);
+                if (maybeI != Integer.MIN_VALUE) {
+                    return $.the(maybeI);
+                }
+
                 try {
-                    key = $.$(s);
+                    return $.$(s);
                 } catch (Narsese.NarseseException e) {
                     throw new UnsupportedEncodingException(e.getMessage());
                 }
                 //throw new UnsupportedOperationException();
         }
 
-        return key;
         //return (Atomic) t.get(key, true); //<- can cause synchronization deadlocks
     }
 

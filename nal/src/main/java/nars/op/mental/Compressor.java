@@ -232,7 +232,9 @@ public class Compressor extends Abbreviation implements RemovalListener<Compound
                 /*Array*/List<SequenceMatcher> mm = (List<SequenceMatcher>) coder.allMatches(wr, i);
 
                 if (!mm.isEmpty()) {
-                    for (int i1 = 0, mmSize = mm.size(); i1 < mmSize; i1++) {
+                    int mms = mm.size();
+
+                    for (int i1 = 0, mmSize = mms; i1 < mmSize; i1++) {
                         SequenceMatcher m = mm.get(i1);
                         Abbr c = abbr(m, en);
                         if (c != null) {
