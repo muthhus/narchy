@@ -23,6 +23,7 @@ import net.byteseek.matcher.multisequence.MultiSequenceMatcher;
 import net.byteseek.matcher.multisequence.TrieMultiSequenceMatcher;
 import net.byteseek.matcher.sequence.ByteSequenceMatcher;
 import net.byteseek.matcher.sequence.SequenceMatcher;
+import org.eclipse.collections.impl.list.mutable.primitive.IntArrayList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -254,21 +255,34 @@ public class Compressor extends Abbreviation implements RemovalListener<Compound
 
         //byte[] bOriginal = b;
 
-        int i = 0;
+
+        int ii = 0;
 
 
         ByteArrayReader wr = null;
+        final IntArrayList termPos = new IntArrayList();
 
-        compare: do {
+
+        do {
 
             if (wr == null) {
-                i = 0; //start from beginning
                 wr = new ByteArrayReader(b);
+                try {
+                    IO.mapSubTerms(b, (o, depth, p) -> {
+                        termPos.add(p);
+                    });
+                } catch (IOException e) {
+                    logger.error(e.getMessage());
+                    return b;
+                }
             }
+
+            int i = termPos.get(ii++);
 
             try {
 
-                /*Array*/List<SequenceMatcher> mm = (List<SequenceMatcher>) coder.allMatches(wr, i);
+                /*Array*/
+                List<SequenceMatcher> mm = (List<SequenceMatcher>) coder.allMatches(wr, i);
 
                 if (!mm.isEmpty()) {
                     int mms = mm.size();
@@ -291,21 +305,23 @@ public class Compressor extends Abbreviation implements RemovalListener<Compound
                             if (i < l)
                                 System.arraycopy(prev, i + from.length, next, i + to.length, l - (i + from.length));
 
+                            termPos.clear();
                             b = next;
-                            break compare;
+                            ii = 0;
                         }
 
                     }
                 }
 
-                i++;
+
 
 
             } catch (IOException e) {
-                e.printStackTrace();
+                logger.error("{}", e.getMessage());
+                return b;
             }
 
-        } while (i < b.length);
+        } while (ii < termPos.size());
 
 
         return b;
