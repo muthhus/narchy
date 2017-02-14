@@ -50,9 +50,11 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
     Compound term();
 
     /** occurrence starting time */
+    @Override
     long start();
 
     /** occurrence ending time */
+    @Override
     long end();
 
     static void proof(@NotNull Task task, int indent, @NotNull Appendable sb) {
@@ -444,13 +446,8 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
         return temporary;
     }
 
-    @Nullable
-    default Truth getDesire() {
-        return truth();
-    }
 
 
-    @Nullable Object log(int index);
 
 
     /**
@@ -611,19 +608,19 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
     }
 
 
-    default boolean temporal() {
-        return start() != ETERNAL;
-    }
+//    default boolean temporal() {
+//        return start() != ETERNAL;
+//    }
 
 
     default int dt() {
         return term().dt();
     }
 
-    @NotNull
-    default ImmutableLongSet evidenceSet() {
-        return LongSets.immutable.of(evidence());
-    }
+//    @NotNull
+//    default ImmutableLongSet evidenceSet() {
+//        return LongSets.immutable.of(evidence());
+//    }
 
 
     default float conf(long when, float dur) {
@@ -665,8 +662,5 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
         return (s != ETERNAL) ? Math.round((s + end()) / 2L) : ETERNAL;
     }
 
-    default long range() {
-        return Math.abs(end() - start());
-    }
 
 }

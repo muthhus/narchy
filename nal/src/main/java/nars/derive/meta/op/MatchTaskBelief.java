@@ -1,8 +1,11 @@
 package nars.derive.meta.op;
 
 import com.google.common.base.Joiner;
+import com.google.common.collect.Iterators;
 import com.google.common.collect.ListMultimap;
+import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
+import jcog.data.array.Arrays;
 import nars.$;
 import nars.Op;
 import nars.derive.meta.AtomicBoolCondition;
@@ -118,7 +121,7 @@ public class MatchTaskBelief extends AtomicBoolCondition {
                 && null==Ellipsis.firstEllipsis((Compound)task)
                 && null==Ellipsis.firstEllipsis((Compound)belief)
                 ) {
-            int[] beliefInTask = ((Compound)task).isSubterm(belief);
+            byte[] beliefInTask = ((Compound)task).isSubterm(belief);
             if (beliefInTask != null) {
                 //add precondition for this constraint that is checked between the premise's terms
                 //assuming this succeeds, only need to test the task half
@@ -131,7 +134,7 @@ public class MatchTaskBelief extends AtomicBoolCondition {
                 && null==Ellipsis.firstEllipsis((Compound)belief)
                 && null==Ellipsis.firstEllipsis((Compound)task)
          ) {
-            int[] taskInBelief = ((Compound)belief).isSubterm(task);
+            byte[] taskInBelief = ((Compound)belief).isSubterm(task);
             if (taskInBelief != null) {
                 //add precondition for this constraint that is checked between the premise's terms
                 //assuming this succeeds, only need to test the belief half
@@ -293,11 +296,11 @@ public class MatchTaskBelief extends AtomicBoolCondition {
         @NotNull
         private final String id;
         private final int container, contained;
-        private final int[] path;
+        private final byte[] path;
 
-        public ComponentCondition(int container, int[] path, int contained) {
+        public ComponentCondition(int container, byte[] path, int contained) {
             this.id = "component(" + container + ",(" + Joiner.on(",").join(
-                    Ints.asList(path)
+                    Bytes.asList(path)
             ) + ")," + contained + ')';
 
             this.container = container;
@@ -342,7 +345,7 @@ public class MatchTaskBelief extends AtomicBoolCondition {
 
         @Override
         public boolean invalid(@NotNull Term assignee, @NotNull Term value, @NotNull Unify f) {
-            return x.equals(assignee) && constraint.invalid(assignee, value, f);
+            return assignee.equals(x) && constraint.invalid(assignee, value, f);
         }
     }
     public static final class DoubleMatchConstraint implements MatchConstraint {
@@ -358,8 +361,8 @@ public class MatchTaskBelief extends AtomicBoolCondition {
 
         @Override
         public boolean invalid(@NotNull Term assignee, @NotNull Term value, @NotNull Unify f) {
-            return (x.equals(assignee) && xConstraint.invalid(assignee, value, f)) ||
-                   (y.equals(assignee) && yConstraint.invalid(assignee, value, f));
+            return (assignee.equals(x) && xConstraint.invalid(assignee, value, f)) ||
+                   (assignee.equals(y) && yConstraint.invalid(assignee, value, f));
         }
     }
 

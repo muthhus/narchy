@@ -29,9 +29,9 @@ public class MutableTask extends AbstractTask {
         this(t, punct, new DefaultTruth(freq, nar.confidenceDefault(punct)));
     }
 
-    public MutableTask(@NotNull String compoundTermString, char punct, float freq, float conf) throws Narsese.NarseseException {
-        this($.$(compoundTermString), punct, t(freq, conf));
-    }
+//    public MutableTask(@NotNull String compoundTermString, char punct, float freq, float conf) throws Narsese.NarseseException {
+//        this($.$(compoundTermString), punct, t(freq, conf));
+//    }
     public MutableTask(@NotNull Termed<Compound> t, char punct, float freq, float conf) {
         this(t, punct, t(freq, conf));
     }
@@ -46,49 +46,6 @@ public class MutableTask extends AbstractTask {
             /* budget: */ 0, Float.NaN, Float.NaN);
     }
 
-
-    @NotNull
-    public MutableTask truth(@Nullable Truth tv) {
-        setTruth(tv);
-        return this;
-    }
-
-
-    @NotNull
-    public final MutableTask truth(float freq, float conf) {
-        return truth($.t(freq,conf));
-    }
-
-
-    @NotNull
-    public MutableTask belief() {
-        punc(Op.BELIEF);
-        return this;
-    }
-
-    @NotNull
-    public MutableTask question() {
-        punc(Op.QUESTION);
-        return this;
-    }
-
-    @NotNull
-    public MutableTask quest() {
-        punc(Op.QUEST);
-        return this;
-    }
-
-    @NotNull
-    public MutableTask goal() {
-        punc(Op.GOAL);
-        return this;
-    }
-
-    @NotNull
-    public MutableTask time(@NotNull Tense t, @NotNull NAR nar) {
-        occurr(Tense.getRelativeOccurrence(t, nar));
-        return this;
-    }
 
     @NotNull
     public final MutableTask present(@NotNull NAR nar) {
@@ -125,11 +82,6 @@ public class MutableTask extends AbstractTask {
         return this;
     }
 
-    @NotNull
-    public MutableTask punctuation(char punctuation) {
-        punc(punctuation);
-        return this;
-    }
 
     @NotNull
     public MutableTask time(long creationTime, long start, long end) {
@@ -147,12 +99,6 @@ public class MutableTask extends AbstractTask {
         return this;
     }
 
-
-    @NotNull
-    public MutableTask because(@NotNull Object reason) {
-        log(reason);
-        return this;
-    }
 
 
     @NotNull
@@ -172,14 +118,6 @@ public class MutableTask extends AbstractTask {
 
 
 
-    @NotNull
-    protected final MutableTask punc(char punctuation) {
-        if (this.punc !=punctuation) {
-            this.punc = punctuation;
-            invalidate();
-        }
-        return this;
-    }
 
     @NotNull
     public final MutableTask evidence(long... evi) {
@@ -191,16 +129,16 @@ public class MutableTask extends AbstractTask {
         return evidence(evidenceToCopy.evidence());
     }
 
-    @NotNull
-    public Task log(@Nullable List historyToCopy) {
-        if (!Param.DEBUG_TASK_LOG)
-            return this;
-
-        if ((historyToCopy != null) && (!historyToCopy.isEmpty())) {
-            getOrCreateLog().addAll(historyToCopy);
-        }
-        return this;
-    }
+//    @NotNull
+//    public Task log(@Nullable List historyToCopy) {
+//        if (!Param.DEBUG_TASK_LOG)
+//            return this;
+//
+//        if ((historyToCopy != null) && (!historyToCopy.isEmpty())) {
+//            getOrCreateLog().addAll(historyToCopy);
+//        }
+//        return this;
+//    }
 
     /**
      * append an entry to this task's log history
@@ -215,12 +153,12 @@ public class MutableTask extends AbstractTask {
         return this;
     }
 
-    /** retrieve the log element at the specified index, or null if it doesnt exist */
-    @Override
-    public final Object log(int index) {
-        @Nullable List l = this.log;
-        return l != null ? (l.size() > index ? l.get(index) : null) : null;
-    }
+//    /** retrieve the log element at the specified index, or null if it doesnt exist */
+//    @Override
+//    public final Object log(int index) {
+//        @Nullable List l = this.log;
+//        return l != null ? (l.size() > index ? l.get(index) : null) : null;
+//    }
 
     @Nullable
     @Override
@@ -275,15 +213,16 @@ public class MutableTask extends AbstractTask {
 //        setBudget(p, d, q);
         return this;
     }
-    /** if p is NaN (indicating deletion), p <== 0 */
-    @NotNull public final MutableTask budgetSafe(float p, NAR nar) {
-        priority = p;
-        quality = isQuestOrQuestion() ? nar.qualityDefault(punc()) : BudgetFunctions.truthToQuality(truth());
-//        if (p!=p)
-//            p = 0;
-//        setBudget(p, d, q);
-        return this;
-    }
+
+//    /** if p is NaN (indicating deletion), p <== 0 */
+//    @NotNull public final MutableTask budgetSafe(float p, NAR nar) {
+//        priority = p;
+//        quality = isQuestOrQuestion() ? nar.qualityDefault(punc()) : BudgetFunctions.truthToQuality(truth());
+////        if (p!=p)
+////            p = 0;
+////        setBudget(p, d, q);
+//        return this;
+//    }
 
     @Nullable public static MutableTask clone(@NotNull Task xt, @NotNull Compound y) {
 //        if (!y.isNormalized()) {

@@ -217,7 +217,7 @@ public class Inperience extends Leak<Task,BLink<Task>> {
             time(now, task.start() != ETERNAL ? task.start() : now)
                     .budgetByTruth(task.priSafe(0))
                     .evidence(task)
-                    .because("Inperience");
+                    .log("Inperience");
         }
     }
 
@@ -374,7 +374,7 @@ public class Inperience extends Leak<Task,BLink<Task>> {
                                 Global.DEFAULT_GOAL_DURABILITY * INTERNAL_EXPERIENCE_DURABILITY_MUL)*/
                 //.parent(parent, belief)
                 .time(now, now + delay)
-                .because("Inperience")
+                .log("Inperience")
         );
     }
 

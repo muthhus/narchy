@@ -35,21 +35,14 @@ public final class InvalidTermException extends SoftException {
         this.reason = reason;
     }
 
-
-
     @NotNull
     @Override
     public String getMessage() {
-        return toString();
-    }
-
-    @NotNull
-    @Override
-    public String toString() {
         return getClass().getSimpleName() + ": " + reason + " {" +
                 op +
                 ", dt=" + dt +
                 ", args=" + Arrays.toString(args) +
                 '}';
     }
+
 }

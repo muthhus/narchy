@@ -77,32 +77,6 @@ public interface Compound extends Term, IPair, TermContainer {
         return t;
     }
 
-    @NotNull
-    default Set<Term> recurseTermsToSet() {
-        Set<Term> t = $.newHashSet(volume() /* estimate */);
-        recurseTerms(t::add);
-        return t;
-    }
-
-    @NotNull
-    default SortedSet<Term> recurseTermsToSortedSet() {
-        TreeSet<Term> t = new TreeSet();
-        recurseTerms((x) -> t.add(x));
-        return t;
-    }
-
-    @NotNull
-    default MutableBiMap<Term, Short> recurseTermsToBiMap() {
-        MutableBiMap<Term, Short> t = new HashBiMap(volume() /* estimate */); //BiMaps.mutable.empty();
-        recurseTerms((x) -> t.putIfAbsent(x, (short) t.size()));
-        return t;
-    }
-
-
-    @NotNull
-    default boolean termsToSet(@NotNull Collection<Term> t, boolean addOrRemoved) {
-        return termsToSet(-1, t, addOrRemoved);
-    }
 
     /**
      * returns whether the set operation caused a change or not
@@ -343,27 +317,26 @@ public interface Compound extends Term, IPair, TermContainer {
     }
 
 
-    /**
-     * extracts a subterm provided by the address tuple
-     * returns null if specified subterm does not exist
-     */
-    @Nullable
-    default Term subterm(@NotNull int... path) {
-        Term ptr = this;
-        for (int i : path) {
-            if ((ptr = ptr.termOr(i, null)) == null)
-                return null;
-        }
-        return ptr;
-    }
+//    @Nullable
+//    default Term subterm(@NotNull int... path) {
+//        Term ptr = this;
+//        for (int i : path) {
+//            if ((ptr = ptr.termOr(i, null)) == null)
+//                return null;
+//        }
+//        return ptr;
+//    }
 
     @Nullable
     default Term subterm(@NotNull ByteList path) {
         return subterm(path.toArray()); //HACK avoid creation of new array
     }
 
-    @Nullable
-    default Term subterm(@NotNull byte... path) {
+    /**
+     * extracts a subterm provided by the address tuple
+     * returns null if specified subterm does not exist
+     */
+    @Nullable default Term subterm(@NotNull byte... path) {
         Term ptr = this;
         for (int i : path) {
             if ((ptr = ptr.termOr(i, null)) == null)
@@ -582,9 +555,9 @@ public interface Compound extends Term, IPair, TermContainer {
      * or null if none was found
      */
     @Nullable
-    default int[] isSubterm(@NotNull Term t) {
+    default byte[] isSubterm(@NotNull Term t) {
         if (!impossibleSubTerm(t)) {
-            IntArrayList l = new IntArrayList();
+            ByteArrayList l = new ByteArrayList();
 
             if (isSubterm(this, t, l)) {
 
@@ -595,13 +568,13 @@ public interface Compound extends Term, IPair, TermContainer {
     }
 
 
-    static boolean isSubterm(@NotNull Compound container, @NotNull Term t, @NotNull IntArrayList l) {
+    static boolean isSubterm(@NotNull Compound container, @NotNull Term t, @NotNull ByteArrayList l) {
         Term[] x = container.terms();
         int s = x.length;
         for (int i = 0; i < s; i++) {
             Term xx = x[i];
             if (xx.equals(t) || ((xx.containsTerm(t)) && isSubterm((Compound) xx, t, l))) {
-                l.add(i);
+                l.add((byte)i);
                 return true;
             } //else, try next subterm and its subtree
         }
@@ -1295,3 +1268,29 @@ public interface Compound extends Term, IPair, TermContainer {
 //    }
 
 
+//    @NotNull
+//    default Set<Term> recurseTermsToSet() {
+//        Set<Term> t = $.newHashSet(volume() /* estimate */);
+//        recurseTerms(t::add);
+//        return t;
+//    }
+
+//    @NotNull
+//    default SortedSet<Term> recurseTermsToSortedSet() {
+//        TreeSet<Term> t = new TreeSet();
+//        recurseTerms((x) -> t.add(x));
+//        return t;
+//    }
+//
+//    @NotNull
+//    default MutableBiMap<Term, Short> recurseTermsToBiMap() {
+//        MutableBiMap<Term, Short> t = new HashBiMap(volume() /* estimate */); //BiMaps.mutable.empty();
+//        recurseTerms((x) -> t.putIfAbsent(x, (short) t.size()));
+//        return t;
+//    }
+
+//
+//    @NotNull
+//    default boolean termsToSet(@NotNull Collection<Term> t, boolean addOrRemoved) {
+//        return termsToSet(-1, t, addOrRemoved);
+//    }

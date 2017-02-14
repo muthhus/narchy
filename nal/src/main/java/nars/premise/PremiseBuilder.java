@@ -69,8 +69,6 @@ abstract public class PremiseBuilder {
 
         Task belief = null;
 
-
-
         //temporal focus:
         long when = task.mid();
         if (when == ETERNAL || nar.random.nextBoolean())

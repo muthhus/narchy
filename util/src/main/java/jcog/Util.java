@@ -25,6 +25,7 @@ import jcog.signal.OneDHaar;
 import org.apache.commons.lang3.ArrayUtils;
 import org.eclipse.collections.api.block.function.primitive.IntToFloatFunction;
 import org.eclipse.collections.api.tuple.Pair;
+import org.eclipse.collections.impl.list.mutable.primitive.ByteArrayList;
 import org.eclipse.collections.impl.list.mutable.primitive.DoubleArrayList;
 import org.eclipse.collections.impl.list.mutable.primitive.IntArrayList;
 import org.eclipse.collections.impl.tuple.Tuples;
@@ -962,6 +963,19 @@ public enum Util { ;
                 //reverse the array since it has been constructed in reverse
                 //TODO use more efficient array reversal
                 return l.asReversed().toArray();//toReversed().toArray();
+        }
+    }
+    public static byte[] reverse(ByteArrayList l) {
+        int s = l.size();
+        switch (s) {
+            case 0: return ArrayUtils.EMPTY_BYTE_ARRAY;
+            case 1: return new byte[] {l.get(0)};
+            case 2: return new byte[] {l.get(1), l.get(0)};
+            default:
+                byte[] b = new byte[s];
+                for (int i = 0; i < s; i++)
+                    b[i] = l.get(--s);
+                return b;
         }
     }
 
