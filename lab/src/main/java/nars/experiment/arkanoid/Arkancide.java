@@ -50,7 +50,7 @@ public class Arkancide extends NAgents {
 
             return agent;
 
-        }, 40, 15, 1000);
+        }, 40, 10, 50000);
 
 
         Path f = Files.createTempFile(Paths.get("/tmp"), "arkancide", ".nal");

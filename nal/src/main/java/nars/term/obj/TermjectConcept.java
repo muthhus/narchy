@@ -13,6 +13,7 @@ import nars.table.QuestionTable;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termlike;
+import nars.term.atom.Atomic;
 import nars.term.subst.Unify;
 import nars.term.visit.SubtermVisitor;
 import nars.term.visit.SubtermVisitorX;
@@ -21,12 +22,13 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicLongArray;
 import java.util.function.Predicate;
 
 /**
  * Created by me on 7/28/16.
  */
-public class TermjectConcept<X> implements Concept, Termject<X> {
+public class TermjectConcept<X> implements Atomic, Concept, Termject<X> {
 
     @NotNull
     private final Termject<X> termject;

@@ -919,8 +919,9 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
     /** resets any existing atom or operator */
     private void enableOperator(@NotNull Atom a, @NotNull Operator o) {
         DefaultConceptBuilder builder = (DefaultConceptBuilder) concepts.conceptBuilder();
-        Map map = builder.newBagMap(1);
-        PermanentAtomConcept c = new PermanentAtomConcept(a, builder.newBag(map), builder.newBag(map));
+        PermanentAtomConcept c = builder.withBags(a, (termlink,tasklink)->{
+            return new PermanentAtomConcept(a, termlink, tasklink);
+        });
         c.put(Operator.class, o);
         concepts.set(c);
         operators.put(c, o);

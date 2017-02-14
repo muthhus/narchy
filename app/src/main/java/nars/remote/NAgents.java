@@ -8,6 +8,7 @@ import nars.NAgent;
 import nars.Task;
 import nars.attention.Forget;
 import nars.bag.ArrayBag;
+import nars.bag.Bag;
 import nars.bag.Bagregate;
 import nars.bag.HijackBag;
 import nars.budget.BudgetMerge;
@@ -48,6 +49,7 @@ import java.util.*;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -174,23 +176,33 @@ abstract public class NAgents extends NAgent {
         Random rng = new XorShift128PlusRandom(1);
         final Executioner exe =
                 //new SingleThreadExecutioner();
-                new MultiThreadExecutioner(threads, 8192 /* TODO chose a power of 2 number to scale proportionally to # of threads */)
+                new MultiThreadExecutioner(threads, 4096 /* TODO chose a power of 2 number to scale proportionally to # of threads */)
                     //.sync(false)
                 ;
 
-        int conceptsPerCycle = 32*threads;
+        int conceptsPerCycle = 64*threads;
 
+        final int reprobes = 3;
 
         //Multi nar = new Multi(3,512,
+        DefaultConceptBuilder cb = new DefaultConceptBuilder() {
+            @Override
+            public <X> X withBags(Term t, BiFunction<Bag<Term, BLink<Term>>, Bag<Task, BLink<Task>>, X> f) {
+                Bag<Term, BLink<Term>> termlink = new HijackBag(reprobes, BudgetMerge.orBlend, rng );
+                Bag<Task, BLink<Task>> tasklink = new HijackBag(reprobes, BudgetMerge.orBlend, rng );
+                return f.apply(termlink, tasklink);
+            }
+        };
+
         Default nar = new Default(16 * 1024,
                 conceptsPerCycle, 1, 3, rng,
-                new CaffeineIndex(new DefaultConceptBuilder(), 164*1024, false, exe)
+                new CaffeineIndex(cb, 164*1024, false, exe)
                 //new TreeTermIndex.L1TreeIndex(new DefaultConceptBuilder(), 300000, 32 * 1024, 3)
                 ,
                 time,
                 exe) {
 
-            final Compressor compressor = new Compressor(this, "_", 3, 12,
+            final Compressor compressor = new Compressor(this, "_", 2, 6,
                     1f, 64, 768);
 
             @Override
@@ -220,10 +232,10 @@ abstract public class NAgents extends NAgent {
 
             @Override
             protected HijackBag<Concept> newConceptBag(int activeConcepts) {
-                return new HijackBag<>(activeConcepts, 4, BudgetMerge.maxBlend, random ) {
+                return new HijackBag<>(activeConcepts, reprobes, BudgetMerge.orBlend, random ) {
                     @Override
                     public Forget forget(float rate) {
-                        float memoryForget = 0.9f;
+                        float memoryForget = 1f;
                         return new Forget(rate, memoryForget, memoryForget);
                     }
                 };
@@ -233,7 +245,7 @@ abstract public class NAgents extends NAgent {
         nar.beliefConfidence(0.9f);
         nar.goalConfidence(0.9f);
 
-        float p = 0.5f;
+        float p = 0.1f;
         nar.DEFAULT_BELIEF_PRIORITY = 0.7f * p;
         nar.DEFAULT_GOAL_PRIORITY = 0.9f * p;
         nar.DEFAULT_QUESTION_PRIORITY = 0.25f * p;

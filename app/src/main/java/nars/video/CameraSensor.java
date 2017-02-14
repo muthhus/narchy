@@ -25,7 +25,7 @@ import java.util.function.Consumer;
 public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Consumer<NAR> {
 
 
-    private static final int radix = 3;
+    private static final int radix = 2;
     private final NAR nar;
     private final NAgent agent;
     float resolution = Param.TRUTH_EPSILON;
@@ -54,8 +54,8 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
 
 
     @NotNull
-    public static Compound coord(int x, int width) {
-        return $.pRecurse($.radixArray(x, radix, width));
+    public static Compound coord(int n, int max) {
+        return $.pRecurse($.radixArray(n, radix, max));
         //return $.p($.radixArray(x, radix, width));
     }
 

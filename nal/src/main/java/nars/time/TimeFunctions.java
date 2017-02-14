@@ -23,6 +23,7 @@ import static nars.Op.CONJ;
 import static nars.Op.NEG;
 import static nars.index.TermBuilder.isTrueOrFalse;
 import static nars.task.Revision.chooseByConf;
+import static nars.term.Terms.compoundOrNull;
 import static nars.time.Tense.*;
 import static nars.time.TimeFunctions.occInterpolate;
 
@@ -614,9 +615,9 @@ public interface TimeFunctions {
             if (!(newPresub instanceof Compound))
                 return null;
 
-            derived = (Compound) (p.index.the(derived,
+            derived = compoundOrNull((p.index.the(derived,
                     new Term[] { $.negIf(newPresub, neg), derived.term(1) })
-            );
+            ));
         }
         if (post && derived.term(1) instanceof Compound) {
 
@@ -643,13 +644,14 @@ public interface TimeFunctions {
                 return null;
 
 
-            Term newDerived = p.index.the(derived, new Term[] { derived.term(0), $.negIf(newSubterm1,neg) } );
-            if (!(newDerived instanceof Compound))
-                return null;
-
-            derived = (Compound) newDerived;
+            derived = compoundOrNull(
+                    p.index.the(derived, new Term[] { derived.term(0), $.negIf(newSubterm1,neg) } )
+            );
 
         }
+
+        if (derived == null)
+            return null;
 
         return deriveDT(derived, 1, eventDelta, occReturn);
     }

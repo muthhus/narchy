@@ -125,6 +125,8 @@ public class Compressor extends Abbreviation implements RemovalListener<Compound
             return;
 
         abbreviated = decode(abbreviated);
+        if (abbreviated.volume() > volume.hi())
+            return; //expanded too much
 
         Abbr abb = code.get(abbreviated, (a) -> {
 
