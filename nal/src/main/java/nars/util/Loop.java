@@ -1,5 +1,6 @@
 package nars.util;
 
+import jcog.Util;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -56,7 +57,7 @@ abstract public class Loop implements Runnable {
     }
 
     protected final void start(float fps) {
-        start((int)(1000f/fps));
+        start((int) (1000f / fps));
     }
 
     protected void start(int period) {
@@ -68,51 +69,53 @@ abstract public class Loop implements Runnable {
 
     @NotNull
     public Loop at(float fps) {
-        setPeriodMS((int)(1000f/fps));
+        setPeriodMS((int) (1000f / fps));
         return this;
     }
 
-    /** dont call this directly */
-    @Override public final void run() {
+    /**
+     * dont call this directly
+     */
+    @Override
+    public final void run() {
 
         afterTime = System.currentTimeMillis();
 
         while (!stopping) {
+
+            //this.prevTime = Util.pauseLockUntil(prevTime + periodMS);
+            long prevPrevTime = this.afterTime;
+
+            long beforeTime = System.currentTimeMillis();
+
             try {
-
-
-
-                long beforeTime = System.currentTimeMillis();
 
                 next();
 
-                //this.prevTime = Util.pauseLockUntil(prevTime + periodMS);
-                long prevPrevTime = this.afterTime;
-
-                //if we have a set period time, delay as appropriate otherwise continue immediately with the next cycle
-                this.afterTime = System.currentTimeMillis();
-                            //periodMS <= 0 ? System.currentTimeMillis() : Util.pauseWaitUntil(prevPrevTime + periodMS);
-
-                long frameTime = afterTime - prevPrevTime;
-
-                long delayable = (beforeTime+periodMS) - afterTime;
-                if (delayable > 0) {
-                    //logger.info("delay {}", delayable);
-                    Thread.sleep(delayable);
-                }
-
-                this.frameTime.addValue(frameTime);
-
-
             } catch (Throwable e) {
-                logger.error("{}",e.toString());
-                e.printStackTrace();
+                logger.error("{}", e);
                 /*nar.eventError.emit(e);
                 if (Param.DEBUG) {
                     stop();
                     break;
                 }*/
             }
+
+
+            //if we have a set period time, delay as appropriate otherwise continue immediately with the next cycle
+            this.afterTime = System.currentTimeMillis();
+            //periodMS <= 0 ? System.currentTimeMillis() : Util.pauseWaitUntil(prevPrevTime + periodMS);
+
+            long frameTime = afterTime - prevPrevTime;
+
+            long delayable = (beforeTime + periodMS) - afterTime;
+            if (delayable > 0) {
+                //logger.info("delay {}", delayable);
+                Util.pause(delayable);
+            }
+
+            this.frameTime.addValue(frameTime);
+
         }
 
         logger.info("stopped");

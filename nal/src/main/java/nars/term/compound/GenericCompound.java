@@ -14,7 +14,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import static nars.Op.CONJ;
-import static nars.Op.EQUI;
 import static nars.time.Tense.DTERNAL;
 
 
@@ -57,10 +56,6 @@ public class GenericCompound implements Compound  {
             if (op != CONJ && (op.temporal && subterms.size()!=2))
                 throw new InvalidTermException(op, dt, "Invalid dt value for operator " + op, subterms.terms());
         }
-
-        if ((op == EQUI) && subterms.size()!=2)
-            System.out.println("CAUGH IT");
-
 
 //        if (dt!=XTERNAL && dt!=DTERNAL && Math.abs(dt) > 2000000)
 //            System.err.println("time oob");

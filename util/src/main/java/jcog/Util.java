@@ -1387,7 +1387,6 @@ public enum Util { ;
 
     }
 
-    /** http://www.qat.com/using-waitnotify-instead-thread-sleep-java */
     public static void sleep(long periodMS) {
         try {
             Thread.sleep(periodMS);

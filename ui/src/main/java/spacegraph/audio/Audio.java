@@ -6,7 +6,6 @@ import spacegraph.audio.sample.SonarSample;
 import javax.sound.sampled.*;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.List;

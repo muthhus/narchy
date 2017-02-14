@@ -97,8 +97,8 @@ public class MultiThreadExecutioner extends Executioner {
                 ringSize /* ringbuffer size */,
                 exe,
                 ProducerType.MULTI,
-                new LiteBlockingWaitStrategy()
-                //new PhasedBackoffWaitStrategy(1,2, TimeUnit.MILLISECONDS, new LiteBlockingWaitStrategy())
+                new PhasedBackoffWaitStrategy(2,4, TimeUnit.MILLISECONDS, new LiteBlockingWaitStrategy())
+                //new LiteBlockingWaitStrategy()
                 //new SleepingWaitStrategy()
                 //new BlockingWaitStrategy()
                 //new LiteTimeoutBlockingWaitStrategy(0, TimeUnit.MILLISECONDS)
@@ -160,16 +160,17 @@ public class MultiThreadExecutioner extends Executioner {
             }
         }*/
 
+        Consumer[] vv;
         synchronized (nar.eventCycleStart) {
-            Consumer[] vv = nar.eventCycleStart.getCachedNullTerminatedArray();
-            if (vv != null) {
-                for (int i = 0; ; ) {
-                    Consumer c = vv[i++];
-                    if (c == null)
-                        break; //null terminator hit
+            vv = nar.eventCycleStart.getCachedNullTerminatedArray();
+        }
+        if (vv != null) {
+            for (int i = 0; ; ) {
+                Consumer c = vv[i++];
+                if (c == null)
+                    break; //null terminator hit
 
-                    run(c);
-                }
+                run(c);
             }
         }
 
@@ -224,26 +225,28 @@ public class MultiThreadExecutioner extends Executioner {
 
     @Override
     public final void run(@NotNull Runnable r) {
-        disruptor.publishEvent(runPublisher, r);
-//        if (!ring.tryPublishEvent(runPublisher, r)) {
-//            logger.warn("dropped: {}", r);
-//        }
+        //disruptor.publishEvent(runPublisher, r);
+        if (!ring.tryPublishEvent(runPublisher, r)) {
+            r.run(); //execute in own thread
+            //logger.warn("dropped: {}", r);
+        }
     }
 
     @Override
     public final void run(@NotNull Consumer<NAR> r) {
         disruptor.publishEvent(narPublisher, r);
-//        if (!ring.tryPublishEvent(narPublisher, r)) {
-//            logger.warn("dropped: {}", r);
-//        }
+        if (!ring.tryPublishEvent(narPublisher, r)) {
+            r.accept(nar); //execute in own thread
+            //logger.warn("dropped: {}", r);
+        }
     }
 
 
     @Override
-    public final void run(@NotNull Task[] t) {
+    public final void run(@NotNull Task... t) {
         if (!ring.tryPublishEvent(taskPublisher, t)) {
-            //TODO use a bag to collect these
-            logger.warn("dropped: {}", t);
+            nar.input(t); //execute in own thread
+            //logger.warn("dropped: {}", t);
         }
     }
 

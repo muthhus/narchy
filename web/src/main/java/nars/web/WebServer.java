@@ -7,8 +7,6 @@ import io.undertow.server.handlers.resource.FileResourceManager;
 import io.undertow.websockets.WebSocketConnectionCallback;
 import io.undertow.websockets.extensions.PerMessageDeflateHandshake;
 import nars.NAR;
-import nars.NARLoop;
-import nars.nar.Default;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,11 +14,10 @@ import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import static io.undertow.Handlers.*;
+import static io.undertow.Handlers.resource;
+import static io.undertow.Handlers.websocket;
 import static io.undertow.UndertowOptions.ENABLE_HTTP2;
 import static java.util.zip.Deflater.BEST_COMPRESSION;
-import static nars.$.newHashSet;
-import static nars.$.quote;
 import static nars.web.IRCAgent.newRealtimeNAR;
 
 

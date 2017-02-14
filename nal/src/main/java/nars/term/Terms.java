@@ -594,14 +594,20 @@ public class Terms   {
 
         if (subsChanged || dtChanged) {
 
-            if (subsChanged &&o.statement && newSubs.size()==1) {
+            if (subsChanged && o.temporal && newSubs.size()==1) {
                 //it was a repeat which collapsed, so use XTERNAL and repeat the subterm
-                pdt = XTERNAL;
+
+                if (pdt!=DTERNAL)
+                    pdt = XTERNAL;
+
                 Term s = newSubs.term(0);
                 newSubs = TermVector.the(s,s);
             } else {
                 if (o.temporal)
                     pdt = DTERNAL; //dont destroy image relation
+            }
+            if (o.temporal && newSubs!=null && newSubs.size() == 1) {
+                System.out.println("?");
             }
 
             Compound xx = $.terms.newCompound(o,

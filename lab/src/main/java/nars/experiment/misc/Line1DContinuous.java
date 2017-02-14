@@ -7,14 +7,14 @@ import nars.NAgent;
 import nars.Param;
 import nars.concept.ActionConcept;
 import nars.concept.SensorConcept;
+import nars.conceptualize.DefaultConceptBuilder;
 import nars.index.term.map.CaffeineIndex;
 import nars.nar.Default;
-import nars.util.exe.Executioner;
-import nars.util.exe.SynchronousExecutor;
-import nars.conceptualize.DefaultConceptBuilder;
 import nars.remote.NAgents;
 import nars.task.DerivedTask;
 import nars.time.FrameTime;
+import nars.util.exe.Executioner;
+import nars.util.exe.SynchronousExecutor;
 
 import java.util.Arrays;
 

@@ -23,7 +23,7 @@ import java.util.function.Supplier;
 
 import static jake2.Globals.*;
 import static jake2.render.Base.vid;
-import static nars.$.*;
+import static nars.$.$;
 import static nars.$.t;
 
 /**

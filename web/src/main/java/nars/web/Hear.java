@@ -7,7 +7,6 @@ import nars.*;
 import nars.concept.Concept;
 import nars.nlp.Twenglish;
 import nars.op.Command;
-import nars.table.DefaultBeliefTable;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.atom.Atom;

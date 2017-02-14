@@ -24,9 +24,7 @@ import java.util.List;
 
 import static nars.term.Terms.compoundOrNull;
 import static nars.time.Tense.ETERNAL;
-import static nars.util.UtilityFunctions.and;
 import static nars.util.UtilityFunctions.aveAri;
-import static nars.util.UtilityFunctions.or;
 
 
 abstract public class PremiseBuilder {

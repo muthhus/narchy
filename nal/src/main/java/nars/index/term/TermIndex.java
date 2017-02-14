@@ -595,7 +595,7 @@ public abstract class TermIndex extends TermBuilder {
             }
         }
 
-        if (term instanceof Variable)
+        if ((term instanceof Variable) || (TermBuilder.isTrue(term)))
             return null;
 
         return term;

@@ -930,7 +930,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
     /**
      * Exits an iteration loop if running
      */
-    public void stop() {
+    public final void stop() {
         exe.stop();
     }
 

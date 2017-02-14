@@ -1,9 +1,11 @@
 package nars.experiment.go;
 
-import java.awt.*;
-import java.awt.event.*;
-import java.util.*;
 import javax.swing.*;
+import java.awt.*;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 /** https://github.com/mattshin/GO */
 public class GO extends JPanel implements MouseListener{

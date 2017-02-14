@@ -3,27 +3,21 @@ package nars.experiment.tetris;
 import nars.$;
 import nars.NAR;
 import nars.Narsese;
-import nars.audio.SoNAR;
 import nars.concept.ActionConcept;
 import nars.concept.SensorConcept;
-import nars.control.TaskNAR;
 import nars.experiment.tetris.impl.TetrisState;
 import nars.experiment.tetris.impl.TetrisVisualizer;
-import nars.nar.Default;
-import nars.op.stm.MySTMClustered;
 import nars.remote.NAgents;
 import nars.term.Compound;
 import nars.term.atom.Atomic;
 import nars.time.FrameTime;
 import nars.truth.Truth;
-import nars.util.exe.MultiThreadExecutioner;
 import nars.util.task.TaskStatistics;
 import org.jetbrains.annotations.NotNull;
 import spacegraph.math.v2;
 import spacegraph.space.layout.Grid;
 import spacegraph.space.widget.MatrixView;
 
-import javax.sound.sampled.LineUnavailableException;
 import java.util.List;
 
 import static nars.$.$;

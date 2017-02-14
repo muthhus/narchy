@@ -3,15 +3,9 @@ package spacegraph.audio.demo;
 import spacegraph.audio.Audio;
 import spacegraph.audio.SoundListener;
 import spacegraph.audio.granular.Granulize;
-import spacegraph.audio.granular.TimeStretchGui;
 import spacegraph.audio.sample.SampleLoader;
-import spacegraph.audio.sample.SonarSample;
 
 import javax.sound.sampled.LineUnavailableException;
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 
 public enum GranulizerDemo {
     ;

@@ -18,7 +18,6 @@ import nars.term.util.InvalidTermException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import static nars.$.belief;
 import static nars.$.terms;
 import static nars.Op.CONJ;
 import static nars.Op.NEG;

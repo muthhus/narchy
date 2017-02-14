@@ -6,7 +6,6 @@ import nars.concept.Concept;
 import nars.nar.Default;
 import nars.term.Term;
 import spacegraph.audio.Audio;
-import spacegraph.audio.SoundListener;
 import spacegraph.audio.granular.Granulize;
 import spacegraph.audio.sample.SampleLoader;
 import spacegraph.audio.sample.SonarSample;

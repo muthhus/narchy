@@ -36,6 +36,7 @@
 
                         <testFailureIgnore>true</testFailureIgnore>
                         <disableXmlReport>true</disableXmlReport>
+                        <detail>false</detail>
                     </configuration>
                 </plugin>
             </plugins>

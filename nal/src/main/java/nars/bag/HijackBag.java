@@ -1,6 +1,5 @@
 package nars.bag;
 
-import jcog.Util;
 import nars.$;
 import nars.Param;
 import nars.budget.Budget;

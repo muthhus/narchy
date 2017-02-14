@@ -2,28 +2,15 @@ package nars.web;
 
 import io.undertow.websockets.core.BufferedTextMessage;
 import io.undertow.websockets.core.WebSocketChannel;
-import io.undertow.websockets.core.WebSockets;
 import jcog.data.byt.DynByteSeq;
-import jcog.event.Ons;
 import nars.IO;
 import nars.NAR;
 import nars.Task;
-import nars.bag.Bag;
-import nars.bag.CurveBag;
-import nars.budget.BudgetMerge;
-import nars.link.BLink;
-import nars.nlp.Twenglish;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spacegraph.web.WebsocketService;
 
-import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.util.HashMap;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Created by me on 4/21/16.

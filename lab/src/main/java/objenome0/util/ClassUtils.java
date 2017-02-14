@@ -358,7 +358,7 @@ public enum ClassUtils {
         }
 
         int availableSpace = len;
-        int packageLevels = StringUtils.countMatches(className, '.');
+        int packageLevels = StringUtils.countMatches(className, ".");
         String[] output = new String[packageLevels + 1];
         int endIndex = className.length() - 1;
         for (int level = packageLevels; level >= 0; level--) {
