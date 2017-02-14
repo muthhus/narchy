@@ -769,7 +769,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
     }
 
     /** override to perform any preprocessing of a task (applied before the normalization step) */
-    @Nullable protected Task pre(@NotNull Task t) {
+    @Nullable public Task pre(@NotNull Task t) {
         return t;
     }
 

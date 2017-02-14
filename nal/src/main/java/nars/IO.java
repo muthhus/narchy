@@ -815,7 +815,7 @@ public class IO {
         int i = 0;
 
         int level = 0;
-        final int MAX_LEVELS = 16;
+        final int MAX_LEVELS = 32;
         byte[][] levels = new byte[MAX_LEVELS][2]; //level stack x (op, subterms remaining) tuple
 
         do {

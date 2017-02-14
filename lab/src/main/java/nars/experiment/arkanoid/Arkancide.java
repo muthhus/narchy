@@ -65,7 +65,7 @@ public class Arkancide extends NAgents {
         };
 
         //nar.linkFeedbackRate.setValue(0.02f);
-        nar.termVolumeMax.setValue(40);
+
         maxPaddleSpeed = 35 * Arkanoid.BALL_VELOCITY;
 
         nar.truthResolution.setValue(0.02f);

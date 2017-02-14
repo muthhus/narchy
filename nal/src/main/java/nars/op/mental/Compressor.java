@@ -69,7 +69,7 @@ public class Compressor extends Abbreviation implements RemovalListener<Compound
 
             this.decompressed = decompressed;
 
-            this.encoded = IO.asBytes(this.compressed.term());
+            this.encoded = IO.asBytes(this.compressed);
             this.decoded = IO.asBytes(decompressed);
             this.decode = new ByteSequenceMatcher(encoded);
             this.encode = new ByteSequenceMatcher(decoded);
@@ -93,22 +93,17 @@ public class Compressor extends Abbreviation implements RemovalListener<Compound
     @Override
     protected float onOut(BLink<Compound> b) {
         Compound x = b.get();
-        if (code.getIfPresent(x)!=null)
-            return 0; //already in
+//        if (code.getIfPresent(x)!=null)
+//            return 0; //already in
 
-        Term yy = decode(x);
-        if (!(yy instanceof Compound)) {
-            //System.out.println(x + " -> " + yy + " ?");
-            return 0; //invalid for some reason
-        }
-        Compound y = (Compound) yy;
-        int xxl = y.volume();
-        if (xxl >= volume.lo() && xxl <= volume.hi()) {
+//        Compound y = decode(x);
+//        int xxl = y.volume();
+//        if (xxl >= volume.lo() && xxl <= volume.hi()) {
             //return super.onOut(b);
-            abbreviate(y, b);
+            abbreviate(x, b);
             return 1f;
-        } else
-            return 0; //rejected
+//        } else
+//            return 0; //rejected
     }
 
     @Override
@@ -129,7 +124,7 @@ public class Compressor extends Abbreviation implements RemovalListener<Compound
             //System.out.println("compress CODE: " + a + " to " + compr);
 
             changed[0] = true;
-            return new Abbr(a.term(), compr, nar);
+            return new Abbr(decode(a.term())  /** store fully decompress */, compr, nar);
         });
         if (changed[0]) {
             Compound s = compoundOrNull( $.sim(abb.compressed, abb.decompressed) );
@@ -239,9 +234,12 @@ public class Compressor extends Abbreviation implements RemovalListener<Compound
         return transcode(t, true);
     }
 
-    @NotNull
-    public Term decode(Term t) {
+    @NotNull public Term decode(Term t) {
         return transcode(t, false);
+    }
+    @NotNull public Compound decode(Compound t) {
+        Compound u = compoundOrNull(transcode(t, false));
+        return (u!=null) ? u : t;
     }
 
 
@@ -297,6 +295,9 @@ public class Compressor extends Abbreviation implements RemovalListener<Compound
 
                             final byte[] prev = b;
                             int change = to.length - from.length;
+                            if (change < -b.length)
+                                throw new ArrayIndexOutOfBoundsException();
+
                             final byte[] next = new byte[b.length + change];
 
                             System.arraycopy(prev, 0, next, 0, i);
@@ -308,6 +309,7 @@ public class Compressor extends Abbreviation implements RemovalListener<Compound
                             termPos.clear();
                             b = next;
                             ii = 0;
+                            break;
                         }
 
                     }

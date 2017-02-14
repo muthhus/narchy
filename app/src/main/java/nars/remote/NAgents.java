@@ -184,14 +184,14 @@ abstract public class NAgents extends NAgent {
         //Multi nar = new Multi(3,512,
         Default nar = new Default(16 * 1024,
                 conceptsPerCycle, 1, 3, rng,
-                new CaffeineIndex(new DefaultConceptBuilder(), 256*1024, false, exe)
+                new CaffeineIndex(new DefaultConceptBuilder(), 164*1024, false, exe)
                 //new TreeTermIndex.L1TreeIndex(new DefaultConceptBuilder(), 300000, 32 * 1024, 3)
                 ,
                 time,
                 exe) {
 
-            final Compressor compressor = new Compressor(this, "_", 3, 16,
-                    2f, 64, 512);
+            final Compressor compressor = new Compressor(this, "_", 3, 12,
+                    1f, 64, 768);
 
             @Override
             public Task pre(@NotNull Task t) {
@@ -240,8 +240,8 @@ abstract public class NAgents extends NAgent {
         nar.DEFAULT_QUEST_PRIORITY = 0.25f * p;
 
         nar.confMin.setValue(0.01f);
-        nar.truthResolution.setValue(0.03f);
-        nar.termVolumeMax.setValue(48);
+        nar.truthResolution.setValue(0.01f);
+        nar.termVolumeMax.setValue(32);
 
         MySTMClustered stm = new MySTMClustered(nar, 64, '.', 3, true, 6);
         MySTMClustered stmGoal = new MySTMClustered(nar, 32, '!', 2, true, 4);
