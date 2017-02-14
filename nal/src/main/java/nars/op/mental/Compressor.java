@@ -35,6 +35,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static nars.term.Terms.compoundOrNull;
+
 /**
  * Created by me on 2/11/17.
  */
@@ -108,8 +110,14 @@ public class Compressor extends Abbreviation implements RemovalListener<Compound
             return new Abbr(a.term(), compr, nar);
         });
         if (changed[0]) {
-            nar.believe($.sim(abb.compressed, abb.decompressed), Tense.Eternal, 1f, 0.99f);
-            recompile();
+            Compound s = compoundOrNull( $.sim(abb.compressed, abb.decompressed) );
+            if (s == null) {
+                logger.warn("unrelateable: {}", abb);
+            } else {
+                nar.believe(s, Tense.Eternal, 1f, 0.99f);
+                recompile();
+            }
+
         }
 
     }

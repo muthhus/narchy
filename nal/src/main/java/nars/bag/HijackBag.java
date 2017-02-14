@@ -139,7 +139,6 @@ public class HijackBag<X> implements Bag<X,BLink<X>> {
         float targetPri = Float.POSITIVE_INFINITY;
 
         BLink<X> added = null;
-        float addingPri = adding != null ? adding.priSafe(0) : Float.NaN;
 
         BLink<X> target = null;
         BLink<X> found = null; //get or remove
@@ -166,8 +165,7 @@ public class HijackBag<X> implements Bag<X,BLink<X>> {
                     }
                 } else {
                     X iiv = ii.get();
-                    boolean sameInstance;
-                    if ((sameInstance = (iiv == x)) || equals(x, iiv)) { //existing
+                    if (equals(x, iiv)) { //existing
 
                         if (!add) {
 
@@ -207,22 +205,22 @@ public class HijackBag<X> implements Bag<X,BLink<X>> {
 
             //add at target index
             if (targetIndex != -1) {
-                if (targetPri == Float.NEGATIVE_INFINITY) {
 
-                    BLink<X> adding2 = adding.cloneScaled(merge, scale);
+                BLink<X> adding2 = adding.cloneScaled(merge, scale);
+                float adding2Pri = adding2.priSafe(0);
+                pressure += adding2Pri;
+
+                if (targetPri == Float.NEGATIVE_INFINITY) {
 
                     //insert to empty
                     if (map.compareAndSet(targetIndex, null, adding2)) {
                         added = adding2;
-                        pressure += adding2.priSafe(0);
                     }
 
                 } else {
-                    if (replace(addingPri, targetPri)) {
-                        if (map.compareAndSet(targetIndex, target, adding)) {
-                            //inserted
-                            pressure += Math.max(0, addingPri - targetPri);
-
+                    if (replace(adding2Pri, targetPri)) {
+                        if (map.compareAndSet(targetIndex, target, adding2)) { //inserted
+                            //pressure -= targetPri;
                             found = target;
                             added = adding;
                         }

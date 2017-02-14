@@ -399,7 +399,7 @@ public interface Bag<K,V extends PLink<K>> extends Table<K, V>, Iterable<V> {
         //float r = (pressurePlusOversize) / (pressurePlusOversize + existingMass*4f /* momentum*/);
 
         //System.out.println(pressure + " " + existingMass + "\t" + r);
-        return r >= Param.BUDGET_EPSILON ? forget(Util.unitize(r)) : null;
+        return r >= (Param.BUDGET_EPSILON/s) ? forget(Util.unitize(r)) : null;
     }
 
     default Forget forget(float rate) {

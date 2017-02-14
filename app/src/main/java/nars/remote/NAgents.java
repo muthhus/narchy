@@ -190,8 +190,8 @@ abstract public class NAgents extends NAgent {
                 time,
                 exe) {
 
-            final Compressor compressor = new Compressor(this, "_", 3, 10,
-                    3f, 64, 512);
+            final Compressor compressor = new Compressor(this, "_", 3, 7,
+                    2f, 64, 512);
 
             @Override
             public Task pre(@NotNull Task t) {
@@ -223,8 +223,8 @@ abstract public class NAgents extends NAgent {
                 return new HijackBag<>(activeConcepts, 4, BudgetMerge.maxBlend, random ) {
                     @Override
                     public Forget forget(float rate) {
-                        float memoryForget = 0.75f;
-                        return new Forget(rate, 1f, memoryForget);
+                        float memoryForget = 0.9f;
+                        return new Forget(rate, memoryForget, memoryForget);
                     }
                 };
             }
