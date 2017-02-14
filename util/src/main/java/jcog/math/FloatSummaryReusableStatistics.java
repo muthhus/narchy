@@ -1,5 +1,8 @@
 package jcog.math;
 
+import jcog.Util;
+import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
+import org.apache.commons.math3.util.FastMath;
 import org.eclipse.collections.api.block.procedure.primitive.FloatProcedure;
 
 import java.io.Serializable;
@@ -14,11 +17,15 @@ import java.io.Serializable;
  */
 public class FloatSummaryReusableStatistics implements FloatProcedure, Serializable {
     protected long count;
-    protected float sum;
+
+
+
+    protected float sSum;
     //private float sumCompensation; // Low order bits of sum
 //    private float simpleSum; // Used to compute right sum for non-finite inputs
     protected float min;
     protected float max;
+    protected float mean;
 
     /**
      * Construct an empty instance with zero count, zero sum,
@@ -36,7 +43,8 @@ public class FloatSummaryReusableStatistics implements FloatProcedure, Serializa
 
     public final void clear() {
         count = 0;
-        sum = 0;
+        sSum = 0;
+        mean = 0;
         min = Float.POSITIVE_INFINITY;
         max = Float.NEGATIVE_INFINITY;
     }
@@ -46,9 +54,16 @@ public class FloatSummaryReusableStatistics implements FloatProcedure, Serializa
      * @param value the input value
      */
     public final void accept(float value) {
-        ++count;
-        //simpleSum += value;
-        sum += value;
+
+        //http://stackoverflow.com/a/36590815
+        //"waldorf method"
+        float tmpMean = mean;
+        if (tmpMean!=tmpMean)
+            mean = tmpMean = 0;
+        float delta = value - tmpMean;
+        mean += delta / ++count;
+        sSum += delta * (value - mean);
+
         //sumWithCompensation(value);
         if (min > value) min = value;
         if (max < value) max = value;
@@ -98,7 +113,7 @@ public class FloatSummaryReusableStatistics implements FloatProcedure, Serializa
      * @return the sum of values, or zero if none
      */
     public final float getSum() {
-        return sum;
+        return getAverage() * count;
 
 //        // Better error bounds to add both terms as the final sum
 //        float tmp =  sum + sumCompensation;
@@ -160,8 +175,7 @@ public class FloatSummaryReusableStatistics implements FloatProcedure, Serializa
      * @return the arithmetic mean of values, or zero if none
      */
     public final float getAverage() {
-        long c = getCount();
-        return c > 0 ? getSum() / c : 0.0f;
+        return mean;
     }
 
     /**
@@ -186,9 +200,33 @@ public class FloatSummaryReusableStatistics implements FloatProcedure, Serializa
     public final float normalize(float n) {
         float min = getMin();
         float max = getMax();
-        if (min == max) return n;
+        float range = max - min;
+        if (range < Float.MIN_VALUE*64f /* estimate of an FP epsilon */)
+            return 0.5f;
+        else
+            return (n - min) / (range);
+    }
 
-        return (n - min) / (max-min);
+    /**
+     * Returns the standard deviation of the values that have been added.
+     * <p>
+     * Double.NaN is returned if no values have been added.
+     * </p>
+     * The Standard Deviation is a measure of how spread out numbers are.
+     * @return the standard deviation
+     */
+    public float getStandardDeviation() {
+        float v = getVariance();
+        if (v==v)
+            return (float) Math.sqrt(v);
+        else
+            return Float.NaN;
+    }
+
+    public float getVariance() {
+        long c = count;
+        if (c == 0) return Float.NaN;
+        return sSum / (c);
     }
 
 }

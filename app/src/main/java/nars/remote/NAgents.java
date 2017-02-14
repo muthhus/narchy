@@ -190,7 +190,7 @@ abstract public class NAgents extends NAgent {
                 time,
                 exe) {
 
-            final Compressor compressor = new Compressor(this, "_", 3, 7,
+            final Compressor compressor = new Compressor(this, "_", 3, 16,
                     2f, 64, 512);
 
             @Override

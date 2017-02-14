@@ -178,12 +178,15 @@ public class DoubleSummaryReusableStatistics implements DoubleConsumer, Serializ
                 getMax());
     }
 
+
     public final double normalize(double n) {
         double min = getMin();
         double max = getMax();
-        if (min == max) return n;
-
-        return (n - min) / (max-min);
+        double range = max - min;
+        if (range < Double.MIN_VALUE*64f /* estimate of an FP epsilon */)
+            return 0.5f;
+        else
+            return (n - min) / (range);
     }
 
 }

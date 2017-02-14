@@ -4,11 +4,10 @@ import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.RemovalCause;
 import com.github.benmanes.caffeine.cache.RemovalListener;
-import nars.$;
-import nars.IO;
-import nars.NAR;
-import nars.Task;
+import jcog.list.FasterList;
+import nars.*;
 import nars.budget.Budget;
+import nars.link.BLink;
 import nars.nar.Default;
 import nars.task.MutableTask;
 import nars.term.Compound;
@@ -87,6 +86,28 @@ public class Compressor extends Abbreviation implements RemovalListener<Compound
         super(n, termPrefix, volMin, volMax, selectionRate, pendingCapacity);
 
         code = Caffeine.newBuilder().maximumSize(maxCodes).removalListener(this).executor(n.exe).build();
+    }
+
+
+    @Override
+    protected float onOut(BLink<Compound> b) {
+        Compound x = b.get();
+        if (code.getIfPresent(x)!=null)
+            return 0; //already in
+
+        Term yy = decode(x);
+        if (!(yy instanceof Compound)) {
+            //System.out.println(x + " -> " + yy + " ?");
+            return 0; //invalid for some reason
+        }
+        Compound y = (Compound) yy;
+        int xxl = y.volume();
+        if (xxl >= volume.lo() && xxl <= volume.hi()) {
+            //return super.onOut(b);
+            abbreviate(y, b);
+            return 1f;
+        } else
+            return 0; //rejected
     }
 
     @Override
@@ -203,6 +224,16 @@ public class Compressor extends Abbreviation implements RemovalListener<Compound
     }
 
     @NotNull
+    public byte[] transcodeBytes(Term t, boolean en) {
+        byte[] ii = IO.asBytes(t);
+        if (!(t instanceof Compound))
+            return ii;
+        else {
+            return transcode(ii, en);
+        }
+    }
+
+    @NotNull
     public Term encode(Term t) {
         return transcode(t, true);
     }
@@ -211,6 +242,9 @@ public class Compressor extends Abbreviation implements RemovalListener<Compound
     public Term decode(Term t) {
         return transcode(t, false);
     }
+
+
+
 
     public byte[] transcode(byte[] b, boolean en) {
 
@@ -223,9 +257,14 @@ public class Compressor extends Abbreviation implements RemovalListener<Compound
         int i = 0;
 
 
-        ByteArrayReader wr = new ByteArrayReader(b);
+        ByteArrayReader wr = null;
 
         compare: do {
+
+            if (wr == null) {
+                i = 0; //start from beginning
+                wr = new ByteArrayReader(b);
+            }
 
             try {
 
@@ -253,8 +292,6 @@ public class Compressor extends Abbreviation implements RemovalListener<Compound
                                 System.arraycopy(prev, i + from.length, next, i + to.length, l - (i + from.length));
 
                             b = next;
-                            i = 0; //start from beginning
-                            wr = new ByteArrayReader(b);
                             break compare;
                         }
 

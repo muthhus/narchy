@@ -13,6 +13,7 @@ import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -169,5 +170,46 @@ public class TermIOTest {
 //        assertTrue("diff: " + diff.toString() + "\n\t" + abB + "\n\t" + bbB, 2 >= diff.size());
     }
 
+    @Test public void testByteMappingAtom() throws IOException, Narsese.NarseseException {
+        assertEquals("(0,0)=. ", map("x"));
+    }
+
+    @Test public void testByteMappingAtomInt() throws IOException, Narsese.NarseseException {
+        assertEquals("(0,0)=`i ", map("1"));
+    }
+
+    @Test public void testByteMappingInh() throws IOException, Narsese.NarseseException {
+        assertEquals("(0,0)=--> (1,2)=. (1,6)=. ", map("a:b"));
+    }
+
+    @Test public void testByteMappingCompoundDT() throws IOException, Narsese.NarseseException {
+        assertEquals("(0,0)===> (1,2)=. (1,6)=. ",
+                map("(a ==>+1 b)"));
+    }
+
+    @Test public void testByteMappingCompoundDTExt() throws IOException, Narsese.NarseseException {
+        assertEquals("(0,0)=--> (1,2)===> (2,4)=. (2,8)=. (1,16)=. ",
+                map("((a ==>+1 b) --> c)"));
+    }
+
+    @Test public void testByteMappingCompound() throws IOException, Narsese.NarseseException {
+        assertEquals("(0,0)===> (1,2)=--> (2,4)=* (3,6)=. (3,10)=. (2,16)=. (1,20)=. ",
+                map("(a(b,\"c\") ==>+1 d)"));
+    }
+
+    public String map(String x) throws IOException, Narsese.NarseseException {
+        return map($.$(x));
+    }
+
+    public String map(Term x) throws IOException {
+        byte[] xb = IO.asBytes(x);
+        StringBuilder sb = new StringBuilder();
+        IO.mapSubTerms(xb, (o, depth, i) -> {
+            String msg = "(" + depth + "," + i + ")=" + o + " ";
+            //System.out.println(msg);
+            sb.append(msg);
+        });
+        return sb.toString();
+    }
 }
 

@@ -2,6 +2,7 @@ package nars.index.term;
 
 import nars.*;
 import nars.concept.Concept;
+import nars.concept.PermanentConcept;
 import nars.conceptualize.ConceptBuilder;
 import nars.derive.meta.match.EllipsisMatch;
 import nars.index.TermBuilder;
@@ -622,19 +623,18 @@ public abstract class TermIndex extends TermBuilder {
     }
 
 
-    private static boolean isDeletable(@NotNull Concept c) {
-        return c.get(Concept.Savior.class) == null;
+    protected void onRemove(Termed value) {
+        if (value instanceof Concept) {
+            if (value instanceof PermanentConcept) {
+                //refuse deletion
+                set(value.term(), value);
+            } else {
+                ((Concept) value).delete(nar);
+            }
+        }
     }
 
-    /**
-     * attempts to delete a concept
-     */
-    protected void delete(@NotNull Concept value, @NotNull NAR nar) {
-        if (isDeletable(value))
-            value.delete(nar);
-    }
-
-//    @Override
+    //    @Override
 //    protected @NotNull Term statement(@NotNull Op op, int dt, @NotNull Term subject, @NotNull Term predicate) {
 //        if ( op == INH && predicate instanceof Atom && !(predicate instanceof Concept) && transformImmediates() ) {
 //            //resolve atomic statement predicates in inheritance, for inline term rewriting

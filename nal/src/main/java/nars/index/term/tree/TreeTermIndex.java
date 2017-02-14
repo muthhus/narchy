@@ -259,7 +259,7 @@ public class TreeTermIndex extends TermIndex implements Consumer<NAR> {
 
 
     protected void onRemoval(@NotNull Concept value) {
-        delete(value, nar);
+        onRemove(value);
     }
 
     @Override

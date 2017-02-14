@@ -177,14 +177,6 @@ public interface Concept extends Termed {
     }
 
 
-    /**
-     * the value (if present in the meta table for the class key),
-     * is a reference to an object preventing deletion and also
-     * manages and takes responsibility for the remainder of
-     * this concept's lifecycle.
-     */
-    interface Savior {
-    }
 
 
     @Nullable

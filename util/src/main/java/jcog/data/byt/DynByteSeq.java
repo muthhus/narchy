@@ -226,15 +226,17 @@ public class DynByteSeq implements DataOutput, Appendable, ByteSeq {
         //throw new UnsupportedOperationException("yet");
 
         //WARNING this isnt UTF8
-        this.write(strToBytes(s));
-        this.writeByte(0); //null-terminated
+//        this.write(strToBytes(s));
+//        this.writeByte(0); //null-terminated
 
 
 
 //        s.getBytes()
-//        this.writeBytes(s);
+        byte[] ss = strToBytes(s);
+        this.writeShort(ss.length);
+        this.write(ss);
+
 //        UTF8Writer
-//        this.writeShort(s.length());
 //        UTFUtils.writeUTFBytes(this, s);
     }
 

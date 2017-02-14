@@ -170,16 +170,8 @@ public class CaffeineIndex extends MaplikeTermIndex implements RemovalListener<T
 
     /** this will be called from within a worker task */
     @Override public final void onRemoval(Term key, Termed value, @NotNull RemovalCause cause) {
-        if (value instanceof Concept) {
-            if (value instanceof PermanentConcept) {
-                //refuse deletion
-                set(key, value);
-            } else {
-                delete(((Concept) value), nar);
-            }
-        }
+        onRemove(value);
     }
-
 
 
 

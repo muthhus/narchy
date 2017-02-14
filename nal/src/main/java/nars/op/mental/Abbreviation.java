@@ -1,5 +1,6 @@
 package nars.op.mental;
 
+import jcog.data.MutableIntRange;
 import jcog.data.MutableInteger;
 import nars.$;
 import nars.NAR;
@@ -47,14 +48,8 @@ import static nars.time.Tense.ETERNAL;
  */
 public class Abbreviation/*<S extends Term>*/ extends Leak<Compound, BLink<Compound>> {
 
-    /**
-     * when a concept is important and exceeds a syntactic complexity above
-     * this value multiplied by the NAR's volume limit, then LET NARS NAME IT.
-     */
-    public final MutableInteger minAbbreviableVolume = new MutableInteger();
 
-    //TODO different parameters for priorities and budgets of both the abbreviation process and the resulting abbreviation judgment
-    //public AtomicDouble priorityFactor = new AtomicDouble(1.0);
+
     /**
      * generated abbreviation belief's confidence
      */
@@ -73,7 +68,9 @@ public class Abbreviation/*<S extends Term>*/ extends Leak<Compound, BLink<Compo
     @NotNull
     protected final NAR nar;
     private final String termPrefix;
-    private final int maxVol;
+
+    /** accepted volume range, inclusive */
+    public final MutableIntRange volume;
 
 
     public Abbreviation(@NotNull NAR n, String termPrefix, int volMin, int volMax, float selectionRate, int capacity) {
@@ -84,12 +81,11 @@ public class Abbreviation/*<S extends Term>*/ extends Leak<Compound, BLink<Compo
         this.nar = n;
         this.termPrefix = termPrefix;
         this.setCapacity(capacity);
-        this.minAbbreviableVolume.set(volMin);
         this.abbreviationConfidence =
                 new MutableFloat(nar.confidenceDefault(Op.BELIEF));
         //new MutableFloat(1f - nar.truthResolution.floatValue());
         //new MutableFloat(nar.confidenceDefault(Symbols.BELIEF));
-        this.maxVol = volMax;
+        volume = new MutableIntRange(volMin,volMax);
     }
 
     @Nullable
@@ -106,15 +102,14 @@ public class Abbreviation/*<S extends Term>*/ extends Leak<Compound, BLink<Compo
 
     private void input(@NotNull Budget b, @NotNull Consumer<BLink<Compound>> each, @NotNull Compound t) {
         int vol = t.volume();
-        if (vol <= maxVol) {
+        if (vol <= volume.hi()) {
             if (t.vars() == 0 && !t.hasTemporal()) {
-                if (vol >= minAbbreviableVolume.intValue()) {
+                if (vol >= volume.lo()) {
 
                     CompoundConcept abbreviable = (CompoundConcept) nar.concept(t);
                     if ((abbreviable == null) ||
                             !(abbreviable instanceof PermanentConcept) &&
-                            abbreviable.get(Abbreviation.class) == null &&
-                            abbreviable.get(Concept.Savior.class) == null) {
+                            abbreviable.get(Abbreviation.class) == null) {
 
                         each.accept(new RawBLink<Compound>(t, b));
                     }
@@ -283,10 +278,9 @@ public class Abbreviation/*<S extends Term>*/ extends Leak<Compound, BLink<Compo
         private final CompoundConcept abbr;
         private TermContainer templates;
 
-        static public AliasConcept get(@NotNull String term, @NotNull Compound abbreviated, @NotNull NAR nar, @NotNull Term... additionalTerms) {
-            Concept c = nar.concept(abbreviated, true);
-            AliasConcept a = new AliasConcept(term, (CompoundConcept)c, nar, additionalTerms);
-            c.put(Concept.Savior.class, a);
+        static public AliasConcept get(@NotNull String compressed, @NotNull Compound decompressed, @NotNull NAR nar, @NotNull Term... additionalTerms) {
+            Concept c = nar.concept(decompressed, true);
+            AliasConcept a = new AliasConcept(compressed, (CompoundConcept)c, nar, additionalTerms);
             return a;
         }
 

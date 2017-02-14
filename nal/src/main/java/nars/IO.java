@@ -6,7 +6,6 @@ import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
 import jcog.Hack;
 import jcog.Texts;
-import jcog.Util;
 import jcog.data.byt.DynByteSeq;
 import nars.budget.Budgeted;
 import nars.index.term.TermIndex;
@@ -95,7 +94,9 @@ public class IO {
     }
 
 
-    /** with Term first */
+    /**
+     * with Term first
+     */
     public static void writeTask(@NotNull DataOutput out, @NotNull Task t) throws IOException {
 
         writeTerm(out, t.term());
@@ -117,7 +118,9 @@ public class IO {
 
     }
 
-    /** with Term last */
+    /**
+     * with Term last
+     */
     public static void writeTask2(@NotNull DataOutput out, @NotNull Task t) throws IOException {
 
         char p = t.punc();
@@ -169,19 +172,9 @@ public class IO {
     }
 
 
-
-    public static void writeAtomic(@NotNull DataOutput out, @NotNull Atomic a) throws IOException {
-        //TODO use StringHack
-        out.writeUTF(a.toString());
-    }
-
     @Nullable
     public static Atomic readVariable(@NotNull DataInput in, @NotNull Op o, @NotNull TermIndex t) throws IOException {
         return $.v(o, in.readByte());
-    }
-
-    public static void writeVariable(@NotNull DataOutput out, @NotNull AbstractVariable v) throws IOException {
-        out.writeByte(v.id);
     }
 
     @Nullable
@@ -241,49 +234,44 @@ public class IO {
 
     public static void writeTerm(@NotNull DataOutput out, @NotNull Term term) throws IOException {
 
+        //HACK this should not be necessary
         if (isSpecial(term)) {
             out.writeByte(SPECIAL_OP);
             out.writeUTF(term.toString());
             return;
         }
 
-        out.writeByte(term.op().ordinal());
+        Op o = term.op();
+        out.writeByte(o.ordinal());
 
         if (term instanceof Atomic) {
 
             if (term instanceof AbstractVariable) {
-                writeVariable(out, (AbstractVariable) term);
+                out.writeByte(((AbstractVariable) term).id);
             } else {
-                writeAtomic(out, (Atomic) term);
+                out.writeUTF(term.toString()); //TODO use StringHack ?
             }
-        } else
-            writeCompound(out, (Compound) term);
-    }
+        } else {
 
+            @NotNull TermContainer c = ((Compound) term).subterms();
+            int siz = c.size();
+
+            out.writeByte(siz);
+
+            for (int i = 0; i < siz; i++) {
+                writeTerm(out, c.term(i));
+            }
+
+            if (o.image)
+                out.writeByte((byte) ((Compound) term).dt());
+            else if (o.temporal)
+                out.writeInt(((Compound) term).dt());
+        }
+    }
 
 
     public static boolean isSpecial(@NotNull Term term) {
         return term instanceof GenericVariable;
-    }
-
-    public static void writeCompound(@NotNull DataOutput out, @NotNull Compound c) throws IOException {
-
-        //how many subterms to follow
-        writeTermContainer(out, c.subterms());
-
-        //TODO write only a byte for image, int for temporal
-        if (c.op().image)
-            out.writeByte((byte)c.dt());
-        else if (c.op().temporal)
-            out.writeInt(c.dt());
-    }
-
-    static void writeTermContainer(@NotNull DataOutput out, @NotNull TermContainer c) throws IOException {
-        int siz = c.size();
-        out.writeByte(siz);
-        for (int i = 0; i < siz; i++) {
-            writeTerm(out, c.term(i));
-        }
     }
 
 
@@ -332,15 +320,14 @@ public class IO {
 
     public static byte[] asBytes(@NotNull Term t) {
         try {
-            ByteArrayOutputStream bs = new ByteArrayOutputStream();
-            IO.writeTerm(new DataOutputStream(bs), t);
-            return bs.toByteArray();
+            DynByteSeq d = new DynByteSeq(t.volume() * 4 /* estimate */);
+            //ByteArrayOutputStream bs = new ByteArrayOutputStream();
+            IO.writeTerm(d, t);
+            return d.array(); //bs.toByteArray();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
-
-
 
 
     public enum TaskSerialization {
@@ -352,9 +339,10 @@ public class IO {
     public static byte[] taskToBytes(@NotNull Task x) {
         return taskToBytes(x, TermFirst);
     }
+
     public static byte[] taskToBytes(@NotNull Task x, @NotNull TaskSerialization mode) {
         try {
-            DynByteSeq dos = new DynByteSeq(x.volume()*16);
+            DynByteSeq dos = new DynByteSeq(x.volume() * 16);
             switch (mode) {
                 case TermFirst:
                     IO.writeTask(dos, x);
@@ -372,7 +360,7 @@ public class IO {
 
     public static Task taskFromBytes(@NotNull byte[] b, @NotNull TermIndex index) {
         try {
-            return IO.readTask(new DataInputStream(new ByteArrayInputStream(b)), index);
+            return IO.readTask(input(b), index);
         } catch (IOException e) {
             e.printStackTrace();
             return null;
@@ -381,13 +369,20 @@ public class IO {
 
     public static Term termFromBytes(@NotNull byte[] b, @NotNull TermIndex index) {
         try {
-            return IO.readTerm(new DataInputStream(new ByteArrayInputStream(b)), index);
+            return IO.readTerm(input(b), index);
         } catch (IOException e) {
             e.printStackTrace();
             return null;
         }
     }
 
+    public static DataInputStream input(@NotNull byte[] b) {
+        return new DataInputStream(new ByteArrayInputStream(b));
+    }
+
+    public static DataInputStream input(@NotNull byte[] b, int offset) {
+        return new DataInputStream(new ByteArrayInputStream(b, offset, b.length - offset));
+    }
 
 
     public interface Printer {
@@ -538,7 +533,7 @@ public class IO {
 
             int dt = c.dt();
             boolean reversedDT;
-            if (dt < 0 && c.isCommutative() && dt!=DTERNAL && dt!=XTERNAL) {
+            if (dt < 0 && c.isCommutative() && dt != DTERNAL && dt != XTERNAL) {
                 reversedDT = true;
                 Term x = a;
                 a = b;
@@ -695,30 +690,30 @@ public class IO {
             }*/
             case PROD:
                 JsonArray a = (JsonArray) Json.array();
-                for (Term x : ((Compound)term))
+                for (Term x : ((Compound) term))
                     a.add(toJSONValue(x));
                 return a;
             default:
-                return Json.value(term.toString() );
+                return Json.value(term.toString());
         }
     }
 
     public static Term fromJSON(JsonValue v) {
         if (v instanceof JsonObject) {
-            JsonObject o = (JsonObject)v;
+            JsonObject o = (JsonObject) v;
             int s = o.size();
             List<Term> members = $.newArrayList(s);
-            o.forEach(m -> members.add( $.inh(fromJSON(m.getValue()), $.the(m.getName())) ));
+            o.forEach(m -> members.add($.inh(fromJSON(m.getValue()), $.the(m.getName()))));
             return $.
                     //parallel
-                    sete
+                            sete
                     //secte
-                        (members/*.toArray(new Term[s])*/);
+                            (members/*.toArray(new Term[s])*/);
 
         } else if (v instanceof JsonArray) {
-            JsonArray o = (JsonArray)v;
+            JsonArray o = (JsonArray) v;
             List<Term> vv = $.newArrayList(o.size());
-            o.forEach(x -> vv.add( fromJSON(x) ));
+            o.forEach(x -> vv.add(fromJSON(x)));
             return $.p(vv);
         }
         String vv = v.toString();
@@ -802,6 +797,82 @@ public class IO {
                 out.writeByte((byte) (0xC0 | ((c >> 6) & 0x1F)));
                 out.writeByte((byte) (0x80 | ((c >> 0) & 0x3F)));
             }
+        }
+    }
+
+    /**
+     * visits each subterm of a compound and stores a tuple of integers for it
+     */
+
+
+    @FunctionalInterface  public interface EachTerm {
+        void nextTerm(Op o, int depth, int byteStart);
+    }
+
+    public static void mapSubTerms(byte[] term, EachTerm t) throws IOException {
+
+        int l = term.length;
+        int i = 0;
+
+        int level = 0;
+        final int MAX_LEVELS = 16;
+        byte[][] levels = new byte[MAX_LEVELS][2]; //level stack x (op, subterms remaining) tuple
+
+        do {
+
+            int termStart = i;
+            byte ob = term[i]; i++;
+            Op o = Op.values()[ob];
+            t.nextTerm(o, level, termStart);
+
+
+            if (o.var) {
+                i += 1; //int id = input(term, i).readByte();
+            } else if (o.atomic) {
+                //bytearr[count++] = (byte) ((utflen >>> 8) & 0xFF);
+                //bytearr[count++] = (byte) ((utflen >>> 0) & 0xFF);
+//                DataInputStream ii = input(term, i);
+                int hi = term[i++] & 0xff;
+                int lo = term[i++] & 0xff; //ii.readUnsignedByte();
+                int utfLen = //input(term, i).readUnsignedShort();
+                        (hi << 8) | lo;
+                //i += 2;
+                i += utfLen;
+
+            //null-terminated mode
+//                while (term[i++]!=0 /* null terminator */) { }
+            } else {
+
+                int subterms = input(term, i).readUnsignedByte();
+                i++;
+                levels[level][0] = ob;
+                levels[level][1] = (byte) (subterms  /* include this? */);
+                level++;
+
+            }
+
+            pop: while (level > 0) {
+                byte[] ll = levels[level - 1];
+                byte subtermsRemain = ll[1];
+                if (subtermsRemain == 0) {
+                    //end of compound:
+                    Op ol = Op.values()[ll[0]];
+                    if (ol.image)
+                        i++; //skip image index byte
+                    else if (ol.temporal)
+                        i += 4; //skip temporal dt (32 bits)
+                    level--;
+                    continue pop; //see if the next level up is finished
+                } else {
+                    ll[1] = (byte)(subtermsRemain - 1);
+                    break; //continue to next subterm
+                }
+            }
+
+        } while (i < l);
+
+        if (i != l) {
+            throw new IOException("decoding error");
         }
     }
 
