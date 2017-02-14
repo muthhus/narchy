@@ -1,6 +1,7 @@
 package jcog.signal.markov;
 
 import com.google.common.collect.Iterables;
+import com.google.common.io.ByteStreams;
 import jcog.io.Twokenize;
 
 import java.io.IOException;
@@ -38,14 +39,14 @@ public class MarkovSentence extends MarkovChain<String> {
 //        mTerminateChars = chars;
 //    }
 
-    /**
-     * Converts a String to a ByteArrayInputStream and parses.
-     *
-     * @param s String object to parse.
-     */
-    public void parseSentence(InputStream is) throws IOException {
-        parseSentence(new String(is.readAllBytes()));
-    }
+//    /**
+//     * Converts a String to a ByteArrayInputStream and parses.
+//     *
+//     * @param s String object to parse.
+//     */
+//    public void parseSentence(InputStream is) throws IOException {
+//        parseSentence(new String(is.readBytes(is.readAllBytes()));
+//    }
 
     /**
      * Stream-safe method to parse an InputStream.

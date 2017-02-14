@@ -452,11 +452,11 @@ public interface Term extends Termed, Termlike, Comparable<Termlike> {
             boolean gy = y instanceof GenericVariable;
             if (gx && !gy)
                 return -1;
-            else if (!gx && gy)
+            if (!gx && gy)
                 return +1;
 
-            //return this.toString().compareTo((/*(Atomic)*/y).toString());
-            return Hack.compare(toString(), y.toString());
+            return this.toString().compareTo((/*(Atomic)*/y).toString());
+            //return Hack.compare(toString(), y.toString());
 
         }
 
