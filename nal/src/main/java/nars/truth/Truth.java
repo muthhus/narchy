@@ -34,6 +34,7 @@ import java.io.IOException;
 import java.util.Comparator;
 
 import static jcog.Util.clampround;
+import static nars.truth.TruthFunctions.c2w;
 import static nars.truth.TruthFunctions.w2c;
 
 
@@ -226,10 +227,6 @@ public interface Truth extends Truthed {
         return negate ? negated() : this;
     }
 
-    default int hash(float truthEpsilon) {
-        return Truth.hash(freq(), conf(), truthEpsilon);
-    }
-
     default float eternalizedConf() {
         return TruthFunctions.eternalize(conf());
     }
@@ -251,6 +248,12 @@ public interface Truth extends Truthed {
         float f = clampround(freq(), res);
         float c = Util.clamp(clampround(conf(), res), res, 1f - res);
         return $.t(f, c);
+    }
+
+    default float eternalizedEvi() {
+//        float c = eternalizedConf();
+//        return c2w(c);
+        return conf(); //c2w(w2c(conf)) = conf
     }
 
 

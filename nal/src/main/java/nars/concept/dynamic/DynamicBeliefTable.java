@@ -9,6 +9,7 @@ import nars.concept.CompoundConcept;
 import nars.table.DefaultBeliefTable;
 import nars.table.QuestionTable;
 import nars.term.Compound;
+import nars.term.Terms;
 import nars.truth.Stamp;
 import nars.truth.Truth;
 import nars.truth.TruthDelta;
@@ -26,7 +27,7 @@ public class DynamicBeliefTable extends DefaultBeliefTable {
     final DynamicTruthModel model;
     private final boolean beliefOrGoal;
 
-    static final boolean rejectDerivations = false;
+    //static final boolean rejectDerivations = false;
 
 
     public DynamicBeliefTable(DynamicConcept dynamicConcept, DynamicTruthModel model, boolean beliefOrGoal) {
@@ -36,12 +37,12 @@ public class DynamicBeliefTable extends DefaultBeliefTable {
         this.beliefOrGoal = beliefOrGoal;
     }
 
-    @Override
-    public TruthDelta add(@NotNull Task input, @NotNull QuestionTable questions, @NotNull CompoundConcept<?> concept, @NotNull NAR nar) {
-        if (rejectDerivations && !input.isInput())
-            return null;
-        return super.add(input, questions, concept, nar);
-    }
+//    @Override
+//    public TruthDelta add(@NotNull Task input, @NotNull QuestionTable questions, @NotNull CompoundConcept<?> concept, @NotNull NAR nar) {
+//        if (rejectDerivations && !input.isInput())
+//            return null;
+//        return super.add(input, questions, concept, nar);
+//    }
 
     @Nullable
     public DynamicBeliefTask generate(@NotNull Compound template, long when) {
@@ -120,7 +121,14 @@ public class DynamicBeliefTable extends DefaultBeliefTable {
 
     @Override
     public @Nullable Task match(long when, long now, float dur, @Nullable Task target, boolean noOverlap) {
-        Compound template = target != null ? target.term() : dynamicConcept.term();
+        Compound localTerm = dynamicConcept.term();
+
+        Compound template =
+                //use the provided target task as a temporal template if it matches with this
+                ((target != null) && Terms.equal(localTerm, target.term(), false, false, true)) ?
+                        target.term()
+                    :
+                localTerm;
 
         Task y = generate(template, when);
 
@@ -138,8 +146,8 @@ public class DynamicBeliefTable extends DefaultBeliefTable {
         }
 
         //choose higher confidence
-        float xc = x.conf();
-        float yc = y.conf();
+        float xc = x.conf(when, dur);
+        float yc = y.conf(when, dur);
         if (!Util.equals(xc, yc, TRUTH_EPSILON)) {
             return xc > yc ? x : y;
         }

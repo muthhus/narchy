@@ -60,27 +60,56 @@ abstract public class PremiseBuilder {
         if (taskBudget == null)
             return null;
 
-        final Task task = /*nar.pre*/(_task);
-        Term beliefTerm = /*nar.pre*/(_beliefTerm);//.unneg();
+        final Task task = nar.post(_task);
+        Term beliefTerm = nar.post(_beliefTerm).unneg();
 
         Task belief = null;
 
+        float dur = nar.time.dur();
+
         //temporal focus:
-        long when = task.mid();
-        if (when == ETERNAL || nar.random.nextBoolean())
+        long when;
+        long start = task.start();
+        if (start != ETERNAL && nar.random.nextBoolean()) {
+            //USE TASK's OCCURENCE
+            //find nearest end-point to now
+            long end = task.end();
+            if ((now >= start) && (now <= end)) {
+                when = now; //inner
+            } else {
+                //use nearest endpoint of the task
+                if (Math.abs(now - start) < Math.abs(now - end)) {
+                    when = start;
+                } else {
+                    when = end;
+                }
+            }
+        } else {
+            //USE CURRENT TIME AS FOCUS
             when = now;
+        }
+
+        //if (when == ETERNAL) {
+//            double focusDurs = 8;
+//            when = now +
+//                    Math.abs(
+//                            Math.round(
+//                                    nar.random.nextGaussian() * dur * focusDurs
+//                            )
+//                    );
+        //}
+
 
         //nar.random.nextBoolean() ?
         // : now;
         //now;
         //(long)(now + dur);
 
-        float dur = nar.time.dur();
 
         if (beliefTerm instanceof Compound && task.isQuestOrQuestion()) {
 
             Compound answerTerm = unify(task.term(), (Compound) beliefTerm, nar);
-            if (answerTerm != null) {
+            if ((answerTerm != null) && (answerTerm.varQuery()==0)) {
 
                 beliefTerm = (answerTerm = (Compound) answerTerm.unneg());
 
@@ -99,6 +128,8 @@ abstract public class PremiseBuilder {
 
                         answered = task.onAnswered(answered, nar);
                         if (answered != null) {
+
+                            nar.inputLater(answered);
 
                             //transfer budget from question to answer
                             //float qBefore = taskBudget.priSafe(0);
@@ -127,8 +158,10 @@ abstract public class PremiseBuilder {
                             */
 
 
-                            if (answered.punc() == Op.BELIEF)
+                            if (answered.punc() == Op.BELIEF) {
                                 belief = answered;
+                                beliefTerm = answered.term();
+                            }
                         }
 
                     }
@@ -137,7 +170,7 @@ abstract public class PremiseBuilder {
 
         }
 
-        if (belief == null) {
+        if ((belief == null) && (beliefTerm.varQuery() == 0 )) {
             Concept beliefConcept = nar.concept(beliefTerm);
             if (beliefConcept != null) {
 

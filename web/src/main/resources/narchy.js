@@ -111,10 +111,10 @@ function decodeTasks(e, m) {
 
     const decoder = new TextDecoder("utf8");
 
+
     while (d.byteLength > j) {
 
         let punct = String.fromCharCode(d.getUint8(j++)).charAt(0);
-
 
         //TODO use charCodePoint
         switch (punct) {
@@ -128,9 +128,13 @@ function decodeTasks(e, m) {
                 const pri = d.getFloat32(j); j += 4;
                 const qua = d.getFloat32(j); j += 4;
 
-                const whenLow = d.getInt32(j); j += 4;
-                const whenHigh = d.getInt32(j); j += 4;
-                const when = whenLow | (whenHigh << 32);
+                const startLow = d.getInt32(j); j += 4;
+                const startHigh = d.getInt32(j); j += 4;
+                const start = startLow | (startHigh << 32);
+
+                const endLow = d.getInt32(j); j += 4;
+                const endHigh = d.getInt32(j); j += 4;
+                const end = endLow | (endHigh << 32);
 
                 let freq, conf;
                 if ((punct == '.') || (punct == '!')) {
@@ -139,17 +143,16 @@ function decodeTasks(e, m) {
                 } else {
                     freq = conf = undefined;
                 }
-                const termStrLen = d.getInt16(j); j += 2;
+                const termStrLen = d.getUint16(j); j += 2;
                 const term = decoder.decode(m.slice(j, j + termStrLen)); j += termStrLen;
 
-                //console.log(term, punct, pri, when, freq, conf);
 
                 e.emit('task', {
                     term: term,
                     punc: punct,
                     pri: pri,
                     qua: qua,
-                    when: when,
+                    when: [start,end],
                     freq: freq,
                     conf: conf
                 });

@@ -35,6 +35,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static nars.term.Terms.compoundOr;
 import static nars.term.Terms.compoundOrNull;
 import static nars.time.Tense.ETERNAL;
 
@@ -232,13 +233,13 @@ public class Compressor extends Abbreviation implements RemovalListener<Compound
     }
 
     @NotNull
-    public Term transcode(Term t, boolean en) {
+    public Term transcode(@NotNull Term t, boolean en) {
         if (!(t instanceof Compound))
             return t;
         else {
             byte[] ii = IO.asBytes(t);
             byte[] oo = transcode(ii, en);
-            return ii != oo ? IO.termFromBytes(oo, nar.concepts) : t;
+            return ii != oo ? compoundOr(IO.termFromBytes(oo, nar.concepts), (Compound)t) : t;
         }
     }
 
@@ -264,8 +265,7 @@ public class Compressor extends Abbreviation implements RemovalListener<Compound
 
     @NotNull
     public Compound decode(Compound t) {
-        Compound u = compoundOrNull(transcode(t, false));
-        return (u != null) ? u : t;
+        return (Compound)transcode(t, false);
     }
 
 

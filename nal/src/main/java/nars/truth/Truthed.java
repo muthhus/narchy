@@ -66,6 +66,7 @@ public interface Truthed  {
 
 
 
+
     //void setValue(T v); //move to MutableMetaTruth interface
 
 

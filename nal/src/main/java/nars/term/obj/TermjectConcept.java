@@ -229,4 +229,9 @@ public class TermjectConcept<X> implements Atomic, Concept, Termject<X> {
     public void setMeta(@NotNull Map newMeta) {
 
     }
+
+    @Override
+    public String toString() {
+        return term().toString();
+    }
 }

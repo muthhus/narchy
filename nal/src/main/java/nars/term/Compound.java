@@ -590,7 +590,7 @@ public interface Compound extends Term, IPair, TermContainer {
 
 
     @Override
-    default boolean equalsIgnoringVariables(@NotNull Term other) {
+    default boolean equalsIgnoringVariables(@NotNull Term other, boolean requireSameTime) {
         if (other instanceof Variable)
             return true;
 
@@ -600,17 +600,23 @@ public interface Compound extends Term, IPair, TermContainer {
 //        if (other.op()==NEG)
 //            other = other.unneg();
 
-        if (!(other.op() == op()))
+        Op op = op();
+        if (!(other.op() == op))
             return false;
 
         int s = size();
 
-        if ((other.size() == s) && (((Compound) other).dt() == dt())) {
+        if (other.size() == s) {
+
+            if (op.image || requireSameTime)
+                 if (((Compound) other).dt() != dt())
+                    return false;
+
             Compound o = (Compound) other;
             Term[] a = terms();
             Term[] b = o.terms();
             for (int i = 0; i < s; i++) {
-                if (!a[i].equalsIgnoringVariables(b[i]))
+                if (!a[i].equalsIgnoringVariables(b[i], requireSameTime))
                     return false;
             }
             return true;

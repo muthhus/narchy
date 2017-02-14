@@ -151,7 +151,9 @@ public class Plot2D extends Surface {
         add(new Series(name, maxHistory) {
             @Override public void update() {
                 limit();
-                add((float)valueFunc.getAsDouble());
+                synchronized (this) {
+                    add((float) valueFunc.getAsDouble());
+                }
                 autorange();
             }
         });
@@ -165,7 +167,7 @@ public class Plot2D extends Surface {
         List<Series> series = this.series;
 
         //HACK (not initialized yet but run() called
-        if (series == null || series.isEmpty()) {
+        if (series.isEmpty()) {
             return;
         }
 
@@ -245,7 +247,7 @@ public class Plot2D extends Surface {
         }
     };
 
-    public float[] backgroundColor = new float[] { 0, 0, 0, 0.75f };
+    public float[] backgroundColor = { 0, 0, 0, 0.75f };
 
     public static final PlotVis Line = (List<Series> series, GL2 gl, float minValue, float maxValue) -> {
 

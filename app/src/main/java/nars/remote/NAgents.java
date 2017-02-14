@@ -246,10 +246,10 @@ abstract public class NAgents extends NAgent {
         nar.goalConfidence(0.9f);
 
         float p = 0.1f;
-        nar.DEFAULT_BELIEF_PRIORITY = 0.7f * p;
-        nar.DEFAULT_GOAL_PRIORITY = 0.9f * p;
-        nar.DEFAULT_QUESTION_PRIORITY = 0.25f * p;
-        nar.DEFAULT_QUEST_PRIORITY = 0.25f * p;
+        nar.DEFAULT_BELIEF_PRIORITY = 0.5f * p;
+        nar.DEFAULT_GOAL_PRIORITY = 0.75f * p;
+        nar.DEFAULT_QUESTION_PRIORITY = 0.5f * p;
+        nar.DEFAULT_QUEST_PRIORITY = 0.5f * p;
 
         nar.confMin.setValue(0.01f);
         nar.truthResolution.setValue(0.01f);

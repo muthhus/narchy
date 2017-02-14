@@ -20,8 +20,10 @@ import static nars.time.Tense.ETERNAL;
  */
 public class DefaultBeliefTable implements BeliefTable {
 
-    @Nullable public EternalTable eternal = EternalTable.EMPTY;
-    @Nullable public TemporalBeliefTable temporal = TemporalBeliefTable.EMPTY;
+    @Nullable
+    public EternalTable eternal = EternalTable.EMPTY;
+    @Nullable
+    public TemporalBeliefTable temporal = TemporalBeliefTable.EMPTY;
 
 
     /**
@@ -39,7 +41,7 @@ public class DefaultBeliefTable implements BeliefTable {
 
     @Override
     public boolean remove(Task x) {
-        return (x.isEternal()) ?  eternal.remove(x) : temporal.remove(x);
+        return (x.isEternal()) ? eternal.remove(x) : temporal.remove(x);
     }
 
     @Override
@@ -86,7 +88,8 @@ public class DefaultBeliefTable implements BeliefTable {
     }
 
     @Override
-    @Deprecated public int capacity() {
+    @Deprecated
+    public int capacity() {
         //throw new UnsupportedOperationException("doesnt make sense to call this");
         return eternal.capacity() + temporal.capacity();
     }
@@ -101,7 +104,8 @@ public class DefaultBeliefTable implements BeliefTable {
      * get the most relevant belief/goal with respect to a specific time.
      */
     @Nullable
-    @Override public Task match(long when, long now, float dur, @Nullable Task against, boolean noOverlap) {
+    @Override
+    public Task match(long when, long now, float dur, @Nullable Task against, boolean noOverlap) {
 
         final Task ete = eternal.match();
         if (when == ETERNAL) {
@@ -110,7 +114,7 @@ public class DefaultBeliefTable implements BeliefTable {
             }
         }
 
-        if (now!=ETERNAL) {
+        if (now != ETERNAL) {
 
             Task tmp = temporal.match(when, now, dur, against);
 
@@ -135,27 +139,33 @@ public class DefaultBeliefTable implements BeliefTable {
     public TruthDelta add(@NotNull Task input, @NotNull QuestionTable questions, @NotNull CompoundConcept<?> concept, @NotNull NAR nar) {
         if (input.isEternal()) {
 
-            synchronized(concept) {
-                if (eternal == EternalTable.EMPTY) {
-                    int cap = concept.state().beliefCap(concept, input.isBelief(), true);
-                    if (cap > 0)
-                        eternal = concept.newEternalTable(cap); //allocate
-                    else
-                        return null;
+            if (eternal == EternalTable.EMPTY) {
+                synchronized (concept) {
+                    if (eternal == EternalTable.EMPTY) {
+                        int cap = concept.state().beliefCap(concept, input.isBelief(), true);
+                        if (cap > 0)
+                            eternal = concept.newEternalTable(cap); //allocate
+                        else
+                            return null;
+                    }
                 }
             }
 
             return eternal.add(input, concept, nar);
+
         } else {
-            synchronized (concept) {
-                if (temporal == TemporalBeliefTable.EMPTY) {
-                    int cap = concept.state().beliefCap(concept, input.isBelief(), false);
-                    if (cap > 0)
-                        temporal = concept.newTemporalTable(cap); //allocate
-                    else
-                        return null;
+            if (temporal == TemporalBeliefTable.EMPTY) {
+                synchronized (concept) {
+                    if (temporal == TemporalBeliefTable.EMPTY) { //HACK double boiler
+                        int cap = concept.state().beliefCap(concept, input.isBelief(), false);
+                        if (cap > 0)
+                            temporal = concept.newTemporalTable(cap); //allocate
+                        else
+                            return null;
+                    }
                 }
             }
+
             return temporal.add(input, eternal, concept, nar);
         }
     }

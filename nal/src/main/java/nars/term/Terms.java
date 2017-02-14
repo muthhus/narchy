@@ -424,30 +424,30 @@ public class Terms   {
         return arr;
     }
 
-    @NotNull
-    public static <T extends Term> Term[] filter(@NotNull T[] input, @NotNull IntObjectPredicate<T> filter) {
+//    @NotNull
+//    public static <T extends Term> Term[] filter(@NotNull T[] input, @NotNull IntObjectPredicate<T> filter) {
+//
+//        int s = input.length;
+//
+//        List<Term> l = $.newArrayList(s);
+//
+//        for (int i = 0; i < s; i++) {
+//            T t = input[i];
+//            if (filter.accept(i, t))
+//                l.add(t);
+//        }
+//        return !l.isEmpty() ? l.toArray(new Term[l.size()]) : Terms.empty;
+//    }
 
-        int s = input.length;
+//    @NotNull
+//    public static Term[] filter(@NotNull Term[] input, @NotNull IntPredicate filter) {
+//        return filter(input, (i, t) -> filter.test(i));
+//    }
 
-        List<Term> l = $.newArrayList(s);
-
-        for (int i = 0; i < s; i++) {
-            T t = input[i];
-            if (filter.accept(i, t))
-                l.add(t);
-        }
-        return !l.isEmpty() ? l.toArray(new Term[l.size()]) : Terms.empty;
-    }
-
-    @NotNull
-    public static Term[] filter(@NotNull Term[] input, @NotNull IntPredicate filter) {
-        return filter(input, (i, t) -> filter.test(i));
-    }
-
-    @NotNull
-    public static Term[] filter(@NotNull Term[] input, @NotNull Predicate<Term> filter) {
-        return filter(input, (i, t) -> filter.test(t));
-    }
+//    @NotNull
+//    public static Term[] filter(@NotNull Term[] input, @NotNull Predicate<Term> filter) {
+//        return filter(input, (i, t) -> filter.test(t));
+//    }
 
     @NotNull
     public static Term[] toArray(@NotNull Collection<Term> l) {
@@ -455,17 +455,17 @@ public class Terms   {
         return s == 0 ? Terms.empty : l.toArray(new Term[s]);
     }
 
-    @NotNull
-    public static Term[] cloneTermsReplacing(@NotNull Term[] term, @NotNull Term from, @NotNull Term to) {
-        Term[] y = new Term[term.length];
-        int i = 0;
-        for (Term x : term) {
-            if (x.equals(from))
-                x = to;
-            y[i++] = x;
-        }
-        return y;
-    }
+//    @NotNull
+//    public static Term[] cloneTermsReplacing(@NotNull Term[] term, @NotNull Term from, @NotNull Term to) {
+//        Term[] y = new Term[term.length];
+//        int i = 0;
+//        for (Term x : term) {
+//            if (x.equals(from))
+//                x = to;
+//            y[i++] = x;
+//        }
+//        return y;
+//    }
 
     /**
      * returns lev distance divided by max(a.length(), b.length()
@@ -501,27 +501,28 @@ public class Terms   {
 //
 //    }
 
+//    public static ImmutableSet<Term> unique(@NotNull Term c, @NotNull Predicate<Term> p) {
+//        UnifiedSet<Term> u = new UnifiedSet();
+//        c.recurseTerms(x -> {
+//            if (p.test(x)) {
+//                u.add(x);
+//            }
+//        });
+//        return u.toImmutable();
+//    }
 
-
-
-    public static ImmutableSet<Term> unique(@NotNull Term c, @NotNull Predicate<Term> p) {
-        UnifiedSet<Term> u = new UnifiedSet();
-        c.recurseTerms(x -> {
-            if (p.test(x)) {
-                u.add(x);
-            }
-        });
-        return u.toImmutable();
+    @Nullable public static Compound compoundOr(@Nullable Term possiblyCompound, Compound other) {
+        return (possiblyCompound instanceof Compound) ? (Compound) possiblyCompound : other;
     }
 
     /** dangerous because some operations involving concepts can naturally reduce to atoms, and using this interprets them as non-existent */
-    @Deprecated @Nullable public static Compound compoundOrNull(@Nullable Term t) {
-        return (t instanceof Compound) ? (Compound) t : null;
+    @Nullable public static Compound compoundOrNull(@Nullable Term t) {
+        return compoundOr(t, null);
     }
 
     /** dangerous because some operations involving concepts can naturally reduce to atoms, and using this interprets them as non-existent */
-    @Deprecated @Nullable public static Compound compoundOrNull(@Nullable Termed t) {
-        return (t instanceof Compound) ? ((Compound) t) : compoundOrNull(t.term());
+    @Nullable public static Compound compoundOrNull(@Nullable Termed t) {
+        return compoundOrNull(t.term());
     }
 
     /** detects a negated conjunction of negated subterms:
@@ -783,11 +784,15 @@ public class Terms   {
         return equal(a.term(), b.term(), false, false);
     }
 
+    public static boolean equal(@NotNull Term a, @NotNull Term b, boolean sameTemporality, boolean samePolarity) {
+        return equal(a, b, sameTemporality, samePolarity, false);
+    }
+
     /** equal atemporally AND with any outer negations removed
      * @param samePolarity whether the top-level polarity should be ignored (auto-unnegate)
      *
      */
-    public static boolean equal(@NotNull Term a, @NotNull Term b, boolean sameTemporality, boolean samePolarity) {
+    public static boolean equal(@NotNull Term a, @NotNull Term b, boolean sameTemporality, boolean samePolarity, boolean ignoreVariables) {
 
         if (a == b)
             return true;
@@ -800,14 +805,20 @@ public class Terms   {
         if (a.equals(b))
             return true;
 
-        if (!sameTemporality) {
-            return ((a.structure() == b.structure()) &&
-                    (a.volume() == b.volume()) &&
-                    (a.op() == b.op()) &&
-                    atemporalize(b).equals(atemporalize(a)));
+        if (a.op() == b.op()) {
+            if (!ignoreVariables) {
+                if (!sameTemporality) {
+                    return ((a.structure() == b.structure()) &&
+                            (a.volume() == b.volume()) &&
+                            atemporalize(b).equals(atemporalize(a)));
+                }
+            } else {
+                return atemporalize(a).equalsIgnoringVariables(atemporalize(b), sameTemporality);
+            }
         }
 
         return false;
+
     }
 
     /** a Set is already duplicate free, so just sort it */

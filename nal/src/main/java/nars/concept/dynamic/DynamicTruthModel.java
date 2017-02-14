@@ -69,6 +69,7 @@ abstract public class DynamicTruthModel {
                 if (dt == DTERNAL) dt = 0;
                 boolean evi = d.e != null;
 
+
                 Truth nt;
                 if (tableDynamic && subterm instanceof Compound) {
                     DynTruth ndt = ((DynamicBeliefTable) table).truth(when + dt, now, (Compound) subterm, evi);

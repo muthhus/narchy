@@ -25,6 +25,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.*;
+import java.nio.charset.Charset;
 import java.util.List;
 import java.util.function.Function;
 
@@ -150,7 +151,7 @@ public class IO {
     public static void writeStringUTF(@NotNull DataOutput out, String s) throws IOException {
 
         //byte[] bb = s.getBytes(Charset.defaultCharset());
-        byte[] bb = Hack.bytes(s);
+        byte[] bb = s.getBytes(Charset.defaultCharset()); //Hack.bytes(s);
         out.writeShort(bb.length);
         out.write(bb);
     }
@@ -168,7 +169,8 @@ public class IO {
     }
 
     public static void writeTruth(@NotNull DataOutput out, @NotNull Truthed t) throws IOException {
-        out.writeInt(t.truth().hash(Param.TRUTH_EPSILON));
+        Truth tt = t.truth();
+        out.writeInt(Truth.hash(tt.freq(), tt.conf(), Param.TRUTH_EPSILON));
     }
 
 

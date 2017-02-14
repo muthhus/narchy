@@ -42,7 +42,7 @@ public class Tetris extends NAgents {
 
     private static SensorConcept[][] concept;
     //private int afterlife = TIME_PER_FALL * tetris_height * tetris_width;
-    static boolean easy = false;
+    static boolean easy;
 
     private final TetrisState state;
 
@@ -453,7 +453,7 @@ public class Tetris extends NAgents {
         public static void main(String[] args) throws Narsese.NarseseException {
             //Param.DEBUG = true;
 
-            FrameTime clock = new FrameTime().dur(3);
+            FrameTime clock = new FrameTime().dur(TIME_PER_FALL);
             NAR nar =
                     NAgents.newMultiThreadNAR(4, clock);
                     //NARBuilder.newALANN(clock, 4, 64, 5, 4, 1);

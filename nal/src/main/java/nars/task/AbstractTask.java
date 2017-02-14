@@ -553,7 +553,7 @@ public abstract class AbstractTask extends RawBudget implements Task {
         if (a == ETERNAL)
             return cw;
         else if (when == ETERNAL)// || when == now) && o == when) //optimization: if at the current time and when
-            return t.eternalizedConf();
+            return t.eternalizedEvi();
         else {
             long z = end();
             //float dur = dur();
@@ -561,40 +561,35 @@ public abstract class AbstractTask extends RawBudget implements Task {
 //            if (z - start < dur)
 //                z = Math.round(start + dur); //HACK
 
-            float factor =
-                    /*(this instanceof DerivedTask) ?
-                        (z==a) ? 1f : Math.min(1f, dur / (z - a)) //divide the evidence across the timespan, in proportion to the number of durations involved
-                            :*/
-                        1f;
 
-            float ccw = factor * cw;
 
             if ((when >= a) && (when <= z)) {
+
+                //full confidence
 
             } else {
                 //nearest endpoint of the interval
                 if (dur > 0)
-                    ccw = TruthPolation.evidenceDecay(ccw, dur, Math.abs((when <= a ? a : z) - when));
+                    cw = TruthPolation.evidenceDecay(cw, dur, Math.min(Math.abs(a - when), Math.abs(z - when)));
                 else
-                    ccw = 0;
+                    cw = 0;
 
-                //ccw = 0;
+                if (eternalizable()) {
+                    float et = t.eternalizedEvi();
+                    if (et > cw)
+                        cw = et;
+                }
             }
 
-            if (eternalizable()) {
-                float et = t.eternalizedConf() * factor;
-                ccw = Math.max(ccw, et);
-            }
-
-            return ccw;
+            return cw;
 
         }
 
     }
 
     public boolean eternalizable() {
-        return term.vars() > 0;
-        //return term.varIndep() > 0;
+        //return term.vars() > 0;
+        return term.varIndep() > 0;
         //return false;
 
 

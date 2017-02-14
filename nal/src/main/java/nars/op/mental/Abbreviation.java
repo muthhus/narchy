@@ -362,10 +362,7 @@ public class Abbreviation/*<S extends Term>*/ extends Leak<Compound, BLink<Compo
 //        }
 
 
-        @Override
-        public @Nullable Truth belief(long when, long now, float dur) {
-            return super.belief(when, now, dur);
-        }
+
 
         @Override
         public final Activation process(@NotNull Task input, NAR nar) {

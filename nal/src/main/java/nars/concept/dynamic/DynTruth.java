@@ -2,6 +2,7 @@ package nars.concept.dynamic;
 
 import nars.$;
 import nars.Op;
+import nars.Param;
 import nars.Task;
 import nars.budget.Budget;
 import nars.budget.BudgetFunctions;
@@ -13,6 +14,9 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+
+import static nars.Op.CONJ;
+import static nars.time.Tense.ETERNAL;
 
 /**
  * Created by me on 12/4/16.
@@ -72,16 +76,20 @@ public final class DynTruth implements Truthed {
         return truth().toString();
     }
 
-    @Nullable public DynamicBeliefTask task(@NotNull Compound template, boolean beliefOrGoal, long cre, long occ, @Nullable Budget b) {
+    @Nullable public DynamicBeliefTask task(@NotNull Compound template, boolean beliefOrGoal, long cre, long start, @Nullable Budget b) {
 
         Budget budget = b != null ? b : budget();
         if (budget.isDeleted())
             return null;
-        DynamicBeliefTask t = new DynamicBeliefTask(template, beliefOrGoal ? Op.BELIEF : Op.GOAL,
-                truth(), cre, occ, evidence());
-        t.setBudget( budget );
-        t.log("Dynamic");
-        return t;
 
+        long dur = (start!=ETERNAL && template.op() == CONJ) ? template.dtRange() : 0;
+
+        DynamicBeliefTask t = new DynamicBeliefTask(template, beliefOrGoal ? Op.BELIEF : Op.GOAL,
+                truth(), cre, start, start + dur, evidence());
+        t.setBudget( budget );
+        if (Param.DEBUG)
+            t.log("Dynamic");
+
+        return t;
     }
 }

@@ -142,7 +142,7 @@ public class MicrosphereTemporalBeliefTable extends MultiRWFasterList<Task> impl
         int cap = capacity();
         if (cap == 0)
             return null;
-
+        
         //the result of compression is processed separately
         final TruthDelta[] delta = new TruthDelta[1];
 

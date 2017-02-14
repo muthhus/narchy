@@ -367,7 +367,7 @@ public interface Term extends Termed, Termlike, Comparable<Termlike> {
         return hashCode();
     }
 
-    default boolean equalsIgnoringVariables(@NotNull Term other) {
+    default boolean equalsIgnoringVariables(@NotNull Term other, boolean requireSameTime) {
         return (this instanceof Variable) || (other instanceof Variable) || equals(other);
     }
 

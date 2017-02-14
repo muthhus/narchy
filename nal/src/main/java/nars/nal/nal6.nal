@@ -176,4 +176,6 @@
     (Z ==> (&&,C,A..+)), (Z ==> (&&,C,B..+)), neqCom(A..+,B..+), time(dtCombine) |- ((&&,B..+) ==>+- (&&,A..+)), (Belief:Abduction)
 
 
+    (X ==> Y), (X ==> Y), task("?"), time(dtTaskExact) |- (?1 ==>+- Y), (Punctuation:Question)
+    (X ==> Y), (X ==> Y), task("?"), time(dtTaskExact) |- (X ==>+- ?1), (Punctuation:Question)
 

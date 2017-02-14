@@ -81,7 +81,8 @@ public class DepIndepVarIntroduction extends VarIntroduction {
                 dep = false; indep = true;
                 break;
             default:
-                throw new UnsupportedOperationException();
+                return null; //????
+                //throw new UnsupportedOperationException();
         }
 
 

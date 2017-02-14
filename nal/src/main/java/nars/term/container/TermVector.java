@@ -119,10 +119,10 @@ public abstract class TermVector implements TermContainer {
         forEach(action, 0, size());
     }
 
-    @NotNull
-    @Override public final Term[] terms(@NotNull IntObjectPredicate<Term> filter) {
-        return Terms.filter(terms(), filter);
-    }
+//    @NotNull
+//    @Override public final Term[] terms(@NotNull IntObjectPredicate<Term> filter) {
+//        return Terms.filter(terms(), filter);
+//    }
 
     @Override
     public final int structure() {
