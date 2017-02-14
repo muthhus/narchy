@@ -751,7 +751,7 @@ public abstract class TermBuilder {
 
                     case SIM:
 
-                        if (subject == predicate)
+                        if (subject.equals(predicate))
                             return True;
                         if (isTrue(subject) || isFalse(subject) || isTrue(predicate) || isFalse(predicate))
                             return False;
@@ -759,7 +759,7 @@ public abstract class TermBuilder {
 
                     case INH:
 
-                        if (subject == predicate)
+                        if (subject.equals( predicate) )
                             return True;
                         if (isTrue(subject) || isFalse(subject) || isTrue(predicate) || isFalse(predicate))
                             return False;
@@ -777,7 +777,7 @@ public abstract class TermBuilder {
 
                         if ((dt!=0 && dt!=DTERNAL)) {
                             mustNotEqual = false; //allow repeat
-                        } else if (subject == predicate) {
+                        } else if (subject.equals(predicate)) {
                             return True;
                         }
 
@@ -812,7 +812,7 @@ public abstract class TermBuilder {
 
                         if ((dt!=0 && dt!=DTERNAL)) {
                             mustNotEqual = false; //allow repeat
-                        } else if (subject==predicate) {
+                        } else if (subject.equals(predicate)) {
                             return True;
                         }
 

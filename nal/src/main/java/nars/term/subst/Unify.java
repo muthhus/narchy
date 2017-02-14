@@ -97,6 +97,16 @@ public abstract class Unify extends Termunator implements Subst {
         this(index, type, random, new Versioning(stackMax), termutesMax );
     }
 
+    /** call this to invoke the next termutator in the chain */
+    public final boolean chain(Termutator[] chain, int next) {
+
+        //increment the version counter by one and detect if the limit exceeded.
+        // this is to prevent infinite recursions in which no version incrementing
+        // occurrs that would otherwise trigger overflow to interrupt it.
+        return versioning.nextChange() && chain[++next].run(this, chain, next);
+
+    }
+
     protected final class Constraints extends Versioned<MatchConstraint> implements BiPredicate<Term,Term> {
 
         public Constraints(@NotNull Versioning context, int maxConstr) {
@@ -201,7 +211,7 @@ public abstract class Unify extends Termunator implements Subst {
     public final boolean run(@NotNull Unify f, Termutator[] ignored, int ignoredAlwaysNegativeOne) {
         Termutator[] n = next();
         if (n != null) {
-            return Termutator.next(f, n, -1); //combinatorial recurse starts here
+            return chain(n, -1); //combinatorial recurse starts here
         } else {
             return f.onMatch(); //ends here when termutes exhausted
         }

@@ -95,9 +95,7 @@ public class FuzzyScalarConcepts implements Iterable<SensorConcept> {
                 i++;
             }
         } else {
-            sensors.add( new SensorConcept(states[0], nar, this.input,
-                    (x) -> t(x, conf)
-            ));
+           throw new RuntimeException("should be >1 states");
         }
 
 

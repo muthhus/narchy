@@ -48,12 +48,20 @@ public class Versioning extends FasterList<Versioned> {
     /** start a new version with a commit, returns true if add was successful or false if unsuccessful (capacity exceeded)
      *  @return null if capacity exceeded
      * */
-    public final boolean nextChange(@Nullable Versioned v, @Nullable Object x) {
+    public final boolean nextChange(@NotNull Versioned v, @Nullable Object x) {
         int c = next();
         if (c!=-1) {
-            if (v!=null)
-                v.add(x);
+            v.add(x);
             add(v);
+            return true;
+        }
+        return false;
+    }
+
+    public final boolean nextChange() {
+        int c = next();
+        if (c!=-1) {
+            add(null);
             return true;
         }
         return false;

@@ -49,7 +49,7 @@ public final class CommutivePermutations extends Termutator {
             p.next();
 
             if (f.matchLinear(p, y)) {
-                if (!next(f, chain, current))
+                if (!f.chain(chain, current))
                     return false;
             }
 

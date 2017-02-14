@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.function.*;
 
 import static nars.$.*;
+import static nars.term.Terms.compoundOrNull;
 
 /**
  * agent sensor builder
@@ -64,7 +65,7 @@ public interface NSense {
     /**
      * interpret an int as a selector between enumerated values
      */
-    default <E extends Enum> void senseSwitch(String term, @NotNull Supplier<E> value) {
+    default <E extends Enum> void senseSwitch(String term, @NotNull Supplier<E> value) throws Narsese.NarseseException {
         E[] values = ((Class<? extends E>) value.get().getClass()).getEnumConstants();
         for (E e : values) {
             Compound t = switchTerm(term, e.toString());
@@ -73,8 +74,8 @@ public interface NSense {
     }
 
     @NotNull
-    static Compound switchTerm(String a, String b) {
-        return switchTerm(the(a), the(b));
+    static Compound switchTerm(String a, String b) throws Narsese.NarseseException {
+        return switchTerm($(a), $(b));
     }
 
     @NotNull
@@ -100,7 +101,7 @@ public interface NSense {
     /**
      * interpret an int as a selector between (enumerated) object values
      */
-    default <O> void senseSwitch(String term, @NotNull Supplier<O> value, @NotNull O... values) {
+    default <O> void senseSwitch(String term, @NotNull Supplier<O> value, @NotNull O... values) throws Narsese.NarseseException {
         for (O e : values) {
             Compound t = switchTerm(term, "\"" + e.toString() + "\"");
             sense(t, () -> value.get().equals(e));
@@ -156,18 +157,19 @@ public interface NSense {
     }
 
     @NotNull
-    default List<SensorConcept> senseNumber(int from, int to, IntFunction<String> id, IntFunction<FloatSupplier> v) {
+    default List<SensorConcept> senseNumber(int from, int to, IntFunction<String> id, IntFunction<FloatSupplier> v) throws Narsese.NarseseException {
         List<SensorConcept> l = newArrayList(to-from);
         for (int i = from; i < to; i++) {
-            l.addAll( senseNumber(id.apply(i), v.apply(i)).sensors );
+            l.add( senseNumber( id.apply(i), v.apply(i)) );
         }
         return l;
     }
 
 
-    @NotNull
-    default FuzzyScalarConcepts senseNumber(Compound id, FloatSupplier v) {
-        return senseNumber(v, id);
+    default SensorConcept senseNumber(Compound id, FloatSupplier v) {
+        return new SensorConcept(id, nar(), v,
+                (x) -> t(x, nar().confidenceDefault(Op.BELIEF))
+        );
     }
 
     @NotNull
@@ -180,19 +182,18 @@ public interface NSense {
     }
 
     @NotNull
-    default FuzzyScalarConcepts senseNumberBi(String id, FloatSupplier v) {
-        Atomic ID = the(id);
+    default FuzzyScalarConcepts senseNumberBi(String id, FloatSupplier v) throws Narsese.NarseseException {
+        Atomic ID = $(id);
         return senseNumber(v,  inh(ID, the("hi")), inh(ID, the("lo")));
     }
     @NotNull
-    default FuzzyScalarConcepts senseNumberTri(String id, FloatSupplier v) {
-        Atomic ID = the(id);
+    default FuzzyScalarConcepts senseNumberTri(String id, FloatSupplier v) throws Narsese.NarseseException {
+        Atomic ID = $(id);
         return senseNumber(v,  inh(ID, the("hi")), inh(ID, the("mid")), inh(ID, the("lo")));
     }
 
-    @NotNull
-    default FuzzyScalarConcepts senseNumber(String id, DoubleSupplier v) {
-        return senseNumber(()->(float)v.getAsDouble(), $.p(the(id)));
+    default SensorConcept senseNumber(String id, DoubleSupplier v) throws Narsese.NarseseException {
+        return senseNumber(compoundOrNull($(id)), ()->(float)v.getAsDouble());
     }
 
     /**

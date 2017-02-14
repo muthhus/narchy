@@ -2,6 +2,7 @@ package nars.experiment.minicraft;
 
 import nars.$;
 import nars.NAR;
+import nars.Narsese;
 import nars.experiment.minicraft.top.InputHandler;
 import nars.experiment.minicraft.top.TopDownMinicraft;
 import nars.remote.NAgents;
@@ -34,13 +35,20 @@ public class TopCraft extends NAgents {
 
     private final TopDownMinicraft craft;
     private Sensor2D pixels;
-    private PixelAutoClassifier camAE = null;
+    private final PixelAutoClassifier camAE;
 
     public static void main(String[] args) {
-        runRT(TopCraft::new, 25, 10, -1);
+        runRT(nar1 -> {
+            try {
+                return new TopCraft(nar1);
+            } catch (Narsese.NarseseException e) {
+                e.printStackTrace();
+                return null;
+            }
+        }, 25, 10, -1);
     }
 
-    public TopCraft(NAR nar) {
+    public TopCraft(NAR nar) throws Narsese.NarseseException {
         super("cra", nar, 1);
 
         this.craft = new TopDownMinicraft();
@@ -131,7 +139,7 @@ public class TopCraft extends NAgents {
 
 
 
-    float prevScore = 0;
+    float prevScore;
     @Override protected float act() {
 
         float nextScore = craft.frameImmediate();
@@ -144,16 +152,16 @@ public class TopCraft extends NAgents {
 
     /** customized copy of JEncode's */
     public class SequenceEncoder {
-        private SeekableByteChannel ch;
+        private final SeekableByteChannel ch;
         private Picture toEncode;
-        private Transform transform;
-        private H264Encoder encoder;
-        private ArrayList<ByteBuffer> spsList;
-        private ArrayList<ByteBuffer> ppsList;
-        private FramesMP4MuxerTrack outTrack;
-        private ByteBuffer _out;
+        private final Transform transform;
+        private final H264Encoder encoder;
+        private final ArrayList<ByteBuffer> spsList;
+        private final ArrayList<ByteBuffer> ppsList;
+        private final FramesMP4MuxerTrack outTrack;
+        private final ByteBuffer _out;
         private int frameNo;
-        private MP4Muxer muxer;
+        private final MP4Muxer muxer;
 
         int timescale = 25;
         int duration = 1;

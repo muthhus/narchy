@@ -1402,30 +1402,6 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
 
 
 
-    /**
-     * text output
-     */
-    public void outputTasks(@NotNull Predicate<Task> filter, @NotNull PrintStream out) {
-        forEachConceptTask(c -> {
-            if (filter.test(c))
-                out.println(c.term().toString() + c.punc() + " " + c.truth()); //TODO occurence time
-        }, true, true, true, true);
-    }
-
-
-//    public void dumpConcepts(@NotNull String path) throws FileNotFoundException {
-//        PrintStream pw = new PrintStream(new FileOutputStream(new File(path)));
-//        index.forEach(t -> {
-//            if (t instanceof Concept) {
-//                Concept cc = (Concept)t;
-//                cc.print(pw);
-//            } else {
-//                pw.append(t.toString());
-//            }
-//        });
-//        pw.close();
-//    }
-
     @NotNull
     public On onTask(@NotNull Consumer<Task> o) {
         return eventTaskProcess.on(o);

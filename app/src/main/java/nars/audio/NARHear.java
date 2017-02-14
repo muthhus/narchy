@@ -6,6 +6,7 @@ import jcog.signal.Autoencoder;
 import nars.$;
 import nars.NAR;
 import nars.NAgent;
+import nars.Narsese;
 import nars.concept.SensorConcept;
 import nars.gui.Vis;
 import nars.remote.NAgents;
@@ -39,11 +40,16 @@ public class NARHear extends NAgent {
                 //new SineSource(128),
                 20);
 
-        List<SensorConcept> freqInputs = senseNumber(0, au.freqSamplesPerFrame,
-                i -> $.func("f", $.the(i)).toString(),
+        List<SensorConcept> freqInputs = null; //absolute value unipolar
+        try {
+            freqInputs = senseNumber(0, au.freqSamplesPerFrame,
+                    i -> $.func("f", $.the(i)).toString(),
 
-        //        i -> () -> (Util.clamp(au.history[i], -1f, 1f)+1f)/2f); //raw bipolar
-                i -> () -> (Util.sqr(Util.clamp(au.data[i], 0f, 1f)))); //absolute value unipolar
+            //        i -> () -> (Util.clamp(au.history[i], -1f, 1f)+1f)/2f); //raw bipolar
+                    i -> () -> (Util.sqr(Util.clamp(au.data[i], 0f, 1f))));
+        } catch (Narsese.NarseseException e) {
+            e.printStackTrace();
+        }
 
         freqInputs.forEach(s -> s.resolution(0.05f));
 

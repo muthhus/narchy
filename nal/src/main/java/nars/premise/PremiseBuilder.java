@@ -60,12 +60,8 @@ abstract public class PremiseBuilder {
         if (taskBudget == null)
             return null;
 
-        final Task task = nar.pre(_task);
-        Term beliefTerm = nar.pre(_beliefTerm).unneg();
-//        Budget termLinkBudget = termLink.clone();
-//        if (termLinkBudget == null)
-//            return null;
-
+        final Task task = /*nar.pre*/(_task);
+        Term beliefTerm = /*nar.pre*/(_beliefTerm);//.unneg();
 
         Task belief = null;
 

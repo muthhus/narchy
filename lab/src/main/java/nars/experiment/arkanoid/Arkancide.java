@@ -2,40 +2,23 @@ package nars.experiment.arkanoid;
 
 
 import jcog.math.FloatPolarNormalized;
-import nars.$;
-import nars.NAR;
-import nars.Param;
+import nars.*;
 import nars.concept.ActionConcept;
 import nars.remote.NAgents;
 
+import java.io.BufferedOutputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.PrintStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 public class Arkancide extends NAgents {
 
-    static boolean cam = true;
+    static boolean cam;
 
     private final float paddleSpeed = 1f;
-
-
-    public static void main(String[] args) {
-        Param.DEBUG = false;
-
-        //runRT(Arkancide::new);
-        //nRT(Arkancide::new, 25, 5);
-
-        NAR nar = runRT((NAR n) -> {
-
-            Arkancide agent = new Arkancide(n, cam);
-
-            return agent;
-
-        }, 50, 3, -1);
-
-        //System.out.println(ts.db.getInfo());
-
-        //ts.db.close();
-
-        //nar.beliefConfidence(0.75f);
-        //nar.goalConfidence(0.75f);
-    }
 
 
     final int visW = 32;
@@ -50,9 +33,52 @@ public class Arkancide extends NAgents {
 
     private float prevScore;
 
+    public static void main(String[] args) throws IOException {
+        Param.DEBUG = true;
+
+        //runRT(Arkancide::new);
+        //nRT(Arkancide::new, 25, 5);
+
+        NAR nar = runRT((NAR n) -> {
+
+            Arkancide agent = null;
+            try {
+                agent = new Arkancide(n, cam);
+            } catch (Narsese.NarseseException e) {
+
+            }
+
+            return agent;
+
+        }, 40, 15, 1000);
 
 
-    public Arkancide(NAR nar, boolean cam) {
+        Path f = Files.createTempFile(Paths.get("/tmp"), "arkancide", ".nal");
+        System.out.println("saving tasks: " + f);
+        FileOutputStream os = new FileOutputStream(f.toFile());
+        PrintStream ps = new PrintStream(os);
+        nar.tasks.forEach(t -> {
+            Task tt = nar.post(t);
+            try {
+                tt.appendTSV(ps);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            //ps.println(tt.toString(/*NAR.this*/));
+        });
+
+        //System.out.println(ts.db.getInfo());
+
+        //ts.db.close();
+
+        //nar.beliefConfidence(0.75f);
+        //nar.goalConfidence(0.75f);
+    }
+
+
+
+
+    public Arkancide(NAR nar, boolean cam) throws Narsese.NarseseException {
         super("noid", nar);
 
 
@@ -69,8 +95,6 @@ public class Arkancide extends NAgents {
         maxPaddleSpeed = 35 * Arkanoid.BALL_VELOCITY;
 
         nar.truthResolution.setValue(0.02f);
-        nar.beliefConfidence(0.75f);
-        nar.goalConfidence(0.75f);
 
         //nar.input(new MutableTask(happy, Op.BELIEF, $.t(0.5f, 0.15f)).eternal());
 
@@ -80,8 +104,9 @@ public class Arkancide extends NAgents {
 
         if (cam) {
             senseCamera("cam1", noid, visW, visH);
-            senseCameraRetina("cam2", noid, visW/2, visH/2, (v) -> $.t(v, alpha));
+            //senseCameraRetina("cam2", noid, visW/2, visH/2, (v) -> $.t(v, alpha));
         } else {
+            nar.termVolumeMax.set(12);
             senseNumber( "x(paddle, noid)", new FloatPolarNormalized(()->noid.paddle.x, noid.getWidth()/2));//.resolution(resX);
             senseNumber( "x(ball, noid)", new FloatPolarNormalized(()->noid.ball.x, noid.getWidth()/2));//.resolution(resX);
             senseNumber( "y(ball, noid)", new FloatPolarNormalized(()->noid.ball.y, noid.getHeight()/2));//.resolution(resY);

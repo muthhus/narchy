@@ -100,11 +100,7 @@ abstract public class substituteIfUnifies extends Functor {
         Term y = a[2];
 
         Term z = unify(term, x, y);
-        if (z != null) {
-            return z;
-        } else {
-            return False;
-        }
+        return (z != null) ? z : False;
     }
 
     public @Nullable Term unify(@NotNull Term term, @NotNull Term x, @NotNull Term y) {

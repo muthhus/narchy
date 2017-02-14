@@ -3,6 +3,7 @@ package spacegraph.render;
 import com.jogamp.newt.event.*;
 import com.jogamp.newt.opengl.GLWindow;
 import com.jogamp.opengl.*;
+import com.jogamp.opengl.fixedfunc.GLMatrixFunc;
 import com.jogamp.opengl.glu.GLU;
 import com.jogamp.opengl.util.FPSAnimator;
 import com.jogamp.opengl.util.gl2.GLUT;
@@ -16,6 +17,7 @@ import java.io.PrintStream;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static com.jogamp.opengl.fixedfunc.GLMatrixFunc.GL_PROJECTION;
 
@@ -47,46 +49,43 @@ public abstract class JoglSpace implements GLEventListener, WindowListener {
         return w;
     }
 
-    public static final Set<GLWindow> windows = Collections.synchronizedSet(  new HashSet<>() );
+    public static final Set<GLWindow> windows = Collections.newSetFromMap(  new ConcurrentHashMap<>() );
 
     public static final Logger logger = LoggerFactory.getLogger(JoglSpace.class);
 
     private static void animate(GLWindow w) {
-        synchronized (a) {
-            boolean wasEmpty = windows.isEmpty();
+        //synchronized (a) {
 
             if (!windows.add(w))
                 return;
 
-            if (wasEmpty) {
-                if (!a.isStarted()) {
-                    a.start(Thread.MIN_PRIORITY);
-                    logger.info("START {}", a);
-                } else {
-                    a.resume();
-                    logger.info("RESUME {}", a);
-                }
+            if (!a.isStarted()) {
+                a.start(Thread.MIN_PRIORITY);
+                logger.info("START {}", a);
+            } else {
+                a.resume();
+                logger.info("RESUME {}", a);
             }
 
             a.add(w);
-        }
+        //}
 
         w.addWindowListener(new WindowAdapter() {
 
             @Override
             public void windowDestroyed(WindowEvent e) {
-                windows.remove(w);
+                if (windows.remove(w)) {
 
-                boolean nowEmpty = windows.isEmpty();
-                synchronized (a) {
+                    boolean nowEmpty = windows.isEmpty();
+
                     a.remove(w);
                     if (nowEmpty) {
                         a.pause();
                         logger.info("PAUSE {}", a);
                     }
-                }
 
-                super.windowDestroyed(e);
+                    super.windowDestroyed(e);
+                }
             }
         });
     }
@@ -111,12 +110,12 @@ public abstract class JoglSpace implements GLEventListener, WindowListener {
         System.err.print("GL:");
         System.err.println(gl);
         System.err.print("GL_VERSION=");
-        System.err.println(gl.glGetString(gl.GL_VERSION));
+        System.err.println(gl.glGetString(GL.GL_VERSION));
         System.err.print("GL_EXTENSIONS: ");
-        System.err.println(gl.glGetString(gl.GL_EXTENSIONS));
+        System.err.println(gl.glGetString(GL.GL_EXTENSIONS));
     }
 
-    public synchronized static GLCapabilitiesImmutable newDefaultConfig() {
+    public static GLCapabilitiesImmutable newDefaultConfig() {
 
 
         GLCapabilities config = new GLCapabilities(
@@ -248,12 +247,12 @@ public abstract class JoglSpace implements GLEventListener, WindowListener {
             setUpdateFPSFrames(updateEveryNFrames, new PrintStream(new OutputStream() {
 
                 @Override
-                public void write(int b) throws IOException {
+                public void write(int b) {
                 }
 
-                long lastUpdate = 0;
+                long lastUpdate;
                 @Override
-                public void flush() throws IOException {
+                public void flush() {
                     long l = getLastFPSUpdateTime();
                     if (lastUpdate==l)
                         return;
@@ -337,7 +336,7 @@ public abstract class JoglSpace implements GLEventListener, WindowListener {
 //        // mover the origin from the bottom left corner
 //        // to the upper left corner
 //        //gl.glTranslatef(0f, -screenHeight, 0f);
-        gl.glMatrixMode(gl.GL_MODELVIEW);
+        gl.glMatrixMode(GLMatrixFunc.GL_MODELVIEW);
         //gl.glLoadIdentity();
 
 

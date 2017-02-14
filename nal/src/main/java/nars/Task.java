@@ -1,5 +1,6 @@
 package nars;
 
+import jcog.Texts;
 import jcog.map.SynchronizedHashMap;
 import nars.bag.ArrayBag;
 import nars.budget.BudgetMerge;
@@ -663,4 +664,28 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
     }
 
 
+    /**
+     * prints this task as a TSV/CSV line.  fields:
+     *      Compound
+     *      Punc
+     *      Freq (blank space if quest/question)
+     *      Conf (blank space if quest/question)
+     *      Start
+     *      End
+     */
+    default void appendTSV(Appendable a) throws IOException {
+
+        char sep = '\t'; //','
+
+        a
+            .append(term().toString()).append(sep)
+            .append("\"" + punc() + "\"").append(sep)
+            .append(truth()!=null ? Texts.n2(truth().freq()) : " ").append(sep)
+            .append(truth()!=null ? Texts.n2(truth().conf()) : " ").append(sep)
+            .append(!isEternal() ? Long.toString(start()) : " ").append(sep)
+            .append(!isEternal() ? Long.toString(end()) : " ").append(sep)
+            .append(proof().replace("\n", "  ")).append(sep)
+            .append('\n');
+
+    }
 }

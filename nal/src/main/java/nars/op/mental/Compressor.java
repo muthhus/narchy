@@ -36,6 +36,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static nars.term.Terms.compoundOrNull;
+import static nars.time.Tense.ETERNAL;
 
 /**
  * Created by me on 2/11/17.
@@ -56,7 +57,7 @@ public class Compressor extends Abbreviation implements RemovalListener<Compound
 
 
     /* static */ class Abbr {
-        public final Term decompressed;
+        public final Compound decompressed;
         public final AliasConcept compressed;
         final SequenceMatcher encode;
         final SequenceMatcher decode;
@@ -100,6 +101,8 @@ public class Compressor extends Abbreviation implements RemovalListener<Compound
 //        int xxl = y.volume();
 //        if (xxl >= volume.lo() && xxl <= volume.hi()) {
         //return super.onOut(b);
+        x = (Compound) nar.concepts.productNormalize(x);
+
         abbreviate(x, b);
         return 1f;
 //        } else
@@ -117,6 +120,11 @@ public class Compressor extends Abbreviation implements RemovalListener<Compound
     protected void abbreviate(@NotNull Compound abbreviated, @NotNull Budget b) {
         final boolean[] changed = {false};
 
+        abbreviated = decode(abbreviated);
+
+        if (abbreviated.op()==Op.EQUI || abbreviated.op()==Op.IMPL) //HACK for equivalence relation
+            return;
+
         Abbr abb = code.get(abbreviated, (a) -> {
 
             String compr = newSerialTerm();
@@ -124,14 +132,26 @@ public class Compressor extends Abbreviation implements RemovalListener<Compound
             //System.out.println("compress CODE: " + a + " to " + compr);
 
             changed[0] = true;
-            return new Abbr(decode(a.term())  /** store fully decompress */, compr, nar);
+            return new Abbr(a  /** store fully decompress */, compr, nar);
         });
         if (changed[0]) {
-            Compound s = compoundOrNull($.sim(abb.compressed, abb.decompressed));
+            Compound s = compoundOrNull(
+                //$.sim
+                $.equi
+                    (abb.compressed, abb.decompressed)
+            );
             if (s == null) {
                 logger.warn("unrelateable: {}", abb);
             } else {
-                nar.believe(s, Tense.Eternal, 1f, 0.99f);
+
+                Task abbreviationTask = new AbbreviationTask(
+                        s, abb.decompressed, abb.compressed, abbreviationConfidence.floatValue())
+                        .time(nar.time(), ETERNAL)
+                        .log("Abbreviate")
+                        .budgetSafe(b);
+                nar.input(abbreviationTask);
+
+
                 recompile();
             }
 
@@ -265,7 +285,9 @@ public class Compressor extends Abbreviation implements RemovalListener<Compound
         do {
 
             if (wr == null) {
+                ii = 0;
                 wr = new ByteArrayReader(b);
+                termPos.clear();
                 try {
                     IO.mapSubTerms(b, (o, depth, p) -> {
                         termPos.add(p);
@@ -307,10 +329,9 @@ public class Compressor extends Abbreviation implements RemovalListener<Compound
                         if (i < l)
                             System.arraycopy(prev, i + from.length, next, i + to.length, l - (i + from.length));
 
-                        termPos.clear();
+                        wr = null;
                         b = next;
-                        ii = 0;
-                        break;
+                        continue; //restart
                     }
 
                 }
@@ -334,7 +355,7 @@ public class Compressor extends Abbreviation implements RemovalListener<Compound
 
     public static void main(String[] args) {
         Default n = new Default();
-        Compressor c = new Compressor(n, "_", 2, 8, 0.5f, 8, 32);
+        Compressor c = new Compressor(n, "_", 4, 8, 0.5f, 8, 32);
 
         n.onTask(x -> {
             Task y = c.encode(x);
@@ -342,7 +363,7 @@ public class Compressor extends Abbreviation implements RemovalListener<Compound
                 System.out.println(y);
         });
         n.log();
-        n.input("a:b. b:(a,c, 1, 1, 2). c:(d,a). d:e.");
+        n.input("a:b. b(a,c, 1, 1, 2). c:(d,a). d:e.");
         n.run(800);
 
 
