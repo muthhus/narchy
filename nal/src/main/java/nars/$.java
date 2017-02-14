@@ -976,11 +976,12 @@ public enum $ {
     }
 
     /** generates a recursive product for the given terms array. the terms should be ordered with the
-     * most significant digit first. */
+     * most significant digit FIRST -- the array will be composed so that common locality corresponds
+     * to common inner subterms and not vice-versa. */
     public static @NotNull Compound pRecurse(@NotNull Term... t) {
         int tl = t.length;
-        Compound nextInner = $.p(t[tl - 1]); //wrap innermost item in product too, for fairness
-        for (int i = tl - 2; i >= 0; i--) {
+        Compound nextInner = $.p(t[0]); //wrap innermost item in product too, for fairness
+        for (int i = 1; i < tl; i++) {
             nextInner = $.p(t[i], nextInner);
         }
         return nextInner;

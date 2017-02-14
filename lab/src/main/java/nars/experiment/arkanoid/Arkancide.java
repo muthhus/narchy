@@ -16,7 +16,7 @@ import java.nio.file.Paths;
 
 public class Arkancide extends NAgents {
 
-    static boolean cam;
+    static boolean cam = true;
 
     private final float paddleSpeed = 1f;
 

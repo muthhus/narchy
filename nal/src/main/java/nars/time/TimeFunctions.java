@@ -436,7 +436,13 @@ public interface TimeFunctions {
 
     @Nullable
     static Term resolve(@NotNull Derivation p, @NotNull Term x) {
-        Term y = p.resolve(p.index.productNormalize(x));
+        Term y;
+        try {
+            y = p.resolve(p.index.productNormalize(x));
+        } catch (InvalidTermException e) {
+            //failed, just return the input
+            y = null;
+        }
         return y!=null ? y : x;
     }
 

@@ -25,6 +25,7 @@ import nars.term.Term;
 import nars.term.Termed;
 import nars.term.container.TermContainer;
 import nars.term.subst.Unify;
+import nars.truth.Truth;
 import nars.truth.TruthDelta;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
@@ -355,9 +356,15 @@ public class Abbreviation/*<S extends Term>*/ extends Leak<Compound, BLink<Compo
             return /*super.unify(y, subst) || */abbr.term().unify(y, subst);
         }
 
+//        @Override
+//        public boolean equals(Object u) {
+//            return super.equals(u);
+//        }
+
+
         @Override
-        public boolean equals(Object u) {
-            return super.equals(u);
+        public @Nullable Truth belief(long when, long now, float dur) {
+            return super.belief(when, now, dur);
         }
 
         @Override

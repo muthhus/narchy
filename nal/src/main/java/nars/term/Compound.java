@@ -123,6 +123,12 @@ public interface Compound extends Term, IPair, TermContainer {
         return r[0];
     }
 
+
+    @Override
+    default Op opUnneg() {
+        return unneg().op();
+    }
+
     @NotNull
     @Override
     default Term unneg() {

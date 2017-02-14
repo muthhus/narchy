@@ -290,7 +290,7 @@ public abstract class TermBuilder {
 
 
     private static boolean validEquivalenceTerm(@NotNull Term t) {
-        return !t.isAny(InvalidEquivalenceTerm);
+        return !t.opUnneg().in(InvalidEquivalenceTerm);
 //        if ( instanceof Implication) || (subject instanceof Equivalence)
 //                || (predicate instanceof Implication) || (predicate instanceof Equivalence) ||
 //                (subject instanceof CyclesInterval) || (predicate instanceof CyclesInterval)) {
@@ -786,6 +786,11 @@ public abstract class TermBuilder {
                         if (isTrue(predicate))  return subject;
                         if (isFalse(predicate)) return neg(subject);
 
+                        if (!validEquivalenceTerm(subject))
+                            throw new InvalidTermException(op, dt, "Invalid equivalence subject", subject, predicate);
+                        if (!validEquivalenceTerm(predicate))
+                            throw new InvalidTermException(op, dt, "Invalid equivalence predicate", subject, predicate);
+
                         boolean subjNeg = sop == NEG;
                         boolean predNeg = predicate.op() == NEG;
                         if (subjNeg && predNeg) {
@@ -797,12 +802,6 @@ public abstract class TermBuilder {
                         } else if (subjNeg && !predNeg) {
                             return neg(statement(op, dt, subject.unneg(), predicate));
                         }
-
-                        if (!validEquivalenceTerm(subject))
-                            throw new InvalidTermException(op, dt, "Invalid equivalence subject", subject, predicate);
-                        if (!validEquivalenceTerm(predicate))
-                            throw new InvalidTermException(op, dt, "Invalid equivalence predicate", subject, predicate);
-
 
                         break;
                     }

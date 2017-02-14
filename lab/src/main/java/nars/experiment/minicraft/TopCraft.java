@@ -35,7 +35,7 @@ public class TopCraft extends NAgents {
 
     private final TopDownMinicraft craft;
     private Sensor2D pixels;
-    private final PixelAutoClassifier camAE;
+    private PixelAutoClassifier camAE;
 
     public static void main(String[] args) {
         runRT(nar1 -> {

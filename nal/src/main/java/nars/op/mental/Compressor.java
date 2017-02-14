@@ -101,7 +101,7 @@ public class Compressor extends Abbreviation implements RemovalListener<Compound
 //        int xxl = y.volume();
 //        if (xxl >= volume.lo() && xxl <= volume.hi()) {
         //return super.onOut(b);
-        x = (Compound) nar.concepts.productNormalize(x);
+        x = (Compound) (nar.concepts.productNormalize(x)).unneg();
 
         abbreviate(x, b);
         return 1f;
@@ -120,10 +120,11 @@ public class Compressor extends Abbreviation implements RemovalListener<Compound
     protected void abbreviate(@NotNull Compound abbreviated, @NotNull Budget b) {
         final boolean[] changed = {false};
 
-        abbreviated = decode(abbreviated);
-
-        if (abbreviated.op()==Op.EQUI || abbreviated.op()==Op.IMPL) //HACK for equivalence relation
+        Op ao = abbreviated.op();
+        if (ao == Op.EQUI || ao == Op.IMPL) //HACK for equivalence relation
             return;
+
+        abbreviated = decode(abbreviated);
 
         Abbr abb = code.get(abbreviated, (a) -> {
 
