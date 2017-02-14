@@ -654,8 +654,7 @@ public class NAL8Test extends AbstractNALTest {
         tester.input("(c:d &&+0 e:f). :|:"); //PRESENT
         tester.input("e:f! :|:"); //PRESENT
         tester.mustDesire(cycles, "a:b", 1.0f, 0.73f, 0);
-        tester.mustNotOutput(cycles*2, "a:b", '!', ETERNAL);
-
+        tester.mustNotOutput(cycles, "a:b", '!', ETERNAL);
     }
 
     @Test
@@ -665,7 +664,38 @@ public class NAL8Test extends AbstractNALTest {
         tester.input("(a:b<=>c:d)."); //ETERNAL
         tester.input("(c:d &&+0 e:f). :|:"); //PRESENT
         tester.mustBelieve(cycles, "(a:b &&+0 e:f)", 1.0f, 0.81f, 0);
-        tester.mustNotOutput(cycles*2, "(a:b &&+0 e:f)", '.', ETERNAL);
+        tester.mustNotOutput(cycles, "(a:b &&+0 e:f)", '.', ETERNAL);
+    }
+    @Test
+    public void conjunctionGoalSubstitutionViaEquiv()  {
+        TestNAR tester = test();
+
+        tester.input("(a:b<=>c:d)."); //ETERNAL
+        tester.input("(c:d &&+0 e:f)! :|:"); //PRESENT
+        tester.mustDesire(cycles, "(a:b &&+0 e:f)", 1.0f, 0.81f, 0);
+        tester.mustNotOutput(cycles, "(a:b &&+0 e:f)", '.', ETERNAL);
+    }
+
+    @Test
+    public void conjunctionSubstitutionViaEquivSimultaneous()  {
+        TestNAR tester = test();
+
+        tester.input("(a:b <=>+0 c:d)."); //ETERNAL or Zero, for now dont allow time relation
+        tester.input("(c:d &&+0 e:f). :|:"); //PRESENT
+        tester.mustBelieve(cycles, "(a:b &&+0 e:f)", 1.0f, 0.81f, 0);
+        tester.mustNotOutput(cycles, "(a:b &&+0 e:f)", '.', ETERNAL);
+    }
+
+
+    @Test
+    public void conjunctionSubstitutionViaEquivTemporal()  {
+        TestNAR tester = test();
+
+        tester.input("(a:b <=>+1 c:d)."); //ETERNAL or Zero, for now dont allow time relation
+        tester.input("(x:y <=>+0 c:d)."); //ETERNAL or Zero, for now dont allow time relation
+        tester.input("(c:d &&+0 e:f). :|:"); //PRESENT
+        tester.mustBelieve(cycles, "(x:y &&+0 e:f)", 1.0f, 0.81f, 0);
+        tester.mustNotOutput(cycles, "(a:b &&+0 e:f)", '.');
     }
 
     @Test

@@ -47,21 +47,21 @@ abstract public class events extends AtomicBoolCondition {
 
     };
 
-    /** order doesnt matter, just that they are both temporal */
-    @Nullable public static final events bothTemporal = new events() {
-
-        @Override
-        public String toString() {
-            return "bothTemporal";
-        }
-
-        @Override
-        public boolean run(@NotNull Derivation m) {
-            int d = deltaOcc(m.task, m.belief);
-            return d!=DTERNAL;
-        }
-
-    };
+//    /** order doesnt matter, just that they are both temporal */
+//    @Nullable public static final events bothTemporal = new events() {
+//
+//        @Override
+//        public String toString() {
+//            return "bothTemporal";
+//        }
+//
+//        @Override
+//        public boolean run(@NotNull Derivation m) {
+//            int d = deltaOcc(m.task, m.belief);
+//            return d!=DTERNAL;
+//        }
+//
+//    };
 
     public static final BoolCondition taskNotDTernal = new events() {
 
@@ -77,6 +77,22 @@ abstract public class events extends AtomicBoolCondition {
         }
 
     };
+
+    public static final BoolCondition beliefDTSimultaneous = new events() {
+
+        @Override
+        public String toString() {
+            return "beliefDTSimultaneous";
+        }
+
+        @Override
+        public boolean run(@NotNull Derivation m) {
+            int dt = m.belief.dt();
+            return (dt == DTERNAL) || (dt == 0);
+        }
+
+    };
+
 //    /** true if the belief term is in the earliest position of a conjunction.
 //     * for parallel and eternal, automatically true.
 //     *  */

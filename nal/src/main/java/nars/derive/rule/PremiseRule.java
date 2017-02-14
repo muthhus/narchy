@@ -714,6 +714,10 @@ public class PremiseRule extends GenericCompound {
                             timeFunction = TimeFunctions.decomposeTaskComponents;
                             break;
 
+                        case "beliefDTSimultaneous":
+                            pres.add(events.beliefDTSimultaneous);
+                            break;
+
 //                        case "decomposeTaskIfTermLinkBefore":
 //                            timeFunction = TimeFunctions.decomposeTask;
 //                            pres.add(IfTermLinkBefore.ifTermLinkBefore);

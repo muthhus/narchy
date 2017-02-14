@@ -49,7 +49,7 @@
      X, (B<->C), neqCom(X,C), neq(X,B) |- substitute(X,B,C,strict), (Belief:Intersection, Goal:Intersection)
 
 //needs special temporal handling to shift occurrence time of result if the <=> has a non-zero non-eternal dt
-     //X, (B<=>C), neqCom(X,C), neq(X,B) |- substitute(X,B,C,strict), (Belief:Intersection, Goal:Intersection)
+     X, (B<=>C), neqCom(X,C), neq(X,B), time(beliefDTSimultaneous) |- substitute(X,B,C,strict), (Belief:Intersection, Goal:Intersection)
 
 //INVALID:
 //desire spreading by similarity (was: Goal:Intersection)
