@@ -453,7 +453,7 @@ public class Tetris extends NAgents {
         public static void main(String[] args) throws Narsese.NarseseException {
             //Param.DEBUG = true;
 
-            FrameTime clock = new FrameTime().dur(TIME_PER_FALL);
+            FrameTime clock = new FrameTime().dur(TIME_PER_FALL/2f);
             NAR nar =
                     NAgents.newMultiThreadNAR(4, clock);
                     //NARBuilder.newALANN(clock, 4, 64, 5, 4, 1);

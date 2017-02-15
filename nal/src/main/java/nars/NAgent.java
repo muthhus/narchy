@@ -430,18 +430,22 @@ abstract public class NAgent implements NSense, NAction {
 //                            .eternal(),
 //                            //.time(nar, dur)
 
-                    new PredictionTask($.impl(action, dur, happiness), '?')
-                            .time(nar.time()),
-                    new PredictionTask($.impl($.neg(action), dur, happiness), '?')
-                            .time(nar.time()),
-
-                    new PredictionTask($.impl(action, dur, $.varQuery(1)), '?')
-                            .time(nar.time())
-
-//                    new PredictionTask($.seq(action, dur, happiness), '?')
+//                    new PredictionTask($.impl(action, dur, happiness), '?')
 //                            .time(nar.time()),
-//                    new PredictionTask($.seq($.neg(action), dur, happiness), '?')
+//                    new PredictionTask($.impl($.neg(action), dur, happiness), '?')
+//                            .time(nar.time()),
+
+//                    new PredictionTask($.impl(action, dur, $.varQuery(1)), '?')
 //                            .time(nar.time())
+
+                    new PredictionTask($.seq(action, dur, happiness), '?')
+                            .time(nar.time()),
+                    new PredictionTask($.seq($.neg(action), dur, happiness), '?')
+                            .time(nar.time()),
+                    new PredictionTask($.seq(action, dur, $.neg(happiness)), '?')
+                            .time(nar.time()),
+                    new PredictionTask($.seq($.neg(action), dur, $.neg(happiness)), '?')
+                            .time(nar.time())
 
 //                    new PredictionTask($.seq($.varQuery("x"), 0, $.seq(action, dur, happiness)), '?').eternal(),
 //                    new PredictionTask($.seq($.varQuery("x"), 0, $.seq($.neg(action), dur, happiness)), '?').eternal()
@@ -612,7 +616,7 @@ abstract public class NAgent implements NSense, NAction {
                 //UtilityFunctions.aveAri(nar.priorityDefault('.'), nar.priorityDefault('!'))
                        ///* / (predictors.size()/predictorProbability)*/ * predictorPriFactor;
 
-        float lookAhead = 2;
+        float lookAhead = 8;
 
         if (pri > 0) {
             //long frameDelta = now-prev;
@@ -681,7 +685,7 @@ abstract public class NAgent implements NSense, NAction {
         if (t.start() != ETERNAL) {
             s = (t instanceof PredictionTask) ? new PredictionTask(t.term(), pp) : new MutableTask(t.term(), pp, t.truth());
             s.budgetByTruth(p, nar)
-                .time(now, now, now + Math.round(dur * lookAhead * nar.random.nextFloat()))
+                .time(now, now + Math.round(dur * lookAhead * nar.random.nextFloat()))
                 .log("Agent Predictor");
 
             //s.evidence(t)
@@ -737,14 +741,17 @@ abstract public class NAgent implements NSense, NAction {
             assert(punct == Op.QUESTION || punct == Op.QUEST);
         }
 
+        /*
         @Override
         public Task onAnswered(Task answer, NAR nar) {
             if (!answer.isDeleted()) {
-                long lag = answer.creation() - creation();
-                nar.logger.info("Prediction:\t{}\n\t{}\tlag={}", this, answer, lag);
+                long reactionTime = answer.creation() - creation();
+                long lag = !answer.isEternal() ? nar.time() - answer.start() : 0;
+                //nar.logger.info("Prediction:\t{}\n\t{}\tlag={},{}", this, answer, reactionTime, lag);
             }
             return answer;
         }
+        */
     }
 
 }

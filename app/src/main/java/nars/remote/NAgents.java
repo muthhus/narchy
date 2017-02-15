@@ -194,15 +194,15 @@ abstract public class NAgents extends NAgent {
             }
         };
 
-        Default nar = new Default(16 * 1024,
+        Default nar = new Default(32 * 1024,
                 conceptsPerCycle, 1, 3, rng,
-                new CaffeineIndex(cb, 164*1024, false, exe)
+                new CaffeineIndex(cb, 64*1024, false, exe)
                 //new TreeTermIndex.L1TreeIndex(new DefaultConceptBuilder(), 300000, 32 * 1024, 3)
                 ,
                 time,
                 exe) {
 
-            final Compressor compressor = new Compressor(this, "_", 2, 6,
+            final Compressor compressor = new Compressor(this, "_", 2, 7,
                     1f, 64, 768);
 
             @Override
@@ -232,10 +232,10 @@ abstract public class NAgents extends NAgent {
 
             @Override
             protected HijackBag<Concept> newConceptBag(int activeConcepts) {
-                return new HijackBag<>(activeConcepts, reprobes, BudgetMerge.orBlend, random ) {
+                return new HijackBag<>(activeConcepts, reprobes, BudgetMerge.plusBlend, random ) {
                     @Override
                     public Forget forget(float rate) {
-                        float memoryForget = 1f;
+                        float memoryForget = 0.8f;
                         return new Forget(rate, memoryForget, memoryForget);
                     }
                 };
@@ -245,15 +245,15 @@ abstract public class NAgents extends NAgent {
         nar.beliefConfidence(0.9f);
         nar.goalConfidence(0.9f);
 
-        float p = 0.1f;
+        float p = 0.5f;
         nar.DEFAULT_BELIEF_PRIORITY = 0.5f * p;
         nar.DEFAULT_GOAL_PRIORITY = 0.75f * p;
-        nar.DEFAULT_QUESTION_PRIORITY = 0.5f * p;
-        nar.DEFAULT_QUEST_PRIORITY = 0.5f * p;
+        nar.DEFAULT_QUESTION_PRIORITY = 0.25f * p;
+        nar.DEFAULT_QUEST_PRIORITY = 0.25f * p;
 
         nar.confMin.setValue(0.01f);
-        nar.truthResolution.setValue(0.01f);
-        nar.termVolumeMax.setValue(32);
+        nar.truthResolution.setValue(0.04f);
+        nar.termVolumeMax.setValue(80);
 
         MySTMClustered stm = new MySTMClustered(nar, 64, '.', 3, true, 6);
         MySTMClustered stmGoal = new MySTMClustered(nar, 32, '!', 2, true, 4);
