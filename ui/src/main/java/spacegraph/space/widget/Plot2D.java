@@ -148,15 +148,14 @@ public class Plot2D extends Surface {
     }
 
     public Plot2D add(String name, DoubleSupplier valueFunc) {
-        add(new Series(name, maxHistory) {
-            @Override public void update() {
-                limit();
-                synchronized (this) {
+            add(new Series(name, maxHistory) {
+                @Override public void update() {
+                    limit();
                     add((float) valueFunc.getAsDouble());
+                    autorange();
                 }
-                autorange();
-            }
-        });
+            });
+
         return this;
     }
 
@@ -325,15 +324,20 @@ public class Plot2D extends Surface {
     }
 
 
-    public void update() {
-        series.forEach(Series::update);
+    //TODO AtomicBoolean busy... instead of synchronized
 
-        minValue = Float.POSITIVE_INFINITY;
-        maxValue = Float.NEGATIVE_INFINITY;
-        series.forEach((Series s) -> {
-            minValue = Math.min(minValue, s.minValue);
-            maxValue = Math.max(maxValue, s.maxValue);
-        });
+    public void update() {
+        synchronized (series) {
+
+            series.forEach(Series::update);
+
+            minValue = Float.POSITIVE_INFINITY;
+            maxValue = Float.NEGATIVE_INFINITY;
+            series.forEach((Series s) -> {
+                minValue = Math.min(minValue, s.minValue);
+                maxValue = Math.max(maxValue, s.maxValue);
+            });
+        }
     }
 
 }
