@@ -43,18 +43,17 @@ public class ArrayQuestionTable extends MultiRWFasterList<Task> implements Quest
 
         if (this.capacity != newCapacity) {
 
+            this.capacity = newCapacity;
 
             withWriteLockAndDelegate(ll -> {
-                this.capacity = newCapacity;
 
                 int s = ll.size();
-                if (s > newCapacity) {
-                    int toRemove = s - capacity;
-                    while (toRemove > 0) {
-                        n.tasks.remove(ll.remove(--s)); //last element
-                        toRemove--;
-                    }
+                int toRemove = s - capacity;
+                while (toRemove > 0) {
+                    remove(--s).delete(); //last element
+                    toRemove--;
                 }
+
             });
         }
     }
@@ -114,9 +113,6 @@ public class ArrayQuestionTable extends MultiRWFasterList<Task> implements Quest
 
             result[0] = question;
         });
-
-        if (trash[0] != null)
-            n.tasks.remove(trash[0]);
 
         return result[0];
     }

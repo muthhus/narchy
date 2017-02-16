@@ -70,18 +70,17 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, Sorted
 
             this.capacity = c;
 
-            List<Task> removed = $.newArrayList(1);
             synchronized (this) {
 
                 int s = size();
 
                 //TODO can be accelerated by batch remove operation
                 while (c < s--) {
-                    removed.add(removeWeakest());
+                    Task r = removeWeakest();
+                    r.delete();
                 }
             }
 
-            nar.tasks.remove(removed);
         }
     }
 
@@ -320,7 +319,7 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, Sorted
 
 
             //Finally try inserting this task.  If successful, it will be returned for link activation etc
-            delta = insert(input, nar);
+            delta = insert(input);
 
         }
 
@@ -355,7 +354,7 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, Sorted
      * try to insert but dont delete the input task if it wasn't inserted (but delete a displaced if it was)
      * returns true if it was inserted, false if not
      */
-    private TruthDelta insert(@NotNull Task input, @NotNull NAR nar) {
+    private TruthDelta insert(@NotNull Task input) {
 
         Truth before = this.truth;
 
@@ -365,7 +364,7 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, Sorted
             return null; //rejected
         } else if (displaced != null) {
             TaskTable.removeTask(displaced,
-                    "Displaced", nar
+                    "Displaced"
                     //"Displaced by " + incoming,
             );
         }
@@ -376,7 +375,7 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, Sorted
     private void addEternalAxiom(@NotNull Task input, @NotNull EternalTable et, NAR nar) {
         //lock incoming 100% confidence belief/goal into a 1-item capacity table by itself, preventing further insertions or changes
         //1. clear the corresponding table, set capacity to one, and insert this task
-        Consumer<Task> overridden = t -> TaskTable.removeTask(t, "Overridden", nar);
+        Consumer<Task> overridden = t -> TaskTable.removeTask(t, "Overridden");
         et.forEach(overridden);
         et.clear();
         et.capacity(1, nar);

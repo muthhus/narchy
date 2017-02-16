@@ -147,9 +147,7 @@ public interface Concept extends Termed {
 
 
     static void delete(@NotNull Concept c, @NotNull NAR nar) {
-        List<Task> removed = $.newArrayList();
         c.state(ConceptState.Deleted, nar);
-        nar.tasks.remove(removed);
 
         c.termlinks().clear();
         c.tasklinks().clear();
@@ -302,6 +300,12 @@ public interface Concept extends Termed {
         if (includeConceptQuests) quests().forEach(each);
     }
 
+    default void forEachTask(@NotNull Consumer<Task> each) {
+        beliefs().forEach(each);
+        questions().forEach(each);
+        goals().forEach(each);
+        quests().forEach(each);
+    }
 
     @NotNull
     default Iterator<Task> iterateTasks(boolean onbeliefs, boolean ongoals, boolean onquestions, boolean onquests) {

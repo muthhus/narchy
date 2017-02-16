@@ -27,12 +27,12 @@ public class TaskStatistics {
     final Frequency qua = new Frequency();
 
     public TaskStatistics add(NAR nar) {
-        nar.tasks.forEach(this::add);
+        nar.forEachTask(this::add);
         return this;
     }
 
     public TaskStatistics add(Concept c) {
-        c.forEachTask(true, true, true, true, this::add);
+        c.forEachTask(this::add);
         return this;
     }
 

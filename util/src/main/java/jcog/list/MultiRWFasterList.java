@@ -221,23 +221,27 @@ public class MultiRWFasterList<T> extends AbstractMultiReaderMutableCollection<T
         }
     }
 
+    public void ifSizeExceedsWriteWith(int n, Consumer<MutableList<T>> procedure) {
+        this.acquireWriteLock();
+        try {
+            if (delegate.size() > n)
+                procedure.accept(delegate);
+        } finally {
+            this.unlockWriteLock();
+        }
+    }
+
+
     public <Y> Y ifNotEmptyWriteWith(Function<MutableList<T>, Y> procedure) {
         Y result = null;
 
-        //this.acquireReadLock();
-        //try {
-
-                this.acquireWriteLock();
-                try {
-                    if (!delegate.isEmpty())
-                        result = procedure.apply(delegate);
-                } finally {
-                    this.unlockWriteLock();
-                }
-
-        //} finally {
-        //    this.unlockReadLock();
-        //}
+        this.acquireWriteLock();
+        try {
+            if (!delegate.isEmpty())
+                result = procedure.apply(delegate);
+        } finally {
+            this.unlockWriteLock();
+        }
 
         return result;
     }

@@ -101,7 +101,7 @@ abstract public class NAgents extends NAgent {
         //NAR.printActiveTasks(nar, true);
         //NAR.printActiveTasks(nar, false);
 
-        nar.tasks.forEach(x -> {
+        nar.forEachTask(x -> {
             System.out.println(x);
             //if (x.isQuestOrQuestion())
                 ///System.out.println(x.proof());

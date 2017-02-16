@@ -39,8 +39,12 @@ public class MicrosphereTemporalBeliefTable extends MultiRWFasterList<Task> impl
         this.capacity = initialCapacity;
     }
 
-    /** warning: not efficient as forEach visiting */
-    @NotNull @Override public Iterator<Task> iterator() {
+    /**
+     * warning: not efficient as forEach visiting
+     */
+    @NotNull
+    @Override
+    public Iterator<Task> iterator() {
         return toImmutable().iterator();
     }
 
@@ -52,17 +56,11 @@ public class MicrosphereTemporalBeliefTable extends MultiRWFasterList<Task> impl
             this.capacity = newCapacity;
 
             //compress until under-capacity
-            List<Task>[] changes = ifNotEmptyWriteWith((l) -> {
+            ifSizeExceedsWriteWith(newCapacity, (l) -> {
 
-                int toRemove = l.size() - newCapacity;
-                if (toRemove <= 0) {
-                    return null;
-                }
+                int toRemove = l.size() - newCapacity; //will be positive
 
-                List<Task> merged;
-                List<Task> trash = $.newArrayList(toRemove);
-
-                clean(l, trash);
+                clean(l);
 
                 toRemove = l.size() - newCapacity;
                 if (toRemove > 0) {
@@ -75,7 +73,6 @@ public class MicrosphereTemporalBeliefTable extends MultiRWFasterList<Task> impl
                     float confMin = nar.confMin.floatValue();
 
                     Function<Task, Float> rank = temporalConfidence(now, dur);
-                    merged = $.newArrayList(1);
 
                     while (l.size() > capacity) {
 
@@ -85,30 +82,20 @@ public class MicrosphereTemporalBeliefTable extends MultiRWFasterList<Task> impl
 
                         Task c = (b != null && b != a) ? merge(a, b, now, confMin) : null;
 
-                        removeLater(l, a, trash);
+                        remove(l, a);
 
                         if (c != null) {
-                            removeLater(l, b, trash);
+                            remove(l, b);
 
                             l.add(c);
 
-                            merged.add(c);
                         }
 
                     }
 
-                } else {
-                    merged = null;
                 }
 
-                return new List[] { merged, trash };
             });
-
-            if (changes!=null) {
-                nar.tasks.remove(changes[1]);
-                nar.inputLater(changes[1]);
-                //nar.tasks.change(changes[0], changes[1]);
-            }
 
         }
 
@@ -119,8 +106,9 @@ public class MicrosphereTemporalBeliefTable extends MultiRWFasterList<Task> impl
     public boolean remove(Task x) {
         final boolean[] removed = new boolean[1];
         withWriteLockAndDelegate(l -> {
-           removed[0] = l.remove(x);
+            removed[0] = l.remove(x);
         });
+        x.delete();
         return removed[0];
     }
 
@@ -142,12 +130,10 @@ public class MicrosphereTemporalBeliefTable extends MultiRWFasterList<Task> impl
         int cap = capacity();
         if (cap == 0)
             return null;
-        
+
         //the result of compression is processed separately
         final TruthDelta[] delta = new TruthDelta[1];
 
-        Task[] merged = new Task[1];
-        List<Task> trash = $.newArrayList();
 
         withWriteLockAndDelegate(l -> {
             final Truth before;
@@ -162,13 +148,13 @@ public class MicrosphereTemporalBeliefTable extends MultiRWFasterList<Task> impl
             Task next;
 
             float confMin = nar.confMin.floatValue();
-            if ((next = compress(input, now, l, trash, dur, confMin)) != null) {
+            if ((next = compress(input, now, l, dur, confMin)) != null) {
 
                 l.add(input);
                 //this will be inserted to the index in a callee method
 
                 if (next != input /*&& list.size() + 1 <= cap*/) {
-                    l.add(merged[0] = next);
+                    l.add(next);
                 }
 
                 final Truth after = truth(now, dur, eternal);
@@ -178,17 +164,12 @@ public class MicrosphereTemporalBeliefTable extends MultiRWFasterList<Task> impl
             }
         });
 
-        //update the index outside of the atomic procedure
-        nar.tasks.remove(trash);
-
-        for (Task x : merged)
-            if (x != null)
-                nar.tasks.addIfAbsent(x);
-
         return delta[0];
     }
 
-    /** apply feedback for a newly inserted task */
+    /**
+     * apply feedback for a newly inserted task
+     */
     protected void feedback(MutableList<Task> l, @NotNull Task inserted) {
         float f = inserted.freq();
         float q = inserted.qua();
@@ -214,9 +195,9 @@ public class MicrosphereTemporalBeliefTable extends MultiRWFasterList<Task> impl
                     long xs = x.start();
                     long xe = x.end();
                     Interval overlap = ii.intersection(new Interval(xs, xe));
-                    if (overlap!=null) {
+                    if (overlap != null) {
 
-                        float penalty =  dqf * ((1f + overlap.length()) / (1f + (xe-xs)));
+                        float penalty = dqf * ((1f + overlap.length()) / (1f + (xe - xs)));
                         if (penalty > Param.BUDGET_EPSILON) {
                             Budget b = x.budget();
                             float pBefore = b.priSafe(0), pAfter;
@@ -271,28 +252,12 @@ public class MicrosphereTemporalBeliefTable extends MultiRWFasterList<Task> impl
     @Override
     public void clear(NAR nar) {
 
-        List<Task> copy = ifNotEmptyWriteWith(l->{
-            List<Task> cc = $.newArrayList(l.size());
-            cc.addAll(l);
+        ifNotEmptyWriteWith(l -> {
+            l.forEach(Task::delete);
             l.clear();
-            return cc;
+            return null;
         });
 
-        if (copy!=null)
-            copy.forEach(t -> nar.tasks.remove(t));
-    }
-
-
-    boolean removeIfDeleted(MutableList<Task> l, List<Task> trash) {
-        boolean r = l.removeIf(((Predicate<Task>) t -> {
-            if (t.isDeleted()) {
-                trash.add(t);
-                return true;
-            }
-            return false;
-        }));
-
-        return false;
     }
 
 
@@ -332,10 +297,9 @@ public class MicrosphereTemporalBeliefTable extends MultiRWFasterList<Task> impl
 //    }
 
 
-    private final boolean removeLater(MutableList<Task> l, @NotNull Task x, List<Task> trash) {
+    static final boolean remove(MutableList<Task> l, @NotNull Task x) {
         if (l.remove(x)) {
             x.delete();
-            trash.add(x);
             return true;
         }
         return false;
@@ -347,7 +311,7 @@ public class MicrosphereTemporalBeliefTable extends MultiRWFasterList<Task> impl
     }
 
     final float rankTemporalByConfidenceAndQuality(@Nullable Task t, long when, float dur) {
-        return t!=null ? t.confWeight(when, dur) : Float.NEGATIVE_INFINITY;// * (1+t.range()) * t.qua();
+        return t != null ? t.confWeight(when, dur) : Float.NEGATIVE_INFINITY;// * (1+t.range()) * t.qua();
 
 //        long range = Math.max(1, t.range());
 //        long worstDistance = range == 1 ? Math.abs(when - t.mid()) : Math.max(abs(when - t.start()), abs(when - t.end()));
@@ -389,9 +353,9 @@ public class MicrosphereTemporalBeliefTable extends MultiRWFasterList<Task> impl
                     //* (1f + 1f / (1f + x.range()))
                     //* (1f + 1f / (1f + x.dur()))
                     * (1f
-                        + TruthPolation.evidenceDecay(1, dur,
-                        abs(xs - ys) + abs(xe - ye) + abs((xe+xs)/2f - now))
-                    )
+                    + TruthPolation.evidenceDecay(1, dur,
+                    abs(xs - ys) + abs(xe - ye) + abs((xe + xs) / 2f - now))
+            )
                     ;
         };
 
@@ -412,11 +376,11 @@ public class MicrosphereTemporalBeliefTable extends MultiRWFasterList<Task> impl
     /**
      * frees one slot by removing 2 and projecting a new belief to their midpoint. returns the merged task
      */
-    protected Task compress(@Nullable Task input, long now, MutableList<Task> l, List<Task> trash, float dur, float confMin) {
+    protected Task compress(@Nullable Task input, long now, MutableList<Task> l, float dur, float confMin) {
 
         int cap = capacity();
 
-        if (l.size() < cap || clean(l, trash)) {
+        if (l.size() < cap || clean(l)) {
             return input; //no need for compression
         }
 
@@ -430,7 +394,7 @@ public class MicrosphereTemporalBeliefTable extends MultiRWFasterList<Task> impl
             return null;
         }
 
-        removeLater(l, a, trash);
+        remove(l, a);
 
         Task b = matchMerge(l, now, a, dur);
         if (b != null) {
@@ -438,7 +402,7 @@ public class MicrosphereTemporalBeliefTable extends MultiRWFasterList<Task> impl
             if (merged == null) {
                 return input;
             } else {
-                removeLater(l, b, trash);
+                remove(l, b);
                 return merged;
             }
         } else {
@@ -473,12 +437,12 @@ public class MicrosphereTemporalBeliefTable extends MultiRWFasterList<Task> impl
             Interval bi = new Interval(b.start(), b.end());
             Interval overlap = ai.intersection(bi);
             long mergedStart, mergedEnd;
-            if (overlap!=null) {
+            if (overlap != null) {
                 Interval union = ai.union(bi);
                 mergedStart = union.a;
-                    //(long) Math.round(Util.lerp(factor, a.start(), b.start()));
+                //(long) Math.round(Util.lerp(factor, a.start(), b.start()));
                 mergedEnd = union.b;
-                    //(long) Math.round(Util.lerp(factor, a.end(), b.end()));
+                //(long) Math.round(Util.lerp(factor, a.end(), b.end()));
 
                 float timeRatio = Math.min(1f,
                         (float) Math.max(1, overlap.length()) /
@@ -490,7 +454,7 @@ public class MicrosphereTemporalBeliefTable extends MultiRWFasterList<Task> impl
                 mergedStart = mergedEnd = Math.round(Util.lerp(factor, a.mid(), b.mid()));
             }
 
-            if (t!=null)
+            if (t != null)
                 return Revision.mergeInterpolate(a, b, mergedStart, mergedEnd, now, t, true);
         }
 
@@ -501,7 +465,7 @@ public class MicrosphereTemporalBeliefTable extends MultiRWFasterList<Task> impl
     @Nullable
     @Override
     public final Task match(long when, @Deprecated long now, float dur, @Nullable Task against) {
-        return ifNotEmptyReadWith(l->{
+        return ifNotEmptyReadWith(l -> {
             switch (l.size()) {
 //                case 0:
 //                    throw new RuntimeException("should not reach here");
@@ -518,19 +482,21 @@ public class MicrosphereTemporalBeliefTable extends MultiRWFasterList<Task> impl
         return truth(when, when, dur, eternal);
     }
 
-    @Nullable @Override public final Truth truth(long when, long now, float dur, @Nullable EternalTable eternal) {
+    @Nullable
+    @Override
+    public final Truth truth(long when, long now, float dur, @Nullable EternalTable eternal) {
 
-        Task topEternal = eternal!=null ? eternal.match() : null;
+        Task topEternal = eternal != null ? eternal.match() : null;
 
-        Truth r = ifNotEmptyReadWith(l->{
+        Truth r = ifNotEmptyReadWith(l -> {
             return TruthPolation.truth(topEternal, when, dur, l);
         });
 
-        return (r == null && topEternal!=null) ? topEternal.truth() : r;
+        return (r == null && topEternal != null) ? topEternal.truth() : r;
     }
 
-    private final boolean clean(MutableList<Task> l, List<Task> trash) {
-        return removeIfDeleted(l, trash);
+    static final boolean clean(MutableList<Task> l) {
+        return l.removeIf(((Predicate<Task>) Task::isDeleted ));
     }
 
 

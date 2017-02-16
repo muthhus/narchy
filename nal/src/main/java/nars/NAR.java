@@ -18,8 +18,6 @@ import nars.concept.Concept;
 import nars.concept.PermanentConcept;
 import nars.conceptualize.DefaultConceptBuilder;
 import nars.conceptualize.state.ConceptState;
-import nars.index.task.MapTaskIndex;
-import nars.index.task.TaskIndex;
 import nars.index.term.TermIndex;
 import nars.link.BLink;
 import nars.op.Operator;
@@ -98,17 +96,17 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
     public final transient Topic<NAR> eventReset = new ArrayTopic<>();
     public final transient ArrayTopic<NAR> eventCycleStart = new ArrayTopic<>();
     public final transient Topic<Task> eventTaskProcess = new ArrayTopic<>();
-    final Map<PermanentAtomConcept,Operator> operators = new ConcurrentHashMap();
-    @NotNull public final transient Emotion emotion;
-    @NotNull public final Time time;
+    final Map<PermanentAtomConcept, Operator> operators = new ConcurrentHashMap();
+    @NotNull
+    public final transient Emotion emotion;
+    @NotNull
+    public final Time time;
     /**
      * holds known Term's and Concept's
      */
     @NotNull
     public final TermIndex concepts;
 
-    @NotNull
-    public final TaskIndex tasks;
 
     private Control control = Control.NullControl;
 
@@ -121,8 +119,6 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
      * maximum NAL level currently supported by this memory, for restricting it to activity below NAL8
      */
     int level;
-
-
 
 
     private NARLoop loop;
@@ -208,8 +204,6 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
 
         this.concepts = concepts;
 
-        this.tasks = newTaskIndex();
-
         this.emotion = new Emotion();
 
         concepts.start(this);
@@ -233,9 +227,6 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
         restart();
     }
 
-    protected TaskIndex newTaskIndex() {
-        return new MapTaskIndex(exe.concurrent());
-    }
 
     /**
      * Reset the system with an empty memory and reset clock.  Event handlers
@@ -258,7 +249,6 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
 
             concepts.clear();
 
-            tasks.clear();
 
             restart();
 
@@ -267,10 +257,12 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
     }
 
     public void clear() {
-        runLater( () -> eventReset.emit(this));
+        runLater(() -> eventReset.emit(this));
     }
 
-    /** initialization and post-reset procedure */
+    /**
+     * initialization and post-reset procedure
+     */
     protected void restart() {
 
         for (Concept t : Builtin.statik)
@@ -285,11 +277,9 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
     }
 
 
-
     public void setControl(Control control) {
         this.control = control;
     }
-
 
 
     public void setSelf(Atom self) {
@@ -341,7 +331,8 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
         return task;
     }
 
-    @NotNull public List<Task> tasks(@NotNull String parse) {
+    @NotNull
+    public List<Task> tasks(@NotNull String parse) {
         List<Task> result = newArrayList(1);
         List<NarseseException> exc = newArrayList(0);
         Narsese.the().tasks(parse, result, exc, this);
@@ -471,13 +462,13 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
 
 
     @Nullable
-    public Task believe(float priority, @NotNull Termed term, @NotNull Tense tense, float freq, float conf)  {
+    public Task believe(float priority, @NotNull Termed term, @NotNull Tense tense, float freq, float conf) {
         return believe(priority, term, time(tense), freq, conf);
     }
 
 
     @NotNull
-    public NAR believe(@NotNull Termed term, float freq, float conf)  {
+    public NAR believe(@NotNull Termed term, float freq, float conf) {
         return believe(term, Tense.Eternal, freq, conf);
     }
 
@@ -487,7 +478,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
     }
 
     @NotNull
-    public NAR believe(@NotNull String term, @NotNull Tense tense, float freq, float conf)  {
+    public NAR believe(@NotNull String term, @NotNull Tense tense, float freq, float conf) {
         try {
             believe(priorityDefault(BELIEF), term(term), time(tense), freq, conf);
         } catch (NarseseException e) {
@@ -506,7 +497,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
     }
 
     @NotNull
-    public Task goal(@NotNull String termString)  {
+    public Task goal(@NotNull String termString) {
         try {
             return goal((Termed) term(termString), true);
         } catch (NarseseException e) {
@@ -520,7 +511,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
     }
 
     @NotNull
-    public NAR believe(@NotNull String termString, boolean isTrue)  {
+    public NAR believe(@NotNull String termString, boolean isTrue) {
         try {
             return believe(term(termString), isTrue);
         } catch (NarseseException e) {
@@ -534,12 +525,12 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
     }
 
     @NotNull
-    public NAR believe(@NotNull Termed<Compound> term)  {
+    public NAR believe(@NotNull Termed<Compound> term) {
         return believe(term, true);
     }
 
     @NotNull
-    public NAR believe(@NotNull Termed<Compound> term, boolean trueOrFalse)  {
+    public NAR believe(@NotNull Termed<Compound> term, boolean trueOrFalse) {
         return believe(term, trueOrFalse, confidenceDefault(BELIEF));
     }
 
@@ -554,7 +545,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
     }
 
     @NotNull
-    public NAR believe(@NotNull Termed<Compound> term, boolean trueOrFalse, float conf)  {
+    public NAR believe(@NotNull Termed<Compound> term, boolean trueOrFalse, float conf) {
         return believe(term, trueOrFalse ? 1.0f : 0f, conf);
     }
 
@@ -688,9 +679,9 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
                 Term args = inputTerm.term(0);
                 if (args.op() == PROD) {
                     Concept funcConcept = concept(func);
-                    if (funcConcept!=null) {
+                    if (funcConcept != null) {
                         Operator o = funcConcept.get(Operator.class);
-                        if (o!=null) {
+                        if (o != null) {
                             Task result = o.run(input, this);
 
                             if (isCommand) {
@@ -718,9 +709,8 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
 
         emotion.busy(input.priSafe(0));
 
-        Task existing = tasks.addIfAbsent(input);
 
-        if (existing == null) {
+        {
 
             if (time instanceof FrameTime) {
                 //HACK for unique serial number w/ frameclock
@@ -751,7 +741,6 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
 
             } catch (Concept.InvalidConceptException | InvalidTermException | InvalidTaskException | Budget.BudgetException e) {
 
-                tasks.remove(input);
 
                 emotion.eror();
 
@@ -759,17 +748,20 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
                 if (Param.DEBUG)
                     logger.warn("task process: {} {}", e, input);
             }
-        } else {
+        } /*else {
 
             processDuplicate(input, existing);
 
-        }
+        }*/
 
         return null;
     }
 
-    /** override to perform any preprocessing of a task (applied before the normalization step) */
-    @Nullable public Task pre(@NotNull Task t) {
+    /**
+     * override to perform any preprocessing of a task (applied before the normalization step)
+     */
+    @Nullable
+    public Task pre(@NotNull Task t) {
         return t;
     }
 
@@ -780,25 +772,32 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
 
     @NotNull
     public Compound pre(@NotNull Compound c) {
-        Compound d = compoundOrNull(pre((Term)c));
+        Compound d = compoundOrNull(pre((Term) c));
         if (d == null)
             return c; //unchanged because post-processing resulted in invalid or non-compound
         else
             return d;
     }
 
-    /** override to apply any post-processing of a task before it is made available for external use (ex: decompression) */
-    @NotNull public Task post(@NotNull Task t) {
+    /**
+     * override to apply any post-processing of a task before it is made available for external use (ex: decompression)
+     */
+    @NotNull
+    public Task post(@NotNull Task t) {
         return t;
     }
 
-    /** override to apply any post-processing of a term before it is made available for external use (ex: decompression) */
-    @NotNull public Term post(@NotNull Term t) {
+    /**
+     * override to apply any post-processing of a term before it is made available for external use (ex: decompression)
+     */
+    @NotNull
+    public Term post(@NotNull Term t) {
         return t;
     }
 
-    @NotNull public Compound post(@NotNull Compound c) {
-        Compound d = compoundOrNull(post((Term)c));
+    @NotNull
+    public Compound post(@NotNull Compound c) {
+        Compound d = compoundOrNull(post((Term) c));
         if (d == null)
             return c; //unchanged because post-processing resulted in invalid or non-compound
         else
@@ -903,7 +902,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
     }
 
     public final void on(@NotNull String atom, @NotNull Operator o) {
-        on((Atom)$.the(atom), o);
+        on((Atom) $.the(atom), o);
     }
 
     public final void on(@NotNull Atom a, @NotNull Operator o) {
@@ -911,15 +910,17 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
     }
 
     static class PermanentAtomConcept extends AtomConcept implements PermanentConcept {
-        public PermanentAtomConcept(@NotNull Atomic atom, Bag<Term,BLink<Term>> termLinks, Bag<Task,BLink<Task>> taskLinks) {
+        public PermanentAtomConcept(@NotNull Atomic atom, Bag<Term, BLink<Term>> termLinks, Bag<Task, BLink<Task>> taskLinks) {
             super(atom, termLinks, taskLinks);
         }
     }
 
-    /** resets any existing atom or operator */
+    /**
+     * resets any existing atom or operator
+     */
     private void enableOperator(@NotNull Atom a, @NotNull Operator o) {
         DefaultConceptBuilder builder = (DefaultConceptBuilder) concepts.conceptBuilder();
-        PermanentAtomConcept c = builder.withBags(a, (termlink,tasklink)->{
+        PermanentAtomConcept c = builder.withBags(a, (termlink, tasklink) -> {
             return new PermanentAtomConcept(a, termlink, tasklink);
         });
         c.put(Operator.class, o);
@@ -1138,7 +1139,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
                 runLater(() -> {
                     for (int j = start; j < end; j++) {
                         X x = items.get(j);
-                        if (x!=null)
+                        if (x != null)
                             each.accept(x);
                     }
                 });
@@ -1178,8 +1179,6 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
     public String toString() {
         return self() + ":" + getClass().getSimpleName();
     }
-
-
 
 
 //    /**
@@ -1250,7 +1249,13 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
     }
 
     @NotNull
-    public NAR forEachConceptTask(@NotNull Consumer<Task> each, boolean includeConceptBeliefs, boolean includeConceptQuestions, boolean includeConceptGoals, boolean includeConceptQuests) {
+    public NAR forEachTask(@NotNull Consumer<Task> each) {
+        forEachConcept( c -> c.forEachTask(each) );
+        return this;
+    }
+
+    @NotNull
+    public NAR forEachTask(@NotNull Consumer<Task> each, boolean includeConceptBeliefs, boolean includeConceptQuestions, boolean includeConceptGoals, boolean includeConceptQuests) {
         forEachConcept(c -> {
             c.forEachTask(includeConceptBeliefs, includeConceptQuestions, includeConceptGoals, includeConceptQuests, each);
         });
@@ -1258,9 +1263,9 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
     }
 
     @NotNull
-    public NAR forEachConceptTask(boolean includeConceptBeliefs, boolean includeConceptQuestions, boolean includeConceptGoals, boolean includeConceptQuests,
-                                  boolean includeTaskLinks, int maxPerConcept,
-                                  @NotNull Consumer<Task> recip) {
+    public NAR forEachTask(boolean includeConceptBeliefs, boolean includeConceptQuestions, boolean includeConceptGoals, boolean includeConceptQuests,
+                           boolean includeTaskLinks, int maxPerConcept,
+                           @NotNull Consumer<Task> recip) {
         forEachConcept(c -> {
             if (includeConceptBeliefs) c.beliefs().top(maxPerConcept, recip);
             if (includeConceptQuestions) c.questions().top(maxPerConcept, recip);
@@ -1302,7 +1307,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
 
     @Nullable
     public NAR forEachActiveConcept(@NotNull Consumer<Concept> recip) {
-        conceptsActive().forEach(n->recip.accept(n.get()));
+        conceptsActive().forEach(n -> recip.accept(n.get()));
         return this;
     }
 
@@ -1358,7 +1363,8 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
     }
 
     @NotNull
-    @Deprecated public NAR eachCycle(@NotNull Consumer<NAR> each) {
+    @Deprecated
+    public NAR eachCycle(@NotNull Consumer<NAR> each) {
         onCycle(each);
         return this;
     }
@@ -1389,18 +1395,19 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
         return this == obj;
     }
 
-    @Override public void activate(Termed term, float priToAdd) {
+    @Override
+    public void activate(Termed term, float priToAdd) {
         control.activate(term, priToAdd);
     }
 
-    @Override public float pri(@NotNull Termed termed) {
+    @Override
+    public float pri(@NotNull Termed termed) {
         return control.pri(termed);
     }
 
     public Iterable<BLink<Concept>> conceptsActive() {
         return control.conceptsActive();
     }
-
 
 
     @NotNull
@@ -1420,7 +1427,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
     public final Concept on(@NotNull Concept c) {
 
         Concept existing = concept(c.term());
-        if ((existing !=null) && (existing!=c))
+        if ((existing != null) && (existing != c))
             throw new RuntimeException("concept already indexed for term: " + c.term());
 
         concepts.set(c);
@@ -1429,7 +1436,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
     }
 
     @NotNull
-    public final Concept on(@NotNull String termAtom, @NotNull Function<Term[],Term> f) {
+    public final Concept on(@NotNull String termAtom, @NotNull Function<Term[], Term> f) {
         return on(f(termAtom, f));
     }
 
@@ -1451,7 +1458,6 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
     }
 
 
-
     @Override
     public final int level() {
         return level;
@@ -1466,7 +1472,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
 
     public final void setState(@NotNull Concept c, @NotNull ConceptState p) {
 
-        if (c.state(p, this)!=p) {
+        if (c.state(p, this) != p) {
             concepts.onStateChanged(c);
         }
 
@@ -1475,9 +1481,6 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
     public final long time() {
         return time.time();
     }
-
-
-
 
 
     public @NotNull NAR input(@NotNull File input) throws IOException {
@@ -1505,7 +1508,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
 
         MutableInteger total = new MutableInteger(0), filtered = new MutableInteger(0);
 
-        forEachConceptTask(t -> {
+        forEachTask(t -> {
             total.increment();
             if (each.test(t)) {
                 try {
@@ -1555,7 +1558,6 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
 
         return this;
     }
-
 
 
     /**

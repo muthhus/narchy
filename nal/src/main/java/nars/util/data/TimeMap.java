@@ -17,7 +17,7 @@ public class TimeMap extends IntervalTree<Long, Task> implements Consumer<Task> 
 
     public TimeMap(@NotNull NAR n) {
         this.nar = n;
-        n.forEachConceptTask(this, true, true, false, false);
+        n.forEachTask(this, true, true, false, false);
     }
 
     @Override

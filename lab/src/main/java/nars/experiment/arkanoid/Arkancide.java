@@ -57,7 +57,7 @@ public class Arkancide extends NAgents {
         System.out.println("saving tasks: " + f);
         FileOutputStream os = new FileOutputStream(f.toFile());
         PrintStream ps = new PrintStream(os);
-        nar.tasks.forEach(t -> {
+        nar.forEachTask(t -> {
             Task tt = nar.post(t);
             try {
                 tt.appendTSV(ps);

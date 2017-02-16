@@ -401,11 +401,6 @@ public class CompoundConcept<T extends Compound> implements Concept, Termlike {
             a = null;
         }
 
-        if (a == null) {
-            //available for both conditions above
-            nar.tasks.remove(input); //which was added in the callee
-        }
-
         return a;
     }
 

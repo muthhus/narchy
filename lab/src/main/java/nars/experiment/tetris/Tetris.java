@@ -611,7 +611,7 @@ public class Tetris extends NAgents {
             //nar.stop();
 
             //nar.index.print(System.out);
-            nar.tasks.forEach(System.out::println);
+            nar.forEachTask(System.out::println);
 
             //NAR.printActiveTasks(nar, true);
             //NAR.printActiveTasks(nar, false);

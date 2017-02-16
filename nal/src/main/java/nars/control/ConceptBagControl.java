@@ -159,15 +159,11 @@ public class ConceptBagControl implements Control, Consumer<DerivedTask> {
 
     @Override
     public void accept(DerivedTask d) {
-        if (!nar.tasks.contains(d)) { //prefilter
-            if (nar.input(d)!=null) {
-                meter.hit();
-                return;
-            }
+        if (nar.input(d)!=null) {
+            meter.hit();
         } else {
-            d.delete();
+            meter.miss();
         }
-        meter.miss();
     }
 
 //    /** called when a concept is displaced from the concept bag */

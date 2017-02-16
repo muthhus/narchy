@@ -405,7 +405,7 @@ public class TemporalTest {
 
         cc.print();
 
-        d.tasks.forEach(System.out::println);
+        d.forEachTask(System.out::println);
 
 
         //INTERMPOLATION APPLIED AFTER REVECTION:

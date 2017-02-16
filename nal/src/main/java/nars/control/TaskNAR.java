@@ -89,10 +89,6 @@ public class TaskNAR extends NAR {
 
     }
 
-    @Override
-    protected TaskIndex newTaskIndex() {
-        return new TaskBagIndex();
-    }
 
 
     public TaskNAR(int capacity) {
@@ -251,6 +247,7 @@ public class TaskNAR extends NAR {
         }
     }
 
+    @Override
     protected void processDuplicate(@NotNull Task input, Task existing) {
         /* n/a */
         if (existing!=input) {
