@@ -10,6 +10,7 @@ import nars.op.Command;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.atom.Atom;
+import nars.term.atom.Atomic;
 import nars.time.Tense;
 import nars.util.Loop;
 import org.apache.commons.lang3.StringEscapeUtils;
@@ -23,14 +24,14 @@ import static nars.Op.BELIEF;
 
 public class Hear extends Loop {
 
-    final static Atom START = $.the("start");
+    final static Atomic START = $.the("start");
 
     private final NAR nar;
     private final Term[] context;
     //private final Term[] contextAnonymous;
     private final List<Term> tokens;
     public final On onReset;
-    int token = 0;
+    int token;
 
     float priorityFactor = 1f;
     float confFactor = 1f;
@@ -100,15 +101,13 @@ public class Hear extends Loop {
 
         float onConf = nar.confidenceDefault(BELIEF) * confFactor;
 
-        {
-            Concept concept = nar.concept(term);
+        Concept concept = nar.concept(term);
 
-            //if (((DefaultBeliefTable) concept.beliefs()).eternal.isEmpty()) {
-            if (concept == null) {
-                //input a constant negative bias - we dont hear the word when it is not spoken
-                //only input when first conceptualized
-                nar.believe(term, Tense.Eternal, 0f, offConf);
-            }
+        //if (((DefaultBeliefTable) concept.beliefs()).eternal.isEmpty()) {
+        if (concept == null) {
+            //input a constant negative bias - we dont hear the word when it is not spoken
+            //only input when first conceptualized
+            nar.believe(term, Tense.Eternal, 0f, offConf);
         }
 
         nar.believe(nar.priorityDefault(BELIEF) * priorityFactor,

@@ -211,7 +211,7 @@ public abstract class NQuadsRDF {
 
             if (s.isEmpty()) return null;
 
-            return the(s, true);
+            return the(s);
         //}
         //else
           //  return null;

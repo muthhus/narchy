@@ -25,8 +25,8 @@ abstract public class events extends AtomicBoolCondition {
 
         @Override
         public boolean run(@NotNull Derivation m) {
-            int d = deltaOcc(m.task, m.belief);
-            return d<=0 && d!=DTERNAL; /* && d!=DTERNAL which is negative */
+            long d = deltaOcc(m.task, m.belief);
+            return d<=0 && d!=ETERNAL; /* && d!=DTERNAL which is negative */
         }
 
     };
@@ -41,8 +41,8 @@ abstract public class events extends AtomicBoolCondition {
 
         @Override
         public boolean run(@NotNull Derivation m) {
-            int d = deltaOcc(m.task, m.belief);
-            return d>=0 /* && d!=DTERNAL which is negative */;
+            long d = deltaOcc(m.task, m.belief);
+            return d>=0 /* && d!=ETERNAL which is negative */;
         }
 
     };
@@ -134,20 +134,20 @@ abstract public class events extends AtomicBoolCondition {
 //        }
 //    };
 
-    public static int deltaOcc(@NotNull Task a, @Nullable Task b) {
+    public static long deltaOcc(@NotNull Task a, @Nullable Task b) {
 
         if (b == null)
-            return DTERNAL;
+            return ETERNAL;
 
         long tOcc = a.start();
         if (tOcc == ETERNAL)
-            return DTERNAL;
+            return ETERNAL;
 
         long bOcc = b.start();
         if (bOcc == ETERNAL)
-            return DTERNAL;
+            return ETERNAL;
 
-        return (int)(tOcc - bOcc);
+        return (tOcc - bOcc);
     }
 
     /** both task and belief must be non-null and eternal */

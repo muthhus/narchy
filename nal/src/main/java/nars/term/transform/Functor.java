@@ -20,6 +20,8 @@ import java.util.function.Supplier;
 
 import static nars.$.the;
 import static nars.Op.INT;
+import static nars.term.Terms.atomOrNull;
+import static nars.term.Terms.compoundOrNull;
 
 /** a functor is a term transform which immediately returns
  *  a result Term from the Term[] arguments of
@@ -28,7 +30,7 @@ import static nars.Op.INT;
 abstract public class Functor extends AtomConcept implements PermanentConcept, Function<Term[],Term> {
 
     public Functor(@NotNull String atom) {
-        this($.the(atom));
+        this(fName(atom));
     }
 
     public Functor(@NotNull Atom atom) {
@@ -36,7 +38,7 @@ abstract public class Functor extends AtomConcept implements PermanentConcept, F
     }
 
     public static Atom fName(@NotNull String termAtom) {
-        return the(termAtom);
+        return atomOrNull(the(termAtom));
     }
 
     /** creates a new functor from a term name and a lambda */
@@ -50,7 +52,7 @@ abstract public class Functor extends AtomConcept implements PermanentConcept, F
     }
 
     public static Concept f(@NotNull String termAtom, int arityRequired, @NotNull Function<Term[], Term> ff) {
-        return f($.the(termAtom), arityRequired, ff);
+        return f(fName(termAtom), arityRequired, ff);
     }
 
     public static Concept f(@NotNull Atom termAtom, int arityRequired, @NotNull Function<Term[], Term> ff) {

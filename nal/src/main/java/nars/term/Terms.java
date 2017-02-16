@@ -6,6 +6,7 @@ import jcog.data.sorted.SortedList;
 import jcog.list.FasterList;
 import nars.$;
 import nars.Op;
+import nars.term.atom.Atom;
 import nars.term.compound.GenericCompound;
 import nars.term.container.ArrayTermVector;
 import nars.term.container.TermContainer;
@@ -513,6 +514,14 @@ public class Terms   {
 
     @Nullable public static Compound compoundOr(@Nullable Term possiblyCompound, Compound other) {
         return (possiblyCompound instanceof Compound) ? (Compound) possiblyCompound : other;
+    }
+
+    @Nullable public static Atom atomOr(@Nullable Term possiblyCompound, Atom other) {
+        return (possiblyCompound instanceof Atom) ? (Atom) possiblyCompound : other;
+    }
+
+    @Nullable public static Atom atomOrNull(@Nullable Term t) {
+        return atomOr(t, null);
     }
 
     /** dangerous because some operations involving concepts can naturally reduce to atoms, and using this interprets them as non-existent */

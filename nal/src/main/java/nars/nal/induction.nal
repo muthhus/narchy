@@ -6,28 +6,29 @@
         A, B, task(negative), task("."), time(dtAfter),                          notImplEqui(A), notEqui(B) |- ((--,%A) ==>+- B), (Belief:InductionN)
         A, B, task(negative), task("."), time(dtAfterOrEternal), neqAndCom(A,B), notImplEqui(A), notEqui(B) |- varIntro(((--,%A) ==>+- B)), (Belief:InductionN)
 
-    A, B, task(positive), task("."), time(dtAfterReverse),                                notEqui(A), notImplEqui(B) |- (B ==>+- A), (Belief:Abduction)
-    A, B, task(positive), task("."), time(dtAfterOrEternalReverse), neqAndCom(A,B),       notEqui(A), notImplEqui(B) |- varIntro((B ==>+- A)), (Belief:Abduction)
-        A, B, belief(negative), task("."), time(dtAfterReverse),                          notEqui(A), notImplEqui(B) |- ((--,%B) ==>+- A), (Belief:AbductionPN)
-        A, B, belief(negative), task("."), time(dtAfterOrEternalReverse), neqAndCom(A,B), notEqui(A), notImplEqui(B) |- varIntro(((--,%B) ==>+- A)), (Belief:AbductionPN)
-        A, B, task(negative), task("."), time(dtAfterReverse),                            notEqui(A), notImplEqui(B) |- (--,(B ==>+- A)), (Belief:AbductionN)
-        A, B, task(negative), task("."), time(dtAfterOrEternalReverse), neqAndCom(A,B),   notEqui(A), notImplEqui(B) |- (--,varIntro((B ==>+- A))), (Belief:AbductionN)
+    A, B, belief(positive), task("."), time(dtAfterReverse),                                notEqui(A), notImplEqui(B) |- (B ==>+- A), (Belief:Abduction)
+    A, B, belief(positive), task("."), time(dtAfterOrEternalReverse), neqAndCom(A,B),       notEqui(A), notImplEqui(B) |- varIntro((B ==>+- A)), (Belief:Abduction)
+        A, B, belief(negative), task("."), time(dtAfterReverse),                            notEqui(A), notImplEqui(B) |- ((--,%B) ==>+- A), (Belief:AbductionPN)
+        A, B, belief(negative), task("."), time(dtAfterOrEternalReverse), neqAndCom(A,B),   notEqui(A), notImplEqui(B) |- varIntro(((--,%B) ==>+- A)), (Belief:AbductionPN)
 
     A, B, task(positive), task("."), time(dtAfter),                                  notImplEqui(A), notImplEqui(B) |- (A <=>+- B), (Belief:Comparison)
     A, B, task(positive), task("."), time(dtAfterOrEternal), neqAndCom(A,B),         notImplEqui(A), notImplEqui(B) |- varIntro((A <=>+- B)), (Belief:Comparison)
         A, B, task(negative), task("."), time(dtAfter),                              notImplEqui(A), notImplEqui(B) |- (--,(A <=>+- B)), (Belief:ComparisonN)
         A, B, task(negative), task("."), time(dtAfterOrEternal), neqAndCom(A,B),     notImplEqui(A), notImplEqui(B) |- (--,varIntro((A <=>+- B))), (Belief:ComparisonN)
 
-    A, B, task(positive), task("."), time(dtAfter)                                                |- (A &&+- B), (Belief:Intersection)
-    A, B, task(positive), task("."), time(dtAfterOrEternal), neqAndCom(A,B)                       |- varIntro((A &&+- B)), (Belief:Intersection)
-        A, B, task(positive), belief(negative), task("."), time(dtAfterReverse)                   |- (A &&+- (--,%B)), (Belief:IntersectionPN)
+    A, B, task(positive), belief(positive), task("."), time(dtAfter)                              |- (A &&+- B), (Belief:Intersection)
+    A, B, task(positive), belief(positive), task("."), time(dtAfterOrEternal), neqAndCom(A,B)     |- varIntro((A &&+- B)), (Belief:Intersection)
+        A, B, task(positive), belief(negative), task("."), time(dtAfterReverse)                          |- (A &&+- (--,%B)), (Belief:IntersectionPN)
         A, B, task(positive), belief(negative), task("."), time(dtAfterOrEternalReverse), neqAndCom(A,B) |- varIntro((A &&+- (--,%B))), (Belief:IntersectionPN)
-        A, B, task(negative), task("."), time(dtAfter)                                            |- ((--,%A) &&+- B), (Belief:IntersectionN)
-        A, B, task(negative), task("."), time(dtAfterOrEternal), neqAndCom(A,B)                   |- varIntro(((--,%A) &&+- B)), (Belief:IntersectionN)
+            //note: these are 'dtAfterReverse' because of the unintended subterm ordering being reversed due to the negations
+    A, B, task(negative), belief(positive), task("."), time(dtAfter)                              |- ((--,%A) &&+- B), (Belief:IntersectionN)
+    A, B, task(negative), belief(positive), task("."), time(dtAfterOrEternal), neqAndCom(A,B)     |- varIntro(((--,%A) &&+- B)), (Belief:IntersectionN)
+        A, B, task(negative), belief(negative), task("."), time(dtAfter)                          |- ((--,%A) &&+- (--,%B)), (Belief:IntersectionNN)
+        A, B, task(negative), belief(negative), task("."), time(dtAfterOrEternal), neqAndCom(A,B) |- varIntro(((--,%A) &&+- (--,%B))), (Belief:IntersectionNN)
 
-    //S || P:
-    S, P, time(dtAfter), task("."), neqCom(P,S) |- (--,((--,%S) &&+- (--,%P))), (Belief:Union)
-    S, P, time(dtAfterOrEternal), task("."), neqAndCom(P,S) |- (--,varIntro(((--,%S) &&+- (--,%P)))), (Belief:Union)
+    //S || P: //should be covered more accurataely by the above cases
+    //S, P, time(dtAfter), task("."), neqCom(P,S) |- (--,((--,%S) &&+- (--,%P))), (Belief:Union)
+    //S, P, time(dtAfterOrEternal), task("."), neqAndCom(P,S) |- (--,varIntro(((--,%S) &&+- (--,%P)))), (Belief:Union)
 
 
 //backward temporal induction

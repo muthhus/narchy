@@ -395,7 +395,7 @@ public enum Texts {
 
     /**
      * fast parse a non-negative int under certain conditions, avoiding Integer.parse if possible
-     *
+     * TODO parse negative values with a leading '-'
      */
     public static int i(String s, int ifMissing) {
         switch (s.length()) {
@@ -407,18 +407,19 @@ public enum Texts {
 
                 //attempt to avoid throwing a stack trace
                 for (int i = 0; i < s.length(); i++)
-                    if (!Character.isDigit(s.charAt(i)))
+                    if (i(s.charAt(i))==-1) //non-digit found
                         return ifMissing;
 
 
                 try {
                     return Integer.parseInt(s);
-                }
-                catch (NumberFormatException e) {
-                    return ifMissing;
+                } catch (NumberFormatException e) {
+                    //return ifMissing;
+                    throw new RuntimeException("non-integer case should have been caught earlier");
                 }
         }
     }
+
     public static int i(String s, int offset, int ifMissing) {
         int sl = s.length() - offset;
         if (sl <= 0)

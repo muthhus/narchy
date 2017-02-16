@@ -238,7 +238,7 @@ public class Twenglish {
     public static Term tagToTerm(String c) {
         c = c.toLowerCase();
         if ("word".equals(c)) return $.quote(" ");
-        return $.the(c, true);
+        return $.the(c);
     }
     
     

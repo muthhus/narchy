@@ -5,6 +5,7 @@ import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.encoder.PatternLayoutEncoder;
 import ch.qos.logback.core.ConsoleAppender;
+import jcog.Texts;
 import jcog.Util;
 import jcog.list.FasterList;
 import jdk.nashorn.api.scripting.NashornScriptEngine;
@@ -44,6 +45,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static java.lang.Integer.MIN_VALUE;
 import static nars.Op.*;
 import static nars.term.Terms.compoundOrNull;
 import static nars.time.Tense.DTERNAL;
@@ -74,21 +76,32 @@ public enum $ {
         return terms.parse(term);
     }
 
-
-
-
 //    public static @NotNull <O> ObjRef<O> ref(String term, O instance) {
 //        return new ObjRef(term, instance);
 //    }
 
     @NotNull
-    public static Atom the(@NotNull String id) {
-        return new Atom(id);
+    public static Atomic the(@NotNull String id) {
+        if (quoteNecessary(id))
+            return quote(id);
+        else {
+            int i = Texts.i(id, MIN_VALUE);
+            if (i != MIN_VALUE)
+                return the(i); //parsed as integer, so
+            else
+                return new Atom(id);
+        }
     }
 
     @NotNull
     public static Atom quote(Object text) {
-        return (Atom)$.the("\"" + text + '"');
+        String s = text.toString();
+        if (s.charAt(0)=='\"' && s.charAt(s.length()-1)=='\"') {
+            //already quoted
+        } else {
+            s = ("\"" + s + '"');
+        }
+        return new Atom(s);
     }
 
 
@@ -109,8 +122,15 @@ public enum $ {
 
     @NotNull
     public static IntTerm the(int i) {
-        //return the(i, 10);
-        return new IntTerm(i);
+        if (i >= 0 && i < 10) {
+            IntTerm cached = digits[i];
+            if (cached==null) {
+                digits[i] = cached = new IntTerm(i);
+            }
+            return cached;
+        } else {
+            return new IntTerm(i);
+        }
     }
 
     @NotNull
@@ -603,26 +623,32 @@ public enum $ {
         if (o instanceof Short) return the(o.intValue());
         if (o instanceof Integer) return the(o.intValue());
 
-        if (o instanceof Long) return the(Long.toString((long)o));
+        if (o instanceof Long) {
+            if (((int)o) == o.longValue())
+                return the(o.intValue()); //use the integer form since it will be IntTerm
+            else
+                return the(Long.toString((long)o));
+        }
 
-        if ((o instanceof Float) || (o instanceof Double)) return the(o.floatValue());
+        if ((o instanceof Float) || (o instanceof Double))
+            return the(o.floatValue());
 
-        return the(o.toString(), true);
+        return the(o.toString());
     }
 
-    private static final Term[] digits = new Term[10];
+    private static final IntTerm[] digits = new IntTerm[10];
 
     /** gets the atomic term of an integer, with specific radix (up to 36) */
     @NotNull
     public static Atom the(int i, int radix) {
-        //fast lookup for single digits
-        if ((i >= 0) && (i <= 9)) {
-            Term a = digits[i];
-            if (a == null)
-                a = digits[i] = the(Integer.toString(i, radix));
-            return (Atom) a;
-        }
-        //return Atom.the(Utf8.toUtf8(name));
+//        //fast lookup for single digits
+//        if ((i >= 0) && (i <= 9)) {
+//            Term a = digits[i];
+//            if (a == null)
+//                a = digits[i] = the(Integer.toString(i, radix));
+//            return (Atom) a;
+//        }
+//        //return Atom.the(Utf8.toUtf8(name));
 
         return (Atom) the(Integer.toString(i, radix));
 
@@ -670,31 +696,7 @@ public enum $ {
         //  }
     }
 
-    @NotNull
-    public static Atomic the(@NotNull String name, boolean quoteIfNecessary) {
-        if (quoteIfNecessary && quoteNecessary(name))
-            return quote(name);
 
-        //return Atom.the(Utf8.toUtf8(name));
-
-        return the(name);
-
-//        int olen = name.length();
-//        switch (olen) {
-//            case 0:
-//                throw new RuntimeException("empty atom name: " + name);
-//
-////            //re-use short term names
-////            case 1:
-////            case 2:
-////                return theCached(name);
-//
-//            default:
-//                if (olen > Short.MAX_VALUE/2)
-//                    throw new RuntimeException("atom name too long");
-
-        //  }
-    }
 
     @Nullable
     public static Term inhImageExt(@NotNull Compound x, @Nullable Term y, @NotNull Atomic oper) {
@@ -804,10 +806,8 @@ public enum $ {
     public static boolean quoteNecessary(@NotNull CharSequence t) {
         for (int i = 0; i < t.length(); i++) {
             char c = t.charAt(i);
-//            if (Character.isWhitespace(c)) return true;
             if (!Narsese.isValidAtomChar(c))
                 return true;
-//            if ((!Character.isDigit(c)) && (!Character.isAlphabetic(c))) return true;
         }
         return false;
     }
