@@ -26,9 +26,9 @@
 
     <dependencies>
         <dependency>
-            <groupId>opennars</groupId>
-            <artifactId>logic</artifactId>
-            <version>1.8-SNAPSHOT</version>
+            <groupId>automenta</groupId>
+            <artifactId>jcog</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
 

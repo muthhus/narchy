@@ -1,11 +1,11 @@
 package nars.util.signal;
 
 import com.google.common.collect.Lists;
+import jcog.learn.lstm.Interaction;
+import jcog.learn.lstm.test.LiveSTM;
 import jcog.list.FasterList;
 import jcog.math.DelayedFloat;
 import jcog.math.FloatSupplier;
-import nars.learn.lstm.Interaction;
-import nars.learn.lstm.test.LiveSTM;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 

@@ -1,7 +1,7 @@
 package nars.experiment.misc;
 
 import jcog.Util;
-import nars.learn.Agent;
+import jcog.learn.Agent;
 import org.eclipse.collections.api.tuple.Twin;
 
 import java.util.Arrays;

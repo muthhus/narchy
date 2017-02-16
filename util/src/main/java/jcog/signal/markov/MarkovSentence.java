@@ -1,11 +1,8 @@
 package jcog.signal.markov;
 
 import com.google.common.collect.Iterables;
-import com.google.common.io.ByteStreams;
 import jcog.io.Twokenize;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Random;

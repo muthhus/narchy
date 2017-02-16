@@ -2,8 +2,8 @@ package nars.gui;
 
 import jcog.Util;
 import jcog.data.random.XorShift128PlusRandom;
-import nars.learn.lstm.DistractedSequenceRecall;
-import nars.learn.lstm.SimpleLSTM;
+import jcog.learn.lstm.DistractedSequenceRecall;
+import jcog.learn.lstm.SimpleLSTM;
 import spacegraph.space.layout.Grid;
 import spacegraph.space.widget.MatrixView;
 

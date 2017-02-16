@@ -23,7 +23,8 @@
 
 package spacegraph.phys.collision.broad;
 
-import org.codehaus.commons.nullanalysis.NotNull;
+
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import spacegraph.phys.Collidable;
 import spacegraph.phys.Dynamic;

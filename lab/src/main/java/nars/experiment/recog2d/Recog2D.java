@@ -4,12 +4,12 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.jogamp.opengl.GL2;
 import jcog.Util;
+import jcog.learn.MLP;
 import nars.$;
 import nars.NAR;
 import nars.Param;
 import nars.concept.Concept;
 import nars.gui.BeliefTableChart;
-import nars.learn.MLP;
 import nars.remote.NAgents;
 import nars.time.Tense;
 import nars.truth.Truth;
@@ -49,7 +49,7 @@ public class Recog2D extends NAgents {
 
 
 
-    int image = 0;
+    int image;
     final int maxImages = 6;
     int imagePeriod = 64;
 
@@ -226,8 +226,7 @@ public class Recog2D extends NAgents {
      //   if (outs.verify) {
             r = 0.5f - (float) outs.errorSum()
                     / outs.states;
-                    ;
-//        } else {
+        //        } else {
 //            //r = 1f; //general positive reinforcement during training
 //            r = Float.NaN; //no feedback during training
 //        }
@@ -271,14 +270,14 @@ public class Recog2D extends NAgents {
         private final MLP trainer;
         private final NAR nar;
 
-        private float learningRate = 0.3f;
+        private final float learningRate = 0.3f;
 
         /** Introduction of the momentum rate allows the attenuation of oscillations in the gradient descent. The geometric idea behind this idea can probably best be understood in terms of an eigenspace analysis in the linear case. If the ratio between lowest and largest eigenvalue is large then performing a gradient descent is slow even if the learning rate large due to the conditioning of the matrix. The momentum introduces some balancing in the update between the eigenvectors associated to lower and larger eigenvalues.
 
          For more detail I refer to
 
          http://page.mi.fu-berlin.de/rojas/neural/chapter/K8.pdf */
-        private float momentum = 0.6f;
+        private final float momentum = 0.6f;
 
         public Training(java.util.List<Concept> ins, Outputs outs, NAR nar) {
 

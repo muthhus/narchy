@@ -1,8 +1,5 @@
 package jcog.math;
 
-import jcog.Util;
-import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
-import org.apache.commons.math3.util.FastMath;
 import org.eclipse.collections.api.block.procedure.primitive.FloatProcedure;
 
 import java.io.Serializable;
