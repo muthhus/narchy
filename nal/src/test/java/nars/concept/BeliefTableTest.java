@@ -2,6 +2,7 @@ package nars.concept;
 
 import nars.NAR;
 import nars.Param;
+import nars.conceptualize.state.DefaultConceptState;
 import nars.table.BeliefTable;
 import nars.test.analyze.BeliefAnalysis;
 import nars.truth.DefaultTruth;
@@ -156,6 +157,7 @@ public class BeliefTableTest  {
 
         int maxBeliefs = 3; //includes 3 eternal beliefs we arent using:
         NAR n = newNAR(maxBeliefs*2);
+        ((DefaultConceptState)n.concepts.conceptBuilder().awake()).beliefsMaxTemp.set(maxBeliefs);
 
 
         BeliefAnalysis b = new BeliefAnalysis(n, AB);
@@ -168,6 +170,7 @@ public class BeliefTableTest  {
         //create linear gradient of belief across time, freq beginning at 0 and increasing to 1
         for (int i = 0; i < maxBeliefs; i++) {
             b.believe(0.5f, i/((float)maxBeliefs-1), conf, i * spacing).run(spacing);
+
             assertEquals(i+1, b.size());
         }
 

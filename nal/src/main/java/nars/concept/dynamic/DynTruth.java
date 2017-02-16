@@ -39,7 +39,7 @@ public final class DynTruth implements Truthed {
         this.truth = truth;
     }
 
-    @NotNull
+    @Nullable
     public Budget budget() {
         //RawBudget b = new RawBudget();
         int s = e.size();
@@ -79,7 +79,7 @@ public final class DynTruth implements Truthed {
     @Nullable public DynamicBeliefTask task(@NotNull Compound template, boolean beliefOrGoal, long cre, long start, @Nullable Budget b) {
 
         Budget budget = b != null ? b : budget();
-        if (budget.isDeleted())
+        if (budget == null || budget.isDeleted())
             return null;
 
         long dur = (start!=ETERNAL && template.op() == CONJ) ? template.dtRange() : 0;

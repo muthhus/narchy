@@ -67,27 +67,6 @@ abstract public class PremiseBuilder {
 
         float dur = nar.time.dur();
 
-        //temporal focus:
-        long when;
-        long start = task.start();
-        if (start != ETERNAL && nar.random.nextBoolean()) {
-            //USE TASK's OCCURENCE
-            //find nearest end-point to now
-            long end = task.end();
-            if ((now >= start) && (now <= end)) {
-                when = now; //inner
-            } else {
-                //use nearest endpoint of the task
-                if (Math.abs(now - start) < Math.abs(now - end)) {
-                    when = start;
-                } else {
-                    when = end;
-                }
-            }
-        } else {
-            //USE CURRENT TIME AS FOCUS
-            when = now;
-        }
 
         //if (when == ETERNAL) {
 //            double focusDurs = 8;
@@ -118,7 +97,7 @@ abstract public class PremiseBuilder {
 
                     BeliefTable table = task.isQuest() ? answerConcept.goals() : answerConcept.beliefs();
 
-                    Task answered = table.answer(when, now, dur, task, answerTerm, nar.confMin.floatValue());
+                    Task answered = table.answer(task.start(), now, dur, task, answerTerm, nar.confMin.floatValue());
                     if (answered != null) {
 
 //                        boolean exists = nar.tasks.contains(answered);
@@ -173,6 +152,29 @@ abstract public class PremiseBuilder {
         if ((belief == null) && (beliefTerm.varQuery() == 0 )) {
             Concept beliefConcept = nar.concept(beliefTerm);
             if (beliefConcept != null) {
+
+                //temporal focus:
+                long when;
+                long start = task.start();
+                if (start != ETERNAL && nar.random.nextBoolean()) {
+                    //USE TASK's OCCURENCE
+                    //find nearest end-point to now
+                    long end = task.end();
+                    if ((now >= start) && (now <= end)) {
+                        when = now; //inner
+                    } else {
+                        //use nearest endpoint of the task
+                        if (Math.abs(now - start) < Math.abs(now - end)) {
+                            when = start;
+                        } else {
+                            when = end;
+                        }
+                    }
+                } else {
+                    //USE CURRENT TIME AS FOCUS
+                    when = now;
+                }
+
 
                 belief = beliefConcept.beliefs().match(when, now, dur, task, true); //in case of quest, proceed with matching belief
             }
