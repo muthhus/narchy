@@ -221,12 +221,13 @@ public abstract class Param /*extends Container*/  {
     private Truth defaultGoalTruth, defaultBeliefTruth;
 
 
+    /** internal granularity which truth components are rounded to */
+    public static final float TRUTH_EPSILON = 0.001f;
 
-    public static final float TRUTH_EPSILON = 0.01f;
     /**
      * how precise unit test results must match expected values to pass
      */
-    public static final float TESTS_TRUTH_ERROR_TOLERANCE = TRUTH_EPSILON;
+    public static final float TESTS_TRUTH_ERROR_TOLERANCE = 0.01f;
 
 
     /**

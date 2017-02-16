@@ -90,7 +90,7 @@ public class IO {
 
     @NotNull
     public static Truth readTruth(@NotNull DataInput in) throws IOException {
-        return Truth.unhash(in.readInt(), Param.TRUTH_EPSILON);
+        return Truth.intToTruth(in.readInt());
     }
 
 
@@ -169,7 +169,7 @@ public class IO {
 
     public static void writeTruth(@NotNull DataOutput out, @NotNull Truthed t) throws IOException {
         Truth tt = t.truth();
-        out.writeInt(Truth.hash(tt.freq(), tt.conf(), Param.TRUTH_EPSILON));
+        out.writeInt(Truth.truthToInt(tt.freq(), tt.conf()));
     }
 
 

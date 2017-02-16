@@ -62,7 +62,9 @@ abstract public class Solve extends AtomicBoolCondition {
                 ))==null)
                     return false;
 
-                t = t.dither(m.truthResolution);
+                t = t.dither(m.truthResolution, m.confMin);
+                if (t == null)
+                    return false;
 
                 break;
 

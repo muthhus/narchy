@@ -714,11 +714,11 @@ public enum Util { ;
     }
 
     public static float clampround(float value, float epsilon) {
-        return round(unitize(value), epsilon );
+        return unitize(round(value, epsilon ));
     }
 
     public static int hash(float f, int discretness) {
-        return Math.round(f * discretness);
+        return (int)(f * discretness);
     }
     public static float unhash(int i, int discretness) {
         return ((float)i) / discretness;

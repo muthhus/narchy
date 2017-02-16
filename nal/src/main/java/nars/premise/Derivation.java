@@ -47,11 +47,6 @@ public class Derivation extends Unify {
         return this.punct.set(new Derivation.TruthPuncEvidence(t, p, evidence))!=null;
     }
 
-    @Nullable public Truth dither(@NotNull Truth t) {
-        float res = this.truthResolution;
-        return res == Param.TRUTH_EPSILON ? t : DefaultTruth.ditherOrNull(t, res);
-    }
-
     public final long time() {
         return nar.time();
     }

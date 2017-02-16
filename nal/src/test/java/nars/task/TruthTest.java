@@ -3,6 +3,7 @@ package nars.task;
 import jcog.data.random.XorShift128PlusRandom;
 import nars.$;
 import nars.Param;
+import nars.truth.DefaultTruth;
 import nars.truth.Truth;
 import nars.truth.TruthFunctions;
 import org.junit.Test;
@@ -21,7 +22,8 @@ public class TruthTest {
         Truth aCopy = t(1.0f, 0.9f);
         assertEquals(a, aCopy);
 
-        Truth aEqualWithinThresh = t(1.0f- Param.TRUTH_EPSILON / 2.0f, 0.9f);
+        Truth aEqualWithinThresh = t(
+                1.0f - Param.TRUTH_EPSILON / 2.1f /* slightly less than half */, 0.9f);
         assertEquals(a, aEqualWithinThresh);
         assertEquals(a.hashCode(), aEqualWithinThresh.hashCode());
 
@@ -35,7 +37,7 @@ public class TruthTest {
     public void testConfEquality() {
         Truth a = t(1.0f, 0.5f);
 
-        Truth aEqualWithinThresh = t(1.0f, 0.5f- Param.TRUTH_EPSILON / 2.0f);
+        Truth aEqualWithinThresh = t(1.0f, 0.5f - Param.TRUTH_EPSILON / 2.1f /* slightly less than half the epsilon */);
         assertEquals(a, aEqualWithinThresh);
         assertEquals(a.hashCode(), aEqualWithinThresh.hashCode());
 
@@ -65,13 +67,15 @@ public class TruthTest {
         assertEquals( t(0.5f, 0.5f).hashCode(), t(0.5f, 0.5f).hashCode() );
         assertNotEquals( t(1.0f, 0.5f).hashCode(), t(0.5f, 0.5f).hashCode() );
         assertNotEquals( t(0.51f, 0.5f).hashCode(), t(0.5f, 0.5f).hashCode() );
-        assertEquals( t(0.504f, 0.5f).hashCode(), t(0.5f, 0.5f).hashCode() );
         assertNotEquals( t(0.506f, 0.5f).hashCode(), t(0.5f, 0.5f).hashCode() );
 
-
         assertEquals( t(0, 0.01f).hashCode(), t(0, 0.01f).hashCode() );
-        assertEquals( t(0.004f, 0.01f).hashCode(), t(0, 0.01f).hashCode() );
-        assertNotEquals( t(0.006f, 0.01f).hashCode(), t(0, 0.01f).hashCode() );
+
+        //0.01 granularity
+        assertEquals( new DefaultTruth(0.504f, 0.5f, 0.01f).hashCode(), new DefaultTruth(0.5f, 0.5f, 0.01f).hashCode() );
+        assertEquals( new DefaultTruth(0.004f, 0.01f, 0.01f).hashCode(), new DefaultTruth(0, 0.01f, 0.01f).hashCode() );
+        assertNotEquals( new DefaultTruth(0.006f, 0.01f, 0.01f).hashCode(), new DefaultTruth(0, 0.01f, 0.01f).hashCode() );
+
 
     }
 
@@ -85,7 +89,7 @@ public class TruthTest {
         Truth t = $.t(f, c);
         if (t == null)
             return;
-        Truth u = Truth.unhash(t.hashCode(), Param.TRUTH_EPSILON);
+        Truth u = Truth.intToTruth(t.hashCode());
         assertEquals(t, u);
     }
 

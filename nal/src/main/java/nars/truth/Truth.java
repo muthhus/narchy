@@ -24,14 +24,13 @@ import jcog.Texts;
 import jcog.Util;
 import nars.$;
 import nars.Op;
-import nars.Param;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 
-import static jcog.Util.clampround;
+import static jcog.Util.*;
 import static nars.truth.TruthFunctions.w2c;
 
 
@@ -110,8 +109,8 @@ public interface Truth extends Truthed {
      * into the two 16-bit words of a 32-bit integer.
      *
      * Since the same epsilon used in other truth
-     * resolution here (Truth components do not need the full
-     * resolution of a floating point value, and also do not
+     * resolution here (Truth components do not necessarily utilize the full
+     * resolution of a floating point value, and also do not necessarily
      * need the full resolution of a 16bit number when discretized)
      * the hash value can be used for equality comparisons
      * as well as non-naturally ordered / non-lexicographic
@@ -119,31 +118,29 @@ public interface Truth extends Truthed {
      */
 
     static int hash(float freq, float conf) {
-        return hash(freq, conf, Param.TRUTH_EPSILON);
+        return truthToInt(freq, conf);
     }
 
-    static int hash(float freq, float conf, float epsilon) {
-        return hash(freq, conf, (int)(1f/epsilon));
-    }
 
-    static int hash(float freq, float conf, int hashDiscreteness) {
-        //assuming epsilon is large enough such that: 0 <= h < 2^15:
-        int freqHash = Util.hash(freq, hashDiscreteness);
-        int confHash = Util.hash(conf, hashDiscreteness);
+
+    /** truth component resolution of a 16-bit encoding */
+    int hashDiscreteness16 = Short.MAX_VALUE-1;
+
+    /** correct behavior of this requires epsilon
+     * large enough such that: 0 <= h < 2^15: */
+    static int truthToInt(float freq, float conf) {
+
+        int freqHash = Util.hash(freq, hashDiscreteness16) & 0x0000ffff;
+        int confHash = Util.hash(conf, hashDiscreteness16) & 0x0000ffff;
 
         return (freqHash << 16) | confHash;
     }
 
     @Nullable
-    static Truth unhash(int h, float epsilon) {
-        return unhash(h, (int)(1f/epsilon));
-    }
-
-    @Nullable
-    static Truth unhash(int h, int hashDiscreteness) {
+    static Truth intToTruth(int h) {
         return $.t(
-                Util.unhash((h>>16) & 0xffff, hashDiscreteness),
-                Util.unhash(h & 0xffff, hashDiscreteness)
+                Util.unhash( (h>>16) /* & 0xffff*/, hashDiscreteness16),
+                Util.unhash(h & 0xffff, hashDiscreteness16)
         );
     }
 
@@ -241,10 +238,20 @@ public interface Truth extends Truthed {
         return a.conf() >= b.conf() ? a : b;
     }
 
-    default Truth dither(float res) {
-        float f = clampround(freq(), res);
-        float c = Util.clamp(clampround(conf(), res), res, 1f - res);
-        return $.t(f, c);
+    static float freq(float f, float epsilon) {
+        return unitize(round(f, epsilon));
+    }
+
+    static float conf(float c, float epsilon) {
+        return clamp(round(c, epsilon), 0, 1f - epsilon);
+    }
+
+
+    @Nullable default Truth dither(float res, float confMin) {
+        float c = conf(conf(), res);
+        if (c < confMin)
+            return null;
+        return $.t(freq(freq(), res), c);
     }
 
     default float eternalizedEvi() {

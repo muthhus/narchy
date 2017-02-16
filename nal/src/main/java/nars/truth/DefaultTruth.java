@@ -8,15 +8,12 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 
-import static jcog.Util.clampround;
+import static jcog.Util.*;
 
 
 public class DefaultTruth implements Truth  {
 
     public final float freq, conf;
-
-
-    //public final int hash;
 
     @Override
     public final float freq() {
@@ -28,27 +25,17 @@ public class DefaultTruth implements Truth  {
         return conf;
     }
 
-    /** use with caution */
-    public DefaultTruth(float... fc) {
-        this(fc[0], fc[1]);
-    }
-
     public DefaultTruth(float f, float c) {
         this(f, c, Param.TRUTH_EPSILON);
     }
 
     public DefaultTruth(float f, float c, float epsilon) {
-
-        //assert(Float.isFinite(f) && Float.isFinite(c));
-
-        this.freq /*= f*/ = clampround(f, epsilon);
-        this.conf = c = clampround(c, epsilon);
-
-        if (c==0)
-            throw new RuntimeException("zero conf");
-
-        //this.hash = Truth.hash(f, c, discreteness);
+        float C = Truth.conf(c, epsilon);
+        assert(C > 0);
+        this.freq = Truth.freq(f, epsilon);
+        this.conf = C;
     }
+
 
     public DefaultTruth(char punctuation, @NotNull NAR m) {
         this(1.0f, m.confidenceDefault(punctuation));
@@ -62,12 +49,6 @@ public class DefaultTruth implements Truth  {
 
     @Nullable
     @Override public final Truth withConf(float newConf) {
-        if (newConf == 1f)
-            return this;
-
-        if (newConf < Param.TRUTH_EPSILON)
-            return null;
-        //return !Util.equals(conf, newConf, Global.TRUTH_EPSILON) ? new DefaultTruth(freq, newConf) : this;
         return new DefaultTruth(freq, newConf);
     }
 
@@ -100,8 +81,7 @@ public class DefaultTruth implements Truth  {
 
     @Override
     public final int hashCode() {
-        return Truth.hash(freq, conf);
-        //return hash;
+        return Truth.truthToInt(freq, conf);
     }
 
     @NotNull
@@ -120,11 +100,6 @@ public class DefaultTruth implements Truth  {
 //    }
 //
 //    private static final int hashDiscreteness = (int)(1.0f / Param.TRUTH_EPSILON);
-
-    @Nullable public static Truth ditherOrNull(@NotNull Truth t, float res) {
-        float c = clampround(t.conf(), res);
-        return c > res ? new DefaultTruth(clampround(t.freq(), res), Util.clamp(c,res,1f-res), res) : null;
-    }
 
 
 

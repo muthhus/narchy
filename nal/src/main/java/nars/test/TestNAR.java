@@ -29,9 +29,9 @@ import static org.junit.Assert.assertTrue;
 */
 public class TestNAR  {
 
-    static {
-        $.logger.hashCode(); //HACK trigger logging?
-    }
+//    static {
+//        $.logger.hashCode(); //HACK trigger logging?
+//    }
 
     static final Logger logger = LoggerFactory.getLogger(TestNAR.class);
 
