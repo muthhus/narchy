@@ -97,7 +97,7 @@ abstract public class PremiseBuilder {
 
                     BeliefTable table = task.isQuest() ? answerConcept.goals() : answerConcept.beliefs();
 
-                    Task answered = table.answer(task.start(), now, dur, task, answerTerm, nar.confMin.floatValue());
+                    Task answered = table.answer(task.mid(), now, dur, task, answerTerm, nar.confMin.floatValue());
                     if (answered != null) {
 
 //                        boolean exists = nar.tasks.contains(answered);
@@ -106,22 +106,29 @@ abstract public class PremiseBuilder {
 //                        }
 
                         answered = task.onAnswered(answered, nar);
-                        if (answered != null) {
+                        if (answered != null && !answered.isDeleted()) {
 
-                            nar.inputLater(answered);
 
-                            //transfer budget from question to answer
-                            //float qBefore = taskBudget.priSafe(0);
-                            //float aBefore = answered.priSafe(0);
-                            BudgetFunctions.transferPri(taskBudget, answered.budget(),
-                                (float)Math.sqrt(answered.conf())
+                            if (nar.input(answered)!=null) {
+
+                                //transfer budget from question to answer
+                                //float qBefore = taskBudget.priSafe(0);
+                                //float aBefore = answered.priSafe(0);
+                                BudgetFunctions.transferPri(taskBudget, answered.budget(),
+                                        (float) Math.sqrt(answered.conf())
                                         //(1f - taskBudget.qua())
                                         //(1f - Util.unitize(taskBudget.qua()/answered.qua())) //proportion of the taskBudget which the answer receives as a boost
-                            );
+                                );
 
-                            task.budget().set(taskBudget); //update the task budget
 
-                            Crosslink.crossLink(task, answered, answered.conf(), nar);
+
+                                task.budget().set(taskBudget); //update the task budget
+
+                                Crosslink.crossLink(task, answered, answered.conf(), nar);
+                            }
+
+                            if (answered.isDeleted())
+                                throw new RuntimeException("answer should not have been deleted since it may be used in the premise");
 
                             /*
                             if (qBefore > 0) {
@@ -156,7 +163,9 @@ abstract public class PremiseBuilder {
                 //temporal focus:
                 long when;
                 long start = task.start();
-                if (start != ETERNAL && nar.random.nextBoolean()) {
+                if (start == ETERNAL) {
+                    when = ETERNAL;
+                } else if (nar.random.nextBoolean()) {
                     //USE TASK's OCCURENCE
                     //find nearest end-point to now
                     long end = task.end();

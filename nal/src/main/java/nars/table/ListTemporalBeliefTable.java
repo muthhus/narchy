@@ -9,6 +9,7 @@ import nars.NAR;
 import nars.Param;
 import nars.Task;
 import nars.budget.Budget;
+import nars.budget.BudgetMerge;
 import nars.concept.Concept;
 import nars.task.Revision;
 import nars.task.TruthPolation;
@@ -30,11 +31,11 @@ import static java.lang.Math.abs;
 /**
  * stores the items unsorted; revection manages their ranking and removal
  */
-public class MicrosphereTemporalBeliefTable extends MultiRWFasterList<Task> implements TemporalBeliefTable {
+public class ListTemporalBeliefTable extends MultiRWFasterList<Task> implements TemporalBeliefTable {
 
     private int capacity;
 
-    public MicrosphereTemporalBeliefTable(int initialCapacity) {
+    public ListTemporalBeliefTable(int initialCapacity) {
         super(new FasterList<Task>(initialCapacity));
         this.capacity = initialCapacity;
     }
@@ -105,10 +106,10 @@ public class MicrosphereTemporalBeliefTable extends MultiRWFasterList<Task> impl
     @Override
     public boolean remove(Task x) {
         final boolean[] removed = new boolean[1];
+        x.delete();
         withWriteLockAndDelegate(l -> {
             removed[0] = l.remove(x);
         });
-        x.delete();
         return removed[0];
     }
 
@@ -131,13 +132,27 @@ public class MicrosphereTemporalBeliefTable extends MultiRWFasterList<Task> impl
         if (cap == 0)
             return null;
 
+
+
         //the result of compression is processed separately
         final TruthDelta[] delta = new TruthDelta[1];
 
 
         withWriteLockAndDelegate(l -> {
-            final Truth before;
 
+            //1. check for duplicate, merge budget. exit
+            for (int i = 0; i < l.size(); i++) {
+                Task x = l.get(i);
+                if (x == input)
+                    return; //same instance
+
+                if (x.equals(input)) {
+                    BudgetMerge.maxBlend.apply(x.budget(), input.budget(), 1f);
+                    return;
+                }
+            }
+
+            final Truth before;
 
             Time time = nar.time;
             long now = time.time();

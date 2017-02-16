@@ -135,8 +135,14 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, Sorted
 //        return 0;
 //    }
 
-    @Nullable
-    public /*Revision*/Task tryRevision(@NotNull Task newBelief, @NotNull Concept concept, @NotNull NAR nar) {
+    /**
+     *
+     * @return
+     *      null: no revision could be applied
+     *      ==newBelief: existing duplicate found
+     *      non-null: revised task
+     */
+    @Nullable public /*Revision*/Task tryRevision(@NotNull Task newBelief, @NotNull Concept concept, @NotNull NAR nar) {
 
         Object[] list = this.list;
         int bsize = list.length;
@@ -157,6 +163,9 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, Sorted
 
             if (x == null) //the array has trailing nulls from having extra capacity
                 break;
+
+            if (x.equals(newBelief))
+                return newBelief; //duplicate, ignore it
 
             if (!Revision.isRevisible(newBelief, x))
                 continue;
@@ -303,6 +312,11 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, Sorted
             {
                 revised = tryRevision(input, concept, nar);
                 if (revised != null) {
+                    if (revised == input) {
+                        //duplicate detected
+                        return null;
+                    }
+
                     if (revised.isDeleted()) {
                         revised = null;
                     } else if (Param.DEBUG) {

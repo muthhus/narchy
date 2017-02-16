@@ -189,8 +189,8 @@ public class CompoundConcept<T extends Compound> implements Concept, Termlike {
         return new DefaultBeliefTable( );
     }
 
-    public MicrosphereTemporalBeliefTable newTemporalTable(final int tCap) {
-        return new MicrosphereTemporalBeliefTable(tCap);
+    public ListTemporalBeliefTable newTemporalTable(final int tCap) {
+        return new ListTemporalBeliefTable(tCap);
     }
 
     public EternalTable newEternalTable(int eCap) {

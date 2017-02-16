@@ -6,6 +6,7 @@ import nars.bag.ArrayBag;
 import nars.budget.BudgetMerge;
 import nars.budget.Budgeted;
 import nars.concept.Concept;
+import nars.link.BLink;
 import nars.link.RawBLink;
 import nars.op.Command;
 import nars.task.Tasked;
@@ -235,11 +236,16 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
     @Nullable default Task onAnswered(@NotNull Task answer, @NotNull NAR nar) {
         if (isInput()) {
             ArrayBag<Task> answers = concept(nar).computeIfAbsent(Op.QUESTION, () ->
-                new ArrayBag<>(BudgetMerge.maxHard, new SynchronizedHashMap<>()).capacity(Param.MAX_INPUT_ANSWERS)
+                new ArrayBag<>(BudgetMerge.maxBlend,
+                        new SynchronizedHashMap<>()).capacity(Param.MAX_INPUT_ANSWERS)
             );
-            float confEffective = answer.conf(start(), nar.time.dur());
-            if (answers.putIfAbsent(new RawBLink(answer, 1f, confEffective))) {
-                answers.commit();
+            float confEffective = answer.conf(mid(), nar.time.dur());
+
+            BLink<Task> insertion = answers.put(new RawBLink<>(answer, 1f, confEffective));
+
+            answers.commit();
+
+            if (insertion!=null && insertion.get()==answer) /* first insert */ {
                 Command.log(nar, this.toString() + "  " + answer.toString());
             } else {
                 return null;

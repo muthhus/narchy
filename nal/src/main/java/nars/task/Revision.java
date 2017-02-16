@@ -228,7 +228,7 @@ public class Revision {
     public static boolean isRevisible(@NotNull Task newBelief, @NotNull Task oldBelief) {
         //Term t = newBelief.term();
         return
-                newBelief != oldBelief &&
+
 
                         //!(t.op().isConjunctive() && t.hasVarDep()) &&  // t.hasVarDep());
 

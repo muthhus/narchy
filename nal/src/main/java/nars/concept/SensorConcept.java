@@ -5,7 +5,7 @@ import nars.$;
 import nars.NAR;
 import nars.Narsese;
 import nars.Task;
-import nars.table.MicrosphereTemporalBeliefTable;
+import nars.table.ListTemporalBeliefTable;
 import nars.table.SensorBeliefTable;
 import nars.term.Compound;
 import nars.term.Term;
@@ -56,8 +56,8 @@ public class SensorConcept extends WiredConcept implements FloatFunction<Term>, 
     }
 
     @Override
-    public MicrosphereTemporalBeliefTable newTemporalTable(int tCap) {
-        return new MyMicrosphereTemporalBeliefTable(tCap);
+    public ListTemporalBeliefTable newTemporalTable(int tCap) {
+        return new MyListTemporalBeliefTable(tCap);
     }
 
     //    /** originating from this sensor, or a future prediction */
@@ -201,8 +201,8 @@ public class SensorConcept extends WiredConcept implements FloatFunction<Term>, 
         nar.input(generated);
     }
 
-    private static class MyMicrosphereTemporalBeliefTable extends MicrosphereTemporalBeliefTable {
-        public MyMicrosphereTemporalBeliefTable(int tCap) {
+    private static class MyListTemporalBeliefTable extends ListTemporalBeliefTable {
+        public MyListTemporalBeliefTable(int tCap) {
             super(tCap);
         }
 

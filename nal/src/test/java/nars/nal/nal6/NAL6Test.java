@@ -507,7 +507,7 @@ public class NAL6Test extends AbstractNALTest {
         .believe("<0 --> n>", 1.0f, 0.9f)
         .believe("<<$1 --> n> ==> <(/,next,$1,_) --> n>>", 1.0f, 0.9f)
         .ask("<(/,next,(/,next,0,_),_) --> n>")
-        .mustBelieve(time, "<(/,next,0,_) --> n>", 1.0f, 1.0f, 0.80f, 1.0f)
+        .mustBelieve(time, "<(/,next,0,_) --> n>", 1.0f, 1.0f, 0.81f, 1.0f)
         .mustBelieve(time, "<(/,next,(/,next,0,_),_) --> n>", 1.0f, 1.0f, 0.73f, 1.0f) //should work
         //.mustBelieve(time, "((/,next,(/,next,(/,next,0,_),_),_)-->n).", 1.0f, 1.0f, finalConf, 1.0f)
         ;
@@ -544,7 +544,7 @@ public class NAL6Test extends AbstractNALTest {
                 .believe("num(0)", 1.0f, 0.9f)
                 .believe("( num($1) ==> num(($1)) )", 1.0f, 0.9f)
                 .ask("num(((0)))")
-                .mustBelieve(time, "num((0))", 1.0f, 1.0f, 0.80f, 1.0f)
+                .mustBelieve(time, "num((0))", 1.0f, 1.0f, 0.81f, 1.0f)
                 .mustBelieve(time, "num(((0)))", 1.0f, 1.0f, 0.59f, 1.0f)
         //.mustBelieve(time, "num:(((0)))", 1.0f, 1.0f, 0.66f, 1.0f)
         //.mustBelieve(time, "num:((((0))))", 1.0f, 1.0f, 0.81f, 1.0f)

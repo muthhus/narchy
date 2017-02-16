@@ -130,16 +130,20 @@ public class GenericCompound implements Compound  {
         if (this == that)
             return true;
 
-        if (that == null || hashCode() != that.hashCode())
-            return false;
-
-        Compound cthat;
         if (that instanceof Compound) {
 
+            if (hashCode() != that.hashCode())
+                return false;
 
-            cthat = (Compound)that;
+            Compound cthat = (Compound)that;
 
-        } else if (that instanceof Concept /* Termed but not Task*/)  {
+            //return subterms.equals(cthat.subterms()) &&
+            return (op == cthat.op()) &&
+                    subterms.equivalent(cthat.subterms()) &&
+                   (dt == cthat.dt());
+
+
+        } /*else if (that instanceof Concept )  { //Termed but not Task
             Term tthat = ((Concept) that).term();
             if (tthat instanceof Compound) {
 
@@ -151,9 +155,10 @@ public class GenericCompound implements Compound  {
             } else {
                 return false;
             }
-        } else {
+        }  else { */
+        else
             return false;
-        }
+
 
         //subterm sharing:
 //        if (as != cs) {
@@ -167,9 +172,7 @@ public class GenericCompound implements Compound  {
 //            }
 //        }
 
-        //return subterms.equals(cthat.subterms()) &&
-        return subterms.equivalent(cthat.subterms()) &&
-                (op == cthat.op()) && (dt == cthat.dt());
+
 
     }
 

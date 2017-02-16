@@ -10,6 +10,7 @@ import nars.task.Tasked;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Terms;
+import nars.truth.Truth;
 import nars.truth.Truthed;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -221,13 +222,13 @@ public class EternalTaskCondition implements NARCondition, Predicate<Task>, Cons
             return false;
         }
 
-        if (!task.term().equals(term)) return false;
-
         if (task.punc() != punc)
             return false;
 
         if (!truthMatches(task))
             return false;
+
+        if (!task.term().equals(term)) return false;
 
         if (!timeMatches(task))
             return false;
@@ -239,15 +240,18 @@ public class EternalTaskCondition implements NARCondition, Predicate<Task>, Cons
 
     private boolean truthMatches(@NotNull Truthed task) {
         if ((punc == Op.BELIEF) || (punc == Op.GOAL)) {
-            if (task.truth() == null) {
+            Truth tt = task.truth();
+            if (tt == null)
                 return false;
-            }
-            float fr = task.freq();
-            float co = task.conf();
 
-            if ((co > confMax) || (co < confMin) || (fr > freqMax) || (fr < freqMin)) {
+            float fr = tt.freq();
+            if ((fr > freqMax) || (fr < freqMin))
                 return false;
-            }
+
+            float co = tt.conf();
+            if ((co > confMax) || (co < confMin))
+                return false;
+
         }
         return true;
     }

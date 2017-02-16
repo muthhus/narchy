@@ -12,6 +12,7 @@ import nars.table.BeliefTable;
 import nars.table.QuestionTable;
 import nars.term.Compound;
 import nars.term.Term;
+import nars.term.Termed;
 import nars.term.Termlike;
 import nars.term.atom.Atomic;
 import nars.term.subst.Unify;
@@ -97,6 +98,16 @@ public class TermjectConcept<X> implements Atomic, Concept, Termject<X> {
     @Override
     public int size() {
         return term().size();
+    }
+
+    @Override
+    public int hashCode() {
+        return term().hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return obj instanceof Termed && term().equals(((Termed)obj).term());
     }
 
     @Override
