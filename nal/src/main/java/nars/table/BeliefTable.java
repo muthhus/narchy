@@ -127,7 +127,7 @@ public interface BeliefTable extends TaskTable {
         }
 
         @Override
-        public void clear(NAR nar) {
+        public void clear() {
 
         }
 
@@ -233,7 +233,7 @@ public interface BeliefTable extends TaskTable {
     /**
      * empties the table, an unindexes them in the NAR
      */
-    void clear(NAR nar);
+    void clear();
 
     default float eviSum(long now, float dur) {
 

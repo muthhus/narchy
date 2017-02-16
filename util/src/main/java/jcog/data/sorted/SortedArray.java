@@ -49,7 +49,8 @@ public class SortedArray<E> implements Iterable<E> {
     final static Object[] zeroList = new Object[0];
 
     public static final int binarySearchThreshold = 8;
-    @Deprecated protected final IntFunction<E[]> builder;
+    @Deprecated
+    protected final IntFunction<E[]> builder;
     protected E[] list = (E[]) zeroList;
     private int size;
 
@@ -71,21 +72,24 @@ public class SortedArray<E> implements Iterable<E> {
         E previous = list[index];
         int totalOffset = this.size - index - 1;
         if (totalOffset > 0) {
-            System.arraycopy(list , index + 1, list, index, totalOffset);
+            System.arraycopy(list, index + 1, list, index, totalOffset);
         }
         list[--this.size] = null;
         return previous;
     }
+
     public void removeFast(int index) {
         E[] list = this.list;
         int totalOffset = this.size - index - 1;
         if (totalOffset > 0)
-            System.arraycopy(list , index + 1, list, index, totalOffset);
+            System.arraycopy(list, index + 1, list, index, totalOffset);
         list[--this.size] = null;
     }
 
 
-    /** set the size as a quick way to remove null entries from the end */
+    /**
+     * set the size as a quick way to remove null entries from the end
+     */
     public void _setSize(int s) {
         this.size = s;
     }
@@ -96,11 +100,9 @@ public class SortedArray<E> implements Iterable<E> {
     }
 
     public void clear() {
-        final int s = size();
-        if (s!=0) {
-            this.list = (E[])zeroList;
-            this.size = 0;
-        }
+        this.list = (E[]) zeroList;
+        this.size = 0;
+
     }
 
 //    /**
@@ -126,7 +128,6 @@ public class SortedArray<E> implements Iterable<E> {
 //    }
 
 
-
 //    /**
 //     * the type of the sorting algorithm
 //     */
@@ -136,24 +137,24 @@ public class SortedArray<E> implements Iterable<E> {
     /**
      * constructor
      *
-     * @param list       decorated List
-     * @param inverted   if true the sorted order will be inverted, the list will be
-     *                   sorted in descending order
-     * @param preSort    if true the the list, which is the parameter in the
-     *                   constructor will be sorted, before it will be decorated
+     * @param list     decorated List
+     * @param inverted if true the sorted order will be inverted, the list will be
+     *                 sorted in descending order
+     * @param preSort  if true the the list, which is the parameter in the
+     *                 constructor will be sorted, before it will be decorated
      */
     public SortedArray(final IntFunction<E[]> builder) {
         //this.setDecoratedInternally(decorated); //Collections_1x4.failFastList(decorated));
 
         this.builder = builder;
-        this.list = (E[])zeroList; //builder.apply(initialCapacity);
+        this.list = (E[]) zeroList; //builder.apply(initialCapacity);
     }
 
 
     @Override
     public void forEach(Consumer<? super E> action) {
         for (E x : list) {
-            if (x!=null) {
+            if (x != null) {
                 action.accept(x);
             } else {
                 break; //first null element at the end of the array indicates the end
@@ -173,7 +174,6 @@ public class SortedArray<E> implements Iterable<E> {
             addBinary(element, s, cmp);
 
     }
-
 
 
     public interface Ranker<X> {
@@ -222,7 +222,7 @@ public class SortedArray<E> implements Iterable<E> {
             E[] newList = builder.apply(grow(s));
             System.arraycopy(l, 0, newList, 0, s);
             this.list = l = newList;
-		}
+        }
         l[this.size++] = e;
     }
 
@@ -260,9 +260,9 @@ public class SortedArray<E> implements Iterable<E> {
 
     public E removeWeakest() {
         //if (size > 0)
-            return this.list[--size];
+        return this.list[--size];
         //else
-            //return null;
+        //return null;
     }
 
     @NotNull
@@ -277,14 +277,13 @@ public class SortedArray<E> implements Iterable<E> {
     }
 
 
-
     static class ArrayIterator<E> implements ListIterator<E> {
         private final E[] array;
         private final int size;
         private int next;
         private int lastReturned;
 
-        protected ArrayIterator( E[] array, int index, int size ) {
+        protected ArrayIterator(E[] array, int index, int size) {
             this.array = array;
             next = index;
             lastReturned = -1;
@@ -298,7 +297,7 @@ public class SortedArray<E> implements Iterable<E> {
 
         @Override
         public E next() {
-            if( !hasNext() )
+            if (!hasNext())
                 throw new NoSuchElementException();
             lastReturned = next++;
             return array[lastReturned];
@@ -311,7 +310,7 @@ public class SortedArray<E> implements Iterable<E> {
 
         @Override
         public E previous() {
-            if( !hasPrevious() )
+            if (!hasPrevious())
                 throw new NoSuchElementException();
             lastReturned = --next;
             return array[lastReturned];
@@ -493,17 +492,17 @@ public class SortedArray<E> implements Iterable<E> {
 //	}
 
 
-	@SuppressWarnings("unchecked")
-	public int indexOf(@NotNull final E element, Ranker<E> cmp) {
+    @SuppressWarnings("unchecked")
+    public int indexOf(@NotNull final E element, Ranker<E> cmp) {
 
 		/*if (element == null)
-			return -1;*/
+            return -1;*/
 
-		int size = size();
-		if (size == 0)
-		    return -1;
+        int size = size();
+        if (size == 0)
+            return -1;
 
-		if (size >= binarySearchThreshold) {
+        if (size >= binarySearchThreshold) {
 
             final int[] rightBorder = {0};
             final int left = this.findInsertionIndex(cmp.rank(element), 0, size, rightBorder, cmp);
@@ -520,7 +519,7 @@ public class SortedArray<E> implements Iterable<E> {
         }
         return indexOfInternal(element);
 
-	}
+    }
 
     private final int indexOfInternal(E e) {
         E[] l = this.list;
@@ -598,7 +597,7 @@ public class SortedArray<E> implements Iterable<E> {
             float elementRank, final int left, final int right,
             @NotNull final int[] rightBorder, @NotNull Ranker<E> cmp) {
 
-        assert(right >= left); //"right must be bigger or equals as the left"
+        assert (right >= left); //"right must be bigger or equals as the left"
 
         if ((right - left) <= binarySearchThreshold) {
             rightBorder[0] = right;//.setObject(right);
@@ -629,15 +628,15 @@ public class SortedArray<E> implements Iterable<E> {
 
         boolean c = (0 < comparedValue);
 
-        return this.findInsertionIndex(elementRank, c ? left : midle, c ? midle: right, rightBorder, cmp);
+        return this.findInsertionIndex(elementRank, c ? left : midle, c ? midle : right, rightBorder, cmp);
     }
 
     /**
      * searches for the first index found for given element
      *
-     * @param list    the list or sublist which should be invastigated
-     * @param left    left index (inclusively)
-     * @param right   right index (exclusively)
+     * @param list  the list or sublist which should be invastigated
+     * @param left  left index (inclusively)
+     * @param right right index (exclusively)
      * @return
      */
     private int findFirstIndex(float elementRank,
@@ -682,11 +681,11 @@ public class SortedArray<E> implements Iterable<E> {
 //	}
 
 
-
     /**
      * Returns the first (lowest) element currently in this list.
      */
-    @Nullable public final E first() {
+    @Nullable
+    public final E first() {
         return this.isEmpty() ? null : list[0];
     }
 
@@ -698,7 +697,7 @@ public class SortedArray<E> implements Iterable<E> {
         int size = this.size;
         if (size == 0) return null;
         E[] ll = list;
-        return ll[Math.min(ll.length-1, size - 1)];
+        return ll[Math.min(ll.length - 1, size - 1)];
     }
 
 //	@Override

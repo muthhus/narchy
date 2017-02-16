@@ -176,13 +176,13 @@ abstract public class NAgents extends NAgent {
         Random rng = new XorShift128PlusRandom(1);
         final Executioner exe =
                 //new SingleThreadExecutioner();
-                new MultiThreadExecutioner(threads, 4096 /* TODO chose a power of 2 number to scale proportionally to # of threads */)
+                new MultiThreadExecutioner(threads, 2048 /* TODO chose a power of 2 number to scale proportionally to # of threads */)
                     //.sync(false)
                 ;
 
-        int conceptsPerCycle = 64*threads;
+        int conceptsPerCycle = 48*threads;
 
-        final int reprobes = 3;
+        final int reprobes = 4;
 
         //Multi nar = new Multi(3,512,
         DefaultConceptBuilder cb = new DefaultConceptBuilder() {
@@ -194,15 +194,15 @@ abstract public class NAgents extends NAgent {
             }
         };
 
-        Default nar = new Default(32 * 1024,
+        Default nar = new Default(16 * 1024,
                 conceptsPerCycle, 1, 3, rng,
-                new CaffeineIndex(cb, 64*1024, false, exe)
+                new CaffeineIndex(cb, 32*1024, false, exe)
                 //new TreeTermIndex.L1TreeIndex(new DefaultConceptBuilder(), 300000, 32 * 1024, 3)
                 ,
                 time,
                 exe) {
 
-            final Compressor compressor = new Compressor(this, "_", 2, 7,
+            final Compressor compressor = new Compressor(this, "_", 3, 5,
                     1f, 64, 768);
 
             @Override
@@ -235,7 +235,7 @@ abstract public class NAgents extends NAgent {
                 return new HijackBag<>(activeConcepts, reprobes, BudgetMerge.plusBlend, random ) {
                     @Override
                     public Forget forget(float rate) {
-                        float memoryForget = 0.8f;
+                        float memoryForget = 1f;
                         return new Forget(rate, memoryForget, memoryForget);
                     }
                 };
@@ -252,8 +252,8 @@ abstract public class NAgents extends NAgent {
         nar.DEFAULT_QUEST_PRIORITY = 0.25f * p;
 
         nar.confMin.setValue(0.01f);
-        nar.truthResolution.setValue(0.04f);
-        nar.termVolumeMax.setValue(80);
+        nar.truthResolution.setValue(0.02f);
+        nar.termVolumeMax.setValue(55);
 
         MySTMClustered stm = new MySTMClustered(nar, 64, '.', 3, true, 6);
         MySTMClustered stmGoal = new MySTMClustered(nar, 32, '!', 2, true, 4);

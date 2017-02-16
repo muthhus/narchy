@@ -1,7 +1,6 @@
 package nars.table;
 
 import jcog.data.sorted.SortedArray;
-import nars.$;
 import nars.NAR;
 import nars.Param;
 import nars.Task;
@@ -16,7 +15,6 @@ import nars.truth.TruthDelta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
 import java.util.function.Consumer;
 
 import static nars.time.Tense.ETERNAL;
@@ -65,7 +63,7 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, Sorted
         this.capacity = initialCapacity;
     }
 
-    public void capacity(int c, @NotNull NAR nar) {
+    public void capacity(int c) {
         if (this.capacity != c) {
 
             this.capacity = c;
@@ -271,7 +269,17 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, Sorted
 
 
     @Override
+    public void clear() {
+        synchronized (this) {
+            forEach(Task::delete);
+            super.clear();
+        }
+    }
+
+    @Override
     public boolean remove(Task x) {
+
+        x.delete();
 
         int index = indexOf(x, this);
         if (index == -1)
@@ -392,7 +400,7 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, Sorted
         Consumer<Task> overridden = t -> TaskTable.removeTask(t, "Overridden");
         et.forEach(overridden);
         et.clear();
-        et.capacity(1, nar);
+        et.capacity(1);
 
 //        //2. clear the other table, set capcity to zero preventing temporal tasks
         //TODO

@@ -115,7 +115,7 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
 
                     Derivation.TruthPuncEvidence ct = m.punct.get();
 
-                    if (r.volume() < nar.termVolumeMax.intValue() && Task.taskStatementValid((Compound) r, ct.punc, !Param.DEBUG)) {
+                    if (/*r.volume() < nar.termVolumeMax.intValue() && */Task.taskStatementValid((Compound) r, ct.punc, !Param.DEBUG)) {
 
                         Truth truth = ct.truth;
 
@@ -250,6 +250,10 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
                     return; //excessive doubt
             }
         }
+
+        content = nar.pre(content);
+        if (content.volume() > nar.termVolumeMax.intValue())
+            return;
 
         DerivedTask d = derive(content, budget, nar.time(), occ, m, truth, ct);
         if (d != null)

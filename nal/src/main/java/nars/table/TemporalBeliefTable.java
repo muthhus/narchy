@@ -33,7 +33,7 @@ public interface TemporalBeliefTable extends TaskTable {
 
     boolean isFull();
 
-    void clear(NAR nar);
+    void clear();
 
     TemporalBeliefTable EMPTY = new TemporalBeliefTable() {
         @Override
@@ -86,7 +86,7 @@ public interface TemporalBeliefTable extends TaskTable {
         }
 
         @Override
-        public void clear(NAR nar) {
+        public void clear() {
 
         }
     };

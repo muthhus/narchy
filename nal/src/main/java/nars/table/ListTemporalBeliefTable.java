@@ -4,7 +4,6 @@ import jcog.Util;
 import jcog.list.FasterList;
 import jcog.list.MultiRWFasterList;
 import jcog.math.Interval;
-import nars.$;
 import nars.NAR;
 import nars.Param;
 import nars.Task;
@@ -23,7 +22,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Iterator;
-import java.util.List;
 import java.util.function.Predicate;
 
 import static java.lang.Math.abs;
@@ -265,7 +263,7 @@ public class ListTemporalBeliefTable extends MultiRWFasterList<Task> implements 
 //    }
 
     @Override
-    public void clear(NAR nar) {
+    public void clear() {
 
         ifNotEmptyWriteWith(l -> {
             l.forEach(Task::delete);

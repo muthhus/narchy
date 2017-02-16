@@ -147,7 +147,14 @@ public interface Concept extends Termed {
 
 
     static void delete(@NotNull Concept c, @NotNull NAR nar) {
+        c.beliefs().clear();
+        c.goals().clear();
+        //c.questions().clear(); //TODO?
+        //c.quests().clear();
+
         c.state(ConceptState.Deleted, nar);
+
+
 
         c.termlinks().clear();
         c.tasklinks().clear();

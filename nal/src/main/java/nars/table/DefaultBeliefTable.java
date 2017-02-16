@@ -45,11 +45,9 @@ public class DefaultBeliefTable implements BeliefTable {
     }
 
     @Override
-    public void clear(@NotNull NAR nar) {
-        if (!eternal.isEmpty())
-            throw new UnsupportedOperationException("eternal clear impl soon");
-
-        temporal.clear(nar);
+    public void clear() {
+        temporal.clear();
+        eternal.clear();
     }
 
     @NotNull
@@ -97,7 +95,7 @@ public class DefaultBeliefTable implements BeliefTable {
     @Override
     public final void capacity(int eternals, int temporals, NAR nar) {
         temporal.capacity(temporals, nar);
-        eternal.capacity(eternals, nar);
+        eternal.capacity(eternals);
     }
 
     /**
