@@ -25,16 +25,13 @@ import jcog.Util;
 import nars.$;
 import nars.Op;
 import nars.Param;
-import nars.term.Term;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
-import java.util.Comparator;
 
 import static jcog.Util.clampround;
-import static nars.truth.TruthFunctions.c2w;
 import static nars.truth.TruthFunctions.w2c;
 
 

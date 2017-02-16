@@ -19,6 +19,7 @@ import com.google.common.io.CharStreams;
 import com.google.common.io.Closeables;
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Longs;
+import com.google.common.reflect.Reflection;
 import jcog.data.LongString;
 import jcog.list.FasterList;
 import jcog.signal.OneDHaar;
@@ -29,6 +30,7 @@ import org.eclipse.collections.impl.list.mutable.primitive.ByteArrayList;
 import org.eclipse.collections.impl.list.mutable.primitive.DoubleArrayList;
 import org.eclipse.collections.impl.list.mutable.primitive.IntArrayList;
 import org.eclipse.collections.impl.tuple.Tuples;
+import org.eclipse.collections.impl.utility.internal.ReflectionHelper;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import sun.misc.Unsafe;
@@ -36,6 +38,8 @@ import sun.misc.Unsafe;
 import java.io.*;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Path;
@@ -1436,5 +1440,80 @@ public enum Util { ;
         }
     }
 
+    public static void shallowCopy(Object source, Object dest, final boolean publicOnly)
+    {
+        if (!source.getClass().isInstance(dest))
+            throw new IllegalArgumentException();
+
+        for (Field f : Util.getAllDeclaredFields(source, publicOnly)) {
+            try
+            {
+
+                final int mods = f.getModifiers();
+                if (Modifier.isStatic(mods) || Modifier.isFinal(mods))
+                    continue;
+
+                f.setAccessible(true);
+
+                Object sourceValue = f.get(source);
+                f.set(dest, sourceValue);
+            }
+            catch (IllegalArgumentException e)
+            {
+                e.printStackTrace();
+            }
+            catch (IllegalAccessException e)
+            {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    /** 'publicOnly' just gets public fields (Class.getFields vs. Class.getDeclaredFields) so we can work with reduced
+     *  functionality in a sandboxed environment (ie. applets)
+     */
+    public static Collection<Field> getAllDeclaredFields(Object object, final boolean publicOnly)
+    {
+        Set<Field> result = new HashSet<Field>();
+
+        Class<?> clazz = object.getClass();
+        while (clazz != null)
+        {
+            Field[] fields;
+            if (publicOnly)
+                fields = clazz.getFields();
+            else
+                fields = clazz.getDeclaredFields();
+
+            for (int i=0; i<fields.length; i++)
+                result.add(fields[i]);
+
+            clazz = clazz.getSuperclass();
+        }
+
+        return result;
+    }
+
+    /**
+     * http://www.java-gaming.org/topics/utils-essentials/22144/30/view.html
+     * calculate height on a uniform grid, by splitting a quad into two triangles:
+     */
+    public static final float lerp2d(float x, float z, float nw, float ne, float se, float sw)
+    {
+        // n -= n % dim -> n = 0..dim (local offset)
+        x = x - (int) x;
+        z = z - (int) z;
+
+        // Which triangle of quad (left | right)
+        if (x > z)
+            sw = nw + se - ne;
+        else
+            ne = se + nw - sw;
+
+        // calculate interpolation of selected triangle
+        float n = lerp(x, nw, ne);
+        float s = lerp(x, sw, se);
+        return lerp(z, n, s);
+    }
 
 }

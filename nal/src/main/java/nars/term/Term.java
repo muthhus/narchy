@@ -21,7 +21,6 @@
 package nars.term;
 
 
-import jcog.Hack;
 import jcog.Texts;
 import jcog.data.array.IntArrays;
 import nars.$;
@@ -47,7 +46,6 @@ import java.util.List;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
 
-import static nars.Op.NEG;
 import static nars.time.Tense.DTERNAL;
 import static nars.time.Tense.XTERNAL;
 

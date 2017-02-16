@@ -26,18 +26,18 @@ public class FuzzyScalarConceptsTest {
     //HACK TODO make sure this is smaller
     final static float tolerance = 0.2f;
 
-    @Test
-    public void testRewardConceptsFuzzification1() {
-        NAR d = new Default();
-        MutableFloat m = new MutableFloat(0f);
-
-        testSteadyFreqCondition(m,
-            new FuzzyScalarConcepts(
-                new FloatNormalized(() -> m.floatValue()).updateRange(-1).updateRange(1),
-                d, FuzzyScalarConcepts.FuzzyTriangle, $.p("x")),
-                (f) -> Util.equals(f, 0.5f + 0.5f * m.floatValue(), tolerance)
-        );
-    }
+//    @Test
+//    public void testRewardConceptsFuzzification1() {
+//        NAR d = new Default();
+//        MutableFloat m = new MutableFloat(0f);
+//
+//        testSteadyFreqCondition(m,
+//            new FuzzyScalarConcepts(
+//                new FloatNormalized(() -> m.floatValue()).updateRange(-1).updateRange(1),
+//                d, FuzzyScalarConcepts.FuzzyTriangle, $.p("x")),
+//                (f) -> Util.equals(f, 0.5f + 0.5f * m.floatValue(), tolerance)
+//        );
+//    }
 
     @Test
     public void testRewardConceptsFuzzification3() {

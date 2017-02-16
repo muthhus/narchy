@@ -15,8 +15,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.function.Consumer;
 
-import static nars.$.t;
-
 /**
  * manages a set of concepts whose beliefs represent components of an
  * N-ary (N>=1) discretization of a varying scalar (32-bit floating point) signal.

@@ -1,7 +1,6 @@
 package nars.derive.meta;
 
 import com.google.common.base.Joiner;
-import jcog.Texts;
 import nars.NAR;
 import nars.Op;
 import nars.Param;
@@ -9,7 +8,6 @@ import nars.Task;
 import nars.budget.Budget;
 import nars.derive.rule.PremiseRule;
 import nars.premise.Derivation;
-import nars.premise.Premise;
 import nars.task.DerivedTask;
 import nars.term.Compound;
 import nars.term.Term;
@@ -18,16 +16,11 @@ import nars.term.atom.AtomicStringConstant;
 import nars.term.util.InvalidTermException;
 import nars.time.TimeFunctions;
 import nars.truth.Truth;
-import nars.truth.TruthDelta;
 import nars.util.task.InvalidTaskException;
-import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 import static nars.Op.ATOM;
 import static nars.Op.NEG;

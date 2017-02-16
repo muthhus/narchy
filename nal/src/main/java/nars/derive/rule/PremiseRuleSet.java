@@ -1,9 +1,10 @@
 package nars.derive.rule;
 
 import com.google.common.collect.Lists;
-import jcog.Util;
-import nars.*;
-import nars.derive.Deriver;
+import nars.$;
+import nars.NAR;
+import nars.Narsese;
+import nars.Param;
 import nars.index.term.PatternTermIndex;
 import nars.term.Compound;
 import nars.term.Term;
@@ -14,25 +15,16 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.DataInput;
-import java.io.DataOutput;
 import java.io.IOException;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
-import static java.nio.file.Files.readAllLines;
 import static java.util.stream.Collectors.toList;
-import static nars.IO.readTerm;
 
 
 /**

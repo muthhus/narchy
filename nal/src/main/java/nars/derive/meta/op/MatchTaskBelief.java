@@ -1,11 +1,8 @@
 package nars.derive.meta.op;
 
 import com.google.common.base.Joiner;
-import com.google.common.collect.Iterators;
 import com.google.common.collect.ListMultimap;
 import com.google.common.primitives.Bytes;
-import com.google.common.primitives.Ints;
-import jcog.data.array.Arrays;
 import nars.$;
 import nars.Op;
 import nars.derive.meta.AtomicBoolCondition;

@@ -2,17 +2,13 @@ package nars.concept.dynamic;
 
 import jcog.Util;
 import nars.$;
-import nars.NAR;
 import nars.Task;
 import nars.budget.Budget;
-import nars.concept.CompoundConcept;
 import nars.table.DefaultBeliefTable;
-import nars.table.QuestionTable;
 import nars.term.Compound;
 import nars.term.Terms;
 import nars.truth.Stamp;
 import nars.truth.Truth;
-import nars.truth.TruthDelta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

@@ -19,8 +19,6 @@ import nars.truth.Truth;
 import nars.truth.TruthDelta;
 import nars.truth.Truthed;
 import nars.util.task.InvalidTaskException;
-import org.eclipse.collections.api.set.primitive.ImmutableLongSet;
-import org.eclipse.collections.impl.factory.primitive.LongSets;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

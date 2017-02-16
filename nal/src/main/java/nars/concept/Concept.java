@@ -21,7 +21,6 @@
 package nars.concept;
 
 import com.google.common.collect.Iterators;
-import nars.$;
 import nars.NAR;
 import nars.Task;
 import nars.attention.Activation;
@@ -42,7 +41,6 @@ import org.jetbrains.annotations.Nullable;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;

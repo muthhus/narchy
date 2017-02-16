@@ -1,7 +1,6 @@
 package nars.op.mental;
 
 import jcog.data.MutableIntRange;
-import jcog.data.MutableInteger;
 import nars.$;
 import nars.NAR;
 import nars.Op;
@@ -25,7 +24,6 @@ import nars.term.Term;
 import nars.term.Termed;
 import nars.term.container.TermContainer;
 import nars.term.subst.Unify;
-import nars.truth.Truth;
 import nars.truth.TruthDelta;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;

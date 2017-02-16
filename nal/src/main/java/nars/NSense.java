@@ -17,6 +17,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.function.*;
 
+import static nars.$.$;
 import static nars.$.*;
 import static nars.term.Terms.compoundOrNull;
 

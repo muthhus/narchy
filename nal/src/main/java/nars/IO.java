@@ -4,7 +4,6 @@ import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
-import jcog.Hack;
 import jcog.Texts;
 import jcog.data.byt.DynByteSeq;
 import nars.budget.Budgeted;

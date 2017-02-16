@@ -21,7 +21,6 @@ import java.util.function.Supplier;
 import static nars.$.the;
 import static nars.Op.INT;
 import static nars.term.Terms.atomOrNull;
-import static nars.term.Terms.compoundOrNull;
 
 /** a functor is a term transform which immediately returns
  *  a result Term from the Term[] arguments of

@@ -1,9 +1,6 @@
 package nars.table;
 
-import nars.NAR;
-import nars.Param;
 import nars.Task;
-import nars.task.MutableTask;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
