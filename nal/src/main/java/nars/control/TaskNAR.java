@@ -8,7 +8,7 @@ import nars.Task;
 import nars.attention.Activation;
 import nars.attention.Forget;
 import jcog.bag.Bag;
-import nars.bag.impl.HijackBag;
+import nars.bag.impl.BLinkHijackBag;
 import nars.budget.BLink;
 import nars.budget.Budget;
 import nars.budget.BudgetMerge;
@@ -102,11 +102,11 @@ public class TaskNAR extends NAR {
 
         compressor = new Compressor(this, "_", 4, 8, 6f, 32, 256);
 
-        tasksBag = new HijackBag<Task>(capacity, 6, BudgetMerge.maxBlend, random) {
+        tasksBag = new BLinkHijackBag<Task>(capacity, 6, BudgetMerge.maxBlend, random) {
         //tasksBag = new CurveBag<Task>(capacity, new CurveBag.NormalizedSampler(power2BagCurve, random), BudgetMerge.maxBlend, new ConcurrentHashMap<>(capacity)) {
 
             @Override
-            public Forget<Task> forget(float rate) {
+            public Forget<BLink<Task>> forget(float rate) {
                 return new MyTaskForget(rate);
             }
 
@@ -313,34 +313,34 @@ public class TaskNAR extends NAR {
 
     }
 
-    private static class MyTaskForget extends Forget<Task> {
+    public static class MyTaskForget extends Forget<BLink<Task>> {
         public MyTaskForget(float rate) {
             super(rate);
         }
 
         @Override
-        public void accept(@NotNull BLink<Task> bLink) {
-            Task t = bLink.get();
+        public void accept(@NotNull BLink<Task> b) {
+            Task t = b.get();
 
             float tp = t.priSafe(-1);
             if (tp < 0) {
-                bLink.delete();
+                b.delete();
                 return;
             }
 
             if (t.isInput() && t.isEternal()) {
                 //dont forget eternal input tasks and act as a copy of the task's budget
-                bLink.set(t);
+                b.set(t);
                 return;
             } else {
                 //make the link always less than the task. if the task decreases more than the link, then bring the link down too
-                if (tp < bLink.pri()) {
-                    bLink.set(t);
+                if (tp < b.pri()) {
+                    b.set(t);
                 }
             }
 
 
-            super.accept(bLink);
+            super.accept(b);
         }
     }
 

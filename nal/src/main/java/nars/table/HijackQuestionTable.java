@@ -3,7 +3,7 @@ package nars.table;
 import com.google.common.collect.Iterators;
 import nars.NAR;
 import nars.Task;
-import nars.bag.impl.HijackBag;
+import nars.bag.impl.TaskHijackBag;
 import nars.budget.BLink;
 import nars.budget.BudgetMerge;
 import nars.budget.DependentBLink;
@@ -18,16 +18,19 @@ import java.util.function.Supplier;
 /**
  * Created by me on 2/16/17.
  */
-public class HijackQuestionTable extends HijackBag<Task> implements QuestionTable {
+public class HijackQuestionTable extends TaskHijackBag implements QuestionTable {
+
+    private long lastCommitTime = Long.MIN_VALUE;
 
     public HijackQuestionTable(int cap, int reprobes, BudgetMerge merge, Random random) {
-        super(cap, reprobes, merge, random);
-    }
+        super(reprobes, merge, random);
 
+        capacity(cap);
+    }
 
     @Override
     public Iterator<Task> taskIterator() {
-        return Iterators.transform(iterator(), Supplier::get);
+        return iterator();
     }
 
     @Override
@@ -44,13 +47,19 @@ public class HijackQuestionTable extends HijackBag<Task> implements QuestionTabl
     @Override
     public @Nullable Task add(@NotNull Task t, @NotNull BeliefTable answers, @NotNull NAR n) {
 
-        boolean present = contains(t);
+        //boolean present = contains(t);
 
-        commit();
 
-        BLink inserted = put(new DependentBLink<Task>(t, t.priSafe(0), t.qua()));
+        long now = n.time();
+        if (now != lastCommitTime) {
+            commit();
+            lastCommitTime = now;
+        }
+
+        Task inserted = put(t);
         if (inserted!=null) {
-            return !present ? t : null;
+            //signal successful insert when inserted item is what is inserted, not a pre-existing duplicate
+            return inserted==t ? t : null;
         }
 
         return null;
@@ -58,7 +67,8 @@ public class HijackQuestionTable extends HijackBag<Task> implements QuestionTabl
 
     @Override
     public void capacity(int newCapacity, NAR nar) {
-        capacity(newCapacity);
+        setCapacity(newCapacity); //hijackbag
+        capacity(newCapacity); //question table
     }
 
     @Override

@@ -3,7 +3,7 @@ package nars;
 import jcog.Util;
 import jcog.data.random.XorShift128PlusRandom;
 import jcog.bag.Bag;
-import nars.bag.impl.HijackBag;
+import nars.bag.impl.BLinkHijackBag;
 import nars.budget.BudgetMerge;
 import nars.gui.HistogramChart;
 import nars.gui.Vis;
@@ -62,7 +62,7 @@ public class BagLab  {
     public static void main(String[] arg) {
         BagLab bagLab = new BagLab(
                 //new CurveBag(256, plusBlend, new XorShift128PlusRandom(1), new HashMap())
-                new HijackBag(512, 4, BudgetMerge.maxBlend, new XorShift128PlusRandom(1))
+                new BLinkHijackBag(512, 4, BudgetMerge.maxBlend, new XorShift128PlusRandom(1))
         );
 
         SpaceGraph.window(

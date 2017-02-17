@@ -3,6 +3,7 @@ package jcog.bag;
 import jcog.Util;
 import jcog.table.Table;
 import org.apache.commons.lang3.mutable.MutableFloat;
+import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunction;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -18,6 +19,29 @@ import java.util.function.Predicate;
  * K=key, V = item/value of type Item
  */
 public interface Bag<K,V> extends Table<K, V>, Iterable<V> {
+
+    /**
+     * temperature parameter, in the range of 0..1.0 controls the target average priority that
+     * forgetting should attempt to cause.
+     *
+     * higher temperature means faster forgetting allowing new items to more easily penetrate into
+     * the bag.
+     *
+     * lower temperature means old items are forgotten more slowly
+     * so new items have more difficulty entering.
+     *
+     * @return the update function to apply to a bag
+     */
+    @Nullable public static <X> Consumer<X> forget(int s, float p, float m, float temperature, float priEpsilon, FloatToObjectFunction<Consumer<X>> f) {
+
+        float targetMeanPri = 1f - temperature;
+
+        float r = p > 0 ?
+                -((s * targetMeanPri) - p - m) / m :
+                0;
+
+        return r >= (priEpsilon/s) ? f.valueOf(Util.unitize(r)) : null;
+    }
 
     /**
      * returns the bag to an empty state

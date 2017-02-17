@@ -74,8 +74,8 @@ public abstract class Param /*extends Container*/  {
     public static final boolean BACKWARD_QUESTION_RULES = true;
 
 
-    /** average priority target for bag forgetting */
-    public static final float BAG_THRESHOLD = (0.5f);
+    /** higher value means faster forgetting */
+    public static final float BAG_TEMPERATURE = (0.5f);
 
     /** conjunctions over this length will be ineligible for 2nd-layer termlink templates. it can be decomposed however, and decompositions of this size or less will be eligible. */
     public static final int MAX_CONJ_SIZE_FOR_LAYER2_TEMPLATES = 3;

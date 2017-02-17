@@ -1,8 +1,10 @@
 package nars.attention;
 
-import jcog.Util;
+import jcog.bag.Bag;
 import nars.Param;
 import nars.budget.BLink;
+import nars.budget.Budget;
+import nars.budget.Budgeted;
 import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunction;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -10,9 +12,10 @@ import org.jetbrains.annotations.Nullable;
 import java.util.function.Consumer;
 
 /**
- * Created by me on 9/4/16.
+ * decreases priority at a specified rate which is diminished in proportion to a budget's quality
+ * so that high quality results in slower priority loss
  */
-public class Forget<X> implements Consumer<BLink<X>> {
+public class Forget<X extends Budget> implements Consumer<X> {
 
     public final float r;
 
@@ -32,29 +35,18 @@ public class Forget<X> implements Consumer<BLink<X>> {
 
     @Nullable
     public static <X> Consumer<X> forget(int s, float p, float m, FloatToObjectFunction<Consumer<X>> f) {
-
-        float r = p > 0 ?
-                -((s * Param.BAG_THRESHOLD) - p - m) / m :
-                0;
-
-        //float pressurePlusOversize = pressure + Math.max(0, expectedAvgMass * size - existingMass);
-        //float r = (pressurePlusOversize) / (pressurePlusOversize + existingMass*4f /* momentum*/);
-
-        //System.out.println(pressure + " " + existingMass + "\t" + r);
-        return r >= (Param.BUDGET_EPSILON/s) ? f.valueOf(Util.unitize(r)) : null;
+        return Bag.forget(s, p, m, Param.BAG_TEMPERATURE, Param.BUDGET_EPSILON, f);
     }
 
     @Override
-    public void accept(@NotNull BLink<X> bLink) {
-        float p = bLink.priSafe(-1);
+    public void accept(@NotNull X b) {
+        float p = b.priSafe(-1);
         if (p > 0) {
-            float q = bLink.qua();
-            //if (q==q) //???
-                bLink.setPriority(gain * p * (1f - (r * (1f - q * maxEffectiveQuality))));
+            b.setPriority(gain * p * (1f - (r * (1f - b.qua() * maxEffectiveQuality))));
+
             //else
                 //bLink.delete();
             //bLink.setPriority(p - (r * (1f - q * maxEffectiveQuality)));
-
         }
     }
 

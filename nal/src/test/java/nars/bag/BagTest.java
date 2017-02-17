@@ -6,7 +6,7 @@ import jcog.data.random.XorShift128PlusRandom;
 import nars.Param;
 import nars.bag.impl.ArrayBag;
 import nars.bag.impl.CurveBag;
-import nars.bag.impl.HijackBag;
+import nars.bag.impl.BLinkHijackBag;
 import nars.budget.Budget;
 import nars.budget.BudgetMerge;
 import nars.budget.RawBudget;
@@ -57,7 +57,7 @@ public class BagTest {
 
 
         assertEquals(1, c.capacity());
-        if (!(c instanceof HijackBag)) {
+        if (!(c instanceof BLinkHijackBag)) {
             assertEquals(0, c.size());
             assertTrue(c.isEmpty());
         }

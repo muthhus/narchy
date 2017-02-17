@@ -8,7 +8,7 @@ import nars.NAR;
 import nars.Task;
 import jcog.bag.Bag;
 import jcog.bag.Prioritized;
-import nars.bag.impl.HijackBag;
+import nars.bag.impl.BLinkHijackBag;
 import nars.budget.BLink;
 import nars.budget.BudgetMerge;
 import nars.budget.DependentBLink;
@@ -312,7 +312,7 @@ public abstract class STMClustered extends STM {
         this.punc = punc;
 
         //this.input = new ArrayBag<Task>(capacity.intValue(), BudgetMerge.maxBlend, new ConcurrentHashMap<>(capacity.intValue())) {
-        this.input = ThreadLocal.withInitial(() -> new HijackBag<Task>(capacity.intValue(), 4, BudgetMerge.maxBlend, nar.random) {
+        this.input = ThreadLocal.withInitial(() -> new BLinkHijackBag<Task>(capacity.intValue(), 4, BudgetMerge.maxBlend, nar.random) {
 
 //            @NotNull
 //            @Override

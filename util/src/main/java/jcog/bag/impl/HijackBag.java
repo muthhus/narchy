@@ -1,12 +1,8 @@
-package nars.bag.impl;
+package jcog.bag.impl;
 
 import jcog.bag.Bag;
-import nars.$;
-import nars.Param;
-import nars.attention.Forget;
-import nars.budget.BLink;
-import nars.budget.Budget;
-import nars.budget.BudgetMerge;
+
+import jcog.list.FasterList;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.eclipse.collections.impl.map.mutable.ConcurrentHashMapUnsafe;
 import org.jetbrains.annotations.NotNull;
@@ -25,17 +21,19 @@ import java.util.stream.Stream;
 /**
  * Created by me on 2/17/17.
  */
-public abstract class AbstractHijackBag<K,V> implements Bag<K,V> {
+public abstract class HijackBag<K,V> implements Bag<K,V> {
+
     public static final AtomicReferenceArray EMPTY_ARRAY = new AtomicReferenceArray(0);
+
     /**
      * max # of times allowed to scan through until either the next item is
      * accepted with final tolerance or gives up.
      * for safety, should be >= 1.0
      */
-    private static final float SCAN_ITERATIONS = 1.1f;
+    private static final float SCAN_ITERATIONS = 1f;
     protected final Random random;
     protected final int reprobes;
-    transient final AtomicReference<AtomicReferenceArray<V>> map;
+    protected transient final AtomicReference<AtomicReferenceArray<V>> map;
     final AtomicInteger size = new AtomicInteger(0);
     final AtomicInteger capacity = new AtomicInteger(0);
     /**
@@ -51,10 +49,10 @@ public abstract class AbstractHijackBag<K,V> implements Bag<K,V> {
     float priMin;
     float priMax;
 
-    public AbstractHijackBag(Random random, int reprobes) {
+    public HijackBag(Random random, int reprobes) {
         this.random = random;
         this.reprobes = reprobes;
-        this.map = new AtomicReference<>();
+        this.map = new AtomicReference<>(EMPTY_ARRAY);
     }
 
     private static int i(int c, int hash) {
@@ -65,11 +63,11 @@ public abstract class AbstractHijackBag<K,V> implements Bag<K,V> {
         return weakestPri <= newPri;
     }
 
-    public static <X,Y> void forEachActive(@NotNull AbstractHijackBag<X,Y> bag, @NotNull Consumer<? super Y> e) {
+    public static <X,Y> void forEachActive(@NotNull HijackBag<X,Y> bag, @NotNull Consumer<? super Y> e) {
         forEachActive(bag, bag.map.get(), e);
     }
 
-    public static <X,Y> void forEachActive(@NotNull AbstractHijackBag<X,Y> bag, @NotNull AtomicReferenceArray<Y> map, @NotNull Consumer<? super Y> e) {
+    public static <X,Y> void forEachActive(@NotNull HijackBag<X,Y> bag, @NotNull AtomicReferenceArray<Y> map, @NotNull Consumer<? super Y> e) {
         forEach(map, bag::active, e);
     }
 
@@ -97,7 +95,7 @@ public abstract class AbstractHijackBag<K,V> implements Bag<K,V> {
 
         if (capacity.getAndSet(newCapacity)!=newCapacity) {
 
-            List<V> removed = $.newArrayList();
+            List<V> removed = new FasterList();
 
             final AtomicReferenceArray<V>[] prev = new AtomicReferenceArray[1];
 
@@ -305,9 +303,11 @@ public abstract class AbstractHijackBag<K,V> implements Bag<K,V> {
 
     private boolean hijackSoftmax(float newPri, float oldPri) {
 
-        boolean oldPriThresh = oldPri > Param.BUDGET_EPSILON;
+        float priEpsilon = priEpsilon();
+
+        boolean oldPriThresh = oldPri > priEpsilon;
         if (!oldPriThresh) {
-            boolean newPriThresh = newPri > Param.BUDGET_EPSILON;
+            boolean newPriThresh = newPri > priEpsilon;
             if (newPriThresh)
                 return true;
             else
@@ -364,8 +364,8 @@ public abstract class AbstractHijackBag<K,V> implements Bag<K,V> {
      */
     private float range(float p) {
         if (p != p)
-            throw new Budget.BudgetException();
-            //return p;
+            throw new RuntimeException("NaN prioritization");
+
         if (p > priMax) priMax = p;
         if (p < priMin) priMin = p;
         return p;
@@ -398,7 +398,7 @@ public abstract class AbstractHijackBag<K,V> implements Bag<K,V> {
 
     @Nullable
     @Override
-    public AbstractHijackBag<K,V> sample(int n, @NotNull Predicate<? super V> target) {
+    public HijackBag<K,V> sample(int n, @NotNull Predicate<? super V> target) {
         AtomicReferenceArray<V> map = this.map.get();
         int c = map.length();
         if (c == 0)
@@ -500,15 +500,22 @@ public abstract class AbstractHijackBag<K,V> implements Bag<K,V> {
 
     @Override
     @Deprecated public Bag<K,V> commit() {
-        return commit((b)-> Forget.forget(
-                b.size(), pressure, mass, this::forget));
+        return commit((b)-> Bag.forget(
+                b.size(), pressure, mass, temperature(), priEpsilon(), this::forget));
     }
 
-    abstract Consumer<V> forget(float rate);
+    protected float temperature() {
+        return 0.5f;
+    }
+    protected float priEpsilon() {
+        return Float.MIN_VALUE;
+    }
+
+    protected abstract Consumer<V> forget(float rate);
 
     @NotNull
     @Override
-    public AbstractHijackBag<K,V> commit(Function<Bag<K,V>, Consumer<V>> update) {
+    public HijackBag<K,V> commit(Function<Bag<K,V>, Consumer<V>> update) {
 
 
         final float[] mass = {0};
@@ -554,7 +561,7 @@ public abstract class AbstractHijackBag<K,V> implements Bag<K,V> {
     }
 
     @NotNull
-    public AbstractHijackBag<K,V> update(@Nullable Consumer<V> each) {
+    public HijackBag<K,V> update(@Nullable Consumer<V> each) {
 
         if (each != null) {
             this.pressure = 0;
@@ -564,6 +571,26 @@ public abstract class AbstractHijackBag<K,V> implements Bag<K,V> {
         return this;
     }
 
+    /*private static int i(int c, int hash, int r) {
+        return (int) ((Integer.toUnsignedLong(hash) + r) % c);
+    }*/
 
+
+    //    /**
+//     * beam width (tolerance range)
+//     * searchProgress in range 0..1.0
+//     */
+//    private static float tolerance(int j, int jLimit, int b, int batchSize, int cap) {
+//
+//        float searchProgress = ((float) j) / jLimit;
+//        //float selectionRate =  ((float)batchSize)/cap;
+//
+//        /* raised polynomially to sharpen the selection curve, growing more slowly at the beginning */
+//        return Util.sqr(Util.sqr(searchProgress * searchProgress));// * searchProgress);
+//
+//        /*
+//        float exp = 6;
+//        return float) Math.pow(searchProgress, exp);// + selectionRate;*/
+//    }
 
 }

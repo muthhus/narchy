@@ -10,7 +10,7 @@ import nars.attention.Forget;
 import nars.bag.impl.ArrayBag;
 import jcog.bag.Bag;
 import nars.bag.Bagregate;
-import nars.bag.impl.HijackBag;
+import nars.bag.impl.BLinkHijackBag;
 import nars.budget.BudgetMerge;
 import nars.concept.Concept;
 import nars.conceptualize.DefaultConceptBuilder;
@@ -20,7 +20,6 @@ import nars.index.term.map.CaffeineIndex;
 import nars.budget.BLink;
 import nars.budget.RawBLink;
 import nars.nar.Default;
-import nars.nar.NARBuilder;
 import nars.op.Leak;
 import nars.op.mental.Compressor;
 import nars.op.mental.Inperience;
@@ -188,8 +187,8 @@ abstract public class NAgents extends NAgent {
         DefaultConceptBuilder cb = new DefaultConceptBuilder() {
             @Override
             public <X> X withBags(Term t, BiFunction<Bag<Term, BLink<Term>>, Bag<Task, BLink<Task>>, X> f) {
-                Bag<Term, BLink<Term>> termlink = new HijackBag(reprobes, BudgetMerge.orBlend, rng );
-                Bag<Task, BLink<Task>> tasklink = new HijackBag(reprobes, BudgetMerge.orBlend, rng );
+                Bag<Term, BLink<Term>> termlink = new BLinkHijackBag(reprobes, BudgetMerge.orBlend, rng );
+                Bag<Task, BLink<Task>> tasklink = new BLinkHijackBag(reprobes, BudgetMerge.orBlend, rng );
                 return f.apply(termlink, tasklink);
             }
         };
@@ -231,8 +230,8 @@ abstract public class NAgents extends NAgent {
             }
 
             @Override
-            protected HijackBag<Concept> newConceptBag(int activeConcepts) {
-                return new HijackBag<>(activeConcepts, reprobes, BudgetMerge.plusBlend, random ) {
+            protected BLinkHijackBag<Concept> newConceptBag(int activeConcepts) {
+                return new BLinkHijackBag<>(activeConcepts, reprobes, BudgetMerge.plusBlend, random ) {
                     @Override
                     public Forget forget(float rate) {
                         float memoryForget = 0.98f;
