@@ -121,7 +121,7 @@ public class BeliefTableTest  {
 
         b.believe(1.0f, 0.5f); n.next();
         b.print();
-        assertEquals(0.79, beliefs.matchEternal().conf(), 0.01);
+        assertEquals(0.79, beliefs.matchEternal().conf(), 0.02);
         assertEquals(7, beliefs.size());
 
         //n.step();
