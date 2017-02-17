@@ -164,6 +164,13 @@ public interface Bag<K,V> extends Table<K, V>, Iterable<V> {
     /** returns the priority of a value, or NaN if such entry is not present */
     float pri(@NotNull V key);
 
+    default boolean active(@NotNull V key) {
+        return priSafeOrNeg1(key) >= 0;
+    }
+
+    default float priSafeOrZero(@NotNull V key) { return priSafe(key, 0);     }
+    default float priSafeOrNeg1(@NotNull V key) { return priSafe(key, -1);     }
+
     default float priSafe(@NotNull V key, float valueIfMissing) {
         float p = pri(key);
         return (p==p) ? p : valueIfMissing;
@@ -393,29 +400,18 @@ public interface Bag<K,V> extends Table<K, V>, Iterable<V> {
 
         @Nullable
         @Override
-        public PLink sample() {
+        public Object sample() {
             return null;
         }
 
         @Nullable
         @Override
-        public PLink remove(@NotNull Object x) {
+        public Object remove(@NotNull Object x) {
             return null;
         }
 
         @Override
-        public PLink put(@NotNull Object b, float scale, @Nullable MutableFloat overflowing) {
-            return null;
-        }
-
-
-        @Override public PLink add(Object c, float x) {
-            return null;
-        }
-
-
-        @Override
-        public PLink mul(Object key, float boost) {
+        public Object put(@NotNull Object b, float scale, @Nullable MutableFloat overflowing) {
             return null;
         }
 
@@ -426,7 +422,7 @@ public interface Bag<K,V> extends Table<K, V>, Iterable<V> {
 
         @NotNull
         @Override
-        public Iterator<PLink> iterator() {
+        public Iterator iterator() {
             return Collections.emptyIterator();
         }
 
@@ -502,12 +498,6 @@ public interface Bag<K,V> extends Table<K, V>, Iterable<V> {
         forEach(b -> each.accept(key(b)));
     }
 
-
-    /** if key is present, adds a priority amount (quality unaffected) */
-    @Nullable V add(Object key, float toAdd);
-
-    /** if key is present, applies a priority multiplier factor, and returns the link */
-    @Nullable V mul(Object key, float factor);
 
     /** samples and removes the sampled item. returns null if bag empty, or for some other reason the sample did not succeed  */
     @Nullable default V pop() {

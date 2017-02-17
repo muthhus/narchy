@@ -31,7 +31,7 @@ public class Forget<X> implements Consumer<BLink<X>> {
     }
 
     @Nullable
-    public static <X> Consumer<BLink<X>> forget(int s, float p, float m, FloatToObjectFunction<Consumer<BLink<X>>> f) {
+    public static <X> Consumer<X> forget(int s, float p, float m, FloatToObjectFunction<Consumer<X>> f) {
 
         float r = p > 0 ?
                 -((s * Param.BAG_THRESHOLD) - p - m) / m :

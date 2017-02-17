@@ -326,6 +326,7 @@ public abstract class STMClustered extends STM {
 
             @Override
             public void onRemoved(@NotNull BLink<Task> value) {
+                super.onRemoved(value);
                 drop((TLink) value);
             }
 

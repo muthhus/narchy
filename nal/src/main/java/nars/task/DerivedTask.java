@@ -4,6 +4,7 @@ import jcog.Util;
 import nars.NAR;
 import nars.Param;
 import nars.Task;
+import nars.budget.BLink;
 import nars.budget.Budget;
 import nars.budget.DependentBLink;
 import nars.budget.RawBLink;
@@ -11,6 +12,7 @@ import nars.concept.Concept;
 import nars.premise.Derivation;
 import nars.premise.Premise;
 import nars.term.Compound;
+import nars.term.Term;
 import nars.term.Termed;
 import nars.truth.Truth;
 import nars.truth.TruthDelta;
@@ -226,13 +228,13 @@ abstract public class DerivedTask extends MutableTask {
                 @Nullable Premise premise1 = this.premise;
                 if (premise1 != null) {
 
-                    float b = boost;
+                    nar.activate(premise1.concept, boost);
 
-                    nar.activate(premise1.concept, b);
+                    BLink<Term> b = new RawBLink(premise1.term, boost, 0.5f);
 
                     Concept c = nar.concept(premise1.concept);
                     if (c != null) {
-                        c.termlinks().add(premise1.term, b);
+                        c.termlinks().put(b);
                         //c.tasklinks().boost(premise.task, score);
                         //nar.concept(c.term(), b);
                     }

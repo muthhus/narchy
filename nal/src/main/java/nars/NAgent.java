@@ -576,7 +576,7 @@ abstract public class NAgent implements NSense, NAction {
 
             }
 
-            boost(action, actionBoost);
+            //boost(action, actionBoost);
         }
     }
 
@@ -654,25 +654,25 @@ abstract public class NAgent implements NSense, NAction {
         return Math.min(1f, ((float) avgActionDesire.getMean()));
     }
 
-    @Nullable
-    protected Concept boost(Concept c, float amount) {
-
-        //HACK
-        if (nar instanceof Default) {
-            ((Default) nar).core.active.add(c, amount);
-        }
-
-//        new Activation(boostBudget, c, nar, 1) {
+//    @Nullable
+//    protected Concept boost(Concept c, float amount) {
 //
-//            @Override
-//            public void commit(float scale) {
-//                linkTermLinks(c, scale); //activate all termlinks of this concept
-//                super.commit(scale);
-//            }
-//        };
-
-        return c;
-    }
+//        //HACK
+//        if (nar instanceof Default) {
+//            ((Default) nar).core.active.add(c, amount);
+//        }
+//
+////        new Activation(boostBudget, c, nar, 1) {
+////
+////            @Override
+////            public void commit(float scale) {
+////                linkTermLinks(c, scale); //activate all termlinks of this concept
+////                super.commit(scale);
+////            }
+////        };
+//
+//        return c;
+//    }
 
 
     private MutableTask boost(@NotNull MutableTask t, float p, float dur, float lookAhead /* in multiples of dur */) {

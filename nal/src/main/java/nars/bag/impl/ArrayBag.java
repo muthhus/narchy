@@ -238,45 +238,6 @@ public class ArrayBag<X> extends SortedListTable<X, BLink<X>> implements Bag<X,B
         return s;
     }
 
-    @Nullable
-    @Override
-    public BLink<X> add(Object key, float toAdd) {
-        BLink<X> c = map.get(key);
-        if (c != null && !c.isDeleted()) {
-            //float dur = c.dur();
-            float pBefore = c.priSafe(0);
-            c.setPriority(pBefore + toAdd);
-            float delta = c.pri() - pBefore;
-            pressure += delta;// * dur;
-
-            update(null, false);
-
-            return c;
-        }
-        return null;
-    }
-
-    @Override
-    public BLink<X> mul(Object key, float factor) {
-        BLink<X> c = map.get(key);
-        if (c != null) {
-            float pBefore = c.pri();
-            if (pBefore != pBefore)
-                return null; //already deleted
-
-            if (c.priMult(factor)==null) {
-                return null;
-            }
-            float delta = c.pri() - pBefore;
-            pressure += delta;// * dur;
-
-            update(null, false);
-
-            return c;
-        }
-        return null;
-
-    }
 
     @Override
     public final float rank(BLink x) {

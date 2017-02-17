@@ -139,17 +139,7 @@ public class BagAdapter<X> implements Bag<X,BLink<X>> {
         return this;
     }
 
-    @Nullable
-    @Override
-    public BLink<X> add(Object key, float toAdd) {
-        return bag.add(key, toAdd);
-    }
 
-    @Nullable
-    @Override
-    public BLink<X> mul(Object key, float factor) {
-        return bag.mul(key, factor);
-    }
 
     @Override
     public void onAdded(BLink<X> v) {

@@ -66,7 +66,7 @@ public class BagTest {
         c.put(new RawBLink("x", 0, 0f));
         c.commit();
 
-        assertEquals(c.size(), 1);
+        assertEquals(1, c.size());
 
 
         assertEquals(0, c.priMin(), 0.001f);
@@ -191,7 +191,7 @@ public class BagTest {
         a.put(new RawBLink("y",0.1f, 0.5f));
         a.put(new RawBLink("y",0.1f, 0.5f), 0.5f, null);
         a.put(new RawBLink("y",0.1f, 0.5f), 0.25f, null);
-        a.commit();
+        //a.commit();
 
         assertEquals(0.175, a.get("y").pri(), 0.001f);
 
