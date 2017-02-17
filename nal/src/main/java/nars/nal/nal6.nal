@@ -78,8 +78,10 @@
 //      Reasoning about temporal statements. those are using the ==> relation because relation in time is a relation of the truth between statements.
 
 
-    B, (A ==> C), task(positive), time(decomposeBelief) |- subIfUnifiesAny(C,A,B), (Belief:Deduction, Goal:Induction)
-        B, ((--,%A) ==> C), task(negative), time(decomposeBelief) |- subIfUnifiesAny(C,A,B), (Belief:DeductionN, Goal:InductionN)
+    B, (A ==> C), task(positive), belief(positive), time(decomposeBelief) |- subIfUnifiesAny(C,A,B), (Belief:Deduction, Goal:Induction)
+        B, (A ==> C), task(positive), belief(negative), time(decomposeBelief) |- (--,subIfUnifiesAny(C,A,B)), (Belief:DeductionPN, Goal:InductionPN)
+    B, ((--,%A) ==> C), task(negative), belief(positive), time(decomposeBelief) |- subIfUnifiesAny(C,A,B), (Belief:DeductionN, Goal:InductionN)
+        B, ((--,%A) ==> C), task(negative), belief(negative), time(decomposeBelief) |- (--,subIfUnifiesAny(C,A,B)), (Belief:DeductionNN, Goal:InductionNN)
 
     B, (C ==> A), belief(positive), time(decomposeBelief) |- subIfUnifiesAny(C,A,B), (Belief:Abduction, Goal:Deduction)
         B, (C ==> A), belief(negative), time(decomposeBelief) |- (--,subIfUnifiesAny(C,A,B)), (Belief:AbductionPN, Goal:DeductionPN)

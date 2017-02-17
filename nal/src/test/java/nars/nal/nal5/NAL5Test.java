@@ -74,6 +74,30 @@ public class NAL5Test extends AbstractNALTest {
     }
 
 
+    @Test public void testImplBeliefPosPos() {
+        //B, (A ==> C), belief(positive) |- subIfUnifiesAny(C,A,B), (Belief:Deduction, Goal:Induction)
+        test()
+            .believe("(b)")
+            .believe("((b)==>(c))",1,0.9f)
+            .mustBelieve(cycles,"(c)",1.00f,0.81f);
+    }
+//    @Test public void testImplBeliefNegPos() {
+//        //B, (A ==> C), belief(positive) |- subIfUnifiesAny(C,A,B), (Belief:Deduction, Goal:Induction)
+//        test()
+//                .log()
+//                .believe("(--,(b))")
+//                .believe("((b)==>(c))",1,0.9f)
+//                .mustNotOutput(cycles,"(c)",'.');
+//    }
+
+    @Test public void testImplBeliefPosNeg() {
+        //B, (A ==> C), belief(negative) |- subIfUnifiesAny(C,A,B), (Belief:Deduction, Goal:Induction)
+        test()
+                .believe("(b)")
+                .believe("((b) ==> --(c))",1,0.9f)
+                .mustBelieve(cycles,"(c)",0.00f,0.81f);
+    }
+
     @Test
     public void detachment(){
         TestNAR tester = test();
@@ -471,7 +495,7 @@ public class NAL5Test extends AbstractNALTest {
 //    }
 
 
-    @Test public void testNegPosImplicationSubj() {
+    @Test public void testImplNegPos() {
         test()
                 .input("(x). %0.0;0.90%")
                 .input("((--,(x)) ==> (y)).")
@@ -479,6 +503,15 @@ public class NAL5Test extends AbstractNALTest {
                 .mustNotOutput(cycles, "(y)", '.', 0f, 0.5f, 0, 1, ETERNAL)
         ;
     }
+    @Test public void testImplNegNeg() {
+        test()
+                .input("(x). %0.0;0.90%")
+                .input("((--,(x)) ==> (--,(y))).")
+                .mustBelieve(cycles, "(y)", 0.0f, 0.81f)
+                .mustNotOutput(cycles, "(y)", '.', 0.5f, 1f, 0, 1, ETERNAL)
+        ;
+    }
+
     @Test public void testNegPosImplicationPred() {
         test()
                 //.log()
