@@ -22,7 +22,7 @@ public abstract class Param /*extends Container*/  {
 
     /** absolute limit for constructing terms in any context in which a NAR is not known, which could provide a limit.
      * typically a NAR instance's 'compoundVolumeMax' parameter will be lower than this */
-    public static final int COMPOUND_VOLUME_MAX = 96;
+    public static final int COMPOUND_VOLUME_MAX = 127;
 
     /** number of cycles for rolling average of busy emotion */
     public static final int BUSY_WINDOW = 4;
@@ -131,7 +131,7 @@ public abstract class Param /*extends Container*/  {
     /**
      * minimum difference necessary to indicate a significant modification in budget float number components
      */
-    public static final float BUDGET_EPSILON = 0.001f;
+    public static final float BUDGET_EPSILON = 0.0001f;
 
 
     public static final int DEFAULT_WIRED_CONCEPT_BELIEFS = 16;

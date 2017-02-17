@@ -123,10 +123,10 @@ abstract public class NAgents extends NAgent {
 
     public static NAR runRT(Function<NAR, NAgents> init, float fps, int durFrames, int endTime) {
 
-        Time clock = new RealTime.DS(true).dur(durFrames / fps);
+        Time clock = new RealTime.CS(true).dur(durFrames / fps);
         NAR nar =
                 //new TaskNAR(32 * 1024, new MultiThreadExecutioner(4, 4 * 1024), clock);
-                NAgents.newMultiThreadNAR(3, clock, false);
+                NAgents.newMultiThreadNAR(4, clock, false);
         //NAR nar = newNAR();
         //NAR nar = newAlann(durFrames/fps);
 
@@ -176,34 +176,34 @@ abstract public class NAgents extends NAgent {
         Random rng = new XorShift128PlusRandom(1);
         final Executioner exe =
                 //new SingleThreadExecutioner();
-                new MultiThreadExecutioner(threads, 4096 /* TODO chose a power of 2 number to scale proportionally to # of threads */)
+                new MultiThreadExecutioner(threads, 16384 /* TODO chose a power of 2 number to scale proportionally to # of threads */)
                     //.sync(false)
                 ;
 
-        int conceptsPerCycle = 96*threads;
+        int conceptsPerCycle = 48*threads;
 
         final int reprobes = 4;
 
         //Multi nar = new Multi(3,512,
         DefaultConceptBuilder cb = new DefaultConceptBuilder() {
-            @Override
+            /*@Override
             public <X> X withBags(Term t, BiFunction<Bag<Term, BLink<Term>>, Bag<Task, BLink<Task>>, X> f) {
                 Bag<Term, BLink<Term>> termlink = new BLinkHijackBag(reprobes, BudgetMerge.orBlend, rng );
                 Bag<Task, BLink<Task>> tasklink = new BLinkHijackBag(reprobes, BudgetMerge.orBlend, rng );
                 return f.apply(termlink, tasklink);
-            }
+            }*/
         };
 
-        Default nar = new Default(1 * 1024,
+        Default nar = new Default(16 * 1024,
                 conceptsPerCycle, 1, 3, rng,
-                new CaffeineIndex(cb, 32*1024, false, exe)
+                new CaffeineIndex(cb, 64*1024, false, exe)
                 //new TreeTermIndex.L1TreeIndex(new DefaultConceptBuilder(), 300000, 32 * 1024, 3)
                 ,
                 time,
                 exe) {
 
-            final Compressor compressor = new Compressor(this, "_", 2, 5,
-                    1f, 64, 768);
+            final Compressor compressor = new Compressor(this, "_", 2, 8,
+                    1f, 16, 256);
 
             @Override
             public Task pre(@NotNull Task t) {
@@ -247,13 +247,13 @@ abstract public class NAgents extends NAgent {
 
         float p = 0.75f;
         nar.DEFAULT_BELIEF_PRIORITY = 0.5f * p;
-        nar.DEFAULT_GOAL_PRIORITY = 0.75f * p;
-        nar.DEFAULT_QUESTION_PRIORITY = 0.25f * p;
-        nar.DEFAULT_QUEST_PRIORITY = 0.25f * p;
+        nar.DEFAULT_GOAL_PRIORITY = 0.6f * p;
+        nar.DEFAULT_QUESTION_PRIORITY = 0.4f * p;
+        nar.DEFAULT_QUEST_PRIORITY = 0.4f * p;
 
-        nar.confMin.setValue(0.01f);
-        //nar.truthResolution.setValue(0.01f);
-        nar.termVolumeMax.setValue(90);
+        nar.confMin.setValue(0.05f);
+        nar.truthResolution.setValue(0.05f);
+        nar.termVolumeMax.setValue(72);
 
         MySTMClustered stm = new MySTMClustered(nar, 64, '.', 3, true, 6);
         MySTMClustered stmGoal = new MySTMClustered(nar, 32, '!', 2, true, 4);

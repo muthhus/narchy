@@ -72,7 +72,7 @@
 
     (P --> S), (S --> P),                                     task("?") |- (P --> S),   (Belief:Conversion, Punctuation:Belief)
     (P ==> S), (S ==> P), time(dtCombine),                    task("?") |- (P ==>+- S), (Belief:Conversion, Punctuation:Belief)
-    (P ==> S), ((--,%S) ==> P), time(dtCombine),              task("?") |- --(P ==>+- S), (Belief:Conversion, Punctuation:Belief)
+    (P ==> S), ((--,%S) ==> P), time(dtCombine),              task("?") |- (--,(P ==>+- S)), (Belief:Conversion, Punctuation:Belief)
     (P ==> S), (S ==> P), belief(negative), time(dtCombine),  task("?") |- ((--,%P) ==>+- S), (Belief:ConversionPN, Punctuation:Belief)
 
 //and the backward inference driven forward inference:

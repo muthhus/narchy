@@ -1,5 +1,6 @@
 package nars.conceptualize;
 
+import jcog.bag.impl.HijackBag;
 import jcog.map.SynchronizedHashMap;
 import jcog.map.SynchronizedUnifiedMap;
 import nars.$;
@@ -7,6 +8,7 @@ import nars.NAR;
 import nars.Op;
 import nars.Task;
 import jcog.bag.Bag;
+import nars.bag.impl.BLinkHijackBag;
 import nars.bag.impl.CurveBag;
 import nars.budget.BLink;
 import nars.budget.BudgetMerge;
@@ -45,8 +47,8 @@ public class DefaultConceptBuilder implements ConceptBuilder {
 
     public DefaultConceptBuilder() {
         this(
-            new DefaultConceptState("sleep", 12, 12, 2, 16, 8),
-            new DefaultConceptState("awake", 14, 14, 3, 24, 12)
+            new DefaultConceptState("sleep", 12, 12, 6, 16, 8),
+            new DefaultConceptState("awake", 14, 14, 6, 24, 12)
         );
     }
 
@@ -86,14 +88,17 @@ public class DefaultConceptBuilder implements ConceptBuilder {
         Map sharedMap = newBagMap(t.volume());
         @NotNull Bag<Term,BLink<Term>> termbag = newBag(sharedMap);
         @NotNull Bag<Task,BLink<Task>> taskbag = newBag(sharedMap);
+
+
+//        @NotNull Bag<Term,BLink<Term>> termbag = new BLinkHijackBag<>(3, BudgetMerge.maxBlend, nar.random);
+//        @NotNull Bag<Task,BLink<Task>> taskbag = new BLinkHijackBag<>(3, BudgetMerge.maxBlend, nar.random);
+
         return f.apply(termbag, taskbag);
     }
 
     @Nullable
     final Concept newConcept(@NotNull Compound t) {
 
-//        @NotNull Bag<Term,BLink<Term>> termbag = new HijackBag<>(3, BudgetMerge.maxBlend, nar.random);
-//        @NotNull Bag<Task,BLink<Task>> taskbag = new HijackBag<>(3, BudgetMerge.maxBlend, nar.random);
 
         return withBags(t, (termbag, taskbag) -> {
 
@@ -347,7 +352,7 @@ public class DefaultConceptBuilder implements ConceptBuilder {
 //            //ConcurrentHashMapUnsafe(cap);
 //        } else {
 //            return new HashMap(defaultInitialCap, 1f);
-            if (volume < 6) {
+            if (volume < 3) {
                 return new ConcurrentHashMap(8);
             } else if (volume < 13){
                 return new SynchronizedHashMap(2, loadFactor);

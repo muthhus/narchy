@@ -15,7 +15,7 @@ import java.nio.file.Paths;
 
 public class Arkancide extends NAgents {
 
-    static boolean cam;
+    static boolean cam = true;
 
     private final float paddleSpeed = 1f;
 
@@ -33,7 +33,7 @@ public class Arkancide extends NAgents {
     private float prevScore;
 
     public static void main(String[] args) throws IOException {
-        Param.DEBUG = true;
+        Param.DEBUG = false;
 
         //runRT(Arkancide::new);
         //nRT(Arkancide::new, 25, 5);
@@ -49,7 +49,7 @@ public class Arkancide extends NAgents {
 
             return agent;
 
-        }, 20, 5, 50000);
+        }, 30, 10, 50000);
 
 
         Path f = Files.createTempFile(Paths.get("/tmp"), "arkancide", ".nal");

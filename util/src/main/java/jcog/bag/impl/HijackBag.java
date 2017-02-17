@@ -425,6 +425,8 @@ public abstract class HijackBag<K,V> implements Bag<K,V> {
         //randomly choose traversal direction
         boolean di = random.nextBoolean();
 
+        float tolerance = 0, toleranceInc = priRange / jLimit;
+
         while ((n > 0) && (j < jLimit) /* prevent infinite looping */) {
 
             V v = map.get(i);
@@ -442,7 +444,7 @@ public abstract class HijackBag<K,V> implements Bag<K,V> {
 
                     float r = curve() * priRange + priMin; //randomized threshold
 
-                    if ((r < p) /*|| (r < p + tolerance(j, jLimit, n, batchSize, c))*/) {
+                    if ((r < p + tolerance) /*|| (r < p + tolerance(j, jLimit, n, batchSize, c))*/) {
                         if (target.test(v)) {
                             n--;
                         }
@@ -456,7 +458,9 @@ public abstract class HijackBag<K,V> implements Bag<K,V> {
 //                    }
                 }
             }
+
             j++;
+            tolerance += toleranceInc;
         }
 
         return this;
