@@ -2,8 +2,8 @@ package nars.table;
 
 import nars.NAR;
 import nars.Task;
+import jcog.bag.Prioritized;
 import nars.budget.Budget;
-import nars.budget.Prioritized;
 import nars.concept.CompoundConcept;
 import nars.concept.dynamic.DynamicBeliefTable;
 import nars.task.AnswerTask;

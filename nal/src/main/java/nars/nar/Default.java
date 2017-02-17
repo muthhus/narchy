@@ -2,15 +2,15 @@ package nars.nar;
 
 import jcog.data.random.XorShift128PlusRandom;
 import nars.NAR;
-import nars.bag.Bag;
-import nars.bag.CurveBag;
+import jcog.bag.Bag;
+import nars.bag.impl.CurveBag;
+import nars.budget.BLink;
 import nars.concept.Concept;
 import nars.conceptualize.DefaultConceptBuilder;
 import nars.control.ConceptBagControl;
 import nars.derive.DefaultDeriver;
 import nars.index.term.TermIndex;
 import nars.index.term.map.MapTermIndex;
-import nars.link.BLink;
 import nars.op.stm.STMTemporalLinkage;
 import nars.time.FrameTime;
 import nars.time.Time;

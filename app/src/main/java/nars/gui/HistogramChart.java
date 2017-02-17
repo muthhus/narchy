@@ -4,7 +4,7 @@ import com.jogamp.opengl.GL2;
 import jcog.Util;
 import nars.NAR;
 import nars.concept.Concept;
-import nars.link.BLink;
+import nars.budget.BLink;
 import nars.nar.Default;
 import org.eclipse.collections.api.block.function.primitive.FloatFunction;
 import spacegraph.Surface;
@@ -38,7 +38,7 @@ public class HistogramChart extends Surface {
         this.light = light;
 
         nar.onCycle(nn -> {
-            ((Default) nn).conceptsActive().forEach(c -> {
+            nn.conceptsActive().forEach(c -> {
                 float p = meter.floatValueOf(c);
                 int b = Util.bin(p, bins - 1);
                 data[b]++;

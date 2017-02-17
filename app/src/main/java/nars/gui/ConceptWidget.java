@@ -2,10 +2,10 @@ package nars.gui;
 
 import com.jogamp.opengl.GL2;
 import nars.NAR;
-import nars.bag.ArrayBag;
+import nars.bag.impl.ArrayBag;
 import nars.budget.BudgetMerge;
 import nars.concept.Concept;
-import nars.link.BLink;
+import nars.budget.BLink;
 import nars.term.Term;
 import nars.term.Termed;
 import org.jetbrains.annotations.NotNull;
@@ -33,7 +33,7 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<BLink<? exte
 
     //caches a reference to the current concept
     public Concept concept;
-    private ConceptVis conceptVis = new ConceptVis2();
+    private final ConceptVis conceptVis = new ConceptVis2();
     private transient ConceptsSpace space;
 
     private static final float bagMomentum = 0.5f;
@@ -323,6 +323,7 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<BLink<? exte
         final float maxSize = 6f;
 
 
+        @Override
         public void apply(ConceptWidget conceptWidget, Term tt) {
             float p = conceptWidget.space.nar.pri(tt, Float.NaN);
             p = (p == p) ? p : 0;// = 1; //pri = key.priIfFiniteElseZero();
@@ -340,6 +341,7 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<BLink<? exte
         final float minSize = 2f;
         final float maxSize = 8f;
 
+        @Override
         public void apply(ConceptWidget conceptWidget, Term tt) {
             ConceptsSpace space = conceptWidget.space;
             NAR nar = space.nar;

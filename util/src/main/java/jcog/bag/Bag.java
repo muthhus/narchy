@@ -1,11 +1,7 @@
-package nars.bag;
+package jcog.bag;
 
 import jcog.Util;
 import jcog.table.Table;
-import nars.Param;
-import nars.attention.Forget;
-import nars.link.BLink;
-import nars.link.PLink;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -20,12 +16,8 @@ import java.util.function.Predicate;
 
 /**
  * K=key, V = item/value of type Item
- * <p>
- * TODO remove unnecessary methods, documetn
- * TODO implement java.util.Map interface
  */
-public interface Bag<K,V extends PLink<K>> extends Table<K, V>, Iterable<V> {
-
+public interface Bag<K,V> extends Table<K, V>, Iterable<V> {
 
     /**
      * returns the bag to an empty state
@@ -38,7 +30,7 @@ public interface Bag<K,V extends PLink<K>> extends Table<K, V>, Iterable<V> {
      * the bag is cycled so that subsequent elements are different.
      */
     @Nullable default V sample() {
-        PLink[] result = new PLink[1];
+        Object[] result = new Object[1];
         sample(1, (x) -> { result[0] = x; return true; } );
         return (V) result[0];
     }
@@ -80,17 +72,7 @@ public interface Bag<K,V extends PLink<K>> extends Table<K, V>, Iterable<V> {
 
 
 
-    @Deprecated @Override default @Nullable V put(@NotNull K i, @NotNull V b) {
-        assert(b.get().equals(i));
-        return put(i, b, 1f, null);
-    }
-
-
-    default V put(@NotNull V b, float scale, @Nullable MutableFloat overflowing) {
-        return put(b.get(), b, scale, overflowing);
-    }
-
-    @Deprecated V put(@NotNull K i, @NotNull V b, float scale, @Nullable MutableFloat overflowing);
+    @Deprecated V put(@NotNull V b, float scale, @Nullable MutableFloat overflowing);
 
 
 
@@ -179,13 +161,16 @@ public interface Bag<K,V extends PLink<K>> extends Table<K, V>, Iterable<V> {
 
     }
 
-    default float pri(@NotNull Object x, float valueIfMissing) {
-        V y = get(x);
-        if (y==null || y.isDeleted())
-            return valueIfMissing;
-        return y.pri();
+    /** returns the priority of a value, or NaN if such entry is not present */
+    float pri(@NotNull V key);
+
+    default float priSafe(@NotNull V key, float valueIfMissing) {
+        float p = pri(key);
+        return (p==p) ? p : valueIfMissing;
     }
 
+    /** resolves the key associated with a particular value */
+    @NotNull K key(V value);
 
 
 //    /**
@@ -215,7 +200,7 @@ public interface Bag<K,V extends PLink<K>> extends Table<K, V>, Iterable<V> {
     //@Override abstract public void forEach(final Consumer<? super V> action);
     default float priSum() {
         float[] total = {0};
-        forEach(v -> total[0] += v.pri());
+        forEach(v -> total[0] += priSafe(v, 0));
         return total[0];
     }
 
@@ -240,7 +225,7 @@ public interface Bag<K,V extends PLink<K>> extends Table<K, V>, Iterable<V> {
     default float priMin() {
         float[] min = {Float.POSITIVE_INFINITY};
         forEach(b -> {
-            float p = b.pri();
+            float p = priSafe(b, 0);
             if (p < min[0]) min[0] = p;
         });
         return min[0];
@@ -252,7 +237,7 @@ public interface Bag<K,V extends PLink<K>> extends Table<K, V>, Iterable<V> {
     default float priMax() {
         float[] max = {Float.NEGATIVE_INFINITY};
         forEach(b -> {
-            float p = b.pri();
+            float p = priSafe(b, 0);
             if (p > max[0]) max[0] = p;
         });
         return max[0];
@@ -363,7 +348,7 @@ public interface Bag<K,V extends PLink<K>> extends Table<K, V>, Iterable<V> {
     default double[] priHistogram(@NotNull double[] x) {
         int bins = x.length;
         forEach(budget -> {
-            float p = budget.pri();
+            float p = priSafe(budget, 0);
             int b = Util.bin(p, bins - 1);
             x[b]++;
         });
@@ -378,39 +363,15 @@ public interface Bag<K,V extends PLink<K>> extends Table<K, V>, Iterable<V> {
         return x;
     }
 
+    @Deprecated Bag<K,V> commit();
 
 
-    @Deprecated default Bag<K,V> commit() {
-        return commit((b)->{
-            float p = b instanceof ArrayBag ? ((ArrayBag) b).pressure : ((HijackBag)b).pressure; //HACK
-            float m = b instanceof ArrayBag ? ((ArrayBag) b).mass(): ((HijackBag)b).mass; //HACK
-            return forget(b.size(), p, m);
-        });
-    }
-
-    @Nullable
-    default Forget forget(int s, float p, float m) {
-
-        float r = p > 0 ?
-                -((s * Param.BAG_THRESHOLD) - p - m) / m :
-                0;
-
-        //float pressurePlusOversize = pressure + Math.max(0, expectedAvgMass * size - existingMass);
-        //float r = (pressurePlusOversize) / (pressurePlusOversize + existingMass*4f /* momentum*/);
-
-        //System.out.println(pressure + " " + existingMass + "\t" + r);
-        return r >= (Param.BUDGET_EPSILON/s) ? forget(Util.unitize(r)) : null;
-    }
-
-    default Forget forget(float rate) {
-        return new Forget(rate);
-    }
 
     /**
      * commits the next set of changes and updates budgeting
      * @return this bag
      */
-    @NotNull Bag<K,V> commit(Function<Bag,Consumer<BLink>> update);
+    @NotNull Bag<K,V> commit(Function<Bag<K,V>, Consumer<V>> update);
 
 
     @Nullable Bag EMPTY = new Bag() {
@@ -420,31 +381,41 @@ public interface Bag<K,V extends PLink<K>> extends Table<K, V>, Iterable<V> {
 
         }
 
-        @Nullable
         @Override
-        public BLink sample() {
-            return null;
+        public Object key(Object value) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public float pri(@NotNull Object key) {
+            return 0;
         }
 
         @Nullable
         @Override
-        public BLink remove(@NotNull Object x) {
+        public PLink sample() {
+            return null;
+        }
+
+        @Nullable
+        @Override
+        public PLink remove(@NotNull Object x) {
             return null;
         }
 
         @Override
-        public PLink put(@NotNull Object i, @NotNull PLink b, float scale, @Nullable MutableFloat overflowing) {
+        public PLink put(@NotNull Object b, float scale, @Nullable MutableFloat overflowing) {
             return null;
         }
 
 
-        @Override public BLink add(Object c, float x) {
+        @Override public PLink add(Object c, float x) {
             return null;
         }
 
 
         @Override
-        public BLink mul(Object key, float boost) {
+        public PLink mul(Object key, float boost) {
             return null;
         }
 
@@ -455,7 +426,7 @@ public interface Bag<K,V extends PLink<K>> extends Table<K, V>, Iterable<V> {
 
         @NotNull
         @Override
-        public Iterator<BLink> iterator() {
+        public Iterator<PLink> iterator() {
             return Collections.emptyIterator();
         }
 
@@ -499,12 +470,6 @@ public interface Bag<K,V extends PLink<K>> extends Table<K, V>, Iterable<V> {
             return null;
         }
 
-        @Nullable
-        @Override
-        public Object put(@NotNull Object o, @NotNull Object o2) {
-            return null;
-        }
-
         @Override
         public void forEachKey(@NotNull Consumer each) {
 
@@ -520,7 +485,6 @@ public interface Bag<K,V extends PLink<K>> extends Table<K, V>, Iterable<V> {
 
         }
 
-
     };
 
 
@@ -535,7 +499,7 @@ public interface Bag<K,V extends PLink<K>> extends Table<K, V>, Iterable<V> {
 
     @Override
     default void forEachKey(Consumer<? super K> each) {
-        forEach(b -> each.accept(b.get()));
+        forEach(b -> each.accept(key(b)));
     }
 
 
@@ -548,40 +512,8 @@ public interface Bag<K,V extends PLink<K>> extends Table<K, V>, Iterable<V> {
     /** samples and removes the sampled item. returns null if bag empty, or for some other reason the sample did not succeed  */
     @Nullable default V pop() {
         V x = sample();
-        if (x!=null) {
-            K k = x.get();
-            remove(k);
-            return x;
-        }
-        return null;
+        return (x != null) ? remove(key(x)) : null;
     }
-
-//    /** apply a transformation to each value. if the function returns null, it indicates
-//     * the link is to be removed.  if it returns the original value, no change for that link.
-//     * changes are buffered until after list iteration completes.
-//     */
-//    default void compute(@NotNull Function<V,V> o) {
-//        List<V[]> changed = $.newArrayList(size());
-//        forEach(x -> {
-//            V y;
-//
-//            if (x.isDeleted())
-//                y = null;
-//            else
-//                y = o.apply(x);
-//
-//           if (y!=x) {
-//               changed.add(new BLink[]{ x, y });
-//           }
-//        });
-//        for (V[] c : changed) {
-//            remove(c[0].get());
-//
-//            V toAdd = c[1];
-//            if (toAdd!=null)
-//                putLink(toAdd);
-//        }
-//    }
 
     default Bag<K,V> copy(@NotNull Bag target, int limit) {
         return this.sample(limit, t -> {
@@ -595,14 +527,15 @@ public interface Bag<K,V extends PLink<K>> extends Table<K, V>, Iterable<V> {
         return this;
     }
 
-    default boolean putIfAbsent(V b) {
-        K x = b.get();
-        if (contains(x))
-            return false;
-        if (put(b, 1f, null)==null)
-            return false;
-        return true;
-    }
+//    default boolean putIfAbsent(V b) {
+//        K x = b.get();
+//        if (contains(x))
+//            return false;
+//        if (put(b, 1f, null)==null)
+//            return false;
+//        return true;
+//    }
+
 
 
     //TODO default @NotNull Bag<V> move(int limit, @NotNull Bag target) {

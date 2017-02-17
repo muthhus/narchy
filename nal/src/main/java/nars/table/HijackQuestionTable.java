@@ -3,10 +3,10 @@ package nars.table;
 import com.google.common.collect.Iterators;
 import nars.NAR;
 import nars.Task;
-import nars.bag.HijackBag;
+import nars.bag.impl.HijackBag;
+import nars.budget.BLink;
 import nars.budget.BudgetMerge;
-import nars.link.BLink;
-import nars.link.DependentBLink;
+import nars.budget.DependentBLink;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

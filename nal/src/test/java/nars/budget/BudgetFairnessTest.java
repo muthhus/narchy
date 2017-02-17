@@ -4,7 +4,6 @@ import jcog.math.MultiStatistics;
 import nars.Control;
 import nars.Op;
 import nars.concept.Concept;
-import nars.link.BLink;
 import nars.nar.Default;
 import nars.term.Term;
 import nars.term.Termed;

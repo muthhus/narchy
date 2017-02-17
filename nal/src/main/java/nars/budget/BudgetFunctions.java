@@ -20,9 +20,7 @@
  */
 package nars.budget;
 
-import jcog.Util;
 import nars.Task;
-import nars.term.Termed;
 import nars.truth.Truthed;
 import nars.util.UtilityFunctions;
 import org.jetbrains.annotations.NotNull;

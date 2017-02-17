@@ -1,10 +1,12 @@
-package nars.bag;
+package nars.bag.impl;
 
 import nars.$;
 import nars.Param;
+import nars.attention.Forget;
+import jcog.bag.Bag;
+import nars.budget.BLink;
 import nars.budget.Budget;
 import nars.budget.BudgetMerge;
-import nars.link.BLink;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.eclipse.collections.impl.map.mutable.ConcurrentHashMapUnsafe;
 import org.jetbrains.annotations.NotNull;
@@ -74,6 +76,18 @@ public class HijackBag<X> implements Bag<X,BLink<X>> {
         this.map.set(EMPTY_ARRAY);
     }
 
+    @Override
+    public float pri(@NotNull BLink<X> key) {
+        return key.pri();
+    }
+
+    @NotNull
+    @Override
+    public X key(BLink<X> value) {
+        return value.get();
+    }
+
+    @Override
     public boolean setCapacity(int newCapacity) {
 
 
@@ -313,7 +327,7 @@ public class HijackBag<X> implements Bag<X,BLink<X>> {
 
 
     @Override
-    public BLink<X> put(@NotNull X x, @NotNull BLink<X> bb, float scale, /* TODO */ @Nullable MutableFloat overflowing) {
+    public BLink<X> put(@NotNull BLink<X> bb, float scale, /* TODO */ @Nullable MutableFloat overflowing) {
 
 //        BLink<X> bb;
 //        if (b instanceof BLink) {
@@ -327,7 +341,7 @@ public class HijackBag<X> implements Bag<X,BLink<X>> {
 //            bb.setBudget(p, q);
 //        }
 
-        BLink<X> y = update(x, bb, scale);
+        BLink<X> y = update(key(bb), bb, scale);
 
         if (y != null)
             range(y.priSafe(0));
@@ -538,9 +552,21 @@ public class HijackBag<X> implements Bag<X,BLink<X>> {
         return get(it) != null;
     }
 
+    @Override
+    @Deprecated public Bag<X,BLink<X>> commit() {
+        return commit((b)-> Forget.forget(
+                size(), pressure, mass, this::forget));
+    }
+
+    protected Forget<X> forget(float rate) {
+        return new Forget<>(rate);
+    }
+
+
+
     @NotNull
     @Override
-    public HijackBag<X> commit(Function<Bag, Consumer<BLink>> update) {
+    public HijackBag<X> commit(Function<Bag<X,BLink<X>>, Consumer<BLink<X>>> update) {
 
 
         final float[] mass = {0};
@@ -586,7 +612,7 @@ public class HijackBag<X> implements Bag<X,BLink<X>> {
     }
 
     @NotNull
-    public HijackBag<X> update(@Nullable Consumer<BLink> each) {
+    public HijackBag<X> update(@Nullable Consumer<BLink<X>> each) {
 
         if (each != null) {
             this.pressure = 0;

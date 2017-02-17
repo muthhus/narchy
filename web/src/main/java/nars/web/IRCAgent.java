@@ -6,7 +6,7 @@ import nars.Param;
 import nars.Task;
 import nars.conceptualize.DefaultConceptBuilder;
 import nars.index.term.map.CaffeineIndex;
-import nars.link.BLink;
+import nars.budget.BLink;
 import nars.nar.Default;
 import nars.op.Command;
 import nars.op.Leak;
@@ -47,12 +47,12 @@ public class IRCAgent extends IRC {
     private final NAR nar;
     //private float ircMessagePri = 0.9f;
 
-    private boolean hearTwenglish = false;
+    private final boolean hearTwenglish;
 
     final int wordDelayMS = 25; //for serializing tokens to events: the time in millisecond between each perceived (subvocalized) word, when the input is received simultaneously
     private final Leak<Task,BLink<Task>> out;
 
-    boolean trace = false;
+    boolean trace;
 
     public IRCAgent(NAR nar, String nick, String server, String... channels) throws Exception {
         super(nick, server, channels);
@@ -243,7 +243,7 @@ public class IRCAgent extends IRC {
 
 
     @NotNull
-    public static Default newRealtimeNAR(int activeConcepts, int framesPerSecond, int conceptsPerFrame) throws FileNotFoundException {
+    public static Default newRealtimeNAR(int activeConcepts, int framesPerSecond, int conceptsPerFrame) {
 
         Random random = new XorShift128PlusRandom(System.currentTimeMillis());
 

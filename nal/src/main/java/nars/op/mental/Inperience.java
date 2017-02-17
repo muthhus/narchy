@@ -5,10 +5,10 @@ import nars.$;
 import nars.NAR;
 import nars.Op;
 import nars.Task;
-import nars.bag.CurveBag;
+import nars.bag.impl.CurveBag;
+import nars.budget.BLink;
 import nars.budget.BudgetMerge;
-import nars.link.BLink;
-import nars.link.RawBLink;
+import nars.budget.RawBLink;
 import nars.op.Leak;
 import nars.premise.Premise;
 import nars.task.GeneratedTask;
@@ -33,7 +33,7 @@ import java.util.function.Consumer;
 
 import static nars.$.the;
 import static nars.Op.*;
-import static nars.bag.CurveBag.power2BagCurve;
+import static nars.bag.impl.CurveBag.power2BagCurve;
 import static nars.time.Tense.ETERNAL;
 
 /**

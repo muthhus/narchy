@@ -14,7 +14,6 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.term.subst.Unify;
 import nars.term.transform.substitute;
-import nars.truth.DefaultTruth;
 import nars.truth.Stamp;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;

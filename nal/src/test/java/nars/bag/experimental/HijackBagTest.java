@@ -1,12 +1,12 @@
 package nars.bag.experimental;
 
 import com.google.common.base.Joiner;
-import nars.bag.Bag;
+import jcog.bag.Bag;
 import nars.bag.BagTest;
-import nars.bag.HijackBag;
+import nars.bag.impl.HijackBag;
 import nars.budget.BudgetMerge;
-import nars.link.BLink;
-import nars.link.RawBLink;
+import nars.budget.BLink;
+import nars.budget.RawBLink;
 import org.apache.commons.math3.random.EmpiricalDistribution;
 import org.junit.Test;
 

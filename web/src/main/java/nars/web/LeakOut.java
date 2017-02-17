@@ -2,10 +2,10 @@ package nars.web;
 
 import nars.NAR;
 import nars.Task;
-import nars.bag.ArrayBag;
+import nars.bag.impl.ArrayBag;
 import nars.budget.BudgetMerge;
-import nars.link.BLink;
-import nars.link.RawBLink;
+import nars.budget.BLink;
+import nars.budget.RawBLink;
 import nars.op.Leak;
 import org.jetbrains.annotations.NotNull;
 

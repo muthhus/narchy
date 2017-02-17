@@ -17,10 +17,6 @@ public interface Table<K,V> extends Iterable<V> {
     @Nullable
     Object remove(@NotNull K key);
 
-    /** same semantics as Map.put; output value is an existing value or null if none */
-    @Nullable
-    V put(@NotNull K k, @NotNull V v);
-
     int size();
 
 

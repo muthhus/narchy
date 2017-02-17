@@ -1,7 +1,6 @@
-package nars.link;
+package nars.budget;
 
-import nars.budget.Budget;
-import nars.budget.BudgetMerge;
+import jcog.bag.PLink;
 
 /**
  * Created by me on 5/29/16.

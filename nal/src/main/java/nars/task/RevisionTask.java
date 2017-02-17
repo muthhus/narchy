@@ -2,10 +2,10 @@ package nars.task;
 
 import nars.NAR;
 import nars.Task;
-import nars.bag.Bag;
+import jcog.bag.Bag;
+import nars.budget.BLink;
 import nars.budget.BudgetFunctions;
 import nars.concept.Concept;
-import nars.link.BLink;
 import nars.term.Compound;
 import nars.term.Termed;
 import nars.truth.Truth;

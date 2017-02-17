@@ -1,7 +1,8 @@
 package nars.nal.nal7;
 
 import nars.*;
-import nars.bag.Bag;
+import jcog.bag.Bag;
+import nars.budget.BLink;
 import nars.concept.CompoundConcept;
 import nars.concept.Concept;
 import nars.io.NarseseTest;
@@ -395,7 +396,7 @@ public class TemporalTest {
         d.believe("((a ==>+6 b)-->[pill])", Tense.Present, 1f, 0.9f);
         d.run(1);
 
-        Bag<Concept,?> cb = d.core.active;
+        Bag<Concept,BLink<Concept>> cb = d.core.active;
         cb.print();
         assertTrue(5 <= cb.size());
         Concept cc = cb.iterator().next().get();//((ArrayBag<Concept>) cb).get(0).get();

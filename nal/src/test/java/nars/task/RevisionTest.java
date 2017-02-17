@@ -2,7 +2,7 @@ package nars.task;
 
 import jcog.data.random.XorShift128PlusRandom;
 import nars.*;
-import nars.bag.Bag;
+import jcog.bag.Bag;
 import nars.conceptualize.state.DefaultConceptState;
 import nars.nar.Default;
 import nars.term.Compound;

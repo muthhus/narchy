@@ -1,4 +1,4 @@
-package nars.link;
+package jcog.bag;
 
 import java.util.function.Supplier;
 

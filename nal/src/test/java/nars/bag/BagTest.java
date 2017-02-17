@@ -1,13 +1,17 @@
 package nars.bag;
 
+import jcog.bag.Bag;
+import jcog.bag.Prioritized;
 import jcog.data.random.XorShift128PlusRandom;
 import nars.Param;
+import nars.bag.impl.ArrayBag;
+import nars.bag.impl.CurveBag;
+import nars.bag.impl.HijackBag;
 import nars.budget.Budget;
 import nars.budget.BudgetMerge;
-import nars.budget.Prioritized;
 import nars.budget.RawBudget;
-import nars.link.BLink;
-import nars.link.RawBLink;
+import nars.budget.BLink;
+import nars.budget.RawBLink;
 import org.apache.commons.math3.random.EmpiricalDistribution;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.eclipse.collections.impl.list.mutable.primitive.DoubleArrayList;
@@ -221,7 +225,7 @@ public class BagTest {
 
 
     @NotNull
-    public static EmpiricalDistribution getSamplingPriorityDistribution(@NotNull Bag b, int n, int bins) {
+    public static EmpiricalDistribution getSamplingPriorityDistribution(@NotNull Bag<?,? extends Prioritized> b, int n, int bins) {
         DoubleArrayList f = new DoubleArrayList(n);
         if (!b.isEmpty()) {
             for (int i = 0; i < n; i++) {

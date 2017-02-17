@@ -1,6 +1,4 @@
-package nars.link;
-
-import nars.budget.Prioritized;
+package jcog.bag;
 
 /**
  * Created by me on 2/11/17.

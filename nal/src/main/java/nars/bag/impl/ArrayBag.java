@@ -1,12 +1,14 @@
-package nars.bag;
+package nars.bag.impl;
 
 import jcog.data.sorted.SortedArray;
 import jcog.table.SortedListTable;
 import nars.$;
 import nars.Param;
+import nars.attention.Forget;
+import jcog.bag.Bag;
+import jcog.bag.Prioritized;
+import nars.budget.BLink;
 import nars.budget.BudgetMerge;
-import nars.budget.Prioritized;
-import nars.link.BLink;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -48,9 +50,8 @@ public class ArrayBag<X> extends SortedListTable<X, BLink<X>> implements Bag<X,B
     /**
      * inbound pressure sum since last commit
      */
-    public float pressure;
+    public float pressure, mass;
 
-    private static final Logger logger = LoggerFactory.getLogger(ArrayBag.class);
 
     public ArrayBag(BudgetMerge mergeFunction, @NotNull Map<X, BLink<X>> map) {
         this(0, mergeFunction, map);
@@ -356,7 +357,7 @@ public class ArrayBag<X> extends SortedListTable<X, BLink<X>> implements Bag<X,B
 
 
     @Override
-    public final BLink<X> put(@NotNull X key, @NotNull BLink<X> b, float scale, @Nullable MutableFloat overflow) {
+    public final BLink<X> put(@NotNull BLink<X> b, float scale, @Nullable MutableFloat overflow) {
 
 
         float bp = b.priSafe(-1);
@@ -364,6 +365,7 @@ public class ArrayBag<X> extends SortedListTable<X, BLink<X>> implements Bag<X,B
             return null;
         }
 
+        X key = key(b);
         BLink<X> v = map.compute(key, (k, existing) ->{
             if (existing!=null && !existing.isDeleted())
                 return existing;
@@ -438,38 +440,45 @@ public class ArrayBag<X> extends SortedListTable<X, BLink<X>> implements Bag<X,B
 
 
     @Override
+    @Deprecated public Bag<X,BLink<X>> commit() {
+        return commit((b)-> Forget.forget(size(), pressure, mass, Forget::new));
+    }
+
+    @Override
     @NotNull
-    public final ArrayBag<X> commit(@Nullable Function<Bag, Consumer<BLink>> update) {
+    public final ArrayBag<X> commit(@Nullable Function<Bag<X,BLink<X>>, Consumer<BLink<X>>> update) {
         commit(update, false);
         return this;
     }
 
-    private void commit(@Nullable Function<Bag, Consumer<BLink>> update, boolean checkCapacity) {
-        Consumer<BLink> u = update != null ? update.apply(this) : null;
+    private void commit(@Nullable Function<Bag<X,BLink<X>>, Consumer<BLink<X>>> update, boolean checkCapacity) {
+
+        if (update!=null) {
+            float mass = 0;
+            synchronized (items) {
+                int iii = size();
+                for (int i = 0; i < iii; i++) {
+                    BLink x = get(i);
+                    if (x != null)
+                        mass += x.priSafe(0);
+                }
+            }
+            this.mass = mass;
+        }
+
+        Consumer<BLink<X>> u = update != null ? update.apply(this) : null;
         if (u != null || checkCapacity)
             update(u, checkCapacity);
     }
 
-    public float mass() {
-        float mass = 0;
-        synchronized (items) {
-            int iii = size();
-            for (int i = 0; i < iii; i++) {
-                BLink x = get(i);
-                if (x != null)
-                    mass += x.priSafe(0);
-            }
-        }
-        return mass;
-    }
+
 
 
     /**
      * applies the 'each' consumer and commit simultaneously, noting the range of items that will need sorted
      */
     @NotNull
-    protected ArrayBag<X> update(@Nullable Consumer<BLink> each, boolean checkCapacity) {
-
+    protected ArrayBag<X> update(@Nullable Consumer<BLink<X>> each, boolean checkCapacity) {
 
         if (each != null)
             this.pressure = 0; //reset pressure accumulator
@@ -525,7 +534,7 @@ public class ArrayBag<X> extends SortedListTable<X, BLink<X>> implements Bag<X,B
     /**
      * returns whether the items list was detected to be sorted
      */
-    private boolean updateBudget(@NotNull Consumer<BLink> each) {
+    private boolean updateBudget(@NotNull Consumer<BLink<X>> each) {
 //        int dirtyStart = -1;
         boolean sorted = true;
 
@@ -599,6 +608,17 @@ public class ArrayBag<X> extends SortedListTable<X, BLink<X>> implements Bag<X,B
 //            return bNext;
 //        }
 //    }
+
+
+    @Override
+    public float pri(@NotNull BLink<X> key) {
+        return key.pri();
+    }
+
+    @Override
+    public void forEachKey(@NotNull Consumer<? super X> each) {
+        forEach(x -> each.accept(x.get()));
+    }
 
     @Override
     public void forEach(Consumer<? super BLink<X>> action) {

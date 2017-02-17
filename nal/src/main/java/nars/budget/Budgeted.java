@@ -2,6 +2,7 @@ package nars.budget;
 
 import jcog.Util;
 import nars.Param;
+import jcog.bag.Prioritized;
 import org.jetbrains.annotations.NotNull;
 
 import static nars.budget.Budget.aveGeo;

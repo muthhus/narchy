@@ -1,8 +1,9 @@
 package nars.bag;
 
 import jcog.data.FloatParam;
+import nars.bag.impl.ArrayBag;
+import nars.budget.BLink;
 import nars.budget.BudgetMerge;
-import nars.link.BLink;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 
@@ -42,7 +43,7 @@ public class Bagregate<X> extends ArrayBag<X> {
         while (ss.hasNext() && count < limit) {
             BLink<X> x = ss.next();
             if (x!=null && include(x)) {
-                if (put(x.get(), x, scale, null)!=null)
+                if (put(x, scale, null)!=null)
                     count++;
             }
         }

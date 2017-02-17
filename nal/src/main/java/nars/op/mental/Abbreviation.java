@@ -6,15 +6,15 @@ import nars.NAR;
 import nars.Op;
 import nars.Task;
 import nars.attention.Activation;
-import nars.bag.CurveBag;
+import nars.bag.impl.CurveBag;
+import nars.budget.BLink;
 import nars.budget.Budget;
 import nars.budget.BudgetMerge;
+import nars.budget.RawBLink;
 import nars.concept.AtomConcept;
 import nars.concept.CompoundConcept;
 import nars.concept.Concept;
 import nars.concept.PermanentConcept;
-import nars.link.BLink;
-import nars.link.RawBLink;
 import nars.op.Leak;
 import nars.table.BeliefTable;
 import nars.table.QuestionTable;
@@ -36,7 +36,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
-import static nars.bag.CurveBag.power4BagCurve;
+import static nars.bag.impl.CurveBag.power4BagCurve;
 import static nars.term.Terms.compoundOrNull;
 import static nars.time.Tense.ETERNAL;
 

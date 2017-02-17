@@ -8,14 +8,14 @@ import nars.$;
 import nars.Control;
 import nars.NAR;
 import nars.Param;
-import nars.bag.Bag;
+import jcog.bag.Bag;
 import nars.bag.BagAdapter;
+import nars.budget.BLink;
 import nars.budget.BudgetMerge;
+import nars.budget.RawBLink;
 import nars.concept.Concept;
 import nars.conceptualize.ConceptBuilder;
 import nars.derive.Deriver;
-import nars.link.BLink;
-import nars.link.RawBLink;
 import nars.premise.MatrixPremiseBuilder;
 import nars.task.DerivedTask;
 import nars.term.Termed;
@@ -179,7 +179,7 @@ public class ConceptBagControl implements Control, Consumer<DerivedTask> {
 
     @Override
     public void activate(Termed term, float priToAdd) {
-        active.put((Concept)term, new RawBLink(term, priToAdd, 0.5f), 1f, null);
+        active.put(new RawBLink(term, priToAdd, 0.5f), 1f, null);
     }
 
 

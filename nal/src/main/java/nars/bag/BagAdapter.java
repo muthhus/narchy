@@ -1,6 +1,7 @@
 package nars.bag;
 
-import nars.link.BLink;
+import jcog.bag.Bag;
+import nars.budget.BLink;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -19,6 +20,17 @@ public class BagAdapter<X> implements Bag<X,BLink<X>> {
 
     public BagAdapter(Bag<X,BLink<X>> delegate) {
         set(delegate);
+    }
+
+    @Override
+    public float pri(@NotNull BLink<X> key) {
+        return key.pri();
+    }
+
+    @NotNull
+    @Override
+    public X key(BLink<X> value) {
+        return value.get();
     }
 
     public void set(Bag<X,BLink<X>> delegate) {
@@ -72,8 +84,8 @@ public class BagAdapter<X> implements Bag<X,BLink<X>> {
     }
 
     @Override
-    public BLink<X> put(@NotNull X i, @NotNull BLink<X> b, float scale, @Nullable MutableFloat overflowing) {
-        return bag.put(i, b, scale, overflowing);
+    public BLink<X> put(@NotNull BLink<X> b, float scale, @Nullable MutableFloat overflowing) {
+        return bag.put(b, scale, overflowing);
     }
 
     @NotNull
@@ -122,7 +134,7 @@ public class BagAdapter<X> implements Bag<X,BLink<X>> {
 
     @NotNull
     @Override
-    public Bag<X,BLink<X>> commit(Function<Bag, Consumer<BLink>> update) {
+    public Bag<X,BLink<X>> commit(Function<Bag<X,BLink<X>>, Consumer<BLink<X>>> update) {
         bag.commit(update);
         return this;
     }

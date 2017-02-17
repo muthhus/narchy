@@ -1,8 +1,8 @@
 package nars;
 
 import jcog.Texts;
+import nars.budget.BLink;
 import nars.concept.Concept;
-import nars.link.BLink;
 import nars.op.Command;
 import nars.op.data.*;
 import nars.term.atom.Atom;

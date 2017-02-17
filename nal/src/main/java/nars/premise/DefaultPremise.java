@@ -1,11 +1,8 @@
 package nars.premise;
 
-import jcog.Util;
 import nars.$;
-import nars.Param;
 import nars.Task;
 import nars.budget.Budget;
-import nars.budget.BudgetFunctions;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;

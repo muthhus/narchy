@@ -7,18 +7,18 @@ import nars.NAR;
 import nars.NAgent;
 import nars.Task;
 import nars.attention.Forget;
-import nars.bag.ArrayBag;
-import nars.bag.Bag;
+import nars.bag.impl.ArrayBag;
+import jcog.bag.Bag;
 import nars.bag.Bagregate;
-import nars.bag.HijackBag;
+import nars.bag.impl.HijackBag;
 import nars.budget.BudgetMerge;
 import nars.concept.Concept;
 import nars.conceptualize.DefaultConceptBuilder;
 import nars.gui.BagChart;
 import nars.gui.Vis;
 import nars.index.term.map.CaffeineIndex;
-import nars.link.BLink;
-import nars.link.RawBLink;
+import nars.budget.BLink;
+import nars.budget.RawBLink;
 import nars.nar.Default;
 import nars.nar.NARBuilder;
 import nars.op.Leak;
@@ -150,26 +150,26 @@ abstract public class NAgents extends NAgent {
         return d;
     }
 
-    public static NAR newAlann(float dur) {
-
-        NAR nar = NARBuilder.newALANN(new RealTime.CS(true).dur( dur ), 3, 512, 3, 3, 2 );
-
-        nar.termVolumeMax.set(32);
-
-        MySTMClustered stm = new MySTMClustered(nar, 64, '.', 8, true, 3);
-        MySTMClustered stmGoal = new MySTMClustered(nar, 32, '!', 8, true, 3);
-
-//        Abbreviation abbr = new Abbreviation(nar, "the",
-//                4, 16,
-//                0.05f, 32);
-
-        new Inperience(nar, 0.05f, 16);
-
-        /*SpaceGraph.window(grid(nar.cores.stream().map(c ->
-                Vis.items(c.activeBag(), nar, 16)).toArray(Surface[]::new)), 900, 700);*/
-
-        return nar;
-    }
+//    public static NAR newAlann(float dur) {
+//
+//        NAR nar = NARBuilder.newALANN(new RealTime.CS(true).dur( dur ), 3, 512, 3, 3, 2 );
+//
+//        nar.termVolumeMax.set(32);
+//
+//        MySTMClustered stm = new MySTMClustered(nar, 64, '.', 8, true, 3);
+//        MySTMClustered stmGoal = new MySTMClustered(nar, 32, '!', 8, true, 3);
+//
+////        Abbreviation abbr = new Abbreviation(nar, "the",
+////                4, 16,
+////                0.05f, 32);
+//
+//        new Inperience(nar, 0.05f, 16);
+//
+//        /*SpaceGraph.window(grid(nar.cores.stream().map(c ->
+//                Vis.items(c.activeBag(), nar, 16)).toArray(Surface[]::new)), 900, 700);*/
+//
+//        return nar;
+//    }
 
 
     public static Default newMultiThreadNAR(int threads, Time time) {

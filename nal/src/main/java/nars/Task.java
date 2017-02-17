@@ -2,12 +2,12 @@ package nars;
 
 import jcog.Texts;
 import jcog.map.SynchronizedHashMap;
-import nars.bag.ArrayBag;
+import nars.bag.impl.ArrayBag;
+import nars.budget.BLink;
 import nars.budget.BudgetMerge;
 import nars.budget.Budgeted;
+import nars.budget.RawBLink;
 import nars.concept.Concept;
-import nars.link.BLink;
-import nars.link.RawBLink;
 import nars.op.Command;
 import nars.task.Tasked;
 import nars.term.Compound;

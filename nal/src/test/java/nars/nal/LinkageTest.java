@@ -5,7 +5,7 @@ import nars.$;
 import nars.NAR;
 import nars.Narsese;
 import nars.concept.Concept;
-import nars.link.BLink;
+import nars.budget.BLink;
 import nars.nar.Default;
 import nars.term.Term;
 import nars.term.Termed;

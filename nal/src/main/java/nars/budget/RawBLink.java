@@ -1,8 +1,5 @@
-package nars.link;
+package nars.budget;
 
-import nars.budget.BudgetMerge;
-import nars.budget.Budgeted;
-import nars.budget.RawBudget;
 import org.jetbrains.annotations.NotNull;
 
 /**

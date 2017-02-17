@@ -3,9 +3,9 @@ package nars.web;
 import jcog.data.MutableInteger;
 import nars.IO;
 import nars.NAR;
-import nars.bag.Bag;
+import jcog.bag.Bag;
 import nars.concept.Concept;
-import nars.link.BLink;
+import nars.budget.BLink;
 import nars.term.Term;
 import spacegraph.web.PeriodicWebsocketService;
 
@@ -54,40 +54,37 @@ public class ActiveConceptService extends PeriodicWebsocketService {
                 //SummaryStatistics s = new SummaryStatistics();
 
 
-                {
+                ByteArrayOutputStream bs = new ByteArrayOutputStream(4096);
+                DataOutput dos = new DataOutputStream(bs);
 
-                    ByteArrayOutputStream bs = new ByteArrayOutputStream(4096);
-                    DataOutput dos = new DataOutputStream(bs);
-
-                    nar.conceptsActive().forEach(c -> {
-
-                        try {
-                            writeConceptSummary(dos, c);
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-
-
-                        //        return new Object[] {
-                        //                Json.escape(c), //ID
-                        //                b(bc.pri()), b(bc.dur()), b(bc.qua()),
-                        //                termLinks(c, maxTermLinks),
-                        //                truth(c.beliefs()),
-                        //                truth(c.goals()),
-                        //                //TODO tasklinks, beliefs
-                        //        };
-                        //s.addValue(c.pri());
-                    });
+                nar.conceptsActive().forEach(c -> {
 
                     try {
-                        dos.writeFloat(-1); //end of concepts
-                    } catch (IOException e) { }
-
-                    ByteBuffer next = ByteBuffer.wrap(bs.toByteArray());
-                    if (!Objects.equals(current, next)) {
-                        send(next);
-                        current = next;
+                        writeConceptSummary(dos, c);
+                    } catch (IOException e) {
+                        e.printStackTrace();
                     }
+
+
+                    //        return new Object[] {
+                    //                Json.escape(c), //ID
+                    //                b(bc.pri()), b(bc.dur()), b(bc.qua()),
+                    //                termLinks(c, maxTermLinks),
+                    //                truth(c.beliefs()),
+                    //                truth(c.goals()),
+                    //                //TODO tasklinks, beliefs
+                    //        };
+                    //s.addValue(c.pri());
+                });
+
+                try {
+                    dos.writeFloat(-1); //end of concepts
+                } catch (IOException e) { }
+
+                ByteBuffer next = ByteBuffer.wrap(bs.toByteArray());
+                if (!Objects.equals(current, next)) {
+                    send(next);
+                    current = next;
                 }
 
                 ready.set(true);

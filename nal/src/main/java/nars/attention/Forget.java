@@ -1,7 +1,11 @@
 package nars.attention;
 
-import nars.link.BLink;
+import jcog.Util;
+import nars.Param;
+import nars.budget.BLink;
+import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunction;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Consumer;
 
@@ -24,6 +28,20 @@ public class Forget<X> implements Consumer<BLink<X>> {
         this.r = r;
         this.maxEffectiveQuality = maxEffectiveQuality;
         this.gain = gain;
+    }
+
+    @Nullable
+    public static <X> Consumer<BLink<X>> forget(int s, float p, float m, FloatToObjectFunction<Consumer<BLink<X>>> f) {
+
+        float r = p > 0 ?
+                -((s * Param.BAG_THRESHOLD) - p - m) / m :
+                0;
+
+        //float pressurePlusOversize = pressure + Math.max(0, expectedAvgMass * size - existingMass);
+        //float r = (pressurePlusOversize) / (pressurePlusOversize + existingMass*4f /* momentum*/);
+
+        //System.out.println(pressure + " " + existingMass + "\t" + r);
+        return r >= (Param.BUDGET_EPSILON/s) ? f.valueOf(Util.unitize(r)) : null;
     }
 
     @Override

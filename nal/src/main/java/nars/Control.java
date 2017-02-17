@@ -1,7 +1,7 @@
 package nars;
 
+import nars.budget.BLink;
 import nars.concept.Concept;
-import nars.link.BLink;
 import nars.term.Termed;
 import org.jetbrains.annotations.NotNull;
 

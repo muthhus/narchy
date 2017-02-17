@@ -3,7 +3,7 @@ package nars.gui;
 import nars.NAR;
 import nars.bag.Bagregate;
 import nars.concept.Concept;
-import nars.link.BLink;
+import nars.budget.BLink;
 import nars.term.Term;
 
 import java.util.Collection;

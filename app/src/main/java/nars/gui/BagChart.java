@@ -1,8 +1,8 @@
 package nars.gui;
 
 import com.jogamp.opengl.GL2;
-import nars.bag.Bag;
-import nars.link.BLink;
+import jcog.bag.Bag;
+import nars.budget.BLink;
 import nars.nar.Default;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
