@@ -77,7 +77,7 @@ public class ConceptBagControl implements Control, Consumer<DerivedTask> {
     public final HitMissMeter meter = new HitMissMeter(ConceptBagControl.class.getSimpleName());
 
     public final FloatParam activationRate = new FloatParam(1f);
-    private float currentActivationRate;
+    private float currentActivationRate = 1f;
 
 //    private Comparator<? super BLink<Concept>> sortConceptLinks = (a, b) -> {
 //        Concept A = a.get();
@@ -108,7 +108,7 @@ public class ConceptBagControl implements Control, Consumer<DerivedTask> {
             if (busy.compareAndSet(false, true)) {
 
                 //updae concept bag
-                currentActivationRate = activationRate.floatValue() * 1f/((float)Math.sqrt(active.capacity()));
+                currentActivationRate = activationRate.floatValue();// * 1f/((float)Math.sqrt(active.capacity()));
 
                 active.commit();
 

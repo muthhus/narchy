@@ -44,6 +44,6 @@ public class PLinkHijackBag<X> extends HijackBag<X, PLink<X>> {
     @Override
     public PForget forget(float rate) {
         float memoryForget = 1f;
-        return new PForget(rate, memoryForget);
+        return new PForget(rate * memoryForget);
     }
 }

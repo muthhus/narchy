@@ -3,7 +3,6 @@ package nars.attention;
 import jcog.bag.Bag;
 import jcog.bag.Priority;
 import nars.Param;
-import nars.budget.Budget;
 import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunction;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -16,17 +15,10 @@ import java.util.function.Consumer;
  */
 public class PForget<X extends Priority> implements Consumer<X> {
 
-    public final float r;
-
     public final float gain;
 
-    public PForget(float r) {
-        this(r, 1f);
-    }
-
-    public PForget(float r, float gain) {
-        this.r = r;
-        this.gain = gain;
+    public PForget(float rate) {
+        this.gain = 1f-rate;
     }
 
     @Nullable
@@ -38,7 +30,7 @@ public class PForget<X extends Priority> implements Consumer<X> {
     public void accept(@NotNull X b) {
         float p = b.priSafe(-1);
         if (p > 0) {
-            b.setPriority(gain * p);
+            b.priMult(gain);
         }
     }
 
