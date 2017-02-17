@@ -38,6 +38,7 @@ public class RevisionTest {
 
         //}
         ((DefaultConceptState)d.concepts.conceptBuilder().awake()).beliefsMaxEte.set(maxBeliefs);
+        ((DefaultConceptState)d.concepts.conceptBuilder().awake()).beliefsMaxTemp.set(maxBeliefs);
         return d;
     }
 

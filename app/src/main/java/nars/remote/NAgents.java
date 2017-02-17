@@ -196,7 +196,7 @@ abstract public class NAgents extends NAgent {
 
         Default nar = new Default(16 * 1024,
                 conceptsPerCycle, 1, 3, rng,
-                new CaffeineIndex(cb, 32*1024, false, exe)
+                new CaffeineIndex(cb, 96*1024, false, exe)
                 //new TreeTermIndex.L1TreeIndex(new DefaultConceptBuilder(), 300000, 32 * 1024, 3)
                 ,
                 time,
@@ -235,7 +235,7 @@ abstract public class NAgents extends NAgent {
                 return new HijackBag<>(activeConcepts, reprobes, BudgetMerge.plusBlend, random ) {
                     @Override
                     public Forget forget(float rate) {
-                        float memoryForget = 1f;
+                        float memoryForget = 0.9f;
                         return new Forget(rate, memoryForget, memoryForget);
                     }
                 };
@@ -252,8 +252,8 @@ abstract public class NAgents extends NAgent {
         nar.DEFAULT_QUEST_PRIORITY = 0.25f * p;
 
         nar.confMin.setValue(0.01f);
-        nar.truthResolution.setValue(0.02f);
-        nar.termVolumeMax.setValue(55);
+        //nar.truthResolution.setValue(0.01f);
+        nar.termVolumeMax.setValue(60);
 
         MySTMClustered stm = new MySTMClustered(nar, 64, '.', 3, true, 6);
         MySTMClustered stmGoal = new MySTMClustered(nar, 32, '!', 2, true, 4);

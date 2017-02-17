@@ -19,7 +19,7 @@
      (&&,X,A..+), X, time(decomposeTaskSubset), task("?@") |- (&&,A..+), ()
         (&&,(--,%X),A..+), X, time(decomposeTaskSubset), task("?@") |- (&&,A..+), ()
 
-     B, (&&,X,A..+), time(decomposeBelief) |- subIfUnifiesDep((&&,A..+),X,B), (Belief:AnonymousAnalogy, Goal:Strong)
+     B, (&&,X,A..+), time(decomposeBelief) |- subIfUnifiesDep((&&,A..+),X,B), (Belief:AnonymousAnalogy, Goal:StructuralGoduction)
 
 ///// conjunction decompose
 //

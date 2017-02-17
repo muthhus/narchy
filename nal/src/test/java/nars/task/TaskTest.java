@@ -21,12 +21,12 @@ public class TaskTest {
 
 
 
-    @Test public void testTruthHash() {
+    @Test public void testTruthHash16Plus16Bit() {
         //for TRUTH EPSILON 0.01:
 
-        assertEquals(10, $.t(0, 0.1f).hashCode());
+        assertEquals(3276, $.t(0, 0.1f).hashCode());
 
-        assertEquals(6553700, $.t(1, 1.0f).hashCode());
+        assertEquals(2147385309, $.t(1, 1.0f).hashCode());
     }
 
     /** tests the ordering of tasks that differ by truth values,

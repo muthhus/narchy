@@ -285,6 +285,7 @@ public final class TruthFunctions extends UtilityFunctions {
 
 
     /**
+     * original name: desireDed
      * A function specially designed for desire value [To be refined]
      * @param a Truth value of the first premise
      * @param b Truth value of the second premise

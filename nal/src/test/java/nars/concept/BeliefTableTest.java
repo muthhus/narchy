@@ -110,14 +110,14 @@ public class BeliefTableTest  {
         b.believe(1.0f, 0.5f); n.next();
         b.print();
         assertEquals(3 /* revision */, beliefs.size());
-        assertEquals(0.669, beliefs.matchEternal().conf(), 0.001);
+        assertEquals(0.669, beliefs.matchEternal().conf(), 0.01);
 
         b.believe(1.0f, 0.5f); n.next();
         b.print();
         assertEquals(5, beliefs.size());
         @NotNull BeliefTable bb = beliefs;
         assertEquals(0.75, bb.matchEternal().conf(), 0.001);
-        assertEquals(0.75, bb.match(n.time(), dur).conf(), 0.001);
+        assertEquals(0.75, bb.match(n.time(), dur).conf(), 0.01);
 
         b.believe(1.0f, 0.5f); n.next();
         b.print();

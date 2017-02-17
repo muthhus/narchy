@@ -653,7 +653,7 @@ public class NAL7Test extends AbstractNALTest {
         test()
                 .inputAt(2, "a:x. :|: %1.0;0.45%")
                 .inputAt(5, "b:x. :|: %1.0;0.90%")
-                .mustBelieve(cycles, "(a:#1 &&+3 b:#1)", 1f, 0.40f, 2, 5)
+                .mustBelieve(cycles, "(a:#1 &&+3 b:#1)", 1f, 0.41f, 2, 5)
                 .mustNotOutput(cycles, "(a:#1 &&-3 b:#1)", '.', 0f, 1, 0f, 1, 2);
 
     }
