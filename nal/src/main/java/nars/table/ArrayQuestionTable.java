@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.function.Consumer;
 
 /**
@@ -59,7 +60,7 @@ public class ArrayQuestionTable extends MultiRWFasterList<Task> implements Quest
     }
 
     @Override
-    public boolean remove(Task x) {
+    public boolean removeTask(Task x) {
         final boolean[] removed = new boolean[1];
         withWriteLockAndDelegate(l -> {
             removed[0] = l.remove(x);
@@ -116,6 +117,11 @@ public class ArrayQuestionTable extends MultiRWFasterList<Task> implements Quest
         });
 
         return result[0];
+    }
+
+    @Override
+    public Iterator<Task> taskIterator() {
+        return iterator();
     }
 
     @Override public final void forEach(@NotNull Consumer<? super Task> action) {

@@ -28,6 +28,8 @@ public abstract class Param /*extends Container*/  {
     public static final int BUSY_WINDOW = 4;
     public static final int MAX_INPUT_ANSWERS = 16;
 
+
+
     /**
      * hard upper-bound limit on Compound term complexity;
      * if this is exceeded it may indicate a recursively
@@ -223,6 +225,8 @@ public abstract class Param /*extends Container*/  {
 
     /** internal granularity which truth components are rounded to */
     public static final float TRUTH_EPSILON = 0.001f;
+
+    public static final float DEFAULT_SENSOR_RESOLUTION = 0.01f;
 
     /**
      * how precise unit test results must match expected values to pass

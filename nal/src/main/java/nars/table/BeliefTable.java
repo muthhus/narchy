@@ -16,6 +16,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintStream;
 import java.util.*;
+import java.util.function.Consumer;
 
 import static java.util.stream.StreamSupport.stream;
 import static nars.time.Tense.ETERNAL;
@@ -25,8 +26,12 @@ import static nars.util.UtilityFunctions.and;
  * A model storing, ranking, and projecting beliefs or goals (tasks with TruthValue).
  * It should iterate in top-down order (highest ranking first)
  */
-public interface BeliefTable extends TaskTable {
+public interface BeliefTable extends TaskTable, Iterable<Task> {
 
+
+    default Iterator<Task> taskIterator() {
+        return iterator();
+    }
 
     @Nullable
     BeliefTable EMPTY = new BeliefTable() {
@@ -38,7 +43,7 @@ public interface BeliefTable extends TaskTable {
 
 
         @Override
-        public boolean remove(Task x) {
+        public boolean removeTask(Task x) {
             return false;
         }
 
@@ -79,12 +84,6 @@ public interface BeliefTable extends TaskTable {
         @Override
         public int size() {
             return 0;
-        }
-
-
-        @Override
-        public boolean isEmpty() {
-            return true;
         }
 
 
@@ -182,7 +181,7 @@ public interface BeliefTable extends TaskTable {
 
 
     default void print(@NotNull PrintStream out) {
-        this.forEach(t -> out.println(t + " " + Arrays.toString(t.evidence()) + ' ' + t.log()));
+        this.forEachTask(t -> out.println(t + " " + Arrays.toString(t.evidence()) + ' ' + t.log()));
     }
 
     default void print() {
@@ -238,7 +237,7 @@ public interface BeliefTable extends TaskTable {
     default float eviSum(long now, float dur) {
 
         final float[] eSum = {0};
-        forEach(t -> {
+        forEachTask(t -> {
             Truth tt = t.truth(now, dur);
             if (tt != null) {
                 eSum[0] += tt.evi();
@@ -296,6 +295,10 @@ public interface BeliefTable extends TaskTable {
 
 
         return answer;
+    }
+
+    @Override default void forEachTask(Consumer<? super Task> x) {
+        forEach(x);
     }
 
 //    /** 2-element array containing running min/max range accumulator */

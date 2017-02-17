@@ -100,12 +100,12 @@ public class Compressor extends Abbreviation implements RemovalListener<Compound
 //        int xxl = y.volume();
 //        if (xxl >= volume.lo() && xxl <= volume.hi()) {
         //return super.onOut(b);
-        x = (Compound) (nar.concepts.productNormalize(x)).unneg();
-
-        abbreviate(x, b);
-        return 1f;
-//        } else
-//            return 0; //rejected
+        x = compoundOrNull((nar.concepts.productNormalize(x)).unneg());
+        if (x!=null) {
+            abbreviate(x, b);
+            return 1f;
+        } else
+            return 0; //rejected
     }
 
     @Override

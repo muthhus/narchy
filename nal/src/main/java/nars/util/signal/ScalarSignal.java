@@ -29,7 +29,7 @@ public class ScalarSignal implements Consumer<NAR>, DoubleSupplier {
     /**
      * resolution of the output freq value
      */
-    float resolution = 0.01f;
+    float resolution = Param.DEFAULT_SENSOR_RESOLUTION;
 
     /** in frames time */
     final static long latchResolution = 1;
@@ -125,7 +125,6 @@ public class ScalarSignal implements Consumer<NAR>, DoubleSupplier {
             return; //all
         }// ow the value function to prevent input by returning NaN
 
-        float f = Util.round(next, resolution);
 
         int maxT = this.maxTimeBetweenUpdates;
         boolean limitsMaxTime = maxT > 0;
@@ -134,11 +133,11 @@ public class ScalarSignal implements Consumer<NAR>, DoubleSupplier {
 
         boolean tooSoon = (limitsMinTime && (timeSinceLastInput < minT));
         boolean lateEnough = (limitsMaxTime && (timeSinceLastInput >= maxT));
-        boolean different = (currentValue != currentValue /* NaN */) || !Util.equals(f, currentValue, Param.TRUTH_EPSILON);
+        boolean different = (currentValue != currentValue /* NaN */) || !Util.equals(next, currentValue, resolution);
 
         if ((inputIfSame || different || lateEnough) && (!tooSoon)) {
 
-            SignalTask t = task(f, currentValue,
+            SignalTask t = task(next, currentValue,
                     now - Math.round(nar.time.dur()), now,
                     this.current);
             if (t!=null) {
@@ -153,7 +152,7 @@ public class ScalarSignal implements Consumer<NAR>, DoubleSupplier {
 
                 target.accept(this.current = t);
                 this.lastInputTime = now;
-                this.currentValue = f;
+                this.currentValue = next;
             }
         }
 
@@ -185,9 +184,9 @@ public class ScalarSignal implements Consumer<NAR>, DoubleSupplier {
 //    }
 
     @Nullable
-    protected SignalTask task(float v, float prevV, long start, long end, Task previous) {
+    protected SignalTask task(float next, float prevV, long start, long end, Task previous) {
 
-        Truth t = truthFloatFunction.valueOf(v);
+        Truth t = truthFloatFunction.valueOf(next);
         if (t == null)
             return null;
 

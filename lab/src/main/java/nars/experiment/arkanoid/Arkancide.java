@@ -15,7 +15,7 @@ import java.nio.file.Paths;
 
 public class Arkancide extends NAgents {
 
-    static boolean cam = true;
+    static boolean cam;
 
     private final float paddleSpeed = 1f;
 
@@ -49,7 +49,7 @@ public class Arkancide extends NAgents {
 
             return agent;
 
-        }, 40, 10, 50000);
+        }, 20, 5, 50000);
 
 
         Path f = Files.createTempFile(Paths.get("/tmp"), "arkancide", ".nal");
@@ -93,7 +93,7 @@ public class Arkancide extends NAgents {
 
         maxPaddleSpeed = 35 * Arkanoid.BALL_VELOCITY;
 
-        nar.truthResolution.setValue(0.02f);
+        //nar.truthResolution.setValue(0.02f);
 
         //nar.input(new MutableTask(happy, Op.BELIEF, $.t(0.5f, 0.15f)).eternal());
 
@@ -105,7 +105,7 @@ public class Arkancide extends NAgents {
             senseCamera("cam1", noid, visW, visH);
             //senseCameraRetina("cam2", noid, visW/2, visH/2, (v) -> $.t(v, alpha));
         } else {
-            nar.termVolumeMax.set(12);
+            //nar.termVolumeMax.set(12);
             senseNumber( "x(paddle, noid)", new FloatPolarNormalized(()->noid.paddle.x, noid.getWidth()/2));//.resolution(resX);
             senseNumber( "x(ball, noid)", new FloatPolarNormalized(()->noid.ball.x, noid.getWidth()/2));//.resolution(resX);
             senseNumber( "y(ball, noid)", new FloatPolarNormalized(()->noid.ball.y, noid.getHeight()/2));//.resolution(resY);

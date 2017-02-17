@@ -63,7 +63,7 @@ public class TruthWave {
         float[] t = this.truth;
 
         final int[] size = {0};
-        b.forEach(x -> {
+        b.forEachTask(x -> {
             int ss = size[0];
             if (ss < s) { //HACK in case the table size changed since allocating above
                 int j = (size[0]++) * ENTRY_SIZE;

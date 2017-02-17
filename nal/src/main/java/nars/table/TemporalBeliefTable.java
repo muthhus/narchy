@@ -10,11 +10,13 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.function.Consumer;
 
 /**
  * Created by me on 5/7/16.
  */
-public interface TemporalBeliefTable extends TaskTable {
+public interface TemporalBeliefTable extends TaskTable, Iterable<Task> {
+
 
 
     /** finds the strongest match to the specified parameters. Task against is an optional argument which can be used to compare internal temporal dt structure for similarity */
@@ -35,12 +37,12 @@ public interface TemporalBeliefTable extends TaskTable {
 
     void clear();
 
-    TemporalBeliefTable EMPTY = new TemporalBeliefTable() {
-        @Override
-        public Iterator<Task> iterator() {
-            return Collections.emptyIterator();
-        }
+    @Override
+    default Iterator<Task> iterator() {
+        return taskIterator();
+    }
 
+    TemporalBeliefTable EMPTY = new TemporalBeliefTable() {
         @Override
         public int capacity() {
             //throw new UnsupportedOperationException();
@@ -48,7 +50,7 @@ public interface TemporalBeliefTable extends TaskTable {
         }
 
         @Override
-        public boolean remove(Task x) {
+        public boolean removeTask(Task x) {
             return false;
         }
 
@@ -58,8 +60,13 @@ public interface TemporalBeliefTable extends TaskTable {
         }
 
         @Override
-        public boolean isEmpty() {
-            return true;
+        public Iterator<Task> taskIterator() {
+            return Collections.emptyIterator();
+        }
+
+        @Override
+        public void forEachTask(Consumer<? super Task> x) {
+
         }
 
         @Override

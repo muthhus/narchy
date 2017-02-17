@@ -129,8 +129,8 @@ abstract public class PremiseBuilder {
                                 Crosslink.crossLink(task, answered, answered.conf(), nar);
                             }
 
-                            if (answered.isDeleted())
-                                throw new RuntimeException("answer should not have been deleted since it may be used in the premise");
+//                            if (answered.isDeleted())
+//                                throw new RuntimeException("answer should not have been deleted since it may be used in the premise");
 
                             /*
                             if (qBefore > 0) {

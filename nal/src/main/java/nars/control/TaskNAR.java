@@ -147,7 +147,7 @@ public class TaskNAR extends NAR {
                 if (c != null) {
                     //runLater(() -> {
 
-                        c.tableFor(x.punc()).remove(x);
+                        c.tableFor(x.punc()).removeTask(x);
 
                         if (!(c instanceof PermanentConcept)) {
                             //synchronized (c) {

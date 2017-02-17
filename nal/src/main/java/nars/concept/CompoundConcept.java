@@ -156,13 +156,20 @@ public class CompoundConcept<T extends Compound> implements Concept, Termlike {
     }
 
     @NotNull
-    final QuestionTable questionsOrNew() {
-        return questions == null ? (questions = new ArrayQuestionTable(state.questionCap(true))) : questions;
+    final QuestionTable questionsOrNew(@NotNull NAR nar) {
+        return questions == null ? (questions =
+                //new ArrayQuestionTable(state.questionCap(true)))
+                new HijackQuestionTable(state.questionCap(true), 3, BudgetMerge.maxBlend, nar.random))
+                : questions;
+
     }
 
     @NotNull
-    final QuestionTable questsOrNew() {
-        return quests == null ? (quests = new ArrayQuestionTable(state.questionCap(false))) : quests;
+    final QuestionTable questsOrNew(@NotNull NAR nar) {
+        return quests == null ? (quests =
+                //new ArrayQuestionTable(state.questionCap(false)))
+                new HijackQuestionTable(state.questionCap(true), 3, BudgetMerge.maxBlend, nar.random))
+                : quests;
     }
 
     @NotNull
@@ -321,11 +328,11 @@ public class CompoundConcept<T extends Compound> implements Concept, Termlike {
         final BeliefTable answerTable;
         if (q.isQuestion()) {
             //if (questions == null) questions = new ArrayQuestionTable(nar.conceptQuestionsMax.intValue());
-            questionTable = questionsOrNew();
+            questionTable = questionsOrNew(nar);
             answerTable = beliefs();
         } else { // else if (q.isQuest())
             //if (quests == null) quests = new ArrayQuestionTable(nar.conceptQuestionsMax.intValue());
-            questionTable = questsOrNew();
+            questionTable = questsOrNew(nar);
             answerTable = goals();
         }
 

@@ -40,8 +40,8 @@ public class DefaultBeliefTable implements BeliefTable {
     }
 
     @Override
-    public boolean remove(Task x) {
-        return (x.isEternal()) ? eternal.remove(x) : temporal.remove(x);
+    public boolean removeTask(Task x) {
+        return (x.isEternal()) ? eternal.removeTask(x) : temporal.removeTask(x);
     }
 
     @Override
@@ -56,33 +56,28 @@ public class DefaultBeliefTable implements BeliefTable {
     public final Iterator<Task> iterator() {
         return Iterators.concat(
                 eternal.iterator(),
-                temporal.iterator()
+                temporal.taskIterator()
         );
     }
 
     @Override
     public void forEach(@NotNull Consumer<? super Task> action) {
         eternal.forEach(action);
-        temporal.forEach(action);
+        temporal.forEachTask(action);
     }
 
     @Override
     public float priSum() {
         final float[] total = {0};
         Consumer<Task> totaler = t -> total[0] += t.priSafe(0);
-        eternal.forEach(totaler);
-        temporal.forEach(totaler);
+        eternal.forEachTask(totaler);
+        temporal.forEachTask(totaler);
         return total[0];
     }
 
     @Override
     public int size() {
         return eternal.size() + temporal.size();
-    }
-
-    @Override
-    public boolean isEmpty() {
-        return size() == 0;
     }
 
     @Override

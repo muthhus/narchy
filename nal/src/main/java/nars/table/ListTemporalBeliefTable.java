@@ -22,6 +22,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Iterator;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 import static java.lang.Math.abs;
@@ -102,18 +103,13 @@ public class ListTemporalBeliefTable extends MultiRWFasterList<Task> implements 
 
 
     @Override
-    public boolean remove(Task x) {
+    public boolean removeTask(Task x) {
         final boolean[] removed = new boolean[1];
         x.delete();
         withWriteLockAndDelegate(l -> {
             removed[0] = l.remove(x);
         });
         return removed[0];
-    }
-
-    @Override
-    public final boolean isEmpty() {
-        return size() == 0;
     }
 
     @Override
@@ -273,6 +269,15 @@ public class ListTemporalBeliefTable extends MultiRWFasterList<Task> implements 
 
     }
 
+    @Override
+    public Iterator<Task> taskIterator() {
+        return iterator();
+    }
+
+    @Override
+    public void forEachTask(Consumer<? super Task> x) {
+        forEach(x);
+    }
 
     @Override
     public final boolean isFull() {

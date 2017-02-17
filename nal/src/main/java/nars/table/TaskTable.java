@@ -4,13 +4,14 @@ import nars.Task;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Iterator;
 import java.util.function.Consumer;
 
 /**
  * holds a set of ranked question/quests tasks
  * top ranking items are stored in the lower indexes so they will be first iterated
  */
-public interface TaskTable extends Iterable<Task> {
+public interface TaskTable  {
 
     @Deprecated static void removeTask(@NotNull Task t, @Nullable String reason) {
 //        if (reason!=null && Param.DEBUG && t instanceof MutableTask)
@@ -26,8 +27,11 @@ public interface TaskTable extends Iterable<Task> {
      */
     int size();
 
-    boolean isEmpty();
+    default boolean isEmpty() {
+        return size() == 0;
+    }
 
+    Iterator<Task> taskIterator();
 
 
 
@@ -47,10 +51,14 @@ public interface TaskTable extends Iterable<Task> {
 //        return null;
 //    }
 
+    default void forEachTask(Consumer<? super Task> x) {
+        taskIterator().forEachRemaining(x);
+    }
+
     default void top(int _maxPerConcept, @NotNull Consumer<Task> recip) {
         int s = size();
         final int[] maxPerConcept = {Math.min(s, _maxPerConcept)};
-        forEach(t -> {
+        forEachTask(t -> {
             if ((maxPerConcept[0]--) >= 0)
                 recip.accept(t);
             //if (--maxPerConcept == 0) break; //TODO use a forEachWhile w/ Predicate or something
@@ -58,7 +66,7 @@ public interface TaskTable extends Iterable<Task> {
     }
 
     /** returns true if the task was removed */
-    boolean remove(Task x);
+    boolean removeTask(Task x);
 
 
     //boolean contains(Task t);

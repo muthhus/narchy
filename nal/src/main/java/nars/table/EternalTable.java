@@ -15,6 +15,8 @@ import nars.truth.TruthDelta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Collections;
+import java.util.Iterator;
 import java.util.function.Consumer;
 
 import static nars.time.Tense.ETERNAL;
@@ -33,7 +35,7 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, Sorted
         }
 
         @Override
-        public boolean remove(Task x) {
+        public boolean removeTask(Task x) {
             return false;
         }
 
@@ -44,8 +46,13 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, Sorted
         }
 
         @Override
-        public void forEach(Consumer<? super Task> action) {
+        public void forEachTask(Consumer<? super Task> action) {
 
+        }
+
+        @Override
+        public Iterator<Task> taskIterator() {
+            return Collections.emptyIterator();
         }
 
         @Override
@@ -82,7 +89,13 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, Sorted
         }
     }
 
-//    @Override
+    @Override
+    public void forEachTask(Consumer<? super Task> x) {
+        forEach(x);
+    }
+
+
+    //    @Override
 //    public void forEach(Consumer<? super Task> action) {
 //        //synchronized (this) {
 //            super.forEach(action);
@@ -110,6 +123,11 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, Sorted
         while (n > 0 && (w = (Task) l[n]) != null) n--; //scan upwards for first non-null
         return w;
 
+    }
+
+    @Override
+    public Iterator<Task> taskIterator() {
+        return iterator();
     }
 
     public final float rank(@NotNull Task w) {
@@ -271,13 +289,13 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, Sorted
     @Override
     public void clear() {
         synchronized (this) {
-            forEach(Task::delete);
+            forEachTask(Task::delete);
             super.clear();
         }
     }
 
     @Override
-    public boolean remove(Task x) {
+    public boolean removeTask(Task x) {
 
         x.delete();
 
@@ -398,7 +416,7 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, Sorted
         //lock incoming 100% confidence belief/goal into a 1-item capacity table by itself, preventing further insertions or changes
         //1. clear the corresponding table, set capacity to one, and insert this task
         Consumer<Task> overridden = t -> TaskTable.removeTask(t, "Overridden");
-        et.forEach(overridden);
+        et.forEachTask(overridden);
         et.clear();
         et.capacity(1);
 

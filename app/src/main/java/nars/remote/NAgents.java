@@ -123,7 +123,7 @@ abstract public class NAgents extends NAgent {
 
     public static NAR runRT(Function<NAR, NAgents> init, float fps, int durFrames, int endTime) {
 
-        Time clock = new RealTime.CS(true).dur(durFrames / fps);
+        Time clock = new RealTime.DS(true).dur(durFrames / fps);
         NAR nar =
                 //new TaskNAR(32 * 1024, new MultiThreadExecutioner(4, 4 * 1024), clock);
                 NAgents.newMultiThreadNAR(3, clock, false);
@@ -176,11 +176,11 @@ abstract public class NAgents extends NAgent {
         Random rng = new XorShift128PlusRandom(1);
         final Executioner exe =
                 //new SingleThreadExecutioner();
-                new MultiThreadExecutioner(threads, 2048 /* TODO chose a power of 2 number to scale proportionally to # of threads */)
+                new MultiThreadExecutioner(threads, 4096 /* TODO chose a power of 2 number to scale proportionally to # of threads */)
                     //.sync(false)
                 ;
 
-        int conceptsPerCycle = 48*threads;
+        int conceptsPerCycle = 96*threads;
 
         final int reprobes = 4;
 
@@ -196,13 +196,13 @@ abstract public class NAgents extends NAgent {
 
         Default nar = new Default(16 * 1024,
                 conceptsPerCycle, 1, 3, rng,
-                new CaffeineIndex(cb, 96*1024, false, exe)
+                new CaffeineIndex(cb, 32*1024, false, exe)
                 //new TreeTermIndex.L1TreeIndex(new DefaultConceptBuilder(), 300000, 32 * 1024, 3)
                 ,
                 time,
                 exe) {
 
-            final Compressor compressor = new Compressor(this, "_", 3, 5,
+            final Compressor compressor = new Compressor(this, "_", 2, 5,
                     1f, 64, 768);
 
             @Override
@@ -235,15 +235,15 @@ abstract public class NAgents extends NAgent {
                 return new HijackBag<>(activeConcepts, reprobes, BudgetMerge.plusBlend, random ) {
                     @Override
                     public Forget forget(float rate) {
-                        float memoryForget = 0.9f;
+                        float memoryForget = 0.98f;
                         return new Forget(rate, memoryForget, memoryForget);
                     }
                 };
             }
         };
 
-        nar.beliefConfidence(0.9f);
-        nar.goalConfidence(0.9f);
+        nar.beliefConfidence(0.5f);
+        nar.goalConfidence(0.5f);
 
         float p = 0.5f;
         nar.DEFAULT_BELIEF_PRIORITY = 0.5f * p;
@@ -253,7 +253,7 @@ abstract public class NAgents extends NAgent {
 
         nar.confMin.setValue(0.01f);
         //nar.truthResolution.setValue(0.01f);
-        nar.termVolumeMax.setValue(60);
+        nar.termVolumeMax.setValue(90);
 
         MySTMClustered stm = new MySTMClustered(nar, 64, '.', 3, true, 6);
         MySTMClustered stmGoal = new MySTMClustered(nar, 32, '!', 2, true, 4);

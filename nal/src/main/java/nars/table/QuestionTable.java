@@ -9,6 +9,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.Spliterator;
 import java.util.Spliterators;
+import java.util.function.Consumer;
 
 /** task table used for storing Questions and Quests.
  *  simpler than Belief/Goal tables
@@ -40,23 +41,21 @@ public interface QuestionTable extends TaskTable {
 
     @Nullable QuestionTable EMPTY = new QuestionTable() {
 
+
+
         @Override
-        public Iterator<Task> iterator() {
+        public Iterator<Task> taskIterator() {
             return Collections.emptyIterator();
         }
+//
+//        @Override
+//        public Spliterator<Task> spliterator() {
+//            return Spliterators.emptySpliterator();
+//        }
+
 
         @Override
-        public Spliterator<Task> spliterator() {
-            return Spliterators.emptySpliterator();
-        }
-
-        @Override
-        public float priSum() {
-            return 0;
-        }
-
-        @Override
-        public boolean remove(Task x) {
+        public boolean removeTask(Task x) {
             return false;
         }
 
@@ -81,18 +80,9 @@ public interface QuestionTable extends TaskTable {
             return 0;
         }
 
-        @Override
-        public boolean isEmpty() {
-            return true;
-        }
 
 
     };
 
-    default float priSum() {
-        final float[] p = {0};
-        forEach(t -> p[0] +=t.pri());
-        return p[0];
-    }
 
 }

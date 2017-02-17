@@ -299,17 +299,17 @@ public interface Concept extends Termed {
 
 
     default void forEachTask(boolean includeConceptBeliefs, boolean includeConceptQuestions, boolean includeConceptGoals, boolean includeConceptQuests, @NotNull Consumer<Task> each) {
-        if (includeConceptBeliefs) beliefs().forEach(each);
-        if (includeConceptQuestions) questions().forEach(each);
-        if (includeConceptGoals) goals().forEach(each);
-        if (includeConceptQuests) quests().forEach(each);
+        if (includeConceptBeliefs) beliefs().forEachTask(each);
+        if (includeConceptQuestions) questions().forEachTask(each);
+        if (includeConceptGoals) goals().forEachTask(each);
+        if (includeConceptQuests) quests().forEachTask(each);
     }
 
     default void forEachTask(@NotNull Consumer<Task> each) {
-        beliefs().forEach(each);
-        questions().forEach(each);
-        goals().forEach(each);
-        quests().forEach(each);
+        beliefs().forEachTask(each);
+        questions().forEachTask(each);
+        goals().forEachTask(each);
+        quests().forEachTask(each);
     }
 
     @NotNull
@@ -320,10 +320,10 @@ public interface Concept extends Termed {
         TaskTable questions = onquestions ? questions() : null;
         TaskTable quests = onquests ? quests() : null;
 
-        Iterator<Task> b1 = beliefs != null ? beliefs.iterator() : Collections.emptyIterator();
-        Iterator<Task> b2 = goals != null ? goals.iterator() : Collections.emptyIterator();
-        Iterator<Task> b3 = questions != null ? questions.iterator() : Collections.emptyIterator();
-        Iterator<Task> b4 = quests != null ? quests.iterator() : Collections.emptyIterator();
+        Iterator<Task> b1 = beliefs != null ? beliefs.taskIterator() : Collections.emptyIterator();
+        Iterator<Task> b2 = goals != null ? goals.taskIterator() : Collections.emptyIterator();
+        Iterator<Task> b3 = questions != null ? questions.taskIterator() : Collections.emptyIterator();
+        Iterator<Task> b4 = quests != null ? quests.taskIterator() : Collections.emptyIterator();
         return Iterators.concat(b1, b2, b3, b4);
     }
 
@@ -376,13 +376,13 @@ public interface Concept extends Termed {
                 if (beliefs().isEmpty()) out.append(" none").append('\n');
                 else {
                     out.append('\n');
-                    beliefs().forEach(printTask);
+                    beliefs().forEachTask(printTask);
                 }
                 out.append(" Questions:");
                 if (questions().isEmpty()) out.append(" none").append('\n');
                 else {
                     out.append('\n');
-                    questions().forEach(printTask);
+                    questions().forEachTask(printTask);
                 }
             }
 
@@ -391,13 +391,13 @@ public interface Concept extends Termed {
                 if (goals().isEmpty()) out.append(" none").append('\n');
                 else {
                     out.append('\n');
-                    goals().forEach(printTask);
+                    goals().forEachTask(printTask);
                 }
                 out.append(" Quests:");
                 if (questions().isEmpty()) out.append(" none").append('\n');
                 else {
                     out.append('\n');
-                    quests().forEach(printTask);
+                    quests().forEachTask(printTask);
                 }
             }
 

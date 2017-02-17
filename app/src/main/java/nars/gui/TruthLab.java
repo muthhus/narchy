@@ -36,7 +36,7 @@ public class TruthLab extends Grid {
     int samplePeriod = 1;
 
     long start, end;
-    boolean showBeliefs = false;
+    boolean showBeliefs;
 
     public TruthLab(NAR n, Compound... x) {
         super(VERTICAL);
@@ -119,11 +119,9 @@ public class TruthLab extends Grid {
 
             //HACK
             push(gl);
-            {
-                gl.glScalef(0.1f, 2f, 1f);
-                gl.glColor4fv(labelColor, 0);
-                Draw.text(gl, label, 0.05f, 0, 0.25f, 0, Draw.TextAlignment.Right);
-            }
+            gl.glScalef(0.1f, 2f, 1f);
+            gl.glColor4fv(labelColor, 0);
+            Draw.text(gl, label, 0.05f, 0, 0.25f, 0, Draw.TextAlignment.Right);
             pop(gl);
 
             for (int i = 0; i < data.length; ) {
@@ -175,7 +173,7 @@ public class TruthLab extends Grid {
 
     public class ConceptTimeline extends Grid {
         private final Compound term;
-        private boolean showBeliefs;
+        private final boolean showBeliefs;
 
         public ConceptTimeline(Compound x, boolean showBeliefs) {
             super(VERTICAL);
@@ -199,7 +197,7 @@ public class TruthLab extends Grid {
                 cc.add(new BeliefTableTimeline(term, c.beliefs(), start, end, samplePeriod));
 
                 if (showBeliefs) {
-                    c.beliefs().forEach(b -> {
+                    c.beliefs().forEachTask(b -> {
                         cc.add(new TaskTimeline(b, start, end, samplePeriod));
                     });
                 }
