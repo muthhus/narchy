@@ -235,6 +235,7 @@ abstract public class PremiseBuilder {
 
 
         float tq = taskBudget.qua();
+
         float bq = (beliefBudget!=null) ? beliefBudget.qua() : Float.NaN;
         float qua = belief == null ? tq : aveAri(tq, bq);
         if (qua < nar.quaMin.floatValue())

@@ -210,7 +210,7 @@ public class NAL7Test extends AbstractNALTest {
 
                 //.input("X:x.") //shouldnt be necessary
                 .inputAt(1, "(X:x &&+1 (Y:y &&+2 Z:z)). :|:")
-                .mustBelieve(time, "X:x.", 1.00f, 0.73f, 1)
+                .mustBelieve(time, "X:x.", 1.00f, 0.81f, 1)
                 .mustBelieve(time, "(Y:y &&+2 Z:z).", 1.00f, 0.81f, 2, 4)
                 .mustNotOutput(time, "(Y:y &&+2 Z:z)", '.', 1.00f, 1f, 0.43f, 0.43f, 2) //avoid the substitutionIfUnifies result
                 .mustBelieve(time, "Y:y.", 1.00f, 0.73f, 2)

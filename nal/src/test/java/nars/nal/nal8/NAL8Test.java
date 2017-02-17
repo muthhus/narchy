@@ -20,7 +20,7 @@ import static org.junit.Assert.assertEquals;
 @RunWith(Parameterized.class)
 public class NAL8Test extends AbstractNALTest {
 
-    final int cycles = 150;
+    final int cycles = 350;
 
     public NAL8Test(Supplier<NAR> b) { super(b); }
 
@@ -918,13 +918,16 @@ public class NAL8Test extends AbstractNALTest {
 
     @Test
     public void testInhibition1()  {
+        //deisreDed, and its negative counterpart for the negated belief
         test()
-                
+                //.log()
                 .goal("(reward)")
                 .believe("((good) ==> (reward))", 1, 0.9f)
                 .believe("((bad) ==> (--,(reward)))", 1, 0.9f)
                 .mustDesire(cycles, "(good)", 1.0f, 0.81f)
-                .mustDesire(cycles, "(bad)", 0.0f, 0.81f);
+                .mustNotOutput(cycles, "(good)", '!', 0.0f, 0.5f, 0.75f, 1f, ETERNAL)
+                .mustDesire(cycles, "(bad)", 0.0f, 0.81f)
+                .mustNotOutput(cycles, "(bad)", '!', 0.5f, 1f, 0.75f, 1f, ETERNAL);
     }
 
 

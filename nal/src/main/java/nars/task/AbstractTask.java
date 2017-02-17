@@ -119,8 +119,10 @@ public abstract class AbstractTask extends RawBudget implements Task {
 //    }
 
 
-    public AbstractTask(@NotNull Termed<Compound> term, char punctuation, @Nullable Truth truth, float p, float d, float q) {
-        super(p, q);
+    public AbstractTask(@NotNull Termed<Compound> term, char punctuation, @Nullable Truth truth, float p, float q) {
+        super();
+        priority = p; //direct set
+        quality = q; //direct set
 
         this.punc = punctuation;
 

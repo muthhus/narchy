@@ -8,6 +8,7 @@ import nars.Task;
 import nars.budget.Budget;
 import nars.budget.RawBudget;
 import nars.task.Tasked;
+import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.truth.Truth;
@@ -178,5 +179,5 @@ public abstract class Premise extends RawBudget implements Tasked {
         return result;
     }
 
-    @Nullable abstract public Budget budget(@NotNull Term conclusion, @Nullable Truth truth, @NotNull Derivation conclude);
+    @Nullable abstract public Budget budget(@NotNull Compound conclusion, @Nullable Truth truth, @NotNull Derivation conclude);
 }

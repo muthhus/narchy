@@ -31,7 +31,6 @@ public class DefaultTruth implements Truth  {
 
     public DefaultTruth(float f, float c, float epsilon) {
         float C = Truth.conf(c, epsilon);
-        assert(C > 0);
         this.freq = Truth.freq(f, epsilon);
         this.conf = C;
     }

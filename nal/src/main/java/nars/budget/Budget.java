@@ -159,9 +159,9 @@ public interface Budget extends Budgeted {
     }
 
     public static float validQuality(float q) {
-        if (q!=q /* fast NaN test */)
-            return Float.NaN;
-        else {
+        if (q!=q /* fast NaN test */) {
+            throw new BudgetException("NaN quality");
+        } else {
 //            if (p > 1f - Param.BUDGET_EPSILON)
 //                throw new BudgetException("quality must be < 1.0");
 //            else if (p < 0f)

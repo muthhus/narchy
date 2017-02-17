@@ -73,9 +73,10 @@ public class ArrayQuestionTable extends MultiRWFasterList<Task> implements Quest
     @Override
     public final Task add(@NotNull Task question, @NotNull BeliefTable answers, @NotNull NAR n) {
 
+        if (contains(question))
+            return null; //already here
 
         float tp = question.pri();
-
 
         final Task[] trash = new Task[1];
         final Task[] result = new Task[1];

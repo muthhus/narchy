@@ -297,21 +297,4 @@ public final class BudgetFunctions extends UtilityFunctions {
         }
     }
 
-    /** occam's razor: penalize relative complexity growth
-     * @return a value between 0 and 1 that priority will be scaled by */
-    public static float occamComplexityGrowthRelative(@NotNull Termed derived, Task parentTask, Task parentBelief, int decayComplexity) {
-
-        int parentComplexity;
-        int taskCompl = parentTask.complexity();
-        if (parentBelief!=null) // && parentBelief.complexity() > parentComplexity)
-            parentComplexity =
-                Math.min(taskCompl, parentBelief.complexity());
-        else
-            parentComplexity = taskCompl;
-
-        int derivedComplexity = derived.complexity();
-        //return parentComplexity / (1f + Math.max(parentComplexity, derivedComplexity));
-        //return Math.max(1f, (parentComplexity/derivedComplexity));
-        return Util.unitize((float)parentComplexity/(decayComplexity +derivedComplexity));
-    }
 }

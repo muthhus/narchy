@@ -25,7 +25,8 @@ public class RawBLink<X> extends RawBudget implements BLink<X> {
 
     public RawBLink(@NotNull X id, float p, float q) {
         this.id = id;
-        setBudget(p, q);
+        this.priority = p;
+        this.quality = q;
     }
 
     public RawBLink(@NotNull X id, @NotNull Budgeted b) {

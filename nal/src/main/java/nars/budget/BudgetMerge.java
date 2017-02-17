@@ -1,6 +1,7 @@
 package nars.budget;
 
 import jcog.Util;
+import nars.Param;
 import nars.link.BLink;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -95,11 +96,13 @@ public interface BudgetMerge extends BiFunction<Budget, Budget, Budget> {
             case MAX:
                 nextPri = Math.max(ePri, iPri);
                 //nextQua = Math.max(eQua, iQua);
-                float pInfluence = iPri / (ePri + iPri);
-                if (eQua!=iQua)
+
+                if (eQua + iQua > Param.BUDGET_EPSILON && ePri + iPri > Param.BUDGET_EPSILON) {
+                    float pInfluence = iPri / (ePri + iPri);
                     nextQua = Util.lerp(pInfluence, iQua, eQua);
-                else
+                } else {
                     nextQua = eQua;
+                }
                 break;
             case AVG:
                 nextPri = (ePri+iPri)*0.5f;

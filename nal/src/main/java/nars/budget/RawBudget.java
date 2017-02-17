@@ -62,11 +62,6 @@ public class RawBudget implements Budget {
 
 
 
-
-
-
-
-
     /**
      * Get quality value
      *

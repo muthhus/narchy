@@ -6,42 +6,65 @@ import nars.Param;
 import nars.Task;
 import nars.budget.Budget;
 import nars.budget.BudgetFunctions;
+import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import static jcog.Util.unitize;
+
 /**
  * Created by me on 2/6/17.
  */
-public class DefaultPremise extends Premise {
+abstract public class DefaultPremise extends Premise {
 
     public DefaultPremise(@NotNull Termed c, @NotNull Task task, Term beliefTerm, Task belief, float pri, float qua) {
         super(c, task, beliefTerm, belief, pri, qua);
     }
 
 
-    @Override
-    public @Nullable Budget budget(@NotNull Term conclusion, @Nullable Truth truth, @NotNull Derivation conclude) {
-
-        float truthFactor = Util.unitize(qualityFactor(truth, conclude));
-        float complexityFactor =
-                BudgetFunctions.occamComplexityGrowthRelative(conclusion, task, belief, 1);
-
-        final float q = qua() * complexityFactor;
-
-        if (q < conclude.quaMin)
+    protected Budget budget(float priFactor, float quaFactor, float quaMin) {
+        float q = qua() * quaFactor;
+        if (q < quaMin)
             return null;
+        else
+            return $.b(pri() * priFactor, q);
+    }
 
-        float p = pri() * truthFactor * complexityFactor;
+    @Override
+    public @Nullable Budget budget(@NotNull Compound conclusion, @Nullable Truth truth, @NotNull Derivation conclude) {
 
 
-        return $.b(p, Util.clamp(q, 0f, 1f - Param.BUDGET_EPSILON));
+        float quaMin = conclude.quaMin;
+        if (truth!=null) {
+            //belief and goal:
+            float quaFactor = unitize(qualityFactor(truth, conclude));
+            if (quaFactor!=quaFactor)
+                throw new Budget.BudgetException("NaN quality during premise build");
+
+            //early termination test to avoid calculating priFactor:
+            if (quaFactor * qua() < quaMin)
+                return null;
+
+            return budget(
+                    unitize(priFactor(truth, conclusion, task, belief)),
+                    quaFactor,
+                    quaMin);
+        } else {
+            //question and quest
+            float priFactor = unitize(priFactor(truth, conclusion, task, belief));
+            return budget(
+                    priFactor,
+                    priFactor,
+                    quaMin);
+        }
 
     }
 
-    protected float qualityFactor(@Nullable Truth truth, @NotNull Derivation conclude) {
-        return 1f;
-    }
+    abstract float qualityFactor(@NotNull Truth truth, @NotNull Derivation conclude);
+
+    abstract float priFactor(@Nullable Truth truth, @NotNull Compound conclusion, @NotNull Task task, @Nullable Task belief);
+
 }

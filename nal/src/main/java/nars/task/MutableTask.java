@@ -43,7 +43,7 @@ public class MutableTask extends AbstractTask {
 
     public MutableTask(@NotNull Termed<Compound> term, char punct, @Nullable Truth truth) {
         super(term, punct, truth,
-            /* budget: */ 0, Float.NaN, Float.NaN);
+            /* budget: */ 0, Float.NaN);
     }
 
 
