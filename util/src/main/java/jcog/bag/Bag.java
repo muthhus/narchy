@@ -200,6 +200,7 @@ public interface Bag<K,V> extends Table<K, V>, Iterable<V> {
         return (p==p) ? p : valueIfMissing;
     }
 
+
     /** resolves the key associated with a particular value */
     @NotNull K key(V value);
 

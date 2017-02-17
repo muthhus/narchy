@@ -2,6 +2,7 @@ package nars.control;
 
 import jcog.bag.PLink;
 import jcog.bag.RawPLink;
+import jcog.data.FloatParam;
 import jcog.data.MutableIntRange;
 import jcog.data.MutableInteger;
 import jcog.data.Range;
@@ -11,10 +12,6 @@ import nars.Control;
 import nars.NAR;
 import nars.Param;
 import jcog.bag.Bag;
-import nars.bag.BagAdapter;
-import nars.budget.BLink;
-import nars.budget.BudgetMerge;
-import nars.budget.RawBLink;
 import nars.concept.Concept;
 import nars.conceptualize.ConceptBuilder;
 import nars.derive.Deriver;
@@ -22,8 +19,6 @@ import nars.premise.MatrixPremiseBuilder;
 import nars.task.DerivedTask;
 import nars.term.Termed;
 import org.jetbrains.annotations.NotNull;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -37,10 +32,6 @@ import java.util.function.Consumer;
  */
 public class ConceptBagControl implements Control, Consumer<DerivedTask> {
 
-
-    private static final Logger logger = LoggerFactory.getLogger(ConceptBagControl.class);
-
-    public static final BudgetMerge CONCEPT_BAG_BLEND = BudgetMerge.orBlend;
 
     final Deriver deriver;
 
@@ -85,6 +76,9 @@ public class ConceptBagControl implements Control, Consumer<DerivedTask> {
 
     public final HitMissMeter meter = new HitMissMeter(ConceptBagControl.class.getSimpleName());
 
+    public final FloatParam activationRate = new FloatParam(1f);
+    private float currentActivationRate;
+
 //    private Comparator<? super BLink<Concept>> sortConceptLinks = (a, b) -> {
 //        Concept A = a.get();
 //        Concept B = b.get();
@@ -114,6 +108,8 @@ public class ConceptBagControl implements Control, Consumer<DerivedTask> {
             if (busy.compareAndSet(false, true)) {
 
                 //updae concept bag
+                currentActivationRate = activationRate.floatValue() * 1f/((float)Math.sqrt(active.capacity()));
+
                 active.commit();
 
                 float load = nar.exe.load();
@@ -181,8 +177,8 @@ public class ConceptBagControl implements Control, Consumer<DerivedTask> {
 
 
     @Override
-    public void activate(/*Concept*/ Termed concept, float priToAdd) {
-        active.put(new RawPLink(concept, priToAdd));
+    public void activate(/*Concept*/ Concept concept, float priToAdd) {
+        active.put(new RawPLink(concept, priToAdd), currentActivationRate, null);
     }
 
 

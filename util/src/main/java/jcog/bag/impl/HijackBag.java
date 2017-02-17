@@ -49,7 +49,12 @@ public abstract class HijackBag<K,V> implements Bag<K,V> {
     float priMin;
     float priMax;
 
-    public HijackBag(Random random, int reprobes) {
+    public HijackBag(int initialCapacity, int reprobes, Random random) {
+        this(reprobes, random);
+        setCapacity(initialCapacity);
+    }
+
+    public HijackBag(int reprobes, Random random) {
         this.random = random;
         this.reprobes = reprobes;
         this.map = new AtomicReference<>(EMPTY_ARRAY);
@@ -130,9 +135,7 @@ public abstract class HijackBag<K,V> implements Bag<K,V> {
     public void clear() {
         if (!size.compareAndSet(0, 0)) {
             AtomicReferenceArray<V> prevMap = map.getAndSet(new AtomicReferenceArray<V>(capacity()));
-            forEach(prevMap, null, x -> {
-                onRemoved(x);
-            });
+            forEachActive(this, prevMap, this::onRemoved);
             //Arrays.fill(map, null);
         }
     }

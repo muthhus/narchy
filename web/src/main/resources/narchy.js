@@ -221,7 +221,6 @@ function graphConcepts(tgt) {
 
     const decoder = new TextDecoder("utf8");
 
-    //callee should increment its data pointer by 3 x 4 (12 bytes)
     function nextBudgeted(d, m) {
         var j = d.j || 0;
 
@@ -242,10 +241,30 @@ function graphConcepts(tgt) {
 
         d.j = j;
 
-
         return x;
     }
 
+    function nextBudgeted(d, m) {
+        var j = d.j || 0;
+
+        const p = d.getFloat32(j); j += 4;
+
+        const x = { };
+
+        if (p >= 0) {
+            x.pri = p;
+
+            const termStrLen = d.getInt16(j); j += 2;
+            if (termStrLen > 0) {
+                x.term = decoder.decode(m.slice(j, j + termStrLen)); j += termStrLen;
+            }
+
+        } /* else, it is end of segment signal */
+
+        d.j = j;
+
+        return x;
+    }
     function decodeConceptSummaries(e, m) {
         const d = new DataView(m);
         let j = 0;
@@ -256,10 +275,9 @@ function graphConcepts(tgt) {
 
         while (d.byteLength > j) {
 
-            //budget + Concept ID
-            const x = nextBudgeted(d, m);
+            //priority + Concept ID
+            const x = nextPrioritized(d, m);
             if (x.term) {
-
 
                 //TERMLINKS sequence
                 {

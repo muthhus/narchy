@@ -2,6 +2,7 @@ package nars.gui;
 
 import com.google.common.collect.Lists;
 import com.jogamp.opengl.GL2;
+import jcog.bag.PLink;
 import nars.$;
 import nars.NAR;
 import nars.NAgent;
@@ -107,12 +108,12 @@ public class Vis {
         return treeChart(d, d.core.active, count);
     }
 
-    public static BagChart<Concept> treeChart(NAR nar, Bag<Concept,BLink<Concept>> b, final int count) {
+    public static BagChart<Concept> treeChart(NAR nar, Bag<Concept,PLink<Concept>> b, final int count) {
         long[] now = new long[]{nar.time()};
         BagChart<Concept> tc = new BagChart<Concept>(b, count) {
 
             @Override
-            public void accept(BLink<Concept> x, ItemVis<BLink<Concept>> y) {
+            public void accept(PLink<Concept> x, ItemVis<PLink<Concept>> y) {
                 float p = x.pri();
                 float ph = 0.25f + 0.75f * p;
 
@@ -169,10 +170,10 @@ public class Vis {
         return tc;
     }
 
-    public static <X extends Termed> BagChart<X> items(Bag<X,?> bag, final Cycles d, final int count) {
+    public static <X extends Termed> BagChart<X> items(Bag<X,PLink<X>> bag, final Cycles d, final int count) {
         BagChart tc = new BagChart(bag, count) {
             @Override
-            public void accept(BLink x, ItemVis y) {
+            public void accept(PLink x, ItemVis y) {
                 float p = x.pri();
 
                 float[] f = Draw.hsb(

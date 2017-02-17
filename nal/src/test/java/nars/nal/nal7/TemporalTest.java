@@ -1,5 +1,6 @@
 package nars.nal.nal7;
 
+import jcog.bag.PLink;
 import nars.*;
 import jcog.bag.Bag;
 import nars.budget.BLink;
@@ -396,7 +397,7 @@ public class TemporalTest {
         d.believe("((a ==>+6 b)-->[pill])", Tense.Present, 1f, 0.9f);
         d.run(1);
 
-        Bag<Concept,BLink<Concept>> cb = d.core.active;
+        Bag<Concept,PLink<Concept>> cb = d.core.active;
         cb.print();
         assertTrue(5 <= cb.size());
         Concept cc = cb.iterator().next().get();//((ArrayBag<Concept>) cb).get(0).get();

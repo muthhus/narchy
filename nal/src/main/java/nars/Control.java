@@ -16,7 +16,7 @@ public interface Control {
      * if the concept is active, returns the Concept while applying the boost factor to its budget
      */
 
-    void activate(Termed term, float priToAdd);
+    void activate(Concept term, float priToAdd);
 
 
     /**
@@ -35,7 +35,7 @@ public interface Control {
 
     Control NullControl = new Control() {
         @Override
-        public void activate(Termed term, float priToAdd) {
+        public void activate(Concept term, float priToAdd) {
 
         }
 

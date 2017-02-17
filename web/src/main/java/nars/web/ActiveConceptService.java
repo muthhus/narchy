@@ -1,5 +1,6 @@
 package nars.web;
 
+import jcog.bag.PLink;
 import jcog.data.MutableInteger;
 import nars.IO;
 import nars.NAR;
@@ -117,12 +118,12 @@ public class ActiveConceptService extends PeriodicWebsocketService {
         }
     }
 
-    private static void writeConceptSummary(DataOutput out, BLink<Concept> bc) throws IOException {
+    private static void writeConceptSummary(DataOutput out, PLink<Concept> bc) throws IOException {
         Concept c = bc.get();
 
         //punctuation: ConceptSummary
 
-        IO.writeBudget(out, bc);
+        IO.writePriority(out, bc);
 
         IO.writeStringUTF(out, c.toString());
 

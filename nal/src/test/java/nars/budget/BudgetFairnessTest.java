@@ -1,5 +1,6 @@
 package nars.budget;
 
+import jcog.bag.PLink;
 import jcog.math.MultiStatistics;
 import nars.Control;
 import nars.Op;
@@ -36,7 +37,7 @@ public class BudgetFairnessTest {
         Control c = d.getControl();
         d.setControl(new Control() {
             @Override
-            public void activate(Termed term, float priToAdd) {
+            public void activate(Concept term, float priToAdd) {
 
                 c.activate(term, priToAdd);
                 m.value(priToAdd, term.term());
@@ -48,7 +49,7 @@ public class BudgetFairnessTest {
             }
 
             @Override
-            public Iterable<BLink<Concept>> conceptsActive() {
+            public Iterable<PLink<Concept>> conceptsActive() {
                 return c.conceptsActive();
             }
         });

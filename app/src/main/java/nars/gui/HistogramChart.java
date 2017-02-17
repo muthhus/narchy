@@ -2,6 +2,7 @@ package nars.gui;
 
 import com.jogamp.opengl.GL2;
 import jcog.Util;
+import jcog.bag.PLink;
 import nars.NAR;
 import nars.concept.Concept;
 import nars.budget.BLink;
@@ -30,7 +31,7 @@ public class HistogramChart extends Surface {
 
     }
 
-    public HistogramChart(NAR nar, FloatFunction<BLink<Concept>> meter, int bins, Color3f dark, Color3f light) {
+    public HistogramChart(NAR nar, FloatFunction<PLink<Concept>> meter, int bins, Color3f dark, Color3f light) {
 
         double[] data = new double[bins];
         this.data = () -> data;

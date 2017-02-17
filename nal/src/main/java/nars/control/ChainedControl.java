@@ -22,7 +22,7 @@ public class ChainedControl extends ConcurrentArrayList<Control> implements Cont
     }
 
     @Override
-    public void activate(Termed term, float priToAdd) {
+    public void activate(Concept term, float priToAdd) {
         for (int i = 0, controlSize = size(); i < controlSize; i++) {
             get(i).activate(term, priToAdd);
         }

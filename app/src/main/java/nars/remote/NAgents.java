@@ -1,5 +1,6 @@
 package nars.remote;
 
+import jcog.bag.PLink;
 import jcog.data.FloatParam;
 import jcog.data.random.XorShift128PlusRandom;
 import nars.$;
@@ -193,7 +194,7 @@ abstract public class NAgents extends NAgent {
             }
         };
 
-        Default nar = new Default(16 * 1024,
+        Default nar = new Default(1 * 1024,
                 conceptsPerCycle, 1, 3, rng,
                 new CaffeineIndex(cb, 32*1024, false, exe)
                 //new TreeTermIndex.L1TreeIndex(new DefaultConceptBuilder(), 300000, 32 * 1024, 3)
@@ -229,22 +230,22 @@ abstract public class NAgents extends NAgent {
                 return compressor.decode(t);
             }
 
-            @Override
-            protected BLinkHijackBag<Concept> newConceptBag(int activeConcepts) {
-                return new BLinkHijackBag<>(activeConcepts, reprobes, BudgetMerge.plusBlend, random ) {
-                    @Override
-                    public Forget forget(float rate) {
-                        float memoryForget = 0.98f;
-                        return new Forget(rate, memoryForget, memoryForget);
-                    }
-                };
-            }
+//            @Override
+//            protected BLinkHijackBag<Concept> newConceptBag(int activeConcepts) {
+//                return new BLinkHijackBag<>(activeConcepts, reprobes, BudgetMerge.plusBlend, random ) {
+//                    @Override
+//                    public Forget forget(float rate) {
+//                        float memoryForget = 0.98f;
+//                        return new Forget(rate, memoryForget, memoryForget);
+//                    }
+//                };
+//            }
         };
 
-        nar.beliefConfidence(0.5f);
-        nar.goalConfidence(0.5f);
+        nar.beliefConfidence(0.75f);
+        nar.goalConfidence(0.75f);
 
-        float p = 0.5f;
+        float p = 0.75f;
         nar.DEFAULT_BELIEF_PRIORITY = 0.5f * p;
         nar.DEFAULT_GOAL_PRIORITY = 0.75f * p;
         nar.DEFAULT_QUESTION_PRIORITY = 0.25f * p;
@@ -344,21 +345,21 @@ abstract public class NAgents extends NAgent {
     public static void chart(NAgents a) {
         NAR nar = a.nar;
 
-        BagChart<Task> taskChart = new BagChart<Task>(new Leak<Task,BLink<Task>>(new ArrayBag<Task>(16, BudgetMerge.maxBlend, new ConcurrentHashMap<>()), 0f, a.nar) {
-
-            @Override
-            protected float onOut(@NotNull BLink<Task> b) {
-                return 1;
-            }
-
-            @Override
-            protected void in(@NotNull Task task, Consumer<BLink<Task>> each) {
-                if (!task.isCommand() && !task.isDeleted())
-                    each.accept(new RawBLink<>(task, task, 0.1f));
-            }
-
-        }.bag, 16);
-        a.nar.onCycle(f -> taskChart.update());
+//        BagChart<Task> taskChart = new BagChart<Task>(new Leak<Task,PLink<Task>>(new ArrayBag<Task>(16, BudgetMerge.maxBlend, new ConcurrentHashMap<>()), 0f, a.nar) {
+//
+//            @Override
+//            protected float onOut(@NotNull PLink<Task> b) {
+//                return 1;
+//            }
+//
+//            @Override
+//            protected void in(@NotNull Task task, Consumer<PLink<Task>> each) {
+//                if (!task.isCommand() && !task.isDeleted())
+//                    each.accept(new RawBLink<>(task, task, 0.1f));
+//            }
+//
+//        }.bag, 16);
+//        a.nar.onCycle(f -> taskChart.update());
 
         a.nar.runLater(()-> {
 
@@ -378,11 +379,11 @@ abstract public class NAgents extends NAgent {
                                     new CameraSensorView(cs, nar).align(Surface.Align.Center, cs.width, cs.height))
                                     .toArray(Surface[]::new)),
                             "inputEdit",()->Vis.newInputEditor(a.nar),
-                            "concepts", ()->
-                                    Vis.treeChart( a.nar, new Bagregate<>(a.nar.conceptsActive(), 64, 0.05f) , 64),
+//                            "concepts", ()->
+//                                    Vis.treeChart( a.nar, new Bagregate(a.nar.conceptsActive(), 64, 0.05f) , 64),
                             "conceptBudget", ()->
                                     Vis.budgetHistogram(nar, 64),
-                            "tasks", ()-> taskChart,
+                            //"tasks", ()-> taskChart,
                             "agentCharts", ()-> Vis.emotionPlots(a.nar, 256),
                             "agentActions", ()-> Vis.agentActions(a, 400),
                             "agentPredict", ()-> Vis.beliefCharts(400, a.predictors, a.nar)

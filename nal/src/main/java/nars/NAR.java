@@ -1396,9 +1396,17 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
         return this == obj;
     }
 
+    public Concept activate(Termed term, float priToAdd) {
+        Concept c = concept(term);
+        if (c != null) {
+            activate(c, priToAdd);
+        }
+        return c;
+    }
+
     @Override
-    public void activate(Termed term, float priToAdd) {
-        control.activate(term, priToAdd);
+    public void activate(Concept c, float priToAdd) {
+        control.activate(c, priToAdd);
     }
 
     @Override
