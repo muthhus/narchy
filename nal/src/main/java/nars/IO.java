@@ -5,6 +5,7 @@ import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
 import jcog.Texts;
+import jcog.bag.Prioritized;
 import jcog.data.byt.DynByteSeq;
 import nars.budget.Budgeted;
 import nars.index.term.TermIndex;
@@ -155,8 +156,12 @@ public class IO {
         out.write(bb);
     }
 
-    public static void writeBudget(@NotNull DataOutput out, @NotNull Budgeted t) throws IOException {
+    public static void writePriority(@NotNull DataOutput out, @NotNull Prioritized t) throws IOException {
         out.writeFloat(t.priSafe(0));
+    }
+
+    public static void writeBudget(@NotNull DataOutput out, @NotNull Budgeted t) throws IOException {
+        writePriority(out, t);
         out.writeFloat(t.qua());
     }
 

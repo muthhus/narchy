@@ -3,6 +3,7 @@ package nars;
 
 import com.google.common.collect.Sets;
 import jcog.Util;
+import jcog.bag.PLink;
 import jcog.data.MutableInteger;
 import jcog.event.ArrayTopic;
 import jcog.event.On;
@@ -1405,7 +1406,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
         return control.pri(termed);
     }
 
-    public Iterable<BLink<Concept>> conceptsActive() {
+    public Iterable<PLink<Concept>> conceptsActive() {
         return control.conceptsActive();
     }
 

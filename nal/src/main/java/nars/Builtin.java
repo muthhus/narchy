@@ -1,6 +1,7 @@
 package nars;
 
 import jcog.Texts;
+import jcog.bag.PLink;
 import nars.budget.BLink;
 import nars.concept.Concept;
 import nars.op.Command;
@@ -87,14 +88,14 @@ public class Builtin  {
 
 
         nar.on("top", (Command) (op, args, n) -> {
-            Iterable<BLink<Concept>> ii = n.conceptsActive();
+            Iterable<PLink<Concept>> ii = n.conceptsActive();
 
             int MAX_RESULT_LENGTH = 250;
             StringBuilder b = new StringBuilder(MAX_RESULT_LENGTH+8);
 
             if (args.length > 0 && args[0] instanceof Atom) {
                 String query = $.unquote(args[0]).toLowerCase();
-                for (BLink<Concept> bc : ii) {
+                for (PLink<Concept> bc : ii) {
                     String bs = bc.get().toString();
                     String cs = bs.toLowerCase();
                     if (cs.contains(query)) {
@@ -105,7 +106,7 @@ public class Builtin  {
 
                 }
             } else {
-                for (BLink<Concept> bc : ii) {
+                for (PLink<Concept> bc : ii) {
                     b.append(bc.get()).append('=').append(Texts.n2(bc.pri())).append("  ");
                     if (b.length() > MAX_RESULT_LENGTH)
                         break;

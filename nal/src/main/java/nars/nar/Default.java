@@ -1,10 +1,10 @@
 package nars.nar;
 
+import jcog.bag.PLink;
 import jcog.data.random.XorShift128PlusRandom;
 import nars.NAR;
 import jcog.bag.Bag;
-import nars.bag.impl.CurveBag;
-import nars.budget.BLink;
+import nars.bag.impl.PLinkHijackBag;
 import nars.concept.Concept;
 import nars.conceptualize.DefaultConceptBuilder;
 import nars.control.ConceptBagControl;
@@ -69,12 +69,11 @@ public class Default extends NAR {
         setControl(this.core);
     }
 
-    protected Bag<Concept,BLink<Concept>> newConceptBag(int activeConcepts) {
+    protected Bag<Concept,PLink<Concept>> newConceptBag(int initialCapacity) {
 
-
-        return
-                new CurveBag<Concept>(activeConcepts, ((DefaultConceptBuilder) concepts.conceptBuilder()).defaultCurveSampler, ConceptBagControl.CONCEPT_BAG_BLEND,
-                this.exe.concurrent() ? new java.util.concurrent.ConcurrentHashMap<>() : new HashMap());
+        return new PLinkHijackBag(initialCapacity, 4, random);
+//                new CurveBag<Concept>(activeConcepts, ((DefaultConceptBuilder) concepts.conceptBuilder()).defaultCurveSampler, ConceptBagControl.CONCEPT_BAG_BLEND,
+//                this.exe.concurrent() ? new java.util.concurrent.ConcurrentHashMap<>() : new HashMap());
 
                 //new HijackBag<>(8192, 8, BudgetMerge.maxBlend, nar.random )
 
@@ -97,8 +96,6 @@ public class Default extends NAR {
             );
         }
     }
-
-
 
 
 }

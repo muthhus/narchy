@@ -2,6 +2,7 @@ package nars.budget;
 
 import jcog.Texts;
 import jcog.Util;
+import jcog.bag.Priority;
 import nars.Op;
 import nars.Param;
 import nars.Task;
@@ -22,7 +23,7 @@ import static nars.util.UtilityFunctions.or;
 /**
  * Created by me on 12/11/15.
  */
-public interface Budget extends Budgeted {
+public interface Budget extends Priority, Budgeted {
 
 
     /**common instance for a 'Deleted budget'.*/
@@ -105,11 +106,6 @@ public interface Budget extends Budgeted {
         return this;
     }
 
-    default void priAdd(float toAdd) {
-        setPriority(priSafe(0) + toAdd);
-    }
-    default void priSub(float toSubtract) { setPriority(priSafe(0) - toSubtract); }
-
     @NotNull
     default Budget cloneMult(float p, float q) {
         Budget x = clone();
@@ -128,9 +124,6 @@ public interface Budget extends Budgeted {
     }
 
 
-
-
-
     final static class BudgetException extends SoftException {
         public BudgetException() {
             super("NaN");
@@ -138,24 +131,6 @@ public interface Budget extends Budgeted {
         public BudgetException(String message) {
             super(message);
         }
-    }
-
-    /**
-     * Change priority value
-     *
-     * @param p The new priority
-     * @return whether the operation had any effect
-     */
-    void setPriority(float p);
-
-    public static float validPriority(float p) {
-        if (p!=p /* fast NaN test */)
-            throw new BudgetException();
-        if (p > 1.0f)
-            p = 1.0f;
-        else if (p < 0.0f)
-            p = 0.0f;
-        return p;
     }
 
     public static float validQuality(float q) {
@@ -179,33 +154,9 @@ public interface Budget extends Budgeted {
 //        return this;
 //    }
 //
-    @NotNull
-    default Budget priMult(float factor) {
-        float p = pri();
-        if (p==p)
-            setPriority(p * factor);
-        return this;
-    }
 
-    @NotNull
-    default Budget priLerp(float target, float speed) {
-        setPriority(lerp(speed, target, pri()));
-        return this;
-    }
 
-    /** returns the delta */
-    default float priLerpMult(float factor, float speed) {
 
-        if (Util.equals(factor, 1f, Param.BUDGET_EPSILON))
-            return 0; //no change
-
-        float p = pri();
-        float target = unitize(p * factor);
-        float delta = target - p;
-        setPriority(lerp(speed, target, p));
-        return delta;
-
-    }
 
     default void quaMult(float factor) {
         setQua(qua() * factor);

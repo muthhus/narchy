@@ -1,6 +1,6 @@
 package nars;
 
-import nars.budget.BLink;
+import jcog.bag.PLink;
 import nars.concept.Concept;
 import nars.term.Termed;
 import org.jetbrains.annotations.NotNull;
@@ -29,7 +29,7 @@ public interface Control {
         return (p == p) ? p : valueIfInactive;
     }
 
-    Iterable<BLink<Concept>> conceptsActive();
+    Iterable<PLink<Concept>> conceptsActive();
 
 
 
@@ -45,7 +45,7 @@ public interface Control {
         }
 
         @Override
-        public Iterable<BLink<Concept>> conceptsActive() {
+        public Iterable<PLink<Concept>> conceptsActive() {
             return Collections.emptyList();
         }
     };

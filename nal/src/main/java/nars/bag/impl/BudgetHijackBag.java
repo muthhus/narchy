@@ -1,7 +1,6 @@
 package nars.bag.impl;
 
 import jcog.bag.impl.HijackBag;
-import nars.Task;
 import nars.budget.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -16,7 +15,7 @@ abstract public class BudgetHijackBag<K,V extends Budgeted> extends HijackBag<K,
     protected final BudgetMerge merge;
 
     public BudgetHijackBag(Random random, BudgetMerge merge, int reprobes) {
-        super(random, reprobes);
+        super(reprobes, random);
         this.merge = merge;
     }
 
@@ -36,9 +35,7 @@ abstract public class BudgetHijackBag<K,V extends Budgeted> extends HijackBag<K,
 
         float pBefore = priSafe(existing, 0);
         merge.apply(existing.budget(), applied, scale); //TODO overflow
-        pressure += priSafe(existing, 0) - pBefore;
-
-        return pressure;
+        return priSafe(existing, 0) - pBefore;
     }
 
 

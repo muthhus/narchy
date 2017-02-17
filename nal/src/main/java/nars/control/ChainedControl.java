@@ -1,9 +1,9 @@
 package nars.control;
 
 import com.google.common.collect.Iterators;
+import jcog.bag.PLink;
 import jcog.list.ConcurrentArrayList;
 import nars.Control;
-import nars.budget.BLink;
 import nars.concept.Concept;
 import nars.term.Termed;
 import org.jetbrains.annotations.NotNull;
@@ -39,7 +39,7 @@ public class ChainedControl extends ConcurrentArrayList<Control> implements Cont
     }
 
     @Override
-    public Iterable<BLink<Concept>> conceptsActive() {
+    public Iterable<PLink<Concept>> conceptsActive() {
         int s = size();
         switch (s) {
             case 0:
