@@ -1,7 +1,6 @@
-package nars.decide;
+package jcog.decide;
 
 import jcog.Util;
-import nars.Param;
 
 import java.util.Random;
 
@@ -9,6 +8,7 @@ public class DecidingSoftmax implements Deciding {
 
     private final float minTemperature;
     private final float temperatureDecay;
+    private final Random random;
     /**
      * normalized motivation
      */
@@ -22,14 +22,15 @@ public class DecidingSoftmax implements Deciding {
     float temperature;
     private float decisiveness;
 
-    public DecidingSoftmax(float initialTemperature, float minTemperature, float decay) {
+    public DecidingSoftmax(float initialTemperature, float minTemperature, float decay, Random random) {
         this.temperature = initialTemperature;
         this.minTemperature = minTemperature;
         this.temperatureDecay = decay;
+        this.random = random;
     }
 
     @Override
-    public int decide(float[] motivation, int lastAction, Random random) {
+    public int decide(float[] motivation, int lastAction) {
 
         temperature = Math.max(minTemperature,temperature * temperatureDecay);
 
@@ -46,7 +47,7 @@ public class DecidingSoftmax implements Deciding {
         }
 
         float sumMotivation = Util.sum(motivation);
-        if (sumMotivation < Param.TRUTH_EPSILON) {
+        if (sumMotivation < Float.MIN_VALUE) {
             decisiveness = 0;
             return random.nextInt(motivation.length);
         }

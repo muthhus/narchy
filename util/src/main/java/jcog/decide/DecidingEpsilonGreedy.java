@@ -1,4 +1,4 @@
-package nars.decide;
+package jcog.decide;
 
 import jcog.Util;
 import jcog.data.array.Arrays;
@@ -10,6 +10,7 @@ import java.util.Random;
  */
 public class DecidingEpsilonGreedy implements Deciding {
 
+    private final Random random;
     float epsilonRandom; //0.01f;
 
     /*
@@ -18,14 +19,16 @@ public class DecidingEpsilonGreedy implements Deciding {
             epsilonRandom = Math.max(epsilonRandom, epsilonRandomMin);
      */
 
-    public DecidingEpsilonGreedy(float epsilonRandom) {
+    public DecidingEpsilonGreedy(float epsilonRandom, Random random) {
+
         this.epsilonRandom = epsilonRandom;
+        this.random = random;
     }
 
     int motivationOrder[];
 
     @Override
-    public int decide(float[] motivation, int lastAction, Random random) {
+    public int decide(float[] motivation, int lastAction) {
         int actions = motivation.length;
 
         if (motivationOrder == null) {
@@ -60,8 +63,6 @@ public class DecidingEpsilonGreedy implements Deciding {
         if (equalToPreviousAction) //all equal?
             return lastAction;
 
-        if (nextAction != lastAction)
-            System.err.println("DECIDED " + nextAction);
 
         return nextAction;
     }

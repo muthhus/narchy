@@ -1,9 +1,6 @@
 package nars;
 
-import com.eclipsesource.json.Json;
-import com.eclipsesource.json.JsonArray;
-import com.eclipsesource.json.JsonObject;
-import com.eclipsesource.json.JsonValue;
+
 import jcog.Texts;
 import jcog.bag.Prioritized;
 import jcog.data.byt.DynByteSeq;
@@ -675,57 +672,57 @@ public class IO {
         }
     }
 
-    public static Term fromJSON(String json) {
-        JsonValue v = Json.parse(json);
-        return fromJSON(v);
-    }
-
-    public static Term toJSON(Term term) {
-        return $.func("json", $.quote(toJSONValue(term)));
-    }
-
-    public static JsonValue toJSONValue(Term term) {
-        switch (term.op()) {
-
-            //TODO other types
-
-            /*case SETe: {
-                JsonObject o = Json.object();
-                for (Term x : term)
-                    o.add
-            }*/
-            case PROD:
-                JsonArray a = (JsonArray) Json.array();
-                for (Term x : ((Compound) term))
-                    a.add(toJSONValue(x));
-                return a;
-            default:
-                return Json.value(term.toString());
-        }
-    }
-
-    public static Term fromJSON(JsonValue v) {
-        if (v instanceof JsonObject) {
-            JsonObject o = (JsonObject) v;
-            int s = o.size();
-            List<Term> members = $.newArrayList(s);
-            o.forEach(m -> members.add($.inh(fromJSON(m.getValue()), $.the(m.getName()))));
-            return $.
-                    //parallel
-                            sete
-                    //secte
-                            (members/*.toArray(new Term[s])*/);
-
-        } else if (v instanceof JsonArray) {
-            JsonArray o = (JsonArray) v;
-            List<Term> vv = $.newArrayList(o.size());
-            o.forEach(x -> vv.add(fromJSON(x)));
-            return $.p(vv);
-        }
-        String vv = v.toString();
-        return $.the(vv);
-        //return $.quote(vv);
-    }
+//    public static Term fromJSON(String json) {
+//        JsonValue v = Json.parse(json);
+//        return fromJSON(v);
+//    }
+//
+//    public static Term toJSON(Term term) {
+//        return $.func("json", $.quote(toJSONValue(term)));
+//    }
+//
+//    public static JsonValue toJSONValue(Term term) {
+//        switch (term.op()) {
+//
+//            //TODO other types
+//
+//            /*case SETe: {
+//                JsonObject o = Json.object();
+//                for (Term x : term)
+//                    o.add
+//            }*/
+//            case PROD:
+//                JsonArray a = (JsonArray) Json.array();
+//                for (Term x : ((Compound) term))
+//                    a.add(toJSONValue(x));
+//                return a;
+//            default:
+//                return Json.value(term.toString());
+//        }
+//    }
+//
+//    public static Term fromJSON(JsonValue v) {
+//        if (v instanceof JsonObject) {
+//            JsonObject o = (JsonObject) v;
+//            int s = o.size();
+//            List<Term> members = $.newArrayList(s);
+//            o.forEach(m -> members.add($.inh(fromJSON(m.getValue()), $.the(m.getName()))));
+//            return $.
+//                    //parallel
+//                            sete
+//                    //secte
+//                            (members/*.toArray(new Term[s])*/);
+//
+//        } else if (v instanceof JsonArray) {
+//            JsonArray o = (JsonArray) v;
+//            List<Term> vv = $.newArrayList(o.size());
+//            o.forEach(x -> vv.add(fromJSON(x)));
+//            return $.p(vv);
+//        }
+//        String vv = v.toString();
+//        return $.the(vv);
+//        //return $.quote(vv);
+//    }
 
     /**
      * Writes a string to the specified DataOutput using

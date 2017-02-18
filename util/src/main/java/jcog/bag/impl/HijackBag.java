@@ -444,7 +444,7 @@ public abstract class HijackBag<K,V> implements Bag<K,V> {
 
                     float r = curve() * priRange + priMin; //randomized threshold
 
-                    if ((r < p + tolerance) /*|| (r < p + tolerance(j, jLimit, n, batchSize, c))*/) {
+                    if (r < p + tolerance(((float)j)/jLimit)) { /*|| (r < p + tolerance(j, jLimit, n, batchSize, c))*/
                         if (target.test(v)) {
                             n--;
                         }
@@ -464,6 +464,17 @@ public abstract class HijackBag<K,V> implements Bag<K,V> {
         }
 
         return this;
+    }
+
+
+    /**
+     * a value between 0 and 1 of how much percent of the priority range
+     * to accept an item which is below the current sampling target priority.
+     * generally this should be a monotonically increasing function of
+     * the scan progress proportion, a value in 0..1.0 also.
+     * */
+    protected float tolerance(float scanProgressProportion) {
+        return scanProgressProportion * scanProgressProportion /* power 2 curve */;
     }
 
     @Override

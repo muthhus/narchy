@@ -6,10 +6,12 @@ import org.slf4j.LoggerFactory;
 
 import javax.script.ScriptEngineManager;
 import javax.script.SimpleBindings;
+import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.net.SocketException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ForkJoinPool;
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -28,29 +30,29 @@ public class JsUDPServer<A> extends UDPServer<JsUDPServer<A>.JsSession> {
     static transient final ScriptEngineManager engineManager = new ScriptEngineManager();
     static transient final NashornScriptEngine JS = (NashornScriptEngine) engineManager.getEngineByName("nashorn");
 
-    private final Function<SocketAddress, A> apiBuilder;
+    private final BiFunction<UDP, InetSocketAddress, A> apiBuilder;
 
     public JsUDPServer(int port, Supplier<A> apiBuilder) throws SocketException {
-        this(port, (a) -> apiBuilder.get());
+        this(port, (udp, a) -> apiBuilder.get());
     }
 
-    public JsUDPServer(int port, Function<SocketAddress, A> apiBuilder) throws SocketException {
+    public JsUDPServer(int port, BiFunction<UDP, InetSocketAddress, A> apiBuilder) throws SocketException {
         super(port);
         this.apiBuilder = apiBuilder;
     }
 
     @Override
-    protected JsSession get(SocketAddress a) {
-        return new JsSession(a, apiBuilder.apply(a));
+    protected JsSession get(InetSocketAddress a) {
+        return new JsSession(a, apiBuilder.apply(this, a));
     }
 
 
     class JsSession extends SimpleBindings implements Consumer<byte[]> {
 
         private final A context;
-        private final SocketAddress host;
+        private final InetSocketAddress host;
 
-        public JsSession(SocketAddress s, A api) {
+        public JsSession(InetSocketAddress s, A api) {
             super();
             this.host = s;
             this.context = api;
@@ -79,9 +81,7 @@ public class JsUDPServer<A> extends UDPServer<JsUDPServer<A>.JsSession> {
 //                    } catch (IOException e) {
 //                        logger.error("{}", e);
 //                    }
-                    out(result.toString().getBytes(), host);
-
-
+                    outJSON(result, host);
                 }
             });
         }

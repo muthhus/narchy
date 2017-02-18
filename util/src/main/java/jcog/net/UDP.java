@@ -1,12 +1,21 @@
 package jcog.net;
 
+import com.google.common.io.ByteArrayDataOutput;
+import com.google.common.io.ByteStreams;
+import com.google.gson.ExclusionStrategy;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import jcog.data.byt.DynByteSeq;
 import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.DataOutput;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.*;
+import java.nio.charset.Charset;
 import java.util.Arrays;
 
 /**
@@ -27,6 +36,11 @@ public abstract class UDP  {
     private static final InetAddress local = new InetSocketAddress(0).getAddress();
 
     //final BidiMap<UUID,IntObjectPair<InetAddress>> who = new DualHashBidiMap<>();
+
+    public final Gson json = new GsonBuilder()
+            //.setLenient()
+            //.disableHtmlEscaping()
+            .create();
 
     public UDP(String host, int port) throws SocketException, UnknownHostException {
         this(InetAddress.getByName(host), port);
@@ -56,13 +70,13 @@ public abstract class UDP  {
 
         onStart();
 
-        DatagramPacket p = new DatagramPacket(receiveData, receiveData.length);
         while (running) {
             try {
+                DatagramPacket p = new DatagramPacket(receiveData, receiveData.length);
                 in.receive(p);
-                in(Arrays.copyOfRange(p.getData(), p.getOffset(), p.getLength()), p.getSocketAddress());
-            } catch (IOException e) {
-                logger.error("{}",e);
+                in(Arrays.copyOfRange(p.getData(), p.getOffset(), p.getLength()), (InetSocketAddress) p.getSocketAddress());
+            } catch (Exception e) {
+                logger.error("{}", e);
             }
         }
     }
@@ -93,20 +107,41 @@ public abstract class UDP  {
     }
 
     public boolean out(byte[] data, int port) {
-        return out(data, new InetSocketAddress(local, port) );
+        return outBytes(data, new InetSocketAddress(local, port) );
     }
-
 
     public boolean out(byte[] data, String host, int port) throws UnknownHostException {
-        return out(data, new InetSocketAddress(InetAddress.getByName(host), port) );
+        return outBytes(data, new InetSocketAddress(InetAddress.getByName(host), port) );
     }
+
+    public boolean outJSON(Object x, String host, int port) throws UnknownHostException {
+        return outJSON(x, new InetSocketAddress(InetAddress.getByName(host), port)  );
+    }
+
+    public boolean outJSON(Object x, int port) throws UnknownHostException {
+        return outJSON(x, new InetSocketAddress(local, port)  );
+    }
+
+    public boolean outJSON(Object x, InetSocketAddress addr)  {
+        //DynByteSeq dyn = new DynByteSeq(MAX_PACKET_SIZE); //TODO wont work with the current hacked UTF output
+
+//        ByteArrayDataOutput dyn = ByteStreams.newDataOutput();
+//        json.toJson(x, new PrintStream());
+//        return outBytes(dyn.array(), addr);
+
+        String s = json.toJson(x);
+        return outBytes(s.getBytes(UTF8), addr);
+
+    }
+
+    final static Charset UTF8 = Charset.forName("UTF8");
 
 
     final static ThreadLocal<DatagramPacket> packet = ThreadLocal.withInitial(()->{
         return new DatagramPacket(ArrayUtils.EMPTY_BYTE_ARRAY, 0, 0);
     });
 
-    public boolean out(byte[] data, SocketAddress to) {
+    public boolean outBytes(byte[] data, InetSocketAddress to) {
         try {
 
             //DatagramPacket sendPacket = new DatagramPacket(data, data.length, to);
@@ -122,7 +157,7 @@ public abstract class UDP  {
         }
     }
 
-    abstract protected void in(byte[] data, SocketAddress from);
+    abstract protected void in(byte[] data, InetSocketAddress from);
 
 //    static class UDPClient {
 //        public static void main(String args[]) throws Exception {

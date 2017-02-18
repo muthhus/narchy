@@ -2,6 +2,8 @@ package jcog.learn.ql;
 
 import jcog.data.Range;
 import jcog.data.random.XorShift128PlusRandom;
+import jcog.decide.Deciding;
+import jcog.decide.DecidingSoftmax;
 import jcog.learn.Agent;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
@@ -67,6 +69,8 @@ abstract public class HaiQ implements Agent {
 	private int inputs;
 	public float Epsilon;
 
+	protected final Deciding decide = new DecidingSoftmax(0.25f, 0.1f, 0.99f, new Random());
+
 	public HaiQ() {
 		rng = new XorShift128PlusRandom(1);
 	}
@@ -130,21 +134,24 @@ abstract public class HaiQ implements Agent {
 	}
 
 	protected int choose(int state) {
-		int maxk = -1;
-		float maxval = Float.NEGATIVE_INFINITY;
+		return decide.decide(q[state], lastDecidedAction);
 
-		float[] qs = q[state];
-		for (int k = 0; k < actions; k++) {
-			float qq = qs[k];
-			// TODO determine if q is significant enough above threshold to
-			// count
-			if (qq > maxval) {
-				maxk = k;
-				maxval = qq;
-			}
-		}
+//		int maxk = -1;
+//		float maxval = Float.NEGATIVE_INFINITY;
+//
 
-		return maxk != -1 ? maxk : randomAction();
+//
+//		for (int k = 0; k < actions; k++) {
+//			float qq = qs[k];
+//			// TODO determine if q is significant enough above threshold to
+//			// count
+//			if (qq > maxval) {
+//				maxk = k;
+//				maxval = qq;
+//			}
+//		}
+//
+//		return maxk != -1 ? maxk : randomAction();
 	}
 
 	@Override

@@ -838,7 +838,10 @@ public enum Util { ;
     }
 
     public static int bin(float x, int bins) {
-        return (int) Math.floor((x + (0.5f / bins)) * bins);
+        int b = (int) Math.floor((x + (0.5f / bins)) * bins);
+        if (b >= bins)
+            b = bins-1; //???
+        return b;
     }
 
     /** bins a priority value to an integer */

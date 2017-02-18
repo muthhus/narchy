@@ -176,22 +176,22 @@ abstract public class NAgents extends NAgent {
         Random rng = new XorShift128PlusRandom(1);
         final Executioner exe =
                 //new SingleThreadExecutioner();
-                new MultiThreadExecutioner(threads, 16384 /* TODO chose a power of 2 number to scale proportionally to # of threads */)
+                new MultiThreadExecutioner(threads, 8192 /* TODO chose a power of 2 number to scale proportionally to # of threads */)
                     //.sync(false)
                 ;
 
-        int conceptsPerCycle = 48*threads;
+        int conceptsPerCycle = 32*threads;
 
         final int reprobes = 4;
 
         //Multi nar = new Multi(3,512,
         DefaultConceptBuilder cb = new DefaultConceptBuilder() {
-            /*@Override
+            @Override
             public <X> X withBags(Term t, BiFunction<Bag<Term, BLink<Term>>, Bag<Task, BLink<Task>>, X> f) {
                 Bag<Term, BLink<Term>> termlink = new BLinkHijackBag(reprobes, BudgetMerge.orBlend, rng );
                 Bag<Task, BLink<Task>> tasklink = new BLinkHijackBag(reprobes, BudgetMerge.orBlend, rng );
                 return f.apply(termlink, tasklink);
-            }*/
+            }
         };
 
         Default nar = new Default(16 * 1024,
@@ -202,7 +202,7 @@ abstract public class NAgents extends NAgent {
                 time,
                 exe) {
 
-            final Compressor compressor = new Compressor(this, "_", 2, 8,
+            final Compressor compressor = new Compressor(this, "_", 2, 5,
                     1f, 16, 256);
 
             @Override
@@ -252,7 +252,7 @@ abstract public class NAgents extends NAgent {
         nar.DEFAULT_QUEST_PRIORITY = 0.4f * p;
 
         nar.confMin.setValue(0.05f);
-        nar.truthResolution.setValue(0.05f);
+        //nar.truthResolution.setValue(0.01f);
         nar.termVolumeMax.setValue(72);
 
         MySTMClustered stm = new MySTMClustered(nar, 64, '.', 3, true, 6);

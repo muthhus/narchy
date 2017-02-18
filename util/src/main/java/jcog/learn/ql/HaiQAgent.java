@@ -40,6 +40,7 @@ public class HaiQAgent extends HaiQ {
     @Override
     protected int nextAction(int state) {
         //alpha is applied elsewhere, so here directly choose
+
         return choose(state);
     }
 

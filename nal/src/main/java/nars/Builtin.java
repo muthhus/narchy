@@ -28,8 +28,10 @@ public class Builtin  {
             //Functor.f0("date", () -> quote(new Date().toString())),
 
             Functor.f1Const("reflect", reflect::reflect),
-            Functor.f1Const("fromJSON", (jsonString)-> IO.fromJSON($.unquote(jsonString))),
-            Functor.f1Const("toJSON", IO::toJSON),
+
+//            Functor.f1Const("fromJSON", (jsonString)-> IO.fromJSON($.unquote(jsonString))),
+//            Functor.f1Const("toJSON", IO::toJSON),
+
             Functor.f1Const("toString", x -> $.quote(x.toString())),
             Functor.f1Const("toChars", x -> $.p(x.toString().toCharArray(), $::the)),
             Functor.f1Const("complexity", x -> $.the(x.complexity())),

@@ -9,6 +9,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.net.SocketException;
 import java.util.Map;
@@ -18,7 +19,7 @@ import java.util.function.Consumer;
 /**
  * javascript UDP context
  */
-public abstract class UDPServer<S extends Consumer<byte[]>> extends UDP implements RemovalListener<SocketAddress,UDPServer.Session<S>> {
+public abstract class UDPServer<S extends Consumer<byte[]>> extends UDP implements RemovalListener<InetSocketAddress,UDPServer.Session<S>> {
 
     final static int MAX_SESSIONS = 32;
 
@@ -43,7 +44,7 @@ public abstract class UDPServer<S extends Consumer<byte[]>> extends UDP implemen
         public void touch() { this.last = System.currentTimeMillis(); }
     }
 
-    final Cache<SocketAddress,Session<S>> sessions;
+    final Cache<InetSocketAddress,Session<S>> sessions;
 
     public UDPServer(int port) throws SocketException {
         super(port);
@@ -52,7 +53,7 @@ public abstract class UDPServer<S extends Consumer<byte[]>> extends UDP implemen
 
 
     @Override
-    public void onRemoval(@Nullable SocketAddress key, @Nullable Session<S> value, @NotNull RemovalCause cause) {
+    public void onRemoval(@Nullable InetSocketAddress key, @Nullable Session<S> value, @NotNull RemovalCause cause) {
         end(value.api, false);
     }
 
@@ -69,8 +70,8 @@ public abstract class UDPServer<S extends Consumer<byte[]>> extends UDP implemen
 
         if (removeFromCache) {
             //HACK
-            Set<Map.Entry<SocketAddress, Session<S>>> e = sessions.asMap().entrySet();
-            for (Map.Entry<SocketAddress, Session<S>> ee : e) {
+            Set<Map.Entry<InetSocketAddress, Session<S>>> e = sessions.asMap().entrySet();
+            for (Map.Entry<InetSocketAddress, Session<S>> ee : e) {
                 if (ee.getValue() == s) {
                     sessions.invalidate(ee.getKey());
                 }
@@ -79,15 +80,15 @@ public abstract class UDPServer<S extends Consumer<byte[]>> extends UDP implemen
     }
 
     @Override
-    protected void in(byte[] data, SocketAddress from) {
+    protected void in(byte[] data, InetSocketAddress from) {
         Session<S> ss = sessions.get(from, this::session);
         ss.touch();
         ss.api.accept(data);
     }
 
-    abstract protected S get(SocketAddress socketAddress);
+    abstract protected S get(InetSocketAddress socketAddress);
 
-    protected Session<S> session(SocketAddress a) {
+    protected Session<S> session(InetSocketAddress a) {
         return new Session<>(get(a));
     }
 
