@@ -1,16 +1,9 @@
 package nars.nar;
 
-import jcog.data.random.XorShift128PlusRandom;
 import nars.NAR;
-import nars.conceptualize.DefaultConceptBuilder;
 import nars.index.term.TermIndex;
-import nars.index.term.map.CaffeineIndex;
-import nars.op.stm.STMTemporalLinkage;
 import nars.time.Time;
 import nars.util.exe.Executioner;
-import nars.util.exe.MultiThreadExecutioner;
-import nars.util.exe.SynchronousExecutor;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.Random;
 

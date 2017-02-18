@@ -1,13 +1,13 @@
 package nars.op.stm;
 
 import jcog.Util;
+import jcog.bag.Bag;
+import jcog.bag.Prioritized;
 import jcog.data.MutableInteger;
 import jcog.learn.gng.NeuralGasNet;
 import jcog.learn.gng.Node;
 import nars.NAR;
 import nars.Task;
-import jcog.bag.Bag;
-import jcog.bag.Prioritized;
 import nars.bag.impl.BLinkHijackBag;
 import nars.budget.BLink;
 import nars.budget.BudgetMerge;

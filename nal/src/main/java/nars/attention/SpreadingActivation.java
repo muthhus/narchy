@@ -1,9 +1,9 @@
 package nars.attention;
 
+import jcog.bag.Bag;
 import nars.NAR;
 import nars.Param;
 import nars.Task;
-import jcog.bag.Bag;
 import nars.budget.BLink;
 import nars.budget.Budgeted;
 import nars.budget.DependentBLink;

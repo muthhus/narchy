@@ -1,8 +1,8 @@
 package nars.util.graph;
 
+import jcog.bag.Bag;
 import nars.$;
 import nars.NAR;
-import jcog.bag.Bag;
 import nars.budget.BLink;
 import nars.concept.Concept;
 import nars.term.Term;

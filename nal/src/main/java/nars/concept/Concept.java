@@ -21,10 +21,10 @@
 package nars.concept;
 
 import com.google.common.collect.Iterators;
+import jcog.bag.Bag;
 import nars.NAR;
 import nars.Task;
 import nars.attention.Activation;
-import jcog.bag.Bag;
 import nars.budget.BLink;
 import nars.conceptualize.state.ConceptState;
 import nars.table.BeliefTable;

@@ -2,7 +2,6 @@ package nars.bag.impl;
 
 import jcog.bag.PLink;
 import jcog.bag.impl.HijackBag;
-import nars.attention.Forget;
 import nars.attention.PForget;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

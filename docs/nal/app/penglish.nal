@@ -1,0 +1,24 @@
+
+//language_knowledge.nal
+
+((VERB:$V && FRAG($N1,$V,$N2)) ==> (((/,MEANS,$N1,_),(/,MEANS,$N2,_)) --> (/,MEANS,$V,_))).
+
+((DET:#a && FRAG($N1,$V,#a,$N2)) ==> (((/,MEANS,$N1,_),(/,MEANS,$N2,_)) --> (/,MEANS,$V,_))).
+((DET:#a && FRAG(#a,$N1,$V,$N2)) ==> (((/,MEANS,$N1,_),(/,MEANS,$N2,_)) --> (/,MEANS,$V,_))).
+((DET:#a && FRAG($N1,$V,#a,$N2)) ==> (((/,MEANS,$N1,_),(/,MEANS,$N2,_)) --> (/,MEANS,$V,_))).
+
+((PLACE_PREP:#in && FRAG(#in,$where)) ==> PLACE:(/,MEANS,$where,_)).
+$0.1;0.9$ ((TIME_PREP:#at && FRAG(#at,$when)) ==> TIME:(/,MEANS,$when,_)).
+((DET:#a && FRAG(#a,$it)) ==> IT:(/,MEANS,$it,_)).
+
+these are all so far
+and its this plus the power-ngrams? is there anything else
+just organized in 2 layers
+this plus "power-ngrams"
+the last one is for pronoun resolution
+the 2 before the last one for prepositions such as "at" 7, "in" vienna
+and the others are for making use of determiner position to guess the sentence structure
+except the first one, which makes explicitly use of a verb when its known to the system
+ill call this derivatio nof english 'penglish' it represnts your understanding of it
+english language does not deserve much thought so im glad this is concise
+indeed, its the best thing I was able to get in as little lines as possible

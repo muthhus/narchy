@@ -1,19 +1,15 @@
 package nars.table;
 
-import com.google.common.collect.Iterators;
 import nars.NAR;
 import nars.Task;
 import nars.bag.impl.TaskHijackBag;
-import nars.budget.BLink;
 import nars.budget.BudgetMerge;
-import nars.budget.DependentBLink;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Iterator;
 import java.util.Random;
 import java.util.function.Consumer;
-import java.util.function.Supplier;
 
 /**
  * Created by me on 2/16/17.
@@ -43,12 +39,8 @@ public class HijackQuestionTable extends TaskHijackBag implements QuestionTable 
         return remove(x)!=null;
     }
 
-
     @Override
     public @Nullable Task add(@NotNull Task t, @NotNull BeliefTable answers, @NotNull NAR n) {
-
-        //boolean present = contains(t);
-
 
         long now = n.time();
         if (now != lastCommitTime) {
@@ -59,10 +51,10 @@ public class HijackQuestionTable extends TaskHijackBag implements QuestionTable 
         Task inserted = put(t);
         if (inserted!=null) {
             //signal successful insert when inserted item is what is inserted, not a pre-existing duplicate
-            return inserted==t ? t : null;
+            return (inserted == t) ? t : null;
+        } else {
+            return null;
         }
-
-        return null;
     }
 
     @Override

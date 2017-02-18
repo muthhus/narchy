@@ -1,7 +1,7 @@
 package nars.concept.dynamic;
 
-import nars.NAR;
 import jcog.bag.Bag;
+import nars.NAR;
 import nars.concept.CompoundConcept;
 import nars.term.Compound;
 import org.jetbrains.annotations.NotNull;

@@ -1,5 +1,6 @@
 package nars.control;
 
+import jcog.bag.Bag;
 import jcog.data.MutableInteger;
 import jcog.data.random.XorShift128PlusRandom;
 import nars.$;
@@ -7,7 +8,6 @@ import nars.NAR;
 import nars.Task;
 import nars.attention.Activation;
 import nars.attention.Forget;
-import jcog.bag.Bag;
 import nars.bag.impl.BLinkHijackBag;
 import nars.budget.BLink;
 import nars.budget.Budget;

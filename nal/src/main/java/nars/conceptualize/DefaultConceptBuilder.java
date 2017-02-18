@@ -1,14 +1,12 @@
 package nars.conceptualize;
 
-import jcog.bag.impl.HijackBag;
+import jcog.bag.Bag;
 import jcog.map.SynchronizedHashMap;
 import jcog.map.SynchronizedUnifiedMap;
 import nars.$;
 import nars.NAR;
 import nars.Op;
 import nars.Task;
-import jcog.bag.Bag;
-import nars.bag.impl.BLinkHijackBag;
 import nars.bag.impl.CurveBag;
 import nars.budget.BLink;
 import nars.budget.BudgetMerge;

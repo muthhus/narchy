@@ -1,7 +1,6 @@
 package jcog.bag.impl;
 
 import jcog.bag.Bag;
-
 import jcog.list.FasterList;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.eclipse.collections.impl.map.mutable.ConcurrentHashMapUnsafe;
@@ -250,7 +249,7 @@ public abstract class HijackBag<K,V> implements Bag<K,V> {
         }
 
         if (!merged) {
-            if ((add || remove) && found != null) {
+            if (found != null && (add || remove)) {
                 size.decrementAndGet();
                 onRemoved(found);
             }
@@ -258,7 +257,12 @@ public abstract class HijackBag<K,V> implements Bag<K,V> {
             if (added != null) {
                 size.incrementAndGet();
                 onAdded(added);
+            } else if (add) {
+                //rejected: add but not added and not merged
+                pressure += pri(adding) * scale;
             }
+
+
         }
 
 //        /*if (Param.DEBUG)*/
@@ -320,8 +324,8 @@ public abstract class HijackBag<K,V> implements Bag<K,V> {
         }
     }
 
-    @Override
-    public V put(@NotNull V bb, float scale, /* TODO */ @Nullable MutableFloat overflowing) {
+    /** warning: the instance 'bb' that is passed here may be modified by this */
+    @Override public V put(@NotNull V bb, float scale, /* TODO */ @Nullable MutableFloat overflowing) {
 
 //        BLink<X> bb;
 //        if (b instanceof BLink) {

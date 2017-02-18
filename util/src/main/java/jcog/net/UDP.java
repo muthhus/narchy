@@ -1,18 +1,12 @@
 package jcog.net;
 
-import com.google.common.io.ByteArrayDataOutput;
-import com.google.common.io.ByteStreams;
-import com.google.gson.ExclusionStrategy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import jcog.data.byt.DynByteSeq;
 import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.DataOutput;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.*;
 import java.nio.charset.Charset;

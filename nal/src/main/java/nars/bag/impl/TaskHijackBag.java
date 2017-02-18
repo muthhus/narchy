@@ -1,11 +1,9 @@
 package nars.bag.impl;
 
-import jcog.bag.impl.HijackBag;
 import nars.Task;
 import nars.attention.Forget;
 import nars.budget.BudgetMerge;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.Random;
 import java.util.function.Consumer;

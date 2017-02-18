@@ -1,7 +1,5 @@
 package jcog.bag;
 
-import org.jetbrains.annotations.NotNull;
-
 /**
  * Created by me on 2/11/17.
  */

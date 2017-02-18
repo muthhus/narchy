@@ -1,9 +1,8 @@
 package nars.nal.nal7;
 
+import jcog.bag.Bag;
 import jcog.bag.PLink;
 import nars.*;
-import jcog.bag.Bag;
-import nars.budget.BLink;
 import nars.concept.CompoundConcept;
 import nars.concept.Concept;
 import nars.io.NarseseTest;

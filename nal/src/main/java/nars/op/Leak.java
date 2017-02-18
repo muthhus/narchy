@@ -1,9 +1,9 @@
 package nars.op;
 
-import nars.NAR;
-import nars.Task;
 import jcog.bag.Bag;
 import jcog.bag.PLink;
+import nars.NAR;
+import nars.Task;
 import nars.budget.Budget;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;

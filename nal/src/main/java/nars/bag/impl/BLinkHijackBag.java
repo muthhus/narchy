@@ -1,15 +1,12 @@
 package nars.bag.impl;
 
-import jcog.bag.impl.HijackBag;
 import nars.Param;
 import nars.attention.Forget;
 import nars.budget.BLink;
 import nars.budget.BudgetMerge;
-import nars.budget.RawBLink;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.Random;
 import java.util.function.Consumer;
 
 /**

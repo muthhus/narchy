@@ -1,8 +1,8 @@
 package nars.task;
 
+import jcog.bag.Bag;
 import nars.NAR;
 import nars.Task;
-import jcog.bag.Bag;
 import nars.budget.BLink;
 import nars.budget.BudgetFunctions;
 import nars.concept.Concept;

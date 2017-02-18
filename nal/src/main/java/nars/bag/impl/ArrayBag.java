@@ -1,19 +1,17 @@
 package nars.bag.impl;
 
+import jcog.bag.Bag;
+import jcog.bag.Prioritized;
 import jcog.data.sorted.SortedArray;
 import jcog.table.SortedListTable;
 import nars.$;
 import nars.Param;
 import nars.attention.Forget;
-import jcog.bag.Bag;
-import jcog.bag.Prioritized;
 import nars.budget.BLink;
 import nars.budget.BudgetMerge;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
 import java.util.List;

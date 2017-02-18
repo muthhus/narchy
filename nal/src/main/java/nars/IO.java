@@ -23,7 +23,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.*;
 import java.nio.charset.Charset;
-import java.util.List;
 import java.util.function.Function;
 
 import static nars.IO.TaskSerialization.TermFirst;

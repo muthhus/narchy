@@ -1,11 +1,11 @@
 package nars.concept;
 
 import jcog.Util;
+import jcog.bag.Bag;
 import nars.NAR;
 import nars.Task;
 import nars.attention.Activation;
 import nars.attention.SpreadingActivation;
-import jcog.bag.Bag;
 import nars.budget.BLink;
 import nars.budget.BudgetMerge;
 import nars.conceptualize.DefaultConceptBuilder;

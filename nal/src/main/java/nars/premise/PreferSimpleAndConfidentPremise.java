@@ -10,6 +10,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import static nars.truth.TruthFunctions.w2c;
+import static nars.util.UtilityFunctions.and;
 
 /**
  * prioritizes derivations exhibiting confidence increase, relative to the premise's evidence
@@ -53,7 +54,11 @@ public class PreferSimpleAndConfidentPremise extends DefaultPremise {
                     //parentComplexity;
                     taskCompl + beliefCompl;
         }
-        return Util.unitize( ((float) parentComplexity) / (penaltyComplexity + derivedComplexity));
+        return
+                Util.sqr( //sharpen
+                    Util.unitize( ((float) parentComplexity) / (penaltyComplexity + derivedComplexity))
+                )
+            ;
     }
 
     @Override
@@ -62,7 +67,8 @@ public class PreferSimpleAndConfidentPremise extends DefaultPremise {
         float pe = conclude.premiseEvidence;
         if (pe == 0)
             return 0; //??
-        return truth.conf() / w2c(pe);
+        //return truth.conf() / w2c(pe);
+        return and(truth.conf(), w2c(pe));
 
     }
 

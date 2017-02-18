@@ -590,8 +590,8 @@ public abstract class AbstractTask extends RawBudget implements Task {
     }
 
     public boolean eternalizable() {
-        //return term.vars() > 0;
-        return term.varIndep() > 0;
+        return term.vars() > 0;
+        //return term.varIndep() > 0;
         //return false;
 
 

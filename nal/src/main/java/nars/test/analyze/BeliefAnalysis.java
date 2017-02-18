@@ -1,9 +1,9 @@
 package nars.test.analyze;
 
+import jcog.bag.Bag;
 import nars.NAR;
 import nars.Narsese;
 import nars.Task;
-import jcog.bag.Bag;
 import nars.budget.BLink;
 import nars.concept.Concept;
 import nars.table.BeliefTable;

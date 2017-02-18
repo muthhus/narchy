@@ -2,9 +2,7 @@ package nars.attention;
 
 import jcog.bag.Bag;
 import nars.Param;
-import nars.budget.BLink;
 import nars.budget.Budget;
-import nars.budget.Budgeted;
 import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunction;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

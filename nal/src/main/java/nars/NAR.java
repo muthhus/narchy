@@ -3,15 +3,15 @@ package nars;
 
 import com.google.common.collect.Sets;
 import jcog.Util;
+import jcog.bag.Bag;
 import jcog.bag.PLink;
+import jcog.bag.Prioritized;
 import jcog.data.MutableInteger;
 import jcog.event.ArrayTopic;
 import jcog.event.On;
 import jcog.event.Topic;
 import nars.Narsese.NarseseException;
 import nars.attention.Activation;
-import jcog.bag.Bag;
-import jcog.bag.Prioritized;
 import nars.budget.BLink;
 import nars.budget.Budget;
 import nars.concept.AtomConcept;

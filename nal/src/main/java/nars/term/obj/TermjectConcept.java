@@ -1,10 +1,10 @@
 package nars.term.obj;
 
+import jcog.bag.Bag;
 import nars.NAR;
 import nars.Op;
 import nars.Task;
 import nars.attention.Activation;
-import jcog.bag.Bag;
 import nars.budget.BLink;
 import nars.concept.Concept;
 import nars.conceptualize.state.ConceptState;

@@ -1,5 +1,6 @@
 package nars.control;
 
+import jcog.bag.Bag;
 import jcog.bag.PLink;
 import jcog.bag.RawPLink;
 import jcog.data.FloatParam;
@@ -11,7 +12,6 @@ import nars.$;
 import nars.Control;
 import nars.NAR;
 import nars.Param;
-import jcog.bag.Bag;
 import nars.concept.Concept;
 import nars.conceptualize.ConceptBuilder;
 import nars.derive.Deriver;
@@ -108,7 +108,9 @@ public class ConceptBagControl implements Control, Consumer<DerivedTask> {
             if (busy.compareAndSet(false, true)) {
 
                 //updae concept bag
-                currentActivationRate = activationRate.floatValue();// * 1f/((float)Math.sqrt(active.capacity()));
+                currentActivationRate = activationRate.floatValue()
+                    // * 1f/((float)Math.sqrt(active.capacity()))
+                ;
 
                 active.commit();
 

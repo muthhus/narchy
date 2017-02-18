@@ -1,12 +1,12 @@
 package nars.premise;
 
+import jcog.bag.Bag;
 import jcog.data.MutableIntRange;
 import jcog.list.FasterList;
 import nars.$;
 import nars.NAR;
 import nars.Param;
 import nars.Task;
-import jcog.bag.Bag;
 import nars.budget.BLink;
 import nars.concept.Concept;
 import nars.derive.Deriver;

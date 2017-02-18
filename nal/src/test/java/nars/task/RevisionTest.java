@@ -1,8 +1,8 @@
 package nars.task;
 
+import jcog.bag.Bag;
 import jcog.data.random.XorShift128PlusRandom;
 import nars.*;
-import jcog.bag.Bag;
 import nars.conceptualize.state.DefaultConceptState;
 import nars.nar.Default;
 import nars.term.Compound;

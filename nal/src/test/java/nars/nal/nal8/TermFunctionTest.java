@@ -1,16 +1,10 @@
 package nars.nal.nal8;
 
-import nars.IO;
-import nars.Narsese;
 import nars.Param;
 import nars.nar.Default;
-import nars.nar.Terminal;
-import nars.term.Term;
 import nars.test.TestNAR;
 import org.junit.Test;
 
-import static nars.$.$;
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 

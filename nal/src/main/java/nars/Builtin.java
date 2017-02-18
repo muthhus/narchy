@@ -2,7 +2,6 @@ package nars;
 
 import jcog.Texts;
 import jcog.bag.PLink;
-import nars.budget.BLink;
 import nars.concept.Concept;
 import nars.op.Command;
 import nars.op.data.*;

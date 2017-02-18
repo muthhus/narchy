@@ -1,6 +1,5 @@
 package jcog.bag;
 
-import jcog.Util;
 import org.jetbrains.annotations.NotNull;
 
 import static jcog.Util.lerp;

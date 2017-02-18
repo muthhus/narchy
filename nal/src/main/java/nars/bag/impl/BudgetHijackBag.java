@@ -1,7 +1,10 @@
 package nars.bag.impl;
 
 import jcog.bag.impl.HijackBag;
-import nars.budget.*;
+import nars.budget.Budget;
+import nars.budget.BudgetMerge;
+import nars.budget.Budgeted;
+import nars.budget.RawBudget;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
