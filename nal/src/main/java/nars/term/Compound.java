@@ -49,9 +49,7 @@ import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import static nars.Op.ATOM;
-import static nars.Op.NEG;
-import static nars.Op.PROD;
+import static nars.Op.*;
 import static nars.time.Tense.DTERNAL;
 
 /**
@@ -650,13 +648,31 @@ public interface Compound extends Term, IPair, TermContainer {
     @Override
     default Term eval(TermIndex index) {
 
-        Compound compound = (Compound) this;
+        //somewhere in the subterms is a functor to eval
+        if (hasAll(Op.OpBits)) {
+            int s = size();
+            Term[] evalSubs = terms().clone();
+            boolean modified = false;
+            for (int i = 0, evalSubsLength = evalSubs.length; i < evalSubsLength; i++) {
+                Term y = evalSubs[i].eval(index);
+                if (!evalSubs[i].equals(y)) {
+                    evalSubs[i] = y;
+                    modified = true;
+                }
+            }
+            if (modified) {
+                return index.the(this, evalSubs).eval(index);
+            }
+        }
 
-        //recursively compute contained subterm functors
-        if (compound.size() == 2 && compound.hasAll(Op.OpBits)) {
-            Term subject = compound.term(0);
+
+        //check if this is a funct
+        if (op() == INH) {
+            //recursively compute contained subterm functors
+
+            Term subject = ((Compound) this).term(0);
             if (subject.op() == PROD) {
-                Term predicate = compound.term(1);
+                Term predicate = ((Compound) this).term(1);
                 if (predicate.op() == ATOM) {
 
                     Functor f = null;
@@ -688,6 +704,8 @@ public interface Compound extends Term, IPair, TermContainer {
                     }
                 }
             }
+
+
         }
 
         return this;

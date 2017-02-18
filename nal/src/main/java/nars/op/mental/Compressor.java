@@ -293,7 +293,7 @@ public class Compressor extends Abbreviation implements RemovalListener<Compound
                     IO.mapSubTerms(b, (o, depth, p) -> {
                         termPos.add(p);
                     });
-                } catch (IOException e) {
+                } catch (Exception e) {
                     logger.error(e.getMessage());
                     return b;
                 }

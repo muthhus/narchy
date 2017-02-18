@@ -286,7 +286,9 @@ public interface TimeFunctions {
                     occReturn[1] = occReturn[0] + (derived.op()==CONJ ? derived.dtRange() : 0);
                     return derived;
                 } else if (p.belief != null && !p.belief.isEternal()) {
-                    int timeOfBeliefInTask = resolvedTaskTerm.subtermTime(p.beliefTerm);
+                    int timeOfBeliefInTask = resolvedTaskTerm.subtermTime(resolve(p,p.beliefTerm));
+                    if (timeOfBeliefInTask==DTERNAL)
+                        timeOfBeliefInTask = 0;
                     long taskOcc = p.belief.start() - timeOfBeliefInTask;
                     occReturn[0] = taskOcc + derivedInTask;
                     occReturn[1] = occReturn[0] + (derived.op()==CONJ ? derived.dtRange() : 0);
