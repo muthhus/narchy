@@ -12,7 +12,7 @@ import java.util.function.BiFunction;
 public class HaiQAgent extends HaiQ {
 
     //Hsom...
-    final static float perceptionAlpha = 0.02f;
+    final static float perceptionAlpha = 0.05f;
     @NotNull Autoencoder ae;
     final BiFunction<Integer,Integer,Integer> numStates;
     float perceptionNoise = 0.02f;
@@ -20,9 +20,8 @@ public class HaiQAgent extends HaiQ {
 
 
     public HaiQAgent() {
-        this((inputs, outputs) -> {
-            return (int) (Math.ceil(/*Math.sqrt*/(1+inputs*outputs)));
-        });
+        this((inputs, outputs) ->
+                (int) Math.ceil(/*Math.sqrt*/((1+inputs)*(1+outputs))));
     }
 
     public HaiQAgent(BiFunction<Integer,Integer,Integer> numStates) {
@@ -35,6 +34,10 @@ public class HaiQAgent extends HaiQ {
         int states = numStates.apply(inputs, outputs);
         ae = new Autoencoder(inputs, states, new XorShift128PlusRandom(1));
         super.start(states, outputs);
+    }
+
+    public Autoencoder perception() {
+        return ae;
     }
 
     @Override

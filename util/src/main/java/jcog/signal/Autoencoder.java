@@ -65,18 +65,8 @@ public class Autoencoder {
 			}
 		}
 
-
-
 		this.hbias = new float[outs];
-		for (int i = 0; i < outs; i++) {
-			this.hbias[i] = 0;
-		}
-
-
 		this.vbias = new float[ins];
-		for (int i = 0; i < ins; i++) {
-			this.vbias[i] = 0;
-		}
 	}
 
 	private float[] preprocess(float[] x, float noiseLevel, float corruptionRate) {

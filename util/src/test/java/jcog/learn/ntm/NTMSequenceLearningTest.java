@@ -3,6 +3,7 @@ package jcog.learn.ntm;
 import jcog.learn.ntm.run.SequenceGenerator;
 import jcog.learn.ntm.run.SequenceLearner;
 import jcog.learn.ntm.run.TrainingSequence;
+import org.junit.Test;
 
 import static org.junit.Assert.*;
 
@@ -11,20 +12,28 @@ import static org.junit.Assert.*;
  */
 public class NTMSequenceLearningTest {
 
+    @Test
+    public void testSimpleSequence() throws Exception {
+        SequenceLearner s = new RunSequenceLearner(8);
+        double startError = s.run();
+        assertTrue(startError > 0.1f);
+        for (int i = 0; i < 5000; i++) {
+            s.run();
+        }
+
+        double endError = s.run();
+        assertTrue(endError < 0.01f);
+    }
+
+
     public static class RunSequenceLearner extends SequenceLearner {
 
         /** print every frame in all sequences, in the order they are trained */
         boolean printSequences;
 
-        public static void main(String[] args) throws Exception {
-            SequenceLearner s = new RunSequenceLearner(16);
-            while (true) {
-                s.run();
-            }
-        }
 
         public RunSequenceLearner(int vectorSize) {
-            super(vectorSize, 8, 32, 1, 64);
+            super(vectorSize, 8, 32, 2, 16);
         }
 
         @Override

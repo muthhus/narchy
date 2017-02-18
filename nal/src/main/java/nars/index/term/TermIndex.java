@@ -11,12 +11,10 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.Terms;
-import nars.term.atom.Atomic;
 import nars.term.container.TermContainer;
 import nars.term.subst.MapSubst;
 import nars.term.subst.Subst;
 import nars.term.transform.CompoundTransform;
-import nars.term.transform.Functor;
 import nars.term.transform.VariableNormalization;
 import nars.term.util.InvalidTermException;
 import nars.term.var.Variable;
@@ -34,7 +32,6 @@ import java.util.Map;
 import java.util.function.Consumer;
 
 import static nars.Op.CONJ;
-import static nars.Op.PROD;
 import static nars.term.Term.False;
 import static nars.term.Termed.termOrNull;
 
@@ -52,7 +49,7 @@ public abstract class TermIndex extends TermBuilder {
      * get if not absent
      */
     @Nullable
-    private Termed get(@NotNull Term t) {
+    public Termed get(@NotNull Term t) {
         return get(t, false);
     }
 
@@ -75,7 +72,9 @@ public abstract class TermIndex extends TermBuilder {
     abstract public void forEach(Consumer<? super Termed> c);
 
 
-    /** called when a concept has been modified, ie. to trigger persistence */
+    /**
+     * called when a concept has been modified, ie. to trigger persistence
+     */
     public void commit(Concept c) {
         //by default does nothing
     }
@@ -92,7 +91,6 @@ public abstract class TermIndex extends TermBuilder {
 
     @NotNull
     abstract public ConceptBuilder conceptBuilder();
-
 
 
     /**
@@ -122,7 +120,8 @@ public abstract class TermIndex extends TermBuilder {
 //        }
 //    }
 
-    @NotNull private final Term theSafe(@NotNull Op o, int dt, @NotNull Term[] u) {
+    @NotNull
+    private final Term theSafe(@NotNull Op o, int dt, @NotNull Term[] u) {
         try {
             return super.the(o, dt, u);
             //return t == null ? False : t;
@@ -131,14 +130,10 @@ public abstract class TermIndex extends TermBuilder {
                 logger.warn("{x} : {} {} {}", x, o, dt, u);
             }
         } catch (Throwable e) {
-            logger.error("{x} : {} {} {}",  e, o, dt, u);
+            logger.error("{x} : {} {} {}", e, o, dt, u);
         }
         return False; //place a False placeholder so that a repeat call will not have to discover this manually
     }
-
-
-
-
 
 
     /**
@@ -165,7 +160,6 @@ public abstract class TermIndex extends TermBuilder {
         }
 
 
-
         //no variables that could be substituted, so return this constant
         if (f instanceof Derivation && src.vars() + src.varPattern() == 0) //shortcut for premise evaluation matching
             return src;
@@ -180,11 +174,11 @@ public abstract class TermIndex extends TermBuilder {
         Op cop = crc.op();
 
         //early prefilter for True/False subterms
-        boolean filterTrueFalse = !(cop.statement || cop==CONJ);
+        boolean filterTrueFalse = !(cop.statement || cop == CONJ);
 
         //use COMPOUND_VOLUME_MAX instead of trying for the nar's to provide construction head-room that can allow terms
         //to reduce and potentially meet the requirement
-        int volLimit = Param.COMPOUND_VOLUME_MAX-1; /* -1 for the wrapping compound contribution of +1 volume if succesful */
+        int volLimit = Param.COMPOUND_VOLUME_MAX - 1; /* -1 for the wrapping compound contribution of +1 volume if succesful */
         int volSum = 0, volAt = 0, subAt = 0;
         for (int i = 0; i < len; i++) {
             Term t = crc.term(i);
@@ -199,7 +193,10 @@ public abstract class TermIndex extends TermBuilder {
                 for (; volAt < subAt; volAt++) {
                     Term st = sub.get(volAt);
                     if (filterTrueFalse && isTrueOrFalse(st)) return null;
-                    volSum += st.volume();  if (volSum >= volLimit) { return null; } //HARD VOLUME LIMIT REACHED
+                    volSum += st.volume();
+                    if (volSum >= volLimit) {
+                        return null;
+                    } //HARD VOLUME LIMIT REACHED
                 }
 
                 changed = true;
@@ -208,7 +205,9 @@ public abstract class TermIndex extends TermBuilder {
 
                 if (u == null) {
 
-                    if (strict) { return null; }
+                    if (strict) {
+                        return null;
+                    }
 
                     u = t; //keep value
 
@@ -218,7 +217,10 @@ public abstract class TermIndex extends TermBuilder {
 
                 if (filterTrueFalse && isTrueOrFalse(u))
                     return null;
-                volSum += u.volume();  if (volSum >= volLimit) { return null; } //HARD VOLUME LIMIT REACHED
+                volSum += u.volume();
+                if (volSum >= volLimit) {
+                    return null;
+                } //HARD VOLUME LIMIT REACHED
 
                 sub.add(u);
 
@@ -231,7 +233,7 @@ public abstract class TermIndex extends TermBuilder {
 
         Term transformed;
         int ss = sub.size();
-        if (!changed || (ss==len && crc.equalTerms(sub)))
+        if (!changed || (ss == len && crc.equalTerms(sub)))
             transformed = crc;
         else {
             transformed = the(cop, crc.dt(), sub.toArray(new Term[ss]));
@@ -263,7 +265,7 @@ public abstract class TermIndex extends TermBuilder {
 
     @NotNull
     public final Term the(@NotNull Compound csrc, int newDT) {
-        if (csrc.dt()==newDT) //no change
+        if (csrc.dt() == newDT) //no change
             return csrc;
 
         return the(csrc.op(), newDT, csrc.terms());
@@ -318,14 +320,14 @@ public abstract class TermIndex extends TermBuilder {
                 result = transform(src,
                         (vars == 1 && pVars == 0) ?
                                 VariableNormalization.singleVariableNormalization //special case for efficiency
-                                    :
+                                :
                                 new VariableNormalization(totalVars /* estimate */)
                 );
             } else {
                 result =
                         src.hasAll(Op.OpBits) ?
-                            transform(src, CompoundTransform.None) : //force subterm functor eval
-                            intern((Term)src);
+                                transform(src, CompoundTransform.None) : //force subterm functor eval
+                                ((Term) src).eval(this);
             }
 
 
@@ -338,45 +340,6 @@ public abstract class TermIndex extends TermBuilder {
         }
 
         return result;
-    }
-
-    @NotNull
-    public Term intern(@NotNull Term x) {
-        if (x instanceof Variable) {
-            //nothing
-        } else if (x instanceof Atomic /** or non-temporal, non-negation compound */) {
-            if (isTrue(x) || isFalse(x))
-                return x;
-
-            Termed yExist = get(x);
-            if (yExist!=null)
-                x = (Term)yExist; //assumes the AtomConcept returned is the Term itself, as .term() would return
-
-        } else if (x instanceof Compound) {
-            Compound cx = (Compound)x;
-            //compute any contained subterm functors
-            if (cx.hasAll(Op.OpBits) &&  cx.size()==2) {
-                x = eval(cx);
-            }
-        }
-        return x;
-    }
-
-    @NotNull
-    private Term eval(@NotNull Compound inhCompound) {
-        Termed predicate = get(inhCompound.term(1));
-        if (predicate instanceof Functor) {
-            Term subject = inhCompound.term(0);
-            if (subject.op() == PROD) {
-                Term dy = eval((Compound) subject, (Functor) predicate);
-                if (dy == null || dy == inhCompound) {
-                    //null return value means just keep the original input term
-                    return inhCompound;
-                }
-                return intern(dy); //recurse
-            }
-        }
-        return inhCompound;
     }
 
 
@@ -430,7 +393,7 @@ public abstract class TermIndex extends TermBuilder {
             //construct new compound with same op and dt
             return the(src.op(), dt, tc);
         } else {
-            return intern((Term)src); //unmodified
+            return ((Term) src).eval(this);
         }
     }
 
@@ -457,11 +420,11 @@ public abstract class TermIndex extends TermBuilder {
             }
 
 
-            if (y!=null)
-                y = intern(y);
+            if (y != null)
+                y = y.eval(this);
 
             //if (x != y) { //must be refernce equality test for some variable normalization cases
-            if (y!=null && !x.equals(y)) { //must be refernce equality test for some variable normalization cases
+            if (y != null && !x.equals(y)) { //must be refernce equality test for some variable normalization cases
                 modifications++;
             } else {
                 y = x; //use original value
@@ -496,7 +459,7 @@ public abstract class TermIndex extends TermBuilder {
         Term[] target = new Term[n];
 
 
-        for (int i = 0; i < n;) {
+        for (int i = 0; i < n; ) {
             Term x = csrc.term(i);
             Term y;
             if (path.get(depth) != i) {
@@ -612,7 +575,6 @@ public abstract class TermIndex extends TermBuilder {
     public Term replace(@NotNull Term src, Term from, Term to) {
         return replace(src, Maps.mutable.of(from, to));
     }
-
 
 
     /**

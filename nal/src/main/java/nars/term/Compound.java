@@ -27,8 +27,10 @@ import jcog.data.sexpression.Pair;
 import nars.$;
 import nars.IO;
 import nars.Op;
+import nars.index.term.TermIndex;
 import nars.term.container.TermContainer;
 import nars.term.subst.Unify;
+import nars.term.transform.Functor;
 import nars.term.var.Variable;
 import nars.term.visit.SubtermVisitor;
 import nars.term.visit.SubtermVisitorX;
@@ -47,7 +49,9 @@ import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+import static nars.Op.ATOM;
 import static nars.Op.NEG;
+import static nars.Op.PROD;
 import static nars.time.Tense.DTERNAL;
 
 /**
@@ -341,7 +345,8 @@ public interface Compound extends Term, IPair, TermContainer {
      * extracts a subterm provided by the address tuple
      * returns null if specified subterm does not exist
      */
-    @Nullable default Term subterm(@NotNull byte... path) {
+    @Nullable
+    default Term subterm(@NotNull byte... path) {
         Term ptr = this;
         for (int i : path) {
             if ((ptr = ptr.termOr(i, null)) == null)
@@ -579,7 +584,7 @@ public interface Compound extends Term, IPair, TermContainer {
         for (int i = 0; i < s; i++) {
             Term xx = x[i];
             if (xx.equals(t) || ((xx.containsTerm(t)) && isSubterm((Compound) xx, t, l))) {
-                l.add((byte)i);
+                l.add((byte) i);
                 return true;
             } //else, try next subterm and its subtree
         }
@@ -608,7 +613,7 @@ public interface Compound extends Term, IPair, TermContainer {
         if (other.size() == s) {
 
             if (op.image || requireSameTime)
-                 if (((Compound) other).dt() != dt())
+                if (((Compound) other).dt() != dt())
                     return false;
 
             Compound o = (Compound) other;
@@ -642,8 +647,53 @@ public interface Compound extends Term, IPair, TermContainer {
         return false;
     }
 
+    @Override
+    default Term eval(TermIndex index) {
 
-//    default MutableSet<Term> toSetAtemporal() {
+        Compound compound = (Compound) this;
+
+        //recursively compute contained subterm functors
+        if (compound.size() == 2 && compound.hasAll(Op.OpBits)) {
+            Term subject = compound.term(0);
+            if (subject.op() == PROD) {
+                Term predicate = compound.term(1);
+                if (predicate.op() == ATOM) {
+
+                    Functor f = null;
+                    if (predicate instanceof Functor) {
+                        //the term is already the functor we want to apply
+                        f = (Functor) predicate;
+                    } else {
+                        //try to resolve a functor referenced by this term
+                        Termed resolvedPred = index.get(predicate);
+                        if (resolvedPred != null) {
+                            Term resolvedPredTerm = resolvedPred.term();
+                            if (resolvedPredTerm instanceof Functor) {
+                                f = (Functor) (resolvedPred.term());
+                            }
+                        }
+                    }
+
+                    if (f != null) {
+                        if (subject.op() == PROD) {
+
+                            Term dy = f.apply(((Compound) subject).terms());
+                            if (dy == null || dy == this) {
+                                //null return value means just keep the original input term
+                                return this;
+                            } else {
+                                return dy.eval(index);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return this;
+    }
+
+    //    default MutableSet<Term> toSetAtemporal() {
 //        int ss = size();
 //        MutableSet<Term> s = new UnifiedSet<>(ss);
 //        for (int i = 0; i < ss; i++) {

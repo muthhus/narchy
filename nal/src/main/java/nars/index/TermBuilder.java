@@ -183,11 +183,6 @@ public abstract class TermBuilder {
 //    }
 
 
-    @Nullable protected static Term eval(@NotNull Compound subject, @NotNull Functor predicate) {
-        return predicate.apply(subject.terms());
-    }
-
-
     /** should only be applied to subterms, not the outer-most compound */
     @NotNull public Term productNormalize(@NotNull Term u) {
         if (!(u instanceof Compound && u.hasAny(Op.InhAndIMGbits) && u.varPattern()==0))
@@ -424,7 +419,7 @@ public abstract class TermBuilder {
                 return False;
             }
 
-            x = intern(productNormalize(x));
+            x = /*eval*/(productNormalize(x));
 
             if (isTrueOrFalse(x))
                 return False; //may have become False through eval()
@@ -450,10 +445,7 @@ public abstract class TermBuilder {
     }
 
 
-    @NotNull protected Term intern(@NotNull Term x) {
-        return x;
-        //return productNormalize(x);
-    }
+
 
     @NotNull
     public Term inst(Term subj, Term pred) {
@@ -759,17 +751,11 @@ public abstract class TermBuilder {
 
                     case INH:
 
-                        if (subject.equals( predicate) )
+                        if (subject.equals( predicate) ) //equal test first to allow, ex: False<->False to result in True
                             return True;
-                        if (isTrue(subject) || isFalse(subject) || isTrue(predicate) || isFalse(predicate))
+                        if (isTrueOrFalse(subject) || isTrueOrFalse(predicate))
                             return False;
 
-                        if (predicate instanceof Functor && sop == PROD) {
-                            Term y = eval((Compound)subject, (Functor)predicate);
-                            if (y != null) {
-                                return y;
-                            }
-                        }
                         break;
 
 

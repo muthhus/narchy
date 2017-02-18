@@ -25,6 +25,7 @@ import jcog.Texts;
 import jcog.data.array.IntArrays;
 import nars.$;
 import nars.Op;
+import nars.index.term.TermIndex;
 import nars.term.atom.Atomic;
 import nars.term.atom.AtomicSingleton;
 import nars.term.container.TermContainer;
@@ -491,5 +492,6 @@ public interface Term extends Termed, Termlike, Comparable<Termlike> {
         return op();
     }
 
+    Term eval(TermIndex index);
 }
 

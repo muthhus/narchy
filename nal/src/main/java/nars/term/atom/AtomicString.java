@@ -1,5 +1,8 @@
 package nars.term.atom;
 
+import nars.index.term.TermIndex;
+import nars.term.Term;
+
 /**
  * Created by me on 1/1/16.
  */
@@ -32,5 +35,8 @@ public abstract class AtomicString implements Atomic {
         return toString().hashCode();
     }
 
-
+    @Override
+    public Term eval(TermIndex termIndex) {
+        return this;
+    }
 }

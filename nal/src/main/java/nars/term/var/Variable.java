@@ -1,5 +1,7 @@
 package nars.term.var;
 
+import nars.index.term.TermIndex;
+import nars.term.Term;
 import nars.term.atom.Atomic;
 import org.jetbrains.annotations.NotNull;
 
@@ -10,9 +12,6 @@ import org.jetbrains.annotations.NotNull;
  * implemented by both raw variable terms and variable concepts
  **/
 public interface Variable extends Atomic {
-
-
-
 
     /** an ID by which this variable can be uniquely identified,
      * among the other existing variables with the same ID but
@@ -68,5 +67,10 @@ public interface Variable extends Atomic {
         meta[4] ++;
         meta[5] |= structure();
         return hashCode();
+    }
+
+    @Override
+    default Term eval(TermIndex termIndex) {
+        return this;
     }
 }

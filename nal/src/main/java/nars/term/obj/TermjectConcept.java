@@ -8,6 +8,7 @@ import nars.attention.Activation;
 import nars.budget.BLink;
 import nars.concept.Concept;
 import nars.conceptualize.state.ConceptState;
+import nars.index.term.TermIndex;
 import nars.table.BeliefTable;
 import nars.table.QuestionTable;
 import nars.term.Compound;
@@ -243,5 +244,10 @@ public class TermjectConcept<X> implements Atomic, Concept, Termject<X> {
     @Override
     public String toString() {
         return term().toString();
+    }
+
+    @Override
+    public Term eval(TermIndex index) {
+        return this;
     }
 }

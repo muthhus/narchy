@@ -1,9 +1,6 @@
 package nars.op;
 
-import nars.$;
-import nars.NAR;
-import nars.Op;
-import nars.Task;
+import nars.*;
 import nars.task.MutableTask;
 import nars.term.Compound;
 import nars.term.Term;
@@ -35,7 +32,10 @@ public interface Command extends Operator {
                 run((Atomic) (c.term(1)), ((Compound) (t.term(0))).terms(), nar);
                 return t;
             } catch (Throwable error) {
-                return error(error);
+                if (Param.DEBUG)
+                    throw error;
+                else
+                    return error(error);
             }
         }
         return null;

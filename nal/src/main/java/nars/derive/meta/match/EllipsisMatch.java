@@ -1,6 +1,7 @@
 package nars.derive.meta.match;
 
 import nars.Op;
+import nars.index.term.TermIndex;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Terms;
@@ -127,6 +128,10 @@ public class EllipsisMatch extends ArrayTermVector implements Term {
         w.append(toString());
     }
 
+    @Override
+    public Term eval(TermIndex index) {
+        return this;
+    }
 
     public boolean addWhileMatching(@NotNull Compound y, @NotNull Collection<Term> target, int min) {
         int n = 0;

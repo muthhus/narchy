@@ -63,13 +63,13 @@ abstract public class SequenceLearner {
         // double changeMultiplier,
         // double changeAddConstant) {
         teacher = new BPTTTeacher(machine,
-                new RMSPropWeightUpdater(weightsCount, 0.25, 0.25, 0.01, 0.001));
+                new RMSPropWeightUpdater(weightsCount, 0.05, 0.05, 0.02, 0.001));
 
 
     }
 
     /** train the next sequence */
-    public void run() {
+    public double run() {
 
         TrainingSequence sequence = nextTrainingSequence();
 
@@ -89,6 +89,8 @@ abstract public class SequenceLearner {
         onTrained(i, sequence, output, trainTimeNS, averageError);
 
         i++;
+
+        return averageError;
     }
 
     /** shift all items in an array down 1 index, leaving the last element ready for a new item */

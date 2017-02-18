@@ -106,23 +106,28 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
 
                 if (r instanceof Compound) {
 
-                    Derivation.TruthPuncEvidence ct = m.punct.get();
+                    r = r.eval(m.index);
 
-                    Compound R = (Compound) r;
-                    if (/*r.volume() < nar.termVolumeMax.intValue() && */Task.taskStatementValid(R, ct.punc, !Param.DEBUG)) {
+                    if (r instanceof Compound) {
 
-                        Truth truth = ct.truth;
+                        Derivation.TruthPuncEvidence ct = m.punct.get();
 
-                        //note: the budget function used here should not depend on the truth's frequency. btw, it may be inverted below
-                        Budget budget = m.premise.budget(R, truth, m);
-                        if (budget != null) {
-                            Term crr = nar.normalize(R);
-                            if (!(crr instanceof Compound)) {
-                                throw new InvalidTermException(r.op(), DTERNAL, "normalization failed", (R).terms());
+                        Compound R = (Compound) r;
+                        if (/*r.volume() < nar.termVolumeMax.intValue() && */Task.taskStatementValid(R, ct.punc, !Param.DEBUG)) {
+
+                            Truth truth = ct.truth;
+
+                            //note: the budget function used here should not depend on the truth's frequency. btw, it may be inverted below
+                            Budget budget = m.premise.budget(R, truth, m);
+                            if (budget != null) {
+                                Term crr = nar.normalize(R);
+                                if (!(crr instanceof Compound)) {
+                                    throw new InvalidTermException(r.op(), DTERNAL, "normalization failed", (R).terms());
+                                }
+
+                                derive(m, (Compound) crr, truth, budget, ct); //continue to stage 2
+
                             }
-
-                            derive(m, (Compound)crr, truth, budget, ct); //continue to stage 2
-
                         }
                     }
                 }

@@ -1,6 +1,7 @@
 package nars.term.atom;
 
 import nars.Op;
+import nars.index.term.TermIndex;
 import nars.term.Term;
 import nars.term.Termlike;
 import nars.term.subst.Unify;
@@ -41,5 +42,7 @@ public class AtomicSingleton extends AtomicStringConstant {
         //throw new UnsupportedOperationException("AtomicSingleton leak");
         return false;
     }
+
+
 
 }
