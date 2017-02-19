@@ -38,7 +38,7 @@ public class ActionConcept extends WiredConcept implements WiredConcept.Prioriti
     private final boolean updateOnBeliefChange = false;
 
     //enable/disable dynamic tasklink truth revision
-    private final boolean linkTruth;
+    private final boolean linkTruth = false;
 
     @Override
     public void pri(FloatSupplier v) {
