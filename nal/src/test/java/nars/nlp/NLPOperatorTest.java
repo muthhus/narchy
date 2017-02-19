@@ -1,19 +1,13 @@
 package nars.nlp;
 
-import com.google.common.base.Joiner;
-import nars.NAR;
-import nars.Op;
-import nars.Param;
-import nars.Task;
+import nars.*;
 import nars.nar.Default;
 import nars.op.Command;
-import nars.op.Operator;
-import nars.term.Compound;
-import nars.term.Term;
-import nars.term.atom.Atomic;
-import nars.term.obj.IntTerm;
-import org.jetbrains.annotations.NotNull;
+import org.junit.Ignore;
 import org.junit.Test;
+
+import java.io.IOException;
+import java.util.Arrays;
 
 import static nars.term.Terms.compoundOrNull;
 import static org.junit.Assert.assertEquals;
@@ -25,60 +19,93 @@ import static org.junit.Assert.assertTrue;
 public class NLPOperatorTest {
 
 
-    @Test
-    public void testNLP1() {
+    @Test @Ignore
+    public void testNLP1() throws IOException {
         //Param.DEBUG = true;
 
         NAR n = new Default(1024,10,2,4);
+        //n.DEFAULT_QUEST_PRIORITY = 0.1f;
 
+        //n.quaMin.setValue(0.1f);
+        n.truthResolution.setValue(0.1f);
+
+        n.on("say", (Command)(x, args, nn) -> {
+            System.err.println(Arrays.toString(args));
+        });
 
         //n.log();
-
-        n.log(System.out, x -> x instanceof Task && ((Task)x).isGoal());
+        //n.logBudgetMin(System.out, 0.2f);
+        //n.log(System.out, x -> x instanceof Task && ((Task)x).isGoal());
 
         n.input(
-            "( (RANGE:{$range} && SENTENCE:$x) ==> FRAG:slice($x, $range)).",
+            //"( (RANGE:{$range} && SENTENCE:$x) ==> FRAG:slice($x, $range)).",
 
-            "((VERB:{$V} && FRAG($X,$V,$Y)) ==> (((/,MEANS,$X,_),(/,MEANS,$Y,_)) --> (/,MEANS,$V,_))).",
+            //"((VERB:{$V} && FRAG($X,$V,$Y)) ==> (((/,MEANS,$X,_),(/,MEANS,$Y,_)) --> (/,MEANS,$V,_))).",
 
             //"((FRAG:$XY && ($XY <-> flat((FRAG($X), and, FRAG($Y))))) <=> ((/,MEANS,$X,_) && (/,MEANS,$Y,_))).",
 
+            "((VERB:{$V} && SENTENCE($X,$V,$Y))                ==> (((/,MEANS,$X,_),(/,MEANS,$Y,_)) --> (/,MEANS,$V,_))).",
+            "((&&, VERB:{$V}, ADV:{$A}, SENTENCE($X,$V,$A,$Y)) ==> (((/,MEANS,$X,_),(/,MEANS,$Y,_)) --> ((/,MEANS,$V,_)|(/,MEANS,$A,_)))).",
+            "((&&, VERB:{$V}, DET:{#a}, SENTENCE($X,$V,#a,$Y)) ==> (((/,MEANS,$X,_),(/,MEANS,$Y,_)) --> (/,MEANS,$V,_))).",
+            "((&&, VERB:{$V}, DET:{#a}, SENTENCE(#a,$X,$V,$Y)) ==> (((/,MEANS,$X,_),(/,MEANS,$Y,_)) --> (/,MEANS,$V,_))).",
 
 
-            "(FRAG<->SENTENCE).", //sentence is also its own fragment
+            //"((WHERE_PREP:{#in} && FRAG(#in,$where)) ==> WHERE:(/,MEANS,$where,_))."
 
-            "RANGE:{(0,3),(1,4),(4,7),(0,7)}.",
+            //"(FRAG<->SENTENCE).", //sentence is also its own fragment
+
+            //"RANGE:{(0,3),(1,4),(4,7),(0,7)}.",
                 //"RANGE:{(0,3)}.",
                 //"RANGE:{0,1,2,3,4,(0,1),(0,2),(0,3)}.",
 
-            "VERB:{is,maybe,isnt,was,willBe,wants,can}.",
-            //"VERB:{is,maybe,isnt}.",
+            "VERB:{is,maybe,isnt,was,willBe,wants,can,likes}.",
+            "DET:{a,the}.",
+            "PREP:{for,on,in,with}.",
+            "ADV:{never,always,maybe}.",
 
-            "SENTENCE(yes,wants,no).",
-            "SENTENCE(yes,is,no).",
-            "SENTENCE(yes,isnt,no).",
+            "SENTENCE(tom,is,never,sky).",
+            "SENTENCE(tom,is,always,cat).",
+            "SENTENCE(tom,is,cat).",
+            "SENTENCE(tom,is,a,cat).",
+            "SENTENCE(tom,likes,the,sky).",
+            "SENTENCE(tom,likes,maybe,cat).",
+            "SENTENCE(the,sky,is,blue).",
+            "SENTENCE(a,cat,likes,blue).",
+            "SENTENCE(sky,wants,the,blue).",
+            "SENTENCE(sky,is,always,blue).",
 
-            "SENTENCE(it,is,my,good).",
-            "SENTENCE(it,is,bad,and,it,can,good).",
-            "SENTENCE(good,was,bad).",
-            "SENTENCE(right,willBe,wrong).",
-            "SENTENCE(true,can,false).",
+//            "SENTENCE(yes,wants,no).",
+//            "SENTENCE(yes,is,no).",
+//            "SENTENCE(yes,isnt,no).",
+//
+//            "SENTENCE(it,is,my,good).",
+//            "SENTENCE(it,is,bad,and,it,can,good).",
+//            "SENTENCE(good,was,bad).",
+//            "SENTENCE(right,willBe,wrong).",
+//            "SENTENCE(true,can,false).",
 
 
 
             //"$0.9$ (?y --> (/,MEANS,?x,_))?",
 
-            "$0.9$ SENTENCE(?z,?x,?y)?"
+            //"$0.9$ SENTENCE(?z,?x,?y)?"
 
-            //"$0.9$ SENTENCE:{?y}?",
+            //"$0.9$ SENTENCE(?y)?",
 
-            //"$0.9$ (SENTENCE:{$y} ==> say($y)).",
-            //"$0.9;0.9$ (SENTENCE(#y) && say(#y))!",
+            //"$0.9;0.9$ (VERB:{$v} ==> say(DO, $v))."
+            //"$0.9;0.9$ say(#y)!",
 
-            //"$0.9;0.9$ say(#y)!"
+            "$0.9;0.9$ (SENTENCE:#y ==> say:#y).",
+            "$0.9;0.9$ (SENTENCE:#y && say:#y)!"
+            //"say(cat,is,blue)!",
+            //"say(#x,is,#y)!"
+
+
         );
 
-        n.run(250);
+        n.run(1550);
+
+        //IO.saveTasksToTemporaryTextFile(n);
     }
 
 }

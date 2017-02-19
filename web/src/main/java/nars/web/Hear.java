@@ -17,6 +17,8 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 import static nars.Op.BELIEF;
 
@@ -38,6 +40,17 @@ public class Hear extends Loop {
 
     /** set wordDelayMS to 0 to disable twenglish function */
     public static Loop hear(NAR nar, String msg, String src, int wordDelayMS) {
+        return hear(nar, msg, src, (m) -> {
+            if (wordDelayMS > 0) {
+                List<Term> tokens = tokenize(m);
+                if (tokens != null && !tokens.isEmpty())
+                    return new Hear(nar, tokens, src, wordDelayMS);
+            }
+            return null;
+        });
+    }
+
+    public static Loop hear(NAR nar, String msg, String src, Function<String,Loop> ifNotNarsese) {
         @NotNull List<Task> parsed = $.newArrayList();
         @NotNull List<Narsese.NarseseException> errors = $.newArrayList();
 
@@ -46,14 +59,10 @@ public class Hear extends Loop {
         if (!parsed.isEmpty() && errors.isEmpty()) {
             logger.info("narsese: {}", parsed);
             parsed.forEach(nar::input);
+            return null;
         } else {
-            if (wordDelayMS > 0) {
-                List<Term> tokens = tokenize(msg);
-                if (tokens!=null && !tokens.isEmpty())
-                    return new Hear(nar, tokens, src, wordDelayMS);
-            }
+            return ifNotNarsese.apply(msg);
         }
-        return null;
     }
 
     public Hear(NAR nar, @NotNull List<Term> msg, @NotNull String who, int wordDelayMS) {

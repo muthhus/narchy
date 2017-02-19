@@ -648,10 +648,6 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
         return null;
     }
 
-    @Nullable
-    default Truth truth(long when, float dur) {
-        return truth(when, dur, Param.TRUTH_EPSILON);
-    }
 
     /**
      * @param when time
@@ -661,11 +657,9 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
     float confWeight(long when, float dur);
 
 
-
-
     default long mid() {
         long s = start();
-        return (s != ETERNAL) ? Math.round((s + end()) / 2L) : ETERNAL;
+        return (s != ETERNAL) ? ((s + end()) / 2L) : ETERNAL;
     }
 
 

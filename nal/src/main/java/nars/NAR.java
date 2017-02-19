@@ -663,7 +663,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
         }
 
         boolean isCommand = input.isCommand();
-        if (isCommand) {
+        if (isCommand || (input.isGoal() && input.expectation() >= Param.EXECUTION_THRESHOLD) && ( input.isEternal() || (!input.isEternal() && Math.abs(time()-input.start()) <= time.dur() ) ) ) {
 
             Compound inputTerm = input.term();
             if (inputTerm.hasAll(Operator.OPERATOR_BITS) && inputTerm.op() == INH) {
@@ -696,8 +696,10 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
                 }
             }
 
-            eventTaskProcess.emit(input);
-            return null;
+            if (isCommand) {
+                eventTaskProcess.emit(input);
+                return null;
+            }
         }
 
         emotion.busy(input.priSafe(0));

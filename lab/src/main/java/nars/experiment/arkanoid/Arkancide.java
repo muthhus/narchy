@@ -6,12 +6,7 @@ import nars.*;
 import nars.concept.ActionConcept;
 import nars.remote.NAgents;
 
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.PrintStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 public class Arkancide extends NAgents {
 
@@ -52,19 +47,7 @@ public class Arkancide extends NAgents {
         }, 30, 5, 50000);
 
 
-        Path f = Files.createTempFile(Paths.get("/tmp"), "arkancide", ".nal");
-        System.out.println("saving tasks: " + f);
-        FileOutputStream os = new FileOutputStream(f.toFile());
-        PrintStream ps = new PrintStream(os);
-        nar.forEachTask(t -> {
-            Task tt = nar.post(t);
-            try {
-                tt.appendTSV(ps);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            //ps.println(tt.toString(/*NAR.this*/));
-        });
+        IO.saveTasksToTemporaryTSVFile(nar);
 
         //System.out.println(ts.db.getInfo());
 
@@ -73,8 +56,6 @@ public class Arkancide extends NAgents {
         //nar.beliefConfidence(0.75f);
         //nar.goalConfidence(0.75f);
     }
-
-
 
 
     public Arkancide(NAR nar, boolean cam) throws Narsese.NarseseException {

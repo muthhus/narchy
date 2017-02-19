@@ -37,6 +37,9 @@ public class ActionConcept extends WiredConcept implements WiredConcept.Prioriti
 
     private final boolean updateOnBeliefChange = false;
 
+    //enable/disable dynamic tasklink truth revision
+    private final boolean linkTruth;
+
     @Override
     public void pri(FloatSupplier v) {
         this.pri = v;
@@ -244,8 +247,14 @@ public class ActionConcept extends WiredConcept implements WiredConcept.Prioriti
 
         long then = now + decisionDT;
 
-        Truth[] td = truthLinked(then, now, nar.confMin.floatValue());
-        Truth tdb = td[0];
+        Truth tdb, tdg;
+        if (linkTruth) {
+            Truth[] td = linkTruth ? truthLinked(then, now, nar.confMin.floatValue()) : null;
+            tdb = td[0];
+            tdg = td[1];
+        } else {
+            tdb = tdg = null;
+        }
 
         float dur = nar.time.dur();
 
@@ -255,7 +264,6 @@ public class ActionConcept extends WiredConcept implements WiredConcept.Prioriti
         }
 
         @Nullable Truth d = this.goal(then, now, dur);
-        Truth tdg = td[1];
         if (tdg!=null) {
             d = (d != null) ? Revision.revise(d, tdg) : tdg;
         }

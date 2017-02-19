@@ -23,6 +23,9 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.*;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.function.Function;
 
 import static nars.IO.TaskSerialization.TermFirst;
@@ -331,6 +334,36 @@ public class IO {
         }
     }
 
+    public static void saveTasksToTemporaryTSVFile(NAR nar) throws IOException {
+        Path f = Files.createTempFile(Paths.get("/tmp"), "nar", ".tsv");
+        System.out.println("saving tasks: " + f);
+        FileOutputStream os = new FileOutputStream(f.toFile());
+        PrintStream ps = new PrintStream(os);
+        nar.forEachTask(t -> {
+            Task tt = nar.post(t);
+            try {
+                tt.appendTSV(ps);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
+    }
+
+    public static void saveTasksToTemporaryTextFile(NAR nar) throws IOException {
+        Path f = Files.createTempFile(Paths.get("/tmp"), "nar", ".nal");
+        System.out.println("saving tasks: file://" + f);
+        FileOutputStream os = new FileOutputStream(f.toFile());
+        PrintStream ps = new PrintStream(os);
+        nar.forEachTask(t -> {
+            Task tt = nar.post(t);
+            try {
+                tt.appendTo(ps);
+                ps.append('\n');
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
+    }
 
     public enum TaskSerialization {
         TermFirst,

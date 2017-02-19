@@ -146,7 +146,7 @@ public class TruthLab extends Grid {
     class TaskTimeline extends TruthTimeline {
 
         public TaskTimeline(Task task, long start, long end, int samplePeriod) {
-            super(start, end, samplePeriod, (w) -> task.truth(w, dur));
+            super(start, end, samplePeriod, (w) -> task.truth(w, dur, Param.TRUTH_EPSILON));
 
             this.label = task.toString();
             Draw.colorHash(Terms.atemporalize( task.term() ), labelColor);
@@ -162,7 +162,7 @@ public class TruthLab extends Grid {
             super(start, end, samplePeriod, (w) -> {
                 Task x = b.match(w, w, dur, $.task(t, '?', null).evidence(0), true);
                 if (x!=null)
-                    return x.truth(w, dur);
+                    return x.truth(w, dur, Param.TRUTH_EPSILON);
                 return null;
             });
 

@@ -455,7 +455,7 @@ public class Tetris extends NAgents {
             //Param.DEBUG = true;
             //Param.HORIZON = 1/100f;
 
-            FrameTime clock = new FrameTime().dur(TIME_PER_FALL/4);
+            FrameTime clock = new FrameTime().dur(TIME_PER_FALL/2);
             NAR nar =
                     NAgents.newMultiThreadNAR(4, clock);
                     //NARBuilder.newALANN(clock, 4, 64, 5, 4, 1);

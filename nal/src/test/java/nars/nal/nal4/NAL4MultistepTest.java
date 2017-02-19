@@ -42,10 +42,10 @@ public class NAL4MultistepTest extends AbstractNALTest {
         tester.believe("<{tom} --> cat>",1.0f,0.9f); //en("tom is a cat");
         tester.believe("<({tom},{sky}) --> likes>",1.0f,0.9f); //en("tom likes the sky");
 
-        tester.askAt(0, "<(cat,[blue]) --> likes>"); //cats like blue?
+        tester.inputAt(15, "$0.9;0.9$ likes(cat,[blue])?"); //cats like blue?
 
         tester.mustBelieve(time, "likes(cat,[blue])", 1.0f,
-                0.29f);
+                0.22f);
                 //0.42f);
 
     }

@@ -71,10 +71,6 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
             return 0;
         }
 
-        @Override
-        public float eviSum(long now, float dur) {
-            return 0;
-        }
 
         @Override
         public Task answer(long when, long now, float dur, @NotNull Task question, Compound template, float minConf) {
@@ -234,18 +230,7 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
      */
     void clear();
 
-    default float eviSum(long now, float dur) {
 
-        final float[] eSum = {0};
-        forEachTask(t -> {
-            Truth tt = t.truth(now, dur);
-            if (tt != null) {
-                eSum[0] += tt.evi();
-            }
-        });
-
-        return eSum[0];
-    }
 
     default Task answer(long when, long now, float dur, @NotNull Task question, Compound template, float minConf) {
 
@@ -280,7 +265,7 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
 
         //project if different occurrence
         if (answer.start() != when) {
-            Truth aProj = answer.truth(when, minConf);
+            Truth aProj = answer.truth(when, dur, minConf);
             if (aProj == null)
                 return null;
 

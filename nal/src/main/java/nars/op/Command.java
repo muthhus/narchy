@@ -26,19 +26,16 @@ public interface Command extends Operator {
 
     @Override
     default @Nullable Task run(@NotNull Task t, @NotNull NAR nar) {
-        if (t.punc() == COMMAND) {
-            Compound c = t.term();
-            try {
-                run((Atomic) (c.term(1)), ((Compound) (t.term(0))).terms(), nar);
-                return t;
-            } catch (Throwable error) {
-                if (Param.DEBUG)
-                    throw error;
-                else
-                    return error(error);
-            }
+        Compound c = t.term();
+        try {
+            run((Atomic) (c.term(1)), ((Compound) (t.term(0))).terms(), nar);
+            return t;
+        } catch (Throwable error) {
+            if (Param.DEBUG)
+                throw error;
+            else
+                return error(error);
         }
-        return null;
     }
 
     static Task error(Throwable error) {

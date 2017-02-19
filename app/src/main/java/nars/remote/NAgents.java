@@ -180,7 +180,7 @@ abstract public class NAgents extends NAgent {
                     //.sync(false)
                 ;
 
-        int conceptsPerCycle = 32*threads;
+        int conceptsPerCycle = 128*threads;
 
         final int reprobes = 4;
 
@@ -188,8 +188,8 @@ abstract public class NAgents extends NAgent {
         DefaultConceptBuilder cb = new DefaultConceptBuilder() {
             @Override
             public <X> X withBags(Term t, BiFunction<Bag<Term, BLink<Term>>, Bag<Task, BLink<Task>>, X> f) {
-                Bag<Term, BLink<Term>> termlink = new BLinkHijackBag(reprobes, BudgetMerge.orBlend, rng );
-                Bag<Task, BLink<Task>> tasklink = new BLinkHijackBag(reprobes, BudgetMerge.orBlend, rng );
+                Bag<Term, BLink<Term>> termlink = new BLinkHijackBag(reprobes, BudgetMerge.plusBlend, rng );
+                Bag<Task, BLink<Task>> tasklink = new BLinkHijackBag(reprobes, BudgetMerge.plusBlend, rng );
                 return f.apply(termlink, tasklink);
             }
         };
@@ -253,7 +253,7 @@ abstract public class NAgents extends NAgent {
 //                4, 16,
 //                0.02f, 32);
 
-        new Inperience(nar, 0.02f, 16);
+        new Inperience(nar, 0.005f, 16);
 
 //        //causal accelerator
 //        nar.onTask(t -> {

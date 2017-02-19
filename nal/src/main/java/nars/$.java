@@ -167,6 +167,9 @@ public enum $ {
     public static Compound func(@NotNull String opTerm, @Nullable Term... arg) {
         return func($.the(opTerm), arg);
     }
+    public static Compound func(@NotNull String opTerm, @Nullable List<Term> arg) {
+        return func($.the(opTerm), arg.toArray(new Term[arg.size()]));
+    }
     public static Compound func(@NotNull String opTerm, @Nullable String... arg) {
         return func($.the(opTerm), $.array(arg));
     }
@@ -1005,16 +1008,17 @@ public enum $ {
         return command(func(functor, args));
     }
 
-    @NotNull
-    public static String unquote(@NotNull Term s) {
-        String x = s.toString();
-        if (s instanceof Atom) {
-            int len = x.length();
-            if (len > 0 && x.charAt(0) == '\"' && x.charAt(len - 1) == '\"') {
-                return x.substring(1, len - 1);
-            }
+    @NotNull public static String unquote(@NotNull Term s) {
+        return unquote(s.toString());
+    }
+
+    @NotNull public static String unquote(String x) {
+        int len = x.length();
+        if (len > 0 && x.charAt(0) == '\"' && x.charAt(len - 1) == '\"') {
+            return unquote(x.substring(1, len - 1));
+        } else {
+            return x;
         }
-        return x;
     }
 
     /** global shared Javascript context */

@@ -26,8 +26,10 @@ public abstract class Param /*extends Container*/  {
 
     /** number of cycles for rolling average of busy emotion */
     public static final int BUSY_WINDOW = 4;
+
     public static final int MAX_INPUT_ANSWERS = 16;
 
+    public static float EXECUTION_THRESHOLD = 0.666f;
 
 
     /**
