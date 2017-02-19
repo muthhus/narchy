@@ -1,17 +1,24 @@
 package jcog.time;
 
+import jcog.math.Interval;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
 import java.util.Collection;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * Created by me on 9/4/15.
  */
 public class IntervalTreeTest {
+
+    @Test public void testIntersectionAdjacent() {
+        //two adjacent but non-overlapping intervals create a zero
+        Interval x = Interval.intersect(1, 2, 2, 3);
+        assertNotNull(x);
+        assertEquals(0,x.length());
+    }
 
         @Test
         public void testCreate(){

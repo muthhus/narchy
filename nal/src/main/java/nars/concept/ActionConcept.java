@@ -247,12 +247,14 @@ public class ActionConcept extends WiredConcept implements WiredConcept.Prioriti
         Truth[] td = truthLinked(then, now, nar.confMin.floatValue());
         Truth tdb = td[0];
 
-        @Nullable Truth b = this.belief(then, now, nar.time.dur());
+        float dur = nar.time.dur();
+
+        @Nullable Truth b = this.belief(then, now, dur);
         if (tdb != null) {
             b = (b != null) ? Revision.revise(b, tdb) : tdb;
         }
 
-        @Nullable Truth d = this.goal(then, now, nar.time.dur());
+        @Nullable Truth d = this.goal(then, now, dur);
         Truth tdg = td[1];
         if (tdg!=null) {
             d = (d != null) ? Revision.revise(d, tdg) : tdg;

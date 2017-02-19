@@ -202,17 +202,17 @@ abstract public class NAgents extends NAgent {
                 time,
                 exe) {
 
-            final Compressor compressor = new Compressor(this, "_", 2, 5,
-                    1f, 16, 256);
+//            final Compressor compressor = new Compressor(this, "_", 2, 5,
+//                    1f, 16, 256);
 
-            @Override
-            public Task pre(@NotNull Task t) {
-                if (!t.isInput() ) {
-                    return compressor.encode(t);
-                } else {
-                    return t; //dont affect input
-                }
-            }
+//            @Override
+//            public Task pre(@NotNull Task t) {
+//                if (!t.isInput() ) {
+//                    return compressor.encode(t);
+//                } else {
+//                    return t; //dont affect input
+//                }
+//            }
 
 //            @NotNull
 //            @Override
@@ -233,8 +233,8 @@ abstract public class NAgents extends NAgent {
 
         };
 
-        nar.beliefConfidence(0.75f);
-        nar.goalConfidence(0.75f);
+        nar.beliefConfidence(0.85f);
+        nar.goalConfidence(0.85f);
 
         float p = 0.75f;
         nar.DEFAULT_BELIEF_PRIORITY = 0.5f * p;
@@ -242,9 +242,9 @@ abstract public class NAgents extends NAgent {
         nar.DEFAULT_QUESTION_PRIORITY = 0.4f * p;
         nar.DEFAULT_QUEST_PRIORITY = 0.4f * p;
 
-        nar.confMin.setValue(0.05f);
+        nar.confMin.setValue(0.01f);
         //nar.truthResolution.setValue(0.01f);
-        nar.termVolumeMax.setValue(72);
+        nar.termVolumeMax.setValue(65);
 
         MySTMClustered stm = new MySTMClustered(nar, 64, '.', 3, true, 6);
         MySTMClustered stmGoal = new MySTMClustered(nar, 32, '!', 2, true, 4);

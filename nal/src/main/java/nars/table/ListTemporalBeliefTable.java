@@ -80,7 +80,7 @@ public class ListTemporalBeliefTable extends MultiRWFasterList<Task> implements 
 
                         Task b = matchMerge(l, now, a, dur);
 
-                        Task c = (b != null && b != a) ? merge(a, b, now, confMin) : null;
+                        Task c = (b != null && b != a) ? merge(a, b, now, confMin, dur) : null;
 
                         remove(l, a);
 
@@ -416,7 +416,7 @@ public class ListTemporalBeliefTable extends MultiRWFasterList<Task> implements 
 
         Task b = matchMerge(l, now, a, dur);
         if (b != null) {
-            Task merged = merge(a, b, now, confMin);
+            Task merged = merge(a, b, now, confMin, dur);
             if (merged == null) {
                 return input;
             } else {
@@ -432,8 +432,7 @@ public class ListTemporalBeliefTable extends MultiRWFasterList<Task> implements 
     /**
      * t is the target time of the new merged task
      */
-    @Nullable
-    private Task merge(@NotNull Task a, @NotNull Task b, long now, float confMin) {
+    private Task merge(@NotNull Task a, @NotNull Task b, long now, float confMin, float dur) {
 
         float ac = a.evi();
         float bc = b.evi();
@@ -451,9 +450,12 @@ public class ListTemporalBeliefTable extends MultiRWFasterList<Task> implements 
 
             double factor = (double) ac / (ac + bc);
 
-            Interval ai = new Interval(a.start(), a.end());
-            Interval bi = new Interval(b.start(), b.end());
+            int tolerance = Math.round(dur); //additional tolerance range allowing the tasks to overlap and replaced with a union rather than a point sample
+            Interval ai = new Interval(a.start() - tolerance, a.end() + tolerance);
+            Interval bi = new Interval(b.start() - tolerance, b.end() + tolerance);
+
             Interval overlap = ai.intersection(bi);
+
             long mergedStart, mergedEnd;
             if (overlap != null) {
                 Interval union = ai.union(bi);
@@ -462,11 +464,11 @@ public class ListTemporalBeliefTable extends MultiRWFasterList<Task> implements 
                 mergedEnd = union.b;
                 //(long) Math.round(Util.lerp(factor, a.end(), b.end()));
 
-                float timeRatio = Math.min(1f,
-                        (float) Math.max(1, overlap.length()) /
-                                Math.max(1, union.length())
-                );
-                t = t.confWeightMult(timeRatio);
+//                float timeRatio = Math.min(1f,
+//                        (float) Math.max(1, overlap.length()) /
+//                                Math.max(1, union.length())
+//                );
+//                t = t.confWeightMult(timeRatio);
             } else {
                 //create point sample
                 mergedStart = mergedEnd = Math.round(Util.lerp(factor, a.mid(), b.mid()));

@@ -31,8 +31,7 @@ public class ScalarSignal implements Consumer<NAR>, DoubleSupplier {
      */
     float resolution = Param.DEFAULT_SENSOR_RESOLUTION;
 
-    /** in frames time */
-    final static long latchResolution = 1;
+
 
     @NotNull
     private final Term term;

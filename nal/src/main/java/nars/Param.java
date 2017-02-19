@@ -65,7 +65,7 @@ public abstract class Param /*extends Container*/  {
     /**
      * Maximum length of the evidental base of the Stamp, a power of 2
      */
-    public static final int STAMP_CAPACITY = 16;
+    public static final int STAMP_CAPACITY = 10;
 
 
     /**
@@ -134,8 +134,8 @@ public abstract class Param /*extends Container*/  {
     public static final float BUDGET_EPSILON = 0.0001f;
 
 
-    public static final int DEFAULT_WIRED_CONCEPT_BELIEFS = 16;
-    public static final int DEFAULT_WIRED_CONCEPT_GOALS = 16;
+    public static final int DEFAULT_WIRED_CONCEPT_BELIEFS = 32;
+    public static final int DEFAULT_WIRED_CONCEPT_GOALS = 32;
 
     /** size of each thread's normalization cache, in entries */
     public static final int NORMALIZATION_CACHE_SIZE = 16*1024;
