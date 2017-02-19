@@ -32,48 +32,12 @@ public class NLPOperatorTest {
 
         NAR n = new Default();
 
-        //slice(<compound>,<selector>)
-        //  selector :-
-        //      a specific integer value index, from 0 to compound size
-        //      (a,b) pair of integers, a range of indices
 
-        n.on("quote", (args) -> {
-            //throw new RuntimeException("quote should never actually be invoked by the system");
-            return args[0];
-        });
-
-        n.on("slice", (args) -> {
-            if (args.length > 1) {
-                Compound x = compoundOrNull(args[0]);
-                if (x != null) {
-                    switch (args.length) {
-                        case 2:
-                            //specific index
-                            Term index = args[1];
-                            if (index.op() == Op.INT) {
-                                int i = ((IntTerm) index).val;
-                                return x.term(i);
-                            }
-                            break;
-                        case 3:
-                            //TODO
-                            break;
-                    }
-
-                }
-            }
-            return null;
-        });
-        n.on("assertEquals", new Command() {
-            @Override public void run(@NotNull Atomic op, @NotNull Term[] args, @NotNull NAR nar) {
-                String msg = op + "(" + Joiner.on(',').join(args) + ')';
-                assertEquals(msg, 2, args.length);
-                assertEquals(msg, args[0], args[1]);
-            }
-        });
 
         n.log();
         n.input("(slice((a,b,c),2)).");
+        n.input("assertEquals(c, slice((a,b,c),add(1,1)));");
+        n.input("assertEquals((a,b), slice((a,b,c),(0,2)));");
         n.input("(quote(x)).");
         n.input("log(quote(x));");
         n.input("assertEquals(c, c);");

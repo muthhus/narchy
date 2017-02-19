@@ -1,17 +1,31 @@
 package nars;
 
+import com.google.common.base.Joiner;
 import jcog.Texts;
 import jcog.bag.PLink;
 import nars.concept.Concept;
 import nars.op.Command;
 import nars.op.data.*;
+import nars.term.Compound;
+import nars.term.Term;
+import nars.term.Terms;
 import nars.term.atom.Atom;
+import nars.term.atom.Atomic;
+import nars.term.obj.IntTerm;
 import nars.term.transform.Functor;
 import nars.term.var.Variable;
+import org.jetbrains.annotations.NotNull;
+import org.junit.Assert;
+
+import java.util.Arrays;
 
 import static nars.$.quote;
+import static nars.Op.INT;
+import static nars.Op.PROD;
 import static nars.term.Term.False;
 import static nars.term.Term.True;
+import static nars.term.Terms.compoundOrNull;
+import static org.junit.Assert.assertEquals;
 
 /**
  * Built-in functors, ie. the standard core function set
@@ -42,7 +56,11 @@ public class Builtin  {
                 x.equals(y) ? True : (!((x instanceof Variable) || (y instanceof Variable)) ? False : null)),
 
             Functor.f2Int("add", (x, y) -> x + y),
-            Functor.f2Int("sub", (x, y) -> x - y)
+            Functor.f2Int("sub", (x, y) -> x - y),
+
+            Functor.f1("quote", x->x), //TODO does this work    //throw new RuntimeException("quote should never actually be invoked by the system");
+
+
     };
 
     /**
@@ -50,6 +68,55 @@ public class Builtin  {
      */
     public static void load(NAR nar) {
         //TODO these should be command-only operators, not functors
+
+        //slice(<compound>,<selector>)
+        //  selector :-
+        //      a specific integer value index, from 0 to compound size
+        //      (a,b) pair of integers, a range of indices
+        nar.on("slice", (args) -> {
+            if (args.length == 2) {
+                Compound x = compoundOrNull(args[0]);
+                int len = x.size();
+
+                if (x != null) {
+
+                    Term index = args[1];
+                    Op o = index.op();
+                    if (o == INT) {
+                        //specific index
+                        int i = ((IntTerm) index).val;
+                        if (i >= 0 && i < len)
+                            return x.term(i);
+                    } else if (o == PROD && index.size() == 2) {
+                        Term start = ((Compound)index).term(0);
+                        if (start.op()==INT) {
+                            Term end = ((Compound) index).term(1);
+                            if (end.op() == INT) {
+                                int si = ((IntTerm)start).val;
+                                if (si >= 0 && si < len) {
+                                    int ei = ((IntTerm) end).val;
+                                    if (ei >= 0 && ei < len) {
+                                        if (si == ei)
+                                            return Terms.ZeroProduct;
+                                        if (si < ei) {
+                                            return $.p(Arrays.copyOfRange(x.terms(), si, ei));
+                                        }
+                                    }
+                                }
+                                //TODO maybe reverse order will return reversed subproduct
+                            }
+                        }
+
+                    }
+                }
+            }
+            return null;
+        });
+        nar.on("assertEquals", (Command) (op, args, nn) -> {
+            //String msg = op + "(" + Joiner.on(',').join(args) + ')';
+            Assert.assertEquals(/*msg,*/ 2, args.length);
+            Assert.assertEquals(/*msg,*/ args[0], args[1]);
+        });
 
         nar.on(Functor.f0("self", nar::self));
 
