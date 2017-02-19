@@ -60,7 +60,7 @@ public abstract class Param /*extends Container*/  {
      * Evidential Horizon, the amount of future evidence to be considered (during revision).
      * Must be >=1.0, usually 1 .. 2
      */
-    public static final float HORIZON = 1f;
+    public static float HORIZON = 1f;
     public static final int MAX_VARIABLE_CACHED_PER_TYPE = 16;
     /**
      * Maximum length of the evidental base of the Stamp, a power of 2

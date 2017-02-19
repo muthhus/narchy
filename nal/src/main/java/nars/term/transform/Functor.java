@@ -162,7 +162,8 @@ abstract public class Functor extends AtomConcept implements PermanentConcept, F
         @Nullable
         @Override public final Term apply(@NotNull Term[] x) {
             if (x.length!=1)
-                throw new UnsupportedOperationException("# args must equal 2");
+                return null;
+                //throw new UnsupportedOperationException("# args must equal 1");
 
             return apply(x[0]);
         }

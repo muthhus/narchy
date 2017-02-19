@@ -239,14 +239,15 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
             );
             float confEffective = answer.conf(mid(), nar.time.dur());
 
-            BLink<Task> insertion = answers.put(new RawBLink<>(answer, 1f, confEffective));
+            if (!answers.contains(answer)) {
 
-            answers.commit();
+                answers.commit();
 
-            if (insertion!=null && insertion.get()==answer) /* first insert */ {
-                Command.log(nar, this.toString() + "  " + answer.toString());
-            } else {
-                return null;
+                BLink<Task> insertion = answers.put(new RawBLink<>(answer, 1f, confEffective));
+
+                if (insertion != null) {
+                    Command.log(nar, this.toString() + "  " + answer.toString());
+                }
             }
         }
 

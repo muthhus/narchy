@@ -108,7 +108,6 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
                 if (r instanceof Compound) {
 
                     Compound cr = (Compound) r;
-                    //if (/*r.volume() < nar.termVolumeMax.intValue() && */Task.taskStatementValid(cr, ct.punc, !Param.DEBUG)) {
 
                     //note: the budget function used here should not depend on the truth's frequency. btw, it may be inverted below
                     Compound crr = compoundOrNull(nar.concepts.eval(cr));
@@ -123,7 +122,6 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
                         derive(m, crr, truth, budget, ct); //continue to stage 2
 
                     }
-
                 }
             } catch (@NotNull InvalidTermException | InvalidTaskException e) {
                 if (Param.DEBUG_EXTRA)

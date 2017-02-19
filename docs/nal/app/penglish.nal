@@ -7,8 +7,8 @@
 ((DET:#a && FRAG(#a,$N1,$V,$N2)) ==> (((/,MEANS,$N1,_),(/,MEANS,$N2,_)) --> (/,MEANS,$V,_))).
 ((DET:#a && FRAG($N1,$V,#a,$N2)) ==> (((/,MEANS,$N1,_),(/,MEANS,$N2,_)) --> (/,MEANS,$V,_))).
 
-((PLACE_PREP:#in && FRAG(#in,$where)) ==> PLACE:(/,MEANS,$where,_)).
-$0.1;0.9$ ((TIME_PREP:#at && FRAG(#at,$when)) ==> TIME:(/,MEANS,$when,_)).
+((WHERE_PREP:#in && FRAG(#in,$where)) ==> WHERE:(/,MEANS,$where,_)).
+$0.1;0.9$ ((WHEN_PREP:#at && FRAG(#at,$when)) ==> WHEN:(/,MEANS,$when,_)).
 ((DET:#a && FRAG(#a,$it)) ==> IT:(/,MEANS,$it,_)).
 
 these are all so far

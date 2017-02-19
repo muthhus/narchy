@@ -429,22 +429,22 @@ abstract public class NAgent implements NSense, NAction {
 //                            .eternal(),
 //                            //.time(nar, dur)
 
-//                    new PredictionTask($.impl(action, dur, happiness), '?')
-//                            .time(nar.time()),
-//                    new PredictionTask($.impl($.neg(action), dur, happiness), '?')
-//                            .time(nar.time()),
+                    new PredictionTask($.impl(action, dur, happiness), '?')
+                            .time(nar.time()),
+                    new PredictionTask($.impl($.neg(action), dur, happiness), '?')
+                            .time(nar.time())
 
 //                    new PredictionTask($.impl(action, dur, $.varQuery(1)), '?')
 //                            .time(nar.time())
 
-                    new PredictionTask($.seq(action, dur, happiness), '?')
-                            .time(nar.time()),
-                    new PredictionTask($.seq($.neg(action), dur, happiness), '?')
-                            .time(nar.time()),
-                    new PredictionTask($.seq(action, dur, $.neg(happiness)), '?')
-                            .time(nar.time()),
-                    new PredictionTask($.seq($.neg(action), dur, $.neg(happiness)), '?')
-                            .time(nar.time())
+//                    new PredictionTask($.seq(action, dur, happiness), '?')
+//                            .time(nar.time()),
+//                    new PredictionTask($.seq($.neg(action), dur, happiness), '?')
+//                            .time(nar.time()),
+//                    new PredictionTask($.seq(action, dur, $.neg(happiness)), '?')
+//                            .time(nar.time()),
+//                    new PredictionTask($.seq($.neg(action), dur, $.neg(happiness)), '?')
+//                            .time(nar.time())
 
 //                    new PredictionTask($.seq($.varQuery("x"), 0, $.seq(action, dur, happiness)), '?').eternal(),
 //                    new PredictionTask($.seq($.varQuery("x"), 0, $.seq($.neg(action), dur, happiness)), '?').eternal()

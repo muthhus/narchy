@@ -1,21 +1,39 @@
-//package nars.nal.nal8;
-//
-//import nars.$;
-//import nars.NAR;
-//import nars.Op;
-//import nars.nar.Default;
-//import nars.term.Compound;
-//import nars.term.atom.Atomic;
-//import nars.test.TestNAR;
-//import org.junit.Test;
-//
-//import static nars.$.$;
-//import static org.junit.Assert.assertEquals;
-//import static org.junit.Assert.assertTrue;
-//
-//public class OperatorTest {
-//
-//
+package nars.nal.nal8;
+
+import nars.NAR;
+import nars.Param;
+import nars.nar.Default;
+import org.junit.Test;
+
+public class OperatorTest {
+
+
+    @Test
+    public void testSliceAssertEtc() {
+        //https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/slice
+        //_.slice(array, [start=0], [end=array.length])
+
+        Param.DEBUG = true;
+
+        NAR n = new Default();
+        n.log();
+        n.input("(slice((a,b,c),2)).");
+        n.input("assertEquals(c, slice((a,b,c),add(1,1)));");
+        n.input("assertEquals((a,b), slice((a,b,c),(0,2)));");
+
+        //TODO add invalid slice conditions
+
+        n.input("(quote(x)).");
+        n.input("log(quote(x));");
+        n.input("assertEquals(c, c);");
+        n.input("assertEquals(x, quote(x));");
+        n.input("assertEquals(c, slice((a,b,c),2));");
+        n.input("assertEquals(quote(slice((a,b,c),#x)), slice((a,b,c),#x));");
+        n.run(5);
+
+
+    }
+
 ////    @Test public void testOperatorEquality() {
 ////        assertNotNull( $.oper("echo") );
 ////        assertEquals( $.oper("echo"), $.oper("echo"));
@@ -267,4 +285,4 @@
 ////                "<(^count,{(^count,{a,b},SELF),2},$1,SELF) =/> <$1 <-> 1>>. :|: %1.00;0.90%"
 ////        );
 ////    }
-//}
+}

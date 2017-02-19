@@ -26,7 +26,7 @@ public class BudgetTest {
         assertEquals(0, Util.bin(0.0f, 9));
         assertEquals(1, Util.bin(0.1f, 9));
         assertEquals(8, Util.bin(0.9f, 9));
-        assertEquals(9, Util.bin(1.0f, 9));
+        assertEquals(8, Util.bin(1.0f, 9));
     }
 
     @Test public void testCurveSawtooth() {

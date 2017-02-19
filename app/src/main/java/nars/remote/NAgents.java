@@ -214,32 +214,23 @@ abstract public class NAgents extends NAgent {
                 }
             }
 
-            @NotNull
-            @Override
-            public Term pre(@NotNull Term t) {
-                return compressor.encode(t);
-            }
-
-            @NotNull
-            @Override public Task post(@NotNull Task t) {
-                return compressor.decode(t);
-            }
-
-            @Override
-            @NotNull public Term post(@NotNull Term t) {
-                return compressor.decode(t);
-            }
-
+//            @NotNull
 //            @Override
-//            protected BLinkHijackBag<Concept> newConceptBag(int activeConcepts) {
-//                return new BLinkHijackBag<>(activeConcepts, reprobes, BudgetMerge.plusBlend, random ) {
-//                    @Override
-//                    public Forget forget(float rate) {
-//                        float memoryForget = 0.98f;
-//                        return new Forget(rate, memoryForget, memoryForget);
-//                    }
-//                };
+//            public Term pre(@NotNull Term t) {
+//                return compressor.encode(t);
 //            }
+//
+//            @NotNull
+//            @Override public Task post(@NotNull Task t) {
+//                return compressor.decode(t);
+//            }
+//
+//            @Override
+//            @NotNull public Term post(@NotNull Term t) {
+//                return compressor.decode(t);
+//            }
+
+
         };
 
         nar.beliefConfidence(0.75f);

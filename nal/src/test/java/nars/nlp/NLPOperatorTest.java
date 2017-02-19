@@ -4,6 +4,7 @@ import com.google.common.base.Joiner;
 import nars.NAR;
 import nars.Op;
 import nars.Param;
+import nars.Task;
 import nars.nar.Default;
 import nars.op.Command;
 import nars.op.Operator;
@@ -23,51 +24,61 @@ import static org.junit.Assert.assertTrue;
  */
 public class NLPOperatorTest {
 
-    @Test
-    public void testProductSlice() {
-        //https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/slice
-        //_.slice(array, [start=0], [end=array.length])
-
-        Param.DEBUG = true;
-
-        NAR n = new Default();
-        n.log();
-        n.input("(slice((a,b,c),2)).");
-        n.input("assertEquals(c, slice((a,b,c),add(1,1)));");
-        n.input("assertEquals((a,b), slice((a,b,c),(0,2)));");
-
-        //TODO add invalid slice conditions
-
-        n.input("(quote(x)).");
-        n.input("log(quote(x));");
-        n.input("assertEquals(c, c);");
-        n.input("assertEquals(x, quote(x));");
-        n.input("assertEquals(c, slice((a,b,c),2));");
-        n.input("assertEquals(quote(slice((a,b,c),#x)), slice((a,b,c),#x));");
-        n.run(5);
-
-
-    }
 
     @Test
     public void testNLP1() {
-        NAR n = new Default();
-        n.log();
+        //Param.DEBUG = true;
+
+        NAR n = new Default(1024,100,2,4);
+
+
+        //n.log();
+
+        n.log(System.out, x -> x instanceof Task && ((Task)x).isGoal());
+
         n.input(
+            "( (RANGE:{$range} && SENTENCE:$x) ==> FRAG:slice($x, $range)).",
 
-            "( ( INT:{$start} && INT:{$end} ) ==> RANGE($start,$end) )",
+            "((VERB:{$V} && FRAG($X,$V,$Y)) ==> (((/,MEANS,$X,_),(/,MEANS,$Y,_)) --> (/,MEANS,$V,_))).",
 
-            "(( RANGE($start,$end) && SENTENCE:$x) ==> FRAG:slice($x, ($start,$end))).",
+            //"((FRAG:$XY && ($XY <-> flat((FRAG($X), and, FRAG($Y))))) <=> ((/,MEANS,$X,_) && (/,MEANS,$Y,_))).",
 
-            "((VERB:$V && FRAG($N1,$V,$N2)) ==> (((/,MEANS,$N1,_),(/,MEANS,$N2,_)) --> (/,MEANS,$V,_))).",
 
-            "INT:{0,1,2,3,4}.",
-            "VERB:is.",
 
-            "SENTENCE(yes,is,no)."
+            "(FRAG<->SENTENCE).", //sentence is also its own fragment
+
+            "RANGE:{(0,3),(1,4),(4,7),(0,7)}.",
+                //"RANGE:{(0,3)}.",
+                //"RANGE:{0,1,2,3,4,(0,1),(0,2),(0,3)}.",
+
+            "VERB:{is,maybe,isnt,was,willBe,wants,can}.",
+            //"VERB:{is,maybe,isnt}.",
+
+            "SENTENCE(yes,wants,no).",
+            "SENTENCE(yes,is,no).",
+            "SENTENCE(yes,isnt,no).",
+
+            "SENTENCE(it,is,my,good).",
+            "SENTENCE(it,is,bad,and,it,can,good).",
+            "SENTENCE(good,was,bad).",
+            "SENTENCE(right,willBe,wrong).",
+            "SENTENCE(true,can,false).",
+
+
+
+            //"$0.9$ (?y --> (/,MEANS,?x,_))?",
+
+            "$0.9$ SENTENCE(?z,?x,?y)?"
+
+            //"$0.9$ SENTENCE:{?y}?",
+
+            //"$0.9$ (SENTENCE:{$y} ==> say($y)).",
+            //"$0.9;0.9$ (SENTENCE(#y) && say(#y))!",
+
+            //"$0.9;0.9$ say(#y)!"
         );
 
-        n.run(250);
+        n.run(5250);
     }
 
 }

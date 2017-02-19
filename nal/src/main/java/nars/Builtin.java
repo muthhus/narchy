@@ -86,6 +86,9 @@ public class Builtin  {
                         int i = ((IntTerm) index).val;
                         if (i >= 0 && i < len)
                             return x.term(i);
+                        else
+                            return False;
+
                     } else if (o == PROD && index.size() == 2) {
                         Term start = ((Compound)index).term(0);
                         if (start.op()==INT) {
@@ -103,6 +106,7 @@ public class Builtin  {
                                     }
                                 }
                                 //TODO maybe reverse order will return reversed subproduct
+                                return False;
                             }
                         }
 
@@ -111,6 +115,7 @@ public class Builtin  {
             }
             return null;
         });
+
         nar.on("assertEquals", (Command) (op, args, nn) -> {
             //String msg = op + "(" + Joiner.on(',').join(args) + ')';
             Assert.assertEquals(/*msg,*/ 2, args.length);

@@ -3,6 +3,7 @@ package nars.experiment.tetris;
 import nars.$;
 import nars.NAR;
 import nars.Narsese;
+import nars.Param;
 import nars.concept.ActionConcept;
 import nars.concept.SensorConcept;
 import nars.experiment.tetris.impl.TetrisState;
@@ -36,8 +37,8 @@ public class Tetris extends NAgents {
 
 
     public static final int tetris_width = 6;
-    public static final int tetris_height = 16;
-    public static final int TIME_PER_FALL = 6;
+    public static final int tetris_height = 12;
+    public static final int TIME_PER_FALL = 12;
     public static final int PIXEL_RADIX = 2;
 
     private static SensorConcept[][] concept;
@@ -452,8 +453,9 @@ public class Tetris extends NAgents {
 
         public static void main(String[] args) throws Narsese.NarseseException {
             //Param.DEBUG = true;
+            //Param.HORIZON = 1/100f;
 
-            FrameTime clock = new FrameTime().dur(TIME_PER_FALL/2f);
+            FrameTime clock = new FrameTime().dur(TIME_PER_FALL/4);
             NAR nar =
                     NAgents.newMultiThreadNAR(4, clock);
                     //NARBuilder.newALANN(clock, 4, 64, 5, 4, 1);
