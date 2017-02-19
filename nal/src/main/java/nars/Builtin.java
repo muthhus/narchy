@@ -76,9 +76,8 @@ public class Builtin  {
         nar.on("slice", (args) -> {
             if (args.length == 2) {
                 Compound x = compoundOrNull(args[0]);
-                int len = x.size();
-
                 if (x != null) {
+                    int len = x.size();
 
                     Term index = args[1];
                     Op o = index.op();
@@ -95,7 +94,7 @@ public class Builtin  {
                                 int si = ((IntTerm)start).val;
                                 if (si >= 0 && si < len) {
                                     int ei = ((IntTerm) end).val;
-                                    if (ei >= 0 && ei < len) {
+                                    if (ei >= 0 && ei <= len) {
                                         if (si == ei)
                                             return Terms.ZeroProduct;
                                         if (si < ei) {

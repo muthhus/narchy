@@ -598,19 +598,13 @@ public abstract class TermIndex extends TermBuilder {
     }
 
     public Term eval(Compound x) {
-        Term y = normalize(x);
-        if (y == null)
+
+        //eval before normalizing
+        Compound z = compoundOrNull(x.eval(this));
+        if (z == null)
             return null;
 
-        Term z = y.eval(this);
-        if (z != null) {
-            if (z instanceof Compound && z!=y)
-                return normalize((Compound)z);
-            else
-                return z;
-        } else {
-            return y;
-        }
+        return normalize(z);
     }
 
     //    @Override

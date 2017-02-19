@@ -107,12 +107,8 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
 
                 if (r instanceof Compound) {
 
-                    Derivation.TruthPuncEvidence ct = m.punct.get();
-
                     Compound cr = (Compound) r;
                     //if (/*r.volume() < nar.termVolumeMax.intValue() && */Task.taskStatementValid(cr, ct.punc, !Param.DEBUG)) {
-
-                    Truth truth = ct.truth;
 
                     //note: the budget function used here should not depend on the truth's frequency. btw, it may be inverted below
                     Compound crr = compoundOrNull(nar.concepts.eval(cr));
@@ -120,6 +116,8 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
                         throw new InvalidTermException(r.op(), DTERNAL, "normalization failed", (cr).terms());
                     }
 
+                    Derivation.TruthPuncEvidence ct = m.punct.get();
+                    Truth truth = ct.truth;
                     Budget budget = m.premise.budget(crr, truth, m);
                     if (budget != null) {
                         derive(m, crr, truth, budget, ct); //continue to stage 2
