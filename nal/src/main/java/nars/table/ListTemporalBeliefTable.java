@@ -325,10 +325,10 @@ public class ListTemporalBeliefTable extends MultiRWFasterList<Task> implements 
 
 
     private Function<Task, Float> temporalConfidence(long when, float dur) {
-        return x -> rankTemporalByConfidenceAndQuality(x, when, dur);
+        return x -> rankTemporalByConfidence(x, when, dur);
     }
 
-    final float rankTemporalByConfidenceAndQuality(@Nullable Task t, long when, float dur) {
+    final float rankTemporalByConfidence(@Nullable Task t, long when, float dur) {
         return t != null ? t.confWeight(when, dur) : Float.NEGATIVE_INFINITY;// * (1+t.range()) * t.qua();
 
 //        long range = Math.max(1, t.range());
@@ -372,7 +372,7 @@ public class ListTemporalBeliefTable extends MultiRWFasterList<Task> implements 
                     //* (1f + 1f / (1f + x.dur()))
                     * (1f
                     + TruthPolation.evidenceDecay(1, dur,
-                    abs(xs - ys) + abs(xe - ye) + abs((xe + xs) / 2f - now))
+                    abs(xs - ys) + abs(xe - ye) + Math.min(Math.abs(xe-now), Math.abs(xs-now)))
             )
                     ;
         };
@@ -403,11 +403,11 @@ public class ListTemporalBeliefTable extends MultiRWFasterList<Task> implements 
         }
 
         //return rankTemporalByConfidenceAndOriginality(t, when, now, -1);
-        float inputRank = input != null ? rankTemporalByConfidenceAndQuality(input, now, dur) : Float.POSITIVE_INFINITY;
+        float inputRank = input != null ? rankTemporalByConfidence(input, now, dur) : Float.POSITIVE_INFINITY;
 
         Task a = l.minBy(temporalConfidence(now, dur));
         //return rankTemporalByConfidenceAndOriginality(t, when, now, -1);
-        if (a == null || inputRank < rankTemporalByConfidenceAndQuality(a, now, dur)) {
+        if (a == null || inputRank < rankTemporalByConfidence(a, now, dur)) {
             //dont continue if the input was too weak
             return null;
         }
@@ -470,8 +470,10 @@ public class ListTemporalBeliefTable extends MultiRWFasterList<Task> implements 
 //                );
 //                t = t.confWeightMult(timeRatio);
             } else {
-                //create point sample
-                mergedStart = mergedEnd = Math.round(Util.lerp(factor, a.mid(), b.mid()));
+                //create point sample of duration width
+                double mergedMid = Math.round(Util.lerp(factor, a.mid(), b.mid()));
+                mergedStart = (long) Math.floor(mergedMid - dur/2f);
+                mergedEnd = (long) Math.ceil(mergedMid + dur/2f);
             }
 
             if (t != null)

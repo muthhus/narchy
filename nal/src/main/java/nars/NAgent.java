@@ -71,6 +71,7 @@ abstract public class NAgent implements NSense, NAction {
     public final List<ActionConcept> actions = $.newArrayList();
 
 
+    float lookAhead = 12;
 
     public float alpha, gamma;
 
@@ -432,19 +433,19 @@ abstract public class NAgent implements NSense, NAction {
                     new PredictionTask($.impl(action, dur, happiness), '?')
                             .time(nar.time()),
                     new PredictionTask($.impl($.neg(action), dur, happiness), '?')
+                            .time(nar.time()),
+
+                    new PredictionTask($.impl(action, dur, $.varQuery(1)), '?')
+                            .time(nar.time()),
+
+                    new PredictionTask($.seq(action, dur, happiness), '?')
+                            .time(nar.time()),
+                    new PredictionTask($.seq($.neg(action), dur, happiness), '?')
+                            .time(nar.time()),
+                    new PredictionTask($.seq(action, dur, $.neg(happiness)), '?')
+                            .time(nar.time()),
+                    new PredictionTask($.seq($.neg(action), dur, $.neg(happiness)), '?')
                             .time(nar.time())
-
-//                    new PredictionTask($.impl(action, dur, $.varQuery(1)), '?')
-//                            .time(nar.time())
-
-//                    new PredictionTask($.seq(action, dur, happiness), '?')
-//                            .time(nar.time()),
-//                    new PredictionTask($.seq($.neg(action), dur, happiness), '?')
-//                            .time(nar.time()),
-//                    new PredictionTask($.seq(action, dur, $.neg(happiness)), '?')
-//                            .time(nar.time()),
-//                    new PredictionTask($.seq($.neg(action), dur, $.neg(happiness)), '?')
-//                            .time(nar.time())
 
 //                    new PredictionTask($.seq($.varQuery("x"), 0, $.seq(action, dur, happiness)), '?').eternal(),
 //                    new PredictionTask($.seq($.varQuery("x"), 0, $.seq($.neg(action), dur, happiness)), '?').eternal()
@@ -615,7 +616,7 @@ abstract public class NAgent implements NSense, NAction {
                 //UtilityFunctions.aveAri(nar.priorityDefault('.'), nar.priorityDefault('!'))
                        ///* / (predictors.size()/predictorProbability)*/ * predictorPriFactor;
 
-        float lookAhead = 8;
+
 
         if (pri > 0) {
             //long frameDelta = now-prev;
