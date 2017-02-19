@@ -29,7 +29,7 @@ public class NLPOperatorTest {
     public void testNLP1() {
         //Param.DEBUG = true;
 
-        NAR n = new Default(1024,100,2,4);
+        NAR n = new Default(1024,10,2,4);
 
 
         //n.log();
@@ -78,7 +78,7 @@ public class NLPOperatorTest {
             //"$0.9;0.9$ say(#y)!"
         );
 
-        n.run(5250);
+        n.run(250);
     }
 
 }

@@ -23,10 +23,10 @@ public abstract class UDPServer<S extends Consumer<byte[]>> extends UDP implemen
     final static int MAX_SESSIONS = 32;
 
     static class Session<A> {
-        final A api;
+        @NotNull final A api;
         private long last;
 
-        Session(A api) {
+        Session(@NotNull A api) {
             this.api = api;
             touch();
         }
@@ -57,7 +57,7 @@ public abstract class UDPServer<S extends Consumer<byte[]>> extends UDP implemen
     }
 
     /** explicitly disconnect a client */
-    public void end(S s, boolean removeFromCache) {
+    public void end(@NotNull S s, boolean removeFromCache) {
 
         if (s instanceof Closeable) {
             try {
@@ -79,15 +79,15 @@ public abstract class UDPServer<S extends Consumer<byte[]>> extends UDP implemen
     }
 
     @Override
-    protected void in(byte[] data, InetSocketAddress from) {
+    protected void in(@NotNull byte[] data, @NotNull InetSocketAddress from) {
         Session<S> ss = sessions.get(from, this::session);
         ss.touch();
         ss.api.accept(data);
     }
 
-    abstract protected S get(InetSocketAddress socketAddress);
+    abstract protected S get(@NotNull InetSocketAddress socketAddress);
 
-    protected Session<S> session(InetSocketAddress a) {
+    protected Session<S> session(@NotNull InetSocketAddress a) {
         return new Session<>(get(a));
     }
 

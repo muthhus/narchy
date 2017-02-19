@@ -649,7 +649,12 @@ public interface Compound extends Term, IPair, TermContainer {
     default Term eval(TermIndex index) {
 
         //somewhere in the subterms is a functor to eval
-        if (hasAll(Op.OpBits)) {
+        if (!hasAll(Op.OpBits)) {
+            return this;
+        }
+
+        //any contained evaluables
+        if (subterms().hasAll(OpBits)) {
             int s = size();
             Term[] evalSubs = terms().clone();
             boolean modified = false;
