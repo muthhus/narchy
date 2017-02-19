@@ -9,6 +9,7 @@ import nars.Task;
 import nars.budget.BudgetFunctions;
 import nars.budget.RawBudget;
 import nars.concept.Concept;
+import nars.index.term.TermIndex;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
@@ -25,6 +26,7 @@ import java.util.Objects;
 
 import static nars.$.t;
 import static nars.Op.*;
+import static nars.term.Terms.compoundOrNull;
 import static nars.time.Tense.ETERNAL;
 
 /**
@@ -163,16 +165,14 @@ public abstract class AbstractTask extends RawBudget implements Task {
             throw new InvalidTaskException(this, "Unspecified punctuation");
 
 
-        Term ntt = n.normalize(t);
-        if (ntt == null || (!(ntt instanceof Compound)))
+        Compound cntt = eval(n.concepts, t);
+        if (cntt == null)
             throw new InvalidTaskException(t, "Failed normalization");
 
-        Compound cntt = (Compound)ntt;
-
         if (!Task.taskContentValid(cntt, punc, n.level(), n.termVolumeMax.intValue(), !Param.DEBUG))
-            throw new InvalidTaskException(ntt, "Invalid content");
+            throw new InvalidTaskException(cntt, "Invalid content");
 
-        if (ntt!=t) {
+        if (cntt!=t) {
             this.term = cntt;
             invalidate();
         }
@@ -263,6 +263,9 @@ public abstract class AbstractTask extends RawBudget implements Task {
 
     }
 
+    @Nullable protected Compound eval(@NotNull TermIndex index, @NotNull Compound t) {
+        return compoundOrNull(index.eval(t));
+    }
 
 
     //    /** if validated and entered into the system. can be overridden in subclasses to handle this event

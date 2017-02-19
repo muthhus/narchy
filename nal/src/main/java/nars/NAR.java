@@ -187,11 +187,6 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
     }
 
 
-    @Nullable
-    public final Term normalize(@NotNull Compound t) {
-        return concepts.normalize(t);
-    }
-
     public NAR(@NotNull Time time, @NotNull TermIndex concepts, @NotNull Random rng, @NotNull Executioner exe) {
 
 
@@ -670,90 +665,49 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
         boolean isCommand = input.isCommand();
         if (isCommand) {
             eventTaskProcess.emit(input);
-        }
-
-        //TODO evaluate from inside first, then outwards. like ordinary order of operations
-        Compound inputTerm = input.term();
-        if (inputTerm.hasAll(Operator.OPERATOR_BITS) && inputTerm.op() == INH) {
-            Term func = inputTerm.term(1);
-            if (func.op() == ATOM) {
-                Term args = inputTerm.term(0);
-                if (args.op() == PROD) {
-                    Concept funcConcept = concept(func);
-                    if (funcConcept != null) {
-                        Operator o = funcConcept.get(Operator.class);
-                        if (o != null) {
-                            Task result = o.run(input, this);
-
-                            if (isCommand) {
-                                if (result != null && result != input)
-                                    return input(result); //recurse
-                            } else {
-                                if (result != input) { //instance equality, not actual equality in case it wants to change this
-                                    if (result == null) {
-                                        return null; //finished
-                                    } else {
-                                        return input(result); //recurse until its stable
-                                    }
-                                }
-                            }
-
-                        }
-                    }
-                }
-            }
-        }
-
-        if (isCommand) {
             return null;
         }
 
         emotion.busy(input.priSafe(0));
 
 
-        {
+        if (time instanceof FrameTime) {
+            //HACK for unique serial number w/ frameclock
+            ((FrameTime) time).validate(input.evidence());
+        }
 
-            if (time instanceof FrameTime) {
-                //HACK for unique serial number w/ frameclock
-                ((FrameTime) time).validate(input.evidence());
+        try {
+
+            Concept c = input.concept(this);
+
+            Activation a = process(input, c);
+
+            if (a != null) {
+
+                eventTaskProcess.emit(post(input));
+
+                emotion.learn(input.priSafe(0));
+
+                concepts.commit(c);
+
+                return c; //SUCCESSFULLY PROCESSED
+
+            } else {
+
+                return null;
+
             }
 
-            try {
 
-                Concept c = input.concept(this);
-
-                Activation a = process(input, c);
-                if (a != null) {
-
-                    eventTaskProcess.emit(post(input));
-
-                    emotion.learn(input.priSafe(0));
-
-                    concepts.commit(c);
-
-                    return c; //SUCCESSFULLY PROCESSED
-
-                } else {
-
-                    return null;
-
-                }
+        } catch (Concept.InvalidConceptException | InvalidTermException | InvalidTaskException | Budget.BudgetException e) {
 
 
-            } catch (Concept.InvalidConceptException | InvalidTermException | InvalidTaskException | Budget.BudgetException e) {
+            emotion.eror();
 
-
-                emotion.eror();
-
-                //input.feedback(null, Float.NaN, Float.NaN, this);
-                if (Param.DEBUG)
-                    logger.warn("task process: {} {}", e, input);
-            }
-        } /*else {
-
-            processDuplicate(input, existing);
-
-        }*/
+            //input.feedback(null, Float.NaN, Float.NaN, this);
+            if (Param.DEBUG)
+                logger.warn("task process: {} {}", e, input);
+        }
 
         return null;
     }
@@ -1251,7 +1205,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
 
     @NotNull
     public NAR forEachTask(@NotNull Consumer<Task> each) {
-        forEachConcept( c -> c.forEachTask(each) );
+        forEachConcept(c -> c.forEachTask(each));
         return this;
     }
 

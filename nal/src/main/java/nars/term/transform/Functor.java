@@ -57,7 +57,8 @@ abstract public class Functor extends AtomConcept implements PermanentConcept, F
     public static Concept f(@NotNull Atom termAtom, int arityRequired, @NotNull Function<Term[], Term> ff) {
         return f(termAtom, (tt)->{
             if (tt.length!=arityRequired)
-                throw new RuntimeException(termAtom + " requires " + arityRequired + " arguments: " + Arrays.toString(tt));
+                return null;
+                //throw new RuntimeException(termAtom + " requires " + arityRequired + " arguments: " + Arrays.toString(tt));
 
             return ff.apply(tt);
         });

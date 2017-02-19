@@ -38,8 +38,10 @@ public class NLPOperatorTest {
         //      (a,b) pair of integers, a range of indices
 
         n.on("quote", (args) -> {
-            throw new RuntimeException("quote should never actually be invoked by the system");
+            //throw new RuntimeException("quote should never actually be invoked by the system");
+            return args[0];
         });
+
         n.on("slice", (args) -> {
             if (args.length > 1) {
                 Compound x = compoundOrNull(args[0]);
@@ -73,12 +75,11 @@ public class NLPOperatorTest {
         n.log();
         n.input("(slice((a,b,c),2)).");
         n.input("(quote(x)).");
-        n.input("quote(x);");
         n.input("log(quote(x));");
         n.input("assertEquals(c, c);");
         n.input("assertEquals(x, quote(x));");
         n.input("assertEquals(c, slice((a,b,c),2));");
-        n.input("assertEquals(quote(slice((a,b,c),$x)), slice((a,b,c),$x));");
+        n.input("assertEquals(quote(slice((a,b,c),#x)), slice((a,b,c),#x));");
         n.run(5);
 
 

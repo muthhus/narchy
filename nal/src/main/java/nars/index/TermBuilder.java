@@ -597,7 +597,7 @@ public abstract class TermBuilder {
 
 
         Set<Term> s =
-                new UnifiedSet<>(u.length);
+                new HashSet<>(u.length);
         //new TreeSet();
         if (!flatten(op, u, dt, s))
             return False;

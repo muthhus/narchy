@@ -1,6 +1,8 @@
 package nars.term;
 
+import nars.$;
 import nars.Narsese;
+import nars.nar.Terminal;
 import org.junit.Test;
 
 import static nars.$.$;
@@ -23,4 +25,13 @@ public class TermNormalizationTest {
         }
     }
 
+    @Test public void testConjNorm() throws Narsese.NarseseException {
+        String a = "(&&,(#1-->key),(#2-->lock),open(#1,#2))";
+        String b = "(&&,(#2-->key),(#1-->lock),open(#2,#1))";
+
+        assertEquals($.$(a), $.$(b));
+
+        Terminal t = new Terminal();
+        assertEquals(t.term(a), t.term(b));
+    }
 }

@@ -19,8 +19,8 @@ public class BudgetTest {
         assertEquals(1, Util.bin(0.1f, 10));
         assertEquals(9, Util.bin(0.9f, 10));
         assertEquals(9, Util.bin(0.925f, 10));
-        assertEquals(10, Util.bin(0.975f, 10));
-        assertEquals(10, Util.bin(1.0f, 10));
+        assertEquals(9, Util.bin(0.975f, 10));
+        assertEquals(9, Util.bin(1.0f, 10));
         
         
         assertEquals(0, Util.bin(0.0f, 9));

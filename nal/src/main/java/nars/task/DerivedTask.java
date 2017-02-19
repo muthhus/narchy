@@ -9,6 +9,7 @@ import nars.budget.Budget;
 import nars.budget.DependentBLink;
 import nars.budget.RawBLink;
 import nars.concept.Concept;
+import nars.index.term.TermIndex;
 import nars.premise.Derivation;
 import nars.premise.Premise;
 import nars.term.Compound;
@@ -19,6 +20,7 @@ import nars.truth.TruthDelta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import static nars.term.Terms.compoundOrNull;
 import static nars.time.Tense.ETERNAL;
 
 
@@ -91,6 +93,12 @@ abstract public class DerivedTask extends MutableTask {
 //    public long end() {
 //        return startEnd == null ? super.end() : startEnd[1];
 //    }
+
+
+    @Override
+    protected @Nullable Compound eval(@NotNull TermIndex index, @NotNull Compound t) {
+        return compoundOrNull(index.normalize(t)); //this should already have been evaluated in the derivation 'Conclude' step
+    }
 
     @Override
     public final boolean isInput() {

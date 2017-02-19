@@ -13,6 +13,7 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.atom.AtomicStringConstant;
+import nars.term.compound.GenericCompound;
 import nars.term.util.InvalidTermException;
 import nars.time.TimeFunctions;
 import nars.truth.Truth;
@@ -106,30 +107,25 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
 
                 if (r instanceof Compound) {
 
-                    r = r.eval(m.index);
+                    Derivation.TruthPuncEvidence ct = m.punct.get();
 
-                    if (r instanceof Compound) {
+                    Compound cr = (Compound) r;
+                    //if (/*r.volume() < nar.termVolumeMax.intValue() && */Task.taskStatementValid(cr, ct.punc, !Param.DEBUG)) {
 
-                        Derivation.TruthPuncEvidence ct = m.punct.get();
+                    Truth truth = ct.truth;
 
-                        Compound R = (Compound) r;
-                        if (/*r.volume() < nar.termVolumeMax.intValue() && */Task.taskStatementValid(R, ct.punc, !Param.DEBUG)) {
-
-                            Truth truth = ct.truth;
-
-                            //note: the budget function used here should not depend on the truth's frequency. btw, it may be inverted below
-                            Budget budget = m.premise.budget(R, truth, m);
-                            if (budget != null) {
-                                Term crr = nar.normalize(R);
-                                if (!(crr instanceof Compound)) {
-                                    throw new InvalidTermException(r.op(), DTERNAL, "normalization failed", (R).terms());
-                                }
-
-                                derive(m, (Compound) crr, truth, budget, ct); //continue to stage 2
-
-                            }
-                        }
+                    //note: the budget function used here should not depend on the truth's frequency. btw, it may be inverted below
+                    Compound crr = compoundOrNull(nar.concepts.eval(cr));
+                    if (crr == null) {
+                        throw new InvalidTermException(r.op(), DTERNAL, "normalization failed", (cr).terms());
                     }
+
+                    Budget budget = m.premise.budget(crr, truth, m);
+                    if (budget != null) {
+                        derive(m, crr, truth, budget, ct); //continue to stage 2
+
+                    }
+
                 }
             } catch (@NotNull InvalidTermException | InvalidTaskException e) {
                 if (Param.DEBUG_EXTRA)
@@ -228,15 +224,14 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
         //the derived compound indicated a potential dt, but the premise was actually atemporal;
         // this indicates a temporal placeholder (XTERNAL) in the rules which needs to be set to DTERNAL
         if (content.dt() == XTERNAL /*&& !o.isImage()*/) {
-            Term ete = m.index.the(content, DTERNAL);
-            if (!(ete instanceof Compound))
-                throw new InvalidTermException(o, DTERNAL, "untemporalization failed", content.terms());
 
-            Term ete2 = nar.normalize((Compound) ete);
-            if (!(ete2 instanceof Compound))
-                throw new InvalidTermException(o, DTERNAL, "untemporalization failed", content.terms());
+            content = compoundOrNull(m.index.the(content, DTERNAL)); //necessary to trigger flattening as a result of the atemporalization
+            if (content == null)
+                return;
 
-            content = (Compound) ete2;
+            content = compoundOrNull(m.index.normalize(content));
+            if (content == null)
+                return;
         }
 
 

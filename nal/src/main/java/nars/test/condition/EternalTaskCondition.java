@@ -218,9 +218,8 @@ public class EternalTaskCondition implements NARCondition, Predicate<Task>, Cons
 
 
     public boolean matches(@Nullable Task task) {
-        if (task == null) {
+        if (task == null)
             return false;
-        }
 
         if (task.punc() != punc)
             return false;
@@ -228,15 +227,10 @@ public class EternalTaskCondition implements NARCondition, Predicate<Task>, Cons
         if (!truthMatches(task))
             return false;
 
-        if (!task.term().equals(term))
-            return false;
-
         if (!timeMatches(task))
             return false;
 
-        //require exact term
-        return true;
-
+        return task.term().equals(term);
     }
 
     private boolean truthMatches(@NotNull Truthed task) {
@@ -296,7 +290,7 @@ public class EternalTaskCondition implements NARCondition, Predicate<Task>, Cons
         synchronized (similar = this.similar) {
 
             //TODO add the levenshtein distance of other task components
-            float worstDiff = similar != null && similar.size() >= maxSimilars ? similar.lastKey() : Float.POSITIVE_INFINITY;
+            float worstDiff = similar.size() >= maxSimilars ? similar.lastKey() : Float.POSITIVE_INFINITY;
 
             float difference = 0;
             Compound tterm = task.term();

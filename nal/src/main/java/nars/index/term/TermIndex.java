@@ -34,6 +34,7 @@ import java.util.function.Consumer;
 import static nars.Op.CONJ;
 import static nars.term.Term.False;
 import static nars.term.Termed.termOrNull;
+import static nars.term.Terms.compoundOrNull;
 
 /**
  *
@@ -324,10 +325,11 @@ public abstract class TermIndex extends TermBuilder {
                                 new VariableNormalization(totalVars /* estimate */)
                 );
             } else {
-                result =
-                        src.hasAll(Op.OpBits) ?
-                                transform(src, CompoundTransform.None) : //force subterm functor eval
-                                ((Term) src).eval(this);
+                result = src;
+//                result =
+//                        src.hasAll(Op.OpBits) ?
+//                                transform(src, CompoundTransform.None) : //force subterm functor eval
+//                                ((Term) src);
             }
 
 
@@ -344,28 +346,28 @@ public abstract class TermIndex extends TermBuilder {
 
 
     @Nullable
-    public final Term normalize(@NotNull Compound src) {
+    public final Term normalize(@NotNull Compound x) {
 
-
-        if (src.isNormalized()) {
-            return src;
+        if (x.isNormalized()) {
+            return x;
         } else {
             //see if subterms need change
 
-            Term tgt = _normalize(src);
+            Term y = _normalize(x);
 
-            if (tgt instanceof Compound) {
+            if (y instanceof Compound) {
 
                 //if (c!=null) {
                 //c = compoundOrNull($.unneg((Compound) c));
-                ((Compound) tgt).setNormalized();
+                ((Compound) y).setNormalized();
                 //}
             }
-
-            return tgt;
+            return y;
         }
 
     }
+
+
 
 //    private boolean cacheNormalization(@NotNull Compound src) {
 //        return false;
@@ -393,7 +395,7 @@ public abstract class TermIndex extends TermBuilder {
             //construct new compound with same op and dt
             return the(src.op(), dt, tc);
         } else {
-            return ((Term) src).eval(this);
+            return src; //((Term) src).eval(this);
         }
     }
 
@@ -419,9 +421,8 @@ public abstract class TermIndex extends TermBuilder {
                 y = null;
             }
 
-
-            if (y != null)
-                y = y.eval(this);
+//            if (y != null)
+//                y = y.eval(this);
 
             //if (x != y) { //must be refernce equality test for some variable normalization cases
             if (y != null && !x.equals(y)) { //must be refernce equality test for some variable normalization cases
@@ -593,6 +594,22 @@ public abstract class TermIndex extends TermBuilder {
             } else {
                 ((Concept) value).delete(nar);
             }
+        }
+    }
+
+    public Term eval(Compound x) {
+        Term y = normalize(x);
+        if (y == null)
+            return null;
+
+        Term z = y.eval(this);
+        if (z != null) {
+            if (z instanceof Compound && z!=y)
+                return normalize((Compound)z);
+            else
+                return z;
+        } else {
+            return y;
         }
     }
 

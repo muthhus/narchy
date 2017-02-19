@@ -5,6 +5,7 @@ import nars.nar.Default;
 import nars.test.TestNAR;
 import org.junit.Test;
 
+import static junit.framework.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 
@@ -19,8 +20,7 @@ public class TermFunctionTest {
         final boolean[] got = {false};
         d.onTask(t -> {
             String s = t.toString();
-            if (s.contains("union"))
-               assertTrue(false);
+            assertFalse(s.contains("union"));
             if (s.contains("[a,b]"))
                 got[0] = true;
         });

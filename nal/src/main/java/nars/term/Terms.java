@@ -615,9 +615,9 @@ public class Terms   {
                 if (o.temporal)
                     pdt = DTERNAL; //dont destroy image relation
             }
-            if (o.temporal && newSubs!=null && newSubs.size() == 1) {
-                System.out.println("?");
-            }
+//            if (o.temporal && newSubs!=null && newSubs.size() == 1) {
+//                System.out.println("?");
+//            }
 
             Compound xx = $.terms.newCompound(o,
                     pdt,
