@@ -6,11 +6,8 @@ import nars.Op;
 import nars.Param;
 import nars.Task;
 import nars.derive.meta.BoolCondition;
-import nars.derive.meta.Conclusion;
-import nars.derive.meta.OccurrenceSolver;
 import nars.derive.meta.constraint.MatchConstraint;
 import nars.op.DepIndepVarIntroduction;
-import nars.task.DerivedTask;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.subst.Unify;
@@ -20,14 +17,9 @@ import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.HashSet;
-import java.util.Set;
-import java.util.function.Consumer;
-
 import static nars.Op.NEG;
 import static nars.Op.VAR_PATTERN;
 import static nars.term.transform.substituteIfUnifies.*;
-import static nars.time.Tense.DTERNAL;
 
 
 /**

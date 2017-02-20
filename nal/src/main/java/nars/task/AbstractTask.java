@@ -164,19 +164,7 @@ public abstract class AbstractTask extends RawBudget implements Task {
         if (punc == 0)
             throw new InvalidTaskException(this, "Unspecified punctuation");
 
-
-
-        Compound cntt;
-//        if (t instanceof SerialCompound) {
-//            Compound xt = compoundOrNullDeserialized(((SerialCompound) t), n.concepts);
-//            if (xt == null)
-//                throw new InvalidTaskException(t, "Error decoding SerialCompound");
-//            cntt = xt;
-//        } else {
-//            cntt = t;
-//        }
-
-        cntt = eval(n.concepts, t);
+        Compound cntt = eval(n.concepts, t);
         if (cntt == null)
             throw new InvalidTaskException(t, "Failed normalization");
 

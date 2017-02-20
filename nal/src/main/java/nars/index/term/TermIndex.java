@@ -248,7 +248,7 @@ public abstract class TermIndex extends TermBuilder implements TermResolver {
 
         Term transformed;
         int ss = sub.size();
-        if (!changed || (ss == len && ((Compound) src).equalTermsShallow(sub)))
+        if (!changed || (ss == len && ((Compound) src).equals(sub)))
             transformed = (Compound) src;
         else {
             transformed = the(op, src.dt(), sub.toArray(new Term[ss]));
@@ -343,10 +343,6 @@ public abstract class TermIndex extends TermBuilder implements TermResolver {
                 );
             } else {
                 result = src;
-//                result =
-//                        src.hasAll(Op.OpBits) ?
-//                                transform(src, CompoundTransform.None) : //force subterm functor eval
-//                                ((Term) src);
             }
 
 
@@ -369,9 +365,6 @@ public abstract class TermIndex extends TermBuilder implements TermResolver {
             return x;
         } else {
 
-            x = compoundOrNull(x);
-            if (x == null)
-                return null;
 
             //see if subterms need change
 

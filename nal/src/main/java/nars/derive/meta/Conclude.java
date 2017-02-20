@@ -6,12 +6,11 @@ import nars.Op;
 import nars.Param;
 import nars.budget.Budget;
 import nars.derive.rule.PremiseRule;
-import nars.index.term.TermIndex;
 import nars.premise.Derivation;
+import nars.premise.Premise;
 import nars.task.DerivedTask;
 import nars.term.Compound;
 import nars.term.Term;
-import nars.term.Termed;
 import nars.term.atom.AtomicStringConstant;
 import nars.term.util.InvalidTermException;
 import nars.time.TimeFunctions;
@@ -40,6 +39,7 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
 
     @NotNull
     public final PremiseRule rule;
+
     private final @NotNull TimeFunctions time;
 
     /**
@@ -94,6 +94,7 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
     public final boolean run(@NotNull Derivation m) {
 
         NAR nar = m.nar;
+        @NotNull Premise p = m.premise;
 
         if (rule.minNAL <= nar.level()) { //HACK
 
@@ -123,7 +124,109 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
                             truth = truth.negated();
                     }
 
-                    m.premise.accept(new Conclusion(term, ct.punc, truth, m, ct.evidence, rule));
+                    long[] occ;
+
+                    term = compoundOrNull(term.eval(m));
+                    if (term != null && term.volume() <= nar.termVolumeMax.intValue()) {
+
+                        if (p.temporal) {
+//            if (nar.level() < 7)
+//                throw new NAR.InvalidTaskException(content, "invalid NAL level");
+
+                            long[] occReturn = {ETERNAL, ETERNAL};
+                            float[] confScale = {1f};
+
+                            Compound temporalized = rule.time.compute(term,
+                                    m, this, occReturn, confScale, nar
+                            );
+
+                            //temporalization failure, could not determine temporal attributes. seems this can happen normally
+                            if ((temporalized == null) /*|| (Math.abs(occReturn[0]) > 2047483628)*/ /* long cast here due to integer wraparound */) {
+//                 {
+//                    //FOR DEBUGGING, re-run it
+//                    Compound temporalized2 = this.time.compute(content,
+//                            m, this, occReturn, confScale
+//                    );
+//                }
+
+                                throw new InvalidTermException(term.op(), term.dt(), "temporalization failure" + (Param.DEBUG ? rule : ""), term.terms()
+                                );
+                            }
+
+                            int tdt = temporalized.dt();
+                            if (tdt == XTERNAL || tdt == -XTERNAL) {
+                                throw new InvalidTermException(term.op(), term.dt(), "XTERNAL/DTERNAL leak", term.terms());
+                            }
+
+//            if (Param.DEBUG && occReturn[0] != ETERNAL && Math.abs(occReturn[0] - DTERNAL) < 1000) {
+//                //temporalizer.compute(content.term(), m, this, occReturn, confScale); //leave this commented for debugging
+//                throw new NAR.InvalidTaskException(content, "temporalization resulted in suspicious occurrence time");
+//            }
+
+                            term = temporalized;
+
+//            if (temporalized != content) {
+//                ((content = temporalized)).setNormalized();
+//            }
+
+
+                            //apply any non 1.0 the confidence scale
+                            if (truth != null) {
+
+                                float cf = confScale[0];
+                                if (cf != 1) {
+                                    throw new UnsupportedOperationException("yet");
+//                    truth = truth.confMultViaWeightMaxEternal(cf);
+//                    if (truth == null) {
+//                        throw new InvalidTaskException(content, "temporal leak");
+//                    }
+                                }
+                            }
+
+                            occ = occReturn;
+
+                        } else {
+
+                            occ = null;
+                        }
+
+
+                        //the derived compound indicated a potential dt, but the premise was actually atemporal;
+                        // this indicates a temporal placeholder (XTERNAL) in the rules which needs to be set to DTERNAL
+                        if (term.dt() == XTERNAL /*&& !o.isImage()*/) {
+
+                            term = compoundOrNull(nar.concepts.the(term, DTERNAL)); //necessary to trigger flattening as a result of the atemporalization
+                            if (term == null)
+                                return true;
+
+                        }
+
+
+                        if (truth != null) {
+                            float eFactor = nar.evidenceFactor.asFloat();
+                            if (eFactor != 1) {
+                                truth = truth.confWeightMult(eFactor);
+                                if (truth == null)
+                                    return true; //excessive doubt
+                            }
+                        }
+
+                        term = compoundOrNull(nar.concepts.normalize(term));
+                        if (term != null) {
+                            term = nar.pre(term);
+
+
+                                Budget budget = p.budget(term, truth, m);
+                                if (budget != null) {
+
+
+                                    DerivedTask d = derive(term, budget, nar.time(), occ, truth, ct.evidence, ct.punc, rule, p);
+                                    if (d != null)
+                                        m.premise.accept(d);
+                                }
+
+                        }
+                    }
 
                 }
             } catch (@NotNull InvalidTermException | InvalidTaskException e) {
@@ -134,6 +237,34 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
 
         return true;
     }
+
+    @Nullable
+    protected final static DerivedTask derive(@NotNull Compound c, @NotNull Budget budget, long now, long[] occ, Truth truth, long[] evidence, char punc, PremiseRule rule, Premise p) {
+
+
+        DerivedTask d =
+                new DerivedTask.DefaultDerivedTask(c, truth, punc, evidence, p, now, occ);
+
+
+        //new RuleFeedbackDerivedTask(c, truth, punc, evidence, p, rule);
+        d.budget(budget) // copied in, not shared
+                //.anticipate(derivedTemporal && d.anticipate)
+                .log(Param.DEBUG ? rule : null);
+
+
+//            //TEMPORARY MEASUREMENT
+//            if (dt.isGoal()) {
+//               synchronized (posGoal) {
+//                   ((dt.freq() >= 0.5f) ? posGoal : negGoal).addOccurrences(rule, (int)(Math.abs(dt.freq()-0.5f)*100));
+//               }
+//            }
+//            //</TEMPORARY MEASUREMENT
+
+        return d;
+
+
+    }
+
 
     public @Nullable Term term(@NotNull Derivation m) {
         if (conclusionPattern instanceof Compound) {

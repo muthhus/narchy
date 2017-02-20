@@ -3,9 +3,9 @@ package nars.time;
 import jcog.Util;
 import jcog.math.Interval;
 import nars.*;
-import nars.derive.meta.Conclusion;
+import nars.derive.meta.Conclude;
 import nars.derive.meta.OccurrenceSolver;
-import nars.derive.rule.PremiseRule;
+import nars.premise.Derivation;
 import nars.premise.Premise;
 import nars.term.Compound;
 import nars.term.Term;
@@ -32,14 +32,13 @@ public interface TimeFunctions {
 
     /**
      * @param derived   raw resulting untemporalized derived term that may or may not need temporalized and/or occurrence shifted as part of a derived task
-     * @param p         current match context
      * @param d         derivation rule being evaluated
-     * @param occReturn holds the occurrence time as a return value for the callee to use in building the task
+     * @param conclude
+     *@param occReturn holds the occurrence time as a return value for the callee to use in building the task
      * @param confScale
-     * @param nar
-     * @return
+     * @param nar    @return
      */
-    Compound compute(@NotNull Compound derived, Premise p, Conclusion d, @NotNull long[] occReturn, @NotNull float[] confScale, NAR nar);
+    Compound compute(@NotNull Compound derived, Derivation d, Conclude conclude, @NotNull long[] occReturn, @NotNull float[] confScale, NAR nar);
 
 
     static long earlyOrLate(long t, long b, boolean early) {
@@ -67,36 +66,35 @@ public interface TimeFunctions {
     /**
      * early-aligned, difference in dt
      */
-    TimeFunctions dtTminB = (@NotNull Compound derived, Premise p, Conclusion d, @NotNull long[] occReturn, float[] confScale, NAR nar) -> dtDiff(derived, p, occReturn, +1);
+    TimeFunctions dtTminB = (@NotNull Compound derived, Derivation d, Conclude conclude, @NotNull long[] occReturn, float[] confScale, NAR nar) -> dtDiff(derived, d, occReturn, +1);
     /**
      * early-aligned, difference in dt
      */
-    TimeFunctions dtBminT = (@NotNull Compound derived, Premise p, Conclusion d, @NotNull long[] occReturn, float[] confScale, NAR nar) -> dtDiff(derived, p, occReturn, -1);
+    TimeFunctions dtBminT = (@NotNull Compound derived, Derivation d, Conclude conclude, @NotNull long[] occReturn, float[] confScale, NAR nar) -> dtDiff(derived, d, occReturn, -1);
     /**
      * early-aligned, difference in dt
      */
-    TimeFunctions dtIntersect = (@NotNull Compound derived, Premise p, Conclusion d, @NotNull long[] occReturn, float[] confScale, NAR nar) -> dtDiff(derived, p, occReturn, 0);
+    TimeFunctions dtIntersect = (@NotNull Compound derived, Derivation d, Conclude conclude, @NotNull long[] occReturn, float[] confScale, NAR nar) -> dtDiff(derived, d, occReturn, 0);
 
     /**
      * early-aligned, difference in dt
      */
-    TimeFunctions dtUnion = (@NotNull Compound derived, Premise p, Conclusion d, @NotNull long[] occReturn, float[] confScale, NAR nar) -> {
+    TimeFunctions dtUnion = (@NotNull Compound derived, Derivation d, Conclude conclude, @NotNull long[] occReturn, float[] confScale, NAR nar) -> {
         //TODO
-        return dtDiff(derived, p, occReturn, 2);
+        return dtDiff(derived, d, occReturn, 2);
     };
-    TimeFunctions dtUnionReverse = (@NotNull Compound derived, Premise p, Conclusion d, @NotNull long[] occReturn, float[] confScale, NAR nar) -> {
+    TimeFunctions dtUnionReverse = (@NotNull Compound derived, Derivation d, Conclude conclude, @NotNull long[] occReturn, float[] confScale, NAR nar) -> {
         //TODO
-        return dtDiff(derived, p, occReturn, -2);
+        return dtDiff(derived, d, occReturn, -2);
     };
 
     /**
      * does nothing but set DTternal; the input tasks will be considered to be eternal
      */
-    @Nullable TimeFunctions dternal = (derived, p, d, occReturn, confScale, nar) -> dt(derived, DTERNAL, occReturn);
+    @Nullable TimeFunctions dternal = (derived, d, conclude, occReturn, confScale, nar) -> dt(derived, DTERNAL, occReturn);
 
-    @NotNull
-    static Compound dtDiff(@NotNull Compound derived, @NotNull Premise p, @NotNull long[] occReturn, int polarity) {
-
+    static Compound dtDiff(@NotNull Compound derived, Derivation d, @NotNull long[] occReturn, int polarity) {
+        Premise p = d.premise;
         Compound taskTerm = (Compound) p.taskTerm().unneg();
         Termed<Compound> beliefTerm = p.beliefTerm();
 
@@ -146,12 +144,12 @@ public interface TimeFunctions {
 
     /**
      * simple delta-time between task and belief resulting in the dt of the temporal compound.
-     * this assumes the conclusion term is size=2 compound.
+     * this assumes the Conclude term is size=2 compound.
      * no occurence shift
      * should be used in combination with a "premise Event" precondition
      */
-    TimeFunctions occForward = (derived, p, d, occReturn, confScale, nar) -> occBeliefMinTask(derived, p, occReturn, +1);
-    TimeFunctions occReverse = (derived, p, d, occReturn, confScale, nar) -> occBeliefMinTask(derived, p, occReturn, -1);
+    TimeFunctions occForward = (derived, d, conclude, occReturn, confScale, nar) -> occBeliefMinTask(derived, d.premise, occReturn, +1);
+    TimeFunctions occReverse = (derived, d, conclude, occReturn, confScale, nar) -> occBeliefMinTask(derived, d.premise, occReturn, -1);
 
 
     @NotNull
@@ -217,22 +215,23 @@ public interface TimeFunctions {
     /**
      * copiesthe 'dt' and the occurence of the task term directly
      */
-    TimeFunctions dtTaskExact = (@NotNull Compound derived, Premise p, Conclusion d, long[] occReturn, float[] confScale, NAR nar) ->
-            dtExact(derived, occReturn, p, true);
-    TimeFunctions dtBeliefExact = (@NotNull Compound derived, Premise p, Conclusion d, long[] occReturn, float[] confScale, NAR nar) ->
-            dtExact(derived, occReturn, p, false);
+    TimeFunctions dtTaskExact = (@NotNull Compound derived, Derivation d, Conclude conclude, long[] occReturn, float[] confScale, NAR nar) ->
+            dtExact(derived, occReturn, d.premise, true);
+    TimeFunctions dtBeliefExact = (@NotNull Compound derived, Derivation d, Conclude conclude, long[] occReturn, float[] confScale, NAR nar) ->
+            dtExact(derived, occReturn, d.premise, false);
 
 
     /**
      * special handling for dealing with detaching, esp. conjunctions which involve a potential mix of eternal and non-eternal premise components
      */
-    @Nullable TimeFunctions decomposeTask = (@NotNull Compound derived, Premise p, Conclusion d, @NotNull long[] occReturn, float[] confScale, NAR nar) ->
-            decompose(derived, p, d, occReturn, true);
-    @Nullable TimeFunctions decomposeBelief = (@NotNull Compound derived, Premise p, Conclusion d, @NotNull long[] occReturn, float[] confScale, NAR nar) ->
-            decompose(derived, p, d, occReturn, false);
+    @Nullable TimeFunctions decomposeTask = (@NotNull Compound derived, Derivation d, Conclude conclude, @NotNull long[] occReturn, float[] confScale, NAR nar) ->
+            decompose(derived, d, occReturn, true);
+    @Nullable TimeFunctions decomposeBelief = (@NotNull Compound derived, Derivation d, Conclude conclude, @NotNull long[] occReturn, float[] confScale, NAR nar) ->
+            decompose(derived, d, occReturn, false);
 
     /** the 2-ary result will have its 'dt' assigned by the occurrence of its subterms in the task's compound */
-    @Nullable TimeFunctions decomposeTaskComponents = (@NotNull Compound derived, Premise p, Conclusion d, @NotNull long[] occReturn, float[] confScale, NAR nar) -> {
+    @Nullable TimeFunctions decomposeTaskComponents = (@NotNull Compound derived, Derivation d, Conclude conclude, @NotNull long[] occReturn, float[] confScale, NAR nar) -> {
+        Premise p = d.premise;
 
         if (derived.size()==2) {
 
@@ -257,7 +256,8 @@ public interface TimeFunctions {
     };
 
     /*** special case for decomposing conjunctions in the task slot */
-    @Nullable TimeFunctions decomposeTaskSubset = (@NotNull Compound derived, Premise p, Conclusion d, @NotNull long[] occReturn, float[] confScale, NAR nar) -> {
+    @Nullable TimeFunctions decomposeTaskSubset = (@NotNull Compound derived, Derivation d, Conclude conclude, @NotNull long[] occReturn, float[] confScale, NAR nar) -> {
+        Premise p = d.premise;
         Task task = p.task;
         Compound taskTerm = task.term();
 
@@ -323,8 +323,9 @@ public interface TimeFunctions {
         return null;
     };
 
-    static Compound decompose(@NotNull Compound derived, @NotNull Premise p, Conclusion d, @NotNull long[] occReturn, boolean decomposeTask) {
+    static Compound decompose(@NotNull Compound derived, Derivation d, @NotNull long[] occReturn, boolean decomposeTask) {
 
+        Premise p = d.premise;
 
         Task task = p.task;
         Task belief = p.belief;
@@ -434,10 +435,10 @@ public interface TimeFunctions {
 
     }
 
-    static Term resolve(Conclusion c, @NotNull Term x) {
+    static Term resolve(Derivation c, @NotNull Term x) {
         Term y;
         try {
-            y = c.res.get/*p.resolve*/($.terms.productNormalize(x));
+            y = c.resolve(c.index.productNormalize(x));
         } catch (InvalidTermException e) {
             //failed, just return the input
             y = null;
@@ -508,14 +509,14 @@ public interface TimeFunctions {
     }
 
 
-    @NotNull TimeFunctions dtCombine = (@NotNull Compound derived, Premise p, Conclusion d, long[] occReturn, float[] confScale, NAR nar) ->
-            dtCombiner(derived, p, occReturn, false, false, nar);
+    @NotNull TimeFunctions dtCombine = (@NotNull Compound derived, Derivation d, Conclude conclude, long[] occReturn, float[] confScale, NAR nar) ->
+            dtCombiner(derived, d.premise, occReturn, false, false, nar);
 
-    @NotNull TimeFunctions dtCombinePre = (@NotNull Compound derived, Premise p, Conclusion d, long[] occReturn, float[] confScale, NAR nar) ->
-            dtCombiner(derived, p, occReturn, true, false, nar);
+    @NotNull TimeFunctions dtCombinePre = (@NotNull Compound derived, Derivation d, Conclude conclude, long[] occReturn, float[] confScale, NAR nar) ->
+            dtCombiner(derived, d.premise, occReturn, true, false, nar);
 
-    @NotNull TimeFunctions dtCombinePost = (@NotNull Compound derived, Premise p, Conclusion d, long[] occReturn, float[] confScale, NAR nar) ->
-            dtCombiner(derived, p, occReturn, false, true, nar);
+    @NotNull TimeFunctions dtCombinePost = (@NotNull Compound derived, Derivation d, Conclude conclude, long[] occReturn, float[] confScale, NAR nar) ->
+            dtCombiner(derived, d.premise, occReturn, false, true, nar);
 
 
     /**
@@ -608,12 +609,12 @@ public interface TimeFunctions {
                 preDT = DTERNAL;
             }
 
-            Term newPresub = $.terms.the( preSub, preDT );
+            Term newPresub = nar.concepts.the( preSub, preDT );
 
             if (!(newPresub instanceof Compound))
                 return null;
 
-            derived = compoundOrNull(($.terms.the(derived,
+            derived = compoundOrNull((nar.concepts.the(derived,
                     new Term[] { $.negIf(newPresub, neg), derived.term(1) })
             ));
         }
@@ -636,14 +637,14 @@ public interface TimeFunctions {
 
 
             //set subterm 1's DT
-            Term newSubterm1 = $.terms.the((Compound) derived.term(1), postDT);
+            Term newSubterm1 = nar.concepts.the((Compound) derived.term(1), postDT);
 
             if (isTrueOrFalse(newSubterm1))
                 return null;
 
 
             derived = compoundOrNull(
-                    $.terms.the(derived, new Term[] { derived.term(0), $.negIf(newSubterm1,neg) } )
+                    nar.concepts.the(derived, new Term[] { derived.term(0), $.negIf(newSubterm1,neg) } )
             );
 
         }
@@ -659,12 +660,12 @@ public interface TimeFunctions {
      * "automatic" implementation of Temporalize, used by default. slow and wrong about 25..30% of the time sux needs rewritten or replaced
      * apply temporal characteristics to a newly derived term according to the premise's
      */
-    @NotNull TimeFunctions Auto = (derived, p, d, occReturn, confScale, nar) -> {
+    @NotNull TimeFunctions Auto = (derived, d, conclude, occReturn, confScale, nar) -> {
+        Premise p = d.premise;
 
-
-        @NotNull PremiseRule rule = d.rule;
-        Term tp = rule.getTask();
-        Term bp = rule.getBelief();
+//        @NotNull PremiseRule rule = d.rule;
+//        Term tp = rule.getTask();
+//        Term bp = rule.getBelief();
 
         //ConceptProcess premise = p.premise;
 
@@ -682,7 +683,7 @@ public interface TimeFunctions {
 
         int t = DTERNAL;
 
-        Term cp = d.rule.getConclusion(); //TODO this may be a wrapped immediatefunction?
+        Term cp = conclude.conclusionPattern; //TODO this may be a wrapped immediatefunction?
 
         if (derived.op().temporal && cp instanceof Compound) {
 
@@ -692,11 +693,11 @@ public interface TimeFunctions {
             //System.out.println(tt + " "  + bb);
 
         /* CASES:
-            conclusion pattern size 1
+            Conclude pattern size 1
                 equal to task subterm
                 equal to belief subterm
                 unique term
-            conclusion pattern size 2 (a, b)
+            Conclude pattern size 2 (a, b)
                 a equal to task subterm
                 b equal to task subterm
                 a equal to belief subterm
@@ -828,7 +829,7 @@ public interface TimeFunctions {
                     //TODO cleanup simplify this is messy and confusing
 
                     if (task.isEternal() && !belief.isEternal()) {
-                        //find relative time of belief in the task, relative time of the conclusion, and subtract
+                        //find relative time of belief in the task, relative time of the Conclude, and subtract
                         //the occ (=belief time's)
                         long timeOfBeliefInTask = T.subtermTime(B, td);
                         long timeOfDerivedInTask = T.subtermTime(derived, td);

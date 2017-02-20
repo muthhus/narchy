@@ -7,8 +7,8 @@ package nars.premise;
 import nars.Task;
 import nars.budget.Budget;
 import nars.budget.RawBudget;
-import nars.derive.meta.Conclusion;
 import nars.derive.meta.OccurrenceSolver;
+import nars.task.DerivedTask;
 import nars.task.Tasked;
 import nars.term.Compound;
 import nars.term.Term;
@@ -30,7 +30,7 @@ import static nars.time.Tense.DTERNAL;
  * It is meant to be disposable and should not be kept referenced longer than necessary
  * to avoid GC loops, so it may need to be weakly referenced.
  */
-public abstract class Premise extends RawBudget implements Tasked, Consumer<Conclusion> {
+public abstract class Premise extends RawBudget implements Tasked, Consumer<DerivedTask> {
 
     //private static final Logger logger = LoggerFactory.getLogger(Premise.class);
 
@@ -49,7 +49,7 @@ public abstract class Premise extends RawBudget implements Tasked, Consumer<Conc
     public transient final boolean temporal;
 
 
-    public final Set<Conclusion> conclusions = new HashSet<>();
+    public final Set<DerivedTask> conclusions = new HashSet<>();
 
 
 
@@ -75,7 +75,7 @@ public abstract class Premise extends RawBudget implements Tasked, Consumer<Conc
     }
 
     @Override
-    public void accept(Conclusion conclusion) {
+    public void accept(DerivedTask conclusion) {
         if (conclusions.add(conclusion)) {
 
         }/* else {

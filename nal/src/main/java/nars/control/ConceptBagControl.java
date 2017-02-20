@@ -12,7 +12,6 @@ import nars.*;
 import nars.concept.Concept;
 import nars.conceptualize.ConceptBuilder;
 import nars.derive.Deriver;
-import nars.derive.meta.Conclusion;
 import nars.premise.MatrixPremiseBuilder;
 import nars.premise.Premise;
 import nars.task.DerivedTask;
@@ -31,7 +30,7 @@ import java.util.function.Consumer;
 /**
  * The default deterministic memory cycle implementation that is currently used as a standard
  * for development and testing.
- *
+ * <p>
  * multithreading granularity at the concept (outermost loop)
  */
 public class ConceptBagControl implements Control, Consumer<DerivedTask> {
@@ -49,7 +48,7 @@ public class ConceptBagControl implements Control, Consumer<DerivedTask> {
      * concepts active in this cycle
      */
     @NotNull
-    public final Bag<Concept,PLink<Concept>> active;
+    public final Bag<Concept, PLink<Concept>> active;
 
     @Deprecated
     public final transient @NotNull NAR nar;
@@ -61,9 +60,10 @@ public class ConceptBagControl implements Control, Consumer<DerivedTask> {
     public final @NotNull MutableInteger conceptsFiredPerCycle;
 
 
-    /** size of each sampled concept batch that adds up to conceptsFiredPerCycle.
-     *  reducing this value should provide finer-grained / higher-precision concept selection
-     *  since results between batches can affect the next one.
+    /**
+     * size of each sampled concept batch that adds up to conceptsFiredPerCycle.
+     * reducing this value should provide finer-grained / higher-precision concept selection
+     * since results between batches can affect the next one.
      */
     public final @NotNull MutableInteger conceptsFiredPerBatch;
 
@@ -74,7 +74,8 @@ public class ConceptBagControl implements Control, Consumer<DerivedTask> {
     //@Range(min = 0, max = 16, unit = "TermLink")
     public final MutableIntRange termlinksFiredPerFiredConcept = new MutableIntRange(1, 1);
 
-    @NotNull private final ConceptBuilder conceptBuilder;
+    @NotNull
+    private final ConceptBuilder conceptBuilder;
 
     final AtomicBoolean busy = new AtomicBoolean(false);
 
@@ -94,7 +95,7 @@ public class ConceptBagControl implements Control, Consumer<DerivedTask> {
     //private final CapacityLinkedHashMap<Premise,Premise> recent = new CapacityLinkedHashMap<>(256);
     //long novel=0, total=0;
 
-    public ConceptBagControl(@NotNull NAR nar, @NotNull Deriver deriver, @NotNull Bag<Concept,PLink<Concept>> conceptBag) {
+    public ConceptBagControl(@NotNull NAR nar, @NotNull Deriver deriver, @NotNull Bag<Concept, PLink<Concept>> conceptBag) {
 
         this.nar = nar;
 
@@ -104,7 +105,7 @@ public class ConceptBagControl implements Control, Consumer<DerivedTask> {
         this.conceptBuilder = nar.concepts.conceptBuilder();
 
         this.active = conceptBag;
-                //new ConceptBag( conceptBag );
+        //new ConceptBag( conceptBag );
 
 
         //nar.onFrame(this);
@@ -113,7 +114,7 @@ public class ConceptBagControl implements Control, Consumer<DerivedTask> {
 
                 //updae concept bag
                 currentActivationRate = activationRate.floatValue()
-                    // * 1f/((float)Math.sqrt(active.capacity()))
+                // * 1f/((float)Math.sqrt(active.capacity()))
                 ;
 
                 active.commit();
@@ -155,7 +156,7 @@ public class ConceptBagControl implements Control, Consumer<DerivedTask> {
             }
 
         });
-        nar.onReset((n)->active.clear());
+        nar.onReset((n) -> active.clear());
 
     }
 
@@ -172,22 +173,12 @@ public class ConceptBagControl implements Control, Consumer<DerivedTask> {
             //TODO use a merging map or bag
             Set<Task> r = new HashSet();
 
-            derived.forEach(p -> p.conclusions.forEach(c -> {
-                try {
-                    DerivedTask t = c.derive(p, nar);
-                    if (t != null) {
-                        if (r.add(t)) {
-                            //unique
-                        }/* else {
+            derived.forEach(p -> p.conclusions.forEach(t -> {
+                if (r.add(t)) {
+                    //unique
+                }/* else {
                             System.out.println("duplicate: " + t + " in " + p + " for " + fired);
-                        }*/
-                    }
-                } catch (InvalidTermException e) {
-                    if (Param.DEBUG_EXTRA) {
-                        logger.info("derive: {}", e);
-                    }
-                }
-
+                }*/
             }));
 
             if (!r.isEmpty()) {
@@ -199,7 +190,7 @@ public class ConceptBagControl implements Control, Consumer<DerivedTask> {
 
     @Override
     public void accept(DerivedTask d) {
-        if (nar.input(d)!=null) {
+        if (nar.input(d) != null) {
             meter.hit();
         } else {
             meter.miss();
@@ -214,7 +205,6 @@ public class ConceptBagControl implements Control, Consumer<DerivedTask> {
 //
 //        n.emotion.alert(1f / active.size());
 //    }
-
 
 
     @Override
