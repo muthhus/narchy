@@ -60,8 +60,10 @@ public class UnifySubst extends Unify {
         //TODO combine these two blocks to use the same sub-method
 
         //try {
-            @Nullable Term bb = resolve(a, xy);
-            Term aa = bb instanceof SerialCompound ? ((SerialCompound)bb).build(this) : bb;
+            //@Nullable Term bb = resolve(a, xy);
+            //Term aa = bb instanceof SerialCompound ? ((SerialCompound)bb).build(this) : bb;
+
+            @Nullable Term aa = resolve(a, xy);
 
             matches++;
 

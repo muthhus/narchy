@@ -25,7 +25,7 @@ public class GenericVariable extends AtomicString implements Variable {
 
     @Override
     public final int id() {
-         throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException();
     }
 
     final @Override public boolean equals(Object u) {

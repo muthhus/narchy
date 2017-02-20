@@ -203,9 +203,9 @@ public interface TimeFunctions {
     }
 
 //    static boolean derivationMatch(@NotNull Term a, @NotNull Term b, @NotNull Derivation p) {
-//        Term pa = resolve(p, a);
+//        Term pa = resolve(d, a);
 //        if (pa!=null) {
-//            Term pb = resolve(p, b);
+//            Term pb = resolve(d, b);
 //            if (pb!=null) {
 //                return pa.unneg().equalsIgnoringVariables(pb);
 //            }
@@ -227,9 +227,9 @@ public interface TimeFunctions {
      * special handling for dealing with detaching, esp. conjunctions which involve a potential mix of eternal and non-eternal premise components
      */
     @Nullable TimeFunctions decomposeTask = (@NotNull Compound derived, Premise p, Conclusion d, @NotNull long[] occReturn, float[] confScale, NAR nar) ->
-            decompose(derived, p, occReturn, true);
+            decompose(derived, p, d, occReturn, true);
     @Nullable TimeFunctions decomposeBelief = (@NotNull Compound derived, Premise p, Conclusion d, @NotNull long[] occReturn, float[] confScale, NAR nar) ->
-            decompose(derived, p, occReturn, false);
+            decompose(derived, p, d, occReturn, false);
 
     /** the 2-ary result will have its 'dt' assigned by the occurrence of its subterms in the task's compound */
     @Nullable TimeFunctions decomposeTaskComponents = (@NotNull Compound derived, Premise p, Conclusion d, @NotNull long[] occReturn, float[] confScale, NAR nar) -> {
@@ -276,7 +276,7 @@ public interface TimeFunctions {
             //return decompose(derived, p, occReturn, true);
 
 
-            Term resolvedTaskTerm = resolve(p, taskTerm);
+            Term resolvedTaskTerm = resolve(d, taskTerm);
             int derivedInTask = resolvedTaskTerm.subtermTime(derived);
             if (derivedInTask!=DTERNAL) {
                 if (!task.isEternal()) {
@@ -284,7 +284,7 @@ public interface TimeFunctions {
                     occReturn[1] = occReturn[0] + (derived.op()==CONJ ? derived.dtRange() : 0);
                     return derived;
                 } else if (p.belief != null && !p.belief.isEternal()) {
-                    int timeOfBeliefInTask = resolvedTaskTerm.subtermTime(resolve(p,p.beliefTerm()));
+                    int timeOfBeliefInTask = resolvedTaskTerm.subtermTime(resolve(d,p.beliefTerm()));
                     if (timeOfBeliefInTask==DTERNAL)
                         timeOfBeliefInTask = 0;
                     long taskOcc = p.belief.start() - timeOfBeliefInTask;
@@ -305,7 +305,7 @@ public interface TimeFunctions {
                 if (!task.isEternal()) {
                     occReturn[0] = task.start();
                 } else if ((p.belief != null && !p.belief.isEternal())) {
-                    Term resolvedTaskTerm = resolve(p, taskTerm);
+                    Term resolvedTaskTerm = resolve(d, taskTerm);
                     int timeOfBeliefInTask = resolvedTaskTerm.subtermTime(p.beliefTerm());
                     occReturn[0] = p.belief.start() - timeOfBeliefInTask;
                 } else {
@@ -323,8 +323,7 @@ public interface TimeFunctions {
         return null;
     };
 
-    @Nullable
-    static Compound decompose(@NotNull Compound derived, @NotNull Premise p, @NotNull long[] occReturn, boolean decomposeTask) {
+    static Compound decompose(@NotNull Compound derived, @NotNull Premise p, Conclusion d, @NotNull long[] occReturn, boolean decomposeTask) {
 
 
         Task task = p.task;
@@ -362,11 +361,11 @@ public interface TimeFunctions {
             occ = occDecomposed != ETERNAL ? occDecomposed : occOther;
         } else {
 
-            @Nullable Term rDecomposed = resolve(p, decomposedTerm);
+            @Nullable Term rDecomposed = resolve(d, decomposedTerm);
 
             if (rDecomposed!=null) {
 
-                @Nullable Term rDerived = resolve(p, derived);
+                @Nullable Term rDerived = resolve(d, derived);
 
                 if (rDerived != null && occDecomposed != ETERNAL) {
 
@@ -379,7 +378,7 @@ public interface TimeFunctions {
                 if (occ == ETERNAL && occOther != ETERNAL) {
 
 
-                    @Nullable Term rOtherTerm = resolve(p, decomposeTask ? p.beliefTerm() : p.taskTerm());
+                    @Nullable Term rOtherTerm = resolve(d, decomposeTask ? p.beliefTerm() : p.taskTerm());
                     if (rOtherTerm != null) {
 
                         //                        if (derivationMatch(rOtherTerm, derived, p)) {
@@ -435,11 +434,10 @@ public interface TimeFunctions {
 
     }
 
-    @Nullable
-    static Term resolve(@NotNull Premise p, @NotNull Term x) {
+    static Term resolve(Conclusion c, @NotNull Term x) {
         Term y;
         try {
-            y = /*p.resolve*/($.terms.productNormalize(x));
+            y = c.res.get/*p.resolve*/($.terms.productNormalize(x));
         } catch (InvalidTermException e) {
             //failed, just return the input
             y = null;
@@ -822,9 +820,9 @@ public interface TimeFunctions {
         //apply occurrence shift
         if (occ > Tense.TIMELESS) {
 
-            Term T = resolve(p, tt);
+            Term T = resolve(d, tt);
             if (T!=null) {
-                Term B = resolve(p, bb);
+                Term B = resolve(d, bb);
 
                 if (belief != null) {
                     //TODO cleanup simplify this is messy and confusing

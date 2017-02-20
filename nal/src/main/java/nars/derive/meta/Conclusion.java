@@ -1,20 +1,25 @@
 package nars.derive.meta;
 
+import com.google.common.collect.ImmutableMap;
 import nars.NAR;
 import nars.Param;
 import nars.budget.Budget;
 import nars.budget.RawBudget;
 import nars.derive.rule.PremiseRule;
+import nars.premise.Derivation;
 import nars.premise.Premise;
 import nars.task.DerivedTask;
 import nars.term.Compound;
+import nars.term.Term;
 import nars.term.compound.SerialCompound;
 import nars.term.util.InvalidTermException;
 import nars.truth.Truth;
+import org.eclipse.collections.impl.factory.Maps;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
+import java.util.HashMap;
 
 import static nars.term.Terms.compoundOrNull;
 import static nars.time.Tense.DTERNAL;
@@ -22,7 +27,7 @@ import static nars.time.Tense.ETERNAL;
 import static nars.time.Tense.XTERNAL;
 
 /** the final part of a derivation, which can lazily produce a Derived Task */
-public class Conclusion extends RawBudget {
+public class Conclusion  {
 
     @NotNull public final Compound term;
 
@@ -33,15 +38,24 @@ public class Conclusion extends RawBudget {
     public final char punc;
     @Nullable public final Truth truth;
     private final long[] evidence;
+    private final Derivation der;
+    public final HashMap<Term,Term> res;
 
-    public Conclusion(Compound term, char punc, Truth truth, Budget budget, long[] evidence, @NotNull PremiseRule rule) {
-        super(budget);
+    /** TODO instead of passing derivation, use a Budget lambda or function
+     * which sets the budget on the derivation outside of this at the concept
+     * firing level right before insert
+     */
+    public Conclusion(Compound term, char punc, Truth truth, @Deprecated @NotNull Derivation der, long[] evidence, @NotNull PremiseRule rule) {
+        super();
 
 
         this.term = term;
         this.punc = punc;
         this.truth = truth;
         this.evidence = evidence;
+
+        this.der = der;
+        this.res = der.premise.temporal ? new HashMap(der.xy) : null;
 
         this.rule = rule;
     }
@@ -51,12 +65,12 @@ public class Conclusion extends RawBudget {
      */
     public final DerivedTask derive(@NotNull Premise p, NAR nar) {
 
-//        Compound content = term.build(nar.concepts /* TODO a memoized instance of the Derivation that produced this */);
-//        if (content == null)
-//            return null;
-        Compound content = compoundOrNull(nar.concepts.eval(term));
+        Compound content = compoundOrNull(term.eval(nar.concepts));
         if (content == null)
             return null;
+//        Compound content = compoundOrNull(nar.concepts.eval(term));
+//        if (content == null)
+//            return null;
 
 //this is performed on input also
 //        if (!Task.taskContentValid(content, ct.punc, nar, false/* !Param.DEBUG*/))
@@ -99,9 +113,9 @@ public class Conclusion extends RawBudget {
 //                throw new NAR.InvalidTaskException(content, "temporalization resulted in suspicious occurrence time");
 //            }
 
-            if (temporalized != content) {
-                ((content = temporalized)).setNormalized();
-            }
+//            if (temporalized != content) {
+//                ((content = temporalized)).setNormalized();
+//            }
 
 
             //apply any non 1.0 the confidence scale
@@ -147,15 +161,20 @@ public class Conclusion extends RawBudget {
         }
 
 
-        content = compoundOrNull(nar.concepts.normalize(content));
-        if (content == null)
-            return null;
+//        content = compoundOrNull(nar.concepts.normalize(content));
+//        if (content == null)
+//            return null;
 
         content = nar.pre(content);
         if (content.volume() > nar.termVolumeMax.intValue())
             return null;
 
-        return derive(content, this, nar.time(), occ, truth, evidence, punc, rule, p);
+        Budget budget = p.budget(term, truth, der);
+        if (budget != null) {
+            return derive(content, budget, nar.time(), occ, truth, evidence, punc, rule, p);
+        } else {
+            return null;
+        }
     }
 
 

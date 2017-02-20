@@ -111,8 +111,7 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
 
                     Derivation.TruthPuncEvidence ct = m.punct.get();
                     Truth truth = ct.truth;
-                    Budget budget = m.premise.budget(term, truth, m);
-                    if (budget != null) {
+
 
 
                         Op o = term.op();
@@ -125,8 +124,8 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
                                 truth = truth.negated();
                         }
 
-                        m.premise.accept(new Conclusion(term, ct.punc, truth, budget, ct.evidence, rule));
-                    }
+                        m.premise.accept(new Conclusion(term, ct.punc, truth, m, ct.evidence, rule));
+
                 }
             } catch (@NotNull InvalidTermException | InvalidTaskException e) {
                 if (Param.DEBUG_EXTRA)

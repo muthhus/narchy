@@ -271,9 +271,7 @@ abstract public class PremiseBuilder {
             new UnifySubst(null /* all variables */, nar, result::add, 1 /*Param.QUERY_ANSWERS_PER_MATCH*/)
                     .unifyAll(q, a);
             if (!result.isEmpty()) {
-                //        if (t instanceof SerialCompound) {
-//            t = ((SerialCompound)t).build(i);
-//        }
+
                 Compound unified = compoundOrNull(result.get(0));
                 if (unified != null)
                     return unified;
