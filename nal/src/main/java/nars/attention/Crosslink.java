@@ -3,6 +3,8 @@ package nars.attention;
 import nars.NAR;
 import nars.Task;
 import nars.concept.Concept;
+import nars.term.Termed;
+import org.eclipse.collections.impl.map.mutable.primitive.ObjectFloatHashMap;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -25,7 +27,8 @@ public class Crosslink {
             return; //null or same concept
 
 
-        new SpreadingActivation(srcTask, scale, tgtConcept, 1, nar);
-        new SpreadingActivation(tgtTask, scale, srcConcept, 1, nar);
+        ObjectFloatHashMap<Termed> activation = nar.acti.get();
+        new SpreadingActivation(srcTask, scale, tgtConcept, 1, activation, nar);
+        new SpreadingActivation(tgtTask, scale, srcConcept, 1, activation, nar);
     }
 }

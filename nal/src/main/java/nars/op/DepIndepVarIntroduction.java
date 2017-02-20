@@ -10,9 +10,11 @@ import org.eclipse.collections.impl.map.mutable.primitive.ObjectByteHashMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 import java.util.function.Predicate;
+import java.util.function.ToIntFunction;
 
 import static nars.$.varDep;
 import static nars.$.varIndep;
@@ -42,12 +44,16 @@ public class DepIndepVarIntroduction extends VarIntroduction {
 
     final static int ConjOrStatementBits = Op.IMPL.bit | Op.EQUI.bit | Op.CONJ.bit;
     private final static int DepOrIndepBits = Op.VAR_INDEP.bit | Op.VAR_DEP.bit | Op.VAR_PATTERN.bit;
+
     private static final Predicate<Term> condition = subterm -> !subterm.isAny(DepOrIndepBits);
+
+    /** sum by complexity if passes include filter */
+    private static final ToIntFunction<Term> depIndepScore = sub -> condition.test(sub) ? 1 : 0;
 
     @Nullable
     @Override
-    protected Term[] select(Compound input) {
-        return Terms.substAllRepeats(input, condition, 2);
+    protected Iterator<Term> select(Compound input) {
+        return Terms.substAllRepeats(input, depIndepScore, 2);
     }
 
     @Nullable

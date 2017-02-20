@@ -1,5 +1,6 @@
 package nars.term;
 
+import com.google.common.collect.Iterators;
 import jcog.Texts;
 import jcog.Util;
 import jcog.data.sorted.SortedList;
@@ -36,13 +37,17 @@ import static nars.time.Tense.XTERNAL;
  *
  * @author me
  */
-public class Terms   {
+public class Terms {
 
     //@NotNull public static final int[] ZeroIntArray = new int[0];
-    @NotNull public static final Term[] empty = new Term[0];
-    @NotNull public static final TermVector NoSubterms =  new ArrayTermVector((Term[]) new Term[]{});
-    @NotNull public static final Compound ZeroProduct = new GenericCompound(Op.PROD, NoSubterms);
-    @NotNull public static final IntFunction<Term[]> NewTermArray = Term[]::new;
+    @NotNull
+    public static final Term[] empty = new Term[0];
+    @NotNull
+    public static final TermVector NoSubterms = new ArrayTermVector((Term[]) new Term[]{});
+    @NotNull
+    public static final Compound ZeroProduct = new GenericCompound(Op.PROD, NoSubterms);
+    @NotNull
+    public static final IntFunction<Term[]> NewTermArray = Term[]::new;
 
     /**
      * TODO decide on some reasonable coding scheme for bundling these numeric values
@@ -52,7 +57,9 @@ public class Terms   {
         return (type.ordinal() << 16) | id;
     }
 
-    /** computes the content hash while accumulating subterm metadata summary fields into int[] meta */
+    /**
+     * computes the content hash while accumulating subterm metadata summary fields into int[] meta
+     */
     public static int hashSubterms(@NotNull Term[] term, @NotNull int[] meta) {
         int h = 1;
         for (Term t : term) {
@@ -61,7 +68,9 @@ public class Terms   {
         return h;
     }
 
-    /** should be consistent with the other hash method(s) */
+    /**
+     * should be consistent with the other hash method(s)
+     */
     public static int hashSubterms(@NotNull TermContainer container) {
         int h = 1;
         int s = container.size();
@@ -71,12 +80,14 @@ public class Terms   {
         return h;
     }
 
-    /** match a range of subterms of Y.  */
+    /**
+     * match a range of subterms of Y.
+     */
     @NotNull
     public static Term[] subRange(@NotNull Compound c, int from, int to) {
-        int s = to-from;
+        int s = to - from;
 
-        Term[] l = new Term[to-from];
+        Term[] l = new Term[to - from];
 
         int x = 0, y = from;
         for (int i = 0; i < s; i++) {
@@ -94,65 +105,63 @@ public class Terms   {
             return true;
         }
         if (a.op() == NEG) {
-            return ((Compound)a).term(0).equals(b);
+            return ((Compound) a).term(0).equals(b);
         } else if (b.op() == NEG) {
-            return ((Compound)b).term(0).equals(a);
+            return ((Compound) b).term(0).equals(a);
         }
         return false;
     }
 
 
-
-    @Deprecated public static boolean equalSubTermsInRespectToImageAndProduct(@Nullable Term a, @Nullable Term b) {
+    @Deprecated
+    public static boolean equalSubTermsInRespectToImageAndProduct(@Nullable Term a, @Nullable Term b) {
 
         /*if (a == null || b == null) {
             return false;
         } else {*/
-            Op o = a.op();
-            boolean equalOps = (o == b.op());
+        Op o = a.op();
+        boolean equalOps = (o == b.op());
 
-            if (equalOps) {
+        if (equalOps) {
 
-                switch (o) {
-                    case INH:
-                        return equalSubjectPredicateInRespectToImageAndProduct((Compound) a, (Compound) b);
+            switch (o) {
+                case INH:
+                    return equalSubjectPredicateInRespectToImageAndProduct((Compound) a, (Compound) b);
 
-                    case SIM:
-                        //only half seems necessary:
-                        //boolean y = equalSubjectPredicateInRespectToImageAndProduct((Compound) b, (Compound) a);
-                        return equalSubjectPredicateInRespectToImageAndProduct((Compound) a, (Compound) b);
+                case SIM:
+                    //only half seems necessary:
+                    //boolean y = equalSubjectPredicateInRespectToImageAndProduct((Compound) b, (Compound) a);
+                    return equalSubjectPredicateInRespectToImageAndProduct((Compound) a, (Compound) b);
 
-                    default:
-                        if (Terms.equalAtemporally(a, b))
-                            return false;
-                        break;
-                }
+                default:
+                    if (Terms.equalAtemporally(a, b))
+                        return false;
+                    break;
             }
+        }
 
 
-            if ((a instanceof Compound) && (b instanceof Compound)) {
-                //both are compounds
+        if ((a instanceof Compound) && (b instanceof Compound)) {
+            //both are compounds
 
 
-                Compound A = ((Compound) a);
-                Compound B = ((Compound) b);
-                int aLen = A.size();
-                if (aLen != B.size()) {
-                    return false;
-                } else {
+            Compound A = ((Compound) a);
+            Compound B = ((Compound) b);
+            int aLen = A.size();
+            if (aLen != B.size()) {
+                return false;
+            } else {
 
-                    //match all subterms
-                    for (int i = 0; i < aLen; i++) {
-                        if (!equalSubTermsInRespectToImageAndProduct(A.term(i), B.term(i)))
-                            return false;
-                    }
-                    return true;
+                //match all subterms
+                for (int i = 0; i < aLen; i++) {
+                    if (!equalSubTermsInRespectToImageAndProduct(A.term(i), B.term(i)))
+                        return false;
                 }
+                return true;
             }
+        }
 
-            return false;
-
-
+        return false;
 
 
     }
@@ -474,7 +483,7 @@ public class Terms   {
     public static float levenshteinDistancePercent(@NotNull CharSequence a, @NotNull CharSequence b) {
         int len = Math.max(a.length(), b.length());
         if (len == 0) return 0f;
-        return Texts.levenshteinDistance(a, b) / ((float)len);
+        return Texts.levenshteinDistance(a, b) / ((float) len);
     }
 
 
@@ -512,40 +521,51 @@ public class Terms   {
 //        return u.toImmutable();
 //    }
 
-    @Nullable public static Compound compoundOr(@Nullable Term possiblyCompound, Compound other) {
+    @Nullable
+    public static Compound compoundOr(@Nullable Term possiblyCompound, Compound other) {
         return (possiblyCompound instanceof Compound) ? (Compound) possiblyCompound : other;
     }
 
-    @Nullable public static Atom atomOr(@Nullable Term possiblyCompound, Atom other) {
+    @Nullable
+    public static Atom atomOr(@Nullable Term possiblyCompound, Atom other) {
         return (possiblyCompound instanceof Atom) ? (Atom) possiblyCompound : other;
     }
 
-    @Nullable public static Atom atomOrNull(@Nullable Term t) {
+    @Nullable
+    public static Atom atomOrNull(@Nullable Term t) {
         return atomOr(t, null);
     }
 
-    /** dangerous because some operations involving concepts can naturally reduce to atoms, and using this interprets them as non-existent */
-    @Nullable public static Compound compoundOrNull(@Nullable Term t) {
+    /**
+     * dangerous because some operations involving concepts can naturally reduce to atoms, and using this interprets them as non-existent
+     */
+    @Nullable
+    public static Compound compoundOrNull(@Nullable Term t) {
         return compoundOr(t, null);
     }
 
-    /** dangerous because some operations involving concepts can naturally reduce to atoms, and using this interprets them as non-existent */
-    @Nullable public static Compound compoundOrNull(@Nullable Termed t) {
+    /**
+     * dangerous because some operations involving concepts can naturally reduce to atoms, and using this interprets them as non-existent
+     */
+    @Nullable
+    public static Compound compoundOrNull(@Nullable Termed t) {
         return compoundOrNull(t.term());
     }
 
-    /** detects a negated conjunction of negated subterms:
-     *  (--, (&&, --A, --B, .., --Z) ) */
+    /**
+     * detects a negated conjunction of negated subterms:
+     * (--, (&&, --A, --B, .., --Z) )
+     */
     public static boolean isDisjunction(@NotNull Compound c) {
         if (c.dt() == DTERNAL && c.op() == NEG && c.isTerm(0, CONJ)) {
-            return allNegated(((Compound)c.term(0)).subterms());
+            return allNegated(((Compound) c.term(0)).subterms());
         }
         return false;
     }
 
 
     public static boolean allNegated(@NotNull TermContainer subterms) {
-        return subterms.and((Term t)-> t.op() == NEG);
+        return subterms.and((Term t) -> t.op() == NEG);
     }
 
 
@@ -576,7 +596,7 @@ public class Terms   {
             for (int i = 0; i < cs; i++) {
 
                 Term m = psubs.term(i);
-                if (m != (ss[i] = m instanceof Compound ? atemporalize((Compound)m) : m))
+                if (m != (ss[i] = m instanceof Compound ? atemporalize((Compound) m) : m))
                     subsChanged = true;
 
             }
@@ -587,7 +607,6 @@ public class Terms   {
                     ss)/*)*/ : null;
 
 
-
         } else {
             newSubs = null;
         }
@@ -596,21 +615,19 @@ public class Terms   {
         int pdt = c.dt();
 
 
-
-
         boolean dtChanged = (pdt != DTERNAL && o.temporal);
-        boolean subsChanged = (newSubs!=null);
+        boolean subsChanged = (newSubs != null);
 
         if (subsChanged || dtChanged) {
 
-            if (subsChanged && o.temporal && newSubs.size()==1) {
+            if (subsChanged && o.temporal && newSubs.size() == 1) {
                 //it was a repeat which collapsed, so use XTERNAL and repeat the subterm
 
-                if (pdt!=DTERNAL)
+                if (pdt != DTERNAL)
                     pdt = XTERNAL;
 
                 Term s = newSubs.term(0);
-                newSubs = TermVector.the(s,s);
+                newSubs = TermVector.the(s, s);
             } else {
                 if (o.temporal)
                     pdt = DTERNAL; //dont destroy image relation
@@ -628,7 +645,7 @@ public class Terms   {
 
             //Termed exxist = get(xx, false); //early exit: atemporalized to a concept already, so return
             //if (exxist!=null)
-                //return exxist.term();
+            //return exxist.term();
 
 
             //x = i.the(xx).term();
@@ -638,15 +655,17 @@ public class Terms   {
         }
     }
 
-    /** returns the most optimal subterm that can be replaced with a variable, or null if one does not meet the criteria */
+    /**
+     * returns the most optimal subterm that can be replaced with a variable, or null if one does not meet the criteria
+     */
     @Nullable
     public static Term[] substMaximal(@NotNull Compound c, @NotNull Predicate<Term> include, int minCount, int minScore) {
         HashBag<Term> uniques = subtermScore(c,
-            t -> include.test(t) ? t.volume() : 0 //sum by complexity if passes include filter
+                t -> include.test(t) ? t.volume() : 0 //sum by complexity if passes include filter
         );
 
         int s = uniques.size();
-        if (s>0) {
+        if (s > 0) {
             MutableList<ObjectIntPair<Term>> u = uniques.topOccurrences(s);
             for (ObjectIntPair<Term> p : u) {
                 int score = p.getTwo();
@@ -654,7 +673,7 @@ public class Terms   {
                     Term subterm = p.getOne();
                     int count = score / subterm.complexity(); //should be a whole number according to the above scoring policy
                     if (count >= minCount) {
-                        return new Term[] { subterm };
+                        return new Term[]{subterm};
                     }
                 }
             }
@@ -664,7 +683,9 @@ public class Terms   {
         return null;
     }
 
-    /** returns the most optimal subterm that can be replaced with a variable, or null if one does not meet the criteria */
+    /**
+     * returns the most optimal subterm that can be replaced with a variable, or null if one does not meet the criteria
+     */
     @Nullable
     public static Term[] substRoulette(@NotNull Compound c, @NotNull Predicate<Term> include, int minCount, Random rng) {
         HashBag<Term> uniques = subtermScore(c,
@@ -676,7 +697,7 @@ public class Terms   {
             ObjectIntPair<Term>[] oi = new ObjectIntPair[s];
             final int[] j = {0};
             final int[] sum = {0};
-            uniques.forEachWithOccurrences((Term t, int count)->{
+            uniques.forEachWithOccurrences((Term t, int count) -> {
                 if (count >= minCount) {
                     int score = count * t.volume();
                     oi[j[0]++] = PrimitiveTuples.pair(t, score);
@@ -696,42 +717,44 @@ public class Terms   {
         return null;
     }
 
-    /** returns the most optimal subterm that can be replaced with a variable, or null if one does not meet the criteria */
+    /**
+     * returns the most optimal subterm that can be replaced with a variable, or null if one does not meet the criteria
+     */
     @Nullable
-    public static Term[] substAllRepeats(@NotNull Compound c, @NotNull Predicate<Term> include, int minCount) {
-        HashBag<Term> uniques = Terms.subtermScore(c,
-                (sub) -> {
-                    return include.test(sub) ? 1 : 0; //sum by complexity if passes include filter
-                }
-        );
+    public static Iterator<Term> substAllRepeats(@NotNull Compound c, @NotNull ToIntFunction<Term> score, int minCount) {
+        FasterList<Term> oi = getUniqueRepeats(c, score, minCount);
+        if (oi == null)
+            return null;
 
-        int s = uniques.size();
-        if (s > 0) {
+        oi.sort((a, b) -> Integer.compare(a.volume(), b.volume())); //sorted by volume
 
-            FasterList<Term> oi = (FasterList)$.newArrayList();
+        //keep terms which are not contained by other terms in the list
+        //renive terms which are contained by other terms in the list
 
-            uniques.forEachWithOccurrences((Term t, int count) -> {
-                if (count >= minCount) {
-                    oi.add(t);
-                }
-            });
+        return Iterators.filter(oi.iterator(), b -> {
+            return !oi.anySatisfy(
+                a -> (a != b) &&
+                     (a instanceof Compound) &&
+                     ((Compound) a).containsTermRecursively(b)
+            );
+        });
+    }
 
-            //remove terms which are contained by other terms in the list
+    @Nullable static FasterList<Term> getUniqueRepeats(@NotNull Compound c, @NotNull ToIntFunction<Term> score, int minCount) {
+        HashBag<Term> uniques = Terms.subtermScore(c, score);
+        int us = uniques.size();
+        if (us == 0)
+            return null;
 
-            oi.sort((a,b)->Integer.compare(a.volume(),b.volume())); //sorted by volume
-            Iterator<Term> ii = oi.iterator();
-            while (ii.hasNext()) {
-                Term b = ii.next();
-                if (oi.anySatisfy((a) ->
-                        a!=b && a instanceof Compound && ((Compound)a).containsTermRecursively(b)
-                )) {
-                    ii.remove();
-                }
+        FasterList<Term> oi = (FasterList) $.newArrayList(us);
+
+        uniques.forEachWithOccurrences((Term t, int count) -> {
+            if (count >= minCount) {
+                oi.add(t);
             }
+        });
 
-            return oi.toArray(new Term[oi.size()]);
-        }
-        return null;
+        return oi;
     }
 
 
@@ -761,7 +784,9 @@ public class Terms   {
 //        return ObjectIntMaps.immutable.empty();
 //    }
 
-    /** counts the repetition occurrence count of each subterm within a compound */
+    /**
+     * counts the repetition occurrence count of each subterm within a compound
+     */
     @NotNull
     public static HashBag<Term> subtermScore(@NotNull Compound c, @NotNull ToIntFunction<Term> score) {
         HashBag<Term> uniques = new HashBag<>(c.volume());
@@ -776,10 +801,11 @@ public class Terms   {
     }
 
     /**
-     *  atemporally set equality AND with any outer negations removed
-     * NOTE: assumes that x must already contain only atemporal terms */
+     * atemporally set equality AND with any outer negations removed
+     * NOTE: assumes that x must already contain only atemporal terms
+     */
     public static boolean equalAtemporally(@NotNull Set<Term> x, @NotNull Set<Term> y) {
-        if (x.size()!=y.size())
+        if (x.size() != y.size())
             return false;
         for (Term yy : y) {
             @NotNull Term ay = Terms.atemporalize(yy);
@@ -797,9 +823,10 @@ public class Terms   {
         return equal(a, b, sameTemporality, samePolarity, false);
     }
 
-    /** equal atemporally AND with any outer negations removed
-     * @param samePolarity whether the top-level polarity should be ignored (auto-unnegate)
+    /**
+     * equal atemporally AND with any outer negations removed
      *
+     * @param samePolarity whether the top-level polarity should be ignored (auto-unnegate)
      */
     public static boolean equal(@NotNull Term a, @NotNull Term b, boolean sameTemporality, boolean samePolarity, boolean ignoreVariables) {
 
@@ -830,7 +857,9 @@ public class Terms   {
 
     }
 
-    /** a Set is already duplicate free, so just sort it */
+    /**
+     * a Set is already duplicate free, so just sort it
+     */
     public static Term[] sorted(Set<Term> s) {
 
         //1. deduplicated
@@ -845,19 +874,21 @@ public class Terms   {
 
     @Nullable
     public static Term subj(@NotNull Termed statement) {
-        return ((TermContainer)statement.term()).term(0);
+        return ((TermContainer) statement.term()).term(0);
     }
 
     @Nullable
     public static Term pred(@NotNull Termed statement) {
-        return ((TermContainer)statement.term()).term(1);
+        return ((TermContainer) statement.term()).term(1);
     }
 
     interface SubtermScorer {
         public int score(Compound superterm, Term subterm);
     }
 
-    /** counts the repetition occurrence count of each subterm within a compound */
+    /**
+     * counts the repetition occurrence count of each subterm within a compound
+     */
     @NotNull
     public static HashBag<Term> subtermScore(@NotNull Compound c, @NotNull SubtermScorer score) {
         HashBag<Term> uniques = new HashBag<>(c.volume());

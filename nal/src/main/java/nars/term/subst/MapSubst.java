@@ -6,28 +6,13 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
 
-/**
- * Created by me on 12/3/15.
- */
+
 public class MapSubst implements Subst {
 
     public final Map<Term, Term> xy;
 
-//    /**
-//     * creates a substitution of one variable; more efficient than supplying a Map
-//     */
-//    public MapSubst(Term termFrom, Term termTo) {
-//        this(UnifiedMap.newWithKeysValues(termFrom, termTo));
-//    }
-
-
-    public MapSubst(@NotNull Term x, @NotNull Term y) {
-        this(Map.of(x,y)); //JDK9 only
-    }
-
     public MapSubst(Map<Term, Term> xy) {
         this.xy = xy;
-
     }
 
 //    @Override
@@ -47,6 +32,7 @@ public class MapSubst implements Subst {
 
     /**
      * gets the substitute
+     *
      * @param t
      */
     @Nullable
@@ -67,47 +53,6 @@ public class MapSubst implements Subst {
         return "Substitution{" +
                 "subs=" + xy +
                 '}';
-    }
-
-    /** wrapper which parameterized by an additional mapping pair that acts as an overriding overlay prior to accessing the MapSubst internal map */
-    public final static class MapSubstWithOverride extends MapSubst {
-        @NotNull
-        final Term ox, oy;
-
-        public MapSubstWithOverride(@NotNull Map<Term, Term> xy, @NotNull Term ox, @NotNull Term oy) {
-            super(xy);
-            this.ox = ox;
-            this.oy = oy;
-        }
-
-        @Override
-        public Term xy(@NotNull Term t) {
-            return t.equals(ox) ? oy : super.xy(t);
-        }
-//
-//        @Override
-//        public void forEach(@NotNull BiConsumer<? super Term, ? super Term> each) {
-//            throw new UnsupportedOperationException();
-//        }
-
-        @Override
-        public boolean isEmpty() {
-            return false;
-        }
-
-        @Override
-        public void clear() {
-            throw new UnsupportedOperationException();
-        }
-
-        @NotNull
-        @Override
-        public String toString() {
-            return "Substitution{(" + ox + ',' + oy + ") && " +
-                    "inherited subs=" + xy +
-                    '}';
-        }
-
     }
 
 

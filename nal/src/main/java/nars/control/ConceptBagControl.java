@@ -7,7 +7,6 @@ import jcog.data.FloatParam;
 import jcog.data.MutableIntRange;
 import jcog.data.MutableInteger;
 import jcog.data.Range;
-import jcog.meter.event.HitMissMeter;
 import nars.*;
 import nars.budget.BudgetMerge;
 import nars.concept.Concept;
@@ -18,7 +17,6 @@ import nars.task.DerivedTask;
 import nars.term.Termed;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;

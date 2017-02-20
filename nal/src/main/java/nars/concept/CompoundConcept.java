@@ -389,7 +389,7 @@ public class CompoundConcept<T extends Compound> implements Concept, Termlike {
 
         Activation a;
         if (accepted) {
-            a = activateTask(input, nar);
+            a = nar.activateTask(input, this);
 
             if (delta != null) {
                 //beliefs/goals
@@ -411,14 +411,7 @@ public class CompoundConcept<T extends Compound> implements Concept, Termlike {
         return a;
     }
 
-    public Activation activateTask(@NotNull Task input, @NotNull NAR nar) {
-        return activateTask(input, nar, 1f);
-    }
 
-    public Activation activateTask(@NotNull Task input, @NotNull NAR nar, float scale) {
-        //return new DepthFirstActivation(input, this, nar, nar.priorityFactor.floatValue());
-        return new SpreadingActivation(input, this, nar, nar.priorityFactor.floatValue() * scale);
-    }
 
     /**
      * apply derivation feedback and update NAR emotion state

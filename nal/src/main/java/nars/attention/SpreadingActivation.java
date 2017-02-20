@@ -34,14 +34,17 @@ public class SpreadingActivation extends Activation implements ObjectFloatProced
     /**
      * runs the task activation procedure
      */
-    public SpreadingActivation(@NotNull Budgeted in, @NotNull Concept c, @NotNull NAR nar, float scale) {
-        this(in, scale, c, in instanceof Task ? levels(((Task)in).term()) : Param.ACTIVATION_TERMLINK_DEPTH, nar);
+    public SpreadingActivation(@NotNull Budgeted in, @NotNull Concept c, @NotNull NAR nar, float scale, ObjectFloatHashMap<Termed> spread) {
+        this(in, scale, c, in instanceof Task ? levels(((Task)in).term()) : Param.ACTIVATION_TERMLINK_DEPTH,
+                spread,
+                nar);
     }
+
 
     /**
      * unidirectional task activation procedure
      */
-    public SpreadingActivation(@NotNull Budgeted in, float scale, @NotNull Concept src, int termlinkDepth, @NotNull NAR nar) {
+    public SpreadingActivation(@NotNull Budgeted in, float scale, @NotNull Concept src, int termlinkDepth, ObjectFloatHashMap<Termed> spread, @NotNull NAR nar) {
         super(in, scale, src, nar);
 
         this.inPri = in.priSafe(0); // * in.qua(); //activate concept by the priority times the quality
@@ -50,11 +53,13 @@ public class SpreadingActivation extends Activation implements ObjectFloatProced
 
         Term srcTerm = src.term();
 
-        spread = new ObjectFloatHashMap<>(srcTerm.volume()*4 /* estimate */);
+        this.spread = spread;
 
         link(srcTerm, scale, 0);
 
         spread.forEachKeyValue(this);
+
+        spread.clear();
 
         nar.emotion.stress(linkOverflow);
 
@@ -164,7 +169,10 @@ public class SpreadingActivation extends Activation implements ObjectFloatProced
                     if (maxSubScale >= minScale) {
                         tlinks.forEach(b -> {
                             Term key = b.get();
-                            float p = b.priSafe(0) * maxSubScale;
+                            float p =
+                                    //b.priSafe(0)
+                                    b.qua()
+                                        * maxSubScale;
                             if (p >= minScale)
                                 spread.addToValue(key, p);
                         });

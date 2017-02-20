@@ -12,8 +12,6 @@ import org.jetbrains.annotations.Nullable;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
-import static nars.Op.COMMAND;
-
 /**
  * Operator interface specifically for Command ';' punctuation
  */

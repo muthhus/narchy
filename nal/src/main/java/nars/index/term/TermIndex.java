@@ -13,6 +13,7 @@ import nars.term.Termed;
 import nars.term.Terms;
 import nars.term.container.TermContainer;
 import nars.term.subst.MapSubst;
+import nars.term.subst.MapSubst1;
 import nars.term.subst.Subst;
 import nars.term.transform.CompoundTransform;
 import nars.term.transform.VariableNormalization;
@@ -234,11 +235,11 @@ public abstract class TermIndex extends TermBuilder {
 
         Term transformed;
         int ss = sub.size();
-        if (!changed || (ss == len && crc.equalTerms(sub)))
-            transformed = crc;
-        else {
+//        if (!changed || (ss == len && crc.equalTerms(sub)))
+//            transformed = crc;
+//        else {
             transformed = the(cop, crc.dt(), sub.toArray(new Term[ss]));
-        }
+        //}
 
 //        //cache the result
 //        if (transformed!=null) //TODO store false for 'null' result
@@ -389,7 +390,7 @@ public abstract class TermIndex extends TermBuilder {
             return src;
 
         int dt = src.dt();
-        TermContainer tc = transform(src, src, src.dt(), t);
+        TermContainer tc = transform(src, src, dt, t);
 
         if (tc != src) {
             //construct new compound with same op and dt
@@ -460,6 +461,7 @@ public abstract class TermIndex extends TermBuilder {
         Term[] target = new Term[n];
 
 
+        boolean changed = false;
         for (int i = 0; i < n; ) {
             Term x = csrc.term(i);
             Term y;
@@ -469,10 +471,14 @@ public abstract class TermIndex extends TermBuilder {
             } else {
                 //replacement is in this subtree
                 y = transform(x, path, depth + 1, replacement);
+                changed = true;
             }
 
             target[i++] = y;
         }
+
+        if (!changed)
+            return csrc;
 
         return the(csrc.op(), csrc.dt(), target);
     }
@@ -569,12 +575,12 @@ public abstract class TermIndex extends TermBuilder {
 
     @Nullable
     public Term replace(@NotNull Term src, Map<Term, Term> m) {
-        return termOrNull(transform(src, new MapSubst(m)));
+        return transform(src, new MapSubst(m));
     }
 
     @Nullable
     public Term replace(@NotNull Term src, Term from, Term to) {
-        return replace(src, Maps.mutable.of(from, to));
+        return transform(src, new MapSubst1(from, to));
     }
 
 

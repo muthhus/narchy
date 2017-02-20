@@ -2,7 +2,6 @@ package nars.term.compound;
 
 import nars.Narsese;
 import nars.term.Compound;
-import nars.term.Term;
 import org.junit.Test;
 
 import static nars.$.$;

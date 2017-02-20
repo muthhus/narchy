@@ -12,6 +12,7 @@ import jcog.event.On;
 import jcog.event.Topic;
 import nars.Narsese.NarseseException;
 import nars.attention.Activation;
+import nars.attention.SpreadingActivation;
 import nars.budget.BLink;
 import nars.budget.Budget;
 import nars.concept.AtomConcept;
@@ -41,6 +42,7 @@ import nars.util.exe.Executioner;
 import nars.util.task.InvalidTaskException;
 import org.apache.commons.math3.stat.Frequency;
 import org.eclipse.collections.api.tuple.Twin;
+import org.eclipse.collections.impl.map.mutable.primitive.ObjectFloatHashMap;
 import org.fusesource.jansi.Ansi;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -820,7 +822,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
             if (reactivation > 0) {
                 Concept c = existing.concept(this);
                 if (c != null) {
-                    ((CompoundConcept) c).activateTask(existing, this, reactivation);
+                    activateTask(existing, c, reactivation);
                 }
             }
 
@@ -831,6 +833,18 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
         return c.process(t, this);
     }
 
+    public final static ThreadLocal<ObjectFloatHashMap<Termed>> acti = ThreadLocal.withInitial(()->{
+        return new ObjectFloatHashMap<>();
+    });
+
+    public Activation activateTask(@NotNull Task input, @NotNull Concept c) {
+        return activateTask(input, c, 1f);
+    }
+
+    public Activation activateTask(@NotNull Task input, @NotNull Concept c, float scale) {
+        //return new DepthFirstActivation(input, this, nar, nar.priorityFactor.floatValue());
+        return new SpreadingActivation(input, c, this, priorityFactor.floatValue() * scale, acti.get());
+    }
 
 //    /**
 //     * meta-reasoner evaluator

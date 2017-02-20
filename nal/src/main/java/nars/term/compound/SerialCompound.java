@@ -2,20 +2,19 @@ package nars.term.compound;
 
 import com.google.common.primitives.Ints;
 import jcog.data.byt.DynByteSeq;
-import nars.*;
+import nars.$;
+import nars.IO;
+import nars.Op;
+import nars.Param;
 import nars.index.term.TermIndex;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.container.TermContainer;
-import nars.term.visit.SubtermVisitorXY;
-import org.eclipse.collections.impl.map.mutable.primitive.ObjectByteHashMap;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.List;
 
-import static nars.$.$;
 import static nars.time.Tense.DTERNAL;
 
 /**

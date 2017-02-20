@@ -1,6 +1,5 @@
 package nars;
 
-import com.google.common.base.Joiner;
 import jcog.Texts;
 import jcog.bag.PLink;
 import nars.concept.Concept;
@@ -10,11 +9,9 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Terms;
 import nars.term.atom.Atom;
-import nars.term.atom.Atomic;
 import nars.term.obj.IntTerm;
 import nars.term.transform.Functor;
 import nars.term.var.Variable;
-import org.jetbrains.annotations.NotNull;
 import org.junit.Assert;
 
 import java.util.Arrays;
@@ -25,7 +22,6 @@ import static nars.Op.PROD;
 import static nars.term.Term.False;
 import static nars.term.Term.True;
 import static nars.term.Terms.compoundOrNull;
-import static org.junit.Assert.assertEquals;
 
 /**
  * Built-in functors, ie. the standard core function set

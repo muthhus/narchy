@@ -1,6 +1,6 @@
 package nars.nlp;
 
-import nars.*;
+import nars.NAR;
 import nars.nar.Default;
 import nars.op.Command;
 import org.junit.Ignore;
@@ -8,10 +8,6 @@ import org.junit.Test;
 
 import java.io.IOException;
 import java.util.Arrays;
-
-import static nars.term.Terms.compoundOrNull;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 /**
  * Created by me on 2/18/17.

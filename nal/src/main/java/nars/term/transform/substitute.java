@@ -5,7 +5,7 @@ import nars.$;
 import nars.premise.Derivation;
 import nars.term.Compound;
 import nars.term.Term;
-import nars.term.subst.MapSubst;
+import nars.term.subst.MapSubstWithOverride;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -44,7 +44,7 @@ public final class substitute extends Functor {
         //replacement term (y)
         final Term y = parent.yxResolve(xx[2]);
 
-        return parent.transform(term, new MapSubst.MapSubstWithOverride(parent.yx,  x, y));
+        return parent.transform(term, new MapSubstWithOverride(parent.yx,  x, y));
     }
 
 

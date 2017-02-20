@@ -7,6 +7,7 @@ import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Iterator;
 import java.util.Random;
 import java.util.function.Consumer;
 
@@ -33,29 +34,27 @@ public abstract class VarIntroduction {
             return; //earliest failure test
 
 
-        Term[] selections = select(c);
-        if (selections != null && selections.length > 0) {
+        int max = maxIterations;
 
-            int max = maxIterations;
+        Iterator<Term> selections = select(c);
+        while (selections.hasNext()) {
 
-            Util.shuffle(selections, rng);
-            for (Term s : selections) {
+            Term s = selections.next();
 
-                Term[] dd = next(c, s);
+            Term[] dd = next(c, s);
 
-                if (dd != null) {
-                    int replacements = dd.length;
-                    if (replacements > 0) {
+            if (dd != null) {
+                int replacements = dd.length;
+                if (replacements > 0) {
 
-                        Term d = dd[rng.nextInt(replacements)]; //choose one randomly
-                        //for (Term d : dd) {
-                        Term newContent = $.terms.replace(c, s, d);
+                    Term d = dd[rng.nextInt(replacements)]; //choose one randomly
+                    //for (Term d : dd) {
+                    Term newContent = $.terms.replace(c, s, d);
 
-                        if ((newContent instanceof Compound) && !newContent.equals(c)) {
-                            each.accept((Compound) newContent);
-                            if (--max <= 0)
-                                return;
-                        }
+                    if ((newContent instanceof Compound) && !newContent.equals(c)) {
+                        each.accept((Compound) newContent);
+                        if (--max <= 0)
+                            return;
                     }
                 }
             }
@@ -69,7 +68,7 @@ public abstract class VarIntroduction {
 
 
     @Nullable
-    abstract protected Term[] select(Compound input);
+    abstract protected Iterator<Term> select(Compound input);
 
 
     /** provides the next terms that will be substituted in separate permutations; return null to prevent introduction */
