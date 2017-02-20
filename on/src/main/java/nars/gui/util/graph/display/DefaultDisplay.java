@@ -48,15 +48,4 @@ public class DefaultDisplay<V, E> implements GraphDisplay<V, E> {
         v.speed = 0.5f;
     }
 
-    @Override
-    public boolean preUpdate(AbstractGraphVis<V, E> g) {
-        //enables continuous animation
-        return true;
-    }
-
-    @Override
-    public boolean postUpdate(AbstractGraphVis<V, E> g) {
-        return true;
-    }
-    
 }

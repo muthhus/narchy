@@ -30,11 +30,6 @@ public class SwingLogPanel extends LogPanel {
 
         ioText = new SwingLogText(narControls.nar) {
 
-            @Override
-            protected void onLineVisible(final int offset) {                
-                //System.out.println(offset + " " + lines.get(offset));
-            }
-            
         };
         
         

@@ -45,19 +45,22 @@ abstract public class ProcessingGraphPanel2<V,E> extends NPanel {
         
         this.items = sentences;
 
-        app = new PGraphPanel<V,E>() {
+        app = new PGraphPanel<>() {
 
-            @Override public int edgeColor(E edge) {
+            @Override
+            public int edgeColor(E edge) {
                 return ProcessingGraphPanel2.this.edgeColor(edge);
             }
 
-            @Override public float edgeWeight(E edge) {
+            @Override
+            public float edgeWeight(E edge) {
                 return ProcessingGraphPanel2.this.edgeWeight(edge);
             }
 
-            @Override public int vertexColor(V vertex) {
+            @Override
+            public int vertexColor(V vertex) {
                 return ProcessingGraphPanel2.this.vertexColor(vertex);
-            }            
+            }
         };
         
 
@@ -79,24 +82,20 @@ abstract public class ProcessingGraphPanel2<V,E> extends NPanel {
         final JComboBox layoutSelect = new JComboBox();
         layoutSelect.addItem("Graph");
         layoutSelect.addItem("Tree");
-        layoutSelect.addActionListener(new ActionListener() {
-            @Override public void actionPerformed(ActionEvent e) {
-                layoutMode = layoutSelect.getSelectedItem().toString();
-                needLayout = true;
-                update();
-                redraw();
-            }
+        layoutSelect.addActionListener(e -> {
+            layoutMode = layoutSelect.getSelectedItem().toString();
+            needLayout = true;
+            update();
+            redraw();
         });
         layoutMode = layoutSelect.getSelectedItem().toString();
         menu.add(layoutSelect);
         
         final JCheckBox beliefsEnable = new JCheckBox("Syntax");
-        beliefsEnable.addActionListener(new ActionListener() {
-            @Override public void actionPerformed(ActionEvent e) {
-                showSyntax = beliefsEnable.isSelected();
-                update();                
-                redraw();
-            }
+        beliefsEnable.addActionListener(e -> {
+            showSyntax = beliefsEnable.isSelected();
+            update();
+            redraw();
         });
         menu.add(beliefsEnable);
         
@@ -182,12 +181,10 @@ abstract public class ProcessingGraphPanel2<V,E> extends NPanel {
             
             @Override
             public void componentResized(ComponentEvent e) {
-                SwingUtilities.invokeLater(new Runnable() {
-                    @Override public void run() {                         
-                        app.setSize(getWidth(), getHeight());
-                        redraw();                                  
-                    }
-                });                
+                SwingUtilities.invokeLater(() -> {
+                    app.setSize(getWidth(), getHeight());
+                    redraw();
+                });
             }
             
         });

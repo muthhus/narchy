@@ -139,14 +139,11 @@ public class NARControls extends JPanel implements ActionListener, EventObserver
         m = new JMenu("Windows");
 
         JMenuItem mv3 = new JMenuItem("+ Input");
-        mv3.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                TextInputPanel inputPanel = new TextInputPanel(nar);
-                NWindow inputWindow = new NWindow("Input", inputPanel);
-                inputWindow.setSize(800, 200);
-                inputWindow.setVisible(true);
-            }
+        mv3.addActionListener(e -> {
+            TextInputPanel inputPanel = new TextInputPanel(nar);
+            NWindow inputWindow = new NWindow("Input", inputPanel);
+            inputWindow.setSize(800, 200);
+            inputWindow.setVisible(true);
         });
         m.add(mv3);
 
@@ -164,24 +161,14 @@ public class NARControls extends JPanel implements ActionListener, EventObserver
             m.add(cct4);*/
 
         JMenuItem ml = new JMenuItem("+ Output");
-        ml.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                new NWindow("Output", new SwingLogPanel(NARControls.this)).show(500, 300);
-            }
-        });
+        ml.addActionListener(e -> new NWindow("Output", new SwingLogPanel(NARControls.this)).show(500, 300));
         m.add(ml);
 
         m.addSeparator();
 
 
         JMenuItem mv = new JMenuItem("+ Concept Network");
-        mv.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                new NWindow("graphvis", new NARGraphPanel( nar) ).show(800, 800, false);
-            }
-        });
+        mv.addActionListener(e -> new NWindow("graphvis", new NARGraphPanel( nar) ).show(800, 800, false));
         m.add(mv);
 
             /*JMenuItem tlp = new JMenuItem("+ Timeline");
@@ -264,54 +251,36 @@ public class NARControls extends JPanel implements ActionListener, EventObserver
         // m.addSeparator();
 
         JMenuItem tt = new JMenuItem("+ Task Tree");
-        tt.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                new NWindow("Task Tree", new TaskTree(nar)).show(300, 650, false);
-            }
-        });
+        tt.addActionListener(e -> new NWindow("Task Tree", new TaskTree(nar)).show(300, 650, false));
         m.add(tt);
 
         //  m.addSeparator();
 
         JMenuItem st = new JMenuItem("+ Sentence Table");
-        st.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                SentenceTablePanel p = new SentenceTablePanel(nar);
-                NWindow w = new NWindow("Sentence Table", p);
-                w.setSize(500, 300);
-                w.setVisible(true);
-            }
+        st.addActionListener(e -> {
+            SentenceTablePanel p = new SentenceTablePanel(nar);
+            NWindow w = new NWindow("Sentence Table", p);
+            w.setSize(500, 300);
+            w.setVisible(true);
         });
         m.add(st);
 
         m.addSeparator();
 
         JMenuItem gml = new JMenuItem("+ Concept Forgetting Log");
-        gml.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                new NWindow("Forgot", new SwingLogPanel(NARControls.this,
-                        Events.ConceptForget.class
-                        //, Events.TaskRemove.class, Events.TermLinkRemove.class, Events.TaskLinkRemove.class)
-                ))
-                .show(500, 300);
-            }
-        });
+        gml.addActionListener(e -> new NWindow("Forgot", new SwingLogPanel(NARControls.this,
+                Events.ConceptForget.class
+                //, Events.TaskRemove.class, Events.TermLinkRemove.class, Events.TaskLinkRemove.class)
+        ))
+        .show(500, 300));
         m.add(gml);
 
         JMenuItem gml2 = new JMenuItem("+ Task Forgetting Log");
-        gml2.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                new NWindow("Forgot", new SwingLogPanel(NARControls.this,
-                        Events.TaskRemove.class
-                        //, Events.TaskRemove.class, Events.TermLinkRemove.class, Events.TaskLinkRemove.class)
-                ))
-                .show(500, 300);
-            }
-        });
+        gml2.addActionListener(e -> new NWindow("Forgot", new SwingLogPanel(NARControls.this,
+                Events.TaskRemove.class
+                //, Events.TaskRemove.class, Events.TermLinkRemove.class, Events.TaskLinkRemove.class)
+        ))
+        .show(500, 300));
         m.add(gml2);
 
          /* not working yet anyway   JMenuItem fc = new JMenuItem("+ Freq. vs Confidence");
@@ -484,11 +453,7 @@ public class NARControls extends JPanel implements ActionListener, EventObserver
         nar.memory.event.on(FrameEnd.class, this);
     }
 
-    final Runnable updateGUIRunnable = new Runnable() {
-        @Override public void run() {
-            updateGUI();
-        }
-    };
+    final Runnable updateGUIRunnable = () -> updateGUI();
     
     /** in ms */
     long lastUpdateTime = -1;
@@ -750,27 +715,16 @@ public class NARControls extends JPanel implements ActionListener, EventObserver
         JButton focusButton = new AwesomeButton(FA_FocusCharacter);
         focusButton.setBackground(Color.DARK_GRAY);
         focusButton.setToolTipText("Focus");
-        focusButton.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                setSpeed(1.0f);
-                volumeSlider.setValue(0.0f);
-            }
-
+        focusButton.addActionListener(e -> {
+            setSpeed(1.0f);
+            volumeSlider.setValue(0.0f);
         });
         pc.add(focusButton);
         
         
         JButton pluginsButton = new AwesomeButton(FA_ControlCharacter);
         pluginsButton.setToolTipText("Plugins");
-        pluginsButton.addActionListener(new ActionListener() {
-
-            @Override public void actionPerformed(ActionEvent e) {
-                new NWindow("Plugins", new PluginPanel(nar)).show(350, 600);
-            }
-
-        });
+        pluginsButton.addActionListener(e -> new NWindow("Plugins", new PluginPanel(nar)).show(350, 600));
         pc.add(pluginsButton);
         
         p.setLayout(new GridBagLayout());
@@ -837,9 +791,6 @@ public class NARControls extends JPanel implements ActionListener, EventObserver
                 x.set(i);
             }
 
-            @Override
-            public void onChange(float v) {
-            }
         };
 
         return s;

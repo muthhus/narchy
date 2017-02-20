@@ -67,6 +67,11 @@ public class Javascript extends SynchronousFunctionOperator {
     }
 
     @Override public Term getRange() {
-        return Term.get("js_evaluation");
+        return new Term("js_evaluation");
+        /*Term x = atoms.get(name);
+        if (x != null) return x;
+        x = new Term(name);
+        atoms.put(name, x);
+        return x;*/
     }
 }

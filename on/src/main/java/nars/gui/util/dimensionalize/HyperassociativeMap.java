@@ -328,7 +328,7 @@ public class HyperassociativeMap<N, E> {
     
     void getNeighbors(final N nodeToQuery, Map<N, Double> neighbors) {
         if (neighbors == null)
-            neighbors = new HashMap<N, Double>();
+            neighbors = new HashMap<>();
         else
             neighbors.clear();
         
@@ -518,7 +518,7 @@ public class HyperassociativeMap<N, E> {
     }
 
     private List<Future<ArrayRealVector>> submitFutureAligns() {
-        final ArrayList<Future<ArrayRealVector>> futures = new ArrayList<Future<ArrayRealVector>>();
+        final ArrayList<Future<ArrayRealVector>> futures = new ArrayList<>();
         for (final N node : graph.vertexSet()) {
             futures.add(threadExecutor.submit(new Align(node)));
         }

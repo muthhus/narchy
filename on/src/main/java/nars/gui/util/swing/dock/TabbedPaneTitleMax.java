@@ -105,12 +105,7 @@ import static javax.swing.BorderFactory.createEmptyBorder;
         bn_float.setBorderPainted(false);
         bn_float.setContentAreaFilled(false);
         //bn_float.setMargin(new java.awt.Insets(0, 0, 0, 0));
-        bn_float.addActionListener(new java.awt.event.ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                bn_floatActionPerformed(evt);
-            }
-        });
+        bn_float.addActionListener(evt -> bn_floatActionPerformed(evt));
         add(bn_float);
         
 //        //bn_minimize.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/minimize.png"))); // NOI18N
@@ -129,12 +124,7 @@ import static javax.swing.BorderFactory.createEmptyBorder;
         bn_close.setBorderPainted(false);
         bn_close.setContentAreaFilled(false);
         //bn_close.setMargin(new java.awt.Insets(0, 0, 0, 0));
-        bn_close.addActionListener(new java.awt.event.ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                bn_closeActionPerformed(evt);
-            }
-        });
+        bn_close.addActionListener(evt -> bn_closeActionPerformed(evt));
         add(bn_close);
     } // </editor-fold>//GEN-END:initComponents
 

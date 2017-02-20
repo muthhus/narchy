@@ -12,7 +12,6 @@ import nars.gui.util.graph.EdgeVis;
 import nars.gui.util.graph.GraphDisplay;
 import nars.gui.util.graph.VertexVis;
 import nars.gui.util.swing.NSlider;
-import nars.inference.TruthFunctions;
 import nars.inference.UtilityFunctions;
 import nars.language.Term;
 
@@ -258,17 +257,7 @@ public class NARGraphDisplay<V,E> implements GraphDisplay<V,E> {
         return menu;
     }
 
-    @Override
-    public boolean preUpdate(AbstractGraphVis<V, E> g) {
-        return true;
-    }
 
-    @Override
-    public boolean postUpdate(AbstractGraphVis<V, E> g) {
-        return true;
-    }
-    
-    
 }
     
 

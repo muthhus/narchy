@@ -479,7 +479,7 @@ public class LevelBag<E extends Item<K>,K> extends Bag<E,K> {
 
     public Iterable<E> getLevel(final int i) {
         if (level[i] == null) {
-            return Collections.EMPTY_LIST;
+            return Collections.emptyList();
         }
         return level[i];
     }
@@ -491,7 +491,7 @@ public class LevelBag<E extends Item<K>,K> extends Bag<E,K> {
 
     @Override
     public Iterator<E> iterator() {
-        return new Iterator<E>() {
+        return new Iterator<>() {
             int l = level.length - 1;
             private Iterator<E> levelIterator;
             private E next;

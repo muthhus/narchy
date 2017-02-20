@@ -156,11 +156,6 @@ public class NARGraph extends DirectedMultigraph {
             return super.getTarget();
         }
 
-        @Override
-        public Object clone() {
-            return super.clone();
-        }
-
     }
 
     public static class TermBelief extends NAREdge {
@@ -170,10 +165,6 @@ public class NARGraph extends DirectedMultigraph {
             return "belief";
         }
 
-        @Override
-        public Object clone() {
-            return super.clone();
-        }
     }
 
     public static class TermLinkEdge extends NAREdge<TermLink> {
@@ -185,11 +176,6 @@ public class NARGraph extends DirectedMultigraph {
         @Override
         public String toString() {
             return "termlink";
-        }
-
-        @Override
-        public Object clone() {
-            return super.clone();
         }
 
         public BudgetValue getBudget() {
@@ -213,11 +199,6 @@ public class NARGraph extends DirectedMultigraph {
             return "tasklink";
         }
 
-        @Override
-        public Object clone() {
-            return super.clone();
-        }
-
         public BudgetValue getBudget() {
             return this.getObject().getBudget();
         }
@@ -234,10 +215,6 @@ public class NARGraph extends DirectedMultigraph {
             return "question";
         }
 
-        @Override
-        public Object clone() {
-            return super.clone();
-        }
     }
 
     public static class TermDerivation extends NAREdge {
@@ -247,10 +224,6 @@ public class NARGraph extends DirectedMultigraph {
             return "derives";
         }
 
-        @Override
-        public Object clone() {
-            return super.clone();
-        }
     }
 
     public static class TermContent extends NAREdge {
@@ -260,10 +233,6 @@ public class NARGraph extends DirectedMultigraph {
             return "has";
         }
 
-        @Override
-        public Object clone() {
-            return super.clone();
-        }
     }
 
     public static class TermType extends NAREdge {
@@ -273,10 +242,6 @@ public class NARGraph extends DirectedMultigraph {
             return "type";
         }
 
-        @Override
-        public Object clone() {
-            return super.clone();
-        }
     }
 
     public static class SentenceContent extends NAREdge {
@@ -286,10 +251,6 @@ public class NARGraph extends DirectedMultigraph {
             return "sentence";
         }
 
-        @Override
-        public Object clone() {
-            return super.clone();
-        }
     }
 
     public NARGraph() {
@@ -370,7 +331,7 @@ public class NARGraph extends DirectedMultigraph {
         return (Graph) super.clone();
     }
 
-    public void graphMLWrite(String filename) throws Exception {
+    public void graphMLWrite(String filename) throws SAXException, TransformerConfigurationException, IOException {
         new GraphMLExporter(new IntegerNameProvider(), new StringNameProvider(), new IntegerEdgeNameProvider(), new StringEdgeNameProvider()).export(new FileWriter(filename), this);
     }
 

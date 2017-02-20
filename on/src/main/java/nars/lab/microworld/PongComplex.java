@@ -27,7 +27,7 @@ public class PongComplex extends Frame {
 
     public PongComplex() {
         String[] args = {"Pong"};
-        MyPapplet mp = new MyPapplet ();
+        MyPapplet mp = new MyPapplet();
         mp.setSize(800,600);
         PApplet.runSketch(args, mp);
     }
@@ -35,7 +35,7 @@ public class PongComplex extends Frame {
     static MyPapplet.Obj agent;
         static MyPapplet.Obj ball;
 
-    public class MyPapplet extends PApplet {
+    public static class MyPapplet extends PApplet {
 
         float mouseScroll;
         @Override
@@ -624,7 +624,7 @@ public class PongComplex extends Frame {
                         pushMatrix();
                         if(hamlib.Mode==hamlib.Hamlib3DMode)
                         {
-                            translate(0,0, (float) 1.5);
+                            translate(0,0, 1.5f);
                         }
                         line(oi.x,oi.y,oi.x+viewdist*cos(a+visarea),oi.y+viewdist*sin(a+visarea));
                         line(oi.x,oi.y,oi.x+viewdist*cos(a-visarea),oi.y+viewdist*sin(a-visarea));

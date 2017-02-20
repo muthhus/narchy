@@ -69,29 +69,23 @@ public class TaskTree extends NPanel implements EventObserver, Runnable {
         
         JCheckBox showJudgments = new JCheckBox("Judgments");
         showJudgments.setSelected(showingJudgments);
-        showJudgments.addActionListener(new ActionListener() {
-            @Override public void actionPerformed(ActionEvent e) {
-                showingJudgments = showJudgments.isSelected();
-                reset();
-            }            
+        showJudgments.addActionListener(e -> {
+            showingJudgments = showJudgments.isSelected();
+            reset();
         });
         menu.add(showJudgments);
         JCheckBox showQuestions = new JCheckBox("Questions");
         showQuestions.setSelected(showingQuestions);
-        showQuestions.addActionListener(new ActionListener() {
-            @Override public void actionPerformed(ActionEvent e) {
-                showingQuestions = showQuestions.isSelected();
-                reset();
-            }            
+        showQuestions.addActionListener(e -> {
+            showingQuestions = showQuestions.isSelected();
+            reset();
         });
         menu.add(showQuestions);
         JCheckBox showGoals = new JCheckBox("Goals");
         showGoals.setSelected(showingGoals);
-        showGoals.addActionListener(new ActionListener() {
-            @Override public void actionPerformed(ActionEvent e) {
-                showingGoals = showGoals.isSelected();
-                reset();
-            }            
+        showGoals.addActionListener(e -> {
+            showingGoals = showGoals.isSelected();
+            reset();
         });
         menu.add(showGoals);
         
@@ -148,9 +142,9 @@ public class TaskTree extends NPanel implements EventObserver, Runnable {
     /** get all tasks in the system by iterating all newTasks, novelTasks, Concept TaskLinks */
     //not part of Memory.java anymore as this is not something nars_core needs!
     public static Set<Task> getTasks(Memory mem, boolean includeTaskLinks, boolean includeNewTasks, boolean includeNovelTasks) {
-        
+
         Set<Task> t = new HashSet();
-        
+
         if (includeTaskLinks) {
             for (Concept c : mem) {
                 for (TaskLink tl : c.taskLinks) {
@@ -158,15 +152,15 @@ public class TaskTree extends NPanel implements EventObserver, Runnable {
                 }
             }
         }
-        
+
         if (includeNewTasks)
-            t.addAll(mem.newTasks);
-        
+            t.addAll(mem.newTasks.values());
+
         if (includeNovelTasks)
             for (Task n : mem.novelTasks)
                 t.add(n);
-            
-        return t;        
+
+        return t;
     }
     
     public void update() {

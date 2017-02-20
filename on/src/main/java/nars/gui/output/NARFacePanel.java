@@ -13,19 +13,7 @@ public class NARFacePanel extends HumanoidFacePanel  {
         super();
         this.nar = n;
     }
-    
-    @Override
-    protected void onShowing(boolean showing) {
-        super.onShowing(showing);
-        
-//        if (showing) {
-//            nar.addOutput(this);
-//        }
-//        else {
-//            nar.removeOutput(this);
-//        }
-    }
-    
+
 
     @Override
     public void update(double t) {

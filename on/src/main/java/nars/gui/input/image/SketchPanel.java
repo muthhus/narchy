@@ -167,7 +167,7 @@ public class SketchPanel extends PPanel {
         }
     }
 
-    class Result {
+    static class Result {
 
         String Name;
         float Score;

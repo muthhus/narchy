@@ -47,7 +47,12 @@ public class Reflect extends SynchronousFunctionOperator {
         return Inheritance.make(Product.make(getMetaTerm(subject),getMetaTerm(object)), predicate);
     }
     public static Term sop(Statement s, String operatorName) {
-        return Inheritance.make(Product.make(getMetaTerm(s.getSubject()),getMetaTerm(s.getPredicate())), Term.get(operatorName));
+        /*Term x = atoms.get(name);
+        if (x != null) return x;
+        x = new Term(name);
+        atoms.put(name, x);
+        return x;*/
+        return Inheritance.make(Product.make(getMetaTerm(s.getSubject()),getMetaTerm(s.getPredicate())), new Term(operatorName));
     }
     public static Term sop(Statement s, Term predicate) {
         return Inheritance.make(Product.make(getMetaTerm(s.getSubject()),getMetaTerm(s.getPredicate())), predicate);
@@ -58,7 +63,12 @@ public class Reflect extends SynchronousFunctionOperator {
         for (Term x : t)
             m[i++] = getMetaTerm(x);
         
-        return Inheritance.make(Product.make(m), Term.get(operatorName));
+        /*Term x = atoms.get(name);
+        if (x != null) return x;
+        x = new Term(name);
+        atoms.put(name, x);
+        return x;*/
+        return Inheritance.make(Product.make(m), new Term(operatorName));
     }
     
     public static Term getMetaTerm(Term node) {
@@ -76,7 +86,12 @@ public class Reflect extends SynchronousFunctionOperator {
 
     @Override
     protected Term getRange() {
-        return Term.get("reflect");
+        return new Term("reflect");
+        /*Term x = atoms.get(name);
+        if (x != null) return x;
+        x = new Term(name);
+        atoms.put(name, x);
+        return x;*/
     }
     
     

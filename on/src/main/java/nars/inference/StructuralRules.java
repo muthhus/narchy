@@ -582,8 +582,6 @@ public final class StructuralRules {
         Sentence sentence = task.sentence;
         TruthValue truth = sentence.truth;
 
-        final float reliance = Parameters.reliance;
-
         BudgetValue budget;
         if (sentence.isQuestion() || sentence.isQuest()) {
             budget = BudgetFunctions.compoundBackward(content, nal);
@@ -593,12 +591,12 @@ public final class StructuralRules {
             //[03:25] <patham9> <a --> b>.     (||,<a --> b>,<x --> y>).     => dont derive it  "outputMustNotContain(<x --> y>)"
             //[03:25] <patham9> <a --> b>.     (&&,<a --> b>,<x --> y>)?    =>      dont derive it   "outputMustNotContain( (&&,<a --> b>,<x --> y>))"
             //[03:25] <patham9> <a --> b>.     (&&,<a --> b>,<x --> y>).   =>    <x --> y>
+            final float reliance = Parameters.reliance;
             if ((sentence.isJudgment() || sentence.isGoal()) && (compoundTask ? compound instanceof Conjunction : compound instanceof Disjunction)) {
                 truth = TruthFunctions.deduction(truth, reliance);
             }else {
-                TruthValue v1, v2;
-                v1 = TruthFunctions.negation(truth);
-                v2 = TruthFunctions.deduction(v1, reliance);
+                TruthValue v1 = TruthFunctions.negation(truth);
+                TruthValue v2 = TruthFunctions.deduction(v1, reliance);
                 truth = TruthFunctions.negation(v2);
             }
             budget = BudgetFunctions.forward(truth, nal);

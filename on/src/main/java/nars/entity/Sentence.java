@@ -187,13 +187,11 @@ public class Sentence<T extends Term> implements Cloneable {
             
             List<Variable> vars = new ArrayList(); //may contain duplicates, list for efficiency
             
-            c.recurseSubtermsContainingVariables(new Term.TermVisitor() {
-                @Override public void visit(final Term t, final Term parent) {
-                    if (t instanceof Variable) {
-                        Variable v = ((Variable)t);                        
-                        vars.add(v);
-                    }                    
-                }            
+            c.recurseSubtermsContainingVariables((t, parent) -> {
+                if (t instanceof Variable) {
+                    Variable v = ((Variable)t);
+                    vars.add(v);
+                }
             });
 
             int varsSize = vars.size();
@@ -585,12 +583,12 @@ public class Sentence<T extends Term> implements Cloneable {
     
     public static List<Sentence> sortExpectation(Collection<Sentence> s) {
         List<Sentence> l = new ArrayList(s);
-        Collections.sort(l, ExpectationComparator.the);
+        l.sort(ExpectationComparator.the);
         return l;
     }
     public static List<Sentence> sortConfidence(Collection<Sentence> s) {
         List<Sentence> l = new ArrayList(s);
-        Collections.sort(l, ConfidenceComparator.the);
+        l.sort(ConfidenceComparator.the);
         return l;
     }
     

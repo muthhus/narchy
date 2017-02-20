@@ -131,7 +131,7 @@ public class RuleTables {
                         } //else {
                         try {
                             goalFromQuestion(task, taskTerm, nal); 
-                        }catch(Exception ex) {} //todo fix
+                        }catch(Exception ignored) {} //todo fix
                         //}
                         break;
                     case TermLink.COMPOUND_STATEMENT:

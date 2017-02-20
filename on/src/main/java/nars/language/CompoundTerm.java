@@ -354,6 +354,7 @@ public abstract class CompoundTerm extends Term implements Iterable<Term> {
 
         String opString = op.toString();
         size += opString.length();
+
         for (final Term t : arg)
             size += 1 + t.name().length();
 

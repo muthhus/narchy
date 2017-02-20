@@ -191,7 +191,7 @@ abstract public class PGraphPanel<V,E> extends PPanel implements ActionListener 
                     float cy = (y1 + y2) / 2.0f;
                     drawArrow(x1, y1, x2, y2);
                     text(t(edge.toString()), cx, cy);            
-                }                catch (Exception e) {}
+                }                catch (Exception ignored) {}
             }
         }
         

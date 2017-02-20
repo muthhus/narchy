@@ -96,21 +96,17 @@ public class NARGraphVis extends AnimatingGraphVis<Object,Object> implements Eve
 
             final JCheckBox termlinkEnable = new JCheckBox("TermLinks");
             termlinkEnable.setSelected(showTermLinks);
-            termlinkEnable.addActionListener(new ActionListener() {
-                @Override public void actionPerformed(ActionEvent e) {
-                    showTermLinks = (termlinkEnable.isSelected());                
-                    setUpdateNext();
-                }
+            termlinkEnable.addActionListener(e -> {
+                showTermLinks = (termlinkEnable.isSelected());
+                setUpdateNext();
             });
             j.add(termlinkEnable);        
 
             final JCheckBox taskLinkEnable = new JCheckBox("TaskLinks");
             taskLinkEnable.setSelected(showTaskLinks);
-            taskLinkEnable.addActionListener(new ActionListener() {
-                @Override public void actionPerformed(ActionEvent e) {
-                    showTaskLinks = (taskLinkEnable.isSelected());                
-                    setUpdateNext();
-                }
+            taskLinkEnable.addActionListener(e -> {
+                showTaskLinks = (taskLinkEnable.isSelected());
+                setUpdateNext();
             });
             j.add(taskLinkEnable);
 
@@ -244,26 +240,24 @@ public class NARGraphVis extends AnimatingGraphVis<Object,Object> implements Eve
         layoutSelect.addItem("Grid");
         
         //modeSelect.setSelectedIndex(cg.mode);
-        layoutSelect.addActionListener(new ActionListener() {
-            @Override public void actionPerformed(ActionEvent e) {
-                switch (layoutSelect.getSelectedIndex()) {
-                    case 0:
-                        update(style, new FastOrganicLayout());
-                        break;
-                    case 1:
-                        update(style, new HashPriorityPolarLayout(0f, 1f, 50));     
-                        break;
-                    case 2:
-                        update(style, new HashPriorityPolarLayout(0.25f, 0.75f, 75));     
-                        break;
-                    case 3:
-                        update(style, new HyperassociativeLayout());     
-                        break;
+        layoutSelect.addActionListener(e -> {
+            switch (layoutSelect.getSelectedIndex()) {
+                case 0:
+                    update(style, new FastOrganicLayout());
+                    break;
+                case 1:
+                    update(style, new HashPriorityPolarLayout(0f, 1f, 50));
+                    break;
+                case 2:
+                    update(style, new HashPriorityPolarLayout(0.25f, 0.75f, 75));
+                    break;
+                case 3:
+                    update(style, new HyperassociativeLayout());
+                    break;
 
-                }
-//cg.mode = modeSelect.getSelectedIndex();
-                setUpdateNext();
             }
+//cg.mode = modeSelect.getSelectedIndex();
+            setUpdateNext();
         });
         j.add(layoutSelect);
         return j;
@@ -287,19 +281,17 @@ public class NARGraphVis extends AnimatingGraphVis<Object,Object> implements Eve
         modeSel.addItem("Concepts");
         modeSel.addItem("Inheritance");       
         //modeSelect.setSelectedIndex(cg.mode);
-        modeSel.addActionListener(new ActionListener() {
-            @Override public void actionPerformed(ActionEvent e) {
-                switch (modeSel.getSelectedIndex()) {
-                    case 0:
-                        setMode(new ConceptGraphMode());
-                        break;
-                    case 1:
-                        setMode(new InheritanceGraphMode());
-                        break;
+        modeSel.addActionListener(e -> {
+            switch (modeSel.getSelectedIndex()) {
+                case 0:
+                    setMode(new ConceptGraphMode());
+                    break;
+                case 1:
+                    setMode(new InheritanceGraphMode());
+                    break;
 
-                }
-                setUpdateNext();
             }
+            setUpdateNext();
         });
         
         j.add(modeSel);

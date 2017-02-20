@@ -123,7 +123,7 @@ public abstract class Operator extends Term implements Plugin {
 //                reportExecution(operation, args, n, memory);
 //            }
 //        }
-        catch (Exception e) {                        
+        catch (Exception ignored) {
             //reportExecution(operation, args, e, memory);            
         }
         return false;
@@ -200,7 +200,7 @@ public abstract class Operator extends Term implements Plugin {
     }
 
     public final boolean call(final Operation op, final Memory memory) {
-        if(!op.isExecutable(memory)) {
+        if(!op.isExecutable()) {
             return false;
         }
         Product args = op.getArguments();

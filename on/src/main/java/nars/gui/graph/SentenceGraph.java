@@ -31,13 +31,7 @@ abstract public class SentenceGraph<E> extends DirectedMultigraph<Term, E> imple
     public final EventEmitter event = new EventEmitter( GraphChange.class );
     
     public SentenceGraph(Memory memory) {
-        super(/*null*/new EdgeFactory() {
-
-            @Override public Object createEdge(Object v, Object v1) {
-                return null;
-            }
-            
-        });
+        super(/*null*/(v, v1) -> null);
         
         this.memory = memory;
         
@@ -83,7 +77,7 @@ abstract public class SentenceGraph<E> extends DirectedMultigraph<Term, E> imple
             Concept c = (Concept)a[0];
             
             //create a clone of the list for thread safety
-            for (Task b : new ArrayList<Task>(c.beliefs)) {
+            for (Task b : new ArrayList<>(c.beliefs)) {
                 remove(b.sentence);
             }            
         }
@@ -175,7 +169,7 @@ abstract public class SentenceGraph<E> extends DirectedMultigraph<Term, E> imple
                 }
             }        
         }
-        catch (NoSuchElementException e) { }
+        catch (NoSuchElementException ignored) { }
     }
     
     protected final void ensureTermConnected(final Term t) {
@@ -208,12 +202,8 @@ abstract public class SentenceGraph<E> extends DirectedMultigraph<Term, E> imple
     
    
     protected void addComponents(final Sentence parentSentence, final E edge) {
-        List<E> componentList = components.get(parentSentence);
-        if (componentList == null) {
-            componentList = new ArrayList(1);
-            components.put(parentSentence, componentList);
-        }
-        componentList.add(edge);        
+        List<E> componentList = components.computeIfAbsent(parentSentence, k -> new ArrayList(1));
+        componentList.add(edge);
     }
     
     public boolean add(final Sentence s, final Item c) {         

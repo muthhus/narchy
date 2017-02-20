@@ -265,7 +265,7 @@ public class GraphApp extends JPanel
         {   
             pixelgrabber.grabPixels();   
         }   
-        catch(InterruptedException _ex)   
+        catch(InterruptedException ignored)
         {   
             System.out.println("interrupted waiting for pixels!");   
             return null;   

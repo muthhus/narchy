@@ -37,10 +37,15 @@ public abstract class Feel extends Operator {
         super(name);
         
         // remove the "^feel" prefix from name
-        this.feelingTerm = Term.get(((String)name()).substring(5));
+        /*Term x = atoms.get(name);
+        if (x != null) return x;
+        x = new Term(name);
+        atoms.put(name, x);
+        return x;*/
+        this.feelingTerm = new Term(((String) name()).substring(5));
     }
 
-    final static Term self = Term.get(Symbols.SELF);
+    final static Term self = new Term(Symbols.SELF);
     final static Term selfSubject = SetExt.make(self);
     
     /**

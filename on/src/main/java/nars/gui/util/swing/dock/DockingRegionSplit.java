@@ -45,11 +45,6 @@ public class DockingRegionSplit extends JSplitPane
     }
 
     @Override
-    public void resetToPreferredSizes() {
-        super.resetToPreferredSizes();
-    }
-
-    @Override
     public JComponent getComponent() {
         return this;
     }

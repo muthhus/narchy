@@ -12,7 +12,6 @@ import nars.entity.TaskLink;
 import nars.gui.WrapLayout;
 import nars.gui.util.Video;
 import nars.gui.util.swing.NPanel;
-import nars.inference.TruthFunctions;
 import nars.inference.UtilityFunctions;
 import nars.util.EventEmitter.EventObserver;
 import nars.util.Events;
@@ -286,7 +285,7 @@ public class ConceptsPanel extends NPanel implements EventObserver, Runnable {
 
             if (!concept.beliefs.isEmpty()) {
                 List<Task> bbT = concept.getBeliefs();
-                List<Sentence> bb=new ArrayList<Sentence>();
+                List<Sentence> bb= new ArrayList<>();
                 for(Task ts : bbT) {
                     bb.add(ts.sentence);
                 }
@@ -309,7 +308,7 @@ public class ConceptsPanel extends NPanel implements EventObserver, Runnable {
             
             if (!concept.desires.isEmpty()) {
                 List<Task> ddT = concept.getDesires();
-                List<Sentence> dd=new ArrayList<Sentence>();
+                List<Sentence> dd= new ArrayList<>();
                 for(Task ts : ddT) {
                     dd.add(ts.sentence);
                 }
@@ -370,7 +369,7 @@ public class ConceptsPanel extends NPanel implements EventObserver, Runnable {
 
         public PriorityColumn(int width, int height) {
             super(width, height);
-            update(Collections.EMPTY_LIST);
+            update(Collections.<Task>emptyList());
         }
 
         public void update(Iterable<Task> i) {

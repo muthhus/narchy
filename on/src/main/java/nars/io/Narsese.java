@@ -3,7 +3,6 @@ package nars.io;
 import nars.NAR;
 import nars.config.Parameters;
 import nars.entity.*;
-import nars.io.Symbols.*;
 import nars.language.*;
 import nars.operator.Operation;
 import nars.operator.Operator;
@@ -431,7 +430,12 @@ public class Narsese {
         if (containVar(s)) {
             return new Variable(s);
         } else {
-            return Term.get(s);
+            return new Term(s);
+        /*Term x = atoms.get(name);
+        if (x != null) return x;
+        x = new Term(name);
+        atoms.put(name, x);
+        return x;*/
         }
     }
 

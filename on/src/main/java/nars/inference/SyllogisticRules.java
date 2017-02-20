@@ -437,6 +437,7 @@ public final class SyllogisticRules {
             }
             budget = BudgetFunctions.forward(truth, nal);
         }
+
         if(!Variables.indepVarUsedInvalid(content)) {
             boolean allowOverlap = taskSentence.isJudgment() && strong;
             List<Task> ret = nal.doublePremiseTask(content, truth, budget, false, allowOverlap); //(strong) when strong on judgement
@@ -451,11 +452,11 @@ public final class SyllogisticRules {
         //derivation was successful and it was a judgment event
         
         try { //that was predicted by an eternal belief that shifted time
-        float immediateDisappointmentConfidence = 0.1f;
-        Stamp stamp = new Stamp(nal.memory);
+            Stamp stamp = new Stamp(nal.memory);
         stamp.setOccurrenceTime(Stamp.ETERNAL);
         //long serial = stamp.evidentialBase[0];
-        Sentence s = new Sentence(mainSentence.term, mainSentence.punctuation, new TruthValue(0.0f, immediateDisappointmentConfidence), stamp);
+            float immediateDisappointmentConfidence = 0.1f;
+            Sentence s = new Sentence(mainSentence.term, mainSentence.punctuation, new TruthValue(0.0f, immediateDisappointmentConfidence), stamp);
         //s.producedByTemporalInduction = true; //also here to not go into sequence buffer
         Task t = new Task(s, new BudgetValue(0.99f,0.1f,0.1f)); //Budget for one-time processing
         Concept c = nal.memory.concept(((Statement) mainSentence.term).getPredicate()); //put into consequence concept
@@ -468,7 +469,7 @@ public final class SyllogisticRules {
                 nal.memory.emit(Output.ANTICIPATE.class,((Statement) c.negConfirmation.sentence.term).getPredicate()); //disappoint/confirm printed anyway
             }
        }
-        }catch(Exception ex) {
+        }catch(Exception ignored) {
             System.out.println("problem in anticipation handling");
         }
     }
@@ -490,7 +491,6 @@ public final class SyllogisticRules {
         Task task = nal.getCurrentTask();
         Sentence taskSentence = task.sentence;
         Sentence belief = nal.getCurrentBelief();
-        boolean deduction = (side != 0);
         boolean conditionalTask = Variables.hasSubstitute(Symbols.VAR_INDEPENDENT, premise2, belief.term);
         Term commonComponent;
         Term newComponent = null;
@@ -617,6 +617,7 @@ public final class SyllogisticRules {
         TruthValue truth2 = belief.truth;
         TruthValue truth = null;
         BudgetValue budget;
+        boolean deduction = (side != 0);
         if (taskSentence.isQuestion() || taskSentence.isQuest()) {
             budget = BudgetFunctions.backwardWeak(truth2, nal);
         } else {
@@ -774,12 +775,12 @@ public final class SyllogisticRules {
             return false;
         }
         Term term1 = null;
-        Term term2 = null;
-//        if ((cond1 instanceof Conjunction) && !Variable.containVarDep(cond1.getName())) {
+        //        if ((cond1 instanceof Conjunction) && !Variable.containVarDep(cond1.getName())) {
         if (cond1 instanceof Conjunction) {
             term1 = reduceComponents((CompoundTerm) cond1, cond2, nal.mem());
         }
 //        if ((cond2 instanceof Conjunction) && !Variable.containVarDep(cond2.getName())) {
+        Term term2 = null;
         if (cond2 instanceof Conjunction) {
             term2 = reduceComponents((CompoundTerm) cond2, cond1, nal.mem());
         }

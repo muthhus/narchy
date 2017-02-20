@@ -67,11 +67,7 @@ public class InferenceLogger extends MemoryObserver {
     public void addOutput(PrintStream p) {
         //TODO removeOutput(p)
         
-        addOutput(new LogOutput() {
-            @Override public void traceAppend(Class channel, String s) {
-                p.println(channel + ": " + s);
-            }
-        });        
+        addOutput((channel, s) -> p.println(channel + ": " + s));
     }
     
     public void removeOutput(LogOutput l) {

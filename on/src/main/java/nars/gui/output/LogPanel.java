@@ -87,12 +87,7 @@ abstract public class LogPanel extends NPanel implements LogOutput {
         clearButton.setForeground(Color.WHITE); 
         clearButton.setBackground(Color.DARK_GRAY);
         clearButton.setToolTipText("Clear");
-        clearButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                clearLog();
-            }
-        });
+        clearButton.addActionListener(e -> clearLog());
         menuTop.add(clearButton);
 
         final String defaultStreamButtonLabel = "Stream to File..";
@@ -100,20 +95,17 @@ abstract public class LogPanel extends NPanel implements LogOutput {
         streamButton.setForeground(Color.WHITE); 
         streamButton.setBackground(Color.DARK_GRAY);
         streamButton.setToolTipText(defaultStreamButtonLabel);
-        streamButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
+        streamButton.addActionListener(e -> {
 
-                if (streamButton.isSelected()) {
-                    if (!openLogFile()) {
-                        streamButton.setSelected(false);
-                    } else {
-                        streamButton.setToolTipText("Streaming...");
-                    }
+            if (streamButton.isSelected()) {
+                if (!openLogFile()) {
+                    streamButton.setSelected(false);
                 } else {
-                    streamButton.setToolTipText(defaultStreamButtonLabel);
-                    closeLogFile();
+                    streamButton.setToolTipText("Streaming...");
                 }
+            } else {
+                streamButton.setToolTipText(defaultStreamButtonLabel);
+                closeLogFile();
             }
         });
         menuTop.add(streamButton);
@@ -125,12 +117,7 @@ abstract public class LogPanel extends NPanel implements LogOutput {
         showStatementsBox.setBackground(Color.DARK_GRAY);
         showStatementsBox.setToolTipText("Show Statements");
         showStatementsBox.setSelected(showStatements);
-        showStatementsBox.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                showStatements = showStatementsBox.isSelected();
-            }
-        });
+        showStatementsBox.addActionListener(e -> showStatements = showStatementsBox.isSelected());
         menuTop.add(showStatementsBox);
 
         final JToggleButton showQuestionsBox = new JToggleButton("?");
@@ -138,12 +125,7 @@ abstract public class LogPanel extends NPanel implements LogOutput {
         showQuestionsBox.setBackground(Color.DARK_GRAY);
         showQuestionsBox.setToolTipText("Show Questions");
         showQuestionsBox.setSelected(showQuestions);
-        showQuestionsBox.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                showQuestions = showQuestionsBox.isSelected();
-            }
-        });
+        showQuestionsBox.addActionListener(e -> showQuestions = showQuestionsBox.isSelected());
         menuTop.add(showQuestionsBox);
 
         final JToggleButton showExecutionsBox = new JToggleButton("!");
@@ -151,47 +133,27 @@ abstract public class LogPanel extends NPanel implements LogOutput {
         showExecutionsBox.setBackground(Color.DARK_GRAY);
         showExecutionsBox.setToolTipText("Show Goals & Executions");
         showExecutionsBox.setSelected(showExecutions);
-        showExecutionsBox.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                showExecutions = showExecutionsBox.isSelected();
-            }
-        });
+        showExecutionsBox.addActionListener(e -> showExecutions = showExecutionsBox.isSelected());
         menuTop.add(showExecutionsBox);
         
         final JToggleButton showErrorBox = new JToggleButton("Errors");
         showErrorBox.setForeground(Color.WHITE); 
         showErrorBox.setBackground(Color.DARK_GRAY);
         showErrorBox.setSelected(showErrors);
-        showErrorBox.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                showErrors = showErrorBox.isSelected();
-            }
-        });
+        showErrorBox.addActionListener(e -> showErrors = showErrorBox.isSelected());
         menuTop.add(showErrorBox);
 
         final JToggleButton showStampBox = new JToggleButton("Stamp");
         showStampBox.setForeground(Color.WHITE); 
         showStampBox.setBackground(Color.DARK_GRAY);
-        showStampBox.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                setShowStamp(showStampBox.isSelected());
-            }
-        });
+        showStampBox.addActionListener(e -> setShowStamp(showStampBox.isSelected()));
         menuTop.add(showStampBox);
 
         final JToggleButton showTraceBox = new JToggleButton("Trace");
         showTraceBox.setForeground(Color.WHITE); 
         showTraceBox.setBackground(Color.DARK_GRAY);
         showTraceBox.setEnabled(true);
-        showTraceBox.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                setTrace(showTraceBox.isSelected());
-            }
-        });
+        showTraceBox.addActionListener(e -> setTrace(showTraceBox.isSelected()));
         setTrace(showTraceBox.isSelected());
         menuTop.add(showTraceBox);
 

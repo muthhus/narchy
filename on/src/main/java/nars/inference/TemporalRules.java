@@ -143,14 +143,14 @@ public class TemporalRules {
         
         if ((s1.truth==null) || (s2.truth==null) || s1.punctuation!=Symbols.JUDGMENT_MARK || s2.punctuation!=Symbols.JUDGMENT_MARK
                 || s1.isEternal() || s2.isEternal())
-            return Collections.EMPTY_LIST;
+            return Collections.emptyList();
         
         Term t1 = s1.term;
         Term t2 = s2.term;
                
         boolean deriveSequenceOnly = Statement.invalidStatement(t1, t2, true);
         if (Statement.invalidStatement(t1, t2, false))
-            return Collections.EMPTY_LIST;
+            return Collections.emptyList();
         
         Term t11=null;
         Term t22=null;
@@ -339,8 +339,8 @@ public class TemporalRules {
                 boolean SubsPred=precon.containsTermRecursively(pred);
                 Variable v1=new Variable("$91");
                 Variable v2=new Variable("$92");
-                HashMap<Term,Term> app=new HashMap<Term,Term>();
                 if(SubsSub || SubsPred) {
+                    HashMap<Term, Term> app = new HashMap<>();
                     if(SubsSub)
                         app.put(sub, v1);
                     if(SubsPred)
@@ -354,7 +354,7 @@ public class TemporalRules {
              }
         }
         
-        List<Task> success=new ArrayList<Task>();
+        List<Task> success= new ArrayList<>();
         if(!deriveSequenceOnly && t11!=null && t22!=null) {
             Statement statement11 = Implication.make(t11, t22, order);
             Statement statement22 = Implication.make(t22, t11, reverseOrder(order));
@@ -519,7 +519,6 @@ public class TemporalRules {
      * necessary
      */
     public static BudgetValue solutionEval(final Task problem, final Sentence solution, Task task, final nars.control.DerivationContext nal) {
-        BudgetValue budget = null;
         boolean feedbackToLinks = false;
         if (task == null) {
             task = nal.getCurrentTask();
@@ -532,7 +531,8 @@ public class TemporalRules {
         if (problem.sentence.isGoal()) {
             nal.memory.emotion.adjustHappy(quality, task.getPriority(), nal);
         }
-        
+
+        BudgetValue budget = null;
         if (judgmentTask) {
             task.incPriority(quality);
         } else {

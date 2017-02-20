@@ -97,7 +97,7 @@ public class SwingText extends JTextPane {
             int l = doc.getLength();
             doc.insertString(l, s, aset);
         } catch (BadLocationException ex) {
-            Logger.getLogger(SwingLogText.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(SwingText.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -111,7 +111,7 @@ public class SwingText extends JTextPane {
         if (overLength > 0) {
             try {
                 doc.remove(0, overLength + LogPanel.clearMargin);
-            } catch (BadLocationException ex) {
+            } catch (BadLocationException ignored) {
             }
         }
     }

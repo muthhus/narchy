@@ -40,7 +40,7 @@ public class Video {
     static {        
         try {
             Video.FontAwesome = Font.createFont(Font.TRUETYPE_FONT, Video.class.getResourceAsStream("FontAwesome.ttf")).deriveFont(Font.PLAIN, 14);
-        } catch (Exception ex) {    
+        } catch (Exception ignored) {
             System.err.println("FontAwesome.ttf not found");
             //ex.printStackTrace();
         }

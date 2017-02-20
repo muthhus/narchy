@@ -127,12 +127,12 @@ public class Variables {
             Term[] list = cTerm1.cloneTerms();
             if (cTerm1.isCommutative()) {
                 CompoundTerm.shuffle(list, Memory.randomNumber);
-                HashSet<Integer> alreadyMatched = new HashSet<Integer>();
+                HashSet<Integer> alreadyMatched = new HashSet<>();
                 //ok attempt unification
                 if(cTerm2 == null || list == null || cTerm2.term == null || list.length != cTerm2.term.length) {
                     return false;
                 }
-                HashSet<Integer> matchedJ = new HashSet<Integer>(list.length*2);
+                HashSet<Integer> matchedJ = new HashSet<>(list.length * 2);
                 for(int i = 0; i < list.length; i++) {
                     boolean succeeded = false;
                     for(int j = 0; j < list.length; j++) {
@@ -142,13 +142,13 @@ public class Variables {
                         Term ti = list[i].clone();
                         //clone map also:
                         Map<Term, Term>[] mapNew = (Map<Term, Term>[]) new HashMap<?,?>[2];
-                        mapNew[0] = new HashMap<Term,Term>();
-                        mapNew[1] = new HashMap<Term,Term>();
+                        mapNew[0] = new HashMap<>();
+                        mapNew[1] = new HashMap<>();
                         if(map[0] == null) {
-                            map[0] = new HashMap<Term,Term>();
+                            map[0] = new HashMap<>();
                         }
                         if(map[1] == null) {
-                            map[1] = new HashMap<Term,Term>();
+                            map[1] = new HashMap<>();
                         }
                         for(Term c : map[0].keySet()) {
                             mapNew[0].put(c, map[0].get(c));

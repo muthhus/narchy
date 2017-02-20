@@ -424,7 +424,7 @@ public class FastOrganicLayout<V, E> implements GraphDisplay<V,E> {
                                         // Check the connected cell in part of the vertex list to be
                     // acted on by this layout
                     if (index != null) {
-                        neighbors[i][j] = index.intValue();
+                        neighbors[i][j] = index;
                     } // Else if index of the other cell doesn't correspond to
                     // any cell listed to be acted upon in this layout. Set
                     // the index to the value of this vertex (a dummy self-loop)
@@ -460,7 +460,7 @@ public class FastOrganicLayout<V, E> implements GraphDisplay<V,E> {
                 reduceTemperature();
             }
         }
-        catch (Exception e) { }
+        catch (Exception ignored) { }
 
         double minx = 0, miny = 0, maxx = 0, maxy = 0;
 
@@ -650,11 +650,6 @@ public class FastOrganicLayout<V, E> implements GraphDisplay<V,E> {
                 }
             }
         }
-    }
-
-    @Override
-    public boolean preUpdate(AbstractGraphVis<V,E> g) {
-        return true;
     }
 
     @Override

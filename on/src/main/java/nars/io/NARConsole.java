@@ -62,7 +62,7 @@ public class NARConsole {
         this.nar = n;
     }
 
-    private class InputThread extends Thread
+    private static class InputThread extends Thread
     {
       private final BufferedReader bufIn;
       NAR nar;
@@ -81,11 +81,11 @@ public class NARConsole {
             String line=bufIn.readLine();
             if(line!=null)
                 nar.addInput(line);
-          }catch(Exception ex){}
+          }catch(Exception ignored){}
           try
           {
             Thread.sleep(1);
-          }catch(Exception ex){}
+          }catch(Exception ignored){}
         }
       }
     }
@@ -105,14 +105,14 @@ public class NARConsole {
         if (args.length > 0) {
             try {
                 nar.addInput(new TextInput(new File(args[0])));
-            } catch (Exception ex) {
+            } catch (Exception ignored) {
                 noFile = true;
                 sleep = Integer.valueOf(args[0]); //Integer.valueOf(args[0]);
                 //System.err.println("NARRun.init: " + ex);
             }
         }
         if(args.length == 0 || noFile) {   
-            it=new InputThread(System.in,nar);
+            it= new InputThread(System.in, nar);
             it.start();
             //nar.addInput(new TextInput(new BufferedReader(new InputStreamReader(System.in))));
         }

@@ -242,7 +242,7 @@ public class DockingRegionTabbed extends JTabbedPane implements DockingChild {
         }
     }
 
-    class TabLayout {
+    static class TabLayout {
 
         DockingContent content;
         Component component;

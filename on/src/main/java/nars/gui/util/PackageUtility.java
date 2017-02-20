@@ -29,7 +29,7 @@ public class PackageUtility {
             if (resource == null)
                 throw new ClassNotFoundException("No resource for " + pkgPath);
             directory = new File(resource.getFile());
-        } catch (final NullPointerException x) {
+        } catch (final NullPointerException ignored) {
             throw new ClassNotFoundException(pkgName + " (" + directory
                     + ") does not appear to be a valid package");
         }
@@ -72,7 +72,7 @@ public class PackageUtility {
         }
     }
 
-    public static List<Class> getClasses(final String jarName, final String packageName) throws IOException {
+    public static List<Class> getClasses(final String jarName, final String packageName) throws IOException, FileNotFoundException {
         final ArrayList<Class> classes = new ArrayList<>();
 
         final String cleanedPackageName = packageName.replaceAll("\\.", "/");
@@ -92,7 +92,7 @@ public class PackageUtility {
                 try {
                     classes.add(Class.forName(classFileName.substring(0,
                             classFileName.length() - 6)));
-                } catch (final ClassNotFoundException caughtException) {
+                } catch (final ClassNotFoundException ignored) {
                     throw new FileNotFoundException(
                             "class not found, do you have the right jar file?");
                 }

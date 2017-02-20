@@ -156,12 +156,7 @@ public class Launcher extends javax.swing.JFrame {
         jButton1.setForeground(new java.awt.Color(255, 255, 254));
         jButton1.setText("OpenNARS");
         jButton1.setActionCommand("jButton1");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
-            }
-        });
+        jButton1.addActionListener(evt -> jButton1ActionPerformed(evt));
 
         jLabel3.setForeground(new java.awt.Color(254, 255, 255));
         jLabel3.setText("Run Application Examples:");
@@ -169,12 +164,7 @@ public class Launcher extends javax.swing.JFrame {
         jButton2.setForeground(new java.awt.Color(254, 255, 255));
         jButton2.setText("Website");
         jButton2.setActionCommand("jButton1");
-        jButton2.addActionListener(new java.awt.event.ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton2ActionPerformed(evt);
-            }
-        });
+        jButton2.addActionListener(evt -> jButton2ActionPerformed(evt));
 
         jLabel6.setBackground(new java.awt.Color(255, 255, 255));
         jLabel6.setForeground(new java.awt.Color(254, 255, 255));
@@ -189,22 +179,12 @@ public class Launcher extends javax.swing.JFrame {
         jButton5.setForeground(new java.awt.Color(254, 255, 255));
         jButton5.setText("IRC");
         jButton5.setActionCommand("jButton1");
-        jButton5.addActionListener(new java.awt.event.ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton5ActionPerformed(evt);
-            }
-        });
+        jButton5.addActionListener(evt -> jButton5ActionPerformed(evt));
 
         jButton3.setForeground(new java.awt.Color(255, 255, 254));
         jButton3.setText("Web GUI");
         jButton3.setActionCommand("jButton1");
-        jButton3.addActionListener(new java.awt.event.ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton3ActionPerformed(evt);
-            }
-        });
+        jButton3.addActionListener(evt -> jButton3ActionPerformed(evt));
 
         jLabel9.setBackground(new java.awt.Color(255, 255, 255));
         jLabel9.setForeground(new java.awt.Color(254, 255, 255));
@@ -329,7 +309,7 @@ public class Launcher extends javax.swing.JFrame {
     private static void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         try{
         Desktop.getDesktop().browse(new URI("http://code.google.com/p/open-nars/"));
-        }catch(Exception ex){}
+        }catch(Exception ignored){}
     }//GEN-LAST:event_jButton2ActionPerformed
 
 //    private void jLabel6MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel6MouseClicked
@@ -341,14 +321,14 @@ public class Launcher extends javax.swing.JFrame {
     private static void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
          try{
         Desktop.getDesktop().browse(new URI("http://webchat.freenode.net/?channels=nars"));
-        }catch(Exception ex){}
+        }catch(Exception ignored){}
     }//GEN-LAST:event_jButton5ActionPerformed
 
     private static void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
         try {
             //NARServer.main(new String[]{"9999","localhost","9100","1000"});
             //Desktop.getDesktop().browse(new URI("http://127.0.0.1:9999"));
-        }catch(Exception ex){}
+        }catch(Exception ignored){}
     }//GEN-LAST:event_jButton3ActionPerformed
 
     private void jLabel9MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel9MouseClicked
@@ -409,12 +389,7 @@ public class Launcher extends javax.swing.JFrame {
         NARSwing.themeInvert();
         
         /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                new Launcher().setVisible(true);
-            }
-        });
+        java.awt.EventQueue.invokeLater(() -> new Launcher().setVisible(true));
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

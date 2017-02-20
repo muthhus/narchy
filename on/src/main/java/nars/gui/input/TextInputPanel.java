@@ -85,7 +85,7 @@ public class TextInputPanel extends NPanel /*implements ActionListener*/ {
     }
     
     /** provides actions that will be available even if, or only if, input is blank */
-    public class NullInput implements TextInputMode {
+    public static class NullInput implements TextInputMode {
 
         private String input;
         private NAR nar;
@@ -183,7 +183,7 @@ public class TextInputPanel extends NPanel /*implements ActionListener*/ {
         }
     }
     
-    public class NarseseInput implements TextInputMode {
+    public static class NarseseInput implements TextInputMode {
         //public final NarseseParser p = NarseseParser.newParser();
         
         private String input;
@@ -438,20 +438,14 @@ public class TextInputPanel extends NPanel /*implements ActionListener*/ {
             scrollp = new JScrollPane(comments);
             add(scrollp, BorderLayout.CENTER);
             
-            scrollp.getVerticalScrollBar().addAdjustmentListener(new AdjustmentListener() {  
-                @Override
-                public void adjustmentValueChanged(AdjustmentEvent e) {
-                    if(Math.abs(date.getSeconds()-new Date().getSeconds()) < 1)
-                        e.getAdjustable().setValue(e.getAdjustable().getMinimum()); 
-                }
+            scrollp.getVerticalScrollBar().addAdjustmentListener(e -> {
+                if(Math.abs(date.getSeconds()-new Date().getSeconds()) < 1)
+                    e.getAdjustable().setValue(e.getAdjustable().getMinimum());
             });
             
-            scrollp.getHorizontalScrollBar().addAdjustmentListener(new AdjustmentListener() {  
-                @Override
-                public void adjustmentValueChanged(AdjustmentEvent e) {
-                    if(Math.abs(date.getSeconds()-new Date().getSeconds()) < 1)
-                        e.getAdjustable().setValue(e.getAdjustable().getMinimum()); 
-                }
+            scrollp.getHorizontalScrollBar().addAdjustmentListener(e -> {
+                if(Math.abs(date.getSeconds()-new Date().getSeconds()) < 1)
+                    e.getAdjustable().setValue(e.getAdjustable().getMinimum());
             });
         }
 
@@ -531,19 +525,13 @@ public class TextInputPanel extends NPanel /*implements ActionListener*/ {
                // b.setFont(b.getFont().deriveFont((float)(b.getFont().getSize() * (0.5f + 0.5f * strength))));
                 b.setForeground(Color.WHITE); 
                 b.setBackground(Color.DARK_GRAY);
-                b.addActionListener(new ActionListener() {
-                    @Override public void actionPerformed(ActionEvent e) {
-                        SwingUtilities.invokeLater(new Runnable() {
-                            @Override public void run() {
-                                //TODO catch error around run() ?
-                                String result = a.run();
-                                if (result!=null) {
-                                    inputText.setText(result);
-                                }
-                            }
-                        });
+                b.addActionListener(e -> SwingUtilities.invokeLater(() -> {
+                    //TODO catch error around run() ?
+                    String result = a.run();
+                    if (result!=null) {
+                        inputText.setText(result);
                     }
-                });
+                }));
                
                 menu.add(b);
             }
@@ -627,11 +615,7 @@ public class TextInputPanel extends NPanel /*implements ActionListener*/ {
     }
 
     protected void updateContext() {
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override public void run() {
-                infoPane.update();
-            }            
-        });
+        SwingUtilities.invokeLater(() -> infoPane.update());
     }
 
     /**

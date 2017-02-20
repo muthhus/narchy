@@ -177,11 +177,9 @@ public class Interval extends Term {
     public static List<Interval> intervalTimeSequence(final long t, final int maxTerms, final Memory memory) {
         if (maxTerms == 1)
             return Lists.newArrayList(interval(t, memory));
-        
-        long a; //current approximation value
-        Interval first;
-        first = interval(t, memory);
-        a = first.getTime(memory);
+
+        Interval first = interval(t, memory);
+        long a = first.getTime(memory); //current approximation value
         if (a == t) return Lists.newArrayList(first);
         else if (a < t) {
             //ok we will add to it. nothing to do here

@@ -567,8 +567,8 @@ public final class CompositionalRules {
         Sentence belief = nal.getCurrentBelief();
         HashMap<Term, Term> substitute = new HashMap<>();
         
-        boolean b1 = false, b2 = false;
-        
+        boolean b1 = false;
+
         {
             Variable varDep2 = new Variable("#varDep2");
 
@@ -618,7 +618,7 @@ public final class CompositionalRules {
 
         BudgetValue budget = BudgetFunctions.forward(truth, nal);
 
-        b2 = nal.doublePremiseTask(content, truth, budget, false, false)!=null;
+        boolean b2 = nal.doublePremiseTask(content, truth, budget, false, false) != null;
 
         return b1 || b2;
     }

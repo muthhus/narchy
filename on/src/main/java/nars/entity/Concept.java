@@ -559,7 +559,7 @@ public class Concept extends Item<Term> {
                         }
                     }
                 }
-                }catch(Exception ex) {
+                }catch(Exception ignored) {
                     System.out.println("Failure in operation choice rule, analyze!");
                 }
                 
@@ -583,7 +583,7 @@ public class Concept extends Item<Term> {
     private static void questionFromGoal(final Task task, final DerivationContext nal) {
         if(Parameters.QUESTION_GENERATION_ON_DECISION_MAKING || Parameters.HOW_QUESTION_GENERATION_ON_DECISION_MAKING) {
             //ok, how can we achieve it? add a question of whether it is fullfilled
-            ArrayList<Term> qu=new ArrayList<Term>();
+            ArrayList<Term> qu= new ArrayList<>();
             if(Parameters.HOW_QUESTION_GENERATION_ON_DECISION_MAKING) {
                 if(!(task.sentence.term instanceof Equivalence) && !(task.sentence.term instanceof Implication)) {
                     Variable how=new Variable("?how");

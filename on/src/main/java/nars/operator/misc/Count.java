@@ -46,9 +46,9 @@ public class Count extends SynchronousFunctionOperator {
 
     final static String requireMessage = "Requires 1 SetExt or SetInt argument";
     
-    final static Term counted = Term.get("counted");
-    
-    
+    final static Term counted = new Term("counted");
+
+
     @Override
     protected Term function(Memory memory, Term[] x) {
         if (x.length!=1) {

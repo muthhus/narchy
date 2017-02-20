@@ -47,14 +47,7 @@ public class BeliefView extends PPanel {
     }
 
 
-    @Override
-    public void setup() {
-        super.setup();
-        
-    }
-
-    
-// Draws the chart and a title.
+    // Draws the chart and a title.
     @Override
     public void draw() {
 //        background(0);

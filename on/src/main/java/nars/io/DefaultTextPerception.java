@@ -133,31 +133,27 @@ public class DefaultTextPerception implements Plugin, EventObserver {
                     int cycles = Integer.parseInt(input);
                     return new PauseInput(cycles);                    
                 }
-                catch (NumberFormatException e) {                }
+                catch (NumberFormatException ignored) {                }
                 return null;
             }
         });
         
         //reset
-        parsers.add(new TextReaction() {
-            @Override public Object react(String input) {                
-                if (input.equals(Symbols.RESET_COMMAND) || (input.startsWith("*") && !input.startsWith("*start") && !input.startsWith("*decisionthreshold") 
-                        && !input.startsWith("*stop") && !input.startsWith("*volume"))) //TODO!
-                    return new Reset(input);
-                return null;
-            }
+        parsers.add(input -> {
+            if (input.equals(Symbols.RESET_COMMAND) || (input.startsWith("*") && !input.startsWith("*start") && !input.startsWith("*decisionthreshold")
+                    && !input.startsWith("*stop") && !input.startsWith("*volume"))) //TODO!
+                return new Reset(input);
+            return null;
         });
         //reboot
-        parsers.add(new TextReaction() {
-            @Override public Object react(String input) {                
-                if (input.equals(Symbols.REBOOT_COMMAND)) {
-                    //immediately reset the memory
-                    memory.emit(IN.class, "reboot");
-                    memory.reset();
-                    return new Reboot();
-                }
-                return null;
+        parsers.add(input -> {
+            if (input.equals(Symbols.REBOOT_COMMAND)) {
+                //immediately reset the memory
+                memory.emit(IN.class, "reboot");
+                memory.reset();
+                return new Reboot();
             }
+            return null;
         });
 
 //      TODO implement these with AbstractTask's        
@@ -191,24 +187,22 @@ public class DefaultTextPerception implements Plugin, EventObserver {
 //        });
         
         //silence
-        parsers.add(new TextReaction() {
-            @Override public Object react(String input) {                
-                if (input.indexOf(Symbols.SET_NOISE_LEVEL_COMMAND)==0) {
-                    String[] p = input.split("=");
-                    if (p.length == 2) {
-                        int noiseLevel = Integer.parseInt(p[1].trim());
-                        return new SetVolume(noiseLevel);
-                    }
+        parsers.add(input -> {
+            if (input.indexOf(Symbols.SET_NOISE_LEVEL_COMMAND)==0) {
+                String[] p = input.split("=");
+                if (p.length == 2) {
+                    int noiseLevel = Integer.parseInt(p[1].trim());
+                    return new SetVolume(noiseLevel);
                 }
-                if (input.indexOf(Symbols.SET_DECISION_LEVEL_COMMAND)==0) {
-                    String[] p = input.split("=");
-                    if (p.length == 2) {
-                        double threshold = Double.parseDouble(p[1].trim());
-                        return new SetDecisionThreshold(threshold);
-                    }
-                }
-                return null;                
             }
+            if (input.indexOf(Symbols.SET_DECISION_LEVEL_COMMAND)==0) {
+                String[] p = input.split("=");
+                if (p.length == 2) {
+                    double threshold = Double.parseDouble(p[1].trim());
+                    return new SetDecisionThreshold(threshold);
+                }
+            }
+            return null;
         });
         
 //        //URL include
@@ -230,107 +224,92 @@ public class DefaultTextPerception implements Plugin, EventObserver {
 
         //echo
         //TODO standardize on an echo/comment format
-        parsers.add(new TextReaction() {
-            @Override
-            public Object react(String input) {
-                char c = input.charAt(0);
-                if (c == Symbols.ECHO_MARK) {            
-                    String echoString = input.substring(1);
-                    return new Echo(Echo.class, echoString);
-                }
-                final String it = input.trim();
-                if (it.startsWith("OUT:") || it.startsWith("//") || it.startsWith("***") ) {
-                    return new Echo(Echo.class, input);
-                }
-                return null;                
+        parsers.add(input -> {
+            char c = input.charAt(0);
+            if (c == Symbols.ECHO_MARK) {
+                String echoString = input.substring(1);
+                return new Echo(Echo.class, echoString);
             }
+            final String it = input.trim();
+            if (it.startsWith("OUT:") || it.startsWith("//") || it.startsWith("***") ) {
+                return new Echo(Echo.class, input);
+            }
+            return null;
         });
         
         parsers.add(new BindJavascriptExpression(memory));
         //narsese
-        parsers.add(new TextReaction() {
-            @Override
-            public Object react(String input) {
+        parsers.add(input -> {
 
-                if (enableNarsese) {
-                    char c = input.charAt(0);
-                    if (c != Symbols.COMMENT_MARK) {
-                        try {
-                            Item task = narsese.parseNarsese(new StringBuilder(input));
-                            if (task != null) {
-                                return task;
-                            }
-                        } catch (InvalidInputException ex) {
-                            return ex;
+            if (enableNarsese) {
+                char c = input.charAt(0);
+                if (c != Symbols.COMMENT_MARK) {
+                    try {
+                        Item task = narsese.parseNarsese(new StringBuilder(input));
+                        if (task != null) {
+                            return task;
                         }
+                    } catch (InvalidInputException ex) {
+                        return ex;
                     }
                 }
-                return null;
             }
-        });             
+            return null;
+        });
 
         //englisch
-        parsers.add(new TextReaction() {
-            @Override
-            public Object react(String line) {
-                
-                /*if (enableEnglisch) {
-                    //if (!possiblyNarsese(line)) 
-                    {                    
-                        List<AbstractTask> l;
-                        try {
-                            l = englisch.parse(line, narsese, true);
-                            if ((l == null) || (l.isEmpty())) 
-                                return null;
-                            return l;
-                        } catch (InvalidInputException ex) {
+        parsers.add(line -> {
+
+            /*if (enableEnglisch) {
+                //if (!possiblyNarsese(line))
+                {
+                    List<AbstractTask> l;
+                    try {
+                        l = englisch.parse(line, narsese, true);
+                        if ((l == null) || (l.isEmpty()))
                             return null;
-                        }
+                        return l;
+                    } catch (InvalidInputException ex) {
+                        return null;
                     }
-                }*/
-                return null;            
-            }
+                }
+            }*/
+            return null;
         });
         
     //englisch
-        parsers.add(new TextReaction() {
-            @Override
-            public Object react(String line) {
-                
-                /*if (enableTwenglish) {
-                    //if (!possiblyNarsese(line))
-                    {                    
-                        List<AbstractTask> l;
-                        try {
-                            l = twenglish.parse(line, narsese, true);
-                            if ((l == null) || (l.isEmpty())) 
-                                return null;
-                            return l;
-                        } catch (InvalidInputException ex) {
+        parsers.add(line -> {
+
+            /*if (enableTwenglish) {
+                //if (!possiblyNarsese(line))
+                {
+                    List<AbstractTask> l;
+                    try {
+                        l = twenglish.parse(line, narsese, true);
+                        if ((l == null) || (l.isEmpty()))
                             return null;
-                        }
+                        return l;
+                    } catch (InvalidInputException ex) {
+                        return null;
                     }
-                }*/
-                return null;            
-            }
+                }
+            }*/
+            return null;
         });
         
         // natural language
-        parsers.add(new TextReaction() {
-            @Override
-            public Object react(String line) {
-                
-                /*if (enableNaturalLanguage) {
-                    //if (!possiblyNarsese(line)) 
-                    {                    
-                        List<AbstractTask> l = NaturalLanguagePerception.parseLine(line, narsese, "word");
-                        if ((l == null) || (l.isEmpty())) 
-                            return null;
-                        return l;
-                    }
-                }*/
-                return null;            
-            }
+        parsers.add(line -> {
+
+            /*if (enableNaturalLanguage) {
+                //if (!possiblyNarsese(line))
+                {
+                    List<AbstractTask> l = NaturalLanguagePerception.parseLine(line, narsese, "word");
+                    if ((l == null) || (l.isEmpty()))
+                        return null;
+                    return l;
+                }
+            }*/
+            return null;
         });
         
         return parsers;           

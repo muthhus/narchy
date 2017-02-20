@@ -264,23 +264,18 @@ public class PointCloudLibrary
       results[i] = new PointCloudMatchResult(pointCloud.getName(), d);
     }
 
-    Arrays.sort(results, new Comparator<PointCloudMatchResult>()
-    {
-       @Override
-       public int compare(PointCloudMatchResult obj1, PointCloudMatchResult obj2)
-        {
-          if(obj1.getScore() < obj2.getScore())
-          {
-            return -1;
-          }
-  
-          if(obj1.getScore() > obj2.getScore())
-          {
-            return 1;
-          }
-  
-          return 0;
-        }
+    Arrays.sort(results, (obj1, obj2) -> {
+      if(obj1.getScore() < obj2.getScore())
+      {
+        return -1;
+      }
+
+      if(obj1.getScore() > obj2.getScore())
+      {
+        return 1;
+      }
+
+      return 0;
     });
 
     return results;

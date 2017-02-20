@@ -25,21 +25,17 @@ public class Workspace {
         this.nar=nar;
         Workspace ws=this;
         farg.coderack=new LevelBag(farg.codelet_level,farg.max_codelets);
-        nar.on(CycleEnd.class, new EventObserver() { 
-
-            @Override
-            public void event(Class event, Object[] args) {
-                for(int i=0;i<10;i++) { //process 10 codelets in each step
-                    Codelet cod=farg.coderack.takeNext();
-                    if(cod!=null) {
-                        if(Codelet.run(ws)) {
-                            farg.coderack.putIn(cod);
-                        }
+        nar.on(CycleEnd.class, (event, args) -> {
+            for(int i=0;i<10;i++) { //process 10 codelets in each step
+                Codelet cod=farg.coderack.takeNext();
+                if(cod!=null) {
+                    if(Codelet.run(ws)) {
+                        farg.coderack.putIn(cod);
                     }
-                    temperature=calc_temperature();
                 }
-                controller();
+                temperature=calc_temperature();
             }
+            controller();
         });
     }
     

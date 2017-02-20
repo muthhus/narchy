@@ -69,7 +69,7 @@ public class TextInput extends Symbols implements Input {
             if (input!=null) {
                 try {
                     input.close();
-                } catch (IOException ex) {
+                } catch (IOException ignored) {
                 }
             }
             finished = true;
@@ -101,7 +101,7 @@ public class TextInput extends Symbols implements Input {
         if (finished) {
             try {
                 input.close();
-            } catch (IOException ex1) {            }
+            } catch (IOException ignored) {            }
         }
 
         if (line!=null)

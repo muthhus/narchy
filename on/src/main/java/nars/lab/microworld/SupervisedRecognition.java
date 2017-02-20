@@ -122,7 +122,7 @@ public class SupervisedRecognition {
                     @Override
                     public void onChildSolution(Task child, Sentence belief) {}
                 });
-            } catch (Narsese.InvalidInputException ex) {
+            } catch (Narsese.InvalidInputException ignored) {
         }
         
         nar.step(100000);

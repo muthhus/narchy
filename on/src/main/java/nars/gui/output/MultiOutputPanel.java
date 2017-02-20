@@ -108,11 +108,7 @@ public class MultiOutputPanel extends JPanel implements HierarchyListener {
                 p = new MultiModePanel(nar, category);
                 JButton jc = p.newStatusButton();
                 
-                jc.addActionListener(new ActionListener() {
-                    @Override public void actionPerformed(ActionEvent e) {
-                        showCategory(category);
-                    }                    
-                });
+                jc.addActionListener(e -> showCategory(category));
                 categories.put(category, p);
                                         
                 categoriesListModel.addElement(jc);
@@ -147,12 +143,9 @@ public class MultiOutputPanel extends JPanel implements HierarchyListener {
         cont.getTab().setFont(Video.fontMono(15));
         cont.getTab().setMenuButton(headerMenu);
         
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                revalidate();
-                repaint();
-            }
+        SwingUtilities.invokeLater(() -> {
+            revalidate();
+            repaint();
         });
         
         return x;

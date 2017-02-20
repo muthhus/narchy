@@ -86,12 +86,7 @@ public class LanguageGUI extends javax.swing.JFrame {
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
         jButton1.setText("Input");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
-            }
-        });
+        jButton1.addActionListener(evt -> jButton1ActionPerformed(evt));
 
         jScrollPane2.setViewportView(jTextPane1);
 
@@ -195,11 +190,11 @@ public class LanguageGUI extends javax.swing.JFrame {
     //NAR learnerNAR = new NAR(); //for learning language structure
     static NAR languageNAR;
     static NAR reasonerNAR;
-    ArrayList<Answered> q = new ArrayList<Answered>();
+    ArrayList<Answered> q = new ArrayList<>();
     int seed = 1;
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         String text = this.inputPanel.getText();
-        List<String> inputs = new ArrayList<String>();
+        List<String> inputs = new ArrayList<>();
         this.inputPanel.setText("");
         String[] words = text.split(" ");
         String punctuation = "sentence";
@@ -237,8 +232,8 @@ public class LanguageGUI extends javax.swing.JFrame {
         seed++;
         
         try {
-            HashMap<String,String> wordTypes = new HashMap<String,String>();
-            HashSet<String> qWords = new HashSet<String>();
+            HashMap<String,String> wordTypes = new HashMap<>();
+            HashSet<String> qWords = new HashSet<>();
             for(String s : jTextPane1.getText().split("\n")) {
                 //if its a word type definition we won't add it directly but only when used in the sentence
                 if(s.startsWith("<\"")) {
@@ -328,12 +323,7 @@ public class LanguageGUI extends javax.swing.JFrame {
         NARSwing.themeInvert();
  
         /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                new LanguageGUI().setVisible(true);
-            }
-        });
+        java.awt.EventQueue.invokeLater(() -> new LanguageGUI().setVisible(true));
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

@@ -81,7 +81,7 @@ public class TemporalInferenceControl {
             }*/
             
             //also attempt direct
-            HashSet<Task> already_attempted = new HashSet<Task>();
+            HashSet<Task> already_attempted = new HashSet<>();
             for(int i =0 ;i<Parameters.SEQUENCE_BAG_ATTEMPTS;i++) {
                 Task takeout = nal.memory.sequenceTasks.takeNext();
                 if(takeout == null) {

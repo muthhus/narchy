@@ -147,12 +147,9 @@ abstract public class GridButtonPanel extends NPanel implements EventObserver {
         
         updated = false;
         
-        SwingUtilities.invokeLater(new Runnable() {
-
-            @Override public void run() {
-                repaint();
-                updated = true;
-            }            
+        SwingUtilities.invokeLater(() -> {
+            repaint();
+            updated = true;
         });
     }
     

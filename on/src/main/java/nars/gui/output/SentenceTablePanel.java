@@ -47,22 +47,14 @@ public class SentenceTablePanel extends TablePanel {
         syntaxGraphButton = new JButton("Graph");
         syntaxGraphButton.setEnabled(false);
         syntaxGraphButton.setBackground(Color.DARK_GRAY);
-        syntaxGraphButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                newSelectedGraphPanel();
-            }
-        });
+        syntaxGraphButton.addActionListener(e -> newSelectedGraphPanel());
         menu.add(syntaxGraphButton);
 
         JButton clearButton = new JButton("Clear");
         clearButton.setBackground(Color.DARK_GRAY);
-        clearButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                data = newModel();
-                table.setModel(data);
-            }
+        clearButton.addActionListener(e -> {
+            data = newModel();
+            table.setModel(data);
         });
         menu.add(clearButton);
 

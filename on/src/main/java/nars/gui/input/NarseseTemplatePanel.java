@@ -219,14 +219,7 @@ public class NarseseTemplatePanel {
         };
         
         formSelect.addActionListener(change);
-        t.getSelectionModel().addTreeSelectionListener(new TreeSelectionListener() {
-
-            @Override
-            public void valueChanged(TreeSelectionEvent e) {
-                change.actionPerformed(null);
-            }
-            
-        });
+        t.getSelectionModel().addTreeSelectionListener(e -> change.actionPerformed(null));
         
         change.actionPerformed(null);
         

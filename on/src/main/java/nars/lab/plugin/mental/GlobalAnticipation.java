@@ -27,7 +27,7 @@ import java.util.List;
 public class GlobalAnticipation implements Plugin, EventEmitter.EventObserver {
 
     public final ArrayDeque<Task> stm = new ArrayDeque();
-    public final List<Task> current_tasks=new ArrayList<Task>();
+    public final List<Task> current_tasks= new ArrayList<>();
     int MatchUpTo=20;
     
     public void setMatchEventsMax(double value) {
@@ -88,7 +88,7 @@ public class GlobalAnticipation implements Plugin, EventEmitter.EventObserver {
             return; 
         }
         
-        ArrayList<Task> lastEvents=new ArrayList<Task>();
+        ArrayList<Task> lastEvents= new ArrayList<>();
         lastEvents.addAll(stm);
         
         if(lastEvents.isEmpty()) {
@@ -96,7 +96,7 @@ public class GlobalAnticipation implements Plugin, EventEmitter.EventObserver {
         }
         
         final long duration = nal.memory.param.duration.get();
-        ArrayList<Task> derivetasks=new ArrayList<Task>();
+        ArrayList<Task> derivetasks= new ArrayList<>();
         
         for(final Task c : current_tasks) { //a =/> b or (&/ a1...an) =/> b
             boolean concurrent_conjunction=false;
@@ -188,7 +188,7 @@ public class GlobalAnticipation implements Plugin, EventEmitter.EventObserver {
                 boolean debug=true;
             }
         }
-        ArrayList<Task> toDelete=new ArrayList<Task>();
+        ArrayList<Task> toDelete= new ArrayList<>();
         for(Task t: current_tasks) {
             Concept w=nal.memory.concept(t.sentence.term);
             if(w==null) { //concept does not exist anymore, delete

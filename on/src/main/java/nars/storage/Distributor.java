@@ -36,11 +36,7 @@ public final class Distributor {
 
     private final static Map<Integer,Distributor> distributors = new HashMap(8);
     public static Distributor get(int range) {
-        Distributor d = distributors.get(range);
-        if (d==null) {
-            d = new Distributor(range);
-            distributors.put(range, d);
-        }
+        Distributor d = distributors.computeIfAbsent(range, Distributor::new);
         return d;
     }
     
@@ -49,16 +45,15 @@ public final class Distributor {
      * @param range Range of valid numbers
      */
     protected Distributor(final int range) {
-        int index, rank, time;
         capacity = (range * (range + 1)) / 2;
         order = new short[capacity];
         
         Arrays.fill(order, (short)-1);
-        index = capacity;
-        
-        for (rank = range; rank > 0; rank--) {
+        int index = capacity;
+
+        for (int rank = range; rank > 0; rank--) {
             final int capDivRank = capacity / rank;
-            for (time = 0; time < rank; time++) {
+            for (int time = 0; time < rank; time++) {
                 index = (capDivRank + index) % capacity;
                 while (order[index] >= 0) {
                     index = (index + 1) % capacity;

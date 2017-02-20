@@ -37,7 +37,7 @@ public class BitmapPanel extends JComponent {
             //g.drawImage(resize(image, X, Y), (getWidth()-X)/2, (getHeight()-Y)/2, null);            
             g.drawImage(image, 0, 0, getWidth(), getHeight(), null);
        //          g.drawImage(image, 0, 0, null);
-        } catch (NullPointerException e) {}
+        } catch (NullPointerException ignored) {}
     }
 
     /**
@@ -51,7 +51,7 @@ public class BitmapPanel extends JComponent {
             img = ImageIO.read(new File(imagePath));
             this.image = img;
             repaint();
-        } catch (IOException ex) { }
+        } catch (IOException ignored) { }
     }
     
     public void setImage(BufferedImage img) {

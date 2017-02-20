@@ -179,16 +179,16 @@ public class Stamp implements Cloneable {
     }
     
     public static boolean baseOverlap(long[] base1, long[] base2) {
-        HashSet<Long> task_base = new HashSet<Long>(base1.length + base2.length);
+        HashSet<Long> task_base = new HashSet<>(base1.length + base2.length);
         for(int i=0; i < base1.length; i++) {
-            if(task_base.contains(Long.valueOf(base1[i]))) { //can have an overlap in itself already
+            if(task_base.contains(base1[i])) { //can have an overlap in itself already
                 return true;
             }
             task_base.add(base1[i]);
         }
         //too restrictive, its checked for non-deductive inference rules in derivedTask
         for(int i=0; i < base2.length; i++) {
-            if(task_base.contains(Long.valueOf(base2[i]))) {
+            if(task_base.contains(base2[i])) {
                 return true;
             }
             task_base.add(base2[i]); //also add to detect collision with itself
@@ -197,10 +197,10 @@ public class Stamp implements Cloneable {
      }
     
     public boolean evidenceIsCyclic() {
-        HashSet<Long> task_base = new HashSet<Long>(this.evidentialBase.length);
+        HashSet<Long> task_base = new HashSet<>(this.evidentialBase.length);
         boolean cyclic = false;
         for(int i=0; i < this.evidentialBase.length; i++) {
-            if(task_base.contains(Long.valueOf(this.evidentialBase[i]))) { //can have an overlap in itself already
+            if(task_base.contains(this.evidentialBase[i])) { //can have an overlap in itself already
                 return true;
             }
             task_base.add(this.evidentialBase[i]);

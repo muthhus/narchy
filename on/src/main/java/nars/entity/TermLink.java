@@ -243,10 +243,6 @@ public class TermLink extends Item<TermLink> implements TLink<Term> {
         this(target, type, (short)i0, (short)i1, (short)i2, (short)i3);
     }
 
-    @Override public void end() {
-        
-    }
-
     @Override
     public Term getTarget() {
         return target;

@@ -229,21 +229,7 @@ public abstract class Item<K> {
         
         public StringKeyItem(final BudgetValue budget) { super(budget);         }
 
-                
-        @Override
-        public int hashCode() {
-            return name().hashCode();
-        }
 
-        @Override
-        public boolean equals(final Object obj) {
-            if (obj == this) return true;
-            if (obj instanceof Item) {
-                return ((Item)obj).name().equals(name());
-            }
-            return false;
-        }
-    
     }
 
     public static float getPrioritySum(Iterable<? extends Item> c) {

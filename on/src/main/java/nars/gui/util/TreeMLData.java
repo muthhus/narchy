@@ -77,7 +77,7 @@ public class TreeMLData implements MLData {
         try{
             ret=values.lastKey(); 
         }
-        catch(Exception ex) {}
+        catch(Exception ignored) {}
         if(ret==null)
             return 0;
         return ret;
@@ -106,7 +106,7 @@ public class TreeMLData implements MLData {
         Double x = getData(t);
         if (x == null) setData(t, f);
         else
-            setData(t, f + x.doubleValue());
+            setData(t, f + x);
     }
     
     @Override
@@ -148,7 +148,7 @@ public class TreeMLData implements MLData {
         Double f=null;
         try{
              f = values.get(t);
-        }catch(Exception ex){}
+        }catch(Exception ignored){}
         if (f == null) {
             return defaultValue;
         }

@@ -51,7 +51,7 @@ public class NARSwing  {
         UIManager.put("ScrollBar.width", 12);
         UIManager.put("ScrollBar.shadow", Color.BLACK);
         UIManager.put("ScrollBar.darkShadow", Color.WHITE);
-        ArrayList<Object> gradients = new ArrayList<Object>(5);
+        ArrayList<Object> gradients = new ArrayList<>(5);
         gradients.add(0.0f);
         gradients.add(0.0f);
         gradients.add(Color.WHITE);

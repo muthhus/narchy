@@ -109,17 +109,6 @@ public class NeuralTimestream<V, E> implements GraphDisplay<V,E>  {
     public void edge(AbstractGraphVis<V, E> g, EdgeVis<V, E> ee) {
         
     }
-    
-
-    @Override
-    public boolean preUpdate(AbstractGraphVis<V, E> g) {
-        return true;
-    }
-
-    @Override
-    public boolean postUpdate(AbstractGraphVis<V, E> g) {
-        return true;
-    }
 
 
 }

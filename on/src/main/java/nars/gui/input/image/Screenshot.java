@@ -33,7 +33,7 @@ public class Screenshot {
         return robot.createScreenCapture(new Rectangle(x1, y1, sw, sh));
     }
     
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) throws AWTException, HeadlessException {
         //BufferedImage i = new Screenshot().capture();
         BufferedImage i = new Screenshot().captureCursor(40, 40);
         

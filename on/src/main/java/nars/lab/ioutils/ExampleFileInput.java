@@ -25,7 +25,7 @@ public class ExampleFileInput extends TextInput {
             basePath + "nal/Examples/ClassicalConditioning"
     };
 
-    public static String load(String path) throws IOException {
+    public static String load(String path) throws IOException, FileNotFoundException {
         StringBuilder  sb  = new StringBuilder();
         String line;
         File fp = new File(path);
@@ -44,7 +44,7 @@ public class ExampleFileInput extends TextInput {
         this.source = input;
     }
     
-    public static ExampleFileInput get(String id) throws Exception {
+    public static ExampleFileInput get(String id) throws IOException {
         return new ExampleFileInput(load(basePath + "./nal/" + id +".nal"));
     }
     

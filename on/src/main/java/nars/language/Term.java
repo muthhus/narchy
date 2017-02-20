@@ -30,8 +30,6 @@ import nars.operator.Operator;
 import nars.storage.Memory;
 
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.TreeSet;
 //import nars.util.sort.SortedList;
 
@@ -43,9 +41,8 @@ import java.util.TreeSet;
  * exists. Multiple objects may represent the same Term.
  */
 public class Term implements AbstractTerm {
-    private static final Map<CharSequence,Term> atoms = new HashMap();
 
-    final public static Term SELF = Term.get("SELF");
+    final public static Term SELF = new Term("SELF");
 
     final public static boolean isSelf(final Term t) {
         return SELF.equals(t);
@@ -59,7 +56,7 @@ public class Term implements AbstractTerm {
         return (this instanceof Equivalence) || (this instanceof Implication);
     }
     
-    public boolean isExecutable(Memory mem) {
+    public boolean isExecutable() {
         //don't allow ^want and ^believe to be active/have an effect, 
         //which means its only used as monitor
         boolean isOp=this instanceof Operation;
@@ -96,32 +93,88 @@ public class Term implements AbstractTerm {
     public Term(final CharSequence name) {
         setName(name);
     }
-    
-    /** gets the atomic term given a name */
-    public final static Term get(final CharSequence name) {
-        Term x = atoms.get(name);
-        if (x != null) return x;
-        x = new Term(name);
-        atoms.put(name, x);
-        return x;
-    }
-    
+
     /** gets the atomic term of an integer */
     public final static Term get(final int i) {
         //fast lookup for single digits
         switch (i) {
-            case 0: return get("0");
-            case 1: return get("1");
-            case 2: return get("2");
-            case 3: return get("3");
-            case 4: return get("4");
-            case 5: return get("5");
-            case 6: return get("6");
-            case 7: return get("7");
-            case 8: return get("8");
-            case 9: return get("9");
+            case 0:
+                return new Term("0");
+        /*Term x = atoms.get(name);
+        if (x != null) return x;
+        x = new Term(name);
+        atoms.put(name, x);
+        return x;*/
+            case 1:
+                return new Term("1");
+        /*Term x = atoms.get(name);
+        if (x != null) return x;
+        x = new Term(name);
+        atoms.put(name, x);
+        return x;*/
+            case 2:
+                return new Term("2");
+        /*Term x = atoms.get(name);
+        if (x != null) return x;
+        x = new Term(name);
+        atoms.put(name, x);
+        return x;*/
+            case 3:
+                return new Term("3");
+        /*Term x = atoms.get(name);
+        if (x != null) return x;
+        x = new Term(name);
+        atoms.put(name, x);
+        return x;*/
+            case 4:
+                return new Term("4");
+        /*Term x = atoms.get(name);
+        if (x != null) return x;
+        x = new Term(name);
+        atoms.put(name, x);
+        return x;*/
+            case 5:
+                return new Term("5");
+        /*Term x = atoms.get(name);
+        if (x != null) return x;
+        x = new Term(name);
+        atoms.put(name, x);
+        return x;*/
+            case 6:
+                return new Term("6");
+        /*Term x = atoms.get(name);
+        if (x != null) return x;
+        x = new Term(name);
+        atoms.put(name, x);
+        return x;*/
+            case 7:
+                return new Term("7");
+        /*Term x = atoms.get(name);
+        if (x != null) return x;
+        x = new Term(name);
+        atoms.put(name, x);
+        return x;*/
+            case 8:
+                return new Term("8");
+        /*Term x = atoms.get(name);
+        if (x != null) return x;
+        x = new Term(name);
+        atoms.put(name, x);
+        return x;*/
+            case 9:
+                return new Term("9");
+        /*Term x = atoms.get(name);
+        if (x != null) return x;
+        x = new Term(name);
+        atoms.put(name, x);
+        return x;*/
         }
-        return get(Integer.toString(i));
+        return new Term(Integer.toString(i));
+        /*Term x = atoms.get(name);
+        if (x != null) return x;
+        x = new Term(name);
+        atoms.put(name, x);
+        return x;*/
     }
     
 
@@ -325,7 +378,12 @@ public class Term implements AbstractTerm {
 
     /** Creates a quote-escaped term from a string. Useful for an atomic term that is meant to contain a message as its name */
     public static Term text(String t) {
-        return Term.get(Texts.escape('"' + t + '"').toString());
+        return new Term(Texts.escape('"' + t + '"').toString());
+        /*Term x = atoms.get(name);
+        if (x != null) return x;
+        x = new Term(name);
+        atoms.put(name, x);
+        return x;*/
     }
 
 
@@ -423,7 +481,7 @@ public class Term implements AbstractTerm {
             Term cloned = content.cloneDeep();
             return cloned!=null;
         }
-        catch (Throwable e) {
+        catch (Throwable ignored) {
             /*if (Parameters.DEBUG && Parameters.DEBUG_INVALID_SENTENCES) {
                 System.err.println("INVALID TERM: " + content);
                 e.printStackTrace();

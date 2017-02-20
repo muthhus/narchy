@@ -32,11 +32,6 @@ import java.util.Set;
 public class AbegoTreeLayout<V,E> implements GraphDisplay<V,E> {
 
     boolean finished;
-    
-    @Override
-    public boolean preUpdate(AbstractGraphVis<V, E> g) {
-        return true;
-    }
 
     @Override
     public void vertex(AbstractGraphVis<V, E> g, VertexVis<V, E> v) {
@@ -59,12 +54,12 @@ public class AbegoTreeLayout<V,E> implements GraphDisplay<V,E> {
         
         DirectedGraph<V, E> graph = (DirectedGraph<V,E>)g.getGraph();
         
-        ArrayList<V> roots = new ArrayList<V>();
+        ArrayList<V> roots = new ArrayList<>();
         for (V v: graph.vertexSet())
             if (graph.inDegreeOf(v) == 0)
                 roots.add(v);
 
-        KruskalMinimumSpanningTree<V,E> st = new KruskalMinimumSpanningTree<V,E>(graph);
+        KruskalMinimumSpanningTree<V,E> st = new KruskalMinimumSpanningTree<>(graph);
         
         //Set<V> processed = new HashSet();
         
@@ -91,14 +86,14 @@ public class AbegoTreeLayout<V,E> implements GraphDisplay<V,E> {
                 subgraph.addEdge(from, to, e);
             }
             
-            BreadthFirstIterator<V, E> i = new BreadthFirstIterator<V,E>(subgraph, r) {
-                
+            BreadthFirstIterator<V, E> i = new BreadthFirstIterator<>(subgraph, r) {
+
                 @Override
                 protected void encounterVertex(V parent, E edge) {
                     super.encounterVertex(parent, edge);
-                    
+
                     VertexVis p = g.getVertexDisplay(parent);
-                    
+
                     Set<E> children = graph.outgoingEdgesOf(parent);
                     VertexVis[] cv = new VertexVis[children.size()];
                     int j = 0;
@@ -108,15 +103,14 @@ public class AbegoTreeLayout<V,E> implements GraphDisplay<V,E> {
                     }
 
                     //System.out.println("vertex -> " + parent + " " + Arrays.toString(cv));
-                    
+
                     try {
                         tree.addChildren(p, cv);
-                    }
-                    catch (Exception e) { 
+                    } catch (Exception e) {
                         System.err.println(e);
                         System.err.println("vertex -> " + parent + ' ' + Arrays.toString(cv));
                     }
-                    
+
                 }
             };
             while (i.hasNext()) i.next();                                  

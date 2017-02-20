@@ -21,11 +21,6 @@ public class AwesomeToggleButton extends JToggleButton {
     }
 
     @Override
-    public void setSelected(boolean b) {
-        super.setSelected(b);
-    }
-
-    @Override
     public void paint(Graphics g) {
         if (isSelected()) {
             setText(String.valueOf(codeSelected));

@@ -6,7 +6,6 @@ import nars.entity.Sentence;
 import nars.entity.Task;
 import nars.entity.TruthValue;
 import nars.gui.util.Video;
-import nars.inference.TruthFunctions;
 import nars.inference.UtilityFunctions;
 import nars.io.Output.OUT;
 
@@ -121,26 +120,22 @@ public class SwingLogText extends SwingText  {
             SwingUtilities.invokeLater(update);
         }
     }
-    
-    public final Runnable update = new Runnable() {
-        
-        //final Rectangle bottom = new Rectangle(0,Integer.MAX_VALUE-1,1,1);        
-        
-        @Override public void run() {
-            
-            while (pendingDisplay.size() > 0) {
-                LogLine l = pendingDisplay.removeFirst();
-                print(l.c, l.o);
-            
-            }
-                        
-            limitBuffer();                        
 
-            /*try {
-                //scrollRectToVisible(bottom);
-            }
-            catch (Exception e) { } */
+    //final Rectangle bottom = new Rectangle(0,Integer.MAX_VALUE-1,1,1);
+    public final Runnable update = () -> {
+
+        while (pendingDisplay.size() > 0) {
+            LogLine l = pendingDisplay.removeFirst();
+            print(l.c, l.o);
+
         }
+
+        limitBuffer();
+
+        /*try {
+            //scrollRectToVisible(bottom);
+        }
+        catch (Exception e) { } */
     };
     
 //    public class TaskIcon extends NCanvas {

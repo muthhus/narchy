@@ -210,7 +210,7 @@ public class DerivationContext {
      */
     public List<Task> doublePremiseTask(final Term newContent, final TruthValue newTruth, final BudgetValue newBudget, boolean temporalInduction, boolean overlapAllowed) {
                 
-        List<Task> ret = new ArrayList<Task>();
+        List<Task> ret = new ArrayList<>();
         if(newContent == null) {
             return null;
         }
@@ -237,7 +237,7 @@ public class DerivationContext {
                     }
                 }
             }
-            catch (CompoundTerm.UnableToCloneException e) {
+            catch (CompoundTerm.UnableToCloneException ignored) {
                 return null;
             }
             
@@ -261,7 +261,7 @@ public class DerivationContext {
                 }
                 
             }
-            catch (CompoundTerm.UnableToCloneException e) {
+            catch (CompoundTerm.UnableToCloneException ignored) {
                 return null;
             }
                 
@@ -416,12 +416,7 @@ public class DerivationContext {
     /** creates a lazy/deferred StampBuilder which only constructs the stamp if getTheNewStamp() is actually invoked */
     public void setTheNewStamp(final Stamp first, final Stamp second, final long time) {
         newStamp = null;
-        newStampBuilder = new StampBuilder() {
-            @Override
-            public Stamp build() {
-                return new Stamp(first, second, time);
-            }
-        };
+        newStampBuilder = () -> new Stamp(first, second, time);
     }
 
     /**

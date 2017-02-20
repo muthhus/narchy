@@ -96,7 +96,7 @@ public class EventEmitter {
         
         try {
         events.get(event).remove(o);
-        } catch(Exception ex) { }
+        } catch(Exception ignored) { }
         /*if (!removed) {
             throw new RuntimeException("EventObserver " + o + " was not registered for events");
         }*/        
@@ -123,7 +123,7 @@ public class EventEmitter {
             try{
             EventObserver m = observers.get(i);
             m.event(eventClass, params);
-            }catch(Exception ex){}
+            }catch(Exception ignored){}
         }
         
     }

@@ -291,7 +291,7 @@ public abstract class BaseClass extends JPanel implements Runnable, KeyListener,
                 d += 0.10000000000000001D;   
             } while(true);   
         }   
-        catch(InterruptedException _ex)   
+        catch(InterruptedException ignored)
         {   
             return;   
         }   
@@ -303,7 +303,7 @@ public abstract class BaseClass extends JPanel implements Runnable, KeyListener,
         {   
             Thread.sleep(i);   
         }   
-        catch(InterruptedException _ex) { }   
+        catch(InterruptedException ignored) { }
     }   
    
     public void start()   

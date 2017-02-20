@@ -31,9 +31,9 @@ public class MathExpression  extends SynchronousFunctionOperator {
 
     final static String requireMessage = "Requires 1 string argument";
     
-    final static Term exp = Term.get("math");
-    
-    
+    final static Term exp = new Term("math");
+
+
     @Override
     protected Term function(Memory memory, Term[] x) {
 
@@ -86,18 +86,28 @@ public class MathExpression  extends SynchronousFunctionOperator {
                 if (p.isVariable()) {
                     long idx = data[0].toIntValue();
                     String varname = p.getOwner().getVariables().getVariableName((int)idx);
-                    return Term.get(varname);
+                    return new Term(varname);
+        /*Term x = atoms.get(name);
+        if (x != null) return x;
+        x = new Term(name);
+        atoms.put(name, x);
+        return x;*/
                 }
-                return Term.get(name);
+                return new Term(name);
+        /*Term x = atoms.get(name);
+        if (x != null) return x;
+        x = new Term(name);
+        atoms.put(name, x);
+        return x;*/
             }
             else
                 return getTerms(data);
         }
                 
         if ((data!=null) && (data.length > 0))
-            return Inheritance.make(new Product(getTerms(children), getTerms(data)), Term.get(name));
+            return Inheritance.make(new Product(getTerms(children), getTerms(data)), new Term(name));
         else
-            return Inheritance.make(getTerms(children), Term.get(name));
+            return Inheritance.make(getTerms(children), new Term(name));
     }
     
     public static Term getTerms(List<TreeNode> children) {
@@ -129,9 +139,19 @@ public class MathExpression  extends SynchronousFunctionOperator {
     }
 
     public static Term getTerm(ExpressionValue t) {        
+        /*Term x = atoms.get(name);
+        if (x != null) return x;
+        x = new Term(name);
+        atoms.put(name, x);
+        return x;*/
+    /*Term x = atoms.get(name);
+    if (x != null) return x;
+    x = new Term(name);
+    atoms.put(name, x);
+    return x;*/
         return Inheritance.make(
-                Term.get(Texts.escape(t.toStringValue())),
-                Term.get(t.getExpressionType().toString()));
+                new Term(Texts.escape(t.toStringValue())),
+                new Term(t.getExpressionType().toString()));
     }
 
 }

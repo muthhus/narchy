@@ -58,7 +58,7 @@ public class MultipleExecutionManager {
         
         this.graph = new GraphExecutive(mem, this);
 
-        this.tasks = new ConcurrentSkipListSet<Execution>() {
+        this.tasks = new ConcurrentSkipListSet<>() {
 
             @Override
             public boolean add(Execution e) {

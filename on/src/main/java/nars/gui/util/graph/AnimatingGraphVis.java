@@ -13,7 +13,7 @@ public class AnimatingGraphVis<V,E> extends AbstractGraphVis<V,E> {
     Graph<V, E> graph;    
 
     public AnimatingGraphVis(Graph<V,E> graph, GraphDisplay<V,E>... displays) {
-        this(graph, new GraphDisplays<V,E>(displays));
+        this(graph, new GraphDisplays<>(displays));
     }
     
     public AnimatingGraphVis(Graph<V,E> graph, GraphDisplay<V,E> display) {

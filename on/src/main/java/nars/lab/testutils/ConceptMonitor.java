@@ -24,7 +24,7 @@ public class ConceptMonitor {
         Task ret;
         try {
             ret = narsese.parseTask(s + Symbols.JUDGMENT_MARK);
-        } catch (Narsese.InvalidInputException ex) {
+        } catch (Narsese.InvalidInputException ignored) {
             return null;
         }
         if(ret == null) {

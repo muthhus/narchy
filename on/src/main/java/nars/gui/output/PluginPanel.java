@@ -50,11 +50,7 @@ public class PluginPanel extends VerticalPanel {
         
         TreeMap<String, JMenu> menus = new TreeMap();
         try {
-            TreeSet<Class> plugins = new TreeSet<>(new Comparator<Class>() {
-                @Override public int compare(Class o1, Class o2) {
-                    return o1.getSimpleName().compareTo(o2.getSimpleName());
-                }                
-            });
+            TreeSet<Class> plugins = new TreeSet<>((o1, o2) -> o1.getSimpleName().compareTo(o2.getSimpleName()));
             plugins.addAll(PackageUtility.getClasses("nars.plugin", false));
             for (Class c : plugins) {
                 if (!Plugin.class.isAssignableFrom(c))
@@ -62,11 +58,7 @@ public class PluginPanel extends VerticalPanel {
                 
                 String[] p = c.getPackage().getName().split("\\.");
                 String category = p[2];
-                JMenu j = menus.get(category);
-                if (j == null) {
-                    j = new JMenu(category);
-                    menus.put(category, j);
-                }
+                JMenu j = menus.computeIfAbsent(category, JMenu::new);
                 JMenuItem x = newAddPluginItem(c);
                 j.add(x);
             }
@@ -97,28 +89,14 @@ public class PluginPanel extends VerticalPanel {
             
             JCheckBox e = new JCheckBox();
             e.setSelected(p.isEnabled());
-            e.addActionListener(new ActionListener() {
-                @Override public void actionPerformed(ActionEvent ae) {
-                    SwingUtilities.invokeLater(new Runnable() {
-                        @Override public void run() {
-                            boolean s = e.isSelected();
-                            p.setEnabled(s);
-                        }                        
-                    });
-                }
-            });
+            e.addActionListener(ae -> SwingUtilities.invokeLater(() -> {
+                boolean s = e.isSelected();
+                p.setEnabled(s);
+            }));
             buttons.add(e);
             
             JButton removeButton = new JButton("X");
-            removeButton.addActionListener(new ActionListener() {
-                @Override public void actionPerformed(ActionEvent ae) {
-                    SwingUtilities.invokeLater(new Runnable() {
-                        @Override public void run() {
-                            removePlugin(plugin);
-                        }                        
-                    });
-                }
-            });
+            removeButton.addActionListener(ae -> SwingUtilities.invokeLater(() -> removePlugin(plugin)));
             
             buttons.add(removeButton);            
             
@@ -154,26 +132,18 @@ public class PluginPanel extends VerticalPanel {
 
     @Override
     public void onShowing(boolean b) {
-        nar.memory.event.set(new EventObserver() {
-            @Override public void event(Class event, Object[] arguments) {
-                if (event == Events.PluginsChange.class)
-                    update();
-            }            
+        nar.memory.event.set((event, arguments) -> {
+            if (event == Events.PluginsChange.class)
+                update();
         }, b, Events.PluginsChange.class);
     }
 
     private JMenuItem newAddPluginItem(Class c) {
         String name = c.getSimpleName();
         JMenuItem j = new JMenuItem(name);
-        j.addActionListener(new ActionListener() {
-            @Override public void actionPerformed(ActionEvent e) {
-                addPlugin(c);
-                SwingUtilities.invokeLater(new Runnable() {
-                    @Override public void run() {
-                        update();
-                    }                    
-                });
-            }            
+        j.addActionListener(e -> {
+            addPlugin(c);
+            SwingUtilities.invokeLater(() -> update());
         });
         return j;
     }

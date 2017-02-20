@@ -87,13 +87,8 @@ public class TicTacToe extends JPanel {
         (nar.param).noiseLevel.set(0);
         
         new NARSwing(nar);    
-        nar.on(FrameEnd.class, new EventObserver() {
-
-            @Override
-            public void event(Class event, Object[] args) {
-               // nar.memory.addSimulationTime(500);
-            }
-            
+        nar.on(FrameEnd.class, (event, args) -> {
+           // nar.memory.addSimulationTime(500);
         });
         nar.start(30);
         
@@ -101,11 +96,7 @@ public class TicTacToe extends JPanel {
 
         JButton resetButton = new JButton("RESET");
         resetButton.setBackground(Color.DARK_GRAY);
-        resetButton.addActionListener(new ActionListener() {
-            @Override public void actionPerformed(ActionEvent e) {
-                reset();
-            }            
-        });        
+        resetButton.addActionListener(e -> reset());
         menu.add(resetButton);
 
         status = new JLabel("");
@@ -113,11 +104,7 @@ public class TicTacToe extends JPanel {
         
         JButton teachButton = new JButton("Look and Hurry!");
         teachButton.setBackground(Color.DARK_GRAY);
-        teachButton.addActionListener(new ActionListener() {
-            @Override public void actionPerformed(ActionEvent e) {
-                teach();
-            }            
-        });
+        teachButton.addActionListener(e -> teach());
         menu.add(teachButton);
         
         add(menu, SOUTH);
@@ -150,14 +137,7 @@ public class TicTacToe extends JPanel {
                 updateField();
             }
 
-            @Override
-            public void onMouse(GridButtonPanel.ConceptButton c, boolean press, boolean hover, int wheel) {
-                //enable NARS to cheat a bit by watching where mouse cursor is
-                /*int i = index(c);                
-                nar.addInput("$0.10$ <" + i + " --> moused>. :|:");*/
-            }
 
-            
             //TODO
             /*
             @Override
@@ -225,7 +205,7 @@ public class TicTacToe extends JPanel {
             try {
                 i = Integer.parseInt( args[0].toString() );
             }
-            catch (Throwable e) {
+            catch (Throwable ignored) {
                 return null;
             }
             
@@ -411,12 +391,7 @@ public class TicTacToe extends JPanel {
         NARSwing.themeInvert();
 
         /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                new NWindow("NARTacToe", new TicTacToe()).show(400,400,true);
-            }
-        });
+        java.awt.EventQueue.invokeLater(() -> new NWindow("NARTacToe", new TicTacToe()).show(400,400,true));
 
     }
 

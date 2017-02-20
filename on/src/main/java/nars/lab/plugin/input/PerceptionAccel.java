@@ -8,7 +8,6 @@ import nars.NAR;
 import nars.config.Parameters;
 import nars.control.DerivationContext;
 import nars.entity.*;
-import nars.inference.BudgetFunctions;
 import nars.inference.TruthFunctions;
 import nars.inference.UtilityFunctions;
 import nars.io.Symbols;
@@ -62,7 +61,7 @@ public class PerceptionAccel implements Plugin, EventEmitter.EventObserver {
             Task newEvent=eventbuffer.get(eventbuffer.size()-1);
             TruthValue truth=newEvent.sentence.truth;
             Stamp st=new Stamp(nal.memory);
-            ArrayList<Long> evBase=new ArrayList<Long>();
+            ArrayList<Long> evBase= new ArrayList<>();
             
             int k=0;
             for(int i=0;i<Len;i++) {

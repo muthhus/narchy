@@ -116,7 +116,7 @@ public class MultiModePanel extends NPanel implements EventObserver {
         
     }
     
-    public class GraphView2 {
+    public static class GraphView2 {
         /*         Window w = new Window("Edit",new JGraphXGraphPanel(nar));
         w.setVisible(true);
         w.pack();
@@ -154,19 +154,14 @@ public class MultiModePanel extends NPanel implements EventObserver {
     }
     
     public void setMode(MultiViewMode mode) {
-        invokeLater(new Runnable() {
+        invokeLater(() -> {
+            if (currentMode!=null)
+                remove((JComponent)currentMode);
 
-            @Override
-            public void run() {
-                if (currentMode!=null)
-                    remove((JComponent)currentMode);
+            currentMode = mode;
 
-                currentMode = mode;
+            add((JComponent)mode, BorderLayout.CENTER);
 
-                add((JComponent)mode, BorderLayout.CENTER);
-                
-            }
-            
         });
     }
     
@@ -177,19 +172,11 @@ public class MultiModePanel extends NPanel implements EventObserver {
         
         JMenuItem log;
         m.add(log = new JMenuItem("Log"));
-        log.addActionListener(new ActionListener() {
-            @Override public void actionPerformed(ActionEvent e) {
-                setMode(new LogView());
-            }            
-        });
+        log.addActionListener(e -> setMode(new LogView()));
 
         JMenuItem conceptNetwork;
         m.add(conceptNetwork = new JMenuItem("Concepts Network"));
-        conceptNetwork.addActionListener(new ActionListener() {
-            @Override public void actionPerformed(ActionEvent e) {
-                setMode(new GraphView());
-            }            
-        });
+        conceptNetwork.addActionListener(e -> setMode(new GraphView()));
         
         
         m.add(new JMenuItem("Concept List"));

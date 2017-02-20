@@ -39,13 +39,13 @@ public class Add extends SynchronousFunctionOperator {
         
         try {
             n1 = Integer.parseInt(String.valueOf(x[0].name()));
-        } catch (NumberFormatException e) {
+        } catch (NumberFormatException ignored) {
             throw new RuntimeException("1st parameter not an integer");
         }
         
         try {
             n2 = Integer.parseInt(String.valueOf(x[1].name()));
-        } catch (NumberFormatException e) {
+        } catch (NumberFormatException ignored) {
             throw new RuntimeException("2nd parameter not an integer");
         }
         
@@ -54,7 +54,12 @@ public class Add extends SynchronousFunctionOperator {
 
     @Override
     protected Term getRange() {
-        return Term.get("added");
+        return new Term("added");
+        /*Term x = atoms.get(name);
+        if (x != null) return x;
+        x = new Term(name);
+        atoms.put(name, x);
+        return x;*/
     }
     
 }
