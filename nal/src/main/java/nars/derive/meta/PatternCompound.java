@@ -53,19 +53,13 @@ abstract public class PatternCompound extends GenericCompound {
 
             this.ellipsis = ellipsis;
 
-
-
         }
 
         abstract protected boolean matchEllipsis(@NotNull Compound y, @NotNull Unify subst);
 
-        protected boolean canMatch(@NotNull Term y) {
-            return op == y.op() && y.hasAll(structureCached);
-        }
-
         @Override
-        public boolean unify(@NotNull Term y, @NotNull Unify subst) {
-            return canMatch(y) && matchEllipsis((Compound)y, subst);
+        public final boolean unify(@NotNull Term y, @NotNull Unify subst) {
+            return op == y.op() && y.hasAll(structureCached) && matchEllipsis((Compound)y, subst);
         }
 
 

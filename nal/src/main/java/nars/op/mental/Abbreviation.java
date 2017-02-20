@@ -336,22 +336,23 @@ public class Abbreviation/*<S extends Term>*/ extends Leak<Compound, BLink<Compo
             super.delete(nar);
         }
 
-//        @Override
-//        public ConceptPolicy policy() {
-//            return abbr.policy();
-//        }
-//        @Override
-//        public void policy(@NotNull ConceptPolicy p, long now, List<Task> removed) {
-//
-//            //abbr.policy(p, now, removed);
-//        }
 
-        /**
-         * equality will have already been tested here, and the parent super.unify() method is just return false. so skip it and just try the abbreviated
-         */
         @Override
         public boolean unify(@NotNull Term y, @NotNull Unify subst) {
-            return /*super.unify(y, subst) || */abbr.term().unify(y, subst);
+
+            Term tt = abbr.term();
+            if (y instanceof AliasConcept) {
+                //try to unify with y's abbreviated
+//                if (tt.unify( ((AliasConcept)y).abbr.term(), subst ))
+//                    return true;
+
+                //if this is constant (no variables) then all it needs is equality test
+                if (tt.equals(((AliasConcept)y).abbr.term()))
+                    return true;
+            }
+
+            //try to unify with 'y'
+            return tt.equals(y); //tt.unify(y, subst);
         }
 
 //        @Override

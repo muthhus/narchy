@@ -389,7 +389,7 @@ public class CompoundConcept<T extends Compound> implements Concept, Termlike {
 
         Activation a;
         if (accepted) {
-            a = nar.activateTask(input, this);
+            a = nar.activateTask(input, this, 1f);
 
             if (delta != null) {
                 //beliefs/goals

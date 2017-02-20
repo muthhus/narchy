@@ -118,7 +118,7 @@ public class BeliefTableChart extends Widget {
         long now = this.now = nar.time();
         float dur = this.dur = nar.time.dur();
 
-        Concept c = nar.concept(term/* lookup by term, not the termed which could be a dead instance */);
+        Concept c = nar.concept(term.term()/* lookup by term, not the termed which could be a dead instance */);
 
         if (c != null) {
             beliefs.set(c.beliefs(), now, dur);

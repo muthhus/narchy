@@ -240,7 +240,7 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
 
 
 
-        content = nar.pre(content);
+        //content = nar.pre(content);
         if (content.volume() > nar.termVolumeMax.intValue())
             return;
 

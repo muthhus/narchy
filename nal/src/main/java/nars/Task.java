@@ -2,6 +2,7 @@ package nars;
 
 import jcog.Texts;
 import jcog.map.SynchronizedHashMap;
+import nars.attention.Activation;
 import nars.bag.impl.ArrayBag;
 import nars.budget.BLink;
 import nars.budget.BudgetMerge;
@@ -201,6 +202,15 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
     @Nullable
     default Concept concept(@NotNull NAR n) {
         return n.concept(term(), true);
+    }
+
+    @Nullable
+    default Activation activate(@NotNull NAR n) {
+        Concept c = n.activate(term(), pri());
+        if (c!=null)
+            return c.process(this, n);
+        else
+            return null;
     }
 
     /**

@@ -13,6 +13,7 @@ import java.util.function.Consumer;
 
 /**
  * acts as a pass-through. only holds permanent concepts and explicit set values
+ * UNTESTED not quite right yet
  */
 public class NullTermIndex extends MapTermIndex {
 

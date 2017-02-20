@@ -236,7 +236,7 @@ abstract public class DerivedTask extends MutableTask {
                 @Nullable Premise premise1 = this.premise;
                 if (premise1 != null) {
 
-                    nar.activate(premise1.concept, boost);
+                    nar.activate(premise1.concept.term(), boost);
 
                     BLink<Term> b = new RawBLink(premise1.term, boost, 0.5f);
 

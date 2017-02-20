@@ -108,7 +108,10 @@ abstract public class PremiseBuilder {
 
                 beliefTerm = (answerTerm = (Compound) answerTerm.unneg());
 
-                Concept answerConcept = nar.concept(answerTerm);
+                Concept answerConcept =
+                        nar.concept(answerTerm);
+                        //nar.activate(answerTerm, taskLink.pri());
+
                 if (answerConcept != null) {
 
                     BeliefTable table = task.isQuest() ? answerConcept.goals() : answerConcept.beliefs();

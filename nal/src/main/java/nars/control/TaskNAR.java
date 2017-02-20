@@ -248,17 +248,17 @@ public class TaskNAR extends NAR {
         }
     }
 
-    @Override
-    protected void processDuplicate(@NotNull Task input, Task existing) {
-        /* n/a */
-        if (existing!=input) {
-            //set the task budget, the link budget will already have been merged prior to this
-            Budget eb = existing.budget();
-            if (!eb.equalsBudget(input.budget()))
-                BudgetMerge.maxBlend.merge(eb, input, 1f);
-        }
-
-    }
+//    @Override
+//    protected void processDuplicate(@NotNull Task input, Task existing) {
+//        /* n/a */
+//        if (existing!=input) {
+//            //set the task budget, the link budget will already have been merged prior to this
+//            Budget eb = existing.budget();
+//            if (!eb.equalsBudget(input.budget()))
+//                BudgetMerge.maxBlend.merge(eb, input, 1f);
+//        }
+//
+//    }
 
     public void derive(BLink<Task> ba, BLink<Task> bb, float minPri) {
 

@@ -44,10 +44,15 @@ public class Arkancide extends NAgents {
 
             return agent;
 
-        }, 30, 5, 50000);
+        }, 30, 5, 6500);
 
 
-        IO.saveTasksToTemporaryTSVFile(nar);
+        nar.forEachActiveConcept(c -> {
+            c.forEachTask(t -> {
+                System.out.println(t);
+            });
+        });
+        //IO.saveTasksToTemporaryTextFile(nar);
 
         //System.out.println(ts.db.getInfo());
 

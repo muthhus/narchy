@@ -105,15 +105,15 @@ abstract public class NAgents extends NAgent {
         nar.forEachTask(x -> {
             System.out.println(x);
             //if (x.isQuestOrQuestion())
-                ///System.out.println(x.proof());
+            ///System.out.println(x.proof());
         });
 
         nar.printConceptStatistics();
         new TaskStatistics().add(nar).print(System.out);
 
-        a.predictors.forEach(p->{
+        a.predictors.forEach(p -> {
             Concept pp = nar.concept(p);
-            if (pp!=null)
+            if (pp != null)
                 pp.print();
         });
     }
@@ -178,10 +178,10 @@ abstract public class NAgents extends NAgent {
         final Executioner exe =
                 //new SingleThreadExecutioner();
                 new MultiThreadExecutioner(threads, 8192 /* TODO chose a power of 2 number to scale proportionally to # of threads */)
-                    //.sync(false)
+                //.sync(false)
                 ;
 
-        int conceptsPerCycle = 256*threads;
+        int conceptsPerCycle = 128 * threads;
 
         final int reprobes = 4;
 
@@ -189,49 +189,52 @@ abstract public class NAgents extends NAgent {
         DefaultConceptBuilder cb = new DefaultConceptBuilder() {
             @Override
             public <X> X withBags(Term t, BiFunction<Bag<Term, BLink<Term>>, Bag<Task, BLink<Task>>, X> f) {
-                Bag<Term, BLink<Term>> termlink = new BLinkHijackBag(reprobes, BudgetMerge.plusBlend, rng );
-                Bag<Task, BLink<Task>> tasklink = new BLinkHijackBag(reprobes, BudgetMerge.plusBlend, rng );
+                Bag<Term, BLink<Term>> termlink = new BLinkHijackBag(reprobes, BudgetMerge.plusBlend, rng);
+                Bag<Task, BLink<Task>> tasklink = new BLinkHijackBag(reprobes, BudgetMerge.plusBlend, rng);
                 return f.apply(termlink, tasklink);
             }
         };
 
-        Default nar = new Default(32 * 1024,
+        Default nar = new Default(64 * 1024,
                 conceptsPerCycle, 1, 3, rng,
 
-                new NullTermIndex(cb)
-                //new CaffeineIndex(cb, 64*1024, false, exe)
+                //new NullTermIndex(cb)
+                new CaffeineIndex(cb, 64*1024, false, exe)
                 //new TreeTermIndex.L1TreeIndex(new DefaultConceptBuilder(), 300000, 32 * 1024, 3)
                 ,
                 time,
                 exe) {
 
-//            final Compressor compressor = new Compressor(this, "_", 2, 5,
-//                    1f, 16, 256);
+            final Compressor compressor = new Compressor(this, "_",
+                    3, 16,
+                    10f, 128, 512);
 
-//            @Override
-//            public Task pre(@NotNull Task t) {
-//                if (!t.isInput() ) {
-//                    return compressor.encode(t);
-//                } else {
-//                    return t; //dont affect input
-//                }
-//            }
+            @Override
+            public Task pre(@NotNull Task t) {
+                if (!t.isInput()) {
+                    return compressor.encode(t);
+                } else {
+                    return t; //dont affect input
+                }
+            }
 
-//            @NotNull
-//            @Override
-//            public Term pre(@NotNull Term t) {
-//                return compressor.encode(t);
-//            }
-//
-//            @NotNull
-//            @Override public Task post(@NotNull Task t) {
-//                return compressor.decode(t);
-//            }
-//
-//            @Override
-//            @NotNull public Term post(@NotNull Term t) {
-//                return compressor.decode(t);
-//            }
+            @NotNull
+            @Override
+            public Term pre(@NotNull Term t) {
+                return compressor.encode(t);
+            }
+
+            @NotNull
+            @Override
+            public Task post(@NotNull Task t) {
+                return compressor.decode(t);
+            }
+
+            @Override
+            @NotNull
+            public Term post(@NotNull Term t) {
+                return compressor.decode(t);
+            }
 
 
         };
@@ -355,7 +358,7 @@ abstract public class NAgents extends NAgent {
 //        }.bag, 16);
 //        a.nar.onCycle(f -> taskChart.update());
 
-        a.nar.runLater(()-> {
+        a.nar.runLater(() -> {
 
             //Vis.conceptsWindow2D(a.nar, Iterables.concat(a.predictors, a.actions, a.sensors) /* a.nar */,64 ,8).show(1000, 800);
             //Vis.conceptsWindow2D(a.nar, 16 ,4).show(1000, 800);
@@ -366,21 +369,21 @@ abstract public class NAgents extends NAgent {
 //                "dsf", () -> grid(new Label("y"), new Label("xy"), new Label("xyzxcv"))
 //            ))), 800, 600);
             window(
-                    new TabPane(new TreeMap<String,Supplier<Surface>>(Map.of(
-                            "agent", ()-> new ReflectionSurface(a),
+                    new TabPane(new TreeMap<String, Supplier<Surface>>(Map.of(
+                            "agent", () -> new ReflectionSurface(a),
                             //"control", () -> new ReflectionSurface(a.nar),
                             "input", () -> grid(a.cam.values().stream().map(cs ->
                                     new CameraSensorView(cs, nar).align(Surface.Align.Center, cs.width, cs.height))
                                     .toArray(Surface[]::new)),
-                            "inputEdit",()->Vis.newInputEditor(a.nar),
+                            "inputEdit", () -> Vis.newInputEditor(a.nar),
 //                            "concepts", ()->
 //                                    Vis.treeChart( a.nar, new Bagregate(a.nar.conceptsActive(), 64, 0.05f) , 64),
-                            "conceptBudget", ()->
+                            "conceptBudget", () ->
                                     Vis.budgetHistogram(nar, 64),
                             //"tasks", ()-> taskChart,
-                            "agentCharts", ()-> Vis.emotionPlots(a.nar, 256),
-                            "agentActions", ()-> Vis.agentActions(a, 400),
-                            "agentPredict", ()-> Vis.beliefCharts(400, a.predictors, a.nar)
+                            "agentCharts", () -> Vis.emotionPlots(a.nar, 256),
+                            "agentActions", () -> Vis.agentActions(a, 400),
+                            "agentPredict", () -> Vis.beliefCharts(400, a.predictors, a.nar)
 
                     ))
 
@@ -393,9 +396,10 @@ abstract public class NAgents extends NAgent {
                     ), 1200, 900);
         });
     }
+
     public static void chart(NAgent a) {
 
-        a.nar.runLater(()-> {
+        a.nar.runLater(() -> {
 
             Vis.conceptsWindow3D(a.nar, 64, 12).show(1000, 800);
 
@@ -475,7 +479,7 @@ abstract public class NAgents extends NAgent {
 
         private final X x;
 
-        public ReflectionSurface(@NotNull X x)  {
+        public ReflectionSurface(@NotNull X x) {
             this.x = x;
 
             List<Surface> l = $.newArrayList();
@@ -483,7 +487,7 @@ abstract public class NAgents extends NAgent {
 
             Class cc = x.getClass();
             for (Field f : cc.getFields()) {
-            //SuperReflect.fields(x, (String k, Class c, SuperReflect v) -> {
+                //SuperReflect.fields(x, (String k, Class c, SuperReflect v) -> {
 
                 try {
                     String k = f.getName();
@@ -491,7 +495,7 @@ abstract public class NAgents extends NAgent {
 
                     if (c == FloatParam.class) {
                         FloatParam p = (FloatParam) f.get(x);
-                        l.add(col(Vis.label(k), new FloatSlider(p) ));
+                        l.add(col(Vis.label(k), new FloatSlider(p)));
                     } else if (c == AtomicBoolean.class) {
                         AtomicBoolean p = (AtomicBoolean) f.get(x);
                         l.add(new CheckBox(k, p));
@@ -499,7 +503,7 @@ abstract public class NAgents extends NAgent {
                     /*else {
                         l.add(new PushButton(k));
                     }*/
-                }catch (Throwable t) {
+                } catch (Throwable t) {
                     t.printStackTrace();
                 }
             }

@@ -189,7 +189,7 @@ public class IO {
         switch (o) {
 
             case ATOM:
-                return new Atom(s);
+                return (Atomic) t.get(new Atom(s), true);
 
             default:
                 int maybeI = Texts.i(s, Integer.MIN_VALUE);

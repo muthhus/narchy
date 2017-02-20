@@ -641,11 +641,11 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
      * if the task was a command, it will return false even if executed
      */
     @Nullable
-    public final Concept input(@NotNull Task input) {
+    public final Concept input(@NotNull Task input0) {
 
-//        Task input = pre(input0);
-//        if (input == null)
-//            return null;
+        Task input = pre(input0);
+        if (input == null)
+            return null;
 
         try {
 
@@ -665,7 +665,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
         }
 
         boolean isCommand = input.isCommand();
-        if (isCommand || (input.isGoal() && input.expectation() >= Param.EXECUTION_THRESHOLD) && ( input.isEternal() || (!input.isEternal() && Math.abs(time()-input.start()) <= time.dur() ) ) ) {
+        if (isCommand || (input.isGoal() && input.expectation() >= Param.EXECUTION_THRESHOLD) && (input.isEternal() || (!input.isEternal() && Math.abs(time() - input.start()) <= time.dur()))) {
 
             Compound inputTerm = input.term();
             if (inputTerm.hasAll(Operator.OPERATOR_BITS) && inputTerm.op() == INH) {
@@ -714,11 +714,11 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
 
         try {
 
-            Concept c = input.concept(this);
-
-            Activation a = process(input, c);
+            Activation a = input.activate(this);
 
             if (a != null) {
+
+                Concept c = a.origin;
 
                 eventTaskProcess.emit(post(input));
 
@@ -728,7 +728,9 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
 
                 return c; //SUCCESSFULLY PROCESSED
 
+
             } else {
+
 
                 return null;
 
@@ -795,51 +797,47 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
             return d;
     }
 
-    protected void processDuplicate(@NotNull Task input, Task existing) {
-        if (existing != input) {
-
-            //different instance
-
-            float reactivation;
-            Budget e = existing.budget();
-            if (!existing.isDeleted()) {
-                float ep = e.priSafe(0);
-                reactivation = Util.unitize((input.priSafe(0) - ep) / ep);
-                if (reactivation > 0) {
-                    DuplicateMerge.merge(e, input, 1f);
-                }
-                input.feedback(null, Float.NaN, Float.NaN, this);
-            } else {
-                //this may never get called due to the replacement above
-                //attempt to revive deleted task
-                e.set(input.budget());
-                reactivation = 1f;
-            }
-
-            input.delete();
-
-            //re-activate only
-            if (reactivation > 0) {
-                Concept c = existing.concept(this);
-                if (c != null) {
-                    activateTask(existing, c, reactivation);
-                }
-            }
-
-        }
-    }
+//    protected void processDuplicate(@NotNull Task input, Task existing) {
+//        if (existing != input) {
+//
+//            //different instance
+//
+//            float reactivation;
+//            Budget e = existing.budget();
+//            if (!existing.isDeleted()) {
+//                float ep = e.priSafe(0);
+//                reactivation = Util.unitize((input.priSafe(0) - ep) / ep);
+//                if (reactivation > 0) {
+//                    DuplicateMerge.merge(e, input, 1f);
+//                }
+//                input.feedback(null, Float.NaN, Float.NaN, this);
+//            } else {
+//                //this may never get called due to the replacement above
+//                //attempt to revive deleted task
+//                e.set(input.budget());
+//                reactivation = 1f;
+//            }
+//
+//            input.delete();
+//
+//            //re-activate only
+//            if (reactivation > 0) {
+//                Concept c = existing.concept(this);
+//                if (c != null) {
+//                    activateTask(existing, c, reactivation);
+//                }
+//            }
+//
+//        }
+//    }
 
     protected Activation process(@NotNull Task t, Concept c) {
         return c.process(t, this);
     }
 
-    public final static ThreadLocal<ObjectFloatHashMap<Termed>> acti = ThreadLocal.withInitial(()->{
+    public final static ThreadLocal<ObjectFloatHashMap<Termed>> acti = ThreadLocal.withInitial(() -> {
         return new ObjectFloatHashMap<>();
     });
-
-    public Activation activateTask(@NotNull Task input, @NotNull Concept c) {
-        return activateTask(input, c, 1f);
-    }
 
     public Activation activateTask(@NotNull Task input, @NotNull Concept c, float scale) {
         //return new DepthFirstActivation(input, this, nar, nar.priorityFactor.floatValue());
@@ -1282,6 +1280,11 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
     }
 
 
+    @Override
+    public final Concept concept(@NotNull Term tt) {
+        return concept(tt, false);
+    }
+
     @Nullable
     public final Concept concept(@NotNull Termed t) {
         return concept(t, false);
@@ -1298,6 +1301,11 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
     }
 
     public final @Nullable Concept concept(@NotNull Term t, boolean createIfMissing) {
+
+        t = concepts.conceptualizable(t);
+        if (t == null)
+            return null;
+
         Concept controlProvided = control.concept(t);
         if (controlProvided != null)
             return controlProvided;
@@ -1402,8 +1410,8 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
         return this == obj;
     }
 
-    public Concept activate(Termed term, float priToAdd) {
-        Concept c = concept(term);
+    public Concept activate(Term term, float priToAdd) {
+        Concept c = concept(term, true);
         if (c != null) {
             activate(c, priToAdd);
         }

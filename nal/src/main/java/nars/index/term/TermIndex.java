@@ -496,13 +496,10 @@ public abstract class TermIndex extends TermBuilder {
 
     /**
      * applies normalization and anonymization to resolve the term of the concept the input term maps t
+     * term should be conceptualizable prior to calling this
      */
     @Nullable
-    public final Concept concept(@NotNull Term possiblyConceptualizable, boolean createIfMissing) {
-
-        Term term = conceptualizable(possiblyConceptualizable);
-        if (term == null)
-            return null;
+    public final Concept concept(@NotNull Term term, boolean createIfMissing) {
 
         @Nullable Termed c = get(term, createIfMissing);
         if (!(c instanceof Concept)) {
@@ -521,7 +518,7 @@ public abstract class TermIndex extends TermBuilder {
     }
 
     @Nullable
-    private Term conceptualizable(@NotNull Term term) {
+    public Term conceptualizable(@NotNull Term term) {
         Term termPre = null;
         while (term instanceof Compound && termPre != term && term != null) {
 //            //shouldnt need to check for this here

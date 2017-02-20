@@ -51,10 +51,16 @@ public class HijackQuestionTable extends TaskHijackBag implements QuestionTable 
         Task inserted = put(t);
         if (inserted!=null) {
             //signal successful insert when inserted item is what is inserted, not a pre-existing duplicate
-            return (inserted == t) ? t : null;
-        } else {
-            return null;
+            if (inserted == t) {
+                return t;
+            } else if (inserted.equals(t)) {
+                //merged budget
+                return inserted;
+            }
         }
+
+        //failed insert
+        return null;
     }
 
     @Override

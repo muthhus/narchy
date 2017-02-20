@@ -7,6 +7,7 @@ import com.github.benmanes.caffeine.cache.RemovalListener;
 import nars.*;
 import nars.budget.BLink;
 import nars.budget.Budget;
+import nars.concept.PermanentConcept;
 import nars.nar.Default;
 import nars.task.MutableTask;
 import nars.term.Compound;
@@ -126,6 +127,10 @@ public class Compressor extends Abbreviation implements RemovalListener<Compound
         abbreviated = decode(abbreviated);
         if (abbreviated.volume() > volume.hi())
             return; //expanded too much
+
+        /** dont abbreviate PermanentConcept's themselves */
+        if (nar.concept(abbreviated) instanceof PermanentConcept)
+            return;
 
         Abbr abb = code.get(abbreviated, (a) -> {
 
