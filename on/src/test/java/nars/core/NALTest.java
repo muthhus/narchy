@@ -110,7 +110,7 @@ public class NALTest  {
         //Result result = org.junit.runner.JUnitCore.runClasses(NALTest.class);
         
         Result result = JUnitCore.runClasses(
-                new ParallelComputer(true, false),
+                new ParallelComputer(true, true),
                 c);
               
         

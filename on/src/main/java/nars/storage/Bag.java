@@ -1,5 +1,6 @@
 package nars.storage;
 
+import jcog.Util;
 import nars.config.Parameters;
 import nars.entity.Item;
 import nars.inference.BudgetFunctions;
@@ -10,10 +11,7 @@ import java.util.Set;
 
 public abstract class Bag<E extends Item<K>,K> implements Iterable<E> {
     
-    public static final int bin(final float x, final int bins) {
-        int i = (int)Math.floor((x + 0.5f/bins) * bins);
-        return i;
-    }
+
 
     public abstract void clear();   
 
@@ -104,22 +102,22 @@ public abstract class Bag<E extends Item<K>,K> implements Iterable<E> {
     public abstract int size();
     
     
-    public void printAll() {
-        Iterator<E> d = iterator();
-        while (d.hasNext()) {
-            System.out.println("  " + d.next() + "\n" );
-        }
-    }
+//    public void printAll() {
+//        Iterator<E> d = iterator();
+//        while (d.hasNext()) {
+//            System.out.println("  " + d.next() + "\n" );
+//        }
+//    }
     
     abstract public Iterable<E> values();
 
     public abstract float getAveragePriority();
 
-    public float getTotalPriority() {
-        int size = size();
-        if (size == 0) return 0;
-        return getAveragePriority() * size();
-    }
+//    public float getTotalPriority() {
+//        int size = size();
+//        if (size == 0) return 0;
+//        return getAveragePriority() * size();
+//    }
 
     /** iterates all items in (approximately) descending priority */
     @Override public abstract Iterator<E> iterator();
@@ -145,29 +143,29 @@ public abstract class Bag<E extends Item<K>,K> implements Iterable<E> {
     }
     
     
-    /** x = takeOut(), then putBack(x)
-     *  @forgetCycles forgetting time in cycles
-     *  @return the variable that was updated, or null if none was taken out
-     */
-    public E processNext(final float forgetCycles, final Memory m) {
-                
-        final E x = takeNext();
-        if (x == null)
-            return null;
-        
-        E r = putBack(x, forgetCycles, m);
-        if (r!=null) {
-            throw new RuntimeException("Bag.processNext should always be able to re-insert item: " + r);
-        }
-        return x;
-    }
+//    /** x = takeOut(), then putBack(x)
+//     *  @forgetCycles forgetting time in cycles
+//     *  @return the variable that was updated, or null if none was taken out
+//     */
+//    public E processNext(final float forgetCycles, final Memory m) {
+//
+//        final E x = takeNext();
+//        if (x == null)
+//            return null;
+//
+//        E r = putBack(x, forgetCycles, m);
+//        if (r!=null) {
+//            throw new RuntimeException("Bag.processNext should always be able to re-insert item: " + r);
+//        }
+//        return x;
+//    }
     
     public double[] getPriorityDistribution(double[] x) {
         int bins = x.length;
         double total = 0;
         for (E e : values()) {
             float p = e.budget.getPriority();
-            int b = bin(p, bins-1);
+            int b = Util.bin(p, bins-1);
             x[b]++;
             total++;
         }

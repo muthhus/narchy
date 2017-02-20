@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import jcog.Util;
 import nars.gui.util.TreeMLData;
 import nars.util.EventEmitter.EventObserver;
 import nars.util.Events;
@@ -85,13 +86,13 @@ public class BagFairness {
 
                 if (nextConceptPriority!=-1) {
                     float p = nextConceptPriority;
-                    int b = Bag.bin(p, bins-1);
+                    int b = Util.bin(p, bins-1);
 
                     fireCount[b]++;                
                 }
 
 
-                int concepts = n.memory.concepts.size();
+                //int concepts = n.memory.concepts.size();
 
                 n.memory.concepts.getPriorityDistribution(d);
                 for (int b = 0; b < bins; b++) {

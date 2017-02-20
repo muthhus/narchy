@@ -42,6 +42,8 @@ import nars.storage.Memory;
 import nars.util.EventEmitter.EventObserver;
 import nars.util.Events;
 import nars.util.Events.CycleEnd;
+import org.eclipse.collections.api.tuple.primitive.LongLongPair;
+import org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples;
 
 import java.util.*;
 
@@ -50,9 +52,13 @@ import java.util.*;
  //*
 public class Anticipate extends Operator implements EventObserver {
 
-    public final Map<Vector2Int,LinkedHashSet<Term>> anticipations = new LinkedHashMap();
+    /*
+    key LongLongPair = (predicted creation,  predicted occurrence)
+     */
+    final Map<LongLongPair,LinkedHashSet<Term>> anticipations = new LinkedHashMap<>();
             
-    final Set<Term> newTasks = new LinkedHashSet();
+    final Set<Term> newTasks = new LinkedHashSet<>();
+
     DerivationContext nal;
  
     final static TruthValue expiredTruth = new TruthValue(0.0f, Parameters.ANTICIPATION_CONFIDENCE);
@@ -68,14 +74,14 @@ public class Anticipate extends Operator implements EventObserver {
         return true;
     }
     
-    class Vector2Int {
-        public long predictionCreationTime; //2014 and this is still the best way to define a data structure that simple?
-        public long predictedOccurenceTime; 
-        public Vector2Int(long predictionCreationTime, long predictedOccurenceTime) { //rest of the crap:
-            this.predictionCreationTime=predictionCreationTime; //when the prediction happened
-            this.predictedOccurenceTime=predictedOccurenceTime; //when the event is expected
-        }
-    }
+//    class Vector2Int {
+//        public long predictionCreationTime; //2014 and this is still the best way to define a data structure that simple?
+//        public long predictedOccurenceTime;
+//        public Vector2Int(long predictionCreationTime, long predictedOccurenceTime) { //rest of the crap:
+//            this.predictionCreationTime=predictionCreationTime; //when the prediction happened
+//            this.predictedOccurenceTime=predictedOccurenceTime; //when the event is expected
+//        }
+//    }
     
     public void updateAnticipations() {
 
@@ -87,13 +93,13 @@ public class Anticipate extends Operator implements EventObserver {
         
         boolean hasNewTasks = !newTasks.isEmpty();
         
-        Iterator<Map.Entry<Vector2Int, LinkedHashSet<Term>>> aei = anticipations.entrySet().iterator();
+        Iterator<Map.Entry<LongLongPair, LinkedHashSet<Term>>> aei = anticipations.entrySet().iterator();
         while (aei.hasNext()) {
             
-            Map.Entry<Vector2Int, LinkedHashSet<Term>> ae = aei.next();
+            Map.Entry<LongLongPair, LinkedHashSet<Term>> ae = aei.next();
             
-            long aTime = ae.getKey().predictedOccurenceTime;
-            long predictionstarted=ae.getKey().predictionCreationTime;
+            long aTime = ae.getKey().getOne();
+            long predictionstarted=ae.getKey().getTwo();
             if(aTime < predictionstarted) { //its about the past..
                 return;
             }
@@ -224,7 +230,7 @@ public class Anticipate extends Operator implements EventObserver {
        }
         
         LinkedHashSet<Term> ae = new LinkedHashSet();
-        anticipations.put(new Vector2Int(memory.time(),occurenceTime), ae);
+        anticipations.put(PrimitiveTuples.pair(memory.time(),occurenceTime), ae);
 
         ae.add(content);
         
