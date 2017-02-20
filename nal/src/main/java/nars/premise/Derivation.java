@@ -6,6 +6,7 @@ import nars.Op;
 import nars.Param;
 import nars.Task;
 import nars.derive.meta.BoolCondition;
+import nars.derive.meta.Conclusion;
 import nars.derive.meta.OccurrenceSolver;
 import nars.derive.meta.constraint.MatchConstraint;
 import nars.op.DepIndepVarIntroduction;
@@ -19,6 +20,8 @@ import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.function.Consumer;
 
 import static nars.Op.NEG;
@@ -32,12 +35,12 @@ import static nars.time.Tense.DTERNAL;
  */
 public class Derivation extends Unify {
 
-
     /**
      * the current premise being evaluated in this context TODO make private again
      */
     @NotNull
     public final Premise premise;
+
     public final float truthResolution;
     public final float quaMin;
     public final float premiseEvidence;
@@ -49,6 +52,7 @@ public class Derivation extends Unify {
     public final long time() {
         return nar.time();
     }
+
 
     public static final class TruthPuncEvidence {
         public final Truth truth;
@@ -124,16 +128,14 @@ public class Derivation extends Unify {
     /**
      * whether the premise involves temporality that must be calculated upon derivation
      */
-    public final boolean temporal;
     @Nullable
     private long[] evidenceDouble, evidenceSingle;
 
-    @Nullable
-    public final Consumer<DerivedTask> target;
+
     public final boolean cyclic;
 
 
-    public Derivation(@NotNull NAR nar, @NotNull Premise p, @NotNull Consumer<DerivedTask> c) {
+    public Derivation(@NotNull NAR nar, @NotNull Premise p) {
         super(nar.concepts, VAR_PATTERN, nar.random, Param.UnificationStackMax, Param.UnificationTermutesMax);
 
         this.nar = nar;
@@ -204,9 +206,6 @@ public class Derivation extends Unify {
         this.termSub1op = bOp.ordinal();
         this.termSub1opBit = bOp.bit;
 
-        this.temporal = temporal(task, belief);
-
-        this.target = c;
 
         float premiseEvidence = task.isBeliefOrGoal() ? task.evi() : 0;
         if (belief!=null)
@@ -286,37 +285,6 @@ public class Derivation extends Unify {
     }
 
 
-
-
-    private static boolean temporal(@NotNull Task task, @Nullable Task belief) {
-        if (!task.isEternal() || task.dt() != DTERNAL)
-            return true;
-
-        return belief != null && (!belief.isEternal() || belief.dt() != DTERNAL);
-    }
-
-
-
-
-
-    public final long occurrenceTarget(@NotNull OccurrenceSolver s) {
-        long tOcc = task.start();
-        Task b = belief;
-        if (b == null) {
-            return tOcc;
-        } else {
-            long bOcc = b.start();
-            return s.compute(tOcc, bOcc);
-
-//            //if (bOcc == ETERNAL) {
-//            return (tOcc != ETERNAL) ?
-//                        whenBothNonEternal.compute(tOcc, bOcc) :
-//                        ((bOcc != ETERNAL) ?
-//                            bOcc :
-//                            ETERNAL
-//            );
-        }
-    }
 
 
 //    /** specific minimum confidence function for advanced filtering heuristics TODO */

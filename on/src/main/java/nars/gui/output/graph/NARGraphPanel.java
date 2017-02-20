@@ -51,8 +51,13 @@ public class NARGraphPanel extends NPanel {
         menu.add(visControl);
         menu.add(canvasControl);
         menu.add(layoutControl);
-        
-        add((Component) canvas.getSurface().getNative(), BorderLayout.CENTER);
+
+        Component cmp = canvas.component();
+        cmp.setPreferredSize(new Dimension(500, 500));
+        cmp.setSize(new Dimension(500, 500));
+        cmp.setVisible(true);
+
+        add(cmp, BorderLayout.CENTER);
         add(menu, BorderLayout.NORTH);
         
     }

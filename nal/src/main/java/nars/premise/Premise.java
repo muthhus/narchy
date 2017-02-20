@@ -7,6 +7,8 @@ package nars.premise;
 import nars.Task;
 import nars.budget.Budget;
 import nars.budget.RawBudget;
+import nars.derive.meta.Conclusion;
+import nars.derive.meta.OccurrenceSolver;
 import nars.task.Tasked;
 import nars.term.Compound;
 import nars.term.Term;
@@ -15,6 +17,12 @@ import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.HashSet;
+import java.util.Set;
+import java.util.function.Consumer;
+
+import static nars.time.Tense.DTERNAL;
+
 /**
  * Defines the conditions used in an instance of a derivation
  * Contains the information necessary for generating derivation Tasks via reasoning rules.
@@ -22,7 +30,7 @@ import org.jetbrains.annotations.Nullable;
  * It is meant to be disposable and should not be kept referenced longer than necessary
  * to avoid GC loops, so it may need to be weakly referenced.
  */
-public abstract class Premise extends RawBudget implements Tasked {
+public abstract class Premise extends RawBudget implements Tasked, Consumer<Conclusion> {
 
     //private static final Logger logger = LoggerFactory.getLogger(Premise.class);
 
@@ -37,6 +45,14 @@ public abstract class Premise extends RawBudget implements Tasked {
 
     @NotNull
     public final Termed concept;
+
+    public transient final boolean temporal;
+
+
+    public final Set<Conclusion> conclusions = new HashSet<>();
+
+
+
 
     protected Premise(@NotNull Termed concept, @NotNull Task taskLink,
                    @NotNull Term termLink,
@@ -55,9 +71,44 @@ public abstract class Premise extends RawBudget implements Tasked {
 
         //this.conceptLink = conceptLink;
 
-
+        this.temporal = temporal(task, belief);
     }
 
+    @Override
+    public void accept(Conclusion conclusion) {
+        if (conclusions.add(conclusion)) {
+
+        } else {
+            System.out.println("duplicate: " + conclusion);
+        }
+    }
+
+
+    private static boolean temporal(@NotNull Task task, @Nullable Task belief) {
+        if (!task.isEternal() || task.dt() != DTERNAL)
+            return true;
+
+        return belief != null && (!belief.isEternal() || belief.dt() != DTERNAL);
+    }
+
+    public final long occurrenceTarget(@NotNull OccurrenceSolver s) {
+        long tOcc = task.start();
+        Task b = belief;
+        if (b == null) {
+            return tOcc;
+        } else {
+            long bOcc = b.start();
+            return s.compute(tOcc, bOcc);
+
+//            //if (bOcc == ETERNAL) {
+//            return (tOcc != ETERNAL) ?
+//                        whenBothNonEternal.compute(tOcc, bOcc) :
+//                        ((bOcc != ETERNAL) ?
+//                            bOcc :
+//                            ETERNAL
+//            );
+        }
+    }
 
 
 //    @Nullable
@@ -180,4 +231,9 @@ public abstract class Premise extends RawBudget implements Tasked {
     }
 
     @Nullable abstract public Budget budget(@NotNull Compound conclusion, @Nullable Truth truth, @NotNull Derivation conclude);
+
+    public Term taskTerm() {
+        return task.term();
+    }
+
 }

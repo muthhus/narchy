@@ -16,7 +16,9 @@ public class Video {
     public static Font monofont;
  
 
-        static {
+    static {
+        System.setProperty("java.version", "1.8.666"); //so processing 3 works on jdk9
+
         System.setProperty("sun.java2d.opengl","True");        
     }
 

@@ -281,13 +281,12 @@ public class TaskNAR extends NAR {
 
         if (c != null) {
 
-            deriver.accept(new Derivation(this, c,
+            deriver.accept(new Derivation(this, c
                     //                t -> {
                     //                    //if (t.pri() > a.pri() || t.pri() > b.pri())
                     //                        logger.info("{} {}\n\t{}", a, b, t);
                     //                    input(t);
                     //                }
-                    this::input
             ));
         }
 

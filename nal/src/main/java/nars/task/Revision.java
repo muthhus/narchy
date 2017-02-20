@@ -3,6 +3,7 @@ package nars.task;
 import jcog.Util;
 import jcog.data.random.XorShift128PlusRandom;
 import nars.$;
+import nars.NAR;
 import nars.Task;
 import nars.premise.Derivation;
 import nars.term.Compound;
@@ -238,7 +239,7 @@ public class Revision {
 
 
     @NotNull
-    public static Task chooseByConf(@NotNull Task t, @Nullable Task b, @NotNull Derivation p) {
+    public static Task chooseByConf(@NotNull Task t, @Nullable Task b, Random rng) {
 
         if ((b == null) || !b.isBeliefOrGoal())
             return t;
@@ -247,7 +248,7 @@ public class Revision {
         float bw = b.evi();
 
         //randomize choice by confidence
-        return p.random.nextFloat() < tw/(tw+bw) ? t : b;
+        return rng.nextFloat() < tw/(tw+bw) ? t : b;
 
     }
 

@@ -9,11 +9,15 @@ import nars.gui.util.Vis;
 import processing.core.PApplet;
 import processing.event.MouseEvent;
 
+import java.awt.*;
+import java.awt.event.HierarchyEvent;
+import java.awt.event.HierarchyListener;
+
 /**
  *
  * @author me
  */
-public class PCanvas extends PApplet /* implements HierarchyListener*/ {
+public class PCanvas extends PApplet implements HierarchyListener /* implements HierarchyListener*/ {
 
     int mouseScroll;
 
@@ -52,7 +56,12 @@ public class PCanvas extends PApplet /* implements HierarchyListener*/ {
     public PCanvas(Vis vis, int frameRate) {
         super();
         this.FrameRate = frameRate;
+
+        initSurface();
+        startSurface();
+
         //init();
+
         if ((vis == null) && (this instanceof Vis)) {
             //for subclasses:
             vis = (Vis)this;
@@ -167,6 +176,8 @@ public class PCanvas extends PApplet /* implements HierarchyListener*/ {
     @Override
     public void setup() {
 
+        component().addHierarchyListener(this);
+
         //size(500,500,P3D);
         frameRate(FrameRate);
 
@@ -190,15 +201,18 @@ public class PCanvas extends PApplet /* implements HierarchyListener*/ {
 //        removeHierarchyListener(this);
 //        super.removeNotify();
 //    }
-//
-//    @Override
-//    public void hierarchyChanged(HierarchyEvent e) {
-//        if ((e.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED) != 0) {
-//            boolean showing = isShowing();
-//            onShowing(showing);
-//
-//        }
-//    }
+
+    public Component component() {
+        return (Component) getSurface().getNative();
+    }
+    @Override
+    public void hierarchyChanged(HierarchyEvent e) {
+        if ((e.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED) != 0) {
+            boolean showing = component().isShowing();
+            onShowing(showing);
+
+        }
+    }
 
     
     protected void onShowing(boolean showing) {

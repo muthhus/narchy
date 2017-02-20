@@ -10,15 +10,15 @@ import nars.Task;
 import nars.budget.BLink;
 import nars.concept.Concept;
 import nars.derive.Deriver;
-import nars.task.DerivedTask;
 import nars.term.Term;
 import nars.term.Termed;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
-import java.util.function.Consumer;
 
 /**
  * constructs premises from a virtual matrix of tasks (row x column)
@@ -38,16 +38,15 @@ public class MatrixPremiseBuilder extends PremiseBuilder {
     }
 
 
-    public int newPremiseMatrix(@NotNull Concept c,
-                                @NotNull NAR nar,
-                                int tasklinks, MutableIntRange termlinks,
-                                @NotNull Consumer<DerivedTask> target,
-                                @NotNull Deriver deriver) {
+    public List<Premise> newPremiseMatrix(@NotNull Concept c,
+                                          @NotNull NAR nar,
+                                          int tasklinks, MutableIntRange termlinks,
+                                          @NotNull Deriver deriver) {
 
-        return newPremiseMatrix(c, tasklinks, termlinks, c.tasklinks(), c.termlinks(), deriver, target, nar);
+        return newPremiseMatrix(c, tasklinks, termlinks, c.tasklinks(), c.termlinks(), deriver, nar);
     }
 
-    public int newPremiseMatrix(@NotNull Concept c, int tasklinks, MutableIntRange termlinks, @NotNull Bag<Task,BLink<Task>> tasklinkBag, @NotNull Bag<Term,BLink<Term>> termlinkBag, @NotNull Deriver deriver, @NotNull Consumer<DerivedTask> target, @NotNull NAR nar) {
+    public List<Premise> newPremiseMatrix(@NotNull Concept c, int tasklinks, MutableIntRange termlinks, @NotNull Bag<Task, BLink<Task>> tasklinkBag, @NotNull Bag<Term, BLink<Term>> termlinkBag, @NotNull Deriver deriver, @NotNull NAR nar) {
 
         c.commit();
 
@@ -58,20 +57,19 @@ public class MatrixPremiseBuilder extends PremiseBuilder {
 
         int tasksBufferSize = tasksBuffer.size();
         if (tasksBufferSize > 0) {
-            return newPremiseMatrix(c, termlinks, target, deriver, termlinkBag, tasksBuffer, nar);
+            return newPremiseMatrix(c, termlinks, deriver, termlinkBag, tasksBuffer, nar);
         } else {
             if (Param.DEBUG_EXTRA)
                 logger.warn("{} has zero tasklinks", c);
-            return 0;
+            return Collections.emptyList();
         }
     }
 
     /**
      * derives matrix of: concept => (tasklink x termlink) => premises
      */
-    public int newPremiseMatrix(@NotNull Concept c, MutableIntRange termlinks, @NotNull Consumer<DerivedTask> target, @NotNull Deriver deriver, @NotNull Bag<Term,BLink<Term>> termlinkBag, List<BLink<Task>> taskLinks, @NotNull NAR nar) {
+    public List<Premise> newPremiseMatrix(@NotNull Concept c, MutableIntRange termlinks, @NotNull Deriver deriver, @NotNull Bag<Term, BLink<Term>> termlinkBag, List<BLink<Task>> taskLinks, @NotNull NAR nar) {
 
-        int count = 0;
 
         int numTaskLinks = taskLinks.size();
         int termlinksSampled = (int) Math.ceil(termlinks.hi());
@@ -87,6 +85,8 @@ public class MatrixPremiseBuilder extends PremiseBuilder {
         priFactor = 1f;
 
 
+
+        List<Premise> l = $.newArrayList();
 
         int termsBufferSize = termsBuffer.size();
         if (termsBufferSize > 0) {
@@ -115,7 +115,8 @@ public class MatrixPremiseBuilder extends PremiseBuilder {
 
                     Premise p = premise(c, task, termsBuffer.get(jl % termsBufferSize).get(), now, nar, priFactor, -1f);
                     if (p != null) {
-                        deriver.accept(new Derivation(nar, p, target));
+                        deriver.accept(new Derivation(nar, p));
+                        l.add(p);
                         countPerTermlink++;
                     }
 
@@ -125,7 +126,7 @@ public class MatrixPremiseBuilder extends PremiseBuilder {
 
             }
 
-            count += countPerTasklink;
+
 
         } else {
             if (Param.DEBUG_EXTRA)
@@ -133,7 +134,7 @@ public class MatrixPremiseBuilder extends PremiseBuilder {
         }
 
 
-        return count;
+        return l;
     }
 
 }

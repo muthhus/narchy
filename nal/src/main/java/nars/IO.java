@@ -13,6 +13,7 @@ import nars.term.Termed;
 import nars.term.Terms;
 import nars.term.atom.Atom;
 import nars.term.atom.Atomic;
+import nars.term.compound.SerialCompound;
 import nars.term.container.TermContainer;
 import nars.term.var.AbstractVariable;
 import nars.term.var.GenericVariable;
@@ -239,6 +240,13 @@ public class IO {
 
     public static void writeTerm(@NotNull DataOutput out, @NotNull Term term) throws IOException {
 
+
+        if (term instanceof SerialCompound) {
+            //it's already serialized in a SerialCompound
+            ((SerialCompound)term).appendTo(out);
+            return;
+        }
+
         //HACK this should not be necessary
         if (isSpecial(term)) {
             out.writeByte(SPECIAL_OP);
@@ -267,11 +275,15 @@ public class IO {
                 writeTerm(out, c.term(i));
             }
 
-            if (o.image)
-                out.writeByte((byte) ((Compound) term).dt());
-            else if (o.temporal)
-                out.writeInt(((Compound) term).dt());
+            writeCompoundSuffix(out, ((Compound)term).dt(), o);
         }
+    }
+
+    public static void writeCompoundSuffix(@NotNull DataOutput out, int dt, Op o) throws IOException {
+        if (o.image)
+            out.writeByte((byte) dt);
+        else if (o.temporal)
+            out.writeInt(dt);
     }
 
 

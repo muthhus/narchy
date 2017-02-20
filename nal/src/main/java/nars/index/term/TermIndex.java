@@ -11,6 +11,7 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.Terms;
+import nars.term.compound.SerialCompound;
 import nars.term.container.TermContainer;
 import nars.term.subst.MapSubst;
 import nars.term.subst.Subst;
@@ -141,8 +142,7 @@ public abstract class TermIndex extends TermBuilder {
      * returns the resolved term according to the substitution
      */
     @Nullable
-    public Term transform(@NotNull Term src, @NotNull Subst f) {
-
+    public static Term transform(@NotNull Term src, @NotNull Subst f) {
 
         Term y = f.xy(src);
         if (y != null)
@@ -160,6 +160,10 @@ public abstract class TermIndex extends TermBuilder {
                 return null; //unassigned pattern variable
         }
 
+        return transform((Compound)src, f);
+    }
+
+    public static @Nullable Term transform(@NotNull Compound src, @NotNull Subst f) {
 
         //no variables that could be substituted, so return this constant
         if (f instanceof Derivation && src.vars() + src.varPattern() == 0) //shortcut for premise evaluation matching
@@ -171,18 +175,19 @@ public abstract class TermIndex extends TermBuilder {
         boolean strict = f instanceof Derivation;
 
         boolean changed = false;
-        Compound crc = (Compound) src;
-        Op cop = crc.op();
+
+        Op op = src.op();
 
         //early prefilter for True/False subterms
-        boolean filterTrueFalse = !(cop.statement || cop == CONJ);
+        boolean filterTrueFalse = !(op.statement || op == CONJ);
+
 
         //use COMPOUND_VOLUME_MAX instead of trying for the nar's to provide construction head-room that can allow terms
         //to reduce and potentially meet the requirement
         int volLimit = Param.COMPOUND_VOLUME_MAX - 1; /* -1 for the wrapping compound contribution of +1 volume if succesful */
         int volSum = 0, volAt = 0, subAt = 0;
         for (int i = 0; i < len; i++) {
-            Term t = crc.term(i);
+            Term t = ((Compound) src).term(i);
             Term u = transform(t, f);
 
 
@@ -234,10 +239,12 @@ public abstract class TermIndex extends TermBuilder {
 
         Term transformed;
         int ss = sub.size();
-        if (!changed || (ss == len && crc.equalTerms(sub)))
-            transformed = crc;
+        if (!changed || (ss == len && ((Compound) src).equalTerms(sub)))
+            transformed = (Compound) src;
         else {
-            transformed = the(cop, crc.dt(), sub.toArray(new Term[ss]));
+            transformed =
+                    //the(cop, crc.dt(), sub.toArray(new Term[ss]));
+                    new SerialCompound(op, src.dt(), sub.toArray(new Term[ss]));
         }
 
 //        //cache the result

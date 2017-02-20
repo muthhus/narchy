@@ -47,6 +47,7 @@ public abstract class VarIntroduction {
                     int replacements = dd.length;
                     if (replacements > 0) {
 
+
                         Term d = dd[rng.nextInt(replacements)]; //choose one randomly
                         //for (Term d : dd) {
                         Term newContent = $.terms.replace(c, s, d);
@@ -55,7 +56,10 @@ public abstract class VarIntroduction {
                             each.accept((Compound) newContent);
                             if (--max <= 0)
                                 return;
-                        }
+                        } /*else {
+                            if (dd.length > 1)
+                                System.out.println("could another?");
+                        }*/
                     }
                 }
             }

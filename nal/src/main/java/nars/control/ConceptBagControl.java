@@ -8,19 +8,20 @@ import jcog.data.MutableIntRange;
 import jcog.data.MutableInteger;
 import jcog.data.Range;
 import jcog.meter.event.HitMissMeter;
-import nars.$;
-import nars.Control;
-import nars.NAR;
-import nars.Param;
+import nars.*;
 import nars.concept.Concept;
 import nars.conceptualize.ConceptBuilder;
 import nars.derive.Deriver;
+import nars.derive.meta.Conclusion;
 import nars.premise.MatrixPremiseBuilder;
+import nars.premise.Premise;
 import nars.task.DerivedTask;
 import nars.term.Termed;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
@@ -138,11 +139,8 @@ public class ConceptBagControl implements Control, Consumer<DerivedTask> {
                             int _tasklinks = tasklinksFiredPerFiredConcept.intValue();
 
                             for (int i = 0, toFireSize = toFire.size(); i < toFireSize; i++) {
-                                premiser.newPremiseMatrix(toFire.get(i).get(), this.nar,
-                                        _tasklinks, termlinksFiredPerFiredConcept,
-                                        this, //input them within the current thread here
-                                        deriver
-                                );
+                                Concept fired = toFire.get(i).get();
+                                fire(fired, deriver, _tasklinks);
                             }
                         });
 
@@ -156,6 +154,38 @@ public class ConceptBagControl implements Control, Consumer<DerivedTask> {
         });
         nar.onReset((n)->active.clear());
 
+    }
+
+    void fire(Concept fired, @NotNull Deriver deriver, int taskLinks) {
+        List<Premise> derived = premiser.newPremiseMatrix(fired, this.nar,
+                taskLinks, termlinksFiredPerFiredConcept,
+                //input them within the current thread here
+                deriver
+        );
+
+        //post-processing
+        if (!derived.isEmpty()) {
+
+            //TODO use a merging map or bag
+            Set<Task> r = new HashSet();
+
+            derived.forEach(p -> p.conclusions.forEach(c -> {
+                DerivedTask t = c.derive(p, nar);
+                if (t!=null) {
+                    if (r.add(t)) {
+                        //unique
+                    } else {
+                        System.out.println("duplicate: " + t + " in " + p + " for " + fired);
+                    }
+                }
+
+            }));
+
+            if (!r.isEmpty()) {
+                nar.inputLater(r);
+            }
+
+        }
     }
 
     @Override

@@ -117,7 +117,8 @@ public class PremiseRule extends GenericCompound {
     @Nullable
     MatchTaskBelief match;
 
-    private @Nullable TimeFunctions timeFunction = TimeFunctions.Auto;
+    //TODO make final
+    public @Nullable TimeFunctions time = TimeFunctions.Auto;
 
 
     @Nullable
@@ -197,7 +198,7 @@ public class PremiseRule extends GenericCompound {
     public List<Term> conditions(@NotNull PostCondition post) {
 
         Set<Term> s = newHashSet(2); //for ensuring uniqueness / no duplicates
-        Solve truth = solve(post, this, anticipate, eternalize, timeFunction);
+        Solve truth = solve(post, this, anticipate, eternalize, time);
 
         //PREFIX
         {
@@ -684,7 +685,7 @@ public class PremiseRule extends GenericCompound {
 //                            timeFunction = TimeFunctions.dtBeliefEnd;
 //                            break;
                         case "dtBeliefExact":
-                            timeFunction = TimeFunctions.dtBeliefExact;
+                            time = TimeFunctions.dtBeliefExact;
                             break;
 
 //                        case "dtTask":
@@ -694,11 +695,11 @@ public class PremiseRule extends GenericCompound {
 //                            timeFunction = TimeFunctions.dtTaskEnd;
 //                            break;
                         case "dtTaskExact":
-                            timeFunction = TimeFunctions.dtTaskExact;
+                            time = TimeFunctions.dtTaskExact;
                             break;
 
                         case "decomposeTask":
-                            timeFunction = TimeFunctions.decomposeTask;
+                            time = TimeFunctions.decomposeTask;
                             break;
 //                        case "decomposeTaskIfTemporal":
 //                            pres.add(events.taskNotDTernal);
@@ -706,10 +707,10 @@ public class PremiseRule extends GenericCompound {
 //                            break;
 
                         case "decomposeTaskSubset":
-                            timeFunction = TimeFunctions.decomposeTaskSubset;
+                            time = TimeFunctions.decomposeTaskSubset;
                             break;
                         case "decomposeTaskComponents":
-                            timeFunction = TimeFunctions.decomposeTaskComponents;
+                            time = TimeFunctions.decomposeTaskComponents;
                             break;
 
                         case "beliefDTSimultaneous":
@@ -726,11 +727,11 @@ public class PremiseRule extends GenericCompound {
 //                            pres.add(IfTermLinkBefore.ifBeliefBefore);
 //                            break;
 
-                        case "decomposeBelief": timeFunction = TimeFunctions.decomposeBelief; break;
+                        case "decomposeBelief": time = TimeFunctions.decomposeBelief; break;
 
-                        case "dtCombine":     timeFunction = TimeFunctions.dtCombine;  break;
-                        case "dtCombinePre":  timeFunction = TimeFunctions.dtCombinePre; break;
-                        case "dtCombinePost": timeFunction = TimeFunctions.dtCombinePost; break;
+                        case "dtCombine":     time = TimeFunctions.dtCombine;  break;
+                        case "dtCombinePre":  time = TimeFunctions.dtCombinePre; break;
+                        case "dtCombinePost": time = TimeFunctions.dtCombinePost; break;
 
 //                        case "dtForward":
 //                            timeFunction = TimeFunctions.occForward;
@@ -738,11 +739,11 @@ public class PremiseRule extends GenericCompound {
 //                            break;
 
                         case "dtAfter":
-                            timeFunction = TimeFunctions.occForward;
+                            time = TimeFunctions.occForward;
                             pres.add(events.after);
                             break;
                         case "dtAfterReverse":
-                            timeFunction = TimeFunctions.occReverse;
+                            time = TimeFunctions.occReverse;
                             pres.add(events.after);
                             break;
 
@@ -759,28 +760,28 @@ public class PremiseRule extends GenericCompound {
 
 
                         case "dtAfterOrEternal":
-                            timeFunction = TimeFunctions.occForward;
+                            time = TimeFunctions.occForward;
                             pres.add(events.afterOrEternal);
                             break;
                         case "dtAfterOrEternalReverse":
-                            timeFunction = TimeFunctions.occReverse;
+                            time = TimeFunctions.occReverse;
                             pres.add(events.afterOrEternal);
                             break;
 
                         case "dtTminB":
-                            timeFunction = TimeFunctions.dtTminB;
+                            time = TimeFunctions.dtTminB;
                             break;
                         case "dtBminT":
-                            timeFunction = TimeFunctions.dtBminT;
+                            time = TimeFunctions.dtBminT;
                             break;
 //                        case "dtIntersect":
 //                            timeFunction = TimeFunctions.dtIntersect;
 //                            break;
                         case "dtUnion":
-                            timeFunction = TimeFunctions.dtUnion;
+                            time = TimeFunctions.dtUnion;
                             break;
                         case "dtUnionReverse":
-                            timeFunction = TimeFunctions.dtUnionReverse;
+                            time = TimeFunctions.dtUnionReverse;
                             break;
 //                        case "occMerge":
 //                            timeFunction = TimeFunctions.occMerge;
