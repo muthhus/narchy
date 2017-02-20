@@ -8,10 +8,8 @@ import jcog.data.MutableIntRange;
 import jcog.data.MutableInteger;
 import jcog.data.Range;
 import jcog.meter.event.HitMissMeter;
-import nars.$;
-import nars.Control;
-import nars.NAR;
-import nars.Param;
+import nars.*;
+import nars.budget.BudgetMerge;
 import nars.concept.Concept;
 import nars.conceptualize.ConceptBuilder;
 import nars.derive.Deriver;
@@ -20,7 +18,10 @@ import nars.task.DerivedTask;
 import nars.term.Termed;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
@@ -74,7 +75,7 @@ public class ConceptBagControl implements Control, Consumer<DerivedTask> {
 
     final AtomicBoolean busy = new AtomicBoolean(false);
 
-    public final HitMissMeter meter = new HitMissMeter(ConceptBagControl.class.getSimpleName());
+    //public final HitMissMeter meter = new HitMissMeter(ConceptBagControl.class.getSimpleName());
 
     public final FloatParam activationRate = new FloatParam(1f);
     private float currentActivationRate = 1f;
@@ -106,6 +107,8 @@ public class ConceptBagControl implements Control, Consumer<DerivedTask> {
         //nar.onFrame(this);
         nar.onCycle((n) -> {
             if (busy.compareAndSet(false, true)) {
+
+                commit();
 
                 //updae concept bag
                 currentActivationRate = activationRate.floatValue()
@@ -144,6 +147,7 @@ public class ConceptBagControl implements Control, Consumer<DerivedTask> {
                                         deriver
                                 );
                             }
+
                         });
 
 
@@ -158,13 +162,34 @@ public class ConceptBagControl implements Control, Consumer<DerivedTask> {
 
     }
 
+    final Map<Task, Task> pending = new ConcurrentHashMap();
+    //int _merges = 0;
+
+
     @Override
     public void accept(DerivedTask d) {
-        if (nar.input(d)!=null) {
-            meter.hit();
-        } else {
-            meter.miss();
+        pending.merge(d, d, (o, n) -> {
+            BudgetMerge.maxBlend.apply(o.budget(), n, 1f);
+            //_merges++;
+            return o;
+        });
+
+//        if (nar.input(d)!=null) {
+//            meter.hit();
+//        } else {
+//            meter.miss();
+//        }
+    }
+
+    protected void commit() {
+        //synchronized (pending) {
+        if (!pending.isEmpty()) {
+            //System.out.println(pending.size() + " unique new tasks, " + _merges + " merges");
+            nar.inputLater(pending.values());
+            pending.clear();
+            //_merges = 0;
         }
+        //}
     }
 
 //    /** called when a concept is displaced from the concept bag */

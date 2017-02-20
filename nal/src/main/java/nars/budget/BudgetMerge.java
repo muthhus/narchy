@@ -34,7 +34,7 @@ public interface BudgetMerge extends BiFunction<Budget, Budget, Budget> {
     }
 
     @Nullable
-    default Budget apply(@NotNull Budget target, @NotNull Budget incoming, float scale) {
+    default Budget apply(@NotNull Budget target, @NotNull Budgeted incoming, float scale) {
         merge(target, incoming, scale);
         return target;
     }
