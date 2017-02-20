@@ -113,6 +113,8 @@ public class Conclusion  {
 //                throw new NAR.InvalidTaskException(content, "temporalization resulted in suspicious occurrence time");
 //            }
 
+             content = temporalized;
+
 //            if (temporalized != content) {
 //                ((content = temporalized)).setNormalized();
 //            }

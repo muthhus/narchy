@@ -113,18 +113,17 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
                     Truth truth = ct.truth;
 
 
+                    Op o = term.op();
+                    if (o == NEG) {
+                        term = compoundOrNull(term.unneg());
+                        if (term == null)
+                            throw new InvalidTaskException(term, "unneg resulted in null compound");
 
-                        Op o = term.op();
-                        if (o == NEG) {
-                            term = compoundOrNull(term.unneg());
-                            if (term == null)
-                                throw new RuntimeException("unneg resulted in null compound");
+                        if (truth != null)
+                            truth = truth.negated();
+                    }
 
-                            if (truth != null)
-                                truth = truth.negated();
-                        }
-
-                        m.premise.accept(new Conclusion(term, ct.punc, truth, m, ct.evidence, rule));
+                    m.premise.accept(new Conclusion(term, ct.punc, truth, m, ct.evidence, rule));
 
                 }
             } catch (@NotNull InvalidTermException | InvalidTaskException e) {
@@ -143,7 +142,6 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
             return m.xy.get(conclusionPattern); //single variable, just lookup
         }
     }
-
 
 
 //    public static class RuleFeedbackDerivedTask extends DerivedTask.DefaultDerivedTask {
