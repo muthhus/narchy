@@ -68,7 +68,7 @@ public class BitmapPanel extends JComponent {
      *
      * @return the resized image
      */
-    private BufferedImage resize(BufferedImage img, int newW, int newH) {
+    private static BufferedImage resize(BufferedImage img, int newW, int newH) {
         int w = img.getWidth();
         int h = img.getHeight();
         BufferedImage dimg = new BufferedImage(newW, newH, 1);

@@ -116,7 +116,7 @@ public abstract class OutputCondition<O> extends Output {
     
     @Override
     public String toString() {
-        return getClass().getSimpleName() + " " + (succeeded ? "OK: " + getTrueReasons() : getFalseReason());
+        return getClass().getSimpleName() + ' ' + (succeeded ? "OK: " + getTrueReasons() : getFalseReason());
     }
 
     public List<O> getTrueReasons() {

@@ -275,34 +275,14 @@ public class Texts {
                 sb.append(s);
             }
         }
-        return Texts.sequence(sb);
+        return sb;
     }    
     
-    public static boolean containsChar(final CharSequence n, final char c) {
-        if (n instanceof String)
-            return ((String)n).indexOf(c)!=-1;
-        
-        final int l = n.length();
-        for (int i = 0; i < l; i++)            
-            if (n.charAt(i) == c)
-                return true;        
-        return false;
-    }    
 
-    /**
-     * wraps a StringBuilder in CharArrayRope for use as a general purpose immutable CharSequence.
-     * StringBuilder lacks hashCode and other support that CharArrayRope provides.
-     * CharArrayRope can use the StringBuilder's underlying char[] directly without copy.
-     */
-    public static CharSequence sequence(StringBuilder b) {
-        return b; //new CharArrayRope(b);
-    }
 
-    final static Format fourDecimal = new DecimalFormat("0.0000");
-    public static final String n4(final float x) { return fourDecimal.format(x);     }
 
-    final static Format twoDecimal = new DecimalFormat("0.00");    
-    public static final String n2Slow(final float x) { return twoDecimal.format(x);     }
+//    final static Format twoDecimal = new DecimalFormat("0.00");
+//    public static final String n2Slow(final float x) { return twoDecimal.format(x);     }
 
     public static long thousandths(final float d) {
         return (long) ((d * 1000f + 0.5f));
@@ -310,11 +290,11 @@ public class Texts {
     public static long hundredths(final float d) {
         return (long) ((d * 100f + 0.5f));
     }
-     
-    public static final CharSequence n2(final float x) {         
+
+    public static final CharSequence n2Old(final float x) {
         if ((x < 0) || (x > 1.0f))
             throw new RuntimeException("Invalid value for Texts.n2");
-        
+
         int hundredths = (int)hundredths(x);
         switch (hundredths) {
             //some common values
@@ -323,7 +303,7 @@ public class Texts {
             case 90: return "0.90";
             case 0: return "0.00";
         }
-                    
+
         if (hundredths > 9) {
             int tens = hundredths/10;
             return new String(new char[] {
@@ -334,10 +314,10 @@ public class Texts {
             return new String(new char[] {
                 '0', '.', '0', (char)('0' + hundredths)
             });
-        }            
+        }
     }
-    
-    final static Format oneDecimal = new DecimalFormat("0.0");    
+
+    final static Format oneDecimal = new DecimalFormat("0.0");
     public static final String n1(final float x) { return oneDecimal.format(x);     }
 
     public static int compareTo(final CharSequence s, final CharSequence t) {
@@ -368,8 +348,8 @@ public class Texts {
         return sl - tl;
       }
 
-    public static CharSequence n2(final double p) {
-        return n2((float)p);
+    public static CharSequence n2Old(final double p) {
+        return n2Old((float)p);
     }
 
 //    /** fast append to CharBuffer */

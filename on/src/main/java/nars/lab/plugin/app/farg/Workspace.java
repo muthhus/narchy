@@ -32,7 +32,7 @@ public class Workspace {
                 for(int i=0;i<10;i++) { //process 10 codelets in each step
                     Codelet cod=farg.coderack.takeNext();
                     if(cod!=null) {
-                        if(cod.run(ws)) {
+                        if(Codelet.run(ws)) {
                             farg.coderack.putIn(cod);
                         }
                     }

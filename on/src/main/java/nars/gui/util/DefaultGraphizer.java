@@ -86,7 +86,7 @@ public class DefaultGraphizer implements NARGraph.Graphize {
         
         Term t = c.term;
         
-        if(this.filterBox != null && ("".equals(this.filterBox.getText()) || t.toString().contains(this.filterBox.getText()))){
+        if(this.filterBox != null && (this.filterBox.getText() != null && this.filterBox.getText().isEmpty() || t.toString().contains(this.filterBox.getText()))){
             g.addVertex(c);
             terms.put(c.term, c);
         } else {

@@ -62,7 +62,7 @@ public class NarseseTemplatePanel {
             forms.put("en", parse(english));
         }
 
-        public List<TemplateElement> parse(String p) /*throws InvalidTemplateException*/ {
+        public static List<TemplateElement> parse(String p) /*throws InvalidTemplateException*/ {
             
             Pattern P = Pattern.compile("~t|~b|~\\#[\\D]|[.]+");
             
@@ -111,7 +111,7 @@ public class NarseseTemplatePanel {
             for (TemplateElement e : forms.get(form)) {
                 if (!form.equals("narsese") && (!(e instanceof Text) || (e instanceof Concept)))
                     continue;
-                s.append(e.toString()).append(" ");    
+                s.append(e.toString()).append(' ');
             }
             return s.toString();
         }
@@ -237,14 +237,13 @@ public class NarseseTemplatePanel {
     
     
     public static void main(String[] args) {
-        List<NarseseTemplate> templates = new ArrayList();
-        templates.addAll(Arrays.asList(new NarseseTemplate("<~#a--> ~#b>? %~t%",  "Is ~#a is a ~#b? ~t"),
+        List<NarseseTemplate> templates = new ArrayList(Arrays.asList(new NarseseTemplate("<~#a--> ~#b>? %~t%",  "Is ~#a is a ~#b? ~t"),
                 new NarseseTemplate("<~#a--> ~#b>. %~t%",  "~#a is a ~#b. ~t"),
                 new NarseseTemplate("<~#a --> ~#b>. %1.00;0.99%",  "~#a is a ~#b."),
                 new NarseseTemplate("<~#a --> ~#b>. %0.00;0.99%",  "~#a is not a ~#b."),
                 new NarseseTemplate("<~#a --> ~#b>. %1.00;0.50%",  "~#a is possibly a ~#b."),
                 new NarseseTemplate("<~#a --> ~#b>. %0.00;0.50%",  "~#a is possibly not a ~#b.")));
-        
+
         NWindow w = new NWindow("NarseseTemplatePanel test", NarseseTemplatePanel.newPanel(templates) );
         w.setSize(400, 200);
         w.setVisible(true);

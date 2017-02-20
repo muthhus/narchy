@@ -156,7 +156,7 @@ import static javax.swing.BorderFactory.createEmptyBorder;
         tabPanel.closeFromMaximize(content);
     } //GEN-LAST:event_bn_closeActionPerformed
 
-    private void label_titleMouseDragged(java.awt.event.MouseEvent evt) //GEN-FIRST:event_label_titleMouseDragged
+    private static void label_titleMouseDragged(java.awt.event.MouseEvent evt) //GEN-FIRST:event_label_titleMouseDragged
     {
         //GEN-HEADEREND:event_label_titleMouseDragged
         System.err.println("Dragging");

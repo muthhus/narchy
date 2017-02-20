@@ -238,7 +238,7 @@ public class MultiModePanel extends NPanel implements EventObserver {
     }
         
     public JButton newStatusButton() {
-        JButton statusButton = new JButton(" " + getLabel()) {
+        JButton statusButton = new JButton(' ' + getLabel()) {
 
         Color bgColor = Color.WHITE;
         private Color fgColor = Color.WHITE;

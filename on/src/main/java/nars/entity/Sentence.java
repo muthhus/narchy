@@ -99,9 +99,7 @@ public class Sentence<T extends Term> implements Cloneable {
                 if(c.getTemporalOrder()==TemporalRules.ORDER_FORWARD) {
                     if(c.term[c.term.length-1] instanceof Interval) {
                         Term[] term2=new Term[c.term.length-1];
-                        for(int i=0;i<c.term.length-1;i++) {
-                            term2[i]=c.term[i];
-                        }
+                        System.arraycopy(c.term, 0, term2, 0, c.term.length - 1);
                         taskTerm=(T) Conjunction.make(term2, c.getTemporalOrder());
                         //ok we removed a part of the interval, we have to transform the occurence time of the sentence back
                         //accordingly
@@ -508,7 +506,7 @@ public class Sentence<T extends Term> implements Cloneable {
             int Int = Interval.timeToMagnitude(diffabs, nar.param.duration);
             timediff = (diff > 0 ? "+" : "-") +String.valueOf(Int);
         }
-        String tenseString = ":"+timediff+":"; //stamp.getTense(t, nar.memory.getDuration());
+        String tenseString = ':' +timediff+ ':'; //stamp.getTense(t, nar.memory.getDuration());
         
         if(stamp.getOccurrenceTime() == Stamp.ETERNAL)
             tenseString="";

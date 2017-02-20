@@ -89,11 +89,11 @@ public class DefaultTextPerception implements Plugin, EventObserver {
             } else if (o instanceof Sentence) {
                 //TEMPORARY
                 Sentence s = (Sentence) o;
-                return perceive(s.term.toString() + s.punctuation + " " + s.truth.toString());
+                return perceive(s.term.toString() + s.punctuation + ' ' + s.truth.toString());
             } else if (o instanceof Task) {
                 return Iterators.forArray((Task)o);
             }
-            error = new IOException("Input unrecognized: " + o + " [" + o.getClass() + "]");
+            error = new IOException("Input unrecognized: " + o + " [" + o.getClass() + ']');
         }
         catch (Exception e) {
             if (Parameters.DEBUG)
@@ -363,7 +363,7 @@ public class DefaultTextPerception implements Plugin, EventObserver {
             }
         }
 
-        String errorMessage = "Invalid input: \'" + line + "\'";
+        String errorMessage = "Invalid input: \'" + line + '\'';
 
         if (lastException!=null) {
             errorMessage += " : " + lastException.toString(); 

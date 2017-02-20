@@ -29,6 +29,7 @@ import nars.operator.Operation;
 import nars.operator.Operator;
 import nars.storage.Memory;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeSet;
@@ -261,18 +262,7 @@ public class Term implements AbstractTerm {
     public int compareTo(final AbstractTerm that) {
         if (that==this) return 0;
         
-        if (Parameters.TERM_ELEMENT_EQUIVALENCY) {
-            if (!getClass().equals(that.getClass())) {
-                //differnt class, use class as ordering
-                return getClass().getSimpleName().compareTo(that.getClass().getSimpleName());
-            }
-            else {
-                //same class, compare by name()
-                return Texts.compareTo(name(), that.name());
-            }
 
-        }
-        else {
             //previously: Orders among terms: variable < atomic < compound
             boolean thatVar = that instanceof Variable;
             boolean thisVar = this instanceof Variable;
@@ -296,7 +286,7 @@ public class Term implements AbstractTerm {
                 }
             }
             return c;
-        }
+
     }
 
     
@@ -372,7 +362,7 @@ public class Term implements AbstractTerm {
     public static TreeSet<Term> toSortedSet(final Term... arg) {
         //use toSortedSetArray where possible
         TreeSet<Term> t = new TreeSet();
-        for (Term x : arg) t.add(x);
+        Collections.addAll(t, arg);
         return t;        
     }
     
@@ -409,8 +399,8 @@ public class Term implements AbstractTerm {
         TreeSet<Term> s = new TreeSet();
         //SortedList<Term> s = new SortedList(arg.length);
         //s.setAllowDuplicate(false);
-        
-        for (Term a: arg) s.add(a);        
+
+        Collections.addAll(s, arg);
         
         return s.toArray(new Term[s.size()] );
         

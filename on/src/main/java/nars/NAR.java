@@ -2,6 +2,8 @@ package nars;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterators;
+import jcog.Util;
+import jcog.list.FasterList;
 import nars.config.Parameters;
 import nars.config.Plugins;
 import nars.config.RuntimeParameters;
@@ -56,6 +58,8 @@ public class NAR implements Runnable {
             + "      NARS website:  http://sites.google.com/site/narswang/ \n" +
               "    Github website:  http://github.com/opennars/ \n" + 
             "    IRC:  http://webchat.freenode.net/?channels=nars \n";
+
+    private final Narsese narsese;
 
 
     private Thread thread;
@@ -119,14 +123,14 @@ public class NAR implements Runnable {
     
     
     private boolean inputting = true;
-    private boolean threadYield;
+
     
     private int inputSelected; //counter for the current selected input channel
     private boolean ioChanged;
     
     private int cyclesPerFrame = 1; //how many memory cycles to execute in one NAR cycle
     
-    public Memory NewMemory(RuntimeParameters p) {
+    public static Memory NewMemory(RuntimeParameters p) {
         return new Memory(p, 
                 new LevelBag(Parameters.CONCEPT_BAG_LEVELS, Parameters.CONCEPT_BAG_SIZE), 
                 new LevelBag<>(Parameters.NOVEL_TASK_BAG_LEVELS, Parameters.NOVEL_TASK_BAG_SIZE),
@@ -142,9 +146,11 @@ public class NAR implements Runnable {
         Memory m = NewMemory(b.param);
         this.memory = m;        
         this.param = m.param;
+
+        this.narsese = new Narsese(this);
         
         //needs to be concurrent in case we change this while running
-        inputChannels = new ArrayList();
+        inputChannels = new FasterList();
         newInputChannels = new CopyOnWriteArrayList();
         b.init(this);
     }
@@ -197,20 +203,20 @@ public class NAR implements Runnable {
     
    public NAR believe(float pri, float dur, String termString, Tense tense, float freq, float conf) throws InvalidInputException {
         
-        return addInput(memory.newTask(new Narsese(this).parseTerm(termString),
+        return addInput(memory.newTask(narsese.parseTerm(termString),
                 Symbols.JUDGMENT_MARK, freq, conf, pri, dur, tense));
     }
 
+
    
     public NAR believe(String termString, Tense tense, float freq, float conf) throws InvalidInputException {
-        
         return believe(Parameters.DEFAULT_JUDGMENT_PRIORITY, Parameters.DEFAULT_JUDGMENT_DURABILITY, termString, tense, freq, conf);
     }
 
     
    /** gets a concept if it exists, or returns null if it does not */
     public Concept concept(String concept) throws InvalidInputException {
-        return memory.concept(new Narsese(this).parseTerm(concept));
+        return memory.concept(narsese.parseTerm(concept));
     }
     
     public NAR ask(String termString) throws InvalidInputException {
@@ -223,7 +229,7 @@ public class NAR implements Runnable {
         addInput(
                 t = new Task(
                         new Sentence(
-                                new Narsese(this).parseTerm(termString),
+                                narsese.parseTerm(termString),
                                 Symbols.QUESTION_MARK, 
                                 null, 
                                 new Stamp(memory, Tense.Eternal)), 
@@ -246,7 +252,7 @@ public class NAR implements Runnable {
         addInput(
                 t = new Task(
                         new Sentence(
-                                new Narsese(this).parseTerm(termString),
+                                narsese.parseTerm(termString),
                                 Symbols.QUESTION_MARK, 
                                 null, 
                                 new Stamp(memory, Tense.Present)), 
@@ -279,7 +285,7 @@ public class NAR implements Runnable {
     
     public NAR addInput(float priority, float durability, final String taskText, float frequency, float confidence) throws InvalidInputException {
         
-        Task t = new Narsese(this).parseTask(taskText);        
+        Task t = narsese.parseTask(taskText);        
         if (frequency!=-1)
             t.sentence.truth.setFrequency(frequency);
         if (confidence!=-1)
@@ -532,13 +538,9 @@ public class NAR implements Runnable {
             frame();
                         
             if (minCyclePeriodMS > 0) {
-                try {
-                    Thread.sleep(minCyclePeriodMS);
-                } catch (InterruptedException e) { }
+                Util.pause(minCyclePeriodMS);
             }
-            else if (threadYield) {
-                Thread.yield();
-            }
+
         }
     }
     
@@ -686,12 +688,7 @@ public class NAR implements Runnable {
         return minCyclePeriodMS;
     }
 
-    /** When b is true, NAR will call Thread.yield each run() iteration that minCyclePeriodMS==0 (no delay). 
-     *  This is for improving program responsiveness when NAR is run with no delay.
-     */
-    public void setThreadYield(boolean b) {
-        this.threadYield = b;
-    }
+
 
     /** stops ad empties all input channels into a receiver. this
         results in no pending input. 

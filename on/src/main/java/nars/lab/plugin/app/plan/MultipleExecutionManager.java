@@ -206,7 +206,7 @@ public class MultipleExecutionManager {
 
         @Override
         public String toString() {
-            return "!" + Texts.n2Slow(getDesire()) + "|" + sequence + "! " + t.toString();
+            return '!' + jcog.Texts.n2(getDesire()) + '|' + sequence + "! " + t.toString();
         }
 
         public void end() {

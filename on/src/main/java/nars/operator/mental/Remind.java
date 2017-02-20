@@ -38,7 +38,7 @@ public class Remind extends Operator {
         super("^remind");
     }
     
-    public void activate(Memory memory, final Concept c, final BudgetValue b, Activating mode) {
+    public static void activate(Memory memory, final Concept c, final BudgetValue b, Activating mode) {
         memory.concepts.take(c.name());
         BudgetFunctions.activate(c.budget, b, mode);
         memory.concepts.putBack(c, memory.cycles(memory.param.conceptForgetDurations), memory);

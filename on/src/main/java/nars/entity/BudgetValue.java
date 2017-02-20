@@ -271,7 +271,7 @@ public class BudgetValue implements Cloneable {
      */
     @Override
     public String toString() {
-        return MARK + Texts.n4(priority) + SEPARATOR + Texts.n4(durability) + SEPARATOR + Texts.n4(quality) + MARK;
+        return MARK + jcog.Texts.n4(priority) + SEPARATOR + jcog.Texts.n4(durability) + SEPARATOR + jcog.Texts.n4(quality) + MARK;
     }
 
     /**
@@ -281,9 +281,9 @@ public class BudgetValue implements Cloneable {
     public String toStringExternal() {
         //return MARK + priority.toStringBrief() + SEPARATOR + durability.toStringBrief() + SEPARATOR + quality.toStringBrief() + MARK;
 
-        final CharSequence priorityString = Texts.n2(priority);
-        final CharSequence durabilityString = Texts.n2(durability);
-        final CharSequence qualityString = Texts.n2(quality);
+        final CharSequence priorityString = Texts.n2Old(priority);
+        final CharSequence durabilityString = Texts.n2Old(durability);
+        final CharSequence qualityString = Texts.n2Old(quality);
         return new StringBuilder(1 + priorityString.length() + 1 + durabilityString.length() + 1 + qualityString.length() + 1)
             .append(MARK)
             .append(priorityString).append(SEPARATOR)

@@ -19,6 +19,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 import static java.lang.Math.min;
 
@@ -37,9 +38,9 @@ public class DockingRegionTabbed extends JTabbedPane implements DockingChild {
 
     public DockingContent getDockingContent(int index) {
         Component comp = getComponentAt(index);
-        for (DockingContent key : tabs.keySet()) {
-            if (tabs.get(key).component == comp) {
-                return key;
+        for (Map.Entry<DockingContent, TabLayout> dockingContentTabLayoutEntry : tabs.entrySet()) {
+            if (dockingContentTabLayoutEntry.getValue().component == comp) {
+                return (DockingContent) dockingContentTabLayoutEntry.getKey();
             }
         }
         return null;
@@ -202,19 +203,19 @@ public class DockingRegionTabbed extends JTabbedPane implements DockingChild {
         }
 
         if (containerPoint.y < bounds.y + bounds.height / 3) {
-            return new DockingPickRecord(this, SwingUtilities.NORTH);
+            return new DockingPickRecord(this, SwingConstants.NORTH);
         }
         if (containerPoint.y > bounds.y + bounds.height * 2 / 3) {
-            return new DockingPickRecord(this, SwingUtilities.SOUTH);
+            return new DockingPickRecord(this, SwingConstants.SOUTH);
         }
         if (containerPoint.x < bounds.x + bounds.width / 3) {
-            return new DockingPickRecord(this, SwingUtilities.WEST);
+            return new DockingPickRecord(this, SwingConstants.WEST);
         }
         if (containerPoint.x > bounds.x + bounds.width * 2 / 3) {
-            return new DockingPickRecord(this, SwingUtilities.EAST);
+            return new DockingPickRecord(this, SwingConstants.EAST);
         }
 
-        return new DockingPickRecord(this, SwingUtilities.CENTER);
+        return new DockingPickRecord(this, SwingConstants.CENTER);
     }
 
     @Override

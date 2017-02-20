@@ -12,6 +12,7 @@ import nars.io.Answered;
 import nars.io.Narsese;
 
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  *
@@ -25,69 +26,69 @@ public class SupervisedRecognition {
 
         //ONES:
         
-        map.put("oxooo" + "\n" +
-                "xxooo" + "\n" +
-                "oxooo" + "\n" +
-                "oxooo" + "\n" +
-                "oxooo" + "\n", 
+        map.put("oxooo" + '\n' +
+                "xxooo" + '\n' +
+                "oxooo" + '\n' +
+                "oxooo" + '\n' +
+                "oxooo" + '\n',
                 1);
         
-        map.put("oxxoo" + "\n" +
-                "xoxoo" + "\n" +
-                "ooxoo" + "\n" +
-                "ooxoo" + "\n" +
-                "ooxoo" + "\n", 
+        map.put("oxxoo" + '\n' +
+                "xoxoo" + '\n' +
+                "ooxoo" + '\n' +
+                "ooxoo" + '\n' +
+                "ooxoo" + '\n',
                 1);
         
-        map.put("oooxo" + "\n" +
-                "ooxxo" + "\n" +
-                "oooxo" + "\n" +
-                "oooxo" + "\n" +
-                "oooxo" + "\n", 
+        map.put("oooxo" + '\n' +
+                "ooxxo" + '\n' +
+                "oooxo" + '\n' +
+                "oooxo" + '\n' +
+                "oooxo" + '\n',
                 1);
         
-        map.put("oooox" + "\n" +
-                "oooxx" + "\n" +
-                "oooox" + "\n" +
-                "oooox" + "\n" +
-                "oooox" + "\n", 
+        map.put("oooox" + '\n' +
+                "oooxx" + '\n' +
+                "oooox" + '\n' +
+                "oooox" + '\n' +
+                "oooox" + '\n',
                 1);
         
         //ZEROS:
         
-        map.put("ooooo" + "\n" +
-                "xxxxx" + "\n" +
-                "xooox" + "\n" +
-                "xooox" + "\n" +
-                "xxxxx" + "\n", 
+        map.put("ooooo" + '\n' +
+                "xxxxx" + '\n' +
+                "xooox" + '\n' +
+                "xooox" + '\n' +
+                "xxxxx" + '\n',
                 0);
         
-        map.put("xxxxx" + "\n" +
-                "xooox" + "\n" +
-                "xooox" + "\n" +
-                "xooox" + "\n" +
-                "xxxxx" + "\n", 
+        map.put("xxxxx" + '\n' +
+                "xooox" + '\n' +
+                "xooox" + '\n' +
+                "xooox" + '\n' +
+                "xxxxx" + '\n',
                 0);
         
-        map.put("ooooo" + "\n" +
-                "ooooo" + "\n" +
-                "xxxxx" + "\n" +
-                "xooox" + "\n" +
-                "xxxxx" + "\n", 
+        map.put("ooooo" + '\n' +
+                "ooooo" + '\n' +
+                "xxxxx" + '\n' +
+                "xooox" + '\n' +
+                "xxxxx" + '\n',
                 0);
         
-        map.put("ooooo" + "\n" +
-                "oxxxx" + "\n" +
-                "oxoox" + "\n" +
-                "oxoox" + "\n" +
-                "oxxxx" + "\n", 
+        map.put("ooooo" + '\n' +
+                "oxxxx" + '\n' +
+                "oxoox" + '\n' +
+                "oxoox" + '\n' +
+                "oxxxx" + '\n',
                 0);
         
-        map.put("ooooo" + "\n" +
-                "xxxxx" + "\n" +
-                "xooox" + "\n" +
-                "xooox" + "\n" +
-                "xxxxx" + "\n", 
+        map.put("ooooo" + '\n' +
+                "xxxxx" + '\n' +
+                "xooox" + '\n' +
+                "xooox" + '\n' +
+                "xxxxx" + '\n',
                 0);
         
         //training phase:
@@ -97,20 +98,20 @@ public class SupervisedRecognition {
         new NARSwing(nar);
         nar.param.noiseLevel.set(0);
         
-        for(String example : map.keySet()) {
-            int solution = map.get(example);
-            inputExample(nar, example, solution);
+        for(Map.Entry<String, Integer> stringIntegerEntry : map.entrySet()) {
+            int solution = stringIntegerEntry.getValue();
+            inputExample(nar, (String) stringIntegerEntry.getKey(), solution);
             nar.step(1000);
         }
         
         //Test phase:
         
         inputExample(nar, 
-                "ooxoo" + "\n" +
-                "ooxoo" + "\n" +
-                "ooxoo" + "\n" +
-                "ooxoo" + "\n" +
-                "ooxoo" + "\n", -1);
+                "ooxoo" + '\n' +
+                "ooxoo" + '\n' +
+                "ooxoo" + '\n' +
+                "ooxoo" + '\n' +
+                "ooxoo" + '\n', -1);
         
         try {
                 nar.askNow("<?what --> EXAMPLE>", new Answered() {
@@ -133,13 +134,13 @@ public class SupervisedRecognition {
         for(int i=0;i<lines.length;i++) {
             for(int j=0;j<lines[i].length();j++) {
                 if(lines[i].charAt(j) == 'x') {
-                    String inp = "<T_"+String.valueOf(i)+"_"+String.valueOf(j) + "--> on>. :|:";
+                    String inp = "<T_"+String.valueOf(i)+ '_' +String.valueOf(j) + "--> on>. :|:";
                     nar.addInput(inp);
                 }
             }
         }
         if(solution != -1) {
-            nar.addInput("<"+ String.valueOf(solution) +" --> EXAMPLE>. :|:");    
+            nar.addInput('<' + String.valueOf(solution) +" --> EXAMPLE>. :|:");
         }
     }
     

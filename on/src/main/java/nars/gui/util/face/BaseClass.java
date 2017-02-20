@@ -85,7 +85,7 @@ public abstract class BaseClass extends JPanel implements Runnable, KeyListener,
         hiY = Math.max(hiY, l);   
     }   
    
-    public void drawArrow(Graphics g, int i, int j, int k, int l, int i1)   
+    public static void drawArrow(Graphics g, int i, int j, int k, int l, int i1)
     {   
         int j1 = k - i;   
         int k1 = l - j;   
@@ -106,7 +106,7 @@ public abstract class BaseClass extends JPanel implements Runnable, KeyListener,
         }   
     }   
    
-    public void drawBar(Graphics g, int i, int j, int k, int l, int i1)   
+    public static void drawBar(Graphics g, int i, int j, int k, int l, int i1)
     {   
         int j1 = k - i;   
         int k1 = l - j;   
@@ -130,12 +130,12 @@ public abstract class BaseClass extends JPanel implements Runnable, KeyListener,
         }   
     }   
    
-    public void drawCircle(Graphics g, int i, int j, int k)   
+    public static void drawCircle(Graphics g, int i, int j, int k)
     {   
         g.drawOval(i - k, j - k, 2 * k, 2 * k);   
     }   
    
-    public void fillCircle(Graphics g, int i, int j, int k)   
+    public static void fillCircle(Graphics g, int i, int j, int k)
     {   
         g.fillOval(i - k, j - k, 2 * k, 2 * k);   
     }   
@@ -297,7 +297,7 @@ public abstract class BaseClass extends JPanel implements Runnable, KeyListener,
         }   
     }   
    
-    public void sleep(int i)   
+    public static void sleep(int i)
     {   
         try   
         {   

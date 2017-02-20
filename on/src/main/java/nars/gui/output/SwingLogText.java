@@ -176,7 +176,7 @@ public class SwingLogText extends SwingText  {
                 case 0: break;
                 case 1: n = "   " + n; break;
                 case 2: n = "  " + n; break;
-                case 3: n = " " + n; break;           
+                case 3: n = ' ' + n; break;
             }
             Color chanColor = Video.getColor(c.getClass().hashCode(), 0.8f, 0.8f);
             print(chanColor, n);

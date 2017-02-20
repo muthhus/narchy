@@ -220,9 +220,7 @@ public class Parameters {
     public static int TEMPORAL_INTERVAL_PRECISION = 1;
     
 
-    
-    /** equivalency based on Term contents; experimental mode - not ready yet, leave FALSE */
-    public static boolean TERM_ELEMENT_EQUIVALENCY;
+
     
     //temporary parameter for setting #threads to use, globally
     public static boolean IMMEDIATE_ETERNALIZATION=true;

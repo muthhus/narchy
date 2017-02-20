@@ -492,9 +492,7 @@ public class Concept extends Item<Term> {
                 for(Task t: this.executable_preconditions) {
                     Term[] prec = ((Conjunction) ((Implication) t.getTerm()).getSubject()).term;
                     Term[] newprec = new Term[prec.length-3];
-                    for(int i=0;i<prec.length-3;i++) { //skip the last part: interval, operator, interval
-                        newprec[i] = prec[i];
-                    }
+                    System.arraycopy(prec, 0, newprec, 0, prec.length - 3);
                     
                     //distance = Interval.magnitudeToTime(((Interval)prec[prec.length-1]).magnitude, nal.memory.param.duration);
                     mintime = nal.memory.time() + Interval.magnitudeToTime(((Interval)prec[prec.length-1]).magnitude-1, nal.memory.param.duration);
@@ -582,7 +580,7 @@ public class Concept extends Item<Term> {
         return false;
     }
 
-    private void questionFromGoal(final Task task, final DerivationContext nal) {
+    private static void questionFromGoal(final Task task, final DerivationContext nal) {
         if(Parameters.QUESTION_GENERATION_ON_DECISION_MAKING || Parameters.HOW_QUESTION_GENERATION_ON_DECISION_MAKING) {
             //ok, how can we achieve it? add a question of whether it is fullfilled
             ArrayList<Term> qu=new ArrayList<Term>();
@@ -757,7 +755,7 @@ public class Concept extends Item<Term> {
         float beliefQuality;
         Task candidate = null;
         boolean rateByConfidence = true; //table vote, yes/no question / local processing
-        synchronized (list) {            
+        //synchronized (list) {
             for (int i = 0; i < list.size(); i++) {
                 Task judgT = list.get(i);
                 Sentence judg = judgT.sentence;
@@ -767,7 +765,7 @@ public class Concept extends Item<Term> {
                     candidate = judgT;
                 }
             }
-        }
+        //}
         return candidate;
     }
 
@@ -966,7 +964,7 @@ public class Concept extends Item<Term> {
     @Override
     public String toStringLong() {
         String res = 
-                toStringExternal() + " " + term.name()
+                toStringExternal() + ' ' + term.name()
                 + toStringIfNotNull(termLinks.size(), "termLinks")
                 + toStringIfNotNull(taskLinks.size(), "taskLinks")
                 + toStringIfNotNull(beliefs.size(), "beliefs")
@@ -982,7 +980,7 @@ public class Concept extends Item<Term> {
         return res;
     }
 
-    private String toStringIfNotNull(final Object item, final String title) {
+    private static String toStringIfNotNull(final Object item, final String title) {
         if (item == null) {
             return "";
         }
@@ -990,7 +988,7 @@ public class Concept extends Item<Term> {
         final String itemString = item.toString();
 
         return new StringBuilder(2 + title.length() + itemString.length() + 1).
-                append(" ").append(title).append(':').append(itemString).toString();
+                append(' ').append(title).append(':').append(itemString).toString();
     }
 
     /**

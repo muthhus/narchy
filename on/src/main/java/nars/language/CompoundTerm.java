@@ -58,7 +58,7 @@ public abstract class CompoundTerm extends Term implements Iterable<Term> {
     transient private boolean hasVariables, hasVarQueries, hasVarIndeps, hasVarDeps;
 
     transient int containedTemporalRelations = -1;
-    int hash;
+
     private boolean normalized;
 
 
@@ -140,7 +140,7 @@ public abstract class CompoundTerm extends Term implements Iterable<Term> {
         return (CompoundTerm) c;
     }
 
-    protected void transformIndependentVariableToDependent(HashMap<String, Variable> vars, CompoundTerm T) { //a special instance of transformVariableTermsDeep in 1.7
+    protected static void transformIndependentVariableToDependent(HashMap<String, Variable> vars, CompoundTerm T) { //a special instance of transformVariableTermsDeep in 1.7
         Term[] term = T.term;
         for (int i = 0; i < term.length; i++) {
             Term t = term[i];
@@ -176,7 +176,7 @@ public abstract class CompoundTerm extends Term implements Iterable<Term> {
         return T;
     }
 
-    public CompoundTerm transformIndependentVariableToDependentVar(CompoundTerm T) {
+    public static CompoundTerm transformIndependentVariableToDependentVar(CompoundTerm T) {
         T = T.cloneDeep(); //we will operate on a copy
         int counter = 0;
         for (char c : T.toString().toCharArray()) {
@@ -853,48 +853,13 @@ public abstract class CompoundTerm extends Term implements Iterable<Term> {
     }
 
     final public void addTermsTo(final Collection<Term> c) {
-        for (final Term t : term)
-            c.add(t);
+        Collections.addAll(c, term);
     }
 
 
     @Override
     public int hashCode() {
-        if (!Parameters.TERM_ELEMENT_EQUIVALENCY) {
-            return name().hashCode();
-        } else {
-            return hash;
-        }
-    }
-
-    @Override
-    public int compareTo(final AbstractTerm that) {
-        if (that == this) return 0;
-
-        if (Parameters.TERM_ELEMENT_EQUIVALENCY) {
-            if (that instanceof CompoundTerm) {
-                CompoundTerm t = (CompoundTerm) that;
-
-                int h = Integer.compare(hashCode(), t.hashCode());
-                if (h != 0) return h;
-
-                int o = operator().compareTo(t.operator());
-                if (o != 0) return o;
-
-                //same operator
-                int c = Integer.compare(getComplexity(), t.getComplexity());
-                if (c != 0) return c;
-
-                //should almost never reach here, the hashcode above will handle > 99% of comparisons
-                if (!equals(that)) {
-                    return Integer.compare(System.identityHashCode(this), System.identityHashCode(that));
-                }
-                return 0;
-            } else
-                return super.compareTo(that);
-        }
-        return
-                super.compareTo(that);
+        return name().hashCode();
     }
 
     @Override
@@ -902,46 +867,44 @@ public abstract class CompoundTerm extends Term implements Iterable<Term> {
         if (that == this) return true;
         if (!(that instanceof Term))
             return false;
-        if (Parameters.TERM_ELEMENT_EQUIVALENCY)
-            return equalsByTerm(that);
         return name().equals(((Term) that).name());
     }
 
-    public boolean equalsByTerm(final Object that) {
-        if (!(that instanceof CompoundTerm)) return false;
-
-        final CompoundTerm t = (CompoundTerm) that;
-
-        if (operator() != t.operator())
-            return false;
-
-        if (getComplexity() != t.getComplexity())
-            return false;
-
-        if (getTemporalOrder() != t.getTemporalOrder())
-            return false;
-
-        if (!equals2(t))
-            return false;
-
-        if (term.length != t.term.length)
-            return false;
-
-        for (int i = 0; i < term.length; i++) {
-            if (!term[i].equals(t.term[i]))
-                return false;
-        }
-
-        return true;
-    }
+//    public boolean equalsByTerm(final Object that) {
+//        if (!(that instanceof CompoundTerm)) return false;
+//
+//        final CompoundTerm t = (CompoundTerm) that;
+//
+//        if (operator() != t.operator())
+//            return false;
+//
+//        if (getComplexity() != t.getComplexity())
+//            return false;
+//
+//        if (getTemporalOrder() != t.getTemporalOrder())
+//            return false;
+//
+//        if (!equals2(t))
+//            return false;
+//
+//        if (term.length != t.term.length)
+//            return false;
+//
+//        for (int i = 0; i < term.length; i++) {
+//            if (!term[i].equals(t.term[i]))
+//                return false;
+//        }
+//
+//        return true;
+//    }
 
 
     /**
      * additional equality checks, in subclasses
      */
-    public boolean equals2(final CompoundTerm other) {
-        return true;
-    }
+//    public boolean equals2(final CompoundTerm other) {
+//        return true;
+//    }
 
 //    /** may be overridden in subclass to include other details */
 //    protected int calcHash() {

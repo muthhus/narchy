@@ -304,7 +304,7 @@ public class DockingRegionContainer extends JPanel implements DockingContainer {
         repaint();
     }
 
-    private void centerWindow(DockingRegionWindow win, Rectangle bounds) {
+    private static void centerWindow(DockingRegionWindow win, Rectangle bounds) {
         int dw = (bounds.width - win.getWidth()) / 2;
         int dh = (bounds.height - win.getHeight()) / 2;
 

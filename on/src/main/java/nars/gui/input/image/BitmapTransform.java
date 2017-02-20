@@ -86,7 +86,7 @@ public class BitmapTransform {
      * @param img - Image object.
      * @return BufferedImage object representing img parameter.
      */
-    public BufferedImage imageToBufferedImage(Image img) {
+    public static BufferedImage imageToBufferedImage(Image img) {
         BufferedImage bi = new BufferedImage(img.getWidth(null), img.getHeight(null), BufferedImage.TYPE_INT_RGB);
         Graphics bg = bi.getGraphics();
         bg.drawImage(img, 0, 0, null);

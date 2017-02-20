@@ -46,32 +46,32 @@ public class InternalExperience implements Plugin, EventObserver {
     //
     public static boolean OLD_BELIEVE_WANT_EVALUATE_WONDER_STRATEGY; //https://groups.google.com/forum/#!topic/open-nars/DVE5FJd7FaM
     
-    public boolean isAllowNewStrategy() {
+    public static boolean isAllowNewStrategy() {
         return !OLD_BELIEVE_WANT_EVALUATE_WONDER_STRATEGY;
     }
-    public void setAllowNewStrategy(boolean val) {
+    public static void setAllowNewStrategy(boolean val) {
         OLD_BELIEVE_WANT_EVALUATE_WONDER_STRATEGY=!val;
     }
     
-    public boolean isAllowWantBelieve() {
+    public static boolean isAllowWantBelieve() {
         return AllowWantBelieve;
     }
-    public void setAllowWantBelieve(boolean val) {
+    public static void setAllowWantBelieve(boolean val) {
         AllowWantBelieve=val;
     }
 
     
-    public double getMinCreationBudgetSummary() {
+    public static double getMinCreationBudgetSummary() {
         return MINIMUM_BUDGET_SUMMARY_TO_CREATE;
     }
-    public void setMinCreationBudgetSummary(double val) {
+    public static void setMinCreationBudgetSummary(double val) {
         MINIMUM_BUDGET_SUMMARY_TO_CREATE=(float) val;
     }
     
-    public double getMinCreationBudgetSummaryWonderEvaluate() {
+    public static double getMinCreationBudgetSummaryWonderEvaluate() {
         return MINIMUM_BUDGET_SUMMARY_TO_CREATE_WONDER_EVALUATE;
     }
-    public void setMinCreationBudgetSummaryWonderEvaluate(double val) {
+    public static void setMinCreationBudgetSummaryWonderEvaluate(double val) {
         MINIMUM_BUDGET_SUMMARY_TO_CREATE_WONDER_EVALUATE=(float) val;
     }
     

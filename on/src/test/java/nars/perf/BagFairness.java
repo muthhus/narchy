@@ -15,7 +15,6 @@ import nars.gui.util.timeline.LineChart;
 import nars.io.Input;
 import nars.io.Texts;
 import nars.language.Term;
-import nars.storage.Bag;
 import nars.gui.util.timeline.Chart;
 import nars.gui.util.timeline.MultiTimeline;
 import nars.gui.util.timeline.StackedPercentageChart;
@@ -47,9 +46,9 @@ public class BagFairness {
             double percentEnd = ((double)(b+1))/bins;            
             if (percentEnd > 1.0) percentEnd = 1.0;
             
-            held[b] = new TreeMLData("Concept: " + Texts.n2(percentStart) + ".." + Texts.n2(percentEnd), Color.getHSBColor(0.2f + 0.7f * (float)percentStart, 0.8f, 0.8f), iterations-1).setRange(0, 1.0f);
+            held[b] = new TreeMLData("Concept: " + Texts.n2Old(percentStart) + ".." + Texts.n2Old(percentEnd), Color.getHSBColor(0.2f + 0.7f * (float)percentStart, 0.8f, 0.8f), iterations-1).setRange(0, 1.0f);
             
-            fired[b] = new TreeMLData("Fired: " + Texts.n2(percentStart) + ".." + Texts.n2(percentEnd), Color.getHSBColor(0.2f + 0.7f * (float)percentStart, 0.8f, 0.8f), iterations-1).setRange(0, maxConcepts);
+            fired[b] = new TreeMLData("Fired: " + Texts.n2Old(percentStart) + ".." + Texts.n2Old(percentEnd), Color.getHSBColor(0.2f + 0.7f * (float)percentStart, 0.8f, 0.8f), iterations-1).setRange(0, maxConcepts);
         }
 
         //TODO use ConceptFire event observer impl
@@ -178,13 +177,13 @@ public class BagFairness {
                 double tp = inheritanceProb + similarityProb + productProb;                
                 double s = Math.random() * tp;
                 s -= inheritanceProb; if (s < 0) {
-                    return "$" + Texts.n2(priority) + "$ <" + randomTerm() + " --> " + randomTerm() + ">.";
+                    return "$" + Texts.n2Old(priority) + "$ <" + randomTerm() + " --> " + randomTerm() + ">.";
                 }
                 s -= similarityProb; if (s < 0) {
-                    return "$" + Texts.n2(priority) + "$ <" + randomTerm() + " <-> " + randomTerm() + ">.";
+                    return "$" + Texts.n2Old(priority) + "$ <" + randomTerm() + " <-> " + randomTerm() + ">.";
                 }
                 s -= productProb; if (s < 0) {
-                    return "$" + Texts.n2(priority) + "$ <(*," + randomTerm() + "," + randomTerm() + ") --> " + randomTerm() + ">.";
+                    return "$" + Texts.n2Old(priority) + "$ <(*," + randomTerm() + "," + randomTerm() + ") --> " + randomTerm() + ">.";
                 }
                 
                 inputs++;

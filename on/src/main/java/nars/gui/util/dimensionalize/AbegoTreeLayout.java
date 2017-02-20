@@ -114,7 +114,7 @@ public class AbegoTreeLayout<V,E> implements GraphDisplay<V,E> {
                     }
                     catch (Exception e) { 
                         System.err.println(e);
-                        System.err.println("vertex -> " + parent + " " + Arrays.toString(cv));
+                        System.err.println("vertex -> " + parent + ' ' + Arrays.toString(cv));
                     }
                     
                 }

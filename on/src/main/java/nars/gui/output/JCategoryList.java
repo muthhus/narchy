@@ -53,8 +53,8 @@ public class JCategoryList extends JList<JButton> {
         public Component getListCellRendererComponent(JList<? extends JButton> list, JButton value, int index, boolean isSelected, boolean cellHasFocus) {
             JButton b = value;
             b.setContentAreaFilled(false);
-            b.setHorizontalTextPosition(JButton.LEFT);
-            b.setHorizontalAlignment(JButton.LEFT);
+            b.setHorizontalTextPosition(SwingConstants.LEFT);
+            b.setHorizontalAlignment(SwingConstants.LEFT);
             b.setForeground(Color.WHITE);
             b.setFocusPainted(false);
             b.setBorderPainted(false);

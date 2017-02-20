@@ -326,7 +326,7 @@ public class LevelBag<E extends Item<K>,K> extends Bag<E,K> {
             int is = sizeItems();
             if (ns == is)
                 return null;
-            throw new RuntimeException("LevelBag inconsistency: " + nameTable.size() + "|" + sizeItems() + " Can not remove missing element: size inconsistency" + oldItem + " from " + this.getClass().getSimpleName());
+            throw new RuntimeException("LevelBag inconsistency: " + nameTable.size() + '|' + sizeItems() + " Can not remove missing element: size inconsistency" + oldItem + " from " + this.getClass().getSimpleName());
         }
         return oldItem;
     }
@@ -410,7 +410,7 @@ public class LevelBag<E extends Item<K>,K> extends Bag<E,K> {
     public String toStringLong(int minLevel) {
         StringBuilder buf = new StringBuilder(32)
                 .append(" BAG ").append(getClass().getSimpleName())
-                .append(" ").append(showSizes());
+                .append(' ').append(showSizes());
 
         for (int i = levels; i >= minLevel; i--) {
             if (!levelEmpty[i - 1]) {

@@ -268,7 +268,7 @@ public class ConceptsPanel extends NPanel implements EventObserver, Runnable {
                     String s = tl.targetTask.sentence.toString()+ " priority:" + tl.getBudget().getPriority();
                     if(s.contains(filter)) {
                         conceptstr.append(s);
-                        conceptstr.append("\n");
+                        conceptstr.append('\n');
                     }
                 }
             }
@@ -315,7 +315,7 @@ public class ConceptsPanel extends NPanel implements EventObserver, Runnable {
                 }
                 
                 String s=sub;
-                sub = (s.equals("") ? "" : s+" ")+"  desire: "+concept.desires.get(0).sentence.truth.toString();
+                sub = (s.isEmpty() ? "" : s+ ' ')+"  desire: "+concept.desires.get(0).sentence.truth.toString();
                 ArrayList<Sentence> desir=new ArrayList();
                 for(Task ts: concept.desires) {
                     desir.add(ts.sentence);
@@ -327,7 +327,7 @@ public class ConceptsPanel extends NPanel implements EventObserver, Runnable {
             } else {
                 desireTime.setVisible(false);
             }
-            String finalstr = sub+"\n\n"+conceptstr.toString();
+            String finalstr = sub+"\n\n"+ conceptstr;
             subtitle.setText(finalstr);
 
             updateUI();

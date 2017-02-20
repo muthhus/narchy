@@ -222,7 +222,7 @@ public class GraphApp extends JPanel
    
     protected String getFrameString()   
     {   
-        String s = new String();   
+        String s = "";
         for(int i = 0; i < frames.size(); i++)   
         {   
             FaceFrame faceframe = (FaceFrame)frames.elementAt(i);   
@@ -309,7 +309,7 @@ public class GraphApp extends JPanel
         }   
    
         Image image1 = createImage(new MemoryImageSource(k, l, ai1, 0, k));   
-        System.out.println(image1 + "  " + image1.getWidth(this) + "," + image1.getHeight(this));   
+        System.out.println(image1 + "  " + image1.getWidth(this) + ',' + image1.getHeight(this));
         return image1;   
     }   
    
@@ -350,7 +350,7 @@ public class GraphApp extends JPanel
         return i >= point.x && i < point.x + dimension.width && j >= point.y && j < point.y + dimension.height;   
     }   
    
-    protected void insertInOrder(Vector vector, FaceFrame faceframe)   
+    protected static void insertInOrder(Vector vector, FaceFrame faceframe)
     {   
         int i;   
         for(i = 0; i < vector.size(); i++)   

@@ -34,7 +34,7 @@ public class DockDemo extends DockingRegionRoot {
         
         w.setSize(640, 480);
         w.setVisible(true);
-        w.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        w.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
     }
 
 

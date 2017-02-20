@@ -74,17 +74,17 @@ public class DraggingOverlayPanel extends javax.swing.JPanel {
                     tabbed, tabbedBounds, this);
 
             switch (pickRecord.getDirection()) {
-                case SwingUtilities.NORTH:
+                case SwingConstants.NORTH:
                     rect.height /= 3;
                     break;
-                case SwingUtilities.SOUTH:
+                case SwingConstants.SOUTH:
                     rect.height /= 3;
                     rect.y += rect.height * 2;
                     break;
-                case SwingUtilities.WEST:
+                case SwingConstants.WEST:
                     rect.width /= 3;
                     break;
-                case SwingUtilities.EAST:
+                case SwingConstants.EAST:
                     rect.width /= 3;
                     rect.x += rect.width * 2;
                     break;
@@ -135,19 +135,19 @@ public class DraggingOverlayPanel extends javax.swing.JPanel {
 
         DockingRegionTabbed destChild = (DockingRegionTabbed) pickRecord.getChild();
         switch (pickRecord.getDirection()) {
-            case SwingUtilities.CENTER:
+            case SwingConstants.CENTER:
                 destChild.addDockContent(content);
                 break;
-            case SwingUtilities.NORTH:
+            case SwingConstants.NORTH:
                 destChild.split(content, false, true);
                 break;
-            case SwingUtilities.SOUTH:
+            case SwingConstants.SOUTH:
                 destChild.split(content, true, true);
                 break;
-            case SwingUtilities.WEST:
+            case SwingConstants.WEST:
                 destChild.split(content, false, false);
                 break;
-            case SwingUtilities.EAST:
+            case SwingConstants.EAST:
                 destChild.split(content, true, false);
                 break;
         }
@@ -177,12 +177,12 @@ public class DraggingOverlayPanel extends javax.swing.JPanel {
         });
     }// </editor-fold>//GEN-END:initComponents
 
-    private void formMouseDragged(java.awt.event.MouseEvent evt)//GEN-FIRST:event_formMouseDragged
+    private static void formMouseDragged(java.awt.event.MouseEvent evt)//GEN-FIRST:event_formMouseDragged
     {//GEN-HEADEREND:event_formMouseDragged
         System.err.println("Overlay drag");
     }//GEN-LAST:event_formMouseDragged
 
-    private void formMouseMoved(java.awt.event.MouseEvent evt)//GEN-FIRST:event_formMouseMoved
+    private static void formMouseMoved(java.awt.event.MouseEvent evt)//GEN-FIRST:event_formMouseMoved
     {//GEN-HEADEREND:event_formMouseMoved
         System.err.println("Overlay move");
     }//GEN-LAST:event_formMouseMoved

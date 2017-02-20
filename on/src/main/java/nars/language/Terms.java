@@ -222,7 +222,7 @@ public class Terms {
             case EQUIVALENCE_AFTER:
                 return Equivalence.make(a[0], a[1], TemporalRules.ORDER_FORWARD);
         }
-        throw new RuntimeException("Unknown Term operator: " + op + " (" + op.name() + ")");
+        throw new RuntimeException("Unknown Term operator: " + op + " (" + op.name() + ')');
     }
     
     /**

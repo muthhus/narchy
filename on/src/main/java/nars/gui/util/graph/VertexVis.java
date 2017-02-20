@@ -59,7 +59,7 @@ public class VertexVis<V, E> {
 
     @Override
     public String toString() {
-        return "vis[" + vertex.toString() + "]";
+        return "vis[" + vertex.toString() + ']';
     }
 
     

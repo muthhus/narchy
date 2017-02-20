@@ -5,6 +5,7 @@ import nars.gui.util.timeline.Chart.MultiChart;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class LineChart extends Chart implements MultiChart {
@@ -26,8 +27,7 @@ public class LineChart extends Chart implements MultiChart {
         super();
         
         this.data = new ArrayList(series.length);
-        for (TreeMLData s : series)
-            data.add(s);
+        Collections.addAll(data, series);
         
     }
     
@@ -113,8 +113,8 @@ public class LineChart extends Chart implements MultiChart {
         l.g.fill(210);
         
         //TODO number precision formatting
-        l.g.text("" + ((double) min), 0, screenyLo - dsy / 10f);
-        l.g.text("" + ((double) max), 0, screenyHi + dsy / 10f);
+        l.g.text(String.valueOf((double) min), 0, screenyLo - dsy / 10f);
+        l.g.text(String.valueOf((double) max), 0, screenyHi + dsy / 10f);
 
         l.g.textSize(15f);
         float dsyt = screenyHi + 0.15f * dsy;

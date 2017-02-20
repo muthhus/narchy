@@ -120,7 +120,7 @@ public class NARConsole {
             if (logging)
                 log("NARSBatch.run():"
                         + " step " + nar.time()
-                        + " " + nar.inputChannels.size());
+                        + ' ' + nar.inputChannels.size());
             
             nar.step(1);
             try {
@@ -136,7 +136,7 @@ public class NARConsole {
             if (logging)
                 log("NARSBatch.run(): after tick"
                         + " step " + nar.time()
-                        + " " + nar.inputChannels.size());
+                        + ' ' + nar.inputChannels.size());
             
             if (maxTime > 0) {
                 if ((nar.inputChannels.isEmpty()) || nar.time() == maxTime) {

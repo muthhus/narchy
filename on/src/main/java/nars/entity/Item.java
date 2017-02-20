@@ -32,19 +32,19 @@ import java.util.Comparator;
  */
 public abstract class Item<K> {
 
-    public static class ItemPriorityComparator<E extends Item> implements Comparator<E> {
-
-        @Override public int compare(final E a, final E b) {
-            float ap = a.getPriority();
-            float bp = b.getPriority();
-
-            if ((a == b) || (a.name().equals(b.name())) || (ap==bp))
-                return a.hashCode() - b.hashCode();
-            else if (ap < bp) return 1;
-            else return -1;
-        }        
-        
-    }
+//    public static class ItemPriorityComparator<E extends Item> implements Comparator<E> {
+//
+//        @Override public int compare(final E a, final E b) {
+//            float ap = a.getPriority();
+//            float bp = b.getPriority();
+//
+//            if ((a == b) || (a.name().equals(b.name())) || (ap==bp))
+//                return a.hashCode() - b.hashCode();
+//            else if (ap < bp) return 1;
+//            else return -1;
+//        }
+//
+//    }
     
     /** The budget of the Item, consisting of 3 numbers */
     public final BudgetValue budget;

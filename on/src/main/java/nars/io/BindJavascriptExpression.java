@@ -80,15 +80,15 @@ public class BindJavascriptExpression implements TextReaction {
                     protected Term function(Memory memory, Term[] args) {
                        StringBuilder argsToParameters = new StringBuilder();
                         for (int i = 0; i < args.length; i++) {
-                            argsToParameters.append("'").append(args[i].toString()).append("'");
+                            argsToParameters.append('\'').append(args[i].toString()).append('\'');
                             if (args.length-1 != i) 
-                                argsToParameters.append(",");
+                                argsToParameters.append(',');
                         }
                         
                         
                         Object result = null;
                         try {
-                            result = js.eval(o + "(" + argsToParameters + ")");
+                            result = js.eval(o + '(' + argsToParameters + ')');
                         } catch (ScriptException ex) {
                             throw new RuntimeException("Exception in executing " + this + ": " + ex.toString(), ex);
                         }

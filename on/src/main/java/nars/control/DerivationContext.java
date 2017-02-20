@@ -515,6 +515,6 @@ public class DerivationContext {
     
     @Override
     public String toString() {
-        return "DerivationContext[" + currentConcept + "," + currentTaskLink + "]";
+        return "DerivationContext[" + currentConcept + ',' + currentTaskLink + ']';
     }
 }

@@ -192,7 +192,7 @@ public class TaskLink extends Item<Task> implements TLink<Task> {
 
     @Override
     public String toString() {
-        return super.toString() + " " + getTarget().sentence.stamp;
+        return super.toString() + ' ' + getTarget().sentence.stamp;
     }
     
     public String toStringBrief() {

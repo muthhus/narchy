@@ -326,7 +326,7 @@ public class Launcher extends javax.swing.JFrame {
 
     }//GEN-LAST:event_jButton1ActionPerformed
 
-    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+    private static void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         try{
         Desktop.getDesktop().browse(new URI("http://code.google.com/p/open-nars/"));
         }catch(Exception ex){}
@@ -338,13 +338,13 @@ public class Launcher extends javax.swing.JFrame {
 //        this.dispose();
 //    }//GEN-LAST:event_jLabel6MouseClicked
 
-    private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
+    private static void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
          try{
         Desktop.getDesktop().browse(new URI("http://webchat.freenode.net/?channels=nars"));
         }catch(Exception ex){}
     }//GEN-LAST:event_jButton5ActionPerformed
 
-    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+    private static void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
         try {
             //NARServer.main(new String[]{"9999","localhost","9100","1000"});
             //Desktop.getDesktop().browse(new URI("http://127.0.0.1:9999"));

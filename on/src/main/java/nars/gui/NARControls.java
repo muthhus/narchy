@@ -822,7 +822,7 @@ public class NARControls extends JPanel implements ActionListener, EventObserver
         return p;
     }
 
-    private NSlider newIntSlider(final AtomicInteger x, final String prefix, int min, int max) {
+    private static NSlider newIntSlider(final AtomicInteger x, final String prefix, int min, int max) {
         final NSlider s = new NSlider(x.intValue(), min, max) {
 
             @Override

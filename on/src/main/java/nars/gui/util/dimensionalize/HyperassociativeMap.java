@@ -199,7 +199,7 @@ public class HyperassociativeMap<N, E> {
         }
     }
 
-    public boolean isAlignable() {
+    public static boolean isAlignable() {
         return true;
     }
 

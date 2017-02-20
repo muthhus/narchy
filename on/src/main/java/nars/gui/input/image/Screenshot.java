@@ -44,7 +44,7 @@ public class Screenshot {
         JFrame j= new JFrame();
         j.setContentPane(new JScrollPane(p));
         j.setSize(400, 400);
-        j.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        j.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         j.setVisible(true);
     }
     

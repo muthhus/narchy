@@ -30,23 +30,8 @@ abstract public class Image extends CompoundTerm {
     @Override
     protected void init(Term[] components) {
         super.init(components);
-        this.hash = Objects.hash(super.hashCode(), relationIndex); 
     }
 
-    
-    @Override
-    public int hashCode() {
-        if (Parameters.TERM_ELEMENT_EQUIVALENCY)
-            return hash;        
-        else
-            return super.hashCode();
-    }
-
-    @Override
-    public boolean equals2(final CompoundTerm other) {
-        return relationIndex == ((Image)other).relationIndex;           
-    }
-    
     @Override
     public int compareTo(final AbstractTerm that) {
         if (that instanceof Image) {
@@ -57,16 +42,12 @@ abstract public class Image extends CompoundTerm {
         return super.compareTo(that);
     }
 
-    
-    
-    
-    
-
     //TODO replace with a special Term type
     public static boolean isPlaceHolder(final Term t) {
         if (t.getClass() != Term.class) return false;
         CharSequence n = t.name();
-        if (n.length() != 1) return false;
+        if (n.length() != 1)
+            return false;
         return n.charAt(0) == Symbols.IMAGE_PLACE_HOLDER;
     }    
     

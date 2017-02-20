@@ -41,7 +41,7 @@ public class EventEmitter {
         }
     }
 
-    protected List<EventObserver> newObserverList() {
+    protected static List<EventObserver> newObserverList() {
         return new ArrayList();
         /*return Parameters.THREADS == 1 ? 
                 new ArrayList() : Collections.synchronizedList(new ArrayList());*/

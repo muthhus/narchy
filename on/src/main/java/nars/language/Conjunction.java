@@ -41,9 +41,7 @@ public class Conjunction extends CompoundTerm {
     public static Term[] removeFirstInterval(Term[] arg) {
         if(arg[0] instanceof Interval) {
             Term[] argNew = new Term[arg.length - 1];
-            for(int i=1;i<arg.length;i++) {
-                argNew[i - 1] = arg[i];
-            }
+            System.arraycopy(arg, 1, argNew, 0, arg.length - 1);
             return argNew;
         }
         return arg;

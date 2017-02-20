@@ -63,7 +63,7 @@ public class SwingLogPanel extends LogPanel {
     @Override
     void print(Class c, Object o) {
         
-        if(!filter.equals("")) { //ok its filtered we can afford the ToStrings for this case as we also want the logfile to be affected
+        if(!filter.isEmpty()) { //ok its filtered we can afford the ToStrings for this case as we also want the logfile to be affected
             if(!o.toString().contains(filter)) {
                 return;
             }

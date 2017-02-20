@@ -230,9 +230,9 @@ public class TruthValue implements Cloneable { // implements Cloneable {
         sb.ensureCapacity(11);
         return sb
             .append(DELIMITER)
-            .append(Texts.n2(frequency))
+            .append(Texts.n2Old(frequency))
             .append(SEPARATOR)
-            .append(Texts.n2(confidence))
+            .append(Texts.n2Old(confidence))
             .append(DELIMITER);        
     }
 
@@ -264,13 +264,13 @@ public class TruthValue implements Cloneable { // implements Cloneable {
     
     
     /** displays the truth value as a short string indicating degree of true/false */
-    public String toTrueFalseString() {        
+    public static String toTrueFalseString() {
         //TODO:
         //  F,f,~,t,T
         return null;
     }
     /** displays the truth value as a short string indicating degree of yes/no */
-    public String toYesNoString() {        
+    public static String toYesNoString() {
         //TODO
         // N,n,~,y,Y
         return null;

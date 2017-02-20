@@ -692,7 +692,7 @@ public class FaceGUI extends BaseClass {
         }
     }
 
-    int area(int ai[], int ai1[], int i) {
+    static int area(int ai[], int ai1[], int i) {
         int j = 0;
         for (int l = 0; l < i; l++) {
             int k = (l + 1) % i;
@@ -702,11 +702,11 @@ public class FaceGUI extends BaseClass {
         return j / 2;
     }
 
-    double pulse(double d, double d1) {
+    static double pulse(double d, double d1) {
         return (double) (d - (double) (int) d >= d1 ? 0 : 1);
     }
 
-    int getShade(int ai[], int ai1[], int ai2[]) {
+    static int getShade(int ai[], int ai1[], int ai2[]) {
         int i = ai[1] - ai[0];
         int j = ai1[1] - ai1[0];
         int k = ai2[1] - ai2[0];

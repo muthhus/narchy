@@ -69,7 +69,7 @@ public class SentenceTablePanel extends TablePanel {
         add(menu, BorderLayout.SOUTH);
     }
 
-    public DefaultTableModel newModel() {
+    public static DefaultTableModel newModel() {
         DefaultTableModel data = new DefaultTableModel();
         data.addColumn("Time");
         data.addColumn("Sentence");

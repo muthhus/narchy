@@ -111,7 +111,7 @@ public class TextInput extends Symbols implements Input {
 
     
     /** can be overridden in subclasses to preprocess addInput */
-    public String process(String input) {
+    public static String process(String input) {
         return input;
     }
 

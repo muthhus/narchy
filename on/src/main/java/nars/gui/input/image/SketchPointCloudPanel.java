@@ -48,7 +48,8 @@ public class SketchPointCloudPanel extends Panel implements MouseListener, Mouse
             lineColors[i] = new Color((float) Math.random(), (float) Math.random(), (float) Math.random());
         }
 
-        String[] s = _library.getNames().toArray(new String[0]);
+        java.util.Set<String> var = _library.getNames();
+        String[] s = var.toArray(new String[var.size()]);
 
         for (int i = 0; i < s.length; i++) {
             standardNames.add(s[i]);
@@ -138,20 +139,20 @@ public class SketchPointCloudPanel extends Panel implements MouseListener, Mouse
             return;
         }
         
-        if(e.getSource() == addInput && !drawing.equals("")) {
-            nar.addInput("<"+drawing.replace(" ","-")+" --> drawn>. :|:");
-            if(lastdrawing!=null && !lastdrawing.equals("")) {
+        if(e.getSource() == addInput && !drawing.isEmpty()) {
+            nar.addInput('<' +drawing.replace(" ","-")+" --> drawn>. :|:");
+            if(lastdrawing!=null && !lastdrawing.isEmpty()) {
                 if(Math.abs(coordx-lastcoordx)>10) {
                     String direction=coordx-lastcoordx > 0 ? "left" : "right"; 
                     String opdirection=coordx-lastcoordx > 0 ? "right" : "left"; 
-                    nar.addInput("<(*,"+drawing.replace(" ","-")+","+lastdrawing.replace(" ","-")+") --> "+direction+">. :|:");
-                    nar.addInput("<(*,"+lastdrawing.replace(" ","-")+","+drawing.replace(" ","-")+") --> "+opdirection+">. :|:");
+                    nar.addInput("<(*,"+drawing.replace(" ","-")+ ',' +lastdrawing.replace(" ","-")+") --> "+direction+">. :|:");
+                    nar.addInput("<(*,"+lastdrawing.replace(" ","-")+ ',' +drawing.replace(" ","-")+") --> "+opdirection+">. :|:");
                 }
                 if(Math.abs(coordy-lastcoordy)>10) {
                     String direction=coordy-lastcoordy > 0 ? "up" : "down"; 
                     String opdirection=coordy-lastcoordy > 0 ? "down" : "up"; 
-                    nar.addInput("<(*,"+drawing.replace(" ","-")+","+lastdrawing.replace(" ","-")+") --> "+direction+">. :|:");
-                    nar.addInput("<(*,"+lastdrawing.replace(" ","-")+","+drawing.replace(" ","-")+") --> "+opdirection+">. :|:");
+                    nar.addInput("<(*,"+drawing.replace(" ","-")+ ',' +lastdrawing.replace(" ","-")+") --> "+direction+">. :|:");
+                    nar.addInput("<(*,"+lastdrawing.replace(" ","-")+ ',' +drawing.replace(" ","-")+") --> "+opdirection+">. :|:");
                 }
             }
             nar.step(1);
@@ -267,7 +268,7 @@ public class SketchPointCloudPanel extends Panel implements MouseListener, Mouse
                 name = r.getName();
                 score = r.getScore();
                 caption.setForeground(defaultColor);
-                caption.setText("Result: " + name + " (" + round(score, 2) + ")");
+                caption.setText("Result: " + name + " (" + round(score, 2) + ')');
                 lastdrawing=drawing;
                 drawing=name;
                 state = GESTURE_PROCESSED;
@@ -340,7 +341,7 @@ public class SketchPointCloudPanel extends Panel implements MouseListener, Mouse
         }
     }
 
-    private double round(double n, double d) // round 'n' to 'd' decimals
+    private static double round(double n, double d) // round 'n' to 'd' decimals
     {
         d = Math.pow(10, d);
         return Math.round(n * d) / d;

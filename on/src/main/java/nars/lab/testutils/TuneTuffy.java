@@ -33,7 +33,7 @@ public class TuneTuffy {
             Term t = new Narsese(n).parseTerm(term);
             this.term = t;
             
-            n.addInput(t.toString() + "?");
+            n.addInput(t.toString() + '?');
         }
 
         @Override

@@ -118,7 +118,7 @@ public class NSlider extends JLabel implements MouseListener, MouseMotionListene
     @Override
     public String getText() {
         if (value!=null)
-            return prefix + " " + nf.format(value.floatValue());
+            return prefix + ' ' + nf.format(value.floatValue());
         return "";
     }
     

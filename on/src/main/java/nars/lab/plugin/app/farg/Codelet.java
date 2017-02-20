@@ -39,7 +39,7 @@ public class Codelet extends Item<Term> {
     }
     
     
-    public boolean run(Workspace ws) { return true; }
+    public static boolean run(Workspace ws) { return true; }
 
     @Override
     public Term name() {

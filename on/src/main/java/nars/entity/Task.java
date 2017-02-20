@@ -254,7 +254,7 @@ public class Task<T extends Term> extends Item<Sentence<T>>  {
         if (pt != null) {
             s.append("  \n from task: ").append(pt.toStringExternal());
             if (parentBelief != null) {
-                s.append("  \n from belief: ").append(parentBelief.toString());
+                s.append("  \n from belief: ").append(parentBelief.get().toString());
             }
         }
         if (bestSolution != null) {
@@ -297,17 +297,17 @@ public class Task<T extends Term> extends Item<Sentence<T>>  {
     }
 
     public String getExplanation() {
-        String x = toString() + "\n";
+        String x = toString() + '\n';
         if (bestSolution!=null) {
             if (!getTerm().equals(bestSolution.term))
-                x += "  solution=" + bestSolution + "\n";
+                x += "  solution=" + bestSolution + '\n';
         }
         if (parentBelief!=null)
-            x += "  parentBelief=" + parentBelief + " @ " + parentBelief.get().getCreationTime() + "\n";
+            x += "  parentBelief=" + parentBelief.get() + " @ " + parentBelief.get().getCreationTime() + '\n';
         
         Task pt = getParentTask();
         if (pt!=null) {
-            x += "  parentTask=" + pt + " @ " + pt.getCreationTime() + "\n";
+            x += "  parentTask=" + pt + " @ " + pt.getCreationTime() + '\n';
         
             int indentLevel = 1;
             Task p=getParentTask();
@@ -369,13 +369,7 @@ public class Task<T extends Term> extends Item<Sentence<T>>  {
         return this.observablePrediction;
     }
 
-    
-    public static Set<Task> getTasks(Collection<Task> tasks) {
-        Set<Task> tl = new HashSet();
-        for (Task t : tasks)
-            tl.add(t);
-        return tl;
-    }
+
 
     public T getTerm() {
         return sentence.getTerm();

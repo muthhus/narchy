@@ -229,7 +229,7 @@ abstract public class PGraphPanel<V,E> extends PPanel implements ActionListener 
         
     }
     
-    public String t(String s) {
+    public static String t(String s) {
          int maxLen = 32;
          if (s.length() > maxLen) {
              return s.substring(0,maxLen-2) + "..";

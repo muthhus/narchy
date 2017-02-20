@@ -71,13 +71,13 @@ public class FaceFrame extends Object {
     }
 
     public String toString() {
-	String retVal = new String();
+	String retVal = "";
 	retVal += when + "\n";
 	for(int s = 0; s < 2; s++) {
 	    for(int v = 0; v < targets[s].length; v++) {
 		if(v != 0)
 		    retVal += ",";
-		retVal += "" + targets[s][v];
+		retVal += String.valueOf(targets[s][v]);
 	    }
 	    retVal += "\n";
 	}

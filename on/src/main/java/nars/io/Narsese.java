@@ -263,7 +263,7 @@ public class Narsese {
                 durability = Parameters.DEFAULT_QUEST_DURABILITY;
                 break;                
             default:
-                throw new InvalidInputException("unknown punctuation: '" + punctuation + "'");
+                throw new InvalidInputException("unknown punctuation: '" + punctuation + '\'');
         }
         if (s != null) { // overrite default
             int i = s.indexOf(VALUE_SEPARATOR);
@@ -454,7 +454,7 @@ public class Narsese {
         Term predicate = parseTerm(s.substring(i + 3));
         Statement t = make(getRelation(relation), subject, predicate, false, 0);
         if (t == null) {
-            throw new InvalidInputException("invalid statement: statement unable to create: " + getOperator(relation) + " " + subject + " " + predicate);
+            throw new InvalidInputException("invalid statement: statement unable to create: " + getOperator(relation) + ' ' + subject + ' ' + predicate);
         }
         return t;
     }

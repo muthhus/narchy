@@ -40,7 +40,7 @@ public class Abbreviation implements Plugin {
 
         private static final AtomicInteger currentTermSerial = new AtomicInteger(1);
 
-        public Term newSerialTerm(char prefix) {
+        public static Term newSerialTerm(char prefix) {
             return new Term(prefix + String.valueOf(currentTermSerial.incrementAndGet()));
         }
 

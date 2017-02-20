@@ -185,7 +185,7 @@ public class PerceptionAccel implements Plugin, EventEmitter.EventObserver {
         Conjunction c=(Conjunction) t;
         
         if(debugMechanism) {
-            System.out.println("handleConjunctionSequence with "+t.toString()+" "+String.valueOf(Add));
+            System.out.println("handleConjunctionSequence with "+t.toString()+ ' ' +String.valueOf(Add));
         }
         
         if(Add) { //manage concept counter

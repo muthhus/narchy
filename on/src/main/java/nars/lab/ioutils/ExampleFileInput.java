@@ -31,7 +31,7 @@ public class ExampleFileInput extends TextInput {
         File fp = new File(path);
         BufferedReader br = new BufferedReader(new FileReader(fp));
         while ((line = br.readLine())!=null) {
-            sb.append(line).append("\n");
+            sb.append(line).append('\n');
         }
         return sb.toString();
     }

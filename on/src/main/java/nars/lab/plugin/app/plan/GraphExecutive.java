@@ -8,7 +8,6 @@ import nars.gui.graph.ImplicationGraph.PostCondition;
 import nars.inference.BudgetFunctions;
 import nars.inference.TemporalRules;
 import nars.inference.TruthFunctions;
-import nars.io.Texts;
 import nars.language.Conjunction;
 import nars.language.Implication;
 import nars.language.Interval;
@@ -45,7 +44,7 @@ public class GraphExecutive {
     }
 
     
-    protected void accumulate(final Term t, final Cause[] path) {        
+    protected static void accumulate(final Term t, final Cause[] path) {
         for (final Cause s : path)
             s.addActivity(1.0);
     }
@@ -106,7 +105,7 @@ public class GraphExecutive {
 
         @Override
         public String toString() {
-            return "[" + Texts.n4((float)score()) + "|" + Texts.n4((float)distance) + "] "/*+ target */ + " <- " + Arrays.toString(bestPath);
+            return '[' + jcog.Texts.n4((float) score()) + '|' + jcog.Texts.n4((float) distance) + "] "/*+ target */ + " <- " + Arrays.toString(bestPath);
         }
 
         /** can be used to favor the total activation, or short distnce, or combinations of other factors  */
@@ -413,7 +412,7 @@ public class GraphExecutive {
     
     
     /** returns (no relevancy) 0..1.0 (high relevancy) */
-    public double getCauseRelevancy(final Cause c, final Term goal) {
+    public static double getCauseRelevancy(final Cause c, final Term goal) {
 //        //how desired is the implication?
 //        Concept w=memory.concept(c.getImplication().getPredicate());
 //        if(w!=null && w.getDesire()!=null) {
@@ -429,7 +428,7 @@ public class GraphExecutive {
     }
     
     /** returns (no relevancy) 0..1.0 (high relevancy) */
-    public double getCauseRelevancy(final Cause c) {
+    public static double getCauseRelevancy(final Cause c) {
         return getCauseRelevancy(c, null);
     }    
 
@@ -564,7 +563,7 @@ public class GraphExecutive {
         
         @Override
         public String toString() {
-            return "[" + score() + "|" + distance + "] " + sequence;
+            return "[" + score() + '|' + distance + "] " + sequence;
         }
         
         public Task planTask(Concept c, Task goal, Term goalTerm, char punctuation) {

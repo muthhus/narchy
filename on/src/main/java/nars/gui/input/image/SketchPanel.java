@@ -64,7 +64,7 @@ public class SketchPanel extends PPanel {
         if (result != null) {
             textAlign(CENTER, CENTER);
             fill(color(12, 12, 12));
-            text(result.Name + " " + str(result.Ratio), 10, 10, 200, 20);
+            text(result.Name + ' ' + str(result.Ratio), 10, 10, 200, 20);
         }
     }
 
@@ -398,7 +398,7 @@ public class SketchPanel extends PPanel {
         return d;
     }
 
-    float PathDistance(Point[] pts1, Point[] pts2) {
+    static float PathDistance(Point[] pts1, Point[] pts2) {
         if (pts1.length != pts2.length) {
             println("Lengths differ. " + pts1.length + " != " + pts2.length);
             return Infinity;
@@ -527,7 +527,7 @@ public class SketchPanel extends PPanel {
         return min(f1, f2);
     }
 
-    float DistanceAtAngle(Point[] points, Template T, float theta) {
+    static float DistanceAtAngle(Point[] points, Template T, float theta) {
         Point[] newpoints = RotateBy(points, theta);
         return PathDistance(newpoints, T.Points);
     }

@@ -704,10 +704,7 @@ public class PongComplex extends Frame {
             }
             void farrcpy(float[] a,float[] b,int sz)
             {
-                for(int i=0;i<sz;i++)
-                {
-                    a[i]=b[i];
-                }
+                System.arraycopy(b, 0, a, 0, sz);
             }
             float angleDiff(float a,float b)
             {
@@ -1291,9 +1288,9 @@ public class PongComplex extends Frame {
             //mem.simulate_damping=0.90;
             //size(worldSize-200,worldSize-200);
             hamlib.Init(false);
-            im[0]=loadImage("."+File.separator+"nars_lab"+File.separator+"nars"+File.separator+"lab"+File.separator+"microworld"+File.separator+"bar.png");
-            im[1]=loadImage("."+File.separator+"nars_lab"+File.separator+"nars"+File.separator+"lab"+File.separator+"microworld"+File.separator+"ball.png");
-            im[2]=loadImage("."+File.separator+"nars_lab"+File.separator+"nars"+File.separator+"lab"+File.separator+"microworld"+File.separator+"fire.png");
+            im[0]=loadImage('.' +File.separator+"nars_lab"+File.separator+"nars"+File.separator+"lab"+File.separator+"microworld"+File.separator+"bar.png");
+            im[1]=loadImage('.' +File.separator+"nars_lab"+File.separator+"nars"+File.separator+"lab"+File.separator+"microworld"+File.separator+"ball.png");
+            im[2]=loadImage('.' +File.separator+"nars_lab"+File.separator+"nars"+File.separator+"lab"+File.separator+"microworld"+File.separator+"fire.png");
             for(int i=0;i<1;i++)
             {
                 int SomSize=10;

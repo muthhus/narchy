@@ -245,7 +245,7 @@ public class TicTacToe extends JPanel {
                 if (success) {
                     playing = HUMAN;
                     nar.emit(TicTacToe.class, "NARS plays: " + i);
-                    nar.addInput("<input --> succeeded>. :|: %" + (success ? "1.00" : "0.00") + "%" );
+                    nar.addInput("<input --> succeeded>. :|: %" + (success ? "1.00" : "0.00") + '%');
                     nar.addInput("<(*," + i + ",nars) --> move>. :|:");
                     
                     System.out.println( operation.getTask().getExplanation() );

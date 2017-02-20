@@ -89,9 +89,7 @@ public class GlobalAnticipation implements Plugin, EventEmitter.EventObserver {
         }
         
         ArrayList<Task> lastEvents=new ArrayList<Task>();
-        for (Task stmLast : stm) {
-            lastEvents.add(stmLast);
-        }
+        lastEvents.addAll(stm);
         
         if(lastEvents.isEmpty()) {
             return;
@@ -197,9 +195,7 @@ public class GlobalAnticipation implements Plugin, EventEmitter.EventObserver {
                 toDelete.add(t);
             }
         }
-        for(Task t: toDelete) {
-            current_tasks.remove(t);
-        }
+        current_tasks.removeAll(toDelete);
     }
     
     @Override
