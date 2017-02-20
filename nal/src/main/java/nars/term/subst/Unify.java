@@ -458,11 +458,6 @@ public abstract class Unify extends Termunator implements Subst {
 //
 //    }
 
-    @Nullable
-    public final Term resolve(@NotNull Term x) {
-        return transform(x, this);
-    }
-
 
     @Nullable
     public final Term transform(@NotNull Term t, @NotNull Subst subst) {

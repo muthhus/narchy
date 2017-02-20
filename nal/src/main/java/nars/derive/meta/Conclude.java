@@ -139,7 +139,7 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
 
     public @Nullable Term term(@NotNull Derivation m) {
         if (conclusionPattern instanceof Compound) {
-            return TermIndex.transform((Compound)this.conclusionPattern, m);
+            return m.transform(this.conclusionPattern, m);
         } else {
             return m.xy.get(conclusionPattern); //single variable, just lookup
         }

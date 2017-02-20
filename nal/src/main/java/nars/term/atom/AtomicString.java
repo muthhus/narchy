@@ -1,6 +1,6 @@
 package nars.term.atom;
 
-import nars.index.term.TermIndex;
+import nars.index.term.TermResolver;
 import nars.term.Term;
 
 /**
@@ -36,7 +36,7 @@ public abstract class AtomicString implements Atomic {
     }
 
     @Override
-    public Term eval(TermIndex termIndex) {
+    public Term eval(TermResolver termIndex) {
         return this;
     }
 }

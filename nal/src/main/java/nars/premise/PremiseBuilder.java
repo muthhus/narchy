@@ -23,7 +23,6 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 
 import static nars.term.Terms.compoundOrNull;
-import static nars.term.Terms.compoundOrNullDeserialized;
 import static nars.time.Tense.ETERNAL;
 import static nars.util.UtilityFunctions.aveAri;
 
@@ -272,7 +271,10 @@ abstract public class PremiseBuilder {
             new UnifySubst(null /* all variables */, nar, result::add, 1 /*Param.QUERY_ANSWERS_PER_MATCH*/)
                     .unifyAll(q, a);
             if (!result.isEmpty()) {
-                Compound unified = compoundOrNullDeserialized(result.get(0));
+                //        if (t instanceof SerialCompound) {
+//            t = ((SerialCompound)t).build(i);
+//        }
+                Compound unified = compoundOrNull(result.get(0));
                 if (unified != null)
                     return unified;
             }

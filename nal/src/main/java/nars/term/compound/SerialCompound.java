@@ -4,20 +4,16 @@ import com.google.common.primitives.Ints;
 import jcog.Util;
 import jcog.data.byt.DynByteSeq;
 import nars.*;
-import nars.index.term.TermIndex;
+import nars.index.term.TermResolver;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.container.TermContainer;
-import nars.term.visit.SubtermVisitorXY;
-import org.eclipse.collections.impl.map.mutable.primitive.ObjectByteHashMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.List;
 
-import static nars.$.$;
 import static nars.term.Terms.compoundOrNull;
 import static nars.time.Tense.DTERNAL;
 
@@ -96,8 +92,11 @@ public class SerialCompound extends DynByteSeq implements Compound {
     }
 
     @Nullable
-    public Compound build(@NotNull TermIndex index) {
-        return compoundOrNull(IO.termFromBytes(bytes, index));
+    public Compound build(@NotNull TermResolver r) {
+        Compound c = compoundOrNull(IO.termFromBytes(bytes, r));
+        if (c == null)
+            return null;
+        return compoundOrNull(c.eval(r));
     }
 
     @Override

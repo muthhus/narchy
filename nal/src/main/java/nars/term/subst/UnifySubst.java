@@ -4,6 +4,7 @@ import nars.NAR;
 import nars.Op;
 import nars.Param;
 import nars.term.Term;
+import nars.term.compound.SerialCompound;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -59,7 +60,8 @@ public class UnifySubst extends Unify {
         //TODO combine these two blocks to use the same sub-method
 
         //try {
-            Term aa = resolve(a, xy);
+            @Nullable Term bb = resolve(a, xy);
+            Term aa = bb instanceof SerialCompound ? ((SerialCompound)bb).build(this) : bb;
 
             matches++;
 

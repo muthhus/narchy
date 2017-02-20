@@ -6,6 +6,7 @@ import jcog.bag.Prioritized;
 import jcog.data.byt.DynByteSeq;
 import nars.budget.Budgeted;
 import nars.index.term.TermIndex;
+import nars.index.term.TermResolver;
 import nars.task.MutableTask;
 import nars.term.Compound;
 import nars.term.Term;
@@ -48,7 +49,7 @@ public class IO {
 
 
     @NotNull
-    public static MutableTask readTask(@NotNull DataInput in, @NotNull TermIndex t) throws IOException {
+    public static MutableTask readTask(@NotNull DataInput in, @NotNull TermResolver t) throws IOException {
 
         Term term = readTerm(in, t);
 
@@ -179,12 +180,12 @@ public class IO {
 
 
     @Nullable
-    public static Atomic readVariable(@NotNull DataInput in, @NotNull Op o, @NotNull TermIndex t) throws IOException {
+    public static Atomic readVariable(@NotNull DataInput in, @NotNull Op o, @NotNull TermResolver t) throws IOException {
         return $.v(o, in.readByte());
     }
 
     @Nullable
-    public static Atomic readAtomic(@NotNull DataInput in, @NotNull Op o, @NotNull TermIndex t) throws IOException {
+    public static Atomic readAtomic(@NotNull DataInput in, @NotNull Op o, @NotNull TermResolver t) throws IOException {
         String s = in.readUTF();
         switch (o) {
 
@@ -213,7 +214,7 @@ public class IO {
      * called by readTerm after determining the op type
      */
     @Nullable
-    public static Term readTerm(@NotNull DataInput in, @NotNull TermIndex t) throws IOException {
+    public static Term readTerm(@NotNull DataInput in, @NotNull TermResolver t) throws IOException {
 
         byte ob = in.readByte();
         if (ob == SPECIAL_OP)
@@ -222,17 +223,17 @@ public class IO {
         Op o = Op.values()[ob];
         if (o.var)
             return readVariable(in, o, t);
-        else if (o.atomic)
+        else if (o.atomic) {
             return readAtomic(in, o, t);
-        else
+        } else
             return readCompound(in, o, t);
     }
 
     public
     @Nullable
-    static Term readSpecialTerm(@NotNull DataInput in, @NotNull TermIndex t) throws IOException {
+    static Term readSpecialTerm(@NotNull DataInput in, @NotNull TermResolver t) throws IOException {
         try {
-            return t.parseRaw(in.readUTF());
+            return Narsese.the().term(in.readUTF());
         } catch (Narsese.NarseseException e) {
             throw new IOException(e);
         }
@@ -293,11 +294,11 @@ public class IO {
 
 
     @Nullable
-    public static Term[] readTermContainer(@NotNull DataInput in, @NotNull TermIndex t) throws IOException {
+    public static Term[] readTermContainer(@NotNull DataInput in, @NotNull TermResolver t) throws IOException {
         int siz = in.readByte();
         Term[] s = new Term[siz];
         for (int i = 0; i < siz; i++) {
-            s[i] = readTerm(in, t);
+            s[i] = t.resolve(readTerm(in, t));
         }
 
         return s;
@@ -308,9 +309,9 @@ public class IO {
      * TODO make a version which reads directlyinto TermIndex
      */
     @Nullable
-    static Term readCompound(@NotNull DataInput in, @NotNull Op o, @NotNull TermIndex t) throws IOException {
+    static Term readCompound(@NotNull DataInput in, @NotNull Op o, @NotNull TermResolver tt) throws IOException {
 
-        Term[] v = readTermContainer(in, t);
+        Term[] v = readTermContainer(in, tt);
 
         int dt = DTERNAL;
 
@@ -319,7 +320,8 @@ public class IO {
         else if (o.temporal)
             dt = in.readInt();
 
-        return t.the(o, dt, v);
+        return tt instanceof TermIndex ? ((TermIndex)tt).the(o, dt, v) : tt.resolve($.terms.the(o, dt, v));
+
 //        if (key == null)
 //            throw new UnsupportedOperationException();
 //        return (Compound) t.normalize(key, true);
@@ -405,7 +407,7 @@ public class IO {
         }
     }
 
-    public static Task taskFromBytes(@NotNull byte[] b, @NotNull TermIndex index) {
+    public static Task taskFromBytes(@NotNull byte[] b, @NotNull TermResolver index) {
         try {
             return IO.readTask(input(b), index);
         } catch (IOException e) {
@@ -414,7 +416,7 @@ public class IO {
         }
     }
 
-    public static Term termFromBytes(@NotNull byte[] b, @NotNull TermIndex index) {
+    public static Term termFromBytes(@NotNull byte[] b, @NotNull TermResolver index) {
         try {
             return IO.readTerm(input(b), index);
         } catch (IOException e) {

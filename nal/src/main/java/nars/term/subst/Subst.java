@@ -1,5 +1,6 @@
 package nars.term.subst;
 
+import nars.index.term.TermResolver;
 import nars.term.Term;
 import nars.term.atom.Atomic;
 import nars.term.transform.Functor;
@@ -7,13 +8,19 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 
-public interface Subst  {
+public interface Subst extends TermResolver {
 
     /** can be used to determine if this subst will have any possible effect on any transforms to any possible term,
      * used as a quick test to prevent transform initializations */
     boolean isEmpty();
 
     @Nullable Term xy(Term t);
+
+    @Override
+    default Term resolve(Term x) {
+        Term y = xy(x);
+        return (y == null) ? x : y;
+    }
 
 //    /** suggests to this to store a cached result, which can be ignored if the impl chooses */
 //    void cache(@NotNull Term x /* usually a Variable */, @NotNull Term y);

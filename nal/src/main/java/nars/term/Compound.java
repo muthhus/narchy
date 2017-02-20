@@ -27,7 +27,7 @@ import jcog.data.sexpression.Pair;
 import nars.$;
 import nars.IO;
 import nars.Op;
-import nars.index.term.TermIndex;
+import nars.index.term.TermResolver;
 import nars.term.container.TermContainer;
 import nars.term.subst.Unify;
 import nars.term.transform.Functor;
@@ -646,7 +646,7 @@ public interface Compound extends Term, IPair, TermContainer {
     }
 
     @Override
-    default Term eval(TermIndex index) {
+    default Term eval(TermResolver r) {
 
         //somewhere in the subterms is a functor to eval
         if (!hasAll(Op.OpBits)) {
@@ -659,14 +659,14 @@ public interface Compound extends Term, IPair, TermContainer {
             Term[] evalSubs = terms().clone();
             boolean modified = false;
             for (int i = 0, evalSubsLength = evalSubs.length; i < evalSubsLength; i++) {
-                Term y = evalSubs[i].eval(index);
+                Term y = evalSubs[i].eval(r);
                 if (!evalSubs[i].equals(y)) {
                     evalSubs[i] = y;
                     modified = true;
                 }
             }
             if (modified) {
-                return index.the(this, evalSubs).eval(index);
+                return $.terms.the(this, evalSubs).eval(r);
             }
         }
 
@@ -686,12 +686,9 @@ public interface Compound extends Term, IPair, TermContainer {
                         f = (Functor) predicate;
                     } else {
                         //try to resolve a functor referenced by this term
-                        Termed resolvedPred = index.get(predicate);
-                        if (resolvedPred != null) {
-                            Term resolvedPredTerm = resolvedPred.term();
-                            if (resolvedPredTerm instanceof Functor) {
-                                f = (Functor) (resolvedPred.term());
-                            }
+                        Term resolvedPredTerm = r.resolve(predicate);
+                        if (resolvedPredTerm instanceof Functor) {
+                            f = (Functor)resolvedPredTerm;
                         }
                     }
 
@@ -703,7 +700,7 @@ public interface Compound extends Term, IPair, TermContainer {
                                 //null return value means just keep the original input term
                                 return this;
                             } else {
-                                return dy.eval(index);
+                                return dy.eval(r);
                             }
                         }
                     }
@@ -715,6 +712,9 @@ public interface Compound extends Term, IPair, TermContainer {
 
         return this;
     }
+
+
+
 
     //    default MutableSet<Term> toSetAtemporal() {
 //        int ss = size();

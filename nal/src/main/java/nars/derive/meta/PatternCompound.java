@@ -226,7 +226,7 @@ abstract public class PatternCompound extends GenericCompound {
             EllipsisTransform et = this.ellipsisTransform;
             @NotNull Term from = et.from;
             if (from.equals(Op.Imdex)) {
-                Term n = subst.resolve(et.to);
+                Term n = subst.transform(et.to, subst);
                 if (n != null /*&& !n.equals(y)*/) {
 
                     //the indicated term should be inserted
@@ -240,7 +240,7 @@ abstract public class PatternCompound extends GenericCompound {
 
                 }
             } else {
-                Term n = subst.resolve(from);
+                Term n = subst.transform(from, subst);
 //                if (n == null) {
 //                    //select at random TODO make termutator
 //                    int imageIndex = random.nextInt(Y.size());

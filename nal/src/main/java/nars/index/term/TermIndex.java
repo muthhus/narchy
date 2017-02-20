@@ -40,7 +40,7 @@ import static nars.term.Terms.compoundOrNull;
 /**
  *
  */
-public abstract class TermIndex extends TermBuilder {
+public abstract class TermIndex extends TermBuilder implements TermResolver {
 
 
     private static final Logger logger = LoggerFactory.getLogger(TermIndex.class);
@@ -84,6 +84,15 @@ public abstract class TermIndex extends TermBuilder {
     public void start(NAR nar) {
         this.nar = nar;
         conceptBuilder().start(nar);
+    }
+
+    @Override
+    public Term resolve(Term x) {
+        Termed exist = get(x);
+        if (exist!=null) {
+            return exist.term();
+        }
+        return x;
     }
 
     /**
@@ -142,7 +151,7 @@ public abstract class TermIndex extends TermBuilder {
      * returns the resolved term according to the substitution
      */
     @Nullable
-    public static Term transform(@NotNull Term src, @NotNull Subst f) {
+    public Term transform(@NotNull Term src, @NotNull Subst f) {
 
         Term y = f.xy(src);
         if (y != null)
@@ -163,7 +172,7 @@ public abstract class TermIndex extends TermBuilder {
         return transform((Compound)src, f);
     }
 
-    public static @Nullable Term transform(@NotNull Compound src, @NotNull Subst f) {
+    public @Nullable Term transform(@NotNull Compound src, @NotNull Subst f) {
 
         //no variables that could be substituted, so return this constant
         if (f instanceof Derivation && src.vars() + src.varPattern() == 0) //shortcut for premise evaluation matching
@@ -239,12 +248,13 @@ public abstract class TermIndex extends TermBuilder {
 
         Term transformed;
         int ss = sub.size();
-        if (!changed || (ss == len && ((Compound) src).equalTerms(sub)))
+        if (!changed || (ss == len && ((Compound) src).equalTermsShallow(sub)))
             transformed = (Compound) src;
         else {
-            transformed =
-                    //the(cop, crc.dt(), sub.toArray(new Term[ss]));
-                    new SerialCompound(op, src.dt(), sub.toArray(new Term[ss]));
+            transformed = the(op, src.dt(), sub.toArray(new Term[ss]));
+
+            //Term[] subterms = sub.toArray(new Term[ss]);
+            //transformed = new SerialCompound(op, src.dt(), subterms);
         }
 
 //        //cache the result
@@ -358,6 +368,11 @@ public abstract class TermIndex extends TermBuilder {
         if (x.isNormalized()) {
             return x;
         } else {
+
+            x = compoundOrNull(x);
+            if (x == null)
+                return null;
+
             //see if subterms need change
 
             Term y = _normalize(x);
@@ -544,6 +559,10 @@ public abstract class TermIndex extends TermBuilder {
 
                 default:
 
+                    //        if (t instanceof SerialCompound) {
+//            t = ((SerialCompound)t).build(i);
+//        }
+                    Compound cterm = compoundOrNull(term);
                     if (term instanceof Compound) {
 
 //                        if (Param.FILTER_CONCEPTS_WITHOUT_ATOMS) {
@@ -607,7 +626,17 @@ public abstract class TermIndex extends TermBuilder {
     public Term eval(Compound x) {
 
         //eval before normalizing
-        Compound z = compoundOrNull(x.eval(this));
+        //        if (t instanceof SerialCompound) {
+//            t = ((SerialCompound)t).build(i);
+//        }
+        Compound ccc = compoundOrNull(x);
+        if (ccc == null)
+            return null;
+
+        //        if (t instanceof SerialCompound) {
+//            t = ((SerialCompound)t).build(i);
+//        }
+        Compound z = compoundOrNull(ccc.eval(this));
         if (z == null)
             return null;
 

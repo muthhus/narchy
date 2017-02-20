@@ -7,7 +7,7 @@ import nars.Task;
 import nars.attention.Activation;
 import nars.budget.BLink;
 import nars.conceptualize.state.ConceptState;
-import nars.index.term.TermIndex;
+import nars.index.term.TermResolver;
 import nars.table.BeliefTable;
 import nars.table.QuestionTable;
 import nars.term.Term;
@@ -54,7 +54,7 @@ public class AtomConcept extends AtomicStringConstant implements Concept {
     }
 
     @Override
-    public final Term eval(TermIndex index) {
+    public final Term eval(TermResolver r) {
         return this;
     }
 

@@ -17,7 +17,10 @@ import nars.premise.MatrixPremiseBuilder;
 import nars.premise.Premise;
 import nars.task.DerivedTask;
 import nars.term.Termed;
+import nars.term.util.InvalidTermException;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.HashSet;
 import java.util.List;
@@ -86,7 +89,7 @@ public class ConceptBagControl implements Control, Consumer<DerivedTask> {
 //        String as = A!=null ? A.term
 //    };
 
-//    private static final Logger logger = LoggerFactory.getLogger(AbstractCore.class);
+    private static final Logger logger = LoggerFactory.getLogger(ConceptBagControl.class);
 
     //private final CapacityLinkedHashMap<Premise,Premise> recent = new CapacityLinkedHashMap<>(256);
     //long novel=0, total=0;
@@ -170,12 +173,18 @@ public class ConceptBagControl implements Control, Consumer<DerivedTask> {
             Set<Task> r = new HashSet();
 
             derived.forEach(p -> p.conclusions.forEach(c -> {
-                DerivedTask t = c.derive(p, nar);
-                if (t!=null) {
-                    if (r.add(t)) {
-                        //unique
-                    } else {
-                        System.out.println("duplicate: " + t + " in " + p + " for " + fired);
+                try {
+                    DerivedTask t = c.derive(p, nar);
+                    if (t != null) {
+                        if (r.add(t)) {
+                            //unique
+                        }/* else {
+                            System.out.println("duplicate: " + t + " in " + p + " for " + fired);
+                        }*/
+                    }
+                } catch (InvalidTermException e) {
+                    if (Param.DEBUG_EXTRA) {
+                        logger.info("derive: {}", e);
                     }
                 }
 

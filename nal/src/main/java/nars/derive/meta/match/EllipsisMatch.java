@@ -1,7 +1,7 @@
 package nars.derive.meta.match;
 
 import nars.Op;
-import nars.index.term.TermIndex;
+import nars.index.term.TermResolver;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Terms;
@@ -129,7 +129,7 @@ public class EllipsisMatch extends ArrayTermVector implements Term {
     }
 
     @Override
-    public Term eval(TermIndex index) {
+    public Term eval(TermResolver r) {
         return this;
     }
 

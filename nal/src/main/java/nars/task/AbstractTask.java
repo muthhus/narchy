@@ -13,8 +13,6 @@ import nars.index.term.TermIndex;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
-import nars.term.compound.SerialCompound;
-import nars.term.util.InvalidTermException;
 import nars.time.Tense;
 import nars.truth.Truth;
 import nars.truth.TruthDelta;
@@ -29,7 +27,6 @@ import java.util.Objects;
 import static nars.$.t;
 import static nars.Op.*;
 import static nars.term.Terms.compoundOrNull;
-import static nars.time.Tense.DTERNAL;
 import static nars.time.Tense.ETERNAL;
 
 /**
@@ -170,16 +167,16 @@ public abstract class AbstractTask extends RawBudget implements Task {
 
 
         Compound cntt;
-        if (t instanceof SerialCompound) {
-            Compound xt = ((SerialCompound) t).build();
-            if (xt == null)
-                throw new InvalidTaskException(t, "Error decoding SerialCompound");
-            cntt = xt;
-        } else {
-            cntt = t;
-        }
+//        if (t instanceof SerialCompound) {
+//            Compound xt = compoundOrNullDeserialized(((SerialCompound) t), n.concepts);
+//            if (xt == null)
+//                throw new InvalidTaskException(t, "Error decoding SerialCompound");
+//            cntt = xt;
+//        } else {
+//            cntt = t;
+//        }
 
-        cntt = eval(n.concepts, cntt);
+        cntt = eval(n.concepts, t);
         if (cntt == null)
             throw new InvalidTaskException(t, "Failed normalization");
 
@@ -278,6 +275,12 @@ public abstract class AbstractTask extends RawBudget implements Task {
     }
 
     @Nullable protected Compound eval(@NotNull TermIndex index, @NotNull Compound t) {
+        //        if (t instanceof SerialCompound) {
+//            t = ((SerialCompound)t).build(i);
+//        }
+        t = compoundOrNull(t);
+        if (t==null) return null;
+
         return compoundOrNull(index.eval(t));
     }
 

@@ -8,6 +8,7 @@ import nars.derive.rule.PremiseRule;
 import nars.premise.Premise;
 import nars.task.DerivedTask;
 import nars.term.Compound;
+import nars.term.compound.SerialCompound;
 import nars.term.util.InvalidTermException;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
@@ -50,8 +51,12 @@ public class Conclusion extends RawBudget {
      */
     public final DerivedTask derive(@NotNull Premise p, NAR nar) {
 
-        Compound content = term;
-
+//        Compound content = term.build(nar.concepts /* TODO a memoized instance of the Derivation that produced this */);
+//        if (content == null)
+//            return null;
+        Compound content = compoundOrNull(nar.concepts.eval(term));
+        if (content == null)
+            return null;
 
 //this is performed on input also
 //        if (!Task.taskContentValid(content, ct.punc, nar, false/* !Param.DEBUG*/))
@@ -128,9 +133,6 @@ public class Conclusion extends RawBudget {
             if (content == null)
                 return null;
 
-            content = compoundOrNull(nar.concepts.normalize(content));
-            if (content == null)
-                return null;
         }
 
         Truth truth = this.truth;
@@ -143,6 +145,11 @@ public class Conclusion extends RawBudget {
                     return null; //excessive doubt
             }
         }
+
+
+        content = compoundOrNull(nar.concepts.normalize(content));
+        if (content == null)
+            return null;
 
         content = nar.pre(content);
         if (content.volume() > nar.termVolumeMax.intValue())

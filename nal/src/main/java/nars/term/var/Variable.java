@@ -1,6 +1,6 @@
 package nars.term.var;
 
-import nars.index.term.TermIndex;
+import nars.index.term.TermResolver;
 import nars.term.Term;
 import nars.term.atom.Atomic;
 import org.jetbrains.annotations.NotNull;
@@ -70,7 +70,7 @@ public interface Variable extends Atomic {
     }
 
     @Override
-    default Term eval(TermIndex termIndex) {
+    default Term eval(TermResolver termIndex) {
         return this;
     }
 }
