@@ -45,25 +45,25 @@ public class DynByteSeq implements DataOutput, Appendable, ByteSeq {
     }
 
     @Override
-    public void write(int v) throws IOException {
+    public void write(int v)  {
         writeByte(v);
     }
 
 
     @Override
-    public void writeByte(int v) throws IOException {
+    public void writeByte(int v)  {
         ensureSized(1);
         this.bytes[this.position++] = (byte) v;
     }
 
 
     @Override
-    public void write(@NotNull byte[] bytes) throws IOException {
+    public void write(@NotNull byte[] bytes)  {
         this.write(bytes, 0, bytes.length);
     }
 
     @Override
-    public void write(@NotNull byte[] bytes, int off, int len) throws IOException {
+    public void write(@NotNull byte[] bytes, int off, int len)  {
         int position = ensureSized(len);
         System.arraycopy(bytes, off, this.bytes, position, len);
         this.position = position + len;
@@ -99,14 +99,14 @@ public class DynByteSeq implements DataOutput, Appendable, ByteSeq {
 
 
     @Override
-    public void writeBoolean(boolean v) throws IOException {
+    public void writeBoolean(boolean v)  {
         ensureSized(1);
         byte[] e = this.bytes;
         e[this.position++] = (byte) (v ? 1 : 0);
     }
 
     @Override
-    public void writeShort(int v) throws IOException {
+    public void writeShort(int v)  {
         int s = ensureSized(2);
         byte[] e = this.bytes;
         e[s] = (byte) (v >> 8);
@@ -115,7 +115,7 @@ public class DynByteSeq implements DataOutput, Appendable, ByteSeq {
     }
 
     @Override
-    public void writeChar(int v) throws IOException {
+    public void writeChar(int v)  {
 
         int s = ensureSized(2);
         byte[] e = this.bytes;
@@ -126,7 +126,7 @@ public class DynByteSeq implements DataOutput, Appendable, ByteSeq {
     }
 
     @Override
-    public void writeInt(int v) throws IOException {
+    public void writeInt(int v)  {
 
         int s = ensureSized(4);
         byte[] e = this.bytes;
@@ -138,7 +138,7 @@ public class DynByteSeq implements DataOutput, Appendable, ByteSeq {
     }
 
     @Override
-    public void writeLong(long v) throws IOException {
+    public void writeLong(long v)  {
 
         int s = ensureSized(8);
         byte[] e = this.bytes;
@@ -154,7 +154,7 @@ public class DynByteSeq implements DataOutput, Appendable, ByteSeq {
     }
 
     @Override
-    public void writeFloat(float v) throws IOException {
+    public void writeFloat(float v)  {
 
         int s = ensureSized(4);
         byte[] e = this.bytes;
@@ -167,7 +167,7 @@ public class DynByteSeq implements DataOutput, Appendable, ByteSeq {
     }
 
     @Override
-    public void writeDouble(double v) throws IOException {
+    public void writeDouble(double v)  {
         throw new UnsupportedOperationException("yet");
 //        long bits = Double.doubleToLongBits(v);
 //
@@ -200,29 +200,29 @@ public class DynByteSeq implements DataOutput, Appendable, ByteSeq {
     }
 
     @Override
-    public void writeBytes(String s) throws IOException {
+    public void writeBytes(String s)  {
 //        int len = s.length();
 //
 //        for (int i = 0; i < len; ++i) {
 //            this.write(s.charAt(i));
 //        }
-        throw new UnsupportedEncodingException();
+        throw new UnsupportedOperationException("TODO");
 
     }
 
     @Override
-    public void writeChars(String s) throws IOException {
+    public void writeChars(String s)  {
 //        int len = s.length();
 //
 //        for (int i = 0; i < len; ++i) {
 //            this.writeChar(s.charAt(i));
 //        }
-        throw new UnsupportedEncodingException();
+        throw new UnsupportedOperationException("TODO");
 
     }
 
     @Override
-    public void writeUTF(@NotNull String s) throws IOException {
+    public void writeUTF(@NotNull String s)  {
         //throw new UnsupportedOperationException("yet");
 
         //WARNING this isnt UTF8
@@ -245,12 +245,12 @@ public class DynByteSeq implements DataOutput, Appendable, ByteSeq {
     }
 
     @Override
-    public Appendable append(CharSequence csq) throws IOException {
+    public Appendable append(CharSequence csq)  {
         return append(csq, 0, csq.length());
     }
 
     @Override
-    public Appendable append(CharSequence csq, int start, int end) throws IOException {
+    public Appendable append(CharSequence csq, int start, int end)  {
         for (int i = start; i < end; i++) {
             writeChar(csq.charAt(i)); //TODO optimize
         }
@@ -258,13 +258,17 @@ public class DynByteSeq implements DataOutput, Appendable, ByteSeq {
     }
 
     @Override
-    public Appendable append(char c) throws IOException {
+    public Appendable append(char c)  {
         writeChar(c);
         return this;
     }
 
+    public void appendTo(@NotNull DataOutput out) throws IOException {
+        out.write(bytes, 0, position);
+    }
+
 //    @Override
-//    public void flush() throws IOException {
+//    public void flush()  {
 //        int pos = this.position;
 //        ByteOutput byteOutput = this.byteOutput;
 //        if (byteOutput != null) {
@@ -278,7 +282,7 @@ public class DynByteSeq implements DataOutput, Appendable, ByteSeq {
 //
 //    }
 
-//    protected void shallowFlush() throws IOException {
+//    protected void shallowFlush()  {
 //        int pos = this.position;
 //        ByteOutput byteOutput = this.byteOutput;
 //        if (byteOutput != null) {
@@ -291,12 +295,12 @@ public class DynByteSeq implements DataOutput, Appendable, ByteSeq {
 //
 //    }
 
-//    protected void start(ByteOutput byteOutput) throws IOException {
+//    protected void start(ByteOutput byteOutput)  {
 //        this.byteOutput = byteOutput;
 //        this.buffer = new byte[this.bufferSize];
 //    }
 
-//    protected void finish() throws IOException {
+//    protected void finish()  {
 //        try {
 //            
 //        } finally {
@@ -307,7 +311,7 @@ public class DynByteSeq implements DataOutput, Appendable, ByteSeq {
 //    }
 //
 //    @Override
-//    public void close() throws IOException {
+//    public void close()  {
 //        
 //        this.byteOutput.close();
 //    }
