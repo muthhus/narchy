@@ -17,6 +17,7 @@ import nars.concept.Concept;
 import nars.conceptualize.DefaultConceptBuilder;
 import nars.gui.BagChart;
 import nars.gui.Vis;
+import nars.index.term.HijackTermIndex;
 import nars.index.term.NullTermIndex;
 import nars.index.term.map.CaffeineIndex;
 import nars.budget.BLink;
@@ -181,7 +182,7 @@ abstract public class NAgents extends NAgent {
                 //.sync(false)
                 ;
 
-        int conceptsPerCycle = 128 * threads;
+        int conceptsPerCycle = 16 * threads;
 
         final int reprobes = 4;
 
@@ -195,19 +196,20 @@ abstract public class NAgents extends NAgent {
             }
         };
 
-        Default nar = new Default(64 * 1024,
+        Default nar = new Default(16 * 1024,
                 conceptsPerCycle, 1, 3, rng,
 
+                new HijackTermIndex(cb, 1024 * 64, 4)
                 //new NullTermIndex(cb)
-                new CaffeineIndex(cb, 64*1024, false, exe)
+                //new CaffeineIndex(cb, 64*1024, false, exe)
                 //new TreeTermIndex.L1TreeIndex(new DefaultConceptBuilder(), 300000, 32 * 1024, 3)
                 ,
                 time,
                 exe) {
 
             final Compressor compressor = new Compressor(this, "_",
-                    3, 16,
-                    10f, 128, 512);
+                    3, 7,
+                    1f, 16, 128);
 
             @Override
             public Task pre(@NotNull Task t) {

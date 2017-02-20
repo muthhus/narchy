@@ -279,8 +279,11 @@ public class Abbreviation/*<S extends Term>*/ extends Leak<Compound, BLink<Compo
 
         static public AliasConcept get(@NotNull String compressed, @NotNull Compound decompressed, @NotNull NAR nar, @NotNull Term... additionalTerms) {
             Concept c = nar.concept(decompressed, true);
-            AliasConcept a = new AliasConcept(compressed, (CompoundConcept)c, nar, additionalTerms);
-            return a;
+            if(c!=null) {
+                AliasConcept a = new AliasConcept(compressed, (CompoundConcept) c, nar, additionalTerms);
+                return a;
+            }
+            return null;
         }
 
         AliasConcept(@NotNull String abbreviation, CompoundConcept abbr, @NotNull NAR nar, @NotNull Term... additionalTerms) {

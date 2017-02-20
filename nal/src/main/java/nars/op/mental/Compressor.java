@@ -58,15 +58,15 @@ public class Compressor extends Abbreviation implements RemovalListener<Compound
 
     /* static */ class Abbr {
         public final Compound decompressed;
-        public final AliasConcept compressed;
+        @NotNull public final AliasConcept compressed;
         final SequenceMatcher encode;
         final SequenceMatcher decode;
         private final byte[] encoded;
         private final byte[] decoded;
 
-        Abbr(Compound decompressed, String compressed, NAR nar) {
+        Abbr(Compound decompressed, @NotNull AliasConcept compressed, NAR nar) {
 
-            this.compressed = AliasConcept.get(compressed, decompressed, nar);
+            this.compressed = compressed;
 
             this.decompressed = decompressed;
 
@@ -134,32 +134,40 @@ public class Compressor extends Abbreviation implements RemovalListener<Compound
 
         Abbr abb = code.get(abbreviated, (a) -> {
 
-            String compr = newSerialTerm();
+
 
             //System.out.println("compress CODE: " + a + " to " + compr);
 
             changed[0] = true;
-            return new Abbr(a  /** store fully decompress */, compr, nar);
+            AliasConcept aa = AliasConcept.get(newSerialTerm(), a, nar);
+            if (aa == null)
+                return null;
+
+            return new Abbr(a  /** store fully decompress */, aa, nar);
         });
         if (changed[0]) {
-            Compound s = compoundOrNull(
-                //$.sim
-                $.equi
-                    (abb.compressed, abb.decompressed)
-            );
-            if (s == null) {
-                logger.warn("unrelateable: {}", abb);
+            if (abb!=null) {
+                Compound s = compoundOrNull(
+                        //$.sim
+                        $.equi
+                                (abb.compressed, abb.decompressed)
+                );
+                if (s == null) {
+                    logger.warn("unrelateable: {}", abb);
+                } else {
+
+                    Task abbreviationTask = new AbbreviationTask(
+                            s, abb.decompressed, abb.compressed, abbreviationConfidence.floatValue())
+                            .time(nar.time(), ETERNAL)
+                            .log("Abbreviate")
+                            .budgetSafe(b);
+                    nar.input(abbreviationTask);
+
+
+                    recompile();
+                }
             } else {
-
-                Task abbreviationTask = new AbbreviationTask(
-                        s, abb.decompressed, abb.compressed, abbreviationConfidence.floatValue())
-                        .time(nar.time(), ETERNAL)
-                        .log("Abbreviate")
-                        .budgetSafe(b);
-                nar.input(abbreviationTask);
-
-
-                recompile();
+                code.invalidate(abbreviated);
             }
 
         }

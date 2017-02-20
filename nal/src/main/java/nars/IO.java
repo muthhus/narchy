@@ -189,7 +189,12 @@ public class IO {
         switch (o) {
 
             case ATOM:
-                return (Atomic) t.get(new Atom(s), true);
+                Atom a = new Atom(s);
+                Atomic aa = (Atomic) t.get(a);
+                if (aa!=null)
+                    return aa; //the concept, if exists
+                else
+                    return a; //just the term
 
             default:
                 int maybeI = Texts.i(s, Integer.MIN_VALUE);

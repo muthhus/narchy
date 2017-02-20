@@ -4,7 +4,10 @@ import jcog.Util;
 import nars.IO;
 import nars.Op;
 import nars.Param;
+import nars.concept.CompoundConcept;
+import nars.concept.Concept;
 import nars.term.Compound;
+import nars.term.Term;
 import nars.term.container.TermContainer;
 import nars.term.util.InvalidTermException;
 import nars.time.Tense;
@@ -128,34 +131,22 @@ public class GenericCompound implements Compound  {
         if (this == that)
             return true;
 
+        Compound cthat;
         if (that instanceof Compound) {
-
-            if (hashCode() != that.hashCode())
-                return false;
-
-            Compound cthat = (Compound)that;
-
-            //return subterms.equals(cthat.subterms()) &&
-            return (op == cthat.op()) &&
-                    subterms.equivalent(cthat.subterms()) &&
-                   (dt == cthat.dt());
-
-
-        } /*else if (that instanceof Concept )  { //Termed but not Task
-            Term tthat = ((Concept) that).term();
-            if (tthat instanceof Compound) {
-
-                if (this == tthat)
-                    return true;
-
-                cthat = (Compound) tthat;
-
-            } else {
-                return false;
-            }
-        }  else { */
-        else
+            cthat = (Compound)that;
+        } else if (that instanceof CompoundConcept) { //Termed but not Task
+            cthat = (Compound) ((Concept) that).term();
+            if (this == cthat)
+                return true;
+        } else {
             return false;
+        }
+
+        //return subterms.equals(cthat.subterms()) &&
+        return (hash == that.hashCode()) &&
+               (op == cthat.op()) &&
+                subterms.equivalent(cthat.subterms()) &&
+               (dt == cthat.dt());
 
 
         //subterm sharing:

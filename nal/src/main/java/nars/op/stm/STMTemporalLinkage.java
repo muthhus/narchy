@@ -56,8 +56,7 @@ public final class STMTemporalLinkage extends STM {
             return;
         }
 
-        /** current task's... */
-        Concept concept = t.concept(nar);
+
 
         int stmCapacity = capacity.intValue();
 
@@ -110,7 +109,10 @@ public final class STMTemporalLinkage extends STM {
                 if (tPri > 0) {
                     for (int i = 0, queuedSize = queued.size(); i < queuedSize; i++) {
                         Task u = queued.get(i);
-                        crossLink(concept, t, u, strength * or(tPri, u.priSafe(0)), nar);
+                        /** current task's... */
+                        Concept concept = t.concept(nar);
+                        if (concept!=null)
+                            crossLink(concept, t, u, strength * or(tPri, u.priSafe(0)), nar);
                     }
                 }
             });

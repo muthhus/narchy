@@ -40,7 +40,7 @@ public class DynamicBeliefTableTest {
 
         Concept cc = n.concept($("(&&, a:x, a:y, a:z)"), true);
         Truth now = cc.belief(n.time(), n.time.dur());
-        assertEquals($.t(1f, 0.73f), now);
+        assertTrue($.t(1f, 0.73f).equals(now, 0.01f));
         //the truth values were provided despite the belief tables being empty:
         assertTrue(cc.beliefs().isEmpty());
 
@@ -55,7 +55,7 @@ public class DynamicBeliefTableTest {
         {
             Concept ccn = n.concept($("(&&, a:x, (--, a:y), a:z)"), true);
             Truth nown = ccn.belief(n.time(), n.time.dur());
-            assertEquals(ccn.toString(), $.t(0f, 0.73f), nown);
+            assertTrue($.t(0f, 0.73f).equals(nown, 0.01f));
         }
 
         //test change after a component's revision:

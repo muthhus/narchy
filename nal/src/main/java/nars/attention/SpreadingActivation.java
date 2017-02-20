@@ -134,11 +134,11 @@ public class SpreadingActivation extends Activation implements ObjectFloatProced
 
         Termed linkedTerm;
         if (isntVariable) {
-            Concept termConcept = nar.concept(targetTerm, true);
+            Concept termConcept = nar.concept(targetTerm, false);
             if (termConcept != null)
                 linkedTerm = termConcept;
             else
-                return;
+                linkedTerm = targetTerm;
         } else {
             linkedTerm = targetTerm;
         }

@@ -16,6 +16,16 @@ public class RawPLink<X> implements PLink<X> {
     }
 
     @Override
+    public boolean equals(Object obj) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public int hashCode() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public void setPriority(float p) {
         this.pri = Priority.validPriority(p);
     }

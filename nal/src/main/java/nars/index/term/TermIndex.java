@@ -503,9 +503,9 @@ public abstract class TermIndex extends TermBuilder {
 
         @Nullable Termed c = get(term, createIfMissing);
         if (!(c instanceof Concept)) {
-            if (createIfMissing) {
-                throw new Concept.InvalidConceptException(term, "Failed to build concept");
-            }
+//            if (createIfMissing) {
+//                throw new Concept.InvalidConceptException(term, "Failed to build concept");
+//            }
             return null;
         }
 

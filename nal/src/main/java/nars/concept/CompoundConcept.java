@@ -555,6 +555,7 @@ public class CompoundConcept<T extends Compound> implements Concept, Termlike {
 
     @Override
     public final boolean equals(Object obj) {
+
         return this == obj || term.equals(obj);
     }
 
