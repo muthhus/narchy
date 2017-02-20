@@ -55,9 +55,9 @@ public class PreferSimpleAndConfidentPremise extends DefaultPremise {
                     taskCompl + beliefCompl;
         }
         return
-                Util.sqr( //sharpen
+                //Util.sqr( //sharpen
                     Util.unitize( ((float) parentComplexity) / (penaltyComplexity + derivedComplexity))
-                )
+                //)
             ;
     }
 

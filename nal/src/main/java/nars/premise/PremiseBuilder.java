@@ -3,8 +3,7 @@ package nars.premise;
 import jcog.Util;
 import nars.*;
 import nars.attention.Crosslink;
-import nars.budget.Budget;
-import nars.budget.BudgetFunctions;
+import nars.budget.*;
 import nars.concept.Concept;
 import nars.table.BeliefTable;
 import nars.task.DerivedTask;
@@ -56,7 +55,7 @@ abstract public class PremiseBuilder {
      * patham9 its using the result of higher confidence
      */
     @Nullable
-    public Premise premise(@NotNull Termed c, @NotNull final Task _task, Term _beliefTerm, long now, NAR nar, float priFactor, float priMin) {
+    public Premise premise(@NotNull Termed c, @NotNull final BLink<Task> theTaskLink, Term _beliefTerm, long now, NAR nar, float priFactor, float priMin) {
 
         //if (Param.PREMISE_LOG)
         //logger.info("try: { concept:\"{}\",\ttask:\"{}\",\tbeliefTerm:\"{}\" }", c, task, beliefTerm);
@@ -65,9 +64,15 @@ abstract public class PremiseBuilder {
 //            return null;
 
 
-        final Budget taskBudget = _task.budget().clone();
-        if (taskBudget == null)
+        Budget taskLink = theTaskLink.clone(); /* copy, in case the tasklink becomes deleted during this method */
+        if (taskLink == null) //deleted
             return null;
+
+        Task _task = theTaskLink.get();
+        //System.out.println(_task.pri() + ";" + _task.qua() + "\t" + taskLink.pri() + ";" + taskLink.qua());
+        //final Budget taskBudget = _task.budget().clone();
+        //if (taskBudget == null)
+            //return null;
 
 //        final Task task = nar.post(_task);
 //        Term beliefTerm = nar.post(_beliefTerm).unneg();
@@ -125,15 +130,15 @@ abstract public class PremiseBuilder {
                                 //transfer budget from question to answer
                                 //float qBefore = taskBudget.priSafe(0);
                                 //float aBefore = answered.priSafe(0);
-                                BudgetFunctions.transferPri(taskBudget, answered.budget(),
+                                BudgetFunctions.transferPri(taskLink, answered.budget(),
                                         (float) Math.sqrt(answered.conf())
                                         //(1f - taskBudget.qua())
                                         //(1f - Util.unitize(taskBudget.qua()/answered.qua())) //proportion of the taskBudget which the answer receives as a boost
                                 );
 
+                                BudgetMerge.maxBlend.apply(theTaskLink, taskLink, 1f);
 
-
-                                task.budget().set(taskBudget); //update the task budget
+                                //task.budget().set(taskBudget); //update the task budget
 
                                 Crosslink.crossLink(task, answered, answered.conf(), nar);
                             }
@@ -243,15 +248,18 @@ abstract public class PremiseBuilder {
         //TODO lerp by the two budget's qualities instead of aveAri,or etc ?
 
 
-        float tq = taskBudget.qua();
+        float tq = taskLink.qua();
 
         float bq = (beliefBudget!=null) ? beliefBudget.qua() : Float.NaN;
         float qua = belief == null ? tq : aveAri(tq, bq);
         if (qua < nar.quaMin.floatValue())
             return null;
 
+        //combine either the task or the tasklink. this makes tasks more competitive allowing the priority reduction to be applied to either the task (in belief table) or the tasklink's ordinary forgetting
+        float taskPri = aveAri(taskLink.pri(), task.priSafe(0));
+
         float pri =
-                belief == null ? taskBudget.pri() : Util.lerp(tq / (tq + bq), taskBudget.pri(), beliefBudget.pri());
+                belief == null ? taskPri : Util.lerp(tq / (tq + bq), taskPri, beliefBudget.pri());
         if (pri < priMin)
             return null;
 

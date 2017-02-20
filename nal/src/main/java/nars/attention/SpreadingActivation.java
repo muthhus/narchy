@@ -205,7 +205,10 @@ public class SpreadingActivation extends Activation implements ObjectFloatProced
 
     void tasklink(Concept target, float scale) {
         Task src = (Task) in;
-        target.tasklinks().put(new DependentBLink(src), scale, null);
+        target.tasklinks().put(
+                //new DependentBLink(src),
+                new RawBLink(src, src.pri(), src.qua()),
+                scale, null);
     }
 
     void termlink(Concept from, Term to, float scale) {

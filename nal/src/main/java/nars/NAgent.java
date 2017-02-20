@@ -17,12 +17,14 @@ import nars.task.MutableTask;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
+import nars.term.atom.Atom;
 import nars.time.FrameTime;
 import nars.time.Time;
 import nars.truth.Truth;
 import nars.util.Loop;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -63,7 +65,7 @@ abstract public class NAgent implements NSense, NAction {
     @NotNull
     public final FloatNormalized rewardNormalized;
     private final float actionBoost;
-    private final String id;
+    private final Term id;
 
     public final NAR nar;
 
@@ -140,6 +142,10 @@ abstract public class NAgent implements NSense, NAction {
     }
 
     public NAgent(String id, @NotNull NAR nar, int frameRate) {
+        this(id.isEmpty() ? null : $.the(id), nar, frameRate);
+    }
+
+    public NAgent(@Nullable Term id, @NotNull NAR nar, int frameRate) {
 
         this.id = id;
         this.nar = nar;
@@ -161,7 +167,7 @@ abstract public class NAgent implements NSense, NAction {
 
         this.happy = new SensorConcept(
                 //"happy" + "(" + nar.self + ")", nar,
-                id.isEmpty() ? $.p("happy") : $.func("happy", id),
+                id == null ? $.p("happy") : $.func("happy", id),
                 nar,
                 rewardNormalized,
                 (x) -> t(x, alpha)

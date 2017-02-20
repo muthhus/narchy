@@ -27,6 +27,11 @@ public class RawPLink<X> implements PLink<X> {
     }
 
     @Override
+    public String toString() {
+        return id + "=" + pri;
+    }
+
+    @Override
     public float pri() {
         return pri;
     }

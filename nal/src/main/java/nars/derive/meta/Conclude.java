@@ -115,6 +115,16 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
 
                     Derivation.TruthPuncEvidence ct = m.punct.get();
                     Truth truth = ct.truth;
+
+                    if (truth != null) {
+                        float eFactor = nar.derivedEvidenceGain.asFloat();
+                        if (eFactor != 1) {
+                            truth = truth.confWeightMult(eFactor);
+                            if (truth == null)
+                                return true;
+                        }
+                    }
+
                     Budget budget = m.premise.budget(crr, truth, m);
                     if (budget != null) {
                         derive(m, crr, truth, budget, ct); //continue to stage 2
@@ -146,7 +156,6 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
 
             if (truth != null)
                 truth = truth.negated();
-            o = content.op();
         }
 
 //this is performed on input also
@@ -229,14 +238,7 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
         }
 
 
-        if (truth != null) {
-            float eFactor = nar.evidenceFactor.asFloat();
-            if (eFactor != 1) {
-                truth = truth.confWeightMult(eFactor);
-                if (truth == null)
-                    return; //excessive doubt
-            }
-        }
+
 
         content = nar.pre(content);
         if (content.volume() > nar.termVolumeMax.intValue())

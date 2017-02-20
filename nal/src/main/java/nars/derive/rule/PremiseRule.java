@@ -49,7 +49,7 @@ import static nars.term.Terms.*;
  */
 public class PremiseRule extends GenericCompound {
 
-    static final Term TaskAny = $.func("task", "any");
+    static final Term TaskAny = $.func("task", $.the("any"));
     static final Term QUESTION_PUNCTUATION = $.inh($.the("Question"), $.the("Punctuation"));
     static final Atomic BELIEF = $.the("Belief");
     static final Atomic GOAL = $.the("Goal");

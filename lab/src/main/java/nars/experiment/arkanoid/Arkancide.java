@@ -61,6 +61,8 @@ public class Arkancide extends NAgents {
     public Arkancide(NAR nar, boolean cam) throws Narsese.NarseseException {
         super("noid", nar);
 
+        nar.derivedEvidenceGain.setValue(1.5f);
+
 
         noid = new Arkanoid(!cam) {
             @Override
@@ -87,11 +89,11 @@ public class Arkancide extends NAgents {
             //senseCameraRetina("cam2", noid, visW/2, visH/2, (v) -> $.t(v, alpha));
         } else {
             //nar.termVolumeMax.set(12);
-            senseNumber( "x(paddle, noid)", new FloatPolarNormalized(()->noid.paddle.x, noid.getWidth()/2));//.resolution(resX);
-            senseNumber( "x(ball, noid)", new FloatPolarNormalized(()->noid.ball.x, noid.getWidth()/2));//.resolution(resX);
-            senseNumber( "y(ball, noid)", new FloatPolarNormalized(()->noid.ball.y, noid.getHeight()/2));//.resolution(resY);
-            senseNumber("vx(ball, noid)", new FloatPolarNormalized(()->noid.ball.velocityX));
-            senseNumber("vy(ball, noid)", new FloatPolarNormalized(()->noid.ball.velocityY));
+            senseNumber( "x(paddle(noid))", new FloatPolarNormalized(()->noid.paddle.x, noid.getWidth()/2));//.resolution(resX);
+            senseNumber( "x(ball(noid))", new FloatPolarNormalized(()->noid.ball.x, noid.getWidth()/2));//.resolution(resX);
+            senseNumber( "y(ball(noid))", new FloatPolarNormalized(()->noid.ball.y, noid.getHeight()/2));//.resolution(resY);
+            senseNumber("vx(ball(noid))", new FloatPolarNormalized(()->noid.ball.velocityX));
+            senseNumber("vy(ball(noid))", new FloatPolarNormalized(()->noid.ball.velocityY));
         }
 
 
@@ -105,7 +107,7 @@ public class Arkancide extends NAgents {
             }
             return $.t(paddleSpeed, nar.confidenceDefault('.'));
         }));*/
-        action(new ActionConcept( $.func("x", "paddleNext", "noid"), nar, (b, d) -> {
+        action(new ActionConcept( $.func("nx", "paddle(noid)"), nar, (b, d) -> {
 
 
             float pct;

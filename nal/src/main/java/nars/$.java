@@ -170,7 +170,7 @@ public enum $ {
     public static Compound func(@NotNull String opTerm, @Nullable List<Term> arg) {
         return func($.the(opTerm), arg.toArray(new Term[arg.size()]));
     }
-    public static Compound func(@NotNull String opTerm, @Nullable String... arg) {
+    public static Compound func(@NotNull String opTerm, @Nullable String... arg) throws Narsese.NarseseException {
         return func($.the(opTerm), $.array(arg));
     }
 
@@ -390,11 +390,11 @@ public enum $ {
    private static Term[] array(@NotNull Collection<? extends Term> t) {
         return t.toArray(new Term[t.size()]);
     }
-    private static Term[] array(String... s) {
+    private static Term[] array(String... s) throws Narsese.NarseseException {
         int l = s.length;
         Term[] tt = new Term[l];
         for (int i = 0; i < l; i++)
-            tt[i] = $.the(s[i]);
+            tt[i] = $.$(s[i]);
 
         return tt;
     }

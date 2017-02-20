@@ -41,8 +41,8 @@ public abstract class TermVector implements TermContainer {
 
     public TermVector(Term... terms) {
 
-        if (terms.length > Param.MAX_SUBTERMS)
-            throw new UnsupportedOperationException("too many subterms (" + terms.length + " > " + Param.MAX_SUBTERMS);
+        if (terms.length > Param.COMPOUND_SUBTERMS_MAX)
+            throw new UnsupportedOperationException("too many subterms (" + terms.length + " > " + Param.COMPOUND_SUBTERMS_MAX);
 
 
 //         if (Param.DEBUG) {

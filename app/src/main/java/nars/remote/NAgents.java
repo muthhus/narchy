@@ -17,6 +17,7 @@ import nars.concept.Concept;
 import nars.conceptualize.DefaultConceptBuilder;
 import nars.gui.BagChart;
 import nars.gui.Vis;
+import nars.index.term.NullTermIndex;
 import nars.index.term.map.CaffeineIndex;
 import nars.budget.BLink;
 import nars.budget.RawBLink;
@@ -180,7 +181,7 @@ abstract public class NAgents extends NAgent {
                     //.sync(false)
                 ;
 
-        int conceptsPerCycle = 128*threads;
+        int conceptsPerCycle = 256*threads;
 
         final int reprobes = 4;
 
@@ -194,9 +195,11 @@ abstract public class NAgents extends NAgent {
             }
         };
 
-        Default nar = new Default(16 * 1024,
+        Default nar = new Default(32 * 1024,
                 conceptsPerCycle, 1, 3, rng,
-                new CaffeineIndex(cb, 64*1024, false, exe)
+
+                new NullTermIndex(cb)
+                //new CaffeineIndex(cb, 64*1024, false, exe)
                 //new TreeTermIndex.L1TreeIndex(new DefaultConceptBuilder(), 300000, 32 * 1024, 3)
                 ,
                 time,
@@ -244,7 +247,7 @@ abstract public class NAgents extends NAgent {
 
         nar.confMin.setValue(0.01f);
         //nar.truthResolution.setValue(0.01f);
-        nar.termVolumeMax.setValue(65);
+        nar.termVolumeMax.setValue(70);
 
         MySTMClustered stm = new MySTMClustered(nar, 64, '.', 3, true, 6);
         MySTMClustered stmGoal = new MySTMClustered(nar, 32, '!', 2, true, 4);

@@ -2,6 +2,7 @@ package nars;
 
 import jcog.bag.PLink;
 import nars.concept.Concept;
+import nars.term.Term;
 import nars.term.Termed;
 import org.jetbrains.annotations.NotNull;
 
@@ -50,4 +51,8 @@ public interface Control {
         }
     };
 
+    /** allows the control to override the concept index on concept look-up */
+    default Concept concept(@NotNull Term tt) {
+        return null;
+    }
 }

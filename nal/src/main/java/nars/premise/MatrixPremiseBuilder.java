@@ -105,15 +105,13 @@ public class MatrixPremiseBuilder extends PremiseBuilder {
 
                 BLink<Task> taskLink = taskLinks.get(il % numTaskLinks);
 
-                Task task = taskLink.get(); /*match(taskLink.get(), nar); if (task==null) continue;*/
-
                 int countPerTermlink = 0;
 
                 int termlinksPerForThisTask = termlinks.lerp(taskLink.pri());
 
                 for (int j = 0; j < termsBufferSize && countPerTermlink < termlinksPerForThisTask; j++, jl++) {
 
-                    Premise p = premise(c, task, termsBuffer.get(jl % termsBufferSize).get(), now, nar, priFactor, -1f);
+                    Premise p = premise(c, taskLink, termsBuffer.get(jl % termsBufferSize).get(), now, nar, priFactor, -1f);
                     if (p != null) {
                         Derivation d = derivationBuilder.derive(p, target, nar);
                         if (d!=null) {

@@ -4,6 +4,7 @@ import jcog.data.random.XorShift128PlusRandom;
 import nars.$;
 import nars.NAgent;
 import nars.concept.ActionConcept;
+import nars.term.Term;
 
 import java.awt.image.BufferedImage;
 import java.util.List;
@@ -264,11 +265,13 @@ public abstract class PixelBag implements Bitmap2D {
     }
 
 
-    public PixelBag addActions(String termRoot, NAgent a) {
+    public PixelBag addActions(String termRootStr, NAgent a) {
         actions = $.newArrayList(3);
-        actions.add(a.actionBipolar($.func("see", termRoot, "rx"), this::setXRelative));
-        actions.add(a.actionBipolar($.func("see", termRoot, "ry"), this::setYRelative));
-        actions.add(a.actionBipolar($.func("see", termRoot, "zoom"), this::setZoom));
+
+        Term termRoot = $.the(termRootStr);
+        actions.add(a.actionBipolar($.func("see", termRoot, $.the("rx")), this::setXRelative));
+        actions.add(a.actionBipolar($.func("see", termRoot, $.the("ry")), this::setYRelative));
+        actions.add(a.actionBipolar($.func("see", termRoot, $.the("zoom")), this::setZoom));
 //        actions.add( a.actionBipolar("see(" + termRoot + ",fr)", this::setRedFilter) );
 //        actions.add( a.actionBipolar("see(" + termRoot + ",fg)", this::setGreenFilter) );
 //        actions.add( a.actionBipolar("see(" + termRoot + ",fb)", this::setBlueFilter) );

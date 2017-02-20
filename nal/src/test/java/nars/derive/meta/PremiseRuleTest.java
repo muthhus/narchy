@@ -175,7 +175,7 @@ public class PremiseRuleTest {
 
     @Test
     public void testBackwardPermutations() throws Narsese.NarseseException {
-        if (Param.BACKWARD_QUESTION_RULES) {
+        if (Param.DERIVER_PERMUTE_BACKWARD) {
             Set<PremiseRule> s = PremiseRuleSet.permute(
                     rule("(A --> B), (B --> C), neq(A,C) |- (A --> C), (Belief:Deduction, Goal:Strong, Permute:Backward, Permute:Swap)")
             );

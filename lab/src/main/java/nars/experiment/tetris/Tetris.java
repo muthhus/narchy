@@ -3,7 +3,6 @@ package nars.experiment.tetris;
 import nars.$;
 import nars.NAR;
 import nars.Narsese;
-import nars.Param;
 import nars.concept.ActionConcept;
 import nars.concept.SensorConcept;
 import nars.experiment.tetris.impl.TetrisState;
@@ -463,6 +462,7 @@ public class Tetris extends NAgents {
             //NAR nar = new TaskNAR(32 * 1024, new MultiThreadExecutioner(4, 4096), clock);
 //            MySTMClustered stm = new MySTMClustered(nar, 64, '.', 4, false, 2);
 //            MySTMClustered stmGoal = new MySTMClustered(nar, 16, '!', 2, false, 1);
+
 
 
 

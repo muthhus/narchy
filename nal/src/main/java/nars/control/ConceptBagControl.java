@@ -14,8 +14,10 @@ import nars.conceptualize.ConceptBuilder;
 import nars.derive.Deriver;
 import nars.premise.MatrixPremiseBuilder;
 import nars.task.DerivedTask;
+import nars.term.Term;
 import nars.term.Termed;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Map;
@@ -78,16 +80,10 @@ public class ConceptBagControl implements Control, Consumer<DerivedTask> {
     public final FloatParam activationRate = new FloatParam(1f);
     private float currentActivationRate = 1f;
 
-//    private Comparator<? super BLink<Concept>> sortConceptLinks = (a, b) -> {
-//        Concept A = a.get();
-//        Concept B = b.get();
-//        String as = A!=null ? A.term
-//    };
+    /** pending derivations to be input after this cycle */
+    final Map<Task, Task> pending = new ConcurrentHashMap();
+    //int _merges = 0;
 
-//    private static final Logger logger = LoggerFactory.getLogger(AbstractCore.class);
-
-    //private final CapacityLinkedHashMap<Premise,Premise> recent = new CapacityLinkedHashMap<>(256);
-    //long novel=0, total=0;
 
     public ConceptBagControl(@NotNull NAR nar, @NotNull Deriver deriver, @NotNull Bag<Concept,PLink<Concept>> conceptBag) {
 
@@ -160,9 +156,15 @@ public class ConceptBagControl implements Control, Consumer<DerivedTask> {
 
     }
 
-    final Map<Task, Task> pending = new ConcurrentHashMap();
-    //int _merges = 0;
 
+
+    @Override
+    public Concept concept(@NotNull Term tt) {
+        PLink<Concept> x = active.get(tt);
+        if (x!=null)
+            return x.get();
+        return null;
+    }
 
     @Override
     public void accept(DerivedTask d) {

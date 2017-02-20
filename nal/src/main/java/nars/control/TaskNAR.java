@@ -265,18 +265,14 @@ public class TaskNAR extends NAR {
         if (ba == null || bb == null)
             return;
 
-        Task a = ba.get();
-        if (a == null)
-            return;
-
         Task b = bb.get();
         if (b == null)
             return;
 
         Term t = b.term();
 
-        Premise c = premiseBuilder.premise(a /* not necessary */,
-                a, t, time(),
+        Premise c = premiseBuilder.premise(ba.get() /* not necessary */,
+                ba, t, time(),
                 this, 1f, minPri
         );
 

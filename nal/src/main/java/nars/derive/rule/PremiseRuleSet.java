@@ -296,7 +296,7 @@ public class PremiseRuleSet {
     }
 
     static void permuteBackward(String src, @NotNull PatternTermIndex index, @NotNull Collection<PremiseRule> ur, @NotNull PremiseRule r) {
-        if (Param.BACKWARD_QUESTION_RULES && r.allowBackward) {
+        if (Param.DERIVER_PERMUTE_BACKWARD && r.allowBackward) {
 
             r.backwardPermutation(index, (q, reason) -> {
                 PremiseRule b = add(q, src + ':' + reason, ur, index);
@@ -327,7 +327,7 @@ public class PremiseRuleSet {
 
         then.accept(r);
 
-        if (Param.PERMUTE_SWAPPED_RULES && r.allowForward && permuteSwap(r)) {
+        if (Param.DERIVER_PERMUTE_SWAPPED && r.allowForward && permuteSwap(r)) {
             PremiseRule bSwap = r.swapPermutation(index);
             if (bSwap != null)
                 then.accept(add(bSwap, src + ":forward", ur, index));

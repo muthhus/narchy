@@ -17,18 +17,25 @@ import static nars.Op.*;
 /**
  * NAR Parameters which can be changed during runtime.
  */
-public abstract class Param /*extends Container*/  {
+public abstract class Param  {
 
 
     /** absolute limit for constructing terms in any context in which a NAR is not known, which could provide a limit.
      * typically a NAR instance's 'compoundVolumeMax' parameter will be lower than this */
     public static final int COMPOUND_VOLUME_MAX = 127;
 
+    /**
+     * limited because some subterm paths are stored as byte[]. to be safe, use 7-bits
+     */
+    public static final int COMPOUND_SUBTERMS_MAX = 127;
+
     /** number of cycles for rolling average of busy emotion */
     public static final int BUSY_WINDOW = 4;
 
+    /** how many answers to record per input question task (in its concept's answer bag) */
     public static final int MAX_INPUT_ANSWERS = 16;
 
+    /** determines if an input goal or command operation task executes */
     public static float EXECUTION_THRESHOLD = 0.666f;
 
 
@@ -54,10 +61,7 @@ public abstract class Param /*extends Container*/  {
     }
 
 
-    /**
-     * limited because some subterm paths are stored as byte[]. to be safe, use 7-bits
-     */
-    public static final int MAX_SUBTERMS = 127;
+
     /**
      * Evidential Horizon, the amount of future evidence to be considered (during revision).
      * Must be >=1.0, usually 1 .. 2
@@ -67,13 +71,19 @@ public abstract class Param /*extends Container*/  {
     /**
      * Maximum length of the evidental base of the Stamp, a power of 2
      */
-    public static final int STAMP_CAPACITY = 10;
+    public static final int STAMP_CAPACITY = 16;
 
 
     /**
      * permute certain rules backward to questions (experimental, generates a lot of questions)
      */
-    public static final boolean BACKWARD_QUESTION_RULES = true;
+    public static final boolean DERIVER_PERMUTE_BACKWARD = true;
+
+
+    /**
+     * swap task and belief in eligible rules ("forward" permutation)
+     */
+    public static final boolean DERIVER_PERMUTE_SWAPPED = true;
 
 
     /** higher value means faster forgetting */
@@ -110,28 +120,20 @@ public abstract class Param /*extends Container*/  {
     /**
      * upper and lower limits for # of termutations derived, determined by premise's priority
      */
-    public static final int UnificationMatchesMax = 4;
+    public static final int UnificationMatchesMax = 3;
 
 
     public final static int SubUnificationStackMax = UnificationStackMax/2;
     public static final int SubUnificationMatchRetries = UnificationMatchesMax;
 
     /**
-     * swap task and belief in eligible rules ("forward" permutation)
-     */
-    public static final boolean PERMUTE_SWAPPED_RULES = true;
-    /**
      * minimum difference necessary to indicate a significant modification in budget float number components
      */
-    public static final float BUDGET_EPSILON = 0.0001f;
+    public static final float BUDGET_EPSILON = 0.00001f;
 
 
     public static final int DEFAULT_WIRED_CONCEPT_BELIEFS = 32;
     public static final int DEFAULT_WIRED_CONCEPT_GOALS = 32;
-
-    /** size of each thread's normalization cache, in entries */
-    public static final int NORMALIZATION_CACHE_SIZE = 16*1024;
-    public static final int TERM_CACHE_SIZE = 32*1024;
 
 
     public static int DEFAULT_NAL_LEVEL = 8;
@@ -155,61 +157,6 @@ public abstract class Param /*extends Container*/  {
 
 
 
-    //public static int QUERY_ANSWERS_PER_MATCH = 1;
-    //public static boolean REDUCE_TRUTH_BY_TEMPORAL_DISTANCE;
-
-
-    /**
-     * how much to multiply (shrink) the rank of a potential belief match if it overlaps with the task.
-     * used to discourage premise's choice of belief tasks which overlap with the task.
-     */
-    //public static float PREMISE_MATCH_OVERLAP_MULTIPLIER = 1f; //0.1f;
-
-
-//    /**
-//     * relates time and evidence (confidence); how past and future beliefs decay in rank
-//     * across time; width of the temporal focus relative to the min/max occurrence times
-//     * of tasks contained in the belief table
-//     */
-//    public static final float TEMPORAL_DURATION = 0.9f;
-
-//    /**
-//     * exponent by which confidence (modeled as luminance) decays through the time axis (>=1)
-//     * see: the microsphere interpolation paper for analysis on this parameter
-//     */
-//    public static FloatToFloatFunction timeToLuminosity = (dt) -> {
-//        //luminosity curve function
-//        // see: https://en.wikipedia.org/wiki/Inverse-square_law
-//        //      https://en.wikipedia.org/wiki/Distance_decay
-//        //      https://en.wikipedia.org/wiki/Proportionality_(mathematics)#Inverse_proportionality
-//        //float timeRate = 1f;
-//        //return InterpolatingMicrosphere.pow(Math.max(0.5f, diffNorm)*timeRate, -exponent);
-//
-//        float duration = 1f;
-//        return 1f / (1 + (dt*dt)/(duration*duration));
-//
-//        //return 1f / (1f + dt);
-//        //return 1f / (1f + dt*dt);
-//        //return 1f / ( 1f + (float)Math.sqrt(dt));
-//        //return 1f / ( (float)Math.pow(1+dt, 1.5f));
-//
-//    };
-
-
-
-//    /** confidence factor to multiply eternalizable temporal beliefs.
-//     *  displaced temporal beliefs and goals can be eternalized before being deleted, possibly preserving some of their truth value
-//     *  should be equal to or less than 1.0, so that resulting eternal beliefs dont override temporal beliefs of the smae confidence.
-//     *  (although revision can accumulate higher confidence).
-//     *
-//     *  this is applied after the usual TruthFunctions.eternalize function
-//     *  that determines a (lower) confidence value for the given temporal.
-//     *
-//     *  set to 0.0 to disable this functionality.
-//     */
-//    public static float ETERNALIZE_FORGOTTEN_TEMPORAL_TASKS_CONFIDENCE_FACTOR = 1f;
-
-
 
 
     private Truth defaultGoalTruth, defaultBeliefTruth;
@@ -231,42 +178,7 @@ public abstract class Param /*extends Container*/  {
      */
     @NotNull public FloatParam priorityFactor = new FloatParam(1f, 0f, 2f);
 
-    @NotNull public FloatParam evidenceFactor = new FloatParam(1f, 0f, 2f);
-
-    ///** extra debugging checks */
-    //public static final boolean DEBUG_PARANOID = false;
-
-    //public static boolean PRINT_DUPLICATE_DERIVATIONS = false;
-    //public static final boolean DEBUG_DERIVATION_GRAPH = false;
-    //public static final boolean DEBUG_REMOVED_CYCLIC_DERIVATIONS = false;
-    //public static final boolean DEBUG_REMOVED_INSUFFICIENT_BUDGET_DERIVATIONS = false;
-    //public static boolean DEBUG_DETECT_DUPLICATE_RULES;
-    //public static final boolean DEBUG_NON_INPUT_ANSWERED_QUESTIONS = false;
-
-
-    //TODO eventually sort out in case that a parameter is not needed anymore
-//
-//    public static float CURIOSITY_BUSINESS_THRESHOLD=0.15f; //dont be curious if business is above
-//    public static float CURIOSITY_PRIORITY_THRESHOLD=0.3f; //0.3f in 1.6.3
-//    public static float CURIOSITY_CONFIDENCE_THRESHOLD=0.8f;
-//    public static float CURIOSITY_DESIRE_CONFIDENCE_MUL=0.1f; //how much risk is the system allowed to take just to fullfill its hunger for knowledge?
-//    public static float CURIOSITY_DESIRE_PRIORITY_MUL=0.1f; //how much priority should curiosity have?
-//    public static boolean CURIOSITY_FOR_OPERATOR_ONLY=false; //for Peis concern that it may be overkill to allow it for all <a =/> b> statement, so that a has to be an operator
-//    public static boolean CURIOSITY_ALSO_ON_LOW_CONFIDENT_HIGH_PRIORITY_BELIEF=true;
-//
-//    //public static float HAPPY_EVENT_HIGHER_THRESHOLD=0.75f;
-//    public static float HAPPY_EVENT_CHANGE_THRESHOLD =0.01f;
-//    //public static float BUSY_EVENT_HIGHER_THRESHOLD=0.9f; //1.6.4, step by step^, there is already enough new things ^^
-//    public static float BUSY_EVENT_CHANGE_THRESHOLD =0.5f;
-//    public static boolean REFLECT_META_HAPPY_GOAL = false;
-//    public static boolean REFLECT_META_BUSY_BELIEF = false;
-//    public static boolean CONSIDER_REMIND=true;
-
-//
-//    public static boolean QUESTION_GENERATION_ON_DECISION_MAKING=true;
-//    public static boolean HOW_QUESTION_GENERATION_ON_DECISION_MAKING=true;
-//
-//    public static float ANTICIPATION_CONFIDENCE=0.95f;
+    @NotNull public FloatParam derivedEvidenceGain = new FloatParam(1f, 0f, 2f);
 
 
     @NotNull
@@ -277,16 +189,6 @@ public abstract class Param /*extends Container*/  {
     @Range(min = 0, max = 1f)
     public final FloatParam truthResolution = new FloatParam(TRUTH_EPSILON);
 
-
-    /*
-     BUDGET THRESHOLDS
-     * Increasing this value decreases the resolution with which
-     *   budgets are propagated or otherwise measured, which can result
-     *   in a performance gain.      */
-
-
-//    /** budget summary necessary to Conceptualize. this will compare the summary of the task during the TaskProcess */
-//    public final AtomicDouble newConceptThreshold = new AtomicDouble(0);
 
     /**
      * budget quality threshold necessary to form a derived task.
@@ -372,13 +274,6 @@ public abstract class Param /*extends Container*/  {
         throw new RuntimeException("Use truthToQuality for: " + punctuation);
     }
 
-    //decision threshold is enough for now
-    //float EXECUTION_SATISFACTION_TRESHOLD;
-
-    /*public float getExecutionSatisfactionThreshold() {
-        return EXECUTION_SATISFACTION_TRESHOLD;
-    }*/
-
 
     @Nullable
     public final Truth truthDefault(char p) {
@@ -399,83 +294,6 @@ public abstract class Param /*extends Container*/  {
         }
     }
 
-
-//    /** Reliance factor, the empirical confidence of analytical truth.
-//        (generally, the same as default judgment confidence)  */
-//    public final AtomicDouble reliance = new AtomicDouble();
-
-
-
-
-/*    public static Param fromJSON(String json) {
-        return Param.json.fromJson(json, Param.class);
-    }*/
-//    @Override
-//    public String toString() {
-//        return Json.toJson(this);
-//    }
-
-//    public double[] toGenome(String... excludeFields) {
-//        JsonObject j = json.toJsonTree(this).getAsJsonObject();
-//        TreeSet<Map.Entry<String, JsonElement>> fields = new TreeSet<>(j.entrySet());
-//        
-//        Set<String> excluded = new HashSet();
-//        for (String e : excludeFields)
-//            excluded.add(e);
-//        
-//        List<Double> l = new ArrayList();
-//        for (Map.Entry<String, JsonElement> e : fields) {
-//            String f = e.getKey();
-//            if (excluded.contains(f))
-//                continue;
-//            JsonElement v = e.getValue();
-//            if (v.isJsonPrimitive()) {
-//                try {
-//                    double d = v.getAsDouble();
-//                    l.add(d);                
-//                }
-//                catch (NumberFormatException nfe) { }
-//            }
-//        }
-//        return Doubles.toArray(l);
-//    }
-
-//    static public final Gson json;
-//    static {
-//        GsonBuilder b = new GsonBuilder();
-//        b.setPrettyPrinting();
-//        b.disableHtmlEscaping();
-//        b.serializeNulls();
-//
-//        final JsonSerializer<AtomicDouble> atomicDoubleSerializer = new JsonSerializer<AtomicDouble>() {
-//            @Override public JsonElement serialize(AtomicDouble t, Type type, JsonSerializationContext jsc) {
-//                return new JsonPrimitive(t.get());
-//            }
-//        };
-//
-//        JsonDeserializer<AtomicDouble> atomicDoubleDeserializer = new JsonDeserializer<AtomicDouble>() {
-//            @Override public AtomicDouble deserialize(JsonElement je, Type type, JsonDeserializationContext jdc) throws JsonParseException {
-//                return new AtomicDouble(je.getAsDouble());
-//            }
-//        };
-//
-//        b.registerTypeAdapter(AtomicDouble.class, atomicDoubleSerializer);
-//        b.registerTypeAdapter(AtomicDouble.class, atomicDoubleDeserializer);
-//
-//        b.registerTypeAdapter(AtomicInteger.class, new JsonSerializer<AtomicInteger>() {
-//            @Override public JsonElement serialize(AtomicInteger t, Type type, JsonSerializationContext jsc) {
-//                return new JsonPrimitive(t.get());
-//            }
-//        });
-//        b.registerTypeAdapter(AtomicInteger.class, new JsonDeserializer<AtomicInteger>() {
-//            @Override public AtomicInteger deserialize(JsonElement je, Type type, JsonDeserializationContext jdc) throws JsonParseException {
-//                return new AtomicInteger(je.getAsInt());
-//            }
-//        });
-//
-//
-//        json = b.create();
-//    }
 
     Param() {
         beliefConfidence(0.9f);
@@ -499,16 +317,16 @@ public abstract class Param /*extends Container*/  {
 
     abstract public int level();
 
-    @NotNull
-    Predicate levelMax(int level) {
-        return (r -> (level() <= level));
-    }
 
-    //TODO use IntStream.range?
-    Predicate[] maxLevel = {
-            levelMax(0), levelMax(1), levelMax(2), levelMax(3), levelMax(4), levelMax(5), levelMax(6), levelMax(7)
-    };
+//    @NotNull
+//    Predicate levelMax(int level) {
+//        return (r -> (level() <= level));
+//    }
 
-
+//    //TODO use IntStream.range?
+//    Predicate[] maxLevel = {
+//            levelMax(0), levelMax(1), levelMax(2), levelMax(3), levelMax(4), levelMax(5), levelMax(6), levelMax(7)
+//    };
+//
 
 }
