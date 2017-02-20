@@ -246,6 +246,9 @@ public class Stamp implements Cloneable {
     public Stamp clone() {
         return new Stamp(this);
     }
+    public Stamp cloneEternal() {
+        return new Stamp(this, ETERNAL);
+    }
 
     /**
      * Get a number from the evidentialBase by index, called in this class only
@@ -351,7 +354,7 @@ public class Stamp implements Cloneable {
         return evidentialHash;
     }
     
-    public Stamp cloneWithNewOccurrenceTime(final long newOcurrenceTime) {
+    public Stamp cloneAt(final long newOcurrenceTime) {
         Stamp s = clone();
         if (newOcurrenceTime == ETERNAL)
             s.tense = Tense.Eternal;

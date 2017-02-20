@@ -11,6 +11,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 import nars.config.Plugins;
 import nars.gui.InferenceLogger;
 import nars.io.TextInput;
@@ -45,10 +47,10 @@ public class NALTest  {
     static public boolean showReport = true;
     static public boolean requireSuccess = true;
     static public int similarsToSave = 5;       
-    private static final boolean waitForEnterKeyOnStart; //useful for running profiler or some other instrumentation
+    private static final boolean waitForEnterKeyOnStart = false; //useful for running profiler or some other instrumentation
       
 
-    protected static Map<String, String> examples = new HashMap(); //path -> script data
+    protected static Map<String, String> examples = new ConcurrentHashMap(); //path -> script data
     public static Map<String, Boolean> tests = new HashMap();
     public static Map<String, Double> scores = new HashMap();
     final String scriptPath;
@@ -60,9 +62,9 @@ public class NALTest  {
             String existing = examples.get(path);
             if (existing!=null)
                 return existing;
-            
+
             existing = ExampleFileInput.load(path);
-            
+
             examples.put(path, existing);
             return existing;
         } catch (Exception ex) {

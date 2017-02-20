@@ -130,7 +130,7 @@ public class GraphExecutive {
         private int edgeDecisionPass;
         private int edgeDecisionFailCyclical;
         private int edgeDecisionFailInvalidVertex;
-        private final int edgeDecisionFailInactiveEdge;
+        private final int edgeDecisionFailInactiveEdge = 0;
         private int pathFailEmpty;
         private int pathFailNoOperation;
         private int pathsValid;

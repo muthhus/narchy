@@ -78,9 +78,9 @@ public class NARGraphVis extends AnimatingGraphVis<Object,Object> implements Eve
     
     JTextField filterBox = new JTextField();
     public class ConceptGraphMode extends MinPriorityGraphMode implements GraphMode {
-        private final boolean showBeliefs;
-        private final boolean showQuestions;
-        private final boolean showTermContent;
+        private final boolean showBeliefs = false;
+        private final boolean showQuestions = false;
+        private final boolean showTermContent = false;
         
         boolean showTaskLinks;
         boolean showTermLinks = true;

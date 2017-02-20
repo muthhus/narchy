@@ -251,7 +251,7 @@ public class Texts {
      * 
      * TODO do not allow a StringBuilder to appear in output, instead wrap in CharArrayRope
      */
-    public static CharSequence yarn(final int maxLen, final CharSequence... components) {
+    public static CharSequence yarn(final CharSequence... components) {
         int totalLen = 0;
         int total = 0;
         CharSequence lastNonNull = null;
