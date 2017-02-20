@@ -30,11 +30,11 @@ public class PreferSimpleAndConfidentPremise extends DefaultPremise {
     float priFactor(@Nullable Truth truth, Compound conclusion, Task task, Task belief) {
 
         int parentComplexity;
-        int taskCompl = task.complexity();
+        int taskCompl = task.volume(); //complexity();
         int beliefCompl;
         if (belief != null) // && parentBelief.complexity() > parentComplexity)
         {
-            beliefCompl = belief.complexity();
+            beliefCompl = belief.volume(); //complexity();
             parentComplexity =
                     Math.max(taskCompl, beliefCompl);
         } else {
@@ -42,7 +42,7 @@ public class PreferSimpleAndConfidentPremise extends DefaultPremise {
             parentComplexity = taskCompl;
         }
 
-        int derivedComplexity = conclusion.complexity();
+        int derivedComplexity = conclusion.volume(); //complexity();
 
         //controls complexity decay rate
         int penaltyComplexity;

@@ -78,9 +78,9 @@ public abstract class Premise extends RawBudget implements Tasked, Consumer<Conc
     public void accept(Conclusion conclusion) {
         if (conclusions.add(conclusion)) {
 
-        } else {
+        } /*else {
             System.out.println("duplicate: " + conclusion);
-        }
+        }*/
     }
 
 

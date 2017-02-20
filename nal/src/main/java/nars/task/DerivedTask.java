@@ -96,11 +96,6 @@ abstract public class DerivedTask extends MutableTask {
 
 
     @Override
-    protected @Nullable Compound eval(@NotNull TermIndex index, @NotNull Compound t) {
-        return compoundOrNull(index.normalize(t)); //this should already have been evaluated in the derivation 'Conclude' step
-    }
-
-    @Override
     public final boolean isInput() {
         return false;
     }

@@ -222,10 +222,13 @@ public class Conclusion extends RawBudget {
 
         Conclusion that = (Conclusion) o;
 
-        if (!Arrays.equals(evidence, that.evidence)) return false;
-        if (punc != that.punc) return false;
-        if (!term.equals(that.term)) return false;
-        return truth != null ? truth.equals(that.truth) : that.truth == null;
+        if (!Arrays.equals(evidence, that.evidence))
+            return false;
+        if (!(truth != null ? truth.equals(that.truth) : that.truth == null))
+            return false;
+        if (punc != that.punc)
+            return false;
+        return term.equals(that.term);
     }
 
     @Override

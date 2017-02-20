@@ -1,6 +1,7 @@
 package nars.term.compound;
 
 import com.google.common.primitives.Ints;
+import jcog.Util;
 import jcog.data.byt.DynByteSeq;
 import nars.*;
 import nars.index.term.TermIndex;
@@ -10,12 +11,14 @@ import nars.term.container.TermContainer;
 import nars.term.visit.SubtermVisitorXY;
 import org.eclipse.collections.impl.map.mutable.primitive.ObjectByteHashMap;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
 import static nars.$.$;
+import static nars.term.Terms.compoundOrNull;
 import static nars.time.Tense.DTERNAL;
 
 /**
@@ -28,6 +31,9 @@ import static nars.time.Tense.DTERNAL;
 public class SerialCompound extends DynByteSeq implements Compound {
 
     final byte volume;
+
+    /** this is not the same kind of hashcode as GenericCompound / TermVector would expect */
+    final int byteHash;
 
     public SerialCompound(Compound c) {
         this(c.op(), c.dt(), c.terms());
@@ -56,16 +62,42 @@ public class SerialCompound extends DynByteSeq implements Compound {
         }
 
         assert(v < Param.COMPOUND_VOLUME_MAX);
+
         this.volume = (byte) v;
+
+        long hashSeed = (((long)op.ordinal()) << 32) | (dt);
+        this.byteHash = (int) Util.hashELF(bytes, hashSeed, 0, position);
 
     }
 
-    public Compound build() {
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof SerialCompound)) return false;
+
+        SerialCompound oo = (SerialCompound) o;
+
+        return byteHash == oo.byteHash &&
+                length() == oo.length() &&
+                Arrays.equals(bytes, 0, position, oo.bytes, 0, position);
+    }
+
+    @Override public int hashCode() {
+        return byteHash;
+    }
+
+    @Override
+    public void setNormalized() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Nullable public Compound build() {
         return build($.terms);
     }
 
-    public Compound build(TermIndex index) {
-        return (Compound) IO.termFromBytes(bytes, index);
+    @Nullable
+    public Compound build(@NotNull TermIndex index) {
+        return compoundOrNull(IO.termFromBytes(bytes, index));
     }
 
     @Override

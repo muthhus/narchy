@@ -8,6 +8,7 @@ import nars.$;
 import nars.Op;
 import nars.term.atom.Atom;
 import nars.term.compound.GenericCompound;
+import nars.term.compound.SerialCompound;
 import nars.term.container.ArrayTermVector;
 import nars.term.container.TermContainer;
 import nars.term.container.TermVector;
@@ -27,6 +28,7 @@ import java.util.function.ToIntFunction;
 
 import static nars.Op.*;
 import static nars.time.Tense.DTERNAL;
+import static nars.time.Tense.Past;
 import static nars.time.Tense.XTERNAL;
 
 /**
@@ -526,6 +528,12 @@ public class Terms   {
 
     /** dangerous because some operations involving concepts can naturally reduce to atoms, and using this interprets them as non-existent */
     @Nullable public static Compound compoundOrNull(@Nullable Term t) {
+        return compoundOr(t, null);
+    }
+    @Nullable public static Compound compoundOrNullDeserialized(@Nullable Term t) {
+        if (t instanceof SerialCompound) {
+            t = ((SerialCompound)t).build();
+        }
         return compoundOr(t, null);
     }
 
