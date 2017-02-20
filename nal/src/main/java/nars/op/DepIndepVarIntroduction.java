@@ -6,6 +6,7 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Terms;
 import nars.term.transform.Functor;
+import nars.term.var.Variable;
 import org.eclipse.collections.impl.map.mutable.primitive.ObjectByteHashMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -27,8 +28,8 @@ public class DepIndepVarIntroduction extends VarIntroduction {
 
 
 
-    private DepIndepVarIntroduction(Random rng) {
-        super(1, rng);
+    private DepIndepVarIntroduction() {
+        super(1);
     }
 
 //    @Override
@@ -56,35 +57,39 @@ public class DepIndepVarIntroduction extends VarIntroduction {
         return Terms.substAllRepeats(input, depIndepScore, 2);
     }
 
+    static final Variable i0 = varIndep("i0");
+    static final Variable d0 = varDep("d0");
+
     @Nullable
     @Override
-    protected Term[] next(@NotNull Compound input, Term selected) {
+    protected Term[] next(@NotNull Compound input, @NotNull Term selected) {
 
         if (selected == Imdex)
             return null;
 
         List<byte[]> p = input.pathsTo(selected);
-        if (p.isEmpty())
+        int pSize = p.size();
+        if (pSize == 0)
             return null;
 
         //detect an invalid top-level indep var substitution
         Op inOp = input.op();
         if (inOp.statement) {
-            for (int i = 0, pSize = p.size(); i < pSize; i++) {
+            for (int i = 0; i < pSize; i++) {
                 if (p.get(i).length < 2)
                     return null; //substitution would replace something at the top level of a statement}
             }
         }
 
         //decide what kind of variable can be introduced according to the input operator
-        boolean dep, indep;
+        boolean depOrIndep;
         switch (inOp) {
             case CONJ:
-                dep = true; indep = false;
+                depOrIndep = true;
                 break;
             case IMPL:
             case EQUI:
-                dep = false; indep = true;
+                depOrIndep = false;
                 break;
             default:
                 return null; //????
@@ -92,9 +97,7 @@ public class DepIndepVarIntroduction extends VarIntroduction {
         }
 
 
-        int pSize = p.size();
-        @Nullable ObjectByteHashMap<Term> conjCoverage = dep ? new ObjectByteHashMap<>(pSize) : null;
-        @Nullable ObjectByteHashMap<Term> indepEquivCoverage = indep ? new ObjectByteHashMap<>(pSize /* estimate */) : null;
+        @Nullable ObjectByteHashMap<Term> m = new ObjectByteHashMap<>(pSize);
         for (int occurrence = 0; occurrence < pSize; occurrence++) {
             byte[] path = p.get(occurrence);
             Term t = null; //root
@@ -103,33 +106,26 @@ public class DepIndepVarIntroduction extends VarIntroduction {
                 t = (i == -1) ? input : ((Compound) t).term(path[i]);
                 Op o = t.op();
 
-                if (indep && validIndepVarSuperterm(o)) {
+                if (!depOrIndep && validIndepVarSuperterm(o)) {
                     byte inside = (byte) (1 << path[i + 1]);
-                    indepEquivCoverage.updateValue(t, inside, (previous) -> (byte) ((previous) | inside));
-                } else if (dep && validDepVarSuperterm(o)) {
-                    conjCoverage.addToValue(t, (byte) 1);
+                    m.updateValue(t, inside, (previous) -> (byte) ((previous) | inside));
+                } else if (depOrIndep && validDepVarSuperterm(o)) {
+                    m.addToValue(t, (byte) 1);
                 }
             }
         }
 
         int iteration = 0;
 
-        //at least one impl/equiv must have both sides covered
-        Term I = indep && (indepEquivCoverage.anySatisfy(b -> b == 0b11)) ?
-                varIndep("i" + iteration) : null;
+        if (!depOrIndep) {
+            //at least one impl/equiv must have both sides covered
+            return (m.anySatisfy(b -> b == 0b11)) ?
+                    new Term[] { i0 } : null;
 
-        //at least one conjunction must contain >=2 path instances
-        Term D = dep && conjCoverage.anySatisfy(b -> b >= 2) ?
-                varDep("i" + iteration) : null;
-
-        /*if (I!=null && D!=null) {
-            return new Term[] { I , D };
-        } else */if (I!=null) {
-            return new Term[] { I };
-        } else if (D!=null) {
-            return new Term[] { D };
         } else {
-            return null;
+            //at least one conjunction must contain >=2 path instances
+            return m.anySatisfy(b -> b >= 2) ?
+                    new Term[] { d0 } : null;
         }
 
     }
@@ -147,9 +143,9 @@ public class DepIndepVarIntroduction extends VarIntroduction {
         @NotNull
         final DepIndepVarIntroduction introducer;
 
-        public VarIntro(@NotNull Random rng) {
+        public VarIntro() {
             super("varIntro");
-            this.introducer = new DepIndepVarIntroduction(rng);
+            this.introducer = new DepIndepVarIntroduction();
         }
 
         @Override

@@ -105,26 +105,16 @@ public abstract class Param /*extends Container*/  {
      * maximum changes logged in deriver's stack.
      * bigger number means deeper unification depth for bigger compounds and more permutations
      */
-    public final static int UnificationStackMax = 48;
+    public final static int UnificationStackMax = 32;
 
     /**
      * upper and lower limits for # of termutations derived, determined by premise's priority
      */
-    public static final float UnificationMatchesMax = 4, UnificationMatchesMin = 2;
-
-
-//    public static final boolean FILTER_CONCEPTS_WITHOUT_ATOMS = false;
-
-    /**
-     * max # of chained termutes which can be active
-     * bigger number means deeper unification depth for bigger compounds and more permutations
-     */
-    public final static int UnificationTermutesMax = 3;
+    public static final int UnificationMatchesMax = 4;
 
 
     public final static int SubUnificationStackMax = UnificationStackMax/2;
-    public final static int SubUnificationTermutesMax = UnificationTermutesMax/2;
-    public static final int SubUnificationMatchRetries = (int) Math.ceil(UnificationMatchesMin);
+    public static final int SubUnificationMatchRetries = UnificationMatchesMax;
 
     /**
      * swap task and belief in eligible rules ("forward" permutation)

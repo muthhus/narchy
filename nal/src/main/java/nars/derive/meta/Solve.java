@@ -82,8 +82,7 @@ abstract public class Solve extends AtomicBoolCondition {
         }
 
 
-
-        return m.setPunct(t, punct, m.evidence(single));
+        return m.punct.set(new Derivation.TruthPuncEvidence(t, punct, m.evidence(single)))!=null;
     }
 
 

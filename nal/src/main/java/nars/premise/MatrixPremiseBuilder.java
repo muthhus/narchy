@@ -115,8 +115,11 @@ public class MatrixPremiseBuilder extends PremiseBuilder {
 
                     Premise p = premise(c, task, termsBuffer.get(jl % termsBufferSize).get(), now, nar, priFactor, -1f);
                     if (p != null) {
-                        deriver.accept(new Derivation(nar, p, target));
-                        countPerTermlink++;
+                        Derivation d = derivationBuilder.derive(p, target, nar);
+                        if (d!=null) {
+                            deriver.accept(d);
+                            countPerTermlink++;
+                        }
                     }
 
                 }

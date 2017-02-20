@@ -1,9 +1,9 @@
 package nars.term.subst;
 
-import jcog.list.LimitedFasterList;
 import jcog.version.VersionMap;
 import jcog.version.Versioned;
 import jcog.version.Versioning;
+import nars.$;
 import nars.Op;
 import nars.derive.meta.constraint.MatchConstraint;
 import nars.index.term.TermIndex;
@@ -93,8 +93,8 @@ public abstract class Unify extends Termunator implements Subst {
 //    }
 
 
-    protected Unify(TermIndex index, @Nullable Op type, Random random, int stackMax, int termutesMax) {
-        this(index, type, random, new Versioning(stackMax), termutesMax );
+    protected Unify(TermIndex index, @Nullable Op type, Random random, int stackMax) {
+        this(index, type, random, new Versioning(stackMax));
     }
 
     /** call this to invoke the next termutator in the chain */
@@ -126,10 +126,10 @@ public abstract class Unify extends Termunator implements Subst {
             return true;        }
     }
 
-    protected Unify(TermIndex index, @Nullable Op type, Random random, @NotNull Versioning versioning, int termutesMax) {
+    protected Unify(TermIndex index, @Nullable Op type, Random random, @NotNull Versioning versioning) {
         super();
 
-        this.termutes = new LimitedFasterList(termutesMax);
+        this.termutes = $.newArrayList();
 
         this.index = index;
 

@@ -4,6 +4,7 @@ import jcog.Texts;
 import jcog.bag.PLink;
 import nars.concept.Concept;
 import nars.op.Command;
+import nars.op.DepIndepVarIntroduction;
 import nars.op.data.*;
 import nars.term.Compound;
 import nars.term.Term;
@@ -33,6 +34,7 @@ public class Builtin  {
             new intersect(),
             new differ(),
             new union(),
+            new DepIndepVarIntroduction.VarIntro(),
 
             //Functor.f0("date", () -> quote(new Date().toString())),
 

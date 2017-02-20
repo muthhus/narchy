@@ -81,7 +81,7 @@ public class UnificationTest {
             AtomicBoolean subbed = new AtomicBoolean(false);
 
             final Term finalT = t1;
-            Unify sub = new Unify($.terms /* new Indexes.DefaultTermIndex(256, new XorShift128PlusRandom(1)) */, type, nar.random, Param.UnificationStackMax, Param.UnificationTermutesMax) {
+            Unify sub = new Unify($.terms /* new Indexes.DefaultTermIndex(256, new XorShift128PlusRandom(1)) */, type, nar.random, Param.UnificationStackMax) {
 
 //            @Override
 //            public void onPartial() {

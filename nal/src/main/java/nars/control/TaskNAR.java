@@ -5,6 +5,7 @@ import jcog.data.MutableInteger;
 import jcog.data.random.XorShift128PlusRandom;
 import nars.$;
 import nars.NAR;
+import nars.Param;
 import nars.Task;
 import nars.attention.Activation;
 import nars.attention.Forget;
@@ -287,7 +288,7 @@ public class TaskNAR extends NAR {
                     //                        logger.info("{} {}\n\t{}", a, b, t);
                     //                    input(t);
                     //                }
-                    this::input
+                    this::input, Param.UnificationMatchesMax, Param.UnificationStackMax
             ));
         }
 

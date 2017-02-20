@@ -32,7 +32,7 @@ public class UnifyTest {
 
         AtomicBoolean matched = new AtomicBoolean(false);
 
-        Unify f = new Unify($.terms, Op.VAR_QUERY, new XorShift128PlusRandom(1), Param.UnificationStackMax, Param.UnificationTermutesMax) {
+        Unify f = new Unify($.terms, Op.VAR_QUERY, new XorShift128PlusRandom(1), Param.UnificationStackMax) {
 
             @Override
             public boolean onMatch() {

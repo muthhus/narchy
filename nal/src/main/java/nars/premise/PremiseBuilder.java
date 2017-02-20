@@ -1,15 +1,13 @@
 package nars.premise;
 
 import jcog.Util;
-import nars.$;
-import nars.NAR;
-import nars.Op;
-import nars.Task;
+import nars.*;
 import nars.attention.Crosslink;
 import nars.budget.Budget;
 import nars.budget.BudgetFunctions;
 import nars.concept.Concept;
 import nars.table.BeliefTable;
+import nars.task.DerivedTask;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
@@ -21,6 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
+import java.util.function.Consumer;
 
 import static nars.term.Terms.compoundOrNull;
 import static nars.time.Tense.ETERNAL;
@@ -31,6 +30,16 @@ abstract public class PremiseBuilder {
 
     private static final Logger logger = LoggerFactory.getLogger(PremiseBuilder.class);
 
+    @FunctionalInterface interface DerivationBuilder {
+        @Nullable Derivation derive(Premise p, Consumer<DerivedTask> each, NAR nar);
+    }
+
+    public final DerivationBuilder derivationBuilder = (p, each, nar)->{
+        return new Derivation(nar, p, each,
+                Param.UnificationMatchesMax,
+                Param.UnificationStackMax
+        );
+    };
 
 
     /**

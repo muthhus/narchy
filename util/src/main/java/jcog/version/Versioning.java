@@ -17,10 +17,6 @@ public class Versioning extends FasterList<Versioned> {
 
     private int now;
 
-    /** serial id's assigned to each Versioned */
-    private final int nextID = 1;
-
-
     @NotNull
     @Override
     public String toString() {

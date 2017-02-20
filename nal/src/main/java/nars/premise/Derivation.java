@@ -3,12 +3,10 @@ package nars.premise;
 import jcog.version.Versioned;
 import nars.NAR;
 import nars.Op;
-import nars.Param;
 import nars.Task;
 import nars.derive.meta.BoolCondition;
 import nars.derive.meta.OccurrenceSolver;
 import nars.derive.meta.constraint.MatchConstraint;
-import nars.op.DepIndepVarIntroduction;
 import nars.task.DerivedTask;
 import nars.term.Compound;
 import nars.term.Term;
@@ -41,10 +39,6 @@ public class Derivation extends Unify {
     public final float truthResolution;
     public final float quaMin;
     public final float premiseEvidence;
-
-    public boolean setPunct(@Nullable Truth t, char p, long[] evidence) {
-        return this.punct.set(new Derivation.TruthPuncEvidence(t, p, evidence))!=null;
-    }
 
     public final long time() {
         return nar.time();
@@ -133,8 +127,11 @@ public class Derivation extends Unify {
     public final boolean cyclic;
 
 
-    public Derivation(@NotNull NAR nar, @NotNull Premise p, @NotNull Consumer<DerivedTask> c) {
-        super(nar.concepts, VAR_PATTERN, nar.random, Param.UnificationStackMax, Param.UnificationTermutesMax);
+    public Derivation(@NotNull NAR nar, @NotNull Premise p, @NotNull Consumer<DerivedTask> c,
+                      int matchMax, int stack) {
+        super(nar.concepts, VAR_PATTERN, nar.random, stack);
+
+        this.matchesMax = matchMax;
 
         this.nar = nar;
         this.truthResolution = nar.truthResolution.floatValue();
@@ -144,13 +141,13 @@ public class Derivation extends Unify {
 
         //occDelta = new Versioned(this);
         //tDelta = new Versioned(this);
-        this.punct = new Versioned(versioning, 2);
+        this.punct = new Versioned<>(versioning, 2);
 
         set(new substitute(this));
         set(new substituteIfUnifiesAny(this));
         set(new substituteIfUnifiesForward(this));
         set(new substituteIfUnifiesDep(this));
-        set(new DepIndepVarIntroduction.VarIntro(nar.random));
+
 
         this.premise = p;
 
@@ -169,7 +166,7 @@ public class Derivation extends Unify {
         this.taskTruth = task.truth();
         this.taskPunct = task.punc();
         this.beliefTruth = belief != null ? belief.truth() : null;
-        this.matchesMax = matchesMax(task.qua() /* .summary() */);
+
 
 //        //normalize to positive truth
 //        if (taskTruth != null && Global.INVERT_NEGATIVE_PREMISE_TASK && taskTruth.isNegative()) {
@@ -226,12 +223,6 @@ public class Derivation extends Unify {
     protected final void set(@NotNull Term t) {
         setXY(t, t);
     }
-
-    public static int matchesMax(float p) {
-        final float min = Param.UnificationMatchesMin, max = Param.UnificationMatchesMax;
-        return (int) Math.ceil(p * (max - min) + min);
-    }
-
 
     /**
      * only one thread should be in here at a time

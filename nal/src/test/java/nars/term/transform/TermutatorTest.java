@@ -30,7 +30,7 @@ import static org.junit.Assert.assertTrue;
  */
 public class TermutatorTest {
 
-    final Unify f = new Unify(terms, Op.VAR_PATTERN, new XorShift128PlusRandom(1), Param.UnificationStackMax, Param.UnificationTermutesMax) {
+    final Unify f = new Unify(terms, Op.VAR_PATTERN, new XorShift128PlusRandom(1), Param.UnificationStackMax) {
         @Override
         public boolean onMatch() {
             return true;

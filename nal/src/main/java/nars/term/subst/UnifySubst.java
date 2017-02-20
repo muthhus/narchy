@@ -28,7 +28,7 @@ public class UnifySubst extends Unify {
     int matches;
 
     public UnifySubst(Op varType, @NotNull NAR memory, Consumer<Term> target, int maxMatches) {
-        super(memory.concepts, varType, memory.random, Param.SubUnificationStackMax, Param.SubUnificationTermutesMax);
+        super(memory.concepts, varType, memory.random, Param.SubUnificationStackMax);
 
         this.memory = memory;
         this.maxMatches = maxMatches;

@@ -19,15 +19,16 @@ public final class SubUnify extends Unify {
     private @Nullable Derivation target;
 
     @Nullable private Term result;
-    int retries = Param.SubUnificationMatchRetries;
 
+    int retries;
 
-    public SubUnify(TermIndex index, Op type, Random r) {
-        super(index, type, r, Param.SubUnificationStackMax, Param.SubUnificationTermutesMax);
+    public SubUnify(TermIndex index, Op type, Random r, int tries) {
+        super(index, type, r, Param.SubUnificationStackMax);
+        this.retries = tries;
     }
 
-    public SubUnify(@NotNull Unify parent, @Nullable Op type) {
-        this(parent.index, type, parent.random);
+    public SubUnify(@NotNull Unify parent, @Nullable Op type, int tries) {
+        this(parent.index, type, parent.random, tries);
     }
 
 

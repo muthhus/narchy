@@ -1,6 +1,5 @@
 package nars.op;
 
-import jcog.Util;
 import nars.$;
 import nars.term.Compound;
 import nars.term.Term;
@@ -18,14 +17,10 @@ import static nars.op.DepIndepVarIntroduction.ConjOrStatementBits;
  */
 public abstract class VarIntroduction {
 
-    @Deprecated final static String tag = VarIntroduction.class.getSimpleName();
+    final int maxResults;
 
-    final Random rng;
-    final int maxIterations;
-
-    public VarIntroduction(int maxIterations, Random rng) {
-        this.maxIterations = maxIterations;
-        this.rng = rng;
+    public VarIntroduction(int maxResults) {
+        this.maxResults = maxResults;
     }
 
     public void accept(@NotNull Compound c, @NotNull Consumer<Compound> each) {
@@ -33,8 +28,7 @@ public abstract class VarIntroduction {
         if (!c.hasAny(ConjOrStatementBits) || c.volume() < 2)
             return; //earliest failure test
 
-
-        int max = maxIterations;
+        int max = maxResults;
 
         Iterator<Term> selections = select(c);
         while (selections.hasNext()) {
@@ -47,8 +41,11 @@ public abstract class VarIntroduction {
                 int replacements = dd.length;
                 if (replacements > 0) {
 
-                    Term d = dd[rng.nextInt(replacements)]; //choose one randomly
-                    //for (Term d : dd) {
+                    if (replacements > 1)
+                        throw new UnsupportedOperationException("TODO"); //choose one randomly
+
+                    Term d = dd[0];
+
                     Term newContent = $.terms.replace(c, s, d);
 
                     if ((newContent instanceof Compound) && !newContent.equals(c)) {
@@ -61,10 +58,6 @@ public abstract class VarIntroduction {
         }
     }
 
-//    public void accept(@NotNull Task input) {
-//        Compound c = input.term();
-//        accept(c, newContent -> input(input, newContent));
-//    }
 
 
     @Nullable
@@ -72,7 +65,7 @@ public abstract class VarIntroduction {
 
 
     /** provides the next terms that will be substituted in separate permutations; return null to prevent introduction */
-    abstract protected Term[] next(Compound input, Term selection);
+    abstract protected Term[] next(@NotNull Compound input, @NotNull Term selection);
     /*{
         return $.varQuery("c" + iteration);
     }*/
