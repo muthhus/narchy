@@ -2,7 +2,9 @@ package nars.nal.multistep;
 
 import nars.NAR;
 import nars.nal.AbstractNALTest;
+import nars.nar.Default;
 import nars.test.TestNAR;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -126,4 +128,60 @@ public class PatrickTests extends AbstractNALTest {
 
     }
 
+    @Ignore
+    @Test public void testConditioningWithoutAnticipation() {
+        /*
+        <a --> A>. :|: <b --> B>. :|: %0% <c --> C>. %0%
+        8
+        <b --> B>. :|: <a --> A>. :|: %0% <c --> C>. %0%
+        8
+        <c --> C>. :|: <a --> a>. :|: %0% <b --> B>. %0%
+        8
+        <a --> A>. :|: <b --> B>. :|: %0% <c --> C>. %0%
+        100
+        <b --> B>. :|: <a --> A>. :|: %0% <c --> C>. %0%
+        100
+        <?1 =/> <c --> C>>? //this line needs to be translated to NARchy syntax
+
+        Expected result: (also in OpenNARS syntax)
+        For appropriate Interval term "time", "time2",
+        <(&/,<a --> A>,time) =/> <c --> C>>.
+        and
+        <(&/,<b --> B>,time) =/> <c --> C>>.
+        needs to be reduced in frequency, making
+        <(&/,<a --> A>,time,<b --> B>,time2) =/> <c --> C>>.
+        the strongest hypothesis based on the last two inputs where neither a nor b "leaded to" c.
+         */
+
+        NAR n = new Default();
+        n.DEFAULT_BELIEF_PRIORITY = 0.01f;
+
+        //n.log();
+        n.inputAt(  0, "  A:a. :|:    --B:b. :|:    --C:c. :|:");
+        n.inputAt(  8, "  B:b. :|:    --A:a. :|:    --C:c. :|:");
+        n.inputAt( 16, "  C:c. :|:    --A:a. :|:    --B:b. :|:");
+        n.inputAt( 24, "  A:a. :|:    --B:b. :|:    --C:c. :|:");
+        n.inputAt(124, "  B:b. :|:    --A:a. :|:    --C:c. :|:");
+
+        n.run(224);
+        n.clear();
+
+        n.input("       $0.9;0.9$ (?x ==>   C:c)?");
+        //n.input("       $0.9;0.9$ (?x ==>+8 C:c)?");
+        //n.input("       $0.9;0.9$ ((A:a && B:b) ==> C:c)?");
+        //n.input("       $0.9;0.9$ ((A:a && B:b) ==> C:c)? :|:");
+        n.run(12500);
+
+        /*
+        Expected result: (also in OpenNARS syntax)
+        For appropriate Interval term "time", "time2",
+        <(&/,<a --> A>,time) =/> <c --> C>>.
+        and
+        <(&/,<b --> B>,time) =/> <c --> C>>.
+        needs to be reduced in frequency, making
+        <(&/,<a --> A>,time,<b --> B>,time2) =/> <c --> C>>.
+        the strongest hypothesis based on the last two inputs where neither a nor b "leaded to" c.
+         */
+
+    }
 }

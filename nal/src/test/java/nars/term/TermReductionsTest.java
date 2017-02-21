@@ -550,8 +550,18 @@ public class TermReductionsTest {
         assertValidTermValidConceptInvalidTaskContent(("((--,(a1)) && (a1))"));
         assertValidTermValidConceptInvalidTaskContent("((--,(a1)) &&+0 (a1))");
         assertValid($("((--,(a1)) &&+1 (a1))"));
+        assertValid($("((a1) &&+1 (a1))"));
+
+        assertEquals($("(a1)"), $("((a1) &&+0 (a1))"));
+        assertEquals($("(a1)"), $("((a1) && (a1))"));
+        assertNotEquals($("(a1)"), $("((a1) &&+1 (a1))"));
 
         assertInvalidTerms("((--,(a1)) || (a1))");
+
+    }
+
+    @Test public void testRepeatInverseEquivalent() throws Narsese.NarseseException {
+        assertEquals($("((a1) &&-1 (a1))"), $("((a1) &&+1 (a1))"));
     }
 
     @Test
@@ -744,8 +754,13 @@ public class TermReductionsTest {
         assertEquals(
                   "{r(a,b)}",
                 $("{(b-->(/,r,a,_))}").toString());
+
         assertEquals(
-                  "(--,r(a,b))",
+                  "{likes(cat,{sky})}",
+                $("{({sky}-->(/,likes,cat,_))}").toString());
+
+        assertEquals(
+                "(--,r(a,b))",
                 $("(--,(a-->(/,r,_,b)))").toString());
 
     }

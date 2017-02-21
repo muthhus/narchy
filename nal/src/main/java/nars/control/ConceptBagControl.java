@@ -97,13 +97,10 @@ public class ConceptBagControl implements Control, Consumer<DerivedTask> {
 
         nar.onReset((n)->{
             active.clear();
-            pending.set(null);
+            pending.set(new ConcurrentHashMap<>());
         });
 
     }
-
-    final DoubleSummaryReusableStatistics cycleTimeNS = new DoubleSummaryReusableStatistics();
-
 
     protected void cycle() {
         if (!busy.compareAndSet(false, true))

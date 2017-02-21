@@ -255,13 +255,9 @@ public abstract class Unify extends Termunator implements Subst {
 
     public final boolean matchPossible(@NotNull Termlike x) {
         Op t = this.type;
-        if (t == null) {
-            return x.hasAny(Op.VariableBits);
-        } else if (t == Op.VAR_PATTERN) {
-            return x.varPattern() > 0;
-        } else {
-            return x.hasAny(t.bit);
-        }
+        return (t == Op.VAR_PATTERN) ?
+                    (x.varPattern() > 0) :
+                    x.hasAny(t == null ? Op.VariableBits : t.bit);
     }
 
 

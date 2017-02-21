@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 /** not thread safe, use 1 per thread (do not interrupt matchAll) */
 public class UnifySubst extends Unify {
@@ -21,13 +22,13 @@ public class UnifySubst extends Unify {
     public final NAR memory;
 
 
-    final Consumer<Term> target;
+    final Predicate<Term> target;
     final int maxMatches;
     private Term a;
 
     int matches;
 
-    public UnifySubst(Op varType, @NotNull NAR memory, Consumer<Term> target, int maxMatches) {
+    public UnifySubst(Op varType, @NotNull NAR memory, Predicate<Term> target, int maxMatches) {
         super(memory.concepts, varType, memory.random, Param.SubUnificationStackMax);
 
         this.memory = memory;
@@ -61,9 +62,8 @@ public class UnifySubst extends Unify {
         //try {
             Term aa = resolve(a, xy);
 
-            matches++;
-
-            target.accept(aa);
+            if (target.test(aa))
+                matches++;
             //if (accept(a, aa))
 
 

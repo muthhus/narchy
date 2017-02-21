@@ -32,12 +32,12 @@ public class IntTerm extends Termject.PrimTermject<Integer> {
         return Integer.class;
     }
 
-    @Override
-    public boolean unify(@NotNull Term y, @NotNull Unify f) {
-
-        if (y instanceof IntInterval) {
-            return y.unify(this, f); //reverse x,y necessary?
-        }
-        return false;
-    }
+//    @Override
+//    public boolean unify(@NotNull Term y, @NotNull Unify f) {
+//
+//        if (y instanceof IntInterval) {
+//            return y.unify(this, f); //reverse x,y necessary?
+//        }
+//        return false;
+//    }
 }
