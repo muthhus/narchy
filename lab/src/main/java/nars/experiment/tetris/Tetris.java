@@ -456,10 +456,10 @@ public class Tetris extends NAgents {
 
             FrameTime clock = new FrameTime().dur(TIME_PER_FALL/2);
             NAR nar =
-                    NAgents.newMultiThreadNAR(3, clock);
+                    NAgents.newMultiThreadNAR(4, clock);
                     //NARBuilder.newALANN(clock, 4, 64, 5, 4, 1);
 
-            nar.derivedEvidenceGain.setValue(0.5f);
+            //nar.derivedEvidenceGain.setValue(0.5f);
 
             nar.termVolumeMax.setValue(40);
             nar.truthResolution.setValue(0.05f);

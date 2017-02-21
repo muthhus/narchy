@@ -11,6 +11,8 @@ import org.junit.runners.Parameterized;
 
 import java.util.function.Supplier;
 
+import static nars.time.Tense.ETERNAL;
+
 @RunWith(Parameterized.class)
 public class NAL4MultistepTest extends AbstractNALTest {
 
@@ -27,14 +29,13 @@ public class NAL4MultistepTest extends AbstractNALTest {
     //this test only works because the confidence matches, but the related task has insufficient budget
     @Test
     public void nal4_everyday_reasoning() throws Narsese.NarseseException {
-        int time = 4050;
+        int time = 1700;
 
         //Global.DEBUG = true;
 
         TestNAR tester = test();
 
         //tester.log();
-        //tester.nar.logSummaryGT(System.out, 0.5f);
 
         //(({tom},{sky})-->likes).  <{tom} --> cat>. <({tom},{sky}) --> likes>. <(cat,[blue]) --> likes>?
 
@@ -42,11 +43,12 @@ public class NAL4MultistepTest extends AbstractNALTest {
         tester.believe("<{tom} --> cat>",1.0f,0.9f); //en("tom is a cat");
         tester.believe("<({tom},{sky}) --> likes>",1.0f,0.9f); //en("tom likes the sky");
 
-        tester.inputAt(15, "$0.9;0.9$ likes(cat,[blue])?"); //cats like blue?
+        tester.input( "$0.9;0.9$ likes(cat,[blue])?"); //cats like blue?
 
-        tester.mustBelieve(time, "likes(cat,[blue])", 1.0f,
-                0.22f);
-                //0.42f);
+        //return mustOutput(cycleStart, cycleEnd, sentenceTerm, punc, freqMin, freqMax, confMin, confMax, occTimeAbsolute, occTimeAbsolute);
+        tester.mustOutput(0, time, "likes(cat,[blue])", '.',
+                1f, 1f,
+                0.2f, 1f, ETERNAL, ETERNAL);
 
     }
 

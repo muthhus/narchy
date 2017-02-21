@@ -6,6 +6,7 @@ import nars.attention.Crosslink;
 import nars.budget.*;
 import nars.concept.Concept;
 import nars.table.BeliefTable;
+import nars.task.AnswerTask;
 import nars.task.DerivedTask;
 import nars.term.Compound;
 import nars.term.Term;
@@ -64,8 +65,8 @@ abstract public class PremiseBuilder {
 //            return null;
 
 
-        Budget taskLink = theTaskLink.clone(); /* copy, in case the tasklink becomes deleted during this method */
-        if (taskLink == null) //deleted
+        Budget taskLinkCopy = theTaskLink.clone(); /* copy, in case the tasklink becomes deleted during this method */
+        if (taskLinkCopy == null) //deleted
             return null;
 
         Task _task = theTaskLink.get();
@@ -108,15 +109,15 @@ abstract public class PremiseBuilder {
 
                 beliefTerm = (answerTerm = (Compound) answerTerm.unneg());
 
-                Concept answerConcept =
-                        nar.concept(answerTerm);
-                        //nar.activate(answerTerm, taskLink.pri());
+                Concept answerConcept = nar.concept(answerTerm);
 
                 if (answerConcept != null) {
 
+                    nar.activate(answerConcept, task.priSafe(0));
+
                     BeliefTable table = task.isQuest() ? answerConcept.goals() : answerConcept.beliefs();
 
-                    Task answered = table.answer(task.mid(), now, dur, task, answerTerm, nar.confMin.floatValue());
+                    Task answered = table.answer(task.mid(), now, dur, task, answerTerm, nar);
                     if (answered != null) {
 
 //                        boolean exists = nar.tasks.contains(answered);
@@ -128,22 +129,26 @@ abstract public class PremiseBuilder {
                         if (answered != null && !answered.isDeleted()) {
 
 
-                            if (nar.input(answered)!=null) {
+                            /*if (nar.input(answered)!=null)*/ {
 
                                 //transfer budget from question to answer
                                 //float qBefore = taskBudget.priSafe(0);
                                 //float aBefore = answered.priSafe(0);
-                                BudgetFunctions.transferPri(taskLink, answered.budget(),
-                                        (float) Math.sqrt(answered.conf())
+                                BudgetFunctions.transferPri(taskLinkCopy, answered.budget(),
+                                        (float) Math.sqrt(answered.conf() * answered.qua())
                                         //(1f - taskBudget.qua())
                                         //(1f - Util.unitize(taskBudget.qua()/answered.qua())) //proportion of the taskBudget which the answer receives as a boost
                                 );
 
-                                BudgetMerge.maxBlend.apply(theTaskLink, taskLink, 1f);
+                                BudgetMerge.maxBlend.apply(theTaskLink, taskLinkCopy, 1f);
 
                                 //task.budget().set(taskBudget); //update the task budget
 
-                                Crosslink.crossLink(task, answered, answered.conf(), nar);
+                                //Crosslink.crossLink(task, answered, answered.conf(), nar);
+
+                                if (task.isInput())
+                                    nar.inputLater(answered);
+
                             }
 
 //                            if (answered.isDeleted())
@@ -251,7 +256,7 @@ abstract public class PremiseBuilder {
         //TODO lerp by the two budget's qualities instead of aveAri,or etc ?
 
 
-        float tq = taskLink.qua();
+        float tq = taskLinkCopy.qua();
 
         float bq = (beliefBudget!=null) ? beliefBudget.qua() : Float.NaN;
         float qua = belief == null ? tq : aveAri(tq, bq);
@@ -259,7 +264,7 @@ abstract public class PremiseBuilder {
             return null;
 
         //combine either the task or the tasklink. this makes tasks more competitive allowing the priority reduction to be applied to either the task (in belief table) or the tasklink's ordinary forgetting
-        float taskPri = aveAri(taskLink.pri(), task.priSafe(0));
+        float taskPri = aveAri(taskLinkCopy.pri(), task.priSafe(0));
 
         float pri =
                 belief == null ? taskPri : Util.lerp(tq / (tq + bq), taskPri, beliefBudget.pri());

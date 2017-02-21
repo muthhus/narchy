@@ -1397,7 +1397,8 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
 
     @Override
     public void activate(Concept c, float priToAdd) {
-        control.activate(c, priToAdd);
+        if (priToAdd > Param.BUDGET_EPSILON)
+            control.activate(c, priToAdd);
     }
 
     @Override

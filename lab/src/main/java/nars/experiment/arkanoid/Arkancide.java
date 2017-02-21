@@ -67,7 +67,7 @@ public class Arkancide extends NAgents {
     public Arkancide(NAR nar, boolean cam) throws Narsese.NarseseException {
         super("noid", nar);
 
-        nar.derivedEvidenceGain.setValue(0.5f);
+        nar.derivedEvidenceGain.setValue(1f);
 
 
         noid = new Arkanoid(!cam) {

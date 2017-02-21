@@ -6,6 +6,7 @@ import nars.Task;
 import nars.budget.Budget;
 import nars.concept.CompoundConcept;
 import nars.concept.dynamic.DynamicBeliefTable;
+import nars.concept.dynamic.DynamicBeliefTask;
 import nars.task.AnswerTask;
 import nars.term.Compound;
 import nars.truth.Truth;
@@ -73,7 +74,7 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
 
 
         @Override
-        public Task answer(long when, long now, float dur, @NotNull Task question, Compound template, float minConf) {
+        public Task answer(long when, long now, float dur, @NotNull Task question, Compound template, NAR nar) {
             return null;
         }
 
@@ -232,31 +233,14 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
 
 
 
-    default Task answer(long when, long now, float dur, @NotNull Task question, Compound template, float minConf) {
+    default Task answer(long when, long now, float dur, @NotNull Task question, Compound template, NAR nar) {
 
         Budget qBudget = question.budget();
 
         Task answer;
-        Budget answerBudget;
-        if (this instanceof DynamicBeliefTable) {
-            answer = ((DynamicBeliefTable) this).generate(template, when);
-            if (answer != null) {
-
-//                answerBudget = answer.budget().clone();
-//                if (answerBudget != null)
-//                    return null;
-
-                return answer;
-            }
-
-        }
 
         answer = match(when, now, dur, question, false);
-        if (answer == null)
-            return null;
-
-        answerBudget = answer.budget().clone();
-        if (answerBudget == null || answerBudget.isDeleted())
+        if (answer == null || answer.isDeleted())
             return null;
 
 //            //require EXACT term (except for variables) but otherwise requiring exact same dt structure
@@ -265,8 +249,12 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
 
         //project if different occurrence
         if (answer.start() != when) {
-            Truth aProj = answer.truth(when, dur, minConf);
+            Truth aProj = answer.truth(when, dur, nar.confMin.floatValue());
             if (aProj == null)
+                return null;
+
+            Budget answerBudget = answer.budget().clone();
+            if (answerBudget == null)
                 return null;
 
             answer = new AnswerTask(
@@ -276,7 +264,10 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
                     aProj, now, when, when, 0.5f)
                     .log("Answer Projected")
                     .budget(answerBudget);
+
         }
+
+
 
 
         return answer;
