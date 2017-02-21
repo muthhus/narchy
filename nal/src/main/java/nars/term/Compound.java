@@ -656,14 +656,17 @@ public interface Compound extends Term, IPair, TermContainer {
         //any contained evaluables
         if (subterms().hasAll(OpBits)) {
             int s = size();
-            Term[] evalSubs = terms().clone();
+            Term[] evalSubs = new Term[s];
             boolean modified = false;
             for (int i = 0, evalSubsLength = evalSubs.length; i < evalSubsLength; i++) {
-                Term y = evalSubs[i].eval(index);
-                if (!evalSubs[i].equals(y)) {
-                    evalSubs[i] = y;
+                Term x = term(i);
+                Term y = x.eval(index);
+                if (!x.equals(y)) {
                     modified = true;
+                } else {
+                    y = x;
                 }
+                evalSubs[i] = y;
             }
             if (modified) {
                 return index.the(this, evalSubs).eval(index);

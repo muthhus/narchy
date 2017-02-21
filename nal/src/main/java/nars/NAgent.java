@@ -334,7 +334,7 @@ abstract public class NAgent implements NSense, NAction {
     @NotNull
     public String summary() {
 
-        sendInfluxDB("localhost", 8089);
+        //sendInfluxDB("localhost", 8089);
 
         return "rwrd=" + n2(rewardValue) + " " +
                 "motv=" + n4(desireConf()) + " " +

@@ -32,13 +32,13 @@ public class HijackTermIndex extends MaplikeTermIndex implements Runnable {
     private Thread updateThread;
     private boolean running;
 
-    private long updatePeriodMS;
+    private final long updatePeriodMS;
 
     /** current update index */
     private int visit;
 
     /** how many items to visit during update */
-    private int updateBatchSize;
+    private final int updateBatchSize;
 
     public HijackTermIndex(ConceptBuilder cb, int capacity, int reprobes) {
         super(cb);
@@ -157,7 +157,7 @@ public class HijackTermIndex extends MaplikeTermIndex implements Runnable {
     protected void update(PLink<Termed> x) {
 
         //TODO better update function based on Concept features
-        Concept c = (Concept)x.get();
+        Termed c = x.get();
         if (!(c instanceof PermanentConcept)) {
             float decayRate = c.complexity() / ((float)Param.COMPOUND_VOLUME_MAX);
                     // / (1f + c.beliefs().priSum() + c.goals().priSum());

@@ -36,7 +36,7 @@ public class Line1DContinuous extends NAgent {
 
     private final IntToFloatFunction targetFunc;
     int size;
-    boolean print;
+    public boolean print;
     private float yHidden;
     private float yEst;
     float speed = 5f;
@@ -250,18 +250,18 @@ public class Line1DContinuous extends NAgent {
     public static void main(String[] args) {
 
         XorShift128PlusRandom rng = new XorShift128PlusRandom((int)(Math.random()*1000));
-        int conceptsPerCycle = 4;
+        int conceptsPerCycle = 8;
 
         final Executioner exe =
                 //new MultiThreadExecutioner(2, 2048);
                 new SynchronousExecutor();
 
         Default nar = new Default(1024,
-                conceptsPerCycle, 2, 8, rng,
+                conceptsPerCycle, 1, 3, rng,
                 new CaffeineIndex(new DefaultConceptBuilder(), 1024*16, false, exe),
                 new FrameTime(1f), exe
         );
-        nar.termVolumeMax.set(19);
+        nar.termVolumeMax.set(26);
 
 
         nar.beliefConfidence(0.9f);
@@ -276,25 +276,25 @@ public class Line1DContinuous extends NAgent {
         );
 
 
-        NAgents.chart(l);
+        //NAgents.chart(l);
 
         //nar.logSummaryGT(System.out, 0.5f);
-        nar.onTask(t -> {
-            if (t instanceof DerivedTask && t.isGoal())
-                System.out.println(t.proof());
-        });
+//        nar.onTask(t -> {
+//            if (t instanceof DerivedTask && t.isGoal())
+//                System.out.println(t.proof());
+//        });
 
         l.print = true;
-        l.runRT(25, 15000).join();
-        //l.run(2000);
+        //l.runRT(25, 15000).join();
+        l.run(2000);
 
 
         NAR.printActiveTasks(nar, true);
         NAR.printActiveTasks(nar, false);
 
-        l.predictors.forEach(p->{
-           nar.concept(p).print();
-        });
+//        l.predictors.forEach(p->{
+//           nar.concept(p).print();
+//        });
         System.out.println("AVG SCORE=" + l.rewardSum()/ nar.time());
 
     }

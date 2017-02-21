@@ -24,6 +24,11 @@
       <artifactId>nal</artifactId>
       <version>1.8-SNAPSHOT</version>
     </dependency>
+    <dependency>
+      <groupId>opennars</groupId>
+      <artifactId>lab</artifactId>
+      <version>1.8-SNAPSHOT</version>
+    </dependency>
 
     <!-- https://mvnrepository.com/artifact/net.tuis.ubench/ubench -->
     <dependency>
