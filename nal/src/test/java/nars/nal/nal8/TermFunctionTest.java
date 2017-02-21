@@ -51,17 +51,17 @@ public class TermFunctionTest {
         d.run(16);
     }
 
-    @Test
-    public void testFunctor1() {
+    /** tests correct TRUE fall-through behavior, also backward question triggered execution */
+    @Test public void testFunctor1() {
         Param.DEBUG = true;
 
         TestNAR t = new TestNAR(new Default());
-        //t.log();
+        t.log();
         t.believe("((complexity($1)<->3)==>c3($1))");
         //t.believe("--(2<->3)");
         t.ask("c3(x:y)");
         //t.ask("c3((x))");
-        t.mustBelieve(16, "c3(x:y)", 1f, 0.81f);
+        t.mustBelieve(128, "c3(x:y)", 1f, 0.81f);
         t.run(true);
     }
 
@@ -71,7 +71,7 @@ public class TermFunctionTest {
 
         int TIME = 64;
         TestNAR t = new TestNAR(new Default(1024, 8,2,2));
-        t.log();
+        //t.log();
         t.believe("(equal(complexity($1),$2) <=> c($1,$2))");
         t.ask("c(x, 1)");
         t.ask("c(x, 2)");

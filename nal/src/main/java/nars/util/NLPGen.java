@@ -16,7 +16,7 @@ import java.util.List;
 import static nars.Op.VAR_PATTERN;
 
 /**
- * Created by me on 7/9/16.
+ * TODO not finished
  */
 public class NLPGen {
 

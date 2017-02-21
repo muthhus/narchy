@@ -50,6 +50,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 import static nars.Op.*;
+import static nars.index.TermBuilder.isTrueOrFalse;
 import static nars.time.Tense.DTERNAL;
 
 /**
@@ -649,9 +650,8 @@ public interface Compound extends Term, IPair, TermContainer {
     default Term eval(TermIndex index) {
 
         //somewhere in the subterms is a functor to eval
-        if (!hasAll(Op.OpBits)) {
+        if (!hasAll(Op.OpBits))
             return this;
-        }
 
         //any contained evaluables
         if (subterms().hasAll(OpBits)) {
@@ -669,7 +669,7 @@ public interface Compound extends Term, IPair, TermContainer {
                 evalSubs[i] = y;
             }
             if (modified) {
-                return index.the(this, evalSubs).eval(index);
+                return index.the(op(), dt(), evalSubs).eval(index);
             }
         }
 
@@ -678,7 +678,7 @@ public interface Compound extends Term, IPair, TermContainer {
         if (op() == INH) {
             //recursively compute contained subterm functors
 
-            Term subject = ((Compound) this).term(0);
+            final Term subject = ((Compound) this).term(0);
             if (subject.op() == PROD) {
                 Term predicate = ((Compound) this).term(1);
                 if (predicate.op() == ATOM) {
@@ -693,22 +693,20 @@ public interface Compound extends Term, IPair, TermContainer {
                         if (resolvedPred != null) {
                             Term resolvedPredTerm = resolvedPred.term();
                             if (resolvedPredTerm instanceof Functor) {
-                                f = (Functor) (resolvedPred.term());
+                                f = (Functor)resolvedPredTerm;
                             }
                         }
                     }
 
                     if (f != null) {
-                        if (subject.op() == PROD) {
 
-                            Term dy = f.apply(((Compound) subject).terms());
-                            if (dy == null || dy == this) {
-                                //null return value means just keep the original input term
-                                return this;
-                            } else {
-                                return dy.eval(index);
-                            }
+                        Term dy = f.apply(((Compound) subject).terms());
+                        if (dy == null || dy == this) {
+                            return this; //functor returning null return value means keep the original input term
+                        } else {
+                            return dy.eval(index); //recurse
                         }
+
                     }
                 }
             }

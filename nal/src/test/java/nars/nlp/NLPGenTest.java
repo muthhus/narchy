@@ -4,6 +4,7 @@ import nars.NAR;
 import nars.Narsese;
 import nars.nar.Default;
 import nars.util.NLPGen;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -11,6 +12,7 @@ import static org.junit.Assert.assertEquals;
 /**
  * Created by me on 7/9/16.
  */
+@Ignore
 public class NLPGenTest {
 
     final NLPGen g = new NLPGen();

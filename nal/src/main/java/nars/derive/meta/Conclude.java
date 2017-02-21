@@ -110,9 +110,9 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
                     //note: the budget function used here should not depend on the truth's frequency. btw, it may be inverted below
                     Compound crr = compoundOrNull(nar.concepts.eval(cr));
                     if (crr == null) {
-                        if (Param.DEBUG)
-                            throw new InvalidTermException(r.op(), DTERNAL, "normalization failed", (cr).terms());
-                        else
+//                        if (Param.DEBUG)
+//                            throw new InvalidTermException(r.op(), DTERNAL, "normalization failed", (cr).terms());
+//                        else
                             return true;
                     }
 
@@ -121,7 +121,6 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
                     Budget budget = m.premise.budget(crr, truth, m);
                     if (budget != null) {
                         derive(m, crr, truth, budget, ct); //continue to stage 2
-
                     }
                 }
             } catch (@NotNull InvalidTermException | InvalidTaskException e) {

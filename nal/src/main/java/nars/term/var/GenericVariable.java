@@ -97,8 +97,8 @@ public class GenericVariable extends AtomicString implements Variable {
         return str;
     }
 
-    @Override
-    public boolean unify(@NotNull Term y, @NotNull Unify subst) {
-        throw new UnsupportedOperationException();
-    }
+//    @Override
+//    public boolean unify(@NotNull Term y, @NotNull Unify subst) {
+//        throw new UnsupportedOperationException();
+//    }
 }
