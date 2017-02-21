@@ -8,6 +8,7 @@ import jcog.data.FloatParam;
 import jcog.list.FasterList;
 import jcog.math.FloatNormalized;
 import jcog.math.FloatPolarNormalized;
+import jcog.net.UDP;
 import nars.concept.ActionConcept;
 import nars.concept.Concept;
 import nars.concept.SensorConcept;
@@ -306,8 +307,35 @@ abstract public class NAgent implements NSense, NAction {
     }
 
 
+    final UDP udp = new UDP();
+
+    /*
+    https://docs.influxdata.com/influxdb/v0.9/write_protocols/udp/
+    To write, just send newline separated line protocol over UDP. For better performance send batches of points rather than multiple single points.
+    $ echo "cpu value=1"> /dev/udp/localhost/8089
+         */
+    public void sendInfluxDB(String host, int port) {
+        //String s = "cpu,host=server01,region=uswest load=" + (Math.random() * 100) +  " " + System.currentTimeMillis();
+
+        //SELECT mean("hapy") FROM "cpu"
+        //SELECT mean("busyVol") FROM "cpu" WHERE $timeFilter GROUP BY time($interval) fill(null)
+
+        @NotNull Emotion e = nar.emotion;
+        String s = "cpu " +
+                 "busyVol=" + e.busyVol.getSum() +
+                ",busyPri=" + e.busyPri.getSum() +
+                ",hapy=" + e.happy.getSum() +
+                ",sad=" + e.sad.getSum();
+                //" " + System.nanoTime();
+
+        udp.out(s, host, port);
+    }
+
     @NotNull
     public String summary() {
+
+        sendInfluxDB("localhost", 8089);
+
         return "rwrd=" + n2(rewardValue) + " " +
                 "motv=" + n4(desireConf()) + " " +
                 n4(varPct(nar)) + "\t" + nar.concepts.summary() + " " +

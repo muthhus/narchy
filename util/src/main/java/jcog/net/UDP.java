@@ -15,7 +15,7 @@ import java.util.Arrays;
 /**
  * Created by me on 2/15/17.
  */
-public abstract class UDP  {
+public class UDP  {
 
     /** in bytes */
     static final int MAX_PACKET_SIZE = 4096;
@@ -42,6 +42,18 @@ public abstract class UDP  {
 
     public UDP(int port) throws SocketException {
         this((InetAddress)null, port);
+    }
+
+    public UDP()  {
+        DatagramSocket iin;
+        try {
+            iin = new DatagramSocket(null);
+        } catch (SocketException e) {
+            logger.error("{}", e);
+            iin = null;
+        }
+        this.in = iin;
+        this.thread = null;
     }
 
     public UDP(@Nullable InetAddress a, int port) throws SocketException {
@@ -151,7 +163,9 @@ public abstract class UDP  {
         }
     }
 
-    abstract protected void in(byte[] data, InetSocketAddress from);
+    protected void in(byte[] data, InetSocketAddress from) {
+
+    }
 
 //    static class UDPClient {
 //        public static void main(String args[]) throws Exception {
