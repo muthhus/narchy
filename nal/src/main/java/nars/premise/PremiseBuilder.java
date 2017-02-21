@@ -31,15 +31,10 @@ abstract public class PremiseBuilder {
     private static final Logger logger = LoggerFactory.getLogger(PremiseBuilder.class);
 
     @FunctionalInterface interface DerivationBuilder {
-        @Nullable Derivation derive(Premise p, Consumer<DerivedTask> each, NAR nar);
+        @Nullable Derivation derive(@NotNull Premise p, @NotNull Consumer<DerivedTask> each, @NotNull NAR nar);
     }
 
-    public final DerivationBuilder derivationBuilder = (p, each, nar)->{
-        return new Derivation(nar, p, each,
-                Param.UnificationMatchesMax,
-                Param.UnificationStackMax
-        );
-    };
+
 
 
     /**

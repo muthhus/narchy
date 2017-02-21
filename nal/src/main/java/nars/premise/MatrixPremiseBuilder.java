@@ -1,5 +1,6 @@
 package nars.premise;
 
+import jcog.Util;
 import jcog.bag.Bag;
 import jcog.data.MutableIntRange;
 import jcog.list.FasterList;
@@ -27,7 +28,12 @@ public class MatrixPremiseBuilder extends PremiseBuilder {
 
     private static final Logger logger = LoggerFactory.getLogger(MatrixPremiseBuilder.class);
 
-
+    public final DerivationBuilder derivationBuilder = (p, each, nar)->{
+        return new Derivation(nar, p, each,
+                Util.lerp(p.qua(), Param.UnificationMatchesMax, 1),
+                Param.UnificationStackMax
+        );
+    };
 
     @Override
     public @NotNull Premise newPremise(@NotNull Termed c, @NotNull Task task, Term beliefTerm, Task belief, float pri, float qua) {
