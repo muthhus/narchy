@@ -768,6 +768,9 @@ public abstract class TermBuilder {
 
                         if ((dt!=0 && dt!=DTERNAL)) {
                             mustNotEqual = false; //allow repeat
+                            if (dt < 0 && subject.equals(predicate)) {
+                                dt = -dt; //use only the forward direction on a repeat
+                            }
                         } else if (subject.equals(predicate)) {
                             return True;
                         }
@@ -825,7 +828,7 @@ public abstract class TermBuilder {
                         if ((usub.op() == CONJ) && (predicate.op() == CONJ)) {
                             Compound csub = (Compound) usub;
                             Compound cpred = (Compound) predicate;
-                            if (commutive(dt) || dt == XTERNAL /* if XTERNAL somehow happens here, just consider it as commutive */) {
+                            if (commutive(dt)) {
 
                                 TermContainer subjs = csub.subterms();
                                 TermContainer preds = cpred.subterms();
@@ -892,9 +895,7 @@ public abstract class TermBuilder {
 
                 if (op.commutative) {
 
-                    boolean crossesTime = !commutive(dt); //(dt != DTERNAL) && (dt != XTERNAL) && (dt != 0);
-
-                    //System.out.println("\t" + subject + " " + predicate + " " + subject.compareTo(predicate) + " " + predicate.compareTo(subject));
+                    boolean crossesTime = !commutive(dt);
 
                     //normalize co-negation
                     boolean sn = subject.op() == NEG;

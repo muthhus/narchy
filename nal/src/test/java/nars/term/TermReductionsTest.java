@@ -562,6 +562,7 @@ public class TermReductionsTest {
 
     @Test public void testRepeatInverseEquivalent() throws Narsese.NarseseException {
         assertEquals($("((a1) &&-1 (a1))"), $("((a1) &&+1 (a1))"));
+        assertEquals($("((a1) <=>-1 (a1))"), $("((a1) <=>+1 (a1))"));
     }
 
     @Test

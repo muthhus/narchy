@@ -605,11 +605,9 @@ public interface TermContainer extends Termlike, Iterable<Term> {
     }
 
 
+    /** non-zero or non-iternal dt disqualifies any reason for needing a TermSet */
     public static boolean requiresSorting(@NotNull Op op, int dt, int num) {
-        return op.commutative &&
-                num > 1 && //non-zero or non-iternal dt disqualifies any reason for needing a TermSet
-                commutive(dt)
-                ;
+        return num > 1 && op.commutative && commutive(dt);
     }
 
     default boolean isSorted() {
