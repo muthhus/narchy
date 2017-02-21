@@ -157,15 +157,6 @@ public class ConceptBagControl implements Control, Consumer<DerivedTask> {
     }
 
 
-
-    @Override
-    public Concept concept(@NotNull Term tt) {
-        PLink<Concept> x = active.get(tt);
-        if (x!=null)
-            return x.get();
-        return null;
-    }
-
     @Override
     public void accept(DerivedTask d) {
         pending.merge(d, d, (o, n) -> {

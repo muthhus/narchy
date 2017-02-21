@@ -1280,11 +1280,6 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
     }
 
 
-    @Override
-    public final Concept concept(@NotNull Term tt) {
-        return concept(tt, false);
-    }
-
     @Nullable
     public final Concept concept(@NotNull Termed t) {
         return concept(t, false);
@@ -1305,10 +1300,6 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
         t = concepts.conceptualizable(t);
         if (t == null)
             return null;
-
-        Concept controlProvided = control.concept(t);
-        if (controlProvided != null)
-            return controlProvided;
 
         Concept c = concepts.concept(t, createIfMissing);
         if (c != null && createIfMissing && c.isDeleted()) {

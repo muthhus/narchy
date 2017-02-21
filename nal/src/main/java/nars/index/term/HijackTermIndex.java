@@ -3,15 +3,16 @@ package nars.index.term;
 import jcog.Util;
 import jcog.bag.PLink;
 import jcog.bag.RawPLink;
-import jcog.bag.impl.HijackBag;
 import jcog.data.random.XorShift128PlusRandom;
 import nars.NAR;
 import nars.bag.impl.PLinkHijackBag;
-import nars.budget.BudgetMerge;
+import nars.concept.Concept;
+import nars.concept.PermanentConcept;
 import nars.conceptualize.ConceptBuilder;
 import nars.index.term.map.MaplikeTermIndex;
 import nars.term.Term;
 import nars.term.Termed;
+import org.eclipse.collections.impl.map.mutable.ConcurrentHashMapUnsafe;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -26,11 +27,11 @@ import java.util.function.Consumer;
 public class HijackTermIndex extends MaplikeTermIndex implements Runnable {
 
     private final PLinkHijackBag<Termed> table;
-    private final Map<Term,Termed> permanent = new ConcurrentHashMap<>();
+    private final Map<Term,Termed> permanent = new ConcurrentHashMapUnsafe<>(1024);
     private Thread updateThread;
     private boolean running;
 
-    private long updatePeriodMS = 250;
+    private long updatePeriodMS;
 
     /** current update index */
     private int visit;
@@ -41,7 +42,8 @@ public class HijackTermIndex extends MaplikeTermIndex implements Runnable {
     public HijackTermIndex(ConceptBuilder cb, int capacity, int reprobes) {
         super(cb);
 
-        updateBatchSize = 1 + (capacity / reprobes);
+        updateBatchSize = 1024; //1 + (capacity / (reprobes * 2));
+        updatePeriodMS = 50;
 
         this.table = new PLinkHijackBag<Termed>(capacity, reprobes, new XorShift128PlusRandom(1));
     }
@@ -62,13 +64,15 @@ public class HijackTermIndex extends MaplikeTermIndex implements Runnable {
         } else {
 
             Termed v = permanent.get(key);
-            if (v!=null)
+            if (v!=null) {
+                table.put(new RawPLink(key, 1f));
                 return v;
+            }
 
             if (createIfMissing) {
                 Termed kc = conceptBuilder.apply(key);
                 if (kc!=null) {
-                    PLink<Termed> inserted = insert(kc);
+                    PLink<Termed> inserted = table.put(new RawPLink<>(kc, activation(kc)));
                     if (inserted != null) {
                         Termed ig = inserted.get();
                         if (ig.term().equals(kc))
@@ -83,19 +87,15 @@ public class HijackTermIndex extends MaplikeTermIndex implements Runnable {
         return null;
     }
 
-    PLink insert(@NotNull Termed value) {
-        return table.put(new RawPLink<>(value, activation(value)));
-    }
-
     private float activation(@NotNull Termed value) {
-        return 0.5f; //TODO adjust based on complexity etc
+        return 0.75f; //TODO adjust based on complexity etc
     }
 
     @Override
     public void set(@NotNull Term src, Termed target) {
-        table.remove(target); //in-case it already exists, remove it
+        remove(src);
         permanent.put(src, target);
-        insert(target);
+        table.put(new RawPLink<>(target, 1f));
     }
 
     @Override
@@ -134,7 +134,10 @@ public class HijackTermIndex extends MaplikeTermIndex implements Runnable {
 
             int c = tt.length();
 
-            for (int i = 0; i < updateBatchSize; i++ , visit++) {
+            int visit = this.visit;
+            int n = updateBatchSize;
+
+            for (int i = 0; i < n; i++ , visit++) {
 
                 if (visit >= c) visit = 0;
 
@@ -143,12 +146,21 @@ public class HijackTermIndex extends MaplikeTermIndex implements Runnable {
                     update(x);
             }
 
-            Util.pause(updatePeriodMS);
+            this.visit = visit;
+
+            //Util.pause(updatePeriodMS);
+            Util.sleep(updatePeriodMS);
         }
     }
 
     protected void update(PLink<Termed> x) {
-        x.priMult(0.99f); //TODO better update function based on Concept features
+
+//        //TODO better update function based on Concept features
+//        Concept c = (Concept)x.get();
+//        if (!(c instanceof PermanentConcept)) {
+//            float decayRate = (0.005f /* ~1/200 */ * c.complexity()) / (1f + c.beliefs().priSum() + c.goals().priSum());
+//            x.priMult(1f - decayRate);
+//        }
     }
 
 }

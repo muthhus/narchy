@@ -118,7 +118,6 @@ public class GenericCompound implements Compound  {
         return op;
     }
 
-
     @NotNull
     @Override
     public String toString() {
@@ -135,7 +134,7 @@ public class GenericCompound implements Compound  {
         if (that instanceof Compound) {
             cthat = (Compound)that;
         } else if (that instanceof CompoundConcept) { //Termed but not Task
-            cthat = (Compound) ((Concept) that).term();
+            cthat = ((CompoundConcept) that).term();
             if (this == cthat)
                 return true;
         } else {
@@ -143,10 +142,11 @@ public class GenericCompound implements Compound  {
         }
 
         //return subterms.equals(cthat.subterms()) &&
-        return (hash == that.hashCode()) &&
+        return (hash == cthat.hashCode()) &&
                (op == cthat.op()) &&
-                subterms.equivalent(cthat.subterms()) &&
-               (dt == cthat.dt());
+               (dt == cthat.dt()) &&
+                subterms.equivalent(cthat.subterms())
+               ;
 
 
         //subterm sharing:

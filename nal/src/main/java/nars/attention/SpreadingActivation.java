@@ -181,7 +181,8 @@ public class SpreadingActivation extends Activation implements ObjectFloatProced
             }
         }
 
-        spread.addToValue(linkedTerm, thisScale);
+        if (!linkedTerm.equals(origin.term())) //origin probably has already be preactivated
+            spread.addToValue(linkedTerm, thisScale);
 
     }
 

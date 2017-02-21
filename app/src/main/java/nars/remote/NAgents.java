@@ -178,11 +178,11 @@ abstract public class NAgents extends NAgent {
         Random rng = new XorShift128PlusRandom(1);
         final Executioner exe =
                 //new SingleThreadExecutioner();
-                new MultiThreadExecutioner(threads, 8192 /* TODO chose a power of 2 number to scale proportionally to # of threads */)
+                new MultiThreadExecutioner(threads, 16384 /* TODO chose a power of 2 number to scale proportionally to # of threads */)
                 //.sync(false)
                 ;
 
-        int conceptsPerCycle = 16 * threads;
+        int conceptsPerCycle = 32 * threads;
 
         final int reprobes = 4;
 
@@ -196,12 +196,12 @@ abstract public class NAgents extends NAgent {
             }
         };
 
-        Default nar = new Default(16 * 1024,
+        Default nar = new Default(8 * 1024,
                 conceptsPerCycle, 1, 3, rng,
 
-                new HijackTermIndex(cb, 1024 * 64, 4)
+                //new HijackTermIndex(cb, 1024 * 64, 5)
                 //new NullTermIndex(cb)
-                //new CaffeineIndex(cb, 64*1024, false, exe)
+                new CaffeineIndex(cb, 64*1024, false, exe)
                 //new TreeTermIndex.L1TreeIndex(new DefaultConceptBuilder(), 300000, 32 * 1024, 3)
                 ,
                 time,
@@ -209,7 +209,7 @@ abstract public class NAgents extends NAgent {
 
             final Compressor compressor = new Compressor(this, "_",
                     3, 7,
-                    1f, 16, 128);
+                    2f, 16, 256);
 
             @Override
             public Task pre(@NotNull Task t) {
@@ -252,7 +252,6 @@ abstract public class NAgents extends NAgent {
 
         nar.confMin.setValue(0.01f);
         //nar.truthResolution.setValue(0.01f);
-        nar.termVolumeMax.setValue(70);
 
         MySTMClustered stm = new MySTMClustered(nar, 64, '.', 3, true, 6);
         MySTMClustered stmGoal = new MySTMClustered(nar, 32, '!', 2, true, 4);

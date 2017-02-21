@@ -44,14 +44,15 @@ public class Arkancide extends NAgents {
 
             return agent;
 
-        }, 30, 5, 6500);
+        }, 30, 5, 1500);
 
 
-        nar.forEachActiveConcept(c -> {
-            c.forEachTask(t -> {
-                System.out.println(t);
-            });
-        });
+//        nar.forEachActiveConcept(c -> {
+//            c.forEachTask(t -> {
+//                System.out.println(t);
+//            });
+//        });
+
         //IO.saveTasksToTemporaryTextFile(nar);
 
         //System.out.println(ts.db.getInfo());
@@ -66,7 +67,7 @@ public class Arkancide extends NAgents {
     public Arkancide(NAR nar, boolean cam) throws Narsese.NarseseException {
         super("noid", nar);
 
-        nar.derivedEvidenceGain.setValue(1.5f);
+        nar.derivedEvidenceGain.setValue(1f);
 
 
         noid = new Arkanoid(!cam) {

@@ -51,8 +51,5 @@ public interface Control {
         }
     };
 
-    /** allows the control to override the concept index on concept look-up */
-    default Concept concept(@NotNull Term tt) {
-        return null;
-    }
+
 }

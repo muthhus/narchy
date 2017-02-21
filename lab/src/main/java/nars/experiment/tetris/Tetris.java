@@ -37,8 +37,8 @@ public class Tetris extends NAgents {
 
     public static final int tetris_width = 6;
     public static final int tetris_height = 12;
-    public static final int TIME_PER_FALL = 12;
-    public static final int PIXEL_RADIX = 2;
+    public static final int TIME_PER_FALL = 4;
+    public static final int PIXEL_RADIX = 3;
 
     private static SensorConcept[][] concept;
     //private int afterlife = TIME_PER_FALL * tetris_height * tetris_width;
@@ -456,8 +456,11 @@ public class Tetris extends NAgents {
 
             FrameTime clock = new FrameTime().dur(TIME_PER_FALL/2);
             NAR nar =
-                    NAgents.newMultiThreadNAR(4, clock);
+                    NAgents.newMultiThreadNAR(3, clock);
                     //NARBuilder.newALANN(clock, 4, 64, 5, 4, 1);
+            nar.derivedEvidenceGain.setValue(0.1f);
+            nar.termVolumeMax.setValue(50);
+            nar.truthResolution.setValue(0.1f);
 
             //NAR nar = new TaskNAR(32 * 1024, new MultiThreadExecutioner(4, 4096), clock);
 //            MySTMClustered stm = new MySTMClustered(nar, 64, '.', 4, false, 2);
