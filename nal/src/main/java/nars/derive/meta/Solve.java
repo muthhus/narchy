@@ -54,16 +54,23 @@ abstract public class Solve extends AtomicBoolCondition {
                     return false;
 
                 //truth function is single premise so set belief truth to be null to prevent any negations below:
+                float confMin = m.confMin;
+
+
                 if ((t = f.apply(
                         m.taskTruth, //task truth is not involved in the outcome of this; set task truth to be null to prevent any negations below:
                         (single) ? null : m.beliefTruth,
-                        m.nar,
-                        m.confMin
+                        m.nar, confMin
                 ))==null)
                     return false;
 
-                t = t.dither(m.truthResolution, m.confMin);
-                if (t == null)
+                float eFactor = m.nar.derivedEvidenceGain.asFloat();
+                if (eFactor != 1) {
+                    if ((t = t.confWeightMult(eFactor))==null)
+                        return false;
+                }
+
+                if ((t = t.dither(m.truthResolution, confMin))==null)
                     return false;
 
                 break;

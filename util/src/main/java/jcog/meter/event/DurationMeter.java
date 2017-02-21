@@ -13,7 +13,7 @@ public class DurationMeter extends DoubleMeter {
 	private double startTime = Double.NaN;
 	private final boolean nanoSeconds;
 	// DescriptiveStatistics stat;
-	private final double window;
+	//private final double window;
 	// private double prev;
 	private final boolean frequency;
 	private final boolean strict = false;
@@ -22,7 +22,7 @@ public class DurationMeter extends DoubleMeter {
 			boolean asFrequency) {
 		super(id);
 
-		window = windowSec * 1.0E9;
+		//window = windowSec * 1.0E9;
 		// this.stat = new DescriptiveStatistics();
 		this.nanoSeconds = nanoSeconds;
 		frequency = asFrequency;

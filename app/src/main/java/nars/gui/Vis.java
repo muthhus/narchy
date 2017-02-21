@@ -8,7 +8,6 @@ import nars.NAR;
 import nars.NAgent;
 import jcog.bag.Bag;
 import nars.concept.Concept;
-import nars.budget.BLink;
 import nars.nar.Default;
 import nars.remote.NAgents;
 import nars.term.Term;
@@ -291,8 +290,8 @@ public class Vis {
         plot1.add("Conf", () -> nar.emotion.confident.getSum());
 
         Plot2D plot2 = new Plot2D(plotHistory, Plot2D.Line);
-        plot2.add("Busy", () -> nar.emotion.busyMass.getSum());
-        plot2.add("Lern", () -> nar.emotion.busyMass.getSum() - nar.emotion.learn.getSum());
+        plot2.add("Busy", () -> nar.emotion.busyPri.getSum());
+        plot2.add("Lern", () -> nar.emotion.busyPri.getSum() - nar.emotion.learnPri.getSum());
 
         Plot2D plot3 = new Plot2D(plotHistory, Plot2D.Line);
         plot3.add("Strs", () -> nar.emotion.stress.getSum());

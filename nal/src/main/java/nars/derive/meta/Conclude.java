@@ -110,21 +110,14 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
                     //note: the budget function used here should not depend on the truth's frequency. btw, it may be inverted below
                     Compound crr = compoundOrNull(nar.concepts.eval(cr));
                     if (crr == null) {
-                        throw new InvalidTermException(r.op(), DTERNAL, "normalization failed", (cr).terms());
+                        if (Param.DEBUG)
+                            throw new InvalidTermException(r.op(), DTERNAL, "normalization failed", (cr).terms());
+                        else
+                            return true;
                     }
 
                     Derivation.TruthPuncEvidence ct = m.punct.get();
                     Truth truth = ct.truth;
-
-                    if (truth != null) {
-                        float eFactor = nar.derivedEvidenceGain.asFloat();
-                        if (eFactor != 1) {
-                            truth = truth.confWeightMult(eFactor);
-                            if (truth == null)
-                                return true;
-                        }
-                    }
-
                     Budget budget = m.premise.budget(crr, truth, m);
                     if (budget != null) {
                         derive(m, crr, truth, budget, ct); //continue to stage 2

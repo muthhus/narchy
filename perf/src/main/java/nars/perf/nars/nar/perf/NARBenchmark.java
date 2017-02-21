@@ -61,41 +61,45 @@ public class NARBenchmark {
         //n.derivedActivation.setValue(0.5f);
         //n.nal(4);
 
+        n.core.conceptsFiredPerCycle.setValue(64);
 
-        new DeductiveMeshTest(n, new int[]{4, 4});
+
+        new DeductiveMeshTest(n, new int[]{16, 16});
         //new DeductiveChainTest(n, 10, 9999991, (x, y) -> $.p($.the(x), $.the(y)));
 
-        n.run(500);
+        n.run(1000);
+
+        System.err.println(n.concepts.summary());
 
     }
 
-    @Benchmark
-    @BenchmarkMode(value = Mode.AverageTime)
-    public void nal1Deduction() throws Narsese.NarseseException {
-        n.nal(1);
-        Compound a = $("<a-->b>");
-        Compound b = $("<b-->c>");
-
-        n.believe(a);
-        n.believe(b);
-        n.run(10000);
-    }
-
-    @Benchmark
-    @BenchmarkMode(value = Mode.AverageTime)
-    public void nal1DeductionInNAL8() throws Narsese.NarseseException {
-        n.nal(8);
-        Compound a = $("<a-->b>");
-        Compound b = $("<b-->c>");
-
-        n.believe(a);
-        n.believe(b);
-        n.run(10000);
-    }
+//    @Benchmark
+//    @BenchmarkMode(value = Mode.AverageTime)
+//    public void nal1Deduction() throws Narsese.NarseseException {
+//        n.nal(1);
+//        Compound a = $("<a-->b>");
+//        Compound b = $("<b-->c>");
+//
+//        n.believe(a);
+//        n.believe(b);
+//        n.run(10000);
+//    }
+//
+//    @Benchmark
+//    @BenchmarkMode(value = Mode.AverageTime)
+//    public void nal1DeductionInNAL8() throws Narsese.NarseseException {
+//        n.nal(8);
+//        Compound a = $("<a-->b>");
+//        Compound b = $("<b-->c>");
+//
+//        n.believe(a);
+//        n.believe(b);
+//        n.run(10000);
+//    }
 
 
     public static void main(String[] args) throws RunnerException {
-        perf(NARBenchmark.class, 5, 1);
+        perf(NARBenchmark.class, 2, 2);
     }
 
 }

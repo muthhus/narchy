@@ -308,24 +308,10 @@ abstract public class NAgent implements NSense, NAction {
 
     @NotNull
     public String summary() {
-
-        @NotNull Emotion emotion = nar.emotion;
-
-        //long now = nar.time();
-
-
-        return
-//                 + "rwrd=[" +
-//                     n4( sad.beliefs().truth(now).motivation() )
-//                             + "," +
-//                     n4( happy.beliefs().truth(now).motivation() )
-//                 + "] "
-                new StringBuilder().append("rwrd=").append(n2(rewardValue)).append("\t").append("motv=").append(n4(desireConf())).append(" ").append("hapy=").append(n4(emotion.happy() - emotion.sad())).append(" ").append("busy=").append(n4(emotion.busyMass.getSum())).append(" ").append("lern=").append(n4(emotion.learning())).append(" ").append("strs=").append(n4(emotion.stress.getSum())).append(" ").append("alrt=").append(n4(emotion.alert.getSum())).append(" ").append(" var=").append(n4(varPct(nar))).append(" ").append("\t").append(nar.concepts.summary()).toString()
-
-//                + "," + dRewardPos.belief(nar.time()) +
-//                "," + dRewardNeg.belief(nar.time());
-                ;
-
+        return "rwrd=" + n2(rewardValue) + " " +
+                "motv=" + n4(desireConf()) + " " +
+                n4(varPct(nar)) + "\t" + nar.concepts.summary() + " " +
+                nar.emotion.summary();
     }
 
 

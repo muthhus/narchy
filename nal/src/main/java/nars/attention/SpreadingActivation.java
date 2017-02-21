@@ -107,6 +107,7 @@ public class SpreadingActivation extends Activation implements ObjectFloatProced
 
 
         Termed kk = nar.concept(k, true);
+
         if (kk != null) {
             Concept ckk = (Concept) kk;
 
@@ -181,9 +182,7 @@ public class SpreadingActivation extends Activation implements ObjectFloatProced
             }
         }
 
-        if (!linkedTerm.equals(origin.term())) //origin probably has already be preactivated
-            spread.addToValue(linkedTerm, thisScale);
-
+        spread.addToValue(linkedTerm, thisScale);
     }
 
     final void termBidi(@NotNull Termed tgt, float tlForward, float tlReverse) {

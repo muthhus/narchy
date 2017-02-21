@@ -15,8 +15,8 @@ public class Arkancide extends NAgents {
     private final float paddleSpeed = 1f;
 
 
-    final int visW = 32;
-    final int visH = 16;
+    final int visW = 40;
+    final int visH = 24;
 
     //final int afterlife = 60;
 
@@ -44,7 +44,7 @@ public class Arkancide extends NAgents {
 
             return agent;
 
-        }, 30, 5, 1500);
+        }, 30, 5, 150000);
 
 
 //        nar.forEachActiveConcept(c -> {
@@ -67,7 +67,7 @@ public class Arkancide extends NAgents {
     public Arkancide(NAR nar, boolean cam) throws Narsese.NarseseException {
         super("noid", nar);
 
-        nar.derivedEvidenceGain.setValue(1f);
+        nar.derivedEvidenceGain.setValue(0.5f);
 
 
         noid = new Arkanoid(!cam) {
@@ -81,6 +81,8 @@ public class Arkancide extends NAgents {
         //nar.linkFeedbackRate.setValue(0.02f);
 
         maxPaddleSpeed = 35 * Arkanoid.BALL_VELOCITY;
+
+        nar.termVolumeMax.set(30);
 
         //nar.truthResolution.setValue(0.02f);
 

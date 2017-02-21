@@ -228,6 +228,7 @@ public class NAL3Test extends AbstractNALTest {
     @Test
     public void compound_decomposition_one_premise()  {
         TestNAR tester = test();
+
         tester.believe("<robin --> (-,bird,swimmer)>", 0.9f, 0.9f); //.en("Robin is a type of nonswimming bird.");
         tester.mustBelieve(cycles, "<robin --> bird>", 0.90f ,0.73f); //.en("Robin is a type of bird.");
 

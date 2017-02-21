@@ -29,9 +29,6 @@ public abstract class Param  {
      */
     public static final int COMPOUND_SUBTERMS_MAX = 127;
 
-    /** number of cycles for rolling average of busy emotion */
-    public static final int BUSY_WINDOW = 4;
-
     /** how many answers to record per input question task (in its concept's answer bag) */
     public static final int MAX_INPUT_ANSWERS = 16;
 
@@ -115,12 +112,12 @@ public abstract class Param  {
      * maximum changes logged in deriver's stack.
      * bigger number means deeper unification depth for bigger compounds and more permutations
      */
-    public final static int UnificationStackMax = 72;
+    public final static int UnificationStackMax = 96;
 
     /**
      * upper and lower limits for # of termutations derived, determined by premise's priority
      */
-    public static final int UnificationMatchesMax = 3;
+    public static final int UnificationMatchesMax = 6;
 
 
     public final static int SubUnificationStackMax = UnificationStackMax/2;

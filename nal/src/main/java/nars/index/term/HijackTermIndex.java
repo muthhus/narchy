@@ -5,6 +5,7 @@ import jcog.bag.PLink;
 import jcog.bag.RawPLink;
 import jcog.data.random.XorShift128PlusRandom;
 import nars.NAR;
+import nars.Param;
 import nars.bag.impl.PLinkHijackBag;
 import nars.concept.Concept;
 import nars.concept.PermanentConcept;
@@ -27,7 +28,7 @@ import java.util.function.Consumer;
 public class HijackTermIndex extends MaplikeTermIndex implements Runnable {
 
     private final PLinkHijackBag<Termed> table;
-    private final Map<Term,Termed> permanent = new ConcurrentHashMapUnsafe<>(1024);
+    private final Map<Term,Termed> permanent = new ConcurrentHashMap<>(1024);
     private Thread updateThread;
     private boolean running;
 
@@ -155,12 +156,13 @@ public class HijackTermIndex extends MaplikeTermIndex implements Runnable {
 
     protected void update(PLink<Termed> x) {
 
-//        //TODO better update function based on Concept features
-//        Concept c = (Concept)x.get();
-//        if (!(c instanceof PermanentConcept)) {
-//            float decayRate = (0.005f /* ~1/200 */ * c.complexity()) / (1f + c.beliefs().priSum() + c.goals().priSum());
-//            x.priMult(1f - decayRate);
-//        }
+        //TODO better update function based on Concept features
+        Concept c = (Concept)x.get();
+        if (!(c instanceof PermanentConcept)) {
+            float decayRate = c.complexity() / ((float)Param.COMPOUND_VOLUME_MAX);
+                    // / (1f + c.beliefs().priSum() + c.goals().priSum());
+            x.priMult(1f - 0.1f * Util.unitize(decayRate));
+        }
     }
 
 }

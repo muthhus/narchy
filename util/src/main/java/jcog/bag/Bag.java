@@ -115,7 +115,7 @@ public interface Bag<K,V> extends Table<K, V>, Iterable<V> {
      * fills a collection with at-most N items, if an item passes the predicate.
      * returns how many items added
      */
-    @NotNull
+    @Nullable
     Bag<K,V> sample(int n, @NotNull Predicate<? super V> target);
 
 

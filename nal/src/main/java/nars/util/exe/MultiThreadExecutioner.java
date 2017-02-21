@@ -89,15 +89,15 @@ public class MultiThreadExecutioner extends Executioner {
 
         this.cap = ringSize;
         this.safetyLimit =
-                (int)((1f/threads) * ringSize)/2;
-                //0;
+                //(int)((1f/threads) * ringSize)/2;
+                0;
 
         this.disruptor = new Disruptor<>(
                 TaskEvent::new,
                 ringSize /* ringbuffer size */,
                 exe,
                 ProducerType.MULTI,
-                new PhasedBackoffWaitStrategy(2,4, TimeUnit.MILLISECONDS, new LiteBlockingWaitStrategy())
+                new PhasedBackoffWaitStrategy(1,1, TimeUnit.MICROSECONDS, new LiteBlockingWaitStrategy())
                 //new LiteBlockingWaitStrategy()
                 //new SleepingWaitStrategy()
                 //new BlockingWaitStrategy()

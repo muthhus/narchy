@@ -7,22 +7,23 @@ import jcog.data.FloatParam;
 import jcog.data.MutableIntRange;
 import jcog.data.MutableInteger;
 import jcog.data.Range;
+import jcog.math.DoubleSummaryReusableStatistics;
+import jcog.meter.event.HitMeter;
+import jcog.meter.event.PeriodMeter;
 import nars.*;
 import nars.budget.BudgetMerge;
 import nars.concept.Concept;
-import nars.conceptualize.ConceptBuilder;
 import nars.derive.Deriver;
 import nars.premise.MatrixPremiseBuilder;
 import nars.task.DerivedTask;
-import nars.term.Term;
 import nars.term.Termed;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
 /**
@@ -65,23 +66,20 @@ public class ConceptBagControl implements Control, Consumer<DerivedTask> {
     public final @NotNull MutableInteger conceptsFiredPerBatch;
 
 
-    @Range(min = 0, max = 16, unit = "TaskLink") //TODO use float percentage
     public final MutableInteger tasklinksFiredPerFiredConcept = new MutableInteger(1);
 
-    //@Range(min = 0, max = 16, unit = "TermLink")
     public final MutableIntRange termlinksFiredPerFiredConcept = new MutableIntRange(1, 1);
 
-    @NotNull private final ConceptBuilder conceptBuilder;
 
     final AtomicBoolean busy = new AtomicBoolean(false);
 
     //public final HitMissMeter meter = new HitMissMeter(ConceptBagControl.class.getSimpleName());
 
-    public final FloatParam activationRate = new FloatParam(1f);
+    public final FloatParam conceptActivationRate = new FloatParam(1f);
     private float currentActivationRate = 1f;
 
     /** pending derivations to be input after this cycle */
-    final Map<Task, Task> pending = new ConcurrentHashMap();
+    final AtomicReference<Map<Task, Task>> pending = new AtomicReference(new ConcurrentHashMap<>());
     //int _merges = 0;
 
 
@@ -92,74 +90,77 @@ public class ConceptBagControl implements Control, Consumer<DerivedTask> {
         this.deriver = deriver;
         this.conceptsFiredPerCycle = new MutableInteger(1);
         this.conceptsFiredPerBatch = new MutableInteger(Param.CONCEPT_FIRE_BATCH_SIZE);
-        this.conceptBuilder = nar.concepts.conceptBuilder();
 
         this.active = conceptBag;
-                //new ConceptBag( conceptBag );
 
+        nar.onCycle(this::cycle);
 
-        //nar.onFrame(this);
-        nar.onCycle((n) -> {
-            if (busy.compareAndSet(false, true)) {
-
-                commit();
-
-                //updae concept bag
-                currentActivationRate = activationRate.floatValue()
-                    // * 1f/((float)Math.sqrt(active.capacity()))
-                ;
-
-                active.commit();
-
-                float load = nar.exe.load();
-
-                int cpf = Math.round(conceptsFiredPerCycle.floatValue() * (1f - load));
-                if (cpf > 0) {
-
-                    int cbs = conceptsFiredPerBatch.intValue();
-
-                    //logger.info("firing {} concepts (exe load={})", cpf, load);
-
-                    while (cpf > 0) {
-
-                        int batchSize = Math.min(cpf, cbs);
-                        cpf -= cbs;
-
-                        this.nar.runLater(() -> {
-
-                            List<PLink<Concept>> toFire = $.newArrayList(batchSize);
-                            toFire.clear();
-                            active.sample(batchSize, toFire::add);
-
-
-                            int _tasklinks = tasklinksFiredPerFiredConcept.intValue();
-
-                            for (int i = 0, toFireSize = toFire.size(); i < toFireSize; i++) {
-                                premiser.newPremiseMatrix(toFire.get(i).get(), this.nar,
-                                        _tasklinks, termlinksFiredPerFiredConcept,
-                                        this, //input them within the current thread here
-                                        deriver
-                                );
-                            }
-
-                        });
-
-
-                    }
-                }
-
-                busy.set(false);
-            }
-
+        nar.onReset((n)->{
+            active.clear();
+            pending.set(null);
         });
-        nar.onReset((n)->active.clear());
 
     }
 
+    final DoubleSummaryReusableStatistics cycleTimeNS = new DoubleSummaryReusableStatistics();
+
+
+    protected void cycle() {
+        if (!busy.compareAndSet(false, true))
+            return;
+
+        Map<Task, Task> prevPending = pending.getAndSet(new ConcurrentHashMap<>());
+        if (!prevPending.isEmpty()) {
+            //System.out.println(pending.size() + " unique new tasks, " + _merges + " merges");
+            this.nar.inputLater(prevPending.values());
+            //_merges = 0;
+        }
+
+        active.commit();
+
+        //update concept bag
+        currentActivationRate = conceptActivationRate.floatValue()
+        // * 1f/((float)Math.sqrt(active.capacity()))
+        ;
+
+        float load = nar.exe.load();
+        int cbs = conceptsFiredPerBatch.intValue();
+
+        int cpf = Math.round(conceptsFiredPerCycle.floatValue() * (1f - load));
+
+        //logger.info("firing {} concepts (exe load={})", cpf, load);
+
+        while (cpf > 0) {
+
+            int batchSize = Math.min(cpf, cbs);
+            cpf -= cbs;
+
+            this.nar.runLater(() -> {
+
+                List<PLink<Concept>> toFire = $.newArrayList(batchSize);
+                active.sample(batchSize, toFire::add);
+
+                int _tasklinks = tasklinksFiredPerFiredConcept.intValue();
+
+                for (int i = 0, toFireSize = toFire.size(); i < toFireSize; i++) {
+                    premiser.newPremiseMatrix(toFire.get(i).get(), this.nar,
+                            _tasklinks, termlinksFiredPerFiredConcept,
+                            this, //input them within the current thread here
+                            deriver
+                    );
+                }
+
+            });
+
+        }
+
+
+        busy.set(false);
+    }
 
     @Override
     public void accept(DerivedTask d) {
-        pending.merge(d, d, (o, n) -> {
+        pending.get().merge(d, d, (o, n) -> {
             BudgetMerge.maxBlend.apply(o.budget(), n, 1f);
             //_merges++;
             return o;
@@ -172,18 +173,7 @@ public class ConceptBagControl implements Control, Consumer<DerivedTask> {
 //        }
     }
 
-    protected void commit() {
-        //synchronized (pending) {
-        if (!pending.isEmpty()) {
-            //System.out.println(pending.size() + " unique new tasks, " + _merges + " merges");
-            nar.inputLater(pending.values());
-            pending.clear();
-            //_merges = 0;
-        }
-        //}
-    }
-
-//    /** called when a concept is displaced from the concept bag */
+    //    /** called when a concept is displaced from the concept bag */
 //    protected void sleep(@NotNull Concept c) {
 //        NAR n = this.nar;
 //

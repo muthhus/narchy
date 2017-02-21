@@ -199,9 +199,9 @@ abstract public class NAgents extends NAgent {
         Default nar = new Default(8 * 1024,
                 conceptsPerCycle, 1, 3, rng,
 
-                //new HijackTermIndex(cb, 1024 * 64, 5)
+                new HijackTermIndex(cb, 1024 * 64, 3)
                 //new NullTermIndex(cb)
-                new CaffeineIndex(cb, 64*1024, false, exe)
+                //new CaffeineIndex(cb, 64*1024, false, exe)
                 //new TreeTermIndex.L1TreeIndex(new DefaultConceptBuilder(), 300000, 32 * 1024, 3)
                 ,
                 time,

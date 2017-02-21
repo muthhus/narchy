@@ -38,7 +38,7 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
     /**
      * hash -> ticket
      */
-    final ConcurrentHashMapUnsafe<Integer, Integer> busy = new ConcurrentHashMapUnsafe<>();
+    final Map<Integer, Integer> busy = new ConcurrentHashMapUnsafe<>();
     final AtomicInteger ticket = new AtomicInteger(0);
     /**
      * pressure from outside trying to enter
@@ -94,7 +94,7 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
     }
 
     @Override
-    public boolean setCapacity(int newCapacity) {
+    public final boolean setCapacity(int newCapacity) {
 
 
         if (capacity.getAndSet(newCapacity) != newCapacity) {
@@ -151,22 +151,23 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
         boolean add = adding != null;
         boolean remove = (!add && (scale == -1));
 
-        int targetIndex = -1;
-        float targetPri = Float.POSITIVE_INFINITY;
-
         V added = null;
 
-        V target = null;
         V found = null; //get or remove
 
         boolean merged = false;
         final int ticket = add ? busy(hash) : Integer.MIN_VALUE /* N/A for get or remove */;
 
 
+        int targetIndex = -1;
+        float targetPri = Float.POSITIVE_INFINITY;
+        V target = null;
+
         int iStart = i(c, hash);
         boolean dir = random.nextBoolean(); //choose random initial direction
 
         try {
+
             for (int retry = 0; retry < reprobes; retry++, dir = !dir) {
 
                 int i = dir ? iStart : (iStart + reprobes)-1;
@@ -188,8 +189,7 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
                             targetPri = Float.NEGATIVE_INFINITY;
                         }
                     } else {
-                        K iiv = key(ii);
-                        if (equals(x, iiv)) { //existing
+                        if (key(ii).equals(x)) { //existing
 
                             if (!add) {
 
@@ -319,7 +319,7 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
 
     @Nullable
     @Override
-    public V remove(K k) {
+    public V remove(@NotNull K k) {
         return update(k, null, -1);
     }
 
@@ -327,15 +327,10 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
 
         float priEpsilon = priEpsilon();
 
-        boolean oldPriThresh = oldPri > priEpsilon;
-        if (!oldPriThresh) {
-            boolean newPriThresh = newPri > priEpsilon;
-            if (newPriThresh)
-                return true;
-            else
-                return random.nextBoolean(); //50/50 chance
-        } else {
+        if (oldPri > priEpsilon) {
             return (random.nextFloat() > (oldPri / (newPri + oldPri)));
+        } else {
+            return (newPri > priEpsilon) || random.nextBoolean(); //50/50 chance
         }
     }
 
@@ -482,7 +477,7 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
      * generally this should be a monotonically increasing function of
      * the scan progress proportion, a value in 0..1.0 also.
      */
-    protected float tolerance(float scanProgressProportion) {
+    protected static float tolerance(float scanProgressProportion) {
         return scanProgressProportion * scanProgressProportion /* power 2 curve */;
     }
 
@@ -521,7 +516,7 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
     }
 
     @Override
-    public boolean contains(K it) {
+    public boolean contains(@NotNull K it) {
         return get(it) != null;
     }
 

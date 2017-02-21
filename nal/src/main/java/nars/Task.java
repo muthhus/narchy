@@ -204,15 +204,6 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
         return n.concept(term(), true);
     }
 
-    @Nullable
-    default Activation activate(@NotNull NAR n) {
-        Concept c = n.activate(term(), pri());
-        if (c!=null)
-            return c.process(this, n);
-        else
-            return null;
-    }
-
     /**
      * called if this task is entered into a concept's belief tables
      * TODO what about for questions/quests

@@ -1,13 +1,17 @@
 package nars;
 
+import jcog.Texts;
 import jcog.meter.event.FloatGuage;
+import jcog.meter.event.PeriodMeter;
 import nars.term.Compound;
 import nars.term.Term;
 import org.apache.commons.lang3.mutable.MutableFloat;
-import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.Serializable;
+
+import static jcog.Texts.n2;
+import static jcog.Texts.n4;
 
 /**
  * emotion state: self-felt internal mental states; variables used to record emotional values
@@ -16,13 +20,13 @@ public final class Emotion implements Serializable {
 
     /** priority rate of Task processing attempted */
     @NotNull
-    public final FloatGuage busyMass;
-
-    public final DescriptiveStatistics busyMassAvg = new DescriptiveStatistics(Param.BUSY_WINDOW);
+    public final FloatGuage busyPri;
+    @NotNull
+    public final FloatGuage busyVol;
 
     /** priority rate of Task processing which affected concepts */
     @NotNull
-    public final FloatGuage learn;
+    public final FloatGuage learnPri, learnVol;
 
     /** task priority overflow rate */
     @NotNull
@@ -42,23 +46,31 @@ public final class Emotion implements Serializable {
 
     /** count of errors */
     @NotNull
-    public final FloatGuage errr;
+    public final FloatGuage errrVol;
 
 
     //private transient final Logger logger;
 
-    /** alertness, % active concepts change per cycle */
-    @NotNull
-    public final FloatGuage alert;
+//    /** alertness, % active concepts change per cycle */
+//    @NotNull
+//    public final FloatGuage alert;
 
+    /** statistic of time elapsed between cycles.
+     *  analogous to main brainwave frequency  */
+    final PeriodMeter cycleTime = new PeriodMeter("cycleTime", true,
+            4, false);
 
 
     public Emotion() {
         super();
 
-        //logger = LoggerFactory.getLogger(Emotion.class);
+        //logger = LoggerFactory.getLogger(class);
 
-        this.busyMass = new FloatGuage("busy");
+        this.busyPri = new FloatGuage("busyP");
+        this.busyVol = new FloatGuage("busyV");
+
+        this.learnPri = new FloatGuage("learnP");
+        this.learnVol = new FloatGuage("learnV");
 
         this.happy = new FloatGuage("happy");
         this.sad = new FloatGuage("sad");
@@ -66,40 +78,54 @@ public final class Emotion implements Serializable {
         this.confident = new FloatGuage("confidence");
 
         this.stress = new FloatGuage("stress");
-        this.learn = new FloatGuage("learn");
-        this.alert = new FloatGuage("alert");
-        this.errr = new FloatGuage("error");
+
+        //this.alert = new FloatGuage("alert");
+
+        this.errrVol = new FloatGuage("error");
 
     }
 
 
     /** new frame started */
-    public void frame() {
+    public void cycle() {
+
+        cycleTime.hit();
+
         happy.clear();
         sad.clear();
 
-        busyMassAvg.addValue(busyMass.getSum());
-        busyMass.clear();
+        busyPri.clear();
+        busyVol.clear();
+
+        learnPri.clear();
+        learnVol.clear();
 
         stress.clear();
-        learn.clear();
-        alert.clear();
-        errr.clear();
+
+        //alert.clear();
+
+        errrVol.clear();
+
         confident.clear();
     }
 
     /** percentage of business which was not frustration */
     public float learning() {
-        return learn.getSum()/ busyMass.getSum();
+        return learnVol.getSum() / busyVol.getSum();
     }
 
-    /** joy = first derivative of happiness, delta happiness / delta business */
-    public float joy() {
-        double b = busyMass.getSum();
-        if (b == 0)
-            return 0;
-        return (float)(happy() / b);
+    public float erring() {
+        return errrVol.getSum() / busyVol.getSum();
     }
+
+
+//    /** joy = first derivative of happiness, delta happiness / delta business */
+//    public float joy() {
+//        double b = busyPri.getSum();
+//        if (b == 0)
+//            return 0;
+//        return (float)(happy() / b);
+//    }
 
     public float happy() {
         return happy.getSum();
@@ -158,11 +184,12 @@ public final class Emotion implements Serializable {
         if (delta > 0)
             happy.accept( delta );
         else
-            sad.accept(delta);
+            sad.accept(-delta);
     }
 
-    @Deprecated public void busy(float pri) {
-        busyMass.accept( pri );
+    @Deprecated public void busy(float pri, int vol) {
+        busyPri.accept( pri );
+        busyVol.accept( vol );
     }
 
 
@@ -172,9 +199,10 @@ public final class Emotion implements Serializable {
             stress.accept( v );
     }
 
-    @Deprecated public void learn(float pri) {
+    @Deprecated public void learn(float pri, int vol) {
 
-        learn.accept( pri );
+        learnPri.accept( pri );
+        learnVol.accept(vol);
 
     }
 
@@ -183,17 +211,45 @@ public final class Emotion implements Serializable {
 
     }
 
-    @Deprecated public void alert(float percentFocusChange) {
-        alert.accept( percentFocusChange );
-    }
+//    @Deprecated public void alert(float percentFocusChange) {
+//        alert.accept( percentFocusChange );
+//    }
 
-    public void eror() {
-        errr.accept(1);
+    public void eror(int vol) {
+        errrVol.accept(vol);
     }
 
     public double happysad() {
 
         return happy.getSum() + sad.getSum();
+    }
+
+    public String summary() {
+        //long now = nar.time();
+
+        return new StringBuilder().append(
+                Texts.n4(
+                    this.cycleTime.mean()/1E6
+                )).append("ms ")
+                .append(" hapy=").append(n4(happy() - sad()))
+                .append(" busy=").append(n4(busyVol.getSum()))
+                .append(" lern=").append(n4(learning()))
+                .append(" errr=").append(n4(erring()))
+                .append(" strs=").append(n4(stress.getSum()))
+                //.append(" alrt=").append(n4(alert.getSum()))
+        .toString();
+
+
+//                 + "rwrd=[" +
+//                     n4( sad.beliefs().truth(now).motivation() )
+//                             + "," +
+//                     n4( happy.beliefs().truth(now).motivation() )
+//                 + "] "
+
+
+//                + "," + dRewardPos.belief(nar.time()) +
+//                "," + dRewardNeg.belief(nar.time());
+
     }
 
 

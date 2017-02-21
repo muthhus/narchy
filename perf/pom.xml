@@ -21,21 +21,40 @@
   <dependencies>
     <dependency>
       <groupId>opennars</groupId>
-      <artifactId>app</artifactId>
+      <artifactId>nal</artifactId>
       <version>1.8-SNAPSHOT</version>
-      <scope>compile</scope>
     </dependency>
+
+    <!-- https://mvnrepository.com/artifact/net.tuis.ubench/ubench -->
+    <dependency>
+      <groupId>net.tuis.ubench</groupId>
+      <artifactId>ubench</artifactId>
+      <version>0.2.0</version>
+    </dependency>
+
+
     <dependency>
       <groupId>org.openjdk.jmh</groupId>
       <artifactId>jmh-core</artifactId>
       <version>1.17.4</version>
-      <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>org.openjdk.jmh</groupId>
       <artifactId>jmh-generator-annprocess</artifactId>
       <version>1.17.4</version>
-      <scope>compile</scope>
     </dependency>
+    <!-- https://mvnrepository.com/artifact/org.openjdk.jmh/jmh-generator-reflection -->
+    <dependency>
+      <groupId>org.openjdk.jmh</groupId>
+      <artifactId>jmh-generator-reflection</artifactId>
+      <version>1.17.4</version>
+    </dependency>
+    <!-- https://mvnrepository.com/artifact/org.openjdk.jmh/jmh-generator-bytecode -->
+    <dependency>
+      <groupId>org.openjdk.jmh</groupId>
+      <artifactId>jmh-generator-bytecode</artifactId>
+      <version>1.17.4</version>
+    </dependency>
+
   </dependencies>
 </project>

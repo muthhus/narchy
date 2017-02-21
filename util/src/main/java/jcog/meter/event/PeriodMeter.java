@@ -18,20 +18,16 @@ import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
  */
 public class PeriodMeter extends FunctionMeter<Double> {
     
-    double lastReset;
-    private final boolean nanoSeconds;
+    private final boolean nanoOrMilli;
     final DescriptiveStatistics stat;
-    private final double window;
-    private double prev;
+    private double prev = Double.NaN;
     private final boolean frequency;
     
-    public PeriodMeter(String id, boolean nanoSeconds, double windowSec, boolean asFrequency) {
+    public PeriodMeter(String id, boolean nanoOrMilli, int window, boolean asFrequency) {
         super(id, true, ".min", ".max", ".mean", ".stddev");
 
-
-        window = windowSec * 1.0E9;
-        stat = new DescriptiveStatistics();
-        this.nanoSeconds = nanoSeconds;
+        this.stat = new DescriptiveStatistics(window);
+        this.nanoOrMilli = nanoOrMilli;
         frequency = asFrequency;
         reset();
     }
@@ -40,31 +36,25 @@ public class PeriodMeter extends FunctionMeter<Double> {
          return nanoSeconds ? System.nanoTime() : System.currentTimeMillis() * 1.0E6;
     }
 
-    public double sinceStart() {
-        return now(nanoSeconds) - lastReset;
-    }
+
     
 
-    public double reset() {
-        lastReset = now(nanoSeconds);
+    public void reset() {
         stat.clear();
-        return lastReset;
     }
 
-    public DescriptiveStatistics hit() {
-        return hit(1);
+    public void hit() {
+        hit(1);
     }
 
-    public DescriptiveStatistics hit(int n) {
-        double now;
-        now = sinceStart() > window ? reset() : now(nanoSeconds);
-        if (Double.isFinite(prev)) {
+    public void hit(int n) {
+        double now = now(nanoOrMilli);
+        if (prev == prev) {
             double dt = now - prev;
             for (int i = 0; i < n; i++)
                 stat.addValue(dt);
         }
         prev = now;
-        return stat;
     }
     
     
@@ -88,5 +78,9 @@ public class PeriodMeter extends FunctionMeter<Double> {
         return period;
     }
 
-    
+
+    public double mean() {
+        return this.stat.getMean();
+    }
+
 }

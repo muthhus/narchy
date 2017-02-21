@@ -2,7 +2,6 @@ package nars;
 
 
 import com.google.common.collect.Sets;
-import jcog.Util;
 import jcog.bag.Bag;
 import jcog.bag.PLink;
 import jcog.bag.Prioritized;
@@ -16,7 +15,6 @@ import nars.attention.SpreadingActivation;
 import nars.budget.BLink;
 import nars.budget.Budget;
 import nars.concept.AtomConcept;
-import nars.concept.CompoundConcept;
 import nars.concept.Concept;
 import nars.concept.PermanentConcept;
 import nars.conceptualize.DefaultConceptBuilder;
@@ -62,7 +60,6 @@ import java.util.stream.Stream;
 import static nars.$.$;
 import static nars.$.*;
 import static nars.Op.*;
-import static nars.concept.CompoundConcept.DuplicateMerge;
 import static nars.term.Terms.compoundOrNull;
 import static nars.term.transform.Functor.f;
 import static nars.time.Tense.ETERNAL;
@@ -647,12 +644,14 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
         if (input == null)
             return null;
 
-        try {
+        float inputPri = input.priSafe(0);
+        emotion.busy(inputPri, input.volume());
 
+        try {
             input.normalize(this); //accept into input buffer for eventual processing
         } catch (@NotNull InvalidTaskException | InvalidTermException | Budget.BudgetException e) {
 
-            emotion.eror();
+            emotion.eror(input.volume());
 
             input.delete();
 
@@ -704,7 +703,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
             }
         }
 
-        emotion.busy(input.priSafe(0));
+
 
 
         if (time instanceof FrameTime) {
@@ -714,33 +713,27 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
 
         try {
 
-            Activation a = input.activate(this);
+            Concept c = input.concept(this);
+            if (c!=null) {
 
-            if (a != null) {
+                Activation a = c.process(input, this);
 
-                Concept c = a.origin;
+                if (a != null) {
 
-                eventTaskProcess.emit(post(input));
+                    eventTaskProcess.emit(post(input));
 
-                emotion.learn(input.priSafe(0));
+                    emotion.learn(inputPri, input.volume());
 
-                concepts.commit(c);
+                    concepts.commit(c);
 
-                return c; //SUCCESSFULLY PROCESSED
-
-
-            } else {
-
-
-                return null;
+                    return c; //SUCCESSFULLY PROCESSED
+                }
 
             }
 
-
         } catch (Concept.InvalidConceptException | InvalidTermException | InvalidTaskException | Budget.BudgetException e) {
 
-
-            emotion.eror();
+            emotion.eror(input.volume());
 
             //input.feedback(null, Float.NaN, Float.NaN, this);
             if (Param.DEBUG)
@@ -960,7 +953,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
 
             exe.next(this);
 
-            emotion.frame();
+            emotion.cycle();
 
         }
 
@@ -1401,13 +1394,6 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
         return this == obj;
     }
 
-    public Concept activate(Term term, float priToAdd) {
-        Concept c = concept(term, true);
-        if (c != null) {
-            activate(c, priToAdd);
-        }
-        return c;
-    }
 
     @Override
     public void activate(Concept c, float priToAdd) {
