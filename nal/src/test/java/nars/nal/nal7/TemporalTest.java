@@ -1,5 +1,6 @@
 package nars.nal.nal7;
 
+import com.google.common.base.Joiner;
 import jcog.bag.Bag;
 import jcog.bag.PLink;
 import nars.*;
@@ -19,6 +20,7 @@ import org.jetbrains.annotations.Nullable;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.io.StringWriter;
 import java.util.TreeSet;
 
 import static com.google.common.collect.Iterables.size;
@@ -388,7 +390,7 @@ public class TemporalTest {
     }
 
     @Test
-    public void testConceptualizationIntermpolationTemporal() {
+    public void testConceptualizationIntermpolationTemporal() throws Narsese.NarseseException {
 
         Default d = new Default();
         d.believe("((a ==>+2 b)-->[pill])", Tense.Present, 1f, 0.9f);
@@ -399,8 +401,10 @@ public class TemporalTest {
         Bag<Concept,PLink<Concept>> cb = d.core.active;
         cb.print();
         assertTrue(5 <= cb.size());
-        Concept cc = cb.iterator().next().get();//((ArrayBag<Concept>) cb).get(0).get();
-        assertEquals("((a==>b)-->[pill])", cc.toString());
+        String abpill = "((a==>b)-->[pill])";
+        assertTrue( Joiner.on(' ').join(cb).contains(abpill) );
+
+        Concept cc = cb.get($(abpill)).get(); //iterator().next().get();//((ArrayBag<Concept>) cb).get(0).get();
 
         cc.beliefs().capacity(1, 1, d); //set to capacity=1 to force compression
 
