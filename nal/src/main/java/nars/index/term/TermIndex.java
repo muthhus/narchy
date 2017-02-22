@@ -599,6 +599,9 @@ public abstract class TermIndex extends TermBuilder {
     @NotNull
     public Compound atemporalize(@NotNull Compound c) {
 
+        if (!c.hasTemporal())
+            return c;
+
         TermContainer psubs = c.subterms();
         Term[] newSubs;
 
@@ -614,11 +617,12 @@ public abstract class TermIndex extends TermBuilder {
                     subsChanged = true;
 
             }
-            int dt = c.dt();
-            newSubs = subsChanged ? /*theSubterms(*/TermContainer.theTermArray(o,
-                    DTERNAL,
-                    //(dt == DTERNAL||dt==0) ? DTERNAL : XTERNAL /* preserve order */,
-                    ss)/*)*/ : null;
+//            int dt = c.dt();
+//            newSubs = subsChanged ? /*theSubterms(*/TermContainer.theTermArray(o,
+//                    DTERNAL,
+//                    //(dt == DTERNAL||dt==0) ? DTERNAL : XTERNAL /* preserve order */,
+//                    ss)/*)*/ : null;
+            newSubs = subsChanged ? ss : null;
 
 
         } else {
@@ -644,15 +648,15 @@ public abstract class TermIndex extends TermBuilder {
                 newSubs = new Term[] {s, s};
             } else {
                 if (o.temporal)
-                    pdt = DTERNAL; //dont destroy image relation
+                    pdt = DTERNAL;
             }
 //            if (o.temporal && newSubs!=null && newSubs.size() == 1) {
 //                System.out.println("?");
 //            }
 
-            Compound xx = compoundOrNull(the(o,
+            Compound xx = compoundOrNull(newCompound(o,
                     pdt,
-                    subsChanged ? newSubs : psubs.terms()));
+                    subsChanged ? intern(newSubs) : psubs));
             if (xx == null)
                 throw new InvalidTermException("unable to atemporalize", c);
 

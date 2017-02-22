@@ -626,7 +626,7 @@ public class TemporalTest {
     @Test public void testAtemporalization1() throws Narsese.NarseseException {
         Term x = $("(((--,(tetris-->(_n,#2))) &&+1 $1) <=>+1 ($1 &&+0 (--,(tetris-->(_n,#2)))))");
         Term y = $.terms.atemporalize(x);
-        assertEquals("(($1&&(--,(tetris-->(_n,#2)))) <=>+- ($1&&(--,(tetris-->(_n,#2)))))", y.toString());
+        assertEquals("(($1&&(--,(tetris-->(_n,#2))))<=>($1&&(--,(tetris-->(_n,#2)))))", y.toString());
     }
 
 
