@@ -50,7 +50,7 @@ public interface NARBuilder {
                 //.sync(false)
                 ;
 
-        int conceptsPerCycle = 64 * threads;
+        int conceptsPerCycle = 256 * threads;
 
         final int reprobes = 4;
 
@@ -69,7 +69,7 @@ public interface NARBuilder {
 
                 //new HijackTermIndex(cb, 1024 * 128, reprobes)
                 //new NullTermIndex(cb)
-                new CaffeineIndex(cb, 128 * 1024, -1, null /* fork join common pool */)
+                new CaffeineIndex(cb, -1 /*128 * 1024*/, -1, null /* null = fork join common pool */)
                 //new TreeTermIndex.L1TreeIndex(new DefaultConceptBuilder(), 300000, 32 * 1024, 3)
                 ,
                 time,

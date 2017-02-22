@@ -105,7 +105,7 @@ public class PeriodMeter extends FunctionMeter<Double> {
     @Override
     public String toString() {
 
-        return id + "{" + Util.secondStr(stat.getMean()) + "AVG x " + stat.getN() + "= " + Util.secondStr(stat.getSum()) + "}";
+        return id + "{" + Util.secondStr(stat.getMean()) + "AVG x " + stat.getN() + "~= " + Util.secondStr(stat.getSum()) + "}";
     }
 
 }

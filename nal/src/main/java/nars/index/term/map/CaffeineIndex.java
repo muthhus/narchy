@@ -87,8 +87,10 @@ public class CaffeineIndex extends MaplikeTermIndex implements RemovalListener<T
 
         if (subCapacity > 0)
             subTermsBuilder.maximumSize(subCapacity);
-        else
+        else {
             subTermsBuilder.weakValues();
+            //subTermsBuilder.softValues();
+        }
 
 
         this.concepts = builder.build();
