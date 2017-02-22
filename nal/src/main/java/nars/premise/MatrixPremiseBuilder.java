@@ -117,14 +117,21 @@ public class MatrixPremiseBuilder extends PremiseBuilder {
 
                 for (int j = 0; j < termsBufferSize && countPerTermlink < termlinksPerForThisTask; j++, jl++) {
 
+                    long start = System.nanoTime();
+                    boolean accepted = false;
+
                     Premise p = premise(c, taskLink, termsBuffer.get(jl % termsBufferSize).get(), now, nar, priFactor, -1f);
                     if (p != null) {
                         Derivation d = derivationBuilder.derive(p, target, nar);
                         if (d!=null) {
                             deriver.accept(d);
+                            accepted = true;
                             countPerTermlink++;
                         }
                     }
+
+                    long end = System.nanoTime();
+                    nar.emotion.thought(p, end-start, accepted);
 
                 }
 

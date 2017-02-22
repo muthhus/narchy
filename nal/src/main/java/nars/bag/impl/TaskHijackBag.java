@@ -33,4 +33,5 @@ public class TaskHijackBag extends BudgetHijackBag<Task,Task> {
         return new Forget(rate);
     }
 
+
 }

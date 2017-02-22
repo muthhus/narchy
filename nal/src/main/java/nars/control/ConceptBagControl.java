@@ -3,6 +3,7 @@ package nars.control;
 import jcog.bag.Bag;
 import jcog.bag.PLink;
 import jcog.bag.RawPLink;
+import jcog.bag.impl.HijackBag;
 import jcog.data.FloatParam;
 import jcog.data.MutableIntRange;
 import jcog.data.MutableInteger;
@@ -11,6 +12,7 @@ import jcog.math.DoubleSummaryReusableStatistics;
 import jcog.meter.event.HitMeter;
 import jcog.meter.event.PeriodMeter;
 import nars.*;
+import nars.bag.impl.TaskHijackBag;
 import nars.budget.BudgetMerge;
 import nars.concept.Concept;
 import nars.derive.Deriver;
@@ -24,6 +26,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.atomic.AtomicReferenceArray;
 import java.util.function.Consumer;
 
 /**
@@ -75,17 +78,22 @@ public class ConceptBagControl implements Control, Consumer<DerivedTask> {
 
     //public final HitMissMeter meter = new HitMissMeter(ConceptBagControl.class.getSimpleName());
 
+    public final MutableInteger newTasksPerCycleMax = new MutableInteger(500);
+
     public final FloatParam conceptActivationRate = new FloatParam(1f);
     private float currentActivationRate = 1f;
 
     /** pending derivations to be input after this cycle */
-    final AtomicReference<Map<Task, Task>> pending = new AtomicReference(new ConcurrentHashMap<>());
+    //final AtomicReference<Map<Task, Task>> pending = new AtomicReference(new ConcurrentHashMap<>());
+    final TaskHijackBag pending;
     //int _merges = 0;
 
 
     public ConceptBagControl(@NotNull NAR nar, @NotNull Deriver deriver, @NotNull Bag<Concept,PLink<Concept>> conceptBag) {
 
         this.nar = nar;
+
+        this.pending = new TaskHijackBag(5, BudgetMerge.maxBlend, nar.random);
 
         this.deriver = deriver;
         this.conceptsFiredPerCycle = new MutableInteger(1);
@@ -97,7 +105,7 @@ public class ConceptBagControl implements Control, Consumer<DerivedTask> {
 
         nar.onReset((n)->{
             active.clear();
-            pending.set(new ConcurrentHashMap<>());
+            pending.clear();
         });
 
     }
@@ -106,16 +114,15 @@ public class ConceptBagControl implements Control, Consumer<DerivedTask> {
         if (!busy.compareAndSet(false, true))
             return;
 
-        Map<Task, Task> prevPending = pending.getAndSet(new ConcurrentHashMap<>());
-        if (!prevPending.isEmpty()) {
-            //System.out.println(pending.size() + " unique new tasks, " + _merges + " merges");
-            this.nar.inputLater(prevPending.values());
-            //_merges = 0;
+        if (!pending.isEmpty()) {
+            AtomicReferenceArray<Task> all = pending.reset();
+            nar.inputLater( HijackBag.stream(all) );
         }
 
         active.commit();
 
         //update concept bag
+        pending.capacity( newTasksPerCycleMax.intValue() );
         currentActivationRate = conceptActivationRate.floatValue()
         // * 1f/((float)Math.sqrt(active.capacity()))
         ;
@@ -157,11 +164,7 @@ public class ConceptBagControl implements Control, Consumer<DerivedTask> {
 
     @Override
     public void accept(DerivedTask d) {
-        pending.get().merge(d, d, (o, n) -> {
-            BudgetMerge.maxBlend.apply(o.budget(), n, 1f);
-            //_merges++;
-            return o;
-        });
+        pending.put(d);
 
 //        if (nar.input(d)!=null) {
 //            meter.hit();

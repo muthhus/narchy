@@ -18,7 +18,6 @@ import nars.task.MutableTask;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
-import nars.term.atom.Atom;
 import nars.time.FrameTime;
 import nars.time.Time;
 import nars.truth.Truth;
@@ -267,7 +266,7 @@ abstract public class NAgent implements NSense, NAction {
     private void ticks(int t) {
         Time time = (Time) nar.time;
         if (time instanceof FrameTime)
-            ((FrameTime) time).tick(t); //resume clock for the last cycle before repeating
+            ((FrameTime) time).cycle(t); //resume clock for the last cycle before repeating
     }
 
     private void doFrame() {
@@ -572,7 +571,7 @@ abstract public class NAgent implements NSense, NAction {
 
                 if (t!=null) {
                     nar.input(
-                            new GeneratedTask(action, GOAL, t)
+                            new MutableTask(action, GOAL, t)
                                     .time(now, now - Math.round(nar.time.dur()), now)
                                     .budgetByTruth(action.pri.asFloat())
                                     .log("Curiosity")

@@ -949,11 +949,11 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
 
         for (; frames > 0; frames--) {
 
-            time.tick();
-
-            exe.next(this);
+            time.cycle();
 
             emotion.cycle();
+
+            exe.cycle(this);
 
         }
 

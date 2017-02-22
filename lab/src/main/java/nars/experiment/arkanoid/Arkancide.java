@@ -44,7 +44,7 @@ public class Arkancide extends NAgents {
 
             return agent;
 
-        }, 30, 5, 150000);
+        }, 30, 5, -1);
 
 
 //        nar.forEachActiveConcept(c -> {
@@ -82,7 +82,7 @@ public class Arkancide extends NAgents {
 
         maxPaddleSpeed = 35 * Arkanoid.BALL_VELOCITY;
 
-        nar.termVolumeMax.set(60);
+        nar.termVolumeMax.set(40);
 
 
         //nar.truthResolution.setValue(0.02f);

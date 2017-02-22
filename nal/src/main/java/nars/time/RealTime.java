@@ -41,7 +41,7 @@ public abstract class RealTime implements Time {
 
     @Override
     public void clear() {
-        tick();
+        cycle();
 
         if (start!=0)
             start = getRealTime();
@@ -51,7 +51,7 @@ public abstract class RealTime implements Time {
 
 
     @Override
-    public final void tick() {
+    public final void cycle() {
         long now = (getRealTime()-start);
 
         t0 = t;

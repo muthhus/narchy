@@ -2,6 +2,7 @@ package nars.derive.meta;
 
 import nars.Op;
 import nars.premise.Derivation;
+import nars.premise.TruthPuncEvidence;
 import nars.truth.Truth;
 import nars.truth.func.TruthOperator;
 import org.jetbrains.annotations.NotNull;
@@ -89,7 +90,9 @@ abstract public class Solve extends AtomicBoolCondition {
         }
 
 
-        return m.punct.set(new Derivation.TruthPuncEvidence(t, punct, m.evidence(single)))!=null;
+        return m.punct.set(new TruthPuncEvidence(t, punct,
+                single ? m.evidenceSingle() : m.evidenceDouble()
+        ))!=null;
     }
 
 

@@ -36,26 +36,13 @@ public class Derivation extends Unify {
      */
     @NotNull
     public final Premise premise;
+
+    // cached for fast access during derivation:
     public final float truthResolution;
     public final float quaMin;
     public final float premiseEvidence;
+    public final float confMin;
 
-    public final long time() {
-        return nar.time();
-    }
-
-    public static final class TruthPuncEvidence {
-        public final Truth truth;
-        public final char punc;
-        public final long[] evidence;
-
-        public TruthPuncEvidence(Truth truth, char punc, long[] evidence) {
-            this.truth = truth;
-            this.punc = punc;
-            this.evidence = evidence;
-        }
-
-    }
 
     @NotNull
     public final Versioned<TruthPuncEvidence> punct;
@@ -64,9 +51,8 @@ public class Derivation extends Unify {
     /**
      * current MatchTerm to receive matches at the end of the Termute chain; set prior to a complete match by the matchee
      */
-    @Nullable
-    @Deprecated
-    public BoolCondition forEachMatch;
+    @NotNull
+    private BoolCondition forEachMatch;
 
 
     /**
@@ -81,13 +67,12 @@ public class Derivation extends Unify {
      * cached values
      */
 
-    public final float confMin;
 
-    /** op ordinals, 0=task, 1=belief */
-    public final int termSub0op;
-    public final int termSub1op;
+    /** op ordinals: 0=task, 1=belief */
+    public final byte termSub0op;
+    public final byte termSub1op;
 
-    /** op bits, 0=task, 1=belief */
+    /** op bits: 0=task, 1=belief */
     public final int termSub0opBit;
     public final int termSub1opBit;
 
@@ -119,6 +104,7 @@ public class Derivation extends Unify {
      * whether the premise involves temporality that must be calculated upon derivation
      */
     public final boolean temporal;
+
     @Nullable
     private long[] evidenceDouble, evidenceSingle;
 
@@ -192,13 +178,13 @@ public class Derivation extends Unify {
         this.termSub0Struct = taskTerm.structure();
 
         Op tOp = taskTerm.op();
-        this.termSub0op = tOp.ordinal();
+        this.termSub0op = (byte) tOp.ordinal();
         this.termSub0opBit = tOp.bit;
 
         this.termSub1Struct = beliefTerm.structure();
 
         Op bOp = beliefTerm.op();
-        this.termSub1op = bOp.ordinal();
+        this.termSub1op = (byte) bOp.ordinal();
         this.termSub1opBit = bOp.bit;
 
         this.temporal = temporal(task, belief);
@@ -208,17 +194,10 @@ public class Derivation extends Unify {
         float premiseEvidence = task.isBeliefOrGoal() ? task.evi() : 0;
         if (belief!=null)
             premiseEvidence += belief.evi();
-            //premiseEvidence = Math.max(premiseEvidence, belief.evi());
-
-//        if (premiseEvidence!=premiseEvidence)
-//            premiseEvidence = 0; //???
         this.premiseEvidence = premiseEvidence;
 
     }
 
-    protected final void put(@NotNull Term t) {
-        putXY(t, t);
-    }
 
     protected final void set(@NotNull Term t) {
         setXY(t, t);
@@ -231,23 +210,14 @@ public class Derivation extends Unify {
 
         int t = now();
 
-        this.forEachMatch = eachMatch; //to notify of matches
-        boolean finish;
-        if (eachMatch != null) {
-            //set the # of matches according to the # of conclusions in this branch
-            //each matched termutation will be used to derive F=matchFactor conclusions,
-            //so divide the premiseMatches value by it to equalize the derivation quantity
-            this.matchesRemain = matchesMax;
-            finish = true;
-        } else {
-            this.matchesRemain = -1; //will not apply unless eachMatch!=null (final step)
-            finish = false;
-        }
-
         if (constraints != null) {
             if (this.constraints.set(constraints)==null)
                 throw new RuntimeException("constraints not set");
         }
+
+        this.forEachMatch = eachMatch; //to notify of matches
+        boolean finish = eachMatch!=null;
+        matchesRemain = matchesMax;
 
         unify(x, y, !finish, finish);
 
@@ -257,26 +227,11 @@ public class Derivation extends Unify {
             versioning.revert(t);
         } //else: allows the set constraints to continue
 
-
     }
 
-    @Override
-    public final boolean onMatch() {
-
- //       try {
-//            if (!forEachMatch.run(this, now()))
-//                return false;
-//        } catch (RuntimeException e) {
-//            if (Param.DEBUG_DERIVER)
-//                Conclude.logger.warn("{}\n\tderiving {}", e, ((Conclude)forEachMatch).rule.source);
-//            //continue
-//        }
-
-        //return forEachMatch.run(this, now()) && (--matchesRemain > 0);
+    @Override public final boolean onMatch() {
         return  (--matchesRemain > 0) && forEachMatch.run(this);
     }
-
-
 
 
     private static boolean temporal(@NotNull Task task, @Nullable Task belief) {
@@ -310,21 +265,6 @@ public class Derivation extends Unify {
     }
 
 
-//    /** specific minimum confidence function for advanced filtering heuristics TODO */
-//    public final float confidenceMin(Term pattern, char punc) {
-//
-////        //EXAMPLE TEMPORARY HACK
-////        Op o = pattern.op();
-////        if (o!=VAR_PATTERN) {
-////            int str = pattern.structure();
-////
-////            if ((Op.hasAny(str, Op.EQUIV) || (o == Op.INHERIT)))
-////                return minConfidence * 3;
-////        }
-//
-//        return confMin;
-//    }
-
     /**
      * gets the op of the (top-level) pattern being compared
      *
@@ -337,61 +277,11 @@ public class Derivation extends Unify {
         return (i == 0 ? termSub0op : termSub1op);
     }
 
-    /**
-     * @param subterm 0 or 1, indicating task or belief
-     */
-    public final boolean subTermMatch(int subterm, int bits) {
-        //if the OR produces a different result compared to subterms,
-        // it means there is some component of the other term which is not found
-        //return ((possibleSubtermStructure | existingStructure) != existingStructure);
-        return Op.hasAll((subterm == 0 ? termSub0Struct : termSub1Struct), bits);
-    }
-
-    /**
-     * both
-     */
-    public final boolean subTermsMatch(int bits) {
-        //if the OR produces a different result compared to subterms,
-        // it means there is some component of the other term which is not found
-        //return ((possibleSubtermStructure | existingStructure) != existingStructure);
-        //if the OR produces a different result compared to subterms,
-        // it means there is some component of the other term which is not found
-        //return ((possibleSubtermStructure | existingStructure) != existingStructure);
-        return Op.hasAll(termSub0Struct, bits) &&
-                Op.hasAll(termSub1Struct, bits);
-    }
-
-//    /** returns whether the put operation was successful */
-//    public final boolean putXY(Term k, Versioned<Term> vv) {
-//        Term v = vv.get();
-//        if (v != null) {
-//            return putXY(k, v);
-//        }
-//        return false;
-//    }
-
-//    /** copy the new mappings to the match; returns false if there was an error, true if successful or if it was empty */
-//    public final boolean putAllXY(Subst m) {
-//        if (m instanceof FindSubst) {
-//            return ((FindSubst) m).forEachVersioned((BiPredicate<Term,Versioned>)this::putXY);
-//        } else {
-//            if (!m.isEmpty()) {
-//                return m.forEach((BiPredicate<Term,Term>)this::putXY);
-//            }
-//        }
-//        return true;
-//    }
 
     public void replaceAllXY(@NotNull Unify m) {
         m.xy.forEachVersioned(this::replaceXY);
     }
 
-
-    @Nullable
-    public long[] evidence(boolean single) {
-
-        return single ? evidenceSingle() : evidenceDouble();
-    }
 
     @Nullable
     public long[] evidenceSingle() {

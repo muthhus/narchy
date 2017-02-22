@@ -1,5 +1,6 @@
 package jcog.meter.resource;
 
+import jcog.Texts;
 import jcog.meter.event.DoubleMeter;
 
 /**
@@ -14,6 +15,11 @@ public class MemoryUseTracker extends DoubleMeter {
 
     public MemoryUseTracker(String id) {
         super(id);
+    }
+
+    @Override
+    public String toString() {
+        return Texts.n2(getMemoryUsed()/1024.0) + "kb use";
     }
 
     public static long getMemoryUsed() {

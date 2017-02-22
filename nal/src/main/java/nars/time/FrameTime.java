@@ -53,7 +53,7 @@ public class FrameTime implements Time {
 
 
     @Override
-    public final void tick() {
+    public final void cycle() {
         t+=dt;
     }
 

@@ -142,7 +142,7 @@ public class MultiThreadExecutioner extends Executioner {
     }
 
     @Override
-    public void next(@NotNull NAR nar) {
+    public void cycle(@NotNull NAR nar) {
 
         //SYNCHRONIZE -----------------------------
         if (sync) {

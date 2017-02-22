@@ -7,6 +7,7 @@ import nars.Param;
 import nars.budget.Budget;
 import nars.derive.rule.PremiseRule;
 import nars.premise.Derivation;
+import nars.premise.TruthPuncEvidence;
 import nars.task.DerivedTask;
 import nars.term.Compound;
 import nars.term.Term;
@@ -116,7 +117,7 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
                             return true;
                     }
 
-                    Derivation.TruthPuncEvidence ct = m.punct.get();
+                    TruthPuncEvidence ct = m.punct.get();
                     Truth truth = ct.truth;
                     Budget budget = m.premise.budget(crr, truth, m);
                     if (budget != null) {
@@ -136,7 +137,7 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
     /**
      * 2nd-stage
      */
-    final void derive(@NotNull Derivation m, @NotNull Compound content, Truth truth, Budget budget, @NotNull Derivation.TruthPuncEvidence ct) {
+    final void derive(@NotNull Derivation m, @NotNull Compound content, Truth truth, Budget budget, @NotNull TruthPuncEvidence ct) {
 
         NAR nar = m.nar;
 
@@ -246,7 +247,7 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
      * part 2
      */
     @Nullable
-    public final DerivedTask derive(@NotNull Termed<Compound> c, @NotNull Budget budget, long now, long[] occ, @NotNull Derivation p, Truth truth, Derivation.TruthPuncEvidence ct) {
+    public final DerivedTask derive(@NotNull Termed<Compound> c, @NotNull Budget budget, long now, long[] occ, @NotNull Derivation p, Truth truth, TruthPuncEvidence ct) {
         char punc = ct.punc;
         long[] evidence = ct.evidence;
 

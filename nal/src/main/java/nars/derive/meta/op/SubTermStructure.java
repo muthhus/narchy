@@ -40,8 +40,10 @@ public final class SubTermStructure extends AtomicBoolCondition {
 
     @Override
     public boolean run(@NotNull Derivation ff) {
-
-        return ff.subTermMatch(subterm, bits);
+        //if the OR produces a different result compared to subterms,
+        // it means there is some component of the other term which is not found
+        //return ((possibleSubtermStructure | existingStructure) != existingStructure);
+        return Op.hasAll((subterm == 0 ? ff.termSub0Struct : ff.termSub1Struct), bits);
     }
 
     static int filter(@NotNull Op matchingType, int bits) {

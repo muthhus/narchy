@@ -29,12 +29,7 @@ import static nars.time.Tense.ETERNAL;
  */
 abstract public class DerivedTask extends MutableTask {
 
-
-    @Nullable
-    public volatile transient Premise premise;
-
-
-    //@Nullable long[] startEnd;
+    @Nullable public transient Premise premise;
 
     //TODO should this also affect the Belief task?
 
@@ -42,7 +37,6 @@ abstract public class DerivedTask extends MutableTask {
         super(tc, punct, truth);
 
         this.premise = p.premise;
-
 
         if (occ!=null) {
             long start = occ[0];

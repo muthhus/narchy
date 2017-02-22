@@ -1,9 +1,10 @@
 package nars;
 
 import jcog.Texts;
+import jcog.meter.ResourceMeter;
 import jcog.meter.event.FloatGuage;
 import jcog.meter.event.PeriodMeter;
-import jcog.net.UDP;
+import nars.premise.Premise;
 import nars.term.Compound;
 import nars.term.Term;
 import org.apache.commons.lang3.mutable.MutableFloat;
@@ -18,6 +19,8 @@ import static jcog.Texts.n4;
  * emotion state: self-felt internal mental states; variables used to record emotional values
  */
 public final class Emotion implements Serializable {
+
+    final static int windowCycles = 2;
 
     /** priority rate of Task processing attempted */
     @NotNull
@@ -58,9 +61,12 @@ public final class Emotion implements Serializable {
 
     /** statistic of time elapsed between cycles.
      *  analogous to main brainwave frequency  */
-    final PeriodMeter cycleTime = new PeriodMeter("cycleTime", true,
-            4, false);
+    final PeriodMeter cycleTime = new PeriodMeter("cycleTime", true, windowCycles, false);
 
+    final ResourceMeter resourceMeter = new ResourceMeter();
+
+    final PeriodMeter thoughtSerious = new PeriodMeter("thoughtSerious", true, -1, false);
+    final PeriodMeter thoughtWaste = new PeriodMeter("thoughtWaste", true, -1, false);
 
     public Emotion() {
         super();
@@ -104,6 +110,9 @@ public final class Emotion implements Serializable {
         stress.clear();
 
         //alert.clear();
+
+        thoughtSerious.clear();
+        thoughtWaste.clear();
 
         errrVol.clear();
 
@@ -212,7 +221,6 @@ public final class Emotion implements Serializable {
 
     public void confident(float deltaConf, @NotNull Compound term) {
         confident.accept( deltaConf );
-
     }
 
 //    @Deprecated public void alert(float percentFocusChange) {
@@ -240,6 +248,11 @@ public final class Emotion implements Serializable {
                 .append(" lern=").append(n4(learning()))
                 .append(" errr=").append(n4(erring()))
                 .append(" strs=").append(n4(stress.getSum()))
+                .append('\n')
+                .append(" ").append(thoughtSerious)
+                .append(" ").append(thoughtWaste)
+                //.append(" cpu=").append(resourceMeter.CYCLE_CPU_TIME)
+                .append(" mem=").append(resourceMeter.CYCLE_RAM_USED)
                 //.append(" alrt=").append(n4(alert.getSum()))
         .toString();
 
@@ -257,7 +270,9 @@ public final class Emotion implements Serializable {
     }
 
 
-
+    public void thought(Premise p, long timeNS, boolean serious) {
+        (serious ? thoughtSerious : thoughtWaste).hit(timeNS/1.0E9);
+    }
 
 /*    public void busy(@NotNull Task cause, float activation) {
         busy += cause.pri() * activation;

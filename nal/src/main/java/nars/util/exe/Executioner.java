@@ -35,7 +35,7 @@ abstract public class Executioner implements Executor {
         }*/
     }
 
-    abstract public void next(@NotNull NAR nar);
+    abstract public void cycle(@NotNull NAR nar);
 
 
     /** an estimate or exact number of parallel processes this runs */

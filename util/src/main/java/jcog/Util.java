@@ -1517,4 +1517,9 @@ public enum Util { ;
         return lerp(z, n, s);
     }
 
+    public static String secondStr(double s) {
+        if (s >= 0.01) return Texts.n2(s) + "s";
+        else if (s >= 0.00001) return Texts.n2(s * 1000) + "ms";
+        else return Texts.n2(s * 1.0E6) + "us";
+    }
 }

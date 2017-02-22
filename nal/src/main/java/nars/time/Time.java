@@ -17,11 +17,11 @@ public interface Time extends Serializable {
 	long nextStamp();
 
 		/** called each cycle */
-	void tick();
+	void cycle();
 
-	default void tick(int ticks) {
+	default void cycle(int ticks) {
 		for (int i = 0; i < ticks; i++)
-			tick();
+			cycle();
 	}
 
 	long elapsed();
