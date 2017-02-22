@@ -7,7 +7,7 @@ import nars.NAR;
 import nars.NSchool;
 import nars.concept.SensorConcept;
 import nars.experiment.tetris.impl.TetrisState;
-import nars.remote.NAgents;
+import nars.nar.NARBuilder;
 import nars.term.Termed;
 import nars.time.RealTime;
 import spacegraph.Ortho;
@@ -90,7 +90,7 @@ public class TetriSchool extends NSchool implements Runnable {
 
         NAR n =
                 //NAgents.newAlann();
-                NAgents.newMultiThreadNAR(3,
+                NARBuilder.newMultiThreadNAR(3,
                     new RealTime.DS(true)
                 ).loop(40).nar;
 

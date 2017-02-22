@@ -7,6 +7,7 @@ import nars.concept.ActionConcept;
 import nars.concept.SensorConcept;
 import nars.experiment.tetris.impl.TetrisState;
 import nars.experiment.tetris.impl.TetrisVisualizer;
+import nars.nar.NARBuilder;
 import nars.remote.NAgents;
 import nars.term.Compound;
 import nars.term.atom.Atomic;
@@ -456,13 +457,13 @@ public class Tetris extends NAgents {
 
             FrameTime clock = new FrameTime().dur(TIME_PER_FALL/2);
             NAR nar =
-                    NAgents.newMultiThreadNAR(4, clock);
+                    NARBuilder.newMultiThreadNAR(4, clock);
                     //NARBuilder.newALANN(clock, 4, 64, 5, 4, 1);
 
-            //nar.derivedEvidenceGain.setValue(0.5f);
+            nar.derivedEvidenceGain.setValue(2f);
 
             nar.termVolumeMax.setValue(40);
-            nar.truthResolution.setValue(0.05f);
+            //nar.truthResolution.setValue(0.05f);
 
             //NAR nar = new TaskNAR(32 * 1024, new MultiThreadExecutioner(4, 4096), clock);
 //            MySTMClustered stm = new MySTMClustered(nar, 64, '.', 4, false, 2);

@@ -24,7 +24,7 @@ import java.util.function.Predicate;
 /**
  * A bag implemented as a combination of a Map and a SortedArrayList
  */
-public class ArrayBag<X> extends SortedListTable<X, BLink<X>> implements Bag<X,BLink<X>> {
+public class ArrayBag<X> extends SortedListTable<X, BLink<X>> implements Bag<X, BLink<X>> {
 
 //    @Deprecated @NotNull
 //    public static <K> BLink<K> newLink(@NotNull K i, @Nullable Budgeted exists) {
@@ -77,8 +77,6 @@ public class ArrayBag<X> extends SortedListTable<X, BLink<X>> implements Bag<X,B
         }
         return false;
     }
-
-
 
 
     /**
@@ -314,67 +312,75 @@ public class ArrayBag<X> extends SortedListTable<X, BLink<X>> implements Bag<X,B
     }
 
 
-
     @Override
     public final BLink<X> put(@NotNull BLink<X> b, float scale, @Nullable MutableFloat overflow) {
 
 
-        float bp = b.priSafe(-1);
-        if (bp < 0) { //already deleted
-            return null;
-        }
+        final boolean[] isNew = {false};
 
         X key = key(b);
-        BLink<X> v = map.compute(key, (k, existing) ->{
-            if (existing!=null && !existing.isDeleted())
-                return existing;
-            else
-                return b.cloneZero(Float.NaN);
+        BLink<X> v = map.compute(key, (kk, existing) -> {
+            BLink<X> res;
+            float o;
+            float pBefore = 0;
+            if (existing != null && !existing.isDeleted()) {
+                //merge
+                res = existing;
+                pBefore = existing.priSafe(0);
+                o = mergeFunction.merge(existing, b, scale);
+            } else {
+                //new
+                BLink<X> n = b.cloneZero(b.qua());
+                float oo = mergeFunction.merge(n, b, scale);
+                float np = n.pri();
+
+                if (size() >= capacity && np < priMin()) {
+                    res = null; //failed insert
+                    o = 0;
+                    pressure += np;
+                } else {
+                    pBefore = 0;
+                    isNew[0] = true;
+                    res = n;
+                    o = oo;
+                }
+            }
+
+            if ((o > 0) && overflow != null) {
+                overflow.add(o);
+            }
+
+            if (res != null) {
+                float pAfter = res.priSafe(0);
+                pressure += pAfter - pBefore;
+            }
+
+            return res;
+
         });
 
-        float pBefore;
-        float vq = v.qua();
-        boolean isNew = (vq!=vq);
-        if (isNew) {
-            v.setQua(b.qua());
-            pBefore = 0;
-        } else {
-            pBefore = v.priSafe(0);
+        if (v == null) {
+            return null; //rejected
         }
 
+        if (isNew[0]) {
 
-        float o = mergeFunction.merge(v, b, scale);
-        if ((o > 0) && overflow != null) {
-            overflow.add(o);
-        }
+            //attempt new insert
+            boolean added;
+            synchronized (items) {
 
-        float pAfter = v.priSafe(0);
-        if (!isNew) {
-            if ((pAfter - pBefore) <= Param.BUDGET_EPSILON)
-                return v;//no change
-        }
+                added = updateItems(v);
 
-        pressure += pAfter - pBefore;
-
-        if (isNew) {
-            if (size() < capacity || v.pri() >= priMin()) {
-
-                boolean added;
-                synchronized (items) {
-                    //attempt new insert
-                    if (!updateItems(v)) {
-                        v.delete();
-                        added = false;
-                    } else {
-                        sortAfterUpdate();
-                        added = true;
-                    }
+                if (!added) {
+                    v.delete();
+                } else {
+                    sortAfterUpdate();
                 }
+            }
 
-                if (added) {
-                    onAdded(v);
-                    return v;
-                }
+            if (added) {
+                onAdded(v);
+                return v;
             }
 
             map.remove(key);
@@ -399,20 +405,21 @@ public class ArrayBag<X> extends SortedListTable<X, BLink<X>> implements Bag<X,B
 
 
     @Override
-    @Deprecated public Bag<X,BLink<X>> commit() {
-        return commit((b)-> Forget.forget(size(), pressure, mass, Forget::new));
+    @Deprecated
+    public Bag<X, BLink<X>> commit() {
+        return commit((b) -> Forget.forget(size(), pressure, mass, Forget::new));
     }
 
     @Override
     @NotNull
-    public final ArrayBag<X> commit(@Nullable Function<Bag<X,BLink<X>>, Consumer<BLink<X>>> update) {
+    public final ArrayBag<X> commit(@Nullable Function<Bag<X, BLink<X>>, Consumer<BLink<X>>> update) {
         commit(update, false);
         return this;
     }
 
-    private void commit(@Nullable Function<Bag<X,BLink<X>>, Consumer<BLink<X>>> update, boolean checkCapacity) {
+    private void commit(@Nullable Function<Bag<X, BLink<X>>, Consumer<BLink<X>>> update, boolean checkCapacity) {
 
-        if (update!=null) {
+        if (update != null) {
             float mass = 0;
             synchronized (items) {
                 int iii = size();
@@ -429,8 +436,6 @@ public class ArrayBag<X> extends SortedListTable<X, BLink<X>> implements Bag<X,B
         if (u != null || checkCapacity)
             update(u, checkCapacity);
     }
-
-
 
 
     /**
@@ -450,7 +455,7 @@ public class ArrayBag<X> extends SortedListTable<X, BLink<X>> implements Bag<X,B
                         return this;
 
                 boolean needsSort;
-                if (each!=null) {
+                if (each != null) {
                     needsSort = !updateBudget(each);
                 } else {
                     needsSort = true;
@@ -483,7 +488,7 @@ public class ArrayBag<X> extends SortedListTable<X, BLink<X>> implements Bag<X,B
         //estimate, probably log2(size)
         if (s < 128) {
             return 8;
-        } else  if (s < 2048) {
+        } else if (s < 2048) {
             return 16;
         } else {
             return 32;

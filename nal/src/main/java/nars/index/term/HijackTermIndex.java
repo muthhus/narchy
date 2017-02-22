@@ -28,7 +28,7 @@ import java.util.function.Consumer;
 public class HijackTermIndex extends MaplikeTermIndex implements Runnable {
 
     private final PLinkHijackBag<Termed> table;
-    private final Map<Term,Termed> permanent = new ConcurrentHashMap<>(1024);
+    //private final Map<Term,Termed> permanent = new ConcurrentHashMap<>(1024);
     private Thread updateThread;
     private boolean running;
 
@@ -46,7 +46,16 @@ public class HijackTermIndex extends MaplikeTermIndex implements Runnable {
         updateBatchSize = 1024; //1 + (capacity / (reprobes * 2));
         updatePeriodMS = 50;
 
-        this.table = new PLinkHijackBag<Termed>(capacity, reprobes, new XorShift128PlusRandom(1));
+        this.table = new PLinkHijackBag<Termed>(capacity, reprobes, new XorShift128PlusRandom(1)) {
+            @Override
+            protected boolean replace(PLink<Termed> incoming, PLink<Termed> existing) {
+                if (incoming.get() instanceof PermanentConcept)
+                    return true;
+                if (existing.get() instanceof PermanentConcept)
+                    return false;
+                return super.replace(incoming, existing);
+            }
+        };
     }
 
     @Override
@@ -64,11 +73,11 @@ public class HijackTermIndex extends MaplikeTermIndex implements Runnable {
             return x.get(); //cache hit
         } else {
 
-            Termed v = permanent.get(key);
+            /*Termed v = permanent.get(key);
             if (v!=null) {
                 table.put(new RawPLink(key, 1f));
                 return v;
-            }
+            }*/
 
             if (createIfMissing) {
                 Termed kc = conceptBuilder.apply(key);
@@ -95,7 +104,7 @@ public class HijackTermIndex extends MaplikeTermIndex implements Runnable {
     @Override
     public void set(@NotNull Term src, Termed target) {
         remove(src);
-        permanent.put(src, target);
+        //permanent.put(src, target);
         table.put(new RawPLink<>(target, 1f));
     }
 
@@ -108,7 +117,7 @@ public class HijackTermIndex extends MaplikeTermIndex implements Runnable {
     public void forEach(@NotNull Consumer<? super Termed> c) {
         //TODO make sure this doesnt visit a term twice appearing in both tables but its ok for now
         table.forEachKey(c);
-        permanent.values().forEach(c);
+        //permanent.values().forEach(c);
     }
 
     @Override
@@ -118,13 +127,14 @@ public class HijackTermIndex extends MaplikeTermIndex implements Runnable {
 
     @Override
     public @NotNull String summary() {
-        return table.size() + " concepts (" + permanent.size() + " permanent)";
+
+        return table.size() + " concepts"; // (" + permanent.size() + " permanent)";
     }
 
     @Override
     public void remove(@NotNull Term entry) {
         table.remove(entry);
-        permanent.remove(entry);
+        //permanent.remove(entry);
     }
 
     @Override

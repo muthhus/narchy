@@ -557,6 +557,7 @@ public enum Texts {
         }
         return sb.toString();
     }
+
     public static String n4(double[] v) {
         StringBuilder sb = new StringBuilder(v.length * 6 + 2 /* approx */);
         int s = v.length;

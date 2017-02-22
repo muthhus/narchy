@@ -30,10 +30,10 @@ public class BenchmarkLine1DContinuous {
     @BenchmarkMode(value = Mode.AverageTime)
     public void line1d() {
 
-        int time = 2000;
+        int time = 5000;
 
         XorShift128PlusRandom rng = new XorShift128PlusRandom((int)(Math.random()*1000));
-        int conceptsPerCycle = 8;
+        int conceptsPerCycle = 32;
 
         final Executioner exe =
                 //new MultiThreadExecutioner(2, 2048);
@@ -41,10 +41,10 @@ public class BenchmarkLine1DContinuous {
 
         Default nar = new Default(1024,
                 conceptsPerCycle, 1, 3, rng,
-                new CaffeineIndex(new DefaultConceptBuilder(), 1024*16, false, exe),
+                new CaffeineIndex(new DefaultConceptBuilder(), 1024*64, false, exe),
                 new FrameTime(1f), exe
         );
-        nar.termVolumeMax.set(26);
+        nar.termVolumeMax.set(32);
 
 
         nar.beliefConfidence(0.9f);
@@ -72,8 +72,8 @@ public class BenchmarkLine1DContinuous {
         l.run(time);
 
 
-        NAR.printActiveTasks(nar, true);
-        NAR.printActiveTasks(nar, false);
+//        NAR.printActiveTasks(nar, true);
+//        NAR.printActiveTasks(nar, false);
 
 //        l.predictors.forEach(p->{
 //           nar.concept(p).print();

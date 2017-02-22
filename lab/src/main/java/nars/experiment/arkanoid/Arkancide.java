@@ -82,7 +82,8 @@ public class Arkancide extends NAgents {
 
         maxPaddleSpeed = 35 * Arkanoid.BALL_VELOCITY;
 
-        nar.termVolumeMax.set(30);
+        nar.termVolumeMax.set(60);
+
 
         //nar.truthResolution.setValue(0.02f);
 

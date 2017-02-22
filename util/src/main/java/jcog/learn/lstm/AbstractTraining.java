@@ -74,11 +74,11 @@ public abstract class AbstractTraining {
 //        agentExecuteNonResetInteractionsAndFlush(agent, agentNonResetInteraction);
 //    }
 
-    private void agentExecuteNonResetInteractionsAndFlush(SimpleLSTM agent, final List<AgentSupervised.NonResetInteraction> nonResetInteractions, float forgetRate)  {
-        agent.learnBatch(nonResetInteractions, false);
-
-        nonResetInteractions.clear();
-    }
+//    private void agentExecuteNonResetInteractionsAndFlush(SimpleLSTM agent, final List<AgentSupervised.NonResetInteraction> nonResetInteractions, float forgetRate)  {
+//        agent.learnBatch(nonResetInteractions, false);
+//
+//        nonResetInteractions.clear();
+//    }
 
 
     protected final Random random;

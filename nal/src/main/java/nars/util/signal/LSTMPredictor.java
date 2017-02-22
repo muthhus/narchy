@@ -12,7 +12,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 
 /**
- * Created by me on 7/9/16.
+ * NOT TESTED YET
  */
 public class LSTMPredictor {
 

@@ -30,12 +30,12 @@
       <version>1.8-SNAPSHOT</version>
     </dependency>
 
-    <!-- https://mvnrepository.com/artifact/net.tuis.ubench/ubench -->
-    <dependency>
-      <groupId>net.tuis.ubench</groupId>
-      <artifactId>ubench</artifactId>
-      <version>0.2.0</version>
-    </dependency>
+    <!--&lt;!&ndash; https://mvnrepository.com/artifact/net.tuis.ubench/ubench &ndash;&gt;-->
+    <!--<dependency>-->
+      <!--<groupId>net.tuis.ubench</groupId>-->
+      <!--<artifactId>ubench</artifactId>-->
+      <!--<version>0.2.0</version>-->
+    <!--</dependency>-->
 
 
     <dependency>

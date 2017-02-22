@@ -8,7 +8,7 @@ import java.util.Random;
 
 import static org.apache.commons.math3.util.MathArrays.scaleInPlace;
 
-public class SimpleLSTM extends AgentSupervised {
+public class SimpleLSTM  {
 
 	public double[] out;
 	public double[] in;
@@ -79,7 +79,7 @@ public class SimpleLSTM extends AgentSupervised {
 		}
 	}
 	
-	@Override
+
 	public void clear()	{
 
 		Arrays.fill(context, 0.0);
@@ -113,22 +113,13 @@ public class SimpleLSTM extends AgentSupervised {
 
 
 	}
-	
-	@Override
+
 	public double[] predict(double[] input)
 	{
 		return learn(input, null, -1);
 	}
-	
-	public static void Display()
-	{
-		System.out.println("==============================");
-		System.out.println("DAGate: todo...");
-		System.out.println("\n==============================");
-	}
 
 
-	@Override
 	public double[] learn(double[] input, @Nullable double[] target_output, float learningRate) {
 
 		final int cell_blocks = this.cell_blocks;
@@ -199,7 +190,7 @@ public class SimpleLSTM extends AgentSupervised {
 		//calculate output
 		for (int k = 0; k < output_dimension; k++)
 		{
-			double s = (double) 0;
+			double s = 0;
 			double wk[] = weightsOut[k];
 			for (int j = 0; j < cell_blocks + 1; j++)
 				s += wk[j] * full_hidden[j];
@@ -295,10 +286,6 @@ public class SimpleLSTM extends AgentSupervised {
 		}
 	}
 
-	@Override
-	public double[] learnBatch(List<NonResetInteraction> interactions, boolean requireOutput)  {
-		throw new RuntimeException("TODO");
-	}
 
 
 

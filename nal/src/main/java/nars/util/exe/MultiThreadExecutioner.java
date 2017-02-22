@@ -89,8 +89,8 @@ public class MultiThreadExecutioner extends Executioner {
 
         this.cap = ringSize;
         this.safetyLimit =
-                //(int)((1f/threads) * ringSize)/2;
-                1;
+                (int)((1f/threads) * ringSize)/2;
+                //1;
 
         this.disruptor = new Disruptor<>(
                 TaskEvent::new,
@@ -234,7 +234,7 @@ public class MultiThreadExecutioner extends Executioner {
 
     @Override
     public final void run(@NotNull Consumer<NAR> r) {
-        disruptor.publishEvent(narPublisher, r);
+        //disruptor.publishEvent(narPublisher, r);
         if (!ring.tryPublishEvent(narPublisher, r)) {
             r.accept(nar); //execute in own thread
             //logger.warn("dropped: {}", r);

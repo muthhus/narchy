@@ -213,11 +213,13 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
 
 
     default boolean isQuestOrQuestion() {
-        return isQuestion() || isQuest();
+        char c = punc();
+        return c == Op.QUESTION || c == Op.QUEST;
     }
 
     default boolean isBeliefOrGoal() {
-        return isBelief() || isGoal();
+        char c = punc();
+        return c == Op.BELIEF || c == Op.GOAL;
     }
 
 //    /** allows for budget feedback that occurrs on revision */

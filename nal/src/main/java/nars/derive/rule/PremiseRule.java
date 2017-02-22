@@ -54,6 +54,13 @@ public class PremiseRule extends GenericCompound {
     static final Atomic BELIEF = $.the("Belief");
     static final Atomic GOAL = $.the("Goal");
 
+    static final MultimapBuilder.ListMultimapBuilder<Object, Object> constraintMapBuilder =
+            MultimapBuilder.
+                hashKeys()
+                //treeKeys()
+                    .arrayListValues();
+
+
 
     public boolean allowBackward;
     public boolean allowForward = false;
@@ -539,8 +546,7 @@ public class PremiseRule extends GenericCompound {
         //pattern = PatternCompound.make(p(taskTermPattern, beliefTermPattern));
 
 
-        ListMultimap<Term, MatchConstraint> constraints =
-                MultimapBuilder.treeKeys().arrayListValues().build();
+        ListMultimap<Term, MatchConstraint> constraints = constraintMapBuilder.build();
 
         char taskPunc = 0;
 

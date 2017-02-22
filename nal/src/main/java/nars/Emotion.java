@@ -112,7 +112,10 @@ public final class Emotion implements Serializable {
 
     /** percentage of business which was not frustration */
     public float learning() {
-        return learnVol.getSum() / busyVol.getSum();
+        float v = busyVol.getSum();
+        if (v > 0)
+            return learnVol.getSum() / v;
+        return 0;
     }
 
     public float erring() {

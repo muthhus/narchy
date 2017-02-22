@@ -27,17 +27,17 @@ public enum Main {
 
 				 //.include(//c.getName())
 				//.include(".*" + c.getSimpleName() + ".*")
-				.warmupIterations(1)
+				.warmupIterations(0)
 				.measurementIterations(iterations)
 				.measurementBatchSize(batchSize)
 				.threads(1)
 				.forks(1)
 				.resultFormat(ResultFormatType.TEXT)
-				.verbosity(VerboseMode.EXTRA) //VERBOSE OUTPUT
+				.verbosity(VerboseMode.NORMAL) //VERBOSE OUTPUT
 
 				//.addProfiler(StackProfiler.class)
 				.addProfiler(StackProfiler.class,
-						"lines=10;top=10;period=5;detailLine=true")
+						"lines=10;top=10;period=10;detailLine=true")
 				 //.addProfiler(GCProfiler.class)
 
 				//.addProfiler(LinuxPerfProfiler.class)

@@ -160,7 +160,6 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
 
 
         int targetIndex = -1;
-        float targetPri = Float.POSITIVE_INFINITY;
         V target = null;
 
         int iStart = i(c, hash);
@@ -170,6 +169,7 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
 
             for (int retry = 0; retry < reprobes; retry++, dir = !dir) {
 
+                float targetPri = Float.POSITIVE_INFINITY;
                 int i = dir ? iStart : (iStart + reprobes)-1;
 
                 for (int probe = 0; probe < reprobes; probe++) {
@@ -238,7 +238,7 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
                         }
 
                     } else {
-                        if (replace(pri(adding), targetPri)) {
+                        if (replace(adding, target)) {
                             if (map.compareAndSet(targetIndex, target, adding)) { //inserted
                                 //pressure -= targetPri;
                                 pressure += merge(null, adding, scale);
@@ -294,6 +294,10 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
 
     }
 
+    private boolean replace(Object addingK, @Nullable V addingV, V existingV, float targetPri) {
+        return false;
+    }
+
     /**
      * if no existing value then existing will be null.
      * this should modify the existing value if it exists,
@@ -304,10 +308,12 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
     protected abstract float merge(@Nullable V existing, @NotNull V incoming, float scale);
 
     /**
-     * can override in subclasses for custom replacement policy
+     * can override in subclasses for custom replacement policy.
+     * true allows the incoming to replace the existing
      */
-    protected boolean replace(float incomingPri, float existingPri) {
-        return hijackSoftmax(incomingPri, existingPri);
+    protected boolean replace(V incoming, V existing) {
+        float incomingPri = pri(incoming);
+        return hijackSoftmax(incomingPri, pri(existing));
     }
 
     /**
@@ -323,7 +329,7 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
         return update(k, null, -1);
     }
 
-    private boolean hijackSoftmax(float newPri, float oldPri) {
+    protected boolean hijackSoftmax(float newPri, float oldPri) {
 
         float priEpsilon = priEpsilon();
 
