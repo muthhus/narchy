@@ -65,8 +65,8 @@ public final class Emotion implements Serializable {
 
     final ResourceMeter resourceMeter = new ResourceMeter();
 
-    final PeriodMeter thoughtSerious = new PeriodMeter("thoughtSerious", true, -1, false);
-    final PeriodMeter thoughtWaste = new PeriodMeter("thoughtWaste", true, -1, false);
+    final PeriodMeter derive = new PeriodMeter("derive", true, -1, false);
+    final PeriodMeter deriveWaste = new PeriodMeter("deriveWaste", true, -1, false);
 
     public Emotion() {
         super();
@@ -111,8 +111,8 @@ public final class Emotion implements Serializable {
 
         //alert.clear();
 
-        thoughtSerious.clear();
-        thoughtWaste.clear();
+        derive.clear();
+        deriveWaste.clear();
 
         errrVol.clear();
 
@@ -249,8 +249,8 @@ public final class Emotion implements Serializable {
                 .append(" errr=").append(n4(erring()))
                 .append(" strs=").append(n4(stress.getSum()))
                 .append('\n')
-                .append(" ").append(thoughtSerious)
-                .append(" ").append(thoughtWaste)
+                .append(" ").append(derive)
+                .append(" (").append(Texts.n2(100f * deriveWaste.sum() / derive.sum())).append(" waste)")
                 //.append(" cpu=").append(resourceMeter.CYCLE_CPU_TIME)
                 .append(" mem=").append(resourceMeter.CYCLE_RAM_USED)
                 //.append(" alrt=").append(n4(alert.getSum()))
@@ -271,7 +271,7 @@ public final class Emotion implements Serializable {
 
 
     public void thought(Premise p, long timeNS, boolean serious) {
-        (serious ? thoughtSerious : thoughtWaste).hit(timeNS/1.0E9);
+        (serious ? derive : deriveWaste).hit(timeNS/1.0E9);
     }
 
 /*    public void busy(@NotNull Task cause, float activation) {

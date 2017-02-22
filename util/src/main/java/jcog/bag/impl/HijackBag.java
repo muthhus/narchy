@@ -132,13 +132,14 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
     @Override
     public void clear() {
         if (!size.compareAndSet(0, 0)) {
-            reset();
+            AtomicReferenceArray<V> x = reset();
+            forEachActive(this, x, this::onRemoved);
         }
     }
 
     public AtomicReferenceArray<V> reset() {
         AtomicReferenceArray<V> prevMap = map.getAndSet(new AtomicReferenceArray<V>(capacity()));
-        forEachActive(this, prevMap, this::onRemoved);
+        pressure = 0;
         return prevMap;
     }
 
@@ -606,7 +607,7 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
     }
 
     public static <X> Stream<X> stream(AtomicReferenceArray<X> a) {
-        return IntStream.of(0, a.length()-1).mapToObj(a::get).filter(Objects::nonNull);
+        return IntStream.range(0, a.length()-1).mapToObj(a::get).filter(Objects::nonNull);
     }
 
     /*private static int i(int c, int hash, int r) {
