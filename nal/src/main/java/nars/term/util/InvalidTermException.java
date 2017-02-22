@@ -1,6 +1,7 @@
 package nars.term.util;
 
 import nars.Op;
+import nars.term.Compound;
 import nars.term.Term;
 import nars.term.container.TermContainer;
 import nars.util.SoftException;
@@ -33,6 +34,10 @@ public final class InvalidTermException extends SoftException {
         this.dt = dt;
         this.args = args;
         this.reason = reason;
+    }
+
+    public InvalidTermException(String s, @NotNull Compound c) {
+        this(c.op(), c.dt(), c.subterms(), s);
     }
 
     @NotNull

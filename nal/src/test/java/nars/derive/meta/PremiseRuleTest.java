@@ -2,6 +2,7 @@ package nars.derive.meta;
 
 import com.google.common.base.Joiner;
 import nars.Narsese;
+import nars.Op;
 import nars.Param;
 import nars.derive.rule.PremiseRule;
 import nars.derive.rule.PremiseRuleSet;
@@ -134,6 +135,8 @@ public class PremiseRuleTest {
 
 
         Compound y = rule("(S --> P), (--,%S) |- (P --> S), (Belief:Conversion)");
+        assertTrue(y.hasAny(Op.NEG));
+
         assertNotNull(y);
 
         PatternTermIndex i = new PatternTermIndex();

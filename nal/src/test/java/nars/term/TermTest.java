@@ -621,7 +621,7 @@ public class TermTest {
         assertNotNull(o);
         assertNotEquals(False, o);
         assertNotEquals(True, o);
-        assertNotEquals(Null, o);
+        assertNotEquals(Narsese.NarseseNull, o);
     }
 
     public static void assertValidTermValidConceptInvalidTaskContent(@NotNull Supplier<Term> o) {

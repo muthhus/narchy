@@ -149,7 +149,7 @@ public class TruthLab extends Grid {
             super(start, end, samplePeriod, (w) -> task.truth(w, dur, Param.TRUTH_EPSILON));
 
             this.label = task.toString();
-            Draw.colorHash(Terms.atemporalize( task.term() ), labelColor);
+            Draw.colorHash($.terms.atemporalize( task.term() ), labelColor);
         }
     }
 

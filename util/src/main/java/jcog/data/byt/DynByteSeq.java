@@ -1,12 +1,12 @@
 package jcog.data.byt;
 
 import jcog.Hack;
+import jcog.Util;
 import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.DataOutput;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 
 /**
@@ -16,15 +16,29 @@ public class DynByteSeq implements DataOutput, Appendable, ByteSeq {
 
     public static final int MIN_GROWTH_BYTES = 128;
     protected byte[] bytes;
-    public int position;
+    public int len;
 
     public DynByteSeq(int bufferSize) {
         this.bytes = new byte[bufferSize];
     }
 
     @Override
+    public int hashCode() {
+        return (int) Util.hashELF(bytes, 1, 0, len);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+
+        DynByteSeq d = (DynByteSeq) obj;
+        return d.len == len && Arrays.equals(bytes, 0, len, d.bytes, 0, len);
+    }
+
+    @Override
     public final int length() {
-        return position;
+        return len;
 //        return Integer.MAX_VALUE;
     }
 
@@ -53,7 +67,7 @@ public class DynByteSeq implements DataOutput, Appendable, ByteSeq {
     @Override
     public void writeByte(int v)  {
         ensureSized(1);
-        this.bytes[this.position++] = (byte) v;
+        this.bytes[this.len++] = (byte) v;
     }
 
 
@@ -66,12 +80,12 @@ public class DynByteSeq implements DataOutput, Appendable, ByteSeq {
     public void write(@NotNull byte[] bytes, int off, int len)  {
         int position = ensureSized(len);
         System.arraycopy(bytes, off, this.bytes, position, len);
-        this.position = position + len;
+        this.len = position + len;
     }
 
     private int ensureSized(int extra) {
         int space = this.bytes.length;
-        int p = this.position;
+        int p = this.len;
         if (space - p <= extra) {
             this.bytes = Arrays.copyOf(this.bytes, space + Math.max(extra, MIN_GROWTH_BYTES));
         }
@@ -81,11 +95,20 @@ public class DynByteSeq implements DataOutput, Appendable, ByteSeq {
     @Override
     public byte[] array() {
         byte[] b = bytes;
-        if (b.length == position)
+        int pos = this.len;
+        if (b.length == pos)
             return bytes;
         else
-            return Arrays.copyOfRange(bytes, 0, length());
+            return Arrays.copyOfRange(b, 0, pos);
     }
+
+    public void compact() {
+        int pos = this.len;
+        byte[] b = this.bytes;
+        if (b.length != pos)
+            this.bytes = Arrays.copyOfRange(b, 0, pos);
+    }
+
 
     @Override
     public void toArray(byte[] c, int offset) {
@@ -102,7 +125,7 @@ public class DynByteSeq implements DataOutput, Appendable, ByteSeq {
     public void writeBoolean(boolean v)  {
         ensureSized(1);
         byte[] e = this.bytes;
-        e[this.position++] = (byte) (v ? 1 : 0);
+        e[this.len++] = (byte) (v ? 1 : 0);
     }
 
     @Override
@@ -111,7 +134,7 @@ public class DynByteSeq implements DataOutput, Appendable, ByteSeq {
         byte[] e = this.bytes;
         e[s] = (byte) (v >> 8);
         e[s + 1] = (byte) v;
-        this.position += 2;
+        this.len += 2;
     }
 
     @Override
@@ -121,7 +144,7 @@ public class DynByteSeq implements DataOutput, Appendable, ByteSeq {
         byte[] e = this.bytes;
         e[s] = (byte) (v >> 8);
         e[s + 1] = (byte) v;
-        this.position += 2;
+        this.len += 2;
 
     }
 
@@ -134,7 +157,7 @@ public class DynByteSeq implements DataOutput, Appendable, ByteSeq {
         e[s + 1] = (byte) (v >> 16);
         e[s + 2] = (byte) (v >> 8);
         e[s + 3] = (byte) v;
-        this.position += 4;
+        this.len += 4;
     }
 
     @Override
@@ -150,7 +173,7 @@ public class DynByteSeq implements DataOutput, Appendable, ByteSeq {
         e[s + 5] = (byte) ((int) (v >> 16));
         e[s + 6] = (byte) ((int) (v >> 8));
         e[s + 7] = (byte) ((int) v);
-        this.position += 8;
+        this.len += 8;
     }
 
     @Override
@@ -163,7 +186,7 @@ public class DynByteSeq implements DataOutput, Appendable, ByteSeq {
         e[s + 1] = (byte) (bits >> 16);
         e[s + 2] = (byte) (bits >> 8);
         e[s + 3] = (byte) bits;
-        this.position += 4;
+        this.len += 4;
     }
 
     @Override
@@ -264,7 +287,7 @@ public class DynByteSeq implements DataOutput, Appendable, ByteSeq {
     }
 
     public void appendTo(@NotNull DataOutput out) throws IOException {
-        out.write(bytes, 0, position);
+        out.write(bytes, 0, len);
     }
 
 //    @Override

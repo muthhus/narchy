@@ -39,12 +39,15 @@ public class HijackTermIndex extends MaplikeTermIndex implements Runnable {
 
     /** how many items to visit during update */
     private final int updateBatchSize;
+    private float initial = 0.5f;
+    private float getBoost = 0.02f;
+    private float forget = 0.05f;
 
     public HijackTermIndex(ConceptBuilder cb, int capacity, int reprobes) {
         super(cb);
 
-        updateBatchSize = 1024; //1 + (capacity / (reprobes * 2));
-        updatePeriodMS = 50;
+        updateBatchSize = 4096; //1 + (capacity / (reprobes * 2));
+        updatePeriodMS = 100;
 
         this.table = new PLinkHijackBag<Termed>(capacity, reprobes, new XorShift128PlusRandom(1)) {
             @Override
@@ -70,19 +73,14 @@ public class HijackTermIndex extends MaplikeTermIndex implements Runnable {
     public @Nullable Termed get(@NotNull Term key, boolean createIfMissing) {
         @Nullable PLink<Termed> x = table.get(key);
         if (x != null) {
+            x.priAdd(getBoost);
             return x.get(); //cache hit
         } else {
-
-            /*Termed v = permanent.get(key);
-            if (v!=null) {
-                table.put(new RawPLink(key, 1f));
-                return v;
-            }*/
 
             if (createIfMissing) {
                 Termed kc = conceptBuilder.apply(key);
                 if (kc!=null) {
-                    PLink<Termed> inserted = table.put(new RawPLink<>(kc, activation(kc)));
+                    PLink<Termed> inserted = table.put(new RawPLink<>(kc, initial));
                     if (inserted != null) {
                         Termed ig = inserted.get();
                         if (ig.term().equals(kc))
@@ -97,9 +95,6 @@ public class HijackTermIndex extends MaplikeTermIndex implements Runnable {
         return null;
     }
 
-    private float activation(@NotNull Termed value) {
-        return 0.75f; //TODO adjust based on complexity etc
-    }
 
     @Override
     public void set(@NotNull Term src, Termed target) {
@@ -171,7 +166,7 @@ public class HijackTermIndex extends MaplikeTermIndex implements Runnable {
         if (!(c instanceof PermanentConcept)) {
             float decayRate = c.complexity() / ((float)Param.COMPOUND_VOLUME_MAX);
                     // / (1f + c.beliefs().priSum() + c.goals().priSum());
-            x.priMult(1f - 0.1f * Util.unitize(decayRate));
+            x.priMult(1f - forget * Util.unitize(decayRate));
         }
     }
 

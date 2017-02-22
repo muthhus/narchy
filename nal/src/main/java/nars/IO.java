@@ -15,6 +15,7 @@ import nars.term.atom.Atom;
 import nars.term.atom.Atomic;
 import nars.term.compound.SerialCompound;
 import nars.term.container.TermContainer;
+import nars.term.obj.IntTerm;
 import nars.term.var.AbstractVariable;
 import nars.term.var.GenericVariable;
 import nars.truth.Truth;
@@ -31,6 +32,8 @@ import java.util.function.Function;
 
 import static nars.IO.TaskSerialization.TermFirst;
 import static nars.Op.ATOM;
+import static nars.Op.INT;
+import static nars.index.TermBuilder.isTrueOrFalse;
 import static nars.time.Tense.DTERNAL;
 import static nars.time.Tense.XTERNAL;
 
@@ -51,6 +54,8 @@ public class IO {
     public static MutableTask readTask(@NotNull DataInput in, @NotNull TermIndex t) throws IOException {
 
         Term term = readTerm(in, t);
+        if (term == null)
+            return null;
 
         //TODO combine these into one byte
         char punc = (char) in.readByte();
@@ -185,29 +190,33 @@ public class IO {
 
     @Nullable
     public static Atomic readAtomic(@NotNull DataInput in, @NotNull Op o, @NotNull TermIndex t) throws IOException {
-        String s = in.readUTF();
+
         switch (o) {
 
-            case ATOM:
-                Atom a = new Atom(s);
+            case ATOM: {
+
+                String s = in.readUTF();
+                Atomic a = $.the(s);
                 Atomic aa = (Atomic) t.get(a);
-                if (aa!=null)
+                if (aa != null)
                     return aa; //the concept, if exists
                 else
                     return a; //just the term
+            }
 
-            default:
-                int maybeI = Texts.i(s, Integer.MIN_VALUE);
-                if (maybeI != Integer.MIN_VALUE) {
-                    return $.the(maybeI);
-                }
+            case INT: {
+                return $.the(in.readInt());
+            }
 
+            default: {
+
+                String s = in.readUTF();
                 try {
                     return $.$(s);
                 } catch (Narsese.NarseseException e) {
                     throw new UnsupportedEncodingException(e.getMessage());
                 }
-                //throw new UnsupportedOperationException();
+            }
         }
 
         //return (Atomic) t.get(key, true); //<- can cause synchronization deadlocks
@@ -245,6 +254,8 @@ public class IO {
 
     public static void writeTerm(@NotNull DataOutput out, @NotNull Term term) throws IOException {
 
+        if (isTrueOrFalse(term))
+            throw new RuntimeException("true/false leak");
 
         if (term instanceof SerialCompound) {
             //it's already serialized in a SerialCompound
@@ -263,24 +274,43 @@ public class IO {
         out.writeByte(o.ordinal());
 
         if (term instanceof Atomic) {
-
-            if (term instanceof AbstractVariable) {
-                out.writeByte(((AbstractVariable) term).id);
-            } else {
-                out.writeUTF(term.toString()); //TODO use StringHack ?
+            switch (o) {
+                case INT:
+                    out.writeInt(((IntTerm) term).val);
+                    break;
+                case VAR_DEP:
+                case VAR_INDEP:
+                case VAR_QUERY:
+                case VAR_PATTERN:
+                    out.writeByte(((AbstractVariable) term).id);
+                    break;
+                default:
+                    out.writeUTF(term.toString()); //TODO use StringHack ?
+                    break;
             }
+
+
         } else {
 
-            @NotNull TermContainer c = ((Compound) term).subterms();
-            int siz = c.size();
+            Compound c = (Compound) term;
+            writeTermContainer(out, c.subterms());
+            writeCompoundSuffix(out, c.dt(), o);
+        }
+    }
 
-            out.writeByte(siz);
+    public static void writeTermContainer(@NotNull DataOutput out, @NotNull TermContainer c) throws IOException {
+        int siz = c.size();
 
-            for (int i = 0; i < siz; i++) {
-                writeTerm(out, c.term(i));
-            }
+        out.writeByte(siz);
 
-            writeCompoundSuffix(out, ((Compound)term).dt(), o);
+        for (int i = 0; i < siz; i++)
+            writeTerm(out, c.term(i));
+    }
+
+    public static void writeTermContainer(@NotNull DataOutput out, @NotNull Term... subterms) throws IOException {
+        out.writeByte(subterms.length);
+        for (Term x : subterms) {
+            writeTerm(out, x);
         }
     }
 
@@ -299,9 +329,13 @@ public class IO {
     @Nullable
     public static Term[] readTermContainer(@NotNull DataInput in, @NotNull TermIndex t) throws IOException {
         int siz = in.readByte();
+
+        assert(siz < Param.COMPOUND_VOLUME_MAX);
+
         Term[] s = new Term[siz];
         for (int i = 0; i < siz; i++) {
-            s[i] = readTerm(in, t);
+            if ((s[i] = readTerm(in, t)) == null)
+                return null;
         }
 
         return s;
@@ -315,13 +349,19 @@ public class IO {
     static Term readCompound(@NotNull DataInput in, @NotNull Op o, @NotNull TermIndex t) throws IOException {
 
         Term[] v = readTermContainer(in, t);
+        if (v == null)
+            return null;
 
-        int dt = DTERNAL;
+        int dt;
 
-        if (o.image)
+        if (o.image) {
             dt = in.readByte();
-        else if (o.temporal)
+            assert(dt >= 0);
+        } else if (o.temporal) {
             dt = in.readInt();
+        } else {
+            dt = DTERNAL;
+        }
 
         return t.the(o, dt, v);
 //        if (key == null)
@@ -341,7 +381,7 @@ public class IO {
 
     public static byte[] asBytes(@NotNull Term t) {
         try {
-            DynByteSeq d = new DynByteSeq(t.volume() * 4 /* estimate */);
+            DynByteSeq d = new DynByteSeq(t.volume() * 2 /* estimate */);
             //ByteArrayOutputStream bs = new ByteArrayOutputStream();
             IO.writeTerm(d, t);
             return d.array(); //bs.toByteArray();
@@ -418,12 +458,11 @@ public class IO {
         }
     }
 
-    public static Term termFromBytes(@NotNull byte[] b, @NotNull TermIndex index) {
+    @Nullable public static Term termFromBytes(@NotNull byte[] b, @NotNull TermIndex index) {
         try {
             return IO.readTerm(input(b), index);
         } catch (IOException e) {
-            e.printStackTrace();
-            return null;
+            throw new RuntimeException(e);
         }
     }
 
@@ -880,18 +919,22 @@ public class IO {
             if (o.var) {
                 i += 1; //int id = input(term, i).readByte();
             } else if (o.atomic) {
-                //bytearr[count++] = (byte) ((utflen >>> 8) & 0xFF);
-                //bytearr[count++] = (byte) ((utflen >>> 0) & 0xFF);
-//                DataInputStream ii = input(term, i);
-                int hi = term[i++] & 0xff;
-                int lo = term[i++] & 0xff; //ii.readUnsignedByte();
-                int utfLen = //input(term, i).readUnsignedShort();
-                        (hi << 8) | lo;
-                //i += 2;
-                i += utfLen;
+                if (o == INT) {
+                     i+=4; //32bit
+                } else {
+                    //bytearr[count++] = (byte) ((utflen >>> 8) & 0xFF);
+                    //bytearr[count++] = (byte) ((utflen >>> 0) & 0xFF);
+                    //                DataInputStream ii = input(term, i);
+                    int hi = term[i++] & 0xff;
+                    int lo = term[i++] & 0xff; //ii.readUnsignedByte();
+                    int utfLen = //input(term, i).readUnsignedShort();
+                            (hi << 8) | lo;
+                    //i += 2;
+                    i += utfLen;
 
-                //null-terminated mode
-//                while (term[i++]!=0 /* null terminator */) { }
+                    //null-terminated mode
+                    //                while (term[i++]!=0 /* null terminator */) { }
+                }
             } else {
 
                 int subterms = input(term, i).readUnsignedByte();

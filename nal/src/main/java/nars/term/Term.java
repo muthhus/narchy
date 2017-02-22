@@ -68,7 +68,7 @@ public interface Term extends Termed, Termlike, Comparable<Termlike> {
             return True;
         }
     };*/
-    AtomicSingleton Null = new AtomicSingleton("");
+
 
     @NotNull
     @Override

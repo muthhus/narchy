@@ -288,12 +288,11 @@ public interface Compound extends Term, IPair, TermContainer {
             int xs;
             if (op == y.op()) {
 
-                TermContainer xsubs = subterms();
-
-                if ((xs = xsubs.size()) == y.size()) {
+                if ((xs = size()) == y.size()) {
 
                     if (!op.image || (dt() == y.dt())) {
 
+                        TermContainer xsubs = subterms();
                         TermContainer ysubs = y.subterms();
 
                         return
@@ -493,7 +492,7 @@ public interface Compound extends Term, IPair, TermContainer {
     }
 
     public static boolean commutative(@NotNull Op op, int size) {
-        return op.commutative && size > 1;
+        return size > 1 && op.commutative;
     }
 
     @Override
@@ -639,7 +638,7 @@ public interface Compound extends Term, IPair, TermContainer {
     default boolean containsTermAtemporally(Term y) {
         y = y.unneg();
         if (!impossibleSubTerm(y)) {
-            Term ay = Terms.atemporalize(y);
+            Term ay = $.terms.atemporalize(y);
             if (or(x -> Terms.equalAtemporally(x, ay)))
                 return true;
         }

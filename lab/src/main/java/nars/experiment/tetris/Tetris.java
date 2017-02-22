@@ -457,10 +457,10 @@ public class Tetris extends NAgents {
 
             FrameTime clock = new FrameTime().dur(TIME_PER_FALL/2);
             NAR nar =
-                    NARBuilder.newMultiThreadNAR(4, clock);
+                    NARBuilder.newMultiThreadNAR(3, clock);
                     //NARBuilder.newALANN(clock, 4, 64, 5, 4, 1);
 
-            nar.derivedEvidenceGain.setValue(2f);
+            //nar.derivedEvidenceGain.setValue(2f);
 
             nar.termVolumeMax.setValue(40);
             //nar.truthResolution.setValue(0.05f);

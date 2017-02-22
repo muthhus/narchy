@@ -28,8 +28,6 @@ import nars.term.Terms;
 import nars.term.subst.Unify;
 import org.jetbrains.annotations.NotNull;
 
-import static nars.Op.VAR_QUERY;
-
 /**
  * Normalized variable
  * "highly immutable" and re-used
@@ -58,7 +56,7 @@ public abstract class AbstractVariable implements Variable {
     @Override
     public final boolean equals(Object obj) {
         return obj==this ||
-                (obj instanceof AbstractVariable && obj.hashCode() == hash); //hash first, it is more likely to differ
+                (obj instanceof AbstractVariable && ((AbstractVariable)obj).hash == hash); //hash first, it is more likely to differ
                 //((obj instanceof Variable) && ((Variable)obj).hash == hash);
     }
 
@@ -127,9 +125,9 @@ public abstract class AbstractVariable implements Variable {
             case '$':
                 return Op.VAR_INDEP;
             case '?':
-                return VAR_QUERY;
+                return Op.VAR_QUERY;
         }
-        throw new RuntimeException(c + " not a variable");
+        throw new RuntimeException("invalid variable character");
     }
 
     //    @NotNull
@@ -146,7 +144,7 @@ public abstract class AbstractVariable implements Variable {
 //        }
 //        throw new RuntimeException(c + " not a variable");
 //    }
-    static int typeIndex(@NotNull Op o) {
+    public static int opToVarIndex(@NotNull Op o) {
         switch (o) {
             case VAR_PATTERN:
                 return 0;
@@ -168,41 +166,37 @@ public abstract class AbstractVariable implements Variable {
     static {
         //precompute cached variable instances
         for (Op o : new Op[]{Op.VAR_PATTERN, Op.VAR_QUERY, Op.VAR_DEP, Op.VAR_INDEP}) {
-            int t = typeIndex(o);
+            int t = opToVarIndex(o);
             for (int i = 0; i < Param.MAX_VARIABLE_CACHED_PER_TYPE; i++) {
                 varCache[t][i] = vNew(o, i);
             }
         }
     }
 
-    public static AbstractVariable cached(@NotNull Op type, int counter) {
-        if (counter >= Param.MAX_VARIABLE_CACHED_PER_TYPE) {
-            return vNew(type, counter); //for special variables like ellipsis
-        }
-
-        return varCache[typeIndex(type)][counter];
-//        if (v == null) {
-//            v = vNew(type, counter);
-//            vct[counter] = v;
-//        }
-    }
-
     /**
      * TODO move this to TermBuilder
      */
     @NotNull
-    static AbstractVariable vNew(@NotNull Op type, int counter) {
+    static AbstractVariable vNew(@NotNull Op type, int id) {
         switch (type) {
             case VAR_PATTERN:
-                return new VarPattern(counter);
+                return new VarPattern(id);
             case VAR_QUERY:
-                return new VarQuery(counter);
+                return new VarQuery(id);
             case VAR_DEP:
-                return new VarDep(counter);
+                return new VarDep(id);
             case VAR_INDEP:
-                return new VarIndep(counter);
+                return new VarIndep(id);
             default:
                 throw new UnsupportedOperationException();
+        }
+    }
+
+    public static AbstractVariable the(@NotNull Op type, int id) {
+        if (id >= Param.MAX_VARIABLE_CACHED_PER_TYPE) {
+            return AbstractVariable.vNew(type, id); //for special variables like ellipsis
+        } else {
+            return AbstractVariable.varCache[AbstractVariable.opToVarIndex(type)][id];
         }
     }
 

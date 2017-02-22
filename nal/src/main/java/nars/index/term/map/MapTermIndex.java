@@ -29,8 +29,9 @@ public class MapTermIndex extends MaplikeTermIndex {
     }
 
     @Override
-    public final TermContainer intern(TermContainer s) {
-        if (subterms==null)
+    public final TermContainer intern(Term[] a) {
+        TermContainer s = super.intern(a);
+        if (subterms==null || a.length < 2)
             return s;
         else {
             TermContainer r = subterms.putIfAbsent(s, s);

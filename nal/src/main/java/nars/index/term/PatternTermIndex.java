@@ -11,6 +11,7 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.container.TermContainer;
+import nars.term.container.TermVector;
 import nars.term.var.Variable;
 import org.jetbrains.annotations.NotNull;
 
@@ -78,7 +79,8 @@ public class PatternTermIndex extends MapTermIndex {
             bb[i] = b;
         }
 
-        TermContainer v = (changed ? TermContainer.the(x.op(), x.dt(), bb) : s);
+
+        TermContainer v = (changed ? TermVector.the(TermContainer.theTermArray(x.op(), x.dt(), bb)) : s);
 
 
         Ellipsis e = Ellipsis.firstEllipsis(v);

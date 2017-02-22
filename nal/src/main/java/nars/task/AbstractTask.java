@@ -548,8 +548,8 @@ public abstract class AbstractTask extends RawBudget implements Task {
 
     @Override
     public float confWeight(long when, float dur) {
-        if (!isBeliefOrGoal())
-            throw new UnsupportedOperationException();
+//        if (!isBeliefOrGoal())
+//            throw new UnsupportedOperationException();
 
         long a = start();
 

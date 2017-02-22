@@ -37,7 +37,7 @@ public enum Main {
 
 				//.addProfiler(StackProfiler.class)
 				.addProfiler(StackProfiler.class,
-						"lines=10;top=10;period=10;detailLine=true")
+						"lines=10;top=10;period=1;detailLine=true")
 				 //.addProfiler(GCProfiler.class)
 
 				//.addProfiler(LinuxPerfProfiler.class)

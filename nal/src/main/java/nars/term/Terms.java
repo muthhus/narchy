@@ -565,7 +565,7 @@ public class Terms {
 
 
     public static boolean allNegated(@NotNull TermContainer subterms) {
-        return subterms.and((Term t) -> t.op() == NEG);
+        return subterms.hasAny(Op.NEG) && subterms.and((Term t) -> t.op() == NEG);
     }
 
 
@@ -576,84 +576,6 @@ public class Terms {
 //        return c;
 //    }
 
-    @NotNull
-    public static Term atemporalize(@NotNull Term t) {
-        return t instanceof Compound ? atemporalize((Compound) t) : t;
-    }
-
-    @NotNull
-    public static Compound atemporalize(@NotNull Compound c) {
-
-
-        TermContainer psubs = c.subterms();
-        TermContainer newSubs;
-
-        Op o = c.op();
-        if (psubs.hasAny(Op.TemporalBits)) {
-            boolean subsChanged = false;
-            int cs = c.size();
-            Term[] ss = new Term[cs];
-            for (int i = 0; i < cs; i++) {
-
-                Term m = psubs.term(i);
-                if (m != (ss[i] = m instanceof Compound ? atemporalize((Compound) m) : m))
-                    subsChanged = true;
-
-            }
-            int dt = c.dt();
-            newSubs = subsChanged ? /*theSubterms(*/TermContainer.the(o,
-                    DTERNAL,
-                    //(dt == DTERNAL||dt==0) ? DTERNAL : XTERNAL /* preserve order */,
-                    ss)/*)*/ : null;
-
-
-        } else {
-            newSubs = null;
-        }
-
-
-        int pdt = c.dt();
-
-
-        boolean dtChanged = (pdt != DTERNAL && o.temporal);
-        boolean subsChanged = (newSubs != null);
-
-        if (subsChanged || dtChanged) {
-
-            if (subsChanged && o.temporal && newSubs.size() == 1) {
-                //it was a repeat which collapsed, so use XTERNAL and repeat the subterm
-
-                if (pdt != DTERNAL)
-                    pdt = XTERNAL;
-
-                Term s = newSubs.term(0);
-                newSubs = TermVector.the(s, s);
-            } else {
-                if (o.temporal)
-                    pdt = DTERNAL; //dont destroy image relation
-            }
-//            if (o.temporal && newSubs!=null && newSubs.size() == 1) {
-//                System.out.println("?");
-//            }
-
-            Compound xx = $.terms.newCompound(o,
-                    pdt,
-                    subsChanged ? newSubs : psubs);
-
-            if (c.isNormalized())
-                xx.setNormalized();
-
-            //Termed exxist = get(xx, false); //early exit: atemporalized to a concept already, so return
-            //if (exxist!=null)
-            //return exxist.term();
-
-
-            //x = i.the(xx).term();
-            return xx;
-        } else {
-            return c;
-        }
-    }
 
     /**
      * returns the most optimal subterm that can be replaced with a variable, or null if one does not meet the criteria
@@ -808,7 +730,7 @@ public class Terms {
         if (x.size() != y.size())
             return false;
         for (Term yy : y) {
-            @NotNull Term ay = Terms.atemporalize(yy);
+            @NotNull Term ay = $.terms.atemporalize(yy);
             if (!x.contains(ay) && !x.contains($.neg(ay)))
                 return false;
         }
@@ -846,10 +768,10 @@ public class Terms {
                 if (!sameTemporality) {
                     return ((a.structure() == b.structure()) &&
                             (a.volume() == b.volume()) &&
-                            atemporalize(b).equals(atemporalize(a)));
+                            $.terms.atemporalize(b).equals($.terms.atemporalize(a)));
                 }
             } else {
-                return atemporalize(a).equalsIgnoringVariables(atemporalize(b), sameTemporality);
+                return $.terms.atemporalize(a).equalsIgnoringVariables($.terms.atemporalize(b), sameTemporality);
             }
         }
 

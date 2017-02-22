@@ -122,12 +122,8 @@ public enum $ {
 
     @NotNull
     public static IntTerm the(int i) {
-        if (i >= 0 && i < 10) {
-            IntTerm cached = digits[i];
-            if (cached==null) {
-                digits[i] = cached = new IntTerm(i);
-            }
-            return cached;
+        if (i >= 0 && i < MAX_CACHED_INTS) {
+            return digits[i];
         } else {
             return new IntTerm(i);
         }
@@ -441,7 +437,7 @@ public enum $ {
 
     /** normalized variable */
     public static @NotNull AbstractVariable v(@NotNull Op type, int id) {
-        return AbstractVariable.cached(type, id);
+        return AbstractVariable.the(type, id);
     }
 
     @Nullable
@@ -639,7 +635,13 @@ public enum $ {
         return the(o.toString());
     }
 
-    private static final IntTerm[] digits = new IntTerm[10];
+    final static int MAX_CACHED_INTS = 16;
+    private static final IntTerm[] digits = new IntTerm[MAX_CACHED_INTS];
+    static {
+        for (int i = 0; i < MAX_CACHED_INTS; i++) {
+            digits[i] = new IntTerm(i);
+        }
+    }
 
     /** gets the atomic term of an integer, with specific radix (up to 36) */
     @NotNull

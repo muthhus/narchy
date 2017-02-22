@@ -440,7 +440,7 @@ public interface TermContainer extends Termlike, Iterable<Term> {
     default int indexOfAtemporally(Term t) {
         t = t.unneg(); //unneg before testing impossible
         if (!impossibleSubTerm(t)) {
-            Term at = Terms.atemporalize(t);
+            Term at = $.terms.atemporalize(t);
             int s = size();
             for (int i = 0; i < s; i++) {
                 if (Terms.equalAtemporally(at, term(i)))
@@ -599,14 +599,18 @@ public interface TermContainer extends Termlike, Iterable<Term> {
 
     @NotNull
     static TermContainer the(@NotNull Op op, int dt, @NotNull Term... tt) {
-        return requiresSorting(op, dt, tt.length) ?
-                TermSet.the(tt) :
-                TermVector.the(tt);
+        return TermVector.the(theTermArray(op, dt, tt));
     }
 
+    @NotNull
+    static Term[] theTermArray(@NotNull Op op, int dt, @NotNull Term... tt) {
+        return mustSortAndUniquify(op, dt, tt.length) ?
+                Terms.sorted(tt) :
+                tt;
+    }
 
     /** non-zero or non-iternal dt disqualifies any reason for needing a TermSet */
-    public static boolean requiresSorting(@NotNull Op op, int dt, int num) {
+    public static boolean mustSortAndUniquify(@NotNull Op op, int dt, int num) {
         return num > 1 && op.commutative && commutive(dt);
     }
 

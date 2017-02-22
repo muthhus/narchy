@@ -227,7 +227,7 @@ public class Derivation extends Unify {
     /**
      * only one thread should be in here at a time
      */
-    public final void matchAll(@NotNull Term x, @NotNull Term y, @Nullable BoolCondition eachMatch, @Nullable MatchConstraint constraints, int matchFactor) {
+    public final void matchAll(@NotNull Term x, @NotNull Term y, @Nullable BoolCondition eachMatch, @Nullable MatchConstraint constraints) {
 
         int t = now();
 
@@ -237,7 +237,7 @@ public class Derivation extends Unify {
             //set the # of matches according to the # of conclusions in this branch
             //each matched termutation will be used to derive F=matchFactor conclusions,
             //so divide the premiseMatches value by it to equalize the derivation quantity
-            this.matchesRemain = Math.max(1, matchesMax / matchFactor);
+            this.matchesRemain = matchesMax;
             finish = true;
         } else {
             this.matchesRemain = -1; //will not apply unless eachMatch!=null (final step)

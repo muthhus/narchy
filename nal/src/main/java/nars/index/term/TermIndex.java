@@ -12,6 +12,7 @@ import nars.term.Term;
 import nars.term.Termed;
 import nars.term.Terms;
 import nars.term.container.TermContainer;
+import nars.term.container.TermVector;
 import nars.term.subst.MapSubst;
 import nars.term.subst.MapSubst1;
 import nars.term.subst.Subst;
@@ -36,6 +37,8 @@ import static nars.Op.CONJ;
 import static nars.term.Term.False;
 import static nars.term.Termed.termOrNull;
 import static nars.term.Terms.compoundOrNull;
+import static nars.time.Tense.DTERNAL;
+import static nars.time.Tense.XTERNAL;
 
 /**
  *
@@ -555,7 +558,7 @@ public abstract class TermIndex extends TermBuilder {
                     }
 
                     if (term instanceof Compound) {
-                        term = Terms.atemporalize((Compound) term);
+                        term = atemporalize((Compound) term);
                     }
 
                     break;
@@ -586,6 +589,86 @@ public abstract class TermIndex extends TermBuilder {
      */
     public void onStateChanged(Concept c) {
         /* nothing */
+    }
+
+    @NotNull
+    public Term atemporalize(@NotNull Term t) {
+        return t instanceof Compound ? atemporalize((Compound) t) : t;
+    }
+
+    @NotNull
+    public Compound atemporalize(@NotNull Compound c) {
+
+        TermContainer psubs = c.subterms();
+        Term[] newSubs;
+
+        Op o = c.op();
+        if (psubs.hasAny(Op.TemporalBits)) {
+            boolean subsChanged = false;
+            int cs = c.size();
+            Term[] ss = new Term[cs];
+            for (int i = 0; i < cs; i++) {
+
+                Term m = psubs.term(i);
+                if (m != (ss[i] = m instanceof Compound ? atemporalize((Compound) m) : m))
+                    subsChanged = true;
+
+            }
+            int dt = c.dt();
+            newSubs = subsChanged ? /*theSubterms(*/TermContainer.theTermArray(o,
+                    DTERNAL,
+                    //(dt == DTERNAL||dt==0) ? DTERNAL : XTERNAL /* preserve order */,
+                    ss)/*)*/ : null;
+
+
+        } else {
+            newSubs = null;
+        }
+
+
+        int pdt = c.dt();
+
+
+        boolean dtChanged = (pdt != DTERNAL && o.temporal);
+        boolean subsChanged = (newSubs != null);
+
+        if (subsChanged || dtChanged) {
+
+            if (subsChanged && o.temporal && newSubs.length == 1) {
+                //it was a repeat which collapsed, so use XTERNAL and repeat the subterm
+
+                if (pdt != DTERNAL)
+                    pdt = XTERNAL;
+
+                Term s = newSubs[0];
+                newSubs = new Term[] {s, s};
+            } else {
+                if (o.temporal)
+                    pdt = DTERNAL; //dont destroy image relation
+            }
+//            if (o.temporal && newSubs!=null && newSubs.size() == 1) {
+//                System.out.println("?");
+//            }
+
+            Compound xx = compoundOrNull(the(o,
+                    pdt,
+                    subsChanged ? newSubs : psubs.terms()));
+            if (xx == null)
+                throw new InvalidTermException("unable to atemporalize", c);
+
+            if (c.isNormalized())
+                xx.setNormalized();
+
+            //Termed exxist = get(xx, false); //early exit: atemporalized to a concept already, so return
+            //if (exxist!=null)
+            //return exxist.term();
+
+
+            //x = i.the(xx).term();
+            return xx;
+        } else {
+            return c;
+        }
     }
 
 

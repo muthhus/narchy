@@ -243,7 +243,7 @@ abstract public class PatternCompound extends GenericCompound {
 //                }
 
                 if (n != null /*&& n.op() != subst.type*/) {
-                    int imageIndex = y.indexOfAtemporally(n);
+                    int imageIndex = y.indexOf(n);
                     if (imageIndex != -1)
                         return matchEllipsedLinear(y, subst) &&
                                 subst.replaceXY(et,
@@ -327,8 +327,8 @@ abstract public class PatternCompound extends GenericCompound {
 
                 } else if (v != null) {
 
-                    if (y.containsTermAtemporally(v)) {
-                        alreadyInY.add(Terms.atemporalize(v));
+                    if (y.containsTerm(v)) {
+                        alreadyInY.add(v);
                     } else {
                         //required but not actually present in Y
                         return false;
@@ -346,10 +346,10 @@ abstract public class PatternCompound extends GenericCompound {
 
             if (ellipsisMatched) {
                 //Xellipsis = null;
-                return Terms.equalAtemporally(alreadyInY, yFree);
+                return alreadyInY.equals(yFree);
             } else {
 
-                yFree.removeIf(yy -> alreadyInY.contains(Terms.atemporalize(yy)));
+                yFree.removeIf(alreadyInY::contains);
 
                 int numRemainingForEllipsis = yFree.size() - xFree.size();
 

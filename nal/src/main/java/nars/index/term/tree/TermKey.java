@@ -112,7 +112,7 @@ public class TermKey extends DynByteSeq {
             //TODO copy suffix
 
             this.bytes = compressed;
-            this.position = compressedLength;
+            this.len = compressedLength;
             return true;
         }
         return false;

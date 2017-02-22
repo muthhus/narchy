@@ -136,7 +136,7 @@ public class EllipsisMatch extends ArrayTermVector implements Term {
     public boolean addWhileMatching(@NotNull Compound y, @NotNull Collection<Term> target, int min) {
         int n = 0;
         for (Term e : terms) {
-            if (!(y.containsTermAtemporally(e) && target.add(e)))
+            if (!(y.containsTerm(e) && target.add(e)))
                 return false;
             n++;
         }

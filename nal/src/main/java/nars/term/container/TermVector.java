@@ -1,18 +1,29 @@
 package nars.term.container;
 
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import com.google.common.base.Joiner;
+import com.google.common.collect.Interner;
+import com.google.common.collect.Interners;
 import jcog.Util;
+import jcog.data.byt.DynByteSeq;
+import nars.IO;
 import nars.Op;
 import nars.Param;
+import nars.derive.meta.match.EllipsisTransform;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Terms;
 import nars.term.visit.SubtermVisitorX;
 import org.jetbrains.annotations.NotNull;
+import org.mockito.internal.util.concurrent.WeakConcurrentMap;
 
+import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.Map;
+import java.util.concurrent.ForkJoinPool;
 import java.util.function.Consumer;
 
 /**
@@ -84,6 +95,8 @@ public abstract class TermVector implements TermContainer {
     public static TermVector1 the(@NotNull Term the) {
         return new TermVector1(the);
     }
+
+
 
     @NotNull
     public static TermVector the(@NotNull Term x, @NotNull Term y) {

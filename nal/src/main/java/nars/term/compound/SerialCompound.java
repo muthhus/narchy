@@ -101,11 +101,11 @@ public class SerialCompound extends DynByteSeq implements Compound {
         //last two bytes
         Op o = op();
         if (o.temporal) {
-            int p = this.position;
+            int p = this.len;
             byte[] bb = Arrays.copyOfRange(bytes, p - 4, p);
             return Ints.fromByteArray(bb);
         } else if (o.image) {
-            return bytes[position-1];
+            return bytes[len -1];
         } else {
             return DTERNAL;
         }

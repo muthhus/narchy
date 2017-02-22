@@ -46,13 +46,13 @@ public interface NARBuilder {
         Random rng = new XorShift128PlusRandom(1);
         final Executioner exe =
                 //new SingleThreadExecutioner();
-                new MultiThreadExecutioner(threads, 8192 /* TODO chose a power of 2 number to scale proportionally to # of threads */)
+                new MultiThreadExecutioner(threads, 16384 /* TODO chose a power of 2 number to scale proportionally to # of threads */)
                 //.sync(false)
                 ;
 
-        int conceptsPerCycle = 40 * threads;
+        int conceptsPerCycle = 24 * threads;
 
-        final int reprobes = 4;
+        final int reprobes = 3;
 
         //Multi nar = new Multi(3,512,
         DefaultConceptBuilder cb = new DefaultConceptBuilder() {
@@ -67,17 +67,17 @@ public interface NARBuilder {
         Default nar = new Default(8 * 1024,
                 conceptsPerCycle, 1, 3, rng,
 
-                new HijackTermIndex(cb, 1024 * 64, 3)
+                //new HijackTermIndex(cb, 1024 * 256, 3)
                 //new NullTermIndex(cb)
-                //new CaffeineIndex(cb, 64 * 1024, false, exe)
+                new CaffeineIndex(cb, -1, -1, null /* fork join common pool */)
                 //new TreeTermIndex.L1TreeIndex(new DefaultConceptBuilder(), 300000, 32 * 1024, 3)
                 ,
                 time,
                 exe) {
 
             final Compressor compressor = new Compressor(this, "_",
-                    3, 7,
-                    2f, 16, 256);
+                    3, 5,
+                    1f, 16, 256);
 
             @Override
             public Task pre(@NotNull Task t) {

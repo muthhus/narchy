@@ -10,6 +10,7 @@ import nars.term.atom.AtomicSingleton;
 import nars.term.compound.GenericCompound;
 import nars.term.container.TermContainer;
 import nars.term.container.TermVector;
+import nars.term.container.TermVector1;
 import nars.term.util.InvalidTermException;
 import nars.term.var.Variable;
 import org.apache.commons.lang3.ArrayUtils;
@@ -211,8 +212,8 @@ public abstract class TermBuilder {
     }
 
     @NotNull
-    private static Term imageUnwrapToProd(Term p, @NotNull Compound ii) {
-        return $.p(imageUnwrap(ii, p));
+    private Term imageUnwrapToProd(Term p, @NotNull Compound ii) {
+        return the(Op.PROD, imageUnwrap(ii, p));
     }
 
     @NotNull
@@ -306,8 +307,8 @@ public abstract class TermBuilder {
      * override to possibly intern termcontainers
      */
     @NotNull
-    public TermContainer intern(@NotNull TermContainer s) {
-        return s;
+    public TermContainer intern(@NotNull Term[] s) {
+        return TermVector.the(s);
     }
 
     public final GenericCompound newCompound(@NotNull Op op, int dt, TermContainer subterms) {
@@ -353,7 +354,7 @@ public abstract class TermBuilder {
 
     @NotNull
     private Term finish(@NotNull Op op, int dt, @NotNull Term... args) {
-        return finish(TermContainer.requiresSorting(op, dt, args.length), op, dt, args);
+        return finish(TermContainer.mustSortAndUniquify(op, dt, args.length), op, dt, args);
     }
     @NotNull
     private Term finish(boolean sort, @NotNull Op op, int dt, @NotNull Term... args) {
@@ -439,7 +440,7 @@ public abstract class TermBuilder {
             }
         }
 
-        return newCompound(op, dt, intern(TermVector.the(args)));
+        return newCompound(op, dt, intern(args));
     }
 
 
@@ -472,18 +473,18 @@ public abstract class TermBuilder {
 
     @NotNull
     public final Term neg(@NotNull Term t) {
-        //HACK testing for equality like this is not a complete solution. for that we need a new special term type
 
-        if ((t instanceof Compound) || (t instanceof Variable)) {
+        if (t instanceof Compound) {
             // (--,(--,P)) = P
-            return (t.op() == NEG) ? t.unneg() : finalize(NEG, t);
-        } else {
-            if (t instanceof AtomicSingleton) {
-                if (isFalse(t)) return True;
-                if (isTrue(t)) return False;
-            }
-            return t;
+            if (t.op() == NEG)
+                return t.unneg();
+        } else if (t instanceof AtomicSingleton) {
+            if (isFalse(t)) return True;
+            if (isTrue(t)) return False;
         }
+
+        return finalize(NEG,t);
+        //return newCompound(Op.NEG, DTERNAL, new TermVector1(t)); //<- faster than through finalize()
     }
 
 

@@ -15,6 +15,7 @@ import com.github.fge.grappa.run.context.MatcherContext;
 import com.github.fge.grappa.stack.ArrayValueStack;
 import com.github.fge.grappa.stack.ValueStack;
 import com.github.fge.grappa.support.Var;
+import com.google.common.collect.ImmutableList;
 import jcog.Texts;
 import nars.derive.meta.match.Ellipsis;
 import nars.index.term.TermIndex;
@@ -23,6 +24,7 @@ import nars.task.MutableTask;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Terms;
+import nars.term.atom.AtomicSingleton;
 import nars.term.var.GenericVariable;
 import nars.term.var.Variable;
 import nars.time.Tense;
@@ -1032,25 +1034,23 @@ public class Narsese extends BaseParser<Object> {
             op = PROD;
 
         //return $.compound(op, vectorterms);
-        Term x = termCache.get(Tuples.pair(op, vectorterms), termBuilder);
-        if (x == Term.Null)
+        Term x = termCache.get(Tuples.pair(op, ImmutableList.copyOf(vectorterms)), termBuilder);
+        if (x == NarseseNull)
             return null;
         return x;
-
-//        if (vectorterms.isEmpty())
-//            return null;
-//
-//        return popTermFunction.apply(pair(op, (List)vectorterms));
-        //return vectorTerms.get().computeIfAbsent(Tuples.pair(op, (List) vectorterms), popTermFunction);
     }
 
-    final static Cache<Pair<Op,List>, Term> termCache = Caffeine.newBuilder().maximumSize(1024 * 32).build();
+    final static Cache<Pair<Op,ImmutableList>, Term> termCache = Caffeine.newBuilder()
+            .softValues()
+            //.maximumSize(1024 * 32)
+            .build();
 
-    static final Function<Pair<Op,List>, Term> termBuilder = (k) ->{
-       Term x = $.compound(k.getOne(), k.getTwo());
-       if (x == null) //cant store null values so use placeholder
-           return Term.Null;
-       return x;
+    /** place-holder for invalid term. this value should never leave this class */
+    public final static AtomicSingleton NarseseNull = new AtomicSingleton("");
+
+    static final Function<Pair<Op,ImmutableList>, Term> termBuilder = (k) ->{
+        Term x = $.compound(k.getOne(), k.getTwo());
+        return x == null ? NarseseNull : x;
     };
 
 //    @Nullable
