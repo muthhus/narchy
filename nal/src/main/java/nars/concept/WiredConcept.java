@@ -26,10 +26,7 @@ public abstract class WiredConcept extends CompoundConcept<Compound> implements 
 
     @NotNull
     protected final NAR nar;
-    int beliefCapacity = Param.DEFAULT_WIRED_CONCEPT_BELIEFS;
-    int goalCapacity = Param.DEFAULT_WIRED_CONCEPT_GOALS;
 
-    //@NotNull final private AtomicBoolean pendingRun = new AtomicBoolean(false);
 
     public interface Prioritizable {
         void pri(FloatSupplier v);

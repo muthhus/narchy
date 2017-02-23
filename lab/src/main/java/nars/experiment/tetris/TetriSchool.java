@@ -62,7 +62,7 @@ public class TetriSchool extends NSchool implements Runnable {
                 super.next();
 
                 nar.input("tetris(time," + game.time + " ). :|:");
-                cells.forEach(SensorConcept::run);
+                cells.forEach(d -> nar.input(d.apply(nar)));
             }
         };
 

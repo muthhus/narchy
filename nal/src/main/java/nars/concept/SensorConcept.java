@@ -15,10 +15,12 @@ import org.eclipse.collections.api.block.function.primitive.FloatFunction;
 import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunction;
 import org.eclipse.collections.api.list.MutableList;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 import static nars.Op.BELIEF;
 
@@ -26,7 +28,7 @@ import static nars.Op.BELIEF;
 /**
  * primarily a collector for believing time-changing input signals
  */
-public class SensorConcept extends WiredConcept implements FloatFunction<Term>, FloatSupplier, WiredConcept.Prioritizable, Consumer<Task>, Runnable {
+public class SensorConcept extends WiredConcept implements FloatFunction<Term>, FloatSupplier, WiredConcept.Prioritizable, Consumer<Task>, Function<NAR,Task> {
 
     @NotNull
     public final ScalarSignal sensor;
@@ -47,7 +49,7 @@ public class SensorConcept extends WiredConcept implements FloatFunction<Term>, 
     public SensorConcept(@NotNull Compound term, @NotNull NAR n, FloatSupplier signal, FloatToObjectFunction<Truth> truth)  {
         super(term, n);
 
-        this.sensor = new ScalarSignal(n, this, this, truth, this);
+        this.sensor = new ScalarSignal(n, this, this, truth);
 
         this.signal = signal;
         this.beliefs = new SensorBeliefTable(this);
@@ -192,8 +194,9 @@ public class SensorConcept extends WiredConcept implements FloatFunction<Term>, 
 //    }
 
     /** should only be called if autoupdate() is false */
-    @Override public final void run() {
-        sensor.accept(nar);
+    @Nullable
+    @Override public final Task apply(NAR nar) {
+        return sensor.apply(nar);
     }
 
     @Override

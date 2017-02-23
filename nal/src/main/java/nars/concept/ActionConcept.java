@@ -14,6 +14,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 import static nars.$.$;
 import static nars.$.t;
@@ -22,7 +23,7 @@ import static nars.Op.NEG;
 
 
 /** TODO make extend SensorConcept and utilize that for feedback control */
-public class ActionConcept extends WiredConcept implements WiredConcept.Prioritizable, Runnable, FloatFunction<Term>, Consumer<Task> {
+public class ActionConcept extends WiredConcept implements WiredConcept.Prioritizable, FloatFunction<Term>, Function<NAR,Task> {
 
 
     /** relative temporal delta time for desire/belief prediction */
@@ -46,14 +47,72 @@ public class ActionConcept extends WiredConcept implements WiredConcept.Prioriti
     }
     private Truth lastGoal, lastBelief;
 
-    @Override
-    public void accept(Task feedback) {
-        nar.input(feedback);
-    }
-
     public ActionConcept feedbackResolution(float res) {
         feedback.resolution(res);
         return this;
+    }
+
+    @Override
+    public Task apply(NAR nar) {
+
+        long now = nar.time();
+
+
+        long then = now + decisionDT;
+
+        Truth tdb, tdg;
+        if (linkTruth) {
+            Truth[] td = linkTruth ? truthLinked(then, now, nar.confMin.floatValue()) : null;
+            tdb = td[0];
+            tdg = td[1];
+        } else {
+            tdb = tdg = null;
+        }
+
+        float dur = nar.time.dur();
+
+        @Nullable Truth b = this.belief(then, now, dur);
+        if (tdb != null) {
+            b = (b != null) ? Revision.revise(b, tdb) : tdb;
+        }
+
+        @Nullable Truth d = this.goal(then, now, dur);
+        if (tdg!=null) {
+            d = (d != null) ? Revision.revise(d, tdg) : tdg;
+        }
+
+
+
+        boolean noDesire = d == null;
+        boolean goalChange =   (noDesire ^ lastGoal == null) || (!noDesire && !d.equals(lastGoal));
+        lastGoal = d;
+
+        boolean noBelief = b == null;
+        boolean beliefChange = (noBelief ^ lastBelief == null) || (!noBelief && !b.equals(lastBelief));
+        lastBelief = b;
+
+
+        if (goalChange || (updateOnBeliefChange && beliefChange)) {
+
+            Truth f = this.motor.motor(b, d);
+            if (f!=null) {
+                this.currentFeedback = f.freq(); //HACK ignores the conf component
+                this.feedbackConf = f.conf();
+            } else {
+                this.currentFeedback = Float.NaN;
+            }
+
+
+//            if (feedback != null) {
+//                //if feedback is different from last
+//                if (nextFeedback == null || !nextFeedback.equalsTruth(feedback, feedbackResolution)) {
+//                    this.nextFeedback = feedback(feedback, now + feedbackDT);
+//                    nar.input(nextFeedback);
+//                }
+//            }
+        }
+
+        return feedback.apply(nar);
     }
 
 
@@ -103,11 +162,10 @@ public class ActionConcept extends WiredConcept implements WiredConcept.Prioriti
         //this.commonEvidence = Param.SENSOR_TASKS_SHARE_COMMON_EVIDENCE ? new long[] { n.time.nextStamp() } : LongArrays.EMPTY_ARRAY;
 
         feedback = new ScalarSignal(n, term, this, (x) ->
-            t(x, feedbackConf),
-            this
+            t(x, feedbackConf)
         );
         feedback.pri(
-                () -> n.priorityDefault(Op.BELIEF)
+            () -> n.priorityDefault(Op.BELIEF)
         );
     }
 
@@ -240,67 +298,6 @@ public class ActionConcept extends WiredConcept implements WiredConcept.Prioriti
     }
 
 
-    @Override
-    public void run() {
-        long now = nar.time();
-
-
-        long then = now + decisionDT;
-
-        Truth tdb, tdg;
-        if (linkTruth) {
-            Truth[] td = linkTruth ? truthLinked(then, now, nar.confMin.floatValue()) : null;
-            tdb = td[0];
-            tdg = td[1];
-        } else {
-            tdb = tdg = null;
-        }
-
-        float dur = nar.time.dur();
-
-        @Nullable Truth b = this.belief(then, now, dur);
-        if (tdb != null) {
-            b = (b != null) ? Revision.revise(b, tdb) : tdb;
-        }
-
-        @Nullable Truth d = this.goal(then, now, dur);
-        if (tdg!=null) {
-            d = (d != null) ? Revision.revise(d, tdg) : tdg;
-        }
-
-
-
-        boolean noDesire = d == null;
-        boolean goalChange =   (noDesire ^ lastGoal == null) || (!noDesire && !d.equals(lastGoal));
-        lastGoal = d;
-
-        boolean noBelief = b == null;
-        boolean beliefChange = (noBelief ^ lastBelief == null) || (!noBelief && !b.equals(lastBelief));
-        lastBelief = b;
-
-
-        if (goalChange || (updateOnBeliefChange && beliefChange)) {
-
-            Truth f = this.motor.motor(b, d);
-            if (f!=null) {
-                this.currentFeedback = f.freq(); //HACK ignores the conf component
-                this.feedbackConf = f.conf();
-            } else {
-                this.currentFeedback = Float.NaN;
-            }
-
-
-//            if (feedback != null) {
-//                //if feedback is different from last
-//                if (nextFeedback == null || !nextFeedback.equalsTruth(feedback, feedbackResolution)) {
-//                    this.nextFeedback = feedback(feedback, now + feedbackDT);
-//                    nar.input(nextFeedback);
-//                }
-//            }
-        }
-
-        feedback.accept(nar);
-    }
 
 
 

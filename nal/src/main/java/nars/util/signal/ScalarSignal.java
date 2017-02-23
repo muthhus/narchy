@@ -16,16 +16,18 @@ import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunctio
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.function.Consumer;
 import java.util.function.DoubleSupplier;
+import java.util.function.Function;
 
 /**
  * Generates temporal tasks in reaction to the change in a scalar numeric value
+ *
+ * when NAR wants to update the signal, it will call Function.apply. it can return
+ * an update Task, or null if no change
  */
-public class ScalarSignal implements Consumer<NAR>, DoubleSupplier {
+public class ScalarSignal implements Function<NAR, Task>, DoubleSupplier {
 
 
-    private final Consumer<Task> target;
     /**
      * resolution of the output freq value
      */
@@ -56,11 +58,11 @@ public class ScalarSignal implements Consumer<NAR>, DoubleSupplier {
     public SignalTask current;
 
 
-    public ScalarSignal(@NotNull NAR n, @NotNull Termed t, FloatFunction<Term> value, FloatToObjectFunction<Truth> truthFloatFunction, Consumer<Task> target) {
-        this(n, t, value, truthFloatFunction, n.priorityDefault(Op.BELIEF), target);
+    public ScalarSignal(@NotNull NAR n, @NotNull Termed t, FloatFunction<Term> value, FloatToObjectFunction<Truth> truthFloatFunction) {
+        this(n, t, value, truthFloatFunction, n.priorityDefault(Op.BELIEF));
     }
 
-    public ScalarSignal(@NotNull NAR n, @NotNull Termed t, FloatFunction<Term> value, @Nullable FloatToObjectFunction<Truth> truthFloatFunction, float pri, Consumer<Task> target) {
+    public ScalarSignal(@NotNull NAR n, @NotNull Termed t, FloatFunction<Term> value, @Nullable FloatToObjectFunction<Truth> truthFloatFunction, float pri) {
 
         this.term = t.term();
         this.value = value;
@@ -72,7 +74,6 @@ public class ScalarSignal implements Consumer<NAR>, DoubleSupplier {
         this.lastInputTime = n.time() - 1;
 
         this.currentValue = Float.NaN;
-        this.target = target;
     }
 
     @NotNull
@@ -100,7 +101,7 @@ public class ScalarSignal implements Consumer<NAR>, DoubleSupplier {
 //    }
 
     @Override
-    public void accept(@NotNull NAR nar) {
+    public Task apply(@NotNull NAR nar) {
 
         long now = nar.time();
 
@@ -121,7 +122,7 @@ public class ScalarSignal implements Consumer<NAR>, DoubleSupplier {
             invalidate();
             this.current = null;
 
-            return; //all
+            return null; //all
         }// ow the value function to prevent input by returning NaN
 
 
@@ -149,12 +150,14 @@ public class ScalarSignal implements Consumer<NAR>, DoubleSupplier {
 //                    prevEnd = null; //dont generate an intermediate task
 //                }
 
-                target.accept(this.current = t);
+                this.current = t;
                 this.lastInputTime = now;
                 this.currentValue = next;
+                return t;
             }
         }
 
+        return null;
     }
 
 

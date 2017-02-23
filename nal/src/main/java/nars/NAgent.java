@@ -3,6 +3,7 @@ package nars;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Streams;
 import jcog.Util;
 import jcog.data.FloatParam;
 import jcog.list.FasterList;
@@ -32,6 +33,7 @@ import java.util.Collection;
 import java.util.DoubleSummaryStatistics;
 import java.util.List;
 import java.util.Random;
+import java.util.stream.Stream;
 
 import static jcog.Texts.n2;
 import static jcog.Texts.n4;
@@ -285,16 +287,16 @@ abstract public class NAgent implements NSense, NAction {
         float load = nar.exe.load();
         if (load < 1) {
 
-            happy.run();
-            //joy.run();
-
-            nar.runLater(sensors, SensorConcept::run, 4);
-
             predict();
 
             updateActions();
 
             curiosity();
+
+            nar.inputLater(
+                Streams.concat(Stream.of(happy), sensors.stream(), actions.stream()).map(f -> f.apply(nar))
+            );
+
 
         } else {
             logger.warn("sensor overwhelm: load={}",load);
@@ -624,7 +626,6 @@ abstract public class NAgent implements NSense, NAction {
         }
         avgActionDesire.addValue(w2c(m/n)); //resulting from the previous frame
 
-        nar.runLater(actions, ActionConcept::run, 1);
     }
 
 

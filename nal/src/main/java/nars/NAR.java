@@ -1385,10 +1385,15 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
         inputLater(tasks.stream(), maxChunkSize);
     }
 
-    public final void inputLater(@NotNull Stream<Task> taskStream) {
+    public final void inputLater(@Nullable Stream<Task> taskStream) {
         inputLater(taskStream, Param.DEFAULT_TASK_INPUT_CHUNK_SIZE);
     }
-    public void inputLater(@NotNull Stream<Task> taskStream, int chunkSize) {
+    public void inputLater(@Nullable Stream<Task> taskStream, int chunkSize) {
+        if (taskStream == null)
+            return;
+
+        taskStream = taskStream.filter(Objects::nonNull);
+
         int concurrency = exe.concurrency();
         if (concurrency == 1 || chunkSize <= 1) {
             taskStream.forEach(this::input);
