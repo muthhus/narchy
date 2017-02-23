@@ -1377,20 +1377,22 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
         return this;
     }
 
-    public void inputLater(@NotNull List<Task> tasks) {
-        inputLater(tasks, 1);
+    public final void inputLater(@NotNull Collection<Task> tasks) {
+        inputLater(tasks.stream());
     }
 
-    public void inputLater(@NotNull List<Task> tasks, int maxChunkSize) {
-        runLater(tasks, this::input, maxChunkSize);
+    public void inputLater(@NotNull Collection<Task> tasks, int maxChunkSize) {
+        inputLater(tasks.stream(), maxChunkSize);
     }
 
-    public void inputLater(@NotNull Stream<Task> taskStream) {
+    public final void inputLater(@NotNull Stream<Task> taskStream) {
+        inputLater(taskStream, Param.DEFAULT_TASK_INPUT_CHUNK_SIZE);
+    }
+    public void inputLater(@NotNull Stream<Task> taskStream, int chunkSize) {
         int concurrency = exe.concurrency();
-        if (concurrency == 1) {
+        if (concurrency == 1 || chunkSize <= 1) {
             taskStream.forEach(this::input);
         } else {
-            int chunkSize = 8;
             taskStream.collect(Collectors2.chunk(concurrency * chunkSize /* estimate */)).forEach(this::input);
         }
     }
@@ -1458,12 +1460,6 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
 
         exe.run(t);
 
-    }
-
-    public final void inputLater(@NotNull Collection<Task> tt) {
-        int s = tt.size();
-        if (s > 0)
-            inputLater(tt.toArray(new Task[s]));
     }
 
 

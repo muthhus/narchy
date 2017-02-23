@@ -1,8 +1,8 @@
 package nars.io;
 
 import jcog.Texts;
-import jcog.data.rope.Rope;
-import jcog.data.rope.impl.FastConcatenationRope;
+import jcog.data.string.Rope;
+import jcog.data.string.impl.FastConcatenationRope;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 

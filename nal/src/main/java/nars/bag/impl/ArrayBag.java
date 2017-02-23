@@ -14,6 +14,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -317,6 +318,7 @@ public class ArrayBag<X> extends SortedListTable<X, BLink<X>> implements Bag<X, 
 
 
         final boolean[] isNew = {false};
+
 
         X key = key(b);
         BLink<X> v = map.compute(key, (kk, existing) -> {

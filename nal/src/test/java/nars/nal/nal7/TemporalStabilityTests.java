@@ -15,7 +15,7 @@ import org.junit.Test;
 public class TemporalStabilityTests {
 
     static {
-        Param.DEBUG = true;
+        Param.DEBUG = false;
     }
 
     static class T1 extends TemporalStabilityTest {

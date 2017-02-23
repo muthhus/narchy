@@ -125,13 +125,13 @@ public class ActiveConceptService extends PeriodicWebsocketService {
 
         IO.writePriority(out, bc);
 
-        IO.writeStringUTF(out, c.toString());
+        IO.writeUTF8WithPreLen(c.toString(), out);
 
         Bag<Term,BLink<Term>> b = c.termlinks();
         b.forEach(termlinks, t -> {
             try {
                 IO.writeBudget(out, t);
-                IO.writeStringUTF(out, t.get().toString());
+                IO.writeUTF8WithPreLen(t.get().toString(), out);
                 //TODO write budget info
             } catch (IOException e) {            }
         });

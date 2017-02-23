@@ -23,7 +23,7 @@ import static nars.perf.Main.perf;
 public class BenchmarkLine1DContinuous {
 
     public static void main(String[] args) throws RunnerException {
-        perf(BenchmarkLine1DContinuous.class, 1, 1);
+        perf(BenchmarkLine1DContinuous.class, 4, 1);
     }
 
     @Benchmark

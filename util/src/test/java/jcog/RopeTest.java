@@ -22,11 +22,11 @@
  */
 package jcog;
 
-import jcog.data.rope.Rope;
-import jcog.data.rope.impl.ConcatenationRope;
-import jcog.data.rope.impl.FlatCharSequenceRope;
-import jcog.data.rope.impl.ReverseRope;
-import jcog.data.rope.impl.SubstringRope;
+import jcog.data.string.Rope;
+import jcog.data.string.impl.ConcatenationRope;
+import jcog.data.string.impl.FlatCharSequenceRope;
+import jcog.data.string.impl.ReverseRope;
+import jcog.data.string.impl.SubstringRope;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Assert;
 import org.junit.Ignore;

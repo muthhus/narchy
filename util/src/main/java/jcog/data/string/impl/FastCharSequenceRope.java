@@ -1,4 +1,4 @@
-package jcog.data.rope.impl;
+package jcog.data.string.impl;
 
 /**
  * Variation on FlatCharSequenceRope that sacrifices the ability to compare

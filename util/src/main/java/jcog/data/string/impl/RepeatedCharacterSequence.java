@@ -20,7 +20,7 @@
  *  Amin Ahmad can be contacted at amin.ahmad@gmail.com or on the web at
  *  www.ahmadsoft.org.
  */
-package jcog.data.rope.impl;
+package jcog.data.string.impl;
 
 import java.util.Arrays;
 

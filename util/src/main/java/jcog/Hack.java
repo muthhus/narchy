@@ -1,9 +1,11 @@
 package jcog;
 
 
+import com.google.common.base.Charsets;
 import sun.misc.Unsafe;
 
 import java.lang.reflect.Field;
+import java.nio.charset.Charset;
 
 /**
  *
@@ -21,29 +23,12 @@ import java.lang.reflect.Field;
  * */
 public class Hack {
 
-  public static final Unsafe unsafe;
+
   public static final Field sbval;
   public static final Field String_value;
 
   private Hack() { } // dummy private constructor
 
-  /** Fetch the Unsafe.  Use With Caution. */
-  static {
-    // Not on bootclasspath
-    Unsafe u;
-    if( Hack.class.getClassLoader() == null ) {
-      u = Unsafe.getUnsafe();
-    } else {
-      try {
-        final Field fld = Unsafe.class.getDeclaredField("theUnsafe");
-        fld.setAccessible(true);
-        u = (Unsafe) fld.get(Hack.class);
-      } catch (Exception e) {
-        throw new RuntimeException("Could not obtain access to Unsafe", e);
-      }
-    }
-    unsafe = u;
-  }
 
   //Add reflection for String value access
   static {
@@ -65,26 +50,40 @@ public class Hack {
     sbval = sbv;
   }
 
-  private static final long _Bbase  = unsafe.arrayBaseOffset(byte[].class);
-  public static byte   get1 ( byte[] buf, int off ) { return unsafe.getByte  (buf, _Bbase+off); }
-  public static int    get2 ( byte[] buf, int off ) { return unsafe.getShort (buf, _Bbase+off); }
-  public static int    get4 ( byte[] buf, int off ) { return unsafe.getInt   (buf, _Bbase+off); }
-  public static long   get8 ( byte[] buf, int off ) { return unsafe.getLong  (buf, _Bbase+off); }
-  public static float  get4f( byte[] buf, int off ) { return unsafe.getFloat (buf, _Bbase+off); }
-  public static double get8d( byte[] buf, int off ) { return unsafe.getDouble(buf, _Bbase+off); }
+  public static final Unsafe UNSAFE = com.lmax.disruptor.util.Util.getUnsafe();
 
-  public static int set1 (byte[] buf, int off, byte x )  {unsafe.putByte  (buf, _Bbase+off, x); return 1;}
-  public static int set2 (byte[] buf, int off, short x ) {unsafe.putShort (buf, _Bbase+off, x); return 2;}
-  public static int set4 (byte[] buf, int off, int x   ) {unsafe.putInt   (buf, _Bbase+off, x); return 4;}
-  public static int set4f(byte[] buf, int off, float f ) {unsafe.putFloat (buf, _Bbase+off, f); return 4;}
-  public static int set8 (byte[] buf, int off, long x  ) {unsafe.putLong  (buf, _Bbase+off, x); return 8;}
-  public static int set8d(byte[] buf, int off, double x) {unsafe.putDouble(buf, _Bbase+off, x); return 8;}
+  private static final long _Bbase  = UNSAFE.arrayBaseOffset(byte[].class);
+  public static byte   get1 ( byte[] buf, int off ) { return UNSAFE.getByte  (buf, _Bbase+off); }
+  public static int    get2 ( byte[] buf, int off ) { return UNSAFE.getShort (buf, _Bbase+off); }
+  public static int    get4 ( byte[] buf, int off ) { return UNSAFE.getInt   (buf, _Bbase+off); }
+  public static long   get8 ( byte[] buf, int off ) { return UNSAFE.getLong  (buf, _Bbase+off); }
+  public static float  get4f( byte[] buf, int off ) { return UNSAFE.getFloat (buf, _Bbase+off); }
+  public static double get8d( byte[] buf, int off ) { return UNSAFE.getDouble(buf, _Bbase+off); }
+
+  public static int set1 (byte[] buf, int off, byte x )  {
+    UNSAFE.putByte  (buf, _Bbase+off, x); return 1;}
+  public static int set2 (byte[] buf, int off, short x ) {
+    UNSAFE.putShort (buf, _Bbase+off, x); return 2;}
+  public static int set4 (byte[] buf, int off, int x   ) {
+    UNSAFE.putInt   (buf, _Bbase+off, x); return 4;}
+  public static int set4f(byte[] buf, int off, float f ) {
+    UNSAFE.putFloat (buf, _Bbase+off, f); return 4;}
+  public static int set8 (byte[] buf, int off, long x  ) {
+    UNSAFE.putLong  (buf, _Bbase+off, x); return 8;}
+  public static int set8d(byte[] buf, int off, double x) {
+    UNSAFE.putDouble(buf, _Bbase+off, x); return 8;}
+
+  static final Charset utf8 = Charsets.UTF_8;
 
   public static byte[] bytes(String s) {
 
-      //return (byte[])unsafe.getObject(s, svo);
-      return s.getBytes();
 
+
+
+        //SAFE access:
+        return s.getBytes(utf8);
+
+        //UNSAFE FAST access:
 //        try {
 //            return (byte[]) String_value.get(s);
 //        } catch (IllegalAccessException e) {
@@ -92,7 +91,6 @@ public class Hack {
 //            throw new RuntimeException(e);
 //        }
 
-      //return s.toCharArray();
   }
 
 //  /** TODO microbenchmark comparison if this faster than String.compareTo */

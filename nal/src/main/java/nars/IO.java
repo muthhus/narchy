@@ -1,9 +1,9 @@
 package nars;
 
 
-import jcog.Texts;
 import jcog.bag.Prioritized;
 import jcog.data.byt.DynByteSeq;
+import jcog.data.string.Utf8Writer;
 import nars.budget.Budgeted;
 import nars.index.term.TermIndex;
 import nars.task.MutableTask;
@@ -11,7 +11,6 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.Terms;
-import nars.term.atom.Atom;
 import nars.term.atom.Atomic;
 import nars.term.compound.SerialCompound;
 import nars.term.container.TermContainer;
@@ -24,7 +23,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.*;
-import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -150,16 +148,16 @@ public class IO {
     }
 
     public static void writeTermStringUTF(@NotNull DataOutput out, @NotNull Termed t) throws IOException {
-        writeStringUTF(out, t.term().toString());
+        IO.writeUTF8WithPreLen(t.term().toString(), out);
     }
 
-    public static void writeStringUTF(@NotNull DataOutput out, String s) throws IOException {
-
-        //byte[] bb = s.getBytes(Charset.defaultCharset());
-        byte[] bb = s.getBytes(Charset.defaultCharset()); //Hack.bytes(s);
-        out.writeShort(bb.length);
-        out.write(bb);
-    }
+//    public static void writeStringUTF(@NotNull DataOutput out, String s) throws IOException {
+//
+//        //byte[] bb = s.getBytes(Charset.defaultCharset());
+//        byte[] bb = s.getBytes(Charset.defaultCharset()); //Hack.bytes(s);
+//        out.writeShort(bb.length);
+//        out.write(bb);
+//    }
 
     public static void writePriority(@NotNull DataOutput out, @NotNull Prioritized t) throws IOException {
         out.writeFloat(t.priSafe(0));
@@ -266,7 +264,7 @@ public class IO {
         //HACK this should not be necessary
         if (isSpecial(term)) {
             out.writeByte(SPECIAL_OP);
-            out.writeUTF(term.toString());
+            IO.writeUTF8WithPreLen(term.toString(), out);
             return;
         }
 
@@ -285,7 +283,7 @@ public class IO {
                     out.writeByte(((AbstractVariable) term).id);
                     break;
                 default:
-                    out.writeUTF(term.toString()); //TODO use StringHack ?
+                    IO.writeUTF8WithPreLen(term.toString(), out);
                     break;
             }
 
@@ -757,6 +755,19 @@ public class IO {
             }
             return sb;
         }
+    }
+
+    public static void writeUTF8(String s, DataOutput o) throws IOException {
+        new Utf8Writer(o).write(s);
+    }
+
+    public static void writeUTF8WithPreLen(String s, DataOutput o) throws IOException {
+        DynByteSeq d = new DynByteSeq(s.length());
+
+        new Utf8Writer(d).write(s);
+
+        o.writeShort( d.length() );
+        d.appendTo(o);
     }
 
 //    public static Term fromJSON(String json) {

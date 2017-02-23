@@ -20,10 +20,10 @@
  *  Amin Ahmad can be contacted at amin.ahmad@gmail.com or on the web at
  *  www.ahmadsoft.org.
  */
-package jcog.data.rope;
+package jcog.data.string;
 
 import jcog.Hack;
-import jcog.data.rope.impl.*;
+import jcog.data.string.impl.*;
 
 import java.io.IOException;
 import java.io.PrintStream;

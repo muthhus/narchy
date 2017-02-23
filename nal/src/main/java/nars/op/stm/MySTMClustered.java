@@ -183,12 +183,12 @@ public class MySTMClustered extends STMClustered {
                         tt.forEach(_z -> {
                             Task z = _z.get();
                             //if (z != null) {
-                                vv.merge(z.term(), z, (prevZ, newZ) -> {
-                                    if (prevZ == null || newZ.conf() > prevZ.conf())
-                                        return newZ;
-                                    else
-                                        return prevZ;
-                                });
+                            vv.merge(z.term(), z, (prevZ, newZ) -> {
+                                if (prevZ == null || newZ.conf() > prevZ.conf())
+                                    return newZ;
+                                else
+                                    return prevZ;
+                            });
                             //}
                         });
 

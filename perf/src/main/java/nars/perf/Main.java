@@ -27,7 +27,7 @@ public enum Main {
 
 				 //.include(//c.getName())
 				//.include(".*" + c.getSimpleName() + ".*")
-				.warmupIterations(0)
+				.warmupIterations(1)
 				.measurementIterations(iterations)
 				.measurementBatchSize(batchSize)
 				.threads(1)
@@ -37,7 +37,7 @@ public enum Main {
 
 				//.addProfiler(StackProfiler.class)
 				.addProfiler(StackProfiler.class,
-						"lines=10;top=10;period=1;detailLine=true")
+						"lines=10;top=20;period=2;detailLine=true")
 				 //.addProfiler(GCProfiler.class)
 
 				//.addProfiler(LinuxPerfProfiler.class)

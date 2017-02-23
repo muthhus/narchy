@@ -34,7 +34,7 @@ abstract public class TemporalStabilityTest {
                 long o = tt.start();
                 if (!validOccurrence(o)) {
                     if (irregular.add(tt)) { //already detected?
-                        System.err.println("  instability: " + tt + "\n" + tt.proof() + "\n");
+                        //System.err.println("  instability: " + tt + "\n" + tt.proof() + "\n");
                     }
                 }
 
@@ -63,12 +63,12 @@ abstract public class TemporalStabilityTest {
 
         if (!irregular.isEmpty()) {
 
-            TimeMap m = new TimeMap(n);
+//            TimeMap m = new TimeMap(n);
 
-//            irregular.forEach(i -> {
-//
-//                System.err.println(i.proof());
-//            });
+            irregular.forEach(i -> {
+
+                System.err.println(i.proof());
+            });
 
             //m.print();
 

@@ -1,6 +1,6 @@
-package jcog.data.rope.impl;
+package jcog.data.string.impl;
 
-import jcog.data.rope.Rope;
+import jcog.data.string.Rope;
 
 import java.io.Writer;
 import java.util.Iterator;

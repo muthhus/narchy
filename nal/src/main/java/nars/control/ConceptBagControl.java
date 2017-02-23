@@ -86,7 +86,6 @@ public class ConceptBagControl implements Control, Consumer<DerivedTask> {
     /** pending derivations to be input after this cycle */
     //final AtomicReference<Map<Task, Task>> pending = new AtomicReference(new ConcurrentHashMap<>());
     final TaskHijackBag pending;
-    //int _merges = 0;
 
 
     public ConceptBagControl(@NotNull NAR nar, @NotNull Deriver deriver, @NotNull Bag<Concept,PLink<Concept>> conceptBag) {

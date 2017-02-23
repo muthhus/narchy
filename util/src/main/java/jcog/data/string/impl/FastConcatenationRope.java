@@ -1,7 +1,7 @@
-package jcog.data.rope.impl;
+package jcog.data.string.impl;
 
 import com.google.common.collect.Iterators;
-import jcog.data.rope.Rope;
+import jcog.data.string.Rope;
 
 import java.util.Iterator;
 

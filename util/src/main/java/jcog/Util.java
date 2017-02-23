@@ -64,8 +64,6 @@ public enum Util { ;
     public static final float[] EmptyFloatArray = new float[0];
     // --- Bits to allow Unsafe access to arrays
 
-    public static final Unsafe UNSAFE = com.lmax.disruptor.util.Util.getUnsafe();
-
     /**
      * It is basically the same as a lookup table with 2048 entries and linear interpolation between the entries, but all this with IEEE floating point tricks.
      * http://stackoverflow.com/questions/412019/math-optimization-in-c-sharp#412988

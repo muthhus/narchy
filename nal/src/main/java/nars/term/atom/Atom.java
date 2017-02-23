@@ -13,6 +13,7 @@ public class Atom extends AtomicString {
     private final String id;
 
     public Atom(@NotNull String id) {
+
         this.id = (validateAtomID(id));
     }
 

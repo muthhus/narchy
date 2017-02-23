@@ -1,6 +1,5 @@
 package jcog.data.byt;
 
-import jcog.Hack;
 import jcog.Util;
 import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.NotNull;
@@ -245,26 +244,23 @@ public class DynByteSeq implements DataOutput, Appendable, ByteSeq {
     }
 
     @Override
-    public void writeUTF(@NotNull String s)  {
-        //throw new UnsupportedOperationException("yet");
+    public void writeUTF(@NotNull String s) throws IOException {
+
+        throw new UnsupportedOperationException("yet");
 
         //WARNING this isnt UTF8
 //        this.write(strToBytes(s));
 //        this.writeByte(0); //null-terminated
 
+        //IO.writeWithPreLen(s, this);
 
 
-//        s.getBytes()
-        byte[] ss = strToBytes(s);
-        this.writeShort(ss.length);
-        this.write(ss);
+//        byte[] ss = Hack.bytes(s);
+//        this.writeShort(ss.length);
+//        this.write(ss);
 
 //        UTF8Writer
 //        UTFUtils.writeUTFBytes(this, s);
-    }
-
-    private byte[] strToBytes(String s) {
-        return Hack.bytes(s);
     }
 
     @Override

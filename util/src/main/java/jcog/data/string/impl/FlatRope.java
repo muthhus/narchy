@@ -1,5 +1,5 @@
 /*
- *  RopeIterator.java
+ *  FlatRope.java
  *  Copyright (C) 2007 Amin Ahmad.
  *
  *  This file is part of Java Ropes.
@@ -20,16 +20,25 @@
  *  Amin Ahmad can be contacted at amin.ahmad@gmail.com or on the web at
  *  www.ahmadsoft.org.
  */
-package jcog.data.rope.impl;
+package jcog.data.string.impl;
 
-import java.util.Iterator;
+import jcog.data.string.Rope;
 
-public interface RopeIterator extends Iterator<Character> {
+/**
+ * A rope that is directly backed by a data source.
+ * 
+ * @author Amin Ahmad
+ */
+public interface FlatRope extends Rope {
 
-    /**
-     * Returns the position of the last character returned.
-     *
-     * @return
-     */
-    int getPosition();
+	/**
+	 * Returns a <code>String</code> representation of a range in this rope.
+	 * 
+	 * @param offset
+	 *            the offset.
+	 * @param length
+	 *            the length.
+	 * @return a <code>String</code> representation of a range in this rope.
+	 */
+	String toString(int offset, int length);
 }
