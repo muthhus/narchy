@@ -573,11 +573,23 @@ public class TermReductionsTest {
 
 
     @Test
-    public void testCoNegatedImplication() throws Narsese.NarseseException {
-
+    public void testCoNegatedImpl() throws Narsese.NarseseException {
         assertValidTermValidConceptInvalidTaskContent(("((--,(a)) ==> (a))"));
         assertValidTermValidConceptInvalidTaskContent(("((--,(a)) ==>+0 (a))"));
+    }
+    @Test
+    public void testCoNegatedEqui() throws Narsese.NarseseException {
+        assertValidTermValidConceptInvalidTaskContent(("((--,(a)) <=> (a))"));
+        assertValidTermValidConceptInvalidTaskContent(("((--,(a)) <=>+0 (a))"));
+    }
+
+    @Test public void testCoNegatedImplOK() throws Narsese.NarseseException {
         assertValid($("((--,(a)) ==>+1 (a))"));
+        assertValid($("((--,a) ==>+1 a)"));
+    }
+    @Test public void testCoNegatedEquiOK() throws Narsese.NarseseException {
+        assertValid($("((--,(a)) <=>+1 (a))"));
+        assertValid($("((--,a) <=>+1 a)"));
     }
 
     @Test public void testRepeatEvent() throws Narsese.NarseseException {

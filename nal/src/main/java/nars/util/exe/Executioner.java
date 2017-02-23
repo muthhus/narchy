@@ -70,7 +70,7 @@ abstract public class Executioner implements Executor {
      *
      * @return
      */
-    public float throttle() { return 0; }
+    //TODO public float throttle() { return 0; }
 
 
     /** a scaling factor that executions can use to throttle the workload they will produce in the next cycle */

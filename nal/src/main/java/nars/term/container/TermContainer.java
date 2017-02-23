@@ -190,7 +190,7 @@ public interface TermContainer extends Termlike, Iterable<Term> {
             int s = size();
             for (int i = 0; i < s; i++) {
                 Term x = term(i);
-                if (x.equals(b) || ((x instanceof Compound) && (((Compound) x).containsTermRecursively(b)))) {
+                if (x.equals(b) || ((x instanceof Compound) && (((Compound) x).subterms().containsTermRecursively(b)))) {
                     return true;
                 }
             }

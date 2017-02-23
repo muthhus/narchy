@@ -209,7 +209,7 @@ public class Abbreviation/*<S extends Term>*/ extends Leak<Compound, BLink<Compo
                             .time(nar.time(), ETERNAL)
                             .log("Abbreviate")
                             .budgetSafe(b);
-                    nar.input(abbreviationTask);
+                    nar.inputLater(abbreviationTask);
                     logger.info("{}", abbreviationTask);
                 }
             }

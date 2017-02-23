@@ -3,12 +3,14 @@ package nars.task;
 import jcog.bag.Bag;
 import jcog.data.random.XorShift128PlusRandom;
 import nars.*;
+import nars.concept.Concept;
 import nars.conceptualize.state.DefaultConceptState;
 import nars.nar.Default;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.test.analyze.BeliefAnalysis;
 import nars.time.Tense;
+import nars.truth.Truth;
 import org.junit.Test;
 
 import java.util.Random;
@@ -217,7 +219,24 @@ public class RevisionTest {
         Task t = n.concept("(a)").beliefs().matchEternal();
         assertEquals(0.37f, t.freq(), 0.01f);
         assertEquals(0.75f, t.conf(), 0.01f);
+    }
 
+    @Test public void testRevision2EternalImpl() throws Narsese.NarseseException {
+        NAR n = newNAR(3)
+            .input("(x ==> y). %1.0;0.9%",
+                   "(x ==> y). %0.0;0.9%" );
+        Task t = n.concept("(x ==> y)").beliefs().matchEternal();
+        assertEquals(0.5f, t.freq(), 0.01f);
+        assertEquals(0.947f, t.conf(), 0.01f);
+    }
+
+    @Test public void testRevision2TemporalImpl() throws Narsese.NarseseException {
+        NAR n = newNAR(3)
+                .input("(x ==> y). :|: %1.0;0.9%",
+                       "(x ==> y). :|: %0.0;0.9%" );
+        Truth t = n.concept("(x ==> y)").belief(0, 1f);
+        assertEquals(0.5f, t.freq(), 0.01f);
+        assertEquals(0.947f, t.conf(), 0.01f);
     }
 
     /** test that budget is conserved during a revision between

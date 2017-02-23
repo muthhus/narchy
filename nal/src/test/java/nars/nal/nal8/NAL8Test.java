@@ -411,7 +411,7 @@ public class NAL8Test extends AbstractNALTest {
         test()
 //                
                 .inputAt(1, "at:t003! :|:")
-                .inputAt(1, "(at:$1 ==>+5 goto:$1).")
+                .input( "(at:$1 ==>+5 goto:$1).")
 
                 .mustDesire(cycles*2, "goto:t003", 1.0f, 0.45f, 6);
 

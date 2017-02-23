@@ -33,6 +33,7 @@ import java.util.Collection;
 import java.util.DoubleSummaryStatistics;
 import java.util.List;
 import java.util.Random;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import static jcog.Texts.n2;
@@ -572,7 +573,7 @@ abstract public class NAgent implements NSense, NAction {
                 //action.biasDesire(t);
 
                 if (t!=null) {
-                    nar.input(
+                    nar.inputLater(
                             new MutableTask(action, GOAL, t)
                                     .time(now, now - Math.round(nar.time.dur()), now)
                                     .budgetByTruth(action.pri.asFloat())
@@ -636,14 +637,20 @@ abstract public class NAgent implements NSense, NAction {
                 //UtilityFunctions.aveAri(nar.priorityDefault('.'), nar.priorityDefault('!'))
                        ///* / (predictors.size()/predictorProbability)*/ * predictorPriFactor;
 
-
-
         if (pri > 0) {
             //long frameDelta = now-prev;
             float dur = nar.time.dur();
-            for (int i = 0, predictorsSize = predictors.size(); i < predictorsSize; i++) {
-                predictors.set(i, boost(predictors.get(i), pri, dur, lookAhead));
-            }
+            nar.inputLater(
+                IntStream.range(0, predictors.size()).mapToObj(i -> {
+                    MutableTask x = predictors.get(i);
+                    MutableTask y = boost(x, pri, dur, lookAhead);
+                    if (x!=y) {
+                        predictors.set(i, y); //predictor changed or needs re-input
+                        return y;
+                    }
+                    return null; //dont re-input this predictor
+                })
+            );
         }
 
 //        Task beHappy = new MutableTask(happy, '!', 1f, nar).time(Tense.Present, nar).budgetByTruth(1f);
@@ -709,7 +716,6 @@ abstract public class NAgent implements NSense, NAction {
                 .log("Agent Predictor");
 
             //s.evidence(t)
-            nar.input(s);
             return s;
         } else if (t.isDeleted()) {
             s = (t instanceof PredictionTask) ?
@@ -720,11 +726,9 @@ abstract public class NAgent implements NSense, NAction {
 
             t.delete(); //allow the new one to replace it on re-activation
 
-            nar.input(s);
             return s;
         } else {
             t.budgetByTruth(p, nar).eternal().log("Agent Predictor");
-            nar.input(t);
             return t;
         }
 

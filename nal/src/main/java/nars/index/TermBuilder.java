@@ -805,6 +805,7 @@ public abstract class TermBuilder {
 
                         if ((dt!=0 && dt!=DTERNAL)) {
                             mustNotEqual = false; //allow repeat
+                            mustNotContain = false;
                         } else if (subject.equals(predicate)) {
                             return True;
                         }
@@ -878,16 +879,18 @@ public abstract class TermBuilder {
                 }
 
 
-                Term ss = subject.unneg();
-                Term pp = predicate.unneg();
 
-                if (mustNotEqual && Terms.equalAtemporally(ss, pp)) {
-                    return ((subject == ss) ^ (predicate == pp)) ? False : True;  //handle root-level negation comparison
+                if (mustNotEqual) {//Terms.equalAtemporally(ss, pp)) {
+                    Term ss = subject.unneg();
+                    Term pp = predicate.unneg();
+                    if (ss.equals(pp)) {
+                        return ((subject == ss) ^ (predicate == pp)) ? False : True;  //handle root-level negation comparison
+                    }
                 }
 
                 if (mustNotContain) {
-                    if ((ss instanceof Compound && ss.varPattern() == 0 && ((Compound) ss).containsTermAtemporally(pp)) ||
-                            (pp instanceof Compound && pp.varPattern() == 0 && ((Compound) pp).containsTermAtemporally(ss))) {
+                    if ((subject instanceof Compound && subject.varPattern() == 0 && subject.containsTerm(predicate)) ||
+                            (predicate instanceof Compound && predicate.varPattern() == 0 && predicate.containsTerm(subject))) {
                         return False; //self-reference
                     }
                 }

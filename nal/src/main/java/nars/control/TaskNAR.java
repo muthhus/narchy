@@ -283,7 +283,7 @@ public class TaskNAR extends NAR {
                     //                        logger.info("{} {}\n\t{}", a, b, t);
                     //                    input(t);
                     //                }
-                    this::input, Param.UnificationMatchesMax, Param.UnificationStackMax
+                    this::inputLater, Param.UnificationMatchesMax, Param.UnificationStackMax
             ));
         }
 

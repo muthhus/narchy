@@ -369,7 +369,7 @@ public class Inperience extends Leak<Task,BLink<Task>> {
 
         long now = nar.time();
 
-        nar.input(new MutableTask(new_term, GOAL, 1f, nar)
+        nar.inputLater(new MutableTask(new_term, GOAL, 1f, nar)
                         /*.budget(Global.DEFAULT_GOAL_PRIORITY * INTERNAL_EXPERIENCE_PRIORITY_MUL,
                                 Global.DEFAULT_GOAL_DURABILITY * INTERNAL_EXPERIENCE_DURABILITY_MUL)*/
                 //.parent(parent, belief)

@@ -342,9 +342,9 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
 
     @NotNull
     public List<Task> input(@NotNull String text) {
-        List<Task> lt = tasks(text);
-        lt.forEach(this::input);
-        return lt;
+        List<Task> l = tasks(text);
+        inputLater(l);
+        return l;
     }
 
     @NotNull
@@ -604,7 +604,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
         t.time(time(), when);
         t.setPriority(priorityDefault(questionOrQuest));
 
-        input(t);
+        inputLater(t);
 
         return t;
 
@@ -639,7 +639,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
      * if the task was a command, it will return false even if executed
      */
     @Nullable
-    public final Concept input(@NotNull Task input0) {
+    protected final Concept process(@NotNull Task input0) {
 
         Task input = pre(input0);
         if (input == null)
@@ -665,7 +665,13 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
         }
 
         boolean isCommand = input.isCommand();
-        if (isCommand || (input.isGoal() && input.expectation() >= Param.EXECUTION_THRESHOLD) && (input.isEternal() || (!input.isEternal() && Math.abs(time() - input.start()) <= time.dur()))) {
+        if (isCommand || (input.isGoal() && input.expectation() >= Param.EXECUTION_THRESHOLD) &&
+                (input.isEternal() || (!input.isEternal() && ( input.start() - time() ) >= -time.dur()))) { //eternal, present (within duration radius), or future
+
+            if (!input.isEternal() && input.start() > time() + time.dur()) {
+                //TODO schedule for run later
+                return null;
+            }
 
             Compound inputTerm = input.term();
             if (inputTerm.hasAll(Operator.OPERATOR_BITS) && inputTerm.op() == INH) {
@@ -681,13 +687,13 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
 
                                 if (isCommand) {
                                     if (result != null && result != input)
-                                        return input(result); //recurse
+                                        return process(result); //recurse
                                 } else {
                                     if (result != input) { //instance equality, not actual equality in case it wants to change this
                                         if (result == null) {
                                             return null; //finished
                                         } else {
-                                            return input(result); //recurse until its stable
+                                            return process(result); //recurse until its stable
                                         }
                                     }
                                 }
@@ -886,14 +892,14 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
         //TaskQueue tq = new TaskQueue(t);
         //input((Input) tq);
         //return tq;
-        t.forEach(this::input);
+        t.forEach(this::process);
         return t;
     }
 
     @NotNull
-    public void input(@NotNull Task... t) {
+    public void processAll(@NotNull Task... t) {
         for (Task x : t)
-            input(x);
+            process(x);
     }
 
     public final void on(@NotNull String atom, @NotNull Operator o) {
@@ -1217,25 +1223,25 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
                 my.occurr(time);
         }
 
-        inputAt(time, x);
+        inputAt(time, x.toArray(new Task[x.size()]));
         return this;
     }
 
-    public void inputAt(long when, @NotNull Collection<Task> x) {
+    public void inputAt(long when, @NotNull Task... x) {
         long now = time();
         if (when < now) {
             //past
             throw new RuntimeException("can not input at a past time");
         } else if (when == now) {
             //current cycle
-            input(x);
+            inputLater(x);
         } else {
             //future
 
             onCycle(m -> {
                 //if (timeCondition.test(m.time())) {
                 if (m.time() == when) {
-                    m.input(x);
+                    m.inputLater(x);
                     //this.off.off();
                 }
             });
@@ -1394,9 +1400,10 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
 
         int concurrency = exe.concurrency();
         if (concurrency == 1 || chunkSize <= 1) {
-            taskStream.forEach(this::input);
+            taskStream.forEach(this::process);
         } else {
-            taskStream.collect(Collectors2.chunk(concurrency * chunkSize /* estimate */)).forEach(this::input);
+            taskStream.collect(Collectors2.chunk(concurrency * chunkSize /* estimate */))
+                    .forEach(x -> inputLater(x.toArray(new Task[x.size()])));
         }
     }
 
@@ -1434,7 +1441,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
     }
 
     /**
-     * installs a concept in the index and activates it, used for setup of custom concept implementations
+     * activate/"turn-ON"/install a concept in the index and activates it, used for setup of custom concept implementations
      * implementations should apply active concept capacity policy
      */
     @NotNull
@@ -1458,11 +1465,8 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
      * processes the input before the next frame has run
      */
     public final void inputLater(@NotNull Task... t) {
-        if (t.length == 0)
-            throw new RuntimeException("empty task array");
-
-        exe.run(t);
-
+        if (t.length > 0)
+            exe.run(t);
     }
 
 
@@ -1545,6 +1549,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
 
     /**
      * byte codec input stream of tasks, to be input after decode
+     * TODO use input(Stream<Task>..</Task>
      */
     @NotNull
     public NAR input(@NotNull InputStream i) throws IOException {
@@ -1556,7 +1561,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
 
         while ((i.available() > 0) || (i.available() > 0) || (ii.available() > 0)) {
             Task t = IO.readTask(ii, concepts);
-            input(t);
+            inputLater(t);
             count++;
         }
 

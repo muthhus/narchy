@@ -15,7 +15,8 @@ import java.util.function.Consumer;
  */
 public interface NARIn {
 
-    Concept input(Task t);
+
+    void inputLater(Task... t);
 
     Termed term(@NotNull String t) throws Narsese.NarseseException;
 
@@ -49,7 +50,7 @@ public interface NARIn {
     }
 
     @NotNull default <T extends Task> T inputAndGet(@NotNull T t) {
-        input(t);
+        inputLater(t);
         return t;
     }
 

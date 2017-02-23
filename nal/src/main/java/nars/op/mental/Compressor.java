@@ -161,7 +161,7 @@ public class Compressor extends Abbreviation implements RemovalListener<Compound
                             .time(nar.time(), ETERNAL)
                             .log("Abbreviate")
                             .budgetSafe(b);
-                    nar.input(abbreviationTask);
+                    nar.inputLater(abbreviationTask);
 
 
                     recompile();

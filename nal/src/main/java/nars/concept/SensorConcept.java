@@ -28,7 +28,7 @@ import static nars.Op.BELIEF;
 /**
  * primarily a collector for believing time-changing input signals
  */
-public class SensorConcept extends WiredConcept implements FloatFunction<Term>, FloatSupplier, WiredConcept.Prioritizable, Consumer<Task>, Function<NAR,Task> {
+public class SensorConcept extends WiredConcept implements FloatFunction<Term>, FloatSupplier, WiredConcept.Prioritizable, Function<NAR,Task> {
 
     @NotNull
     public final ScalarSignal sensor;
@@ -38,9 +38,6 @@ public class SensorConcept extends WiredConcept implements FloatFunction<Term>, 
     public static final Logger logger = LoggerFactory.getLogger(SensorConcept.class);
 
     //private boolean latchLastValue = true;
-
-
-
 
     public SensorConcept(@NotNull String term, @NotNull NAR n, FloatSupplier signal, FloatToObjectFunction<Truth> truth) throws Narsese.NarseseException {
         this($.$(term), n, signal, truth);
@@ -199,10 +196,6 @@ public class SensorConcept extends WiredConcept implements FloatFunction<Term>, 
         return sensor.apply(nar);
     }
 
-    @Override
-    public void accept(Task generated) {
-        nar.input(generated);
-    }
 
     private static class MyListTemporalBeliefTable extends ListTemporalBeliefTable {
         public MyListTemporalBeliefTable(int tCap) {

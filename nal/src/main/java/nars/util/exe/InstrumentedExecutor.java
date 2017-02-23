@@ -34,6 +34,18 @@ public class InstrumentedExecutor extends Executioner {
         this.taskInput = meter(Task.class);
     }
 
+    @Override
+    public synchronized void start(NAR nar) {
+        super.start(nar);
+        exe.start(nar);
+    }
+
+    @Override
+    public synchronized void stop() {
+        exe.stop();
+        super.stop();
+    }
+
     public PeriodMeter meter(Class cc) {
         return meters.computeIfAbsent(cc, c -> new PeriodMeter(c.getName(), windowCycles));
     }
@@ -93,6 +105,11 @@ public class InstrumentedExecutor extends Executioner {
     @Override
     public void run(@NotNull Task[] t) {
         run(()->exe.run(t), taskInput);
+    }
+
+    @Override
+    public float load() {
+        return exe.load();
     }
 
 }

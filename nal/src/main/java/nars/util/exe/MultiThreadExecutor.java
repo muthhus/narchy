@@ -249,7 +249,7 @@ public class MultiThreadExecutor extends Executioner {
     @Override
     public final void run(@NotNull Task... t) {
         if (!ring.tryPublishEvent(taskPublisher, t)) {
-            nar.input(t); //execute in own thread
+            nar.processAll(t); //execute in own thread
             //logger.warn("dropped: {}", t);
         }
     }
@@ -268,7 +268,7 @@ public class MultiThreadExecutor extends Executioner {
             te.val = null;
             switch (te.e) {
                 case TASK_ARRAY:
-                    nar.input((Task[])val);
+                    nar.processAll((Task[])val);
                     break;
                 case RUNNABLE:
                     ((Runnable)val).run();

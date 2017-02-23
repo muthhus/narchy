@@ -43,7 +43,7 @@ public class SynchronousExecutor extends Executioner {
     @Override
     public final void run(Task[] t) {
         //just execute here in this thread
-        nar.input(t);
+        nar.processAll(t);
     }
 
 

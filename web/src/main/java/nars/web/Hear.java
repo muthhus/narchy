@@ -58,7 +58,7 @@ public class Hear extends Loop {
 
         if (!parsed.isEmpty() && errors.isEmpty()) {
             logger.info("narsese: {}", parsed);
-            parsed.forEach(nar::input);
+            nar.inputLater(parsed);
             return null;
         } else {
             return ifNotNarsese.apply(msg);

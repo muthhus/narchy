@@ -134,9 +134,9 @@ public class TestNAR  {
         nar.inputAt(time, s);
         return this;
     }
-    @NotNull public TestNAR inputAt(long time, Task t) {
+    @NotNull public TestNAR inputAt(long time, Task... t) {
         finished = false;
-        nar.inputAt(time, Collections.singleton(t));
+        nar.inputAt(time, t);
         return this;
     }
 

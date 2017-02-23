@@ -153,8 +153,10 @@ public class PatrickTests extends AbstractNALTest {
         the strongest hypothesis based on the last two inputs where neither a nor b "leaded to" c.
          */
 
-        NAR n = new Default();
+        Default n = new Default(1024, 16, 1, 3);
         n.DEFAULT_BELIEF_PRIORITY = 0.01f;
+        n.termVolumeMax.setValue(16);
+
 
         //n.log();
         n.inputAt(  0, "  A:a. :|:    --B:b. :|:    --C:c. :|:");
@@ -170,7 +172,7 @@ public class PatrickTests extends AbstractNALTest {
         //n.input("       $0.9;0.9$ (?x ==>+8 C:c)?");
         //n.input("       $0.9;0.9$ ((A:a && B:b) ==> C:c)?");
         //n.input("       $0.9;0.9$ ((A:a && B:b) ==> C:c)? :|:");
-        n.run(12500);
+        n.run(2000);
 
         /*
         Expected result: (also in OpenNARS syntax)
