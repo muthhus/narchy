@@ -91,7 +91,7 @@ public abstract class NQuadsRDF {
     }
 
     @Deprecated public static void input(@NotNull NAR nar, @NotNull Stream<Node[]> nxp) {
-        nar.inputLater(  stream(nar, nxp) );
+        nar.input(  stream(nar, nxp) );
     }
 
 

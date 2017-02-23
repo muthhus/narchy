@@ -12,6 +12,7 @@ import nars.derive.DefaultDeriver;
 import nars.index.term.TermIndex;
 import nars.index.term.map.MapTermIndex;
 import nars.op.stm.STMTemporalLinkage;
+import nars.op.stm.STMTemporalLinkage2;
 import nars.time.FrameTime;
 import nars.time.Time;
 import nars.util.exe.Executioner;
@@ -31,6 +32,7 @@ public class Default extends NAR {
     public final ConceptBagControl core;
 
     private final STMTemporalLinkage stmLinkage = new STMTemporalLinkage(this, 2);
+    //private final STMTemporalLinkage2 stmLinkage = new STMTemporalLinkage2(this, 16, 1, 2);
 
 
     @Deprecated

@@ -27,7 +27,7 @@ public class ChangedTextInput {
 
 	public boolean set(@NotNull List<Task> s) {
 		if (enable() && allowRepeats() || (!last.equals(s))) {
-			nar.inputLater(s);
+			nar.input(s);
 			last = s;
 			return true;
 		}

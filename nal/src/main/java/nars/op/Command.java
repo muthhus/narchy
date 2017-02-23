@@ -60,11 +60,11 @@ public interface Command extends Operator {
     }
 
     static void log(NAR nar, @NotNull Term content) {
-        nar.inputLater( Command.logTask(content) );
+        nar.input( Command.logTask(content) );
     }
 
     static void log(NAR nar, @NotNull String msg) {
-        nar.inputLater( Command.logTask(msg) );
+        nar.input( Command.logTask(msg) );
     }
 
 

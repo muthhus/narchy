@@ -1,6 +1,5 @@
 package nars;
 
-import nars.concept.Concept;
 import nars.task.LambdaQuestionTask;
 import nars.term.Compound;
 import nars.term.Termed;
@@ -16,7 +15,7 @@ import java.util.function.Consumer;
 public interface NARIn {
 
 
-    void inputLater(Task... t);
+    void input(Task... t);
 
     Termed term(@NotNull String t) throws Narsese.NarseseException;
 
@@ -50,7 +49,7 @@ public interface NARIn {
     }
 
     @NotNull default <T extends Task> T inputAndGet(@NotNull T t) {
-        inputLater(t);
+        input(t);
         return t;
     }
 

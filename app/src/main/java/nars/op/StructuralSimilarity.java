@@ -41,7 +41,7 @@ public class StructuralSimilarity implements Consumer<Task> {
                 float uniques = plus - e.size();
                 float similarity = (uniques / max);
                 if (similarity > 0) //remain silent about cases where nothing is common
-                    n.inputLater(new MutableTask($.sim(a, b), '.', similarity, n).log("StructuralSimilarity"));
+                    n.input(new MutableTask($.sim(a, b), '.', similarity, n).log("StructuralSimilarity"));
             }
         }
     }

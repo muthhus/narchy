@@ -20,7 +20,7 @@ public class FileInput {
 
     public static @NotNull Collection<Task> load(@NotNull NAR p, @NotNull File input) throws IOException {
         List<Task> t = tasks(p, input);
-        p.inputLater(t);
+        p.input(t);
         return t;
     }
     public static List<Task> tasks(@NotNull final NAR nar, @NotNull File input) throws IOException {

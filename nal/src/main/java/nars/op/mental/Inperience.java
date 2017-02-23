@@ -197,7 +197,7 @@ public class Inperience extends Leak<Task,BLink<Task>> {
                         nar.confidenceDefault(BELIEF));
 
                 logger.info(" {}", e);
-                nar.inputLater(e);
+                nar.input(e);
             }
         } catch (ClassCastException ignored) {
             //happens rarely, due to circularity while trying to create something like: want((x<->want),...
@@ -369,7 +369,7 @@ public class Inperience extends Leak<Task,BLink<Task>> {
 
         long now = nar.time();
 
-        nar.inputLater(new MutableTask(new_term, GOAL, 1f, nar)
+        nar.input(new MutableTask(new_term, GOAL, 1f, nar)
                         /*.budget(Global.DEFAULT_GOAL_PRIORITY * INTERNAL_EXPERIENCE_PRIORITY_MUL,
                                 Global.DEFAULT_GOAL_DURABILITY * INTERNAL_EXPERIENCE_DURABILITY_MUL)*/
                 //.parent(parent, belief)

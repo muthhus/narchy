@@ -72,7 +72,7 @@ public class ConceptBagControl implements Control, Consumer<DerivedTask> {
 
     //public final HitMissMeter meter = new HitMissMeter(ConceptBagControl.class.getSimpleName());
 
-    public final MutableInteger newTasksPerCycleMax = new MutableInteger(96);
+    public final MutableInteger newTasksPerCycleMax = new MutableInteger(128);
 
     public final FloatParam conceptActivationRate = new FloatParam(1f);
     private float currentActivationRate = 1f;
@@ -109,7 +109,7 @@ public class ConceptBagControl implements Control, Consumer<DerivedTask> {
 
         if (!pending.isEmpty()) {
             AtomicReferenceArray<Task> all = pending.reset();
-            nar.inputLater( HijackBag.stream(all) );
+            nar.input( HijackBag.stream(all) );
         }
 
         active.commit();
@@ -123,7 +123,8 @@ public class ConceptBagControl implements Control, Consumer<DerivedTask> {
         float load = nar.exe.load();
         int cbs = conceptsFiredPerBatch.intValue();
 
-        int cpf = Math.round(conceptsFiredPerCycle.floatValue() * (1f - load));
+        int cpf = Math.round(conceptsFiredPerCycle.floatValue());
+                ///Math.round(conceptsFiredPerCycle.floatValue() * (1f - load));
 
         //logger.info("firing {} concepts (exe load={})", cpf, load);
 
@@ -132,21 +133,13 @@ public class ConceptBagControl implements Control, Consumer<DerivedTask> {
             int batchSize = Math.min(cpf, cbs);
             cpf -= cbs;
 
-            this.nar.runLater(() -> {
+            //List<PLink<Concept>> toFire = $.newArrayList(batchSize);
 
-                List<PLink<Concept>> toFire = $.newArrayList(batchSize);
-                active.sample(batchSize, toFire::add);
+            int _tasklinks = tasklinksFiredPerFiredConcept.intValue();
 
-                int _tasklinks = tasklinksFiredPerFiredConcept.intValue();
-
-                for (int i = 0, toFireSize = toFire.size(); i < toFireSize; i++) {
-                    premiser.newPremiseMatrix(toFire.get(i).get(), this.nar,
-                            _tasklinks, termlinksFiredPerFiredConcept,
-                            this, //input them within the current thread here
-                            deriver
-                    );
-                }
-
+            active.sample(batchSize, n -> {
+                nar.runLater(new PremiseMatrix(n, _tasklinks));
+                return true;
             });
 
         }
@@ -193,6 +186,26 @@ public class ConceptBagControl implements Control, Consumer<DerivedTask> {
     @Override
     public Iterable<PLink<Concept>> conceptsActive() {
         return active;
+    }
+
+
+    private class PremiseMatrix implements Consumer<NAR> {
+        private final PLink<Concept> n;
+        private final int _tasklinks;
+
+        public PremiseMatrix(PLink<Concept> n, int _tasklinks) {
+            this.n = n;
+            this._tasklinks = _tasklinks;
+        }
+
+        @Override
+        public void accept(NAR nar) {
+            premiser.newPremiseMatrix(n.get(), nar,
+                    _tasklinks, termlinksFiredPerFiredConcept,
+                    ConceptBagControl.this, //input them within the current thread here
+                    deriver
+            );
+        }
     }
 
 //    static final class BudgetSavings extends RawBudget {

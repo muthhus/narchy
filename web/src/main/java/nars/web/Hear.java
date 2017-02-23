@@ -17,7 +17,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.function.Consumer;
 import java.util.function.Function;
 
 import static nars.Op.BELIEF;
@@ -58,7 +57,7 @@ public class Hear extends Loop {
 
         if (!parsed.isEmpty() && errors.isEmpty()) {
             logger.info("narsese: {}", parsed);
-            nar.inputLater(parsed);
+            nar.input(parsed);
             return null;
         } else {
             return ifNotNarsese.apply(msg);

@@ -1515,8 +1515,28 @@ public enum Util { ;
     }
 
     public static String secondStr(double s) {
-        if (s >= 0.01) return Texts.n2(s) + "s";
-        else if (s >= 0.00001) return Texts.n2(s * 1000) + "ms";
-        else return Texts.n2(s * 1.0E6) + "us";
+        int decimals;
+        if (s >= 0.01) decimals = 0;
+        else if (s >= 0.00001) decimals = 3;
+        else decimals = 6;
+
+        return secondStr(s, decimals);
+    }
+
+    public static String secondStr(double s, int decimals) {
+        if (decimals < 0)
+            return secondStr(s);
+        else {
+            switch (decimals) {
+                case 0:
+                    return Texts.n2(s) + "s";
+                case 3:
+                    return Texts.n2(s * 1000) + "ms";
+                case 6:
+                    return Texts.n2(s * 1.0E6) + "us";
+                default:
+                    throw new UnsupportedOperationException("TODO");
+            }
+        }
     }
 }

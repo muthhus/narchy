@@ -20,6 +20,7 @@ import nars.time.Time;
 import nars.util.exe.Executioner;
 import nars.util.exe.InstrumentedExecutor;
 import nars.util.exe.MultiThreadExecutor;
+import nars.util.exe.SynchronousExecutor;
 import org.apache.commons.math3.util.MathArrays;
 import org.jetbrains.annotations.NotNull;
 
@@ -41,12 +42,10 @@ public interface NARBuilder {
     static Default newMultiThreadNAR(int threads, Time time, boolean sync) {
         Random rng = new XorShift128PlusRandom(1);
         Executioner exe =
-                //new SingleThreadExecutioner();
-                new MultiThreadExecutor(threads,
-                        8192 /* TODO chose a power of 2 number to scale proportionally to # of threads */,
-                        sync);
+                //new SynchronousExecutor();
+                new MultiThreadExecutor(threads, 2048, sync);
 
-        int conceptsPerCycle = 256 * threads;
+        int conceptsPerCycle = 512 * exe.concurrency();
 
         final int reprobes = 4;
 
@@ -60,21 +59,21 @@ public interface NARBuilder {
             }
         };
 
-        exe = new InstrumentedExecutor(exe, 4);
+        //exe = new InstrumentedExecutor(exe);
 
         Default nar = new Default(8 * 1024,
                 conceptsPerCycle, 1, 3, rng,
 
                 //new HijackTermIndex(cb, 1024 * 128, reprobes)
                 //new NullTermIndex(cb)
-                new CaffeineIndex(cb, /*-1*/ 128 * 1024, -1, null /* null = fork join common pool */)
+                new CaffeineIndex(cb, /*-1*/ 256 * 1024, -1, null /* null = fork join common pool */)
                 //new TreeTermIndex.L1TreeIndex(new DefaultConceptBuilder(), 300000, 32 * 1024, 3)
                 ,
                 time,
                 exe) {
 
             final Compressor compressor = new Compressor(this, "_",
-                    4, 7,
+                    3, 7,
                     1f, 16, 128);
 
             @Override

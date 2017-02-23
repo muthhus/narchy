@@ -146,7 +146,7 @@ abstract public class PremiseBuilder {
                                 //Crosslink.crossLink(task, answered, answered.conf(), nar);
 
                                 if (task.isInput())
-                                    nar.inputLater(answered);
+                                    nar.input(answered);
 
                             }
 

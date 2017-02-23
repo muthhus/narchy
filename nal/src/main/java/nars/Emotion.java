@@ -60,9 +60,6 @@ public final class Emotion implements Serializable {
 
     final ResourceMeter resourceMeter = new ResourceMeter();
 
-    final PeriodMeter derive = new PeriodMeter("derive", -1, false);
-    final PeriodMeter deriveWaste = new PeriodMeter("deriveWaste", -1, false);
-
     public Emotion() {
         super();
 
@@ -101,11 +98,6 @@ public final class Emotion implements Serializable {
         learnVol.clear();
 
         stress.clear();
-
-        //alert.clear();
-
-        derive.clear();
-        deriveWaste.clear();
 
         errrVol.clear();
 
@@ -238,9 +230,6 @@ public final class Emotion implements Serializable {
                 .append(" lern=").append(n4(learning()))
                 .append(" errr=").append(n4(erring()))
                 .append(" strs=").append(n4(stress.getSum()))
-                .append('\n')
-                .append(" ").append(derive)
-                .append(" (").append(Texts.n2(100f * deriveWaste.sum() / derive.sum())).append(" waste)")
                 //.append(" cpu=").append(resourceMeter.CYCLE_CPU_TIME)
                 .append(" mem=").append(resourceMeter.CYCLE_RAM_USED)
                 //.append(" alrt=").append(n4(alert.getSum()))
@@ -260,9 +249,6 @@ public final class Emotion implements Serializable {
     }
 
 
-    public void thought(Premise p, long timeNS, boolean serious) {
-        (serious ? derive : deriveWaste).hitNano(timeNS);
-    }
 
 /*    public void busy(@NotNull Task cause, float activation) {
         busy += cause.pri() * activation;

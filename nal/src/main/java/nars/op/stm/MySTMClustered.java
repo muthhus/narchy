@@ -243,7 +243,7 @@ public class MySTMClustered extends STMClustered {
                 });
 
         if (!toInput.isEmpty())
-            nar.inputLater(toInput);
+            nar.input(toInput);
 
     }
 

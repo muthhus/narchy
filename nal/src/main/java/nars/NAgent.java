@@ -285,8 +285,8 @@ abstract public class NAgent implements NSense, NAction {
 
 
         /** safety valve: if overloaded, enter shock / black out and do not receive sensor input */
-        float load = nar.exe.load();
-        if (load < 1) {
+//        float load = nar.exe.load();
+//        if (load < 1) {
 
             predict();
 
@@ -294,14 +294,14 @@ abstract public class NAgent implements NSense, NAction {
 
             curiosity();
 
-            nar.inputLater(
+            nar.input(
                 Streams.concat(Stream.of(happy), sensors.stream(), actions.stream()).map(f -> f.apply(nar))
             );
 
 
-        } else {
-            logger.warn("sensor overwhelm: load={}",load);
-        }
+//        } else {
+//            logger.warn("sensor overwhelm: load={}",load);
+//        }
 
 
         if (trace)
@@ -573,7 +573,7 @@ abstract public class NAgent implements NSense, NAction {
                 //action.biasDesire(t);
 
                 if (t!=null) {
-                    nar.inputLater(
+                    nar.input(
                             new MutableTask(action, GOAL, t)
                                     .time(now, now - Math.round(nar.time.dur()), now)
                                     .budgetByTruth(action.pri.asFloat())
@@ -640,7 +640,7 @@ abstract public class NAgent implements NSense, NAction {
         if (pri > 0) {
             //long frameDelta = now-prev;
             float dur = nar.time.dur();
-            nar.inputLater(
+            nar.input(
                 IntStream.range(0, predictors.size()).mapToObj(i -> {
                     MutableTask x = predictors.get(i);
                     MutableTask y = boost(x, pri, dur, lookAhead);

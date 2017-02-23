@@ -61,7 +61,7 @@ public interface RuleTest {
 	static void test(@NotNull TestNAR test, @NotNull Task task, @NotNull Task belief, @NotNull String result,
                      float minFreq, float maxFreq, float minConf, float maxConf) {
 
-		test.nar.inputLater(task, belief);
+		test.nar.input(task, belief);
 		//test.log();
 		test.mustBelieve(25, result, minFreq, maxFreq, minConf, maxConf);
 

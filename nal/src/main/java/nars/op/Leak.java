@@ -15,7 +15,7 @@ import java.util.function.Consumer;
 /**
  * interface for controlled draining of a bag
  */
-public abstract class Leak</* TODO: A, */X, V extends PLink<X>>  {
+public abstract class Leak</* TODO: A, */X, V extends PLink<X>> implements Consumer<Task> {
 
     //private static final Logger logger = LoggerFactory.getLogger(MutaTaskBag.class);
     @NotNull
@@ -30,15 +30,18 @@ public abstract class Leak</* TODO: A, */X, V extends PLink<X>>  {
     public Leak(@NotNull Bag<X,V> bag, @NotNull MutableFloat rate, @NotNull NAR n) {
         this.bag = bag;
         this.rate = rate;
-        n.onTask(task -> {
-            try {
-                in(task, bag::put);
-            } catch (Budget.BudgetException e) {
-                //was deleted before the link could be made
-            }
-        });
+        n.onTask(this);
         n.onReset((nn)->bag.clear());
         n.onCycle(this::next);
+    }
+
+    @Override
+    public void accept(Task task) {
+        try {
+            in(task, bag::put);
+        } catch (Budget.BudgetException e) {
+            //was deleted before the link could be made
+        }
     }
 
     /** transduce an input to a series of created BLink's to be inserted */
@@ -51,7 +54,7 @@ public abstract class Leak</* TODO: A, */X, V extends PLink<X>>  {
     abstract protected float onOut(@NotNull V b);
 
     /** next iteration, each frame */
-    protected final void next(@NotNull NAR nar) {
+    protected void next(@NotNull NAR nar) {
 
         bag.commit();
 
@@ -59,7 +62,7 @@ public abstract class Leak</* TODO: A, */X, V extends PLink<X>>  {
         // each fraction of an integer = some probability of a next one occurring
         for (float r = rate.floatValue();
              (r > 0) &&
-             !bag.isEmpty() &&
+             bag.size() >= minSizeForLeak() &&
              ((r >= 1) || ((r < 1f) && (nar.random.nextFloat() < r)));
              ) {
             @Nullable V t = bag.pop();
@@ -69,6 +72,11 @@ public abstract class Leak</* TODO: A, */X, V extends PLink<X>>  {
             }
         }
 
+    }
+
+    /** minimum bag size allowed before leak */
+    public int minSizeForLeak() {
+        return 1;
     }
 
 

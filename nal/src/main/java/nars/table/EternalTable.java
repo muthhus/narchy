@@ -379,7 +379,7 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, Sorted
             //                }
             //            }
             //result = insert(revised, et) ? revised : result;
-            nar.inputLater(revised);
+            nar.input(revised);
             //            nar.runLater(() -> {
             //                if (!revised.isDeleted())
             //                    nar.input(revised);

@@ -44,7 +44,7 @@ public class Arkancide extends NAgents {
 
             return agent;
 
-        }, 10, 2, -1);
+        }, 50, 5, -1);
 
 
 //        nar.forEachActiveConcept(c -> {

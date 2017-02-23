@@ -1,10 +1,13 @@
 package nars.util.exe;
 
 import com.google.common.base.Joiner;
+import com.google.common.collect.Iterables;
 import jcog.Texts;
 import jcog.meter.event.PeriodMeter;
 import nars.NAR;
 import nars.Task;
+import org.eclipse.collections.impl.collector.Collectors2;
+import org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
@@ -14,6 +17,8 @@ import java.util.function.Consumer;
 /**
  *  measures statistics of time elapsed between cycles for various procedures in the system
  *  analogous to brainwave frequencies
+ *
+ *  TODO use this correctly with MultithreadExecutor, this is currently missing most of what it does
  */
 public class InstrumentedExecutor extends Executioner {
 
@@ -23,13 +28,11 @@ public class InstrumentedExecutor extends Executioner {
 
     final Map<Class, PeriodMeter> meters = new ConcurrentHashMap<>();
 
-    private final int windowCycles;
 
     private boolean trace = true;
 
-    public InstrumentedExecutor(Executioner delegate, int windowCycles) {
+    public InstrumentedExecutor(Executioner delegate) {
         this.exe = delegate;
-        this.windowCycles = windowCycles;
         this.cycleTime = meter(NAR.class);
         this.taskInput = meter(Task.class);
     }
@@ -47,20 +50,28 @@ public class InstrumentedExecutor extends Executioner {
     }
 
     public PeriodMeter meter(Class cc) {
-        return meters.computeIfAbsent(cc, c -> new PeriodMeter(c.getName(), windowCycles));
+        return meters.computeIfAbsent(cc, c -> new PeriodMeter(c.getName(), -1));
     }
 
     @Override
     public void cycle(@NotNull NAR nar) {
+
+        exe.cycle(nar);
+
         synchronized (cycleTime) {
             cycleTime.hit();
         }
 
-        exe.cycle(nar);
-
         if (trace) {
             System.out.println(summary());
         }
+
+        meters.values().forEach(x -> {
+            synchronized (x) {
+                x.clear();
+            }
+        });
+
     }
 
     public InstrumentedExecutor setTrace(boolean trace) {
@@ -69,12 +80,10 @@ public class InstrumentedExecutor extends Executioner {
     }
 
     public String summary() {
-        return Joiner.on(' ').join(meters.values());
-//        return new StringBuilder().append(
-//            Texts.n4(
-//                this.cycleTime.mean()/1E6
-//            )).append("ms ")
-//        .toString();
+        return Joiner.on('\n').join(
+                meters.values().stream().map(x -> PrimitiveTuples.pair(x.sum(), x.toStringMicro())).collect(
+                        Collectors2.toSortedListBy( x -> -x.getOne() )).stream().map(x -> x.getTwo()).iterator() );
+
     }
 
     @Override
