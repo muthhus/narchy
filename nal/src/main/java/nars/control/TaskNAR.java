@@ -11,7 +11,6 @@ import nars.attention.Activation;
 import nars.attention.Forget;
 import nars.bag.impl.BLinkHijackBag;
 import nars.budget.BLink;
-import nars.budget.Budget;
 import nars.budget.BudgetMerge;
 import nars.budget.DependentBLink;
 import nars.concept.CompoundConcept;
@@ -35,7 +34,7 @@ import nars.time.FrameTime;
 import nars.time.Time;
 import nars.truth.TruthDelta;
 import nars.util.exe.Executioner;
-import nars.util.exe.MultiThreadExecutioner;
+import nars.util.exe.MultiThreadExecutor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -93,7 +92,7 @@ public class TaskNAR extends NAR {
 
 
     public TaskNAR(int capacity) {
-        this(capacity, new MultiThreadExecutioner(2, 4096), new FrameTime());
+        this(capacity, new MultiThreadExecutor(2, 4096), new FrameTime());
     }
 
     public TaskNAR(int capacity, Executioner exe, Time time) {

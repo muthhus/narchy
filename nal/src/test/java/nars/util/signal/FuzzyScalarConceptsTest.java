@@ -7,7 +7,6 @@ import jcog.math.FloatPolarNormalized;
 import nars.$;
 import nars.NAR;
 import nars.concept.FuzzyScalarConcepts;
-import nars.concept.SensorConcept;
 import nars.nar.Default;
 import nars.nar.Terminal;
 import org.apache.commons.lang3.mutable.MutableFloat;

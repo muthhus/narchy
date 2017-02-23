@@ -6,7 +6,6 @@ import nars.concept.Concept;
 import nars.term.Termed;
 import org.eclipse.collections.impl.map.mutable.primitive.ObjectFloatHashMap;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 /**
  * Created by me on 12/18/16.

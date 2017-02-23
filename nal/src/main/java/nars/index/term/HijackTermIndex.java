@@ -7,18 +7,14 @@ import jcog.data.random.XorShift128PlusRandom;
 import nars.NAR;
 import nars.Param;
 import nars.bag.impl.PLinkHijackBag;
-import nars.concept.Concept;
 import nars.concept.PermanentConcept;
 import nars.conceptualize.ConceptBuilder;
 import nars.index.term.map.MaplikeTermIndex;
 import nars.term.Term;
 import nars.term.Termed;
-import org.eclipse.collections.impl.map.mutable.ConcurrentHashMapUnsafe;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReferenceArray;
 import java.util.function.Consumer;
 

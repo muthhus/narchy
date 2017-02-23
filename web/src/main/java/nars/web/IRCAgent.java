@@ -14,7 +14,7 @@ import nars.op.mental.Abbreviation;
 import nars.op.mental.Inperience;
 import nars.op.stm.MySTMClustered;
 import nars.time.RealTime;
-import nars.util.exe.MultiThreadExecutioner;
+import nars.util.exe.MultiThreadExecutor;
 import org.jetbrains.annotations.NotNull;
 import org.pircbotx.hooks.events.MessageEvent;
 import org.pircbotx.hooks.events.PrivateMessageEvent;
@@ -23,7 +23,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spacegraph.net.IRC;
 
-import java.io.FileNotFoundException;
 import java.util.Random;
 import java.util.function.Consumer;
 
@@ -247,7 +246,7 @@ public class IRCAgent extends IRC {
 
         Random random = new XorShift128PlusRandom(System.currentTimeMillis());
 
-        MultiThreadExecutioner exe = new MultiThreadExecutioner(2, 1024 * 16);
+        MultiThreadExecutor exe = new MultiThreadExecutor(2, 1024 * 16);
         exe.sync(true);
 
         Default nar = new Default(activeConcepts, conceptsPerFrame, 1, 3, random,

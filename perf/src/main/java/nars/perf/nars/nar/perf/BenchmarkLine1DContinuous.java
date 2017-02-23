@@ -1,13 +1,13 @@
 package nars.perf.nars.nar.perf;
 
 import jcog.data.random.XorShift128PlusRandom;
-import nars.NAR;
 import nars.conceptualize.DefaultConceptBuilder;
 import nars.experiment.misc.Line1DContinuous;
 import nars.index.term.map.CaffeineIndex;
 import nars.nar.Default;
 import nars.time.FrameTime;
 import nars.util.exe.Executioner;
+import nars.util.exe.InstrumentedExecutor;
 import nars.util.exe.SynchronousExecutor;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
@@ -23,28 +23,28 @@ import static nars.perf.Main.perf;
 public class BenchmarkLine1DContinuous {
 
     public static void main(String[] args) throws RunnerException {
-        perf(BenchmarkLine1DContinuous.class, 4, 1);
+        perf(BenchmarkLine1DContinuous.class, 2, 1);
     }
 
     @Benchmark
     @BenchmarkMode(value = Mode.AverageTime)
     public void line1d() {
 
-        int time = 5000;
+        int time = 100;
 
         XorShift128PlusRandom rng = new XorShift128PlusRandom((int)(Math.random()*1000));
-        int conceptsPerCycle = 32;
+        int conceptsPerCycle = 16;
 
         final Executioner exe =
-                //new MultiThreadExecutioner(2, 2048);
+                //new MultiThreadExecutioner(3, 2048, true);
                 new SynchronousExecutor();
 
         Default nar = new Default(1024,
                 conceptsPerCycle, 1, 3, rng,
-                new CaffeineIndex(new DefaultConceptBuilder(), 1024*64, false, exe),
-                new FrameTime(1f), exe
+                new CaffeineIndex(new DefaultConceptBuilder(), 1024*64, false, null),
+                new FrameTime(1f), new InstrumentedExecutor( exe, 4 )
         );
-        nar.termVolumeMax.set(32);
+        nar.termVolumeMax.set(46);
 
 
         nar.beliefConfidence(0.9f);
@@ -53,7 +53,7 @@ public class BenchmarkLine1DContinuous {
         //nar.truthResolution.setValue(0.02f);
 
 
-        Line1DContinuous l = new Line1DContinuous(nar, 6,
+        Line1DContinuous l = new Line1DContinuous(nar, 12,
                 //sine(50)
                 random(16)
         );
@@ -80,6 +80,7 @@ public class BenchmarkLine1DContinuous {
 //        });
         System.out.println("AVG SCORE=" + l.rewardSum()/ nar.time());
 
+        nar.stop();
 
     }
 }

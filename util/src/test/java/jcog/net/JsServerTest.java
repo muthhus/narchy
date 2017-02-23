@@ -6,11 +6,9 @@ import org.eclipse.collections.impl.factory.Maps;
 import org.junit.Test;
 
 import java.net.InetSocketAddress;
-import java.net.SocketAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.Arrays;
-import java.util.Map;
 
 import static junit.framework.TestCase.assertTrue;
 

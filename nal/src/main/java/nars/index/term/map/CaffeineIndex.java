@@ -9,11 +9,9 @@ import nars.IO;
 import nars.NAR;
 import nars.Param;
 import nars.conceptualize.ConceptBuilder;
-import nars.derive.meta.match.EllipsisTransform;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.container.TermContainer;
-import nars.term.container.TermVector2;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

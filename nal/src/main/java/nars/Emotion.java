@@ -12,7 +12,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.Serializable;
 
-import static jcog.Texts.n2;
 import static jcog.Texts.n4;
 
 /**
@@ -20,7 +19,6 @@ import static jcog.Texts.n4;
  */
 public final class Emotion implements Serializable {
 
-    final static int windowCycles = 2;
 
     /** priority rate of Task processing attempted */
     @NotNull
@@ -59,14 +57,11 @@ public final class Emotion implements Serializable {
 //    @NotNull
 //    public final FloatGuage alert;
 
-    /** statistic of time elapsed between cycles.
-     *  analogous to main brainwave frequency  */
-    final PeriodMeter cycleTime = new PeriodMeter("cycleTime", true, windowCycles, false);
 
     final ResourceMeter resourceMeter = new ResourceMeter();
 
-    final PeriodMeter derive = new PeriodMeter("derive", true, -1, false);
-    final PeriodMeter deriveWaste = new PeriodMeter("deriveWaste", true, -1, false);
+    final PeriodMeter derive = new PeriodMeter("derive", -1, false);
+    final PeriodMeter deriveWaste = new PeriodMeter("deriveWaste", -1, false);
 
     public Emotion() {
         super();
@@ -96,8 +91,6 @@ public final class Emotion implements Serializable {
     /** new frame started */
     public void cycle() {
 
-        cycleTime.hit();
-
         happy.clear();
         sad.clear();
 
@@ -121,14 +114,14 @@ public final class Emotion implements Serializable {
 
     /** percentage of business which was not frustration */
     public float learning() {
-        float v = busyVol.getSum();
+        double v = busyVol.getSum();
         if (v > 0)
-            return learnVol.getSum() / v;
+            return (float) (learnVol.getSum() / v);
         return 0;
     }
 
     public float erring() {
-        return errrVol.getSum() / busyVol.getSum();
+        return (float) (errrVol.getSum() / busyVol.getSum());
     }
 
 
@@ -141,10 +134,10 @@ public final class Emotion implements Serializable {
 //    }
 
     public float happy() {
-        return happy.getSum();
+        return (float) happy.getSum();
     }
     public float sad() {
-        return sad.getSum();
+        return (float) sad.getSum();
     }
 
 //    public void print(@NotNull OutputStream output) {
@@ -239,10 +232,7 @@ public final class Emotion implements Serializable {
     public String summary() {
         //long now = nar.time();
 
-        return new StringBuilder().append(
-                Texts.n4(
-                    this.cycleTime.mean()/1E6
-                )).append("ms ")
+        return new StringBuilder()
                 .append(" hapy=").append(n4(happy() - sad()))
                 .append(" busy=").append(n4(busyVol.getSum()))
                 .append(" lern=").append(n4(learning()))
@@ -271,7 +261,7 @@ public final class Emotion implements Serializable {
 
 
     public void thought(Premise p, long timeNS, boolean serious) {
-        (serious ? derive : deriveWaste).hit(timeNS/1.0E9);
+        (serious ? derive : deriveWaste).hitNano(timeNS);
     }
 
 /*    public void busy(@NotNull Task cause, float activation) {

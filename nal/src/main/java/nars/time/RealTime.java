@@ -117,6 +117,25 @@ public abstract class RealTime implements Time {
 
     }
 
+    /** half-decisecond (50ms ~ 20hz) accuracy */
+    public static class DSHalf extends RealTime {
+
+
+        public DSHalf() {
+            this(false);
+        }
+
+        public DSHalf(boolean relativeToStart) {
+            super(50, relativeToStart);
+        }
+
+        @Override
+        protected long getRealTime() {
+            return System.currentTimeMillis() / 20;
+        }
+
+    }
+
     /** centisecond (0.01) accuracy */
     public static class CS extends RealTime {
 

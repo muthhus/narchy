@@ -25,8 +25,10 @@ import spacegraph.space.widget.FloatSlider;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.lang.reflect.Field;
-import java.util.*;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -100,7 +102,7 @@ abstract public class NAgents extends NAgent {
 
     public static NAR runRT(Function<NAR, NAgents> init, float fps, int durFrames, int endTime) {
 
-        Time clock = new RealTime.CS(true).dur(durFrames / fps);
+        Time clock = new RealTime.DSHalf(true).dur(durFrames / fps);
         NAR nar =
                 //new TaskNAR(32 * 1024, new MultiThreadExecutioner(4, 4 * 1024), clock);
                 NARBuilder.newMultiThreadNAR(3, clock, false);

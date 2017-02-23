@@ -3,7 +3,6 @@ package jcog.learn.lstm;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.Random;
 
 import static org.apache.commons.math3.util.MathArrays.scaleInPlace;

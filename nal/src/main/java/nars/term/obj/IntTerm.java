@@ -1,8 +1,6 @@
 package nars.term.obj;
 
 import nars.Op;
-import nars.term.Term;
-import nars.term.subst.Unify;
 import org.jetbrains.annotations.NotNull;
 
 import static nars.Op.INT;

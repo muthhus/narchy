@@ -1,5 +1,6 @@
 package jcog.math;
 
+import org.apache.commons.math3.stat.descriptive.StatisticalSummary;
 import org.eclipse.collections.api.block.procedure.primitive.FloatProcedure;
 
 import java.io.Serializable;
@@ -12,24 +13,24 @@ import java.io.Serializable;
  * Commons Math SummaryStatistics which also is undesirable
  *
  */
-public class FloatSummaryReusableStatistics implements FloatProcedure, Serializable {
+public class RecycledSummaryStatistics implements FloatProcedure, Serializable, StatisticalSummary {
     protected long count;
 
 
 
-    protected float sSum;
+    protected double sSum;
     //private float sumCompensation; // Low order bits of sum
 //    private float simpleSum; // Used to compute right sum for non-finite inputs
-    protected float min;
-    protected float max;
-    protected float mean;
+    protected double min;
+    protected double max;
+    protected double mean;
 
     /**
      * Construct an empty instance with zero count, zero sum,
      * {@code float.POSITIVE_INFINITY} min, {@code float.NEGATIVE_INFINITY}
      * max and zero average.
      */
-    public FloatSummaryReusableStatistics() {
+    public RecycledSummaryStatistics() {
         clear();
     }
 
@@ -49,15 +50,17 @@ public class FloatSummaryReusableStatistics implements FloatProcedure, Serializa
      * Records another value into the summary information.
      *
      * @param value the input value
+     *
+     * NOT THREAD SAFE
      */
-    public final void accept(float value) {
+    public final void accept(double value) {
 
         //http://stackoverflow.com/a/36590815
         //"waldorf method"
-        float tmpMean = mean;
+        double tmpMean = mean;
         if (tmpMean!=tmpMean)
             mean = tmpMean = 0;
-        float delta = value - tmpMean;
+        double delta = value - tmpMean;
         mean += delta / ++count;
         sSum += delta * (value - mean);
 
@@ -76,15 +79,6 @@ public class FloatSummaryReusableStatistics implements FloatProcedure, Serializa
 //        sumCompensation = (velvel - sum) - tmp;
 //        sum = velvel;
 //    }
-
-    /**
-     * Return the count of values recorded.
-     *
-     * @return the count of values
-     */
-    public final long getCount() {
-        return count;
-    }
 
     /**
      * Returns the sum of values recorded, or zero if no values have been
@@ -109,8 +103,8 @@ public class FloatSummaryReusableStatistics implements FloatProcedure, Serializa
      *
      * @return the sum of values, or zero if none
      */
-    public final float getSum() {
-        return getAverage() * count;
+    public final double getSum() {
+        return (float) getMean() * count;
 
 //        // Better error bounds to add both terms as the final sum
 //        float tmp =  sum + sumCompensation;
@@ -134,8 +128,13 @@ public class FloatSummaryReusableStatistics implements FloatProcedure, Serializa
      * value was NaN or {@code float.POSITIVE_INFINITY} if no values were
      * recorded
      */
-    public final float getMin() {
+    public final double getMin() {
         return min;
+    }
+
+    @Override
+    public long getN() {
+        return count;
     }
 
     /**
@@ -148,31 +147,8 @@ public class FloatSummaryReusableStatistics implements FloatProcedure, Serializa
      * value was NaN or {@code float.NEGATIVE_INFINITY} if no values were
      * recorded
      */
-    public final float getMax() {
+    public final double getMax() {
         return max;
-    }
-
-    /**
-     * Returns the arithmetic mean of values recorded, or zero if no
-     * values have been recorded.
-     *
-     * If any recorded value is a NaN or the sum is at any point a NaN
-     * then the average will be code NaN.
-     *
-     * <p>The average returned can vary depending upon the order in
-     * which values are recorded.
-     *
-     * This method may be implemented using compensated summation or
-     * other technique to reduce the error bound in the {@link #getSum
-     * numerical sum} used to compute the average.
-     *
-     * @apiNote Values sorted by increasing absolute magnitude tend to yield
-     * more accurate results.
-     *
-     * @return the arithmetic mean of values, or zero if none
-     */
-    public final float getAverage() {
-        return mean;
     }
 
     /**
@@ -187,17 +163,17 @@ public class FloatSummaryReusableStatistics implements FloatProcedure, Serializa
         return String.format(
                 "%s{n=%d, sum=%f, min=%f, avg=%f, max=%f}",
                 getClass().getSimpleName(),
-                getCount(),
+                getN(),
                 getSum(),
                 getMin(),
-                getAverage(),
+                (float) getMean(),
                 getMax());
     }
 
-    public final float normalize(float n) {
-        float min = getMin();
-        float max = getMax();
-        float range = max - min;
+    public final double normalize(float n) {
+        double min = getMin();
+        double max = getMax();
+        double range = max - min;
         if (range < Float.MIN_VALUE*64f /* estimate of an FP epsilon */)
             return 0.5f;
         else
@@ -212,15 +188,20 @@ public class FloatSummaryReusableStatistics implements FloatProcedure, Serializa
      * The Standard Deviation is a measure of how spread out numbers are.
      * @return the standard deviation
      */
-    public float getStandardDeviation() {
-        float v = getVariance();
+    public double getStandardDeviation() {
+        double v = getVariance();
         if (v==v)
             return (float) Math.sqrt(v);
         else
             return Float.NaN;
     }
 
-    public float getVariance() {
+    @Override
+    public double getMean() {
+        return mean;
+    }
+
+    public double getVariance() {
         long c = count;
         if (c == 0) return Float.NaN;
         return sSum / (c);

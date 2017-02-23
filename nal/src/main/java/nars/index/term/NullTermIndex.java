@@ -2,14 +2,12 @@ package nars.index.term;
 
 import nars.conceptualize.ConceptBuilder;
 import nars.index.term.map.MapTermIndex;
-import nars.index.term.map.MaplikeTermIndex;
 import nars.term.Term;
 import nars.term.Termed;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Consumer;
 
 /**
  * acts as a pass-through. only holds permanent concepts and explicit set values

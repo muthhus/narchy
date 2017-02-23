@@ -27,7 +27,7 @@ public enum Main {
 
 				 //.include(//c.getName())
 				//.include(".*" + c.getSimpleName() + ".*")
-				.warmupIterations(1)
+				.warmupIterations(0)
 				.measurementIterations(iterations)
 				.measurementBatchSize(batchSize)
 				.threads(1)

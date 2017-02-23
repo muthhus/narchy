@@ -12,15 +12,14 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 /**
  * Created by me on 8/16/16.
  */
-public class MultiThreadExecutioner extends Executioner {
+public class MultiThreadExecutor extends Executioner {
 
-    private static final Logger logger = LoggerFactory.getLogger(MultiThreadExecutioner.class);
+    private static final Logger logger = LoggerFactory.getLogger(MultiThreadExecutor.class);
 
     /** actual load value to report as 100% load */
     public final long safetyLimit;
@@ -36,11 +35,6 @@ public class MultiThreadExecutioner extends Executioner {
     private SequenceBarrier barrier;
     private long cursor;
     private boolean sync = true;
-
-    public MultiThreadExecutioner sync(boolean b) {
-        this.sync = b;
-        return this;
-    }
 
 
     enum EventType {
@@ -81,15 +75,22 @@ public class MultiThreadExecutioner extends Executioner {
 //    }
 //
 
-    public MultiThreadExecutioner(int threads, int ringSize) {
+    public MultiThreadExecutor(int threads, int ringSize, boolean sync) {
+        this(threads, ringSize);
+        sync(sync);
+    }
+
+    public MultiThreadExecutor(int threads, int ringSize) {
 
         this.threads = threads;
 
         this.exe = new AffinityExecutor("exe");
 
         this.cap = ringSize;
+
+        float safetyThreshold = 0.1f;
         this.safetyLimit =
-                (int)((1f/threads) * ringSize)/2;
+                (int)(Math.ceil(ringSize * safetyThreshold));
                 //1;
 
         this.disruptor = new Disruptor<>(
@@ -97,7 +98,9 @@ public class MultiThreadExecutioner extends Executioner {
                 ringSize /* ringbuffer size */,
                 exe,
                 ProducerType.MULTI,
-                new PhasedBackoffWaitStrategy(1,1, TimeUnit.MILLISECONDS, new LiteBlockingWaitStrategy())
+                new BusySpinWaitStrategy()
+                /*new PhasedBackoffWaitStrategy(250,500, TimeUnit.MICROSECONDS,
+                        new LiteBlockingWaitStrategy())*/
                 //new LiteBlockingWaitStrategy()
                 //new SleepingWaitStrategy()
                 //new BlockingWaitStrategy()
@@ -110,10 +113,11 @@ public class MultiThreadExecutioner extends Executioner {
 
     }
 
-    @Override
-    public boolean sync() {
-        return sync;
+    public MultiThreadExecutor sync(boolean b) {
+        this.sync = b;
+        return this;
     }
+
 
     @Override
     public synchronized void stop() {
@@ -170,7 +174,7 @@ public class MultiThreadExecutioner extends Executioner {
                 if (c == null)
                     break; //null terminator hit
 
-                run(c);
+                nar.exe.run(c); //use nar.exe because this executor may be wrapped in something else that we want this to pass through, ie. instrumentor
             }
         }
 

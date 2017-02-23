@@ -50,7 +50,6 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 import static nars.Op.*;
-import static nars.index.TermBuilder.isTrueOrFalse;
 import static nars.time.Tense.DTERNAL;
 
 /**

@@ -4,9 +4,9 @@ import com.google.common.collect.Iterables;
 import jcog.bag.PLink;
 import nars.NAR;
 import nars.bag.Bagregate;
+import nars.budget.BLink;
 import nars.budget.RawBLink;
 import nars.concept.Concept;
-import nars.budget.BLink;
 import nars.term.Term;
 
 import java.util.Collection;

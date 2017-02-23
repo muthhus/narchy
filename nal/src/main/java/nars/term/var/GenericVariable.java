@@ -2,9 +2,7 @@ package nars.term.var;
 
 import nars.$;
 import nars.Op;
-import nars.term.Term;
 import nars.term.atom.AtomicString;
-import nars.term.subst.Unify;
 import org.jetbrains.annotations.NotNull;
 
 /**

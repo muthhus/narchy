@@ -10,7 +10,6 @@ import nars.term.atom.AtomicSingleton;
 import nars.term.compound.GenericCompound;
 import nars.term.container.TermContainer;
 import nars.term.container.TermVector;
-import nars.term.container.TermVector1;
 import nars.term.util.InvalidTermException;
 import nars.term.var.Variable;
 import org.apache.commons.lang3.ArrayUtils;

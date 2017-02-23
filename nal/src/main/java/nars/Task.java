@@ -2,7 +2,6 @@ package nars;
 
 import jcog.Texts;
 import jcog.map.SynchronizedHashMap;
-import nars.attention.Activation;
 import nars.bag.impl.ArrayBag;
 import nars.budget.BLink;
 import nars.budget.BudgetMerge;

@@ -7,7 +7,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Iterator;
-import java.util.Random;
 import java.util.function.Consumer;
 
 import static nars.op.DepIndepVarIntroduction.ConjOrStatementBits;

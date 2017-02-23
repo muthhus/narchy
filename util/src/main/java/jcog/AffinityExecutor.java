@@ -2,12 +2,16 @@ package jcog;
 
 import net.openhft.affinity.AffinityLock;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadInfo;
 import java.lang.management.ThreadMXBean;
 import java.util.Collection;
 import java.util.concurrent.ConcurrentLinkedDeque;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.Executor;
 
 /**
@@ -15,14 +19,17 @@ import java.util.concurrent.Executor;
  */
 public class AffinityExecutor implements Executor {
 
-    public final Collection<Thread> threads = new ConcurrentLinkedDeque();
+    private static final Logger logger = LoggerFactory.getLogger(AffinityExecutor.class);
+
+    public final Collection<Thread> threads = new CopyOnWriteArraySet<>();
     public final String id;
 
     public AffinityExecutor(String id) {
         this.id = id;
     }
 
-    static final class AffinityThread extends Thread {
+
+    final class AffinityThread extends Thread {
 
         Runnable cmd;
         public AffinityThread(@NotNull String name, Runnable cmd) {
@@ -32,9 +39,15 @@ public class AffinityExecutor implements Executor {
 
         @Override
         public void run() {
-            try (AffinityLock al = AffinityLock.acquireLock()) {
+
+            threads.add( this );
+
+            try (AffinityLock lock = AffinityLock.acquireLock()) {
                 cmd.run(); //avoid virtual call to super etc
             }
+
+            threads.remove(this);
+
         }
     }
 
@@ -44,10 +57,6 @@ public class AffinityExecutor implements Executor {
     public final void execute(Runnable command) {
 
         final Thread thread = new AffinityThread(id + ":" + threads.size(), command);
-
-
-        threads.add(thread);
-
 
         thread.start();
 

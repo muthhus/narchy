@@ -6,7 +6,6 @@ import nars.Param;
 import nars.Task;
 import nars.budget.BLink;
 import nars.budget.Budgeted;
-import nars.budget.DependentBLink;
 import nars.budget.RawBLink;
 import nars.concept.Concept;
 import nars.term.Compound;

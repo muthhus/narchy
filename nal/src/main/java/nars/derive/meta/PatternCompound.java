@@ -8,7 +8,6 @@ import nars.derive.meta.match.EllipsisTransform;
 import nars.derive.meta.match.ImageMatch;
 import nars.term.Compound;
 import nars.term.Term;
-import nars.term.Terms;
 import nars.term.compound.GenericCompound;
 import nars.term.container.TermContainer;
 import nars.term.mutate.Choose1;

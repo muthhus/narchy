@@ -2,7 +2,6 @@ package nars.concept;
 
 import jcog.math.FloatSupplier;
 import nars.NAR;
-import nars.Param;
 import nars.term.Compound;
 import org.jetbrains.annotations.NotNull;
 

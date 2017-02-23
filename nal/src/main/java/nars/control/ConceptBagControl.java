@@ -8,9 +8,6 @@ import jcog.data.FloatParam;
 import jcog.data.MutableIntRange;
 import jcog.data.MutableInteger;
 import jcog.data.Range;
-import jcog.math.DoubleSummaryReusableStatistics;
-import jcog.meter.event.HitMeter;
-import jcog.meter.event.PeriodMeter;
 import nars.*;
 import nars.bag.impl.TaskHijackBag;
 import nars.budget.BudgetMerge;
@@ -22,10 +19,7 @@ import nars.term.Termed;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.atomic.AtomicReferenceArray;
 import java.util.function.Consumer;
 

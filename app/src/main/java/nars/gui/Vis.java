@@ -2,11 +2,11 @@ package nars.gui;
 
 import com.google.common.collect.Lists;
 import com.jogamp.opengl.GL2;
+import jcog.bag.Bag;
 import jcog.bag.PLink;
 import nars.$;
 import nars.NAR;
 import nars.NAgent;
-import jcog.bag.Bag;
 import nars.concept.Concept;
 import nars.nar.Default;
 import nars.remote.NAgents;

@@ -49,10 +49,7 @@ abstract public class Executioner implements Executor {
         return concurrency() > 1;
     }
 
-    /** whether the execution model is synchronous or asynch */
-    public boolean sync() {
-        return false;
-    }
+
 
     /** default impl: */
     public void run(@NotNull Consumer<NAR> r) {

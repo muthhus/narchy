@@ -1,10 +1,8 @@
 package nars.nar;
 
-import jcog.Texts;
 import jcog.bag.Bag;
 import jcog.data.random.XorShift128PlusRandom;
 import jcog.learn.lstm.SimpleLSTM;
-import jcog.learn.lstm.test.LiveSTM;
 import nars.NAR;
 import nars.Param;
 import nars.Task;
@@ -12,7 +10,6 @@ import nars.bag.impl.BLinkHijackBag;
 import nars.budget.BLink;
 import nars.budget.BudgetMerge;
 import nars.conceptualize.DefaultConceptBuilder;
-import nars.index.term.HijackTermIndex;
 import nars.index.term.TermIndex;
 import nars.index.term.map.CaffeineIndex;
 import nars.op.mental.Compressor;
@@ -21,7 +18,8 @@ import nars.op.stm.MySTMClustered;
 import nars.term.Term;
 import nars.time.Time;
 import nars.util.exe.Executioner;
-import nars.util.exe.MultiThreadExecutioner;
+import nars.util.exe.InstrumentedExecutor;
+import nars.util.exe.MultiThreadExecutor;
 import org.apache.commons.math3.util.MathArrays;
 import org.jetbrains.annotations.NotNull;
 
@@ -36,19 +34,17 @@ import static jcog.Texts.n4;
  */
 public interface NARBuilder {
 
-    static Default newMultiThreadNAR(int cores, Time time, boolean sync) {
-        Default d = newMultiThreadNAR(cores, time);
-        ((MultiThreadExecutioner) d.exe).sync(sync);
-        return d;
+    static Default newMultiThreadNAR(int cores, Time time) {
+        return newMultiThreadNAR(cores, time, false);
     }
 
-    static Default newMultiThreadNAR(int threads, Time time) {
+    static Default newMultiThreadNAR(int threads, Time time, boolean sync) {
         Random rng = new XorShift128PlusRandom(1);
-        final Executioner exe =
+        Executioner exe =
                 //new SingleThreadExecutioner();
-                new MultiThreadExecutioner(threads, 8192 /* TODO chose a power of 2 number to scale proportionally to # of threads */)
-                //.sync(false)
-                ;
+                new MultiThreadExecutor(threads,
+                        8192 /* TODO chose a power of 2 number to scale proportionally to # of threads */,
+                        sync);
 
         int conceptsPerCycle = 256 * threads;
 
@@ -63,6 +59,8 @@ public interface NARBuilder {
                 return f.apply(termlink, tasklink);
             }
         };
+
+        exe = new InstrumentedExecutor(exe, 4);
 
         Default nar = new Default(8 * 1024,
                 conceptsPerCycle, 1, 3, rng,
@@ -330,9 +328,9 @@ public interface NARBuilder {
         public void run() {
             double[] current = new double[outputs];
             current[0] = nar.emotion.learning();
-            current[1] = nar.emotion.busyVol.getAverage()/ Param.COMPOUND_VOLUME_MAX;
-            current[2] = nar.emotion.busyPri.getAverage();
-            current[3] = nar.emotion.confident.getAverage();
+            current[1] = (float) nar.emotion.busyVol.getMean() / Param.COMPOUND_VOLUME_MAX;
+            current[2] = (float) nar.emotion.busyPri.getMean();
+            current[3] = (float) nar.emotion.confident.getMean();
 
             double error = MathArrays.distance1(predict, current);
 

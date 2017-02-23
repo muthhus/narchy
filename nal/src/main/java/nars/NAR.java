@@ -39,7 +39,6 @@ import nars.util.Cycles;
 import nars.util.exe.Executioner;
 import nars.util.task.InvalidTaskException;
 import org.apache.commons.math3.stat.Frequency;
-import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.api.tuple.Twin;
 import org.eclipse.collections.impl.collector.Collectors2;
 import org.eclipse.collections.impl.map.mutable.primitive.ObjectFloatHashMap;
@@ -58,7 +57,6 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
 import static nars.$.$;
 import static nars.$.*;

@@ -3,7 +3,6 @@ package jcog.learn.lstm;
 
 import jcog.Util;
 
-import java.util.List;
 import java.util.Random;
 import java.util.function.Consumer;
 

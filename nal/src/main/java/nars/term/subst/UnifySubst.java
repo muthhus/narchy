@@ -10,7 +10,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Map;
-import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 /** not thread safe, use 1 per thread (do not interrupt matchAll) */

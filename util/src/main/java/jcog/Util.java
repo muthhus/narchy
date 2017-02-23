@@ -31,7 +31,6 @@ import org.eclipse.collections.impl.list.mutable.primitive.IntArrayList;
 import org.eclipse.collections.impl.tuple.Tuples;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
-import sun.misc.Unsafe;
 
 import java.io.*;
 import java.lang.invoke.MethodHandle;

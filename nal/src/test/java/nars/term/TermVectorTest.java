@@ -3,7 +3,6 @@ package nars.term;
 import nars.$;
 import nars.Narsese;
 import nars.term.container.TermContainer;
-import nars.term.container.TermSet;
 import nars.term.container.TermVector;
 import org.junit.Test;
 

@@ -20,7 +20,6 @@ import org.jetbrains.annotations.Nullable;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.io.StringWriter;
 import java.util.TreeSet;
 
 import static com.google.common.collect.Iterables.size;

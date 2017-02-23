@@ -14,7 +14,7 @@ import java.util.function.Predicate;
 public class MultiStatistics<X> implements FloatObjectProcedure<X> {
 
 
-    public static class Condition<X> extends DoubleSummaryReusableStatistics {
+    public static class Condition<X> extends RecycledSummaryStatistics {
         public final Predicate<X> filter;
         public final String id;
         public final HashBag<X> uniques;
@@ -28,7 +28,7 @@ public class MultiStatistics<X> implements FloatObjectProcedure<X> {
 
         @Override
         public String toString() {
-            return id + ": #" + getCount() +":" + getMin() + ".." + getMax() + ", avg=" + getAverage() + ", sum=" + getSum() + ":" + uniques;
+            return id + ": #" + getN() +":" + getMin() + ".." + getMax() + ", avg=" + getMean() + ", sum=" + getSum() + ":" + uniques;
         }
 
         public void accept(X parameter, float v) {

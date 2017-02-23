@@ -1,14 +1,14 @@
 package nars;
 
 import jcog.Util;
-import jcog.data.random.XorShift128PlusRandom;
 import jcog.bag.Bag;
+import jcog.data.random.XorShift128PlusRandom;
 import nars.bag.impl.BLinkHijackBag;
+import nars.budget.BLink;
 import nars.budget.BudgetMerge;
+import nars.budget.RawBLink;
 import nars.gui.HistogramChart;
 import nars.gui.Vis;
-import nars.budget.BLink;
-import nars.budget.RawBLink;
 import spacegraph.SpaceGraph;
 import spacegraph.Surface;
 import spacegraph.math.Color3f;

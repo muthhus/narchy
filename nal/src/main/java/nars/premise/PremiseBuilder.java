@@ -1,12 +1,16 @@
 package nars.premise;
 
 import jcog.Util;
-import nars.*;
-import nars.attention.Crosslink;
-import nars.budget.*;
+import nars.$;
+import nars.NAR;
+import nars.Op;
+import nars.Task;
+import nars.budget.BLink;
+import nars.budget.Budget;
+import nars.budget.BudgetFunctions;
+import nars.budget.BudgetMerge;
 import nars.concept.Concept;
 import nars.table.BeliefTable;
-import nars.task.AnswerTask;
 import nars.task.DerivedTask;
 import nars.term.Compound;
 import nars.term.Term;

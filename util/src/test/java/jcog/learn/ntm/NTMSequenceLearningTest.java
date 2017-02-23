@@ -5,7 +5,7 @@ import jcog.learn.ntm.run.SequenceLearner;
 import jcog.learn.ntm.run.TrainingSequence;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Created by me on 2/17/17.

@@ -28,7 +28,6 @@ import java.util.function.ToIntFunction;
 
 import static nars.Op.*;
 import static nars.time.Tense.DTERNAL;
-import static nars.time.Tense.XTERNAL;
 
 /**
  * Static utility class for static methods related to Terms

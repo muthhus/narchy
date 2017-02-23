@@ -3,9 +3,7 @@ package nars.web;
 
 import com.google.common.base.Joiner;
 import jcog.Util;
-import jcog.bag.PLink;
 import jcog.data.random.XorShift128PlusRandom;
-import jcog.io.Twokenize;
 import nars.*;
 import nars.bag.impl.ArrayBag;
 import nars.budget.BudgetMerge;
@@ -14,16 +12,13 @@ import nars.conceptualize.DefaultConceptBuilder;
 import nars.index.term.map.CaffeineIndex;
 import nars.budget.BLink;
 import nars.nar.Default;
-import nars.nlp.Twenglish;
 import nars.op.Command;
-import nars.op.Leak;
-import nars.op.mental.Abbreviation;
 import nars.op.mental.Inperience;
 import nars.op.stm.MySTMClustered;
 import nars.term.Compound;
 import nars.time.RealTime;
 import nars.time.Tense;
-import nars.util.exe.MultiThreadExecutioner;
+import nars.util.exe.MultiThreadExecutor;
 import org.jetbrains.annotations.NotNull;
 import org.pircbotx.hooks.events.MessageEvent;
 import org.pircbotx.hooks.events.PrivateMessageEvent;
@@ -32,15 +27,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spacegraph.net.IRC;
 
-import java.io.FileNotFoundException;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Consumer;
 import java.util.stream.Stream;
-
-import static nars.Op.ATOM;
 
 /**
  * $0.9;0.9;0.99$
@@ -268,7 +258,7 @@ public class IRCNLP extends IRC {
 
         Random random = new XorShift128PlusRandom(System.currentTimeMillis());
 
-        MultiThreadExecutioner exe = new MultiThreadExecutioner(3, 1024 * 8);
+        MultiThreadExecutor exe = new MultiThreadExecutor(3, 1024 * 8);
         exe.sync(true);
 
         Default nar = new Default(activeConcepts, conceptsPerFrame, 1, 3, random,

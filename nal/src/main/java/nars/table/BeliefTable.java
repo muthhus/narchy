@@ -5,8 +5,6 @@ import nars.NAR;
 import nars.Task;
 import nars.budget.Budget;
 import nars.concept.CompoundConcept;
-import nars.concept.dynamic.DynamicBeliefTable;
-import nars.concept.dynamic.DynamicBeliefTask;
 import nars.task.AnswerTask;
 import nars.term.Compound;
 import nars.truth.Truth;

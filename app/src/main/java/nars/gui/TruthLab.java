@@ -7,7 +7,6 @@ import nars.concept.Concept;
 import nars.nar.Default;
 import nars.table.BeliefTable;
 import nars.term.Compound;
-import nars.term.Terms;
 import nars.truth.Truth;
 import org.eclipse.collections.api.block.function.primitive.IntToObjectFunction;
 import spacegraph.SpaceGraph;
