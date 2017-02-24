@@ -178,7 +178,7 @@
         <dependency>
             <groupId>net.bytebuddy</groupId>
             <artifactId>byte-buddy</artifactId>
-            <version>1.6.8</version>
+            <version>1.6.9</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
@@ -269,7 +269,7 @@
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
-            <version>2.7.10</version>
+            <version>2.7.11</version>
             <exclusions>
                 <exclusion>
                     <artifactId>byte-buddy</artifactId>
@@ -371,7 +371,7 @@
 
         <dependency>
             <groupId>com.google.truth</groupId>
-            <version>0.31</version>
+            <version>0.32</version>
             <artifactId>truth</artifactId>
             <scope>test</scope>
         </dependency>

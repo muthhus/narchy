@@ -39,10 +39,13 @@ public class BenchmarkLine1DContinuous {
                 //new MultiThreadExecutioner(3, 2048, true);
                 new SynchronousExecutor();
 
+        //exe = new InstrumentedExecutor( exe );
+
         Default nar = new Default(1024,
                 conceptsPerCycle, 1, 3, rng,
                 new CaffeineIndex(new DefaultConceptBuilder(), 1024*64, false, null),
-                new FrameTime(1f), new InstrumentedExecutor( exe, 4 )
+                new FrameTime(1f),
+                exe
         );
         nar.termVolumeMax.set(46);
 
