@@ -9,7 +9,7 @@ import jake2.render.JoglGL2Renderer;
 import jake2.sys.IN;
 import nars.NAR;
 import nars.Narsese;
-import nars.remote.NAgents;
+import nars.NAgents;
 import nars.video.PixelAutoClassifier;
 import nars.video.PixelBag;
 import nars.video.Sensor2D;

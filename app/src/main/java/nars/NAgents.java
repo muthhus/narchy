@@ -1,9 +1,6 @@
-package nars.remote;
+package nars;
 
 import jcog.data.FloatParam;
-import nars.$;
-import nars.NAR;
-import nars.NAgent;
 import nars.concept.Concept;
 import nars.gui.Vis;
 import nars.nar.Default;

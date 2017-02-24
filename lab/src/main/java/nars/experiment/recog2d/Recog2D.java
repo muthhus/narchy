@@ -10,7 +10,7 @@ import nars.NAR;
 import nars.Param;
 import nars.concept.Concept;
 import nars.gui.BeliefTableChart;
-import nars.remote.NAgents;
+import nars.NAgents;
 import nars.time.Tense;
 import nars.truth.Truth;
 import nars.video.PixelBag;

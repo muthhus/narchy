@@ -4,13 +4,13 @@ package nars.experiment.arkanoid;
 import jcog.math.FloatPolarNormalized;
 import nars.*;
 import nars.concept.ActionConcept;
-import nars.remote.NAgents;
+import nars.NAgents;
 
 import java.io.IOException;
 
 public class Arkancide extends NAgents {
 
-    static boolean cam = true;
+    static boolean cam = false;
 
     private final float paddleSpeed = 1f;
 
@@ -44,7 +44,7 @@ public class Arkancide extends NAgents {
 
             return agent;
 
-        }, 50, 5, -1);
+        }, 50, 15, -1);
 
 
 //        nar.forEachActiveConcept(c -> {
@@ -80,9 +80,9 @@ public class Arkancide extends NAgents {
 
         //nar.linkFeedbackRate.setValue(0.02f);
 
-        maxPaddleSpeed = 35 * Arkanoid.BALL_VELOCITY;
+        maxPaddleSpeed = 25 * Arkanoid.BALL_VELOCITY;
 
-        nar.termVolumeMax.set(30);
+        nar.termVolumeMax.set(20);
 
 
         //nar.truthResolution.setValue(0.02f);

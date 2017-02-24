@@ -9,7 +9,7 @@ import nars.NAR;
 import nars.NAgent;
 import nars.concept.Concept;
 import nars.nar.Default;
-import nars.remote.NAgents;
+import nars.NAgents;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.atom.Atomic;

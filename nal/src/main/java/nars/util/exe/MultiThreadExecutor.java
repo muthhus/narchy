@@ -229,19 +229,15 @@ public class MultiThreadExecutor extends Executioner {
 
     @Override
     public final void run(@NotNull Runnable r) {
-        //disruptor.publishEvent(runPublisher, r);
         if (!ring.tryPublishEvent(runPublisher, r)) {
-            r.run(); //execute in own thread
-            //logger.warn("dropped: {}", r);
+            r.run(); //execute in callee's thread
         }
     }
 
     @Override
     public final void run(@NotNull Consumer<NAR> r) {
-        //disruptor.publishEvent(narPublisher, r);
         if (!ring.tryPublishEvent(narPublisher, r)) {
-            r.accept(nar); //execute in own thread
-            //logger.warn("dropped: {}", r);
+            r.accept(nar); //execute in callee's thread
         }
     }
 
@@ -249,8 +245,7 @@ public class MultiThreadExecutor extends Executioner {
     @Override
     public final void run(@NotNull Task... t) {
         if (!ring.tryPublishEvent(taskPublisher, t)) {
-            nar.processAll(t); //execute in own thread
-            //logger.warn("dropped: {}", t);
+            nar.processAll(t); //execute in callee's thread
         }
     }
 

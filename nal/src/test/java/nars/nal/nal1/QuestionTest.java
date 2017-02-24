@@ -195,7 +195,7 @@ public class QuestionTest {
 
         Param.DEBUG = true;
 
-        n.on("odd", a->{
+        n.onTerm("odd", a->{
             if (a.length == 1 && a[0].op()== Op.INT) {
                 return ((IntTerm)a[0]).val() % 2 == 0 ? Term.False : Term.True;
             }

@@ -60,7 +60,7 @@ public enum Util { ;
     public static final int PRIME3 = 524287;
     public static final int PRIME2 = 92821;
     public static final int PRIME1 = 31;
-    public static final float[] EmptyFloatArray = new float[0];
+    public static final float[] EmptyFloatArray = new float[0]; //TODO find what class this is elsewhere something like ArrayUtils
     // --- Bits to allow Unsafe access to arrays
 
     /**

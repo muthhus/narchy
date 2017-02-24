@@ -27,7 +27,7 @@ import static nars.term.Terms.compoundOrNull;
 /**
  * Built-in functors, ie. the standard core function set
  */
-public class Builtin  {
+public class Builtin {
 
     static Concept[] statik = {
 
@@ -50,14 +50,60 @@ public class Builtin  {
             new flat.flatProduct(),
             new similaritree(),
 
-            Functor.f2("equal", (x,y) ->
-                x.equals(y) ? True : (!((x instanceof Variable) || (y instanceof Variable)) ? False : null)),
+            Functor.f2("equal", (x, y) ->
+                    x.equals(y) ? True : (!((x instanceof Variable) || (y instanceof Variable)) ? False : null)),
 
             Functor.f2Int("add", (x, y) -> x + y),
             Functor.f2Int("sub", (x, y) -> x - y),
 
-            Functor.f1("quote", x->x), //TODO does this work    //throw new RuntimeException("quote should never actually be invoked by the system");
+            Functor.f1("quote", x -> x), //TODO does this work    //throw new RuntimeException("quote should never actually be invoked by the system");
 
+            /** slice(<compound>,<selector>)
+                  selector :-
+                      a specific integer value index, from 0 to compound size
+                      (a,b) pair of integers, a range of indices */
+            Functor.f("slice", (args) -> {
+                if (args.length == 2) {
+                    Compound x = compoundOrNull(args[0]);
+                    if (x != null) {
+                        int len = x.size();
+
+                        Term index = args[1];
+                        Op o = index.op();
+                        if (o == INT) {
+                            //specific index
+                            int i = ((IntTerm) index).val;
+                            if (i >= 0 && i < len)
+                                return x.term(i);
+                            else
+                                return False;
+
+                        } else if (o == PROD && index.size() == 2) {
+                            Term start = ((Compound) index).term(0);
+                            if (start.op() == INT) {
+                                Term end = ((Compound) index).term(1);
+                                if (end.op() == INT) {
+                                    int si = ((IntTerm) start).val;
+                                    if (si >= 0 && si < len) {
+                                        int ei = ((IntTerm) end).val;
+                                        if (ei >= 0 && ei <= len) {
+                                            if (si == ei)
+                                                return Terms.ZeroProduct;
+                                            if (si < ei) {
+                                                return $.p(Arrays.copyOfRange(x.terms(), si, ei));
+                                            }
+                                        }
+                                    }
+                                    //TODO maybe reverse order will return reversed subproduct
+                                    return False;
+                                }
+                            }
+
+                        }
+                    }
+                }
+                return null;
+            })
 
     };
 
@@ -67,52 +113,7 @@ public class Builtin  {
     public static void load(NAR nar) {
         //TODO these should be command-only operators, not functors
 
-        //slice(<compound>,<selector>)
-        //  selector :-
-        //      a specific integer value index, from 0 to compound size
-        //      (a,b) pair of integers, a range of indices
-        nar.on("slice", (args) -> {
-            if (args.length == 2) {
-                Compound x = compoundOrNull(args[0]);
-                if (x != null) {
-                    int len = x.size();
 
-                    Term index = args[1];
-                    Op o = index.op();
-                    if (o == INT) {
-                        //specific index
-                        int i = ((IntTerm) index).val;
-                        if (i >= 0 && i < len)
-                            return x.term(i);
-                        else
-                            return False;
-
-                    } else if (o == PROD && index.size() == 2) {
-                        Term start = ((Compound)index).term(0);
-                        if (start.op()==INT) {
-                            Term end = ((Compound) index).term(1);
-                            if (end.op() == INT) {
-                                int si = ((IntTerm)start).val;
-                                if (si >= 0 && si < len) {
-                                    int ei = ((IntTerm) end).val;
-                                    if (ei >= 0 && ei <= len) {
-                                        if (si == ei)
-                                            return Terms.ZeroProduct;
-                                        if (si < ei) {
-                                            return $.p(Arrays.copyOfRange(x.terms(), si, ei));
-                                        }
-                                    }
-                                }
-                                //TODO maybe reverse order will return reversed subproduct
-                                return False;
-                            }
-                        }
-
-                    }
-                }
-            }
-            return null;
-        });
 
         nar.on("assertEquals", (Command) (op, args, nn) -> {
             //String msg = op + "(" + Joiner.on(',').join(args) + ')';
@@ -128,8 +129,8 @@ public class Builtin  {
         nar.on("concept", (Command) (op, a, nn) -> {
             Concept c = nn.concept(a[0]);
             Command.log(nn,
-                (c!=null) ?
-                    quote(c.print(new StringBuilder(1024))) : $.func("unknown", a[0])
+                    (c != null) ?
+                            quote(c.print(new StringBuilder(1024))) : $.func("unknown", a[0])
             );
         });
 
@@ -137,31 +138,30 @@ public class Builtin  {
         nar.on("log", log);
         nar.on(Command.LOG_FUNCTOR, log);
 
-        nar.on("error", (Command) (a, t, n) -> NAR.logger.error("{}", t) );
+        nar.on("error", (Command) (a, t, n) -> NAR.logger.error("{}", t));
 
 
         nar.on("memstat", (Command) (op, a, nn) ->
-            Command.log(nn, quote(nn.concepts.summary()))
+                Command.log(nn, quote(nn.concepts.summary()))
         );
 
         nar.on("reset", (Command) (op, args1, nar1) ->
-            nar1.runLater(NAR::reset)
+                nar1.runLater(NAR::reset)
         );
 
         nar.on("clear", (Command) (op, args, n) -> {
             n.clear();
-            n.runLater(()->{
+            n.runLater(() -> {
                 Command.log(n, "Ready. (" + n.concepts.size() + " subconcepts)");
             });
         });
-
 
 
         nar.on("top", (Command) (op, args, n) -> {
             Iterable<PLink<Concept>> ii = n.conceptsActive();
 
             int MAX_RESULT_LENGTH = 250;
-            StringBuilder b = new StringBuilder(MAX_RESULT_LENGTH+8);
+            StringBuilder b = new StringBuilder(MAX_RESULT_LENGTH + 8);
 
             if (args.length > 0 && args[0] instanceof Atom) {
                 String query = $.unquote(args[0]).toLowerCase();

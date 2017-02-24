@@ -22,16 +22,15 @@ abstract public class STM /*extends BagBuffer<Task>*/ implements Consumer<Task> 
         super();
         this.nar = nar;
         this.capacity = capacity;
-        nar.eventTaskProcess.on(t -> {
+        nar.onTask(t -> {
             if (temporallyInductable(t, allowNonInput))
                 accept(t);
         });
-        nar.eventReset.on(n -> clear());
-
+        nar.onReset(n -> clear());
     }
 
-    static public boolean temporallyInductable(@NotNull Task newEvent, boolean allowNonInput) {
-        return ( (allowNonInput || newEvent.isInput()) && newEvent.isBeliefOrGoal() && !newEvent.isEternal());
+    static boolean temporallyInductable(@NotNull Task newEvent, boolean allowNonInput) {
+        return ( !newEvent.isEternal() && (allowNonInput || newEvent.isInput()) && newEvent.isBeliefOrGoal());
     }
 
     abstract public void clear();

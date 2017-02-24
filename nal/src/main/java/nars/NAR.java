@@ -900,19 +900,6 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
     }
 
     public final void on(@NotNull Atom a, @NotNull Operator o) {
-        enableOperator(a, o);
-    }
-
-    static class PermanentAtomConcept extends AtomConcept implements PermanentConcept {
-        public PermanentAtomConcept(@NotNull Atomic atom, Bag<Term, BLink<Term>> termLinks, Bag<Task, BLink<Task>> taskLinks) {
-            super(atom, termLinks, taskLinks);
-        }
-    }
-
-    /**
-     * resets any existing atom or operator
-     */
-    private void enableOperator(@NotNull Atom a, @NotNull Operator o) {
         DefaultConceptBuilder builder = (DefaultConceptBuilder) concepts.conceptBuilder();
         PermanentAtomConcept c = builder.withBags(a, (termlink, tasklink) -> {
             return new PermanentAtomConcept(a, termlink, tasklink);
@@ -920,6 +907,12 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
         c.put(Operator.class, o);
         concepts.set(c);
         operators.put(c, o);
+    }
+
+    static class PermanentAtomConcept extends AtomConcept implements PermanentConcept {
+        public PermanentAtomConcept(@NotNull Atomic atom, Bag<Term, BLink<Term>> termLinks, Bag<Task, BLink<Task>> taskLinks) {
+            super(atom, termLinks, taskLinks);
+        }
     }
 
 
@@ -1454,8 +1447,8 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
         return c;
     }
 
-    @NotNull
-    public final Concept on(@NotNull String termAtom, @NotNull Function<Term[], Term> f) {
+    /** registers a term rewrite functor */
+    @NotNull public final Concept onTerm(@NotNull String termAtom, @NotNull Function<Term[], Term> f) {
         return on(f(termAtom, f));
     }
 

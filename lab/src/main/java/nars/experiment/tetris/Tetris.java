@@ -8,7 +8,7 @@ import nars.concept.SensorConcept;
 import nars.experiment.tetris.impl.TetrisState;
 import nars.experiment.tetris.impl.TetrisVisualizer;
 import nars.nar.NARBuilder;
-import nars.remote.NAgents;
+import nars.NAgents;
 import nars.term.Compound;
 import nars.term.atom.Atomic;
 import nars.time.FrameTime;
