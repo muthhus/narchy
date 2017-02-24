@@ -8,8 +8,8 @@ import nars.term.Term;
 import nars.term.obj.IntTerm;
 import nars.test.DeductiveMeshTest;
 import nars.test.TestNAR;
-import nars.util.task.Answerer;
-import nars.util.task.OperationAnswerer;
+import nars.util.task.TaskMatch;
+import nars.util.task.OperationTaskMatch;
 import nars.util.task.TaskStatistics;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Ignore;
@@ -93,10 +93,11 @@ public class QuestionTest {
         NAR nar = new Terminal();
 
         final int[] s = {0};
-        new Answerer( $.$("add(%1, %2, #x)"), nar) {
+        new TaskMatch("add(%1, %2, #x)", nar) {
 
             @Override
-            protected void onMatch(Map<Term, Term> xy) {
+            protected void onMatch(Task task, Map<Term, Term> xy) {
+                System.out.println(task + " " + xy);
                 s[0] = xy.size();
             }
         };
@@ -111,7 +112,7 @@ public class QuestionTest {
         NAR nar = new Terminal();
 
         final int[] s = {0};
-        new OperationAnswerer( $.$("add(%1, %2, #x)"), nar) {
+        new OperationTaskMatch( $.$("add(%1, %2, #x)"), nar) {
 
             @Override
             protected void onMatch(Term[] args) {

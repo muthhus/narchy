@@ -2,6 +2,7 @@ package nars.util.task;
 
 import nars.NAR;
 import nars.Op;
+import nars.Task;
 import nars.term.Compound;
 import nars.term.Term;
 import org.eclipse.collections.impl.map.mutable.primitive.ObjectIntHashMap;
@@ -12,13 +13,13 @@ import java.util.Map;
 /**
  * Created by me on 6/1/16.
  */
-abstract public class OperationAnswerer extends Answerer {
+abstract public class OperationTaskMatch extends TaskMatch {
 
     @NotNull
     private final ObjectIntHashMap argIndex;
     private final int numArgs;
 
-    public OperationAnswerer(@NotNull Compound pattern, @NotNull NAR n) {
+    public OperationTaskMatch(@NotNull Compound pattern, @NotNull NAR n) {
         super(pattern, n);
         if (!Op.isOperation(pattern))
             throw new RuntimeException(pattern + " is not an operation compound pattern");
@@ -35,7 +36,7 @@ abstract public class OperationAnswerer extends Answerer {
     }
 
     @Override
-    protected final void onMatch(@NotNull Map<Term, Term> xy) {
+    protected final void onMatch(Task task, @NotNull Map<Term, Term> xy) {
         Term[] args = new Term[numArgs];
         xy.forEach((k, v) -> {
             int i = argIndex.getIfAbsent(k, -1);

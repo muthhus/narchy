@@ -74,7 +74,7 @@ public class InfluxDB {
         return new float[] { };
     }
 
-    public String rfc(long from) {
+    static String rfc(long from) {
         return RFCTime.format(new Date(from));
     }
 
