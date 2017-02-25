@@ -151,7 +151,7 @@ public class EternalTaskCondition implements NARCondition, Predicate<Task>, Cons
     @NotNull
     @Override
     public String toString() {
-        return term.toString() + punc + " %" +
+        return term.toString() + ((char)punc) + " %" +
                 rangeStringN2(freqMin, freqMax) + ';' + rangeStringN2(confMin, confMax) + '%' + ' ' +
                 " creation: (" + creationStart + ',' + creationEnd + ')';
     }

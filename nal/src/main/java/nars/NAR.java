@@ -23,6 +23,7 @@ import nars.conceptualize.state.ConceptState;
 import nars.index.term.TermIndex;
 import nars.op.Operator;
 
+import nars.task.ImmutableTask;
 import nars.task.TaskBuilder;
 import nars.term.Compound;
 import nars.term.Term;
@@ -545,11 +546,8 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
             throw new InvalidTaskException(term, "insufficient confidence");
         }
 
-        TaskBuilder x = new TaskBuilder((Compound)term, punc, tr)
-                .budgetByTruth(pri)
-                .time(time(), occurrenceTime);
-
-        Task y = x.apply(this);
+        Task y = new ImmutableTask((Compound)term, punc, tr, time(), occurrenceTime, occurrenceTime, new long[] { time.nextStamp() });
+        y.budget(pri, this);
 
         input(y);
 
@@ -611,6 +609,11 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
         Task input = pre(input0);
         if (input == null)
             return null;
+
+        float q = input.qua();
+        if (q!=q) { //default budget if qua == NaN
+            input.budget(this);
+        }
 
         float inputPri = input.priSafe(0);
         emotion.busy(inputPri, input.volume());
@@ -1556,7 +1559,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
         return control;
     }
 
-    public On onReset(Consumer<NAR> o) {
+    public final On onReset(Consumer<NAR> o) {
         return eventReset.on(o);
     }
 

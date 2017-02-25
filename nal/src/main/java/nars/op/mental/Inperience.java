@@ -12,6 +12,7 @@ import nars.budget.BudgetMerge;
 import nars.budget.RawBLink;
 import nars.op.Leak;
 import nars.premise.Premise;
+import nars.task.ImmutableTask;
 import nars.task.TaskBuilder;
 import nars.term.Compound;
 import nars.term.Term;
@@ -190,19 +191,18 @@ public class Inperience extends Leak<Task, BLink<Task>> {
         try {
             Compound r = reify(task, nar.self());
             if (r != null) {
-                TaskBuilder e = new TaskBuilder(
-                        r,
-                        BELIEF,
-                        $.t(1, nar.confidenceDefault(BELIEF)));
 
                 long now = nar.time();
-                e.time(now, now);
 
-                BudgetFunctions
-                        .budgetByTruth(e, e.truth(), task.priSafe(0));
-
-                e.evidence(task)
-                        .log("Inperience");
+                ImmutableTask e = new ImmutableTask(
+                        r,
+                        BELIEF,
+                        $.t(1, nar.confidenceDefault(BELIEF)),
+                        now, now, now,
+                        task.evidence()
+                );
+                e.log("Inperience");
+                e.budget( task.priSafe(0), nar);
 
                 logger.info(" {}", e);
                 nar.input(e);

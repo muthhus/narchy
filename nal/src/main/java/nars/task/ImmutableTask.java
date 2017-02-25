@@ -37,6 +37,16 @@ public class ImmutableTask extends RawBudget implements Task {
     public Map meta = null;
 
     public ImmutableTask(Compound term, byte punc, Truth truth, long creation, long start, long end, long[] evidence) {
+
+        if (term.op()==NEG) {
+            term = (Compound) term.unneg();
+            if (truth!=null)
+                truth = truth.negated();
+        }
+
+        this.priority = 0;
+        this.quality = Float.NaN;
+
         this.term = term;
         this.truth = truth;
         this.punc = punc;

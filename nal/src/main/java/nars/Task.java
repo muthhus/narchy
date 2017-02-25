@@ -8,7 +8,6 @@ import nars.concept.Concept;
 import nars.op.Command;
 import nars.task.ImmutableTask;
 
-import nars.task.TaskBuilder;
 import nars.task.Tasked;
 import nars.term.Compound;
 import nars.term.Term;
@@ -671,8 +670,27 @@ public interface Task extends Budgeted, Truthed, Stamp, Termed<Compound>, Tasked
     }
 
 
-    default Task budgetByTruth(float p, NAR nar) {
-        BudgetFunctions.budgetByTruth(this, truth(), punc(), p, nar);
+    /** auto budget by truth (if belief/goal, or punctuation if question/quest) */
+    default Task budget(NAR nar) {
+        budget(nar.priorityDefault(punc()), nar);
+        return this;
+    }
+
+    /** auto budget by truth (if belief/goal, or punctuation if question/quest), with a specific non-default priority */
+    default Task budget(float p, NAR nar) {
+        float q;
+
+        Truth tt = truth();
+        if (tt != null) {
+            q = BudgetFunctions.truthToQuality(tt);
+        } else {
+            if (nar != null) {
+                q = nar.qualityDefault(punc());
+            } else
+                throw new RuntimeException("missing truth");
+        }
+
+        budget().setBudget(p, q);
         return this;
     }
 

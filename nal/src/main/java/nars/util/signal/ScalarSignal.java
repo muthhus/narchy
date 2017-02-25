@@ -6,9 +6,9 @@ import nars.NAR;
 import nars.Op;
 import nars.Param;
 import nars.Task;
+import nars.budget.BudgetFunctions;
 import nars.term.Compound;
 import nars.term.Term;
-import nars.term.Termed;
 import nars.truth.Truth;
 import org.eclipse.collections.api.block.function.primitive.FloatFunction;
 import org.eclipse.collections.api.block.function.primitive.FloatToFloatFunction;
@@ -19,7 +19,6 @@ import org.jetbrains.annotations.Nullable;
 import java.util.function.DoubleSupplier;
 import java.util.function.Function;
 
-import static nars.budget.BudgetFunctions.budgetByTruth;
 
 /**
  * Generates temporal tasks in reaction to the change in a scalar numeric value
@@ -196,7 +195,7 @@ public class ScalarSignal implements Function<NAR, Task>, DoubleSupplier {
 
 
         SignalTask s = new SignalTask(term(), punc, t, start, end, nar.time.nextStamp());
-        budgetByTruth( s, t, pri.asFloat()  /*(v, now, prevF, lastInput)*/);
+        s.budget(pri.asFloat(), nar);
 
         //float changeFactor = prevV==prevV ? Math.abs(v - prevV) : 1f /* if prevV == NaN */;
         //s.budgetByTruth( Math.max(Param.BUDGET_EPSILON*2, changeFactor * pri.asFloat())  /*(v, now, prevF, lastInput)*/);

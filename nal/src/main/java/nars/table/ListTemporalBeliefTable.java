@@ -450,7 +450,7 @@ public class ListTemporalBeliefTable extends MultiRWFasterList<Task> implements 
 
             double factor = (double) ac / (ac + bc);
 
-            int tolerance = Math.round(dur); //additional tolerance range allowing the tasks to overlap and replaced with a union rather than a point sample
+            int tolerance = (int)Math.ceil(dur/2f); //additional tolerance range allowing the tasks to overlap and replaced with a union rather than a point sample
             Interval ai = new Interval(a.start() - tolerance, a.end() + tolerance);
             Interval bi = new Interval(b.start() - tolerance, b.end() + tolerance);
 

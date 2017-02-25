@@ -120,9 +120,9 @@ public class ConceptBagControl implements Control, Consumer<DerivedTask> {
         // * 1f/((float)Math.sqrt(active.capacity()))
         ;
 
-        float load = nar.exe.load();
         int cbs = conceptsFiredPerBatch.intValue();
 
+        //float load = nar.exe.load();
         int cpf = Math.round(conceptsFiredPerCycle.floatValue());
                 ///Math.round(conceptsFiredPerCycle.floatValue() * (1f - load));
 
@@ -137,8 +137,8 @@ public class ConceptBagControl implements Control, Consumer<DerivedTask> {
 
             int _tasklinks = tasklinksFiredPerFiredConcept.intValue();
 
-            active.sample(batchSize, n -> {
-                nar.runLater(new PremiseMatrix(n, _tasklinks));
+            active.sample(batchSize, C -> {
+                nar.runLater(new PremiseMatrix(C, _tasklinks));
                 return true;
             });
 

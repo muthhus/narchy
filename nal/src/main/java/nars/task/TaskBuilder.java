@@ -548,20 +548,6 @@ public class TaskBuilder extends RawBudget implements Termed, Truthed, Function<
         return this;
     }
 
-    public TaskBuilder budgetByTruth(@NotNull Budget budget, float p) {
-        return null;
-    }
-
-    @NotNull
-    public TaskBuilder budgetByTruth(float p) {
-        return budgetByTruth(p, null);
-    }
-
-    @NotNull
-    public TaskBuilder budgetByTruth(float p, @Nullable NAR nar) {
-        BudgetFunctions.budgetByTruth(this, truth(), punc(), p, nar);
-        return this;
-    }
 
     public TaskBuilder budgetSafe(float p, float q) {
         super.budgetSafe(p, q);

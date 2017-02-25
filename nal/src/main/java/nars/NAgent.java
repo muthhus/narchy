@@ -10,18 +10,14 @@ import jcog.list.FasterList;
 import jcog.math.FloatNormalized;
 import jcog.math.FloatPolarNormalized;
 import jcog.net.UDP;
-import nars.budget.BudgetFunctions;
 import nars.concept.ActionConcept;
 import nars.concept.Concept;
 import nars.concept.SensorConcept;
 import nars.nar.Default;
-import nars.task.GeneratedTask;
 
 import nars.task.ImmutableTask;
-import nars.task.TaskBuilder;
 import nars.term.Compound;
 import nars.term.Term;
-import nars.term.Termed;
 import nars.time.FrameTime;
 import nars.time.Time;
 import nars.truth.Truth;
@@ -693,7 +689,6 @@ abstract public class NAgent implements NSense, NAction {
         if (nar.random.nextFloat() > predictorProbability)
             return t;
 
-        TaskBuilder s;
         byte pp = t.punc();
         if (t.start() != ETERNAL) {
 
@@ -704,7 +699,7 @@ abstract public class NAgent implements NSense, NAction {
             return prediction(t.term(), t.punc(), t.truth(), ETERNAL, ETERNAL);
 
         } else {
-            t.budgetByTruth(p, nar).log("Agent Predictor");
+            t.budget(p, nar).log("Agent Predictor");
             return t;
         }
 
@@ -749,7 +744,7 @@ abstract public class NAgent implements NSense, NAction {
 
     public Task prediction(@NotNull Compound term, byte punct, Truth truth, long start, long end) {
         return new ImmutableTask(term, punct, truth, nar.time(), start, end, new long[] { nar.time.nextStamp() } )
-                .budgetByTruth(predictorPriority.floatValue(), nar)
+                .budget(predictorPriority.floatValue(), nar)
                 .log("Agent Predictor");
     }
 
