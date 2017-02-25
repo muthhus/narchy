@@ -23,24 +23,24 @@ public interface NARIn {
 
     @Nullable
     default Task ask(@NotNull String questionTerm, long occ, @NotNull BiConsumer<LambdaQuestionTask,Task> eachAnswer) throws Narsese.NarseseException {
-        return ask(term(questionTerm), occ, eachAnswer);
+        return ask((Compound)term(questionTerm), occ, eachAnswer);
     }
 
     @Nullable
-    default Task ask(@NotNull Termed<Compound> term, long occ, @NotNull BiConsumer<LambdaQuestionTask,Task> eachAnswer) {
+    default Task ask(@NotNull Compound term, long occ, @NotNull BiConsumer<LambdaQuestionTask,Task> eachAnswer) {
         return ask(term, occ, Op.QUESTION, eachAnswer);
     }
 
     @Nullable
-    default LambdaQuestionTask ask(@NotNull Termed<Compound> term, long occ, byte punc /* question or quest */, @NotNull BiConsumer<LambdaQuestionTask, Task> eachAnswer) {
+    default LambdaQuestionTask ask(@NotNull Compound term, long occ, byte punc /* question or quest */, @NotNull BiConsumer<LambdaQuestionTask, Task> eachAnswer) {
         assert(punc == Op.QUESTION || punc == Op.QUEST);
-        return inputAndGet( new LambdaQuestionTask(term, punc, occ, 16, eachAnswer) );
+        return inputAndGet( new LambdaQuestionTask(term, punc, occ, 16, (NAR)this, eachAnswer) );
     }
 
     @Nullable
-    default LambdaQuestionTask ask(@NotNull Termed<Compound> term, long occ, byte punc /* question or quest */, @NotNull Consumer<Task> eachAnswer) {
+    default LambdaQuestionTask ask(@NotNull Compound term, long occ, byte punc /* question or quest */, @NotNull Consumer<Task> eachAnswer) {
         assert(punc == Op.QUESTION || punc == Op.QUEST);
-        return inputAndGet( new LambdaQuestionTask(term, punc, occ, 16, eachAnswer) );
+        return inputAndGet( new LambdaQuestionTask(term, punc, occ, 16, (NAR)this, eachAnswer) );
     }
 
     @NotNull

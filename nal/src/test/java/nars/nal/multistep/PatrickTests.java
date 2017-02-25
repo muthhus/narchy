@@ -14,6 +14,7 @@ import org.junit.runners.Parameterized;
 import java.util.function.Supplier;
 
 import static nars.$.$;
+import static nars.Op.GOAL;
 
 /**
  * see Natural_Language_Processing2.md
@@ -129,7 +130,7 @@ public class PatrickTests extends AbstractNALTest {
 
         );
 
-        tt.mustOutput(0, 2500, "lighter({SELF}, toothbrush)", '!', 1f, 1f,
+        tt.mustOutput(0, 2500, "lighter({SELF}, toothbrush)", GOAL, 1f, 1f,
 0.1f, 1f, //at least some confidence
 /*@*/ 10L);  //is this correct time? might be off by +/-10 , will check
 

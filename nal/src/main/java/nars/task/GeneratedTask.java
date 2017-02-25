@@ -7,10 +7,10 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 
-public class GeneratedTask extends MutableTask {
+public class GeneratedTask extends ImmutableTask {
 
-    public GeneratedTask(@NotNull Termed<Compound> term, byte punct, @Nullable Truth truth) {
-        super(term, punct, truth);
+    public GeneratedTask(Compound term, byte punc, Truth truth, long creation, long start, long end, long[] evidence) {
+        super(term, punc, truth, creation, start, end, evidence);
     }
 
     @Override

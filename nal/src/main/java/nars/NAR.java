@@ -545,7 +545,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
             throw new InvalidTaskException(term, "insufficient confidence");
         }
 
-        TaskBuilder x = BudgetFunctions
+        TaskBuilder x = new TaskBuilder((Compound)term, punc, tr)
                 .budgetByTruth(pri)
                 .time(time(), occurrenceTime);
 

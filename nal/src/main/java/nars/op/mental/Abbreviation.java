@@ -24,6 +24,7 @@ import nars.term.Term;
 import nars.term.Termed;
 import nars.term.container.TermContainer;
 import nars.term.subst.Unify;
+import nars.truth.Truth;
 import nars.truth.TruthDelta;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
@@ -36,6 +37,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
+import static nars.Op.BELIEF;
 import static nars.bag.impl.CurveBag.power4BagCurve;
 import static nars.term.Terms.compoundOrNull;
 import static nars.time.Tense.ETERNAL;
@@ -81,7 +83,7 @@ public class Abbreviation/*<S extends Term>*/ extends Leak<Compound, BLink<Compo
         this.termPrefix = termPrefix;
         this.setCapacity(capacity);
         this.abbreviationConfidence =
-                new MutableFloat(nar.confidenceDefault(Op.BELIEF));
+                new MutableFloat(nar.confidenceDefault(BELIEF));
         //new MutableFloat(1f - nar.truthResolution.floatValue());
         //new MutableFloat(nar.confidenceDefault(Symbols.BELIEF));
         volume = new MutableIntRange(volMin,volMax);
@@ -205,10 +207,13 @@ public class Abbreviation/*<S extends Term>*/ extends Leak<Compound, BLink<Compo
                     Compound abbreviatedTerm = abbreviated.term();
 
                     Task abbreviationTask = new AbbreviationTask(
-                            abbreviation, abbreviatedTerm, aliasTerm, abbreviationConfidence.floatValue())
-                            .time(nar.time(), ETERNAL)
-                            .log("Abbreviate")
-                            .budgetSafe(b);
+                        abbreviation, BELIEF, $.t(1f, abbreviationConfidence.floatValue()),
+                        nar.time(), ETERNAL, ETERNAL,
+                        new long[] { nar.time.nextStamp() }, abbreviatedTerm, aliasTerm
+                    );
+                    abbreviationTask.log("Abbreviate");
+                    abbreviationTask.setBudget(b);
+
                     nar.input(abbreviationTask);
                     logger.info("{}", abbreviationTask);
                 }
@@ -409,11 +414,12 @@ public class Abbreviation/*<S extends Term>*/ extends Leak<Compound, BLink<Compo
         @NotNull
         private final Term alias;
 
-        public AbbreviationTask(@NotNull Compound abbreviation, @NotNull Compound abbreviated, @NotNull Termed alias, float conf) {
-            super(abbreviation, Op.BELIEF, $.t(1, conf));
+        public AbbreviationTask(Compound term, byte punc, Truth truth, long creation, long start, long end, long[] evidence, @NotNull Compound abbreviated, @NotNull Termed alias) {
+            super(term, punc, truth, creation, start, end, evidence);
             this.abbreviated = abbreviated;
             this.alias = alias.term();
         }
+
 
         @Override
         public void feedback(TruthDelta delta, float deltaConfidence, float deltaSatisfaction, @NotNull NAR nar) {

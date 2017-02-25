@@ -19,7 +19,7 @@ final public class TaskPunctuation extends AtomicBoolCondition {
 
     public static final AtomicBoolCondition QuestionOrQuest = new AtomicBoolCondition() {
         @Override public boolean run(@NotNull Derivation o) {
-            char c = o.taskPunct;
+            byte c = o.taskPunct;
             return c == Op.QUESTION || c == Op.QUEST;
         }
         @Override public String toString() {
@@ -52,7 +52,7 @@ final public class TaskPunctuation extends AtomicBoolCondition {
 //    };
     public static final AtomicBoolCondition NotQuestion = new AtomicBoolCondition()  {
         @Override public boolean run(@NotNull Derivation o) {
-            char p = o.taskPunct;
+            byte p = o.taskPunct;
             return (p != Op.QUESTION && p!= Op.QUEST);
         }
         @Override public String toString() { return "task:\".!\""; }

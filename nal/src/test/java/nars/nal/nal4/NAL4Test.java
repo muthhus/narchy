@@ -11,6 +11,7 @@ import org.junit.runners.Parameterized;
 
 import java.util.function.Supplier;
 
+import static nars.Op.BELIEF;
 import static nars.time.Tense.ETERNAL;
 
 /**
@@ -262,7 +263,7 @@ public class NAL4Test extends AbstractNALTest {
                 .log()
                 .believe("((x,z)-->?1)")
                 .ask( "((x,z)-->?1)")
-                .mustNotOutput(CYCLES*10, "((x,z)-->?1)", '.', 0f, 1f, 0, 0.81f, ETERNAL);
+                .mustNotOutput(CYCLES*10, "((x,z)-->?1)", BELIEF, 0f, 1f, 0, 0.81f, ETERNAL);
 
     }
 

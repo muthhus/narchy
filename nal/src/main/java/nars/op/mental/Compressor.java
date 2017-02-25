@@ -35,6 +35,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static nars.Op.BELIEF;
 import static nars.term.Terms.compoundOr;
 import static nars.term.Terms.compoundOrNull;
 import static nars.time.Tense.ETERNAL;
@@ -157,13 +158,15 @@ public class Compressor extends Abbreviation implements RemovalListener<Compound
                     logger.warn("unrelateable: {}", abb);
                 } else {
 
-                    Task abbreviationTask = new AbbreviationTask(
-                            s, abb.decompressed, abb.compressed, abbreviationConfidence.floatValue())
-                            .time(nar.time(), ETERNAL)
-                            .log("Abbreviate")
-                            .budgetSafe(b);
-                    nar.input(abbreviationTask);
 
+                    Task abbreviationTask = new AbbreviationTask(
+                            s, BELIEF, $.t(1f, abbreviationConfidence.floatValue()),
+                            nar.time(), ETERNAL, ETERNAL,
+                            new long[] { nar.time.nextStamp() }, abb.decompressed, abb.compressed
+                            );
+                    abbreviationTask.log("Abbreviate");
+                    abbreviationTask.setBudget(b);
+                    nar.input(abbreviationTask);
 
                     recompile();
                 }
@@ -231,7 +234,7 @@ public class Compressor extends Abbreviation implements RemovalListener<Compound
                 //System.out.println("  compress: " + i + " to " + o);
 
                 if (o instanceof Compound) {
-                    @Nullable MutableTask rr = TaskBuilder.clone(tt, (Compound) o);
+                    @Nullable Task rr = Task.clone(tt, (Compound) o);
                     if (rr != null)
                         return rr;
                 }

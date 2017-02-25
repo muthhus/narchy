@@ -9,6 +9,7 @@ import org.junit.Test;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static nars.$.$;
+import static nars.Op.QUEST;
 import static nars.time.Tense.ETERNAL;
 import static org.junit.Assert.assertTrue;
 
@@ -59,7 +60,7 @@ public class QuestTest {
     }
 
     public void question(NAR nar, AtomicBoolean valid) throws Narsese.NarseseException {
-        nar.ask($("a:?b@"), ETERNAL, '@', (q,a) -> {
+        nar.ask($("a:?b@"), ETERNAL, QUEST, (q,a) -> {
             //System.out.println("answer: " + a);
             //System.out.println(" " + a.getLog());
             if (a.toString().contains("(b-->a)!"))

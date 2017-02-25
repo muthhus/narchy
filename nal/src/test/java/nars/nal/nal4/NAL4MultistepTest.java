@@ -11,6 +11,7 @@ import org.junit.runners.Parameterized;
 
 import java.util.function.Supplier;
 
+import static nars.Op.BELIEF;
 import static nars.time.Tense.ETERNAL;
 
 @RunWith(Parameterized.class)
@@ -46,7 +47,7 @@ public class NAL4MultistepTest extends AbstractNALTest {
         tester.input( "$0.9;0.9$ likes(cat,[blue])?"); //cats like blue?
 
         //return mustOutput(cycleStart, cycleEnd, sentenceTerm, punc, freqMin, freqMax, confMin, confMax, occTimeAbsolute, occTimeAbsolute);
-        tester.mustOutput(0, time, "likes(cat,[blue])", '.',
+        tester.mustOutput(0, time, "likes(cat,[blue])", BELIEF,
                 1f, 1f,
                 0.15f, 1f, ETERNAL, ETERNAL);
 

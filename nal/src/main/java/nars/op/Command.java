@@ -2,6 +2,7 @@ package nars.op;
 
 import nars.*;
 
+import nars.task.ImmutableTask;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.atom.Atomic;
@@ -11,6 +12,8 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+
+import static nars.time.Tense.ETERNAL;
 
 /**
  * Operator interface specifically for Command ';' punctuation
@@ -44,7 +47,7 @@ public interface Command extends Operator {
 
 
     static Task task(Compound content) {
-        return new TaskBuilder(content, Op.COMMAND, null);
+        return new ImmutableTask(content, Op.COMMAND, null, ETERNAL, ETERNAL, ETERNAL, new long[] { } );
     }
 
     static Task logTask(@NotNull Term content) {

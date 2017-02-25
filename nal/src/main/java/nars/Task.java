@@ -8,6 +8,7 @@ import nars.concept.Concept;
 import nars.op.Command;
 import nars.task.ImmutableTask;
 
+import nars.task.TaskBuilder;
 import nars.task.Tasked;
 import nars.term.Compound;
 import nars.term.Term;
@@ -582,9 +583,10 @@ public interface Task extends Budgeted, Truthed, Stamp, Termed<Compound>, Tasked
      * of the Task and the reason for it.
      */
     @NotNull
-    default void log(@Nullable Object entry) {
+    default Task log(@Nullable Object entry) {
         if (!(entry == null || !Param.DEBUG_TASK_LOG))
             getOrCreateLog().add(entry);
+        return this;
     }
 
     @Nullable
@@ -656,5 +658,10 @@ public interface Task extends Budgeted, Truthed, Stamp, Termed<Compound>, Tasked
         return temporary;
     }
 
+
+    default Task budgetByTruth(float p, NAR nar) {
+        BudgetFunctions.budgetByTruth(this, truth(), punc(), p, nar);
+        return this;
+    }
 
 }

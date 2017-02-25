@@ -12,6 +12,7 @@ import org.junit.runners.Parameterized;
 
 import java.util.function.Supplier;
 
+import static nars.Op.BELIEF;
 import static nars.time.Tense.ETERNAL;
 import static org.junit.Assert.assertEquals;
 
@@ -254,7 +255,7 @@ public class NAL3Test extends AbstractNALTest {
         test()
             .believe("a:b")
             .believe("b:c")
-            .mustNotOutput(200, "(((a~c)~c)-->b)", '.', ETERNAL);
+            .mustNotOutput(200, "(((a~c)~c)-->b)", BELIEF, ETERNAL);
 
     }
 
@@ -300,9 +301,9 @@ public class NAL3Test extends AbstractNALTest {
             .mustBelieve(cycles, "<{z}-->c>", 1f, 0.81f) //difference
             .mustBelieve(cycles, "<{y}-->c>", 0f, 0.81f) //difference
         //these are probably ok:
-            //.mustNotOutput(cycles,"<{x}-->c>", '.', 0, 0, 0.5f, 1, ETERNAL) //contradiction of input above conf=0.5
-            //.mustNotOutput(cycles,"<{x,y}-->c>", '.', 0, 0, 0.5f, 1, ETERNAL) //contradiction of input above conf=0.5
-            //.mustNotOutput(cycles,"<{x,z}-->c>", '.', 0, 0, 0.5f, 1, ETERNAL) //contradiction of input above conf=0.5
+            //.mustNotOutput(cycles,"<{x}-->c>", BELIEF, 0, 0, 0.5f, 1, ETERNAL) //contradiction of input above conf=0.5
+            //.mustNotOutput(cycles,"<{x,y}-->c>", BELIEF, 0, 0, 0.5f, 1, ETERNAL) //contradiction of input above conf=0.5
+            //.mustNotOutput(cycles,"<{x,z}-->c>", BELIEF, 0, 0, 0.5f, 1, ETERNAL) //contradiction of input above conf=0.5
         ;
 
     }

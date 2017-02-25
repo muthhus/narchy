@@ -17,6 +17,7 @@ import com.github.fge.grappa.stack.ValueStack;
 import com.github.fge.grappa.support.Var;
 import com.google.common.collect.ImmutableList;
 import jcog.Texts;
+import nars.budget.BudgetFunctions;
 import nars.derive.meta.match.Ellipsis;
 import nars.index.term.TermIndex;
 import nars.op.Command;
@@ -143,10 +144,10 @@ public class Narsese extends BaseParser<Object> {
 
         switch (blen) {
             case 0:     /* do not set, Memory will apply defaults */
-                ttt.budgetSafe(nar.priorityDefault(p), Float.NaN);
+                ttt.budgetSafe(nar.priorityDefault(p), quality(nar, p, t));
                 break;
             case 1:
-                ttt.budgetSafe(b[0], Float.NaN);
+                ttt.budgetSafe(b[0], quality(nar, p, t));
                 break;
             case 2:
                 ttt.budgetSafe(b[1], b[0]);
@@ -156,6 +157,10 @@ public class Narsese extends BaseParser<Object> {
         }
 
         return ttt.log(NARSESE_TASK_TAG).apply(nar);
+    }
+
+    public static float quality(NAR nar, byte p, @Nullable Truth t) {
+        return t!=null ? BudgetFunctions.truthToQuality(t) : nar.qualityDefault(p);
     }
 
     public static boolean isPunctuation(char c) {

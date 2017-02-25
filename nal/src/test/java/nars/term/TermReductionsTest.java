@@ -599,11 +599,10 @@ public class TermReductionsTest {
             Term t = $(x);
             assertValid(t);
 
-            Task y = task((Compound)t, Op.BELIEF, $.t(1f,0.9f));
+            Task y = task((Compound)t, Op.BELIEF, $.t(1f,0.9f)).apply(n);
 
             assertEquals(x, y.term().toString());
 
-            y.normalize(n); //that normalization doesnt throw
         }
 
 

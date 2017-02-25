@@ -98,7 +98,7 @@ public class Derivation extends Unify {
     public final Task task;
     @Nullable
     public final Task belief;
-    public final char taskPunct;
+    public final byte taskPunct;
 
     /**
      * whether the premise involves temporality that must be calculated upon derivation

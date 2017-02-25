@@ -20,6 +20,7 @@
  */
 package nars.budget;
 
+import nars.NAR;
 import nars.Task;
 import nars.truth.Truth;
 import nars.truth.Truthed;
@@ -300,4 +301,19 @@ public final class BudgetFunctions extends UtilityFunctions {
     public static void budgetByTruth(@NotNull Budgeted b, @NotNull Truth t, float p) {
         b.budget().setBudget(p, truthToQuality(t));
     }
+
+    public static void budgetByTruth(@NotNull Budgeted b, @Nullable Truth t, byte punc, float p, NAR nar) {
+        float q;
+
+        if (t != null) {
+            q = BudgetFunctions.truthToQuality(t);
+        } else {
+            if (nar != null) {
+                q = nar.qualityDefault(punc);
+            } else
+                throw new RuntimeException("missing truth");
+        }
+        b.budget().setBudget(p, q);
+    }
+
 }

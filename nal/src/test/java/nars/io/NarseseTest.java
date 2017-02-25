@@ -364,13 +364,13 @@ public class NarseseTest {
     @Test public void testQueryVariableTask() throws Narsese.NarseseException {
         String term = "hear(Time,(the,?x))";
         assertEquals("hear(Time,(the,?x))", term( term ).toString());
-        assertEquals("$.50;NaN$ hear(Time,(the,?x)). %1.0;.90%", task(term + ".").toString());
+        assertEquals("$.50;NaN$ hear(Time,(the,#x)). %1.0;.90%", task(term + ".").toString());
         assertEquals("$.50;NaN$ hear(Time,(the,?x))?", task(term + "?").toString());
     }
     @Test public void testQueryVariableTaskQuotes() throws Narsese.NarseseException {
         String term = "hear(\"Time\",(\"the\",?x))";
         assertEquals("hear(\"Time\",(\"the\",?x))", term( term ).toString());
-        assertEquals("$.50;NaN$ hear(\"Time\",(\"the\",?x)). %1.0;.90%", task(term + ".").toString());
+        assertEquals("$.50;NaN$ hear(\"Time\",(\"the\",#x)). %1.0;.90%", task(term + ".").toString());
         assertEquals("$.50;NaN$ hear(\"Time\",(\"the\",?x))?", task(term + "?").toString());
     }
 
@@ -640,7 +640,7 @@ public class NarseseTest {
     public static void assertInvalidTasks(Supplier<Task> s) {
 
             try {
-                s.get().normalize(new Terminal());
+                s.get();
                 assertTrue(false);
             } catch (InvalidTaskException good) {
                 assertTrue(true); //what should happen
@@ -656,8 +656,8 @@ public class NarseseTest {
             Compound bad = $.p("x", "y", "z");
             bad.subterms().terms()[0] = t; //directly replace it because constructing such a term wont be allowed
 
-            assertInvalidTasks(()->$.task(bad, Op.BELIEF, $.t(1f, 0.9f)));
-            assertInvalidTasks(()->$.task(bad, Op.QUESTION, $.t(1f, 0.9f)));
+            assertInvalidTasks(()->$.task(bad, Op.BELIEF, $.t(1f, 0.9f)).apply(n));
+            assertInvalidTasks(()->$.task(bad, Op.QUESTION, $.t(1f, 0.9f)).apply(n));
         }
 
     }

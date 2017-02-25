@@ -1,11 +1,9 @@
 package nars.task;
 
-import jcog.Util;
 import jcog.data.array.LongArrays;
 import nars.*;
 import nars.budget.Budget;
 import nars.budget.BudgetFunctions;
-import nars.budget.Budgeted;
 import nars.budget.RawBudget;
 import nars.concept.Concept;
 import nars.index.term.TermIndex;
@@ -13,18 +11,15 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.time.Tense;
-import nars.truth.DefaultTruth;
 import nars.truth.Truth;
 import nars.truth.Truthed;
 import nars.util.task.InvalidTaskException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 import static nars.$.t;
 import static nars.Op.*;
@@ -34,18 +29,18 @@ import static nars.time.Tense.ETERNAL;
 /**
  * Default Task implementation
  * TODO move all mutable methods to TaskBuilder and call this ImTaskBuilder
- *
+ * <p>
  * NOTE:
-     if evidence length == 1 (input) then do not include
-     truth or occurrence time as part of the hash, equality, and
-     comparison tests.
-
-     this allows an input task to modify itself in these two
-     fields without changing its hash and equality consistency.
-
-     once input, input tasks will have unique serial numbers anyway
+ * if evidence length == 1 (input) then do not include
+ * truth or occurrence time as part of the hash, equality, and
+ * comparison tests.
+ * <p>
+ * this allows an input task to modify itself in these two
+ * fields without changing its hash and equality consistency.
+ * <p>
+ * once input, input tasks will have unique serial numbers anyway
  */
-public class TaskBuilder extends RawBudget implements Termed, Truthed, Function<NAR,Task> {
+public class TaskBuilder extends RawBudget implements Termed, Truthed, Function<NAR, Task> {
 
     @NotNull
     private Compound term;
@@ -130,8 +125,6 @@ public class TaskBuilder extends RawBudget implements Termed, Truthed, Function<
     }
 
 
-
-
     public boolean isInput() {
         return evidence().length <= 1;
     }
@@ -143,7 +136,7 @@ public class TaskBuilder extends RawBudget implements Termed, Truthed, Function<
 
         Compound t = term;
 
-        if (!t.levelValid( n.level() ))
+        if (!t.levelValid(n.level()))
             throw new InvalidTaskException(this, "Unsupported NAL level");
 
         byte punc = punc();
@@ -158,7 +151,7 @@ public class TaskBuilder extends RawBudget implements Termed, Truthed, Function<
         if (!Task.taskContentValid(cntt, punc, n.level(), n.termVolumeMax.intValue(), !Param.DEBUG))
             throw new InvalidTaskException(cntt, "Invalid content");
 
-        if (cntt!=t) {
+        if (cntt != t) {
             this.term = cntt;
             invalidate();
         }
@@ -182,7 +175,7 @@ public class TaskBuilder extends RawBudget implements Termed, Truthed, Function<
                 break;
             case QUEST:
             case QUESTION:
-                if (truth!=null)
+                if (truth != null)
                     throw new RuntimeException("quests and questions must have null truth");
                 break;
             case COMMAND:
@@ -217,7 +210,7 @@ public class TaskBuilder extends RawBudget implements Termed, Truthed, Function<
 
         //if quality is not specified (NaN), then this means to assign the default budgeting according to the task's punctuation
         float q = qua();
-        if (q!=q) {
+        if (q != q) {
 
             setPriority(n.priorityDefault(punc));
 
@@ -234,23 +227,25 @@ public class TaskBuilder extends RawBudget implements Termed, Truthed, Function<
 //            dur = n.time.dur();
 //        }
 
-            //shift the occurrence time if input and dt < 0 and non-eternal HACK dont use log it may be removed without warning
+        //shift the occurrence time if input and dt < 0 and non-eternal HACK dont use log it may be removed without warning
 //        if (isInput()) {
 //            long exOcc = occurrence();
 //            if (exOcc != ETERNAL) {
 //                int termDur = ntt.dt();
 //                if (termDur != DTERNAL && termDur < 0) {
-//                    setOccurrence(exOcc - termDur);
+//                    setOccurrence(exOcctermDur);
 //                }
 //            }
 //        }
 
 
-        return new ImmutableTask(term, punc, truth, creation, start, end, evidence);
-
+        ImmutableTask i = new ImmutableTask(term, punc, truth, creation, start, end, evidence);
+        i.setBudget(this);
+        return i;
     }
 
-    @Nullable protected Compound eval(@NotNull TermIndex index, @NotNull Compound t) {
+    @Nullable
+    protected Compound eval(@NotNull TermIndex index, @NotNull Compound t) {
         return compoundOrNull(index.eval(t));
     }
 
@@ -263,22 +258,23 @@ public class TaskBuilder extends RawBudget implements Termed, Truthed, Function<
 //    }
 
 
-
-    @NotNull @Override
+    @NotNull
+    @Override
     public final Compound term() {
         return term;
     }
 
 
-
     public boolean isBeliefOrGoal() {
-        return punc==Op.BELIEF || punc==Op.GOAL;
-    }
-    public boolean isCommand() {
-        return punc==Op.COMMAND;
+        return punc == Op.BELIEF || punc == Op.GOAL;
     }
 
-    @Nullable @Override
+    public boolean isCommand() {
+        return punc == Op.COMMAND;
+    }
+
+    @Nullable
+    @Override
     public final Truth truth() {
         return truth;
     }
@@ -295,18 +291,19 @@ public class TaskBuilder extends RawBudget implements Termed, Truthed, Function<
     }
 
 
-
-
 //    @Override
 //    public final boolean isAnticipated() {
 //        return isBelief() && !isEternal() &&
 //                (/*state() == TaskState.Anticipated ||*/ isInput());
 //    }
 
-    /** the evidence should be sorted and de-duplicaed prior to calling this */
-    @NotNull protected TaskBuilder setEvidence(@Nullable long... evidentialSet) {
+    /**
+     * the evidence should be sorted and de-duplicaed prior to calling this
+     */
+    @NotNull
+    protected TaskBuilder setEvidence(@Nullable long... evidentialSet) {
 
-        if (this.evidence !=evidentialSet) {
+        if (this.evidence != evidentialSet) {
             this.evidence = evidentialSet;
             invalidate();
         }
@@ -377,7 +374,7 @@ public class TaskBuilder extends RawBudget implements Termed, Truthed, Function<
         }
         //if (this.creationTime != creationTime) {
         this.creation = creationTime;
-            //does not need invalidated since creation time is not part of hash
+        //does not need invalidated since creation time is not part of hash
         //}
         return this;
     }
@@ -386,7 +383,9 @@ public class TaskBuilder extends RawBudget implements Termed, Truthed, Function<
         hash = 0;
     }
 
-    /** TODO for external use in TaskBuilder instances only */
+    /**
+     * TODO for external use in TaskBuilder instances only
+     */
     public final void setStart(long o) {
 //        if ((o == Integer.MIN_VALUE || o == Integer.MAX_VALUE) && Param.DEBUG) {
 //            System.err.println("Likely an invalid occurrence time being set");
@@ -398,13 +397,15 @@ public class TaskBuilder extends RawBudget implements Termed, Truthed, Function<
         }
     }
 
-    /** TODO for external use in TaskBuilder instances only */
+    /**
+     * TODO for external use in TaskBuilder instances only
+     */
     public final void setEnd(long o) {
 //        if ((o == Integer.MIN_VALUE || o == Integer.MAX_VALUE) && Param.DEBUG) {
 //            System.err.println("Likely an invalid occurrence time being set");
 //        }
         if (o != end) {
-            if (start == ETERNAL && o!=ETERNAL)
+            if (start == ETERNAL && o != ETERNAL)
                 throw new RuntimeException("can not set end time for eternal task");
             if (o < start)
                 throw new RuntimeException("end must be equal to or greater than start");
@@ -413,7 +414,6 @@ public class TaskBuilder extends RawBudget implements Termed, Truthed, Function<
             invalidate();
         }
     }
-
 
 
     @Override
@@ -456,13 +456,9 @@ public class TaskBuilder extends RawBudget implements Termed, Truthed, Function<
     }*/
 
 
-
-
-
-
-
-
-    /** end occurrence */
+    /**
+     * end occurrence
+     */
     public final long end() {
 
         return end;
@@ -492,7 +488,8 @@ public class TaskBuilder extends RawBudget implements Termed, Truthed, Function<
         return time(nar.time() + dt);
     }
 
-    @NotNull public final TaskBuilder time(long when) {
+    @NotNull
+    public final TaskBuilder time(long when) {
         return TaskBuilder.this.time(when, when);
     }
 
@@ -537,7 +534,6 @@ public class TaskBuilder extends RawBudget implements Termed, Truthed, Function<
     }
 
 
-
     @NotNull
     public final TaskBuilder budget(@NotNull Budget bb) {
         setBudget(bb);
@@ -549,6 +545,26 @@ public class TaskBuilder extends RawBudget implements Termed, Truthed, Function<
         if (log == null)
             log = $.newArrayList(1);
         log.add(s);
+        return this;
+    }
+
+    public TaskBuilder budgetByTruth(@NotNull Budget budget, float p) {
+        return null;
+    }
+
+    @NotNull
+    public TaskBuilder budgetByTruth(float p) {
+        return budgetByTruth(p, null);
+    }
+
+    @NotNull
+    public TaskBuilder budgetByTruth(float p, @Nullable NAR nar) {
+        BudgetFunctions.budgetByTruth(this, truth(), punc(), p, nar);
+        return this;
+    }
+
+    public TaskBuilder budgetSafe(float p, float q) {
+        super.budgetSafe(p, q);
         return this;
     }
 }

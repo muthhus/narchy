@@ -22,6 +22,9 @@ import org.junit.runners.Parameterized;
 
 import java.util.function.Supplier;
 
+import static nars.Op.BELIEF;
+import static nars.Op.GOAL;
+import static nars.Op.QUESTION;
 import static org.junit.Assert.*;
 
 //don't touch this file - patham9
@@ -86,7 +89,7 @@ public class LinkageTest extends AbstractNALTest {
     }
 
     public void ProperlyLinkedIndirectlyTest(@NotNull String spremise1, @NotNull String spremise2) throws Exception {
-        ProperlyLinkedIndirectlyTest(spremise1, '.',  spremise2);
+        ProperlyLinkedIndirectlyTest(spremise1, BELIEF,  spremise2);
     }
 
     //interlinked with an intermediate concept, this is needed in order to select one as task and the other as belief
@@ -364,15 +367,15 @@ public class LinkageTest extends AbstractNALTest {
 
     @Test @Ignore /* requires inheritance to have termlink templates to level 2, but this doesnt seem critical otherwise */
     public void Indirect_Linkage_Layer2_Basic_WithVar2() throws Exception {
-        ProperlyLinkedIndirectlyTest("<a --> <b --> <#1 --> x>>>", '.', "<k --> x>");
+        ProperlyLinkedIndirectlyTest("<a --> <b --> <#1 --> x>>>", BELIEF, "<k --> x>");
     }
     @Test @Ignore /* requires inheritance to have termlink templates to level 2, but this doesnt seem critical otherwise */
     public void Indirect_Linkage_Layer2_Basic_WithVar2_Goal() throws Exception {
-        ProperlyLinkedIndirectlyTest("<a --> <b --> <#1 --> x>>>", '!', "<k --> x>");
+        ProperlyLinkedIndirectlyTest("<a --> <b --> <#1 --> x>>>", GOAL, "<k --> x>");
     }
     @Test @Ignore /* requires inheritance to have termlink templates to level 2, but this doesnt seem critical otherwise */
     public void Indirect_Linkage_Layer2_Basic_WithVar2_Question() throws Exception {
-        ProperlyLinkedIndirectlyTest("<a --> <b --> <#1 --> x>>>", '?', "<k --> x>");
+        ProperlyLinkedIndirectlyTest("<a --> <b --> <#1 --> x>>>", QUESTION, "<k --> x>");
     }
 
     public void testConceptFormed(@NotNull String s) throws Exception {

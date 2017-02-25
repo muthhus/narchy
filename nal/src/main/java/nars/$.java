@@ -196,8 +196,8 @@ public enum $ {
     }
 
     @NotNull
-    public static Term impl(@NotNull Term a, int dt, @NotNull Term b) {
-        return compound(IMPL, dt, a, b);
+    public static Compound impl(@NotNull Term a, int dt, @NotNull Term b) {
+        return (Compound)compound(IMPL, dt, a, b);
     }
 
     @NotNull
@@ -853,8 +853,8 @@ public enum $ {
     }
 
     /** conjunction sequence (2-ary) */
-    @Nullable public static Term seq(Term x, int dt, Term y) {
-        return compound(CONJ, dt, x, y); //must be a vector, not set
+    @Nullable public static Compound seq(Term x, int dt, Term y) {
+        return (Compound)(compound(CONJ, dt, x, y)); //must be a vector, not set
     }
 
 

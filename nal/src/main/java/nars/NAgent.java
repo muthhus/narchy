@@ -17,6 +17,7 @@ import nars.concept.SensorConcept;
 import nars.nar.Default;
 import nars.task.GeneratedTask;
 
+import nars.task.ImmutableTask;
 import nars.task.TaskBuilder;
 import nars.term.Compound;
 import nars.term.Term;
@@ -40,9 +41,11 @@ import java.util.stream.Stream;
 
 import static jcog.Texts.n2;
 import static jcog.Texts.n4;
+import static nars.$.*;
 import static nars.$.t;
 import static nars.Op.BELIEF;
 import static nars.Op.GOAL;
+import static nars.Op.QUESTION;
 import static nars.time.Tense.ETERNAL;
 import static nars.truth.TruthFunctions.w2c;
 
@@ -74,8 +77,8 @@ abstract public class NAgent implements NSense, NAction {
 
     public final NAR nar;
 
-    public final List<SensorConcept> sensors = $.newArrayList();
-    public final List<ActionConcept> actions = $.newArrayList();
+    public final List<SensorConcept> sensors = newArrayList();
+    public final List<ActionConcept> actions = newArrayList();
 
 
     float lookAhead = 12;
@@ -102,7 +105,7 @@ abstract public class NAgent implements NSense, NAction {
         }
     }
 
-    final List<CuriosityPhasor> curiosityPhasor = $.newArrayList();
+    final List<CuriosityPhasor> curiosityPhasor = newArrayList();
 
     public final FloatParam epsilonProbability = new FloatParam(0.1f);
 
@@ -117,7 +120,7 @@ abstract public class NAgent implements NSense, NAction {
 
     float predictorProbability = 1f;
 
-    public final List<TaskBuilder> predictors = $.newArrayList();
+    public final List<Task> predictors = newArrayList();
     public final FloatParam predictorPriority = new FloatParam(1);
 
     public boolean trace = false;
@@ -147,7 +150,7 @@ abstract public class NAgent implements NSense, NAction {
     }
 
     public NAgent(String id, @NotNull NAR nar, int frameRate) {
-        this(id.isEmpty() ? null : $.the(id), nar, frameRate);
+        this(id.isEmpty() ? null : the(id), nar, frameRate);
     }
 
     public NAgent(@Nullable Term id, @NotNull NAR nar, int frameRate) {
@@ -172,7 +175,7 @@ abstract public class NAgent implements NSense, NAction {
 
         this.happy = new SensorConcept(
                 //"happy" + "(" + nar.self + ")", nar,
-                id == null ? $.p("happy") : $.func("happy", id),
+                id == null ? p("happy") : func("happy", id),
                 nar,
                 rewardNormalized,
                 (x) -> t(x, alpha)
@@ -395,19 +398,10 @@ abstract public class NAgent implements NSense, NAction {
 
         @NotNull Compound happiness = happy.term();
 
-        {
+        predictors.add(
+            goal(happiness, t(1f, nar.confidenceDefault(GOAL)), ETERNAL)
+        );
 
-
-            predictors.add(
-                    BudgetFunctions
-                            .budgetByTruth(rewardPriority.floatValue())
-                            .eternal()
-                            //.present(nar)
-            );
-//                    happy.desire($.t(1f, rewardGamma),
-//                            nar.priorityDefault(Symbols.GOAL),
-//                            happinssDurability));
-        }
 
 //        predictors.addAll(
 //                //what will imply reward
@@ -454,22 +448,13 @@ abstract public class NAgent implements NSense, NAction {
 //                            .eternal(),
 //                            //.time(nar, dur)
 
-                    new PredictionTask($.impl(action, dur, happiness), '?')
-                            .time(nar.time()),
-                    new PredictionTask($.impl($.neg(action), dur, happiness), '?')
-                            .time(nar.time()),
-
-                    new PredictionTask($.impl(action, dur, $.varQuery(1)), '?')
-                            .time(nar.time()),
-
-                    new PredictionTask($.seq(action, dur, happiness), '?')
-                            .time(nar.time()),
-                    new PredictionTask($.seq($.neg(action), dur, happiness), '?')
-                            .time(nar.time()),
-                    new PredictionTask($.seq(action, dur, $.neg(happiness)), '?')
-                            .time(nar.time()),
-                    new PredictionTask($.seq($.neg(action), dur, $.neg(happiness)), '?')
-                            .time(nar.time())
+                    question(impl(action, dur, happiness), nar.time()),
+                    question(impl(neg(action), dur, happiness), nar.time()),
+                    //question(impl(neg(action), dur, varQuery(1)), nar.time()),
+                    question(seq(action, dur, happiness), nar.time()),
+                    question(seq(neg(action), dur, happiness), nar.time()),
+                    question(seq(action, dur, neg(happiness)), nar.time()),
+                    question(seq(neg(action), dur, neg(happiness)), nar.time())
 
 //                    new PredictionTask($.seq($.varQuery("x"), 0, $.seq(action, dur, happiness)), '?').eternal(),
 //                    new PredictionTask($.seq($.varQuery("x"), 0, $.seq($.neg(action), dur, happiness)), '?').eternal()
@@ -570,15 +555,15 @@ abstract public class NAgent implements NSense, NAction {
 
                 float f = curiosityPhasor.get(i).next();
                 float cc = gamma * gammaEpsilonFactor;// * (1f - Math.min(1f, action.goalConf(now, 0) / gamma));
-                Truth t = $.t(f, cc);
+                Truth t = t(f, cc);
 
                 //action.biasDesire(t);
 
                 if (t!=null) {
                     nar.input(
-                            BudgetFunctions
-                                    .budgetByTruth(action.pri.asFloat())
-                                    .log("Curiosity")
+                            goal(action.term(), t, now, now - Math.round(nar.time.dur()))
+                                //.budgetByTruth(action.pri.asFloat(), nar)
+                                .log("Curiosity")
                     );
                 }
 
@@ -643,8 +628,8 @@ abstract public class NAgent implements NSense, NAction {
             float dur = nar.time.dur();
             nar.input(
                 IntStream.range(0, predictors.size()).mapToObj(i -> {
-                    MutableTask x = predictors.get(i);
-                    MutableTask y = boost(x, pri, dur, lookAhead);
+                    Task x = predictors.get(i);
+                    Task y = boost(x, pri, dur, lookAhead);
                     if (x!=y) {
                         predictors.set(i, y); //predictor changed or needs re-input
                         return y;
@@ -703,33 +688,23 @@ abstract public class NAgent implements NSense, NAction {
 //    }
 
 
-    private MutableTask boost(@NotNull MutableTask t, float p, float dur, float lookAhead /* in multiples of dur */) {
+    private Task boost(@NotNull Task t, float p, float dur, float lookAhead /* in multiples of dur */) {
 
         if (nar.random.nextFloat() > predictorProbability)
             return t;
 
-        MutableTask s;
-        char pp = t.punc();
+        TaskBuilder s;
+        byte pp = t.punc();
         if (t.start() != ETERNAL) {
-            s = (t instanceof PredictionTask) ? new PredictionTask(t.term(), pp) : new TaskBuilder(t.term(), pp, t.truth());
-            s.budgetByTruth(p, nar)
-                .time(now, now + Math.round(dur * lookAhead * nar.random.nextFloat()))
-                .log("Agent Predictor");
 
-            //s.evidence(t)
-            return s;
+            return prediction(t.term(), t.punc(), t.truth(), now, now + Math.round(dur * lookAhead * nar.random.nextFloat()));
+
         } else if (t.isDeleted()) {
-            s = (t instanceof PredictionTask) ?
-                    new PredictionTask(t.term(), pp) :
-                    new TaskBuilder(t.term(), pp, t.truth());
 
-            s.budgetByTruth(p, nar).eternal().log("Agent Predictor");
+            return prediction(t.term(), t.punc(), t.truth(), ETERNAL, ETERNAL);
 
-            t.delete(); //allow the new one to replace it on re-activation
-
-            return s;
         } else {
-            t.budgetByTruth(p, nar).eternal().log("Agent Predictor");
+            t.budgetByTruth(p, nar).log("Agent Predictor");
             return t;
         }
 
@@ -759,12 +734,24 @@ abstract public class NAgent implements NSense, NAction {
         return Float.NaN;
     }
 
-    public static class PredictionTask extends GeneratedTask {
 
-        public PredictionTask(@NotNull Termed<Compound> term, byte punct) {
-            super(term, punct, null);
-            assert(punct == Op.QUESTION || punct == Op.QUEST);
-        }
+    public Task goal(@NotNull Compound term, Truth truth, long when) {
+        return prediction(term, GOAL, truth, when, when);
+    }
+
+    public Task goal(@NotNull Compound term, Truth truth, long start, long end) {
+        return prediction(term, GOAL, truth, start, end);
+    }
+
+    public Task question(@NotNull Compound term, long when) {
+        return prediction(term, QUESTION, null, when, when);
+    }
+
+    public Task prediction(@NotNull Compound term, byte punct, Truth truth, long start, long end) {
+        return new ImmutableTask(term, punct, truth, nar.time(), start, end, new long[] { nar.time.nextStamp() } )
+                .budgetByTruth(predictorPriority.floatValue(), nar)
+                .log("Agent Predictor");
+    }
 
         /*
         @Override
@@ -777,6 +764,6 @@ abstract public class NAgent implements NSense, NAction {
             return answer;
         }
         */
-    }
+
 
 }

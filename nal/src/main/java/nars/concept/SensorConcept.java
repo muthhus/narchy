@@ -46,7 +46,7 @@ public class SensorConcept extends WiredConcept implements FloatFunction<Term>, 
     public SensorConcept(@NotNull Compound term, @NotNull NAR n, FloatSupplier signal, FloatToObjectFunction<Truth> truth)  {
         super(term, n);
 
-        this.sensor = new ScalarSignal(n, this, this, truth);
+        this.sensor = new ScalarSignal(n, term, this, truth);
 
         this.signal = signal;
         this.beliefs = new SensorBeliefTable(this);
@@ -160,7 +160,7 @@ public class SensorConcept extends WiredConcept implements FloatFunction<Term>, 
     }
 
     @NotNull
-    public <S extends SensorConcept> S punc(char c) {
+    public <S extends SensorConcept> S punc(byte c) {
         sensor.punc(c);
         return (S)this;
     }

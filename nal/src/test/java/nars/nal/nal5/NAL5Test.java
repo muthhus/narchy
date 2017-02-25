@@ -10,6 +10,7 @@ import org.junit.runners.Parameterized;
 
 import java.util.function.Supplier;
 
+import static nars.Op.BELIEF;
 import static nars.time.Tense.ETERNAL;
 
 @RunWith(Parameterized.class)
@@ -87,7 +88,7 @@ public class NAL5Test extends AbstractNALTest {
 //                .log()
 //                .believe("(--,(b))")
 //                .believe("((b)==>(c))",1,0.9f)
-//                .mustNotOutput(cycles,"(c)",'.');
+//                .mustNotOutput(cycles,"(c)",BELIEF);
 //    }
 
     @Test public void testImplBeliefPosNeg() {
@@ -240,7 +241,7 @@ public class NAL5Test extends AbstractNALTest {
         //freq 0 conjunction would not be decomposed
         TestNAR tester = test();
         tester.believe("(&&,<robin --> [flying]>,<robin --> swimmer>)",0.0f,0.9f); //.en("Robin cannot be both a flyer and a swimmer.");
-        tester.mustNotOutput(cycles,"<robin --> swimmer>", '.', ETERNAL); //.en("Robin cannot swim.");
+        tester.mustNotOutput(cycles,"<robin --> swimmer>", BELIEF, ETERNAL); //.en("Robin cannot swim.");
     }
 
 
@@ -482,7 +483,7 @@ public class NAL5Test extends AbstractNALTest {
                 .input("(x). %1.0;0.90%")
                 .input("((x) ==> (y)).")
                 .mustBelieve(cycles, "(y)", 1.0f, 0.81f)
-                .mustNotOutput(cycles, "(y)", '.', 0f, 0.5f, 0, 1, ETERNAL);
+                .mustNotOutput(cycles, "(y)", BELIEF, 0f, 0.5f, 0, 1, ETERNAL);
 
     }
 
@@ -491,7 +492,7 @@ public class NAL5Test extends AbstractNALTest {
 //                .input("(x). %1.0;0.90%")
 //                .input("((x) ==> (--,(y))).")
 //                .mustBelieve(cycles, "(y)", 0.0f, 0.81f)
-//                .mustNotOutput(cycles, "(y)", '.', 0.5f, 1f, 0, 1, ETERNAL);
+//                .mustNotOutput(cycles, "(y)", BELIEF, 0.5f, 1f, 0, 1, ETERNAL);
 //    }
 
 
@@ -500,7 +501,7 @@ public class NAL5Test extends AbstractNALTest {
                 .input("(x). %0.0;0.90%")
                 .input("((--,(x)) ==> (y)).")
                 .mustBelieve(cycles, "(y)", 1.0f, 0.81f)
-                .mustNotOutput(cycles, "(y)", '.', 0f, 0.5f, 0, 1, ETERNAL)
+                .mustNotOutput(cycles, "(y)", BELIEF, 0f, 0.5f, 0, 1, ETERNAL)
         ;
     }
     @Test public void testImplNegNeg() {
@@ -508,7 +509,7 @@ public class NAL5Test extends AbstractNALTest {
                 .input("(x). %0.0;0.90%")
                 .input("((--,(x)) ==> (--,(y))).")
                 .mustBelieve(cycles, "(y)", 0.0f, 0.81f)
-                .mustNotOutput(cycles, "(y)", '.', 0.5f, 1f, 0, 1, ETERNAL)
+                .mustNotOutput(cycles, "(y)", BELIEF, 0.5f, 1f, 0, 1, ETERNAL)
         ;
     }
 
@@ -518,7 +519,7 @@ public class NAL5Test extends AbstractNALTest {
                 .input("(y). %1.0;0.90%")
                 .input("((--,(x)) ==> (y)).")
                 .mustBelieve(cycles, "(x)", 0.0f, 0.45f)
-                .mustNotOutput(cycles, "(x)", '.', 0.5f, 1f, 0, 1, ETERNAL)
+                .mustNotOutput(cycles, "(x)", BELIEF, 0.5f, 1f, 0, 1, ETERNAL)
         ;
     }
 //    @Test public void testNegNegImplicationPred() {
@@ -526,7 +527,7 @@ public class NAL5Test extends AbstractNALTest {
 //                .input("(--,(y)).")
 //                .input("((--,(x)) ==> (--,(y))).")
 //                .mustBelieve(cycles, "(x)", 0.0f, 0.45f)
-//                .mustNotOutput(cycles, "(x)", '.', 0.5f, 1f, 0, 1, ETERNAL)
+//                .mustNotOutput(cycles, "(x)", BELIEF, 0.5f, 1f, 0, 1, ETERNAL)
 //        ;
 //    }
 
@@ -536,7 +537,7 @@ public class NAL5Test extends AbstractNALTest {
 //                .input("(x). %0.0;0.90%")
 //                .input("((--,(x)) ==> (--,(y))).")
 //                .mustBelieve(cycles, "(y)", 0.0f, 0.81f)
-//                .mustNotOutput(cycles, "(y)", '.', 0.5f, 1f, 0, 1, ETERNAL)
+//                .mustNotOutput(cycles, "(y)", BELIEF, 0.5f, 1f, 0, 1, ETERNAL)
 //        ;
 //    }
     @Test public void testNegNegEquivPred() {
@@ -544,7 +545,7 @@ public class NAL5Test extends AbstractNALTest {
                 .input("(--,(y)).")
                 .input("((--,(x)) <=> (--,(y))).")
                 .mustBelieve(cycles, "(x)", 0.0f, 0.81f)
-                .mustNotOutput(cycles, "(x)", '.', 0.5f, 1f, 0, 1, ETERNAL)
+                .mustNotOutput(cycles, "(x)", BELIEF, 0.5f, 1f, 0, 1, ETERNAL)
         ;
     }
     @Test public void testNegNegEquivPredInv() {
@@ -552,7 +553,7 @@ public class NAL5Test extends AbstractNALTest {
                 .input("(y).")
                 .input("((--,(x)) <=> (--,(y))).")
                 .mustBelieve(cycles, "(x)", 1.0f, 0.81f)
-                .mustNotOutput(cycles, "(x)", '.', 0f, 0.5f, 0, 1, ETERNAL)
+                .mustNotOutput(cycles, "(x)", BELIEF, 0f, 0.5f, 0, 1, ETERNAL)
         ;
     }
     @Test public void testConversion() {

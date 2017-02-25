@@ -1,6 +1,7 @@
 package nars.task;
 
 import nars.*;
+import nars.nar.Terminal;
 import nars.test.analyze.BeliefAnalysis;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
@@ -11,6 +12,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import static nars.Op.BELIEF;
 import static nars.task.RevisionTest.newNAR;
 import static nars.truth.TruthFunctions.c2w;
 import static nars.truth.TruthFunctions.w2c;
@@ -32,16 +34,20 @@ public class RevectionTest {
         //assertEquals(a.truth(), TruthPolation.truth(0, a, a)); //same item
 
         //System.out.println( TruthPolation.truth(0, a, b) );
-        assertEquals(Revision.revise(a, b), TruthPolation.truth(0, 1, a, b));
+        assertEquals(Revision.revise(a, b), TruthPolation.truth(0, 1, a.apply(n), b.apply(n)));
 
     }
+
+    final static NAR n = new Terminal();
+
 
     @Test
     public void testRevisionInequivalenceDueToTemporalSeparation() throws Narsese.NarseseException {
         TaskBuilder a = t(1f, 0.5f, -4).evidence(1);
         TaskBuilder b = t(0f, 0.5f, 4).evidence(2);
 
-        Truth pt = TruthPolation.truth(0, 1, a, b);
+
+        Truth pt = TruthPolation.truth(0, 1, a.apply(n), b.apply(n));
         @Nullable Truth rt = Revision.revise(a, b);
 
         assertEquals(pt.freq(), rt.freq(), 0.01f);
@@ -52,9 +58,9 @@ public class RevectionTest {
 
     @Test
     public void testRevisionEquivalence2Instant() throws Narsese.NarseseException {
-        Task a = t(1f, 0.5f, 0);
-        Task b = t(0f, 0.5f, 0);
-        assertEquals( Revision.revise(a, b), TruthPolation.truth(0, 1, a, b) );
+        TaskBuilder a = t(1f, 0.5f, 0);
+        TaskBuilder b = t(0f, 0.5f, 0);
+        assertEquals( Revision.revise(a, b), TruthPolation.truth(0, 1, a.apply(n), b.apply(n)) );
     }
 
     @Test
@@ -62,8 +68,8 @@ public class RevectionTest {
 
         float dur = 1;
 
-        Task a = t(1f, 0.5f, 3).evidence(1);
-        Task b = t(0f, 0.5f, 6).evidence(2);
+        Task a = t(1f, 0.5f, 3).evidence(1).apply(n);
+        Task b = t(0f, 0.5f, 6).evidence(2).apply(n);
         for (int i = 0; i < 10; i++) {
             System.out.println(i + " " + TruthPolation.truth(i, dur, a, b));
         }
@@ -84,11 +90,11 @@ public class RevectionTest {
 
     @Test
     public void testRevisionEquivalence4() throws Narsese.NarseseException {
-        Task a = t(0f, 0.1f, 3).evidence(1);
-        Task b = t(0f, 0.1f, 4).evidence(2);
-        Task c = t(1f, 0.1f, 5).evidence(3);
-        Task d = t(0f, 0.1f, 6).evidence(4);
-        Task e = t(0f, 0.1f, 7).evidence(5);
+        Task a = t(0f, 0.1f, 3).evidence(1).apply(n);
+        Task b = t(0f, 0.1f, 4).evidence(2).apply(n);
+        Task c = t(1f, 0.1f, 5).evidence(3).apply(n);
+        Task d = t(0f, 0.1f, 6).evidence(4).apply(n);
+        Task e = t(0f, 0.1f, 7).evidence(5).apply(n);
 
         for (int i = 0; i < 15; i++) {
             System.out.println(i + " " + TruthPolation.truth(i, 1, a, b, c, d, e));
@@ -97,10 +103,10 @@ public class RevectionTest {
     }
 
     public static TaskBuilder t(float freq, float conf, long occ) throws Narsese.NarseseException {
-        return new TaskBuilder("a:b", '.', $.t(freq, conf)).time(0, occ);
+        return new TaskBuilder("a:b", BELIEF, $.t(freq, conf)).time(0, occ);
     }
     public static TaskBuilder t(float freq, float conf, long start, long end) throws Narsese.NarseseException {
-        return new TaskBuilder("a:b", '.', $.t(freq, conf)).time(0, start, end);
+        return new TaskBuilder("a:b", BELIEF, $.t(freq, conf)).time(0, start, end);
     }
 
 //    public static void _main(String[] args) {
@@ -111,9 +117,9 @@ public class RevectionTest {
 //        List<Task> l = Global.newArrayList();
 //
 //        //NAR n = new Default();
-//        l.add( new TaskBuilder("a:b", '.', new DefaultTruth(0f, 0.5f) ).occurr(0).setCreationTime(0) );
-//        l.add( new TaskBuilder("a:b", '.', new DefaultTruth(1f, 0.5f) ).occurr(5).setCreationTime(0) );
-//        l.add( new TaskBuilder("a:b", '.', new DefaultTruth(0f, 0.75f) ).occurr(10).setCreationTime(0) );
+//        l.add( new TaskBuilder("a:b", BELIEF, new DefaultTruth(0f, 0.5f) ).occurr(0).setCreationTime(0) );
+//        l.add( new TaskBuilder("a:b", BELIEF, new DefaultTruth(1f, 0.5f) ).occurr(5).setCreationTime(0) );
+//        l.add( new TaskBuilder("a:b", BELIEF, new DefaultTruth(0f, 0.75f) ).occurr(10).setCreationTime(0) );
 //        print(p, l, -5, 15);
 //
 //

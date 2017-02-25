@@ -4,6 +4,7 @@ import jcog.Util;
 import jcog.bag.Prioritized;
 import nars.Param;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import static nars.budget.Budget.aveGeo;
 
@@ -43,7 +44,6 @@ public interface Budgeted extends Prioritized {
     }
 
 
-    default void setBudget(Budget b) {
-        budget().setBudget(b);
-    }
+    Budget setBudget(@Nullable Budgeted srcCopy);
+
 }

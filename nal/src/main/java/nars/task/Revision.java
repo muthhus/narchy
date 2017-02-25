@@ -125,11 +125,13 @@ public class Revision {
 
 
 
-        MutableTask t = new RevisionTask(cc, a.punc(),
+        RevisionTask t = new RevisionTask(cc, a.punc(),
                 newTruth,
                 now, start, end,
                 evidence
-        ).budget(a, b, aProp);
+        );
+
+        t.budget(a, b, aProp);
 
         return t;//.dur(lerp(aw / (aw + bw), a.dur(), b.dur())).log("Revection Merge");
     }

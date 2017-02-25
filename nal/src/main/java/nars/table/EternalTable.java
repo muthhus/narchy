@@ -9,6 +9,7 @@ import nars.concept.Concept;
 import nars.task.Revision;
 import nars.task.RevisionTask;
 import nars.task.TaskBuilder;
+import nars.term.Compound;
 import nars.term.Term;
 import nars.truth.Truth;
 import nars.truth.TruthDelta;
@@ -19,6 +20,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.function.Consumer;
 
+import static nars.term.Terms.compoundOrNull;
 import static nars.time.Tense.ETERNAL;
 
 
@@ -226,20 +228,23 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, Sorted
 
         final float newBeliefWeight = newBelief.evi();
         float aProp = newBeliefWeight / (newBeliefWeight + oldBelief.evi());
-        Term t = Revision.intermpolate(
+        Compound t = compoundOrNull(Revision.intermpolate(
                 newBelief.term(), oldBelief.term(),
                 aProp,
                 nar.random,
                 true
-        );
+        ));
+        if (t==null)
+            return null;
 
-        TaskBuilder r = new RevisionTask(t,
+        RevisionTask r = new RevisionTask(t,
                 newBelief, oldBelief,
                 conclusion,
                 nar.time(),
                 ETERNAL, ETERNAL,
                 (CompoundConcept) concept
-        ).budget(oldBelief, newBelief);
+        );
+        r.budget(oldBelief, newBelief);
 
         if (r == null)
             return null;

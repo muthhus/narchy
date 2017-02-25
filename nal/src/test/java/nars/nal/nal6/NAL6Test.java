@@ -10,6 +10,7 @@ import org.junit.runners.Parameterized;
 
 import java.util.function.Supplier;
 
+import static nars.Op.BELIEF;
 import static nars.time.Tense.ETERNAL;
 
 @RunWith(Parameterized.class)
@@ -445,7 +446,7 @@ public class NAL6Test extends AbstractNALTest {
                 ///tester.believe("<<lock1 --> (/,open,$1,_)> ==> <$1 --> key>>", 1.00f, 0.90f); //en("whatever opens lock1 is a key");
                 .believe("(((--,(#1 --> lock)) && open($2,#1)) ==> ($2 --> key))", 1.00f, 0.90f) //en("there is NOT a lock with the property that when opened by something, this something is a key");
                 .mustBelieve(cycles, "lock:lock1", 0.00f, 0.45f) //en("lock1 is NOT a lock")
-                .mustNotOutput(cycles, "lock:lock1", '.', 0.5f,1f,0,1f,ETERNAL)
+                .mustNotOutput(cycles, "lock:lock1", BELIEF, 0.5f,1f,0,1f,ETERNAL)
         ;
     }
 

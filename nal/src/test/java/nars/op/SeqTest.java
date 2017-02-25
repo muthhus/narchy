@@ -86,7 +86,7 @@ public class SeqTest {
                             }
 
                             if (belief instanceof Compound) {
-                                TaskBuilder u = TaskBuilder.clone(t, (Compound) belief);
+                                Task u = Task.clone(t, (Compound) belief);
                                 if (u != null)
                                     return u.log("seqAdd(" + key + ")");
                             } else {

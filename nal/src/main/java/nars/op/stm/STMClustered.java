@@ -201,7 +201,7 @@ public abstract class STMClustered extends STM {
     /**
      * temporal link, centroid
      */
-    public final class TLink extends DependentBLink<Task> implements Truthed, Comparable<TLink> {
+    public final class TLink extends DependentBLink<Task> implements Truthed {
 
         /**
          * feature vector representing the item as learned by clusterer
@@ -273,18 +273,18 @@ public abstract class STMClustered extends STM {
             nearest().insert(this);
         }
 
-        @Override
-        public int compareTo(TLink o) {
-            @Nullable Task id = this.id;
-            @Nullable Task oid = o.id;
-            if (id == oid)
-                return 0;
-//            if (id == null)
-//                return 1;
-//            if (oid == null)
-//                return -1;
-            return id.compareTo(oid);
-        }
+//        @Override
+//        public int compareTo(TLink o) {
+//            @Nullable Task id = this.id;
+//            @Nullable Task oid = o.id;
+//            if (id == oid)
+//                return 0;
+////            if (id == null)
+////                return 1;
+////            if (oid == null)
+////                return -1;
+//            return id.compareTo(oid);
+//        }
     }
 
 //    @Deprecated final float baseForgetRate = 0.01f;

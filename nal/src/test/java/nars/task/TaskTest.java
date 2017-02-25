@@ -11,6 +11,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.TreeSet;
 
+import static nars.Op.BELIEF;
 import static org.junit.Assert.*;
 
 /**
@@ -40,7 +41,7 @@ public class TaskTest {
         for (float f = 0; f < 1.0f; f += 0.3f)
             for (float c = 0.01f; c < 1.0f; c += 0.3f) {
                 t.add(
-                    n.inputAndGet($.task("a:b", '.',f, c))
+                    n.inputAndGet($.task("a:b", BELIEF,f, c).apply(n))
                 );
                 count++;
             }

@@ -146,7 +146,7 @@ public class RawBudget implements Budget {
     }
 
     /** if p is NaN (indicating deletion), p <== 0 */
-    @NotNull public final RawBudget budgetSafe(float p, float q) {
+    @NotNull public RawBudget budgetSafe(float p, float q) {
         priority = p;
         quality = q;
         return this;

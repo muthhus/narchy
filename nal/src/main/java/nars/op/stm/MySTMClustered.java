@@ -21,6 +21,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static nars.term.Terms.compoundOrNull;
+
 /**
  * Task Dimension Mapping:
  *  0: Start time
@@ -203,12 +205,13 @@ public class MySTMClustered extends STMClustered {
 
                         long[] evidence = Stamp.zip(uu);
 
-                        @Nullable Term conj = group(negated, uu);
+                        @Nullable Compound conj = group(negated, uu);
+                        if (conj == null)
+                            return;
+
                         if (conj.volume() > maxVol)
                             return; //throw new RuntimeException("exceeded max volume");
 
-                        if (!(conj instanceof Compound))
-                            return;
 
 
                         @Nullable double[] nc = node.coherence(0);
@@ -221,11 +224,10 @@ public class MySTMClustered extends STMClustered {
                         float pri = (float) uu.stream().mapToDouble(x -> x.priSafe(0)).max().getAsDouble();
 
                         Task m = new GeneratedTask(conj, punc,
-                                $.t(finalFreq, conf)) //TODO use a truth calculated specific to this fixed-size batch, not all the tasks combined
-                                .time(now, t)
-                                .evidence(evidence)
-                                .budget(BudgetFunctions.fund(uu, pri / uu.size()))
-                                .log("STMCluster CoOccurr");
+                                $.t(finalFreq, conf), now, now, t, evidence ); //TODO use a truth calculated specific to this fixed-size batch, not all the tasks combined
+
+                        m.setBudget(BudgetFunctions.fund(uu, pri / uu.size()));
+                        m.log("STMCluster CoOccurr");
 
                         toInput.add(m);
 
@@ -248,7 +250,7 @@ public class MySTMClustered extends STMClustered {
     }
 
     @Nullable
-    private static Term group(boolean negated, @NotNull Collection<Task> uuu) {
+    private static Compound group(boolean negated, @NotNull Collection<Task> uuu) {
 
 
         if (uuu.size() == 2) {
@@ -283,7 +285,7 @@ public class MySTMClustered extends STMClustered {
                 $.neg(uu);
 
             //just assume they occurr simultaneously
-            return $.parallel(uu);
+            return compoundOrNull($.parallel(uu));
             //return $.secte(s);
         }
     }

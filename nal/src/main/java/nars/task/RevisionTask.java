@@ -28,13 +28,13 @@ public class RevisionTask extends AnswerTask  {
     @Nullable
     private Concept concept;
 
-    public RevisionTask(@NotNull Termed<Compound> term, @NotNull Task newBelief, @NotNull Task oldBelief, Truth conclusion, long creationTime, long start, long end, Concept target) {
+    public RevisionTask(@NotNull Compound term, @NotNull Task newBelief, @NotNull Task oldBelief, Truth conclusion, long creationTime, long start, long end, Concept target) {
         super(term, newBelief, oldBelief, conclusion, creationTime, start, end, 0.5f);
         this.concept = target;
     }
 
 
-    public RevisionTask(@NotNull Termed<Compound> term, byte punc, Truth conclusion, long creationTime, long start, long end, long[] evidence) {
+    public RevisionTask(@NotNull Compound term, byte punc, Truth conclusion, long creationTime, long start, long end, long[] evidence) {
         super(term, punc, conclusion, creationTime, start, end, evidence);
     }
 
