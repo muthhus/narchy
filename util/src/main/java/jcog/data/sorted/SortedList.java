@@ -20,7 +20,7 @@ public class SortedList<E extends Comparable> extends FasterList<E> {
 
     static final Comparator<Comparable> defaultComparator = Comparable::compareTo;
 
-    private boolean allowDuplicate;
+//    private boolean allowDuplicate;
 
 //    /**
 //     * <p>
@@ -45,16 +45,15 @@ public class SortedList<E extends Comparable> extends FasterList<E> {
     }
 
     /** uses array directly */
-    @SafeVarargs
-    public SortedList(E... x) {
-        super(x.length);
-        for (E e : x)
+    public SortedList(E[] toSort, E[] scratch) {
+        super(0, scratch);
+        for (E e : toSort)
             add(e); //must add them sequentially to remove duplicates and sort
     }
 
-    public void setAllowDuplicate(boolean allowDuplicate) {
-        this.allowDuplicate = allowDuplicate;
-    }
+//    public void setAllowDuplicate(boolean allowDuplicate) {
+//        this.allowDuplicate = allowDuplicate;
+//    }
 
 
     /**
@@ -79,15 +78,15 @@ public class SortedList<E extends Comparable> extends FasterList<E> {
         //binary search
         int high = s - 1;
 
-        boolean allowDuplicate = this.allowDuplicate;
+//        boolean allowDuplicate = this.allowDuplicate;
 
-        Comparator cmpr = defaultComparator;
+        //Comparator cmpr = defaultComparator;
 
         while (low <= high) {
             int mid = (low + high) / 2;
             E midVal = get(mid);
 
-            int cmp = cmpr.compare(midVal, o);
+            int cmp = midVal.compareTo(o); //cmpr.compare(midVal, o);
 
             if (cmp < 0) {
                 low = mid + 1;
@@ -95,17 +94,16 @@ public class SortedList<E extends Comparable> extends FasterList<E> {
                 high = mid - 1;
             } else {
                 // key found, insert after it
-                if (!allowDuplicate)
+                //if (!allowDuplicate)
                     return false;
-                super.add(mid, o);
-                return true;
+//                super.add(mid, o);
+//                return true;
             }
         }
 
         if (low == s) {
-            super.add(o); //HACK for using FastList
-        }
-        else {
+            super.addWithoutResizeCheck(o); //HACK for using FastList
+        } else {
             super.add(low, o);
         }
 

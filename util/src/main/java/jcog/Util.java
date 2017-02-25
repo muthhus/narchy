@@ -1535,4 +1535,23 @@ public enum Util { ;
             }
         }
     }
+
+    public static <X> X[] sortUniquely(@NotNull X[] arg) {
+        int len = arg.length;
+        Arrays.sort(arg);
+        for (int i = 0; i < len - 1; i++) {
+            int dups = 0;
+            while (arg[i].equals(arg[i+1])) {
+                dups++;
+                if (++i == len-1)
+                    break;
+            }
+            if (dups > 0) {
+                System.arraycopy(arg, i, arg, i-dups, len-i);
+                len -= dups;
+            }
+        }
+
+        return len != arg.length ? Arrays.copyOfRange(arg, 0, len) : arg;
+    }
 }

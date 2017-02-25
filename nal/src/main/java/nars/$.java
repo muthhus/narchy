@@ -854,7 +854,7 @@ public enum $ {
 
     /** conjunction sequence (2-ary) */
     @Nullable public static Compound seq(Term x, int dt, Term y) {
-        return (Compound)(compound(CONJ, dt, x, y)); //must be a vector, not set
+        return compoundOrNull(compound(CONJ, dt, x, y)); //must be a vector, not set
     }
 
 
@@ -877,7 +877,7 @@ public enum $ {
     }
 
     public static @NotNull <X> List<X> newArrayList() {
-        return new FasterList<>(); //GS
+        return new FasterList<>();
         //return new ArrayList();
     }
 

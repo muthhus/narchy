@@ -307,4 +307,18 @@ public class FasterList<X> extends FastList<X> {
         return toArray(array);
     }
 
+    /** dangerous unless you know the array has enough capacity */
+    public void addWithoutResizeCheck(X x) {
+        this.items[this.size++] = x;
+    }
+
+    public X[] toArrayRecycled(IntFunction<X[]> ii) {
+        X[] a = array();
+        int s = size;
+        if (s == a.length)
+            return a;
+        else
+            return toArray(ii);
+    }
+
 }

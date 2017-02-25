@@ -9,6 +9,7 @@ import nars.budget.RawBudget;
 import nars.term.Compound;
 import nars.truth.Truth;
 import nars.truth.TruthDelta;
+import org.apache.commons.collections4.map.Flat3Map;
 import org.eclipse.collections.impl.map.mutable.UnifiedMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -240,7 +241,8 @@ public class ImmutableTask extends RawBudget implements Task {
     public void meta(Object key, Object value) {
         synchronized (this) {
             if (meta==null) {
-                meta = new UnifiedMap(1); /* for compactness */
+                //meta = new UnifiedMap(1); /* for compactness */
+                meta = new Flat3Map(); /* for compactness */
             }
 
             meta.put(key, value);

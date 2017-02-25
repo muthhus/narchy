@@ -10,6 +10,7 @@ import nars.bag.impl.BLinkHijackBag;
 import nars.budget.BLink;
 import nars.budget.BudgetMerge;
 import nars.conceptualize.DefaultConceptBuilder;
+import nars.index.term.HijackTermIndex;
 import nars.index.term.TermIndex;
 import nars.index.term.map.CaffeineIndex;
 import nars.op.mental.Compressor;
@@ -45,7 +46,7 @@ public interface NARBuilder {
         Random rng = new XorShift128PlusRandom(1);
         Executioner exe =
                 //new SynchronousExecutor();
-                new MultiThreadExecutor(threads, 512, sync);
+                new MultiThreadExecutor(threads, 1024, sync);
 
         //exe = new InstrumentedExecutor(exe, 8);
 

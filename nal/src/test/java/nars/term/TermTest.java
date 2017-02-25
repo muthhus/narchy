@@ -137,6 +137,11 @@ public class TermTest {
         assertEquals(1, Terms.sorted(a, a).length);
         assertEquals(1, Terms.sorted(a).length);
         assertEquals("correct natural ordering", a, Terms.sorted(a, b)[0]);
+        assertEquals("correct natural ordering", a, Terms.sorted(a, b, c)[0]);
+        assertEquals("correct natural ordering", b, Terms.sorted(a, b, c)[1]);
+        assertEquals("correct natural ordering", c, Terms.sorted(a, b, c)[2]);
+        assertEquals("correct natural ordering", b, Terms.sorted(a, a, b, b, c, c)[1]);
+
     }
 
     @Test

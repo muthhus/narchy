@@ -22,7 +22,6 @@ import org.jetbrains.annotations.Nullable;
 import java.io.PrintStream;
 import java.util.*;
 import java.util.function.Consumer;
-import java.util.function.IntFunction;
 import java.util.function.Predicate;
 import java.util.function.ToIntFunction;
 
@@ -45,8 +44,6 @@ public class Terms {
     public static final TermVector NoSubterms = new ArrayTermVector((Term[]) new Term[]{});
     @NotNull
     public static final Compound ZeroProduct = new GenericCompound(Op.PROD, NoSubterms);
-    @NotNull
-    public static final IntFunction<Term[]> NewTermArray = Term[]::new;
 
     /**
      * TODO decide on some reasonable coding scheme for bundling these numeric values
@@ -296,8 +293,10 @@ public class Terms {
     }
 
 
+    /** warning may rearrange items in the input */
     public static Term[] sorted(@NotNull Term... arg) {
-        switch (arg.length) {
+        int len = arg.length;
+        switch (len) {
 
             case 0:
                 return Terms.empty;
@@ -309,23 +308,19 @@ public class Terms {
                 Term b = arg[1];
                 int c = a.compareTo(b);
 
-//                if (Global.DEBUG) {
-//                    //verify consistency of compareTo() and equals()
-//                    boolean equal = a.equals(b);
-//                    if ((equal && (c!=0)) || (!equal && (c==0))) {
-//                        throw new RuntimeException("invalid order (" + c + "): " + a + " = " + b);
-//                    }
-//                }
 
                 if (c < 0) return arg; //same as input //new Term[]{a, b};
                 else if (c > 0) return new Term[]{b, a};
                 else /*if (c == 0)*/ return new Term[]{a}; //equal
 
-                //TODO fast sorted array for arg.length == 3
+                //TODO fast sorted array for arg.length == 3 ?
 
             default:
-                //terms > 2:
-                return new SortedList<>(arg).toArray(NewTermArray);
+                SortedList<Term> x = new SortedList<>(arg, new Term[arg.length]);
+                return x.toArrayRecycled(Term[]::new);
+
+                //return sortUniquely(arg); //<- may also work but seems slower
+
         }
     }
 
@@ -371,34 +366,34 @@ public class Terms {
     }
 
 
-    public static List<Term> toList(Term[] t) {
-        return Arrays.asList(t);
-    }
+//    public static List<Term> toList(Term[] t) {
+//        return Arrays.asList(t);
+//    }
 
-    /**
-     * makes a set from the array of terms
-     */
-    @NotNull
-    public static Set<Term> toSet(@NotNull Term[] t) {
-        if (t.length == 1)
-            return Collections.singleton(t[0]);
-        Set<Term> l = $.newHashSet(t.length);
-        Collections.addAll(l, t);
-        return l;
-    }
-
-    @NotNull
-    @SafeVarargs
-    public static <T> Set<T> toSortedSet(@NotNull T... t) {
-
-        int l = t.length;
-        if (l == 1)
-            return Collections.singleton(t[0]);
-
-        TreeSet<T> s = new TreeSet();
-        Collections.addAll(s, t);
-        return s;
-    }
+//    /**
+//     * makes a set from the array of terms
+//     */
+//    @NotNull
+//    public static Set<Term> toSet(@NotNull Term[] t) {
+//        if (t.length == 1)
+//            return Collections.singleton(t[0]);
+//        Set<Term> l = $.newHashSet(t.length);
+//        Collections.addAll(l, t);
+//        return l;
+//    }
+//
+//    @NotNull
+//    @SafeVarargs
+//    public static <T> Set<T> toSortedSet(@NotNull T... t) {
+//
+//        int l = t.length;
+//        if (l == 1)
+//            return Collections.singleton(t[0]);
+//
+//        TreeSet<T> s = new TreeSet();
+//        Collections.addAll(s, t);
+//        return s;
+//    }
 
     public static int maxLevel(@NotNull Term term) {
         int[] max = {0};
