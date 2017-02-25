@@ -2,21 +2,14 @@ package nars.op.stm;
 
 import jcog.bag.PLink;
 import jcog.bag.RawPLink;
-import jcog.data.MutableInteger;
 import jcog.event.On;
-import nars.$;
 import nars.NAR;
 import nars.Task;
 import nars.bag.impl.PLinkHijackBag;
 import nars.concept.Concept;
 import nars.op.Leak;
-import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayDeque;
-import java.util.Deque;
-import java.util.Iterator;
-import java.util.List;
 import java.util.function.Consumer;
 
 import static nars.attention.Crosslink.crossLink;

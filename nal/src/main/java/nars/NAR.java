@@ -14,7 +14,6 @@ import nars.attention.Activation;
 import nars.attention.SpreadingActivation;
 import nars.budget.BLink;
 import nars.budget.Budget;
-import nars.budget.BudgetFunctions;
 import nars.concept.AtomConcept;
 import nars.concept.Concept;
 import nars.concept.PermanentConcept;
@@ -22,7 +21,6 @@ import nars.conceptualize.DefaultConceptBuilder;
 import nars.conceptualize.state.ConceptState;
 import nars.index.term.TermIndex;
 import nars.op.Operator;
-
 import nars.task.ImmutableTask;
 import nars.task.TaskBuilder;
 import nars.term.Compound;

@@ -4,13 +4,11 @@ import jcog.Util;
 import nars.NAR;
 import nars.Param;
 import nars.Task;
-import nars.budget.Budget;
 import nars.budget.RawBudget;
 import nars.term.Compound;
 import nars.truth.Truth;
 import nars.truth.TruthDelta;
 import org.apache.commons.collections4.map.Flat3Map;
-import org.eclipse.collections.impl.map.mutable.UnifiedMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -20,7 +18,6 @@ import java.util.List;
 import java.util.Map;
 
 import static nars.Op.NEG;
-import static nars.term.Terms.compoundOrNull;
 import static nars.time.Tense.ETERNAL;
 
 /**

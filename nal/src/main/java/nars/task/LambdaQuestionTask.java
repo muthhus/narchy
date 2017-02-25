@@ -6,14 +6,11 @@ import nars.bag.impl.ArrayBag;
 import nars.budget.BudgetMerge;
 import nars.budget.DependentBLink;
 import nars.term.Compound;
-import nars.term.Termed;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
-
-import static nars.time.Tense.ETERNAL;
 
 /**
  * Question task which accepts a callback to be invoked on answers

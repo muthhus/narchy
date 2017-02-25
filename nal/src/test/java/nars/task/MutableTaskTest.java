@@ -2,7 +2,6 @@ package nars.task;
 
 import nars.NAR;
 import nars.Narsese;
-import nars.Task;
 import nars.nar.Default;
 import nars.time.Tense;
 import org.junit.Test;

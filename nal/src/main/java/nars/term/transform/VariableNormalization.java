@@ -5,7 +5,6 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.term.var.GenericVariable;
 import nars.term.var.Variable;
-import org.eclipse.collections.impl.map.mutable.UnifiedMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

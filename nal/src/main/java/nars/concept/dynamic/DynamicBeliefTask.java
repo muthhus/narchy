@@ -2,7 +2,6 @@ package nars.concept.dynamic;
 
 import nars.task.RevisionTask;
 import nars.term.Compound;
-import nars.term.Termed;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 

@@ -11,9 +11,6 @@ import org.junit.runners.Parameterized;
 
 import java.util.function.Supplier;
 
-import static nars.Op.BELIEF;
-import static nars.time.Tense.ETERNAL;
-
 /**
  *   <neutralization --> (acid,base)>" //en("Neutralization is a relation between an acid and a base. ");
  //     <(\,neutralization,_,base) --> acid> //en("Something that can neutralize a base is an acid.");

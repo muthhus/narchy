@@ -14,7 +14,6 @@ import nars.concept.ActionConcept;
 import nars.concept.Concept;
 import nars.concept.SensorConcept;
 import nars.nar.Default;
-
 import nars.task.ImmutableTask;
 import nars.term.Compound;
 import nars.term.Term;
@@ -38,10 +37,7 @@ import java.util.stream.Stream;
 import static jcog.Texts.n2;
 import static jcog.Texts.n4;
 import static nars.$.*;
-import static nars.$.t;
-import static nars.Op.BELIEF;
-import static nars.Op.GOAL;
-import static nars.Op.QUESTION;
+import static nars.Op.*;
 import static nars.time.Tense.ETERNAL;
 import static nars.truth.TruthFunctions.w2c;
 

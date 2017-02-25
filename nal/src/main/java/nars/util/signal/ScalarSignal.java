@@ -6,7 +6,6 @@ import nars.NAR;
 import nars.Op;
 import nars.Param;
 import nars.Task;
-import nars.budget.BudgetFunctions;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.truth.Truth;

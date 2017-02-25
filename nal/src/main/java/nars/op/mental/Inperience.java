@@ -7,7 +7,6 @@ import nars.Op;
 import nars.Task;
 import nars.bag.impl.CurveBag;
 import nars.budget.BLink;
-import nars.budget.BudgetFunctions;
 import nars.budget.BudgetMerge;
 import nars.budget.RawBLink;
 import nars.op.Leak;

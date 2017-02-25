@@ -7,7 +7,6 @@ import nars.budget.BLink;
 import nars.budget.BudgetFunctions;
 import nars.concept.Concept;
 import nars.term.Compound;
-import nars.term.Termed;
 import nars.truth.Truth;
 import nars.truth.TruthDelta;
 import org.jetbrains.annotations.NotNull;

@@ -1,10 +1,7 @@
 package nars;
 
-import jcog.Texts;
 import jcog.meter.ResourceMeter;
 import jcog.meter.event.FloatGuage;
-import jcog.meter.event.PeriodMeter;
-import nars.premise.Premise;
 import nars.term.Compound;
 import nars.term.Term;
 import org.apache.commons.lang3.mutable.MutableFloat;

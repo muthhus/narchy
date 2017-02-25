@@ -13,9 +13,7 @@ import org.junit.runners.Parameterized;
 import java.util.function.Supplier;
 
 import static nars.$.$;
-import static nars.Op.BELIEF;
-import static nars.Op.QUEST;
-import static nars.Op.QUESTION;
+import static nars.Op.*;
 import static nars.time.Tense.ETERNAL;
 
 /**

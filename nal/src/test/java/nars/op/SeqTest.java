@@ -5,7 +5,6 @@ import jcog.list.CircularArrayList;
 import nars.NAR;
 import nars.Task;
 import nars.nar.Default;
-import nars.task.TaskBuilder;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.transform.Functor;

@@ -4,7 +4,6 @@ import nars.$;
 import nars.NAR;
 import nars.Op;
 import nars.Task;
-
 import nars.task.TaskBuilder;
 import nars.term.Compound;
 import nars.term.Term;

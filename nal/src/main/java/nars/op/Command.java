@@ -1,7 +1,6 @@
 package nars.op;
 
 import nars.*;
-
 import nars.task.ImmutableTask;
 import nars.term.Compound;
 import nars.term.Term;

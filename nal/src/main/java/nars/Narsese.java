@@ -21,7 +21,6 @@ import nars.budget.BudgetFunctions;
 import nars.derive.meta.match.Ellipsis;
 import nars.index.term.TermIndex;
 import nars.op.Command;
-
 import nars.task.TaskBuilder;
 import nars.term.Compound;
 import nars.term.Term;

@@ -7,7 +7,6 @@ import nars.budget.*;
 import nars.concept.Concept;
 import nars.op.Command;
 import nars.task.ImmutableTask;
-
 import nars.task.Tasked;
 import nars.term.Compound;
 import nars.term.Term;

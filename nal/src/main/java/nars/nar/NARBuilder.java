@@ -10,7 +10,6 @@ import nars.bag.impl.BLinkHijackBag;
 import nars.budget.BLink;
 import nars.budget.BudgetMerge;
 import nars.conceptualize.DefaultConceptBuilder;
-import nars.index.term.HijackTermIndex;
 import nars.index.term.TermIndex;
 import nars.index.term.map.CaffeineIndex;
 import nars.op.mental.Compressor;
@@ -19,9 +18,7 @@ import nars.op.stm.MySTMClustered;
 import nars.term.Term;
 import nars.time.Time;
 import nars.util.exe.Executioner;
-import nars.util.exe.InstrumentedExecutor;
 import nars.util.exe.MultiThreadExecutor;
-import nars.util.exe.SynchronousExecutor;
 import org.apache.commons.math3.util.MathArrays;
 import org.jetbrains.annotations.NotNull;
 

@@ -4,7 +4,6 @@ import jcog.Util;
 import nars.NAR;
 import nars.Task;
 import nars.term.Compound;
-import nars.term.Termed;
 import nars.truth.Stamp;
 import nars.truth.Truth;
 import nars.truth.TruthDelta;

@@ -9,7 +9,6 @@ import nars.budget.Budget;
 import nars.budget.DependentBLink;
 import nars.budget.RawBLink;
 import nars.concept.Concept;
-import nars.index.term.TermIndex;
 import nars.premise.Derivation;
 import nars.premise.Premise;
 import nars.term.Compound;
@@ -19,9 +18,6 @@ import nars.truth.Truth;
 import nars.truth.TruthDelta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import static nars.term.Terms.compoundOrNull;
-import static nars.time.Tense.ETERNAL;
 
 
 /**

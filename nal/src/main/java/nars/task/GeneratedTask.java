@@ -1,10 +1,7 @@
 package nars.task;
 
 import nars.term.Compound;
-import nars.term.Termed;
 import nars.truth.Truth;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 
 public class GeneratedTask extends ImmutableTask {

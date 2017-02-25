@@ -26,6 +26,8 @@ import spacegraph.net.IRC;
 import java.util.Random;
 import java.util.function.Consumer;
 
+import static nars.Op.BELIEF;
+
 /**
  * $0.9;0.9;0.99$
  *
@@ -288,7 +290,7 @@ public class IRCAgent extends IRC {
         //nar.linkFeedbackRate.setValue(0.005f);
 
 
-        MySTMClustered stm = new MySTMClustered(nar, 32, '.', 8, true, 3);
+        MySTMClustered stm = new MySTMClustered(nar, 32, BELIEF, 8, true, 3);
         //MySTMClustered stm2 = new MySTMClustered(nar, 32, '.', 2, true, 2);
 
         new Abbreviation(nar, "_", 3, 12, 0.001f, 8);

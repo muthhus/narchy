@@ -13,7 +13,6 @@ import nars.budget.Budget;
 import nars.budget.RawBudget;
 import nars.conceptualize.ConceptBuilder;
 import nars.index.term.TermIndex;
-
 import nars.task.TaskBuilder;
 import nars.term.Compound;
 import nars.term.Term;

@@ -12,7 +12,6 @@ import nars.derive.DefaultDeriver;
 import nars.index.term.TermIndex;
 import nars.index.term.map.MapTermIndex;
 import nars.op.stm.STMTemporalLinkage;
-import nars.op.stm.STMTemporalLinkage2;
 import nars.time.FrameTime;
 import nars.time.Time;
 import nars.util.exe.Executioner;

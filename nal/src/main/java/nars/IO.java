@@ -7,8 +7,6 @@ import jcog.data.string.Utf8Writer;
 import nars.budget.Budgeted;
 import nars.index.term.TermIndex;
 import nars.task.ImmutableTask;
-
-import nars.task.TaskBuilder;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;

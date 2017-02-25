@@ -9,8 +9,6 @@ import nars.budget.BLink;
 import nars.budget.Budget;
 import nars.concept.PermanentConcept;
 import nars.nar.Default;
-
-import nars.task.TaskBuilder;
 import nars.term.Compound;
 import nars.term.Term;
 import net.byteseek.automata.factory.MutableStateFactory;

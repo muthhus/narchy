@@ -1,18 +1,14 @@
 package nars.task;
 
-import com.google.common.collect.Lists;
 import nars.*;
 import nars.nar.Default;
-import nars.nar.Terminal;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
 import java.util.Arrays;
-import java.util.List;
-import java.util.TreeSet;
 
-import static nars.Op.BELIEF;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
 
 /**
  * Created by me on 11/3/15.

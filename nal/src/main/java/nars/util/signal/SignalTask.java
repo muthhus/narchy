@@ -3,10 +3,8 @@ package nars.util.signal;
 
 import nars.task.ImmutableTask;
 import nars.term.Compound;
-import nars.term.Termed;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 /**
  * Created by me on 2/12/17.
