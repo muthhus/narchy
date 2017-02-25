@@ -26,7 +26,7 @@
 //import com.google.common.collect.Multimap;
 //import jcog.Util;
 //import nars.*;
-//import nars.task.MutableTask;
+//
 //import nars.task.Temporal;
 //import nars.term.Compound;
 //import nars.truth.DefaultTruth;
@@ -125,7 +125,7 @@
 ////        if (debug)
 ////            System.err.println("Anticipation Negated " + tt.task);
 //
-//        nar.input(new MutableTask(prediction, Symbols.BELIEF,
+//        nar.input(new TaskBuilder(prediction, Symbols.BELIEF,
 //                        new DefaultTruth(0f /* FALSE */, nar.truthDefault(Symbols.BELIEF).conf())
 //                )
 //                .time(nar.time(), expectedOccurrenceTime)

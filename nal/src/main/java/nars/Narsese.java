@@ -20,7 +20,8 @@ import jcog.Texts;
 import nars.derive.meta.match.Ellipsis;
 import nars.index.term.TermIndex;
 import nars.op.Command;
-import nars.task.MutableTask;
+
+import nars.task.TaskBuilder;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Terms;
@@ -114,7 +115,7 @@ public class Narsese extends BaseParser<Object> {
     }
 
     @NotNull
-    public static Task makeTask(NAR nar, @Nullable float[] b, Compound content, char p, @Nullable Truth t, Tense tense) throws NarseseException {
+    public static Task makeTask(NAR nar, @Nullable float[] b, Compound content, byte p, @Nullable Truth t, Tense tense) throws NarseseException {
 
 //        if (p == null)
 //            throw new RuntimeException("character is null");
@@ -131,8 +132,8 @@ public class Narsese extends BaseParser<Object> {
             t = nar.truthDefault(p);
         }
 
-        MutableTask ttt =
-                new MutableTask(content, p, t)
+        TaskBuilder ttt =
+                new TaskBuilder(content, p, t)
                         .time(
                                 nar.time(), //creation time
                                 Tense.getRelativeOccurrence(
@@ -154,7 +155,7 @@ public class Narsese extends BaseParser<Object> {
                 throw new NarseseException("budget parse error");
         }
 
-        return ttt.log(NARSESE_TASK_TAG);
+        return ttt.log(NARSESE_TASK_TAG).apply(nar);
     }
 
     public static boolean isPunctuation(char c) {
@@ -1215,7 +1216,7 @@ public class Narsese extends BaseParser<Object> {
             //return Command.task($.func("log", content));
         } else */{
 
-            char punct = (Character) x[2];
+            byte punct = (byte)((Character) x[2]).charValue();
 
             Truth t = (Truth) x[3];
             if (t != null && !Float.isFinite(t.conf()))

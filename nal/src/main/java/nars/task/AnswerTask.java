@@ -16,19 +16,17 @@ import static jcog.Util.lerp;
 /**
  * Created by me on 7/3/16.
  */
-public class AnswerTask extends MutableTask {
+public class AnswerTask extends ImmutableTask {
 
 
     @Nullable
     protected Task aBelief, bBelief;
 
-    public AnswerTask(@NotNull Termed<Compound> term, char punc, Truth conclusion, long creationTime, long start, long end, long[] evidence) {
-        super(term, punc, conclusion);
-        evidence(evidence);
-        time(creationTime, start, end);
+    public AnswerTask(@NotNull Compound term, byte punc, Truth conclusion, long creationTime, long start, long end, long[] evidence) {
+        super(term, punc, conclusion, creationTime, start, end, evidence);
     }
 
-    public AnswerTask(@NotNull Termed<Compound> term, @NotNull Task aBelief, @NotNull Task bBelief, Truth conclusion, long creationTime, long start, long end, float evidenceBalance) {
+    public AnswerTask(@NotNull Compound term, @NotNull Task aBelief, @NotNull Task bBelief, Truth conclusion, long creationTime, long start, long end, float evidenceBalance) {
         this(term, aBelief.punc(), conclusion, creationTime, start, end, Stamp.zip(aBelief.evidence(), bBelief.evidence(), evidenceBalance));
 
         this.aBelief = aBelief;

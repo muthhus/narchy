@@ -124,7 +124,7 @@ public class QEntry<S extends Term, A extends Term> /*extends ConceptMatrixEntry
 //    }
 
     /** input to NAR */
-    public void commit(char punctuation, float qUpdateConfidence, float freqThreshold, float priorityGain) {
+    public void commit(byte punctuation, float qUpdateConfidence, float freqThreshold, float priorityGain) {
 
         clearDQ();
 

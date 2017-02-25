@@ -21,7 +21,7 @@
 //import nars.Symbols;
 //import nars.Task;
 //import nars.nal.nal8.AbstractOperator;
-//import nars.task.MutableTask;
+//
 //import nars.term.Term;
 //import org.jetbrains.annotations.NotNull;
 //
@@ -43,7 +43,7 @@
 //        Term content = $.instprop(nar.self, feeling);
 //
 //        return
-//            new MutableTask(content, Symbols.BELIEF, t(value, 0.99f))
+//            new TaskBuilder(content, Symbols.BELIEF, t(value, 0.99f))
 //                .time(nar.time())
 //        ;
 //    }

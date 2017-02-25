@@ -20,6 +20,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
+import static nars.Op.BELIEF;
+import static nars.Op.GOAL;
 import static org.junit.Assert.assertTrue;
 
 
@@ -224,11 +226,11 @@ public class TestNAR  {
     final Topic<Tasked>[] outputEvents;
 
     @NotNull
-    public TestNAR mustOutput(long cycleStart, long cycleEnd, @NotNull String sentenceTerm, char punc, float freqMin, float freqMax, float confMin, float confMax, long occTimeAbsolute)  {
+    public TestNAR mustOutput(long cycleStart, long cycleEnd, @NotNull String sentenceTerm, byte punc, float freqMin, float freqMax, float confMin, float confMax, long occTimeAbsolute)  {
         return mustOutput(cycleStart, cycleEnd, sentenceTerm, punc, freqMin, freqMax, confMin, confMax, occTimeAbsolute, occTimeAbsolute);
     }
     @NotNull
-    public TestNAR mustOutput(long cycleStart, long cycleEnd, @NotNull String sentenceTerm, char punc, float freqMin, float freqMax, float confMin, float confMax, long start, long end)  {
+    public TestNAR mustOutput(long cycleStart, long cycleEnd, @NotNull String sentenceTerm, byte punc, float freqMin, float freqMax, float confMin, float confMax, long start, long end)  {
         mustEmit(outputEvents, cycleStart, cycleEnd, sentenceTerm, punc, freqMin, freqMax, confMin, confMax, start, end);
         return this;
     }
@@ -259,22 +261,22 @@ public class TestNAR  {
 //
 //    }
 
-//    public TestNAR mustOutput(Topic<Tasked> c, long cycleStart, long cycleEnd, String sentenceTerm, char punc, float freqMin, float freqMax, float confMin, float confMax, int ocRelative) throws InvalidInputException {
+//    public TestNAR mustOutput(Topic<Tasked> c, long cycleStart, long cycleEnd, String sentenceTerm, byte punc, float freqMin, float freqMax, float confMin, float confMax, int ocRelative) throws InvalidInputException {
 //        return mustEmit(c, cycleStart, cycleEnd, sentenceTerm, punc, freqMin, freqMax, confMin, confMax, ocRelative );
 //    }
 
     @NotNull
-    public TestNAR mustEmit(@NotNull Topic<Tasked>[] c, long cycleStart, long cycleEnd, @NotNull String sentenceTerm, char punc, float freqMin, float freqMax, float confMin, float confMax) {
+    public TestNAR mustEmit(@NotNull Topic<Tasked>[] c, long cycleStart, long cycleEnd, @NotNull String sentenceTerm, byte punc, float freqMin, float freqMax, float confMin, float confMax) {
         return mustEmit(c, cycleStart, cycleEnd, sentenceTerm, punc, freqMin, freqMax, confMin, confMax, Tense.ETERNAL, Tense.ETERNAL );
     }
 
 //    @NotNull
-//    public TestNAR mustEmit(@NotNull Topic<Tasked>[] c, long cycleStart, long cycleEnd, @NotNull String sentenceTerm, char punc, float freqMin, float freqMax, float confMin, float confMax, @NotNull Tense t)  {
+//    public TestNAR mustEmit(@NotNull Topic<Tasked>[] c, long cycleStart, long cycleEnd, @NotNull String sentenceTerm, byte punc, float freqMin, float freqMax, float confMin, float confMax, @NotNull Tense t)  {
 //        return mustEmit(c, cycleStart, cycleEnd, sentenceTerm, punc, freqMin, freqMax, confMin, confMax, nar.time(t));
 //    }
 
     @NotNull
-    TestNAR mustEmit(@NotNull Topic<Tasked>[] c, long cycleStart, long cycleEnd, @NotNull String sentenceTerm, char punc, float freqMin, float freqMax, float confMin, float confMax, long start, long end)  {
+    TestNAR mustEmit(@NotNull Topic<Tasked>[] c, long cycleStart, long cycleEnd, @NotNull String sentenceTerm, byte punc, float freqMin, float freqMax, float confMin, float confMax, long start, long end)  {
         try {
             return mustEmit(c, cycleStart, cycleEnd, sentenceTerm, punc, freqMin, freqMax, confMin, confMax, start, end, true);
         } catch (Narsese.NarseseException e) {
@@ -283,7 +285,7 @@ public class TestNAR  {
     }
 
     @NotNull
-    TestNAR mustEmit(@NotNull Topic<Tasked>[] c, long cycleStart, long cycleEnd, @NotNull String sentenceTerm, char punc, float freqMin, float freqMax, float confMin, float confMax, long start, long end, boolean must) throws Narsese.NarseseException {
+    TestNAR mustEmit(@NotNull Topic<Tasked>[] c, long cycleStart, long cycleEnd, @NotNull String sentenceTerm, byte punc, float freqMin, float freqMax, float confMin, float confMax, long start, long end, boolean must) throws Narsese.NarseseException {
 
 
         float h = (freqMin!=-1) ? truthTolerance / 2.0f : 0;
@@ -370,7 +372,7 @@ public class TestNAR  {
     }
 
     @NotNull
-    public TestNAR mustOutput(long withinCycles, @NotNull String term, char punc, float freq, float conf)  {
+    public TestNAR mustOutput(long withinCycles, @NotNull String term, byte punc, float freq, float conf)  {
         long now = time();
         return mustOutput(now, now + withinCycles, term, punc, freq, freq, conf, conf, nar.time(Tense.Eternal));
     }
@@ -382,31 +384,31 @@ public class TestNAR  {
     @NotNull
     public TestNAR mustBelieve(long withinCycles, @NotNull String term, float freqMin, float freqMax, float confMin, float confMax, long tense)  {
         long now = time();
-        return mustOutput(now, now + withinCycles, term, '.', freqMin, freqMax, confMin, confMax, tense);
+        return mustOutput(now, now + withinCycles, term, BELIEF, freqMin, freqMax, confMin, confMax, tense);
     }
 //    public TestNAR mustBelievePast(long withinCycles, String term, float freqMin, float freqMax, float confMin, float confMax, int maxPastWindow) throws InvalidInputException {
 //        long now = time();
-//        return mustOutput(now, now + withinCycles, term, '.', freqMin, freqMax, confMin, confMax);
+//        return mustOutput(now, now + withinCycles, term, BELIEF, freqMin, freqMax, confMin, confMax);
 //    }
 //    public ExplainableTask mustBelieve(long cycleStart, long cycleStop, String term, float freq, float confidence) throws InvalidInputException {
 //        long now = time();
-//        return mustOutput(now + cycleStart, now + cycleStop, term, '.', freq, freq, confidence, confidence);
+//        return mustOutput(now + cycleStart, now + cycleStop, term, BELIEF, freq, freq, confidence, confidence);
 //    }
     @NotNull
     public TestNAR mustBelieve(long withinCycles, @NotNull String term, float freq, float confidence, @NotNull Tense t)  {
         long ttt = nar.time();
-        return mustOutput(ttt, ttt + withinCycles, term, '.', freq, freq, confidence, confidence, nar.time(t));
+        return mustOutput(ttt, ttt + withinCycles, term, BELIEF, freq, freq, confidence, confidence, nar.time(t));
     }
 
     /** tests for any truth value at the given occurrences */
-    @NotNull public TestNAR mustNotOutput(long withinCycles, @NotNull String sentenceTerm, char punc, @NotNull long... occs) {
+    @NotNull public TestNAR mustNotOutput(long withinCycles, @NotNull String sentenceTerm, byte punc, @NotNull long... occs) {
         for (long occ : occs)
             mustNotOutput(withinCycles, sentenceTerm, punc, 0, 1, 0, 1, occ);
         return this;
     }
 
     @NotNull
-    public TestNAR mustNotOutput(long withinCycles, @NotNull String sentenceTerm, char punc, float freqMin, float freqMax, float confMin, float confMax, long occ) {
+    public TestNAR mustNotOutput(long withinCycles, @NotNull String sentenceTerm, byte punc, float freqMin, float freqMax, float confMin, float confMax, long occ) {
         if (freqMin < 0 || freqMin > 1f || freqMax < 0 || freqMax > 1f || confMin < 0 || confMin > 1f || confMax < 0 || confMax > 1f || freqMin!=freqMin || freqMax!=freqMax)
             throw new UnsupportedOperationException();
 
@@ -430,17 +432,17 @@ public class TestNAR  {
 //    public TestNAR mustAnswer(long withinCycles, @NotNull String term, float freq, float confidence, long when)  {
 //        long ttt = nar.time();
 //        return mustEmit(new Topic[] { answerReceiver },
-//                ttt, ttt + withinCycles, term, '.', freq, freq, confidence, confidence, when);
+//                ttt, ttt + withinCycles, term, BELIEF, freq, freq, confidence, confidence, when);
 //    }
     @NotNull
     public TestNAR mustBelieve(long withinCycles, @NotNull String term, float freq, float confidence, long occTimeAbsolute)  {
         long t = nar.time();
-        return mustOutput(t, t + withinCycles, term, '.', freq, freq, confidence, confidence,occTimeAbsolute);
+        return mustOutput(t, t + withinCycles, term, BELIEF, freq, freq, confidence, confidence,occTimeAbsolute);
     }
     @NotNull
     public TestNAR mustBelieve(long withinCycles, @NotNull String term, float freq, float confidence, long start, long end)  {
         long t = nar.time();
-        return mustOutput(t, t + withinCycles, term, '.', freq, freq, confidence, confidence, start, end);
+        return mustOutput(t, t + withinCycles, term, BELIEF, freq, freq, confidence, confidence, start, end);
     }
 
     @NotNull
@@ -454,18 +456,18 @@ public class TestNAR  {
 
     @NotNull
     public TestNAR mustDesire(long withinCycles, @NotNull String goalTerm, float freq, float conf) {
-        return mustOutput(withinCycles, goalTerm, '!', freq, conf);
+        return mustOutput(withinCycles, goalTerm, GOAL, freq, conf);
     }
 
     @NotNull
     public TestNAR mustDesire(long withinCycles, @NotNull String goalTerm, float freq, float conf, long occ) {
         long t = nar.time();
-        return mustOutput(t, t + withinCycles, goalTerm, '!', freq, freq, conf, conf, occ);
+        return mustOutput(t, t + withinCycles, goalTerm, GOAL, freq, freq, conf, conf, occ);
     }
     @NotNull
     public TestNAR mustDesire(long withinCycles, @NotNull String goalTerm, float freq, float conf, long start, long end) {
         long t = nar.time();
-        return mustOutput(t, t + withinCycles, goalTerm, '!', freq, freq, conf, conf, start, end);
+        return mustOutput(t, t + withinCycles, goalTerm, GOAL, freq, freq, conf, conf, start, end);
     }
 
 
@@ -485,7 +487,7 @@ public class TestNAR  {
         //Override believe to input beliefs that have occurrenceTime set on input
         // "lazy timing" appropriate for test cases that can have delays
         try {
-            Task t = nar.ask(termString);
+            nar.ask(termString);
         } catch (Narsese.NarseseException e) {
             throw new RuntimeException(e);
         }

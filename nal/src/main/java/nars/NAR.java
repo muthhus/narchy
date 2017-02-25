@@ -14,6 +14,7 @@ import nars.attention.Activation;
 import nars.attention.SpreadingActivation;
 import nars.budget.BLink;
 import nars.budget.Budget;
+import nars.budget.BudgetFunctions;
 import nars.concept.AtomConcept;
 import nars.concept.Concept;
 import nars.concept.PermanentConcept;
@@ -21,8 +22,8 @@ import nars.conceptualize.DefaultConceptBuilder;
 import nars.conceptualize.state.ConceptState;
 import nars.index.term.TermIndex;
 import nars.op.Operator;
-import nars.table.BeliefTable;
-import nars.task.MutableTask;
+
+import nars.task.TaskBuilder;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
@@ -282,40 +283,6 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
         this.self = self;
     }
 
-    @Deprecated
-    public static void printActiveTasks(@NotNull NAR n, boolean beliefsOrGoals) {
-        printActiveTasks(n, beliefsOrGoals, (t) -> {
-            System.out.println(t.proof());
-        });
-    }
-
-    @Deprecated
-    public static void printActiveTasks(@NotNull NAR n, boolean beliefsOrGoals, @NotNull Consumer<Task> e) {
-        TreeSet<Task> bt = new TreeSet<>((a, b) ->
-                //sort by name
-                //{ return a.term().toString().compareTo(b.term().toString()); }
-                //sort by confidence (descending)
-        {
-            int i = Float.compare(b.conf(), a.conf());
-            if (i == 0 && a != b) {
-                return b.compareTo(a); //equal conf but different task
-            }
-            return i;
-        }
-        );
-
-        float dur = n.time.dur();
-        n.forEachActiveConcept(c -> {
-            BeliefTable table = beliefsOrGoals ? c.beliefs() : c.goals();
-
-            if (!table.isEmpty()) {
-                bt.add(table.match(n.time(), dur));
-                //System.out.println("\t" + c.beliefs().top(n.time()));
-            }
-        });
-        bt.forEach(e);
-    }
-
 
     /**
      * parses and forms a Task from a string but doesnt input it
@@ -382,18 +349,18 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
      * ask question
      */
     @NotNull
-    public Task ask(@NotNull String termString) throws NarseseException {
+    public void ask(@NotNull String termString) throws NarseseException {
         //TODO remove '?' if it is attached at end
-        return ask(term(termString));
+        ask(term(termString));
     }
 
     /**
      * ask question
      */
     @NotNull
-    public Task ask(@NotNull Termed<Compound> c) {
+    public void ask(@NotNull Termed<Compound> c) {
         //TODO remove '?' if it is attached at end
-        return ask(c, QUESTION);
+        ask(c, (char)QUESTION);
     }
 
 //    /**
@@ -567,7 +534,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
     }
 
     @Nullable
-    public Task input(float pri, Termed<Compound> term, char punc, long occurrenceTime, float freq, float conf) {
+    public Task input(float pri, Termed<Compound> term, byte punc, long occurrenceTime, float freq, float conf) {
 
         if (term == null) {
             throw new NullPointerException("null task term");
@@ -578,35 +545,35 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
             throw new InvalidTaskException(term, "insufficient confidence");
         }
 
-        Task t = new MutableTask(term, punc, tr)
+        TaskBuilder x = BudgetFunctions
                 .budgetByTruth(pri)
                 .time(time(), occurrenceTime);
 
-        input(t);
+        Task y = x.apply(this);
 
-        return t;
+        input(y);
+
+        return y;
     }
 
     @NotNull
-    public Task ask(@NotNull Termed<Compound> term, char questionOrQuest) {
-        return ask(term, questionOrQuest, ETERNAL);
+    public void ask(@NotNull Termed<Compound> term, char questionOrQuest) {
+        ask(term, questionOrQuest, ETERNAL);
     }
 
     @NotNull
-    public Task ask(@NotNull Termed<Compound> term, char questionOrQuest, long when) {
+    public void ask(@NotNull Termed<Compound> term, char questionOrQuest, long when) {
 
 
         //TODO use input method like believe uses which avoids creation of redundant Budget instance
         if ((questionOrQuest != QUESTION) && (questionOrQuest != QUEST))
             throw new RuntimeException("invalid punctuation");
 
-        MutableTask t = new MutableTask(term, questionOrQuest, null);
+        TaskBuilder t = new TaskBuilder((Compound)term, (byte)questionOrQuest, null);
         t.time(time(), when);
-        t.setPriority(priorityDefault(questionOrQuest));
+        t.setPriority(priorityDefault((byte)questionOrQuest));
 
         input(t);
-
-        return t;
 
         //ex: return new Answered(this, t);
 
@@ -648,25 +615,10 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
         float inputPri = input.priSafe(0);
         emotion.busy(inputPri, input.volume());
 
-        try {
-            input.normalize(this); //accept into input buffer for eventual processing
-        } catch (@NotNull InvalidTaskException | InvalidTermException | Budget.BudgetException e) {
-
-            emotion.eror(input.volume());
-
-            input.delete();
-
-            if (input.isInput() || Param.DEBUG_EXTRA)
-                logger.warn("input: {}", e.toString());
-
-            //e.printStackTrace();
-            //throw e;
-            return null;
-        }
 
         boolean isCommand = input.isCommand();
         if (isCommand || (input.isGoal() && input.expectation() >= Param.EXECUTION_THRESHOLD) &&
-                (input.isEternal() || (!input.isEternal() && ( input.start() - time() ) >= -time.dur()))) { //eternal, present (within duration radius), or future
+                (input.isEternal() || (!input.isEternal() && (input.start() - time()) >= -time.dur()))) { //eternal, present (within duration radius), or future
 
             if (!input.isEternal() && input.start() > time() + time.dur()) {
                 //TODO schedule for run later
@@ -711,8 +663,6 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
         }
 
 
-
-
         if (time instanceof FrameTime) {
             //HACK for unique serial number w/ frameclock
             ((FrameTime) time).validate(input.evidence());
@@ -721,7 +671,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
         try {
 
             Concept c = input.concept(this);
-            if (c!=null) {
+            if (c != null) {
 
                 Activation a = c.process(input, this);
 
@@ -888,7 +838,6 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
     }
 
 
-
     @NotNull
     public void processAll(@NotNull Task... t) {
         for (Task x : t)
@@ -907,6 +856,30 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
         c.put(Operator.class, o);
         concepts.set(c);
         operators.put(c, o);
+    }
+
+    public void input(Function<NAR, Task>... tasks) {
+        for (Function<NAR, Task> x : tasks) {
+
+            try {
+
+                input( x.apply(this) );
+
+            } catch (@NotNull InvalidTaskException | InvalidTermException | Budget.BudgetException e) {
+
+                if (x instanceof TaskBuilder) {
+
+                    TaskBuilder tb = (TaskBuilder) x;
+
+                    emotion.eror(tb.volume());
+
+                    if (tb.isInput() || Param.DEBUG_EXTRA)
+                        logger.warn("input: {}", e.toString());
+
+                }
+
+            }
+        }
     }
 
     static class PermanentAtomConcept extends AtomConcept implements PermanentConcept {
@@ -1203,7 +1176,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
 
         //set the appropriate creation and occurrence times
         for (Task y : x) {
-            MutableTask my = (MutableTask) y;
+            TaskBuilder my = (TaskBuilder) y;
             my.setCreationTime(time);
             if (my.start() != ETERNAL)
                 my.occurr(time);
@@ -1383,6 +1356,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
     public final void input(@Nullable Stream<Task> taskStream) {
         input(taskStream, Param.DEFAULT_TASK_INPUT_CHUNK_SIZE);
     }
+
     public void input(@Nullable Stream<Task> taskStream, int chunkSize) {
         if (taskStream == null)
             return;
@@ -1447,8 +1421,11 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
         return c;
     }
 
-    /** registers a term rewrite functor */
-    @NotNull public final Concept onTerm(@NotNull String termAtom, @NotNull Function<Term[], Term> f) {
+    /**
+     * registers a term rewrite functor
+     */
+    @NotNull
+    public final Concept onTerm(@NotNull String termAtom, @NotNull Function<Term[], Term> f) {
         return on(f(termAtom, f));
     }
 

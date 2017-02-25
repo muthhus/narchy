@@ -19,6 +19,8 @@ import org.jetbrains.annotations.Nullable;
 import java.util.function.DoubleSupplier;
 import java.util.function.Function;
 
+import static nars.budget.BudgetFunctions.budgetByTruth;
+
 /**
  * Generates temporal tasks in reaction to the change in a scalar numeric value
  *
@@ -36,7 +38,7 @@ public class ScalarSignal implements Function<NAR, Task>, DoubleSupplier {
 
 
     @NotNull
-    private final Term term;
+    private final Compound term;
     private final FloatFunction<Term> value;
     @NotNull
     private final FloatToObjectFunction<Truth> truthFloatFunction;
@@ -49,20 +51,20 @@ public class ScalarSignal implements Function<NAR, Task>, DoubleSupplier {
     int maxTimeBetweenUpdates;
     int minTimeBetweenUpdates;
 
-    char punc = '.';
+    byte punc = '.';
 
     public long lastInputTime;
 
     public final static FloatToFloatFunction direct = n -> n;
-    @Nullable
-    public SignalTask current;
+
+    @Nullable public SignalTask current;
 
 
-    public ScalarSignal(@NotNull NAR n, @NotNull Termed t, FloatFunction<Term> value, FloatToObjectFunction<Truth> truthFloatFunction) {
+    public ScalarSignal(@NotNull NAR n, @NotNull Compound t, FloatFunction<Term> value, FloatToObjectFunction<Truth> truthFloatFunction) {
         this(n, t, value, truthFloatFunction, n.priorityDefault(Op.BELIEF));
     }
 
-    public ScalarSignal(@NotNull NAR n, @NotNull Termed t, FloatFunction<Term> value, @Nullable FloatToObjectFunction<Truth> truthFloatFunction, float pri) {
+    public ScalarSignal(@NotNull NAR n, @NotNull Compound t, FloatFunction<Term> value, @Nullable FloatToObjectFunction<Truth> truthFloatFunction, float pri) {
 
         this.term = t.term();
         this.value = value;
@@ -88,12 +90,12 @@ public class ScalarSignal implements Function<NAR, Task>, DoubleSupplier {
     }
 
     @NotNull
-    public ScalarSignal punc(char c) {
+    public ScalarSignal punc(byte c) {
         this.punc = c;
         return this;
     }
 
-    public char punc() { return punc; }
+    public byte punc() { return punc; }
 
 //    /** clears timing information so it thinks it will need to input on next attempt */
 //    public void ready() {
@@ -139,7 +141,7 @@ public class ScalarSignal implements Function<NAR, Task>, DoubleSupplier {
 
             SignalTask t = task(next, currentValue,
                     now - Math.round(nar.time.dur()), now,
-                    this.current);
+                    this.current, nar);
             if (t!=null) {
                 //Task prevStart = this.current;
 
@@ -186,14 +188,15 @@ public class ScalarSignal implements Function<NAR, Task>, DoubleSupplier {
 //    }
 
     @Nullable
-    protected SignalTask task(float next, float prevV, long start, long end, Task previous) {
+    protected SignalTask task(float next, float prevV, long start, long end, Task previous, NAR nar) {
 
         Truth t = truthFloatFunction.valueOf(next);
         if (t == null)
             return null;
 
-        SignalTask s = new SignalTask(term(), punc, t, start, end);
-        s.budgetByTruth( pri.asFloat()  /*(v, now, prevF, lastInput)*/);
+
+        SignalTask s = new SignalTask(term(), punc, t, start, end, nar.time.nextStamp());
+        budgetByTruth( s, t, pri.asFloat()  /*(v, now, prevF, lastInput)*/);
 
         //float changeFactor = prevV==prevV ? Math.abs(v - prevV) : 1f /* if prevV == NaN */;
         //s.budgetByTruth( Math.max(Param.BUDGET_EPSILON*2, changeFactor * pri.asFloat())  /*(v, now, prevF, lastInput)*/);
@@ -212,7 +215,7 @@ public class ScalarSignal implements Function<NAR, Task>, DoubleSupplier {
 //    }
 
     @NotNull
-    public Termed<Compound> term() {
+    public Compound term() {
         return term;
     }
 

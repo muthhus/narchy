@@ -7,12 +7,12 @@ import nars.Op;
 import nars.Task;
 import nars.bag.impl.CurveBag;
 import nars.budget.BLink;
+import nars.budget.BudgetFunctions;
 import nars.budget.BudgetMerge;
 import nars.budget.RawBLink;
 import nars.op.Leak;
 import nars.premise.Premise;
-import nars.task.GeneratedTask;
-import nars.task.MutableTask;
+import nars.task.TaskBuilder;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Terms;
@@ -34,7 +34,6 @@ import java.util.function.Consumer;
 import static nars.$.the;
 import static nars.Op.*;
 import static nars.bag.impl.CurveBag.power2BagCurve;
-import static nars.time.Tense.ETERNAL;
 
 /**
  * Internal Experience (NAL9)
@@ -42,7 +41,7 @@ import static nars.time.Tense.ETERNAL;
  * <p>
  * https://www.youtube.com/watch?v=ia4wMU-vfrw
  */
-public class Inperience extends Leak<Task,BLink<Task>> {
+public class Inperience extends Leak<Task, BLink<Task>> {
 
     public static final Logger logger = LoggerFactory.getLogger(Inperience.class);
 
@@ -148,7 +147,7 @@ public class Inperience extends Leak<Task,BLink<Task>> {
 
         Compound tt = task.term();
 
-        if (task.isCommand() || task instanceof Abbreviation.AbbreviationTask || task instanceof InperienceTask) //no infinite loops in the present moment
+        if (task.isCommand() || task instanceof Abbreviation.AbbreviationTask /*|| task instanceof InperienceTask*/) //no infinite loops in the present moment
             return;
 
         if (!task.isDeleted())
@@ -156,7 +155,7 @@ public class Inperience extends Leak<Task,BLink<Task>> {
 
         // if(OLD_BELIEVE_WANT_EVALUATE_WONDER_STRATEGY ||
         //         (!OLD_BELIEVE_WANT_EVALUATE_WONDER_STRATEGY && (task.sentence.punctuation==Symbols.QUESTION || task.sentence.punctuation==Symbols.QUEST))) {
-        //char punc = task.getPunctuation();
+        //byte punc = task.getPunctuation();
 //        Budget b = task.budget();
 //        if (task.isQuestOrQuestion()) {
 //            if (b.summaryLessThan(MINIMUM_BUDGET_SUMMARY_TO_CREATE_WONDER_EVALUATE)) {
@@ -190,11 +189,20 @@ public class Inperience extends Leak<Task,BLink<Task>> {
 
         try {
             Compound r = reify(task, nar.self());
-            if (r!=null) {
-                MutableTask e = new InperienceTask(task,
+            if (r != null) {
+                TaskBuilder e = new TaskBuilder(
                         r,
-                        nar.time(),
-                        nar.confidenceDefault(BELIEF));
+                        BELIEF,
+                        $.t(1, nar.confidenceDefault(BELIEF)));
+
+                long now = nar.time();
+                e.time(now, now);
+
+                BudgetFunctions
+                        .budgetByTruth(e, e.truth(), task.priSafe(0));
+
+                e.evidence(task)
+                        .log("Inperience");
 
                 logger.info(" {}", e);
                 nar.input(e);
@@ -209,25 +217,13 @@ public class Inperience extends Leak<Task,BLink<Task>> {
     }
 
 
-    public static class InperienceTask extends GeneratedTask {
-
-        public InperienceTask(Task task, Compound c, long now, float conf) {
-            super(c, BELIEF, $.t(1, conf));
-
-            time(now, task.start() != ETERNAL ? task.start() : now)
-                    .budgetByTruth(task.priSafe(0))
-                    .evidence(task)
-                    .log("Inperience");
-        }
-    }
-
 //    private boolean isExperienceTerm(@NotNull Compound term) {
 //        return term.op() == INH && operators.contains(term.subterm(1) /* predicate of the inheritance */);
 //    }
 
 
     @NotNull
-    public static Atomic reify(char punc) {
+    public static Atomic reify(byte punc) {
         Atomic opTerm;
         switch (punc) {
             case BELIEF:
@@ -280,16 +276,21 @@ public class Inperience extends Leak<Task,BLink<Task>> {
         return $.terms.transform(term, queryToDepVar);
     }
 
-    /** change all query variables to dep vars */
-    final static CompoundTransform<Compound,Term> queryToDepVar = new CompoundTransform<Compound,Term>() {
+    /**
+     * change all query variables to dep vars
+     */
+    final static CompoundTransform<Compound, Term> queryToDepVar = new CompoundTransform<Compound, Term>() {
 
-        @Override public boolean test(Term o) {
+        @Override
+        public boolean test(Term o) {
             return o.hasVarQuery();
         }
 
-        @Nullable @Override public Term apply(@Nullable Compound parent, @NotNull Term subterm) {
-            if (subterm.op()==VAR_QUERY) {
-                return $.varDep((((Variable)subterm).id()));
+        @Nullable
+        @Override
+        public Term apply(@Nullable Compound parent, @NotNull Term subterm) {
+            if (subterm.op() == VAR_QUERY) {
+                return $.varDep((((Variable) subterm).id()));
             }
             return subterm;
         }
@@ -369,7 +370,7 @@ public class Inperience extends Leak<Task,BLink<Task>> {
 
         long now = nar.time();
 
-        nar.input(new MutableTask(new_term, GOAL, 1f, nar)
+        nar.input(new TaskBuilder(new_term, GOAL, 1f, nar)
                         /*.budget(Global.DEFAULT_GOAL_PRIORITY * INTERNAL_EXPERIENCE_PRIORITY_MUL,
                                 Global.DEFAULT_GOAL_DURABILITY * INTERNAL_EXPERIENCE_DURABILITY_MUL)*/
                 //.parent(parent, belief)

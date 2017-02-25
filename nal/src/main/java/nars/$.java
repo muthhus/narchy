@@ -13,7 +13,8 @@ import nars.budget.Budget;
 import nars.budget.RawBudget;
 import nars.conceptualize.ConceptBuilder;
 import nars.index.term.TermIndex;
-import nars.task.MutableTask;
+
+import nars.task.TaskBuilder;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
@@ -313,32 +314,32 @@ public enum $ {
 //    }
 
     @NotNull
-    public static MutableTask belief(@NotNull Compound term, @NotNull Truth copyFrom) {
+    public static TaskBuilder belief(@NotNull Compound term, @NotNull Truth copyFrom) {
         return belief(term, copyFrom.freq(), copyFrom.conf());
     }
 
     @NotNull
-    public static MutableTask belief(@NotNull Compound term, float freq, float conf) {
+    public static TaskBuilder belief(@NotNull Compound term, float freq, float conf) {
         return task(term, BELIEF, freq, conf);
     }
 
     @NotNull
-    public static MutableTask goal(@NotNull Compound term, float freq, float conf) {
+    public static TaskBuilder goal(@NotNull Compound term, float freq, float conf) {
         return task(term, GOAL, freq, conf);
     }
 
     @NotNull
-    public static MutableTask task(@NotNull String term, char punct, float freq, float conf) throws Narsese.NarseseException {
+    public static TaskBuilder task(@NotNull String term, byte punct, float freq, float conf) throws Narsese.NarseseException {
         return task((Compound)$.$(term), punct, freq, conf);
     }
 
     @NotNull
-    public static MutableTask task(@NotNull Compound term, char punct, float freq, float conf) {
+    public static TaskBuilder task(@NotNull Compound term, byte punct, float freq, float conf) {
         return task(term, punct, t(freq, conf));
     }
     @NotNull
-    public static MutableTask task(@NotNull Compound term, char punct, Truth truth) {
-        return new MutableTask(term, punct, truth);
+    public static TaskBuilder task(@NotNull Compound term, byte punct, Truth truth) {
+        return new TaskBuilder(term, punct, truth);
     }
 
     @NotNull
@@ -995,15 +996,15 @@ public enum $ {
     }
 
     @NotNull
-    public static Task command(@NotNull Compound op) {
+    public static TaskBuilder command(@NotNull Compound op) {
         //TODO use lightweight CommandTask impl without all the logic metadata
-        MutableTask t = new MutableTask(op, COMMAND, null);
+        TaskBuilder t = new TaskBuilder(op, COMMAND, null);
         t.setBudget(1f, 1f);
         return t;
     }
 
     @NotNull
-    public static Task command(@NotNull String functor, Term... args) {
+    public static TaskBuilder command(@NotNull String functor, Term... args) {
         //TODO use lightweight CommandTask impl without all the logic metadata
         return command(func(functor, args));
     }

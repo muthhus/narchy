@@ -12,7 +12,7 @@ import org.jetbrains.annotations.NotNull;
 public class DynamicBeliefTask extends RevisionTask {
 
 
-    public DynamicBeliefTask(@NotNull Termed<Compound> term, char punc, Truth conclusion, long creationTime, long start, long end, long[] evidence) {
+    public DynamicBeliefTask(@NotNull Termed<Compound> term, byte punc, Truth conclusion, long creationTime, long start, long end, long[] evidence) {
         super(term, punc, conclusion, creationTime, start, end, evidence);
     }
 }

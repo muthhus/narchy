@@ -22,13 +22,13 @@ public class LambdaQuestionTask extends MutableTask {
 
     final ArrayBag<Task> answers;
 
-    public LambdaQuestionTask(@NotNull Termed<Compound> term, char punc, long occ, int history, @NotNull Consumer<Task> eachAnswer) {
+    public LambdaQuestionTask(@NotNull Termed<Compound> term, byte punc, long occ, int history, @NotNull Consumer<Task> eachAnswer) {
         this(term, punc, occ, history, (q, a) -> {
             eachAnswer.accept(a);
         });
     }
 
-    public LambdaQuestionTask(@NotNull Termed<Compound> term, char punc, long occ, int history, @NotNull BiConsumer<LambdaQuestionTask, Task> eachAnswer) {
+    public LambdaQuestionTask(@NotNull Termed<Compound> term, byte punc, long occ, int history, @NotNull BiConsumer<LambdaQuestionTask, Task> eachAnswer) {
         super(term, punc, null);
         this.answers = new ArrayBag<>(history, BudgetMerge.maxHard, new ConcurrentHashMap<>(history));
         this.eachAnswer = eachAnswer;

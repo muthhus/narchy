@@ -94,7 +94,7 @@ public class Narsese {
 
 //    public static Sentence parseOutput(String s) {
 //        Term content = null;
-//        char punc = 0;
+//        byte punc = 0;
 //        TruthValue truth = null;
 //
 //        try {
@@ -134,7 +134,7 @@ public class Narsese {
         Tense tense = parseTense(buffer);
         String str = buffer.toString().trim();
         int last = str.length() - 1;
-        char punc = str.charAt(last);
+        byte punc = str.charAt(last);
         
         Stamp stamp = new Stamp(-1 /* if -1, will be set right before the Task is input */, 
                 tense, memory.newStampSerial(), memory.param.duration.get());
@@ -242,7 +242,7 @@ public class Narsese {
      * @throws nars.io.StringParser.InvalidInputException If the String cannot
      * be parsed into a BudgetValue
      */
-    private static BudgetValue parseBudget(String s, char punctuation, TruthValue truth) throws InvalidInputException {
+    private static BudgetValue parseBudget(String s, byte punctuation, TruthValue truth) throws InvalidInputException {
         float priority, durability;
         switch (punctuation) {
             case JUDGMENT_MARK:

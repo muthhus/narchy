@@ -247,20 +247,30 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
      * part 2
      */
     @Nullable
-    public final DerivedTask derive(@NotNull Termed<Compound> c, @NotNull Budget budget, long now, long[] occ, @NotNull Derivation p, Truth truth, TruthPuncEvidence ct) {
-        char punc = ct.punc;
+    public final DerivedTask derive(@NotNull Compound c, @NotNull Budget budget, long now, long[] occ, @NotNull Derivation p, Truth truth, TruthPuncEvidence ct) {
+        byte punc = ct.punc;
         long[] evidence = ct.evidence;
 
+        long start, end;
+        if (occ!=null) {
+            start = occ[0];
+            end = occ[1];
+            if (end == ETERNAL)
+                end = start;
+        }
+        else
+            start = end = ETERNAL;
 
         DerivedTask d =
-                new DerivedTask.DefaultDerivedTask(c, truth, punc, evidence, p, now, occ);
+                new DerivedTask.DefaultDerivedTask(c, truth, punc, evidence, p, now, start, end);
 
 
         //new RuleFeedbackDerivedTask(c, truth, punc, evidence, p, rule);
-        d.budget(budget) // copied in, not shared
+        d.setBudget(budget); // copied in, not shared
                 //.anticipate(derivedTemporal && d.anticipate)
-                .log(Param.DEBUG ? rule : null);
 
+        if (Param.DEBUG)
+            d.log(rule);
 
 //            //TEMPORARY MEASUREMENT
 //            if (dt.isGoal()) {
@@ -301,7 +311,7 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
 //
 //        private final @NotNull PremiseRule rule;
 //
-//        public RuleFeedbackDerivedTask(@NotNull Termed<Compound> tc, @Nullable Truth truth, char punct, long[] evidence, @NotNull Derivation premise, @NotNull PremiseRule rule, long now, long[] occ) {
+//        public RuleFeedbackDerivedTask(@NotNull Termed<Compound> tc, @Nullable Truth truth, byte punct, long[] evidence, @NotNull Derivation premise, @NotNull PremiseRule rule, long now, long[] occ) {
 //            super(tc, truth, punct, evidence, premise, now, occ);
 //            this.rule = rule;
 //        }

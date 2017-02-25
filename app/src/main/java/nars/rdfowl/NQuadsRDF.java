@@ -4,7 +4,7 @@ import nars.$;
 import nars.NAR;
 import nars.Op;
 import nars.Task;
-import nars.task.MutableTask;
+
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.atom.Atom;
@@ -322,7 +322,7 @@ public abstract class NQuadsRDF {
             Term term = /*$.inst*/ $.inh($.p(subject, object), predicate);
             if (term == null)
                 throw new NullPointerException();
-            Task t = new MutableTask(term, '.', 1f, nar);
+            Task t = new TaskBuilder(term, '.', 1f, nar);
             return t;
         } catch (Exception e) {
             logger.error("rdf({}) to task: {}", new Term[] { subject, object, predicate }, e);
@@ -436,7 +436,7 @@ public abstract class NQuadsRDF {
         if (belief instanceof Compound) {
             //System.out.println(subject + " " + predicate + " " + object + " :: " + belief);
 
-            return new MutableTask(belief, Op.BELIEF, 1f, nar)
+            return new TaskBuilder(belief, Op.BELIEF, 1f, nar)
                     .eternal();
         }
 

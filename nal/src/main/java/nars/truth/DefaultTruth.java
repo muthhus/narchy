@@ -33,7 +33,7 @@ public class DefaultTruth implements Truth  {
     }
 
 
-    public DefaultTruth(char punctuation, @NotNull NAR m) {
+    public DefaultTruth(byte punctuation, @NotNull NAR m) {
         this(1.0f, m.confidenceDefault(punctuation));
     }
 

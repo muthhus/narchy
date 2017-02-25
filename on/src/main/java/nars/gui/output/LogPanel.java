@@ -283,7 +283,7 @@ abstract public class LogPanel extends NPanel implements LogOutput {
         return new Color(val,0,0);
     }
 
-    final static Color getStatementColor(final char punctuation, final float priority) {
+    final static Color getStatementColor(final byte punctuation, final float priority) {
         
         float r = 1f, g = 1f, b = 1f;
         /*switch (punctuation) {

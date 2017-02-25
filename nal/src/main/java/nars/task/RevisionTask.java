@@ -34,7 +34,7 @@ public class RevisionTask extends AnswerTask  {
     }
 
 
-    public RevisionTask(@NotNull Termed<Compound> term, char punc, Truth conclusion, long creationTime, long start, long end, long[] evidence) {
+    public RevisionTask(@NotNull Termed<Compound> term, byte punc, Truth conclusion, long creationTime, long start, long end, long[] evidence) {
         super(term, punc, conclusion, creationTime, start, end, evidence);
     }
 

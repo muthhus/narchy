@@ -309,7 +309,7 @@ public class DerivationContext {
      * @param newTruth The truth value of the sentence in task
      * @param newBudget The budget value in task
      */
-    public boolean singlePremiseTask(final Term newContent, final char punctuation, final TruthValue newTruth, final BudgetValue newBudget) {
+    public boolean singlePremiseTask(final Term newContent, final byte punctuation, final TruthValue newTruth, final BudgetValue newBudget) {
         
         if (!newBudget.aboveThreshold())
             return false;

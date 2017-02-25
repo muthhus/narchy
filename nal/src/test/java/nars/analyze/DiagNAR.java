@@ -80,8 +80,8 @@
 //        }
 //    }
 //
-////    final MutableTask nullTask = new MutableTask($.$("(null)"), '.');
-////    static final MutableTask null = new MutableTask($.$("(null)"), '.');
+////    final MutableTask nullTask = new TaskBuilder($.$("(null)"), '.');
+////    static final MutableTask null = new TaskBuilder($.$("(null)"), '.');
 //
 //    private void onPremiseComplete(DiagConceptProcess p) {
 //        Collection<Task> c = p.results;

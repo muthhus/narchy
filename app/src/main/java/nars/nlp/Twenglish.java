@@ -21,7 +21,8 @@ import jcog.io.Twokenize.Span;
 import nars.$;
 import nars.NAR;
 import nars.Narsese;
-import nars.task.MutableTask;
+import nars.task.TaskBuilder;
+import nars.term.Compound;
 import nars.term.Term;
 import nars.term.atom.Atom;
 import org.jetbrains.annotations.NotNull;
@@ -29,9 +30,11 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
+import static nars.Op.BELIEF;
+
 
 /**
- * Twitter English - english with additional tags for twitter-like content 
+ * Twitter English - english with additional tags for twitter-like content
  */
 public class Twenglish {
 //    public static final Atomic GOAL = $.the("exclaims");
@@ -41,18 +44,20 @@ public class Twenglish {
 //    public static final Atomic FRAGMENT = $.the("says");
 
     //public final ArrayList<String> vocabulary = new ArrayList<>();
-    
-    /** substitutions */
-    public final Map<String,String> sub = new HashMap();
+
+    /**
+     * substitutions
+     */
+    public final Map<String, String> sub = new HashMap();
 
 
     //boolean languageBooted = true; //set to false to initialize on first twenglish input
     boolean inputProduct = true;
 
-    
-    public static final Map<String,String> POS = new HashMap(){{
+
+    public static final Map<String, String> POS = new HashMap<>() {{
         //https://www.englishclub.com/grammar/parts-of-speech-table.htm
-        
+
         put("i", "pronoun");
         put("it", "pronoun");
         put("them", "pronoun");
@@ -67,7 +72,7 @@ public class Twenglish {
         put("that", "pronoun");
         put("these", "pronoun");
         put("those", "pronoun");
-        
+
         put("is", "verb");
 
         put("who", "qpronoun");
@@ -76,22 +81,22 @@ public class Twenglish {
         put("when", "qpronoun");
         put("why", "qpronoun");
         put("which", "qpronoun");
-        
+
         put("to", "prepos");
         put("at", "prepos");
         put("before", "prepos");
         put("after", "prepos");
         put("on", "prepos");
         put("but", "prepos");
-        
+
         put("and", "conjunc");
         put("but", "conjunc");
         put("or", "conjunc");
         put("if", "conjunc");
         put("while", "conjunct");
-                
+
     }};
-    
+
     public Twenglish() {
         //TODO use word tokenization so that word substitutions dont get applied across words.
         sub.put("go to", "goto");
@@ -100,12 +105,12 @@ public class Twenglish {
 
 
     @NotNull
-    protected Collection<MutableTask> parseSentence(String source, @NotNull NAR n, @NotNull List<Span> s) {
+    protected Collection<TaskBuilder> parseSentence(String source, @NotNull NAR n, @NotNull List<Span> s) {
 
         LinkedList<Term> t = new LinkedList();
         Span last = null;
         for (Span c : s) {
-            t.add( spanToTerm(c) );
+            t.add(spanToTerm(c));
             last = c;
         }
         if (t.isEmpty()) return Collections.emptyList();
@@ -127,13 +132,13 @@ public class Twenglish {
             return null;
 
 
-        List<MutableTask> tt = new ArrayList();
+        List<TaskBuilder> tt = new ArrayList();
 
         //1. add the logical structure of the sequence of terms
         if (inputProduct) {
 
             Term tokens =
-                $.p(t.toArray(new Term[t.size()]));
+                    $.p(t.toArray(new Term[t.size()]));
 //            Term q =
 //                    $.image(2,
 //                            $.the(source),
@@ -141,13 +146,11 @@ public class Twenglish {
 //                            tokens
 //                    )
 
-            Term q = $.func("hear", $.the(source), tokens);
+            Compound q = $.func("hear", $.the(source), tokens);
 
-            if (q != null) {
-                MutableTask newtask = new MutableTask(q,'.', 1f, n).present(n); //n.task(q + ". %0.95|0.95%");
-                if (newtask!=null)
-                    tt.add(newtask); //TODO non-string construct
-            }
+            TaskBuilder newtask = new TaskBuilder(q, BELIEF, 1f, n).present(n); //n.task(q + ". %0.95|0.95%");
+            tt.add(newtask); //TODO non-string construct
+
 
         }
 
@@ -190,8 +193,7 @@ public class Twenglish {
                 //TODO support >1 and probabalistic POS
                 if (!includeWordPOS) {
                     return lexToTerm(c.content);
-                }
-                else {
+                } else {
                     String pos = POS.get(c.content.toLowerCase());
                     if (pos != null) {
                         return $.prop(lexToTerm(c.content), tagToTerm(pos));
@@ -200,17 +202,21 @@ public class Twenglish {
                 break;
             case "punct":
                 switch (c.content) {
-                    case "!": return EXCLAMATION;
-                    case ".": return PERIOD;
-                    case "?": return QUESTION_MARK;
-                    case ",": return COMMA;
+                    case "!":
+                        return EXCLAMATION;
+                    case ".":
+                        return PERIOD;
+                    case "?":
+                        return QUESTION_MARK;
+                    case ",":
+                        return COMMA;
                 }
                 break;
         }
 
-        return $.prop( lexToTerm(c.content), tagToTerm(c.pattern) );
+        return $.prop(lexToTerm(c.content), tagToTerm(c.pattern));
     }
-    
+
     public static Term lexToTerm(String c) {
         //return Atom.the(c, true);
         return $.quote(c);
@@ -234,30 +240,33 @@ public class Twenglish {
 
         //  }
     }
+
     @NotNull
     public static Term tagToTerm(String c) {
         c = c.toLowerCase();
         if ("word".equals(c)) return $.quote(" ");
         return $.the(c);
     }
-    
-    
-    /** returns a list of all tasks that it was able to parse for the input */
-    @NotNull
-    public List<MutableTask> parse(String source, @NotNull NAR n, String s) throws Narsese.NarseseException {
 
-        
-        List<MutableTask> results = $.newArrayList();
+
+    /**
+     * returns a list of all tasks that it was able to parse for the input
+     */
+    @NotNull
+    public List<TaskBuilder> parse(String source, @NotNull NAR n, String s) throws Narsese.NarseseException {
+
+
+        List<TaskBuilder> results = $.newArrayList();
 
         List<Span> tokens = Twokenize.twokenize(s);
-        
+
         List<List<Span>> sentences = $.newArrayList();
-        
+
         List<Span> currentSentence = $.newArrayList(tokens.size());
         for (Span p : tokens) {
-            
+
             currentSentence.add(p);
-            
+
             if ("punct".equals(p.pattern)) {
                 switch (p.content) {
                     case ".":
@@ -271,16 +280,16 @@ public class Twenglish {
                 }
             }
         }
-                
+
         if (!currentSentence.isEmpty())
             sentences.add(currentSentence);
-        
+
         for (List<Span> x : sentences) {
-            Collection<MutableTask> ss = parseSentence(source, n, x);
-            if (ss!=null)
+            Collection<TaskBuilder> ss = parseSentence(source, n, x);
+            if (ss != null)
                 results.addAll(ss);
         }
-                
+
         if (!results.isEmpty()) {
 //            if (!languageBooted) {
 //
@@ -292,9 +301,9 @@ public class Twenglish {
 //
 //                languageBooted = true;
 //            }
-                
+
         }
-        
+
         return results;
     }
 

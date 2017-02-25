@@ -105,7 +105,7 @@
 //    public class SentenceType implements Comparable<SentenceType> {
 //
 //        public final Op op;
-//        public final char punc;
+//        public final byte punc;
 //
 //        transient private final int hash;
 //        private ArrayList sentences;

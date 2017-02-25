@@ -4,7 +4,7 @@
 //import nars.NAR;
 //import nars.Symbols;
 //import nars.data.Range;
-//import nars.task.MutableTask;
+//
 //import nars.task.Task;
 //import nars.term.Termed;
 //import nars.truth.DefaultTruth;
@@ -118,7 +118,7 @@
 //    public static class InputTask implements Action {
 //        final Termed term;
 //        final NAR nar;
-//        private final char punct;
+//        private final byte punct;
 //        private final boolean invert;
 //
 //        @Deprecated public InputTask(NAR n, Termed term) {
@@ -131,7 +131,7 @@
 //            return ((invert) ? "--" : "") + term.toString() + punct;
 //        }
 //
-//        public InputTask(NAR n, Termed term, char punct, boolean invert) {
+//        public InputTask(NAR n, Termed term, byte punct, boolean invert) {
 //            this.nar = n;
 //            this.term = term;
 //            this.punct = punct;
@@ -154,7 +154,7 @@
 //            int dt = 0;
 //            //TODO solve for strength/additional desire so expectation is correct
 //            long now = nar.time();
-//            final Task t = new MutableTask(term, punct, new DefaultTruth(invert ? 0f : 1f, conf))
+//            final Task t = new TaskBuilder(term, punct, new DefaultTruth(invert ? 0f : 1f, conf))
 //                    //.time(Tense.Future, nar.memory)
 //                    .time(now, now + dt )
 //                    .log("Q Action");
@@ -440,7 +440,7 @@
 ////        }
 ////        float onF = 1f, offF = 0.5f;
 ////        for (int a = 0; a < outs.length; a++) {
-////            final Task t = new MutableTask(outs[a]).goal().truth(a == x ? onF : offF, 0.7f).time(Tense.Future, nar.memory).log("Q Action");
+////            final Task t = new TaskBuilder(outs[a]).goal().truth(a == x ? onF : offF, 0.7f).time(Tense.Future, nar.memory).log("Q Action");
 ////            //logger.info("q act: {}", t );
 ////            nar.input(t);
 ////        }

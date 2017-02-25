@@ -677,10 +677,10 @@ public class IRCAgent extends IRC {
 //                //String r = "<" + a + " --> " + pattern + ">. :|:\n";
 //
 //                //Term tt = Inheritance.make(wordTerm, Term.get(pattern));
-//                //char punc = '.';
+//                //byte punc = '.';
 //
 //                //Term tt = Operation.make(nar.memory.operate("^say"), new Term[] {wordTerm});
-//                //char punc = '!';
+//                //byte punc = '!';
 //
 //                //nar.input(new Sentence(tt, punc, new TruthValue(1.0f, 0.9f), new Stamp(nar.memory, Tense.Present)));
 //                //nar.think(delay);

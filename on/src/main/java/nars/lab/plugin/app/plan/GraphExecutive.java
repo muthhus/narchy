@@ -566,7 +566,7 @@ public class GraphExecutive {
             return "[" + score() + '|' + distance + "] " + sequence;
         }
         
-        public Task planTask(Concept c, Task goal, Term goalTerm, char punctuation) {
+        public Task planTask(Concept c, Task goal, Term goalTerm, byte punctuation) {
             
             Cause currentEdge = path[path.length-1];
 
@@ -747,7 +747,7 @@ public class GraphExecutive {
         return plans;
     } 
     
-    protected Task planTask(nars.control.DerivationContext nal, ParticlePlan plan, Concept c, Task task, Term target, char punctuation) {
+    protected Task planTask(nars.control.DerivationContext nal, ParticlePlan plan, Concept c, Task task, Term target, byte punctuation) {
         
         Task newTask = plan.planTask(c, task, target, punctuation);
         
@@ -759,7 +759,7 @@ public class GraphExecutive {
         
     }
 
-   public int plan(final nars.control.DerivationContext nal, Concept c, Task task, Term target, int particles, double searchDistance, char punctuation, int maxTasks) {
+   public int plan(final nars.control.DerivationContext nal, Concept c, Task task, Term target, int particles, double searchDistance, byte punctuation, int maxTasks) {
 
         TreeSet<ParticlePlan> plans = particlePlan(target, searchDistance, particles);
         

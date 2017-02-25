@@ -194,7 +194,7 @@ public abstract class Param  {
     public final FloatParam quaMin = new FloatParam(Param.BUDGET_EPSILON*1f);
 
 
-    public float confidenceDefault(char punctuation) {
+    public float confidenceDefault(byte punctuation) {
 
         switch (punctuation) {
             case BELIEF:
@@ -239,7 +239,7 @@ public abstract class Param  {
     public float DEFAULT_QUESTION_QUALITY = 0.5f;
     public float DEFAULT_QUEST_QUALITY = DEFAULT_QUESTION_QUALITY;
 
-    public float priorityDefault(char punctuation) {
+    public float priorityDefault(byte punctuation) {
         switch (punctuation) {
             case BELIEF:
                 return DEFAULT_BELIEF_PRIORITY;
@@ -260,7 +260,7 @@ public abstract class Param  {
     }
 
 
-    @Deprecated public float qualityDefault(char punctuation) {
+    @Deprecated public float qualityDefault(byte punctuation) {
         switch (punctuation) {
             case QUEST:
                 return DEFAULT_QUEST_QUALITY;
@@ -274,7 +274,7 @@ public abstract class Param  {
 
 
     @Nullable
-    public final Truth truthDefault(char p) {
+    public final Truth truthDefault(byte p) {
         switch (p) {
             case GOAL:
                 return defaultGoalTruth;

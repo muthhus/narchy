@@ -22,9 +22,9 @@ public class MutableTaskTest {
 
         assertTrue("default is eternal", n.task(s).isEternal());
 
-        assertTrue("tense=eternal is eternal", Tense.isEternal(((MutableTask)n.task(s)).eternal().start()));
+        assertTrue("tense=eternal is eternal", Tense.isEternal(((TaskBuilder)n.task(s)).eternal().start()));
 
-        assertTrue("present is non-eternal", !Tense.isEternal(((MutableTask)n.task(s)).present(n).start()));
+        assertTrue("present is non-eternal", !Tense.isEternal(((TaskBuilder)n.task(s)).present(n).start()));
 
     }
 
@@ -35,9 +35,9 @@ public class MutableTaskTest {
         String s = "<a --> b>.";
 
         //the final occurr() or tense() is the value applied
-        assertTrue(!Tense.isEternal(((MutableTask)n.task(s)).eternal().occurr(100).start()));
-        assertTrue(!Tense.isEternal(((MutableTask)n.task(s)).eternal().present(n).start()));
-        assertTrue(Tense.isEternal(((MutableTask)n.task(s)).occurr(100).eternal().start()));
+        assertTrue(!Tense.isEternal(((TaskBuilder)n.task(s)).eternal().occurr(100).start()));
+        assertTrue(!Tense.isEternal(((TaskBuilder)n.task(s)).eternal().present(n).start()));
+        assertTrue(Tense.isEternal(((TaskBuilder)n.task(s)).occurr(100).eternal().start()));
     }
 
 

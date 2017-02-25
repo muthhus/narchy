@@ -245,7 +245,7 @@ public class PixelAutoClassifier extends Autoencoder implements Consumer<NAR> {
 //
 //                    Term Y = $.inh($.p(root, $.the(i), $.the(j)), $.seti(vt));
 //                    tasks.add(
-//                        new MutableTask(Y, Symbols.BELIEF, 1f, conf)
+//                        new TaskBuilder(Y, Symbols.BELIEF, 1f, conf)
 //                            .budget(conf * basePri, baseDur)
 //                            .present(nar) //.log(TAG))
 //                    );

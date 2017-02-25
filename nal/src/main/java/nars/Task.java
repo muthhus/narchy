@@ -3,12 +3,11 @@ package nars;
 import jcog.Texts;
 import jcog.map.SynchronizedHashMap;
 import nars.bag.impl.ArrayBag;
-import nars.budget.BLink;
-import nars.budget.BudgetMerge;
-import nars.budget.Budgeted;
-import nars.budget.RawBLink;
+import nars.budget.*;
 import nars.concept.Concept;
 import nars.op.Command;
+import nars.task.ImmutableTask;
+
 import nars.task.Tasked;
 import nars.term.Compound;
 import nars.term.Term;
@@ -23,9 +22,13 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 import static nars.Op.*;
+import static nars.term.Terms.compoundOrNull;
 import static nars.time.Tense.ETERNAL;
 import static nars.truth.TruthFunctions.w2c;
 
@@ -37,9 +40,9 @@ import static nars.truth.TruthFunctions.w2c;
  * <p>
  * TODO decide if the Sentence fields need to be Reference<> also
  */
-public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed<Compound>, Tasked {
+public interface Task extends Budgeted, Truthed, Stamp, Termed<Compound>, Tasked {
 
-    char punc();
+    byte punc();
 
 
     @Override
@@ -56,6 +59,31 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
     /** occurrence ending time */
     @Override
     long end();
+
+    static boolean equivalentTo(@NotNull Task a, @NotNull Task b, boolean punctuation, boolean term, boolean truth, boolean stamp, boolean occurrenceTime) {
+
+        @NotNull long[] evidence = a.evidence();
+
+        if (stamp && (!Arrays.equals(evidence, b.evidence())))
+            return false;
+
+        if (evidence.length > 1) {
+            if (occurrenceTime && (a.start() != b.start()) || (a.end() != b.end()))
+                return false;
+
+            if (truth && !Objects.equals(a.truth(), b.truth()))
+                return false;
+        }
+
+        if (term && !a.term().equals(b.term()))
+            return false;
+
+        if (punctuation && (a.punc() != b.punc()))
+            return false;
+
+        return true;
+    }
+
 
     static void proof(@NotNull Task task, int indent, @NotNull Appendable sb) {
         //TODO StringBuilder
@@ -85,7 +113,7 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
     }
 
     @Nullable
-    static boolean taskContentValid(@NotNull Compound t, char punc, int nalLevel, int maxVol, boolean safe) {
+    static boolean taskContentValid(@NotNull Compound t, byte punc, int nalLevel, int maxVol, boolean safe) {
         if (!t.isNormalized())
             return test(t, "Task Term is null or not a normalized Compound", safe);
         if (t.volume() > maxVol)
@@ -108,7 +136,7 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
     /** call this directly instead of taskContentValid if the level, volume, and normalization have already been tested.
      * these can all be tested prenormalization, because normalization will not affect the result
      * */
-    @Nullable static boolean taskStatementValid(@NotNull Compound t, char punc, boolean safe) {
+    @Nullable static boolean taskStatementValid(@NotNull Compound t, byte punc, boolean safe) {
         /* A statement sentence is not allowed to have a independent variable as subj or pred"); */
         Op op = t.op();
 
@@ -162,16 +190,6 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
     }
 
 
-    /**
-     * Check whether different aspects of sentence are equivalent to another one
-     *
-     * @param that The other judgment
-     * @return Whether the two are equivalent
-     */
-    boolean equivalentTo(@NotNull Task that, boolean punctuation, boolean term, boolean truth, boolean stamp, boolean creationTime);
-
-
-
 
     default boolean isQuestion() { return (punc() == QUESTION);     }
     default boolean isBelief() {
@@ -212,12 +230,12 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
 
 
     default boolean isQuestOrQuestion() {
-        char c = punc();
+        byte c = punc();
         return c == Op.QUESTION || c == Op.QUEST;
     }
 
     default boolean isBeliefOrGoal() {
-        char c = punc();
+        byte c = punc();
         return c == Op.BELIEF || c == Op.GOAL;
     }
 
@@ -413,7 +431,7 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
             budget().toBudgetStringExternal(buffer).append(' ');
         }
 
-        buffer.append(contentName).append(punc());
+        buffer.append(contentName).append((char)punc());
 
         if (tenseString.length() > 0)
             buffer.append(' ').append(tenseString);
@@ -434,35 +452,10 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
         return buffer;
     }
 
-    @Nullable
-    default Object lastLogged() {
-        List log = log();
-        return log == null || log.isEmpty() ? null : log.get(log.size() - 1);
-    }
-
-
-    @NotNull
-    default String proof() {
-        StringBuilder sb = new StringBuilder(512);
-        return proof(sb).toString();
-    }
-
-    @NotNull
-    default StringBuilder proof(@NotNull StringBuilder temporary) {
-        temporary.setLength(0);
-        proof(this, 0, temporary);
-        return temporary;
-    }
 
 
 
 
-
-    /**
-     * get the recorded log entries
-     */
-    @Nullable
-    List log();
 
 
     /**
@@ -477,68 +470,12 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
     }
 
 
-//    /**
-//     * a task is considered amnesiac (origin not rememebered) if its parent task has been forgotten (garbage collected via a soft/weakref)
-//     */
-//    default boolean isAmnesiac() {
-//        return !isInput() && getParentTask() == null;
-//    }
-
-
-    /**
-     * if unnormalized, returns a normalized version of the task,
-     * null if not normalizable
-     */
-    void normalize(@NotNull NAR n) throws InvalidTaskException, Concept.InvalidConceptException;
-
-
-//    default void ensureValidParentTaskRef() {
-//        if ((getParentTaskRef() != null && getParentTask() == null))
-//            throw new RuntimeException("parentTask must be null itself, or reference a non-null Task");
-//    }
-
-
-
-
-//
-//    /** normalize a collection of tasks to each other
-//     * so that the aggregate budget sums to a provided
-//     * normalization amount.
-//     * @param derived
-//     * @param premisePriority the total value that the derivation group should reach, effectively a final scalar factor determined by premise parent and possibly existing belief tasks
-//     * @return the input collection, unmodified (elements may be adjusted individually)
-//     */
-//    static void normalizeCombined(@NotNull Iterable<Task> derived, float premisePriority) {
-//
-//
-//        float totalDerivedPriority = prioritySum(derived);
-//        float factor = Math.min(
-//                    premisePriority/totalDerivedPriority,
-//                    1.0f //limit to only diminish
-//                );
-//
-//        if (!Float.isFinite(factor))
-//            throw new RuntimeException("NaN");
-//
-//        derived.forEach(t -> t.budget().priMult(factor));
-//    }
-//
-//    static void normalize(@NotNull Iterable<Task> derived, float premisePriority) {
-//        derived.forEach(t -> t.budget().priMult(premisePriority));
-//    }
-//    static void inputNormalized(@NotNull Iterable<Task> derived, float premisePriority, @NotNull Consumer<Task> target) {
-//        derived.forEach(t -> {
-//            t.budget().priMult(premisePriority);
-//            target.accept(t);
-//        });
-//    }
-
     default boolean isEternal() {
         return start() == ETERNAL;
     }
 
 
-    default String getTense(long currentTime) {
+    @Deprecated default String getTense(long currentTime) {
 
         long ot = start();
 
@@ -555,45 +492,6 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
                 return Op.TENSE_PRESENT;
         }
     }
-
-//    default Truth projection(long targetTime, long now) {
-//        return projection(targetTime, now, true);
-//    }
-
-    //projects the truth to a certain time, covering all 4 cases as discussed in
-    //https://groups.google.com/forum/#!searchin/open-nars/task$20eteneral/open-nars/8KnAbKzjp4E/rBc-6V5pem8J
-//    @Nullable
-//    default ProjectedTruth projectTruth(long targetTime, long now, boolean eternalizeIfWeaklyTemporal) {
-//
-//
-//        Truth currentTruth = truth();
-//        long occ = occurrence();
-//
-//        if (targetTime == ETERNAL) {
-//
-//            return isEternal() ? new ProjectedTruth(currentTruth, ETERNAL) : eternalize(currentTruth);
-//
-//        } else {
-//
-//            return Revision.project(currentTruth, targetTime, now, occ, eternalizeIfWeaklyTemporal);
-//        }
-//
-//    }
-
-
-//    final class ExpectationComparator implements Comparator<Task>, Serializable {
-//        static final Comparator the = new ExpectationComparator();
-//        @Override public int compare(@NotNull Task b, @NotNull Task a) {
-//            return Float.compare(a.expectation(), b.expectation());
-//        }
-//    }
-//
-//    final class ConfidenceComparator implements Comparator<Task>, Serializable {
-//        static final Comparator the = new ExpectationComparator();
-//        @Override public int compare(@NotNull Task b, @NotNull Task a) {
-//            return Float.compare(a.conf(), b.conf());
-//        }
-//    }
 
 
     @Nullable
@@ -615,27 +513,14 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
         return Stamp.isCyclic(evidence());
     }
 
-
-//    default boolean temporal() {
-//        return start() != ETERNAL;
-//    }
-
-
     default int dt() {
         return term().dt();
     }
-
-//    @NotNull
-//    default ImmutableLongSet evidenceSet() {
-//        return LongSets.immutable.of(evidence());
-//    }
-
 
     default float conf(long when, float dur) {
         float cw = confWeight(when, dur);
         return cw == cw ? w2c(cw) : Float.NaN;
     }
-
 
     @Nullable
     default Truth truth(long when, float dur, float minConf) {
@@ -689,4 +574,87 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
             .append('\n');
 
     }
+
+    /**
+     * append an entry to this task's log history
+     * useful for debugging but can also be applied to meta-analysis
+     * ex: an entry might be a String describing a change in the story/history
+     * of the Task and the reason for it.
+     */
+    @NotNull
+    default void log(@Nullable Object entry) {
+        if (!(entry == null || !Param.DEBUG_TASK_LOG))
+            getOrCreateLog().add(entry);
+    }
+
+    @Nullable
+    public static ImmutableTask clone(@NotNull Task x, @NotNull Compound newContent) {
+//        if (!y.isNormalized()) {
+//            y = (Compound) nar.normalize(y);
+//            if (y == null)
+//                return null;
+//        }
+
+        Budget b = x.budget().clone(); //snapshot its budget
+        if (b.isDeleted())
+            return null;
+
+        boolean negated = (newContent.op() == NEG);
+        if (negated)
+            newContent = compoundOrNull(newContent.unneg());
+
+        if (newContent == null)
+            return null;
+
+        ImmutableTask y = new ImmutableTask(newContent, x.punc(), x.truth().negIf(negated), x.creation(), x.start(), x.end(), x.evidence());
+        y.setBudget(b);
+        y.meta = x.meta();
+        return y;
+
+    }
+
+    Map meta();
+
+    <X> X meta(Object key);
+
+    void meta(Object key, Object value);
+
+    @Nullable
+    default List log() {
+        return meta(String.class);
+    }
+
+    @NotNull
+    default List getOrCreateLog() {
+
+        List exist = log();
+        if (exist == null) {
+            meta(String.class,  (exist = $.newArrayList(1)) );
+        }
+        return exist;
+    }
+
+
+
+    @Nullable
+    default Object lastLogged() {
+        List log = log();
+        return log == null || log.isEmpty() ? null : log.get(log.size() - 1);
+    }
+
+
+    @NotNull
+    default String proof() {
+        StringBuilder sb = new StringBuilder(512);
+        return proof(sb).toString();
+    }
+
+    @NotNull
+    default StringBuilder proof(@NotNull StringBuilder temporary) {
+        temporary.setLength(0);
+        proof(this, 0, temporary);
+        return temporary;
+    }
+
+
 }

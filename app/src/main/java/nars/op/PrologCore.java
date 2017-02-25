@@ -8,7 +8,7 @@
 //import nars.Op;
 //import nars.Task;
 //import nars.concept.Concept;
-//import nars.task.MutableTask;
+//
 //import nars.term.Compound;
 //import nars.term.Term;
 //import nars.term.atom.Atomic;
@@ -227,7 +227,7 @@
 //
 //                    boolean truth = answer.getVarValue("F").isEqual(ONE);
 //
-//                    MutableTask t = new MutableTask(nterm, '.', $.t(truth ? 1f : 0f, answerConf.floatValue()));
+//                    MutableTask t = new TaskBuilder(nterm, '.', $.t(truth ? 1f : 0f, answerConf.floatValue()));
 //                    //t.present(nar.time());
 //                    t.log("Prolog Answer");
 //

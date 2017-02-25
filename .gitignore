@@ -16,7 +16,10 @@ target
 *.iml
 .idea
 dev/netbeans/nbproject/private
+
 hs_err_pid*
+replay*.log
+
 nb-configuration.xml
 UIFiles
 .classpath

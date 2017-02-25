@@ -8,10 +8,10 @@ import org.jetbrains.annotations.NotNull;
  * Created by me on 5/26/16.
  */
 public final class SolvePuncOverride extends Solve {
-    private final char puncOverride;
+    private final byte puncOverride;
 
 
-    public SolvePuncOverride(String i, Conclude der, char puncOverride, TruthOperator belief, TruthOperator desire) {
+    public SolvePuncOverride(String i, Conclude der, byte puncOverride, TruthOperator belief, TruthOperator desire) {
         super(i, der, belief, desire);
         this.puncOverride = puncOverride;
     }

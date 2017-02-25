@@ -10,7 +10,7 @@
 //import nars.budget.forget.Forget;
 //import nars.budget.merge.BudgetMerge;
 //import nars.concept.Concept;
-//import nars.task.MutableTask;
+//
 //import nars.task.Task;
 //import nars.term.Term;
 //import nars.term.atom.Atomic;
@@ -91,7 +91,7 @@
 ////            onInput(tt);
 ////        });
 //
-//        MutableTask m = new MutableTask($.exec(op, args), Symbols.COMMAND, null) {
+//        MutableTask m = new TaskBuilder($.exec(op, args), Symbols.COMMAND, null) {
 //
 //            /** isnt called for Command tasks currently; they will be executed right away anyway */
 //            @Override protected void onInput(@NotNull Memory m) {

@@ -35,7 +35,7 @@ abstract public class Solve extends AtomicBoolCondition {
         return id;
     }
 
-    final boolean measure(@NotNull Derivation m, char punct) {
+    final boolean measure(@NotNull Derivation m, byte punct) {
 
         boolean single;
         Truth t;

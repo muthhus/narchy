@@ -374,7 +374,7 @@ public class PremiseRule extends GenericCompound {
                               @NotNull TimeFunctions temporalizer) {
 
 
-        char puncOverride = p.puncOverride;
+        byte puncOverride = p.puncOverride;
 
         TruthOperator belief = BeliefFunction.get(p.beliefTruth);
         if ((p.beliefTruth != null) && !p.beliefTruth.equals(TruthOperator.NONE) && (belief == null)) {

@@ -2,11 +2,10 @@ package nars.task;
 
 import jcog.Util;
 import jcog.data.array.LongArrays;
-import nars.NAR;
-import nars.Op;
-import nars.Param;
-import nars.Task;
+import nars.*;
+import nars.budget.Budget;
 import nars.budget.BudgetFunctions;
+import nars.budget.Budgeted;
 import nars.budget.RawBudget;
 import nars.concept.Concept;
 import nars.index.term.TermIndex;
@@ -14,15 +13,18 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.time.Tense;
+import nars.truth.DefaultTruth;
 import nars.truth.Truth;
-import nars.truth.TruthDelta;
+import nars.truth.Truthed;
 import nars.util.task.InvalidTaskException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
-import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 import static nars.$.t;
 import static nars.Op.*;
@@ -31,7 +33,7 @@ import static nars.time.Tense.ETERNAL;
 
 /**
  * Default Task implementation
- * TODO move all mutable methods to MutableTask and call this ImmutableTask
+ * TODO move all mutable methods to TaskBuilder and call this ImTaskBuilder
  *
  * NOTE:
      if evidence length == 1 (input) then do not include
@@ -43,12 +45,12 @@ import static nars.time.Tense.ETERNAL;
 
      once input, input tasks will have unique serial numbers anyway
  */
-public abstract class AbstractTask extends RawBudget implements Task {
+public class TaskBuilder extends RawBudget implements Termed, Truthed, Function<NAR,Task> {
 
     @NotNull
     private Compound term;
 
-    protected char punc;
+    protected byte punc;
 
     @Nullable
     private Truth truth;
@@ -77,56 +79,37 @@ public abstract class AbstractTask extends RawBudget implements Task {
 //    @Nullable protected transient Reference<Task> parentBelief;
 
     private transient int hash;
+    @Nullable
+    private List log;
 
 
+    public TaskBuilder(@NotNull Compound t, byte punct, float freq, @NotNull NAR nar) {
+        this(t, punct, $.t(freq, nar.confidenceDefault(punct)));
+    }
 
-
-
-//    public AbstractTask(Compound term, char punctuation, Truth truth, Budget bv, Task parentTask, Task parentBelief, Task solution) {
-//        this(term, punctuation, truth,
-//                bv.getPriority(),
-//                bv.getDurability(),
-//                bv.getQuality(),
-//                parentTask, parentBelief,
-//                solution);
+    //    public MutableTask(@NotNull String compoundTermString, byte punct, float freq, float conf) throws Narsese.NarseseException {
+//        this($.$(compoundTermString), punct, t(freq, conf));
 //    }
+    public TaskBuilder(@NotNull Compound t, byte punct, float freq, float conf) {
+        this(t, punct, t(freq, conf));
+    }
 
-//    public AbstractTask(@NotNull Compound term, char punc, Truth truth, float p, float d, float q) {
-//        this(term, punc, truth, p, d, q, (Task) null, null);
-//    }
-
-//    public AbstractTask(@NotNull Compound term, char punc, Truth truth, float p, float d, float q, Task parentTask, Task parentBelief) {
-//        this(term, punc, truth,
-//                p, d, q,
-//                parentTask,
-//                parentBelief
-//        );
-//    }
-
-//    /** copy/clone constructor */
-//    public AbstractTask(@NotNull Task task) {
-//        this(task, task.punc(), task.truth(),
-//                task.pri(), task.dur(), task.qua());
-//        setEvidence(task.evidence());
-//        setOccurrence(task.occurrence());
-//    }
+    public TaskBuilder(@NotNull String compoundTermString, byte punct, @Nullable Truth truth) throws Narsese.NarseseException {
+        this($.$(compoundTermString), punct, truth);
+    }
 
 
-//    protected final void setTerm(@NotNull Termed<Compound> t) {
-//        Termed existing = term;
-//        term = t.term(); //use the provided instance even if equals
-//        if (!existing.equals(t)) {
-//            invalidate();
-//        }
-//    }
+    public TaskBuilder(@NotNull Compound term, byte punct, @Nullable Truth truth) {
+        this(term, punct, truth,
+            /* budget: */ 0, Float.NaN);
+    }
 
-
-    public AbstractTask(@NotNull Termed<Compound> term, char punctuation, @Nullable Truth truth, float p, float q) {
+    public TaskBuilder(@NotNull Compound term, byte punctuation /* TODO byte */, @Nullable Truth truth, float p, float q) {
         super();
         priority = p; //direct set
         quality = q; //direct set
 
-        this.punc = punctuation;
+        this.punc = (byte) punctuation;
 
         //unwrap top-level negation
         Compound tt = term.term();
@@ -135,7 +118,7 @@ public abstract class AbstractTask extends RawBudget implements Task {
             if (nt instanceof Compound) {
                 tt = (Compound) nt;
 
-                if (isBeliefOrGoal())
+                if (punctuation == Op.BELIEF || punctuation == Op.GOAL)
                     truth = truth.negated();
             } else {
                 throw new InvalidTaskException(this, "Top-level negation not wrapping a Compound");
@@ -149,8 +132,11 @@ public abstract class AbstractTask extends RawBudget implements Task {
 
 
 
-    @Override
-    public void normalize(@NotNull NAR n) throws Concept.InvalidConceptException, InvalidTaskException {
+    public boolean isInput() {
+        return evidence().length <= 1;
+    }
+
+    public Task apply(@NotNull NAR n) throws Concept.InvalidConceptException, InvalidTaskException {
 
         if (isDeleted())
             throw new InvalidTaskException(this, "Deleted");
@@ -160,7 +146,7 @@ public abstract class AbstractTask extends RawBudget implements Task {
         if (!t.levelValid( n.level() ))
             throw new InvalidTaskException(this, "Unsupported NAL level");
 
-        char punc = punc();
+        byte punc = punc();
         if (punc == 0)
             throw new InvalidTaskException(this, "Unspecified punctuation");
 
@@ -260,6 +246,7 @@ public abstract class AbstractTask extends RawBudget implements Task {
 //        }
 
 
+        return new ImmutableTask(term, punc, truth, creation, start, end, evidence);
 
     }
 
@@ -277,47 +264,18 @@ public abstract class AbstractTask extends RawBudget implements Task {
 
 
 
-    /** includes: evidentialset, occurrencetime, truth, term, punctuation */
-    private final int rehash() {
-
-        @Nullable long[] e = this.evidence;
-
-        int h = Util.hashCombine(
-                term.hashCode(),
-                punc,
-                Arrays.hashCode(e)
-        );
-
-
-        if (e.length > 1) {
-
-            Truth t = truth();
-
-            h = Util.hashCombine(
-                    h,
-                    Long.hashCode(start),
-                    Long.hashCode(end)
-            );
-
-            if (t!=null)
-                h = Util.hashCombine(h, t.hashCode());
-        }
-
-
-        if (h == 0) h = 1; //reserve 0 for non-hashed
-
-        return h;
-    }
-
     @NotNull @Override
     public final Compound term() {
         return term;
     }
 
 
-    @Override
-    public void feedback(TruthDelta delta, float deltaConfidence, float deltaSatisfaction, NAR nar) {
 
+    public boolean isBeliefOrGoal() {
+        return punc==Op.BELIEF || punc==Op.GOAL;
+    }
+    public boolean isCommand() {
+        return punc==Op.COMMAND;
     }
 
     @Nullable @Override
@@ -346,7 +304,7 @@ public abstract class AbstractTask extends RawBudget implements Task {
 //    }
 
     /** the evidence should be sorted and de-duplicaed prior to calling this */
-    @NotNull protected Task setEvidence(@Nullable long... evidentialSet) {
+    @NotNull protected TaskBuilder setEvidence(@Nullable long... evidentialSet) {
 
         if (this.evidence !=evidentialSet) {
             this.evidence = evidentialSet;
@@ -355,70 +313,62 @@ public abstract class AbstractTask extends RawBudget implements Task {
         return this;
     }
 
-
-
-    @Override
-    public final char punc() {
+    public final byte punc() {
         return punc;
     }
 
     @NotNull
-    @Override
     public final long[] evidence() {
         return this.evidence;
     }
 
-    @Override
     public final long creation() {
         return creation;
     }
 
-    @Override
     public final long start() {
         return start;
     }
 
 
-    @Override
-    public int compareTo(@NotNull Task obj) {
-
-        if (this == obj)
-            return 0;
-
-        Task o = (Task)obj;
-
-        int c = Util.compare(evidence, o.evidence());
-        if (c != 0)
-            return c;
-
-        if (evidence.length > 1) {
-            Truth tr = this.truth;
-
-            if (tr != null) {
-                @Nullable Truth otruth = o.truth();
-                if (otruth == null)
-                    return 1;
-                int tu = Truth.compare(tr, otruth);
-                if (tu != 0) return tu;
-            }
-
-
-            int to = Long.compare(start, o.start());
-            if (to != 0) return to;
-        }
-
-
-        int tc = term.compareTo(o.term());
-        if (tc != 0) return tc;
-
-        return Character.compare(punc(), o.punc())
-                ;
-
-    }
+//    @Override
+//    public int compareTo(@NotNull Task obj) {
+//
+//        if (this == obj)
+//            return 0;
+//
+//        Task o = (Task)obj;
+//
+//        int c = Util.compare(evidence, o.evidence());
+//        if (c != 0)
+//            return c;
+//
+//        if (evidence.length > 1) {
+//            Truth tr = this.truth;
+//
+//            if (tr != null) {
+//                @Nullable Truth otruth = o.truth();
+//                if (otruth == null)
+//                    return 1;
+//                int tu = Truth.compare(tr, otruth);
+//                if (tu != 0) return tu;
+//            }
+//
+//
+//            int to = Long.compare(start, o.start());
+//            if (to != 0) return to;
+//        }
+//
+//
+//        int tc = term.compareTo(o.term());
+//        if (tc != 0) return tc;
+//
+//        return Character.compare(punc(), o.punc())
+//                ;
+//    }
 
     @NotNull
-    @Override
-    public final Task setCreationTime(long creationTime) {
+    public final TaskBuilder setCreationTime(long creationTime) {
         if ((this.creation <= Tense.TIMELESS) && (start > Tense.TIMELESS)) {
             //use the occurrence time as the delta, now that this has a "finite" creationTime
             long when = start + creationTime;
@@ -436,7 +386,7 @@ public abstract class AbstractTask extends RawBudget implements Task {
         hash = 0;
     }
 
-    /** TODO for external use in MutableTask instances only */
+    /** TODO for external use in TaskBuilder instances only */
     public final void setStart(long o) {
 //        if ((o == Integer.MIN_VALUE || o == Integer.MAX_VALUE) && Param.DEBUG) {
 //            System.err.println("Likely an invalid occurrence time being set");
@@ -448,7 +398,7 @@ public abstract class AbstractTask extends RawBudget implements Task {
         }
     }
 
-    /** TODO for external use in MutableTask instances only */
+    /** TODO for external use in TaskBuilder instances only */
     public final void setEnd(long o) {
 //        if ((o == Integer.MIN_VALUE || o == Integer.MAX_VALUE) && Param.DEBUG) {
 //            System.err.println("Likely an invalid occurrence time being set");
@@ -464,13 +414,16 @@ public abstract class AbstractTask extends RawBudget implements Task {
         }
     }
 
+
+
     @Override
     public final int hashCode() {
-        int h = this.hash;
-        if (h == 0) {
-            return this.hash = rehash();
-        }
-        return h;
+        throw new UnsupportedOperationException();
+//        int h = this.hash;
+//        if (h == 0) {
+//            return this.hash = rehash();
+//        }
+//        return h;
     }
 
     /**
@@ -482,37 +435,9 @@ public abstract class AbstractTask extends RawBudget implements Task {
      */
     @Override
     public final boolean equals(@Nullable Object that) {
-
-        return this == that ||
-                (that!=null  &&
-                    that instanceof Task &&
-                    hashCode() == that.hashCode() &&
-                    equivalentTo((Task) that, true, true, true, true, true));
-
+        throw new UnsupportedOperationException();
     }
 
-    @Override
-    public final boolean equivalentTo(@NotNull Task that, boolean punctuation, boolean term, boolean truth, boolean stamp, boolean occurrenceTime) {
-
-        if (stamp && (!Arrays.equals(this.evidence, that.evidence())))
-            return false;
-
-        if (evidence.length > 1) {
-            if (occurrenceTime && (this.start != that.start()) || (this.end != that.end()))
-                return false;
-
-            if (truth && !Objects.equals(this.truth, that.truth()))
-                return false;
-        }
-
-        if (term && !this.term.equals(that.term()))
-            return false;
-
-        if (punctuation && (this.punc != that.punc()))
-            return false;
-
-        return true;
-    }
 
 
 
@@ -534,80 +459,11 @@ public abstract class AbstractTask extends RawBudget implements Task {
 
 
 
-    @NotNull
-    @Override
-    @Deprecated
-    public String toString() {
-        try {
-            return appendTo(null, null).toString();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-
-    @Override
-    public float confWeight(long when, float dur) {
-//        if (!isBeliefOrGoal())
-//            throw new UnsupportedOperationException();
-
-        long a = start();
-
-        Truth t = truth();
-        float cw = t.evi();
-        if (a == ETERNAL)
-            return cw;
-        else if (when == ETERNAL)// || when == now) && o == when) //optimization: if at the current time and when
-            return t.eternalizedEvi();
-        else {
-            long z = end();
-            //float dur = dur();
-
-//            if (z - start < dur)
-//                z = Math.round(start + dur); //HACK
-
-
-
-            if ((when >= a) && (when <= z)) {
-
-                //full confidence
-
-            } else {
-                //nearest endpoint of the interval
-                if (dur > 0)
-                    cw = TruthPolation.evidenceDecay(cw, dur, Math.min(Math.abs(a - when), Math.abs(z - when)));
-                else
-                    cw = 0;
-
-                if (eternalizable()) {
-                    float et = t.eternalizedEvi();
-                    if (et > cw)
-                        cw = et;
-                }
-            }
-
-            return cw;
-
-        }
-
-    }
-
-    public boolean eternalizable() {
-
-        return term.vars() > 0;
-        //return term.varIndep() > 0;
-        //return false;
-
-
-        //Op op = term.op();
-        //return op ==IMPL || op ==EQUI || term.vars() > 0;
-        //return op.statement || term.vars() > 0;
-    }
 
 
 
     /** end occurrence */
-    @Override public final long end() {
+    public final long end() {
 
         return end;
 
@@ -626,6 +482,73 @@ public abstract class AbstractTask extends RawBudget implements Task {
     }
 
 
+    @NotNull
+    public final TaskBuilder present(@NotNull NAR nar) {
+        return time(nar.time());
+    }
+
+    @NotNull
+    public final TaskBuilder time(@NotNull NAR nar, int dt) {
+        return time(nar.time() + dt);
+    }
+
+    @NotNull public final TaskBuilder time(long when) {
+        return TaskBuilder.this.time(when, when);
+    }
+
+    @NotNull
+    public TaskBuilder time(long creationTime, long start, long end) {
+        setCreationTime(creationTime);
+        setStart(start);
+        setEnd(end);
+        return this;
+    }
+
+    @NotNull
+    public TaskBuilder time(long creationTime, long occurrenceTime) {
+        setCreationTime(creationTime);
+        setStart(occurrenceTime);
+        setEnd(occurrenceTime);
+        return this;
+    }
+
+    @NotNull
+    public final TaskBuilder occurr(long occurrenceTime) {
+        setStart(occurrenceTime);
+        setEnd(occurrenceTime);
+        return this;
+    }
+
+    @NotNull
+    public TaskBuilder eternal() {
+        setStart(ETERNAL);
+        setEnd(ETERNAL);
+        return this;
+    }
+
+    @NotNull
+    public final TaskBuilder evidence(long... evi) {
+        setEvidence(evi);
+        return this;
+    }
+
+    public final TaskBuilder evidence(@NotNull Task evidenceToCopy) {
+        return evidence(evidenceToCopy.evidence());
+    }
 
 
+
+    @NotNull
+    public final TaskBuilder budget(@NotNull Budget bb) {
+        setBudget(bb);
+        return this;
+    }
+
+
+    public TaskBuilder log(String s) {
+        if (log == null)
+            log = $.newArrayList(1);
+        log.add(s);
+        return this;
+    }
 }

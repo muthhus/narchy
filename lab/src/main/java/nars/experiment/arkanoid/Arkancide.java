@@ -86,7 +86,7 @@ public class Arkancide extends NAgents {
 
         //nar.truthResolution.setValue(0.02f);
 
-        //nar.input(new MutableTask(happy, Op.BELIEF, $.t(0.5f, 0.15f)).eternal());
+        //nar.input(new TaskBuilder(happy, Op.BELIEF, $.t(0.5f, 0.15f)).eternal());
 
         //float resX = Math.max(0.01f, 1f/visW); //dont need more resolution than 1/pixel_width
         //float resY = Math.max(0.01f, 1f/visH); //dont need more resolution than 1/pixel_width

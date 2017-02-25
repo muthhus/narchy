@@ -21,7 +21,7 @@ public class TemporalTaskCondition extends EternalTaskCondition {
     public TemporalTaskCondition(@NotNull NAR n, long cycleStart, long cycleEnd,
                                  long occStartStart, long occStartEnd,
                                  long occEndStart, long occEndEnd,
-                                 @NotNull String sentenceTerm, char punc, float freqMin, float freqMax, float confMin, float confMax) throws Narsese.NarseseException {
+                                 @NotNull String sentenceTerm, byte punc, float freqMin, float freqMax, float confMin, float confMax) throws Narsese.NarseseException {
         super(n, cycleStart, cycleEnd, sentenceTerm, punc, freqMin, freqMax, confMin, confMax);
         this.occStartStart = occStartStart;
         this.occStartEnd = occStartEnd;

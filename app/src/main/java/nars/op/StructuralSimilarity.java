@@ -4,7 +4,7 @@ import nars.$;
 import nars.NAR;
 import nars.Op;
 import nars.Task;
-import nars.task.MutableTask;
+
 import nars.term.Compound;
 import nars.term.Term;
 
@@ -41,7 +41,7 @@ public class StructuralSimilarity implements Consumer<Task> {
                 float uniques = plus - e.size();
                 float similarity = (uniques / max);
                 if (similarity > 0) //remain silent about cases where nothing is common
-                    n.input(new MutableTask($.sim(a, b), '.', similarity, n).log("StructuralSimilarity"));
+                    n.input(new TaskBuilder($.sim(a, b), '.', similarity, n).log("StructuralSimilarity"));
             }
         }
     }

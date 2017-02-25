@@ -32,7 +32,7 @@ public class PostCondition implements Serializable //since there can be multiple
      */
     public final int minNAL;
 
-    public PostCondition(@NotNull Term pattern, Term beliefTruth, Term goalTruth, char puncOverride) {
+    public PostCondition(@NotNull Term pattern, Term beliefTruth, Term goalTruth, byte puncOverride) {
         this.pattern = pattern;
         this.beliefTruth = beliefTruth;
         this.goalTruth = goalTruth;
@@ -69,7 +69,7 @@ public class PostCondition implements Serializable //since there can be multiple
      * if puncOverride == 0 (unspecified), then the default punctuation rule determines the
      * derived task's punctuation.  otherwise, its punctuation will be set to puncOverride's value
      */
-    public final transient char puncOverride;
+    public final transient byte puncOverride;
 
 
     /**
@@ -85,7 +85,7 @@ public class PostCondition implements Serializable //since there can be multiple
         Term beliefTruth = null, goalTruth = null;
 
         //boolean negate = false;
-        char puncOverride = 0;
+        byte puncOverride = 0;
 
         for (Term m : modifiers) {
             if (m.op() != Op.INH) {

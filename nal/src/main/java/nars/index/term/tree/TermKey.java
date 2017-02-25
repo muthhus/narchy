@@ -67,7 +67,7 @@ public class TermKey extends DynByteSeq {
 
             writeCompoundSeq(this, task.term(), true);
 
-            char punc = task.punc();
+            byte punc = task.punc();
             this.writeByte(punc);
 
 

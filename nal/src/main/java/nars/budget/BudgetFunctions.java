@@ -21,6 +21,7 @@
 package nars.budget;
 
 import nars.Task;
+import nars.truth.Truth;
 import nars.truth.Truthed;
 import nars.util.UtilityFunctions;
 import org.jetbrains.annotations.NotNull;
@@ -295,4 +296,8 @@ public final class BudgetFunctions extends UtilityFunctions {
         }
     }
 
+    @NotNull
+    public static void budgetByTruth(@NotNull Budgeted b, @NotNull Truth t, float p) {
+        b.budget().setBudget(p, truthToQuality(t));
+    }
 }

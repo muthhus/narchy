@@ -176,7 +176,7 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
 
 
     default void print(@NotNull PrintStream out) {
-        this.forEachTask(t -> out.println(t + " " + Arrays.toString(t.evidence()) + ' ' + t.log()));
+        this.forEachTask(t -> out.println(t + " " + Arrays.toString(t.evidence())));
     }
 
     default void print() {
@@ -255,13 +255,16 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
             if (answerBudget == null)
                 return null;
 
-            answer = new AnswerTask(
-                    answer,
+            AnswerTask a = new AnswerTask(
+                    answer.term(),
                     answer,
                     question,
-                    aProj, now, when, when, 0.5f)
-                    .log("Answer Projected")
-                    .budget(answerBudget);
+                    aProj, now, when, when, 0.5f);
+            a.setBudget(answerBudget);
+            answer = a;
+
+                    //.log("Answer Projected")
+
 
         }
 

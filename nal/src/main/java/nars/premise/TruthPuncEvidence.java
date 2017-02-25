@@ -7,10 +7,10 @@ import nars.truth.Truth;
  */
 public final class TruthPuncEvidence {
     public final Truth truth;
-    public final char punc;
+    public final byte punc;
     public final long[] evidence;
 
-    public TruthPuncEvidence(Truth truth, char punc, long[] evidence) {
+    public TruthPuncEvidence(Truth truth, byte punc, long[] evidence) {
         this.truth = truth;
         this.punc = punc;
         this.evidence = evidence;

@@ -28,7 +28,7 @@ public class EternalTaskCondition implements NARCondition, Predicate<Task>, Cons
 
     @NotNull
     protected final NAR nar;
-    private final char punc;
+    private final byte punc;
 
     @NotNull
     private final Term term;
@@ -44,7 +44,7 @@ public class EternalTaskCondition implements NARCondition, Predicate<Task>, Cons
     //public  Term term;
 
     //@Expose
-    //public  char punc;
+    //public  byte punc;
 
     public final float freqMin;
     public final float freqMax;
@@ -78,7 +78,7 @@ public class EternalTaskCondition implements NARCondition, Predicate<Task>, Cons
 //        return DefaultTruth.NULL;
 //    }
 
-    public EternalTaskCondition(@NotNull NAR n, long creationStart, long creationEnd, @NotNull String sentenceTerm, char punc, float freqMin, float freqMax, float confMin, float confMax) throws RuntimeException, nars.Narsese.NarseseException {
+    public EternalTaskCondition(@NotNull NAR n, long creationStart, long creationEnd, @NotNull String sentenceTerm, byte punc, float freqMin, float freqMax, float confMin, float confMax) throws RuntimeException, nars.Narsese.NarseseException {
         //super(n.task(sentenceTerm + punc).normalize(n.memory));
 
 

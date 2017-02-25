@@ -210,7 +210,7 @@ public interface Concept extends Termed {
 
 
     @Nullable
-    default TaskTable tableFor(char punc) {
+    default TaskTable tableFor(byte punc) {
         switch (punc) {
             case BELIEF:
                 return beliefs();

@@ -58,7 +58,7 @@
 //
 //    }
 //
-//    public static void discountBeliefConfidence(@NotNull Concept concept, char punc, float confMultiplied /* < 1.0 */, @NotNull NAR nar) {
+//    public static void discountBeliefConfidence(@NotNull Concept concept, byte punc, float confMultiplied /* < 1.0 */, @NotNull NAR nar) {
 //        BeliefTable table;
 //        switch (punc) {
 //            case Symbols.BELIEF:

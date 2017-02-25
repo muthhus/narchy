@@ -6,9 +6,9 @@ import nars.Param;
 import nars.Task;
 import nars.concept.CompoundConcept;
 import nars.concept.Concept;
-import nars.task.MutableTask;
 import nars.task.Revision;
 import nars.task.RevisionTask;
+import nars.task.TaskBuilder;
 import nars.term.Term;
 import nars.truth.Truth;
 import nars.truth.TruthDelta;
@@ -233,7 +233,7 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, Sorted
                 true
         );
 
-        MutableTask r = new RevisionTask(t,
+        TaskBuilder r = new RevisionTask(t,
                 newBelief, oldBelief,
                 conclusion,
                 nar.time(),

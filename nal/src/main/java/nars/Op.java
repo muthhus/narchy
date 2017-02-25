@@ -108,11 +108,11 @@ public enum Op {
     public static final int OpBits = Op.or(Op.ATOM, Op.INH, Op.PROD);
     public static final int InhAndIMGbits = Op.or(Op.INH, Op.IMGe, Op.IMGi);
 
-    public static final char BELIEF = '.';
-    public static final char QUESTION = '?';
-    public static final char GOAL = '!';
-    public static final char QUEST = '@';
-    public static final char COMMAND = ';';
+    public static final byte BELIEF = '.';
+    public static final byte QUESTION = '?';
+    public static final byte GOAL = '!';
+    public static final byte QUEST = '@';
+    public static final byte COMMAND = ';';
 
     public static final String TENSE_PAST = ":\\:";
     public static final String TENSE_PRESENT = ":|:";
@@ -435,7 +435,7 @@ public enum Op {
 
 
     public static class InvalidPunctuationException extends RuntimeException {
-        public InvalidPunctuationException(char c) {
+        public InvalidPunctuationException(byte c) {
             super("Invalid punctuation: " + c);
         }
     }

@@ -125,7 +125,7 @@ public class SensorConcept extends WiredConcept implements FloatFunction<Term>, 
 //            }
 //
 //            if (t!=null) {
-//                this.desire = new MutableTask(term(), Symbols.GOAL, t).budget(pri, dur).log("Sensor Goal");
+//                this.desire = new TaskBuilder(term(), Symbols.GOAL, t).budget(pri, dur).log("Sensor Goal");
 //                //policy(policy(), nar.time()); //trigger capacity update
 //                sensor.nar.inputLater(this.desire);
 //            }

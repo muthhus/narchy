@@ -5,7 +5,7 @@ import jcog.list.CircularArrayList;
 import nars.NAR;
 import nars.Task;
 import nars.nar.Default;
-import nars.task.MutableTask;
+import nars.task.TaskBuilder;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.transform.Functor;
@@ -86,7 +86,7 @@ public class SeqTest {
                             }
 
                             if (belief instanceof Compound) {
-                                MutableTask u = MutableTask.clone(t, (Compound) belief);
+                                TaskBuilder u = TaskBuilder.clone(t, (Compound) belief);
                                 if (u != null)
                                     return u.log("seqAdd(" + key + ")");
                             } else {

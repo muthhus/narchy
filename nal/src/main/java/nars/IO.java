@@ -6,7 +6,9 @@ import jcog.data.byt.DynByteSeq;
 import jcog.data.string.Utf8Writer;
 import nars.budget.Budgeted;
 import nars.index.term.TermIndex;
-import nars.task.MutableTask;
+import nars.task.ImmutableTask;
+
+import nars.task.TaskBuilder;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
@@ -32,6 +34,7 @@ import static nars.IO.TaskSerialization.TermFirst;
 import static nars.Op.ATOM;
 import static nars.Op.INT;
 import static nars.index.TermBuilder.isTrueOrFalse;
+import static nars.term.Terms.compoundOrNull;
 import static nars.time.Tense.DTERNAL;
 import static nars.time.Tense.XTERNAL;
 
@@ -43,20 +46,20 @@ public class IO {
 
     public static final byte SPECIAL_OP = (byte) (Op.values().length + 1);
 
-    static boolean hasTruth(char punc) {
+    static boolean hasTruth(byte punc) {
         return punc == Op.BELIEF || punc == Op.GOAL;
     }
 
 
     @NotNull
-    public static MutableTask readTask(@NotNull DataInput in, @NotNull TermIndex t) throws IOException {
+    public static ImmutableTask readTask(@NotNull DataInput in, @NotNull TermIndex t) throws IOException {
 
-        Term term = readTerm(in, t);
+        Compound term = compoundOrNull(readTerm(in, t));
         if (term == null)
             return null;
 
         //TODO combine these into one byte
-        char punc = (char) in.readByte();
+        byte punc = in.readByte();
 
         Truth truth;
         if (hasTruth(punc)) {
@@ -76,8 +79,7 @@ public class IO {
         long cre = in.readLong();
 
 
-        MutableTask mm = new MutableTask(term, punc, truth).time(cre, start, end);
-        mm.evidence(evi);
+        ImmutableTask mm = new ImmutableTask(term, punc, truth, cre, start, end, evi);
         mm.setBudget(pri, qua);
         return mm;
     }
@@ -105,7 +107,7 @@ public class IO {
 
         writeTerm(out, t.term());
 
-        char p = t.punc();
+        byte p = t.punc();
         out.writeByte(p);
 
         if (hasTruth(p))
@@ -127,7 +129,7 @@ public class IO {
      */
     public static void writeTask2(@NotNull DataOutput out, @NotNull Task t) throws IOException {
 
-        char p = t.punc();
+        byte p = t.punc();
         out.writeByte(p);
 
         writeBudget(out, t);

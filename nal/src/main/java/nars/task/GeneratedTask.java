@@ -9,7 +9,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class GeneratedTask extends MutableTask {
 
-    public GeneratedTask(@NotNull Termed<Compound> term, char punct, @Nullable Truth truth) {
+    public GeneratedTask(@NotNull Termed<Compound> term, byte punct, @Nullable Truth truth) {
         super(term, punct, truth);
     }
 

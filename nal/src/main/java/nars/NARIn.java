@@ -32,13 +32,13 @@ public interface NARIn {
     }
 
     @Nullable
-    default LambdaQuestionTask ask(@NotNull Termed<Compound> term, long occ, char punc /* question or quest */, @NotNull BiConsumer<LambdaQuestionTask, Task> eachAnswer) {
+    default LambdaQuestionTask ask(@NotNull Termed<Compound> term, long occ, byte punc /* question or quest */, @NotNull BiConsumer<LambdaQuestionTask, Task> eachAnswer) {
         assert(punc == Op.QUESTION || punc == Op.QUEST);
         return inputAndGet( new LambdaQuestionTask(term, punc, occ, 16, eachAnswer) );
     }
 
     @Nullable
-    default LambdaQuestionTask ask(@NotNull Termed<Compound> term, long occ, char punc /* question or quest */, @NotNull Consumer<Task> eachAnswer) {
+    default LambdaQuestionTask ask(@NotNull Termed<Compound> term, long occ, byte punc /* question or quest */, @NotNull Consumer<Task> eachAnswer) {
         assert(punc == Op.QUESTION || punc == Op.QUEST);
         return inputAndGet( new LambdaQuestionTask(term, punc, occ, 16, eachAnswer) );
     }

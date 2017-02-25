@@ -54,7 +54,7 @@ public class Sentence<T extends Term> implements Cloneable {
      * Judgment, Question, Goal, or Quest.
      * Represented by characters: '.', '?', '!', or '@'
      */
-    public final char punctuation;
+    public final byte punctuation;
     
     /**
      * The truth value of Judgment, or desire value of Goal     
@@ -77,7 +77,7 @@ public class Sentence<T extends Term> implements Cloneable {
     private final int hash;
     
     
-    public Sentence(T term, char punctuation, TruthValue newTruth, Stamp newStamp) {
+    public Sentence(T term, byte punctuation, TruthValue newTruth, Stamp newStamp) {
         this(term, punctuation, newTruth, newStamp, true);
     }
     
@@ -90,7 +90,7 @@ public class Sentence<T extends Term> implements Cloneable {
      * @param stamp The stamp of the sentence indicating its derivation time and
      * base
      */
-    private Sentence(T taskTerm, final char punctuation, final TruthValue truth, final Stamp stamp, boolean normalize) {
+    private Sentence(T taskTerm, final byte punctuation, final TruthValue truth, final Stamp stamp, boolean normalize) {
         
         //cut interval at end for sentence in serial conjunction, and inbetween for parallel
         if(punctuation!=Symbols.TERM_NORMALIZING_WORKAROUND_MARK) {

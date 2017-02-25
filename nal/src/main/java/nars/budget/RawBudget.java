@@ -1,5 +1,6 @@
 package nars.budget;
 
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -134,6 +135,21 @@ public class RawBudget implements Budget {
     @Override
     public final void setQua(float q) {
         this.quality = validQuality(q);
+    }
+
+
+    /** sets the budget even if 'b' has been deleted; priority will be zero in that case */
+    @NotNull
+    public final RawBudget budgetSafe(@NotNull Budget b) {
+        budgetSafe(b.pri(), b.qua());
+        return this;
+    }
+
+    /** if p is NaN (indicating deletion), p <== 0 */
+    @NotNull public final RawBudget budgetSafe(float p, float q) {
+        priority = p;
+        quality = q;
+        return this;
     }
 
 

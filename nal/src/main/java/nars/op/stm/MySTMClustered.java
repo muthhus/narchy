@@ -46,18 +46,18 @@ public class MySTMClustered extends STMClustered {
     float confMin;
 
 
-    public MySTMClustered(@NotNull NAR nar, int size, char punc, int maxGroupSize) {
+    public MySTMClustered(@NotNull NAR nar, int size, byte punc, int maxGroupSize) {
         this(nar, size, punc, maxGroupSize, false, 1);
     }
 
-    public MySTMClustered(@NotNull NAR nar, int size, char punc, int maxGroupSize, boolean allowNonInput, int intinputsPerCycle) {
+    public MySTMClustered(@NotNull NAR nar, int size, byte punc, int maxGroupSize, boolean allowNonInput, int intinputsPerCycle) {
         this(nar, size, punc, maxGroupSize, maxGroupSize,
                 Math.round(((float) nar.termVolumeMax.intValue()) / (2)) /* estimate */
                 , allowNonInput,
                 intinputsPerCycle);
     }
 
-    public MySTMClustered(@NotNull NAR nar, int size, char punc, int minGroupSize, int maxGroupSize, int maxInputVolume, boolean allowNonInput, int inputsPerFrame) {
+    public MySTMClustered(@NotNull NAR nar, int size, byte punc, int minGroupSize, int maxGroupSize, int maxInputVolume, boolean allowNonInput, int inputsPerFrame) {
         super(4, nar, new MutableInteger(size), punc, maxGroupSize);
 
         this.minGroupSize = minGroupSize;

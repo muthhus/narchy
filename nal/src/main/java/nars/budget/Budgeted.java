@@ -43,4 +43,7 @@ public interface Budgeted extends Prioritized {
     }
 
 
+    default void setBudget(Budget b) {
+        budget().setBudget(b);
+    }
 }

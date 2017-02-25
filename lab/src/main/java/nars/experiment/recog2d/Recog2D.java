@@ -86,8 +86,8 @@ public class Recog2D extends NAgents {
 
 //        imgTrainer.out.keySet().forEach(x ->
 //                        predictors.addAll(
-//                                new MutableTask($.seq(x.term(), 1, happy.term()), '?', null).time(now, now),
-//                                new MutableTask($.impl($.inh($.varQuery("wat"), $.the("cam")), 0, happy.term()), '?', null) {
+//                                new TaskBuilder($.seq(x.term(), 1, happy.term()), '?', null).time(now, now),
+//                                new TaskBuilder($.impl($.inh($.varQuery("wat"), $.the("cam")), 0, happy.term()), '?', null) {
 //                                    @Override
 //                                    public boolean onAnswered(Task answer) {
 //                                        System.err.println(this + "\n\t" + answer);
@@ -95,7 +95,7 @@ public class Recog2D extends NAgents {
 //                                    }
 //                                }.time(now, now)
 //                        )
-//                predictors.add(new MutableTask(x, Symbols.QUESTION, null).present(nar.time()))
+//                predictors.add(new TaskBuilder(x, Symbols.QUESTION, null).present(nar.time()))
 
 
         //retina

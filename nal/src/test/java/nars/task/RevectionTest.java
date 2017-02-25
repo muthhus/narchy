@@ -24,9 +24,9 @@ public class RevectionTest {
 
     @Test
     public void testRevisionEquivalence() throws Narsese.NarseseException {
-        MutableTask a = t(1f, 0.5f, 0); //c~=0.67
+        TaskBuilder a = t(1f, 0.5f, 0); //c~=0.67
         a.evidence(0);
-        MutableTask b = t(1f, 0.5f, 0);
+        TaskBuilder b = t(1f, 0.5f, 0);
         b.evidence(1); //cause different hash
 
         //assertEquals(a.truth(), TruthPolation.truth(0, a, a)); //same item
@@ -38,8 +38,8 @@ public class RevectionTest {
 
     @Test
     public void testRevisionInequivalenceDueToTemporalSeparation() throws Narsese.NarseseException {
-        MutableTask a = t(1f, 0.5f, -4).evidence(1);
-        MutableTask b = t(0f, 0.5f, 4).evidence(2);
+        TaskBuilder a = t(1f, 0.5f, -4).evidence(1);
+        TaskBuilder b = t(0f, 0.5f, 4).evidence(2);
 
         Truth pt = TruthPolation.truth(0, 1, a, b);
         @Nullable Truth rt = Revision.revise(a, b);
@@ -96,11 +96,11 @@ public class RevectionTest {
 
     }
 
-    public static MutableTask t(float freq, float conf, long occ) throws Narsese.NarseseException {
-        return new MutableTask("a:b", '.', $.t(freq, conf)).time(0, occ);
+    public static TaskBuilder t(float freq, float conf, long occ) throws Narsese.NarseseException {
+        return new TaskBuilder("a:b", '.', $.t(freq, conf)).time(0, occ);
     }
-    public static MutableTask t(float freq, float conf, long start, long end) throws Narsese.NarseseException {
-        return new MutableTask("a:b", '.', $.t(freq, conf)).time(0, start, end);
+    public static TaskBuilder t(float freq, float conf, long start, long end) throws Narsese.NarseseException {
+        return new TaskBuilder("a:b", '.', $.t(freq, conf)).time(0, start, end);
     }
 
 //    public static void _main(String[] args) {
@@ -111,9 +111,9 @@ public class RevectionTest {
 //        List<Task> l = Global.newArrayList();
 //
 //        //NAR n = new Default();
-//        l.add( new MutableTask("a:b", '.', new DefaultTruth(0f, 0.5f) ).occurr(0).setCreationTime(0) );
-//        l.add( new MutableTask("a:b", '.', new DefaultTruth(1f, 0.5f) ).occurr(5).setCreationTime(0) );
-//        l.add( new MutableTask("a:b", '.', new DefaultTruth(0f, 0.75f) ).occurr(10).setCreationTime(0) );
+//        l.add( new TaskBuilder("a:b", '.', new DefaultTruth(0f, 0.5f) ).occurr(0).setCreationTime(0) );
+//        l.add( new TaskBuilder("a:b", '.', new DefaultTruth(1f, 0.5f) ).occurr(5).setCreationTime(0) );
+//        l.add( new TaskBuilder("a:b", '.', new DefaultTruth(0f, 0.75f) ).occurr(10).setCreationTime(0) );
 //        print(p, l, -5, 15);
 //
 //

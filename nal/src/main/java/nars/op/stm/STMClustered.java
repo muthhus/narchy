@@ -45,7 +45,7 @@ public abstract class STMClustered extends STM {
     //final Map<TLink,TasksNode> transfer = new ConcurrentHashMap();
 
 
-    public final char punc;
+    public final byte punc;
 
     final Deque<TasksNode> removed =
             new ArrayDeque<>();
@@ -301,7 +301,7 @@ public abstract class STMClustered extends STM {
     abstract double[] getCoord(@NotNull Task t);
 
 
-    public STMClustered(int dims, @NotNull NAR nar, @NotNull MutableInteger capacity, char punc, int expectedTasksPerNode) {
+    public STMClustered(int dims, @NotNull NAR nar, @NotNull MutableInteger capacity, byte punc, int expectedTasksPerNode) {
         super(nar, capacity);
 
         this.dims = dims;
@@ -494,7 +494,7 @@ public abstract class STMClustered extends STM {
 //            @NotNull
 //            @Override
 //            Task task(int u) {
-//                return new MutableTask(term(u), /*(Math.random() < 0.5f) ?*/ '.' /*: '!'*/, new DefaultTruth((float) Math.random(), 0.5f)).time(now, now);
+//                return new TaskBuilder(term(u), /*(Math.random() < 0.5f) ?*/ '.' /*: '!'*/, new DefaultTruth((float) Math.random(), 0.5f)).time(now, now);
 //            }
 //        };
 //

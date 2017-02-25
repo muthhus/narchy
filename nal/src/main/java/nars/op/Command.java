@@ -1,7 +1,7 @@
 package nars.op;
 
 import nars.*;
-import nars.task.MutableTask;
+
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.atom.Atomic;
@@ -44,7 +44,7 @@ public interface Command extends Operator {
 
 
     static Task task(Compound content) {
-        return new MutableTask(content, Op.COMMAND, null);
+        return new TaskBuilder(content, Op.COMMAND, null);
     }
 
     static Task logTask(@NotNull Term content) {

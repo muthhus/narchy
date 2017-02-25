@@ -27,28 +27,17 @@ import static nars.time.Tense.ETERNAL;
 /**
  * TODO extend an ImmutableTask class
  */
-abstract public class DerivedTask extends MutableTask {
+abstract public class DerivedTask extends ImmutableTask {
 
     @Nullable public transient Premise premise;
 
     //TODO should this also affect the Belief task?
 
-    public DerivedTask(@NotNull Termed<Compound> tc, char punct, @Nullable Truth truth, @NotNull Derivation p, long[] evidence, long now, long[] occ) {
-        super(tc, punct, truth);
+    public DerivedTask(@NotNull Compound tc, byte punct, @Nullable Truth truth, @NotNull Derivation p, long[] evidence, long now, long start, long end) {
+        super(tc, punct, truth, now, start, end, evidence);
 
         this.premise = p.premise;
 
-        if (occ!=null) {
-            long start = occ[0];
-            long end = occ[1];
-            if (end == ETERNAL)
-                end = start;
-            time(now, start, end);
-        }
-        else
-            time(now, ETERNAL);
-
-        evidence(evidence);
 
 
 //        if (!isBeliefOrGoal() || tc.term().dt()!=DTERNAL) {
@@ -89,10 +78,6 @@ abstract public class DerivedTask extends MutableTask {
 //    }
 
 
-    @Override
-    protected @Nullable Compound eval(@NotNull TermIndex index, @NotNull Compound t) {
-        return compoundOrNull(index.normalize(t)); //this should already have been evaluated in the derivation 'Conclude' step
-    }
 
     @Override
     public final boolean isInput() {
@@ -142,8 +127,8 @@ abstract public class DerivedTask extends MutableTask {
 
     public static class DefaultDerivedTask extends DerivedTask {
 
-        public DefaultDerivedTask(@NotNull Termed<Compound> tc, @Nullable Truth truth, char punct, long[] evidence, @NotNull Derivation premise, long now, long[] occ) {
-            super(tc, punct, truth, premise, evidence, now, occ);
+        public DefaultDerivedTask(@NotNull Compound tc, @Nullable Truth truth, byte punct, long[] evidence, @NotNull Derivation premise, long now, long start, long end) {
+            super(tc, punct, truth, premise, evidence, now, start, end);
         }
 
 
@@ -257,7 +242,7 @@ abstract public class DerivedTask extends MutableTask {
 //    public static class CompetingDerivedTask extends DerivedTask {
 //
 //
-//        public CompetingDerivedTask(@NotNull Termed<Compound> tc, char punct, @Nullable Truth truth, @NotNull PremiseEval premise) {
+//        public CompetingDerivedTask(@NotNull Termed<Compound> tc, byte punct, @Nullable Truth truth, @NotNull PremiseEval premise) {
 //            super(tc, punct, truth, premise);
 //        }
 //

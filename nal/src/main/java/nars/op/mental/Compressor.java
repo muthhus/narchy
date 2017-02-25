@@ -9,7 +9,8 @@ import nars.budget.BLink;
 import nars.budget.Budget;
 import nars.concept.PermanentConcept;
 import nars.nar.Default;
-import nars.task.MutableTask;
+
+import nars.task.TaskBuilder;
 import nars.term.Compound;
 import nars.term.Term;
 import net.byteseek.automata.factory.MutableStateFactory;
@@ -230,7 +231,7 @@ public class Compressor extends Abbreviation implements RemovalListener<Compound
                 //System.out.println("  compress: " + i + " to " + o);
 
                 if (o instanceof Compound) {
-                    @Nullable MutableTask rr = MutableTask.clone(tt, (Compound) o);
+                    @Nullable MutableTask rr = TaskBuilder.clone(tt, (Compound) o);
                     if (rr != null)
                         return rr;
                 }

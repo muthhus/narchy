@@ -10,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
  */
 final public class TaskPunctuation extends AtomicBoolCondition {
 
-    public final char punc;
+    public final byte punc;
     public final String id;
 
 
@@ -71,7 +71,7 @@ final public class TaskPunctuation extends AtomicBoolCondition {
     }
 
     TaskPunctuation(char p, String id) {
-        this.punc = p;
+        this.punc = (byte)p;
         this.id = id;
     }
 

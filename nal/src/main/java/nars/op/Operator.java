@@ -203,7 +203,7 @@ import static nars.time.Tense.ETERNAL;
 //
 //import nars.*;
 //import nars.concept.OperationConcept;
-//import nars.task.MutableTask;
+//
 //import nars.term.Compound;
 //import nars.term.Term;
 //import nars.term.atom.Atomic;
@@ -268,7 +268,7 @@ import static nars.time.Tense.ETERNAL;
 //        }
 //
 //
-//        return new MutableTask(inh, Symbols.BELIEF, 1f, nar)  //with default truth value
+//        return new TaskBuilder(inh, Symbols.BELIEF, 1f, nar)  //with default truth value
 //                .time(tense, nar)
 //                //.budget(goal.budget())
 //                //.budgetScaled(feedbackPriorityMultiplier, feedbackDurabilityMultiplier)
