@@ -251,21 +251,6 @@ public class NAL4Test extends AbstractNALTest {
     }
 
 
-    @Test public void testQuestionDeductionLoopPrevention() {
-        // neq(X,(A..+)) condition on the nal4 rule prevents this:
-        /*
-        $0.0;.39$ ((x,z)-->?1). :12: %1.0;.81% {12: 1;2} ((((%1073742337..+)-->%2),(%3-->%4),task("?")),(((%1073742337..+)-->substitute((%1073742337..+),%3,%4)),((BeliefStructuralDeduction-->Belief),(Belief-->Punctuation))))
-            $0.0;.50$ ((x,z)-->?1)? :10: {10: 2} Narsese
-            $0.0;.40$ ((x,z)-->?1). :12: %1.0;.90% {12: 1} Dynamic
-            */
-
-        test()
-                .log()
-                .believe("((x,z)-->?1)")
-                .ask( "((x,z)-->?1)")
-                .mustNotOutput(CYCLES*10, "((x,z)-->?1)", BELIEF, 0f, 1f, 0, 0.81f, ETERNAL);
-
-    }
 
     @Ignore @Test public void testRecursionForce1() {
         //    ((X,Z) --> Y), X |- ((X,Z)-->((/,Y,_,Z),Z)), (Belief:StructuralDeduction, Desire:StructuralDeduction)

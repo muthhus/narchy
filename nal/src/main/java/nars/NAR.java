@@ -1169,20 +1169,24 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
     public NAR inputAt(long time, @NotNull String... tt) {
         //LongPredicate timeCondition = t -> t == time;
 
-        List<Task> x = newArrayList(tt.length);
+        List<Task> yy = newArrayList(tt.length);
         for (String s : tt) {
-            x.addAll(tasks(s));
+            tasks(s).forEach(x -> {
+                long xs = x.start();
+                Task y = Task.clone(x, time, xs!=ETERNAL ? time : ETERNAL, xs!=ETERNAL ? time : ETERNAL);
+                yy.add(y);
+            });
         }
 
-        //set the appropriate creation and occurrence times
-        for (Task y : x) {
-            TaskBuilder my = (TaskBuilder) y;
-            my.setCreationTime(time);
-            if (my.start() != ETERNAL)
-                my.occurr(time);
-        }
+//        //set the appropriate creation and occurrence times
+//        for (Task y : x) {
+//            TaskBuilder my = (TaskBuilder) y;
+//            my.setCreationTime(time);
+//            if (my.start() != ETERNAL)
+//                my.occurr(time);
+//        }
 
-        inputAt(time, x.toArray(new Task[x.size()]));
+        inputAt(time, yy.toArray(new Task[yy.size()]));
         return this;
     }
 

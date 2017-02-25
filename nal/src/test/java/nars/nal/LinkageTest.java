@@ -170,10 +170,10 @@ public class LinkageTest extends AbstractNALTest {
 
     @NotNull
     public String getTask(byte punc, @NotNull Termed premise1) {
-        if (punc=='?') {
-            return premise1.toString() + String.valueOf('?');
+        if (punc==QUESTION) {
+            return premise1.toString() + (char)(QUESTION);
         } else {
-            return premise1.toString() + String.valueOf(punc) + " %1.0;0.9%";
+            return premise1.toString() + (char)(punc) + " %1.0;0.9%";
         }
     }
 

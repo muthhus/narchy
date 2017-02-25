@@ -481,7 +481,12 @@ public class TermReductionsTest {
 
     @Test public void testInvalidStatementIndepVarTask() throws Narsese.NarseseException {
         Terminal t = new Terminal();
-        assertTrue(/* failure */ t.inputAndGet("at($1,$2,$3)").isDeleted());
+        try {
+            t.inputAndGet("at($1,$2,$3)");
+            assertTrue(false);
+        } catch (Narsese.NarseseException e) {
+            assertTrue(true);
+        }
     }
 
     @Test public void testConegatedConjunctionTerms1() throws Narsese.NarseseException {

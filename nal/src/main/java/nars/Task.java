@@ -590,7 +590,19 @@ public interface Task extends Budgeted, Truthed, Stamp, Termed<Compound>, Tasked
     }
 
     @Nullable
-    public static ImmutableTask clone(@NotNull Task x, @NotNull Compound newContent) {
+    static ImmutableTask clone(@NotNull Task x, long created, long start, long end) {
+        Budget b = x.budget().clone(); //snapshot its budget
+        if (b.isDeleted())
+            return null;
+
+        ImmutableTask y = new ImmutableTask(x.term(), x.punc(), x.truth(), created, start, end, x.evidence());
+        y.setBudget(b);
+        y.meta = x.meta();
+        return y;
+    }
+
+    @Nullable
+    static ImmutableTask clone(@NotNull Task x, @NotNull Compound newContent) {
 //        if (!y.isNormalized()) {
 //            y = (Compound) nar.normalize(y);
 //            if (y == null)

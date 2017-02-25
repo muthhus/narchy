@@ -262,14 +262,18 @@ public abstract class Param  {
 
     @Deprecated public float qualityDefault(byte punctuation) {
         switch (punctuation) {
+            case COMMAND:
+                return 0;
+
             case QUEST:
                 return DEFAULT_QUEST_QUALITY;
             case QUESTION:
                 return DEFAULT_QUESTION_QUALITY;
             /*case Symbols.GOAL:
                 return DEFAULT_GOAL_QUALITY;*/
+
         }
-        throw new RuntimeException("Use truthToQuality for: " + punctuation);
+        throw new RuntimeException("Use truthToQuality for: " + (char)punctuation);
     }
 
 

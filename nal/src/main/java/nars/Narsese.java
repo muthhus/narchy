@@ -144,10 +144,10 @@ public class Narsese extends BaseParser<Object> {
 
         switch (blen) {
             case 0:     /* do not set, Memory will apply defaults */
-                ttt.budgetSafe(nar.priorityDefault(p), quality(nar, p, t));
+                ttt.budgetSafe(nar.priorityDefault(p), quality(nar, p, ttt.truth()));
                 break;
             case 1:
-                ttt.budgetSafe(b[0], quality(nar, p, t));
+                ttt.budgetSafe(b[0], quality(nar, p, ttt.truth()));
                 break;
             case 2:
                 ttt.budgetSafe(b[1], b[0]);
@@ -1221,7 +1221,9 @@ public class Narsese extends BaseParser<Object> {
             //return Command.task($.func("log", content));
         } else */{
 
-            byte punct = (byte)((Character) x[2]).charValue();
+            Object px = x[2];
+
+            byte punct = (byte)(((Character) x[2]).charValue());
 
             Truth t = (Truth) x[3];
             if (t != null && !Float.isFinite(t.conf()))
