@@ -92,11 +92,11 @@ public class Outputs {
     final int states;
 
     private final NAR nar;
-    boolean train = true;
+
     boolean verify = false;
 
 
-    public Outputs(IntFunction<Compound> namer, int maxStates, NAgent a) {
+    public Outputs(IntFunction<Compound> namer, int maxStates, NAgent a, float goalInfluence) {
         this.nar = a.nar;
         this.states = maxStates;
         this.out = new LinkedHashMap<>(maxStates);
@@ -122,7 +122,7 @@ public class Outputs {
 //                        } else {
                             //return d!=null ? d.confWeightMult(0.5f) : null;
                         //}
-                        return d;
+                        return d!=null ? d.confWeightMult(goalInfluence) : null;
                     });
                 }
 //                        a.sense(namer.apply(i), () -> {
@@ -146,8 +146,9 @@ public class Outputs {
             out.forEach((cc, nnn) -> {
 
                 Truth t =
-                        cc.belief(now, dur);
-                        //cc.goal(now);
+                        //cc.belief(now, dur);
+                        cc.goal(now, dur);
+
                 float f, c;
                 if (t == null) {
                     f = Float.NaN;
@@ -176,7 +177,7 @@ public class Outputs {
 //        return nar.concept(state).beliefFreq(when);
 //    }
 
-    public void expect(IntToFloatFunction stateValue) {
+    void expect(IntToFloatFunction stateValue) {
         //long now = nar.time();
         for (int i = 0; i < states; i++)
             out.get(outVector[i]).expect( stateValue.valueOf(i));
@@ -192,15 +193,15 @@ public class Outputs {
         expect(ii -> ii == onlyStateToBeOn ? 1f : offValue);
     }
 
-    public void train() {
-        train = true;
-        verify = false;
-    }
+//    public void train() {
+//        train = true;
+//        verify = false;
+//    }
 
-    public void verify() {
-        verify = true;
-        train = false;
-    }
+//    public void verify() {
+//        verify = true;
+//        train = false;
+//    }
 
     public float error(Compound c) {
         return out.get(c).error;

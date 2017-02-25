@@ -53,6 +53,7 @@ import java.util.List;
 
 import static com.jogamp.opengl.util.gl2.GLUT.STROKE_MONO_ROMAN;
 import static spacegraph.math.v3.v;
+import static spacegraph.render.JoglSpace.glsrt;
 import static spacegraph.render.JoglSpace.glut;
 import static spacegraph.test.Lesson14.renderString;
 
@@ -62,7 +63,6 @@ import static spacegraph.test.Lesson14.renderString;
 public enum Draw {
     ;
 
-    public final static GLSRT glsrt = new GLSRT(JoglSpace.glu);
 
 
 	/*

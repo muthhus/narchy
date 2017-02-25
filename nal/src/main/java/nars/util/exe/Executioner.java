@@ -58,7 +58,7 @@ abstract public class Executioner implements Executor {
 
     abstract public void run(Runnable cmd);
 
-    abstract public void run(@NotNull Task[] t);
+    abstract public void run(@NotNull Task... t);
 
 
     /** a postive or negative value indicating the percentage difference from the

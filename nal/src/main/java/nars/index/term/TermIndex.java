@@ -308,42 +308,6 @@ public abstract class TermIndex extends TermBuilder {
         out.println();
     }
 
-    private Term _normalize(Compound src) {
-
-        Term result;
-
-        try {
-            int vars = src.vars();
-            int pVars = src.varPattern();
-            int totalVars = vars + pVars;
-
-            if (totalVars > 0) {
-                result = transform(src,
-                        (vars == 1 && pVars == 0) ?
-                                VariableNormalization.singleVariableNormalization //special case for efficiency
-                                :
-                                new VariableNormalization(totalVars /* estimate */)
-                );
-            } else {
-                result = src;
-//                result =
-//                        src.hasAll(Op.OpBits) ?
-//                                transform(src, CompoundTransform.None) : //force subterm functor eval
-//                                ((Term) src);
-            }
-
-
-        } catch (InvalidTermException e) {
-
-            if (Param.DEBUG_EXTRA)
-                logger.warn("normalize {} : {}", src, e);
-
-            result = InvalidCompound;
-        }
-
-        return result;
-    }
-
 
     @Nullable
     public final Term normalize(@NotNull Compound x) {
@@ -351,9 +315,33 @@ public abstract class TermIndex extends TermBuilder {
         if (x.isNormalized()) {
             return x;
         } else {
-            //see if subterms need change
 
-            Term y = _normalize(x);
+            Term y;
+
+            try {
+                int vars = x.vars();
+                int pVars = x.varPattern();
+                int totalVars = vars + pVars;
+
+                if (totalVars > 0) {
+                    y = transform(x,
+                            (vars == 1 && pVars == 0) ?
+                                    VariableNormalization.singleVariableNormalization //special case for efficiency
+                                    :
+                                    new VariableNormalization(totalVars /* estimate */)
+                    );
+                } else {
+                    y = x;
+                }
+
+
+            } catch (InvalidTermException e) {
+
+                if (Param.DEBUG_EXTRA)
+                    logger.warn("normalize {} : {}", x, e);
+
+                return InvalidCompound;
+            }
 
             if (y instanceof Compound) {
 
@@ -362,6 +350,7 @@ public abstract class TermIndex extends TermBuilder {
                 ((Compound) y).setNormalized();
                 //}
             }
+
             return y;
         }
 
@@ -540,16 +529,6 @@ public abstract class TermIndex extends TermBuilder {
                 default:
 
                     if (term instanceof Compound) {
-
-//                        if (Param.FILTER_CONCEPTS_WITHOUT_ATOMS) {
-//                            if (!term.hasAny(ATOM.bit | Op.INT.bit))
-//                                return null;
-//                        } /*else {
-//                            //only filter 0-length compounds, example: ()
-//                            if (term.size() == 0)
-//                                return null;
-//                        }*/
-
                         term = normalize((Compound) term);
                     }
 
@@ -562,7 +541,7 @@ public abstract class TermIndex extends TermBuilder {
             }
         }
 
-        if ((term instanceof Variable) || (TermBuilder.isTrue(term)))
+        if ((term instanceof Variable) || (TermBuilder.isTrueOrFalse(term)))
             return null;
 
         return term;
@@ -608,9 +587,14 @@ public abstract class TermIndex extends TermBuilder {
             Term[] ss = new Term[cs];
             for (int i = 0; i < cs; i++) {
 
-                Term m = psubs.term(i);
-                if (m != (ss[i] = m instanceof Compound ? atemporalize((Compound) m) : m))
-                    subsChanged = true;
+                Term x = psubs.term(i), y;
+                if (x instanceof Compound) {
+                    subsChanged |= (!x.equals(y = atemporalize((Compound) x)));
+                } else {
+                    y = x;
+                }
+
+                ss[i] = y;
 
             }
 //            int dt = c.dt();

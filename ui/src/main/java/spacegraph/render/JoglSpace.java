@@ -26,6 +26,8 @@ public abstract class JoglSpace implements GLEventListener, WindowListener {
     public static final int MIN_FPS = 3;
     private static final MyFPSAnimator a = new MyFPSAnimator(JoglSpace.FPS_DEFAULT, MIN_FPS, 50);
 
+    public final static GLSRT glsrt = new GLSRT(JoglSpace.glu);
+
     public static final GLU glu = new GLU();
     public static final GLUT glut = new GLUT();
 
@@ -58,7 +60,7 @@ public abstract class JoglSpace implements GLEventListener, WindowListener {
                 return;
 
             if (!a.isStarted()) {
-                a.start(Thread.MIN_PRIORITY);
+                a.start();
                 logger.info("START {}", a);
             } else {
                 a.resume();
@@ -303,10 +305,7 @@ public abstract class JoglSpace implements GLEventListener, WindowListener {
 
         }
 
-        public synchronized void start(int threadPriority) {
-            start();
-            animThread.setPriority(threadPriority);
-        }
+
     }
 
     // See http://www.lighthouse3d.com/opengl/glut/index.php?bmpfontortho

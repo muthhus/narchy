@@ -10,7 +10,7 @@ import java.io.IOException;
 
 public class Arkancide extends NAgents {
 
-    static boolean cam = false;
+    static boolean cam = true;
 
     private final float paddleSpeed = 1f;
 
@@ -44,7 +44,7 @@ public class Arkancide extends NAgents {
 
             return agent;
 
-        }, 50, 15, -1);
+        }, 50, 5, -1);
 
 
 //        nar.forEachActiveConcept(c -> {
@@ -67,7 +67,7 @@ public class Arkancide extends NAgents {
     public Arkancide(NAR nar, boolean cam) throws Narsese.NarseseException {
         super("noid", nar);
 
-        nar.derivedEvidenceGain.setValue(1f);
+        //nar.derivedEvidenceGain.setValue(1f);
 
 
         noid = new Arkanoid(!cam) {
@@ -80,9 +80,8 @@ public class Arkancide extends NAgents {
 
         //nar.linkFeedbackRate.setValue(0.02f);
 
-        maxPaddleSpeed = 25 * Arkanoid.BALL_VELOCITY;
+        maxPaddleSpeed = 35 * Arkanoid.BALL_VELOCITY;
 
-        nar.termVolumeMax.set(20);
 
 
         //nar.truthResolution.setValue(0.02f);

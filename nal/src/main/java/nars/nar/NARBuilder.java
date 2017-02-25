@@ -43,9 +43,11 @@ public interface NARBuilder {
         Random rng = new XorShift128PlusRandom(1);
         Executioner exe =
                 //new SynchronousExecutor();
-                new MultiThreadExecutor(threads, 2048, sync);
+                new MultiThreadExecutor(threads, 512, sync);
 
-        int conceptsPerCycle = 512 * exe.concurrency();
+        //exe = new InstrumentedExecutor(exe, 8);
+
+        int conceptsPerCycle = 128 * exe.concurrency();
 
         final int reprobes = 4;
 
@@ -59,14 +61,13 @@ public interface NARBuilder {
             }
         };
 
-        //exe = new InstrumentedExecutor(exe);
 
         Default nar = new Default(8 * 1024,
                 conceptsPerCycle, 1, 3, rng,
 
                 //new HijackTermIndex(cb, 1024 * 128, reprobes)
                 //new NullTermIndex(cb)
-                new CaffeineIndex(cb, /*-1*/ 256 * 1024, -1, null /* null = fork join common pool */)
+                new CaffeineIndex(cb, -1 /*256 * 1024*/, -1, null /* null = fork join common pool */)
                 //new TreeTermIndex.L1TreeIndex(new DefaultConceptBuilder(), 300000, 32 * 1024, 3)
                 ,
                 time,
@@ -74,14 +75,19 @@ public interface NARBuilder {
 
             final Compressor compressor = new Compressor(this, "_",
                     3, 7,
-                    1f, 16, 128);
+                    3f, 16, 256);
 
             @Override
             public Task pre(@NotNull Task t) {
                 if (!t.isInput()) {
                     return compressor.encode(t);
                 } else {
-                    return t; //dont affect input
+                    @NotNull Task encoded = compressor.encode(t);
+                    if (!encoded.equals(t))
+                        process(encoded); //input both forms
+                    return t;
+
+                    //return t; //dont affect input
                 }
             }
 
@@ -106,16 +112,16 @@ public interface NARBuilder {
 
         };
 
-        nar.beliefConfidence(0.85f);
-        nar.goalConfidence(0.85f);
+        nar.beliefConfidence(0.9f);
+        nar.goalConfidence(0.9f);
 
         float p = 0.75f;
         nar.DEFAULT_BELIEF_PRIORITY = 0.5f * p;
-        nar.DEFAULT_GOAL_PRIORITY = 0.6f * p;
+        nar.DEFAULT_GOAL_PRIORITY = 0.8f * p;
         nar.DEFAULT_QUESTION_PRIORITY = 0.4f * p;
         nar.DEFAULT_QUEST_PRIORITY = 0.4f * p;
 
-        nar.confMin.setValue(0.01f);
+        nar.confMin.setValue(0.02f);
         //nar.truthResolution.setValue(0.01f);
 
         //NARTune tune = new NARTune(nar);

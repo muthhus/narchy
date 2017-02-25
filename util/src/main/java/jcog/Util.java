@@ -1528,14 +1528,10 @@ public enum Util { ;
             return secondStr(s);
         else {
             switch (decimals) {
-                case 0:
-                    return Texts.n2(s) + "s";
-                case 3:
-                    return Texts.n2(s * 1000) + "ms";
-                case 6:
-                    return Texts.n2(s * 1.0E6) + "us";
-                default:
-                    throw new UnsupportedOperationException("TODO");
+                case 0: return Texts.n2(s) + "s";
+                case 3: return Texts.n2(s * 1000) + "ms";
+                case 6: return Texts.n2(s * 1.0E6) + "us";
+                default: throw new UnsupportedOperationException("TODO");
             }
         }
     }

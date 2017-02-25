@@ -9,6 +9,8 @@ import org.eclipse.collections.impl.map.mutable.UnifiedMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.function.Function;
 
 /**
@@ -24,7 +26,7 @@ import java.util.function.Function;
 public class VariableNormalization extends VariableTransform implements Function<Variable,Variable> {
 
     @NotNull
-    private final UnifiedMap<Variable, Variable /*Variable*/> rename;
+    private final Map<Variable, Variable /*Variable*/> rename;
 
     //private boolean renamed;
 
@@ -35,10 +37,10 @@ public class VariableNormalization extends VariableTransform implements Function
 
 
     public VariableNormalization(int size /* estimate */) {
-        this(new UnifiedMap<>(size));
+        this(new HashMap<>(size));
     }
 
-    public VariableNormalization(@NotNull UnifiedMap<Variable, Variable> r) {
+    public VariableNormalization(@NotNull Map<Variable, Variable> r) {
         rename = r;
 
         //NOTE:

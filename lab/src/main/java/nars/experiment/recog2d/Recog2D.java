@@ -13,7 +13,9 @@ import nars.gui.BeliefTableChart;
 import nars.NAgents;
 import nars.time.Tense;
 import nars.truth.Truth;
+import nars.video.Bitmap2D;
 import nars.video.PixelBag;
+import nars.video.Scale;
 import nars.video.Sensor2D;
 import spacegraph.SpaceGraph;
 import spacegraph.Surface;
@@ -41,17 +43,24 @@ public class Recog2D extends NAgents {
     private final int h;
     private final int w;
     private final Outputs outs;
+
     private final Training train;
+
+    boolean mlpLearn = true, mlpSupport;
+
     BufferedImage canvas;
 
-    public final AtomicBoolean neural = new AtomicBoolean(true);
+    public final AtomicBoolean neural = new AtomicBoolean(false);
 
 
 
 
     int image;
-    final int maxImages = 6;
-    int imagePeriod = 64;
+    final int maxImages = 4;
+    static int duration = 10;
+    int imagePeriod = duration * 2;
+    static int fps = 25;
+    float goalInfluence = 0.5f; //how much goal feedback will influence beliefs, <=1
 
 //    float theta;
 //    float dTheta = 0.25f;
@@ -61,7 +70,8 @@ public class Recog2D extends NAgents {
     }
 
     public Recog2D(NAR n) {
-        super("x", n, 8);
+        super("x", n);
+
 
         w = 10;
         h = 12;
@@ -89,26 +99,25 @@ public class Recog2D extends NAgents {
 
 
         //retina
-        Sensor2D<PixelBag> sp = senseCameraRetina("x", () -> canvas, w, h, v -> $.t(v, alpha));
-
+        //Sensor2D sp = senseCameraRetina("x", () -> canvas, w, h, v -> $.t(v, alpha));
 
         //still
-        //addCamera("x", new Scale(() -> canvas, w, h), v -> $.t(v, alpha));
+        Sensor2D sp = senseCamera("x", new Scale(() -> canvas, w, h), v -> $.t(v, alpha));
 
         //nar.log();
 
-
-
-        outs = new Outputs(ii -> $.func("x", $.the("s" + ii)), maxImages, this);
+        outs = new Outputs(ii -> $.func("x", $.the("s" + ii)), maxImages, this, goalInfluence);
         train = new Training(
                 //sensors,
-                Lists.newArrayList(Iterables.concat(sensors,sp.src.actions)),
+                Lists.newArrayList(
+                    sp.src instanceof PixelBag ?  Iterables.concat(sensors, ((PixelBag)sp.src).actions) : sensors
+                ),
                 outs, nar);
         //epsilonProbability = 0; //disable curiosity
 
-        new Thread(() -> {
+        //new Thread(() -> {
             SpaceGraph.window(conceptTraining(outs, nar), 800, 600);
-        }).start();
+        //}).start();
 
     }
 
@@ -124,7 +133,10 @@ public class Recog2D extends NAgents {
 
                 row(BeliefTableChart.beliefTableCharts(nar, out.keySet(), 1024)),
 
-                row(p = new Plot2D(history, Plot2D.Line).add("Error", () -> tv.errorSum())),
+                row(p = new Plot2D(history, Plot2D.Line).add("Reward", () ->
+                    rewardValue
+                    //tv.errorSum()
+                )),
                 //row(s = new Plot2D(history, Plot2D.BarWave).add("Rward", () -> rewardValue)),
 
                 row(out.entrySet().stream().map(ccnn -> new Surface() {
@@ -198,15 +210,15 @@ public class Recog2D extends NAgents {
             if (neural.get()) {
                 //if (nar.time() < trainFrames) {
                 outs.expect(image);
-                outs.train();
             }
             //} else {
               //  outs.expect(-1);
               //  outs.verify();
             //}
 
+
             if (neural.get()) {
-                train.update(outs.train, true);
+                train.update(mlpLearn, mlpSupport);
             }
 
             p.update();
@@ -220,20 +232,30 @@ public class Recog2D extends NAgents {
     @Override
     protected float act() {
 
-        float r;
+        float error = 0;
+
+        for (int i = 0; i < maxImages; i++) {
 
 
-     //   if (outs.verify) {
-            r = 0.5f - (float) outs.errorSum()
-                    / outs.states;
-        //        } else {
-//            //r = 1f; //general positive reinforcement during training
-//            r = Float.NaN; //no feedback during training
-//        }
+            Truth g = nar.concept(outs.outVector[i]).belief( nar.time(), nar.time.dur() );
+
+            if (g == null) {
+                error += 0.5;
+            } else {
+                //error += Math.abs(g.freq() - (image == i) ? 1f : 0f);
+                error += ((image == i) ? g.freq() > 0.5f : g.freq() < 0.5f) ? 1f : 0f;
+            }
+        }
+
+        return 1f - 2 * (error /  maxImages);
 
 
 
-        return r;
+//            r = 0.5f - (float) outs.errorSum()
+//                    / outs.states;
+        //return r;
+
+
     }
 
 
@@ -253,7 +275,7 @@ public class Recog2D extends NAgents {
         //LineMetrics lineMetrics = fontMetrics.getLineMetrics(s, g);
         Rectangle2D sb = fontMetrics.getStringBounds(s, g);
 
-        //System.out.println(s + " : " + lineMetrics.getHeight() + " pixel height");
+        System.out.println(s + " : " + sb);
 
         //g.rotate(nar.random.nextFloat() * dTheta, w/2, h/2);
 
@@ -261,7 +283,7 @@ public class Recog2D extends NAgents {
     }
 
     public static void main(String[] arg) {
-        NAgents.run(Recog2D::new, 50000);
+        NAgents.runRT(Recog2D::new, fps, duration, -1);
     }
 
     public static class Training {
@@ -298,7 +320,10 @@ public class Recog2D extends NAgents {
             if (i == null || i.length!= s)
                 i = new float[s];
             for (int j = 0, insSize = ins.size(); j < insSize; j++) {
-                i[j] = ins.get(j).beliefFreq(when, 0.5f);
+                float b = ins.get(j).beliefFreq(when, 0.5f);
+                if (b!=b) //dont input NaN
+                    b = 0.5f;
+                i[j] = b;
             }
 
             return i;
@@ -317,13 +342,16 @@ public class Recog2D extends NAgents {
                 errSum = 0f;
             }
 
-            if (apply && errSum < 0.25f) {
+            if (apply/* && errSum < 0.25f*/) {
                 float[] o = trainer.get(i);
                 for (int j = 0, oLength = o.length; j < oLength; j++) {
                     float y = o[j];
                     //nar.goal(
-                    nar.believe(
-                            outs.outVector[j], Tense.Present, y, nar.confidenceDefault('.') * (1f - errSum));
+                    float c = nar.confidenceDefault('.') * (1f - errSum);
+                    if (c > 0) {
+                        nar.believe(
+                                outs.outVector[j], Tense.Present, y, c);
+                    }
 
                 }
                 //System.out.println(Arrays.toString(o));

@@ -409,7 +409,7 @@ public class NAL8Test extends AbstractNALTest {
     @Test
     public void condition_goal_deduction_3simplerReverse()  {
         test()
-//                
+                .log()
                 .inputAt(1, "at:t003! :|:")
                 .input( "(at:$1 ==>+5 goto:$1).")
 

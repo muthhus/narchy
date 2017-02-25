@@ -60,8 +60,7 @@ public class UnifySubst extends Unify {
 
         //try {
             Term aa = resolve(a, xy);
-
-            if (target.test(aa))
+            if (aa!=null && target.test(aa))
                 matches++;
             //if (accept(a, aa))
 

@@ -639,7 +639,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
      * if the task was a command, it will return false even if executed
      */
     @Nullable
-    protected final Concept process(@NotNull Task input0) {
+    public final Concept process(@NotNull Task input0) {
 
         Task input = pre(input0);
         if (input == null)

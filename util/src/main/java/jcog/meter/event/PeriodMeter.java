@@ -131,4 +131,8 @@ public class PeriodMeter extends FunctionMeter<Double> {
     public String toStringMicro() {
         return toString(6);
     }
+
+    public long getN() {
+        return stat.getN();
+    }
 }

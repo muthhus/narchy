@@ -23,7 +23,7 @@ import java.util.function.Consumer;
 public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Consumer<NAR> {
 
 
-    private static final int radix = 2;
+    private static final int radix = 3;
     private final NAR nar;
     private final NAgent agent;
     float resolution = Param.TRUTH_EPSILON;
@@ -37,9 +37,9 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
         agent.sensors.addAll(
             encode((x,y)->
 
-                //$.func(root,
-                $.inh(
-                    root,
+                $.func(root,
+                //$.inh(
+                    //root,
                     $.p(radix > 1 ?
                         new Term[] { coord(x, width), coord(y, height) } :
                         new Term[] { $.the(x), $.the(y) }

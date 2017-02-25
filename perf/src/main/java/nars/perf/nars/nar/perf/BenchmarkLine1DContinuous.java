@@ -35,11 +35,11 @@ public class BenchmarkLine1DContinuous {
         XorShift128PlusRandom rng = new XorShift128PlusRandom((int)(Math.random()*1000));
         int conceptsPerCycle = 16;
 
-        final Executioner exe =
+        Executioner exe =
                 //new MultiThreadExecutioner(3, 2048, true);
                 new SynchronousExecutor();
 
-        //exe = new InstrumentedExecutor( exe );
+        exe = new InstrumentedExecutor( exe, 16 );
 
         Default nar = new Default(1024,
                 conceptsPerCycle, 1, 3, rng,

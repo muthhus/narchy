@@ -1,8 +1,6 @@
 package nars.util.exe;
 
 import com.google.common.base.Joiner;
-import com.google.common.collect.Iterables;
-import jcog.Texts;
 import jcog.meter.event.PeriodMeter;
 import nars.NAR;
 import nars.Task;
@@ -27,12 +25,18 @@ public class InstrumentedExecutor extends Executioner {
     final PeriodMeter cycleTime, taskInput;
 
     final Map<Class, PeriodMeter> meters = new ConcurrentHashMap<>();
+    private final int collectionPeriod;
 
 
     private boolean trace = true;
 
     public InstrumentedExecutor(Executioner delegate) {
+        this(delegate, 1);
+    }
+
+    public InstrumentedExecutor(Executioner delegate, int collectionPeriod) {
         this.exe = delegate;
+        this.collectionPeriod = collectionPeriod;
         this.cycleTime = meter(NAR.class);
         this.taskInput = meter(Task.class);
     }
@@ -62,15 +66,17 @@ public class InstrumentedExecutor extends Executioner {
             cycleTime.hit();
         }
 
-        if (trace) {
-            System.out.println(summary());
-        }
-
-        meters.values().forEach(x -> {
-            synchronized (x) {
-                x.clear();
+        if (cycleTime.getN() % collectionPeriod == collectionPeriod-1) {
+            if (trace) {
+                System.out.println(summary());
             }
-        });
+
+            meters.values().forEach(x -> {
+                synchronized (x) {
+                    x.clear();
+                }
+            });
+        }
 
     }
 
@@ -93,15 +99,16 @@ public class InstrumentedExecutor extends Executioner {
 
     @Override
     public void run(@NotNull Consumer<NAR> r) {
-        run(()->exe.run(r), meter(r.getClass()));
+        exe.run( ()-> measure(()->r.accept(nar), meter(r.getClass())));
     }
 
     @Override
     public void run(Runnable cmd) {
-        run(()->exe.run(cmd), meter(cmd.getClass()));
+        exe.run( ()-> measure(cmd, meter(cmd.getClass())));
     }
 
-    static void run(Runnable cmd, PeriodMeter p) {
+
+    static void measure(Runnable cmd, PeriodMeter p) {
         long start = System.nanoTime();
         cmd.run();
         long end = System.nanoTime();
@@ -111,9 +118,16 @@ public class InstrumentedExecutor extends Executioner {
         }
     }
 
+//    @Override
+//    public void run(@NotNull Task[] t) {
+//    }
     @Override
     public void run(@NotNull Task[] t) {
-        run(()->exe.run(t), taskInput);
+        exe.run(() -> {
+            //measure each task individually processed
+            for (Task u : t)
+                measure(() -> nar.process(u), taskInput);
+        });
     }
 
     @Override
