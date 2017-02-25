@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static jcog.Texts.n2;
+import static nars.Op.BELIEF;
 import static spacegraph.space.layout.Grid.col;
 import static spacegraph.space.layout.Grid.row;
 
@@ -347,7 +348,7 @@ public class Recog2D extends NAgents {
                 for (int j = 0, oLength = o.length; j < oLength; j++) {
                     float y = o[j];
                     //nar.goal(
-                    float c = nar.confidenceDefault('.') * (1f - errSum);
+                    float c = nar.confidenceDefault(BELIEF) * (1f - errSum);
                     if (c > 0) {
                         nar.believe(
                                 outs.outVector[j], Tense.Present, y, c);

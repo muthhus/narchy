@@ -18,6 +18,7 @@ import java.util.List;
 
 import static java.util.stream.Collectors.toList;
 import static nars.$.$;
+import static nars.Op.QUESTION;
 import static spacegraph.render.Draw.pop;
 import static spacegraph.render.Draw.push;
 
@@ -159,7 +160,7 @@ public class TruthLab extends Grid {
 
         public BeliefTableTimeline(Compound t, BeliefTable b, long start, long end, int samplePeriod) {
             super(start, end, samplePeriod, (w) -> {
-                Task x = b.match(w, w, dur, $.task(t, '?', null).evidence(0), true);
+                Task x = b.match(w, w, dur, $.task(t, QUESTION, null).apply(nar), true);
                 if (x!=null)
                     return x.truth(w, dur, Param.TRUTH_EPSILON);
                 return null;

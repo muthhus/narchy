@@ -7,6 +7,7 @@ import nars.nar.Default;
 
 import static jcog.Texts.n2;
 import static jcog.Util.unitize;
+import static nars.Op.BELIEF;
 
 
 /**
@@ -47,7 +48,7 @@ public class Line1DSimplest extends NAgent {
                         //d.freq()
                 );
             }
-            return $.t(yEst, nar.confidenceDefault('.'));
+            return $.t(yEst, nar.confidenceDefault(BELIEF));
         });
 
 

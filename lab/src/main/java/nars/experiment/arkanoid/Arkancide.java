@@ -8,6 +8,8 @@ import nars.NAgents;
 
 import java.io.IOException;
 
+import static nars.Op.BELIEF;
+
 public class Arkancide extends NAgents {
 
     static boolean cam = true;
@@ -124,7 +126,7 @@ public class Arkancide extends NAgents {
             } else {
                 pct = noid.paddle.x / Arkanoid.SCREEN_WIDTH; //unchanged
             }
-            return $.t(pct, nar.confidenceDefault('.'));
+            return $.t(pct, nar.confidenceDefault(BELIEF));
             //return null; //$.t(0.5f, alpha);
         })/*.feedbackResolution(resX)*/);
 

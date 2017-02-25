@@ -287,8 +287,8 @@ public class Line1DContinuous extends NAgent {
         l.run(2000);
 
 
-        NAR.printActiveTasks(nar, true);
-        NAR.printActiveTasks(nar, false);
+//        NAR.printActiveTasks(nar, true);
+//        NAR.printActiveTasks(nar, false);
 
 //        l.predictors.forEach(p->{
 //           nar.concept(p).print();

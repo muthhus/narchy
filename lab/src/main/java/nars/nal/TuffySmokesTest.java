@@ -134,9 +134,9 @@ public class TuffySmokesTest {
 
         axioms(n);
         input(n);
-        n.input(new LambdaQuestionTask($("(?x --> Cancer)"), '?', ETERNAL, 16, (q, a) -> {
-            System.out.println(a.proof());
-        }).budgetSafe(1f,0.99f));
+//        n.input(new LambdaQuestionTask($("(?x --> Cancer)"), '?', ETERNAL, 16, (q, a) -> {
+//            System.out.println(a);
+//        }).budgetSafe(1f,0.99f));
         n.run(250);  print();
         n.run(250);  print();
         n.run(250);  print();

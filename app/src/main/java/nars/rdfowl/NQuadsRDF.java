@@ -5,6 +5,7 @@ import nars.NAR;
 import nars.Op;
 import nars.Task;
 
+import nars.task.TaskBuilder;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.atom.Atom;
@@ -26,6 +27,8 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import static nars.$.*;
+import static nars.Op.BELIEF;
+import static nars.term.Terms.compoundOrNull;
 
 /**
  * Created by me on 6/4/15.
@@ -319,10 +322,10 @@ public abstract class NQuadsRDF {
             return null;
 
         try {
-            Term term = /*$.inst*/ $.inh($.p(subject, object), predicate);
+            Compound term = /*$.inst*/ compoundOrNull($.inh($.p(subject, object), predicate));
             if (term == null)
                 throw new NullPointerException();
-            Task t = new TaskBuilder(term, '.', 1f, nar);
+            Task t = new TaskBuilder(term, BELIEF, $.t(1f, nar.confidenceDefault(BELIEF))).apply(nar);
             return t;
         } catch (Exception e) {
             logger.error("rdf({}) to task: {}", new Term[] { subject, object, predicate }, e);
@@ -436,8 +439,8 @@ public abstract class NQuadsRDF {
         if (belief instanceof Compound) {
             //System.out.println(subject + " " + predicate + " " + object + " :: " + belief);
 
-            return new TaskBuilder(belief, Op.BELIEF, 1f, nar)
-                    .eternal();
+            return new TaskBuilder((Compound)belief, BELIEF, $.t(1f, nar.confidenceDefault(BELIEF)))
+                    .eternal().apply(nar);
         }
 
         return null;

@@ -5,6 +5,7 @@ import nars.NAR;
 import nars.Op;
 import nars.Task;
 
+import nars.task.TaskBuilder;
 import nars.term.Compound;
 import nars.term.Term;
 
@@ -12,6 +13,8 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Consumer;
+
+import static nars.Op.BELIEF;
 
 /**
  * Created by me on 7/20/16.
@@ -41,7 +44,7 @@ public class StructuralSimilarity implements Consumer<Task> {
                 float uniques = plus - e.size();
                 float similarity = (uniques / max);
                 if (similarity > 0) //remain silent about cases where nothing is common
-                    n.input(new TaskBuilder($.sim(a, b), '.', similarity, n).log("StructuralSimilarity"));
+                    n.input(new TaskBuilder((Compound)$.sim(a, b), BELIEF, $.t(similarity, n.confidenceDefault(BELIEF))).log("StructuralSimilarity"));
             }
         }
     }

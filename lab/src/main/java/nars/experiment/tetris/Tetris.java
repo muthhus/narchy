@@ -22,6 +22,7 @@ import spacegraph.space.widget.MatrixView;
 import java.util.List;
 
 import static nars.$.$;
+import static nars.Op.BELIEF;
 import static nars.experiment.tetris.impl.TetrisState.*;
 import static spacegraph.SpaceGraph.window;
 
@@ -171,7 +172,7 @@ public class Tetris extends NAgents {
 
 
         public static void actions(NAR nar, TetrisState state, List<ActionConcept> actions) throws Narsese.NarseseException {
-            float alpha = nar.confidenceDefault('.');
+            float alpha = nar.confidenceDefault(BELIEF);
 
             float actionMargin =
                     0.33f; //divides the range into 3 sections: left/nothing/right
@@ -237,7 +238,7 @@ public class Tetris extends NAgents {
         }
 
         public static void sensors(NAR nar, TetrisState state, List<SensorConcept> sensors) {
-            float alpha = nar.confidenceDefault('.');
+            float alpha = nar.confidenceDefault(BELIEF);
 
             concept = new SensorConcept[state.width][state.height];
 
