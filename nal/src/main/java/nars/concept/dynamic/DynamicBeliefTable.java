@@ -2,13 +2,17 @@ package nars.concept.dynamic;
 
 import jcog.Util;
 import nars.$;
+import nars.NAR;
 import nars.Task;
 import nars.budget.Budget;
+import nars.concept.CompoundConcept;
 import nars.table.DefaultBeliefTable;
+import nars.table.QuestionTable;
 import nars.term.Compound;
 import nars.term.Terms;
 import nars.truth.Stamp;
 import nars.truth.Truth;
+import nars.truth.TruthDelta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -25,6 +29,14 @@ public class DynamicBeliefTable extends DefaultBeliefTable {
 
     //static final boolean rejectDerivations = false;
 
+
+    @Override
+    public TruthDelta add(@NotNull Task input, @NotNull QuestionTable questions, @NotNull CompoundConcept<?> concept, @NotNull NAR nar) {
+        if (input instanceof DynamicBeliefTask)
+            return TruthDelta.zero; //dont insert its own dynamic belief task, causing a feedback loop
+        else
+            return super.add(input, questions, concept, nar);
+    }
 
     public DynamicBeliefTable(DynamicConcept dynamicConcept, DynamicTruthModel model, boolean beliefOrGoal) {
         super();

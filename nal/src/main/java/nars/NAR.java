@@ -557,21 +557,19 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
         ask(term, questionOrQuest, ETERNAL);
     }
 
-    @NotNull
-    public void ask(@NotNull Termed<Compound> term, char questionOrQuest, long when) {
+    public Task ask(@NotNull Termed<Compound> term, char questionOrQuest, long when) {
 
 
         //TODO use input method like believe uses which avoids creation of redundant Budget instance
         if ((questionOrQuest != QUESTION) && (questionOrQuest != QUEST))
             throw new RuntimeException("invalid punctuation");
 
-        TaskBuilder t = new TaskBuilder((Compound)term, (byte)questionOrQuest, null);
-        t.time(time(), when);
-        t.setPriority(priorityDefault((byte)questionOrQuest));
+        Task t = new ImmutableTask((Compound) term, (byte) questionOrQuest, null,
+                time(), when, when, new long[] { time.nextStamp() } ).budget(this);
 
         input(t);
 
-        //ex: return new Answered(this, t);
+        return t;
 
     }
 

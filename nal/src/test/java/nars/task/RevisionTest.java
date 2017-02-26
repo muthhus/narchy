@@ -229,6 +229,7 @@ public class RevisionTest {
         assertEquals(0.947f, t.conf(), 0.01f);
     }
 
+
     @Test public void testRevision2TemporalImpl() throws Narsese.NarseseException {
         NAR n = newNAR(3)
                 .input("(x ==> y). :|: %1.0;0.9%",

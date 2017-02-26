@@ -1032,7 +1032,7 @@ public abstract class TermBuilder {
             args = new Term[]{term1, term2};
         }
 
-        return finish(intersection, args);
+        return finalize(intersection, Terms.sorted(args));
     }
 
 
