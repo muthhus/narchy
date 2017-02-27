@@ -25,7 +25,7 @@ import org.oakgp.node.Node;
  */
 final class Divide extends ArithmeticOperator {
     private final NumberUtils<?> numberUtils;
-    private final ConstantNode minusOne;
+
 
     /**
      * @see NumberUtils#getDivide()
@@ -33,7 +33,6 @@ final class Divide extends ArithmeticOperator {
     Divide(NumberUtils<?> numberUtils) {
         super(numberUtils.getType());
         this.numberUtils = numberUtils;
-        this.minusOne = numberUtils.negateConstant(numberUtils.one());
     }
 
     @Override
@@ -52,8 +51,10 @@ final class Divide extends ArithmeticOperator {
             return numberUtils.one();
         } else if (numberUtils.isOne(arg2)) {
             return arguments.firstArg();
-        } else if (minusOne.equals(arg2)) {
+        } else if (numberUtils.minusOne.equals(arg2)) {
             return numberUtils.negate(arguments.firstArg());
+        } else if (arguments.firstArg().equals(arg2)) {
+            return numberUtils.one;
         } else {
             return null;
         }

@@ -347,12 +347,19 @@ public final class Evolution {
             return new InitialPopulationSetter();
         }
 
+        public InitialPopulationSetter setFitness(final FitnessFunction fitnessFunction) {
+            return setFitness(fitnessFunction, false);
+        }
+
         /**
          * Set the {@code FitnessFunction} used to determine the fitness of a candidate.
          */
-        public InitialPopulationSetter setFitness(final FitnessFunction fitnessFunction) {
+        public InitialPopulationSetter setFitness(final FitnessFunction fitnessFunction, boolean parallel) {
             requireNonNull(fitnessFunction);
-            return ranked(new FitnessFunctionGenerationRanker(ensureCached(fitnessFunction)));
+            FitnessFunction cf = ensureCached(fitnessFunction);
+            return ranked(
+                parallel ? new FitnessFunctionGenerationRanker.Parallel(cf) : new FitnessFunctionGenerationRanker.SingleThread(cf)
+            );
         }
 
         private FitnessFunction ensureCached(final FitnessFunction fitnessFunction) {

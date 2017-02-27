@@ -14,13 +14,13 @@ import nars.nar.Default;
 import nars.time.FrameTime;
 import nars.util.exe.Executioner;
 import nars.util.exe.SynchronousExecutor;
+import org.oakgp.Arguments;
 import org.oakgp.Assignments;
 import org.oakgp.Evolution;
 import org.oakgp.Type;
+import org.oakgp.function.coll.PairDouble;
 import org.oakgp.function.math.DoubleUtils;
-import org.oakgp.function.math.IntegerUtils;
 import org.oakgp.node.Node;
-import org.oakgp.rank.fitness.TestDataFitnessFunction;
 import org.oakgp.util.Utils;
 
 import java.util.Arrays;
@@ -297,7 +297,7 @@ public class Line1DContinuous extends NAgent {
             );
 
             l.print = false;
-            l.run(32);
+            l.run(500);
 
             float score = l.rewardSum() / nar.time();
             //System.out.println("AVG SCORE=" + score);
@@ -327,11 +327,15 @@ public class Line1DContinuous extends NAgent {
                         nar.emotion.busyPri.getSum(), (double)nar.emotion.learning(),
                         (double)nar.emotion.happy(), (double)nar.emotion.sad()
                         );
-                double y = f.eval(x);
+                Arguments y = f.eval(x);
 
-                int tpf = 32;
-                int termLinks = (int) Math.round( Util.clamp((float)y, 0f, 3f) * cpf);
+                double y0 = y.arg(0).eval(x);
+                double y1 = y.arg(1).eval(x);
+
+                int tpf = Math.round( Util.clamp((float)y0, 0f, 4) * cpf);
+                int termLinks = Util.clampI((float)y1, 0, 4);
                 int taskLinks = 1;
+                //System.out.println(y + " " + tpf + " " + termLinks);
 
                 nar.core.conceptsFiredPerCycle.setValue(cpf);
                 nar.core.tasklinksFiredPerFiredConcept.set(taskLinks);
@@ -344,26 +348,28 @@ public class Line1DContinuous extends NAgent {
             nar.beliefConfidence(0.9f);
             nar.goalConfidence(0.9f);
 
-            double score = 1/(1f+Util.clamp((float) eval(nar), -1f, +1f));
-            System.out.println(f + " = " + score);
-            return score;
+            double score = eval(nar);
+            System.out.println(Thread.currentThread() + " " + f + " = " + score);
+            return -score; //minimizes
         }
 
         public static void main(String[] args) {
 
-            new Evolution().returning(Type.doubleType())
+            new Evolution().returning(Type.arrayType(Type.doubleType()))// Type.doubleType())
                     .setRandom(new XorShift128PlusRandom(1))
-                    .setConstants(Utils.createIntegerConstants(1, 3))
+                    .setConstants(Utils.createIntegerConstants(1, 5))
                     .setVariables(Type.doubleType(), Type.doubleType(), Type.doubleType(), Type.doubleType())
                     .setFunctions(
                             DoubleUtils.the.add,
                             DoubleUtils.the.subtract,
-                            DoubleUtils.the.multiply
+                            DoubleUtils.the.multiply,
+                            DoubleUtils.the.divide,
+                            new PairDouble()
                     )
-                    .setFitness(Evolve::eval) // the fitness function will compare candidates against a data set which maps inputs to their expected outputs
-                    .setInitialPopulationSize(16).setTreeDepth(4)
-                    .setTargetFitness(0)
-                    .setMaxGenerations(64)
+                    .setFitness(Evolve::eval, true) // the fitness function will compare candidates against a data set which maps inputs to their expected outputs
+                    .setInitialPopulationSize(6).setTreeDepth(5)
+                    .setTargetFitness(-1.0)
+                    .setMaxGenerations(16)
                     .get();
 
 

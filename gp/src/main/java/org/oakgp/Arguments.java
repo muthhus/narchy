@@ -34,7 +34,7 @@ public final class Arguments {
     /**
      * @see #createArguments(Node...)
      */
-    public Arguments(Node[] args) {
+    public Arguments(Node... args) {
         this.args = args;
         this.hashCode = Arrays.hashCode(args);
     }

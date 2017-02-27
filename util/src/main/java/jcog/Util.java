@@ -1337,7 +1337,7 @@ public enum Util { ;
     }
 
 
-    public static int clamp(float i, int min, int max) {
+    public static int clampI(float i, int min, int max) {
         return clamp(Math.round(i), min, max);
     }
 

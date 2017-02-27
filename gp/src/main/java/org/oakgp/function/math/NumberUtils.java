@@ -31,12 +31,14 @@ import static org.oakgp.node.NodeType.isFunction;
  * @param <T> the type this instance is concerned with; this will commonly be (but is not limited to) a sub-class of {@code java.lang.Number}
  */
 abstract class NumberUtils<T extends Comparable<T>> {
+
     public final Type type;
     public final T rawZero;
     public final T rawOne;
     public final ConstantNode zero;
     public final ConstantNode one;
     public final ConstantNode two;
+    public final ConstantNode minusOne;
     public final ArithmeticExpressionSimplifier simplifier;
     public final Add add;
     public final Subtract subtract;
@@ -55,9 +57,12 @@ abstract class NumberUtils<T extends Comparable<T>> {
         this.type = type;
         this.rawZero = zero;
         this.rawOne = one;
+
         this.zero = createConstant(zero);
         this.one = createConstant(one);
         this.two = createConstant(two);
+        this.minusOne = negateConstant(this.one);
+
         this.simplifier = new ArithmeticExpressionSimplifier(this);
         this.add = new Add(this);
         this.subtract = new Subtract(this);

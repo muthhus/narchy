@@ -31,7 +31,7 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
      */
     private static final float SCAN_ITERATIONS = 1f;
     protected final Random random;
-    protected final int reprobes;
+    public final int reprobes;
     public transient final AtomicReference<AtomicReferenceArray<V>> map;
     final AtomicInteger size = new AtomicInteger(0);
     final AtomicInteger capacity = new AtomicInteger(0);
@@ -94,8 +94,9 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
     }
 
     @Override
-    public final boolean setCapacity(int newCapacity) {
+    public final boolean setCapacity(int _newCapacity) {
 
+        int newCapacity = Math.max(_newCapacity, reprobes);
 
         if (capacity.getAndSet(newCapacity) != newCapacity) {
 

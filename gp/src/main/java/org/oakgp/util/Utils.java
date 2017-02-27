@@ -138,6 +138,7 @@ public enum Utils { ;
      * Returns a copy of the specified array.
      */
     public static <T> T[] copyOf(T[] original) {
-        return Arrays.copyOf(original, original.length);
+        return original.clone();
+        //return Arrays.copyOf(original, original.length);
     }
 }

@@ -89,9 +89,9 @@ public class HijackBagTest {
     @Test
     public void testHijackResize() {
         Random rng = rng();
-        Bag<String,BLink<String>> b = new BLinkHijackBag(0, 7, BudgetMerge.maxBlend, rng);
+        BLinkHijackBag b = new BLinkHijackBag(0, 7, BudgetMerge.maxBlend, rng);
         BagTest.populate(b, rng, 10, 20, 0f, 1f, 0.5f);
-        assertEquals(0, b.size());
+        assertEquals(b.reprobes /*0*/, b.size());
 
 
         int dimensionality = 50;

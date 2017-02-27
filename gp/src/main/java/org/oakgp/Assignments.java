@@ -48,13 +48,13 @@ public final class Assignments {
     }
 
     @Override
-    public int hashCode() {
+    public final int hashCode() {
         return hashCode;
     }
 
     @Override
     public boolean equals(Object o) {
-        return o instanceof Assignments && Arrays.equals(this.assignments, ((Assignments) o).assignments);
+        return this == o || (o instanceof Assignments && hashCode == o.hashCode() && Arrays.equals(this.assignments, ((Assignments) o).assignments));
     }
 
     @Override
