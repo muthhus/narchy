@@ -94,7 +94,7 @@ public class TreeGeneratorTest {
 
             @Override
             public Signature sig() {
-                return Signature.build(returnType, arguments);
+                return new Signature(returnType, arguments);
             }
 
             @Override

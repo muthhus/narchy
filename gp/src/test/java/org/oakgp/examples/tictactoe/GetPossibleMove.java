@@ -22,10 +22,9 @@ import org.oakgp.function.Signature;
 
 import static org.oakgp.Type.nullableType;
 import static org.oakgp.Type.type;
-import static org.oakgp.function.Signature.build;
 
 final class GetPossibleMove implements Function {
-    private static final Signature SIGNATURE = build(nullableType(type("move")), type("board"));
+    private static final Signature SIGNATURE = new Signature(nullableType(type("move")), type("board"));
 
     private final String displayName;
     private final java.util.function.Function<Board, Move> f;

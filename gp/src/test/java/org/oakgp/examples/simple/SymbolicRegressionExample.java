@@ -21,7 +21,7 @@ import org.oakgp.function.math.IntegerUtils;
 import org.oakgp.node.Node;
 import org.oakgp.rank.RankedCandidates;
 import org.oakgp.rank.fitness.TestDataFitnessFunction;
-import org.oakgp.util.Evolution;
+import org.oakgp.Evolution;
 import org.oakgp.util.Utils;
 
 import java.util.HashMap;
@@ -64,7 +64,7 @@ public class SymbolicRegressionExample {
     private static Map<Assignments, Integer> createDataSet() {
         Map<Assignments, Integer> tests = new HashMap<>();
         for (int i = -10; i < 11; i++) {
-            Assignments assignments = Assignments.createAssignments(i);
+            Assignments assignments = new Assignments(i);
             tests.put(assignments, getExpectedOutput(i));
         }
         return tests;

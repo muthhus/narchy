@@ -27,7 +27,7 @@ import org.oakgp.function.Signature;
 class IsFoodAhead implements ImpureFunction {
     @Override
     public Signature sig() {
-        return Signature.build(Type.booleanType(), MutableState.STATE_TYPE);
+        return new Signature(Type.booleanType(), MutableState.STATE_TYPE);
     }
 
     @Override

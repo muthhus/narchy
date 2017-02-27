@@ -27,7 +27,7 @@ class TicTacToe implements TwoPlayerGame {
         Board board = new Board();
         Symbol next = X;
         while (true) {
-            Assignments assignments = Assignments.createAssignments(board, next, next.getOpponent());
+            Assignments assignments = new Assignments(board, next, next.getOpponent());
             Move move = (next == X ? player1 : player2).eval(assignments);
             board = board.update(next, move);
 

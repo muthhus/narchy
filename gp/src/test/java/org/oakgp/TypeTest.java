@@ -177,16 +177,16 @@ public class TypeTest {
     }
 
     private void assertSameTypes(Type[] a, Type[] b) {
-        assertTrue(Type.sameTypes(a, a));
-        assertTrue(Type.sameTypes(b, b));
-        assertTrue(Type.sameTypes(a, b));
-        assertTrue(Type.sameTypes(b, a));
+        assertTrue(Type.equal(a, a));
+        assertTrue(Type.equal(b, b));
+        assertTrue(Type.equal(a, b));
+        assertTrue(Type.equal(b, a));
     }
 
     private void assertNotSameTypes(Type[] a, Type[] b) {
-        assertTrue(Type.sameTypes(a, a));
-        assertTrue(Type.sameTypes(b, b));
-        assertFalse(Type.sameTypes(a, b));
-        assertFalse(Type.sameTypes(b, a));
+        assertTrue(Type.equal(a, a));
+        assertTrue(Type.equal(b, b));
+        assertFalse(Type.equal(a, b));
+        assertFalse(Type.equal(b, a));
     }
 }

@@ -1,5 +1,6 @@
 package nars.experiment.misc;
 
+import jcog.Util;
 import jcog.data.random.XorShift128PlusRandom;
 import nars.$;
 import nars.NAR;
@@ -13,6 +14,14 @@ import nars.nar.Default;
 import nars.time.FrameTime;
 import nars.util.exe.Executioner;
 import nars.util.exe.SynchronousExecutor;
+import org.oakgp.Assignments;
+import org.oakgp.Evolution;
+import org.oakgp.Type;
+import org.oakgp.function.math.DoubleUtils;
+import org.oakgp.function.math.IntegerUtils;
+import org.oakgp.node.Node;
+import org.oakgp.rank.fitness.TestDataFitnessFunction;
+import org.oakgp.util.Utils;
 
 import java.util.Arrays;
 
@@ -248,53 +257,119 @@ public class Line1DContinuous extends NAgent {
     public static void main(String[] args) {
 
         XorShift128PlusRandom rng = new XorShift128PlusRandom((int)(Math.random()*1000));
-        int conceptsPerCycle = 8;
 
         final Executioner exe =
                 //new MultiThreadExecutioner(2, 2048);
                 new SynchronousExecutor();
 
         Default nar = new Default(1024,
-                conceptsPerCycle, 1, 3, rng,
+                8, 1, 3, rng,
                 new CaffeineIndex(new DefaultConceptBuilder(), 1024*16, false, exe),
                 new FrameTime(1f), exe
         );
-        nar.termVolumeMax.set(26);
+        nar.termVolumeMax.set(32);
 
 
         nar.beliefConfidence(0.9f);
         nar.goalConfidence(0.9f);
 
-        //nar.truthResolution.setValue(0.02f);
-
 
         Line1DContinuous l = new Line1DContinuous(nar, 6,
-                //sine(50)
                 random(16)
         );
-
-
-        //NAgents.chart(l);
-
-        //nar.logSummaryGT(System.out, 0.5f);
-//        nar.onTask(t -> {
-//            if (t instanceof DerivedTask && t.isGoal())
-//                System.out.println(t.proof());
-//        });
 
         l.print = true;
         //l.runRT(25, 15000).join();
         l.run(2000);
 
-
-//        NAR.printActiveTasks(nar, true);
-//        NAR.printActiveTasks(nar, false);
-
-//        l.predictors.forEach(p->{
-//           nar.concept(p).print();
-//        });
         System.out.println("AVG SCORE=" + l.rewardSum()/ nar.time());
 
     }
 
+
+    static class Evolve {
+
+        static double eval(NAR nar) {
+
+            Line1DContinuous l = new Line1DContinuous(nar, 6,
+                    //sine(50)
+                    random(8)
+            );
+
+            l.print = false;
+            l.run(32);
+
+            float score = l.rewardSum() / nar.time();
+            //System.out.println("AVG SCORE=" + score);
+            return score;
+        }
+
+        static double eval(Node f) {
+
+            XorShift128PlusRandom rng = new XorShift128PlusRandom((int)(Math.random()*1000));
+
+            final Executioner exe =
+                    new SynchronousExecutor();
+
+            Param.ANSWER_REPORTING = false;
+
+            Default nar = new Default(1024,
+                    8, 1, 3, rng,
+                    new CaffeineIndex(new DefaultConceptBuilder(), 1024*16, false, exe),
+                    new FrameTime(1f), exe
+            );
+            nar.termVolumeMax.set(32);
+
+            int cpf = 8;
+
+            nar.onCycle(()-> {
+                Assignments x = new Assignments(
+                        nar.emotion.busyPri.getSum(), (double)nar.emotion.learning(),
+                        (double)nar.emotion.happy(), (double)nar.emotion.sad()
+                        );
+                double y = f.eval(x);
+
+                int tpf = 32;
+                int termLinks = (int) Math.round( Util.clamp((float)y, 0f, 3f) * cpf);
+                int taskLinks = 1;
+
+                nar.core.conceptsFiredPerCycle.setValue(cpf);
+                nar.core.tasklinksFiredPerFiredConcept.set(taskLinks);
+                nar.core.termlinksFiredPerFiredConcept.set(1, termLinks);
+                nar.core.tasksInputPerCycle.setValue(tpf);
+            });
+
+
+
+            nar.beliefConfidence(0.9f);
+            nar.goalConfidence(0.9f);
+
+            double score = 1/(1f+Util.clamp((float) eval(nar), -1f, +1f));
+            System.out.println(f + " = " + score);
+            return score;
+        }
+
+        public static void main(String[] args) {
+
+            new Evolution().returning(Type.doubleType())
+                    .setRandom(new XorShift128PlusRandom(1))
+                    .setConstants(Utils.createIntegerConstants(1, 3))
+                    .setVariables(Type.doubleType(), Type.doubleType(), Type.doubleType(), Type.doubleType())
+                    .setFunctions(
+                            DoubleUtils.the.add,
+                            DoubleUtils.the.subtract,
+                            DoubleUtils.the.multiply
+                    )
+                    .setFitness(Evolve::eval) // the fitness function will compare candidates against a data set which maps inputs to their expected outputs
+                    .setInitialPopulationSize(16).setTreeDepth(4)
+                    .setTargetFitness(0)
+                    .setMaxGenerations(64)
+                    .get();
+
+
+
+
+        }
+
+    }
 }

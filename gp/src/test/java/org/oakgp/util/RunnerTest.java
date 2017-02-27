@@ -16,6 +16,7 @@
 package org.oakgp.util;
 
 import org.junit.Test;
+import org.oakgp.Evolution;
 import org.oakgp.evolve.GenerationEvolver;
 import org.oakgp.node.Node;
 import org.oakgp.rank.GenerationRanker;

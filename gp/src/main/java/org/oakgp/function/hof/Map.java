@@ -47,7 +47,7 @@ public final class Map implements Function {
      * @param to   the type of the elements contained in the collection returned by the function
      */
     public Map(Type from, Type to) {
-        signature = Signature.build(arrayType(to), functionType(to, from), arrayType(from));
+        signature = new Signature(arrayType(to), functionType(to, from), arrayType(from));
     }
 
     @Override
@@ -60,11 +60,12 @@ public final class Map implements Function {
         List<Node> result = new ArrayList<>(args);
         for (int i = 0; i < args; i++) {
             Node inputNode = candidates.arg(i);
-            Object evaluateResult = f.evaluate(Arguments.createArguments(inputNode), assignments);
+            Object evaluateResult = f.evaluate(new Arguments(new Node[]{inputNode}), assignments);
             ConstantNode outputNode = new ConstantNode(evaluateResult, returnType);
             result.add(outputNode);
         }
-        return Arguments.createArguments(result.toArray(new Node[result.size()]));
+        Node[] args1 = result.toArray(new Node[result.size()]);
+        return new Arguments(args1);
     }
 
     @Override

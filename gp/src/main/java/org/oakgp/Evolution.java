@@ -13,9 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.oakgp.util;
+package org.oakgp;
 
-import org.oakgp.Type;
 import org.oakgp.evolve.GenerationEvolver;
 import org.oakgp.evolve.GenerationEvolverImpl;
 import org.oakgp.evolve.GeneticOperator;
@@ -44,6 +43,8 @@ import org.oakgp.terminate.CompositeTerminator;
 import org.oakgp.terminate.MaxGenerationsTerminator;
 import org.oakgp.terminate.MaxGenerationsWithoutImprovementTerminator;
 import org.oakgp.terminate.TargetFitnessTerminator;
+import org.oakgp.util.*;
+import org.oakgp.util.Random;
 
 import java.util.*;
 import java.util.function.Predicate;
@@ -51,7 +52,7 @@ import java.util.function.Supplier;
 import java.util.logging.Logger;
 
 import static java.util.Objects.requireNonNull;
-import static org.oakgp.NodeSimplifier.simplify;
+import static org.oakgp.util.NodeSimplifier.simplify;
 
 /**
  * Provides a convenient way to configure and start a genetic programming run.
@@ -59,12 +60,12 @@ import static org.oakgp.NodeSimplifier.simplify;
  * @see <a href="http://oakgp.org/getting-started-with-oakgp">Getting Started with OakGP</a>
  */
 public final class Evolution {
-    private static final Random RANDOM = new StdRandom();
+    private static final org.oakgp.util.Random RANDOM = new StdRandom();
     private static final double RATIO_VARIABLES = .6;
     private static final int DEFAULT_CACHE_SIZE = 10000;
 
     private Type _returnType;
-    private Random _random = RANDOM;
+    private org.oakgp.util.Random _random = RANDOM;
     private PrimitiveSet _primitiveSet;
     private GenerationRanker _generationRanker;
     private GenerationEvolver _generationEvolver;
@@ -191,9 +192,12 @@ public final class Evolution {
         /**
          * Sets the {@code Random} to use to generate random numbers required by the run.
          */
-        public PrimitiveSetSetter setRandom(final Random random) {
+        public PrimitiveSetSetter setRandom(final org.oakgp.util.Random random) {
             _random = requireNonNull(random);
             return new PrimitiveSetSetter();
+        }
+        public PrimitiveSetSetter setRandom(final java.util.Random random) {
+            return setRandom(new StdRandom(random));
         }
     }
 
@@ -424,9 +428,9 @@ public final class Evolution {
 
             // NOTE could use a NodeSet rather than an ArrayList - but then the resulting population may be < generationSize (due to duplicates)
             // NOTE could generate using a 50:50 split of TreeGeneratorImpl.grow and TreeGeneratorImpl.full
-            Collection<Node> initialPopulation = new ArrayList<>();
+            NodeSet initialPopulation = new NodeSet();
             TreeGenerator treeGenerator = TreeGeneratorImpl.grow(_primitiveSet, _random);
-            for (int i = 0; i < generationSize; i++) {
+            while (initialPopulation.size() < generationSize) {
                 Node n = treeGenerator.generate(_returnType, treeDepth);
                 initialPopulation.add(n);
             }
@@ -607,7 +611,7 @@ public final class Evolution {
             return _primitiveSet;
         }
 
-        public Random getRandom() {
+        public org.oakgp.util.Random getRandom() {
             return _random;
         }
 

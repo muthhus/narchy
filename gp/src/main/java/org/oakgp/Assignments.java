@@ -31,21 +31,9 @@ public final class Assignments {
     /**
      * @see #createAssignments(Node...)
      */
-    private Assignments(Object[] assignments) {
+    public Assignments(Object... assignments) {
         this.assignments = Utils.copyOf(assignments);
         this.hashCode = Arrays.hashCode(assignments);
-    }
-
-    /**
-     * Returns a new {@code Assignments} which contains the specified values.
-     * <p>
-     * Note: {@code Assignments} is immutable - so subsequent changes to {@code values} will not be reflected in the returned {@code Assignments}.
-     *
-     * @param values the values to be stored in the {@code Assignments}
-     * @return a new {@code Assignments} which contains the values specified by {@code values}
-     */
-    public static Assignments createAssignments(Object... values) {
-        return new Assignments(values);
     }
 
     /**

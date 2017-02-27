@@ -34,33 +34,13 @@ public final class Arguments {
     /**
      * @see #createArguments(Node...)
      */
-    private Arguments(Node[] args) {
+    public Arguments(Node[] args) {
         this.args = args;
         this.hashCode = Arrays.hashCode(args);
     }
 
-    /**
-     * Returns a new {@code Arguments} which contains the specified values.
-     * <p>
-     * Note: {@code Arguments} is immutable - so subsequent changes to {@code args} will not be reflected in the returned {@code Arguments}.
-     *
-     * @param args the values to be stored in the {@code Arguments}
-     * @return a new {@code Arguments} which contains the values specified by {@code args}
-     */
-    public static Arguments createArguments(List<? extends Node> args) {
-        return new Arguments(args.toArray(new Node[args.size()]));
-    }
-
-    /**
-     * Returns a new {@code Arguments} which contains the specified values.
-     * <p>
-     * Note: {@code Arguments} is immutable - so subsequent changes to {@code args} will not be reflected in the returned {@code Arguments}.
-     *
-     * @param args the values to be stored in the {@code Arguments}
-     * @return a new {@code Arguments} which contains the values specified by {@code args}
-     */
-    public static Arguments createArguments(Node... args) {
-        return new Arguments(copyOf(args));
+    public Arguments(List<? extends Node> args) {
+        this(args.toArray(new Node[args.size()]));
     }
 
     /**
@@ -138,7 +118,7 @@ public final class Arguments {
 
     @Override
     public boolean equals(Object o) {
-        return o instanceof Arguments && Arrays.equals(this.args, ((Arguments) o).args);
+        return this ==o || (o instanceof Arguments && Arrays.equals(this.args, ((Arguments) o).args));
     }
 
     @Override

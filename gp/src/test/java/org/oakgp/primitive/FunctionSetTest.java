@@ -17,6 +17,7 @@ package org.oakgp.primitive;
 
 import org.junit.Test;
 import org.oakgp.function.Function;
+import org.oakgp.function.Signature;
 import org.oakgp.function.choice.If;
 import org.oakgp.function.classify.IsNegative;
 import org.oakgp.function.classify.IsPositive;
@@ -32,7 +33,6 @@ import java.util.List;
 import static org.junit.Assert.*;
 import static org.oakgp.TestUtils.assertUnmodifiable;
 import static org.oakgp.Type.*;
-import static org.oakgp.function.Signature.build;
 
 public class FunctionSetTest {
     private static final Function ADD = IntegerUtils.the.getAdd();
@@ -90,20 +90,20 @@ public class FunctionSetTest {
         // sanity check we have added 4 functions with a return type of integer
         assertEquals(4, functionSet.getByType(integerType()).size());
 
-        List<Function> integers = functionSet.getBySignature(build(integerType(), integerType(), integerType()));
+        List<Function> integers = functionSet.getBySignature(new Signature(integerType(), integerType(), integerType()));
         assertEquals(2, integers.size());
         assertSame(ADD, integers.get(0));
         assertSame(SUBTRACT, integers.get(1));
 
-        List<Function> integerArrays = functionSet.getBySignature(build(integerType(), integerArrayType()));
+        List<Function> integerArrays = functionSet.getBySignature(new Signature(integerType(), integerArrayType()));
         assertEquals(1, integerArrays.size());
         assertSame(countIntegerArray, integerArrays.get(0));
 
-        List<Function> booleanArrays = functionSet.getBySignature(build(integerType(), booleanArrayType()));
+        List<Function> booleanArrays = functionSet.getBySignature(new Signature(integerType(), booleanArrayType()));
         assertEquals(1, booleanArrays.size());
         assertSame(countBooleanArray, booleanArrays.get(0));
 
-        assertNull(functionSet.getBySignature(build(stringType(), integerType(), integerType())));
+        assertNull(functionSet.getBySignature(new Signature(stringType(), integerType(), integerType())));
     }
 
     @Test

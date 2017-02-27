@@ -26,7 +26,7 @@ import org.oakgp.rank.RankedCandidates;
 import org.oakgp.rank.tournament.FirstPlayerAdvantageGame;
 import org.oakgp.rank.tournament.TwoPlayerGame;
 import org.oakgp.util.Random;
-import org.oakgp.util.Evolution;
+import org.oakgp.Evolution;
 import org.oakgp.util.StdRandom;
 import org.oakgp.util.Utils;
 

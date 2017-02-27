@@ -70,7 +70,7 @@ class DummyFunction implements Function {
 class IsBooleanDummyFunction implements Function {
     @Override
     public Signature sig() {
-        return Signature.build(Type.booleanType(), Type.integerType());
+        return new Signature(Type.booleanType(), Type.integerType());
     }
 
     @Override

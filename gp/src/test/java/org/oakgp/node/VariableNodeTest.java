@@ -20,7 +20,6 @@ import org.oakgp.Assignments;
 import org.oakgp.Type;
 
 import static org.junit.Assert.*;
-import static org.oakgp.Assignments.createAssignments;
 import static org.oakgp.TestUtils.createVariable;
 import static org.oakgp.TestUtils.integerConstant;
 import static org.oakgp.Type.integerType;
@@ -45,7 +44,7 @@ public class VariableNodeTest {
     public void testEvaluate() {
         final Integer expected = 9;
         final VariableNode v = createVariable(0);
-        final Assignments assignments = createAssignments(expected);
+        final Assignments assignments = new Assignments(expected);
         final Object actual = (int) v.eval(assignments);
         assertSame(expected, actual);
     }

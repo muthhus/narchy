@@ -28,7 +28,7 @@ import static org.oakgp.examples.hanoi.TowersOfHanoiExample.STATE_TYPE;
  * Determines if a move is a valid move for a particular game state.
  */
 class IsValid implements Function {
-    private static final Signature SIGNATURE = Signature.build(booleanType(), STATE_TYPE, MOVE_TYPE);
+    private static final Signature SIGNATURE = new Signature(booleanType(), STATE_TYPE, MOVE_TYPE);
 
     @Override
     public Signature sig() {

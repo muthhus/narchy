@@ -22,6 +22,7 @@ import org.oakgp.function.Signature;
 import org.oakgp.node.ConstantNode;
 import org.oakgp.node.FunctionNode;
 import org.oakgp.node.Node;
+import org.oakgp.util.NodeSimplifier;
 
 import static org.junit.Assert.*;
 import static org.oakgp.TestUtils.*;
@@ -70,7 +71,7 @@ public class NodeSimplifierTest {
         Node output = NodeSimplifier.simplify(input);
         assertSame(FunctionNode.class, output.getClass());
         assertEquals("(- (* 37 v0) 1)", output.toString());
-        assertEquals(73, (int) output.eval(Assignments.createAssignments(2)));
+        assertEquals(73, (int) output.eval(new Assignments(2)));
     }
 
     @Test
@@ -191,6 +192,13 @@ public class NodeSimplifierTest {
     }
 
     @Test
+    public void testMiscSimplification1() {
+        Node input = readNode("(- v3 (* (+ v0 v0) v2))");
+        Node output = NodeSimplifier.simplify(input);
+        assertEquals("(- v3 (* v2 (* 2 v0)))", output.toString());
+    }
+
+    @Test
     public void testSanityCheckDoesFail() {
         // check that the "when/expect" pattern used in these tests does actually fail when the results are not as expected
         try {
@@ -207,7 +215,7 @@ public class NodeSimplifierTest {
         Function f = new Function() {
             @Override
             public Signature sig() {
-                return Signature.build(Type.integerType(), Type.integerType());
+                return new Signature(Type.integerType(), Type.integerType());
             }
 
             @Override
@@ -270,7 +278,7 @@ public class NodeSimplifierTest {
                     {-1, 9, 7, 4, 0}, {-7, 0, -2, -3, 8}};
             String simplifiedVersionString = writeNode(simplifiedVersion);
             for (Object[] assignedValue : assignedValues) {
-                Assignments assignments = Assignments.createAssignments(assignedValue);
+                Assignments assignments = new Assignments(assignedValue);
                 assertEquals(simplifiedVersionString, evaluate(inputNode, assignments), evaluate(simplifiedVersion, assignments));
             }
 
@@ -286,4 +294,5 @@ public class NodeSimplifierTest {
             return n.eval(assignments);
         }
     }
+
 }

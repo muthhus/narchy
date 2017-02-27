@@ -24,12 +24,11 @@ import static org.junit.Assert.*;
 import static org.oakgp.TestUtils.assertUnmodifiable;
 import static org.oakgp.Type.booleanType;
 import static org.oakgp.Type.integerType;
-import static org.oakgp.function.Signature.build;
 
 public class SignatureTest {
     @Test
     public void testGetArgumentType() {
-        Signature signature = build(integerType(), booleanType(), integerType(), booleanType());
+        Signature signature = new Signature(integerType(), booleanType(), integerType(), booleanType());
 
         assertEquals(3, signature.size());
         assertSame(integerType(), signature.returnType());
@@ -52,7 +51,7 @@ public class SignatureTest {
 
     @Test
     public void testGetArgumemntTypes() {
-        Signature signature = build(integerType(), booleanType(), integerType(), booleanType());
+        Signature signature = new Signature(integerType(), booleanType(), integerType(), booleanType());
         List<Type> types = signature.argTypes();
         assertEquals(3, types.size());
         assertSame(booleanType(), types.get(0));
@@ -63,14 +62,14 @@ public class SignatureTest {
 
     @Test
     public void testToString() {
-        Signature signature = build(integerType(), booleanType(), integerType(), booleanType());
+        Signature signature = new Signature(integerType(), booleanType(), integerType(), booleanType());
         assertEquals("integer [boolean, integer, boolean]", signature.toString());
     }
 
     @Test
     public void testEquals() {
-        Signature s1 = build(integerType(), booleanType(), integerType(), booleanType());
-        Signature s2 = build(integerType(), booleanType(), integerType(), booleanType());
+        Signature s1 = new Signature(integerType(), booleanType(), integerType(), booleanType());
+        Signature s2 = new Signature(integerType(), booleanType(), integerType(), booleanType());
         assertEquals(s1.hashCode(), s2.hashCode());
         assertTrue(s1.equals(s1));
         assertTrue(s1.equals(s2));
@@ -79,11 +78,11 @@ public class SignatureTest {
 
     @Test
     public void testNotEquals() {
-        Signature s1 = build(integerType(), booleanType(), integerType(), booleanType());
-        Signature s2 = build(integerType(), integerType(), booleanType(), booleanType());
-        Signature s3 = build(booleanType(), booleanType(), integerType(), booleanType());
-        Signature s4 = build(integerType(), booleanType(), integerType(), booleanType(), integerType());
-        Signature s5 = build(integerType(), booleanType(), integerType(), booleanType(), booleanType());
+        Signature s1 = new Signature(integerType(), booleanType(), integerType(), booleanType());
+        Signature s2 = new Signature(integerType(), integerType(), booleanType(), booleanType());
+        Signature s3 = new Signature(booleanType(), booleanType(), integerType(), booleanType());
+        Signature s4 = new Signature(integerType(), booleanType(), integerType(), booleanType(), integerType());
+        Signature s5 = new Signature(integerType(), booleanType(), integerType(), booleanType(), booleanType());
 
         assertTrue(s1.equals(s1));
         assertFalse(s1.equals(s2));

@@ -251,7 +251,7 @@ public interface Task extends Budgeted, Truthed, Stamp, Termed<Compound>, Tasked
      * to cancel any matched premise belief.
      */
     @Nullable default Task onAnswered(@NotNull Task answer, @NotNull NAR nar) {
-        if (isInput()) {
+        if (Param.ANSWER_REPORTING && isInput()) {
             ArrayBag<Task> answers = concept(nar).computeIfAbsent(Op.QUESTION, () ->
                 new ArrayBag<>(BudgetMerge.maxBlend,
                         new SynchronizedHashMap<>()).capacity(Param.MAX_INPUT_ANSWERS)

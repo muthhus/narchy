@@ -34,7 +34,7 @@ public final class Count implements Function {
      * Constructs a function to return the number of items in collections of the specified type.
      */
     public Count(Type t) {
-        signature = Signature.build(integerType(), arrayType(t));
+        signature = new Signature(integerType(), arrayType(t));
     }
 
     @Override

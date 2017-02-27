@@ -181,7 +181,7 @@ public final class Type implements Comparable<Type> {
      * @param b the other array to be tested for equality
      * @return {@code true} if the two arrays contain the same elements in the same order, else {@code false}
      */
-    public static boolean sameTypes(Type[] a, Type[] b) {
+    public static boolean equal(Type[] a, Type[] b) {
 
         int length = a.length;
         if (b.length != length) {
@@ -199,21 +199,45 @@ public final class Type implements Comparable<Type> {
 
     @Override
     public int compareTo(Type t) {
-        return name.compareTo(t.name);
+        if (this == t)
+            return 0;
+
+        int i = name.compareTo(t.name);
+        if (i == 0) {
+
+            i = Integer.compare(args.length, t.args.length);
+
+            if (i == 0) {
+                for (int x = 0; x < args.length; x++) {
+                    i = args[x].compareTo(t.args[x]);
+                    if (i != 0)
+                        return i;
+                }
+
+                return 0;
+            }
+            return i;
+
+        }
+        return i;
     }
+
 
     @Override
     public boolean equals(Object o) {
+        if (this == o)
+            return true;
+
         if (o instanceof Type) {
             Type t = (Type) o;
-            return this.name.equals(t.name) && sameTypes(this.args, t.args);
+            return t.hashCode == hashCode && this.name.equals(t.name) && equal(this.args, t.args);
         } else {
             return false;
         }
     }
 
     @Override
-    public int hashCode() {
+    public final int hashCode() {
         return hashCode;
     }
 

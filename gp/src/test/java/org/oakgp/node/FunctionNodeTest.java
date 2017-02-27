@@ -23,8 +23,6 @@ import org.oakgp.function.Signature;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
-import static org.oakgp.Arguments.createArguments;
-import static org.oakgp.Assignments.createAssignments;
 import static org.oakgp.TestUtils.*;
 import static org.oakgp.Type.integerType;
 import static org.oakgp.function.math.IntegerUtils.the;
@@ -40,7 +38,7 @@ public class FunctionNodeTest {
         FunctionNode n1 = new FunctionNode(function, arg1, arg2);
 
         // Construct using Arguments
-        Arguments arguments = createArguments(arg1, arg2);
+        Arguments arguments = new Arguments(new Node[]{arg1, arg2});
         FunctionNode n2 = new FunctionNode(function, arguments);
 
         // assert the result is the same
@@ -50,13 +48,13 @@ public class FunctionNodeTest {
     @Test
     public void testEvaluate() {
         Function function = the.getMultiply();
-        Arguments arguments = createArguments(integerConstant(42), createVariable(0));
+        Arguments arguments = new Arguments(new Node[]{integerConstant(42), createVariable(0)});
         FunctionNode functionNode = new FunctionNode(function, arguments);
 
         assertSame(function, functionNode.func());
         assertSame(arguments, functionNode.args());
 
-        Assignments assignments = createAssignments(3);
+        Assignments assignments = new Assignments(3);
         assertEquals(126, functionNode.eval(assignments));
     }
 
@@ -169,7 +167,7 @@ public class FunctionNodeTest {
 
         Function f1 = new DummyFunction();
         Function f2 = new DummyFunction();
-        Arguments arguments = Arguments.createArguments(integerConstant(1));
+        Arguments arguments = new Arguments(new Node[]{integerConstant(1)});
         FunctionNode fn1 = new FunctionNode(f1, arguments);
         FunctionNode fn2 = new FunctionNode(f2, arguments);
 

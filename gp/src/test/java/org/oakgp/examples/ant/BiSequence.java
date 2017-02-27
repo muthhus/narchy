@@ -37,7 +37,7 @@ class BiSequence implements ImpureFunction {
 
     @Override
     public Signature sig() {
-        return Signature.build(VOID_TYPE, VOID_TYPE, VOID_TYPE);
+        return new Signature(VOID_TYPE, VOID_TYPE, VOID_TYPE);
     }
 
     @Override

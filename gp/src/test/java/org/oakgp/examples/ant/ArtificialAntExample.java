@@ -20,7 +20,7 @@ import org.oakgp.function.choice.If;
 import org.oakgp.node.Node;
 import org.oakgp.rank.RankedCandidates;
 import org.oakgp.rank.fitness.FitnessFunction;
-import org.oakgp.util.Evolution;
+import org.oakgp.Evolution;
 
 import static org.oakgp.examples.ant.AntMovement.*;
 import static org.oakgp.examples.ant.BiSequence.BISEQUENCE;

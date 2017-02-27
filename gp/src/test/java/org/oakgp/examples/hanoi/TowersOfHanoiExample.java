@@ -27,7 +27,7 @@ import org.oakgp.node.ConstantNode;
 import org.oakgp.node.Node;
 import org.oakgp.rank.RankedCandidates;
 import org.oakgp.rank.fitness.FitnessFunction;
-import org.oakgp.util.Evolution;
+import org.oakgp.Evolution;
 import org.oakgp.util.Utils;
 
 import java.util.ArrayList;

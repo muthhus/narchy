@@ -28,8 +28,13 @@ public final class StdRandom implements Random {
      * constructor.
      */
     public StdRandom() {
-        this.random = new java.util.Random();
+        this(new java.util.Random());
     }
+
+    public StdRandom(java.util.Random random) {
+        this.random = random;
+    }
+
 
     /**
      * Creates a new random number generator using the specified seed.

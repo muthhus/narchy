@@ -15,6 +15,7 @@
  */
 package org.oakgp.serialize;
 
+import org.oakgp.Arguments;
 import org.oakgp.Type;
 import org.oakgp.function.Function;
 import org.oakgp.function.Signature;
@@ -33,7 +34,6 @@ import java.math.BigInteger;
 import java.util.*;
 import java.util.function.Predicate;
 
-import static org.oakgp.Arguments.createArguments;
 import static org.oakgp.Type.*;
 import static org.oakgp.util.Utils.*;
 import static org.oakgp.util.Void.VOID_CONSTANT;
@@ -293,7 +293,7 @@ public final class NodeReader implements Closeable {
             types.add(n.returnType());
         }
         Function function = getFunction(functionName, types);
-        return new FunctionNode(function, createArguments(arguments));
+        return new FunctionNode(function, new Arguments(arguments));
     }
 
     private Function getFunction(String functionName, List<Type> types) {
@@ -328,7 +328,7 @@ public final class NodeReader implements Closeable {
             }
             arguments.add(n);
         }
-        return new ConstantNode(createArguments(arguments), arrayType(t));
+        return new ConstantNode(new Arguments(arguments), arrayType(t));
     }
 
     private Node createNode(String token) {

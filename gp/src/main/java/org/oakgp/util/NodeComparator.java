@@ -40,6 +40,9 @@ public final class NodeComparator implements Comparator<Node>, Serializable {
 
     @Override
     public int compare(Node o1, Node o2) {
+        if (o1 == o2)
+            return 0;
+
         NodeType t1 = o1.nodeType();
         NodeType t2 = o2.nodeType();
 

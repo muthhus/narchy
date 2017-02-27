@@ -481,7 +481,7 @@ abstract public class NAgent implements NSense, NAction {
 //                new TaskBuilder($.seq($.varQuery(0 /*"what"*/), dur, happiness), '?', null).time(now, now)
 //        );
 
-        System.out.println(Joiner.on('\n').join(predictors));
+        //System.out.println(Joiner.on('\n').join(predictors));
     }
 
     @NotNull

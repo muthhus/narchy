@@ -18,7 +18,7 @@ package org.oakgp.function;
 import org.junit.Test;
 import org.oakgp.Arguments;
 import org.oakgp.Assignments;
-import org.oakgp.NodeSimplifier;
+import org.oakgp.util.NodeSimplifier;
 import org.oakgp.Type;
 import org.oakgp.node.ConstantNode;
 import org.oakgp.node.FunctionNode;
@@ -159,7 +159,7 @@ public abstract class AbstractFunctionTest {
             for (int i = 0; i < constants.length; i++) {
                 values[i] = constants[i].eval(null);
             }
-            return Assignments.createAssignments(values);
+            return new Assignments(values);
         }
 
         private Type[] toVariableTypes(ConstantNode[] constants) {
@@ -222,7 +222,7 @@ public abstract class AbstractFunctionTest {
         }
 
         public SimplifyExpectation verify(Object... values) {
-            Assignments assignments = Assignments.createAssignments(values);
+            Assignments assignments = new Assignments(values);
             Object expectedOutcome = inputNode.eval(assignments);
             Object actualOutcome = simplifiedNode.eval(assignments);
             assertEquals(expectedOutcome, actualOutcome);

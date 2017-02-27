@@ -141,7 +141,7 @@ public class TestUtils {
         for (int i = 0; i < expressions.length; i++) {
             args[i] = readNode(expressions[i]);
         }
-        return Arguments.createArguments(args);
+        return new Arguments(args);
     }
 
     public static ConstantNode integerConstant(int value) {

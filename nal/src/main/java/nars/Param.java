@@ -36,6 +36,8 @@ public abstract class Param  {
     /** determines if an input goal or command operation task executes */
     public static float EXECUTION_THRESHOLD = 0.666f;
 
+    public static boolean ANSWER_REPORTING = true;
+
 
     /**
      * hard upper-bound limit on Compound term complexity;

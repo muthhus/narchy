@@ -25,7 +25,7 @@ import static java.lang.Boolean.TRUE;
 import static org.oakgp.Type.booleanType;
 
 class And implements Function {
-    private static final Signature SIGNATURE = Signature.build(booleanType(), booleanType(), booleanType());
+    private static final Signature SIGNATURE = new Signature(booleanType(), booleanType(), booleanType());
 
     @Override
     public Object evaluate(Arguments arguments, Assignments assignments) {

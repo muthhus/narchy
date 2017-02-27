@@ -23,7 +23,6 @@ import org.oakgp.function.Signature;
 import org.oakgp.node.ConstantNode;
 import org.oakgp.node.Node;
 
-import static org.oakgp.Arguments.createArguments;
 import static org.oakgp.Type.arrayType;
 import static org.oakgp.Type.functionType;
 
@@ -48,7 +47,7 @@ public final class Reduce implements Function {
      * @param type the type of the elements contained in the collection - this will also be the type associated with the value produced by evaluating this function
      */
     public Reduce(Type type) {
-        signature = Signature.build(type, functionType(type, type, type), type, arrayType(type));
+        signature = new Signature(type, functionType(type, type, type), type, arrayType(type));
     }
 
     @Override
@@ -57,7 +56,7 @@ public final class Reduce implements Function {
         Node result = arguments.secondArg();
         Arguments candidates = arguments.thirdArg().eval(assignments);
         for (int i = 0; i < candidates.args(); i++) {
-            result = new ConstantNode(f.evaluate(createArguments(result, candidates.arg(i)), assignments), f.sig().returnType());
+            result = new ConstantNode(f.evaluate(new Arguments(new Node[]{result, candidates.arg(i)}), assignments), f.sig().returnType());
         }
         return result.eval(assignments);
     }

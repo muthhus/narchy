@@ -28,7 +28,7 @@ import static org.oakgp.examples.hanoi.TowersOfHanoiExample.STATE_TYPE;
  * Returns the ID of the next disc that would be returned from a particular pole for a particular game state.
  */
 class Next implements Function {
-    private static final Signature SIGNATURE = Signature.build(integerType(), STATE_TYPE, POLE_TYPE);
+    private static final Signature SIGNATURE = new Signature(integerType(), STATE_TYPE, POLE_TYPE);
 
     @Override
     public Signature sig() {

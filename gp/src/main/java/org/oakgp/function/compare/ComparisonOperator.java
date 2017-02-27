@@ -30,7 +30,7 @@ abstract class ComparisonOperator implements Function {
     private final boolean equalsIsTrue;
 
     protected ComparisonOperator(Type type, boolean equalsIsTrue) {
-        this.signature = Signature.build(booleanType(), type, type);
+        this.signature = new Signature(booleanType(), type, type);
         this.equalsIsTrue = equalsIsTrue;
     }
 

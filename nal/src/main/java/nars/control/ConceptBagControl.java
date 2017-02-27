@@ -4,10 +4,7 @@ import jcog.bag.Bag;
 import jcog.bag.PLink;
 import jcog.bag.RawPLink;
 import jcog.bag.impl.HijackBag;
-import jcog.data.FloatParam;
-import jcog.data.MutableIntRange;
-import jcog.data.MutableInteger;
-import jcog.data.Range;
+import jcog.data.*;
 import nars.Control;
 import nars.NAR;
 import nars.Param;
@@ -74,7 +71,7 @@ public class ConceptBagControl implements Control, Consumer<DerivedTask> {
 
     //public final HitMissMeter meter = new HitMissMeter(ConceptBagControl.class.getSimpleName());
 
-    public final MutableInteger newTasksPerCycleMax = new MutableInteger(64);
+    public final MutableInteger tasksInputPerCycle = new MutableInteger(64);
 
     public final FloatParam conceptActivationRate = new FloatParam(1f);
     private float currentActivationRate = 1f;
@@ -82,6 +79,7 @@ public class ConceptBagControl implements Control, Consumer<DerivedTask> {
     /** pending derivations to be input after this cycle */
     //final AtomicReference<Map<Task, Task>> pending = new AtomicReference(new ConcurrentHashMap<>());
     final TaskHijackBag pending;
+
 
 
     public ConceptBagControl(@NotNull NAR nar, @NotNull Deriver deriver, @NotNull Bag<Concept,PLink<Concept>> conceptBag) {
@@ -117,7 +115,7 @@ public class ConceptBagControl implements Control, Consumer<DerivedTask> {
         active.commit();
 
         //update concept bag
-        pending.capacity( newTasksPerCycleMax.intValue() );
+        pending.capacity( tasksInputPerCycle.intValue() );
         currentActivationRate = conceptActivationRate.floatValue()
         // * 1f/((float)Math.sqrt(active.capacity()))
         ;

@@ -26,7 +26,7 @@ abstract class ArithmeticOperator implements Function {
     private final Signature signature;
 
     protected ArithmeticOperator(Type type) {
-        signature = Signature.build(type, type, type);
+        signature = new Signature(type, type, type);
     }
 
     @Override

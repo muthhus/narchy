@@ -27,7 +27,7 @@ public class BenchmarkLine1DContinuous {
     }
 
     @Benchmark
-    @BenchmarkMode(value = Mode.AverageTime)
+    @BenchmarkMode(Mode.AverageTime)
     public void line1d() {
 
         int time = 100;

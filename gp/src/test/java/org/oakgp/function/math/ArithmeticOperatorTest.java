@@ -30,7 +30,7 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
-import static org.oakgp.NodeSimplifier.simplify;
+import static org.oakgp.util.NodeSimplifier.simplify;
 import static org.oakgp.TestUtils.readNode;
 import static org.oakgp.Type.integerType;
 import static org.oakgp.function.math.ArithmeticExpressionSimplifier.assertEvaluateToSameResult;

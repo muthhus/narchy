@@ -114,7 +114,7 @@ public final class NodeWalk {
                         replacementArgs[i] = replacedArg;
                     }
                     if (updated) {
-                        return new FunctionNode(functionNode.func(), Arguments.createArguments(replacementArgs));
+                        return new FunctionNode(functionNode.func(), new Arguments(replacementArgs));
                     } else {
                         return node;
                     }

@@ -48,7 +48,7 @@ class TowersOfHanoiFitnessFunction implements FitnessFunction {
         int previousFitness = Integer.MAX_VALUE;
         while (true) {
             // update the puzzle with the next move returned from the potential solution
-            Assignments assignments = Assignments.createAssignments(towersOfHanoi, previousMove);
+            Assignments assignments = new Assignments(towersOfHanoi, previousMove);
             previousMove = n.eval(assignments);
             towersOfHanoi = towersOfHanoi.move(previousMove);
             if (doLog) {

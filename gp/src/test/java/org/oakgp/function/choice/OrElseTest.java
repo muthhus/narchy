@@ -15,7 +15,7 @@
  */
 package org.oakgp.function.choice;
 
-import org.oakgp.NodeSimplifier;
+import org.oakgp.util.NodeSimplifier;
 import org.oakgp.Type;
 import org.oakgp.function.AbstractFunctionTest;
 import org.oakgp.node.ConstantNode;

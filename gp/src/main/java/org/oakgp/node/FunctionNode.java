@@ -45,7 +45,7 @@ public final class FunctionNode implements Node {
      * @param arguments the arguments (i.e. operands) to apply to {@code function} when evaluating this {@code FunctionNode}
      */
     public FunctionNode(Function function, Node... arguments) {
-        this(function, Arguments.createArguments(arguments));
+        this(function, new Arguments(arguments));
     }
 
     /**

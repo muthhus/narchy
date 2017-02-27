@@ -36,7 +36,7 @@ class ArtificialAntFitnessFunction implements FitnessFunction {
      * Keeps evaluating the given candidate using the given state until either the maximum number of moves have been taken or all the food has been eaten.
      */
     private void evaluate(Node candidate, MutableState state) {
-        Assignments assignments = Assignments.createAssignments(state);
+        Assignments assignments = new Assignments(state);
         int movesTaken = 0;
         while (movesTaken < MAX_MOVES && isRemainingFood(state)) {
             candidate.eval(assignments);

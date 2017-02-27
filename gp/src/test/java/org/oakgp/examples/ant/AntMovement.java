@@ -81,7 +81,7 @@ final class AntMovement implements ImpureFunction {
 
     @Override
     public Signature sig() {
-        return Signature.build(Void.VOID_TYPE, MutableState.STATE_TYPE);
+        return new Signature(Void.VOID_TYPE, MutableState.STATE_TYPE);
     }
 
     @Override

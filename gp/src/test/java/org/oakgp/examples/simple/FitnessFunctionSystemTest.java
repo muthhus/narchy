@@ -29,12 +29,12 @@ import org.oakgp.function.compare.*;
 import org.oakgp.function.hof.Filter;
 import org.oakgp.function.math.IntegerUtils;
 import org.oakgp.node.ConstantNode;
+import org.oakgp.node.Node;
 import org.oakgp.rank.fitness.FitnessFunction;
-import org.oakgp.util.Evolution;
+import org.oakgp.Evolution;
 
 import java.util.*;
 
-import static org.oakgp.Assignments.createAssignments;
 import static org.oakgp.TestUtils.createArguments;
 import static org.oakgp.Type.*;
 import static org.oakgp.rank.fitness.TestDataFitnessFunction.createIntegerTestDataFitnessFunction;
@@ -60,7 +60,7 @@ public class FitnessFunctionSystemTest {
         Map<Assignments, Integer> tests = new HashMap<>(count);
         for (int i = 0; i < count; i++) {
             Object[] inputs = createInputs(numVariables);
-            Assignments assignments = createAssignments(inputs);
+            Assignments assignments = new Assignments(inputs);
             tests.put(assignments, f.apply(assignments));
         }
         return tests;
@@ -146,7 +146,7 @@ public class FitnessFunctionSystemTest {
         IsZero isZero = new IsZero();
         ConstantNode[] constants = {new ConstantNode(Boolean.TRUE, booleanType()), new ConstantNode(Boolean.FALSE, booleanType()),
                 new ConstantNode(isPositive, integerToBooleanFunctionType()), new ConstantNode(isNegative, integerToBooleanFunctionType()),
-                new ConstantNode(isZero, integerToBooleanFunctionType()), new ConstantNode(Arguments.createArguments(), integerArrayType()),
+                new ConstantNode(isZero, integerToBooleanFunctionType()), new ConstantNode(new Arguments(new Node[]{}), integerArrayType()),
                 new ConstantNode(0, integerType())};
         Type[] variableTypes = {integerArrayType()};
         List<Function> functions = new ArrayList<>();
@@ -154,14 +154,14 @@ public class FitnessFunctionSystemTest {
         Collections.addAll(functions, new Function[]{new Filter(integerType()), isPositive, isNegative, isZero, new Count(integerType())});
 
         Map<Assignments, Integer> testData = new HashMap<>();
-        testData.put(createAssignments(createArguments("0", "0", "0", "0", "0", "0", "0", "0")), 8);
-        testData.put(createAssignments(createArguments("6", "3", "4", "0", "2", "4", "1", "3")), 1);
-        testData.put(createAssignments(createArguments("0", "0", "4", "0", "0", "0", "1", "0")), 6);
-        testData.put(createAssignments(createArguments("1", "-1", "2", "5", "4", "-2")), 0);
-        testData.put(createAssignments(createArguments("1", "0", "2", "5", "4", "-2")), 1);
-        testData.put(createAssignments(createArguments("1", "0", "2", "5", "4", "0")), 2);
-        testData.put(createAssignments(createArguments("-2", "0", "8", "7", "0", "-3", "0")), 3);
-        testData.put(createAssignments(createArguments("0", "0", "0")), 3);
+        testData.put(new Assignments(createArguments("0", "0", "0", "0", "0", "0", "0", "0")), 8);
+        testData.put(new Assignments(createArguments("6", "3", "4", "0", "2", "4", "1", "3")), 1);
+        testData.put(new Assignments(createArguments("0", "0", "4", "0", "0", "0", "1", "0")), 6);
+        testData.put(new Assignments(createArguments("1", "-1", "2", "5", "4", "-2")), 0);
+        testData.put(new Assignments(createArguments("1", "0", "2", "5", "4", "-2")), 1);
+        testData.put(new Assignments(createArguments("1", "0", "2", "5", "4", "0")), 2);
+        testData.put(new Assignments(createArguments("-2", "0", "8", "7", "0", "-3", "0")), 3);
+        testData.put(new Assignments(createArguments("0", "0", "0")), 3);
         FitnessFunction fitnessFunction = createIntegerTestDataFitnessFunction(testData);
 
         new Evolution().returning(integerType()).setConstants(constants).setVariables(variableTypes).setFunctions(functions)

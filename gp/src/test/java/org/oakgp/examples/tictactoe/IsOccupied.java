@@ -22,10 +22,9 @@ import org.oakgp.function.Signature;
 
 import static org.oakgp.Type.booleanType;
 import static org.oakgp.Type.type;
-import static org.oakgp.function.Signature.build;
 
 public class IsOccupied implements Function {
-    private static final Signature SIGNATURE = build(booleanType(), type("board"), type("possibleMove"), type("symbol"));
+    private static final Signature SIGNATURE = new Signature(booleanType(), type("board"), type("possibleMove"), type("symbol"));
 
     @Override
     public Object evaluate(Arguments arguments, Assignments assignments) {

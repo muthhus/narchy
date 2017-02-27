@@ -74,7 +74,7 @@ final class ArithmeticExpressionSimplifier {
      */
     static void assertEvaluateToSameResult(Node first, Node second) {
         Object[] assignedValues = {2, 14, 4, 9, 7};
-        Assignments assignments = Assignments.createAssignments(assignedValues);
+        Assignments assignments = new Assignments(assignedValues);
         Object firstResult = first.eval(assignments);
         Object secondResult = second.eval(assignments);
         if (!firstResult.equals(secondResult)) {

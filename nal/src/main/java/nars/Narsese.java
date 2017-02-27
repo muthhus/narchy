@@ -464,7 +464,7 @@ public class Narsese extends BaseParser<Object> {
         return o != null ? o : new MiniNullPointerException();
     }
 
-    @Cached
+    //@Cached
     Rule Term(boolean oper, boolean meta) {
         /*
                  <term> ::= <word>                             // an atomic constant term
@@ -988,7 +988,10 @@ public class Narsese extends BaseParser<Object> {
 
         ArrayValueStack<Object> stack = (ArrayValueStack) getContext().getValueStack();
 
-        List vectorterms = $.newArrayList(2); //stack.size() + 1);
+//        if (stack.isEmpty())
+//            return null;
+
+        List vectorterms = $.newArrayList( stack.size() );
 
         while (!stack.isEmpty()) {
             Object p = pop();
@@ -1017,7 +1020,7 @@ public class Narsese extends BaseParser<Object> {
             if (p instanceof String) {
                 //throw new RuntimeException("string not expected here");
                 //Term t = $.the((String) p);
-                vectorterms.add($.the(p));
+                vectorterms.add($.the((String)p));
             } else if (p instanceof Term) {
                 vectorterms.add(p);
             } else if (p instanceof Op) {
@@ -1046,7 +1049,7 @@ public class Narsese extends BaseParser<Object> {
     }
 
     final static Cache<Pair<Op,ImmutableList>, Term> termCache = Caffeine.newBuilder()
-            .softValues()
+            .weakValues()
             //.maximumSize(1024 * 32)
             .build();
 

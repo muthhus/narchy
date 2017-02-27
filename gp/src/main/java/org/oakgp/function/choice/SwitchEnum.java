@@ -50,7 +50,7 @@ public final class SwitchEnum implements Function {
         for (int i = 1; i < types.length; i++) {
             types[i] = returnType;
         }
-        this.signature = Signature.build(returnType, types);
+        this.signature = new Signature(returnType, types);
     }
 
     @Override
@@ -78,7 +78,7 @@ public final class SwitchEnum implements Function {
             replacementArgs[i] = replacedArg;
         }
         if (updated) {
-            return new FunctionNode(this, Arguments.createArguments(replacementArgs));
+            return new FunctionNode(this, new Arguments(replacementArgs));
         } else {
             return null;
         }

@@ -51,7 +51,7 @@ public final class If implements Function {
      * Constructs a selection operator that returns values of the specified type.
      */
     public If(Type type) {
-        signature = Signature.build(type, booleanType(), type, type);
+        signature = new Signature(type, booleanType(), type, type);
     }
 
     private static int getOutcomeArgumentIndex(Arguments arguments, Assignments assignments) {

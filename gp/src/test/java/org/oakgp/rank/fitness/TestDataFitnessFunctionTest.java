@@ -24,7 +24,6 @@ import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.BDDMockito.given;
-import static org.oakgp.Assignments.createAssignments;
 import static org.oakgp.TestUtils.mockNode;
 
 public class TestDataFitnessFunctionTest {
@@ -32,11 +31,11 @@ public class TestDataFitnessFunctionTest {
     public void testDefaultRankingFunction() {
         // test data
         Map<Assignments, Integer> testData = new HashMap<>();
-        Assignments assignments1 = createAssignments(1);
+        Assignments assignments1 = new Assignments(1);
         testData.put(assignments1, 9);
-        Assignments assignments2 = createAssignments(2);
+        Assignments assignments2 = new Assignments(2);
         testData.put(assignments2, 2);
-        Assignments assignments3 = createAssignments(3);
+        Assignments assignments3 = new Assignments(3);
         testData.put(assignments3, 7);
 
         // mock
@@ -57,11 +56,11 @@ public class TestDataFitnessFunctionTest {
     public void testSpecifiedRankingFunction() {
         // test data
         Map<Assignments, String> testData = new HashMap<>();
-        Assignments assignments1 = createAssignments(1);
+        Assignments assignments1 = new Assignments(1);
         testData.put(assignments1, "abcdef");
-        Assignments assignments2 = createAssignments(2);
+        Assignments assignments2 = new Assignments(2);
         testData.put(assignments2, "asdfgh");
-        Assignments assignments3 = createAssignments(3);
+        Assignments assignments3 = new Assignments(3);
         testData.put(assignments3, "qwerty");
 
         // mock

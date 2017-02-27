@@ -16,12 +16,12 @@
 package org.oakgp.examples.ant;
 
 import org.junit.Test;
+import org.oakgp.Arguments;
 import org.oakgp.node.FunctionNode;
 import org.oakgp.node.Node;
 import org.oakgp.node.VariableNode;
 
 import static org.junit.Assert.*;
-import static org.oakgp.Arguments.createArguments;
 import static org.oakgp.examples.ant.AntMovement.*;
 import static org.oakgp.examples.ant.BiSequence.BISEQUENCE;
 import static org.oakgp.examples.ant.TriSequence.TRISEQUENCE;
@@ -83,7 +83,7 @@ public class TriSequenceTest {
     }
 
     private Node simplify(Node first, Node second, Node third) {
-        return TRISEQUENCE.simplify(createArguments(first, second, third));
+        return TRISEQUENCE.simplify(new Arguments(new Node[]{first, second, third}));
     }
 
     private void assertAllSame(Object first, Object... rest) {

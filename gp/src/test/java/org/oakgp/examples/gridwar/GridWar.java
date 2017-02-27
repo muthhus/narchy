@@ -73,8 +73,7 @@ class GridWar implements TwoPlayerGame {
     }
 
     private static Assignments createAssignments(Player playerToMoveNext, Player opponent) {
-        return Assignments.createAssignments(playerToMoveNext.getX(), playerToMoveNext.getY(), playerToMoveNext.getPreviousMove(), opponent.getX(),
-                opponent.getY(), opponent.getPreviousMove());
+        return new Assignments(playerToMoveNext.getX(), playerToMoveNext.getY(), playerToMoveNext.getPreviousMove(), opponent.getX(), opponent.getY(), opponent.getPreviousMove());
     }
 
     private static boolean isRepeatedMove(Player currentPlayer, int nextMove) {

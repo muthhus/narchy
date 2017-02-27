@@ -21,10 +21,9 @@ import org.oakgp.function.Function;
 import org.oakgp.function.Signature;
 
 import static org.oakgp.Type.type;
-import static org.oakgp.function.Signature.build;
 
 public class GetAnyMove implements Function {
-    private static final Signature SIGNATURE = build(type("move"), type("board"));
+    private static final Signature SIGNATURE = new Signature(type("move"), type("board"));
 
     @Override
     public Object evaluate(Arguments arguments, Assignments assignments) {

@@ -18,7 +18,6 @@ package org.oakgp;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
-import static org.oakgp.Assignments.createAssignments;
 
 public class AssignmentsTest {
     @Test
@@ -26,7 +25,7 @@ public class AssignmentsTest {
         int x = 9;
         int y = 7;
         Object[] values = {x, y};
-        Assignments assignments = createAssignments(values);
+        Assignments assignments = new Assignments(values);
         assertEquals(x, assignments.get(0));
         assertEquals(y, assignments.get(1));
 
@@ -41,8 +40,8 @@ public class AssignmentsTest {
 
     @Test
     public void testEqualsAndHashCode() {
-        Assignments a1 = createAssignments("hello", true, 42);
-        Assignments a2 = createAssignments("hello", true, 42);
+        Assignments a1 = new Assignments("hello", true, 42);
+        Assignments a2 = new Assignments("hello", true, 42);
         assertEquals(a1, a1);
         assertEquals(a1.hashCode(), a2.hashCode());
         assertEquals(a1, a2);
@@ -50,24 +49,24 @@ public class AssignmentsTest {
 
     @Test
     public void testNotEquals() {
-        Assignments a = createAssignments("hello", true, 42);
+        Assignments a = new Assignments("hello", true, 42);
 
         // same arguments, different order
-        assertNotEquals(a, createAssignments(42, true, "hello"));
+        assertNotEquals(a, new Assignments(42, true, "hello"));
 
         // different arguments
-        assertNotEquals(a, createAssignments("hello", true, 43));
+        assertNotEquals(a, new Assignments("hello", true, 43));
 
         // one fewer argument
-        assertNotEquals(a, createAssignments("hello", true));
+        assertNotEquals(a, new Assignments("hello", true));
 
         // one extra argument
-        assertNotEquals(a, createAssignments("hello", true, 42, 42));
+        assertNotEquals(a, new Assignments("hello", true, 42, 42));
     }
 
     @Test
     public void testToString() {
-        Assignments assignments = createAssignments("hello", true, 42);
+        Assignments assignments = new Assignments("hello", true, 42);
         assertEquals("[hello, true, 42]", assignments.toString());
     }
 

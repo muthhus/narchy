@@ -13,8 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.oakgp;
+package org.oakgp.util;
 
+import org.oakgp.Arguments;
 import org.oakgp.node.ConstantNode;
 import org.oakgp.node.FunctionNode;
 import org.oakgp.node.Node;
@@ -22,7 +23,6 @@ import org.oakgp.node.Node;
 import java.util.HashSet;
 import java.util.Set;
 
-import static org.oakgp.Arguments.createArguments;
 import static org.oakgp.node.NodeType.isConstant;
 import static org.oakgp.node.NodeType.isFunction;
 
@@ -117,7 +117,7 @@ public final class NodeSimplifier {
         Arguments arguments;
         FunctionNode output;
         if (haveAnyArgumentsBeenSimplified) {
-            arguments = createArguments(simplifiedArgs);
+            arguments = new Arguments(simplifiedArgs);
             output = new FunctionNode(input.func(), arguments);
         } else {
             arguments = inputArgs;

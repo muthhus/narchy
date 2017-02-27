@@ -168,13 +168,12 @@ public class NodeReaderTest {
 
     @Test
     public void testEmptyArray() {
-        assertParseLiteral("[]", Arguments.createArguments());
+        assertParseLiteral("[]", new Arguments(new Node[]{}));
     }
 
     @Test
     public void testTypeArray() {
-        Arguments expected = Arguments.createArguments(new ConstantNode(9, integerType()), new ConstantNode(2, integerType()), createVariable(0),
-                new ConstantNode(7, integerType()));
+        Arguments expected = new Arguments(new Node[]{new ConstantNode(9, integerType()), new ConstantNode(2, integerType()), createVariable(0), new ConstantNode(7, integerType())});
         assertParseLiteral("[9 2 v0 7]", expected);
     }
 

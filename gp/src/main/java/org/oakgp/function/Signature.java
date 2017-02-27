@@ -32,17 +32,10 @@ public final class Signature {
     private final Type[] argumentTypes;
     private final int hashCode;
 
-    private Signature(Type returnType, Type[] userSuppliedArgumentTypes) {
+    public Signature(Type returnType, Type... userSuppliedArgumentTypes) {
         this.returnType = returnType;
         this.argumentTypes = Utils.copyOf(userSuppliedArgumentTypes);
         this.hashCode = (returnType.hashCode() * 31) * Arrays.hashCode(argumentTypes);
-    }
-
-    /**
-     * Returns a new {@code Signature} with the specified return type and argument types.
-     */
-    public static Signature build(Type returnType, Type... argumentTypes) {
-        return new Signature(returnType, argumentTypes);
     }
 
     /**
@@ -88,7 +81,7 @@ public final class Signature {
             return true;
         } else if (o instanceof Signature) {
             Signature s = (Signature) o;
-            return this.returnType == s.returnType && Type.sameTypes(this.argumentTypes, s.argumentTypes);
+            return this.returnType == s.returnType && Type.equal(this.argumentTypes, s.argumentTypes);
         } else {
             return false;
         }

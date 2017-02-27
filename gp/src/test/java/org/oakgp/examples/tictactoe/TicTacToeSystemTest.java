@@ -27,7 +27,7 @@ import org.oakgp.rank.fitness.FitnessFunction;
 import org.oakgp.rank.tournament.FirstPlayerAdvantageGame;
 import org.oakgp.rank.tournament.TwoPlayerGame;
 import org.oakgp.util.DummyNode;
-import org.oakgp.util.Evolution;
+import org.oakgp.Evolution;
 import org.oakgp.util.Utils;
 
 import static org.oakgp.Type.type;

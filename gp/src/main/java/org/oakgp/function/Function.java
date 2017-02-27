@@ -19,6 +19,7 @@ import org.oakgp.Arguments;
 import org.oakgp.Assignments;
 import org.oakgp.Type;
 import org.oakgp.node.Node;
+import org.oakgp.util.NodeSimplifier;
 
 /**
  * Represents an operation.
@@ -46,7 +47,7 @@ public interface Function {
      *
      * @param arguments the arguments to be applied to (i.e. evaluated by) this function
      * @return a simplified version of applying this function to the specified arguments, or {@code null} if unable to simplify.
-     * @see org.oakgp.NodeSimplifier
+     * @see NodeSimplifier
      */
     default Node simplify(Arguments arguments) {
         return null;

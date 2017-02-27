@@ -44,7 +44,7 @@ public final class Filter implements Function {
      * @param type the type of the elements contained in the collection
      */
     public Filter(Type type) {
-        signature = Signature.build(arrayType(type), functionType(booleanType(), type), arrayType(type));
+        signature = new Signature(arrayType(type), functionType(booleanType(), type), arrayType(type));
     }
 
     @Override
@@ -54,11 +54,12 @@ public final class Filter implements Function {
         List<Node> result = new ArrayList<>();
         for (int i = 0; i < candidates.args(); i++) {
             Node candidate = candidates.arg(i);
-            if ((Boolean) f.evaluate(Arguments.createArguments(candidate), assignments)) {
+            if ((Boolean) f.evaluate(new Arguments(new Node[]{candidate}), assignments)) {
                 result.add(candidate);
             }
         }
-        return Arguments.createArguments(result.toArray(new Node[result.size()]));
+        Node[] args = result.toArray(new Node[result.size()]);
+        return new Arguments(args);
     }
 
     @Override

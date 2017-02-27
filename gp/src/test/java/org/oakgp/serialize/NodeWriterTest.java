@@ -16,14 +16,15 @@
 package org.oakgp.serialize;
 
 import org.junit.Test;
+import org.oakgp.Arguments;
 import org.oakgp.function.classify.IsPositive;
 import org.oakgp.function.hof.Filter;
 import org.oakgp.function.math.IntegerUtils;
 import org.oakgp.node.ConstantNode;
 import org.oakgp.node.FunctionNode;
+import org.oakgp.node.Node;
 
 import static org.junit.Assert.assertEquals;
-import static org.oakgp.Arguments.createArguments;
 import static org.oakgp.TestUtils.*;
 import static org.oakgp.Type.*;
 import static org.oakgp.util.Void.VOID_CONSTANT;
@@ -96,7 +97,7 @@ public class NodeWriterTest {
 
     @Test
     public void testArguments() {
-        ConstantNode input = new ConstantNode(createArguments(integerConstant(6), integerConstant(-2), integerConstant(17)), arrayType(integerType()));
+        ConstantNode input = new ConstantNode(new Arguments(new Node[]{integerConstant(6), integerConstant(-2), integerConstant(17)}), arrayType(integerType()));
         String output = new NodeWriter().writeNode(input);
         assertEquals("[6 -2 17]", output);
     }
@@ -104,7 +105,7 @@ public class NodeWriterTest {
     @Test
     public void testFunctionAsArgument() {
         ConstantNode criteria = new ConstantNode(new IsPositive(), integerToBooleanFunctionType());
-        ConstantNode args = new ConstantNode(createArguments(integerConstant(6), integerConstant(-2), integerConstant(17)), arrayType(integerType()));
+        ConstantNode args = new ConstantNode(new Arguments(new Node[]{integerConstant(6), integerConstant(-2), integerConstant(17)}), arrayType(integerType()));
         FunctionNode input = new FunctionNode(new Filter(integerType()), criteria, args);
 
         String output = new NodeWriter().writeNode(input);
