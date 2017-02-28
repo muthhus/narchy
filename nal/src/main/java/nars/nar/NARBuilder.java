@@ -84,51 +84,51 @@ public interface NARBuilder {
                 time,
                 exe) {
 
-            @Override
-            public MatrixPremiseBuilder newPremiseBuilder() {
-                return new MatrixPremiseBuilder() {
-                    @Override
-                    public @NotNull Premise newPremise(@NotNull Termed c, @NotNull Task task, Term beliefTerm, Task belief, float pri, float qua) {
-                        return new PreferSimpleAndConfidentPremise(c, task, beliefTerm, belief, pri, qua) {
-                            @Override
-                            protected float priFactor(Compound conclusion, @Nullable Truth truth, byte punc, Task task, Task belief) {
-                                float p = super.priFactor(conclusion, truth, punc, task, belief);
-
-                                if (punc == GOAL)
-                                    return 1f;
-
-                                switch (conclusion.op()) {
-                                    case NEG:
-                                        throw new RuntimeException("shouldnt happen");
-
-                                    case INH:
-                                        if (Op.isOperation(conclusion))
-                                            p *= 1f;
-                                        else
-                                            p *= 0.8f;
-                                        break;
-
-                                    case CONJ:
-                                        if (conclusion.vars() > 0)
-                                            p*=1f;
-                                        else
-                                            p*=0.8f;
-                                        break;
-
-                                    case EQUI:
-                                    case IMPL:
-                                        p *= 1f;
-                                        break;
-                                    default:
-                                        p *= 0.8f;
-                                        break;
-                                }
-                                return p;
-                            }
-                        };
-                    }
-                };
-            }
+//            @Override
+//            public MatrixPremiseBuilder newPremiseBuilder() {
+//                return new MatrixPremiseBuilder() {
+//                    @Override
+//                    public @NotNull Premise newPremise(@NotNull Termed c, @NotNull Task task, Term beliefTerm, Task belief, float pri, float qua) {
+//                        return new PreferSimpleAndConfidentPremise(c, task, beliefTerm, belief, pri, qua) {
+//                            @Override
+//                            protected float priFactor(Compound conclusion, @Nullable Truth truth, byte punc, Task task, Task belief) {
+//                                float p = super.priFactor(conclusion, truth, punc, task, belief);
+//
+//                                if (punc == GOAL)
+//                                    return 1f;
+//
+//                                switch (conclusion.op()) {
+//                                    case NEG:
+//                                        throw new RuntimeException("shouldnt happen");
+//
+//                                    case INH:
+//                                        if (Op.isOperation(conclusion))
+//                                            p *= 1f;
+//                                        else
+//                                            p *= 0.8f;
+//                                        break;
+//
+//                                    case CONJ:
+//                                        if (conclusion.vars() > 0)
+//                                            p*=1f;
+//                                        else
+//                                            p*=0.8f;
+//                                        break;
+//
+//                                    case EQUI:
+//                                    case IMPL:
+//                                        p *= 1f;
+//                                        break;
+//                                    default:
+//                                        p *= 0.8f;
+//                                        break;
+//                                }
+//                                return p;
+//                            }
+//                        };
+//                    }
+//                };
+//            }
 
             final Compressor compressor = new Compressor(this, "_",
                     3, 7,

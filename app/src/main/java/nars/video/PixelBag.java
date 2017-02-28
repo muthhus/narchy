@@ -7,6 +7,7 @@ import nars.concept.ActionConcept;
 import nars.term.Term;
 
 import java.awt.image.BufferedImage;
+import java.awt.image.VolatileImage;
 import java.util.List;
 import java.util.Random;
 import java.util.function.Supplier;

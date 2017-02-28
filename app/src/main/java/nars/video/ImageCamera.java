@@ -55,7 +55,11 @@ public class ImageCamera implements Bitmap2D, Supplier<BufferedImage> {
     }
 
     @Override public float brightness(int xx, int yy) {
-        return out!=null ? decodeRed(out.getRGB(xx, yy)) : Float.NaN;
+        if (out!=null) {
+            int rgb = out.getRGB(xx, yy);
+            return (decodeRed(rgb) + decodeGreen(rgb) + decodeBlue(rgb)) / 3f;
+        }
+        return Float.NaN;
     }
 
 //    public void updateBuffered(EachPixelRGBf m) {
