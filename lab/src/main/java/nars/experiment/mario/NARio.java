@@ -53,8 +53,23 @@ public class NARio extends NAgents {
             senseNumberDifference($("nario(x,v)"), ()-> mario.scene instanceof LevelScene ? ((LevelScene)mario.scene).mario.x : 0);
             senseNumberDifference($("nario(y,v)"), ()-> mario.scene instanceof LevelScene ? ((LevelScene)mario.scene).mario.y : 0);
 
-            actionToggle($("nario(x,n)"), (b)->mario.scene.toggleKey(Mario.KEY_LEFT, b));
-            actionToggle($("nario(x,p)"), (b)->mario.scene.toggleKey(Mario.KEY_RIGHT, b));
+            actionTriState($("nario(x)"), i -> {
+               switch(i){
+                   case -1:
+                       mario.scene.toggleKey(Mario.KEY_LEFT, true);
+                       break;
+                   case +1:
+                       mario.scene.toggleKey(Mario.KEY_RIGHT, true);
+                       break;
+                   case 0:
+                       mario.scene.toggleKey(Mario.KEY_LEFT, false);
+                       mario.scene.toggleKey(Mario.KEY_RIGHT, false);
+                       break;
+               }
+            });
+//            actionToggle($("nario(x,n)"), (b)->mario.scene.toggleKey(Mario.KEY_LEFT, b));
+//            actionToggle($("nario(x,p)"), (b)->mario.scene.toggleKey(Mario.KEY_RIGHT, b));
+
             actionToggle($("nario(jump)"), (b)->mario.scene.toggleKey(Mario.KEY_JUMP, b));
             actionToggle($("nario(y,n)"), (b)->mario.scene.toggleKey(Mario.KEY_DOWN, b));
             actionToggle($("nario(y,p)"), (b)->mario.scene.toggleKey(Mario.KEY_UP, b));

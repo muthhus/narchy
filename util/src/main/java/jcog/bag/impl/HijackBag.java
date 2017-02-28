@@ -616,7 +616,7 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
 
     /** SUSPECT */
     public static <X> Stream<X> stream(AtomicReferenceArray<X> a) {
-        return IntStream.range(0, a.length()).mapToObj(a::get).filter(Objects::nonNull);
+        return IntStream.range(0, a.length()).mapToObj(a::get);//.filter(Objects::nonNull);
     }
 
     public static <X> List<X> list(AtomicReferenceArray<X> a) {

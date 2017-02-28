@@ -59,7 +59,7 @@ public interface NARBuilder {
 
         //exe = new InstrumentedExecutor(exe, 8);
 
-        int conceptsPerCycle = 128 * exe.concurrency();
+        int conceptsPerCycle = 256 * exe.concurrency();
 
         final int reprobes = 4;
 
@@ -67,15 +67,15 @@ public interface NARBuilder {
         DefaultConceptBuilder cb = new DefaultConceptBuilder() {
             @Override
             public <X> X withBags(Term t, BiFunction<Bag<Term, BLink<Term>>, Bag<Task, BLink<Task>>, X> f) {
-                Bag<Term, BLink<Term>> termlink = new BLinkHijackBag<>(reprobes, BudgetMerge.maxBlend, rng);
-                Bag<Task, BLink<Task>> tasklink = new BLinkHijackBag<>(reprobes, BudgetMerge.maxBlend, rng);
+                Bag<Term, BLink<Term>> termlink = new BLinkHijackBag<>(reprobes, BudgetMerge.plusBlend, rng);
+                Bag<Task, BLink<Task>> tasklink = new BLinkHijackBag<>(reprobes, BudgetMerge.plusBlend, rng);
                 return f.apply(termlink, tasklink);
             }
         };
 
 
-        Default nar = new Default(8 * 1024,
-                conceptsPerCycle, 1, 4, rng,
+        Default nar = new Default(4 * 1024,
+                conceptsPerCycle, 1, 3, rng,
 
                 new HijackTermIndex(cb, 1024 * 256, reprobes)
                 //new NullTermIndex(cb)
