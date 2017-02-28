@@ -31,7 +31,7 @@ abstract public class DefaultPremise extends Premise {
     }
 
     @Override
-    public @Nullable Budget budget(@NotNull Compound conclusion, @Nullable Truth truth, @NotNull Derivation conclude) {
+    public Budget budget(@NotNull Compound conclusion, @Nullable Truth truth, byte punc, @NotNull Derivation conclude) {
 
 
         float quaMin = conclude.quaMin;
@@ -46,12 +46,12 @@ abstract public class DefaultPremise extends Premise {
                 return null;
 
             return budget(
-                    unitize(priFactor(truth, conclusion, task, belief)),
+                    unitize(priFactor(conclusion, truth, punc, task, belief)),
                     quaFactor,
                     quaMin);
         } else {
             //question and quest
-            float priFactor = unitize(priFactor(truth, conclusion, task, belief));
+            float priFactor = unitize(priFactor(conclusion, truth, punc, task, belief));
             return budget(
                     priFactor,
                     priFactor,
@@ -62,6 +62,6 @@ abstract public class DefaultPremise extends Premise {
 
     abstract float qualityFactor(@NotNull Truth truth, @NotNull Derivation conclude);
 
-    abstract float priFactor(@Nullable Truth truth, @NotNull Compound conclusion, @NotNull Task task, @Nullable Task belief);
+    abstract float priFactor(@NotNull Compound conclusion, @Nullable Truth truth, byte punc, @NotNull Task task, @Nullable Task belief);
 
 }

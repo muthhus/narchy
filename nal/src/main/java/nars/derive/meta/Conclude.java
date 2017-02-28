@@ -129,9 +129,10 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
                             truth = truth.negated();
                     }
 
-                    Budget budget = m.premise.budget(crr, truth, m);
+                    byte punc = ct.punc;
+                    Budget budget = m.premise.budget(crr, truth, punc, m);
                     if (budget != null) {
-                        derive(m, crr, truth, budget, ct); //continue to stage 2
+                        derive(m, crr, truth, budget, punc, ct.evidence); //continue to stage 2
                     }
                 }
             } catch (@NotNull InvalidTermException | InvalidTaskException e) {
@@ -147,7 +148,7 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
     /**
      * 2nd-stage
      */
-    final void derive(@NotNull Derivation m, @NotNull Compound content, Truth truth, Budget budget, @NotNull TruthPuncEvidence ct) {
+    final void derive(@NotNull Derivation m, @NotNull Compound content, Truth truth, Budget budget, byte punc, long[] evidence) {
 
         NAR nar = m.nar;
 
@@ -247,7 +248,7 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
         if (content.volume() > nar.termVolumeMax.intValue())
             return;
 
-        DerivedTask d = derive(content, budget, nar.time(), occ, m, truth, ct);
+        DerivedTask d = derive(content, budget, nar.time(), occ, m, truth, punc, evidence);
         if (d != null)
             m.target.accept(d);
     }
@@ -257,9 +258,7 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
      * part 2
      */
     @Nullable
-    public final DerivedTask derive(@NotNull Compound c, @NotNull Budget budget, long now, long[] occ, @NotNull Derivation p, Truth truth, TruthPuncEvidence ct) {
-        byte punc = ct.punc;
-        long[] evidence = ct.evidence;
+    public final DerivedTask derive(@NotNull Compound c, @NotNull Budget budget, long now, long[] occ, @NotNull Derivation p, Truth truth, byte punc, long[] evidence) {
 
         long start, end;
         if (occ!=null) {

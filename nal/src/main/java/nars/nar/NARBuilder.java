@@ -66,15 +66,15 @@ public interface NARBuilder {
         DefaultConceptBuilder cb = new DefaultConceptBuilder() {
             @Override
             public <X> X withBags(Term t, BiFunction<Bag<Term, BLink<Term>>, Bag<Task, BLink<Task>>, X> f) {
-                Bag<Term, BLink<Term>> termlink = new BLinkHijackBag(reprobes, BudgetMerge.plusBlend, rng);
-                Bag<Task, BLink<Task>> tasklink = new BLinkHijackBag(reprobes, BudgetMerge.maxBlend, rng);
+                Bag<Term, BLink<Term>> termlink = new BLinkHijackBag<>(reprobes, BudgetMerge.maxBlend, rng);
+                Bag<Task, BLink<Task>> tasklink = new BLinkHijackBag<>(reprobes, BudgetMerge.maxBlend, rng);
                 return f.apply(termlink, tasklink);
             }
         };
 
 
-        Default nar = new Default(8 * 1024,
-                conceptsPerCycle, 1, 3, rng,
+        Default nar = new Default(4 * 1024,
+                conceptsPerCycle, 1, 4, rng,
 
                 //new HijackTermIndex(cb, 1024 * 128, reprobes)
                 //new NullTermIndex(cb)
@@ -91,9 +91,12 @@ public interface NARBuilder {
                     public @NotNull Premise newPremise(@NotNull Termed c, @NotNull Task task, Term beliefTerm, Task belief, float pri, float qua) {
                         return new PreferSimpleAndConfidentPremise(c, task, beliefTerm, belief, pri, qua) {
                             @Override
-                            protected float priFactor(@Nullable Truth truth, Compound conclusion, Task task, Task belief) {
-                                float p = super.priFactor(truth, conclusion, task, belief);
-                                //op equalzi
+                            protected float priFactor(Compound conclusion, @Nullable Truth truth, byte punc, Task task, Task belief) {
+                                float p = super.priFactor(conclusion, truth, punc, task, belief);
+
+                                if (punc == GOAL)
+                                    return 1f;
+
                                 switch (conclusion.op()) {
                                     case NEG:
                                         throw new RuntimeException("shouldnt happen");
@@ -102,13 +105,14 @@ public interface NARBuilder {
                                         if (Op.isOperation(conclusion))
                                             p *= 1f;
                                         else
-                                            p *= 0.5f;
+                                            p *= 0.8f;
+                                        break;
 
                                     case CONJ:
                                         if (conclusion.vars() > 0)
                                             p*=1f;
                                         else
-                                            p*=0.75f;
+                                            p*=0.8f;
                                         break;
 
                                     case EQUI:
@@ -116,7 +120,7 @@ public interface NARBuilder {
                                         p *= 1f;
                                         break;
                                     default:
-                                        p *= 0.5f;
+                                        p *= 0.8f;
                                         break;
                                 }
                                 return p;
@@ -135,12 +139,12 @@ public interface NARBuilder {
                 if (!t.isInput()) {
                     return compressor.encode(t);
                 } else {
-                    @NotNull Task encoded = compressor.encode(t);
-                    if (!encoded.equals(t))
-                        process(encoded); //input both forms
-                    return t;
+                    //@NotNull Task encoded = compressor.encode(t);
+//                    if (!encoded.equals(t))
+//                        process(t); //input both forms
+                    //return encoded;
 
-                    //return t; //dont affect input
+                    return t; //dont affect input
                 }
             }
 
@@ -165,18 +169,18 @@ public interface NARBuilder {
 
         };
 
-        nar.beliefConfidence(0.9f);
-        nar.goalConfidence(0.9f);
+        nar.beliefConfidence(0.8f);
+        nar.goalConfidence(0.8f);
         //nar.derivedEvidenceGain.setValue(0.75f);
 
         float p = 0.75f;
         nar.DEFAULT_BELIEF_PRIORITY = 0.5f * p;
-        nar.DEFAULT_GOAL_PRIORITY = 0.8f * p;
+        nar.DEFAULT_GOAL_PRIORITY = 0.6f * p;
         nar.DEFAULT_QUESTION_PRIORITY = 0.4f * p;
         nar.DEFAULT_QUEST_PRIORITY = 0.4f * p;
 
         nar.confMin.setValue(0.01f);
-        nar.truthResolution.setValue(0.01f);
+        nar.truthResolution.setValue(0.02f);
 
 
         //NARTune tune = new NARTune(nar);

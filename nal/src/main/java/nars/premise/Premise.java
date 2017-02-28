@@ -179,5 +179,5 @@ public abstract class Premise extends RawBudget implements Tasked {
         return result;
     }
 
-    @Nullable abstract public Budget budget(@NotNull Compound conclusion, @Nullable Truth truth, @NotNull Derivation conclude);
+    abstract public Budget budget(@NotNull Compound conclusion, @Nullable Truth truth, byte punc, @NotNull Derivation conclude);
 }
