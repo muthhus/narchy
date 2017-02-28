@@ -40,7 +40,9 @@ public class Tetris extends NAgents {
     public static final int tetris_width = 6;
     public static final int tetris_height = 12;
     public static final int TIME_PER_FALL = 4;
-    public static final int PIXEL_RADIX = 3;
+    public static final int PIXEL_RADIX = 2;
+    private static final int COMPUTE_CYCLES = 32;
+    static final int DUR = 1;
 
     private static SensorConcept[][] concept;
     //private int afterlife = TIME_PER_FALL * tetris_height * tetris_width;
@@ -111,9 +113,10 @@ public class Tetris extends NAgents {
          * @param width
          * @param height
          * @param timePerFall larger is slower gravity
+         * @param computeCycles
          */
-        public Tetris(NAR nar, int width, int height, int timePerFall) throws Narsese.NarseseException {
-            super("tetris", nar);
+        public Tetris(NAR nar, int width, int height, int timePerFall, int computeCycles) throws Narsese.NarseseException {
+            super("tetris", nar, computeCycles);
 
             state = new TetrisState(width, height, timePerFall) {
                 @Override
@@ -456,9 +459,9 @@ public class Tetris extends NAgents {
             //Param.DEBUG = true;
             //Param.HORIZON = 1/100f;
 
-            FrameTime clock = new FrameTime().dur(TIME_PER_FALL/2);
+            FrameTime clock = new FrameTime().dur( DUR );
             NAR nar =
-                    NARBuilder.newMultiThreadNAR(3, clock);
+                    NARBuilder.newMultiThreadNAR(4, clock);
                     //NARBuilder.newALANN(clock, 4, 64, 5, 4, 1);
 
             //nar.derivedEvidenceGain.setValue(2f);
@@ -674,7 +677,7 @@ public class Tetris extends NAgents {
     public static class MyTetris extends Tetris {
 
         public MyTetris(NAR nar) throws Narsese.NarseseException {
-            super(nar, Tetris.tetris_width, Tetris.tetris_height, Tetris.TIME_PER_FALL);
+            super(nar, Tetris.tetris_width, Tetris.tetris_height, Tetris.TIME_PER_FALL, Tetris.COMPUTE_CYCLES);
         }
 
         @Override

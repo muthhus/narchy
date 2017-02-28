@@ -6,8 +6,10 @@ import nars.Param;
 import nars.Task;
 import nars.budget.RawBudget;
 import nars.term.Compound;
+import nars.term.Term;
 import nars.truth.Truth;
 import nars.truth.TruthDelta;
+import nars.util.task.InvalidTaskException;
 import org.apache.commons.collections4.map.Flat3Map;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -18,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 
 import static nars.Op.NEG;
+import static nars.term.Terms.compoundOrNull;
 import static nars.time.Tense.ETERNAL;
 
 /**
@@ -37,7 +40,10 @@ public class ImmutableTask extends RawBudget implements Task {
     public ImmutableTask(Compound term, byte punc, Truth truth, long creation, long start, long end, long[] evidence) {
 
         if (term.op()==NEG) {
-            term = (Compound) term.unneg();
+            Compound term2 = compoundOrNull(term.unneg());
+            if (term2 == null)
+                throw new InvalidTaskException(term, "became non-compound on un-negation");
+            term = term2;
             if (truth!=null)
                 truth = truth.negated();
         }

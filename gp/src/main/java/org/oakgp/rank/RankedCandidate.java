@@ -42,6 +42,8 @@ public final class RankedCandidate implements Comparable<RankedCandidate> {
 
     @Override
     public boolean equals(Object o) {
+        if (this == o) return true;
+
         if (o instanceof RankedCandidate) {
             RankedCandidate r = (RankedCandidate) o;
             return this.node.equals(r.node) && this.fitness == r.fitness;
@@ -57,6 +59,8 @@ public final class RankedCandidate implements Comparable<RankedCandidate> {
 
     @Override
     public int compareTo(RankedCandidate o) {
+        if (this == o) return 0;
+
         int result = Double.compare(fitness, o.fitness);
         if (result == 0) {
             // when two candidates have identical fitness values, compare them by node count - favouring shorter solutions

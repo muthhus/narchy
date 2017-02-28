@@ -14,6 +14,7 @@ import nars.budget.BudgetMerge;
 import nars.concept.Concept;
 import nars.derive.Deriver;
 import nars.premise.MatrixPremiseBuilder;
+import nars.premise.PremiseBuilder;
 import nars.task.DerivedTask;
 import nars.term.Termed;
 import org.jetbrains.annotations.NotNull;
@@ -33,7 +34,7 @@ public class ConceptBagControl implements Control, Consumer<DerivedTask> {
 
     final Deriver deriver;
 
-    final MatrixPremiseBuilder premiser = new MatrixPremiseBuilder();
+    final MatrixPremiseBuilder premiser;
 
 //    /** this will be scaled by the input priority factor for each concept */
 //    public static final ROBudget insertionBudget = new ROBudget(1f, 0.5f);
@@ -82,10 +83,11 @@ public class ConceptBagControl implements Control, Consumer<DerivedTask> {
 
 
 
-    public ConceptBagControl(@NotNull NAR nar, @NotNull Deriver deriver, @NotNull Bag<Concept,PLink<Concept>> conceptBag) {
+    public ConceptBagControl(@NotNull NAR nar, @NotNull Deriver deriver, @NotNull Bag<Concept, PLink<Concept>> conceptBag, MatrixPremiseBuilder premiseBuilder) {
 
         this.nar = nar;
 
+        this.premiser = premiseBuilder;
         this.pending = new TaskHijackBag(5, BudgetMerge.maxBlend, nar.random);
 
         this.deriver = deriver;

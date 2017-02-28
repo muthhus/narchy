@@ -29,6 +29,7 @@ import static java.lang.Boolean.TRUE;
 import static java.util.Collections.unmodifiableList;
 import static java.util.stream.Collectors.groupingBy;
 import static org.oakgp.Type.booleanType;
+import static org.oakgp.Type.doubleType;
 import static org.oakgp.Type.integerType;
 
 /**
@@ -71,6 +72,13 @@ public enum Utils { ;
         ConstantNode[] constants = new ConstantNode[maxInclusive - minInclusive + 1];
         for (int n = minInclusive, i = 0; n <= maxInclusive; i++, n++) {
             constants[i] = new ConstantNode(n, integerType());
+        }
+        return constants;
+    }
+    public static ConstantNode[] createDoubleConstants(int minInclusive, int maxInclusive) {
+        ConstantNode[] constants = new ConstantNode[maxInclusive - minInclusive + 1];
+        for (int n = minInclusive, i = 0; n <= maxInclusive; i++, n++) {
+            constants[i] = new ConstantNode((double)n, doubleType());
         }
         return constants;
     }

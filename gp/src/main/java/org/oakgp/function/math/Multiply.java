@@ -83,6 +83,9 @@ final class Multiply extends ArithmeticOperator {
                         return new FunctionNode(f, numberUtils.multiply(arg1, fnArg1), new FunctionNode(this, arg1, fnArg2));
                     } else if (numberUtils.isMultiply(f)) {
                         return new FunctionNode(this, numberUtils.multiply(arg1, fnArg1), fnArg2);
+                    } else if (numberUtils.isDivide(f)) {
+                        //TODO?
+                        return null;
                     } else {
                         throw new IllegalArgumentException();
                     }

@@ -15,6 +15,7 @@
  */
 package org.oakgp.rank.fitness;
 
+import com.github.benmanes.caffeine.cache.Cache;
 import org.oakgp.node.Node;
 import org.oakgp.util.CacheMap;
 
@@ -25,7 +26,7 @@ import java.util.Map;
  */
 public final class FitnessFunctionCache implements FitnessFunction {
     private final FitnessFunction fitnessFunction;
-    private final Map<Node, Double> cache;
+    private final Cache<Node, Double> cache;
 
     /**
      * Creates a cache of the given maximum size which will contain the results of evaluating the given {@code FitnessFunction}.
@@ -37,7 +38,6 @@ public final class FitnessFunctionCache implements FitnessFunction {
 
     @Override
     public double evaluate(Node n) {
-        Double result = cache.computeIfAbsent(n, fitnessFunction::evaluate);
-        return result;
+        return cache.get(n, fitnessFunction::evaluate);
     }
 }

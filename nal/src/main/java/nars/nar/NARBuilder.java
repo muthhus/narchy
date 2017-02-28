@@ -4,6 +4,7 @@ import jcog.bag.Bag;
 import jcog.data.random.XorShift128PlusRandom;
 import jcog.learn.lstm.SimpleLSTM;
 import nars.NAR;
+import nars.Op;
 import nars.Param;
 import nars.Task;
 import nars.bag.impl.BLinkHijackBag;
@@ -12,15 +13,24 @@ import nars.budget.BudgetMerge;
 import nars.conceptualize.DefaultConceptBuilder;
 import nars.index.term.TermIndex;
 import nars.index.term.map.CaffeineIndex;
+import nars.op.Operator;
 import nars.op.mental.Compressor;
 import nars.op.mental.Inperience;
 import nars.op.stm.MySTMClustered;
+import nars.premise.MatrixPremiseBuilder;
+import nars.premise.PreferSimpleAndConfidentPremise;
+import nars.premise.Premise;
+import nars.term.Compound;
 import nars.term.Term;
+import nars.term.Termed;
+import nars.term.Terms;
 import nars.time.Time;
+import nars.truth.Truth;
 import nars.util.exe.Executioner;
 import nars.util.exe.MultiThreadExecutor;
 import org.apache.commons.math3.util.MathArrays;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Random;
 import java.util.function.BiFunction;
@@ -28,6 +38,7 @@ import java.util.function.BiFunction;
 import static jcog.Texts.n2;
 import static jcog.Texts.n4;
 import static nars.Op.BELIEF;
+import static nars.Op.CONJ;
 import static nars.Op.GOAL;
 
 /**
@@ -73,6 +84,48 @@ public interface NARBuilder {
                 time,
                 exe) {
 
+            @Override
+            public MatrixPremiseBuilder newPremiseBuilder() {
+                return new MatrixPremiseBuilder() {
+                    @Override
+                    public @NotNull Premise newPremise(@NotNull Termed c, @NotNull Task task, Term beliefTerm, Task belief, float pri, float qua) {
+                        return new PreferSimpleAndConfidentPremise(c, task, beliefTerm, belief, pri, qua) {
+                            @Override
+                            protected float priFactor(@Nullable Truth truth, Compound conclusion, Task task, Task belief) {
+                                float p = super.priFactor(truth, conclusion, task, belief);
+                                //op equalzi
+                                switch (conclusion.op()) {
+                                    case NEG:
+                                        throw new RuntimeException("shouldnt happen");
+
+                                    case INH:
+                                        if (Op.isOperation(conclusion))
+                                            p *= 1f;
+                                        else
+                                            p *= 0.5f;
+
+                                    case CONJ:
+                                        if (conclusion.vars() > 0)
+                                            p*=1f;
+                                        else
+                                            p*=0.75f;
+                                        break;
+
+                                    case EQUI:
+                                    case IMPL:
+                                        p *= 1f;
+                                        break;
+                                    default:
+                                        p *= 0.5f;
+                                        break;
+                                }
+                                return p;
+                            }
+                        };
+                    }
+                };
+            }
+
             final Compressor compressor = new Compressor(this, "_",
                     3, 7,
                     3f, 16, 256);
@@ -114,6 +167,7 @@ public interface NARBuilder {
 
         nar.beliefConfidence(0.9f);
         nar.goalConfidence(0.9f);
+        //nar.derivedEvidenceGain.setValue(0.75f);
 
         float p = 0.75f;
         nar.DEFAULT_BELIEF_PRIORITY = 0.5f * p;
@@ -121,8 +175,9 @@ public interface NARBuilder {
         nar.DEFAULT_QUESTION_PRIORITY = 0.4f * p;
         nar.DEFAULT_QUEST_PRIORITY = 0.4f * p;
 
-        nar.confMin.setValue(0.02f);
-        //nar.truthResolution.setValue(0.01f);
+        nar.confMin.setValue(0.01f);
+        nar.truthResolution.setValue(0.01f);
+
 
         //NARTune tune = new NARTune(nar);
 

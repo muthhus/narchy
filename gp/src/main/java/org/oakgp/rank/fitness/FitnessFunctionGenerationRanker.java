@@ -78,9 +78,7 @@ abstract public class FitnessFunctionGenerationRanker implements GenerationRanke
 
         @Override
         public RankedCandidates rank(Collection<Node> input) {
-            return new RankedCandidates( input.parallelStream().map(n ->
-                rankCandidate(n)
-            ).toArray(RankedCandidate[]::new));
+            return new RankedCandidates( input.parallelStream().map(this::rankCandidate).toArray(RankedCandidate[]::new));
         }
     }
 

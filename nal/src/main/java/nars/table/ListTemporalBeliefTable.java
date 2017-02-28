@@ -152,7 +152,7 @@ public class ListTemporalBeliefTable extends MultiRWFasterList<Task> implements 
             long now = time.time();
             float dur = time.dur();
 
-            before = truth(now, dur, eternal);
+            before = truth(now, dur, eternal, l);
 
             Task next;
 
@@ -166,7 +166,7 @@ public class ListTemporalBeliefTable extends MultiRWFasterList<Task> implements 
                     l.add(next);
                 }
 
-                final Truth after = truth(now, dur, eternal);
+                final Truth after = truth(now, dur, eternal, l);
                 delta[0] = new TruthDelta(before, after);
 
                 feedback(l, input);
@@ -508,13 +508,17 @@ public class ListTemporalBeliefTable extends MultiRWFasterList<Task> implements 
     @Override
     public final Truth truth(long when, long now, float dur, @Nullable EternalTable eternal) {
 
-        Task topEternal = eternal != null ? eternal.match() : null;
-
         Truth r = ifNotEmptyReadWith(l -> {
-            return TruthPolation.truth(topEternal, when, dur, l);
+            return truth(when, dur, eternal, l);
         });
 
-        return (r == null && topEternal != null) ? topEternal.truth() : r;
+        return r;
+        //return Truth.maxConf(r, topEternal);
+        //return (r == null && topEternal != null) ? topEternal.truth() : r;
+    }
+
+    @Nullable Truth truth(long when, float dur, @Nullable EternalTable eternal, MutableList<Task> l) {
+        return TruthPolation.truth(eternal != null ? eternal.match() : null, when, dur, l);
     }
 
     static final boolean clean(MutableList<Task> l) {

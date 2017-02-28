@@ -357,7 +357,6 @@ public class CompoundConcept<T extends Compound> implements Concept, Termlike {
     @Override
     public final Activation process(@NotNull Task input, @NotNull NAR nar) {
 
-
         boolean accepted = false;
 
         TruthDelta delta = null;
@@ -417,20 +416,21 @@ public class CompoundConcept<T extends Compound> implements Concept, Termlike {
      */
     protected static void feedback(@NotNull Task input, @NotNull TruthDelta delta, @NotNull CompoundConcept concept, @NotNull NAR nar) {
 
-
         //update emotion happy/sad
         Truth before = delta.before;
         Truth after = delta.after;
 
         float deltaSatisfaction, deltaConf;
 
+
         if (before != null && after != null) {
 
+            float thisConf = after.conf();
             float deltaFreq = after.freq() - before.conf();
-            deltaConf = after.conf() - before.conf();
+            deltaConf = thisConf - before.conf();
 
             Truth other;
-            float polarity = 0;
+            int polarity = 0;
 
             Time time = nar.time;
             float dur = time.dur();
@@ -439,12 +439,12 @@ public class CompoundConcept<T extends Compound> implements Concept, Termlike {
                 //compare against the current goal state
                 other = concept.goals().truth(now, dur);
                 if (other != null)
-                    polarity = +1f;
+                    polarity = +1;
             } else if (input.isGoal()) {
                 //compare against the current belief state
                 other = concept.beliefs().truth(now, dur);
                 if (other != null)
-                    polarity = -1f;
+                    polarity = -1;
             } else {
                 other = null;
             }
@@ -452,22 +452,26 @@ public class CompoundConcept<T extends Compound> implements Concept, Termlike {
 
             if (other != null) {
 
-                float f = other.freq();
+                float otherFreq = other.freq();
 
-                if (Util.equals(f, 0.5f, TRUTH_EPSILON)) {
+                if (polarity==0 || Util.equals(otherFreq, 0.5f, TRUTH_EPSILON)) {
 
                     //ambivalence: no change
                     deltaSatisfaction = 0;
 
-                } else if (f > 0.5f) {
-                    //measure how much the freq increased since goal is positive
-                    deltaSatisfaction = +polarity * deltaFreq / (2f * (other.freq() - 0.5f));
                 } else {
-                    //measure how much the freq decreased since goal is negative
-                    deltaSatisfaction = -polarity * deltaFreq / (2f * (0.5f - other.freq()));
+
+                    if (otherFreq > 0.5f) {
+                        //measure how much the freq increased since goal is positive
+                        deltaSatisfaction = +polarity * deltaFreq / (2f * (otherFreq - 0.5f));
+                    } else {
+                        //measure how much the freq decreased since goal is negative
+                        deltaSatisfaction = -polarity * deltaFreq / (2f * (0.5f - otherFreq));
+                    }
+
+                    nar.emotion.happy(deltaSatisfaction * (thisConf * other.conf()));
                 }
 
-                nar.emotion.happy(deltaSatisfaction, input.term());
 
             } else {
                 deltaSatisfaction = 0;

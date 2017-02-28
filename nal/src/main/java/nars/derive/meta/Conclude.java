@@ -1,6 +1,7 @@
 package nars.derive.meta;
 
 import com.google.common.base.Joiner;
+import nars.$;
 import nars.NAR;
 import nars.Op;
 import nars.Param;
@@ -118,6 +119,16 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
 
                     TruthPuncEvidence ct = m.punct.get();
                     Truth truth = ct.truth;
+
+                    if (crr.op()==NEG) {
+                        crr = compoundOrNull(crr.unneg());
+                        if (crr == null)
+                            return true;
+
+                        if (truth!=null)
+                            truth = truth.negated();
+                    }
+
                     Budget budget = m.premise.budget(crr, truth, m);
                     if (budget != null) {
                         derive(m, crr, truth, budget, ct); //continue to stage 2

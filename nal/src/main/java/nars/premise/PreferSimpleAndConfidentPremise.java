@@ -27,7 +27,7 @@ public class PreferSimpleAndConfidentPremise extends DefaultPremise {
      * @return a value between 0 and 1 that priority will be scaled by
      */
     @Override
-    float priFactor(@Nullable Truth truth, Compound conclusion, Task task, Task belief) {
+    protected float priFactor(@Nullable Truth truth, Compound conclusion, Task task, Task belief) {
 
         int parentComplexity;
         int taskCompl = task.complexity();

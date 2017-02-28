@@ -170,11 +170,13 @@ public final class Emotion implements Serializable {
 
     //TODO use Meter subclass that will accept and transform these float parameters
 
-    @Deprecated public void happy(float delta, @NotNull Term concept) {
+    @Deprecated public void happy(float delta) {
 
-        float factor = 1f / concept.complexity(); //adjust by the complexity of the concept's term
+//        float factor = 1f / concept.complexity(); //adjust by the complexity of the concept's term
+//
+//        delta *= factor;
 
-        delta *= factor;
+        //System.out.println(delta + " " + concept);
 
         if (delta > 0)
             happy.accept( delta );
@@ -213,10 +215,10 @@ public final class Emotion implements Serializable {
         errrVol.accept(vol);
     }
 
-    public double happysad() {
-
-        return happy.getSum() + sad.getSum();
-    }
+//    public double happysad() {
+//
+//        return happy.getSum() + sad.getSum();
+//    }
 
     public String summary() {
         //long now = nar.time();

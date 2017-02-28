@@ -15,6 +15,7 @@
  */
 package org.oakgp.rank.tournament;
 
+import com.github.benmanes.caffeine.cache.Cache;
 import org.oakgp.node.Node;
 import org.oakgp.util.CacheMap;
 
@@ -25,7 +26,7 @@ import java.util.Map;
  */
 public final class TwoPlayerGameCache implements TwoPlayerGame {
     private final TwoPlayerGame twoPlayerGame;
-    private final Map<NodePair, Double> cache;
+    private final Cache<NodePair, Double> cache;
 
     /**
      * Creates a cache of the given maximum size which will contain the results of evaluating the given {@code TwoPlayerGame}.
@@ -38,7 +39,7 @@ public final class TwoPlayerGameCache implements TwoPlayerGame {
     @Override
     public double evaluate(Node player1, Node player2) {
         NodePair pair = new NodePair(player1, player2);
-        Double result = cache.get(pair);
+        Double result = cache.getIfPresent(pair);
         if (result == null) {
             result = twoPlayerGame.evaluate(player1, player2);
             cache.put(new NodePair(player2, player1), -result);

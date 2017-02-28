@@ -291,13 +291,16 @@ public class Line1DContinuous extends NAgent {
 
         static double eval(NAR nar) {
 
-            Line1DContinuous l = new Line1DContinuous(nar, 6,
+            Line1DContinuous l = new Line1DContinuous(nar, 3,
                     //sine(50)
                     random(8)
             );
 
             l.print = false;
-            l.run(500);
+            l.run(200);
+
+            l.stop();
+
 
             float score = l.rewardSum() / nar.time();
             //System.out.println("AVG SCORE=" + score);
@@ -315,10 +318,10 @@ public class Line1DContinuous extends NAgent {
 
             Default nar = new Default(1024,
                     8, 1, 3, rng,
-                    new CaffeineIndex(new DefaultConceptBuilder(), 1024*16, false, exe),
+                    new CaffeineIndex(new DefaultConceptBuilder(), 1024*4, false, exe),
                     new FrameTime(1f), exe
             );
-            nar.termVolumeMax.set(32);
+            nar.termVolumeMax.set(22);
 
             int cpf = 8;
 
@@ -326,13 +329,13 @@ public class Line1DContinuous extends NAgent {
                 Assignments x = new Assignments(
                         nar.emotion.busyPri.getSum(), (double)nar.emotion.learning(),
                         (double)nar.emotion.happy(), (double)nar.emotion.sad()
-                        );
+                );
                 Arguments y = f.eval(x);
 
                 double y0 = y.arg(0).eval(x);
                 double y1 = y.arg(1).eval(x);
 
-                int tpf = Math.round( Util.clamp((float)y0, 0f, 4) * cpf);
+                int tpf = Math.round( Util.clamp((float)y0, 0f, 128));
                 int termLinks = Util.clampI((float)y1, 0, 4);
                 int taskLinks = 1;
                 //System.out.println(y + " " + tpf + " " + termLinks);
@@ -349,7 +352,7 @@ public class Line1DContinuous extends NAgent {
             nar.goalConfidence(0.9f);
 
             double score = eval(nar);
-            System.out.println(Thread.currentThread() + " " + f + " = " + score);
+            System.out.println(/*Thread.currentThread() + " " */ f + " = " + score);
             return -score; //minimizes
         }
 
@@ -357,7 +360,7 @@ public class Line1DContinuous extends NAgent {
 
             new Evolution().returning(Type.arrayType(Type.doubleType()))// Type.doubleType())
                     .setRandom(new XorShift128PlusRandom(1))
-                    .setConstants(Utils.createIntegerConstants(1, 5))
+                    .setConstants(Utils.createDoubleConstants(1, 3))
                     .setVariables(Type.doubleType(), Type.doubleType(), Type.doubleType(), Type.doubleType())
                     .setFunctions(
                             DoubleUtils.the.add,
@@ -367,9 +370,9 @@ public class Line1DContinuous extends NAgent {
                             new PairDouble()
                     )
                     .setFitness(Evolve::eval, true) // the fitness function will compare candidates against a data set which maps inputs to their expected outputs
-                    .setInitialPopulationSize(6).setTreeDepth(5)
+                    .setInitialPopulationSize(16).setTreeDepth(6)
                     .setTargetFitness(-1.0)
-                    .setMaxGenerations(16)
+                    .setMaxGenerations(64)
                     .get();
 
 

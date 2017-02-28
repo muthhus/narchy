@@ -15,6 +15,9 @@
  */
 package org.oakgp.util;
 
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
+
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -27,19 +30,19 @@ import java.util.Map;
  * @param <K> the type of keys maintained by this map
  * @param <V> the type of mapped values
  */
-public final class CacheMap<K, V> extends LinkedHashMap<K, V> {
-    private static final long serialVersionUID = 1L;
-
-    private final int maxSize;
-
-    /**
-     * @param maxSize the maximum size restriction to enforce on the returned map
-     * @see #createCache(int)
-     */
-    private CacheMap(int maxSize) {
-        super(maxSize, 0.1f, true);
-        this.maxSize = maxSize;
-    }
+public final class CacheMap<K, V>  {
+//    private static final long serialVersionUID = 1L;
+//
+//    private final int maxSize;
+//
+//    /**
+//     * @param maxSize the maximum size restriction to enforce on the returned map
+//     * @see #createCache(int)
+//     */
+//    private CacheMap(int maxSize) {
+//        super(maxSize, 0.1f, true);
+//        this.maxSize = maxSize;
+//    }
 
     /**
      * Returns a size-limited map of keys to values.
@@ -49,13 +52,15 @@ public final class CacheMap<K, V> extends LinkedHashMap<K, V> {
      * @param <V>     the type of mapped values
      * @return a size-limited map of keys to values
      */
-    public static <K, V> Map<K, V> createCache(int maxSize) {
-        CacheMap<K, V> m = new CacheMap<>(maxSize);
-        return Collections.synchronizedMap(m);
+    public static <K, V> Cache<K, V> createCache(int maxSize) {
+//        CacheMap<K, V> m = new CacheMap<>(maxSize);
+//        return Collections.synchronizedMap(m);
+
+        return Caffeine.newBuilder().maximumSize(maxSize).build();
     }
 
-    @Override
-    protected boolean removeEldestEntry(Map.Entry<K, V> eldest) {
-        return size() > maxSize;
-    }
+//    @Override
+//    protected boolean removeEldestEntry(Map.Entry<K, V> eldest) {
+//        return size() > maxSize;
+//    }
 }

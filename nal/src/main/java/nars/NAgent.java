@@ -80,6 +80,10 @@ abstract public class NAgent implements NSense, NAction {
     float curiosityFreqMin = 0.5f;
     float curiosityFreqMax = 1.5f;
 
+    public void stop() {
+        nar.stop();
+    }
+
     class CuriosityPhasor {
         public float freq, phase;
         public CuriosityPhasor() {
@@ -624,9 +628,10 @@ abstract public class NAgent implements NSense, NAction {
                     Task y = boost(x, pri, dur, lookAhead);
                     if (x!=y) {
                         predictors.set(i, y); //predictor changed or needs re-input
-                        return y;
+                        //return y;
                     }
-                    return null; //dont re-input this predictor
+                    return y;
+                    //return null; //dont re-input this predictor
                 })
             );
         }

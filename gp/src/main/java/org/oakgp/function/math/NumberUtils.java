@@ -308,10 +308,11 @@ abstract class NumberUtils<T extends Comparable<T>> {
         return f == multiply;
     }
 
+
     /**
      * Returns {@code true} if the given {@code Function} is the same as returned from {@link #getDivide()}.
      */
-    private boolean isDivide(Function f) {
+    public boolean isDivide(Function f) {
         return f == divide;
     }
 

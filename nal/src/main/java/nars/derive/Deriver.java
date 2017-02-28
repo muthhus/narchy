@@ -1,6 +1,7 @@
 package nars.derive;
 
 import com.github.benmanes.caffeine.cache.AsyncLoadingCache;
+import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.google.common.collect.Lists;
 import nars.derive.rule.PremiseRuleSet;
@@ -11,6 +12,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 /**
  * Implements a strategy for managing submitted derivation processes
@@ -28,21 +30,22 @@ public interface Deriver extends Consumer<Derivation> {
 
     Logger logger = LoggerFactory.getLogger(Deriver.class);
 
-    AsyncLoadingCache<String, Deriver> derivers = Caffeine.newBuilder().buildAsync((s) -> {
+    Cache<String, Deriver> derivers = Caffeine.newBuilder().build();
+    final static Function<String,Deriver> loader = (s) -> {
         try {
             return new TrieDeriver(PremiseRuleSet.rules(s));
         } catch (IOException ignored) {
             return (Deriver) null;
         }
-    });
+    };
 
     @NotNull
     static Deriver get(String path) {
-        return derivers.synchronous().get(path);
+        return derivers.get(path, loader);
     }
     @NotNull
     static Deriver[] get(String... paths) {
-        return Lists.newArrayList(paths).parallelStream().map(path -> derivers.synchronous().get(path)).toArray(Deriver[]::new);
+        return Lists.newArrayList(paths).stream().map(path -> derivers.get(path,loader)).toArray(Deriver[]::new);
     }
 
 
