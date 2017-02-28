@@ -1,7 +1,10 @@
 package nars;
 
 import jcog.Util;
+import jcog.math.FirstOrderDifferenceFloat;
+import jcog.math.FloatPolarNormalized;
 import jcog.math.FloatSupplier;
+import jcog.meter.func.FirstOrderDifference;
 import nars.concept.FuzzyScalarConcepts;
 import nars.concept.SensorConcept;
 import nars.term.Compound;
@@ -167,10 +170,16 @@ public interface NSense {
     }
 
 
+    default SensorConcept senseNumberDifference(Compound id, FloatSupplier v) {
+        return senseNumber(id, new FloatPolarNormalized( new FirstOrderDifferenceFloat(()->nar().time(), v)) );
+    }
+
     default SensorConcept senseNumber(Compound id, FloatSupplier v) {
-        return new SensorConcept(id, nar(), v,
+        SensorConcept c = new SensorConcept(id, nar(), v,
                 (x) -> t(x, nar().confidenceDefault(Op.BELIEF))
         );
+        sensors().add(c);
+        return c;
     }
 
     @NotNull

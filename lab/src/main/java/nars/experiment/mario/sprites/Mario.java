@@ -14,6 +14,10 @@ public class Mario extends Sprite
     public static int coins = 0;
     public static int lives = 3;
     public static String levelString = "none";
+    private int kill_reward_coins = 4;
+    private static int medical_bill = 2;
+    private int retirement_benefit = 8;
+    private int burial_cost = 4;
 
     public static void resetStatic()
     {
@@ -521,9 +525,11 @@ public class Mario extends Sprite
         return blocking;
     }
 
-    public void stomp(Enemy enemy)
-    {
+    public void stomp(Enemy enemy)     {
+        coins += kill_reward_coins;
+
         if (deathTime > 0 || world.paused) return;
+
 
         float targetY = enemy.y - enemy.height / 2;
         move(0, targetY - y);
@@ -563,8 +569,12 @@ public class Mario extends Sprite
         }
     }
 
-    public void getHurt()
-    {
+    public void getHurt()     {
+
+        coins -= medical_bill;
+        //if (coins < 0) coins = 0;
+
+
         if (deathTime > 0 || world.paused) return;
         if (invulnerableTime > 0) return;
 
@@ -589,8 +599,9 @@ public class Mario extends Sprite
         }
     }
 
-    private void win()
-    {
+    private void win()     {
+        coins += retirement_benefit;
+
         xDeathPos = (int) x;
         yDeathPos = (int) y;
         world.paused = true;
@@ -599,8 +610,9 @@ public class Mario extends Sprite
         //world.sound.play(Art.samples[Art.SAMPLE_LEVEL_EXIT], this, 1, 1, 1);
     }
 
-    public void die()
-    {
+    public void die()     {
+        coins -= burial_cost;
+
         xDeathPos = (int) x;
         yDeathPos = (int) y;
         world.paused = true;
@@ -610,8 +622,7 @@ public class Mario extends Sprite
     }
 
 
-    public void getFlower()
-    {
+    public void getFlower()     {
         if (deathTime > 0 || world.paused) return;
 
         if (!fire)
@@ -664,6 +675,8 @@ public class Mario extends Sprite
 
     public void stomp(BulletBill bill)
     {
+        coins += kill_reward_coins;
+
         if (deathTime > 0 || world.paused) return;
 
         float targetY = bill.y - bill.height / 2;
@@ -699,6 +712,8 @@ public class Mario extends Sprite
 
     public static void get1Up()
     {
+        coins += medical_bill;
+
         instance.//world.sound.play(Art.samples[Art.SAMPLE_MARIO_1UP], instance, 1, 1, 1);
         lives++;
         if (lives==99)
@@ -710,10 +725,10 @@ public class Mario extends Sprite
     public static void getCoin()
     {
         coins++;
-        if (coins==100)
-        {
-            coins = 0;
-            get1Up();
-        }
+//        if (coins==100)
+//        {
+//            coins = 0;
+//            get1Up();
+//        }
     }
 }

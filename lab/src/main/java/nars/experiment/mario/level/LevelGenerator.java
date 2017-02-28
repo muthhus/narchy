@@ -456,9 +456,9 @@ public class LevelGenerator
                                 level.setBlock(x, floor - 4, (byte) (4 + 1 + 1 * 16));
                             }
                         }
-                        else if (random.nextInt(4) == 0)
+                        else if (random.nextInt(2) == 0)
                         {
-                            if (random.nextInt(4) == 0)
+                            if (random.nextInt(2) == 0)
                             {
                                 level.setBlock(x, floor - 4, (byte) (2 + 1 * 16));
                             }

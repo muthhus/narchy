@@ -14,6 +14,8 @@ import java.util.List;
 
 public class LevelScene extends Scene implements SpriteContext
 {
+    private boolean renderBackground = false;
+
     private List<Sprite> sprites = new ArrayList<Sprite>();
     private List<Sprite> spritesToAdd = new ArrayList<Sprite>();
     private List<Sprite> spritesToRemove = new ArrayList<Sprite>();
@@ -318,10 +320,12 @@ public class LevelScene extends Scene implements SpriteContext
 
         //      g.drawImage(Art.background, 0, 0, null);
 
-        for (int i = 0; i < 2; i++)
-        {
-            bgLayer[i].setCam(xCam, yCam);
-            bgLayer[i].render(g, tick, alpha);
+
+        if (renderBackground) {
+            for (int i = 0; i < 2; i++) {
+                bgLayer[i].setCam(xCam, yCam);
+                bgLayer[i].render(g, tick, alpha);
+            }
         }
 
         g.translate(-xCam, -yCam);

@@ -1,9 +1,6 @@
 package nars.experiment.mario;
 
-import nars.NAR;
-import nars.NAgent;
-import nars.NAgents;
-import nars.Narsese;
+import nars.*;
 import nars.experiment.arkanoid.Arkancide;
 import nars.experiment.mario.sprites.Mario;
 import nars.nar.NARBuilder;
@@ -23,6 +20,8 @@ public class NARio extends NAgents {
 
     public NARio(NAR nar) {
         super(nar);
+
+        Param.ANSWER_REPORTING = false;
 
         //Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         mario = new MarioComponent(
@@ -45,9 +44,15 @@ public class NARio extends NAgents {
 
         mario.start();
 
-        senseCameraRetina("camAll", ()->mario.image, 40, 30, (v) -> t(v, alpha));
 
         try {
+            senseCamera("camF", ()->mario.image, 60, 30, (v) -> t(v, alpha));
+            //senseCameraRetina("camZ", ()->mario.image, 30, 18, (v) -> t(v, alpha));
+
+
+            senseNumberDifference($("nario(x,v)"), ()-> mario.scene instanceof LevelScene ? ((LevelScene)mario.scene).mario.x : 0);
+            senseNumberDifference($("nario(y,v)"), ()-> mario.scene instanceof LevelScene ? ((LevelScene)mario.scene).mario.y : 0);
+
             actionToggle($("nario(x,n)"), (b)->mario.scene.toggleKey(Mario.KEY_LEFT, b));
             actionToggle($("nario(x,p)"), (b)->mario.scene.toggleKey(Mario.KEY_RIGHT, b));
             actionToggle($("nario(jump)"), (b)->mario.scene.toggleKey(Mario.KEY_JUMP, b));
@@ -62,10 +67,14 @@ public class NARio extends NAgents {
 //        frame.addFocusListener(mario);
     }
 
+    int lastCoins = 0;
+
     @Override
     protected float act() {
-        float score = Mario.coins;
-        return 0;
+        int coins = Mario.coins;
+        float reward = coins - lastCoins;
+        lastCoins = coins;
+        return -0.1f + reward/4f;
     }
 
     public static void main(String[] args) {
@@ -75,7 +84,7 @@ public class NARio extends NAgents {
 
             return new NARio(n);
 
-        }, 40, 10, -1);
+        }, 8, 2, -1);
     }
 }
 

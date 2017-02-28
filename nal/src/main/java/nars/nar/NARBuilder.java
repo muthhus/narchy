@@ -11,6 +11,7 @@ import nars.bag.impl.BLinkHijackBag;
 import nars.budget.BLink;
 import nars.budget.BudgetMerge;
 import nars.conceptualize.DefaultConceptBuilder;
+import nars.index.term.HijackTermIndex;
 import nars.index.term.TermIndex;
 import nars.index.term.map.CaffeineIndex;
 import nars.op.Operator;
@@ -73,12 +74,12 @@ public interface NARBuilder {
         };
 
 
-        Default nar = new Default(4 * 1024,
+        Default nar = new Default(8 * 1024,
                 conceptsPerCycle, 1, 4, rng,
 
-                //new HijackTermIndex(cb, 1024 * 128, reprobes)
+                new HijackTermIndex(cb, 1024 * 256, reprobes)
                 //new NullTermIndex(cb)
-                new CaffeineIndex(cb, -1 /*256 * 1024*/, -1, null /* null = fork join common pool */)
+                //new CaffeineIndex(cb, -1 /*256 * 1024*/, -1, null /* null = fork join common pool */)
                 //new TreeTermIndex.L1TreeIndex(new DefaultConceptBuilder(), 300000, 32 * 1024, 3)
                 ,
                 time,
@@ -131,8 +132,8 @@ public interface NARBuilder {
 //            }
 
             final Compressor compressor = new Compressor(this, "_",
-                    3, 7,
-                    3f, 16, 256);
+                    5, 10,
+                    2f, 16, 256);
 
             @Override
             public Task pre(@NotNull Task t) {
@@ -169,8 +170,8 @@ public interface NARBuilder {
 
         };
 
-        nar.beliefConfidence(0.8f);
-        nar.goalConfidence(0.8f);
+        nar.beliefConfidence(0.9f);
+        nar.goalConfidence(0.9f);
         //nar.derivedEvidenceGain.setValue(0.75f);
 
         float p = 0.75f;
@@ -180,13 +181,13 @@ public interface NARBuilder {
         nar.DEFAULT_QUEST_PRIORITY = 0.4f * p;
 
         nar.confMin.setValue(0.01f);
-        nar.truthResolution.setValue(0.02f);
+        nar.truthResolution.setValue(0.01f);
 
 
         //NARTune tune = new NARTune(nar);
 
-        MySTMClustered stm = new MySTMClustered(nar, 64, BELIEF, 3, true, 6);
-        MySTMClustered stmGoal = new MySTMClustered(nar, 32, GOAL, 2, true, 4);
+        MySTMClustered stm = new MySTMClustered(nar, 32, BELIEF, 4, true, 6);
+        MySTMClustered stmGoal = new MySTMClustered(nar, 16, GOAL, 2, true, 4);
 
 //        Abbreviation abbr = new Abbreviation(nar, "the",
 //                4, 16,

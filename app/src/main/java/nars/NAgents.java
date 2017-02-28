@@ -235,6 +235,10 @@ abstract public class NAgents extends NAgent {
         return senseCamera(id, w, pw, ph, (v) -> t(v, alpha));
     }
 
+    protected Sensor2D<Scale> senseCamera(String id, Supplier<BufferedImage> w, int pw, int ph, FloatToObjectFunction<Truth> pixelTruth) {
+        return senseCamera(id, new Scale(w, pw, ph), pixelTruth);
+    }
+
     protected Sensor2D<Scale> senseCamera(String id, Container w, int pw, int ph, FloatToObjectFunction<Truth> pixelTruth) {
         return senseCamera(id, new Scale(new SwingCamera(w), pw, ph), pixelTruth);
     }

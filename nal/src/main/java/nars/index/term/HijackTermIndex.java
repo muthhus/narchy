@@ -7,6 +7,7 @@ import jcog.data.random.XorShift128PlusRandom;
 import nars.NAR;
 import nars.Param;
 import nars.bag.impl.PLinkHijackBag;
+import nars.concept.Concept;
 import nars.concept.PermanentConcept;
 import nars.conceptualize.ConceptBuilder;
 import nars.index.term.map.MaplikeTermIndex;
@@ -63,6 +64,11 @@ public class HijackTermIndex extends MaplikeTermIndex implements Runnable {
         running = true;
         updateThread = new Thread(this);
         updateThread.start();
+    }
+
+    @Override
+    public void commit(Concept c) {
+        get(c.term(), false); //get boost
     }
 
     @Override

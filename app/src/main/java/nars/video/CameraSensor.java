@@ -23,10 +23,11 @@ import java.util.function.Consumer;
 public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Consumer<NAR> {
 
 
-    private static final int radix = 3;
     private final NAR nar;
     private final NAgent agent;
-    float resolution = Param.TRUTH_EPSILON;
+
+    private static final int radix = 4;
+    float resolution = 0.01f;//Param.TRUTH_EPSILON;
 
     public CameraSensor(Atomic root, P src, NAgent agent, FloatToObjectFunction<Truth> brightnessToTruth) {
         super(src, src.width(), src.height());
