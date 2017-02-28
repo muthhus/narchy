@@ -14,6 +14,7 @@ import java.util.concurrent.atomic.AtomicReferenceArray;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -132,16 +133,22 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
 
     @Override
     public void clear() {
-        if (!size.compareAndSet(0, 0)) {
-            AtomicReferenceArray<V> x = reset();
+        AtomicReferenceArray<V> x = reset();
+        if (x!=null) {
             forEachActive(this, x, this::onRemoved);
         }
     }
 
-    public AtomicReferenceArray<V> reset() {
-        AtomicReferenceArray<V> prevMap = map.getAndSet(new AtomicReferenceArray<V>(capacity()));
-        pressure = 0;
-        return prevMap;
+    @Nullable public AtomicReferenceArray<V> reset() {
+        if (!size.compareAndSet(0, 0)) {
+            AtomicReferenceArray<V> prevMap = map.getAndSet(new AtomicReferenceArray<V>(capacity()));
+            pressure = 0;
+            this.priMax = 0;
+            this.priMin = 0;
+            return prevMap;
+        } else {
+            return null;
+        }
     }
 
     @Nullable
@@ -607,8 +614,13 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
         return this;
     }
 
+    /** SUSPECT */
     public static <X> Stream<X> stream(AtomicReferenceArray<X> a) {
         return IntStream.range(0, a.length()).mapToObj(a::get).filter(Objects::nonNull);
+    }
+
+    public static <X> List<X> list(AtomicReferenceArray<X> a) {
+        return IntStream.range(0, a.length()).mapToObj(a::get).filter(Objects::nonNull).collect(Collectors.toList());
     }
 
     /*private static int i(int c, int hash, int r) {

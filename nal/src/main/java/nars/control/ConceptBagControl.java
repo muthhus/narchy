@@ -19,6 +19,7 @@ import nars.task.DerivedTask;
 import nars.term.Termed;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReferenceArray;
 import java.util.function.Consumer;
@@ -109,9 +110,9 @@ public class ConceptBagControl implements Control, Consumer<DerivedTask> {
         if (!busy.compareAndSet(false, true))
             return;
 
-        if (!pending.isEmpty()) {
-            AtomicReferenceArray<Task> all = pending.reset();
-            nar.input( HijackBag.stream(all) );
+        AtomicReferenceArray<Task> all = pending.reset();
+        if (all!=null) {
+            nar.input(HijackBag.stream(all));
         }
 
         active.commit();

@@ -403,7 +403,8 @@ public interface TimeFunctions {
                                     }
                                 }
 
-
+                            } else {
+                                return null; //could not back substitute resolve
                             }
                         }
 

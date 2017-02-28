@@ -3,6 +3,7 @@ package nars.nal.nal8;
 import nars.$;
 import nars.NAR;
 import nars.Narsese;
+import nars.Op;
 import nars.nal.AbstractNALTest;
 import nars.term.Term;
 import nars.test.TestNAR;
@@ -411,11 +412,12 @@ public class NAL8Test extends AbstractNALTest {
     @Test
     public void condition_goal_deduction_3simplerReverse()  {
         test()
-                .log()
+                //.log()
                 .inputAt(1, "at:t003! :|:")
                 .input( "(at:$1 ==>+5 goto:$1).")
 
-                .mustDesire(cycles*2, "goto:t003", 1.0f, 0.45f, 6);
+                .mustDesire(cycles, "goto:t003", 1.0f, 0.45f, 6)
+                .mustNotOutput(cycles, "goto:t003", Op.GOAL,  1);
 
     }
 

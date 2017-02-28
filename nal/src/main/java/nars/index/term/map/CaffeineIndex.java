@@ -68,7 +68,6 @@ public class CaffeineIndex extends MaplikeTermIndex implements RemovalListener<T
         //long maxSubtermWeight = maxWeight * 3; //estimate considering re-use of subterms in compounds and also caching of non-compound subterms
 
         Caffeine<Term, Termed> builder = Caffeine.newBuilder().removalListener(this);
-        Caffeine<Object, Object> subTermsBuilder = Caffeine.newBuilder();
         if (capacity > 0)
             builder.maximumSize(capacity);
         else
@@ -76,6 +75,8 @@ public class CaffeineIndex extends MaplikeTermIndex implements RemovalListener<T
 
         if (Param.DEBUG)
             builder.recordStats();
+
+        Caffeine<Object, Object> subTermsBuilder = Caffeine.newBuilder();
 
         if (exe!=null) {
             builder.executor(exe);

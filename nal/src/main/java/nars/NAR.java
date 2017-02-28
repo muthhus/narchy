@@ -619,10 +619,9 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
         if (isCommand || (input.isGoal() && input.expectation() >= Param.EXECUTION_THRESHOLD) &&
                 (input.isEternal() || (!input.isEternal() && (input.start() - time()) >= -time.dur()))) { //eternal, present (within duration radius), or future
 
-            if (!input.isEternal() && input.start() > time() + time.dur()) {
-                //TODO schedule for run later
-                return null;
-            }
+//            if (!input.isEternal() && input.start() > time() + time.dur()) {
+//                //TODO schedule for run later
+//            }
 
             Compound inputTerm = input.term();
             if (inputTerm.hasAll(Operator.OPERATOR_BITS) && inputTerm.op() == INH) {
