@@ -17,6 +17,9 @@ package org.oakgp.util;
 
 import org.junit.Test;
 import org.oakgp.Evolution;
+import org.oakgp.Evolution.Config;
+import org.oakgp.Evolution.InitialPopulationSetter;
+import org.oakgp.Evolution.TreeDepthSetter;
 import org.oakgp.Type;
 import org.oakgp.evolve.GenerationEvolver;
 import org.oakgp.node.Node;
@@ -24,9 +27,6 @@ import org.oakgp.primitive.DummyPrimitiveSet;
 import org.oakgp.rank.GenerationRanker;
 import org.oakgp.rank.RankedCandidate;
 import org.oakgp.rank.RankedCandidates;
-import org.oakgp.Evolution.Config;
-import org.oakgp.Evolution.InitialPopulationSetter;
-import org.oakgp.Evolution.TreeDepthSetter;
 
 import java.util.Collection;
 import java.util.function.Function;

@@ -105,6 +105,12 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
 
     }
 
+    public CameraSensor setResolution(float resolution) {
+        this.resolution = resolution;
+        return this;
+    }
+
+
     interface Int2Function<T> {
         T get(int x, int y);
     }

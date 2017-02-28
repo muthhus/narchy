@@ -17,7 +17,6 @@ package org.oakgp.primitive;
 
 import org.oakgp.Type;
 import org.oakgp.function.Function;
-import org.oakgp.function.Signature;
 import org.oakgp.node.Node;
 import org.oakgp.util.Random;
 

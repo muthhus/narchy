@@ -83,7 +83,7 @@ public class ConsoleTerminal extends ConsoleSurface implements Appendable {
     public boolean onKey(KeyEvent e, boolean pressed) {
 
         //return super.onKey(e, pressed);
-        DefaultVirtualTerminal eterm = (DefaultVirtualTerminal) this.term;
+        DefaultVirtualTerminal eterm = this.term;
 
         int cc = e.getKeyCode();
         if (pressed && cc== 13) {

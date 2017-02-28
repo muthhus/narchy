@@ -4,7 +4,6 @@ import jcog.Util;
 import jcog.math.FirstOrderDifferenceFloat;
 import jcog.math.FloatPolarNormalized;
 import jcog.math.FloatSupplier;
-import jcog.meter.func.FirstOrderDifference;
 import nars.concept.FuzzyScalarConcepts;
 import nars.concept.SensorConcept;
 import nars.term.Compound;

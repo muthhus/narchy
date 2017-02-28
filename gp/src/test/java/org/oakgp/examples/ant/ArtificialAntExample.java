@@ -15,12 +15,12 @@
  */
 package org.oakgp.examples.ant;
 
+import org.oakgp.Evolution;
 import org.oakgp.function.Function;
 import org.oakgp.function.choice.If;
 import org.oakgp.node.Node;
 import org.oakgp.rank.RankedCandidates;
 import org.oakgp.rank.fitness.FitnessFunction;
-import org.oakgp.Evolution;
 
 import static org.oakgp.examples.ant.AntMovement.*;
 import static org.oakgp.examples.ant.BiSequence.BISEQUENCE;

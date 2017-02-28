@@ -10,10 +10,9 @@ import nars.NAR;
 import nars.Param;
 import nars.concept.Concept;
 import nars.gui.BeliefTableChart;
-import nars.NAgents;
+import nars.NAgentX;
 import nars.time.Tense;
 import nars.truth.Truth;
-import nars.video.Bitmap2D;
 import nars.video.PixelBag;
 import nars.video.Scale;
 import nars.video.Sensor2D;
@@ -38,7 +37,7 @@ import static spacegraph.space.layout.Grid.row;
 /**
  * Created by me on 10/8/16.
  */
-public class Recog2D extends NAgents {
+public class Recog2D extends NAgentX {
 
     private final Graphics2D g;
     private final int h;
@@ -284,7 +283,7 @@ public class Recog2D extends NAgents {
     }
 
     public static void main(String[] arg) {
-        NAgents.runRT(Recog2D::new, fps, duration, -1);
+        NAgentX.runRT(Recog2D::new, fps, duration, -1);
     }
 
     public static class Training {

@@ -28,9 +28,7 @@ import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 import static java.util.Collections.unmodifiableList;
 import static java.util.stream.Collectors.groupingBy;
-import static org.oakgp.Type.booleanType;
-import static org.oakgp.Type.doubleType;
-import static org.oakgp.Type.integerType;
+import static org.oakgp.Type.*;
 
 /**
  * Utility methods that support the functionality provided by the rest of the framework.

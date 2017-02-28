@@ -5,7 +5,7 @@ import nars.NAR;
 import nars.Narsese;
 import nars.experiment.minicraft.top.InputHandler;
 import nars.experiment.minicraft.top.TopDownMinicraft;
-import nars.NAgents;
+import nars.NAgentX;
 import nars.video.PixelAutoClassifier;
 import nars.video.Sensor2D;
 import org.jcodec.codecs.h264.H264Encoder;
@@ -31,7 +31,7 @@ import java.util.ArrayList;
 /**
  * Created by me on 9/19/16.
  */
-public class TopCraft extends NAgents {
+public class TopCraft extends NAgentX {
 
     private final TopDownMinicraft craft;
     private Sensor2D pixels;

@@ -43,8 +43,8 @@ import org.oakgp.terminate.CompositeTerminator;
 import org.oakgp.terminate.MaxGenerationsTerminator;
 import org.oakgp.terminate.MaxGenerationsWithoutImprovementTerminator;
 import org.oakgp.terminate.TargetFitnessTerminator;
-import org.oakgp.util.*;
-import org.oakgp.util.Random;
+import org.oakgp.util.NodeSet;
+import org.oakgp.util.StdRandom;
 
 import java.util.*;
 import java.util.function.Predicate;

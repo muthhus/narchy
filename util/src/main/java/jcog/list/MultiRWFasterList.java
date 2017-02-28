@@ -112,10 +112,26 @@ public class MultiRWFasterList<T> extends AbstractMultiReaderMutableCollection<T
             return false;
         this.acquireWriteLock();
         try {
-            return delegate.removeIf(filter);
+
+            boolean removed = false;
+            final Iterator<T> each = delegate.iterator();
+            while (each.hasNext()) {
+                T x = each.next();
+                if (filter.test(x)) {
+                    each.remove();
+                    onRemoved(x);
+                    removed = true;
+                }
+            }
+            return removed;
+
         } finally {
             this.unlockWriteLock();
         }
+    }
+
+    protected void onRemoved(T x) {
+
     }
 
     /**
@@ -791,8 +807,29 @@ public class MultiRWFasterList<T> extends AbstractMultiReaderMutableCollection<T
     public T remove(int index) {
         this.acquireWriteLock();
         try {
-            return this.delegate.remove(index);
+            T x = this.delegate.remove(index);
+            if (x!=null) {
+                onRemoved(x);
+            }
+            return x;
         } finally {
+            this.unlockWriteLock();
+        }
+    }
+    @Override
+    public boolean remove(Object item)
+    {
+        this.acquireWriteLock();
+        try
+        {
+            if (delegate.remove(item)) {
+                onRemoved((T)item);
+                return true;
+            } else
+                return false;
+        }
+        finally
+        {
             this.unlockWriteLock();
         }
     }
@@ -1340,7 +1377,9 @@ public class MultiRWFasterList<T> extends AbstractMultiReaderMutableCollection<T
 
         @Override
         public T remove(int index) {
-            return this.getDelegate().remove(index);
+
+            throw new UnsupportedOperationException("TODO"); //should pass through onRemoved
+            //return this.getDelegate().remove(index);
         }
 
         @Override
@@ -1434,7 +1473,8 @@ public class MultiRWFasterList<T> extends AbstractMultiReaderMutableCollection<T
 
         @Override
         public void remove() {
-            this.delegate.remove();
+            throw new UnsupportedOperationException("TODO"); //should pass through onRemoved
+            //this.delegate.remove();
         }
 
         @Override

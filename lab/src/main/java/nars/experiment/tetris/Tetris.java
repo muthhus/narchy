@@ -8,7 +8,7 @@ import nars.concept.SensorConcept;
 import nars.experiment.tetris.impl.TetrisState;
 import nars.experiment.tetris.impl.TetrisVisualizer;
 import nars.nar.NARBuilder;
-import nars.NAgents;
+import nars.NAgentX;
 import nars.term.Compound;
 import nars.term.atom.Atomic;
 import nars.time.FrameTime;
@@ -29,7 +29,7 @@ import static spacegraph.SpaceGraph.window;
 /**
  * Created by me on 7/28/16.
  */
-public class Tetris extends NAgents {
+public class Tetris extends NAgentX {
 
     //    static final Executioner exe =
 //            //new SingleThreadExecutioner();
@@ -689,7 +689,7 @@ public class Tetris extends NAgents {
 //
 //                view.plot2 = Vis.agentBudgetPlot(this, 256);
             window(view, 600, 600);
-            NAgents.chart(this);
+            NAgentX.chart(this);
         }
     }
 

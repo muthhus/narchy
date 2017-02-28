@@ -18,13 +18,13 @@ package org.oakgp.function;
 import org.junit.Test;
 import org.oakgp.Arguments;
 import org.oakgp.Assignments;
-import org.oakgp.util.NodeSimplifier;
 import org.oakgp.Type;
 import org.oakgp.node.ConstantNode;
 import org.oakgp.node.FunctionNode;
 import org.oakgp.node.Node;
 import org.oakgp.primitive.VariableSet;
 import org.oakgp.serialize.NodeReader;
+import org.oakgp.util.NodeSimplifier;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;

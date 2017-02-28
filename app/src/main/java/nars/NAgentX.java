@@ -1,6 +1,5 @@
 package nars;
 
-import jcog.data.FloatParam;
 import nars.concept.Concept;
 import nars.gui.Vis;
 import nars.nar.Default;
@@ -12,21 +11,15 @@ import nars.truth.Truth;
 import nars.util.task.TaskStatistics;
 import nars.video.*;
 import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunction;
-import org.jetbrains.annotations.NotNull;
 import spacegraph.Surface;
-import spacegraph.space.layout.Grid;
 import spacegraph.space.layout.TabPane;
-import spacegraph.space.widget.CheckBox;
-import spacegraph.space.widget.FloatSlider;
+import spacegraph.space.widget.ReflectionSurface;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.lang.reflect.Field;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -35,45 +28,48 @@ import static spacegraph.SpaceGraph.window;
 import static spacegraph.space.layout.Grid.grid;
 
 /**
- * Created by me on 9/19/16.
+ * Extensions to NAgent interface:
+ *
+ *      --chart output (spacegraph)
+ *      --cameras (Swing and OpenGL)
  */
-abstract public class NAgents extends NAgent {
+abstract public class NAgentX extends NAgent {
 
     public final Map<String, CameraSensor> cam = new LinkedHashMap<>();
 
-    public NAgents(NAR nar) {
+    public NAgentX(NAR nar) {
         this("", nar);
     }
 
-    public NAgents(String id, NAR nar) {
+    public NAgentX(String id, NAR nar) {
         this(id, nar, 1);
     }
 
-    public NAgents(String id, NAR nar, int reasonerFramesPerEnvironmentFrame) {
+    public NAgentX(String id, NAR nar, int reasonerFramesPerEnvironmentFrame) {
         super(id, nar, reasonerFramesPerEnvironmentFrame);
     }
 
-    public static void run(Function<NAR, NAgents> init, int frames) {
-        Default nar = NARBuilder.newMultiThreadNAR(3, new FrameTime(), true);
-        //Default nar = newNAR();
-        //Default2 nar = newNAR2();
+//    public static void run(Function<NAR, NAgentX> init, int frames) {
+//        Default nar = NARBuilder.newMultiThreadNAR(3, new FrameTime(), true);
+//        //Default nar = newNAR();
+//        //Default2 nar = newNAR2();
+//
+//        NAgentX a = init.apply(nar);
+//        a.trace = true;
+//
+//
+//        chart(a);
+//
+//        a.run(frames);
+//
+//        print(nar, a);
+//
+//
+//        //((TreeTaskIndex)nar.tasks).tasks.prettyPrint(System.out);
+//
+//    }
 
-        NAgents a = init.apply(nar);
-        a.trace = true;
-
-
-        chart(a);
-
-        a.run(frames);
-
-        print(nar, a);
-
-
-        //((TreeTaskIndex)nar.tasks).tasks.prettyPrint(System.out);
-
-    }
-
-    private static void print(NAR nar, NAgents a) {
+    private static void print(NAR nar, NAgentX a) {
         //NAR.printActiveTasks(nar, true);
         //NAR.printActiveTasks(nar, false);
 
@@ -93,20 +89,20 @@ abstract public class NAgents extends NAgent {
         });
     }
 
-    public static NAR runRT(Function<NAR, NAgents> init, float fps) {
+    public static NAR runRT(Function<NAR, NAgentX> init, float fps) {
         return runRT(init, fps, 1, -1);
     }
 
-    public static NAR runRT(Function<NAR, NAgents> init, float fps, int durFrames, int endTime) {
+    public static NAR runRT(Function<NAR, NAgentX> init, float fps, int durFrames, int endTime) {
 
         Time clock = new RealTime.DSHalf(true).dur(durFrames / fps);
         NAR nar =
                 //new TaskNAR(32 * 1024, new MultiThreadExecutioner(4, 4 * 1024), clock);
-                NARBuilder.newMultiThreadNAR(3, clock, true);
+                NARBuilder.newMultiThreadNAR(4, clock, true);
         //NAR nar = newNAR();
         //NAR nar = newAlann(durFrames/fps);
 
-        NAgents a = init.apply(nar);
+        NAgentX a = init.apply(nar);
         a.trace = true;
 
         chart(a);
@@ -142,7 +138,7 @@ abstract public class NAgents extends NAgent {
 //    }
 
 
-    public static void chart(NAgents a) {
+    public static void chart(NAgentX a) {
         NAR nar = a.nar;
 
 //        BagChart<Task> taskChart = new BagChart<Task>(new Leak<Task,PLink<Task>>(new ArrayBag<Task>(16, BudgetMerge.maxBlend, new ConcurrentHashMap<>()), 0f, a.nar) {
@@ -174,7 +170,8 @@ abstract public class NAgents extends NAgent {
             window(
                     new TabPane(new TreeMap<String, Supplier<Surface>>(Map.of(
                             "agent", () -> new ReflectionSurface(a),
-                            //"control", () -> new ReflectionSurface(a.nar),
+                            "core", () -> new ReflectionSurface(((Default)a.nar).core),
+                            "nar", () -> new ReflectionSurface(a.nar),
                             "input", () -> grid(a.cam.values().stream().map(cs ->
                                     new CameraSensorView(cs, nar).align(Surface.Align.Center, cs.width, cs.height))
                                     .toArray(Surface[]::new)),
@@ -235,7 +232,7 @@ abstract public class NAgents extends NAgent {
         return senseCamera(id, w, pw, ph, (v) -> t(v, alpha));
     }
 
-    protected Sensor2D<Scale> senseCamera(String id, Supplier<BufferedImage> w, int pw, int ph, FloatToObjectFunction<Truth> pixelTruth) {
+    protected CameraSensor<Scale> senseCamera(String id, Supplier<BufferedImage> w, int pw, int ph, FloatToObjectFunction<Truth> pixelTruth) {
         return senseCamera(id, new Scale(w, pw, ph), pixelTruth);
     }
 
@@ -251,19 +248,19 @@ abstract public class NAgents extends NAgent {
         return senseCameraRetina(id, new SwingCamera(w), pw, ph, pixelTruth);
     }
 
-    protected Sensor2D<PixelBag> senseCameraRetina(String id, Supplier<BufferedImage> w, int pw, int ph, FloatToObjectFunction<Truth> pixelTruth) {
+    protected CameraSensor<PixelBag> senseCameraRetina(String id, Supplier<BufferedImage> w, int pw, int ph, FloatToObjectFunction<Truth> pixelTruth) {
         PixelBag pb = PixelBag.of(w, pw, ph);
         pb.addActions(id, this);
         return senseCamera(id, pb, pixelTruth);
     }
 
-    protected Sensor2D<WaveletBag> addFreqCamera(String id, Supplier<BufferedImage> w, int pw, int ph, FloatToObjectFunction<Truth> pixelTruth) {
+    protected Sensor2D<WaveletBag> senesCameraFreq(String id, Supplier<BufferedImage> w, int pw, int ph, FloatToObjectFunction<Truth> pixelTruth) {
         WaveletBag pb = new WaveletBag(w, pw, ph);
         return senseCamera(id, pb, pixelTruth);
     }
 
-    protected <C extends Bitmap2D> Sensor2D<C> senseCamera(String id, C bc, FloatToObjectFunction<Truth> pixelTruth) {
-        CameraSensor c = new CameraSensor<>($.the(id), bc, this, pixelTruth);
+    protected <C extends Bitmap2D> CameraSensor<C> senseCamera(String id, C bc, FloatToObjectFunction<Truth> pixelTruth) {
+        CameraSensor<C> c = new CameraSensor<>($.the(id), bc, this, pixelTruth);
         cam.put(id, c);
         return c;
     }
@@ -281,41 +278,5 @@ abstract public class NAgents extends NAgent {
 //        cam.put(id, c);
 //        return c;
 //    }
-
-    public static class ReflectionSurface<X> extends Grid {
-
-        private final X x;
-
-        public ReflectionSurface(@NotNull X x) {
-            this.x = x;
-
-            List<Surface> l = $.newArrayList();
-
-
-            Class cc = x.getClass();
-            for (Field f : cc.getFields()) {
-                //SuperReflect.fields(x, (String k, Class c, SuperReflect v) -> {
-
-                try {
-                    String k = f.getName();
-                    Class c = f.getType();
-
-                    if (c == FloatParam.class) {
-                        FloatParam p = (FloatParam) f.get(x);
-                        l.add(col(Vis.label(k), new FloatSlider(p)));
-                    } else if (c == AtomicBoolean.class) {
-                        AtomicBoolean p = (AtomicBoolean) f.get(x);
-                        l.add(new CheckBox(k, p));
-                    }
-                    /*else {
-                        l.add(new PushButton(k));
-                    }*/
-                } catch (Throwable t) {
-                    t.printStackTrace();
-                }
-            }
-            setChildren(l);
-        }
-    }
 
 }

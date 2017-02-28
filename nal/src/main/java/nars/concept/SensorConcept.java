@@ -6,11 +6,13 @@ import nars.NAR;
 import nars.Narsese;
 import nars.Task;
 import nars.table.ListTemporalBeliefTable;
+import nars.table.ListTemporalExtendedBeliefTable;
 import nars.table.SensorBeliefTable;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.truth.Truth;
 import nars.util.signal.ScalarSignal;
+import nars.util.signal.SignalTask;
 import org.eclipse.collections.api.block.function.primitive.FloatFunction;
 import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunction;
 import org.eclipse.collections.api.list.MutableList;
@@ -196,9 +198,19 @@ public class SensorConcept extends WiredConcept implements FloatFunction<Term>, 
     }
 
 
-    private static class MyListTemporalBeliefTable extends ListTemporalBeliefTable {
+    private class MyListTemporalBeliefTable extends ListTemporalExtendedBeliefTable {
         public MyListTemporalBeliefTable(int tCap) {
-            super(tCap);
+            super(tCap, tCap*2);
+        }
+
+        protected Task ressurect(Task t) {
+            t.budget().setPriority(sensor.pri.asFloat());
+            return t;
+        }
+
+        @Override
+        protected boolean save(Task t) {
+            return t instanceof SignalTask;
         }
 
         @Override

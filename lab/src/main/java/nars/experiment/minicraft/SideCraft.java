@@ -6,7 +6,7 @@ import nars.NAR;
 import nars.Narsese;
 import nars.experiment.minicraft.side.SideScrollMinicraft;
 import nars.experiment.minicraft.side.awtgraphics.AwtGraphicsHandler;
-import nars.NAgents;
+import nars.NAgentX;
 import nars.video.PixelAutoClassifier;
 import nars.video.PixelBag;
 import nars.video.Sensor2D;
@@ -18,7 +18,7 @@ import static nars.$.$;
 /**
  * Created by me on 9/19/16.
  */
-public class SideCraft extends NAgents {
+public class SideCraft extends NAgentX {
 
     private final SideScrollMinicraft craft;
     private final Sensor2D pixels;

@@ -15,13 +15,13 @@
  */
 package org.oakgp.function.choice;
 
-import org.oakgp.util.NodeSimplifier;
 import org.oakgp.Type;
 import org.oakgp.function.AbstractFunctionTest;
 import org.oakgp.node.ConstantNode;
 import org.oakgp.node.FunctionNode;
 import org.oakgp.node.Node;
 import org.oakgp.node.VariableNode;
+import org.oakgp.util.NodeSimplifier;
 
 import static org.junit.Assert.assertEquals;
 import static org.oakgp.Type.nullableType;

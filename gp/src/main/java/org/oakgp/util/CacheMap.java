@@ -18,10 +18,6 @@ package org.oakgp.util;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.Map;
-
 /**
  * Provides a size-limited map of keys to values.
  * <p>

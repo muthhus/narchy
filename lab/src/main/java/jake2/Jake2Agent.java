@@ -9,7 +9,7 @@ import jake2.render.JoglGL2Renderer;
 import jake2.sys.IN;
 import nars.NAR;
 import nars.Narsese;
-import nars.NAgents;
+import nars.NAgentX;
 import nars.video.PixelAutoClassifier;
 import nars.video.PixelBag;
 import nars.video.Sensor2D;
@@ -29,7 +29,7 @@ import static nars.$.t;
 /**
  * Created by me on 9/22/16.
  */
-public class Jake2Agent extends NAgents implements Runnable {
+public class Jake2Agent extends NAgentX implements Runnable {
 
     private PixelAutoClassifier camAE = null;
     ByteBuffer seen = null;

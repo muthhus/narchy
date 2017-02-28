@@ -15,6 +15,7 @@
  */
 package org.oakgp.examples.gridwar;
 
+import org.oakgp.Evolution;
 import org.oakgp.Type;
 import org.oakgp.function.Function;
 import org.oakgp.function.choice.If;
@@ -26,7 +27,6 @@ import org.oakgp.rank.RankedCandidates;
 import org.oakgp.rank.tournament.FirstPlayerAdvantageGame;
 import org.oakgp.rank.tournament.TwoPlayerGame;
 import org.oakgp.util.Random;
-import org.oakgp.Evolution;
 import org.oakgp.util.StdRandom;
 import org.oakgp.util.Utils;
 

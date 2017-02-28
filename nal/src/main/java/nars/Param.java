@@ -132,9 +132,6 @@ public abstract class Param  {
     public static final float BUDGET_EPSILON = 0.00001f;
 
 
-    public static final int DEFAULT_WIRED_CONCEPT_BELIEFS = 32;
-    public static final int DEFAULT_WIRED_CONCEPT_GOALS = 32;
-
 
     public static int DEFAULT_NAL_LEVEL = 8;
 

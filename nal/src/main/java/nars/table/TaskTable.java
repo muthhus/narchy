@@ -13,11 +13,7 @@ import java.util.function.Consumer;
  */
 public interface TaskTable  {
 
-    @Deprecated static void removeTask(@NotNull Task t, @Nullable String reason) {
-//        if (reason!=null && Param.DEBUG && t instanceof MutableTask)
-//            ((MutableTask)t).log(reason);
-        t.delete();
-    }
+
 
     int capacity();
 
@@ -55,7 +51,7 @@ public interface TaskTable  {
         taskIterator().forEachRemaining(x);
     }
 
-    default void top(int _maxPerConcept, @NotNull Consumer<Task> recip) {
+    default void forEach(int _maxPerConcept, @NotNull Consumer<Task> recip) {
         int s = size();
         final int[] maxPerConcept = {Math.min(s, _maxPerConcept)};
         forEachTask(t -> {

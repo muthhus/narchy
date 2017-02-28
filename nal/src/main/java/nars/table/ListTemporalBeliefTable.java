@@ -60,9 +60,10 @@ public class ListTemporalBeliefTable extends MultiRWFasterList<Task> implements 
 
                 int toRemove = l.size() - newCapacity; //will be positive
 
-                clean(l);
+                if (clean(l)) {
+                    toRemove = l.size() - newCapacity;
+                }
 
-                toRemove = l.size() - newCapacity;
                 if (toRemove > 0) {
 
                     Time time = nar.time;
@@ -315,20 +316,21 @@ public class ListTemporalBeliefTable extends MultiRWFasterList<Task> implements 
 //    }
 
 
-    static final boolean remove(MutableList<Task> l, @NotNull Task x) {
+    final boolean remove(MutableList<Task> l, @NotNull Task x) {
         if (l.remove(x)) {
             x.delete();
+            onRemoved(x);
             return true;
         }
         return false;
     }
 
 
-    private Function<Task, Float> temporalConfidence(long when, float dur) {
+    static private Function<Task, Float> temporalConfidence(long when, float dur) {
         return x -> rankTemporalByConfidence(x, when, dur);
     }
 
-    final float rankTemporalByConfidence(@Nullable Task t, long when, float dur) {
+    static final float rankTemporalByConfidence(@Nullable Task t, long when, float dur) {
         return t != null ? t.confWeight(when, dur) : Float.NEGATIVE_INFINITY;// * (1+t.range()) * t.qua();
 
 //        long range = Math.max(1, t.range());
@@ -337,7 +339,7 @@ public class ListTemporalBeliefTable extends MultiRWFasterList<Task> implements 
 //                (t.conf() * range / (range + (worstDistance * worstDistance)));
     }
 
-    Task matchMerge(MutableList<Task> l, long now, @NotNull Task toMergeWith, float dur) {
+    static Task matchMerge(MutableList<Task> l, long now, @NotNull Task toMergeWith, float dur) {
         return l.maxBy(rankMatchMerge(toMergeWith, now, dur));
     }
 
@@ -345,7 +347,7 @@ public class ListTemporalBeliefTable extends MultiRWFasterList<Task> implements 
      * max value given to the ideal match for the provided task to be merged with
      */
     @NotNull
-    public Function<Task, Float> rankMatchMerge(@NotNull Task y, long now, float dur) {
+    static public Function<Task, Float> rankMatchMerge(@NotNull Task y, long now, float dur) {
 
         //prefer (when selecting by minimum rank:)
         //  less freq delta
@@ -486,7 +488,7 @@ public class ListTemporalBeliefTable extends MultiRWFasterList<Task> implements 
 
     @Nullable
     @Override
-    public final Task match(long when, @Deprecated long now, float dur, @Nullable Task against) {
+    public Task match(long when, @Deprecated long now, float dur, @Nullable Task against) {
         return ifNotEmptyReadWith(l -> {
             switch (l.size()) {
 //                case 0:
@@ -499,14 +501,10 @@ public class ListTemporalBeliefTable extends MultiRWFasterList<Task> implements 
         });
     }
 
-    @Nullable
-    public final Truth truth(long when, float dur, @Deprecated @Nullable EternalTable eternal) {
-        return truth(when, when, dur, eternal);
-    }
 
     @Nullable
     @Override
-    public final Truth truth(long when, long now, float dur, @Nullable EternalTable eternal) {
+    public Truth truth(long when, long now, float dur, @Nullable EternalTable eternal) {
 
         Truth r = ifNotEmptyReadWith(l -> {
             return truth(when, dur, eternal, l);
@@ -521,8 +519,14 @@ public class ListTemporalBeliefTable extends MultiRWFasterList<Task> implements 
         return TruthPolation.truth(eternal != null ? eternal.match() : null, when, dur, l);
     }
 
-    static final boolean clean(MutableList<Task> l) {
-        return l.removeIf(((Predicate<Task>) Task::isDeleted ));
+    final boolean clean(MutableList<Task> l) {
+        return l.removeIf(x -> {
+            if (x.isDeleted()) {
+                onRemoved(x);
+                return true;
+            }
+            return false;
+        });
     }
 
 

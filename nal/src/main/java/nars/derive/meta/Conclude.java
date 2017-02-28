@@ -1,7 +1,6 @@
 package nars.derive.meta;
 
 import com.google.common.base.Joiner;
-import nars.$;
 import nars.NAR;
 import nars.Op;
 import nars.Param;

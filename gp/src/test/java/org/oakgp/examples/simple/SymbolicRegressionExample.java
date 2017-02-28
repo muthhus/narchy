@@ -16,12 +16,12 @@
 package org.oakgp.examples.simple;
 
 import org.oakgp.Assignments;
+import org.oakgp.Evolution;
 import org.oakgp.Type;
 import org.oakgp.function.math.IntegerUtils;
 import org.oakgp.node.Node;
 import org.oakgp.rank.RankedCandidates;
 import org.oakgp.rank.fitness.TestDataFitnessFunction;
-import org.oakgp.Evolution;
 import org.oakgp.util.Utils;
 
 import java.util.HashMap;

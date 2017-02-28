@@ -3,9 +3,6 @@ package nars.budget;
 import jcog.Util;
 import jcog.bag.Prioritized;
 import nars.Param;
-import nars.premise.Derivation;
-import nars.term.Compound;
-import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

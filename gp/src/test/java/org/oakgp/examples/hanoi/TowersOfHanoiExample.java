@@ -15,6 +15,7 @@
  */
 package org.oakgp.examples.hanoi;
 
+import org.oakgp.Evolution;
 import org.oakgp.Type;
 import org.oakgp.function.Function;
 import org.oakgp.function.choice.If;
@@ -27,7 +28,6 @@ import org.oakgp.node.ConstantNode;
 import org.oakgp.node.Node;
 import org.oakgp.rank.RankedCandidates;
 import org.oakgp.rank.fitness.FitnessFunction;
-import org.oakgp.Evolution;
 import org.oakgp.util.Utils;
 
 import java.util.ArrayList;

@@ -151,6 +151,12 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, Sorted
 //        return 0;
 //    }
 
+    @Deprecated static void removeTask(@NotNull Task t, @Nullable String reason) {
+//        if (reason!=null && Param.DEBUG && t instanceof MutableTask)
+//            ((MutableTask)t).log(reason);
+        t.delete();
+    }
+
     /**
      *
      * @return
@@ -406,7 +412,7 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, Sorted
         if (displaced == input) {
             return null; //rejected
         } else if (displaced != null) {
-            TaskTable.removeTask(displaced,
+            removeTask(displaced,
                     "Displaced"
                     //"Displaced by " + incoming,
             );
@@ -418,7 +424,7 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, Sorted
     private void addEternalAxiom(@NotNull Task input, @NotNull EternalTable et, NAR nar) {
         //lock incoming 100% confidence belief/goal into a 1-item capacity table by itself, preventing further insertions or changes
         //1. clear the corresponding table, set capacity to one, and insert this task
-        Consumer<Task> overridden = t -> TaskTable.removeTask(t, "Overridden");
+        Consumer<Task> overridden = t -> removeTask(t, "Overridden");
         et.forEachTask(overridden);
         et.clear();
         et.capacity(1);

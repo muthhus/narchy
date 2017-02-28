@@ -19,8 +19,6 @@ import com.github.benmanes.caffeine.cache.Cache;
 import org.oakgp.node.Node;
 import org.oakgp.util.CacheMap;
 
-import java.util.Map;
-
 /**
  * Wraps a {@code FitnessFunction} to provide caching of results.
  */

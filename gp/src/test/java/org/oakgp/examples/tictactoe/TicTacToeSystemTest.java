@@ -17,6 +17,7 @@ package org.oakgp.examples.tictactoe;
 
 import org.junit.Test;
 import org.oakgp.Assignments;
+import org.oakgp.Evolution;
 import org.oakgp.Type;
 import org.oakgp.function.Function;
 import org.oakgp.function.choice.If;
@@ -27,7 +28,6 @@ import org.oakgp.rank.fitness.FitnessFunction;
 import org.oakgp.rank.tournament.FirstPlayerAdvantageGame;
 import org.oakgp.rank.tournament.TwoPlayerGame;
 import org.oakgp.util.DummyNode;
-import org.oakgp.Evolution;
 import org.oakgp.util.Utils;
 
 import static org.oakgp.Type.type;

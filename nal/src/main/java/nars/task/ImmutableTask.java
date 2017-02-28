@@ -6,7 +6,6 @@ import nars.Param;
 import nars.Task;
 import nars.budget.RawBudget;
 import nars.term.Compound;
-import nars.term.Term;
 import nars.truth.Truth;
 import nars.truth.TruthDelta;
 import nars.util.task.InvalidTaskException;

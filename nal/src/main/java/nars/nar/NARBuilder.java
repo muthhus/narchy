@@ -4,7 +4,6 @@ import jcog.bag.Bag;
 import jcog.data.random.XorShift128PlusRandom;
 import jcog.learn.lstm.SimpleLSTM;
 import nars.NAR;
-import nars.Op;
 import nars.Param;
 import nars.Task;
 import nars.bag.impl.BLinkHijackBag;
@@ -13,25 +12,15 @@ import nars.budget.BudgetMerge;
 import nars.conceptualize.DefaultConceptBuilder;
 import nars.index.term.HijackTermIndex;
 import nars.index.term.TermIndex;
-import nars.index.term.map.CaffeineIndex;
-import nars.op.Operator;
 import nars.op.mental.Compressor;
 import nars.op.mental.Inperience;
 import nars.op.stm.MySTMClustered;
-import nars.premise.MatrixPremiseBuilder;
-import nars.premise.PreferSimpleAndConfidentPremise;
-import nars.premise.Premise;
-import nars.term.Compound;
 import nars.term.Term;
-import nars.term.Termed;
-import nars.term.Terms;
 import nars.time.Time;
-import nars.truth.Truth;
 import nars.util.exe.Executioner;
 import nars.util.exe.MultiThreadExecutor;
 import org.apache.commons.math3.util.MathArrays;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.Random;
 import java.util.function.BiFunction;
@@ -39,7 +28,6 @@ import java.util.function.BiFunction;
 import static jcog.Texts.n2;
 import static jcog.Texts.n4;
 import static nars.Op.BELIEF;
-import static nars.Op.CONJ;
 import static nars.Op.GOAL;
 
 /**
@@ -132,7 +120,7 @@ public interface NARBuilder {
 //            }
 
             final Compressor compressor = new Compressor(this, "_",
-                    5, 10,
+                    4, 10,
                     2f, 16, 256);
 
             @Override
@@ -193,7 +181,7 @@ public interface NARBuilder {
 //                4, 16,
 //                0.02f, 32);
 
-        new Inperience(nar, 0.005f, 16);
+        new Inperience(nar, 0.01f, 16);
 
 //        //causal accelerator
 //        nar.onTask(t -> {

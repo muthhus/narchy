@@ -4,10 +4,7 @@ import com.google.common.collect.Lists;
 import com.jogamp.opengl.GL2;
 import jcog.bag.Bag;
 import jcog.bag.PLink;
-import nars.$;
-import nars.NAR;
-import nars.NAgent;
-import nars.NAgents;
+import nars.*;
 import nars.concept.Concept;
 import nars.nar.Default;
 import nars.term.Term;
@@ -437,7 +434,7 @@ public class Vis {
 
         s.add(new Ortho(new CrosshairSurface(s)));
 
-        SpaceGraph.window(new NAgents.ReflectionSurface(fd), 500, 500);
+        SpaceGraph.window(new ReflectionSurface(fd), 500, 500);
 
         return s;
     }

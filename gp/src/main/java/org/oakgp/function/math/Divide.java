@@ -17,7 +17,6 @@ package org.oakgp.function.math;
 
 import org.oakgp.Arguments;
 import org.oakgp.Assignments;
-import org.oakgp.node.ConstantNode;
 import org.oakgp.node.Node;
 
 /**

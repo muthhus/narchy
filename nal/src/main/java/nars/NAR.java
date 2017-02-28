@@ -1229,10 +1229,10 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
                            boolean includeTaskLinks, int maxPerConcept,
                            @NotNull Consumer<Task> recip) {
         forEachConcept(c -> {
-            if (includeConceptBeliefs) c.beliefs().top(maxPerConcept, recip);
-            if (includeConceptQuestions) c.questions().top(maxPerConcept, recip);
-            if (includeConceptGoals) c.goals().top(maxPerConcept, recip);
-            if (includeConceptQuests) c.quests().top(maxPerConcept, recip);
+            if (includeConceptBeliefs) c.beliefs().forEach(maxPerConcept, recip);
+            if (includeConceptQuestions) c.questions().forEach(maxPerConcept, recip);
+            if (includeConceptGoals) c.goals().forEach(maxPerConcept, recip);
+            if (includeConceptQuests) c.quests().forEach(maxPerConcept, recip);
             if (includeTaskLinks)
                 c.tasklinks().forEach(maxPerConcept, t -> recip.accept(t.get()));
         });

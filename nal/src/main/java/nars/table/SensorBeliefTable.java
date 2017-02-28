@@ -4,7 +4,6 @@ import nars.NAR;
 import nars.Task;
 import nars.concept.CompoundConcept;
 import nars.concept.SensorConcept;
-import nars.truth.Truth;
 import nars.truth.TruthDelta;
 import nars.util.signal.SignalTask;
 import org.jetbrains.annotations.NotNull;
@@ -24,6 +23,8 @@ public class SensorBeliefTable extends DefaultBeliefTable  {
         super();
         this.sensorConcept = sensorConcept;
     }
+
+
 
 
     @Override
@@ -48,6 +49,8 @@ public class SensorBeliefTable extends DefaultBeliefTable  {
 
         return super.add(input, questions, concept, nar);
     }
+
+
 
 //    @Override
 //    public TruthDelta add(@NotNull Task input, @NotNull QuestionTable questions, @NotNull CompoundConcept<?> concept, @NotNull NAR nar) {

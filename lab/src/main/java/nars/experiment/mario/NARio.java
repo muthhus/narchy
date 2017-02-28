@@ -1,20 +1,14 @@
 package nars.experiment.mario;
 
 import nars.*;
-import nars.experiment.arkanoid.Arkancide;
 import nars.experiment.mario.sprites.Mario;
-import nars.nar.NARBuilder;
-import nars.time.FrameTime;
-import nars.time.RealTime;
 
 import javax.swing.*;
-import java.awt.*;
 
-import static java.awt.event.KeyEvent.VK_LEFT;
 import static nars.$.$;
 import static nars.$.t;
 
-public class NARio extends NAgents {
+public class NARio extends NAgentX {
 
     private final MarioComponent mario;
 
@@ -46,8 +40,8 @@ public class NARio extends NAgents {
 
 
         try {
-            senseCamera("camF", ()->mario.image, 60, 30, (v) -> t(v, alpha));
-            //senseCameraRetina("camZ", ()->mario.image, 30, 18, (v) -> t(v, alpha));
+            senseCamera("camF", ()->mario.image, 60, 30, (v) -> t(v, alpha)).setResolution(0.1f);
+            senseCameraRetina("camZ", ()->mario.image, 30, 18, (v) -> t(v, alpha)).setResolution(0.04f);
 
 
             senseNumberDifference($("nario(x,v)"), ()-> mario.scene instanceof LevelScene ? ((LevelScene)mario.scene).mario.x : 0);

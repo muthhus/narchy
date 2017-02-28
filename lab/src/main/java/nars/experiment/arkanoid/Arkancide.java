@@ -4,13 +4,13 @@ package nars.experiment.arkanoid;
 import jcog.math.FloatPolarNormalized;
 import nars.*;
 import nars.concept.ActionConcept;
-import nars.NAgents;
+import nars.NAgentX;
 
 import java.io.IOException;
 
 import static nars.Op.BELIEF;
 
-public class Arkancide extends NAgents {
+public class Arkancide extends NAgentX {
 
     static boolean cam = true;
 
