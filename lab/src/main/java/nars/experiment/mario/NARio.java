@@ -92,7 +92,10 @@ public class NARio extends NAgentX {
         int coins = Mario.coins;
         float reward = coins - lastCoins;
         lastCoins = coins;
-        return 0f + Util.clamp(reward/2f, -1, +1);
+        float r = 0f + Util.clamp(reward/2f, -1, +1);
+        if (r == 0)
+            return Float.NaN;
+        return r;
     }
 
     public static void main(String[] args) {
@@ -102,7 +105,7 @@ public class NARio extends NAgentX {
 
             return new NARio(n);
 
-        }, 8, 2, -1);
+        }, 8, 4, -1);
     }
 }
 

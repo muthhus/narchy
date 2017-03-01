@@ -42,7 +42,7 @@ public class ActionConcept extends WiredConcept implements WiredConcept.Prioriti
     private final boolean updateOnBeliefChange = false;
 
     //enable/disable dynamic tasklink truth revision
-    private final boolean linkTruth = false;
+    private final boolean linkTruth = true;
 
     @Override
     public void pri(FloatSupplier v) {
@@ -96,7 +96,7 @@ public class ActionConcept extends WiredConcept implements WiredConcept.Prioriti
 
         Truth tdb, tdg;
         if (linkTruth) {
-            Truth[] td = linkTruth ? truthLinked(then, now, nar.confMin.floatValue()) : null;
+            Truth[] td = truthLinked(then, now, nar.confMin.floatValue());
             tdb = td[0];
             tdg = td[1];
         } else {
@@ -222,6 +222,7 @@ public class ActionConcept extends WiredConcept implements WiredConcept.Prioriti
 
                 Compound ct = (Compound) t;
                 Term postCondition = ct.term(1);
+
                 if (postCondition.equals(term())) {
                     //a termlink to an implication in which the postcondition is this concept
                     Concept implConcept = nar.concept(t);

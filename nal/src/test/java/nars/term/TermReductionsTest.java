@@ -106,6 +106,11 @@ public class TermReductionsTest {
         assertEquals("(robin-->bird)", $("<(|,robin)-->(|,bird)>").toString());
     }
 
+    @Test
+    public void testInheritNegative() throws Narsese.NarseseException {
+        assertEquals("(--,(x-->y))", $.inh($.neg($("x")), $("y")).toString()  );
+        assertEquals("(x-->y)", $.inh($.neg($("x")), $.neg($("y"))).toString()  );
+    }
 
     @Test
     public void testInvalidEquivalences() throws Narsese.NarseseException {

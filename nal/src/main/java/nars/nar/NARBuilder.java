@@ -10,6 +10,7 @@ import nars.bag.impl.BLinkHijackBag;
 import nars.budget.BLink;
 import nars.budget.BudgetMerge;
 import nars.conceptualize.DefaultConceptBuilder;
+import nars.conceptualize.state.DefaultConceptState;
 import nars.index.term.HijackTermIndex;
 import nars.index.term.TermIndex;
 import nars.op.mental.Compressor;
@@ -22,6 +23,7 @@ import nars.util.exe.MultiThreadExecutor;
 import org.apache.commons.math3.util.MathArrays;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Map;
 import java.util.Random;
 import java.util.function.BiFunction;
 
@@ -52,14 +54,25 @@ public interface NARBuilder {
         final int reprobes = 4;
 
         //Multi nar = new Multi(3,512,
-        DefaultConceptBuilder cb = new DefaultConceptBuilder() {
+        DefaultConceptBuilder cb = new DefaultConceptBuilder(
+                new DefaultConceptState("sleep", 12, 12, 6, 16, 8),
+                new DefaultConceptState("awake", 14, 14, 6, 48, 32)
+        ) {
             @Override
             public <X> X withBags(Term t, BiFunction<Bag<Term, BLink<Term>>, Bag<Task, BLink<Task>>, X> f) {
                 Bag<Term, BLink<Term>> termlink = new BLinkHijackBag<>(reprobes, BudgetMerge.plusBlend, rng);
                 Bag<Task, BLink<Task>> tasklink = new BLinkHijackBag<>(reprobes, BudgetMerge.plusBlend, rng);
                 return f.apply(termlink, tasklink);
             }
+
+            @NotNull
+            @Deprecated @Override
+            public <X> Bag<X, BLink<X>> newBag(@NotNull Map m) {
+                return new BLinkHijackBag<>(reprobes, BudgetMerge.plusBlend, rng);
+            }
         };
+
+
 
 
         Default nar = new Default(4 * 1024,
@@ -162,11 +175,11 @@ public interface NARBuilder {
         nar.goalConfidence(0.9f);
         //nar.derivedEvidenceGain.setValue(0.75f);
 
-        float p = 0.75f;
-        nar.DEFAULT_BELIEF_PRIORITY = 0.5f * p;
-        nar.DEFAULT_GOAL_PRIORITY = 0.95f * p;
-        nar.DEFAULT_QUESTION_PRIORITY = 0.4f * p;
-        nar.DEFAULT_QUEST_PRIORITY = 0.4f * p;
+        float p = 0.25f;
+        nar.DEFAULT_BELIEF_PRIORITY = 1f * p;
+        nar.DEFAULT_GOAL_PRIORITY = 1f * p;
+        nar.DEFAULT_QUESTION_PRIORITY = 0.75f * p;
+        nar.DEFAULT_QUEST_PRIORITY = 0.75f * p;
 
         nar.confMin.setValue(0.01f);
         nar.truthResolution.setValue(0.01f);

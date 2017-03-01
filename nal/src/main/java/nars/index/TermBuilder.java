@@ -761,6 +761,17 @@ public abstract class TermBuilder {
                         if (isTrueOrFalse(subject) || isTrueOrFalse(predicate))
                             return False;
 
+                        boolean sNeg = subject.op()==NEG;
+                        boolean pNeg = predicate.op()==NEG;
+                        if (sNeg && pNeg) {
+                            subject = subject.unneg();
+                            predicate = predicate.unneg();
+                        } else if (sNeg && !pNeg) {
+                            return neg(statement(op, dt, subject.unneg(), predicate));
+                        } else if (pNeg && !sNeg) {
+                            return neg(statement(op, dt, subject, predicate.unneg()));
+                        }
+
                         break;
 
 
@@ -785,16 +796,18 @@ public abstract class TermBuilder {
                         if (!validEquivalenceTerm(predicate))
                             throw new InvalidTermException(op, dt, "Invalid equivalence predicate", subject, predicate);
 
-                        boolean subjNeg = sop == NEG;
-                        boolean predNeg = predicate.op() == NEG;
-                        if (subjNeg && predNeg) {
-                            subject = subject.unneg();
-                            predicate = predicate.unneg();
-                            continue statement;
-                        } else if (!subjNeg && predNeg) {
-                            return neg(statement(op, dt, subject, predicate.unneg()));
-                        } else if (subjNeg && !predNeg) {
-                            return neg(statement(op, dt, subject.unneg(), predicate));
+                        {
+                            boolean subjNeg = sop == NEG;
+                            boolean predNeg = predicate.op() == NEG;
+                            if (subjNeg && predNeg) {
+                                subject = subject.unneg();
+                                predicate = predicate.unneg();
+                                continue statement;
+                            } else if (!subjNeg && predNeg) {
+                                return neg(statement(op, dt, subject, predicate.unneg()));
+                            } else if (subjNeg && !predNeg) {
+                                return neg(statement(op, dt, subject.unneg(), predicate));
+                            }
                         }
 
                         break;

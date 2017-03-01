@@ -5,13 +5,17 @@ package jcog.math;
  * */
 public class FloatPolarNormalized extends FloatNormalized {
 
-    public FloatPolarNormalized(FloatSupplier in, float midPoint) {
-        this(() -> in.asFloat() - midPoint );
+    public FloatPolarNormalized(FloatSupplier in, float midPoint, float radius) {
+        this(() -> in.asFloat() - midPoint, radius );
     }
 
     public FloatPolarNormalized(FloatSupplier in) {
+        this(in, 1);
+    }
+
+    public FloatPolarNormalized(FloatSupplier in, float radius) {
         super(in);
-        min = 0; //origin
+        radius(radius);
     }
 
     @Override

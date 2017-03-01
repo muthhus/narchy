@@ -54,6 +54,9 @@ public class DynamicBeliefTableTest {
         assertEquals($.t(1f,0.81f), n.concept($("(b --> (x|z))"), true).belief(now, dur));
         assertEquals($.t(0f,0.81f), n.concept($("(b --> (x&z))"), true).belief(now, dur));
 
+        assertTrue(n.concept($("((x|(--,y))-->a)"), true) instanceof DynamicConcept);
+        assertEquals($.t(0f,0.81f), n.concept($("((x|(--,y))-->a)"), true).belief(now, dur));
+        assertEquals($.t(1f,0.81f), n.concept($("((x|(--,z))-->a)"), true).belief(now, dur));
     }
 
     @Test
