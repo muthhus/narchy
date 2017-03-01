@@ -2,13 +2,17 @@ package nars.concept;
 
 import jcog.math.FloatSupplier;
 import nars.*;
+import nars.table.ListTemporalBeliefTable;
+import nars.table.ListTemporalExtendedBeliefTable;
 import nars.task.Revision;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.truth.Truth;
 import nars.truth.TruthFunctions;
 import nars.util.signal.ScalarSignal;
+import nars.util.signal.SignalTask;
 import org.eclipse.collections.api.block.function.primitive.FloatFunction;
+import org.eclipse.collections.api.list.MutableList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -49,6 +53,37 @@ public class ActionConcept extends WiredConcept implements WiredConcept.Prioriti
     public ActionConcept feedbackResolution(float res) {
         feedback.resolution(res);
         return this;
+    }
+
+
+    protected class MyListTemporalBeliefTable extends ListTemporalExtendedBeliefTable {
+
+        public MyListTemporalBeliefTable(int tCap, int historicCap) {
+            super(tCap, historicCap);
+        }
+
+        protected Task ressurect(Task t) {
+            t.budget().setPriority(feedback.pri.asFloat());
+            return t;
+        }
+
+        @Override
+        protected boolean save(Task t) {
+            if (t.isBelief())
+                return t instanceof SignalTask;
+            else
+                return true; //accept all goals
+        }
+
+        @Override
+        protected void feedback(MutableList<Task> l, @NotNull Task inserted) {
+            //ignore feedback here
+        }
+    }
+    @Override
+    public ListTemporalBeliefTable newTemporalTable(int tCap) {
+        //TODO only for Beliefs; Goals can remain normal
+        return new MyListTemporalBeliefTable(tCap, tCap * 4);
     }
 
     @Override

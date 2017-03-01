@@ -38,6 +38,8 @@ public class SensorConcept extends WiredConcept implements FloatFunction<Term>, 
 
     public static final Logger logger = LoggerFactory.getLogger(SensorConcept.class);
 
+    private static final int historicCapMultiplier = 4;
+
     //private boolean latchLastValue = true;
 
     public SensorConcept(@NotNull String term, @NotNull NAR n, FloatSupplier signal, FloatToObjectFunction<Truth> truth) throws Narsese.NarseseException {
@@ -57,7 +59,8 @@ public class SensorConcept extends WiredConcept implements FloatFunction<Term>, 
 
     @Override
     public ListTemporalBeliefTable newTemporalTable(int tCap) {
-        return new MyListTemporalBeliefTable(tCap);
+        //TODO only for Beliefs; Goals can remain normal
+        return new MyListTemporalBeliefTable(tCap, tCap * historicCapMultiplier);
     }
 
     //    /** originating from this sensor, or a future prediction */
@@ -198,9 +201,10 @@ public class SensorConcept extends WiredConcept implements FloatFunction<Term>, 
     }
 
 
-    private class MyListTemporalBeliefTable extends ListTemporalExtendedBeliefTable {
-        public MyListTemporalBeliefTable(int tCap) {
-            super(tCap, tCap*2);
+    protected class MyListTemporalBeliefTable extends ListTemporalExtendedBeliefTable {
+
+        public MyListTemporalBeliefTable(int tCap, int historicCap) {
+            super(tCap, historicCap);
         }
 
         protected Task ressurect(Task t) {

@@ -149,10 +149,10 @@ public abstract class STMClustered extends STM {
             return v;
         }
 
-        //TODO cache this value
-        public float priSum() {
-            return (float) tasks.stream().mapToDouble(TLink::pri).sum();
-        }
+//        //TODO cache this value
+//        public float priSum() {
+//            return (float) tasks.stream().mapToDouble(TLink::pri).sum();
+//        }
 
         /**
          * produces a parallel conjunction term consisting of all the task's terms

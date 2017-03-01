@@ -49,6 +49,8 @@ abstract public class DynamicTruthModel {
 
         float confMin = n.confMin.floatValue();
 
+        float dur = n.time.dur();
+
         for (int i = 0; i < inputs.length; i++) {
             @NotNull Term subterm = inputs[i];
             if (subterm == null)
@@ -86,11 +88,11 @@ abstract public class DynamicTruthModel {
                         return null;
                     }
                 } else {
-                    nt = table.truth(when + dt, now);
+                    nt = table.truth(when + dt, now, dur);
                     if (nt != null && add(i, d, nt.negIf(negated), confMin)) {
                         if (evi) {
                             //HACK this is a crude approximation
-                            Task bt = table.match(when + dt, now);
+                            Task bt = table.match(when + dt, now, dur);
                             if (bt == null) {
                                 return null; //missing
                             }

@@ -73,7 +73,7 @@ public class ListTemporalBeliefTable extends MultiRWFasterList<Task> implements 
 
                     float confMin = nar.confMin.floatValue();
 
-                    Function<Task, Float> rank = temporalConfidence(now, dur);
+                    Function<Task, Float> rank = temporalConfidence(now, now, dur);
 
                     while (l.size() > capacity) {
 
@@ -326,12 +326,19 @@ public class ListTemporalBeliefTable extends MultiRWFasterList<Task> implements 
     }
 
 
-    static private Function<Task, Float> temporalConfidence(long when, float dur) {
-        return x -> rankTemporalByConfidence(x, when, dur);
+    static private Function<Task, Float> temporalConfidence(long when, long now, float dur) {
+        return x -> rankTemporalByConfidence(x, when, now, dur);
     }
 
-    static final float rankTemporalByConfidence(@Nullable Task t, long when, float dur) {
-        return t != null ? t.confWeight(when, dur) : Float.NEGATIVE_INFINITY;// * (1+t.range()) * t.qua();
+    static final float rankTemporalByConfidence(@Nullable Task t, long when, long now, float dur) {
+
+        float r = (t != null) ? t.confWeight(when, dur) : Float.NEGATIVE_INFINITY;// * (1+t.range()) * t.qua();
+
+//        if (t!=null && t.start() > now+dur) {
+//            r *=2; //experimental future (prediction) preference
+//        }
+
+        return r;
 
 //        long range = Math.max(1, t.range());
 //        long worstDistance = range == 1 ? Math.abs(when - t.mid()) : Math.max(abs(when - t.start()), abs(when - t.end()));
@@ -405,11 +412,11 @@ public class ListTemporalBeliefTable extends MultiRWFasterList<Task> implements 
         }
 
         //return rankTemporalByConfidenceAndOriginality(t, when, now, -1);
-        float inputRank = input != null ? rankTemporalByConfidence(input, now, dur) : Float.POSITIVE_INFINITY;
+        float inputRank = input != null ? rankTemporalByConfidence(input, now, now, dur) : Float.POSITIVE_INFINITY;
 
-        Task a = l.minBy(temporalConfidence(now, dur));
+        Task a = l.minBy(temporalConfidence(now, now, dur));
         //return rankTemporalByConfidenceAndOriginality(t, when, now, -1);
-        if (a == null || inputRank < rankTemporalByConfidence(a, now, dur)) {
+        if (a == null || inputRank < rankTemporalByConfidence(a, now, now, dur)) {
             //dont continue if the input was too weak
             return null;
         }
@@ -488,7 +495,7 @@ public class ListTemporalBeliefTable extends MultiRWFasterList<Task> implements 
 
     @Nullable
     @Override
-    public Task match(long when, @Deprecated long now, float dur, @Nullable Task against) {
+    public Task match(long when, long now, float dur, @Nullable Task against) {
         return ifNotEmptyReadWith(l -> {
             switch (l.size()) {
 //                case 0:
@@ -496,7 +503,7 @@ public class ListTemporalBeliefTable extends MultiRWFasterList<Task> implements 
                 case 1:
                     return l.get(0); //special case avoid creating the lambda
                 default:
-                    return l.maxBy(temporalConfidence(when, dur));
+                    return l.maxBy(temporalConfidence(when, now, dur));
             }
         });
     }

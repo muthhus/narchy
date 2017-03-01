@@ -70,11 +70,11 @@ public class NAL3Test extends AbstractNALTest {
 
     @Test
     public void set_operations()  {
-        TestNAR tester = test();
-        tester.believe("<planetX --> {Mars,Pluto,Venus}>",0.9f,0.9f); //.en("PlanetX is Mars, Pluto, or Venus.");
-        tester.believe("<planetX --> {Pluto,Saturn}>", 0.7f,0.9f); //.en("PlanetX is probably Pluto or Saturn.");
-        tester.mustBelieve(cycles, "<planetX --> {Mars,Pluto,Saturn,Venus}>", 0.97f ,0.81f); //.en("PlanetX is Mars, Pluto, Saturn, or Venus.");
-        tester.mustBelieve(cycles, "<planetX --> {Pluto}>", 0.63f ,0.81f); //.en("PlanetX is probably Pluto.");
+        test()
+            .believe("<planetX --> {Mars,Pluto,Venus}>",0.9f,0.9f) //.en("PlanetX is Mars, Pluto, or Venus.");
+            .believe("<planetX --> {Pluto,Saturn}>", 0.7f,0.9f) //.en("PlanetX is probably Pluto or Saturn.");
+            .mustBelieve(cycles, "<planetX --> {Mars,Pluto,Saturn,Venus}>", 0.97f ,0.81f) //.en("PlanetX is Mars, Pluto, Saturn, or Venus.");
+            .mustBelieve(cycles, "<planetX --> {Pluto}>", 0.63f ,0.81f); //.en("PlanetX is probably Pluto.");
 
     }
 

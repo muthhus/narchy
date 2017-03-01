@@ -640,6 +640,7 @@ public class Tetris extends NAgentX {
         }
 
         public MatrixView.ViewFunction2D sensorMatrixView(NAR nar, long whenRelative) {
+            float dur = nar.time.dur();
             return (x, y, g) -> {
 //            int rgb = cam.out.getRGB(x,y);
 //            float r = decodeRed(rgb);
@@ -649,9 +650,9 @@ public class Tetris extends NAgentX {
 
                 SensorConcept s = sensors.get(y * tetris_width + x);
 
-                Truth b = s.beliefs().truth(now + whenRelative, whenRelative);
+                Truth b = s.beliefs().truth(now + whenRelative, whenRelative, dur);
                 float bf = b != null ? b.freq() : 0.5f;
-                Truth dt = s.goals().truth(now + whenRelative, whenRelative);
+                Truth dt = s.goals().truth(now + whenRelative, whenRelative, dur);
                 float dr, dg;
                 if (dt == null) {
                     dr = dg = 0;
