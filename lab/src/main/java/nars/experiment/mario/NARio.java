@@ -14,9 +14,9 @@ public class NARio extends NAgentX {
     private final MarioComponent mario;
 
     public NARio(NAR nar) {
-        super(nar);
+        super("nario", nar);
 
-        Param.ANSWER_REPORTING = false;
+        //Param.ANSWER_REPORTING = false;
 
         //Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         mario = new MarioComponent(

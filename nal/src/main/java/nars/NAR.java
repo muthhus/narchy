@@ -1258,6 +1258,8 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
 
     public final @Nullable Concept concept(@NotNull Term t, boolean createIfMissing) {
 
+        //t = post(t);
+
         t = concepts.conceptualizable(t);
         if (t == null)
             return null;

@@ -424,6 +424,9 @@ abstract public class NAgent implements NSense, NAction {
 
         int dur = (int) Math.ceil(nar.time.dur());
 
+        predictors.add( question((Compound)$.parallel(happiness, $.varDep(1)), now) );
+        predictors.add( question((Compound)$.parallel($.neg(happiness), $.varDep(1)), now) );
+
         for (Concept a : actions) {
             Term action = a.term();
 
@@ -443,6 +446,7 @@ abstract public class NAgent implements NSense, NAction {
 //                    new PredictionTask($.impl($.parallel($.neg(action), $.varQuery(1)), happiness), '?')
 //                            .eternal(),
 //                            //.time(nar, dur)
+
 
                     question(impl(action, dur, happiness), now),
                     question(impl(neg(action), dur, happiness), now),
