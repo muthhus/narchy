@@ -72,7 +72,8 @@ abstract public class NAgent implements NSense, NAction {
     public final List<ActionConcept> actions = newArrayList();
 
 
-    float lookAhead = 12;
+    /** lookahead time in durations (multiples of duration) */
+    float horizon = 32;
 
     public float alpha, gamma;
 
@@ -427,11 +428,11 @@ abstract public class NAgent implements NSense, NAction {
             Term action = a.term();
 
 
-
-
+            long now = nar.time();
             ((FasterList)predictors).addAll(
 
 
+                    quest((Compound)(action.term()), now),
 
 //                    new PredictionTask($.impl(action, dur, happiness), '?').time(nar, dur),
 //                    new PredictionTask($.impl($.neg(action), dur, happiness), '?').time(nar, dur),
@@ -443,13 +444,13 @@ abstract public class NAgent implements NSense, NAction {
 //                            .eternal(),
 //                            //.time(nar, dur)
 
-                    question(impl(action, dur, happiness), nar.time()),
-                    question(impl(neg(action), dur, happiness), nar.time()),
+                    question(impl(action, dur, happiness), now),
+                    question(impl(neg(action), dur, happiness), now),
                     //question(impl(neg(action), dur, varQuery(1)), nar.time()),
-                    question(seq(action, dur, happiness), nar.time()),
-                    question(seq(neg(action), dur, happiness), nar.time()),
-                    question(seq(action, dur, neg(happiness)), nar.time()),
-                    question(seq(neg(action), dur, neg(happiness)), nar.time())
+                    question(seq(action, dur, happiness), now),
+                    question(seq(neg(action), dur, happiness), now),
+                    question(seq(action, dur, neg(happiness)), now),
+                    question(seq(neg(action), dur, neg(happiness)), now)
 
 //                    new PredictionTask($.seq($.varQuery("x"), 0, $.seq(action, dur, happiness)), '?').eternal(),
 //                    new PredictionTask($.seq($.varQuery("x"), 0, $.seq($.neg(action), dur, happiness)), '?').eternal()
@@ -624,7 +625,7 @@ abstract public class NAgent implements NSense, NAction {
             nar.input(
                 IntStream.range(0, predictors.size()).mapToObj(i -> {
                     Task x = predictors.get(i);
-                    Task y = boost(x, pri, dur, lookAhead);
+                    Task y = boost(x, pri, dur, horizon);
                     if (x!=y) {
                         predictors.set(i, y); //predictor changed or needs re-input
                         //return y;
@@ -692,7 +693,9 @@ abstract public class NAgent implements NSense, NAction {
         byte pp = t.punc();
         if (t.start() != ETERNAL) {
 
-            return prediction(t.term(), t.punc(), t.truth(), now, now + Math.round(dur * lookAhead * nar.random.nextFloat()));
+            long shift = Math.round(dur * lookAhead * nar.random.nextFloat());
+            long range = t.end() - t.start();
+            return prediction(t.term(), t.punc(), t.truth(), now + shift , now + shift + range);
 
         } else if (t.isDeleted()) {
 
@@ -740,6 +743,9 @@ abstract public class NAgent implements NSense, NAction {
 
     public Task question(@NotNull Compound term, long when) {
         return prediction(term, QUESTION, null, when, when);
+    }
+    public Task quest(@NotNull Compound term, long when) {
+        return prediction(term, QUEST, null, when, when);
     }
 
     public Task prediction(@NotNull Compound term, byte punct, Truth truth, long start, long end) {

@@ -56,7 +56,9 @@ public interface NAction {
 
 
         ActionConcept m = new ActionConcept(s, nar(), (b, d) -> {
-            float deadZoneFreq = 1f/4;
+            float deadZoneFreq =
+                    1f/6;
+                    //1f/4
 
             int ii;
             if (d == null) {
@@ -70,6 +72,7 @@ public interface NAction {
                 else
                     ii = 0;
             }
+
             i.accept(ii);
 
             float f;

@@ -164,7 +164,7 @@ public interface NARBuilder {
 
         float p = 0.75f;
         nar.DEFAULT_BELIEF_PRIORITY = 0.5f * p;
-        nar.DEFAULT_GOAL_PRIORITY = 0.6f * p;
+        nar.DEFAULT_GOAL_PRIORITY = 0.95f * p;
         nar.DEFAULT_QUESTION_PRIORITY = 0.4f * p;
         nar.DEFAULT_QUEST_PRIORITY = 0.4f * p;
 
