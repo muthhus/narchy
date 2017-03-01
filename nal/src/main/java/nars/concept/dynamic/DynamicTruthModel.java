@@ -235,14 +235,14 @@ abstract public class DynamicTruthModel {
         }
 
         @Override
-        protected boolean add(int subterm, DynTruth d, Truth truth, float confMin) {
+        protected final boolean add(int subterm, DynTruth d, Truth truth, float confMin) {
 
             //specific to Truth.Intersection:
             d.conf *= c(truth.conf());
             if (d.conf < confMin)
                 return false;
 
-            d.freq *= truth.freq();
+            d.freq *= f(truth.freq());
 
             return true;
 

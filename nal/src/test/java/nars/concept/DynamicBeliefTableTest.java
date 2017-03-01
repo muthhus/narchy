@@ -5,6 +5,7 @@ import nars.NAR;
 import nars.Narsese;
 import nars.concept.dynamic.DynTruth;
 import nars.concept.dynamic.DynamicBeliefTable;
+import nars.concept.dynamic.DynamicConcept;
 import nars.nar.Default;
 import nars.term.Compound;
 import nars.truth.Truth;
@@ -23,11 +24,36 @@ public class DynamicBeliefTableTest {
         NAR n = new Default();
         n.believe("a:x", 1f, 0.9f);
         n.believe("a:y", 1f, 0.9f);
+        n.believe("b:x", 0f, 0.9f);
         n.run(1);
-        Truth now = n.concept($("(a:x && a:y)"), true).belief(n.time(), n.time.dur());
-        assertEquals($.t(1f,0.81f),now);
+        long now = n.time();
+        float dur = n.time.dur();
+        assertEquals($.t(1f,0.81f), n.concept($("(a:x && a:y)"), true).belief(now, dur));
+        assertEquals($.t(0f,0.81f), n.concept($("(b:x && a:y)"), true).belief(now, dur));
+        assertEquals($.t(0f,0.81f), n.concept($("(a:x && (--,a:y))"), true).belief(now, dur));
+        assertEquals($.t(1f,0.81f), n.concept($("((--,b:x) && a:y)"), true).belief(now, dur));
+        assertEquals($.t(0f,0.81f), n.concept($("((--,b:x) && (--,a:y))"), true).belief(now, dur));
+    }
+    @Test
+    public void testDynamicIntersection() throws Narsese.NarseseException {
+        NAR n = new Default();
+        n.believe("a:x", 1f, 0.9f);
+        n.believe("a:y", 1f, 0.9f);
+        n.believe("a:z", 0f, 0.9f);
+        n.believe("x:b", 1f, 0.9f);
+        n.believe("y:b", 1f, 0.9f);
+        n.believe("z:b", 0f, 0.9f);
+        n.run(1);
+        long now = n.time();
+        float dur = n.time.dur();
+        assertTrue(n.concept($("((x|y)-->a)"), true) instanceof DynamicConcept);
+        assertEquals($.t(1f,0.81f), n.concept($("((x|y)-->a)"), true).belief(now, dur));
+        assertEquals($.t(0f,0.81f), n.concept($("((x|z)-->a)"), true).belief(now, dur));
+        assertEquals($.t(1f,0.81f), n.concept($("((x&z)-->a)"), true).belief(now, dur));
+        assertEquals($.t(1f,0.81f), n.concept($("(b --> (x|y))"), true).belief(now, dur));
+        assertEquals($.t(1f,0.81f), n.concept($("(b --> (x|z))"), true).belief(now, dur));
+        assertEquals($.t(0f,0.81f), n.concept($("(b --> (x&z))"), true).belief(now, dur));
 
-        //n.ask("(a:x && a:y)")
     }
 
     @Test
