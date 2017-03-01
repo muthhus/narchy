@@ -133,7 +133,7 @@ public interface NARBuilder {
 //            }
 
             final Compressor compressor = new Compressor(this, "_",
-                    4, 10,
+                    4, 14,
                     2f, 16, 256);
 
             @Override

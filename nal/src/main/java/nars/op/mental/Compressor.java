@@ -1,10 +1,11 @@
 package nars.op.mental;
 
-import com.github.benmanes.caffeine.cache.Cache;
-import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.RemovalCause;
 import com.github.benmanes.caffeine.cache.RemovalListener;
+import jcog.bag.RawPLink;
+import jcog.bag.impl.HijackBag;
 import nars.*;
+import nars.bag.impl.PLinkHijackBag;
 import nars.budget.BLink;
 import nars.budget.Budget;
 import nars.concept.PermanentConcept;
@@ -26,13 +27,16 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static java.util.stream.Collectors.toList;
 import static nars.Op.BELIEF;
 import static nars.term.Terms.compoundOr;
 import static nars.term.Terms.compoundOrNull;
@@ -47,28 +51,30 @@ public class Compressor extends Abbreviation implements RemovalListener<Compound
     final ByteMatcherTransitionFactory<SequenceMatcher> transitionFactory = new ByteMatcherTransitionFactory<>();
     final TrieFactory<SequenceMatcher> smFactory = sequences -> new SequenceMatcherTrie(sequences, stateFactory, transitionFactory);
 
-    private MultiSequenceMatcher encoder;
-    private MultiSequenceMatcher decoder;
+    private MultiSequenceMatcher encoder, decoder;
 
-    final Cache<Compound, Abbr> code;
+    //final Cache<Compound, Abbr> code;
+    final HijackBag<Compound,Abbr> code;
 
     final Map<SequenceMatcher, Abbr> dc = new ConcurrentHashMap(); //HACK
     final Map<SequenceMatcher, Abbr> ec = new ConcurrentHashMap(); //HACK
+    private float boostBig = 0.1f;
+    private float boostSmall = 0.05f;
 
 
-    /* static */ class Abbr {
-        public final Compound decompressed;
-        @NotNull public final AliasConcept compressed;
+    /* static */ class Abbr extends RawPLink<Compound> {
+
+        @NotNull
+        public final AliasConcept compressed;
         final SequenceMatcher encode;
         final SequenceMatcher decode;
         private final byte[] encoded;
         private final byte[] decoded;
 
         Abbr(Compound decompressed, @NotNull AliasConcept compressed, NAR nar) {
+            super(decompressed, 1f);
 
             this.compressed = compressed;
-
-            this.decompressed = decompressed;
 
             this.encoded = IO.asBytes(this.compressed);
             this.decoded = IO.asBytes(decompressed);
@@ -87,7 +93,9 @@ public class Compressor extends Abbreviation implements RemovalListener<Compound
     public Compressor(@NotNull NAR n, String termPrefix, int volMin, int volMax, float selectionRate, int pendingCapacity, int maxCodes) {
         super(n, termPrefix, volMin, volMax, selectionRate, pendingCapacity);
 
-        code = Caffeine.newBuilder().maximumSize(maxCodes).removalListener(this).executor(n.exe).build();
+        code =
+                //Caffeine.newBuilder().maximumSize(maxCodes).removalListener(this).executor(n.exe).build();
+                new PLinkHijackBag(maxCodes, 4, nar.random);
     }
 
 
@@ -102,7 +110,7 @@ public class Compressor extends Abbreviation implements RemovalListener<Compound
 //        if (xxl >= volume.lo() && xxl <= volume.hi()) {
         //return super.onOut(b);
         x = compoundOrNull((nar.concepts.productNormalize(x)).unneg());
-        if (x!=null) {
+        if (x != null) {
             abbreviate(x, b);
             return 1f;
         } else
@@ -132,49 +140,56 @@ public class Compressor extends Abbreviation implements RemovalListener<Compound
         if (nar.concept(abbreviated) instanceof PermanentConcept)
             return;
 
-        Abbr abb = code.get(abbreviated, (a) -> {
+        Abbr abb = (Abbr) code.get(abbreviated);
+        if (abb != null) {
+            //boost it
+            abb.priAdd(b.pri());
+            return;
+        }
 
 
+        //System.out.println("compress CODE: " + a + " to " + compr);
 
-            //System.out.println("compress CODE: " + a + " to " + compr);
+        changed[0] = true;
+        AliasConcept aa = AliasConcept.get(newSerialTerm(), abbreviated, nar);
+        if (aa == null)
+            return;
 
-            changed[0] = true;
-            AliasConcept aa = AliasConcept.get(newSerialTerm(), a, nar);
-            if (aa == null)
-                return null;
+        abb = new Abbr(abbreviated  /** store fully decompress */, aa, nar);
 
-            return new Abbr(a  /** store fully decompress */, aa, nar);
-        });
-        if (changed[0]) {
-            if (abb!=null) {
-                Compound s = compoundOrNull(
-                        //$.sim
-                        $.equi
-                                (abb.compressed, abb.decompressed)
-                );
-                if (s == null) {
-                    logger.warn("unrelateable: {}", abb);
-                } else {
-
-
-                    Task abbreviationTask = new AbbreviationTask(
-                            s, BELIEF, $.t(1f, abbreviationConfidence.floatValue()),
-                            nar.time(), ETERNAL, ETERNAL,
-                            new long[] { nar.time.nextStamp() }, abb.decompressed, abb.compressed
-                            );
-                    abbreviationTask.log("Abbreviate");
-                    abbreviationTask.setBudget(b);
-                    nar.input(abbreviationTask);
-
-                    recompile();
-                }
-            } else {
-                code.invalidate(abbreviated);
+        synchronized (code) {
+            if (code.put(abb) == null) {
+                return; //failed insert
             }
+        }
 
+        code.commit();
+
+        Compound s = compoundOrNull(
+                //$.sim
+                $.equi
+                        (abb.compressed, abb.get())
+        );
+        if (s == null) {
+            logger.error("unrelateable: {}", abb);
+        } else {
+
+
+            Task abbreviationTask = new AbbreviationTask(
+                    s, BELIEF, $.t(1f, abbreviationConfidence.floatValue()),
+                    nar.time(), ETERNAL, ETERNAL,
+                    new long[]{nar.time.nextStamp()}, abb.get(), abb.compressed
+            );
+            abbreviationTask.log("Abbreviate");
+            abbreviationTask.setBudget(b);
+            nar.input(abbreviationTask);
+
+            recompile();
         }
 
     }
+
+
 
     final AtomicBoolean busy = new AtomicBoolean();
 
@@ -194,7 +209,9 @@ public class Compressor extends Abbreviation implements RemovalListener<Compound
 
     private MultiSequenceMatcher matcher(Function<Abbr, SequenceMatcher> which) {
 
-        List<SequenceMatcher> mm = code.asMap().values().stream().map(which).collect(Collectors.toList());
+        Collection<SequenceMatcher> mm = HijackBag.stream(code.map.get()).filter(Objects::nonNull).map(which).collect(toList());
+            //code.asMap().values().stream().map(which).collect(Collectors.toList());
+
         switch (mm.size()) {
             case 0:
                 return null;
@@ -252,7 +269,7 @@ public class Compressor extends Abbreviation implements RemovalListener<Compound
         else {
             byte[] ii = IO.asBytes(t);
             byte[] oo = transcode(ii, en);
-            return ii != oo ? compoundOr(IO.termFromBytes(oo, nar.concepts), (Compound)t) : t;
+            return ii != oo ? compoundOr(IO.termFromBytes(oo, nar.concepts), (Compound) t) : t;
         }
     }
 
@@ -278,7 +295,7 @@ public class Compressor extends Abbreviation implements RemovalListener<Compound
 
     @NotNull
     public Compound decode(Compound t) {
-        return (Compound)transcode(t, false);
+        return (Compound) transcode(t, false);
     }
 
 
@@ -297,6 +314,7 @@ public class Compressor extends Abbreviation implements RemovalListener<Compound
         ByteArrayReader wr = null;
         final IntArrayList termPos = new IntArrayList();
 
+        int numCodes = code.size();
 
         do {
 
@@ -320,7 +338,7 @@ public class Compressor extends Abbreviation implements RemovalListener<Compound
 
                 /*Array*/
                 SequenceMatcher m = coder.firstMatch(wr, i);
-                if (m!=null) {
+                if (m != null) {
                     //if (!mm.isEmpty()) {
                     //int mms = mm.size();
 
@@ -328,6 +346,8 @@ public class Compressor extends Abbreviation implements RemovalListener<Compound
                     //SequenceMatcher m = mm.get(i1);
                     Abbr c = abbr(m, en);
                     if (c != null) {
+                        c.priAdd(1f/ numCodes);
+
                         //substitute
                         final byte[] to = en ? c.encoded : c.decoded;
                         final byte[] from = en ? c.decoded : c.encoded;
