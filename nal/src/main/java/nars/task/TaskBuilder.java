@@ -73,7 +73,6 @@ public class TaskBuilder extends RawBudget implements Termed, Truthed, Function<
 //    /** Belief from which the Task is derived, or null if derived from a theorem     */
 //    @Nullable protected transient Reference<Task> parentBelief;
 
-    private transient int hash;
     @Nullable
     private List log;
 
@@ -136,24 +135,19 @@ public class TaskBuilder extends RawBudget implements Termed, Truthed, Function<
 
         Compound t = term;
 
-        if (!t.levelValid(n.level()))
-            throw new InvalidTaskException(this, "Unsupported NAL level");
-
         byte punc = punc();
         if (punc == 0)
             throw new InvalidTaskException(this, "Unspecified punctuation");
-
 
         Compound cntt = eval(n.concepts, t);
         if (cntt == null)
             throw new InvalidTaskException(t, "Failed normalization");
 
-        if (!Task.taskContentValid(cntt, punc, n.level(), n.termVolumeMax.intValue(), !Param.DEBUG))
+        if (!Task.taskContentValid(cntt, punc, n, !Param.DEBUG))
             throw new InvalidTaskException(cntt, "Invalid content");
 
         if (cntt != t) {
             this.term = cntt;
-            invalidate();
         }
 
         //noinspection IfStatementWithTooManyBranches
@@ -286,7 +280,6 @@ public class TaskBuilder extends RawBudget implements Termed, Truthed, Function<
 
         if (!Objects.equals(truth, t)) {
             truth = t;
-            invalidate();
         }
     }
 
@@ -305,7 +298,6 @@ public class TaskBuilder extends RawBudget implements Termed, Truthed, Function<
 
         if (this.evidence != evidentialSet) {
             this.evidence = evidentialSet;
-            invalidate();
         }
         return this;
     }
@@ -379,10 +371,6 @@ public class TaskBuilder extends RawBudget implements Termed, Truthed, Function<
         return this;
     }
 
-    protected final void invalidate() {
-        hash = 0;
-    }
-
     /**
      * TODO for external use in TaskBuilder instances only
      */
@@ -393,7 +381,6 @@ public class TaskBuilder extends RawBudget implements Termed, Truthed, Function<
         if (o != start) {
 
             this.start = o;
-            invalidate();
         }
     }
 
@@ -411,7 +398,6 @@ public class TaskBuilder extends RawBudget implements Termed, Truthed, Function<
                 throw new RuntimeException("end must be equal to or greater than start");
 
             this.end = o;
-            invalidate();
         }
     }
 

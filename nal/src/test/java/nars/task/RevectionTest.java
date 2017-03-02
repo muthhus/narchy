@@ -125,7 +125,7 @@ public class RevectionTest {
 //
 //    }
 
-    public static void print(@NotNull TruthPolation p, @NotNull List<Task> l, int start, int end) {
+    public static void print(@NotNull List<Task> l, int start, int end) {
         //interpolation (revision) and extrapolation (projection)
         System.out.println("INPUT");
         for (Task t : l) {
@@ -136,7 +136,7 @@ public class RevectionTest {
 
         System.out.println("TRUTHPOLATION");
         for (long d = start; d < end; d++) {
-            Truth a1 = TruthPolation.truth(d, 1, l);
+            Truth a1 = TruthPolation.truth(null, d, 1, l);
             System.out.println(d + ": " + a1);
         }
     }

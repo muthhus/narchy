@@ -36,10 +36,6 @@ public enum TruthPolation  {
     final static float MIN_ILLUMINATION = c2w(TRUTH_EPSILON);
 
     @Nullable
-    public static Truth truth(long when, float dur, @NotNull List<Task> tasks) {
-        return truth(null, when, dur, tasks);
-    }
-    @Nullable
     public static Truth truth(long when, float dur, @NotNull Task... tasks) {
         return truth(null, when, dur, Lists.newArrayList(tasks));
     }
@@ -51,7 +47,6 @@ public enum TruthPolation  {
 
         int tasksSize = tasks.size();
         if (tasksSize > 0) {
-
 
             // Contribution of each sample point to the illumination of the
             // microsphere's facets.
@@ -80,118 +75,7 @@ public enum TruthPolation  {
         float f = weightedValue / illumination;
         float c = w2c(illumination);
 
-        //System.out.println(when + " " + $.t(f, c) + " (" + weightedValue + " " + illumination + ")\n\t" + Arrays.toString(tasks));
-
         return $.t(f, c);
     }
-
-
-//    /**
-//     * Microsphere "facet" (surface element).
-//     */
-//    private static class Facet {
-//        /** Normal vector characterizing a surface element. */
-//        private final float[] normal;
-//
-//        /**
-//         * @param n Normal vector characterizing a surface element
-//         * of the microsphere. No copy is made.
-//         */
-//        Facet(float[] n) {
-//            normal = n;
-//        }
-//
-//        /**
-//         * Return a reference to the vector normal to this facet.
-//         *
-//         * @return the normal vector.
-//         */
-//        public float[] getNormal() {
-//            return normal;
-//        }
-//    }
-//
-//    /**
-//     * Data associated with each {@link Facet}.
-//     */
-//    private static class FacetData {
-//        /** Illumination received from the sample. */
-//        private final float illumination;
-//        /** Data value of the sample. */
-//        private final float sample;
-//
-//        /**
-//         * @param illumination Illumination.
-//         * @param sample Data value.
-//         */
-//        FacetData(float illumination, float sample) {
-//            this.illumination = illumination;
-//            this.sample = sample;
-//        }
-//
-//        /**
-//         * Get the illumination.
-//         * @return the illumination.
-//         */
-//        public float illumination() {
-//            return illumination;
-//        }
-//
-//        /**
-//         * Get the data value.
-//         * @return the data value.
-//         */
-//        public float sample() {
-//            return sample;
-//        }
-//    }
-
-//
-//    public float[] value(float[] floats, float[][] data, float[] value, float exp, float ulp) {
-//        return value(floats, data, value, null, exp, ulp, data.length);
-//    }
-
-
-//    LightCurve lightCurve = (dt, evidence) -> {
-//
-//        //if (dt > dtTolerance) dt -= dtTolerance;
-//
-//
-//        //return 1f / (1f + (dt*dt)/(duration*duration));
-//        //return 1f / (1f + (dt/duration)*(dt/duration));
-//        //return 1f / (1f + (dt / duration));
-//        //return 1f / (float)Math.log(dt/duration + Math.E);
-//        return 1f / (dt/duration + 1f);
-//        //return 1f / ((dt*dt)/durationSq + 1f);
-//        //return (float)Math.sqrt(1f / (dt/durationSq + 1f));
-//        //return (1f / (1f + (float)log(dt + 1f)));
-//    };
-
-//    public final WeakHashMap<Task,Float> credit =new WeakHashMap();
-//
-//    protected void updateCredit() {
-//
-//        for (double[] ss : s.microsphereData) {
-//            int sample = (int)ss[3];
-//            if (sample >= 0) {
-//                credit.compute(tasks.get(sample), (tt,v) -> {
-//                    float ill = (float)ss[0];
-//                    if (v == null)
-//                        return ill;
-//                    else
-//                        return v+ill;
-//                });
-//            }
-//
-//        }
-//
-//    }
-
-
-
-//    /** returns a metric of the usefulness of a given task according to its influence in determining past measurements */
-//    public float value(Task t, float valueIfNotKnown) {
-//        return credit.getOrDefault(t, valueIfNotKnown);
-//    }
 
 }

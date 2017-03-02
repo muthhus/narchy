@@ -466,7 +466,7 @@ public class Tetris extends NAgentX {
 
             //nar.derivedEvidenceGain.setValue(2f);
 
-            nar.termVolumeMax.setValue(40);
+
             //nar.truthResolution.setValue(0.05f);
 
             //NAR nar = new TaskNAR(32 * 1024, new MultiThreadExecutioner(4, 4096), clock);

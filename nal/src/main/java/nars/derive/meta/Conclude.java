@@ -4,6 +4,7 @@ import com.google.common.base.Joiner;
 import nars.NAR;
 import nars.Op;
 import nars.Param;
+import nars.Task;
 import nars.budget.Budget;
 import nars.derive.rule.PremiseRule;
 import nars.premise.Derivation;
@@ -117,6 +118,8 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
                     }
 
                     TruthPuncEvidence ct = m.punct.get();
+                    byte punc = ct.punc;
+
                     Truth truth = ct.truth;
 
                     if (crr.op()==NEG) {
@@ -128,7 +131,12 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
                             truth = truth.negated();
                     }
 
-                    byte punc = ct.punc;
+                    if (!Task.taskContentValid(crr, punc, nar, !Param.DEBUG)) {
+                        //throw new InvalidTaskException(crr, "Invalid content");
+                        //Task.taskContentValid(crr, punc, nar, !Param.DEBUG);
+                        return true;
+                    }
+
                     Budget budget = m.premise.budget(crr, truth, punc, m);
                     if (budget != null) {
                         derive(m, crr, truth, budget, punc, ct.evidence); //continue to stage 2

@@ -112,17 +112,23 @@ public class QuestionTest {
         NAR nar = new Terminal();
 
         final int[] s = {0};
+        StringBuilder match = new StringBuilder();
         new OperationTaskMatch( $.$("add(%1, %2, #x)"), nar) {
 
             @Override
             protected void onMatch(Term[] args) {
-                System.out.println(Arrays.toString(args));
+                match.append(Arrays.toString(args)).append(' ');
             }
         };
 
         nar.ask($.$("add(1, 2, #x)"));
 
+        assertTrue(match.toString().contains("[1, 2, #1026]"));
 
+        nar.ask($.$("add(1, #x)"));
+        nar.ask($.$("(#x --> add)"));
+
+        assertFalse(match.toString().contains("[1, #1026]"));
     }
 
     /** tests whether the use of a question guides inference as measured by the speed to reach a specific conclusion */

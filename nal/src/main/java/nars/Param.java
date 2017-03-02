@@ -44,7 +44,7 @@ public abstract class Param  {
      * if this is exceeded it may indicate a recursively
      * malformed term due to a serious inference bug
      */
-    public final MutableInteger termVolumeMax = new MutableInteger(COMPOUND_VOLUME_MAX / 2 );
+    public final MutableInteger termVolumeMax = new MutableInteger(COMPOUND_VOLUME_MAX );
 
     //public static final boolean ARITHMETIC_INDUCTION = false;
 

@@ -112,11 +112,15 @@ public interface Task extends Budgeted, Truthed, Stamp, Termed<Compound>, Tasked
     }
 
     @Nullable
-    static boolean taskContentValid(@NotNull Compound t, byte punc, int nalLevel, int maxVol, boolean safe) {
+    static boolean taskContentValid(@NotNull Compound t, byte punc, NAR nar, boolean safe) {
         if (!t.isNormalized())
             return test(t, "Task Term is null or not a normalized Compound", safe);
+
+        int maxVol = nar.termVolumeMax.intValue();
         if (t.volume() > maxVol)
             return test(t, "Term exceeds maximum volume", safe);
+
+        int nalLevel = nar.level();
         if (!t.levelValid(nalLevel))
             return test(t, "Term exceeds maximum NAL level", safe);
 

@@ -368,12 +368,10 @@ public class Inperience extends Leak<Task, BLink<Task>> {
         //TODO should this be a mew stamp or attached to parent.. originally it was a fresh new stamp from memory
 
         long now = nar.time();
+        long when = now + delay;
 
-        nar.input(new TaskBuilder(new_term, GOAL, 1f, nar)
-                        /*.budget(Global.DEFAULT_GOAL_PRIORITY * INTERNAL_EXPERIENCE_PRIORITY_MUL,
-                                Global.DEFAULT_GOAL_DURABILITY * INTERNAL_EXPERIENCE_DURABILITY_MUL)*/
-                //.parent(parent, belief)
-                .time(now, now + delay)
+        nar.input(
+            new ImmutableTask(new_term, GOAL, $.t(1f, nar.confidenceDefault(GOAL)), now, when, when, new long[] { nar.time.nextStamp() })
                 .log("Inperience")
         );
     }

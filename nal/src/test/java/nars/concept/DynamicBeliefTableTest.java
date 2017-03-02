@@ -3,15 +3,18 @@ package nars.concept;
 import nars.$;
 import nars.NAR;
 import nars.Narsese;
+import nars.Task;
 import nars.concept.dynamic.DynTruth;
 import nars.concept.dynamic.DynamicBeliefTable;
 import nars.concept.dynamic.DynamicConcept;
 import nars.nar.Default;
 import nars.term.Compound;
 import nars.truth.Truth;
+import org.jetbrains.annotations.Nullable;
 import org.junit.Test;
 
 import static nars.$.$;
+import static nars.Op.QUESTION;
 import static org.junit.Assert.*;
 
 /**
@@ -195,4 +198,15 @@ public class DynamicBeliefTableTest {
 
     }
 
+    @Test public void testAnswerTemplateWithVar() throws Narsese.NarseseException {
+        NAR n = new Default();
+        String c = "(tetris-->(((0,(1,(1))),(0,(0,(1,(0)))))&((1,(0,(1))),(0,(0,(1,(0)))))))";
+        n.believe(c);
+        n.run(1);
+        @Nullable Task a = n.concept(c).beliefs().match(0, 0, 1, $.task($("(tetris-->#1)"), QUESTION, null).apply(n), false);
+        //System.out.println(a);
+        assertEquals("$.50;.90$ (tetris-->(((0,(1,(1))),(0,(0,(1,(0)))))&((1,(0,(1))),(0,(0,(1,(0))))))). %1.0;.90%", a.toString());
+//        @Nullable Task b = n.concept(c).beliefs().match(10, 0, 1, $.task($("(tetris-->#1)"), QUESTION, null).apply(n), false);
+//        System.out.println(b);
+    }
 }
