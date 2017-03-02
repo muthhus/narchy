@@ -248,7 +248,6 @@ public class NAL5Test extends AbstractNALTest {
     @Test
     public void compound_decomposition_two_premises3(){
         TestNAR tester = test();
-        tester.log();
         tester.believe("(||,<robin --> [flying]>,<robin --> swimmer>)"); //.en("Robin can fly or swim.");
         tester.believe("<robin --> swimmer>",0.0f,0.9f); //.en("Robin cannot swim.");
         tester.mustBelieve(cycles,"<robin --> [flying]>",1.00f,0.81f); //.en("Robin can fly.");
@@ -328,7 +327,6 @@ public class NAL5Test extends AbstractNALTest {
          OUT: <(--,<robin --> [flying]>) ==> <robin --> bird>>. %0.00;0.45%
                       // I guess it is unlikely that if robin cannot fly then robin is a type of bird.
          */
-        tester.log();
         tester.believe("<(--,<robin --> bird>) ==> <robin --> [flying]>>", 0.1f, 0.9f); //.en("It is unlikely that if robin is not a type of bird then robin can fly.");
         tester.ask("<(--,<robin --> [flying]>) ==> <robin --> bird>>"); //.en("If robin cannot fly then is robin a type of bird ? ");
         tester.mustBelieve(cycles, " <(--,<robin --> [flying]>) ==> <robin --> bird>>", 0f, 0.45f); //.en("I guess it is unlikely that if robin cannot fly then robin is a type of bird.");

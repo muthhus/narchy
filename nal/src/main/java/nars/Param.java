@@ -95,16 +95,6 @@ public abstract class Param  {
     ///* adjuts this between 0 and 1. 0=fully backward, 0.5=balanced, 1=fully forward */
     //public static final float ACTIVATION_TERMLINK_BALANCE = 0.5f;
 
-    /** note: depth=0 means the concept itself, and increasing numbers are recursion iterations in the activation traversal pattern */
-    public static final int ACTIVATION_TERMLINK_DEPTH = 3;
-    //public static final int ACTIVATION_CONCEPTUALIZE_DEPTH = 3;
-    //public static final int ACTIVATION_TASKLINK_DEPTH = 1;
-    //public static final boolean ACTIVATE_TERMLINKS_IF_NO_TEMPLATE = false;
-
-
-    //public static final boolean PREMISE_LOG = true;
-
-
 
     /** used in linear interpolating link adjustments during feedback. set to zero to disable */
     public final FloatParam linkFeedbackRate = new FloatParam(0.0f);

@@ -32,7 +32,7 @@ import static nars.util.UtilityFunctions.aveAri;
 
 abstract public class PremiseBuilder {
 
-    private static final Logger logger = LoggerFactory.getLogger(PremiseBuilder.class);
+    //private static final Logger logger = LoggerFactory.getLogger(PremiseBuilder.class);
 
     @FunctionalInterface interface DerivationBuilder {
         @Nullable Derivation derive(@NotNull Premise p, @NotNull Consumer<DerivedTask> each, @NotNull NAR nar);
@@ -293,7 +293,7 @@ abstract public class PremiseBuilder {
 
             List<Term> result = $.newArrayList(1);
             new UnifySubst(null /* all variables */, nar, (r) -> {
-                if (!r.equals(q)) {
+                if (!r.equals(q) && !q.containsTermRecursively(r) /* HACK to prevent answering (#1 && x) with (x && x) === x */) {
                     return result.add(r);
                 }
                 return false;
@@ -312,34 +312,4 @@ abstract public class PremiseBuilder {
             return null;
     }
 
-
-//    /**
-//     * attempt to revise / match a better premise task
-//     */
-//    private static Task match(Task task, NAR nar) {
-//
-//        if (!task.isInput() && task.isBeliefOrGoal()) {
-//            Concept c = task.concept(nar);
-//
-//            long when = task.occurrence();
-//
-//            if (c != null) {
-//                BeliefTable table = (BeliefTable) c.tableFor(task.punc());
-//                long now = nar.time();
-//                Task revised = table.match(when, now, task, false);
-//                if (revised != null) {
-//                    if (task.isDeleted() || task.conf() < revised.conf()) {
-//                        task = revised;
-//                    }
-//                }
-//
-//            }
-//
-//        }
-//
-//        if (task.isDeleted())
-//            return null;
-//
-//        return task;
-//    }
 }

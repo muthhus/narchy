@@ -63,13 +63,7 @@ public class PreferSimpleAndConfidentPremise extends DefaultPremise {
 
     @Override
     protected float qualityFactor(@NotNull Truth truth, @NotNull Derivation conclude) {
-
-        float pe = conclude.premiseEvidence;
-        if (pe == 0)
-            return 0; //??
-        //return truth.conf() / w2c(pe);
-        return and(truth.conf(), w2c(pe));
-
+        return and(truth.conf(), w2c( conclude.premiseEvidence ));
     }
 
 }

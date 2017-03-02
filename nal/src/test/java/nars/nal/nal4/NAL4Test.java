@@ -44,7 +44,6 @@ public class NAL4Test extends AbstractNALTest {
     @Test
     public void structural_transformation1_DepVar()  {
         TestNAR t = test();
-        t.log();
         t.believe("reaction(acid,#1)",1.0f,0.9f); //en("An acid and a base can have a reaction.");
         t.mustBelieve(CYCLES, "<acid --> (/,reaction,_,#1)>", 1.0f, 0.9f); //en("Acid can react with base.");
         t.mustBelieve(CYCLES, "<#1 --> (/,reaction,acid,_)>", 1.0f, 0.9f); //en("A base is something that has a reaction with an acid.");
@@ -89,7 +88,6 @@ public class NAL4Test extends AbstractNALTest {
     @Test
     public void structural_transformation5()  {
         TestNAR tester = test();
-        tester.log();
         tester.believe("<(\\,neutralization,_,base) --> acid>",1.0f,0.9f); //en("Something that can neutralize a base is an acid.");
         tester.mustBelieve(CYCLES, "<neutralization --> (acid,base)>", 1.0f, 0.9f); //en("Neutralization is a relation between an acid and a base.");
     }
@@ -194,7 +192,6 @@ public class NAL4Test extends AbstractNALTest {
     @Test
     public void composition_on_both_sides_of_a_statement2()  {
         TestNAR tester = test();
-        tester.log();
         tester.believe("<neutralization --> reaction>",1.0f,0.9f); //en("Neutralization is a type of reaction.");
         tester.ask("<(\\,neutralization,acid,_) --> ?x>"); //en("What can be neutralized by acid?");
             //?x could be anything, including #x, or some other non-variable value

@@ -21,11 +21,6 @@ public class PForget<X extends Priority> implements Consumer<X> {
         this.gain = 1f-rate;
     }
 
-    @Nullable
-    public static <X> Consumer<X> forget(int s, float p, float m, FloatToObjectFunction<Consumer<X>> f) {
-        return Bag.forget(s, p, m, Param.BAG_TEMPERATURE, Param.BUDGET_EPSILON, f);
-    }
-
     @Override
     public void accept(@NotNull X b) {
         float p = b.priSafe(-1);

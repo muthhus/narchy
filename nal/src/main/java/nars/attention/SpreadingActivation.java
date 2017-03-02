@@ -33,8 +33,8 @@ public class SpreadingActivation extends Activation implements ObjectFloatProced
     /**
      * runs the task activation procedure
      */
-    public SpreadingActivation(@NotNull Budgeted in, @NotNull Concept c, @NotNull NAR nar, float scale, ObjectFloatHashMap<Termed> spread) {
-        this(in, scale, c, in instanceof Task ? levels(((Task)in).term()) : Param.ACTIVATION_TERMLINK_DEPTH,
+    public SpreadingActivation(@NotNull Task in, @NotNull Concept c, @NotNull NAR nar, float scale, ObjectFloatHashMap<Termed> spread) {
+        this(in, scale, c, levels(in.term()),
                 spread,
                 nar);
     }

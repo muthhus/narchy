@@ -22,7 +22,7 @@ abstract public class DefaultPremise extends Premise {
     }
 
 
-    protected Budget budget(float priFactor, float quaFactor, float quaMin) {
+    @Nullable protected Budget budget(float priFactor, float quaFactor, float quaMin) {
         float q = qua() * quaFactor;
         if (q < quaMin)
             return null;
@@ -38,8 +38,8 @@ abstract public class DefaultPremise extends Premise {
         if (truth!=null) {
             //belief and goal:
             float quaFactor = unitize(qualityFactor(truth, conclude));
-            if (quaFactor!=quaFactor)
-                throw new Budget.BudgetException("NaN quality during premise build");
+//            if (quaFactor!=quaFactor)
+//                throw new Budget.BudgetException("NaN quality during premise build");
 
             //early termination test to avoid calculating priFactor:
             if (quaFactor * qua() < quaMin)

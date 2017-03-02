@@ -164,9 +164,6 @@ public class NAL8Test extends AbstractNALTest {
     public void condition_goal_deductionWithVariableElimination()  {
 
         test()
-
-                .log()
-                //.input("at(SELF,{t003}). :|:")
                 .input("goto({t003}). :|:")
                 .inputAt(10, "(goto(#1) &&+5 at(SELF,#1))!")
 
@@ -455,7 +452,6 @@ public class NAL8Test extends AbstractNALTest {
     @Test
     public void subgoal_2_inner_dt()  {
         test()
-            .log()
             .input("(hold(SELF,{t002}) &&+5 (at(SELF,{t001}) &&+5 open({t001})))! :|:")
             .mustDesire(cycles, "hold(SELF,{t002})", 1.0f, 0.73f, 0)
             .mustNotOutput(cycles, "hold(SELF,{t002})", GOAL, ETERNAL);
@@ -980,7 +976,6 @@ public class NAL8Test extends AbstractNALTest {
     //similarity should not spread desire
     @Test public void testNegatedGoalSimilaritySpreading() {
         test()
-                .log()
                 .input("--(R)!")
                 .input("((G) <-> (R)).")
                 .mustNotOutput(cycles, "(G)", GOAL, ETERNAL); // because <-> isnt symmetric

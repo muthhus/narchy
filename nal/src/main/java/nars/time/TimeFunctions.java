@@ -10,6 +10,7 @@ import nars.derive.meta.Conclude;
 import nars.derive.meta.OccurrenceSolver;
 import nars.derive.rule.PremiseRule;
 import nars.premise.Derivation;
+import nars.premise.Premise;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
@@ -134,13 +135,13 @@ public interface TimeFunctions {
         }
 
         if ((polarity == 0) || (polarity == 2) || (polarity == -2)) {
-            occReturn[0] = p.occurrenceTarget(earliestOccurrence); //TODO CALCULATE
+            occReturn[0] = occurrenceTarget(p.premise, earliestOccurrence); //TODO CALCULATE
 
             //restore forward polarity for function call at the end
             polarity = 1;
         } else {
             //diff
-            occReturn[0] = p.occurrenceTarget(earliestOccurrence);
+            occReturn[0] = occurrenceTarget(p.premise, earliestOccurrence);
         }
 
         return deriveDT(derived, polarity, dt, occReturn);
@@ -165,7 +166,7 @@ public interface TimeFunctions {
         if (beliefStart != ETERNAL && taskStart != ETERNAL) {
 
             int dt = (int) (beliefStart - taskStart); //TODO check valid int/long conversion
-            long start = p.occurrenceTarget(earliestOccurrence);
+            long start = occurrenceTarget(p.premise, earliestOccurrence);
 
             occReturn[0] = start;
 
@@ -592,7 +593,7 @@ public interface TimeFunctions {
             }
         }
 
-        occReturn[0] = p.occurrenceTarget(earliestOccurrence);
+        occReturn[0] = occurrenceTarget(p.premise, earliestOccurrence);
 
         if (pre && derived.term(0) instanceof Compound) {
             //set subterm 0's DT
@@ -1007,6 +1008,26 @@ public interface TimeFunctions {
             return (Compound) n;
         } else {
             return derived;
+        }
+    }
+
+
+    public static long occurrenceTarget(Premise p, @NotNull OccurrenceSolver s) {
+        long tOcc = p.task.start();
+        Task b = p.belief;
+        if (b == null) {
+            return tOcc;
+        } else {
+            long bOcc = b.start();
+            return s.compute(tOcc, bOcc);
+
+//            //if (bOcc == ETERNAL) {
+//            return (tOcc != ETERNAL) ?
+//                        whenBothNonEternal.compute(tOcc, bOcc) :
+//                        ((bOcc != ETERNAL) ?
+//                            bOcc :
+//                            ETERNAL
+//            );
         }
     }
 }

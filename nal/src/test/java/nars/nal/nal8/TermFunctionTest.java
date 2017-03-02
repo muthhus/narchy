@@ -56,7 +56,6 @@ public class TermFunctionTest {
         Param.DEBUG = true;
 
         TestNAR t = new TestNAR(new Default());
-        t.log();
         t.believe("((complexity($1)<->3)==>c3($1))");
         //t.believe("--(2<->3)");
         t.ask("c3(x:y)");

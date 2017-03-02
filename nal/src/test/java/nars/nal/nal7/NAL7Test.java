@@ -979,7 +979,6 @@ public class NAL7Test extends AbstractNALTest {
     @Test
     public void testPreconditionCombineNeg() { //may be equivalent to another case
         test()
-                .log()
                 .believe("((x) ==>+5 (z))")
                 .believe("(--(y) ==>+5 (z))")
                 .mustBelieve(cycles, "( ((x) &&+0 --(y)) ==>+5 (z))", 1f, 0.81f);

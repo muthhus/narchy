@@ -52,7 +52,7 @@ public class NARio extends NAgentX {
                boolean n, p;
                switch(i){
                    case -1: p = false; n = true; break;
-                   case +1: p = true; n = false; break;
+                   case +1: p = true;  n = false; break;
                    case  0: p = false; n = false; break;
                    default:
                        throw new RuntimeException();
@@ -64,7 +64,7 @@ public class NARio extends NAgentX {
                 boolean n, p;
                 switch(i){
                     case -1: p = false; n = true; break;
-                    case +1: p = true; n = false; break;
+                    case +1: p = true;  n = false; break;
                     case  0: p = false; n = false; break;
                     default:
                         throw new RuntimeException();

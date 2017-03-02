@@ -134,7 +134,6 @@ public class Derivation extends Unify {
         set(new substituteIfUnifiesForward(this));
         set(new substituteIfUnifiesDep(this));
 
-
         this.premise = p;
 
         Task task;
@@ -215,8 +214,8 @@ public class Derivation extends Unify {
                 throw new RuntimeException("constraints not set");
         }
 
-        this.forEachMatch = eachMatch; //to notify of matches
         boolean finish = eachMatch!=null;
+        this.forEachMatch = eachMatch; //to notify of matches
         matchesRemain = matchesMax;
 
         unify(x, y, !finish, finish);
@@ -245,24 +244,6 @@ public class Derivation extends Unify {
 
 
 
-    public final long occurrenceTarget(@NotNull OccurrenceSolver s) {
-        long tOcc = task.start();
-        Task b = belief;
-        if (b == null) {
-            return tOcc;
-        } else {
-            long bOcc = b.start();
-            return s.compute(tOcc, bOcc);
-
-//            //if (bOcc == ETERNAL) {
-//            return (tOcc != ETERNAL) ?
-//                        whenBothNonEternal.compute(tOcc, bOcc) :
-//                        ((bOcc != ETERNAL) ?
-//                            bOcc :
-//                            ETERNAL
-//            );
-        }
-    }
 
 
     /**

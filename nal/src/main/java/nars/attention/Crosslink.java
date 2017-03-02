@@ -12,9 +12,9 @@ import org.jetbrains.annotations.NotNull;
  */
 public class Crosslink {
 
-    public static void crossLink(@NotNull Task srcTask, @NotNull Task tgtTask, float scale, @NotNull NAR nar) {
-        crossLink(srcTask.concept(nar), srcTask, tgtTask, scale, nar);
-    }
+//    public static void crossLink(@NotNull Task srcTask, @NotNull Task tgtTask, float scale, @NotNull NAR nar) {
+//        crossLink(srcTask.concept(nar), srcTask, tgtTask, scale, nar);
+//    }
 
     /**
      * @param src task with a term equal to this concept's
