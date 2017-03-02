@@ -12,9 +12,10 @@ import static nars.$.t;
 public class NARio extends NAgentX {
 
     private final MarioComponent mario;
+    final static int cyclesPerFrame = 2;
 
     public NARio(NAR nar) {
-        super("nario", nar);
+        super("nario", nar, cyclesPerFrame);
 
         //Param.ANSWER_REPORTING = false;
 
@@ -92,10 +93,10 @@ public class NARio extends NAgentX {
         int coins = Mario.coins;
         float reward = coins - lastCoins;
         lastCoins = coins;
-        float r = 0f + Util.clamp(reward/2f, -1, +1);
-        if (r == 0)
-            return Float.NaN;
-        return r;
+        float r = 0f + Util.clamp(reward, -1, +1);
+//        if (r == 0)
+//            return Float.NaN;
+        return r;// + (float)Math.random()*0.1f;
     }
 
     public static void main(String[] args) {

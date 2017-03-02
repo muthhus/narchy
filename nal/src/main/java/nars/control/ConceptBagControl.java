@@ -74,7 +74,7 @@ public class ConceptBagControl implements Control, Consumer<DerivedTask> {
 
     //public final HitMissMeter meter = new HitMissMeter(ConceptBagControl.class.getSimpleName());
 
-    public final MutableInteger tasksInputPerCycle = new MutableInteger(64);
+    public final MutableInteger tasksInputPerCycle = new MutableInteger(128);
 
     public final FloatParam conceptActivationRate = new FloatParam(1f);
     private float currentActivationRate = 1f;

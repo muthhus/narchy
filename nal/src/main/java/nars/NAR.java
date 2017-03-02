@@ -910,6 +910,11 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
      */
     @NotNull
     public final NAR run(int frames) {
+        return run(frames, 1);
+    }
+
+    @NotNull
+    public final NAR run(int frames, int computeCyclesPerframe) {
 
         for (; frames > 0; frames--) {
 
@@ -917,13 +922,13 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
 
             emotion.cycle();
 
-            exe.cycle(this);
+            for (int i = 0; i < computeCyclesPerframe; i++)
+                exe.cycle(this);
 
         }
 
         return this;
     }
-
 
 //    private void runAsyncFrameTasks() {
 //        try {

@@ -25,6 +25,8 @@ import net.byteseek.matcher.sequence.SequenceMatcher;
 import org.eclipse.collections.impl.list.mutable.primitive.IntArrayList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -46,6 +48,8 @@ import static nars.time.Tense.ETERNAL;
  * Created by me on 2/11/17.
  */
 public class Compressor extends Abbreviation implements RemovalListener<Compound, Compressor.Abbr> {
+
+    static final Logger logger = LoggerFactory.getLogger(Compressor.class);
 
     final MutableStateFactory<SequenceMatcher> stateFactory = new MutableStateFactory<>();
     final ByteMatcherTransitionFactory<SequenceMatcher> transitionFactory = new ByteMatcherTransitionFactory<>();
@@ -327,7 +331,7 @@ public class Compressor extends Abbreviation implements RemovalListener<Compound
                         termPos.add(p);
                     });
                 } catch (Exception e) {
-                    logger.error(e.getMessage());
+                    //logger.error("{}", e);
                     return b;
                 }
             }
@@ -373,7 +377,7 @@ public class Compressor extends Abbreviation implements RemovalListener<Compound
                 }
 
             } catch (IOException e) {
-                logger.error("{}", e.getMessage());
+                //logger.error(" {}", e);
                 return b;
             }
 

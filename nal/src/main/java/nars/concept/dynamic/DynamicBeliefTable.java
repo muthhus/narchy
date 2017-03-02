@@ -86,6 +86,10 @@ public class DynamicBeliefTable extends DefaultBeliefTable {
                 evidence);
     }
 
+    @Override
+    public boolean isEmpty() {
+        return false;
+    }
 
     @Nullable
     public DynTruth truth(long when, int dt, boolean evidence) {

@@ -4,10 +4,12 @@ import jcog.math.FloatSupplier;
 import nars.*;
 import nars.table.ListTemporalBeliefTable;
 import nars.table.ListTemporalExtendedBeliefTable;
+import nars.task.AnswerTask;
 import nars.task.Revision;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.truth.Truth;
+import nars.truth.TruthDelta;
 import nars.truth.TruthFunctions;
 import nars.util.signal.ScalarSignal;
 import nars.util.signal.SignalTask;
@@ -42,7 +44,7 @@ public class ActionConcept extends WiredConcept implements WiredConcept.Prioriti
     private final boolean updateOnBeliefChange = false;
 
     //enable/disable dynamic tasklink truth revision
-    private final boolean linkTruth = true;
+    private final boolean linkTruth = false;
 
     @Override
     public void pri(FloatSupplier v) {
@@ -149,6 +151,13 @@ public class ActionConcept extends WiredConcept implements WiredConcept.Prioriti
         return feedback.apply(nar);
     }
 
+
+//    @Override
+//    protected void feedback(@NotNull Task input, @NotNull TruthDelta delta, @NotNull NAR nar, float deltaSatisfaction, float deltaConf) {
+//        if (!input.isInput() && !(input instanceof AnswerTask))
+//            System.out.println(input + ": " + this + ": " + delta + " " + deltaSatisfaction + " " + deltaConf);
+//        super.feedback(input, delta, nar, deltaSatisfaction, deltaConf);
+//    }
 
     /** determines the feedback belief when desire or belief has changed in a MotorConcept
      *  implementations may be used to trigger procedures based on these changes.

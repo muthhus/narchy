@@ -79,11 +79,12 @@ public class SpreadingActivation extends Activation implements ObjectFloatProced
 
             case INH:
             case SIM:
-                return 2;
+                return 3;
 
             case IMPL:
             case EQUI:
-                return (host.vars() > 0) ? 3 : 2;
+                //return (host.vars() > 0) ? 3 : 2;
+                return 3;
             case CONJ:
 
                 int s = host.size();

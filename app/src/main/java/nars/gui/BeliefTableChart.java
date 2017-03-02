@@ -139,14 +139,14 @@ public class BeliefTableChart extends Widget {
 
 
         TruthWave beliefs = this.beliefs;
-        if (!beliefs.isEmpty()) {
+        //if (!beliefs.isEmpty()) {
             renderTable(cc, minT, maxT, now, gl, beliefs, true);
-        }
+        //}
 
         TruthWave goals = this.goals;
-        if (!goals.isEmpty()) {
+        //if (!goals.isEmpty()) {
             renderTable(cc, minT, maxT, now, gl, goals, false);
-        }
+        //}
 
         if (showTaskLinks) {
             gl.glLineWidth(1f);

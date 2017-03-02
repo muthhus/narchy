@@ -252,8 +252,12 @@ abstract public class NAgent implements NSense, NAction {
 
     protected void frame() {
 
+        long t = nar.time();
+        if (prev == t)
+            return;
+
         prev = now;
-        now = nar.time();
+        now = t;
 
         int phase = (actionFrame++) % (frameRate);
         if (phase == 0) {
@@ -529,7 +533,7 @@ abstract public class NAgent implements NSense, NAction {
 
                 doFrame();
 
-                nar.run(1);
+                nar.run(1, frameRate);
 
             }
         };

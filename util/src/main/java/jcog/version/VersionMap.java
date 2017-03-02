@@ -1,5 +1,6 @@
 package jcog.version;
 
+import org.eclipse.collections.impl.map.mutable.UnifiedMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jgrapht.util.ArrayUnenforcedSet;
@@ -18,9 +19,9 @@ public class VersionMap<X,Y> extends AbstractMap<X, Y>  {
 
     public VersionMap(Versioning context, int initialSize) {
         this(context,
-            //new UnifiedMap(initialSize)
+            new UnifiedMap(initialSize)
             //new LinkedHashMap<>(initialSize)
-            new HashMap(initialSize)
+            //new HashMap(initialSize)
             //new ConcurrentHashMap(initialSize)
             //new ConcurrentHashMapUnsafe<>(initialSize)
         );

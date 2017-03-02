@@ -13,6 +13,7 @@ import nars.conceptualize.DefaultConceptBuilder;
 import nars.conceptualize.state.DefaultConceptState;
 import nars.index.term.HijackTermIndex;
 import nars.index.term.TermIndex;
+import nars.index.term.map.CaffeineIndex;
 import nars.op.mental.Compressor;
 import nars.op.mental.Inperience;
 import nars.op.stm.MySTMClustered;
@@ -73,14 +74,14 @@ public interface NARBuilder {
         };
 
 
-
+        int maxConcepts = 128 * 1024;
 
         Default nar = new Default(4 * 1024,
                 conceptsPerCycle, 1, 3, rng,
 
-                new HijackTermIndex(cb, 1024 * 256, reprobes)
+                //new HijackTermIndex(cb, 1024 * 256, reprobes)
                 //new NullTermIndex(cb)
-                //new CaffeineIndex(cb, -1 /*256 * 1024*/, -1, null /* null = fork join common pool */)
+                new CaffeineIndex(cb, /* -1 */ maxConcepts, -1, null /* null = fork join common pool */)
                 //new TreeTermIndex.L1TreeIndex(new DefaultConceptBuilder(), 300000, 32 * 1024, 3)
                 ,
                 time,
@@ -133,8 +134,8 @@ public interface NARBuilder {
 //            }
 
             final Compressor compressor = new Compressor(this, "_",
-                    4, 14,
-                    2f, 16, 256);
+                    3, 8,
+                    0.5f, 16, 256);
 
             @Override
             public Task pre(@NotNull Task t) {
@@ -171,15 +172,15 @@ public interface NARBuilder {
 
         };
 
-        nar.beliefConfidence(0.9f);
-        nar.goalConfidence(0.9f);
+        nar.beliefConfidence(0.5f);
+        nar.goalConfidence(0.5f);
         //nar.derivedEvidenceGain.setValue(0.75f);
 
         float p = 0.25f;
-        nar.DEFAULT_BELIEF_PRIORITY = 1f * p;
+        nar.DEFAULT_BELIEF_PRIORITY = 0.75f * p;
         nar.DEFAULT_GOAL_PRIORITY = 1f * p;
-        nar.DEFAULT_QUESTION_PRIORITY = 0.75f * p;
-        nar.DEFAULT_QUEST_PRIORITY = 0.75f * p;
+        nar.DEFAULT_QUESTION_PRIORITY = 0.5f * p;
+        nar.DEFAULT_QUEST_PRIORITY = 0.5f * p;
 
         nar.confMin.setValue(0.01f);
         nar.truthResolution.setValue(0.01f);

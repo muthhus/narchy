@@ -16,10 +16,7 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static nars.term.Terms.compoundOrNull;
 
@@ -160,6 +157,7 @@ public class MySTMClustered extends STMClustered {
                     return false;
                 })
                 .limit(limit)
+                .filter(Objects::nonNull)
                 .map(n -> PrimitiveTuples.pair(n, n.coherence(1)[0]))
                 .forEach(nodeFreq -> {
 

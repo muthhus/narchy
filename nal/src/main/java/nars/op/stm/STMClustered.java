@@ -51,6 +51,8 @@ public abstract class STMClustered extends STM {
             new ArrayDeque<>();
             //new ConcurrentLinkedDeque<>();
 
+    final static double[] noCoherence = new double[] { 0, 0 };
+
     public final class TasksNode extends Node {
 
         /**
@@ -134,6 +136,8 @@ public abstract class STMClustered extends STM {
             tasks.clear();
         }
 
+
+
         /**
          * 1f - variance measured from the items for a given vector dimension
          */
@@ -143,7 +147,7 @@ public abstract class STMClustered extends STM {
             double[] v = Util.variance(tasks.stream().mapToDouble(t -> t.coord[dim])); //HACK slow
 
             if (v==null)
-                return null;
+                return noCoherence;
 
             v[1] = 1f - v[1]; //convert variance to coherence
             return v;

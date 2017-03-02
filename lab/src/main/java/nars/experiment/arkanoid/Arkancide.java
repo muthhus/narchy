@@ -12,6 +12,7 @@ import static nars.Op.BELIEF;
 
 public class Arkancide extends NAgentX {
 
+    public static final int CYCLES_PER_FRAME = 2;
     static boolean cam = true;
 
     private final float paddleSpeed = 1f;
@@ -39,7 +40,7 @@ public class Arkancide extends NAgentX {
 
             Arkancide agent = null;
             try {
-                agent = new Arkancide(n, cam);
+                agent = new Arkancide(n, cam, CYCLES_PER_FRAME);
             } catch (Narsese.NarseseException e) {
 
             }
@@ -66,8 +67,8 @@ public class Arkancide extends NAgentX {
     }
 
 
-    public Arkancide(NAR nar, boolean cam) throws Narsese.NarseseException {
-        super("noid", nar);
+    public Arkancide(NAR nar, boolean cam, int framesPerCycle) throws Narsese.NarseseException {
+        super("noid", nar, framesPerCycle);
 
         //nar.derivedEvidenceGain.setValue(1f);
 

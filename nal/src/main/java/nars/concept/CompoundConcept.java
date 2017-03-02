@@ -414,7 +414,7 @@ public class CompoundConcept<T extends Compound> implements Concept, Termlike {
     /**
      * apply derivation feedback and update NAR emotion state
      */
-    protected static void feedback(@NotNull Task input, @NotNull TruthDelta delta, @NotNull CompoundConcept concept, @NotNull NAR nar) {
+    protected void feedback(@NotNull Task input, @NotNull TruthDelta delta, @NotNull CompoundConcept concept, @NotNull NAR nar) {
 
         //update emotion happy/sad
         Truth before = delta.before;
@@ -469,7 +469,9 @@ public class CompoundConcept<T extends Compound> implements Concept, Termlike {
                         deltaSatisfaction = -polarity * deltaFreq / (2f * (0.5f - otherFreq));
                     }
 
-                    nar.emotion.happy(deltaSatisfaction * (thisConf * other.conf()));
+                    deltaSatisfaction *= (thisConf * other.conf());
+
+                    nar.emotion.happy(deltaSatisfaction);
                 }
 
 
@@ -486,11 +488,15 @@ public class CompoundConcept<T extends Compound> implements Concept, Termlike {
             deltaSatisfaction = 0;
         }
 
+        feedback(input, delta, nar, deltaSatisfaction, deltaConf);
+
+    }
+
+    protected void feedback(@NotNull Task input, @NotNull TruthDelta delta, @NotNull NAR nar, float deltaSatisfaction, float deltaConf) {
         if (!Util.equals(deltaConf, 0f, TRUTH_EPSILON))
             nar.emotion.confident(deltaConf, input.term());
 
         input.feedback(delta, deltaConf, deltaSatisfaction, nar);
-
     }
 
 //    private void checkConsistency() {

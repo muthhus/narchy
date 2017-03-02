@@ -41,7 +41,7 @@ public class Tetris extends NAgentX {
     public static final int tetris_height = 12;
     public static final int TIME_PER_FALL = 4;
     public static final int PIXEL_RADIX = 2;
-    private static final int COMPUTE_CYCLES = 32;
+    private static final int COMPUTE_CYCLES = 16;
     static final int DUR = 1;
 
     private static SensorConcept[][] concept;

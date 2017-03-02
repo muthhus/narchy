@@ -62,7 +62,7 @@ public class Abbreviation/*<S extends Term>*/ extends Leak<Compound, BLink<Compo
      */
     boolean aliasConcept = false;
 
-    static final Logger logger = LoggerFactory.getLogger(Abbreviation.class);
+    private static final Logger logger = LoggerFactory.getLogger(Abbreviation.class);
 
     private static final AtomicInteger currentTermSerial = new AtomicInteger(0);
 
