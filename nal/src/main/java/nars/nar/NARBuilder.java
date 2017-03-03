@@ -11,7 +11,6 @@ import nars.budget.BLink;
 import nars.budget.BudgetMerge;
 import nars.conceptualize.DefaultConceptBuilder;
 import nars.conceptualize.state.DefaultConceptState;
-import nars.index.term.HijackTermIndex;
 import nars.index.term.TermIndex;
 import nars.index.term.map.CaffeineIndex;
 import nars.op.mental.Compressor;
@@ -20,6 +19,7 @@ import nars.op.stm.MySTMClustered;
 import nars.term.Term;
 import nars.time.Time;
 import nars.util.exe.Executioner;
+import nars.util.exe.InstrumentedExecutor;
 import nars.util.exe.MultiThreadExecutor;
 import org.apache.commons.math3.util.MathArrays;
 import org.jetbrains.annotations.NotNull;
@@ -48,9 +48,8 @@ public interface NARBuilder {
                 //new SynchronousExecutor();
                 new MultiThreadExecutor(threads, 1024, sync);
 
-        //exe = new InstrumentedExecutor(exe, 8);
+        exe = new InstrumentedExecutor(exe, 8);
 
-        int conceptsPerCycle = 256 * exe.concurrency();
 
         final int reprobes = 4;
 
@@ -77,7 +76,7 @@ public interface NARBuilder {
         int maxConcepts = 128 * 1024;
 
         Default nar = new Default(4 * 1024,
-                conceptsPerCycle, 1, 3, rng,
+                1, 1, 3, rng,
 
                 //new HijackTermIndex(cb, 1024 * 256, reprobes)
                 //new NullTermIndex(cb)
@@ -172,8 +171,8 @@ public interface NARBuilder {
 
         };
 
-        nar.beliefConfidence(0.5f);
-        nar.goalConfidence(0.5f);
+        nar.beliefConfidence(0.9f);
+        nar.goalConfidence(0.9f);
         //nar.derivedEvidenceGain.setValue(0.75f);
 
         float p = 1f;
@@ -181,6 +180,11 @@ public interface NARBuilder {
         nar.DEFAULT_GOAL_PRIORITY = 1f * p;
         nar.DEFAULT_QUESTION_PRIORITY = 0.5f * p;
         nar.DEFAULT_QUEST_PRIORITY = 0.5f * p;
+
+        nar.stmLinkage.capacity.set(0);
+        nar.core.conceptsFiredPerCycle.setValue(256);
+        nar.core.conceptsFiredPerBatch.setValue(32);
+        nar.core.tasksInputPerCycle.setValue(128);
 
         nar.activationRate.setValue(0.04f);
         nar.confMin.setValue(0.01f);

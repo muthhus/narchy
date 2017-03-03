@@ -118,18 +118,6 @@ public class InstrumentedExecutor extends Executioner {
         }
     }
 
-//    @Override
-//    public void run(@NotNull Task[] t) {
-//    }
-    @Override
-    public void run(@NotNull Task[] t) {
-        exe.run(() -> {
-            //measure each task individually processed
-            for (Task u : t)
-                measure(() -> nar.process(u), taskInput);
-        });
-    }
-
     @Override
     public float load() {
         return exe.load();

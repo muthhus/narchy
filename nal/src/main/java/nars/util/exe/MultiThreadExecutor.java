@@ -39,42 +39,18 @@ public class MultiThreadExecutor extends Executioner {
 
 
     enum EventType {
-        TASK_ARRAY, RUNNABLE, NAR_CONSUMER
+        RUNNABLE, NAR_CONSUMER
     }
 
     static final class TaskEvent {
         @Nullable EventType e;
         @Nullable Object val;
-//        @Nullable
-//        public Task[] tasks;
-//        @Nullable
-//        public Runnable runnable;
-//        @Nullable
-//        public Consumer<NAR> nar;
+
     }
 
     @NotNull
     final Disruptor<TaskEvent> disruptor;
 
-
-//    public MultiThreadExecutioner(int threads, int ringSize) {
-//        this(threads, ringSize
-//
-//
-////                new ForkJoinPool(
-////                        threads+extraThreads,
-////                        //Runtime.getRuntime().availableProcessors()-1 /* leave one thread available */,
-////
-////                        defaultForkJoinWorkerThreadFactory,
-////
-////                        null, true /* async */,
-////                        threads+extraThreads,
-////                        threads*2+extraThreads, //max threads (safe to increase)
-////                        threads+extraThreads, //minimum threads to keep running otherwise new ones will be created
-////                        null, 10L, TimeUnit.MILLISECONDS)
-//        );
-//    }
-//
 
     public MultiThreadExecutor(int threads, int ringSize, boolean sync) {
         this(threads, ringSize);
@@ -212,11 +188,6 @@ public class MultiThreadExecutor extends Executioner {
 //    }
 
 
-    final static EventTranslatorOneArg<TaskEvent, Task[]> taskPublisher = (TaskEvent x, long seq, Task[] b) -> {
-        x.e = EventType.TASK_ARRAY;
-        x.val = b;
-    };
-
     final static EventTranslatorOneArg<TaskEvent, Runnable> runPublisher = (TaskEvent x, long seq, Runnable b) -> {
         x.e = EventType.RUNNABLE;
         x.val = b;
@@ -243,13 +214,6 @@ public class MultiThreadExecutor extends Executioner {
     }
 
 
-    @Override
-    public final void run(@NotNull Task... t) {
-        if (!ring.tryPublishEvent(taskPublisher, t)) {
-            nar.processAll(t); //execute in callee's thread
-        }
-    }
-
     private final static class TaskEventWorkHandler implements WorkHandler<TaskEvent> {
         @NotNull
         private final NAR nar;
@@ -263,9 +227,6 @@ public class MultiThreadExecutor extends Executioner {
             Object val = te.val;
             te.val = null;
             switch (te.e) {
-                case TASK_ARRAY:
-                    nar.processAll((Task[])val);
-                    break;
                 case RUNNABLE:
                     ((Runnable)val).run();
                     break;

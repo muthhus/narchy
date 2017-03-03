@@ -1,7 +1,6 @@
 package nars.util.exe;
 
 import nars.NAR;
-import nars.Task;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -38,12 +37,6 @@ public class SynchronousExecutor extends Executioner {
         } catch (Throwable t) {
             NAR.logger.error("{} {}", r, t);
         }
-    }
-
-    @Override
-    public final void run(Task... t) {
-        //just execute here in this thread
-        nar.processAll(t);
     }
 
 

@@ -31,7 +31,7 @@ public class Default extends NAR {
 
     public final ConceptBagControl core;
 
-    private final STMTemporalLinkage stmLinkage = new STMTemporalLinkage(this, 2);
+    public final STMTemporalLinkage stmLinkage = new STMTemporalLinkage(this, 2);
     //private final STMTemporalLinkage2 stmLinkage = new STMTemporalLinkage2(this, 16, 1, 2);
 
 

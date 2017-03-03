@@ -591,6 +591,10 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
         });
     }
 
+    public final void input(@NotNull Task... t) {
+        for (Task x : t)
+            input(x);
+    }
 
     /**
      * exposes the memory to an input, derived, or immediate task.
@@ -600,7 +604,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
      * if the task was a command, it will return false even if executed
      */
     @Nullable
-    public final Concept process(@NotNull Task input0) {
+    public final Concept input(@NotNull Task input0) {
 
         Task input = pre(input0);
         if (input == null)
@@ -637,13 +641,13 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
 
                                 if (isCommand) {
                                     if (result != null && result != input)
-                                        return process(result); //recurse
+                                        return input(result); //recurse
                                 } else {
                                     if (result != input) { //instance equality, not actual equality in case it wants to change this
                                         if (result == null) {
                                             return null; //finished
                                         } else {
-                                            return process(result); //recurse until its stable
+                                            return input(result); //recurse until its stable
                                         }
                                     }
                                 }
@@ -779,10 +783,6 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
 //        }
 //    }
 
-    protected Activation process(@NotNull Task t, Concept c) {
-        return c.process(t, this);
-    }
-
     public final static ThreadLocal<ObjectFloatHashMap<Termed>> acti = ThreadLocal.withInitial(() -> {
         return new ObjectFloatHashMap<>();
     });
@@ -839,7 +839,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
     @NotNull
     public void processAll(@NotNull Task... t) {
         for (Task x : t)
-            process(x);
+            input(x);
     }
 
     public final void on(@NotNull String atom, @NotNull Operator o) {
@@ -1343,35 +1343,19 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
         return this;
     }
 
-    public final void input(@NotNull Collection<Task> tasks) {
-        input(tasks, Param.DEFAULT_TASK_INPUT_CHUNK_SIZE);
-    }
-
-    public void input(@NotNull Collection<Task> tasks, int maxChunkSize) {
-        int s = tasks.size();
-        if (s < maxChunkSize) {
-            input(tasks.toArray(new Task[s]));
-        } else {
-            input(tasks.stream(), maxChunkSize);
-        }
+    public void input(@NotNull Iterable<Task> tasks) {
+        tasks.forEach(x -> {
+            if (x!=null)
+                input(x);
+        });
     }
 
     public final void input(@Nullable Stream<Task> taskStream) {
-        input(taskStream, Param.DEFAULT_TASK_INPUT_CHUNK_SIZE);
-    }
-
-    public void input(@Nullable Stream<Task> taskStream, int chunkSize) {
-        if (taskStream == null)
-            return;
-
-        taskStream = taskStream.filter(Objects::nonNull);
-
-        int concurrency = exe.concurrency();
-        if (concurrency == 1 || chunkSize <= 1) {
-            taskStream.forEach(this::process);
-        } else {
-            taskStream.collect(Collectors2.chunk(chunkSize /* estimate */))
-                    .forEach(x -> input(x.toArray(new Task[x.size()])));
+        if (taskStream != null) {
+            taskStream.forEach(x -> {
+                if (x != null)
+                    input(x);
+            });
         }
     }
 
@@ -1432,13 +1416,6 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
         return on(f(termAtom, f));
     }
 
-    /**
-     * processes the input before the next frame has run
-     */
-    public final void input(@NotNull Task... t) {
-        if (t.length > 0)
-            exe.run(t);
-    }
 
 
     @Override

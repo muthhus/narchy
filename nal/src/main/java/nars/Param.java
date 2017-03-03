@@ -30,13 +30,15 @@ public abstract class Param  {
     /** how many answers to record per input question task (in its concept's answer bag) */
     public static final int MAX_INPUT_ANSWERS = 16;
 
-    /** number of tasks batched (chunked) in a stream input */
-    public static final int DEFAULT_TASK_INPUT_CHUNK_SIZE = 8;
+
 
     /** determines if an input goal or command operation task executes */
     public static float EXECUTION_THRESHOLD = 0.666f;
 
     public static boolean ANSWER_REPORTING = true;
+
+    /** default initial value for ConceptBagControl */
+    public static int TASKS_INPUT_PER_CYCLE = 32;
 
 
     /**
@@ -211,8 +213,6 @@ public abstract class Param  {
     public float DEFAULT_QUESTION_PRIORITY = 0.5f;
 
 
-
-    public static final int CONCEPT_FIRE_BATCH_SIZE = 4;
 
     /**
      * Default priority of input judgment

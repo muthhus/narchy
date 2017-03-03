@@ -254,7 +254,7 @@ abstract public class NAgent implements NSense, NAction {
             curiosity();
 
             nar.input(
-                Streams.concat(Stream.of(happy), sensors.stream(), actions.stream()).map(f -> f.apply(nar))
+                Streams.concat(Stream.of(happy), sensors.stream(), actions.stream())./*parallel().*/map(f -> f.apply(nar))
             );
 
 
@@ -451,20 +451,11 @@ abstract public class NAgent implements NSense, NAction {
 
         init();
 
-        return new Loop("agent", fps) {
+        nar.runLater(() -> {
+            nar.onCycle(nn -> doFrame());
+        });
 
-            @Override
-            public void next() {
-
-                doFrame();
-
-                if (stopTime > 0 && now > stopTime)
-                    stop();
-
-                nar.next();
-
-            }
-        };
+        return nar.loop(fps);
 
     }
 
