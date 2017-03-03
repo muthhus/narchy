@@ -85,7 +85,7 @@ public class Jake2Agent extends NAgentX implements Runnable {
     final PlayerData player = new PlayerData();
 
     public Jake2Agent(NAR nar) throws Narsese.NarseseException {
-        super("q", nar, 1);
+        super("q", nar);
 
 
         Sensor2D<PixelBag> qcam = senseCameraRetina("q", screenshotter, 64, 64, (v) -> t(v, alpha));

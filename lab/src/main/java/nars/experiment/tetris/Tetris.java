@@ -116,7 +116,7 @@ public class Tetris extends NAgentX {
          * @param computeCycles
          */
         public Tetris(NAR nar, int width, int height, int timePerFall, int computeCycles) throws Narsese.NarseseException {
-            super("tetris", nar, computeCycles);
+            super("tetris", nar);
 
             state = new TetrisState(width, height, timePerFall) {
                 @Override

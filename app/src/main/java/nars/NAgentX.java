@@ -41,10 +41,6 @@ abstract public class NAgentX extends NAgent {
     }
 
     public NAgentX(String id, NAR nar) {
-        this(id, nar, 1);
-    }
-
-    public NAgentX(String id, NAR nar, int reasonerFramesPerEnvironmentFrame) {
         super(id, nar);
     }
 

@@ -194,7 +194,7 @@ public class BeliefTableTest  {
 
         /* first */
         @Nullable Truth firstBeliefTruth = table.truth(0, n.time.dur());
-        assertEquals(0.27f, firstBeliefTruth.freq(), 0.1f);
+        assertEquals(0.03f, firstBeliefTruth.freq(), 0.1f);
 
         /* last */
         float dur = n.time.dur();

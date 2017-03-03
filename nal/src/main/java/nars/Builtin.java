@@ -51,7 +51,7 @@ public class Builtin {
             new similaritree(),
 
             Functor.f2("equal", (x, y) ->
-                    x.equals(y) ? True : (!((x instanceof Variable) || (y instanceof Variable)) ? False : null)),
+                    x.equals(y) ? True : ((x instanceof Variable) || (y instanceof Variable) ? null : False)),
 
             Functor.f2Int("add", (x, y) -> x + y),
             Functor.f2Int("sub", (x, y) -> x - y),

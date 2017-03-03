@@ -1,15 +1,10 @@
 package nars.experiment.mario;
 
-import com.google.common.collect.Lists;
 import jcog.Util;
-import jcog.bag.PLink;
 import nars.*;
-import nars.concept.Concept;
 import nars.experiment.mario.sprites.Mario;
 
 import javax.swing.*;
-
-import java.util.ArrayList;
 
 import static nars.$.$;
 import static nars.$.t;
@@ -20,7 +15,7 @@ public class NARio extends NAgentX {
     final static int cyclesPerFrame = 2;
 
     public NARio(NAR nar) {
-        super("nario", nar, cyclesPerFrame);
+        super("nario", nar);
 
         //Param.ANSWER_REPORTING = false;
 

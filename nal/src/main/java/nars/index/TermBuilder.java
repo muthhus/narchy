@@ -827,7 +827,7 @@ public abstract class TermBuilder {
                         if (isTrue(subject))
                             return predicate; //special case for implications: reduce to predicate if the subject is True
                         if (isFalse(subject))
-                            return False; //return neg(predicate); ??
+                            return neg(predicate); //??
                         if (isTrueOrFalse(predicate))
                             return False;
 

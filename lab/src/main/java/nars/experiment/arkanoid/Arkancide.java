@@ -40,7 +40,7 @@ public class Arkancide extends NAgentX {
 
             Arkancide agent = null;
             try {
-                agent = new Arkancide(n, cam, CYCLES_PER_FRAME);
+                agent = new Arkancide(n, cam);
             } catch (Narsese.NarseseException e) {
 
             }
@@ -67,8 +67,8 @@ public class Arkancide extends NAgentX {
     }
 
 
-    public Arkancide(NAR nar, boolean cam, int framesPerCycle) throws Narsese.NarseseException {
-        super("noid", nar, framesPerCycle);
+    public Arkancide(NAR nar, boolean cam) throws Narsese.NarseseException {
+        super("noid", nar);
 
         //nar.derivedEvidenceGain.setValue(1f);
 

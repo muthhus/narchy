@@ -182,7 +182,7 @@ public interface NARBuilder {
         nar.DEFAULT_QUESTION_PRIORITY = 0.5f * p;
         nar.DEFAULT_QUEST_PRIORITY = 0.5f * p;
 
-        nar.activationRate.setValue(0.01f);
+        nar.activationRate.setValue(0.04f);
         nar.confMin.setValue(0.01f);
         nar.truthResolution.setValue(0.01f);
 

@@ -36,7 +36,7 @@ public class SideCraft extends NAgentX {
     }
 
     public SideCraft(NAR nar) throws Narsese.NarseseException {
-        super("cra", nar, 1);
+        super("cra", nar);
 
         this.craft = new SideScrollMinicraft();
 

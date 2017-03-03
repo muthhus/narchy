@@ -49,7 +49,7 @@ public class TopCraft extends NAgentX {
     }
 
     public TopCraft(NAR nar) throws Narsese.NarseseException {
-        super("cra", nar, 1);
+        super("cra", nar);
 
         this.craft = new TopDownMinicraft();
 
