@@ -22,7 +22,7 @@ public class InstrumentedExecutor extends Executioner {
 
     private final Executioner exe;
 
-    final PeriodMeter cycleTime, taskInput;
+    final PeriodMeter cycleTime;
 
     final Map<Class, PeriodMeter> meters = new ConcurrentHashMap<>();
     private final int collectionPeriod;
@@ -38,7 +38,6 @@ public class InstrumentedExecutor extends Executioner {
         this.exe = delegate;
         this.collectionPeriod = collectionPeriod;
         this.cycleTime = meter(NAR.class);
-        this.taskInput = meter(Task.class);
     }
 
     @Override

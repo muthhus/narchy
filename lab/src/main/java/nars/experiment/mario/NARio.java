@@ -3,6 +3,7 @@ package nars.experiment.mario;
 import jcog.Util;
 import nars.*;
 import nars.experiment.mario.sprites.Mario;
+import nars.nar.Default;
 
 import javax.swing.*;
 

@@ -343,7 +343,7 @@ public class Line1DContinuous extends NAgent {
                 nar.core.conceptsFiredPerCycle.setValue(cpf);
                 nar.core.tasklinksFiredPerFiredConcept.set(taskLinks);
                 nar.core.termlinksFiredPerFiredConcept.set(1, termLinks);
-                nar.core.tasksInputPerCycle.setValue(tpf);
+                nar.core.derivationsInputPerCycle.setValue(tpf);
             });
 
 

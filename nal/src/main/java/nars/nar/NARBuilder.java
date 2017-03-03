@@ -39,7 +39,7 @@ import static nars.Op.GOAL;
 public interface NARBuilder {
 
     static Default newMultiThreadNAR(int cores, Time time) {
-        return newMultiThreadNAR(cores, time, false);
+        return newMultiThreadNAR(cores, time, true);
     }
 
     static Default newMultiThreadNAR(int threads, Time time, boolean sync) {
@@ -184,7 +184,7 @@ public interface NARBuilder {
         nar.stmLinkage.capacity.set(0);
         nar.core.conceptsFiredPerCycle.setValue(256);
         nar.core.conceptsFiredPerBatch.setValue(32);
-        nar.core.tasksInputPerCycle.setValue(128);
+        nar.core.derivationsInputPerCycle.setValue(64);
 
         nar.activationRate.setValue(0.04f);
         nar.confMin.setValue(0.01f);
@@ -193,8 +193,8 @@ public interface NARBuilder {
 
         //NARTune tune = new NARTune(nar);
 
-        MySTMClustered stm = new MySTMClustered(nar, 32, BELIEF, 4, true, 6);
-        MySTMClustered stmGoal = new MySTMClustered(nar, 16, GOAL, 2, true, 4);
+        MySTMClustered stm = new MySTMClustered(nar, 64, BELIEF, 5, true, 12);
+        MySTMClustered stmGoal = new MySTMClustered(nar, 32, GOAL, 3, true, 8);
 
 //        Abbreviation abbr = new Abbreviation(nar, "the",
 //                4, 16,

@@ -1,5 +1,6 @@
 package nars;
 
+import nars.bag.Bagregate;
 import nars.concept.Concept;
 import nars.gui.Vis;
 import nars.nar.Default;
@@ -154,6 +155,8 @@ abstract public class NAgentX extends NAgent {
 
         a.nar.runLater(() -> {
 
+            //Vis.conceptsWindow2D(a.nar, 64, 12).show(1000, 800);
+
             //Vis.conceptsWindow2D(a.nar, Iterables.concat(a.predictors, a.actions, a.sensors) /* a.nar */,64 ,8).show(1000, 800);
             //Vis.conceptsWindow2D(a.nar, 16 ,4).show(1000, 800);
 //
@@ -171,8 +174,8 @@ abstract public class NAgentX extends NAgent {
                                     new CameraSensorView(cs, nar).align(Surface.Align.Center, cs.width, cs.height))
                                     .toArray(Surface[]::new)),
                             "inputEdit", () -> Vis.newInputEditor(a.nar),
-//                            "concepts", ()->
-//                                    Vis.treeChart( a.nar, new Bagregate(a.nar.conceptsActive(), 64, 0.05f) , 64),
+                            "concepts", ()->
+                                    Vis.treeChart( a.nar, new Bagregate(a.nar.conceptsActive(), 64, 0.05f) , 64),
                             "conceptBudget", () ->
                                     Vis.budgetHistogram(nar, 64),
                             //"tasks", ()-> taskChart,

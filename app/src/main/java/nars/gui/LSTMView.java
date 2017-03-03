@@ -48,7 +48,6 @@ public class LSTMView extends Grid {
         DistractedSequenceRecall task = new DistractedSequenceRecall(r, 32, 8, 22, 100);
 
         int cell_blocks = 9;
-        double learningRate = 0.05;
         SimpleLSTM lstm = task.lstm(cell_blocks);
 
 

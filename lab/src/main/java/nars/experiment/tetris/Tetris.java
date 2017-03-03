@@ -7,6 +7,7 @@ import nars.concept.ActionConcept;
 import nars.concept.SensorConcept;
 import nars.experiment.tetris.impl.TetrisState;
 import nars.experiment.tetris.impl.TetrisVisualizer;
+import nars.nar.Default;
 import nars.nar.NARBuilder;
 import nars.NAgentX;
 import nars.term.Compound;
@@ -38,10 +39,9 @@ public class Tetris extends NAgentX {
 
 
     public static final int tetris_width = 6;
-    public static final int tetris_height = 12;
-    public static final int TIME_PER_FALL = 4;
-    public static final int PIXEL_RADIX = 2;
-    private static final int COMPUTE_CYCLES = 16;
+    public static final int tetris_height = 16;
+    public static final int TIME_PER_FALL = 16;
+    public static final int PIXEL_RADIX = 4;
     static final int DUR = 1;
 
     private static SensorConcept[][] concept;
@@ -113,9 +113,8 @@ public class Tetris extends NAgentX {
          * @param width
          * @param height
          * @param timePerFall larger is slower gravity
-         * @param computeCycles
          */
-        public Tetris(NAR nar, int width, int height, int timePerFall, int computeCycles) throws Narsese.NarseseException {
+        public Tetris(NAR nar, int width, int height, int timePerFall) throws Narsese.NarseseException {
             super("tetris", nar);
 
             state = new TetrisState(width, height, timePerFall) {
@@ -460,9 +459,27 @@ public class Tetris extends NAgentX {
             //Param.HORIZON = 1/100f;
 
             FrameTime clock = new FrameTime().dur( DUR );
-            NAR nar =
+            NAR n =
                     NARBuilder.newMultiThreadNAR(4, clock);
                     //NARBuilder.newALANN(clock, 4, 64, 5, 4, 1);
+
+
+//            n.onCycle(new Runnable() {
+//
+//                long forgetPeriod = 200;
+//                long lastForget = n.time();
+//
+//                @Override
+//                public void run() {
+//                    long now = n.time();
+//                    if (now - lastForget > forgetPeriod) {
+//                        System.err.println("BREATHE");
+//                        ((Default)n).core.active.clear();
+//                        lastForget = now;
+//                    }
+//                }
+//            });
+
 
             //nar.derivedEvidenceGain.setValue(2f);
 
@@ -586,7 +603,7 @@ public class Tetris extends NAgentX {
             //new VariableCompressor(nar);
 
 
-            Tetris t = new MyTetris(nar);
+            Tetris t = new MyTetris(n);
 
             t.trace = true;
 
@@ -623,12 +640,12 @@ public class Tetris extends NAgentX {
             //nar.stop();
 
             //nar.index.print(System.out);
-            nar.forEachTask(System.out::println);
+            n.forEachTask(System.out::println);
 
             //NAR.printActiveTasks(nar, true);
             //NAR.printActiveTasks(nar, false);
-            nar.printConceptStatistics();
-            new TaskStatistics().add(nar).print();
+            n.printConceptStatistics();
+            new TaskStatistics().add(n).print();
 
 
             //NAR.printTasks(meta.nar, true);
@@ -678,7 +695,7 @@ public class Tetris extends NAgentX {
     public static class MyTetris extends Tetris {
 
         public MyTetris(NAR nar) throws Narsese.NarseseException {
-            super(nar, Tetris.tetris_width, Tetris.tetris_height, Tetris.TIME_PER_FALL, Tetris.COMPUTE_CYCLES);
+            super(nar, Tetris.tetris_width, Tetris.tetris_height, Tetris.TIME_PER_FALL);
         }
 
         @Override

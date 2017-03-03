@@ -16,13 +16,17 @@ public class RawPLink<X> implements PLink<X> {
     }
 
     @Override
-    public boolean equals(Object obj) {
-        throw new UnsupportedOperationException();
+    public final boolean equals(@NotNull Object that) {
+        if (this==that)
+            return true;
+
+        Object b = ((PLink) that).get();
+        return this.id.equals(b);
     }
 
     @Override
     public int hashCode() {
-        throw new UnsupportedOperationException();
+        return id.hashCode();
     }
 
     @Override

@@ -74,7 +74,7 @@ public class ConceptBagControl implements Control, Consumer<DerivedTask> {
 
     //public final HitMissMeter meter = new HitMissMeter(ConceptBagControl.class.getSimpleName());
 
-    public final MutableInteger tasksInputPerCycle;
+    public final MutableInteger derivationsInputPerCycle;
 
     /** distinct from the NAR's */
     public final FloatParam activationRate = new FloatParam(1f);
@@ -96,7 +96,7 @@ public class ConceptBagControl implements Control, Consumer<DerivedTask> {
         this.deriver = deriver;
         this.conceptsFiredPerCycle = new MutableInteger(1);
         this.conceptsFiredPerBatch = new MutableInteger(1);
-        this.tasksInputPerCycle = new MutableInteger(Param.TASKS_INPUT_PER_CYCLE);
+        this.derivationsInputPerCycle = new MutableInteger(Param.TASKS_INPUT_PER_CYCLE);
 
         this.active = conceptBag;
 
@@ -129,7 +129,7 @@ public class ConceptBagControl implements Control, Consumer<DerivedTask> {
 //        }
 
         //update concept bag
-        pending.capacity( tasksInputPerCycle.intValue() );
+        pending.capacity( derivationsInputPerCycle.intValue() );
         currentActivationRate = activationRate.floatValue()
         // * 1f/((float)Math.sqrt(active.capacity()))
         ;

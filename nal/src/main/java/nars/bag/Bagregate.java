@@ -1,9 +1,11 @@
 package nars.bag;
 
+import jcog.bag.PLink;
 import jcog.data.FloatParam;
 import nars.bag.impl.ArrayBag;
 import nars.budget.BLink;
 import nars.budget.BudgetMerge;
+import nars.budget.RawBLink;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 
@@ -18,11 +20,11 @@ import java.util.function.Consumer;
  */
 public class Bagregate<X> extends ArrayBag<X> {
 
-    private final Iterable<? extends BLink<X>> src;
+    private final Iterable<X> src;
     private final MutableFloat scale;
     final AtomicBoolean busy = new AtomicBoolean();
 
-    public Bagregate(@NotNull Iterable<? extends BLink<X>> src, int capacity, float scale) {
+    public Bagregate(@NotNull Iterable<X> src, int capacity, float scale) {
         super(capacity, BudgetMerge.avgBlend, new ConcurrentHashMap<>(capacity));
 
         this.src = src;
@@ -37,13 +39,23 @@ public class Bagregate<X> extends ArrayBag<X> {
 
         float scale = this.scale.floatValue();
 
-        Iterator<? extends BLink<X>> ss = src.iterator();
+        Iterator<? extends X> ss = src.iterator();
         int count = 0;
         int limit = capacity;
         while (ss.hasNext() && count < limit) {
-            BLink<X> x = ss.next();
+            X x = ss.next();
+
+            float pri;
+            if (x instanceof PLink) { //HACK
+                PLink p = (PLink) x;
+                x = (X) p.get();
+                pri = p.pri();
+            } else {
+                pri = 1f;
+            }
+
             if (x!=null && include(x)) {
-                if (put(x, scale, null)!=null)
+                if (put(new RawBLink(x, pri, 0.5f), scale, null)!=null)
                     count++;
             }
         }
@@ -54,7 +66,7 @@ public class Bagregate<X> extends ArrayBag<X> {
     }
 
     /** can be overridden to filter entry */
-    protected boolean include(BLink<X> x) {
+    protected boolean include(X x) {
         return true;
     }
 
