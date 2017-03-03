@@ -86,11 +86,6 @@ public class DynamicBeliefTable extends DefaultBeliefTable {
                 evidence);
     }
 
-    @Override
-    public boolean isEmpty() {
-        return false;
-    }
-
     @Nullable
     public DynTruth truth(long when, int dt, boolean evidence) {
         return truth(when, (Compound) $.terms.the(dynamicConcept.term(), dt), evidence);

@@ -16,8 +16,6 @@ import nars.nar.Default;
 import nars.task.ImmutableTask;
 import nars.term.Compound;
 import nars.term.Term;
-import nars.time.FrameTime;
-import nars.time.Time;
 import nars.truth.Truth;
 import nars.util.Loop;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
@@ -63,7 +61,6 @@ abstract public class NAgent implements NSense, NAction {
 
     @NotNull
     public final FloatNormalized rewardNormalized;
-    private final float actionBoost;
     private final Term id;
 
     public final NAR nar;
@@ -73,7 +70,7 @@ abstract public class NAgent implements NSense, NAction {
 
 
     /** lookahead time in durations (multiples of duration) */
-    float horizon = 32;
+    float horizon = 4;
 
     public float alpha, gamma;
 
@@ -108,7 +105,7 @@ abstract public class NAgent implements NSense, NAction {
     public final FloatParam gammaEpsilonFactor = new FloatParam(0.1f);
 
     //final int curiosityMonitorDuration; //frames
-    final DescriptiveStatistics avgActionDesire;
+    final DescriptiveStatistics actionDesire;
     final DescriptiveStatistics rewardWindow;
 
 
@@ -117,17 +114,11 @@ abstract public class NAgent implements NSense, NAction {
     float predictorProbability = 1f;
 
     public final List<Task> predictors = newArrayList();
-    public final FloatParam predictorPriority = new FloatParam(1);
 
     public boolean trace = false;
 
 
-    /**
-     * >=0 : NAR frames that are computed between each Agent frame
-     */
-    public final int frameRate;
-
-    protected long prev, now;
+    protected long now;
 
 
 
@@ -135,35 +126,25 @@ abstract public class NAgent implements NSense, NAction {
     //private float curiosityAttention;
     private float rewardSum = 0;
 
-    public final FloatParam sensorPriority;
-    public final FloatParam actionPriority;
-    public final FloatParam rewardPriority;
+
 
     //private MutableFloat maxSensorPriority;
 
     public NAgent(@NotNull NAR nar) {
-        this("", nar, 1);
+        this("", nar);
     }
 
-    public NAgent(String id, @NotNull NAR nar, int frameRate) {
-        this(id.isEmpty() ? null : the(id), nar, frameRate);
+    public NAgent(@NotNull String id, @NotNull NAR nar) {
+        this(id.isEmpty() ? null : the(id), nar);
     }
 
-    public NAgent(@Nullable Term id, @NotNull NAR nar, int frameRate) {
+    public NAgent(@Nullable Term id, @NotNull NAR nar) {
 
         this.id = id;
         this.nar = nar;
-        this.alpha = this.nar.confidenceDefault(BELIEF);
-        this.gamma = this.nar.confidenceDefault(GOAL);
-        this.frameRate = frameRate;
 
-        this.sensorPriority = new FloatParam(alpha);
-        this.actionPriority = new FloatParam(gamma);
-        this.rewardPriority = new FloatParam(gamma);
 
-        this.prev = nar.time();
 
-        this.actionBoost = gamma;
 
 
         this.rewardNormalized = new FloatPolarNormalized(() -> rewardValue);
@@ -177,8 +158,8 @@ abstract public class NAgent implements NSense, NAction {
                 (x) -> t(x, alpha)
         );
 
-        int curiosityMonitorDuration = Math.round((1 + nar.time.dur())); //TODO handle changing duration value
-        avgActionDesire = new DescriptiveStatistics(curiosityMonitorDuration);
+        int curiosityMonitorDuration = Math.round((1 + 2 * nar.time.dur())); //TODO handle changing duration value
+        actionDesire = new DescriptiveStatistics(curiosityMonitorDuration);
         rewardWindow = new DescriptiveStatistics(curiosityMonitorDuration);
 
         /*
@@ -250,37 +231,12 @@ abstract public class NAgent implements NSense, NAction {
 
     int actionFrame = 0;
 
-    protected void frame() {
-
-        long t = nar.time();
-        if (prev == t)
-            return;
-
-        prev = now;
-        now = t;
-
-        int phase = (actionFrame++) % (frameRate);
-        if (phase == 0) {
-            ticks(0); //freeze clock
-        }
-        if ((phase == frameRate - 1) || (frameRate < 2)) {
-            ticks(1);
-            doFrame();
-        }
-
-
-    }
-
-    private void ticks(int t) {
-        Time time = (Time) nar.time;
-        if (time instanceof FrameTime)
-            ((FrameTime) time).cycle(t); //resume clock for the last cycle before repeating
-    }
-
     private void doFrame() {
         //System.out.println(nar.conceptPriority(reward) + " " + nar.conceptPriority(dRewardSensor));
 
-
+        this.now = nar.time();
+        this.alpha = this.nar.confidenceDefault(BELIEF);
+        this.gamma = this.nar.confidenceDefault(GOAL);
 
         float r = rewardValue = act();
         if (r == r) {
@@ -294,8 +250,6 @@ abstract public class NAgent implements NSense, NAction {
 //        if (load < 1) {
 
             predict();
-
-            updateActions();
 
             curiosity();
 
@@ -313,30 +267,6 @@ abstract public class NAgent implements NSense, NAction {
             logger.info(summary());
     }
 
-
-    final UDP udp = new UDP();
-
-    /*
-    https://docs.influxdata.com/influxdb/v0.9/write_protocols/udp/
-    To write, just send newline separated line protocol over UDP. For better performance send batches of points rather than multiple single points.
-    $ echo "cpu value=1"> /dev/udp/localhost/8089
-         */
-    public void sendInfluxDB(String host, int port) {
-        //String s = "cpu,host=server01,region=uswest load=" + (Math.random() * 100) +  " " + System.currentTimeMillis();
-
-        //SELECT mean("hapy") FROM "cpu"
-        //SELECT mean("busyVol") FROM "cpu" WHERE $timeFilter GROUP BY time($interval) fill(null)
-
-        @NotNull Emotion e = nar.emotion;
-        String s = "cpu " +
-                 "busyVol=" + e.busyVol.getSum() +
-                ",busyPri=" + e.busyPri.getSum() +
-                ",hapy=" + e.happy.getSum() +
-                ",sad=" + e.sad.getSum();
-                //" " + System.nanoTime();
-
-        udp.out(s, host, port);
-    }
 
     @NotNull
     public String summary() {
@@ -382,9 +312,6 @@ abstract public class NAgent implements NSense, NAction {
 //        SensorConcept.activeAttention(actions, new MutableFloat(maxSensorPriority.floatValue()/actions.size()), maxSensorPriority, nar);
 //        SensorConcept.activeAttention(newArrayList(happy, joy), new MutableFloat(maxSensorPriority.floatValue()/2f), maxSensorPriority, nar);
 
-        sensors.forEach(s -> s.pri(sensorPriority));
-        actions.forEach(s -> s.pri(actionPriority));
-        happy.pri(rewardPriority);
         //joy.pri(rewardPriority);
 
         //SensorConcept.flatAttention(p, minSensorPriority);
@@ -496,15 +423,18 @@ abstract public class NAgent implements NSense, NAction {
         //System.out.println(Joiner.on('\n').join(predictors));
     }
 
-    @NotNull
-    public NAgent run(final int cycles) {
+
+    /** synchronous execution managed by existing NAR's */
+    @NotNull public NAgent run(final int cycles) {
 
         init();
 
         nar.runLater(() -> {
-            nar.onCycle(nn -> frame());
+            nar.onCycle(nn -> doFrame());
         });
+
         nar.run(cycles);
+
         return this;
     }
 
@@ -512,8 +442,9 @@ abstract public class NAgent implements NSense, NAction {
     public Loop runRT(float fps) {
         return runRT(fps, -1);
     }
+
     /**
-     * run Real-time
+     * synchronous execution which runs a NAR directly at a given framerate
      */
     @NotNull
     public Loop runRT(float fps, int stopTime) {
@@ -525,15 +456,12 @@ abstract public class NAgent implements NSense, NAction {
             @Override
             public void next() {
 
-                prev = now;
-                now = nar.time();
+                doFrame();
 
                 if (stopTime > 0 && now > stopTime)
                     stop();
 
-                doFrame();
-
-                nar.run(1, frameRate);
+                nar.next();
 
             }
         };
@@ -565,75 +493,30 @@ abstract public class NAgent implements NSense, NAction {
 
                 if (t!=null) {
                     nar.input(
-                            goal(action.term(), t, now, now - Math.round(nar.time.dur()))
+                            goal(action.term(), t, now)
                                 //.budgetByTruth(action.pri.asFloat(), nar)
                                 .log("Curiosity")
                     );
                 }
 
-                //in order to auto-destruct corectly, the task needs to remove itself from the taskindex too
-                /* {
-                    @Override
-                    public boolean onConcept(@NotNull Concept c) {
-                        if (super.onConcept(c)) {
-                            //self-destruct later
-                            nar.runLater(()->{
-                                delete();
-                            });
-                            return true;
-                        }
-                        return false;
-                    }
-                }*/
-
             }
 
-            //boost(action, actionBoost);
         }
     }
 
-    private void updateActions() {
-        float m = 0;
-        int n = actions.size();
-        for (ActionConcept a : actions) {
 
-//            Term at = a.term();
-//
-//            for (BLink<Term> x : a.termlinks()) {
-//                Term t = x.get();
-//                System.out.println(t + " -> " + a);
-//                if (t instanceof Compound) {
-//                    if (t.op() == IMPL && ((Compound)t).term(1).equals(at)) {
-//                        System.out.println("\t***");
-//                    } else {
-//
-//                    }
-//                }
-//            }
-
-            Truth d = a.goals().truth(now, nar.time.dur());
-            if (d != null)
-                m += d.evi();
-        }
-        avgActionDesire.addValue(w2c(m/n)); //resulting from the previous frame
-
-    }
 
 
     protected void predict() {
 
-        float pri =
-                predictorPriority.floatValue();
-                //UtilityFunctions.aveAri(nar.priorityDefault('.'), nar.priorityDefault('!'))
-                       ///* / (predictors.size()/predictorProbability)*/ * predictorPriFactor;
 
-        if (pri > 0) {
+
             //long frameDelta = now-prev;
             float dur = nar.time.dur();
             nar.input(
                 IntStream.range(0, predictors.size()).mapToObj(i -> {
                     Task x = predictors.get(i);
-                    Task y = boost(x, pri, dur, horizon);
+                    Task y = boost(x, dur, horizon);
                     if (x!=y) {
                         predictors.set(i, y); //predictor changed or needs re-input
                         //return y;
@@ -642,34 +525,21 @@ abstract public class NAgent implements NSense, NAction {
                     //return null; //dont re-input this predictor
                 })
             );
+
+
+        float m = 0;
+        int n = actions.size();
+        for (ActionConcept a : actions) {
+            Truth d = a.goals().truth(now, nar.time.dur());
+            if (d != null)
+                m += d.evi();
         }
+        actionDesire.addValue(w2c(m/n)); //resulting from the previous frame
 
-//        Task beHappy = new TaskBuilder(happy, '!', 1f, nar).time(Tense.Present, nar).budgetByTruth(1f);
-//        beHappy.normalize(nar);
-//        for (ActionConcept a : actions) {
-//            a.tasklinks().put(beHappy);
-//        }
-
-//        Compound term = happy.term();
-//        happy.termlinks().forEach(tl -> {
-//            Term x = tl.get();
-//            if (x.op().temporal) {
-//                if (((Compound)x).containsTerm(term)) {
-//                    System.out.println(x);
-//                }
-//            }
-////            if (x.op()==IMPL) {
-////                Compound i = (Compound)x;
-////                int dt = i.dt();
-////                if (i.term(1).equals(term)) {
-////                    System.out.println(i);
-////                }
-////            }
-//        });
     }
 
     public float desireConf() {
-        return Math.min(1f, ((float) avgActionDesire.getMean()));
+        return Math.min(1f, ((float) actionDesire.getMean()));
     }
 
 //    @Nullable
@@ -693,7 +563,7 @@ abstract public class NAgent implements NSense, NAction {
 //    }
 
 
-    private Task boost(@NotNull Task t, float p, float dur, float lookAhead /* in multiples of dur */) {
+    private Task boost(@NotNull Task t, float dur, float lookAhead /* in multiples of dur */) {
 
         if (nar.random.nextFloat() > predictorProbability)
             return t;
@@ -710,7 +580,7 @@ abstract public class NAgent implements NSense, NAction {
             return prediction(t.term(), t.punc(), t.truth(), ETERNAL, ETERNAL);
 
         } else {
-            t.budget(p, nar).log("Agent Predictor");
+            t.budget(nar).log("Agent Predictor");
             return t;
         }
 
@@ -758,7 +628,7 @@ abstract public class NAgent implements NSense, NAction {
 
     public Task prediction(@NotNull Compound term, byte punct, Truth truth, long start, long end) {
         return new ImmutableTask(term, punct, truth, nar.time(), start, end, new long[] { nar.time.nextStamp() } )
-                .budget(predictorPriority.floatValue(), nar)
+                .budget(nar)
                 .log("Agent Predictor");
     }
 

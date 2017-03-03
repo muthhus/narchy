@@ -4,7 +4,6 @@ import nars.concept.Concept;
 import nars.gui.Vis;
 import nars.nar.Default;
 import nars.nar.NARBuilder;
-import nars.time.FrameTime;
 import nars.time.RealTime;
 import nars.time.Time;
 import nars.truth.Truth;
@@ -46,7 +45,7 @@ abstract public class NAgentX extends NAgent {
     }
 
     public NAgentX(String id, NAR nar, int reasonerFramesPerEnvironmentFrame) {
-        super(id, nar, reasonerFramesPerEnvironmentFrame);
+        super(id, nar);
     }
 
 //    public static void run(Function<NAR, NAgentX> init, int frames) {

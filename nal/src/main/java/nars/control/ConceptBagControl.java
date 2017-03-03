@@ -76,7 +76,8 @@ public class ConceptBagControl implements Control, Consumer<DerivedTask> {
 
     public final MutableInteger tasksInputPerCycle = new MutableInteger(128);
 
-    public final FloatParam conceptActivationRate = new FloatParam(1f);
+    /** distinct from the NAR's */
+    public final FloatParam activatinRate = new FloatParam(1f);
     private float currentActivationRate = 1f;
 
     /** pending derivations to be input after this cycle */
@@ -120,7 +121,7 @@ public class ConceptBagControl implements Control, Consumer<DerivedTask> {
 
         //update concept bag
         pending.capacity( tasksInputPerCycle.intValue() );
-        currentActivationRate = conceptActivationRate.floatValue()
+        currentActivationRate = activatinRate.floatValue()
         // * 1f/((float)Math.sqrt(active.capacity()))
         ;
 

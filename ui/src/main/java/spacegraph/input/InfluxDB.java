@@ -5,7 +5,9 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import jcog.Util;
+import jcog.net.UDP;
 import org.apache.commons.compress.utils.IOUtils;
+import org.jetbrains.annotations.NotNull;
 import org.mockito.internal.util.io.IOUtil;
 
 import java.io.IOException;
@@ -39,6 +41,32 @@ public class InfluxDB {
         this.port = port;
         this.db = db;
     }
+
+
+    final UDP udp = new UDP();
+
+    /*
+    https://docs.influxdata.com/influxdb/v0.9/write_protocols/udp/
+    To write, just send newline separated line protocol over UDP. For better performance send batches of points rather than multiple single points.
+    $ echo "cpu value=1"> /dev/udp/localhost/8089
+         */
+    public void sendInfluxDB() {
+        //String s = "cpu,host=server01,region=uswest load=" + (Math.random() * 100) +  " " + System.currentTimeMillis();
+
+        //SELECT mean("hapy") FROM "cpu"
+        //SELECT mean("busyVol") FROM "cpu" WHERE $timeFilter GROUP BY time($interval) fill(null)
+
+//        @NotNull Emotion e = nar.emotion;
+//        String s = "cpu " +
+//                "busyVol=" + e.busyVol.getSum() +
+//                ",busyPri=" + e.busyPri.getSum() +
+//                ",hapy=" + e.happy.getSum() +
+//                ",sad=" + e.sad.getSum();
+//        //" " + System.nanoTime();
+//
+//        udp.out(s, host, port);
+    }
+
 
     public float[] get(String measurement, long from, long to) {
         return get(measurement, "*", from, to);

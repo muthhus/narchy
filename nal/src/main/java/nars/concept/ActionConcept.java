@@ -28,7 +28,7 @@ import static nars.Op.NEG;
 
 
 /** TODO make extend SensorConcept and utilize that for feedback control */
-public class ActionConcept extends WiredConcept implements WiredConcept.Prioritizable, FloatFunction<Term>, Function<NAR,Task> {
+public class ActionConcept extends WiredConcept implements FloatFunction<Term>, Function<NAR,Task> {
 
 
     /** relative temporal delta time for desire/belief prediction */
@@ -39,17 +39,13 @@ public class ActionConcept extends WiredConcept implements WiredConcept.Prioriti
 
     private float currentFeedback;
 
-    public FloatSupplier pri;
 
     private final boolean updateOnBeliefChange = false;
 
     //enable/disable dynamic tasklink truth revision
     private final boolean linkTruth = false;
 
-    @Override
-    public void pri(FloatSupplier v) {
-        this.pri = v;
-    }
+
     private Truth lastGoal, lastBelief;
 
     public ActionConcept feedbackResolution(float res) {

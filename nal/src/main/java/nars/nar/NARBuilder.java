@@ -176,12 +176,13 @@ public interface NARBuilder {
         nar.goalConfidence(0.5f);
         //nar.derivedEvidenceGain.setValue(0.75f);
 
-        float p = 0.25f;
+        float p = 1f;
         nar.DEFAULT_BELIEF_PRIORITY = 0.75f * p;
         nar.DEFAULT_GOAL_PRIORITY = 1f * p;
         nar.DEFAULT_QUESTION_PRIORITY = 0.5f * p;
         nar.DEFAULT_QUEST_PRIORITY = 0.5f * p;
 
+        nar.activationRate.setValue(0.01f);
         nar.confMin.setValue(0.01f);
         nar.truthResolution.setValue(0.01f);
 

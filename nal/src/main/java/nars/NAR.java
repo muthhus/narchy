@@ -789,7 +789,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
 
     public Activation activateTask(@NotNull Task input, @NotNull Concept c, float scale) {
         //return new DepthFirstActivation(input, this, nar, nar.priorityFactor.floatValue());
-        return new SpreadingActivation(input, c, this, priorityFactor.floatValue() * scale, acti.get());
+        return new SpreadingActivation(input, c, this, activationRate.floatValue() * scale, acti.get());
     }
 
 //    /**
@@ -910,11 +910,6 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
      */
     @NotNull
     public final NAR run(int frames) {
-        return run(frames, 1);
-    }
-
-    @NotNull
-    public final NAR run(int frames, int computeCyclesPerframe) {
 
         for (; frames > 0; frames--) {
 
@@ -922,8 +917,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
 
             emotion.cycle();
 
-            for (int i = 0; i < computeCyclesPerframe; i++)
-                exe.cycle(this);
+            exe.cycle(this);
 
         }
 

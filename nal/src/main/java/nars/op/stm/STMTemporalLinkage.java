@@ -27,7 +27,6 @@ public final class STMTemporalLinkage extends STM {
     @NotNull public final Deque<Task> stm;
     @NotNull
     private final On onReset;
-    float strength = 1f;
 
     public STMTemporalLinkage(@NotNull NAR nar, int capacity) {
         super(nar, new MutableInteger(capacity));
@@ -105,6 +104,7 @@ public final class STMTemporalLinkage extends STM {
 
         if (queued!=null) {
             nar.runLater(()-> {
+                float strength = nar.activationRate.floatValue();
                 float tPri = t.priSafe(0);
                 if (tPri > 0) {
                     for (int i = 0, queuedSize = queued.size(); i < queuedSize; i++) {

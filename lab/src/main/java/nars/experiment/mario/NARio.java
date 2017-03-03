@@ -1,10 +1,15 @@
 package nars.experiment.mario;
 
+import com.google.common.collect.Lists;
 import jcog.Util;
+import jcog.bag.PLink;
 import nars.*;
+import nars.concept.Concept;
 import nars.experiment.mario.sprites.Mario;
 
 import javax.swing.*;
+
+import java.util.ArrayList;
 
 import static nars.$.$;
 import static nars.$.t;
@@ -42,8 +47,8 @@ public class NARio extends NAgentX {
 
 
         try {
-            senseCamera("camF", ()->mario.image, 60, 40, (v) -> t(v, alpha)).setResolution(0.05f);
-            //senseCameraRetina("camZ", ()->mario.image, 30, 18, (v) -> t(v, alpha)).setResolution(0.04f);
+            //senseCamera("camF", ()->mario.image, 60, 40, (v) -> t(v, alpha)).setResolution(0.05f);
+            senseCameraRetina("camZ", ()->mario.image, 30, 18, (v) -> t(v, alpha)).setResolution(0.1f);
 
 
             senseNumberDifference($("nario(x,v)"), ()-> mario.scene instanceof LevelScene ? ((LevelScene)mario.scene).mario.x : 0);
@@ -107,6 +112,18 @@ public class NARio extends NAgentX {
             return new NARio(n);
 
         }, 8, 4, -1);
+
+
+//        ArrayList<PLink<Concept>> x = Lists.newArrayList(nar.conceptsActive());
+//        x.sort((a,b)->{
+//            int z = Float.compare(a.pri(), b.pri());
+//            if (z == 0)
+//                return Integer.compare(a.get().hashCode(), b.get().hashCode());
+//            return z;
+//        });
+//        for (PLink y : x)
+//            System.out.println(y);
+
     }
 }
 

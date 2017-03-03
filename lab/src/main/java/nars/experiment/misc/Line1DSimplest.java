@@ -31,7 +31,7 @@ public class Line1DSimplest extends NAgent {
 
 
     public Line1DSimplest(NAR n, IntToFloatFunction target) throws Narsese.NarseseException {
-        super("", n, 1);
+        super("", n);
 
         this.targetFunc = target;
 

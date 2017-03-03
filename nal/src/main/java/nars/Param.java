@@ -163,7 +163,7 @@ public abstract class Param  {
     /**
      * global input activation multiplier, applied to both concepts and links
      */
-    @NotNull public FloatParam priorityFactor = new FloatParam(1f, 0f, 2f);
+    @NotNull public FloatParam activationRate = new FloatParam(1f, 0f, 2f);
 
     @NotNull public FloatParam derivedEvidenceGain = new FloatParam(1f, 0f, 2f);
 

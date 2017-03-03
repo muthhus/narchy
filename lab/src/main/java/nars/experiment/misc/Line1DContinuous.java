@@ -50,7 +50,7 @@ public class Line1DContinuous extends NAgent {
     final float[] ins;
 
     public Line1DContinuous(NAR n, int size, IntToFloatFunction target) {
-        super("x", n, 1);
+        super("x", n);
         this.size = size;
         ins = new float[size*2];
         this.targetFunc = target;
