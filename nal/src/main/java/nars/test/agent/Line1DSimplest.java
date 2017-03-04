@@ -1,5 +1,6 @@
 package nars.test.agent;
 
+import jcog.Texts;
 import nars.*;
 import nars.concept.ActionConcept;
 import nars.concept.SensorConcept;
@@ -35,9 +36,23 @@ public class Line1DSimplest extends NAgent {
         in = senseNumber($.p("in"), () -> this.target );
 
         out = action($.p("out"), (b, d) -> {
+
+            float previous = current;
+
             if (d != null) {
                 current = d.freq();
             }
+
+            /*
+            float prevDist = Math.abs(target - previous);
+            float curDist = Math.abs(current - previous);
+            if (curDist - prevDist > 0.01f) {
+                System.err.println(nar.time() + " DEVIATION " + Texts.n2(curDist - prevDist));
+            } else if (prevDist - curDist > 0.01f ){
+                System.err.println(nar.time() + " CORRECTION " + Texts.n2(prevDist - curDist));
+            }
+            */
+
             return $.t(current, nar.confidenceDefault(BELIEF));
         });
 

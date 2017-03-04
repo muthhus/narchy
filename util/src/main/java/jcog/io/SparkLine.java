@@ -33,6 +33,16 @@ public enum SparkLine {
 		}
 		return accumulator.toString();
 	}
+	public static String renderFloats(Collection<Float> values) {
+		float max = Collections.max(values), min = Collections.min(values);
+		float scale = (max - min) / 7.0f;
+		StringBuilder accumulator = new StringBuilder();
+		for (Float value : values) {
+			int index = Math.round((value - min) / scale);
+			accumulator.append(ticks.get(index));
+		}
+		return accumulator.toString();
+	}
 
 	/**
 	 * Renders an ascii graph.

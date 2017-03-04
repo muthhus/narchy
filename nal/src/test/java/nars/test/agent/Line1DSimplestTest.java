@@ -1,9 +1,16 @@
 package nars.test.agent;
 
+import jcog.io.SparkLine;
 import nars.NAR;
 import nars.Narsese;
+import nars.Param;
 import nars.nar.Default;
+import org.eclipse.collections.impl.list.mutable.primitive.FloatArrayList;
 import org.junit.Test;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 import static org.junit.Assert.*;
 
@@ -21,7 +28,7 @@ public class Line1DSimplestTest {
 
         a.init();
 
-        n.log();
+        //n.log();
         a.trace = true;
 
         System.out.println("START initializing at target..\n");
@@ -45,4 +52,72 @@ public class Line1DSimplestTest {
         System.out.println("AVG SCORE=" + a.rewardSum() / n.time());
 
     }
+
+    @Test
+    public void testSimplePerformance() throws Narsese.NarseseException {
+
+        Param.ANSWER_REPORTING = false;
+
+        Default n = new Default();
+        n.core.conceptsFiredPerCycle.setValue(16);
+
+        n.truthResolution.setValue(0.01f);
+        n.termVolumeMax.setValue(24);
+
+        Line1DSimplest a = new Line1DSimplest(n);
+
+        a.init();
+
+        List<Float> rewards = new ArrayList(8*1024);
+        List<Float> motv = new ArrayList(8*1024);
+
+        n.onCycle(()->{
+            rewards.add(a.rewardValue);
+            motv.add(a.desireConf());
+        });
+
+        //n.log();
+        //a.trace = true;
+
+        int trainTime = 8;
+
+        a.current = 0; a.target = 0; n.run(trainTime);
+        a.current = 0; a.target = 1; n.run(trainTime);
+        a.current = 1; a.target = 0; n.run(trainTime);
+        a.current = 1; a.target = 1; n.run(trainTime);
+
+
+        final int changePeriod = trainTime;
+
+        int time = 400;
+
+        //n.log();
+        for (int i = 0; i < time; i++) {
+            if (i % changePeriod == 0)
+                a.target = n.random.nextBoolean() ?  1f : 0f;
+            n.run(1);
+        }
+
+        System.out.println( "rwrd: " +  SparkLine.renderFloats(downSample(rewards, 4)) );
+        System.out.println( "motv: " + SparkLine.renderFloats(downSample(motv, 4)) );
+        float avgReward = a.rewardSum() / n.time();
+        System.out.println("avg reward = " + avgReward);
+
+        assertTrue(avgReward > 0.5f); //75% accuracy
+
+    }
+
+    private static List<Float> downSample(List<Float> motv, int divisor) {
+        List<Float> l = new ArrayList((int)Math.ceil(((float)motv.size())/divisor));
+        for (int i = 0; i < motv.size(); ) {
+            float total = 0;
+            int j;
+            for (j = 0; j < divisor && i < motv.size(); j++ ) {
+                total += motv.get(i++);
+            }
+            l.add(total/j);
+        }
+        return l;
+    }
+
 }
