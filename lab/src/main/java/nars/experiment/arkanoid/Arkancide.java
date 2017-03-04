@@ -123,7 +123,7 @@ public class Arkancide extends NAgentX {
 
             float pct;
             if (d != null) {
-                pct = noid.paddle.moveTo(d.freq(), paddleSpeed * maxPaddleSpeed); //* d.conf());
+                pct = noid.paddle.moveTo(d.freq(), paddleSpeed * maxPaddleSpeed * d.conf());
             } else {
                 pct = noid.paddle.x / Arkanoid.SCREEN_WIDTH; //unchanged
             }

@@ -48,7 +48,7 @@ public interface NARBuilder {
                 //new SynchronousExecutor();
                 new MultiThreadExecutor(threads, 1024, sync);
 
-        exe = new InstrumentedExecutor(exe, 8);
+        //exe = new InstrumentedExecutor(exe, 8);
 
 
         final int reprobes = 4;
@@ -172,7 +172,7 @@ public interface NARBuilder {
         };
 
         nar.beliefConfidence(0.9f);
-        nar.goalConfidence(0.5f);
+        nar.goalConfidence(0.9f);
         //nar.derivedEvidenceGain.setValue(0.75f);
 
         float p = 1f;

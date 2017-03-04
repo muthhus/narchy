@@ -30,22 +30,22 @@ abstract public class events extends AtomicBoolCondition {
         }
 
     };
-    /** true if both are non-eternal and task is after or simultaneous with belief  */
-    @Nullable
-    public static final events before = new events() {
-
-        @Override
-        public String toString() {
-            return "before";
-        }
-
-        @Override
-        public boolean run(@NotNull Derivation m) {
-            long d = deltaOcc(m.task, m.belief);
-            return d>=0 /* && d!=ETERNAL which is negative */;
-        }
-
-    };
+//    /** true if both are non-eternal and task is after or simultaneous with belief  */
+//    @Nullable
+//    public static final events before = new events() {
+//
+//        @Override
+//        public String toString() {
+//            return "before";
+//        }
+//
+//        @Override
+//        public boolean run(@NotNull Derivation m) {
+//            long d = deltaOcc(m.task, m.belief);
+//            return d>=0 /* && d!=ETERNAL which is negative */;
+//        }
+//
+//    };
 
 //    /** order doesnt matter, just that they are both temporal */
 //    @Nullable public static final events bothTemporal = new events() {
@@ -63,20 +63,20 @@ abstract public class events extends AtomicBoolCondition {
 //
 //    };
 
-    public static final BoolCondition taskNotDTernal = new events() {
-
-        @Override
-        public String toString() {
-            return "taskNotDTernal";
-        }
-
-        @Override
-        public boolean run(@NotNull Derivation m) {
-            int dt = m.task.dt();
-            return (dt != DTERNAL);
-        }
-
-    };
+//    public static final BoolCondition taskNotDTernal = new events() {
+//
+//        @Override
+//        public String toString() {
+//            return "taskNotDTernal";
+//        }
+//
+//        @Override
+//        public boolean run(@NotNull Derivation m) {
+//            int dt = m.task.dt();
+//            return (dt != DTERNAL);
+//        }
+//
+//    };
 
     public static final BoolCondition beliefDTSimultaneous = new events() {
 
@@ -150,22 +150,22 @@ abstract public class events extends AtomicBoolCondition {
         return (tOcc - bOcc);
     }
 
-    /** both task and belief must be non-null and eternal */
-    @Nullable
-    public static final events eternal = new events() {
-
-        @Override
-        public String toString() {
-            return "eternal";
-        }
-
-        @Override
-        public boolean run(@NotNull Derivation m) {
-            Task b = m.belief;
-            if (b == null) return false;
-            return m.task.start() == ETERNAL && b.start() == ETERNAL;
-        }
-    };
+//    /** both task and belief must be non-null and eternal */
+//    @Nullable
+//    public static final events eternal = new events() {
+//
+//        @Override
+//        public String toString() {
+//            return "eternal";
+//        }
+//
+//        @Override
+//        public boolean run(@NotNull Derivation m) {
+//            Task b = m.belief;
+//            if (b == null) return false;
+//            return m.task.start() == ETERNAL && b.start() == ETERNAL;
+//        }
+//    };
 
 
     /** task is before or simultaneous with belief which follows (T ... B) */

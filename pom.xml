@@ -79,7 +79,6 @@
 
 
     <modules>
-        <module>logic</module>
         <module>nal</module>
         <module>app</module>
         <module>lab</module>

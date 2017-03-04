@@ -36,7 +36,7 @@ public class EternalTaskCondition implements NARCondition, Predicate<Task>, Cons
     boolean succeeded;
     //long successTime = Tense.TIMELESS;
 
-    final static Logger logger = LoggerFactory.getLogger(EternalTaskCondition.class);
+    //final static Logger logger = LoggerFactory.getLogger(EternalTaskCondition.class);
 
     //@Expose
 

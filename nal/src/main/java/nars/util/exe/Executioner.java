@@ -20,11 +20,11 @@ abstract public class Executioner implements Executor {
     }
 
     public synchronized void start(NAR nar) {
-        if (this.nar == null) {
+        //if (this.nar == null) {
             this.nar = nar;
-        } else {
-            throw new RuntimeException("already started");
-        }
+//        } else {
+//            throw new RuntimeException("already started");
+//        }
     }
 
     public synchronized void stop() {

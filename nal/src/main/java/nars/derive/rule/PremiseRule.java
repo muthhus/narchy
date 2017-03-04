@@ -277,7 +277,7 @@ public class PremiseRule extends GenericCompound {
         put("PatternOp0", 20);
 
         put(SubTermsStructure.class, 18);
-        put(PatternOpNot.class, 16);
+//        put(PatternOpNot.class, 16);
 
         put(SubTermStructure.class, 12);
 
@@ -313,16 +313,16 @@ public class PremiseRule extends GenericCompound {
 
         if (b instanceof TermNotEquals) return TermNotEquals.class;
 
-        if (b instanceof PatternOpNot) return PatternOpNot.class;
-        if (b instanceof PatternOpNotContained) return PatternOpNot.class;
+//        if (b instanceof PatternOpNot) return PatternOpNot.class;
+//        if (b instanceof PatternOpNotContained) return PatternOpNot.class;
 
         //if (b == TaskPunctuation.NotGoal) return TaskPunctuation.class;
         //if (b == TaskPunctuation.NotBelief) return TaskPunctuation.class;
 
         if (b == events.after) return events.class;
         if (b == events.afterOrEternal) return events.class;
-        if (b == IfTermLinkBefore.ifTermLinkBefore) return events.class;
-        if (b == IfTermLinkBefore.ifBeliefBefore) return events.class;
+        //if (b == IfTermLinkBefore.ifTermLinkBefore) return events.class;
+        //if (b == IfTermLinkBefore.ifBeliefBefore) return events.class;
 
         if (b instanceof Solve) return Solve.class;
 

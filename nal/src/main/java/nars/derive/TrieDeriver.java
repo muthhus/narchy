@@ -232,58 +232,58 @@ public class TrieDeriver implements Deriver {
         return p;
     }
 
-    public void recurse(@NotNull CauseEffect each) {
-        for (BoolCondition p : roots) {
-            recurse(null, p, each);
-        }
-    }
+//    public void recurse(@NotNull CauseEffect each) {
+//        for (BoolCondition p : roots) {
+//            recurse(null, p, each);
+//        }
+//    }
 
     public interface CauseEffect extends BiConsumer<Term, Term> {
 
     }
 
-    public static Term recurse(Term pred, Term curr, @NotNull CauseEffect each) {
-
-        each.accept(pred, curr);
-
-        /*if (curr instanceof IfThen) {
-
-            IfThen it = (IfThen) curr;
-//            each.accept(/*recurse(curr, _/it.cond/_, each)-/, recurse(curr, it.conseq, each));
-
-        } else */
-        if (curr instanceof AndCondition) {
-
-            AndCondition ac = (AndCondition) curr;
-            Term p = curr;
-            for (BoolCondition b : ac.termCache) {
-                p = recurse(p, b, each);
-            }
-
-        } else if (curr instanceof Fork) {
-            Fork ac = (Fork) curr;
-            for (BoolCondition b : ac.termCache) {
-                recurse(curr, b, each);
-            }
-        } else if (curr instanceof PatternOpSwitch) {
-            PatternOpSwitch sw = (PatternOpSwitch) curr;
-            int i = -1;
-            for (BoolCondition b : sw.proc) {
-                i++;
-                if (b == null)
-                    continue;
-
-                //construct a virtual if/then branch to emulate the entire switch structure
-                recurse(curr,
-                        AndCondition.the(Lists.newArrayList(
-                                new PatternOp(sw.subterm, Op.values()[i]), b)),
-                        each);
-
-            }
-        }
-
-        return curr;
-    }
+//    public static Term recurse(Term pred, Term curr, @NotNull CauseEffect each) {
+//
+//        each.accept(pred, curr);
+//
+//        /*if (curr instanceof IfThen) {
+//
+//            IfThen it = (IfThen) curr;
+////            each.accept(/*recurse(curr, _/it.cond/_, each)-/, recurse(curr, it.conseq, each));
+//
+//        } else */
+//        if (curr instanceof AndCondition) {
+//
+//            AndCondition ac = (AndCondition) curr;
+//            Term p = curr;
+//            for (BoolCondition b : ac.termCache) {
+//                p = recurse(p, b, each);
+//            }
+//
+//        } else if (curr instanceof Fork) {
+//            Fork ac = (Fork) curr;
+//            for (BoolCondition b : ac.termCache) {
+//                recurse(curr, b, each);
+//            }
+//        } else if (curr instanceof PatternOpSwitch) {
+//            PatternOpSwitch sw = (PatternOpSwitch) curr;
+//            int i = -1;
+//            for (BoolCondition b : sw.proc) {
+//                i++;
+//                if (b == null)
+//                    continue;
+//
+//                //construct a virtual if/then branch to emulate the entire switch structure
+//                recurse(curr,
+//                        AndCondition.the(Lists.newArrayList(
+//                                new PatternOp(sw.subterm, Op.values()[i]), b)),
+//                        each);
+//
+//            }
+//        }
+//
+//        return curr;
+//    }
 
     public static void print(Object p, @NotNull PrintStream out, int indent) {
 

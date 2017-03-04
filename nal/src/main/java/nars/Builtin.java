@@ -29,6 +29,8 @@ import static nars.term.Terms.compoundOrNull;
  */
 public class Builtin {
 
+    //TODO: http://software-lab.de/doc/ref.html#fun
+
     static Concept[] statik = {
 
             new intersect(),
