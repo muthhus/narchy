@@ -1073,4 +1073,13 @@ public class NAL8Test extends AbstractNALTest {
 //        ;
 //    }
 
+    @Test public void questConjunction() {
+        test()
+                .log()
+                .input("((a) && (b)).")
+                .input("(a)@")
+                .mustOutput(cycles, "(b)", Op.QUEST, 0, 1f);
+
+    }
+
 }

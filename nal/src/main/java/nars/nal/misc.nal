@@ -13,7 +13,11 @@
 
      (&&,X,A..+), B, task("!"), time(decomposeTaskSubset) |- subIfUnifiesForward((&&,A..+),X,B), (Goal:Strong)
         (&&,(--,%X),A..+), B,  task("!"), time(decomposeTaskSubset), belief(negative) |- subIfUnifiesForward((&&,A..+),X,B), (Goal:StrongPN)
-        // ^ this negation handling is not quite right
+        // ^ this negation handling may not be quite right
+
+     X, (&&,X,A..+), time(decomposeBelief), task("?@") |- (&&,A..+), ()
+        X, (&&,(--,%X),A..+), time(decomposeBelief), task("?@") |- (&&,A..+), ()
+     B, (A==>B), time(decomposeBelief), task("?@") |- A, ()
 
 
      (&&,X,A..+), X, time(decomposeTaskSubset), task("?@") |- (&&,A..+), ()

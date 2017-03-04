@@ -106,12 +106,8 @@ public class ScalarSignal implements Function<NAR, Task>, DoubleSupplier {
         long now = nar.time();
 
         //update previous task: extend its end time to current time
-        if (current!=null) {
-            if (!current.isDeleted()) {
-                current.setEnd(now);
-            } else {
-                currentValue = Float.NaN; //force re-input
-            }
+        if (current!=null && current.isDeleted())  {
+            currentValue = Float.NaN; //force re-input
         }
 
         int timeSinceLastInput = (int) (now - lastInputTime);
@@ -155,6 +151,11 @@ public class ScalarSignal implements Function<NAR, Task>, DoubleSupplier {
                 this.currentValue = next;
                 return t;
             }
+        }
+
+        //nothing new was input, continue previous task if exists
+        if (current!=null && !current.isDeleted()) {
+            current.setEnd(now);
         }
 
         return null;

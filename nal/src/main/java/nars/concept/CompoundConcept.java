@@ -420,71 +420,80 @@ public class CompoundConcept<T extends Compound> implements Concept, Termlike {
         Truth before = delta.before;
         Truth after = delta.after;
 
-        float deltaSatisfaction, deltaConf;
+        float deltaSatisfaction, deltaConf, deltaFreq;
 
 
         if (before != null && after != null) {
 
-            float thisConf = after.conf();
-            float deltaFreq = after.freq() - before.conf();
-            deltaConf = thisConf - before.conf();
-
-            Truth other;
-            int polarity = 0;
-
-            Time time = nar.time;
-            float dur = time.dur();
-            long now = time.time();
-            if (input.isBelief()) {
-                //compare against the current goal state
-                other = concept.goals().truth(now, dur);
-                if (other != null)
-                    polarity = +1;
-            } else if (input.isGoal()) {
-                //compare against the current belief state
-                other = concept.beliefs().truth(now, dur);
-                if (other != null)
-                    polarity = -1;
-            } else {
-                other = null;
-            }
-
-
-            if (other != null) {
-
-                float otherFreq = other.freq();
-
-                if (polarity==0 || Util.equals(otherFreq, 0.5f, TRUTH_EPSILON)) {
-
-                    //ambivalence: no change
-                    deltaSatisfaction = 0;
-
-                } else {
-
-                    if (otherFreq > 0.5f) {
-                        //measure how much the freq increased since goal is positive
-                        deltaSatisfaction = +polarity * deltaFreq / (2f * (otherFreq - 0.5f));
-                    } else {
-                        //measure how much the freq decreased since goal is negative
-                        deltaSatisfaction = -polarity * deltaFreq / (2f * (0.5f - otherFreq));
-                    }
-
-                    deltaSatisfaction *= (thisConf * other.conf());
-
-                    nar.emotion.happy(deltaSatisfaction);
-                }
-
-
-            } else {
-                deltaSatisfaction = 0;
-            }
+            deltaFreq = after.freq() - before.freq();
+            deltaConf = after.conf() - before.conf();
 
         } else {
             if (before == null && after != null) {
                 deltaConf = after.conf();
+                deltaFreq = after.freq();
+            } else if (before!=null) {
+                deltaConf = -before.conf();
+                deltaFreq = -before.freq();
             } else {
                 deltaConf = 0;
+                deltaFreq = 0;
             }
+        }
+
+        Truth other;
+        int polarity = 0;
+
+        Time time = nar.time;
+        float dur = time.dur();
+        long now = time.time();
+        if (input.isBelief()) {
+            //compare against the current goal state
+            other = concept.goals().truth(now, dur);
+            if (other != null)
+                polarity = +1;
+        } else if (input.isGoal()) {
+            //compare against the current belief state
+            other = concept.beliefs().truth(now, dur);
+            if (other != null)
+                polarity = -1;
+        } else {
+            other = null;
+        }
+
+
+        if (other != null) {
+
+            float otherFreq = other.freq();
+
+            if (polarity==0) {
+
+                //ambivalence: no change
+                deltaSatisfaction = 0;
+
+            } else {
+
+//                if (otherFreq > 0.5f) {
+//                    //measure how much the freq increased since goal is positive
+//                    deltaSatisfaction = +polarity * deltaFreq / (2f * (otherFreq - 0.5f));
+//                } else {
+//                    //measure how much the freq decreased since goal is negative
+//                    deltaSatisfaction = -polarity * deltaFreq / (2f * (0.5f - otherFreq));
+//                }
+
+                if (after!=null) {
+                    deltaSatisfaction = /*Math.abs(deltaFreq) * */ (2f * (1f - Math.abs(after.freq() - otherFreq)) - 1f);
+
+                    deltaSatisfaction *= (after.conf() * other.conf());
+
+                    nar.emotion.happy(deltaSatisfaction);
+                } else {
+                    deltaSatisfaction = 0;
+                }
+            }
+
+
+        } else {
             deltaSatisfaction = 0;
         }
 

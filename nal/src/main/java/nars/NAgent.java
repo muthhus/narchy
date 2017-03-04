@@ -8,7 +8,6 @@ import jcog.data.FloatParam;
 import jcog.list.FasterList;
 import jcog.math.FloatNormalized;
 import jcog.math.FloatPolarNormalized;
-import jcog.net.UDP;
 import nars.concept.ActionConcept;
 import nars.concept.Concept;
 import nars.concept.SensorConcept;
@@ -73,15 +72,14 @@ abstract public class NAgent implements NSense, NAction {
     float horizon = 4;
 
     public float alpha, gamma;
+    private boolean initialized;
 
-    float curiosityFreqMin = 0.5f;
-    float curiosityFreqMax = 1.5f;
-
-    public void stop() {
-        nar.stop();
-    }
 
     class CuriosityPhasor {
+
+        float curiosityFreqMin = 0.5f;
+        float curiosityFreqMax = 1.5f;
+
         public float freq, phase;
         public CuriosityPhasor() {
             Random r = nar.random;
@@ -91,7 +89,7 @@ abstract public class NAgent implements NSense, NAction {
 
         public float next() {
 
-            float mutateRate = (curiosityFreqMax - curiosityFreqMin)/20f;
+            float mutateRate = (curiosityFreqMax - curiosityFreqMin);
             freq = Util.clamp(freq + (nar.random.nextFloat() - 0.5f) * mutateRate, curiosityFreqMin, curiosityFreqMax);
 
             return (float)Math.sin(freq * nar.time()/nar.time.dur()/(2*(float)Math.PI) + phase)/2f + 0.5f;
@@ -104,31 +102,21 @@ abstract public class NAgent implements NSense, NAction {
 
     public final FloatParam gammaEpsilonFactor = new FloatParam(0.1f);
 
+    public final List<Task> predictors = newArrayList();
+
     //final int curiosityMonitorDuration; //frames
     final DescriptiveStatistics actionDesire;
     final DescriptiveStatistics rewardWindow;
 
-
-    public float rewardValue;
-
     float predictorProbability = 1f;
-
-    public final List<Task> predictors = newArrayList();
 
     public boolean trace = false;
 
-
     protected long now;
 
-
-
-
-    //private float curiosityAttention;
     private float rewardSum = 0;
 
-
-
-    //private MutableFloat maxSensorPriority;
+    public float rewardValue;
 
     public NAgent(@NotNull NAR nar) {
         this("", nar);
@@ -142,10 +130,6 @@ abstract public class NAgent implements NSense, NAction {
 
         this.id = id;
         this.nar = nar;
-
-
-
-
 
         this.rewardNormalized = new FloatPolarNormalized(() -> rewardValue);
 
@@ -161,20 +145,6 @@ abstract public class NAgent implements NSense, NAction {
         int curiosityMonitorDuration = Math.round((1 + 2 * nar.time.dur())); //TODO handle changing duration value
         actionDesire = new DescriptiveStatistics(curiosityMonitorDuration);
         rewardWindow = new DescriptiveStatistics(curiosityMonitorDuration);
-
-        /*
-        joy = new SensorConcept(
-                //"joy" + "(" + nar.self + ")", nar,
-                "change(" + happy.term() + ")",
-                nar,
-                new FloatPolarNormalized(
-                        new FirstOrderDifferenceFloat(
-                                () -> nar.time(), () -> rewardValue
-                        )
-                ),
-                (x) -> t(x, rewardConf)
-        );
-        */
 
     }
 
@@ -193,6 +163,10 @@ abstract public class NAgent implements NSense, NAction {
     @Override
     public final NAR nar() {
         return nar;
+    }
+
+    public void stop() {
+        nar.stop();
     }
 
     /**
@@ -231,7 +205,7 @@ abstract public class NAgent implements NSense, NAction {
 
     int actionFrame = 0;
 
-    private void doFrame() {
+    private void cycle() {
         //System.out.println(nar.conceptPriority(reward) + " " + nar.conceptPriority(dRewardSensor));
 
         this.now = nar.time();
@@ -280,8 +254,15 @@ abstract public class NAgent implements NSense, NAction {
     }
 
 
-    protected void init() {
+    /** registers sensor, action, and reward concepts with the NAR
+     *  TODO call this in the constructor
+     * */
+    public synchronized void init() {
 
+        if (initialized)
+            return;
+
+        initialized = true;
 
         //this.curiosityAttention = reinforcementAttention / actions.size();
 
@@ -420,6 +401,11 @@ abstract public class NAgent implements NSense, NAction {
 //                new TaskBuilder($.seq($.varQuery(0 /*"what"*/), dur, happiness), '?', null).time(now, now)
 //        );
 
+
+        nar.runLater(() -> {
+            nar.onCycle(this::cycle);
+        });
+
         //System.out.println(Joiner.on('\n').join(predictors));
     }
 
@@ -428,10 +414,6 @@ abstract public class NAgent implements NSense, NAction {
     @NotNull public NAgent run(final int cycles) {
 
         init();
-
-        nar.runLater(() -> {
-            nar.onCycle(nn -> doFrame());
-        });
 
         nar.run(cycles);
 
@@ -450,10 +432,6 @@ abstract public class NAgent implements NSense, NAction {
     public Loop runRT(float fps, int stopTime) {
 
         init();
-
-        nar.runLater(() -> {
-            nar.onCycle(nn -> doFrame());
-        });
 
         return nar.loop(fps);
 

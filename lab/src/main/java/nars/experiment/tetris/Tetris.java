@@ -39,10 +39,10 @@ public class Tetris extends NAgentX {
 
 
     public static final int tetris_width = 6;
-    public static final int tetris_height = 16;
-    public static final int TIME_PER_FALL = 16;
+    public static final int tetris_height = 12;
+    public static final int TIME_PER_FALL = 4;
     public static final int PIXEL_RADIX = 4;
-    static final int DUR = 1;
+    static final int DUR = 2;
 
     private static SensorConcept[][] concept;
     //private int afterlife = TIME_PER_FALL * tetris_height * tetris_width;
@@ -696,16 +696,13 @@ public class Tetris extends NAgentX {
 
         public MyTetris(NAR nar) throws Narsese.NarseseException {
             super(nar, Tetris.tetris_width, Tetris.tetris_height, Tetris.TIME_PER_FALL);
-        }
 
-        @Override
-        protected void init() {
-            super.init();
 //                view.plot1 =
 //                        Vis.emotionPlots(nar, 256);
 //
 //
 //                view.plot2 = Vis.agentBudgetPlot(this, 256);
+
             window(view, 600, 600);
             NAgentX.chart(this);
         }
