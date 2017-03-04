@@ -13,7 +13,6 @@ import static nars.$.t;
 public class NARio extends NAgentX {
 
     private final MarioComponent mario;
-    final static int cyclesPerFrame = 2;
 
     public NARio(NAR nar) {
         super("nario", nar);
@@ -43,8 +42,8 @@ public class NARio extends NAgentX {
 
 
         try {
-            //senseCamera("camF", ()->mario.image, 60, 40, (v) -> t(v, alpha)).setResolution(0.05f);
-            senseCameraRetina("camZ", ()->mario.image, 30, 18, (v) -> t(v, alpha)).setResolution(0.1f);
+            senseCamera("camF", ()->mario.image, 60, 40, (v) -> t(v, alpha)).setResolution(0.05f);
+            //senseCameraRetina("camZ", ()->mario.image, 30, 18, (v) -> t(v, alpha)).setResolution(0.1f);
 
 
             senseNumberDifference($("nario(x,v)"), ()-> mario.scene instanceof LevelScene ? ((LevelScene)mario.scene).mario.x : 0);
@@ -107,7 +106,7 @@ public class NARio extends NAgentX {
 
             return new NARio(n);
 
-        }, 8, 4, -1);
+        }, 16, 2, -1);
 
 
 //        ArrayList<PLink<Concept>> x = Lists.newArrayList(nar.conceptsActive());

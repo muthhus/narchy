@@ -60,15 +60,15 @@ public interface NARBuilder {
         ) {
             @Override
             public <X> X withBags(Term t, BiFunction<Bag<Term, BLink<Term>>, Bag<Task, BLink<Task>>, X> f) {
-                Bag<Term, BLink<Term>> termlink = new BLinkHijackBag<>(reprobes, BudgetMerge.plusBlend, rng);
-                Bag<Task, BLink<Task>> tasklink = new BLinkHijackBag<>(reprobes, BudgetMerge.plusBlend, rng);
+                Bag<Term, BLink<Term>> termlink = new BLinkHijackBag<>(reprobes, BudgetMerge.maxBlend, rng);
+                Bag<Task, BLink<Task>> tasklink = new BLinkHijackBag<>(reprobes, BudgetMerge.maxBlend, rng);
                 return f.apply(termlink, tasklink);
             }
 
             @NotNull
             @Deprecated @Override
             public <X> Bag<X, BLink<X>> newBag(@NotNull Map m) {
-                return new BLinkHijackBag<>(reprobes, BudgetMerge.plusBlend, rng);
+                return new BLinkHijackBag<>(reprobes, BudgetMerge.maxBlend, rng);
             }
         };
 
@@ -172,7 +172,7 @@ public interface NARBuilder {
         };
 
         nar.beliefConfidence(0.9f);
-        nar.goalConfidence(0.9f);
+        nar.goalConfidence(0.5f);
         //nar.derivedEvidenceGain.setValue(0.75f);
 
         float p = 1f;
@@ -182,11 +182,11 @@ public interface NARBuilder {
         nar.DEFAULT_QUEST_PRIORITY = 0.5f * p;
 
         nar.stmLinkage.capacity.set(0);
-        nar.core.conceptsFiredPerCycle.setValue(256);
+        nar.core.conceptsFiredPerCycle.setValue(128);
         nar.core.conceptsFiredPerBatch.setValue(32);
-        nar.core.derivationsInputPerCycle.setValue(64);
+        nar.core.derivationsInputPerCycle.setValue(48);
 
-        nar.activationRate.setValue(0.04f);
+        nar.activationRate.setValue(0.1f);
         nar.confMin.setValue(0.01f);
         nar.truthResolution.setValue(0.01f);
 
