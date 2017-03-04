@@ -4,6 +4,8 @@ import jcog.io.SparkLine;
 import nars.NAR;
 import nars.Narsese;
 import nars.Param;
+import nars.derive.DefaultDeriver;
+import nars.derive.Deriver;
 import nars.nar.Default;
 import org.eclipse.collections.impl.list.mutable.primitive.FloatArrayList;
 import org.junit.Test;
@@ -58,11 +60,18 @@ public class Line1DSimplestTest {
 
         Param.ANSWER_REPORTING = false;
 
-        Default n = new Default();
+        Default n = new Default() {
+//            @Override
+//            public Deriver newDeriver() {
+//                return Deriver.get("induction.nal");
+//            }
+        };
         n.core.conceptsFiredPerCycle.setValue(16);
 
         n.truthResolution.setValue(0.01f);
         n.termVolumeMax.setValue(24);
+
+        n.log();
 
         Line1DSimplest a = new Line1DSimplest(n);
 
@@ -89,7 +98,7 @@ public class Line1DSimplestTest {
 
         final int changePeriod = trainTime;
 
-        int time = 400;
+        int time = 100;
 
         //n.log();
         for (int i = 0; i < time; i++) {

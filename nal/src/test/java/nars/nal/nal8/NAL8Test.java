@@ -492,10 +492,10 @@ public class NAL8Test extends AbstractNALTest {
     @Test
     public void further_detachment_2()  {
         test()
-            .input("reachable:(SELF,{t002}). :|:")
-            .inputAt(3, "((reachable:(SELF,{t002}) &&+5 pick({t002})) ==>+7 hold(SELF,{t002})).")
+            .input("reachable(SELF,{t002}). :|:")
+            .inputAt(3, "((reachable(SELF,{t002}) &&+5 pick({t002})) ==>+7 hold(SELF,{t002})).")
             .mustBelieve(cycles, "(pick({t002}) ==>+7 hold(SELF, {t002}))", 1.0f, 0.81f, 5)
-            .mustNotOutput(cycles, "(pick({t002}) ==>+7 hold(SELF, {t002}))", BELIEF, 0)
+            //.mustNotOutput(cycles, "(pick({t002}) ==>+7 hold(SELF, {t002}))", BELIEF, 0)
         ;
 
     }
@@ -1075,11 +1075,72 @@ public class NAL8Test extends AbstractNALTest {
 
     @Test public void questConjunction() {
         test()
-                .log()
                 .input("((a) && (b)).")
                 .input("(a)@")
                 .mustOutput(cycles, "(b)", Op.QUEST, 0, 1f);
 
     }
+
+    @Test public void testGoalConjunctionNegative1() {
+        test()
+                .input("(a)!")
+                .input("((a) && (b)).")
+                .mustDesire(cycles, "(b)", 1f, 0.81f);
+    }
+    @Test public void testGoalConjunctionNegative1N() {
+        test()
+                .input("--(a)!")
+                .input("(--(a) && (b)).")
+                .mustDesire(cycles, "(b)", 1f, 0.81f);
+    }
+    @Test public void testGoalConjunctionNegative2() {
+        test()
+                .input("(a)!")
+                .input("((a) && --(b)).")
+                .mustDesire(cycles, "(b)", 0f, 0.81f);
+    }
+    @Test public void testGoalConjunctionNegative3() {
+        test()
+                .input("(a)!")
+                .input("(--(a) && (b)).")
+                .mustNotOutput(cycles, "(b)", GOAL, ETERNAL);
+    }
+    @Test public void testGoalEquivComponent() {
+        test()
+                .input("(happy)!")
+                .input("((happy) <=>+0 ((--,(happy))&&(--,(out)))).")
+                .mustDesire(cycles, "((--,(happy))&&(--,(out)))", 1f, 0.81f);
+    }
+    @Test public void testGoalEquivComponentNeg() {
+        test()
+                .input("(happy)!")
+                .input("(--(happy) <=>+0 ((--,(happy))&&(--,(out)))).")
+                .mustDesire(cycles, "((--,(happy))&&(--,(out)))", 0f, 0.81f);
+    }
+    @Test public void testGoalImplComponent() {
+        test()
+                .log()
+                .input("(happy)!")
+                .input("((--,(in)) ==>+0 ((happy)&&(--,(out)))).")
+                .mustDesire(cycles, "(in)", 0f, 0.73f);
+    }
+    @Test public void testGoalImplComponentTimedSubs() {
+        test()
+                .log()
+                .input("(happy)! :|:")
+                .input("((--,(in)) ==>+1 ((happy) &&-1 (--,(out)))).")
+                .mustDesire(cycles, "(in)", 0f, 0.73f, -2);
+    }
+    //$.50;.90$ (happy)! %1.0;.90%    $.11;.51$ ((--,(happy))&&(--,(out))). -1⋈8 %0.0;.88%
+    //$.13;.03$ (happy)! 19 %.47;.11% $0.0;.68$ ((--,(happy))&&(--,(out))). 19 %.16;.83%
+
+    //$.50;.90$ (happy)! %1.0;.90% $.24;.28$ ((--,(in)) ==>+0 ((--,(happy))&&(--,(out)))). 0 %0.0;.42%
+
+    //$.61;.90$ (happy)! 6 %1.0;.90% $.13;.27$ ((happy) <=>+0 ((--,(happy))&&(--,(out)))). 8 %1.0;.41%
+    //$.61;.90$ (happy)! 6 %1.0;.90% $0.0;.68$ ((--,(in))&&(happy)). 6 %.80;.83%
+    //$.50;.90$ (happy)! %1.0;.90% $.24;.28$ ((||,(happy),(out)) ==>+0 (in)). 0 %0.0;.42%
+    //$.50;.90$ (happy)! %1.0;.90% $.09;.15$ ((--,((--,(in))&&(happy))) ==>-6 ((--,(happy))&&(--,(out)))). 4 %0.0;.30%
+    //$.61;.90$ (happy)! 6 %1.0;.90% $.19;.16$ ((||,(happy),(out)) ==>+6 ((--,(in))&&(happy))). 4 %.10;.32%
+    //$.61;.90$ (happy)! 6 %1.0;.90% $.24;.28$ ((||,(happy),(out)) ==>+0 (in)). 0 %0.0;.42%
 
 }

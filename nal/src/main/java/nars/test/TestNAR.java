@@ -22,6 +22,7 @@ import java.util.function.Consumer;
 
 import static nars.Op.BELIEF;
 import static nars.Op.GOAL;
+import static nars.time.Tense.ETERNAL;
 import static org.junit.Assert.assertTrue;
 
 
@@ -267,7 +268,7 @@ public class TestNAR  {
 
     @NotNull
     public TestNAR mustEmit(@NotNull Topic<Tasked>[] c, long cycleStart, long cycleEnd, @NotNull String sentenceTerm, byte punc, float freqMin, float freqMax, float confMin, float confMax) {
-        return mustEmit(c, cycleStart, cycleEnd, sentenceTerm, punc, freqMin, freqMax, confMin, confMax, Tense.ETERNAL, Tense.ETERNAL );
+        return mustEmit(c, cycleStart, cycleEnd, sentenceTerm, punc, freqMin, freqMax, confMin, confMax, ETERNAL, ETERNAL );
     }
 
 //    @NotNull
@@ -296,7 +297,7 @@ public class TestNAR  {
         cycleStart -= tt;
         cycleEnd += tt;
 
-        EternalTaskCondition tc = start == Tense.ETERNAL ?
+        EternalTaskCondition tc = start == ETERNAL ?
                 new EternalTaskCondition(nar,
                         cycleStart, cycleEnd,
                         sentenceTerm, punc, freqMin - h, freqMax + h, confMin - h, confMax + h) :
@@ -374,12 +375,12 @@ public class TestNAR  {
     @NotNull
     public TestNAR mustOutput(long withinCycles, @NotNull String term, byte punc, float freq, float conf)  {
         long now = time();
-        return mustOutput(now, now + withinCycles, term, punc, freq, freq, conf, conf, nar.time(Tense.Eternal));
+        return mustOutput(now, now + withinCycles, term, punc, freq, freq, conf, conf, ETERNAL);
     }
 
     @NotNull
     public TestNAR mustBelieve(long withinCycles, @NotNull String term, float freqMin, float freqMax, float confMin, float confMax)  {
-        return mustBelieve(withinCycles, term, freqMin, freqMax, confMin, confMax, Tense.ETERNAL);
+        return mustBelieve(withinCycles, term, freqMin, freqMax, confMin, confMax, ETERNAL);
     }
     @NotNull
     public TestNAR mustBelieve(long withinCycles, @NotNull String term, float freqMin, float freqMax, float confMin, float confMax, long tense)  {

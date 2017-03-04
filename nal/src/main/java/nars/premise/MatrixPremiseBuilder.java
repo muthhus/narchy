@@ -38,7 +38,6 @@ public class MatrixPremiseBuilder extends PremiseBuilder {
     @Override
     public @NotNull Premise newPremise(@NotNull Termed c, @NotNull Task task, Term beliefTerm, Task belief, float pri, float qua) {
 
-        //return new DefaultPremise
         return new PreferSimpleAndConfidentPremise(c, task, beliefTerm, belief, pri, qua);
 
     }
