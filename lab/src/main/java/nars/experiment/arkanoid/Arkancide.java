@@ -96,8 +96,8 @@ public class Arkancide extends NAgentX {
 
 
         if (cam) {
-            senseCamera("cam1", noid, visW, visH);
-            //senseCameraRetina("cam2", noid, visW/2, visH/2, (v) -> $.t(v, alpha));
+            senseCamera("noid", noid, visW, visH);
+            //senseCameraRetina("noid", noid, visW/2, visH/2, (v) -> $.t(v, alpha));
         } else {
             //nar.termVolumeMax.set(12);
             senseNumber( "x(paddle(noid))", new FloatPolarNormalized(()->noid.paddle.x, noid.getWidth()/2));//.resolution(resX);

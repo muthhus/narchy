@@ -1119,18 +1119,23 @@ public class NAL8Test extends AbstractNALTest {
     }
     @Test public void testGoalImplComponent() {
         test()
-                .log()
                 .input("(happy)!")
                 .input("((--,(in)) ==>+0 ((happy)&&(--,(out)))).")
                 .mustDesire(cycles, "(in)", 0f, 0.73f);
     }
     @Test public void testGoalImplComponentTimedSubs() {
         test()
-                .log()
                 .input("(happy)! :|:")
                 .input("((--,(in)) ==>+1 ((happy) &&-1 (--,(out)))).")
                 .mustDesire(cycles, "(in)", 0f, 0.73f, -2);
     }
+    @Test public void testConjDecomposeWithDepVar() {
+        test()
+                .input("(#1&&(--,(out)))! :|:")
+                .mustDesire(cycles, "(out)", 0f, 0.81f, 0);
+
+    }
+
     //$.50;.90$ (happy)! %1.0;.90%    $.11;.51$ ((--,(happy))&&(--,(out))). -1⋈8 %0.0;.88%
     //$.13;.03$ (happy)! 19 %.47;.11% $0.0;.68$ ((--,(happy))&&(--,(out))). 19 %.16;.83%
 

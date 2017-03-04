@@ -793,4 +793,10 @@ public class TermReductionsTest {
 
     }
 
+    @Test public void testConjDisjNeg() throws Narsese.NarseseException {
+        assertEquals(
+                False,
+                $("((--,(out))&&(||,(happy),(out)))"));
+
+    }
 }
