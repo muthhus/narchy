@@ -1,15 +1,12 @@
 package nars.experiment.tetris;
 
-import nars.$;
-import nars.NAR;
-import nars.Narsese;
+import nars.*;
 import nars.concept.ActionConcept;
 import nars.concept.SensorConcept;
 import nars.experiment.tetris.impl.TetrisState;
 import nars.experiment.tetris.impl.TetrisVisualizer;
 import nars.nar.Default;
 import nars.nar.NARBuilder;
-import nars.NAgentX;
 import nars.term.Compound;
 import nars.term.atom.Atomic;
 import nars.time.FrameTime;
@@ -604,8 +601,13 @@ public class Tetris extends NAgentX {
 
 
             Tetris t = new MyTetris(n);
-
+            NAgentX.chart( t );
             t.trace = true;
+
+            MetaAgent metaT = new MetaAgent(t);
+            metaT.init();
+            //NAgentX.chart( metaT );
+            metaT.trace = true;
 
 //
 //            SoNAR s = null;
@@ -704,7 +706,6 @@ public class Tetris extends NAgentX {
 //                view.plot2 = Vis.agentBudgetPlot(this, 256);
 
             window(view, 600, 600);
-            NAgentX.chart(this);
         }
     }
 

@@ -53,7 +53,7 @@ abstract public class NAgent implements NSense, NAction {
     /**
      * identifies this environment instance
      **/
-    private final Term id;
+    public final Term id;
 
     public final NAR nar;
 

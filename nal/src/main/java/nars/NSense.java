@@ -204,6 +204,9 @@ public interface NSense {
     default SensorConcept senseNumber(String id, DoubleSupplier v) throws Narsese.NarseseException {
         return senseNumber(compoundOrNull($(id)), ()->(float)v.getAsDouble());
     }
+    default SensorConcept senseNumber(String id, FloatSupplier v) throws Narsese.NarseseException {
+        return senseNumber(compoundOrNull($(id)), ()-> v.asFloat());
+    }
 
     /**
      * generic lowest common denominator numeric input

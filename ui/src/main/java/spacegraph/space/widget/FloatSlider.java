@@ -4,6 +4,7 @@ import com.jogamp.opengl.GL2;
 import jcog.Texts;
 import jcog.Util;
 import jcog.data.FloatParam;
+import jcog.math.FloatSupplier;
 import spacegraph.render.Draw;
 
 /**
@@ -14,6 +15,7 @@ public class FloatSlider extends BaseSlider {
     private final float max;
     private final float min;
     String label;
+    public FloatSupplier input = null;
 
     public FloatSlider(float v, float min, float max) {
         super((v - min) / (max - min));
@@ -29,6 +31,7 @@ public class FloatSlider extends BaseSlider {
     public FloatSlider(FloatParam f) {
         this(f.floatValue(), f.min, f.max);
         on((s,v)-> f.setValue(v));
+        input = f;
     }
 
     public spacegraph.space.widget.FloatSlider label(String label) {
@@ -38,7 +41,11 @@ public class FloatSlider extends BaseSlider {
 
     @Override
     protected void paint(GL2 gl) {
+
         super.paint(gl);
+
+        if (input!=null)
+            value(input.asFloat());
 
         gl.glLineWidth(1f);
         gl.glColor3f(1, 1, 1);
