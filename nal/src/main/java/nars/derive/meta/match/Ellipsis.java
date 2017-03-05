@@ -5,7 +5,6 @@ import nars.Op;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.container.TermContainer;
-import nars.term.transform.VariableNormalization;
 import nars.term.var.AbstractVariable;
 import nars.term.var.GenericVariable;
 import nars.term.var.Variable;
@@ -31,8 +30,8 @@ public abstract class Ellipsis extends AbstractVariable implements Ellipsislike 
 //        }
 //    };
 
-    @NotNull
-    public abstract Variable clone(AbstractVariable newVar, VariableNormalization normalizer);
+//    @NotNull
+//    public abstract Variable clone(AbstractVariable newVar, VariableNormalization normalizer);
 
 
     public final int sizeMin() {

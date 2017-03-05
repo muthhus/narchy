@@ -40,7 +40,6 @@ import nars.util.exe.Executioner;
 import nars.util.task.InvalidTaskException;
 import org.apache.commons.math3.stat.Frequency;
 import org.eclipse.collections.api.tuple.Twin;
-import org.eclipse.collections.impl.collector.Collectors2;
 import org.eclipse.collections.impl.map.mutable.primitive.ObjectFloatHashMap;
 import org.fusesource.jansi.Ansi;
 import org.jetbrains.annotations.NotNull;

@@ -20,7 +20,11 @@ public class DefaultDeriver implements Deriver {
 
     @Override
     public void accept(Derivation x) {
-        for (Deriver d : modules)
+        int start = x.now();
+        for (Deriver d : modules) {
             d.accept(x);
+            if (x.now()!=start)
+                throw new RuntimeException("revert fault");
+        }
     }
 }

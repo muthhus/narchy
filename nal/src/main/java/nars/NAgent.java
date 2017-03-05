@@ -16,7 +16,6 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.truth.Truth;
 import nars.util.Loop;
-import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -208,7 +207,7 @@ abstract public class NAgent implements NSense, NAction {
         //sendInfluxDB("localhost", 8089);
 
         return "rwrd=" + n2(rewardValue) +
-                " motv=" + n4(desireConf()) +
+                " motv=" + n4(dexterity()) +
                 " var=" + n4(varPct(nar)) + "\t" + nar.concepts.summary() + " " +
                 nar.emotion.summary();
     }
@@ -474,7 +473,10 @@ abstract public class NAgent implements NSense, NAction {
 
     }
 
-    public float desireConf() {
+    /** average confidence of actions
+     *  see: http://www.dictionary.com/browse/dexterity?s=t
+     * */
+    public float dexterity() {
         float m = 0;
         int n = actions.size();
         for (ActionConcept a : actions) {

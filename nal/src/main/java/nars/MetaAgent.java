@@ -1,7 +1,5 @@
 package nars;
 
-import jcog.Util;
-
 /**
  * meta-controller of an NAgent
  *      essentially tunes runtime parameters in response to feedback signals
@@ -23,23 +21,18 @@ public class MetaAgent extends NAgent {
 
         senseNumber($.p("happy"), ()->agentNAR.emotion.happy());
         senseNumber($.p("sad"), ()->agentNAR.emotion.sad());
-        senseNumber($.p("busy"), ()->(float)agentNAR.emotion.busyPri.getSum());
-        senseNumber($.p("lern"), ()->(float)agentNAR.emotion.learning());
+        senseNumber($.p("busy", "pri"), ()->(float)agentNAR.emotion.busyPri.getSum());
+        senseNumber($.p("busy", "vol"), ()->(float)agentNAR.emotion.busyVol.getSum());
+        senseNumber($.p("lern"), ()-> agentNAR.emotion.learning());
+        senseNumber($.p("dext"), ()-> agent.dexterity());
 
-        actionUnipolar($.p("curi"), (f) -> {
-            float newCuriosity = Util.lerp(f, 0.25f, 0f);
-            System.out.println("curiosity: " + newCuriosity);
-            agent.curiosity.setValue(newCuriosity);
-            return true;
-        });
+        actionLerp($.p("curi"), (q) -> agent.curiosity.setValue(q), 0f, 0.25f);
 
-        //warning this will feedback and affect this NAR unless it's in a separate NAR
-        actionUnipolar($.p("quaMin"), (f) -> {
-            float newQuaMin = Util.lerp(f, 0.1f, 0f);
-            System.out.println("quaMin: " + newQuaMin);
-            agentNAR.quaMin.setValue(newQuaMin);
-            return true;
-        });
+        //warning these can feedback and affect this NAR unless it's in a separate NAR
+        actionLerp($.p("quaMin"), (q) -> agentNAR.quaMin.setValue(q), 0f, 0.1f);
+        actionLerp($.p("dur"), (d) -> agentNAR.time.dur(d),
+                0.1f /* 0 might cause problems with temporal truthpolation, examine */,
+                nar.time.dur()*2f /* multiple of the input NAR */);
     }
 
     @Override

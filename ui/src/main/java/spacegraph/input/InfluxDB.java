@@ -1,20 +1,15 @@
 package spacegraph.input;
 
 import com.google.common.net.UrlEscapers;
-import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import jcog.Util;
 import jcog.net.UDP;
-import org.apache.commons.compress.utils.IOUtils;
-import org.jetbrains.annotations.NotNull;
-import org.mockito.internal.util.io.IOUtil;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLEncoder;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;

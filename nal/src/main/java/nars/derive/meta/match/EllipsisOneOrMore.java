@@ -1,8 +1,6 @@
 package nars.derive.meta.match;
 
-import nars.term.transform.VariableNormalization;
 import nars.term.var.AbstractVariable;
-import nars.term.var.Variable;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -18,12 +16,12 @@ public class EllipsisOneOrMore extends Ellipsis {
         super(name, 1, id);
     }
 
-    @Override
-    public @NotNull Variable clone(@NotNull AbstractVariable newVar, VariableNormalization normalizer) {
-//        if (newVar.hashCode()==hash)
-//            return this;
-        return new EllipsisOneOrMore(newVar);
-    }
+//    @Override
+//    public @NotNull Variable clone(@NotNull AbstractVariable newVar, VariableNormalization normalizer) {
+////        if (newVar.hashCode()==hash)
+////            return this;
+//        return new EllipsisOneOrMore(newVar);
+//    }
 
 
 

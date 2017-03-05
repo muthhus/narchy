@@ -5,7 +5,6 @@ import nars.NAR;
 import nars.Op;
 import nars.Task;
 import nars.derive.meta.BoolCondition;
-import nars.derive.meta.OccurrenceSolver;
 import nars.derive.meta.constraint.MatchConstraint;
 import nars.task.DerivedTask;
 import nars.term.Compound;

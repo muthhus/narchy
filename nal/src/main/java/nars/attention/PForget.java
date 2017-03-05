@@ -1,11 +1,7 @@
 package nars.attention;
 
-import jcog.bag.Bag;
 import jcog.bag.Priority;
-import nars.Param;
-import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunction;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Consumer;
 

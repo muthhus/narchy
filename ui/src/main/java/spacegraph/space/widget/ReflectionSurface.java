@@ -5,8 +5,6 @@ import jcog.list.FasterList;
 import org.jetbrains.annotations.NotNull;
 import spacegraph.Surface;
 import spacegraph.space.layout.Grid;
-import spacegraph.space.widget.CheckBox;
-import spacegraph.space.widget.FloatSlider;
 
 import java.lang.reflect.Field;
 import java.util.List;

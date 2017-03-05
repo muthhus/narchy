@@ -3,7 +3,6 @@ package nars.util.exe;
 import com.google.common.base.Joiner;
 import jcog.meter.event.PeriodMeter;
 import nars.NAR;
-import nars.Task;
 import org.eclipse.collections.impl.collector.Collectors2;
 import org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples;
 import org.jetbrains.annotations.NotNull;

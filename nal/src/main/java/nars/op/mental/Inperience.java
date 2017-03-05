@@ -12,7 +12,6 @@ import nars.budget.RawBLink;
 import nars.op.Leak;
 import nars.premise.Premise;
 import nars.task.ImmutableTask;
-import nars.task.TaskBuilder;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Terms;

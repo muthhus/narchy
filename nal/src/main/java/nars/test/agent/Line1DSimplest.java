@@ -1,13 +1,12 @@
 package nars.test.agent;
 
-import jcog.Texts;
-import nars.*;
+import nars.$;
+import nars.NAR;
+import nars.NAgent;
+import nars.Param;
 import nars.concept.ActionConcept;
 import nars.concept.SensorConcept;
-import nars.nar.Default;
 
-import static jcog.Texts.n2;
-import static jcog.Util.unitize;
 import static nars.Op.BELIEF;
 
 

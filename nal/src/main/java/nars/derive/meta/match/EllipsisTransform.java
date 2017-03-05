@@ -38,13 +38,13 @@ public class EllipsisTransform extends EllipsisOneOrMore {
                 ".." + from + '=' + to + "..+";
     }
 
-    @NotNull
-    @Override
-    @Deprecated public Variable clone(@NotNull AbstractVariable v, VariableNormalization normalizer) {
-        //throw new RuntimeException("n/a");
-        //return new GenericVariable(Op.VAR_QUERY, "Ellipsis_Transform_Clone_Unknown");
-        return this;
-    }
+//    @NotNull
+//    @Override
+//    @Deprecated public Variable clone(@NotNull AbstractVariable v, VariableNormalization normalizer) {
+//        //throw new RuntimeException("n/a");
+//        //return new GenericVariable(Op.VAR_QUERY, "Ellipsis_Transform_Clone_Unknown");
+//        return this;
+//    }
 
     @NotNull
     public static Variable make(@NotNull AbstractVariable v, Term from, Term to, VariableNormalization normalizer) {

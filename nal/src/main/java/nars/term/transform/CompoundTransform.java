@@ -17,17 +17,17 @@ public interface CompoundTransform<I extends Compound, T extends Term> extends P
         return true;
     }
 
-    CompoundTransform<Compound,Term> None = new CompoundTransform<Compound,Term>() {
-        @Override
-        public boolean test(Term o) {
-            return true;
-        }
-
-        @Nullable
-        @Override
-        public Term apply(Compound parent, Term subterm) {
-            return subterm;
-        }
-    };
+//    CompoundTransform<Compound,Term> None = new CompoundTransform<Compound,Term>() {
+//        @Override
+//        public boolean test(Term o) {
+//            return true;
+//        }
+//
+//        @Nullable
+//        @Override
+//        public Term apply(Compound parent, Term subterm) {
+//            return subterm;
+//        }
+//    };
 
 }

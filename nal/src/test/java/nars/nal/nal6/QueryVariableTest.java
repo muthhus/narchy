@@ -28,6 +28,16 @@ public class QueryVariableTest {
         testQuestionAnswer("<c --> (a&b)>", "<?x --> (a&b)>");
     }
 
+    @Test
+    public void testQuery2() throws Narsese.NarseseException {
+        testQueryAnswered(64, 4);
+    }
+
+    @Test
+    public void testQuery1() throws Narsese.NarseseException {
+        testQueryAnswered(1, 32);
+    }
+
     void testQuestionAnswer(@NotNull String beliefString, @NotNull String question) throws Narsese.NarseseException {
 
         int time = 64;
@@ -50,18 +60,8 @@ public class QueryVariableTest {
 
     }
 
-    @Test
-    public void testQuery2() throws Narsese.NarseseException {
-        testQueryAnswered(64, 4);
-    }
 
-    @Test
-    public void testQuery1() throws Narsese.NarseseException {
-        testQueryAnswered(1, 32);
-    }
-
-
-    public void testQueryAnswered(int cyclesBeforeQuestion, int cyclesAfterQuestion) throws Narsese.NarseseException {
+    void testQueryAnswered(int cyclesBeforeQuestion, int cyclesAfterQuestion) throws Narsese.NarseseException {
 
         AtomicBoolean b = new AtomicBoolean(false);
 

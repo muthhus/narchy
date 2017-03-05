@@ -1,7 +1,6 @@
 package nars;
 
 import nars.bag.Bagregate;
-import nars.concept.Concept;
 import nars.gui.Vis;
 import nars.nar.Default;
 import nars.nar.NARBuilder;

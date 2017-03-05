@@ -19,7 +19,6 @@ import nars.op.stm.MySTMClustered;
 import nars.term.Term;
 import nars.time.Time;
 import nars.util.exe.Executioner;
-import nars.util.exe.InstrumentedExecutor;
 import nars.util.exe.MultiThreadExecutor;
 import org.apache.commons.math3.util.MathArrays;
 import org.jetbrains.annotations.NotNull;
@@ -31,7 +30,6 @@ import java.util.function.BiFunction;
 import static jcog.Texts.n2;
 import static jcog.Texts.n4;
 import static nars.Op.BELIEF;
-import static nars.Op.GOAL;
 
 /**
  * Created by me on 12/27/16.

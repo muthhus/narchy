@@ -4,17 +4,14 @@ import jcog.io.SparkLine;
 import nars.NAR;
 import nars.Narsese;
 import nars.Param;
-import nars.derive.DefaultDeriver;
-import nars.derive.Deriver;
 import nars.nar.Default;
-import org.eclipse.collections.impl.list.mutable.primitive.FloatArrayList;
 import org.junit.Test;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Created by me on 3/4/17.
@@ -82,7 +79,7 @@ public class Line1DSimplestTest {
 
         n.onCycle(()->{
             rewards.add(a.rewardValue);
-            motv.add(a.desireConf());
+            motv.add(a.dexterity());
         });
 
         //n.log();

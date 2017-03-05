@@ -1,10 +1,12 @@
 package nars;
 
+import jcog.Util;
 import nars.concept.ActionConcept;
 import nars.term.Compound;
 import nars.time.Tense;
 import org.eclipse.collections.api.block.predicate.primitive.FloatPredicate;
 import org.eclipse.collections.api.block.procedure.primitive.BooleanProcedure;
+import org.eclipse.collections.api.block.procedure.primitive.FloatProcedure;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -206,6 +208,13 @@ public interface NAction {
                 }
             }
             return null;
+        });
+    }
+
+    default ActionConcept actionLerp(Compound s, FloatProcedure g, float min, float max) {
+        return actionUnipolar(s, (f) -> {
+            g.value(Util.lerp(f, max, min));
+            return true;
         });
     }
 

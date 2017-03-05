@@ -14,7 +14,6 @@ import nars.time.FrameTime;
 import nars.util.exe.Executioner;
 import nars.util.exe.SynchronousExecutor;
 
-
 import java.util.Arrays;
 
 import static java.lang.System.out;

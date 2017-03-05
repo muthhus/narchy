@@ -1,7 +1,6 @@
 package nars.util.exe;
 
 import nars.NAR;
-import nars.Task;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
