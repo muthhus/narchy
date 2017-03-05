@@ -133,8 +133,8 @@ public interface NARBuilder {
 //            }
 
             final Compressor compressor = new Compressor(this, "_",
-                    3, 8,
-                    2f, 16, 256);
+                    2, 12,
+                    2f, 32, 256);
 
             @Override
             public Task pre(@NotNull Task t) {
@@ -172,7 +172,7 @@ public interface NARBuilder {
         };
 
         nar.beliefConfidence(0.9f);
-        nar.goalConfidence(0.5f);
+        nar.goalConfidence(0.75f);
         //nar.derivedEvidenceGain.setValue(0.75f);
 
         float p = 1f;
@@ -183,10 +183,10 @@ public interface NARBuilder {
 
         nar.stmLinkage.capacity.set(0);
         nar.core.conceptsFiredPerCycle.setValue(128);
-        nar.core.conceptsFiredPerBatch.setValue(32);
-        nar.core.derivationsInputPerCycle.setValue(48);
+        nar.core.conceptsFiredPerBatch.setValue(16);
+        nar.core.derivationsInputPerCycle.setValue(64);
 
-        nar.activationRate.setValue(0.1f);
+        nar.activationRate.setValue(0.5f);
         nar.confMin.setValue(0.01f);
         nar.truthResolution.setValue(0.01f);
 
@@ -194,7 +194,7 @@ public interface NARBuilder {
         //NARTune tune = new NARTune(nar);
 
         MySTMClustered stm = new MySTMClustered(nar, 64, BELIEF, 5, true, 12);
-        MySTMClustered stmGoal = new MySTMClustered(nar, 32, GOAL, 3, true, 8);
+        //MySTMClustered stmGoal = new MySTMClustered(nar, 32, GOAL, 3, true, 8);
 
 //        Abbreviation abbr = new Abbreviation(nar, "the",
 //                4, 16,

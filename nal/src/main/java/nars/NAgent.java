@@ -75,6 +75,7 @@ abstract public class NAgent implements NSense, NAction {
     private boolean initialized;
 
 
+    /*
     class CuriosityPhasor {
 
         float curiosityFreqMin = 0.5f;
@@ -97,6 +98,7 @@ abstract public class NAgent implements NSense, NAction {
     }
 
     final List<CuriosityPhasor> curiosityPhasor = newArrayList();
+    */
 
     public final FloatParam epsilonProbability = new FloatParam(0.1f);
 
@@ -108,7 +110,7 @@ abstract public class NAgent implements NSense, NAction {
     final DescriptiveStatistics actionDesire;
     final DescriptiveStatistics rewardWindow;
 
-    float predictorProbability = 1f;
+    float predictorProbability = 1f; //scaled to 1/num predictors
 
     public boolean trace = false;
 
@@ -225,7 +227,7 @@ abstract public class NAgent implements NSense, NAction {
 
             predict();
 
-            curiosity();
+            //curiosity();
 
             nar.input(
                 Streams.concat(Stream.of(happy), sensors.stream(), actions.stream())./*parallel().*/map(f -> f.apply(nar))
@@ -297,9 +299,9 @@ abstract public class NAgent implements NSense, NAction {
 
         //SensorConcept.flatAttention(p, minSensorPriority);
 
-        for (int i = 0; i < numActions; i++) {
+        /*for (int i = 0; i < numActions; i++) {
             curiosityPhasor.add(new CuriosityPhasor());
-        }
+        }*/
 
         //@NotNull Term what = $.$("?w"); //#w
         //@NotNull Term what = $.$("#s"); //#w
@@ -307,7 +309,7 @@ abstract public class NAgent implements NSense, NAction {
         @NotNull Compound happiness = happy.term();
 
         predictors.add(
-            goal(happiness, t(1f, nar.confidenceDefault(GOAL)), ETERNAL)
+            goal(happiness, t(1f, nar.confidenceDefault( BELIEF /*GOAL*/ ) ), ETERNAL)
         );
 
 
@@ -336,18 +338,24 @@ abstract public class NAgent implements NSense, NAction {
 
         int dur = (int) Math.ceil(nar.time.dur());
 
-        predictors.add( question((Compound)$.parallel(happiness, $.varDep(1)), now) );
-        predictors.add( question((Compound)$.parallel($.neg(happiness), $.varDep(1)), now) );
+        //predictors.add( question((Compound)$.parallel(happiness, $.varDep(1)), now) );
+        //predictors.add( question((Compound)$.parallel($.neg(happiness), $.varDep(1)), now) );
 
         for (Concept a : actions) {
             Term action = a.term();
 
 
             long now = nar.time();
+
+            float epsilon = nar.confMin.floatValue() * 2;
+
             ((FasterList)predictors).addAll(
 
+                    goal((Compound)action.term(), $.t(1f, epsilon), now),
+                    //goal((Compound)action.term(), $.t(0.5f, epsilon ), now),
+                    goal((Compound)action.term(), $.t(0f, epsilon ), now),
 
-                    quest((Compound)(action.term()), now),
+                    quest((Compound)(action.term()), now)
 
 //                    new PredictionTask($.impl(action, dur, happiness), '?').time(nar, dur),
 //                    new PredictionTask($.impl($.neg(action), dur, happiness), '?').time(nar, dur),
@@ -359,14 +367,17 @@ abstract public class NAgent implements NSense, NAction {
 //                            .eternal(),
 //                            //.time(nar, dur)
 
-
-                    question(impl(action, dur, happiness), now),
-                    question(impl(neg(action), dur, happiness), now),
                     //question(impl(neg(action), dur, varQuery(1)), nar.time()),
-                    question(seq(action, dur, happiness), now),
-                    question(seq(neg(action), dur, happiness), now),
-                    question(seq(action, dur, neg(happiness)), now),
-                    question(seq(neg(action), dur, neg(happiness)), now)
+
+//                    question(impl(action, dur, happiness), now),
+//                    question(impl(neg(action), dur, happiness), now),
+//                    question(seq(action, dur, happiness), now),
+//                    question(seq(neg(action), dur, happiness), now),
+//                    question(seq(action, dur, neg(happiness)), now),
+//                    question(seq(neg(action), dur, neg(happiness)), now)
+
+
+
 
 //                    new PredictionTask($.seq($.varQuery("x"), 0, $.seq(action, dur, happiness)), '?').eternal(),
 //                    new PredictionTask($.seq($.varQuery("x"), 0, $.seq($.neg(action), dur, happiness)), '?').eternal()
@@ -438,40 +449,40 @@ abstract public class NAgent implements NSense, NAction {
     }
 
 
-    private void curiosity() {
-        //Budget curiosityBudget = Budget.One.clone().multiplied(minSensorPriority.floatValue(), 0.5f, 0.9f);
-
-
-        float gammaEpsilonFactor = this.gammaEpsilonFactor.floatValue();
-
-        for (int i = 0, actionsSize = actions.size(); i < actionsSize; i++) {
-            ActionConcept action = actions.get(i);
-
-            float motorEpsilonProbability = epsilonProbability.floatValue() * (1f - Math.min(1f, action.goalConf(now, nar.time.dur(), 0) / gamma));
-
-
-            if (nar.random.nextFloat() < motorEpsilonProbability) {
-
-                //logger.info("curiosity: {} conf={}", action, action.goalConf(now, 0));
-
-                float f = curiosityPhasor.get(i).next();
-                float cc = gamma * gammaEpsilonFactor;// * (1f - Math.min(1f, action.goalConf(now, 0) / gamma));
-                Truth t = t(f, cc);
-
-                //action.biasDesire(t);
-
-                if (t!=null) {
-                    nar.input(
-                            goal(action.term(), t, now)
-                                //.budgetByTruth(action.pri.asFloat(), nar)
-                                .log("Curiosity")
-                    );
-                }
-
-            }
-
-        }
-    }
+//    private void curiosity() {
+//        //Budget curiosityBudget = Budget.One.clone().multiplied(minSensorPriority.floatValue(), 0.5f, 0.9f);
+//
+//
+//        float gammaEpsilonFactor = this.gammaEpsilonFactor.floatValue();
+//
+//        for (int i = 0, actionsSize = actions.size(); i < actionsSize; i++) {
+//            ActionConcept action = actions.get(i);
+//
+//            float motorEpsilonProbability = epsilonProbability.floatValue() * (1f - Math.min(1f, action.goalConf(now, nar.time.dur(), 0) / gamma));
+//
+//
+//            if (nar.random.nextFloat() < motorEpsilonProbability) {
+//
+//                //logger.info("curiosity: {} conf={}", action, action.goalConf(now, 0));
+//
+//                float f = curiosityPhasor.get(i).next();
+//                float cc = gamma * gammaEpsilonFactor;// * (1f - Math.min(1f, action.goalConf(now, 0) / gamma));
+//                Truth t = t(f, cc);
+//
+//                //action.biasDesire(t);
+//
+//                if (t!=null) {
+//                    nar.input(
+//                            goal(action.term(), t, now)
+//                                //.budgetByTruth(action.pri.asFloat(), nar)
+//                                .log("Curiosity")
+//                    );
+//                }
+//
+//            }
+//
+//        }
+//    }
 
 
 
@@ -534,7 +545,7 @@ abstract public class NAgent implements NSense, NAction {
 
     private Task boost(@NotNull Task t, float dur, float lookAhead /* in multiples of dur */) {
 
-        if (nar.random.nextFloat() > predictorProbability)
+        if (nar.random.nextFloat() > predictorProbability/predictors.size())
             return t;
 
         byte pp = t.punc();

@@ -170,7 +170,8 @@ public class ListTemporalBeliefTable extends MultiRWFasterList<Task> implements 
                 final Truth after = truth(now, dur, eternal, l);
                 delta[0] = new TruthDelta(before, after);
 
-                feedback(l, input);
+                if (Param.SIBLING_TEMPORAL_TASK_FEEDBACK)
+                    feedback(l, input);
             }
         });
 

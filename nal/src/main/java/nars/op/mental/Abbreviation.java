@@ -107,7 +107,7 @@ public class Abbreviation/*<S extends Term>*/ extends Leak<Compound, BLink<Compo
             if (t.vars() == 0 && !t.hasTemporal()) {
                 if (vol >= volume.lo()) {
 
-                    CompoundConcept abbreviable = (CompoundConcept) nar.concept(t);
+                    Concept abbreviable = (Concept) nar.concept(t);
                     if ((abbreviable == null) ||
                             !(abbreviable instanceof PermanentConcept) &&
                             abbreviable.get(Abbreviation.class) == null) {

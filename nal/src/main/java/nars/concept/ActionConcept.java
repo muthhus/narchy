@@ -40,8 +40,6 @@ public class ActionConcept extends WiredConcept implements FloatFunction<Term>, 
 
     private final boolean updateOnBeliefChange = false;
 
-    //enable/disable dynamic tasklink truth revision
-    private final boolean linkTruth = true;
 
 
     private Truth lastGoal, lastBelief;
@@ -86,7 +84,7 @@ public class ActionConcept extends WiredConcept implements FloatFunction<Term>, 
         long then = now + decisionDT;
 
         Truth tdb, tdg;
-        if (linkTruth) {
+        if (Param.ACTION_CONCEPT_LINK_TRUTH) {
             Truth[] td = linkTruth(then, now, nar.confMin.floatValue());
             tdb = td[0];
             tdg = td[1];

@@ -32,6 +32,7 @@ public abstract class Param  {
 
 
 
+
     /** determines if an input goal or command operation task executes */
     public static float EXECUTION_THRESHOLD = 0.666f;
 
@@ -160,6 +161,14 @@ public abstract class Param  {
      * how precise unit test results must match expected values to pass
      */
     public static final float TESTS_TRUTH_ERROR_TOLERANCE = 0.01f;
+
+
+
+    /** EXPERIMENTAL  decreasing priority of sibling tasks on temporal task insertion */
+    public static final boolean SIBLING_TEMPORAL_TASK_FEEDBACK = false;
+
+    /** EXPERIMENTAL enable/disable dynamic tasklink truth revision */
+    public static final boolean ACTION_CONCEPT_LINK_TRUTH = false;
 
 
     /**
