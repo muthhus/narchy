@@ -12,18 +12,32 @@ public class MetaAgent extends NAgent {
     /** agent controlled by this */
     private final NAgent agent;
 
+    /** colocated with the agent's NAR */
     public MetaAgent(NAgent agent) {
-        super($.func("meta", agent.id), agent.nar);
+        this(agent, agent.nar);
+    }
+
+    public MetaAgent(NAgent agent, NAR agentNAR) {
+        super($.func("meta", agent.id), agentNAR);
         this.agent = agent;
 
-        //senseNumber($.p("happy"), agent.happy);
-        senseNumber($.p("busy"), ()->(float)nar.emotion.busyPri.getSum());
-        senseNumber($.p("lern"), ()->(float)nar.emotion.learning());
+        senseNumber($.p("happy"), ()->agentNAR.emotion.happy());
+        senseNumber($.p("sad"), ()->agentNAR.emotion.sad());
+        senseNumber($.p("busy"), ()->(float)agentNAR.emotion.busyPri.getSum());
+        senseNumber($.p("lern"), ()->(float)agentNAR.emotion.learning());
 
-        actionBipolar($.p("curi"), (f) -> {
+        actionUnipolar($.p("curi"), (f) -> {
             float newCuriosity = Util.lerp(f, 0.25f, 0f);
             System.out.println("curiosity: " + newCuriosity);
             agent.curiosity.setValue(newCuriosity);
+            return true;
+        });
+
+        //warning this will feedback and affect this NAR unless it's in a separate NAR
+        actionUnipolar($.p("quaMin"), (f) -> {
+            float newQuaMin = Util.lerp(f, 0.1f, 0f);
+            System.out.println("quaMin: " + newQuaMin);
+            agentNAR.quaMin.setValue(newQuaMin);
             return true;
         });
     }

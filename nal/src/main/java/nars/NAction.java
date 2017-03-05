@@ -186,12 +186,19 @@ public interface NAction {
      */
     @NotNull
     default ActionConcept actionBipolar(@NotNull Compound s, @NotNull FloatPredicate update) {
+        return actionUnipolar(s, (f)-> {
+            float y = (f - 0.5f) * 2f;
+            return update.accept(y);
+        });
+    }
+
+    /** update function receives a value in 0..1.0 corresponding directly to the present goal frequency */
+    @NotNull default ActionConcept actionUnipolar(@NotNull Compound s, @NotNull FloatPredicate update) {
         return action(s, (b, d) -> {
             if (d!=null) {
                 float f = d.freq();
-                float y = (f - 0.5f) * 2f;
                 float alpha = nar().confidenceDefault(Op.BELIEF);
-                if (update.accept(y)) {
+                if (update.accept(f)) {
                     return $.t(f, alpha);
                 } else {
                     //return $.t(0.5f, alpha); //neutral on failure
