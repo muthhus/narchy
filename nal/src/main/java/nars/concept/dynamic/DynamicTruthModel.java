@@ -47,7 +47,7 @@ abstract public class DynamicTruthModel {
 
         DynTruth d = eval(superterm, when, stamp, n);
 
-        float confMin = n.confMin.floatValue();
+        float confMin = 0; //n.confMin.floatValue();
 
         float dur = n.time.dur();
 

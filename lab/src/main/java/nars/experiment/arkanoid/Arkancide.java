@@ -5,7 +5,11 @@ import jcog.math.FloatPolarNormalized;
 import nars.*;
 import nars.concept.ActionConcept;
 import nars.NAgentX;
+import nars.conceptualize.DefaultConceptBuilder;
+import nars.index.term.map.CaffeineIndex;
 import nars.nar.Default;
+import nars.time.FrameTime;
+import nars.time.RealTime;
 
 import java.io.IOException;
 
@@ -42,14 +46,18 @@ public class Arkancide extends NAgentX {
             try {
                 a = new Arkancide(n, cam);
 
-                Default m = new Default();
-                m.core.conceptsFiredPerCycle.setValue(16);
-                m.termVolumeMax.setValue(10);
+                Default m = new Default(512, 32, 1, 3, n.random,
+                        new CaffeineIndex(new DefaultConceptBuilder(), 4096, false, null),
+                        new RealTime.DSHalf());
+                float metaLearningRate = 0.75f;
+                m.confMin.setValue(0.01f);
+                m.goalConfidence(metaLearningRate);
+                m.termVolumeMax.setValue(16);
                 MetaAgent metaT = new MetaAgent(a, m);
-                metaT.nar.log();
                 metaT.init();
                 metaT.trace = true;
                 n.onCycle(metaT.nar::cycle);
+                //metaT.nar.log();
 
             } catch (Narsese.NarseseException e) {
 

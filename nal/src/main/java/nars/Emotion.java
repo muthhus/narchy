@@ -100,11 +100,19 @@ public final class Emotion implements Serializable {
         confident.clear();
     }
 
-    /** percentage of business which was not frustration */
-    public float learning() {
+    /** percentage of business which was not frustration, by aggregate volume */
+    public float learningVol() {
         double v = busyVol.getSum();
         if (v > 0)
             return (float) (learnVol.getSum() / v);
+        return 0;
+    }
+
+    /** percentage of business which was not frustration, by aggregate priority */
+    public float learningPri() {
+        double v = busyPri.getSum();
+        if (v > 0)
+            return (float) (learnPri.getSum() / v);
         return 0;
     }
 
@@ -225,7 +233,7 @@ public final class Emotion implements Serializable {
         return new StringBuilder()
                 .append(" hapy=").append(n4(happy() - sad()))
                 .append(" busy=").append(n4(busyVol.getSum()))
-                .append(" lern=").append(n4(learning()))
+                .append(" lern=").append(n4(learningVol()))
                 .append(" errr=").append(n4(erring()))
                 .append(" strs=").append(n4(stress.getSum()))
                 //.append(" cpu=").append(resourceMeter.CYCLE_CPU_TIME)

@@ -397,7 +397,7 @@ public interface NARBuilder {
         @Override
         public void run() {
             double[] current = new double[outputs];
-            current[0] = nar.emotion.learning();
+            current[0] = nar.emotion.learningVol();
             current[1] = (float) nar.emotion.busyVol.getMean() / Param.COMPOUND_VOLUME_MAX;
             current[2] = (float) nar.emotion.busyPri.getMean();
             current[3] = (float) nar.emotion.confident.getMean();

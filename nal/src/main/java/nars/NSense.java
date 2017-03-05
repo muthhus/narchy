@@ -2,6 +2,7 @@ package nars;
 
 import jcog.Util;
 import jcog.math.FirstOrderDifferenceFloat;
+import jcog.math.FloatNormalized;
 import jcog.math.FloatPolarNormalized;
 import jcog.math.FloatSupplier;
 import nars.concept.FuzzyScalarConcepts;
@@ -188,6 +189,10 @@ public interface NSense {
         );//.resolution(0.05f);
         sensors().addAll(fs.sensors);
         return fs;
+    }
+
+    default SensorConcept senseNumberNormalized(Compound id, FloatSupplier v) {
+        return senseNumber(id, new FloatNormalized(v));
     }
 
     @NotNull

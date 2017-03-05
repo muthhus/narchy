@@ -2,6 +2,7 @@ package nars.task;
 
 import jcog.Util;
 import nars.NAR;
+import nars.Op;
 import nars.Param;
 import nars.Task;
 import nars.budget.RawBudget;
@@ -46,6 +47,9 @@ public class ImmutableTask extends RawBudget implements Task {
             if (truth!=null)
                 truth = truth.negated();
         }
+
+        if (truth == null && ((punc == Op.BELIEF) || (punc == Op.GOAL)))
+            throw new InvalidTaskException(term, "null truth");
 
         this.priority = 0;
         this.quality = Float.NaN;

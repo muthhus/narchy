@@ -44,7 +44,7 @@ public class Versioning extends FasterList<Versioned> {
 
     /** reverts/undo to previous state */
     public final void revert(int when) {
-        int n = size() - when;
+        int n = size - when;
         for (int i = 0; i < n; i++) {
             revert();
         }

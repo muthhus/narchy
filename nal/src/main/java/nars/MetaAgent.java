@@ -1,5 +1,7 @@
 package nars;
 
+import static nars.$.*;
+
 /**
  * meta-controller of an NAgent
  *      essentially tunes runtime parameters in response to feedback signals
@@ -16,21 +18,20 @@ public class MetaAgent extends NAgent {
     }
 
     public MetaAgent(NAgent agent, NAR metaNAR) {
-        super($.func("meta", agent.id), metaNAR);
+        super(func("meta", agent.id), metaNAR);
         this.agent = agent;
         NAR agentNAR = agent.nar;
 
-        senseNumber($.p("happy"), ()->agentNAR.emotion.happy());
-        senseNumber($.p("sad"), ()->agentNAR.emotion.sad());
-        senseNumber($.p("busy", "pri"), ()->(float)agentNAR.emotion.busyPri.getSum());
-        senseNumber($.p("busy", "vol"), ()->(float)agentNAR.emotion.busyVol.getSum());
-        senseNumber($.p("lern"), ()-> agentNAR.emotion.learning());
-        senseNumber($.p("dext"), ()-> agent.dexterity());
+        senseNumberNormalized(p("happy"), ()->agentNAR.emotion.happy());
+        senseNumberNormalized(p("sad"), ()->agentNAR.emotion.sad());
+        senseNumberNormalized(p("busyPri") /*$.func($.the("busy"),$.the("pri"))*/, ()->(float)agentNAR.emotion.busyPri.getSum());
+        senseNumberNormalized(p("busyVol") /*$.func($.the("busy"),$.the("vol"))*/, ()->(float)agentNAR.emotion.busyVol.getSum());
+        senseNumber(p("lernPri") /*$.func($.the("lern"),$.the("pri"))*/, ()-> agentNAR.emotion.learningPri());
+        senseNumber(p("lernVol") /*$.func($.the("lern"),$.the("vol"))*/, ()-> agentNAR.emotion.learningVol());
+        senseNumber(p("dext"), ()-> agent.dexterity());
 
-        actionLerp($.p("curi"), (q) -> agent.curiosity.setValue(q), 0f, 0.25f);
-
-        //warning these can feedback and affect this NAR unless it's in a separate NAR
-        actionLerp($.p("quaMin"), (q) -> agentNAR.quaMin.setValue(q), 0f, 0.1f);
+        actionLerp(p("curi"), (q) -> agent.curiosity.setValue(q), 0f, 0.25f);
+        actionLerp(p("quaMin"), (q) -> agentNAR.quaMin.setValue(q), 0f, 0.1f);
 //        actionLerp($.p("dur"), (d) -> agentNAR.time.dur(d),
 //                0.1f /* 0 might cause problems with temporal truthpolation, examine */,
 //                nar.time.dur()*2f /* multiple of the input NAR */);
@@ -39,7 +40,11 @@ public class MetaAgent extends NAgent {
     @Override
     protected float act() {
         //TODO other qualities to maximize: runtime speed, memory usage, etc..
-        return agent.happy.asFloat();
+        //float agentHappiness = agent.happy.asFloat();
+        float narHappiness = agent.nar.emotion.happy();
+        float narSadness = agent.nar.emotion.sad();
+
+        return /*agentHappiness + */narHappiness - narSadness;
     }
 
 }

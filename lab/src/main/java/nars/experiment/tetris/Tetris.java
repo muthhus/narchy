@@ -3,13 +3,17 @@ package nars.experiment.tetris;
 import nars.*;
 import nars.concept.ActionConcept;
 import nars.concept.SensorConcept;
+import nars.conceptualize.DefaultConceptBuilder;
 import nars.experiment.tetris.impl.TetrisState;
 import nars.experiment.tetris.impl.TetrisVisualizer;
+import nars.index.term.map.CaffeineIndex;
 import nars.nar.Default;
 import nars.nar.NARBuilder;
+import nars.task.DerivedTask;
 import nars.term.Compound;
 import nars.term.atom.Atomic;
 import nars.time.FrameTime;
+import nars.time.RealTime;
 import nars.truth.Truth;
 import nars.util.task.TaskStatistics;
 import org.jetbrains.annotations.NotNull;
@@ -22,6 +26,7 @@ import java.util.List;
 import static nars.$.$;
 import static nars.Op.BELIEF;
 import static nars.experiment.tetris.impl.TetrisState.*;
+import static nars.gui.Vis.conceptsTreeChart;
 import static spacegraph.SpaceGraph.window;
 
 /**
@@ -600,13 +605,27 @@ public class Tetris extends NAgentX {
             //new VariableCompressor(nar);
 
 
-            Tetris t = new MyTetris(n);
-            NAgentX.chart( t );
-            t.trace = true;
+            Tetris a = new MyTetris(n);
+            NAgentX.chart( a );
+            a.trace = true;
 
-            MetaAgent metaT = new MetaAgent(t);
+            Default m = new Default(512, 32, 1, 3, n.random,
+                    new CaffeineIndex(new DefaultConceptBuilder(), 4096, false, null),
+                    new RealTime.DSHalf());
+            float metaLearningRate = 0.75f;
+            m.confMin.setValue(0.01f);
+            m.goalConfidence(metaLearningRate);
+            m.termVolumeMax.setValue(8);
+            MetaAgent metaT = new MetaAgent(a, m);
             metaT.init();
             metaT.trace = true;
+            n.onCycle(metaT.nar::cycle);
+            //metaT.nar.log();
+            m.onTask(t -> {
+                if (t instanceof DerivedTask)
+                    System.out.println("meta: " + t);
+            });
+            //window(conceptsTreeChart(m, 64), 800, 600);
             //NAgentX.chart( metaT );
 
 //
@@ -627,7 +646,7 @@ public class Tetris extends NAgentX {
 //            }
 
 
-            t.runRT(25f ).join();
+            a.runRT(25f ).join();
 
 
 //        NARController meta = new NARController(nar, loop, t);
