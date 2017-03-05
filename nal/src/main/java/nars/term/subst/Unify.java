@@ -657,7 +657,7 @@ public abstract class Unify extends Termunator implements Subst {
 
 
     public final int now() {
-        return versioning.now();
+        return versioning.size();
     }
 
     public final void revert(int then) {

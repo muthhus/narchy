@@ -25,7 +25,7 @@ public class VersioningTest {
         VersionMap m = new VersionMap(w,10);
         m.tryPut("x", "a");
         assertEquals("{x=a}", m.toString());
-        assertEquals(1, w.now());
+        assertEquals(1, w.size());
         m.tryPut("x", "b");
 
         assertEquals("{x=b}", m.toString());
@@ -33,17 +33,17 @@ public class VersioningTest {
         Versioned mvx = m.version("x");
 
         assertEquals("(a, b)", mvx.toStackString());
-        assertEquals(2, w.now());
+        assertEquals(2, w.size());
         assertEquals(2, mvx.size());
 
         w.revert(2); //should have no effect:
-        assertEquals(2, w.now());
+        assertEquals(2, w.size());
         assertEquals("(a, b)", mvx.toStackString());
         assertEquals(2, mvx.size());
         assertEquals(2, w.size());
 
         w.revert(1);
-        assertEquals(1, w.now());
+        assertEquals(1, w.size());
         assertEquals("{x=a}", m.toString());
         assertEquals("(a)", mvx.toStackString());
         assertEquals(1, mvx.size());
@@ -51,7 +51,7 @@ public class VersioningTest {
 
         w.revert(0);
         assertEquals(0, w.size());
-        assertEquals(0, w.now());
+        assertEquals(0, w.size());
         assertEquals(0, mvx.size());
         assertEquals("{x=null}", m.toString());
 
@@ -108,7 +108,7 @@ public class VersioningTest {
 
 
     @Test
-    public void testRewind() {
+    public void testRevert() {
 
         initTestSequence1();
 
@@ -116,17 +116,17 @@ public class VersioningTest {
 
         System.out.println(v);
         assertEquals(6, v.size()); assertEquals("a3 b1", s.get());
-        assertEquals(6, v.now());
+        assertEquals(6, v.size());
 
         System.out.println("revert to 3");
 
         //skip behind to halfway
         v.revert(3); System.out.println(v);
-        assertEquals(3, v.now());
+        assertEquals(3, v.size());
         assertEquals(3, v.size()); assertEquals("a1 b0", s.get());
 
         v.revert();  System.out.println(v);
-        assertEquals(2, v.now());
+        assertEquals(2, v.size());
         assertEquals(2, v.size()); assertEquals("a1 null", s.get());
 
     }
