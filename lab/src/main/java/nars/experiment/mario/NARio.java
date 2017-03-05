@@ -3,7 +3,6 @@ package nars.experiment.mario;
 import jcog.Util;
 import nars.*;
 import nars.experiment.mario.sprites.Mario;
-import nars.nar.Default;
 
 import javax.swing.*;
 
@@ -42,7 +41,7 @@ public class NARio extends NAgentX {
 
 
         try {
-            senseCamera("camF", ()->mario.image, 60, 40, (v) -> t(v, alpha)).setResolution(0.05f);
+            senseCamera("camF", ()->mario.image, 60, 40, (v) -> t(v, alpha())).setResolution(0.05f);
             //senseCameraRetina("camZ", ()->mario.image, 30, 18, (v) -> t(v, alpha)).setResolution(0.1f);
 
 

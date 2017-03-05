@@ -102,7 +102,7 @@ public class Recog2D extends NAgentX {
         //Sensor2D sp = senseCameraRetina("x", () -> canvas, w, h, v -> $.t(v, alpha));
 
         //still
-        Sensor2D sp = senseCamera("x", new Scale(() -> canvas, w, h), v -> $.t(v, alpha));
+        Sensor2D sp = senseCamera("x", new Scale(() -> canvas, w, h), v -> $.t(v, alpha()));
 
         //nar.log();
 

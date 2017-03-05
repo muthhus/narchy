@@ -12,7 +12,6 @@ import static nars.Op.BELIEF;
 
 public class Arkancide extends NAgentX {
 
-    public static final int CYCLES_PER_FRAME = 2;
     static boolean cam = true;
 
     private final float paddleSpeed = 1f;
@@ -83,7 +82,7 @@ public class Arkancide extends NAgentX {
 
         //nar.linkFeedbackRate.setValue(0.02f);
 
-        maxPaddleSpeed = 35 * Arkanoid.BALL_VELOCITY;
+        maxPaddleSpeed = 15 * Arkanoid.BALL_VELOCITY;
 
 
 

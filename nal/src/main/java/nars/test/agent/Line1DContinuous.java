@@ -59,7 +59,7 @@ public class Line1DContinuous extends NAgent {
                     //$.p($.the("h"), $.the(i)),
                     n, ()->{
                 return ins[ii];
-            }, (v) -> $.t(v, alpha)));
+            }, (v) -> $.t(v, alpha())));
 
             //estimated
             sensors.add(new SensorConcept(
@@ -68,7 +68,7 @@ public class Line1DContinuous extends NAgent {
                     //$.p($.the("e"), $.the(i)),
                     n, ()->{
                 return ins[size + ii];
-            }, (v) -> $.t(v, alpha)));
+            }, (v) -> $.t(v, alpha())));
         }
 
         ActionConcept a;
@@ -89,7 +89,7 @@ public class Line1DContinuous extends NAgent {
                     f = v;
                 }
 
-                return $.t(f, alpha);
+                return $.t(f, alpha());
                 //return d;
             }
             return null;

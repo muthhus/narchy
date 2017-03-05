@@ -22,7 +22,7 @@ import org.jetbrains.annotations.Nullable;
  * It is meant to be disposable and should not be kept referenced longer than necessary
  * to avoid GC loops, so it may need to be weakly referenced.
  */
-public abstract class Premise extends RawBudget implements Tasked {
+public abstract class Premise extends RawBudget  {
 
     //private static final Logger logger = LoggerFactory.getLogger(Premise.class);
 
@@ -106,12 +106,6 @@ public abstract class Premise extends RawBudget implements Tasked {
 //        }
 //    }
 
-
-    @NotNull
-    @Override
-    public final Task task() {
-        return task;
-    }
 
 
     @NotNull

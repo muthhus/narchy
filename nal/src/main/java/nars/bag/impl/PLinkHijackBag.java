@@ -31,14 +31,12 @@ public class PLinkHijackBag<X> extends HijackBag<X, PLink<X>> {
 
     @Override
     protected float merge(@Nullable PLink<X> existing, @NotNull PLink<X> incoming, float scale) {
-        if (existing == null) {
-            incoming.priMult(scale);
-            return incoming.priSafe(0);
-        } else {
-            float pBefore = existing.priSafe(0);
-            existing.priAdd(incoming.priSafe(0) * scale);
-            return existing.priSafe(0) - pBefore;
+        incoming.priMult(scale);
+        float pAdd = incoming.priSafe(0);
+        if (existing != null) {
+            existing.priAdd(pAdd);
         }
+        return pAdd;
     }
 
     @Override

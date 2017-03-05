@@ -88,7 +88,7 @@ public class Jake2Agent extends NAgentX implements Runnable {
         super("q", nar);
 
 
-        Sensor2D<PixelBag> qcam = senseCameraRetina("q", screenshotter, 64, 64, (v) -> t(v, alpha));
+        Sensor2D<PixelBag> qcam = senseCameraRetina("q", screenshotter, 64, 64, (v) -> t(v, alpha()));
         qcam.src.vflip = true;
 
 //        camAE = new PixelAutoClassifier("cra", qcam.src.pixels, 16, 16, 32, this);

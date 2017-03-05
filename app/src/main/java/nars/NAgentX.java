@@ -78,11 +78,6 @@ abstract public class NAgentX extends NAgent {
         nar.printConceptStatistics();
         new TaskStatistics().add(nar).print(System.out);
 
-        a.predictors.forEach(p -> {
-            Concept pp = nar.concept(p);
-            if (pp != null)
-                pp.print();
-        });
     }
 
     public static NAR runRT(Function<NAR, NAgentX> init, float fps) {
@@ -104,8 +99,6 @@ abstract public class NAgentX extends NAgent {
         chart(a);
 
         a.runRT(fps, endTime).join();
-
-        print(nar, a);
 
         return nar;
 
@@ -180,8 +173,8 @@ abstract public class NAgentX extends NAgent {
                                     Vis.budgetHistogram(nar, 64),
                             //"tasks", ()-> taskChart,
                             "agentCharts", () -> Vis.emotionPlots(a.nar, 256),
-                            "agentActions", () -> Vis.agentActions(a, 400),
-                            "agentPredict", () -> Vis.beliefCharts(400, a.predictors, a.nar)
+                            "agentActions", () -> Vis.agentActions(a, 400)
+                            ///"agentPredict", () -> Vis.beliefCharts(400, a.predictors, a.nar)
 
                     ))
 
@@ -212,7 +205,7 @@ abstract public class NAgentX extends NAgent {
                             //budgetHistogram(d, 16),
 
                             Vis.agentActions(a, 400),
-                            Vis.beliefCharts(400, a.predictors, a.nar),
+                            //Vis.beliefCharts(400, a.predictors, a.nar),
                             new ReflectionSurface<>(a.nar),
 
                             Vis.budgetHistogram(a.nar, 24)
@@ -227,7 +220,7 @@ abstract public class NAgentX extends NAgent {
      * pixelTruth defaults to linear monochrome brightness -> frequency
      */
     protected Sensor2D senseCamera(String id, Container w, int pw, int ph) {
-        return senseCamera(id, w, pw, ph, (v) -> t(v, alpha));
+        return senseCamera(id, w, pw, ph, (v) -> t(v, alpha()));
     }
 
     protected CameraSensor<Scale> senseCamera(String id, Supplier<BufferedImage> w, int pw, int ph, FloatToObjectFunction<Truth> pixelTruth) {
@@ -239,7 +232,7 @@ abstract public class NAgentX extends NAgent {
     }
 
     protected Sensor2D<PixelBag> senseCameraRetina(String id, Container w, int pw, int ph) {
-        return senseCameraRetina(id, new SwingCamera(w), pw, ph, (v) -> t(v, alpha));
+        return senseCameraRetina(id, new SwingCamera(w), pw, ph, (v) -> t(v, alpha()));
     }
 
     protected Sensor2D<PixelBag> senseCameraRetina(String id, Container w, int pw, int ph, FloatToObjectFunction<Truth> pixelTruth) {
