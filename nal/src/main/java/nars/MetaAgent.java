@@ -15,9 +15,10 @@ public class MetaAgent extends NAgent {
         this(agent, agent.nar);
     }
 
-    public MetaAgent(NAgent agent, NAR agentNAR) {
-        super($.func("meta", agent.id), agentNAR);
+    public MetaAgent(NAgent agent, NAR metaNAR) {
+        super($.func("meta", agent.id), metaNAR);
         this.agent = agent;
+        NAR agentNAR = agent.nar;
 
         senseNumber($.p("happy"), ()->agentNAR.emotion.happy());
         senseNumber($.p("sad"), ()->agentNAR.emotion.sad());
@@ -30,9 +31,9 @@ public class MetaAgent extends NAgent {
 
         //warning these can feedback and affect this NAR unless it's in a separate NAR
         actionLerp($.p("quaMin"), (q) -> agentNAR.quaMin.setValue(q), 0f, 0.1f);
-        actionLerp($.p("dur"), (d) -> agentNAR.time.dur(d),
-                0.1f /* 0 might cause problems with temporal truthpolation, examine */,
-                nar.time.dur()*2f /* multiple of the input NAR */);
+//        actionLerp($.p("dur"), (d) -> agentNAR.time.dur(d),
+//                0.1f /* 0 might cause problems with temporal truthpolation, examine */,
+//                nar.time.dur()*2f /* multiple of the input NAR */);
     }
 
     @Override

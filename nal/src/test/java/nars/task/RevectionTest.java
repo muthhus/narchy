@@ -270,11 +270,11 @@ public class RevectionTest {
 
 
         b.believe(0.5f, 0.0f, 0.85f, 5);
-        n.next();
+        n.cycle();
         b.believe(0.5f, 0.95f, 0.85f, 10);
-        n.next();
+        n.cycle();
         b.believe(0.5f, 1.0f, 0.85f, 11); //this and the previous one should get combined when inserting the 4th
-        n.next();
+        n.cycle();
 
         b.print();
         assertEquals(3, b.size());
@@ -284,7 +284,7 @@ public class RevectionTest {
         b.believe(0.5f, 1.0f, 0.99f, 12); //this should cause the cycle=10 and cycle=11 beliefs to get revected into one and allow this belief to be inserted
         //the cycle=5 belief should remain since it is more unique
 
-        n.next().next().next();
+        n.cycle().cycle().cycle();
         b.print();
         assertEquals(4, b.size());
 

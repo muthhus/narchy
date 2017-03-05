@@ -14,7 +14,7 @@ public class TermLinkTest {
 
         for (int i = 0; i < 55; i++) {
             System.out.println(n.time());
-            n.next();
+            n.cycle();
         }
 
     }

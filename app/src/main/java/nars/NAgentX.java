@@ -4,6 +4,7 @@ import nars.bag.Bagregate;
 import nars.gui.Vis;
 import nars.nar.Default;
 import nars.nar.NARBuilder;
+import nars.term.Term;
 import nars.time.RealTime;
 import nars.time.Time;
 import nars.truth.Truth;
@@ -41,6 +42,9 @@ abstract public class NAgentX extends NAgent {
     }
 
     public NAgentX(String id, NAR nar) {
+        super(id, nar);
+    }
+    public NAgentX(Term id, NAR nar) {
         super(id, nar);
     }
 

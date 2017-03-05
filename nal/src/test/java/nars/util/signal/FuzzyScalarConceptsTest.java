@@ -83,7 +83,7 @@ public class FuzzyScalarConceptsTest {
         //run a few oscillations
         for (int i = 0; i < 5; i++) {
             m.setValue(Math.sin(i/2f));
-            d.next();
+            d.cycle();
 
 
             double freqSum = StreamSupport.stream(f.spliterator(), false)

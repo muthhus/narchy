@@ -24,7 +24,7 @@ public class Versioning extends FasterList<Versioned> {
     public final boolean nextChange(@Nullable Versioned v, @Nullable Object x) {
         if (add(v)) {
             if (v!=null)
-                v.add(x);
+                v.add(x); //if this returns false? shouldnt happen but if it did it would require that this.remove(v)
             return true;
         }
         return false;

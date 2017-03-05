@@ -80,7 +80,7 @@ public class TemporalTest {
         Task a = n.inputAndGet("((x) ==>+10 (y)).");
         Task c = n.inputAndGet("((x) ==>+9 (y)).");
         Task b = n.inputAndGet("((x) <-> (y)).");
-        n.next();
+        n.cycle();
 
         @NotNull Compound aa = a.term();
         assertNotNull(aa);
@@ -239,7 +239,7 @@ public class TemporalTest {
         //n.input("(((SELF,#1)-->at) &&+0 goto(#1)).");
 
 
-        n.next();
+        n.cycle();
 
         Concept a = n.concept("(((SELF,#1)-->at) && goto(#1)).");
         Concept a0 = n.concept("(goto(#1) && ((SELF,#1)-->at)).");
@@ -329,7 +329,7 @@ public class TemporalTest {
         //d.index().print(System.out);
         //d.concept("(x==>y)").print();
 
-        d.next();
+        d.cycle();
 
         int indexSize = d.concepts.size();
 
@@ -339,7 +339,7 @@ public class TemporalTest {
         assertEquals(3, d.concept("(x==>y)").beliefs().size());
 
         d.input("(x ==>+1 y). :|:"); //present
-        d.next();
+        d.cycle();
 
         //d.concept("(x==>y)").print();
 

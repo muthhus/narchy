@@ -606,8 +606,8 @@ public class Tetris extends NAgentX {
 
             MetaAgent metaT = new MetaAgent(t);
             metaT.init();
-            //NAgentX.chart( metaT );
             metaT.trace = true;
+            //NAgentX.chart( metaT );
 
 //
 //            SoNAR s = null;

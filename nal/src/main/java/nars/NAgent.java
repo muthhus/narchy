@@ -206,7 +206,7 @@ abstract public class NAgent implements NSense, NAction {
 
         //sendInfluxDB("localhost", 8089);
 
-        return "rwrd=" + n2(rewardValue) +
+        return id + " rwrd=" + n2(rewardValue) +
                 " motv=" + n4(dexterity()) +
                 " var=" + n4(varPct(nar)) + "\t" + nar.concepts.summary() + " " +
                 nar.emotion.summary();

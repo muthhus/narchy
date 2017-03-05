@@ -5,6 +5,7 @@ import jcog.math.FloatPolarNormalized;
 import nars.*;
 import nars.concept.ActionConcept;
 import nars.NAgentX;
+import nars.nar.Default;
 
 import java.io.IOException;
 
@@ -37,14 +38,24 @@ public class Arkancide extends NAgentX {
 
         NAR nar = runRT((NAR n) -> {
 
-            Arkancide agent = null;
+            Arkancide a = null;
             try {
-                agent = new Arkancide(n, cam);
+                a = new Arkancide(n, cam);
+
+                Default m = new Default();
+                m.core.conceptsFiredPerCycle.setValue(16);
+                m.termVolumeMax.setValue(10);
+                MetaAgent metaT = new MetaAgent(a, m);
+                metaT.nar.log();
+                metaT.init();
+                metaT.trace = true;
+                n.onCycle(metaT.nar::cycle);
+
             } catch (Narsese.NarseseException e) {
 
             }
 
-            return agent;
+            return a;
 
         }, 20, 2, -1);
 
@@ -67,7 +78,7 @@ public class Arkancide extends NAgentX {
 
 
     public Arkancide(NAR nar, boolean cam) throws Narsese.NarseseException {
-        super("noid", nar);
+        super($.the("noid"), nar);
 
         //nar.derivedEvidenceGain.setValue(1f);
 

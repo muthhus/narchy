@@ -65,7 +65,7 @@ public class Repl {
                 .build();
 
         nar.logBudgetMin(new PrintStream(reader.getTerminal().output()), 0.1f);
-        nar.next();
+        nar.cycle();
         NARLoop loop = nar.loop(20f);
 
 

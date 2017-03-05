@@ -897,7 +897,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
      * steps 1 frame forward. cyclesPerFrame determines how many cycles this frame consists of
      */
     @NotNull
-    public final NAR next() {
+    public final NAR cycle() {
         return run(1);
     }
 
