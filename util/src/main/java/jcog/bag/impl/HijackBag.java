@@ -307,16 +307,22 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
 
     }
 
-    private boolean replace(Object addingK, @Nullable V addingV, V existingV, float targetPri) {
-        return false;
-    }
 
     /**
      * if no existing value then existing will be null.
      * this should modify the existing value if it exists,
      * or the incoming value if none.
      *
-     * @return the pressure increase the merge has caused.
+     * @return the pressure increase the merge causes.
+     *
+     * NOTE:
+     * this should usually equal the amount of priority increased by the
+     * insertion (considering the scale's influence too) as if there were
+     * no existing budget to merge with, even if there is.
+     *
+     * this supports fairness so that existing items will not have a
+     * second-order budgeting advantage of not contributing as much
+     * to the presssure as new insertions.
      */
     protected abstract float merge(@Nullable V existing, @NotNull V incoming, float scale);
 

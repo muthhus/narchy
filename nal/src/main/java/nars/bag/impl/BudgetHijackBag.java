@@ -24,21 +24,22 @@ abstract public class BudgetHijackBag<K,V extends Budgeted> extends HijackBag<K,
 
     @Override
     protected float merge(@Nullable V existing, @NotNull V incoming, float scale) {
+        float inPri = incoming.priSafe(0);
+        float pressure = inPri * scale;
         Budget applied;
         if (existing == null) {
-            if (scale == 1)
-                return incoming.priSafe(0); //nothing needs done
-
             existing = incoming;
             applied = new RawBudget(0, existing.qua() );
-            scale = 1f - scale;
+            scale = 1f - scale; //?? does this actually work
         } else {
             applied = incoming.budget();
         }
 
-        float pBefore = priSafe(existing, 0);
+        //float pBefore = priSafe(existing, 0);
         merge.apply(existing.budget(), applied, scale); //TODO overflow
-        return priSafe(existing, 0) - pBefore;
+        //return priSafe(existing, 0) - pBefore;
+
+        return pressure;
     }
 
 
