@@ -89,6 +89,7 @@ public abstract class RealTime implements Time {
         return secondsSinceStart() + "s";
     }
 
+    @Override
     public Time dur(float seconds) {
         this.dur = secondsToUnits(seconds);
         return this;

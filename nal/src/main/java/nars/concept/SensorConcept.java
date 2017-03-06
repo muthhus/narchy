@@ -52,7 +52,7 @@ public class SensorConcept extends WiredConcept implements FloatFunction<Term>, 
         this.sensor = new ScalarSignal(n, term, this, truth);
 
         this.signal = signal;
-        this.beliefs = new SensorBeliefTable(this);
+        this.beliefs = new SensorBeliefTable();
 
         pri(() -> n.priorityDefault(BELIEF));
     }
@@ -207,6 +207,7 @@ public class SensorConcept extends WiredConcept implements FloatFunction<Term>, 
             super(tCap, historicCap);
         }
 
+        @Override
         protected Task ressurect(Task t) {
             t.budget().setPriority(sensor.pri.asFloat());
             return t;

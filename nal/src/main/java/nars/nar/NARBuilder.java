@@ -132,7 +132,7 @@ public interface NARBuilder {
 
             final Compressor compressor = new Compressor(this, "_",
                     2, 12,
-                    2f, 32, 256);
+                    1f, 32, 256);
 
             @Override
             public Task pre(@NotNull Task t) {

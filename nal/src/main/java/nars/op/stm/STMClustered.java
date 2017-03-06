@@ -51,7 +51,7 @@ public abstract class STMClustered extends STM {
             new ArrayDeque<>();
             //new ConcurrentLinkedDeque<>();
 
-    final static double[] noCoherence = new double[] { 0, 0 };
+    final static double[] noCoherence = { 0, 0 };
 
     public final class TasksNode extends Node {
 

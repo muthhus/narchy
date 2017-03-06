@@ -36,6 +36,7 @@ public class FrameTime implements Time {
         return dur;
     }
 
+    @Override
     public FrameTime dur(float d) {
         this.dur = d;
         return this;

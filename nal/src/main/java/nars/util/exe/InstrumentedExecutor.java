@@ -3,6 +3,7 @@ package nars.util.exe;
 import com.google.common.base.Joiner;
 import jcog.meter.event.PeriodMeter;
 import nars.NAR;
+import org.eclipse.collections.api.tuple.primitive.DoubleObjectPair;
 import org.eclipse.collections.impl.collector.Collectors2;
 import org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples;
 import org.jetbrains.annotations.NotNull;
@@ -86,7 +87,7 @@ public class InstrumentedExecutor extends Executioner {
     public String summary() {
         return Joiner.on('\n').join(
                 meters.values().stream().map(x -> PrimitiveTuples.pair(x.sum(), x.toStringMicro())).collect(
-                        Collectors2.toSortedListBy( x -> -x.getOne() )).stream().map(x -> x.getTwo()).iterator() );
+                        Collectors2.toSortedListBy( x -> -x.getOne() )).stream().map(DoubleObjectPair::getTwo).iterator() );
 
     }
 

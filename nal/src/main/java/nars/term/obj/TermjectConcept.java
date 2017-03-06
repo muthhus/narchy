@@ -54,11 +54,6 @@ public class TermjectConcept<X> implements Atomic, Concept, Termject<X> {
         return term().op();
     }
 
-    @Override
-    public boolean isNormalized() {
-        return true;
-    }
-
 
     @Override
     public int complexity() {

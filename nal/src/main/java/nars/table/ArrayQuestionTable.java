@@ -79,7 +79,7 @@ public class ArrayQuestionTable extends MultiRWFasterList<Task> implements Quest
 
         float tp = question.pri();
 
-        final Task[] trash = new Task[1];
+        //final Task[] trash = new Task[1];
         final Task[] result = new Task[1];
 
         withWriteLockAndDelegate(l -> {
@@ -96,7 +96,7 @@ public class ArrayQuestionTable extends MultiRWFasterList<Task> implements Quest
                     } else {
                         Task weakest = l.remove(sizeStart - 1);
                         weakest.delete();
-                        trash[0] = weakest;
+                        //trash[0] = weakest;
 //                        float removedPri = remove(list, sizeStart - 1, "Table Pop", n);
 //                        if (removedPri == removedPri) //not deleted
 //                            t.budget().setPriority(Math.max(t.pri(), removedPri)); //utilize at least its priority since theyre sorted by other factor

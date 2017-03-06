@@ -310,7 +310,7 @@ public abstract class TermBuilder {
         return TermVector.the(s);
     }
 
-    public final GenericCompound newCompound(@NotNull Op op, int dt, TermContainer subterms) {
+    static public final GenericCompound newCompound(@NotNull Op op, int dt, TermContainer subterms) {
         return new GenericCompound(op, dt, subterms);
     }
 

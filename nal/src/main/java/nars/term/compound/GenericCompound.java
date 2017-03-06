@@ -1,7 +1,6 @@
 package nars.term.compound;
 
 import jcog.Util;
-import nars.$;
 import nars.IO;
 import nars.Op;
 import nars.Param;

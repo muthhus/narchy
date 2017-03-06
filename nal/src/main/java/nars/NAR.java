@@ -467,7 +467,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
     }
 
     @NotNull
-    public NAR believe(@NotNull String termString) throws NarseseException {
+    public NAR believe(@NotNull String termString) {
         return believe(termString, true);
     }
 
@@ -1466,7 +1466,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
      * if this function returns null it will not output that task (use as a filter).
      */
     @NotNull
-    public NAR output(@NotNull OutputStream o, @NotNull Function<Task, Task> each) throws IOException {
+    public NAR output(@NotNull OutputStream o, @NotNull Function<Task, Task> each) {
 
         //SnappyFramedOutputStream os = new SnappyFramedOutputStream(o);
 

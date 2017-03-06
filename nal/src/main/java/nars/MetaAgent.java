@@ -22,16 +22,16 @@ public class MetaAgent extends NAgent {
         this.agent = agent;
         NAR agentNAR = agent.nar;
 
-        senseNumberNormalized(p("happy"), ()->agentNAR.emotion.happy());
-        senseNumberNormalized(p("sad"), ()->agentNAR.emotion.sad());
+        senseNumberNormalized(p("happy"), agentNAR.emotion::happy);
+        senseNumberNormalized(p("sad"), agentNAR.emotion::sad);
         senseNumberNormalized(p("busyPri") /*$.func($.the("busy"),$.the("pri"))*/, ()->(float)agentNAR.emotion.busyPri.getSum());
         senseNumberNormalized(p("busyVol") /*$.func($.the("busy"),$.the("vol"))*/, ()->(float)agentNAR.emotion.busyVol.getSum());
-        senseNumber(p("lernPri") /*$.func($.the("lern"),$.the("pri"))*/, ()-> agentNAR.emotion.learningPri());
-        senseNumber(p("lernVol") /*$.func($.the("lern"),$.the("vol"))*/, ()-> agentNAR.emotion.learningVol());
-        senseNumber(p("dext"), ()-> agent.dexterity());
+        senseNumber(p("lernPri") /*$.func($.the("lern"),$.the("pri"))*/, agentNAR.emotion::learningPri);
+        senseNumber(p("lernVol") /*$.func($.the("lern"),$.the("vol"))*/, agentNAR.emotion::learningVol);
+        senseNumber(p("dext"), agent::dexterity);
 
-        actionLerp(p("curi"), (q) -> agent.curiosity.setValue(q), 0f, 0.05f);
-        actionLerp(p("quaMin"), (q) -> agentNAR.quaMin.setValue(q), 0f, 0.2f);
+        actionLerp(p("curi"), agent.curiosity::setValue, 0f, 0.05f);
+        actionLerp(p("quaMin"), agentNAR.quaMin::setValue, 0f, 0.2f);
 //        actionLerp($.p("dur"), (d) -> agentNAR.time.dur(d),
 //                0.1f /* 0 might cause problems with temporal truthpolation, examine */,
 //                nar.time.dur()*2f /* multiple of the input NAR */);

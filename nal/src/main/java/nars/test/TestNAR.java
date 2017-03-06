@@ -24,6 +24,7 @@ import static nars.Op.BELIEF;
 import static nars.Op.GOAL;
 import static nars.time.Tense.ETERNAL;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 
 /**
@@ -179,7 +180,7 @@ public class TestNAR  {
         requireConditions = false; //this is the condition
         nar.onTask(c -> {
             if (!c.isInput())
-                assertTrue(c.toString() + " output, but must not output anything", false);
+                fail(c.toString() + " output, but must not output anything");
         });
         return this;
     }
@@ -506,11 +507,7 @@ public class TestNAR  {
     @NotNull
     public TestNAR believe(@NotNull String... termString)  {
         for (String s : termString) {
-            try {
-                nar.believe(s);
-            } catch (Narsese.NarseseException e) {
-                throw new RuntimeException(e);
-            }
+            nar.believe(s);
         }
         return this;
     }

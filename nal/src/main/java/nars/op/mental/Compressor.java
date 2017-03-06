@@ -135,8 +135,8 @@ public class Compressor extends Abbreviation implements RemovalListener<Compound
             return;
 
         abbreviated = decode(abbreviated);
-//        if (abbreviated.volume() > volume.hi())
-//            return; //expanded too much
+        if (abbreviated.volume() > volume.hi())
+            return; //expanded too much
 
         /** dont abbreviate PermanentConcept's themselves */
         if (nar.concept(abbreviated) instanceof PermanentConcept)

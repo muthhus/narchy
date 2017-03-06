@@ -51,6 +51,7 @@ public class ActionConcept extends WiredConcept implements FloatFunction<Term>, 
             super(tCap, historicCap);
         }
 
+        @Override
         protected Task ressurect(Task t) {
             t.budget().setPriority(feedback.pri.asFloat());
             return t;

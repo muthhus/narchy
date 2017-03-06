@@ -251,22 +251,22 @@ public class ImmutableTask extends RawBudget implements Task {
 
     @Override
     public void meta(Object key, Object value) {
-        synchronized (this) {
+        //synchronized (this) {
             if (meta==null) {
                 //meta = new UnifiedMap(1); /* for compactness */
                 meta = new Flat3Map(); /* for compactness */
             }
 
             meta.put(key, value);
-        }
+        //}
     }
 
     @Override
     public <X> X meta(Object key) {
         if (meta!=null) {
-            synchronized (this) {
+            //synchronized (this) {
                 return (X) meta.get(key);
-            }
+            //}
         }
         return null;
     }

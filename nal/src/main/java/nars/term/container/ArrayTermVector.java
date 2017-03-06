@@ -26,6 +26,7 @@ public class ArrayTermVector extends TermVector {
     /**
      * size should already be known equal
      */
+    @Override
     public final boolean equalTerms(@NotNull TermContainer c) {
 
         int s = terms.length;
@@ -45,6 +46,7 @@ public class ArrayTermVector extends TermVector {
         return true;
     }
 
+    @Override
     public final boolean equivalent(@NotNull TermContainer c) {
         return (hash == c.hashCodeSubTerms()) && equalTerms(c);
     }

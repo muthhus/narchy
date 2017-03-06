@@ -17,11 +17,11 @@ import org.slf4j.LoggerFactory;
 public class SensorBeliefTable extends DefaultBeliefTable  {
 
     private static final Logger logger = LoggerFactory.getLogger(SensorBeliefTable.class);
-    private final SensorConcept sensorConcept;
 
-    public SensorBeliefTable(SensorConcept sensorConcept) {
+
+    public SensorBeliefTable() {
         super();
-        this.sensorConcept = sensorConcept;
+
     }
 
 

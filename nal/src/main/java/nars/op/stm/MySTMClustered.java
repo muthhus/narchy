@@ -73,6 +73,7 @@ public class MySTMClustered extends STMClustered {
         net.setWinnerUpdateRate(0.03f, 0.01f);
     }
 
+    @Override
     @NotNull
     public double[] getCoord(@NotNull Task t) {
         double[] c = new double[dims];

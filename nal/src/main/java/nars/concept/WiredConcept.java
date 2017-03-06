@@ -37,12 +37,6 @@ public abstract class WiredConcept extends CompoundConcept<Compound> implements 
         n.on(this);
     }
 
-    @Override
-    public void linkCapacity(int termlinks, int tasklinks) {
-        super.linkCapacity(termlinks, tasklinks);
-    }
-
-
 
     //    @Override
 //    protected TermContainer buildTemplates(Compound term, NAR nar) {

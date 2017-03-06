@@ -33,7 +33,6 @@ import static nars.IO.TaskSerialization.TermFirst;
 import static nars.Op.ATOM;
 import static nars.Op.INT;
 import static nars.index.TermBuilder.isTrueOrFalse;
-import static nars.term.Terms.compoundOrNull;
 import static nars.time.Tense.DTERNAL;
 import static nars.time.Tense.XTERNAL;
 
@@ -187,7 +186,7 @@ public class IO {
     }
 
     @NotNull
-    public static Atomic readAtomic(@NotNull DataInput in, @NotNull Op o, @NotNull TermIndex t) throws IOException {
+    public static Atomic readAtomic(@NotNull DataInput in, @NotNull Op o, @NotNull TermIndex t) throws IOException, UnsupportedEncodingException {
 
         switch (o) {
 
@@ -391,7 +390,7 @@ public class IO {
         }
     }
 
-    public static void saveTasksToTemporaryTSVFile(NAR nar) throws IOException {
+    public static void saveTasksToTemporaryTSVFile(NAR nar) throws IOException, FileNotFoundException {
         Path f = Files.createTempFile(Paths.get("/tmp"), "nar", ".tsv");
         System.out.println("saving tasks: " + f);
         FileOutputStream os = new FileOutputStream(f.toFile());
@@ -406,7 +405,7 @@ public class IO {
         });
     }
 
-    public static void saveTasksToTemporaryTextFile(NAR nar) throws IOException {
+    public static void saveTasksToTemporaryTextFile(NAR nar) throws IOException, FileNotFoundException {
         Path f = Files.createTempFile(Paths.get("/tmp"), "nar", ".nal");
         System.out.println("saving tasks: file://" + f);
         FileOutputStream os = new FileOutputStream(f.toFile());
