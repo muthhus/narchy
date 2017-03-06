@@ -15,6 +15,7 @@
 package jcog;
 
 import com.google.common.base.Charsets;
+import com.google.common.base.Joiner;
 import com.google.common.io.CharStreams;
 import com.google.common.io.Closeables;
 import com.google.common.primitives.Bytes;
@@ -1553,5 +1554,9 @@ public enum Util { ;
         }
 
         return len != arg.length ? Arrays.copyOfRange(arg, 0, len) : arg;
+    }
+
+    public static boolean calledBySomethingContaining(String s) {
+        return Joiner.on(' ').join(Thread.currentThread().getStackTrace()).contains(s);
     }
 }

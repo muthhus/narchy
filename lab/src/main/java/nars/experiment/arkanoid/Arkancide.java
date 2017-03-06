@@ -53,6 +53,11 @@ public class Arkancide extends NAgentX {
                         new RealTime.DSHalf());
 
                 MetaAgent metaT = new MetaAgent(a, m); //init before loading from file
+                float metaLearningRate = 0.9f;
+                m.confMin.setValue(0.01f);
+                m.goalConfidence(metaLearningRate);
+                m.termVolumeMax.setValue(16);
+                metaT.trace = true;
                 metaT.init();
 
                 String META_PATH = "/tmp/meta.nal";
@@ -61,18 +66,13 @@ public class Arkancide extends NAgentX {
                     try { m.output(new File(META_PATH), (x) -> {
                         if (!x.isDeleted()) {
                             Task y = x.eternalized();
-                            System.out.println(y);
                             return y;
                         }
                         return null;
                     }); } catch (IOException e) {  e.printStackTrace(); }
                 }));
 
-                float metaLearningRate = 0.75f;
-                m.confMin.setValue(0.01f);
-                m.goalConfidence(metaLearningRate);
-                m.termVolumeMax.setValue(16);
-                metaT.trace = true;
+
                 n.onCycle(metaT.nar::cycle);
                 //metaT.nar.log();
 

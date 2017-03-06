@@ -380,7 +380,7 @@ public class IO {
         }
     }
 
-    public static byte[] asBytes(@NotNull Term t) {
+    public static byte[] termToBytes(@NotNull Term t) {
         try {
             DynByteSeq d = new DynByteSeq(t.volume() * 2 /* estimate */);
             //ByteArrayOutputStream bs = new ByteArrayOutputStream();
@@ -450,20 +450,26 @@ public class IO {
         }
     }
 
-    public static Task taskFromBytes(@NotNull byte[] b, @NotNull TermIndex index) {
+    /** WARNING */
+    @Nullable public static Task taskFromBytes(@NotNull byte[] b, @NotNull TermIndex index) {
         try {
             return IO.readTask(input(b), index);
         } catch (IOException e) {
             e.printStackTrace();
             return null;
+        } catch (InvalidTermException e) {
+            return null;
         }
     }
 
+    /** WARNING */
     @Nullable public static Term termFromBytes(@NotNull byte[] b, @NotNull TermIndex index) {
         try {
             return IO.readTerm(input(b), index);
         } catch (IOException e) {
             throw new RuntimeException(e);
+        } catch (InvalidTermException f) {
+            return null;
         }
     }
 

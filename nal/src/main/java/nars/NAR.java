@@ -358,7 +358,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
     @NotNull
     public void ask(@NotNull Termed<Compound> c) {
         //TODO remove '?' if it is attached at end
-        ask(c, (char)QUESTION);
+        ask(c, (char) QUESTION);
     }
 
 //    /**
@@ -543,7 +543,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
             throw new InvalidTaskException(term, "insufficient confidence");
         }
 
-        Task y = new ImmutableTask((Compound)term, punc, tr, time(), occurrenceTime, occurrenceTime, new long[] { time.nextStamp() });
+        Task y = new ImmutableTask((Compound) term, punc, tr, time(), occurrenceTime, occurrenceTime, new long[]{time.nextStamp()});
         y.budget(pri, this);
 
         input(y);
@@ -564,7 +564,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
             throw new RuntimeException("invalid punctuation");
 
         Task t = new ImmutableTask((Compound) term, (byte) questionOrQuest, null,
-                time(), when, when, new long[] { time.nextStamp() } ).budget(this);
+                time(), when, when, new long[]{time.nextStamp()}).budget(this);
 
         input(t);
 
@@ -616,7 +616,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
         }
 
         float q = input.qua();
-        if (q!=q) { //default budget if qua == NaN
+        if (q != q) { //default budget if qua == NaN
             input.budget(this);
         }
 
@@ -866,7 +866,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
 
             try {
 
-                input( x.apply(this) );
+                input(x.apply(this));
 
             } catch (@NotNull InvalidTaskException | InvalidTermException | Budget.BudgetException e) {
 
@@ -1175,7 +1175,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
         for (String s : tt) {
             tasks(s).forEach(x -> {
                 long xs = x.start();
-                Task y = Task.clone(x, time, xs!=ETERNAL ? time : ETERNAL, xs!=ETERNAL ? time : ETERNAL);
+                Task y = Task.clone(x, time, xs != ETERNAL ? time : ETERNAL, xs != ETERNAL ? time : ETERNAL);
                 yy.add(y);
             });
         }
@@ -1350,7 +1350,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
 
     public void input(@NotNull Iterable<Task> tasks) {
         tasks.forEach(x -> {
-            if (x!=null)
+            if (x != null)
                 input(x);
         });
     }
@@ -1422,7 +1422,6 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
     }
 
 
-
     @Override
     public final int level() {
         return level;
@@ -1453,7 +1452,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
     }
 
     @NotNull
-    public NAR output(@NotNull File f, boolean append, @NotNull Function<Task,Task> each) throws IOException {
+    public NAR output(@NotNull File f, boolean append, @NotNull Function<Task, Task> each) throws IOException {
         FileOutputStream ff = new FileOutputStream(f, append);
         output(ff, each);
         ff.close();
@@ -1462,35 +1461,53 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
 
     /**
      * byte codec output of matching concept tasks (blocking)
-     *
+     * <p>
      * the each function allows transforming each task to an optional output form.
      * if this function returns null it will not output that task (use as a filter).
      */
     @NotNull
-    public NAR output(@NotNull OutputStream o, @NotNull Function<Task,Task> each) throws IOException {
+    public NAR output(@NotNull OutputStream o, @NotNull Function<Task, Task> each) throws IOException {
 
         //SnappyFramedOutputStream os = new SnappyFramedOutputStream(o);
 
         DataOutputStream oo = new DataOutputStream(o);
 
-        MutableInteger total = new MutableInteger(0), filtered = new MutableInteger(0);
+        MutableInteger total = new MutableInteger(0), wrote = new MutableInteger(0);
 
-        forEachTask(x -> {
+        forEachTask(_x -> {
             total.increment();
-            Task y = each.apply(post(x));
-            if (y!=null) {
-                try {
-                    IO.writeTask(oo, x);
-                    filtered.increment();
-                } catch (IOException e) {
-                    logger.error("{} when trying to output to {}", x, e);
-                    throw new RuntimeException(e);
-                    //e.printStackTrace();
+            Task x = post(_x);
+            x = each.apply(x);
+            if (x != null) {
+                byte[] b = IO.taskToBytes(x);
+                if (b != null) {
+                    try {
+
+                        //HACK temporary until this is debugged
+                        Task xx = IO.taskFromBytes(b, concepts);
+                        if (xx == null || !xx.equals(x)) {
+                            //this can happen if a subterm is decompressed only to discover that it contradicts another part of the compound it belongs within
+                            //logger.error("task serialization problem: {} != {}", _x, xx);
+                        } else {
+
+                            oo.write(b);
+
+                            //IO.writeTask(oo, x);
+
+                            wrote.increment();
+                        }
+                    } catch (IOException e) {
+                        logger.error("{} can not output {}", x, e);
+                        throw new RuntimeException(e);
+                        //e.printStackTrace();
+                    }
+                } else {
+                    //warn?
                 }
             }
         });
 
-        logger.info("Saved {}/{} tasks ({} bytes)", filtered, total, oo.size());
+        logger.info("Saved {}/{} tasks ({} bytes)", wrote, total, oo.size());
 
         return this;
     }
@@ -1501,7 +1518,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
     }
 
     @NotNull
-    public NAR output(@NotNull File o, Function<Task,Task> f) throws IOException {
+    public NAR output(@NotNull File o, Function<Task, Task> f) throws IOException {
         return output(new FileOutputStream(o), f);
     }
 

@@ -128,7 +128,7 @@ public class DynamicBeliefTable extends DefaultBeliefTable {
 
     @Override
     public @Nullable Task match(long when, long now, float dur, @Nullable Task target, boolean noOverlap) {
-        Compound localTerm = dynamicConcept.term();
+        Compound localTerm = $.terms.retemporalize( dynamicConcept.term() );
 
         Compound template =
                 //use the provided target task as a temporal template if it matches with this

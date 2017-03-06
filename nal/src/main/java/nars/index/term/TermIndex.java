@@ -1,5 +1,6 @@
 package nars.index.term;
 
+import jcog.Util;
 import nars.*;
 import nars.concept.Concept;
 import nars.concept.PermanentConcept;
@@ -422,6 +423,8 @@ public abstract class TermIndex extends TermBuilder {
 
             target[i] = y;
         }
+
+        //TODO does it need to recreate the container if the dt has changed because it may need to be commuted ... && (superterm.dt()==dt) but more specific for the case: (XTERNAL -> 0 or DTERNAL)
 
         return modifications == 0 ? src : TermContainer.the(superterm.op(), dt, target);
     }

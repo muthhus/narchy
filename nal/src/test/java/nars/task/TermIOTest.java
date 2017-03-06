@@ -41,7 +41,7 @@ public class TermIOTest {
             barray = IO.asBytes(torig);
         }
         else if (orig instanceof Term)
-            barray = IO.asBytes((Term)orig);
+            barray = IO.termToBytes((Term)orig);
         else
             throw new RuntimeException("");
 
@@ -202,7 +202,7 @@ public class TermIOTest {
     }
 
     public String map(Term x) throws IOException {
-        byte[] xb = IO.asBytes(x);
+        byte[] xb = IO.termToBytes(x);
         StringBuilder sb = new StringBuilder();
         IO.mapSubTerms(xb, (o, depth, i) -> {
             String msg = "(" + depth + "," + i + ")=" + o + " ";

@@ -78,8 +78,8 @@ public class Compressor extends Abbreviation implements RemovalListener<Compound
 
             this.compressed = compressed;
 
-            this.encoded = IO.asBytes(this.compressed);
-            this.decoded = IO.asBytes(decompressed);
+            this.encoded = IO.termToBytes(this.compressed);
+            this.decoded = IO.termToBytes(decompressed);
             this.decode = new ByteSequenceMatcher(encoded);
             this.encode = new ByteSequenceMatcher(decoded);
 
@@ -266,7 +266,7 @@ public class Compressor extends Abbreviation implements RemovalListener<Compound
         if (!(t instanceof Compound))
             return t;
         else {
-            byte[] ii = IO.asBytes(t);
+            byte[] ii = IO.termToBytes(t);
             byte[] oo = transcode(ii, en);
             return ii != oo ? compoundOr(IO.termFromBytes(oo, nar.concepts), (Compound) t) : t;
         }
@@ -274,7 +274,7 @@ public class Compressor extends Abbreviation implements RemovalListener<Compound
 
     @NotNull
     public byte[] transcodeBytes(Term t, boolean en) {
-        byte[] ii = IO.asBytes(t);
+        byte[] ii = IO.termToBytes(t);
         if (!(t instanceof Compound))
             return ii;
         else {

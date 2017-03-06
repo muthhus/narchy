@@ -1,10 +1,7 @@
 package nars.derive.meta;
 
 import com.google.common.base.Joiner;
-import nars.NAR;
-import nars.Op;
-import nars.Param;
-import nars.Task;
+import nars.*;
 import nars.budget.Budget;
 import nars.derive.rule.PremiseRule;
 import nars.premise.Derivation;
@@ -107,6 +104,8 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
                 if (r instanceof Compound) {
 
                     Compound cr = (Compound) r;
+
+
 
                     //note: the budget function used here should not depend on the truth's frequency. btw, it may be inverted below
                     Compound crr = compoundOrNull(nar.concepts.eval(cr));
@@ -238,12 +237,14 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
         //the derived compound indicated a potential dt, but the premise was actually atemporal;
         // this indicates a temporal placeholder (XTERNAL) in the rules which needs to be set to DTERNAL
         if (content.hasTemporal()) {
-            content = m.index.retemporalize(content);
-            if (content == null)
+            Compound content2 = m.index.retemporalize(content);
+            if (content2 == null)
                 return;
+
+
+
+            content = content2;
         }
-
-
 
 
         //content = nar.pre(content);
@@ -251,6 +252,9 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
             return;
 
         DerivedTask d = derive(content, budget, nar.time(), occ, m, truth, punc, evidence);
+
+
+
         if (d != null)
             m.target.accept(d);
     }

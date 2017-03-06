@@ -1,6 +1,7 @@
 package nars.term.compound;
 
 import jcog.Util;
+import nars.$;
 import nars.IO;
 import nars.Op;
 import nars.Param;
@@ -18,7 +19,7 @@ import static nars.Op.NEG;
 import static nars.time.Tense.DTERNAL;
 
 
-public class GenericCompound implements Compound  {
+public class GenericCompound implements Compound {
 
     /**
      * subterm vector
@@ -37,7 +38,8 @@ public class GenericCompound implements Compound  {
      */
     public final int hash;
 
-    @NotNull public final Op op;
+    @NotNull
+    public final Op op;
 
 
     public transient boolean normalized;
@@ -54,7 +56,7 @@ public class GenericCompound implements Compound  {
             if (op.image && ((dt < 0) || (dt > subterms.size()))) {
                 throw new InvalidTermException(op, dt, "Invalid dt value for image " + op, subterms.terms());
             }
-            if (op != CONJ && (op.temporal && subterms.size()!=2))
+            if (op != CONJ && (op.temporal && subterms.size() != 2))
                 throw new InvalidTermException(op, dt, "Invalid dt value for operator " + op, subterms.terms());
         }
 
@@ -66,14 +68,15 @@ public class GenericCompound implements Compound  {
         this.subterms = subterms;
 
         this.normalized = false; //force normalization to evaluate any contained functor subterms
-                //!(op==INH&&subterms.term(1) instanceof AtomicString && subterms.term(0).op()==PROD)
-                ///&& subterms.constant();  /* to force functor evaluation at normalization */;
+        //!(op==INH&&subterms.term(1) instanceof AtomicString && subterms.term(0).op()==PROD)
+        ///&& subterms.constant();  /* to force functor evaluation at normalization */;
 
         this.dt = dt;
 
         this.hash = Util.hashCombine(subterms.hashCode(), op.ordinal(), dt);
-    }
 
+
+    }
 
 
     @Override
@@ -109,12 +112,13 @@ public class GenericCompound implements Compound  {
         if (op() == NEG) {
             Term x = term(0);
             if (x instanceof Compound && isNormalized()) { //the unnegated content will also be normalized if this is
-                ((Compound)x).setNormalized();
+                ((Compound) x).setNormalized();
             }
             return x;
         }
         return this;
     }
+
     /**
      * do not call this manually, it will be set by VariableNormalization only
      */
@@ -143,7 +147,7 @@ public class GenericCompound implements Compound  {
 
         Compound cthat;
         if (that instanceof Compound) {
-            cthat = (Compound)that;
+            cthat = (Compound) that;
         } else if (that instanceof CompoundConcept) { //Termed but not Task
             cthat = ((CompoundConcept) that).term();
             if (this == cthat)
@@ -154,10 +158,10 @@ public class GenericCompound implements Compound  {
 
         //return subterms.equals(cthat.subterms()) &&
         return (hash == cthat.hashCode()) &&
-               (op == cthat.op()) &&
-               (dt == cthat.dt()) &&
+                (op == cthat.op()) &&
+                (dt == cthat.dt()) &&
                 subterms.equivalent(cthat.subterms())
-               ;
+                ;
 
 
         //subterm sharing:
@@ -171,7 +175,6 @@ public class GenericCompound implements Compound  {
 //                }
 //            }
 //        }
-
 
 
     }
