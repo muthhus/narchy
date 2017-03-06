@@ -52,7 +52,7 @@ public class TaskStatistics {
         rootOp.addValue(t.op());
         clazz.addValue(t.getClass().toString());
         punc.addValue(t.punc());
-        eviLength.addValue(t.evidence().length);
+        eviLength.addValue(t.stamp().length);
 
         if (t.isBeliefOrGoal()) {
             freq.addValue(Util.round(t.freq(), 0.1f));

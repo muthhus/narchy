@@ -46,7 +46,7 @@ public interface Command extends Operator {
 
 
     static Task task(Compound content) {
-        return new ImmutableTask(content, Op.COMMAND, null, ETERNAL, ETERNAL, ETERNAL, new long[] { } );
+        return ImmutableTask.Eternal(content, Op.COMMAND, null, ETERNAL, new long[] { } );
     }
 
     static Task logTask(@NotNull Term content) {

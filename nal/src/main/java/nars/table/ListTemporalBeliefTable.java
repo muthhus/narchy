@@ -449,7 +449,7 @@ public class ListTemporalBeliefTable extends MultiRWFasterList<Task> implements 
         float f =
 //                //more evidence overlap indicates redundant information, so reduce the confWeight (measure of evidence) by this amount
 //                //TODO weight the contributed overlap amount by the relative confidence provided by each task
-                1f - Stamp.overlapFraction(a.evidence(), b.evidence()) / 2f;
+                1f - Stamp.overlapFraction(a.stamp(), b.stamp()) / 2f;
 //                1f;
 
         float p = ac / (ac + bc);

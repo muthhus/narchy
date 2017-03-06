@@ -84,11 +84,11 @@ public class TaskTest {
         Param.DEBUG = true;
 
         Task x = n.inputAndGet("<a --> b>.");
-        assertArrayEquals(new long[]{1}, x.evidence());
+        assertArrayEquals(new long[]{1}, x.stamp());
         n.cycle();
 
         Task y = n.inputAndGet("<b --> c>.");
-        assertArrayEquals(new long[]{2}, y.evidence());
+        assertArrayEquals(new long[]{2}, y.stamp());
         n.cycle();
 
         n.reset();
@@ -98,7 +98,7 @@ public class TaskTest {
         n.run(10);
 
         Task q = n.inputAndGet("<c --> d>.");
-        assertArrayEquals(new long[]{5}, q.evidence());
+        assertArrayEquals(new long[]{5}, q.stamp());
 
     }
 
@@ -114,7 +114,7 @@ public class TaskTest {
         d.eventTaskProcess.on(t -> {
             if (t.getParentBelief()!=null && !t.cyclic())
                 assertArrayEquals("all double-premise derived terms have this evidence: "
-                        + t + ": " + Arrays.toString(ev) + "!=" + Arrays.toString(t.evidence()), ev, t.evidence());
+                        + t + ": " + Arrays.toString(ev) + "!=" + Arrays.toString(t.stamp()), ev, t.stamp());
 
             //System.out.println(t);
         });

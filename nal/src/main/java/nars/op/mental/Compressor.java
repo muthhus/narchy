@@ -60,8 +60,8 @@ public class Compressor extends Abbreviation implements RemovalListener<Compound
 
     final Map<SequenceMatcher, Abbr> dc = new ConcurrentHashMap(); //HACK
     final Map<SequenceMatcher, Abbr> ec = new ConcurrentHashMap(); //HACK
-    private float boostBig = 0.1f;
-    private float boostSmall = 0.05f;
+    private final float boostBig = 0.1f;
+    private final float boostSmall = 0.05f;
 
 
     /* static */ class Abbr extends RawPLink<Compound> {
@@ -135,20 +135,19 @@ public class Compressor extends Abbreviation implements RemovalListener<Compound
             return;
 
         abbreviated = decode(abbreviated);
-        if (abbreviated.volume() > volume.hi())
-            return; //expanded too much
+//        if (abbreviated.volume() > volume.hi())
+//            return; //expanded too much
 
         /** dont abbreviate PermanentConcept's themselves */
         if (nar.concept(abbreviated) instanceof PermanentConcept)
             return;
 
-        Abbr abb = (Abbr) code.get(abbreviated);
+        Abbr abb = code.get(abbreviated);
         if (abb != null) {
             //boost it
             abb.priAdd(b.pri());
             return;
         }
-
 
         //System.out.println("compress CODE: " + a + " to " + compr);
 
@@ -159,10 +158,8 @@ public class Compressor extends Abbreviation implements RemovalListener<Compound
 
         abb = new Abbr(abbreviated  /** store fully decompress */, aa, nar);
 
-        synchronized (code) {
-            if (code.put(abb) == null) {
-                return; //failed insert
-            }
+        if (code.put(abb) == null) {
+            return; //failed insert
         }
 
         code.commit();

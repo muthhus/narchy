@@ -61,9 +61,9 @@ public interface Task extends Budgeted, Truthed, Stamp, Termed<Compound>, Tasked
 
     static boolean equivalentTo(@NotNull Task a, @NotNull Task b, boolean punctuation, boolean term, boolean truth, boolean stamp, boolean occurrenceTime) {
 
-        @NotNull long[] evidence = a.evidence();
+        @NotNull long[] evidence = a.stamp();
 
-        if (stamp && (!Arrays.equals(evidence, b.evidence())))
+        if (stamp && (!Arrays.equals(evidence, b.stamp())))
             return false;
 
         if (evidence.length > 1) {
@@ -466,7 +466,7 @@ public interface Task extends Budgeted, Truthed, Stamp, Termed<Compound>, Tasked
      * or if its origin has been forgotten or never known
      */
     default boolean isInput() {
-        return evidence().length <= 1;
+        return stamp().length <= 1;
         //return evidence().length <= 1;
         //return (getParentTask() == null);
         //return (evidence().length <= 1) && ;
@@ -513,7 +513,7 @@ public interface Task extends Budgeted, Truthed, Stamp, Termed<Compound>, Tasked
     }
 
     default boolean cyclic() {
-        return Stamp.isCyclic(evidence());
+        return Stamp.isCyclic(stamp());
     }
 
     default int dt() {
@@ -597,7 +597,7 @@ public interface Task extends Budgeted, Truthed, Stamp, Termed<Compound>, Tasked
         if (b.isDeleted())
             return null;
 
-        ImmutableTask y = new ImmutableTask(x.term(), x.punc(), x.truth(), created, start, end, x.evidence());
+        ImmutableTask y = new ImmutableTask(x.term(), x.punc(), x.truth(), created, start, end, x.stamp());
         y.setBudget(b);
         y.meta = x.meta();
         return y;
@@ -622,7 +622,7 @@ public interface Task extends Budgeted, Truthed, Stamp, Termed<Compound>, Tasked
         if (newContent == null)
             return null;
 
-        ImmutableTask y = new ImmutableTask(newContent, x.punc(), x.truth().negIf(negated), x.creation(), x.start(), x.end(), x.evidence());
+        ImmutableTask y = new ImmutableTask(newContent, x.punc(), x.truth().negIf(negated), x.creation(), x.start(), x.end(), x.stamp());
         y.setBudget(b);
         y.meta = x.meta();
         return y;
@@ -697,4 +697,14 @@ public interface Task extends Budgeted, Truthed, Stamp, Termed<Compound>, Tasked
         return this;
     }
 
+    default Task eternalized() {
+        if (isEternal()) {
+            return this;
+        } else {
+            Truth t = truth();
+            ImmutableTask y = ImmutableTask.Eternal(term(), punc(), t!=null ? t.eternalized() : null, creation(), stamp());
+            y.budgetSafe(budget());
+            return y;
+        }
+    }
 }

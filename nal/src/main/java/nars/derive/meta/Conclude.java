@@ -237,13 +237,8 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
 
         //the derived compound indicated a potential dt, but the premise was actually atemporal;
         // this indicates a temporal placeholder (XTERNAL) in the rules which needs to be set to DTERNAL
-        if (content.dt() == XTERNAL /*&& !o.isImage()*/) {
-
-            content = compoundOrNull(m.index.the(content, DTERNAL)); //necessary to trigger flattening as a result of the atemporalization
-            if (content == null)
-                return;
-
-            content = compoundOrNull(m.index.normalize(content));
+        if (content.hasTemporal()) {
+            content = m.index.retemporalize(content);
             if (content == null)
                 return;
         }

@@ -605,9 +605,15 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
     @Nullable
     public final Concept input(@NotNull Task input0) {
 
-        Task input = pre(input0);
-        if (input == null)
+        Task input;
+        try {
+            input = pre(input0);
+            if (input == null)
+                return null;
+        } catch (InvalidTermException e) {
+            emotion.eror(input0.volume());
             return null;
+        }
 
         float q = input.qua();
         if (q!=q) { //default budget if qua == NaN
@@ -666,7 +672,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
 
         if (time instanceof FrameTime) {
             //HACK for unique serial number w/ frameclock
-            ((FrameTime) time).validate(input.evidence());
+            ((FrameTime) time).validate(input.stamp());
         }
 
         try {
@@ -1447,7 +1453,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
     }
 
     @NotNull
-    public NAR output(@NotNull File f, boolean append, @NotNull Predicate<Task> each) throws IOException {
+    public NAR output(@NotNull File f, boolean append, @NotNull Function<Task,Task> each) throws IOException {
         FileOutputStream ff = new FileOutputStream(f, append);
         output(ff, each);
         ff.close();
@@ -1456,42 +1462,52 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
 
     /**
      * byte codec output of matching concept tasks (blocking)
+     *
+     * the each function allows transforming each task to an optional output form.
+     * if this function returns null it will not output that task (use as a filter).
      */
     @NotNull
-    public NAR output(@NotNull OutputStream o, @NotNull Predicate<Task> each) throws IOException {
+    public NAR output(@NotNull OutputStream o, @NotNull Function<Task,Task> each) throws IOException {
 
         //SnappyFramedOutputStream os = new SnappyFramedOutputStream(o);
-
 
         DataOutputStream oo = new DataOutputStream(o);
 
         MutableInteger total = new MutableInteger(0), filtered = new MutableInteger(0);
 
-        forEachTask(t -> {
+        forEachTask(x -> {
             total.increment();
-            if (each.test(t)) {
+            Task y = each.apply(post(x));
+            if (y!=null) {
                 try {
-                    IO.writeTask(oo, t);
+                    IO.writeTask(oo, x);
                     filtered.increment();
                 } catch (IOException e) {
-                    logger.error("{} when trying to output to {}", t, e);
+                    logger.error("{} when trying to output to {}", x, e);
                     throw new RuntimeException(e);
                     //e.printStackTrace();
                 }
             }
-        }, true, true, true, true);
+        });
 
         logger.info("Saved {}/{} tasks ({} bytes)", filtered, total, oo.size());
-
-        oo.close();
 
         return this;
     }
 
+    @NotNull
+    public NAR output(@NotNull File o) throws IOException {
+        return output(new FileOutputStream(o));
+    }
+
+    @NotNull
+    public NAR output(@NotNull File o, Function<Task,Task> f) throws IOException {
+        return output(new FileOutputStream(o), f);
+    }
 
     @NotNull
     public NAR output(@NotNull OutputStream o) throws IOException {
-        return output(o, x -> !x.isDeleted());
+        return output(o, x -> x.isDeleted() ? null : x);
     }
 
     /**

@@ -799,4 +799,10 @@ public class TermReductionsTest {
                 $("((--,(out))&&(||,(happy),(out)))"));
 
     }
+
+    @Test public void taskWithFlattenedConunctions() {
+        //$0.0;NaN$ ((busyVol)&&((busyPri)&&(busyVol))). %.19;.10%  //<-- should not be allowed to be constructed
+        //  instead should have been: (busyVol&&busyPri)
+
+    }
 }

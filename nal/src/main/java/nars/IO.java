@@ -15,6 +15,7 @@ import nars.term.atom.Atomic;
 import nars.term.compound.SerialCompound;
 import nars.term.container.TermContainer;
 import nars.term.obj.IntTerm;
+import nars.term.util.InvalidTermException;
 import nars.term.var.AbstractVariable;
 import nars.term.var.GenericVariable;
 import nars.truth.Truth;
@@ -52,9 +53,8 @@ public class IO {
     @NotNull
     public static ImmutableTask readTask(@NotNull DataInput in, @NotNull TermIndex t) throws IOException {
 
-        Compound term = compoundOrNull(readTerm(in, t));
-        if (term == null)
-            return null;
+
+        Compound term = (Compound) readTerm(in, t);
 
         //TODO combine these into one byte
         byte punc = in.readByte();
@@ -114,7 +114,7 @@ public class IO {
         out.writeLong(t.start());
         out.writeLong(t.end());
 
-        writeEvidence(out, t.evidence());
+        writeEvidence(out, t.stamp());
 
         writeBudget(out, t);
 
@@ -181,12 +181,12 @@ public class IO {
     }
 
 
-    @Nullable
+    @NotNull
     public static Atomic readVariable(@NotNull DataInput in, @NotNull Op o, @NotNull TermIndex t) throws IOException {
         return $.v(o, in.readByte());
     }
 
-    @Nullable
+    @NotNull
     public static Atomic readAtomic(@NotNull DataInput in, @NotNull Op o, @NotNull TermIndex t) throws IOException {
 
         switch (o) {
@@ -224,7 +224,7 @@ public class IO {
     /**
      * called by readTerm after determining the op type
      */
-    @Nullable
+    @NotNull
     public static Term readTerm(@NotNull DataInput in, @NotNull TermIndex t) throws IOException {
 
         byte ob = in.readByte();
@@ -324,16 +324,17 @@ public class IO {
     }
 
 
-    @Nullable
+    @NotNull
     public static Term[] readTermContainer(@NotNull DataInput in, @NotNull TermIndex t) throws IOException {
         int siz = in.readByte();
 
-        assert(siz < Param.COMPOUND_VOLUME_MAX);
+        assert(siz < Param.COMPOUND_SUBTERMS_MAX);
 
         Term[] s = new Term[siz];
         for (int i = 0; i < siz; i++) {
-            if ((s[i] = readTerm(in, t)) == null)
-                return null;
+            Term read = (s[i] = readTerm(in, t));
+            if (read == null || isTrueOrFalse(read))
+                throw new InvalidTermException(Op.PROD /* consider the termvector as a product */, s, "invalid");
         }
 
         return s;
@@ -343,12 +344,10 @@ public class IO {
      * called by readTerm after determining the op type
      * TODO make a version which reads directlyinto TermIndex
      */
-    @Nullable
+    @NotNull
     static Term readCompound(@NotNull DataInput in, @NotNull Op o, @NotNull TermIndex t) throws IOException {
 
         Term[] v = readTermContainer(in, t);
-        if (v == null)
-            return null;
 
         int dt;
 
@@ -361,10 +360,14 @@ public class IO {
             dt = DTERNAL;
         }
 
-        return t.the(o, dt, v);
+        Term y = t.the(o, dt, v);
+        if (isTrueOrFalse(y))
+            throw new InvalidTermException(o, dt, v, "invalid term");
+
 //        if (key == null)
 //            throw new UnsupportedOperationException();
 //        return (Compound) t.normalize(key, true);
+        return y;
     }
 
     public static byte[] asBytes(@NotNull Task t) {

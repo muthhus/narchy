@@ -259,17 +259,12 @@ public abstract class TermIndex extends TermBuilder {
 
     @NotNull
     public final Term the(@NotNull Compound csrc, @NotNull Term[] args) {
-        if (csrc.equalTerms(args))
-            return csrc;
-        return the(csrc.op(), csrc.dt(), args);
+        return csrc.equalTerms(args) ? csrc : the(csrc.op(), csrc.dt(), args);
     }
 
     @NotNull
     public final Term the(@NotNull Compound csrc, int newDT) {
-        if (csrc.dt() == newDT) //no change
-            return csrc;
-
-        return the(csrc.op(), newDT, csrc.terms());
+        return csrc.dt() == newDT ? csrc : the(csrc.op(), newDT, csrc.terms());
     }
 
 //    @Override
@@ -374,18 +369,23 @@ public abstract class TermIndex extends TermBuilder {
 
     @NotNull
     public Term transform(@NotNull Compound src, @NotNull CompoundTransform t) {
-        if (!t.testSuperTerm(src))
+        if (!t.testSuperTerm(src)) {
             return src;
-
-        int dt = src.dt();
-        TermContainer tc = transform(src, src, dt, t);
-
-        if (tc != src) {
-            //construct new compound with same op and dt
-            return the(src.op(), dt, tc);
         } else {
-            return src; //((Term) src).eval(this);
+            int dt = src.dt();
+
+            TermContainer tc = transform(src, src, dt, t);
+
+            return tc != src ? the(src.op(), dt, tc) : src;
         }
+    }
+
+    @NotNull
+    public Term transform(@NotNull Compound src, int newDT, @NotNull CompoundTransform t) {
+        if (src.dt()==newDT)
+            return transform(src, t); //no dt change, use non-DT changing method that has early fail
+        else
+            return the(src.op(), newDT, transform(src, src, newDT, t));
     }
 
     @NotNull
@@ -393,11 +393,11 @@ public abstract class TermIndex extends TermBuilder {
 
         int modifications = 0;
 
-        int s = src.size();
 
-        Term[] target = new Term[s];
 
         Term[] xx = src.terms();
+        int s = xx.length;
+        Term[] target = new Term[s];
         for (int i = 0; i < s; i++) {
 
             Term x = xx[i], y;
@@ -676,6 +676,40 @@ public abstract class TermIndex extends TermBuilder {
 
         return normalize(z);
     }
+
+    /** changes all 'XTERNAL' to 'DTERNAL' and applies reductions in the process.  a change requires renormalization */
+    @Nullable public Compound retemporalize(@NotNull Compound x) {
+
+        int dt = x.dt();
+        Term y = transform(x, dt==XTERNAL ? DTERNAL : dt, retemporalization);
+        if (y==x)
+            return x;
+        else if (!(y instanceof Compound)) {
+            return null;
+        } else {
+            if (x.isNormalized()) {
+                return compoundOrNull(normalize((Compound)y));
+            } else {
+                return ((Compound)y);
+            }
+        }
+
+    }
+
+    final CompoundTransform retemporalization = new CompoundTransform<Compound,Term>() {
+
+        @Override
+        public boolean test(Term term) {
+            return term instanceof Compound && ((Compound)term).dt()==XTERNAL;
+        }
+
+        @Nullable
+        @Override
+        public Term apply(@Nullable Compound parent, @NotNull Term subterm) {
+            Compound cs = (Compound) subterm;
+            return the(cs.op(), DTERNAL, cs.terms());
+        }
+    };
 
     //    @Override
 //    protected @NotNull Term statement(@NotNull Op op, int dt, @NotNull Term subject, @NotNull Term predicate) {

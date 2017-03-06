@@ -26,7 +26,7 @@ public class AnswerTask extends ImmutableTask {
     }
 
     public AnswerTask(@NotNull Compound term, @NotNull Task aBelief, @NotNull Task bBelief, Truth conclusion, long creationTime, long start, long end, float evidenceBalance) {
-        this(term, aBelief.punc(), conclusion, creationTime, start, end, Stamp.zip(aBelief.evidence(), bBelief.evidence(), evidenceBalance));
+        this(term, aBelief.punc(), conclusion, creationTime, start, end, Stamp.zip(aBelief.stamp(), bBelief.stamp(), evidenceBalance));
 
         this.aBelief = aBelief;
         this.bBelief = bBelief;

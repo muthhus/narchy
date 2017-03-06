@@ -32,12 +32,18 @@ public class ImmutableTask extends RawBudget implements Task {
     public final Truth truth;
     public final byte punc;
     public final long creation, start, end;
-    public final long[] evidence;
+    public final long[] stamp;
     final int hash;
 
     public Map meta = null;
 
-    public ImmutableTask(Compound term, byte punc, Truth truth, long creation, long start, long end, long[] evidence) {
+
+    public static ImmutableTask Eternal(Compound term, byte punc, Truth truth, long creation, long[] stamp) {
+        return new ImmutableTask(term, punc, truth, creation, ETERNAL, ETERNAL, stamp);
+    }
+
+    public ImmutableTask(Compound term, byte punc, Truth truth, long creation, long start, long end, long[] stamp) {
+
 
         if (term.op()==NEG) {
             Compound term2 = compoundOrNull(term.unneg());
@@ -60,15 +66,15 @@ public class ImmutableTask extends RawBudget implements Task {
         this.creation = creation;
         this.start = start;
         this.end = end;
-        this.evidence = evidence;
+        this.stamp = stamp;
 
         int h = Util.hashCombine(
                 term.hashCode(),
                 punc,
-                Arrays.hashCode(evidence)
+                Arrays.hashCode(stamp)
         );
 
-        if (evidence.length > 1) {
+        if (stamp.length > 1) {
 
             Truth t = truth();
 
@@ -135,8 +141,8 @@ public class ImmutableTask extends RawBudget implements Task {
 
 
     @Override
-    public @NotNull long[] evidence() {
-        return evidence;
+    public @NotNull long[] stamp() {
+        return stamp;
     }
 
     @Override

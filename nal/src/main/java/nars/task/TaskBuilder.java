@@ -516,7 +516,7 @@ public class TaskBuilder extends RawBudget implements Termed, Truthed, Function<
     }
 
     public final TaskBuilder evidence(@NotNull Task evidenceToCopy) {
-        return evidence(evidenceToCopy.evidence());
+        return evidence(evidenceToCopy.stamp());
     }
 
 

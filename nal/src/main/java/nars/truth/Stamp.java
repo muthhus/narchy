@@ -181,7 +181,7 @@ public interface Stamp {
     @NotNull
     default CharSequence stampAsStringBuilder() {
 
-        long[] ev = evidence();
+        long[] ev = stamp();
         int len = ev.length;
         int estimatedInitialSize = 8 + (len * 3);
 
@@ -277,7 +277,7 @@ public interface Stamp {
     }
 
     static boolean overlapping(@NotNull Stamp a, @NotNull Stamp b) {
-        return ((a == b) || overlapping(a.evidence(), b.evidence()));
+        return ((a == b) || overlapping(a.stamp(), b.stamp()));
     }
 
     /**
@@ -347,7 +347,7 @@ public interface Stamp {
     /** originality monotonically decreases with evidence length increase.
      * it must always be < 1 (never equal to one) due to its use in the or(conf, originality) ranking */
     default float originality() {
-        return TruthFunctions.originality(evidence().length);
+        return TruthFunctions.originality(stamp().length);
     }
 
     /**
@@ -356,14 +356,14 @@ public interface Stamp {
      * since it is the deduplicated and sorted form of it.
      */
     @NotNull
-    long[] evidence();
+    long[] stamp();
 
     //Stamp setEvidence(long... evidentialSet);
 
     @NotNull
     static long[] zip(@NotNull Task a, @NotNull Task b) {
-        @Nullable long[] bb = b.evidence();
-        @Nullable long[] aa = a.evidence();
+        @Nullable long[] bb = b.stamp();
+        @Nullable long[] aa = a.stamp();
         return (a.creation() > b.creation()) ?
                 Stamp.zip(bb, aa) :
                 Stamp.zip(aa, bb);
@@ -373,7 +373,7 @@ public interface Stamp {
         return Math.max(Param.STAMP_CAPACITY, aLen + bLen);
     }
     static int evidenceLength(@NotNull Task a, @NotNull Task b) {
-        return evidenceLength(a.evidence().length, b.evidence().length);
+        return evidenceLength(a.stamp().length, b.stamp().length);
     }
 
     static long[] zip(@NotNull TemporalBeliefTable s) {
@@ -391,7 +391,7 @@ public interface Stamp {
         LongHashSet l = new LongHashSet(maxLen);
         //final boolean[] cyclic = {false};
         s.forEach( (Stamp t) -> {
-            long[] e = t.evidence();
+            long[] e = t.stamp();
             int el = e.length;
             for (int i = Math.max(0, el - maxPer); i < el; i++) {
                 long ee = e[i];

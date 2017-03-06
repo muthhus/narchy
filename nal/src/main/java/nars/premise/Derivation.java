@@ -266,7 +266,7 @@ public class Derivation extends Unify {
     @Nullable
     public long[] evidenceSingle() {
         if (evidenceSingle == null) {
-            evidenceSingle = Stamp.cyclic(task.evidence());
+            evidenceSingle = Stamp.cyclic(task.stamp());
         }
         return evidenceSingle;
     }
@@ -274,7 +274,7 @@ public class Derivation extends Unify {
     @Nullable
     public long[] evidenceDouble() {
         if (evidenceDouble == null) {
-            evidenceDouble = Stamp.zip(task.evidence(), belief.evidence());
+            evidenceDouble = Stamp.zip(task.stamp(), belief.stamp());
 //            if ((task.cyclic() || belief.cyclic()) && Stamp.isCyclic(evidenceDouble))
 //                throw new RuntimeException("cyclic should not be propagated");
             //System.out.println(Arrays.toString(task.evidence()) + " " + Arrays.toString(belief.evidence()) + " -> " + Arrays.toString(evidenceDouble));

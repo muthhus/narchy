@@ -197,7 +197,7 @@ public class Inperience extends Leak<Task, BLink<Task>> {
                         BELIEF,
                         $.t(1, nar.confidenceDefault(BELIEF)),
                         now, now, now,
-                        task.evidence()
+                        task.stamp()
                 );
                 e.log("Inperience");
                 e.budget( task.priSafe(0), nar);

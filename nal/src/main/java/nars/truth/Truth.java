@@ -260,6 +260,10 @@ public interface Truth extends Truthed {
         return conf(); //c2w(w2c(conf)) = conf
     }
 
+    default Truth eternalized() {
+        return $.t(freq(), eternalizedConf());
+    }
+
 
 //    static <T extends Truthed> T minConf(T a, T b) {
 //        return a.conf() <= b.conf() ? a : b;

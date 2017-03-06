@@ -11,8 +11,10 @@ import nars.nar.Default;
 import nars.time.FrameTime;
 import nars.time.RealTime;
 
+import java.io.File;
 import java.io.IOException;
 
+import static java.lang.Runtime.getRuntime;
 import static nars.Op.BELIEF;
 
 public class Arkancide extends NAgentX {
@@ -49,12 +51,27 @@ public class Arkancide extends NAgentX {
                 Default m = new Default(512, 32, 1, 3, n.random,
                         new CaffeineIndex(new DefaultConceptBuilder(), 4096, false, null),
                         new RealTime.DSHalf());
+
+                MetaAgent metaT = new MetaAgent(a, m); //init before loading from file
+                metaT.init();
+
+                String META_PATH = "/tmp/meta.nal";
+                try {  m.input(new File(META_PATH)); } catch (IOException e) {                }
+                getRuntime().addShutdownHook(new Thread(()->{
+                    try { m.output(new File(META_PATH), (x) -> {
+                        if (!x.isDeleted()) {
+                            Task y = x.eternalized();
+                            System.out.println(y);
+                            return y;
+                        }
+                        return null;
+                    }); } catch (IOException e) {  e.printStackTrace(); }
+                }));
+
                 float metaLearningRate = 0.75f;
                 m.confMin.setValue(0.01f);
                 m.goalConfidence(metaLearningRate);
                 m.termVolumeMax.setValue(16);
-                MetaAgent metaT = new MetaAgent(a, m);
-                metaT.init();
                 metaT.trace = true;
                 n.onCycle(metaT.nar::cycle);
                 //metaT.nar.log();

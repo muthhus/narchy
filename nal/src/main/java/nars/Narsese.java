@@ -14,6 +14,7 @@ import com.github.fge.grappa.run.context.MatcherContext;
 import com.github.fge.grappa.stack.ArrayValueStack;
 import com.github.fge.grappa.stack.ValueStack;
 import com.github.fge.grappa.support.Var;
+import com.github.fge.grappa.transform.ParserTransformer;
 import com.google.common.collect.ImmutableList;
 import jcog.Texts;
 import nars.budget.BudgetFunctions;
@@ -101,7 +102,29 @@ public class Narsese extends BaseParser<Object> {
 
     //private final Map<String,Term> termCache = new HashMap();
 
-    static final ThreadLocal<Narsese> parsers = ThreadLocal.withInitial(() -> Grappa.createParser(Narsese.class));
+    static final Class parser;
+    static {
+        Class p;
+        try {
+            p = ParserTransformer.extendParserClass(Narsese.class).getExtendedClass();
+        } catch (Exception e) {
+            e.printStackTrace();
+            p = null;
+        }
+        parser = p;
+    }
+
+    static final ThreadLocal<Narsese> parsers = ThreadLocal.withInitial(
+            //() -> Grappa.createParser(Narsese.class)
+            () -> {
+                try {
+                    return (Narsese)parser.newInstance();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    return null;
+                }
+            }
+    );
 
 //    static final ThreadLocal<Map<Pair<Op, List>, Term>> vectorTerms = ThreadLocal.withInitial(() ->
 //            new CapacityLinkedHashMap<Pair<Op, List>, Term>(512));
@@ -109,12 +132,12 @@ public class Narsese extends BaseParser<Object> {
 
 
 
-    public static Narsese the() {
+    @NotNull public static Narsese the() {
         return parsers.get();
     }
 
     @NotNull
-    public static Task makeTask(NAR nar, @Nullable float[] b, Compound content, byte p, @Nullable Truth t, Tense tense) throws NarseseException {
+    public static Task makeTask(@NotNull NAR nar, @Nullable float[] b, @NotNull Compound content, byte p, @Nullable Truth t, Tense tense) throws NarseseException {
 
 //        if (p == null)
 //            throw new RuntimeException("character is null");

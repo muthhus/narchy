@@ -634,15 +634,15 @@ public interface Compound extends Term, IPair, TermContainer {
         return false;
     }
 
-    default boolean containsTermAtemporally(Term y) {
-        y = y.unneg();
-        if (!impossibleSubTerm(y)) {
-            Term ay = $.terms.atemporalize(y);
-            if (or(x -> Terms.equalAtemporally(x, ay)))
-                return true;
-        }
-        return false;
-    }
+//    default boolean containsTermAtemporally(Term y) {
+//        y = y.unneg();
+//        if (!impossibleSubTerm(y)) {
+//            Term ay = $.terms.atemporalize(y);
+//            if (or(x -> Terms.equalAtemporally(x, ay)))
+//                return true;
+//        }
+//        return false;
+//    }
 
     @Override
     default Term eval(TermIndex index) {

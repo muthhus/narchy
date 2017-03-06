@@ -77,7 +77,7 @@ public class TermKey extends DynByteSeq {
                 writeInt(task.truth().hashCode());
             }
 
-            writeEvidence(this, task.evidence());
+            writeEvidence(this, task.stamp());
 
             if (COMPRESS)
                 compress();

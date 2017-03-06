@@ -50,7 +50,6 @@ import static nars.time.Tense.ETERNAL;
 public class Abbreviation/*<S extends Term>*/ extends Leak<Compound, BLink<Compound>> {
 
 
-
     /**
      * generated abbreviation belief's confidence
      */
@@ -70,7 +69,9 @@ public class Abbreviation/*<S extends Term>*/ extends Leak<Compound, BLink<Compo
     protected final NAR nar;
     private final String termPrefix;
 
-    /** accepted volume range, inclusive */
+    /**
+     * accepted volume range, inclusive
+     */
     public final MutableIntRange volume;
 
 
@@ -86,7 +87,7 @@ public class Abbreviation/*<S extends Term>*/ extends Leak<Compound, BLink<Compo
                 new MutableFloat(nar.confidenceDefault(BELIEF));
         //new MutableFloat(1f - nar.truthResolution.floatValue());
         //new MutableFloat(nar.confidenceDefault(Symbols.BELIEF));
-        volume = new MutableIntRange(volMin,volMax);
+        volume = new MutableIntRange(volMin, volMax);
     }
 
     @Nullable
@@ -98,30 +99,32 @@ public class Abbreviation/*<S extends Term>*/ extends Leak<Compound, BLink<Compo
 
         Budget b = task.budget().clone();
         if (b != null)
-            input(b, each, task.term());
+            input(b, each, task.term(), 1f);
     }
 
-    private void input(@NotNull Budget b, @NotNull Consumer<BLink<Compound>> each, @NotNull Compound t) {
+    private void input(@NotNull Budget b, @NotNull Consumer<BLink<Compound>> each, @NotNull Compound t, float scale) {
         int vol = t.volume();
+        if (vol < volume.lo())
+            return;
+
         if (vol <= volume.hi()) {
             if (t.vars() == 0 && !t.hasTemporal()) {
-                if (vol >= volume.lo()) {
+                Concept abbreviable = (Concept) nar.concept(t);
+                if ((abbreviable == null) ||
+                        !(abbreviable instanceof PermanentConcept) &&
+                                abbreviable.get(Abbreviation.class) == null) {
 
-                    Concept abbreviable = (Concept) nar.concept(t);
-                    if ((abbreviable == null) ||
-                            !(abbreviable instanceof PermanentConcept) &&
-                            abbreviable.get(Abbreviation.class) == null) {
-
-                        each.accept(new RawBLink<Compound>(t, b));
-                    }
-
+                    each.accept(new RawBLink<Compound>(t, b));
                 }
             }
         } else {
             //recursiely try subterms of a temporal or exceedingly large concept
             //budget with a proportion of this compound relative to their volume contribution
-            float tVolume = t.volume();
-            t.forEachCompound(x -> input(b.cloneMult(x.volume()/tVolume, 1f), each, ((Compound) x)));
+            float subScale = 1f / (1 + t.size());
+            t.forEachCompound(x -> {
+                if (x instanceof Compound)
+                    input(b, each, ((Compound) x), subScale);
+            });
         }
     }
 
@@ -207,9 +210,9 @@ public class Abbreviation/*<S extends Term>*/ extends Leak<Compound, BLink<Compo
                     Compound abbreviatedTerm = abbreviated.term();
 
                     Task abbreviationTask = new AbbreviationTask(
-                        abbreviation, BELIEF, $.t(1f, abbreviationConfidence.floatValue()),
-                        nar.time(), ETERNAL, ETERNAL,
-                        new long[] { nar.time.nextStamp() }, abbreviatedTerm, aliasTerm
+                            abbreviation, BELIEF, $.t(1f, abbreviationConfidence.floatValue()),
+                            nar.time(), ETERNAL, ETERNAL,
+                            new long[]{nar.time.nextStamp()}, abbreviatedTerm, aliasTerm
                     );
                     abbreviationTask.log("Abbreviate");
                     abbreviationTask.setBudget(b);
@@ -284,7 +287,7 @@ public class Abbreviation/*<S extends Term>*/ extends Leak<Compound, BLink<Compo
 
         static public AliasConcept get(@NotNull String compressed, @NotNull Compound decompressed, @NotNull NAR nar, @NotNull Term... additionalTerms) {
             Concept c = nar.concept(decompressed, true);
-            if(c!=null) {
+            if (c != null) {
                 AliasConcept a = new AliasConcept(compressed, (CompoundConcept) c, nar, additionalTerms);
                 return a;
             }
@@ -355,7 +358,7 @@ public class Abbreviation/*<S extends Term>*/ extends Leak<Compound, BLink<Compo
 //                    return true;
 
                 //if this is constant (no variables) then all it needs is equality test
-                if (tt.equals(((AliasConcept)y).abbr.term()))
+                if (tt.equals(((AliasConcept) y).abbr.term()))
                     return true;
             }
 
@@ -367,8 +370,6 @@ public class Abbreviation/*<S extends Term>*/ extends Leak<Compound, BLink<Compo
 //        public boolean equals(Object u) {
 //            return super.equals(u);
 //        }
-
-
 
 
         @Override

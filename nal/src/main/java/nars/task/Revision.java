@@ -121,7 +121,7 @@ public class Revision {
         //TODO weight by the relative confidence of each so that more confidence contributes more evidence data to the stamp
         //long[] evidence = Stamp.zip(((DefaultBeliefTable) concept.tableFor(a.punc())).temporal);
 
-        long[] evidence = Stamp.zip(a.evidence(), b.evidence(), aProp);
+        long[] evidence = Stamp.zip(a.stamp(), b.stamp(), aProp);
 
 
 
