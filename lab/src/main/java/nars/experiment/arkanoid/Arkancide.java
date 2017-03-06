@@ -16,6 +16,8 @@ import java.io.IOException;
 
 import static java.lang.Runtime.getRuntime;
 import static nars.Op.BELIEF;
+import static nars.Op.CONJ;
+import static nars.Op.IMPL;
 
 public class Arkancide extends NAgentX {
 
@@ -48,15 +50,15 @@ public class Arkancide extends NAgentX {
             try {
                 a = new Arkancide(n, cam);
 
-                Default m = new Default(512, 32, 1, 3, n.random,
-                        new CaffeineIndex(new DefaultConceptBuilder(), 4096, false, null),
+                Default m = new Default(256, 48, 1, 2, n.random,
+                        new CaffeineIndex(new DefaultConceptBuilder(), 8192, false, null),
                         new RealTime.DSHalf());
+                float metaLearningRate = 0.9f;
+                m.confMin.setValue(0.02f);
+                m.goalConfidence(metaLearningRate);
+                m.termVolumeMax.setValue(9);
 
                 MetaAgent metaT = new MetaAgent(a, m); //init before loading from file
-                float metaLearningRate = 0.9f;
-                m.confMin.setValue(0.01f);
-                m.goalConfidence(metaLearningRate);
-                m.termVolumeMax.setValue(16);
                 metaT.trace = true;
                 metaT.init();
 
@@ -64,7 +66,7 @@ public class Arkancide extends NAgentX {
                 try {  m.input(new File(META_PATH)); } catch (IOException e) {                }
                 getRuntime().addShutdownHook(new Thread(()->{
                     try { m.output(new File(META_PATH), (x) -> {
-                        if (!x.isDeleted()) {
+                        if (x.isBeliefOrGoal() && !x.isDeleted() && (x.op()==IMPL || x.op()==Op.EQUI || x.op() == CONJ)) {
                             Task y = x.eternalized();
                             return y;
                         }

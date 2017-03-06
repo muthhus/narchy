@@ -30,8 +30,8 @@ public class MetaAgent extends NAgent {
         senseNumber(p("lernVol") /*$.func($.the("lern"),$.the("vol"))*/, ()-> agentNAR.emotion.learningVol());
         senseNumber(p("dext"), ()-> agent.dexterity());
 
-        actionLerp(p("curi"), (q) -> agent.curiosity.setValue(q), 0f, 0.25f);
-        actionLerp(p("quaMin"), (q) -> agentNAR.quaMin.setValue(q), 0f, 0.1f);
+        actionLerp(p("curi"), (q) -> agent.curiosity.setValue(q), 0f, 0.05f);
+        actionLerp(p("quaMin"), (q) -> agentNAR.quaMin.setValue(q), 0f, 0.2f);
 //        actionLerp($.p("dur"), (d) -> agentNAR.time.dur(d),
 //                0.1f /* 0 might cause problems with temporal truthpolation, examine */,
 //                nar.time.dur()*2f /* multiple of the input NAR */);
