@@ -9,6 +9,7 @@ import nars.budget.RawBudget;
 import nars.term.Compound;
 import nars.truth.Truth;
 import nars.truth.TruthDelta;
+import nars.util.signal.SignalTask;
 import nars.util.task.InvalidTaskException;
 import org.apache.commons.collections4.map.Flat3Map;
 import org.jetbrains.annotations.NotNull;
@@ -237,6 +238,7 @@ public class ImmutableTask extends RawBudget implements Task {
         return term.vars() > 0;
         //return term.varIndep() > 0;
         //return false;
+        //return true;
 
 
         //Op op = term.op();

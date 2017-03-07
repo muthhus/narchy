@@ -1,6 +1,7 @@
 package nars;
 
 import jcog.meter.ResourceMeter;
+import jcog.meter.event.BufferedFloatGuage;
 import jcog.meter.event.FloatGuage;
 import nars.term.Compound;
 import org.apache.commons.lang3.mutable.MutableFloat;
@@ -18,33 +19,33 @@ public final class Emotion implements Serializable {
 
     /** priority rate of Task processing attempted */
     @NotNull
-    public final FloatGuage busyPri;
+    public final BufferedFloatGuage busyPri;
     @NotNull
-    public final FloatGuage busyVol;
+    public final BufferedFloatGuage busyVol;
 
     /** priority rate of Task processing which affected concepts */
     @NotNull
-    public final FloatGuage learnPri, learnVol;
+    public final BufferedFloatGuage learnPri, learnVol;
 
     /** task priority overflow rate */
     @NotNull
-    public final FloatGuage stress;
+    public final BufferedFloatGuage stress;
 
     /** happiness rate */
     @NotNull
-    public final FloatGuage happy;
+    public final BufferedFloatGuage happy;
 
     /** sadness rate */
     @NotNull
-    public final FloatGuage sad;
+    public final BufferedFloatGuage sad;
 
     @NotNull
-    public final FloatGuage confident;
+    public final BufferedFloatGuage confident;
 
 
     /** count of errors */
     @NotNull
-    public final FloatGuage errrVol;
+    public final BufferedFloatGuage errrVol;
 
 
     //private transient final Logger logger;
@@ -61,28 +62,28 @@ public final class Emotion implements Serializable {
 
         //logger = LoggerFactory.getLogger(class);
 
-        this.busyPri = new FloatGuage("busyP");
-        this.busyVol = new FloatGuage("busyV");
+        this.busyPri = new BufferedFloatGuage("busyP");
+        this.busyVol = new BufferedFloatGuage("busyV");
 
-        this.learnPri = new FloatGuage("learnP");
-        this.learnVol = new FloatGuage("learnV");
+        this.learnPri = new BufferedFloatGuage("learnP");
+        this.learnVol = new BufferedFloatGuage("learnV");
 
-        this.happy = new FloatGuage("happy");
-        this.sad = new FloatGuage("sad");
+        this.happy = new BufferedFloatGuage("happy");
+        this.sad = new BufferedFloatGuage("sad");
 
-        this.confident = new FloatGuage("confidence");
+        this.confident = new BufferedFloatGuage("confidence");
 
-        this.stress = new FloatGuage("stress");
+        this.stress = new BufferedFloatGuage("stress");
 
-        //this.alert = new FloatGuage("alert");
+        //this.alert = new BufferedFloatGuage("alert");
 
-        this.errrVol = new FloatGuage("error");
+        this.errrVol = new BufferedFloatGuage("error");
 
     }
 
 
     /** new frame started */
-    public void cycle() {
+    public synchronized void cycle() {
 
         happy.clear();
         sad.clear();

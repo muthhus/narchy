@@ -45,7 +45,7 @@ import static nars.time.Tense.ETERNAL;
 /**
  * Created by me on 2/11/17.
  */
-public class Compressor extends Abbreviation implements RemovalListener<Compound, Compressor.Abbr> {
+public class Compressor extends Abbreviation /* implements RemovalListener<Compound, Compressor.Abbr>*/ {
 
     static final Logger logger = LoggerFactory.getLogger(Compressor.class);
 
@@ -60,8 +60,7 @@ public class Compressor extends Abbreviation implements RemovalListener<Compound
 
     final Map<SequenceMatcher, Abbr> dc = new ConcurrentHashMap(); //HACK
     final Map<SequenceMatcher, Abbr> ec = new ConcurrentHashMap(); //HACK
-    private final float boostBig = 0.1f;
-    private final float boostSmall = 0.05f;
+
 
 
     /* static */ class Abbr extends RawPLink<Compound> {
@@ -97,7 +96,12 @@ public class Compressor extends Abbreviation implements RemovalListener<Compound
 
         code =
                 //Caffeine.newBuilder().maximumSize(maxCodes).removalListener(this).executor(n.exe).build();
-                new PLinkHijackBag(maxCodes, 4, nar.random);
+                new PLinkHijackBag(maxCodes, 4, nar.random) {
+                    @Override
+                    public void onRemoved(@NotNull Object value) {
+                        onRemoval((Abbr)value);
+                    }
+                };
     }
 
 
@@ -119,8 +123,7 @@ public class Compressor extends Abbreviation implements RemovalListener<Compound
             return 0; //rejected
     }
 
-    @Override
-    public void onRemoval(Compound key, Abbr value, RemovalCause cause) {
+    public void onRemoval(/*Compound key, */Abbr value/*, RemovalCause cause*/) {
         ec.remove(value.encode);
         dc.remove(value.decode);
     }

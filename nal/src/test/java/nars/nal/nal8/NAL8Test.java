@@ -165,9 +165,7 @@ public class NAL8Test extends AbstractNALTest {
 
         test()
                 .input("goto({t003}). :|:")
-                .inputAt(10, "(goto(#1) &&+5 at(SELF,#1))!")
-
-                //.mustDesire(cycles, "goto({t003})", 1.0f, 0.81f, -5)
+                .input("(goto(#1) &&+5 at(SELF,#1))!")
                 .mustDesire(cycles, "at(SELF,{t003})", 1.0f, 0.81f, 5)
                 //.mustNotOutput(cycles, "goto({t003})", GOAL, -5) //??
                 ;
@@ -178,8 +176,7 @@ public class NAL8Test extends AbstractNALTest {
 
         test()
                 .input("goto({t003}). :|:")
-                .inputAt(10, "(goto(#1) &&+5 at(SELF,#1))!")
-
+                .input("(goto(#1) &&+5 at(SELF,#1))!")
                 .mustDesire(2 * cycles, "at(SELF,{t003})", 1.0f, 0.81f, 5)
         ;
     }
@@ -516,9 +513,9 @@ public class NAL8Test extends AbstractNALTest {
     public void condition_goal_deduction_2()  {
         test()
             
-            .input("<({t002},{t003}) --> on>. :|:")
-            .inputAt(10, "(<({t002},#1) --> on> &&+0 <(SELF,#1) --> at>)!")
-            .mustDesire(cycles, "<(SELF,{t003}) --> at>", 1.0f, 0.81f, 0);
+            .input("on({t002},{t003}). :|:")
+            .input("(on({t002},#1) &&+0 at(SELF,#1))!")
+            .mustDesire(cycles, "at(SELF,{t003})", 1.0f, 0.81f, 0);
 
         //tester.mustNotOutput(time, selfAtT3, GOAL, 0, 1f, 0, 1f, ETERNAL);
     }
@@ -528,7 +525,7 @@ public class NAL8Test extends AbstractNALTest {
         test()
             
             .input(              "on({t002},{t003}). :|:")
-            .inputAt(10,         "(on({t002},#1) &&+0 at(SELF,#1)).")
+            .inputAt(10,  "(on({t002},#1) &&+0 at(SELF,#1)).")
             .mustBelieve(cycles,   "at(SELF,{t003})", 1.0f, 0.43f, 0)
             .mustNotOutput(cycles, "at(SELF,{t003})", BELIEF, 0, 1f, 0, 1f, ETERNAL);
 

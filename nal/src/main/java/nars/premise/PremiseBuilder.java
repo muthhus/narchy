@@ -185,7 +185,13 @@ abstract public class PremiseBuilder {
                 long when;
                 long start = task.start();
                 if (start == ETERNAL) {
-                    when = ETERNAL;
+
+                    if (belief!=null) {
+                        when = belief.start();
+                        if (when == ETERNAL) when = now;
+                    } else {
+                        when = now;
+                    }
                 } else if (nar.random.nextBoolean()) {
                     //USE TASK's OCCURENCE
                     //find nearest end-point to now
