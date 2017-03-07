@@ -42,7 +42,7 @@ public class Hear extends Loop {
         return hear(nar, msg, src, (m) -> {
             if (wordDelayMS > 0) {
                 List<Term> tokens = tokenize(m);
-                if (tokens != null && !tokens.isEmpty())
+                if (!tokens.isEmpty())
                     return new Hear(nar, tokens, src, wordDelayMS);
             }
             return null;
@@ -81,7 +81,7 @@ public class Hear extends Loop {
     }
 
 
-    public static List<Term> tokenize(String msg) {
+    @NotNull public static List<Term> tokenize(String msg) {
         return Lists.transform(Twokenize.tokenize(msg), Twenglish::spanToTerm);
     }
 

@@ -144,11 +144,15 @@ public class Builtin {
 
 
         nar.on("memstat", (Command) (op, a, nn) ->
-                Command.log(nn, quote(nn.concepts.summary()))
+            Command.log(nn, quote(nn.concepts.summary()))
         );
 
-        nar.on("reset", (Command) (op, args1, nar1) ->
-                nar1.runLater(NAR::reset)
+        nar.on("emotion", (Command) (op, a, nn) ->
+            Command.log(nn, quote(nn.emotion.summary()))
+        );
+
+        nar.on("reset", (Command) (op, args1, nn) ->
+            nn.runLater(NAR::reset)
         );
 
         nar.on("clear", (Command) (op, args, n) -> {

@@ -1247,7 +1247,11 @@ public class Narsese extends BaseParser<Object> {
 
             Object px = x[2];
 
-            byte punct = (byte)(((Character) x[2]).charValue());
+            byte punct =
+                    px instanceof Byte ?
+                        ((Byte) x[2]).byteValue()
+                                    :
+                        (byte)(((Character) x[2]).charValue());
 
             Truth t = (Truth) x[3];
             if (t != null && !Float.isFinite(t.conf()))

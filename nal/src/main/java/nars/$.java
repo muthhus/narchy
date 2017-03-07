@@ -93,14 +93,22 @@ public enum $ {
         }
     }
 
-    @NotNull
-    public static Atom quote(Object text) {
+    final static Atom emptyQuote = (Atom) $.the("\"\"");
+
+    @NotNull public static Atom quote(@NotNull Object text) {
         String s = text.toString();
-        if (s.charAt(0)=='\"' && s.charAt(s.length()-1)=='\"') {
+
+        int length = s.length();
+
+        if (length == 0)
+            return emptyQuote;
+
+        if (s.charAt(0)=='\"' && s.charAt(length -1)=='\"') {
             //already quoted
         } else {
             s = ("\"" + s + '"');
         }
+
         return new Atom(s);
     }
 

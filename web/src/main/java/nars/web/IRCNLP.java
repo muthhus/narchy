@@ -30,6 +30,7 @@ import spacegraph.net.IRC;
 import java.util.Arrays;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 import static nars.Op.BELIEF;
@@ -86,37 +87,9 @@ public class IRCNLP extends IRC {
                 Util.pause(5500);
             }
         }).start();
-//        out = new LeakOut(nar, 8, 0.03f) {
-//            @Override
-//            protected float send(String s) {
-//                Runnable r = IRCNLP.this.send(channels, s);
-//                if (r != null) {
-//                    nar.runLater(r);
-//                    return 1;
-//                }
-//                return 0;
-//            }
-//
-//            @Override
-//            protected void in(@NotNull Task t, Consumer<BLink<Task>> each) {
-//                if (trace || t.isCommand())
-//                    super.in(t, each);
-//            }
-//        };
 
-//        //SPEAK
-//        nar.onTask(t -> {
-//
-//        });
+        new MyLeakOut(nar, channels);
 
-
-//        nar.onExec(new IRCBotOperator("top") {
-//
-//            @Override
-//            protected Object function(Compound arguments) {
-//                return null;
-//            }
-//        });
 
         /*
         $0.9;0.9;0.99$ (hear(?someone, $something) ==>+1 hear(I,$something)).
@@ -155,6 +128,42 @@ public class IRCNLP extends IRC {
 //            }
 //        });
 
+    }
+
+    /** identical with IRCAgent, TODO share them */
+    private class MyLeakOut extends LeakOut {
+        private final NAR nar;
+        private final String[] channels;
+
+        public MyLeakOut(NAR nar, String... channels) {
+            super(nar, 8, 0.03f);
+            this.nar = nar;
+            this.channels = channels;
+        }
+
+        @Override
+        protected float send(Task task) {
+            boolean cmd = task.isCommand();
+            if (cmd || (trace && !task.isDeleted())) {
+                String s = (!cmd) ? task.toString() : task.term().toString();
+                Runnable r = IRCNLP.this.send(channels, s);
+                if (r!=null) {
+                    nar.runLater(r);
+                    if (Param.DEBUG && !task.isCommand())
+                        logger.info("{}\n{}", task, task.proof());
+                } else {
+                    //..?
+                }
+                return cmd ? 0 : 1; //no cost for command outputs
+            }
+            return 0;
+        }
+
+        @Override
+        protected void in(@NotNull Task t, Consumer<BLink<Task>> each) {
+            if (trace || t.isCommand())
+                super.in(t, each);
+        }
     }
 
     public void setTrace(boolean trace) {
@@ -336,9 +345,9 @@ public class IRCNLP extends IRC {
 
         IRCNLP bot = new IRCNLP(n,
                 "experiment1", "irc.freenode.net",
-                //"#123xyz"
+                "#123xyz"
                 //"#netention"
-                "#nars"
+                //"#nars"
         );
 
         n.truthResolution.setValue(0.02f);

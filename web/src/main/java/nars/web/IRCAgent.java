@@ -61,31 +61,7 @@ public class IRCAgent extends IRC {
         this.nar = nar;
 
 
-        out = new LeakOut(nar, 8, 0.03f) {
-            @Override
-            protected float send(Task task) {
-                boolean cmd = task.isCommand();
-                if (cmd || (trace && !task.isDeleted())) {
-                    String s = (!cmd) ? task.toString() : task.term().toString();
-                    Runnable r = IRCAgent.this.send(channels, s);
-                    if (r!=null) {
-                        nar.runLater(r);
-                        if (Param.DEBUG && !task.isCommand())
-                            logger.info("{}\n{}", task, task.proof());
-                    } else {
-                        //..?
-                    }
-                    return cmd ? 0 : 1; //no cost for command outputs
-                }
-                return 0;
-            }
-
-            @Override
-            protected void in(@NotNull Task t, Consumer<BLink<Task>> each) {
-                if (trace || t.isCommand())
-                    super.in(t, each);
-            }
-        };
+        out = new MyLeakOut(nar, channels);
 
 //        //SPEAK
 //        nar.onTask(t -> {
@@ -408,6 +384,41 @@ public class IRCAgent extends IRC {
 
     static boolean canReadURL(String url) {
         return url.startsWith("https://gist.githubusercontent");
+    }
+
+    private class MyLeakOut extends LeakOut {
+        private final NAR nar;
+        private final String[] channels;
+
+        public MyLeakOut(NAR nar, String... channels) {
+            super(nar, 8, 0.03f);
+            this.nar = nar;
+            this.channels = channels;
+        }
+
+        @Override
+        protected float send(Task task) {
+            boolean cmd = task.isCommand();
+            if (cmd || (trace && !task.isDeleted())) {
+                String s = (!cmd) ? task.toString() : task.term().toString();
+                Runnable r = IRCAgent.this.send(channels, s);
+                if (r!=null) {
+                    nar.runLater(r);
+                    if (Param.DEBUG && !task.isCommand())
+                        logger.info("{}\n{}", task, task.proof());
+                } else {
+                    //..?
+                }
+                return cmd ? 0 : 1; //no cost for command outputs
+            }
+            return 0;
+        }
+
+        @Override
+        protected void in(@NotNull Task t, Consumer<BLink<Task>> each) {
+            if (trace || t.isCommand())
+                super.in(t, each);
+        }
     }
 
 //    final StringBuilder b = new StringBuilder();
