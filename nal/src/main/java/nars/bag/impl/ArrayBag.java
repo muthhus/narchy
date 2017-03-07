@@ -318,16 +318,15 @@ public class ArrayBag<X> extends SortedListTable<X, BLink<X>> implements Bag<X, 
 
         final boolean[] isNew = {false};
 
+        pressure += b.pri() * scale;
 
         X key = key(b);
         BLink<X> v = map.compute(key, (kk, existing) -> {
             BLink<X> res;
             float o;
-            float pBefore = 0;
             if (existing != null && !existing.isDeleted()) {
                 //merge
                 res = existing;
-                pBefore = existing.priSafe(0);
                 o = mergeFunction.merge(existing, b, scale);
             } else {
                 //new
@@ -338,9 +337,7 @@ public class ArrayBag<X> extends SortedListTable<X, BLink<X>> implements Bag<X, 
                 if (size() >= capacity && np < priMin()) {
                     res = null; //failed insert
                     o = 0;
-                    pressure += np;
                 } else {
-                    pBefore = 0;
                     isNew[0] = true;
                     res = n;
                     o = oo;
@@ -351,10 +348,6 @@ public class ArrayBag<X> extends SortedListTable<X, BLink<X>> implements Bag<X, 
                 overflow.add(o);
             }
 
-            if (res != null) {
-                float pAfter = res.priSafe(0);
-                pressure += pAfter - pBefore;
-            }
 
             return res;
 
