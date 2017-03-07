@@ -33,6 +33,7 @@ import static nars.IO.TaskSerialization.TermFirst;
 import static nars.Op.ATOM;
 import static nars.Op.INT;
 import static nars.index.TermBuilder.isTrueOrFalse;
+import static nars.term.Terms.compoundOrNull;
 import static nars.time.Tense.DTERNAL;
 import static nars.time.Tense.XTERNAL;
 
@@ -53,7 +54,9 @@ public class IO {
     public static ImmutableTask readTask(@NotNull DataInput in, @NotNull TermIndex t) throws IOException {
 
 
-        Compound term = (Compound) readTerm(in, t);
+        Compound term = compoundOrNull(readTerm(in, t));
+        if (term == null)
+            throw new IOException("invalid task term");
 
         //TODO combine these into one byte
         byte punc = in.readByte();

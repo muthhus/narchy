@@ -51,7 +51,7 @@ public class Arkancide extends NAgentX {
                 a = new Arkancide(n, cam);
 
                 Default m = new Default(256, 48, 1, 2, n.random,
-                        new CaffeineIndex(new DefaultConceptBuilder(), 8192, false, null),
+                        new CaffeineIndex(new DefaultConceptBuilder(), 2048, false, null),
                         new RealTime.DSHalf());
                 float metaLearningRate = 0.9f;
                 m.confMin.setValue(0.02f);
@@ -67,8 +67,9 @@ public class Arkancide extends NAgentX {
                 getRuntime().addShutdownHook(new Thread(()->{
                     try { m.output(new File(META_PATH), (x) -> {
                         if (x.isBeliefOrGoal() && !x.isDeleted() && (x.op()==IMPL || x.op()==Op.EQUI || x.op() == CONJ)) {
-                            Task y = x.eternalized();
-                            return y;
+                            //Task y = x.eternalized();
+                            //return y;
+                            return x;
                         }
                         return null;
                     }); } catch (IOException e) {  e.printStackTrace(); }

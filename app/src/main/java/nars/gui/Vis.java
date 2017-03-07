@@ -286,25 +286,25 @@ public class Vis {
 //        plot.add("Rwrd", reward);
 
         Plot2D plot1 = new Plot2D(plotHistory, Plot2D.Line);
-        plot1.add("Conf", () -> nar.emotion.confident.getSum());
+        plot1.add("Conf", nar.emotion.confident::getSum);
 
         Plot2D plot2 = new Plot2D(plotHistory, Plot2D.Line);
-        plot2.add("Busy", () -> nar.emotion.busyPri.getSum());
-        plot2.add("Lern", () -> nar.emotion.busyPri.getSum() - nar.emotion.learnPri.getSum());
+        plot2.add("Busy", nar.emotion.busyPri::getSum);
+
 
         Plot2D plot3 = new Plot2D(plotHistory, Plot2D.Line);
-        plot3.add("Strs", () -> nar.emotion.stress.getSum());
+        //plot3.add("Strs", () -> nar.emotion.stress.getSum());
+        plot3.add("Lern", nar.emotion::learningPri);
 
 
         Plot2D plot4 = new Plot2D(plotHistory, Plot2D.Line);
-        plot4.add("Hapy", () -> nar.emotion.happy.getSum());
-        plot4.add("Sad", () -> nar.emotion.sad.getSum());
+        plot4.add("Hapy", nar.emotion.happy::getSum);
+        plot4.add("Sad",nar.emotion.sad::getSum);
 
 //                Plot2D plot4 = new Plot2D(plotHistory, Plot2D.Line);
 //                plot4.add("Errr", ()->nar.emotion.errr.getSum());
 
         nar.onCycle(f -> {
-            //plot.update();
             plot1.update();
             plot2.update();
             plot3.update();

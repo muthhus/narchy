@@ -1,10 +1,7 @@
 package jcog.meter.event;
 
 import jcog.math.RecycledSummaryStatistics;
-import org.apache.commons.math3.stat.descriptive.StatisticalSummary;
-import org.eclipse.collections.api.block.procedure.primitive.FloatProcedure;
 
-import java.io.Serializable;
 
 /**
  * Sums guaged objects, and returns

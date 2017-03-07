@@ -25,6 +25,7 @@ public class BufferedFloatGuage implements FloatProcedure, Serializable {
         return mean;
     }
 
+    /** records current values and clears for a new cycle */
     public void clear() {
         mean = (float) data.getMean();
         sum = (float) data.getSum();
@@ -36,7 +37,7 @@ public class BufferedFloatGuage implements FloatProcedure, Serializable {
     }
 
     @Override
-    public void value(float v) {
+    public final void value(float v) {
         accept(v);
     }
 }
