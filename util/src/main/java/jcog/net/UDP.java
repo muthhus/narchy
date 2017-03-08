@@ -47,7 +47,7 @@ public class UDP  {
     public UDP()  {
         DatagramSocket iin;
         try {
-            iin = new DatagramSocket(null);
+            iin = new DatagramSocket();
         } catch (SocketException e) {
             logger.error("{}", e);
             iin = null;

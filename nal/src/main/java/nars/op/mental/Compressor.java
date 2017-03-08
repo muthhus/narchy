@@ -3,7 +3,7 @@ package nars.op.mental;
 import jcog.bag.RawPLink;
 import jcog.bag.impl.HijackBag;
 import nars.*;
-import nars.bag.impl.PLinkHijackBag;
+import jcog.bag.impl.PLinkHijackBag;
 import nars.budget.BLink;
 import nars.budget.Budget;
 import nars.concept.PermanentConcept;

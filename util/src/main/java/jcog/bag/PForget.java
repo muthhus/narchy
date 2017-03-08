@@ -1,4 +1,4 @@
-package nars.attention;
+package jcog.bag;
 
 import jcog.bag.Priority;
 import org.jetbrains.annotations.NotNull;

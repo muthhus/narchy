@@ -21,9 +21,18 @@ public class DynByteSeq implements DataOutput, Appendable, ByteSeq {
         this.bytes = new byte[bufferSize];
     }
 
+    public DynByteSeq(byte[] zeroCopy) {
+        this.bytes = zeroCopy;
+        this.len = bytes.length;
+    }
+
     @Override
     public int hashCode() {
-        return (int) Util.hashELF(bytes, 1, 0, len);
+        return hash(0, len);
+    }
+
+    public int hash(int from, int to) {
+        return (int) Util.hashELF(bytes, 1, from, to);
     }
 
     @Override

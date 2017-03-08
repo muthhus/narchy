@@ -33,7 +33,7 @@ public class Forget<X extends Budget> implements Consumer<X> {
 
     @Nullable
     public static <X> Consumer<X> forget(int s, float p, float m, FloatToObjectFunction<Consumer<X>> f) {
-        return Bag.forget(s, p, m, Param.BAG_TEMPERATURE, Param.BUDGET_EPSILON, f);
+        return Bag.forget(s, p, m, 0.5f, Param.BUDGET_EPSILON, f);
     }
 
     @Override

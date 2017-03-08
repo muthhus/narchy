@@ -55,7 +55,7 @@ public class BLinkHijackBag<K> extends BudgetHijackBag<K,BLink<K>> {
 
     @Override
     protected float temperature() {
-        return Param.BAG_TEMPERATURE;
+        return 0.5f;
     }
 
 

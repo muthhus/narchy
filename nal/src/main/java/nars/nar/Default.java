@@ -4,7 +4,7 @@ import jcog.bag.Bag;
 import jcog.bag.PLink;
 import jcog.data.random.XorShift128PlusRandom;
 import nars.NAR;
-import nars.bag.impl.PLinkHijackBag;
+import jcog.bag.impl.PLinkHijackBag;
 import nars.concept.Concept;
 import nars.conceptualize.DefaultConceptBuilder;
 import nars.control.ConceptBagControl;

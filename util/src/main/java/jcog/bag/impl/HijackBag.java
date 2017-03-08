@@ -552,6 +552,7 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
                 b.size(), pressure, mass, temperature(), priEpsilon(), this::forget));
     }
 
+    /** higher value means faster forgetting */
     protected float temperature() {
         return 0.5f;
     }

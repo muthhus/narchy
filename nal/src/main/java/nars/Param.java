@@ -1,6 +1,7 @@
 package nars;
 
 import jcog.Util;
+import jcog.bag.PLink;
 import jcog.data.FloatParam;
 import jcog.data.MutableInteger;
 import jcog.data.Range;
@@ -89,9 +90,6 @@ public abstract class Param  {
     public static final boolean DERIVER_PERMUTE_SWAPPED = true;
 
 
-    /** higher value means faster forgetting */
-    public static final float BAG_TEMPERATURE = (0.5f);
-
     /** conjunctions over this length will be ineligible for 2nd-layer termlink templates. it can be decomposed however, and decompositions of this size or less will be eligible. */
     public static final int MAX_CONJ_SIZE_FOR_LAYER2_TEMPLATES = 3;
 
@@ -122,7 +120,7 @@ public abstract class Param  {
     /**
      * minimum difference necessary to indicate a significant modification in budget float number components
      */
-    public static final float BUDGET_EPSILON = 0.00001f;
+    public static final float BUDGET_EPSILON = PLink.DEFAULT_EPSILON;
 
 
 

@@ -1,9 +1,8 @@
-package nars.bag.impl;
+package jcog.bag.impl;
 
 import jcog.bag.PLink;
 import jcog.bag.impl.HijackBag;
-import nars.Param;
-import nars.attention.PForget;
+import jcog.bag.PForget;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -41,12 +40,12 @@ public class PLinkHijackBag<X> extends HijackBag<X, PLink<X>> {
 
     @Override
     protected float priEpsilon() {
-        return Param.BUDGET_EPSILON;
+        return PLink.DEFAULT_EPSILON;
     }
 
     @Override
     protected float temperature() {
-        return Param.BAG_TEMPERATURE;
+        return 0.5f;
     }
 
     @Override

@@ -5,7 +5,7 @@ import jcog.bag.RawPLink;
 import jcog.event.On;
 import nars.NAR;
 import nars.Task;
-import nars.bag.impl.PLinkHijackBag;
+import jcog.bag.impl.PLinkHijackBag;
 import nars.concept.Concept;
 import nars.op.Leak;
 import org.jetbrains.annotations.NotNull;
