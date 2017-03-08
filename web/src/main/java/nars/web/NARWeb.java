@@ -1,13 +1,8 @@
 package nars.web;
 
-import io.undertow.websockets.core.BufferedTextMessage;
-import io.undertow.websockets.core.WebSocketChannel;
-import nars.IO;
 import nars.NAR;
-import nars.time.Tense;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import spacegraph.web.WebsocketService;
 
 /**
  * Created by me on 1/21/17.

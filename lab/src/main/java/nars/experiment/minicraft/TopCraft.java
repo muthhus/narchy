@@ -2,10 +2,10 @@ package nars.experiment.minicraft;
 
 import nars.$;
 import nars.NAR;
+import nars.NAgentX;
 import nars.Narsese;
 import nars.experiment.minicraft.top.InputHandler;
 import nars.experiment.minicraft.top.TopDownMinicraft;
-import nars.NAgentX;
 import nars.video.PixelAutoClassifier;
 import nars.video.Sensor2D;
 import org.jcodec.codecs.h264.H264Encoder;

@@ -1,6 +1,6 @@
 package nars.perf;
 
-import org.openjdk.jmh.profile.*;
+import org.openjdk.jmh.profile.StackProfiler;
 import org.openjdk.jmh.results.format.ResultFormatType;
 import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;

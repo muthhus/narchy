@@ -1,8 +1,7 @@
 package nars.experiment.mario;
 
 import nars.experiment.mario.level.LevelGenerator;
-import nars.experiment.mario.sprites.*;
-
+import nars.experiment.mario.sprites.Mario;
 import spacegraph.audio.Audio;
 import spacegraph.audio.FakeSoundEngine;
 
@@ -14,7 +13,6 @@ import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.image.BufferedImage;
-import java.awt.image.VolatileImage;
 import java.util.Random;
 
 

@@ -1,7 +1,5 @@
 package nars.op.mental;
 
-import com.github.benmanes.caffeine.cache.RemovalCause;
-import com.github.benmanes.caffeine.cache.RemovalListener;
 import jcog.bag.RawPLink;
 import jcog.bag.impl.HijackBag;
 import nars.*;

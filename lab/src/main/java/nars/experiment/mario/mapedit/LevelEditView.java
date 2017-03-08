@@ -1,7 +1,8 @@
 package nars.experiment.mario.mapedit;
 
-import nars.experiment.mario.*;
-import nars.experiment.mario.level.*;
+import nars.experiment.mario.Art;
+import nars.experiment.mario.LevelRenderer;
+import nars.experiment.mario.level.Level;
 
 import javax.swing.*;
 import java.awt.*;

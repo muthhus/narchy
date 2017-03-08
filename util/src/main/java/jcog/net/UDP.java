@@ -22,7 +22,7 @@ public class UDP  {
 
     static final int DEFAULT_socket_BUFFER_SIZE = 1024 * 1024;
 
-    private final DatagramSocket in;
+    protected final DatagramSocket in;
     public final Thread thread;
     protected boolean running = true;
     private static final Logger logger = LoggerFactory.getLogger(UDP.class);

@@ -1,6 +1,6 @@
 package nars.experiment.mario.mapedit;
 
-import nars.experiment.mario.level.*;
+import nars.experiment.mario.level.Level;
 
 import javax.swing.*;
 import javax.swing.border.EtchedBorder;

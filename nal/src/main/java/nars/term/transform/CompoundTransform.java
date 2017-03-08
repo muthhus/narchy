@@ -5,8 +5,6 @@ import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.function.Predicate;
-
 /** I = input term type, T = transformable subterm type */
 @FunctionalInterface public interface CompoundTransform  {
 

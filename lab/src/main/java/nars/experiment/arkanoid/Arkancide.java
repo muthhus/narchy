@@ -4,20 +4,16 @@ package nars.experiment.arkanoid;
 import jcog.math.FloatPolarNormalized;
 import nars.*;
 import nars.concept.ActionConcept;
-import nars.NAgentX;
 import nars.conceptualize.DefaultConceptBuilder;
 import nars.index.term.map.CaffeineIndex;
 import nars.nar.Default;
-import nars.time.FrameTime;
 import nars.time.RealTime;
 
 import java.io.File;
 import java.io.IOException;
 
 import static java.lang.Runtime.getRuntime;
-import static nars.Op.BELIEF;
-import static nars.Op.CONJ;
-import static nars.Op.IMPL;
+import static nars.Op.*;
 
 public class Arkancide extends NAgentX {
 

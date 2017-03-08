@@ -308,7 +308,7 @@ abstract public class NAgent implements NSense, NAction {
 
             ((FasterList<Tasked>) predictors).addAll(
                     () -> goal((Compound) action.term(), $.t(1f, curiosity.floatValue()), now),
-                    //goal((Compound)action.term(), $.t(0.5f, epsilon ), now),
+                    () -> goal((Compound) action.term(), $.t(0.5f, curiosity.floatValue()), now),
                     () -> goal((Compound) action.term(), $.t(0f, curiosity.floatValue()), now)
             );
 

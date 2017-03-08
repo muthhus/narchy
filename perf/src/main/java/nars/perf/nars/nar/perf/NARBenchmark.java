@@ -31,14 +31,11 @@
 
 package nars.perf.nars.nar.perf;
 
-import nars.Narsese;
 import nars.nar.Default;
-import nars.term.Compound;
 import nars.test.DeductiveMeshTest;
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.runner.RunnerException;
 
-import static nars.$.$;
 import static nars.perf.Main.perf;
 
 @State(Scope.Benchmark)

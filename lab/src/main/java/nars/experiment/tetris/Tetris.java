@@ -9,7 +9,6 @@ import nars.experiment.tetris.impl.TetrisVisualizer;
 import nars.index.term.map.CaffeineIndex;
 import nars.nar.Default;
 import nars.nar.NARBuilder;
-import nars.task.DerivedTask;
 import nars.term.Compound;
 import nars.term.atom.Atomic;
 import nars.time.FrameTime;
@@ -26,7 +25,6 @@ import java.util.List;
 import static nars.$.$;
 import static nars.Op.BELIEF;
 import static nars.experiment.tetris.impl.TetrisState.*;
-import static nars.gui.Vis.conceptsTreeChart;
 import static spacegraph.SpaceGraph.window;
 
 /**

@@ -8,7 +8,6 @@ import nars.term.Term;
 import nars.term.Terms;
 import nars.term.atom.Atomic;
 import nars.term.container.TermContainer;
-import nars.term.container.TermSet;
 import nars.term.container.TermVector;
 import nars.term.obj.IntTerm;
 import nars.term.obj.Termject.IntInterval;

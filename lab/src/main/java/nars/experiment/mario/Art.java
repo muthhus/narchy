@@ -1,13 +1,9 @@
 package nars.experiment.mario;
 
 
-
-
-import spacegraph.audio.sample.SampleLoader;
 import spacegraph.audio.sample.SonarSample;
 
 import javax.imageio.ImageIO;
-import javax.sound.midi.MidiSystem;
 import javax.sound.midi.Sequence;
 import javax.sound.midi.Sequencer;
 import java.awt.*;

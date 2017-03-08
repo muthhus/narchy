@@ -1,9 +1,6 @@
 package nars.term.subst;
 
 import nars.term.Term;
-import nars.term.atom.Atomic;
-import nars.term.transform.Functor;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 

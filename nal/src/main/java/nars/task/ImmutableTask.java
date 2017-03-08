@@ -2,14 +2,12 @@ package nars.task;
 
 import jcog.Util;
 import nars.NAR;
-import nars.Op;
 import nars.Param;
 import nars.Task;
 import nars.budget.RawBudget;
 import nars.term.Compound;
 import nars.truth.Truth;
 import nars.truth.TruthDelta;
-import nars.util.signal.SignalTask;
 import nars.util.task.InvalidTaskException;
 import org.apache.commons.collections4.map.Flat3Map;
 import org.jetbrains.annotations.NotNull;
@@ -20,9 +18,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import static nars.Op.BELIEF;
-import static nars.Op.GOAL;
-import static nars.Op.NEG;
+import static nars.Op.*;
 import static nars.term.Terms.compoundOrNull;
 import static nars.time.Tense.ETERNAL;
 

@@ -4,10 +4,6 @@ import nars.NAR;
 import nars.Narsese;
 import nars.concept.Concept;
 import nars.nar.Default;
-import nars.task.LambdaQuestionTask;
-
-import static nars.$.$;
-import static nars.time.Tense.ETERNAL;
 
 /**
  * Created by me on 1/28/16.

@@ -2,7 +2,6 @@ package nars;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
-import com.github.fge.grappa.Grappa;
 import com.github.fge.grappa.matchers.MatcherType;
 import com.github.fge.grappa.matchers.base.AbstractMatcher;
 import com.github.fge.grappa.matchers.base.Matcher;

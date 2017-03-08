@@ -2,9 +2,9 @@ package nars.perf.nars.nar.perf;
 
 import jcog.data.random.XorShift128PlusRandom;
 import nars.conceptualize.DefaultConceptBuilder;
-import nars.test.agent.Line1DContinuous;
 import nars.index.term.map.CaffeineIndex;
 import nars.nar.Default;
+import nars.test.agent.Line1DContinuous;
 import nars.time.FrameTime;
 import nars.util.exe.Executioner;
 import nars.util.exe.InstrumentedExecutor;
@@ -14,8 +14,8 @@ import org.openjdk.jmh.annotations.BenchmarkMode;
 import org.openjdk.jmh.annotations.Mode;
 import org.openjdk.jmh.runner.RunnerException;
 
-import static nars.test.agent.Line1DContinuous.random;
 import static nars.perf.Main.perf;
+import static nars.test.agent.Line1DContinuous.random;
 
 /**
  * Created by me on 2/21/17.

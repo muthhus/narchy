@@ -1,10 +1,11 @@
 package nars.experiment.mario;
 
 import jcog.Util;
-import nars.*;
+import nars.NAR;
+import nars.NAgentX;
+import nars.Narsese;
 import nars.experiment.mario.sprites.Mario;
 import nars.video.PixelBag;
-import nars.video.Scale;
 
 import javax.swing.*;
 

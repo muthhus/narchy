@@ -1,6 +1,7 @@
 package nars;
 
-import static nars.$.*;
+import static nars.$.func;
+import static nars.$.p;
 
 /**
  * meta-controller of an NAgent

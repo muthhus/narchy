@@ -4,7 +4,7 @@ package nars.experiment.mario.sprites;
 import nars.experiment.mario.Art;
 import nars.experiment.mario.LevelScene;
 import nars.experiment.mario.Scene;
-import nars.experiment.mario.level.*;
+import nars.experiment.mario.level.Level;
 
 
 public class Mario extends Sprite

@@ -1,6 +1,6 @@
 package nars.experiment.mario.mapedit;
 
-import nars.experiment.mario.*;
+import nars.experiment.mario.Art;
 
 import javax.swing.*;
 import java.awt.*;

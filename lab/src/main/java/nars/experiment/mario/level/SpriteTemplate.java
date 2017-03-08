@@ -1,7 +1,9 @@
 package nars.experiment.mario.level;
 
 import nars.experiment.mario.LevelScene;
-import nars.experiment.mario.sprites.*;
+import nars.experiment.mario.sprites.Enemy;
+import nars.experiment.mario.sprites.FlowerEnemy;
+import nars.experiment.mario.sprites.Sprite;
 
 public class SpriteTemplate
 {

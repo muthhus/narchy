@@ -1,6 +1,6 @@
 package nars.experiment.mario;
 
-import nars.experiment.mario.level.*;
+import nars.experiment.mario.level.Level;
 
 import java.awt.*;
 import java.util.Random;

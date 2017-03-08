@@ -23,6 +23,7 @@ public class Line1DSimplestTest {
 
         NAR n = new Default();
 
+
         Line1DSimplest a = new Line1DSimplest(n);
 
         a.init();
@@ -32,9 +33,13 @@ public class Line1DSimplestTest {
 
         System.out.println("START initializing at target..\n");
         a.current = 0; a.target = 0;
+
         n.run(1);
 
         assertEquals(1f, a.rewardValue, 0.01f);
+
+        n.run(1);
+
         assertEquals( 0.81f, n.emotion.happy(), 0.01f);
         assertEquals( 0.0, n.emotion.sad(), 0.01f);
 

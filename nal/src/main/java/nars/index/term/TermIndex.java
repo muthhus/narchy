@@ -1,6 +1,5 @@
 package nars.index.term;
 
-import jcog.Util;
 import nars.*;
 import nars.concept.Concept;
 import nars.concept.PermanentConcept;

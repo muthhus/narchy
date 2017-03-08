@@ -3,7 +3,6 @@ package nars.table;
 import nars.NAR;
 import nars.Task;
 import nars.concept.CompoundConcept;
-import nars.concept.SensorConcept;
 import nars.truth.TruthDelta;
 import nars.util.signal.SignalTask;
 import org.jetbrains.annotations.NotNull;

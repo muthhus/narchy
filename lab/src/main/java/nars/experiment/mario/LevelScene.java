@@ -1,8 +1,10 @@
 package nars.experiment.mario;
 
-import nars.experiment.mario.level.*;
+import nars.experiment.mario.level.BgLevelGenerator;
+import nars.experiment.mario.level.Level;
+import nars.experiment.mario.level.LevelGenerator;
+import nars.experiment.mario.level.SpriteTemplate;
 import nars.experiment.mario.sprites.*;
-import spacegraph.audio.FixedSoundSource;
 
 import java.awt.*;
 import java.io.DataInputStream;

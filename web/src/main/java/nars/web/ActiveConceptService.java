@@ -1,12 +1,12 @@
 package nars.web;
 
+import jcog.bag.Bag;
 import jcog.bag.PLink;
 import jcog.data.MutableInteger;
 import nars.IO;
 import nars.NAR;
-import jcog.bag.Bag;
-import nars.concept.Concept;
 import nars.budget.BLink;
+import nars.concept.Concept;
 import nars.term.Term;
 import spacegraph.web.PeriodicWebsocketService;
 

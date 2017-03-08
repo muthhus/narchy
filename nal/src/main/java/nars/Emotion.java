@@ -2,7 +2,6 @@ package nars;
 
 import jcog.meter.ResourceMeter;
 import jcog.meter.event.BufferedFloatGuage;
-import jcog.meter.event.FloatGuage;
 import nars.term.Compound;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
