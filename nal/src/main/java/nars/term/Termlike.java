@@ -35,9 +35,9 @@ public interface Termlike {
      */
     boolean containsTerm(Termlike t);
 
-    default boolean containsTermRecursivelyAtemporally(@NotNull Term b) {
-        return false;
-    }
+//    default boolean containsTermRecursivelyAtemporally(@NotNull Term b) {
+//        return false;
+//    }
 
 
         /** whether any subterms (recursively) have a non-DTernal temporal relation */
@@ -138,7 +138,4 @@ public interface Termlike {
     int varPattern();
 
 
-    default boolean constant() {
-        return !hasAny(Op.VariableBits) && (varPattern() == 0); /* not included in the count */
-    }
 }

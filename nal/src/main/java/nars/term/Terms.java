@@ -35,7 +35,7 @@ import static nars.time.Tense.DTERNAL;
  *
  * @author me
  */
-public class Terms {
+public enum Terms { ;
 
     //@NotNull public static final int[] ZeroIntArray = new int[0];
     @NotNull
@@ -93,20 +93,6 @@ public class Terms {
         return l;
     }
 
-    public static boolean equalOrNegationOf(@Nullable Term a, @Nullable Term b) {
-        if (a == null || b == null)
-            return false;
-
-        if (a.equals(b)) {
-            return true;
-        }
-        if (a.op() == NEG) {
-            return ((Compound) a).term(0).equals(b);
-        } else if (b.op() == NEG) {
-            return ((Compound) b).term(0).equals(a);
-        }
-        return false;
-    }
 
 
     @Deprecated
@@ -271,16 +257,6 @@ public class Terms {
     }
 
 
-    /**
-     * brute-force equality test
-     */
-    public static boolean contains(@NotNull Term[] container, @NotNull Termlike v) {
-        for (Term e : container)
-            if (v.equals(e))
-                return true;
-        return false;
-    }
-
 
     @NotNull
     public static Term[] reverse(@NotNull Term[] arg) {
@@ -366,34 +342,6 @@ public class Terms {
     }
 
 
-//    public static List<Term> toList(Term[] t) {
-//        return Arrays.asList(t);
-//    }
-
-//    /**
-//     * makes a set from the array of terms
-//     */
-//    @NotNull
-//    public static Set<Term> toSet(@NotNull Term[] t) {
-//        if (t.length == 1)
-//            return Collections.singleton(t[0]);
-//        Set<Term> l = $.newHashSet(t.length);
-//        Collections.addAll(l, t);
-//        return l;
-//    }
-//
-//    @NotNull
-//    @SafeVarargs
-//    public static <T> Set<T> toSortedSet(@NotNull T... t) {
-//
-//        int l = t.length;
-//        if (l == 1)
-//            return Collections.singleton(t[0]);
-//
-//        TreeSet<T> s = new TreeSet();
-//        Collections.addAll(s, t);
-//        return s;
-//    }
 
     public static int maxLevel(@NotNull Term term) {
         int[] max = {0};
@@ -428,48 +376,11 @@ public class Terms {
         return arr;
     }
 
-//    @NotNull
-//    public static <T extends Term> Term[] filter(@NotNull T[] input, @NotNull IntObjectPredicate<T> filter) {
-//
-//        int s = input.length;
-//
-//        List<Term> l = $.newArrayList(s);
-//
-//        for (int i = 0; i < s; i++) {
-//            T t = input[i];
-//            if (filter.accept(i, t))
-//                l.add(t);
-//        }
-//        return !l.isEmpty() ? l.toArray(new Term[l.size()]) : Terms.empty;
-//    }
-
-//    @NotNull
-//    public static Term[] filter(@NotNull Term[] input, @NotNull IntPredicate filter) {
-//        return filter(input, (i, t) -> filter.test(i));
-//    }
-
-//    @NotNull
-//    public static Term[] filter(@NotNull Term[] input, @NotNull Predicate<Term> filter) {
-//        return filter(input, (i, t) -> filter.test(t));
-//    }
-
     @NotNull
     public static Term[] toArray(@NotNull Collection<Term> l) {
         int s = l.size();
         return s == 0 ? Terms.empty : l.toArray(new Term[s]);
     }
-
-//    @NotNull
-//    public static Term[] cloneTermsReplacing(@NotNull Term[] term, @NotNull Term from, @NotNull Term to) {
-//        Term[] y = new Term[term.length];
-//        int i = 0;
-//        for (Term x : term) {
-//            if (x.equals(from))
-//                x = to;
-//            y[i++] = x;
-//        }
-//        return y;
-//    }
 
     /**
      * returns lev distance divided by max(a.length(), b.length()
@@ -480,40 +391,6 @@ public class Terms {
         return Texts.levenshteinDistance(a, b) / ((float) len);
     }
 
-
-//    /** compare everything except dt() when not in image case */
-//    @Deprecated private static boolean equalsAnonymous(@NotNull Compound a, @NotNull Compound b) {
-//        int as = a.structure();
-//        if (Op.hasAny(as, Op.TemporalBits)) {
-//
-//            if (as == b.structure()) {
-//                Op ao = a.op();
-//                if (ao == b.op()) {
-//                    if (ao.image && a.dt() != b.dt()) //must match dt for image
-//                        return false;
-//
-//                    return equalsAnonymous(a.subterms(), b.subterms());
-//                }
-//            }
-//
-//            return false;
-//
-//        } else {
-//            //no temporal subterms
-//            return a.equals(b);
-//        }
-//
-//    }
-
-//    public static ImmutableSet<Term> unique(@NotNull Term c, @NotNull Predicate<Term> p) {
-//        UnifiedSet<Term> u = new UnifiedSet();
-//        c.recurseTerms(x -> {
-//            if (p.test(x)) {
-//                u.add(x);
-//            }
-//        });
-//        return u.toImmutable();
-//    }
 
     @Nullable
     public static Compound compoundOr(@Nullable Term possiblyCompound, Compound other) {
@@ -674,32 +551,6 @@ public class Terms {
     }
 
 
-//    /** produces a Map<Object,Int> of 'scores' of how much complexity would be reduced by replacing all occurrences of that subterm with a variable */
-//    @NotNull public static ObjectIntMap<Term> substAnalysis(Compound c, Predicate<Term> include, int minCount) {
-//
-//        HashBag<Term> uniques = subtermRepeats(c, include, t -> t.complexity());
-//
-//        if (!uniques.isEmpty()) {
-//
-//            //ObjectIntHashMap<Term> h = new ObjectIntHashMap<>(uniques.size());
-//            uniques.forEachWithOccurrences((subterm, score) -> {
-//                if (count >= minCount) {
-//                    int xc = subterm.complexity();
-//                    int score = xc * count;
-//                    h.put(subterm, score);
-//                }
-//            });
-//
-//            if (!h.isEmpty()) {
-//                h.compact();
-//                return h;
-//            }
-//
-//        }
-//
-//        return ObjectIntMaps.immutable.empty();
-//    }
-
     /**
      * counts the repetition occurrence count of each subterm within a compound
      */
@@ -716,20 +567,7 @@ public class Terms {
         return uniques;
     }
 
-    /**
-     * atemporally set equality AND with any outer negations removed
-     * NOTE: assumes that x must already contain only atemporal terms
-     */
-    public static boolean equalAtemporally(@NotNull Set<Term> x, @NotNull Set<Term> y) {
-        if (x.size() != y.size())
-            return false;
-        for (Term yy : y) {
-            @NotNull Term ay = $.terms.atemporalize(yy);
-            if (!x.contains(ay) && !x.contains($.neg(ay)))
-                return false;
-        }
-        return true;
-    }
+
 
     public static boolean equalAtemporally(@NotNull Termed a, @NotNull Termed b) {
         return equal(a.term(), b.term(), false, false);
@@ -802,21 +640,6 @@ public class Terms {
         public int score(Compound superterm, Term subterm);
     }
 
-    /**
-     * counts the repetition occurrence count of each subterm within a compound
-     */
-    @NotNull
-    public static HashBag<Term> subtermScore(@NotNull Compound c, @NotNull SubtermScorer score) {
-        HashBag<Term> uniques = new HashBag<>(c.volume());
-
-        c.recurseTerms((Term subterm, Compound superterm) -> {
-            int s = score.score(superterm, subterm);
-            if (s > 0)
-                uniques.addOccurrences(subterm, s);
-        });
-
-        return uniques;
-    }
 }
 
 

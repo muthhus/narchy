@@ -37,26 +37,6 @@ public interface TermContainer extends Termlike, Iterable<Term> {
 
 
 
-    @NotNull
-    static TermContainer union(@NotNull TermContainer a, @NotNull TermContainer b) {
-        if (a.equals(b))
-            return a;
-
-        int as = a.size();
-        int bs = b.size();
-        int maxSize = Math.max(as, bs);
-        TreeSet<Term> t = new TreeSet<>();
-        a.copyInto(t);
-        b.copyInto(t);
-        if (t.size() == maxSize) {
-            //the smaller is contained by the larger other
-            return as > bs ? a : b;
-        }
-        return TermSet.the(t);
-    }
-
-
-
 
     @NotNull
     default public TermContainer append(@NotNull Term x) {
@@ -211,19 +191,19 @@ public interface TermContainer extends Termlike, Iterable<Term> {
         return false;
     }
 
-    default boolean containsTermRecursivelyAtemporally(@NotNull Term b) {
-        b = b.unneg();
-        if (!impossibleSubTerm(b)) {
-            int s = size();
-            for (int i = 0; i < s; i++) {
-                Term x = term(i);
-                if (Terms.equalAtemporally(x,b) || ((x instanceof Compound) && (((Compound) x).containsTermRecursivelyAtemporally(b)))) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
+//    default boolean containsTermRecursivelyAtemporally(@NotNull Term b) {
+//        b = b.unneg();
+//        if (!impossibleSubTerm(b)) {
+//            int s = size();
+//            for (int i = 0; i < s; i++) {
+//                Term x = term(i);
+//                if (Terms.equalAtemporally(x,b) || ((x instanceof Compound) && (((Compound) x).containsTermRecursivelyAtemporally(b)))) {
+//                    return true;
+//                }
+//            }
+//        }
+//        return false;
+//    }
 
     @NotNull
     static boolean commonSubterms(@NotNull Compound a, @NotNull Compound b, boolean excludeVariables) {

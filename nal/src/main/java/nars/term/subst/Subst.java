@@ -40,9 +40,6 @@ public interface Subst  {
 //        return b[0];
 //    }
 
-    @Deprecated default @Nullable Functor getTransform(@NotNull Atomic t) {
-        return null;
-    }
 
 
 

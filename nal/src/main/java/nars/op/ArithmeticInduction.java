@@ -5,9 +5,11 @@ import nars.$;
 import nars.Op;
 import nars.term.Compound;
 import nars.term.Term;
+import nars.term.Terms;
 import nars.term.atom.Atomic;
 import nars.term.container.TermContainer;
 import nars.term.container.TermSet;
+import nars.term.container.TermVector;
 import nars.term.obj.IntTerm;
 import nars.term.obj.Termject.IntInterval;
 import org.eclipse.collections.api.list.primitive.ByteList;
@@ -50,7 +52,7 @@ public class ArithmeticInduction {
         Set<Term> yy = compress(xx, 2);
 
         if (!yy.equals(xx)) {
-            return TermSet.the(yy);
+            return TermVector.the(Terms.sorted(yy));
         }
 
         return args; //unchanged

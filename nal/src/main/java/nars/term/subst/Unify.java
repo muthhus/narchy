@@ -40,7 +40,6 @@ So it can be useful for a more easy to understand rewrite of this class TODO
 */
 public abstract class Unify extends Termunator implements Subst {
 
-
     @NotNull public final Random random;
 
     @Nullable public final Op type;
@@ -54,44 +53,16 @@ public abstract class Unify extends Termunator implements Subst {
     @NotNull
     public final TermIndex index;
 
-
     /**
      * variables whose contents are disallowed to equal each other
      */
     @NotNull public final Constraints constraints;
     @NotNull public final VersionMap.Reassigner<Term, Term> reassignerXY;//, reassignerYX;
 
-    /*
-    @NotNull public final Matcher matcherXY, matcherYX;
-    */
-
     @NotNull
     public final VersionMap<Term, Term> xy;
     @NotNull
     public final VersionMap<Term, Term> yx;
-
-
-//    @NotNull
-//    public final Versioned<Term> term;
-
-
-
-
-
-//    @NotNull
-//    @Override
-//    public String toString() {
-//        return "subst:{" +
-//                "now:" + versioning.now() +
-//                ", type:" + type +
-//                //", term:" + term +
-//                ", parent:" + parent +
-//                //"random:" + random +
-//                ", xy:" + xy +
-//                ", yx:" + yx +
-//                '}';
-//    }
-
 
     protected Unify(TermIndex index, @Nullable Op type, Random random, int stackMax) {
         this(index, type, random, new Versioning(stackMax));
@@ -123,7 +94,8 @@ public abstract class Unify extends Termunator implements Subst {
                         return false;
                 }
             }
-            return true;        }
+            return true;
+        }
     }
 
     protected Unify(TermIndex index, @Nullable Op type, Random random, @NotNull Versioning versioning) {
@@ -148,21 +120,12 @@ public abstract class Unify extends Termunator implements Subst {
         //reassignerYX = new VersionMap.Reassigner<>(constraintPredicate, yx);
     }
 
-//    @Override
-//    public Versioned<Term> get() {
-//        return new Versioned(versioning);
-//    }
 
     /**
      * called each time all variables are satisfied in a unique way
      */
     public abstract boolean onMatch();
-//    /**
-//     * called each time a match is not fully successful
-//     */
-//    public void onPartial() {
-//
-//    }
+
 
     @Override
     public final void clear() {
@@ -261,63 +224,16 @@ public abstract class Unify extends Termunator implements Subst {
     }
 
 
-//        if (x.equals(y)) {
-//            return true;
-//        } else {
-//
-//            final Op xOp = x.op();
-//            final Op yOp = y.op();
-//
-//            switch (xOp) {
-//                case OBJECT:
-//                    if (yOp ==OBJECT)
-//                        return ((Termject)x).match(y, this);
-//                    break; //continue to end
-//
-//
-//                case OPER:
-//                case ATOM:
-//                    //Atomic
-//                    break; //continue to end
-//
-//            }
-//
-//            return false;
-//            //return (matching(yOp)) && matchVarY(x, y);
-
-//    private static boolean hasAnyVar(Compound x) {
-//        return x.complexity()<x.volume() || x.firstEllipsis()!=null;
-//    }
-//
-//    private final boolean matchVarCommon(@NotNull Term /* var */ xVar, @NotNull Term /* var */ y) {
-//        return (equalOp) ?
-//                putCommon((Variable)xVar, (Variable)y) :
-//                putXY(xVar, y);
-//
-//        //            if ((y.op() == Op.VAR_QUERY && xVar.op() != Op.VAR_QUERY) ||
-//        //                    (y.op() != Op.VAR_QUERY && xVar.op() == Op.VAR_QUERY)) {
-//        //                return false;
-//        //            }
-//
-//    }
-
 
     /**
      * x's and y's ops already determined inequal
      */
     public final boolean matchVarX(@NotNull Term /* var */ x, @NotNull Term y) {
         Term x2 = xy(x);
-        //try {
             return (x2 != null) ?
                     unify(x2, y) :
                     putVarX(/* (Variable) */ x, y);
-//        } catch (StackOverflowError e) {
-//            //TEMPORARY FOR DEBUGGING
-//            e.printStackTrace();
-//            return false;
-//        }
 
-        //return matcherXY.computeMatch(x, y);
     }
 
 
@@ -329,21 +245,7 @@ public abstract class Unify extends Termunator implements Subst {
         Term y2 = yx.get(y);
         if (y2 != null) {
             return unify(x, y2);
-//            if (y.op() == y2.op()) {
-//                if (y2.equals(y))
-//                    return true;
-//
-//                int a = now();
-//                //experimental: x needs to be assigned to both ?
-//                if (putYX(x, y) && putYX(x, y2)) {
-//                    return true;
-//                } else {
-//                    revert(a);
-//                    return false;
-//                }
-//            } else {
-//                return unify(x, y2);
-//            }
+
         } else {
 
             //return putYX(x, y);
@@ -357,102 +259,14 @@ public abstract class Unify extends Termunator implements Subst {
             }
         }
         return false;
-//        System.out.println(x + " " + y + " " + y2);
-//        return (y2 != null) ?
-//                //(y2.equals(y) || unify(x, y2)) :
-//                (unify(x, y2)) :
-//                putYX(/*(Variable)*/ x, y);  // && putXY(y, /*(Variable)*/ x));
-
-        //return matcherYX.computeMatch(y, x);
 
     }
-
-//    public class Matcher extends VersionMap.Reassigner<Term,Term> {
-//
-//        public Matcher(BiPredicate<Term, Term> assigner, VersionMap map) {
-//            super(assigner, map);
-//        }
-//
-//        @Override
-//        public Versioned<Term> apply(Term x, Versioned<Term> vy) {
-//            Term t = vy!=null ? vy.get() : null;
-//            if (t!=null) {
-//                return match(t, y) ? vy : null;
-//            } else {
-//                return super.apply(x, vy);
-//            }
-//        }
-//
-//        public final boolean computeMatch(@NotNull Term x, @NotNull Term y) {
-//            this.y = y;
-//            return map.computeAssignable(x, this);
-//        }
-//    }
-
-
-
-
-
-
-//    private static void printComparison(int power, Compound cx, Compound cy) {
-//        System.out.println(cx.structureString() + " " + cx.volume() + "\t" + cx);
-//        System.out.println(cy.structureString() + " " + cy.volume() + "\t" + cy);
-//        System.out.println(!cx.impossibleToMatch(cy) + "|" + !cy.impossibleToMatch(cx) + " ---> " + (power >= 0) + " " + power);
-//        System.out.println();
-//    }
-
 
     @Override
     public final boolean isEmpty() {
-//        if (xy.isEmpty() && !yx.isEmpty()) {
-//            System.err.println("YX: " + yx);
-//        }
         return xy.isEmpty();
     }
 
-//    public final boolean matchCompoundWithEllipsis(@NotNull Compound X, @NotNull Compound Y) {
-//
-//
-////        final int numNonpatternVars;
-////        int ellipsisToMatch = Ellipsis.numUnmatchedEllipsis(X, this);
-////        if (ellipsisToMatch == 0) {
-////
-////            int ellipsisTotal = Ellipsis.numEllipsis(X);
-////            if (ellipsisTotal > 0) {
-////                //compute a virtual set of subterms based on an existing Ellipsis match
-////                Term XX = X.substituted(this);
-////                return (match(XX, Y));
-////            }
-////
-////            /** NORMAL: match subterms but do not collect for ellipsis */
-////            if (xsize != Y.size()) {
-////                return false;
-////            }
-////            numNonpatternVars = xsize;
-////        } else {
-////            numNonpatternVars = Ellipsis.countNumNonEllipsis(X);
-////        }
-//
-//        //TODO see if there is a volume or structural constraint that can terminate early here
-//
-//
-//        Ellipsis e = Ellipsis.firstEllipsis(X);
-//
-//
-////        if (!e.valid(numNonpatternVars, ysize)) {
-////            return false;
-////        }
-//
-//
-//        if (X.isCommutative()) {
-//            return matchEllipsedCommutative(
-//                    X, e, Y
-//            );
-//        } else {
-//            return matchCompoundWithEllipsisLinear(X, Y, e);
-//        }
-//
-//    }
 
     @Nullable
     public final Term resolve(@NotNull Term x) {
@@ -466,39 +280,15 @@ public abstract class Unify extends Termunator implements Subst {
     }
 
 
-    //    private boolean matchEllipsisImage(Compound x, Ellipsis e, Compound y) {
-//        /*  ex:
-//           (M --> (A..B=_..+))
-//        */
-//        putXY(e, new ShadowProduct(x.terms()));
-//        return false;
-//    }
-
     public boolean addTermutator(@NotNull Termutator x) {
-
-        //resolve termutator interferences that the addition may cause
-        Object xKey = x.key;
-
         List<Termutator> t = this.termutes;
         int s = t.size();
 
         for (int i = 0; i < s; i++) {
             Termutator y = t.get(i);
-            Object yKey = y.key;
-            if (xKey.equals(yKey)) {
-                //TODO maybe bifurcate a termutator tree with an OR branch?
-                return true;
+            if (x.equals(y)) {
+                return true; //TODO maybe bifurcate a termutator tree with an OR branch?
             }
-
-//            if (xKey.containsTerm((Termlike) yKey)) {
-//                //insert b before a since it is more specific
-//                t.add(i, x);
-//                return true;
-//            } /*else if (b.containsTerm((Term) a)) {
-//                //a contained by b; append to end (after a)
-//                continue;
-//            } */
-
         }
 
         return t.add(x);
@@ -510,53 +300,6 @@ public abstract class Unify extends Termunator implements Subst {
     }
 
 
-//    private boolean matchChoose2(Term[] x, MutableSet<Term> y) {
-//        int prePermute = now();
-//        MutableSet<Term> yCopy = y.clone(); //because matchChoose1 will remove on match
-//
-//        //initial shuffle
-//        if (random.nextBoolean()) {
-//            Term p = x[0];
-//            x[0] = x[1];
-//            x[1] = p;
-//        }
-//
-//        int startDivisor = powerDivisor;
-//        if (!powerDividable(2))
-//            return false;
-//
-//        boolean matched = false;
-//        for (int i = 0; i < 2; i++) {
-//
-//            boolean modified = false;
-//            if (matchChoose1(x[0], y)) {
-//                modified = true;
-//                if (matchChoose1(x[1], y)) {
-//                    matched = true;
-//                    break;
-//                }
-//            }
-//
-//            if (modified) {
-//                y.addAll(yCopy); //restore the original set if any where removed during an incomplete match
-//            }
-//
-//            revert(prePermute);
-//
-//            /* swap */
-//            Term p = x[0];
-//            x[0] = x[1];
-//            x[1] = p;
-//        }
-//
-//        powerDivisor = startDivisor;
-//        return matched;
-//    }
-
-
-////    /**
-////     * elimination
-////     */
     public boolean putVarX(@NotNull Term /* var */ x, @NotNull Term y) {
         if (putXY(x, y)) {
             if (x instanceof CommonVariable) {
@@ -574,12 +317,6 @@ public abstract class Unify extends Termunator implements Subst {
     public boolean putCommon(@NotNull Variable/* var */ x, @NotNull Variable y) {
         @NotNull Term common = CommonVariable.make((Variable) x, (Variable) y);
         return putXY(x, common) && putYX(y, common);
-//        if (putXY(x, common)) {
-//            if (putYX(y, common)) {
-//                return true;
-//            }
-//        }
-//        return false;
     }
 
     /**
@@ -589,7 +326,7 @@ public abstract class Unify extends Termunator implements Subst {
         int s = X.size();
         switch (s) {
             case 0:
-                return true;
+                return true; //shouldnt ever happen
             case 1:
                 return matchSub(X, Y, 0);
             case 2:
@@ -608,14 +345,14 @@ public abstract class Unify extends Termunator implements Subst {
         return true;
     }
 
-    public final boolean matchSub(@NotNull TermContainer X, @NotNull TermContainer Y, int i) {
+    final boolean matchSub(@NotNull TermContainer X, @NotNull TermContainer Y, int i) {
         return unify(X.term(i), Y.term(i));
     }
 
     /**
      * special match for size=2 compounds, with order reversal ability
      */
-    public final boolean matchLinear2(@NotNull TermContainer X, @NotNull TermContainer Y, int first) {
+    final boolean matchLinear2(@NotNull TermContainer X, @NotNull TermContainer Y, int first) {
         return matchSub(X, Y, first) && matchSub(X, Y, 1 - first);
     }
 
@@ -623,9 +360,8 @@ public abstract class Unify extends Termunator implements Subst {
     /**
      * returns true if the assignment was allowed, false otherwise
      */
-    public final boolean putYX(@NotNull Term x /* usually a Variable */, @NotNull Term y) {
+    final boolean putYX(@NotNull Term x /* usually a Variable */, @NotNull Term y) {
         return yx.tryPut(y,x);
-        //return reassignerYX.compute(y, x);
     }
 
     /**
@@ -635,26 +371,12 @@ public abstract class Unify extends Termunator implements Subst {
         return reassignerXY.compute(x, y);
     }
 
-//    @Override public final void cache(@NotNull Term x, @NotNull Term y) {
-//        //DISABLED
-//        //xy.tryPut(x, y);
-//    }
-
-
-//    public final boolean replaceXY(Term x /* usually a Variable */, @NotNull Versioned<Term> y) {
-//        return replaceXY(x, y.get());
-//    }
-
     public final boolean replaceXY(Term x /* usually a Variable */, @NotNull Term y) {
         return xy.tryPut(x, y);
     }
     public final void setXY(Term x /* usually a Variable */, @NotNull Term y) {
         xy.putConstant(x, y);
     }
-
-
-
-
 
     public final int now() {
         return versioning.size();
@@ -664,146 +386,11 @@ public abstract class Unify extends Termunator implements Subst {
         versioning.revert(then);
     }
 
-//    public void forEachVersioned(@NotNull BiConsumer<? super Term, ? super Versioned<Term>> each) {
-//        xy.forEachVersioned(each);
-//        //TODO yx also?
-//    }
-
-//
-//    public final boolean isFull() {
-//        return versioning.isFull();
-//    }
-
     @NotNull public final Term yxResolve(@NotNull Term y) {
         Term y1 = yx.get(y);
         return (y1 == null) ? y : y1;
     }
 
-
-
-
-//    public boolean forEachVersioned(@NotNull BiPredicate<? super Term, ? super Versioned<Term>> each) {
-//        return xy.forEachVersioned(each);
-//        //TODO yx also?
-//    }
-
-
-//    /**
-//     * VersionMap<Term,Term> which caches Variable keys, but allows any Term as keys (uncached)
-//     */
-//    public static final class VarCachedVersionMap extends VersionMap<Term, Term> implements Subst {
-//
-//        public VarCachedVersionMap(Versioning context) {
-//            super(context);
-//        }
-//
-////        public VarCachedVersionMap(Versioning context, Map<Term, Versioned<Term>> map) {
-////            super(context, map);
-////        }
-//
-//        @Override
-//        public void forEach(@NotNull BiConsumer<? super Term, ? super Term> each) {
-//            Map<Term, Versioned<Term>> m = this.map;
-//            if (!m.isEmpty()) {
-//                m.forEach((k, vv) -> {
-//                    Term v = vv.get();
-//                    if (v != null)
-//                        each.accept(k, v);
-//                });
-//            }
-//        }
-//
-//        public void forEachVersioned(@NotNull BiConsumer<? super Term, ? super Versioned<Term>> each) {
-//            Map<Term, Versioned<Term>> m = this.map;
-//            if (!m.isEmpty())
-//                m.forEach(each);
-//        }
-//
-//        /** returns true only if each evaluates true; if empty, returns true also */
-//        public boolean forEachVersioned(@NotNull BiPredicate<? super Term, ? super Versioned<Term>> each) {
-//            Map<Term, Versioned<Term>> m = this.map;
-//            if (!m.isEmpty()) {
-//                final boolean[] b = {true};
-//
-//                m.forEach((k,v)->{
-//
-//                    if (!each.test(k, v)) {
-//                        b[0] = false;
-//                    }
-//
-//                });
-//
-//                return b[0];
-//            }
-//            return true;
-//        }
-//
-//
-//        @Override
-//        public final Term term(Term t) {
-//
-//            assert(!(t instanceof GenericVariable)); //throw new RuntimeException("variables must be normalized");
-//
-//            Versioned<Term> v = map.get(t);
-//            return v == null ? null : v.get();
-//        }
-//
-//        /**
-//         * must inspect elements because the entries will be there but possibly null
-//         */
-//        @Override
-//        public boolean isEmpty() {
-//            if (!super.isEmpty()) {
-//                for (Versioned x : map.values()) {
-//                    if (x.get() != null) return false;
-//                }
-//            }
-//            return true;
-//        }
-//    }
-
-//    public boolean matchLinearReverse(@NotNull TermContainer X, @NotNull TermContainer Y) {
-//        for (int i = X.size() - 1; i >= 0; i--) {
-//            if (!matchSub(X, Y, i)) return false;
-//        }
-//        return true;
-//    }
-
-
-//    public void termute(int i, Termutator[] chain) {
-//
-//        int max = chain.length;
-//        if (i == max) {
-//            onMatch();
-//            return;
-//        }
-//
-//        Termutator t = chain[i];
-//        t.reset(this, i, chain);
-//
-//    }
-
-//    public final boolean putYX(@NotNull Term y /* usually a Variable */, Term x) {
-//        //yx.put(x, y);
-//
-//        VarCachedVersionMap yx = this.yx;
-//
-//        Versioned<Term> v = yx.map.get(x);
-//
-//        /*if (!assignable(x, y))
-//            return false;*/
-//
-//        if (v == null) {
-//            v = yx.getOrCreateIfAbsent(x);
-//        } else {
-//            Term vv = (v != null) ? v.get() : null;
-//            if (vv != null) {
-//                return y.equals(vv);
-//            }
-//        }
-//        v.set(y);
-//        return true;
-//    }
 
 }
 
