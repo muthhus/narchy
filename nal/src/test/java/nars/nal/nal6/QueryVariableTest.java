@@ -30,7 +30,7 @@ public class QueryVariableTest {
 
     @Test
     public void testQuery2() throws Narsese.NarseseException {
-        testQueryAnswered(64, 4);
+        testQueryAnswered(32, 4);
     }
 
     @Test
@@ -46,7 +46,7 @@ public class QueryVariableTest {
 
 
         Default nar = new Default();
-        nar.log();
+        //nar.log();
         Termed beliefTerm = nar.term(beliefString);
         nar.believe(beliefTerm, 1f, 0.9f);
         nar.ask(question, Tense.ETERNAL, (q,a)-> {

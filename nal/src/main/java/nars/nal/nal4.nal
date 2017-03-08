@@ -15,14 +15,14 @@
 
 
 //NAL4 backwards composition
-    ((/, %M, A.._=B..+) --> Z), (C --> B), task("?") |- ((/, %M, A.._=B..+) --> substitute((/, %M, A.._=B..+),B,C)), (Belief:BeliefStructuralDeduction, Punctuation:Belief)
+    ((/, %M, A.._=B..+) --> Z), (C --> B), task("?") |- ((/, %M, A.._=B..+) --> substitute((/, %M, A.._=B..+),B,C,strict)), (Belief:BeliefStructuralDeduction, Punctuation:Belief)
     ((\, N, A..+) --> Z), (N --> R), task("?") |- ((\, N, A..+) --> (\, R, A..+)), (Belief:BeliefStructuralDeduction, Punctuation:Belief)
 
 
 ////composition on both sides of a statement  TODO - quests handling of these
-    ((A..+) --> Z), (X --> Y), neq(X,(A..+)), task("?") |- ((A..+) --> substitute((A..+),X,Y)), (Belief:BeliefStructuralDeduction, Punctuation:Belief)
-    ((A..+) <-> Z), (X <-> Y), neq(X,(A..+)), neq(Y,(A..+)), task("?") |- ((A..+) <-> substitute((A..+),X,Y)), (Belief:BeliefStructuralDeduction, Punctuation:Belief)
-
+    ((A..+) --> Z), (X --> Y), neq(X,(A..+)), task("?") |- ((A..+) --> substitute((A..+),X,Y,strict)), (Belief:BeliefStructuralDeduction, Punctuation:Belief)
+    (Z --> (A..+)), (X --> Y), neq(X,(A..+)), task("?") |- (substitute((A..+),X,Y,strict) --> (A..+)), (Belief:BeliefStructuralDeduction, Punctuation:Belief)
+    ((A..+) <-> Z), (X <-> Y), neq(X,(A..+)), neq(Y,(A..+)), task("?") |- ((A..+) <-> substitute((A..+),X,Y,strict)), (Belief:BeliefStructuralDeduction, Punctuation:Belief)
 
 
 

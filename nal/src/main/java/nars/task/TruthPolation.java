@@ -55,7 +55,7 @@ public enum TruthPolation  {
                 if (t instanceof DynamicBeliefTask)
                     continue; //ignore dynamic belief tasks
 
-                float tw = t.confWeight(when, dur);
+                float tw = t.evi(when, dur);
                 if (tw > 0) {
                     illumination += tw;
                     weightedValue += tw * t.freq();

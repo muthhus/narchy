@@ -521,13 +521,13 @@ public interface Task extends Budgeted, Truthed, Stamp, Termed<Compound>, Tasked
     }
 
     default float conf(long when, float dur) {
-        float cw = confWeight(when, dur);
+        float cw = evi(when, dur);
         return cw == cw ? w2c(cw) : Float.NaN;
     }
 
     @Nullable
     default Truth truth(long when, float dur, float minConf) {
-        float cw = confWeight(when, dur);
+        float cw = evi(when, dur);
         if (cw == cw && cw > 0) {
 
             float conf = w2c(cw);
@@ -540,11 +540,12 @@ public interface Task extends Budgeted, Truthed, Stamp, Termed<Compound>, Tasked
 
 
     /**
+     * amount of evidence aka evidence weight
      * @param when time
      * @param dur duration period across which evidence can decay before and after its defined start/stop time
      * @return value >= 0 indicating the evidence
      */
-    float confWeight(long when, float dur);
+    float evi(long when, float dur);
 
 
     default long mid() {

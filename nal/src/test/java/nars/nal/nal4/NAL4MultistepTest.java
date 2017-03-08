@@ -27,22 +27,21 @@ public class NAL4MultistepTest extends AbstractNALTest {
         return AbstractNALTest.nars(4);
     }
 
-    //this test only works because the confidence matches, but the related task has insufficient budget
     @Test
     public void nal4_everyday_reasoning() throws Narsese.NarseseException {
-        int time = 2700;
+        int time = 500;
 
         //Global.DEBUG = true;
 
         TestNAR tester = test();
 
-        //tester.log();
+        tester.log();
 
         //(({tom},{sky})-->likes).  <{tom} --> cat>. <({tom},{sky}) --> likes>. <(cat,[blue]) --> likes>?
 
         tester.believe("<{sky} --> [blue]>",1.0f,0.9f); //en("the sky is blue");
         tester.believe("<{tom} --> cat>",1.0f,0.9f); //en("tom is a cat");
-        tester.believe("<({tom},{sky}) --> likes>",1.0f,0.9f); //en("tom likes the sky");
+        tester.believe("likes({tom},{sky})",1.0f,0.9f); //en("tom likes the sky");
 
         tester.input( "$0.9;0.9$ likes(cat,[blue])?"); //cats like blue?
 

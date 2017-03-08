@@ -117,7 +117,7 @@ public class DefaultBeliefTable implements BeliefTable {
                 if (ete == null) {
                     return tmp;
                 } else {
-                    return (ete.confWeight(when, dur) > tmp.confWeight(when, dur)) ?
+                    return (ete.evi(when, dur) > tmp.evi(when, dur)) ?
                             ete : tmp;
                 }
             }

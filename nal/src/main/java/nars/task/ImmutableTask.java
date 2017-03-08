@@ -188,26 +188,18 @@ public class ImmutableTask extends RawBudget implements Task {
     }
 
 
-    @Override
-    public float confWeight(long when, float dur) {
-//        if (!isBeliefOrGoal())
-//            throw new UnsupportedOperationException();
-
-        long a = start();
+    @Override public float evi(long when, float dur) {
 
         Truth t = truth();
+        long a = start();
         float cw = t.evi();
+
         if (a == ETERNAL)
             return cw;
-        else if (when == ETERNAL)// || when == now) && o == when) //optimization: if at the current time and when
+        else if (when == ETERNAL)
             return t.eternalizedEvi();
         else {
             long z = end();
-            //float dur = dur();
-
-//            if (z - start < dur)
-//                z = Math.round(start + dur); //HACK
-
 
             if ((when >= a) && (when <= z)) {
 

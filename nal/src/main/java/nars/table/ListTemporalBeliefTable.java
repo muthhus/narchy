@@ -332,7 +332,7 @@ public class ListTemporalBeliefTable extends MultiRWFasterList<Task> implements 
 
     static final float rankTemporalByConfidence(@Nullable Task t, long when, long now, float dur) {
 
-        float r = (t != null) ? t.confWeight(when, dur) : Float.NEGATIVE_INFINITY;// * (1+t.range()) * t.qua();
+        float r = (t != null) ? t.evi(when, dur) : Float.NEGATIVE_INFINITY;// * (1+t.range()) * t.qua();
 
 //        if (t!=null && t.start() > now+dur) {
 //            r *=2; //experimental future (prediction) preference
