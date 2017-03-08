@@ -11,7 +11,6 @@ import jcog.data.byt.DynByteSeq;
 import jcog.data.random.XorShift128PlusRandom;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.math3.stat.descriptive.SynchronizedDescriptiveStatistics;
-import org.eclipse.collections.impl.factory.Maps;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -20,7 +19,6 @@ import java.net.InetSocketAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.Arrays;
-import java.util.Map;
 import java.util.function.Consumer;
 
 /**
@@ -34,10 +32,12 @@ public class UDPeer extends UDP {
 
     public static final byte PING = (byte)'P';
     public static final byte PONG = (byte)'p';
+    public static final byte SAY = (byte)'s';
 
-    private static final byte DEFAULT_PING_TTL = 4;
+    private static final byte DEFAULT_PING_TTL = 3;
 
     private final InetSocketAddress me;
+
 
 
     static class Msg extends DynByteSeq {
@@ -72,6 +72,15 @@ public class UDPeer extends UDP {
 
             if (payload.length > 0)
                 write(payload);
+
+            hash = hash();
+        }
+
+        public Msg(byte cmd, byte ttl, InetSocketAddress origin, int payload) {
+            super(HEADER_SIZE);
+            init(cmd, ttl, origin);
+
+            writeInt(payload);
 
             hash = hash();
         }
@@ -115,8 +124,7 @@ public class UDPeer extends UDP {
             int ttl = ttl();
             if (ttl <= 0)
                 return false;
-            bytes[TTL_BYTE]--;
-            return true;
+            return (--bytes[TTL_BYTE]) >= 0;
         }
 
         @Nullable public static Msg get(byte[] data) {
@@ -135,7 +143,7 @@ public class UDPeer extends UDP {
             return length() - PAYLOAD_START_BYTE;
         }
 
-        public byte[] payload(int start, int end) {
+        public byte[] data(int start, int end) {
             return Arrays.copyOfRange(bytes, PAYLOAD_START_BYTE + start, PAYLOAD_START_BYTE + end );
         }
 
@@ -144,12 +152,16 @@ public class UDPeer extends UDP {
             if (dataLength() != 8 )
                 throw new RuntimeException("unexpected payload");
 
-            return Longs.fromByteArray(payload(0, 8));
+            return Longs.fromByteArray(data(0, 8));
         }
 
         public boolean originEquals(byte[] addrBytes) {
             int addrLen = addrBytes.length;
             return Arrays.equals(bytes, PORT_BYTE, PORT_BYTE + addrLen, addrBytes, 0, addrLen);
+        }
+
+        public String dataString() {
+            return new String(data(0, dataLength()));
         }
     }
 
@@ -206,7 +218,7 @@ public class UDPeer extends UDP {
 
             @Override
             public void onAdded(UDProfile p) {
-                System.out.println(UDPeer.this + " connected " + p.addr);
+                System.out.println(UDPeer.this + " connected " + p.addr + "( " + summary() + ")");
             }
 
             @Override
@@ -261,6 +273,10 @@ public class UDPeer extends UDP {
         }
     }
 
+    public void say(String msg, byte ttl) {
+        send(new Msg(SAY, ttl, me, msg.getBytes(UTF8) ), 1f);
+    }
+
     /** send to a specific known recipient */
     public void send(Msg o, InetSocketAddress to) {
         outBytes(o.array(), to);
@@ -277,7 +293,7 @@ public class UDPeer extends UDP {
         if (m == null)
             return;
 
-        float pri = 0.5f;
+        float pri = 1f;
 
         PLink<Msg> pm = new RawPLink<>(m, pri);
         boolean seen = this.seen.put(pm)!=pm;
@@ -295,10 +311,16 @@ public class UDPeer extends UDP {
         switch (m.cmd()) {
             case PONG:
                 connected = recvPong(from, m, connected, now);
+                continues = false;
                 break;
             case PING:
                 sendPong(from, m); //continue below
                 break;
+            case SAY:
+                System.out.println( me + " recv: " + m.dataString() + " (ttl=" + m.ttl() + ")" );
+                break;
+            default:
+                return;
         }
 
         if (connected==null) {

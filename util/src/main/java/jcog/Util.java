@@ -1409,7 +1409,7 @@ public enum Util { ;
             Thread.sleep(periodMS);
         } catch (InterruptedException e) {
             //TODO
-            //e.printStackTrace();
+            e.printStackTrace();
         }
     }
 

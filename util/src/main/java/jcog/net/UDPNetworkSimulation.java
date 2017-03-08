@@ -24,13 +24,20 @@ public class UDPNetworkSimulation {
             };
         }
 
-        for (int i = 1; i < size; i++) {
-            peers[i].ping(peers[i-1].me());
-        }
+        //for (int j = 0; j < 3; j++) {
+            //System.out.println("round " + j);
+
+            for (int i = 0; i < size; i++) {
+                peers[i].ping(peers[ (i + 1) % size ].me());
+                //peers[i].ping(peers[ (i + 2) % size ].me());
+            }
+
+        ///}
 
         Util.sleep(1000);
 
-        //peers[1].send(Maps.mutable.of("_", "y"), 0.5f);
+        peers[0].say("hi", (byte)6);
+
 
         Util.sleep(10000);
 
@@ -38,6 +45,6 @@ public class UDPNetworkSimulation {
     }
 
     public static void main(String[] args) throws SocketException, UnknownHostException {
-        new UDPNetworkSimulation(16);
+        new UDPNetworkSimulation(8);
     }
 }
