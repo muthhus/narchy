@@ -139,7 +139,13 @@ public class Interval {
 		return a+".."+b;
 	}
 
-	public static Interval intersect(long x1, long x2, long y1, long y2) {
+	public static long intersectLength(long x1, long y1, long x2, long y2) {
+		long a = max(x1, x2);
+		long b = min(y1, y2);
+		return a > b ? -1 : b - a;
+	}
+
+	@Nullable public static Interval intersect(long x1, long x2, long y1, long y2) {
 		return new Interval(x1, x2).intersection(new Interval(y1, y2));
 	}
 	public static Interval union(long x1, long x2, long y1, long y2) {

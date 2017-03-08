@@ -187,7 +187,7 @@ public interface Truth extends Truthed {
 
 
 
-    default Truth confWeightMult(float f) {
+    default Truth eviMult(float f) {
         return (f == 1f) ? this : withConf(w2c(evi() * f));
     }
 

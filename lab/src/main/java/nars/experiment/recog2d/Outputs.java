@@ -122,7 +122,7 @@ public class Outputs {
 //                        } else {
                             //return d!=null ? d.confWeightMult(0.5f) : null;
                         //}
-                        return d!=null ? d.confWeightMult(goalInfluence) : null;
+                        return d!=null ? d.eviMult(goalInfluence) : null;
                     });
                 }
 //                        a.sense(namer.apply(i), () -> {

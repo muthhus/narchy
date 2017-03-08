@@ -1,6 +1,5 @@
 package nars.table;
 
-import jcog.Util;
 import jcog.list.FasterList;
 import jcog.list.MultiRWFasterList;
 import jcog.math.Interval;
@@ -25,6 +24,7 @@ import java.util.Iterator;
 import java.util.function.Consumer;
 
 import static java.lang.Math.abs;
+import static jcog.math.Interval.intersectLength;
 
 /**
  * stores the items unsorted; revection manages their ranking and removal
@@ -186,7 +186,6 @@ public class ListTemporalBeliefTable extends MultiRWFasterList<Task> implements 
         float c = inserted.conf();
         long is = inserted.start();
         long ie = inserted.end();
-        Interval ii = new Interval(is, ie);
 
         float penaltySum = 0;
 
@@ -204,10 +203,10 @@ public class ListTemporalBeliefTable extends MultiRWFasterList<Task> implements 
 
                     long xs = x.start();
                     long xe = x.end();
-                    Interval overlap = ii.intersection(new Interval(xs, xe));
-                    if (overlap != null) {
+                    long overlapLength = Interval.intersectLength(is, ie, xs, xe);
+                    if (overlapLength >= 0) {
 
-                        float penalty = dqf * ((1f + overlap.length()) / (1f + (xe - xs)));
+                        float penalty = dqf * ((1f + overlapLength) / (1f + (xe - xs)));
                         if (penalty > Param.BUDGET_EPSILON) {
                             Budget b = x.budget();
                             float pBefore = b.priSafe(0), pAfter;
@@ -356,14 +355,15 @@ public class ListTemporalBeliefTable extends MultiRWFasterList<Task> implements 
     @NotNull
     static public Function<Task, Float> rankMatchMerge(@NotNull Task y, long now, float dur) {
 
-        //prefer (when selecting by minimum rank:)
-        //  less freq delta
-        //  less time delta
-        //  more time from now
-        //  less range
+        //prefer
+        //  same frequency
+        //  low confidence
+        //  long time from now
+        //  non-zero overlap with the task
 
         long ys = y.start();
         long ye = y.end();
+        float yRange = (ye - ys);
         float yf = y.freq();
 
         return x -> {
@@ -375,13 +375,14 @@ public class ListTemporalBeliefTable extends MultiRWFasterList<Task> implements 
 //            float xtc = x.conf(yo);
 //            if (xtc!=xtc) xtc = 0;
 
-            return (1f + (1f - abs(x.freq() - yf)))
-                    //* (1f + (1f - xtc))
-                    //* (1f + 1f / (1f + x.range()))
-                    //* (1f + 1f / (1f + x.dur()))
-                    * (1f
-                    + TruthPolation.evidenceDecay(1, dur,
-                    abs(xs - ys) + abs(xe - ye) + Math.min(Math.abs(xe-now), Math.abs(xs-now)))
+            long overlap = intersectLength(ys, ye, xs, xe);
+            if (overlap == -1)
+                return Float.NEGATIVE_INFINITY; //dont allow merge if no overlap
+
+            return (1f + (1f - abs(x.freq() - yf))) *
+                   (1f + (1f - x.conf())) *
+                   (1f + Math.min(Math.abs(xe-now), Math.abs(xs-now)) *
+                   (1f + overlap / yRange)
             )
                     ;
         };
@@ -441,7 +442,7 @@ public class ListTemporalBeliefTable extends MultiRWFasterList<Task> implements 
     /**
      * t is the target time of the new merged task
      */
-    private Task merge(@NotNull Task a, @NotNull Task b, long now, float confMin, float dur) {
+    @Nullable private Task merge(@NotNull Task a, @NotNull Task b, long now, float confMin, float dur) {
 
         float ac = a.evi();
         float bc = b.evi();
@@ -459,7 +460,7 @@ public class ListTemporalBeliefTable extends MultiRWFasterList<Task> implements 
 
             double factor = (double) ac / (ac + bc);
 
-            int tolerance = (int)Math.ceil(dur/2f); //additional tolerance range allowing the tasks to overlap and replaced with a union rather than a point sample
+            int tolerance = 0; //(int)Math.ceil(dur/2f); //additional tolerance range allowing the tasks to overlap and replaced with a union rather than a point sample
             Interval ai = new Interval(a.start() - tolerance, a.end() + tolerance);
             Interval bi = new Interval(b.start() - tolerance, b.end() + tolerance);
 
@@ -473,16 +474,16 @@ public class ListTemporalBeliefTable extends MultiRWFasterList<Task> implements 
                 mergedEnd = union.b;
                 //(long) Math.round(Util.lerp(factor, a.end(), b.end()));
 
-//                float timeRatio = Math.min(1f,
-//                        (float) Math.max(1, overlap.length()) /
-//                                Math.max(1, union.length())
-//                );
-//                t = t.confWeightMult(timeRatio);
+                float rangeEquality = 0.5f / (1f + Math.abs(ai.length() - bi.length()));
+                float timeRatio = rangeEquality + (1f-rangeEquality) * ((float) (overlap.length())) / (1 + union.length());
+                t = t.eviMult(timeRatio);
             } else {
                 //create point sample of duration width
-                double mergedMid = Math.round(Util.lerp(factor, a.mid(), b.mid()));
-                mergedStart = (long) Math.floor(mergedMid - dur/2f);
-                mergedEnd = (long) Math.ceil(mergedMid + dur/2f);
+//                double mergedMid = Math.round(Util.lerp(factor, a.mid(), b.mid()));
+//                mergedStart = (long) Math.floor(mergedMid - dur/2f);
+//                mergedEnd = (long) Math.ceil(mergedMid + dur/2f);
+
+                return null; //shouldnt happen
             }
 
             if (t != null)

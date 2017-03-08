@@ -67,7 +67,7 @@ abstract public class Solve extends AtomicBoolCondition {
 
                 float eFactor = m.nar.derivedEvidenceGain.asFloat();
                 if (eFactor != 1) {
-                    if ((t = t.confWeightMult(eFactor))==null)
+                    if ((t = t.eviMult(eFactor))==null)
                         return false;
                 }
 

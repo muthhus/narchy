@@ -621,10 +621,10 @@ public class Tetris extends NAgentX {
             metaT.trace = true;
             n.onCycle(metaT.nar::cycle);
             //metaT.nar.log();
-            m.onTask(t -> {
-                if (t instanceof DerivedTask)
-                    System.out.println("meta: " + t);
-            });
+//            m.onTask(t -> {
+//                if (t instanceof DerivedTask)
+//                    System.out.println("meta: " + t);
+//            });
             //window(conceptsTreeChart(m, 64), 800, 600);
             //NAgentX.chart( metaT );
 
