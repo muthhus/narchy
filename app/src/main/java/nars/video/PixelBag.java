@@ -40,7 +40,7 @@ public abstract class PixelBag implements Bitmap2D {
     public final float[][] pixels;
 
     /* > 0 */
-    float minZoomOut = 0.2f;
+    float minZoomOut = 0.01f;
 
     /**
      * increase >1 to allow zoom out beyond input size (ex: thumbnail size)
@@ -52,6 +52,8 @@ public abstract class PixelBag implements Bitmap2D {
     private float fr = 1f;
     private float fg = 1f;
     private float fb = 1f;
+    float minClarity = 0.15f, maxClarity = 1f;
+    private boolean inBounds = false;
 
 
     public static PixelBag of(Supplier<BufferedImage> bb, int px, int py) {
@@ -108,27 +110,37 @@ public abstract class PixelBag implements Bitmap2D {
         int sw = sw();
         int sh = sh();
 
-        float ew = max(Z * sw * maxZoomOut, sw * minZoomOut);
-        float eh = max(Z * sh * maxZoomOut, sh * minZoomOut);
+        float ew, eh;
+        ew = max(Z * sw * maxZoomOut, sw * minZoomOut);
+        eh = max(Z * sh * maxZoomOut, sh * minZoomOut);
 
 
-        //margin size
-        float mw, mh;
-        if (ew > sw) {
-            mw = 0;
+        float minX, maxX, minY, maxY;
+        if (inBounds) {
+            //margin size
+            float mw, mh;
+            if (ew > sw) {
+                mw = 0;
+            } else {
+                mw = sw - ew;
+            }
+            if (eh > sh) {
+                mh = 0;
+            } else {
+                mh = sh - eh;
+            }
+            minX = (X * mw);
+            maxX = minX + ew;
+            minY = (Y * mh);
+            maxY = minY + eh;
         } else {
-            mw = sw - ew;
-        }
-        if (eh > sh) {
-            mh = 0;
-        } else {
-            mh = sh - eh;
+            minX = (X * sw) - ew/2f;
+            maxX = (X * sw) + ew/2f;
+            minY = (Y * sh) - eh/2f;
+            maxY = (Y * sh) + eh/2f;
         }
 
-        float minX = (X * mw);
-        float maxX = minX + ew;
-        float minY = (Y * mh);
-        float maxY = minY + eh;
+
 
 //        System.out.println(X + "," + Y + "," + Z + ": [" + (minX+maxX)/2f + "@" + minX + "," + maxX + "::"
 //                                                         + (minY+maxY)/2f + "@" + minY + "," + maxY + "] <- aspect=" + eh + "/" + ew);
@@ -144,8 +156,6 @@ public abstract class PixelBag implements Bitmap2D {
         float pxf = px - 1;
         float pyf = py - 1;
 
-        float minClarity = 0.15f / frameRate, maxClarity = 1f / frameRate;
-
         float fr = this.fr, fg = this.fg, fb = this.fb;
         float fSum = fr + fg + fb;
 
@@ -153,6 +163,7 @@ public abstract class PixelBag implements Bitmap2D {
         float yRange = maxY-minY;
 
         int supersampling = Math.min((int) Math.floor(xRange / px / 2f), (int) Math.floor(yRange / py / 2f));
+
 
         for (int ly = 0; ly < py; ly++) {
             float l = ly / pyf;
@@ -186,7 +197,13 @@ public abstract class PixelBag implements Bitmap2D {
                 int samples = 0;
                 float R = 0, G = 0, B = 0;
                 for (int esx = Math.max(0, sx - supersampling); esx <= Math.min(sw - 1, sx + supersampling); esx++) {
+
+                    if (esx < 0 || esx >= sw )
+                        continue;
+
                     for (int esy = Math.max(0, sy - supersampling); esy <= Math.min(sh - 1, sy + supersampling); esy++) {
+                        if (esy < 0 || esy >= sh )
+                            continue;
 
                         int RGB = rgb(esx, esy);
                         R += Bitmap2D.decodeRed(RGB);
@@ -201,12 +218,25 @@ public abstract class PixelBag implements Bitmap2D {
         }
     }
 
+    public void setClarity(float minClarity, float maxClarity) {
+        this.minClarity = minClarity;
+        this.maxClarity = maxClarity;
+    }
+
     abstract public int rgb(int sx, int sy);
 
     @Override
     public void see(EachPixelRGB p) {
         throw new UnsupportedOperationException("yet");
 
+    }
+
+    public void setMinZoomOut(float minZoomOut) {
+        this.minZoomOut = minZoomOut;
+    }
+
+    public void setMaxZoomOut(float maxZoomOut) {
+        this.maxZoomOut = maxZoomOut;
     }
 
     @Override

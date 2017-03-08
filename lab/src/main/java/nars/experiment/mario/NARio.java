@@ -3,6 +3,8 @@ package nars.experiment.mario;
 import jcog.Util;
 import nars.*;
 import nars.experiment.mario.sprites.Mario;
+import nars.video.PixelBag;
+import nars.video.Scale;
 
 import javax.swing.*;
 
@@ -41,12 +43,28 @@ public class NARio extends NAgentX {
 
 
         try {
-            senseCamera("camF", ()->mario.image, 60, 40, (v) -> t(v, alpha())).setResolution(0.05f);
+            PixelBag cc = PixelBag.of(() -> mario.image, 40, 40);
+            cc.setClarity(0.5f, 1f);
+            nar.onCycle(()->{
+                LevelScene scene = (LevelScene) mario.scene;
+               if (mario.scene instanceof LevelScene) {
+                   float xCam = scene.xCam;
+                   float yCam = scene.yCam;
+                   Mario M = ((LevelScene) this.mario.scene).mario;
+                   float x = (-160 + M.x - xCam) / 320f;
+                   float y = (-120 + M.y - yCam) / 240f;
+                   cc.setXRelative(x);
+                   cc.setYRelative(y);
+                   cc.setZoom(0.05f);
+               }
+               //cc.setXRelative( mario.)
+            });
+            senseCamera("camF", cc, (v) -> t(v, alpha())).setResolution(0.02f);
             //senseCameraRetina("camZ", ()->mario.image, 30, 18, (v) -> t(v, alpha)).setResolution(0.1f);
 
 
-            senseNumberDifference($("nario(x,v)"), ()-> mario.scene instanceof LevelScene ? ((LevelScene)mario.scene).mario.x : 0);
-            senseNumberDifference($("nario(y,v)"), ()-> mario.scene instanceof LevelScene ? ((LevelScene)mario.scene).mario.y : 0);
+            senseNumberDifference($("nario(x,v)"), ()-> mario.scene instanceof LevelScene ? ((LevelScene) mario.scene).mario.x : 0);
+            senseNumberDifference($("nario(y,v)"), ()-> mario.scene instanceof LevelScene ? ((LevelScene) mario.scene).mario.y : 0);
 
             actionTriState($("nario(x)"), i -> {
                boolean n, p;
@@ -105,7 +123,7 @@ public class NARio extends NAgentX {
 
             return new NARio(n);
 
-        }, 16, 2, -1);
+        }, 24, 2, -1);
 
 
 //        ArrayList<PLink<Concept>> x = Lists.newArrayList(nar.conceptsActive());

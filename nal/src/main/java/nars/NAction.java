@@ -88,7 +88,9 @@ public interface NAction {
                 default:
                     throw new RuntimeException();
             }
+            //return d!=null ? $.t(f, d.conf()) : null;
             return $.t(f, nar().confidenceDefault(Op.BELIEF));
+
         });
 
         actions().add(m);
