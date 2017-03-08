@@ -277,21 +277,11 @@ public class Inperience extends Leak<Task, BLink<Task>> {
     /**
      * change all query variables to dep vars
      */
-    final static CompoundTransform<Compound, Term> queryToDepVar = new CompoundTransform<Compound, Term>() {
-
-        @Override
-        public boolean test(Term o) {
-            return o.hasVarQuery();
+    final static CompoundTransform queryToDepVar = (parent, subterm) -> {
+        if (subterm.op() == VAR_QUERY) {
+            return $.varDep((((Variable) subterm).id()));
         }
-
-        @Nullable
-        @Override
-        public Term apply(@Nullable Compound parent, @NotNull Term subterm) {
-            if (subterm.op() == VAR_QUERY) {
-                return $.varDep((((Variable) subterm).id()));
-            }
-            return subterm;
-        }
+        return subterm;
     };
 
 

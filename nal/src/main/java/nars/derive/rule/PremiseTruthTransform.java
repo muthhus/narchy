@@ -16,7 +16,7 @@ import static nars.Op.INH;
 /**
  * Created by me on 6/9/16.
  */
-abstract class PremiseTruthTransform implements CompoundTransform<Compound, Term>, Function<Term,Term> {
+abstract class PremiseTruthTransform implements CompoundTransform, Function<Term,Term> {
 
     public final boolean includeBelief, includeDesire;
 
@@ -33,29 +33,25 @@ abstract class PremiseTruthTransform implements CompoundTransform<Compound, Term
 
     @Nullable
     @Override
-    public Term apply(@NotNull Compound parent, @NotNull Term subterm) {
-
-        Compound tf = (Compound) subterm;
-        Term func = tf.term(0);
-        Term mode = tf.term(1);
-
-        if (func.equals(TruthOperator.NONE))
-            return subterm; //no change
-
-        if ((!includeDesire && mode.equals(desire)) || (!includeBelief && mode.equals(belief)))
-            return $.inh(TruthOperator.NONE, mode);
-
-        return $.inh(apply(func), mode);
-
-    }
-
-
-    @Override
-    public boolean test(@NotNull Term o) {
+    public Term apply(@NotNull Compound parent, @NotNull Term o) {
         if (o.op() == INH) {
             Term pred = ((Compound) o).term(1);
-            return (pred.equals(belief)) || (pred.equals(desire));
+            if ((pred.equals(belief)) || (pred.equals(desire))) {
+                Compound tf = (Compound) o;
+                Term func = tf.term(0);
+                Term mode = tf.term(1);
+
+                if (func.equals(TruthOperator.NONE))
+                    return o; //no change
+
+                if ((!includeDesire && mode.equals(desire)) || (!includeBelief && mode.equals(belief)))
+                    return $.inh(TruthOperator.NONE, mode);
+
+                return $.inh(apply(func), mode);
+
+            }
         }
-        return false;
+        return o;
     }
+
 }

@@ -1120,6 +1120,7 @@ public class NAL8Test extends AbstractNALTest {
                 .input("((--,(in)) ==>+0 ((happy)&&(--,(out)))).")
                 .mustDesire(cycles, "(in)", 0f, 0.73f);
     }
+
     @Test public void testGoalImplComponentTimedSubs() {
         test()
                 .input("(happy)! :|:")

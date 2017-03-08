@@ -54,16 +54,9 @@ public class PostCondition implements Serializable //since there can be multiple
 
 
     static final Atomic
-            /*negation = the("Negation"),
-            conversion = the("Conversion"),
-            contraposition = the("Contraposition"),
-            identity = the("Identity"),*/
             swap = the("Swap"),
             backward = the("Backward");
-//            fromTask = the("FromTask"),
-//            fromBelief = the("FromBelief"),
-//            anticipate = the("Anticipate"),
-//            immediate = the("Immediate");
+
 
     /**
      * if puncOverride == 0 (unspecified), then the default punctuation rule determines the

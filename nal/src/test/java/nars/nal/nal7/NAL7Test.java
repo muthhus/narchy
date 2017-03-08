@@ -672,7 +672,7 @@ public class NAL7Test extends AbstractNALTest {
                 .inputAt(0, "(--, (x)). :|:")
                 .inputAt(4, "(x)? :|:")
                 .mustNotOutput(cycles, "(x)", BELIEF, 0f, 0.89f, 0f, 0.91f, 10)
-                .mustBelieve(cycles, "(x)", 0f, 0.27f /* some smaller conf since it is a prediction */, 4);
+                .mustBelieve(cycles, "(x)", 0f, 0.35f /* some smaller conf since it is a prediction */, 4);
     }
 
     @Test
@@ -983,6 +983,16 @@ public class NAL7Test extends AbstractNALTest {
                 .believe("(--(y) ==>+5 (z))")
                 .mustBelieve(cycles, "( ((x) &&+0 --(y)) ==>+5 (z))", 1f, 0.81f);
     }
+
+    @Test
+    public void testPropositionalDecompositionPositive() { //may be equivalent to another case
+        test()
+                .believe("(s)")
+                .believe("((s) && (a))")
+                .mustBelieve(cycles, "(a)", 1f, 0.81f);
+    }
+
+
 
 //    @Test public void testBackwardImplicationGeneration() {
 //        test()

@@ -83,9 +83,8 @@
 //      + Indep variable elimination
 //If after M, P usually happens, and M happens, it means P is expected to happen
 
-//      //NAL7 specific inference ////////////////////////////////////////////////////////////////////////////////////
+// NAL7 specific inference ////////////////////////////////////////////////////////////////////////////////////
 //      Reasoning about temporal statements. those are using the ==> relation because relation in time is a relation of the truth between statements.
-
 
     B, (A ==> C), task(positive), belief(positive), time(decomposeBelief) |- subIfUnifiesAny(C,A,B), (Belief:Deduction, Goal:Induction)
         B, (A ==> C), task(positive), belief(negative), time(decomposeBelief) |- (--,subIfUnifiesAny(C,A,B)), (Belief:DeductionPN, Goal:InductionPN)
@@ -108,14 +107,11 @@
     Z, (X==>Y), task("?"), time(dtBeliefExact) |- subIfUnifiesAny((X ==>+- Y), X, Z), (Belief:BeliefStructuralAbduction, Punctuation:Belief)
 
     Z, (X<=>Y), task("?"), time(dtBeliefExact) |- subIfUnifiesAny((X <=>+- Y), Y, Z), (Belief:BeliefStructuralAnalogy, Punctuation:Belief)
-    //Z, (X<=>Y), task("?"), time(dtBeliefExact) |- subIfUnifiesAny(X, Y, Z), ()
 
     //originally these were only valid if A occurrs during or after C. the opposite is not logical and would also produce redundant results
     B, (C && A), task(positive), time(decomposeBelief), neqCom(B,C), notImplEqui(C) |- subIfUnifiesAny(C,A,B), (Goal:Strong)
         B, (C && (--,%A)), task(negative), time(decomposeBelief), neqCom(B,C), notImplEqui(C) |- subIfUnifiesAny(C,A,B), (Goal:StrongN)
 
-        //experimental pos/neg polarization
-        //B, (C && (--,%A)), task(negative), time(decomposeBelief) |- subIfUnifiesForward(C,A,B), (Goal:StrongN)
 
 
 //// multi-conditional syllogism ////////////////////////////////////////////////////////////////////////////////////

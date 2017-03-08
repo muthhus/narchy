@@ -8,12 +8,12 @@ import org.jetbrains.annotations.Nullable;
 import java.util.function.Predicate;
 
 /** I = input term type, T = transformable subterm type */
-public interface CompoundTransform<I extends Compound, T extends Term> extends Predicate<Term> {
+@FunctionalInterface public interface CompoundTransform  {
 
-    @Nullable Term apply(@Nullable I parent, @NotNull T subterm);
+    @Nullable Term apply(@Nullable Compound parent, @NotNull Term subterm);
 
     /** enable predicate determined by the superterm, tested before processing any subterms */
-    default boolean testSuperTerm(@NotNull I terms) {
+    default boolean testSuperTerm(@NotNull Compound c) {
         return true;
     }
 

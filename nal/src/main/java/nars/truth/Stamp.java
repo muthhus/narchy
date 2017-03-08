@@ -139,8 +139,8 @@ public interface Stamp {
 
         /*if (oc == Stamp.TIMELESS)
             throw new RuntimeException("invalid occurrence time");*/
-        if (ct == ETERNAL)
-            throw new RuntimeException("invalid creation time");
+//        if (ct == ETERNAL)
+//            throw new RuntimeException("invalid creation time");
 
         //however, timeless creation time means it has not been perceived yet
 

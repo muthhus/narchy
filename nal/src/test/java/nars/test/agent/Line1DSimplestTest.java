@@ -66,9 +66,7 @@ public class Line1DSimplestTest {
         n.core.conceptsFiredPerCycle.setValue(16);
 
         n.truthResolution.setValue(0.01f);
-        n.termVolumeMax.setValue(24);
-
-        n.log();
+        n.termVolumeMax.setValue(16);
 
         Line1DSimplest a = new Line1DSimplest(n);
 

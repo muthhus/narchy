@@ -403,22 +403,18 @@ public abstract class TermIndex extends TermBuilder {
 
             Term x = xx[i], y;
 
-            if (t.test(x)) {
-                y = t.apply(superterm, x);
-            } else if (x instanceof Compound) {
+            y = t.apply(superterm, x);
+
+            if (y==x && x instanceof Compound) {
                 y = transform((Compound) x, t); //recurse
-            } else {
-                y = null;
             }
 
 //            if (y != null)
 //                y = y.eval(this);
 
             //if (x != y) { //must be refernce equality test for some variable normalization cases
-            if (y != null && !x.equals(y)) { //must be refernce equality test for some variable normalization cases
+            if (y != x && !x.equals(y)) { //must be refernce equality test for some variable normalization cases
                 modifications++;
-            } else {
-                y = x; //use original value
             }
 
             target[i] = y;
@@ -699,18 +695,14 @@ public abstract class TermIndex extends TermBuilder {
 
     }
 
-    final CompoundTransform retemporalization = new CompoundTransform<Compound,Term>() {
+    final CompoundTransform retemporalization = new CompoundTransform() {
 
-        @Override
-        public boolean test(Term term) {
-            return term instanceof Compound && ((Compound)term).dt()==XTERNAL;
-        }
-
-        @Nullable
-        @Override
-        public Term apply(@Nullable Compound parent, @NotNull Term subterm) {
-            Compound cs = (Compound) subterm;
-            return the(cs.op(), DTERNAL, cs.terms());
+        @Nullable @Override public Term apply(@Nullable Compound parent, @NotNull Term term) {
+            if (term instanceof Compound && ((Compound)term).dt()==XTERNAL) {
+                Compound cs = (Compound) term;
+                return the(cs.op(), DTERNAL, cs.terms());
+            }
+            return term;
         }
     };
 

@@ -86,13 +86,16 @@ public class VariableNormalization extends VariableTransform implements Function
     public static final VariableTransform singleVariableNormalization = new VariableTransform() {
 
         @Override
-        public Term apply(@Nullable Compound containing, @NotNull Variable current) {
+        public Term apply(@Nullable Compound containing, @NotNull Term t) {
 
             //if (current instanceof Ellipsis)
                //throw new RuntimeException("not allowed");
                 //return null;
 
-            return $.v(current.op(), 1);
+            if (t instanceof Variable)
+                return $.v(t.op(), 1);
+            else
+                return t;
         }
     };
 
@@ -109,8 +112,11 @@ public class VariableNormalization extends VariableTransform implements Function
     }
 
     @Override
-    public final Term apply(@Nullable Compound ct, @NotNull Variable v) {
-        return rename.computeIfAbsent(v, this);
+    public final Term apply(@Nullable Compound ct, @NotNull Term v) {
+        if (v instanceof Variable)
+            return rename.computeIfAbsent((Variable)v, this);
+        else
+            return v;
     }
 
     @NotNull

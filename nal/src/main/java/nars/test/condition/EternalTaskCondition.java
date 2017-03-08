@@ -423,7 +423,7 @@ public class EternalTaskCondition implements NARCondition, Predicate<Task>, Cons
 
             logger.error(msg);
 
-            synchronized (similar) {
+            //synchronized (similar) {
                 if (!similar.isEmpty()) {
                     similar.values().forEach(s -> {
                         String pattern = "SIM\n{}";
@@ -431,7 +431,7 @@ public class EternalTaskCondition implements NARCondition, Predicate<Task>, Cons
                         //logger.debug(s.getExplanation().replace("\n", "\n\t\t"));
                     });
                 }
-            }
+            //}
         }
 
 

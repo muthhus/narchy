@@ -20,6 +20,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import static nars.Op.BELIEF;
+import static nars.Op.GOAL;
 import static nars.Op.NEG;
 import static nars.term.Terms.compoundOrNull;
 import static nars.time.Tense.ETERNAL;
@@ -55,8 +57,11 @@ public class ImmutableTask extends RawBudget implements Task {
                 truth = truth.negated();
         }
 
-        if (truth == null && ((punc == Op.BELIEF) || (punc == Op.GOAL)))
+        if (truth == null && ((punc == BELIEF) || (punc == GOAL)))
             throw new InvalidTaskException(term, "null truth");
+
+        if (term.varQuery() > 0 && (punc==BELIEF|| punc == GOAL))
+            throw new InvalidTaskException(term, "query variable in belief or goal");
 
         this.priority = 0;
         this.quality = Float.NaN;

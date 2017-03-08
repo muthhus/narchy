@@ -132,7 +132,7 @@ public class DynamicBeliefTable extends DefaultBeliefTable {
 
         Compound template =
                 //use the provided target task as a temporal template if it matches with this
-                ((target != null) && Terms.equal(localTerm, target.term(), false, false, true)) ?
+                ((target != null) && Terms.equal(localTerm, target.term(), false, false, false)) ?
                         target.term()
                     :
                 localTerm;

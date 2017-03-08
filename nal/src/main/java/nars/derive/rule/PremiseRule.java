@@ -17,6 +17,7 @@ import nars.index.term.PatternTermIndex;
 import nars.index.term.TermIndex;
 import nars.term.Compound;
 import nars.term.Term;
+import nars.term.atom.Atom;
 import nars.term.atom.Atomic;
 import nars.term.compound.GenericCompound;
 import nars.term.container.TermContainer;
@@ -128,7 +129,7 @@ public class PremiseRule extends GenericCompound {
 
 
     @Nullable
-    private static final CompoundTransform<Compound, Term> truthSwap = new PremiseTruthTransform(true, true) {
+    private static final CompoundTransform truthSwap = new PremiseTruthTransform(true, true) {
         @Override
         public Term apply(@NotNull Term func) {
             return $.the(func.toString() + 'X');
@@ -474,30 +475,19 @@ public class PremiseRule extends GenericCompound {
 //        );
 //    }
 
-    static final class UppercaseAtomsToPatternVariables implements CompoundTransform<Compound, Term> {
+    static final CompoundTransform UppercaseAtomsToPatternVariables = (containingCompound, v) -> {
 
+        if (v instanceof Atom) {
+            String name = v.toString();
+            if (Character.isUpperCase(name.charAt(0)) && name.length() == 1) {
+                //do not alter postconditions
+                return (containingCompound.op() == Op.INH) && PostCondition.reservedMetaInfoCategories.contains(containingCompound.term(1)) ?
+                        v : v(Op.VAR_PATTERN, v.toString());
 
-        @Override
-        public boolean test(Term term) {
-            if (term instanceof Atomic) {
-                String name = term.toString();
-                return (Character.isUpperCase(name.charAt(0)) && name.length() == 1);
             }
-            return false;
         }
-
-        @NotNull
-        @Override
-        public Term apply(@NotNull Compound containingCompound, @NotNull Term v) {
-
-            //do not alter postconditions
-            return (containingCompound.op() == Op.INH) && PostCondition.reservedMetaInfoCategories.contains(containingCompound.term(1)) ?
-                    v : v(Op.VAR_PATTERN, v.toString());
-
-        }
-    }
-
-    static final UppercaseAtomsToPatternVariables UppercaseAtomsToPatternVariables = new UppercaseAtomsToPatternVariables();
+        return v;
+    };
 
 
     @NotNull
