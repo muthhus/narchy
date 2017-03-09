@@ -36,7 +36,7 @@ public class UDPeer extends UDP {
 
     private static final byte DEFAULT_PING_TTL = 3;
 
-    private final InetSocketAddress me;
+    protected final InetSocketAddress me;
 
 
 
