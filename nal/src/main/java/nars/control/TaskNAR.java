@@ -2,7 +2,7 @@
 //
 //import jcog.bag.Bag;
 //import jcog.data.MutableInteger;
-//import jcog.data.random.XorShift128PlusRandom;
+//import XorShift128PlusRandom;
 //import nars.$;
 //import nars.NAR;
 //import nars.Param;

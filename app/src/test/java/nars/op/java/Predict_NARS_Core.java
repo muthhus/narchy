@@ -1,6 +1,6 @@
 package nars.op.java;
 
-import jcog.time.IntervalTree;
+import jcog.tree.interval.IntervalTree;
 import nars.*;
 import nars.nar.Default;
 import nars.op.in.ChangedTextInput;

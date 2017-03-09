@@ -1,7 +1,7 @@
 package jcog.learn.ql;
 
-import jcog.data.random.XorShift128PlusRandom;
 import jcog.learn.Autoencoder;
+import jcog.random.XorShift128PlusRandom;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.function.BiFunction;

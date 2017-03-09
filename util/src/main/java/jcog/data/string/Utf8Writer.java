@@ -32,7 +32,7 @@ public final class Utf8Writer  {
      * Plane (BMP) in UTF-16. This int stores the first code unit
      * for a code point encoded in two UTF-16 code units.
      */
-    private int lastUTF16CodePoint = 0;
+    private int lastUTF16CodePoint;
 
     public Utf8Writer(DataOutput out) {
         this.out = out;

@@ -1,6 +1,6 @@
 package nars.web;
 
-import jcog.data.random.XorShift128PlusRandom;
+import jcog.random.XorShift128PlusRandom;
 import nars.NAR;
 import nars.Param;
 import nars.Task;

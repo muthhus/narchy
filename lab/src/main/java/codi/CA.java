@@ -1,7 +1,7 @@
 package codi;
 
 
-import jcog.data.random.XorShift128PlusRandom;
+import jcog.random.XorShift128PlusRandom;
 
 import javax.swing.*;
 import java.awt.*;

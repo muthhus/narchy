@@ -1,6 +1,6 @@
 package nars.rdfowl;
 
-import jcog.data.random.XorShift128PlusRandom;
+import jcog.random.XorShift128PlusRandom;
 import nars.NAR;
 import nars.conceptualize.DefaultConceptBuilder;
 import nars.index.term.map.CaffeineIndex;

@@ -2,7 +2,7 @@ package nars;
 
 import jcog.Util;
 import jcog.bag.Bag;
-import jcog.data.random.XorShift128PlusRandom;
+import jcog.random.XorShift128PlusRandom;
 import nars.bag.impl.BLinkHijackBag;
 import nars.budget.BLink;
 import nars.budget.BudgetMerge;

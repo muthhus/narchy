@@ -2,10 +2,10 @@ package nars.op.stm;
 
 import jcog.bag.PLink;
 import jcog.bag.RawPLink;
+import jcog.bag.impl.PLinkHijackBag;
 import jcog.event.On;
 import nars.NAR;
 import nars.Task;
-import jcog.bag.impl.PLinkHijackBag;
 import nars.concept.Concept;
 import nars.op.Leak;
 import org.jetbrains.annotations.NotNull;

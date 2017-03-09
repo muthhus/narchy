@@ -1,19 +1,14 @@
 package nars.util.data;
 
-import jcog.rtree.HyperRect;
-import jcog.rtree.RTree;
-import jcog.rtree.Spatialized;
-import jcog.rtree.rect.RectDouble2D;
-import jcog.rtree.rect.RectLong1D;
-import jcog.time.IntervalTree;
+import jcog.tree.rtree.HyperRect;
+import jcog.tree.rtree.RTree;
+import jcog.tree.rtree.rect.RectDouble2D;
 import nars.NAR;
 import nars.Task;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Consumer;
 import java.util.function.Function;
-
-import static java.lang.System.out;
 
 
 public class TimeMap extends RTree<Task> implements Consumer<Task>, Function<Task,HyperRect> {

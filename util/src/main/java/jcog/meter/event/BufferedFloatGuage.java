@@ -9,7 +9,7 @@ import java.io.Serializable;
 public class BufferedFloatGuage implements FloatProcedure, Serializable {
 
     final RecycledSummaryStatistics data = new RecycledSummaryStatistics();
-    float mean = 0, sum = 0;
+    float mean, sum;
 
     public final String id;
 

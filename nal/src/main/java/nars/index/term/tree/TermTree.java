@@ -1,7 +1,7 @@
 package nars.index.term.tree;
 
 import jcog.data.byt.ByteSeq;
-import jcog.radixtree.MyConcurrentRadixTree;
+import jcog.tree.radix.MyConcurrentRadixTree;
 import nars.$;
 import nars.term.Term;
 import nars.term.Termed;

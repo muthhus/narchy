@@ -103,6 +103,7 @@ public class RecycledSummaryStatistics implements FloatProcedure, Serializable, 
      *
      * @return the sum of values, or zero if none
      */
+    @Override
     public final double getSum() {
         return (float) getMean() * count;
 
@@ -128,6 +129,7 @@ public class RecycledSummaryStatistics implements FloatProcedure, Serializable, 
      * value was NaN or {@code float.POSITIVE_INFINITY} if no values were
      * recorded
      */
+    @Override
     public final double getMin() {
         return min;
     }
@@ -147,6 +149,7 @@ public class RecycledSummaryStatistics implements FloatProcedure, Serializable, 
      * value was NaN or {@code float.NEGATIVE_INFINITY} if no values were
      * recorded
      */
+    @Override
     public final double getMax() {
         return max;
     }
@@ -188,6 +191,7 @@ public class RecycledSummaryStatistics implements FloatProcedure, Serializable, 
      * The Standard Deviation is a measure of how spread out numbers are.
      * @return the standard deviation
      */
+    @Override
     public double getStandardDeviation() {
         double v = getVariance();
         if (v==v)
@@ -201,6 +205,7 @@ public class RecycledSummaryStatistics implements FloatProcedure, Serializable, 
         return mean;
     }
 
+    @Override
     public double getVariance() {
         long c = count;
         if (c == 0) return Float.NaN;

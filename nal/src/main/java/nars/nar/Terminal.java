@@ -1,6 +1,6 @@
 package nars.nar;
 
-import jcog.data.random.XORShiftRandom;
+import jcog.random.XORShiftRandom;
 import nars.NAR;
 import nars.time.FrameTime;
 import nars.time.Time;

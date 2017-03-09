@@ -1,10 +1,10 @@
 package jcog.learn.ql;
 
 import jcog.data.Range;
-import jcog.data.random.XorShift128PlusRandom;
 import jcog.decide.Deciding;
 import jcog.decide.DecidingSoftmax;
 import jcog.learn.Agent;
+import jcog.random.XorShift128PlusRandom;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 

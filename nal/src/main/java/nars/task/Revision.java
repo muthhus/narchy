@@ -1,7 +1,7 @@
 package nars.task;
 
 import jcog.Util;
-import jcog.data.random.XorShift128PlusRandom;
+import jcog.random.XorShift128PlusRandom;
 import nars.$;
 import nars.Task;
 import nars.premise.Derivation;

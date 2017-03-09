@@ -1,6 +1,6 @@
 package nars.video;
 
-import jcog.data.random.XorShift128PlusRandom;
+import jcog.random.XorShift128PlusRandom;
 import nars.$;
 import nars.NAgent;
 import nars.concept.ActionConcept;

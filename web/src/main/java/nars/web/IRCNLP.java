@@ -3,7 +3,7 @@ package nars.web;
 
 import com.google.common.base.Joiner;
 import jcog.Util;
-import jcog.data.random.XorShift128PlusRandom;
+import jcog.random.XorShift128PlusRandom;
 import nars.*;
 import nars.bag.impl.ArrayBag;
 import nars.budget.BLink;

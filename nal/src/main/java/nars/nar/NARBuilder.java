@@ -1,8 +1,8 @@
 package nars.nar;
 
 import jcog.bag.Bag;
-import jcog.data.random.XorShift128PlusRandom;
 import jcog.learn.lstm.SimpleLSTM;
+import jcog.random.XorShift128PlusRandom;
 import nars.NAR;
 import nars.Param;
 import nars.Task;

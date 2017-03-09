@@ -1,9 +1,7 @@
 package jcog.net;
 
 import jcog.Util;
-import org.eclipse.collections.impl.factory.Maps;
 
-import java.net.InetSocketAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 

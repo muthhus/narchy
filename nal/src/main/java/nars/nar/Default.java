@@ -2,9 +2,9 @@ package nars.nar;
 
 import jcog.bag.Bag;
 import jcog.bag.PLink;
-import jcog.data.random.XorShift128PlusRandom;
-import nars.NAR;
 import jcog.bag.impl.PLinkHijackBag;
+import jcog.random.XorShift128PlusRandom;
+import nars.NAR;
 import nars.concept.Concept;
 import nars.conceptualize.DefaultConceptBuilder;
 import nars.control.ConceptBagControl;

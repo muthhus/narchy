@@ -1,7 +1,7 @@
 package nars.term.transform;
 
 import com.google.common.collect.Lists;
-import jcog.data.random.XorShift128PlusRandom;
+import jcog.random.XorShift128PlusRandom;
 import nars.Narsese;
 import nars.Op;
 import nars.Param;

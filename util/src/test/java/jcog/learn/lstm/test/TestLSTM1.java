@@ -1,8 +1,8 @@
 package jcog.learn.lstm.test;
 
-import jcog.data.random.XorShift128PlusRandom;
 import jcog.learn.lstm.DistractedSequenceRecall;
 import jcog.learn.lstm.SimpleLSTM;
+import jcog.random.XorShift128PlusRandom;
 import org.junit.Test;
 
 import java.util.Random;

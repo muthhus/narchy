@@ -21,7 +21,7 @@
 //
 //import com.google.common.collect.Iterables;
 //import com.google.common.collect.Lists;
-//import jcog.data.random.XorShift128PlusRandom;
+//import XorShift128PlusRandom;
 //import nars.$;
 //import nars.NAR;
 //import nars.NAgent;

@@ -1,6 +1,6 @@
 package nars.index.term.tree;
 
-import jcog.radixtree.MyConcurrentRadixTree;
+import jcog.tree.radix.MyConcurrentRadixTree;
 import nars.Narsese;
 import nars.conceptualize.DefaultConceptBuilder;
 import org.junit.Test;

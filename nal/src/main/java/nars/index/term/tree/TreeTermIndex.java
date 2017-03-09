@@ -1,6 +1,6 @@
 package nars.index.term.tree;
 
-import jcog.radixtree.MyConcurrentRadixTree;
+import jcog.tree.radix.MyConcurrentRadixTree;
 import nars.NAR;
 import nars.concept.Concept;
 import nars.concept.PermanentConcept;

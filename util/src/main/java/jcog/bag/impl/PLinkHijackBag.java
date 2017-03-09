@@ -1,8 +1,7 @@
 package jcog.bag.impl;
 
-import jcog.bag.PLink;
-import jcog.bag.impl.HijackBag;
 import jcog.bag.PForget;
+import jcog.bag.PLink;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

@@ -8,13 +8,13 @@ import jcog.bag.RawPLink;
 import jcog.bag.impl.HijackBag;
 import jcog.bag.impl.PLinkHijackBag;
 import jcog.data.byt.DynByteSeq;
-import jcog.data.random.XorShift128PlusRandom;
+import jcog.random.XorShift128PlusRandom;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.math3.stat.descriptive.SynchronizedDescriptiveStatistics;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.net.Inet6Address;
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
@@ -208,9 +208,9 @@ public class UDPeer extends UDP {
     public final PLinkHijackBag<Msg> seen;
 
     public UDPeer( int port) throws SocketException, UnknownHostException {
-        super(Inet6Address.getByName("[0:0:0:0:0:0:0:0]"), port);
+        super(InetAddress.getByName("[0:0:0:0:0:0:0:0]"), port);
 
-        me = new InetSocketAddress(Inet6Address.getByName("[0:0:0:0:0:0:0:0]"), port);
+        me = new InetSocketAddress(InetAddress.getByName("[0:0:0:0:0:0:0:0]"), port);
 
         XorShift128PlusRandom rng = new XorShift128PlusRandom(System.currentTimeMillis());
 
