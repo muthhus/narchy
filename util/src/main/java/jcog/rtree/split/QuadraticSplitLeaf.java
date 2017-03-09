@@ -1,4 +1,4 @@
-package jcog.rtree;
+package jcog.rtree.split;
 
 /*
  * #%L
@@ -20,14 +20,18 @@ package jcog.rtree;
  * #L%
  */
 
+import jcog.rtree.*;
+
+import java.util.function.Function;
+
 /**
  * Guttmann's Quadratic split
  * <p>
  * Created by jcairns on 5/5/15.
  */
-final class QuadraticSplitLeaf<T> extends Leaf<T> {
+public final class QuadraticSplitLeaf<T> extends Leaf<T> {
 
-    QuadraticSplitLeaf(final RectBuilder<T> builder, final int mMin, final int mMax) {
+    public QuadraticSplitLeaf(final Function<T, HyperRect> builder, final int mMin, final int mMax) {
         super(builder, mMin, mMax, RTree.Split.QUADRATIC);
     }
 

@@ -21,7 +21,15 @@ package jcog.rtree;
  */
 
 
+import jcog.rtree.split.AxialSplitLeaf;
+import jcog.rtree.split.LinearSplitLeaf;
+import jcog.rtree.split.QuadraticSplitLeaf;
+import jcog.rtree.util.CounterNode;
+import jcog.rtree.util.Stats;
+import org.jetbrains.annotations.Nullable;
+
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Predicate;
 
 /**
@@ -33,24 +41,36 @@ import java.util.function.Predicate;
  * <p>
  * Created by jcairns on 4/30/15.</p>
  */
-public class RTree<T> implements SpatialSearch<T> {
+public class RTree<T> implements Spatialized<T> {
     private static final double EPSILON = 1e-12;
     public static final float FPSILON = (float) EPSILON;
 
     private final int mMin;
     private final int mMax;
-    private final RectBuilder<T> builder;
+    private final Function<T,HyperRect> spatialize;
     private final Split splitType;
     private Node<T> root;
     private int entryCount;
 
-    public RTree(final RectBuilder<T> builder, final int mMin, final int mMax, final Split splitType) {
+    protected RTree() {
+        this(null);
+    }
+
+    public RTree(@Nullable final Function<T,HyperRect> spatialize) {
+        this(spatialize, 2, 8, Split.AXIAL );
+    }
+
+    public RTree(@Nullable Function<T,HyperRect> spatialize, final int mMin, final int mMax, final Split splitType) {
         this.mMin = mMin;
         this.mMax = mMax;
-        this.builder = builder;
+
+        if (spatialize == null)
+            spatialize = (Function)this; //attempt to use subclass implementations of the Function<>
+
+        this.spatialize = spatialize;
         this.splitType = splitType;
         this.entryCount = 0;
-        root = splitType.newLeaf(builder, mMin, mMax);
+        this.root = splitType.newLeaf(spatialize, mMin, mMax);
     }
 
     public static boolean equals(float a, float b) {
@@ -75,8 +95,8 @@ public class RTree<T> implements SpatialSearch<T> {
         return true;
     }
 
-    @Override
-    public void add(final T t) {
+    /** TODO handle duplicate items (ie: dont increase entryCount if exists) */
+    @Override public void add(final T t) {
         root = root.add(t);
         entryCount++;
     }
@@ -103,7 +123,7 @@ public class RTree<T> implements SpatialSearch<T> {
      */
     public boolean contains(final HyperRect rect, final T... t) {
         for (int i = 0; i < t.length; i++) {
-            if (!rect.contains(builder.apply(t[i]))) {
+            if (!rect.contains(spatialize.apply(t[i]))) {
                 return false;
             }
         }
@@ -178,24 +198,24 @@ public class RTree<T> implements SpatialSearch<T> {
     public enum Split {
         AXIAL {
             @Override
-            public <R> Node<R> newLeaf(RectBuilder<R> builder, int mMin, int m) {
+            public <R> Node<R> newLeaf(Function<R,HyperRect> builder, int mMin, int m) {
                 return new AxialSplitLeaf<>(builder, mMin, m);
             }
         },
         LINEAR {
             @Override
-            public <R> Node<R> newLeaf(RectBuilder<R> builder, int mMin, int m) {
+            public <R> Node<R> newLeaf(Function<R,HyperRect> builder, int mMin, int m) {
                 return new LinearSplitLeaf<>(builder, mMin, m);
             }
         },
         QUADRATIC {
             @Override
-            public <R> Node<R> newLeaf(RectBuilder<R> builder, int mMin, int m) {
+            public <R> Node<R> newLeaf(Function<R,HyperRect> builder, int mMin, int m) {
                 return new QuadraticSplitLeaf<>(builder, mMin, m);
             }
         },;
 
-        abstract public <R> Node<R> newLeaf(RectBuilder<R> builder, int mMin, int m);
+        abstract public <R> Node<R> newLeaf(Function<R,HyperRect> builder, int mMin, int m);
 
     }
 }

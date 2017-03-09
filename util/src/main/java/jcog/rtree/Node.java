@@ -20,13 +20,15 @@ package jcog.rtree;
  * #L%
  */
 
+import jcog.rtree.util.Stats;
+
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 /**
  * Created by jcairns on 4/30/15.
  */
-interface Node<T> {
+public interface Node<T> {
     /**
      * @return boolean - true if this node is a leaf
      */

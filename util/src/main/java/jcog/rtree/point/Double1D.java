@@ -1,12 +1,14 @@
-package jcog.rtree;
+package jcog.rtree.point;
+
+import jcog.rtree.HyperPoint;
 
 /**
  * Created by me on 12/2/16.
  */
-public class Point1D implements HyperPoint {
+public class Double1D implements HyperPoint {
     private final double x;
 
-    public Point1D(double X) {
+    public Double1D(double X) {
         this.x = X;
     }
 
@@ -22,7 +24,7 @@ public class Point1D implements HyperPoint {
 
     @Override
     public double distance(HyperPoint p) {
-        return Math.abs(x - ((Point1D) p).x);
+        return Math.abs(x - ((Double1D) p).x);
     }
 
     @Override

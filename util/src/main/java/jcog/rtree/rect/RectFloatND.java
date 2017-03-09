@@ -1,4 +1,4 @@
-package jcog.rtree;
+package jcog.rtree.rect;
 
 /*
  * #%L
@@ -21,7 +21,12 @@ package jcog.rtree;
  */
 
 
+import jcog.rtree.HyperPoint;
+import jcog.rtree.HyperRect;
+import jcog.rtree.point.FloatND;
+
 import java.io.Serializable;
+import java.util.function.Function;
 
 import static java.lang.Float.NEGATIVE_INFINITY;
 import static java.lang.Float.POSITIVE_INFINITY;
@@ -30,21 +35,21 @@ import static java.lang.Float.POSITIVE_INFINITY;
  * Created by jcovert on 6/15/15.
  */
 
-public class RectND implements HyperRect<PointND>, Serializable {
+public class RectFloatND implements HyperRect<FloatND>, Serializable {
 
-    public static final HyperRect ALL_1 = RectND.all(1);
-    public static final HyperRect ALL_2 = RectND.all(2);
-    public static final HyperRect ALL_3 = RectND.all(3);
-    public static final HyperRect ALL_4 = RectND.all(4);
-
-
-    protected final PointND min;
+    public static final HyperRect ALL_1 = RectFloatND.all(1);
+    public static final HyperRect ALL_2 = RectFloatND.all(2);
+    public static final HyperRect ALL_3 = RectFloatND.all(3);
+    public static final HyperRect ALL_4 = RectFloatND.all(4);
 
 
-    protected final PointND max;
+    public final FloatND min;
 
 
-    public static final PointND unbounded = new PointND() {
+    public final FloatND max;
+
+
+    public static final FloatND unbounded = new FloatND() {
         @Override
         public String toString() {
             return "*";
@@ -52,25 +57,25 @@ public class RectND implements HyperRect<PointND>, Serializable {
     };
 
     public static HyperRect all(int i) {
-        return new RectND(PointND.fill(i, NEGATIVE_INFINITY), PointND.fill(i, POSITIVE_INFINITY));
+        return new RectFloatND(FloatND.fill(i, NEGATIVE_INFINITY), FloatND.fill(i, POSITIVE_INFINITY));
     }
 
-    public RectND() {
+    public RectFloatND() {
         min = unbounded;
         max = unbounded;
     }
 
-    public RectND(final PointND p) {
+    public RectFloatND(final FloatND p) {
         min = p;
         max = p;
     }
 
 
-    public RectND(float[] a, float[] b) {
-        this(new PointND(a), new PointND(b));
+    public RectFloatND(float[] a, float[] b) {
+        this(new FloatND(a), new FloatND(b));
     }
 
-    protected RectND(final PointND a, final PointND b) {
+    public RectFloatND(final FloatND a, final FloatND b) {
         int dim = a.dim();
 
         float[] min = new float[dim];
@@ -84,14 +89,14 @@ public class RectND implements HyperRect<PointND>, Serializable {
             min[i] = Math.min(ai, bi);
             max[i] = Math.max(ai, bi);
         }
-        this.min = new PointND(min);
-        this.max = new PointND(max);
+        this.min = new FloatND(min);
+        this.max = new FloatND(max);
     }
 
 
     @Override
     public boolean contains(final HyperRect _inner) {
-        final RectND inner = (RectND) _inner;
+        final RectFloatND inner = (RectFloatND) _inner;
 
         int dim = dim();
         for (int i = 0; i < dim; i++) {
@@ -104,7 +109,7 @@ public class RectND implements HyperRect<PointND>, Serializable {
 
     @Override
     public boolean intersects(final HyperRect r) {
-        final RectND x = (RectND) r;
+        final RectFloatND x = (RectFloatND) r;
 
         int dim = dim();
         for (int i = 0; i < dim; i++) {
@@ -129,7 +134,7 @@ public class RectND implements HyperRect<PointND>, Serializable {
 
     @Override
     public HyperRect mbr(final HyperRect r) {
-        final RectND x = (RectND) r;
+        final RectFloatND x = (RectFloatND) r;
 
         int dim = dim();
         float[] newMin = new float[dim];
@@ -138,7 +143,7 @@ public class RectND implements HyperRect<PointND>, Serializable {
             newMin[i] = Math.min(min.coord[i], x.min.coord[i]);
             newMax[i] = Math.max(max.coord[i], x.max.coord[i]);
         }
-        return new RectND(newMin, newMax);
+        return new RectFloatND(newMin, newMax);
     }
 
 
@@ -166,7 +171,7 @@ public class RectND implements HyperRect<PointND>, Serializable {
         for (int i = 0; i < dim; i++) {
             c[i] = centerF(i);
         }
-        return new PointND(c);
+        return new FloatND(c);
     }
 
 
@@ -176,12 +181,12 @@ public class RectND implements HyperRect<PointND>, Serializable {
     }
 
     @Override
-    public PointND min() {
+    public FloatND min() {
         return min;
     }
 
     @Override
-    public PointND max() {
+    public FloatND max() {
         return max;
     }
 
@@ -200,7 +205,7 @@ public class RectND implements HyperRect<PointND>, Serializable {
         if (this == o) return true;
         if (o == null /*|| getClass() != o.getClass()*/) return false;
 
-        RectND r = (RectND) o;
+        RectFloatND r = (RectFloatND) o;
         return min.equals(r.min) && max.equals(r.max);
     }
 
@@ -227,7 +232,7 @@ public class RectND implements HyperRect<PointND>, Serializable {
 
 
 
-    public final static class Builder<X extends RectND> implements RectBuilder<X> {
+    public final static class Builder<X extends RectFloatND> implements Function<X, HyperRect> {
 
         @Override
         public X apply(final X rect2D) {

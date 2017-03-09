@@ -1,4 +1,4 @@
-package jcog.rtree;
+package jcog.rtree.util;
 
 /*
  * #%L
@@ -20,18 +20,21 @@ package jcog.rtree;
  * #L%
  */
 
+import jcog.rtree.HyperRect;
+import jcog.rtree.Node;
+
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 /**
  * Created by jcovert on 6/18/15.
  */
-final class CounterNode<T> implements Node<T> {
-    static int searchCount;
-    static int bboxEvalCount;
+public final class CounterNode<T> implements Node<T> {
+    public static int searchCount;
+    public static int bboxEvalCount;
     private final Node<T> node;
 
-    CounterNode(final Node<T> node) {
+    public CounterNode(final Node<T> node) {
         this.node = node;
     }
 

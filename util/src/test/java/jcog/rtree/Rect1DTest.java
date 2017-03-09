@@ -1,5 +1,7 @@
 package jcog.rtree;
 
+import jcog.rtree.rect.RectDouble1D;
+import jcog.rtree.util.Stats;
 import org.eclipse.collections.impl.list.mutable.primitive.DoubleArrayList;
 import org.junit.Assert;
 import org.junit.Test;
@@ -13,7 +15,7 @@ public class Rect1DTest {
     @Test
     public void centroidTest() {
 
-        Rect1D rect = new Rect1D.DefaultRect1D(0, 4);
+        RectDouble1D rect = new RectDouble1D.DefaultRect1D(0, 4);
 
         HyperPoint centroid = rect.center();
         double x = centroid.coord(0);
@@ -31,7 +33,7 @@ public class Rect1DTest {
         final int entryCount = 20;
 
         //for (RTree.Split type : RTree.Split.values()) {
-            RTree<Double> t = new RTree<>((x) -> new Rect1D.DefaultRect1D(x, x), 2, 3, RTree.Split.LINEAR);
+            RTree<Double> t = new RTree<>((x) -> new RectDouble1D.DefaultRect1D(x, x), 2, 3, RTree.Split.LINEAR);
             for (int i = 0; i < entryCount; i++) {
                 t.add((double)(i*i));
             }
@@ -42,7 +44,7 @@ public class Rect1DTest {
             System.out.println(s);
 
             DoubleArrayList d = new DoubleArrayList();
-            t.intersecting(new Rect1D.DefaultRect1D(1, 101), d::add);
+            t.intersecting(new RectDouble1D.DefaultRect1D(1, 101), d::add);
 
             assertEquals(10, d.size());
 

@@ -1,4 +1,4 @@
-package jcog.rtree;
+package jcog.rtree.rect;
 
 /*
  * #%L
@@ -20,23 +20,38 @@ package jcog.rtree;
  * #L%
  */
 
+import jcog.rtree.HyperPoint;
+import jcog.rtree.HyperRect;
+import jcog.rtree.RTree;
+import jcog.rtree.point.Double2D;
+
+import java.util.function.Function;
+
 /**
  * Created by jcovert on 6/15/15.
  */
-public class Rect2D implements HyperRect<Rect2D> {
-    final Point2D min, max;
+public class RectDouble2D implements HyperRect<RectDouble2D> {
+    public final Double2D min;
+    public final Double2D max;
 
-    public Rect2D(final Point2D p) {
+    public RectDouble2D(final Double2D p) {
         min = p;
         max = p;
     }
 
-    public Rect2D(final double x1, final double y1, final double x2, final double y2) {
-        min = new Point2D(x1, y1);
-        max = new Point2D(x2, y2);
+    public RectDouble2D(double x1, double y1, double x2, double y2) {
+        if (x2 < x1) {
+            double t = x2; x2 = x1; x1 = t;
+        }
+        if (y2 < y1) {
+            double t = y2; y2 = y1; y1 = t;
+        }
+
+        min = new Double2D(x1, y1);
+        max = new Double2D(x2, y2);
     }
 
-    public Rect2D(final Point2D p1, final Point2D p2) {
+    public RectDouble2D(final Double2D p1, final Double2D p2) {
         final double minX, maxX;
 
         if (p1.x < p2.x) {
@@ -57,20 +72,20 @@ public class Rect2D implements HyperRect<Rect2D> {
             maxY = p2.y;
         }
 
-        min = new Point2D(minX, minY);
-        max = new Point2D(maxX, maxY);
+        min = new Double2D(minX, minY);
+        max = new Double2D(maxX, maxY);
     }
 
 
     @Override
     public HyperRect mbr(final HyperRect r) {
-        final Rect2D r2 = (Rect2D) r;
+        final RectDouble2D r2 = (RectDouble2D) r;
         final double minX = Math.min(min.x, r2.min.x);
         final double minY = Math.min(min.y, r2.min.y);
         final double maxX = Math.max(max.x, r2.max.x);
         final double maxY = Math.max(max.y, r2.max.y);
 
-        return new Rect2D(minX, minY, maxX, maxY);
+        return new RectDouble2D(minX, minY, maxX, maxY);
 
     }
 
@@ -84,7 +99,7 @@ public class Rect2D implements HyperRect<Rect2D> {
         final double dx = center(0);
         final double dy = center(1);
 
-        return new Point2D(dx, dy);
+        return new Double2D(dx, dy);
     }
 
     @Override public double center(int d) {
@@ -119,7 +134,7 @@ public class Rect2D implements HyperRect<Rect2D> {
 
     @Override
     public boolean contains(final HyperRect r) {
-        final Rect2D r2 = (Rect2D) r;
+        final RectDouble2D r2 = (RectDouble2D) r;
 
         return min.x <= r2.min.x &&
                 max.x >= r2.max.x &&
@@ -129,7 +144,7 @@ public class Rect2D implements HyperRect<Rect2D> {
 
     @Override
     public boolean intersects(final HyperRect r) {
-        final Rect2D r2 = (Rect2D) r;
+        final RectDouble2D r2 = (RectDouble2D) r;
 
         return !((min.x > r2.max.x) || (r2.min.x > max.x) ||
                 (min.y > r2.max.y) || (r2.min.y > max.y));
@@ -148,7 +163,7 @@ public class Rect2D implements HyperRect<Rect2D> {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        Rect2D rect2D = (Rect2D) o;
+        RectDouble2D rect2D = (RectDouble2D) o;
 
         return RTree.equals(min.x, rect2D.min.x) &&
                 RTree.equals(max.x, rect2D.max.x) &&
@@ -180,10 +195,10 @@ public class Rect2D implements HyperRect<Rect2D> {
         return sb.toString();
     }
 
-    public final static class Builder implements RectBuilder<Rect2D> {
+    public final static class Builder implements Function<RectDouble2D, HyperRect> {
 
         @Override
-        public HyperRect apply(final Rect2D rect2D) {
+        public HyperRect apply(final RectDouble2D rect2D) {
             return rect2D;
         }
 

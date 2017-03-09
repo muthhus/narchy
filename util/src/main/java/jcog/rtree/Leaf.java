@@ -20,7 +20,11 @@ package jcog.rtree;
  * #L%
  */
 
+import jcog.rtree.util.CounterNode;
+import jcog.rtree.util.Stats;
+
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Predicate;
 
 /**
@@ -28,19 +32,19 @@ import java.util.function.Predicate;
  * <p>
  * Created by jcairns on 4/30/15.
  */
-abstract class Leaf<T> implements Node<T> {
-    final int mMax;       // max entries per node
-    final int mMin;       // least number of entries per node
+public abstract class Leaf<T> implements Node<T> {
+    protected final int mMax;       // max entries per node
+    protected final int mMin;       // least number of entries per node
 
-    final HyperRect[] r;
-    final T[] entry;
+    protected final HyperRect[] r;
+    protected final T[] entry;
 
-    final RectBuilder<T> builder;
-    final RTree.Split splitType;
-    HyperRect mbr;
-    int size;
+    protected final Function<T,HyperRect> builder;
+    public final RTree.Split splitType;
+    protected HyperRect mbr;
+    protected int size;
 
-    Leaf(final RectBuilder<T> builder, final int mMin, final int mMax, final RTree.Split splitType) {
+    protected Leaf(final Function<T,HyperRect> builder, final int mMin, final int mMax, final RTree.Split splitType) {
         this.mMin = mMin;
         this.mMax = mMax;
         this.mbr = null;
@@ -53,6 +57,10 @@ abstract class Leaf<T> implements Node<T> {
 
     @Override
     public Node<T> add(final T t) {
+
+        if (contains(t))
+            return this;
+
         if (size < mMax) {
             final HyperRect tRect = builder.apply(t);
             mbr = mbr != null ? mbr.mbr(tRect) : tRect;
@@ -74,6 +82,15 @@ abstract class Leaf<T> implements Node<T> {
         return this;
     }
 
+    public boolean contains(T t) {
+        for (int i = 0; i < size; i++) {
+            if (entry[i].equals(t)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     @Override
     public Node<T> remove(final T t) {
         for (int i = 0; i < size; i++) {
@@ -86,8 +103,7 @@ abstract class Leaf<T> implements Node<T> {
                     entry[size - 1] = null;
                     r[size - 1] = null;
                 }
-                size--;
-                if (size > 0) {
+                if (--size > 0) {
                     mbr = r[0];
                     for (i = 1; i < size; i++) {
                         mbr = mbr.mbr(r[i]);
@@ -194,7 +210,7 @@ abstract class Leaf<T> implements Node<T> {
      * @param l2Node right node
      * @param t      data entry to be added
      */
-    final void classify(final Node<T> l1Node, final Node<T> l2Node, final T t) {
+    protected final void classify(final Node<T> l1Node, final Node<T> l2Node, final T t) {
 
         final HyperRect tRect = builder.apply(t);
         final HyperRect l1Mbr = l1Node.bounds().mbr(tRect);

@@ -1,5 +1,8 @@
-package jcog.rtree;
+package jcog.rtree.point;
 
+
+import jcog.rtree.HyperPoint;
+import jcog.rtree.RTree;
 
 import java.io.Serializable;
 import java.util.Arrays;
@@ -10,22 +13,22 @@ import static jcog.rtree.RTree.FPSILON;
 /**
  * Created by me on 12/21/16.
  */
-public class PointND implements HyperPoint, Serializable {
+public class FloatND implements HyperPoint, Serializable {
 
     public final float[] coord;
 
-    public PointND(PointND copy) {
+    public FloatND(FloatND copy) {
         this(copy.coord.clone());
     }
 
-    public PointND(float... coord) {
+    public FloatND(float... coord) {
         this.coord = coord;
     }
 
-    public static PointND fill(int dims, float value) {
+    public static FloatND fill(int dims, float value) {
         float[] a = new float[dims];
         Arrays.fill(a, value);
-        return new PointND(a);
+        return new FloatND(a);
     }
 
     @Override
@@ -40,7 +43,7 @@ public class PointND implements HyperPoint, Serializable {
 
     @Override
     public double distance(HyperPoint h) {
-        PointND p = (PointND) h;
+        FloatND p = (FloatND) h;
         float sumSq = 0;
         for (int i = 0; i < coord.length; i++) {
             float x = coord[i];
@@ -53,13 +56,13 @@ public class PointND implements HyperPoint, Serializable {
 
     @Override
     public double distance(HyperPoint p, int i) {
-        return Math.abs(coord[i] - ((PointND) p).coord[i]);
+        return Math.abs(coord[i] - ((FloatND) p).coord[i]);
     }
 
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;
-        PointND p = (PointND) obj;
+        FloatND p = (FloatND) obj;
         return RTree.equals(coord, p.coord, FPSILON);
     }
 

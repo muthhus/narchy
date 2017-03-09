@@ -1,9 +1,13 @@
-package jcog.rtree;
+package jcog.rtree.rect;
+
+import jcog.rtree.HyperPoint;
+import jcog.rtree.HyperRect;
+import jcog.rtree.point.Double1D;
 
 /**
  * Created by me on 12/2/16.
  */
-public abstract class Rect1D implements HyperRect<Point1D> {
+public abstract class RectDouble1D implements HyperRect<Double1D> {
 
 
     abstract public double from();
@@ -13,7 +17,7 @@ public abstract class Rect1D implements HyperRect<Point1D> {
     @Override
     public HyperRect mbr(HyperRect r) {
 
-        Rect1D s = (Rect1D) r;
+        RectDouble1D s = (RectDouble1D) r;
         double from = from();
         double to = to();
         double f = Math.min(from, s.from());
@@ -28,17 +32,17 @@ public abstract class Rect1D implements HyperRect<Point1D> {
 
     @Override
     public HyperPoint min() {
-        return new Point1D(from());
+        return new Double1D(from());
     }
 
     @Override
     public HyperPoint max() {
-        return new Point1D(to());
+        return new Double1D(to());
     }
 
     @Override
     public HyperPoint center() {
-        return new Point1D(center(0));
+        return new Double1D(center(0));
     }
 
     @Override
@@ -54,13 +58,13 @@ public abstract class Rect1D implements HyperRect<Point1D> {
 
     @Override
     public boolean contains(HyperRect r) {
-        Rect1D inner = (Rect1D) r;
+        RectDouble1D inner = (RectDouble1D) r;
         return inner.from() >= from() && inner.to() <= to();
     }
 
     @Override
     public boolean intersects(HyperRect r) {
-        Rect1D rr = (Rect1D) r;
+        RectDouble1D rr = (RectDouble1D) r;
         return (Math.max(from(), rr.from()) <= Math.min(to(), rr.to()));
     }
 
@@ -70,7 +74,7 @@ public abstract class Rect1D implements HyperRect<Point1D> {
     }
 
 
-    public static class DefaultRect1D extends Rect1D {
+    public static class DefaultRect1D extends RectDouble1D {
 
 
         private final double from, to;

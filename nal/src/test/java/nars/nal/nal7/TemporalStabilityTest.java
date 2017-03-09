@@ -28,18 +28,18 @@ abstract public class TemporalStabilityTest {
                 continue; //wait until the initial temporal model is fully constructed*/
 
             //m.print();
+            m.forEach(tt -> {
 
-            for (Task tt : m.values()) {
-
-                long o = tt.start();
-                if (!validOccurrence(o)) {
+                long start = tt.start();
+                long end = tt.end();
+                if (!validOccurrence(start) || (end != start && !validOccurrence(tt.end())))  {
                     if (irregular.add(tt)) { //already detected?
                         //System.err.println("  instability: " + tt + "\n" + tt.proof() + "\n");
                     }
                 }
+            });
 
 
-            }
         });
 
         input(n);

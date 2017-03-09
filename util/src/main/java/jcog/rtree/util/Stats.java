@@ -1,4 +1,4 @@
-package jcog.rtree;
+package jcog.rtree.util;
 
 /*
  * #%L
@@ -19,6 +19,8 @@ package jcog.rtree;
  * limitations under the License.
  * #L%
  */
+
+import jcog.rtree.RTree;
 
 import java.io.PrintStream;
 import java.util.Arrays;

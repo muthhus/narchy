@@ -1,35 +1,86 @@
 package nars.util.data;
 
+import jcog.rtree.HyperRect;
+import jcog.rtree.RTree;
+import jcog.rtree.Spatialized;
+import jcog.rtree.rect.RectDouble2D;
+import jcog.rtree.rect.RectLong1D;
 import jcog.time.IntervalTree;
 import nars.NAR;
 import nars.Task;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 import static java.lang.System.out;
 
 
-public class TimeMap extends IntervalTree<Long, Task> implements Consumer<Task> {
+public class TimeMap extends RTree<Task> implements Consumer<Task>, Function<Task,HyperRect> {
 
-    @NotNull
-    private final NAR nar;
+    public TimeMap() {
+
+    }
 
     public TimeMap(@NotNull NAR n) {
-        this.nar = n;
+        this();
         n.forEachTask(this, true, true, false, false);
+    }
+
+    @Override
+    public HyperRect apply(Task task) {
+        //return new RectLong1D(task.start(), task.end());
+        int h = task.hashCode();
+        return new RectDouble2D(task.start(), task.end(), h, h);
     }
 
     @Override
     public void accept(@NotNull Task task) {
         if (!task.isEternal()) {
-            put(task.start(), task);
+            add(task);
         }
     }
 
-    public void print() {
-        out.println(nar.time() + ": " + "Total tasks: " + size() + '\t' + keySetSorted().toString());
-    }
+//    public void print() {
+//        out.println(nar.time() + ": " + "Total tasks: " + size() + '\t' + keySetSorted().toString());
+//    }
 
 
 }
+
+
+//package nars.util.data;
+//
+//        import jcog.time.IntervalTree;
+//        import nars.NAR;
+//        import nars.Task;
+//        import org.jetbrains.annotations.NotNull;
+//
+//        import java.util.function.Consumer;
+//
+//        import static java.lang.System.out;
+//
+//
+//public class TimeMap0 extends IntervalTree<Long, Task> implements Consumer<Task> {
+//
+//    @NotNull
+//    private final NAR nar;
+//
+//    public TimeMap0(@NotNull NAR n) {
+//        this.nar = n;
+//        n.forEachTask(this, true, true, false, false);
+//    }
+//
+//    @Override
+//    public void accept(@NotNull Task task) {
+//        if (!task.isEternal()) {
+//            put(task.start(), task);
+//        }
+//    }
+//
+//    public void print() {
+//        out.println(nar.time() + ": " + "Total tasks: " + size() + '\t' + keySetSorted().toString());
+//    }
+//
+//
+//}

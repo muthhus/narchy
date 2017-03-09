@@ -1,4 +1,4 @@
-package jcog.rtree;
+package jcog.rtree.point;
 
 /*
  * #%L
@@ -20,13 +20,20 @@ package jcog.rtree;
  * #L%
  */
 
+import jcog.rtree.HyperPoint;
+import jcog.rtree.HyperRect;
+import jcog.rtree.rect.RectDouble2D;
+
+import java.util.function.Function;
+
 /**
  * Created by jcovert on 6/15/15.
  */
-public class Point2D implements HyperPoint {
-    final double x, y;
+public class Double2D implements HyperPoint {
+    public final double x;
+    public final double y;
 
-    public Point2D(final double x, final double y) {
+    public Double2D(final double x, final double y) {
         this.x = x;
         this.y = y;
     }
@@ -49,7 +56,7 @@ public class Point2D implements HyperPoint {
 
     @Override
     public double distance(final HyperPoint p) {
-        final Point2D p2 = (Point2D) p;
+        final Double2D p2 = (Double2D) p;
 
         final double dx = p2.x - x;
         final double dy = p2.y - y;
@@ -58,7 +65,7 @@ public class Point2D implements HyperPoint {
 
     @Override
     public double distance(final HyperPoint p, final int d) {
-        final Point2D p2 = (Point2D) p;
+        final Double2D p2 = (Double2D) p;
         if (d == 0) {
             return Math.abs(p2.x - x);
         } else if (d == 1) {
@@ -73,11 +80,11 @@ public class Point2D implements HyperPoint {
         return "<" + x + "," + y + '>';
     }
 
-    public final static class Builder implements RectBuilder<Point2D> {
+    public final static class Builder implements Function<Double2D, HyperRect> {
 
         @Override
-        public HyperRect apply(final Point2D point) {
-            return new Rect2D(point);
+        public HyperRect apply(final Double2D point) {
+            return new RectDouble2D(point);
         }
 
 //        @Override

@@ -20,14 +20,17 @@ package jcog.rtree;
  * #L%
  */
 
+import jcog.rtree.util.Stats;
+
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Predicate;
 
 /**
  * Created by jcovert on 12/30/15.
  */
-public interface SpatialSearch<T> {
+public interface Spatialized<T> {
 
     int DEFAULT_MIN_M = 2;
     int DEFAULT_MAX_M = 8;
@@ -36,12 +39,12 @@ public interface SpatialSearch<T> {
     /**
      * Create an R-Tree with default values for m, M, and split type
      *
-     * @param builder - Builder implementation used to create HyperRects out of T's
+     * @param spatializer - Builder implementation used to create HyperRects out of T's
      * @param <T>     - The store type of the bound
      * @return SpatialSearch - The spatial search and index structure
      */
-    static <T> SpatialSearch<T> rTree(final RectBuilder<T> builder) {
-        return new RTree<>(builder, DEFAULT_MIN_M, DEFAULT_MAX_M, DEFAULT_SPLIT_TYPE);
+    static <T> Spatialized<T> rTree(final Function<T,HyperRect> spatializer) {
+        return new RTree<>(spatializer, DEFAULT_MIN_M, DEFAULT_MAX_M, DEFAULT_SPLIT_TYPE);
     }
 
     /**
@@ -54,7 +57,7 @@ public interface SpatialSearch<T> {
      * @param <T>       - The store type of the bound
      * @return SpatialSearch - The spatial search and index structure
      */
-    static <T> SpatialSearch<T> rTree(final RectBuilder<T> builder, final int minM, final int maxM, final RTree.Split splitType) {
+    static <T> Spatialized<T> rTree(final Function<T,HyperRect> builder, final int minM, final int maxM, final RTree.Split splitType) {
         return new RTree<>(builder, minM, maxM, splitType);
     }
 
@@ -65,7 +68,7 @@ public interface SpatialSearch<T> {
      * @param <T>     - The store type of the bound
      * @return SpatialSearch - The spatial search and index structure
      */
-    static <T> SpatialSearch<T> lockingRTree(final RectBuilder builder) {
+    static <T> Spatialized<T> lockingRTree(final Function builder) {
         return new LockingRTree<>(rTree(builder), new ReentrantReadWriteLock(true));
     }
 

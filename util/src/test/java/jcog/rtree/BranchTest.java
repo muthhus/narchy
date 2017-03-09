@@ -20,6 +20,7 @@ package jcog.rtree;
  * #L%
  */
 
+import jcog.rtree.rect.RectDouble2D;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -35,8 +36,8 @@ public class BranchTest {
     public void branchOptimizationTest() {
 
         for(RTree.Split type : RTree.Split.values()) {
-            RTree<Rect2D> rTree = RTree2DTest.createRect2DTree(type);
-            Rect2D[] rects = RTree2DTest.generateRandomRects(80);
+            RTree<RectDouble2D> rTree = RTree2DTest.createRect2DTree(type);
+            RectDouble2D[] rects = RTree2DTest.generateRandomRects(80);
 
             int i = 0;
             // cause no splits, fill up leaf

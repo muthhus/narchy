@@ -22,8 +22,11 @@ package jcog.rtree;
 
 
 import com.google.common.base.Joiner;
+import jcog.rtree.util.CounterNode;
+import jcog.rtree.util.Stats;
 
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Predicate;
 
 /**
@@ -31,10 +34,10 @@ import java.util.function.Predicate;
  * <p>
  * Created by jcairns on 4/30/15.
  */
-final class Branch<T> implements Node<T> {
+public final class Branch<T> implements Node<T> {
 
     private final Node[] child;
-    private final RectBuilder<T> builder;
+    private final Function<T,HyperRect> builder;
     private final int mMax;
     private final int mMin;
     private final RTree.Split splitType;
@@ -42,7 +45,7 @@ final class Branch<T> implements Node<T> {
     private HyperRect mbr;
     private int size;
 
-    Branch(final RectBuilder<T> builder, final int mMin, final int mMax, final RTree.Split splitType) {
+    public Branch(final Function<T, HyperRect> builder, final int mMin, final int mMax, final RTree.Split splitType) {
         this.mMin = mMin;
         this.mMax = mMax;
         this.builder = builder;
@@ -58,7 +61,7 @@ final class Branch<T> implements Node<T> {
      * @param n node to be added (can be leaf or branch)
      * @return position of the added node
      */
-    int addChild(final Node<T> n) {
+    public int addChild(final Node<T> n) {
         if (size < mMax) {
             child[size++] = n;
 

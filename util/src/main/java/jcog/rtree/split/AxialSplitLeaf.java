@@ -1,4 +1,4 @@
-package jcog.rtree;
+package jcog.rtree.split;
 
 /*
  * #%L
@@ -20,8 +20,11 @@ package jcog.rtree;
  * #L%
  */
 
+import jcog.rtree.*;
+
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.function.Function;
 
 /**
  * Fast RTree split suggested by Yufei Tao taoyf@cse.cuhk.edu.hk
@@ -32,7 +35,7 @@ import java.util.Comparator;
  */
 public final class AxialSplitLeaf<T> extends Leaf<T> {
 
-    AxialSplitLeaf(final RectBuilder<T> builder, final int mMin, final int mMax) {
+    public AxialSplitLeaf(final Function<T, HyperRect> builder, final int mMin, final int mMax) {
         super(builder, mMin, mMax, RTree.Split.AXIAL);
     }
 
@@ -48,6 +51,8 @@ public final class AxialSplitLeaf<T> extends Leaf<T> {
         for (int d = 0; d < nD; d++) {
             // split along the greatest finite range extent
             final double dr = mbr.getRangeFinite(d, 0);
+            if (dr < 0)
+                throw new UnsupportedOperationException("range must be non-negative");
             if (dr > rangeD) {
                 axis = d;
                 rangeD = dr;

@@ -20,6 +20,8 @@ package jcog.rtree;
  * #L%
  */
 
+import jcog.rtree.util.Stats;
+
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.function.Consumer;
@@ -28,13 +30,13 @@ import java.util.function.Predicate;
 /**
  * Created by jcovert on 12/30/15.
  */
-public class LockingRTree<T> implements SpatialSearch<T> {
+public class LockingRTree<T> implements Spatialized<T> {
 
-    private final SpatialSearch<T> rTree;
+    private final Spatialized<T> rTree;
     private final Lock readLock;
     private final Lock writeLock;
 
-    public LockingRTree(SpatialSearch<T> rTree, ReadWriteLock lock) {
+    public LockingRTree(Spatialized<T> rTree, ReadWriteLock lock) {
         this.rTree = rTree;
         this.readLock = lock.readLock();
         this.writeLock = lock.writeLock();
