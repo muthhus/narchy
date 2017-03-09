@@ -1,4 +1,4 @@
-package jcog.data.linkedlist;
+package jcog.list.linked;
 
 import java.util.Iterator;
 import java.util.NoSuchElementException;

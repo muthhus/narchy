@@ -1,4 +1,4 @@
-package jcog.signal.markov;
+package jcog.learn.markov;
 
 import jcog.list.FasterList;
 import org.jetbrains.annotations.NotNull;

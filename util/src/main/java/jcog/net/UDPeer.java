@@ -42,13 +42,13 @@ public class UDPeer extends UDP {
 
     static class Msg extends DynByteSeq {
 
-        final static int HEADER_SIZE = 16 /* ESTIMATE */;
-
         final static int TTL_BYTE = 0;
         final static int CMD_BYTE = 1;
         final static int PORT_BYTE = 2;
         final static int ADDR_BYTE = 4;
         final static int PAYLOAD_START_BYTE = 20;
+
+        final static int HEADER_SIZE = PAYLOAD_START_BYTE /* ESTIMATE */;
 
         final int hash;
 

@@ -1,7 +1,7 @@
 package nars.video;
 
 import jcog.Util;
-import jcog.signal.Autoencoder;
+import jcog.learn.Autoencoder;
 import nars.$;
 import nars.NAR;
 import nars.NAgent;

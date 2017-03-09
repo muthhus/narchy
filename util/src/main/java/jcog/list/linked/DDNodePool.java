@@ -1,4 +1,4 @@
-package jcog.data.linkedlist;
+package jcog.list.linked;
 
 
 import jcog.data.pool.DequePool;

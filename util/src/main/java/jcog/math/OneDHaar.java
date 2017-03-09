@@ -1,4 +1,4 @@
-package jcog.signal;
+package jcog.math;
 
 import jcog.Util;
 

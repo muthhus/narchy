@@ -1,6 +1,6 @@
 package nars.util;
 
-import jcog.signal.Autoencoder;
+import jcog.learn.Autoencoder;
 import nars.NAR;
 import nars.nar.Default;
 import nars.util.data.UniformVector;

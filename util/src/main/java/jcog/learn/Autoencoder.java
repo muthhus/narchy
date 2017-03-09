@@ -1,4 +1,4 @@
-package jcog.signal;
+package jcog.learn;
 
 import jcog.Util;
 import org.eclipse.collections.impl.list.mutable.primitive.ShortArrayList;

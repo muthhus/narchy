@@ -1,6 +1,6 @@
-package jcog.signal.markov.test;
+package jcog.learn.markov.test;
 
-import jcog.signal.markov.MarkovChain;
+import jcog.learn.markov.MarkovChain;
 
 import java.util.Random;
 

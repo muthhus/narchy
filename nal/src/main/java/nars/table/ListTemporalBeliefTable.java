@@ -357,14 +357,15 @@ public class ListTemporalBeliefTable extends MultiRWFasterList<Task> implements 
 
         //prefer
         //  same frequency
-        //  low confidence
+        //  low confidence?
         //  long time from now
         //  non-zero overlap with the task
 
         long ys = y.start();
         long ye = y.end();
-        float yRange = (ye - ys);
+        float yRange = (ye - ys) / dur;
         float yf = y.freq();
+        float yDist = Math.min(Math.abs(ye - now), Math.abs(ys - now)) / dur;
 
         return x -> {
             if ((x == y) || (x == null))
@@ -379,12 +380,11 @@ public class ListTemporalBeliefTable extends MultiRWFasterList<Task> implements 
             if (overlap == -1)
                 return Float.NEGATIVE_INFINITY; //dont allow merge if no overlap
 
-            return (1f + (1f - abs(x.freq() - yf))) *
+            return ((1f - abs(x.freq() - yf))) *
                    (1f + (1f - x.conf())) *
-                   (1f + Math.min(Math.abs(xe-now), Math.abs(xs-now)) *
+                   (1f + Math.min(Math.abs(xe-now), Math.abs(xs-now))/yDist) *
                    (1f + overlap / yRange)
-            )
-                    ;
+            ;
         };
 
     }

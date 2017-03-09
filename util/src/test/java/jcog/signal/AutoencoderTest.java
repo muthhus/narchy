@@ -1,5 +1,6 @@
 package jcog.signal;
 
+import jcog.learn.Autoencoder;
 import org.junit.Test;
 
 import java.util.Arrays;

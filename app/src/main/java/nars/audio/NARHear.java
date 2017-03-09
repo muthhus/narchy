@@ -2,7 +2,7 @@ package nars.audio;
 
 import jcog.Util;
 import jcog.data.random.XorShift128PlusRandom;
-import jcog.signal.Autoencoder;
+import jcog.learn.Autoencoder;
 import nars.$;
 import nars.NAR;
 import nars.NAgent;

@@ -30,6 +30,7 @@ import java.util.function.BiFunction;
 import static jcog.Texts.n2;
 import static jcog.Texts.n4;
 import static nars.Op.BELIEF;
+import static nars.Op.GOAL;
 
 /**
  * Created by me on 12/27/16.
@@ -44,17 +45,17 @@ public interface NARBuilder {
         Random rng = new XorShift128PlusRandom(1);
         Executioner exe =
                 //new SynchronousExecutor();
-                new MultiThreadExecutor(threads, 1024, sync);
+                new MultiThreadExecutor(threads, 512, sync);
 
         //exe = new InstrumentedExecutor(exe, 8);
 
 
-        final int reprobes = 4;
+        final int reprobes = 3;
 
         //Multi nar = new Multi(3,512,
         DefaultConceptBuilder cb = new DefaultConceptBuilder(
-                new DefaultConceptState("sleep", 12, 12, 6, 16, 8),
-                new DefaultConceptState("awake", 14, 14, 6, 48, 32)
+                new DefaultConceptState("sleep", 24, 24, 6, 16, 8),
+                new DefaultConceptState("awake", 28, 28, 6, 48, 32)
         ) {
             @Override
             public <X> X withBags(Term t, BiFunction<Bag<Term, BLink<Term>>, Bag<Task, BLink<Task>>, X> f) {
@@ -71,9 +72,9 @@ public interface NARBuilder {
         };
 
 
-        int maxConcepts = 128 * 1024;
+        int maxConcepts = 192 * 1024;
 
-        Default nar = new Default(4 * 1024,
+        Default nar = new Default(2 * 1024,
                 1, 1, 3, rng,
 
                 //new HijackTermIndex(cb, 1024 * 256, reprobes)
@@ -131,7 +132,7 @@ public interface NARBuilder {
 //            }
 
             final Compressor compressor = new Compressor(this, "_",
-                    2, 12,
+                    2, 6,
                     1f, 32, 256);
 
             @Override
@@ -170,7 +171,7 @@ public interface NARBuilder {
         };
 
         nar.beliefConfidence(0.9f);
-        nar.goalConfidence(0.75f);
+        nar.goalConfidence(0.9f);
         //nar.derivedEvidenceGain.setValue(0.75f);
 
         float p = 1f;
@@ -181,8 +182,8 @@ public interface NARBuilder {
 
         nar.stmLinkage.capacity.set(0);
         nar.core.conceptsFiredPerCycle.setValue(128);
-        nar.core.conceptsFiredPerBatch.setValue(16);
-        nar.core.derivationsInputPerCycle.setValue(64);
+        nar.core.conceptsFiredPerBatch.setValue(32);
+        nar.core.derivationsInputPerCycle.setValue(96);
 
         nar.activationRate.setValue(0.5f);
         nar.confMin.setValue(0.01f);
@@ -192,13 +193,13 @@ public interface NARBuilder {
         //NARTune tune = new NARTune(nar);
 
         MySTMClustered stm = new MySTMClustered(nar, 64, BELIEF, 5, true, 12);
-        //MySTMClustered stmGoal = new MySTMClustered(nar, 32, GOAL, 3, true, 8);
+        MySTMClustered stmGoal = new MySTMClustered(nar, 32, GOAL, 3, true, 8);
 
 //        Abbreviation abbr = new Abbreviation(nar, "the",
 //                4, 16,
 //                0.02f, 32);
 
-        new Inperience(nar, 0.01f, 16);
+        new Inperience(nar, 0.1f, 16);
 
 //        //causal accelerator
 //        nar.onTask(t -> {

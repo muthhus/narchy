@@ -38,7 +38,7 @@ public class SensorConcept extends WiredConcept implements FloatFunction<Term>, 
 
     public static final Logger logger = LoggerFactory.getLogger(SensorConcept.class);
 
-    private static final int historicCapMultiplier = 4;
+    private static final int historicCapMultiplier = 2;
 
     //private boolean latchLastValue = true;
 
