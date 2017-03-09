@@ -19,6 +19,8 @@ http://brian.tannerpages.com
 
 package nars.experiment.tetris.impl;
 
+import jcog.Util;
+
 import java.util.Arrays;
 import java.util.Random;
 import java.util.Vector;
@@ -59,6 +61,7 @@ public class TetrisState {
     public int time;
 
     private final int timePerFall;
+    private int rowsFilled;
 
 
     //private double[] worldObservation;
@@ -440,17 +443,31 @@ public class TetrisState {
             }
         }
 
-        score = 0;
+        int prevRows = this.rowsFilled;
+        this.rowsFilled = rowsFilled;
+
 
         if (numRowsCleared > 0) {
             //1 line == 1
             //2 lines == 2
             //3 lines == 4
             //4 lines == 8
-            score += Math.pow(2.0d, numRowsCleared - 1) * 1;
+            //score = numRowsCleared;
+        } else {
+            //score = 0;
         }
-        score -= (((float)rowsFilled) / height) * 0.5f; //penalty for height
+        //score -= (((float)rowsFilled) / height) * 0.5f; //penalty for height
 
+
+        int diff = prevRows - rowsFilled;
+        if (diff >= height-1)
+            score = -1; //no reward for dying
+        else
+            score = Util.clamp(diff /3f, -1, 1);
+    }
+
+    public float height() {
+        return (((float)rowsFilled) / height);
     }
 
     /**
