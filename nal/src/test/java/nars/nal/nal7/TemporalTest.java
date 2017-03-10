@@ -32,7 +32,7 @@ import static org.junit.Assert.*;
 
 public class TemporalTest {
 
-    @NotNull NAR n = new Default();
+    @NotNull Default n = new Default();
 
 
     @Test
@@ -391,28 +391,38 @@ public class TemporalTest {
     @Test
     public void testConceptualizationIntermpolationTemporal() throws Narsese.NarseseException {
 
-        Default d = new Default();
-        d.believe("((a ==>+2 b)-->[pill])", Tense.Present, 1f, 0.9f);
-        d.believe("((a ==>+6 b)-->[pill])", Tense.Present, 1f, 0.9f);
-        d.run(1);
+        n.believe("((a ==>+2 b)-->[pill])", Tense.Present, 1f, 0.9f);
+        n.believe("((a ==>+6 b)-->[pill])", Tense.Present, 1f, 0.9f);
+        n.run(1);
 
-        Bag<Concept,PLink<Concept>> cb = d.core.active;
+        Bag<Concept,PLink<Concept>> cb = n.core.active;
         cb.print();
         assertTrue(5 <= cb.size());
         String abpill = "((a==>b)-->[pill])";
         assertTrue( Joiner.on(' ').join(cb).contains(abpill) );
 
+        String correctMerge = "((a ==>+4 b)-->[pill])";
+
         Concept cc = cb.get($(abpill)).get(); //iterator().next().get();//((ArrayBag<Concept>) cb).get(0).get();
 
-        cc.beliefs().capacity(1, 1, d); //set to capacity=1 to force compression
+        //test belief match interpolated a result
+        {
+            assertEquals(correctMerge, cc.beliefs().match(0, n.time(), this.n.time.dur(), null, true).term().toString());
+        }
 
-        cc.print();
 
-        d.forEachTask(System.out::println);
+        //test merge after capacity shrink:
+        {
 
+            cc.beliefs().capacity(1, 1, n); //set to capacity=1 to force compression
 
-        //INTERMPOLATION APPLIED AFTER REVECTION:
-        assertEquals("((a ==>+4 b)-->[pill])", cc.beliefs().match(0, d.time(), n.time.dur(), null, true).term().toString());
+            cc.print();
+
+            //n.forEachTask(System.out::println);
+
+            //INTERMPOLATION APPLIED AFTER REVECTION:
+            assertEquals(correctMerge, cc.beliefs().match(0, n.time(), this.n.time.dur(), null, true).term().toString());
+        }
     }
 
     @Test

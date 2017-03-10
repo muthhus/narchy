@@ -110,8 +110,4 @@ public class SortedList<E extends Comparable> extends FasterList<E> {
         return true;
     }
 
-//    @Override
-//    public Object clone() {
-//        return super.clone(); //To change body of generated methods, choose Tools | Templates.
-//    }
 }

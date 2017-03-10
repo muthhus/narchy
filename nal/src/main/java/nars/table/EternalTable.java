@@ -11,6 +11,7 @@ import nars.task.RevisionTask;
 import nars.term.Compound;
 import nars.truth.Truth;
 import nars.truth.TruthDelta;
+import org.eclipse.collections.api.block.function.primitive.FloatFunction;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -25,7 +26,7 @@ import static nars.time.Tense.ETERNAL;
 /**
  * Created by me on 5/7/16.
  */
-public class EternalTable extends SortedArray<Task> implements TaskTable, SortedArray.Ranker<Task> {
+public class EternalTable extends SortedArray<Task> implements TaskTable, FloatFunction<Task> {
 
     public static final EternalTable EMPTY = new EternalTable(0) {
 
@@ -130,7 +131,7 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, Sorted
         return iterator();
     }
 
-    public final float rank(@NotNull Task w) {
+    public final float floatValueOf(@NotNull Task w) {
         //return rankEternalByConfAndOriginality(w);
         return -w.conf();
     }
@@ -263,7 +264,7 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, Sorted
         if (size() == capacity()) {
             Task weakestPresent = weakest();
             if (weakestPresent != null) {
-                if (rank(weakestPresent) <= rank(incoming)) {
+                if (floatValueOf(weakestPresent) <= floatValueOf(incoming)) {
                     displaced = removeWeakest();
                 } else {
                     return incoming; //insufficient confidence

@@ -1,6 +1,7 @@
 package jcog.table;
 
 import jcog.data.sorted.SortedArray;
+import org.eclipse.collections.api.block.function.primitive.FloatFunction;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -15,7 +16,7 @@ import java.util.function.IntFunction;
 /**
  * Created by me on 1/15/16.
  */
-abstract public class SortedListTable<V, L> extends ArrayListTable<V,L> implements SortedTable<V,L>, SortedArray.Ranker<L> {
+abstract public class SortedListTable<V, L> extends ArrayListTable<V,L> implements SortedTable<V,L>, FloatFunction<L> {
 
     /**
      * array of lists of items, for items on different level
@@ -102,7 +103,7 @@ abstract public class SortedListTable<V, L> extends ArrayListTable<V,L> implemen
 
         if (size == cap) {
             L last = items.last();
-            if (Float.compare(rank(last), rank(i)) < 0) {
+            if (Float.compare(floatValueOf(last), floatValueOf(i)) < 0) {
                 //insufficient rank, bounce
                 return i;
             }

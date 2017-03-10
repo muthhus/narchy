@@ -1,5 +1,6 @@
 package jcog.data.sorted;
 
+import org.eclipse.collections.api.block.function.primitive.FloatFunction;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -94,7 +95,7 @@ public class SortedArray<E> implements Iterable<E> {
         this.size = s;
     }
 
-    public boolean remove(E removed, Ranker<E> cmp) {
+    public boolean remove(E removed, FloatFunction<E> cmp) {
         int i = indexOf(removed, cmp);
         return i != -1 && remove(i) != null;
     }
@@ -163,7 +164,7 @@ public class SortedArray<E> implements Iterable<E> {
     }
 
 
-    public final void add(final E element, Ranker<E> cmp) {
+    public final void add(final E element, FloatFunction<E> cmp) {
         // use the linked-list sorting if the type is set or if the list-size
         // is to small
         int s = this.size;
@@ -175,18 +176,13 @@ public class SortedArray<E> implements Iterable<E> {
 
     }
 
-
-    public interface Ranker<X> {
-        float rank(X x);
-    }
-
-    public void addBinary(E element, int s, Ranker<E> cmp) {
+    public void addBinary(E element, int s, FloatFunction<E> cmp) {
         // use the binary search
-        float elementRank = cmp.rank(element);
+        float elementRank = cmp.floatValueOf(element);
         final int index = this.findInsertionIndex(elementRank, 0, s - 1, new int[1], cmp);
 
         final E last = list[s - 1];
-        if (index == s || Float.compare(cmp.rank(last), elementRank) < 0) {
+        if (index == s || Float.compare(cmp.floatValueOf(last), elementRank) < 0) {
             addInternal(element);
         } else {
             if (index == -1)
@@ -196,13 +192,13 @@ public class SortedArray<E> implements Iterable<E> {
         }
     }
 
-    public void addLinear(E element, int s, Ranker<E> cmp) {
+    public void addLinear(E element, int s, FloatFunction<E> cmp) {
         E[] l = this.list;
         if (l.length > 0) {
-            float elementRank = cmp.rank(element);
+            float elementRank = cmp.floatValueOf(element);
             for (int i = 0; i < s; i++) {
                 final E current = l[i];
-                if (0 <= Float.compare(cmp.rank(current), elementRank)) {
+                if (0 <= Float.compare(cmp.floatValueOf(current), elementRank)) {
                     addInternal(i, element);
                     return;
                 }
@@ -493,7 +489,7 @@ public class SortedArray<E> implements Iterable<E> {
 
 
     @SuppressWarnings("unchecked")
-    public int indexOf(@NotNull final E element, Ranker<E> cmp) {
+    public int indexOf(@NotNull final E element, FloatFunction<E> cmp) {
 
 		/*if (element == null)
             return -1;*/
@@ -505,7 +501,7 @@ public class SortedArray<E> implements Iterable<E> {
         if (size >= binarySearchThreshold) {
 
             final int[] rightBorder = {0};
-            final int left = this.findInsertionIndex(cmp.rank(element), 0, size, rightBorder, cmp);
+            final int left = this.findInsertionIndex(cmp.floatValueOf(element), 0, size, rightBorder, cmp);
 
             E[] l = this.list;
             for (int index = left; index < rightBorder[0]; index++) {
@@ -595,7 +591,7 @@ public class SortedArray<E> implements Iterable<E> {
      */
     private int findInsertionIndex(
             float elementRank, final int left, final int right,
-            @NotNull final int[] rightBorder, @NotNull Ranker<E> cmp) {
+            @NotNull final int[] rightBorder, @NotNull FloatFunction<E> cmp) {
 
         assert (right >= left); //"right must be bigger or equals as the left"
 
@@ -611,13 +607,13 @@ public class SortedArray<E> implements Iterable<E> {
         final E midleE = list[midle];
 
 
-        final int comparedValue = Float.compare(cmp.rank(midleE), elementRank);
+        final int comparedValue = Float.compare(cmp.floatValueOf(midleE), elementRank);
         if (comparedValue == 0) {
             // find the first element
             int index = midle;
             for (; index >= 0; ) {
                 final E e = list[index];
-                if (0 != Float.compare(cmp.rank(e), elementRank)) {
+                if (0 != Float.compare(cmp.floatValueOf(e), elementRank)) {
                     break;
                 }
                 index--;
@@ -640,12 +636,12 @@ public class SortedArray<E> implements Iterable<E> {
      * @return
      */
     private int findFirstIndex(float elementRank,
-                               final int left, final int right, Ranker<E> cmp) {
+                               final int left, final int right, FloatFunction<E> cmp) {
 
 
         E[] l = this.list;
         for (int index = left; index < right; ) {
-            if (0 <= Float.compare(cmp.rank(l[index]), elementRank)) {
+            if (0 <= Float.compare(cmp.floatValueOf(l[index]), elementRank)) {
                 return index;
             }
             index++;

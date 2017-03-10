@@ -236,7 +236,7 @@ public class ArrayBag<X> extends SortedListTable<X, BLink<X>> implements Bag<X, 
 
 
     @Override
-    public final float rank(BLink x) {
+    public final float floatValueOf(BLink x) {
         return -pCmp(x);
     }
 

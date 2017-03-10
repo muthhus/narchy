@@ -1,5 +1,7 @@
 package nars.table;
 
+import jcog.data.sorted.SortedArray;
+import jcog.data.sorted.SortedList;
 import jcog.list.FasterList;
 import jcog.list.MultiRWFasterList;
 import jcog.math.Interval;
@@ -16,6 +18,8 @@ import nars.truth.Stamp;
 import nars.truth.Truth;
 import nars.truth.TruthDelta;
 import org.eclipse.collections.api.block.function.Function;
+import org.eclipse.collections.api.block.function.primitive.FloatFunction;
+import org.eclipse.collections.api.factory.list.FixedSizeListFactory;
 import org.eclipse.collections.api.list.MutableList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -504,7 +508,25 @@ public class ListTemporalBeliefTable extends MultiRWFasterList<Task> implements 
                 case 1:
                     return l.get(0); //special case avoid creating the lambda
                 default:
-                    return l.maxBy(temporalConfidence(when, now, dur));
+                    //return l.maxBy(temporalConfidence(when, now, dur));
+
+                    //HACK TODO use fixed-size sorted list, we only need the top N (~=2)
+                    SortedArray sa = new SortedArray(Task[]::new);
+
+                    FloatFunction<Task> ranker = x -> -temporalConfidence(when, now, dur).apply(x);
+
+                    l.forEach(x -> sa.add(x, ranker));
+
+                    Task a = (Task) sa.array()[0];
+                    Task b = (Task) sa.array()[1];
+
+                    Task c = merge(a, b, now, 0, dur);
+                    if (c != null) {
+                        return c;
+                    } else {
+                        return a;
+                    }
+
             }
         });
     }
