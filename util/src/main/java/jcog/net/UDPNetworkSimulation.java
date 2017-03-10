@@ -30,14 +30,14 @@ public abstract class UDPNetworkSimulation {
 
             for (int i = 0; i < size; i++) {
                 peers[i].ping(peers[ (i + 1) % size ].me());
-                peers[i].ping(peers[ (i + 2) % size ].me());
+                //peers[i].ping(peers[ (i + 2) % size ].me());
             }
 
         ///}
 
         Util.sleep(5000);
 
-        peers[0].say("hi", (byte)6);
+        peers[0].say("hi", (byte)4);
 
 
         Util.sleep(10000);
@@ -49,7 +49,7 @@ public abstract class UDPNetworkSimulation {
         new UDPNetworkSimulation(32) {
             @Override
             long delay(InetSocketAddress from, InetSocketAddress to, int length) {
-                return (int)(Math.random() * 1000) + 100;
+                return 50 + (int)/*Util.sqr*/(Math.abs(from.getPort() - to.getPort())) * 50;
             }
         };
     }
