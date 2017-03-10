@@ -460,41 +460,41 @@ public class ListTemporalBeliefTable extends MultiRWFasterList<Task> implements 
         float p = ac / (ac + bc);
         Truth t = Revision.revise(a, p, b, f, confMin);
 
-        if (t != null) {
+        if (t == null)
+            return null;
 
-            double factor = (double) ac / (ac + bc);
+        double factor = (double) ac / (ac + bc);
 
-            int tolerance = 0; //(int)Math.ceil(dur/2f); //additional tolerance range allowing the tasks to overlap and replaced with a union rather than a point sample
-            Interval ai = new Interval(a.start() - tolerance, a.end() + tolerance);
-            Interval bi = new Interval(b.start() - tolerance, b.end() + tolerance);
+        int tolerance = 0; //(int)Math.ceil(dur/2f); //additional tolerance range allowing the tasks to overlap and replaced with a union rather than a point sample
+        Interval ai = new Interval(a.start() - tolerance, a.end() + tolerance);
+        Interval bi = new Interval(b.start() - tolerance, b.end() + tolerance);
 
-            Interval overlap = ai.intersection(bi);
+        Interval overlap = ai.intersection(bi);
 
-            long mergedStart, mergedEnd;
-            if (overlap != null) {
-                Interval union = ai.union(bi);
-                mergedStart = union.a;
-                //(long) Math.round(Util.lerp(factor, a.start(), b.start()));
-                mergedEnd = union.b;
-                //(long) Math.round(Util.lerp(factor, a.end(), b.end()));
+        long mergedStart, mergedEnd;
+        if (overlap != null) {
+            Interval union = ai.union(bi);
+            mergedStart = union.a;
+            //(long) Math.round(Util.lerp(factor, a.start(), b.start()));
+            mergedEnd = union.b;
+            //(long) Math.round(Util.lerp(factor, a.end(), b.end()));
 
-                float rangeEquality = 0.5f / (1f + Math.abs(ai.length() - bi.length()));
-                float timeRatio = rangeEquality + (1f-rangeEquality) * ((float) (overlap.length())) / (1 + union.length());
-                t = t.eviMult(timeRatio);
-            } else {
-                //create point sample of duration width
+            float rangeEquality = 0.5f / (1f + Math.abs(ai.length() - bi.length()));
+            float timeRatio = rangeEquality + (1f-rangeEquality) * ((float) (overlap.length())) / (1 + union.length());
+            t = t.eviMult(timeRatio);
+        } else {
+            //create point sample of duration width
 //                double mergedMid = Math.round(Util.lerp(factor, a.mid(), b.mid()));
 //                mergedStart = (long) Math.floor(mergedMid - dur/2f);
 //                mergedEnd = (long) Math.ceil(mergedMid + dur/2f);
 
-                return null; //shouldnt happen
-            }
-
-            if (t != null)
-                return Revision.mergeInterpolate(a, b, mergedStart, mergedEnd, now, t, true);
+            return null; //shouldnt happen
         }
 
-        return null;
+        if (t != null)
+            return Revision.mergeInterpolate(a, b, mergedStart, mergedEnd, now, t, true);
+        else
+            return null;
     }
 
 
@@ -520,7 +520,7 @@ public class ListTemporalBeliefTable extends MultiRWFasterList<Task> implements 
                     Task a = (Task) sa.array()[0];
                     Task b = (Task) sa.array()[1];
 
-                    Task c = merge(a, b, now, 0, dur);
+                    Task c = merge(a, b, now, a.conf(), dur);
                     if (c != null) {
                         return c;
                     } else {
