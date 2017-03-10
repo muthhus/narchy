@@ -277,6 +277,10 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
     }
 
 
+    public void setSelf(String self) {
+        setSelf((Atom)$.the(self));
+    }
+
     public void setSelf(Atom self) {
         this.self = self;
     }

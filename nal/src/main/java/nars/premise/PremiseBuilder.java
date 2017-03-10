@@ -144,7 +144,11 @@ abstract public class PremiseBuilder {
                                 //Crosslink.crossLink(task, answered, answered.conf(), nar);
 
                                 //if (task.isInput())
-                                    nar.input(answered);
+                                Concept ccc = nar.input(answered);
+                                if (ccc==null) {
+                                    //if duplicate, emit by task process anyway
+                                    nar.eventTaskProcess.emit(answered);
+                                }
 
                             }
 

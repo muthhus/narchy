@@ -95,6 +95,7 @@ public class UDP  {
         if (running) {
             running = false;
             thread.stop();
+            in.close();
         }
     }
 

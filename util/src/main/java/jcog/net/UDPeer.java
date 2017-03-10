@@ -48,7 +48,7 @@ public class UDPeer extends UDP {
     final static int SEEN_CAPACITY = 4096;
 
 
-    static class Msg extends DynByteSeq {
+    public static class Msg extends DynByteSeq {
 
         final static int TTL_BYTE = 0;
         final static int CMD_BYTE = 1;
@@ -160,6 +160,10 @@ public class UDPeer extends UDP {
 
         public int dataLength() {
             return length() - DATA_START_BYTE;
+        }
+
+        public byte[] data() {
+            return data(0, dataLength());
         }
 
         public byte[] data(int start, int end) {
@@ -311,33 +315,56 @@ public class UDPeer extends UDP {
 
 
 
-    /** broadcast */
-    public void send(Msg o, float pri) {
+    /** broadcast
+     * @return how many sent
+     * */
+    public int send(Msg o, float pri, boolean onlyIfNotSeen) {
 
         if (them.isEmpty()) {
             //System.err.println(this + " without any peers to broadcast");
+            return 0;
         } else {
+
+            if (onlyIfNotSeen && seen(o, pri))
+                return 0;
 
             byte[] bytes = o.array();
 
+            final int[] count = {0};
             them.sample((int) Math.ceil(pri * them.size()), (to) -> {
                 if (o.originEquals(to.addrBytes))
                     return false;
 
                 outBytes(bytes, to.addr);
+                count[0]++;
                 return true;
             });
+            return count[0];
         }
     }
 
-    public void say(String msg, byte ttl) {
-        send(new Msg(SAY, ttl, me, msg.getBytes(UTF8) ), 1f);
+    private boolean seen(Msg o, float pri) {
+        RawPLink p = new RawPLink(o, pri);
+        return seen.put(p) != p; //what about if it returns null
+    }
+
+    public void say(String msg, int ttl) {
+        say(msg.getBytes(UTF8), ttl);
+    }
+
+    public void say(byte[] msg, int ttl) {
+        say(msg, ttl, false);
+    }
+
+    public void say(byte[] msg, int ttl, boolean onlyIfNotSeen) {
+        send(new Msg(SAY, (byte)ttl, me, msg ), 1f, onlyIfNotSeen);
     }
 
     /** send to a specific known recipient */
     public void send(Msg o, InetSocketAddress to) {
-        if (!o.origin().equals(to))
+        if (!o.origin().equals(to)) {
             outBytes(o.array(), to);
+        }
     }
 
     @Override
@@ -359,8 +386,7 @@ public class UDPeer extends UDP {
 
         float pri = 1;
 
-        PLink<Msg> pm = new RawPLink<>(m, pri);
-        boolean seen = this.seen.put(pm)!=pm;
+        boolean seen = seen(m, pri);
         if (seen)
             return;
 
@@ -384,7 +410,8 @@ public class UDPeer extends UDP {
                 m.dataAddresses(this::ping);
                 break;
             case SAY:
-                System.out.println(me + " recv: " + m.dataString() + " (ttl=" + m.ttl() + ")");
+                //System.out.println(me + " recv: " + m.dataString() + " (ttl=" + m.ttl() + ")");
+                receive(m);
                 break;
             default:
                 return;
@@ -401,10 +428,13 @@ public class UDPeer extends UDP {
         }
 
         if (continues) {
-            send(m, pri);
+            send(m, pri, false);
         }
     }
 
+    protected void receive(Msg m) {
+
+    }
 
     public long latencyAvg() {
         RecycledSummaryStatistics r = new RecycledSummaryStatistics();
