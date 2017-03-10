@@ -1,7 +1,8 @@
-package nars.op;
+package nars.bag.leak;
 
 import jcog.bag.Bag;
 import jcog.bag.PLink;
+import jcog.event.On;
 import nars.NAR;
 import nars.Task;
 import nars.budget.Budget;
@@ -22,6 +23,7 @@ public abstract class Leak</* TODO: A, */X, V extends PLink<X>> implements Consu
     public final MutableFloat rate;
     @NotNull
     public final Bag<X,V> bag;
+    private final On onTask, onReset, onCycle;
 
     public Leak(@NotNull Bag<X,V> bag, float rate, @NotNull NAR n) {
          this(bag, new MutableFloat(rate), n);
@@ -30,9 +32,9 @@ public abstract class Leak</* TODO: A, */X, V extends PLink<X>> implements Consu
     public Leak(@NotNull Bag<X,V> bag, @NotNull MutableFloat rate, @NotNull NAR n) {
         this.bag = bag;
         this.rate = rate;
-        n.onTask(this);
-        n.onReset((nn)->bag.clear());
-        n.onCycle(this::next);
+        onTask = n.onTask(this);
+        onReset = n.onReset((nn)->bag.clear());
+        onCycle = n.onCycle(this::next);
     }
 
     @Override
@@ -86,5 +88,11 @@ public abstract class Leak</* TODO: A, */X, V extends PLink<X>> implements Consu
 
     public void clear() {
         bag.clear();
+    }
+
+    public void stop() {
+        onTask.off();
+        onReset.off();
+        onCycle.off();
     }
 }

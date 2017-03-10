@@ -9,7 +9,7 @@ import nars.bag.impl.CurveBag;
 import nars.budget.BLink;
 import nars.budget.BudgetMerge;
 import nars.budget.RawBLink;
-import nars.op.Leak;
+import nars.bag.leak.Leak;
 import nars.premise.Premise;
 import nars.task.ImmutableTask;
 import nars.term.Compound;

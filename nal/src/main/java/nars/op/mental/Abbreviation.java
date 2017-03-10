@@ -15,7 +15,7 @@ import nars.concept.AtomConcept;
 import nars.concept.CompoundConcept;
 import nars.concept.Concept;
 import nars.concept.PermanentConcept;
-import nars.op.Leak;
+import nars.bag.leak.Leak;
 import nars.table.BeliefTable;
 import nars.table.QuestionTable;
 import nars.task.GeneratedTask;

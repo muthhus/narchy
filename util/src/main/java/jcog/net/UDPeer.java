@@ -356,8 +356,8 @@ public class UDPeer extends UDP {
         say(msg, ttl, false);
     }
 
-    public void say(byte[] msg, int ttl, boolean onlyIfNotSeen) {
-        send(new Msg(SAY, (byte)ttl, me, msg ), 1f, onlyIfNotSeen);
+    public int say(byte[] msg, int ttl, boolean onlyIfNotSeen) {
+        return send(new Msg(SAY, (byte)ttl, me, msg ), 1f, onlyIfNotSeen);
     }
 
     /** send to a specific known recipient */

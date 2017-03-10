@@ -6,6 +6,7 @@ import jcog.data.byt.DynByteSeq;
 import nars.IO;
 import nars.NAR;
 import nars.Task;
+import nars.bag.leak.LeakOut;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spacegraph.web.WebsocketService;

@@ -202,7 +202,8 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
                             targetPri = Float.NEGATIVE_INFINITY;
                         }
                     } else {
-                        if (key(ii).equals(x)) { //existing
+                        K y = key(ii);
+                        if (y ==x || y.equals(x)) { //existing
 
                             if (!add) {
 

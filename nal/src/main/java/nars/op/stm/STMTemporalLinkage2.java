@@ -7,7 +7,7 @@ import jcog.event.On;
 import nars.NAR;
 import nars.Task;
 import nars.concept.Concept;
-import nars.op.Leak;
+import nars.bag.leak.Leak;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Consumer;

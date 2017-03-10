@@ -1,4 +1,4 @@
-package nars.web;
+package nars.bag.leak;
 
 import nars.NAR;
 import nars.Task;
@@ -6,7 +6,6 @@ import nars.bag.impl.ArrayBag;
 import nars.budget.BLink;
 import nars.budget.BudgetMerge;
 import nars.budget.RawBLink;
-import nars.op.Leak;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.ConcurrentHashMap;
@@ -21,10 +20,7 @@ abstract public class LeakOut extends Leak<Task,BLink<Task>> {
         super(new ArrayBag<Task>(capacity, BudgetMerge.maxBlend, new ConcurrentHashMap<>()), rate, nar);
     }
 
-    //boolean echoCommandInput = false;
-
-    @Override
-    protected float onOut(@NotNull BLink<Task> t) {
+    @Override protected float onOut(@NotNull BLink<Task> t) {
         return send(t.get());
     }
 
@@ -36,7 +32,7 @@ abstract public class LeakOut extends Leak<Task,BLink<Task>> {
             send(t); //immediate
         } else {
             float p = t.pri();
-            if (p == p) { // || (t.term().containsTermRecursively(nar.self()) && (p > 0.5f))) {
+            if (p == p) {
                 each.accept(new RawBLink<>(t, t));
             }
         }
