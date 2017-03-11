@@ -134,11 +134,11 @@ public class Arkancide extends NAgentX {
             //senseCameraRetina("noid", noid, visW/2, visH/2, (v) -> $.t(v, alpha));
         } else {
             //nar.termVolumeMax.set(12);
-            senseNumber( "x(paddle(noid))", new FloatPolarNormalized(()->noid.paddle.x, noid.getWidth()/2));//.resolution(resX);
-            senseNumber( "x(ball(noid))", new FloatPolarNormalized(()->noid.ball.x, noid.getWidth()/2));//.resolution(resX);
-            senseNumber( "y(ball(noid))", new FloatPolarNormalized(()->noid.ball.y, noid.getHeight()/2));//.resolution(resY);
-            senseNumber("vx(ball(noid))", new FloatPolarNormalized(()->noid.ball.velocityX));
-            senseNumber("vy(ball(noid))", new FloatPolarNormalized(()->noid.ball.velocityY));
+            senseNumber( "x(paddle)", new FloatPolarNormalized(()->noid.paddle.x, noid.getWidth()/2));//.resolution(resX);
+            senseNumber( "x(ball)", new FloatPolarNormalized(()->noid.ball.x, noid.getWidth()/2));//.resolution(resX);
+            senseNumber( "y(ball)", new FloatPolarNormalized(()->noid.ball.y, noid.getHeight()/2));//.resolution(resY);
+            senseNumber("vx(ball)", new FloatPolarNormalized(()->noid.ball.velocityX));
+            senseNumber("vy(ball)", new FloatPolarNormalized(()->noid.ball.velocityY));
         }
 
 

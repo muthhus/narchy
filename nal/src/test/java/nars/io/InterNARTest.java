@@ -22,7 +22,6 @@ import static org.junit.Assert.assertTrue;
 /**
  * Created by me on 7/8/16.
  */
-@Ignore
 public class InterNARTest {
 
     final static AtomicInteger nextPort = new AtomicInteger(10000);
