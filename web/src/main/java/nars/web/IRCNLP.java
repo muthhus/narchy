@@ -270,7 +270,7 @@ public class IRCNLP extends IRC {
 
         Random random = new XorShift128PlusRandom(System.currentTimeMillis());
 
-        MultiThreadExecutor exe = new MultiThreadExecutor(3, 1024 * 8);
+        MultiThreadExecutor exe = new MultiThreadExecutor(3, 1024 * 8, true);
         exe.sync(true);
 
         Default nar = new Default(activeConcepts, conceptsPerFrame, 1, 3, random,

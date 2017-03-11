@@ -11,6 +11,7 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.concurrent.Executor;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
@@ -27,7 +28,7 @@ public class MultiThreadExecutor extends Executioner {
     private final int threads;
     private final RingBuffer<TaskEvent> ring;
     @NotNull
-    private final AffinityExecutor exe;
+    private final Executor exe;
     private final int cap;
 
     //private CPUThrottle throttle;
@@ -51,16 +52,23 @@ public class MultiThreadExecutor extends Executioner {
     final Disruptor<TaskEvent> disruptor;
 
 
+
+
+
     public MultiThreadExecutor(int threads, int ringSize, boolean sync) {
-        this(threads, ringSize);
+        this(threads, ringSize, sync, new AffinityExecutor("exe"));
+    }
+
+    public MultiThreadExecutor(int threads, int ringSize, boolean sync, Executor exe) {
+        this(threads, ringSize, exe);
         sync(sync);
     }
 
-    public MultiThreadExecutor(int threads, int ringSize) {
+    public MultiThreadExecutor(int threads, int ringSize, Executor exe) {
 
         this.threads = threads;
 
-        this.exe = new AffinityExecutor("exe");
+        this.exe = exe;
 
         this.cap = ringSize;
 

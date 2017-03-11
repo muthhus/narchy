@@ -6,6 +6,7 @@ import io.undertow.server.handlers.PathHandler;
 import io.undertow.server.handlers.resource.FileResourceManager;
 import io.undertow.websockets.WebSocketConnectionCallback;
 import io.undertow.websockets.extensions.PerMessageDeflateHandshake;
+import nars.InterNAR;
 import nars.NAR;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -104,7 +105,9 @@ public class WebServer extends PathHandler /*extends PathHandler*/ {
         int httpPort = args.length < 1 ? 8080 : Integer.parseInt(args[0]);
 
         NAR nar =
-                newRealtimeNAR(512, 25, 2);
+                newRealtimeNAR(512, 10, 32);
+
+        InterNAR net = new InterNAR(nar, 8, 10420);
 
         Hear.wiki(nar);
 

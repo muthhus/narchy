@@ -459,6 +459,15 @@ public class UDPeer extends UDP {
         return connected;
     }
 
+    /** ping same host, different port */
+    public void ping(int port) {
+        ping(new InetSocketAddress(me.getAddress(), port));
+    }
+
+    public void ping(String host, int port) {
+        throw new UnsupportedOperationException("TODO");
+    }
+
     public void ping(InetSocketAddress to) {
         if (to.equals(me))
             return;

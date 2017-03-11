@@ -5,6 +5,9 @@ import jcog.net.UDPeer;
 import nars.bag.leak.LeakOut;
 import nars.budget.BLink;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.net.SocketException;
 import java.net.UnknownHostException;
@@ -14,6 +17,8 @@ import java.util.function.Consumer;
  * InterNAR P2P Network Interface for a NAR
  */
 public class InterNAR extends UDPeer {
+
+    public static final Logger logger = LoggerFactory.getLogger(InterNAR.class);
 
     public final NAR nar;
     public final LeakOut out;
@@ -31,10 +36,22 @@ public class InterNAR extends UDPeer {
         this.nar = nar;
         this.out = new LeakOut(nar, 16, outRate) {
             @Override protected float send(Task x) {
-                if (!them.isEmpty() && say(IO.taskToBytes(x), Util.lerp(x.pri() * x.qua(), 3, 1), true) > 0)
-                    return 1;
-                else
-                    return 0;
+
+                if (!them.isEmpty()) {
+                    try {
+                        x = nar.post(x);
+                        @Nullable byte[] msg = IO.taskToBytes(x);
+                        if (msg!=null) {
+                            if (say(msg, Util.lerp(x.pri() * x.qua(), 3, 1), true) > 0) {
+                                return 1;
+                            }
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+                return 0;
+
             }
 
             @Override
@@ -44,6 +61,7 @@ public class InterNAR extends UDPeer {
                 super.in(t, each);
             }
         };
+        logger.info("start");
     }
 
     @Override
@@ -66,8 +84,9 @@ public class InterNAR extends UDPeer {
     protected void receive(Msg m) {
 
         Task x = IO.taskFromBytes(m.data(), nar.concepts);
+        if (x!=null)
         //System.out.println(me + " RECV " + x + " " + Arrays.toString(x.stamp()) + " from " + m.origin());
-        nar.input(x);
+            nar.input(x);
     }
 
 }

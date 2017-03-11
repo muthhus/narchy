@@ -13,6 +13,7 @@ import nars.term.Compound;
 import nars.term.atom.Atomic;
 import nars.time.FrameTime;
 import nars.time.RealTime;
+import nars.time.Time;
 import nars.truth.Truth;
 import nars.util.task.TaskStatistics;
 import org.jetbrains.annotations.NotNull;
@@ -20,6 +21,8 @@ import spacegraph.math.v2;
 import spacegraph.space.layout.Grid;
 import spacegraph.space.widget.MatrixView;
 
+import java.net.SocketException;
+import java.net.UnknownHostException;
 import java.util.List;
 
 import static nars.$.$;
@@ -42,7 +45,7 @@ public class Tetris extends NAgentX {
     public static final int tetris_height = 12;
     public static final int TIME_PER_FALL = 2;
     public static final int PIXEL_RADIX = 2;
-    static final int DUR = 1;
+    static final int DUR = 4;
 
     private static SensorConcept[][] concept;
     //private int afterlife = TIME_PER_FALL * tetris_height * tetris_width;
@@ -61,15 +64,14 @@ public class Tetris extends NAgentX {
                     new MatrixView(tetris_width, tetris_height, (x, y, gl) -> {
                         SensorConcept cxy = concept[x][y];
                         long now = this.now;
-                        float r = cxy.beliefFreq(now, 0.5f);
-                        float g = cxy.goalFreq(now, 0.5f);
+                        float r = cxy.beliefFreq(now, DUR);
+                        float g = cxy.goalFreq(now, DUR);
                         gl.glColor3f(0, g, r);
                         return 0f;
                     }),
                     new MatrixView(tetris_width, tetris_height, (x, y, gl) -> {
-                        float dur = nar.time.dur();
-                        long then = (long) (now + dur * 8);
-                        Truth f = concept[x][y].belief(then, dur);
+                        long then = (long) (now + DUR * 8);
+                        Truth f = concept[x][y].belief(then, DUR);
                         float fr, co;
                         if (f == null) {
                             fr = 0.5f;
@@ -458,7 +460,7 @@ public class Tetris extends NAgentX {
             //Param.DEBUG = true;
             //Param.HORIZON = 1/100f;
 
-            FrameTime clock = new FrameTime().dur( DUR );
+            Time clock = new RealTime.DSHalf().durCycles( DUR );
             NAR n =
                     NARBuilder.newMultiThreadNAR(4, clock);
                     //NARBuilder.newALANN(clock, 4, 64, 5, 4, 1);
@@ -618,6 +620,14 @@ public class Tetris extends NAgentX {
             metaT.init();
             metaT.trace = true;
             n.onCycle(metaT.nar::cycle);
+
+            try {
+                InterNAR i = new InterNAR(n, 8, 10421);
+                i.ping(10420);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
             //metaT.nar.log();
 //            m.onTask(t -> {
 //                if (t instanceof DerivedTask)

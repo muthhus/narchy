@@ -115,19 +115,10 @@ public class Arkancide extends NAgentX {
             }
         };
 
-        //nar.linkFeedbackRate.setValue(0.02f);
-
         maxPaddleSpeed = 15 * Arkanoid.BALL_VELOCITY;
-
-
-
-        //nar.truthResolution.setValue(0.02f);
-
-        //nar.input(new TaskBuilder(happy, Op.BELIEF, $.t(0.5f, 0.15f)).eternal());
 
         //float resX = Math.max(0.01f, 1f/visW); //dont need more resolution than 1/pixel_width
         //float resY = Math.max(0.01f, 1f/visH); //dont need more resolution than 1/pixel_width
-
 
         if (cam) {
             senseCamera("noid", noid, visW, visH);
@@ -140,11 +131,6 @@ public class Arkancide extends NAgentX {
             senseNumber("vx(ball)", new FloatPolarNormalized(()->noid.ball.velocityX));
             senseNumber("vy(ball)", new FloatPolarNormalized(()->noid.ball.velocityY));
         }
-
-
-
-
-
 
         /*action(new ActionConcept( $.func("dx", "paddleNext", "noid"), nar, (b, d) -> {
             if (d!=null) {

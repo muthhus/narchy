@@ -12,6 +12,8 @@ import nars.util.exe.MultiThreadExecutor;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import java.util.concurrent.Executors;
+import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
@@ -75,7 +77,7 @@ public class InterNARTest {
     private static Default newNAR() {
         return new Default(1024, 2, 1, 3, new XorShift128PlusRandom(System.nanoTime()),
                 new CaffeineIndex(new DefaultConceptBuilder(), 1024, false, null),
-                new RealTime.DSHalf(), new MultiThreadExecutor(2, 16));
+                new RealTime.DSHalf(), new MultiThreadExecutor(3, 128, Executors.newCachedThreadPool()));
     }
 
     @Test
