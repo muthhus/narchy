@@ -886,7 +886,7 @@ public class Narsese extends BaseParser<Object> {
 
                 ),
 
-                push(getOperator(match()))
+                push(Op.fromString(match()))
         );
     }
 
@@ -897,9 +897,10 @@ public class Narsese extends BaseParser<Object> {
                         EQUI.str,
                         CONJ.str
                 ),
-                push(getOperator(match()))
+                push(Op.fromString(match()))
         );
     }
+
     Rule OpTemporalParallel() {
         return firstOf(
                 seq("<|>", push(EQUI)),

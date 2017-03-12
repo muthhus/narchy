@@ -225,10 +225,9 @@ In keeping with a design preference for unity and balanced spectral continuity, 
  Concurrent sorted bag; fuses a Map and Array.  See CurveBag.java
 
 ### Pressurized Auto-balanced Forgetting
- Auto-forgetting removes the need for arbitrary forgetting rates, instead replacing with a continuous forgetting
- applied in a balanced proportion to the bag activation pressure relative to the existing
- bag's mass.
- 
+ Auto-forgetting removes the need for specifying arbitrary forgetting rates.  Instead, a forgetting rate is
+ determined as a balanced proportion by an accumulated activation "pressure" relative to the bag's existing mass.
+
 ### Concept Index 
  A central, concurrent concept index (cache) provides access to all inactive concepts.  The capacity
  of the index can be adjusted in various ways including maximum size, maximum "weight", and weak/soft

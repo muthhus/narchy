@@ -33,8 +33,8 @@ public enum Op {
 
     NEG("--", 5, Args.One),
 
-    INH("-->", 1, OpType.Relation, Args.Two),
-    SIM("<->", true, 2, OpType.Relation, Args.Two),
+    INH("-->", 1, OpType.Statement, Args.Two),
+    SIM("<->", true, 2, OpType.Statement, Args.Two),
 
     /** extensional intersection */
     SECTe("&", true, 3, Args.GTETwo),
@@ -72,10 +72,10 @@ public enum Op {
 
 
     /** implication */
-    IMPL("==>", 5, OpType.Relation, Args.Two),
+    IMPL("==>", 5, OpType.Statement, Args.Two),
 
     /** equivalence */
-    EQUI("<=>", true, 5, OpType.Relation, Args.Two),
+    EQUI("<=>", true, 5, OpType.Statement, Args.Two),
 
 
     // keep all items which are invlved in the lower 32 bit structuralHash above this line
@@ -91,9 +91,9 @@ public enum Op {
 
 
     //VIRTUAL TERMS
-    @Deprecated INSTANCE("-{-", 2, OpType.Relation),
-    @Deprecated PROPERTY("-]-", 2, OpType.Relation),
-    @Deprecated INSTANCE_PROPERTY("{-]", 2, OpType.Relation),
+    @Deprecated INSTANCE("-{-", 2, OpType.Statement),
+    @Deprecated PROPERTY("-]-", 2, OpType.Statement),
+    @Deprecated INSTANCE_PROPERTY("{-]", 2, OpType.Statement),
     @Deprecated DISJ("||", true, 5, Args.GTETwo),
 
     /** for ellipsis, when seen as a term */
@@ -142,15 +142,10 @@ public enum Op {
     public static final char STAMP_STARTER = ':';
 
 
-    /**
-     * symbol representation of this getOperator
-     */
-    @NotNull
-    public final String str;
+    /** string representation */
+    @NotNull public final String str;
 
-    /**
-     * character representation of this getOperator if symbol has length 1; else ch = 0
-     */
+    /** character representation if symbol has length 1; else ch = 0 */
     public final char ch;
 
     public final OpType type;
@@ -354,7 +349,7 @@ public enum Op {
 
     /** top-level Op categories */
     public enum OpType {
-        Relation,
+        Statement,
         Variable,
         Other
     }
@@ -391,7 +386,7 @@ public enum Op {
     //static final CharObjectHashMap<Op> _charToOperator = new CharObjectHashMap(values().length * 2);
 
 
-    public static Op getOperator(String s) {
+    public static Op fromString(String s) {
         return stringToOperator.get(s);
     }
 
