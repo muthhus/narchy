@@ -518,7 +518,7 @@ abstract public class NAgent implements NSense, NAction {
         if (t.start() != ETERNAL) {
 
             //only shift for questions
-            long shift = t.isQuestOrQuestion() ? Math.round(dur * horizon * nar.random.nextFloat()) : 0;
+            long shift = t.isQuestOrQuestion() ? Math.round(dur * (1 + horizon * nar.random.nextFloat())) : (int)Math.ceil(dur);
 
             long range = t.end() - t.start();
             return prediction(t.term(), t.punc(), t.truth(), now + shift, now + shift + range);

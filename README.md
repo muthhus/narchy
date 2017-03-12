@@ -88,24 +88,26 @@ Note:
     - 0.5: "maybe"
     -  1 : "always"
  - Confidence (0..1.0]*
-    - confidence=1.0 triggers a locked axiomatic belief state that overrides any additional beliefs in its table
+    - confidence=1.0 triggers a locked axiomatic belief state that overrides any additional beliefs in its table (EXPERIMENTAL)
 
 **Occurrence** - (64 bit integer, can store resolutions up to Nanosecond precision)
  - specifies a relative (see <dt>) or absolute occurrence time. if unspecified, ETERNAL (TODO)
 
 **Budget** = (priority, durability, quality)
 ```
-<budget> ::= "$"<priority>[";"<durability>[";"<quality>]]"$"  // three numbers in [0,1]x(0,1)
+<budget> ::= "$"<priority>[";"<quality>]"$"  // priority in [0,1], quality in (0,1)
 ```
  - Priority [0..1.0] - determines applied attention relative to other items
- - Durability [0..1.0] - determines forget rate relative to other items
- - Quality [0..1.0] - indicates a level of accumulated utility
+ - Quality [0..1.0] - indicates a level of accumulated utility, higher value preserves priority longer through time during forget
  
 **Variables**
  - $X independent variable
+    - must span a statement (appearing on both sides)
  - \#Y dependent variable
  - ?Z query variable
+    - only useful in question tasks
  - %A pattern variable
+    - the most general variable type which is used in meta-NAL to match terms (including other variables)
 
 
 **Concept** = identified by non-variable, non-negated term
@@ -115,8 +117,7 @@ Note:
  - Capacity Policy
  - Compound Concepts also include..
     - Belief, Goal, Question, and Quest Task Tables
-    - TermLink templates
-    
+
 
 ## Reasoning
 ![Inference](https://raw.githubusercontent.com/automenta/narchy/skynet2/doc/derivation_pipeline.png)
@@ -210,15 +211,17 @@ In keeping with a design preference for unity and balanced spectral continuity, 
  are converted immediately to negated conjunction of negations via DeMorgan's laws.  By preferring 
  the conjunction representation,
  temporal information can not be lost through conversion to or from the non-temporal Disjunction type.
- 
-### Buffered CurveBag with Auto-forgetting 
- The default bag type is a Buffered Auto-Forgetting CurveBag which accumulate updates between 
- "commits" in which the changes are later applied.  Buffering supports rapid high-frequency 
- inter-concept activation without needing constant bag data structure maintenance.  Auto-forgetting
- removes the need for arbitrary forgetting rates, instead replacing with a continuous forgetting
+
+### HijackBag
+ High performance, lock-free concurrent unsorted bag based on linear hash probing.  See HijackBag.java
+
+### CurveBag
+ Concurrent sorted bag; fuses a Map and Array.  See CurveBag.java
+
+### Pressurized Auto-balanced Forgetting
+ Auto-forgetting removes the need for arbitrary forgetting rates, instead replacing with a continuous forgetting
  applied in a balanced proportion to the bag activation pressure relative to the existing
- bag's mass.  Bags also share key maps where possible (between all tasks in a concept, and
- between both termlink and tasklink bags in a concept), reducing memory usage.
+ bag's mass.
  
 ### Concept Index 
  A central, concurrent concept index (cache) provides access to all inactive concepts.  The capacity
@@ -229,12 +232,12 @@ In keeping with a design preference for unity and balanced spectral continuity, 
   While individual concept accesses are not yet entirely synchronization-free, this becomes less important as the number
    of concepts generally greatly exceeds the number of threads.
  
-### Binary Codec for Terms and Tasks 
+### Binary IO Codec for Terms and Tasks
  A compact byte-level codec for terms and tasks allows all concept data to be serialized to and from
  disk, off-heap memory, or network streams.  It is optionally compressed with Snappy compression
  algorithm which offers a tradeoff of speed and size savings.
  
-### Concept Management Policies 
+### Concept Allocation Policies
  An adaptive concept "policy" system manages the allowed capacity of the different concept
  data structures according to activity, term complexity, confidence levels, or other heuristics. 
  This can be used, for example, to allow atomic concepts to support more termlinks than compounds, 

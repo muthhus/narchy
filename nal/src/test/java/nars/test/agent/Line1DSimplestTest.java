@@ -1,6 +1,7 @@
 package nars.test.agent;
 
 import jcog.io.SparkLine;
+import jcog.list.FasterList;
 import nars.NAR;
 import nars.Narsese;
 import nars.Param;
@@ -116,17 +117,54 @@ public class Line1DSimplestTest {
 
     }
 
-    private static List<Float> downSample(List<Float> motv, int divisor) {
-        List<Float> l = new ArrayList((int)Math.ceil(((float)motv.size())/divisor));
-        for (int i = 0; i < motv.size(); ) {
+    private static List<Float> downSample(List<Float> f, int divisor) {
+        List<Float> l = new FasterList<>((int)Math.ceil(((float)f.size())/divisor));
+        for (int i = 0; i < f.size(); ) {
             float total = 0;
             int j;
-            for (j = 0; j < divisor && i < motv.size(); j++ ) {
-                total += motv.get(i++);
+            for (j = 0; j < divisor && i < f.size(); j++ ) {
+                total += f.get(i++);
             }
             l.add(total/j);
         }
         return l;
     }
+
+
+    /** tests with an explicit rule provided that will help it succeed */
+    @Test public void testSimpleCheat() throws Narsese.NarseseException {
+
+        NAR n = new Default();
+
+        Line1DSimplest a = new Line1DSimplest(n);
+
+        n.derivedEvidenceGain.setValue(0f);
+
+        a.init();
+
+        n.log();
+
+        n.input("((in) ==> (out)). %1.0;0.99%");
+        n.input("(--(in) ==> --(out)). %1.0;0.99%");
+
+        n.run(1);
+        a.curiosity.setValue(0f); //then shutoff curiosity
+
+        a.trace = true;
+
+        final int changePeriod = 16;
+
+        int time = 500;
+
+        for (int i = 0; i < time; i++) {
+            if (i % changePeriod == 0)
+                a.target = n.random.nextBoolean() ?  1f : 0f;
+            n.run(1);
+        }
+
+        System.out.println("AVG SCORE=" + a.rewardSum() / n.time());
+
+    }
+
 
 }
