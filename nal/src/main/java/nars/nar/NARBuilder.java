@@ -131,13 +131,14 @@ public interface NARBuilder {
 //                };
 //            }
 
+            final static int COMPRESS_ABOVE_COMPLEXITY = 20;
             final Compressor compressor = new Compressor(this, "_",
                     4, 6,
                     1f, 32, 256);
 
             @Override
             public Task pre(@NotNull Task t) {
-                if (!t.isInput()) {
+                if (!t.isInput() && t.complexity() > COMPRESS_ABOVE_COMPLEXITY) {
                     return compressor.encode(t);
                 } else {
                     //@NotNull Task encoded = compressor.encode(t);
@@ -152,7 +153,10 @@ public interface NARBuilder {
             @NotNull
             @Override
             public Term pre(@NotNull Term t) {
-                return compressor.encode(t);
+                if (t.complexity() > COMPRESS_ABOVE_COMPLEXITY)
+                    return compressor.encode(t);
+                else
+                    return t;
             }
 
             @NotNull
@@ -182,7 +186,7 @@ public interface NARBuilder {
 
         nar.stmLinkage.capacity.set(0);
         nar.core.conceptsFiredPerCycle.setValue(128);
-        nar.core.conceptsFiredPerBatch.setValue(32);
+        nar.core.conceptsFiredPerBatch.setValue(4);
         nar.core.derivationsInputPerCycle.setValue(96);
 
         nar.activationRate.setValue(0.5f);

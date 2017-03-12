@@ -1,10 +1,12 @@
 package nars.experiment.mario;
 
 import jcog.Util;
+import nars.$;
 import nars.NAR;
 import nars.NAgentX;
 import nars.Narsese;
 import nars.experiment.mario.sprites.Mario;
+import nars.video.CameraGasNet;
 import nars.video.PixelBag;
 
 import javax.swing.*;
@@ -60,7 +62,11 @@ public class NARio extends NAgentX {
                }
                //cc.setXRelative( mario.)
             });
+
             senseCamera("camF", cc, (v) -> t(v, alpha())).setResolution(0.02f);
+
+            //new CameraGasNet($.the("camF"), cc, this, 64);
+
             //senseCameraRetina("camZ", ()->mario.image, 30, 18, (v) -> t(v, alpha)).setResolution(0.1f);
 
 
@@ -138,6 +144,7 @@ public class NARio extends NAgentX {
 //            System.out.println(y);
 
     }
+
 }
 
 /*

@@ -8,6 +8,10 @@ import nars.conceptualize.DefaultConceptBuilder;
 import nars.index.term.map.CaffeineIndex;
 import nars.nar.Default;
 import nars.time.RealTime;
+import nars.video.CameraGasNet;
+import nars.video.PixelBag;
+import nars.video.Scale;
+import nars.video.SwingCamera;
 
 import java.io.File;
 import java.io.IOException;
@@ -123,6 +127,7 @@ public class Arkancide extends NAgentX {
         if (cam) {
             senseCamera("noid", noid, visW, visH);
             //senseCameraRetina("noid", noid, visW/2, visH/2, (v) -> $.t(v, alpha));
+            //new CameraGasNet($.the("camF"),new Scale(new SwingCamera(noid), 80, 80), this, 64);
         } else {
             //nar.termVolumeMax.set(12);
             senseNumber( "x(paddle)", new FloatPolarNormalized(()->noid.paddle.x, noid.getWidth()/2));//.resolution(resX);

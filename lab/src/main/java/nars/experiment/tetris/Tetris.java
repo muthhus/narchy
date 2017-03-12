@@ -56,36 +56,48 @@ public class Tetris extends NAgentX {
     //private final int visionSyncPeriod = 4; //16 * TIME_DILATION;
 
     public final Grid view = new Grid(
-                    new MatrixView(tetris_width, tetris_height, (x, y, gl) -> {
-                        float r = nar.pri(concept[x][y], Float.NaN);
-                        gl.glColor3f(r, 0, 0);
-                        return 0f;
-                    }),
+//                    new MatrixView(tetris_width, tetris_height, (x, y, gl) -> {
+//                        float r = nar.pri(concept[x][y], Float.NaN);
+//                        gl.glColor3f(r, 0, 0);
+//                        return 0f;
+//                    }),
                     new MatrixView(tetris_width, tetris_height, (x, y, gl) -> {
                         SensorConcept cxy = concept[x][y];
                         long now = this.now;
-                        float r = cxy.beliefFreq(now, DUR);
+                        float b = cxy.beliefFreq(now, DUR);
                         float g = cxy.goalFreq(now, DUR);
-                        gl.glColor3f(0, g, r);
-                        return 0f;
-                    }),
-                    new MatrixView(tetris_width, tetris_height, (x, y, gl) -> {
-                        long then = (long) (now + DUR * 8);
-                        Truth f = concept[x][y].belief(then, DUR);
-                        float fr, co;
-                        if (f == null) {
-                            fr = 0.5f;
-                            co = 0;
+                        float gp, gn;
+                        if (g == g) {
+                            g -= 0.5f;
+                            g *= 2f;
+                            if (g < 0) {
+                                gp = 0; gn = -g;
+                            } else {
+                                gp = g; gn = 0;
+                            }
                         } else {
-                            fr = f.freq();
-                            co = f.conf();
+                            gp = gn = 0;
                         }
-                        gl.glColor4f(0, fr, 0, 0.25f + 0.75f * co);
-//                        Draw.colorPolarized(gl,
-//                                concept[x][y].beliefFreq(then, 0.5f) -
-//                                        concept[x][y].beliefFreq(now, 0.5f));
+                        gl.glColor3f(gp, b, gn);
                         return 0f;
                     })
+//                    new MatrixView(tetris_width, tetris_height, (x, y, gl) -> {
+//                        long then = (long) (now + DUR * 8);
+//                        Truth f = concept[x][y].belief(then, DUR);
+//                        float fr, co;
+//                        if (f == null) {
+//                            fr = 0.5f;
+//                            co = 0;
+//                        } else {
+//                            fr = f.freq();
+//                            co = f.conf();
+//                        }
+//                        gl.glColor4f(0, fr, 0, 0.25f + 0.75f * co);
+////                        Draw.colorPolarized(gl,
+////                                concept[x][y].beliefFreq(then, 0.5f) -
+////                                        concept[x][y].beliefFreq(now, 0.5f));
+//                        return 0f;
+//                    })
 
         );
 
@@ -462,7 +474,7 @@ public class Tetris extends NAgentX {
 
             Time clock = new RealTime.DSHalf().durCycles( DUR );
             NAR n =
-                    NARBuilder.newMultiThreadNAR(4, clock);
+                    NARBuilder.newMultiThreadNAR(3, clock);
                     //NARBuilder.newALANN(clock, 4, 64, 5, 4, 1);
 
 

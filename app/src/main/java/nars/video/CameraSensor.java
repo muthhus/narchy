@@ -35,17 +35,17 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
         this.agent = agent;
 
         agent.sensors.addAll(
-            encode((x,y)->
+                encode((x,y)->
 
-                $.func(root,
-                //$.inh(
-                    //root,
-                    $.p(radix > 1 ?
-                        new Term[] { coord(x, width), coord(y, height) } :
-                        new Term[] { $.the(x), $.the(y) }
-                ))
+                                $.func(root,
+                                        //$.inh(
+                                        //root,
+                                        $.p(radix > 1 ?
+                                                new Term[] { coord(x, width), coord(y, height) } :
+                                                new Term[] { $.the(x), $.the(y) }
+                                        ))
 
-            , brightnessToTruth));
+                        , brightnessToTruth));
 
         agent.nar.onCycle(this);
     }

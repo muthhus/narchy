@@ -69,7 +69,7 @@ public class MySTMClustered extends STMClustered {
         this.allowNonInput = allowNonInput;
 
         net.setAlpha(0.05f);
-        net.setBeta(0.05f);
+        //net.setBeta(0.05f);
         net.setWinnerUpdateRate(0.03f, 0.01f);
     }
 

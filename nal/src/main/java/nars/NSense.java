@@ -194,6 +194,9 @@ public interface NSense {
     default SensorConcept senseNumberNormalized(Compound id, FloatSupplier v) {
         return senseNumber(id, new FloatNormalized(v));
     }
+    default SensorConcept senseNumberNormalized(Compound id, float min, float max, FloatSupplier v) {
+        return senseNumber(id, new FloatNormalized(v, min, max));
+    }
 
     @NotNull
     default FuzzyScalarConcepts senseNumberBi(String id, FloatSupplier v) throws Narsese.NarseseException {
