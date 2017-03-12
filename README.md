@@ -27,7 +27,7 @@ Non-Axiomatic Reasoning System ([NARS](https://sites.google.com/site/narswang/ho
 
            <compound> ::=
                         | "(--," <term> ")"                  // negation
-                        | --<term>                           // negation shorthand TODO
+                        | --<term>                           // negation shorthand
 
                         | "(" <term> {","<term>} ")"         // product (ie. un-ordered vector or list, length >= 0)
                         | "{" <term> {","<term>} "}"         // extensional set (ordered, all unique, length >= 1)
@@ -76,7 +76,11 @@ Non-Axiomatic Reasoning System ([NARS](https://sites.google.com/site/narswang/ho
 
 Note:
  - Additional restrictions and reductions may be applied to input.  See TermBuilder.java.
- - Built-in TermFunctions are executed inline during the term building process. See BuiltIn.java
+ - Built-in 'Functors' are executed inline during the term building process. See BuiltIn.java.
+   - Functors evaluated inner-most first, from left to right.
+   - Results and their reductions may cascade when outer levels are evaluated.
+   - Most functors will not evaluate (leaving it untouched) if any parameters are variables ("unbound").  Such variables may be eliminated in derivations allowing functor evaluation to proceed with the contant values.
+
 
 
 **Truth** = (frequency, confidence)
@@ -93,13 +97,15 @@ Note:
 **Occurrence** - (64 bit integer, can store resolutions up to Nanosecond precision)
  - specifies a relative (see <dt>) or absolute occurrence time. if unspecified, ETERNAL (TODO)
 
-**Budget** = (priority, durability, quality)
+**Budget**
 ```
 <budget> ::= "$"<priority>[";"<quality>]"$"  // priority in [0,1], quality in (0,1)
 ```
  - Priority [0..1.0] - determines applied attention relative to other items
+    - if unspecified, a default priority will be assigned to inputs
  - Quality [0..1.0] - indicates a level of accumulated utility, higher value preserves priority longer through time during forget
- 
+    - if unspecified, a default quality will be assigned to inputs
+
 **Variables**
  - $X independent variable
     - must span a statement (appearing on both sides)
