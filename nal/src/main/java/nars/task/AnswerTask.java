@@ -64,12 +64,12 @@ public class AnswerTask extends ImmutableTask {
 
     @Nullable
     public final AnswerTask budget(@NotNull Task a, @NotNull Task b, float aMix) {
-        float priSum = lerp(aMix, a.priSafe(0), b.priSafe(0));
-        float newPri = Util.unitize(priSum);
-
         budgetSafe(
-                newPri,
-                lerp(aMix, a.qua(), b.qua())
+            Util.unitize(
+                a.priSafe(0) +
+                   b.priSafe(0)
+            ),
+            lerp(aMix, a.qua(), b.qua())
         );
         return this;
     }

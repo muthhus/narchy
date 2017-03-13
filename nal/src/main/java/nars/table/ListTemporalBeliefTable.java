@@ -86,13 +86,12 @@ public class ListTemporalBeliefTable extends MultiRWFasterList<Task> implements 
 
                         Task c = (b != null && b != a) ? merge(a, b, now, confMin, dur) : null;
 
-                        remove(l, a);
+                        remove(l, a, true);
 
                         if (c != null) {
-                            remove(l, b);
+                            remove(l, b, true);
 
                             l.add(c);
-
                         }
 
                     }
@@ -319,9 +318,10 @@ public class ListTemporalBeliefTable extends MultiRWFasterList<Task> implements 
 //    }
 
 
-    final boolean remove(MutableList<Task> l, @NotNull Task x) {
+    final boolean remove(MutableList<Task> l, @NotNull Task x, boolean delete) {
         if (l.remove(x)) {
-            x.delete();
+            if (delete)
+                x.delete();
             onRemoved(x);
             return true;
         }
@@ -335,18 +335,13 @@ public class ListTemporalBeliefTable extends MultiRWFasterList<Task> implements 
 
     static final float rankTemporalByConfidence(@Nullable Task t, long when, long now, float dur) {
 
-        float r = (t != null) ? t.evi(when, dur) : Float.NEGATIVE_INFINITY;// * (1+t.range()) * t.qua();
+        if (t == null)
+            return Float.NEGATIVE_INFINITY;
 
-//        if (t!=null && t.start() > now+dur) {
-//            r *=2; //experimental future (prediction) preference
-//        }
+        float r = t.evi(when, dur);// * (1+t.range()) * t.qua();
 
         return r;
 
-//        long range = Math.max(1, t.range());
-//        long worstDistance = range == 1 ? Math.abs(when - t.mid()) : Math.max(abs(when - t.start()), abs(when - t.end()));
-//        return t == null ? -1 :
-//                (t.conf() * range / (range + (worstDistance * worstDistance)));
     }
 
     static Task matchMerge(MutableList<Task> l, long now, @NotNull Task toMergeWith, float dur) {
@@ -426,15 +421,18 @@ public class ListTemporalBeliefTable extends MultiRWFasterList<Task> implements 
             return null;
         }
 
-        remove(l, a);
+        remove(l, a, false);
 
         Task b = matchMerge(l, now, a, dur);
         if (b != null) {
             Task merged = merge(a, b, now, confMin, dur);
+
+            a.delete();  //delete a after the merge, so that its budget revises
+
             if (merged == null) {
                 return input;
             } else {
-                remove(l, b);
+                remove(l, b, true);
                 return merged;
             }
         } else {

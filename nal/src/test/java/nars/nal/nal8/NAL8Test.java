@@ -23,7 +23,7 @@ import static org.junit.Assert.assertEquals;
 @RunWith(Parameterized.class)
 public class NAL8Test extends AbstractNALTest {
 
-    final int cycles = 250;
+    final int cycles = 100;
 
     public NAL8Test(Supplier<NAR> b) { super(b); }
 
@@ -753,14 +753,14 @@ public class NAL8Test extends AbstractNALTest {
                 .believe("(x)", Tense.Present, 1f, 0.9f)
                 .goal("((x) &&+3 (y))")
                 .mustDesire(cycles, "(y)", 1f, 0.81f, 3)
-                .mustNotOutput(cycles*3, "(y)", GOAL, ETERNAL);
+                .mustNotOutput(cycles, "(y)", GOAL, ETERNAL);
     }
     @Test public void testDeiredConjDelayedNeg() {
         test()
                 .believe("(x)", Tense.Present, 0f, 0.9f)
                 .goal("(--(x) &&+3 (y))")
                 .mustDesire(cycles, "(y)", 1f, 0.81f, 3)
-                .mustNotOutput(cycles*3, "(y)", GOAL, ETERNAL);
+                .mustNotOutput(cycles, "(y)", GOAL, ETERNAL);
     }
     @Test public void testBelievedImplOfDesireDelayed() {
 
@@ -769,7 +769,7 @@ public class NAL8Test extends AbstractNALTest {
                 .goal("(x)", Tense.Present, 1f, 0.9f)
                 .believe("((x)==>+3(y))")
                 .mustDesire(cycles, "(y)", 1f, 0.45f, 3)
-                .mustNotOutput(cycles*3, "(y)", GOAL, ETERNAL);
+                .mustNotOutput(cycles, "(y)", GOAL, ETERNAL);
     }
 
     @Test public void testGoalConjunctionDecompose() {
@@ -1135,7 +1135,7 @@ public class NAL8Test extends AbstractNALTest {
 
     }
 
-    @Test public void testPredictiveImplication() {
+    @Test public void testPredictiveImplicationTemporalTemporal() {
         /*
         wrong timing: should be (out)! @ 16
         $.36;.02$ (out)! 13 %.35;.05% {13: 9;a;b;t;S;Ü} ((%1,(%2==>%3),belief(negative),time(decomposeBelief)),((--,subIfUnifiesAny(%2,%3,%1)),((AbductionPN-->Belief),(DeductionPN-->Goal))))
@@ -1143,23 +1143,38 @@ public class NAL8Test extends AbstractNALTest {
             $0.0;.02$ ((out) ==>-3 (happy)). 10 %.35;.05% {10: 9;a;b;t;S} ((%1,(%2==>((--,%3)&&%1073742340..+)),time(dtBeliefExact),notImplEqui(%1073742340..+)),(subIfUnifiesAny((%2 ==>+- (&&,%1073742340..+)),(--,%3),(--,%1)),((DeductionN-->Belief))))
         */
         test()
-                .log()
                 .inputAt(0, "((out) ==>-3 (happy)). :|:")
                 .inputAt(13, "(happy)! :|:")
                 .mustDesire(cycles, "(out)", 1f, 0.81f, 16)
                 .mustNotOutput(cycles, "(out)", GOAL, 3);
     }
-
-    //$.50;.90$ (happy)! %1.0;.90%    $.11;.51$ ((--,(happy))&&(--,(out))). -1⋈8 %0.0;.88%
-    //$.13;.03$ (happy)! 19 %.47;.11% $0.0;.68$ ((--,(happy))&&(--,(out))). 19 %.16;.83%
-
-    //$.50;.90$ (happy)! %1.0;.90% $.24;.28$ ((--,(in)) ==>+0 ((--,(happy))&&(--,(out)))). 0 %0.0;.42%
-
-    //$.61;.90$ (happy)! 6 %1.0;.90% $.13;.27$ ((happy) <=>+0 ((--,(happy))&&(--,(out)))). 8 %1.0;.41%
-    //$.61;.90$ (happy)! 6 %1.0;.90% $0.0;.68$ ((--,(in))&&(happy)). 6 %.80;.83%
-    //$.50;.90$ (happy)! %1.0;.90% $.24;.28$ ((||,(happy),(out)) ==>+0 (in)). 0 %0.0;.42%
-    //$.50;.90$ (happy)! %1.0;.90% $.09;.15$ ((--,((--,(in))&&(happy))) ==>-6 ((--,(happy))&&(--,(out)))). 4 %0.0;.30%
-    //$.61;.90$ (happy)! 6 %1.0;.90% $.19;.16$ ((||,(happy),(out)) ==>+6 ((--,(in))&&(happy))). 4 %.10;.32%
-    //$.61;.90$ (happy)! 6 %1.0;.90% $.24;.28$ ((||,(happy),(out)) ==>+0 (in)). 0 %0.0;.42%
+    @Test public void testPredictiveImplicationTemporalEternal() {
+        test()
+                .inputAt(0, "((out) ==>-3 (happy)).")
+                .inputAt(13, "(happy)! :|:")
+                .mustDesire(cycles, "(out)", 1f, 0.81f, 16)
+                .mustNotOutput(cycles, "(out)", GOAL, 3);
+    }
+    @Test public void testPredictiveImplicationEternalTemporal() {
+        test()
+                .inputAt(0, "((out) ==>-3 (happy)). :|:")
+                .inputAt(13, "(happy)!")
+                .mustDesire(cycles, "(out)", 1f, 0.81f, 3)
+                .mustNotOutput(cycles, "(out)", GOAL, 13);
+    }
+    @Test public void testPredictiveEquivalenceTemporalTemporal() {
+        test()
+                .inputAt(0, "((out) <=>-3 (happy)). :|:")
+                .inputAt(13, "(happy)! :|:")
+                .mustDesire(cycles, "(out)", 1f, 0.81f, 16)
+                .mustNotOutput(cycles, "(out)", GOAL, 3);
+    }
+    @Test public void testPredictiveEquivalenceTemporalEternal() {
+        test()
+                .inputAt(0, "((out) <=>-3 (happy)). :|:")
+                .inputAt(13, "(happy)!")
+                .mustDesire(cycles, "(out)", 1f, 0.81f, 3)
+                .mustNotOutput(cycles, "(out)", GOAL, 13);
+    }
 
 }

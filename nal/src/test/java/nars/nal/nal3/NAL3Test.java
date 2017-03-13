@@ -19,7 +19,7 @@ import static org.junit.Assert.assertEquals;
 @RunWith(Parameterized.class)
 public class NAL3Test extends AbstractNALTest {
 
-    public static final int cycles = 800;
+    public static final int cycles = 200;
 
     public NAL3Test(Supplier<NAR> b) { super(b); }
 
@@ -297,7 +297,7 @@ public class NAL3Test extends AbstractNALTest {
             .believe("<{x,z}-->c>")
             .mustBelieve(cycles, "<{x,y,z}-->c>", 1f, 0.81f) //union
             .mustBelieve(cycles, "<{x}-->c>", 1f, 0.81f) //intersect
-            .mustBelieve(cycles, "<{y}-->c>", 1f, 0.73f /*0.81f*/) //difference
+            .mustBelieve(cycles, "<{y}-->c>", 1f, 0.81f) //difference
             .mustBelieve(cycles, "<{z}-->c>", 1f, 0.81f) //difference
             .mustBelieve(cycles, "<{y}-->c>", 0f, 0.81f) //difference
         //these are probably ok:
