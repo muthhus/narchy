@@ -15,10 +15,6 @@ import static nars.Op.BELIEF;
  */
 public class Line1DSimplest extends NAgent {
 
-    static {
-        Param.DEBUG = false;
-    }
-
 
     public float target = 0.5f, current = 0.5f;
 

@@ -6,11 +6,13 @@ import nars.NAR;
 import nars.Narsese;
 import nars.Param;
 import nars.nar.Default;
+import nars.task.DerivedTask;
 import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import static jcog.io.SparkLine.renderFloats;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -108,8 +110,8 @@ public class Line1DSimplestTest {
             n.run(1);
         }
 
-        System.out.println( "rwrd: " +  SparkLine.renderFloats(downSample(rewards, 4)) );
-        System.out.println( "motv: " + SparkLine.renderFloats(downSample(motv, 4)) );
+        System.out.println( "rwrd: " +  renderFloats(downSample(rewards, 4)) );
+        System.out.println( "motv: " + renderFloats(downSample(motv, 4)) );
         float avgReward = a.rewardSum() / n.time();
         System.out.println("avg reward = " + avgReward);
 
@@ -118,6 +120,9 @@ public class Line1DSimplestTest {
     }
 
     private static List<Float> downSample(List<Float> f, int divisor) {
+        if (divisor == 1)
+            return f;
+
         List<Float> l = new FasterList<>((int)Math.ceil(((float)f.size())/divisor));
         for (int i = 0; i < f.size(); ) {
             float total = 0;
@@ -134,33 +139,69 @@ public class Line1DSimplestTest {
     /** tests with an explicit rule provided that will help it succeed */
     @Test public void testSimpleCheat() throws Narsese.NarseseException {
 
-        NAR n = new Default();
+
+        NAR n = new Default(1024, 64, 1, 3);
+
+        n.termVolumeMax.setValue(10);
 
         Line1DSimplest a = new Line1DSimplest(n);
 
-        n.derivedEvidenceGain.setValue(0f);
+        Param.DEBUG = true;
 
-        a.init();
-
-        n.log();
-
-        n.input("((in) ==> (out)). %1.0;0.99%");
-        n.input("(--(in) ==> --(out)). %1.0;0.99%");
-
-        n.run(1);
-        a.curiosity.setValue(0f); //then shutoff curiosity
+        //n.derivedEvidenceGain.setValue(0f);
 
         a.trace = true;
+        a.init();
+        a.target = 0;
+        //a.curiosity.setValue(0f); //then shutoff curiosity
 
-        final int changePeriod = 16;
+        List<Float> hapy = new ArrayList(1*1024);
+        List<Float> motv = new ArrayList(1*1024);
+        List<Float> in = new ArrayList(1*1024);
+        List<Float> out = new ArrayList(1*1024);
 
-        int time = 500;
+        //n.log();
+        n.onTask(t -> {
+            if (t instanceof DerivedTask) {
+                if (t.isGoal() && t.toString().contains("(out)"))
+                    System.out.println(t.proof());
+            }
 
+            //System.out.println(t);
+        });
+
+//        n.input("((in) ==> (out)). %1.0;0.99%");
+//        n.input("(--(in) ==> --(out)). %1.0;0.99%");
+
+
+
+
+        final int changePeriod = 4;
+
+        int time = 80;
+
+        int j = 0;
         for (int i = 0; i < time; i++) {
-            if (i % changePeriod == 0)
-                a.target = n.random.nextBoolean() ?  1f : 0f;
+            n.input("(happy)! :|:");
+
+            if ((i+1) % changePeriod == 0) {
+                System.out.println("SWITCH");
+                a.target = (j++) % 2 == 0  ? 1f : 0f;
+            }
+
             n.run(1);
+
+            in.add(a.in.asFloat());
+            out.add((float)a.out.feedback.getAsDouble());
+            hapy.add(a.rewardValue);
+            motv.add(a.dexterity());
         }
+
+        int ds = 1;
+        System.out.println( "  in:\t" + renderFloats(downSample(in, ds)) );
+        System.out.println( " out:\t" + renderFloats(downSample(out, ds)) );
+        System.out.println( "hapy:\t" + renderFloats(downSample(hapy, ds)) );
+        System.out.println( "motv:\t" + renderFloats(downSample(motv, ds)) );
 
         System.out.println("AVG SCORE=" + a.rewardSum() / n.time());
 

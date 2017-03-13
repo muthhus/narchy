@@ -35,7 +35,7 @@ public class NAL4MultistepTest extends AbstractNALTest {
 
         TestNAR tester = test();
 
-        tester.log();
+        //tester.log();
 
         //(({tom},{sky})-->likes).  <{tom} --> cat>. <({tom},{sky}) --> likes>. <(cat,[blue]) --> likes>?
 

@@ -278,10 +278,11 @@ public class NAL8Test extends AbstractNALTest {
             
             .input("a:b! :|:")
             .inputAt(10, "(( c:d &&+5 e:f ) ==>+0 a:b).")
-            .mustDesire(cycles, "( c:d &&+5 e:f)", 1.0f, 0.81f, 0, 5)
+            .mustDesire(cycles, "( c:d &&+5 e:f)", 1.0f, 0.81f, -5, 0)
             .mustNotOutput(cycles, "( c:d &&+5 e:f)", GOAL, ETERNAL)
         ;
     }
+
     @Test
     public void condition_goal_deduction_interval()  {
         test()
@@ -1132,6 +1133,21 @@ public class NAL8Test extends AbstractNALTest {
                 .input("(#1&&(--,(out)))! :|:")
                 .mustDesire(cycles, "(out)", 0f, 0.81f, 0);
 
+    }
+
+    @Test public void testPredictiveImplication() {
+        /*
+        wrong timing: should be (out)! @ 16
+        $.36;.02$ (out)! 13 %.35;.05% {13: 9;a;b;t;S;Ü} ((%1,(%2==>%3),belief(negative),time(decomposeBelief)),((--,subIfUnifiesAny(%2,%3,%1)),((AbductionPN-->Belief),(DeductionPN-->Goal))))
+            $.50;.90$ (happy)! 13 %1.0;.90% {13: Ü}
+            $0.0;.02$ ((out) ==>-3 (happy)). 10 %.35;.05% {10: 9;a;b;t;S} ((%1,(%2==>((--,%3)&&%1073742340..+)),time(dtBeliefExact),notImplEqui(%1073742340..+)),(subIfUnifiesAny((%2 ==>+- (&&,%1073742340..+)),(--,%3),(--,%1)),((DeductionN-->Belief))))
+        */
+        test()
+                .log()
+                .inputAt(0, "((out) ==>-3 (happy)). :|:")
+                .inputAt(13, "(happy)! :|:")
+                .mustDesire(cycles, "(out)", 1f, 0.81f, 16)
+                .mustNotOutput(cycles, "(out)", GOAL, 3);
     }
 
     //$.50;.90$ (happy)! %1.0;.90%    $.11;.51$ ((--,(happy))&&(--,(out))). -1⋈8 %0.0;.88%

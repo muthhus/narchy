@@ -625,7 +625,7 @@ public class NAL7Test extends AbstractNALTest {
                 .inputAt(0, "(b). :|:")
                 .inputAt(0, "((a) ==>+1 (b)). :|:")
                 .mustNotOutput(cycles, "(a)", BELIEF, ETERNAL)
-                .mustBelieve(cycles, "(a)", 1f, 0.45f, 0 /* occ */);
+                .mustBelieve(cycles, "(a)", 1f, 0.45f, -1 /* 0 ? */);
         //.mustBelieve(cycles, "(a)", 1f, 0.45f, 0 /* occ */);
         //        /** because the two temporal events create a contradiction when evaluating the
         //         * derivation's result time, this tests decomposition's

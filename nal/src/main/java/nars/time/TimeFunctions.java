@@ -337,9 +337,16 @@ public interface TimeFunctions {
 
         Compound decomposedTerm = (Compound) (decomposeTask ? p.taskTerm : p.beliefTerm);
 
-        long occDecomposed = decomposeTask ? task.start() : (belief != null ? belief.start() : task.start());
+        //occOther: the non-decomposed counterpart of the premise
 
-        //the non-decomposed counterpart of the premise
+//        long occDecomposed = task.start();
+//        long occOther = belief!=null ? belief.start() : ETERNAL;
+//        if (task.start() == ETERNAL && belief!=null) {
+//            occDecomposed = belief.start();
+//            occOther = task.start();
+//        }
+
+        long occDecomposed = decomposeTask ? task.start() : (belief != null ? belief.start() : task.start());
         long occOther = (otherTask != null) ? otherTask.start() : ETERNAL;
 
 
@@ -371,12 +378,37 @@ public interface TimeFunctions {
 
                 @Nullable Term rDerived = resolve(p, derived);
 
-                if (rDerived != null && occDecomposed != ETERNAL) {
-
+                if (rDerived != null) {
                     int dt = rDecomposed.subtermTime(rDerived);
-                    if (dt != DTERNAL)
-                        occ = occDecomposed + dt;
 
+                    //prefer the task's occurrence first
+                    if (dt != DTERNAL) {
+
+                        if (!task.isEternal()) {
+
+                            occ = task.start();
+
+                            Term rTaskTerm = resolve(p, task.term());
+                            if (rTaskTerm!=null) {
+                                Term rOtherTerm = resolve(p, p.beliefTerm.term());
+                                if (rOtherTerm != null) {
+                                    int taskInDecomposed = rDecomposed.subtermTime(rTaskTerm);
+                                    if (taskInDecomposed!= DTERNAL) { //???
+                                        int otherInDecomposed = rDecomposed.subtermTime(rOtherTerm);
+                                        if (otherInDecomposed != DTERNAL) { //???
+                                            occ = task.start() - (otherInDecomposed + rDerived.dtRange()) - taskInDecomposed + dt;
+                                        }
+                                    }
+                                }
+                            }
+
+                        } else if (occDecomposed != ETERNAL) {
+
+                            occ = occDecomposed + dt;
+
+                        }
+
+                    }
                 }
 
                 if (occ == ETERNAL && occOther != ETERNAL) {
