@@ -132,6 +132,7 @@ public class Derivation extends Unify {
         set(new substituteIfUnifiesAny(this));
         //set(new substituteIfUnifiesForward(this));
         set(new substituteIfUnifiesDep(this));
+        //set(new substituteIfUnifiesIndep(this));
 
         this.premise = p;
 

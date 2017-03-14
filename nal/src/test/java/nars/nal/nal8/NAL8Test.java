@@ -1148,6 +1148,13 @@ public class NAL8Test extends AbstractNALTest {
                 .mustDesire(cycles, "(out)", 1f, 0.81f, 16)
                 .mustNotOutput(cycles, "(out)", GOAL, 3);
     }
+    @Test public void testPredictiveImplicationTemporalTemporalOpposite() {
+        test()
+                .inputAt(0, "((happy) ==>-3 (out)). :|:")
+                .inputAt(13, "(happy)! :|:")
+                .mustDesire(cycles, "(out)", 1f, 0.45f, 10)
+                .mustNotOutput(cycles, "(out)", GOAL, 3, 16, 0);
+    }
     @Test public void testPredictiveImplicationTemporalTemporalNeg() {
         test()
                 .inputAt(0, "(--(out) ==>-3 (happy)). :|:")
@@ -1190,6 +1197,44 @@ public class NAL8Test extends AbstractNALTest {
                 .inputAt(13, "(happy)! :|:")
                 .mustDesire(cycles, "(out)", 0f, 0.81f, 16)
                 .mustNotOutput(cycles, "(out)", GOAL, 3);
+    }
+    @Test public void conjDecoposeGoalAfter() {
+        test()
+                .log()
+                .inputAt(3, "((a) &&+3 (b)). :|:")
+                .inputAt(13, "(b)! :|:")
+                .mustDesire(cycles, "(a)", 1f, 0.81f, 13) //desired NOW, not at time 10 as would happen during normal decompose
+                .mustNotOutput(cycles, "(a)", GOAL, 3, 0, 10, ETERNAL);
+    }
+    @Test public void conjDecoposeGoalAfterPosNeg() {
+        test()
+                .log()
+                .inputAt(3, "(--(a) &&+3 (b)). :|:")
+                .inputAt(13, "(b)! :|:")
+                .mustDesire(cycles, "(a)", 0f, 0.81f, 13) //desired NOW, not at time 10 as would happen during normal decompose
+                .mustNotOutput(cycles, "(a)", GOAL, 3, 0, 10, ETERNAL);
+    }
+    @Test public void conjDecoposeGoalAfterNegPos() {
+        test()
+                .log()
+                .inputAt(3, "((a) &&+3 --(b)). :|:")
+                .inputAt(13, "(b)! :|:")
+                .mustNotOutput(cycles, "(a)", GOAL, new long[] { 13, 3, 0, 10, ETERNAL } );
+    }
+    @Test public void conjDecoposeGoalAfterNegNeg() {
+        test()
+                .log()
+                .inputAt(3, "((a) &&+3 --(b)). :|:")
+                .inputAt(13, "(--,(b))! :|:")
+                .mustDesire(cycles, "(a)", 1f, 0.81f, 13) //desired NOW, not at time 10 as would happen during normal decompose
+                .mustNotOutput(cycles, "(a)", GOAL, new long[] { 3, 0, 10, ETERNAL } );
+    }
+    @Test public void conjDecoposeGoalBefore() {
+        test()
+                .inputAt(3, "((a) &&+3 (b)). :|:")
+                .inputAt(13, "(a)! :|:")
+                .mustDesire(cycles, "(b)", 1f, 0.81f, 16)
+                .mustNotOutput(cycles, "(b)", GOAL, new long[] { 3L, 0L, 10L, 16L, ETERNAL } );
     }
 
 }

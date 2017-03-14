@@ -723,6 +723,7 @@ public class PremiseRule extends GenericCompound {
 //                            break;
 
                         case "decomposeBelief": timeFunction = TimeFunctions.decomposeBelief; break;
+                        case "decomposeBeliefLate": timeFunction = TimeFunctions.decomposeBeliefLate; break;
 
                         case "dtCombine":     timeFunction = TimeFunctions.dtCombine;  break;
                         case "dtCombinePre":  timeFunction = TimeFunctions.dtCombinePre; break;

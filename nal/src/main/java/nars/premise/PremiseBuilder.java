@@ -12,6 +12,7 @@ import nars.budget.BudgetMerge;
 import nars.concept.Concept;
 import nars.table.BeliefTable;
 import nars.task.DerivedTask;
+import nars.task.ImmutableTask;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
@@ -181,13 +182,14 @@ abstract public class PremiseBuilder {
 
         }
 
+        long taskStart = task.start();
         if ((belief == null) && (beliefTerm.varQuery() == 0 )) {
             Concept beliefConcept = nar.concept(beliefTerm);
             if (beliefConcept != null) {
 
                 //temporal focus:
                 long when;
-                long start = task.start();
+                long start = taskStart;
                 if (start == ETERNAL) {
 
                     when = ETERNAL;
@@ -214,6 +216,11 @@ abstract public class PremiseBuilder {
 
                 belief = beliefConcept.beliefs().match(when, now, dur, task, true); //in case of quest, proceed with matching belief
             }
+        }
+
+        if ((belief != null) && task.isGoal() && !task.isEternal() && !belief.isEternal() && belief.start() != taskStart) {
+            //project the belief to the time of the task
+            belief = ((ImmutableTask) belief).project(taskStart, nar.time.dur(), nar.confMin.floatValue());
         }
 
 

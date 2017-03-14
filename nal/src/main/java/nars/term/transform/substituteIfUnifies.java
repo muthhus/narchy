@@ -193,7 +193,25 @@ abstract public class substituteIfUnifies extends Functor {
             return Op.VAR_DEP;
         }
     }
+    public static final class substituteIfUnifiesIndep extends substituteIfUnifies {
 
+
+        public substituteIfUnifiesIndep(Derivation parent) {
+            super("subIfUnifiesIndep", parent);
+        }
+
+        @Override
+        protected boolean mustSubstitute() {
+            return false;
+        }
+
+
+        @NotNull
+        @Override
+        public Op unifying() {
+            return Op.VAR_INDEP;
+        }
+    }
 //    public static final class substituteOnlyIfUnifiesDep extends substituteIfUnifies {
 //
 //        public substituteOnlyIfUnifiesDep(PremiseEval parent) {

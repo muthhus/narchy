@@ -38,7 +38,7 @@ public class Arkancide extends NAgentX {
 
     private float prevScore;
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) {
         Param.DEBUG = false;
 
         //runRT(Arkancide::new);

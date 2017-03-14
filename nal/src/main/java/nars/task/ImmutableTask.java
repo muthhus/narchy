@@ -1,6 +1,7 @@
 package nars.task;
 
 import jcog.Util;
+import nars.$;
 import nars.NAR;
 import nars.Param;
 import nars.Task;
@@ -266,4 +267,16 @@ public class ImmutableTask extends RawBudget implements Task {
         return null;
     }
 
+    @Nullable public Task project(long newStart, float dur, float confMin) {
+        float newConf = conf(newStart, dur);
+        if (newConf < confMin)
+            return null;
+
+        long range = newStart!=ETERNAL ? end() - start() : 0;
+        ImmutableTask t = new ImmutableTask(term, punc, $.t(freq(), newConf), creation, newStart, newStart + range, stamp);
+        t.budgetSafe(this);
+        //t.meta
+        //t.log("Projected")
+        return t;
+    }
 }

@@ -143,10 +143,11 @@ public class Line1DSimplestTest {
 
         NAR n = new Default(1024, 32, 1, 3);
 
-        final int changePeriod = 16;
-        n.time.dur(changePeriod/4f);
+        final int changePeriod = 32;
 
-        n.termVolumeMax.setValue(7);
+        //n.time.dur(changePeriod/4f);
+
+        n.termVolumeMax.setValue(10);
 
         Line1DSimplest a = new Line1DSimplest(n);
 
@@ -192,7 +193,7 @@ public class Line1DSimplestTest {
                 System.out.println("SWITCH");
                 a.target = (j++) % 2 == 0  ? 1f : 0f;
             }
-            if (i > time/2f)
+            if (i > time/4f)
                 a.curiosity.setValue(0f);
 
             n.run(1);

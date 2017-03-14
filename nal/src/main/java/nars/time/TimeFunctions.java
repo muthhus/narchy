@@ -234,6 +234,28 @@ public interface TimeFunctions {
     @Nullable TimeFunctions decomposeBelief = (@NotNull Compound derived, @NotNull Derivation p, @NotNull Conclude d, @NotNull long[] occReturn, float[] confScale) ->
             decompose(derived, p, occReturn, false);
 
+    @Nullable TimeFunctions decomposeBeliefLate = (@NotNull Compound derived, @NotNull Derivation p, @NotNull Conclude d, @NotNull long[] occReturn, float[] confScale) ->
+            decomposeLate(derived, p, occReturn, false);
+
+    static Compound decomposeLate(@NotNull Compound derived, @NotNull Derivation p, @NotNull long[] occReturn, boolean b) {
+        Compound x = decompose(derived, p, occReturn, b);
+        if ((x!=null) && (occReturn[0]!=ETERNAL)) {
+            long taskStart = p.task.start();
+            if (taskStart!=ETERNAL) {
+                //dont derive a past-tense goal (before the task)
+                if (taskStart > occReturn[0]) {
+                    if (occReturn[1] == ETERNAL) occReturn[1] = occReturn[0]; //HACK
+                    long range = occReturn[1] - occReturn[0];
+
+                    occReturn[0] = taskStart;
+                    occReturn[1] = taskStart + range;
+                }
+            }
+        }
+        return x;
+    }
+
+
     /** the 2-ary result will have its 'dt' assigned by the occurrence of its subterms in the task's compound */
     @Nullable TimeFunctions decomposeTaskComponents = (@NotNull Compound derived, @NotNull Derivation p, @NotNull Conclude d, @NotNull long[] occReturn, float[] confScale) -> {
 
