@@ -4,6 +4,7 @@ import jcog.data.sorted.SortedArray;
 import nars.NAR;
 import nars.Param;
 import nars.Task;
+import nars.budget.BudgetMerge;
 import nars.concept.TaskConcept;
 import nars.task.Revision;
 import nars.task.RevisionTask;
@@ -186,8 +187,10 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
             if (x == null) //the array has trailing nulls from having extra capacity
                 break;
 
-            if (x.equals(newBelief))
+            if (x.equals(newBelief)) {
+                BudgetMerge.maxBlend.apply(x.budget(), newBelief.budget());
                 return newBelief; //duplicate, ignore it
+            }
 
             if (!Revision.isRevisible(newBelief, x))
                 continue;
@@ -349,7 +352,7 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
                 if (revised != null) {
                     if (revised == input) {
                         //duplicate detected
-                        return null;
+                        return TruthDelta.zero;
                     }
 
                     if (revised.isDeleted()) {

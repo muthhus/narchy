@@ -3,10 +3,7 @@ package nars.conceptualize;
 import jcog.bag.Bag;
 import jcog.map.SynchronizedHashMap;
 import jcog.map.SynchronizedUnifiedMap;
-import nars.$;
-import nars.NAR;
-import nars.Op;
-import nars.Task;
+import nars.*;
 import nars.bag.impl.CurveBag;
 import nars.budget.BLink;
 import nars.budget.BudgetMerge;
@@ -100,8 +97,9 @@ public class DefaultConceptBuilder implements ConceptBuilder {
 
 
         if (t.volume() > nar.termVolumeMax.intValue()) {
-            throw new UnsupportedOperationException("tried to conceptualize concept too large");
-            //return null;
+            if (Param.DEBUG)
+                throw new UnsupportedOperationException("tried to conceptualize concept too large");
+            return null;
         }
 
         return withBags(t, (termbag, taskbag) -> {
@@ -319,10 +317,11 @@ public class DefaultConceptBuilder implements ConceptBuilder {
 
         }
         if (result == null) {
-            throw new UnsupportedOperationException(
+            /*throw new UnsupportedOperationException(
                     "unknown conceptualization method for term \"" +
                             term + "\" of class: " + term.getClass()
-            );
+            );*/
+            return null;
         }
 
 

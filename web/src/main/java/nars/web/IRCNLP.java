@@ -278,7 +278,7 @@ public class IRCNLP extends IRC {
                 new CaffeineIndex(new DefaultConceptBuilder(), 128 * 1024, false, exe),
                 //new TreeTermIndex.L1TreeIndex(new DefaultConceptBuilder(), 400000, 64 * 1024, 3),
 
-                new RealTime.DS(true).dur(60f),
+                new RealTime.DS(true).durSeconds(1f),
                 exe
         );
 

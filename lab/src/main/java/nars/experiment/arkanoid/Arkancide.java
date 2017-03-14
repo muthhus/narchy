@@ -52,11 +52,11 @@ public class Arkancide extends NAgentX {
 
                 Default m = new Default(256, 48, 1, 2, n.random,
                         new CaffeineIndex(new DefaultConceptBuilder(), 2048, false, null),
-                        new RealTime.DSHalf().dur(1f));
+                        new RealTime.DSHalf().durSeconds(1f));
                 float metaLearningRate = 0.9f;
                 m.confMin.setValue(0.02f);
                 m.goalConfidence(metaLearningRate);
-                //m.termVolumeMax.setValue(9);
+                m.termVolumeMax.setValue(16);
 
                 MetaAgent metaT = new MetaAgent(a, m); //init before loading from file
                 metaT.trace = true;

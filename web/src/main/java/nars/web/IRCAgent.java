@@ -232,7 +232,7 @@ public class IRCAgent extends IRC {
                 new CaffeineIndex(new DefaultConceptBuilder(), 256 * 1024, false, exe),
                 //new TreeTermIndex.L1TreeIndex(new DefaultConceptBuilder(), 400000, 64 * 1024, 3),
 
-                new RealTime.DSHalf().dur(0.25f),
+                new RealTime.DSHalf().durSeconds(0.25f),
                 exe
         );
 

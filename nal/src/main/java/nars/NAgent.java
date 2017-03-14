@@ -315,7 +315,7 @@ abstract public class NAgent implements NSense, NAction {
 
             ((FasterList) predictors).addAll(
 
-//                    quest((Compound) (action.term()), now),
+                    quest((Compound) (action.term()), now),
 
 //                    new PredictionTask($.impl(action, dur, happiness), '?').time(nar, dur),
 //                    new PredictionTask($.impl($.neg(action), dur, happiness), '?').time(nar, dur),
@@ -330,12 +330,12 @@ abstract public class NAgent implements NSense, NAction {
                     //question(impl(neg(action), dur, varQuery(1)), nar.time()),
 
                     question(impl(action, dur, happiness), now),
-                    question(impl(neg(action), dur, happiness), now),
+                    question(impl(neg(action), dur, happiness), now)
 
-                    question(seq(action, dur, happiness), now),
-                    question(seq(neg(action), dur, happiness), now),
-                    question(seq(action, dur, neg(happiness)), now),
-                    question(seq(neg(action), dur, neg(happiness)), now)
+//                    question(seq(action, dur, happiness), now),
+//                    question(seq(neg(action), dur, happiness), now),
+//                    question(seq(action, dur, neg(happiness)), now),
+//                    question(seq(neg(action), dur, neg(happiness)), now)
 
 
 //                    new PredictionTask($.seq($.varQuery("x"), 0, $.seq(action, dur, happiness)), '?').eternal(),
@@ -530,7 +530,7 @@ abstract public class NAgent implements NSense, NAction {
 
         } else {
             //rebudget non-deleted eternal
-            t.budget(nar).log("Agent Predictor");
+            t.budget(nar);//.log("Agent Predictor");
             return t;
         }
 

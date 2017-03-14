@@ -90,14 +90,15 @@ public abstract class RealTime implements Time {
     }
 
     @Override
-    public Time dur(float seconds) {
-        return durCycles((int) Math.ceil(secondsToUnits(seconds)));
-    }
-
-    public Time durCycles(int cycles) {
+    public Time dur(float cycles) {
         this.dur = cycles;
         return this;
     }
+
+    public Time durSeconds(float seconds) {
+        return dur((int) Math.ceil(secondsToUnits(seconds)));
+    }
+
 
     @Override
     public float dur() {

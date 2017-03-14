@@ -29,7 +29,7 @@ import static spacegraph.space.layout.Grid.row;
 public class NARHear extends NAgent {
 
     public static void main(String[] args) {
-        new NARHear(NARBuilder.newMultiThreadNAR(2, new RealTime.CS(true).dur(0.2f))).runRT(20);
+        new NARHear(NARBuilder.newMultiThreadNAR(2, new RealTime.CS(true).durSeconds(0.2f))).runRT(20);
     }
 
     public NARHear(NAR nar) {

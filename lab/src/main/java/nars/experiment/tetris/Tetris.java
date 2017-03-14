@@ -473,7 +473,7 @@ public class Tetris extends NAgentX {
             //Param.DEBUG = true;
             //Param.HORIZON = 1/100f;
 
-            Time clock = new RealTime.DSHalf().dur( DUR );
+            Time clock = new RealTime.DSHalf().durSeconds( DUR );
             NAR n =
                     NARBuilder.newMultiThreadNAR(5, clock);
                     //NARBuilder.newALANN(clock, 4, 64, 5, 4, 1);
@@ -624,7 +624,7 @@ public class Tetris extends NAgentX {
 
             Default m = new Default(512, 32, 1, 3, n.random,
                     new CaffeineIndex(new DefaultConceptBuilder(), 4096, false, null),
-                    new RealTime.DSHalf().dur(1f));
+                    new RealTime.DSHalf().durSeconds(1f));
             float metaLearningRate = 0.75f;
             m.confMin.setValue(0.01f);
             m.goalConfidence(metaLearningRate);

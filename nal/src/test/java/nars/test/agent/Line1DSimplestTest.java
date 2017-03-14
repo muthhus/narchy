@@ -142,24 +142,24 @@ public class Line1DSimplestTest {
     @Test public void testSimpleCheat() throws Narsese.NarseseException {
 
 
-        NAR n = new Default(1024, 32, 1, 3);
+        NAR n = new Default(1024, 16, 1, 3);
 
-        final int changePeriod = 32;
+        final int changePeriod = 16;
 
-        //n.time.dur(changePeriod/4f);
+        n.time.dur(2);
 
-        n.termVolumeMax.setValue(24);
+        n.termVolumeMax.setValue(16);
 
         Line1DSimplest a = new Line1DSimplest(n);
 
-        Param.DEBUG = true;
+        //Param.DEBUG = true;
 
         //n.derivedEvidenceGain.setValue(0f);
 
         a.trace = true;
         a.init();
         a.target = 0;
-        a.curiosity.setValue(0.05f);
+        a.curiosity.setValue(0.01f);
 
         List<Float> hapy = new ArrayList(1*1024);
         List<Float> motv = new ArrayList(1*1024);
@@ -188,13 +188,12 @@ public class Line1DSimplestTest {
 
         int j = 0;
         for (int i = 0; i < time; i++) {
-            n.input("(happy)! :|:");
 
             if ((i+1) % changePeriod == 0) {
                 System.out.println("SWITCH");
                 a.target = (j++) % 2 == 0  ? 1f : 0f;
             }
-            if (i > time/4f)
+            if (j > 2)
                 a.curiosity.setValue(0f);
 
             n.run(1);
