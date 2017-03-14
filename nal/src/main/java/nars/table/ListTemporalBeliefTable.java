@@ -1,9 +1,8 @@
 package nars.table;
 
-import jcog.data.sorted.SortedArray;
-import jcog.data.sorted.SortedList;
 import jcog.list.FasterList;
 import jcog.list.MultiRWFasterList;
+import jcog.list.Top2;
 import jcog.math.Interval;
 import nars.NAR;
 import nars.Param;
@@ -18,14 +17,11 @@ import nars.truth.Stamp;
 import nars.truth.Truth;
 import nars.truth.TruthDelta;
 import org.eclipse.collections.api.block.function.Function;
-import org.eclipse.collections.api.block.function.primitive.FloatFunction;
-import org.eclipse.collections.api.factory.list.FixedSizeListFactory;
 import org.eclipse.collections.api.list.MutableList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Iterator;
-import java.util.List;
 import java.util.function.Consumer;
 
 import static java.lang.Math.abs;
@@ -513,10 +509,13 @@ public class ListTemporalBeliefTable extends MultiRWFasterList<Task> implements 
     public Task match(long when, long now, float dur, @Nullable Task against) {
         return ifNotEmptyReadWith(l -> {
             switch (l.size()) {
+
 //                case 0:
 //                    throw new RuntimeException("should not reach here");
+
                 case 1:
                     return l.get(0); //special case avoid creating the lambda
+
                 default:
                     //return l.maxBy(temporalConfidence(when, now, dur));
 
@@ -525,30 +524,8 @@ public class ListTemporalBeliefTable extends MultiRWFasterList<Task> implements 
                     Task a = s.a;
                     Task c = merge(a, s.b, now, a.conf(), dur);
                     return c != null ? c : a;
-
             }
         });
-    }
-
-    static class Top2<T> {
-
-        public T a = null, b = null;
-        public float aa = Float.NEGATIVE_INFINITY, bb = Float.NEGATIVE_INFINITY;
-
-        public Top2(Function<T, Float> rank, List<T> from) {
-            int s = from.size();
-            assert(s > 1);
-            for (int i = 0; i < s; i++) {
-                T x = from.get(i);
-                float xx = rank.apply(x);
-                if (xx > aa) {
-                    b = a; bb = aa; //shift down
-                    a = x; aa = xx;
-                } else if (xx > bb) {
-                    b = x; bb = xx;
-                }
-            }
-        }
     }
 
     @Nullable
