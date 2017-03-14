@@ -1148,6 +1148,14 @@ public class NAL8Test extends AbstractNALTest {
                 .mustDesire(cycles, "(out)", 1f, 0.81f, 16)
                 .mustNotOutput(cycles, "(out)", GOAL, 3);
     }
+    @Test public void testPredictiveImplicationTemporalTemporalNeg() {
+        test()
+                .inputAt(0, "(--(out) ==>-3 (happy)). :|:")
+                .inputAt(13, "(happy)! :|:")
+                .mustDesire(cycles, "(out)", 0f, 0.81f, 16)
+                .mustNotOutput(cycles, "(out)", GOAL, 3);
+    }
+
     @Test public void testPredictiveImplicationTemporalEternal() {
         test()
                 .inputAt(0, "((out) ==>-3 (happy)).")
@@ -1175,6 +1183,13 @@ public class NAL8Test extends AbstractNALTest {
                 .inputAt(13, "(happy)!")
                 .mustDesire(cycles, "(out)", 1f, 0.81f, 3)
                 .mustNotOutput(cycles, "(out)", GOAL, 13);
+    }
+    @Test public void testPredictiveEquivalenceTemporalTemporalNeg() {
+        test()
+                .inputAt(0, "(--(out) <=>-3 (happy)). :|:")
+                .inputAt(13, "(happy)! :|:")
+                .mustDesire(cycles, "(out)", 0f, 0.81f, 16)
+                .mustNotOutput(cycles, "(out)", GOAL, 3);
     }
 
 }

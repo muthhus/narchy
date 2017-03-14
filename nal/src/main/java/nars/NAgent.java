@@ -528,6 +528,7 @@ abstract public class NAgent implements NSense, NAction {
             return prediction(t.term(), t.punc(), t.truth(), ETERNAL, ETERNAL);
 
         } else {
+            //rebudget non-deleted eternal
             t.budget(nar).log("Agent Predictor");
             return t;
         }

@@ -45,7 +45,7 @@ public class Tetris extends NAgentX {
     public static final int tetris_height = 12;
     public static final int TIME_PER_FALL = 2;
     public static final int PIXEL_RADIX = 2;
-    static final int DUR = 4;
+    static final float DUR = 0.1f;
 
     private static SensorConcept[][] concept;
     //private int afterlife = TIME_PER_FALL * tetris_height * tetris_width;
@@ -64,8 +64,9 @@ public class Tetris extends NAgentX {
                     new MatrixView(tetris_width, tetris_height, (x, y, gl) -> {
                         SensorConcept cxy = concept[x][y];
                         long now = this.now;
-                        float b = cxy.beliefFreq(now, DUR);
-                        float g = cxy.goalFreq(now, DUR);
+                        float dur = nar.time.dur();
+                        float b = cxy.beliefFreq(now, dur);
+                        float g = cxy.goalFreq(now, dur);
                         float gp, gn;
                         if (g == g) {
                             g -= 0.5f;
@@ -472,9 +473,9 @@ public class Tetris extends NAgentX {
             //Param.DEBUG = true;
             //Param.HORIZON = 1/100f;
 
-            Time clock = new RealTime.DSHalf().durCycles( DUR );
+            Time clock = new RealTime.DSHalf().dur( DUR );
             NAR n =
-                    NARBuilder.newMultiThreadNAR(3, clock);
+                    NARBuilder.newMultiThreadNAR(5, clock);
                     //NARBuilder.newALANN(clock, 4, 64, 5, 4, 1);
 
 
@@ -623,11 +624,11 @@ public class Tetris extends NAgentX {
 
             Default m = new Default(512, 32, 1, 3, n.random,
                     new CaffeineIndex(new DefaultConceptBuilder(), 4096, false, null),
-                    new RealTime.DSHalf());
+                    new RealTime.DSHalf().dur(1f));
             float metaLearningRate = 0.75f;
             m.confMin.setValue(0.01f);
             m.goalConfidence(metaLearningRate);
-            m.termVolumeMax.setValue(8);
+            m.termVolumeMax.setValue(16);
             MetaAgent metaT = new MetaAgent(a, m);
             metaT.init();
             metaT.trace = true;

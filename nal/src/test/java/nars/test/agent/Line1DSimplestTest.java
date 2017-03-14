@@ -2,6 +2,7 @@ package nars.test.agent;
 
 import jcog.io.SparkLine;
 import jcog.list.FasterList;
+import jcog.math.RecycledSummaryStatistics;
 import nars.NAR;
 import nars.Narsese;
 import nars.Param;
@@ -140,9 +141,12 @@ public class Line1DSimplestTest {
     @Test public void testSimpleCheat() throws Narsese.NarseseException {
 
 
-        NAR n = new Default(1024, 64, 1, 3);
+        NAR n = new Default(1024, 32, 1, 3);
 
-        n.termVolumeMax.setValue(10);
+        final int changePeriod = 16;
+        n.time.dur(changePeriod/4f);
+
+        n.termVolumeMax.setValue(7);
 
         Line1DSimplest a = new Line1DSimplest(n);
 
@@ -153,7 +157,7 @@ public class Line1DSimplestTest {
         a.trace = true;
         a.init();
         a.target = 0;
-        //a.curiosity.setValue(0f); //then shutoff curiosity
+        a.curiosity.setValue(0.05f);
 
         List<Float> hapy = new ArrayList(1*1024);
         List<Float> motv = new ArrayList(1*1024);
@@ -170,15 +174,15 @@ public class Line1DSimplestTest {
             //System.out.println(t);
         });
 
-//        n.input("((in) ==> (out)). %1.0;0.99%");
-//        n.input("(--(in) ==> --(out)). %1.0;0.99%");
+//        n.input("((in) <=> (out)). %1.0;0.99%");
+        //n.input("((in) ==> (out)). %1.0;0.99%");
+        //n.input("(--(in) ==> --(out)). %1.0;0.99%");
 
 
 
 
-        final int changePeriod = 4;
 
-        int time = 80;
+        int time = 1024;
 
         int j = 0;
         for (int i = 0; i < time; i++) {
@@ -188,6 +192,8 @@ public class Line1DSimplestTest {
                 System.out.println("SWITCH");
                 a.target = (j++) % 2 == 0  ? 1f : 0f;
             }
+            if (i > time/2f)
+                a.curiosity.setValue(0f);
 
             n.run(1);
 
@@ -197,7 +203,7 @@ public class Line1DSimplestTest {
             motv.add(a.dexterity());
         }
 
-        int ds = 1;
+        int ds = 4;
         System.out.println( "  in:\t" + renderFloats(downSample(in, ds)) );
         System.out.println( " out:\t" + renderFloats(downSample(out, ds)) );
         System.out.println( "hapy:\t" + renderFloats(downSample(hapy, ds)) );
@@ -205,6 +211,10 @@ public class Line1DSimplestTest {
 
         System.out.println("AVG SCORE=" + a.rewardSum() / n.time());
 
+        RecycledSummaryStatistics motvStat = new RecycledSummaryStatistics();
+        for (Float x : motv)
+            motvStat.accept(x);
+        System.out.println(motvStat);
     }
 
 

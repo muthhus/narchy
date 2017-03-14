@@ -1,5 +1,7 @@
 package jcog.data.sorted;
 
+import com.google.common.primitives.Floats;
+import jcog.Util;
 import org.eclipse.collections.api.block.function.primitive.FloatFunction;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -182,7 +184,7 @@ public class SortedArray<E> implements Iterable<E> {
         final int index = this.findInsertionIndex(elementRank, 0, s - 1, new int[1], cmp);
 
         final E last = list[s - 1];
-        if (index == s || Float.compare(cmp.floatValueOf(last), elementRank) < 0) {
+        if (index == s || Util.fastCompare(cmp.floatValueOf(last), elementRank) < 0) {
             addInternal(element);
         } else {
             if (index == -1)
@@ -198,7 +200,7 @@ public class SortedArray<E> implements Iterable<E> {
             float elementRank = cmp.floatValueOf(element);
             for (int i = 0; i < s; i++) {
                 final E current = l[i];
-                if (0 <= Float.compare(cmp.floatValueOf(current), elementRank)) {
+                if (0 <= Util.fastCompare(cmp.floatValueOf(current), elementRank)) {
                     addInternal(i, element);
                     return;
                 }
@@ -206,6 +208,8 @@ public class SortedArray<E> implements Iterable<E> {
         }
         addInternal(element); //add to end
     }
+
+
 
     public final boolean isEmpty() {
         return size == 0;
@@ -607,13 +611,13 @@ public class SortedArray<E> implements Iterable<E> {
         final E midleE = list[midle];
 
 
-        final int comparedValue = Float.compare(cmp.floatValueOf(midleE), elementRank);
+        final int comparedValue = Util.fastCompare(cmp.floatValueOf(midleE), elementRank);
         if (comparedValue == 0) {
             // find the first element
             int index = midle;
             for (; index >= 0; ) {
                 final E e = list[index];
-                if (0 != Float.compare(cmp.floatValueOf(e), elementRank)) {
+                if (0 != Util.fastCompare(cmp.floatValueOf(e), elementRank)) {
                     break;
                 }
                 index--;
@@ -641,7 +645,7 @@ public class SortedArray<E> implements Iterable<E> {
 
         E[] l = this.list;
         for (int index = left; index < right; ) {
-            if (0 <= Float.compare(cmp.floatValueOf(l[index]), elementRank)) {
+            if (0 <= Util.fastCompare(cmp.floatValueOf(l[index]), elementRank)) {
                 return index;
             }
             index++;

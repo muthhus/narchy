@@ -1500,9 +1500,9 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
 
                             wrote.increment();
                         }
-                    } catch (IOException e) {
+                    } catch (Exception e) {
                         logger.error("{} can not output {}", x, e);
-                        throw new RuntimeException(e);
+                        //throw new RuntimeException(e);
                         //e.printStackTrace();
                     }
                 } else {

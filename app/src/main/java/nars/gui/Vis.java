@@ -79,7 +79,7 @@ public class Vis {
         return new Grid(VERTICAL, actionTables);
     }
 
-    public static Grid agentActions(NAgent a, long window) {
+    public static Grid agentActions(NAgent a, float window) {
         List<Termed> ii = Lists.newArrayList();
         ii.addAll(a.actions);
 //        ii.add(a.happy);
@@ -90,12 +90,13 @@ public class Vis {
         return beliefCharts(window, ii, nar);
     }
 
-    public static Grid beliefCharts(long window, List<? extends Termed> ii, NAR nar) {
+    public static Grid beliefCharts(float window, List<? extends Termed> ii, NAR nar) {
         long[] btRange = new long[2];
         nar.onCycle(nn -> {
             long now = nn.time();
-            btRange[0] = now - window;
-            btRange[1] = now + window;
+            float dur = nn.time.dur();
+            btRange[0] = now - (long) Math.ceil(window * dur);
+            btRange[1] = now + (long) Math.ceil(window * dur);
         });
         List<Surface> s = ii.stream().map(c -> new BeliefTableChart(nar, c, btRange)).collect(toList());
         return new Grid(1 / 3f, s);

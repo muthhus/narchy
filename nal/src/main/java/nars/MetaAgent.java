@@ -37,7 +37,7 @@ public class MetaAgent extends NAgent {
         actionLerp(p("curi"), (c) -> {
             c = Util.unitize(c);
             agent.curiosity.setValue(c * nar.confidenceDefault(GOAL));
-        }, -0.05f /* non-zero deadzone */, 0.25f);
+        }, -0.02f /* non-zero deadzone */, 0.1f);
 
         actionLerp(p("quaMin"), agentNAR.quaMin::setValue, 0f, 0.5f);
 

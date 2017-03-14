@@ -170,6 +170,16 @@ public enum Util { ;
         }
     }
 
+    public static int fastCompare(float f1, float f2) {
+
+        if (f1 < f2)
+            return -1;           // Neither val is NaN, thisVal is smaller
+        if (f1 > f2)
+            return 1;            // Neither val is NaN, thisVal is larger
+
+        return 0;
+    }
+
     public static <K, V> void assertNotEmpty(Map<K, V> test, String varName) {
         if (test == null) {
             throw new NullPointerException(varName);

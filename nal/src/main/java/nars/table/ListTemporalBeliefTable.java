@@ -333,6 +333,10 @@ public class ListTemporalBeliefTable extends MultiRWFasterList<Task> implements 
         return x -> rankTemporalByConfidence(x, when, now, dur);
     }
 
+//    static private FloatFunction<Task> temporalConfidenceF(long when, long now, float dur) {
+//        return x -> rankTemporalByConfidence(x, when, now, dur);
+//    }
+
     static final float rankTemporalByConfidence(@Nullable Task t, long when, long now, float dur) {
 
         if (t == null)
@@ -340,8 +344,12 @@ public class ListTemporalBeliefTable extends MultiRWFasterList<Task> implements 
 
         float r = t.evi(when, dur);// * (1+t.range()) * t.qua();
 
-        return r;
+//        //HACK present/future prediction boost
+//        if (t.start() >= now) {
+//            r += 1f;
+//        }
 
+        return r;
     }
 
     static Task matchMerge(MutableList<Task> l, long now, @NotNull Task toMergeWith, float dur) {
@@ -436,6 +444,8 @@ public class ListTemporalBeliefTable extends MultiRWFasterList<Task> implements 
                 return merged;
             }
         } else {
+            a.delete();
+
             return input;
         }
 

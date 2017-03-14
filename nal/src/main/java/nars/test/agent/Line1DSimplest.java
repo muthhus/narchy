@@ -56,6 +56,7 @@ public class Line1DSimplest extends NAgent {
     @Override
     protected float act() {
         float dist = Math.abs(target - current);
+
         return ((1f - dist) * 2f) - 1f; //normalize to -1..+1
     }
 

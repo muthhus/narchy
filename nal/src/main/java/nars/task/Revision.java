@@ -151,7 +151,7 @@ public class Revision {
                 if (a.op().temporal && len == 2) {
                     return dtMergeTemporal(ca, cb, aProp, accumulatedDifference, curDepth/2f, rng, mergeOrChoose);
                 } else {
-                    assert(ca.dt()== cb.dt());
+                    //assert(ca.dt()== cb.dt());
 
                     //Term[] x = choose(ca.terms(), cb.terms(), aProp, rng)
 

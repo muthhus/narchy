@@ -355,8 +355,8 @@ public class BeliefTableChart extends Widget {
             if (showEternal && eternal) {
                 start = end = nowX;
             } else if (((e <= maxT) && (e >= minT)) || ((s >= minT) && (s <= maxT))) {
-                start = xTime(minT, maxT, s);
-                end = xTime(minT, maxT, e);
+                start = xTime(minT, maxT, (long)s);
+                end = xTime(minT, maxT, (long)e);
             } else {
                 return;
             }
@@ -409,7 +409,7 @@ public class BeliefTableChart extends Widget {
             if (eternal) {
                 x = nowX; //???
             } else if ((start >= minT) && (start <= maxT)) {
-                x = xTime(minT, maxT, start);
+                x = xTime(minT, maxT, (long)start);
             } else {
                 return;
             }
@@ -432,7 +432,7 @@ public class BeliefTableChart extends Widget {
                 //x = nowX; //??
                 return;
             } else if ((end >= minT) && (end <= maxT)) {
-                x = xTime(minT, maxT, end);
+                x = xTime(minT, maxT, (long)end);
             }
 
             gl.glVertex3f(x, freq, dz);
@@ -470,9 +470,9 @@ public class BeliefTableChart extends Widget {
 
 
 
-    private static float xTime(float minT, float maxT, float o) {
+    private static float xTime(long minT, long maxT, long o) {
         if (minT == maxT) return 0.5f;
-        return (Math.min(maxT, Math.max(minT,o)) - minT) / (maxT - minT);
+        return (Math.min(maxT, Math.max(minT,o)) - minT) / ((float)(maxT - minT));
     }
 
 

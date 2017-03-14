@@ -1,7 +1,9 @@
 package jcog.list;
 
+import org.eclipse.collections.api.block.function.primitive.FloatFunction;
 import org.eclipse.collections.api.block.predicate.primitive.IntObjectPredicate;
 import org.eclipse.collections.impl.list.mutable.FastList;
+import org.eclipse.collections.impl.utility.ArrayIterate;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -9,6 +11,7 @@ import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.function.Consumer;
 import java.util.function.IntFunction;
 import java.util.function.Predicate;
@@ -63,7 +66,6 @@ public class FasterList<X> extends FastList<X> {
     }
 
 
-
     public void clearHard() {
         this.size = 0;
         this.items = (X[]) ZERO_SIZED_ARRAY;
@@ -93,7 +95,6 @@ public class FasterList<X> extends FastList<X> {
     }
 
 
-
     public final boolean addIfCapacity(X newItem) {
         X[] ii = this.items;
         int s;
@@ -118,7 +119,28 @@ public class FasterList<X> extends FastList<X> {
         return items;
     }
 
-//    /** use this to get the fast null-terminated version;
+
+    public X minBy(float mustExceed, FloatFunction<? super X> function) {
+
+        if (ArrayIterate.isEmpty(items)) {
+            throw new NoSuchElementException();
+        }
+
+        X min = null;
+        float minValue = mustExceed;
+        for (int i = 0; i < size; i++) {
+            X next = items[i];
+            float nextValue = function.floatValueOf(next);
+            if (nextValue < minValue) {
+                min = next;
+                minValue = nextValue;
+            }
+        }
+        return min;
+
+    }
+
+    //    /** use this to get the fast null-terminated version;
 //     *  slightly faster; use with caution
 //     * */
 //    public <E> E[] toNullTerminatedArray(E[] array) {
@@ -138,13 +160,13 @@ public class FasterList<X> extends FastList<X> {
         for (int i = 0; i < s; ) {
             if (filter.test(a[i])) {
                 s--;
-                System.arraycopy(a, i+1, a, i, s - i);
-                Arrays.fill(a, s, ps,null);
+                System.arraycopy(a, i + 1, a, i, s - i);
+                Arrays.fill(a, s, ps, null);
             } else {
                 i++;
             }
         }
-        if (ps!=s) {
+        if (ps != s) {
             this.size = s;
             return true;
         }
@@ -160,13 +182,13 @@ public class FasterList<X> extends FastList<X> {
             X ai = a[i];
             if (ai == null || (filter.test(ai) && displaced.add(ai))) {
                 s--;
-                System.arraycopy(a, i+1, a, i, s - i);
-                Arrays.fill(a, s, ps,null);
+                System.arraycopy(a, i + 1, a, i, s - i);
+                Arrays.fill(a, s, ps, null);
             } else {
                 i++;
             }
         }
-        if (ps!=s) {
+        if (ps != s) {
             this.size = s;
             return true;
         }
@@ -244,7 +266,9 @@ public class FasterList<X> extends FastList<X> {
         this.size = 0;
     }
 
-    /** remove, but with Map.remove semantics */
+    /**
+     * remove, but with Map.remove semantics
+     */
     public X removed(@NotNull X object) {
         int index = this.indexOf(object);
         if (index >= 0) {
@@ -260,12 +284,14 @@ public class FasterList<X> extends FastList<X> {
     }
 
     public final boolean addIfNotNull(@Nullable X x) {
-        if (x!=null)
+        if (x != null)
             return add(x);
         return false;
     }
 
-    /** slow: use a set */
+    /**
+     * slow: use a set
+     */
     public final boolean addIfNotPresent(@Nullable X x) {
         if (!contains(x)) {
             add(x);
@@ -292,9 +318,10 @@ public class FasterList<X> extends FastList<X> {
     public final void setFast(int index, X t) {
         items[index] = t;
     }
+
     public void removeFast(int index) {
         X[] ii = items;
-        System.arraycopy(ii, index+1, ii, index, size - index - 1);
+        System.arraycopy(ii, index + 1, ii, index, size - index - 1);
         ii[--size] = null;
     }
 
@@ -303,11 +330,13 @@ public class FasterList<X> extends FastList<X> {
     }
 
     public <E> E[] arrayClone(Class<? extends E> type) {
-        E [] array = (E []) Array.newInstance(type, size);
+        E[] array = (E[]) Array.newInstance(type, size);
         return toArray(array);
     }
 
-    /** dangerous unless you know the array has enough capacity */
+    /**
+     * dangerous unless you know the array has enough capacity
+     */
     public void addWithoutResizeCheck(X x) {
         this.items[this.size++] = x;
     }

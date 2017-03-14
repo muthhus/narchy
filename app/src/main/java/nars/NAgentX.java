@@ -171,12 +171,12 @@ abstract public class NAgentX extends NAgent {
                                     .toArray(Surface[]::new)),
                             "inputEdit", () -> Vis.newInputEditor(a.nar),
                             "concepts", ()->
-                                    Vis.treeChart( a.nar, new Bagregate(a.nar.conceptsActive(), 64, 0.05f) , 64),
+                                    Vis.treeChart( a.nar, new Bagregate(a.nar.conceptsActive(), 128, 0.05f) , 64),
                             "conceptBudget", () ->
                                     Vis.budgetHistogram(nar, 64),
                             //"tasks", ()-> taskChart,
                             "agentCharts", () -> Vis.emotionPlots(a.nar, 256),
-                            "agentActions", () -> Vis.agentActions(a, 400)
+                            "agentActions", () -> Vis.agentActions(a, 64f)
                             ///"agentPredict", () -> Vis.beliefCharts(400, a.predictors, a.nar)
 
                     ))

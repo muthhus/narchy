@@ -52,7 +52,7 @@ public class Arkancide extends NAgentX {
 
                 Default m = new Default(256, 48, 1, 2, n.random,
                         new CaffeineIndex(new DefaultConceptBuilder(), 2048, false, null),
-                        new RealTime.DSHalf());
+                        new RealTime.DSHalf().dur(1f));
                 float metaLearningRate = 0.9f;
                 m.confMin.setValue(0.02f);
                 m.goalConfidence(metaLearningRate);
@@ -85,7 +85,7 @@ public class Arkancide extends NAgentX {
 
             return a;
 
-        }, 20, 2, -1);
+        }, 17, 1, -1);
 
 
 //        nar.forEachActiveConcept(c -> {
@@ -143,7 +143,7 @@ public class Arkancide extends NAgentX {
             }
             return $.t(paddleSpeed, nar.confidenceDefault('.'));
         }));*/
-        action(new ActionConcept( $.func("nx", "paddle(noid)"), nar, (b, d) -> {
+        action(new ActionConcept( $.func("nx", "paddle"), nar, (b, d) -> {
 
 
             float pct;
