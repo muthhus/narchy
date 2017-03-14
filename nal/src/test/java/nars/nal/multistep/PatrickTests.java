@@ -118,21 +118,23 @@ public class PatrickTests extends AbstractNALTest {
         TestNAR tt = test();
 
 
-        tt.input("made_of(toothbrush,plastic).",
-"( ( made_of($1, plastic) &&+10 lighter({SELF}, $1) ) ==>+10 <$1 --> [heated]>).",
-"(<$1 --> [heated]> ==>+10 <$1 --> [melted]>).",
-"(<$1 --> [melted]> <=>+0 <$1 --> [pliable]>).",
-"(( <$1 --> [pliable]> &&+0 reshape({SELF},$1)) ==>+10 <$1 --> [hardened]>).",
-"(<$1 --> [hardened]> ==>+0 <$1 --> [unscrewing]>).",
-"<toothbrush --> here>. :|:", //there is a toothbrush here
-"( <#1 --> here> &&+0 <#1 --> [unscrewing]>)!"
-//"( <#1 --> here> && <#1 --> [unscrewing]>)! :|:" //alternate: NOW
+        tt.input(
+            "made_of(toothbrush,plastic).",
+            "( ( made_of($1, plastic) &&+10 lighter({SELF}, $1) ) ==>+10 <$1 --> [heated]>).",
+            "(<$1 --> [heated]> ==>+10 <$1 --> [melted]>).",
+            "(<$1 --> [melted]> <=>+0 <$1 --> [pliable]>).",
+            "(( <$1 --> [pliable]> &&+0 reshape({SELF},$1)) ==>+10 <$1 --> [hardened]>).",
+            "(<$1 --> [hardened]> ==>+0 <$1 --> [unscrewing]>).",
+            "<toothbrush --> here>. :|:", //there is a toothbrush here
+            "( <#1 --> here> &&+0 <#1 --> [unscrewing]>)!"
+            //"( <#1 --> here> && <#1 --> [unscrewing]>)! :|:" //alternate: NOW
 
         );
+        //tt.log();
 
         tt.mustOutput(0, 2500, "lighter({SELF}, toothbrush)", GOAL, 1f, 1f,
-0.18f, 1f, //at least some confidence
-/*@*/ -30L);  //is this correct time? might be off by +/-10 , will check
+0.30f, 1f, //at least some confidence
+/*@*/ 0L);  //is this correct time? might be off by +/-10 , will check
 
 
     }

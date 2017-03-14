@@ -239,7 +239,7 @@ public interface TimeFunctions {
 
     static Compound decomposeLate(@NotNull Compound derived, @NotNull Derivation p, @NotNull long[] occReturn, boolean b) {
         Compound x = decompose(derived, p, occReturn, b);
-        if ((x!=null) && (occReturn[0]!=ETERNAL)) {
+        if (p.task.isGoal() && (x!=null) && (occReturn[0]!=ETERNAL)) {
             long taskStart = p.task.start();
             if (taskStart!=ETERNAL) {
                 //dont derive a past-tense goal (before the task)

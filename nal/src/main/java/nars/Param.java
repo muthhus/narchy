@@ -179,7 +179,7 @@ public abstract class Param  {
 
     @NotNull
     @Range(min = 0, max = 1f)
-    public final FloatParam confMin = new FloatParam(TRUTH_EPSILON);
+    public final FloatParam confMin = new FloatParam(0.01f);
 
     @NotNull
     @Range(min = 0, max = 1f)
