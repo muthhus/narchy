@@ -18,7 +18,8 @@
 
     A, B, task(positive), belief(positive), task("."), time(dtAfter)                              |- (A &&+- B), (Belief:Intersection)
     A, B, task(positive), belief(positive), task("."), time(dtAfterOrEternal), neqAndCom(A,B)     |- varIntro((A &&+- B)), (Belief:Intersection)
-        A, B, task(positive), belief(negative), task("."), time(dtAfterReverse)                          |- (A &&+- (--,%B)), (Belief:IntersectionPN)
+        A, B, task(positive), belief(negative), task("."), time(dtAfterReverse)                          |- ((--,%B) &&+- A), (Belief:IntersectionPN)
+            //note: these are 'dtAfterReverse' because of the unintended subterm ordering being reversed due to the negations
         A, B, task(positive), belief(negative), task("."), time(dtAfterOrEternalReverse), neqAndCom(A,B) |- varIntro((A &&+- (--,%B))), (Belief:IntersectionPN)
             //note: these are 'dtAfterReverse' because of the unintended subterm ordering being reversed due to the negations
     A, B, task(negative), belief(positive), task("."), time(dtAfter)                              |- ((--,%A) &&+- B), (Belief:IntersectionN)

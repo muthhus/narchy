@@ -125,10 +125,8 @@ public class PatrickTests extends AbstractNALTest {
             "(<$1 --> [melted]> <=>+0 <$1 --> [pliable]>).",
             "(( <$1 --> [pliable]> &&+0 reshape({SELF},$1)) ==>+10 <$1 --> [hardened]>).",
             "(<$1 --> [hardened]> ==>+0 <$1 --> [unscrewing]>).",
-            "<toothbrush --> here>. :|:", //there is a toothbrush here
-            "( <#1 --> here> &&+0 <#1 --> [unscrewing]>)!"
-            //"( <#1 --> here> && <#1 --> [unscrewing]>)! :|:" //alternate: NOW
-
+            "( <#1 --> here> &&+0 <#1 --> [unscrewing]>)!",
+            "<toothbrush --> here>. :|:" //there is a toothbrush here NOW
         );
         //tt.log();
 

@@ -478,6 +478,7 @@ public class TermReductionsTest {
         assertTrue( $("((x) &&+1 --(x))") instanceof Compound);
 
 
+        assertEquals(False, $("((--,L(out))&&L(out))"));
     }
 
     @Test public void testConegatedConjunctionTerms01() throws Narsese.NarseseException {

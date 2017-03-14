@@ -5,6 +5,7 @@ import nars.NAR;
 import nars.Task;
 import nars.budget.Budget;
 import nars.concept.CompoundConcept;
+import nars.concept.TaskConcept;
 import nars.task.AnswerTask;
 import nars.term.Compound;
 import nars.truth.Truth;
@@ -83,7 +84,7 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
 
 
         @Override
-        public TruthDelta add(@NotNull Task input, @NotNull QuestionTable questions, CompoundConcept<?> concept, @NotNull NAR nar) {
+        public TruthDelta add(@NotNull Task input, @NotNull QuestionTable questions, TaskConcept concept, @NotNull NAR nar) {
             return null;
         }
 
@@ -157,7 +158,7 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
      * <p>
      * return null if wasn't added
      */
-    @Nullable TruthDelta add(@NotNull Task input, @NotNull QuestionTable questions, CompoundConcept<?> concept, @NotNull NAR nar);
+    @Nullable TruthDelta add(@NotNull Task input, @NotNull QuestionTable questions, TaskConcept concept, @NotNull NAR nar);
 
 
     @Nullable Task match(long when, long now, float dur, @Nullable Task against, boolean noOverlap);

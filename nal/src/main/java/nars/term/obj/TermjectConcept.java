@@ -225,12 +225,6 @@ public class TermjectConcept<X> implements Atomic, Concept, Termject<X> {
         return current;
     }
 
-    @NotNull
-    @Override
-    public Activation process(@NotNull Task input, NAR nar) {
-        throw new UnsupportedOperationException();
-    }
-
     @Override
     public void setMeta(@NotNull Map newMeta) {
 

@@ -13,6 +13,7 @@ import nars.budget.BudgetMerge;
 import nars.concept.AtomConcept;
 import nars.concept.CompoundConcept;
 import nars.concept.Concept;
+import nars.concept.TaskConcept;
 import nars.concept.dynamic.DynamicConcept;
 import nars.concept.dynamic.DynamicTruthModel;
 import nars.conceptualize.state.ConceptState;
@@ -98,7 +99,12 @@ public class DefaultConceptBuilder implements ConceptBuilder {
     final Concept newConcept(@NotNull Compound t) {
 
 
+
         return withBags(t, (termbag, taskbag) -> {
+
+            if (!Task.taskContentValid(t, (byte)0, nar, true)) {
+                return new CompoundConcept(t, termbag, taskbag, nar);
+            }
 
             DynamicTruthModel dmt = null;
 
@@ -234,7 +240,7 @@ public class DefaultConceptBuilder implements ConceptBuilder {
             return
                     dmt != null ?
                             new DynamicConcept(t, dmt, dmt, termbag, taskbag, nar) :
-                            new CompoundConcept<>(t, termbag, taskbag, nar)
+                            new TaskConcept(t, termbag, taskbag, nar)
                     ;
         });
     }

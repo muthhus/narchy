@@ -632,9 +632,11 @@ public abstract class TermIndex extends TermBuilder {
 //                System.out.println("?");
 //            }
 
-            Compound xx = compoundOrNull(newCompound(o,
-                    pdt,
-                    subsChanged ? intern(newSubs) : psubs));
+            Compound xx = compoundOrNull(
+                    newCompound(o,
+                        pdt,
+                        subsChanged ? intern(newSubs) : psubs)
+            );
             if (xx == null)
                 throw new InvalidTermException("unable to atemporalize", c);
 

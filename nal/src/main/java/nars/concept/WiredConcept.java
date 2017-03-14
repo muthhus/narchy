@@ -21,7 +21,7 @@ import org.jetbrains.annotations.NotNull;
  * to make them directly reflect the sensor concept as the authority.
  *
  * */
-public abstract class WiredConcept extends CompoundConcept<Compound> implements PermanentConcept {
+public abstract class WiredConcept extends TaskConcept implements PermanentConcept {
 
     @NotNull
     protected final NAR nar;

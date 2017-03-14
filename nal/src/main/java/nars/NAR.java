@@ -14,9 +14,7 @@ import nars.attention.Activation;
 import nars.attention.SpreadingActivation;
 import nars.budget.BLink;
 import nars.budget.Budget;
-import nars.concept.AtomConcept;
-import nars.concept.Concept;
-import nars.concept.PermanentConcept;
+import nars.concept.*;
 import nars.conceptualize.DefaultConceptBuilder;
 import nars.conceptualize.state.ConceptState;
 import nars.index.term.TermIndex;
@@ -682,9 +680,9 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
         try {
 
             Concept c = input.concept(this);
-            if (c != null) {
+            if (c instanceof TaskConcept) {
 
-                Activation a = c.process(input, this);
+                Activation a = ((TaskConcept)c).process(input, this);
 
                 if (a != null) {
 

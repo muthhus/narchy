@@ -4,6 +4,7 @@ import com.google.common.collect.Iterators;
 import nars.NAR;
 import nars.Task;
 import nars.concept.CompoundConcept;
+import nars.concept.TaskConcept;
 import nars.truth.Truth;
 import nars.truth.TruthDelta;
 import org.jetbrains.annotations.NotNull;
@@ -129,7 +130,7 @@ public class DefaultBeliefTable implements BeliefTable {
 
 
     @Override
-    public TruthDelta add(@NotNull Task input, @NotNull QuestionTable questions, @NotNull CompoundConcept<?> concept, @NotNull NAR nar) {
+    public TruthDelta add(@NotNull Task input, @NotNull QuestionTable questions, @NotNull TaskConcept concept, @NotNull NAR nar) {
         if (input.isEternal()) {
 
             if (eternal == EternalTable.EMPTY) {

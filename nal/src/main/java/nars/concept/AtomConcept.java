@@ -96,10 +96,6 @@ public class AtomConcept extends AtomicStringConstant implements Concept {
         this.meta = newMeta;
     }
 
-    @Override
-    public Activation process(@NotNull Task input, NAR nar) {
-        throw new UnsupportedOperationException();
-    }
 
     @NotNull
     @Override

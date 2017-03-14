@@ -6,6 +6,7 @@ import nars.NAR;
 import nars.Task;
 import nars.budget.Budget;
 import nars.concept.CompoundConcept;
+import nars.concept.TaskConcept;
 import nars.table.DefaultBeliefTable;
 import nars.table.QuestionTable;
 import nars.term.Compound;
@@ -16,7 +17,10 @@ import nars.truth.TruthDelta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import static nars.Op.BELIEF;
+import static nars.Op.GOAL;
 import static nars.Param.TRUTH_EPSILON;
+import static nars.term.Terms.compoundOrNull;
 
 /**
  * Created by me on 12/4/16.
@@ -31,7 +35,7 @@ public class DynamicBeliefTable extends DefaultBeliefTable {
 
 
     @Override
-    public TruthDelta add(@NotNull Task input, @NotNull QuestionTable questions, @NotNull CompoundConcept<?> concept, @NotNull NAR nar) {
+    public TruthDelta add(@NotNull Task input, @NotNull QuestionTable questions, @NotNull TaskConcept concept, @NotNull NAR nar) {
         if (input instanceof DynamicBeliefTask)
             return TruthDelta.zero; //dont insert its own dynamic belief task, causing a feedback loop
         else
@@ -57,13 +61,27 @@ public class DynamicBeliefTable extends DefaultBeliefTable {
         return generate(template, when, dynamicConcept.nar.time(), null);
     }
 
-    @Nullable
-    public DynamicBeliefTask generate(@NotNull Compound template, long when, long now) {
-        return generate(template, when, now, null);
-    }
+//    @Nullable
+//    public DynamicBeliefTask generate(@NotNull Compound template, long when, long now) {
+//        return generate(template, when, now, null);
+//    }
 
     @Nullable
     public DynamicBeliefTask generate(@NotNull Compound template, long when, long now, @Nullable Budget b) {
+
+        //HACK try to reconstruct the term because it may be invalid
+        template = compoundOrNull($.terms.the(template.op(), template.dt(), template.terms()));
+        if (template == null)
+            return null;
+
+        // normalize it
+        template = compoundOrNull($.terms.normalize(template));
+
+        // then if the term is valid, see if it is valid for a task
+        if (template==null || !Task.taskContentValid(template, beliefOrGoal ? BELIEF : GOAL, null, true)) {
+            return null;
+        }
+
         DynTruth yy = truth(when, template, true);
         return yy != null ? yy.task(template, beliefOrGoal, now, when, b) : null;
     }

@@ -7,6 +7,7 @@ import nars.Param;
 import nars.concept.ActionConcept;
 import nars.concept.SensorConcept;
 
+import static nars.$.the;
 import static nars.Op.BELIEF;
 
 
@@ -26,11 +27,11 @@ public class Line1DSimplest extends NAgent {
     public final ActionConcept out;
 
     public Line1DSimplest(NAR n) {
-        super("", n);
+        super("L", n);
 
-        in = senseNumber($.p("in"), () -> this.target );
+        in = senseNumber($.func( the("L"), the("in")), () -> this.target );
 
-        out = action($.p("out"), (b, d) -> {
+        out = action($.func( the("L"), the("out")), (b, d) -> {
 
             float previous = current;
 

@@ -58,6 +58,7 @@ public class InterNAR extends UDPeer {
             protected void in(@NotNull Task t, Consumer<BLink<Task>> each) {
                 if (t.isCommand())
                     return;
+
                 super.in(t, each);
             }
         };
@@ -84,9 +85,14 @@ public class InterNAR extends UDPeer {
     protected void receive(Msg m) {
 
         Task x = IO.taskFromBytes(m.data(), nar.concepts);
-        if (x!=null)
-        //System.out.println(me + " RECV " + x + " " + Arrays.toString(x.stamp()) + " from " + m.origin());
+        if (x!=null) {
+            if (x.isQuestOrQuestion()) {
+                //reconstruct a question task with an onAnswered handler to reply with answers to the sender
+            }
+
+            //System.out.println(me + " RECV " + x + " " + Arrays.toString(x.stamp()) + " from " + m.origin());
             nar.input(x);
+        }
     }
 
 }

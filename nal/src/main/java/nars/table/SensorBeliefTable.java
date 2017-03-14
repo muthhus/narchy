@@ -3,6 +3,7 @@ package nars.table;
 import nars.NAR;
 import nars.Task;
 import nars.concept.CompoundConcept;
+import nars.concept.TaskConcept;
 import nars.truth.TruthDelta;
 import nars.util.signal.SignalTask;
 import org.jetbrains.annotations.NotNull;
@@ -27,7 +28,7 @@ public class SensorBeliefTable extends DefaultBeliefTable  {
 
 
     @Override
-    public TruthDelta add(@NotNull Task input, @NotNull QuestionTable questions, @NotNull CompoundConcept<?> concept, @NotNull NAR nar) {
+    public TruthDelta add(@NotNull Task input, @NotNull QuestionTable questions, @NotNull TaskConcept concept, @NotNull NAR nar) {
 
         //boolean refresh = false;
 

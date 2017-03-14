@@ -298,7 +298,7 @@ public class ArrayBag<X> extends SortedListTable<X, BLink<X>> implements Bag<X, 
 
 
     @Override
-    public final X key(@NotNull BLink<X> l) {
+    @NotNull public final X key(@NotNull BLink<X> l) {
         return l.get();
     }
 

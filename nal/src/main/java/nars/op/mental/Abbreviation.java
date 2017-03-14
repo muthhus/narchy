@@ -372,10 +372,10 @@ public class Abbreviation/*<S extends Term>*/ extends Leak<Compound, BLink<Compo
 //        }
 
 
-        @Override
-        public final Activation process(@NotNull Task input, NAR nar) {
-            return abbr.process(input, nar);
-        }
+//        @Override
+//        public final Activation process(@NotNull Task input, NAR nar) {
+//            return abbr.process(input, nar);
+//        }
 
         @Override
         public @Nullable Map<Object, Object> meta() {

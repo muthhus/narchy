@@ -10,6 +10,7 @@ import nars.budget.Budget;
 import nars.budget.BudgetFunctions;
 import nars.budget.BudgetMerge;
 import nars.concept.Concept;
+import nars.concept.TaskConcept;
 import nars.table.BeliefTable;
 import nars.task.DerivedTask;
 import nars.task.ImmutableTask;
@@ -109,7 +110,7 @@ abstract public class PremiseBuilder {
 
                 Concept answerConcept = nar.concept(answerTerm);
 
-                if (answerConcept != null) {
+                if (answerConcept instanceof TaskConcept) {
 
                     nar.activate(answerConcept, task.priSafe(0));
 
@@ -146,10 +147,11 @@ abstract public class PremiseBuilder {
 
                                 //if (task.isInput())
                                 Concept ccc = nar.input(answered);
-                                if (ccc==null) {
-                                    //if duplicate, emit by task process anyway
-                                    nar.eventTaskProcess.emit(answered);
-                                }
+
+//                                if (ccc==null) {
+//                                    //if duplicate, emit by task process anyway
+//                                    nar.eventTaskProcess.emit(answered);
+//                                }
 
                             }
 

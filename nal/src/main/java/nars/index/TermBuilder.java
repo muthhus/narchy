@@ -585,7 +585,8 @@ public abstract class TermBuilder {
     }
 
     public static boolean commutive(int dt) {
-        return (dt == DTERNAL) || (dt == 0) || (dt == XTERNAL);
+
+        return (dt == DTERNAL) || (dt == 0);// || (dt == XTERNAL);
     }
 
 

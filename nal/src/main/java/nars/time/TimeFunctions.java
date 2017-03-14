@@ -688,7 +688,7 @@ public interface TimeFunctions {
             int postDT;
             if ((taskDT != DTERNAL) && (taskDT!=XTERNAL) && (beliefDT != DTERNAL) && (beliefDT!=XTERNAL)) {
                 postDT = (taskDT - beliefDT);
-                if (task.term().size() > 1 && !task.term(1).equals(postSub.term(1)))
+                if (task.term().size() > 1 && postSub.size() > 1 && !task.term(1).equals(postSub.term(1)))
                     postDT = -postDT; //reverse the order
             } else {
                 postDT = DTERNAL;

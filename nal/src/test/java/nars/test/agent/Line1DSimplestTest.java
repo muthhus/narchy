@@ -8,6 +8,7 @@ import nars.Narsese;
 import nars.Param;
 import nars.nar.Default;
 import nars.task.DerivedTask;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -138,6 +139,7 @@ public class Line1DSimplestTest {
 
 
     /** tests with an explicit rule provided that will help it succeed */
+    @Ignore
     @Test public void testSimpleCheat() throws Narsese.NarseseException {
 
 
@@ -168,7 +170,7 @@ public class Line1DSimplestTest {
         //n.log();
         n.onTask(t -> {
             if (t instanceof DerivedTask) {
-                if (t.isGoal() && t.toString().contains("(out)"))
+                if (t.isGoal() && t.term().toString().equals("L(out)"))
                     System.out.println(t.proof());
             }
 

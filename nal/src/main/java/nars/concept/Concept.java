@@ -77,6 +77,7 @@ public interface Concept extends Termed {
     }
 
 
+
     default String termString() {
         return term().toString();
     }
@@ -460,7 +461,6 @@ public interface Concept extends Termed {
         return t != null ? t.freq() : valueIfNonExistent;
     }
 
-    Activation process(@NotNull Task input, NAR nar);
 
 
 //    default Iterator<? extends Termed> getTermedAdjacents(boolean termLinks, boolean taskLinks) {
