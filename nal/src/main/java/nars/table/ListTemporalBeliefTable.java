@@ -25,6 +25,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Iterator;
+import java.util.List;
 import java.util.function.Consumer;
 
 import static java.lang.Math.abs;
@@ -138,7 +139,8 @@ public class ListTemporalBeliefTable extends MultiRWFasterList<Task> implements 
         withWriteLockAndDelegate(l -> {
 
             //1. check for duplicate, merge budget. exit
-            for (int i = 0; i < l.size(); i++) {
+            int size = l.size();
+            for (int i = 0; i < size; i++) {
                 Task x = l.get(i);
                 if (x == input)
                     return; //same instance
@@ -518,27 +520,36 @@ public class ListTemporalBeliefTable extends MultiRWFasterList<Task> implements 
                 default:
                     //return l.maxBy(temporalConfidence(when, now, dur));
 
-                    //HACK TODO use fixed-size sorted list, we only need the top N (~=2)
-                    SortedArray sa = new SortedArray(Task[]::new);
+                    Top2<Task> s = new Top2<>(temporalConfidence(when, now, dur), l);
 
-                    FloatFunction<Task> ranker = x -> -temporalConfidence(when, now, dur).apply(x);
-
-                    l.forEach(x -> sa.add(x, ranker));
-
-                    Task a = (Task) sa.array()[0];
-                    Task b = (Task) sa.array()[1];
-
-                    Task c = merge(a, b, now, a.conf(), dur);
-                    if (c != null) {
-                        return c;
-                    } else {
-                        return a;
-                    }
+                    Task a = s.a;
+                    Task c = merge(a, s.b, now, a.conf(), dur);
+                    return c != null ? c : a;
 
             }
         });
     }
 
+    static class Top2<T> {
+
+        public T a = null, b = null;
+        public float aa = Float.NEGATIVE_INFINITY, bb = Float.NEGATIVE_INFINITY;
+
+        public Top2(Function<T, Float> rank, List<T> from) {
+            int s = from.size();
+            assert(s > 1);
+            for (int i = 0; i < s; i++) {
+                T x = from.get(i);
+                float xx = rank.apply(x);
+                if (xx > aa) {
+                    b = a; bb = aa; //shift down
+                    a = x; aa = xx;
+                } else if (xx > bb) {
+                    b = x; bb = xx;
+                }
+            }
+        }
+    }
 
     @Nullable
     @Override
