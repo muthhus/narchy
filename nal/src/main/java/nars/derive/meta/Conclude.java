@@ -134,11 +134,7 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
                             truth = truth.negated();
                     }
 
-                    if (!Task.taskContentValid(crr, punc, nar, !Param.DEBUG)) {
-                        //throw new InvalidTaskException(crr, "Invalid content");
-                        //Task.taskContentValid(crr, punc, nar, !Param.DEBUG);
-                        return true;
-                    }
+
 
                     Budget budget = m.premise.budget(crr, truth, punc, m);
                     if (budget != null) {
@@ -252,8 +248,12 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
 
 
         //content = nar.pre(content);
-        if (content.volume() > nar.termVolumeMax.intValue())
+
+        if (!Task.taskContentValid(content, punc, nar, !Param.DEBUG)) {
+            //throw new InvalidTaskException(crr, "Invalid content");
+            //Task.taskContentValid(crr, punc, nar, !Param.DEBUG);
             return;
+        }
 
         DerivedTask d = derive(content, budget, nar.time(), occ, m, truth, punc, evidence);
 

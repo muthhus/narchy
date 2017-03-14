@@ -99,6 +99,10 @@ public class DefaultConceptBuilder implements ConceptBuilder {
     final Concept newConcept(@NotNull Compound t) {
 
 
+        if (t.volume() > nar.termVolumeMax.intValue()) {
+            throw new UnsupportedOperationException("tried to conceptualize concept too large");
+            //return null;
+        }
 
         return withBags(t, (termbag, taskbag) -> {
 

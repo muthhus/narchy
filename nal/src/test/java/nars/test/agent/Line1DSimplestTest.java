@@ -148,7 +148,7 @@ public class Line1DSimplestTest {
 
         //n.time.dur(changePeriod/4f);
 
-        n.termVolumeMax.setValue(10);
+        n.termVolumeMax.setValue(24);
 
         Line1DSimplest a = new Line1DSimplest(n);
 

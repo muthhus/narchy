@@ -4,6 +4,7 @@ import jcog.Texts;
 import jcog.map.SynchronizedHashMap;
 import nars.bag.impl.ArrayBag;
 import nars.budget.*;
+import nars.concept.Concept;
 import nars.concept.TaskConcept;
 import nars.op.Command;
 import nars.task.ImmutableTask;
@@ -223,7 +224,14 @@ public interface Task extends Budgeted, Truthed, Stamp, Termed<Compound>, Tasked
 
     @Nullable
     default TaskConcept concept(@NotNull NAR n) {
-        return (TaskConcept) n.concept(term(), true);
+        Concept c = n.concept(term(), true);
+        if (!(c instanceof TaskConcept)) {
+            if (Param.DEBUG)
+                throw new RuntimeException("should conceptualize to TaskConcept");
+            else
+                return null;
+        }
+        return (TaskConcept) c;
     }
 
     /**
