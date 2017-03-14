@@ -28,9 +28,9 @@ public class Line1DSimplest extends NAgent {
     public Line1DSimplest(NAR n) {
         super("L", n);
 
-        in = senseNumber($.func( the("L"), the("in")), () -> this.target );
+        in = senseNumber($.func( the("in"), the("L")), () -> this.target );
 
-        out = action($.func( the("L"), the("out")), (b, d) -> {
+        out = action($.func( the("out"), the("L")), (b, d) -> {
 
             float previous = current;
 

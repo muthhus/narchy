@@ -7,6 +7,7 @@ import nars.Narsese;
 import nars.Param;
 import nars.nar.Default;
 import nars.task.DerivedTask;
+import nars.time.Tense;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -44,7 +45,7 @@ public class Line1DSimplestTest {
 
         n.run(1);
 
-        assertEquals( 0.81f, n.emotion.happy(), 0.01f);
+        assertEquals( 0.81f, n.emotion.happy(), 0.05f);
         assertEquals( 0.0, n.emotion.sad(), 0.01f);
 
         System.out.println("moving target away from reward..\n");
@@ -142,80 +143,99 @@ public class Line1DSimplestTest {
     @Test public void testSimpleCheat() throws Narsese.NarseseException {
 
 
-        NAR n = new Default(1024, 16, 1, 3);
+        NAR n = new Default(1024, 64, 1, 3);
 
-        final int changePeriod = 16;
+        final int changePeriod = 8;
 
-        n.time.dur(2);
+        n.time.dur(1);
 
-        n.termVolumeMax.setValue(16);
+        n.termVolumeMax.setValue(12);
+
+        //n.log();
 
         Line1DSimplest a = new Line1DSimplest(n);
 
-        //Param.DEBUG = true;
+        Param.DEBUG = true;
 
         //n.derivedEvidenceGain.setValue(0f);
 
-        a.trace = true;
+        //a.trace = true;
         a.init();
+        a.current = 0;
         a.target = 0;
-        a.curiosity.setValue(0.01f);
+        a.curiosity.setValue(0.05);
 
-        List<Float> hapy = new ArrayList(1*1024);
-        List<Float> motv = new ArrayList(1*1024);
-        List<Float> in = new ArrayList(1*1024);
-        List<Float> out = new ArrayList(1*1024);
-
-        //n.log();
+//        //n.log();
+//        n.onCycle(()->{
+//            System.err.println(a.current + " --->? " + a.target);
+//        });
         n.onTask(t -> {
+
             if (t instanceof DerivedTask) {
-                if (t.isGoal() && t.term().toString().equals("L(out)"))
-                    System.out.println(t.proof());
+
+
+                if (t.isGoal() && t.term().toString().contains("out(L)")) {
+                    System.err.println(t.proof());
+                }
             }
 
             //System.out.println(t);
         });
 
-//        n.input("((in) <=> (out)). %1.0;0.99%");
-        //n.input("((in) ==> (out)). %1.0;0.99%");
-        //n.input("(--(in) ==> --(out)). %1.0;0.99%");
+//        n.input("(L(in) <=> L(out)). %1.0;0.99%");
+//        n.input("$0.99$ (L(in) &&+0 L(out))! %1.0;0.99%");
+//        n.input("$0.99$ (--L(in) &&+0 --L(out))! %1.0;0.99%");
+//        n.input("$0.99$ (L(in) ==>+0 L(out)). %1.0;0.99%");
+//        n.input("$0.99$ (--L(in) ==>+0 --L(out)). %1.0;0.99%");
 
 
 
+        for (int c = 0; c < 4; c++) {
 
+            List<Float> hapy = new ArrayList(1*1024);
+            List<Float> motv = new ArrayList(1*1024);
+            List<Float> in = new ArrayList(1*1024);
+            List<Float> out = new ArrayList(1*1024);
 
-        int time = 1024;
+            int time = 128;
 
-        int j = 0;
-        for (int i = 0; i < time; i++) {
+            int j = 0;
+            for (int i = 0; i < time; i++) {
 
-            if ((i+1) % changePeriod == 0) {
-                System.out.println("SWITCH");
-                a.target = (j++) % 2 == 0  ? 1f : 0f;
+                if ((i + 1) % changePeriod == 0) {
+                    a.target = (j++) % 2 == 0 ? 1f : 0f;
+                    //n.goal(a.out.term(), Tense.Present, a.target, 0.9f);
+                }
+                if (j > 5) {
+                    a.curiosity.setValue(0f);
+                }
+                //                //a.goal()
+                //            }
+
+                n.run(1);
+
+                in.add(a.in.asFloat());
+                float o = (float) a.out.feedback.getAsDouble();
+                if (o != o)
+                    o = 0.5f;
+                out.add(o);
+                hapy.add(a.rewardValue);
+                motv.add(a.dexterity());
             }
-            if (j > 2)
-                a.curiosity.setValue(0f);
 
-            n.run(1);
+            int ds = 4;
+            System.out.println("  in:\t" + renderFloats(downSample(in, ds)));
+            System.out.println(" out:\t" + renderFloats(downSample(out, ds)));
+            System.out.println("hapy:\t" + renderFloats(downSample(hapy, ds)));
+            System.out.println("motv:\t" + renderFloats(downSample(motv, ds)));
 
-            in.add(a.in.asFloat());
-            out.add((float)a.out.feedback.getAsDouble());
-            hapy.add(a.rewardValue);
-            motv.add(a.dexterity());
+            System.out.println("AVG SCORE=" + a.rewardSum() / n.time());
+
+            RecycledSummaryStatistics motvStat = new RecycledSummaryStatistics();
+            for (Float x : motv)
+                motvStat.accept(x);
+            System.out.println(motvStat);
         }
-
-        int ds = 4;
-        System.out.println( "  in:\t" + renderFloats(downSample(in, ds)) );
-        System.out.println( " out:\t" + renderFloats(downSample(out, ds)) );
-        System.out.println( "hapy:\t" + renderFloats(downSample(hapy, ds)) );
-        System.out.println( "motv:\t" + renderFloats(downSample(motv, ds)) );
-
-        System.out.println("AVG SCORE=" + a.rewardSum() / n.time());
-
-        RecycledSummaryStatistics motvStat = new RecycledSummaryStatistics();
-        for (Float x : motv)
-            motvStat.accept(x);
-        System.out.println(motvStat);
     }
 
 

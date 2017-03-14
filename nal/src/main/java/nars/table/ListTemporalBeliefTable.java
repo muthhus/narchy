@@ -421,30 +421,51 @@ public class ListTemporalBeliefTable extends MultiRWFasterList<Task> implements 
         float inputRank = input != null ? rankTemporalByConfidence(input, now, now, dur) : Float.POSITIVE_INFINITY;
 
         Task a = l.minBy(temporalConfidence(now, now, dur));
-        //return rankTemporalByConfidenceAndOriginality(t, when, now, -1);
-        if (a == null || inputRank < rankTemporalByConfidence(a, now, now, dur)) {
-            //dont continue if the input was too weak
-            return null;
+
+        if (a == null) {
+            return null; // this probably shouldnt happen
         }
 
-        remove(l, a, false);
+        if (inputRank < rankTemporalByConfidence(a, now, now, dur)) {
+            //if weaker than everything else, attempt a merge of the input with another
 
-        Task b = matchMerge(l, now, a, dur);
-        if (b != null) {
-            Task merged = merge(a, b, now, confMin, dur);
-
-            a.delete();  //delete a after the merge, so that its budget revises
-
-            if (merged == null) {
-                return input;
-            } else {
-                remove(l, b, true);
-                return merged;
+            Task b = matchMerge(l, now, input, dur);
+            if (b == null) {
+                return null; //nothing to merge with
             }
-        } else {
-            a.delete();
 
-            return input;
+            Task merged = merge(input, b, now, confMin, dur);
+            if (merged == null) {
+                return null; //merge failed
+            }
+
+            remove(l, b, true);
+
+            return merged;
+
+        } else {
+            //merge 2 weakest and allow the input as-is
+
+            remove(l, a, false);
+
+            Task b = matchMerge(l, now, a, dur);
+            if (b != null) {
+                Task merged = merge(a, b, now, confMin, dur);
+
+                a.delete();  //delete a after the merge, so that its budget revises
+
+                if (merged == null) {
+                    return input;
+                } else {
+                    remove(l, b, true);
+                    return merged;
+                }
+            } else {
+                a.delete();
+
+                return input;
+            }
+
         }
 
     }

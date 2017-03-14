@@ -453,8 +453,15 @@ abstract public class NAgent implements NSense, NAction {
 
         //long frameDelta = now-prev;
         float dur = nar.time.dur();
+        int num = predictors.size();
+
+        float pp =  predictorProbability / num;
+
         nar.input(
-                IntStream.range(0, predictors.size()).mapToObj(i -> {
+                IntStream.range(0, num).mapToObj(i -> {
+                    if (nar.random.nextFloat() > pp)
+                        return null;
+
                     Tasked xx = predictors.get(i);
                     Task x = xx.task();
                     if (x != null) {
@@ -512,8 +519,6 @@ abstract public class NAgent implements NSense, NAction {
 
     private Task boost(@NotNull Task t, float dur, float horizon /* in multiples of dur */) {
 
-        if (nar.random.nextFloat() > predictorProbability / predictors.size())
-            return t;
 
         byte pp = t.punc();
         if (t.start() != ETERNAL) {
