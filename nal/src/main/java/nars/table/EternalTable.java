@@ -4,8 +4,7 @@ import jcog.data.sorted.SortedArray;
 import nars.NAR;
 import nars.Param;
 import nars.Task;
-import nars.concept.CompoundConcept;
-import nars.concept.Concept;
+import nars.concept.TaskConcept;
 import nars.task.Revision;
 import nars.task.RevisionTask;
 import nars.term.Compound;
@@ -165,7 +164,7 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
      *      ==newBelief: existing duplicate found
      *      non-null: revised task
      */
-    @Nullable public /*Revision*/Task tryRevision(@NotNull Task newBelief, @NotNull Concept concept, @NotNull NAR nar) {
+    @Nullable public /*Revision*/Task tryRevision(@NotNull Task newBelief, @NotNull TaskConcept concept, @NotNull NAR nar) {
 
         Object[] list = this.list;
         int bsize = list.length;
@@ -247,7 +246,7 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
                 conclusion,
                 nar.time(),
                 ETERNAL, ETERNAL,
-                (CompoundConcept) concept
+                concept
         );
         r.budget(oldBelief, newBelief);
 
@@ -324,7 +323,7 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
     }
 
     @Nullable
-    public TruthDelta add(@NotNull Task input, CompoundConcept concept, @NotNull NAR nar) {
+    public TruthDelta add(@NotNull Task input, TaskConcept concept, @NotNull NAR nar) {
 
         int cap = capacity();
         if (cap == 0) {

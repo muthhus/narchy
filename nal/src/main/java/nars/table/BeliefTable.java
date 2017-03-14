@@ -4,7 +4,6 @@ import jcog.bag.Prioritized;
 import nars.NAR;
 import nars.Task;
 import nars.budget.Budget;
-import nars.concept.CompoundConcept;
 import nars.concept.TaskConcept;
 import nars.task.AnswerTask;
 import nars.term.Compound;

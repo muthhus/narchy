@@ -103,6 +103,7 @@ public class DefaultConceptBuilder implements ConceptBuilder {
         return withBags(t, (termbag, taskbag) -> {
 
             if (!Task.taskContentValid(t, (byte)0, nar, true)) {
+
                 return new CompoundConcept(t, termbag, taskbag, nar);
             }
 

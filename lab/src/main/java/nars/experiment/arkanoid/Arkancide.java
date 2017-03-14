@@ -56,7 +56,7 @@ public class Arkancide extends NAgentX {
                 float metaLearningRate = 0.9f;
                 m.confMin.setValue(0.02f);
                 m.goalConfidence(metaLearningRate);
-                m.termVolumeMax.setValue(9);
+                //m.termVolumeMax.setValue(9);
 
                 MetaAgent metaT = new MetaAgent(a, m); //init before loading from file
                 metaT.trace = true;

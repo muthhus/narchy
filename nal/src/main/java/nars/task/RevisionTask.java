@@ -5,7 +5,7 @@ import nars.NAR;
 import nars.Task;
 import nars.budget.BLink;
 import nars.budget.BudgetFunctions;
-import nars.concept.Concept;
+import nars.concept.TaskConcept;
 import nars.term.Compound;
 import nars.truth.Truth;
 import nars.truth.TruthDelta;
@@ -25,9 +25,9 @@ public class RevisionTask extends AnswerTask  {
 
 
     @Nullable
-    private Concept concept;
+    private TaskConcept concept;
 
-    public RevisionTask(@NotNull Compound term, @NotNull Task newBelief, @NotNull Task oldBelief, Truth conclusion, long creationTime, long start, long end, Concept target) {
+    public RevisionTask(@NotNull Compound term, @NotNull Task newBelief, @NotNull Task oldBelief, Truth conclusion, long creationTime, long start, long end, TaskConcept target) {
         super(term, newBelief, oldBelief, conclusion, creationTime, start, end, 0.5f);
         this.concept = target;
     }
@@ -47,7 +47,7 @@ public class RevisionTask extends AnswerTask  {
 //    }
 
     @Override
-    public @Nullable Concept concept(@NotNull NAR n) {
+    public @Nullable TaskConcept concept(@NotNull NAR n) {
         if (concept==null)
             return super.concept(n); //HACK
         return concept;

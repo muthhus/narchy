@@ -6,8 +6,8 @@ import jcog.bag.impl.PLinkHijackBag;
 import jcog.event.On;
 import nars.NAR;
 import nars.Task;
-import nars.concept.Concept;
 import nars.bag.leak.Leak;
+import nars.concept.Concept;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Consumer;

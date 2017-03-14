@@ -2,7 +2,6 @@ package nars.table;
 
 import nars.NAR;
 import nars.Task;
-import nars.concept.CompoundConcept;
 import nars.concept.TaskConcept;
 import nars.truth.TruthDelta;
 import nars.util.signal.SignalTask;

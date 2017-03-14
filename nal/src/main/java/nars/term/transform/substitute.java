@@ -1,6 +1,5 @@
 package nars.term.transform;
 
-import com.google.common.base.Objects;
 import nars.$;
 import nars.premise.Derivation;
 import nars.term.Compound;

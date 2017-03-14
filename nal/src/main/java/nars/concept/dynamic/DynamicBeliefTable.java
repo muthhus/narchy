@@ -5,7 +5,6 @@ import nars.$;
 import nars.NAR;
 import nars.Task;
 import nars.budget.Budget;
-import nars.concept.CompoundConcept;
 import nars.concept.TaskConcept;
 import nars.table.DefaultBeliefTable;
 import nars.table.QuestionTable;

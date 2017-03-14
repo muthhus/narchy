@@ -3,7 +3,6 @@ package nars.test.agent;
 import nars.$;
 import nars.NAR;
 import nars.NAgent;
-import nars.Param;
 import nars.concept.ActionConcept;
 import nars.concept.SensorConcept;
 

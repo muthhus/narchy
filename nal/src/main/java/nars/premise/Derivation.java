@@ -20,7 +20,8 @@ import java.util.function.Consumer;
 
 import static nars.Op.NEG;
 import static nars.Op.VAR_PATTERN;
-import static nars.term.transform.substituteIfUnifies.*;
+import static nars.term.transform.substituteIfUnifies.substituteIfUnifiesAny;
+import static nars.term.transform.substituteIfUnifies.substituteIfUnifiesDep;
 import static nars.time.Tense.DTERNAL;
 
 

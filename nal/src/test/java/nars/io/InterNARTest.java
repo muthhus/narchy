@@ -2,18 +2,19 @@ package nars.io;
 
 import jcog.Util;
 import jcog.random.XorShift128PlusRandom;
-import nars.*;
+import nars.InterNAR;
+import nars.NAR;
+import nars.Narsese;
+import nars.Param;
 import nars.conceptualize.DefaultConceptBuilder;
 import nars.index.term.map.CaffeineIndex;
 import nars.nar.Default;
 import nars.time.RealTime;
 import nars.time.Tense;
 import nars.util.exe.MultiThreadExecutor;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.concurrent.Executors;
-import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;

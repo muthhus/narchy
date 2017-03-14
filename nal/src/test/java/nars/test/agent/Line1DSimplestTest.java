@@ -1,6 +1,5 @@
 package nars.test.agent;
 
-import jcog.io.SparkLine;
 import jcog.list.FasterList;
 import jcog.math.RecycledSummaryStatistics;
 import nars.NAR;

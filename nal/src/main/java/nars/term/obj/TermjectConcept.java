@@ -4,7 +4,6 @@ import jcog.bag.Bag;
 import nars.NAR;
 import nars.Op;
 import nars.Task;
-import nars.attention.Activation;
 import nars.budget.BLink;
 import nars.concept.Concept;
 import nars.conceptualize.state.ConceptState;
