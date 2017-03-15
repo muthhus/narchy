@@ -720,4 +720,16 @@ public interface Task extends Budgeted, Truthed, Stamp, Termed<Compound>, Tasked
             return y;
         }
     }
+
+    default boolean contains(long when) {
+        long start = start();
+        if (start != ETERNAL) {
+            if (when >= start) {
+                if (when <= end())
+                    return true;
+            }
+        }
+        return false;
+    }
+
 }

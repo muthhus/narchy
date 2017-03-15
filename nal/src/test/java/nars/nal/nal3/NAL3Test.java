@@ -210,7 +210,6 @@ public class NAL3Test extends AbstractNALTest {
     @Test
     public void compound_composition_one_premise3()  {
         TestNAR tester = test();
-        
         tester.believe("<swan --> bird>",0.9f,0.9f); //.en("Swan is a type of bird.");
         tester.askAt(cycles/2,"<swan --> (-,swimmer,bird)>"); //.en("Is swan a type of nonbird swimmer?");
         tester.mustBelieve(cycles, "<swan --> (-,swimmer,bird)>", 0.10f ,0.73f); //.en("A swan is not a type of nonbird swimmer.");
@@ -262,7 +261,6 @@ public class NAL3Test extends AbstractNALTest {
     @Test public void testArity1_Decomposition_IntersectExt() {
         //(M --> S), (M --> (&,S,A..+)) |- (M --> (&,A..+)), (Belief:DecomposePositiveNegativeNegative)
         test()
-                //.log()
                 .believe("(a-->b)")
                 .believe("(a-->(&,b,c))", 0f, 0.9f)
                 .mustBelieve(cycles, "(a-->c)", 0f, 0.81f, ETERNAL);

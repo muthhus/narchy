@@ -19,7 +19,7 @@ public class UnifySubst extends Unify {
     static final Logger logger = LoggerFactory.getLogger(UnifySubst.class);
 
     @NotNull
-    public final NAR memory;
+    public final NAR nar;
 
 
     final Predicate<Term> target;
@@ -28,10 +28,10 @@ public class UnifySubst extends Unify {
 
     int matches;
 
-    public UnifySubst(Op varType, @NotNull NAR memory, Predicate<Term> target, int maxMatches) {
-        super(memory.concepts, varType, memory.random, Param.SubUnificationStackMax);
+    public UnifySubst(Op varType, @NotNull NAR n, Predicate<Term> target, int maxMatches) {
+        super(n.concepts, varType, n.random, Param.SubUnificationStackMax);
 
-        this.memory = memory;
+        this.nar = n;
         this.maxMatches = maxMatches;
         this.target = target;
 
@@ -89,13 +89,15 @@ public class UnifySubst extends Unify {
         return matches < maxMatches; //determines how many
     }
 
-    //abstract protected boolean accept(Term beliefTerm, Termed unifiedBeliefTerm);
 
-    @Nullable
-    Term resolve(@NotNull Term t, @Nullable Map<Term,Term> subs) {
-        return (subs == null) || (subs.isEmpty()) ?
-                t /* no change necessary */ :
-                memory.concepts.transform(t, new MapSubst(subs));
+    @Nullable Term resolve(@NotNull Term t, @Nullable Map<Term,Term> subs) {
+        try {
+            return (subs == null) || (subs.isEmpty()) ?
+                    t /* no change necessary */ :
+                    nar.concepts.transform(t, new MapSubst(subs));
+        } catch (InvalidTermException e) {
+            return null;
+        }
     }
 
 }

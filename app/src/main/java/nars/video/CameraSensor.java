@@ -53,8 +53,8 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
 
     @NotNull
     public static Compound coord(int n, int max) {
-        return $.pRecurse($.radixArray(n, radix, max));
-        //return $.p($.radixArray(x, radix, width));
+        //return $.pRecurse($.radixArray(n, radix, max));
+        return $.p($.radixArray(n, radix, max));
     }
 
     public List<SensorConcept> encode(Int2Function<Compound> cellTerm, FloatToObjectFunction<Truth> brightnessToTruth) {

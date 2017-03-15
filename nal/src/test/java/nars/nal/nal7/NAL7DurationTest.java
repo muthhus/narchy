@@ -31,7 +31,7 @@ public class NAL7DurationTest {
         assertDuration(n, "(x<->y)", 0, 10);
         assertDuration(n, "((x|y)-->a)", 0, 10);
         assertDuration(n, "((x&y)-->a)", 0, 10);
-        assertDuration(n, "((y~x)-->a)", 0, 10);
+        assertDuration(n, "((x~y)-->a)", 0, 10);
 
         //n.concept("(x-->a)").print();
         //n.concept("(y-->a)").print();
