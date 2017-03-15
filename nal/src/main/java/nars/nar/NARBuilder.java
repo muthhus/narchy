@@ -174,8 +174,8 @@ public interface NARBuilder {
 
         };
 
-        nar.beliefConfidence(0.9f);
-        nar.goalConfidence(0.9f);
+        nar.beliefConfidence(0.5f);
+        nar.goalConfidence(0.5f);
         //nar.derivedEvidenceGain.setValue(0.75f);
 
         float p = 0.5f;

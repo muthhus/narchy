@@ -35,7 +35,8 @@ public class Line1DSimplest extends NAgent {
             float previous = current;
 
             if (d != null) {
-                current = d.freq();
+                float f = d.freq();
+                current = (f > 0.5f) ? 1f : 0f;
             }
 
             /*

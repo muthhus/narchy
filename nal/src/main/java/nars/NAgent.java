@@ -75,7 +75,7 @@ abstract public class NAgent implements NSense, NAction {
 
     public final List<Tasked> predictors = newArrayList();
 
-    float predictorProbability = 1f; //scaled to 1/num predictors
+    public float predictorProbability = 1f; //scaled to 1/num predictors
 
     public boolean trace = false;
 

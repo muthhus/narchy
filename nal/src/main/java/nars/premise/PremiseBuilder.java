@@ -76,7 +76,7 @@ abstract public class PremiseBuilder {
 
 //        final Task task = nar.post(_task);
 //        Term beliefTerm = nar.post(_beliefTerm).unneg();
-        final Task task = (_task);
+        Task task = (_task);
         Term beliefTerm = (_beliefTerm);
 
         Task belief = null;
@@ -100,6 +100,13 @@ abstract public class PremiseBuilder {
         //now;
         //(long)(now + dur);
 
+
+        if (task.isGoal() && task.isEternal()) {
+            //project an eternal goal to the present
+            task = ((ImmutableTask)task).project(now, dur, nar.confMin.floatValue());
+            if (task == null)
+                return null;
+        }
 
         if (beliefTerm instanceof Compound && task.isQuestOrQuestion()) {
 
@@ -220,9 +227,11 @@ abstract public class PremiseBuilder {
             }
         }
 
-        if ((belief != null) && task.isGoal() && !task.isEternal() && !belief.isEternal() && belief.start() != taskStart) {
-            //project the belief to the time of the task
-            belief = ((ImmutableTask) belief).project(taskStart, nar.time.dur(), nar.confMin.floatValue());
+        if (task.isGoal()) {
+            if ((belief != null) && !task.isEternal() && !belief.isEternal() && belief.start() != taskStart) {
+                //project the belief to the time of the task
+                belief = ((ImmutableTask) belief).project(taskStart, nar.time.dur(), nar.confMin.floatValue());
+            }
         }
 
 
