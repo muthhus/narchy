@@ -227,8 +227,10 @@ public interface Task extends Budgeted, Truthed, Stamp, Termed<Compound>, Tasked
         Concept c = n.concept(term(), true);
         if (!(c instanceof TaskConcept)) {
             if (Param.DEBUG)
-                throw new RuntimeException("should conceptualize to TaskConcept");
-            else
+                //throw new RuntimeException
+                System.err.println
+                        ("should conceptualize to TaskConcept: " + c);
+            //else
                 return null;
         }
         return (TaskConcept) c;

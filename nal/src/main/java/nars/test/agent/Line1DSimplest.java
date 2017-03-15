@@ -1,11 +1,13 @@
 package nars.test.agent;
 
+import jcog.data.FloatParam;
 import nars.$;
 import nars.NAR;
 import nars.NAgent;
 import nars.concept.ActionConcept;
 import nars.concept.SensorConcept;
 
+import static jcog.Util.unitize;
 import static nars.$.the;
 import static nars.Op.BELIEF;
 
@@ -15,72 +17,57 @@ import static nars.Op.BELIEF;
  */
 public class Line1DSimplest extends NAgent {
 
-
-    public float target = 0.5f, current = 0.5f;
-
-    public interface LongToFloatFunction {
-        float valueOf(long i);
-    }
-
+    public static final float resolution = 0.25f;
     public final SensorConcept in;
+
+    /** the target value */
+    public final FloatParam i = new FloatParam(0.5f, 0, 1f);
+
     public final ActionConcept out;
+    /** the current value */
+    public final FloatParam o = new FloatParam(0.5f, 0, 1f);
+
 
     public Line1DSimplest(NAR n) {
-        super("", n);
+        super("L", n);
 
-        in = senseNumber($.p("i"), () -> this.target );
+        in = senseNumber( $.inh($.p(id), $.the("i")), this.i);
 
-        out = action($.p("o"), (b, d) -> {
-
-            float previous = current;
+        out = action( $.inh($.p(id), $.the("o")), (b, d) -> {
 
             if (d != null) {
                 float f = d.freq();
-                if (f > 0.75f)
-                    current = 1f;
-                else if (f < 0.25f)
-                    current = 0f;
-                else {
-                    //no change
-                }
+//                float inc = ((f - 0.5f) * 2f) * 0.04f;
+//                o.setValue(unitize(o.getValue() + inc));
+
+                o.setValue(f);
+
+//                else {
+//                    //no change
+//                    return null;
+//                }
+
+
             }
 
-            /*
-            float prevDist = Math.abs(target - previous);
-            float curDist = Math.abs(current - previous);
-            if (curDist - prevDist > 0.01f) {
-                System.err.println(nar.time() + " DEVIATION " + Texts.n2(curDist - prevDist));
-            } else if (prevDist - curDist > 0.01f ){
-                System.err.println(nar.time() + " CORRECTION " + Texts.n2(prevDist - curDist));
-            }
-            */
-
-            return $.t(current, nar.confidenceDefault(BELIEF));
+            return $.t(o.floatValue(), nar.confidenceDefault(BELIEF));
         });
+
+        in.resolution(resolution);
+        out.feedback.resolution(resolution);
 
     }
 
     @Override
     protected float act() {
-        float dist = Math.abs(target - current);
+        if (o != o)
+            return Float.NaN;
 
-        return ((1f - dist) * 2f) - 1f; //normalize to -1..+1
+        float dist = Math.abs(i.floatValue() - o.floatValue());
+
+        //return (1f - dist); //unipolar, 0..1.0
+        return ((1f - dist) * 2f) - 1f; //bipolar, normalized to -1..+1
     }
-
-
-    public static LongToFloatFunction sine(float targetPeriod) {
-        return (t) -> 0.5f + 0.5f * (float) Math.sin(t / (targetPeriod));
-        //+ 0.05f * (a * (float)Math.cos(t / (targetPeriod/3f))-1)
-        //return 0.5f + 0.5f * (float)Math.tan(t / (targetPeriod)) + (float)Math.random()*0.1f;
-    }
-
-    public static LongToFloatFunction random(float targetPeriod) {
-        return (t) -> (((((int) (t / targetPeriod)) * 31) ^ 37) % 256) / 256.0f;
-
-        //+ 0.05f * (a * (float)Math.cos(t / (targetPeriod/3f))-1)
-        //return 0.5f + 0.5f * (float)Math.tan(t / (targetPeriod)) + (float)Math.random()*0.1f;
-    }
-
 
 
 

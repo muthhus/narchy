@@ -5,6 +5,7 @@ import jcog.learn.ntm.learn.BPTTTeacher;
 import jcog.learn.ntm.learn.RMSPropWeightUpdater;
 import jcog.learn.ntm.learn.RandomWeightInitializer;
 import jcog.learn.ntm.memory.address.Head;
+import jcog.random.XorShift128PlusRandom;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
@@ -23,8 +24,8 @@ abstract public class SequenceLearner {
     protected double[] errors = new double[statisticsWindow];
     protected double[] times = new double[statisticsWindow];
     protected int i;
-    final int seed = 32702;
-    protected Random rand = new Random(seed);
+    final int seed = 1;
+    protected Random rand = new XorShift128PlusRandom(seed);
 
     public SequenceLearner(int vectorSize, int memoryWidth, int memoryHeight, int numHeads, int controllerSize) {
 

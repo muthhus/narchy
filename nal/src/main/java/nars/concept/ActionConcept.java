@@ -7,6 +7,7 @@ import nars.task.Revision;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.truth.Truth;
+import nars.truth.TruthDelta;
 import nars.truth.TruthFunctions;
 import nars.util.signal.ScalarSignal;
 import nars.util.signal.SignalTask;
@@ -198,6 +199,18 @@ public class ActionConcept extends WiredConcept implements FloatFunction<Term>, 
         feedback.pri(
             () -> n.priorityDefault(Op.BELIEF)
         );
+    }
+
+
+    @Override
+    public @Nullable TruthDelta processBelief(@NotNull Task belief, @NotNull NAR nar) {
+        //return super.processBelief(belief, nar);
+        if (belief instanceof SignalTask) {
+            return super.processBelief(belief, nar);
+        }
+
+        return null; //reject non-feedback generated beliefs
+
     }
 
     @Override

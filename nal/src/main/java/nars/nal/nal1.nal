@@ -24,16 +24,16 @@
 //seems like only one of these needs permute backward. these generate a lot of questions so minimize them especially when redundant questions would be generated
 
     (A --> B), (B --> C), neqCom(A,C) |- (A --> C), (Belief:Deduction, Goal:Strong, Permute:Backward)
-    (A --> B), (A --> C), neqCom(B,C) |- (C --> B), (Belief:Abduction, Goal:Weak)
-    (A --> C), (B --> C), neqCom(A,B) |- (A --> B), (Belief:Induction, Goal:Weak)
-    (A --> B), (B --> C), neqCom(A,C) |- (C --> A), (Belief:Exemplification, Goal:Weak)
+    (A --> B), (A --> C), neqCom(B,C) |- (C --> B), (Belief:Abduction, Goal:Weak, Permute:Backward)
+    (A --> C), (B --> C), neqCom(A,B) |- (A --> B), (Belief:Induction, Goal:Weak, Permute:Backward)
+    (A --> B), (B --> C), neqCom(A,C) |- (C --> A), (Belief:Exemplification, Goal:Weak, Permute:Backward)
 
 //// similarity-based syllogism ////////////////////////////////////////////////////////////////////////////////////
 //If P and S are a special case of M, then they might be similar (weak),
 //also if P and S are a general case of M
 
-    (P --> M), (S --> M), neqCom(S,P) |- (P <-> S), (Belief:Comparison, Goal:Weak)
-    (M --> P), (M --> S), neqCom(S,P) |- (P <-> S), (Belief:Comparison, Goal:Weak)
+    (P --> M), (S --> M), neqCom(S,P) |- (P <-> S), (Belief:Comparison, Goal:Weak, Permute:Backward)
+    (M --> P), (M --> S), neqCom(S,P) |- (P <-> S), (Belief:Comparison, Goal:Weak, Permute:Backward)
 
 //If M is a special case of P and S and M are similar, then S is also a special case of P (strong)
 

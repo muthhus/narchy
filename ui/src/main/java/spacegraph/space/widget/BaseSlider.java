@@ -16,6 +16,9 @@ import static spacegraph.space.layout.Grid.grid;
 public class BaseSlider extends Widget {
 
 
+    /** dead-zone at the edges to latch min/max values */
+    private static final float margin = 0.02f;
+
     private static final float EPSILON = 0.001f;
 
     @Nullable SliderChange change;
@@ -101,6 +104,7 @@ public class BaseSlider extends Widget {
      * unnormalize: gets proportion from external value
      */
     protected float p(float v) {
+
         return v;
     }
 
@@ -128,7 +132,16 @@ public class BaseSlider extends Widget {
     }
 
     private float p(v2 hitPoint) {
-        return hitPoint.x; //TODO interpret point coordinates according to the current drawn model, which could be a knob etc
+
+        //TODO interpret point coordinates according to the current drawn model, which could be a knob etc
+
+        float x = hitPoint.x;
+        if (x <= margin)
+            return 0;
+        else if (x >= (1f-margin))
+            return 1f;
+        else
+            return hitPoint.x;
     }
 
 

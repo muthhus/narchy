@@ -239,18 +239,21 @@ public interface TimeFunctions {
 
     static Compound decomposeLate(@NotNull Compound derived, @NotNull Derivation p, @NotNull long[] occReturn, boolean b) {
         Compound x = decompose(derived, p, occReturn, b);
-        if (p.task.isGoal() && (x!=null) && (occReturn[0]!=ETERNAL)) {
+        if ((x!=null) && p.task.isGoal() && (occReturn[0]!=ETERNAL)) {
             long taskStart = p.task.start();
-            if (taskStart!=ETERNAL) {
-                //dont derive a past-tense goal (before the task)
-                if (taskStart > occReturn[0]) {
-                    if (occReturn[1] == ETERNAL) occReturn[1] = occReturn[0]; //HACK
-                    long range = occReturn[1] - occReturn[0];
 
-                    occReturn[0] = taskStart;
-                    occReturn[1] = taskStart + range;
-                }
+            if (taskStart == ETERNAL) //imminentize the eschaton
+                taskStart = p.nar.time();
+
+            //dont derive a past-tense goal (before the task)
+            if (taskStart > occReturn[0]) {
+                if (occReturn[1] == ETERNAL) occReturn[1] = occReturn[0]; //HACK
+                long range = occReturn[1] - occReturn[0];
+
+                occReturn[0] = taskStart;
+                occReturn[1] = taskStart + range;
             }
+
         }
         return x;
     }

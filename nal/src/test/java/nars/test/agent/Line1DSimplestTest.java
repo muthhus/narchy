@@ -1,24 +1,18 @@
 package nars.test.agent;
 
 import jcog.list.FasterList;
-import jcog.math.RecycledSummaryStatistics;
 import nars.NAR;
 import nars.Narsese;
 import nars.Param;
-import nars.Task;
 import nars.nar.Default;
-import nars.task.DerivedTask;
 import nars.time.Tense;
-import nars.truth.Truth;
 import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.TreeSet;
 
 import static jcog.io.SparkLine.renderFloats;
-import static nars.Op.IMPL;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -39,47 +33,56 @@ public class Line1DSimplestTest {
 
         int BETWEEN = 32;
 
-        n.believe("in(L)", Tense.Present, 0f, c);
-        n.believe("out(L)", Tense.Present, 0f, c);
-        n.believe("happy(L)", Tense.Present, 1f, c);
+        n.believe("(i)", Tense.Present, 0f, c);
+        n.goal("(o)", Tense.Present, 0f, c);
+        n.believe("(o)", Tense.Present, 0f, c);
+        n.believe("(happy)", Tense.Present, 1f, c);
         n.run(BETWEEN);
 
-        n.believe("in(L)", Tense.Present, 1f, c);
-        n.believe("out(L)", Tense.Present, 1f, c);
-        n.believe("happy(L)", Tense.Present, 1f, c);
+        n.believe("(i)", Tense.Present, 1f, c);
+        n.goal("(o)", Tense.Present, 1f, c);
+        n.believe("(o)", Tense.Present, 1f, c);
+        n.believe("(happy)", Tense.Present, 1f, c);
         n.run(BETWEEN);
 
-        n.believe("in(L)", Tense.Present, 0f, c);
-        n.believe("out(L)", Tense.Present, 1f, c);
-        n.believe("happy(L)", Tense.Present, 0f, c);
+        n.believe("(i)", Tense.Present, 0f, c);
+        n.goal("(o)", Tense.Present, 1f, c);
+        n.believe("(o)", Tense.Present, 1f, c);
+        n.believe("(happy)", Tense.Present, 0f, c);
         n.run(BETWEEN);
 
-        n.believe("in(L)", Tense.Present, 1f, c);
-        n.believe("out(L)", Tense.Present, 0f, c);
-        n.believe("happy(L)", Tense.Present, 0f, c);
+        n.believe("(i)", Tense.Present, 1f, c);
+        n.goal("(o)", Tense.Present, 0f, c);
+        n.believe("(o)", Tense.Present, 0f, c);
+        n.believe("(happy)", Tense.Present, 0f, c);
         n.run(BETWEEN);
 
-        n.clear();
 
-        n.log();
-        n.onTask(t -> {
+//        n.onTask(t -> {
+//
+//            if (t instanceof DerivedTask) {
+//
+//
+//                if (t.isGoal()) {
+//                    System.err.println(t.proof());
+//                }
+//            }
+//
+//            //System.out.println(t);
+//        });
 
-            if (t instanceof DerivedTask) {
+//        n.input("$0.99$ happy(L)! %1.0;0.99%");
+//        n.input("$0.99$ out(L)@ :|:");
+        //n.log();
 
+//        n.input("$0.99$ ((i) ==>+0 (o))?");
+//        n.input("$0.99$ (--(i) ==>+0 (o))?");
+//        n.input("$0.99$ ((o) ==>+0 (i))?");
+//        n.input("$0.99$ (--(o) ==>+0 (i))?");
 
-                if (t.isGoal() && t.term().toString().contains("out(L)")) {
-                    System.err.println(t.proof());
-                }
-            }
+        n.input("$0.99$ (?x ==>+0 (happy))?");
 
-            //System.out.println(t);
-        });
-
-        n.input("$0.99$ happy(L)! %1.0;0.99%");
-        n.input("$0.99$ out(L)@ :|:");
-
-
-        n.run(100);
+        n.run(500);
 
     }
 
@@ -97,7 +100,8 @@ public class Line1DSimplestTest {
         a.trace = true;
 
         System.out.println("START initializing at target..\n");
-        a.current = 0; a.target = 0;
+        a.o.setValue(0);
+        a.i.setValue(0);
 
         n.run(1);
 
@@ -109,7 +113,7 @@ public class Line1DSimplestTest {
         assertEquals( 0.0, n.emotion.sad(), 0.01f);
 
         System.out.println("moving target away from reward..\n");
-        a.target = 1;
+        a.i.setValue(1f);
         n.run(1);
 
         assertEquals(-1f, a.rewardValue, 0.01f);
@@ -155,11 +159,6 @@ public class Line1DSimplestTest {
 
         int trainTime = 8;
 
-        a.current = 0; a.target = 0; n.run(trainTime);
-        a.current = 0; a.target = 1; n.run(trainTime);
-        a.current = 1; a.target = 0; n.run(trainTime);
-        a.current = 1; a.target = 1; n.run(trainTime);
-
 
         final int changePeriod = trainTime;
 
@@ -168,7 +167,7 @@ public class Line1DSimplestTest {
         //n.log();
         for (int i = 0; i < time; i++) {
             if (i % changePeriod == 0)
-                a.target = n.random.nextBoolean() ?  1f : 0f;
+                a.i.setValue( n.random.nextBoolean() ?  1f : 0f );
             n.run(1);
         }
 
@@ -203,15 +202,15 @@ public class Line1DSimplestTest {
     @Test public void testSimpleCheat() throws Narsese.NarseseException {
 
 
-        Default n = new Default(1024, 64, 1, 3);
+        Default n = new Default(1024, 128, 1, 3);
 
-        n.stmLinkage.capacity.setValue(3);
+        n.stmLinkage.capacity.setValue(2);
 
-        final int changePeriod = 4;
+        final int changePeriod = 8;
 
-        n.time.dur(1);
+        n.time.dur(2);
 
-        n.termVolumeMax.setValue(11);
+        n.termVolumeMax.setValue(16);
 
         //n.log();
 
@@ -223,38 +222,39 @@ public class Line1DSimplestTest {
 
         //a.trace = true;
         a.init();
-        a.current = 0;
-        a.target = 0;
-        a.curiosity.setValue(0.01);
-        a.predictorProbability = 2.5f;
+        a.curiosity.setValue(0.25);
+        //a.predictorProbability = 1.0f;
 
 
 //        //n.log();
 //        n.onCycle(()->{
 //            System.err.println(a.current + " --->? " + a.target);
 //        });
-        n.onTask(t -> {
 
-            if (t instanceof DerivedTask) {
+//        n.onTask(t -> {
+//
+//            if (t instanceof DerivedTask) {
+//
+//
+//                if (t.isGoal() && t.term().toString().contains("(o)")) {
+//                    System.err.println(t.proof());
+//                }
+//            }
+//
+//            //System.out.println(t);
+//        });
+
+        n.input("$0.99$ (?x ==>+0 (happy))?");
+
+//        n.input("((i) <=> (o)). %1.0;0.99%");
+//        n.input("$0.99$ ((i) &&+0 (o))! %1.0;0.99%");
+//        n.input("$0.99$ (--(i) &&+0 --(o))! %1.0;0.99%");
+//        n.input("$0.99$ ((i) ==>+0 (o)). %1.0;0.99%");
+//        n.input("$0.99$ (--(i) ==>+0 --(o)). %1.0;0.99%");
 
 
-                if (t.isGoal() && t.term().toString().contains("(o)")) {
-                    System.err.println(t.proof());
-                }
-            }
 
-            //System.out.println(t);
-        });
-
-//        n.input("(L(in) <=> L(out)). %1.0;0.99%");
-//        n.input("$0.99$ (L(in) &&+0 L(out))! %1.0;0.99%");
-//        n.input("$0.99$ (--L(in) &&+0 --L(out))! %1.0;0.99%");
-//        n.input("$0.99$ (L(in) ==>+0 L(out)). %1.0;0.99%");
-//        n.input("$0.99$ (--L(in) ==>+0 --L(out)). %1.0;0.99%");
-
-
-
-        for (int c = 0; c < 16; c++) {
+        for (int c = 0; c < 128; c++) {
 
             List<Float> hapy = new ArrayList(1*1024);
             List<Float> motv = new ArrayList(1*1024);
@@ -267,7 +267,7 @@ public class Line1DSimplestTest {
             for (int i = 0; i < time; i++) {
 
                 if ((i + 1) % changePeriod == 0) {
-                    a.target = (j++) % 2 == 0 ? 1f : 0f;
+                    a.i.setValue( (j++) % 2 == 0 ? 1f : 0f );
                     //n.goal(a.out.term(), Tense.Present, a.target, 0.9f);
                 }
 //                if (j > 5) {
@@ -287,13 +287,13 @@ public class Line1DSimplestTest {
                 motv.add(a.dexterity());
             }
 
-            int ds = 2;
+            int ds = 1;
             System.out.println("  in:\t" + renderFloats(downSample(in, ds)));
             System.out.println(" out:\t" + renderFloats(downSample(out, ds)));
             System.out.println("hapy:\t" + renderFloats(downSample(hapy, ds)));
             System.out.println("motv:\t" + renderFloats(downSample(motv, ds)));
 
-            System.out.println("\tavg rwrd=" + a.rewardSum() / n.time());
+            System.out.println("\tavg rwrd=" + a.rewardSum() / time);
             a.rewardSum = 0; //reset
 
 //            RecycledSummaryStatistics motvStat = new RecycledSummaryStatistics();
@@ -302,14 +302,14 @@ public class Line1DSimplestTest {
 //            System.out.println(motvStat);
         }
 
-        TreeSet<Task> impl = new TreeSet(Truth.compareConfidence);
-
-        n.forEachTask(t -> {
-           if (t.isBelief() && t.op()==IMPL) {
-               impl.add(t);
-           }
-        });
-        impl.forEach(System.out::println);
+//        TreeSet<Task> impl = new TreeSet(Truth.compareConfidence);
+//
+//        n.forEachTask(t -> {
+//           if (t.isBelief() && t.op()==IMPL) {
+//               impl.add(t);
+//           }
+//        });
+//        impl.forEach(System.out::println);
 
     }
 

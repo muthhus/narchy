@@ -66,24 +66,36 @@ public class Revision {
     }
 
     @Nullable
-    public static Truth revise(@NotNull Truthed a, float aFrequencyBalance, @NotNull Truthed b, float evidenceFactor, float minConf) {
-        float w1 = a.evi() * evidenceFactor;
-        float w2 = b.evi() * evidenceFactor;
-        float c = w2c(w1+w2);
+    public static Truth merge(@NotNull Truthed a, float aFrequencyBalance, @NotNull Truthed b, float evidenceFactor, float minConf) {
+        float w1 = a.evi();
+        float w2 = b.evi();
+        float w = (w1+w2) * evidenceFactor;
 
-        if (c >= minConf) {
+        if (w2c(w) >= minConf) {
             //find the right balance of frequency
             float w1f = aFrequencyBalance * w1;
             float w2f = (1f-aFrequencyBalance) * w2;
-            float p = w2f/(w1f+w2f);
+            float p = w1f/(w1f+w2f);
 
-            float f = lerp(p, b.freq(), a.freq());
+            float af = a.freq();
+            float bf = b.freq();
+            float f = lerp(p, af, bf);
 
-            return $.t( f, c );
+//            //compute error (difference) in frequency TODO improve this
+//            float fError =
+//                    Math.abs(f - af) * w1f +
+//                    Math.abs(f - bf) * w2f;
+//
+//            w -= fError;
 
-        } else {
-            return null;
+            float c = w2c(w);
+            if (c >= minConf) {
+                return $.t(f, c);
+            }
+
         }
+
+        return null;
     }
 
 

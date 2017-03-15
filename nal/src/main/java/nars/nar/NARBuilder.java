@@ -134,11 +134,11 @@ public interface NARBuilder {
             final static int COMPRESS_ABOVE_COMPLEXITY = 20;
             final Compressor compressor = new Compressor(this, "_",
                     4, 6,
-                    1f, 32, 256);
+                    0f, 32, 256);
 
             @Override
             public Task pre(@NotNull Task t) {
-                if (!t.isInput() && t.complexity() > COMPRESS_ABOVE_COMPLEXITY) {
+                if (!t.isInput() && t.volume() > COMPRESS_ABOVE_COMPLEXITY) {
                     return compressor.encode(t);
                 } else {
                     //@NotNull Task encoded = compressor.encode(t);
@@ -153,7 +153,7 @@ public interface NARBuilder {
             @NotNull
             @Override
             public Term pre(@NotNull Term t) {
-                if (t.complexity() > COMPRESS_ABOVE_COMPLEXITY)
+                if (t.volume() > COMPRESS_ABOVE_COMPLEXITY)
                     return compressor.encode(t);
                 else
                     return t;
@@ -174,22 +174,22 @@ public interface NARBuilder {
 
         };
 
-        nar.beliefConfidence(0.5f);
-        nar.goalConfidence(0.5f);
+        nar.beliefConfidence(0.75f);
+        nar.goalConfidence(0.75f);
         //nar.derivedEvidenceGain.setValue(0.75f);
 
-        float p = 0.5f;
+        float p = 0.1f;
         nar.DEFAULT_BELIEF_PRIORITY = 0.75f * p;
         nar.DEFAULT_GOAL_PRIORITY = 1f * p;
         nar.DEFAULT_QUESTION_PRIORITY = 0.5f * p;
         nar.DEFAULT_QUEST_PRIORITY = 0.5f * p;
 
-        nar.stmLinkage.capacity.set(0);
+        //nar.stmLinkage.capacity.set(0);
         nar.core.conceptsFiredPerCycle.setValue(128);
-        nar.core.conceptsFiredPerBatch.setValue(4);
+        nar.core.conceptsFiredPerBatch.setValue(16);
         nar.core.derivationsInputPerCycle.setValue(96);
 
-        nar.activationRate.setValue(0.5f);
+        //nar.activationRate.setValue(0.5f);
         nar.confMin.setValue(0.01f);
         nar.truthResolution.setValue(0.01f);
 
@@ -203,7 +203,7 @@ public interface NARBuilder {
 //                4, 16,
 //                0.02f, 32);
 
-        new Inperience(nar, 0.1f, 16);
+        new Inperience(nar, 0.01f, 16);
 
 //        //causal accelerator
 //        nar.onTask(t -> {

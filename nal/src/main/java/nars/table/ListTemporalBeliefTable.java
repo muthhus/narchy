@@ -342,7 +342,8 @@ public class ListTemporalBeliefTable extends MultiRWFasterList<Task> implements 
         if (t == null)
             return Float.NEGATIVE_INFINITY;
 
-        float r = t.evi(when, dur);// * (1+t.range()) * t.qua();
+        float r = t.evi(when, dur);
+        //float r = t.evi(when, dur) * (1+ (t.end()-t.start()) );// * t.qua();
 
 //        //HACK present/future prediction boost
 //        if (t.start() >= now) {
@@ -364,15 +365,18 @@ public class ListTemporalBeliefTable extends MultiRWFasterList<Task> implements 
 
         //prefer
         //  same frequency
-        //  low confidence?
         //  long time from now
         //  non-zero overlap with the task
+        //  least stamp overlap
+        //  low confidence?
+        //  similar range
 
         long ys = y.start();
         long ye = y.end();
         float yRange = (ye - ys) / dur;
         float yf = y.freq();
-        float yDist = Math.min(Math.abs(ye - now), Math.abs(ys - now)) / dur;
+        float yDist = Math.min(abs(ye - now), abs(ys - now)) / dur;
+        long[] yStamp = y.stamp();
 
         return x -> {
             if ((x == y) || (x == null))
@@ -387,25 +391,16 @@ public class ListTemporalBeliefTable extends MultiRWFasterList<Task> implements 
             if (overlap == -1)
                 return Float.NEGATIVE_INFINITY; //dont allow merge if no overlap
 
-            return ((1f - abs(x.freq() - yf))) *
-                   (1f + (1f - x.conf())) *
-                   (1f + Math.min(Math.abs(xe-now), Math.abs(xs-now))/yDist) *
-                   (1f + overlap / yRange)
+            return (1f - abs(x.freq() - yf)) *
+                   (1f / (1f + abs(yRange  - (xe - xs)))) *
+                   (1f + Math.min(abs(xe-now), abs(xs-now))/yDist) *
+                   (1f + overlap / yRange) *
+                   (1f - Stamp.overlapFraction(yStamp, x.stamp())/2f)
+                   //(1f + (1f - x.conf()))
             ;
         };
 
     }
-
-//    @NotNull public Function<Task, Float> rankPenalizingOverlap(long now, @NotNull Task toMergeWith) {
-//        long occ = toMergeWith.occurrence();
-//        ImmutableLongSet toMergeWithEvidence = toMergeWith.evidenceSet();
-//        return x -> rankPenalizingOverlap(x, toMergeWithEvidence, occ, now);
-//    }
-
-//    public float rankPenalizingOverlap(@Nullable Task x, @NotNull LongSet evidence, long occ, long now) {
-//        //return rankTemporalByConfidenceAndOriginality(t, when, now, -1);
-//        return (x == null) ? Float.NEGATIVE_INFINITY : (Stamp.overlapFraction(evidence, x.evidence()) * rankTemporalByConfidence(x, now));
-//    }
 
 
     /**
@@ -481,24 +476,33 @@ public class ListTemporalBeliefTable extends MultiRWFasterList<Task> implements 
         Interval ai = new Interval( a.start() , a.end() );
         Interval bi = new Interval( b.start() , b.end() );
 
-        Interval overlap = ai.intersection(bi);
+        Interval timeOverlap = ai.intersection(bi);
 
-        if (overlap != null) {
-            float ac = a.evi();
-            float bc = b.evi();
+        if (timeOverlap != null) {
+            float aw = a.evi();
+            float bw = b.evi();
 
-            float aa = ac * (1 + ai.length());
-            float bb = bc * (1 + bi.length());
+            float aa = aw * (1 + ai.length());
+            float bb = bw * (1 + bi.length());
             float p = aa / (aa + bb);
 
-            float f =
+            float stampDiscount =
 //                //more evidence overlap indicates redundant information, so reduce the confWeight (measure of evidence) by this amount
 //                //TODO weight the contributed overlap amount by the relative confidence provided by each task
                     1f - Stamp.overlapFraction(a.stamp(), b.stamp()) / 2f;
 
-            Truth t = Revision.revise(a, p, b, f, confMin);
+            //discount related to loss of stamp when its capacity to contain the two incoming is reached
+            float stampCapacityDiscount =
+                    Math.min(1f, ((float)Param.STAMP_CAPACITY) / (a.stamp().length + b.stamp().length));
+
+            float rangeEquality = 0.5f / (1f + Math.abs(ai.length() - bi.length()));
+
+
+            Interval union = ai.union(bi);
+            float timeDiscount = rangeEquality + (1f-rangeEquality) * ((float) (timeOverlap.length())) / (1 + union.length());
+
+            Truth t = Revision.merge(a, p, b, stampDiscount * timeDiscount * stampCapacityDiscount, confMin);
             if (t!=null) {
-                Interval union = ai.union(bi);
                 long mergedStart = union.a;
                 long mergedEnd = union.b;
                 return Revision.mergeInterpolate(a, b, mergedStart, mergedEnd, now, t, true);

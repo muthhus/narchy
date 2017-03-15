@@ -146,7 +146,10 @@ public interface TermContainer extends Termlike, Iterable<Term> {
         if ((excludeVariables) && (a instanceof Variable || b instanceof Variable))
             return false;
 
-        return (recurse ? a.containsTermRecursively(b) : a.containsTerm(b));
+        if (recurse)
+            return a.containsTermRecursively(b) || b.containsTermRecursively(a);
+        else
+            return a.containsTerm(b) || b.containsTerm(a);
     }
 
 

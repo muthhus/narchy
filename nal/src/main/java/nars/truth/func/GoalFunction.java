@@ -32,6 +32,14 @@ public enum GoalFunction implements TruthOperator {
         }
     },
 
+    @AllowOverlap @SinglePremise StructuralGoduction() {
+        @Nullable
+        @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, NAR m, float minConf) {
+            return TruthFunctions.desireStrongOriginal(T, defaultTruth(m), minConf);
+        }
+    },
+
+
     @SinglePremise
     Negation() {
         @Override public @Nullable Truth apply(@Nullable final Truth T, @Nullable final Truth B, NAR m, float minConf) {
@@ -94,12 +102,6 @@ public enum GoalFunction implements TruthOperator {
         }
     },
 
-    @AllowOverlap @SinglePremise StructuralGoduction() {
-        @Nullable
-        @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, NAR m, float minConf) {
-            return TruthFunctions.desireStrongOriginal(T, defaultTruth(m), minConf);
-        }
-    },
 
     @SinglePremise
     @AllowOverlap

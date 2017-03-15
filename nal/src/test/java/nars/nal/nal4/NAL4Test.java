@@ -11,6 +11,9 @@ import org.junit.runners.Parameterized;
 
 import java.util.function.Supplier;
 
+import static nars.Op.BELIEF;
+import static nars.time.Tense.ETERNAL;
+
 /**
  *   <neutralization --> (acid,base)>" //en("Neutralization is a relation between an acid and a base. ");
  //     <(\,neutralization,_,base) --> acid> //en("Something that can neutralize a base is an acid.");
@@ -318,5 +321,19 @@ public class NAL4Test extends AbstractNALTest {
                 .believe("f(x,z)",1.0f,0.9f)
                 .believe("f(y,z)",1.0f,0.9f)
                 .mustBelieve(CYCLES, "f:((x,z)&(y,z))", 1.0f, 0.81f);
+    }
+
+    @Test public void testNeqComConstraint() {
+        /*
+        SHOULD NOT HAPPEN:
+        $.05;.07$ ((((L)~(i|(L)))|(L))-->happy). 1866⋈1876 %.10;.16% {1866⋈1876: êbaîCóòmh;êbaîCóòoÁ;êbaîCóòoÃ;êbaîCóòrj;êbaîCóòrm;êbaîCóòrÏ} (((%1-->%2),(%3-->%2),notSet(%3),notSet(%1),neqCom(%3,%1)),(((%1|%3)-->%2),((Intersection-->Belief),(Intersection-->Goal))))
+            $.08;.75$ happy(L). 1866⋈1876 %1.0;.75% {1866⋈1876: êbaîCóòrj}
+            $.04;.43$ ((((L)~(i|(L)))|(L))-->happy). 1876 %.10;.21% {1876: êbaîCóòmh;êbaîCóòoÁ;êbaîCóòoÃ;êbaîCóòrm;êbaîCóòrÏ} Dynamic
+        */
+        test()
+                //.log()
+                .believe("happy(L)", 1f, 0.9f)
+                .believe("(((i)|(L))-->happy)", 1f, 0.9f)
+                .mustNotOutput(CYCLES, "(((i)|(L))-->happy)", BELIEF, 1f, 1f, 0.81f, 0.81f, ETERNAL);
     }
 }

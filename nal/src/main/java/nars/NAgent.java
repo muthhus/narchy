@@ -307,9 +307,7 @@ abstract public class NAgent implements NSense, NAction {
 
 
             ((FasterList<Tasked>) predictors).addAll(
-                    () -> goal((Compound) action.term(), $.t(1f, curiosity.floatValue()), now),
-                    () -> goal((Compound) action.term(), $.t(0.5f, curiosity.floatValue()), now),
-                    () -> goal((Compound) action.term(), $.t(0f, curiosity.floatValue()), now)
+                () -> goal((Compound) action.term(), $.t(nar.random.nextFloat(), curiosity.floatValue()), now)
             );
 
 
@@ -330,15 +328,15 @@ abstract public class NAgent implements NSense, NAction {
                     //question(impl(neg(action), dur, varQuery(1)), nar.time()),
 
                     question(impl(happiness, -dur, action), now),
-                    question(impl(neg(happiness), -dur, action), now)
+                    question(impl(neg(happiness), -dur, action), now),
 
-//                    question(impl(action, dur, happiness), now),
-//                    question(impl(neg(action), dur, happiness), now)
+                    question(impl(action, dur, happiness), now),
+                    question(impl(neg(action), dur, happiness), now),
 
-//                    question(seq(action, dur, happiness), now),
-//                    question(seq(neg(action), dur, happiness), now),
-//                    question(seq(action, dur, neg(happiness)), now),
-//                    question(seq(neg(action), dur, neg(happiness)), now)
+                    question(seq(action, dur, happiness), now),
+                    question(seq(neg(action), dur, happiness), now),
+                    question(seq(action, dur, neg(happiness)), now),
+                    question(seq(neg(action), dur, neg(happiness)), now)
 
 
 //                    new PredictionTask($.seq($.varQuery("x"), 0, $.seq(action, dur, happiness)), '?').eternal(),

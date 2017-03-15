@@ -83,11 +83,11 @@ abstract public class NAgentX extends NAgent {
 
     }
 
-    public static NAR runRT(Function<NAR, NAgentX> init, float fps) {
+    public static NAR runRT(Function<NAR, NAgent> init, float fps) {
         return runRT(init, fps, 1, -1);
     }
 
-    public static NAR runRT(Function<NAR, NAgentX> init, float fps, int durFrames, int endTime) {
+    public static NAR runRT(Function<NAR, NAgent> init, float fps, int durFrames, int endTime) {
 
         Time clock = new RealTime.DSHalf(true).durSeconds(durFrames / fps);
         NAR nar =
@@ -96,10 +96,13 @@ abstract public class NAgentX extends NAgent {
         //NAR nar = newNAR();
         //NAR nar = newAlann(durFrames/fps);
 
-        NAgentX a = init.apply(nar);
-        a.trace = true;
+        NAgent a = init.apply(nar);
+        //a.trace = true;
 
-        chart(a);
+        if (a instanceof NAgentX)
+            chart((NAgentX)a);
+        else
+            chart(a);
 
         a.runRT(fps, endTime).join();
 
@@ -171,7 +174,7 @@ abstract public class NAgentX extends NAgent {
                                     .toArray(Surface[]::new)),
                             "inputEdit", () -> Vis.newInputEditor(a.nar),
                             "concepts", ()->
-                                    Vis.treeChart( a.nar, new Bagregate(a.nar.conceptsActive(), 128, 0.05f) , 64),
+                                    Vis.treeChart( a.nar, new Bagregate(a.nar.conceptsActive(), 64, 0.05f) , 64),
                             "conceptBudget", () ->
                                     Vis.budgetHistogram(nar, 64),
                             //"tasks", ()-> taskChart,
@@ -203,11 +206,12 @@ abstract public class NAgentX extends NAgent {
 
                             Vis.emotionPlots(a.nar, 256),
 
+                            Vis.treeChart( a.nar, new Bagregate(a.nar.conceptsActive(), 32, 0.05f) , 32),
 
-                            //conceptsTreeChart(d, count),
+
                             //budgetHistogram(d, 16),
 
-                            Vis.agentActions(a, 400),
+                            Vis.agentActions(a, 50),
                             //Vis.beliefCharts(400, a.predictors, a.nar),
                             new ReflectionSurface<>(a.nar),
 
