@@ -97,14 +97,14 @@ public class DefaultConceptBuilder implements ConceptBuilder {
 
 
         if (t.volume() > nar.termVolumeMax.intValue()) {
-            if (Param.DEBUG)
-                throw new UnsupportedOperationException("tried to conceptualize concept too large");
+//            if (Param.DEBUG)
+//                throw new UnsupportedOperationException("tried to conceptualize concept too large");
             return null;
         }
 
         return withBags(t, (termbag, taskbag) -> {
 
-            if (!Task.taskContentValid(t, (byte)0, nar, true)) {
+            if (!Task.taskContentValid(t, (byte)0, null /*nar -- checked above */, true)) {
 
                 return new CompoundConcept(t, termbag, taskbag, nar);
             }

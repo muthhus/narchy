@@ -4,6 +4,7 @@ import nars.NAR;
 import nars.Op;
 import nars.Param;
 import nars.term.Term;
+import nars.term.util.InvalidTermException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -58,17 +59,17 @@ public class UnifySubst extends Unify {
 
         //TODO combine these two blocks to use the same sub-method
 
-        //try {
+        try {
             Term aa = resolve(a, xy);
             if (aa!=null && target.test(aa))
                 matches++;
-            //if (accept(a, aa))
 
-
-        /*}
+        }
         catch (InvalidTermException e) {
-            logger.warn("{}",e);
-        }*/
+            if (Param.DEBUG)
+                logger.warn("{}",e);
+
+        }
 
 //        if ((aa == null) ||
 //        //Op aaop = aa.op();

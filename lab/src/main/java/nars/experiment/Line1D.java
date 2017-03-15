@@ -23,15 +23,15 @@ public class Line1D {
                 }
             });
 
-            n.termVolumeMax.setValue(32);
+            n.termVolumeMax.setValue(16);
 
             Line1DSimplest a = new Line1DSimplest(n);
             n.onCycle(() -> {
-                a.i.setValue( 0.5f * (Math.sin(n.time()/100f) + 1f) );
+                a.i.setValue( 0.5f * (Math.sin(n.time()/1000f) + 1f) );
             });
             return a;
 
-        }, 10, 2, -1);
+        }, 50, 5, -1);
 
     }
 }
