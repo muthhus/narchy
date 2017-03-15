@@ -88,7 +88,17 @@ public class RTree<T> implements Spatialized<T> {
 
     public static boolean equals(float[] a, float[] b, float epsilon) {
         if (a == b) return true;
-        for (int i = 0; i < a.length; i++) {
+        int l = a.length;
+        for (int i = 0; i < l; i++) {
+            if (!equals(a[i], b[i], epsilon))
+                return false;
+        }
+        return true;
+    }
+    public static boolean equals(double[] a, double[] b, double epsilon) {
+        if (a == b) return true;
+        int l = a.length;
+        for (int i = 0; i < l; i++) {
             if (!equals(a[i], b[i], epsilon))
                 return false;
         }
