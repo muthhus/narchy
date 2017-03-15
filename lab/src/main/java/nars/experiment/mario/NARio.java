@@ -1,10 +1,12 @@
 package nars.experiment.mario;
 
 import jcog.Util;
+import jcog.data.FloatParam;
 import nars.$;
 import nars.NAR;
 import nars.NAgentX;
 import nars.Narsese;
+import nars.concept.SensorConcept;
 import nars.experiment.mario.sprites.Mario;
 import nars.video.CameraGasNet;
 import nars.video.PixelBag;
@@ -17,6 +19,7 @@ import static nars.$.t;
 public class NARio extends NAgentX {
 
     private final MarioComponent mario;
+    private SensorConcept vx;
 
     public NARio(NAR nar) {
         super("nario", nar);
@@ -70,10 +73,10 @@ public class NARio extends NAgentX {
             //senseCameraRetina("camZ", ()->mario.image, 30, 18, (v) -> t(v, alpha)).setResolution(0.1f);
 
 
-            senseNumberDifference($("nario(x,v)"), ()-> mario.scene instanceof LevelScene ? ((LevelScene) mario.scene).mario.x : 0);
-            senseNumberDifference($("nario(y,v)"), ()-> mario.scene instanceof LevelScene ? ((LevelScene) mario.scene).mario.y : 0);
+            vx = senseNumberDifference($("vx(nario)"), ()-> mario.scene instanceof LevelScene ? ((LevelScene) mario.scene).mario.x : 0);
+            senseNumberDifference($("vy(nario)"), ()-> mario.scene instanceof LevelScene ? ((LevelScene) mario.scene).mario.y : 0);
 
-            actionTriState($("nario(x)"), i -> {
+            actionTriState($("x(nario)"), i -> {
                boolean n, p;
                switch(i){
                    case -1: p = false; n = true; break;
@@ -85,7 +88,7 @@ public class NARio extends NAgentX {
                 mario.scene.toggleKey(Mario.KEY_LEFT, n);
                 mario.scene.toggleKey(Mario.KEY_RIGHT, p);
             });
-            actionTriState($("nario(y)"), i -> {
+            actionTriState($("y(nario)"), i -> {
                 boolean n, p;
                 switch(i){
                     case -1: p = false; n = true; break;
@@ -99,8 +102,8 @@ public class NARio extends NAgentX {
                 mario.scene.toggleKey(Mario.KEY_JUMP, p);
             });
 
-            //actionToggle($("nario(jump)"), (b)->mario.scene.toggleKey(Mario.KEY_JUMP, b));
-            actionToggle($("nario(speed)"), (b)->mario.scene.toggleKey(Mario.KEY_SPEED, b));
+
+            actionToggle($("speed(nario)"), (b)->mario.scene.toggleKey(Mario.KEY_SPEED, b));
 
         } catch (Narsese.NarseseException e) {
             e.printStackTrace();
@@ -112,11 +115,19 @@ public class NARio extends NAgentX {
 
     int lastCoins = 0;
 
+    public final FloatParam MoveRight = new FloatParam(0.5f, 0f, 1f);
+    public final FloatParam EarnCoin = new FloatParam(0.5f, 0f, 1f);
+
     @Override
     protected float act() {
         int coins = Mario.coins;
-        float reward = coins - lastCoins;
+        float reward = (coins - lastCoins) * EarnCoin.floatValue();
         lastCoins = coins;
+
+        float vx = this.vx.asFloat();
+        if (vx > 0.5f /* in range 0..1.0 */)
+            reward += MoveRight.floatValue();
+
         float r = 0f + Util.clamp(reward, -1, +1);
 //        if (r == 0)
 //            return Float.NaN;

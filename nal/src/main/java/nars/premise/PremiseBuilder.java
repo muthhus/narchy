@@ -101,12 +101,12 @@ abstract public class PremiseBuilder {
         //(long)(now + dur);
 
 
-        if (task.isGoal() && task.isEternal()) {
-            //project an eternal goal to the present
-            task = ((ImmutableTask)task).project(now, dur, nar.confMin.floatValue());
-            if (task == null)
-                return null;
-        }
+//        if (task.isGoal() && task.isEternal()) {
+//            //project an eternal goal to the present
+//            task = ((ImmutableTask)task).project(now, dur, nar.confMin.floatValue());
+//            if (task == null)
+//                return null;
+//        }
 
         if (beliefTerm instanceof Compound && task.isQuestOrQuestion()) {
 

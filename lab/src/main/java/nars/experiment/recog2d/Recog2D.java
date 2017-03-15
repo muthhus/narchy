@@ -57,10 +57,10 @@ public class Recog2D extends NAgentX {
 
     int image;
     final int maxImages = 4;
-    static int duration = 10;
-    int imagePeriod = duration * 2;
+    static int duration = 1;
+    int imagePeriod = duration * 6;
     static int fps = 25;
-    float goalInfluence = 0.5f; //how much goal feedback will influence beliefs, <=1
+    float goalInfluence = 0.1f; //how much goal feedback will influence beliefs, <=1
 
 //    float theta;
 //    float dTheta = 0.25f;
@@ -242,8 +242,8 @@ public class Recog2D extends NAgentX {
             if (g == null) {
                 error += 0.5;
             } else {
-                //error += Math.abs(g.freq() - (image == i) ? 1f : 0f);
-                error += ((image == i) ? g.freq() > 0.5f : g.freq() < 0.5f) ? 1f : 0f;
+                error += Math.abs(g.freq() - ((image == i) ? 1f : 0f)); //smooth
+                //error += ((image == i) ? g.freq() > 0.5f : g.freq() < 0.5f) ? 1f : 0f; //discrete
             }
         }
 

@@ -17,6 +17,7 @@ import nars.truth.Stamp;
 import nars.truth.Truth;
 import nars.truth.TruthDelta;
 import org.eclipse.collections.api.block.function.Function;
+import org.eclipse.collections.api.block.function.primitive.FloatFunction;
 import org.eclipse.collections.api.list.MutableList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -25,6 +26,7 @@ import java.util.Iterator;
 import java.util.function.Consumer;
 
 import static java.lang.Math.abs;
+import static java.lang.Math.floorDiv;
 import static jcog.math.Interval.intersectLength;
 
 /**
@@ -350,15 +352,15 @@ public class ListTemporalBeliefTable extends MultiRWFasterList<Task> implements 
         return r;
     }
 
-    static Task matchMerge(MutableList<Task> l, long now, @NotNull Task toMergeWith, float dur) {
-        return l.maxBy(rankMatchMerge(toMergeWith, now, dur));
+    @Nullable static Task matchMerge(@NotNull FasterList<Task> l, long now, @NotNull Task toMergeWith, float dur) {
+        return l.maxBy(Float.NEGATIVE_INFINITY, rankMatchMerge(toMergeWith, now, dur));
     }
 
     /**
      * max value given to the ideal match for the provided task to be merged with
      */
     @NotNull
-    static public Function<Task, Float> rankMatchMerge(@NotNull Task y, long now, float dur) {
+    static public FloatFunction<Task> rankMatchMerge(@NotNull Task y, long now, float dur) {
 
         //prefer
         //  same frequency
@@ -409,7 +411,7 @@ public class ListTemporalBeliefTable extends MultiRWFasterList<Task> implements 
     /**
      * frees one slot by removing 2 and projecting a new belief to their midpoint. returns the merged task
      */
-    protected Task compress(@Nullable Task input, long now, MutableList<Task> l, float dur, float confMin) {
+    protected Task compress(@Nullable Task input, long now, FasterList<Task> l, float dur, float confMin) {
 
         int cap = capacity();
 
@@ -475,53 +477,36 @@ public class ListTemporalBeliefTable extends MultiRWFasterList<Task> implements 
      */
     @Nullable private Task merge(@NotNull Task a, @NotNull Task b, long now, float confMin, float dur) {
 
-        float ac = a.evi();
-        float bc = b.evi();
 
-        float f =
-//                //more evidence overlap indicates redundant information, so reduce the confWeight (measure of evidence) by this amount
-//                //TODO weight the contributed overlap amount by the relative confidence provided by each task
-                1f - Stamp.overlapFraction(a.stamp(), b.stamp()) / 2f;
-//                1f;
-
-        float p = ac / (ac + bc);
-        Truth t = Revision.revise(a, p, b, f, confMin);
-
-        if (t == null)
-            return null;
-
-        double factor = (double) ac / (ac + bc);
-
-        int tolerance = 0; //(int)Math.ceil(dur/2f); //additional tolerance range allowing the tasks to overlap and replaced with a union rather than a point sample
-        Interval ai = new Interval(a.start() - tolerance, a.end() + tolerance);
-        Interval bi = new Interval(b.start() - tolerance, b.end() + tolerance);
+        Interval ai = new Interval( a.start() , a.end() );
+        Interval bi = new Interval( b.start() , b.end() );
 
         Interval overlap = ai.intersection(bi);
 
-        long mergedStart, mergedEnd;
         if (overlap != null) {
-            Interval union = ai.union(bi);
-            mergedStart = union.a;
-            //(long) Math.round(Util.lerp(factor, a.start(), b.start()));
-            mergedEnd = union.b;
-            //(long) Math.round(Util.lerp(factor, a.end(), b.end()));
+            float ac = a.evi();
+            float bc = b.evi();
 
-            float rangeEquality = 0.5f / (1f + Math.abs(ai.length() - bi.length()));
-            float timeRatio = rangeEquality + (1f-rangeEquality) * ((float) (overlap.length())) / (1 + union.length());
-            t = t.eviMult(timeRatio);
-        } else {
-            //create point sample of duration width
-//                double mergedMid = Math.round(Util.lerp(factor, a.mid(), b.mid()));
-//                mergedStart = (long) Math.floor(mergedMid - dur/2f);
-//                mergedEnd = (long) Math.ceil(mergedMid + dur/2f);
+            float aa = ac * (1 + ai.length());
+            float bb = bc * (1 + bi.length());
+            float p = aa / (aa + bb);
 
-            return null; //shouldnt happen
+            float f =
+//                //more evidence overlap indicates redundant information, so reduce the confWeight (measure of evidence) by this amount
+//                //TODO weight the contributed overlap amount by the relative confidence provided by each task
+                    1f - Stamp.overlapFraction(a.stamp(), b.stamp()) / 2f;
+
+            Truth t = Revision.revise(a, p, b, f, confMin);
+            if (t!=null) {
+                Interval union = ai.union(bi);
+                long mergedStart = union.a;
+                long mergedEnd = union.b;
+                return Revision.mergeInterpolate(a, b, mergedStart, mergedEnd, now, t, true);
+            }
         }
 
-        if (t != null)
-            return Revision.mergeInterpolate(a, b, mergedStart, mergedEnd, now, t, true);
-        else
-            return null;
+        return null;
+
     }
 
 

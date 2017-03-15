@@ -26,17 +26,23 @@ public class Line1DSimplest extends NAgent {
     public final ActionConcept out;
 
     public Line1DSimplest(NAR n) {
-        super("L", n);
+        super("", n);
 
-        in = senseNumber($.func( the("in"), the("L")), () -> this.target );
+        in = senseNumber($.p("i"), () -> this.target );
 
-        out = action($.func( the("out"), the("L")), (b, d) -> {
+        out = action($.p("o"), (b, d) -> {
 
             float previous = current;
 
             if (d != null) {
                 float f = d.freq();
-                current = (f > 0.5f) ? 1f : 0f;
+                if (f > 0.75f)
+                    current = 1f;
+                else if (f < 0.25f)
+                    current = 0f;
+                else {
+                    //no change
+                }
             }
 
             /*

@@ -52,7 +52,7 @@ public class MultiRWFasterList<T> extends AbstractMultiReaderMutableCollection<T
     private static final long serialVersionUID = 1L;
 
     private transient ReadWriteLock lock;
-    private MutableList<T> delegate;
+    private FasterList<T> delegate;
 
 
     public <E> E[] toArray(IntToObjectFunction<E[]> arrayBuilder, int extraSize) {
@@ -177,11 +177,11 @@ public class MultiRWFasterList<T> extends AbstractMultiReaderMutableCollection<T
         // For Externalizable use only
     }
 
-    protected MultiRWFasterList(MutableList<T> newDelegate) {
+    protected MultiRWFasterList(FasterList<T> newDelegate) {
         this(newDelegate, new ReentrantReadWriteLock());
     }
 
-    private MultiRWFasterList(MutableList<T> newDelegate, ReadWriteLock newLock) {
+    private MultiRWFasterList(FasterList<T> newDelegate, ReadWriteLock newLock) {
         this.lock = newLock;
         this.delegate = newDelegate;
     }
@@ -225,7 +225,7 @@ public class MultiRWFasterList<T> extends AbstractMultiReaderMutableCollection<T
         }
     }
 
-    public void withWriteLockAndDelegate(Procedure<MutableList<T>> procedure) {
+    public void withWriteLockAndDelegate(Procedure<FasterList<T>> procedure) {
         this.acquireWriteLock();
         try {
             //MutableList<T> list = this.asWriteUntouchable();
@@ -237,7 +237,7 @@ public class MultiRWFasterList<T> extends AbstractMultiReaderMutableCollection<T
         }
     }
 
-    public void ifSizeExceedsWriteWith(int n, Consumer<MutableList<T>> procedure) {
+    public void ifSizeExceedsWriteWith(int n, Consumer<FasterList<T>> procedure) {
         this.acquireWriteLock();
         try {
             if (delegate.size() > n)
@@ -310,12 +310,14 @@ public class MultiRWFasterList<T> extends AbstractMultiReaderMutableCollection<T
 
     @Override
     public MutableList<T> clone() {
-        this.acquireReadLock();
-        try {
-            return new MultiRWFasterList<>(this.delegate.clone());
-        } finally {
-            this.unlockReadLock();
-        }
+        throw new UnsupportedOperationException("TODO");
+
+//        this.acquireReadLock();
+//        try {
+//            return new MultiRWFasterList<T>(this.delegate.clone());
+//        } finally {
+//            this.unlockReadLock();
+//        }
     }
 
     @Override
@@ -677,12 +679,13 @@ public class MultiRWFasterList<T> extends AbstractMultiReaderMutableCollection<T
 
     @Override
     public MutableList<T> subList(int fromIndex, int toIndex) {
-        this.acquireReadLock();
-        try {
-            return new MultiRWFasterList<>(this.delegate.subList(fromIndex, toIndex), this.lock);
-        } finally {
-            this.unlockReadLock();
-        }
+        throw new UnsupportedOperationException("TODO");
+//        this.acquireReadLock();
+//        try {
+//            return new MultiRWFasterList<T>(this.delegate.subList(fromIndex, toIndex), this.lock);
+//        } finally {
+//            this.unlockReadLock();
+//        }
     }
 
     @Override
@@ -921,7 +924,7 @@ public class MultiRWFasterList<T> extends AbstractMultiReaderMutableCollection<T
 
     @Override
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
-        this.delegate = (MutableList<T>) in.readObject();
+        this.delegate = (FasterList<T>) in.readObject();
         this.lock = new ReentrantReadWriteLock();
     }
 

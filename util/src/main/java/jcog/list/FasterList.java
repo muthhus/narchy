@@ -1,5 +1,6 @@
 package jcog.list;
 
+import org.eclipse.collections.api.block.function.Function;
 import org.eclipse.collections.api.block.function.primitive.FloatFunction;
 import org.eclipse.collections.api.block.predicate.primitive.IntObjectPredicate;
 import org.eclipse.collections.impl.list.mutable.FastList;
@@ -120,7 +121,7 @@ public class FasterList<X> extends FastList<X> {
     }
 
 
-    public X minBy(float mustExceed, FloatFunction<? super X> function) {
+    public X maxBy(float mustExceed, FloatFunction<? super X> function) {
 
         if (ArrayIterate.isEmpty(items)) {
             throw new NoSuchElementException();
@@ -131,7 +132,7 @@ public class FasterList<X> extends FastList<X> {
         for (int i = 0; i < size; i++) {
             X next = items[i];
             float nextValue = function.floatValueOf(next);
-            if (nextValue < minValue) {
+            if (nextValue > minValue) {
                 min = next;
                 minValue = nextValue;
             }
@@ -139,6 +140,25 @@ public class FasterList<X> extends FastList<X> {
         return min;
 
     }
+//    public X minBy(float mustExceed, FloatFunction<? super X> function) {
+//
+//        if (ArrayIterate.isEmpty(items)) {
+//            throw new NoSuchElementException();
+//        }
+//
+//        X min = null;
+//        float minValue = mustExceed;
+//        for (int i = 0; i < size; i++) {
+//            X next = items[i];
+//            float nextValue = function.floatValueOf(next);
+//            if (nextValue < minValue) {
+//                min = next;
+//                minValue = nextValue;
+//            }
+//        }
+//        return min;
+//
+//    }
 
     //    /** use this to get the fast null-terminated version;
 //     *  slightly faster; use with caution

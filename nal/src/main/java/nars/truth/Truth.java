@@ -29,6 +29,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
+import java.util.Comparator;
 
 import static jcog.Util.*;
 import static nars.truth.TruthFunctions.w2c;
@@ -43,7 +44,18 @@ public interface Truth extends Truthed {
 //    Term Truth_MAYBE = $.the("MAYBE");
 //    Term Truth_CERTAIN = $.the("CERTAIN");
 //    Term Truth_UNCERTAIN = $.the("UNCERTAIN");
-//    Comparator<Truthed> compareConfidence = (o1, o2) -> Float.compare(o2.truth().conf(), o1.truth().conf());
+
+    Comparator<Truthed> compareConfidence = (o1, o2) -> {
+        if (o1.equals(o2))
+            return 0;
+
+        float b = o2.conf();
+        float a = o1.conf();
+        if (b < a)
+            return -1;
+        else
+            return +1;
+    };
 
 
     /**

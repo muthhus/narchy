@@ -5,16 +5,20 @@ import jcog.math.RecycledSummaryStatistics;
 import nars.NAR;
 import nars.Narsese;
 import nars.Param;
+import nars.Task;
 import nars.nar.Default;
 import nars.task.DerivedTask;
 import nars.time.Tense;
+import nars.truth.Truth;
 import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.TreeSet;
 
 import static jcog.io.SparkLine.renderFloats;
+import static nars.Op.IMPL;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -199,13 +203,15 @@ public class Line1DSimplestTest {
     @Test public void testSimpleCheat() throws Narsese.NarseseException {
 
 
-        NAR n = new Default(1024, 64, 1, 3);
+        Default n = new Default(1024, 64, 1, 3);
 
-        final int changePeriod = 16;
+        n.stmLinkage.capacity.setValue(3);
 
-        n.time.dur(4);
+        final int changePeriod = 4;
 
-        n.termVolumeMax.setValue(13);
+        n.time.dur(1);
+
+        n.termVolumeMax.setValue(11);
 
         //n.log();
 
@@ -219,8 +225,8 @@ public class Line1DSimplestTest {
         a.init();
         a.current = 0;
         a.target = 0;
-        a.curiosity.setValue(0.05);
-        a.predictorProbability = 0.5f;
+        a.curiosity.setValue(0.01);
+        a.predictorProbability = 2.5f;
 
 
 //        //n.log();
@@ -232,7 +238,7 @@ public class Line1DSimplestTest {
             if (t instanceof DerivedTask) {
 
 
-                if (t.isGoal() && t.term().toString().contains("out(L)")) {
+                if (t.isGoal() && t.term().toString().contains("(o)")) {
                     System.err.println(t.proof());
                 }
             }
@@ -248,7 +254,7 @@ public class Line1DSimplestTest {
 
 
 
-        for (int c = 0; c < 128; c++) {
+        for (int c = 0; c < 16; c++) {
 
             List<Float> hapy = new ArrayList(1*1024);
             List<Float> motv = new ArrayList(1*1024);
@@ -281,19 +287,30 @@ public class Line1DSimplestTest {
                 motv.add(a.dexterity());
             }
 
-            int ds = 4;
+            int ds = 2;
             System.out.println("  in:\t" + renderFloats(downSample(in, ds)));
             System.out.println(" out:\t" + renderFloats(downSample(out, ds)));
             System.out.println("hapy:\t" + renderFloats(downSample(hapy, ds)));
             System.out.println("motv:\t" + renderFloats(downSample(motv, ds)));
 
-            System.out.println("AVG SCORE=" + a.rewardSum() / n.time());
+            System.out.println("\tavg rwrd=" + a.rewardSum() / n.time());
+            a.rewardSum = 0; //reset
 
-            RecycledSummaryStatistics motvStat = new RecycledSummaryStatistics();
-            for (Float x : motv)
-                motvStat.accept(x);
-            System.out.println(motvStat);
+//            RecycledSummaryStatistics motvStat = new RecycledSummaryStatistics();
+//            for (Float x : motv)
+//                motvStat.accept(x);
+//            System.out.println(motvStat);
         }
+
+        TreeSet<Task> impl = new TreeSet(Truth.compareConfidence);
+
+        n.forEachTask(t -> {
+           if (t.isBelief() && t.op()==IMPL) {
+               impl.add(t);
+           }
+        });
+        impl.forEach(System.out::println);
+
     }
 
 

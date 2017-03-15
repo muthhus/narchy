@@ -81,7 +81,7 @@ abstract public class NAgent implements NSense, NAction {
 
     protected long now;
 
-    private float rewardSum = 0;
+    public float rewardSum = 0;
 
     public float rewardValue;
 
@@ -329,8 +329,11 @@ abstract public class NAgent implements NSense, NAction {
 
                     //question(impl(neg(action), dur, varQuery(1)), nar.time()),
 
-                    question(impl(action, dur, happiness), now),
-                    question(impl(neg(action), dur, happiness), now)
+                    question(impl(happiness, -dur, action), now),
+                    question(impl(neg(happiness), -dur, action), now)
+
+//                    question(impl(action, dur, happiness), now),
+//                    question(impl(neg(action), dur, happiness), now)
 
 //                    question(seq(action, dur, happiness), now),
 //                    question(seq(neg(action), dur, happiness), now),

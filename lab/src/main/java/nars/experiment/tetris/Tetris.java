@@ -3,15 +3,11 @@ package nars.experiment.tetris;
 import nars.*;
 import nars.concept.ActionConcept;
 import nars.concept.SensorConcept;
-import nars.conceptualize.DefaultConceptBuilder;
 import nars.experiment.tetris.impl.TetrisState;
 import nars.experiment.tetris.impl.TetrisVisualizer;
-import nars.index.term.map.CaffeineIndex;
-import nars.nar.Default;
 import nars.nar.NARBuilder;
 import nars.term.Compound;
 import nars.term.atom.Atomic;
-import nars.time.FrameTime;
 import nars.time.RealTime;
 import nars.time.Time;
 import nars.truth.Truth;
@@ -21,8 +17,6 @@ import spacegraph.math.v2;
 import spacegraph.space.layout.Grid;
 import spacegraph.space.widget.MatrixView;
 
-import java.net.SocketException;
-import java.net.UnknownHostException;
 import java.util.List;
 
 import static nars.$.$;
@@ -43,9 +37,10 @@ public class Tetris extends NAgentX {
 
     public static final int tetris_width = 6;
     public static final int tetris_height = 12;
-    public static final int TIME_PER_FALL = 2;
+    public static final int TIME_PER_FALL = 1;
     public static final int PIXEL_RADIX = 2;
     static final float DUR = 0.1f;
+    int frameTimeMS = 100;
 
     private static SensorConcept[][] concept;
     //private int afterlife = TIME_PER_FALL * tetris_height * tetris_width;
@@ -61,27 +56,29 @@ public class Tetris extends NAgentX {
 //                        gl.glColor3f(r, 0, 0);
 //                        return 0f;
 //                    }),
-                    new MatrixView(tetris_width, tetris_height, (x, y, gl) -> {
-                        SensorConcept cxy = concept[x][y];
-                        long now = this.now;
-                        float dur = nar.time.dur();
-                        float b = cxy.beliefFreq(now, dur);
-                        float g = cxy.goalFreq(now, dur);
-                        float gp, gn;
-                        if (g == g) {
-                            g -= 0.5f;
-                            g *= 2f;
-                            if (g < 0) {
-                                gp = 0; gn = -g;
-                            } else {
-                                gp = g; gn = 0;
-                            }
-                        } else {
-                            gp = gn = 0;
-                        }
-                        gl.glColor3f(gp, b, gn);
-                        return 0f;
-                    })
+            new MatrixView(tetris_width, tetris_height, (x, y, gl) -> {
+                SensorConcept cxy = concept[x][y];
+                long now = this.now;
+                float dur = nar.time.dur();
+                float b = cxy.beliefFreq(now, dur);
+                float g = cxy.goalFreq(now, dur);
+                float gp, gn;
+                if (g == g) {
+                    g -= 0.5f;
+                    g *= 2f;
+                    if (g < 0) {
+                        gp = 0;
+                        gn = -g;
+                    } else {
+                        gp = g;
+                        gn = 0;
+                    }
+                } else {
+                    gp = gn = 0;
+                }
+                gl.glColor3f(gp, b, gn);
+                return 0f;
+            })
 //                    new MatrixView(tetris_width, tetris_height, (x, y, gl) -> {
 //                        long then = (long) (now + DUR * 8);
 //                        Truth f = concept[x][y].belief(then, DUR);
@@ -100,7 +97,7 @@ public class Tetris extends NAgentX {
 //                        return 0f;
 //                    })
 
-        );
+    );
 
 //        public MatrixView vis4 = new MatrixView(tetris_width, tetris_height, (x,y,gl)->{
 //            float r = concept[x][y].goalFreq(now, 0.5f);
@@ -112,50 +109,50 @@ public class Tetris extends NAgentX {
 //        //public ConsoleSurface term = new ConsoleSurface(40, 8);
 //
 //        public Surface plot2;
-            //public Plot2D lstm;
+    //public Plot2D lstm;
 
 
-        //final View view = new View();
+    //final View view = new View();
 
 
-        //private final ActionConcept motorRotate;
-        //private MotorConcept motorDown;
-        //private final ActionConcept motorLeftRight;
+    //private final ActionConcept motorRotate;
+    //private MotorConcept motorDown;
+    //private final ActionConcept motorLeftRight;
 
-        //private final boolean rotate = !easy;
+    //private final boolean rotate = !easy;
 
-        /**
-         * @param width
-         * @param height
-         * @param timePerFall larger is slower gravity
-         */
-        public Tetris(NAR nar, int width, int height, int timePerFall) throws Narsese.NarseseException {
-            super("tetris", nar);
+    /**
+     * @param width
+     * @param height
+     * @param timePerFall larger is slower gravity
+     */
+    public Tetris(NAR nar, int width, int height, int timePerFall) throws Narsese.NarseseException {
+        super("tetris", nar);
 
-            state = new TetrisState(width, height, timePerFall) {
-                @Override
-                protected int nextBlock() {
+        state = new TetrisState(width, height, timePerFall) {
+            @Override
+            protected int nextBlock() {
 
 
-                    if (easy) {
-                        //EASY MODE
-                        return 1; //square blocks
-                        //return 0; //long blocks
-                    } else {
-                        return super.nextBlock(); //all blocks
-                    }
+                if (easy) {
+                    //EASY MODE
+                    return 1; //square blocks
+                    //return 0; //long blocks
+                } else {
+                    return super.nextBlock(); //all blocks
                 }
+            }
 
-                @Override
-                protected void die() {
-                    //nar.time.tick(afterlife);
-                    super.die();
-                }
-            };
+            @Override
+            protected void die() {
+                //nar.time.tick(afterlife);
+                super.die();
+            }
+        };
 
-            view.children().add( new TetrisVisualizer(state, 2, false) {
-                @Override
-                public boolean onKey(v2 hitPoint, char charCode, boolean pressed) {
+        view.children().add(new TetrisVisualizer(state, 2, false) {
+            @Override
+            public boolean onKey(v2 hitPoint, char charCode, boolean pressed) {
 //
 //                switch (charCode) {
 //                    case 'a':
@@ -174,140 +171,140 @@ public class Tetris extends NAgentX {
 //                        break;
 //                }
 
-                    return true;
-                }
-            });
-            view.layout();
+                return true;
+            }
+        });
+        view.layout();
 
 
-            sensors(nar, state, sensors);
+        sensors(nar, state, sensors);
 
-            actions(nar, state, actions);
+        actions(nar, state, actions);
 
-            state.reset();
-        }
+        state.reset();
+    }
 
 
-        public static void actions(NAR nar, TetrisState state, List<ActionConcept> actions) throws Narsese.NarseseException {
-            float alpha = nar.confidenceDefault(BELIEF);
+    public static void actions(NAR nar, TetrisState state, List<ActionConcept> actions) throws Narsese.NarseseException {
+        float alpha = nar.confidenceDefault(BELIEF);
 
-            float actionMargin =
-                    0.33f; //divides the range into 3 sections: left/nothing/right
-            //0.25f;
+        float actionMargin =
+                0.33f; //divides the range into 3 sections: left/nothing/right
+        //0.25f;
 
-            float actionThresholdHigh = 1f - actionMargin;
-            float actionThresholdLow = actionMargin;
+        float actionThresholdHigh = 1f - actionMargin;
+        float actionThresholdLow = actionMargin;
 //        float actionThresholdHigher = 1f - actionMargin / 1.5f;
 //        float actionThresholdLower = actionMargin / 1.5f;
 
 
-            actions.add(new ActionConcept($("x(tetris)"), nar, (b, d) -> {
-                if (d != null) {
-                    float x = d.freq();
-                    //System.out.println(d + " " + x);
-                    if (x > actionThresholdHigh) {
-                        if (state.take_action(RIGHT))
-                            //return d; //legal move
-                            //return d.withConf(gamma);
-                            return $.t(1, alpha);
-                    } else if (x < actionThresholdLow) {
-                        if (state.take_action(LEFT))
-                            //return d; //legal move
-                            //return d.withConf(gamma);
-                            return $.t(0, alpha);
-                    } else {
-                        //return $.t(0.5f, alpha); //no action taken or move ineffective
-                    }
+        actions.add(new ActionConcept($("x(tetris)"), nar, (b, d) -> {
+            if (d != null) {
+                float x = d.freq();
+                //System.out.println(d + " " + x);
+                if (x > actionThresholdHigh) {
+                    if (state.take_action(RIGHT))
+                        //return d; //legal move
+                        //return d.withConf(gamma);
+                        return $.t(1, alpha);
+                } else if (x < actionThresholdLow) {
+                    if (state.take_action(LEFT))
+                        //return d; //legal move
+                        //return d.withConf(gamma);
+                        return $.t(0, alpha);
+                } else {
+                    //return $.t(0.5f, alpha); //no action taken or move ineffective
                 }
-                return $.t(0.5f, alpha); //no action taken or move ineffective
-                //return null;
-            }));
+            }
+            return $.t(0.5f, alpha); //no action taken or move ineffective
+            //return null;
+        }));
 
-            //if (rotate) {
-            actions.add(new ActionConcept($("rotate(tetris)"), nar, (b, d) -> {
-                if (d != null) {
-                    float r = d.freq();
-                    if (r > actionThresholdHigh) {
-                        if (state.take_action(CW))
-                            //return d; //legal move
-                            //return d.withConf(gamma);
-                            return $.t(1, alpha);
-                    } else if (r < actionThresholdLow) {
-                        if (state.take_action(CCW))
-                            //return d; //legal move
-                            //return d.withConf(gamma);
-                            return $.t(0, alpha);
-                    } else {
-                        //return $.t(0.5f, alpha); //no action taken or move ineffective
-                    }
+        //if (rotate) {
+        actions.add(new ActionConcept($("rotate(tetris)"), nar, (b, d) -> {
+            if (d != null) {
+                float r = d.freq();
+                if (r > actionThresholdHigh) {
+                    if (state.take_action(CW))
+                        //return d; //legal move
+                        //return d.withConf(gamma);
+                        return $.t(1, alpha);
+                } else if (r < actionThresholdLow) {
+                    if (state.take_action(CCW))
+                        //return d; //legal move
+                        //return d.withConf(gamma);
+                        return $.t(0, alpha);
+                } else {
+                    //return $.t(0.5f, alpha); //no action taken or move ineffective
                 }
-                return $.t(0.5f, alpha); //no action taken or move ineffective
-                //return null;
-            }));
+            }
+            return $.t(0.5f, alpha); //no action taken or move ineffective
+            //return null;
+        }));
 //        } else {
 //            motorRotate = null;
 //        }
 
-            //actions.add(motorDown = new MotorConcept("(down)", nar));
+        //actions.add(motorDown = new MotorConcept("(down)", nar));
 //        if (downMotivation > actionThresholdHigh) {
 //            state.take_action(FALL);
 //        }
-        }
+    }
 
-        public static void sensors(NAR nar, TetrisState state, List<SensorConcept> sensors) {
-            float alpha = nar.confidenceDefault(BELIEF);
+    public static void sensors(NAR nar, TetrisState state, List<SensorConcept> sensors) {
+        float alpha = nar.confidenceDefault(BELIEF);
 
-            concept = new SensorConcept[state.width][state.height];
+        concept = new SensorConcept[state.width][state.height];
 
-            Atomic tetris = $.the("tetris");
-            for (int y = 0; y < state.height; y++) {
-                int yy = y;
-                for (int x = 0; x < state.width; x++) {
-                    int xx = x;
-                    Compound squareTerm =
-                            //$.p(x, y);
+        Atomic tetris = $.the("tetris");
+        for (int y = 0; y < state.height; y++) {
+            int yy = y;
+            for (int x = 0; x < state.width; x++) {
+                int xx = x;
+                Compound squareTerm =
+                        //$.p(x, y);
 
-                            $.inh(
-                                    //$.func(
-                                    (tetris),
+                        $.inh(
+                                //$.func(
+                                (tetris),
                                     /*$.p(
                                             $.pRadix(x, PIXEL_RADIX, state.width),
                                             $.pRadix(y, PIXEL_RADIX, state.height)*/
-                                    $.p(
+                                $.p(
                                         $.pRecurse($.radixArray(x, PIXEL_RADIX, state.width)),
                                         $.pRecurse($.radixArray(y, PIXEL_RADIX, state.height))
-                                    )
+                                )
 
-                                    //        x, y
+                                //        x, y
 
-                            )
-                            //$.p(
-                            //$.the("tetris"))
-                            //, $.the(state.time)))
-                            ;
+                        )
+                        //$.p(
+                        //$.the("tetris"))
+                        //, $.the(state.time)))
+                        ;
 
-                    //$.p($.pRadix(x, 4, state.width), $.pRadix(y, 4, state.height));
-                    int index = yy * state.width + xx;
-                    @NotNull SensorConcept s = new SensorConcept(squareTerm, nar,
-                            () -> state.seen[index] > 0 ? 1f : 0f,
+                //$.p($.pRadix(x, 4, state.width), $.pRadix(y, 4, state.height));
+                int index = yy * state.width + xx;
+                @NotNull SensorConcept s = new SensorConcept(squareTerm, nar,
+                        () -> state.seen[index] > 0 ? 1f : 0f,
 
-                            //null //disable input
+                        //null //disable input
 
-                            (v) -> $.t(v, alpha)
+                        (v) -> $.t(v, alpha)
 
-                    )
-                            //timing(0, visionSyncPeriod)
-                            ;
+                )
+                        //timing(0, visionSyncPeriod)
+                        ;
 
 //                FloatSupplier defaultPri = s.sensor.pri;
 //                s.pri( () -> defaultPri.asFloat() * 0.25f );
 
-                    concept[x][y] = s;
-                    sensors.add(s);
+                concept[x][y] = s;
+                sensors.add(s);
 
-                }
             }
         }
+    }
 
 //    //TODO
 //    public static class NARCam {
@@ -422,13 +419,21 @@ public class Tetris extends NAgentX {
 //    }
 
 
-        @Override
-        public float act() {
+    long last = System.currentTimeMillis();
 
+    @Override
+    public float act() {
+
+        long now = System.currentTimeMillis();
+        if (now - last > frameTimeMS) {
             state.next();
-
+            last = now;
             return state.score;
+        } else {
+            return 0;
         }
+
+    }
 
 
 //        public static void newTimeWindow(NAR n) {
@@ -469,14 +474,14 @@ public class Tetris extends NAgentX {
 //            s.show(1300, 900);
 //        }
 
-        public static void main(String[] args) throws Narsese.NarseseException {
-            //Param.DEBUG = true;
-            //Param.HORIZON = 1/100f;
+    public static void main(String[] args) throws Narsese.NarseseException {
+        //Param.DEBUG = true;
+        //Param.HORIZON = 1/100f;
 
-            Time clock = new RealTime.DSHalf().durSeconds( DUR );
-            NAR n =
-                    NARBuilder.newMultiThreadNAR(5, clock);
-                    //NARBuilder.newALANN(clock, 4, 64, 5, 4, 1);
+        Time clock = new RealTime.DSHalf().durSeconds(DUR);
+        NAR n =
+                NARBuilder.newMultiThreadNAR(5, clock);
+        //NARBuilder.newALANN(clock, 4, 64, 5, 4, 1);
 
 
 //            n.onCycle(new Runnable() {
@@ -496,21 +501,19 @@ public class Tetris extends NAgentX {
 //            });
 
 
-            //nar.derivedEvidenceGain.setValue(2f);
+        //nar.derivedEvidenceGain.setValue(2f);
 
 
-            //nar.truthResolution.setValue(0.05f);
+        //nar.truthResolution.setValue(0.05f);
 
-            //NAR nar = new TaskNAR(32 * 1024, new MultiThreadExecutioner(4, 4096), clock);
+        //NAR nar = new TaskNAR(32 * 1024, new MultiThreadExecutioner(4, 4096), clock);
 //            MySTMClustered stm = new MySTMClustered(nar, 64, '.', 4, false, 2);
 //            MySTMClustered stmGoal = new MySTMClustered(nar, 16, '!', 2, false, 1);
 
 
+        //nar.linkFeedbackRate.setValue(0.05f);
 
-
-            //nar.linkFeedbackRate.setValue(0.05f);
-
-            //newTimeWindow(nar);
+        //newTimeWindow(nar);
 
 
 //        Random rng = new XorShift128PlusRandom(1);
@@ -615,39 +618,42 @@ public class Tetris extends NAgentX {
 //        new Inperience(nar);
 //
 
-            //new VariableCompressor(nar);
+        //new VariableCompressor(nar);
 
 
-            Tetris a = new MyTetris(n);
-            NAgentX.chart( a );
-            a.trace = true;
+        Tetris a = new MyTetris(n);
+        NAgentX.chart(a);
+        a.trace = true;
 
-            Default m = new Default(512, 32, 1, 3, n.random,
-                    new CaffeineIndex(new DefaultConceptBuilder(), 4096, false, null),
-                    new RealTime.DSHalf().durSeconds(1f));
-            float metaLearningRate = 0.75f;
-            m.confMin.setValue(0.01f);
-            m.goalConfidence(metaLearningRate);
-            m.termVolumeMax.setValue(16);
-            MetaAgent metaT = new MetaAgent(a, m);
-            metaT.init();
-            metaT.trace = true;
-            n.onCycle(metaT.nar::cycle);
+//            Default m = new Default(512, 32, 1, 3, n.random,
+//                    new CaffeineIndex(new DefaultConceptBuilder(), 4096, false, null),
+//                    new RealTime.DSHalf().durSeconds(1f));
+//            float metaLearningRate = 0.75f;
+//            m.confMin.setValue(0.01f);
+//            m.goalConfidence(metaLearningRate);
+//            m.termVolumeMax.setValue(16);
+        //n.onCycle(metaT.nar::cycle);
+        MetaAgent metaT = new MetaAgent(a
+                //,m
 
-            try {
-                InterNAR i = new InterNAR(n, 8, 10421);
-                i.ping(10420);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+        );
+        metaT.init();
+        metaT.trace = true;
 
-            //metaT.nar.log();
+        try {
+            InterNAR i = new InterNAR(n, 8, 10421);
+            i.ping(10420);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        //metaT.nar.log();
 //            m.onTask(t -> {
 //                if (t instanceof DerivedTask)
 //                    System.out.println("meta: " + t);
 //            });
-            //window(conceptsTreeChart(m, 64), 800, 600);
-            //NAgentX.chart( metaT );
+        //window(conceptsTreeChart(m, 64), 800, 600);
+        //NAgentX.chart( metaT );
 
 //
 //            SoNAR s = null;
@@ -667,7 +673,7 @@ public class Tetris extends NAgentX {
 //            }
 
 
-            a.runRT(25f ).join();
+        a.runRT(25f).join();
 
 
 //        NARController meta = new NARController(nar, loop, t);
@@ -679,60 +685,60 @@ public class Tetris extends NAgentX {
 //        ));
 
 
-            //nar.stop();
+        //nar.stop();
 
-            //nar.index.print(System.out);
-            n.forEachTask(System.out::println);
+        //nar.index.print(System.out);
+        n.forEachTask(System.out::println);
 
-            //NAR.printActiveTasks(nar, true);
-            //NAR.printActiveTasks(nar, false);
-            n.printConceptStatistics();
-            new TaskStatistics().add(n).print();
+        //NAR.printActiveTasks(nar, true);
+        //NAR.printActiveTasks(nar, false);
+        n.printConceptStatistics();
+        new TaskStatistics().add(n).print();
 
 
-            //NAR.printTasks(meta.nar, true);
-            //NAR.printTasks(meta.nar, false);
+        //NAR.printTasks(meta.nar, true);
+        //NAR.printTasks(meta.nar, false);
 //        nar.forEachActiveConcept(c -> {
 //            if (c.volume() < 12)
 //                c.print();
 //        });
-        }
+    }
 
-        public MatrixView.ViewFunction2D sensorMatrixView(NAR nar, long whenRelative) {
-            float dur = nar.time.dur();
-            return (x, y, g) -> {
+    public MatrixView.ViewFunction2D sensorMatrixView(NAR nar, long whenRelative) {
+        float dur = nar.time.dur();
+        return (x, y, g) -> {
 //            int rgb = cam.out.getRGB(x,y);
 //            float r = decodeRed(rgb);
 //            if (r > 0)
 //                System.out.println(x + " "+ y + " " + r);
 //            g.glColor3f(r,0,0);
 
-                SensorConcept s = sensors.get(y * tetris_width + x);
+            SensorConcept s = sensors.get(y * tetris_width + x);
 
-                Truth b = s.beliefs().truth(now + whenRelative, whenRelative, dur);
-                float bf = b != null ? b.freq() : 0.5f;
-                Truth dt = s.goals().truth(now + whenRelative, whenRelative, dur);
-                float dr, dg;
-                if (dt == null) {
-                    dr = dg = 0;
+            Truth b = s.beliefs().truth(now + whenRelative, whenRelative, dur);
+            float bf = b != null ? b.freq() : 0.5f;
+            Truth dt = s.goals().truth(now + whenRelative, whenRelative, dur);
+            float dr, dg;
+            if (dt == null) {
+                dr = dg = 0;
+            } else {
+                float f = dt.freq();
+                float c = dt.conf();
+                if (f > 0.5f) {
+                    dr = 0;
+                    dg = (f - 0.5f) * 2f;// * c;
                 } else {
-                    float f = dt.freq();
-                    float c = dt.conf();
-                    if (f > 0.5f) {
-                        dr = 0;
-                        dg = (f - 0.5f) * 2f;// * c;
-                    } else {
-                        dg = 0;
-                        dr = (0.5f - f) * 2f;// * c;
-                    }
+                    dg = 0;
+                    dr = (0.5f - f) * 2f;// * c;
                 }
+            }
 
-                float p = nar.pri(s, Float.NaN);
-                g.glColor4f(dr, dg, bf, 0.5f + 0.5f * p);
+            float p = nar.pri(s, Float.NaN);
+            g.glColor4f(dr, dg, bf, 0.5f + 0.5f * p);
 
-                return b != null ? b.conf() : 0;
-            };
-        }
+            return b != null ? b.conf() : 0;
+        };
+    }
 
     public static class MyTetris extends Tetris {
 
@@ -944,7 +950,7 @@ public class Tetris extends NAgentX {
 ////        });
 ////    }
 
-    }
+}
 //                AutoClassifier ac = new AutoClassifier($.the("row"), nar, sensors,
 //                        tetris_width/2, 7 /* states */,
 //                        0.05f);

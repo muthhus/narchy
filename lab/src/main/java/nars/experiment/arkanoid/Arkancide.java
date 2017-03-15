@@ -50,34 +50,41 @@ public class Arkancide extends NAgentX {
             try {
                 a = new Arkancide(n, cam);
 
-                Default m = new Default(256, 48, 1, 2, n.random,
-                        new CaffeineIndex(new DefaultConceptBuilder(), 2048, false, null),
-                        new RealTime.DSHalf().durSeconds(1f));
-                float metaLearningRate = 0.9f;
-                m.confMin.setValue(0.02f);
-                m.goalConfidence(metaLearningRate);
-                m.termVolumeMax.setValue(16);
+//                {
+//                    Default m = new Default(256, 48, 1, 2, n.random,
+//                            new CaffeineIndex(new DefaultConceptBuilder(), 2048, false, null),
+//                            new RealTime.DSHalf().durSeconds(1f));
+//                    float metaLearningRate = 0.9f;
+//                    m.confMin.setValue(0.02f);
+//                    m.goalConfidence(metaLearningRate);
+//                    m.termVolumeMax.setValue(16);
+//
+//                    MetaAgent metaT = new MetaAgent(a, m); //init before loading from file
+//                    metaT.trace = true;
+//                    metaT.init();
+//
+//                    String META_PATH = "/tmp/meta.nal";
+//                    try {
+//                        m.input(new File(META_PATH));
+//                    } catch (IOException e) {
+//                    }
+//                    getRuntime().addShutdownHook(new Thread(() -> {
+//                        try {
+//                            m.output(new File(META_PATH), (x) -> {
+//                                if (x.isBeliefOrGoal() && !x.isDeleted() && (x.op() == IMPL || x.op() == Op.EQUI || x.op() == CONJ)) {
+//                                    //Task y = x.eternalized();
+//                                    //return y;
+//                                    return x;
+//                                }
+//                                return null;
+//                            });
+//                        } catch (IOException e) {
+//                            e.printStackTrace();
+//                        }
+//                    }));
+//                n.onCycle(metaT.nar::cycle);
+//                }
 
-                MetaAgent metaT = new MetaAgent(a, m); //init before loading from file
-                metaT.trace = true;
-                metaT.init();
-
-                String META_PATH = "/tmp/meta.nal";
-                try {  m.input(new File(META_PATH)); } catch (IOException e) {                }
-                getRuntime().addShutdownHook(new Thread(()->{
-                    try { m.output(new File(META_PATH), (x) -> {
-                        if (x.isBeliefOrGoal() && !x.isDeleted() && (x.op()==IMPL || x.op()==Op.EQUI || x.op() == CONJ)) {
-                            //Task y = x.eternalized();
-                            //return y;
-                            return x;
-                        }
-                        return null;
-                    }); } catch (IOException e) {  e.printStackTrace(); }
-                }));
-
-
-                n.onCycle(metaT.nar::cycle);
-                //metaT.nar.log();
 
             } catch (Narsese.NarseseException e) {
 
