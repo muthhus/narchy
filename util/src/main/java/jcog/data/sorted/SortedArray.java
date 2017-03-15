@@ -1,6 +1,5 @@
 package jcog.data.sorted;
 
-import com.google.common.primitives.Floats;
 import jcog.Util;
 import org.eclipse.collections.api.block.function.primitive.FloatFunction;
 import org.jetbrains.annotations.NotNull;

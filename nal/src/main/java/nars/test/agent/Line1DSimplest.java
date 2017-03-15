@@ -7,8 +7,6 @@ import nars.NAgent;
 import nars.concept.ActionConcept;
 import nars.concept.SensorConcept;
 
-import static jcog.Util.unitize;
-import static nars.$.the;
 import static nars.Op.BELIEF;
 
 

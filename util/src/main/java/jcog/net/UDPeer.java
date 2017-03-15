@@ -3,7 +3,6 @@ package jcog.net;
 import com.google.common.primitives.Longs;
 import com.google.common.primitives.Shorts;
 import jcog.bag.Bag;
-import jcog.bag.PLink;
 import jcog.bag.RawPLink;
 import jcog.bag.impl.HijackBag;
 import jcog.bag.impl.PLinkHijackBag;

@@ -177,7 +177,7 @@ abstract public class PremiseBuilder {
 
             }
 
-            if (belief!=null && task.isGoal() && !belief.contains(when)) {
+            if (belief!=null && task.isGoal() && !(task.isEternal() && belief.isEternal()) && !belief.contains(when)) {
                 //project it to the time
                 belief = ((ImmutableTask)belief).project(when, dur, nar.confMin.floatValue());
             }

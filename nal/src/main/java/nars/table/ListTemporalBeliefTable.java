@@ -26,7 +26,6 @@ import java.util.Iterator;
 import java.util.function.Consumer;
 
 import static java.lang.Math.abs;
-import static java.lang.Math.floorDiv;
 import static jcog.math.Interval.intersectLength;
 
 /**

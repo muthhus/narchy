@@ -3,24 +3,16 @@ package nars.video;
 import com.jogamp.opengl.GL2;
 import jcog.learn.gng.NeuralGasNet;
 import jcog.learn.gng.Node;
-import jcog.math.FloatSupplier;
 import nars.$;
 import nars.NAR;
 import nars.NAgent;
-import nars.concept.SensorConcept;
-import nars.gui.Vis;
-import nars.term.Compound;
 import nars.term.Term;
 import nars.term.atom.Atomic;
-import nars.truth.Truth;
-import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunction;
 import org.jetbrains.annotations.NotNull;
 import spacegraph.SpaceGraph;
 import spacegraph.Surface;
 import spacegraph.render.Draw;
 
-import java.util.Collections;
-import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.IntStream;
 
