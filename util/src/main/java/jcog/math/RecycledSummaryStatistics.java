@@ -58,8 +58,7 @@ public class RecycledSummaryStatistics implements FloatProcedure, Serializable, 
         //http://stackoverflow.com/a/36590815
         //"waldorf method"
         double tmpMean = mean;
-        if (tmpMean!=tmpMean)
-            mean = tmpMean = 0;
+
         double delta = value - tmpMean;
         mean += delta / ++count;
         sSum += delta * (value - mean);

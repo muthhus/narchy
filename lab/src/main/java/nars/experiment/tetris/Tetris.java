@@ -35,12 +35,12 @@ public class Tetris extends NAgentX {
 //            new MultiThreadExecutioner(3, 1024*8);
 
 
-    public static final int tetris_width = 8;
-    public static final int tetris_height = 16;
+    public static final int tetris_width = 6;
+    public static final int tetris_height = 12;
     public static final int TIME_PER_FALL = 2;
     public static final int PIXEL_RADIX = 2;
-    static final float DUR = 0.3f;
-    int frameTimeMS = 50;
+    static final float DUR = 0.15f;
+    int frameTimeMS = 100;
 
     private static SensorConcept[][] concept;
     //private int afterlife = TIME_PER_FALL * tetris_height * tetris_width;

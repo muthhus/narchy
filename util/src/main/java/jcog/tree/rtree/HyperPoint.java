@@ -71,6 +71,15 @@ public interface HyperPoint {
         }
         return true;
     }
+    default boolean isEntirely(double value) {
+        int d = dim();
+        for (int i = 0; i < d; i++) {
+            double c = coord(i);
+            if (c!=value)
+                return false;
+        }
+        return true;
+    }
 
     default boolean isInfNeg() {
         return isEntirely(Float.NEGATIVE_INFINITY);

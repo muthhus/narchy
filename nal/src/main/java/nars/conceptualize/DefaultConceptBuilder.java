@@ -65,7 +65,7 @@ public class DefaultConceptBuilder implements ConceptBuilder {
 
     @NotNull
     @Deprecated public <X> Bag<X,BLink<X>> newBag(@NotNull Map m) {
-        return new CurveBag<>(8, defaultCurveSampler, BudgetMerge.maxBlend, m);
+        return new CurveBag<>(8, defaultCurveSampler, BudgetMerge.plusBlend, m);
     }
 
 

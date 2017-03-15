@@ -59,15 +59,15 @@ public interface NARBuilder {
         ) {
             @Override
             public <X> X withBags(Term t, BiFunction<Bag<Term, BLink<Term>>, Bag<Task, BLink<Task>>, X> f) {
-                Bag<Term, BLink<Term>> termlink = new BLinkHijackBag<>(reprobes, BudgetMerge.maxBlend, rng);
-                Bag<Task, BLink<Task>> tasklink = new BLinkHijackBag<>(reprobes, BudgetMerge.maxBlend, rng);
+                Bag<Term, BLink<Term>> termlink = new BLinkHijackBag<>(reprobes, BudgetMerge.plusBlend, rng);
+                Bag<Task, BLink<Task>> tasklink = new BLinkHijackBag<>(reprobes, BudgetMerge.plusBlend, rng);
                 return f.apply(termlink, tasklink);
             }
 
             @NotNull
             @Deprecated @Override
             public <X> Bag<X, BLink<X>> newBag(@NotNull Map m) {
-                return new BLinkHijackBag<>(reprobes, BudgetMerge.maxBlend, rng);
+                return new BLinkHijackBag<>(reprobes, BudgetMerge.plusBlend, rng);
             }
         };
 

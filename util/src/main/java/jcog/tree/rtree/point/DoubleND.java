@@ -77,5 +77,11 @@ public class DoubleND implements HyperPoint, Serializable {
         return '(' + Arrays.toString(coord) + ')';
     }
 
+    public final boolean isInfNeg() {
+        return this.isEntirely(-1.0 / 0.0);
+    }
 
+    public final boolean isInfPos() {
+        return this.isEntirely(1.0 / 0.0);
+    }
 }
