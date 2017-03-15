@@ -242,11 +242,8 @@ public interface TimeFunctions {
         if ((x!=null) && p.task.isGoal() && (occReturn[0]!=ETERNAL)) {
             long taskStart = p.task.start();
 
-            if (taskStart == ETERNAL) //imminentize the eschaton
-                taskStart = p.nar.time();
-
             //dont derive a past-tense goal (before the task)
-            if (taskStart > occReturn[0]) {
+            if (taskStart!=ETERNAL && taskStart > occReturn[0]) {
                 if (occReturn[1] == ETERNAL) occReturn[1] = occReturn[0]; //HACK
                 long range = occReturn[1] - occReturn[0];
 

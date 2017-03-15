@@ -27,7 +27,7 @@ public class Line1D {
 
             Line1DSimplest a = new Line1DSimplest(n);
             n.onCycle(() -> {
-                a.i.setValue( 0.5f * (Math.sin(n.time()/1000f) + 1f) );
+                a.i.setValue( 0.5f * (Math.sin(n.time()/200f) + 1f) );
             });
             return a;
 

@@ -331,12 +331,12 @@ abstract public class NAgent implements NSense, NAction {
                     question(impl(neg(happiness), -dur, action), now),
 
                     question(impl(action, dur, happiness), now),
-                    question(impl(neg(action), dur, happiness), now),
+                    question(impl(neg(action), dur, happiness), now)
 
-                    question(seq(action, dur, happiness), now),
-                    question(seq(neg(action), dur, happiness), now),
-                    question(seq(action, dur, neg(happiness)), now),
-                    question(seq(neg(action), dur, neg(happiness)), now)
+//                    question(seq(action, dur, happiness), now),
+//                    question(seq(neg(action), dur, happiness), now),
+//                    question(seq(action, dur, neg(happiness)), now),
+//                    question(seq(neg(action), dur, neg(happiness)), now)
 
 
 //                    new PredictionTask($.seq($.varQuery("x"), 0, $.seq(action, dur, happiness)), '?').eternal(),

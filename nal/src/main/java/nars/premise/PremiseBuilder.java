@@ -192,18 +192,18 @@ abstract public class PremiseBuilder {
         }
 
         long taskStart = task.start();
+        long when = ETERNAL;
         if ((belief == null) && (beliefTerm.varQuery() == 0 )) {
             Concept beliefConcept = nar.concept(beliefTerm);
-            if (beliefConcept != null) {
+            if (beliefConcept instanceof TaskConcept) {
 
                 //temporal focus:
-                long when;
                 long start = taskStart;
                 if (start == ETERNAL) {
 
-                    when = ETERNAL;
+                    when = now;
 
-                } else if (nar.random.nextBoolean()) {
+                } else {//if (nar.random.nextBoolean()) {
                     //USE TASK's OCCURENCE
                     //find nearest end-point to now
                     long end = task.end();
@@ -217,22 +217,23 @@ abstract public class PremiseBuilder {
                             when = end;
                         }
                     }
-                } else {
-                    //USE CURRENT TIME AS FOCUS
-                    when = now;
                 }
+//                else {
+//                    //USE CURRENT TIME AS FOCUS
+//                    when = now;
+//                }
 
 
                 belief = beliefConcept.beliefs().match(when, now, dur, task, true); //in case of quest, proceed with matching belief
             }
         }
 
-        if (task.isGoal()) {
-            if ((belief != null) && !task.isEternal() && !belief.isEternal() && belief.start() != taskStart) {
-                //project the belief to the time of the task
-                belief = ((ImmutableTask) belief).project(taskStart, nar.time.dur(), nar.confMin.floatValue());
-            }
-        }
+//        if (task.isGoal()) {
+//            if ((belief != null) && belief.start() != taskStart) {
+//                //project the belief to the time of the task
+//                belief = ((ImmutableTask) belief).project(taskStart, nar.time.dur(), nar.confMin.floatValue());
+//            }
+//        }
 
 
 
