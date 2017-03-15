@@ -331,9 +331,21 @@ public class NAL4Test extends AbstractNALTest {
             $.04;.43$ ((((L)~(i|(L)))|(L))-->happy). 1876 %.10;.21% {1876: êbaîCóòmh;êbaîCóòoÁ;êbaîCóòoÃ;êbaîCóòrm;êbaîCóòrÏ} Dynamic
         */
         test()
-                //.log()
                 .believe("happy(L)", 1f, 0.9f)
                 .believe("(((i)|(L))-->happy)", 1f, 0.9f)
                 .mustNotOutput(CYCLES, "(((i)|(L))-->happy)", BELIEF, 1f, 1f, 0.81f, 0.81f, ETERNAL);
+    }
+    @Test public void testNeqComRecursiveConstraint() {
+
+        /*
+        SHOULD NOT HAPPEN:
+        $.02;.09$ ((o-(i-happy))-->happy). 497⋈527 %.55;.18% {497⋈527: æ0IáËÑþKn;æ0IáËÑþKM;æ0IáËÑþKÄ;æ0IáËÑþKÉ;æ0IáËÑþKÌ} (((%1-->%2),(%1-->%3),neqCom(%2,%3)),((%3-->%2),((Abduction-->Belief),(Weak-->Goal),(Backward-->Permute))))
+            $.04;.75$ happy(L). 497⋈512 %.55;.75% {497⋈512: æ0IáËÑþKÄ}
+            $.05;.53$ ((L)-->(o-(i-happy))). 527 %.54;.53% {527: æ0IáËÑþKn;æ0IáËÑþKM;æ0IáËÑþKÉ;æ0IáËÑþKÌ} Dynamic
+        */
+        test()
+                .believe("happy(L)", 1f, 0.9f)
+                .believe("((L)-->(o-(i-happy)))", 1f, 0.9f)
+                .mustNotOutput(CYCLES, "((o-(i-happy))-->happy)", BELIEF, ETERNAL);
     }
 }

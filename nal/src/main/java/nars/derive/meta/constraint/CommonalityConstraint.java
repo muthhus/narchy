@@ -41,11 +41,15 @@ public abstract class CommonalityConstraint implements MatchConstraint {
             return bCompound ?
                     invalid((Compound) bb, C)
                     :
-                    C.containsTerm(bb);
+                    invalid(/*(Term)*/bb, C);
 
         }
 
     }
 
     @NotNull protected abstract boolean invalid(Compound x, Compound y);
+
+    @NotNull protected boolean invalid(Term x, Compound y) {
+        return y.containsTerm(x);
+    }
 }

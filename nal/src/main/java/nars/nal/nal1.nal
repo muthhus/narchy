@@ -23,20 +23,20 @@
 
 //seems like only one of these needs permute backward. these generate a lot of questions so minimize them especially when redundant questions would be generated
 
-    (A --> B), (B --> C), neqCom(A,C) |- (A --> C), (Belief:Deduction, Goal:Strong, Permute:Backward)
-    (A --> B), (A --> C), neqCom(B,C) |- (C --> B), (Belief:Abduction, Goal:Weak, Permute:Backward)
-    (A --> C), (B --> C), neqCom(A,B) |- (A --> B), (Belief:Induction, Goal:Weak, Permute:Backward)
-    (A --> B), (B --> C), neqCom(A,C) |- (C --> A), (Belief:Exemplification, Goal:Weak, Permute:Backward)
+    (A --> B), (B --> C), neqRCom(A,C), neqRCom(B,C) |- (A --> C), (Belief:Deduction, Goal:Strong, Permute:Backward)
+    (A --> B), (A --> C), neqRCom(B,C) |- (C --> B), (Belief:Abduction, Goal:Weak)
+    (A --> C), (B --> C), neqRCom(A,B) |- (A --> B), (Belief:Induction, Goal:Weak)
+    (A --> B), (B --> C), neqRCom(A,C) |- (C --> A), (Belief:Exemplification, Goal:Weak)
 
 //// similarity-based syllogism ////////////////////////////////////////////////////////////////////////////////////
 //If P and S are a special case of M, then they might be similar (weak),
 //also if P and S are a general case of M
 
-    (P --> M), (S --> M), neqCom(S,P) |- (P <-> S), (Belief:Comparison, Goal:Weak, Permute:Backward)
-    (M --> P), (M --> S), neqCom(S,P) |- (P <-> S), (Belief:Comparison, Goal:Weak, Permute:Backward)
+    (P --> M), (S --> M), neqRCom(S,P) |- (P <-> S), (Belief:Comparison, Goal:Weak)
+    (M --> P), (M --> S), neqRCom(S,P) |- (P <-> S), (Belief:Comparison, Goal:Weak)
 
 //If M is a special case of P and S and M are similar, then S is also a special case of P (strong)
 
-    (M --> P), (S <-> M), neqCom(S,P) |- (S --> P), (Belief:Analogy, Goal:Strong)
-    (P --> M), (S <-> M), neqCom(S,P) |- (P --> S), (Belief:Analogy, Goal:Strong)
-    (M <-> P), (S <-> M), neqCom(S,P) |- (S <-> P), (Belief:Resemblance, Goal:Strong)
+    (M --> P), (S <-> M), neqRCom(S,P) |- (S --> P), (Belief:Analogy, Goal:Strong)
+    (P --> M), (S <-> M), neqRCom(S,P) |- (P --> S), (Belief:Analogy, Goal:Strong)
+    (M <-> P), (S <-> M), neqRCom(S,P) |- (S <-> P), (Belief:Resemblance, Goal:Strong)

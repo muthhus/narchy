@@ -20,12 +20,14 @@ public final class NoCommonSubtermConstraint extends CommonalityConstraint {
     /** comparison between two compounds */
     @Override
     @NotNull protected boolean invalid(@NotNull Compound x, @NotNull Compound y) {
-
-        //return subtermOfTheOther(x, y, recurse, true);
         return subtermOfTheOther(x, y, recurse, true);
     }
 
-                 //commonSubtermsRecurse((Compound) B, C, true, new HashSet())
+    @NotNull @Override protected boolean invalid(Term x, Compound y) {
+        return (recurse ? y.containsTermRecursively(x) : y.containsTerm(x));
+    }
+
+    //commonSubtermsRecurse((Compound) B, C, true, new HashSet())
                     //commonSubterms((Compound) B, C, true, scratch.get())
 
     @NotNull
