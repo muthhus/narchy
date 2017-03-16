@@ -168,6 +168,7 @@ abstract public class NAgentX extends NAgent {
                     new TabPane(new TreeMap<String, Supplier<Surface>>(Map.of(
                             "agent", () -> new ReflectionSurface(a),
                             "core", () -> new ReflectionSurface(((Default)a.nar).core),
+                            "derive", () -> new ReflectionSurface(((Default)a.nar).derivationBudgeting),
                             "nar", () -> new ReflectionSurface(a.nar),
                             "input", () -> grid(a.cam.values().stream().map(cs ->
                                     new CameraSensorView(cs, nar).align(Surface.Align.Center, cs.width, cs.height))

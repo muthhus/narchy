@@ -13,6 +13,7 @@ import nars.derive.Deriver;
 import nars.index.term.TermIndex;
 import nars.index.term.map.MapTermIndex;
 import nars.op.stm.STMTemporalLinkage;
+import nars.premise.DerivationBudgeting;
 import nars.premise.MatrixPremiseBuilder;
 import nars.premise.PreferSimpleAndConfident;
 import nars.time.FrameTime;
@@ -34,6 +35,9 @@ public class Default extends NAR {
     public final DefaultConceptBagControl core;
 
     public final STMTemporalLinkage stmLinkage = new STMTemporalLinkage(this, 2);
+
+    public final PreferSimpleAndConfident derivationBudgeting;
+
     //private final STMTemporalLinkage2 stmLinkage = new STMTemporalLinkage2(this, 16, 1, 2);
 
 
@@ -67,6 +71,8 @@ public class Default extends NAR {
     public Default(int activeConcepts, int conceptsFirePerCycle, int taskLinksPerConcept, int termLinksPerConcept, @NotNull Random random, @NotNull TermIndex concepts, @NotNull Time time, Executioner exe) {
         super(time, concepts, random, exe);
 
+        derivationBudgeting = newDerivationBudgeting();
+
         core = //exe.concurrent() ?
                 new DefaultConceptBagControl.BufferedConceptBagControl(this, newConceptBag(activeConcepts), newPremiseBuilder())
                 //:
@@ -86,7 +92,7 @@ public class Default extends NAR {
     }
 
     public MatrixPremiseBuilder newPremiseBuilder() {
-        return new MatrixPremiseBuilder(newDeriver(), newDerivationBudgeting());
+        return new MatrixPremiseBuilder(newDeriver(), derivationBudgeting);
     }
 
     public PreferSimpleAndConfident newDerivationBudgeting() {

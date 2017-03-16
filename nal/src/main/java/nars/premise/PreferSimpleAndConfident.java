@@ -1,19 +1,17 @@
 package nars.premise;
 
 import jcog.Util;
+import jcog.data.FloatParam;
 import nars.$;
 import nars.Task;
 import nars.budget.Budget;
 import nars.term.Compound;
-import nars.term.Term;
-import nars.term.Termed;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import static jcog.Util.unitize;
-import static nars.Op.QUEST;
-import static nars.Op.QUESTION;
+import static nars.Op.*;
 import static nars.truth.TruthFunctions.w2c;
 import static nars.util.UtilityFunctions.and;
 
@@ -23,26 +21,66 @@ import static nars.util.UtilityFunctions.and;
 public class PreferSimpleAndConfident implements DerivationBudgeting {
 
 
+    public final FloatParam belief = new FloatParam(1f, 0f, 1f);
+    public final FloatParam goal = new FloatParam(1f, 0f, 1f);
+    public final FloatParam question = new FloatParam(1f, 0f, 1f);
+    public final FloatParam quest = new FloatParam(1f, 0f, 1f);
+
+    public final FloatParam puncFactor(byte punc) {
+        switch (punc) {
+            case BELIEF: return belief;
+            case GOAL: return goal;
+            case QUESTION: return question;
+            case QUEST: return quest;
+
+            default:
+                throw new UnsupportedOperationException();
+        }
+    }
+
+    public final FloatParam structural = new FloatParam(1f, 0f, 1f);
+    public final FloatParam causal = new FloatParam(1f, 0f, 1f);
+
+    public final FloatParam opFactor(Compound c) {
+        switch (c.op()) {
+
+            case INH:
+            case SIM:
+                return structural;
+
+            case IMPL:
+            case CONJ:
+            case EQUI:
+                return causal;
+
+            default:
+                return null;
+        }
+    }
+
+
     @Override
     public Budget budget(@NotNull Derivation d, @NotNull Compound conclusion, @Nullable Truth truth, byte punc) {
 
+        float q = d.premise.qua();
+        final float quaMin = d.quaMin;
 
-        float quaMin = d.quaMin;
-        float quaFactor;
-        if (truth!=null) {
-            //belief and goal:
-            quaFactor = unitize(qualityFactor(truth, d));
-        } else {
-            quaFactor = 0.5f;
+        q *= puncFactor(punc).floatValue();
+        if (q < quaMin) return null;
+
+        FloatParam off = opFactor(conclusion);
+        if (off!=null) {
+            q *= off.floatValue();
+            if (q < quaMin) return null;
         }
 
-        float c = unitize(complexityDiscount(conclusion, punc, d.task, d.belief));
-        quaFactor *= c;
+        if (truth!=null) { //belief and goal:
+            q *= confidencePreservationFactor(truth, d);
+            if (q < quaMin) return null;
+        }
 
-        //early termination test to avoid calculating priFactor:
-        float q = quaFactor * d.premise.qua();
-        if (q < quaMin)
-            return null;
+        q *= complexityFactor(conclusion, punc, d.task, d.belief);
+        if (q < quaMin) return null;
 
         return $.b( d.premise.pri(), q);
     }
@@ -52,7 +90,7 @@ public class PreferSimpleAndConfident implements DerivationBudgeting {
      *
      * @return a value between 0 and 1 that priority will be scaled by
      */
-    public static float complexityDiscount(Compound conclusion, byte punc, Task task, Task belief) {
+    public static float complexityFactor(Compound conclusion, byte punc, Task task, Task belief) {
         int parentComplexity;
         int taskCompl = task.complexity();
         int beliefCompl;
@@ -85,8 +123,8 @@ public class PreferSimpleAndConfident implements DerivationBudgeting {
             ;
     }
 
-    protected float qualityFactor(@NotNull Truth truth, @NotNull Derivation conclude) {
-        return and(truth.conf(), w2c( conclude.premiseEvidence ));
+    protected float confidencePreservationFactor(@NotNull Truth truth, @NotNull Derivation conclude) {
+        return unitize(truth.conf() / w2c( conclude.premiseEvidence ));
     }
 
 }

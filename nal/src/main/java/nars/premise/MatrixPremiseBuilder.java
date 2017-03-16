@@ -31,8 +31,8 @@ public class MatrixPremiseBuilder extends PremiseBuilder {
 
     private static final Logger logger = LoggerFactory.getLogger(MatrixPremiseBuilder.class);
 
-    final DerivationBudgeting budgeting;
-    final Deriver deriver;
+    public final DerivationBudgeting budgeting;
+    public final Deriver deriver;
 
 
     public MatrixPremiseBuilder(Deriver deriver, DerivationBudgeting budgeting) {
