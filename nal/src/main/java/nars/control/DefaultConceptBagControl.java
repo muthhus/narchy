@@ -95,11 +95,14 @@ abstract public class DefaultConceptBagControl extends ConceptBagControl {
             // * 1f/((float)Math.sqrt(active.capacity()))
             ;
 
-            int cbs = conceptsFiredPerBatch.intValue();
+
 
             //float load = nar.exe.load();
             int cpf = Math.round(conceptsFiredPerCycle.floatValue());
             ///Math.round(conceptsFiredPerCycle.floatValue() * (1f - load));
+
+            //int cbs = nar.exe.concurrent() ? conceptsFiredPerBatch.intValue() : cpf /* all of them in one go if non-concurrent */;
+            int cbs = conceptsFiredPerBatch.intValue();
 
             //logger.info("firing {} concepts (exe load={})", cpf, load);
 
@@ -111,7 +114,7 @@ abstract public class DefaultConceptBagControl extends ConceptBagControl {
                 //List<PLink<Concept>> toFire = $.newArrayList(batchSize);
 
                 nar.runLater(
-                        new PremiseMatrix(batchSize, tasklinksFiredPerFiredConcept.intValue(), termlinksFiredPerFiredConcept)
+                    new PremiseMatrix(batchSize, tasklinksFiredPerFiredConcept.intValue(), termlinksFiredPerFiredConcept)
                 );
 
             }

@@ -54,44 +54,15 @@ abstract public class PremiseBuilder {
      * patham9 its using the result of higher confidence
      */
     @Nullable
-    public Premise premise(@NotNull Termed c, @NotNull final BLink<Task> theTaskLink, Term beliefTerm, long now, NAR nar, float priFactor, float priMin) {
+    public Derivation premise(@NotNull Termed c, Task task, Budget taskLinkCopy, long when, Term beliefTerm, long now, NAR nar, float priFactor, float priMin, @NotNull Consumer<DerivedTask> target) {
 
-        //if (Param.PREMISE_LOG)
-        //logger.info("try: { concept:\"{}\",\ttask:\"{}\",\tbeliefTerm:\"{}\" }", c, task, beliefTerm);
 
-//        if (Terms.equalSubTermsInRespectToImageAndProduct(task.term(), term))
-//            return null;
-
-        Budget taskLinkCopy = theTaskLink.clone(); /* copy, in case the tasklink becomes deleted during this method */
-        if (taskLinkCopy == null) //deleted
-            return null;
-
-        Task task = (theTaskLink.get());
 
         Task belief = null;
 
         float dur = nar.time.dur();
 
-        long taskStart = task.start();
-        long when;
-        long start = taskStart;
-        if (start == ETERNAL) {
 
-            when = task.isGoal() ? now : ETERNAL;
-
-        } else {
-            //USE TASK's OCCURENCE find closest end-point to now
-            long end = task.end();
-            if ((now >= start) && (now <= end)) {
-                when = now; //inner
-            } else {
-                if (Math.abs(now - start) < Math.abs(now - end)) {
-                    when = start;
-                } else {
-                    when = end;
-                }
-            }
-        }
 
         if (beliefTerm instanceof Compound) {
 
@@ -131,7 +102,7 @@ abstract public class PremiseBuilder {
                                     //(1f - Util.unitize(taskBudget.qua()/answered.qua())) //proportion of the taskBudget which the answer receives as a boost
                             );
 
-                            BudgetMerge.maxBlend.apply(theTaskLink, taskLinkCopy, 1f);
+                            //BudgetMerge.maxBlend.apply(theTaskLink, taskLinkCopy, 1f);
 
                             //task.budget().set(taskBudget); //update the task budget
 
@@ -219,10 +190,10 @@ abstract public class PremiseBuilder {
         //aveAri(taskLinkBudget.pri(), termLinkBudget.pri());
         //nar.conceptPriority(c);
 
-        return newPremise(c, task, beliefTerm, belief, pri * priFactor, qua);
+        return newPremise(c, task, beliefTerm, belief, pri * priFactor, qua, target, nar);
     }
 
-    abstract protected Premise newPremise(@NotNull Termed c, @NotNull Task task, Term beliefTerm, Task belief, float pri, float qua);
+    @Nullable abstract protected Derivation newPremise(@NotNull Termed c, @NotNull Task task, @NotNull Term beliefTerm, @Nullable Task belief, float pri, float qua, @NotNull Consumer<DerivedTask> target, @NotNull NAR nar);
 //    {
 //        return new Premise(c, task, beliefTerm, belief, pri, qua);
 //    }
