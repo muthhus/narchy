@@ -3,8 +3,11 @@ package nars.experiment.tetris;
 import nars.*;
 import nars.concept.ActionConcept;
 import nars.concept.SensorConcept;
+import nars.conceptualize.DefaultConceptBuilder;
 import nars.experiment.tetris.impl.TetrisState;
 import nars.experiment.tetris.impl.TetrisVisualizer;
+import nars.index.term.map.CaffeineIndex;
+import nars.nar.Default;
 import nars.nar.NARBuilder;
 import nars.term.Compound;
 import nars.term.atom.Atomic;
@@ -61,16 +64,18 @@ public class Tetris extends NAgentX {
                 long now = this.now;
                 float dur = nar.time.dur();
                 float b = cxy.beliefFreq(now, dur);
-                float g = cxy.goalFreq(now, dur);
+                Truth gg = cxy.goal(now, dur);
                 float gp, gn;
+                float g = gg!=null ? gg.freq() : Float.NaN;
                 if (g == g) {
                     g -= 0.5f;
                     g *= 2f;
+                    float c = gg.conf();
                     if (g < 0) {
                         gp = 0;
-                        gn = -g;
+                        gn = -g * c;
                     } else {
-                        gp = g;
+                        gp = g * c;
                         gn = 0;
                     }
                 } else {
@@ -430,7 +435,7 @@ public class Tetris extends NAgentX {
             last = now;
             return state.score;
         } else {
-            return 0;
+            return Float.NaN;
         }
 
     }
@@ -475,14 +480,18 @@ public class Tetris extends NAgentX {
 //        }
 
     public static void main(String[] args) throws Narsese.NarseseException {
-        //Param.DEBUG = true;
+        Param.DEBUG = true;
         //Param.HORIZON = 1/100f;
 
         Time clock = new RealTime.DSHalf().durSeconds(DUR);
         NAR n =
-                NARBuilder.newMultiThreadNAR(5, clock);
+                NARBuilder.newMultiThreadNAR(3, clock);
         //NARBuilder.newALANN(clock, 4, 64, 5, 4, 1);
 
+//        n.onTask((t)->{
+//            if (t.isEternal())
+//                System.out.println(t.proof());
+//        });
 
 //            n.onCycle(new Runnable() {
 //
@@ -622,23 +631,22 @@ public class Tetris extends NAgentX {
 
 
         Tetris a = new MyTetris(n);
-        NAgentX.chart(a);
-        a.trace = true;
 
-//            Default m = new Default(512, 32, 1, 3, n.random,
-//                    new CaffeineIndex(new DefaultConceptBuilder(), 4096, false, null),
-//                    new RealTime.DSHalf().durSeconds(1f));
-//            float metaLearningRate = 0.75f;
-//            m.confMin.setValue(0.01f);
-//            m.goalConfidence(metaLearningRate);
-//            m.termVolumeMax.setValue(16);
-        //n.onCycle(metaT.nar::cycle);
+
+            Default m = new Default(512, 16, 1, 3, n.random,
+                    new CaffeineIndex(new DefaultConceptBuilder(), 4096, false, null),
+                    new RealTime.DSHalf().durSeconds(1f));
+            float metaLearningRate = 0.5f;
+            m.confMin.setValue(0.01f);
+            m.goalConfidence(metaLearningRate);
+            m.termVolumeMax.setValue(24);
         MetaAgent metaT = new MetaAgent(a
-                //,m
+                ,m
 
         );
         metaT.init();
         metaT.trace = true;
+        n.onCycle(metaT.nar::cycle);
 
         try {
             InterNAR i = new InterNAR(n, 8, 10421);
@@ -646,6 +654,9 @@ public class Tetris extends NAgentX {
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+        NAgentX.chart(a);
+        a.trace = true;
 
         //metaT.nar.log();
 //            m.onTask(t -> {

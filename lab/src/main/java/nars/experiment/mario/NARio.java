@@ -158,7 +158,7 @@ public class NARio extends NAgentX {
 
         NAR nar = runRT((NAR n) -> {
 
-            n.termVolumeMax.setValue(60);
+            //n.termVolumeMax.setValue(60);
 
             return new NARio(n);
 

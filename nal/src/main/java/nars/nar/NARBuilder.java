@@ -189,7 +189,7 @@ public interface NARBuilder {
         nar.core.conceptsFiredPerBatch.setValue(16);
         nar.core.derivationsInputPerCycle.setValue(96);
 
-        nar.activationRate.setValue(0.5f);
+        //nar.activationRate.setValue(0.5f);
         nar.confMin.setValue(0.01f);
         nar.truthResolution.setValue(0.01f);
 

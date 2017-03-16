@@ -104,7 +104,7 @@ abstract public class PremiseBuilder {
 
             Concept beliefConcept = nar.concept(beliefTerm);
 
-            if (unifiedTerm != null && beliefConcept instanceof TaskConcept) {
+            if (beliefConcept instanceof TaskConcept) {
 
                 if (task.isQuestOrQuestion()) {
 
@@ -181,6 +181,11 @@ abstract public class PremiseBuilder {
                 //project it to the time
                 belief = ((ImmutableTask)belief).project(when, dur, nar.confMin.floatValue());
             }
+
+            //prevent single eternal goal by projecting to now
+            if (belief == null && task.isGoal() && task.isEternal() && !task.contains(when)) {
+                task= ((ImmutableTask)task).project(when, dur, nar.confMin.floatValue());
+            }
         }
 
 
@@ -249,10 +254,11 @@ abstract public class PremiseBuilder {
             }
         }
 
-        if (Terms.equal(q, a, false, true /* no need to unneg, task content is already non-negated */))
-            return q;
-        else
-            return null;
+        return null;
+//        if (Terms.equal(q, a, false, true /* no need to unneg, task content is already non-negated */))
+//            return q;
+//        else
+//            return null;
     }
 
 }

@@ -723,6 +723,9 @@ public interface Task extends Budgeted, Truthed, Stamp, Termed<Compound>, Tasked
 
     default boolean contains(long when) {
         long start = start();
+
+        if (start == when) return true;
+
         if (start != ETERNAL) {
             if (when >= start) {
                 if (when <= end())
