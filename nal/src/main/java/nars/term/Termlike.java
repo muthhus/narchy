@@ -62,7 +62,7 @@ public interface Termlike {
         // it means there is some component of the other term which is not found
         //return ((possibleSubtermStructure | existingStructure) != existingStructure);
         return  this==target ||
-                ((!Op.hasAll(structure(), target.structure()))) ||
+                (!hasAll(target.structure())) ||
                 (impossibleSubTermVolume(target.volume()));
     }
 

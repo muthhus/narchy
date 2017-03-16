@@ -67,7 +67,9 @@ public class InterNARTest {
             Util.pause(CONNECTION_TIME);
 
             ai.stop();
+            a.stop();
             bi.stop();
+            b.stop();
 
         } catch (Exception e) {
             e.printStackTrace();

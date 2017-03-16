@@ -6,6 +6,7 @@ import com.google.common.collect.Streams;
 import jcog.data.FloatParam;
 import jcog.list.FasterList;
 import jcog.math.FloatPolarNormalized;
+import jcog.math.RecycledSummaryStatistics;
 import nars.concept.ActionConcept;
 import nars.concept.Concept;
 import nars.concept.SensorConcept;
@@ -549,19 +550,15 @@ abstract public class NAgent implements NSense, NAction {
 
     public static float varPct(NAR nar) {
         if (nar instanceof Default) {
-            DoubleSummaryStatistics is = new DoubleSummaryStatistics();
+            RecycledSummaryStatistics is = new RecycledSummaryStatistics();
             nar.forEachActiveConcept(xx -> {
-
-                if (xx != null) {
-                    Term tt = xx.term();
-                    float v = tt.volume();
-                    int c = tt.complexity();
-                    is.accept((v - c) / v);
-                }
-
+                Term tt = xx.term();
+                float v = tt.volume();
+                int c = tt.complexity();
+                is.accept((v - c) / v);
             });
 
-            return (float) is.getAverage();
+            return (float) is.getMean();
         }
         return Float.NaN;
     }
