@@ -11,6 +11,8 @@ import nars.budget.BLink;
 import nars.budget.BudgetMerge;
 import nars.conceptualize.DefaultConceptBuilder;
 import nars.conceptualize.state.DefaultConceptState;
+import nars.control.ConceptBagControl;
+import nars.control.DefaultConceptBagControl;
 import nars.index.term.TermIndex;
 import nars.index.term.map.CaffeineIndex;
 import nars.op.mental.Compressor;
@@ -185,9 +187,10 @@ public interface NARBuilder {
         nar.DEFAULT_QUEST_PRIORITY = 0.5f * p;
 
         //nar.stmLinkage.capacity.set(0);
-        nar.core.conceptsFiredPerCycle.setValue(128);
-        nar.core.conceptsFiredPerBatch.setValue(16);
-        nar.core.derivationsInputPerCycle.setValue(96);
+        DefaultConceptBagControl core = (DefaultConceptBagControl) nar.core;
+        core.conceptsFiredPerCycle.setValue(128);
+        core.conceptsFiredPerBatch.setValue(16);
+        core.derivationsInputPerCycle.setValue(96);
 
         //nar.activationRate.setValue(0.5f);
         nar.confMin.setValue(0.01f);

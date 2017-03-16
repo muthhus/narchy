@@ -8,6 +8,7 @@ import nars.NAR;
 import nars.concept.Concept;
 import nars.conceptualize.DefaultConceptBuilder;
 import nars.control.ConceptBagControl;
+import nars.control.DefaultConceptBagControl;
 import nars.derive.DefaultDeriver;
 import nars.derive.Deriver;
 import nars.index.term.TermIndex;
@@ -30,7 +31,7 @@ public class Default extends NAR {
 
     //private static final Logger logger = LoggerFactory.getLogger(Default.class);
 
-    public final ConceptBagControl core;
+    public final DefaultConceptBagControl core;
 
     public final STMTemporalLinkage stmLinkage = new STMTemporalLinkage(this, 2);
     //private final STMTemporalLinkage2 stmLinkage = new STMTemporalLinkage2(this, 16, 1, 2);
@@ -66,7 +67,11 @@ public class Default extends NAR {
     public Default(int activeConcepts, int conceptsFirePerCycle, int taskLinksPerConcept, int termLinksPerConcept, @NotNull Random random, @NotNull TermIndex concepts, @NotNull Time time, Executioner exe) {
         super(time, concepts, random, exe);
 
-        core = new ConceptBagControl(this, newDeriver(), newConceptBag(activeConcepts), newPremiseBuilder());
+        core = //exe.concurrent() ?
+                new DefaultConceptBagControl.BufferedConceptBagControl(this, newDeriver(), newConceptBag(activeConcepts), newPremiseBuilder())
+                //:
+                //new DefaultConceptBagControl.DirectConceptBagControl(this, newDeriver(), newConceptBag(activeConcepts), newPremiseBuilder());
+        ;
 
         core.active.capacity(activeConcepts);
         core.termlinksFiredPerFiredConcept.set(1, termLinksPerConcept);
