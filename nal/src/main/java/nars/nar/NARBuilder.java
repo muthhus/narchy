@@ -76,12 +76,15 @@ public interface NARBuilder {
 
         int maxConcepts = 192 * 1024;
 
-        Default nar = new Default(2 * 1024,
+        Default nar = new Default(3 * 1024,
                 1, 1, 3, rng,
 
                 //new HijackTermIndex(cb, 1024 * 256, reprobes)
                 //new NullTermIndex(cb)
-                new CaffeineIndex(cb, /* -1 */ maxConcepts, -1, null /* null = fork join common pool */)
+                new CaffeineIndex(cb, /* -1 */ maxConcepts, -1,
+                    exe
+                    //null /* null = fork join common pool */
+                )
                 //new TreeTermIndex.L1TreeIndex(new DefaultConceptBuilder(), 300000, 32 * 1024, 3)
                 ,
                 time,
@@ -180,7 +183,7 @@ public interface NARBuilder {
         nar.goalConfidence(0.75f);
         //nar.derivedEvidenceGain.setValue(0.75f);
 
-        float p = 0.1f;
+        float p = 0.05f;
         nar.DEFAULT_BELIEF_PRIORITY = 0.75f * p;
         nar.DEFAULT_GOAL_PRIORITY = 1f * p;
         nar.DEFAULT_QUESTION_PRIORITY = 0.5f * p;

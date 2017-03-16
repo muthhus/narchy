@@ -941,7 +941,7 @@ public class NAL8Test extends AbstractNALTest {
         test()
                 .goal("(R)")
                 .input("((--,a:b) ==>+0 (R)). :|:")
-                .mustDesire(cycles, "a:b", 0.0f, 0.81f, 0);
+                .mustDesire(cycles, "a:b", 0.0f, 0.74f, 1);
     }
 
     @Test public void testNegatedImplicationP() {
@@ -1195,8 +1195,8 @@ public class NAL8Test extends AbstractNALTest {
         test()
                 .inputAt(0, "((out) <=>-3 (happy)). :|:")
                 .inputAt(13, "(happy)!")
-                .mustDesire(cycles, "(out)", 1f, 0.81f, 3)
-                .mustNotOutput(cycles, "(out)", GOAL, 13);
+                .mustDesire(cycles, "(out)", 1f, 0.04f, 17)
+                .mustNotOutput(cycles, "(out)", GOAL, 13, 3, 0);
     }
     @Test public void testPredictiveEquivalenceTemporalTemporalNeg() {
         test()

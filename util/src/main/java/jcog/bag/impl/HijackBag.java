@@ -101,7 +101,7 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
 
         if (capacity.getAndSet(newCapacity) != newCapacity) {
 
-            List<V> removed = new FasterList();
+            List<V> removed = new FasterList<>();
 
             final AtomicReferenceArray<V>[] prev = new AtomicReferenceArray[1];
 
@@ -455,7 +455,6 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
         //randomly choose traversal direction
         boolean di = random.nextBoolean();
 
-        float toleranceInc = priRange / jLimit;
 
         while ((n > 0) && (j < jLimit) /* prevent infinite looping */) {
 
@@ -567,43 +566,40 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
     @Override
     public HijackBag<K, V> commit(Function<Bag<K, V>, Consumer<V>> update) {
 
+        float mass = 0;
+        float min = Float.POSITIVE_INFINITY;
+        float max = Float.NEGATIVE_INFINITY;
+        int count = 0;
 
-        final float[] mass = {0};
+        AtomicReferenceArray<V> a = map.get();
+        for (int i = 0; i < a.length(); i++) {
+            V f = a.get(i);
+            if (f !=null) {
+                float p = priSafe(f, -1);
+                if (p >= 0) {
+                    count++;
+                    if (p > max) max = p;
+                    if (p < min) min = p;
+                    mass += p;
+                } else {
+                    if (a.compareAndSet(i, f, null)) {
+                        onRemoved(f); //TODO this may call onRemoved unnecessarily if the map has changed (ex: resize)
+                    }
+                }
+            }
+        }
 
-        final float[] min = {Float.POSITIVE_INFINITY};
-        final float[] max = {Float.NEGATIVE_INFINITY};
-        final int[] count = {0};
+        this.size.set(count);
 
-        forEach((V f) -> {
-            float p = priSafe(f, 0);
-            count[0]++;
-            if (p > max[0]) max[0] = p;
-            if (p < min[0]) min[0] = p;
-            mass[0] += p;
-        });
-
-        this.size.set(count[0]);
-
-
-        float MIN = min[0];
-        if (MIN == Float.POSITIVE_INFINITY) {
+        if (min == Float.POSITIVE_INFINITY) {
             this.priMin = 0;
             this.priMax = 0;
         } else {
-            this.priMin = MIN;
-            this.priMax = max[0];
+            this.priMin = min;
+            this.priMax = max;
         }
 
-        this.mass = mass[0];
-
-//        Forget f;
-//        if (existingMass > 0 && pressure > 0) {
-//            float p = this.pressure;
-//            f = Forget.forget(p, existingMass, count[0], Param.BAG_THRESHOLD);
-//        } else {
-//            f = null;
-//        }
-
+        this.mass = mass;
 
         update(update != null ? update.apply(this) : null);
 
