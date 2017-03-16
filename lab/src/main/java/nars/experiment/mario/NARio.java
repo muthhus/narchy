@@ -134,6 +134,7 @@ public class NARio extends NAgentX {
 
     int lastCoins = 0;
 
+    public final FloatParam Depress = new FloatParam(0.1f, 0f, 1f);
     public final FloatParam MoveRight = new FloatParam(0.5f, 0f, 1f);
     public final FloatParam EarnCoin = new FloatParam(0.5f, 0f, 1f);
 
@@ -147,7 +148,9 @@ public class NARio extends NAgentX {
         if (vx > 0.5f /* in range 0..1.0 */)
             reward += MoveRight.floatValue();
 
-        float r = 0f + Util.clamp(reward, -1, +1);
+        reward -= Depress.floatValue();
+
+        float r = Util.clamp(reward, -1, +1);
 //        if (r == 0)
 //            return Float.NaN;
         return r;// + (float)Math.random()*0.1f;

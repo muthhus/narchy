@@ -32,12 +32,6 @@ import static nars.util.UtilityFunctions.aveAri;
 
 abstract public class PremiseBuilder {
 
-    //private static final Logger logger = LoggerFactory.getLogger(PremiseBuilder.class);
-
-    @FunctionalInterface
-    interface DerivationBuilder {
-        @Nullable Derivation derive(@NotNull Premise p, @NotNull Consumer<DerivedTask> each, @NotNull NAR nar);
-    }
 
 
     /**
@@ -69,8 +63,9 @@ abstract public class PremiseBuilder {
             Compound unifiedTerm = unify(task.term(), (Compound) beliefTerm, nar);
 
             if ((unifiedTerm != null) && (unifiedTerm.varQuery() == 0)) {
-
-                beliefTerm = (unifiedTerm = (Compound) unifiedTerm.unneg());
+                unifiedTerm = compoundOrNull(unifiedTerm.unneg());
+                if (unifiedTerm!=null)
+                    beliefTerm = unifiedTerm;
             }
 
             Concept beliefConcept = nar.concept(beliefTerm);
@@ -180,7 +175,9 @@ abstract public class PremiseBuilder {
             return null;
 
         //combine either the task or the tasklink. this makes tasks more competitive allowing the priority reduction to be applied to either the task (in belief table) or the tasklink's ordinary forgetting
-        float taskPri = aveAri(taskLinkCopy.pri(), task.priSafe(0));
+        float taskPri =
+                taskLinkCopy.pri();
+                //aveAri(taskLinkCopy.pri(), task.priSafe(0));
 
         float pri =
                 belief == null ? taskPri : Util.lerp(tq / (tq + bq), taskPri, beliefBudget.pri());
