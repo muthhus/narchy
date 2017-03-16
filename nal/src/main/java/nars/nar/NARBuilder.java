@@ -179,21 +179,19 @@ public interface NARBuilder {
 
         };
 
-        nar.beliefConfidence(0.75f);
-        nar.goalConfidence(0.75f);
-        //nar.derivedEvidenceGain.setValue(0.75f);
+        nar.beliefConfidence(0.9f);
+        nar.goalConfidence(0.9f);
 
         float p = 0.05f;
-        nar.DEFAULT_BELIEF_PRIORITY = 0.75f * p;
+        nar.DEFAULT_BELIEF_PRIORITY = 1f * p;
         nar.DEFAULT_GOAL_PRIORITY = 1f * p;
-        nar.DEFAULT_QUESTION_PRIORITY = 0.5f * p;
-        nar.DEFAULT_QUEST_PRIORITY = 0.5f * p;
+        nar.DEFAULT_QUESTION_PRIORITY = 1f * p;
+        nar.DEFAULT_QUEST_PRIORITY = 1f * p;
 
         //nar.stmLinkage.capacity.set(0);
-        DefaultConceptBagControl core = (DefaultConceptBagControl) nar.core;
-        core.conceptsFiredPerCycle.setValue(128);
-        core.conceptsFiredPerBatch.setValue(16);
-        core.derivationsInputPerCycle.setValue(96);
+        nar.core.conceptsFiredPerCycle.setValue(128);
+        nar.core.conceptsFiredPerBatch.setValue(16);
+        nar.core.derivationsInputPerCycle.setValue(96);
 
         //nar.activationRate.setValue(0.5f);
         nar.confMin.setValue(0.01f);
@@ -202,14 +200,14 @@ public interface NARBuilder {
 
         //NARTune tune = new NARTune(nar);
 
-        MySTMClustered stm = new MySTMClustered(nar, 64, BELIEF, 5, true, 12);
-        MySTMClustered stmGoal = new MySTMClustered(nar, 32, GOAL, 3, true, 8);
+        MySTMClustered stm = new MySTMClustered(nar, 64, BELIEF, 6, true, 12);
+        MySTMClustered stmGoal = new MySTMClustered(nar, 32, GOAL, 2, true, 8);
 
 //        Abbreviation abbr = new Abbreviation(nar, "the",
 //                4, 16,
 //                0.02f, 32);
 
-        new Inperience(nar, 0.01f, 16);
+        new Inperience(nar, 0.1f, 8);
 
 //        //causal accelerator
 //        nar.onTask(t -> {

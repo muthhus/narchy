@@ -235,14 +235,13 @@ public final class BudgetFunctions extends UtilityFunctions {
 
     /** TODO guarantee balanced input and output */
     @NotNull
-    public static Budget fund(@NotNull Iterable<Task> tt, float paymentProportion) {
-        RawBudget u = new RawBudget();
+    public static Budget fund(@NotNull Iterable<Task> tt, float paymentProportion /* TODO: , boolean copyOrTransfer */) {
+        RawBudget u = new RawBudget(0f, Float.NaN);
         for (Task t : tt) {
-            @NotNull Budget tbudget = t.budget();
-            if (!tbudget.isDeleted()) {
-                BudgetMerge.plusBlend.merge(u, tbudget, paymentProportion);
-                tbudget.priMult(1f-paymentProportion);
-            }
+            Budget tbudget = t.budget();
+            BudgetMerge.plusBlend.merge(u, tbudget, paymentProportion);
+            //if (!copyOrTransfer)
+                //tbudget.priAdd(-spent)
         }
         return u;
     }

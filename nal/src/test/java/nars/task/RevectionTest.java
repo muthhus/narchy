@@ -157,7 +157,7 @@ public class RevectionTest {
         b.believe(0.5f, 1.0f, 0.85f, 15);
         b.run(1);
 
-        assertEquals(3, b.size());
+        assertEquals(3, b.size(true));
 
         int period = 1;
         int loops = 20;
@@ -247,7 +247,7 @@ public class RevectionTest {
         }
 
         b.print();
-        assertEquals(repeats, b.size());
+        assertEquals(repeats, b.size(true));
 
         @Nullable Truth result = b.beliefs().truth(at, n.time.dur());
         assertEquals(freq, result.freq(), Param.TRUTH_EPSILON);
@@ -277,7 +277,7 @@ public class RevectionTest {
         n.cycle();
 
         b.print();
-        assertEquals(3, b.size());
+        assertEquals(3, b.size(true));
         assertEquals(5, b.wave().start());
         assertEquals(11, b.wave().end());
 
@@ -286,7 +286,8 @@ public class RevectionTest {
 
         n.cycle().cycle().cycle();
         b.print();
-        assertEquals(4, b.size());
+        assertEquals(4, b.capacity(true));
+        assertEquals(4, b.size(true));
 
         assertEquals(5, b.wave().start());
         assertEquals(12, b.wave().end());

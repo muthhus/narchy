@@ -40,7 +40,10 @@ public class RawBudget implements Budget {
 
     public RawBudget(float p, float q) {
         this.priority = validPriority(p);
-        this.quality = validQuality(q);
+        if (q==q)
+            this.quality = validQuality(q);
+        else
+            this.quality = Float.NaN;
     }
 
 

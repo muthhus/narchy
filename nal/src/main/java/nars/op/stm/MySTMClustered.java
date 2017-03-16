@@ -219,13 +219,11 @@ public class MySTMClustered extends STMClustered {
 
                         long t = Math.round(nc[0]);
 
-                        //priority calculation: conservatively choose the max value and not the sum
-                        float pri = (float) uu.stream().mapToDouble(x -> x.priSafe(0)).max().getAsDouble();
 
                         Task m = new GeneratedTask(conj, punc,
                                 $.t(finalFreq, conf), now, now, t, evidence ); //TODO use a truth calculated specific to this fixed-size batch, not all the tasks combined
 
-                        m.setBudget(BudgetFunctions.fund(uu, pri / uu.size()));
+                        m.setBudget(BudgetFunctions.fund(uu, 1f / uu.size()));
                         m.log("STMCluster CoOccurr");
 
                         toInput.add(m);

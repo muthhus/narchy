@@ -34,7 +34,7 @@ public class Line1D {
 
         NAR nar = runRT((NAR n) -> {
 
-            n.setControl(new InteractiveFirer(n));
+            //n.setControl(new InteractiveFirer(n));
 
             n.onTask(x -> {
                 if (x.isGoal() && !x.isInput()) {
@@ -42,7 +42,7 @@ public class Line1D {
                 }
             });
 
-            n.termVolumeMax.setValue(16);
+            n.termVolumeMax.setValue(32);
 
             Line1DSimplest a = new Line1DSimplest(n);
             n.onCycle(() -> {

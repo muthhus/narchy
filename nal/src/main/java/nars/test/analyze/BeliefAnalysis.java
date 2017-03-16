@@ -101,10 +101,6 @@ public class BeliefAnalysis extends EnergyAnalysis {
 		return beliefOrGoal ? beliefs() : goals();
 	}
 
-	public int size() {
-		return size(true);
-	}
-
 
 	/** sum of priorities of the belief table */
 	public float priSum() {
@@ -127,5 +123,9 @@ public class BeliefAnalysis extends EnergyAnalysis {
 
 	public long time() {
 		return nar.time();
+	}
+
+	public int capacity(boolean beliefOrGoal) {
+		return table(beliefOrGoal).capacity();
 	}
 }

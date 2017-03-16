@@ -179,7 +179,7 @@ public class BagTest {
 
         a.print();
 
-        assertEquals(0.125, a.get("x").pri(), 0.02f);
+        assertEquals(0.100, a.get("x").pri(), 0.02f);
     }
 
     public static void testScalePut2(Bag<String,BLink<String>> a) {

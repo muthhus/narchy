@@ -77,35 +77,30 @@ public interface BudgetMerge extends BiFunction<Budget, Budget, Budget> {
             }
         }
         */
-        float eQua = exi.qua();
         float iQua = inc.qua();
-        float iInfluence = iScale;// * (iQua / (eQua + iQua));
+        float eQua = exi.qua();
+        float iInfluence;
+        if (eQua!=eQua) {
+            eQua = 0;
+            iInfluence = 1f; //fully influenced by incoming
+        } else {
+            iInfluence = iScale/2f;// * (iQua / (eQua + iQua));
+        }
 
 
-        float nextPri, nextQua;
+        float nextPri;
         switch (priMerge) {
             case PLUS:
-                nextPri = ePri + iPri;
-                nextQua = Math.max(eQua,iQua);
+                nextPri = ePri + iPri*iScale;
                 break;
             case OR:
-                nextPri = or(ePri,iPri);
-                nextQua = Math.max(eQua,iQua);
+                nextPri = or(ePri,iPri*iScale);
                 break;
             case MAX:
-                nextPri = Math.max(ePri, iPri);
-                //nextQua = Math.max(eQua, iQua);
-
-                if (eQua + iQua > Param.BUDGET_EPSILON && ePri + iPri > Param.BUDGET_EPSILON) {
-                    float pInfluence = iPri / (ePri + iPri);
-                    nextQua = Util.lerp(pInfluence, iQua, eQua);
-                } else {
-                    nextQua = eQua;
-                }
+                nextPri = Math.max(ePri, iPri*iScale);
                 break;
             case AVG:
-                nextPri = (ePri+iPri)*0.5f;
-                nextQua = (eQua+iQua)*0.5f;
+                nextPri = lerp(iInfluence, iPri, ePri);
                 break;
             //TODO
             //case AND:     .. = ePri * iPri;          break;
@@ -114,19 +109,18 @@ public interface BudgetMerge extends BiFunction<Budget, Budget, Budget> {
                 throw new UnsupportedOperationException();
         }
 
-        float newPri = lerp(iInfluence, nextPri, ePri);
 
         float overflow;
-        if (newPri > 1f) {
-            overflow = newPri - 1f;
-            newPri = 1f;
+        if (nextPri > 1f) {
+            overflow = nextPri - 1f;
+            nextPri = 1f;
         } else {
             overflow = 0;
         }
 
-        float newQua = lerp(iInfluence, nextQua, eQua);
+        float newQua = lerp(iInfluence, iQua, eQua);
 
-        exi.setBudget( newPri, newQua );
+        exi.setBudget( nextPri, newQua );
 
         return overflow;
     }

@@ -27,14 +27,14 @@ public class BudgetMergeTest {
 
         testMerge(b, b, 0, m, b.pri(), b.qua()); //scale of zero should have no effect
 
-        testMerge(b, c, 1, m,0.75f, 0.25f); //test correct affect of components
-        testMerge(b, c, 0.5f, m, 0.625f, 0.25f); //lesser affect (dur and qua closer to original values)
+        testMerge(b, c, 1, m,0.75f, 0.175f); //test correct affect of components
+        testMerge(b, c, 0.5f, m, 0.625f, 0.2125f); //lesser affect (dur and qua closer to original values)
 
 
-        testMerge(a, c, m, 1f, 1, 0.5f, //priority saturation behavior
+        testMerge(a, c, m, 1f, 1, 0.3f, //priority saturation behavior
                 0.25f); //with overflow
 
-        testMerge(a, c, m, 0.5f, 1, 0.5f, //priority saturation behavior, lesser affect (dur and qua closer to original values)
+        testMerge(a, c, m, 0.5f, 1, 0.4f, //priority saturation behavior, lesser affect (dur and qua closer to original values)
                 0f);  //no overflow
 
         testMerge(a, a, 1f, m, a.pri(), a.qua()); //no change since saturated with the same incoming values

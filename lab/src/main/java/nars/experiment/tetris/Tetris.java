@@ -633,9 +633,10 @@ public class Tetris extends NAgentX {
         Tetris a = new MyTetris(n);
 
 
-            Default m = new Default(512, 16, 1, 3, n.random,
+            Default m = new Default(512, 16, 2, 2, n.random,
                     new CaffeineIndex(new DefaultConceptBuilder(), 4096, false, null),
                     new RealTime.DSHalf().durSeconds(1f));
+
             float metaLearningRate = 0.5f;
             m.confMin.setValue(0.01f);
             m.goalConfidence(metaLearningRate);
@@ -656,7 +657,7 @@ public class Tetris extends NAgentX {
         }
 
         NAgentX.chart(a);
-        a.trace = true;
+        //a.trace = true;
 
         //metaT.nar.log();
 //            m.onTask(t -> {
