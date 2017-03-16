@@ -9,6 +9,7 @@ import nars.Param;
 import nars.Task;
 import nars.concept.Concept;
 import nars.control.DefaultConceptBagControl;
+import nars.derive.DefaultDeriver;
 import nars.nar.Default;
 import nars.premise.Premise;
 import nars.task.DerivedTask;
@@ -58,7 +59,7 @@ public class Line1D {
         private Premise premise;
 
         public InteractiveFirer(NAR n) {
-            super(n, ((Default) n).newDeriver(), ((Default) n).newConceptBag(1024), ((Default) n).newPremiseBuilder());
+            super(n, ((Default) n).newConceptBag(1024), ((Default) n).newPremiseBuilder());
         }
 
         final Set<Task> derived = new HashSet(1024);

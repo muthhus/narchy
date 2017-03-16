@@ -37,8 +37,6 @@ public abstract class ConceptBagControl implements Control, Consumer<DerivedTask
 
     static final Logger logger = LoggerFactory.getLogger(ConceptBagControl.class);
 
-    final Deriver deriver;
-
     final MatrixPremiseBuilder premiser;
 
 //    /** this will be scaled by the input priority factor for each concept */
@@ -63,13 +61,11 @@ public abstract class ConceptBagControl implements Control, Consumer<DerivedTask
     //public final HitMissMeter meter = new HitMissMeter(ConceptBagControl.class.getSimpleName());
 
 
-    public ConceptBagControl(@NotNull NAR nar, @NotNull Deriver deriver, @NotNull Bag<Concept, PLink<Concept>> conceptBag, MatrixPremiseBuilder premiseBuilder) {
+    public ConceptBagControl(@NotNull NAR nar, @NotNull Bag<Concept, PLink<Concept>> conceptBag, MatrixPremiseBuilder premiseBuilder) {
 
         this.nar = nar;
 
         this.premiser = premiseBuilder;
-
-        this.deriver = deriver;
 
         this.active = conceptBag;
 
@@ -143,7 +139,6 @@ public abstract class ConceptBagControl implements Control, Consumer<DerivedTask
             active.sample(batchSize, c -> {
                 premiser.newPremiseMatrix(c.get(),
                         _tasklinks, _termlinks,
-                        deriver,
                         ConceptBagControl.this, //input them within the current thread here
                         nar
                 );

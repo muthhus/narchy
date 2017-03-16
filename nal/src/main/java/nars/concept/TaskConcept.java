@@ -33,13 +33,10 @@ public class TaskConcept extends CompoundConcept {
         super(term, termLinks, taskLinks, nar);
     }
 
-    public TaskConcept(@NotNull Compound term, @NotNull NAR n) {
+    @Deprecated public TaskConcept(@NotNull Compound term, @NotNull NAR n) {
         super(term, n);
     }
 
-    TaskConcept(@NotNull Compound term, @NotNull DefaultConceptBuilder b, @NotNull NAR nar, @NotNull Map sharedMap) {
-        super(term, b, nar, sharedMap);
-    }
 
 
     /**

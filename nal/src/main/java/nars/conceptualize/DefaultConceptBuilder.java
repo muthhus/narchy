@@ -36,6 +36,8 @@ import java.util.function.BiFunction;
 
 import static nars.Op.DIFFe;
 import static nars.Op.PROD;
+import static nars.budget.BudgetMerge.maxBlend;
+import static nars.budget.BudgetMerge.plusBlend;
 
 //import org.eclipse.collections.impl.map.mutable.ConcurrentHashMapUnsafe;
 
@@ -64,8 +66,8 @@ public class DefaultConceptBuilder implements ConceptBuilder {
 //    }
 
     @NotNull
-    @Deprecated public <X> Bag<X,BLink<X>> newBag(@NotNull Map m) {
-        return new CurveBag<>(8, defaultCurveSampler, BudgetMerge.plusBlend, m);
+    @Deprecated public <X> Bag<X,BLink<X>> newBag(@NotNull Map m, BudgetMerge blend) {
+        return new CurveBag<>(8, defaultCurveSampler, blend, m);
     }
 
 
@@ -85,8 +87,8 @@ public class DefaultConceptBuilder implements ConceptBuilder {
 
     public <X> X withBags(Term t, BiFunction<Bag<Term,BLink<Term>>,Bag<Task,BLink<Task>>,X> f) {
         Map sharedMap = newBagMap(t.volume());
-        @NotNull Bag<Term,BLink<Term>> termbag = newBag(sharedMap);
-        @NotNull Bag<Task,BLink<Task>> taskbag = newBag(sharedMap);
+        @NotNull Bag<Term,BLink<Term>> termbag = newBag(sharedMap, plusBlend);
+        @NotNull Bag<Task,BLink<Task>> taskbag = newBag(sharedMap, maxBlend);
 
 
 //        @NotNull Bag<Term,BLink<Term>> termbag = new BLinkHijackBag<>(3, BudgetMerge.maxBlend, nar.random);

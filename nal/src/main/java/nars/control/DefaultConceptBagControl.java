@@ -3,7 +3,6 @@ package nars.control;
 import jcog.bag.Bag;
 import jcog.bag.PLink;
 import jcog.bag.impl.HijackBag;
-import jcog.data.FloatParam;
 import jcog.data.MutableIntRange;
 import jcog.data.MutableInteger;
 import jcog.data.Range;
@@ -40,8 +39,8 @@ abstract public class DefaultConceptBagControl extends ConceptBagControl {
     /** directly inptus each result upon derive, for single-thread  */
     public static class DirectConceptBagControl extends DefaultConceptBagControl {
 
-        public DirectConceptBagControl(@NotNull NAR nar, @NotNull Deriver deriver, @NotNull Bag<Concept, PLink<Concept>> conceptBag, MatrixPremiseBuilder premiseBuilder) {
-            super(nar, deriver, conceptBag, premiseBuilder);
+        public DirectConceptBagControl(@NotNull NAR nar, @NotNull Bag<Concept, PLink<Concept>> conceptBag, MatrixPremiseBuilder premiseBuilder) {
+            super(nar, conceptBag, premiseBuilder);
         }
 
         @Override
@@ -63,8 +62,8 @@ abstract public class DefaultConceptBagControl extends ConceptBagControl {
         /** pending derivations to be input after this cycle */
         final TaskHijackBag pending;
 
-        public BufferedConceptBagControl(@NotNull NAR nar, @NotNull Deriver deriver, @NotNull Bag<Concept, PLink<Concept>> conceptBag, MatrixPremiseBuilder premiseBuilder) {
-            super(nar, deriver, conceptBag, premiseBuilder);
+        public BufferedConceptBagControl(@NotNull NAR nar, @NotNull Bag<Concept, PLink<Concept>> conceptBag, MatrixPremiseBuilder premiseBuilder) {
+            super(nar, conceptBag, premiseBuilder);
 
             this.pending = new TaskHijackBag(3, BudgetMerge.maxBlend, nar.random);
 
@@ -135,8 +134,8 @@ abstract public class DefaultConceptBagControl extends ConceptBagControl {
 
     }
 
-    public DefaultConceptBagControl(@NotNull  NAR nar, @NotNull  Deriver deriver, @NotNull  Bag<Concept, PLink<Concept>> conceptBag, MatrixPremiseBuilder premiseBuilder) {
-        super(nar, deriver, conceptBag, premiseBuilder);
+    public DefaultConceptBagControl(@NotNull NAR nar, @NotNull Bag<Concept, PLink<Concept>> conceptBag, MatrixPremiseBuilder premiseBuilder) {
+        super(nar, conceptBag, premiseBuilder);
 
         this.conceptsFiredPerCycle = new MutableInteger(1);
         this.conceptsFiredPerBatch = new MutableInteger(1);

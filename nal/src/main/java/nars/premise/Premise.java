@@ -21,7 +21,7 @@ import org.jetbrains.annotations.Nullable;
  * It is meant to be disposable and should not be kept referenced longer than necessary
  * to avoid GC loops, so it may need to be weakly referenced.
  */
-public abstract class Premise extends RawBudget  {
+public class Premise extends RawBudget  {
 
     //private static final Logger logger = LoggerFactory.getLogger(Premise.class);
 
@@ -172,5 +172,4 @@ public abstract class Premise extends RawBudget  {
         return result;
     }
 
-    abstract public Budget budget(@NotNull Compound conclusion, @Nullable Truth truth, byte punc, @NotNull Derivation conclude);
 }

@@ -111,12 +111,15 @@ public class Derivation extends Unify {
     @Nullable
     public final Consumer<DerivedTask> target;
     public final boolean cyclic;
+    public final DerivationBudgeting budgeting;
 
 
     public Derivation(@NotNull NAR nar, @NotNull Premise p, @NotNull Consumer<DerivedTask> c,
+                      DerivationBudgeting b,
                       int matchMax, int stack) {
         super(nar.concepts, VAR_PATTERN, nar.random, stack);
 
+        this.budgeting = b;
         this.matchesMax = matchMax;
 
         this.nar = nar;

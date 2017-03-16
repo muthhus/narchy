@@ -23,6 +23,8 @@ import java.util.function.BiFunction;
 import java.util.function.Predicate;
 
 import static nars.Param.TRUTH_EPSILON;
+import static nars.budget.BudgetMerge.maxBlend;
+import static nars.budget.BudgetMerge.plusBlend;
 
 /** concept of a compound term which can NOT name a task, so it has no task tables and ability to process tasks */
 public class CompoundConcept implements Concept, Termlike {
@@ -121,15 +123,13 @@ public class CompoundConcept implements Concept, Termlike {
     /**
      * used for setting an explicit OperationConcept instance via java; activates it on initialization
      */
-    public CompoundConcept(@NotNull Compound term, @NotNull NAR n) {
+    @Deprecated public CompoundConcept(@NotNull Compound term, @NotNull NAR n) {
         this(term, (DefaultConceptBuilder) n.concepts.conceptBuilder(), n, ((DefaultConceptBuilder) n.concepts.conceptBuilder()).newBagMap(term.volume()));
     }
 
-    /**
-     * default construction by a NAR on conceptualization
-     */
-    CompoundConcept(@NotNull Compound term, @NotNull DefaultConceptBuilder b, @NotNull NAR nar, @NotNull Map sharedMap) {
-        this(term, b.newBag(sharedMap), b.newBag(sharedMap), nar);
+
+    @Deprecated CompoundConcept(@NotNull Compound term, @NotNull DefaultConceptBuilder b, @NotNull NAR nar, @NotNull Map sharedMap) {
+        this(term, b.newBag(sharedMap, plusBlend), b.newBag(sharedMap, maxBlend), nar);
     }
 
     @Override

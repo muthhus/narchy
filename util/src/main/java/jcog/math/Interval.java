@@ -142,7 +142,7 @@ public class Interval {
 	public static long intersectLength(long x1, long y1, long x2, long y2) {
 		long a = max(x1, x2);
 		long b = min(y1, y2);
-		return a > b ? -1 : b - a;
+		return a <= b ? b - a : -1;
 	}
 
 	@Nullable public static Interval intersect(long x1, long x2, long y1, long y2) {

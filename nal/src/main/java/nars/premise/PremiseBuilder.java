@@ -194,10 +194,6 @@ abstract public class PremiseBuilder {
     }
 
     @Nullable abstract protected Derivation newPremise(@NotNull Termed c, @NotNull Task task, @NotNull Term beliefTerm, @Nullable Task belief, float pri, float qua, @NotNull Consumer<DerivedTask> target, @NotNull NAR nar);
-//    {
-//        return new Premise(c, task, beliefTerm, belief, pri, qua);
-//    }
-
 
     @Nullable
     private static Compound unify(@NotNull Compound q, @NotNull Compound a, NAR nar) {

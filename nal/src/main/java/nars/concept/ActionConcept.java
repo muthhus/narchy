@@ -42,6 +42,8 @@ public class ActionConcept extends WiredConcept implements FloatFunction<Term>, 
     private final boolean updateOnBeliefChange = false;
 
 
+    @NotNull
+    @Deprecated protected final NAR nar;
 
     private Truth lastGoal, lastBelief;
 
@@ -185,6 +187,8 @@ public class ActionConcept extends WiredConcept implements FloatFunction<Term>, 
 
     public ActionConcept(@NotNull Compound term, @NotNull NAR n, @NotNull MotorFunction motor) {
         super(term, n);
+
+        this.nar = n;
 
         //assert (Op.isOperation(this));
 

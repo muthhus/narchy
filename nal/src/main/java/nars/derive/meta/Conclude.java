@@ -134,9 +134,7 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
                             truth = truth.negated();
                     }
 
-
-
-                    Budget budget = m.premise.budget(crr, truth, punc, m);
+                    Budget budget = m.budgeting.budget(m, crr, truth, punc);
                     if (budget != null) {
                         derive(m, crr, truth, budget, punc, ct.evidence); //continue to stage 2
                     }

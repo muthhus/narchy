@@ -20,7 +20,6 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.List;
 import java.util.function.Consumer;
 
 import static nars.time.Tense.ETERNAL;
@@ -32,20 +31,30 @@ public class MatrixPremiseBuilder extends PremiseBuilder {
 
     private static final Logger logger = LoggerFactory.getLogger(MatrixPremiseBuilder.class);
 
+    final DerivationBudgeting budgeting;
+    final Deriver deriver;
+
+
+    public MatrixPremiseBuilder(Deriver deriver, DerivationBudgeting budgeting) {
+        this.deriver = deriver;
+        this.budgeting = budgeting;
+    }
 
 
     @Override
     public @Nullable Derivation newPremise(@NotNull Termed c, @NotNull Task task, Term beliefTerm, Task belief, float pri, float qua, Consumer<DerivedTask> each, NAR nar) {
 
-        Premise p = new PreferSimpleAndConfidentPremise(c, task, beliefTerm, belief, pri, qua);
+        Premise p = new Premise(c, task, beliefTerm, belief, pri, qua);
+
         return new Derivation(nar, p, each,
+                budgeting,
                 Util.lerp(p.qua(), Param.UnificationMatchesMax, 1),
                 Param.UnificationStackMax
         );
     }
 
 
-    public int newPremiseMatrix(@NotNull Concept c, int tasklinks, MutableIntRange termlinks, @NotNull Deriver deriver, @NotNull Consumer<DerivedTask> target, @NotNull NAR nar) {
+    public int newPremiseMatrix(@NotNull Concept c, int tasklinks, MutableIntRange termlinks, @NotNull Consumer<DerivedTask> target, @NotNull NAR nar) {
 
         c.commit();
 
@@ -66,7 +75,7 @@ public class MatrixPremiseBuilder extends PremiseBuilder {
             termlinkBag.sample(termlinksSampled, termsBuffer::add);
 
             if (!termsBuffer.isEmpty())
-                return newPremiseMatrix(c, termlinks, target, deriver, tasksBuffer, termsBuffer, nar);
+                return newPremiseMatrix(c, termlinks, target, tasksBuffer, termsBuffer, nar);
         } else {
             if (Param.DEBUG_EXTRA)
                 logger.warn("{} has zero tasklinks", c);
@@ -78,19 +87,12 @@ public class MatrixPremiseBuilder extends PremiseBuilder {
     /**
      * derives matrix of: concept => (tasklink x termlink) => premises
      */
-    public int newPremiseMatrix(@NotNull Concept c, MutableIntRange termlinks, @NotNull Consumer<DerivedTask> target, @NotNull Deriver deriver, FasterList<BLink<Task>> taskLinks, FasterList<BLink<Term>> termLinks, @NotNull NAR nar) {
+    public int newPremiseMatrix(@NotNull Concept c, MutableIntRange termlinks, @NotNull Consumer<DerivedTask> target, FasterList<BLink<Task>> taskLinks, FasterList<BLink<Term>> termLinks, @NotNull NAR nar) {
 
         int count = 0;
 
         int numTaskLinks = taskLinks.size();
 
-
-        float priFactor;
-//        float busy = (float) nar.emotion.busyMassAvg.getMean() * nar.emotion.learning();
-//        if (busy == busy && busy > 1f)
-//            priFactor = 1f/busy;
-//        else
-        priFactor = 1f;
 
 
 
@@ -150,7 +152,7 @@ public class MatrixPremiseBuilder extends PremiseBuilder {
                 for (int j = 0; j < termsBufferSize && countPerTermlink < termlinksPerForThisTask; j++, jl++) {
 
 
-                    Derivation d = premise(c, task, taskLinkCopy, when, termLinks.get(jl % termsBufferSize).get(), now, nar, priFactor, -1f, target);
+                    Derivation d = premise(c, task, taskLinkCopy, when, termLinks.get(jl % termsBufferSize).get(), now, nar, 1f, -1f, target);
                     if (d != null) {
                         deriver.accept(d);
                         countPerTermlink++;

@@ -7,7 +7,6 @@ import jcog.random.XorShift128PlusRandom;
 import nars.NAR;
 import nars.concept.Concept;
 import nars.conceptualize.DefaultConceptBuilder;
-import nars.control.ConceptBagControl;
 import nars.control.DefaultConceptBagControl;
 import nars.derive.DefaultDeriver;
 import nars.derive.Deriver;
@@ -15,6 +14,7 @@ import nars.index.term.TermIndex;
 import nars.index.term.map.MapTermIndex;
 import nars.op.stm.STMTemporalLinkage;
 import nars.premise.MatrixPremiseBuilder;
+import nars.premise.PreferSimpleAndConfident;
 import nars.time.FrameTime;
 import nars.time.Time;
 import nars.util.exe.Executioner;
@@ -68,7 +68,7 @@ public class Default extends NAR {
         super(time, concepts, random, exe);
 
         core = //exe.concurrent() ?
-                new DefaultConceptBagControl.BufferedConceptBagControl(this, newDeriver(), newConceptBag(activeConcepts), newPremiseBuilder())
+                new DefaultConceptBagControl.BufferedConceptBagControl(this, newConceptBag(activeConcepts), newPremiseBuilder())
                 //:
                 //new DefaultConceptBagControl.DirectConceptBagControl(this, newDeriver(), newConceptBag(activeConcepts), newPremiseBuilder());
         ;
@@ -86,7 +86,11 @@ public class Default extends NAR {
     }
 
     public MatrixPremiseBuilder newPremiseBuilder() {
-        return new MatrixPremiseBuilder();
+        return new MatrixPremiseBuilder(newDeriver(), newDerivationBudgeting());
+    }
+
+    public PreferSimpleAndConfident newDerivationBudgeting() {
+        return new PreferSimpleAndConfident();
     }
 
     public Bag<Concept,PLink<Concept>> newConceptBag(int initialCapacity) {

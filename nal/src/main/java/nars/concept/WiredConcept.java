@@ -23,8 +23,6 @@ import org.jetbrains.annotations.NotNull;
  * */
 public abstract class WiredConcept extends TaskConcept implements PermanentConcept {
 
-    @NotNull
-    protected final NAR nar;
 
 
     public interface Prioritizable {
@@ -33,7 +31,6 @@ public abstract class WiredConcept extends TaskConcept implements PermanentConce
 
     public WiredConcept(@NotNull Compound term, @NotNull NAR n) {
         super(term, n);
-        this.nar = n;
         n.on(this);
     }
 
