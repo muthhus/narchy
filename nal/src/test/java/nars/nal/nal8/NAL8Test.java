@@ -175,6 +175,7 @@ public class NAL8Test extends AbstractNALTest {
     public void condition_goal_deductionWithVariableEliminationOpposite()  {
 
         test()
+                .log()
                 .input("goto({t003}). :|:")
                 .input("(goto(#1) &&+5 at(SELF,#1))!")
                 .mustDesire(2 * cycles, "at(SELF,{t003})", 1.0f, 0.81f, 5)
@@ -941,7 +942,7 @@ public class NAL8Test extends AbstractNALTest {
         test()
                 .goal("(R)")
                 .input("((--,a:b) ==>+0 (R)). :|:")
-                .mustDesire(cycles, "a:b", 0.0f, 0.74f, 1);
+                .mustDesire(cycles, "a:b", 0.0f, 0.81f, 0);
     }
 
     @Test public void testNegatedImplicationP() {
@@ -1195,8 +1196,9 @@ public class NAL8Test extends AbstractNALTest {
         test()
                 .inputAt(0, "((out) <=>-3 (happy)). :|:")
                 .inputAt(13, "(happy)!")
-                .mustDesire(cycles, "(out)", 1f, 0.04f, 17)
-                .mustNotOutput(cycles, "(out)", GOAL, 13, 3, 0);
+                //.mustDesire(cycles, "(out)", 1f, 0.04f, 17)
+                .mustDesire(cycles, "(out)", 1f, 0.81f, 3)
+                .mustNotOutput(cycles, "(out)", GOAL, 13, 0);
     }
     @Test public void testPredictiveEquivalenceTemporalTemporalNeg() {
         test()
@@ -1240,7 +1242,7 @@ public class NAL8Test extends AbstractNALTest {
         test()
                 .inputAt(3, "((a) &&+3 (b)). :|:")
                 .inputAt(13, "(a)! :|:")
-                .mustDesire(cycles, "(b)", 1f, 0.07f /*0.81f*/, 16)
+                .mustDesire(cycles, "(b)", 1f, 0.07f, 16)
                 .mustNotOutput(cycles, "(b)", GOAL, new long[] { 3L, 0L, 10L, ETERNAL } );
     }
 

@@ -23,6 +23,7 @@ import static nars.Op.VAR_PATTERN;
 import static nars.term.transform.substituteIfUnifies.substituteIfUnifiesAny;
 import static nars.term.transform.substituteIfUnifies.substituteIfUnifiesDep;
 import static nars.time.Tense.DTERNAL;
+import static nars.time.Tense.ETERNAL;
 
 
 /**
@@ -154,7 +155,21 @@ public class Derivation extends Unify {
 
         this.taskTruth = task.truth();
         this.taskPunct = task.punc();
-        this.beliefTruth = belief != null ? belief.truth() : null;
+
+        Truth beliefTruth;// = belief != null ? belief.truth() : null;
+
+        if (belief == null) {
+            beliefTruth = null;
+        } else {
+            long start = task.start();
+            if ((start==ETERNAL) || (belief.isEternal())) {
+                beliefTruth = belief.truth();
+            } else {
+                beliefTruth = belief.truth(start, nar.time.dur(), confMin); //project belief truth to task's time
+            }
+        }
+
+        this.beliefTruth = beliefTruth;
 
 
 //        //normalize to positive truth

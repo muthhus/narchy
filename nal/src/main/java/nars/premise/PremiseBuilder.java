@@ -143,15 +143,15 @@ abstract public class PremiseBuilder {
 
             }
 
-            if (belief!=null && task.isGoal() && !(task.isEternal() && belief.isEternal()) && !belief.contains(when)) {
-                //project it to the time
-                belief = ((ImmutableTask)belief).project(when, dur, nar.confMin.floatValue());
-            }
+//            if (belief!=null  && !(task.isEternal() && belief.isEternal()) && !belief.contains(when)) {
+//                //project it to the time
+//                belief = ((ImmutableTask)belief).project(when, dur, nar.confMin.floatValue());
+//            }
 
-            //prevent single eternal goal by projecting to now
-            if (belief == null && task.isGoal() && task.isEternal() && !task.contains(when)) {
-                task= ((ImmutableTask)task).project(when, dur, nar.confMin.floatValue());
-            }
+//            //prevent single eternal goal by projecting to now
+//            if (belief == null && task.isGoal() && task.isEternal() && !task.contains(when)) {
+//                task= ((ImmutableTask)task).project(when, dur, nar.confMin.floatValue());
+//            }
         }
 
 
@@ -176,7 +176,8 @@ abstract public class PremiseBuilder {
 
         //combine either the task or the tasklink. this makes tasks more competitive allowing the priority reduction to be applied to either the task (in belief table) or the tasklink's ordinary forgetting
         float taskPri =
-                taskLinkCopy.pri();
+                task.priSafe(0);
+                //taskLinkCopy.pri();
                 //aveAri(taskLinkCopy.pri(), task.priSafe(0));
 
         float pri =

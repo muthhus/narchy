@@ -18,14 +18,14 @@ import static nars.truth.TruthFunctions.*;
 
 public enum GoalFunction implements TruthOperator {
 
-    Strong() {
+    @AllowOverlap  Strong() {
         @Nullable
         @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, NAR m, float minConf) {
             return (T == null || B == null) ? null : desireStrongOriginal(T, B, minConf);
         }
     },
 
-    Weak() {
+    @AllowOverlap Weak() {
         @Nullable
         @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, NAR m, float minConf) {
             return (T == null || B == null) ? null : desireWeakOriginal(T, B, minConf);

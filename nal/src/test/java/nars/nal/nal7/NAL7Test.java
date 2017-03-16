@@ -425,7 +425,7 @@ public class NAL7Test extends AbstractNALTest {
         tester.mustBelieve(cycles * 2,
                 "(<$1 --> (/, open, _, door)> ==>+2 <$1 --> (/, enter, _, room)>)",
                 1.00f,
-                0.45f,
+                0.37f /* 0.45f */,
                 0
         );
 

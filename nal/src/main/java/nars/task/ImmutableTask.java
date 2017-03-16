@@ -272,7 +272,8 @@ public class ImmutableTask extends RawBudget implements Task {
         if (newConf < confMin)
             return null;
 
-        long range = newStart!=ETERNAL ? end() - start() : 0;
+        //long range = newStart!=ETERNAL ? end() - start() : 0;
+        long range = 0;
         ImmutableTask t = new ImmutableTask(term, punc, $.t(freq(), newConf), creation, newStart, newStart + range, stamp);
         t.budgetSafe(this);
         //t.meta
