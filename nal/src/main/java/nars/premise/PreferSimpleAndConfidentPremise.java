@@ -29,36 +29,38 @@ public class PreferSimpleAndConfidentPremise extends DefaultPremise {
     @Override
     protected float priFactor(Compound conclusion, @Nullable Truth truth, byte punc, Task task, Task belief) {
 
-        int parentComplexity;
-        int taskCompl = task.complexity();
-        int beliefCompl;
-        if (belief != null) // && parentBelief.complexity() > parentComplexity)
-        {
-            beliefCompl = belief.complexity();
-            parentComplexity =
-                    Math.max(taskCompl, beliefCompl);
-        } else {
-            beliefCompl = 0;
-            parentComplexity = taskCompl;
-        }
+        return 1f;
 
-        int derivedComplexity = conclusion.complexity();
-
-        //controls complexity decay rate
-        int penaltyComplexity;
-        if (truth != null) {
-            penaltyComplexity = 1;
-        } else {
-            //for questions, penalize more by including the parentComplexity in the denominator
-            penaltyComplexity =
-                    //parentComplexity;
-                    taskCompl + beliefCompl;
-        }
-        return
-                //Util.sqr( //sharpen
-                    Util.unitize( ((float) parentComplexity) / (penaltyComplexity + derivedComplexity))
-                //)
-            ;
+//        int parentComplexity;
+//        int taskCompl = task.complexity();
+//        int beliefCompl;
+//        if (belief != null) // && parentBelief.complexity() > parentComplexity)
+//        {
+//            beliefCompl = belief.complexity();
+//            parentComplexity =
+//                    Math.max(taskCompl, beliefCompl);
+//        } else {
+//            beliefCompl = 0;
+//            parentComplexity = taskCompl;
+//        }
+//
+//        int derivedComplexity = conclusion.complexity();
+//
+//        //controls complexity decay rate
+//        int penaltyComplexity;
+//        if (truth != null) {
+//            penaltyComplexity = 1;
+//        } else {
+//            //for questions, penalize more by including the parentComplexity in the denominator
+//            penaltyComplexity =
+//                    //parentComplexity;
+//                    taskCompl + beliefCompl;
+//        }
+//        return
+//                //Util.sqr( //sharpen
+//                    Util.unitize( ((float) parentComplexity) / (penaltyComplexity + derivedComplexity))
+//                //)
+//            ;
     }
 
     @Override

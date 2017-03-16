@@ -104,7 +104,7 @@ abstract public class PremiseBuilder {
 
             Concept beliefConcept = nar.concept(beliefTerm);
 
-            if (beliefConcept instanceof TaskConcept) {
+            if (unifiedTerm!=null && beliefConcept instanceof TaskConcept) {
 
                 if (task.isQuestOrQuestion()) {
 
@@ -235,7 +235,7 @@ abstract public class PremiseBuilder {
             return null; //no chance
 
         if (q.equals(a))
-            return null;
+            return q;
 
         if ((q.vars() > 0)/* || (q.varPattern() != 0)*/) {
 
@@ -254,11 +254,10 @@ abstract public class PremiseBuilder {
             }
         }
 
-        return null;
-//        if (Terms.equal(q, a, false, true /* no need to unneg, task content is already non-negated */))
-//            return q;
-//        else
-//            return null;
+        if (Terms.equal(q, a, false, true /* no need to unneg, task content is already non-negated */))
+            return q;
+        else
+            return null;
     }
 
 }

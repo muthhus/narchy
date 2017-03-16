@@ -231,7 +231,7 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
 
 
 
-    default Task answer(long when, long now, float dur, @NotNull Task question, Compound template, NAR nar) {
+    default Task answer(long when, long now, float dur, @NotNull Task question, @Deprecated Compound template, NAR nar) {
 
         Budget qBudget = question.budget();
 
