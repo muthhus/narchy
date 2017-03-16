@@ -89,7 +89,7 @@ public class Default extends NAR {
         return new MatrixPremiseBuilder();
     }
 
-    protected Bag<Concept,PLink<Concept>> newConceptBag(int initialCapacity) {
+    public Bag<Concept,PLink<Concept>> newConceptBag(int initialCapacity) {
 
         return new PLinkHijackBag(initialCapacity, 4, random);
 //                new CurveBag<Concept>(activeConcepts, ((DefaultConceptBuilder) concepts.conceptBuilder()).defaultCurveSampler, ConceptBagControl.CONCEPT_BAG_BLEND,

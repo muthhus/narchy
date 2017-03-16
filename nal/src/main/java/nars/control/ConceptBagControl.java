@@ -140,8 +140,8 @@ public abstract class ConceptBagControl implements Control, Consumer<DerivedTask
 
         @Override
         public void accept(NAR nar) {
-            active.sample(batchSize, C -> {
-                premiser.newPremiseMatrix(C.get(), nar,
+            active.sample(batchSize, c -> {
+                premiser.newPremiseMatrix(c.get(), nar,
                         _tasklinks, _termlinks,
                         ConceptBagControl.this, //input them within the current thread here
                         deriver
@@ -149,6 +149,7 @@ public abstract class ConceptBagControl implements Control, Consumer<DerivedTask
                 return true;
             });
         }
+
     }
 
 //    static final class BudgetSavings extends RawBudget {
