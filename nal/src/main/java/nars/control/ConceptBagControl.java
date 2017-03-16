@@ -54,6 +54,9 @@ public abstract class ConceptBagControl implements Control, Consumer<DerivedTask
 
     /** distinct from the NAR's */
     public final FloatParam activationRate = new FloatParam(1f);
+
+    public final AtomicBoolean clear = new AtomicBoolean(false);
+
     protected float currentActivationRate = 1f;
 
     final AtomicBoolean busy = new AtomicBoolean(false);
@@ -70,8 +73,14 @@ public abstract class ConceptBagControl implements Control, Consumer<DerivedTask
         this.active = conceptBag;
 
         nar.onCycle(()->{
+
             if (!busy.compareAndSet(false, true))
                 return;
+
+            //while clear is enabled, keep active clear
+            if (clear.get()) {
+                active.clear();
+            }
 
             active.commit();
             currentActivationRate = activationRate.floatValue();

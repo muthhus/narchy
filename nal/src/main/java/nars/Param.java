@@ -90,8 +90,8 @@ public abstract class Param  {
     public static final boolean DERIVER_PERMUTE_SWAPPED = true;
 
 
-    /** conjunctions over this length will be ineligible for 2nd-layer termlink templates. it can be decomposed however, and decompositions of this size or less will be eligible. */
-    public static final int MAX_CONJ_SIZE_FOR_LAYER2_TEMPLATES = 3;
+    ///** conjunctions over this length will be ineligible for 2nd-layer termlink templates. it can be decomposed however, and decompositions of this size or less will be eligible. */
+    //public static final int MAX_CONJ_SIZE_FOR_LAYER2_TEMPLATES = 3;
 
     ///* adjuts this between 0 and 1. 0=fully backward, 0.5=balanced, 1=fully forward */
     //public static final float ACTIVATION_TERMLINK_BALANCE = 0.5f;

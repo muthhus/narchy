@@ -19,14 +19,14 @@ abstract public class Solve extends AtomicBoolCondition {
     public final Conclude conclude;
 
     public final TruthOperator belief;
-    public final TruthOperator desire;
+    public final TruthOperator goal;
 
-    public Solve(String id, Conclude conclude, TruthOperator belief, TruthOperator desire) {
+    public Solve(String id, Conclude conclude, TruthOperator belief, TruthOperator goal) {
         super();
         this.id = id;
         this.conclude = conclude;
         this.belief = belief;
-        this.desire = desire;
+        this.goal = goal;
     }
 
     @NotNull
@@ -43,7 +43,7 @@ abstract public class Solve extends AtomicBoolCondition {
         switch (punct) {
             case BELIEF:
             case GOAL:
-                TruthOperator f = (punct == BELIEF) ? belief : desire;
+                TruthOperator f = (punct == BELIEF) ? belief : goal;
                 if (f == null)
                     return false; //there isnt a truth function for this punctuation
 

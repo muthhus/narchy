@@ -19,6 +19,9 @@
         X, (&&,(--,%X),A..+), time(decomposeBelief), task("?@") |- (&&,A..+), ()
      B, (A==>B), time(decomposeBelief), task("?@") |- A, ()
 
+     //quest to 'how' question
+     B, X, neq(B,X), task("@") |- (B ==> X), (Punctuation:Question)
+
 
      (&&,X,A..+), X, time(decomposeTaskSubset), task("?@") |- (&&,A..+), ()
         (&&,(--,%X),A..+), X, time(decomposeTaskSubset), task("?@") |- (&&,A..+), ()

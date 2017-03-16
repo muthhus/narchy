@@ -15,7 +15,7 @@ import static nars.Op.BELIEF;
  */
 public class Line1DSimplest extends NAgent {
 
-    public static final float resolution = 0.05f;
+    public static final float resolution = 0.01f;
     public final SensorConcept in;
 
     /** the target value */

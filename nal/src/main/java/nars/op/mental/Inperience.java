@@ -196,7 +196,7 @@ public class Inperience extends Leak<Task, BLink<Task>> {
                         r,
                         BELIEF,
                         $.t(1, nar.confidenceDefault(BELIEF)),
-                        now, now, now,
+                        now, task.start(), task.end(),
                         task.stamp()
                 );
                 e.log("Inperience");
@@ -307,63 +307,63 @@ public class Inperience extends Leak<Task, BLink<Task>> {
 //    }
 
 
-    private void internalizeImplication(@NotNull Task task, @NotNull Task belief, @NotNull Premise nal) {
-        Compound taskTerm = task.term();
-        Compound beliefTerm = belief.term();
+//    private void internalizeImplication(@NotNull Task task, @NotNull Task belief, @NotNull Premise nal) {
+//        Compound taskTerm = task.term();
+//        Compound beliefTerm = belief.term();
+//
+//        if (beliefTerm.temporal() && beliefTerm.dt() > 0) {
+//            //1. check if its (&/,term,+i1,...,+in) =/> anticipateTerm form:
+//            boolean valid = true;
+//            Term impsub = beliefTerm.term(0);
+//            if (impsub.op() == Op.CONJ) {
+//                Compound conj = (Compound) impsub;
+//                if (!conj.term(0).equals(taskTerm)) {
+//                    valid = false; //the expected needed term is not included
+//                }
+//            } else {
+//                if (!impsub.equals(taskTerm)) {
+//                    valid = false;
+//                }
+//            }
+//
+//            //TODO use interval?
+//
+//
+//            if (valid) {
+//                Compound c = $.func(anticipate, beliefTerm.term(1));
+//                //if (c!=null) {
+//                //long interval = (impsub instanceof Interval ? ((Interval)impsub).duration() : 0);
+//                //int interval = 0;
+//
+//                input(task, belief,
+//                        c,
+//                        0);
+//                //}
+//            }
+//        }
+//    }
 
-        if (beliefTerm.temporal() && beliefTerm.dt() > 0) {
-            //1. check if its (&/,term,+i1,...,+in) =/> anticipateTerm form:
-            boolean valid = true;
-            Term impsub = beliefTerm.term(0);
-            if (impsub.op() == Op.CONJ) {
-                Compound conj = (Compound) impsub;
-                if (!conj.term(0).equals(taskTerm)) {
-                    valid = false; //the expected needed term is not included
-                }
-            } else {
-                if (!impsub.equals(taskTerm)) {
-                    valid = false;
-                }
-            }
-
-            //TODO use interval?
-
-
-            if (valid) {
-                Compound c = $.func(anticipate, beliefTerm.term(1));
-                //if (c!=null) {
-                //long interval = (impsub instanceof Interval ? ((Interval)impsub).duration() : 0);
-                //int interval = 0;
-
-                input(task, belief,
-                        c,
-                        0);
-                //}
-            }
-        }
-    }
-
-    void nonInnate(@NotNull Task task, @NotNull Task belief, @NotNull Atomic op) {
-        //the Atomics which dont have a innate belief
-        //also get a chance to reveal its effects to the system this way
-
-        Compound c = $.func(op, $.p(belief.term()));
-        if (c != null)
-            input(task, belief, c, 0);
-    }
-
-    void input(@NotNull Task parent, Task belief, @NotNull Compound new_term, long delay) {
-
-        //TODO should this be a mew stamp or attached to parent.. originally it was a fresh new stamp from memory
-
-        long now = nar.time();
-        long when = now + delay;
-
-        nar.input(
-            new ImmutableTask(new_term, GOAL, $.t(1f, nar.confidenceDefault(GOAL)), now, when, when, new long[] { nar.time.nextStamp() })
-                .log("Inperience")
-        );
-    }
+//    void nonInnate(@NotNull Task task, @NotNull Task belief, @NotNull Atomic op) {
+//        //the Atomics which dont have a innate belief
+//        //also get a chance to reveal its effects to the system this way
+//
+//        Compound c = $.func(op, $.p(belief.term()));
+//        if (c != null)
+//            input(task, belief, c, 0);
+//    }
+//
+//    void input(@NotNull Task parent, Task belief, @NotNull Compound new_term, long delay) {
+//
+//        //TODO should this be a mew stamp or attached to parent.. originally it was a fresh new stamp from memory
+//
+//        long now = nar.time();
+//        long when = now + delay;
+//
+//        nar.input(
+//            new ImmutableTask(new_term, GOAL, $.t(1f, nar.confidenceDefault(GOAL)), now, when, when, new long[] { nar.time.nextStamp() })
+//                .log("Inperience")
+//        );
+//    }
 
 
 //

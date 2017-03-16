@@ -75,7 +75,7 @@ public class SpreadingActivation extends Activation implements ObjectFloatProced
             case IMGe:
             case IMGi:
             case PROD:
-                return 1;
+                return 2;
 
             case INH:
             case SIM:
@@ -86,15 +86,15 @@ public class SpreadingActivation extends Activation implements ObjectFloatProced
                 //return (host.vars() > 0) ? 3 : 2;
                 return 3;
             case CONJ:
-
-                int s = host.size();
-                if (s <= Param.MAX_CONJ_SIZE_FOR_LAYER2_TEMPLATES) {
-                    int vars = host.vars();
-                    return (vars > 0) ? 3 : 2;
-                } else {
-                    return 2;
-                    //return (vars > 0) ? 2 : 1; //prevent long conjunctions from creating excessive templates
-                }
+                return 3;
+//                int s = host.size();
+//                if (s <= Param.MAX_CONJ_SIZE_FOR_LAYER2_TEMPLATES) {
+//                    int vars = host.vars();
+//                    return (vars > 0) ? 3 : 2;
+//                } else {
+//                    return 2;
+//                    //return (vars > 0) ? 2 : 1; //prevent long conjunctions from creating excessive templates
+//                }
 
             default:
                 throw new UnsupportedOperationException("unhandled operator type: " + host.op());

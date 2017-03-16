@@ -188,7 +188,8 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
                 break;
 
             if (x.equals(newBelief)) {
-                BudgetMerge.maxBlend.apply(x.budget(), newBelief.budget());
+                if (x!=newBelief)
+                    BudgetMerge.maxBlend.apply(x.budget(), newBelief.budget());
                 return newBelief; //duplicate, ignore it
             }
 

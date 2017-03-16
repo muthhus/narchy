@@ -430,10 +430,6 @@ public interface Concept extends Termed {
      */
     @Nullable ConceptState state(@NotNull ConceptState c, @NotNull NAR nar);
 
-    default void commit() {
-        tasklinks().commit();
-        termlinks().commit();
-    }
 
     default float beliefFreq(long time, float dur) {
         return beliefFreq(time, dur, Float.NaN);

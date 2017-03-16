@@ -44,17 +44,18 @@ public class PreferSimpleAndConfident implements DerivationBudgeting {
     public final FloatParam opFactor(Compound c) {
         switch (c.op()) {
 
-            case INH:
-            case SIM:
-                return structural;
-
             case IMPL:
             case CONJ:
             case EQUI:
                 return causal;
 
+            case INH:
+            case SIM:
             default:
-                return null;
+                return structural;
+
+
+
         }
     }
 
@@ -65,14 +66,7 @@ public class PreferSimpleAndConfident implements DerivationBudgeting {
         float q = d.premise.qua();
         final float quaMin = d.quaMin;
 
-        q *= puncFactor(punc).floatValue();
-        if (q < quaMin) return null;
 
-        FloatParam off = opFactor(conclusion);
-        if (off!=null) {
-            q *= off.floatValue();
-            if (q < quaMin) return null;
-        }
 
         if (truth!=null) { //belief and goal:
             q *= confidencePreservationFactor(truth, d);
@@ -82,7 +76,13 @@ public class PreferSimpleAndConfident implements DerivationBudgeting {
         q *= complexityFactor(conclusion, punc, d.task, d.belief);
         if (q < quaMin) return null;
 
-        return $.b( d.premise.pri(), q);
+        float p = d.premise.pri();
+        p *= puncFactor(punc).floatValue();
+
+        FloatParam off = opFactor(conclusion);
+        p *= off.floatValue();
+
+        return $.b(p, q);
     }
 
     /**

@@ -2,12 +2,14 @@ package nars.premise;
 
 import jcog.Util;
 import jcog.bag.Bag;
+import jcog.bag.impl.HijackBag;
 import jcog.data.MutableIntRange;
 import jcog.list.FasterList;
 import nars.$;
 import nars.NAR;
 import nars.Param;
 import nars.Task;
+import nars.bag.impl.ArrayBag;
 import nars.budget.BLink;
 import nars.budget.Budget;
 import nars.concept.Concept;
@@ -56,10 +58,11 @@ public class MatrixPremiseBuilder extends PremiseBuilder {
 
     public int newPremiseMatrix(@NotNull Concept c, int tasklinks, MutableIntRange termlinks, @NotNull Consumer<DerivedTask> target, @NotNull NAR nar) {
 
-        c.commit();
-
         @NotNull Bag<Task,BLink<Task>> tasklinkBag = c.tasklinks();
         @NotNull Bag<Term,BLink<Term>> termlinkBag = c.termlinks();
+
+        tasklinkBag.commit();
+        termlinkBag.commit();
 
         int tasklinksSampled = (int) Math.ceil(tasklinks);
 
@@ -83,6 +86,7 @@ public class MatrixPremiseBuilder extends PremiseBuilder {
 
         return 0;
     }
+
 
     /**
      * derives matrix of: concept => (tasklink x termlink) => premises
@@ -115,7 +119,7 @@ public class MatrixPremiseBuilder extends PremiseBuilder {
 
                 int countPerTermlink = 0;
 
-                int termlinksPerForThisTask = termlinks.lerp(taskLink.pri());
+                int termlinksPerForThisTask = termlinks.lerp(taskLink.qua());
 
                 //if (Param.PREMISE_LOG)
                 //logger.info("try: { concept:\"{}\",\ttask:\"{}\",\tbeliefTerm:\"{}\" }", c, task, beliefTerm);

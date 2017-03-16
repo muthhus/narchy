@@ -77,7 +77,7 @@ public interface NARBuilder {
         int maxConcepts = 192 * 1024;
 
         Default nar = new Default(3 * 1024,
-                1, 2, 3, rng,
+                1, 1, 4, rng,
 
                 //new HijackTermIndex(cb, 1024 * 256, reprobes)
                 //new NullTermIndex(cb)

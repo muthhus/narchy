@@ -36,11 +36,9 @@ public interface Bag<K,V> extends Table<K, V>, Iterable<V> {
 
         float targetMeanPri = 1f - temperature;
 
-        float r = p > 0 ?
-                ((m + p) - (s * targetMeanPri)) / m :
-                0;
+        float r = Util.unitize(((m + p) - (s * targetMeanPri)) / m );
 
-        return r >= (priEpsilon/s) ? f.valueOf(Util.unitize(r)) : null;
+        return r >= (priEpsilon/s) ? f.valueOf(r) : null;
     }
 
     /**

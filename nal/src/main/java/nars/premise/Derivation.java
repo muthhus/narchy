@@ -191,7 +191,7 @@ public class Derivation extends Unify {
         this.cyclic = task.cyclic(); //belief cyclic should not be considered because in single derivation its evidence will not be used any way
         //NOT: this.cyclic = task.cyclic() || (belief != null && belief.cyclic());
 
-        this.overlap = belief != null && Stamp.overlapping(task, belief);
+        this.overlap = belief != null ? Stamp.overlapping(task, belief) : cyclic;
 
         this.termSub0Struct = taskTerm.structure();
 
