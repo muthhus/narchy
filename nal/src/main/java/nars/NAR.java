@@ -279,7 +279,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
 
 
     public void setSelf(String self) {
-        setSelf((Atom)$.the(self));
+        setSelf((Atom) $.the(self));
     }
 
     public void setSelf(Atom self) {
@@ -630,48 +630,19 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
 
 
         boolean isCommand = input.isCommand();
-        if (isCommand || (input.isGoal() && input.expectation() >= Param.EXECUTION_THRESHOLD) &&
-                (input.isEternal() || (!input.isEternal() && (input.start() - time()) >= -time.dur()))) { //eternal, present (within duration radius), or future
+        long now = time();
+        float dur = time.dur();
+        if (isCommand || (input.isGoal() && (input.isEternal() || ((input.start() - now) >= -dur)))) { //eternal, present (within duration radius), or future
 
-//            if (!input.isEternal() && input.start() > time() + time.dur()) {
-//                //TODO schedule for run later
-//            }
 
-            Compound inputTerm = input.term();
-            if (inputTerm.hasAll(Operator.OPERATOR_BITS) && inputTerm.op() == INH) {
-                Term func = inputTerm.term(1);
-                if (func.op() == ATOM) {
-                    Term args = inputTerm.term(0);
-                    if (args.op() == PROD) {
-                        Concept funcConcept = concept(func);
-                        if (funcConcept != null) {
-                            Operator o = funcConcept.get(Operator.class);
-                            if (o != null) {
-                                Task result = o.run(input, this);
-
-                                if (isCommand) {
-                                    if (result != null && result != input)
-                                        return input(result); //recurse
-                                } else {
-                                    if (result != input) { //instance equality, not actual equality in case it wants to change this
-                                        if (result == null) {
-                                            return null; //finished
-                                        } else {
-                                            return input(result); //recurse until its stable
-                                        }
-                                    }
-                                }
-
-                            }
-                        }
-                    }
-                }
-            }
-
-            if (isCommand) {
-                eventTaskProcess.emit(input);
+            Task transformed = execute(input);
+            if (transformed == null)
                 return null;
-            }
+            else if (transformed != input)
+                return input(transformed);
+            //else: continue
+
+
         }
 
 
@@ -685,7 +656,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
             Concept c = input.concept(this);
             if (c instanceof TaskConcept) {
 
-                Activation a = ((TaskConcept)c).process(input, this);
+                Activation a = ((TaskConcept) c).process(input, this);
 
                 if (a != null) {
 
@@ -710,6 +681,81 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
         }
 
         return null;
+    }
+
+
+    private boolean executable(Task input) {
+        if (input.isCommand())
+            return true;
+
+        Concept c = input.concept(this);
+        float be;
+        if (c == null)
+            be = 0;
+        else {
+            Truth b = c.belief(time(), time.dur());
+            if (b == null)
+                be = 0;
+            else
+                be = b.expectation();
+        }
+
+        return input.expectation() - be >= Param.EXECUTION_THRESHOLD;
+    }
+
+    private @Nullable Task execute(Task input) {
+        boolean isCommand = input.isCommand();
+
+        Compound inputTerm = input.term();
+        if (inputTerm.hasAll(Operator.OPERATOR_BITS) && inputTerm.op() == INH) {
+            Term func = inputTerm.term(1);
+            if (func.op() == ATOM) {
+                Term args = inputTerm.term(0);
+                if (args.op() == PROD) {
+                    Concept funcConcept = concept(func);
+                    if (funcConcept != null) {
+                        Operator o = funcConcept.get(Operator.class);
+                        if (o != null) {
+
+
+                            if (isCommand) {
+                                Task result = o.run(input, this);
+                                if (result != null && result != input) {
+                                    //return input(result); //recurse
+                                    return result;
+                                }
+                            } else {
+
+                                if (!input.isEternal() && input.start() > time() + time.dur()) {
+                                    inputAt(input.start(), input); //schedule for execution later
+                                    return null;
+                                } else {
+                                    if (executable(input)) {
+                                        Task result = o.run(input, this);
+                                        if (result != input) { //instance equality, not actual equality in case it wants to change this
+                                            if (result == null) {
+                                                return null; //finished
+                                            } else {
+                                                //input(result); //recurse until its stable
+                                                return result;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+                        }
+                    }
+                }
+            }
+        }
+
+        if (isCommand) {
+            eventTaskProcess.emit(input);
+            return null;
+        }
+
+        return input;
     }
 
     /**
@@ -1197,6 +1243,9 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
         return this;
     }
 
+    /**
+     * TODO use a scheduling using r-tree
+     */
     public void inputAt(long when, @NotNull Task... x) {
         long now = time();
         if (when < now) {
@@ -1206,7 +1255,12 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
             //current cycle
             input(x);
         } else {
+
             //future
+            if (Param.DEBUG) {
+                for (Task t : x)
+                    ((ImmutableTask) t).log("Scheduled");
+            }
 
             onCycle(m -> {
                 //if (timeCondition.test(m.time())) {

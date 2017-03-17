@@ -238,17 +238,28 @@ public interface TimeFunctions {
             decomposeLate(derived, p, occReturn, false);
 
     static Compound decomposeLate(@NotNull Compound derived, @NotNull Derivation p, @NotNull long[] occReturn, boolean b) {
-        Compound x = decompose(derived, p, occReturn, b);
+        return lateIfGoal(p, occReturn, decompose(derived, p, occReturn, b));
+    }
+
+    static Compound lateIfGoal(@NotNull Derivation p, @NotNull long[] occReturn, Compound x) {
         if ((x!=null) && p.task.isGoal() && (occReturn[0]!=ETERNAL)) {
             long taskStart = p.task.start();
 
             //dont derive a past-tense goal (before the task)
-            if (taskStart!=ETERNAL && taskStart > occReturn[0]) {
-                if (occReturn[1] == ETERNAL) occReturn[1] = occReturn[0]; //HACK
-                long range = occReturn[1] - occReturn[0];
+            if (taskStart!=ETERNAL) {
 
-                occReturn[0] = taskStart;
-                occReturn[1] = taskStart + range;
+                long now = p.nar.time();
+                if (taskStart < now) {
+                    taskStart = now; //imminanentize the eschaton
+                }
+
+                if (taskStart > occReturn[0]) {
+                    if (occReturn[1] == ETERNAL) occReturn[1] = occReturn[0]; //HACK
+                    long range = occReturn[1] - occReturn[0];
+
+                    occReturn[0] = taskStart;
+                    occReturn[1] = taskStart + range;
+                }
             }
 
         }
@@ -281,7 +292,8 @@ public interface TimeFunctions {
         return null;
     };
 
-    /*** special case for decomposing conjunctions in the task slot */
+    /*** special case for decomposing conjunctions in the task slot.
+     *   has special case for decomposing goal conjunctions (earliest component only */
     @Nullable TimeFunctions decomposeTaskSubset = (@NotNull Compound derived, @NotNull Derivation p, @NotNull Conclude d, @NotNull long[] occReturn, float[] confScale) -> {
         Task task = p.task;
         Compound taskTerm = task.term();
@@ -303,11 +315,20 @@ public interface TimeFunctions {
 
             Term resolvedTaskTerm = resolve(p, taskTerm);
             int derivedInTask = resolvedTaskTerm.subtermTime(derived);
+
             if (derivedInTask!=DTERNAL) {
+
+                if (task.isGoal() && derivedInTask!=0) {
+                    //if this is the result of the structural decompose: only decompose the earliest component of a conjunction goal
+                        //TODO this could be tested sooner in the derivation, here it has already been nearly constructed just to fail
+                    //otherwise it is the conditional decompose
+                    if (d.goal.single())
+                        return null;
+                }
+
                 if (!task.isEternal()) {
                     occReturn[0] = task.start() + derivedInTask;
                     occReturn[1] = occReturn[0] + (derived.op()==CONJ ? derived.dtRange() : 0);
-                    return derived;
                 } else if (p.belief != null && !p.belief.isEternal()) {
                     int timeOfBeliefInTask = resolvedTaskTerm.subtermTime(resolve(p,p.beliefTerm));
                     if (timeOfBeliefInTask==DTERNAL)
@@ -315,7 +336,6 @@ public interface TimeFunctions {
                     long taskOcc = p.belief.start() - timeOfBeliefInTask;
                     occReturn[0] = taskOcc + derivedInTask;
                     occReturn[1] = occReturn[0] + (derived.op()==CONJ ? derived.dtRange() : 0);
-                    return derived;
                 } else {
                     //both eternal - no temporal basis
                     return null;
@@ -339,13 +359,11 @@ public interface TimeFunctions {
 
                 occReturn[1] = occReturn[0] + derived.dtRange();
 
-                return deriveDT(derived, +0, dt, occReturn);
+                derived = deriveDT(derived, +0, dt, occReturn);
             }
         }
 
-        //throw new UnsupportedOperationException();
-        //return derived;
-        return null;
+        return lateIfGoal(p, occReturn, derived);
     };
 
     @Nullable

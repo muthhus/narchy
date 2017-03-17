@@ -386,8 +386,8 @@ public class PremiseRule extends GenericCompound {
             throw new RuntimeException("unknown DesireFunction: " + p.goalTruth);
         }
 
-        Conclude der = new Conclude(rule, p.pattern,
-                /*anticipate,*/
+        Conclude der = new Conclude(rule, p,
+                belief, desire,
                 temporalizer);
 
         String beliefLabel = belief != null ? belief.toString() : "_";

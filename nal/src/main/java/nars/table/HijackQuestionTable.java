@@ -43,7 +43,7 @@ public class HijackQuestionTable extends TaskHijackBag implements QuestionTable 
     public @Nullable Task add(@NotNull Task t, @NotNull BeliefTable answers, @NotNull NAR n) {
 
         long now = n.time();
-        if (now != lastCommitTime) {
+        if (now != lastCommitTime && !isEmpty()) {
             commit();
             lastCommitTime = now;
         }

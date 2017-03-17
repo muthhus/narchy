@@ -1,11 +1,17 @@
 package nars.test.agent;
 
 import jcog.list.FasterList;
+import nars.$;
 import nars.NAR;
 import nars.Narsese;
 import nars.Param;
 import nars.nar.Default;
+import nars.op.Command;
+import nars.term.Term;
+import nars.term.atom.Atomic;
+import nars.term.var.Variable;
 import nars.time.Tense;
+import org.jetbrains.annotations.NotNull;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -313,5 +319,19 @@ public class Line1DSimplestTest {
 
     }
 
+    @Test public void testSequenceLearning() {
+        Param.DEBUG = true;
+
+        Default n = new Default(1024, 16, 1, 3);
+        n.on("say", (Command) (op, args, nar) -> {
+            if (!(args[0] instanceof Variable))
+                n.inputAt(Math.round(nar.time()+nar.time.dur()), "say(" +  args[0] + "). :|:");
+        });
+
+        n.log();
+        n.input("(say(a) &&+10 say(b))! :|:");
+
+        n.run(100);
+    }
 
 }

@@ -16,6 +16,7 @@ import nars.term.atom.AtomicStringConstant;
 import nars.term.util.InvalidTermException;
 import nars.time.TimeFunctions;
 import nars.truth.Truth;
+import nars.truth.func.TruthOperator;
 import nars.util.task.InvalidTaskException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -49,27 +50,31 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
     @NotNull
     public final Term conclusionPattern;
 
+    public final TruthOperator belief, goal;
+
 
     //private final ImmutableSet<Term> uniquePatternVar;
 
 
-    public Conclude(@NotNull PremiseRule rule, @NotNull Term term,
+    public Conclude(@NotNull PremiseRule rule, PostCondition p,
+                    TruthOperator belief, TruthOperator goal,
                     @NotNull TimeFunctions time) {
         super("Derive(" +
                 Joiner.on(',').join(
-                        term,
+                        p.pattern,
                         "time" + Integer.toHexString(time.hashCode()) //HACK todo until names are given to unique classes
                         //belief != null ? belief : "_",
                         //goal != null ? goal : "_",
                         //eternalize ? "Et" : "_") +
                 ) +
                 ')');
+
         this.rule = rule;
 
-//        this.belief = belief;
-//        this.goal = goal;
+        this.belief = belief;
+        this.goal = goal;
 
-        this.conclusionPattern = term;
+        this.conclusionPattern = p.pattern;
 
 
         //this.uniquePatternVar = Terms.unique(term, (Term x) -> x.op() == VAR_PATTERN);
