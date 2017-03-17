@@ -42,8 +42,11 @@ public class Tetris extends NAgentX {
     public static final int tetris_height = 12;
     public static final int TIME_PER_FALL = 1;
     public static final int PIXEL_RADIX = 2;
-    static final float DUR = 0.15f;
-    int frameTimeMS = 50;
+    static final float DUR = 0.1f;
+    public static final float FPS = 50f;
+
+    /** priority shared by all tetris field pixels */
+    private static float pixelTotalPri = 16f;
 
     private static SensorConcept[][] concept;
     //private int afterlife = TIME_PER_FALL * tetris_height * tetris_width;
@@ -261,6 +264,8 @@ public class Tetris extends NAgentX {
 
         concept = new SensorConcept[state.width][state.height];
 
+        float pixelPri = pixelTotalPri / (state.height * state.width);
+
         Atomic tetris = $.the("tetris");
         for (int y = 0; y < state.height; y++) {
             int yy = y;
@@ -272,13 +277,13 @@ public class Tetris extends NAgentX {
                         $.inh(
                                 //$.func(
                                 (tetris),
-                                    $.p(
+                                 /*   $.p(
                                             $.pRadix(x, PIXEL_RADIX, state.width),
-                                            $.pRadix(y, PIXEL_RADIX, state.height))
-                                /*$.p(
+                                            $.pRadix(y, PIXEL_RADIX, state.height))*/
+                                $.p(
                                         $.pRecurse($.radixArray(x, PIXEL_RADIX, state.width)),
                                         $.pRecurse($.radixArray(y, PIXEL_RADIX, state.height))
-                                )*/
+                                )
 
                                 //        x, y
 
@@ -305,6 +310,9 @@ public class Tetris extends NAgentX {
 //                s.pri( () -> defaultPri.asFloat() * 0.25f );
 
                 concept[x][y] = s;
+
+                s.pri(pixelPri);
+
                 sensors.add(s);
 
             }
@@ -424,19 +432,13 @@ public class Tetris extends NAgentX {
 //    }
 
 
-    long last = System.currentTimeMillis();
+
 
     @Override
     public float act() {
 
-        long now = System.currentTimeMillis();
-        if (now - last > frameTimeMS) {
-            state.next();
-            last = now;
-            return state.score;
-        } else {
-            return Float.NaN;
-        }
+        state.next();
+        return state.score;
 
     }
 
@@ -686,7 +688,7 @@ public class Tetris extends NAgentX {
 //            }
 
 
-        a.runRT(25f).join();
+        a.runRT(FPS).join();
 
 
 //        NARController meta = new NARController(nar, loop, t);

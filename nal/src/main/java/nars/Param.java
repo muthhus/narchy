@@ -179,7 +179,7 @@ public abstract class Param  {
 
     @NotNull
     @Range(min = 0, max = 1f)
-    public final FloatParam confMin = new FloatParam(0.01f);
+    public final FloatParam confMin = new FloatParam(0.01f, TRUTH_EPSILON, 1f);
 
     @NotNull
     @Range(min = 0, max = 1f)
@@ -189,7 +189,7 @@ public abstract class Param  {
     /**
      * budget quality threshold necessary to form a derived task.
      */
-    public final FloatParam quaMin = new FloatParam(Param.BUDGET_EPSILON*1f);
+    public final FloatParam quaMin = new FloatParam(Param.BUDGET_EPSILON, 0, 1f);
 
 
     public float confidenceDefault(byte punctuation) {

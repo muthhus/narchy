@@ -113,7 +113,7 @@ abstract public class NAgent implements NSense, NAction {
             }
         };
 
-        curiosity = new FloatParam(nar.confMin.floatValue() * 2);
+        curiosity = new FloatParam(nar.confMin.floatValue() * 1);
     }
 
     @NotNull
