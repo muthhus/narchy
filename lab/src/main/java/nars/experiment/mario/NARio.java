@@ -2,17 +2,19 @@ package nars.experiment.mario;
 
 import jcog.Util;
 import jcog.data.FloatParam;
-import nars.NAR;
-import nars.NAgentX;
-import nars.Narsese;
+import nars.*;
 import nars.concept.SensorConcept;
 import nars.experiment.mario.sprites.Mario;
+import nars.task.ImmutableTask;
+import nars.term.Compound;
 import nars.video.PixelBag;
 
 import javax.swing.*;
 
 import static nars.$.$;
 import static nars.$.t;
+import static nars.Op.IMPL;
+import static nars.time.Tense.ETERNAL;
 
 public class NARio extends NAgentX {
 
@@ -67,7 +69,7 @@ public class NARio extends NAgentX {
                 //cc.setXRelative( mario.)
             });
 
-            senseCamera("camF", cc, (v) -> t(v, alpha())).setResolution(0.02f);
+            senseCamera("nario", cc, (v) -> t(v, alpha())).setResolution(0.02f).pri(2f);
 
             //new CameraGasNet($.the("camF"), cc, this, 64);
 
@@ -132,7 +134,7 @@ public class NARio extends NAgentX {
 //        frame.addFocusListener(mario);
     }
 
-    int lastCoins = 0;
+    int lastCoins;
 
     public final FloatParam Depress = new FloatParam(0.1f, 0f, 1f);
     public final FloatParam MoveRight = new FloatParam(0.5f, 0f, 1f);
@@ -161,11 +163,31 @@ public class NARio extends NAgentX {
 
         NAR nar = runRT((NAR n) -> {
 
+            NAgentX x = new NARio(n);
+
             //n.termVolumeMax.setValue(60);
 
-            return new NARio(n);
+//            try {
+//                ImmutableTask r = (ImmutableTask) n.ask($.$("(?x ==> happy(nario))"), ETERNAL, (q, a) -> {
+//                    System.err.println(a);
+//                });
+//                n.onCycle((nn) -> {
+//                    r.budgetSafe(1f, 0.9f);
+//                    nn.input(r);
+//                });
 
-        }, 24, 3, -1);
+//                n.onTask(tt -> {
+//                   if (tt.isBelief() && tt.op() == IMPL)
+//                       System.err.println("\t" + tt);
+//                });
+
+//            } catch (Narsese.NarseseException e) {
+//                e.printStackTrace();
+//            }
+
+            return x;
+
+        }, 40, 2, -1);
 
 
 //        ArrayList<PLink<Concept>> x = Lists.newArrayList(nar.conceptsActive());

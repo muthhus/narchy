@@ -326,7 +326,7 @@ abstract public class NAgent implements NSense, NAction {
 
             ((FasterList) predictors).addAll(
 
-                    quest((Compound) (action.term()), now),
+                    quest((Compound) (action.term()), now)
 
                     //prediction($.impl(happiness, dur, action), BELIEF, $.t(0.5f, 0.01f), now, now)
                     //prediction($.seq(action, dur, happiness), BELIEF, $.t(0.5f, 0.01f), now, now)
@@ -346,8 +346,8 @@ abstract public class NAgent implements NSense, NAction {
 //                    question(impl(happiness, -dur, conj(varQuery(1),action)), now),
 //                    question(impl(neg(happiness), -dur, conj(varQuery(1),action)), now)
 
-                    question(impl(happiness, -dur, action), now),
-                    question(impl(neg(happiness), -dur, action), now)
+//                    question(impl(happiness, -dur, action), now),
+//                    question(impl(neg(happiness), -dur, action), now)
 
 //                    question(impl(action, dur, happiness), now),
 //                    question(impl(neg(action), dur, happiness), now),

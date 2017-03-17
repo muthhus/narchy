@@ -26,6 +26,7 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
     private final NAgent agent;
 
     private static final int radix = 4;
+    private final List<SensorConcept> pixels;
     float resolution = 0.01f;//Param.TRUTH_EPSILON;
 
     public CameraSensor(Atomic root, P src, NAgent agent, FloatToObjectFunction<Truth> brightnessToTruth) {
@@ -34,22 +35,29 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
         this.nar = agent.nar;
         this.agent = agent;
 
+        pixels = encode((x, y) ->
+                        $.func(root,
+                                //$.inh(
+                                //root,
+                                $.p(radix > 1 ?
+                                        new Term[]{coord(x, width), coord(y, height)} :
+                                        new Term[]{$.the(x), $.the(y)}
+                                ))
+                , brightnessToTruth);
+
+
         agent.sensors.addAll(
-                encode((x,y)->
-
-                                $.func(root,
-                                        //$.inh(
-                                        //root,
-                                        $.p(radix > 1 ?
-                                                new Term[] { coord(x, width), coord(y, height) } :
-                                                new Term[] { $.the(x), $.the(y) }
-                                        ))
-
-                        , brightnessToTruth));
+                pixels);
 
         agent.nar.onCycle(this);
     }
 
+    public void pri(float totalPri) {
+        float pixelPriority = totalPri / pixels.size();
+        pixels.forEach(p -> {
+            p.pri(pixelPriority);
+        });
+    }
 
     @NotNull
     public static Compound coord(int n, int max) {
@@ -82,6 +90,7 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
                         //distToResolution(cdist)
                         resolution
                 ));
+
                 matrix[x][y] = sss;
             }
         }

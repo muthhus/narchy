@@ -189,7 +189,7 @@ public interface NARBuilder {
         nar.DEFAULT_QUEST_PRIORITY = 1f * p;
 
         //nar.stmLinkage.capacity.set(0);
-        nar.core.conceptsFiredPerCycle.setValue(128);
+        nar.core.conceptsFiredPerCycle.setValue(64);
         nar.core.conceptsFiredPerBatch.setValue(4);
         nar.core.derivationsInputPerCycle.setValue(256);
 
