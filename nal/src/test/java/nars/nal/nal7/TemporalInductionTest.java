@@ -6,6 +6,7 @@ import nars.Narsese;
 import nars.concept.Concept;
 import nars.nar.Default;
 import nars.nar.Terminal;
+import nars.table.BeliefTable;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
@@ -52,15 +53,18 @@ public class TemporalInductionTest {
         Concept c = n.concept("a:b");
         //assertEquals("(b-->a). 5+0 %.50;.95%", c.getBeliefs().top(n.time()).toStringWithoutBudget());
 
+        BeliefTable b = c.beliefs();
+        assertEquals(2, b.size());
+
         //when originality is considered:
         //assertEquals("(b-->a). 5+0 %0.0;.90%", c.beliefs().top(n.time()).toStringWithoutBudget());
 
         //least relevant
         float dur = n.time.dur();
-        assertEquals("(b-->a). 0 %1.0;.90%", c.beliefs().match(0, dur).toStringWithoutBudget());
+        assertEquals("(b-->a). 0 %1.0;.90%", b.match(0, dur).toStringWithoutBudget());
 
         //most current relevant overall:
-        assertEquals("(b-->a). 5 %0.0;.90%", c.beliefs().match(n.time(), dur).toStringWithoutBudget());
+        assertEquals("(b-->a). 5 %0.0;.90%", b.match(n.time(), dur).toStringWithoutBudget());
     }
 
     @Test public void testTemporalRevisionOfTemporalRelation() {

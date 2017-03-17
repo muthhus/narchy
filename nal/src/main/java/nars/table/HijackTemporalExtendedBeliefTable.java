@@ -6,20 +6,21 @@ import nars.truth.Truth;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
+import java.util.Random;
 import java.util.TreeMap;
 
 /**
  * extends ListTemporalBeliefTable with additional read-only history which tasks, once removed from the
  * main (parent) belief table, may be allowed to populate.
  */
-abstract public class ListTemporalExtendedBeliefTable extends ListTemporalBeliefTable {
+abstract public class HijackTemporalExtendedBeliefTable extends HijackTemporalBeliefTable {
 
 
     final TreeMap<Long, Task> history;
     private final int historicCapacity;
 
-    public ListTemporalExtendedBeliefTable(int initialCapacity, int historicCapacity) {
-        super(initialCapacity);
+    public HijackTemporalExtendedBeliefTable(int initialCapacity, int historicCapacity, Random r) {
+        super(initialCapacity, r);
         this.historicCapacity = historicCapacity;
         this.history = new TreeMap<Long, Task>();
     }
@@ -87,7 +88,7 @@ abstract public class ListTemporalExtendedBeliefTable extends ListTemporalBelief
     }
 
     @Override
-    protected void onRemoved(Task x) {
+    public void onRemoved(Task x) {
         if (!save(x))
             return;
 

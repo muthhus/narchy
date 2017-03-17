@@ -7,6 +7,7 @@ import jcog.math.Interval;
 import nars.NAR;
 import nars.Param;
 import nars.Task;
+import nars.bag.impl.TaskHijackBag;
 import nars.budget.Budget;
 import nars.budget.BudgetMerge;
 import nars.concept.Concept;
@@ -23,6 +24,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Iterator;
+import java.util.Random;
 import java.util.function.Consumer;
 
 import static java.lang.Math.abs;
@@ -31,152 +33,150 @@ import static jcog.math.Interval.intersectLength;
 /**
  * stores the items unsorted; revection manages their ranking and removal
  */
-public class ListTemporalBeliefTable extends MultiRWFasterList<Task> implements TemporalBeliefTable {
+public class HijackTemporalBeliefTable extends TaskHijackBag implements TemporalBeliefTable {
 
-    private int capacity;
 
-    public ListTemporalBeliefTable(int initialCapacity) {
-        super(new FasterList<Task>(initialCapacity));
-        this.capacity = initialCapacity;
+
+    public HijackTemporalBeliefTable(int initialCapacity, Random random) {
+        super(4 /* reprobes */, BudgetMerge.maxBlend, random);
+        setCapacity(initialCapacity);
     }
 
-    /**
-     * warning: not efficient as forEach visiting
-     */
-    @NotNull
     @Override
-    public Iterator<Task> iterator() {
-        return toImmutable().iterator();
+    public void capacity(int c, NAR nar) {
+        setCapacity(c);
     }
 
-
-    public void capacity(int newCapacity, NAR nar) {
-
-        if (this.capacity != newCapacity) {
-
-            this.capacity = newCapacity;
-
-            //compress until under-capacity
-            ifSizeExceedsWriteWith(newCapacity, (l) -> {
-
-                int toRemove = l.size() - newCapacity; //will be positive
-
-                if (clean(l)) {
-                    toRemove = l.size() - newCapacity;
-                }
-
-                if (toRemove > 0) {
-
-                    Time time = nar.time;
-
-                    float dur = time.dur();
-                    long now = time.time();
-
-                    float confMin = nar.confMin.floatValue();
-
-                    Function<Task, Float> rank = temporalConfidence(now, now, dur);
-
-                    while (l.size() > capacity) {
-
-                        Task a = l.minBy(rank);
-
-                        Task b = matchMerge(l, now, a, dur);
-
-                        Task c = (b != null && b != a) ? merge(a, b, now, confMin, dur) : null;
-
-                        remove(l, a, true);
-
-                        if (c != null) {
-                            remove(l, b, true);
-
-                            l.add(c);
-                        }
-
-                    }
-
-                }
-
-            });
-
-        }
-
+    @Override
+    public float pri(@NotNull Task key) {
+        return super.pri(key) * (1f / (1f + Math.abs(key.mid() - lastCommitTime)));
     }
+
+    //    public void capacity(int newCapacity, NAR nar) {
+//
+//        if (this.capacity != newCapacity) {
+//
+//            this.capacity = newCapacity;
+//
+//            //compress until under-capacity
+//            ifSizeExceedsWriteWith(newCapacity, (l) -> {
+//
+//                int toRemove = l.size() - newCapacity; //will be positive
+//
+//                if (clean(l)) {
+//                    toRemove = l.size() - newCapacity;
+//                }
+//
+//                if (toRemove > 0) {
+//
+//                    Time time = nar.time;
+//
+//                    float dur = time.dur();
+//                    long now = time.time();
+//
+//                    float confMin = nar.confMin.floatValue();
+//
+//                    Function<Task, Float> rank = temporalConfidence(now, now, dur);
+//
+//                    while (l.size() > capacity) {
+//
+//                        Task a = l.minBy(rank);
+//
+//                        Task b = matchMerge(l, now, a, dur);
+//
+//                        Task c = (b != null && b != a) ? merge(a, b, now, confMin, dur) : null;
+//
+//                        remove(l, a, true);
+//
+//                        if (c != null) {
+//                            remove(l, b, true);
+//
+//                            l.add(c);
+//                        }
+//
+//                    }
+//
+//                }
+//
+//            });
+//
+//        }
+//
+//    }
 
 
     @Override
     public boolean removeTask(Task x) {
-        final boolean[] removed = new boolean[1];
-        x.delete();
-        withWriteLockAndDelegate(l -> {
-            removed[0] = l.remove(x);
-        });
-        return removed[0];
+        return remove(x)!=null;
     }
 
-    @Override
-    public final int capacity() {
-        return capacity;
-    }
 
 
     @Nullable
     @Override
     public final TruthDelta add(@NotNull Task input, EternalTable eternal, Concept concept, @NotNull NAR nar) {
 
-        int cap = capacity();
-        if (cap == 0)
+
+        Task x = add(input, nar);
+        if (x == null)
             return null;
+        else
+            return TruthDelta.zero; //HACK TODO calculate
 
-
-
-        //the result of compression is processed separately
-        final TruthDelta[] delta = new TruthDelta[1];
-
-
-        withWriteLockAndDelegate(l -> {
-
-            //1. check for duplicate, merge budget. exit
-            int size = l.size();
-            for (int i = 0; i < size; i++) {
-                Task x = l.get(i);
-                if (x == input)
-                    return; //same instance
-
-                if (x.equals(input)) {
-                    BudgetMerge.maxBlend.apply(x.budget(), input.budget(), 1f);
-                    return;
-                }
-            }
-
-            final Truth before;
-
-            Time time = nar.time;
-            long now = time.time();
-            float dur = time.dur();
-
-            before = truth(now, dur, eternal, l);
-
-            Task next;
-
-            float confMin = nar.confMin.floatValue();
-            if ((next = compress(input, now, l, dur, confMin)) != null) {
-
-                l.add(input);
-                //this will be inserted to the index in a callee method
-
-                if (next != input /*&& list.size() + 1 <= cap*/) {
-                    l.add(next);
-                }
-
-                final Truth after = truth(now, dur, eternal, l);
-                delta[0] = new TruthDelta(before, after);
-
-                if (Param.SIBLING_TEMPORAL_TASK_FEEDBACK)
-                    feedback(l, input);
-            }
-        });
-
-        return delta[0];
+//        int cap = capacity();
+//        if (cap == 0)
+//            return null;
+//
+//
+//
+//        //the result of compression is processed separately
+//        final TruthDelta[] delta = new TruthDelta[1];
+//
+//
+//        withWriteLockAndDelegate(l -> {
+//
+//            //1. check for duplicate, merge budget. exit
+//            int size = l.size();
+//            for (int i = 0; i < size; i++) {
+//                Task x = l.get(i);
+//                if (x == input)
+//                    return; //same instance
+//
+//                if (x.equals(input)) {
+//                    BudgetMerge.maxBlend.apply(x.budget(), input.budget(), 1f);
+//                    return;
+//                }
+//            }
+//
+//            final Truth before;
+//
+//            Time time = nar.time;
+//            long now = time.time();
+//            float dur = time.dur();
+//
+//            before = truth(now, dur, eternal, l);
+//
+//            Task next;
+//
+//            float confMin = nar.confMin.floatValue();
+//            if ((next = compress(input, now, l, dur, confMin)) != null) {
+//
+//                l.add(input);
+//                //this will be inserted to the index in a callee method
+//
+//                if (next != input /*&& list.size() + 1 <= cap*/) {
+//                    l.add(next);
+//                }
+//
+//                final Truth after = truth(now, dur, eternal, l);
+//                delta[0] = new TruthDelta(before, after);
+//
+//                if (Param.SIBLING_TEMPORAL_TASK_FEEDBACK)
+//                    feedback(l, input);
+//            }
+//        });
+//
+//        return delta[0];
     }
 
     /**
@@ -260,31 +260,13 @@ public class ListTemporalBeliefTable extends MultiRWFasterList<Task> implements 
 //        return 1f;
 //    }
 
-    @Override
-    public void clear() {
 
-        ifNotEmptyWriteWith(l -> {
-            l.forEach(Task::delete);
-            l.clear();
-            return null;
-        });
 
-    }
 
-    @Override
-    public Iterator<Task> taskIterator() {
-        return iterator();
-    }
-
-    @Override
-    public void forEachTask(Consumer<? super Task> x) {
-        forEach(x);
-    }
-
-    @Override
-    public final boolean isFull() {
-        return size() == capacity();
-    }
+//    @Override
+//    public final boolean isFull() {
+//        return size() == capacity();
+//    }
 
 
     //    private void invalidateDuration() {
@@ -516,41 +498,24 @@ public class ListTemporalBeliefTable extends MultiRWFasterList<Task> implements 
     @Nullable
     @Override
     public Task match(long when, long now, float dur, @Nullable Task against) {
-        return ifNotEmptyReadWith(l -> {
-            switch (l.size()) {
+        Top2<Task> s = new Top2<>(temporalConfidence(when, now, dur), this);
 
-//                case 0:
-//                    throw new RuntimeException("should not reach here");
-
-                case 1:
-                    return l.get(0); //special case avoid creating the lambda
-
-                default:
-                    //return l.maxBy(temporalConfidence(when, now, dur));
-
-                    Top2<Task> s = new Top2<>(temporalConfidence(when, now, dur), l);
-
-                    Task a = s.a;
-                    Task c = merge(a, s.b, now, a.conf(), dur);
-                    return c != null ? c : a;
-            }
-        });
+        Task a = s.a;
+        if (s.b == null)
+            return a;
+        Task c = merge(a, s.b, now, a.conf(), dur);
+        return c != null ? c : a;
     }
 
     @Nullable
     @Override
     public Truth truth(long when, long now, float dur, @Nullable EternalTable eternal) {
-
-        Truth r = ifNotEmptyReadWith(l -> {
-            return truth(when, dur, eternal, l);
-        });
-
-        return r;
+        return truth(when, dur, eternal, this);
         //return Truth.maxConf(r, topEternal);
         //return (r == null && topEternal != null) ? topEternal.truth() : r;
     }
 
-    @Nullable Truth truth(long when, float dur, @Nullable EternalTable eternal, MutableList<Task> l) {
+    @Nullable Truth truth(long when, float dur, @Nullable EternalTable eternal, Iterable<Task> l) {
         return TruthPolation.truth(eternal != null ? eternal.match() : null, when, dur, l);
     }
 

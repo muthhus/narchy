@@ -1,8 +1,8 @@
 package nars.concept;
 
 import nars.*;
-import nars.table.ListTemporalBeliefTable;
-import nars.table.ListTemporalExtendedBeliefTable;
+import nars.table.HijackTemporalBeliefTable;
+import nars.table.HijackTemporalExtendedBeliefTable;
 import nars.task.Revision;
 import nars.term.Compound;
 import nars.term.Term;
@@ -17,6 +17,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.Random;
 import java.util.function.Function;
 
 import static nars.$.$;
@@ -48,10 +49,10 @@ public class ActionConcept extends WiredConcept implements FloatFunction<Term>, 
     private Truth lastGoal, lastBelief;
 
 
-    protected class MyListTemporalBeliefTable extends ListTemporalExtendedBeliefTable {
+    protected class MyListTemporalBeliefTable extends HijackTemporalExtendedBeliefTable {
 
-        public MyListTemporalBeliefTable(int tCap, int historicCap) {
-            super(tCap, historicCap);
+        public MyListTemporalBeliefTable(int tCap, int historicCap, Random r) {
+            super(tCap, historicCap, r);
         }
 
         @Override
@@ -74,9 +75,9 @@ public class ActionConcept extends WiredConcept implements FloatFunction<Term>, 
         }
     }
     @Override
-    public ListTemporalBeliefTable newTemporalTable(int tCap) {
+    public HijackTemporalBeliefTable newTemporalTable(int tCap, NAR nar) {
         //TODO only for Beliefs; Goals can remain normal
-        return new MyListTemporalBeliefTable(tCap, tCap * 4);
+        return new MyListTemporalBeliefTable(tCap, tCap * 2, nar.random);
     }
 
     @Override

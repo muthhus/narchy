@@ -33,7 +33,6 @@ public interface TemporalBeliefTable extends TaskTable, Iterable<Task> {
 
     void capacity(int c, NAR nar);
 
-    boolean isFull();
 
     void clear();
 
@@ -87,10 +86,6 @@ public interface TemporalBeliefTable extends TaskTable, Iterable<Task> {
         @Override
         public void capacity(int c, NAR nar) { /* N/A */ }
 
-        @Override
-        public boolean isFull() {
-            throw new UnsupportedOperationException();
-        }
 
         @Override
         public void clear() {

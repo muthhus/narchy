@@ -50,7 +50,7 @@ public interface TaskTable  {
         taskIterator().forEachRemaining(x);
     }
 
-    default void forEach(int _maxPerConcept, @NotNull Consumer<Task> recip) {
+    default void forEach(int _maxPerConcept, @NotNull Consumer<? super Task> recip) {
         int s = size();
         final int[] maxPerConcept = {Math.min(s, _maxPerConcept)};
         forEachTask(t -> {

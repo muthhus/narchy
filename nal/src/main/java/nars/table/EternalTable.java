@@ -43,7 +43,7 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
         @Override
         public final int capacity() {
             //throw new UnsupportedOperationException();
-            return Integer.MAX_VALUE;
+            return 0;
         }
 
         @Override

@@ -5,15 +5,12 @@ import nars.NAR;
 import nars.Task;
 import nars.attention.Activation;
 import nars.budget.BudgetMerge;
-import nars.conceptualize.DefaultConceptBuilder;
 import nars.conceptualize.state.ConceptState;
 import nars.table.*;
 import nars.term.Compound;
 import nars.truth.TruthDelta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.Map;
 
 import static nars.Op.*;
 
@@ -106,8 +103,8 @@ public class TaskConcept extends CompoundConcept {
         return new DefaultBeliefTable( );
     }
 
-    public ListTemporalBeliefTable newTemporalTable(final int tCap) {
-        return new ListTemporalBeliefTable(tCap);
+    public HijackTemporalBeliefTable newTemporalTable(final int tCap, NAR nar) {
+        return new HijackTemporalBeliefTable(tCap, nar.random);
     }
 
     public EternalTable newEternalTable(int eCap) {

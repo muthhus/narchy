@@ -152,7 +152,7 @@ public class DefaultBeliefTable implements BeliefTable {
                     if (temporal == TemporalBeliefTable.EMPTY) { //HACK double boiler
                         int cap = concept.state().beliefCap(concept, input.isBelief(), false);
                         if (cap > 0)
-                            temporal = concept.newTemporalTable(cap); //allocate
+                            temporal = concept.newTemporalTable(cap, nar); //allocate
                         else
                             return null;
                     }

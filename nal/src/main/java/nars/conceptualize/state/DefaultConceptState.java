@@ -11,6 +11,9 @@ import org.jetbrains.annotations.NotNull;
  */
 public final class DefaultConceptState extends ConceptState {
 
+    /** fall-off rate for belief table capacity */
+    float beliefComplexityCapacity = 10;
+
     public final MutableInteger beliefsMaxEte, goalsMaxEte;
     public final MutableInteger questionsMax;
     @NotNull
@@ -49,17 +52,17 @@ public final class DefaultConceptState extends ConceptState {
 
     @Override
     public int beliefCap(CompoundConcept compoundConcept, boolean beliefOrGoal, boolean eternalOrTemporal) {
+        int max;
         if (beliefOrGoal) {
-            if (eternalOrTemporal)
-                return beliefsMaxEte.intValue();
-            else
-                return beliefsMaxTemp.intValue();
+            max = eternalOrTemporal ? beliefsMaxEte.intValue() : beliefsMaxTemp.intValue();
         } else {
-            if (eternalOrTemporal)
-                return goalsMaxEte.intValue();
-            else
-                return goalsMaxTemp.intValue();
+            max = eternalOrTemporal ? goalsMaxEte.intValue() : goalsMaxTemp.intValue();
         }
+        return tasks(compoundConcept, beliefComplexityCapacity, max);
+    }
+
+    static int tasks(CompoundConcept compoundConcept, float complexityCost, int b) {
+        return (int) Math.ceil(b * Math.min(1f, (1f / (compoundConcept.volume()/complexityCost))));
     }
 
     @Override

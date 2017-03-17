@@ -12,11 +12,9 @@ public final class Top2<T> {
     public T a = null, b = null;
     public float aa = Float.NEGATIVE_INFINITY, bb = Float.NEGATIVE_INFINITY;
 
-    public Top2(Function<T, Float> rank, List<T> from) {
-        int s = from.size();
-        assert (s > 1);
-        for (int i = 0; i < s; i++) {
-            T x = from.get(i);
+    public Top2(Function<T, Float> rank, Iterable<T> from) {
+
+        for (T x : from) {
             float xx = rank.apply(x);
             if (xx > aa) {
                 b = a;

@@ -5,8 +5,8 @@ import nars.$;
 import nars.NAR;
 import nars.Narsese;
 import nars.Task;
-import nars.table.ListTemporalBeliefTable;
-import nars.table.ListTemporalExtendedBeliefTable;
+import nars.table.HijackTemporalBeliefTable;
+import nars.table.HijackTemporalExtendedBeliefTable;
 import nars.table.SensorBeliefTable;
 import nars.term.Compound;
 import nars.term.Term;
@@ -21,6 +21,7 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Random;
 import java.util.function.Function;
 
 import static nars.Op.BELIEF;
@@ -58,9 +59,9 @@ public class SensorConcept extends WiredConcept implements FloatFunction<Term>, 
     }
 
     @Override
-    public ListTemporalBeliefTable newTemporalTable(int tCap) {
+    public HijackTemporalBeliefTable newTemporalTable(int tCap, NAR nar) {
         //TODO only for Beliefs; Goals can remain normal
-        return new MyListTemporalBeliefTable(tCap, tCap * historicCapMultiplier);
+        return new MyListTemporalBeliefTable(tCap, tCap * historicCapMultiplier, nar.random);
     }
 
     //    /** originating from this sensor, or a future prediction */
@@ -201,10 +202,10 @@ public class SensorConcept extends WiredConcept implements FloatFunction<Term>, 
     }
 
 
-    protected class MyListTemporalBeliefTable extends ListTemporalExtendedBeliefTable {
+    protected class MyListTemporalBeliefTable extends HijackTemporalExtendedBeliefTable {
 
-        public MyListTemporalBeliefTable(int tCap, int historicCap) {
-            super(tCap, historicCap);
+        public MyListTemporalBeliefTable(int tCap, int historicCap, Random random) {
+            super(tCap, historicCap, random);
         }
 
         @Override
