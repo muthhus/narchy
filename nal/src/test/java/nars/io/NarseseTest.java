@@ -283,7 +283,11 @@ public class NarseseTest {
         testOperationStructure(term("believe(a,b)"));
         testOperationStructure(term("believe(a, b)"));
     }
-
+    @Test
+    public void testImplIsNotOperation() throws Narsese.NarseseException {
+        assertEquals( "((b)==>a)", $.impl($("(b)"), $.the("a")).toString() );
+        assertEquals( "((b) ==>+1 a)", $.impl($("(b)"), 1, $.the("a")).toString() );
+    }
     @Test
     public void testOperationEquivalence() throws Narsese.NarseseException {
         Term a, b;

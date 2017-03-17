@@ -84,7 +84,7 @@ public class TaskHijackBag extends BudgetHijackBag<Task,Task> implements TaskTab
                 return t;
             } else if (inserted.equals(t)) {
                 //merged budget
-                return inserted;
+                return inserted.isInput() ? inserted : null; //ignore duplicate derivations
             }
         }
 

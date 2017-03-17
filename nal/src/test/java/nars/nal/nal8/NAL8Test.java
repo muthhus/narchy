@@ -17,6 +17,7 @@ import java.util.function.Supplier;
 
 import static nars.Op.BELIEF;
 import static nars.Op.GOAL;
+import static nars.Op.QUESTION;
 import static nars.time.Tense.ETERNAL;
 import static org.junit.Assert.assertEquals;
 
@@ -94,9 +95,9 @@ public class NAL8Test extends AbstractNALTest {
                 
                 .input("(open(t1) &&+5 opened(t1))! :|:")
                 .mustDesire(cycles, "open(t1)", 1.0f, 0.81f, 0) //only temporal
-                .mustDesire(cycles, "opened(t1)", 1.0f, 0.81f, 5) //only temporal
+                //.mustDesire(cycles, "opened(t1)", 1.0f, 0.81f, 5) //only temporal  // <-- the 2nd half should not be decomposed here
                 .mustNotOutput(cycles, "open(t1)", GOAL,  ETERNAL, 5) //no eternal
-                .mustNotOutput(cycles, "opened(t1)", GOAL,  ETERNAL, 0) //no eternal
+                .mustNotOutput(cycles, "opened(t1)", GOAL,  ETERNAL, 5) //no eternal
         ;
     }
 
@@ -1240,6 +1241,16 @@ public class NAL8Test extends AbstractNALTest {
                 .inputAt(13, "(a)! :|:")
                 .mustDesire(cycles, "(b)", 1f, 0.07f, 16)
                 .mustNotOutput(cycles, "(b)", GOAL, new long[] { 3L, 0L, 10L, ETERNAL } );
+    }
+
+    @Ignore @Test public void questImplDt() {
+        test()
+                .log()
+                .inputAt(0, "((a),(b)).") //to create termlinks
+                .inputAt(0, "(a). :|:")
+                .inputAt(4, "(b)@ :|:")
+                //TODO needs a 'mustAsk' condition
+                .mustOutput(0, cycles, "((b) ==>-4 (a))?", QUESTION, 0f, 1f, 0f, 1f, 4);
     }
 
 }

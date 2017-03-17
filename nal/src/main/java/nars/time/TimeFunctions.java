@@ -101,11 +101,11 @@ public interface TimeFunctions {
     static Compound dtDiff(@NotNull Compound derived, @NotNull Derivation p, @NotNull long[] occReturn, int polarity) {
 
         Compound taskTerm = (Compound) p.taskTerm.unneg();
-        Termed<Compound> beliefTerm = p.beliefTerm;
+        Term beliefTerm = p.beliefTerm;
 
         int dt;
         int ttd = taskTerm.dt();
-        int btd = beliefTerm.term().dt();
+        int btd = beliefTerm instanceof Compound ? ((Compound)beliefTerm).dt() : DTERNAL;
         if (ttd != DTERNAL && btd != DTERNAL) {
             switch (polarity) {
 

@@ -31,6 +31,7 @@ import java.util.function.Function;
 
 import static nars.IO.TaskSerialization.TermFirst;
 import static nars.Op.ATOM;
+import static nars.Op.INH;
 import static nars.Op.INT;
 import static nars.index.TermBuilder.isTrueOrFalse;
 import static nars.term.Terms.compoundOrNull;
@@ -589,7 +590,7 @@ public class IO {
                 Term subj = c.term(0);
 
                 //special case: functional form
-                if (subj.op() == Op.PROD) {
+                if (op == INH && subj.op() == Op.PROD) {
                     Term pred = c.term(1);
                     Op pOp = pred.op();
                     if (pOp == ATOM) {
